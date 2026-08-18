@@ -24,7 +24,18 @@ import 'reading_library_screen.dart';
 import 'reading_reader_screen.dart';
 
 class ReadingHomeScreen extends StatefulWidget {
-  const ReadingHomeScreen({super.key});
+  const ReadingHomeScreen({super.key, this.initialCollection});
+
+  /// Land on one collection instead of the whole library.
+  ///
+  /// ⚠️ THIS EXISTS BECAUSE A HUB DOOR WAS LANDING IN THE WRONG PLACE.
+  /// "Understand my recovery" (parenting_maternal) opened this screen with no
+  /// argument, so a mother asking about her own body got the default hero —
+  /// which is hardcoded to an article about her BABY's sleep regression.
+  ///
+  /// The screen was never wrong; the arrival was. A library is the right home
+  /// for this content and the wrong front door for one question inside it.
+  final String? initialCollection;
 
   @override
   State<ReadingHomeScreen> createState() => _ReadingHomeScreenState();
@@ -33,7 +44,7 @@ class ReadingHomeScreen extends StatefulWidget {
 class _ReadingHomeScreenState extends State<ReadingHomeScreen> {
   // Two-level Collections filter: level 1 = collection (topic), level 2 = type.
   // null = "All" at either level.
-  String? _collectionFilter;
+  late String? _collectionFilter = widget.initialCollection;
   ReadKind? _typeFilter;
 
   final TextEditingController _searchCtl = TextEditingController();

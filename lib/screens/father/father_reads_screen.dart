@@ -199,12 +199,15 @@ class FatherReadsScreen extends StatelessWidget {
             ),
           ]),
           const SizedBox(height: 12),
+          // The free read leads; buying is available and does not shout. These
+          // shipped the other way round — see the same fix and reasoning in
+          // read_next_screen.dart.
           Row(children: [
             _miniBtn(Icons.menu_book_rounded, _t('Read summary', 'सारांश पढ़ें').now,
-                filled: false, () => _openReader(context, r)),
+                filled: true, () => _openReader(context, r)),
             const SizedBox(width: 8),
             _miniBtn(Icons.shopping_bag_rounded, _t('Buy Book', 'किताब ख़रीदें').now,
-                filled: true, () => _openBuy(context, r)),
+                filled: false, () => _openBuy(context, r)),
           ]),
         ]),
       );

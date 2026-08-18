@@ -309,7 +309,7 @@ class _CohortFunnelScreenState extends State<CohortFunnelScreen> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
-              Text('+ 18% GST · or ParentVeda+ Pro',
+              Text('+ 18% GST',
                   style: ppBody(11, color: ppPurple, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
             ]),
           ),

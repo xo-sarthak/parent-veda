@@ -4032,7 +4032,7 @@ class S {
   String get uiClassesSelfPacedVideo => _p('6 classes · self-paced video + a monthly live Q&A', '6 क्लास · अपनी रफ़्तार से वीडियो + हर महीने एक लाइव सवाल-जवाब');
   String get uiClasses => _p('The 6 classes', 'छह क्लास');
   String get uiLeadsEveryLiveSession => _p('Leads every live session and the group.', 'हर लाइव सेशन और ग्रुप वही चलाती हैं।');
-  String get uiParentvedaMembersAnyCohort => _p(' for ParentVeda+ members on any cohort.', '— किसी भी कोहॉर्ट पर ParentVeda+ सदस्यों के लिए।');
+  String get uiParentvedaMembersAnyCohort => _p(' on any cohort.', '— किसी भी कोहॉर्ट पर।');
   String get uiJoinNextCohort => _p('Join the next cohort', 'अगले कोहॉर्ट में जुड़िए');
   String get uiCohortPrograms => _p('Cohort Programs', 'कोहॉर्ट प्रोग्राम');
   String get uiSmallGroupsRealCoach => _p('Small groups, a real coach, and mums due when you are.', 'छोटे समूह, एक असली कोच, और वे माँएँ जिनकी डिलीवरी आपके साथ है।');
@@ -4041,7 +4041,7 @@ class S {
   String get uiChildbirthEducator => _p(', childbirth educator', '— childbirth educator');
   String get uiMorePrograms => _p('More programs', 'और प्रोग्राम');
   String get uiLiveSessionsSmallPeer => _p('Live sessions · a small peer group · weekly homework · a private WhatsApp group.', 'लाइव सेशन · एक छोटा साथी-समूह · हर हफ़्ते अभ्यास · एक निजी WhatsApp ग्रुप।');
-  String get uiParentveda2 => _p(' for ParentVeda+.', '— ParentVeda+ के लिए।');
+  String get uiParentveda2 => _p('.', '।');
   String get uiTodayJul => _p('Today, 8 Jul', 'आज, 8 जुलाई');
   String get uiBedsideMannerRatedBy => _p('Bedside manner, rated by mothers.', 'माँओं ने बताया, वे कैसे पेश आते हैं।');
   String get uiPickSlotPrivateVideo => _p('Pick a slot → private video call → notes saved to your health record.', 'स्लॉट चुनिए → निजी वीडियो कॉल → नोट आपके हेल्थ रिकॉर्ड में सेव।');
@@ -4052,7 +4052,7 @@ class S {
   String get uiHindiEnglish => _p('Hindi / English', 'हिंदी / अंग्रेज़ी');
   String get uiCoursesCohorts => _p('Courses & Cohorts', 'कोर्स और कोहॉर्ट');
   String get uiSelfPacedCoursesSmall => _p('Self-paced courses, small live cohorts and one-evening masterclasses - all in one place. Search a topic, or browse everything below.', 'अपनी रफ़्तार वाले कोर्स, छोटे लाइव कोहॉर्ट और एक शाम की मास्टरक्लास — सब एक जगह। कोई विषय खोजिए, या नीचे सब देखिए।');
-  String get uiEveryProgramLedBy => _p('Every program is led by a verified expert. Free or included with ParentVeda+.', 'हर प्रोग्राम एक सत्यापित विशेषज्ञ चलाते हैं। मुफ़्त, या ParentVeda+ में शामिल।');
+  String get uiEveryProgramLedBy => _p('Every program is led by a verified expert.', 'हर प्रोग्राम एक सत्यापित विशेषज्ञ चलाते हैं।');
   String get uiNoProgramsMatch => _p('No programs match', 'कोई प्रोग्राम नहीं मिला');
   String get uiTryAnotherTopicClear => _p('Try another topic or clear your filters.', 'दूसरा विषय आज़माइए या फ़िल्टर हटाइए।');
   String get uiWatchSecIntro => _p('Watch the 90-sec intro', '90 सेकंड का परिचय देखिए');
@@ -4099,6 +4099,16 @@ class S {
   String get uiCoursesLiveCohortsExpert => _p('Courses, live cohorts, expert sessions, and gentle movement - chosen for exactly where you are.', 'कोर्स, लाइव कोहॉर्ट, विशेषज्ञ सेशन और सौम्य हलचल — ठीक वहीं के लिए चुने गए जहाँ आप हैं।');
   String get uiRecommendedWeeks => _p('RECOMMENDED AT 30 WEEKS', '30 हफ़्ते पर सुझाया गया');
   String get uiMostFree => _p('Most of this is free with ', 'इसमें से ज़्यादातर मुफ़्त है —');
+
+  /// ⚠️ REPLACES `uiMostFree` + a 'ParentVeda+' span.
+  ///
+  /// The old line was built as three spans so the membership name could be
+  /// purple: "Most of this is free with **ParentVeda+**." With no membership,
+  /// what is left is the true and simpler claim — most of the Prepare tab costs
+  /// nothing — and it needs one span, not three.
+  String get uiMostFreeRest =>
+      _p('Most of this is free. Anything paid is bought on its own.',
+          'इसमें से ज़्यादातर मुफ़्त है। जो paid है, वह अलग से लिया जाता है।');
   String get uiPrepare => _p('Prepare', 'तैयारी');
   String get uiVideoComingSoon => _p('Video coming soon', 'वीडियो जल्द आ रहा है');
   String get uiFullVideoLandsHere => _p('The full video lands here soon. We\'ll notify you when it\'s ready to watch.', 'पूरा वीडियो जल्द यहाँ आएगा। देखने लायक़ होते ही हम बता देंगे।');
@@ -4381,11 +4391,17 @@ class S {
   // ---- masterclasses list ---------------------------------------------------
   String get prepEyebrowLiveExpert => _p('Live with an expert', 'विशेषज्ञ के साथ लाइव');
   String get prepFreeOn => _p(' · free on ', ' · मुफ़्त — ');
+
+  /// What sits beside a price now that the membership does not exist. Says the
+  /// one thing she actually wants to know about a course price: that it is not
+  /// a subscription.
+  String get prepOneTimeNote =>
+      _p('  ·  one-time', '  ·  एक बार');
   String get prepFreeOnPlusShort =>
-      _p('free on ParentVeda+', 'ParentVeda+ पर मुफ़्त');
+      _p('one-time', 'एक बार');
   String get prepFooterMasterclasses => _p(
-      'Always live with an expert. The recording is yours forever. Free for ParentVeda+.',
-      'हमेशा विशेषज्ञ के साथ लाइव। रिकॉर्डिंग हमेशा के लिए आपकी। ParentVeda+ पर मुफ़्त।');
+      'Always live with an expert. The recording is yours forever.',
+      'हमेशा विशेषज्ञ के साथ लाइव। रिकॉर्डिंग हमेशा के लिए आपकी।');
   String prepWithCoach(String name) => _p('With $name', '$name के साथ');
   String prepWithCoaches(String a, String b) =>
       _p('With $a & $b', '$a और $b के साथ');
@@ -4477,8 +4493,8 @@ class S {
   String get prepWhatMothersSay => _p('What mothers say', 'माँएँ क्या कहती हैं');
   String get prepCommonQuestions => _p('Common questions', 'आम सवाल');
   String get prepFooterMasterclassDetail => _p(
-      'Led by a verified expert. Free with ParentVeda+.',
-      'एक सत्यापित विशेषज्ञ चलाती हैं। ParentVeda+ के साथ मुफ़्त।');
+      'Led by a verified expert.',
+      'एक सत्यापित विशेषज्ञ चलाती हैं।');
   String get prepReserved => _p('Reserved', 'जगह रुक गई');
   String get prepReserveYourSeat =>
       _p('Reserve your seat', 'अपनी सीट रोक लीजिए');
@@ -4560,7 +4576,7 @@ class S {
   String prepMinutesUnlocksLater(int n) => _p(
       '$n min · unlocks later, open anyway', '$n मिनट · बाद में खुलेगा, फिर भी खोलिए');
   String get prepIncluded => _p('Included', 'शामिल है');
-  String get prepOnParentVedaPlus => _p('on ParentVeda+', 'ParentVeda+ पर');
+  String get prepOnParentVedaPlus => _p('lifetime access', 'हमेशा के लिए access');
   String prepLedByVerifiedExpert(String note) => _p(
       'Led by a verified expert. $note.', 'एक सत्यापित विशेषज्ञ चलाती हैं। $note।');
 
@@ -4568,7 +4584,7 @@ class S {
   String get prepEyebrowMoveWithMonth =>
       _p('Move with your month', 'अपने महीने के साथ चलिए');
   String get prepFreeWithPlus =>
-      _p('Free with ParentVeda+', 'ParentVeda+ के साथ मुफ़्त');
+      _p('Lifetime access', 'हमेशा के लिए access');
   String get prepThisMonthForYou =>
       _p('This month for you', 'इस महीने आपके लिए');
   String prepMonthN(int m) => _p('Month $m', 'महीना $m');

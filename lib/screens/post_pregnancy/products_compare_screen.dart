@@ -16,10 +16,13 @@
 import 'package:flutter/material.dart';
 import 'pp_child_profile.dart';
 
+import '../../brand/brand_context.dart';
 import '../../brand/brand_models.dart';
+import '../../brand/brand_studio.dart';
 import '../../brand/needs_attention.dart';
 import '../../brand/presented_by.dart';
 import 'pp_common.dart';
+import 'pp_product_widgets.dart';
 import 'pp_products_data.dart';
 
 class ProductsCompareScreen extends StatelessWidget {
@@ -31,9 +34,13 @@ class ProductsCompareScreen extends StatelessWidget {
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
-  void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Opening the store soon'), behavior: SnackBarBehavior.floating),
-      );
+  // Kept for revert: the compare page's buy taps used to stop here with a
+  // "coming soon" snackbar instead of routing. They now go through ppLaunchBuy
+  // like every other buy control in the section - see _buyBtn.
+  //
+  // void _soon(BuildContext context) => ScaffoldMessenger.of(context).showSnackBar(
+  //       const SnackBar(content: Text('Opening the store soon'), behavior: SnackBarBehavior.floating),
+  //     );
 
   @override
   Widget build(BuildContext context) {
@@ -208,7 +215,14 @@ class ProductsCompareScreen extends StatelessWidget {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ppHair)),
           child: Row(children: [
-            const SizedBox(width: 54, child: PpStriped(height: 54, radius: 12)),
+            // Was: const SizedBox(width: 54, child: PpStriped(height: 54, radius: 12)).
+            PpProductImage(
+              url: p.imageUrl,
+              height: 54,
+              width: 54,
+              radius: 12,
+              icon: categoryByName(p.category).icon,
+            ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -387,7 +401,9 @@ class ProductsCompareScreen extends StatelessWidget {
       if (p.volumeLock != null) m['Volume lock'] = p.volumeLock! ? 'Yes' : 'No';
       if (p.power != null) m['Power'] = p.power!;
       m['Price'] = p.priceLabel;
-      m['Sold via'] = p.retailer;
+      // ⚠️ IMS ACT: the price is a fact she needs; naming the shop is a pointer
+      // to buy. Same rule as the detail page's spec sheet.
+      if (ppCanBuy(p)) m['Sold via'] = p.retailer;
     }
     m['Rating'] = '★ ${p.rating.toStringAsFixed(1)} · ${p.reviews} reviews';
     return m;
@@ -397,7 +413,8 @@ class ProductsCompareScreen extends StatelessWidget {
     if (p.pros.isNotEmpty) return p.pros;
     final l = <String>[];
     if (p.rating >= 4.6) l.add('Highly rated - ${p.ratingLabel} from ${p.reviews} reviews');
-    if (p.parentVeda) l.add('Made by ParentVeda');
+    // Was: 'Made by ParentVeda'. Kept for revert - see pp_products_data.dart.
+    if (p.parentVeda) l.add('Our own make, reviewed to the same standard as the rest');
     if (p.verified) l.add('ParentVeda-verified purchase reviews');
     if (p.bestseller) l.add('A bestseller in its category');
     if (l.isEmpty) l.add('${p.ratingLabel} from ${p.reviews} reviews');
@@ -471,7 +488,14 @@ class ProductsCompareScreen extends StatelessWidget {
                             padding: const EdgeInsets.all(12),
                             decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ppHair)),
                             child: Row(children: [
-                              const SizedBox(width: 48, child: PpStriped(height: 48, radius: 10)),
+                              // Was: const SizedBox(width: 48, child: PpStriped(height: 48, radius: 10)).
+                              PpProductImage(
+                                url: o.imageUrl,
+                                height: 48,
+                                width: 48,
+                                radius: 10,
+                                icon: categoryByName(o.category).icon,
+                              ),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -505,19 +529,62 @@ class ProductsCompareScreen extends StatelessWidget {
   /// FLAGGED: a sponsor on the most decision-shaping screen in the app. The
   /// table above is untouched — no spec, no rating, no ordering — and a brand
   /// can never sponsor a comparison it is one of the two products in.
+  ///
+  /// ⚠️ SPONSORSHIP CANNOT MOVE THE VERDICT, AND HERE IS WHY THAT IS STRUCTURAL
+  /// RATHER THAN A PROMISE. Read what actually feeds this screen:
+  ///
+  ///   · the two columns come from `PpCompareStore.selected` — the parent's own
+  ///     taps, in her order;
+  ///   · the spec rows come from each product's own `specs`;
+  ///   · "Parents rated" is its rating and review count;
+  ///   · "The ParentVeda take" is its own `pros` / `cons`;
+  ///   · the suggestion list and every ranked grid in the section sort on
+  ///     `rating` or `price` only.
+  ///
+  /// There is no brand input to any of them. A campaign reaches this screen
+  /// through exactly one widget, [PresentedBy], which renders a line of text and
+  /// returns nothing else. So the sponsor is additive by construction: to change
+  /// a verdict, somebody would have to pass a campaign INTO the ranking, and
+  /// there is no parameter to pass it through. `test/brand_rank_floor_test.dart`
+  /// holds the general rule for the surfaces that do interleave promos.
   Widget _compareSponsor(List<PpProduct> compared) {
-    final brands = compared.map((p) => p.brand.toLowerCase()).toSet();
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       PresentedBy(
         slot: BrandSlot.compareGuide,
         stage: BrandStage.parenting,
         // Hard rule: a brand cannot sponsor a comparison it is IN. A bogus key
         // resolves to nothing, so the line simply does not render.
-        placementKey: brands.contains('tinytoes') ? 'self_blocked' : null,
+        placementKey: _selfSponsored(compared) ? 'self_blocked' : null,
         padding: const EdgeInsets.only(top: 4),
       ),
       const NeedsAttentionFlag(flag: BrandFlag.compareSponsorship, padding: EdgeInsets.only(top: 8)),
     ]);
+  }
+
+  /// Would the live compare sponsor be one of the brands on screen?
+  ///
+  /// Was: `brands.contains('tinytoes')` — a single hardcoded brand name, which
+  /// is not a rule, it is one campaign that happened to exist when the line was
+  /// written. The second sponsor to sign would have walked straight past it, and
+  /// the failure is silent: a brand quietly "presenting" the comparison it wins.
+  ///
+  /// So ask the resolver instead of guessing. The probe is a read: `resolve` is
+  /// pure, only [PresentedBy] records an impression, so checking costs nothing
+  /// and cannot inflate anybody's analytics.
+  bool _selfSponsored(List<PpProduct> compared) {
+    try {
+      final live = BrandStudio.instance.resolve(
+        BrandSlot.compareGuide,
+        captureBrandContext(stage: BrandStage.parenting),
+      );
+      if (live == null) return false;
+      final brands = compared.map((p) => p.brand.toLowerCase()).toSet();
+      return brands.contains(live.brand.name.toLowerCase()) || brands.contains(live.brand.id.toLowerCase());
+    } catch (_) {
+      // A brand surface never breaks its host. Failing closed (treating it as a
+      // conflict) is the safe direction: no sponsor line beats a wrong one.
+      return true;
+    }
   }
 
   Widget _beforeYouCompare(PpProduct a) {
@@ -591,7 +658,16 @@ class ProductsCompareScreen extends StatelessWidget {
             ]),
             const SizedBox(height: 4),
           ],
-          const PpStriped(height: 76, radius: 12),
+          // THE COMPARE COLUMN'S SHOT. Was: const PpStriped(height: 76, radius: 12).
+          // Kept for revert. Two products side by side with no pictures is the
+          // one place the missing field hurt most: a comparison is partly a
+          // visual judgement, and both columns were the same grey hatch.
+          PpProductImage(
+            url: p.imageUrl,
+            height: 76,
+            radius: 12,
+            icon: categoryByName(p.category).icon,
+          ),
           const SizedBox(height: 10),
           Text(p.brand, style: ppBody(11, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
           const SizedBox(height: 2),
@@ -689,26 +765,51 @@ class ProductsCompareScreen extends StatelessWidget {
         ]),
       );
 
-  Widget _buyBtn(BuildContext context, PpProduct p, {required bool primary}) => GestureDetector(
-        onTap: () => _soon(context),
-        child: Container(
-          height: 56,
-          alignment: Alignment.center,
-          padding: const EdgeInsets.symmetric(horizontal: 6),
-          decoration: BoxDecoration(
-            color: primary ? ppPurple : Colors.white,
-            borderRadius: BorderRadius.circular(16),
-            border: primary ? null : Border.all(color: ppLine),
-          ),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            Text('Buy ${p.brand}',
-                style: ppBody(11.5, color: primary ? Colors.white.withValues(alpha: 0.85) : ppSoft, w: FontWeight.w600),
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis),
-            const SizedBox(height: 1),
-            Text(p.priceLabel,
-                style: ppBody(14, color: primary ? Colors.white : ppInk, w: FontWeight.w800), maxLines: 1, overflow: TextOverflow.ellipsis),
-          ]),
-        ),
+  Widget _buyBtn(BuildContext context, PpProduct p, {required bool primary}) {
+    // ⚠️ IMS ACT. The column keeps its specs, its rating, its "Parents loved" and
+    // its ParentVeda take; what it loses is this control. The cell is still
+    // occupied - an empty half at the bottom of a two-column comparison reads as
+    // a rendering fault - but it says why, and it is not tappable.
+    if (!ppCanBuy(p)) {
+      return Container(
+        height: 56,
+        alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(16)),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Text(kPpReviewOnlyLabel,
+              style: ppBody(11.5, color: ppInk, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
+          const SizedBox(height: 1),
+          Text(p.priceLabel, style: ppBody(13, color: ppSoft, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
+        ]),
       );
+    }
+    return GestureDetector(
+      // Was: () => _soon(context) — a "Opening the store soon" snackbar. That
+      // made the compare page the one buy surface a real affiliate link would
+      // NOT switch on, because the tap never reached the router. It now shares
+      // ppLaunchBuy with every other card, so filling `buyUrl` in the data is
+      // genuinely the last step.
+      onTap: () => ppLaunchBuy(context, p),
+      child: Container(
+        height: 56,
+        alignment: Alignment.center,
+        padding: const EdgeInsets.symmetric(horizontal: 6),
+        decoration: BoxDecoration(
+          color: primary ? ppPurple : Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: primary ? null : Border.all(color: ppLine),
+        ),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Text('Buy ${p.brand}',
+              style: ppBody(11.5, color: primary ? Colors.white.withValues(alpha: 0.85) : ppSoft, w: FontWeight.w600),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis),
+          const SizedBox(height: 1),
+          Text(p.priceLabel,
+              style: ppBody(14, color: primary ? Colors.white : ppInk, w: FontWeight.w800), maxLines: 1, overflow: TextOverflow.ellipsis),
+        ]),
+      ),
+    );
+  }
 }

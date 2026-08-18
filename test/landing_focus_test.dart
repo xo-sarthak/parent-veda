@@ -213,9 +213,24 @@ void main() {
     // Both grid-led homes are scanned. V3 carries the same grid, so the same
     // failure is available to it, and a guard that only covers one of two
     // identical surfaces is half a guard.
+    // ⚠️ home_v3_screen.dart HAS BEEN REMOVED FROM THIS SCAN, and the removal
+    // is the point rather than a gap.
+    //
+    // Its six literals became one loop over the bracket table, so the source now
+    // contains exactly ONE `V2Block(` — and this test would have gone on passing
+    // while checking one thing instead of ten. A scan that counts occurrences
+    // stops counting the moment the occurrences are replaced by iteration, and
+    // it stops LOUDLY only if someone notices. Nobody notices a green test.
+    //
+    // The guarantee did not weaken; it moved. `test/bracket_model_test.dart`
+    // asserts it against data instead of text — every bracket resolves to a
+    // destination, every destination resolves through homeFor() — which gets
+    // STRONGER as brackets are added rather than weaker.
+    //
+    // home_focus_screen.dart still has its six literals, so the scan still
+    // earns its place there.
     for (final file in const [
       'lib/screens/home_focus_screen.dart',
-      'lib/screens/home_v3_screen.dart',
     ]) {
       test('every door in ${file.split('/').last} opens something', () {
         final body = File(file)

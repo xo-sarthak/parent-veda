@@ -990,11 +990,19 @@ class DailyReadsHomeCard extends StatelessWidget {
     final s = S(lang);
     return Padding(
       padding: const EdgeInsets.only(left: 66, bottom: 12),
+      // WHICH ONE IS FILLED IS A POSITION, NOT A STYLE CHOICE.
+      //
+      // These two shipped the other way round: "Buy Book" filled, "Read
+      // summary" quiet — so on every row of a reading list, the purchase
+      // carried more weight than the free thing beside it. On a product whose
+      // stated position is "you always know the price before the pitch", that
+      // reads as the opposite of what we say. The free read leads; buying is
+      // available and does not shout. See docs/DESIGN-LAYER.md §6.
       child: Row(children: [
-        _miniBtn(Icons.menu_book_rounded, s.drReadSummary, filled: false,
+        _miniBtn(Icons.menu_book_rounded, s.drReadSummary, filled: true,
             () => _openItem(context, r, controller)),
         const SizedBox(width: 8),
-        _miniBtn(Icons.shopping_bag_rounded, s.drBuyBook, filled: true,
+        _miniBtn(Icons.shopping_bag_rounded, s.drBuyBook, filled: false,
             () => _openBuy(context, r)),
       ]),
     );

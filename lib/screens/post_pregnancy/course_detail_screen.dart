@@ -109,7 +109,7 @@ class CourseDetailScreen extends StatelessWidget {
               ),
             )),
             const SizedBox(height: 12),
-            _pad(Text('Free with ParentVeda+ · lifetime access.', textAlign: TextAlign.center, style: ppBody(12, color: ppMuted))),
+            _pad(Text('Lifetime access.', textAlign: TextAlign.center, style: ppBody(12, color: ppMuted))),
           ],
         ),
       ),

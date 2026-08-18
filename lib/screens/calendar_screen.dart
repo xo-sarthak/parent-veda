@@ -18,6 +18,7 @@ import '../services/pregnancy_controller.dart';
 import '../services/prepare_store.dart';
 import '../services/scans_store.dart';
 import '../services/tools_store.dart';
+import '../widgets/global_ask_fab.dart' show kAskFabReserve;
 import '../theme/app_theme.dart';
 import '../widgets/mic_dictation_button.dart';
 import '../widgets/trimester_progress_bar.dart';
@@ -125,7 +126,10 @@ class _CalendarScreenState extends State<CalendarScreen> {
             Expanded(
               child: ListView(
                 controller: _scrollCtrl,
-                padding: const EdgeInsets.fromLTRB(16, 4, 16, 110),
+                // See tools_hub_screen.dart for why this is the constant and
+                // not a hand-picked number: 110 left the last card under the
+                // Ask Veda FAB.
+                padding: const EdgeInsets.fromLTRB(16, 4, 16, kAskFabReserve),
                 children: [
                   // Task 1: order is Trimester Progress → Calendar → Filters →
                   // Details. Progress sits at the very top (above the tab bar).

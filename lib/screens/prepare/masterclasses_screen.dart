@@ -88,10 +88,13 @@ class MasterclassesScreen extends StatelessWidget {
                             TextSpan(
                                 text: featured.price,
                                 style: const TextStyle(color: kInk, fontWeight: FontWeight.w700)),
-                            TextSpan(text: s.prepFreeOn, style: const TextStyle(color: kMuted)),
-                            const TextSpan(
-                                text: 'ParentVeda+',
-                                style: TextStyle(color: kPurple, fontWeight: FontWeight.w700)),
+                            // Kept for revert — the plus membership does not
+                            // exist yet, so it cannot be half of a price:
+                            //   TextSpan(text: s.prepFreeOn, ...),
+                            //   TextSpan(text: 'ParentVeda+', ...),
+                            TextSpan(
+                                text: s.prepOneTimeNote,
+                                style: const TextStyle(color: kMuted)),
                           ]),
                           style: pvBody(kInk, 14),
                         ),

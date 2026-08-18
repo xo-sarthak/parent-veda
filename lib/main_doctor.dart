@@ -174,7 +174,7 @@ class _Booting extends StatelessWidget {
   const _Booting();
 
   @override
-  Widget build(BuildContext context) => const Scaffold(
+  Widget build(BuildContext context) => Scaffold(
         backgroundColor: AppTheme.scaffoldBackground,
         body: Center(
           child: SizedBox(

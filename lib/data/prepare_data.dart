@@ -718,8 +718,12 @@ class PrepProgram {
     required this.status,
     // const, not _t(): a default parameter value must be a constant
     // expression, and Dart has no const functions.
+    // ⚠️ WAS "free on ParentVeda+" — the plus membership does not exist, so
+    // it cannot be a price. Kept for revert:
+    //   const LocalizedText(en: 'free on ParentVeda+',
+    //                       hi: 'ParentVeda+ पर मुफ़्त'),
     this.priceNote = const LocalizedText(
-        en: 'free on ParentVeda+', hi: 'ParentVeda+ पर मुफ़्त'),
+        en: 'one-time · yours for good', hi: 'एक बार · हमेशा के लिए आपका'),
     this.isLiveScheduled = false,
     this.startLabel,
     this.sessionTimes = const [],
@@ -827,7 +831,9 @@ PrepCta ctaForPrep(PrepProgram p) {
         case PrepStatus.available:
         case PrepStatus.ongoing:
         case PrepStatus.completed:
-          return PrepCta(_t('Start watching', 'देखना शुरू करें'), watch: true, note: _t('Free with ParentVeda+ · lifetime access', 'ParentVeda+ के साथ मुफ़्त · हमेशा के लिए access'));
+          return PrepCta(_t('Start watching', 'देखना शुरू करें'), watch: true, // Kept for revert: _t('Free with ParentVeda+ · lifetime access',
+          //                    'ParentVeda+ के साथ मुफ़्त · हमेशा के लिए access')
+          note: _t('Lifetime access', 'हमेशा के लिए access'));
       }
   }
 }
@@ -1032,7 +1038,8 @@ PrepProgram _fromCohort(Cohort c) {
     topics: meta.topics,
     accent: meta.accent,
     price: c.price,
-    priceNote: _t('or ParentVeda+', 'या ParentVeda+'),
+    // Kept for revert: _t('or ParentVeda+', 'या ParentVeda+')
+    priceNote: _t('one-time', 'एक बार'),
     status: meta.status,
     startLabel: c.start ?? c.forWhen,
     seatsLeft: meta.seatsLeft,
@@ -1159,8 +1166,11 @@ class NutritionPlan {
     this.price = '₹1,499',
     // const, not _t(): a default parameter value must be a constant
     // expression, and Dart has no const functions.
+    // ⚠️ Same removal as above. Kept for revert:
+    //   const LocalizedText(en: 'free on ParentVeda+',
+    //                       hi: 'ParentVeda+ पर मुफ़्त'),
     this.priceNote = const LocalizedText(
-        en: 'free on ParentVeda+', hi: 'ParentVeda+ पर मुफ़्त'),
+        en: 'one-time · yours for good', hi: 'एक बार · हमेशा के लिए आपका'),
   });
 
   final String id;

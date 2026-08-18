@@ -1,0 +1,67 @@
+lib/data/prepare_data.dart	56324	56371		${m.facts[1].big.en} · ${m.facts[1].small.en}	${m.facts[1].big.hi} · ${m.facts[1].small.hi}
+lib/data/prepare_data.dart	56529	56580		${m.facts.first.big.en} ${m.facts.first.small.en}	${m.facts.first.big.hi} ${m.facts.first.small.hi}
+lib/localization/app_language.dart	27718	27751			Aaj kis baat ne aapko muskuraaya?
+lib/localization/app_language.dart	27765	27816			Abhi aap sabse zyada kis baat ke liye excited hain?
+lib/localization/app_language.dart	27830	27886			Aaj ke baare mein aap apne baby ko kya bataana chahengi?
+lib/localization/app_language.dart	27900	27940			Is hafte kis baat ne aapko hairaan kiya?
+lib/localization/app_language.dart	27954	27991			Apne baby ke liye ek message likhein.
+lib/localization/app_language.dart	28005	28047			Aaj aap kis baat ke liye shukrguzaar hain?
+lib/localization/app_language.dart	36087	36130			Aaj main aur mazboot mehsoos kar rahi hoon.
+lib/localization/app_language.dart	36144	36163			Aadha safar poora ❤
+lib/localization/app_language.dart	36177	36211			Baby khoobsurati se badh raha hai.
+lib/localization/app_language.dart	36225	36256			Bahut excited feel ho raha hai.
+lib/localization/app_language.dart	36270	36293			Hamara safar jaari hai.
+lib/localization/app_language.dart	64115	64146			Kya main papaya kha sakti hoon?
+lib/localization/app_language.dart	64160	64180			Kya coffee safe hai?
+lib/localization/app_language.dart	64194	64225			Kya abhi kamar dard normal hai?
+lib/localization/app_language.dart	64239	64264			Acidity kam kaise karein?
+lib/localization/app_language.dart	64278	64302			Behtar neend kaise aaye?
+lib/localization/app_language.dart	64316	64350			Kya main pineapple kha sakti hoon?
+lib/screens/profile_screen.dart	39804	39922		Your employer may already provide ParentVeda. Check with your work email.	Ho sakta hai aapki company ParentVeda ka kharcha uthati ho. Work email se check kar lijiye.
+lib/screens/read_reader_screen.dart	5505	5525		About the book	Book ke baare mein
+lib/screens/read_reader_screen.dart	5614	5628		Core philosophy	Mool vichaar
+lib/screens/read_reader_screen.dart	5698	5713		Key ideas	Zaroori ideas
+lib/screens/read_reader_screen.dart	5798	5819		Chapter by chapter	Chapter dar chapter
+lib/screens/read_reader_screen.dart	5913	5933		ParentVeda\'s take	ParentVeda ki raay
+lib/screens/read_reader_screen.dart	6011	6029		Memorable lines	Yaadgaar baatein
+lib/screens/read_reader_screen.dart	6140	6167		Why we recommend it	Kyun recommend karte hain
+lib/screens/read_reader_screen.dart	6187	6196		The read	Padhein
+lib/screens/read_reader_screen.dart	6270	6292		Why this matters	Yeh kyun zaroori hai
+lib/screens/read_reader_screen.dart	6378	6407		Research simplified	Research aasan bhaasha mein
+lib/screens/read_reader_screen.dart	9662	9684		Why this matters	Yeh kyun zaroori hai
+lib/screens/read_reader_screen.dart	10004	10033		Research simplified	Research aasan bhaasha mein
+lib/screens/read_reader_screen.dart	11561	11587		Sharing coming soon	Sharing jald aa raha hai
+lib/screens/read_reader_screen.dart	18752	18781		What this book is about	Yeh book kis baare mein hai
+lib/screens/read_reader_screen.dart	19088	19102		Core philosophy	Mool vichaar
+lib/screens/read_reader_screen.dart	19311	19332		The most important ideas	Sabse zaroori ideas
+lib/screens/read_reader_screen.dart	19422	19467		Tap any idea to open it.	Kisi bhi idea ko kholne ke liye tap karein.
+lib/screens/read_reader_screen.dart	19914	19935		Chapter by chapter	Chapter dar chapter
+lib/screens/read_reader_screen.dart	20040	20088		Tap any chapter to open its key points.	Kisi bhi chapter ko kholne ke liye tap karein.
+lib/screens/read_reader_screen.dart	20626	20644		Memorable lines	Yaadgaar baatein
+lib/screens/read_reader_screen.dart	21323	21335		BEST FOR	KISKE LIYE
+lib/screens/read_reader_screen.dart	21774	21782		THEMES	VISHAY
+lib/screens/read_reader_screen.dart	26357	26377		PARENTVEDA\'S TAKE	PARENTVEDA KI RAAY
+lib/screens/read_reader_screen.dart	28574	28588		KEY POINTS COVERED	MUKHYA BINDU
+lib/screens/read_reader_screen.dart	30186	30201		Show less	Kam dikhayein
+lib/screens/read_reader_screen.dart	30222	30235		Read more	Aur padhein
+lib/screens/read_reader_screen.dart	34184	34198		Read next	Aage padhein
+lib/screens/read_reader_screen.dart	34393	34423		Keep reading - more on this, one after another.	Padhte rahein - isi par aur.
+lib/screens/read_reader_screen.dart	37497	37511		In this read	Is read mein
+lib/screens/week5_full_flow_screen.dart	11831	11872		Tap any to understand it.	Samajhne ke liye kisi par bhi tap karo.
+lib/screens/week5_full_flow_screen.dart	14608	14702		Common, normal things you may notice now — tap any to understand it and what helps.	Aam, normal cheezein jo abhi mehsoos ho sakti hain — samajhne ke liye kisi par bhi tap karo.
+lib/screens/week5_full_flow_screen.dart	21337	21362		Trimester 1 · Weeks 1–13	Trimester 1 · Week 1–13
+lib/screens/week5_full_flow_screen.dart	23558	23589		Our Pregnancy Week: Week 5	Hamari Pregnancy Week: Week 5
+lib/screens/week5_full_flow_screen.dart	12368	12382		You This Week	Is Hafte Tum
+lib/screens/week5_full_flow_screen.dart	14459	14485		Health this week · Symptoms	Is hafte sehat · Lakshan
+lib/screens/week5_full_flow_screen.dart	17815	17838		Health this week · Diet	Is hafte sehat · Diet
+lib/screens/week5_full_flow_screen.dart	23477	23502		Share With Partner	Partner ke saath baanto
+lib/screens/week5_full_flow_screen.dart	2513	2618		This is for understanding, not diagnosis — your doctor is always the best guide.	Yeh samajhne ke liye hai, diagnosis ke liye nahi — tumhara doctor hamesha sabse accha maargdarshak hai.
+lib/screens/week5_full_flow_screen.dart	17284	17411		If you notice any spotting, bleeding, or anything that does not feel right to you, please check with your doctor. It is always okay to ask.	Agar koi spotting, bleeding, ya kuch bhi jo theek na lage dikhe, to apne doctor se jaanch karwao. Poochhna hamesha theek hai.
+lib/widgets/week_cards/week_overview_card.dart	41798	41837		Your baby's heart began to beat.	Aapke baby ka dil dhadakna shuru hua.
+lib/widgets/week_cards/week_overview_card.dart	42248	42293		Baby's hearing is developing and picking up sound.	Baby ki sunne ki shakti viksit ho rahi hai.
+lib/widgets/week_cards/week_overview_card.dart	42527	42592		You may feel the first kicks - and you're halfway there!	Aap pehli kicks mehsoos kar sakti hain - aur aadha safar poora!
+lib/widgets/week_cards/week_overview_card.dart	42767	42808		A major step in your baby's development.	Aapke baby ke vikas mein ek bada kadam.
+lib/widgets/week_cards/week_whatsapp_info_card.dart	4180	4233		Hi! Here's your Week ${w.week} update 💜	Namaste! Yeh raha aapka Hafta ${w.week} ka update 💜
+lib/widgets/week_cards/week_whatsapp_info_card.dart	5171	5186		Baby's development	Baby ka vikas
+lib/widgets/week_cards/week_whatsapp_info_card.dart	5695	5713		This week's tips	Is hafte ke tips
+lib/widgets/week_cards/week_whatsapp_info_card.dart	6838	6858		This week's update	Is hafte ka update

@@ -1,0 +1,33 @@
+lib/screens/bump_journey_screen.dart	7856	7878		My Bump Journey Book	Meri Bump Journey Book
+lib/screens/bump_journey_screen.dart	8256	8304		Flip through your weeks - view, download or print	Apne hafte flip karein - view, download ya print
+lib/screens/calendar_screen.dart	12453	12466		Tests & Scans	Tests & Scans
+lib/screens/calendar_screen.dart	12552	12560		Programs	Programs
+lib/screens/calendar_screen.dart	48095	48126		A program or class you enrolled in	Aapka enrolled program ya class
+lib/screens/calendar_screen.dart	52078	52091		Tests & Scans	Tests & Scans
+lib/screens/calendar_screen.dart	52244	52252		Programs	Programs
+lib/screens/calendar_screen.dart	52759	52790		A program or class you enrolled in	Aapka enrolled program ya class
+lib/screens/garbh_screen.dart	4780	4796		Samvad & Vichara	Samvad & Vichara
+lib/screens/garbh_screen.dart	26888	26937		Listening sessions gathered for each month.	Har mahine ke liye chuni gayi listening sessions.
+lib/screens/garbh_screen.dart	28394	28403		Month $m	Mahina $m
+lib/screens/garbh_screen.dart	29007	29026		You are here now	Aap abhi yahan hain
+lib/screens/garbh_screen.dart	29376	29416		No sessions for this month yet.	Is mahine ke liye abhi koi session nahi.
+lib/screens/garbh_screen.dart	62004	62017		Breathing & Meditation	Saans & Dhyan
+lib/screens/garbh_screen.dart	62086	62099		Brain Fitness	Brain Fitness
+lib/screens/garbh_screen.dart	71104	71111		Play	Khelein
+lib/screens/profile_screen.dart	39636	39685		ParentVeda Premium, provided by ${sponsor.name}.	ParentVeda Premium — ${sponsor.name} ki taraf se.
+lib/screens/profile_screen.dart	40089	40094		Active	Chalu
+lib/screens/week5_full_flow_screen.dart	10953	10977		What's happening this week	Is hafte kya ho raha hai
+lib/screens/tools/garbh_games.dart	2788	2800		Reload	Dobara shuru
+lib/screens/tools/garbh_games.dart	3049	3060		New puzzle	Naya puzzle
+lib/screens/tools/garbh_games.dart	3311	3322		Next puzzle	Agla puzzle
+lib/screens/tools/spiritual_reading_screen.dart	6871	6876		All	Sabhi
+lib/screens/tools/spiritual_reading_screen.dart	17299	17305		Interested	Pasand
+lib/screens/tools/spiritual_reading_screen.dart	18435	18447		Not interested	Nahi chahiye
+lib/services/veda_context.dart	4349	4364		first trimester	pehli trimester
+lib/services/veda_context.dart	4423	4439		second trimester	doosri trimester
+lib/services/veda_context.dart	4498	4514		third trimester	teesri trimester
+lib/services/veda_context.dart	5235	5280		You're in week $week (${_triName(lang)}).	Aap week $week mein hain (${_triName(lang)}).
+lib/services/veda_context.dart	5874	5992		You noted $n around week ${ls.week} - keep an eye on it and mention it at your next visit.	Aapne $n week ${ls.week} ke aas-paas note kiya tha - ispar nazar rakhein aur agli visit par doctor ko zaroor batayein.
+lib/services/veda_context.dart	6302	6384		You're tracking $m - check anything new against it with your doctor.	Aap $m track kar rahi hain - koi nayi cheez iske saath doctor se confirm kar lein.
+lib/services/veda_context.dart	6956	7068		You've told us about $c - it's worth reading this with that in mind, and checking anything new with your doctor.	Aapne $c ke baare mein bataya tha - ise dhyan mein rakhkar padhein, aur koi nayi cheez doctor se confirm karein.
+lib/services/veda_context.dart	7598	7660		You eat $diet, so we've kept that in mind here.	Aap $diet khaati hain, isliye humne wahi dhyan mein rakha hai.

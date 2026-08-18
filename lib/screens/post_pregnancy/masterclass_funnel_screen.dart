@@ -211,7 +211,7 @@ class _MasterclassFunnelScreenState extends State<MasterclassFunnelScreen> {
               ])),
 
               const SizedBox(height: 22),
-              _pad(Text('Led by a verified paediatrician. Free with ParentVeda+.',
+              _pad(Text('Led by a verified paediatrician.',
                   textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
             ],
           ),
@@ -302,7 +302,7 @@ class _MasterclassFunnelScreenState extends State<MasterclassFunnelScreen> {
         child: Row(children: [
           Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text('₹1,499', style: ppBody(16, color: ppInk, w: FontWeight.w700)),
-            Text('free on ParentVeda+', style: ppBody(11, color: ppPurple, w: FontWeight.w600)),
+            Text('one-time', style: ppBody(11, color: ppPurple, w: FontWeight.w600)),
           ]),
           const SizedBox(width: 14),
           Expanded(

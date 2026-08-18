@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Hanken+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;}
+body{margin:0;}
+.pv-scroll::-webkit-scrollbar{width:0;height:0;}
+.pv-scroll{scrollbar-width:none;}
+</style>
+</helmet>
+
+<div style="min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:48px 24px;background:#E7E1F0;font-family:'Hanken Grotesk',sans-serif;">
+  <div style="background:#1a1320;border-radius:56px;padding:12px;box-shadow:0 40px 80px -28px rgba(70,40,110,.5),0 12px 28px rgba(0,0,0,.18);">
+    <div style="width:390px;height:844px;border-radius:44px;overflow:hidden;position:relative;display:flex;flex-direction:column;background:linear-gradient(172deg,#F2E9FB 0%,#F8EFF8 46%,#FBF2F2 100%);">
+
+      <!-- status bar -->
+      <div style="flex:none;height:46px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;font-size:15px;font-weight:700;color:#2c2138;">
+        <span>9:41</span>
+        <span style="display:flex;align-items:center;gap:7px;">
+          <span style="display:inline-block;width:18px;height:11px;border:1.6px solid #2c2138;border-radius:3px;position:relative;"></span>
+        </span>
+      </div>
+
+      <!-- top bar -->
+      <div style="flex:none;display:flex;align-items:center;justify-content:space-between;padding:6px 22px 14px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <img src="assets/pv-mark.png" alt="ParentVeda" style="width:40px;height:40px;object-fit:contain;display:block;" />
+          <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:21px;font-weight:700;color:#6E2DB9;letter-spacing:-.01em;">ParentVeda</span>
+        </div>
+        <div style="width:42px;height:42px;border-radius:50%;background:rgba(110,45,185,.08);display:flex;align-items:center;justify-content:center;">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#6E2DB9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H3v6h3l5 4z"/><path d="M16 9a4 4 0 0 1 0 6M19 6.5a8 8 0 0 1 0 11"/></svg>
+        </div>
+      </div>
+
+      <!-- scroll area -->
+      <div class="pv-scroll" style="flex:1;overflow-y:auto;padding:4px 22px 24px;">
+
+        <!-- trimester + progress -->
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:10px;">
+          <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:23px;font-weight:700;color:#2c2138;">Trimester 2</span>
+          <span style="font-size:13px;font-weight:700;color:#F1577C;">20 weeks to go</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:18px;">
+          <div style="flex:1;height:9px;background:rgba(110,45,185,.14);border-radius:999px;position:relative;">
+            <div style="position:absolute;left:0;top:0;height:9px;width:50%;background:linear-gradient(90deg,#6E2DB9,#9B4FD6);border-radius:999px;"></div>
+          </div>
+          <span style="font-size:12px;font-weight:700;color:#6E2DB9;">Wk 20 · 23–29 Jun</span>
+        </div>
+
+        <!-- week trail -->
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+          <span style="font-size:13px;color:#b3a6c6;font-weight:600;">18</span>
+          <span style="width:4px;height:4px;border-radius:50%;background:#d8caec;"></span>
+          <span style="font-size:13px;color:#b3a6c6;font-weight:600;">19</span>
+          <span style="width:4px;height:4px;border-radius:50%;background:#d8caec;"></span>
+          <span style="display:flex;align-items:center;justify-content:center;width:38px;height:38px;border-radius:50%;background:#6E2DB9;color:#fff;font-weight:700;font-size:15px;box-shadow:0 7px 16px rgba(110,45,185,.4);">20</span>
+          <span style="width:4px;height:4px;border-radius:50%;background:#d8caec;"></span>
+          <span style="font-size:13px;color:#b3a6c6;font-weight:600;">21</span>
+          <span style="width:4px;height:4px;border-radius:50%;background:#d8caec;"></span>
+          <span style="font-size:13px;color:#b3a6c6;font-weight:600;">22</span>
+        </div>
+
+        <!-- hero with ring -->
+        <div style="position:relative;display:flex;align-items:center;justify-content:center;margin:2px 0 6px;">
+          <div style="width:238px;height:238px;border-radius:50%;background:conic-gradient(#6E2DB9 0% 50%,rgba(110,45,185,.14) 50% 100%);display:flex;align-items:center;justify-content:center;">
+            <div style="width:208px;height:208px;border-radius:50%;overflow:hidden;display:flex;align-items:center;justify-content:center;border:6px solid #FBF2F2;">
+              <sc-if value="{{ isBaby }}" hint-placeholder-val="{{ true }}">
+                <div style="width:100%;height:100%;background:radial-gradient(120% 100% at 50% 30%,#F8D9C6 0%,#F2BDA6 55%,#E59E84 100%);display:flex;align-items:center;justify-content:center;">
+                  <span style="font-family:monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(70,40,30,.5);text-align:center;line-height:1.5;">3D baby<br>drop here</span>
+                </div>
+              </sc-if>
+              <sc-if value="{{ isFruit }}" hint-placeholder-val="{{ false }}">
+                <div style="width:100%;height:100%;background:radial-gradient(120% 100% at 50% 30%,#FDF0C4 0%,#F7DE8E 55%,#EDC85A 100%);display:flex;align-items:center;justify-content:center;">
+                  <span style="font-family:monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(90,70,20,.5);text-align:center;line-height:1.5;">banana<br>actual size</span>
+                </div>
+              </sc-if>
+            </div>
+          </div>
+          <div style="position:absolute;top:2px;left:50%;transform:translateX(-50%);background:#fff;padding:7px 16px;border-radius:999px;font-size:12.5px;font-weight:700;color:#6E2DB9;box-shadow:0 8px 18px rgba(110,45,185,.18);display:flex;align-items:center;gap:6px;">
+            <span style="width:7px;height:7px;border-radius:50%;background:#F1577C;display:inline-block;"></span>Halfway There
+          </div>
+        </div>
+
+        <!-- baby / fruit toggle -->
+        <div style="display:flex;gap:5px;background:rgba(110,45,185,.08);border-radius:999px;padding:5px;margin:14px 0 18px;">
+          <div onClick="{{ setBaby }}" style="{{ babyTab }}">Baby</div>
+          <div onClick="{{ setFruit }}" style="{{ fruitTab }}">Fruit</div>
+        </div>
+
+        <!-- size / length / weight -->
+        <div style="display:flex;gap:10px;margin-bottom:20px;">
+          <div style="flex:1;background:#fff;border-radius:20px;padding:15px 10px;text-align:center;box-shadow:0 8px 20px rgba(110,60,140,.08);">
+            <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#a596bb;font-weight:700;margin-bottom:5px;">Size</div>
+            <div style="font-size:16px;font-weight:700;color:#2c2138;">Banana</div>
+          </div>
+          <div style="flex:1;background:#fff;border-radius:20px;padding:15px 10px;text-align:center;box-shadow:0 8px 20px rgba(110,60,140,.08);">
+            <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#a596bb;font-weight:700;margin-bottom:5px;">Length</div>
+            <div style="font-size:16px;font-weight:700;color:#2c2138;">25.7 cm</div>
+          </div>
+          <div style="flex:1;background:#fff;border-radius:20px;padding:15px 10px;text-align:center;box-shadow:0 8px 20px rgba(110,60,140,.08);">
+            <div style="font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#a596bb;font-weight:700;margin-bottom:5px;">Weight</div>
+            <div style="font-size:16px;font-weight:700;color:#2c2138;">331 g</div>
+          </div>
+        </div>
+
+        <!-- accordions -->
+        <div style="display:flex;flex-direction:column;gap:12px;">
+
+          <!-- BABY -->
+          <div style="background:#fff;border-radius:22px;box-shadow:0 8px 22px rgba(110,60,140,.08);overflow:hidden;">
+            <div onClick="{{ tBaby }}" style="display:flex;align-items:center;gap:14px;padding:16px 18px;cursor:pointer;">
+              <div style="width:42px;height:42px;border-radius:13px;background:rgba(110,45,185,.1);display:flex;align-items:center;justify-content:center;flex:none;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6E2DB9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6.5" r="3"/><circle cx="12" cy="15.5" r="5"/></svg>
+              </div>
+              <div style="flex:1;">
+                <div style="font-size:16px;font-weight:700;color:#2c2138;">Baby</div>
+                <div style="font-size:13px;color:#9385ab;">What I'm doing this week</div>
+              </div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b3a6c6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="{{ babyChev }}"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div style="{{ babyBody }}">
+              <div style="padding:0 18px 18px;font-size:14.5px;line-height:1.6;color:#5b5070;">I can hear sounds now, swallow amniotic fluid, and move my arms and legs with purpose. During the anomaly scan, doctors will carefully assess how I'm growing and developing.</div>
+            </div>
+          </div>
+
+          <!-- MOTHER -->
+          <div style="background:#fff;border-radius:22px;box-shadow:0 8px 22px rgba(110,60,140,.08);overflow:hidden;">
+            <div onClick="{{ tMother }}" style="display:flex;align-items:center;gap:14px;padding:16px 18px;cursor:pointer;">
+              <div style="width:42px;height:42px;border-radius:13px;background:rgba(241,87,124,.12);display:flex;align-items:center;justify-content:center;flex:none;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#F1577C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="7.5" r="3.3"/><path d="M5.5 20c0-3.6 2.9-6.2 6.5-6.2s6.5 2.6 6.5 6.2"/></svg>
+              </div>
+              <div style="flex:1;">
+                <div style="font-size:16px;font-weight:700;color:#2c2138;">Mother</div>
+                <div style="font-size:13px;color:#9385ab;">How you're feeling</div>
+              </div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b3a6c6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="{{ motherChev }}"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div style="{{ motherBody }}">
+              <div style="padding:0 18px 18px;font-size:14.5px;line-height:1.6;color:#5b5070;">You're officially halfway. You may feel the first flutters of movement this week, and your bump is becoming more visible as the top of your uterus reaches your belly button.</div>
+            </div>
+          </div>
+
+          <!-- HEALTH -->
+          <div style="background:#fff;border-radius:22px;box-shadow:0 8px 22px rgba(110,60,140,.08);overflow:hidden;">
+            <div onClick="{{ tHealth }}" style="display:flex;align-items:center;gap:14px;padding:16px 18px;cursor:pointer;">
+              <div style="width:42px;height:42px;border-radius:13px;background:rgba(110,45,185,.1);display:flex;align-items:center;justify-content:center;flex:none;">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6E2DB9" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20s-7-4.6-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.4-7 10-7 10z"/></svg>
+              </div>
+              <div style="flex:1;">
+                <div style="font-size:16px;font-weight:700;color:#2c2138;">Health</div>
+                <div style="font-size:13px;color:#9385ab;">This week's care</div>
+              </div>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b3a6c6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="{{ healthChev }}"><polyline points="6 9 12 15 18 9"/></svg>
+            </div>
+            <div style="{{ healthBody }}">
+              <div style="padding:0 18px 18px;font-size:14.5px;line-height:1.6;color:#5b5070;">Your anomaly scan (18–22 weeks) is a detailed ultrasound checking baby's organs, spine and growth. A good moment to ask your doctor about iron and calcium intake.</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- floating bottom nav -->
+      <div style="flex:none;padding:0 20px 20px;background:linear-gradient(0deg,#FBF2F2 60%,rgba(251,242,242,0));">
+        <div style="height:64px;background:#fff;border-radius:999px;display:flex;align-items:center;justify-content:space-around;padding:0 22px;box-shadow:0 14px 32px rgba(110,45,185,.16);">
+          <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#b9add0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v9a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-9"/></svg>
+          <div style="display:flex;align-items:center;gap:7px;background:#6E2DB9;padding:9px 17px;border-radius:999px;">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polygon points="15.5 8.5 10.5 10.5 8.5 15.5 13.5 13.5"/></svg>
+            <span style="font-size:13px;font-weight:700;color:#fff;">Journey</span>
+          </div>
+          <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#b9add0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="16" rx="3"/><path d="M4 9h16M9 3v4M15 3v4"/></svg>
+          <svg width="23" height="23" viewBox="0 0 24 24" fill="none" stroke="#b9add0" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="9" r="3"/><circle cx="17" cy="10" r="2.3"/><path d="M3 20c0-3 2.7-5 6-5s6 2 6 5M15.5 20c0-2 1-3.4 3-3.4"/></svg>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:438,&quot;height&quot;:892}}">
+class Component extends DCLogic {
+  state = { view: 'baby', open: { baby: true, mother: false, health: false } };
+
+  toggle(k) {
+    this.setState(s => ({ open: { ...s.open, [k]: !s.open[k] } }));
+  }
+
+  renderVals() {
+    const v = this.state.view, open = this.state.open;
+    const tab = (on) => ({
+      flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center',
+      padding: '10px 0', borderRadius: '999px',
+      fontFamily: "'Hanken Grotesk',sans-serif", fontSize: '14px', fontWeight: 700,
+      cursor: 'pointer', color: on ? '#fff' : '#7a6b8e',
+      background: on ? '#6E2DB9' : 'transparent',
+      boxShadow: on ? '0 6px 14px rgba(110,45,185,.32)' : 'none',
+      transition: 'all .25s ease'
+    });
+    const body = (on) => ({
+      overflow: 'hidden', maxHeight: on ? '320px' : '0px', opacity: on ? 1 : 0,
+      transition: 'max-height .4s ease, opacity .3s ease'
+    });
+    const chev = (on) => ({ transition: 'transform .3s ease', transform: on ? 'rotate(180deg)' : 'rotate(0deg)' });
+    return {
+      isBaby: v === 'baby', isFruit: v === 'fruit',
+      setBaby: () => this.setState({ view: 'baby' }),
+      setFruit: () => this.setState({ view: 'fruit' }),
+      babyTab: tab(v === 'baby'), fruitTab: tab(v === 'fruit'),
+      tBaby: () => this.toggle('baby'), tMother: () => this.toggle('mother'), tHealth: () => this.toggle('health'),
+      babyBody: body(open.baby), motherBody: body(open.mother), healthBody: body(open.health),
+      babyChev: chev(open.baby), motherChev: chev(open.mother), healthChev: chev(open.health)
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+lib/screens/bump_journey_screen.dart	7856	7878	मेरे बंप की किताब
+lib/screens/bump_journey_screen.dart	8256	8304	अपने हफ़्ते पलटिए — देखिए, डाउनलोड कीजिए या प्रिंट कीजिए
+lib/screens/calendar_screen.dart	12453	12466	जाँच और स्कैन
+lib/screens/calendar_screen.dart	12552	12560	प्रोग्राम
+lib/screens/calendar_screen.dart	48095	48126	कोई प्रोग्राम या क्लास जिसमें आपने नाम लिखवाया है
+lib/screens/calendar_screen.dart	52078	52091	जाँच और स्कैन
+lib/screens/calendar_screen.dart	52244	52252	प्रोग्राम
+lib/screens/calendar_screen.dart	52759	52790	कोई प्रोग्राम या क्लास जिसमें आपने नाम लिखवाया है
+lib/screens/garbh_screen.dart	4780	4796	संवाद और विचार
+lib/screens/garbh_screen.dart	26888	26937	हर महीने के लिए चुने गए, सुनने के शांत पल।
+lib/screens/garbh_screen.dart	28394	28403	महीना $m
+lib/screens/garbh_screen.dart	29007	29026	आप अभी यहाँ हैं
+lib/screens/garbh_screen.dart	29376	29416	इस महीने के लिए अभी कुछ जोड़ा नहीं गया।
+lib/screens/garbh_screen.dart	62004	62017	साँस और ध्यान
+lib/screens/garbh_screen.dart	62086	62099	दिमाग़ी कसरत
+lib/screens/garbh_screen.dart	71104	71111	खेलिए
+lib/screens/profile_screen.dart	39636	39685	ParentVeda Premium — ${sponsor.name} की तरफ़ से।
+lib/screens/profile_screen.dart	40089	40094	चालू
+lib/screens/week5_full_flow_screen.dart	10953	10977	इस हफ़्ते क्या हो रहा है
+lib/screens/tools/garbh_games.dart	2788	2800	फिर से शुरू
+lib/screens/tools/garbh_games.dart	3049	3060	नई पहेली
+lib/screens/tools/garbh_games.dart	3311	3322	अगली पहेली
+lib/screens/tools/spiritual_reading_screen.dart	6871	6876	सभी
+lib/screens/tools/spiritual_reading_screen.dart	17299	17305	पसंद है
+lib/screens/tools/spiritual_reading_screen.dart	18435	18447	पसंद नहीं
+lib/services/veda_context.dart	4349	4364	पहली तिमाही
+lib/services/veda_context.dart	4423	4439	दूसरी तिमाही
+lib/services/veda_context.dart	4498	4514	तीसरी तिमाही
+lib/services/veda_context.dart	5235	5280	आप $weekवें हफ़्ते में हैं (${_triName(lang)})।
+lib/services/veda_context.dart	5874	5992	आपने ${ls.week}वें हफ़्ते के आसपास $n के बारे में बताया था — इस पर नज़र रखिए और अगली बार डॉक्टर से मिलें तो ज़िक्र ज़रूर कीजिए।
+lib/services/veda_context.dart	6302	6384	आप $m ले रही हैं — कोई भी नई चीज़ इसके साथ डॉक्टर से पूछकर ही लीजिए।
+lib/services/veda_context.dart	6956	7068	आपने हमें $c के बारे में बताया था — इसे उसी बात को ध्यान में रखकर पढ़िए, और कुछ भी नया हो तो डॉक्टर से पूछ लीजिए।
+lib/services/veda_context.dart	7598	7660	आप $diet खाना खाती हैं, इसलिए हमने यहाँ वही ध्यान में रखा है।

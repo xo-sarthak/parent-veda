@@ -1,0 +1,82 @@
+lib/screens/enterprise/activation_flow_screen.dart	7424	7476	हो सकता है आपकी कंपनी यह पहले से दे रही हो।
+lib/screens/enterprise/activation_flow_screen.dart	7641	7781	कुछ कंपनियाँ अपनी टीम के लिए ParentVeda का ख़र्च उठाती हैं। अपना ऑफ़िस वाला ईमेल डालिए, हम जाँच लेते हैं।
+lib/screens/enterprise/activation_flow_screen.dart	8574	8610	जो ईमेल आपकी कंपनी के पास है
+lib/screens/enterprise/activation_flow_screen.dart	10088	10298	हमने आपका ParentVeda वाला ईमेल भर दिया है — अगर कंपनी आपके लिए कोई और ईमेल इस्तेमाल करती है तो उसे बदल लीजिए। दोनों ही हाल में हम इसे एक बार जाँचते हैं, उन्हें कभी दिखाते नहीं।
+lib/screens/enterprise/activation_flow_screen.dart	10681	10693	आगे बढ़िए
+lib/screens/enterprise/activation_flow_screen.dart	11160	11189	अपना ऑफ़िस वाला इनबॉक्स देखिए।
+lib/screens/enterprise/activation_flow_screen.dart	11342	11451	हमने ${_email.text.trim()} पर छह अंकों का कोड भेजा है। यह दस मिनट तक चलेगा।
+lib/screens/enterprise/activation_flow_screen.dart	13456	13471	चालू कीजिए
+lib/screens/enterprise/activation_flow_screen.dart	13775	13792	नया कोड भेजिए
+lib/screens/enterprise/activation_flow_screen.dart	13869	13894	नहीं मिला? दोबारा भेजिए
+lib/screens/enterprise/activation_flow_screen.dart	14301	14324	कोई दूसरा ईमेल इस्तेमाल कीजिए
+lib/screens/enterprise/activation_flow_screen.dart	14675	14695	आपकी कंपनी
+lib/screens/enterprise/activation_flow_screen.dart	15240	15254	सब हो गया।
+lib/screens/enterprise/activation_flow_screen.dart	15331	15372	ParentVeda Premium, $name की तरफ़ से।
+lib/screens/enterprise/activation_flow_screen.dart	15854	15870	देखिए क्या-क्या मिला
+lib/screens/enterprise/activation_flow_screen.dart	16077	16093	आपकी कंपनी
+lib/screens/enterprise/activation_flow_screen.dart	16201	16233	आपकी गर्भावस्था और आपका शिशु
+lib/screens/enterprise/activation_flow_screen.dart	16277	16303	आपका जर्नल और आपकी तस्वीरें
+lib/screens/enterprise/activation_flow_screen.dart	16342	16365	Ask Veda पर आपके सवाल
+lib/screens/enterprise/activation_flow_screen.dart	16408	16440	जो भी आप खोजती या पढ़ती हैं
+lib/screens/enterprise/activation_flow_screen.dart	16485	16517	आपके अपॉइंटमेंट और रिपोर्ट
+lib/screens/enterprise/activation_flow_screen.dart	16984	17022	आपकी कंपनी को क्या कभी नहीं दिखता
+lib/screens/enterprise/activation_flow_screen.dart	18092	18215	उन्हें दिखता है कि कितने लोगों ने चालू किया। कौन, यह नहीं — और आपके बारे में कुछ नहीं।
+lib/screens/enterprise/activation_flow_screen.dart	18472	18668	$name को सिर्फ़ इतना दिखता है कि कितने लोगों ने यह सुविधा चालू की और सब मिलाकर कितने कंसल्टेशन इस्तेमाल हुए। कौन, यह कभी नहीं — क्या, यह भी कभी नहीं।
+lib/screens/enterprise/employer_benefits_screen.dart	3575	3614	कंपनी की कोई सुविधा अभी चालू नहीं है।
+lib/screens/enterprise/employer_benefits_screen.dart	3767	3875	अगर आपकी कंपनी ParentVeda का ख़र्च उठाती है, तो अपने ऑफ़िस वाले ईमेल से इसे चालू कीजिए।
+lib/screens/enterprise/employer_benefits_screen.dart	5532	5561	${sponsor.name} की तरफ़ से
+lib/screens/enterprise/employer_benefits_screen.dart	7342	7520	किसी भी ParentVeda डॉक्टर या काउंसलर से मिलने का समय बुक कीजिए। आपकी कंपनी को यह नहीं बताया जाता कि आप किससे मिलीं और क्यों।
+lib/screens/enterprise/employer_benefits_screen.dart	7717	7845	इस साल के कंसल्टेशन इस्तेमाल हो चुके हैं। जब आपकी कंपनी इसे फिर से लेगी, तब ये भी फिर से मिल जाएँगे।
+lib/screens/enterprise/employer_benefits_screen.dart	8386	8417	अब तक $creditsSpent कंसल्टेशन इस्तेमाल हुए।
+lib/screens/enterprise/employer_benefits_screen.dart	8761	8796	${_date(creditExpires)} तक मान्य
+lib/screens/enterprise/employer_benefits_screen.dart	9332	9374	जिन सेशन के पैसे लगते हैं, वे आपके प्लान में शामिल हैं।
+lib/screens/enterprise/employer_benefits_screen.dart	9727	9859	आपकी कंपनी अपने यहाँ के माता-पिता के लिए जो सेशन रखती है। अभी कुछ तय नहीं हुआ है — जब होगा, यहीं दिखेगा।
+lib/screens/enterprise/employer_benefits_screen.dart	10241	10385	आपकी कंपनी की अपनी परवरिश नीति और गाइड। डॉक्टरी सलाह कभी नहीं — वह हमेशा हमसे या आपके डॉक्टर से आती है।
+lib/screens/enterprise/employer_benefits_screen.dart	11801	11846	${sponsor.name} में अब तक कितने लोगों ने इसे लिया है।
+lib/screens/enterprise/employer_benefits_screen.dart	12651	12681	सुविधा के बारे में सवाल
+lib/screens/enterprise/employer_benefits_screen.dart	13119	13295	सीट, नवीनीकरण या पात्रता से जुड़ी कोई भी बात ${sponsor.supportContact} पर पूछिए। आपकी गर्भावस्था या आपके शिशु से जुड़ी हर बात हमारे पास ही रहती है।
+lib/screens/enterprise/employer_benefits_screen.dart	14262	14294	${sponsor.name} को क्या दिखता है
+lib/screens/enterprise/employer_benefits_screen.dart	14841	15057	कितने लोगों ने चालू किया, और सब मिलाकर कितने कंसल्टेशन इस्तेमाल हुए। बस इतनी ही सूची है। आपकी गर्भावस्था, आपका शिशु, आपका जर्नल, आपके सवाल, आपकी खोज या आपके अपॉइंटमेंट — इनमें से कुछ भी उन्हें नहीं दिखता।
+lib/screens/enterprise/enterprise_common.dart	1894	1934	यह ईमेल पते जैसा नहीं लग रहा।
+lib/screens/enterprise/enterprise_common.dart	2472	2598	इस ईमेल पते पर कोई सुविधा नहीं मिली। अपनी HR टीम से पूछ लीजिए कि उनके पास वही पता है जो आपने लिखा।
+lib/screens/enterprise/enterprise_common.dart	2750	2808	इस ऑफ़िस वाले ईमेल से यह सुविधा पहले ही चालू की जा चुकी है।
+lib/screens/enterprise/enterprise_common.dart	2991	3105	आपकी कंपनी ने जितनी सीट ली थीं, सब इस्तेमाल में हैं। आपकी HR टीम और सीट जोड़ सकती है।
+lib/screens/enterprise/enterprise_common.dart	3221	3277	बहुत सारे कोड माँगे जा चुके हैं। एक घंटे बाद फिर कोशिश कीजिए।
+lib/screens/enterprise/enterprise_common.dart	3393	3451	पहले साइन इन कीजिए, फिर कंपनी की सुविधा चालू कीजिए।
+lib/screens/enterprise/enterprise_common.dart	3556	3598	वह कोड अब काम का नहीं रहा। नया कोड माँग लीजिए।
+lib/screens/enterprise/enterprise_common.dart	3703	3738	उस कोड का समय ख़त्म हो गया। नया कोड माँग लीजिए।
+lib/screens/enterprise/enterprise_common.dart	3851	3888	बहुत बार ग़लत कोड डाला गया। नया कोड माँग लीजिए।
+lib/screens/enterprise/enterprise_common.dart	3963	3988	यह कोड सही नहीं है।
+lib/screens/enterprise/enterprise_common.dart	4089	4122	यह सुविधा अब चालू नहीं है।
+lib/screens/enterprise/enterprise_common.dart	4275	4343	ParentVeda तक पहुँच नहीं पाए। अपना कनेक्शन देखकर फिर कोशिश कीजिए।
+lib/screens/enterprise/enterprise_common.dart	4460	4498	कुछ गड़बड़ हो गई। फिर कोशिश कीजिए।
+lib/screens/enterprise/sponsor_dashboard_screen.dart	4794	4824	आपका प्रोग्राम लोड नहीं हो पाया।
+lib/screens/enterprise/sponsor_dashboard_screen.dart	4909	4947	किसी प्रोग्राम की देखरेख का ज़िम्मा आपके पास नहीं है।
+lib/screens/enterprise/sponsor_dashboard_screen.dart	5061	5098	नीचे खींचकर फिर कोशिश कीजिए।
+lib/screens/enterprise/sponsor_dashboard_screen.dart	5286	5417	अगर आपकी कंपनी में इस सुविधा का ज़िम्मा आपके पास है, तो हमसे कहिए कि आपके अकाउंट को इसकी पहुँच दी जाए।
+lib/screens/enterprise/sponsor_dashboard_screen.dart	5948	5981	${_date(d.renewalAt!)} को नवीनीकरण
+lib/screens/enterprise/sponsor_dashboard_screen.dart	6029	6062	नवीनीकरण की कोई तारीख़ दर्ज नहीं है
+lib/screens/enterprise/sponsor_dashboard_screen.dart	7114	7131	आपकी सूची में
+lib/screens/enterprise/sponsor_dashboard_screen.dart	8448	8561	आपकी सूची में से ${d.eligibleListed - d.activated} लोगों ने अभी तक चालू नहीं किया
+lib/screens/enterprise/sponsor_dashboard_screen.dart	8650	8688	${d.seatsLeft ?? 0} सीट बाक़ी हैं
+lib/screens/enterprise/sponsor_dashboard_screen.dart	9012	9064	पिछले 30 दिनों में ${d.activatedLast30d} लोग जुड़े
+lib/screens/enterprise/sponsor_dashboard_screen.dart	11200	11236	यह डैशबोर्ड क्या नहीं दिखा सकता
+lib/screens/enterprise/sponsor_dashboard_screen.dart	11885	12239	किसी एक व्यक्ति के बारे में कुछ नहीं। किसने बुक किया, किसने क्या पढ़ा, किसने क्या पूछा, किसने ऐप में कितना समय बिताया — आख़िरी वाली बात तो हम किसी के लिए भी नापते ही नहीं। कितने लोगों ने लिया और कुल जोड़ — बस यही पूरी तस्वीर है, और इसी वजह से लोग इसे चालू करने को तैयार होते हैं।
+lib/screens/enterprise/sponsor_dashboard_screen.dart	12944	12961	हटाए गए छिपाइए
+lib/screens/enterprise/sponsor_dashboard_screen.dart	13048	13083	हटाए गए दिखाइए (${removed.length})
+lib/screens/enterprise/sponsor_dashboard_screen.dart	13367	13469	सिर्फ़ पात्रता। यहाँ किसी व्यक्ति के बारे में हम बस इतना दर्ज करते हैं कि उसने चालू किया या नहीं।
+lib/screens/enterprise/sponsor_dashboard_screen.dart	13990	14024	अभी तक किसी ने चालू नहीं किया।
+lib/screens/enterprise/sponsor_dashboard_screen.dart	14399	14526	कर्मचारी ऐप के अंदर अपने ऑफ़िस वाले ईमेल से इसे चालू करते हैं। आम तौर पर बस इतनी सी बात बता देना काफ़ी होता है।
+lib/screens/enterprise/sponsor_dashboard_screen.dart	14988	15007	अब तक कितने लोगों ने लिया
+lib/screens/enterprise/sponsor_dashboard_screen.dart	15101	15137	तीन महीने पहले से $change ज़्यादा
+lib/screens/enterprise/sponsor_dashboard_screen.dart	15226	15254	तीन महीने पहले जितना ही
+lib/screens/enterprise/sponsor_dashboard_screen.dart	15459	15496	तीन महीने पहले से ${-change} कम
+lib/screens/enterprise/sponsor_dashboard_screen.dart	16466	16515	$min लोगों के चालू करने तक यह नहीं दिखाया जाएगा
+lib/screens/enterprise/sponsor_dashboard_screen.dart	16875	17047	छोटे समूह में — इस महीने दो कंसल्टेशन — यह कहना क़रीब-क़रीब नाम बता देने जैसा है। किसी एक इंसान को दिखा देने से बेहतर है कि हम आपको कुछ न दिखाएँ।
+lib/screens/enterprise/sponsor_dashboard_screen.dart	18584	18622	${_date(r.activatedAt)} को चालू हुआ
+lib/screens/enterprise/sponsor_dashboard_screen.dart	18710	18744	${_date(r.removedAt)} को हटाया गया
+lib/screens/enterprise/sponsor_dashboard_screen.dart	18974	18987	हटाइए
+lib/screens/enterprise/sponsor_dashboard_screen.dart	19413	19439	${r.workEmail} को हटाएँ?
+lib/screens/enterprise/sponsor_dashboard_screen.dart	19943	20155	उनकी सीट ख़ाली हो जाएगी और आपकी कंपनी का दिया प्लान हट जाएगा। जो उन्होंने ख़ुद ख़रीदा है उसे कुछ नहीं होगा, और उनका जर्नल, तस्वीरें और रिकॉर्ड उनके ही रहेंगे।
+lib/screens/enterprise/sponsor_dashboard_screen.dart	20844	20871	${r.workEmail} हटा दिया गया।
+lib/screens/enterprise/sponsor_dashboard_screen.dart	20929	20944	यह नहीं हो पाया।

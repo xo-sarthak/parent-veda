@@ -548,7 +548,7 @@ class _LearningDetailScreenState extends State<LearningDetailScreen> {
             Flexible(
               child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(cta.watch ? 'Included' : p.price, style: ppBody(16, color: ppInk, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
-                Text(cta.watch ? 'on ParentVeda+' : p.priceNote, style: ppBody(11, color: ppPurple, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
+                Text(cta.watch ? 'lifetime access' : p.priceNote, style: ppBody(11, color: ppPurple, w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis),
               ]),
             ),
             const SizedBox(width: 14),

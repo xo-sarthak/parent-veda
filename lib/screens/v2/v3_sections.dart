@@ -32,6 +32,7 @@ import '../../models/product_models.dart';
 import '../../models/read_item.dart';
 import '../../theme/pv_fonts.dart';
 import 'v2_palette.dart';
+import 'v3_hero_chrome.dart';
 import 'v2_sections.dart' show v2CoverTint, v2ReadCover;
 
 // -----------------------------------------------------------------------------
@@ -52,6 +53,7 @@ class V3Hero extends StatelessWidget {
     required this.learning,
     required this.p,
     this.onTap,
+    this.onSpine,
     this.onAvatar,
     this.onSaved,
   });
@@ -62,7 +64,23 @@ class V3Hero extends StatelessWidget {
   final int day;
   final String learning;
   final V2Palette p;
+  /// The whole photograph. Historically the ONLY way through to the week, and
+  /// it goes to the Today tab.
   final VoidCallback? onTap;
+
+  /// ⚠️ THE SPINE CHIP'S OWN DESTINATION, AND NOT `onTap`.
+  ///
+  /// The chip first shipped reusing `onTap`, and it landed on the CLASSIC HOME
+  /// instead of the weekly stack. The mechanism is the risk the plan wrote down
+  /// as R1 and I then walked straight into: `onTap` runs `surfaceId ->
+  /// homeFor() -> AppNav.go(tabIndex)`, which is a TAB SHORTCUT, not a push. It
+  /// switches to the Today tab — and the Today tab IS the classic home.
+  ///
+  /// The general lesson, which is what makes this worth six lines: **a callback
+  /// named after a gesture ("onTap") tells you nothing about where it goes.**
+  /// Reusing one because it is already wired to roughly the right area is how a
+  /// chip that says WEEK 40 ends up somewhere that is not week 40.
+  final VoidCallback? onSpine;
   final VoidCallback? onAvatar;
   final VoidCallback? onSaved;
 
@@ -166,19 +184,39 @@ class V3Hero extends StatelessWidget {
                     // saved". Two separate doors, not one — her saved things
                     // and her profile are different places, and burying saved
                     // behind the avatar is how it stops being used.
-                    _HeroIcon(
-                        icon: Icons.bookmark_border_rounded, onTap: onSaved),
-                    const SizedBox(width: 8),
-                    _Avatar(name: name, onTap: onAvatar),
+                    // Was a bare `_HeroIcon` + `_Avatar` pair local to this
+                    // file. Now the shared chrome, so parenting and TTC carry
+                    // literally the same widget rather than a lookalike — the
+                    // journal section already taught what happens otherwise.
+                    V3HeroChrome(
+                      tone: V3HeroTone.onPhoto,
+                      p: p,
+                      initial: name.isEmpty ? '' : name.trim().characters.last,
+                      onSaved: onSaved,
+                      onProfile: onAvatar,
+                    ),
                   ]),
                   const Spacer(),
-                  Text('WEEK $week · DAY $day',
-                      style: pvManrope(
-                          fontSize: 11.5,
-                          fontWeight: FontWeight.w800,
-                          letterSpacing: 1.3,
-                          color: Colors.white.withValues(alpha: 0.85))),
-                  const SizedBox(height: 6),
+                  // ⚠️ THE EYEBROW IS NOW THE DOOR TO THE WEEKLY STACK, and on
+                  // THIS stage that is a fix rather than a feature.
+                  //
+                  // The route already existed: the whole photograph was one
+                  // enormous hit target wired straight through to the weekly
+                  // snapshot, with no affordance of any kind. Perfectly wired,
+                  // perfectly invisible — the "correct but unreachable" failure
+                  // in its purest form, and it survived every review because
+                  // nothing was missing, only unfindable.
+                  //
+                  // ⚠️ The photograph stays tappable. Removing that would take
+                  // the gesture away from anyone who already found it, and a
+                  // bigger target is never the problem — the missing signpost
+                  // was.
+                  V3SpineChip(
+                      label: 'WEEK $week · DAY $day',
+                      tone: V3HeroTone.onPhoto,
+                      p: p,
+                      onTap: onSpine ?? onTap),
+                  const SizedBox(height: 8),
                   Text(learning,
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
@@ -197,70 +235,75 @@ class V3Hero extends StatelessWidget {
   }
 }
 
-/// A circular glass button on the photograph. Same treatment as the avatar so
-/// the two read as a pair rather than as a control and a decoration.
-class _HeroIcon extends StatelessWidget {
-  const _HeroIcon({required this.icon, this.onTap});
-  final IconData icon;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) => InkWell(
-        onTap: onTap,
-        customBorder: const CircleBorder(),
-        child: Container(
-          width: 40,
-          height: 40,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            color: Colors.white.withValues(alpha: 0.18),
-            border:
-                Border.all(color: Colors.white.withValues(alpha: 0.6), width: 1.4),
-          ),
-          child: Icon(icon, size: 19, color: Colors.white),
-        ),
-      );
-}
-
-class _Avatar extends StatelessWidget {
-  const _Avatar({required this.name, this.onTap});
-  final String name;
-  final VoidCallback? onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final initial = name.trim().isEmpty
-        ? '?'
-        : name.trim().replaceFirst(RegExp(r'^Today,\s*'), '')[0].toUpperCase();
-    return InkWell(
-      onTap: onTap,
-      customBorder: const CircleBorder(),
-      child: Container(
-        width: 40,
-        height: 40,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: Colors.white.withValues(alpha: 0.18),
-          border: Border.all(color: Colors.white.withValues(alpha: 0.6), width: 1.4),
-        ),
-        child: Text(initial,
-            style: pvJakarta(
-                fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
-      ),
-    );
-  }
-}
-
-// -----------------------------------------------------------------------------
-//  Vertical read rows
-// -----------------------------------------------------------------------------
-
-/// One read as a row: cover, title, and `CATEGORY · N MIN` on a single line.
-///
-/// Metadata on ONE line rather than category above and time below — it reads as
-/// one fact about the article instead of two separate labels.
+// SUPERSEDED BY `V3HeroChrome` (v3_hero_chrome.dart), which parenting and TTC
+// now share. Kept commented for revert rather than deleted: these two are the
+// ORIGINALS the shared widget was derived from, so if the shared version ever
+// has to be unwound, this is what pregnancy goes back to.
+//
+// /// A circular glass button on the photograph. Same treatment as the avatar so
+// /// the two read as a pair rather than as a control and a decoration.
+// class _HeroIcon extends StatelessWidget {
+//   const _HeroIcon({required this.icon, this.onTap});
+//   final IconData icon;
+//   final VoidCallback? onTap;
+//
+//   @override
+//   Widget build(BuildContext context) => InkWell(
+//         onTap: onTap,
+//         customBorder: const CircleBorder(),
+//         child: Container(
+//           width: 40,
+//           height: 40,
+//           alignment: Alignment.center,
+//           decoration: BoxDecoration(
+//             shape: BoxShape.circle,
+//             color: Colors.white.withValues(alpha: 0.18),
+//             border:
+//                 Border.all(color: Colors.white.withValues(alpha: 0.6), width: 1.4),
+//           ),
+//           child: Icon(icon, size: 19, color: Colors.white),
+//         ),
+//       );
+// }
+//
+// class _Avatar extends StatelessWidget {
+//   const _Avatar({required this.name, this.onTap});
+//   final String name;
+//   final VoidCallback? onTap;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final initial = name.trim().isEmpty
+//         ? '?'
+//         : name.trim().replaceFirst(RegExp(r'^Today,\s*'), '')[0].toUpperCase();
+//     return InkWell(
+//       onTap: onTap,
+//       customBorder: const CircleBorder(),
+//       child: Container(
+//         width: 40,
+//         height: 40,
+//         alignment: Alignment.center,
+//         decoration: BoxDecoration(
+//           shape: BoxShape.circle,
+//           color: Colors.white.withValues(alpha: 0.18),
+//           border: Border.all(color: Colors.white.withValues(alpha: 0.6), width: 1.4),
+//         ),
+//         child: Text(initial,
+//             style: pvJakarta(
+//                 fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white)),
+//       ),
+//     );
+//   }
+// }
+//
+// // -----------------------------------------------------------------------------
+// //  Vertical read rows
+// // -----------------------------------------------------------------------------
+//
+// /// One read as a row: cover, title, and `CATEGORY · N MIN` on a single line.
+// ///
+// /// Metadata on ONE line rather than category above and time below — it reads as
+// /// one fact about the article instead of two separate labels.
 class V3ReadRow extends StatelessWidget {
   const V3ReadRow({super.key, required this.item, required this.p, this.onTap});
 

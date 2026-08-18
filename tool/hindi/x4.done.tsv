@@ -1,0 +1,67 @@
+lib/data/prepare_data.dart	56324	56371	${m.facts[1].big.hi} · ${m.facts[1].small.hi}
+lib/data/prepare_data.dart	56529	56580	${m.facts.first.big.hi} ${m.facts.first.small.hi}
+lib/localization/app_language.dart	27718	27751	आज किस बात ने आपको मुस्कुरा दिया?
+lib/localization/app_language.dart	27765	27816	अभी आपको सबसे ज़्यादा किस बात का इंतज़ार है?
+lib/localization/app_language.dart	27830	27886	आज के बारे में आप अपने शिशु को क्या बताना चाहेंगी?
+lib/localization/app_language.dart	27900	27940	इस हफ़्ते किस बात ने आपको हैरान किया?
+lib/localization/app_language.dart	27954	27991	अपने शिशु के लिए एक संदेश लिखिए।
+lib/localization/app_language.dart	28005	28047	आज आप किस बात के लिए शुक्रगुज़ार हैं?
+lib/localization/app_language.dart	36087	36130	आज ख़ुद को और मज़बूत महसूस किया।
+lib/localization/app_language.dart	36144	36163	आधा सफ़र पूरा ❤
+lib/localization/app_language.dart	36177	36211	शिशु ख़ूबसूरती से बढ़ रहा है।
+lib/localization/app_language.dart	36225	36256	मन उत्साह से भरा है।
+lib/localization/app_language.dart	36270	36293	हमारा सफ़र जारी है।
+lib/localization/app_language.dart	64115	64146	क्या मैं पपीता खा सकती हूँ?
+lib/localization/app_language.dart	64160	64180	क्या कॉफ़ी पीना ठीक है?
+lib/localization/app_language.dart	64194	64225	क्या अभी कमर दर्द होना सामान्य है?
+lib/localization/app_language.dart	64239	64264	एसिडिटी कम कैसे करें?
+lib/localization/app_language.dart	64278	64302	बेहतर नींद कैसे आए?
+lib/localization/app_language.dart	64316	64350	क्या मैं अनानास खा सकती हूँ?
+lib/screens/profile_screen.dart	39804	39922	हो सकता है आपकी कंपनी ParentVeda का ख़र्च उठाती हो। अपने ऑफ़िस की ईमेल से देख लीजिए।
+lib/screens/read_reader_screen.dart	5505	5525	किताब के बारे में
+lib/screens/read_reader_screen.dart	5614	5628	मूल विचार
+lib/screens/read_reader_screen.dart	5698	5713	ज़रूरी बातें
+lib/screens/read_reader_screen.dart	5798	5819	अध्याय दर अध्याय
+lib/screens/read_reader_screen.dart	5913	5933	ParentVeda की राय
+lib/screens/read_reader_screen.dart	6011	6029	यादगार पंक्तियाँ
+lib/screens/read_reader_screen.dart	6140	6167	हम इसे क्यों सुझाते हैं
+lib/screens/read_reader_screen.dart	6187	6196	लेख
+lib/screens/read_reader_screen.dart	6270	6292	यह क्यों ज़रूरी है
+lib/screens/read_reader_screen.dart	6378	6407	शोध, आसान भाषा में
+lib/screens/read_reader_screen.dart	9662	9684	यह क्यों ज़रूरी है
+lib/screens/read_reader_screen.dart	10004	10033	शोध, आसान भाषा में
+lib/screens/read_reader_screen.dart	11561	11587	शेयर करना जल्द आ रहा है
+lib/screens/read_reader_screen.dart	18752	18781	यह किताब किस बारे में है
+lib/screens/read_reader_screen.dart	19088	19102	मूल विचार
+lib/screens/read_reader_screen.dart	19311	19332	सबसे ज़रूरी बातें
+lib/screens/read_reader_screen.dart	19422	19467	किसी भी बात को खोलने के लिए उस पर टैप कीजिए।
+lib/screens/read_reader_screen.dart	19914	19935	अध्याय दर अध्याय
+lib/screens/read_reader_screen.dart	20040	20088	किसी भी अध्याय की मुख्य बातें देखने के लिए उस पर टैप कीजिए।
+lib/screens/read_reader_screen.dart	20626	20644	यादगार पंक्तियाँ
+lib/screens/read_reader_screen.dart	21323	21335	किसके लिए
+lib/screens/read_reader_screen.dart	21774	21782	विषय
+lib/screens/read_reader_screen.dart	26357	26377	ParentVeda की राय
+lib/screens/read_reader_screen.dart	28574	28588	मुख्य बातें
+lib/screens/read_reader_screen.dart	30186	30201	कम दिखाइए
+lib/screens/read_reader_screen.dart	30222	30235	और पढ़िए
+lib/screens/read_reader_screen.dart	34184	34198	आगे पढ़िए
+lib/screens/read_reader_screen.dart	34393	34423	पढ़ते रहिए - इसी पर और भी, एक के बाद एक।
+lib/screens/read_reader_screen.dart	37497	37511	इस लेख में
+lib/screens/week5_full_flow_screen.dart	11831	11872	समझने के लिए किसी पर भी टैप कीजिए।
+lib/screens/week5_full_flow_screen.dart	14608	14702	आम और सामान्य बातें जो अभी महसूस हो सकती हैं — समझने के लिए किसी पर भी टैप कीजिए, और जानिए क्या राहत देता है।
+lib/screens/week5_full_flow_screen.dart	21337	21362	पहली तिमाही · हफ़्ते 1–13
+lib/screens/week5_full_flow_screen.dart	23558	23589	हमारी गर्भावस्था का हफ़्ता 5
+lib/screens/week5_full_flow_screen.dart	12368	12382	इस हफ़्ते आप
+lib/screens/week5_full_flow_screen.dart	14459	14485	इस हफ़्ते सेहत · लक्षण
+lib/screens/week5_full_flow_screen.dart	17815	17838	इस हफ़्ते सेहत · खानपान
+lib/screens/week5_full_flow_screen.dart	23477	23502	साथी के साथ साझा कीजिए
+lib/screens/week5_full_flow_screen.dart	2513	2618	यह समझने के लिए है, निदान के लिए नहीं — सही राह हमेशा आपके डॉक्टर ही बताएँगे।
+lib/screens/week5_full_flow_screen.dart	17284	17411	अगर कभी स्पॉटिंग हो, ख़ून आए, या कुछ भी ठीक न लगे, तो अपने डॉक्टर से ज़रूर बात कीजिए। पूछना हमेशा ठीक है।
+lib/widgets/week_cards/week_overview_card.dart	41798	41837	शिशु का दिल धड़कना शुरू हो गया।
+lib/widgets/week_cards/week_overview_card.dart	42248	42293	सुनने की शक्ति बन रही है, आवाज़ें पहुँचने लगी हैं।
+lib/widgets/week_cards/week_overview_card.dart	42527	42592	आपको पहली हलचल महसूस हो सकती है - और आधा सफ़र पूरा!
+lib/widgets/week_cards/week_overview_card.dart	42767	42808	शिशु के विकास में एक बड़ा क़दम।
+lib/widgets/week_cards/week_whatsapp_info_card.dart	4180	4233	नमस्ते! यह रहा आपका हफ़्ता ${w.week} का अपडेट 💜
+lib/widgets/week_cards/week_whatsapp_info_card.dart	5171	5186	शिशु का विकास
+lib/widgets/week_cards/week_whatsapp_info_card.dart	5695	5713	इस हफ़्ते के सुझाव
+lib/widgets/week_cards/week_whatsapp_info_card.dart	6838	6858	इस हफ़्ते का अपडेट

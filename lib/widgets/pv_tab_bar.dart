@@ -7,9 +7,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-
-import '../theme/app_theme.dart';
-import '../theme/pv_fonts.dart';
+import 'pv_nav_bar.dart';
 
 class PvTab {
   const PvTab(this.icon, this.label);
@@ -37,88 +35,28 @@ class PvTabBar extends StatelessWidget {
   static const Color _fAccent = Color(0xFF2E5266);
   static const Color _fMuted = Color(0xFF6A7B82);
 
+  // ⚠️ THIS IS NOW A THIN ADAPTER OVER `PvNavBar`, AND EVERY RULE LIVES THERE.
+  //
+  // It used to draw its own bar, and so did parenting's and TTC's — three
+  // implementations of the component that appears on every screen of the app.
+  // Each had been half-fixed by a different pass: this one had its filled pill
+  // removed but still re-flowed the row on every tap; parenting had the reflow
+  // fixed but kept a filled disc; TTC had neither.
+  //
+  // Keeping the class name means no call site had to change.
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       top: false,
       child: Padding(
         padding: const EdgeInsets.only(left: 14, right: 14, bottom: 14),
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
-          decoration: BoxDecoration(
-            color: AppTheme.surface,
-            borderRadius: BorderRadius.circular(28),
-            boxShadow: const [
-              BoxShadow(
-                color: Color(0x292D144C), // rgba(45,20,76,0.16)
-                blurRadius: 28,
-                offset: Offset(0, 8),
-              ),
-            ],
-          ),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              for (int i = 0; i < tabs.length; i++) _item(i),
-            ],
-          ),
+        child: PvNavBar(
+          items: [for (final t in tabs) PvNavItem(t.icon, t.label)],
+          activeIndex: activeIndex,
+          onTap: onChanged,
+          accent: father ? _fAccent : null,
+          inactive: father ? _fMuted : null,
         ),
-      ),
-    );
-  }
-
-  Widget _item(int i) {
-    final active = i == activeIndex;
-    final t = tabs[i];
-    final activeBg = father ? _fAccent : AppTheme.primary500;
-    final idle = father ? _fMuted : AppTheme.neutral400;
-    return GestureDetector(
-      onTap: () => onChanged(i),
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOut,
-        padding: EdgeInsets.symmetric(
-            horizontal: active ? 12 : 6, vertical: active ? 9 : 4),
-        decoration: BoxDecoration(
-          color: active ? activeBg : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        // Active = horizontal pill (icon + label). Inactive = icon with a small
-        // label beneath, so the mother always knows what each tab is.
-        child: active
-            ? Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(t.icon, size: 21, color: Colors.white),
-                  const SizedBox(width: 6),
-                  Text(
-                    t.label,
-                    style: pvManrope(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w700,
-                      color: Colors.white,
-                    ),
-                  ),
-                ],
-              )
-            : Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(t.icon, size: 20, color: idle),
-                  const SizedBox(height: 2),
-                  Text(
-                    t.label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: pvManrope(
-                      fontSize: 9,
-                      fontWeight: FontWeight.w600,
-                      color: idle,
-                    ),
-                  ),
-                ],
-              ),
       ),
     );
   }

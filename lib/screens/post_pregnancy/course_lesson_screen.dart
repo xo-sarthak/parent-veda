@@ -190,7 +190,7 @@ class CourseLessonScreen extends StatelessWidget {
               ),
             )),
             const SizedBox(height: 12),
-            _pad(Text('Free with ParentVeda+ · lifetime access. Full lessons unlock as they are filmed.',
+            _pad(Text('Lifetime access. Full lessons unlock as they are filmed.',
                 textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.5))),
           ],
         ),

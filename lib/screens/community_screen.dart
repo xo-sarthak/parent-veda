@@ -177,14 +177,13 @@ String _timeAgo(CommunityPost post) {
   return '${(h / 24).ceil()}d';
 }
 
-/// Cosmetic "views" count (Twitter shows views) derived from engagement.
-String _viewsLabel(CommunityPost post) {
-  final v = post.likes * 247 + post.comments * 90 + 503;
-  if (v >= 1000) {
-    return '${(v / 1000).toStringAsFixed(v >= 100000 ? 0 : 1)}K';
-  }
-  return '$v';
-}
+// _viewsLabel REMOVED 2026-08-14, deliberately not commented out for revert.
+//
+// "Comment out, never delete" exists so a superseded DESIGN can be brought
+// back. This was not a design — it manufactured a statistic out of two real
+// ones and displayed it as measurement. There is no version of the product
+// that wants it back, and leaving it in the file as a commented block is an
+// invitation to un-comment it.
 
 bool _isExpertAuthor(CommunityPost post) =>
     post.cred.isNotEmpty || post.type == PostType.expert;
@@ -1838,11 +1837,20 @@ class CommunityPostCard extends StatelessWidget {
                                 label: '${store.likeCount(post)}',
                                 color: liked ? _like : AppTheme.neutral500,
                                 onTap: () => store.toggleLike(post.id)),
-                            _EngageButton(
-                                icon: Icons.bar_chart_rounded,
-                                label: _viewsLabel(post),
-                                color: AppTheme.neutral500,
-                                onTap: onTap ?? () {}),
+                            // VIEW COUNT REMOVED — it was invented, not counted.
+                            //
+                            // The label came from `likes * 247 + comments * 90
+                            // + 503`: a plausible-looking number with nothing
+                            // behind it, rendered beside real counts so it read
+                            // as measured. On a product whose position is that
+                            // a number on screen can be checked, that is not a
+                            // cosmetic flourish, it is the one thing we say we
+                            // do not do.
+                            //
+                            // It also carried a second cost: a view count is a
+                            // score, and scores are what the design rules ban
+                            // from the browse layer. See docs/DESIGN-LAYER.md
+                            // §6a.
                             _EngageButton(
                                 icon: saved
                                     ? Icons.bookmark_rounded

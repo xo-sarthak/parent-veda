@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../product_guide/product_guide_chooser.dart';
+import '../product_guide/product_guide_data.dart';
 import 'pp_common.dart';
 import 'pp_products_data.dart';
 import 'product_detail_screen.dart';
@@ -40,6 +41,19 @@ void ppToggleCompare(BuildContext context, PpProduct product) {
 // own (in-app) products stay in the app (mock checkout for now).
 Future<void> ppLaunchBuy(BuildContext context, PpProduct p) async {
   final messenger = ScaffoldMessenger.of(context);
+  // ⚠️ IMS ACT BACKSTOP. Every surface already hides the Buy control for a
+  // review-only product, so reaching here means a control was drawn that should
+  // not have been. Refusing at the launch point too is deliberate belt-and-
+  // braces: the failure mode of the UI check alone is an affiliate link opening
+  // for infant formula, which is the exact thing the Act prohibits. A guard is
+  // cheap; that is not.
+  if (!ppCanBuy(p)) {
+    messenger.showSnackBar(const SnackBar(
+      content: Text(kPpReviewOnlyWhy),
+      behavior: SnackBarBehavior.floating,
+    ));
+    return;
+  }
   if (!ppIsAffiliate(p)) {
     messenger.showSnackBar(SnackBar(
       content: Text('Buying ${p.name} in-app - checkout opens soon.'),
@@ -59,6 +73,29 @@ Future<void> ppLaunchBuy(BuildContext context, PpProduct p) async {
       behavior: SnackBarBehavior.floating,
     ));
   }
+}
+
+// ---------------------------------------------------------------------------
+//  The richer trust stack, borrowed rather than invented
+// ---------------------------------------------------------------------------
+/// The three signals the ParentVeda Product Guide leads with - a score out of
+/// 100, the share of parents on the same journey who would recommend it, and the
+/// share of experts who say buy - for a catalogue product, or null.
+///
+/// ⚠️ NULL IS THE COMMON ANSWER AND THAT IS THE POINT. The obvious "consistency"
+/// fix was to derive these from the star rating the way ProductGuide derives
+/// them from its own two ratings. That would have put a measured-looking
+/// percentage under all 23 products off one number, which is the invented view
+/// count in another costume. So: the product's own figures if an editor has
+/// filled them, otherwise the figures from its real Guide if it has one, and
+/// otherwise nothing renders at all.
+({int score, int parents, int experts})? ppSignalsOf(PpProduct p) {
+  if (p.pvScore != null && p.parentsPct != null && p.expertsPct != null) {
+    return (score: p.pvScore!, parents: p.parentsPct!, experts: p.expertsPct!);
+  }
+  final g = guideForProduct(id: p.id, name: p.name);
+  if (g == null) return null;
+  return (score: g.parentScore, parents: g.parentsPct, experts: g.expertsPct);
 }
 
 /// A product card for the 2-column grids: image + badge, name, bestseller tag,
@@ -83,11 +120,23 @@ class PpProductCard extends StatelessWidget {
             behavior: HitTestBehavior.opaque,
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Stack(children: [
-                const PpStriped(height: 130, radius: 16, border: true),
+                // Was: const PpStriped(height: 130, radius: 16, border: true).
+                // Kept for revert - the hatch is now the placeholder INSIDE
+                // PpProductImage rather than the card's only option.
+                PpProductImage(
+                  url: product.imageUrl,
+                  height: 130,
+                  radius: 16,
+                  icon: categoryByName(product.category).icon,
+                ),
                 if (product.parentVeda)
                   Positioned(top: 8, left: 8, child: _badge('ParentVeda', ppBrown))
                 else if (product.verified)
                   Positioned(top: 8, left: 8, child: _badge('✓ Verified', ppPurple)),
+                // The IMS Act mark sits ON the image, where a "Buy" affordance
+                // would otherwise be read into the card at a glance.
+                if (product.reviewOnly)
+                  Positioned(bottom: 8, left: 8, child: _badge(kPpReviewOnlyLabel, ppSoft)),
               ]),
               const SizedBox(height: 9),
               Text(product.name,
@@ -415,7 +464,14 @@ class PpProductSnapshotCard extends StatelessWidget {
               .push(MaterialPageRoute<void>(builder: (_) => ProductDetailScreen(product: product))),
           behavior: HitTestBehavior.opaque,
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            const SizedBox(width: 62, child: PpStriped(height: 62, radius: 14, border: true)),
+            // Was: const SizedBox(width: 62, child: PpStriped(height: 62, radius: 14, border: true)).
+            // Kept for revert.
+            PpProductImage(
+              url: product.imageUrl,
+              height: 62,
+              width: 62,
+              icon: categoryByName(product.category).icon,
+            ),
             const SizedBox(width: 14),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -445,6 +501,28 @@ class PpProductSnapshotCard extends StatelessWidget {
             ),
           ),
         ]),
+
+        // The Product Guide's signal stack, on the shelf card - so a product's
+        // standing reads the same in both places. Renders only where the numbers
+        // are real; see ppSignalsOf.
+        ...() {
+          final s = ppSignalsOf(product);
+          if (s == null) return const <Widget>[];
+          return [
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(12)),
+              child: Row(children: [
+                _signal('${s.score}', '/100 ParentVeda'),
+                _signalDivider(),
+                _signal('${s.parents}%', 'parents like you'),
+                _signalDivider(),
+                _signal('${s.experts}%', 'of experts'),
+              ]),
+            ),
+          ];
+        }(),
         const SizedBox(height: 14),
 
         // why ParentVeda recommends
@@ -460,26 +538,39 @@ class PpProductSnapshotCard extends StatelessWidget {
         const SizedBox(height: 14),
 
         // price + buy
-        Row(children: [
-          Flexible(child: Text(product.priceLabel, style: ppJakarta(18), maxLines: 1, overflow: TextOverflow.ellipsis)),
-          const SizedBox(width: 10),
-          const Spacer(),
-          GestureDetector(
-            onTap: () => ppLaunchBuy(context, product),
-            behavior: HitTestBehavior.opaque,
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-              decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(12)),
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                if (affiliate) ...[
-                  const Icon(Icons.open_in_new_rounded, size: 14, color: Colors.white),
-                  const SizedBox(width: 6),
-                ],
-                Text(ppBuyLabel(product), style: ppBody(13, color: Colors.white, w: FontWeight.w700)),
-              ]),
+        //
+        // ⚠️ IMS ACT. For a review-only product the price still shows (it is a
+        // fact a parent needs in order to judge the product) but the CTA and the
+        // affiliate link do not exist, and the reason takes their place. The
+        // trust signals, the guidance, the pros and the cons above are all
+        // untouched: what the Act restricts is the advertising, not the honesty.
+        if (!ppCanBuy(product))
+          const PpReviewOnlyNote(compact: true)
+        else
+          Row(children: [
+            Flexible(child: Text(product.priceLabel, style: ppJakarta(18), maxLines: 1, overflow: TextOverflow.ellipsis)),
+            const SizedBox(width: 10),
+            const Spacer(),
+            GestureDetector(
+              onTap: () => ppLaunchBuy(context, product),
+              behavior: HitTestBehavior.opaque,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+                decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(12)),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  if (affiliate) ...[
+                    const Icon(Icons.open_in_new_rounded, size: 14, color: Colors.white),
+                    const SizedBox(width: 6),
+                  ],
+                  Text(ppBuyLabel(product), style: ppBody(13, color: Colors.white, w: FontWeight.w700)),
+                ]),
+              ),
             ),
-          ),
-        ]),
+          ]),
+        if (!ppCanBuy(product)) ...[
+          const SizedBox(height: 12),
+          Text(product.priceLabel, style: ppJakarta(18), maxLines: 1, overflow: TextOverflow.ellipsis),
+        ],
       ]),
     );
   }
@@ -515,6 +606,21 @@ class PpProductSnapshotCard extends StatelessWidget {
           Text(affiliate ? product.retailer : 'ParentVeda',
               style: ppBody(10, color: affiliate ? ppBrown : ppPurple, w: FontWeight.w700)),
         ]),
+      );
+
+  Widget _signal(String value, String label) => Expanded(
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(value, style: ppBody(14, color: ppPurple, w: FontWeight.w800), maxLines: 1, overflow: TextOverflow.ellipsis),
+          const SizedBox(height: 1),
+          Text(label, style: ppBody(9.5, color: ppMuted, w: FontWeight.w600), maxLines: 2, overflow: TextOverflow.ellipsis),
+        ]),
+      );
+
+  Widget _signalDivider() => Container(
+        width: 1,
+        height: 26,
+        color: Colors.white,
+        margin: const EdgeInsets.symmetric(horizontal: 10),
       );
 
   Widget _ratingPill(PpProduct p) => Container(

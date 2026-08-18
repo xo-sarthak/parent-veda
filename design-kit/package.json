@@ -1,0 +1,33 @@
+{
+  "name": "@parentveda/v3-kit",
+  "version": "1.0.0",
+  "private": true,
+  "description": "React mirror of the ParentVeda V3 design language, for claude.ai/design. The app itself is Flutter — this exists so a design tool can compose screens in our language. See docs/DESIGN-SYSTEM.md; that file is the source of truth, this package follows it.",
+  "type": "module",
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./kit.css": "./dist/kit.css"
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsup && node ./copy-css.mjs"
+  },
+  "peerDependencies": {
+    "react": ">=18"
+  },
+  "devDependencies": {
+    "@fontsource/fraunces": "^5.0.0",
+    "@fontsource/manrope": "^5.0.0",
+    "@types/react": "^18.3.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.0"
+  }
+}

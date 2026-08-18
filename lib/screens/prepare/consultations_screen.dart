@@ -11,9 +11,36 @@ import 'prepare_common.dart';
 import '../../localization/app_language.dart';
 
 class ConsultationsScreen extends StatelessWidget {
-  const ConsultationsScreen({super.key, required this.lang});
+  const ConsultationsScreen({super.key, required this.lang, this.onlyRole});
 
   final AppLanguage lang;
+
+  /// ⚠️ THE FILTER, AND IT IS A GENERAL RULE RATHER THAN ONE SCREEN'S FEATURE.
+  ///
+  /// Review, stated as a rule: "whichever expert we are pointing to anywhere,
+  /// if the user clicks it, that filter should be applied."
+  ///
+  /// The failure it fixes is small and corrosive. A card said "Have a
+  /// gynaecologist go through it with you", she tapped it, and landed on a list
+  /// of five specialists — gynae, nutritionist, lactation consultant,
+  /// counsellor, sleep expert — with no gynae in sight until she scrolled and
+  /// picked one herself. The app named the expert and then made her find them.
+  /// That reads as the app not remembering what it just said.
+  ///
+  /// So: pass the specialist id you promised. Anything else stays reachable
+  /// through "See all experts" — the filter narrows the view, it never removes
+  /// a specialist from the app, which is the same personalisation line the rest
+  /// of the app holds.
+  final String? onlyRole;
+
+  /// The specialists to show. Falls back to everyone when the requested role
+  /// does not exist, rather than rendering an empty screen — a filter that
+  /// matches nothing must never look like "we have no experts".
+  List<Specialist> get _shown {
+    if (onlyRole == null) return kSpecialists;
+    final hit = kSpecialists.where((x) => x.id == onlyRole).toList();
+    return hit.isEmpty ? kSpecialists : hit;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,9 +67,33 @@ class ConsultationsScreen extends StatelessWidget {
             ]),
             const SizedBox(height: 22),
 
-            for (int i = 0; i < kSpecialists.length; i++)
-              _specialist(s, kSpecialists[i], () => open(kSpecialists[i]),
-                  bottom: i == kSpecialists.length - 1),
+            // Filtered when we promised a specific expert, everyone otherwise.
+            for (int i = 0; i < _shown.length; i++)
+              _specialist(s, _shown[i], () => open(_shown[i]),
+                  bottom: i == _shown.length - 1),
+
+            // ⚠️ THE WAY BACK OUT, and it is not optional. A filtered list that
+            // cannot be widened is a list that has hidden things from her.
+            if (onlyRole != null && _shown.length != kSpecialists.length) ...[
+              const SizedBox(height: 6),
+              InkWell(
+                onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                    builder: (_) => ConsultationsScreen(lang: lang))),
+                borderRadius: BorderRadius.circular(999),
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: kPurple.withValues(alpha: 0.35)),
+                  ),
+                  child: Text('See all experts',
+                      style: pvBody(kPurple, 13.5)
+                          .copyWith(fontWeight: FontWeight.w700)),
+                ),
+              ),
+            ],
 
             const SizedBox(height: 22),
             Container(

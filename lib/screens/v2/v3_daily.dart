@@ -514,7 +514,10 @@ class V3InviteBlock extends StatelessWidget {
                   letterSpacing: 1.6,
                   color: p.ink3)),
           const SizedBox(height: 8),
-          Text('Someone you know is doing this too',
+          // ⚠️ WAS "Someone you know is doing this too" — a statement about
+          // someone else. This asks HER a question she can answer, which is what
+          // an invite actually is.
+          Text('Know someone who might find this useful?',
               style: pvFraunces(
                   fontSize: 20,
                   fontWeight: FontWeight.w600,
@@ -527,10 +530,18 @@ class V3InviteBlock extends StatelessWidget {
               'she gets a $inviteeReward and so do you.',
               style: pvManrope(fontSize: 13.5, height: 1.55, color: p.ink2)),
           const SizedBox(height: 14),
-          // The three facts a reader is silently checking for. Stated as plain
-          // lines rather than fine print, because fine print is what the thing
-          // she distrusts looks like.
-          for (final line in const [
+          // ⚠️ THE THREE BENEFIT LINES ARE OFF, KEPT FOR REVERT.
+          //
+          // They were: "Nothing to buy, now or later" / "She can leave any time,
+          // and so can you" / "Invite as many people as you like". Each was a
+          // fact a distrustful reader silently checks for, and the reasoning for
+          // stating them plainly still stands — but three reassurances above a
+          // single button make a small ask look like a scheme that needs
+          // defending. Removed for now, per review.
+          //
+          // Restore by deleting the `false &&` below.
+          // ignore: dead_code
+          if (false) for (final line in const [
             'Nothing to buy, now or later',
             'She can leave any time, and so can you',
             'Invite as many people as you like',
@@ -564,7 +575,7 @@ class V3InviteBlock extends StatelessWidget {
                 borderRadius: BorderRadius.circular(999),
               ),
               child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Text('Invite someone',
+                Text('Click here to invite',
                     style: pvManrope(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,

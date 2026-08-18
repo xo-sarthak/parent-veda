@@ -1,0 +1,35 @@
+{
+  "projectId": "1cc34d90-816f-454f-b047-9246cc0af04c",
+  "shape": "package",
+  "pkg": "@parentveda/v3-kit",
+  "globalName": "ParentVedaV3",
+  "buildCmd": "npm run build",
+  "srcDir": "src",
+  "tsconfig": "tsconfig.json",
+  "cssEntry": "dist/kit.css",
+  "tokensGlob": "src/tokens.css",
+  "docsDir": "docs",
+  "readmeHeader": ".design-sync/conventions.md",
+  "provider": {
+    "component": "PVScreen",
+    "props": { "phone": false }
+  },
+  "overrides": {
+    "PVHeroField": { "cardMode": "column" },
+    "PVBottomNav": { "cardMode": "column" },
+    "PVScreen": { "cardMode": "column" },
+    "PVIcon": { "cardMode": "column" },
+    "PVBlockGrid": { "cardMode": "column" },
+    "PVBlockTile": { "cardMode": "column" },
+    "PVSpineChip": { "cardMode": "column" },
+    "PVCard": { "cardMode": "column" },
+    "PVText": { "cardMode": "column" }
+  },
+  "extraFonts": [
+    "node_modules/@fontsource/fraunces/latin-600.css",
+    "node_modules/@fontsource/manrope/latin-400.css",
+    "node_modules/@fontsource/manrope/latin-600.css",
+    "node_modules/@fontsource/manrope/latin-700.css",
+    "node_modules/@fontsource/manrope/latin-800.css"
+  ]
+}

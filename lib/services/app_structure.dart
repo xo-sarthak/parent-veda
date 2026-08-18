@@ -107,6 +107,7 @@ const List<AppSurface> kAppSurfaces = [
   AppSurface('yoga', AppHome.prepare, 'Yoga'),
   AppSurface('birthing_classes', AppHome.prepare, 'Birthing classes'),
   AppSurface('shop', AppHome.prepare, 'Shop'),
+  AppSurface('nutrition', AppHome.prepare, 'Nutrition'),
 
   // ---- Tools: track or check -------------------------------------------------
   AppSurface('medication', AppHome.tools, 'Medicines'),
@@ -118,6 +119,18 @@ const List<AppSurface> kAppSurfaces = [
   AppSurface('hospital_bag', AppHome.tools, 'Ready for birth'),
   AppSurface('can_i', AppHome.tools, 'Can I…?'),
   AppSurface('product_guide', AppHome.tools, 'Product guide'),
+  // ---- Added for the bracket model -----------------------------------------
+  // Four tools that ship today and were never declared here. Found by building
+  // the bracket table and discovering its layers had nowhere to point: the
+  // Symptoms Companion is the whole Symptoms bracket's tool layer, and the
+  // report explainer is the most distinctive thing under Scans & tests.
+  //
+  // Worth noting as evidence for this file's own header comment — it describes
+  // the structure rather than enforcing it, so a surface can ship for months
+  // without appearing here and nothing complains.
+  AppSurface('symptoms', AppHome.tools, 'Symptoms'),
+  AppSurface('due_date', AppHome.tools, 'Due date'),
+  AppSurface('reports', AppHome.tools, 'Reports'),
 
   // ---- Community --------------------------------------------------------------
   AppSurface('rooms', AppHome.community, 'Rooms'),

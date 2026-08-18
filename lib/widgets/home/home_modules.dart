@@ -504,7 +504,11 @@ class GrowModule extends StatelessWidget {
           onTap: () {
             home.markEngaged(DailyModule.grow);
             Navigator.of(context).push(MaterialPageRoute(
-              builder: (_) => GrowReaderScreen(grow: g, lang: lang),
+              builder: (_) => GrowReaderScreen(
+                  grow: g,
+                  lang: lang,
+                  week: day.week,
+                  dayOfPregnancy: day.day),
             ));
           },
         ),

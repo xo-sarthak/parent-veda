@@ -1,0 +1,35 @@
+lib/screens/bump_book_screen.dart	31743	31765		My Bump Journey keepsake book	Meri Bump Journey book
+lib/screens/bump_book_screen.dart	31897	31912		Could not share.	Share nahi hua.
+lib/screens/bump_book_screen.dart	32086	32103		My Bump Journey Book	Bump Journey Book
+lib/screens/journal_writer_screen.dart	6149	6169		Week ${widget.week}	Hafta ${widget.week}
+lib/screens/journey_booklet_screen.dart	5545	5553		Week $w	Hafta $w
+lib/screens/photo_viewer_screen.dart	1768	1787		Week ${photo.week}	Hafta ${photo.week}
+lib/screens/week5_full_flow_screen.dart	6118	6129		Got it	Samajh gaya
+lib/screens/week5_full_flow_screen.dart	9558	9583		This week, baby is about a	Is hafte, baby lagbhag ek
+lib/screens/week5_full_flow_screen.dart	9906	9913		Length	Lambaai
+lib/screens/week5_full_flow_screen.dart	10008	10013		Weight	Wazan
+lib/screens/week5_full_flow_screen.dart	10345	10371		ABOUT YOUR BABY	TUMHARE BABY KE BAARE MEIN
+lib/screens/week5_full_flow_screen.dart	10686	10698		In my words	Meri zubaani
+lib/screens/week5_full_flow_screen.dart	10816	10836		How big am I	Main kitna bada hoon
+lib/screens/week5_full_flow_screen.dart	12601	12631		How you might be feeling	Tum kaisa mehsoos kar sakti ho
+lib/screens/week5_full_flow_screen.dart	12757	12777		Your changing body	Tumhara badalta body
+lib/screens/week5_full_flow_screen.dart	12909	12930		Be kind to yourself	Apne saath naram raho
+lib/screens/week5_full_flow_screen.dart	13053	13066		Highlights	Khaas baatein
+lib/screens/week5_full_flow_screen.dart	15166	15184		HOW COMMON IS IT?	YEH KITNA AAM HAI?
+lib/screens/week5_full_flow_screen.dart	15342	15360		WHY IT HAPPENS	AISA KYUN HOTA HAI
+lib/screens/week5_full_flow_screen.dart	15511	15534		WHAT MAY HELP	KYA MADAD KAR SAKTA HAI
+lib/screens/week5_full_flow_screen.dart	16723	16749		WHEN TO CONTACT YOUR DOCTOR	DOCTOR SE KAB SAMPARK KARO
+lib/screens/week5_full_flow_screen.dart	18479	18507		INDIAN SUPERFOOD OF THE WEEK	IS HAFTE KA INDIAN SUPERFOOD
+lib/screens/week5_full_flow_screen.dart	19306	19339		Foods to favour this week	Is hafte pasand karne wale khaane
+lib/screens/week5_full_flow_screen.dart	19812	19829		What to avoid	Kis se bachna hai
+lib/screens/week5_full_flow_screen.dart	23964	23967		Mother	Maa
+lib/screens/week5_full_flow_screen.dart	24114	24146		Scans & appointments coming up	Aane wale scans aur appointments
+lib/screens/week5_full_flow_screen.dart	25173	25201		How you can help	Tum kaise madad kar sakte ho
+lib/screens/week_flow_screen.dart	111635	111638		Mom	Maa
+lib/screens/week_flow_screen.dart	188071	188074		Mom	Maa
+lib/screens/week_flow_screen.dart	226919	226930		View all	Sab dekhein
+lib/screens/week_flow_screen.dart	238608	238621		Previous week	Pichhla hafta
+lib/screens/week_flow_screen.dart	238667	238677		Next week	Agla hafta
+lib/widgets/locked_week_view.dart	3987	4007		Week ${widget.week}	Hafta ${widget.week}
+lib/widgets/memories/memories_section.dart	4960	4979		Week ${entry.week}	Hafta ${entry.week}
+lib/widgets/memories/memories_section.dart	16996	17026		Week ${e.week} · ${e.dateIso}	Hafta ${e.week} · ${e.dateIso}

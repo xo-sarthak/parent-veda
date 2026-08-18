@@ -119,8 +119,10 @@ class MasterclassesScreen extends StatelessWidget {
                         Expanded(
                           child: Text.rich(TextSpan(children: [
                             TextSpan(text: '₹1,499', style: ppBody(15, color: ppInk, w: FontWeight.w700)),
-                            TextSpan(text: '  ·  free on ', style: ppBody(12, color: ppSoft)),
-                            TextSpan(text: 'ParentVeda+', style: ppBody(12, color: ppPurple, w: FontWeight.w700)),
+                            // Kept for revert:
+                            //   TextSpan(text: '  ·  free on ', ...),
+                            //   TextSpan(text: 'ParentVeda+', ...),
+                            TextSpan(text: '  ·  one-time', style: ppBody(12, color: ppSoft)),
                           ])),
                         ),
                         const SizedBox(width: 12),

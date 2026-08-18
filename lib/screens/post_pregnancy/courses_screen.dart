@@ -103,7 +103,7 @@ class CoursesScreen extends StatelessWidget {
                       Expanded(
                         child: Text.rich(TextSpan(children: [
                           TextSpan(text: '₹4,999', style: ppBody(16, color: ppInk, w: FontWeight.w700)),
-                          TextSpan(text: '  ·  free on ParentVeda+', style: ppBody(12, color: ppSoft)),
+                          TextSpan(text: '  ·  one-time', style: ppBody(12, color: ppSoft)),
                         ])),
                       ),
                       const SizedBox(width: 12),
@@ -176,7 +176,7 @@ class CoursesScreen extends StatelessWidget {
                     const SizedBox(height: 12),
                     Text.rich(TextSpan(children: [
                       TextSpan(text: '₹4,999', style: ppBody(15, color: ppInk, w: FontWeight.w700)),
-                      TextSpan(text: '  ·  free on ParentVeda+', style: ppBody(12, color: ppSoft)),
+                      TextSpan(text: '  ·  one-time', style: ppBody(12, color: ppSoft)),
                     ])),
                   ]),
                 ),
@@ -209,7 +209,7 @@ class CoursesScreen extends StatelessWidget {
 
             const SizedBox(height: 22),
             _pad(Text(
-                "You only see what fits your child's age - everything else waits, one tap away. Free with ParentVeda+.",
+                "You only see what fits your child's age - everything else waits, one tap away.",
                 textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
           ],
         ),

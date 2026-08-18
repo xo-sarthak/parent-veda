@@ -39,6 +39,19 @@ enum LifeStage {
 
   /// Day one to age five.
   parenting,
+
+  /// ⚠️ NOT A SELECTABLE STAGE — a fourth VALUE, not a fourth destination.
+  ///
+  /// Skilling exists here so its bracket table can name a stage without lying
+  /// about which one. Nothing sets it: `LifeStageStore` never writes it, the
+  /// splash never routes to it, and `JourneyState` refuses to infer anything
+  /// from it. It is reachable only from the design preview.
+  ///
+  /// It gets a persisted id anyway, because `id` is exhaustive and a stage with
+  /// no id would be one `switch` away from a crash the day someone does wire it.
+  /// A value that can be persisted but never is costs nothing; a missing case
+  /// costs a runtime error.
+  skilling,
 }
 
 extension LifeStageCopy on LifeStage {
@@ -52,6 +65,8 @@ extension LifeStageCopy on LifeStage {
         return 'pregnancy';
       case LifeStage.parenting:
         return 'parenting';
+      case LifeStage.skilling:
+        return 'skilling';
     }
   }
 
@@ -63,6 +78,8 @@ extension LifeStageCopy on LifeStage {
         return hinglish ? 'Pregnancy' : 'Pregnancy';
       case LifeStage.parenting:
         return hinglish ? 'Parenting' : 'Parenting';
+      case LifeStage.skilling:
+        return hinglish ? 'Skilling' : 'Skilling';
     }
   }
 

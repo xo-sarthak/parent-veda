@@ -264,6 +264,41 @@ const List<RecoCollection> kRecoCollections = [
 RecoCollection recoCollectionById(String id) =>
     kRecoCollections.firstWhere((c) => c.id == id, orElse: () => kRecoCollections.first);
 
+// ---- collections by age (for the shop's "What you need now" band) ------------
+//  The Products shop needs to know which collection suits the child in front of
+//  it: a newborn parent must not be offered First Birthday Ideas, and a
+//  two-year parent must not be offered the high-contrast newborn shelf.
+//
+//  ⚠️ DERIVED FROM THE ITEMS, NOT TAGGED ON THE COLLECTION. A `bands:` field on
+//  RecoCollection would be a second source of truth for something the 70 items
+//  already state precisely, in `ageMin`/`ageMax`. Tags rot the first time an
+//  item is added: nobody re-reads the collection header, so "0-6m" outlives the
+//  toddler book that just joined. Deriving cannot go stale.
+//
+//  ⚠️ AND IT RANKS RATHER THAN FILTERS. Several collections (Travel Essentials,
+//  Music & Rhymes) genuinely span every age, so a filter would return most of
+//  the ten for every child and the band would be identical at 2 months and 2
+//  years - the exact failure the spec names. Scoring by how MANY of a
+//  collection's items fit this month makes the top of the list actually move.
+
+/// How many of [c]'s items suit a child of [months].
+int recoCollectionFit(RecoCollection c, int months) =>
+    c.items.where((r) => months >= r.ageMin && months <= r.ageMax).length;
+
+/// The collections worth showing at [months], best fit first. Collections with
+/// nothing for this age are dropped, so an empty result is honest ("we have no
+/// collection for this stage yet") rather than a padded list.
+List<RecoCollection> recoCollectionsForAge(int months) {
+  final scored = <(RecoCollection, int)>[
+    for (final c in kRecoCollections)
+      if (recoCollectionFit(c, months) > 0) (c, recoCollectionFit(c, months)),
+  ];
+  // Ties break on the collection's own order, which is editorial, so the band
+  // does not reshuffle between builds.
+  scored.sort((a, b) => b.$2.compareTo(a.$2));
+  return [for (final s in scored) s.$1];
+}
+
 // =============================================================================
 //  Catalogue - curated, not exhaustive. Weighted for the 0-2y window (Aarav is
 //  ~4 months) but spanning ages so the engine has range. Warm ParentVeda voice.

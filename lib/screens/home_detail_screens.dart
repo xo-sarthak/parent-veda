@@ -18,6 +18,8 @@ import '../models/father_day.dart';
 import '../models/home_day.dart';
 import '../services/baby_voice_service.dart';
 import '../services/daily_store.dart';
+import '../services/narration_service.dart';
+import '../widgets/narration/narrate_button.dart';
 import '../theme/app_theme.dart';
 
 // ---------------------------------------------------------------------------
@@ -25,9 +27,25 @@ import '../theme/app_theme.dart';
 // ---------------------------------------------------------------------------
 
 class GrowReaderScreen extends StatelessWidget {
-  const GrowReaderScreen({super.key, required this.grow, required this.lang});
+  const GrowReaderScreen(
+      {super.key,
+      required this.grow,
+      required this.lang,
+      this.week,
+      this.dayOfPregnancy});
   final GrowContent grow;
   final AppLanguage lang;
+
+  /// Which day this reader is showing, used ONLY to build the narration
+  /// key. Nullable because the father surface reuses this screen through a
+  /// different path and has no recording of its own yet - a null week means
+  /// no speaker rather than a speaker that plays somebody else's passage.
+  final int? week;
+  final int? dayOfPregnancy;
+
+  String? _key(String path) => (week == null || dayOfPregnancy == null)
+      ? null
+      : NarrationService.homeKey(week!, dayOfPregnancy!, path);
 
   @override
   Widget build(BuildContext context) {
@@ -49,6 +67,21 @@ class GrowReaderScreen extends StatelessWidget {
             Text(grow.insight.of(lang),
                 style: text.titleMedium?.copyWith(height: 1.5, color: AppTheme.neutral800)),
             const SizedBox(height: 18),
+            // The speaker sits WITH the long text, not on the card that
+            // opened this screen. This is the wall of Hindi she may prefer to
+            // hear rather than read, so the control belongs here.
+            if (_key('grow.expanded') != null)
+              Row(children: [
+                NarrateButton(
+                  narrationKey: _key('grow.expanded')!,
+                  text: grow.expanded.of(lang),
+                  englishText: grow.expanded.en,
+                  lang: lang,
+                ),
+                Text(S.now.listenLabel,
+                    style: text.labelMedium
+                        ?.copyWith(color: AppTheme.primary600)),
+              ]),
             Text(grow.expanded.of(lang),
                 style: text.bodyLarge?.copyWith(height: 1.6)),
             if (grow.deepDive != null && grow.deepDive!.of(lang).trim().isNotEmpty) ...[
@@ -69,6 +102,16 @@ class GrowReaderScreen extends StatelessWidget {
                             color: AppTheme.primary600, letterSpacing: 1, fontWeight: FontWeight.w800)),
                   ]),
                   const SizedBox(height: 10),
+                  Row(children: [
+                    if (_key('grow.deepDive') != null)
+                      NarrateButton(
+                        narrationKey: _key('grow.deepDive')!,
+                        text: grow.deepDive!.of(lang),
+                        englishText: grow.deepDive!.en,
+                        lang: lang,
+                        size: 18,
+                      ),
+                  ]),
                   Text(grow.deepDive!.of(lang), style: text.bodyMedium?.copyWith(height: 1.6)),
                 ]),
               ),

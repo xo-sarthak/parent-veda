@@ -28,7 +28,7 @@ import 'auth/auth_flow_screen.dart';
 // import 'father/father_daily_screen.dart';
 import 'main_scaffold.dart';
 import 'ttc/ttc_common.dart' show ttcHomeRoute;
-import 'ttc/ttc_today_screen.dart';
+import 'ttc/ttc_home_version.dart';
 import '../theme/pv_fonts.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -177,7 +177,7 @@ class _SplashScreenState extends State<SplashScreen>
   Route<void> _ttcRoute() => PageRouteBuilder(
         settings: const RouteSettings(name: ttcHomeRoute),
         transitionDuration: const Duration(milliseconds: 450),
-        pageBuilder: (_, _, _) => const TtcTodayScreen(),
+        pageBuilder: (_, _, _) => const TtcHomeScreen(),
         transitionsBuilder: (_, anim, _, child) =>
             FadeTransition(opacity: anim, child: child),
       );
@@ -208,16 +208,16 @@ class _SplashScreenState extends State<SplashScreen>
     final s = S(widget.pregnancy.language);
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
               AppTheme.surfaceContainerHigh,
               AppTheme.surfaceContainer,
-              Color(0xFFFFE9EE),
+              const Color(0xFFFFE9EE),
             ],
-            stops: [0.0, 0.55, 1.0],
+            stops: const [0.0, 0.55, 1.0],
           ),
         ),
         child: Stack(

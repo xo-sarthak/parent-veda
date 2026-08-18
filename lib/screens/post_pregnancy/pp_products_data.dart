@@ -62,6 +62,15 @@ class PpProduct {
     this.specs = const {},
     this.pros = const [],
     this.cons = const [],
+    this.imageUrl = '',
+    this.imageUrls = const [],
+    this.reviewOnly = false,
+    this.ageMin = 0,
+    this.ageMax = 72,
+    this.buyUrl,
+    this.pvScore,
+    this.parentsPct,
+    this.expertsPct,
   });
 
   final String id;
@@ -98,6 +107,96 @@ class PpProduct {
   final Map<String, String> specs;
   final List<String> pros;
   final List<String> cons;
+
+  // ---- the product shot ------------------------------------------------------
+  //  ⚠️ THE FIELD THAT WAS MISSING, and the reason every product surface in the
+  //  parenting app drew a diagonal-hatch tile. The model simply had nowhere to
+  //  put a photograph, so no amount of layout work could show one.
+  //
+  //  Shape matches the pregnancy side (`Product.imageUrl` in
+  //  lib/data/product_data.dart) so the two catalogues agree: a plain URL
+  //  string, empty when we do not have a photo yet.
+  //
+  //  ⚠️ ONE DELIBERATE DIFFERENCE FROM THE PREGNANCY SIDE. There, an empty
+  //  `imageUrl` falls back to a keyword-matched stock photo from loremflickr —
+  //  and that file's own header explains why that is a liability: "a
+  //  plausible-looking photo of the wrong object is the visual version of the
+  //  invented view count". This side does NOT do that. An empty imageUrl draws
+  //  an honest branded cover block (PpProductImage), because a parent about to
+  //  spend money must never be shown a picture of something she is not buying.
+  //
+  //  Absolute URL (https://…) or a bundled asset path — PpProductImage decides
+  //  which by looking for a scheme, so a real photo drops in either way.
+  final String imageUrl;
+
+  /// Extra shots for the detail page's gallery. The hero stays [imageUrl]; these
+  /// are the "and here it is from the other side" frames. Optional by design —
+  /// most catalogue entries will only ever have one photo.
+  final List<String> imageUrls;
+
+  // ---- IMS Act / WHO code -----------------------------------------------------
+  //  ⚠️ REVIEW-ONLY / REQUIRES-LEGAL-SIGNOFF. India's Infant Milk Substitutes,
+  //  Feeding Bottles and Infant Foods (Regulation of Production, Supply and
+  //  Distribution) Act — the IMS Act — together with the WHO code prohibits
+  //  ADVERTISING or PROMOTING infant milk substitutes, feeding bottles, and
+  //  infant foods marketed as a breast-milk substitute. It does not prohibit
+  //  telling a parent the truth about one.
+  //
+  //  So this flag removes the COMMERCE and keeps the JOURNALISM: no Buy button,
+  //  no affiliate link, no price CTA — but the trust signals, the guidance, the
+  //  spec table and the ParentVeda take all stay, because honest information is
+  //  lawful and it is the reason a parent came.
+  //
+  //  ONE FLAG DRIVES BOTH SURFACES (the product/category card and the compare
+  //  column) on purpose. Two flags would eventually disagree, and the surface
+  //  that disagreed would be the one that broke the law.
+  //
+  //  Never flip this to false to "enable the buy path". It is a legal boundary,
+  //  not a merchandising switch, and the entry carries the marker in its
+  //  comment so a reviewer can find every one of them.
+  final bool reviewOnly;
+
+  // ---- age window (months) ---------------------------------------------------
+  //  What stage this is actually for. Read by the age-aware "What you need now"
+  //  band so a newborn parent and a two-year parent do not see one grid.
+  //
+  //  ⚠️ IT NARROWS WHAT LEADS, NEVER WHAT EXISTS. Every filter, category and
+  //  search still returns the whole catalogue; this only decides what gets
+  //  surfaced unasked. Same rule as PpPage.bands. Defaults are wide open (0-72)
+  //  so an un-tagged entry is surfaced to everyone rather than hidden from
+  //  everyone — a missing tag must fail loud, not silent.
+  final int ageMin;
+  final int ageMax;
+
+  /// The REAL destination for a buy: an affiliate deep link, or our own store.
+  /// Null falls back to a retailer search built from the name (see [ppBuyUrl]),
+  /// which works today and gets replaced per product without a code change.
+  final String? buyUrl;
+
+  // ---- the richer trust signals ----------------------------------------------
+  //  The stack the ParentVeda Product Guide shows (score /100, % of parents on
+  //  the same journey who would recommend, % of experts who say buy).
+  //
+  //  ⚠️ NULLABLE, AND NEVER DERIVED FROM THE STAR RATING HERE. A percentage
+  //  computed from a rating is a number that looks measured and is not. Null
+  //  means "we have not measured this", the surfaces render nothing, and a
+  //  product that DOES have a Guide borrows the Guide's real figures instead
+  //  (see ppSignalsOf in pp_product_widgets.dart).
+  final int? pvScore;
+  final int? parentsPct;
+  final int? expertsPct;
+
+  /// Every shot we have, hero first, blanks dropped. Empty means "no photo yet",
+  /// which is a rendering decision (an honest cover block), not an error.
+  List<String> get images => [
+        if (imageUrl.isNotEmpty) imageUrl,
+        ...imageUrls.where((u) => u.isNotEmpty && u != imageUrl),
+      ];
+
+  bool get hasImage => images.isNotEmpty;
+
+  /// Is this product for a child of [months]? Inclusive at both ends.
+  bool suitsAge(int months) => months >= ageMin && months <= ageMax;
 
   String get priceLabel => '₹${_grouped(price)}';
   String get ratingLabel => '★ ${rating.toStringAsFixed(1)}';
@@ -149,6 +248,8 @@ const List<PpProduct> kPpProducts = [
   // -- Sleep · Soothers & white noise (faithful to design) --
   PpProduct(
       id: 'dozy',
+      ageMin: 0,
+      ageMax: 24,
       name: 'Dozy White-Noise Soother',
       brand: 'Dozy',
       category: 'Sleep',
@@ -184,6 +285,8 @@ const List<PpProduct> kPpProducts = [
       ]),
   PpProduct(
       id: 'lull',
+      ageMin: 0,
+      ageMax: 24,
       name: 'Lull Portable Soother',
       brand: 'Lull',
       category: 'Sleep',
@@ -218,6 +321,8 @@ const List<PpProduct> kPpProducts = [
       ]),
   PpProduct(
       id: 'hush',
+      ageMin: 0,
+      ageMax: 24,
       name: 'Hush Mini Sound Machine',
       brand: 'Hushh',
       category: 'Sleep',
@@ -252,6 +357,8 @@ const List<PpProduct> kPpProducts = [
       ]),
   PpProduct(
       id: 'cloudtunes',
+      ageMin: 0,
+      ageMax: 24,
       name: 'CloudTunes Soother',
       brand: 'CloudTunes',
       category: 'Sleep',
@@ -287,6 +394,8 @@ const List<PpProduct> kPpProducts = [
   // -- Sleep · Sleepwear & sacks --
   PpProduct(
       id: 'cosysuit',
+      ageMin: 0,
+      ageMax: 12,
       name: 'Cosy Cotton Sleepsuit',
       brand: 'Dozy',
       category: 'Sleep',
@@ -303,6 +412,8 @@ const List<PpProduct> kPpProducts = [
       cons: ['One weight only - layer for winter']),
   PpProduct(
       id: 'merinosack',
+      ageMin: 3,
+      ageMax: 24,
       name: 'Merino Sleep Sack',
       brand: 'SnuggleSack',
       category: 'Sleep',
@@ -320,6 +431,9 @@ const List<PpProduct> kPpProducts = [
   // -- Sleep · Bedding & blackout --
   PpProduct(
       id: 'hushcurtains',
+      // A room, not a size: it stays useful for as long as the child naps in it.
+      ageMin: 0,
+      ageMax: 72,
       name: 'Hush Blackout Curtains',
       brand: 'ParentVeda',
       category: 'Sleep',
@@ -332,10 +446,14 @@ const List<PpProduct> kPpProducts = [
       badge: 'Best overall',
       bestFor: 'Bright rooms & day naps',
       summary: 'True blackout curtains that make day naps and early mornings easier.',
-      pros: ['Genuine blackout, not just dimming', 'Made and backed by ParentVeda', 'Machine-washable'],
+      // Was: 'Made and backed by ParentVeda'. Kept for revert - see the note on
+      // the Soothe lotion below.
+      pros: ['Genuine blackout, not just dimming', 'Our own make, reviewed to the same standard as the rest', 'Machine-washable'],
       cons: ['Needs the right rail width']),
   PpProduct(
       id: 'snugglesack',
+      ageMin: 3,
+      ageMax: 24,
       name: 'SnuggleSack Sleep Bag',
       brand: 'SnuggleSack',
       category: 'Sleep',
@@ -354,6 +472,8 @@ const List<PpProduct> kPpProducts = [
   // -- Skincare (light catalog) --
   PpProduct(
       id: 'lotion',
+      ageMin: 0,
+      ageMax: 36,
       name: 'Soothe Baby Lotion',
       brand: 'ParentVeda',
       category: 'Skincare',
@@ -377,13 +497,20 @@ const List<PpProduct> kPpProducts = [
       pros: [
         'Fragrance- and paraben-free',
         'Absorbs fast without a greasy film',
-        'ParentVeda-made with verified reviews',
+        // Was: 'ParentVeda-made with verified reviews'. Kept for revert.
+        // Our own SKU praising itself for being ours is not a reason to buy it,
+        // and on a shelf where we also rank other brands it reads as a thumb on
+        // the scale. What a parent can actually check is that we did not grade
+        // ourselves easily, so that is what the line now says.
+        'Held to the same review standard as the other brands here',
       ],
       cons: [
         'May feel light for very dry or eczema-prone skin',
       ]),
   PpProduct(
       id: 'rashcream',
+      ageMin: 0,
+      ageMax: 36,
       name: 'Calm Zinc Rash Cream',
       brand: 'Sebamed',
       category: 'Skincare',
@@ -414,6 +541,8 @@ const List<PpProduct> kPpProducts = [
       ]),
   PpProduct(
       id: 'babywash',
+      ageMin: 0,
+      ageMax: 36,
       name: 'Gentle Top-to-Toe Wash',
       brand: 'Mustela',
       category: 'Skincare',
@@ -443,8 +572,16 @@ const List<PpProduct> kPpProducts = [
       ]),
 
   // -- Feeding --
+  //  ⚠️ REVIEW-ONLY / REQUIRES-LEGAL-SIGNOFF (India's IMS Act).
+  //  A feeding bottle is one of the three things the Act names, so this entry
+  //  carries `reviewOnly: true` and every surface drops its Buy CTA and its
+  //  affiliate link. The review itself stays, in full. Do not remove the flag to
+  //  turn the buy path back on; that needs a lawyer, not a merchandiser.
   PpProduct(
       id: 'bottle',
+      reviewOnly: true,
+      ageMin: 0,
+      ageMax: 12,
       name: 'Anti-Colic Feeding Bottle',
       brand: 'Philips',
       category: 'Feeding',
@@ -468,6 +605,8 @@ const List<PpProduct> kPpProducts = [
       ]),
   PpProduct(
       id: 'spoons',
+      ageMin: 6,
+      ageMax: 18,
       name: 'First Spoons Weaning Set',
       brand: 'ParentVeda',
       category: 'Feeding',
@@ -483,13 +622,17 @@ const List<PpProduct> kPpProducts = [
       pros: [
         'Soft, shallow tips are gentle on new gums',
         'BPA-free and dishwasher-safe',
-        'Made and backed by ParentVeda',
+        // Was: 'Made and backed by ParentVeda'. Kept for revert - see the note
+        // on the Soothe lotion above.
+        'Our own make, reviewed to the same standard as the rest',
       ],
       cons: [
         'Best for early weaning, not older toddlers',
       ]),
   PpProduct(
       id: 'steriliser',
+      ageMin: 0,
+      ageMax: 12,
       name: 'Steam Steriliser',
       brand: 'Philips',
       category: 'Feeding',
@@ -514,6 +657,8 @@ const List<PpProduct> kPpProducts = [
   // -- Play & Development --
   PpProduct(
       id: 'playgym',
+      ageMin: 0,
+      ageMax: 8,
       name: 'High-Contrast Play Gym',
       brand: 'Skip Hop',
       category: 'Play & Development',
@@ -538,6 +683,8 @@ const List<PpProduct> kPpProducts = [
       ]),
   PpProduct(
       id: 'clothbook',
+      ageMin: 0,
+      ageMax: 12,
       name: 'Peekaboo Cloth Book',
       brand: 'ParentVeda',
       category: 'Play & Development',
@@ -560,6 +707,8 @@ const List<PpProduct> kPpProducts = [
       ]),
   PpProduct(
       id: 'crinkle',
+      ageMin: 2,
+      ageMax: 12,
       name: 'Crinkle Sensory Set',
       brand: 'Fisher-Price',
       category: 'Play & Development',
@@ -583,6 +732,8 @@ const List<PpProduct> kPpProducts = [
   // -- Health & Safety --
   PpProduct(
       id: 'thermometer',
+      ageMin: 0,
+      ageMax: 72,
       name: 'Forehead Thermometer',
       brand: 'Dr Trust',
       category: 'Health & Safety',
@@ -606,6 +757,9 @@ const List<PpProduct> kPpProducts = [
       ]),
   PpProduct(
       id: 'cornerguard',
+      // Starts mattering when he starts moving, not at birth.
+      ageMin: 6,
+      ageMax: 36,
       name: 'Corner Guard Pack',
       brand: 'Safe-O-Kid',
       category: 'Health & Safety',
@@ -628,6 +782,8 @@ const List<PpProduct> kPpProducts = [
       ]),
   PpProduct(
       id: 'firstaid',
+      ageMin: 0,
+      ageMax: 72,
       name: 'Baby First-Aid Kit',
       brand: 'ParentVeda',
       category: 'Health & Safety',
@@ -652,6 +808,8 @@ const List<PpProduct> kPpProducts = [
   // -- On the move --
   PpProduct(
       id: 'stroller',
+      ageMin: 0,
+      ageMax: 36,
       name: 'Featherlite Stroller',
       brand: 'LuvLap',
       category: 'On the move',
@@ -675,6 +833,8 @@ const List<PpProduct> kPpProducts = [
       ]),
   PpProduct(
       id: 'carrier',
+      ageMin: 0,
+      ageMax: 24,
       name: 'Ergo Baby Carrier',
       brand: 'Ergobaby',
       category: 'On the move',
@@ -698,6 +858,10 @@ const List<PpProduct> kPpProducts = [
       ]),
   PpProduct(
       id: 'carseat',
+      // An infant seat, outgrown by around 15 months. A bigger child needs the
+      // next seat up, so surfacing this one to a two-year parent is wrong.
+      ageMin: 0,
+      ageMax: 15,
       name: 'Infant Car Seat',
       brand: 'Chicco',
       category: 'On the move',
@@ -773,6 +937,40 @@ List<String> ppBrands() => productCatalog.map((p) => p.brand).toSet().toList()..
 
 List<PpProduct> productsInSub(String category, String subName) =>
     productCatalog.where((p) => p.category == category && p.sub == subName).toList();
+
+// ---- age-aware surfacing (the "What you need now" band) ----------------------
+//  ⚠️ NARROWS WHAT LEADS, NEVER WHAT EXISTS. Every category, filter and search
+//  still returns the whole catalogue. This is only for the unasked-for row on
+//  the shop, which is exactly the surface where a newborn parent being shown
+//  corner guards and a two-year parent being shown a high-contrast play gym
+//  looks like nobody is reading the profile.
+
+/// The products that suit a child of [months], best-rated first. A product with
+/// no age window (the wide-open 0-72 default) matches everyone on purpose - a
+/// missing tag must fail loud, by over-showing, rather than silently vanishing.
+List<PpProduct> ppProductsForAge(int months) => productCatalog.where((p) => p.suitsAge(months)).toList()
+  ..sort((a, b) => b.rating.compareTo(a.rating));
+
+/// One product per category that suits [months], so the band reads as a spread
+/// across the shop rather than four soothers. Best-rated wins each category.
+List<PpProduct> ppAgeSpread(int months, {int limit = 6}) {
+  final seen = <String>{};
+  final out = <PpProduct>[];
+  for (final p in ppProductsForAge(months)) {
+    if (seen.add(p.category)) out.add(p);
+    if (out.length >= limit) break;
+  }
+  return out;
+}
+
+/// The photo that should front a subcategory tile: the leading product on that
+/// shelf that actually HAS a photo, else the leading product (so the tile still
+/// carries its category identity), else null for an empty shelf.
+PpProduct? ppLeadProduct(String category, String subName) {
+  final items = productsInSub(category, subName)..sort((a, b) => b.rating.compareTo(a.rating));
+  if (items.isEmpty) return null;
+  return items.firstWhere((p) => p.hasImage, orElse: () => items.first);
+}
 
 // ---- per-subcategory buying guidance (the education layer) -------------------
 //  The "20-second" guidance that leads each subcategory page - a one-liner plus
@@ -887,8 +1085,26 @@ PpGuide ppGuideFor(String category, String sub) =>
 //  ParentVeda's own products (retailer 'In-app') are bought inside the app.
 bool ppIsAffiliate(PpProduct p) => p.retailer != 'In-app';
 
-/// The external search URL for an affiliate product on its retailer.
+/// ⚠️ THE ONE GATE EVERY BUY SURFACE ASKS. False for an IMS Act product, and the
+/// only correct way to decide whether to draw a Buy control.
+///
+/// It is a function rather than each screen reading `p.reviewOnly` directly so
+/// that the rule has ONE definition. If the boundary ever widens (a new category
+/// the Act covers, a state rule), it widens here and every surface follows —
+/// rather than five screens needing to be found and remembered.
+bool ppCanBuy(PpProduct p) => !p.reviewOnly;
+
+/// The buy destination: the product's own affiliate / store link when it has one,
+/// else a retailer search built from its name so the flow works for every entry
+/// today. Dropping in a real affiliate deep link is then a data edit.
+///
+/// ⚠️ Callers must check [ppCanBuy] first. This returns a URL for a review-only
+/// product too, and that is deliberate: a function that silently returned an
+/// empty string would be a second, quieter place for the rule to live, and the
+/// two would eventually disagree.
 String ppBuyUrl(PpProduct p) {
+  final own = p.buyUrl;
+  if (own != null && own.isNotEmpty) return own;
   final q = Uri.encodeComponent(p.name);
   switch (p.retailer) {
     case 'FirstCry':
@@ -902,12 +1118,30 @@ String ppBuyUrl(PpProduct p) {
 /// The buy-button label: an affiliate retailer, or an in-app buy.
 String ppBuyLabel(PpProduct p) => ppIsAffiliate(p) ? 'Buy on ${p.retailer}' : 'Buy now';
 
+// ---- the review-only explanation --------------------------------------------
+//  ⚠️ AN ABSENT BUTTON WITH NO EXPLANATION READS AS A BUG. A parent who finds a
+//  full review of a bottle and no way to buy it will assume the shop is broken,
+//  not that the law is being kept. So the flag never just removes a control - it
+//  replaces it with the reason.
+//
+//  Wording rules for this copy: state what we may not do and why, never imply
+//  the product is unsafe (it is not - the restriction is on advertising, not on
+//  the item), and never suggest a workaround.
+const String kPpReviewOnlyLabel = 'Information only';
+const String kPpReviewOnlyWhy =
+    "India's IMS Act does not allow infant formula, feeding bottles or infant "
+    'foods to be advertised or sold through a link like this, so there is no buy '
+    'button here. The honest review stays, because that is allowed and it is '
+    'what you came for.';
+
 // ---- snapshot-card helpers (with graceful fallbacks) ------------------------
 String ppSummaryOf(PpProduct p) => p.summary.isNotEmpty ? p.summary : '${p.brand} - ${p.sub}';
 
 String ppBestForOf(PpProduct p) {
   if (p.bestFor.isNotEmpty) return p.bestFor;
-  if (p.parentVeda) return 'Parents who want a ParentVeda-made pick';
+  // Was: 'Parents who want a ParentVeda-made pick'. Kept for revert. Our own
+  // make is a fact about provenance, not a group of parents it suits.
+  if (p.parentVeda) return 'Everyday use, from our own make';
   if (p.bestseller) return 'A popular, well-reviewed choice';
   return 'Everyday ${p.sub.toLowerCase()}';
 }
@@ -917,7 +1151,9 @@ List<String> ppProsOf(PpProduct p) {
   if (p.pros.isNotEmpty) return p.pros;
   final l = <String>[];
   if (p.rating >= 4.6) l.add('Highly rated - ${p.ratingLabel} from ${p.reviews} reviews');
-  if (p.parentVeda) l.add('Made by ParentVeda');
+  // Was: 'Made by ParentVeda'. Kept for revert. "We made it" is not a reason to
+  // buy it, and it sat in a list headed "Why ParentVeda recommends".
+  if (p.parentVeda) l.add('Our own make, reviewed to the same standard as the rest');
   if (p.verified) l.add('Verified purchase reviews');
   if (p.bestseller) l.add('A category bestseller');
   if (l.isEmpty) l.add('${p.ratingLabel} from ${p.reviews} reviews');

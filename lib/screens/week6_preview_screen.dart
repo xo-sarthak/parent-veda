@@ -17,7 +17,7 @@ import '../localization/app_language.dart';
 class Week6PreviewScreen extends StatelessWidget {
   const Week6PreviewScreen({super.key});
 
-  static const _bg = AppTheme.scaffoldBackground;
+  static Color get _bg => AppTheme.scaffoldBackground;
 
   @override
   Widget build(BuildContext context) {
@@ -275,7 +275,7 @@ class _SizeCard extends StatelessWidget {
               Container(
                 width: 40,
                 height: 40,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: AppTheme.surfaceContainer,
                   shape: BoxShape.circle,
                 ),

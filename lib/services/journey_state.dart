@@ -207,6 +207,24 @@ class JourneyStateEngine {
         return _pregnancy(input);
       case LifeStage.parenting:
         return _parenting(input);
+      // ⚠️ THE SAME ANSWER AS `null`, AND DELIBERATELY SO. `Inferable` is
+      // default-deny: a stage with no engine behind it must infer NOTHING
+      // rather than fall through to a neighbouring stage's rules. Skilling has
+      // no spine built, so there is nothing true to derive, and guessing here
+      // would put a fabricated fact into the one structure the clinical
+      // invariants read from.
+      //
+      // ⚠️ `stage:` IS STILL REPORTED. The empty inference set is the refusal;
+      // erasing the stage as well would tell every caller she has declared
+      // nothing, which is a different and false statement.
+      case LifeStage.skilling:
+        return const JourneyState(
+          stage: LifeStage.skilling,
+          ownership: ClinicalOwnership.parentveda,
+          pathway: null,
+          nextMilestone: null,
+          mayInferSet: {},
+        );
       case null:
         // Nothing declared. Infer nothing rather than assuming a stage - the
         // whole point of default-deny.

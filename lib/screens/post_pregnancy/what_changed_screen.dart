@@ -28,15 +28,41 @@ String _fill(String s) {
 //  Hub — search + most common + browse by area
 // =============================================================================
 class WhatChangedScreen extends StatefulWidget {
-  const WhatChangedScreen({super.key});
+  const WhatChangedScreen(
+      {super.key, this.initialQuery, this.initialCategories});
+
+  /// Pre-filters the library to what she actually tapped.
+  ///
+  /// ⚠️ THIS EXISTS BECAUSE THREE HUB DOORS LAND HERE — "Help my child sleep",
+  /// "Solve a feeding problem" and "Handle a behaviour". Without it, all three
+  /// dropped her into the same unfiltered list of thirty concerns and asked her
+  /// to search for the thing she had just tapped a button about.
+  ///
+  /// That is the "opens something adjacent and hopes" failure: it looks like an
+  /// answer, wastes her time, and she blames herself for not finding it. The
+  /// app already knows what she asked — it should not ask her again.
+  final String? initialQuery;
+
+  /// Categories to open filtered to, when a text match would not do the job.
+  ///
+  /// ⚠️ ADDED AFTER A REAL FAILURE. "Handle a behaviour" passed the word
+  /// "behaviour" and matched only two concerns — because tantrums, clinginess
+  /// and separation upset are filed under the category "Mood", and none of
+  /// their keywords contain the word "behaviour" either.
+  ///
+  /// So the pre-filter LOOKED like it worked and quietly hid most of what the
+  /// door had just promised her. A category list says what we mean instead of
+  /// hoping a word happens to match a taxonomy nobody checked.
+  final List<String>? initialCategories;
 
   @override
   State<WhatChangedScreen> createState() => _WhatChangedScreenState();
 }
 
 class _WhatChangedScreenState extends State<WhatChangedScreen> {
-  final TextEditingController _search = TextEditingController();
-  String _query = '';
+  late final TextEditingController _search =
+      TextEditingController(text: widget.initialQuery ?? '');
+  late String _query = widget.initialQuery ?? '';
 
   @override
   void dispose() {
@@ -51,8 +77,21 @@ class _WhatChangedScreenState extends State<WhatChangedScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // A category filter beats a text match here: the concern taxonomy does not
+    // line up with the words a door uses, and a near-miss silently hides most
+    // of what the door promised.
+    final cats = widget.initialCategories;
+    final scoped = cats == null
+        ? null
+        : kWcConcerns
+            .where((c) => cats.any(
+                (x) => c.category.toLowerCase() == x.toLowerCase()))
+            .toList();
+
     final searching = _query.trim().isNotEmpty;
-    final results = searching ? wcSearch(_query) : const <WcConcern>[];
+    final results = searching
+        ? wcSearch(_query)
+        : (scoped ?? const <WcConcern>[]);
 
     return Scaffold(
       backgroundColor: ppBg,

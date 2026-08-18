@@ -17,6 +17,7 @@
 //  easy one-line revert in MainScaffold.
 // =============================================================================
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../brand/brand_models.dart';
@@ -44,7 +45,8 @@ import '../theme/app_theme.dart';
 // The parenting app now lands on the My Child home (the old "Today" briefing,
 // PostPregnancyHome, is retired from nav but kept for revert).
 // import 'post_pregnancy/post_pregnancy_home.dart';
-import 'post_pregnancy/my_child_screen.dart';
+import 'post_pregnancy/pp_home_version.dart';
+import 'skilling/skilling_preview_screen.dart';
 import 'ttc/ttc_common.dart';
 import 'ttc/ttc_strings.dart';
 import 'weekly_card_stack_screen.dart';
@@ -126,7 +128,17 @@ class HomeScreenB extends StatelessWidget {
     final weekSummary = hd.isNotEmpty ? hd : snapshot.reveal.of(lang).trim();
 
     return Container(
-      color: AppTheme.surfaceContainer, // lavender canvas (design "lav1")
+      // ⚠️ WAS `surfaceContainer`, WHICH IS THE WRONG TOKEN FOR A PAGE.
+      //
+      // Classic used it as its page canvas ("lavender canvas / lav1") while
+      // every other screen uses it for a QUIET BLOCK SITTING ON the page. One
+      // token, two meanings — so Classic rendered one step darker than V3 at
+      // every ground setting, and the two homes could never match however the
+      // hex values were tuned.
+      //
+      // Measured: Classic #EDEAF0 vs V3 #F5F3F6 on the same setting. Not a
+      // taste difference; a naming one.
+      color: AppTheme.scaffoldBackground,
       child: SafeArea(
         bottom: false,
         child: ListView(
@@ -141,6 +153,10 @@ class HomeScreenB extends StatelessWidget {
             // ...and directly below it, the doorway into the stage that comes
             // BEFORE pregnancy. The two read as siblings on purpose.
             _ttcDoorway(context),
+            // The third door on the shelf. Shown in every build now, debug and
+            // release alike — see the note on `_skillingDoorway`.
+            const SizedBox(height: 10),
+            _skillingDoorway(context),
             const SizedBox(height: 14),
             // ===== WEEKLY SNAPSHOT - the hero + quick shortcuts as one unit ====
             _sectionEyebrow(s.snapshotTitle),
@@ -158,18 +174,6 @@ class HomeScreenB extends StatelessWidget {
             // below the Weekly Snapshot (a highlighted read, not just a card). ==
             GrowModule(day: day, lang: lang, home: home),
             const SizedBox(height: 24),
-            // LAUNCH SPOTLIGHT (Brand Product 2) — the Launch Hub's front door.
-            // Renders NOTHING unless a launch is live for this mother, which is
-            // the usual case. A door to editorial, never an offer, and always
-            // labelled. See docs/BRAND-STUDIO.md §3.
-            LaunchSpotlight(
-              stage: BrandStage.pregnancy,
-              pregnancyWeek: week,
-              padding: const EdgeInsets.only(bottom: 24),
-            ),
-            // REFERRAL. Hides itself when the campaign is off or she has hit
-            // her cap, so it never offers something that would be refused.
-            const InviteNudgeCard(padding: EdgeInsets.only(bottom: 24)),
             // ===== TODAY'S JOURNEY - everything daily lives under this heading ==
             _todaysJourneyHeading(s),
             const SizedBox(height: 14),
@@ -204,6 +208,23 @@ class HomeScreenB extends StatelessWidget {
             // const SizedBox(height: 16),
             // Today's product recommendation (Daily-Reads style, real images).
             _productsCarousel(context, week, lang),
+
+            // ===== COMMERCE, MOVED TO THE FOOT =============================
+            //
+            // These two sat directly under the parenting tip, above Today's
+            // Journey — so the third thing she saw every morning was a sponsor
+            // card and a referral, before a single daily item. They say the
+            // same thing at the bottom and stop competing with the day.
+            //
+            // Both still hide themselves when there is nothing live, so on most
+            // mornings this is empty space rather than moved clutter.
+            const SizedBox(height: 8),
+            LaunchSpotlight(
+              stage: BrandStage.pregnancy,
+              pregnancyWeek: week,
+              padding: const EdgeInsets.only(bottom: 16),
+            ),
+            const InviteNudgeCard(padding: EdgeInsets.only(bottom: 8)),
           ],
         ),
       ),
@@ -218,7 +239,11 @@ class HomeScreenB extends StatelessWidget {
     return GestureDetector(
       onTap: () => Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (_) => const MyChildScreen(home: true),
+          // Was `MyChildScreen(home: true)` directly. Now a wrapper that keeps
+          // that screen as V1 and adds the bracket grid beside it — same
+          // pattern as Brain, Health and Baby names already use in that folder.
+          // The route name is unchanged because openPpTab pops back to it.
+          builder: (_) => PpHomeScreen(lang: pregnancy.language),
           settings: const RouteSettings(name: 'pp/my_child'),
         ),
       ),
@@ -321,6 +346,113 @@ class HomeScreenB extends StatelessWidget {
                           color: Colors.white)),
                   const SizedBox(height: 2),
                   Text(t.doorBody,
+                      style: pvManrope(
+                          fontSize: 12,
+                          color: Colors.white.withValues(alpha: 0.9))),
+                ]),
+          ),
+          const Icon(Icons.arrow_forward_rounded,
+              color: Colors.white, size: 20),
+        ]),
+      ),
+    );
+  }
+
+  // --- Skilling doorway (debug) ----------------------------------------------
+  //
+  // The third door on the shelf, and the only one carrying a PREVIEW pill.
+  //
+  // ⚠️ IT WAS BEHIND `kDebugMode` AND IT IS NOT ANY MORE. The guard is gone by
+  // decision, and the reasoning that put it there is kept because it is still
+  // the thing to watch:
+  //
+  //   Post-Pregnancy and TTC open stages: real content, real tools, months of
+  //   work behind them. Skilling opens a design preview whose twelve doors
+  //   deliberately open nothing at all, because eighty-four bracket cells are
+  //   declared and not one is live. A door is a promise, and this one has
+  //   nothing behind it yet.
+  //
+  // What makes shipping it defensible is that the card does not pretend
+  // otherwise: it carries a PREVIEW pill and says "the design, not the content"
+  // in its own subtitle, and the screen behind it repeats that. A preview that
+  // announces itself is a different object from a door that fails silently.
+  //
+  // ⚠️ SO THE THING TO KEEP TRUE IS THE LABELLING, NOT THE GUARD. The PREVIEW
+  // pill and that subtitle are now load-bearing rather than decorative, and
+  // `test/skilling_doorway_test.dart` holds both. Take them off on the day the
+  // first skilling bracket has a live resolver, not before.
+  //
+  // It keeps the shelf's exact shape and height for the reason the TTC door
+  // does: three doors on one shelf, not three different ideas. The gradient is
+  // the cool sibling of the other two.
+  Widget _skillingDoorway(BuildContext context) {
+    return GestureDetector(
+      onTap: () => Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => SkillingPreviewScreen(lang: pregnancy.language),
+          settings: const RouteSettings(name: 'skilling/preview'),
+        ),
+      ),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20),
+          gradient: const LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [Color(0xFF4A5BB8), Color(0xFF8A9BE0)],
+          ),
+          boxShadow: const [
+            BoxShadow(
+                color: Color(0x2E4A5BB8), blurRadius: 18, offset: Offset(0, 8)),
+          ],
+        ),
+        child: Row(children: [
+          Container(
+            width: 40,
+            height: 40,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.18),
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.school_rounded,
+                color: Colors.white, size: 20),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(children: [
+                    Text('Skilling',
+                        style: pvJakarta(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white)),
+                    const SizedBox(width: 8),
+                    // The pill is load-bearing, not decoration. It is the one
+                    // thing standing between "a fourth stage exists" and "a
+                    // fourth stage is ready".
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 7, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.22),
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: Text('PREVIEW',
+                          style: pvManrope(
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.8,
+                              color: Colors.white)),
+                    ),
+                  ]),
+                  const SizedBox(height: 2),
+                  Text('Twelve skills for the school years — the design, not '
+                      'the content',
                       style: pvManrope(
                           fontSize: 12,
                           color: Colors.white.withValues(alpha: 0.9))),
@@ -1048,9 +1180,10 @@ class HomeScreenB extends StatelessWidget {
             Expanded(
               child: Container(
                 width: double.infinity,
-                decoration: const BoxDecoration(
+                decoration: BoxDecoration(
                   color: AppTheme.surfaceContainerHigh,
-                  borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+                  borderRadius:
+                      const BorderRadius.vertical(top: Radius.circular(18)),
                 ),
                 child: Stack(children: [
                   Center(
@@ -1286,9 +1419,10 @@ class HomeScreenB extends StatelessWidget {
         maxChildSize: 0.95,
         expand: false,
         builder: (ctx, scroll) => Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: AppTheme.surfaceContainer,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(28)),
           ),
           child: ListView(
             controller: scroll,

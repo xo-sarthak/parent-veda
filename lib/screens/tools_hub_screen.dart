@@ -13,6 +13,7 @@ import '../localization/app_language.dart';
 import '../services/family_profile.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
+import '../widgets/global_ask_fab.dart' show kAskFabReserve;
 import '../widgets/profile_ask_strip.dart';
 import 'bump_journey_screen.dart';
 import 'can_i_screen.dart';
@@ -168,7 +169,15 @@ class ToolsHubScreen extends StatelessWidget {
       child: SafeArea(
         bottom: false,
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(18, 14, 18, 110),
+          // kAskFabReserve, not a hand-picked 110.
+          //
+          // The Ask Veda FAB is stacked over the whole app, so a screen that
+          // does not reserve room for it has its last card covered. 110 was
+          // 108px short of what the FAB actually occupies, which is why the
+          // bottom tile sat underneath it. The parenting side already reserves
+          // this constant in seventeen screens; the pregnancy side reserved it
+          // in none.
+          padding: const EdgeInsets.fromLTRB(18, 14, 18, kAskFabReserve),
           children: [
             Text(s.toolsTitle,
                 style: pvJakarta(
@@ -334,16 +343,18 @@ class ToolsHubScreen extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                         color: AppTheme.primary700)),
               ],
-              const SizedBox(height: 6),
-              Row(children: [
-                Text(s.openLabel,
-                    style: pvManrope(
-                        fontSize: 11.5,
-                        fontWeight: FontWeight.w700,
-                        color: t.color)),
-                const SizedBox(width: 3),
-                Icon(Icons.arrow_forward_rounded, size: 13, color: t.color),
-              ]),
+              // "Open →" REMOVED from every tile.
+              //
+              // The whole card is the tap target, so the label told her nothing
+              // she could not already see — and repeated ~24 times down a
+              // two-column grid it became the loudest repeating element on the
+              // screen, in a different accent colour each time. A card that
+              // needs to say "Open" is a card that does not look tappable; the
+              // fix for that is the card, not a caption. See
+              // docs/DESIGN-LAYER.md §6a.
+              //
+              // s.openLabel is left in the string table: tools_screen.dart
+              // still uses it, and it is a legitimate label elsewhere.
             ],
           ),
         ),

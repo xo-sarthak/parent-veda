@@ -121,3 +121,14 @@ voice_samples/
 # OS noise
 .DS_Store
 Thumbs.db
+
+# design-sync (Claude Design)
+.ds-sync/
+ds-bundle/
+.design-sync/.cache/
+.design-sync/learnings/
+.design-sync/node_modules
+.design-sync/upload-list.json
+.design-sync/chunks.txt
+design-kit/node_modules/
+design-kit/dist/

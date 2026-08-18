@@ -257,7 +257,8 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
   Widget _modePill(bool father) {
     final activeColor =
         father ? const Color(0xFF2E5266) : AppTheme.primary600;
-    Widget seg(String label, bool active, VoidCallback onTap) => GestureDetector(
+    Widget seg(String label, bool active, VoidCallback onTap) =>
+        GestureDetector(
           onTap: onTap,
           behavior: HitTestBehavior.opaque,
           child: AnimatedContainer(
@@ -327,6 +328,11 @@ class _V3Pill extends StatelessWidget {
 
   Widget _pill() {
     final store = TodayVersionStore.instance;
+    // ⚠️ ORPHANED, KEPT ON PURPOSE. `seg` draws the duplicate Focus|V3 pill,
+    // and both of its calls are commented out below. Deleting it is the obvious
+    // tidy-up and it is what the repo rule forbids: the revert has to bring
+    // back a block that still compiles.
+    // ignore: unused_element
     Widget seg(String label, TodayVersion v) {
       final on = store.version == v;
       return InkWell(
@@ -354,8 +360,19 @@ class _V3Pill extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(3),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
-          seg('Focus', TodayVersion.focus),
-          seg('V3', TodayVersion.v3),
+          // ⚠️ A SECOND VERSION PILL LIVED HERE and nobody knew.
+          //
+          // `today_home_screen.dart` renders one too, so the phone carried two
+          // controls for the same store — this one offering Focus|V3 and that
+          // one Classic|V3. Three floating pills in one corner, two of them
+          // doing the same job, all clipping the door labels behind them.
+          //
+          // Off, not deleted. The surviving control is the one beside the
+          // ground picker, so both experiments sit together.
+          //
+          // seg('Focus', TodayVersion.focus),
+          // seg('V3', TodayVersion.v3),
+          const SizedBox.shrink(),
         ]),
       ),
     );

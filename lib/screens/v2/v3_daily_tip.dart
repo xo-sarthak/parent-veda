@@ -102,6 +102,10 @@ Future<void> showDailyTip(
   required int week,
   required int day,
   required V2Palette p,
+  /// Overrides "Today's tip". Parenting's tips carry their own titles, which
+  /// are better than a generic label — "End tummy time happy" says more in four
+  /// words than any heading we could write above it.
+  String? heading,
 }) async {
   if (!kDailyTipEnabled || _dailyTipShown || line.trim().isEmpty) return;
   _dailyTipShown = true;
@@ -122,7 +126,7 @@ Future<void> showDailyTip(
     // off to a staggered one feels like arriving.
     transitionDuration: const Duration(milliseconds: 220),
     pageBuilder: (_, _, _) =>
-        _TipDialog(line: line, week: week, day: day, p: p),
+        _TipDialog(line: line, week: week, day: day, p: p, heading: heading),
     transitionBuilder: (context, anim, _, child) {
       final e = CurvedAnimation(parent: anim, curve: Curves.easeOutCubic);
       return FadeTransition(
@@ -141,12 +145,14 @@ class _TipDialog extends StatefulWidget {
       {required this.line,
       required this.week,
       required this.day,
-      required this.p});
+      required this.p,
+      this.heading});
 
   final String line;
   final int week;
   final int day;
   final V2Palette p;
+  final String? heading;
 
   @override
   State<_TipDialog> createState() => _TipDialogState();
@@ -247,7 +253,7 @@ class _TipDialogState extends State<_TipDialog>
                 children: [
                   _rise(
                     _step(0.05, 0.5),
-                    Text('Today’s tip',
+                    Text(widget.heading ?? 'Today’s tip',
                         style: pvFraunces(
                             fontSize: 30,
                             fontWeight: FontWeight.w600,
@@ -263,7 +269,13 @@ class _TipDialogState extends State<_TipDialog>
                     // is the difference between "week 40" as a chapter title
                     // and as today. The hero already pairs them, so the two
                     // surfaces now agree.
-                    Text('WEEK ${widget.week}  ·  DAY ${widget.day}',
+                    Text(
+                        widget.week == 0
+                            // Parenting has no weeks. Passing 0 means "no week"
+                            // and the line becomes the child's age instead —
+                            // the same job, in the unit that stage counts in.
+                            ? '${widget.day} MONTHS'
+                            : 'WEEK ${widget.week}  ·  DAY ${widget.day}',
                         style: pvManrope(
                             fontSize: 11,
                             fontWeight: FontWeight.w800,

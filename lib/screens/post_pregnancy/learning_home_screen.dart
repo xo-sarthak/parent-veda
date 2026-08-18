@@ -202,7 +202,7 @@ class _LearningHomeScreenState extends State<LearningHomeScreen> {
                 _pad(Column(children: [for (final p in results) _card(p)])),
 
               const SizedBox(height: 22),
-              _pad(Text('Every program is led by a verified expert. Free or included with ParentVeda+.',
+              _pad(Text('Every program is led by a verified expert.',
                   textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.55))),
             ],
           ),

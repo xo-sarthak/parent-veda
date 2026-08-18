@@ -25,7 +25,21 @@ import 'ttc_common.dart';
 import 'ttc_strings.dart';
 
 class TtcPrepareScreen extends StatelessWidget {
-  const TtcPrepareScreen({super.key});
+  const TtcPrepareScreen({super.key, this.onlyCategory});
+
+  /// Show one category instead of all nine.
+  ///
+  /// ⚠️ THREE DIFFERENT DOORS LANDED HERE UNSCOPED — "Speak to a fertility
+  /// specialist", "Improve sperm health", and every consult closing. All three
+  /// opened the same page and asked her to scroll past yoga, nutrition and
+  /// lifestyle to reach the one card she had just tapped a button about.
+  ///
+  /// ⚠️ AND THE CODE CLAIMED OTHERWISE. A comment on `kTtcActConsult` said "the
+  /// hub it was tapped from is the context a resolver uses to pick the right
+  /// specific offer". That resolver did not exist. A comment describing
+  /// behaviour the implementation does not have is worse than no comment: it
+  /// stops the next person from checking.
+  final String? onlyCategory;
 
   /// The nine Prepare categories from the master document, §2.6.
   static List<(String, String, String)> get categories => ttcPrepareCategories;
@@ -57,7 +71,8 @@ class TtcPrepareScreen extends StatelessWidget {
             Text(t.prepareBody, style: ttcBody(14, h: 1.6)),
             const SizedBox(height: 20),
 
-            for (final (id, en, hiName) in ttcPrepareCategories) ...[
+            for (final (id, en, hiName) in ttcPrepareCategories.where((e) =>
+                onlyCategory == null || e.$1 == onlyCategory)) ...[
               ttcEyebrow(hi ? hiName : en, color: ttcPurple),
               const SizedBox(height: 11),
               for (final o in ttcOfferingsIn(id)) ...[

@@ -121,6 +121,9 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
   // and she has not clicked the link yet. Drives the 'confirm' screen instead
   // of 'success', and makes the profile write go to PendingProfile.
   bool _needsEmailConfirm = false;
+  /// Password fields she has chosen to reveal, keyed by controller so the
+  /// "new" and "confirm" boxes on the reset screen toggle independently.
+  final _revealed = <TextEditingController>{};
   // SIX boxes — and this number is HALF OF A CONTRACT.
   //
   // The other half is Supabase → Authentication → Providers → Email → "Email
@@ -414,6 +417,19 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
   /// The six boxes as one string.
   String get _otpCode => _otp.map((c) => c.text.trim()).join();
 
+  /// Empty the boxes and put the cursor back at the start.
+  ///
+  /// Called after a rejected code, and it is not cosmetic: with auto-submit,
+  /// six filled boxes and a "wrong code" message is a dead end — every box is
+  /// at its one-character limit, so typing does nothing and she has to delete
+  /// six times before she can try again.
+  void _clearOtp() {
+    for (final c in _otp) {
+      c.clear();
+    }
+    if (mounted) _otpNodes.first.requestFocus();
+  }
+
   Future<void> _sendResetCode({bool resend = false}) async {
     final email = _email.text.trim();
     if (email.isEmpty) {
@@ -477,10 +493,16 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
       _go('reset');
     } on AuthException catch (e) {
       // "Token has expired or is invalid" — wrong code, or older than an hour.
-      if (mounted) _toast(e.message, ms: 5000);
+      if (mounted) {
+        _toast(e.message, ms: 5000);
+        _clearOtp();
+      }
     } catch (e) {
       debugPrint('verifyOTP failed: $e');
-      if (mounted) _toast(S.now.authCodeCheckFailed, ms: 5000);
+      if (mounted) {
+        _toast(S.now.authCodeCheckFailed, ms: 5000);
+        _clearOtp();
+      }
     } finally {
       if (mounted) setState(() => _busy = false);
     }
@@ -1461,12 +1483,16 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
         const SizedBox(height: 14),
         _glass(
           child: Column(children: [
+            // The boxes SHARE the available width rather than each claiming a
+            // fixed one. Six fixed 44px boxes plus gaps overflowed by 18px on a
+            // real phone — and any fixed number is only ever right for one
+            // screen size, so the next handset would have found the next bug.
+            // Expanded makes the row fit by construction.
             Row(
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 for (var i = 0; i < _otpLength; i++) ...[
-                  _otpBox(i),
-                  if (i < _otpLength - 1) const SizedBox(width: 8),
+                  if (i > 0) const SizedBox(width: 7),
+                  Expanded(child: _otpBox(i)),
                 ],
               ],
             ),
@@ -1494,7 +1520,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
       ]);
 
   Widget _otpBox(int i) => SizedBox(
-        width: 44,
+        // Width comes from the Expanded above; only the height is ours.
         height: 58,
         child: TextField(
           controller: _otp[i],
@@ -1508,6 +1534,22 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
               _otpNodes[i + 1].requestFocus();
             }
             if (v.isEmpty && i > 0) _otpNodes[i - 1].requestFocus();
+
+            // AUTO-SUBMIT once every box is filled. Asking her to type six
+            // digits and then hunt for a button is a step that carries no
+            // information — the code is either complete or it is not, and we
+            // can see which.
+            //
+            // WHY IT CANNOT "only submit if the code is right": whether it is
+            // right is a fact only the server holds. There is nothing to check
+            // it against here. So a wrong code costs one round trip and one
+            // message, which is exactly what tapping Verify would have cost.
+            // The button stays for anyone who edits a digit afterwards, and
+            // for retrying without re-typing the lot.
+            if (v.isNotEmpty && _otpCode.length == _otpLength && !_busy) {
+              FocusScope.of(context).unfocus(); // drop the keyboard first
+              _verifyResetCode();
+            }
           },
           style: pvJakarta(
               fontSize: 24, fontWeight: FontWeight.w800, color: _ink),
@@ -1766,6 +1808,9 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
 
   Widget _field(TextEditingController c, String label, String hint,
       {bool obscure = false, TextInputType? keyboard}) {
+    // Per-field reveal, tracked by controller so two password fields on the
+    // same screen (new + confirm) toggle independently.
+    final revealed = _revealed.contains(c);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Text(label,
           style: pvJakarta(
@@ -1773,7 +1818,7 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
       const SizedBox(height: 7),
       TextField(
         controller: c,
-        obscureText: obscure,
+        obscureText: obscure && !revealed,
         keyboardType: keyboard,
         style: pvJakarta(
             fontSize: 15, fontWeight: FontWeight.w600, color: _ink),
@@ -1783,6 +1828,24 @@ class _AuthFlowScreenState extends State<AuthFlowScreen> {
               fontSize: 15, fontWeight: FontWeight.w500, color: _hint),
           filled: true,
           fillColor: _fieldBg,
+          // Let her see what she typed. A password she cannot read is a
+          // password she retypes, and on a phone keyboard that is where most
+          // "wrong password" attempts actually come from.
+          suffixIcon: obscure
+              ? IconButton(
+                  onPressed: () => setState(() {
+                    revealed ? _revealed.remove(c) : _revealed.add(c);
+                  }),
+                  icon: Icon(
+                    revealed
+                        ? Icons.visibility_off_outlined
+                        : Icons.visibility_outlined,
+                    size: 20,
+                    color: _muted2,
+                  ),
+                  tooltip: revealed ? S.now.hidePassword : S.now.showPassword,
+                )
+              : null,
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
           enabledBorder: OutlineInputBorder(

@@ -19,10 +19,13 @@
 // =============================================================================
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:http/http.dart' as http;
+import 'package:path_provider/path_provider.dart';
 
 import '../localization/app_language.dart';
 import 'baby_voice_service.dart';
@@ -70,13 +73,56 @@ class NarrationService extends ChangeNotifier {
     notifyListeners();
   }
 
-  /// Where [key]'s audio lives. THE ONLY PLACE THAT KNOWS.
+  /// Cloudflare R2, public bucket. THE ONLY PLACE THAT KNOWS WHERE AUDIO LIVES.
   ///
-  /// Swap this for `UrlSource(...)` over R2 - or resolve through
-  /// StorageService for download-once-and-cache - and the rest of the app is
-  /// unchanged.
-  Source _sourceFor(String key) =>
-      AssetSource('narration/${_files[key]!}');
+  /// Being one method is what made the move from bundled assets to R2 a
+  /// two-line change instead of a migration: nothing else in the app - no
+  /// screen, no widget, no test - has ever named a path.
+  ///
+  /// ⚠️ This is the r2.dev DEVELOPMENT url. Cloudflare rate-limits it and says
+  /// not to ship on it. Swapping to a custom domain (audio.parentveda.com) is a
+  /// change to this one constant, which is the point.
+  static const String _base =
+      'https://pub-e6e800cad8eb4fec88c09b9ddde6e0e2.r2.dev';
+
+  /// Where [key]'s audio lives.
+  ///
+  /// Through the cache, so a passage is fetched once and then plays from disk -
+  /// offline, instantly, and without spending Cloudflare reads every time she
+  /// replays a card. R2 charges no egress, but a mother on a metered Indian
+  /// connection is paying for every byte we re-download.
+  Future<Source> _sourceFor(String key) async {
+    final rel = _files[key]!;
+    final local = await _cachedFile(rel);
+    if (local != null) return DeviceFileSource(local.path);
+    return UrlSource('$_base/$rel');
+  }
+
+  /// The on-disk copy of [rel], downloading it first if we do not have it.
+  ///
+  /// Returns null rather than throwing: a failed download must fall through to
+  /// streaming, and a failed stream falls through to the device voice. Narration
+  /// is an enhancement, and no layer of it may ever be the reason a card is
+  /// silent.
+  Future<File?> _cachedFile(String rel) async {
+    try {
+      final dir = await getApplicationSupportDirectory();
+      final f = File('${dir.path}/narration/$rel');
+      if (await f.exists() && await f.length() > 0) return f;
+
+      final res = await http.get(Uri.parse('$_base/$rel'));
+      if (res.statusCode != 200 || res.bodyBytes.isEmpty) return null;
+      await f.parent.create(recursive: true);
+      // Write beside and rename, so a kill mid-download cannot leave a
+      // truncated mp3 that we would then treat as cached forever.
+      final tmp = File('${f.path}.part');
+      await tmp.writeAsBytes(res.bodyBytes, flush: true);
+      await tmp.rename(f.path);
+      return f;
+    } catch (_) {
+      return null;
+    }
+  }
 
   /// Speak [key]. [text] is what the passage says, used only if we have to
   /// fall back to the device voice; [englishText] is used if that voice cannot
@@ -98,7 +144,13 @@ class NarrationService extends ChangeNotifier {
       try {
         _playingKey = key;
         notifyListeners();
-        await _player.play(_sourceFor(key));
+        // Resolving can now take a moment - the first play of a passage
+        // downloads it. If she taps another card while that is in flight,
+        // _playingKey has moved on and this result is stale, so drop it rather
+        // than start a second voice over the top of hers.
+        final src = await _sourceFor(key);
+        if (_playingKey != key) return;
+        await _player.play(src);
         return;
       } catch (_) {
         // A missing or corrupt file must not leave the user with silence and
@@ -156,4 +208,25 @@ class NarrationService extends ChangeNotifier {
   /// in the app against the manifest, because a typo here is not a crash - it
   /// is just no audio, forever.
   static String weekKey(int week, String path) => 'week$week.$path';
+
+  /// The manifest prefix for a Daily Moment day — `home.w20.0`.
+  ///
+  /// TWO THINGS HERE ARE EASY TO GET WRONG, and both fail silently: a wrong key
+  /// is not an error, it is a speaker that quietly falls back to the device
+  /// voice for that passage forever.
+  ///
+  ///  * The week is ZERO-PADDED. The keys were generated from the filenames
+  ///    (`week_04.json`), so it is `home.w04`, never `home.w4`.
+  ///  * The second number is the day's INDEX IN ITS WEEK (0-6), not the day of
+  ///    pregnancy. `HomeDay.day` is the pregnancy day — 134 for the first day of
+  ///    week 20 — and the files are arrays of seven, so the index is
+  ///    `day - (week-1)*7 - 1`. Verified against weeks 4, 20 and 40.
+  static String homePrefix(int week, int dayOfPregnancy) {
+    final idx = dayOfPregnancy - (week - 1) * 7 - 1;
+    return 'home.w${week.toString().padLeft(2, '0')}.$idx';
+  }
+
+  /// `home.w20.0.grow.expanded` for a field of a Daily Moment day.
+  static String homeKey(int week, int dayOfPregnancy, String path) =>
+      '${homePrefix(week, dayOfPregnancy)}.$path';
 }

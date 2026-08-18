@@ -169,7 +169,7 @@ const List<YogaClass> kYogaClasses = [
     mode: YogaMode.liveGroup,
     schedule: 'Live · Mon, Wed, Fri · 6:30am IST',
     durationLabel: '40 min',
-    price: '₹399 / class · free on ParentVeda+',
+    price: '₹399 / class',
     level: 'All levels',
     tagline: 'Start the day with a gentle full-body flow.',
     about:
@@ -213,7 +213,7 @@ const List<YogaClass> kYogaClasses = [
     mode: YogaMode.recorded,
     schedule: 'Recorded · watch anytime',
     durationLabel: '25 min',
-    price: 'Free on ParentVeda+',
+    price: 'Free',
     level: 'Gentle',
     tagline: 'Unknot the day before bed.',
     about:
@@ -303,7 +303,7 @@ const List<YogaClass> kYogaClasses = [
     mode: YogaMode.recorded,
     schedule: 'Recorded · watch anytime',
     durationLabel: '30 min',
-    price: 'Free on ParentVeda+',
+    price: 'Free',
     level: 'Beginner',
     tagline: 'Gentle openness for an easier birth.',
     about:
@@ -393,7 +393,7 @@ const List<YogaClass> kYogaClasses = [
     mode: YogaMode.recorded,
     schedule: 'Recorded · watch anytime',
     durationLabel: '20 min',
-    price: 'Free on ParentVeda+',
+    price: 'Free',
     level: 'Beginner',
     tagline: 'Your very first steps back, whenever you are ready.',
     about:
@@ -483,7 +483,7 @@ const List<YogaClass> kYogaClasses = [
     mode: YogaMode.recorded,
     schedule: 'Recorded · watch anytime',
     durationLabel: '30 min',
-    price: 'Free on ParentVeda+',
+    price: 'Free',
     level: 'Restorative',
     tagline: 'Deep rest for a body that has been through a lot.',
     about:
@@ -551,7 +551,7 @@ const List<YogaClass> kYogaClasses = [
     mode: YogaMode.recorded,
     schedule: 'Recorded · watch anytime',
     durationLabel: '15 min',
-    price: 'Free on ParentVeda+',
+    price: 'Free',
     level: 'Beginner',
     tagline: 'The foundational breaths, clearly taught.',
     about:
@@ -597,7 +597,7 @@ const List<YogaClass> kYogaClasses = [
     mode: YogaMode.liveGroup,
     schedule: 'Live · daily · 9pm IST',
     durationLabel: '20 min',
-    price: '₹299 / class · free on ParentVeda+',
+    price: '₹299 / class',
     level: 'All levels',
     tagline: 'End the day in a room full of calm.',
     about:
@@ -641,7 +641,7 @@ const List<YogaClass> kYogaClasses = [
     mode: YogaMode.recorded,
     schedule: 'Recorded · watch anytime',
     durationLabel: '15 min',
-    price: 'Free on ParentVeda+',
+    price: 'Free',
     level: 'Gentle',
     tagline: 'Drift off before the story ends.',
     about:
@@ -731,7 +731,7 @@ const List<YogaClass> kYogaClasses = [
     mode: YogaMode.recorded,
     schedule: 'Recorded · watch anytime',
     durationLabel: '20 min',
-    price: 'Free on ParentVeda+',
+    price: 'Free',
     level: 'Beginner',
     tagline: 'The basics, before any crunches.',
     about:

@@ -15,6 +15,7 @@ import '../../brand/brand_models.dart';
 import '../../brand/brand_preview_screen.dart';
 import '../../brand/launch_hub_screen.dart';
 import '../brand_showcase_screen.dart';
+import '../skilling/skilling_preview_screen.dart';
 import 'courses_explore_screen.dart';
 import 'next_baby_screens.dart';
 import 'read_explore_screen.dart';
@@ -240,6 +241,30 @@ class ExploreDrawer extends StatelessWidget {
                     _section(context, Icons.science_outlined, 'Brand Studio (debug)',
                         'Every campaign, and why it is blocked.',
                         const BrandPreviewScreen()),
+                  // ⚠️ DEBUG-ONLY, AND IT MUST STAY THAT WAY UNTIL SKILLING HAS
+                  // CONTENT. This is the fourth stage's home as a DESIGN
+                  // PREVIEW: twelve doors, none of which opens a real screen,
+                  // because eighty-four bracket cells are declared and not one
+                  // is live. Shipping it to a parent would be twelve promises
+                  // the app cannot keep.
+                  //
+                  // It lives here rather than beside the TTC and Parenting
+                  // gateways on the pregnancy home for exactly that reason —
+                  // those two are stages, this is a mock-up, and the difference
+                  // has to be visible in where it is reachable from.
+                  // ⚠️ THE `kDebugMode` HERE IS GONE TOO, and consistency is the
+                  // whole reason. The pregnancy home's Skilling door is now shown
+                  // in every build; leaving this one debug-only would have meant
+                  // the same preview appearing in one place and not the other
+                  // depending on how the app was compiled, which is worse than
+                  // either answer on its own.
+                  //
+                  // The label does the work the guard used to: "(preview)" and
+                  // "UI only, nothing behind the doors" are the honest version,
+                  // and they stay until a skilling bracket has a live resolver.
+                  _section(context, Icons.school_outlined, 'Skilling (preview)',
+                      'The fourth stage, UI only — nothing behind the doors.',
+                      const SkillingPreviewScreen()),
 
                   // DUE DATE and TRACK OVULATION: two separate features now,
                   // not one "Due date & ovulation" tool. They were in Tools and

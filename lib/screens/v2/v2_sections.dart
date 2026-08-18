@@ -610,12 +610,25 @@ class V2ProductRail extends StatelessWidget {
                         fontWeight: FontWeight.w600,
                         height: 1.25,
                         color: p.ink1)),
-                const SizedBox(height: 3),
-                Text(it.price,
-                    style: pvManrope(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                        color: p.ink2)),
+                // ⚠️ THE PRICE IS GONE FROM THE HOME RAIL. Kept for revert:
+                //
+                //   const SizedBox(height: 3),
+                //   Text(it.price, style: pvManrope(fontSize: 13,
+                //       fontWeight: FontWeight.w700, color: p.ink2)),
+                //
+                // The review asked for it plainly ("remove prices"), and the
+                // comment 50 lines above this argued the opposite — "the price is
+                // the whole point of this section". Both were reasonable and the
+                // review wins, for a reason worth keeping: this rail sits on the
+                // DAILY HOME, between a journal prompt and an invite. A price
+                // there turns a suggestion into a listing, and the home screen
+                // starts reading as a storefront that happens to carry a
+                // pregnancy app. The product page is where a price belongs, and
+                // it still carries one.
+                //
+                // `it.price` is untouched in the data and still renders in the
+                // shop, on the product page and in the rail's own detail — this
+                // is a change to one surface, not a deletion of pricing.
               ]),
             ),
           );
@@ -871,6 +884,71 @@ const Map<String, String> _kReadCategoryPhoto = {
 /// wrong picture.
 String? v2ReadCover(String categoryEn) {
   final id = _kReadCategoryPhoto[categoryEn.trim()];
+  return id == null
+      ? null
+      : 'https://images.unsplash.com/$id?w=300&h=300&fit=crop';
+}
+
+/// A photograph per PARENTING read collection.
+///
+/// ⚠️ THE FIRST VERSION OF THIS MAP WAS WRONG, AND THE WAY IT WAS WRONG IS THE
+/// USEFUL PART.
+///
+/// It assigned three collections a photograph that was "calm and on-register
+/// but not on-subject", on the theory that a near-miss beats a blank tint. On
+/// the phone that theory collapsed immediately: **"Drowsy but awake: the
+/// hardest skill" carried a photograph of a duffel bag.** Health carried
+/// someone reading a novel. Play carried a couple holding hands.
+///
+/// The lesson is not "try harder at near-misses". It is that **a photograph is
+/// read as being about the thing it sits next to.** A tint is read as an
+/// absence and costs nothing; a wrong photograph makes an actively false
+/// statement, which is why `product_data.dart` already says a wrong photograph
+/// is worse than an honest colour. That rule applies to reads too, and this map
+/// had quietly exempted itself from it.
+///
+/// ⚠️ AND THE FIX NEEDED NO NEW IMAGES AT ALL. Every photograph in the bank was
+/// downloaded and LOOKED AT, and it turned out the right picture for each
+/// collection was already there, on the wrong row — the bedroom was on nothing,
+/// the nebuliser was in the product catalogue, the window seat was on
+/// behaviour. The original assignment had been made from filenames and
+/// category names rather than from the pictures.
+///
+/// **Never add an id to this map without rendering it.** An Unsplash id cannot
+/// be judged from its string, and it cannot be judged from the search term that
+/// produced it either.
+///
+/// Every id below is verified: it resolves (200, not 404) and it was viewed at
+/// thumbnail size, which is the size it ships at.
+const Map<String, String> _kPpCollectionPhoto = {
+  // A bed in low warm light. Was a duffel bag on a hallway floor.
+  'sleep': 'photo-1638127815875-d8c930a8d467',
+  // Newborn feet on a blanket.
+  'brain': 'photo-1580301762395-21ce84d00bc6',
+  // A bowl of real food, shot from above.
+  'feeding': 'photo-1546069901-ba9599a7e63c',
+  // Two hands held. Behaviour & Emotions is about co-regulation, and a held
+  // hand says that better than a face would — a face has one expression, and
+  // this collection covers every feeling a toddler has.
+  'behaviour': 'photo-1506014299253-3725319c0f69',
+  // A nebuliser mask in a hand. Borrowed from the product bank, where it was
+  // doing nothing, and it is the only genuinely clinical image we own.
+  'health': 'photo-1645273474679-87b95586294e',
+  // An open book in sunlight. The collection is "Play & LANGUAGE", and a book
+  // is where a child's language actually comes from — closer to the subject
+  // than a photograph of toys would be.
+  'play': 'photo-1506880018603-83d5b814b5a6',
+  // A woman sitting by a window, alone, unhurried. "The Parent, Too."
+  'parent': 'photo-1658279366796-e0c28623cd27',
+};
+
+/// Cover URL for a parenting read, keyed by its COLLECTION id.
+///
+/// By collection rather than by article, for the reason the pregnancy map is by
+/// category: articles keep arriving, and per-article art is a commitment that
+/// never finishes.
+String? v2PpReadCover(String collectionId) {
+  final id = _kPpCollectionPhoto[collectionId.trim()];
   return id == null
       ? null
       : 'https://images.unsplash.com/$id?w=300&h=300&fit=crop';

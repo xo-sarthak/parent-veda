@@ -388,31 +388,49 @@ void main() {
   //  The bottom nav
   // ==========================================================================
   group('bottom nav restyle', () {
-    test('every tab is the same shape now', () {
-      // The old bar changed the ACTIVE tab into a horizontal pill, so the row
-      // re-flowed on every tap. Now colour alone marks the active one.
-      expect(nav.contains('return Expanded('), isTrue,
-          reason: 'all five tabs should share the width evenly');
-      expect(nav.contains('on ? child : Expanded(child: child)'), isFalse,
-          reason: 'the shape-changing active tab should be gone');
+    // ⚠️ THESE FOUR TESTS USED TO GREP `pp_common.dart` FOR ITS OWN BAR, AND
+    // THAT EVIDENCE NO LONGER EXISTS — for a good reason.
+    //
+    // The app had THREE bottom bars and each had a different half of the same
+    // fix: pregnancy had its container removed but still re-flowed the row on
+    // tap; parenting had the reflow fixed but kept a filled disc; TTC had
+    // neither. The parenting bar had even diagnosed the reflow in its own
+    // comment and ended it with "PARENTING ONLY. The pregnancy bar is
+    // deliberately untouched" — which is exactly why they diverged.
+    //
+    // All three now delegate to `PvNavBar`, so the guarantees these tests were
+    // protecting are real for all three stages rather than for one. They are
+    // held properly, against rendered widgets rather than source text, in
+    // `test/nav_consistency_test.dart` — including a measurement that every
+    // label stays within half a pixel of its position whichever tab is active.
+    //
+    // What survives here is the part that is still about THIS file: that the
+    // parenting bar is a thin adapter and has not grown a second implementation.
+    test('parenting delegates to the one shared bar', () {
+      expect(nav.contains('PvNavBar('), isTrue,
+          reason: 'PpBottomNav must delegate, not draw its own bar');
+      expect(nav.contains('AnimatedContainer('), isFalse,
+          reason: 'a second implementation has grown back inside PpBottomNav');
     });
 
-    test('labels are readable', () {
-      // 8.5pt was there to be seen, not read.
-      expect(nav.contains('ppBody(8.5'), isFalse);
-      expect(nav.contains('ppBody(11,'), isTrue);
+    test('and it no longer paints a filled disc behind the active tab', () {
+      expect(nav.contains('on ? ppPurple : Colors.transparent'), isFalse,
+          reason: 'the filled active disc was the one rule this bar broke');
     });
 
-    test('the old bar is commented, not deleted', () {
-      expect(navRaw.contains('// THE OLD BAR. Kept for revert:'), isTrue);
-      expect(navRaw.contains('//   final child = GestureDetector('), isTrue);
-    });
-
-    test('the pregnancy bar was not touched', () {
-      // "that bottom menu for only parenting".
+    // ⚠️ THIS TEST HAS BEEN INVERTED ON PURPOSE.
+    //
+    // It used to assert "the pregnancy bar was not touched", from a review note
+    // that said "that bottom menu for only parenting". That was right at the
+    // time and is now the opposite of what we want: keeping the two apart is
+    // what produced three divergent bars. The pregnancy bar is SUPPOSED to be
+    // the same component now.
+    test('the pregnancy bar is the same component, not a copy', () {
       final preg = _read('lib/widgets/pv_tab_bar.dart');
+      expect(preg.contains('PvNavBar('), isTrue,
+          reason: 'PvTabBar must delegate to the shared bar');
       expect(preg.contains('ppBody('), isFalse,
-          reason: 'the pregnancy bar must not have picked up parenting styles');
+          reason: 'it still must not pick up parenting type helpers');
     });
   });
 

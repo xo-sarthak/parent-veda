@@ -1,0 +1,82 @@
+lib/screens/enterprise/activation_flow_screen.dart	7424	7476		Your employer may already provide this.	Ho sakta hai aapki company yeh already de rahi ho.
+lib/screens/enterprise/activation_flow_screen.dart	7641	7781		Some companies pay for ParentVeda for their team. Enter your work email and we will check.	Kuch companies apni team ke liye ParentVeda ka kharcha uthati hain. Apna work email daaliye, hum check kar lete hain.
+lib/screens/enterprise/activation_flow_screen.dart	8574	8610		The email your company has for you	Jo email aapki company ke paas hai
+lib/screens/enterprise/activation_flow_screen.dart	10088	10298		We have filled in your ParentVeda address — change it if your company uses a different one for you. Either way we check it once and never show it to them.	Humne aapka ParentVeda address bhar diya hai — agar company koi aur email use karti hai to badal lijiye. Sirf ek baar check karte hain, unhe dikhate nahi.
+lib/screens/enterprise/activation_flow_screen.dart	10681	10693		Continue	Aage badho
+lib/screens/enterprise/activation_flow_screen.dart	11160	11189		Check your work inbox.	Apna work inbox check karo.
+lib/screens/enterprise/activation_flow_screen.dart	11342	11451		We sent a six-digit code to ${_email.text.trim()}. It is good for ten minutes.	Humne ${_email.text.trim()} par ek 6-digit code bheja hai. Woh das minute tak chalega.
+lib/screens/enterprise/activation_flow_screen.dart	13456	13471		Activate	Activate karo
+lib/screens/enterprise/activation_flow_screen.dart	13775	13792		Send a new code	Naya code bhejo
+lib/screens/enterprise/activation_flow_screen.dart	13869	13894		Did not get it? Send again	Nahi mila? Dobara bhejo
+lib/screens/enterprise/activation_flow_screen.dart	14301	14324		Use a different email	Doosri email use karo
+lib/screens/enterprise/activation_flow_screen.dart	14675	14695		your organisation	aapke organisation
+lib/screens/enterprise/activation_flow_screen.dart	15240	15254		You're all set.	Sab set hai.
+lib/screens/enterprise/activation_flow_screen.dart	15331	15372		ParentVeda Premium, provided by $name.	ParentVeda Premium — $name ki taraf se.
+lib/screens/enterprise/activation_flow_screen.dart	15854	15870		See what you get	Dekho kya mila
+lib/screens/enterprise/activation_flow_screen.dart	16077	16093		your employer	aapka employer
+lib/screens/enterprise/activation_flow_screen.dart	16201	16233		Your pregnancy and your child	Aapki pregnancy aur aapka baby
+lib/screens/enterprise/activation_flow_screen.dart	16277	16303		Your journal and your photos	Aapka journal aur photos
+lib/screens/enterprise/activation_flow_screen.dart	16342	16365		Your Ask Veda questions	Aapke Ask Veda sawaal
+lib/screens/enterprise/activation_flow_screen.dart	16408	16440		Anything you search or read	Jo bhi search ya read karte ho
+lib/screens/enterprise/activation_flow_screen.dart	16485	16517		Your appointments and reports	Aapke appointments aur reports
+lib/screens/enterprise/activation_flow_screen.dart	16984	17022		What your employer never sees	Aapka employer kya kabhi nahi dekhta
+lib/screens/enterprise/activation_flow_screen.dart	18092	18215		They see how many people activated. Nothing about who, and nothing about you.	Unhe sirf yeh dikhta hai ki kitne logon ne activate kiya. Kaun, ya aapke baare mein kuch nahi.
+lib/screens/enterprise/activation_flow_screen.dart	18472	18668		All $name can see is how many people activated the benefit and how many consultations were used across everyone. Never who, never what.	$name ko sirf itna dikhta hai ki kitne logon ne benefit activate kiya aur sab milakar kitni consultations use hui. Kaun ya kya — kabhi nahi.
+lib/screens/enterprise/employer_benefits_screen.dart	3575	3614		No employer benefit is active.	Koi employer benefit active nahi hai.
+lib/screens/enterprise/employer_benefits_screen.dart	3767	3875		If your company sponsors ParentVeda, activate it with your work email.	Agar aapki company ParentVeda sponsor karti hai, work email se activate kar lijiye.
+lib/screens/enterprise/employer_benefits_screen.dart	5532	5561		Provided by ${sponsor.name}	${sponsor.name} ki taraf se
+lib/screens/enterprise/employer_benefits_screen.dart	7342	7520		Book with any ParentVeda doctor or counsellor. Your employer is not told who you saw or why.	Kisi bhi ParentVeda doctor ya counsellor se book karo. Employer ko yeh nahi pata chalta ki kisse mile ya kyun.
+lib/screens/enterprise/employer_benefits_screen.dart	7717	7845		You have used this year\'s consultations. They renew when your company renews.	Is saal ki consultations use ho chuki hain. Company renew karegi to yeh bhi renew ho jayengi.
+lib/screens/enterprise/employer_benefits_screen.dart	8386	8417		$creditsSpent used so far.	Ab tak $creditsSpent use hui.
+lib/screens/enterprise/employer_benefits_screen.dart	8761	8796		Valid until ${_date(creditExpires)}	${_date(creditExpires)} tak valid
+lib/screens/enterprise/employer_benefits_screen.dart	9332	9374		Paid sessions, included in your plan.	Paid sessions, aapke plan mein included.
+lib/screens/enterprise/employer_benefits_screen.dart	9727	9859		Sessions your organisation runs for its parents. Nothing is scheduled yet — you will see them here.	Aapka organisation apne parents ke liye jo sessions rakhta hai. Abhi kuch schedule nahi hai — yahin dikhenge.
+lib/screens/enterprise/employer_benefits_screen.dart	10241	10385		Your organisation\'s own parenting policy and guides. Never medical advice — that always comes from us or your doctor.	Aapke organisation ki apni parenting policy aur guides. Medical advice kabhi nahi — woh hamesha hamse ya aapke doctor se.
+lib/screens/enterprise/employer_benefits_screen.dart	11801	11846		Take-up across ${sponsor.name}.	${sponsor.name} mein kitna use ho raha hai.
+lib/screens/enterprise/employer_benefits_screen.dart	12651	12681		Questions about the benefit	Benefit ke baare mein sawaal
+lib/screens/enterprise/employer_benefits_screen.dart	13119	13295		Anything about seats, renewal or eligibility goes to ${sponsor.supportContact}. Anything about your pregnancy or your baby stays with us.	Seats, renewal ya eligibility ke liye ${sponsor.supportContact}. Pregnancy ya baby ki baat hamare paas hi rehti hai.
+lib/screens/enterprise/employer_benefits_screen.dart	14262	14294		What ${sponsor.name} sees	${sponsor.name} kya dekhta hai
+lib/screens/enterprise/employer_benefits_screen.dart	14841	15057		How many people activated, and how many consultations were used across everyone. That is the whole list. They cannot see your pregnancy, your child, your journal, your questions, your searches or your appointments.	Kitne logon ne activate kiya, aur sab milakar kitni consultations use hui. Bas itna. Aapki pregnancy, baby, journal, sawaal, search ya appointments — kuch nahi.
+lib/screens/enterprise/enterprise_common.dart	1894	1934		That does not look like an email address.	Yeh email address jaisa nahi lag raha.
+lib/screens/enterprise/enterprise_common.dart	2472	2598		We could not find a benefit for that email address. Check with your HR team that they use the address you typed.	Is email par koi benefit nahi mila. Apni HR team se check karo ki wahi address use hota hai jo aapne likha.
+lib/screens/enterprise/enterprise_common.dart	2750	2808		This work email has already been used to activate the benefit.	Is work email se benefit pehle hi activate ho chuka hai.
+lib/screens/enterprise/enterprise_common.dart	2991	3105		All the seats your organisation purchased are in use. Your HR team can add more.	Aapke organisation ne jitni seats li thi, sab use ho chuki hain. HR team aur add kar sakti hai.
+lib/screens/enterprise/enterprise_common.dart	3221	3277		Too many codes requested. Try again in an hour.	Bahut saare codes maang liye. Ek ghante baad try karo.
+lib/screens/enterprise/enterprise_common.dart	3393	3451		Sign in first, then activate your employer benefit.	Pehle sign in karo, phir employer benefit activate karo.
+lib/screens/enterprise/enterprise_common.dart	3556	3598		That code has gone. Ask for a new one.	Woh code ab valid nahi hai. Naya mangao.
+lib/screens/enterprise/enterprise_common.dart	3703	3738		That code has expired. Ask for a new one.	Code expire ho gaya. Naya mangao.
+lib/screens/enterprise/enterprise_common.dart	3851	3888		Too many incorrect codes. Ask for a new one.	Bahut baar galat code. Naya mangao.
+lib/screens/enterprise/enterprise_common.dart	3963	3988		That code is not right.	Yeh code sahi nahi hai.
+lib/screens/enterprise/enterprise_common.dart	4089	4122		This benefit is no longer active.	Yeh benefit ab active nahi hai.
+lib/screens/enterprise/enterprise_common.dart	4275	4343		We could not reach ParentVeda. Check your connection and try again.	ParentVeda tak nahi pahunch paye. Connection check karke try karo.
+lib/screens/enterprise/enterprise_common.dart	4460	4498		Something went wrong. Try again.	Kuch galat ho gaya. Dobara try karo.
+lib/screens/enterprise/sponsor_dashboard_screen.dart	4794	4824		We could not load your programme.	Programme load nahi ho paya.
+lib/screens/enterprise/sponsor_dashboard_screen.dart	4909	4947		You do not administer a programme.	Aap kisi programme ke admin nahi ho.
+lib/screens/enterprise/sponsor_dashboard_screen.dart	5061	5098		Pull down to try again.	Neeche kheench kar dobara try karo.
+lib/screens/enterprise/sponsor_dashboard_screen.dart	5286	5417		If you handle this benefit for your organisation, ask us to give your account access.	Agar aap apne organisation ke liye yeh benefit dekhte ho, humse apne account ko access dilwa lijiye.
+lib/screens/enterprise/sponsor_dashboard_screen.dart	5948	5981		Renews ${_date(d.renewalAt!)}	${_date(d.renewalAt!)} ko renew
+lib/screens/enterprise/sponsor_dashboard_screen.dart	6029	6062		No renewal date on file	Renewal date file mein nahi hai
+lib/screens/enterprise/sponsor_dashboard_screen.dart	7114	7131		On your list	Aapki list mein
+lib/screens/enterprise/sponsor_dashboard_screen.dart	8448	8561		${d.eligibleListed - d.activated} of the people you listed have not activated yet	Aapki list ke ${d.eligibleListed - d.activated} log abhi tak activate nahi hue
+lib/screens/enterprise/sponsor_dashboard_screen.dart	8650	8688		${d.seatsLeft ?? 0} seats left	${d.seatsLeft ?? 0} seats bachi hain
+lib/screens/enterprise/sponsor_dashboard_screen.dart	9012	9064		${d.activatedLast30d} joined in the last 30 days	Pichhle 30 din mein ${d.activatedLast30d} log jude
+lib/screens/enterprise/sponsor_dashboard_screen.dart	11200	11236		What this dashboard cannot show	Yeh dashboard kya nahi dikha sakta
+lib/screens/enterprise/sponsor_dashboard_screen.dart	11885	12239		Nothing about an individual. Not who booked, not what they read, not what they asked, not how long they spent in the app — we do not measure that last one at all, for anyone. Take-up and totals are the whole picture, and that is what makes people willing to activate.	Kisi ek insaan ke baare mein kuch nahi. Kisne book kiya, kya padha, kya poocha, kitna time app mein bitaya — aakhri wala hum kisi ke liye measure hi nahi karte. Take-up aur totals hi poori picture hain, aur isi wajah se log activate karte hain.
+lib/screens/enterprise/sponsor_dashboard_screen.dart	12944	12961		Hide removed	Removed chhupao
+lib/screens/enterprise/sponsor_dashboard_screen.dart	13048	13083		Show removed (${removed.length})	Removed dekho (${removed.length})
+lib/screens/enterprise/sponsor_dashboard_screen.dart	13367	13469		Eligibility only. Activation is all we record about a person here.	Sirf eligibility. Kisi bhi insaan ke baare mein bas activation record hota hai.
+lib/screens/enterprise/sponsor_dashboard_screen.dart	13990	14024		Nobody has activated yet.	Abhi kisi ne activate nahi kiya.
+lib/screens/enterprise/sponsor_dashboard_screen.dart	14399	14526		Employees activate inside the app with their work email. Sharing that one line is usually all it takes.	Employees app ke andar apni work email se activate karte hain. Bas yeh ek line share kar dijiye.
+lib/screens/enterprise/sponsor_dashboard_screen.dart	14988	15007		Take-up so far	Ab tak ka take-up
+lib/screens/enterprise/sponsor_dashboard_screen.dart	15101	15137		Up $change since three months ago	Teen mahine pehle se $change zyada
+lib/screens/enterprise/sponsor_dashboard_screen.dart	15226	15254		Level with three months ago	Teen mahine pehle jitna hi
+lib/screens/enterprise/sponsor_dashboard_screen.dart	15459	15496		Down ${-change} since three months ago	Teen mahine pehle se ${-change} kam
+lib/screens/enterprise/sponsor_dashboard_screen.dart	16466	16515		Held back until $min people have activated	$min log activate karenge tab tak rok rakha hai
+lib/screens/enterprise/sponsor_dashboard_screen.dart	16875	17047		In a small group, "two consultations this month" is close enough to a name. We would rather show you nothing than show you someone.	Chhote group mein "is mahine do consultations" lagbhag ek naam hi hai. Aapko kuch na dikhana behtar hai, kisi ko dikhane se.
+lib/screens/enterprise/sponsor_dashboard_screen.dart	18584	18622		Activated ${_date(r.activatedAt)}	${_date(r.activatedAt)} ko activated
+lib/screens/enterprise/sponsor_dashboard_screen.dart	18710	18744		Removed ${_date(r.removedAt)}	${_date(r.removedAt)} ko removed
+lib/screens/enterprise/sponsor_dashboard_screen.dart	18974	18987		Remove	Remove karo
+lib/screens/enterprise/sponsor_dashboard_screen.dart	19413	19439		Remove ${r.workEmail}?	${r.workEmail} hatayein?
+lib/screens/enterprise/sponsor_dashboard_screen.dart	19943	20155		Their seat is freed and the plan your organisation provides is withdrawn. Anything they bought themselves is untouched, and their journal, photos and records stay theirs.	Unki seat free ho jayegi aur organisation ka diya plan hat jayega. Jo unhone khud kharida hai woh waise hi rahega, aur unka journal, photos aur records unke hi rahenge.
+lib/screens/enterprise/sponsor_dashboard_screen.dart	20844	20871		${r.workEmail} removed.	${r.workEmail} hata diya.
+lib/screens/enterprise/sponsor_dashboard_screen.dart	20929	20944		That did not work.	Yeh nahi hua.

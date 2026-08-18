@@ -168,9 +168,19 @@ flutter:
     - lib/data/home/
     - lib/data/father/
     - assets/audio/raga_drone.wav
-    # Staged narration for LOCAL testing only - this moves to R2.
+    # Narration now streams from R2 (see NarrationService._sourceFor). Only the
+    # MANIFEST ships in the app.
+    #
+    # It is 743 KB and lists all 5,684 passages, which is what lets
+    # `hasAudio()` answer offline and lets narration_keys_test.dart check every
+    # key in the app against reality. The audio itself is ~580 MB - bundling it
+    # was never going to survive contact with a Play Store listing, and even the
+    # 798-passage pilot was adding 66 MB to the APK for a fifth of the content.
+    #
+    # `assets/narration/hi/` is deliberately NOT declared any more. The staged
+    # mp3s stay on disk (gitignored) so a local build can still be tested
+    # offline by re-adding the line, but they are no longer shipped.
     - assets/narration/manifest_hi.json
-    - assets/narration/hi/
     - assets/baby/
     # Hero block art for the V2 Focus experiment. Transparent PNGs, composited
     # onto whichever palette ground is being tested — which is why they survive

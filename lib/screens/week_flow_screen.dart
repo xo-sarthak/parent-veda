@@ -2241,6 +2241,34 @@ List<Widget> _articleWithMedia(
 // ---------------------------------------------------------------------------
 // Opens on the descriptive "About your baby" read (page 0), then a swipe hint
 // leads into the Baby Science fact cards (pages 1..N).
+/// A "listen to this" row for a long-read popup.
+///
+/// Returns an empty box when the passage has no recording AND no text worth
+/// speaking, so a screen never shows a dead control. It does NOT hide itself
+/// merely because the recording is missing - NarrationService falls back to the
+/// device voice, and a speaker that appears on some weeks and not others reads
+/// as broken rather than as partial coverage.
+Widget _listenRow(BuildContext context, String key, LocalizedText? passage,
+    AppLanguage lang, Color accent) {
+  final text = passage?.of(lang).trim() ?? '';
+  if (text.isEmpty) return const SizedBox.shrink();
+  return Padding(
+    padding: const EdgeInsets.only(bottom: 4),
+    child: Row(children: [
+      NarrateButton(
+        narrationKey: key,
+        text: text,
+        englishText: passage!.en,
+        lang: lang,
+        color: accent,
+      ),
+      Text(S(lang).listenLabel,
+          style: pvManrope(
+              fontSize: 12.5, fontWeight: FontWeight.w700, color: accent)),
+    ]),
+  );
+}
+
 class _BabyDetailScreen extends StatelessWidget {
   const _BabyDetailScreen({required this.w, required this.lang});
   final WeekContent w;
@@ -2275,6 +2303,13 @@ class _BabyDetailScreen extends StatelessWidget {
                   fatherSkin ? _fBabyTitle.of(lang) : s.wfBabySection,
                   father: fatherSkin)),
           const SizedBox(height: 8),
+          _listenRow(
+              context,
+              NarrationService.weekKey(
+                  w.week, 'babyDevelopment.whatImDoing'),
+              w.development.whatImDoing,
+              lang,
+              fatherSkin ? _fAccent : AppTheme.primary500),
           ..._articleWithMedia(context, s, article, lang,
               fatherSkin ? _fAccent : AppTheme.primary500,
               headingColor: fatherSkin ? _fInk : null),
@@ -2477,6 +2512,20 @@ class _MotherDetailScreenState extends State<_MotherDetailScreen> {
                     : s.wfHealthThisWeek,
                 father: fatherSkin)),
         const SizedBox(height: 6),
+        // Listen sits on the "You this week" read only. The Health tab is
+        // symptom lists and diet chips - short, scannable, and not something
+        // anyone wants read aloud - so a speaker there would be noise.
+        if (_section == 0)
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: _listenRow(
+                context,
+                NarrationService.weekKey(
+                    widget.w.week, 'momJourney.emotionalState'),
+                widget.w.mom.emotionalState,
+                lang,
+                fatherSkin ? _fAccent2 : AppTheme.secondary500),
+          ),
         // Father: no Health tab - that's her symptoms & diet in her own voice,
         // which doesn't belong in the partner view. Just the "Her this week" read.
         if (!fatherSkin) ...[

@@ -170,6 +170,17 @@ class LandingFocus extends ChangeNotifier {
           (babyAgeMonths ?? 0) < kProblemToActivityMonths
               ? TodayFocus.problemLed
               : TodayFocus.activityLed,
+        // ⚠️ SKILLING HAS NO LANDING FOCUS OF ITS OWN, and inventing one would
+        // be a claim rather than a default. `TodayFocus` names the four things
+        // a pregnancy or parenting home can lead with; none of them describes a
+        // skilling home, because there is no skilling home — only a design
+        // preview reached from a debug row.
+        //
+        // It takes the same answer as `null` deliberately: this stage cannot be
+        // selected, so this branch is unreachable today, and the day it becomes
+        // reachable the right move is to add a focus, not to discover that one
+        // was silently borrowed from pregnancy.
+        LifeStage.skilling => TodayFocus.weeklyGrowth,
         // No stage recorded yet. Pregnancy is the app's centre of gravity and
         // the stage a brand-new install is most likely in.
         null => TodayFocus.weeklyGrowth,

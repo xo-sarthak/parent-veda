@@ -1,0 +1,35 @@
+lib/screens/bump_book_screen.dart	31743	31765	मेरी बंप जर्नी की यादगार किताब
+lib/screens/bump_book_screen.dart	31897	31912	शेयर नहीं हो पाया.
+lib/screens/bump_book_screen.dart	32086	32103	मेरी बंप जर्नी किताब
+lib/screens/journal_writer_screen.dart	6149	6169	हफ़्ता ${widget.week}
+lib/screens/journey_booklet_screen.dart	5545	5553	हफ़्ता $w
+lib/screens/photo_viewer_screen.dart	1768	1787	हफ़्ता ${photo.week}
+lib/screens/week5_full_flow_screen.dart	6118	6129	ठीक है
+lib/screens/week5_full_flow_screen.dart	9558	9583	इस हफ़्ते शिशु लगभग एक
+lib/screens/week5_full_flow_screen.dart	9906	9913	लंबाई
+lib/screens/week5_full_flow_screen.dart	10008	10013	वज़न
+lib/screens/week5_full_flow_screen.dart	10345	10371	आपके शिशु के बारे में
+lib/screens/week5_full_flow_screen.dart	10686	10698	मेरी ज़ुबानी
+lib/screens/week5_full_flow_screen.dart	10816	10836	अभी मेरा आकार कितना है
+lib/screens/week5_full_flow_screen.dart	12601	12631	आप कैसा महसूस कर रही होंगी
+lib/screens/week5_full_flow_screen.dart	12757	12777	आपका बदलता शरीर
+lib/screens/week5_full_flow_screen.dart	12909	12930	अपने साथ नरमी बरतिए
+lib/screens/week5_full_flow_screen.dart	13053	13066	ख़ास बातें
+lib/screens/week5_full_flow_screen.dart	15166	15184	यह कितना आम है
+lib/screens/week5_full_flow_screen.dart	15342	15360	ऐसा क्यों होता है
+lib/screens/week5_full_flow_screen.dart	15511	15534	किससे आराम मिल सकता है
+lib/screens/week5_full_flow_screen.dart	16723	16749	डॉक्टर से कब बात कीजिए
+lib/screens/week5_full_flow_screen.dart	18479	18507	इस हफ़्ते का भारतीय सुपरफ़ूड
+lib/screens/week5_full_flow_screen.dart	19306	19339	इस हफ़्ते ये ज़रूर खाइए
+lib/screens/week5_full_flow_screen.dart	19812	19829	किन चीज़ों से बचिए
+lib/screens/week5_full_flow_screen.dart	23964	23967	माँ
+lib/screens/week5_full_flow_screen.dart	24114	24146	आने वाले स्कैन और अपॉइंटमेंट
+lib/screens/week5_full_flow_screen.dart	25173	25201	आप कैसे मदद कर सकते हैं
+lib/screens/week_flow_screen.dart	111635	111638	माँ
+lib/screens/week_flow_screen.dart	188071	188074	माँ
+lib/screens/week_flow_screen.dart	226919	226930	सब देखिए
+lib/screens/week_flow_screen.dart	238608	238621	पिछला हफ़्ता
+lib/screens/week_flow_screen.dart	238667	238677	अगला हफ़्ता
+lib/widgets/locked_week_view.dart	3987	4007	हफ़्ता ${widget.week}
+lib/widgets/memories/memories_section.dart	4960	4979	हफ़्ता ${entry.week}
+lib/widgets/memories/memories_section.dart	16996	17026	हफ़्ता ${e.week} · ${e.dateIso}

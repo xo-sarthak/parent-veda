@@ -19,6 +19,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../../widgets/pv_nav_bar.dart';
 
 import '../../services/app_shell.dart';
 import '../../ttc/ttc_chapter.dart';
@@ -28,12 +29,14 @@ import 'ttc_community_screen.dart';
 import 'ttc_prepare_screen.dart';
 import 'ttc_profile_screen.dart';
 import 'ttc_strings.dart';
-import 'ttc_today_screen.dart';
+import 'ttc_home_version.dart';
 import 'ttc_tools_screen.dart';
 import '../../theme/pv_fonts.dart';
 
 // ---- palette (same hexes as pregnancy & parenting) --------------------------
-const Color ttcBg = Color(0xFFFBF9FE);
+// ⚠️ Unified with the pregnancy ground — see pp_common.dart for the
+// full reasoning and why this is static rather than a getter.
+const Color ttcBg = Color(0xFFF5F3F6); // was 0xFFFBF9FE
 const Color ttcInk = Color(0xFF2F2C30);
 const Color ttcSoft = Color(0xFF69636C);
 const Color ttcPurple = Color(0xFF6A30B6);
@@ -49,7 +52,8 @@ const Color ttcPurple = Color(0xFF6A30B6);
 /// cannot quietly pick its own.
 const Color ttcPurpleDeep = Color(0xFF4A1C86);
 const Color ttcCoral = Color(0xFFFF5A79);
-const Color ttcPanel = Color(0xFFF3EEF7);
+// Matched to `surfaceAlt`. Was the old lilac #F3EEF7.
+const Color ttcPanel = Color(0xFFEDEAF0);
 const Color ttcMuted = Color(0xFFA99CBB);
 const Color ttcBorder = Color(0xFFE7DFEE);
 const Color ttcLine = Color(0xFFE4E2E5);
@@ -570,7 +574,12 @@ void openTtcTab(BuildContext context, int index) {
 /// Opens the TTC stage from anywhere (the doorway on the pregnancy Home).
 void openTtc(BuildContext context) {
   Navigator.of(context).push(MaterialPageRoute<void>(
-    builder: (_) => const TtcTodayScreen(),
+    // ⚠️ `TtcHomeScreen`, not `TtcTodayScreen` — the version wrapper, so the
+    // V3 toggle exists on BOTH ways into this stage. Wiring one entry point and
+    // not the other is how a feature ends up reachable from the splash and
+    // invisible from the pregnancy doorway, which is the wiring-gate failure
+    // this repo keeps hitting.
+    builder: (_) => const TtcHomeScreen(),
     settings: const RouteSettings(name: ttcHomeRoute),
   ));
 }
@@ -640,78 +649,22 @@ class TtcBottomNav extends StatelessWidget {
   static List<String> _labels(TtcS t) =>
       [t.tabToday, t.tabPrepare, t.tabTools, t.tabCalendar, t.tabCommunity];
 
-  void _tap(BuildContext context, int i) {
-    if (i == active) return;
-    openTtcTab(context, i);
-  }
-
+  // ⚠️ NOW A THIN ADAPTER OVER `PvNavBar`. This bar was the furthest behind of
+  // the three: it both re-flowed the row on every tap AND kept a saturated
+  // filled pill. Both are gone with the shared component, and the i18n labels
+  // and slate palette are preserved by passing them in.
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 9),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: const [
-          BoxShadow(
-              color: Color(0x292D144C), blurRadius: 28, offset: Offset(0, 8))
-        ],
-      ),
-      child: Row(children: [
-        for (int i = 0; i < _icons.length; i++) _item(context, i)
-      ]),
-    );
-  }
-
-  Widget _item(BuildContext context, int i) {
-    final on = i == active;
     final t = TtcS.current();
-    final icon = _icons[i];
-    final label = _labels(t)[i];
-    final child = GestureDetector(
-      onTap: () => _tap(context, i),
-      behavior: HitTestBehavior.opaque,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOut,
-        padding:
-            EdgeInsets.symmetric(horizontal: on ? 12 : 4, vertical: on ? 9 : 6),
-        decoration: BoxDecoration(
-          color: on ? (slate ? ttcSlate : ttcPurple) : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: on
-            ? Row(mainAxisSize: MainAxisSize.min, children: [
-                Icon(icon, size: 21, color: Colors.white),
-                const SizedBox(width: 6),
-                Text(label,
-                    style: ttcBody(12.5, color: Colors.white, w: FontWeight.w700)),
-              ])
-            : Column(mainAxisSize: MainAxisSize.min, children: [
-                // The ACTIVE pill was made slate for him and the four inactive
-                // tabs were left on `ttcMuted` - which is 0xFFA99CBB, a
-                // lavender grey. It reads as neutral on her near-white
-                // background and unmistakably as HER PURPLE on his warm cream
-                // one. So four of his five tabs were tinted the other app's
-                // colour, on every screen of his half.
-                //
-                // A muted tone is never neutral in the abstract; it is neutral
-                // against the background it was chosen for.
-                Icon(icon, size: 20, color: slate ? ttcSlateSoft : ttcMuted),
-                const SizedBox(height: 3),
-                Text(label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
-                    style: ttcBody(8.5,
-                        color: slate ? ttcSlateSoft : ttcMuted,
-                        w: FontWeight.w600)),
-              ]),
-      ),
+    final labels = _labels(t);
+    return PvNavBar(
+      items: [
+        for (var i = 0; i < _icons.length; i++) PvNavItem(_icons[i], labels[i]),
+      ],
+      activeIndex: active,
+      onTap: (i) => openTtcTab(context, i),
+      accent: slate ? ttcSlate : ttcPurple,
     );
-    // The active pill sizes to its content; the four inactive tabs share the
-    // rest evenly so the row cannot overflow under a large text scale.
-    return on ? child : Expanded(child: child);
   }
 }
 

@@ -123,13 +123,37 @@ void main() {
       // variant, so four of his five tabs wore the other app's colour on every
       // screen of his half.
       //
-      // A muted tone is never neutral in the abstract. It is neutral against
-      // the background it was picked for.
-      final src =
-          File('lib/screens/ttc/ttc_common.dart').readAsStringSync();
-      final nav = src.substring(src.indexOf('class TtcBottomNav'));
-      expect(nav, contains('slate ? ttcSlateSoft : ttcMuted'),
-          reason: 'inactive tabs no longer switch palette');
+      // ⚠️ THE EVIDENCE MOVED, AND THE GUARANTEE IS STRONGER FOR IT.
+      //
+      // This asserted the literal source `slate ? ttcSlateSoft : ttcMuted`
+      // inside `TtcBottomNav`. That bar now delegates to the shared `PvNavBar`,
+      // which takes an `accent` and an `inactive` — so his palette is passed in
+      // rather than branched on, and the same fix is true of all three stages
+      // instead of this one.
+      //
+      // The bug it was written for is worth keeping on the record: his four
+      // inactive tabs were left on `ttcMuted`, a lavender grey chosen against
+      // HER near-white background. On his warm cream it read unmistakably as her
+      // purple. A muted tone is never neutral in the abstract; it is neutral
+      // against the background it was picked for.
+      // ⚠️ SLICE TO THE CLASS, NOT TO END-OF-FILE. `substring(indexOf(...))`
+      // with no end ran to the last line of a 1,200-line file, so "no
+      // Colors.white in the nav bar" was really "no Colors.white anywhere below
+      // it" — and `TtcPage` further down uses white legitimately. A source-grep
+      // test that reads too much file fails for reasons that have nothing to do
+      // with what it is checking.
+      final src = File('lib/screens/ttc/ttc_common.dart').readAsStringSync();
+      final from = src.indexOf('class TtcBottomNav');
+      final next = src.indexOf('\nclass ', from + 1);
+      final nav = src.substring(from, next == -1 ? src.length : next);
+
+      expect(nav, contains('PvNavBar('),
+          reason: 'TtcBottomNav must delegate to the one shared bar');
+      expect(nav, contains('accent: slate ? ttcSlate : ttcPurple'),
+          reason: 'his accent must still be his, passed to the shared bar');
+      expect(nav.contains('Colors.white'), isFalse,
+          reason: 'a white-on-filled-pill active tab would mean the old bar '
+              'has grown back');
     });
   });
 

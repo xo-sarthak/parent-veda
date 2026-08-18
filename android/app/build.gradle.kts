@@ -68,6 +68,23 @@ android {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             signingConfig = signingConfigs.getByName("debug")
+
+            // ⚠️ THE RELEASE APK CRASHED ON LAUNCH WITHOUT THIS.
+            //
+            // R8 shrinks and renames on release only, and it drops the generic
+            // signature attribute that Gson needs to read a
+            // `TypeToken<ArrayList<NotificationDetails>>`. The result was
+            // "Missing type parameter." from flutter_local_notifications' boot
+            // receiver, on a build where every test passed and the debug APK ran
+            // perfectly. See android/app/proguard-rules.pro for the full note.
+            //
+            // Kept explicit rather than switching minification off: shrinking is
+            // worth ~40MB on this APK, and turning it off would hide the same
+            // class of problem until whenever it was turned back on.
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro",
+            )
         }
     }
 }

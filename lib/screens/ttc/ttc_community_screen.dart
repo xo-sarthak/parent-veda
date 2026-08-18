@@ -33,7 +33,26 @@ import 'ttc_common.dart';
 import 'ttc_strings.dart';
 
 class TtcCommunityScreen extends StatefulWidget {
-  const TtcCommunityScreen({super.key});
+  const TtcCommunityScreen({super.key, this.initialRoom});
+
+  /// Open filtered to one room instead of the whole feed.
+  ///
+  /// ⚠️ THIS EXISTS BECAUSE OF THE WORST FAILURE THE DOOR AUDIT FOUND.
+  ///
+  /// "Get emotional support" on the Trying-again-after-loss hub opened this
+  /// screen unfiltered. A "Loss & Recovery" room exists and is written exactly
+  /// right — "no timelines, no silver linings, no advice unless it is asked
+  /// for" — but it is not auto-joined, and the two rooms that ARE auto-joined
+  /// are "Trying Naturally" and "First Month".
+  ///
+  /// So a woman who had just lost a pregnancy was shown a mixed feed of IVF
+  /// costs, ovulation strips and nutrition questions, with the two rooms
+  /// pushed at her being about actively trying — the one thing she had not
+  /// asked for. The room she needed was further down, unjoined, and she had to
+  /// find it herself while grieving.
+  ///
+  /// Nothing was broken. Everything rendered. It was simply cruel by default.
+  final String? initialRoom;
 
   /// Exposed for the tests that assert the rooms this stage must carry.
   static List<Community> get rooms => kTtcCommunities;
@@ -44,7 +63,7 @@ class TtcCommunityScreen extends StatefulWidget {
 
 class _TtcCommunityScreenState extends State<TtcCommunityScreen> {
   /// Null = everything. Otherwise a community id.
-  String? _room;
+  late String? _room = widget.initialRoom;
 
   @override
   Widget build(BuildContext context) {

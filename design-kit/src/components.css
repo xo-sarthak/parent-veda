@@ -1,0 +1,381 @@
+/* =============================================================================
+   ParentVeda V3 — component styles
+   -----------------------------------------------------------------------------
+   Every value here resolves to a token in tokens.css. If you find a literal
+   px or hex below that is not a token, it is a bug: it means a size or colour
+   escaped the scale, which is exactly the drift §2.2b and §2.3 exist to stop.
+   ========================================================================== */
+
+.pv-root {
+  background: var(--pv-ground);
+  color: var(--pv-ink-2);
+  font-family: var(--pv-font-text);
+  font-size: var(--pv-body-size);
+  line-height: var(--pv-body-leading);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- type roles ---------------------------------------------------------- */
+
+.pv-display,
+.pv-title1,
+.pv-title2,
+.pv-title3,
+.pv-card-title {
+  font-family: var(--pv-font-display);
+  font-weight: 600;
+  color: var(--pv-ink-1);
+  margin: 0;
+  text-wrap: balance;
+}
+.pv-display {
+  font-size: var(--pv-display-size);
+  letter-spacing: var(--pv-display-tracking);
+  line-height: var(--pv-display-leading);
+}
+.pv-title1 {
+  font-size: var(--pv-title1-size);
+  letter-spacing: var(--pv-title1-tracking);
+  line-height: var(--pv-title1-leading);
+}
+.pv-title2 {
+  font-size: var(--pv-title2-size);
+  letter-spacing: var(--pv-title2-tracking);
+  line-height: var(--pv-title2-leading);
+}
+.pv-title3 {
+  font-size: var(--pv-title3-size);
+  letter-spacing: var(--pv-title3-tracking);
+  line-height: var(--pv-title3-leading);
+}
+.pv-card-title {
+  font-size: var(--pv-card-title-size);
+  letter-spacing: var(--pv-card-title-tracking);
+  line-height: var(--pv-card-title-leading);
+}
+
+.pv-body {
+  font-family: var(--pv-font-text);
+  font-size: var(--pv-body-size);
+  line-height: var(--pv-body-leading);
+  color: var(--pv-ink-2);
+  margin: 0;
+}
+.pv-body-sm {
+  font-family: var(--pv-font-text);
+  font-size: var(--pv-body-sm-size);
+  line-height: var(--pv-body-sm-leading);
+  color: var(--pv-ink-2);
+  margin: 0;
+}
+.pv-label {
+  font-family: var(--pv-font-text);
+  font-size: var(--pv-label-size);
+  line-height: var(--pv-label-leading);
+  font-weight: 600;
+  color: var(--pv-ink-2);
+}
+.pv-meta {
+  font-family: var(--pv-font-text);
+  font-size: var(--pv-body-sm-size);
+  color: var(--pv-ink-3);
+}
+
+/* --- eyebrow — the signature --------------------------------------------- */
+
+.pv-eyebrow {
+  display: block;
+  font-family: var(--pv-font-text);
+  font-size: var(--pv-eyebrow-size);
+  font-weight: 800;
+  letter-spacing: var(--pv-eyebrow-tracking);
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--pv-action);
+  margin: 0 0 var(--pv-space-sm);
+}
+/* §2.1(b): on the hero field every ink tier moves one step darker, because a
+   grey loses contrast against a chromatic ground faster than a neutral one.
+   The eyebrow keeps action — it just needs a deeper one to survive the field.
+   Shipping it in grey on the field is the bug that hit TTC. */
+.pv-eyebrow--on-field {
+  color: #ffffff;
+  opacity: 0.94;
+}
+
+/* --- button — THERE IS ONE ----------------------------------------------
+   §4.3. Outlined pill, transparent fill, border 1.2, height 44, radius 999.
+   There is deliberately no filled variant anywhere in this file. A filled
+   button is the loudest element on a page, so it decides what the page is
+   FOR — and ours almost never are: the content is. */
+
+.pv-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--pv-space-sm);
+  height: 44px;
+  padding: 0 var(--pv-space-lg);
+  border: 1.2px solid var(--pv-line);
+  border-radius: var(--pv-radius-pill);
+  background: transparent;
+  color: var(--pv-ink-2);
+  font-family: var(--pv-font-text);
+  font-size: 13.5px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: border-color 140ms ease, color 140ms ease;
+}
+.pv-button:hover:not(:disabled) {
+  border-color: rgba(0, 0, 0, 0.16);
+  color: var(--pv-ink-1);
+}
+.pv-button:focus-visible {
+  outline: 2px solid var(--pv-action);
+  outline-offset: 2px;
+}
+.pv-button--quiet {
+  color: var(--pv-ink-3);
+}
+.pv-button--block {
+  display: flex;
+  width: 100%;
+}
+.pv-button:disabled {
+  color: var(--pv-ink-3);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+.pv-button__icon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+}
+
+/* --- surfaces ------------------------------------------------------------ */
+
+.pv-card {
+  background: var(--pv-surface);
+  border: 1px solid var(--pv-line);
+  border-radius: var(--pv-radius-card);
+  box-shadow: var(--pv-shadow-card);
+  padding: var(--pv-space-lg);
+}
+.pv-card--tappable {
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  font: inherit;
+  color: inherit;
+}
+/* §6: no card inside a card. A nested card gets the flat treatment instead. */
+.pv-card .pv-card {
+  box-shadow: none;
+  background: var(--pv-surface-alt);
+  border-color: transparent;
+}
+
+.pv-fact {
+  background: var(--pv-surface-alt);
+  border-radius: var(--pv-radius-row);
+  padding: var(--pv-space-md) var(--pv-space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--pv-space-xs);
+}
+.pv-fact__label {
+  font-family: var(--pv-font-text);
+  font-size: var(--pv-chip-size);
+  font-weight: 800;
+  letter-spacing: var(--pv-chip-tracking);
+  text-transform: uppercase;
+  color: var(--pv-ink-3);
+}
+.pv-fact__value {
+  font-family: var(--pv-font-display);
+  font-size: var(--pv-card-title-size);
+  letter-spacing: var(--pv-card-title-tracking);
+  font-weight: 600;
+  color: var(--pv-ink-1);
+}
+/* §6: a placeholder STATES ITS VALUE and is not tappable. It never pretends
+   to be a live thing that happens to be empty. */
+.pv-fact--placeholder .pv-fact__value {
+  color: var(--pv-ink-3);
+  font-family: var(--pv-font-text);
+  font-size: var(--pv-body-sm-size);
+  font-weight: 400;
+  letter-spacing: normal;
+}
+
+/* --- block tile — the doors ---------------------------------------------- */
+
+.pv-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--pv-space-sm);
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+}
+.pv-tile__well {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: var(--pv-radius-well);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* The hue is the ONLY thing that varies — saturation and lightness are
+     pinned by token. That is what makes twelve tiles read as one family. */
+  background: hsl(var(--pv-tile-hue) var(--pv-tint-saturation) var(--pv-tint-lightness));
+}
+.pv-tile__label {
+  font-family: var(--pv-font-text);
+  font-size: var(--pv-label-size);
+  font-weight: 600;
+  line-height: var(--pv-label-leading);
+  color: var(--pv-ink-1);
+}
+.pv-tile--not-ready .pv-tile__well {
+  opacity: 0.55;
+}
+.pv-tile--not-ready .pv-tile__label {
+  color: var(--pv-ink-3);
+}
+.pv-tile__soon {
+  font-family: var(--pv-font-text);
+  font-size: var(--pv-chip-size);
+  font-weight: 800;
+  letter-spacing: var(--pv-chip-tracking);
+  text-transform: uppercase;
+  color: var(--pv-ink-3);
+}
+
+.pv-grid {
+  display: grid;
+  gap: var(--pv-space-md);
+}
+
+/* --- hero field + sheet --------------------------------------------------
+   §5: the field fills the page and does not scroll; the content is a SHEET
+   over it. That is what removes the seam between a header and a body. */
+
+.pv-hero {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: var(--pv-ground);
+}
+/* ⚠️ The field is pinned to the TOP at its own height — never `inset: 0`.
+   The sheet lives inside .pv-hero too, so a field stretched to the full hero
+   would be scaled to cover a box several times its design height, and
+   `preserveAspectRatio: slice` would silently zoom the gradient until the deep
+   corner was cropped off the canvas. The geometry below is 1:1 on a 390pt
+   phone, which is the only width the composition was designed at. */
+.pv-hero__field {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  display: block;
+}
+.pv-hero__chrome {
+  position: relative;
+  box-sizing: border-box;
+  padding: var(--pv-space-lg) var(--pv-page-pad) 0;
+  color: #ffffff;
+}
+/* ⚠️ The sheet LIFTS OVER the field, it does not sit below it.
+   With the sheet starting after the field, the field's bottom edge is visible
+   as a hard horizontal line wherever the gradient has not yet reached its
+   final (ground) stop — a seam, which is the exact thing this arrangement
+   exists to remove. The chrome is sized to end before the field does, so the
+   sheet always covers that edge. */
+.pv-hero__sheet {
+  position: relative;
+  background: var(--pv-ground);
+  border-radius: var(--pv-radius-sheet) var(--pv-radius-sheet) 0 0;
+  box-shadow: var(--pv-shadow-sheet);
+  padding: var(--pv-space-xl) var(--pv-page-pad) var(--pv-nav-clearance);
+}
+
+.pv-spine-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--pv-space-xs);
+  height: 26px;
+  padding: 0 var(--pv-space-md);
+  border-radius: var(--pv-radius-pill);
+  background: rgba(255, 255, 255, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.34);
+  color: #ffffff;
+  font-family: var(--pv-font-text);
+  font-size: var(--pv-chip-size);
+  font-weight: 800;
+  letter-spacing: var(--pv-chip-tracking);
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+/* --- bottom nav ----------------------------------------------------------
+   §4.9. TWO changes on the active tab and NO container. Labels are always
+   visible, which is precisely why a pill or box behind the active tab is a
+   redundant third signal rather than a helpful one. */
+
+.pv-nav {
+  display: flex;
+  align-items: stretch;
+  gap: var(--pv-space-xs);
+  background: var(--pv-surface);
+  border-radius: var(--pv-radius-sheet);
+  box-shadow: var(--pv-shadow-card);
+  padding: var(--pv-space-sm) var(--pv-space-xs);
+}
+.pv-nav__item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--pv-space-xs);
+  background: none;
+  border: 0;
+  padding: var(--pv-space-xs) 0;
+  cursor: pointer;
+  font: inherit;
+  /* change 1 of 2 — colour */
+  color: var(--pv-ink-3);
+}
+.pv-nav__label {
+  font-family: var(--pv-font-text);
+  font-size: var(--pv-chip-size);
+  letter-spacing: var(--pv-chip-tracking);
+  text-transform: uppercase;
+  /* change 2 of 2 — weight */
+  font-weight: 700;
+}
+.pv-nav__item--active {
+  color: var(--pv-action);
+}
+.pv-nav__item--active .pv-nav__label {
+  font-weight: 800;
+}
+
+/* --- empty state ---------------------------------------------------------
+   A feature is NEVER hidden. An empty section renders an invitation; only the
+   copy changes. The empty state is the feature's advertisement. */
+
+.pv-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--pv-space-md);
+  padding: var(--pv-space-xl) 0;
+}
+.pv-empty__art {
+  opacity: 0.9;
+}

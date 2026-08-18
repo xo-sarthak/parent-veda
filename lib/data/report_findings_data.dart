@@ -47,6 +47,7 @@ const List<String> kReportPopular = [
 final List<ReportFinding> kReportFindings = [
   ReportFinding(
     id: 'low_lying_placenta',
+    tests: ['anomaly_scan', 'growth_scan'],
     name: _t('Low-Lying Placenta', 'नीचे बैठा Placenta'),
     altName: _same('Placenta Previa'),
     weekFrom: 18,
@@ -68,6 +69,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'breech',
+    tests: ['growth_scan'],
     name: _t('Breech Position', 'उल्टी मुद्रा (Breech)'),
     altName: _t('Breech Baby', 'Breech शिशु'),
     weekFrom: 32,
@@ -89,6 +91,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'nuchal_cord',
+    tests: ['growth_scan', 'anomaly_scan'],
     name: _t('Cord Around Neck', 'गर्दन के चारों ओर गर्भनाल'),
     altName: _same('Nuchal Cord'),
     weekFrom: 36,
@@ -109,6 +112,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'gestational_diabetes',
+    tests: ['ogtt', 'growth_scan'],
     name: _t('Gestational Diabetes', 'गर्भावस्था की डायबिटीज़'),
     altName: _same('GDM'),
     weekFrom: 24,
@@ -130,6 +134,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'low_fluid',
+    tests: ['growth_scan', 'doppler'],
     name: _t('Low Amniotic Fluid', 'कम Amniotic Fluid'),
     altName: _same('Oligohydramnios'),
     weekFrom: 30,
@@ -151,6 +156,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'preeclampsia',
+    tests: ['blood_tests', 'doppler'],
     name: _same('Preeclampsia'),
     weekFrom: 20,
     whatItMeans: _t('This means your blood pressure is raised during pregnancy, sometimes with other signs that your body needs closer attention. It is something doctors watch carefully and manage step by step.', 'इसका मतलब है कि गर्भावस्था में आपका ब्लड प्रेशर बढ़ा हुआ है, कभी-कभी कुछ और संकेतों के साथ जो बताते हैं कि शरीर पर ज़्यादा ध्यान चाहिए। डॉक्टर इस पर सावधानी से नज़र रखते हैं और क़दम-दर-क़दम सँभालते हैं।'),
@@ -170,6 +176,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'high_fluid',
+    tests: ['growth_scan'],
     name: _t('High Amniotic Fluid', 'ज़्यादा Amniotic Fluid'),
     altName: _same('Polyhydramnios'),
     weekFrom: 28,
@@ -191,6 +198,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'short_cervix',
+    tests: ['anomaly_scan', 'growth_scan'],
     name: _t('Short Cervix', 'छोटा Cervix'),
     weekFrom: 18,
     weekTo: 24,
@@ -211,6 +219,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'placental_calcification',
+    tests: ['growth_scan'],
     name: _t('Placental Calcification', 'Placenta में Calcification'),
     weekFrom: 28,
     weekTo: 40,
@@ -231,6 +240,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'twin_pregnancy',
+    tests: ['dating_scan', 'anomaly_scan'],
     name: _t('Twin Pregnancy', 'जुड़वाँ गर्भावस्था'),
     weekFrom: 6,
     weekTo: 12,
@@ -251,6 +261,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'anemia',
+    tests: ['blood_tests', 'growth_scan'],
     name: _t('Anemia During Pregnancy', 'गर्भावस्था में ख़ून की कमी'),
     whatItMeans: _t('This means your blood has fewer healthy red cells or less iron than ideal - common in pregnancy as your body makes more blood for your baby. It is usually straightforward to improve.', 'इसका मतलब है कि आपके ख़ून में सेहतमंद लाल कोशिकाएँ या Iron ज़रूरत से कम हैं — गर्भावस्था में यह आम है, क्योंकि शरीर शिशु के लिए ज़्यादा ख़ून बनाता है। इसे सुधारना आम तौर पर आसान होता है।'),
     howCommon: _t('Mild anemia is very common in pregnancy and is picked up by routine blood tests.', 'हल्की anemia गर्भावस्था में बहुत आम है और सामान्य ख़ून की जाँच में पकड़ में आ जाती है।'),
@@ -269,6 +280,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'reduced_movements',
+    tests: ['growth_scan', 'doppler'],
     name: _t('Reduced Fetal Movements', 'शिशु की हलचल कम होना'),
     weekFrom: 28,
     whatItMeans: _t('This means your baby\'s movements have felt less frequent or different than usual. Movement patterns naturally change, and getting it checked is always the right thing to do.', 'इसका मतलब है कि आपके शिशु की हलचल पहले से कम या अलग महसूस हुई है। हलचल का ढंग स्वाभाविक रूप से बदलता है, और इसे जँचवा लेना हमेशा सही क़दम है।'),
@@ -307,6 +319,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'high_bp',
+    tests: ['blood_tests'],
     name: _t('High Blood Pressure', 'ज़्यादा ब्लड प्रेशर'),
     altName: _same('Gestational Hypertension'),
     weekFrom: 20,
@@ -327,6 +340,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'placenta_resolved',
+    tests: ['growth_scan', 'anomaly_scan'],
     name: _t('Low-Lying Placenta (Resolved)', 'नीचे बैठा Placenta (ठीक हो गया)'),
     altName: _t('Placenta Moved Up', 'Placenta ऊपर चला गया'),
     weekFrom: 28,
@@ -348,6 +362,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'small_baby',
+    tests: ['growth_scan', 'doppler'],
     name: _t('Small Baby For Gestational Age', 'उम्र के हिसाब से छोटा शिशु'),
     altName: _same('SGA'),
     weekFrom: 28,
@@ -369,6 +384,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'large_baby',
+    tests: ['growth_scan'],
     name: _t('Large Baby For Gestational Age', 'उम्र के हिसाब से बड़ा शिशु'),
     altName: _same('LGA'),
     weekFrom: 28,
@@ -390,6 +406,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'subchorionic_hematoma',
+    tests: ['dating_scan', 'anomaly_scan'],
     name: _same('Subchorionic Hematoma'),
     weekFrom: 6,
     weekTo: 20,
@@ -410,6 +427,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'vanishing_twin',
+    tests: ['dating_scan'],
     name: _t('Vanishing Twin', 'जुड़वाँ में से एक का न बढ़ना'),
     weekFrom: 6,
     weekTo: 12,
@@ -430,6 +448,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'marginal_cord',
+    tests: ['anomaly_scan', 'growth_scan'],
     name: _t('Marginal Cord Insertion', 'किनारे पर जुड़ी गर्भनाल'),
     weekFrom: 18,
     weekTo: 28,
@@ -450,6 +469,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'single_umbilical_artery',
+    tests: ['anomaly_scan'],
     name: _t('Single Umbilical Artery', 'गर्भनाल में एक ही धमनी'),
     altName: _same('Two-Vessel Cord'),
     weekFrom: 18,
@@ -471,6 +491,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'ventriculomegaly',
+    tests: ['anomaly_scan'],
     name: _t('Mild Ventriculomegaly', 'हल्का Ventriculomegaly'),
     weekFrom: 18,
     weekTo: 24,
@@ -491,6 +512,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'eif',
+    tests: ['anomaly_scan', 'nt_scan'],
     name: _t('Echogenic Intracardiac Focus', 'दिल में चमकीला बिंदु'),
     altName: _same('EIF'),
     weekFrom: 18,
@@ -512,6 +534,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'soft_markers',
+    tests: ['anomaly_scan', 'nt_scan', 'nipt'],
     name: _t('Soft Markers On Scan', 'स्कैन में Soft Markers'),
     weekFrom: 18,
     weekTo: 22,
@@ -532,6 +555,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'fibroids',
+    tests: ['dating_scan', 'anomaly_scan'],
     name: _t('Fibroids During Pregnancy', 'गर्भावस्था में Fibroids'),
     weekFrom: 8,
     weekTo: 20,
@@ -552,6 +576,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'group_b_strep',
+    tests: ['gbs'],
     name: _same('Group B Strep'),
     altName: _same('GBS'),
     weekFrom: 35,
@@ -573,6 +598,7 @@ final List<ReportFinding> kReportFindings = [
   ),
   ReportFinding(
     id: 'rh_negative',
+    tests: ['blood_tests'],
     name: _t('Rh-Negative Pregnancy', 'Rh-Negative गर्भावस्था'),
     altName: _t('Rh Negative Blood', 'Rh Negative ख़ून'),
     weekFrom: 28,

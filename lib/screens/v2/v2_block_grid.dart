@@ -27,6 +27,8 @@
 import 'package:flutter/material.dart';
 
 import 'v2_block_art.dart';
+import 'v3_bracket_art.dart';
+import 'v3_skill_art.dart';
 import 'v2_palette.dart';
 
 @immutable
@@ -38,6 +40,8 @@ class V2Block {
     this.meta,
     this.asset,
     this.mark,
+    this.bracketMark,
+    this.skillMark,
     this.onTap,
   });
 
@@ -76,26 +80,68 @@ class V2Block {
   /// used instead — see v2_block_art.dart for why both sets exist.
   final V2Mark? mark;
 
+  /// A BRACKET's mark, which wins over both of the above when present.
+  ///
+  /// Separate from [mark] rather than folded into it because the two sets are
+  /// authored for different sizes — 110dp doors versus 73dp brackets — and
+  /// sharing one enum would invite someone to use a door mark on a bracket tile,
+  /// where its interior detail turns to mush. See v3_bracket_art.dart.
+  final BracketMark? bracketMark;
+
+  /// A SKILLING bracket's mark. Wins over all of the above.
+  ///
+  /// ⚠️ A THIRD SLOT RATHER THAN MORE CASES IN `BracketMark`, for the same
+  /// reason `bracketMark` is separate from `mark`: the sets are authored
+  /// independently and no stage reads more than one of them. Folding skilling's
+  /// twelve into the bracket enum would make a 29-case switch that every
+  /// painter has to handle exhaustively, to serve four stages that each use a
+  /// disjoint third of it.
+  final SkillMark? skillMark;
+
   final VoidCallback? onTap;
 }
 
 class V2BlockGrid extends StatelessWidget {
-  const V2BlockGrid({super.key, required this.blocks, required this.palette});
+  const V2BlockGrid({
+    super.key,
+    required this.blocks,
+    required this.palette,
+    this.columns = 3,
+  });
 
   final List<V2Block> blocks;
   final V2Palette palette;
 
+  /// THREE FOR THE OLD SIX DOORS, FOUR FOR THE BRACKETS.
+  ///
+  /// The file header argues for six tiles at three columns, and that reasoning
+  /// was right for a hand-picked menu of six. The brackets are not that: they
+  /// are the workbook's full L1 column, and every stage has to fit — 7 for
+  /// preconception, 10 for pregnancy, 11 for after birth, 12 for skilling.
+  ///
+  /// Four columns × three rows is twelve slots, which covers the largest stage
+  /// exactly. So no stage ever needs a "See more", and nothing is ever one tap
+  /// further away than anything else — which matters more here than tile size,
+  /// because a bracket she cannot see is a bracket she does not know exists.
+  ///
+  /// The cost is real and was accepted: at 360dp a four-column tile is ~73dp
+  /// against ~110dp, so labels had to shorten and the marks were redrawn for
+  /// the smaller size rather than scaled down into mush.
+  final int columns;
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(builder: (context, c) {
-      const gap = 10.0;
-      final tile = (c.maxWidth - gap * 2) / 3;
+      final gap = columns >= 4 ? 8.0 : 10.0;
+      final tile = (c.maxWidth - gap * (columns - 1)) / columns;
       return Wrap(
         spacing: gap,
         runSpacing: gap,
         children: [
           for (final b in blocks)
-            SizedBox(width: tile, child: _Tile(block: b, palette: palette)),
+            SizedBox(
+                width: tile,
+                child: _Tile(block: b, palette: palette, tile: tile)),
         ],
       );
     });
@@ -103,10 +149,17 @@ class V2BlockGrid extends StatelessWidget {
 }
 
 class _Tile extends StatelessWidget {
-  const _Tile({required this.block, required this.palette});
+  const _Tile(
+      {required this.block, required this.palette, required this.tile});
 
   final V2Block block;
   final V2Palette palette;
+
+  /// The tile's own width, so type can step down when four columns squeeze it.
+  /// The alternative — one size for both grids — either wastes the three-column
+  /// tile or overflows the four-column one, and the four-column labels are the
+  /// ones with the least room to spare.
+  final double tile;
 
   @override
   Widget build(BuildContext context) {
@@ -164,8 +217,17 @@ class _Tile extends StatelessWidget {
                   // object running to the corners of its own well reads as
                   // cropped rather than as large.
                   padding: EdgeInsets.all(
-                      V2BlockArtMode.instance.vector ? 10 : 6),
-                  child: V2BlockArtMode.instance.vector && block.mark != null
+                      block.bracketMark != null || block.skillMark != null
+                          ? 8
+                          : V2BlockArtMode.instance.vector
+                              ? 10
+                              : 6),
+                  child: block.skillMark != null
+                      ? V3SkillArt(mark: block.skillMark!, tint: block.tint)
+                      : block.bracketMark != null
+                      ? V3BracketArt(
+                          mark: block.bracketMark!, tint: block.tint)
+                      : V2BlockArtMode.instance.vector && block.mark != null
                       ? V2BlockArt(
                           mark: block.mark!,
                           // The tile's own pastel, not a grey. See the note on
@@ -189,10 +251,14 @@ class _Tile extends StatelessWidget {
             // squeeze", and it is backwards. See the note in v3_sections.dart.
             Text(
               block.label,
-              maxLines: 1,
+              // TWO LINES ON THE TIGHT GRID. "Garbh Sanskar" and "Yoga &
+              // fitness" do not fit 73dp on one line, and ellipsising a door's
+              // name is worse than wrapping it — "Garbh Sansk…" is not a label,
+              // it is a truncation she has to decode.
+              maxLines: tile < 90 ? 2 : 1,
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
-                fontSize: 14,
+                fontSize: tile < 90 ? 12.5 : 14,
                 fontWeight: FontWeight.w700,
                 height: 1.15,
                 color: palette.ink1,
@@ -205,7 +271,7 @@ class _Tile extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: 12,
+                  fontSize: tile < 90 ? 11 : 12,
                   height: 1.15,
                   color: palette.ink3,
                 ),

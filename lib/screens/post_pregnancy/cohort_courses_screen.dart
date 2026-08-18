@@ -94,8 +94,10 @@ class CohortCoursesScreen extends StatelessWidget {
                   const SizedBox(height: 16),
                   Text.rich(TextSpan(children: [
                     TextSpan(text: '₹8,999', style: ppBody(16, color: ppInk, w: FontWeight.w700)),
-                    TextSpan(text: '  ·  or ', style: ppBody(13, color: ppSoft)),
-                    TextSpan(text: 'ParentVeda+ Pro', style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
+                    // Kept for revert:
+                    //   TextSpan(text: '  ·  or ', ...),
+                    //   TextSpan(text: 'ParentVeda+ Pro', ...),
+                    TextSpan(text: '  ·  one-time', style: ppBody(13, color: ppSoft)),
                   ])),
                   const SizedBox(height: 16),
                   GestureDetector(

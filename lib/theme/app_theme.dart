@@ -22,6 +22,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../screens/v2/v2_palette.dart';
 
 import '../localization/app_language.dart';
 import 'pv_fonts.dart';
@@ -132,8 +133,19 @@ class AppTheme {
   static const Color neutral100 = Color(0xFFE4E2E5);
   static const Color neutral200 = Color(0xFFCCC9CE);
   static const Color neutral300 = Color(0xFFB2AEB5);
+  // ⚠️ 2.73:1 ON THE APP GROUND — FAILS AA BY A LONG WAY, AND IS LEFT ALONE
+  // DELIBERATELY. A ramp needs a light step for borders, dividers, disabled
+  // states and placeholder glyphs, and darkening this one to pass would push it
+  // past neutral500 and invert the scale.
+  //
+  // THE RULE, THEN: **neutral400 must never carry text a user has to read.**
+  // It was doing exactly that on the bottom nav's inactive labels — the
+  // most-seen text in the entire app — which is now neutral600 (5.28:1).
   static const Color neutral400 = Color(0xFF98939B);
-  static const Color neutral500 = Color(0xFF7B757F); // base
+  // ⚠️ WAS #7B757F AND FAILED AA at 4.06:1 on the app ground. This is the
+  // "base" muted text colour with 245 usage sites, so it carries a great deal
+  // of real copy. #726C75 measures 4.62:1 and passes.
+  static const Color neutral500 = Color(0xFF726C75); // base
   static const Color neutral600 = Color(0xFF69636C);
   static const Color neutral700 = Color(0xFF565259);
   static const Color neutral800 = Color(0xFF444046);
@@ -144,15 +156,37 @@ class AppTheme {
   // ===========================================================================
 
   /// App canvas. Soft lavender-white, never pure white, never grey.
-  static const Color scaffoldBackground = Color(0xFFFBF9FE);
+  // ⚠️ THESE FOUR WERE `static const` AND ARE NOW GETTERS. THAT IS THE
+  // MIGRATION, DONE AT THE ONE PLACE IT IS CHEAP.
+  //
+  // The app had FOUR token systems and therefore three different page grounds
+  // measured live on one device: V3 on #F5F3F6, Classic on #FBF9FE, and the old
+  // lilac #F3EEF7 hardcoded across thirty-one files. The app was visibly
+  // two-toned mid-scroll and nobody could compare a candidate white, because
+  // switching the V3 palette left Classic untouched.
+  //
+  // Hand-editing thirty-eight hex literals was the obvious fix and the wrong
+  // one: it would have unified today and drifted again on the next screen. The
+  // four declarations below carry 261 usage sites between them, so routing THEM
+  // through one source unifies all of it and keeps it unified.
+  //
+  // ⚠️ COST, STATED: a getter cannot be used in a `const` expression, so the
+  // handful of `const` call sites had to change. That is a real cost and it is
+  // the right trade — a compile error at three sites is cheaper than a colour
+  // that silently disagrees with itself in two hundred.
+  static Color get scaffoldBackground =>
+      V2PaletteStore.instance.groundSpec.ground;
 
   /// Cleanest raised surface (cards that need to "pop" off the canvas).
   static const Color surface = Color(0xFFFFFFFF);
 
   /// Soft tinted container (the lavender panels in the board).
-  static const Color surfaceContainer = Color(0xFFF3EEF7);
-  static const Color surfaceContainerLow = Color(0xFFFBF9FE);
-  static const Color surfaceContainerHigh = Color(0xFFECE5F2);
+  static Color get surfaceContainer =>
+      V2PaletteStore.instance.groundSpec.surfaceAlt;
+  static Color get surfaceContainerLow =>
+      V2PaletteStore.instance.groundSpec.ground;
+  static Color get surfaceContainerHigh =>
+      V2PaletteStore.instance.groundSpec.containerHigh;
   static const Color surfaceContainerHighest = Color(0xFFE6DEED);
 
   static const Color outline = Color(0xFFB2AEB5); // neutral300
@@ -179,7 +213,10 @@ class AppTheme {
   //  5. COLOR SCHEMES
   // ===========================================================================
 
-  static const ColorScheme _lightScheme = ColorScheme(
+  static // ⚠️ NO LONGER `const`. Three of its surface entries now read the ground
+// store, and a const expression cannot call a getter. The scheme is built once
+// per read instead of once per program, which is free at this size.
+final ColorScheme _lightScheme = ColorScheme(
     brightness: Brightness.light,
     primary: primary500,
     onPrimary: Colors.white,

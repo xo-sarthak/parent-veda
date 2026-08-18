@@ -120,7 +120,8 @@ class SleepBetterScreen extends StatelessWidget {
                 const SizedBox(height: 8),
                 Text.rich(TextSpan(children: [
                   const TextSpan(text: 'The 2-week Sleep Bootcamp cohort, with a real sleep consultant - '),
-                  TextSpan(text: 'included with ParentVeda+', style: TextStyle(color: ppInk, fontWeight: FontWeight.w600)),
+                  // Kept for revert: 'included with ParentVeda+'
+                  TextSpan(text: 'booked on its own', style: TextStyle(color: ppInk, fontWeight: FontWeight.w600)),
                   const TextSpan(text: '.'),
                 ]), style: ppBody(14, h: 1.6)),
                 const SizedBox(height: 14),

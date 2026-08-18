@@ -598,9 +598,9 @@ Future<void> showFocusChooser(BuildContext context) async {
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
     builder: (ctx) => Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppTheme.surfaceContainer,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 28),
       child: Column(mainAxisSize: MainAxisSize.min, children: [

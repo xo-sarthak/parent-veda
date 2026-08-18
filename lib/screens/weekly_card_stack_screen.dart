@@ -48,7 +48,20 @@ class _WeeklyCardStackScreenState extends State<WeeklyCardStackScreen> {
 
   /// Collapsing-header geometry: the compact info row (trimester + week + date +
   /// progress) is always pinned; the compact week bar below it collapses away.
-  static const double _compactHeaderHeight = 74;
+  ///
+  /// 76, not 74. DEVANAGARI IS TALLER THAN LATIN at the same font size - matras
+  /// hang above the shirorekha and vowel signs drop below the baseline - so
+  /// `हफ़्ता 40 · 27 जुल – 2 अग` needs about a pixel more than
+  /// `Week 40 · 27 Jul – 2 Aug`. A SliverPersistentHeaderDelegate's extent is a
+  /// hard constraint, so that pixel became "BOTTOM OVERFLOWED BY 1.00 PIXELS"
+  /// painted across the date - in Hindi only, on every week.
+  ///
+  /// Found on a phone. It cannot be caught by a test or an analyzer: the layout
+  /// is correct, the arithmetic is correct, and the only thing wrong is that a
+  /// number chosen while reading English is too small for the other language.
+  /// lib/theme/pv_fonts.dart already relaxes line-height for Devanagari; a
+  /// hard-coded box height is the one place that cannot follow it.
+  static const double _compactHeaderHeight = 76;
   // A little extra room so the selected week's round shadow renders fully and
   // isn't clipped (straightened) at the header's bottom edge.
   static const double _stripHeaderHeight = 62;

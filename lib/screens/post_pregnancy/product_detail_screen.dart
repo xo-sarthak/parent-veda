@@ -56,6 +56,15 @@ class ProductDetailScreen extends StatelessWidget {
   // site; ParentVeda's own (in-app) product stays in the app (mock checkout).
   Future<void> _buy(BuildContext context) async {
     final messenger = ScaffoldMessenger.of(context);
+    // ⚠️ IMS ACT BACKSTOP, matching ppLaunchBuy. The CTA is not drawn for a
+    // review-only product; if it somehow is, the link still must not open.
+    if (!ppCanBuy(product)) {
+      messenger.showSnackBar(const SnackBar(
+        content: Text(kPpReviewOnlyWhy),
+        behavior: SnackBarBehavior.floating,
+      ));
+      return;
+    }
     if (!ppIsAffiliate(product)) {
       messenger.showSnackBar(SnackBar(
         content: Text('Buying ${product.name} in-app - checkout opens soon.'),
@@ -121,7 +130,12 @@ class ProductDetailScreen extends StatelessWidget {
     }
     m['Brand'] = p.brand;
     m['Price'] = p.priceLabel;
-    m['Sold via'] = p.retailer == 'In-app' ? 'ParentVeda (in-app)' : p.retailer;
+    // ⚠️ IMS ACT. "Sold via Amazon" on a feeding bottle is a pointer to where to
+    // buy it, which is the thing we may not provide - so the row goes, while the
+    // price stays (a fact she needs to judge the product, not a place to spend).
+    if (ppCanBuy(p)) {
+      m['Sold via'] = p.retailer == 'In-app' ? 'ParentVeda (in-app)' : p.retailer;
+    }
     return m;
   }
 
@@ -129,7 +143,9 @@ class ProductDetailScreen extends StatelessWidget {
     if (p.pros.isNotEmpty) return p.pros;
     final l = <String>[];
     if (p.rating >= 4.6) l.add('Highly rated by parents');
-    if (p.parentVeda) l.add('Made by ParentVeda');
+    // Was: 'Made by ParentVeda'. Kept for revert - our own make is provenance,
+    // not a reason, and this list is headed "What's good".
+    if (p.parentVeda) l.add('Our own make, reviewed to the same standard as the rest');
     if (p.verified) l.add('Verified purchase reviews');
     if (p.bestseller) l.add('A category bestseller');
     if (l.isEmpty) l.add('${p.ratingLabel} from ${p.reviews} reviews');
@@ -279,8 +295,44 @@ class ProductDetailScreen extends StatelessWidget {
             ])),
 
             // product shot
+            //
+            // Was: _pad(const PpStriped(height: 230, radius: 22, border: true)).
+            // Kept for revert. The hatch now lives inside PpProductImage as the
+            // no-photo-yet state, so the hero is a real photo the moment one
+            // exists in the data and an honest cover block until then.
             const SizedBox(height: 16),
-            _pad(const PpStriped(height: 230, radius: 22, border: true)),
+            _pad(PpProductImage(
+              url: product.imageUrl,
+              height: 230,
+              radius: 22,
+              icon: categoryByName(product.category).icon,
+            )),
+
+            // The gallery, only when there is more than one shot. A row of one
+            // thumbnail is a control that does nothing.
+            if (product.images.length > 1) ...[
+              const SizedBox(height: 10),
+              SizedBox(
+                height: 62,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 24),
+                  children: [
+                    for (final u in product.images)
+                      Padding(
+                        padding: const EdgeInsets.only(right: 8),
+                        child: PpProductImage(
+                          url: u,
+                          height: 62,
+                          width: 62,
+                          radius: 12,
+                          icon: categoryByName(product.category).icon,
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ],
 
             // If this product has a ParentVeda Product Guide, offer it inline.
             ...() {
@@ -591,32 +643,42 @@ class ProductDetailScreen extends StatelessWidget {
             )),
 
             // buy - affiliate opens the retailer; in-app stays in ParentVeda
+            //
+            // ⚠️ IMS ACT. A review-only product (infant formula, feeding bottles,
+            // infant foods) keeps this whole page - the specs, the take, the
+            // reviews, the research - and loses exactly two things: the CTA and
+            // the "also on <retailer>" line, which is itself a pointer to a place
+            // to buy. Everything above this comment is untouched by the flag.
             const SizedBox(height: 22),
-            _pad(GestureDetector(
-              onTap: () => _buy(context),
-              behavior: HitTestBehavior.opaque,
-              child: Container(
-                height: 52,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(16)),
-                child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  if (ppIsAffiliate(product)) ...[
-                    const Icon(Icons.open_in_new_rounded, size: 16, color: Colors.white),
-                    const SizedBox(width: 8),
-                  ],
-                  Text('${ppBuyLabel(product)} · ${product.priceLabel}',
-                      style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
-                ]),
-              ),
-            )),
-            if (ppIsAffiliate(product)) ...[
-              const SizedBox(height: 12),
-              _pad(Center(
-                child: Text.rich(TextSpan(children: [
-                  const TextSpan(text: 'Also on '),
-                  TextSpan(text: otherRetailer, style: ppBody(13, color: ppPurple, w: FontWeight.w600)),
-                ]), style: ppBody(13)),
+            if (!ppCanBuy(product))
+              _pad(const PpReviewOnlyNote())
+            else ...[
+              _pad(GestureDetector(
+                onTap: () => _buy(context),
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  height: 52,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(16)),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    if (ppIsAffiliate(product)) ...[
+                      const Icon(Icons.open_in_new_rounded, size: 16, color: Colors.white),
+                      const SizedBox(width: 8),
+                    ],
+                    Text('${ppBuyLabel(product)} · ${product.priceLabel}',
+                        style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
+                  ]),
+                ),
               )),
+              if (ppIsAffiliate(product)) ...[
+                const SizedBox(height: 12),
+                _pad(Center(
+                  child: Text.rich(TextSpan(children: [
+                    const TextSpan(text: 'Also on '),
+                    TextSpan(text: otherRetailer, style: ppBody(13, color: ppPurple, w: FontWeight.w600)),
+                  ]), style: ppBody(13)),
+                )),
+              ],
             ],
 
             const SizedBox(height: 20),

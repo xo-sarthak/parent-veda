@@ -81,7 +81,7 @@ class GuidesToolsScreen extends StatelessWidget {
                         Expanded(
                           child: Text.rich(TextSpan(children: [
                             TextSpan(text: '₹699', style: ppBody(15, color: ppInk, w: FontWeight.w700)),
-                            TextSpan(text: '  ·  free on ParentVeda+', style: ppBody(12, color: ppSoft)),
+                            TextSpan(text: '  ·  one-time', style: ppBody(12, color: ppSoft)),
                           ])),
                         ),
                         const SizedBox(width: 10),

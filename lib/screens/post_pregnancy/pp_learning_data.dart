@@ -78,7 +78,7 @@ class LearningProgram {
     required this.accent,
     required this.price,
     required this.status,
-    this.priceNote = 'free on ParentVeda+',
+    this.priceNote = 'one-time',
     this.isLiveScheduled = false,
     this.startLabel,
     this.sessionTimes = const [],
@@ -218,7 +218,7 @@ LearningCta ctaFor(LearningProgram p) {
         case LearningStatus.available:
         case LearningStatus.ongoing:
         case LearningStatus.completed:
-          return const LearningCta('Watch now', watch: true, note: 'Free with ParentVeda+ · lifetime access');
+          return const LearningCta('Watch now', watch: true, note: 'Lifetime access');
       }
   }
 }
@@ -331,7 +331,7 @@ const List<LearningProgram> kLearningPrograms = [
     topics: ['Sleep'],
     accent: _blue,
     price: '₹8,999',
-    priceNote: 'or ParentVeda+ Pro',
+    priceNote: 'one-time',
     status: LearningStatus.reserveOpen,
     startLabel: 'Next cohort · Sun 21 Jul',
     seatsLeft: 8,
@@ -382,7 +382,7 @@ const List<LearningProgram> kLearningPrograms = [
     topics: ['Feeding & Solids'],
     accent: _amber,
     price: '₹12,999',
-    priceNote: 'or ParentVeda+ Pro',
+    priceNote: 'one-time',
     status: LearningStatus.reserveOpen,
     startLabel: 'Starts 1 Aug · opens at 6 months',
     seatsLeft: 14,
@@ -403,7 +403,7 @@ const List<LearningProgram> kLearningPrograms = [
     topics: ['Mindfulness'],
     accent: _plum,
     price: '₹24,999',
-    priceNote: 'or ParentVeda+ Pro',
+    priceNote: 'one-time',
     status: LearningStatus.reserveOpen,
     startLabel: 'Starts 18 Aug',
     seatsLeft: 20,

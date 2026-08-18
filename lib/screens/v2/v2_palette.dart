@@ -77,17 +77,75 @@ class V2Palette {
 // -----------------------------------------------------------------------------
 
 /// What ships today. Here so the delta is visible rather than remembered.
+///
+/// ⚠️ The ground and surfaceAlt were desaturated on 2026-08-16, from S36/S33 to
+/// S16. The old values are kept in the comment beside each so the delta is
+/// readable rather than archaeological:
+///
+///   ground     #F3EEF7  H273 S36 L95   ->  #F5F3F6  H280 S16 L96
+///   surfaceAlt #ECE5F2  H272 S33 L92   ->  #EDEAF0  H280 S16 L93
+///
+/// The reason is the one the whole design system now rests on: **a brand colour
+/// is not an interface colour.** The inks in this same palette sit at S7–S12 —
+/// correctly, because text should carry no hue of its own. The ground sat at
+/// S36, three to five times more saturated than the inks it holds, so every
+/// screen arrived pre-tinted and every hue placed on top of it (the six door
+/// tints, a photo, a green success state) had to fight a violet cast to read as
+/// itself. Zepto's brand is purple and its shelves are white for exactly this
+/// reason: the loud colour has to be spendable, and you cannot spend a colour
+/// that is already everywhere.
+///
+/// Lightness was deliberately NOT raised while dropping saturation. At L96 the
+/// ground still sits four lightness points below `surface` (#FFFFFF), which is
+/// what makes a white card read as a card without needing a shadow — this system
+/// draws elevation as a line, so that four-point gap is the only separation the
+/// card gets. Pushing to L97/L98 to "brighten" it would have removed the one
+/// thing the ground is doing. Brightness in this app comes from the hue wells,
+/// the hero field and the photography, none of which changed here.
 const _baseline = V2Palette(
   id: 'baseline',
   name: 'Baseline',
-  blurb: 'What ships today — cool lavender ground.',
-  ground: Color(0xFFF3EEF7),
+  blurb: 'What ships today — near-neutral ground, violet spent on purpose.',
+  // ⚠️ SETTLED ON A DEVICE, 2026-08-17. Four candidate grounds were driven on
+  // a real phone across both homes and the pixels were sampled:
+  //
+  //   ground      page      gap to a white card
+  //   White       #FFFFFF   +0.8 L   <- no edge at all
+  //   Soft        #FCFCFD   +1.8 L
+  //   Near        #FAFAFB   +2.6 L
+  //   Current     #F5F3F6   +4.9 L   <- chosen
+  //
+  // Cards in this app are pure white, and below roughly 2–3 lightness points a
+  // card stops having an edge on a phone — worst on the cheap screens most of
+  // our users have. At pure white the gap is 0.8: the card and the page are the
+  // same surface.
+  //
+  // ⚠️ AND THE TINT IS NOT AN OUTLIER. iOS's grouped background is #F2F2F7 —
+  // H240, S23%. Notion's is #F7F6F3 — H45, S20%. Ours is H280 S14%: the LEAST
+  // saturated of the three. Practically nobody ships a neutral grey.
+  //
+  // What made the app read duller than a shopping app was never the ground; it
+  // was that our content stops carrying colour halfway down the page. A whiter
+  // page would have removed the last structure rather than adding brightness.
+  ground: Color(0xFFF5F3F6), // was 0xFFF3EEF7 (S36)
   surface: Color(0xFFFFFFFF),
-  surfaceAlt: Color(0xFFECE5F2),
+  surfaceAlt: Color(0xFFEDEAF0), // was 0xFFECE5F2 (S33)
   line: Color(0x14000000),
   ink1: Color(0xFF201C24),
   ink2: Color(0xFF5B5464),
-  ink3: Color(0xFF8B8494),
+  // ⚠️ WAS #8B8494 AND FAILED WCAG AA. Measured 3.27:1 against this ground;
+  // AA for normal-size text needs 4.5:1. It carries metadata, timestamps,
+  // chevrons, "4 min · read" — and the product-card caveat line — all at
+  // 11–12.5px, which is exactly the size the 4.5 threshold exists for.
+  //
+  // #6F6878 measures 4.85:1. It stays the quietest tier by a clear margin
+  // (ink2 is 6.57:1, ink1 15.19:1), so the three-tier hierarchy survives; it
+  // is simply no longer illegible to anyone whose close vision has shifted.
+  //
+  // ⚠️ THE GROUND WAS NEVER THE PROBLEM. On pure white the old value measured
+  // 3.60:1 — still failing. Chasing a whiter page would not have fixed this,
+  // and the question that found it was about the tint.
+  ink3: Color(0xFF6F6878),
   action: Color(0xFF6A30B6),
 );
 
@@ -202,6 +260,70 @@ class V2BlockHues {
 }
 
 // -----------------------------------------------------------------------------
+//  THE GROUND COMPARISON — how white is the page?
+// -----------------------------------------------------------------------------
+//  ⚠️ THIS EXISTS BECAUSE OF ONE OBSERVATION THAT WAS RIGHT.
+//
+//  Held next to Zepto in the app switcher, our page read grey and theirs read
+//  bright. Measured: theirs is pure #FFFFFF; ours was #F5F3F6.
+//
+//  The earlier reasoning for a tinted ground was sound and incomplete: keep a
+//  few lightness points between ground and card, and a white card reads as a
+//  card without needing a shadow. True — but it assumes separation MUST come
+//  from lightness. Zepto proves the other model: a white page, and cards
+//  separated by a hairline, a tinted shadow, and photography.
+//
+//  Both work. They are different products, not better and worse. So this is a
+//  comparison rather than an argument, and it has to be seen on a phone.
+//
+//  ⚠️ AS THE GROUND APPROACHES WHITE, THE CARD TREATMENT MUST CHANGE WITH IT.
+//  At #FFFFFF a white card on a white page is invisible, so each option below
+//  carries its OWN line strength and its own `surfaceAlt`. Swapping only the
+//  ground hex would have made the brightest option look broken and lost the
+//  comparison for the wrong reason.
+enum GroundOption {
+  /// Pure white. The Zepto / Amazon / Myntra model — brightest, and cards must
+  /// earn their edges from a hairline rather than a lightness step.
+  paperWhite,
+
+  /// Barely off-white. Reads white; keeps one lightness point in hand.
+  softWhite,
+
+  /// Near-white with a whisper of the brand hue.
+  warmGrey,
+
+  /// What ships today — #F5F3F6, S16.
+  current,
+}
+
+class GroundSpec {
+  const GroundSpec(this.label, this.ground, this.surfaceAlt, this.line,
+      this.containerHigh);
+  final String label;
+  final Color ground;
+  final Color surfaceAlt;
+
+  /// One step darker than [surfaceAlt] — chips, inset rows, ring tracks.
+  /// AppTheme's `surfaceContainerHigh` maps here.
+  final Color containerHigh;
+
+  /// ⚠️ STRONGER AS THE GROUND GETS WHITER. On a white page the hairline is
+  /// the only thing telling her where a card ends.
+  final Color line;
+}
+
+const Map<GroundOption, GroundSpec> kGrounds = {
+  GroundOption.paperWhite: GroundSpec('White', Color(0xFFFFFFFF),
+      Color(0xFFF4F2F6), Color(0x1F000000), Color(0xFFEAE7EE)),
+  GroundOption.softWhite: GroundSpec('Soft', Color(0xFFFCFCFD),
+      Color(0xFFF2F0F4), Color(0x1A000000), Color(0xFFE8E5EC)),
+  GroundOption.warmGrey: GroundSpec('Near', Color(0xFFFAFAFB),
+      Color(0xFFEFEDF2), Color(0x17000000), Color(0xFFE6E3EA)),
+  GroundOption.current: GroundSpec('Current', Color(0xFFF5F3F6),
+      Color(0xFFEDEAF0), Color(0x14000000), Color(0xFFE6DEED)),
+};
+
+// -----------------------------------------------------------------------------
 //  The switch
 // -----------------------------------------------------------------------------
 
@@ -216,11 +338,45 @@ class V2PaletteStore extends ChangeNotifier {
   static final V2PaletteStore instance = V2PaletteStore._();
 
   V2Palette _current = _baseline;
-  V2Palette get current => _current;
+
+  /// Which ground is on screen. Defaults to what ships.
+  GroundOption _ground = GroundOption.current;
+  GroundOption get ground => _ground;
+
+  /// ⚠️ EVERY SCREEN READS THIS, so switching the ground repaints the whole app
+  /// without a single per-screen edit. That is the only way a comparison like
+  /// this is worth running: if it only changed one screen, it would be
+  /// comparing a screen rather than a product.
+  V2Palette get current {
+    final g = kGrounds[_ground]!;
+    return V2Palette(
+      id: _current.id,
+      name: _current.name,
+      blurb: _current.blurb,
+      ground: g.ground,
+      surface: _current.surface,
+      surfaceAlt: g.surfaceAlt,
+      line: g.line,
+      ink1: _current.ink1,
+      ink2: _current.ink2,
+      ink3: _current.ink3,
+      action: _current.action,
+    );
+  }
 
   void set(V2Palette p) {
     if (identical(p, _current)) return;
     _current = p;
+    notifyListeners();
+  }
+
+  /// The spec behind whatever ground is on screen. `AppTheme` reads this so
+  /// Classic and every other AppTheme screen answer to the same switch.
+  GroundSpec get groundSpec => kGrounds[_ground]!;
+
+  void setGround(GroundOption g) {
+    if (g == _ground) return;
+    _ground = g;
     notifyListeners();
   }
 }

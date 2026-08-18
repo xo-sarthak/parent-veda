@@ -32,10 +32,62 @@ void _openArticle(BuildContext context, ReportFinding f, PregnancyController c) 
 //  Home
 // ===========================================================================
 
-class ReportScreen extends StatelessWidget {
+/// ⚠️ THE FILTERABLE REPORTS, AND WHY THIS LIST IS SHORT.
+///
+/// Nine reports, not nineteen. `tests_scans_reports_data.dart` holds both the
+/// tests a mother HAS (dating scan, NT, NIPT, anomaly, OGTT, growth, Doppler,
+/// GBS, bloods) and the conditions those tests FIND (`low_lying_placenta`,
+/// `gdm`, `iugr`…). Only the first group belongs here: the filter answers "which
+/// report am I holding", and a condition is not a report. Offering `gdm` as a
+/// filter alongside `ogtt` would ask her to filter by the answer in order to
+/// find the answer.
+const List<(String, String, String)> _kReportFilters = [
+  ('anomaly_scan', 'Anomaly scan', 'Anomaly scan'),
+  ('growth_scan', 'Growth scan', 'Growth scan'),
+  ('dating_scan', 'Dating scan', 'Dating scan'),
+  ('nt_scan', 'NT scan', 'NT scan'),
+  ('nipt', 'NIPT', 'NIPT'),
+  ('ogtt', 'Sugar test (OGTT)', 'शुगर टेस्ट (OGTT)'),
+  ('blood_tests', 'Blood tests', 'Blood tests'),
+  ('doppler', 'Doppler', 'Doppler'),
+  ('gbs', 'GBS swab', 'GBS swab'),
+];
+
+class ReportScreen extends StatefulWidget {
   const ReportScreen({super.key, required this.controller});
 
   final PregnancyController controller;
+
+  @override
+  State<ReportScreen> createState() => _ReportScreenState();
+}
+
+class _ReportScreenState extends State<ReportScreen> {
+  PregnancyController get controller => widget.controller;
+
+  /// ⚠️ A SET, BECAUSE THE REQUIREMENT SAYS "MULTIPLE FILTERS".
+  ///
+  /// Selected reports, and empty means everything — not "nothing". That default
+  /// is the whole reason this can be additive rather than a mandatory first
+  /// choice: a mother who has not been asked anything sees the full library, so
+  /// the filter helps whoever wants it and blocks nobody. The repo rule it
+  /// follows is `a feature is never hidden` — filtering narrows what is shown,
+  /// it never gates the screen behind a selection.
+  final Set<String> _picked = {};
+
+  /// ⚠️ INTERSECTION, NOT EQUALITY — and OR across the picked reports.
+  ///
+  /// A topic shows if it is tagged to ANY selected report. Two readings were
+  /// possible and the other one is wrong: AND (topics tagged to *all* selected
+  /// reports) would mean picking two reports shows fewer topics than picking
+  /// either alone, and usually zero — so the second tap would look broken. She
+  /// is asking "what can appear on any of these", not "what appears on all".
+  List<ReportFinding> _apply(List<ReportFinding> src) {
+    if (_picked.isEmpty) return src;
+    return src
+        .where((f) => f.tests.any(_picked.contains))
+        .toList(growable: false);
+  }
 
   Future<void> _search(BuildContext context, AppLanguage lang) async {
     final picked = await showSearch<ReportFinding?>(
@@ -50,9 +102,10 @@ class ReportScreen extends StatelessWidget {
     final lang = controller.language;
     final s = S(lang);
     final text = Theme.of(context).textTheme;
-    final popular = kReportPopular.map(reportById).whereType<ReportFinding>().toList();
-    final all = [...kReportFindings]
-      ..sort((a, b) => a.name.of(lang).compareTo(b.name.of(lang)));
+    final popular = _apply(
+        kReportPopular.map(reportById).whereType<ReportFinding>().toList());
+    final all = _apply([...kReportFindings]
+      ..sort((a, b) => a.name.of(lang).compareTo(b.name.of(lang))));
     return Scaffold(
       backgroundColor: AppTheme.scaffoldBackground,
       appBar: AppBar(title: Text(s.rTitle)),
@@ -63,10 +116,82 @@ class ReportScreen extends StatelessWidget {
               style: text.bodyLarge?.copyWith(color: AppTheme.neutral600, height: 1.4)),
           const SizedBox(height: 18),
           _SearchBar(hint: s.rSearchHint, onTap: () => _search(context, lang)),
-          const SizedBox(height: 26),
-          Text(s.rPopularTitle,
-              style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
-          const SizedBox(height: 12),
+
+          // ---- THE REPORT FILTER --------------------------------------------
+          const SizedBox(height: 18),
+          Text(
+              lang.isEnglish
+                  ? 'Which report are you holding?'
+                  : 'आपके हाथ में कौन सी रिपोर्ट है?',
+              style: text.labelLarge
+                  ?.copyWith(color: AppTheme.neutral600, height: 1.4)),
+          const SizedBox(height: 10),
+          // Horizontally scrolling chips rather than a wrapped block: nine of
+          // them wrap to three rows on a 360dp phone, which pushes the actual
+          // topics below the fold on the screen whose job is to show topics.
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 2),
+            child: Row(children: [
+              // "All" is a chip, not the absence of chips. Deselecting the last
+              // filter is otherwise an action with no affordance — she can get
+              // into a filtered state and has to guess her way out.
+              _FilterChip(
+                label: lang.isEnglish ? 'All' : 'सभी',
+                selected: _picked.isEmpty,
+                onTap: () => setState(_picked.clear),
+              ),
+              for (final (id, en, hi) in _kReportFilters) ...[
+                const SizedBox(width: 8),
+                _FilterChip(
+                  label: lang.isEnglish ? en : hi,
+                  selected: _picked.contains(id),
+                  onTap: () => setState(() {
+                    if (!_picked.remove(id)) _picked.add(id);
+                  }),
+                ),
+              ],
+            ]),
+          ),
+
+          // ⚠️ AN EMPTY RESULT EXPLAINS ITSELF AND OFFERS THE WAY OUT.
+          //
+          // Two filters can legitimately intersect to nothing — GBS swab plus
+          // Dating scan share no topic — and a blank screen there reads as a
+          // broken app rather than as an answer. The repo's own rule: an empty
+          // section renders an invitation, and only the copy changes.
+          if (_picked.isNotEmpty && popular.isEmpty && all.isEmpty) ...[
+            const SizedBox(height: 26),
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
+              decoration: BoxDecoration(
+                color: AppTheme.surfaceContainer,
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(
+                    lang.isEnglish
+                        ? 'Nothing in the library is read off those reports together.'
+                        : 'इन रिपोर्टों में साथ में पढ़ा जाने वाला कोई विषय नहीं है।',
+                    style: text.bodyMedium?.copyWith(height: 1.5)),
+                const SizedBox(height: 12),
+                GestureDetector(
+                  onTap: () => setState(_picked.clear),
+                  child: Text(
+                      lang.isEnglish ? 'Show everything' : 'सब कुछ दिखाएँ',
+                      style: text.labelLarge?.copyWith(
+                          color: AppTheme.primary600,
+                          fontWeight: FontWeight.w800)),
+                ),
+              ]),
+            ),
+          ],
+
+          if (popular.isNotEmpty) const SizedBox(height: 26),
+          if (popular.isNotEmpty)
+            Text(s.rPopularTitle,
+                style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+          if (popular.isNotEmpty) const SizedBox(height: 12),
           for (final f in popular) ...[
             _TopicRow(
               finding: f,
@@ -75,10 +200,18 @@ class ReportScreen extends StatelessWidget {
             ),
             const SizedBox(height: 10),
           ],
-          const SizedBox(height: 18),
-          Text(s.rAllTopics,
-              style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
-          const SizedBox(height: 12),
+          if (all.isNotEmpty) const SizedBox(height: 18),
+          if (all.isNotEmpty)
+            Text(
+                // The heading has to stop saying "All topics" once a filter is
+                // on, or the screen contradicts itself in its own heading.
+                _picked.isEmpty
+                    ? s.rAllTopics
+                    : (lang.isEnglish
+                        ? 'Topics on these reports'
+                        : 'इन रिपोर्टों के विषय'),
+                style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+          if (all.isNotEmpty) const SizedBox(height: 12),
           for (final f in all) ...[
             _TopicRow(
               finding: f,
@@ -88,6 +221,45 @@ class ReportScreen extends StatelessWidget {
             const SizedBox(height: 10),
           ],
         ],
+      ),
+    );
+  }
+}
+
+/// One report filter. Selected state is colour + weight, matching `PvNavBar`'s
+/// rule — the chip never changes size, so the row does not re-flow under her
+/// finger as she taps along it.
+class _FilterChip extends StatelessWidget {
+  const _FilterChip(
+      {required this.label, required this.selected, required this.onTap});
+
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final text = Theme.of(context).textTheme;
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+        decoration: BoxDecoration(
+          color: selected ? AppTheme.primary600 : AppTheme.surface,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(
+              color: selected ? AppTheme.primary600 : AppTheme.outlineVariant,
+              width: 1.2),
+        ),
+        child: Text(label,
+            style: text.labelLarge?.copyWith(
+              // ⚠️ NOT `neutral400` HERE. Unselected chip text is real text and
+              // has to clear AA; `neutral400` is 2.73:1 and is documented in
+              // `app_theme.dart` as never carrying text.
+              color: selected ? Colors.white : AppTheme.neutral600,
+              fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
+            )),
       ),
     );
   }

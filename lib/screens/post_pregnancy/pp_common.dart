@@ -10,6 +10,7 @@
 
 
 import 'package:flutter/material.dart';
+import '../../widgets/pv_nav_bar.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../theme/app_theme.dart';
@@ -30,12 +31,33 @@ import 'products_discovery_screen.dart';
 import 'tools_hub_screen.dart';
 
 // ---- palette ----------------------------------------------------------------
-const Color ppBg = Color(0xFFFBF9FE);
+// ⚠️ UNIFIED WITH THE PREGNANCY GROUND, 2026-08-17.
+//
+// This was #FBF9FE while V3 ran #F5F3F6 and 31 other files hardcoded #F3EEF7 —
+// four token systems, three different page grounds, and an app that was visibly
+// two-toned mid-scroll. `test/pp_ui_harmony_test.dart` asserts
+// `ppBg == AppTheme.scaffoldBackground` and it CAUGHT this: the moment
+// AppTheme's ground became dynamic, the two diverged and the test failed. That
+// test earned its place.
+//
+// ⚠️ STATIC, NOT A GETTER, AND THAT IS DELIBERATE. AppTheme's four ground
+// tokens became getters so a candidate white could be compared on a real phone.
+// That comparison is finished — #F5F3F6 won on measurement, being the only
+// option leaving a white card a usable edge (+4.9 L against +0.8 at pure
+// white). With the decision made, 752 usage sites across these two stages do
+// not need to be switchable; they need to agree. A getter here would also have
+// meant editing 66 `const` call sites for no remaining benefit.
+//
+// The consequence, stated so it is not a surprise: the ground picker drives V3
+// and the AppTheme surfaces, not these two. When the picker is deleted, every
+// ground in the app is one const value again.
+const Color ppBg = Color(0xFFF5F3F6); // was 0xFFFBF9FE
 const Color ppInk = Color(0xFF2F2C30);
 const Color ppSoft = Color(0xFF69636C);
 const Color ppPurple = Color(0xFF6A30B6);
 const Color ppCoral = Color(0xFFFF5A79);
-const Color ppPanel = Color(0xFFF3EEF7);
+// Matched to `surfaceAlt`. Was the old lilac #F3EEF7.
+const Color ppPanel = Color(0xFFEDEAF0);
 const Color ppMuted = Color(0xFFA99CBB);
 const Color ppBorder = Color(0xFFE7DFEE);
 const Color ppHair = Color(0xFFEFEAF2);
@@ -156,6 +178,191 @@ class PpStriped extends StatelessWidget {
   }
 }
 
+// ============================================================================
+//  PpProductImage - a product shot, or an honest cover block where one will go
+// ----------------------------------------------------------------------------
+//  ⚠️ THIS REPLACES THE BARE PpStriped ON EVERY COMMERCE SURFACE, and it exists
+//  because of one sentence in the shop review: "the empty diagonal-hatch tiles
+//  everywhere". They were not a styling choice. `PpProduct` had no image field
+//  at all, so there was nothing a card could have drawn.
+//
+//  Now there is a field, and this widget is the single place that decides what
+//  a product looks like when the field is filled, empty, still loading, or
+//  broken. Four states, one answer, so no card can disagree with another.
+//
+//  THE RULE IT FOLLOWS is the one lib/widgets/pv_placeholders.dart sets out for
+//  videos and articles: **a placeholder occupies the real geometry.** Same box,
+//  same corner radius, same border as a real photo, so a page can be judged
+//  before the photography arrives. What is missing is the FILE, and only the
+//  file.
+//
+//  ⚠️ AND IT NEVER SUBSTITUTES A DIFFERENT PRODUCT'S PICTURE. The pregnancy side
+//  falls back to a keyword-matched stock photo, and its own header calls that
+//  out as a liability to be removed before anyone can buy. On a page with a
+//  price and a Buy button, a stock photo of a similar object is a claim about
+//  what arrives in the box. So the fallback here is unmistakably a placeholder:
+//  the shelf's tint, a category line icon, and on anything large enough to read
+//  it, a quiet PHOTO SOON mark.
+//
+//  ⚠️ NOT TAPPABLE ON ITS OWN. Callers wrap it in whatever gesture the card
+//  already has; it adds none, so a placeholder never becomes a dead tap target.
+class PpProductImage extends StatelessWidget {
+  const PpProductImage({
+    super.key,
+    required this.url,
+    required this.height,
+    this.width,
+    this.radius = 14,
+    this.border = true,
+    this.icon = Icons.shopping_bag_outlined,
+    this.showSoonMark = true,
+  });
+
+  /// The product's `imageUrl`. Empty, and we draw the cover block.
+  ///
+  /// An `http`/`https` value loads over the network; anything else is treated as
+  /// a bundled asset path, so real photography can ship either way without the
+  /// call sites changing.
+  final String? url;
+
+  final double height;
+  final double? width;
+  final double radius;
+  final bool border;
+
+  /// The line icon for the placeholder. Pass the category's own icon where the
+  /// caller knows it (a bottle on Feeding, a cot on Sleep) - a page of six
+  /// identical bags is the grey-box problem again in a different colour.
+  final IconData icon;
+
+  /// The PHOTO SOON mark. Suppressed automatically on thumbnails, where there is
+  /// no room for it and the icon alone already reads as "no picture yet".
+  final bool showSoonMark;
+
+  bool get _hasUrl => (url ?? '').trim().isNotEmpty;
+  bool get _isNetwork => (url ?? '').startsWith('http');
+
+  @override
+  Widget build(BuildContext context) {
+    final w = width ?? double.infinity;
+    if (!_hasUrl) return _placeholder();
+
+    final img = _isNetwork
+        ? Image.network(
+            url!.trim(),
+            height: height,
+            width: w,
+            fit: BoxFit.cover,
+            // A slow connection shows the same block the empty state shows,
+            // rather than a flash of white that resizes when the bytes land.
+            loadingBuilder: (_, child, progress) => progress == null ? child : _placeholder(),
+            // ⚠️ A DEAD URL MUST NOT DRAW A BROKEN-IMAGE GLYPH. A grey icon with
+            // a torn corner is the one outcome the review named; it reads as a
+            // bug in the app rather than a gap in the catalogue.
+            errorBuilder: (_, _, _) => _placeholder(),
+          )
+        : Image.asset(
+            url!.trim(),
+            height: height,
+            width: w,
+            fit: BoxFit.cover,
+            errorBuilder: (_, _, _) => _placeholder(),
+          );
+
+    return Container(
+      height: height,
+      width: w,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(radius),
+        border: border ? Border.all(color: ppHair) : null,
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: img,
+    );
+  }
+
+  Widget _placeholder() {
+    // Room for the mark is a geometry question, not a preference: a 48px
+    // thumbnail cannot hold 8pt letterspaced text legibly.
+    final roomForMark = showSoonMark && height >= 96 && (width ?? 400) >= 120;
+    return PpStriped(
+      height: height,
+      width: width,
+      radius: radius,
+      border: border,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Center(child: Icon(icon, size: height >= 140 ? 34 : (height >= 70 ? 22 : 16), color: ppMuted)),
+          if (roomForMark)
+            Positioned(
+              left: 10,
+              top: 10,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.88),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text('PHOTO SOON',
+                    style: ppBody(8.5, color: ppSoft, w: FontWeight.w800).copyWith(letterSpacing: 0.9)),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+// ============================================================================
+//  PpReviewOnlyNote - what stands where a Buy button is not allowed to
+// ----------------------------------------------------------------------------
+//  ⚠️ INDIA'S IMS ACT. See the `reviewOnly` doc comment in pp_products_data.dart
+//  for the rule. This is its visible half, and it is the reason the flag removes
+//  a control without leaving a hole: a missing Buy button with no explanation
+//  reads as a broken shop, and a parent who thinks the shop is broken does not
+//  read the review that is still there.
+//
+//  Deliberately NOT alarm-coloured. Nothing is wrong with the product; what is
+//  restricted is advertising it. A red warning would say the opposite.
+class PpReviewOnlyNote extends StatelessWidget {
+  const PpReviewOnlyNote({super.key, this.compact = false});
+
+  /// Cards use the compact form (label + one line); the detail and compare pages
+  /// carry the full sentence, because that is where a parent stops to read.
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(compact ? 12 : 15),
+        decoration: BoxDecoration(
+          color: ppPanel,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Padding(
+            padding: EdgeInsets.only(top: 1),
+            child: Icon(Icons.info_outline_rounded, size: 16, color: ppSoft),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(kPpReviewOnlyLabel, style: ppBody(12.5, color: ppInk, w: FontWeight.w700)),
+              const SizedBox(height: 3),
+              Text(
+                compact
+                    ? 'No buy link on formula, feeding bottles or infant foods. The review stays.'
+                    : kPpReviewOnlyWhy,
+                style: ppBody(compact ? 11.5 : 12.5, color: ppSoft, h: 1.5),
+              ),
+            ]),
+          ),
+        ]),
+      );
+}
+
 class _StripePainter extends CustomPainter {
   _StripePainter(this.a, this.b);
   final Color a;
@@ -219,15 +426,11 @@ class PpBottomNav extends StatelessWidget {
   /// 0 = My Child · 1 = Brain · 2 = Tools · 3 = Community · 4 = Products
   final int active;
 
-  // Mirrors the pregnancy app's PvTabBar: a floating white pill where the active
-  // tab expands into a purple icon+label pill and the rest are icon + tiny label,
-  // so the two apps' bottom navs read as the same component.
   // Tab 1 was AskVeda. Kept for revert:
   //   (Icons.auto_awesome_rounded, 'AskVeda'),
   //
-  // 'Brain' rather than 'Brain Development': the active tab expands into a
-  // horizontal pill with the label beside the icon, and a two-word label in a
-  // five-tab row wraps or truncates on a small phone. The screen it opens is
+  // 'Brain' rather than 'Brain Development': five tabs share the width evenly,
+  // and a two-word label truncates on a small phone. The screen it opens is
   // titled in full.
   static const List<(IconData, String)> _tabs = [
     (Icons.child_care_rounded, 'My Child'),
@@ -237,118 +440,24 @@ class PpBottomNav extends StatelessWidget {
     (Icons.shopping_bag_rounded, 'Products'),
   ];
 
-  void _tap(BuildContext context, int i) {
-    if (i == active) return;
-    openPpTab(context, i);
-  }
-
+  // ⚠️ NOW A THIN ADAPTER OVER `PvNavBar`.
+  //
+  // This bar had already worked out the important half — "every tab is the same
+  // shape, icon above label, always; nothing moves when you switch" — and said
+  // so in a comment that ended "PARENTING ONLY. The pregnancy bar is
+  // deliberately untouched." That sentence is why the app ended up with three
+  // divergent bars. The insight was right and was not carried across; now there
+  // is only one bar to carry it in.
+  //
+  // What it loses here is the filled purple disc behind the active icon, which
+  // was the one rule this bar still broke.
   @override
-  Widget build(BuildContext context) {
-    return Container(
-      // vertical 9 -> 10: the taller icon-over-label stack needs the room, and
-      // a cramped bar is the other half of "hard to read".
-      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: const [BoxShadow(color: Color(0x292D144C), blurRadius: 28, offset: Offset(0, 8))],
-      ),
-      child: Row(children: [for (int i = 0; i < _tabs.length; i++) _item(context, i)]),
-    );
-  }
-
-  // RESTYLED for readability, from the reference screens.
-  //
-  // The old bar (kept below, commented) made the ACTIVE tab a horizontal purple
-  // pill and left the other four as an icon over an 8.5pt label. Two things
-  // came out of that:
-  //
-  //   * 8.5pt is below what is comfortably readable on a phone held one-handed
-  //     while holding a baby. The label was there to be seen, not read.
-  //   * the active tab changed SHAPE, so the whole row re-flowed on every tap -
-  //     four labels sliding sideways as the pill grew and shrank. The bar never
-  //     sat still.
-  //
-  // Now every tab is the same shape - icon above label, always - and the active
-  // one is marked by COLOUR alone: a filled purple disc behind the icon, purple
-  // label under it. Nothing moves when you switch, and every label reads at
-  // 11pt.
-  //
-  // Every tab is Expanded, so the five share the width evenly and the row
-  // cannot overflow whatever the text scale.
-  //
-  // PARENTING ONLY. The pregnancy bar (PvTabBar) is deliberately untouched.
-  Widget _item(BuildContext context, int i) {
-    final on = i == active;
-    final (icon, label) = _tabs[i];
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => _tap(context, i),
-        behavior: HitTestBehavior.opaque,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2),
-          child: Column(mainAxisSize: MainAxisSize.min, children: [
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
-              curve: Curves.easeOut,
-              width: 40,
-              height: 30,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: on ? ppPurple : Colors.transparent,
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: Icon(icon, size: 19, color: on ? Colors.white : ppMuted),
-            ),
-            const SizedBox(height: 4),
-            Text(label,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: ppBody(11,
-                    color: on ? ppPurple : ppSoft,
-                    w: on ? FontWeight.w800 : FontWeight.w600)),
-          ]),
-        ),
-      ),
-    );
-  }
-
-  // THE OLD BAR. Kept for revert:
-  //
-  // Widget _item(BuildContext context, int i) {
-  //   final on = i == active;
-  //   final (icon, label) = _tabs[i];
-  //   final child = GestureDetector(
-  //     onTap: () => _tap(context, i),
-  //     behavior: HitTestBehavior.opaque,
-  //     child: AnimatedContainer(
-  //       duration: const Duration(milliseconds: 200),
-  //       curve: Curves.easeOut,
-  //       padding: EdgeInsets.symmetric(horizontal: on ? 12 : 4, vertical: on ? 9 : 6),
-  //       decoration: BoxDecoration(
-  //         color: on ? ppPurple : Colors.transparent,
-  //         borderRadius: BorderRadius.circular(20),
-  //       ),
-  //       child: on
-  //           ? Row(mainAxisSize: MainAxisSize.min, children: [
-  //               Icon(icon, size: 21, color: Colors.white),
-  //               const SizedBox(width: 6),
-  //               Text(label, style: ppBody(12.5, color: Colors.white, w: FontWeight.w700)),
-  //             ])
-  //           : Column(mainAxisSize: MainAxisSize.min, children: [
-  //               Icon(icon, size: 20, color: ppMuted),
-  //               const SizedBox(height: 3),
-  //               Text(label,
-  //                   maxLines: 1,
-  //                   overflow: TextOverflow.ellipsis,
-  //                   textAlign: TextAlign.center,
-  //                   style: ppBody(8.5, color: ppMuted, w: FontWeight.w600)),
-  //             ]),
-  //     ),
-  //   );
-  //   return on ? child : Expanded(child: child);
-  // }
+  Widget build(BuildContext context) => PvNavBar(
+        items: [for (final (i, l) in _tabs) PvNavItem(i, l)],
+        activeIndex: active,
+        onTap: (i) => openPpTab(context, i),
+        accent: ppPurple,
+      );
 }
 
 // ---- shared deep-dive pieces (back bar, section divider, rows) --------------
@@ -432,7 +541,17 @@ Widget ppProductRow(BuildContext context, String title, String desc, String pric
         bottom: bottom ? const BorderSide(color: ppHair) : BorderSide.none,
       )),
       child: Row(children: [
-        const PpStriped(height: 48, width: 48, radius: 14, border: true),
+        // The same product shot the shop shows. A contextual row inside Health or
+        // Sleep is the same product system (the spec is explicit that these need
+        // no separate build), so it must not be the one surface still drawing a
+        // bare hatch tile. Kept for revert:
+        // const PpStriped(height: 48, width: 48, radius: 14, border: true),
+        PpProductImage(
+          url: product?.imageUrl,
+          height: 48,
+          width: 48,
+          icon: product == null ? Icons.shopping_bag_outlined : categoryByName(product.category).icon,
+        ),
         const SizedBox(width: 14),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

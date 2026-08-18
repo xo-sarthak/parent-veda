@@ -302,9 +302,22 @@ class _Badge extends StatelessWidget {
 
 class TestScanDetailScreen extends StatelessWidget {
   const TestScanDetailScreen(
-      {super.key, required this.info, required this.controller});
+      {super.key,
+      required this.info,
+      required this.controller,
+      this.openParameters = false});
   final TestScanInfo info;
   final PregnancyController controller;
+
+  /// ⚠️ WHICH ARRIVAL THIS IS.
+  ///
+  /// False (the default, from the Tools tab, before a scan): the five
+  /// preparation sections are what she wants, so "What is it" is open.
+  /// True (from "Every reading on the report, explained", after a scan): the
+  /// parameter table is open and the rest are collapsed.
+  ///
+  /// One screen, two arrivals, and the arrival decides what is already open.
+  final bool openParameters;
 
   @override
   Widget build(BuildContext context) {
@@ -325,8 +338,22 @@ class TestScanDetailScreen extends StatelessWidget {
               subtitle: info.altName?.now,
               badge: info.tag.badge.now),
           const SizedBox(height: 16),
+          // ⚠️ WHEN SHE ARRIVES HERE TO READ A REPORT, THE REPORT SECTION IS
+          // THE ONE THAT IS OPEN.
+          //
+          // Review: "remove all sections from it apart from Understanding your
+          // report parameters, and by default show it opened."
+          //
+          // Taken as: when this screen is reached from the "Every reading on the
+          // report, explained" card, the parameter table is open and the other
+          // five sections are collapsed. They are not deleted, because someone
+          // arriving from the Tools tab BEFORE a scan wants exactly those five —
+          // what it is, why, when, how to prepare, what happens. Same screen,
+          // two arrivals, and the arrival decides what is already open.
           _ExpandableSection(
-              title: S.now.uiWhat, body: info.whatItIs.now, initiallyOpen: true),
+              title: S.now.uiWhat,
+              body: info.whatItIs.now,
+              initiallyOpen: !openParameters),
           _ExpandableSection(title: S.now.uiWhySDone, body: info.why.now),
           _ExpandableSection(title: S.now.uiWhen, body: info.when.now),
           _ExpandableSection(title: S.now.uiPreparation, body: info.preparation.now),
@@ -339,6 +366,7 @@ class TestScanDetailScreen extends StatelessWidget {
           _ExpandableSection(
             title: S.now.uiUnderstandingReportParameters,
             body: info.understandingReport.now,
+            initiallyOpen: openParameters,
             children: [
               for (final param in info.parameters) _ParameterCard(param),
             ],

@@ -170,9 +170,12 @@ class PrepareHubScreen extends StatelessWidget {
                 Expanded(
                   child: Text.rich(
                     TextSpan(children: [
-                      pvText(s.uiMostFree),
-                      pvPurple('ParentVeda+'),
-                      pvText('.'),
+                      // Kept for revert — "Most are free, or included with
+                      // ParentVeda+":
+                      //   pvText(s.uiMostFree),
+                      //   pvPurple('ParentVeda+'),
+                      //   pvText('.'),
+                      pvText(s.uiMostFreeRest),
                     ]),
                     style: pvBody(kInk, 13),
                   ),
