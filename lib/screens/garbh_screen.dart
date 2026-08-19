@@ -29,6 +29,8 @@ import '../widgets/cards/raga_player.dart';
 import 'tools/ask_veda_screen.dart';
 import 'tools/garbh_games.dart';
 import '../theme/pv_fonts.dart';
+import '../data/garbh_rebuild_data.dart';
+import 'garbh_buddhi_screen.dart';
 
 // --- warm palette ---
 const _cream = Color(0xFFFBF6EE);
@@ -42,11 +44,21 @@ const _accSamvad = Color(0xFFB98A7E); // warm rose
 const _accKriya = Color(0xFF5E8B7E); // teal-green
 const _accAhara = Color(0xFFC97B4A); // terracotta
 const _green = Color(0xFF3FA56A);
+/// Buddhi's own place on the wheel - see garbh_buddhi_screen.dart.
+const _accBuddhiPillar = Color(0xFF7A6E9B);
 
 void _push(BuildContext c, Widget w) =>
     Navigator.of(c).push(MaterialPageRoute(builder: (_) => w));
 
 // Route a Vichara brain-fitness puzzle card to its real game.
+/// ⚠️ PUBLIC ALIAS, so the daily card can launch a Buddhi puzzle without
+/// importing 2,000 lines of pillar screens' internals. One factory, two
+/// callers, no second copy of the puzzle-to-widget mapping - which is exactly
+/// the drift a second copy would cause the first time a game is renamed.
+Widget gameForPuzzle(GarbhPuzzle p, PregnancyController c,
+        {bool markComplete = true}) =>
+    _gameFor(p, c, markComplete: markComplete);
+
 Widget _gameFor(GarbhPuzzle p, PregnancyController c,
     {bool markComplete = true}) {
   // .en: this switch DISPATCHES to a game widget, so it must match the
@@ -75,6 +87,8 @@ Widget _gameFor(GarbhPuzzle p, PregnancyController c,
       return (emoji: '🎙️', accent: _accSamvad);
     case 'kriya':
       return (emoji: '🌿', accent: _accKriya);
+    case 'buddhi':
+      return (emoji: '🧠', accent: _accBuddhiPillar);
     default:
       return (emoji: '🍲', accent: _accAhara);
   }
@@ -99,19 +113,31 @@ class GarbhScreen extends StatelessWidget {
     // the FULL repository of that pillar (daily == false).
     final pillars = <({String id, String name, String desc})>[
       (id: 'shravan', name: s.gsShravan, desc: s.gsShravanDesc),
-      // Vichara pillar removed from the hub - its brain-fitness games now live
-      // inside Kriya (Brain Fitness) and its reflective reads move under Samvad.
-      // The daily Home Garbh section still uses VicharaScreen(daily:true), so the
-      // class + data stay. (Kept commented for revert.)
-      // (id: 'vichara', name: s.gsVichara, desc: s.gsVicharaDesc),
-      // Samvad renamed to "Samvad & Vichara" at the call site (inline, per the
-      // no-edit-app_language rule). Content inside SamvadScreen is unchanged.
+      // ⚠️ VICHARA IS GONE FOR GOOD NOW, NOT JUST OFF THE HUB.
+      //
+      // The old note here said its games had moved into Kriya and its reads
+      // into Samvad, and left the screen alive for the daily section. The
+      // rebuild finishes that job: Vichara's Sacred Insights duplicated the
+      // Spiritual Reading shelf in Samvad and its Uplifting Vibrations
+      // duplicated Shravan, so the screen was two copies wearing a third
+      // name. What was genuinely unique - the brain fitness content - is now
+      // its own pillar.
       (
         id: 'samvad',
         name: lang.isHinglish ? 'संवाद और विचार' : 'Samvad & Vichara',
         desc: s.gsSamvadDesc
       ),
       (id: 'kriya', name: s.gsKriya, desc: s.gsKriyaDesc),
+      // ⚠️ BUDDHI, THE FOURTH PILLAR, AND THE ONLY ONE THAT IS NOT FOR THE
+      // BABY. Shravan is what she hears, Samvad is what she says, Kriya is
+      // what her body does, Buddhi is what her own mind does. It was already
+      // in the app as "Brain Fitness" buried inside another pillar, which is
+      // why nobody found it.
+      (
+        id: 'buddhi',
+        name: lang.isHinglish ? 'बुद्धि' : 'Buddhi',
+        desc: 'A few quiet minutes that are yours.'
+      ),
     ];
 
     return Scaffold(
@@ -168,6 +194,17 @@ class GarbhScreen extends StatelessWidget {
         break;
       case 'kriya':
         _push(context, KriyaScreen(controller: controller));
+        break;
+      case 'buddhi':
+        _push(
+            context,
+            GarbhBuddhiScreen(
+              controller: controller,
+              // The library arrival: no "today" framing, and games open with
+              // markComplete:false because browsing is not a daily ritual.
+              onOpenPuzzle: (ctx, puzzle) => _push(
+                  ctx, _gameFor(puzzle, controller, markComplete: false)),
+            ));
         break;
       default:
         _push(context, AharaScreen(controller: controller));
@@ -490,39 +527,67 @@ class _WhyCard extends StatelessWidget {
   }
 }
 
-class _MarkComplete extends StatelessWidget {
-  const _MarkComplete({required this.pillarId, required this.accent, this.lang});
+/// ⚠️ THIS IS NO LONGER A BUTTON. IT IS A STATUS LINE AND A SKIP LINK.
+///
+/// The rebuild spec's first non-negotiable: **completion is earned by doing,
+/// never claimed.** Every "Mark complete" in this section is deleted. A
+/// practice completes when the audio finishes, the timer ends, or a recording
+/// is saved.
+///
+/// ⚠️ WHY THE OLD BUTTON WAS WORSE THAN MERELY REDUNDANT. On Kriya it sat
+/// directly beside "Start", identically weighted, so the honest path and the
+/// skip path looked the same and cost the same. Whichever one she pressed, the
+/// app recorded the same thing and told her the same thing. That is not a
+/// habit tracker being lenient; it is a section whose entire premise is
+/// "you are making something for your child" issuing receipts for nothing.
+///
+/// ⚠️ SKIP SURVIVES, DELIBERATELY, AND LOOKS NOTHING LIKE THE REAL ACTION. A
+/// woman who is vomiting at week 8 needs a way to not have today count against
+/// her, and taking it away would make the streak a punishment. So it is a
+/// small quiet text link, never a filled button - the spec is explicit that
+/// the two must not be confusable, which is exactly what went wrong before.
+class _PracticeFoot extends StatelessWidget {
+  const _PracticeFoot({required this.pillarId, required this.accent, this.lang});
   final String pillarId;
   final Color accent;
   final AppLanguage? lang;
+
   @override
   Widget build(BuildContext context) {
     final s = S(lang ?? AppLanguage.english);
-    final text = Theme.of(context).textTheme;
     return AnimatedBuilder(
       animation: GarbhStore.instance,
       builder: (context, _) {
         final done = GarbhStore.instance.isDone(pillarId);
-        return SizedBox(
-          width: double.infinity,
-          child: done
-              ? OutlinedButton.icon(
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: _green,
-                    side: const BorderSide(color: _green, width: 1.4),
-                    padding: const EdgeInsets.symmetric(vertical: 13),
-                  ),
-                  onPressed: () {},
-                  icon: const Icon(Icons.check_circle_rounded, size: 18),
-                  label: Text(s.gsCompletedToday),
-                )
-              : FilledButton(
-                  style: FilledButton.styleFrom(
-                      backgroundColor: accent, padding: const EdgeInsets.symmetric(vertical: 13)),
-                  onPressed: () => GarbhStore.instance.markDone(pillarId),
-                  child: Text(s.gsMarkDone,
-                      style: text.labelLarge?.copyWith(color: Colors.white)),
-                ),
+        if (done) {
+          // Earned. Stated, not offered - there is nothing left to press.
+          return Row(children: [
+            const Icon(Icons.check_circle_rounded, size: 18, color: _green),
+            const SizedBox(width: 8),
+            Text(s.gsCompletedToday,
+                style: pvJakarta(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w700,
+                    color: _green)),
+          ]);
+        }
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Flexible(
+              child: Text(
+                  'This finishes on its own when you are done.',
+                  style: pvJakarta(fontSize: 12, color: _muted)),
+            ),
+            TextButton(
+              onPressed: () => GarbhStore.instance.markDone(pillarId),
+              style: TextButton.styleFrom(
+                  foregroundColor: _muted,
+                  padding: const EdgeInsets.symmetric(horizontal: 8)),
+              child: Text('Skip today',
+                  style: pvJakarta(fontSize: 12, fontWeight: FontWeight.w600)),
+            ),
+          ],
         );
       },
     );
@@ -633,13 +698,37 @@ class ShravanScreen extends StatelessWidget {
           const SizedBox(height: 16),
           _WhyCard(label: s.gsWhyToday, text: shravanWhy(t).now, accent: _accShravan),
           const SizedBox(height: 16),
-          RagaPlayer(title: audio.title.now, subtitle: '${audio.minutes} min'),
+          // ⚠️ COMPLETION FIRES HERE, AT THE END OF THE TRACK, AND IT WRITES
+          // TO MY JOURNAL AT THE SAME MOMENT. Both halves of the rebuild's
+          // principle in one callback: the practice completes because it was
+          // done, and it leaves something behind rather than being consumed.
+          //
+          // The journal entry is "what your baby heard in week N", which is
+          // the honest description - she did not make the raga, so it is
+          // filed as listening rather than counted as her voice. See
+          // GarbhJournalStore.myVoiceSeconds for why that distinction is
+          // load-bearing on the album header.
+          RagaPlayer(
+            title: audio.title.now,
+            subtitle: '${audio.minutes} min',
+            onFinished: () {
+              GarbhStore.instance.markDone('shravan');
+              GarbhJournalStore.instance.add(GarbhJournalEntry(
+                id: 'heard_${audio.id}_${DateTime.now().microsecondsSinceEpoch}',
+                kind: GarbhEntryKind.heard,
+                week: controller.currentWeek,
+                tsMs: DateTime.now().millisecondsSinceEpoch,
+                title: audio.title,
+                seconds: audio.minutes * 60,
+              ));
+            },
+          ),
           const SizedBox(height: 8),
           Text(s.gsSampleAudio,
               textAlign: TextAlign.center,
               style: text.labelSmall?.copyWith(color: _muted)),
           const SizedBox(height: 16),
-          _MarkComplete(pillarId: 'shravan', accent: _accShravan, lang: lang),
+          _PracticeFoot(pillarId: 'shravan', accent: _accShravan, lang: lang),
           _SeeAll(
               label: lang.isHindi ? 'सभी राग देखिए' : 'See all ragas',
               accent: _accShravan,
@@ -943,7 +1032,7 @@ class _SacredTab extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(18, 14, 18, 28),
       children: [
         _insightCard(context, s, ins),
-        _MarkComplete(pillarId: 'vichara', accent: _accVichara, lang: lang),
+        _PracticeFoot(pillarId: 'vichara', accent: _accVichara, lang: lang),
         _SeeAll(
             label: lang.isHindi ? 'सभी विचार देखिए' : 'See all reflections',
             accent: _accVichara,
@@ -1134,7 +1223,7 @@ class _VicharaReader extends StatelessWidget {
           const SizedBox(height: 18),
           // Mark-complete only in DAILY mode (Tools library = no "today's done").
           if (daily) ...[
-            _MarkComplete(pillarId: 'vichara', accent: _accVichara, lang: lang),
+            _PracticeFoot(pillarId: 'vichara', accent: _accVichara, lang: lang),
             _SeeAll(
                 label: lang.isHindi ? 'सभी विचार देखिए' : 'See all reflections',
                 accent: _accVichara,
@@ -1318,7 +1407,7 @@ class _SamvadScreenState extends State<SamvadScreen>
                 text: samvadThemeForTrimester(_trimester).now,
                 accent: _accSamvad),
             const SizedBox(height: 6),
-            _MarkComplete(
+            _PracticeFoot(
                 pillarId: 'samvad',
                 accent: _accSamvad,
                 lang: widget.controller.language),
@@ -1363,7 +1452,7 @@ class _SamvadScreenState extends State<SamvadScreen>
               text: samvadThemeForTrimester(_trimester).now,
               accent: _accSamvad));
           children.add(const SizedBox(height: 6));
-          children.add(_MarkComplete(
+          children.add(_PracticeFoot(
               pillarId: 'samvad',
               accent: _accSamvad,
               lang: widget.controller.language));
@@ -1773,7 +1862,7 @@ List<Widget> _kriyaPracticeBody(BuildContext context, S s, TextTheme text,
     ),
     if (daily) ...[
       const SizedBox(height: 12),
-      _MarkComplete(pillarId: 'kriya', accent: _accKriya, lang: lang),
+      _PracticeFoot(pillarId: 'kriya', accent: _accKriya, lang: lang),
       _SeeAll(
           label: lang.isHindi ? 'सभी अभ्यास देखिए' : 'See all practices',
           accent: _accKriya,
@@ -2118,7 +2207,7 @@ class AharaScreen extends StatelessWidget {
           _aharaRow(context, '🔄', s.gsFoodSwap, n.swap.now),
           _aharaRow(context, '🌙', s.gsLifestyleHabit, n.habit.now),
           const SizedBox(height: 14),
-          _MarkComplete(pillarId: 'ahara', accent: _accAhara, lang: lang),
+          _PracticeFoot(pillarId: 'ahara', accent: _accAhara, lang: lang),
           _LearnMore(controller: controller),
         ],
       ),

@@ -43,11 +43,23 @@ class RagaPlayer extends StatefulWidget {
     required this.title,
     required this.subtitle,
     this.asset = 'audio/raga_drone.wav',
+    this.onFinished,
   });
 
   final String title;
   final String subtitle;
   final String asset;
+
+  /// ⚠️ FIRES WHEN THE TRACK REACHES ITS END, NOT WHEN PLAY IS PRESSED.
+  ///
+  /// This is how Garbh Sanskar's completion rule is actually implemented for
+  /// Shravan: a practice completes because it was DONE, never because it was
+  /// claimed. Pressing play and immediately leaving must not count, or the
+  /// section is back to issuing receipts for nothing.
+  ///
+  /// Fired at most once per mount, so a woman who replays a track does not
+  /// write the same listen into her journal five times.
+  final VoidCallback? onFinished;
 
   @override
   State<RagaPlayer> createState() => _RagaPlayerState();
@@ -57,7 +69,26 @@ class _RagaPlayerState extends State<RagaPlayer>
     with SingleTickerProviderStateMixin {
   late final AnimationController _eq;
 
+  /// Once per mount. See `RagaPlayer.onFinished`.
+  bool _firedFinished = false;
+
   RagaAudioStore get _audio => RagaAudioStore.instance;
+
+  /// ⚠️ "NEAR THE END" RATHER THAN EXACTLY AT IT, and the tolerance is not
+  /// laziness. Position reporting on both platforms lands a little short of
+  /// the reported duration, so an equality check fires for some tracks and
+  /// never for others - which would make completion depend on which raga she
+  /// happened to pick.
+  void _checkFinished(Duration pos, Duration dur) {
+    if (_firedFinished || widget.onFinished == null) return;
+    if (dur.inMilliseconds <= 0) return;
+    if (pos.inMilliseconds < dur.inMilliseconds - 900) return;
+    _firedFinished = true;
+    // Off this frame: the callback writes to a store, and notifying listeners
+    // during a build is what turns a completion into a crash.
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => widget.onFinished?.call());
+  }
 
   @override
   void initState() {
@@ -113,6 +144,7 @@ class _RagaPlayerState extends State<RagaPlayer>
     final duration = _audio.durationFor(widget.asset);
     final totalSecs = duration.inMilliseconds / 1000.0;
     final posSecs = position.inMilliseconds / 1000.0;
+    _checkFinished(position, duration);
 
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 18, 18, 12),

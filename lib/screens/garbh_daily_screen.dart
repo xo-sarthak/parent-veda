@@ -38,8 +38,11 @@ import '../localization/app_language.dart';
 import '../services/garbh_store.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/pv_fonts.dart';
+import '../data/garbh_rebuild_data.dart';
+import 'garbh_buddhi_screen.dart';
+import 'garbh_journal_screen.dart';
 import 'garbh_screen.dart'
-    show ShravanScreen, SamvadScreen, VicharaScreen, KriyaScreen;
+    show ShravanScreen, SamvadScreen, KriyaScreen, gameForPuzzle;
 import 'v2/v2_palette.dart';
 
 LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
@@ -85,14 +88,31 @@ class GarbhDailyScreen extends StatelessWidget {
             accent: const Color(0xFF9C5F51),
             open: () => SamvadScreen(controller: pregnancy, daily: true),
           ),
+          // ⚠️ VICHARA IS REPLACED BY BUDDHI HERE, NOT RENAMED.
+          //
+          // Vichara served a reflective read; its Sacred Insights and
+          // Uplifting Vibrations shelves duplicated Samvad and Shravan, so as
+          // a pillar it was two copies wearing a third name. Buddhi is the
+          // one genuinely distinct thing that was inside it - the brain
+          // fitness games - promoted to stand on its own.
+          //
+          // ⚠️ AND IT IS THE ONE PILLAR THAT IS NOT FOR THE BABY, which is
+          // why its tag says so out loud. See garbh_buddhi_screen.dart.
           _Pillar(
-            id: 'vichara',
-            name: 'Vichara',
-            tag: 'Your own thoughts',
-            today: vicharaStoryForDay(cd).title.en,
-            icon: Icons.self_improvement_rounded,
-            accent: const Color(0xFF3F6E62),
-            open: () => VicharaScreen(controller: pregnancy, daily: true),
+            id: 'buddhi',
+            name: 'Buddhi',
+            tag: 'Just for you',
+            today: buddhiTodayLine(cd).en,
+            icon: Icons.psychology_alt_outlined,
+            accent: const Color(0xFF7A6E9B),
+            open: () => GarbhBuddhiScreen(
+              controller: pregnancy,
+              daily: true,
+              onOpenPuzzle: (ctx, puzzle) => Navigator.of(ctx).push(
+                  MaterialPageRoute<void>(
+                      builder: (_) => gameForPuzzle(puzzle, pregnancy,
+                          markComplete: true))),
+            ),
           ),
           _Pillar(
             id: 'kriya',
@@ -147,6 +167,23 @@ class GarbhDailyScreen extends StatelessWidget {
                       fontWeight: FontWeight.w800,
                       letterSpacing: 0.8,
                       color: p.action)),
+              const SizedBox(height: 20),
+
+              // ---- WHY TODAY, AND NOT ANY OTHER DAY --------------------
+              //
+              // ⚠️ THE SINGLE MOST IMPORTANT LINE ON THIS CARD, and the one
+              // the section was missing. Without it every day's practice is
+              // interchangeable with every other day's, so there is no reason
+              // to do it TODAY rather than at the weekend, and a daily
+              // practice with no reason to be daily is a to-do list.
+              //
+              // ⚠️ IT IS ABOUT THE BABY'S DEVELOPMENT, NEVER ABOUT HER
+              // EFFORT. "You are doing so well" is true in any week, which is
+              // exactly what makes it useless here. See garbh_rebuild_data
+              // for why these are banded rather than written per week, and
+              // for the rule that they say what is FORMING and never that a
+              // practice improves it.
+              _WhyToday(week: pregnancy.currentWeek, p: p, lang: lang),
               const SizedBox(height: 22),
 
               for (final x in pillars) ...[
@@ -163,6 +200,12 @@ class GarbhDailyScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
               ],
+
+              // ---- WHAT TODAY LEFT BEHIND -----------------------------
+              // Last on the card, because it is the consequence of
+              // everything above it rather than another thing to do.
+              const SizedBox(height: 14),
+              _JournalStrip(week: pregnancy.currentWeek, p: p),
             ],
           ),
         );
@@ -189,6 +232,98 @@ class _Pillar {
   final IconData icon;
   final Color accent;
   final Widget Function() open;
+}
+
+/// Why this week matters, said in one line.
+class _WhyToday extends StatelessWidget {
+  const _WhyToday(
+      {required this.week, required this.p, required this.lang});
+  final int week;
+  final V2Palette p;
+  final AppLanguage lang;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(15, 13, 15, 14),
+        decoration: BoxDecoration(
+          color: p.action.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('WHY WEEK $week MATTERS',
+              style: pvManrope(
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.2,
+                  color: p.action)),
+          const SizedBox(height: 7),
+          Text(garbhWeekReason(week).of(lang),
+              style: pvManrope(fontSize: 13.5, height: 1.6, color: p.ink1)),
+        ]),
+      );
+}
+
+/// What she added this week, and the way into the whole thing.
+///
+/// ⚠️ A STRIP, NOT A LIST, AND IT IS THE PAYOFF OF THE ENTIRE SECTION. Every
+/// practice above it writes here. Without this the daily card is a checklist
+/// that empties itself every night; with it, the card visibly leaves something
+/// behind, which is the difference between "completing a practice" and
+/// "making something for your child".
+class _JournalStrip extends StatelessWidget {
+  const _JournalStrip({required this.week, required this.p});
+  final int week;
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) {
+    final store = GarbhJournalStore.instance;
+    return AnimatedBuilder(
+      animation: store,
+      builder: (context, _) {
+        final mine = store.thisWeek(week);
+        return Material(
+          color: p.surfaceAlt,
+          borderRadius: BorderRadius.circular(18),
+          child: InkWell(
+            onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+              settings: const RouteSettings(name: 'garbh/journal'),
+              builder: (_) => const GarbhJournalScreen(),
+            )),
+            borderRadius: BorderRadius.circular(18),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 14, 15),
+              child: Row(children: [
+                Icon(Icons.auto_stories_outlined, size: 20, color: p.ink2),
+                const SizedBox(width: 13),
+                Expanded(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('My Journal',
+                            style: pvManrope(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w700,
+                                color: p.ink1)),
+                        const SizedBox(height: 3),
+                        Text(
+                            mine.isEmpty
+                                ? 'Everything you make lands here, week by '
+                                    'week.'
+                                : '${mine.length} added this week',
+                            style: pvManrope(
+                                fontSize: 12, height: 1.4, color: p.ink3)),
+                      ]),
+                ),
+                Icon(Icons.chevron_right_rounded, size: 19, color: p.ink3),
+              ]),
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
 
 class _PillarCard extends StatelessWidget {
@@ -229,6 +364,15 @@ class _PillarCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // ⚠️ THE TAG IS FLEXIBLE, THE NAME IS NOT.
+                  //
+                  // Both were unbounded Text in a Row, so the row's width
+                  // depended entirely on how long someone made a tag - and
+                  // adding Buddhi, whose tag is longer than the other three,
+                  // painted Flutter's overflow stripe across the card on a
+                  // narrow phone. The pillar NAME must never be trimmed (it
+                  // is the thing she is choosing), so the tag is the half
+                  // that yields.
                   Row(children: [
                     Text(pillar.name,
                         style: pvFraunces(
@@ -236,12 +380,16 @@ class _PillarCard extends StatelessWidget {
                             fontWeight: FontWeight.w600,
                             color: p.ink1)),
                     const SizedBox(width: 8),
-                    Text(pillar.tag.toUpperCase(),
-                        style: pvManrope(
-                            fontSize: 8.5,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.9,
-                            color: p.ink3)),
+                    Flexible(
+                      child: Text(pillar.tag.toUpperCase(),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: pvManrope(
+                              fontSize: 8.5,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.9,
+                              color: p.ink3)),
+                    ),
                   ]),
                   const SizedBox(height: 4),
                   Text(pillar.today,
