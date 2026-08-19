@@ -1818,8 +1818,81 @@ class KriyaScreen extends StatelessWidget {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(18, 10, 18, 28),
         children:
-            _kriyaPracticeBody(context, s, text, t, practice, lang, daily: true),
+            _kriyaPracticeBody(context, s, text, t, practice, lang,
+                daily: true, week: controller.currentWeek),
       ),
+    );
+  }
+}
+
+/// What should make her stop, mid-practice, and who to call.
+///
+/// ⚠️ NAMED SYMPTOMS, NOT "IF YOU FEEL UNWELL". A vague instruction to stop if
+/// something feels wrong is one every woman will override, because pregnancy
+/// feels wrong quite often and she has no way to tell which wrong this is.
+/// Naming the specific things removes the judgement call from someone who is
+/// mid-exercise and least able to make it.
+class _StopIfCard extends StatelessWidget {
+  const _StopIfCard();
+
+  static const _signs = [
+    'Bleeding, or fluid leaking',
+    'Pain in your belly, chest or back that is new',
+    'A tight, painful belly that will not settle',
+    'Dizziness, a bad headache, or blurred vision',
+    'Trouble breathing, or a racing heart that does not slow',
+    'Your baby moving noticeably less than usual',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    // A steady clay tone, not alarm red - the same treatment the itching page
+    // uses. The unmistakability comes from the border and the heading, not
+    // from a colour that reads as an emergency during a breathing exercise.
+    const accent = Color(0xFFB5623E);
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 15),
+      decoration: BoxDecoration(
+        color: accent.withValues(alpha: 0.08),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: accent.withValues(alpha: 0.40), width: 1.3),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          const Icon(Icons.pan_tool_outlined, size: 17, color: accent),
+          const SizedBox(width: 9),
+          Text('STOP IF',
+              style: pvJakarta(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.1,
+                  color: accent)),
+        ]),
+        const SizedBox(height: 10),
+        for (final x in _signs)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 6),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Container(
+                width: 5,
+                height: 5,
+                margin: const EdgeInsets.only(top: 7, right: 10),
+                decoration: const BoxDecoration(
+                    color: accent, shape: BoxShape.circle),
+              ),
+              Expanded(
+                child: Text(x,
+                    style: pvJakarta(
+                        fontSize: 13, height: 1.45, color: _ink)),
+              ),
+            ]),
+          ),
+        const SizedBox(height: 6),
+        Text('Stop, sit down, and call your doctor today.',
+            style: pvJakarta(
+                fontSize: 13, fontWeight: FontWeight.w700, color: _ink)),
+      ]),
     );
   }
 }
@@ -1828,7 +1901,7 @@ class KriyaScreen extends StatelessWidget {
 // breathing screen's markDone happen ONLY in daily mode.
 List<Widget> _kriyaPracticeBody(BuildContext context, S s, TextTheme text,
     int t, GarbhPractice practice, AppLanguage lang,
-    {required bool daily}) {
+    {required bool daily, required int week}) {
   return [
     if (daily) ...[
       Text(s.gsTodaysPractice,
@@ -1845,7 +1918,23 @@ List<Widget> _kriyaPracticeBody(BuildContext context, S s, TextTheme text,
         textAlign: TextAlign.center,
         style: text.bodyMedium?.copyWith(color: _muted)),
     const SizedBox(height: 16),
+    // ⚠️ THE WEEK REASON, WHICH KRIYA WAS THE ONLY PILLAR MISSING. It carried
+    // safety notes and nothing about why today. That made it the one practice
+    // with no answer to "why now rather than tomorrow", which is the question
+    // the whole rebuild exists to answer.
+    _WhyCard(
+        label: 'WHY THIS WEEK',
+        text: garbhWeekReason(week).now,
+        accent: _accKriya),
+    const SizedBox(height: 12),
     _WhyCard(label: s.gsSafetyNotes, text: kriyaSafety(t).now, accent: _accKriya),
+    const SizedBox(height: 12),
+    // ⚠️ "STOP IF" IS SEPARATE FROM THE SAFETY NOTE, AND THE SPLIT IS THE
+    // POINT. A safety note is read before starting and describes how to do
+    // the practice well. This is read DURING it, and it is the only content
+    // on the screen that should interrupt what she is doing. Folding the two
+    // together buries the symptoms that matter inside advice about posture.
+    const _StopIfCard(),
     const SizedBox(height: 16),
     SizedBox(
       width: double.infinity,
@@ -1887,7 +1976,7 @@ class _KriyaDetailScreen extends StatelessWidget {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
         children: _kriyaPracticeBody(context, s, text, t, practice, lang,
-            daily: false),
+            daily: false, week: controller.currentWeek),
       ),
     );
   }

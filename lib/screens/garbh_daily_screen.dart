@@ -40,7 +40,9 @@ import '../services/pregnancy_controller.dart';
 import '../theme/pv_fonts.dart';
 import '../data/garbh_rebuild_data.dart';
 import 'garbh_buddhi_screen.dart';
+import 'garbh_samvad_daily.dart';
 import 'garbh_journal_screen.dart';
+import 'garbh_ritual_screen.dart';
 import 'garbh_screen.dart'
     show ShravanScreen, SamvadScreen, KriyaScreen, gameForPuzzle;
 import 'v2/v2_palette.dart';
@@ -86,7 +88,18 @@ class GarbhDailyScreen extends StatelessWidget {
             today: promptForDay(cd, tri).text.en,
             icon: Icons.record_voice_over_rounded,
             accent: const Color(0xFF9C5F51),
-            open: () => SamvadScreen(controller: pregnancy, daily: true),
+            // ⚠️ THE DAILY ARRIVAL IS NOW THE RECORD-FIRST SCREEN, not the
+            // four-tab one. `SamvadScreen(daily:false)` survives untouched as
+            // the library it always was, reached from below the fold - which
+            // is the move the spec asks for: the shelves stop standing
+            // between her and today's task.
+            open: () => GarbhSamvadDailyScreen(
+              controller: pregnancy,
+              onOpenLibrary: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                      settings: const RouteSettings(name: 'garbh/samvad/lib'),
+                      builder: (_) => SamvadScreen(controller: pregnancy))),
+            ),
           ),
           // ⚠️ VICHARA IS REPLACED BY BUDDHI HERE, NOT RENAMED.
           //
@@ -201,6 +214,15 @@ class GarbhDailyScreen extends StatelessWidget {
                 const SizedBox(height: 10),
               ],
 
+              // ---- HER OWN RITUALS, AS THEIR OWN ROWS ------------------
+              //
+              // ⚠️ ON THE SAME CARD AS THE FOUR PILLARS, NOT IN A SEPARATE
+              // SECTION. The whole reason for asking what she already does is
+              // that her practice predates this app by years; filing it
+              // somewhere else would make it a second daily habit competing
+              // with ours, which is the arrangement where ours loses.
+              _RitualRows(pregnancy: pregnancy, p: p),
+
               // ---- WHAT TODAY LEFT BEHIND -----------------------------
               // Last on the card, because it is the consequence of
               // everything above it rather than another thing to do.
@@ -232,6 +254,155 @@ class _Pillar {
   final IconData icon;
   final Color accent;
   final Widget Function() open;
+}
+
+/// Her chosen rituals, each its own row, plus the way in when she has none.
+class _RitualRows extends StatelessWidget {
+  const _RitualRows({required this.pregnancy, required this.p});
+  final PregnancyController pregnancy;
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) {
+    final store = GarbhJournalStore.instance;
+    return AnimatedBuilder(
+      animation: store,
+      builder: (context, _) {
+        final chosen = kGarbhRituals
+            .where((r) => store.hasRitual(r.id))
+            .toList(growable: false);
+
+        void open() => Navigator.of(context).push(MaterialPageRoute<void>(
+              settings: const RouteSettings(name: 'garbh/ritual'),
+              builder: (_) => GarbhRitualScreen(controller: pregnancy),
+            ));
+
+        // ⚠️ THE INVITATION IS NOT HIDDEN WHEN SHE HAS PICKED NOTHING. Repo
+        // rule: a feature is never hidden, an empty section advertises
+        // itself. Here it is also the only place the question gets asked
+        // after onboarding.
+        if (chosen.isEmpty) {
+          return Padding(
+            padding: const EdgeInsets.only(top: 14),
+            child: Material(
+              color: p.surfaceAlt,
+              borderRadius: BorderRadius.circular(18),
+              child: InkWell(
+                onTap: open,
+                borderRadius: BorderRadius.circular(18),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 14, 14, 15),
+                  child: Row(children: [
+                    Icon(Icons.add_circle_outline_rounded,
+                        size: 20, color: p.ink2),
+                    const SizedBox(width: 13),
+                    Expanded(
+                      child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Add your own daily practice',
+                                style: pvManrope(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w700,
+                                    color: p.ink1)),
+                            const SizedBox(height: 3),
+                            Text(
+                                'Gita paath, a Quran or Bible passage, japa, '
+                                'or five minutes of silence.',
+                                style: pvManrope(
+                                    fontSize: 12, height: 1.4, color: p.ink3)),
+                          ]),
+                    ),
+                    Icon(Icons.chevron_right_rounded, size: 19, color: p.ink3),
+                  ]),
+                ),
+              ),
+            ),
+          );
+        }
+
+        return Column(children: [
+          const SizedBox(height: 14),
+          for (final r in chosen) ...[
+            _RitualRow(
+                ritual: r, week: pregnancy.currentWeek, p: p, onTap: open),
+            const SizedBox(height: 8),
+          ],
+        ]);
+      },
+    );
+  }
+}
+
+class _RitualRow extends StatelessWidget {
+  const _RitualRow(
+      {required this.ritual,
+      required this.week,
+      required this.p,
+      required this.onTap});
+  final GarbhRitual ritual;
+  final int week;
+  final V2Palette p;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final plan = ritual.isPlan ? gitaPlanProgress(week) : null;
+    return Material(
+      color: p.surface,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(15, 13, 13, 14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: p.line),
+          ),
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(children: [
+                  Icon(Icons.self_improvement_rounded,
+                      size: 18, color: p.ink3),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(ritual.name.now,
+                        style: pvManrope(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w700,
+                            color: p.ink1)),
+                  ),
+                ]),
+                // ⚠️ ONLY THE PLAN GETS A BAR. See garbh_ritual_screen.dart:
+                // a habit has no end so a bar on one can only ever show a
+                // deficit, and eight bars would turn her own practice into
+                // eight things she is behind on.
+                if (plan != null) ...[
+                  const SizedBox(height: 10),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(999),
+                    child: LinearProgressIndicator(
+                      value: plan.progress,
+                      minHeight: 5,
+                      backgroundColor: p.action.withValues(alpha: 0.15),
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(p.action),
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                      plan.weeksLeft == 0
+                          ? 'Finished, before your due date.'
+                          : '${plan.weeksLeft} weeks to go',
+                      style: pvManrope(fontSize: 11, color: p.ink3)),
+                ],
+              ]),
+        ),
+      ),
+    );
+  }
 }
 
 /// Why this week matters, said in one line.

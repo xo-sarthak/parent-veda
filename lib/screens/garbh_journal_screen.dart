@@ -40,6 +40,7 @@ import 'package:flutter/material.dart';
 import '../data/garbh_rebuild_data.dart';
 import '../localization/app_language.dart';
 import '../theme/pv_fonts.dart';
+import 'garbh_invite_screen.dart';
 
 const _ink = Color(0xFF2E2A32);
 const _muted = Color(0xFF8A8290);
@@ -120,9 +121,67 @@ class GarbhJournalScreen extends StatelessWidget {
                   ],
 
                 const SizedBox(height: 10),
+                // ---- the family loop, from inside the album --------------
+                //
+                // ⚠️ HERE RATHER THAN ON THE DAILY CARD. The daily card is
+                // about what she does today; this is about what the album
+                // could hold, and it lands hardest looking at an album that
+                // is already growing. It is also the growth loop, so it wants
+                // to be seen by someone who has understood the value first.
+                Material(
+                  color: _accent.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(18),
+                  child: InkWell(
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        settings: const RouteSettings(name: 'garbh/invite'),
+                        builder: (_) => const GarbhInviteScreen(),
+                      ),
+                    ),
+                    borderRadius: BorderRadius.circular(18),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 15, 14, 16),
+                      child: Row(children: [
+                        const Icon(Icons.group_add_outlined,
+                            size: 20, color: _accent),
+                        const SizedBox(width: 13),
+                        Expanded(
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Invite someone to record',
+                                    style: pvManrope(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                        color: _ink)),
+                                const SizedBox(height: 3),
+                                Text(
+                                    'Papa, Dadi, Nani, or anyone else whose '
+                                    'voice your baby should know.',
+                                    style: pvManrope(
+                                        fontSize: 12,
+                                        height: 1.4,
+                                        color: _muted)),
+                              ]),
+                        ),
+                        const Icon(Icons.chevron_right_rounded,
+                            size: 19, color: _muted),
+                      ]),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                // ⚠️ THE BIRTH HANDOVER, PROMISED HERE AND HONOURED BY THE
+                // MODEL. Nothing in this screen asks the controller what week
+                // it is - every entry carries the week it was stamped with -
+                // so the album keeps working after the birth, when there is
+                // no current week at all. That is what makes screen 09's
+                // "becomes the newborn playlist" additive rather than a
+                // rebuild.
                 Text(
-                    'This stays yours. It does not disappear after the birth, '
-                    'and you can play the whole thing back whenever you want.',
+                    'This stays yours. It does not disappear after the birth: '
+                    'these are the voices your newborn will already know, and '
+                    'you can play the whole thing back whenever you want.',
                     style: pvManrope(fontSize: 12, height: 1.55, color: _muted)),
               ],
             ),
