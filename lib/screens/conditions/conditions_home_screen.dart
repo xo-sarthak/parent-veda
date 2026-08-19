@@ -246,6 +246,44 @@ class _Browse extends StatelessWidget {
             if (searching) ...[
               _SearchResults(results: results, p: p, lang: lang, onOpen: onOpen),
             ] else ...[
+              // ---- WHAT SHE HAS ADDED, FIRST -----------------------------
+              //
+              // ⚠️ THE VISIBLE END OF "ADD TO MY JOURNEY", AND IT DID NOT
+              // EXIST. The button wrote to a set nothing read, so the only
+              // evidence anything had happened was the button's own label
+              // changing — which is indistinguishable from a checkbox.
+              //
+              // This is the first thing on the page for anyone who has added
+              // something, because it is the answer to why she came back. It
+              // is a re-entry point, not a summary: the strip's job is to get
+              // her to her own condition in one tap on the second visit.
+              //
+              // ⚠️ IT REORDERS, IT NEVER REPLACES. The common eight are still
+              // below it, in the same order, all eight of them —
+              // personalisation changes what is FIRST, never what exists.
+              // `test/landing_focus_test.dart` holds that line for the whole
+              // app and it holds here too.
+              if (store.addedConditions.isNotEmpty) ...[
+                SolutionGroup(
+                  title: const LocalizedText(
+                      en: 'What you are managing',
+                      hi: 'What you are managing'),
+                  p: p,
+                  lang: lang,
+                  cards: [
+                    for (final c in store.addedConditions)
+                      SolutionCard(
+                        type: SolutionType.read,
+                        title: c.name,
+                        value: c.reassurance,
+                        p: p,
+                        lang: lang,
+                        onTap: () => onOpen(c),
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 26),
+              ],
               SolutionGroup(
                 title: ConditionGroup.common.title,
                 p: p,

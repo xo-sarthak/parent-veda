@@ -63,6 +63,35 @@ class ConditionDetailScreen extends StatelessWidget {
               _FrameNote(p: p, lang: lang),
               const SizedBox(height: 22),
 
+              // ---- THE FILM, AT THE TOP ------------------------------------
+              //
+              // ⚠️ MOVED FROM THE FOOT OF THE PAGE, AND THE MOVE CHANGES WHAT
+              // IT IS FOR.
+              //
+              // At the bottom it was an appendix — something for whoever had
+              // already read two thousand words and wanted more. That is the
+              // wrong reader. The person who has just been handed a word by
+              // her doctor and typed it into a phone is frequently not in a
+              // state to read two thousand words at all, and for her the video
+              // is not "more" — it is the whole page, in five minutes, from a
+              // face rather than a wall of text.
+              //
+              // ⚠️ IT STAYS UNDER THE FRAME NOTE, NOT ABOVE IT. "This helps you
+              // understand what your doctor is managing; it does not replace
+              // them" has to be the first thing on a condition page, and a
+              // video is exactly the element most likely to be mistaken for a
+              // second opinion.
+              //
+              // ⚠️ AND ONLY WHERE IT WAS ALREADY EARNED. `showWatch` still
+              // governs. A rare condition that gets two honest sentences and a
+              // pointer to urgent care does not get a hero video slot above
+              // them — the section's own rule is that depth varies, and moving
+              // an element up must not quietly promote it everywhere.
+              if (entry.showWatch) ...[
+                _WatchSection(entry: entry, p: p, lang: lang),
+                const SizedBox(height: 26),
+              ],
+
               // ---- what it is + reassurance --------------------------------
               _Heading(
                   const LocalizedText(
@@ -194,10 +223,12 @@ class ConditionDetailScreen extends StatelessWidget {
                 const SizedBox(height: 26),
                 _ReadMoreSection(entry: entry, p: p, lang: lang),
               ],
-              if (entry.showWatch) ...[
-                const SizedBox(height: 26),
-                _WatchSection(entry: entry, p: p, lang: lang),
-              ],
+              // ⚠️ WATCH IS NO LONGER HERE — it moved to the top of the page,
+              // above "What this is". See the note at its new call site for
+              // why. Left as a marker rather than silently absent, because the
+              // three foot sections were specified together and the next
+              // person to read this list will otherwise wonder which one was
+              // dropped.
             ],
           ),
         );
@@ -478,25 +509,49 @@ class _WatchSection extends StatelessWidget {
   final AppLanguage lang;
 
   @override
-  Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _Heading(
-              const LocalizedText(en: 'Watch', hi: 'Watch').of(lang), p),
-          PvVideoPlaceholder(
-            title: const LocalizedText(
-                    en: 'Explained in five minutes',
-                    hi: 'Explained in five minutes')
+  Widget build(BuildContext context) {
+    final series = entry.watchEpisodes > 1;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _Heading(
+            (series
+                    ? const LocalizedText(
+                        en: 'Watch this explained',
+                        hi: 'Watch this explained')
+                    : const LocalizedText(en: 'Watch', hi: 'Watch'))
                 .of(lang),
-            subtitle: const LocalizedText(
-                    en: 'What this condition is doing, drawn simply, by a '
-                        'doctor.',
-                    hi: 'What this condition is doing, drawn simply, by a '
-                        'doctor.')
-                .of(lang),
-            duration: '5 MIN',
-            slotId: 'condition_watch_${entry.id}',
-          ),
-        ],
-      );
+            p),
+        PvVideoPlaceholder(
+          // ⚠️ THE TITLE CHANGES WITH THE SHAPE. "Explained in five minutes"
+          // on a four-part series is a promise the card cannot keep, and the
+          // first thing she would notice is that the app told her the wrong
+          // length before she started.
+          title: (series
+                  ? const LocalizedText(
+                      en: 'Understanding this, start to finish',
+                      hi: 'Understanding this, start to finish')
+                  : const LocalizedText(
+                      en: 'Explained in five minutes',
+                      hi: 'Explained in five minutes'))
+              .of(lang),
+          subtitle: const LocalizedText(
+                  en: 'What this condition is doing, drawn simply, by a '
+                      'doctor.',
+                  hi: 'What this condition is doing, drawn simply, by a '
+                      'doctor.')
+              .of(lang),
+          // ⚠️ THE DURATION IS THE FIRST EPISODE'S, NOT THE SERIES TOTAL —
+          // the same thing a playlist thumbnail shows anywhere else. The
+          // total is what the "1 / 4" corner is for; putting a combined
+          // running time here would read as "this one video is 40 minutes".
+          duration: '5 MIN',
+          episodeCount: entry.watchEpisodes,
+          slotId: series
+              ? 'condition_watch_series_${entry.id}'
+              : 'condition_watch_${entry.id}',
+        ),
+      ],
+    );
+  }
 }

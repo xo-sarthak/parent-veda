@@ -23,6 +23,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../localization/app_language.dart';
+import '../services/family_profile.dart';
 
 LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
 
@@ -67,7 +68,16 @@ extension ConditionGroupMeta on ConditionGroup {
         ConditionGroup.positionCervix => _en('Position & cervix'),
         ConditionGroup.discomforts => _en('Common discomforts'),
         ConditionGroup.specialist => _en('Specialist & less common'),
-        ConditionGroup.preExisting => _en('Pregnancy with a pre-existing condition'),
+        // ⚠️ THE SHELF AND THE PAGE ON IT MUST NOT SHARE A NAME. This group
+        // title used to read "Pregnancy with a pre-existing condition" —
+        // exactly the name of the single entry inside it — so the shelf
+        // rendered a heading and one card saying the same words twice, which
+        // reads as a rendering bug rather than as organisation. The spec's own
+        // wording for the shelf is the plural category; the page keeps the
+        // longer sentence, because a page is a thing you read and a shelf is a
+        // thing you scan. Found by a test asserting each group title appears
+        // once.
+        ConditionGroup.preExisting => _en('Pre-existing conditions'),
         ConditionGroup.seasonal => _en('Seasonal & infections'),
       };
 }
@@ -102,7 +112,9 @@ class ConditionEntry {
     this.showMedicine = false,
     this.showReadMore = false,
     this.showWatch = false,
+    this.watchEpisodes = 1,
     this.highAnxiety = false,
+    this.pregSignal,
   });
 
   final String id;
@@ -142,10 +154,46 @@ class ConditionEntry {
   final bool showReadMore;
   final bool showWatch;
 
+  /// How many films the Watch slot will eventually hold.
+  ///
+  /// ⚠️ 1 IS A VIDEO; MORE THAN 1 IS A SERIES, AND THEY LOOK DIFFERENT.
+  /// Review: "it can be a video series too — in that case show only one video
+  /// with ¼ as YT does, and clicking it opens the playlist." So this is not a
+  /// cosmetic count: it decides whether the top of the page promises five
+  /// minutes or forty, which is a thing she is entitled to know before she
+  /// starts. Conditions managed over months earn a series; a one-visit scare
+  /// does not.
+  final int watchEpisodes;
+
   /// Miscarriage and preeclampsia. Governs tone: no product, no upsell, and
   /// — for miscarriage specifically — no cheerful language anywhere on the
   /// page, including the empty states of its (absent) conditional sections.
   final bool highAnxiety;
+
+  /// ⚠️ THE BRIDGE TO THE APP'S REAL PERSONALISATION AXIS, AND THE REASON THIS
+  /// FIELD HAD TO EXIST.
+  ///
+  /// "Add to my journey" used to write into a `Set<String>` inside
+  /// `ConditionsStore` that **nothing anywhere read**. The button changed its
+  /// own label to "Added to your journey" and that was the entire effect — a
+  /// promise of personalisation with no personalisation behind it.
+  ///
+  /// The app already had the right home for this signal:
+  /// `FamilyProfileStore.pregConditions`, which `veda_context.dart` feeds into
+  /// every Ask Veda question and which `matchesSignal` / `orderByPregPriority`
+  /// exist to rank content by. What went wrong is a shape worth naming,
+  /// because it is how a codebase grows two answers to one question: a new
+  /// section needed "which conditions does she have", did not find it, and
+  /// built its own — so the app now held that fact twice, and the copy that
+  /// anything consumed was the one the new section never wrote to.
+  ///
+  /// ⚠️ NULL IS A REAL ANSWER. `PregCondition` has seven values and this
+  /// library has twenty-seven conditions; ICP, HELLP and dengue have no
+  /// counterpart. A null signal means "we keep her note locally and send
+  /// nothing downstream" — which is honest — rather than forcing every
+  /// condition into the nearest enum value, which would tell Ask Veda she has
+  /// something she does not.
+  final PregCondition? pregSignal;
 
   bool matches(String query) {
     final q = query.trim().toLowerCase();
@@ -231,6 +279,8 @@ final List<ConditionEntry> kCommonConditions = [
     showMedicine: true,
     showReadMore: true,
     showWatch: true,
+    pregSignal: PregCondition.gestationalDiabetes,
+    watchEpisodes: 4,
   ),
   ConditionEntry(
     id: 'thyroid',
@@ -291,6 +341,8 @@ final List<ConditionEntry> kCommonConditions = [
     showMedicine: true,
     showReadMore: true,
     showWatch: true,
+    pregSignal: PregCondition.thyroid,
+    watchEpisodes: 2,
   ),
   ConditionEntry(
     id: 'anemia',
@@ -349,6 +401,7 @@ final List<ConditionEntry> kCommonConditions = [
     showMedicine: true,
     showReadMore: true,
     showWatch: true,
+    pregSignal: PregCondition.anemia,
   ),
   ConditionEntry(
     id: 'pcos',
@@ -516,6 +569,7 @@ final List<ConditionEntry> kCommonConditions = [
     ],
     showReadMore: true,
     showWatch: true,
+    pregSignal: PregCondition.lowLyingPlacenta,
   ),
   ConditionEntry(
     id: 'high_bp',
@@ -582,6 +636,8 @@ final List<ConditionEntry> kCommonConditions = [
     showMedicine: true,
     showReadMore: true,
     showWatch: true,
+    pregSignal: PregCondition.hypertension,
+    watchEpisodes: 3,
   ),
   ConditionEntry(
     id: 'ectopic',
@@ -1669,10 +1725,64 @@ class ConditionsStore extends ChangeNotifier {
     _save();
   }
 
+  /// The conditions she has added, as entries, in library order.
+  ///
+  /// ⚠️ ORDERED BY THE LIBRARY, NOT BY WHEN SHE TAPPED. A set has no order, so
+  /// "insertion order" here would be whatever `SharedPreferences` handed back —
+  /// stable enough to look deliberate and not actually meaningful. Reading the
+  /// library's own order means the strip on the home screen lists them the same
+  /// way twice running.
+  List<ConditionEntry> get addedConditions =>
+      kAllConditions.where((c) => _addedToJourney.contains(c.id)).toList();
+
+  /// ⚠️ THIS NOW WRITES SOMEWHERE THAT IS ACTUALLY READ.
+  ///
+  /// It used to update a private `Set<String>` and notify — and the only two
+  /// readers in the app were the button's own label and its own icon. Tapping
+  /// "Add to my journey" changed the words on the button she had just tapped
+  /// and did nothing else anywhere. The section promised personalisation and
+  /// delivered a checkbox.
+  ///
+  /// The fix is not a new personalisation engine; it is writing to the one
+  /// that already exists. `FamilyProfileStore.pregConditions` is fed into every
+  /// Ask Veda question by `veda_context.dart` and is what `matchesSignal` and
+  /// `orderByPregPriority` rank content against, so a condition mirrored into
+  /// it starts shaping answers immediately, with no consumer to write.
+  ///
+  /// ⚠️ THE LOCAL SET IS KEPT AS WELL, ON PURPOSE. It is not redundant:
+  /// `PregCondition` covers seven things and this library covers twenty-seven,
+  /// so the local set is the only record for the twenty-two that have no
+  /// downstream signal. Dropping it would mean adding ICP to her journey
+  /// silently did nothing at all — the exact bug this method is fixing,
+  /// reintroduced from the other side.
   void toggleAddedToJourney(String id) {
-    if (!_addedToJourney.remove(id)) _addedToJourney.add(id);
+    final added = !_addedToJourney.remove(id);
+    if (added) _addedToJourney.add(id);
     notifyListeners();
     _save();
+
+    // ⚠️ MIRRORED, NOT MOVED — and only in the direction she just chose.
+    //
+    // `togglePregCondition` flips, so calling it blindly would invert a
+    // condition she set from the Profile screen instead of matching what she
+    // just did here. Two screens write the same fact; they must agree on its
+    // VALUE, not take turns flipping it.
+    final signal = _signalFor(id);
+    if (signal == null) return;
+    try {
+      final fp = FamilyProfileStore.instance;
+      if (fp.hasPregCondition(signal) != added) fp.togglePregCondition(signal);
+    } catch (_) {
+      // Local-first: an unavailable profile store must never stop her saving
+      // a note to her own journey. The local set above has already recorded it.
+    }
+  }
+
+  PregCondition? _signalFor(String id) {
+    for (final c in kAllConditions) {
+      if (c.id == id) return c.pregSignal;
+    }
+    return null;
   }
 
   Future<void> _save() async {

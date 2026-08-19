@@ -17,6 +17,7 @@ import '../localization/app_language.dart';
 import '../models/report_finding.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
+import '../widgets/pv_placeholders.dart';
 import 'tools/ask_veda_screen.dart';
 
 const Color _calm = Color(0xFF18A39B); // teal - calm, non-alarming accent
@@ -428,6 +429,33 @@ class ReportArticleScreen extends StatelessWidget {
               child: Text(finding.altName!.of(lang),
                   style: text.titleMedium?.copyWith(color: AppTheme.neutral500)),
             ),
+
+          // ---- THE EXPLAINER, BEFORE THE WORDS -------------------------
+          //
+          // ⚠️ EVERY FINDING PAGE OPENS ON A FILM. Review: "Understanding Your
+          // Report — each of it when it opens should basically show a video at
+          // the top."
+          //
+          // It is the same call already made on `ScanDetailScreen`, and for a
+          // stronger reason here. This screen is reached with a printout in her
+          // hand and a word on it she has just looked up — which is the moment
+          // in the whole product when someone is least able to read seven
+          // sections of prose and most able to watch someone explain the thing
+          // once. The text below is what she reads if she would rather read.
+          //
+          // ⚠️ A REAL PLACEHOLDER, NOT A ROW OF TEXT — 16:9, thumbnail, play
+          // control, the title set in the type it will use, and a COMING SOON
+          // mark so it is honest about not existing yet. See pv_placeholders
+          // for why a text stand-in makes a page impossible to judge.
+          PvVideoPlaceholder(
+            title: '${finding.name.en}, explained',
+            subtitle: 'What this means on your report, what usually happens '
+                'next, and what to ask.',
+            duration: '4 MIN',
+            hue: 168,
+            slotId: 'report_finding_${finding.id}',
+          ),
+          const SizedBox(height: 22),
 
           // §1 - What does this mean? (always first)
           _Section(title: s.rSecMeans, body: finding.whatItMeans.of(lang)),

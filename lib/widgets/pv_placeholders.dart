@@ -46,6 +46,7 @@ class PvVideoPlaceholder extends StatelessWidget {
     this.hue = 268,
     this.slotId,
     this.onTap,
+    this.episodeCount = 1,
   });
 
   /// What the video will be called, set in the type it will actually use.
@@ -69,7 +70,20 @@ class PvVideoPlaceholder extends StatelessWidget {
   /// Non-null only once a real video exists.
   final VoidCallback? onTap;
 
+  /// How many films this slot holds. 1 renders a single video; more than 1
+  /// renders the series treatment.
+  ///
+  /// ⚠️ ONE CARD FOR A SERIES, NOT A ROW OF THEM — the YouTube playlist shape,
+  /// and it is the right one for two reasons beyond familiarity. A rail of six
+  /// thumbnails on a condition page reads as homework at the moment she is
+  /// least able to face it, and it also spends the whole width of the page on
+  /// the least useful information: she does not need to see episode four to
+  /// decide to start. One cover, an honest count, one tap.
+  final int episodeCount;
+
   bool get _live => onTap != null;
+
+  bool get _isSeries => episodeCount > 1;
 
   @override
   Widget build(BuildContext context) {
@@ -149,6 +163,36 @@ class PvVideoPlaceholder extends StatelessWidget {
                                   color: Colors.white)),
                         ),
                       ),
+                    // ⚠️ THE SERIES CORNER — "1 / 4", the shape a playlist has
+                    // everywhere she has already seen one.
+                    //
+                    // It sits top-RIGHT, opposite the duration, because the two
+                    // answer different questions ("how long is this one" vs
+                    // "how much is there") and stacking them in one corner
+                    // makes both read as one number.
+                    if (_isSeries)
+                      Positioned(
+                        right: 10,
+                        top: 10,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 9, vertical: 5),
+                          decoration: BoxDecoration(
+                            color: Colors.black.withValues(alpha: 0.62),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(mainAxisSize: MainAxisSize.min, children: [
+                            const Icon(Icons.playlist_play_rounded,
+                                size: 14, color: Colors.white),
+                            const SizedBox(width: 5),
+                            Text('1 / $episodeCount',
+                                style: pvManrope(
+                                    fontSize: 10.5,
+                                    fontWeight: FontWeight.w800,
+                                    color: Colors.white)),
+                          ]),
+                        ),
+                      ),
                     // ⚠️ HONEST, NOT HIDDEN. Looking real is not pretending to
                     // be real.
                     if (!_live)
@@ -191,6 +235,26 @@ class PvVideoPlaceholder extends StatelessWidget {
                       Text(subtitle!,
                           style: pvManrope(
                               fontSize: 13, height: 1.45, color: p.ink2)),
+                    ],
+                    // ⚠️ THE COUNT IS SAID IN WORDS AS WELL AS DRAWN.
+                    //
+                    // The "1 / 4" corner is a convention, and a convention only
+                    // works on someone who already knows it. This line is for
+                    // everyone else — and it is also what makes the tap target
+                    // honest, because a card that opens a list rather than a
+                    // film should say so before she taps it, not after.
+                    if (_isSeries) ...[
+                      const SizedBox(height: 8),
+                      Row(children: [
+                        Icon(Icons.playlist_play_rounded,
+                            size: 16, color: deep),
+                        const SizedBox(width: 6),
+                        Text('$episodeCount-part series  ·  see all',
+                            style: pvManrope(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w700,
+                                color: deep)),
+                      ]),
                     ],
                   ],
                 ),

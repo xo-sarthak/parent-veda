@@ -57,8 +57,21 @@ LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
 final JourneyConfig kPgUnderstandCondition = JourneyConfig(
   doorId: kPgActConditionLibrary,
   title: _en('Understand my condition'),
-  intro: _en('You have been given a name for something. Here is what it '
-      'usually means — and what it usually does not.'),
+  // ⚠️ COPY FIX. The old line — "You have been given a name for something.
+  // Here is what it usually means, and what it usually does not." — is the
+  // same defect already fixed on the hub's hero, still sitting here because
+  // the two were reworded in different passes.
+  //
+  // What makes it read as machine-written is the passive construction. "You
+  // have been given a name for something" describes her situation to her from
+  // the outside, in a voice with no speaker; nobody has ever said that
+  // sentence out loud. The "X — and not Y" tail is the other tell, a rhythm
+  // that sounds balanced and carries almost no information.
+  //
+  // The replacement says the same two things — here is the meaning, most of it
+  // is less frightening than the word — in the words a person would use.
+  intro: _en('Your doctor used a word you did not know. Here is what it '
+      'actually means, in plain language.'),
   steps: [
     JourneyStep(
       question: _en('How worried should I be?'),

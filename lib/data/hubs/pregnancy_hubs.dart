@@ -74,22 +74,57 @@ final HubConfig kPgComplications = HubConfig(
       hue: 344,
       action: kPgActConditionLibrary,
     ),
-    HubNeed(
-      // The repeated visit. GDM and raised BP are managed by logging, and a
-      // number logged today is the reason she opens the app tomorrow.
-      label: _en('Track my readings'),
-      blurb: _en('Sugar, blood pressure or weight — logged, and easy to show '
-          'at your next visit.'),
-      mark: IntentMark.chartLog,
-      hue: 206,
-      action: kPgActTrackReadings,
-    ),
+    // ⚠️ "TRACK MY READINGS" IS OFF, KEPT FOR REVERT — removed per review.
+    //
+    // The argument for it is still on the record and still half-right: GDM and
+    // raised BP are managed by logging, and a number logged today is a reason
+    // to open the app tomorrow. What it got wrong is the SHELF. This hub's core
+    // question is "what is this condition, and what do I have to do about it" —
+    // a question asked once, by someone who has just been handed a word she
+    // does not know. Logging is what she does for the following four months,
+    // and it already has homes that are better at it than a door here: the
+    // weight tool, and the condition pages themselves.
+    //
+    // Two doors also made the hub read as a choice between understanding and
+    // tracking, at the one moment when only one of those is the actual need.
+    //
+    // `kPgActTrackReadings` is untouched and still dispatched in
+    // `home_v3_screen.dart`, so restoring this is uncommenting.
+    //
+    // HubNeed(
+    //   label: _en('Track my readings'),
+    //   blurb: _en('Sugar, blood pressure or weight — logged, and easy to show '
+    //       'at your next visit.'),
+    //   mark: IntentMark.chartLog,
+    //   hue: 206,
+    //   action: kPgActTrackReadings,
+    // ),
   ],
-  closing: HubClosing(
-    label: _en('Talk to a doctor'),
-    blurb: _en('Book a 1:1 and ask about your own readings.'),
-    action: kPgActConsult,
-  ),
+  // ⚠️ THE CLOSING OFFER IS OFF TOO, AND NOT BY CHOICE — IT IS A CONSEQUENCE.
+  //
+  // Dropping "Track my readings" left this hub with ONE door, and a one-door
+  // hub does not render a hub screen at all: `_openBracket` sends her straight
+  // to the door's destination, because a screen whose only content restates
+  // the tile she just tapped is a tap of pure tax. There is therefore nowhere
+  // left for a closing offer to appear, and
+  // `test/problem_hub_test.dart` fails the build rather than let it sit here
+  // as config that looks alive and never renders. That test did its job here:
+  // the one-door consequence was not obvious from the edit that caused it.
+  //
+  // ⚠️ WHAT THIS COSTS, STATED PLAINLY: "Talk to a doctor" has left the
+  // Complications bracket entirely. That is a real loss — a condition is one
+  // of the better reasons to book a gynaecologist — and it was not asked for;
+  // it fell out of the door removal. The right home for it is the foot of a
+  // CONDITION page, at the moment of need, the way `ScanDetailScreen` closes
+  // with "still unsure?". Raised rather than done, because adding a consult
+  // offer to twenty-seven condition pages is a product decision about where
+  // this section is allowed to sell, not a tidy-up.
+  //
+  // closing: HubClosing(
+  //   label: _en('Talk to a doctor'),
+  //   blurb: _en('Book a 1:1 and ask about your own readings.'),
+  //   action: kPgActConsult,
+  // ),
 );
 
 // -----------------------------------------------------------------------------
