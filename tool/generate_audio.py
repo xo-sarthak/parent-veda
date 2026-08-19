@@ -42,8 +42,22 @@ PROJECT = 'project-a0e0d549-3f82-419c-8a0'
 VOICE_HI = 'hi-IN-Chirp3-HD-Callirrhoe'
 VOICE_EN = 'en-IN-Chirp3-HD-Callirrhoe'
 
-OUT = 'build/audio'
-CACHE = 'build/audio/.segments'
+# NOT inside build/. That directory is Flutter's own scratch space and
+# `flutter clean` exists to delete it - which it did, on 2026-08-18, taking
+# 1,660 freshly-synthesised passages and the whole segment cache with it.
+#
+# The .gitignore reasoning for keeping audio out of git was sound: it is derived
+# and regenerable. What nobody checked was WHERE it landed instead. "Derived and
+# regenerable" is only cheap while re-running the recipe is free, and these cost
+# API quota - so between synthesis and upload they are briefly irreplaceable,
+# and they were sitting in the one directory in the repo with a documented
+# self-destruct that any developer triggers without thinking.
+#
+# `.narration-cache/` is gitignored, outside build/, and survives flutter clean.
+# The segment cache surviving also means a re-run is mostly free rather than
+# full price.
+OUT = '.narration-cache/audio'
+CACHE = '.narration-cache/audio/.segments'
 
 # Silence inserted between segments, in milliseconds.
 #

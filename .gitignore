@@ -18,6 +18,12 @@ build/
 #
 # What IS committed is the recipe: the generator, the corpus rules, and the
 # manifest that maps content key -> file + content hash.
+#
+# MOVED 2026-08-18: the generator now writes to .narration-cache/ instead.
+# build/ is Flutter's scratch space and `flutter clean` deletes it - which
+# it did, taking 1,660 freshly-paid-for passages and the segment cache.
+# This rule is kept only so an older build/audio/ left on someone's disk
+# still stays out of git.
 build/audio/
 
 # Android
@@ -87,6 +93,16 @@ flutter_*.log
 # "This is a generated file; do not edit or check into version control."
 .flutter-plugins
 .flutter-plugins-dependencies
+
+# Generated narration output and its segment cache.
+#
+# Lives here rather than under build/ because `flutter clean` deletes build/ and
+# .dart_tool/ - and did, taking 1,660 paid-for passages with it. Derived and
+# regenerable is only cheap while re-running is free; these cost API quota, so
+# between synthesis and upload they are the one artifact worth protecting.
+#
+# Ignored because the audio's real home is R2, not git.
+.narration-cache/
 
 # Generated narration - 66 MB of MP3, and DERIVED rather than authored.
 #
