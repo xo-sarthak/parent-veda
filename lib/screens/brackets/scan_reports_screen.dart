@@ -31,9 +31,11 @@ import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/scan_reports_store.dart';
 import '../../theme/pv_fonts.dart';
+import '../../widgets/storage_image.dart';
 import '../post_pregnancy/pp_attachments.dart';
 import '../v2/v2_palette.dart';
 import 'hub/hub_solution_cards.dart';
+import 'scan_report_viewer_screen.dart';
 
 LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
 
@@ -95,6 +97,18 @@ class _ScanReportsScreenState extends State<ScanReportsScreen> {
                     report: r,
                     p: p,
                     lang: lang,
+                    // ⚠️ THE ROW OPENS THE REPORT. It used to open nothing —
+                    // the only control on it was a bin, so the door built to
+                    // answer "where did I put that report?" could name the
+                    // report and would not show it.
+                    onOpen: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                        settings:
+                            const RouteSettings(name: 'scans/reports/view'),
+                        builder: (_) => ScanReportViewerScreen(
+                            reportId: r.id, pregnancy: widget.pregnancy),
+                      ),
+                    ),
                     onDelete: () => _confirmDelete(context, r, p, lang),
                   ),
                   const SizedBox(height: 10),
@@ -255,11 +269,13 @@ class _ReportRow extends StatelessWidget {
       {required this.report,
       required this.p,
       required this.lang,
+      required this.onOpen,
       required this.onDelete});
 
   final ScanReport report;
   final V2Palette p;
   final AppLanguage lang;
+  final VoidCallback onOpen;
   final VoidCallback onDelete;
 
   @override
@@ -267,40 +283,67 @@ class _ReportRow extends StatelessWidget {
     final d = DateTime.tryParse(report.dateIso);
     final n = report.files.length;
 
-    return Container(
-      padding: const EdgeInsets.fromLTRB(16, 14, 10, 14),
-      decoration: BoxDecoration(
-        color: p.surface,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: p.line),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(report.title,
-                    style: pvFraunces(
-                        fontSize: 15.5,
-                        fontWeight: FontWeight.w600,
-                        color: p.ink1)),
-                const SizedBox(height: 4),
-                Text(
-                    '${d == null ? '' : _fmt(d)}'
-                    '${d == null ? '' : ' · '}'
-                    '$n ${n == 1 ? 'file' : 'files'}',
-                    style: pvManrope(fontSize: 12, color: p.ink3)),
-              ],
-            ),
+    return Material(
+      color: p.surface,
+      borderRadius: BorderRadius.circular(18),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onOpen,
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(16, 14, 6, 14),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: p.line),
           ),
-          IconButton(
-            onPressed: onDelete,
-            icon: Icon(Icons.delete_outline, size: 19, color: p.ink3),
-            tooltip: 'Remove',
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ⚠️ A THUMBNAIL, BECAUSE A TITLE IS NOT HOW SHE RECOGNISES A
+              // REPORT. Several will be called the same thing — "Growth scan"
+              // three times across the third trimester — and the picture is
+              // what tells them apart at a glance. PDFs get an icon; there is
+              // nothing to thumbnail without rendering a page, and rendering
+              // nine of them to draw a list would cost more than it returns.
+              _Thumb(report: report, p: p),
+              const SizedBox(width: 13),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(report.title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: pvFraunces(
+                            fontSize: 15.5,
+                            fontWeight: FontWeight.w600,
+                            color: p.ink1)),
+                    const SizedBox(height: 4),
+                    Text(
+                        '${d == null ? '' : _fmt(d)}'
+                        '${d == null ? '' : ' · '}'
+                        '$n ${n == 1 ? 'file' : 'files'}',
+                        style: pvManrope(fontSize: 12, color: p.ink3)),
+                  ],
+                ),
+              ),
+              // ⚠️ DELETE STAYS ON THE ROW. It is the one control that already
+              // shipped here, and taking it away to "tidy up" would trade a
+              // working one-tap action for a longer path to the same place.
+              // The viewer offers it too, past the document — see there for
+              // why that copy is the safer of the two.
+              IconButton(
+                onPressed: onDelete,
+                icon: Icon(Icons.delete_outline, size: 19, color: p.ink3),
+                tooltip: 'Remove',
+              ),
+              Padding(
+                padding: const EdgeInsets.only(top: 10, right: 6),
+                child: Icon(Icons.chevron_right_rounded,
+                    size: 19, color: p.ink3),
+              ),
+            ],
           ),
-        ],
+        ),
       ),
     );
   }
@@ -311,6 +354,38 @@ class _ReportRow extends StatelessWidget {
       'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
     ];
     return '${d.day} ${m[d.month - 1]} ${d.year}';
+  }
+}
+
+/// The first file, small — or a PDF mark when that is what it is.
+class _Thumb extends StatelessWidget {
+  const _Thumb({required this.report, required this.p});
+
+  final ScanReport report;
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) {
+    final first = report.files.isEmpty ? null : report.files.first;
+    final showImage = first != null && !first.isPdf;
+
+    return Container(
+      width: 46,
+      height: 46,
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: p.surfaceAlt,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: showImage
+          ? StorageImage(first.path, fit: BoxFit.cover)
+          : Icon(
+              first == null
+                  ? Icons.description_outlined
+                  : Icons.picture_as_pdf_outlined,
+              size: 20,
+              color: p.ink3),
+    );
   }
 }
 

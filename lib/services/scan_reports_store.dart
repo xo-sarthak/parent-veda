@@ -77,12 +77,29 @@ class ScanReport {
   final String note;
   final List<ReportFile> files;
 
-  ScanReport copyWith({String? title, String? note, List<ReportFile>? files}) =>
+  /// ⚠️ `clearScanId` EXISTS BECAUSE `scanId` IS NULLABLE, AND THAT MAKES
+  /// `copyWith` AMBIGUOUS.
+  ///
+  /// With a nullable field there is no way for `copyWith` to tell "she unlinked
+  /// this report from its scan" apart from "she did not mention the scan" —
+  /// both arrive as `scanId: null`. Without the flag, unlinking is simply not
+  /// expressible, and the editor would silently keep a link she just removed.
+  ///
+  /// The alternative is a sentinel object, which is shorter to call and worse
+  /// to read: a reviewer has to know what the sentinel means. A named boolean
+  /// says it at the call site.
+  ScanReport copyWith({
+    String? title,
+    String? note,
+    List<ReportFile>? files,
+    String? scanId,
+    bool clearScanId = false,
+  }) =>
       ScanReport(
         id: id,
         title: title ?? this.title,
         dateIso: dateIso,
-        scanId: scanId,
+        scanId: clearScanId ? null : (scanId ?? this.scanId),
         note: note ?? this.note,
         files: files ?? this.files,
       );
