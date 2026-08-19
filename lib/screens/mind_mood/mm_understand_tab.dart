@@ -12,6 +12,7 @@
 import 'package:flutter/material.dart';
 
 import '../../data/mind_mood_data.dart';
+import '../../data/mind_mood_extras.dart';
 import '../../localization/app_language.dart';
 import '../../theme/pv_fonts.dart';
 import '../brackets/hub/hub_solution_cards.dart';
@@ -59,7 +60,62 @@ class MmUnderstandTab extends StatelessWidget {
           ),
           const SizedBox(height: 28),
         ],
+        // ---- the partner article, at the very foot -----------------------
+        //
+        // ⚠️ BELOW EVERYTHING, AND LABELLED AS BEING FOR SOMEONE ELSE.
+        //
+        // The brief asks for a "soft link from Understand", and soft is doing
+        // real work in that sentence. Every shelf above this one is written
+        // to her; this is written to her partner, and putting it in a group
+        // alongside them would read as the app telling her how she ought to
+        // be handled. At the foot, clearly marked, it is what it actually is:
+        // something she can send him.
+        _PartnerLink(p: p, lang: lang),
       ],
     );
   }
+}
+
+class _PartnerLink extends StatelessWidget {
+  const _PartnerLink({required this.p, required this.lang});
+  final V2Palette p;
+  final AppLanguage lang;
+
+  @override
+  Widget build(BuildContext context) => Material(
+        color: p.surfaceAlt,
+        borderRadius: BorderRadius.circular(18),
+        child: InkWell(
+          onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+            settings: const RouteSettings(name: 'mind_mood_partner_support'),
+            builder: (_) => MmArticleScreen(article: kMmPartnerArticle),
+          )),
+          borderRadius: BorderRadius.circular(18),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 15, 14, 16),
+            child: Row(children: [
+              Icon(Icons.volunteer_activism_outlined, size: 20, color: p.ink3),
+              const SizedBox(width: 13),
+              Expanded(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Something to send your partner',
+                          style: pvManrope(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w700,
+                              color: p.ink1)),
+                      const SizedBox(height: 3),
+                      Text(kMmPartnerArticle.title.of(lang),
+                          style: pvManrope(
+                              fontSize: 12.5,
+                              height: 1.4,
+                              color: p.ink3)),
+                    ]),
+              ),
+              Icon(Icons.chevron_right_rounded, size: 19, color: p.ink3),
+            ]),
+          ),
+        ),
+      );
 }

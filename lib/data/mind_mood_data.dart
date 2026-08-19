@@ -1442,6 +1442,37 @@ class MindMoodStore extends ChangeNotifier {
     return mmTextHasSafetySignal(trimmed);
   }
 
+  /// Rewrite an entry she has already saved.
+  ///
+  /// ⚠️ EDIT EXISTED IN THE BRIEF AND NOT IN THE CODE. The journal could write,
+  /// save, view and delete; §9.3 asks for edit too, and its absence is not a
+  /// small omission on this particular feature. Without it, fixing one word in
+  /// a private entry means deleting the whole thing and typing it again, which
+  /// on a page holding a bad night's thoughts is a real cost.
+  ///
+  /// ⚠️ THE TIMESTAMP DOES NOT MOVE. The entry keeps the date she wrote it,
+  /// not the date she corrected a typo, or an edit would silently reorder her
+  /// journal and change what "Tuesday" refers to.
+  ///
+  /// Returns the same safety-signal answer as `addJournalEntry`, because an
+  /// edit can introduce one that the original did not carry.
+  bool updateJournalEntry(String id, String text) {
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) return false;
+    final i = _journal.indexWhere((e) => e.id == id);
+    if (i < 0) return false;
+    final old = _journal[i];
+    _journal[i] = MmJournalEntry(
+      id: old.id,
+      ts: old.ts,
+      text: trimmed,
+      promptId: old.promptId,
+    );
+    notifyListeners();
+    _persistJournal();
+    return mmTextHasSafetySignal(trimmed);
+  }
+
   void deleteJournalEntry(String id) {
     _journal.removeWhere((e) => e.id == id);
     notifyListeners();

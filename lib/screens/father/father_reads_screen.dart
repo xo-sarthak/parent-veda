@@ -21,6 +21,9 @@ import '../../theme/father_skin.dart';
 import 'father_stories_screen.dart';
 import '../../theme/pv_fonts.dart';
 import '../../localization/app_language.dart';
+import '../../data/mind_mood_extras.dart';
+import '../mind_mood/mm_article_screen.dart';
+
 
 LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
 
@@ -54,6 +57,20 @@ class FatherReadsScreen extends StatelessWidget {
             // Tales entry - the Stories, Fables & Mythology collection.
             _talesCard(context),
             const SizedBox(height: 18),
+            // ⚠️ ONE CARD, AND IT OPENS THE MIND & MOOD READER RATHER THAN A
+            // COPY OF THE ARTICLE.
+            //
+            // The brief asks for partner support to surface in Papa Mode and
+            // to stay small. Pasting the body into `kFatherArticles` would
+            // have fitted this screen's own model more neatly and would have
+            // created a second copy of the one article both sections point at
+            // - so the first edit to either would silently produce two
+            // different answers to "what should I avoid saying to her".
+            //
+            // `MmArticleScreen` already renders body copy and an expert video
+            // slot, so reusing it costs one import and keeps a single source.
+            _partnerSupportCard(context),
+            const SizedBox(height: 18),
             // ---- Articles ----
             Text(S.now.uiArticles, style: _eyebrow(kFAccent)),
             const SizedBox(height: 10),
@@ -77,6 +94,40 @@ class FatherReadsScreen extends StatelessWidget {
       ),
     );
   }
+
+  /// The Mind & Mood partner article, surfaced here.
+  ///
+  /// ⚠️ DELIBERATELY NOT STYLED AS A "MENTAL HEALTH" CARD. A father opening
+  /// Reads is not looking for a wellbeing section, and labelling it that way
+  /// is the quickest way to make him scroll past the one thing here most
+  /// likely to change how a hard week goes at home.
+  Widget _partnerSupportCard(BuildContext context) => GestureDetector(
+        onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+            settings: const RouteSettings(name: 'mind_mood_partner_support'),
+            builder: (_) => MmArticleScreen(article: kMmPartnerArticle))),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: const EdgeInsets.all(18),
+          decoration: BoxDecoration(
+            color: kFCard,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: kFLine),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('FOR HER', style: _eyebrow(kFAccent)),
+            const SizedBox(height: 8),
+            Text(kMmPartnerArticle.title.now,
+                style: fatherSerif(19, weight: FontWeight.w600)),
+            const SizedBox(height: 6),
+            Text(
+                'What she may be feeling, what actually helps, and the five '
+                'things worth not saying.',
+                style: _body(13, c: kFMuted)),
+            const SizedBox(height: 12),
+            Text('4 MIN READ', style: _eyebrow(kFMuted)),
+          ]),
+        ),
+      );
 
   Widget _talesCard(BuildContext context) => GestureDetector(
         onTap: () => Navigator.of(context).push(MaterialPageRoute(

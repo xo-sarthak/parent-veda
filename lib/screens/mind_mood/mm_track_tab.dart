@@ -32,6 +32,11 @@ class _MmTrackTabState extends State<MmTrackTab> {
   final _journalCtrl = TextEditingController();
   String? _activePromptId;
 
+  /// ⚠️ THE ID BEING EDITED, OR NULL FOR A NEW ENTRY. One text field serves
+  /// both, because a separate edit screen would mean two places that can save
+  /// a journal entry and two places to get the safety-signal check right.
+  String? _editingId;
+
   @override
   void dispose() {
     _journalCtrl.dispose();
@@ -41,9 +46,15 @@ class _MmTrackTabState extends State<MmTrackTab> {
   void _save(V2Palette p) {
     final text = _journalCtrl.text;
     if (text.trim().isEmpty) return;
-    final signal = _store.addJournalEntry(text, promptId: _activePromptId);
+    final editing = _editingId;
+    final signal = editing == null
+        ? _store.addJournalEntry(text, promptId: _activePromptId)
+        : _store.updateJournalEntry(editing, text);
     _journalCtrl.clear();
-    setState(() => _activePromptId = null);
+    setState(() {
+      _activePromptId = null;
+      _editingId = null;
+    });
     FocusScope.of(context).unfocus();
     if (signal) {
       // A gentle, dismissible offer - never a trap, and it never repeats her
@@ -195,9 +206,51 @@ class _MmTrackTabState extends State<MmTrackTab> {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 20, vertical: 12)),
                 onPressed: () => _save(p),
-                child: const Text('Save'),
+                child: Text(_editingId == null ? 'Save' : 'Save changes'),
               ),
             ),
+            // ⚠️ A WAY OUT OF AN EDIT, and it has to exist. Without it the
+            // only escape from editing an old entry is to save it or to
+            // delete it, and both are changes she did not want to make.
+            if (_editingId != null)
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () => setState(() {
+                    _editingId = null;
+                    _journalCtrl.clear();
+                  }),
+                  child: Text('Cancel',
+                      style: pvManrope(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w700,
+                          color: p.ink3)),
+                ),
+              ),
+            // ⚠️ AN EMPTY JOURNAL RENDERS AN INVITATION, NOT NOTHING.
+            // Previously the whole block was behind `entries.isNotEmpty`, so a
+            // mother with no entries saw the box, saved one, and only then
+            // discovered the app had been keeping them. The repo rule is that
+            // a feature is never hidden and an empty section advertises
+            // itself; here it also does a second job, which is telling her
+            // what happens to what she writes before she writes it.
+            if (entries.isEmpty) ...[
+              const SizedBox(height: 22),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: p.surfaceAlt,
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Text(
+                    'Nothing written yet. Anything you save stays on this '
+                    'phone, and you can come back and change or delete it '
+                    'whenever you want.',
+                    style: pvManrope(
+                        fontSize: 12.5, height: 1.5, color: p.ink2)),
+              ),
+            ],
             if (entries.isNotEmpty) ...[
               const SizedBox(height: 26),
               Text('Earlier entries',
@@ -234,8 +287,38 @@ class _MmTrackTabState extends State<MmTrackTab> {
                           ],
                         ),
                       ),
+                      // ⚠️ EDIT SITS BEFORE DELETE, and the order is not
+                      // arbitrary: the two controls are adjacent and one of
+                      // them is irreversible, so the safe one takes the
+                      // position a thumb reaches first.
                       IconButton(
-                        onPressed: () => _store.deleteJournalEntry(e.id),
+                        onPressed: () {
+                          setState(() {
+                            _editingId = e.id;
+                            _activePromptId = null;
+                            _journalCtrl.text = e.text;
+                            _journalCtrl.selection = TextSelection.collapsed(
+                                offset: _journalCtrl.text.length);
+                          });
+                        },
+                        icon: Icon(Icons.edit_outlined,
+                            size: 15, color: p.ink3),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                      const SizedBox(width: 10),
+                      IconButton(
+                        onPressed: () {
+                          // Editing an entry that is then deleted would leave
+                          // her words in the box with nothing to save them to.
+                          if (_editingId == e.id) {
+                            setState(() {
+                              _editingId = null;
+                              _journalCtrl.clear();
+                            });
+                          }
+                          _store.deleteJournalEntry(e.id);
+                        },
                         icon: Icon(Icons.close_rounded, size: 16, color: p.ink3),
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),

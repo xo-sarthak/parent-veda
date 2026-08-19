@@ -17,9 +17,12 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-import '../../data/garbh_data.dart' show kSamvadT1;
+// ⚠️ NO LONGER IMPORTS `garbh_data.dart`. The affirmation card used to draw
+// from `kSamvadT1`, which is Garbh Sanskar Samvad: words spoken TO THE BABY.
+// See the header of `mind_mood_extras.dart` for why that was a boundary
+// violation rather than a content preference.
 import '../../data/mind_mood_data.dart';
-import '../../models/garbh_content.dart' show GarbhPrompt;
+import '../../data/mind_mood_extras.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_placeholders.dart';
 import '../v2/v2_palette.dart';
@@ -54,7 +57,14 @@ class MmFeelTab extends StatelessWidget {
                 fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink3)),
         const SizedBox(height: 10),
         SizedBox(
-          height: 168,
+          // ⚠️ MEASURED, NOT GUESSED. 220 wide gives a 16:9 thumbnail of
+          // ~124, plus 12 top padding, a title line, 5, two capped caption
+          // lines, and 14 bottom padding. 168 was short by most of the
+          // caption, so on every phone Flutter painted its yellow-and-black
+          // overflow stripe across the breathing rail. The caption cap in
+          // `PvVideoPlaceholder` is what makes this number stable rather
+          // than dependent on how long a description happens to be.
+          height: 260,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
             itemCount: kMmBreathingExercises.length,
@@ -520,14 +530,17 @@ class _AffirmationCard extends StatefulWidget {
 
 class _AffirmationCardState extends State<_AffirmationCard> {
   final _rng = Random();
-  GarbhPrompt? _current;
+  MmAffirmation? _current;
 
+  /// ⚠️ NEVER THE SAME ONE TWICE RUNNING. Tapping "another one" and getting
+  /// back the line you just read reads as broken, and on this card it reads
+  /// as the app not listening, which is worse than usual.
   void _draw() {
-    if (kSamvadT1.isEmpty) return;
-    GarbhPrompt next;
+    if (kMmAffirmations.isEmpty) return;
+    MmAffirmation next;
     do {
-      next = kSamvadT1[_rng.nextInt(kSamvadT1.length)];
-    } while (kSamvadT1.length > 1 && next.id == _current?.id);
+      next = kMmAffirmations[_rng.nextInt(kMmAffirmations.length)];
+    } while (kMmAffirmations.length > 1 && next.text.en == _current?.text.en);
     setState(() => _current = next);
   }
 

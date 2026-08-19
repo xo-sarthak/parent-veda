@@ -232,7 +232,20 @@ class PvVideoPlaceholder extends StatelessWidget {
                             color: p.ink1)),
                     if (subtitle != null) ...[
                       const SizedBox(height: 5),
+                      // ⚠️ CAPPED AT TWO LINES. A caption is a caption; one
+                      // that wraps to five is a bug wherever it appears, and
+                      // here it was a real one: inside the Feel tab's
+                      // horizontal video rail the card is fixed-height, so a
+                      // long subtitle overflowed the box by 165px and Flutter
+                      // painted the yellow-and-black stripe over it on a
+                      // phone. Capping is the right fix rather than growing
+                      // the box, because the box is fixed for a good reason
+                      // (a rail whose cards are different heights reads as
+                      // broken) and because five lines of caption was never
+                      // the intent anywhere.
                       Text(subtitle!,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                           style: pvManrope(
                               fontSize: 13, height: 1.45, color: p.ink2)),
                     ],
