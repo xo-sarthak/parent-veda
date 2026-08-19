@@ -42,6 +42,7 @@ class JournalEntry {
     List<String>? imageUrls,
     List<String>? audioUrls,
     this.customTag = '',
+    this.place,
     this.tags = const [],
     this.isAutomatic = false,
     this.isPartner = false,
@@ -67,6 +68,21 @@ class JournalEntry {
   final List<String> imageUrls; // multiple photos (carousel)
   final List<String> audioUrls; // multiple voice notes (carousel)
   final String customTag; // user-named tag for `custom` entries
+
+  /// ⚠️ WHERE IT WAS TAKEN, AS A HUMAN LABEL, AND IT MAY WELL STAY NULL.
+  ///
+  /// The compose screen stamps date, time and place under an entry the way a
+  /// social post does. Date and time are free; place is not - this app has no
+  /// geolocation package at all, so nothing can currently WRITE this field.
+  ///
+  /// It exists anyway, and the reason is worth stating: adding location
+  /// capture is a product decision with a permission prompt, a privacy-policy
+  /// line and a store-listing consequence behind it, not a code task. Having
+  /// the field and the rendering ready means that decision is one package and
+  /// one call site, rather than a model migration on data she has already
+  /// written. A null place simply renders nothing.
+  final String? place;
+
   final List<String> tags;
   final bool isAutomatic;
 
@@ -94,6 +110,7 @@ class JournalEntry {
     List<String>? imageUrls,
     List<String>? audioUrls,
     String? customTag,
+    String? place,
   }) =>
       JournalEntry(
         id: id,
@@ -105,6 +122,7 @@ class JournalEntry {
         imageUrls: imageUrls ?? this.imageUrls,
         audioUrls: audioUrls ?? this.audioUrls,
         customTag: customTag ?? this.customTag,
+        place: place ?? this.place,
         tags: tags,
         isAutomatic: isAutomatic,
         createdAt: createdAt,
@@ -123,6 +141,7 @@ class JournalEntry {
         'imageUrls': imageUrls,
         'audioUrls': audioUrls,
         'customTag': customTag,
+        'place': place,
         'tags': tags,
         'isAutomatic': isAutomatic,
         'createdAt': createdAt.toIso8601String(),
@@ -155,6 +174,7 @@ class JournalEntry {
       imageUrls: j['imageUrls'] == null ? null : strList(j['imageUrls']),
       audioUrls: j['audioUrls'] == null ? null : strList(j['audioUrls']),
       customTag: (j['customTag'] ?? '').toString(),
+      place: j['place']?.toString(),
       tags: strList(j['tags']),
       isAutomatic: j['isAutomatic'] == true,
       createdAt: parse(j['createdAt']),

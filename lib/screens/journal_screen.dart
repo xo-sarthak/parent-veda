@@ -21,6 +21,7 @@ import '../theme/app_theme.dart';
 import '../widgets/journal/journal_create.dart';
 import '../widgets/storage_image.dart';
 import '../theme/pv_fonts.dart';
+import 'journal_compose_screen.dart';
 
 /// Two ways to read the journal: a tidy grouped LIST, or a flip-through BOOKLET.
 enum _JournalView { list, booklet }
@@ -1312,22 +1313,46 @@ class _JournalScreenState extends State<JournalScreen> {
                     borderRadius: BorderRadius.circular(99)),
               ),
               const SizedBox(height: 10),
-              opt(Icons.edit_note_rounded, const Color(0xFFE0921C),
-                  s.jrWriteMemory, () {
+              // ⚠️ FOUR ACTIONS BECAME TWO, AND THE COLLAPSE IS THE POINT.
+              //
+              // "Write a memory" and "Add a photo" were the SAME entry seen
+              // from two ends, and splitting them meant a mother who started
+              // with a photo could not add a sentence and one who started
+              // writing could not attach a picture. One composer takes either
+              // or both. Review: "user either wrote a note and attached pics
+              // to it, or just added pics in this section."
+              //
+              // ⚠️ THE ICON IS NEUTRAL ON PURPOSE. A pencil says "write" and a
+              // camera says "photo", and this action is neither specifically -
+              // so it is a note-add mark that promises no particular medium.
+              opt(Icons.post_add_rounded, const Color(0xFFE0921C),
+                  'Add a memory or note', () {
                 Navigator.pop(ctx);
-                openJournalText(context, p, JournalEntryType.memory);
+                openJournalCompose(context, p);
               }),
-              opt(Icons.favorite_rounded, const Color(0xFF4F7A52),
-                  s.jrNoteForBaby, () {
-                Navigator.pop(ctx);
-                openJournalText(context, p, JournalEntryType.noteForBaby);
-              }),
-              opt(Icons.add_a_photo_rounded, const Color(0xFFFF5A79),
-                  s.jrAddPhoto, () {
-                Navigator.pop(ctx);
-                openJournalAddPhoto(context, p);
-              }),
-              opt(Icons.mic_rounded, const Color(0xFF4A7BC8), s.jrRecordVoice,
+              // ⚠️ "NOTE FOR BABY" IS REMOVED, KEPT FOR REVERT. Removed per
+              // review. The type itself survives in `JournalEntryType` and
+              // existing entries still render - only the way to CREATE a new
+              // one is gone, which is the same treatment the custom tag got
+              // below.
+              //
+              // opt(Icons.favorite_rounded, const Color(0xFF4F7A52),
+              //     s.jrNoteForBaby, () {
+              //   Navigator.pop(ctx);
+              //   openJournalText(context, p, JournalEntryType.noteForBaby);
+              // }),
+              //
+              // ⚠️ "ADD A PHOTO" IS REMOVED, KEPT FOR REVERT. Folded into the
+              // composer above rather than deleted as a capability: photos are
+              // still addable, from a screen that also lets her say something
+              // about them.
+              //
+              // opt(Icons.add_a_photo_rounded, const Color(0xFFFF5A79),
+              //     s.jrAddPhoto, () {
+              //   Navigator.pop(ctx);
+              //   openJournalAddPhoto(context, p);
+              // }),
+              opt(Icons.mic_rounded, const Color(0xFF4A7BC8), 'Add a voice note',
                   () {
                 Navigator.pop(ctx);
                 openJournalRecordVoice(context, p);

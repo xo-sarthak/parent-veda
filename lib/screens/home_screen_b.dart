@@ -29,7 +29,6 @@ import '../data/product_data.dart';
 import '../data/scan_schedule.dart';
 import '../localization/app_language.dart';
 import '../models/home_day.dart';
-import '../models/journal_entry.dart';
 import '../models/journey_node.dart';
 import '../models/medication.dart';
 import '../models/product_models.dart';
@@ -71,6 +70,7 @@ import 'tools/tests_scans_reports_screen.dart';
 import 'watch_learn_screen.dart';
 import 'week_flow_screen.dart';
 import '../theme/pv_fonts.dart';
+import 'journal_compose_screen.dart';
 
 class HomeScreenB extends StatelessWidget {
   const HomeScreenB({super.key, required this.pregnancy, required this.home});
@@ -1556,18 +1556,30 @@ class HomeScreenB extends StatelessWidget {
         ]),
         const SizedBox(height: 16),
         Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          tile(Icons.edit_note_rounded, const Color(0xFFE0921C), s.jrWriteMemory,
-              () => openJournalText(
-                  context, pregnancy, JournalEntryType.memory)),
+          // ⚠️ THE SAME TWO ACTIONS AS THE JOURNAL SCREEN'S SHEET, and they
+          // have to stay the same two. This card and that sheet are the app's
+          // two ways into the journal; if one offers "Note for baby" and the
+          // other does not, the journal has two different feature sets
+          // depending on which door she used.
+          tile(Icons.post_add_rounded, const Color(0xFFE0921C),
+              'Add a memory or note',
+              () => openJournalCompose(context, pregnancy)),
           const SizedBox(width: 8),
-          tile(Icons.favorite_rounded, const Color(0xFF4F7A52), s.jrNoteForBaby,
-              () => openJournalText(
-                  context, pregnancy, JournalEntryType.noteForBaby)),
-          const SizedBox(width: 8),
-          tile(Icons.add_a_photo_rounded, const Color(0xFFFF5A79), s.jrAddPhoto,
-              () => openJournalAddPhoto(context, pregnancy)),
-          const SizedBox(width: 8),
-          tile(Icons.mic_rounded, const Color(0xFF4A7BC8), s.jrRecordVoice,
+          // "Note for baby" and "Add a photo" removed - see the note at the
+          // matching block in journal_screen.dart. Kept for revert:
+          //
+          // ⚠️ REVERTING THE FIRST ONE ALSO NEEDS `import
+          // '../models/journal_entry.dart';` back at the top - it went with
+          // this block, since JournalEntryType had no other use in this file.
+          //
+          // tile(Icons.favorite_rounded, const Color(0xFF4F7A52),
+          //     s.jrNoteForBaby,
+          //     () => openJournalText(
+          //         context, pregnancy, JournalEntryType.noteForBaby)),
+          // tile(Icons.add_a_photo_rounded, const Color(0xFFFF5A79),
+          //     s.jrAddPhoto,
+          //     () => openJournalAddPhoto(context, pregnancy)),
+          tile(Icons.mic_rounded, const Color(0xFF4A7BC8), 'Add a voice note',
               () => openJournalRecordVoice(context, pregnancy)),
           // Custom-tag option removed per the journal cleanup.
         ]),
