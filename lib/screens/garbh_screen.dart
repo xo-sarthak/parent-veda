@@ -15,6 +15,7 @@ import '../data/read_to_baby_data.dart';
 import '../data/spiritual_reading_data.dart';
 import '../localization/app_language.dart';
 import '../models/garbh_content.dart';
+import 'garbh_browse_screen.dart';
 import '../services/garbh_store.dart';
 import '../services/pregnancy_controller.dart';
 import '../services/read_to_baby_saved_store.dart';
@@ -528,6 +529,52 @@ class _MarkComplete extends StatelessWidget {
   }
 }
 
+/// "See all ragas / reflections / things to say / practices."
+///
+/// ⚠️ IT SITS DIRECTLY UNDER MARK COMPLETE, WHICH IS WHERE REVIEW ASKED FOR IT
+/// AND ALSO WHERE IT BELONGS. The daily pillar screens hand her one thing —
+/// today's raga, today's reflection — and that is right for the ritual, but it
+/// silently implies the app only has one. The moment she has finished today's
+/// is exactly the moment "what else is there" is a real question; before that
+/// it is a distraction from the practice she opened the app to do.
+///
+/// ⚠️ AND IT IS QUIET, NOT A BUTTON. Mark Complete is the action on these
+/// screens and it must stay the only filled control; a second solid button
+/// under it would turn a one-decision page into a two-decision page.
+class _SeeAll extends StatelessWidget {
+  const _SeeAll({
+    required this.label,
+    required this.accent,
+    required this.builder,
+  });
+
+  final String label;
+  final Color accent;
+
+  /// ⚠️ NAMED `builder`, NOT `build`. A `StatelessWidget` already has a
+  /// `build` method, so a field of that name does not compile — worth the
+  /// comment because `build:` reads better at the six call sites and someone
+  /// will try it again.
+  ///
+  /// Lazy so the browse list reads `garbh_data.dart` at tap time rather than
+  /// on every rebuild of the pillar page behind it.
+  final Widget Function() builder;
+
+  @override
+  Widget build(BuildContext context) => Align(
+        alignment: Alignment.centerLeft,
+        child: TextButton.icon(
+          onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(
+            settings: const RouteSettings(name: 'garbh/browse'),
+            builder: (_) => builder(),
+          )),
+          style: TextButton.styleFrom(foregroundColor: accent),
+          icon: const Icon(Icons.list_rounded, size: 16),
+          label: Text(label),
+        ),
+      );
+}
+
 class _LearnMore extends StatelessWidget {
   const _LearnMore({required this.controller});
   final PregnancyController controller;
@@ -593,6 +640,10 @@ class ShravanScreen extends StatelessWidget {
               style: text.labelSmall?.copyWith(color: _muted)),
           const SizedBox(height: 16),
           _MarkComplete(pillarId: 'shravan', accent: _accShravan, lang: lang),
+          _SeeAll(
+              label: lang.isHindi ? 'सभी राग देखिए' : 'See all ragas',
+              accent: _accShravan,
+              builder: () => shravanBrowse(lang, _accShravan)),
           _LearnMore(controller: controller),
         ],
       ),
@@ -893,6 +944,10 @@ class _SacredTab extends StatelessWidget {
       children: [
         _insightCard(context, s, ins),
         _MarkComplete(pillarId: 'vichara', accent: _accVichara, lang: lang),
+        _SeeAll(
+            label: lang.isHindi ? 'सभी विचार देखिए' : 'See all reflections',
+            accent: _accVichara,
+            builder: () => vicharaBrowse(lang, _accVichara)),
       ],
     );
   }
@@ -1078,8 +1133,13 @@ class _VicharaReader extends StatelessWidget {
           _WhyCard(label: s.gsReflectMoment, text: story.reflection.now, accent: _accVichara),
           const SizedBox(height: 18),
           // Mark-complete only in DAILY mode (Tools library = no "today's done").
-          if (daily)
+          if (daily) ...[
             _MarkComplete(pillarId: 'vichara', accent: _accVichara, lang: lang),
+            _SeeAll(
+                label: lang.isHindi ? 'सभी विचार देखिए' : 'See all reflections',
+                accent: _accVichara,
+                builder: () => vicharaBrowse(lang, _accVichara)),
+          ],
         ],
       ),
     );
@@ -1262,6 +1322,13 @@ class _SamvadScreenState extends State<SamvadScreen>
                 pillarId: 'samvad',
                 accent: _accSamvad,
                 lang: widget.controller.language),
+            _SeeAll(
+                label: widget.controller.language.isHindi
+                    ? 'सभी संवाद देखिए'
+                    : 'See all things to say',
+                accent: _accSamvad,
+                builder: () =>
+                    samvadBrowse(widget.controller.language, _accSamvad)),
           ],
         );
       },
@@ -1300,6 +1367,13 @@ class _SamvadScreenState extends State<SamvadScreen>
               pillarId: 'samvad',
               accent: _accSamvad,
               lang: widget.controller.language));
+          children.add(_SeeAll(
+              label: widget.controller.language.isHindi
+                  ? 'सभी संवाद देखिए'
+                  : 'See all things to say',
+              accent: _accSamvad,
+              builder: () =>
+                  samvadBrowse(widget.controller.language, _accSamvad)));
         }
         return ListView(
           padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
@@ -1700,6 +1774,10 @@ List<Widget> _kriyaPracticeBody(BuildContext context, S s, TextTheme text,
     if (daily) ...[
       const SizedBox(height: 12),
       _MarkComplete(pillarId: 'kriya', accent: _accKriya, lang: lang),
+      _SeeAll(
+          label: lang.isHindi ? 'सभी अभ्यास देखिए' : 'See all practices',
+          accent: _accKriya,
+          builder: () => kriyaBrowse(lang, _accKriya)),
     ],
   ];
 }

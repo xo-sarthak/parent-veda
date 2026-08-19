@@ -15,7 +15,6 @@ import '../../models/symptom.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/symptom_store.dart';
 import '../../theme/app_theme.dart';
-import '../../widgets/profile_ask_strip.dart';
 import '../../theme/pv_fonts.dart';
 
 const List<BoxShadow> _soft = [
@@ -100,10 +99,33 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 28),
         children: [
-          // Progressive profiling: she is already thinking about her body here,
-          // so this is the natural place to ask what her doctor has flagged.
-          // Asks once, ever - inline, dismissible, never blocking.
-          pregHealthStrip(lang, 'symptom_companion'),
+          // ⚠️ THE "HAS YOUR DOCTOR MENTIONED ANY OF THESE?" STRIP IS OFF HERE,
+          // KEPT FOR REVERT. Removed per review: "we don't want this section at
+          // all."
+          //
+          // The original reasoning is still on the record and was not silly:
+          // she is already thinking about her body on this screen, so it looked
+          // like the natural place to ask. What it missed is WHAT she is
+          // thinking about her body. She opened Symptoms because something
+          // hurts or feels wrong, and the first thing on the page asked her to
+          // catalogue her diagnoses — a question about her medical history
+          // standing between her and the one about right now.
+          //
+          // ⚠️ AND THE SIGNAL IS NOT LOST, WHICH IS WHY THIS IS SAFE TO DROP.
+          // `ProfileField.pregHealth` still has three other ways in: the
+          // Pregnancy Profile screen's full card, the same strip on the weight
+          // tracker and the tests/scans library, and — since the Complications
+          // rebuild — "Add to my journey" on any condition page, which writes
+          // the same `FamilyProfileStore.pregConditions` set. That last one is
+          // strictly better than this strip was: she names a condition on a
+          // page about that condition, having read what it is.
+          //
+          // ⚠️ THE OTHER TWO CALL SITES ARE UNTOUCHED. Review named Symptoms;
+          // `weight_tracker_screen.dart` and `tests_scans_reports_screen.dart`
+          // still show it. Say the word if it should come out everywhere —
+          // this is one line in each.
+          //
+          // pregHealthStrip(lang, 'symptom_companion'),
           // search
           Container(
             decoration: BoxDecoration(

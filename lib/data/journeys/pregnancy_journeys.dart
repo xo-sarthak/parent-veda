@@ -406,7 +406,14 @@ final JourneyConfig kPgBirthPrep = JourneyConfig(
         ),
         JourneyElement(
           type: SolutionType.tool,
-          title: _en('Try it now'),
+          // ⚠️ NAMED, NOT "Try it now" — per review. A card whose title is a
+          // pronoun only works if the thing it refers to is on screen and
+          // unambiguous, and here it sits under a video card that is also
+          // about the timer, so "it" could be either. Naming the tool also
+          // makes the card survive being surfaced anywhere else: search, a
+          // saved list, a notification. A title that only reads correctly in
+          // its original position is a title that will eventually be wrong.
+          title: _en('Try the contraction timer now'),
           value: _en('Open it once today, while nothing is happening. That is '
               'the whole point.'),
           surfaceId: 'contractions',
