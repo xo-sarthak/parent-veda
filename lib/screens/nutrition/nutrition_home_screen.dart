@@ -12,14 +12,23 @@
 //  `V2Palette`, `pvFraunces` / `pvManrope`, outlined-pill buttons, no filled
 //  violet. English only for now — see `nutrition_data.dart`'s header.
 //
-//  ⚠️ INTEGRATION: call `nutritionHomeScreen()` to get the entry widget. This
-//  file does not register a route; the integrator pushes it from wherever
-//  Nutrition is meant to open (Tools hub, a home tile, etc).
+//  ⚠️ INTEGRATION: call `nutritionHomeScreen(pregnancy: ...)` to get the entry
+//  widget. This file does not register a route; the integrator pushes it from
+//  wherever Nutrition is meant to open (Tools hub, a home tile, etc).
+//
+//  ⚠️ IT TAKES THE PREGNANCY CONTROLLER NOW, AND THAT IS NOT PLUMBING FOR ITS
+//  OWN SAKE. Two screens under this one — Cravings and Diet charts — were
+//  rebuilt to answer at HER stage rather than in general, and neither can do
+//  that without her week. The landing itself barely uses it; it is a conduit,
+//  and the alternative (each child reaching for a singleton) is how a screen
+//  ends up impossible to test with a fixed week.
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
+import '../../services/pregnancy_controller.dart';
 import '../../theme/pv_fonts.dart';
+import '../prepare/consultations_screen.dart';
 import '../v2/v2_palette.dart';
 import 'cravings_screen.dart';
 import 'diet_charts_screen.dart';
@@ -30,10 +39,20 @@ import 'nutrition_recipes_screen.dart';
 import 'nutrition_stage_screen.dart';
 
 /// The entry point the integrator routes to.
-Widget nutritionHomeScreen() => const NutritionHomeScreen();
+Widget nutritionHomeScreen({required PregnancyController pregnancy}) =>
+    NutritionHomeScreen(pregnancy: pregnancy);
+
+/// ⚠️ THE NUTRITIONIST THIS SECTION POINTS AT, NAMED ONCE.
+///
+/// Same rule as `kScanConsultRole` on the scans side: the card's words and the
+/// filter it applies are one fact, and a literal at the call site is how they
+/// drift. `sp_nutrition` is the Prenatal Nutritionist in `prepare_data.dart`.
+const String kNutritionConsultRole = 'sp_nutrition';
 
 class NutritionHomeScreen extends StatelessWidget {
-  const NutritionHomeScreen({super.key});
+  const NutritionHomeScreen({super.key, required this.pregnancy});
+
+  final PregnancyController pregnancy;
 
   @override
   Widget build(BuildContext context) {
@@ -112,8 +131,43 @@ class NutritionHomeScreen extends StatelessWidget {
                   title: 'Cravings',
                   blurb: 'Why they happen, and what is worth mentioning.',
                   onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => const CravingsScreen(),
+                    builder: (_) => CravingsScreen(pregnancy: pregnancy),
                   )),
+                ),
+                const SizedBox(height: 20),
+
+                // ---- THE ONE PAID THING, SAID PLAINLY --------------------
+                //
+                // ⚠️ ON THE LANDING SCREEN, NOT BURIED THREE TAPS DOWN.
+                // Review: "consult expert nutritionist to get customized diet
+                // plan should be a clear option on main Nutrition landing
+                // screen." It previously lived only inside
+                // `ExpertOptionsBlock` on the stage screen, which meant the
+                // one thing in this section a mother might actually want to
+                // buy was reachable only by someone already browsing
+                // trimester guidance.
+                //
+                // ⚠️ IT SITS AFTER THE FIVE FREE DOORS, NOT BEFORE THEM. This
+                // section's whole promise is that everything in it is free;
+                // opening with a paid tile would reframe the free content as
+                // a sample of something better. Clear and findable is the
+                // ask — first is not.
+                //
+                // ⚠️ AND IT NAMES WHAT IT IS. "Get a plan built around your
+                // trimester, your condition and what you actually eat" is the
+                // honest difference between this and the fourteen free charts
+                // above it. A vague "talk to an expert" would be selling the
+                // absence of information.
+                _ConsultCard(
+                  p: p,
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                      settings: const RouteSettings(name: 'consults'),
+                      builder: (_) => ConsultationsScreen(
+                          lang: pregnancy.language,
+                          onlyRole: kNutritionConsultRole),
+                    ),
+                  ),
                 ),
                 const SizedBox(height: 20),
                 _GuidanceCard(p: p),
@@ -125,7 +179,7 @@ class NutritionHomeScreen extends StatelessWidget {
                       icon: Icons.receipt_long_rounded,
                       label: 'Diet charts',
                       onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                        builder: (_) => const DietChartsScreen(),
+                        builder: (_) => DietChartsScreen(pregnancy: pregnancy),
                       )),
                     ),
                   ),
@@ -269,6 +323,81 @@ class _Tile extends StatelessWidget {
       ),
     );
   }
+}
+
+/// "Talk to a nutritionist" — the section's one paid door.
+///
+/// ⚠️ IT LOOKS DIFFERENT FROM THE FIVE FREE TILES ON PURPOSE. A paid offer
+/// dressed identically to free content is the shape that makes people
+/// distrust an app: she taps what she thinks is another article and hits a
+/// price. Filled rather than outlined, with the word "Paid" on it, so the
+/// difference is visible before the tap rather than after it.
+class _ConsultCard extends StatelessWidget {
+  const _ConsultCard({required this.p, required this.onTap});
+
+  final V2Palette p;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Material(
+        color: p.action.withValues(alpha: 0.10),
+        borderRadius: BorderRadius.circular(18),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(18),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(16, 15, 14, 16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: p.action.withValues(alpha: 0.30)),
+            ),
+            child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(Icons.person_outline_rounded, size: 22, color: p.action),
+                  const SizedBox(width: 13),
+                  Expanded(
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(children: [
+                            Expanded(
+                              child: Text('Talk to a nutritionist',
+                                  style: pvFraunces(
+                                      fontSize: 17,
+                                      fontWeight: FontWeight.w600,
+                                      color: p.ink1)),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 3),
+                              decoration: BoxDecoration(
+                                color: p.action,
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                              child: Text('PAID',
+                                  style: pvManrope(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w800,
+                                      letterSpacing: 0.8,
+                                      color: p.onAction)),
+                            ),
+                          ]),
+                          const SizedBox(height: 5),
+                          Text(
+                              'A diet plan built around your trimester, any '
+                              'condition you are managing, and what you '
+                              'actually eat at home.',
+                              style: pvManrope(
+                                  fontSize: 13,
+                                  height: 1.45,
+                                  color: p.ink2)),
+                        ]),
+                  ),
+                ]),
+          ),
+        ),
+      );
 }
 
 class _GuidanceCard extends StatelessWidget {

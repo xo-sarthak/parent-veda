@@ -765,7 +765,7 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
         return;
       case kPgActNutritionFlag:
       case kPgActNutritionMain:
-        push(nutritionHomeScreen(), 'nutrition');
+        push(nutritionHomeScreen(pregnancy: pregnancy), 'nutrition');
         return;
       // Mind & Mood replaces the two placeholder mood actions, which used to
       // fall back to the reads library because no mood surface existed.
