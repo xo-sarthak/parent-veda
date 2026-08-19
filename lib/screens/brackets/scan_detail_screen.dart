@@ -79,6 +79,22 @@ import '../tools/tests_scans_reports_screen.dart';
 import '../v2/v2_palette.dart';
 import 'hub/hub_solution_cards.dart';
 
+/// The specialist this screen's consult card promises, as a `Specialist.id`.
+///
+/// ⚠️ THE CARD'S WORDS AND THE FILTER MUST BE THE SAME FACT, and a literal at
+/// the call site is how they drift: someone reworded the card to name a
+/// different expert and nothing would fail — the list would simply open on the
+/// wrong one, silently, forever. Naming the pairing once means the copy and the
+/// filter are edited in the same glance.
+///
+/// `sp_ob` is the Obstetrician in `prepare_data.dart`, which is who "have a
+/// gynaecologist go through it with you" means in this market. If a scan ever
+/// needs a different expert — a paediatrician for a newborn-facing finding, a
+/// counsellor for a result that lands hard — this becomes a map keyed on
+/// `scan.id`, and the card's title should be built from the same entry rather
+/// than written twice.
+const String kScanConsultRole = 'sp_ob';
+
 class ScanDetailScreen extends StatelessWidget {
   const ScanDetailScreen(
       {super.key, required this.scan, required this.pregnancy});
@@ -319,19 +335,61 @@ class ScanDetailScreen extends StatelessWidget {
                     hi: 'ढूँढिए, मतलब समझिए, और जानिए क्या पूछना है।'),
                 p: p,
                 lang: lang,
-                onTap: () => _push(context,
-                    ReportScreen(controller: pregnancy), 'scans/decoder'),
+                // ⚠️ THE FILTER SHE ALREADY ANSWERED. The decoder opens on
+                // "Which report are you holding?" — and she is holding this
+                // one, because she reached the card from inside it. Passing
+                // the scan id lands her on that report's topics with the chip
+                // already lit; "All" and the other eight are untouched beside
+                // it. See ReportScreen.initialReport.
+                onTap: () => _push(
+                    context,
+                    ReportScreen(
+                        controller: pregnancy, initialReport: scan.id),
+                    'scans/decoder'),
               ),
               const SizedBox(height: 26),
 
               // ---- The safety floor ------------------------------------------
+              //
+              // ⚠️ RENAMED, AND THE NEW NAME IS THE CALMER ONE.
+              //
+              // It read "Call before your next appointment if", which review
+              // asked to change to "Call your gynaecologist if" — and the
+              // reason the new one is better is worth keeping: the old heading
+              // was about a DEADLINE. "Before your next appointment" quietly
+              // says *this cannot wait*, which turns a list of things worth a
+              // phone call into a list of things that are already going wrong.
+              // The new heading names who to call instead of how little time
+              // she has, and the lead-in below says the quiet part out loud —
+              // most people never use this list.
+              //
+              // ⚠️ THE ITEMS THEMSELVES ARE UNCHANGED. Softening the frame
+              // around a red flag is right; softening a red flag is not. The
+              // symptoms in `kScanRedFlags` are the safety floor and they stay
+              // exactly as written.
               if (flags.isNotEmpty) ...[
                 _Q(
                     const LocalizedText(
-                        en: 'Call before your next appointment if',
-                        hi: 'अगली appointment से पहले फ़ोन कीजिए अगर'),
+                        en: 'Call your gynaecologist if',
+                        hi: 'अपनी gynaecologist को फ़ोन कीजिए अगर'),
                     p,
                     lang),
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 14),
+                  child: Text(
+                      const LocalizedText(
+                              en: 'Most pregnancies never need this list. It '
+                                  'is here so you know what is worth a phone '
+                                  'call rather than a wait — asking is always '
+                                  'alright.',
+                              hi: 'ज़्यादातर pregnancy में इस सूची की ज़रूरत ही '
+                                  'नहीं पड़ती। यह इसलिए है ताकि आपको पता हो कि '
+                                  'किस बात पर इंतज़ार नहीं, फ़ोन करना बेहतर है — '
+                                  'पूछना हमेशा ठीक है।')
+                          .of(lang),
+                      style: pvManrope(
+                          fontSize: 13.5, height: 1.55, color: p.ink2)),
+                ),
                 for (final f in flags) ...[
                   Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                     Container(
@@ -373,8 +431,24 @@ class ScanDetailScreen extends StatelessWidget {
                     hi: 'वे बताती हैं कि scan क्या कहता है और क्या नहीं।'),
                 p: p,
                 lang: lang,
-                onTap: () =>
-                    _push(context, ConsultationsScreen(lang: lang), 'consults'),
+                // ⚠️ THE CARD NAMES AN EXPERT, SO THE LIST OPENS ON THAT
+                // EXPERT. `ConsultationsScreen.onlyRole` has existed for this
+                // exact purpose since the review that created it — this call
+                // site simply never passed it, which is the wiring gate in
+                // miniature: correct code, reachable screen, and the two not
+                // joined. The symptom only ever reaches the mother, who is
+                // told "have a gynaecologist go through it with you", taps,
+                // and lands on five specialists with the gynaecologist not
+                // first among them.
+                //
+                // Read `kScanConsultRole` rather than a literal so the pairing
+                // is stated once; if a scan ever routes to someone else, that
+                // is a line in the map, not a second hardcoded id here.
+                onTap: () => _push(
+                    context,
+                    ConsultationsScreen(
+                        lang: lang, onlyRole: kScanConsultRole),
+                    'consults'),
               ),
               const SizedBox(height: 26),
 

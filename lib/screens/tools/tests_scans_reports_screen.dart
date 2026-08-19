@@ -332,32 +332,44 @@ class TestScanDetailScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
         children: [
-          _DetailHeader(
-              icon: Icons.biotech_rounded,
-              title: info.name.now,
-              subtitle: info.altName?.now,
-              badge: info.tag.badge.now),
-          const SizedBox(height: 16),
-          // ⚠️ WHEN SHE ARRIVES HERE TO READ A REPORT, THE REPORT SECTION IS
-          // THE ONE THAT IS OPEN.
+          // ⚠️ WHEN SHE ARRIVES HERE TO READ A REPORT, THE PAGE STARTS AT THE
+          // PARAMETERS AND NOTHING SITS ABOVE THEM.
           //
-          // Review: "remove all sections from it apart from Understanding your
-          // report parameters, and by default show it opened."
+          // Review, second pass: "this section should only start from
+          // understanding your report parameters. Everything written above it
+          // should be removed."
           //
-          // Taken as: when this screen is reached from the "Every reading on the
-          // report, explained" card, the parameter table is open and the other
-          // five sections are collapsed. They are not deleted, because someone
-          // arriving from the Tools tab BEFORE a scan wants exactly those five —
-          // what it is, why, when, how to prepare, what happens. Same screen,
-          // two arrivals, and the arrival decides what is already open.
-          _ExpandableSection(
-              title: S.now.uiWhat,
-              body: info.whatItIs.now,
-              initiallyOpen: !openParameters),
-          _ExpandableSection(title: S.now.uiWhySDone, body: info.why.now),
-          _ExpandableSection(title: S.now.uiWhen, body: info.when.now),
-          _ExpandableSection(title: S.now.uiPreparation, body: info.preparation.now),
-          _ExpandableSection(title: S.now.uiProcedure, body: info.procedure.now),
+          // The first pass read that as *collapse* the five preparation
+          // sections, which was too timid and the review came back. Collapsed
+          // is not removed: she still arrives to a screen whose first five
+          // rows are about a day that has already happened, and has to scroll
+          // past all of them — and past a header restating a scan name the app
+          // bar is already showing — to reach the paper in her hand. So on
+          // this arrival they do not render at all.
+          //
+          // ⚠️ THEY ARE NOT DELETED, AND THAT IS THE POINT OF THE FLAG. Someone
+          // arriving from the Tools tab BEFORE a scan wants exactly those five
+          // — what it is, why, when, how to prepare, what happens — so the
+          // default arrival is untouched. One screen, two arrivals, and the
+          // arrival decides what exists rather than merely what is open.
+          if (!openParameters) ...[
+            _DetailHeader(
+                icon: Icons.biotech_rounded,
+                title: info.name.now,
+                subtitle: info.altName?.now,
+                badge: info.tag.badge.now),
+            const SizedBox(height: 16),
+            _ExpandableSection(
+                title: S.now.uiWhat,
+                body: info.whatItIs.now,
+                initiallyOpen: true),
+            _ExpandableSection(title: S.now.uiWhySDone, body: info.why.now),
+            _ExpandableSection(title: S.now.uiWhen, body: info.when.now),
+            _ExpandableSection(
+                title: S.now.uiPreparation, body: info.preparation.now),
+            _ExpandableSection(
+                title: S.now.uiProcedure, body: info.procedure.now),
+          ],
           // Renamed per the review, from 'Understanding Your Report'. It never
           // explained the report — it explained each PARAMETER on it, one at a
           // time, which is a different and narrower thing. The title now says

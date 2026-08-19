@@ -69,7 +69,24 @@ const List<(String, int, int)> kScanRun = [
 ];
 
 /// Where a row sits relative to her.
-enum _Where { done, now, ahead, passed }
+///
+/// ⚠️ FOUR STATES, AND `next` IS THE ONE THAT DID NOT EXIST BEFORE.
+///
+/// The old enum had `now` — "her week falls inside this scan's window" — which
+/// is a fact about the CALENDAR, not about her. It could mark two rows at once
+/// (three windows overlap around week 28), and it marked nothing at all in the
+/// gaps between windows, which is where a mother most wants to know what is
+/// coming. Review: "the scan expected just next should show an animation."
+///
+/// So `next` is computed once for the whole list rather than per row — exactly
+/// one scan can be next, and which one depends on the rows above it. See
+/// `_nextId`.
+///
+///   · done     — she has marked it complete
+///   · next     — the one she is heading for (animated)
+///   · upcoming — after that, not yet due
+///   · passed   — not marked done and its window has gone by
+enum _Where { done, next, upcoming, passed }
 
 class ScanTimelineScreen extends StatelessWidget {
   const ScanTimelineScreen({super.key, required this.pregnancy});
@@ -88,6 +105,11 @@ class ScanTimelineScreen extends StatelessWidget {
         final store = ScansStore.instance;
         final week = pregnancy.currentWeek;
 
+        // ⚠️ COMPUTED ONCE, FOR THE WHOLE LIST. "Next" is the only state here
+        // that a row cannot work out on its own — it depends on every row above
+        // it — which is why it is not inside `_placeOf`.
+        final nextId = _nextId(week, store);
+
         return Scaffold(
           backgroundColor: p.ground,
           appBar: AppBar(
@@ -105,7 +127,9 @@ class ScanTimelineScreen extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(18, 6, 18, 40),
             children: [
               _WhereYouAre(pregnancy: pregnancy, p: p, lang: lang),
-              const SizedBox(height: 22),
+              const SizedBox(height: 14),
+              _Legend(p: p, lang: lang),
+              const SizedBox(height: 18),
               Container(
                 clipBehavior: Clip.antiAlias,
                 decoration: BoxDecoration(
@@ -119,7 +143,7 @@ class ScanTimelineScreen extends StatelessWidget {
                       scan: _byId(id),
                       from: from,
                       to: to,
-                      where: _placeOf(id, from, to, week, store),
+                      where: _placeOf(id, from, to, week, store, nextId),
                       booked: _bookedFor(id, store),
                       p: p,
                       lang: lang,
@@ -148,11 +172,42 @@ class ScanTimelineScreen extends StatelessWidget {
   /// ⚠️ `done` beats everything. A scan she has marked complete is complete even
   /// if her week says it is still ahead — her record outranks our arithmetic,
   /// which is the truth hierarchy in one line.
-  _Where _placeOf(String id, int from, int to, int week, ScansStore store) {
+  _Where _placeOf(
+      String id, int from, int to, int week, ScansStore store, String? nextId) {
     if (store.isCompleted(id)) return _Where.done;
-    if (week >= from && week <= to) return _Where.now;
-    if (week < from) return _Where.ahead;
-    return _Where.passed;
+    if (id == nextId) return _Where.next;
+    if (to < week) return _Where.passed;
+    return _Where.upcoming;
+  }
+
+  /// The one scan she is heading for, or null when every scan is done.
+  ///
+  /// ⚠️ THE RULE, AND THE TWO IT BEATS.
+  ///
+  /// Next is the first scan she has not marked done **whose window has not
+  /// already gone by** — read in clinical order, which `kScanRun` already
+  /// holds. Two simpler rules were wrong:
+  ///
+  ///   · "first not-done" alone points at a scan from ten weeks ago the moment
+  ///     she forgets to log one. The timeline would then spend the rest of the
+  ///     pregnancy animating a row she has walked past, and the one thing on
+  ///     the screen that is supposed to say *go here next* would be pointing
+  ///     backwards.
+  ///   · "the one whose window contains this week" marks two rows at once —
+  ///     `growth_scan` (28–36) and `doppler` (30–40) overlap for eight weeks —
+  ///     and marks none at all in the gaps, which is exactly when she is asking.
+  ///
+  /// The fallback matters too: if every remaining scan's window has passed,
+  /// the earliest unfinished one is still the honest answer to "what next",
+  /// so it is returned rather than leaving the list with nothing marked.
+  String? _nextId(int week, ScansStore store) {
+    String? fallback;
+    for (final (id, _, to) in kScanRun) {
+      if (store.isCompleted(id)) continue;
+      fallback ??= id;
+      if (to >= week) return id;
+    }
+    return fallback;
   }
 
   /// Her booked appointment for this scan, when she has one.
@@ -281,7 +336,7 @@ class _TimelineRow extends StatelessWidget {
     final s = scan;
     if (s == null) return const SizedBox.shrink();
 
-    final isNow = where == _Where.now;
+    final isNext = where == _Where.next;
     final isDone = where == _Where.done;
     // Kept for revert - the price line is commented out below:
     //   final cost = kScanCost[s.id];
@@ -292,7 +347,11 @@ class _TimelineRow extends StatelessWidget {
         settings: const RouteSettings(name: 'scans/detail'),
         builder: (_) => ScanDetailScreen(scan: s, pregnancy: pregnancy),
       )),
-      child: Padding(
+      // ⚠️ THE NEXT ROW IS TINTED, NOT JUST BADGED. A badge alone reads as a
+      // label on an otherwise identical row; the wash is what makes the row
+      // itself look different when the page is scanned rather than read.
+      child: Container(
+        color: isNext ? p.action.withValues(alpha: 0.05) : null,
         padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -306,12 +365,32 @@ class _TimelineRow extends StatelessWidget {
                   Text(s.name.of(lang),
                       style: pvFraunces(
                           fontSize: 15.5,
-                          fontWeight: FontWeight.w600,
+                          // Next is the heaviest thing in the list; done is the
+                          // lightest. Weight carries the state for anyone who
+                          // cannot separate the dot colours.
+                          fontWeight:
+                              isNext ? FontWeight.w700 : FontWeight.w600,
                           height: 1.25,
                           color: isDone ? p.ink3 : p.ink1)),
                   const SizedBox(height: 3),
                   Text(_en('Week $from–$to').of(lang),
                       style: pvManrope(fontSize: 12, color: p.ink3)),
+                  // ⚠️ THE PASSED STATE SAYS "not marked", NEVER "missed".
+                  //
+                  // We do not know that she skipped it — we know only that
+                  // nothing was logged, and those are different facts. "Missed
+                  // your NT scan" is a small accusation built on a gap in our
+                  // own record, and it would be wrong for every mother who had
+                  // the scan and never opened this screen. The neutral wording
+                  // is also the true one.
+                  if (where == _Where.passed) ...[
+                    const SizedBox(height: 5),
+                    Text(_en('Not marked as done').of(lang),
+                        style: pvManrope(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w600,
+                            color: p.ink3)),
+                  ],
                   // Her own booking outranks the window — if she has a date,
                   // that is the answer to "when", not the range.
                   if (b != null) ...[
@@ -340,21 +419,31 @@ class _TimelineRow extends StatelessWidget {
                 ],
               ),
             ),
-            if (isNow)
+            // ⚠️ ONLY TWO STATES CARRY A CHIP, ON PURPOSE.
+            //
+            // "Upcoming" is the default and the majority of the list — chipping
+            // it would put a badge on almost every row and leave the two that
+            // matter with nothing to stand out against. Absence is the third
+            // state, and the legend above says so out loud rather than leaving
+            // her to infer it.
+            if (isNext || isDone)
               Container(
                 margin: const EdgeInsets.only(top: 2),
                 padding:
                     const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
                 decoration: BoxDecoration(
-                  color: p.action.withValues(alpha: 0.10),
+                  color: isNext
+                      ? p.action
+                      : p.action.withValues(alpha: 0.10),
                   borderRadius: BorderRadius.circular(999),
                 ),
-                child: Text(_en('NOW').of(lang),
+                child: Text(
+                    (isNext ? _en('NEXT UP') : _en('DONE')).of(lang),
                     style: pvManrope(
                         fontSize: 9,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.0,
-                        color: p.action)),
+                        color: isNext ? p.onAction : p.action)),
               ),
           ],
         ),
@@ -369,38 +458,240 @@ class _TimelineRow extends StatelessWidget {
   }
 }
 
-/// The dot on the rail. Filled = done, ringed = now, hollow = ahead.
-class _Station extends StatelessWidget {
+/// The dot on the rail.
+///
+///   · done     — filled, with a tick
+///   · next     — filled, with a slow halo pinging out of it
+///   · upcoming — hollow, quiet outline
+///   · passed   — hollow, dashed-looking (a lighter outline), quiet
+///
+/// ⚠️ THE ANIMATION IS A HALO, NOT A BLINK — and the review asked for exactly
+/// that distinction ("not blink, but like some animation"). A blink is an alarm:
+/// it appears and disappears, so the eye is pulled back every cycle and the row
+/// reads as a warning. A halo expanding out of a dot that never leaves is an
+/// *arrow* — it says "here", stays legible if you look away, and settles into
+/// the page rather than fighting it. That is the whole difference between
+/// pointing at the next scan and worrying her about it.
+class _Station extends StatefulWidget {
   const _Station({required this.where, required this.p});
 
   final _Where where;
   final V2Palette p;
 
   @override
+  State<_Station> createState() => _StationState();
+}
+
+class _StationState extends State<_Station>
+    with SingleTickerProviderStateMixin {
+  /// ⚠️ CREATED FOR EVERY ROW, DRIVEN ONLY FOR THE NEXT ONE.
+  ///
+  /// A controller cannot be conditionally created — `initState` runs before we
+  /// know whether a later rebuild will make this row the next one — so it is
+  /// always constructed and only ever *repeated* while the row is next. An idle
+  /// `AnimationController` schedules no frames, so the eight rows that are not
+  /// next cost nothing to run.
+  late final AnimationController _c = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1800),
+  );
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _sync();
+  }
+
+  @override
+  void didUpdateWidget(covariant _Station old) {
+    super.didUpdateWidget(old);
+    if (old.where != widget.where) _sync();
+  }
+
+  /// ⚠️ REDUCED MOTION IS HONOURED, AND THE MEANING SURVIVES IT.
+  ///
+  /// With animations disabled the halo is drawn at rest rather than dropped —
+  /// so the ring is still there, still marks the row, and the state is still
+  /// readable. An accessibility setting must never cost her the information;
+  /// it only costs the movement.
+  void _sync() {
+    final wants = widget.where == _Where.next &&
+        !MediaQuery.disableAnimationsOf(context);
+    if (wants && !_c.isAnimating) {
+      _c.repeat();
+    } else if (!wants && _c.isAnimating) {
+      _c.stop();
+      _c.value = 0;
+    }
+  }
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final done = where == _Where.done;
-    final now = where == _Where.now;
+    final p = widget.p;
+    final done = widget.where == _Where.done;
+    final next = widget.where == _Where.next;
+    final passed = widget.where == _Where.passed;
+
+    final dot = Container(
+      width: next ? 18 : 14,
+      height: next ? 18 : 14,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: done || next ? p.action : Colors.transparent,
+        border: Border.all(
+          color: done || next
+              ? p.action
+              : p.ink3.withValues(alpha: passed ? 0.28 : 0.45),
+          width: 2,
+        ),
+      ),
+      child: done ? Icon(Icons.check, size: 9, color: p.onAction) : null,
+    );
 
     return SizedBox(
       width: 28,
       child: Column(
         children: [
           const SizedBox(height: 3),
-          Container(
-            width: now ? 18 : 14,
-            height: now ? 18 : 14,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: done ? p.action : Colors.transparent,
-              border: Border.all(
-                color: done || now ? p.action : p.ink3.withValues(alpha: 0.45),
-                width: now ? 3 : 2,
+          if (!next)
+            dot
+          else
+            // The halo needs room to expand into, and the rail is only 28
+            // wide — so the ping is drawn in a fixed 28×28 box with the dot
+            // centred in it, which keeps every row's text starting at the
+            // same x whether or not it is the next one.
+            SizedBox(
+              width: 28,
+              height: 28,
+              child: AnimatedBuilder(
+                animation: _c,
+                builder: (context, child) {
+                  final t = Curves.easeOut.transform(_c.value);
+                  return Stack(
+                    alignment: Alignment.center,
+                    children: [
+                      // Two rings, half a cycle apart, so the rail reads as a
+                      // steady pulse rather than one ring and a long gap.
+                      _ring(p, t),
+                      _ring(p, (t + 0.5) % 1.0),
+                      child!,
+                    ],
+                  );
+                },
+                child: dot,
               ),
             ),
-            child: done ? Icon(Icons.check, size: 9, color: p.onAction) : null,
-          ),
         ],
       ),
+    );
+  }
+
+  /// One expanding, fading ring. [t] runs 0 → 1 across its life.
+  Widget _ring(V2Palette p, double t) {
+    final size = 18.0 + (10.0 * t);
+    return IgnorePointer(
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: p.action.withValues(alpha: 0.45 * (1 - t)),
+            width: 2,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// -----------------------------------------------------------------------------
+//  The legend — what the three treatments mean, said rather than implied
+// -----------------------------------------------------------------------------
+
+/// ⚠️ WHY A LEGEND AND NOT JUST BETTER DOTS.
+///
+/// The review's ask was that the timeline be "intuitive — what we are trying to
+/// tell". Visual state is only intuitive once you have been told the key: a
+/// filled dot and a hollow dot are obviously *different*, but which one means
+/// done is a guess until something says so. Three words each, once, at the top
+/// removes the guess for the whole page — and it costs one line of height
+/// against nine rows of ambiguity.
+class _Legend extends StatelessWidget {
+  const _Legend({required this.p, required this.lang});
+
+  final V2Palette p;
+  final AppLanguage lang;
+
+  @override
+  Widget build(BuildContext context) => Row(children: [
+        _item(
+            _Dot(filled: true, tick: true, p: p), _en('Done').of(lang)),
+        const SizedBox(width: 16),
+        _item(_Dot(filled: true, haloed: true, p: p), _en('Next').of(lang)),
+        const SizedBox(width: 16),
+        _item(_Dot(p: p), _en('Later').of(lang)),
+      ]);
+
+  Widget _item(Widget dot, String label) => Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          dot,
+          const SizedBox(width: 6),
+          Text(label,
+              style: pvManrope(
+                  fontSize: 11.5, fontWeight: FontWeight.w600, color: p.ink3)),
+        ],
+      );
+}
+
+/// A static miniature of a station dot, for the legend only.
+class _Dot extends StatelessWidget {
+  const _Dot(
+      {this.filled = false, this.tick = false, this.haloed = false, required this.p});
+
+  final bool filled;
+  final bool tick;
+  final bool haloed;
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) {
+    final core = Container(
+      width: 11,
+      height: 11,
+      alignment: Alignment.center,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: filled ? p.action : Colors.transparent,
+        border: Border.all(
+            color: filled ? p.action : p.ink3.withValues(alpha: 0.45),
+            width: 1.6),
+      ),
+      child: tick ? Icon(Icons.check, size: 7, color: p.onAction) : null,
+    );
+    if (!haloed) return SizedBox(width: 16, height: 16, child: Center(child: core));
+    return SizedBox(
+      width: 16,
+      height: 16,
+      child: Stack(alignment: Alignment.center, children: [
+        Container(
+          width: 16,
+          height: 16,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border:
+                Border.all(color: p.action.withValues(alpha: 0.35), width: 1.4),
+          ),
+        ),
+        core,
+      ]),
     );
   }
 }

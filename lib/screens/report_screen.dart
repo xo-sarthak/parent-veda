@@ -53,10 +53,43 @@ const List<(String, String, String)> _kReportFilters = [
   ('gbs', 'GBS swab', 'GBS swab'),
 ];
 
+/// Whether [id] is one of the nine reports this screen can filter by.
+///
+/// ⚠️ EXPORTED SO CALL SITES CAN ASK BEFORE THEY PROMISE. A caller that hands
+/// over an id this screen does not know would silently get the unfiltered
+/// library — the failure would look exactly like the bug the filter exists to
+/// fix, and nothing would report it.
+bool canFilterReport(String id) =>
+    _kReportFilters.any((f) => f.$1 == id);
+
 class ReportScreen extends StatefulWidget {
-  const ReportScreen({super.key, required this.controller});
+  const ReportScreen({super.key, required this.controller, this.initialReport});
 
   final PregnancyController controller;
+
+  /// ⚠️ THE REPORT SHE ARRIVED FROM, PRE-SELECTED.
+  ///
+  /// Review: "when we click on a word on your report you do not recognise, it
+  /// should land with the pre-applied filter on whatever scan we are coming
+  /// from."
+  ///
+  /// This is the same rule `ConsultationsScreen.onlyRole` already holds one
+  /// screen over, and it is worth stating as a rule rather than as two
+  /// features: **where the app already knows the answer to a filter's
+  /// question, it must not ask.** She tapped that card from inside the dating
+  /// scan; "which report are you holding?" is a question we watched her answer
+  /// thirty seconds ago, and asking it again reads as the app not remembering
+  /// what it just did.
+  ///
+  /// ⚠️ AND IT IS A FILTER, NOT A MODE. Every other report stays one tap away
+  /// and "All" is still there — the pre-selection saves her a tap, it never
+  /// takes a choice off the screen. That is the same personalisation line the
+  /// rest of the app holds: order and emphasis may change, structure may not.
+  ///
+  /// An id this screen cannot filter by (a condition rather than a report, or
+  /// a scan with no topics tagged to it) is ignored and she sees everything —
+  /// see `initState`.
+  final String? initialReport;
 
   @override
   State<ReportScreen> createState() => _ReportScreenState();
@@ -74,6 +107,17 @@ class _ReportScreenState extends State<ReportScreen> {
   /// follows is `a feature is never hidden` — filtering narrows what is shown,
   /// it never gates the screen behind a selection.
   final Set<String> _picked = {};
+
+  @override
+  void initState() {
+    super.initState();
+    // ⚠️ SEEDED, THEN OWNED BY HER. This runs once; every tap afterwards is
+    // hers, including clearing it. `initialReport` is where she started, not a
+    // state the screen keeps forcing her back into — which is why it is read
+    // here rather than in `build`.
+    final id = widget.initialReport;
+    if (id != null && canFilterReport(id)) _picked.add(id);
+  }
 
   /// ⚠️ INTERSECTION, NOT EQUALITY — and OR across the picked reports.
   ///
