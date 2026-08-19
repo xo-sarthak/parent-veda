@@ -1,50 +1,72 @@
 // =============================================================================
-//  BsItchingScreen — Area 3, the safety core of Belly & Skin
+//  BsItchingScreen - Area 3, the safety core of Belly & Skin
 // -----------------------------------------------------------------------------
-//  ONE page, two clearly separated parts, per the approved spec:
+//  ⚠️ THIS PAGE IS A SAFETY ROUTE, NOT A SKINCARE ARTICLE, AND EVERY DECISION
+//  BELOW IS DOWNSTREAM OF THAT ONE SENTENCE.
 //
-//    Part 1 — normal pregnancy itching (stretching skin, dryness) and how to
-//             soothe it.
-//    Part 2 — the warning. Intense itching, especially palms and soles, can
-//             signal cholestasis of pregnancy (ICP). Stated plainly, with a
-//             route to her doctor.
+//  Four parts, in the order review set them:
 //
-//  ⚠️ THE WARNING IS VISIBLE, NOT BURIED BELOW THE SOOTHING TIPS. It renders
-//  as its own card directly under the intro, before Part 1's tips — the same
-//  "position carries the urgency, not colour" rule problem_hub_screen.dart's
-//  `_UrgentStrip` uses for red-flag content elsewhere in the app. Warm and
-//  steady, not alarming: no red, no siren iconography, just impossible to
-//  miss.
+//    1. Usually harmless   - stretching skin, dryness. Said first, because it
+//                            is what is happening to nearly every woman who
+//                            opens this page.
+//    2. How to soothe it   - moisturising, gentle bathing, avoiding irritants.
+//    3. THE WARNING        - intense itching, especially palms and soles, can
+//                            signal cholestasis of pregnancy (ICP).
+//    4. Two ways out       - talk to your doctor, and read what ICP actually
+//                            is.
 //
-//  ⚠️ NO PRODUCT ANYWHERE ON THIS PAGE. Its only job is to help and to route
-//  to a doctor — see `kBsItchingWarning*` in belly_skin_data.dart, which
-//  carries no `BsProduct` reference at all, and nothing below constructs one
-//  either. That is enforced by construction (there is no product data to
-//  render), not by a comment discipline.
+//  ⚠️ THE WARNING MOVED BELOW THE TIPS, REVERSING WHAT THIS FILE USED TO DO.
+//  The old arrangement put it directly under the intro on the argument that
+//  position carries urgency. See `kBsItchingWarningTitle` in
+//  belly_skin_data.dart for the full reasoning behind the reversal; the short
+//  version is that this order is how a clinician explains it, and the intro
+//  copy already said "further down this page" while the card sat above.
+//
+//  ⚠️ "LEARN ABOUT ICP" IS NOW A REAL DESTINATION. This screen shipped with an
+//  `onSeeDoctorInfo` seam and a comment saying no complications page existed
+//  among the files that build owned. One does now - `icp_cholestasis` in
+//  `conditions_data.dart` - and the two were never joined. That is the wiring
+//  gate in miniature: the seam was built, the destination was built, and the
+//  page went on offering a bottom sheet that said "call your doctor" because
+//  nobody passed the callback. It no longer depends on a callback at all.
+//
+//  ⚠️ NO PRODUCT ANYWHERE ON THIS PAGE, and it is enforced by construction
+//  rather than by discipline: there is no `BsProduct` data reachable from
+//  here and nothing below builds one. The last soft nudge - a bullet reading
+//  "or the belly oil ritual" - came out with this pass.
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
 import '../../data/belly_skin_data.dart';
+import '../../data/conditions_data.dart';
+import '../../services/pregnancy_controller.dart';
 import '../../localization/app_language.dart';
 import '../../theme/pv_fonts.dart';
 import '../brackets/hub/problem_hub_screen.dart' show HubPill;
 import '../v2/v2_palette.dart';
 import '../../widgets/pv_placeholders.dart';
+import '../conditions/condition_detail_screen.dart';
 import 'bs_article_screen.dart' show BsBlockView;
 
 const _lang = AppLanguage.english;
 
 class BsItchingScreen extends StatelessWidget {
-  const BsItchingScreen({super.key, this.onSeeDoctorInfo});
+  const BsItchingScreen({super.key, this.onSeeDoctorInfo, this.pregnancy});
 
-  /// Optional hand-off to a fuller complications explainer (e.g. a
-  /// Complications/ICP page), when the integrator has one to offer. This
-  /// screen's own job is done without it — the doctor CTA below always works
-  /// on its own — so a null callback degrades to "call your doctor", never to
-  /// a dead tap. See the file header of belly_skin_home_screen.dart for why
-  /// this is a callback rather than a hard import: no such destination
-  /// exists among the files this build owns.
+  /// ⚠️ THREADED IN, NEVER CONSTRUCTED HERE. The ICP page needs a controller,
+  /// and the tempting shortcut - `PregnancyController()` at the call site -
+  /// creates a second, disposable controller holding a placeholder due date.
+  /// It would compile, render, and quietly show her a condition page keyed to
+  /// the wrong week, with a leaked listener behind it. Nullable because this
+  /// screen has a legitimate standalone use in previews.
+  final PregnancyController? pregnancy;
+
+  /// ⚠️ KEPT, BUT NO LONGER LOad-BEARING. It was the seam for a complications
+  /// hand-off that did not exist when this file was written; the ICP page now
+  /// exists and this screen routes to it directly. The parameter stays so a
+  /// host that wants to intercept the doctor action (a booking flow, say) can
+  /// still do so, and so no existing call site breaks.
   final VoidCallback? onSeeDoctorInfo;
 
   @override
@@ -74,30 +96,35 @@ class BsItchingScreen extends StatelessWidget {
           const SizedBox(height: 16),
           Text(kBsItchingIntro.of(_lang),
               style: pvManrope(fontSize: 14.5, height: 1.55, color: p.ink2)),
-          const SizedBox(height: 22),
-
-          // ---- PART 2 FIRST, ON PURPOSE -----------------------------------
-          // Reading order still says "normal, then warning" via the heading
-          // below, but the warning card itself sits here — above the tips —
-          // because position is what makes it unmissable on a scroll. Burying
-          // a real complication under "how to soothe dry skin" would read as
-          // reassurance winning the argument.
-          _WarningCard(p: p, onSeeDoctorInfo: onSeeDoctorInfo),
           const SizedBox(height: 26),
 
-          Text('Is this normal?',
-              style: pvFraunces(
-                  fontSize: 19,
-                  fontWeight: FontWeight.w600,
-                  height: 1.2,
-                  letterSpacing: -0.4,
-                  color: p.ink1)),
-          const SizedBox(height: 12),
-          for (final b in kBsItchingNormal) ...[
+          // ---- 1 · USUALLY HARMLESS ---------------------------------------
+          // Named outright rather than asked as "Is this normal?". The
+          // question form makes her supply the worry; the statement answers it
+          // before she has to.
+          _H('Usually harmless', p),
+          const SizedBox(height: 10),
+          for (final b in kBsItchingHarmless) ...[
             BsBlockView(block: b, p: p),
-            const SizedBox(height: 18),
+            const SizedBox(height: 14),
           ],
-          const SizedBox(height: 4),
+          const SizedBox(height: 12),
+
+          // ---- 2 · HOW TO SOOTHE IT ---------------------------------------
+          _H('How to soothe it', p),
+          const SizedBox(height: 10),
+          for (final b in kBsItchingSoothe) ...[
+            BsBlockView(block: b, p: p),
+            const SizedBox(height: 14),
+          ],
+          const SizedBox(height: 20),
+
+          // ---- 3 · THE WARNING --------------------------------------------
+          _WarningCard(
+              p: p,
+              onSeeDoctorInfo: onSeeDoctorInfo,
+              pregnancy: pregnancy),
+          const SizedBox(height: 20),
           _FootDisclaimer(p: p),
         ],
       ),
@@ -105,10 +132,28 @@ class BsItchingScreen extends StatelessWidget {
   }
 }
 
+/// A section heading, in the section's own type scale.
+class _H extends StatelessWidget {
+  const _H(this.text, this.p);
+  final String text;
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) => Text(text,
+      style: pvFraunces(
+          fontSize: 19,
+          fontWeight: FontWeight.w600,
+          height: 1.2,
+          letterSpacing: -0.4,
+          color: p.ink1));
+}
+
 class _WarningCard extends StatelessWidget {
-  const _WarningCard({required this.p, this.onSeeDoctorInfo});
+  const _WarningCard(
+      {required this.p, this.onSeeDoctorInfo, this.pregnancy});
   final V2Palette p;
   final VoidCallback? onSeeDoctorInfo;
+  final PregnancyController? pregnancy;
 
   @override
   Widget build(BuildContext context) {
@@ -149,6 +194,19 @@ class _WarningCard extends StatelessWidget {
         Text(kBsItchingWarningNote.of(_lang),
             style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
         const SizedBox(height: 16),
+        // ⚠️ TWO ACTIONS, NOT ONE, AND THEY ANSWER DIFFERENT QUESTIONS.
+        //
+        // Review asked for both: "Talk to your doctor." and "Learn about ICP".
+        // A woman reading this card is in one of two states, and a single
+        // button serves only one of them. If she has the symptom, she needs
+        // the fastest route to a person and nothing else. If she is reading
+        // ahead, or has been told the word and does not know what it means,
+        // she needs the explanation - and giving her only "see your doctor"
+        // sends her to Google, which on this particular condition returns
+        // stillbirth statistics.
+        //
+        // ⚠️ THE DOCTOR ACTION IS FIRST AND FILLED; ICP IS SECOND AND QUIET.
+        // Both matter, but only one of them is time-sensitive.
         HubPill(
           label: kBsItchingWarningCta.of(_lang),
           icon: Icons.medical_information_outlined,
@@ -156,8 +214,44 @@ class _WarningCard extends StatelessWidget {
           fullWidth: true,
           onTap: () => _seeDoctor(context),
         ),
+        const SizedBox(height: 8),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: TextButton.icon(
+            onPressed: () => _openIcp(context),
+            style: TextButton.styleFrom(foregroundColor: accent),
+            icon: const Icon(Icons.arrow_forward_rounded, size: 16),
+            label: Text('Learn about ICP',
+                style: pvManrope(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w700,
+                    color: accent)),
+          ),
+        ),
       ]),
     );
+  }
+
+  /// Opens the Complications library's own ICP page.
+  ///
+  /// ⚠️ IT DEGRADES TO THE DOCTOR SHEET RATHER THAN TO A DEAD TAP. `mmm`
+  /// lookups by id return null if the entry is ever renamed, and on this page
+  /// a tap that does nothing is worse than on any other in the app: she has
+  /// just read that her symptom might be a real complication. So a missing
+  /// page falls through to the same "call your doctor today" sheet.
+  void _openIcp(BuildContext context) {
+    final c = pregnancy;
+    final icp = kAllConditions.where((x) => x.id == 'icp_cholestasis');
+    // No controller and no page are both "we cannot show the explainer", and
+    // both fall through to the same place rather than to a dead tap.
+    if (c == null || icp.isEmpty) {
+      _seeDoctor(context);
+      return;
+    }
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      settings: const RouteSettings(name: 'conditions/icp_cholestasis'),
+      builder: (_) => ConditionDetailScreen(entry: icp.first, pregnancy: c),
+    ));
   }
 
   void _seeDoctor(BuildContext context) {

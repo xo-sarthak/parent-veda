@@ -52,7 +52,7 @@ class BellySkinHomeScreen extends StatelessWidget {
     if (area == BsArea.itching) {
       Navigator.of(context).push(MaterialPageRoute<void>(
         settings: const RouteSettings(name: 'belly_skin/itching'),
-        builder: (_) => const BsItchingScreen(),
+        builder: (_) => BsItchingScreen(pregnancy: controller),
       ));
       return;
     }

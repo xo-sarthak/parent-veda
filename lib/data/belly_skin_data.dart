@@ -1064,23 +1064,68 @@ final LocalizedText kBsItchingIntro = _en(
     'part is normal. There is also one warning sign worth knowing, further '
     'down this page.');
 
-final List<BsBlock> kBsItchingNormal = [
+/// ⚠️ SPLIT INTO TWO NAMED LISTS, because the page has two headings and the
+/// review asked for both by name: "Usually harmless" and "How to soothe it".
+///
+/// They used to be one list where the first block had no heading and the
+/// second was called "What soothes it", which rendered as one undifferentiated
+/// run of text under "Is this normal?" - so the page answered "why does this
+/// happen" and "what do I do" in the same breath, and a mother scanning for
+/// the second had to read the first.
+final List<BsBlock> kBsItchingHarmless = [
   BsBlock(paragraphs: [
     _en('As skin stretches and dries out faster than usual, it is common to '
         'feel itchy on the belly, breasts and thighs, especially in the '
         'second and third trimester.'),
+    _en('This kind of itching is mild, comes and goes, and usually settles '
+        'with moisturiser. It is uncomfortable rather than worrying.'),
   ]),
-  BsBlock(heading: _en('What soothes it'), bullets: [
-    _en('A fragrance-free moisturiser or the belly oil ritual, applied '
-        'while skin is still a little damp after a shower'),
+];
+
+final List<BsBlock> kBsItchingSoothe = [
+  BsBlock(bullets: [
+    // ⚠️ THE BELLY OIL REFERENCE IS GONE. The bullet read "a fragrance-free
+    // moisturiser or the belly oil ritual", and the ritual is a product
+    // surface. Review: "absolutely no products on this page, this is a safety
+    // route, not a commerce page." A nudge toward something purchasable is
+    // still a nudge, and on the one page in this section that exists to route
+    // a woman to a doctor it is the wrong instinct even in a soft form.
+    _en('A plain, fragrance-free moisturiser, applied while your skin is '
+        'still a little damp after a bath'),
     _en('Lukewarm water instead of hot, which dries skin out faster'),
+    _en('Avoiding what irritates it: strong soaps, heavily perfumed washes, '
+        'and rough synthetic fabric against the skin'),
     _en('Loose, breathable cotton clothing, especially in Indian heat'),
     _en('A humidifier in the room if the air is very dry'),
   ]),
 ];
 
-/// ⚠️ THE WARNING. Rendered ABOVE the soothing tips on screen, not below, and
-/// with no product anywhere near it. State it plainly.
+/// Kept for revert - the pre-split list, before the page grew two headings.
+// final List<BsBlock> kBsItchingNormal = [ ... ];
+
+/// ⚠️ THE WARNING. No product anywhere near it. State it plainly.
+///
+/// ⚠️ IT RENDERS BELOW THE SOOTHING TIPS NOW, NOT ABOVE, AND THAT IS A
+/// REVERSAL WORTH EXPLAINING.
+///
+/// The old comment here said "rendered ABOVE the soothing tips", on the
+/// argument that position carries urgency and burying a complication under
+/// "how to soothe dry skin" lets reassurance win the argument. That argument
+/// is good and it is not what review asked for.
+///
+/// Two things settled it. First, the review's own order is how a clinician
+/// actually explains this: here is what is almost certainly happening, here is
+/// what helps, and here is the one thing to watch for. Leading with the
+/// complication frightens every woman with ordinary dry skin, which is nearly
+/// all of them.
+///
+/// Second, the page was already contradicting itself. `kBsItchingIntro` says
+/// the warning is "further down this page" while the card was rendering
+/// directly above the tips. The copy was written for this order; only the
+/// layout had drifted.
+///
+/// The urgency is carried by treatment instead: its own heavy-bordered card,
+/// its own heading, and two actions rather than one.
 final LocalizedText kBsItchingWarningTitle = _en(
     'When itching is more than dry skin');
 final LocalizedText kBsItchingWarningBody = _en(
