@@ -59,6 +59,8 @@ const List<TtcSurface> kTtcSurfaces = [
 
   // ---- Body and health ------------------------------------------------------
   TtcSurface('ttc_tests', 'Tests & results', 'Tests aur results'),
+  TtcSurface('ttc_vaccinations', 'Vaccinations before trying',
+      'Koshish se pehle vaccinations'),
   TtcSurface('ttc_nutrition', 'Eating for fertility', 'Fertility ke liye khana'),
   TtcSurface('ttc_supplements', 'Supplements', 'Supplements'),
   TtcSurface('ttc_tracker', 'Daily log', 'Roz ka log'),

@@ -40,6 +40,7 @@ import 'ttc_ritual_screen.dart';
 import 'ttc_supplements_screen.dart';
 import 'ttc_tests_screen.dart';
 import 'ttc_treatment_screen.dart';
+import 'ttc_vaccines_screen.dart';
 
 /// The prefix that opens a long-form read.
 ///
@@ -107,6 +108,12 @@ Widget? _ttcStaticSurface(String id) => switch (id) {
 
       // ---- Body and health ---------------------------------------------------
       'ttc_tests' => const TtcTestsScreen(),
+      // ⚠️ SEPARATE FROM `ttc_tests`, DELIBERATELY. That screen is the
+      // fertility work-up library — AMH, HSG, semen analysis. Vaccination is a
+      // different errand at a different moment with a different consequence
+      // (a live vaccine delays trying; a blood test never does). Folding it in
+      // would bury the one item on the preconception list that has a deadline.
+      'ttc_vaccinations' => const TtcVaccinesScreen(),
       'ttc_nutrition' => const TtcNutritionScreen(),
       'ttc_supplements' => const TtcSupplementsScreen(),
       // `ttc_tracker` is deliberately absent: `TtcTrackerScreen` requires a

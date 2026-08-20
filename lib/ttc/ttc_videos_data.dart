@@ -238,6 +238,65 @@ final List<PvVideoSlot> kTtcVideos = [
     readNext: ['ttc_read_ivf_explained'],
     surfaceNext: ['ttc_treatment'],
   ),
+
+  // ---------------------------------------------------------------------------
+  //  Getting ready
+  // ---------------------------------------------------------------------------
+  PvVideoSlot(
+    id: 'ttc_vid_three_months_before',
+    hue: 104,
+    title: _en('Why three months, and not three weeks'),
+    why: _en('An egg matures for ninety days and sperm take eleven weeks — '
+        'which is why the window you can influence is open now.'),
+    seconds: 336,
+    expert: _en('Meghna Iyer'),
+    expertRole: _en('Fertility nutritionist'),
+    chapters: [
+      PvVideoChapter(at: 0, label: _en('Where the three months comes from')),
+      PvVideoChapter(at: 72, label: _en('Folic acid, and the two doses')),
+      PvVideoChapter(at: 158, label: _en('Weight, in both directions')),
+      PvVideoChapter(at: 244, label: _en('His eleven weeks')),
+    ],
+    takeaways: [
+      _en('What you change today shows up in a cycle about three months '
+          'from now — for both of you.'),
+      _en('Folic acid has to be in your body before the neural tube closes, '
+          'which is often before a period is missed.'),
+      _en('Around five per cent is the weight figure that matters, not a BMI '
+          'target.'),
+    ],
+    readNext: ['ttc_read_three_months_before'],
+    surfaceNext: ['ttc_supplements'],
+  ),
+
+  PvVideoSlot(
+    id: 'ttc_vid_preconception_tests',
+    hue: 104,
+    title: _en('The errands worth doing once'),
+    why: _en('A short blood panel, one screening test that matters more in '
+        'India, and two vaccines that need a month of notice.'),
+    seconds: 318,
+    expert: _en('Dr. Ananya Rao'),
+    expertRole: _en('Gynaecologist · 14 years'),
+    chapters: [
+      PvVideoChapter(at: 0, label: _en('The cheap blood panel')),
+      PvVideoChapter(at: 84, label: _en('Thalassaemia, and why it is a couple '
+          'test')),
+      PvVideoChapter(at: 176, label: _en('Rubella, and the month you have to '
+          'wait')),
+      PvVideoChapter(at: 258, label: _en('The medication review')),
+    ],
+    takeaways: [
+      _en('Thalassaemia screening is recommended for all couples here, '
+          'whatever the family history.'),
+      _en('Rubella and varicella are live vaccines — not immune means the jab '
+          'plus a month before trying.'),
+      _en('Take every tablet you both take to one appointment, including '
+          'ayurvedic and herbal ones.'),
+    ],
+    readNext: ['ttc_read_preconception_tests'],
+    surfaceNext: ['ttc_tests'],
+  ),
 ];
 
 /// The slot lookup the reader is handed.

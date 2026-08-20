@@ -350,11 +350,24 @@ final JourneyConfig kTtcPreconceptionReadiness = JourneyConfig(
     JourneyStep(
       question: _en('What should I be eating, and what should I cut out?'),
       elements: [
+        // ⚠️ WAS `ttc_nutrition` TYPED AS A READ, AND IT IS NOT ONE.
+        // That surface is a day-by-day eating planner — genuinely useful, and
+        // not an answer to "what should I change before we start". A planner
+        // says what to eat on Thursday; the read says why the three months
+        // matter at all. Both now appear, each as what it actually is.
         JourneyElement(
           type: SolutionType.read,
-          title: _en('Eating before pregnancy'),
-          value: _en('What to add, what to cut back on, and what actually '
-              "matters versus what's just advice."),
+          title: _en('The three months before'),
+          value: _en('Why this window, what folic acid is doing, and how much '
+              'weight really matters — for both of you.'),
+          meta: _en('9 MIN'),
+          surfaceId: 'ttc_read/ttc_read_three_months_before',
+        ),
+        JourneyElement(
+          type: SolutionType.tool,
+          title: _en('Eating, day to day'),
+          value: _en('The planner, built around what an Indian kitchen '
+              'already cooks.'),
           surfaceId: 'ttc_nutrition',
         ),
       ],
@@ -362,11 +375,30 @@ final JourneyConfig kTtcPreconceptionReadiness = JourneyConfig(
     JourneyStep(
       question: _en('What tests and vaccinations are worth doing first?'),
       elements: [
+        // ⚠️ THE VACCINATION HALF OF THIS DID NOT EXIST ANYWHERE IN TTC until
+        // now — a grep for rubella, MMR or "vaccin" across the whole stage
+        // returned nothing, while the workbook names it in this bracket's
+        // Content cell. `ttc_tests` is the fertility-workup library and never
+        // covered it.
         JourneyElement(
           type: SolutionType.read,
-          title: _en('The pre-pregnancy checklist'),
-          value: _en('Blood tests, vaccinations and screenings worth '
-              'getting done before, not after.'),
+          title: _en('The tests and vaccinations worth doing first'),
+          value: _en('Including two vaccines that need a month of notice, and '
+              'one screening test that matters more in India.'),
+          meta: _en('8 MIN'),
+          surfaceId: 'ttc_read/ttc_read_preconception_tests',
+        ),
+        JourneyElement(
+          type: SolutionType.tool,
+          title: _en('Check your vaccinations'),
+          value: _en('Which to ask for by name, and whether anything means '
+              'waiting a month before you start.'),
+          surfaceId: 'ttc_vaccinations',
+        ),
+        JourneyElement(
+          type: SolutionType.tool,
+          title: _en('The full test library'),
+          value: _en('Every test, when to take it, and what it costs here.'),
           surfaceId: 'ttc_tests',
         ),
       ],
