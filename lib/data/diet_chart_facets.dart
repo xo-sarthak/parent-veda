@@ -44,6 +44,7 @@
 // =============================================================================
 
 import '../localization/app_language.dart';
+import 'diet_chart_content.dart';
 
 LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
 
@@ -281,7 +282,38 @@ const Map<String, ChartFacets> kChartFacets = {
   // defined by what it excludes (onion, garlic, root vegetables), which is
   // exactly what the diet axis is for, and it spans several regions.
   'regional_jain': ChartFacets(diet: ChartDiet.jain),
+
+  // The four written to stand behind filter values that had nothing behind
+  // them. See the note beside them in `nutrition_data.dart`.
+  'anaemia_chart': ChartFacets(condition: ChartCondition.anaemia),
+  'postpartum_chart': ChartFacets(stage: ChartStage.postpartum),
+  'eggetarian_chart': ChartFacets(diet: ChartDiet.eggetarian),
+  'regional_north_indian': ChartFacets(region: ChartRegion.northIndian),
 };
 
-ChartFacets facetsFor(String chartId) =>
-    kChartFacets[chartId] ?? const ChartFacets();
+/// ⚠️ `inHindi` IS OVERRIDDEN HERE, AND THE HAND-WRITTEN VALUE IS IGNORED.
+///
+/// Eight entries in the table below still carry `inHindi: true`. Every one of
+/// them was false: not a word of Hindi existed anywhere in the section, and the
+/// "In Hindi" filter cheerfully returned eight English charts. Nothing failed —
+/// the filter worked exactly as written.
+///
+/// ⚠️ SO THE FIX IS NOT TO CORRECT EIGHT BOOLEANS. That fixes today and leaves
+/// the mechanism: the next person translates a chart and forgets the flag, or
+/// sets the flag and never translates. `hasHindiContent()` reads the chart's
+/// actual text, so the claim and the content cannot disagree — and a chart
+/// becomes findable in Hindi the moment it is translated, with nobody
+/// remembering to do anything.
+///
+/// The literals are left in place rather than deleted so this comment has
+/// something to point at. They are inert; see `test/diet_chart_facets_test.dart`.
+ChartFacets facetsFor(String chartId) {
+  final base = kChartFacets[chartId] ?? const ChartFacets();
+  return ChartFacets(
+    stage: base.stage,
+    diet: base.diet,
+    condition: base.condition,
+    region: base.region,
+    inHindi: hasHindiContent(chartId),
+  );
+}

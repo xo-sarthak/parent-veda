@@ -23,6 +23,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/data/cravings_data.dart';
 import 'package:parentveda/data/diet_chart_facets.dart';
+import 'package:parentveda/services/diet_chart_pdf.dart';
+import 'package:parentveda/data/diet_chart_content.dart';
 import 'package:parentveda/data/nutrition_data.dart';
 import 'package:parentveda/screens/nutrition/craving_detail_screen.dart';
 import 'package:parentveda/screens/nutrition/cravings_screen.dart';
@@ -50,6 +52,7 @@ Future<void> _pump(WidgetTester t, Widget w) async {
 CravingItem _c(String id) => kCravingItems.firstWhere((x) => x.id == id);
 
 void main() {
+  _dietCharts();
   TestWidgetsFlutterBinding.ensureInitialized();
   SharedPreferences.setMockInitialValues({});
 
@@ -261,17 +264,49 @@ void main() {
     });
 
     test('Hindi is a property of a chart, never a kind of chart', () {
-      // ⚠️ THE CLEAREST SYMPTOM OF THE OLD MODEL. "In Hindi" was a shelf, so a
-      // chart was either Hindi or about a trimester. Now the trimester charts
-      // are themselves available in Hindi.
-      expect(facetsFor('t3_chart').inHindi, isTrue);
-      expect(facetsFor('t3_chart').stage, ChartStage.trimester3);
+      // ⚠️ THIS TEST USED TO ASSERT THE BUG, AND THAT IS THE MOST USEFUL THING
+      // IN THIS FILE.
+      //
+      // It read:
+      //
+      //     expect(facetsFor('t3_chart').inHindi, isTrue);
+      //     expect(hindiOnly.length, greaterThan(1));
+      //
+      // with a comment saying "now the trimester charts are themselves
+      // available in Hindi". They were not. Not one word of Hindi existed
+      // anywhere in the section. Eight charts carried `inHindi: true` because
+      // somebody typed it, and this test then required them to keep carrying
+      // it — so the false claim was not merely unguarded, it was DEFENDED. A
+      // correction would have turned the suite red and looked like a
+      // regression.
+      //
+      // ⚠️ THE GENERAL LESSON: a test written from the same assumption as the
+      // code does not check that assumption, it locks it in. Both were written
+      // in one sitting by someone who believed the same wrong thing, and the
+      // green suite afterwards was evidence of consistency, not correctness.
+      // The way out is not more tests of the same kind — it is a test that
+      // reaches data the author of the claim did not control, which is what
+      // `hasHindiContent` does by reading the chart's actual text.
+      //
+      // What survives, and is genuinely worth guarding: the SHAPE. "In Hindi"
+      // must be a property that coexists with the other axes, not a sixth
+      // shelf that a chart has to choose instead of a trimester.
+      const both = ChartFacets(stage: ChartStage.trimester3, inHindi: true);
+      expect(both.satisfies(const ChartFilter(stage: ChartStage.trimester3)),
+          isTrue);
+      expect(both.satisfies(const ChartFilter(inHindi: true)), isTrue);
+      expect(
+          both.satisfies(
+              const ChartFilter(stage: ChartStage.trimester3, inHindi: true)),
+          isTrue,
+          reason: 'a chart must be able to be a trimester chart AND in Hindi');
 
-      final hindiOnly = kDietCharts
-          .where((c) => facetsFor(c.id).satisfies(const ChartFilter(inHindi: true)))
-          .toList();
-      expect(hindiOnly.length, greaterThan(1),
-          reason: 'more than one chart is available in Hindi');
+      // And the real library agrees about the shape, whatever its coverage:
+      // the Hindi chart is found by the Hindi filter, and it is found by a
+      // filter that asks for nothing in particular.
+      expect(facetsFor('hindi_chart').inHindi, isTrue);
+      expect(
+          facetsFor('hindi_chart').satisfies(const ChartFilter()), isTrue);
     });
 
     test('Jain moved from Region to Diet, where it belongs', () {
@@ -415,6 +450,157 @@ void main() {
       // Same rule as the scans card: the words and the filter are one fact.
       expect(find.text('Prenatal Nutritionist'), findsOneWidget);
       expect(find.text('Obstetrician'), findsNothing);
+    });
+  });
+}
+
+// =============================================================================
+//  Diet charts — a chart has a chart in it, and no filter promises fiction
+// -----------------------------------------------------------------------------
+//  Three defects lived in this section at once, and all three shared one shape:
+//  something claimed more than existed, and nothing could fail.
+//
+//    1. Fifteen charts, none with any content — the screen showed a paragraph
+//       DESCRIBING the chart she could not see.
+//    2. Eight charts flagged `inHindi: true` with no Hindi anywhere.
+//    3. Four filter values with no chart behind them, and because a null facet
+//       means "works for any", tapping "Anaemia" returned every untagged chart
+//       rather than none. A specific question, a confident generic answer.
+//
+//  ⚠️ NONE OF THESE COULD BE CAUGHT BY READING ONE FILE. Each was correct
+//  locally: the facet table was well-formed, the filter logic was right, the
+//  screen rendered. They existed only in the relationship between a claim and
+//  the data behind it, which is what these tests check and nothing else does.
+// =============================================================================
+
+void _dietCharts() {
+  group('every chart has an actual chart in it', () {
+    test('no chart is a title with nothing behind it', () {
+      for (final c in kDietCharts) {
+        final content = kChartContent[c.id];
+        expect(content, isNotNull,
+            reason: '${c.id} has no content, so its page renders a heading '
+                'and an apology');
+        expect(content!.days, isNotEmpty, reason: c.id);
+        expect(content.swaps, isNotEmpty, reason: c.id);
+        expect(content.limits, isNotEmpty, reason: c.id);
+      }
+    });
+
+    test('every day has meals and every meal has food in it', () {
+      for (final e in kChartContent.entries) {
+        for (final d in e.value.days) {
+          expect(d.meals, isNotEmpty, reason: e.key);
+          for (final m in d.meals) {
+            expect(m.items.en.trim(), isNotEmpty, reason: e.key);
+            expect(m.meal.en.trim(), isNotEmpty, reason: e.key);
+          }
+        }
+      }
+    });
+
+    test('no content entry is an orphan', () {
+      // A content entry with no chart is invisible - written, paid for in
+      // review time, and never rendered. The wiring gate, pointed at data.
+      final ids = kDietCharts.map((c) => c.id).toSet();
+      for (final k in kChartContent.keys) {
+        expect(ids, contains(k), reason: '$k has content but no chart');
+      }
+    });
+  });
+
+  group('the Hindi filter cannot lie', () {
+    test('a chart is in Hindi only if its text is', () {
+      // ⚠️ THE POINT IS THE DERIVATION, NOT THE COUNT. `facetsFor` ignores the
+      // hand-written `inHindi` and reads the content, so this asserts the two
+      // agree for every chart rather than pinning a number that would have to
+      // be edited on every translation.
+      for (final c in kDietCharts) {
+        expect(facetsFor(c.id).inHindi, hasHindiContent(c.id), reason: c.id);
+      }
+    });
+
+    test('exactly the translated charts answer a Hindi filter', () {
+      const f = ChartFilter(inHindi: true);
+      final hits =
+          kDietCharts.where((c) => facetsFor(c.id).satisfies(f)).toList();
+      // One today. This assertion is deliberately about identity rather than
+      // count: when the other fourteen are translated they join this list on
+      // their own, and the test that would then need editing is the wrong test.
+      for (final c in hits) {
+        expect(hasHindiContent(c.id), isTrue, reason: c.id);
+      }
+      expect(hits.map((c) => c.id), contains('hindi_chart'));
+    });
+
+    test('the translated chart is translated all the way through', () {
+      // A chart that switches to English on day two is worse than one that
+      // never claimed Hindi, because she has already committed to reading it.
+      final c = kChartContent['hindi_chart']!;
+      expect(c.focus.hi, isNot(c.focus.en));
+      for (final d in c.days) {
+        for (final m in d.meals) {
+          expect(m.items.hi, isNot(m.items.en), reason: d.label.en);
+        }
+      }
+    });
+  });
+
+  group('no filter value promises content that does not exist', () {
+    // ⚠️ THIS IS THE TEST THE SECTION MOST NEEDED AND DID NOT HAVE. An enum
+    // value is free to add and an option is free to render, so a filter's
+    // vocabulary drifts ahead of the library with nobody deciding to
+    // over-promise. Either the content gets written or the value comes out.
+    void axisIsBacked<T>(List<T> values, ChartFilter Function(T) filter) {
+      for (final v in values) {
+        final hits = kDietCharts
+            .where((c) => facetsFor(c.id).satisfies(filter(v)))
+            .where((c) => facetsFor(c.id).specificity(filter(v)) > 0);
+        expect(hits, isNotEmpty,
+            reason: '$v is selectable and no chart is actually about it - '
+                'she would get every untagged chart instead of an answer');
+      }
+    }
+
+    test('every stage has a chart', () {
+      axisIsBacked(ChartStage.values, (v) => ChartFilter(stage: v));
+    });
+    test('every diet has a chart', () {
+      axisIsBacked(ChartDiet.values, (v) => ChartFilter(diet: v));
+    });
+    test('every condition has a chart', () {
+      axisIsBacked(ChartCondition.values, (v) => ChartFilter(condition: v));
+    });
+    test('every region has a chart', () {
+      axisIsBacked(ChartRegion.values, (v) => ChartFilter(region: v));
+    });
+  });
+
+  group('the export is real', () {
+    test('the filename comes from the id, never the title', () {
+      // ⚠️ A TITLE IS LocalizedText. Slugging it would produce a Devanagari
+      // filename in the Hindi build - handled badly by printers and some file
+      // managers, and the same chart would arrive under two names depending on
+      // a setting. `.en` is identity; this is that rule reaching a filename.
+      expect(DietChartPdf.slugForFilename('gestational_diabetes_chart'),
+          'gestational-diabetes-chart');
+      expect(DietChartPdf.slugForFilename('t1_chart'), 't1-chart');
+    });
+
+    test('a doctor note sits only where a clinician owns the decision', () {
+      // Present on the three where a number or a prescription is being managed.
+      // ⚠️ AND ABSENT ELSEWHERE ON PURPOSE: a disclaimer stamped on every
+      // screen is a disclaimer nobody reads on the one screen that needed it.
+      const owed = {
+        'gestational_diabetes_chart',
+        'weight_gain_chart',
+        'regional_jain',
+        'anaemia_chart',
+      };
+      for (final e in kChartContent.entries) {
+        expect(e.value.doctorNote != null, owed.contains(e.key),
+            reason: e.key);
+      }
     });
   });
 }

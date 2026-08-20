@@ -25,7 +25,10 @@
 import 'package:flutter/material.dart';
 
 import '../../data/diet_chart_facets.dart';
+import '../../localization/app_language.dart';
+import '../../data/diet_chart_content.dart';
 import '../../data/nutrition_data.dart';
+import '../../services/diet_chart_pdf.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
@@ -165,6 +168,10 @@ class _DietChartsScreenState extends State<DietChartsScreen> {
                   p: p,
                   chips: [
                     (
+                      // ⚠️ WAS "Available in Hindi" WHILE NOTHING WAS. The
+                      // label is unchanged in meaning and now true, because
+                      // what it filters on is derived from the text rather
+                      // than typed beside it.
                       'Available in Hindi',
                       _filter.inHindi,
                       () => setState(
@@ -456,12 +463,80 @@ class _ChartRow extends StatelessWidget {
   }
 }
 
-class DietChartScreen extends StatelessWidget {
+// =============================================================================
+//  A diet chart, with the chart in it
+// -----------------------------------------------------------------------------
+//  ⚠️ WHAT WAS HERE BEFORE. The title, the one-line description, a grey box
+//  that DESCRIBED the chart — "a breakfast, lunch, one or two snacks and a
+//  dinner for each day" — and a Download button that called an empty function
+//  and raised a snackbar reading "Download starting shortly. It will also be
+//  saved in your account."
+//
+//  So the section had fifteen charts and not one chart. Every screen rendered,
+//  every filter worked, every test passed, and a mother who tapped through
+//  three filters to find the right chart arrived at a paragraph telling her
+//  what the chart she could not see would have contained.
+//
+//  ⚠️ WHY IT SURVIVED SO LONG IS THE INTERESTING PART. The grey box read as
+//  content. It was well-written, it sat where content sits, and it described
+//  something specific. Reviewing this screen, the eye reports "yes, there is a
+//  chart here" — the absence only becomes visible if you ask what she would
+//  actually eat tomorrow. A placeholder written well enough is harder to spot
+//  than no placeholder at all.
+//
+//  ⚠️ AND THE BUTTON WAS THE WORSE HALF. Not dead — dead teaches her the app is
+//  unfinished and she moves on. It CONFIRMED, which sent her to look for a file
+//  that never existed and spent a little of the trust that every other
+//  confirmation in the app depends on.
+// =============================================================================
+
+class DietChartScreen extends StatefulWidget {
   const DietChartScreen({super.key, required this.chart});
   final DietChart chart;
 
   @override
+  State<DietChartScreen> createState() => _DietChartScreenState();
+}
+
+class _DietChartScreenState extends State<DietChartScreen> {
+  bool _busy = false;
+
+  Future<void> _export(ChartContent content) async {
+    if (_busy) return;
+    setState(() => _busy = true);
+    try {
+      final bytes = await DietChartPdf.build(
+        chart: widget.chart,
+        content: content,
+        // ⚠️ `S.current` IS THE SAME SOURCE `.now` READS. Taking the
+        // language from anywhere else would let the PDF come out in a
+        // different language from the screen that produced it.
+        lang: S.current,
+      );
+      if (!mounted) return;
+      if (bytes == null) {
+        // ⚠️ THE ONE CASE WORTH HANDLING LOUDLY. `PdfFontSet` fetches its fonts
+        // over the network and falls back to Helvetica, which carries no
+        // Devanagari — so an offline Hindi export would be a document full of
+        // empty rectangles. She might print that and take it to a doctor.
+        // Saying "not right now" is the honest failure; a blank chart is not.
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text('Could not prepare the file. Please try again on a '
+              'connection.'),
+        ));
+        return;
+      }
+      await DietChartPdf.present(chart: widget.chart, bytes: bytes);
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final chart = widget.chart;
+    final content = kChartContent[chart.id];
+
     return AnimatedBuilder(
       animation: V2PaletteStore.instance,
       builder: (context, _) {
@@ -481,66 +556,106 @@ class DietChartScreen extends StatelessWidget {
           body: SafeArea(
             top: false,
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(18, 4, 18, 32),
+              padding: const EdgeInsets.fromLTRB(18, 4, 18, 40),
               children: [
                 Text(chart.description.now,
                     style: pvManrope(
                         fontSize: 14, height: 1.55, color: p.ink1)),
                 const SizedBox(height: 20),
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(18),
-                  decoration: BoxDecoration(
-                      color: p.surfaceAlt,
-                      borderRadius: BorderRadius.circular(18)),
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(children: [
-                          Icon(Icons.description_outlined,
-                              size: 18, color: p.ink2),
-                          const SizedBox(width: 8),
-                          Text('What this chart covers',
-                              style: pvManrope(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w800,
-                                  color: p.ink1)),
-                        ]),
-                        const SizedBox(height: 10),
-                        Text(
-                            'A week of meals built around this chart\'s focus: '
-                            'a breakfast, lunch, one or two snacks and a dinner '
-                            'for each day, in the same plain, everyday style as '
-                            'the rest of Nutrition.',
-                            style: pvManrope(
-                                fontSize: 13, height: 1.5, color: p.ink2)),
-                      ]),
-                ),
-                const SizedBox(height: 22),
-                SizedBox(
-                  width: double.infinity,
-                  child: OutlinedButton.icon(
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      side: BorderSide(color: p.line, width: 1.2),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(999)),
-                    ),
-                    onPressed: () {
-                      downloadDietChartPlaceholder(chart.id);
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                        content: Text(
-                            'Download starting shortly. It will also be saved in your account.'),
-                      ));
-                    },
-                    icon: Icon(Icons.download_rounded, size: 18, color: p.ink2),
-                    label: Text('Download this chart',
-                        style: pvManrope(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            color: p.ink2)),
+
+                // ⚠️ A CHART WITH NO CONTENT SAYS SO. It cannot happen — a test
+                // asserts every chart has an entry — but the branch exists
+                // rather than a `!`, because the alternative to this paragraph
+                // is a crash on a screen a mother reached looking for food.
+                if (content == null)
+                  _MissingContent(p: p)
+                else ...[
+                  Text(content.focus.now,
+                      style: pvManrope(
+                          fontSize: 13.5, height: 1.6, color: p.ink2)),
+                  const SizedBox(height: 22),
+
+                  for (final d in content.days) _DayCard(day: d, p: p),
+
+                  _ChartList(
+                    title: 'Swaps',
+                    // The line that turns three days into a month, said where
+                    // she will look for it rather than in a footnote.
+                    subtitle: 'Three days is a pattern, not a prescription. '
+                        'These keep it going.',
+                    items: content.swaps,
+                    p: p,
                   ),
-                ),
+                  _ChartList(
+                    title: 'Go easy on',
+                    // ⚠️ NOT "AVOID". Almost nothing in an Indian kitchen is
+                    // forbidden in pregnancy, and a forbidden list produces the
+                    // guilt this whole section exists to reduce.
+                    subtitle: null,
+                    items: content.limits,
+                    p: p,
+                  ),
+
+                  if (content.doctorNote != null) ...[
+                    const SizedBox(height: 22),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(15),
+                      decoration: BoxDecoration(
+                        color: p.surfaceAlt,
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: p.line, width: 1),
+                      ),
+                      child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Icon(Icons.medical_information_outlined,
+                                size: 18, color: p.ink2),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: Text(content.doctorNote!.now,
+                                  style: pvManrope(
+                                      fontSize: 12.5,
+                                      height: 1.55,
+                                      color: p.ink2)),
+                            ),
+                          ]),
+                    ),
+                  ],
+
+                  const SizedBox(height: 26),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        side: BorderSide(color: p.line, width: 1.2),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(999)),
+                      ),
+                      onPressed: _busy ? null : () => _export(content),
+                      icon: _busy
+                          ? SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: p.ink2))
+                          : Icon(Icons.ios_share_rounded,
+                              size: 18, color: p.ink2),
+                      // ⚠️ "SAVE OR SHARE", NOT "DOWNLOAD". One sheet offers
+                      // print, save-as-PDF and send-to-any-app, and on a phone
+                      // "download" names the least likely of the three. The
+                      // mother who wants it on her fridge, the one who wants it
+                      // in her files and the one sending it to her mother-in-law
+                      // on WhatsApp all get what they came for.
+                      label: Text(_busy ? 'Preparing…' : 'Save or share this chart',
+                          style: pvManrope(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: p.ink2)),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -549,3 +664,118 @@ class DietChartScreen extends StatelessWidget {
     );
   }
 }
+
+/// One worked day.
+class _DayCard extends StatelessWidget {
+  const _DayCard({required this.day, required this.p});
+  final ChartDay day;
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        margin: const EdgeInsets.only(bottom: 14),
+        decoration: BoxDecoration(
+          color: p.surfaceAlt,
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 16, 10),
+            child: Text(day.label.now,
+                style: pvFraunces(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: p.ink1)),
+          ),
+          for (final m in day.meals)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 12),
+              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                // Fixed-width meal column so the eye can run down it. She is
+                // looking for "lunch", not reading the day as prose.
+                SizedBox(
+                  width: 86,
+                  child: Text(m.meal.now,
+                      style: pvManrope(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w800,
+                          height: 1.4,
+                          color: p.ink3)),
+                ),
+                Expanded(
+                  child: Text(m.items.now,
+                      style: pvManrope(
+                          fontSize: 13, height: 1.5, color: p.ink1)),
+                ),
+              ]),
+            ),
+          const SizedBox(height: 4),
+        ]),
+      );
+}
+
+class _ChartList extends StatelessWidget {
+  const _ChartList(
+      {required this.title,
+      required this.subtitle,
+      required this.items,
+      required this.p});
+  final String title;
+  final String? subtitle;
+  final List<LocalizedText> items;
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(top: 10),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(title,
+              style: pvFraunces(
+                  fontSize: 16, fontWeight: FontWeight.w600, color: p.ink1)),
+          if (subtitle != null) ...[
+            const SizedBox(height: 4),
+            Text(subtitle!,
+                style: pvManrope(fontSize: 12, height: 1.45, color: p.ink3)),
+          ],
+          const SizedBox(height: 10),
+          for (final t in items)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 9),
+              child:
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Container(
+                  width: 4,
+                  height: 4,
+                  margin: const EdgeInsets.only(top: 8, right: 10),
+                  decoration:
+                      BoxDecoration(color: p.ink3, shape: BoxShape.circle),
+                ),
+                Expanded(
+                  child: Text(t.now,
+                      style: pvManrope(
+                          fontSize: 13, height: 1.55, color: p.ink2)),
+                ),
+              ]),
+            ),
+          const SizedBox(height: 6),
+        ]),
+      );
+}
+
+/// Unreachable while the test below holds, and kept anyway — see its call site.
+class _MissingContent extends StatelessWidget {
+  const _MissingContent({required this.p});
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+            color: p.surfaceAlt, borderRadius: BorderRadius.circular(16)),
+        child: Text(
+            'This chart is still being written. The others in the list are '
+            'ready.',
+            style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
+      );
+}
+

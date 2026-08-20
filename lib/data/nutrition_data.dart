@@ -2171,11 +2171,71 @@ final List<DietChart> kDietCharts = [
         'for balanced pregnancy nutrition.'),
     category: DietChartCategory.regional,
   ),
+
+  // ---------------------------------------------------------------------------
+  //  ⚠️ THESE FOUR EXIST BECAUSE THEIR FILTER VALUES ALREADY DID.
+  //
+  //  `ChartCondition.anaemia`, `ChartStage.postpartum`, `ChartDiet.eggetarian`
+  //  and `ChartRegion.northIndian` were all selectable chips, and not one chart
+  //  carried any of them. Tapping "Anaemia" did not return nothing — which
+  //  would at least have been legible — it returned every UNTAGGED chart,
+  //  because a null facet means "works for any". So she asked a specific
+  //  question and got a confident, generic answer.
+  //
+  //  ⚠️ THE GENERAL SHAPE, WHICH IS WORTH MORE THAN THE FOUR CHARTS: **a filter
+  //  value is a promise that content exists behind it.** An enum is free to
+  //  write and an option is free to render, so the vocabulary of a filter drifts
+  //  ahead of the library without anyone deciding to over-promise. Either the
+  //  content gets written or the value comes out; leaving it is the only wrong
+  //  answer, and it is the default one.
+  //
+  //  `test/nutrition_cravings_charts_test.dart` now fails if any value on any
+  //  axis has no chart behind it, so this cannot drift again.
+  // ---------------------------------------------------------------------------
+  DietChart(
+    id: 'anaemia_chart',
+    title: _en('Anaemia chart'),
+    description: _en('For low haemoglobin — the most common thing picked up '
+        'in an Indian pregnancy. Built around iron you can actually absorb.'),
+    category: DietChartCategory.condition,
+  ),
+  DietChart(
+    id: 'postpartum_chart',
+    title: _en('After delivery chart'),
+    description: _en('The first three months after birth: recovery, milk '
+        'supply, and eating at all when there is no time to.'),
+    category: DietChartCategory.stage,
+  ),
+  DietChart(
+    id: 'eggetarian_chart',
+    title: _en('Eggetarian chart'),
+    description: _en('Vegetarian plus egg — which solves most of what a '
+        'vegetarian pregnancy plate struggles with.'),
+    category: DietChartCategory.diet,
+  ),
+  DietChart(
+    id: 'regional_north_indian',
+    title: _en('North Indian chart'),
+    description: _en('Roti, dal, sabzi and curd across UP, Bihar, Rajasthan '
+        'and Delhi — distinct from the Punjabi chart.'),
+    category: DietChartCategory.regional,
+  ),
 ];
 
-/// A clearly-named stub. Downloading a real PDF is a follow-up piece of work;
-/// this exists so the download button has something honest to call today.
-void downloadDietChartPlaceholder(String chartId) {}
+// ⚠️ `downloadDietChartPlaceholder` HAS BEEN REMOVED, AND THIS NOTE REPLACES IT
+// rather than the usual commented-out block, because there is nothing here
+// worth reverting to: it was `void downloadDietChartPlaceholder(String) {}` —
+// an empty body — and the screen that called it raised a snackbar saying
+// "Download starting shortly. It will also be saved in your account."
+//
+// ⚠️ THE STUB WAS HONESTLY NAMED AND STILL SHIPPED A LIE. Its own doc comment
+// said "a clearly-named stub", and that is exactly why it survived: anyone
+// reading THIS file saw a placeholder correctly labelled, and anyone reading
+// the SCREEN saw a working button with a confirmation. Neither view was wrong;
+// the defect only existed in the gap between them. That is the argument for
+// putting the honesty where the user is rather than where the function is.
+//
+// Charts now generate a real PDF — see `lib/services/diet_chart_pdf.dart`.
 
 // =============================================================================
 //  7. Fasting
