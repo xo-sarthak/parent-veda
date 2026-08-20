@@ -47,7 +47,22 @@ class PvVideoPlaceholder extends StatelessWidget {
     this.slotId,
     this.onTap,
     this.episodeCount = 1,
+    this.flat = false,
   });
+
+  /// Drops the diagonal gradient for a single flat tint and a hairline.
+  ///
+  /// ⚠️ ADDED FOR THE READER, AND OFF BY DEFAULT so no existing screen moves.
+  /// The gradient is right on a hub or a bracket page, where a thumbnail is
+  /// competing with tiles and needs presence. It is wrong at the head of a
+  /// long-form article, where the page is trying to read as editorial and a
+  /// diagonal colour wash is the loudest thing on it — the reviewer's word was
+  /// "gimmicky", and on that surface it is.
+  ///
+  /// ⚠️ ONE COMPONENT WITH TWO SKINS, NOT A SECOND COMPONENT. The whole reason
+  /// this file exists is that placeholders kept being re-rolled per screen; the
+  /// reader growing its own video block would be the fifth one.
+  final bool flat;
 
   /// What the video will be called, set in the type it will actually use.
   final String title;
@@ -125,11 +140,14 @@ class PvVideoPlaceholder extends StatelessWidget {
                   children: [
                     DecoratedBox(
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [tint, deep],
-                        ),
+                        color: flat ? tint : null,
+                        gradient: flat
+                            ? null
+                            : LinearGradient(
+                                begin: Alignment.topLeft,
+                                end: Alignment.bottomRight,
+                                colors: [tint, deep],
+                              ),
                       ),
                     ),
                     // A play control, drawn as the real one will be.
