@@ -16,7 +16,11 @@
 
 import 'package:flutter/material.dart';
 
+import '../../localization/app_language.dart';
+import '../../ttc/ttc_reads_data.dart';
 import '../../ttc/ttc_store.dart';
+import '../../ttc/ttc_videos_data.dart';
+import '../reader/pv_reader_screen.dart';
 import 'ttc_appointments_screen.dart';
 import 'ttc_calendar_screen.dart';
 import 'ttc_can_i_screen.dart';
@@ -31,12 +35,64 @@ import 'ttc_partner_screen.dart';
 import 'ttc_prepare_screen.dart';
 import 'ttc_products_screen.dart';
 import 'ttc_records_screen.dart';
+import 'ttc_strings.dart';
 import 'ttc_ritual_screen.dart';
 import 'ttc_supplements_screen.dart';
 import 'ttc_tests_screen.dart';
 import 'ttc_treatment_screen.dart';
 
-Widget? ttcScreenForSurface(String id) => switch (id) {
+/// The prefix that opens a long-form read.
+///
+/// ⚠️ A PREFIX RATHER THAN ONE CASE PER ARTICLE, and that is the whole point.
+/// The library grows by roughly twenty pieces and every other stage's router
+/// would have grown twenty `case` lines, each of which is a place to typo an id
+/// that then routes nowhere. Here the id IS the lookup: adding an article to
+/// `ttc_reads_data.dart` makes it reachable with no router change at all.
+const String kTtcReadPrefix = 'ttc_read/';
+
+Widget? ttcScreenForSurface(String id) {
+  // ---- long-form reads ------------------------------------------------------
+  if (id.startsWith(kTtcReadPrefix)) {
+    final read = ttcReadById(id.substring(kTtcReadPrefix.length));
+    // Null is a real answer here too — an unknown article id opens nothing
+    // rather than opening the wrong article. `ArticleReaderScreen` (parenting)
+    // does the opposite: handed nothing it renders a sleep piece under whatever
+    // title was tapped, and no fault is reported anywhere.
+    if (read == null) return null;
+    return PvReaderScreen(
+      read: read,
+      // ⚠️ TTC's OWN LANGUAGE FLAG, not the pregnancy `AppLanguage` store. The
+      // two are separate on purpose — this stage is still Hinglish and
+      // pregnancy is Devanagari, and reading the wrong one would render
+      // Devanagari inside a Hinglish shell.
+      lang: TtcLang.instance.hinglish
+          ? AppLanguage.hinglish
+          : AppLanguage.english,
+      resolveVideo: ttcVideoBySlot,
+      readTitle: ttcReadTitle,
+      openRead: (context, readId) =>
+          _push(context, kTtcReadPrefix + readId),
+      openSurface: _push,
+    );
+  }
+
+  return _ttcStaticSurface(id);
+}
+
+/// Pushes another surface from inside the reader.
+///
+/// Lives here rather than in the reader because the reader is stage-neutral and
+/// must not know how any one stage names its routes.
+void _push(BuildContext context, String surfaceId) {
+  final screen = ttcScreenForSurface(surfaceId);
+  if (screen == null) return;
+  Navigator.of(context).push(MaterialPageRoute<void>(
+    settings: RouteSettings(name: surfaceId),
+    builder: (_) => screen,
+  ));
+}
+
+Widget? _ttcStaticSurface(String id) => switch (id) {
       // ---- The cycle spine ---------------------------------------------------
       'ttc_cycle' => const TtcCycleScreen(),
       'ttc_ovulation' => const TtcOvulationScreen(),

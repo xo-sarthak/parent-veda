@@ -66,6 +66,7 @@ import '../v2/v3_daily.dart';
 import '../v2/v3_daily_art.dart';
 import '../v2/v3_hero_chrome.dart';
 import '../v2/v3_hero_field.dart';
+import 'ttc_common.dart';
 import 'ttc_journey_map_screen.dart';
 import 'ttc_profile_screen.dart';
 import 'ttc_strings.dart';
@@ -119,7 +120,11 @@ class TtcHomeV3 extends StatelessWidget {
                   variant: _chapterNumber(chapter)),
             ),
             ListView(
-              padding: EdgeInsets.zero,
+              // ⚠️ ROOM FOR THE NAV AND THE ASK FAB. `ttcBottomInset` is what
+              // every other TTC screen reserves, and V3 shipped without it —
+              // the last rows of this page sat under a floating pill and an
+              // opaque 56px circle. See docs/STILL-OPEN.md §9.4.
+              padding: const EdgeInsets.only(bottom: ttcBottomInset),
               children: [
                 _Hero(
                   today: today,
@@ -287,6 +292,36 @@ class TtcHomeV3 extends StatelessWidget {
                   )),
                 ]),
               ],
+            ),
+
+            // ---- THE NAV ---------------------------------------------------
+            //
+            // ⚠️ V3 SHIPPED WITHOUT ONE, AND THAT WAS THE LARGEST HOLE IN IT.
+            // `TtcTodayScreen` (V1) gets its nav from `TtcPage`; this screen
+            // builds its own Scaffold because the field has to be the page's
+            // surface rather than something inside a gutter — so it inherited
+            // no nav, and Prepare · Tools · Calendar · Community simply did not
+            // exist in V3. Four of five tabs unreachable is not a home.
+            //
+            // ⚠️ THE SAME FIVE TABS AS V1, DELIBERATELY, and not a V3-specific
+            // set. Two reasons, both load-bearing:
+            //
+            //   · This is an A/B toggle. Changing the nav AND the home means a
+            //     reaction to V3 cannot be attributed to either one.
+            //   · CLAUDE.md forbids per-pathway navigation — personalisation
+            //     changes content, ranking and order, never structure. A
+            //     version that navigates differently makes the V1→V3 crossing
+            //     the thing she has to relearn, which is the exact cost this
+            //     stage's shared widgets exist to avoid.
+            //
+            // `TtcBottomNav` is already a free-floating pill positioned in a
+            // Stack, so this is a drop-in rather than a layout change.
+            Positioned(
+              left: 14,
+              right: 14,
+              bottom: 14,
+              child: SafeArea(
+                  top: false, child: TtcBottomNav(active: 0)),
             ),
           ]),
         );

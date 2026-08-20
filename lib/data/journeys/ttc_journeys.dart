@@ -128,12 +128,19 @@ final JourneyConfig kTtcPcosLibrary = JourneyConfig(
     JourneyStep(
       question: _en('How worried should I be?'),
       elements: [
+        // ⚠️ THE FIRST SLOT IN THIS STAGE TO STOP BEING A PLACEHOLDER.
+        // `ttc_read_pcos_cycle` is a real ~1,600-word piece written against the
+        // 2023 ESHRE/ASRM/Monash guideline, and it opens in `PvReaderScreen`.
+        // Its own scale-setter answers this step's question before the first
+        // section — which is why this step points at the whole read rather than
+        // at a fragment of it.
         JourneyElement(
           type: SolutionType.read,
-          title: _en('How common this actually is'),
-          value: _en('PCOS affects roughly 1 in 5 women, and most who have '
-              'it go on to conceive — many without any treatment at all.'),
-          owed: true,
+          title: _en('What PCOS is doing to your cycle'),
+          value: _en('How common it actually is, what the pattern really is, '
+              'and why irregular is not the same as closed.'),
+          meta: _en('8 MIN'),
+          surfaceId: 'ttc_read/ttc_read_pcos_cycle',
         ),
       ],
     ),
