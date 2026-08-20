@@ -200,6 +200,11 @@ final List<GarbhPractice> kKriya = [
       BreathPhase(_t('Breathe out', 'साँस छोड़िए'), 4, 0.5),
       BreathPhase(_t('Rest', 'ठहरिए'), 4, 0.5),
     ],
+    // ⚠️ THE ONLY ONE WITH A WINDOW, AND IT IS THE HOLDS. Box breathing's
+    // cycle includes breath retention, which prenatal guidance asks women to
+    // ease off late in pregnancy when there is less room and less reserve.
+    // 27 is the end of the second trimester.
+    safeToWeek: 27,
   ),
   GarbhPractice(
     id: 'calm',

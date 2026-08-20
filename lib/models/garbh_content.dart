@@ -27,6 +27,7 @@ class GarbhAudio {
     required this.emoji,
     required this.minutes,
     required this.kind,
+    this.asset,
   });
   final String id;
   final LocalizedText title;
@@ -34,6 +35,26 @@ class GarbhAudio {
   final String emoji;
   final int minutes;
   final GarbhKind kind;
+
+  /// ⚠️ THE FILE THIS RAGA ACTUALLY PLAYS. Null means the shared placeholder.
+  ///
+  /// Ten named ragas currently point at one bundled twelve-second tanpura
+  /// loop, because no real recordings exist yet. That is not a code problem
+  /// and it will not be fixed by code - it needs audio.
+  ///
+  /// What this field buys is that fixing it stops being a code change at all.
+  /// Drop a file on R2, put its path here, and that raga plays its own
+  /// recording; everything else - the player, the completion hook, the journal
+  /// entry it writes - already works. Without the field, every real file would
+  /// mean editing the player.
+  ///
+  /// ⚠️ AND IT IS NULLABLE RATHER THAN DEFAULTED TO THE DRONE, so the UI can
+  /// tell the difference. A screen that cannot see which ragas are real cannot
+  /// stop telling a mother that a tanpura is ocean waves.
+  final String? asset;
+
+  /// True once this raga has a recording of its own.
+  bool get hasRealAudio => asset != null;
 }
 
 @immutable
@@ -75,6 +96,8 @@ class GarbhPractice {
     required this.emoji,
     required this.minutes,
     required this.phases,
+    this.safeFromWeek = 1,
+    this.safeToWeek = 42,
   });
   final String id;
   final LocalizedText title;
@@ -82,6 +105,29 @@ class GarbhPractice {
   final String emoji;
   final int minutes;
   final List<BreathPhase> phases; // one breath cycle, looped
+
+  /// ⚠️ THE WEEK WINDOW THIS PRACTICE IS SAFE IN, AND MOST ARE ALL OF IT.
+  ///
+  /// The library was offered unfiltered, which the rebuild spec calls out:
+  /// "filter the whole library by trimester so nothing unsafe is ever
+  /// offered." The honest implementation of that is NOT to invent restrictions
+  /// so the filter looks like it is working - gentle breathing is safe
+  /// throughout pregnancy, and four of these five genuinely are.
+  ///
+  /// What is real: **Box Breathing holds the breath.** Its cycle includes two
+  /// hold phases, and breath retention is the one thing in this set that
+  /// standard prenatal guidance asks women to ease off in the third trimester,
+  /// when there is less room for the diaphragm and less reserve. So that one
+  /// carries a window and the rest do not.
+  ///
+  /// Defaulting to 1..42 means a new practice is safe-everywhere until someone
+  /// says otherwise - which is the wrong default for a medical filter, and the
+  /// right one here, because the alternative is a contributor silently
+  /// narrowing a safe practice by forgetting a field.
+  final int safeFromWeek;
+  final int safeToWeek;
+
+  bool safeAtWeek(int week) => week >= safeFromWeek && week <= safeToWeek;
 }
 
 @immutable

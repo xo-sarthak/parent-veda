@@ -153,7 +153,7 @@ class RagaAudioStore extends ChangeNotifier {
   Duration durationFor(String candidate) =>
       owns(candidate) ? _duration : const Duration(seconds: 12);
 
-  Future<void> _ensure(String next) async {
+  Future<void> _ensure(String next, {required bool loop}) async {
     if (_player != null && _asset == next) return;
 
     // ⚠️ A DIFFERENT ASSET MEANS THE OLD ONE STOPS. Two ragas at once is the
@@ -163,7 +163,12 @@ class RagaAudioStore extends ChangeNotifier {
     await _teardown(keepSleepTimer: true);
 
     final p = AudioPlayer();
-    await p.setReleaseMode(ReleaseMode.loop);
+    // ⚠️ LOOP IS PER-TRACK, NOT A CONSTANT. A raga looping is the feature - it
+    // is ambient sound meant to run under sleep. A JOURNAL RECORDING looping
+    // is a small horror: her own voice, or her mother-in-law's blessing,
+    // repeating forever until she finds the pause button. The caller says
+    // which kind of thing it is handing over.
+    await p.setReleaseMode(loop ? ReleaseMode.loop : ReleaseMode.stop);
     _durSub = p.onDurationChanged.listen((d) {
       if (d > Duration.zero) {
         _duration = d;
@@ -230,9 +235,25 @@ class RagaAudioStore extends ChangeNotifier {
   /// One entry point on purpose: a `play()` and a separate `pause()` is how a
   /// caller ends up deciding which to call from a flag it holds itself, and that
   /// flag is where this whole bug lived.
-  Future<void> toggle(String asset, {String? title}) async {
+  /// Play or pause [asset].
+  ///
+  /// ⚠️ `isFile` IS STATED BY THE CALLER, NEVER SNIFFED FROM THE STRING.
+  ///
+  /// A bundled asset is a relative path (`audio/raga_drone.wav`); a recording
+  /// she made is an absolute device path. It is tempting to tell them apart by
+  /// looking for a leading slash - and that is exactly the check that works on
+  /// Android, fails on Windows drive letters, and fails again the day a path
+  /// arrives URL-encoded. The caller knows which kind of thing it is holding;
+  /// asking it to say so costs one argument and removes a whole class of
+  /// platform-specific bug.
+  ///
+  /// ⚠️ AND `loop` DEFAULTS TO TRUE because the first six years of callers were
+  /// all ragas. A new caller passing neither gets the old behaviour, which is
+  /// the right default for the thing this store was built for.
+  Future<void> toggle(String asset,
+      {String? title, bool isFile = false, bool loop = true}) async {
     try {
-      await _ensure(asset);
+      await _ensure(asset, loop: loop);
       if (title != null) _title = title;
       final p = _player;
       if (p == null) return;
@@ -241,9 +262,12 @@ class RagaAudioStore extends ChangeNotifier {
       } else if (_position > Duration.zero) {
         await p.resume();
       } else {
-        await p.play(AssetSource(asset));
+        await p.play(isFile ? DeviceFileSource(asset) : AssetSource(asset));
       }
     } catch (_) {
+      // ⚠️ A MISSING FILE MUST NOT CRASH THE ALBUM. A recording whose file has
+      // been cleaned up by the OS throws here; the album stays usable and the
+      // row simply does not play.
       _playing = false;
       notifyListeners();
     }
