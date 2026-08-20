@@ -10,17 +10,42 @@
 //  is worth more at every later appointment.
 //
 //  ---------------------------------------------------------------------------
-//  ⚠️ LOCAL-FIRST, AND THE FILE NEVER LEAVES THE PHONE UNTIL IT HAS TO
+//  ⚠️ LOCAL-FIRST, AND NOW ACTUALLY DURABLE
 //  ---------------------------------------------------------------------------
-//  Metadata lives in `shared_preferences`; the file itself stays wherever the
-//  picker put it. Uploading to storage is a SEPARATE, later step
-//  (`uploadAttachments`), and a failed upload keeps the local path rather than
-//  dropping the reference — so a report is never lost to a bad network, it is
-//  only "not durable yet".
+//  Metadata syncs through `CloudSyncedStore`; the FILES go to the private media
+//  bucket via `uploadAttachments(picked, 'report')`. A failed upload keeps the
+//  local path rather than dropping the reference — so a report is never lost to
+//  a bad network, it is only "not durable yet", and [ScanReport.needsBackup]
+//  says so.
 //
-//  That ordering matters more here than in most stores: this is a medical
-//  document a mother photographed once, in a clinic, possibly of a printout she
-//  handed back. There may be no second copy anywhere.
+//  ---------------------------------------------------------------------------
+//  ⚠️ THIS PARAGRAPH USED TO DESCRIBE A SECOND STEP THAT NOBODY EVER TOOK
+//  ---------------------------------------------------------------------------
+//  It read: "Uploading to storage is a SEPARATE, later step
+//  (`uploadAttachments`)". `scan_reports_screen.dart` said the same thing at
+//  its own head — "`uploadAttachments` already handles durability" — and
+//  IMPORTED the file that defines it, for the picker. It never called it. Every
+//  report ever added stored the raw camera path, and this store was the one
+//  store of nineteen with no `CloudSyncedStore` at all.
+//
+//  ⚠️ WHY THIS ONE MATTERS MORE THAN THE OTHER WIRING GATES IN THIS REVIEW.
+//  The paragraph below was already in this file and was already right:
+//
+//      this is a medical document a mother photographed once, in a clinic,
+//      possibly of a printout she handed back. There may be no second copy
+//      anywhere.
+//
+//  So the file that best explained the stakes was the file that failed to act
+//  on them. Nothing looked wrong: reports listed, opened, and survived a
+//  restart, because `shared_preferences` is enough for everything except the
+//  case that matters — a new phone.
+//
+//  ⚠️ AND A COMMENT DESCRIBING FUTURE WORK IS THE COMMON THREAD. Mind & Mood's
+//  booking said "wire this later". The diet chart download said "a clearly-named
+//  stub". This said "a SEPARATE, later step". Each reads, to the next person, as
+//  a decision somebody is tracking. Nobody was. A note about work that has not
+//  happened should name what breaks until it does, or it functions as
+//  reassurance.
 //
 //  ⚠️ THE APP GENERATES THE ID, so a local row and its cloud copy share one
 //  identity and syncing is an idempotent merge rather than a duplicate.
@@ -30,6 +55,9 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'remote/cloud_synced_store.dart';
+import 'remote/storage_service.dart';
 
 /// One file attached to a report.
 class ReportFile {
@@ -55,17 +83,63 @@ class ScanReport {
     required this.id,
     required this.title,
     required this.dateIso,
+    String? reportDateIso,
     this.scanId,
     this.note = '',
     this.files = const [],
-  });
+  }) : reportDateOrNull = reportDateIso;
 
   final String id;
 
   /// What she calls it. Defaults to the scan's name when she picked one.
   final String title;
 
+  /// When she ADDED it. An audit fact, never shown as "the date of the report".
   final String dateIso;
+
+  /// When the report itself is from — the date printed on the paper.
+  ///
+  /// ⚠️ TWO DATES BECAUSE THERE ARE TWO FACTS, and collapsing them was a real
+  /// defect rather than a tidiness question: the list sorted on [dateIso], so a
+  /// mother photographing a stack of old reports filed all of them under today,
+  /// in the order she happened to pick them up. The most useful ordering in a
+  /// medical folder — oldest test to newest — was the one ordering the screen
+  /// could not produce.
+  ///
+  /// ⚠️ NULL FALLS BACK TO [dateIso], WHICH IS WHAT MAKES THIS SAFE TO ADD.
+  /// Every report already stored on a phone has no `reportDateIso` in its JSON,
+  /// and reads back sorting exactly as it did before. No migration, no
+  /// backfill, and nothing moves under her without her doing anything.
+  ///
+  /// ⚠️ AND SHE IS NEVER ASKED FOR IT. "Derive, never ask" — it defaults to
+  /// today at capture, which is right for the common case (a report
+  /// photographed the day it was handed over) and correctable in the editor
+  /// that already exists for the case it is wrong.
+  /// ⚠️ NAMED `reportDateOrNull` AND NOT `_reportDateIso`, WHICH IS NOT
+  /// bikeshedding: the constructor takes `reportDateIso`, and a field whose
+  /// name differs from its parameter only by an underscore trips
+  /// `prefer_initializing_formals` — and an initializing formal cannot be used
+  /// here, because a private named parameter is unusable from another library.
+  /// The honest name also states the thing that matters at every read site:
+  /// this can be null, and [reportDateIso] is the one to use.
+  final String? reportDateOrNull;
+
+  /// The report's own date, falling back to when she added it.
+  String get reportDateIso => reportDateOrNull ?? dateIso;
+
+  /// True while any file is still only on this phone.
+  ///
+  /// ⚠️ DERIVED FROM THE PATHS, NOT STORED AS A FLAG. Same argument as the diet
+  /// charts' Hindi flag, reached independently: a stored "backed up" boolean is
+  /// a claim, and a claim goes stale silently — she signs out, an upload fails,
+  /// the flag keeps saying yes. `StorageService.upload` returns the STORAGE
+  /// path on success and the ORIGINAL LOCAL PATH on failure, so the path itself
+  /// already records the truth and nothing else needs to.
+  ///
+  /// A report with no files at all is metadata, which the cloud blob carries —
+  /// so it is not "unbacked".
+  bool get needsBackup =>
+      files.any((f) => !StorageService.isRemoteRef(f.path));
 
   /// ⚠️ NULLABLE ON PURPOSE. A report does not have to belong to a scan we know
   /// about — she may photograph a blood panel, a referral, or something the
@@ -91,6 +165,7 @@ class ScanReport {
   ScanReport copyWith({
     String? title,
     String? note,
+    String? reportDateIso,
     List<ReportFile>? files,
     String? scanId,
     bool clearScanId = false,
@@ -99,6 +174,7 @@ class ScanReport {
         id: id,
         title: title ?? this.title,
         dateIso: dateIso,
+        reportDateIso: reportDateIso ?? reportDateOrNull,
         scanId: clearScanId ? null : (scanId ?? this.scanId),
         note: note ?? this.note,
         files: files ?? this.files,
@@ -108,6 +184,9 @@ class ScanReport {
         'id': id,
         'title': title,
         'dateIso': dateIso,
+        // Written only when set, so an untouched report keeps the exact JSON
+        // it had before this field existed.
+        if (reportDateOrNull != null) 'reportDateIso': reportDateOrNull,
         'scanId': scanId,
         'note': note,
         'files': files.map((f) => f.toJson()).toList(),
@@ -117,6 +196,7 @@ class ScanReport {
         id: (j['id'] ?? '').toString(),
         title: (j['title'] ?? '').toString(),
         dateIso: (j['dateIso'] ?? '').toString(),
+        reportDateIso: j['reportDateIso']?.toString(),
         scanId: j['scanId']?.toString(),
         note: (j['note'] ?? '').toString(),
         files: (j['files'] as List?)
@@ -127,7 +207,7 @@ class ScanReport {
       );
 }
 
-class ScanReportsStore extends ChangeNotifier {
+class ScanReportsStore extends ChangeNotifier with CloudSyncedStore {
   ScanReportsStore._();
   static final ScanReportsStore instance = ScanReportsStore._();
 
@@ -139,7 +219,18 @@ class ScanReportsStore extends ChangeNotifier {
   /// Newest first — the one she just added is the one she is looking for.
   List<ScanReport> get reports {
     final out = [..._reports];
-    out.sort((a, b) => b.dateIso.compareTo(a.dateIso));
+    // ⚠️ SORTS ON THE REPORT DATE, NOT THE UPLOAD DATE. `reportDateIso` falls
+    // back to `dateIso`, so a library recorded before that field existed keeps
+    // exactly the order it had.
+    //
+    // Ties break on `dateIso` DESCENDING, which matters for the case that
+    // motivated the field: photographing a stack of old reports gives several
+    // rows the same report date, and within that day the most recently added
+    // should sit on top — it is the one she is looking at.
+    out.sort((a, b) {
+      final byReport = b.reportDateIso.compareTo(a.reportDateIso);
+      return byReport != 0 ? byReport : b.dateIso.compareTo(a.dateIso);
+    });
     return List.unmodifiable(out);
   }
 
@@ -170,6 +261,15 @@ class ScanReportsStore extends ChangeNotifier {
       // empty list and can add a report, which is better than a crash on a
       // screen whose whole promise is "your things are safe here".
     }
+    // ⚠️ AFTER THE LOCAL READ, AND ONLY THEN. `syncStateFromCloud` adopts with
+    // "cloud wins", and it also flips the mixin's `_cloudReady` guard — which
+    // exists so the notifyListeners() fired while loading the cache cannot push
+    // an empty local list up and clobber a good cloud copy. Calling it first
+    // would do exactly that on a fresh install, which for this store means
+    // deleting her reports from the cloud on a new phone.
+    try {
+      await syncStateFromCloud();
+    } catch (_) {/* offline — the local cache is still hers */}
   }
 
   Future<void> add(ScanReport r) async {
@@ -202,6 +302,53 @@ class ScanReportsStore extends ChangeNotifier {
       // failure; the benefit is that a full disk never breaks the UI.
     }
   }
+
+  // ---------------------------------------------------------------------------
+  //  CloudSyncedStore — the metadata half of durability
+  // ---------------------------------------------------------------------------
+  //  ⚠️ THIS STORE WAS THE ONLY ONE OF NINETEEN WITHOUT IT, and it held the
+  //  documents a mother is least able to replace.
+  //
+  //  ⚠️ WHY A `user_state` BLOB RATHER THAN A TABLE, given that the parenting
+  //  side gave its reports one (`pp_reports`, migration 0022). A dedicated
+  //  table earns its cost when something QUERIES the rows server-side —
+  //  filtering, joining, an Edge Function reading them. Nothing does here:
+  //  reports are read by exactly one device, the one signed in. A blob through
+  //  the existing mixin therefore needs no migration, no RLS policy and no
+  //  schema to keep in step with the Dart model, which is also the failure mode
+  //  CLAUDE.md warns about — a column-name mismatch fails silently because
+  //  cloud writes are fire-and-forget.
+  //
+  //  If reports ever need to be readable by a partner or a doctor, that is the
+  //  moment for a table, and the id is already app-generated so the move is a
+  //  copy rather than a reconciliation.
+  //
+  //  ⚠️ THE BLOB CARRIES FILE REFERENCES, NEVER FILE BYTES. The bytes go to the
+  //  private media bucket. Putting a photographed report inside a JSON blob
+  //  would be both enormous and the wrong place for a medical image.
+  @override
+  String get cloudKey => 'scan_reports';
+
+  @override
+  Object cloudData() => _reports.map((r) => r.toJson()).toList();
+
+  @override
+  void applyCloudData(Object data) {
+    if (data is! List) return;
+    // ⚠️ REPLACE, NOT MERGE, AND THAT IS THE MIXIN'S CONTRACT RATHER THAN A
+    // CHOICE MADE HERE: `applyCloudData` runs once at sync, before local edits
+    // are allowed to push. Merging would also need a per-row timestamp this
+    // model does not carry, and inventing one to guess at conflicts is worse
+    // than the mixin's rule that the cloud is the truth at sync time.
+    _reports
+      ..clear()
+      ..addAll(data
+          .whereType<Map>()
+          .map((m) => ScanReport.fromJson(m.cast<String, dynamic>())));
+  }
+
+  @override
+  Future<void> persistLocalCache() => _save();
 
   /// Test seam. Never called by the app.
   @visibleForTesting

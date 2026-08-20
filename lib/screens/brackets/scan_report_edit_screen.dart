@@ -59,6 +59,10 @@ class _ScanReportEditScreenState extends State<ScanReportEditScreen> {
   late final TextEditingController _title;
   late final TextEditingController _note;
 
+  /// The report's own date. Seeded from the stored value, which falls back
+  /// to the day she added it.
+  DateTime? _reportDate;
+
   /// The linked scan, held separately from the text so choosing from the list
   /// and typing a name stay independent — see the header.
   String? _scanId;
@@ -81,6 +85,8 @@ class _ScanReportEditScreenState extends State<ScanReportEditScreen> {
     _title = TextEditingController(text: r?.title ?? '')
       ..addListener(_markDirty);
     _note = TextEditingController(text: r?.note ?? '')..addListener(_markDirty);
+    _reportDate =
+        r == null ? null : DateTime.tryParse(r.reportDateIso);
     _scanId = r?.scanId;
   }
 
@@ -209,7 +215,68 @@ class _ScanReportEditScreenState extends State<ScanReportEditScreen> {
           ],
           const SizedBox(height: 24),
 
-          // ---- 3 · A note, because paper does not hold one ----------------
+          // ---- 3 · The date on the paper -----------------------------------
+          //
+          // ⚠️ THE APP STORES TWO DATES AND SHOWS ONE. `dateIso` is when she
+          // added it — an audit fact she has no reason to see. This is the date
+          // printed on the report, and it is what the list sorts on.
+          //
+          // ⚠️ WHY IT IS EDITED HERE AND NOT ASKED AT CAPTURE. Adding a report
+          // is two taps, and a date question in that flow would be a third —
+          // paid by every mother, to fix a case that only arises when she is
+          // photographing something old. "Derive, never ask": it defaults to
+          // today, which is right the overwhelming majority of the time, and
+          // this is where the rest gets corrected.
+          //
+          // Sorting on this is the entire point of the field. Photographing a
+          // stack of old reports used to file all of them under today, in the
+          // order she happened to pick them up.
+          _Label(_en('Date on the report').of(lang), p),
+          const SizedBox(height: 8),
+          InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: () async {
+              final now = DateTime.now();
+              final picked = await showDatePicker(
+                context: context,
+                initialDate: _reportDate ?? now,
+                // ⚠️ NO FUTURE DATES. A report cannot be from next week, and
+                // the mis-tap this prevents is the one that would sort a row to
+                // the top of her list and keep it there.
+                firstDate: DateTime(now.year - 3),
+                lastDate: now,
+              );
+              if (picked == null) return;
+              setState(() {
+                _reportDate = picked;
+                _dirty = true;
+              });
+            },
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: p.surface,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: p.line),
+              ),
+              child: Row(children: [
+                Icon(Icons.event_outlined, size: 18, color: p.ink3),
+                const SizedBox(width: 10),
+                Text(
+                    _reportDate == null
+                        ? 'Pick a date'
+                        : _fmtEditDate(_reportDate!),
+                    style: pvManrope(
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w600,
+                        color: p.ink1)),
+              ]),
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          // ---- 4 · A note, because paper does not hold one ----------------
           //
           // The field already existed on the model and nothing ever wrote to
           // it. It is the natural place for "Dr Rao said recheck in 4 weeks" —
@@ -288,11 +355,23 @@ class _ScanReportEditScreenState extends State<ScanReportEditScreen> {
     await ScanReportsStore.instance.update(r.copyWith(
       title: title,
       note: _note.text.trim(),
+      reportDateIso: _reportDate?.toIso8601String(),
       scanId: _scanId,
       clearScanId: _scanId == null,
     ));
     if (mounted) Navigator.of(context).pop();
   }
+}
+
+/// ⚠️ MONTH NAMES RATHER THAN 03/04/2026. India writes day-first and much of
+/// the world writes month-first, and a report date read the wrong way round is
+/// wrong by up to eleven months on a document a doctor may look at.
+String _fmtEditDate(DateTime d) {
+  const m = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  ];
+  return '${d.day} ${m[d.month - 1]} ${d.year}';
 }
 
 TestScanInfo? _scanById(String id) {

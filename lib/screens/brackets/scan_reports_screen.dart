@@ -12,8 +12,24 @@
 //  reads from, and what she carries to the next appointment.
 //
 //  ⚠️ NO NEW UPLOAD ENGINE — prompt §11. `showAttachmentPicker` already does
-//  camera / gallery / PDF and ships today; `uploadAttachments` already handles
+//  camera / gallery / PDF and ships today; `uploadAttachments` handles
 //  durability. This screen is a list, a picker call and a store.
+//
+//  ⚠️ THAT SECOND SENTENCE USED TO READ "`uploadAttachments` ALREADY HANDLES
+//  DURABILITY" AND IT WAS NOT TRUE. This file imported `pp_attachments.dart`
+//  for the picker, so the function was one line away and in scope, and `_add`
+//  stored `a.path` — the raw camera path — straight into the store. Nothing
+//  was ever uploaded. `scan_reports_store.dart` carried a matching claim at its
+//  own head, so two files documented a call that did not exist.
+//
+//  ⚠️ AND IT WAS INVISIBLE FROM THE APP. Reports listed, opened, and survived a
+//  restart, because `shared_preferences` and a local file path are enough for
+//  every case except the one that matters: a new phone. The failure had no
+//  symptom until the moment there was nothing anyone could do about it.
+//
+//  The general form, which has now shown up four times in one review: **a
+//  comment describing work that has not happened reads as a decision somebody
+//  is tracking.** Nobody was tracking any of them.
 //
 //  KNOWN STYLING DEBT: the picker sheet is styled with `pp_common` (the
 //  parenting palette), so it arrives purple inside a V3 screen. Reusing it is
@@ -46,6 +62,23 @@ class ScanReportsScreen extends StatefulWidget {
 
   @override
   State<ScanReportsScreen> createState() => _ScanReportsScreenState();
+}
+
+/// What the "Which one is this?" sheet settles: a title, and optionally a scan.
+///
+/// ⚠️ TWO FACTS, NOT ONE, AND CONFLATING THEM WAS THE DEFECT. The sheet used to
+/// return `TestScanInfo?`, so "which scan" and "what to call it" were one
+/// answer — and the only way to say "none of these" was null, which stored the
+/// literal title "Report". A mother with four unnamed documents got four rows
+/// reading "Report" and had to open each to tell them apart.
+///
+/// A scan id links into the library; a title is what she calls it. Most reports
+/// in a pregnancy folder — a thyroid panel, a referral letter, a discharge
+/// summary — have the second and not the first.
+class _ReportNaming {
+  const _ReportNaming(this.title, this.scanId);
+  final String title;
+  final String? scanId;
 }
 
 class _ScanReportsScreenState extends State<ScanReportsScreen> {
@@ -149,31 +182,94 @@ class _ScanReportsScreenState extends State<ScanReportsScreen> {
     final picked = await showAttachmentPicker(context);
     if (picked.isEmpty || !context.mounted) return;
 
-    final scan = await _askWhichScan(context);
+    final named = await _askWhichScan(context);
     if (!context.mounted) return;
+
+    // ⚠️ THE LINE THAT WAS MISSING. `uploadAttachments` returns copies pointing
+    // at Storage, and keeps the LOCAL path for anything that fails — signed
+    // out, offline, upload rejected — so a report is never dropped for want of
+    // a network. `ScanReport.needsBackup` reads those paths, which is why the
+    // "on this phone only" line is always true rather than a remembered flag.
+    //
+    // Awaited rather than fired off: a photograph is a few hundred KB, this is
+    // the moment she is already waiting, and the alternative is a row that
+    // claims to be saved while its bytes are still in flight.
+    final stored = await uploadAttachments(picked, 'report');
 
     final now = DateTime.now();
     await ScanReportsStore.instance.add(ScanReport(
       // The app generates the id, so a later cloud copy shares this identity
       // and syncing is a merge rather than a duplicate.
       id: 'rep_${now.microsecondsSinceEpoch}',
-      title: scan?.name.en ?? 'Report',
+      title: named.title,
       dateIso: now.toIso8601String(),
-      scanId: scan?.id,
-      files: picked
+      // ⚠️ DEFAULTED, NEVER ASKED. Today is right for the common case — a
+      // report photographed the day it was handed over — and the editor
+      // corrects the case it is wrong. See `ScanReport.reportDateIso`.
+      reportDateIso: now.toIso8601String(),
+      scanId: named.scanId,
+      files: stored
           .map((a) =>
               ReportFile(path: a.path, name: a.name, isPdf: a.isPdf))
           .toList(),
     ));
   }
 
+  /// Ask her to type a name for something the library does not know.
+  ///
+  /// ⚠️ THE CASE THIS EXISTS FOR IS THE COMMON ONE, NOT THE EDGE ONE. The scan
+  /// list covers the imaging the app knows about; a thyroid panel, a referral
+  /// letter and a discharge summary are none of those, and they are most of
+  /// what accumulates in a pregnancy folder. Skipping the sheet used to store
+  /// the literal title "Report" — so a mother with four unnamed documents saw
+  /// four rows called "Report" and had to open each one to tell them apart.
+  Future<String?> _askName(BuildContext context) async {
+    final p = V2PaletteStore.instance.current;
+    final controller = TextEditingController();
+    final name = await showDialog<String>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: p.ground,
+        title: Text('What is this report?',
+            style: pvFraunces(
+                fontSize: 17, fontWeight: FontWeight.w600, color: p.ink1)),
+        content: TextField(
+          controller: controller,
+          autofocus: true,
+          textCapitalization: TextCapitalization.sentences,
+          style: pvManrope(fontSize: 14, color: p.ink1),
+          decoration: InputDecoration(
+            hintText: 'Thyroid panel, referral letter…',
+            hintStyle: pvManrope(fontSize: 14, color: p.ink3),
+          ),
+          onSubmitted: (v) => Navigator.of(ctx).pop(v.trim()),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: Text('Skip', style: pvManrope(fontSize: 13, color: p.ink3)),
+          ),
+          TextButton(
+            onPressed: () =>
+                Navigator.of(ctx).pop(controller.text.trim()),
+            child: Text('Save',
+                style: pvManrope(
+                    fontSize: 13, fontWeight: FontWeight.w700, color: p.ink1)),
+          ),
+        ],
+      ),
+    );
+    controller.dispose();
+    return (name == null || name.isEmpty) ? null : name;
+  }
+
   /// Optional, and skippable. ⚠️ Naming the scan is a convenience, never a
   /// gate — a report we cannot classify is still a report she needs to keep.
-  Future<TestScanInfo?> _askWhichScan(BuildContext context) async {
+  Future<_ReportNaming> _askWhichScan(BuildContext context) async {
     final p = V2PaletteStore.instance.current;
     final lang = S.current;
 
-    return showModalBottomSheet<TestScanInfo?>(
+    final picked = await showModalBottomSheet<Object?>(
       context: context,
       backgroundColor: p.ground,
       shape: const RoundedRectangleBorder(
@@ -203,13 +299,39 @@ class _ScanReportsScreenState extends State<ScanReportsScreen> {
             const SizedBox(height: 16),
             for (final s in kTestsScans.take(12))
               _pickRow(ctx, s.name.of(lang), () => Navigator.pop(ctx, s), p),
+            // ⚠️ THE ROW THAT WAS MISSING, AND IT IS NOT THE EDGE CASE. The
+            // twelve above are the imaging the app knows about. A thyroid
+            // panel, a referral letter and a discharge summary are none of
+            // them, and together they are most of what accumulates in a folder.
+            _pickRow(ctx, _en('Type a name').of(lang),
+                () => Navigator.pop(ctx, _kTypeName), p),
             _pickRow(ctx, _en('Not sure / something else').of(lang),
                 () => Navigator.pop(ctx, null), p),
           ],
         ),
       ),
     );
+
+    if (!context.mounted) return const _ReportNaming('Report', null);
+
+    if (picked is TestScanInfo) {
+      // ⚠️ `.en`, NOT `.of(lang)`. The title is stored, and a stored value is
+      // identity: saving the Hindi label would file the same scan under two
+      // different names depending on a setting she can change afterwards. Same
+      // rule CLAUDE.md names, in the place it is easiest to get wrong.
+      return _ReportNaming(picked.name.en, picked.id);
+    }
+    if (picked == _kTypeName) {
+      final typed = await _askName(context);
+      // She opened the box and closed it again. That is "skip", not an error.
+      return _ReportNaming(typed ?? 'Report', null);
+    }
+    return const _ReportNaming('Report', null);
   }
+
+  /// Sentinel for the "Type a name" row. A private const object rather than a
+  /// magic string, so nothing can collide with a real value coming back.
+  static const Object _kTypeName = Object();
 
   Widget _pickRow(
           BuildContext ctx, String label, VoidCallback onTap, V2Palette p) =>
@@ -280,8 +402,12 @@ class _ReportRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final d = DateTime.tryParse(report.dateIso);
+    // ⚠️ THE REPORT'S OWN DATE, NOT THE UPLOAD DATE. `reportDateIso` falls back
+    // to `dateIso`, so a library recorded before that field existed reads
+    // exactly as it did.
+    final d = DateTime.tryParse(report.reportDateIso);
     final n = report.files.length;
+    final unsafe = report.needsBackup;
 
     return Material(
       color: p.surface,
@@ -323,6 +449,38 @@ class _ReportRow extends StatelessWidget {
                         '${d == null ? '' : ' · '}'
                         '$n ${n == 1 ? 'file' : 'files'}',
                         style: pvManrope(fontSize: 12, color: p.ink3)),
+
+                    // ---- backup state ---------------------------------------
+                    //
+                    // ⚠️ SHOWN ONLY WHEN IT IS NOT SAFE, AND THAT IS THE WHOLE
+                    // DESIGN. A "Backed up" tick on every row would put a
+                    // status label on every medical document she owns, and turn
+                    // a folder into a dashboard she has to audit. Silence means
+                    // safe; the line appears exactly when there is something to
+                    // know.
+                    //
+                    // ⚠️ IT NAMES THE FACT, NOT THE FEAR. "Only on this phone"
+                    // is what is true. "Not backed up" describes the same state
+                    // as a failure, and on a scan report that reads as "you may
+                    // have lost this" — which is not what it means, and is a
+                    // thing to say to a pregnant woman only when it is true.
+                    //
+                    // ⚠️ AND IT IS DERIVED FROM THE FILE PATHS. Nothing stores
+                    // "backed up" as a flag, so this cannot go stale after she
+                    // signs out. See `ScanReport.needsBackup`.
+                    if (unsafe) ...[
+                      const SizedBox(height: 5),
+                      Row(mainAxisSize: MainAxisSize.min, children: [
+                        Icon(Icons.phone_iphone_rounded,
+                            size: 12, color: p.ink3),
+                        const SizedBox(width: 5),
+                        Text('Only on this phone',
+                            style: pvManrope(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: p.ink3)),
+                      ]),
+                    ],
                   ],
                 ),
               ),

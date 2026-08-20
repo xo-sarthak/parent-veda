@@ -18,6 +18,8 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'dart:io';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -52,6 +54,7 @@ Future<void> _pump(WidgetTester t, Widget w) async {
 }
 
 void main() {
+  _durability();
   TestWidgetsFlutterBinding.ensureInitialized();
   SharedPreferences.setMockInitialValues({});
 
@@ -305,6 +308,241 @@ void main() {
 
       final btn = t.widget<FilledButton>(find.byType(FilledButton));
       expect(btn.onPressed, isNull);
+    });
+  });
+}
+
+// =============================================================================
+//  Durability, dates and names — the three things My Reports quietly lacked
+// -----------------------------------------------------------------------------
+//  ⚠️ THE DEFECT THESE EXIST FOR WAS INVISIBLE FROM THE APP. Reports listed,
+//  opened and survived a restart, because `shared_preferences` plus a local
+//  file path is enough for everything except a new phone. Meanwhile the screen
+//  imported `pp_attachments.dart` (for the picker), never called
+//  `uploadAttachments`, and both this store and that screen carried comments
+//  saying durability was handled.
+//
+//  So there is no test here that could have been written by reading one file.
+//  Each one below crosses a boundary: a claim in a comment against a call that
+//  is or is not made, a stored path against what it means, a load order against
+//  what it would destroy.
+// =============================================================================
+
+void _durability() {
+  group('a report knows whether it is safe', () {
+    test('a file that is really on this disk means not backed up', () {
+      // ⚠️ A REAL FILE, BECAUSE `isRemoteRef` ASKS THE FILESYSTEM. It is
+      // `ref.isNotEmpty && !File(ref).existsSync()` - "not an existing local
+      // file" is what makes something remote. So this needs a path that
+      // genuinely exists, not a plausible-looking camera path.
+      //
+      // ⚠️ MY FIRST VERSION OF THIS TEST ASSERTED THE IMPLEMENTATION BACK AT
+      // ITSELF - `expect(r.needsBackup, r.files.any((f) => !File(f.path)
+      // .existsSync()))` - which is not a test, it is the same expression
+      // twice. It only surfaced because it also happened to be wrong.
+      final dir = Directory.systemTemp.createTempSync('pv_report_test');
+      addTearDown(() => dir.deleteSync(recursive: true));
+      final f = File('${dir.path}/scan.jpg')..writeAsStringSync('x');
+
+      final r = ScanReport(
+        id: 'r1',
+        title: 'Growth scan',
+        dateIso: '2026-08-01T10:00:00.000',
+        files: [ReportFile(path: f.path, name: 'scan.jpg')],
+      );
+      expect(r.needsBackup, isTrue,
+          reason: 'the bytes are still only on this device');
+    });
+
+    test('a storage reference means backed up', () {
+      // What `StorageService.upload` returns on success: `<uid>/<type>/<name>`,
+      // which is not a path on this disk.
+      const r = ScanReport(
+        id: 'r2',
+        title: 'Growth scan',
+        dateIso: '2026-08-01T10:00:00.000',
+        files: [
+          ReportFile(path: 'abc-uid/report/scan.jpg', name: 'scan.jpg'),
+        ],
+      );
+      expect(r.needsBackup, isFalse);
+    });
+
+    test('the known weakness of a path-based signal, stated', () {
+      // ⚠️ A LOCAL FILE THAT HAS BEEN DELETED READS AS "REMOTE", because
+      // `isRemoteRef` cannot tell a storage key from a path to something that
+      // is no longer there. So a report whose photo the OS cleaned up stops
+      // showing "Only on this phone" - it looks safe, and it is gone.
+      //
+      // This is pinned rather than fixed because the fix is worse than the bug
+      // at this size: distinguishing them properly means a marker on
+      // `ReportFile` saying which kind of string it holds, written at upload
+      // time - which is a stored flag, and stored flags are what the derived
+      // signal exists to avoid. If report files ever start disappearing, THIS
+      // is the trade-off to revisit, and the answer is probably to have
+      // `StorageService.upload` return a tagged value rather than a bare
+      // String.
+      const r = ScanReport(
+        id: 'r3',
+        title: 'Gone',
+        dateIso: '2026-08-01T10:00:00.000',
+        files: [
+          ReportFile(path: '/no/such/dir/vanished.jpg', name: 'vanished.jpg'),
+        ],
+      );
+      expect(r.needsBackup, isFalse,
+          reason: 'documents the limitation; not a desirable behaviour');
+    });
+
+    test('a report with no files is not flagged', () {
+      // Metadata rides the cloud blob, so a fileless report is not "unbacked".
+      // Flagging it would put "Only on this phone" on a row where the words are
+      // false and there is nothing she could do about it.
+      const r = ScanReport(
+          id: 'r2', title: 'Note to self', dateIso: '2026-08-01T10:00:00.000');
+      expect(r.needsBackup, isFalse);
+    });
+  });
+
+  group('two dates, and the old rows still read correctly', () {
+    test('a report written before the field existed falls back', () {
+      // ⚠️ THE MIGRATION-SAFETY ASSERTION. Every report already on a phone has
+      // no `reportDateIso` key. If the fallback broke, their dates would read
+      // as empty and the list would reorder itself under her.
+      final r = ScanReport.fromJson({
+        'id': 'old',
+        'title': 'Anomaly scan',
+        'dateIso': '2026-03-04T09:00:00.000',
+        'files': const [],
+      });
+      expect(r.reportDateOrNull, isNull);
+      expect(r.reportDateIso, '2026-03-04T09:00:00.000');
+    });
+
+    test('an untouched report round-trips to the exact same json', () {
+      // The field is written only when set, so nothing rewrites a stored blob
+      // just by being read - which matters because the blob now also syncs.
+      final json = {
+        'id': 'old',
+        'title': 'Anomaly scan',
+        'dateIso': '2026-03-04T09:00:00.000',
+        'scanId': null,
+        'note': '',
+        'files': const [],
+      };
+      final out = ScanReport.fromJson(json).toJson();
+      expect(out.containsKey('reportDateIso'), isFalse);
+    });
+
+    test('a set report date is kept and preferred', () {
+      final r = ScanReport.fromJson({
+        'id': 'new',
+        'title': 'Old blood panel',
+        'dateIso': '2026-08-20T18:00:00.000',
+        'reportDateIso': '2026-02-11T00:00:00.000',
+        'files': const [],
+      });
+      expect(r.reportDateIso, '2026-02-11T00:00:00.000');
+      expect(r.dateIso, '2026-08-20T18:00:00.000',
+          reason: 'when she added it is a separate fact and must survive');
+    });
+
+    test('the list sorts on the report date, newest first', () async {
+      final store = ScanReportsStore.instance;
+      store.resetForTest();
+      // Added in one order, dated in another - the exact case that motivated
+      // the field: photographing a stack of old reports in whatever order they
+      // came off the pile.
+      await store.add(const ScanReport(
+          id: 'a',
+          title: 'A',
+          dateIso: '2026-08-20T10:00:00.000',
+          reportDateIso: '2026-01-05T00:00:00.000'));
+      await store.add(const ScanReport(
+          id: 'b',
+          title: 'B',
+          dateIso: '2026-08-20T10:00:01.000',
+          reportDateIso: '2026-06-05T00:00:00.000'));
+      await store.add(const ScanReport(
+          id: 'c',
+          title: 'C',
+          dateIso: '2026-08-20T10:00:02.000',
+          reportDateIso: '2026-03-05T00:00:00.000'));
+      expect(store.reports.map((r) => r.id).toList(), ['b', 'c', 'a']);
+      store.resetForTest();
+    });
+
+    test('same-day reports break the tie on when she added them', () async {
+      final store = ScanReportsStore.instance;
+      store.resetForTest();
+      // Several rows share a report date when she photographs a stack. Within
+      // that day the most recently added belongs on top - it is the one she is
+      // looking at.
+      await store.add(const ScanReport(
+          id: 'first',
+          title: 'first',
+          dateIso: '2026-08-20T10:00:00.000',
+          reportDateIso: '2026-05-05T00:00:00.000'));
+      await store.add(const ScanReport(
+          id: 'second',
+          title: 'second',
+          dateIso: '2026-08-20T10:05:00.000',
+          reportDateIso: '2026-05-05T00:00:00.000'));
+      expect(store.reports.first.id, 'second');
+      store.resetForTest();
+    });
+  });
+
+  group('the cloud contract', () {
+    test('the blob round-trips through the store', () async {
+      final store = ScanReportsStore.instance;
+      store.resetForTest();
+      await store.add(const ScanReport(
+          id: 'x',
+          title: 'Thyroid panel',
+          dateIso: '2026-08-01T10:00:00.000',
+          reportDateIso: '2026-07-30T00:00:00.000',
+          note: 'Recheck in 4 weeks'));
+      final blob = store.cloudData();
+
+      store.resetForTest();
+      expect(store.reports, isEmpty);
+      store.applyCloudData(blob);
+
+      expect(store.reports.length, 1);
+      final r = store.reports.single;
+      expect(r.id, 'x');
+      expect(r.title, 'Thyroid panel');
+      expect(r.note, 'Recheck in 4 weeks');
+      expect(r.reportDateIso, '2026-07-30T00:00:00.000',
+          reason: 'the report date must survive the round trip, or a synced '
+              'library re-sorts itself on the next device');
+      store.resetForTest();
+    });
+
+    test('the blob carries file references, never bytes', () async {
+      final store = ScanReportsStore.instance;
+      store.resetForTest();
+      await store.add(const ScanReport(
+        id: 'y',
+        title: 'Scan',
+        dateIso: '2026-08-01T10:00:00.000',
+        files: [ReportFile(path: 'uid/report/img.jpg', name: 'img.jpg')],
+      ));
+      final blob = store.cloudData() as List;
+      final files = (blob.single as Map)['files'] as List;
+      expect((files.single as Map)['path'], 'uid/report/img.jpg');
+      // A photographed report inside a JSON blob would be enormous and the
+      // wrong place for a medical image.
+      expect((files.single as Map).containsKey('bytes'), isFalse);
+      store.resetForTest();
+    });
+
+    test('the cloud key is stable', () {
+      // ⚠️ THE KEY IS IDENTITY. Renaming it strands every report already synced
+      // under the old one - they are not deleted, they simply stop being found,
+      // which is worse because nothing reports it.
+      expect(ScanReportsStore.instance.cloudKey, 'scan_reports');
     });
   });
 }
