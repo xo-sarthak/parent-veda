@@ -176,6 +176,68 @@ final List<PvVideoSlot> kTtcVideos = [
     readNext: ['ttc_read_timing_myths'],
     surfaceNext: ['ttc_window'],
   ),
+
+  // ---------------------------------------------------------------------------
+  //  Infertility & IVF
+  // ---------------------------------------------------------------------------
+  //  ⚠️ NEITHER OF THESE MAY CARRY A SUCCESS RATE, in the film or in the
+  //  chapter list. `ttc_brackets.dart` and `kTtcInfertility` both state it, and
+  //  a chapter titled "your chances" would be the easiest place in the product
+  //  to break the rule by accident — a video brief is written months before
+  //  anyone reviews the page it sits on.
+  PvVideoSlot(
+    id: 'ttc_vid_when_to_seek_help',
+    hue: 206,
+    title: _en('Is it time to see someone?'),
+    why: _en('The twelve-month rule, and the six situations where it does '
+        'not apply to you at all.'),
+    seconds: 294,
+    expert: _en('Dr. Ananya Rao'),
+    expertRole: _en('Gynaecologist · 14 years'),
+    chapters: [
+      PvVideoChapter(at: 0, label: _en('Where the twelve months comes from')),
+      PvVideoChapter(at: 54, label: _en('Who should not wait it out')),
+      PvVideoChapter(at: 146, label: _en('What a first appointment is like')),
+      PvVideoChapter(at: 222, label: _en('Gynaecologist or fertility clinic?')),
+    ],
+    takeaways: [
+      _en('Twelve months under 36 — but only if your cycles are regular and '
+          'nothing else is known.'),
+      _en('Irregular cycles, painful periods, past pelvic surgery or an '
+          'abnormal semen analysis all mean the clock does not apply.'),
+      _en('Most couples who are investigated do not end up having IVF.'),
+    ],
+    readNext: ['ttc_read_when_to_seek_help'],
+    surfaceNext: ['ttc_tests'],
+  ),
+
+  PvVideoSlot(
+    id: 'ttc_vid_ivf_walkthrough',
+    hue: 206,
+    title: _en('An IVF cycle, start to finish'),
+    why: _en('The whole month laid out in order, so nothing in it arrives as '
+        'a surprise.'),
+    seconds: 528,
+    expert: _en('Dr. Ananya Rao'),
+    expertRole: _en('Gynaecologist · 14 years'),
+    chapters: [
+      PvVideoChapter(at: 0, label: _en('IUI first, because it is smaller')),
+      PvVideoChapter(at: 96, label: _en('Stimulation, and the injections')),
+      PvVideoChapter(at: 198, label: _en('Monitoring, and why it is daily')),
+      PvVideoChapter(at: 276, label: _en('Retrieval day')),
+      PvVideoChapter(at: 354, label: _en('The laboratory, and the phone calls')),
+      PvVideoChapter(at: 438, label: _en('Transfer, and the two weeks after')),
+    ],
+    takeaways: [
+      _en('IUI is one cycle and a two-minute procedure; IVF is about a month '
+          'with one day under sedation.'),
+      _en('The monitoring visits, not the injections, are what makes IVF hard '
+          'to fit around a rigid job.'),
+      _en('A frozen transfer is normal current practice, not a setback.'),
+    ],
+    readNext: ['ttc_read_ivf_explained'],
+    surfaceNext: ['ttc_treatment'],
+  ),
 ];
 
 /// The slot lookup the reader is handed.

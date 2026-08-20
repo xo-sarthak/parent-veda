@@ -15,6 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/screens/post_pregnancy/pp_section_registry.dart';
 import 'package:parentveda/services/ttc_surfaces.dart';
+import 'package:parentveda/ttc/ttc_reads_data.dart';
 import 'package:parentveda/services/parenting_surfaces.dart';
 import 'package:parentveda/data/hubs/ttc_hubs.dart';
 import 'package:parentveda/data/hubs/parenting_hubs.dart';
@@ -352,6 +353,20 @@ bool _surfaceExists(String id) {
   const sectionPrefix = 'pp_section/';
   if (id.startsWith(sectionPrefix)) {
     return ppSectionFor(id.substring(sectionPrefix.length)) != null;
+  }
+
+  // ⚠️ AND A LONG-FORM READ IS A REAL DESTINATION TOO, by exactly the same
+  // argument. `ttc_surface_router.dart` resolves `ttc_read/<id>` by PREFIX
+  // against `kTtcReads`, so that adding an article makes it reachable with no
+  // router change — which also means `ttcSurfaceLabel`, reading a static list,
+  // cannot see it, and this test read a live door as leading nowhere.
+  //
+  // Resolved against the library rather than by accepting the prefix blindly,
+  // so a door naming an article that does not exist still fails. That is the
+  // case this test is actually for.
+  const readPrefix = 'ttc_read/';
+  if (id.startsWith(readPrefix)) {
+    return ttcReadById(id.substring(readPrefix.length)) != null;
   }
   if (homeFor(id) != null) return true;
   if (ppSurfaceLabel(id) != null) return true;

@@ -282,20 +282,18 @@ final JourneyConfig kTtcFertilityReadinessCheck = JourneyConfig(
       question: _en("How long is 'long enough' to have been trying on our "
           'own?'),
       elements: [
+        // Both owed slots are answered by one read: the piece carries the
+        // NICE threshold AND the six situations where the clock does not
+        // apply. Splitting one article across two tiles to keep a one-to-one
+        // map with the old placeholders would be inventory UX — two tiles
+        // opening the same page.
         JourneyElement(
           type: SolutionType.read,
-          title: _en('The usual guideline'),
-          value: _en('Under 35: most guidance says try for 12 months first. '
-              '35 or older: 6 months.'),
-          owed: true,
-        ),
-        JourneyElement(
-          type: SolutionType.read,
-          title: _en('Reasons not to wait at all'),
-          value: _en('Irregular or absent periods, a known condition, a '
-              'past surgery — a shortlist of reasons to see someone '
-              'sooner.'),
-          owed: true,
+          title: _en('When it is time to see someone'),
+          value: _en('The twelve-month guideline, and the reasons not to wait '
+              'it out at all.'),
+          meta: _en('8 MIN'),
+          surfaceId: 'ttc_read/ttc_read_when_to_seek_help',
         ),
       ],
       note: _en('These are population guidelines, not a calculation of your '

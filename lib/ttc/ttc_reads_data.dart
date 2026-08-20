@@ -1462,6 +1462,716 @@ final List<PvRead> kTtcReads = [
 
     readNext: ['ttc_read_pcos_treatment'],
   ),
+  // ===========================================================================
+  //  INFERTILITY & IVF — "when to seek help"
+  // ===========================================================================
+  //  Excel Content cell: "When to seek help, the tests, IUI/IVF explained, cost
+  //  expectations." Four topics, and only three are written here — "the tests"
+  //  is already carried properly by `ttc_tests_data.dart`, which holds ten
+  //  tests with real Indian price ranges, when in the cycle each is taken, and
+  //  how to read the result. Writing a second version of that would be filler,
+  //  and the reads below point at it instead.
+  //
+  //  ---------------------------------------------------------------------------
+  //  ⚠️ THE THREE RULES THIS BRACKET ENFORCES HARDER THAN ANY OTHER
+  //  ---------------------------------------------------------------------------
+  //
+  //  · **NO COMMERCE. AT ALL.** `ttc_brackets.dart` marks Products
+  //    `notApplicable` here with the plainest reason in the file: "Not a fit
+  //    (clinical)". No product row, no course upsell, no "recommended for you".
+  //    A woman reading this has been trying for two years. The consult exists
+  //    because she asked for it, not because we are selling it.
+  //  · **NEVER A SUCCESS RATE. NEVER "YOUR CHANCES."** Not a per-cycle figure,
+  //    not a clinic's advertised number, not an age-banded table. See the
+  //    clinical invariants in CLAUDE.md and the header of `kTtcInfertility`.
+  //    What IS allowed, and is done below, is teaching her how to read the
+  //    number a clinic shows her — that lowers pressure instead of setting a
+  //    target.
+  //  · **THE COSTS CARRY A DATE AND A CAVEAT ABOUT THEIR SOURCE.** Fertility
+  //    pricing in India is published almost entirely by the clinics selling the
+  //    treatment. That does not make it useless; it makes it a range to sanity-
+  //    check against, and saying so is the difference between informing her and
+  //    repeating an advertisement.
+  PvRead(
+    id: 'ttc_read_when_to_seek_help',
+    hue: 206,
+    kicker: _en('IVF & IUI'),
+    title: _en('When it is time to see someone'),
+    teaser: _en('The guidance on how long to try, who should not wait it out, '
+        'and what actually happens at a first appointment.'),
+
+    scaleSetter: _en('Seeing a fertility doctor is not a decision that '
+        'something is wrong. It is a set of tests and a conversation, and for '
+        'a large share of couples it ends with a small correction rather than '
+        'a treatment. Going early costs you very little; going late is the '
+        'thing that is hard to undo.'),
+
+    author: _en('Dr. Ananya Rao'),
+    authorRole: _en('Gynaecologist · 14 years · reviewed August 2026'),
+
+    heroVideoSlot: 'ttc_vid_when_to_seek_help',
+
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en('There is a standard answer to this, and then there is a longer '
+              'list of situations where the standard answer does not apply. '
+              'The second list matters more, because it is the one people do '
+              'not know about and therefore wait through.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('The usual guideline'),
+        paragraphs: [
+          _en('Twelve months of regular, unprotected sex, if you are under 36. '
+              'That is the threshold used by NICE and echoed by most bodies '
+              'internationally, and "regular" means every two or three days '
+              'across the cycle rather than timed attempts around a window.'),
+          _en('At 36 or over, the advice is to be seen at presentation — that '
+              'is, when you first raise it, rather than after a waiting '
+              'period. The reason is not that fertility falls off a cliff at '
+              '36; it is that investigation and treatment both take months, '
+              'and a year spent waiting is a year that cannot be recovered.'),
+          _en('It is worth being precise about what the twelve months is '
+              'measuring. It is a marker for when investigating becomes '
+              'worthwhile across a whole population — not a diagnosis, not a '
+              'deadline, and not a statement about you.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('Reasons not to wait at all'),
+        paragraphs: [
+          _en('The twelve-month rule assumes regular ovulation and no known '
+              'reason for difficulty. If any of the following is true, that '
+              'assumption is already broken and the clock does not apply — you '
+              'can reasonably ask to be seen now.'),
+        ],
+        bullets: [
+          _en('Cycles that are irregular, very long, or absent — including a '
+              'known PCOS diagnosis. Nothing is gained by waiting a year to '
+              'find out you are not ovulating predictably.'),
+          _en('Periods that are very painful or very heavy, or pain during '
+              'sex — the usual reasons endometriosis is suspected.'),
+          _en('Any previous pelvic surgery, a ruptured appendix, or a past '
+              'pelvic infection — all of which can affect the tubes.'),
+          _en('A semen analysis that has already come back abnormal, or a '
+              'known problem on his side. Half of all cases involve a male '
+              'factor and it is the fastest thing in the whole workup to '
+              'check.'),
+          _en('Two or more miscarriages.'),
+          _en('Cancer treatment planned for either of you — this is the one '
+              'situation where the referral is genuinely urgent, because '
+              'fertility preservation has to happen before treatment starts.'),
+        ],
+        callout: PvCallout(
+          tone: PvCalloutTone.note,
+          title: _en('The one that is most often missed'),
+          body: _en('Irregular cycles. Women wait out the full year assuming '
+              'the guidance applies to them, when the guidance was written for '
+              'people whose cycles are predictable. If yours are not, the '
+              'twelve months was never your number.'),
+        ),
+      ),
+
+      PvReadSection(
+        heading: _en('What a first appointment is actually like'),
+        paragraphs: [
+          _en('Almost nobody is treated at the first visit, which surprises '
+              'people in both directions — some expect to start immediately, '
+              'others are braced for something invasive.'),
+          _en('What happens is a history, an examination, and a set of tests '
+              'ordered for both of you. His semen analysis is usually the '
+              'first thing requested, because it is quick, cheap and rules a '
+              'great deal in or out. Yours will typically include blood tests '
+              'timed to particular days of the cycle, and a scan.'),
+          _en('You then come back with results, and the conversation about '
+              'what to do next happens with something concrete in front of '
+              'you. That second appointment is the real one.'),
+        ],
+        tip: PvReadTip(
+          title: _en('What to take with you'),
+          body: _en('Three months of cycle dates, any previous test results '
+              'even if they look old or irrelevant, a list of everything '
+              'either of you takes including supplements, and — if you can — '
+              'him. A first fertility appointment attended by one person '
+              'investigates one person, and half of this is his.'),
+        ),
+      ),
+
+      PvReadSection(
+        heading: _en('Who to see'),
+        paragraphs: [
+          _en('In India this usually starts with a gynaecologist rather than a '
+              'fertility clinic, and that is the sensible order. A general '
+              'gynaecologist runs the initial workup and manages ovulation '
+              'induction routinely, which is where a meaningful share of '
+              'couples stop.'),
+          _en('A referral onward to a fertility specialist tends to come when '
+              'tablets have been tried without success, when a tubal or male '
+              'factor is found, or when age makes moving faster sensible.'),
+          _en('Going straight to a large fertility chain is not wrong, but be '
+              'aware of what it means: their pathway is built around the '
+              'treatments they provide. It is reasonable to ask, at any '
+              'clinic, what the least intensive option for your situation '
+              'would be.'),
+        ],
+        mythFact: PvMythFact(
+          myth: _en('Going to a fertility clinic means ending up on IVF.'),
+          fact: _en('Most couples who are investigated do not have IVF. The '
+              'workup exists to find the specific reason, and the specific '
+              'reason is frequently something addressed with a tablet, a minor '
+              'procedure, or a change on his side. IVF is where the pathway '
+              'goes when the earlier steps do not fit — not where it starts.'),
+        ),
+      ),
+    ],
+
+    faqs: [
+      PvReadFaq(
+        question: _en('We have only been trying eight months but I am '
+            'anxious. Is it too early?'),
+        answer: _en('No. Nothing about being seen earlier is harmful, and the '
+            'first appointment is a conversation and some tests. If waiting is '
+            'costing you sleep, that is itself a reasonable thing to take to a '
+            'doctor.'),
+      ),
+      PvReadFaq(
+        question: _en('Does he really need to come?'),
+        answer: _en('For the semen analysis, yes, and it is worth him being at '
+            'the first appointment too. Male factor is involved in about half '
+            'of cases and is the single quickest thing to check — investigating '
+            'only one of you can waste months.'),
+      ),
+      PvReadFaq(
+        question: _en('What if my reports come back normal?'),
+        answer: _en('That happens in a meaningful minority of couples, and it '
+            'has a name — unexplained infertility. It is frustrating to hear '
+            'and it is not the same as being told nothing can be done; there '
+            'is a standard pathway for it, and it does not mean the tests were '
+            'pointless.'),
+      ),
+      PvReadFaq(
+        question: _en('Will they judge us for waiting this long?'),
+        answer: _en('They will not, and if they do, that is information about '
+            'the clinic. Most couples arrive later than the guidelines suggest, '
+            'for entirely ordinary reasons.'),
+      ),
+    ],
+
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('Do not wait for the twelve months'),
+      body: _en('Book now, rather than at the end of a waiting period, if your '
+          'cycles are irregular or absent, if periods are very painful or very '
+          'heavy, if sex is painful, if you have had pelvic surgery or a '
+          'pelvic infection, if there have been two or more miscarriages, or '
+          'if you are 36 or over. And treat it as urgent — days, not weeks — '
+          'if either of you is about to start cancer treatment, because '
+          'fertility preservation has to happen first.'),
+    ),
+
+    evidence: _en('Referral thresholds follow the NICE fertility guidance: '
+        'referral after 12 months of regular unprotected intercourse for women '
+        'under 36, referral at presentation for women 36 or over or where '
+        'there is a known or suspected cause or a predisposing history, and '
+        'expedited referral where planned treatment may cause infertility. '
+        'Reviewed August 2026.'),
+
+    nextSteps: [
+      PvReadNextStep(
+        kind: PvNextKind.tool,
+        title: _en('The tests, one by one'),
+        value: _en('What each one measures, when in the cycle it is taken, and '
+            'what it costs in India.'),
+        surfaceId: 'ttc_tests',
+      ),
+      PvReadNextStep(
+        kind: PvNextKind.tool,
+        title: _en('Three months of dates to take with you'),
+        value: _en('The single most useful thing you can bring to a first '
+            'appointment.'),
+        surfaceId: 'ttc_cycle',
+      ),
+      PvReadNextStep(
+        kind: PvNextKind.consult,
+        title: _en('Speak to a fertility specialist'),
+        value: _en('A first conversation, on video, before you commit to a '
+            'clinic.'),
+        surfaceId: 'ttc_prepare',
+      ),
+    ],
+
+    readNext: ['ttc_read_ivf_explained'],
+  ),
+
+  // ===========================================================================
+  //  INFERTILITY & IVF — "IUI/IVF explained"
+  // ===========================================================================
+  //  ⚠️ THIS IS THE READ THE DOOR HAS BEEN PROMISING AND NOT DELIVERING.
+  //  The hub door "Understand my tests & treatment" says "What IUI and IVF
+  //  actually involve, step by step, including what they cost", and it opened
+  //  `ttc_treatment` — which is an IVF CYCLE TRACKER (stim start, trigger,
+  //  retrieval, transfer, beta). Excellent for someone already in a cycle;
+  //  useless to someone deciding whether to have one. The tracker is now what
+  //  this read hands her at the end, which is the right order.
+  PvRead(
+    id: 'ttc_read_ivf_explained',
+    hue: 206,
+    kicker: _en('IVF & IUI'),
+    title: _en('What IUI and IVF actually involve'),
+    teaser: _en('Step by step, in order, with the parts nobody warns you '
+        'about — and an honest account of what each one asks of you.'),
+
+    scaleSetter: _en('Neither of these is one event. IUI is a few scans and a '
+        'two-minute procedure spread across one cycle. IVF is roughly a month '
+        'of injections, monitoring and waiting, with one day under sedation in '
+        'the middle. Knowing the shape of it in advance is most of what makes '
+        'it manageable.'),
+
+    author: _en('Dr. Ananya Rao'),
+    authorRole: _en('Gynaecologist · 14 years · reviewed August 2026'),
+
+    heroVideoSlot: 'ttc_vid_ivf_walkthrough',
+
+    sections: [
+      PvReadSection(
+        heading: _en('IUI, first — because it is much smaller'),
+        paragraphs: [
+          _en('Intrauterine insemination does one thing: it places prepared '
+              'sperm directly into the uterus at the right moment, skipping '
+              'the journey through the cervix. Everything else about the cycle '
+              'is your own.'),
+          _en('A cycle runs like this. Tablets or a low dose of injections at '
+              'the start, to make sure a follicle develops. Two or three short '
+              'scans to watch it grow. A trigger injection when it is ready, '
+              'which sets ovulation to a known time. Then, a day or so later, '
+              'the procedure itself — a soft catheter, about two minutes, no '
+              'anaesthetic, and mild cramping at worst. You go home '
+              'immediately.'),
+          _en('IUI suits some situations and not others. It needs at least one '
+              'open tube and reasonable sperm quality. It is often the first '
+              'treatment offered for unexplained infertility, mild male '
+              'factor, or where sex is difficult or infrequent — and it is '
+              'usually tried for a small number of cycles before moving on, '
+              'because almost all of the pregnancies it produces come in the '
+              'first three.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('IVF: the month, in order'),
+        paragraphs: [
+          _en('IVF replaces the whole first half of the process. Eggs are '
+              'grown deliberately, collected, fertilised in a laboratory, and '
+              'one embryo is put back.'),
+        ],
+        bullets: [
+          _en('Stimulation — around ten to twelve days of daily injections '
+              'you give yourself at home, to grow several follicles instead of '
+              'one. Bloating and tenderness are normal by the end.'),
+          _en('Monitoring — scans and blood tests every few days. This is '
+              'the part people underestimate: it means repeated early-morning '
+              'clinic visits, and it is the main reason IVF is difficult to '
+              'combine with a rigid job.'),
+          _en('Trigger — one injection at a precisely specified time, '
+              'usually late at night, that matures the eggs. The timing is '
+              'exact and it matters.'),
+          _en('Retrieval — about twenty minutes under sedation, eggs '
+              'collected with a fine needle guided by ultrasound. You are home '
+              'the same day, usually sore and tired.'),
+          _en('The laboratory — fertilisation happens overnight, either by '
+              'mixing eggs and sperm or, in ICSI, by injecting a single sperm '
+              'into each egg. Embryos are then grown for a few days, and you '
+              'get a phone call each day about how many are continuing. Those '
+              'calls are the hardest part of the process for many people.'),
+          _en('Transfer — one embryo placed in the uterus with a fine '
+              'catheter. It takes minutes, needs no anaesthetic, and feels '
+              'like very little.'),
+          _en('The wait — about two weeks, on progesterone support, until '
+              'a blood test. Home pregnancy tests during this window are '
+              'unreliable because of the trigger injection, which is why '
+              'clinics ask you not to.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('Fresh, frozen, and why so many transfers are frozen now'),
+        paragraphs: [
+          _en('An embryo can be transferred in the same cycle it was made — a '
+              'fresh transfer — or frozen and transferred in a later, quieter '
+              'cycle.'),
+          _en('Freezing has become common because the stimulation that '
+              'produces a good crop of eggs also leaves the uterine lining in '
+              'a less receptive state, and because freezing lets the body come '
+              'down before implantation is attempted. Being told your transfer '
+              'will be frozen is normal practice rather than a setback, though '
+              'it very often lands as one.'),
+          _en('It also means a single stimulation cycle can produce several '
+              'chances, which is the thing most worth understanding before you '
+              'price any of it.'),
+        ],
+        tip: PvReadTip(
+          title: _en('The question to ask about ICSI'),
+          body: _en('ICSI — injecting a single sperm into each egg — is '
+              'essential where sperm quality or count is the problem, and it '
+              'is also applied routinely by many clinics regardless. It adds '
+              'cost. It is entirely reasonable to ask: is ICSI being '
+              'recommended because of our specific results, or as standard '
+              'practice here?'),
+        ),
+      ),
+
+      PvReadSection(
+        // ⚠️ FOLDS. Necessary, and not what she came to the page for.
+        collapsible: true,
+        summary: _en('OHSS, the emotional shape of the two-week wait, and what '
+            'the injections actually feel like.'),
+        heading: _en('What it asks of you'),
+        paragraphs: [
+          _en('Physically, the commonest complication is ovarian '
+              'hyperstimulation — the ovaries overreacting to stimulation, '
+              'causing bloating, discomfort and, rarely, something that needs '
+              'admission. Protocols have improved a great deal and severe '
+              'cases are now uncommon, but it is the reason monitoring is '
+              'frequent and the reason a cycle is sometimes cancelled or '
+              'frozen partway.'),
+          _en('The injections themselves are subcutaneous, fine-needled, and '
+              'almost universally described as far less bad than expected. '
+              'The bruising is the annoying part.'),
+          _en('Emotionally, the shape is specific: a long busy stretch where '
+              'you are doing something every day, then an abrupt stop into two '
+              'weeks where there is nothing to do at all. Almost everyone '
+              'finds the second part harder, and almost nobody is warned. '
+              'Plan something for those two weeks before you reach them.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('About the numbers you will be shown'),
+        paragraphs: [
+          _en('Every clinic publishes a success rate, and we deliberately do '
+              'not give you one — not ours, not theirs, not an age-banded '
+              'table. A single figure cannot describe your situation, and '
+              'carrying one into a cycle turns it into a target you can fail.'),
+          _en('What is worth knowing is how to read theirs. Ask what the '
+              'denominator is: per cycle started, per retrieval, or per '
+              'transfer? Those three numbers can differ enormously from the '
+              'same clinic, and the most flattering one is per transfer, '
+              'because it excludes every cycle that did not get that far.'),
+          _en('Ask, too, whether the figure is live births or pregnancies, and '
+              'for which age band. A clinic that answers all three questions '
+              'without hesitating is telling you something useful about '
+              'itself.'),
+        ],
+      ),
+    ],
+
+    faqs: [
+      PvReadFaq(
+        question: _en('Is egg retrieval painful?'),
+        answer: _en('It is done under sedation, so not during. Afterwards, '
+            'expect cramping and a heavy, bloated feeling for a day or two, '
+            'similar to a bad period. Most people take the day off and are '
+            'fine the next.'),
+      ),
+      PvReadFaq(
+        question: _en('How many IUI cycles before moving to IVF?'),
+        answer: _en('Commonly three, sometimes up to six depending on age and '
+            'cause, because the large majority of IUI pregnancies happen in '
+            'the first three cycles. It is a fair question to ask at the '
+            'start.'),
+      ),
+      PvReadFaq(
+        question: _en('Can I work through an IVF cycle?'),
+        answer: _en('Most people do. The constraint is not the injections, it '
+            'is the monitoring — several early-morning clinic visits at short '
+            'notice over about two weeks, plus one day off for retrieval. Jobs '
+            'with fixed hours and no flexibility are the difficult ones.'),
+      ),
+      PvReadFaq(
+        question: _en('Does bed rest after transfer help?'),
+        answer: _en('No. Lying still afterwards has been studied and does not '
+            'improve outcomes; an embryo cannot fall out. Clinics that still '
+            'advise it are being kind rather than evidence-led. Ordinary '
+            'activity is fine.'),
+      ),
+      PvReadFaq(
+        question: _en('Are IVF babies different in any way?'),
+        answer: _en('No meaningful difference in health or development has '
+            'been shown. There is a slightly higher rate of preterm birth and '
+            'low birth weight, much of which is explained by multiple '
+            'pregnancies — which is precisely why single embryo transfer has '
+            'become standard practice.'),
+      ),
+    ],
+
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('During a cycle, call the clinic'),
+      body: _en('Not an emergency department, and not the internet — your own '
+          'clinic, which will have a number for exactly this. Call if you have '
+          'marked bloating or rapid weight gain over a day or two, severe '
+          'abdominal pain, breathlessness, or if you are passing much less '
+          'urine than usual. These are the signs of ovarian hyperstimulation, '
+          'and reported early it is very manageable. Anything about your own '
+          'dose, your own scan or your own embryos belongs with the team '
+          'treating you.'),
+    ),
+
+    evidence: _en('Procedure sequence, the rationale for freeze-all transfers, '
+        'single embryo transfer as standard practice, and ovarian '
+        'hyperstimulation as the principal complication reflect standard '
+        'assisted-reproduction practice as described by ESHRE and ASRM. '
+        'Reviewed August 2026. Nothing here describes your own protocol, which '
+        'is set by your clinic.'),
+
+    nextSteps: [
+      PvReadNextStep(
+        kind: PvNextKind.read,
+        title: _en('What it actually costs in India'),
+        value: _en('Real ranges, what a package leaves out, and the bills that '
+            'arrive separately.'),
+        surfaceId: 'ttc_read/ttc_read_ivf_costs',
+      ),
+      PvReadNextStep(
+        kind: PvNextKind.tool,
+        title: _en('Track a cycle you are already in'),
+        value: _en('Stim, trigger, retrieval, transfer and the test date — in '
+              'one place, and shared with him.'),
+        surfaceId: 'ttc_treatment',
+      ),
+      PvReadNextStep(
+        kind: PvNextKind.tool,
+        title: _en('Keep your reports together'),
+        value: _en('Every result in one place, so a second opinion takes an '
+            'evening rather than a week.'),
+        surfaceId: 'ttc_records',
+      ),
+    ],
+
+    readNext: ['ttc_read_ivf_costs'],
+  ),
+
+  // ===========================================================================
+  //  INFERTILITY & IVF — "cost expectations"
+  // ===========================================================================
+  //  ⚠️ ITS OWN READ, NOT A SECTION, and the Excel is the reason: "cost
+  //  expectations" is listed as a distinct topic in the Content cell. It is
+  //  also the single most searched aspect of this bracket and the one the app
+  //  had nothing on at all — the treatment screen contains no rupee figure
+  //  anywhere.
+  //
+  //  ⚠️ EVERY FIGURE IS DATED AND ATTRIBUTED, because fertility pricing in
+  //  India is published almost entirely by the clinics selling the treatment.
+  //  That does not make it useless — it makes it a range to sanity-check
+  //  against rather than a quotation, and saying so is the difference between
+  //  informing her and reprinting an advertisement.
+  PvRead(
+    id: 'ttc_read_ivf_costs',
+    hue: 206,
+    kicker: _en('IVF & IUI'),
+    title: _en('What it actually costs in India'),
+    teaser: _en('Real ranges as of 2026, what an advertised package leaves '
+        'out, and the bills that arrive separately.'),
+
+    scaleSetter: _en('The number a clinic advertises is almost never the '
+        'number you pay. It is usually the procedure fee alone, and the '
+        'medicines — which are a third of the bill — are billed separately. '
+        'Knowing that one thing before you walk in is worth more than any '
+        'other piece of financial advice here.'),
+
+    author: _en('Dr. Ananya Rao'),
+    authorRole: _en('Gynaecologist · 14 years · reviewed August 2026'),
+
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en('Fertility treatment in India is not covered by most health '
+              'insurance, is paid out of pocket, and is priced very '
+              'differently from one clinic to the next. The ranges below are '
+              'what clinics across the country were publishing in 2026 — '
+              'treat them as a sanity check on a quotation you are given, not '
+              'as a price list.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('IUI'),
+        paragraphs: [
+          _en('A natural-cycle IUI, with no stimulation, is commonly quoted '
+              'around ₹5,000 to ₹10,000 for the procedure. Most IUI is '
+              'medicated, and a medicated cycle typically lands between '
+              '₹15,000 and ₹35,000 all in, with ovulation medicines adding '
+              'roughly ₹5,000 to ₹10,000 on top of the procedure fee.'),
+          _en('Because IUI is usually tried for around three cycles, the '
+              'figure worth budgeting is the three, not the one.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('IVF: the honest all-in range'),
+        paragraphs: [
+          _en('For one complete IVF cycle in 2026, a realistic all-in figure '
+              'is roughly ₹1.5 to ₹2.5 lakh at an independent clinic, and '
+              '₹2 to ₹3.5 lakh at a large fertility chain in a metro. In '
+              'tier-2 cities the same cycle commonly runs ₹1 to ₹1.8 lakh.'),
+          _en('Against that, the packages advertised at ₹90,000 to ₹1.2 lakh '
+              'are the base procedure fee: egg retrieval, fertilisation in the '
+              'laboratory, and one embryo transfer. That is a real number for '
+              'a real part of the treatment. It is not the cost of the '
+              'treatment.'),
+        ],
+        callout: PvCallout(
+          tone: PvCalloutTone.note,
+          title: _en('What sits outside the package, almost always'),
+          body: _en('Stimulation medicines, at roughly ₹40,000 to ₹90,000 and '
+              'about a third of the final bill. ICSI, adding roughly ₹15,000 '
+              'to ₹45,000. Embryo freezing and its annual storage. A frozen '
+              'transfer later, which is a separate cycle with its own fee. '
+              'Monitoring scans beyond the number the package includes. And '
+              'the initial tests for both of you, before any of it starts.'),
+        ),
+      ),
+
+      PvReadSection(
+        heading: _en('The questions that change the number'),
+        paragraphs: [
+          _en('Ask these before you pay anything, and ask for the answers in '
+              'writing. A clinic that will not put a quotation on paper has '
+              'told you something.'),
+        ],
+        bullets: [
+          _en('What exactly is in the package, and what is billed separately?'),
+          _en('How many monitoring scans are included, and what does each '
+              'extra one cost?'),
+          _en('Is ICSI included, and is it being recommended for our results '
+              'or applied as standard?'),
+          _en('What is the cost of freezing, of a year of storage, and of a '
+              'frozen transfer later?'),
+          _en('If the cycle is cancelled before retrieval, what is refunded?'),
+          _en('Are the medicines bought through the clinic or from a chemist, '
+              'and may we compare?'),
+        ],
+        tip: PvReadTip(
+          title: _en('On medicines specifically'),
+          body: _en('They are the largest single variable and often the '
+              'largest single line. Prices differ meaningfully between the '
+              'clinic pharmacy and an outside chemist, and between brands of '
+              'the same drug. Asking whether you may source them yourself is a '
+              'normal question, not a rude one.'),
+        ),
+      ),
+
+      PvReadSection(
+        // ⚠️ FOLDS. Practical and grim; needed on the day it is needed.
+        collapsible: true,
+        summary: _en('Insurance, EMI schemes, refund packages and the '
+            'multi-cycle offers — read before signing.'),
+        heading: _en('Paying for it'),
+        paragraphs: [
+          _en('Most Indian health insurance excludes fertility treatment '
+              'outright, though a small number of employer group policies have '
+              'begun including limited cover. It is worth reading your own '
+              'policy wording rather than assuming, and worth asking your HR '
+              'directly.'),
+          _en('Many clinics offer EMI arrangements, often through a third-'
+              'party lender. Check the interest rate rather than the monthly '
+              'figure — the monthly figure is designed to be reassuring.'),
+          _en('Multi-cycle and refund packages are increasingly common: pay '
+              'more up front for two or three cycles, with a partial refund if '
+              'none works. These can be genuinely good value for someone '
+              'likely to need more than one cycle, and poor value for someone '
+              'likely to need one. Read the exclusions closely — eligibility '
+              'criteria, what counts as a cycle, and what a refund actually '
+              'covers are where the detail lives.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('One thing worth saying out loud'),
+        paragraphs: [
+          _en('Deciding how much to spend on this is not a medical question '
+              'and nobody at a clinic can answer it for you. It is worth the '
+              'two of you agreeing a number, and a point at which you would '
+              'stop, before the first cycle rather than during the third.'),
+          _en('That conversation is uncomfortable and it protects you. The '
+              'alternative is deciding it one cycle at a time, at the moment '
+              'you are least able to.'),
+        ],
+      ),
+    ],
+
+    faqs: [
+      PvReadFaq(
+        question: _en('Why do quotes differ so much between clinics?'),
+        answer: _en('Laboratory quality and staffing are the genuine '
+            'differences, and they are real. Beyond that, much of the spread '
+            'is city, brand and what has been bundled into the headline '
+            'figure. A higher price is not by itself evidence of a better '
+            'laboratory.'),
+      ),
+      PvReadFaq(
+        question: _en('Is treatment abroad cheaper?'),
+        answer: _en('For most people in India, no — India is already among the '
+            'lower-cost countries for IVF, which is why people travel here for '
+            'it. Travel, accommodation and repeat visits usually erase any '
+            'difference.'),
+      ),
+      PvReadFaq(
+        question: _en('Does a government hospital do IVF?'),
+        answer: _en('Some larger public and teaching hospitals run assisted '
+            'reproduction units at substantially lower cost, with waiting '
+            'lists and eligibility criteria. It is worth asking about locally; '
+            'availability varies a great deal by state.'),
+      ),
+      PvReadFaq(
+        question: _en('Should we budget for more than one cycle?'),
+        answer: _en('It is the more realistic way to plan, and it is why '
+            'freezing matters financially — a single stimulation that produces '
+            'several embryos gives several chances at the much lower cost of a '
+            'frozen transfer, rather than a full cycle each time.'),
+      ),
+    ],
+
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('Before you pay a deposit'),
+      body: _en('Ask for the full quotation in writing, including what is '
+          'excluded and what happens to your money if the cycle is cancelled. '
+          'If a clinic will not provide that, or presses you to decide the '
+          'same day, treat both as reasons to get a second opinion first. '
+          'Nothing about this treatment is so urgent that it cannot wait for a '
+          'written quotation — and your own doctor remains the person to ask '
+          'what is medically necessary in your case.'),
+    ),
+
+    evidence: _en('Cost ranges reflect prices published by Indian fertility '
+        'clinics and treatment aggregators during 2026, and are given as '
+        'ranges because pricing varies widely by city, clinic and inclusions. '
+        '⚠️ Note the source honestly: almost all fertility pricing in India is '
+        'published by the clinics that sell the treatment, so these figures '
+        'are a sanity check against a quotation you are given — never a '
+        'substitute for one in writing. Checked August 2026.'),
+
+    nextSteps: [
+      PvReadNextStep(
+        kind: PvNextKind.tool,
+        title: _en('The tests, with their own price ranges'),
+        value: _en('What the workup costs before treatment even starts.'),
+        surfaceId: 'ttc_tests',
+      ),
+      PvReadNextStep(
+        kind: PvNextKind.consult,
+        title: _en('Get a second opinion before you commit'),
+        value: _en('A fertility specialist who is not the clinic quoting you.'),
+        surfaceId: 'ttc_prepare',
+      ),
+    ],
+
+    readNext: ['ttc_read_when_to_seek_help'],
+  ),
 ];
 
 /// Lookup by id. Null is a real answer — see `ttc_surface_router.dart`.

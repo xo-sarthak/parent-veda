@@ -205,7 +205,19 @@ final HubConfig kTtcInfertility = HubConfig(
           'including what they cost.'),
       mark: IntentMark.reportPage,
       hue: 42,
-      surfaceId: 'ttc_treatment',
+      // ⚠️ WAS `ttc_treatment`, WHICH IS AN IVF CYCLE TRACKER.
+      //
+      // The blurb above promises "step by step, including what they cost" and
+      // the door opened a screen for logging stim start, trigger, retrieval,
+      // transfer and the beta date. Excellent for a woman already in a cycle;
+      // useless to the one this door is written for, who is deciding whether
+      // to have one — and it contained no rupee figure anywhere, while the
+      // blurb said "including what they cost".
+      //
+      // Now the explainer, which ends by handing her the tracker. Explain
+      // first, then the tool for when she is in it. Same two screens, right
+      // order.
+      surfaceId: 'ttc_read/ttc_read_ivf_explained',
     ),
     HubNeed(
       // ⚠️ Gated on real provider supply — do not wire this open until fertility
