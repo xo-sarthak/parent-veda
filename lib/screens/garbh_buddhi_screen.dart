@@ -43,9 +43,9 @@ import '../services/pregnancy_controller.dart';
 import '../theme/pv_fonts.dart';
 
 const _accBuddhi = Color(0xFF7A6E9B); // muted indigo, its own place on the wheel
-const _ink = Color(0xFF2E2A32);
-const _muted = Color(0xFF8A8290);
-const _ground = Color(0xFFFBF9F6);
+const _ink = Color(0xFF201C24); // V3 ink1
+const _muted = Color(0xFF6F6878); // V3 ink3
+const _ground = Color(0xFFF5F3F6); // V3 ground
 
 class GarbhBuddhiScreen extends StatelessWidget {
   const GarbhBuddhiScreen({

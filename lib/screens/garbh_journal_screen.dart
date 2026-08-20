@@ -39,12 +39,13 @@ import 'package:flutter/material.dart';
 
 import '../data/garbh_rebuild_data.dart';
 import '../localization/app_language.dart';
+import '../services/raga_audio_store.dart';
 import '../theme/pv_fonts.dart';
 import 'garbh_invite_screen.dart';
 
-const _ink = Color(0xFF2E2A32);
-const _muted = Color(0xFF8A8290);
-const _ground = Color(0xFFFBF9F6);
+const _ink = Color(0xFF201C24); // V3 ink1
+const _muted = Color(0xFF6F6878); // V3 ink3
+const _ground = Color(0xFFF5F3F6); // V3 ground
 const _accent = Color(0xFFB98A7E); // Samvad's warm rose - this is her voice
 
 class GarbhJournalScreen extends StatelessWidget {
@@ -120,6 +121,56 @@ class GarbhJournalScreen extends StatelessWidget {
                     const SizedBox(height: 22),
                   ],
 
+                const SizedBox(height: 16),
+                // ---- write a letter --------------------------------------
+                //
+                // ⚠️ `GarbhEntryKind.letter` HAD AN ICON AND NO WAY TO CREATE
+                // ONE. The model, the grouping and the row rendering all
+                // handled letters; nothing anywhere made one, so the type was
+                // furniture.
+                //
+                // ⚠️ AND IT SITS HERE RATHER THAN ON THE DAILY CARD. A letter
+                // is not a daily practice - it is the thing she writes on the
+                // evening she has something to say, which is a moment she
+                // arrives at by looking at the album, not by working through
+                // today's list.
+                Material(
+                  color: _accent.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(18),
+                  child: InkWell(
+                    onTap: () => _writeLetter(context),
+                    borderRadius: BorderRadius.circular(18),
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 15, 14, 16),
+                      child: Row(children: [
+                        const Icon(Icons.edit_note_rounded,
+                            size: 20, color: _accent),
+                        const SizedBox(width: 13),
+                        Expanded(
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Write a letter to your baby',
+                                    style: pvManrope(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                        color: _ink)),
+                                const SizedBox(height: 3),
+                                Text(
+                                    'Something to read to them one day. It is '
+                                    'kept under this week.',
+                                    style: pvManrope(
+                                        fontSize: 12,
+                                        height: 1.4,
+                                        color: _muted)),
+                              ]),
+                        ),
+                        const Icon(Icons.chevron_right_rounded,
+                            size: 19, color: _muted),
+                      ]),
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 10),
                 // ---- the family loop, from inside the album --------------
                 //
@@ -190,6 +241,102 @@ class GarbhJournalScreen extends StatelessWidget {
       },
     );
   }
+}
+
+/// A letter, written into the album under the current week.
+///
+/// ⚠️ A SHEET, NOT A SCREEN, AND THAT IS THE OPPOSITE CALL FROM THE PREGNANCY
+/// JOURNAL COMPOSER. That one is a page because it holds a heading, a body,
+/// three photos and a stamp. This holds one thing: what she wants to say. A
+/// full page for a single field is ceremony, and ceremony is what stops a
+/// person writing the short letter they actually had in them.
+Future<void> _writeLetter(BuildContext context) async {
+  final ctrl = TextEditingController();
+  final week = _currentWeekForLetter();
+
+  final text = await showModalBottomSheet<String>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (ctx) => Padding(
+      padding: EdgeInsets.only(
+          bottom: MediaQuery.of(ctx).viewInsets.bottom),
+      child: Container(
+        margin: const EdgeInsets.all(12),
+        padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+        ),
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          Text('A letter to your baby',
+              style: pvFraunces(
+                  fontSize: 19, fontWeight: FontWeight.w600, color: _ink)),
+          const SizedBox(height: 6),
+          Text('Kept under week $week, for them to read one day.',
+              style: pvManrope(fontSize: 12.5, color: _muted)),
+          const SizedBox(height: 16),
+          TextField(
+            controller: ctrl,
+            autofocus: true,
+            minLines: 5,
+            maxLines: 10,
+            textCapitalization: TextCapitalization.sentences,
+            style: pvManrope(fontSize: 15, height: 1.6, color: _ink),
+            decoration: InputDecoration(
+              hintText: 'Whatever you want them to know.',
+              hintStyle: pvManrope(fontSize: 14.5, color: _muted),
+              border: InputBorder.none,
+            ),
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton(
+              style: FilledButton.styleFrom(
+                  backgroundColor: _accent,
+                  padding: const EdgeInsets.symmetric(vertical: 14)),
+              onPressed: () => Navigator.pop(ctx, ctrl.text.trim()),
+              child: Text('Keep it',
+                  style: pvManrope(
+                      fontSize: 15,
+                      fontWeight: FontWeight.w700,
+                      color: Colors.white)),
+            ),
+          ),
+        ]),
+      ),
+    ),
+  );
+
+  ctrl.dispose();
+  if (text == null || text.isEmpty) return;
+
+  await GarbhJournalStore.instance.add(GarbhJournalEntry(
+    id: 'letter_${DateTime.now().microsecondsSinceEpoch}',
+    kind: GarbhEntryKind.letter,
+    week: week,
+    tsMs: DateTime.now().millisecondsSinceEpoch,
+    // ⚠️ THE FIRST LINE IS THE TITLE, not "Letter". The album lists titles,
+    // and twelve rows all reading "Letter" is an album she cannot navigate.
+    title: LocalizedText(
+        en: text.length > 60 ? '${text.substring(0, 60)}...' : text,
+        hi: text.length > 60 ? '${text.substring(0, 60)}...' : text),
+    text: text,
+  ));
+}
+
+/// ⚠️ READ FROM THE MOST RECENT ENTRY, NOT FROM A CONTROLLER.
+///
+/// This screen deliberately takes no `PregnancyController` - it is the one
+/// surface that must keep working after the birth, when there is no current
+/// week at all. So a letter is filed against the same week as whatever she
+/// last added, and falls back to 1 for an empty album. Threading a controller
+/// in just for this would break the property that makes the birth handover
+/// free.
+int _currentWeekForLetter() {
+  final e = GarbhJournalStore.instance.entries;
+  return e.isEmpty ? 1 : e.first.week;
 }
 
 class _Header extends StatelessWidget {
@@ -264,6 +411,12 @@ class _WeekHeading extends StatelessWidget {
       ]);
 }
 
+/// One thing she made, playable where there is something to play.
+///
+/// ⚠️ THE PLAY ICON USED TO RENDER AND DO NOTHING. That is the defect this
+/// section has now produced three times - a control that looks live and is
+/// not - and it is the worst instance of it, because the album's entire
+/// promise is that she can hear this again.
 class _EntryRow extends StatelessWidget {
   const _EntryRow({required this.entry});
   final GarbhJournalEntry entry;
@@ -278,16 +431,45 @@ class _EntryRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final path = entry.path;
+    final audio = RagaAudioStore.instance;
+
+    return AnimatedBuilder(
+      animation: audio,
+      builder: (context, _) {
+        final playing = path != null && audio.isPlayingAsset(path);
+        return Material(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          child: InkWell(
+            // ⚠️ NO TAP TARGET WHERE THERE IS NOTHING TO PLAY. A letter has no
+            // audio; making the whole row tappable anyway would teach her that
+            // taps sometimes do nothing, which is worse than a row that
+            // plainly is not a button.
+            onTap: path == null
+                ? null
+                : () => audio.toggle(path,
+                    title: entry.title.en,
+                    // Her own voice, and her family's, must not loop.
+                    isFile: true,
+                    loop: false),
+            borderRadius: BorderRadius.circular(16),
+            child: _body(playing),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _body(bool playing) {
     final lang = S.current;
     // ⚠️ THE RELATIONSHIP LABEL WINS OVER THE KIND LABEL. She chose the word
     // "Dadi"; showing "Family" instead would replace her word with our
     // category, on the one screen that is supposed to be hers.
     final tag = entry.relationship ?? entry.kind.label.of(lang);
-
     return Container(
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 13),
       decoration: BoxDecoration(
-        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: const Color(0x14000000)),
       ),
@@ -316,8 +498,12 @@ class _EntryRow extends StatelessWidget {
               ]),
         ),
         if (entry.path != null)
-          const Icon(Icons.play_circle_outline_rounded,
-              size: 22, color: _accent),
+          Icon(
+              playing
+                  ? Icons.pause_circle_outline_rounded
+                  : Icons.play_circle_outline_rounded,
+              size: 22,
+              color: _accent),
       ]),
     );
   }

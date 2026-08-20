@@ -39,9 +39,9 @@ import '../localization/app_language.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/pv_fonts.dart';
 
-const _ink = Color(0xFF2E2A32);
-const _muted = Color(0xFF8A8290);
-const _cream = Color(0xFFFBF9F6);
+const _ink = Color(0xFF201C24); // V3 ink1
+const _muted = Color(0xFF6F6878); // V3 ink3
+const _cream = Color(0xFFF5F3F6); // V3 ground
 const _accent = Color(0xFF8A6D3B); // Kriya's warm gold - a practice, not a task
 
 class GarbhRitualScreen extends StatelessWidget {
@@ -117,6 +117,66 @@ class GarbhRitualScreen extends StatelessWidget {
   }
 }
 
+/// Tap to count. Long-press the number to start today over.
+class _JapaCounter extends StatelessWidget {
+  const _JapaCounter();
+
+  @override
+  Widget build(BuildContext context) {
+    final store = GarbhJournalStore.instance;
+    return AnimatedBuilder(
+      animation: store,
+      builder: (context, _) => Row(children: [
+        // ⚠️ A BIG TAP TARGET, because this is tapped 108 times. A small
+        // control here is a small control pressed a hundred times in a row.
+        GestureDetector(
+          onTap: store.japaIncrement,
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            width: 62,
+            height: 62,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: _accent,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text('${store.japaToday}',
+                style: pvFraunces(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.white)),
+          ),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Tap to count',
+                    style: pvManrope(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: _ink)),
+                const SizedBox(height: 3),
+                Text('Starts again tomorrow. Nothing is added up over time.',
+                    style: pvManrope(
+                        fontSize: 11.5, height: 1.4, color: _muted)),
+              ]),
+        ),
+        if (store.japaToday > 0)
+          TextButton(
+            onPressed: store.japaReset,
+            child: Text('Reset',
+                style: pvManrope(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                    color: _muted)),
+          ),
+      ]),
+    );
+  }
+}
+
 class _RitualRow extends StatelessWidget {
   const _RitualRow({
     required this.ritual,
@@ -179,10 +239,11 @@ class _RitualRow extends StatelessWidget {
                                   color: _muted)),
                         ]),
                   ),
-                  if (ritual.hasCounter)
-                    // A japa counter is a different shape from a done tick,
-                    // and saying so on the row means she is not surprised by
-                    // it later.
+                  if (ritual.hasCounter && !on)
+                    // Before she picks it, the row says what SHAPE it is, so
+                    // the counter is not a surprise. After she picks it, the
+                    // counter itself is right there and a label saying
+                    // "counter" beside a counter is noise.
                     Text('COUNTER',
                         style: pvManrope(
                             fontSize: 8.5,
@@ -190,6 +251,22 @@ class _RitualRow extends StatelessWidget {
                             letterSpacing: 0.9,
                             color: _muted)),
                 ]),
+
+                // ---- the japa counter -------------------------------------
+                //
+                // ⚠️ A COUNTER, NOT A DONE TICK, AND THAT IS THE WHOLE REASON
+                // `hasCounter` EXISTS. Japa is counted, not completed: 108 is
+                // a number she is working towards today, and a checkbox would
+                // throw away the only information the practice produces.
+                //
+                // ⚠️ IT RESETS DAILY AND NEVER ACCUMULATES A LIFETIME TOTAL.
+                // A running total turns a practice into a score, which is the
+                // one thing this section refuses to do. See
+                // `GarbhJournalStore.japaToday`.
+                if (ritual.hasCounter && on) ...[
+                  const SizedBox(height: 14),
+                  _JapaCounter(),
+                ],
 
                 // ---- the one progress bar in the section -----------------
                 if (plan != null && on) ...[

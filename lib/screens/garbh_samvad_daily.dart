@@ -50,9 +50,9 @@ import '../services/pregnancy_controller.dart';
 import '../theme/pv_fonts.dart';
 import 'garbh_journal_screen.dart';
 
-const _ink = Color(0xFF2E2A32);
-const _muted = Color(0xFF8A8290);
-const _cream = Color(0xFFFBF9F6);
+const _ink = Color(0xFF201C24); // V3 ink1
+const _muted = Color(0xFF6F6878); // V3 ink3
+const _cream = Color(0xFFF5F3F6); // V3 ground
 const _accSamvad = Color(0xFFB98A7E);
 
 class GarbhSamvadDailyScreen extends StatefulWidget {

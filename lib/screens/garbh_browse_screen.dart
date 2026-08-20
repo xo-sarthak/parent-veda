@@ -52,7 +52,23 @@ import 'package:flutter/material.dart';
 import '../data/garbh_data.dart';
 import '../localization/app_language.dart';
 import '../models/garbh_content.dart';
+import '../data/garbh_rebuild_data.dart';
+import '../services/raga_audio_store.dart';
 import '../theme/pv_fonts.dart';
+
+/// ⚠️ EVERY RAGA CURRENTLY PLAYS THE SAME BUNDLED DRONE.
+///
+/// There is one audio file in the app - `assets/audio/raga_drone.wav`, a
+/// twelve-second tanpura loop - and ten named ragas pointing at it. Real
+/// recordings are a content job that has not happened.
+///
+/// That matters here more than anywhere else, because tapping "Ocean Waves"
+/// and hearing a tanpura is not a missing feature, it is the app telling her
+/// something untrue. So the list SAYS SO in its intro rather than letting her
+/// work it out - the same honesty the video placeholders carry with their
+/// "coming soon" mark. Playable and labelled beats either silent or silently
+/// wrong.
+const String kGarbhRagaAsset = 'audio/raga_drone.wav';
 
 /// One row in the list.
 class GarbhBrowseItem {
@@ -61,6 +77,8 @@ class GarbhBrowseItem {
     this.subtitle,
     this.emoji,
     this.meta,
+    this.onTap,
+    this.pinId,
   });
 
   final String title;
@@ -72,6 +90,15 @@ class GarbhBrowseItem {
 
   /// The right-hand column — "7 min", "3 min read".
   final String? meta;
+
+  /// ⚠️ OPTIONAL, BECAUSE ONLY SHRAVAN HAS SOMETHING TO PLAY. Samvad prompts
+  /// and Vichara reads are text; giving every row a tap target would teach her
+  /// that taps sometimes do nothing, which is worse than a row that plainly is
+  /// not a button.
+  final VoidCallback? onTap;
+
+  /// A stable id for "add to my daily". Null on rows that cannot be pinned.
+  final String? pinId;
 }
 
 /// A titled run of items. A single unnamed group renders with no heading at
@@ -104,9 +131,12 @@ class GarbhBrowseScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const ground = Color(0xFFFBF9F6);
-    const ink = Color(0xFF2E2A32);
-    const muted = Color(0xFF8A8290);
+    // V3 baseline values - see the note at the top of garbh_screen.dart for
+    // why this section carries the values rather than a live palette
+    // reference.
+    const ground = Color(0xFFF5F3F6); // V3 ground
+    const ink = Color(0xFF201C24); // V3 ink1
+    const muted = Color(0xFF6F6878); // V3 ink3
 
     return Scaffold(
       backgroundColor: ground,
@@ -173,7 +203,9 @@ class _Row extends StatelessWidget {
   final Color muted;
 
   @override
-  Widget build(BuildContext context) => Padding(
+  Widget build(BuildContext context) => InkWell(
+        onTap: item.onTap,
+        child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 15),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -205,6 +237,14 @@ class _Row extends StatelessWidget {
                 ],
               ),
             ),
+            // ⚠️ "ADD TO MY DAILY", AND IT IS A QUIET OUTLINE RATHER THAN A
+            // BUTTON. Every row in a ten-row list carrying a solid control
+            // turns a calm list into a form. An outlined star that fills when
+            // it is on says the same thing and disappears when it is off.
+            if (item.pinId != null) ...[
+              const SizedBox(width: 10),
+              _PinButton(id: item.pinId!),
+            ],
             if (item.meta != null) ...[
               const SizedBox(width: 14),
               Padding(
@@ -218,7 +258,39 @@ class _Row extends StatelessWidget {
             ],
           ],
         ),
-      );
+      ));
+}
+
+/// Pin a library item to her own daily.
+class _PinButton extends StatelessWidget {
+  const _PinButton({required this.id});
+  final String id;
+
+  @override
+  Widget build(BuildContext context) {
+    final store = GarbhJournalStore.instance;
+    return AnimatedBuilder(
+      animation: store,
+      builder: (context, _) {
+        final on = store.isPinned(id);
+        return Semantics(
+          label: on ? 'Remove from my daily' : 'Add to my daily',
+          button: true,
+          child: GestureDetector(
+            onTap: () => store.togglePinned(id),
+            behavior: HitTestBehavior.opaque,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+              child: Icon(
+                  on ? Icons.push_pin_rounded : Icons.push_pin_outlined,
+                  size: 17,
+                  color: on ? const Color(0xFF6A30B6) : const Color(0xFF6F6878)),
+            ),
+          ),
+        );
+      },
+    );
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -236,6 +308,17 @@ GarbhBrowseScreen shravanBrowse(AppLanguage lang, Color accent) {
             subtitle: a.subtitle.of(lang),
             emoji: a.emoji,
             meta: '${a.minutes} min',
+            // ⚠️ TAPPING PLAYS IT, WHICH MAKES THIS LIST A CHOICE RATHER THAN
+            // A CATALOGUE. Review: "if we are letting her see all ragas we
+            // might as well allow her to play."
+            //
+            // Loops, like every raga - this is ambient sound, and it is the
+            // one place in the app where playing all evening is the point.
+            // Its own recording where one exists, the shared placeholder
+            // where it does not. See `GarbhAudio.asset`.
+            onTap: () => RagaAudioStore.instance
+                .toggle(a.asset ?? kGarbhRagaAsset, title: a.title.of(lang)),
+            pinId: 'shravan_${a.id}',
           ),
       ];
 
@@ -260,9 +343,18 @@ GarbhBrowseScreen shravanBrowse(AppLanguage lang, Color accent) {
   return GarbhBrowseScreen(
     title: lang.isHindi ? 'सभी राग' : 'All ragas',
     intro: lang.isHindi
-        ? 'हर दिन एक अपने-आप चुना जाता है। पूरी सूची यहाँ है — जो आज के मन से मेल खाए, वही सुनिए।'
+        ? 'हर दिन एक अपने-आप चुना जाता है। पूरी सूची यहाँ है — जो आज के मन से मेल '
+            'खाए, वही सुनिए। अभी सभी एक ही नमूना धुन बजाते हैं; असली रिकॉर्डिंग '
+            'जल्द आ रही हैं।'
         : 'One is chosen for you each day. Here is everything there is, so you '
-            'can pick whatever matches today instead.',
+            'can pick whatever matches today instead.'
+            // ⚠️ THE CAVEAT DISAPPEARS ON ITS OWN once every raga has a real
+            // file. Nobody has to remember to delete it, which is the only
+            // reason an honesty note like this survives contact with a
+            // content drop.
+            '${kShravan.every((a) => a.hasRealAudio) ? '' : ' They all play the '
+                'same sample tone for now; the real recordings are on their '
+                'way.'}',
     accent: accent,
     groups: groups,
   );
@@ -285,6 +377,7 @@ GarbhBrowseScreen vicharaBrowse(AppLanguage lang, Color accent) =>
               title: s.title.of(lang),
               subtitle: s.blurb.of(lang),
               meta: '${s.minutes} min',
+              pinId: 'vichara_${s.id}',
             ),
         ]),
       ],
@@ -307,21 +400,24 @@ GarbhBrowseScreen samvadBrowse(AppLanguage lang, Color accent) =>
           title: lang.isHindi ? 'पहली तिमाही' : 'First trimester',
           items: [
             for (final p in kSamvadT1)
-              GarbhBrowseItem(title: p.text.of(lang)),
+              GarbhBrowseItem(
+                  title: p.text.of(lang), pinId: 'samvad_${p.id}'),
           ],
         ),
         GarbhBrowseGroup(
           title: lang.isHindi ? 'दूसरी तिमाही' : 'Second trimester',
           items: [
             for (final p in kSamvadT2)
-              GarbhBrowseItem(title: p.text.of(lang)),
+              GarbhBrowseItem(
+                  title: p.text.of(lang), pinId: 'samvad_${p.id}'),
           ],
         ),
         GarbhBrowseGroup(
           title: lang.isHindi ? 'तीसरी तिमाही' : 'Third trimester',
           items: [
             for (final p in kSamvadT3)
-              GarbhBrowseItem(title: p.text.of(lang)),
+              GarbhBrowseItem(
+                  title: p.text.of(lang), pinId: 'samvad_${p.id}'),
           ],
         ),
       ],
@@ -343,6 +439,7 @@ GarbhBrowseScreen kriyaBrowse(AppLanguage lang, Color accent) =>
               subtitle: k.blurb.of(lang),
               emoji: k.emoji,
               meta: '${k.minutes} min',
+              pinId: 'kriya_${k.id}',
             ),
         ]),
       ],

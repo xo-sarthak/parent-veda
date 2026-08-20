@@ -48,7 +48,6 @@ import '../localization/app_language.dart';
 import '../models/journal_entry.dart';
 import '../services/journal_store.dart';
 import '../services/pregnancy_controller.dart';
-import '../theme/app_theme.dart';
 import '../theme/pv_fonts.dart';
 import '../widgets/mic_dictation_button.dart';
 
@@ -57,6 +56,27 @@ import '../widgets/mic_dictation_button.dart';
 /// timeline renders these as a carousel that stops being scannable past about
 /// three. It also keeps a single entry small enough to sync.
 const int kJournalMaxPhotos = 3;
+
+// =============================================================================
+//  ⚠️ ON THE V3 DESIGN SYSTEM, NOT `AppTheme`.
+// -----------------------------------------------------------------------------
+//  This screen first shipped on `AppTheme` because `journal_screen.dart` beside
+//  it uses `AppTheme`, and matching a neighbour is usually the right instinct.
+//  It was the wrong one here: `AppTheme` is one of the three older token
+//  systems that still ship the pre-2026-08-16 lilac, so a brand-new screen was
+//  being born into the migration backlog.
+//
+//  Values rather than a live palette reference, for the same reason the Garbh
+//  section carries them - see the note at the top of `garbh_screen.dart`.
+// =============================================================================
+const _ground = Color(0xFFF5F3F6); // V3 ground
+const _surface = Color(0xFFFFFFFF); // V3 surface
+const _surfaceAlt = Color(0xFFEDEAF0); // V3 surfaceAlt
+const _line = Color(0x14000000); // V3 line
+const _ink1 = Color(0xFF201C24); // V3 ink1
+const _ink2 = Color(0xFF5B5464); // V3 ink2
+const _ink3 = Color(0xFF6F6878); // V3 ink3
+const _action = Color(0xFF6A30B6); // V3 action
 
 Future<void> openJournalCompose(
   BuildContext context,
@@ -129,7 +149,7 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
         child: Container(
           margin: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-              color: AppTheme.surface,
+              color: _surface,
               borderRadius: BorderRadius.circular(24)),
           padding: const EdgeInsets.symmetric(vertical: 8),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -213,16 +233,16 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
     final s = S(widget.pregnancy.language);
 
     return Scaffold(
-      backgroundColor: AppTheme.surfaceContainer,
+      backgroundColor: _ground,
       appBar: AppBar(
-        backgroundColor: AppTheme.surfaceContainer,
+        backgroundColor: _ground,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
         title: Text(widget.edit == null ? 'Add a memory' : 'Edit memory',
             style: pvJakarta(
                 fontSize: 17,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.primary900)),
+                color: _ink1)),
         actions: [
           TextButton(
             onPressed: _canSave && !_saving ? _save : null,
@@ -231,8 +251,8 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
                     color: _canSave
-                        ? AppTheme.primary600
-                        : AppTheme.neutral500)),
+                        ? _action
+                        : _ink3)),
           ),
         ],
       ),
@@ -247,13 +267,13 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
             style: pvJakarta(
                 fontSize: 19,
                 fontWeight: FontWeight.w700,
-                color: AppTheme.primary900),
+                color: _ink1),
             decoration: InputDecoration(
               hintText: 'Give it a name (optional)',
               hintStyle: pvJakarta(
                   fontSize: 19,
                   fontWeight: FontWeight.w700,
-                  color: AppTheme.neutral400),
+                  color: _ink3),
               border: InputBorder.none,
               contentPadding: EdgeInsets.zero,
             ),
@@ -268,13 +288,13 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
             maxLines: 14,
             textCapitalization: TextCapitalization.sentences,
             style: pvManrope(
-                fontSize: 15, height: 1.6, color: AppTheme.neutral800),
+                fontSize: 15, height: 1.6, color: _ink2),
             decoration: InputDecoration(
               hintText:
                   'Write it, or tap the mic and just say it. You can also '
                   'skip this and only add photos.',
               hintStyle: pvManrope(
-                  fontSize: 14.5, height: 1.5, color: AppTheme.neutral500),
+                  fontSize: 14.5, height: 1.5, color: _ink3),
               border: InputBorder.none,
               contentPadding: EdgeInsets.zero,
               // ⚠️ REUSED, NOT REBUILT. Speech-to-text already exists and is
@@ -291,10 +311,10 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
                     fontSize: 10,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 1.1,
-                    color: AppTheme.neutral500)),
+                    color: _ink3)),
             const SizedBox(width: 8),
             Text('${_photos.length} of $kJournalMaxPhotos',
-                style: pvManrope(fontSize: 11, color: AppTheme.neutral400)),
+                style: pvManrope(fontSize: 11, color: _ink3)),
           ]),
           const SizedBox(height: 10),
           Wrap(
@@ -327,7 +347,7 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
                 'Write something, or add a photo. Either one is enough to '
                 'save.',
                 style: pvManrope(
-                    fontSize: 12.5, height: 1.5, color: AppTheme.neutral500)),
+                    fontSize: 12.5, height: 1.5, color: _ink3)),
           ],
         ],
       ),
@@ -357,11 +377,11 @@ class _MetaPreview extends StatelessWidget {
   Widget build(BuildContext context) => Container(
         padding: const EdgeInsets.fromLTRB(14, 12, 14, 13),
         decoration: BoxDecoration(
-          color: AppTheme.surface,
+          color: _surface,
           borderRadius: BorderRadius.circular(14),
         ),
         child: Row(children: [
-          Icon(Icons.schedule_rounded, size: 15, color: AppTheme.neutral500),
+          Icon(Icons.schedule_rounded, size: 15, color: _ink3),
           const SizedBox(width: 9),
           Expanded(
             child: Text(
@@ -370,7 +390,7 @@ class _MetaPreview extends StatelessWidget {
                 // feature she never asked for.
                 place == null ? _fmt(stamp) : '${_fmt(stamp)}  ·  $place',
                 style:
-                    pvManrope(fontSize: 12, color: AppTheme.neutral600)),
+                    pvManrope(fontSize: 12, color: _ink2)),
           ),
         ]),
       );
@@ -392,9 +412,9 @@ class _Thumb extends StatelessWidget {
               errorBuilder: (_, _, _) => Container(
                     width: 96,
                     height: 96,
-                    color: AppTheme.neutral200,
+                    color: _surfaceAlt,
                     child: Icon(Icons.broken_image_outlined,
-                        color: AppTheme.neutral500),
+                        color: _ink3),
                   )),
         ),
         Positioned(
@@ -425,11 +445,11 @@ class _AddTile extends StatelessWidget {
           width: 96,
           height: 96,
           decoration: BoxDecoration(
-            color: AppTheme.surface,
+            color: _surface,
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: AppTheme.outlineVariant),
+            border: Border.all(color: _line),
           ),
-          child: Icon(Icons.add_rounded, color: AppTheme.neutral500),
+          child: Icon(Icons.add_rounded, color: _ink3),
         ),
       );
 }

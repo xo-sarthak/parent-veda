@@ -16,6 +16,7 @@ import '../data/spiritual_reading_data.dart';
 import '../localization/app_language.dart';
 import '../models/garbh_content.dart';
 import 'garbh_browse_screen.dart';
+import 'garbh_shravan_version.dart';
 import '../services/garbh_store.dart';
 import '../services/pregnancy_controller.dart';
 import '../services/read_to_baby_saved_store.dart';
@@ -33,11 +34,40 @@ import '../data/garbh_rebuild_data.dart';
 import 'garbh_buddhi_screen.dart';
 
 // --- warm palette ---
-const _cream = Color(0xFFFBF6EE);
-const _surface = Color(0xFFFFFFFF);
-const _ink = Color(0xFF4A463E);
-const _muted = Color(0xFF8C857A);
-const _line = Color(0xFFE9E0D2);
+// =============================================================================
+//  ⚠️ MIGRATED ONTO THE V3 DESIGN SYSTEM, 2026-08-20 - VALUES, NOT REFERENCES.
+// -----------------------------------------------------------------------------
+//  These five were Garbh's own warm-paper neutrals (#FBF6EE cream, #4A463E
+//  brown-grey ink). They now carry V3's `_baseline` values exactly, so the
+//  section stops being the one place in the app with its own ground.
+//
+//  ⚠️ WHY VALUES AND NOT `V2PaletteStore.instance.current.ground`.
+//
+//  113 call sites across this file, and NOT ONE of them has a palette instance
+//  in scope - the widgets here take no `p`. A true migration means threading a
+//  palette through roughly thirty build methods in a 2,000-line file that is
+//  otherwise untouched, which is a large diff and a real regression risk for
+//  a change that is meant to be invisible.
+//
+//  The honest trade: these are a SNAPSHOT of `_baseline`, not a live link, so
+//  they will not follow a palette change automatically. That is acceptable
+//  only because D8 settled the palette - baseline is the palette, and the
+//  comparison bar is coming out. If that is ever reopened, this file is the
+//  first place that goes stale, and the fix is the threading job above.
+//
+//  ⚠️ THE PILLAR ACCENTS BELOW ARE DELIBERATELY NOT MIGRATED. They are section
+//  identity: gold for what she hears, rose for what she says, teal for what
+//  her body does, indigo for her own mind. V3 has one `action` colour, and
+//  collapsing four pillars onto it would erase a distinction the daily card
+//  and the browse lists both rely on. This is the same shape as
+//  `V2NutritionHues` - V3 neutrals plus a local accent set - which is the
+//  established pattern for a section with its own colour language.
+// =============================================================================
+const _cream = Color(0xFFF5F3F6); // V3 ground
+const _surface = Color(0xFFFFFFFF); // V3 surface (already matched)
+const _ink = Color(0xFF201C24); // V3 ink1
+const _muted = Color(0xFF6F6878); // V3 ink3
+const _line = Color(0x14000000); // V3 line
 const _accShravan = Color(0xFFBE9C4E); // gold
 const _accVichara = Color(0xFF6E8C74); // muted green
 const _accSamvad = Color(0xFFB98A7E); // warm rose
@@ -680,7 +710,28 @@ class ShravanScreen extends StatelessWidget {
     // current month), each tappable; no mark-complete. (Old flat "all ragas"
     // list kept in git history / _ShravanDetailScreen for revert.)
     if (!daily) {
-      return _ShravanLibrary(controller: controller);
+      // ⚠️ TWO LIBRARY SHAPES, BEHIND A TOGGLE, ONE RENDERER EACH.
+      //
+      // V1 is the month-by-month programme that shipped first; V2 is the flat
+      // pick-one list added for the rebuild. They answer different questions
+      // and which serves a mother better is a thing you find out by looking.
+      // See garbh_shravan_version.dart.
+      return AnimatedBuilder(
+        animation: ShravanVersionStore.instance,
+        builder: (context, _) {
+          final v2 = ShravanVersionStore.instance.version == ShravanVersion.v2;
+          return Stack(children: [
+            v2
+                ? shravanBrowse(lang, _accShravan)
+                : _ShravanLibrary(controller: controller),
+            const Positioned(
+              right: 18,
+              bottom: 26,
+              child: ShravanVersionPill(),
+            ),
+          ]);
+        },
+      );
     }
 
     // Daily (Home): today's session + mark-complete.
@@ -1994,7 +2045,14 @@ class _KriyaBreathingList extends StatelessWidget {
     return ListView(
       padding: const EdgeInsets.fromLTRB(18, 16, 18, 28),
       children: [
-        for (final p in kKriya)
+        // ⚠️ FILTERED BY HER WEEK, SO NOTHING UNSAFE IS OFFERED AT ALL.
+        //
+        // The daily pick was already trimester-aware; this library was not, so
+        // a woman at 34 weeks could scroll to box breathing and its breath
+        // holds. Filtering here rather than warning on the practice screen is
+        // the right shape: a practice she should not do today is not a thing
+        // to caution her about, it is a thing not to offer.
+        for (final p in kKriya.where((x) => x.safeAtWeek(controller.currentWeek)))
           GestureDetector(
             onTap: () => _push(context,
                 _KriyaDetailScreen(practice: p, controller: controller)),
