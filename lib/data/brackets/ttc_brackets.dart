@@ -112,12 +112,11 @@ final List<Bracket> kTtcBrackets = [
       BracketLayer.content: BracketLayerSpec.live(['ttc_chapter']),
       BracketLayer.activities:
           BracketLayerSpec(state: LayerState.notCore, reason: 'Not core'),
-      // ⚠️ HALF OF WHAT THE WORKBOOK ASKED FOR. It wants "PCOS symptom checker,
-      // cycle tracker"; the cycle tracker ships and the symptom checker does
-      // not. The layer is live because it RESOLVES — she gets a real tool — and
-      // the missing half is a listed gap rather than an absent layer. Same call
-      // as pregnancy's Complications → Tools.
-      BracketLayer.tools: BracketLayerSpec.live(['ttc_cycle', 'ttc_calendar']),
+      // Was half of what the workbook asked for — "PCOS symptom checker, cycle
+      // tracker", with only the tracker shipping. Both halves now exist, and
+      // the checker reads the tracker's data rather than duplicating it.
+      BracketLayer.tools: BracketLayerSpec.live(
+          ['ttc_pcos_check', 'ttc_cycle', 'ttc_calendar']),
       BracketLayer.products: BracketLayerSpec.live(['ttc_supplements']),
       // "PCOS & Conception (paid flagship of stage)" — shipped as
       // `ttc_cohort_pcos`, "The PCOS programme".

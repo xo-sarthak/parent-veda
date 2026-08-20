@@ -218,6 +218,19 @@ final JourneyConfig kTtcPcosLibrary = JourneyConfig(
     JourneyStep(
       question: _en('How do I keep my cycle readable enough to plan around?'),
       elements: [
+        // ⚠️ THE CHECKER FIRST, THE TRACKER SECOND, and the order is the
+        // point. The checker reads her logged cycles and tells her what they
+        // already say; the tracker is what she uses afterwards to sharpen it.
+        // Offering the tracker first asks her to go away and come back in
+        // three months before the app tells her anything.
+        JourneyElement(
+          type: SolutionType.tool,
+          title: _en('Check your own pattern'),
+          value: _en('Three minutes, built on the cycles you have already '
+              'logged. It does not diagnose anything.'),
+          meta: _en('3 MIN'),
+          surfaceId: 'ttc_pcos_check',
+        ),
         JourneyElement(
           type: SolutionType.tool,
           title: _en('Track your cycle'),

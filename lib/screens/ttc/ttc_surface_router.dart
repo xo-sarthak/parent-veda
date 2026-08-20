@@ -32,6 +32,7 @@ import 'ttc_journal_screen.dart';
 import 'ttc_medication_screen.dart';
 import 'ttc_nutrition_screen.dart';
 import 'ttc_partner_screen.dart';
+import 'ttc_pcos_check_screen.dart';
 import 'ttc_prepare_screen.dart';
 import 'ttc_products_screen.dart';
 import 'ttc_records_screen.dart';
@@ -114,6 +115,9 @@ Widget? _ttcStaticSurface(String id) => switch (id) {
       // (a live vaccine delays trying; a blood test never does). Folding it in
       // would bury the one item on the preconception list that has a deadline.
       'ttc_vaccinations' => const TtcVaccinesScreen(),
+      // The workbook's PCOS Tools cell, other half. `ttc_cycle` was always the
+      // tracker; this is the checker that sat beside it as notReady.
+      'ttc_pcos_check' => const TtcPcosCheckScreen(),
       'ttc_nutrition' => const TtcNutritionScreen(),
       'ttc_supplements' => const TtcSupplementsScreen(),
       // `ttc_tracker` is deliberately absent: `TtcTrackerScreen` requires a
