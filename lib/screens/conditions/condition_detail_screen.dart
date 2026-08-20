@@ -24,9 +24,25 @@ import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_placeholders.dart';
+import '../brackets/hub/hub_solution_cards.dart';
 import '../brackets/hub/problem_hub_screen.dart' show HubPill;
+import '../prepare/consultations_screen.dart';
 import '../tools/medicine_tracker_screen.dart';
 import '../v2/v2_palette.dart';
+
+/// The specialist a condition page's consult offer promises, as a `Specialist.id`.
+///
+/// ⚠️ NAMED ONCE, FOR THE REASON `kScanConsultRole` IS NAMED ONCE. The card's
+/// words and the list's filter are the same fact, and a literal at the call
+/// site is how the two drift: reword the card to name a different expert and
+/// nothing fails — the list simply opens on the wrong one, silently, forever.
+///
+/// `sp_ob` is the Obstetrician in `prepare_data.dart`, which is what
+/// "gynaecologist" means in this market. If a condition ever needs someone else
+/// — an endocrinologist for thyroid, a haematologist for a clotting disorder —
+/// this becomes a map keyed on `condition.id`, and the card's title is built
+/// from the same entry rather than written twice.
+const String kConditionConsultRole = 'sp_ob';
 
 class ConditionDetailScreen extends StatelessWidget {
   const ConditionDetailScreen(
@@ -229,6 +245,63 @@ class ConditionDetailScreen extends StatelessWidget {
               // three foot sections were specified together and the next
               // person to read this list will otherwise wonder which one was
               // dropped.
+
+              // ---- talk to a doctor, at the moment of need --------------------
+              //
+              // ⚠️ THIS IS THE OFFER THAT FELL OUT OF THE HUB AND HAD NOWHERE
+              // TO LAND. The review asked to remove "Track my readings"; it did
+              // not ask to remove this. Dropping that door left the hub with one
+              // door, a one-door hub does not render a hub screen at all, and so
+              // the closing offer it carried stopped existing — a deletion
+              // nobody requested, produced as a side effect of one somebody did.
+              //
+              // ⚠️ WHICH TURNED OUT TO BE THE BETTER HOME ANYWAY, and the reason
+              // generalises: an offer belongs where the need is felt, not where
+              // the section begins. At the top of a hub it is a menu item
+              // competing with "understand my condition" — offered before she
+              // knows whether she needs it. Here it is the question she is
+              // actually asking, having just read what the condition is, what it
+              // means for her baby, and eight FAQs that are all about people in
+              // general and none about her.
+              //
+              // ⚠️ AND THAT GAP IS THE PITCH. The page is a library entry; her
+              // case is a case. We are allowed to explain a condition and
+              // forbidden to interpret hers — the clinical-ownership rule in
+              // CLAUDE.md — so "what does this mean for me specifically" is a
+              // question this page structurally cannot answer, and pointing at
+              // someone who can is honest rather than salesy.
+              if (!entry.highAnxiety) ...[
+                const SizedBox(height: 26),
+                _Heading(
+                    const LocalizedText(
+                            en: 'Want to talk it through?',
+                            hi: 'Want to talk it through?')
+                        .of(lang),
+                    p),
+                const SizedBox(height: 12),
+                SolutionCard(
+                  type: SolutionType.consult,
+                  title: const LocalizedText(
+                      en: 'Ask a gynaecologist about your own case',
+                      hi: 'Ask a gynaecologist about your own case'),
+                  // The value line says what the page cannot do, which is the
+                  // only reason worth giving her to book.
+                  value: const LocalizedText(
+                      en: 'This page explains the condition. They can tell you '
+                          'what it means for you.',
+                      hi: 'This page explains the condition. They can tell you '
+                          'what it means for you.'),
+                  p: p,
+                  lang: lang,
+                  // ⚠️ THE FILTER IS THE WHOLE POINT OF THE TAP. Naming a
+                  // gynaecologist and then opening a list of five specialists
+                  // is the wiring gate this app has already shipped once.
+                  onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                      settings: const RouteSettings(name: 'consults'),
+                      builder: (_) => ConsultationsScreen(
+                          lang: lang, onlyRole: kConditionConsultRole))),
+                ),
+              ],
             ],
           ),
         );

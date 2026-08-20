@@ -453,6 +453,7 @@ final List<ConditionEntry> kCommonConditions = [
     showMedicine: true,
     showReadMore: true,
     showWatch: true,
+    pregSignal: PregCondition.pcos,
   ),
   ConditionEntry(
     id: 'hyperemesis',
@@ -514,6 +515,7 @@ final List<ConditionEntry> kCommonConditions = [
     showMedicine: true,
     showReadMore: true,
     showWatch: true,
+    pregSignal: PregCondition.hyperemesis,
   ),
   ConditionEntry(
     id: 'placenta_previa',
@@ -941,6 +943,7 @@ final List<ConditionEntry> kPlacentaBleedingConditions = [
       ),
     ],
     showReadMore: true,
+    pregSignal: PregCondition.iugr,
   ),
   ConditionEntry(
     id: 'low_amniotic_fluid',
@@ -1113,6 +1116,7 @@ final List<ConditionEntry> kPositionCervixConditions = [
       ),
     ],
     showMedicine: true,
+    pregSignal: PregCondition.cervicalIncompetence,
   ),
 ];
 
@@ -1289,6 +1293,7 @@ final List<ConditionEntry> kSpecialistConditions = [
             'usually reviewed and decided afterwards, if at all.'),
       ),
     ],
+    pregSignal: PregCondition.fibroids,
   ),
   ConditionEntry(
     id: 'icp_cholestasis',
@@ -1334,6 +1339,7 @@ final List<ConditionEntry> kSpecialistConditions = [
       ),
     ],
     showMedicine: true,
+    pregSignal: PregCondition.cholestasis,
   ),
   ConditionEntry(
     id: 'hellp',
@@ -1457,6 +1463,7 @@ final List<ConditionEntry> kSpecialistConditions = [
       ),
     ],
     showMedicine: true,
+    pregSignal: PregCondition.rhNegative,
   ),
 ];
 

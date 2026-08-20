@@ -161,7 +161,73 @@ extension NotifyTopicX on NotifyTopic {
 //  NOTE: twins is deliberately NOT in this list. ReadyBirthContextStore already
 //  holds it, and asking for something we already have is exactly the
 //  derive-don't-ask rule this engine is built on. Read [expectingTwins] instead.
-enum PregCondition { gestationalDiabetes, lowLyingPlacenta, anemia, thyroid, hypertension, previousCsection, highRisk }
+/// A condition that shapes what content helps her, what Ask Veda is told, and
+/// how things are ranked.
+///
+/// ⚠️ TWO SETS LIVE IN ONE ENUM, AND CONFLATING THEM IS THE TRAP. The first
+/// seven are ASKED — they are the chips in the profile card and the
+/// progressive-profiling strip. The rest are RECORDED ONLY: she declares them
+/// by tapping "Add to my journey" on a condition page, which means she has
+/// already told us and being asked again would be the app not listening.
+///
+/// ⚠️ WHY THAT SPLIT HAD TO EXIST BEFORE THIS ENUM COULD GROW. Both chip call
+/// sites iterate `PregCondition.values`. Widening the enum therefore grows a
+/// question on screen — silently, with no edit to either screen. Seven chips is
+/// a question; fourteen is a form, and the app's own rule is "derive, never
+/// ask; only ask for what is genuinely unknowable". So `isAskable` is not
+/// tidiness: without it, adding a value to serve Ask Veda would have degraded
+/// onboarding as a side effect, in a file nobody editing this enum would open.
+///
+/// ⚠️ WHAT IS DELIBERATELY NOT HERE, AND THE RULE BEHIND IT: **this enum
+/// records ongoing state, never an event.** A profile has no expiry. Nothing
+/// ever clears a value, so anything true only for a season stays true forever —
+/// and Ask Veda would still be told in March about the dengue she had in
+/// January, and told about a pregnancy that has ended.
+///
+/// So these are refused, each for that reason and not for lack of importance:
+///   · **Ectopic and miscarriage** — losses, not conditions. Persisting either
+///     as "something she has" would have the app addressing a pregnant woman
+///     about a pregnancy that ended. This is the most important refusal here.
+///   · **Abruption, HELLP, vasa praevia** — acute emergencies, managed in
+///     hospital, over by the time any content could help.
+///   · **COVID, dengue, UTI** — infections that resolve. True for a fortnight,
+///     recorded for life.
+///   · **Breech** — a position, not a diagnosis, and the one thing on the list
+///     that reliably flips: most babies turn. It is the clearest case for an
+///     expiring signal, which we do not have.
+///   · **Polyhydramnios and low amniotic fluid** — a measurement at a moment,
+///     re-taken every scan.
+///   · **Piles, varicose veins** — symptoms; they belong to that bracket.
+///
+/// The test for inclusion, stated so the next person applies the same one:
+/// **would a clinician still call this part of her pregnancy history on the day
+/// she delivers?** If yes it is state; if no it is an event.
+///
+/// If an expiring signal ever exists, the refused ones are the reason to build
+/// it, and this comment is the list to work from.
+///
+/// ⚠️ ADDING VALUES IS SAFE; REORDERING AND RENAMING ARE NOT. `.name` is the
+/// persisted key in `shared_preferences` and the analytics `value` column, so a
+/// rename strands every profile that already holds the old string.
+enum PregCondition {
+  // ---- asked: the chips ----------------------------------------------------
+  gestationalDiabetes,
+  lowLyingPlacenta,
+  anemia,
+  thyroid,
+  hypertension,
+  previousCsection,
+  highRisk,
+
+  // ---- recorded only: declared from a condition page ------------------------
+  pcos,
+  hyperemesis,
+  cholestasis,
+  iugr,
+  rhNegative,
+  cervicalIncompetence,
+  fibroids,
+}
 
 /// What she most wants help with while pregnant (multi-select).
 enum PregPriority { nutrition, sleep, anxiety, birthPrep, fitness, babyDevelopment, symptoms }
@@ -213,7 +279,54 @@ extension PregConditionX on PregCondition {
         PregCondition.hypertension => _t('High blood pressure', 'ज़्यादा ब्लड प्रेशर'),
         PregCondition.previousCsection => _t('Previous C-section', 'पहले C-section हुआ है'),
         PregCondition.highRisk => _t('High-risk pregnancy', 'high-risk गर्भावस्था'),
+
+        // ---- recorded-only values ------------------------------------------
+        // ⚠️ THESE LABELS GO OVER THE WIRE. `veda_context.dart` sends
+        // `label.en.toLowerCase()` to the Ask Veda service, so the English side
+        // is not decoration — it is the string the service matches on. Keep it
+        // the words a doctor and a mother would both recognise, and keep it
+        // stable: rewording one silently changes what the service receives.
+        PregCondition.pcos => _same('PCOS'),
+        // The condition page is titled 'Hyperemesis'; the label says what it is
+        // so a mother who has only ever been told "severe vomiting" recognises
+        // herself in the chip if it is ever shown.
+        PregCondition.hyperemesis => _t('Hyperemesis', 'लगातार तेज़ उल्टियाँ'),
+        // ICP is what the prescription and the itching page both say.
+        PregCondition.cholestasis => _same('ICP / cholestasis'),
+        PregCondition.iugr => _t('IUGR', 'शिशु धीरे बढ़ रहा है'),
+        PregCondition.rhNegative => _t('Rh negative', 'Rh negative'),
+        PregCondition.cervicalIncompetence =>
+          _t('Cervical incompetence', 'कमज़ोर cervix'),
+        PregCondition.fibroids => _t('Fibroids', 'fibroids'),
       };
+
+  /// Whether she is ever ASKED this, as opposed to declaring it herself.
+  ///
+  /// ⚠️ THE CHIP LISTS READ THIS, NOT `.values`. See the enum's own comment for
+  /// why that indirection carries its weight: without it, every value added for
+  /// Ask Veda's benefit would appear as another chip in a question that is
+  /// already the right length.
+  ///
+  /// Defaulting new values to NOT askable is the deliberate direction. A
+  /// condition that turns out to be worth asking is one line changed here; a
+  /// question that has quietly grown to fourteen chips is noticed by nobody
+  /// until a mother abandons onboarding.
+  bool get isAskable => switch (this) {
+        PregCondition.gestationalDiabetes ||
+        PregCondition.lowLyingPlacenta ||
+        PregCondition.anemia ||
+        PregCondition.thyroid ||
+        PregCondition.hypertension ||
+        PregCondition.previousCsection ||
+        PregCondition.highRisk =>
+          true,
+        _ => false,
+      };
+
+  /// The chips, in the order they are shown. The only list either chip surface
+  /// should iterate.
+  static List<PregCondition> get askable =>
+      PregCondition.values.where((c) => c.isAskable).toList();
 }
 
 extension PregPriorityX on PregPriority {

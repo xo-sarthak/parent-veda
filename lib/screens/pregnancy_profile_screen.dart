@@ -130,7 +130,11 @@ class _PregnancyProfileScreenState extends State<PregnancyProfileScreen> {
         S.now.askHealthQLong,
         S.now.askHealthWhyLong,
         Wrap(spacing: 8, runSpacing: 8, children: [
-          for (final c in PregCondition.values)
+          // ⚠️ `askable`, NOT `values` — see PregCondition's comment. The
+          // enum carries conditions she declares from a condition page as
+          // well as the ones we ask about, and only the second set belongs
+          // in a question.
+          for (final c in PregConditionX.askable)
             _chip(c.label.now, _p.hasPregCondition(c),
                 () => _p.togglePregCondition(c)),
         ]),

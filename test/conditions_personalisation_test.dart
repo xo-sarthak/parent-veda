@@ -26,6 +26,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/data/conditions_data.dart';
+import 'package:parentveda/data/prepare_data.dart';
+import 'package:parentveda/screens/prepare/consultations_screen.dart';
 import 'package:parentveda/data/hubs/pregnancy_hubs.dart';
 import 'package:parentveda/data/journeys/pregnancy_journeys.dart';
 import 'package:parentveda/screens/conditions/condition_detail_screen.dart';
@@ -44,6 +46,7 @@ Future<void> _pump(WidgetTester t, Widget w) async {
 }
 
 void main() {
+  _widenedSignals();
   TestWidgetsFlutterBinding.ensureInitialized();
   SharedPreferences.setMockInitialValues({});
 
@@ -103,15 +106,23 @@ void main() {
       final fp = FamilyProfileStore.instance;
       final before = fp.pregConditions.length;
 
-      // ICP/cholestasis is real, in the library, and has no `PregCondition`.
-      ConditionsStore.instance.toggleAddedToJourney('icp_cholestasis');
+      // ⚠️ THIS TEST USED TO USE ICP/CHOLESTASIS, WHICH NOW HAS A SIGNAL.
+      // The principle it guards is unchanged; only the example went stale, and
+      // it went stale in the good direction. Dengue replaces it because dengue
+      // is refused on a durable ground rather than an accidental one: it
+      // RESOLVES, and `FamilyProfileStore` has no expiry, so recording it would
+      // still be telling Ask Veda about it three months later. See
+      // `PregCondition`'s comment for the full list and the state-vs-event rule
+      // that produced it - which is why this example cannot go stale the way
+      // the last one did.
+      ConditionsStore.instance.toggleAddedToJourney('dengue_pregnancy');
 
       // ⚠️ NULL IS A REAL ANSWER. The alternative — forcing it into the
       // nearest enum value — would tell Ask Veda she has something she does
       // not, which is worse than telling it nothing.
       expect(fp.pregConditions.length, before);
       // ...but her own record still holds it, or the tap did nothing at all.
-      expect(ConditionsStore.instance.isAddedToJourney('icp_cholestasis'),
+      expect(ConditionsStore.instance.isAddedToJourney('dengue_pregnancy'),
           isTrue);
     });
   });
@@ -331,4 +342,183 @@ void main() {
       }
     });
   });
+
+  // ===========================================================================
+  //  "Talk to a doctor" — the offer that fell out of the hub, and the tap
+  // ===========================================================================
+  //
+  //  ⚠️ THE HISTORY IS THE POINT. The review asked to remove "Track my
+  //  readings". It did not ask to remove the consult offer — but removing that
+  //  door left the hub with ONE door, a one-door hub renders no hub screen at
+  //  all, and so the closing offer it carried stopped existing. A deletion
+  //  nobody requested, produced as a side effect of one somebody did.
+  //
+  //  ⚠️ AND RENDERING IT IS HALF THE JOB. "Make sure it actually helps when
+  //  they click it" — so the tap is asserted, not just the card. A card naming
+  //  a gynaecologist that opens an unfiltered list of five specialists is the
+  //  wiring gate this app has already shipped once, on the scans page.
+  group('talk to a doctor is offered, and the tap lands somewhere useful', () {
+    testWidgets('an ordinary condition page closes with the offer', (t) async {
+      ConditionsStore.instance.setDoor(ConditionDoorAnswer.diagnosed);
+      await _pump(t,
+          ConditionDetailScreen(entry: _byId('gdm'), pregnancy: pregnancy));
+      expect(find.text('Ask a gynaecologist about your own case'),
+          findsOneWidget);
+    });
+
+    testWidgets('tapping it opens the list filtered to the obstetrician',
+        (t) async {
+      ConditionsStore.instance.setDoor(ConditionDoorAnswer.diagnosed);
+      await _pump(t,
+          ConditionDetailScreen(entry: _byId('gdm'), pregnancy: pregnancy));
+
+      await t.tap(find.text('Ask a gynaecologist about your own case'));
+      await t.pumpAndSettle();
+
+      // ⚠️ THE ASSERTION IS ON THE FILTER, NOT ON ARRIVAL. Landing on the
+      // consultations screen at all would pass a weaker test and still ship the
+      // exact defect: she is told "a gynaecologist" and shown five specialists.
+      final screen = t.widget<ConsultationsScreen>(
+          find.byType(ConsultationsScreen));
+      expect(screen.onlyRole, kConditionConsultRole);
+    });
+
+    testWidgets('the role it names is a specialist that actually exists',
+        (t) async {
+      // A filter matching nothing falls back to showing everyone, so a typo in
+      // the role would never render an empty screen — it would silently undo
+      // the filter and nothing above would fail.
+      expect(kSpecialists.map((x) => x.id), contains(kConditionConsultRole));
+    });
+
+    testWidgets('miscarriage is not sold anything', (t) async {
+      // ⚠️ `highAnxiety` GATES THIS, AND MISCARRIAGE IS WHY THE FLAG EXISTS.
+      // A woman reading this page has quite possibly just lost a pregnancy.
+      ConditionsStore.instance.setDoor(ConditionDoorAnswer.diagnosed);
+      await _pump(t, ConditionDetailScreen(
+          entry: _byId('miscarriage'), pregnancy: pregnancy));
+      expect(find.text('Ask a gynaecologist about your own case'), findsNothing);
+    });
+
+    testWidgets('preeclampsia is not sold anything either', (t) async {
+      // Different reason from miscarriage, same answer: this page carries
+      // call-now instructions. At 2am the right response is her doctor's phone
+      // number, not a booking that resolves next week.
+      ConditionsStore.instance.setDoor(ConditionDoorAnswer.diagnosed);
+      await _pump(t, ConditionDetailScreen(
+          entry: _byId('preeclampsia'), pregnancy: pregnancy));
+      expect(find.text('Ask a gynaecologist about your own case'), findsNothing);
+    });
+
+    test('exactly two conditions are exempt, so the flag has not spread', () {
+      // If this number grows, someone has used highAnxiety as a general "no
+      // commerce" switch, which would quietly change the tone rules the flag
+      // also governs.
+      expect(kAllConditions.where((c) => c.highAnxiety).length, 2);
+    });
+  });
+
+}
+
+// =============================================================================
+//  The widened signal set — what it records, what it refuses, and what it
+//  must never turn into
+// -----------------------------------------------------------------------------
+//  Three separate promises, easy to blur into one:
+//
+//    1. Every mapped condition reaches a real enum value.
+//    2. The RECORDED set may grow; the ASKED set may not, silently.
+//    3. Events never become state.
+//
+//  (3) is the one with teeth. `FamilyProfileStore` has no expiry: nothing ever
+//  clears a condition. So a value that is true for a fortnight is true forever,
+//  and the failure lands as Ask Veda being told in March about January's
+//  dengue — or, far worse, addressing a pregnant woman about a pregnancy that
+//  ended in a miscarriage she read about once.
+// =============================================================================
+
+void _widenedSignals() {
+  test('every mapped condition resolves to a real signal', () {
+    final mapped = kAllConditions.where((c) => c.pregSignal != null).toList();
+    expect(mapped.length, greaterThanOrEqualTo(12),
+        reason: 'signals were removed rather than added');
+    for (final c in mapped) {
+      expect(PregCondition.values, contains(c.pregSignal), reason: c.id);
+    }
+  });
+
+  test('the asked chip list stays seven and stays askable', () {
+    // ⚠️ THE ASSERTION THAT PROTECTS ONBOARDING. Both chip surfaces iterate
+    // `askable`, so this number is what a mother actually sees. It is pinned
+    // exactly - not `lessThan` - because the failure mode is drift by one, a
+    // value at a time, each individually defensible.
+    expect(PregConditionX.askable.length, 7);
+    for (final c in PregConditionX.askable) {
+      expect(c.isAskable, isTrue, reason: c.name);
+    }
+  });
+
+  test('recorded-only signals are never asked', () {
+    const recorded = [
+      PregCondition.pcos,
+      PregCondition.hyperemesis,
+      PregCondition.cholestasis,
+      PregCondition.iugr,
+      PregCondition.rhNegative,
+      PregCondition.cervicalIncompetence,
+      PregCondition.fibroids,
+    ];
+    for (final c in recorded) {
+      expect(c.isAskable, isFalse,
+          reason: '${c.name} became a chip - she already declared it on a '
+              'condition page, so asking again is the app not listening');
+    }
+  });
+
+  test('losses and acute events map to no signal, deliberately', () {
+    // ⚠️ THIS TEST IS THE DECISION, NOT A SIDE EFFECT OF IT. Each of these has
+    // a full condition page and could plausibly earn a signal; each is refused
+    // because it is an event rather than ongoing state, and the profile cannot
+    // express "this was true for three weeks".
+    //
+    // Ectopic and miscarriage are the ones that matter most: persisting either
+    // would have the app talking to a woman about a pregnancy that has ended.
+    const mustStayNull = [
+      'ectopic', 'miscarriage', // losses
+      'placental_abruption', 'hellp', 'vasa_previa', // acute emergencies
+      'covid_pregnancy', 'dengue_pregnancy', 'uti', // resolve
+      'breech', // a position; most babies turn
+      'polyhydramnios', 'low_amniotic_fluid', // a measurement at a moment
+      'piles', 'varicose_veins', // symptoms, another bracket
+      'preeclampsia', // clinical call, parked for review
+    ];
+    for (final id in mustStayNull) {
+      final c = kAllConditions.firstWhere((x) => x.id == id);
+      expect(c.pregSignal, isNull,
+          reason: '$id gained a signal. If that was deliberate, the enum '
+              'needs an expiry mechanism first - see PregCondition.');
+    }
+  });
+
+  test('no two conditions claim the same signal', () {
+    // Two pages writing one value means untoggling either clears both, and the
+    // button on the other page silently lies about its own state.
+    final seen = <PregCondition, String>{};
+    for (final c in kAllConditions.where((x) => x.pregSignal != null)) {
+      final prev = seen[c.pregSignal!];
+      expect(prev, isNull,
+          reason: '${c.id} and $prev both map to ${c.pregSignal!.name}');
+      seen[c.pregSignal!] = c.id;
+    }
+  });
+
+  test('every wire label is non-empty and lower-caseable', () {
+    // `veda_context.dart` sends `label.en.toLowerCase()`. An empty or
+    // whitespace label reaches the service as a blank condition, which is worse
+    // than sending nothing: it looks like an answer.
+    for (final c in PregCondition.values) {
+      expect(c.label.en.trim(), isNotEmpty, reason: c.name);
+    }
+  });
+
 }

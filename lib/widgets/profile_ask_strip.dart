@@ -246,7 +246,9 @@ ProfileAskStrip pregHealthStrip(AppLanguage lang, String surface) =>
       icon: Icons.medical_information_outlined,
       multi: true,
       options: [
-        for (final c in PregCondition.values)
+        // ⚠️ `askable`, NOT `values`. This strip interrupts her mid-screen,
+        // so it is the surface where an over-long option list costs most.
+        for (final c in PregConditionX.askable)
           AskOption(c.label,
               () => FamilyProfileStore.instance.togglePregCondition(c)),
       ],

@@ -111,14 +111,25 @@ final HubConfig kPgComplications = HubConfig(
   // as config that looks alive and never renders. That test did its job here:
   // the one-door consequence was not obvious from the edit that caused it.
   //
-  // ⚠️ WHAT THIS COSTS, STATED PLAINLY: "Talk to a doctor" has left the
-  // Complications bracket entirely. That is a real loss — a condition is one
-  // of the better reasons to book a gynaecologist — and it was not asked for;
-  // it fell out of the door removal. The right home for it is the foot of a
-  // CONDITION page, at the moment of need, the way `ScanDetailScreen` closes
-  // with "still unsure?". Raised rather than done, because adding a consult
-  // offer to twenty-seven condition pages is a product decision about where
-  // this section is allowed to sell, not a tidy-up.
+  // ⚠️ RESOLVED 2026-08-20 — AND NOT BY PUTTING IT BACK HERE.
+  //
+  // What the door removal cost, stated plainly at the time: "Talk to a doctor"
+  // had left the Complications bracket entirely. That was a real loss, and it
+  // was not asked for — the review asked to drop "Track my readings" and this
+  // fell out of that edit as a side effect.
+  //
+  // It now lives at the FOOT OF EACH CONDITION PAGE, which turned out to be the
+  // better home rather than merely an available one, and the reason travels:
+  // **an offer belongs where the need is felt, not where the section begins.**
+  // Here it was a menu item competing with "understand my condition", offered
+  // before she knew whether she needed it. There it is the question she is
+  // actually asking, having just read a page that explains the condition in
+  // general and says nothing about her.
+  //
+  // It is gated on `highAnxiety`, so miscarriage and preeclampsia are exempt —
+  // see `condition_detail_screen.dart` and the tests in
+  // `test/conditions_personalisation_test.dart`, which assert the tap lands on
+  // a list FILTERED to the obstetrician rather than merely landing.
   //
   // closing: HubClosing(
   //   label: _en('Talk to a doctor'),

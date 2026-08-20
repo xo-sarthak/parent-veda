@@ -1970,3 +1970,80 @@ Rejected: **refuse** (then why is the field editable?) and **move** (contradicts
 
 None of this blocks the code-entry screen, which can ship against attribution
 alone. It blocks paying anyone correctly.
+
+---
+
+## 14.0 The clinical-review list — OPEN, and it needs a named clinician
+
+Things this app says that are **medically load-bearing and reviewed by nobody**.
+They are collected here rather than left as `REQUIRED_TO_CONFIRM` comments
+scattered across files, because a comment in a Dart file is not a queue and
+nobody is working from it.
+
+⚠️ **This list is not a research task.** Every item below has already been
+researched as far as public sources allow; what is missing is a person with a
+licence saying yes. Adding more research to it does not shorten it.
+
+### 14.1 Preeclampsia sends no personalisation signal — DELIBERATE, needs a ruling
+
+`PregCondition` gained seven values on 2026-08-20 (see
+`docs/CONDITION-SIGNALS-HANDOFF.md`). Preeclampsia was **not** one of them, and
+this is the one omission on that list that is a clinical judgement rather than a
+structural rule.
+
+**The tempting mapping is `hypertension`, and the case against it:** preeclampsia
+is raised blood pressure **plus** proteinuria **plus** organ involvement. Treating
+the two as one thing would have Ask Veda answer a preeclampsia question with
+high-blood-pressure framing — on the most dangerous condition in the library, in
+the direction of under-stating it.
+
+**The case for mapping it anyway:** she currently gets nothing. A woman who has
+declared preeclampsia gets no BP-aware content and no Ask Veda context at all,
+which is its own kind of wrong.
+
+**Three options, for whoever rules on it:**
+
+1. **Leave null.** Status quo. Honest, and she gets nothing.
+2. **Map to `hypertension`.** She gets BP-aware content immediately; the app
+   treats the two as the same condition.
+3. **Give it its own enum value.** Most correct. Costs a second cross-repo round
+   with the Ask Veda service, which must then hold preeclampsia-specific
+   retrieval and framing rather than inheriting hypertension's.
+
+**Recommendation on the record: (3), but only alongside real corpus coverage.**
+Recognising the string without content behind it produces a confidently framed
+answer with nothing under it, which on this condition is the worst of the three.
+
+⚠️ **Do not map it service-side as a workaround.** That puts the app and the
+service in disagreement about her, with no way for either to detect it.
+
+Enforced by `test/conditions_personalisation_test.dart`, which fails the build if
+preeclampsia gains a signal — so this stays a decision rather than drifting.
+
+### 14.2 The crisis helpline is wired but unconfirmed
+
+`Tele-MANAS, 14416` (fallback `1800-891-4416`), in
+`lib/data/mind_mood_data.dart`, flagged `REQUIRED_TO_CONFIRM`.
+
+It replaced KIRAN (`1800-599-0019`), which has been merged into Tele-MANAS.
+**Research is done; sign-off is not.** The general lesson is worth keeping: a
+helpline is the one constant in an app that can go stale without anybody
+touching the code — the number was real, the constant was correct, no test could
+fail, and it had still stopped being the right number.
+
+### 14.3 Mind & Mood copy is counsellor-unreviewed
+
+Six "more than a mood" articles, all six self-check questions, and the safety
+question that routes to the crisis screen. Export is written and ready at
+`docs/MIND-MOOD-REVIEW.md`; it has not been sent.
+
+### 14.4 The 27 condition pages have had no clinical read
+
+The whole library — `lib/data/conditions_data.dart` — was written from research,
+not reviewed. `callNow` lists are the highest-stakes part: they decide what makes
+a mother pick up the phone today, and both directions are harmful.
+
+---
+
+**None of the above blocks a build.** All of it blocks being comfortable, and
+14.2 and 14.4 are the two that reach a mother at her worst moment.
