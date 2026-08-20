@@ -96,6 +96,34 @@ final List<PvVideoSlot> kTtcVideos = [
   //  Conceiving & the fertile window
   // ---------------------------------------------------------------------------
   PvVideoSlot(
+    id: 'ttc_vid_cycle_basics',
+    hue: 344,
+    title: _en('Your cycle, drawn once and for all'),
+    why: _en('The two halves, why only one of them moves, and where '
+        'ovulation actually sits in yours.'),
+    seconds: 384,
+    expert: _en('Dr. Ananya Rao'),
+    expertRole: _en('Gynaecologist · 14 years'),
+    chapters: [
+      PvVideoChapter(at: 0, label: _en('Two halves, not one cycle')),
+      PvVideoChapter(at: 66, label: _en('The half that moves')),
+      PvVideoChapter(at: 152, label: _en('Ovulation, in about a minute')),
+      PvVideoChapter(at: 228, label: _en('The half that does not move')),
+      PvVideoChapter(
+          at: 304, label: _en('Counting backwards, not forwards')),
+    ],
+    takeaways: [
+      _en('The first half of a cycle varies; the second is about fourteen '
+          'days in almost everyone.'),
+      _en('So ovulation is found by counting back from the next period, not '
+          'forward from the last one.'),
+      _en('"Day 14" is only right if your cycle is 28 days.'),
+    ],
+    readNext: ['ttc_read_how_conception_works'],
+    surfaceNext: ['ttc_cycle'],
+  ),
+
+  PvVideoSlot(
     id: 'ttc_vid_timing_myths',
     hue: 344,
     title: _en('Six timing myths, put down one by one'),

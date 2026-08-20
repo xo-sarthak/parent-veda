@@ -192,10 +192,30 @@ class PvReadSection {
   /// relevant, and a read with nothing to show simply has none.
   final String? videoSlot;
 
-  int get _words => [
-        for (final p in paragraphs) p.en.split(RegExp(r'\s+')).length,
-        for (final b in bullets) b.en.split(RegExp(r'\s+')).length,
-      ].fold(0, (a, b) => a + b);
+  /// Every word this section actually renders.
+  ///
+  /// ⚠️ THE FURNITURE COUNTS, and leaving it out was a measurement bug rather
+  /// than a strict standard. The first version counted only paragraphs and
+  /// bullets, and then failed `ttc_read_timing_myths` at 347 words — a piece
+  /// whose entire substance is four myth-and-correction blocks and two tips,
+  /// none of which were being counted. It was not thin; the ruler was wrong.
+  ///
+  /// A `PvMythFact` is sixty words of authored prose that the reader displays
+  /// at reading size. Anything in that category is writing, and an article made
+  /// mostly of it can be excellent — excluding it would have quietly pushed
+  /// every author towards paragraphs and away from the component that is most
+  /// useful on a page competing with confident nonsense.
+  int get _words {
+    int count(String s) => s.trim().isEmpty ? 0 : s.split(RegExp(r'\s+')).length;
+    return [
+      for (final p in paragraphs) count(p.en),
+      for (final b in bullets) count(b.en),
+      if (summary != null) count(summary!.en),
+      if (tip != null) ...[count(tip!.title.en), count(tip!.body.en)],
+      if (mythFact != null) ...[count(mythFact!.myth.en), count(mythFact!.fact.en)],
+      if (callout != null) ...[count(callout!.title.en), count(callout!.body.en)],
+    ].fold(0, (a, b) => a + b);
+  }
 }
 
 // -----------------------------------------------------------------------------

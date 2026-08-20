@@ -63,12 +63,32 @@ final JourneyConfig kTtcImproveChances = JourneyConfig(
     JourneyStep(
       question: _en("What actually helps, and what's just noise?"),
       elements: [
+        // Real, as of the fertile-window content pass. Carries the six-day
+        // window, the every-one-to-two-days guidance, and the four myths —
+        // sourced to the ASRM/SREI committee opinion.
         JourneyElement(
           type: SolutionType.read,
-          title: _en('Timing myths, sorted from what works'),
+          title: _en('Timing, and the advice worth putting down'),
           value: _en('Positions, "saving it up", lying down after — what the '
               'evidence actually says about each.'),
-          owed: true,
+          meta: _en('7 MIN'),
+          surfaceId: 'ttc_read/ttc_read_timing_myths',
+        ),
+        // ⚠️ THE MECHANISM SITS BESIDE THE TIMING, NOT BEFORE IT.
+        //
+        // The workbook's Content cell for this bracket names four topics —
+        // "How conception works, timing, cycle basics, common myths" — and the
+        // first two belong to different questions. Someone asking "what
+        // actually helps" wants the timing; someone who wants to understand
+        // the machinery is asking a calmer question and can take the second
+        // tile. Two tiles in one row, which is exactly what the grid is for.
+        JourneyElement(
+          type: SolutionType.read,
+          title: _en('How conception actually works'),
+          value: _en('The cycle, in two halves — and why only one of them '
+              'moves.'),
+          meta: _en('8 MIN'),
+          surfaceId: 'ttc_read/ttc_read_how_conception_works',
         ),
       ],
     ),
