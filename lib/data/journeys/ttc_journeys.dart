@@ -180,12 +180,16 @@ final JourneyConfig kTtcPcosLibrary = JourneyConfig(
     JourneyStep(
       question: _en("Does having PCOS mean I'll need medication?"),
       elements: [
+        // Real. Follows the 2023 ESHRE/ASRM/Monash order, and is written to
+        // EXPLAIN what she is likely to be offered rather than to recommend —
+        // treatment is the clinician's decision. See TimingOwnership.
         JourneyElement(
           type: SolutionType.read,
           title: _en('What treatment usually looks like'),
-          value: _en('It ranges from a diet change to a tablet to nothing at '
-              "all — what decides which."),
-          owed: true,
+          value: _en('The order things are tried in, and what to ask before '
+              'you agree to any of it.'),
+          meta: _en('9 MIN'),
+          surfaceId: 'ttc_read/ttc_read_pcos_treatment',
         ),
       ],
       note: _en("What's right for you is a question for your own doctor, "
@@ -197,9 +201,10 @@ final JourneyConfig kTtcPcosLibrary = JourneyConfig(
         JourneyElement(
           type: SolutionType.read,
           title: _en('Food, insulin and PCOS'),
-          value: _en('The changes that genuinely move the needle, and the '
-              "ones that are mostly noise."),
-          owed: true,
+          value: _en('What actually changes the curve in an Indian kitchen — '
+              'and why nothing has to leave it.'),
+          meta: _en('9 MIN'),
+          surfaceId: 'ttc_read/ttc_read_pcos_food',
         ),
         JourneyElement(
           type: SolutionType.product,

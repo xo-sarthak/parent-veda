@@ -435,12 +435,12 @@ final List<PvRead> kTtcReads = [
     ],
 
     // ⚠️ NO `relatedVideoSlots` HERE — `ttc_vid_pcos_plate` is already placed
-    // inside section 4, where it is relevant. Repeating it in the foot rail
+    // inside a section, where it is relevant. Repeating it in the foot rail
     // would show the same film twice on one page.
     //
-    // ⚠️ NO `readNext` UNTIL `ttc_read_pcos_food` IS WRITTEN. A dangling id
-    // resolves to null, which renders the "Read next" heading over nothing —
-    // the empty-promise shape this whole build is removing.
+    // Both of these are written now, so the chain is real rather than a
+    // dangling id resolving to null under a "Read next" heading.
+    readNext: ['ttc_read_pcos_treatment', 'ttc_read_pcos_food'],
   ),
   // ===========================================================================
   //  FERTILE WINDOW — the door's Excel Content cell, in two pieces
@@ -936,6 +936,531 @@ final List<PvRead> kTtcReads = [
     ],
 
     readNext: ['ttc_read_how_conception_works'],
+  ),
+  // ===========================================================================
+  //  PCOS — cycle regulation, i.e. "what treatment usually looks like"
+  // ===========================================================================
+  //  The Excel Content cell for this bracket names four topics: "PCOS &
+  //  fertility, symptoms, insulin & diet, cycle regulation."
+  //  `ttc_read_pcos_cycle` covers all four at overview depth. This piece and
+  //  the next take the last two to the depth they are actually asked about —
+  //  which is legitimate rather than padding, because the workbook lists them
+  //  as separate topics and because "what will they put me on" is a different
+  //  question from "what is PCOS".
+  //
+  //  ⚠️ THE HARDEST LINE IN THIS STAGE TO HOLD IS HERE. Treatment is the
+  //  clinician's decision, full stop — see `TimingOwnership` in
+  //  `ttc_care_pathway.dart`. What this piece may do is EXPLAIN what she is
+  //  likely to be offered and PREPARE her to ask about it. What it may never do
+  //  is recommend, rank for her own case, or give her a reason to argue with
+  //  the doctor in front of her. Every paragraph below was written against that
+  //  distinction.
+  PvRead(
+    id: 'ttc_read_pcos_treatment',
+    hue: 288,
+    kicker: _en('PCOS'),
+    title: _en('What treatment usually looks like'),
+    teaser: _en('The order things are normally tried in, what each one is '
+        'actually doing, and what to ask before you agree to any of it.'),
+
+    scaleSetter: _en('Treatment for PCOS almost always starts with the least '
+        'invasive thing that might work and stops as soon as something does. '
+        'Most women never reach the second step. Almost nobody reaches the '
+        'last one.'),
+
+    author: _en('Dr. Ananya Rao'),
+    authorRole: _en('Gynaecologist · 14 years · reviewed August 2026'),
+
+    heroVideoSlot: 'ttc_vid_pcos_treatment',
+
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en('There is a settled international order for this, which is worth '
+              'knowing before you walk into a clinic — not so you can argue '
+              'with anyone, but so nothing that happens is a surprise and you '
+              'know which questions are reasonable to ask.'),
+          _en('The order below is from the 2023 international guideline, '
+              'written jointly by ESHRE, ASRM and Monash University. It is '
+              'about as close to a settled global position as fertility '
+              'medicine gets.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('First: nothing you swallow'),
+        paragraphs: [
+          _en('Before any tablet, the first line is the insulin curve — what '
+              'is on the plate, and movement. Where weight is raised, a loss '
+              'of around five per cent is the figure the evidence keeps '
+              'returning to, and in a meaningful share of women that alone '
+              'brings cycles back.'),
+          _en('Five per cent is a few kilograms. It is not a transformation, '
+              'and the number is deliberately small because the target is '
+              'insulin sensitivity rather than a dress size.'),
+          _en('This step is genuinely first, and it is also the step most '
+              'often delivered badly — "lose weight" said across a desk in '
+              'four seconds, with no plan attached. If that is what you get, '
+              'the reasonable question back is: how much, by when, and what '
+              'would tell us it is working?'),
+        ],
+        callout: PvCallout(
+          tone: PvCalloutTone.note,
+          title: _en('And if your weight is already normal'),
+          body: _en('Plenty of women with textbook PCOS are slim, and this '
+              'step still applies to them — the target was never the scale. '
+              'Steadier blood sugar through the day and regular movement do '
+              'the same work at any weight. If a clinician skips straight past '
+              'this because you are not overweight, it is worth asking about '
+              'insulin resistance directly.'),
+        ),
+      ),
+
+      PvReadSection(
+        heading: _en('Then: a tablet to bring on ovulation'),
+        paragraphs: [
+          _en('If cycles are still not producing an egg, the next step is '
+              'ovulation induction — a short course of tablets early in the '
+              'cycle that pushes the ovary to mature and release one follicle.'),
+          _en('Since 2023 the preferred first choice is letrozole. It is '
+              'taken for five days, usually from about day two to day six, and '
+              'it is inexpensive — a cycle costs less than most people expect. '
+              'Clomiphene was the standard for decades and is still used; the '
+              'guideline moved letrozole ahead of it because it produced more '
+              'live births in head-to-head trials.'),
+          _en('Whichever is used, the cycle is normally monitored with a scan '
+              'to check how many follicles are developing. That monitoring is '
+              'not optional caution — it is how the dose gets adjusted and how '
+              'a twin pregnancy is avoided.'),
+        ],
+        tip: PvReadTip(
+          title: _en('What to ask before the first tablet'),
+          body: _en('How many cycles will we try this for before changing '
+              'course? Will this cycle be monitored with a scan? And what '
+              'would count as it working — a period, a confirmed ovulation, or '
+              'a pregnancy? Those three answers turn an open-ended treatment '
+              'into something with a shape, which is most of what makes it '
+              'bearable.'),
+        ),
+      ),
+
+      PvReadSection(
+        heading: _en('Where metformin fits'),
+        paragraphs: [
+          _en('Metformin is a diabetes medicine, and being handed it for '
+              'fertility unsettles almost everyone. It is not a mistake and it '
+              'does not mean anyone thinks you are diabetic.'),
+          _en('It works on the same thing the diet advice works on — it makes '
+              'cells respond better to insulin, which lowers circulating '
+              'insulin, which lowers the androgen production driving the '
+              'stall. In the current guideline it sits alongside clomiphene as '
+              'a second-line combination rather than as a first move on its '
+              'own.'),
+          _en('It is also the one that most often has side effects worth '
+              'planning around — nausea and loose stools in the first weeks, '
+              'usually easing, and usually much better on the slow-release '
+              'form and taken with food. If it is intolerable, say so early '
+              'rather than stopping quietly; the dose and the form can both '
+              'change.'),
+        ],
+        mythFact: PvMythFact(
+          myth: _en('If they put me on metformin, I must be pre-diabetic.'),
+          fact: _en('Not necessarily. It is prescribed here for insulin '
+              'resistance, which is a different finding from diabetes and very '
+              'common in PCOS at completely normal blood-sugar readings. Your '
+              'HbA1c may well be fine and metformin still be the right '
+              'choice.'),
+        ),
+      ),
+
+      PvReadSection(
+        // ⚠️ FOLDS. Almost nobody reaches these steps, and putting them open
+        // in the middle of the page means everyone reads about ovarian surgery
+        // on the day they were told about a tablet.
+        collapsible: true,
+        summary: _en('Injections, ovarian drilling and IVF — what they are, '
+            'and why they sit third rather than second.'),
+        heading: _en('If tablets do not work'),
+        paragraphs: [
+          _en('The next step is usually injectable gonadotrophins — the '
+              'hormones the brain would normally send, given directly, at low '
+              'dose and closely monitored. They work well and they carry a '
+              'higher risk of stimulating too many follicles at once, which is '
+              'exactly why the monitoring tightens.'),
+          _en('Laparoscopic ovarian drilling is the other second-line option: '
+              'keyhole surgery making a few tiny punctures in the ovary, which '
+              'lowers androgen production and can restore ovulation for a '
+              'period afterwards. It is offered less often now than it once '
+              'was, and it is a reasonable choice for someone who cannot '
+              'attend frequent monitoring.'),
+          _en('IVF sits third. The guideline is explicit that it should not be '
+              'offered first for PCOS-related anovulation in the absence of '
+              'another reason — because the earlier steps work often enough '
+              'that starting with IVF means most women would have gone through '
+              'it unnecessarily.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('What none of it does'),
+        paragraphs: [
+          _en('None of these treats PCOS. They treat the stall. Ovulation '
+              'induction makes an egg arrive this cycle; it does not change '
+              'the underlying pattern, which is why cycles often go back to '
+              'being irregular once treatment stops.'),
+          _en('That sounds discouraging and is not meant to be. It is the '
+              'reason the first step — the insulin curve — stays relevant '
+              'through all the others rather than being something you graduate '
+              'out of. It is also why nobody should feel they have failed when '
+              'a cycle needs help again later.'),
+        ],
+      ),
+    ],
+
+    faqs: [
+      PvReadFaq(
+        question: _en('How many cycles of tablets before something else?'),
+        answer: _en('Commonly around six ovulatory cycles before the approach '
+            'is reconsidered, though this varies with age and with what else '
+            'is going on. It is a fair question to ask at the start rather '
+            'than discovering it at cycle seven.'),
+      ),
+      PvReadFaq(
+        question: _en('Will treatment give me twins?'),
+        answer: _en('The chance of a multiple pregnancy is higher than with an '
+            'unassisted cycle, which is precisely why cycles are monitored '
+            'with a scan and why a cycle is sometimes cancelled. Letrozole '
+            'carries a lower multiple rate than clomiphene, which is one of '
+            'the reasons it is preferred.'),
+      ),
+      PvReadFaq(
+        question: _en('Can I take letrozole without monitoring? It is cheaper.'),
+        answer: _en('This is a conversation for your own doctor and not one to '
+            'settle from an article — but the monitoring exists to adjust the '
+            'dose and to catch a cycle with too many follicles developing, and '
+            'those are the two things that make the treatment safe rather than '
+            'merely effective.'),
+      ),
+      PvReadFaq(
+        question: _en('I was put on the pill for my PCOS. Does that help me '
+            'conceive?'),
+        answer: _en('No, and it is not meant to. The combined pill is used to '
+            'regulate bleeding, control acne and protect the uterine lining '
+            'when cycles are very long — all real reasons, none of them about '
+            'conceiving, and it prevents pregnancy while you take it. If your '
+            'goal has changed to trying, that is the thing to tell your '
+            'doctor.'),
+      ),
+      PvReadFaq(
+        question: _en('Does treatment have to be at a fertility clinic?'),
+        answer: _en('Not for the first steps. A general gynaecologist manages '
+            'ovulation induction routinely, and it is usually where this '
+            'starts in India. A referral onward tends to come when tablets '
+            'have been tried, or when something else in the picture needs a '
+            'specialist.'),
+      ),
+    ],
+
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('While you are on treatment'),
+      body: _en('Call your clinic — not an emergency department, your clinic — '
+          'if you develop marked bloating, quick weight gain over a few days, '
+          'severe abdominal pain, or breathlessness during or after a '
+          'stimulated cycle. These are the signs of ovarian hyperstimulation, '
+          'which is uncommon on tablets and more relevant with injections, and '
+          'which is very manageable when it is reported early. Anything about '
+          'your own dose, your own scan or your own next step belongs with the '
+          'doctor who prescribed it.'),
+    ),
+
+    evidence: _en('The treatment order — lifestyle first, letrozole as '
+        'preferred first-line pharmacological therapy, clomiphene with '
+        'metformin and gonadotrophins or ovarian surgery as second line, IVF '
+        'as third — follows the International Evidence-based Guideline for the '
+        'Assessment and Management of Polycystic Ovary Syndrome (2023), '
+        'developed by Monash University with ESHRE and ASRM. Reviewed August '
+        '2026. Nothing here is a recommendation for your own case; that is '
+        'your doctor.'),
+
+    nextSteps: [
+      PvReadNextStep(
+        kind: PvNextKind.tool,
+        title: _en('Tests worth knowing about'),
+        value: _en('What a first PCOS appointment usually checks, and what '
+            'each result is for.'),
+        surfaceId: 'ttc_tests',
+      ),
+      PvReadNextStep(
+        kind: PvNextKind.tool,
+        title: _en('Keep a record for the appointment'),
+        value: _en('Three months of dates is the single most useful thing you '
+            'can bring with you.'),
+        surfaceId: 'ttc_cycle',
+      ),
+      PvReadNextStep(
+        kind: PvNextKind.consult,
+        title: _en('Talk to a PCOS specialist'),
+        value: _en('Someone who can see your own reports, on video, at a time '
+            'you pick.'),
+        surfaceId: 'ttc_prepare',
+      ),
+    ],
+
+    readNext: ['ttc_read_pcos_food'],
+  ),
+
+  // ===========================================================================
+  //  PCOS — insulin & diet
+  // ===========================================================================
+  //  ⚠️ THE INDIA-FIRST PIECE IN THIS BRACKET, and the reason it cannot be
+  //  adapted from a Western source. Almost all PCOS diet advice in circulation
+  //  is built around removing carbohydrate, which in an Indian kitchen means
+  //  removing the meal. A diet she cannot keep for a year is not a treatment,
+  //  and telling a woman to give up rice and roti is how a page gets closed.
+  PvRead(
+    id: 'ttc_read_pcos_food',
+    hue: 288,
+    kicker: _en('PCOS'),
+    title: _en('Food, insulin and PCOS'),
+    teaser: _en('What actually changes the blood-sugar curve in an Indian '
+        'kitchen — and why nothing has to leave it.'),
+
+    scaleSetter: _en('There is no PCOS diet. The 2023 international guideline '
+        'looked for one and concluded that no single eating pattern beats the '
+        'others — what works is the one you can keep. That is a more useful '
+        'finding than a meal plan, and it is the opposite of what you will be '
+        'sold.'),
+
+    author: _en('Meghna Iyer'),
+    authorRole: _en('Fertility nutritionist · reviewed August 2026'),
+
+    heroVideoSlot: 'ttc_vid_pcos_plate',
+
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en('The target is not calories and it is not carbohydrate. It is '
+              'the shape of the curve — how steeply blood sugar rises after '
+              'you eat, and therefore how much insulin the body has to send to '
+              'deal with it.'),
+          _en('Flatten that curve and circulating insulin falls. Lower insulin '
+              'means less androgen production in the ovary, which is the thing '
+              'stalling the follicles. That is the whole mechanism, and every '
+              'genuinely useful piece of advice below is a way of flattening '
+              'the same curve.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('The order you eat things in'),
+        paragraphs: [
+          _en('This is first because it is free, changes no recipe, removes '
+              'nothing, and has real trial evidence behind it.'),
+          _en('The same plate produces a smaller blood-sugar rise when the '
+              'protein and the vegetables go in before the rice or the roti. '
+              'Not a different plate. The same one, in a different order.'),
+          _en('In practice that means starting with the sabzi and the dal, or '
+              'the curd, or the salad, and coming to the carbohydrate a few '
+              'minutes later. Nobody at the table has to know you are doing '
+              'it.'),
+        ],
+        tip: PvReadTip(
+          title: _en('If you change one thing this week'),
+          body: _en('Make it this, and make it breakfast. The Indian breakfast '
+              'is where the curve is usually steepest — poha, upma, bread, '
+              'idli, all carbohydrate-forward and often eaten fastest. Adding '
+              'a boiled egg, a bowl of curd, a handful of peanuts or a besan '
+              'chilla beside it changes the whole morning.'),
+        ),
+      ),
+
+      PvReadSection(
+        heading: _en('What the evidence actually supports'),
+        paragraphs: [
+          _en('Low glycaemic index eating is the pattern with the most direct '
+              'support in PCOS specifically. A head-to-head trial against '
+              'conventional dietary advice found menstrual regularity improved '
+              'significantly more on the low-GI approach — and menstrual '
+              'regularity is a direct marker that ovulation has returned, '
+              'which makes it a far more meaningful outcome than a weight '
+              'reading.'),
+          _en('Alongside it: where weight is raised, a loss of around five per '
+              'cent restores cycles in a meaningful share of women. Both of '
+              'these work through the same door, which is why doing one tends '
+              'to help the other.'),
+          _en('What the guideline stops short of is naming a winner. No single '
+              'named diet — keto, paleo, low-carb, intermittent fasting — has '
+              'been shown to beat the others for PCOS. Approaches that reduce '
+              'insulin demand outperform standard advice; beyond that, '
+              'sustainability is the deciding variable.'),
+        ],
+        mythFact: PvMythFact(
+          myth: _en('You have to give up rice and roti.'),
+          fact: _en('You do not, and being told to is usually a sign the '
+              'advice was not built for an Indian kitchen. What changes the '
+              'curve is what sits beside the carbohydrate, what you eat first, '
+              'and how much of it — not its removal. A diet that ends the way '
+              'your family eats will not last a year, and a year is the '
+              'timescale that matters.'),
+        ),
+      ),
+
+      PvReadSection(
+        heading: _en('What actually moves the curve, in an Indian kitchen'),
+        bullets: [
+          _en('Protein at every meal, and especially at breakfast — dal, '
+              'curd, paneer, egg, sprouts, chana. This is the single '
+              'commonest gap.'),
+          _en('Whole grains where they are already normal — hand-pounded or '
+              'brown rice, bajra, jowar, ragi — rather than a wholesale swap '
+              'to unfamiliar food.'),
+          _en('Cooling and reheating rice raises its resistant starch, which '
+              'lowers the rise. Yesterday’s rice is genuinely better for '
+              'you than today’s.'),
+          _en('Fat and acid alongside carbohydrate slow it down — ghee on the '
+              'roti, a squeeze of lime, curd with the meal.'),
+          _en('Movement after eating, even ten minutes. Muscle takes up '
+              'glucose with very little insulin, which is why a walk after '
+              'dinner is doing something specific rather than something '
+              'virtuous.'),
+        ],
+      ),
+
+      PvReadSection(
+        // ⚠️ FOLDS. A chemist-aisle lookup, not part of the argument.
+        collapsible: true,
+        summary: _en('Inositol, vitamin D, berberine and the rest — what has '
+            'evidence and what is priced like it does.'),
+        heading: _en('The supplements'),
+        paragraphs: [
+          _en('Inositol is the one with the most respectable evidence. Trials '
+              'suggest it improves insulin sensitivity and, in some women, '
+              'restores ovulation. The 2023 guideline stops short of '
+              'recommending it outright on the grounds that the trials are '
+              'small and inconsistent — which is a fair summary: promising, '
+              'not proven, unlikely to hurt.'),
+          _en('Vitamin D is worth testing rather than assuming, and worth '
+              'correcting if it is low, which in India it very often is. That '
+              'is general health rather than PCOS treatment, and it is still '
+              'worth doing.'),
+          _en('Almost everything else marketed for PCOS here is inositol under '
+              'another name at several times the price, or a multivitamin with '
+              'an ovary on the box. Berberine appears in a lot of these; the '
+              'evidence is thin and it interacts with other medicines, so it '
+              'is not one to start on your own.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('What this is not asking of you'),
+        paragraphs: [
+          _en('Not a separate meal cooked for you. Not weighing food. Not '
+              'explaining yourself at a family table. Almost everything above '
+              'is an adjustment to a meal that is already being made.'),
+          _en('And not perfection across every meal. The curve is a daily and '
+              'weekly average, not a test you pass or fail at each sitting — '
+              'a mithai at a wedding does not undo a month.'),
+        ],
+        callout: PvCallout(
+          tone: PvCalloutTone.reassure,
+          title: _en('If eating has started to feel like a job'),
+          body: _en('That is worth saying out loud to someone. Restrictive '
+              'eating and disordered eating are both commoner in PCOS than '
+              'average, partly because of how often women with it are told to '
+              'lose weight. A plan that is making you anxious about food is '
+              'not working, whatever it is doing to the numbers.'),
+        ),
+      ),
+    ],
+
+    faqs: [
+      PvReadFaq(
+        question: _en('Is keto good for PCOS?'),
+        answer: _en('It lowers insulin, and short trials show metabolic '
+            'improvement. What it does not have is evidence of being better '
+            'than other approaches over the timescales that matter, and it is '
+            'the hardest of them to keep in an Indian household. If you can '
+            'sustain it and enjoy it, it is a legitimate choice; it is not a '
+            'requirement and it is not a cure.'),
+      ),
+      PvReadFaq(
+        question: _en('Should I do intermittent fasting?'),
+        answer: _en('The evidence in PCOS specifically is limited and mixed. '
+            'For some women a shorter eating window helps; for others skipping '
+            'breakfast makes the rest of the day worse. It is worth trying '
+            'only if it feels easy — and it is worth avoiding if you have any '
+            'history of disordered eating.'),
+      ),
+      PvReadFaq(
+        question: _en('How long before I see a change?'),
+        answer: _en('Insulin sensitivity begins shifting within weeks, but '
+            'cycles are the slow signal — three to six months is a realistic '
+            'window before you can tell whether the pattern has changed. This '
+            'is the main reason people give up too early.'),
+      ),
+      PvReadFaq(
+        question: _en('I am not overweight. Does any of this apply to me?'),
+        answer: _en('Yes. Insulin resistance occurs at every body size, and '
+            'lean PCOS is common. Nothing above is about weight loss — the '
+            'order you eat in, the protein, the walk after dinner all do the '
+            'same work whatever the scale says.'),
+      ),
+      PvReadFaq(
+        question: _en('Do I need to see a dietitian?'),
+        answer: _en('Not to start — everything above can be done from your own '
+            'kitchen. It becomes worth it if you have tried for a few months '
+            'without change, if you have another condition to eat around, or '
+            'if you would simply rather have a plan built for how your family '
+            'actually eats.'),
+      ),
+    ],
+
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('Worth an appointment'),
+      body: _en('Book if you have darker velvety patches at the neck or '
+          'underarms, marked thirst or unexplained weight change, or a family '
+          'history of type 2 diabetes — all reasons to have blood sugar and '
+          'insulin looked at properly rather than managed by diet alone. And '
+          'speak to someone sooner if food has become a source of anxiety '
+          'rather than a lever you are using. Nothing on this page replaces '
+          'the plan your own clinician gives you.'),
+    ),
+
+    evidence: _en('Low glycaemic index eating and menstrual regularity from a '
+        'systematic review and meta-analysis of low-GI diets in PCOS, and from '
+        'a randomised isocaloric low-GI trial in women with PCOS (both indexed '
+        'on PubMed Central). The five per cent weight-loss figure and the '
+        'finding that no single dietary pattern is superior are from the '
+        'International Evidence-based Guideline for the Assessment and '
+        'Management of Polycystic Ovary Syndrome (2023). Reviewed August 2026.'),
+
+    nextSteps: [
+      PvReadNextStep(
+        kind: PvNextKind.tool,
+        title: _en('Supplements, recorded honestly'),
+        value: _en('What you are taking and when you started — the thing a '
+            'doctor always asks and nobody remembers.'),
+        surfaceId: 'ttc_supplements',
+      ),
+      PvReadNextStep(
+        kind: PvNextKind.tool,
+        title: _en('Eating, day to day'),
+        value: _en('The nutrition planner, built around what an Indian '
+            'kitchen already cooks.'),
+        surfaceId: 'ttc_nutrition',
+      ),
+      PvReadNextStep(
+        kind: PvNextKind.consult,
+        title: _en('Talk to a fertility nutritionist'),
+        value: _en('A plan built for how your family actually eats, rather '
+            'than a printout.'),
+        surfaceId: 'ttc_prepare',
+      ),
+    ],
+
+    readNext: ['ttc_read_pcos_treatment'],
   ),
 ];
 

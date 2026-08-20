@@ -67,6 +67,33 @@ final List<PvVideoSlot> kTtcVideos = [
   ),
 
   PvVideoSlot(
+    id: 'ttc_vid_pcos_treatment',
+    hue: 288,
+    title: _en('What they will actually offer you'),
+    why: _en('The order treatment is tried in, and what to ask before you '
+        'agree to any of it.'),
+    seconds: 402,
+    expert: _en('Dr. Ananya Rao'),
+    expertRole: _en('Gynaecologist · 14 years'),
+    chapters: [
+      PvVideoChapter(at: 0, label: _en('Why nothing you swallow comes first')),
+      PvVideoChapter(at: 78, label: _en('Letrozole, and what changed in 2023')),
+      PvVideoChapter(at: 168, label: _en('Where metformin actually fits')),
+      PvVideoChapter(at: 252, label: _en('Three questions for the first visit')),
+      PvVideoChapter(at: 336, label: _en('What none of it does')),
+    ],
+    takeaways: [
+      _en('Treatment starts with the least invasive thing that might work '
+          'and stops as soon as something does.'),
+      _en('Letrozole is now the preferred first tablet, ahead of clomiphene.'),
+      _en('None of it treats PCOS — it treats the stall, which is why the '
+          'first step stays relevant throughout.'),
+    ],
+    readNext: ['ttc_read_pcos_treatment'],
+    surfaceNext: ['ttc_tests'],
+  ),
+
+  PvVideoSlot(
     id: 'ttc_vid_pcos_plate',
     hue: 288,
     title: _en('What a PCOS-friendly Indian plate looks like'),
