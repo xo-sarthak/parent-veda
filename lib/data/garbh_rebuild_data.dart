@@ -308,11 +308,19 @@ class GarbhJournalStore extends ChangeNotifier {
   static const _entriesKey = 'garbh_journal_v1';
   static const _ritualsKey = 'garbh_rituals_v1';
   static const _ritualAskedKey = 'garbh_rituals_asked_v1';
+  static const _pinnedKey = 'garbh_pinned_v1';
+  static const _japaKey = 'garbh_japa_v1';
+  static const _japaDateKey = 'garbh_japa_date_v1';
 
   final List<GarbhJournalEntry> _entries = [];
   final Set<String> _rituals = {};
   bool _asked = false;
   bool _loaded = false;
+
+  final Set<String> _pinned = {};
+
+  int _japa = 0;
+  String _japaDate = '';
 
   /// Newest first.
   List<GarbhJournalEntry> get entries {
@@ -358,6 +366,87 @@ class GarbhJournalStore extends ChangeNotifier {
   /// Whether the "what do you already do?" question has been answered once.
   bool get ritualsAsked => _asked;
 
+  // ---- what she chose for her own daily ---------------------------------
+
+  /// ⚠️ "ADD TO MY DAILY" IS A PIN, NOT A REPLACEMENT.
+  ///
+  /// The library items she pins are OFFERED first when the daily pick is made;
+  /// they do not overwrite the rotation. The distinction matters because the
+  /// rotation is what makes the practice a practice - a mother who pins one
+  /// affirmation and then sees only that affirmation for four months has been
+  /// handed a way to make the section boring, dressed up as personalisation.
+  ///
+  /// So: pinned items come first, the rotation continues underneath, and
+  /// nothing she pins can be lost.
+  Set<String> get pinned => Set.unmodifiable(_pinned);
+  bool isPinned(String id) => _pinned.contains(id);
+
+  void togglePinned(String id) {
+    if (!_pinned.remove(id)) _pinned.add(id);
+    notifyListeners();
+    _savePinned();
+  }
+
+  Future<void> _savePinned() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setStringList(_pinnedKey, _pinned.toList());
+    } catch (_) {/* local-first, best effort */}
+  }
+
+  // ---- japa -------------------------------------------------------------
+
+  static String _ymd(DateTime d) =>
+      '${d.year}-${d.month.toString().padLeft(2, '0')}-'
+      '${d.day.toString().padLeft(2, '0')}';
+
+  /// Today's count. Resets on a new day.
+  ///
+  /// ⚠️ IT RESETS, AND IT DOES NOT ACCUMULATE FOREVER. A japa count is a thing
+  /// she does today; a lifetime total turns a practice into a score, which is
+  /// the one thing this whole section refuses to do. The reset is read at
+  /// access rather than written by a timer, so it is right after the app has
+  /// been closed overnight.
+  int get japaToday {
+    if (_japaDate != _ymd(DateTime.now())) return 0;
+    return _japa;
+  }
+
+  void japaIncrement() {
+    final today = _ymd(DateTime.now());
+    if (_japaDate != today) {
+      _japaDate = today;
+      _japa = 0;
+    }
+    _japa++;
+    notifyListeners();
+    _saveJapa();
+  }
+
+  void japaReset() {
+    _japa = 0;
+    _japaDate = _ymd(DateTime.now());
+    notifyListeners();
+    _saveJapa();
+  }
+
+  /// Test seam: write a count under an arbitrary date, so a test can express
+  /// "there was a count yesterday" without waiting a day or faking a clock.
+  @visibleForTesting
+  void japaSetForTest({required int count, required String ymd}) {
+    _japa = count;
+    _japaDate = ymd;
+    notifyListeners();
+  }
+
+  Future<void> _saveJapa() async {
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setInt(_japaKey, _japa);
+      await p.setString(_japaDateKey, _japaDate);
+    } catch (_) {/* local-first, best effort */}
+  }
+
   Future<void> init() async {
     if (_loaded) return;
     _loaded = true;
@@ -365,6 +454,9 @@ class GarbhJournalStore extends ChangeNotifier {
       final p = await SharedPreferences.getInstance();
       _rituals.addAll(p.getStringList(_ritualsKey) ?? const []);
       _asked = p.getBool(_ritualAskedKey) ?? false;
+      _pinned.addAll(p.getStringList(_pinnedKey) ?? const []);
+      _japa = p.getInt(_japaKey) ?? 0;
+      _japaDate = p.getString(_japaDateKey) ?? '';
       final raw = p.getString(_entriesKey);
       if (raw != null && raw.isNotEmpty) {
         final list = jsonDecode(raw);
@@ -428,6 +520,9 @@ class GarbhJournalStore extends ChangeNotifier {
     _rituals.clear();
     _asked = false;
     _loaded = false;
+    _pinned.clear();
+    _japa = 0;
+    _japaDate = '';
   }
 }
 

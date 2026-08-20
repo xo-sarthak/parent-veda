@@ -182,6 +182,17 @@ class GarbhDailyScreen extends StatelessWidget {
                       color: p.action)),
               const SizedBox(height: 20),
 
+              // ---- THE WEEK, SHOWN -------------------------------------
+              //
+              // ⚠️ REUSES `assets/baby/week_NN.jpg`, WHICH ALREADY SHIPS.
+              // Thirty-seven per-week baby renders are already bundled for the
+              // weekly size hero. Commissioning a second set for this card
+              // would have meant two pictures of the same baby in the same
+              // week, drawn differently, which is how an app starts looking
+              // assembled rather than made.
+              _WeekArt(week: pregnancy.currentWeek, p: p),
+              const SizedBox(height: 16),
+
               // ---- WHY TODAY, AND NOT ANY OTHER DAY --------------------
               //
               // ⚠️ THE SINGLE MOST IMPORTANT LINE ON THIS CARD, and the one
@@ -279,8 +290,14 @@ class _RitualRows extends StatelessWidget {
 
         // ⚠️ THE INVITATION IS NOT HIDDEN WHEN SHE HAS PICKED NOTHING. Repo
         // rule: a feature is never hidden, an empty section advertises
-        // itself. Here it is also the only place the question gets asked
-        // after onboarding.
+        // itself.
+        //
+        // ⚠️ AND IT IS THE ONBOARDING ASK, WORDED FOR A FIRST TIME. The spec
+        // says "asked once at onboarding, editable later", and there is no
+        // onboarding flow in this section to hang it off - so the card asks
+        // the first time and becomes an ordinary add-row afterwards.
+        // `ritualsAsked` is the flag that tells the two apart, and it was
+        // written and never read until now.
         if (chosen.isEmpty) {
           return Padding(
             padding: const EdgeInsets.only(top: 14),
@@ -300,15 +317,23 @@ class _RitualRows extends StatelessWidget {
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('Add your own daily practice',
+                            Text(
+                                store.ritualsAsked
+                                    ? 'Add your own daily practice'
+                                    : 'Do you already have a daily practice?',
                                 style: pvManrope(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w700,
                                     color: p.ink1)),
                             const SizedBox(height: 3),
                             Text(
-                                'Gita paath, a Quran or Bible passage, japa, '
-                                'or five minutes of silence.',
+                                store.ritualsAsked
+                                    ? 'Gita paath, a Quran or Bible passage, '
+                                        'japa, or five minutes of silence.'
+                                    : 'Whatever you already do goes on this '
+                                        'card too. Gita paath, a Quran or '
+                                        'Bible passage, japa, or five quiet '
+                                        'minutes.',
                                 style: pvManrope(
                                     fontSize: 12, height: 1.4, color: p.ink3)),
                           ]),
@@ -332,6 +357,57 @@ class _RitualRows extends StatelessWidget {
       },
     );
   }
+}
+
+/// One thing she made this week, small.
+class _JournalChip extends StatelessWidget {
+  const _JournalChip(
+      {required this.entry, required this.p, required this.onTap});
+  final GarbhJournalEntry entry;
+  final V2Palette p;
+  final VoidCallback onTap;
+
+  IconData get _icon => switch (entry.kind) {
+        GarbhEntryKind.myVoice => Icons.mic_none_rounded,
+        GarbhEntryKind.familyVoice => Icons.groups_outlined,
+        GarbhEntryKind.heard => Icons.music_note_outlined,
+        GarbhEntryKind.letter => Icons.edit_note_rounded,
+        GarbhEntryKind.photo => Icons.photo_outlined,
+      };
+
+  @override
+  Widget build(BuildContext context) => Material(
+        color: p.surface,
+        borderRadius: BorderRadius.circular(14),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(14),
+          child: Container(
+            width: 150,
+            padding: const EdgeInsets.fromLTRB(12, 10, 12, 11),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(color: p.line),
+            ),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Icon(_icon, size: 15, color: p.ink3),
+                  const SizedBox(height: 5),
+                  Expanded(
+                    child: Text(entry.title.now,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: pvManrope(
+                            fontSize: 11.5,
+                            height: 1.3,
+                            fontWeight: FontWeight.w600,
+                            color: p.ink1)),
+                  ),
+                ]),
+          ),
+        ),
+      );
 }
 
 class _RitualRow extends StatelessWidget {
@@ -405,6 +481,36 @@ class _RitualRow extends StatelessWidget {
   }
 }
 
+/// The week's baby render, where one exists.
+///
+/// ⚠️ WEEKS 4 TO 40 ONLY, AND EARLIER WEEKS RENDER NOTHING. The bundled set
+/// starts at 4 because that is when there is anything to draw. A placeholder
+/// box for weeks 1 to 3 would be a grey rectangle where a baby should be, on
+/// the card of a woman who has just found out she is pregnant.
+class _WeekArt extends StatelessWidget {
+  const _WeekArt({required this.week, required this.p});
+  final int week;
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) {
+    if (week < 4 || week > 40) return const SizedBox.shrink();
+    final n = week.toString().padLeft(2, '0');
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: Image.asset(
+        'assets/baby/week_$n.jpg',
+        height: 150,
+        width: double.infinity,
+        fit: BoxFit.cover,
+        // A missing file must not blank the card - the reason line below it
+        // is the part that matters.
+        errorBuilder: (_, _, _) => const SizedBox.shrink(),
+      ),
+    );
+  }
+}
+
 /// Why this week matters, said in one line.
 class _WhyToday extends StatelessWidget {
   const _WhyToday(
@@ -454,44 +560,70 @@ class _JournalStrip extends StatelessWidget {
       animation: store,
       builder: (context, _) {
         final mine = store.thisWeek(week);
-        return Material(
-          color: p.surfaceAlt,
-          borderRadius: BorderRadius.circular(18),
-          child: InkWell(
-            onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+        void open() => Navigator.of(context).push(MaterialPageRoute<void>(
               settings: const RouteSettings(name: 'garbh/journal'),
               builder: (_) => const GarbhJournalScreen(),
-            )),
+            ));
+
+        return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Material(
+            color: p.surfaceAlt,
             borderRadius: BorderRadius.circular(18),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 14, 15),
-              child: Row(children: [
-                Icon(Icons.auto_stories_outlined, size: 20, color: p.ink2),
-                const SizedBox(width: 13),
-                Expanded(
-                  child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('My Journal',
-                            style: pvManrope(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                color: p.ink1)),
-                        const SizedBox(height: 3),
-                        Text(
-                            mine.isEmpty
-                                ? 'Everything you make lands here, week by '
-                                    'week.'
-                                : '${mine.length} added this week',
-                            style: pvManrope(
-                                fontSize: 12, height: 1.4, color: p.ink3)),
-                      ]),
-                ),
-                Icon(Icons.chevron_right_rounded, size: 19, color: p.ink3),
-              ]),
+            child: InkWell(
+              onTap: open,
+              borderRadius: BorderRadius.circular(18),
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(16, 14, 14, 15),
+                child: Row(children: [
+                  Icon(Icons.auto_stories_outlined, size: 20, color: p.ink2),
+                  const SizedBox(width: 13),
+                  Expanded(
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text('My Journal',
+                              style: pvManrope(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w700,
+                                  color: p.ink1)),
+                          const SizedBox(height: 3),
+                          Text(
+                              mine.isEmpty
+                                  ? 'Everything you make lands here, week by '
+                                      'week.'
+                                  : '${mine.length} added this week',
+                              style: pvManrope(
+                                  fontSize: 12, height: 1.4, color: p.ink3)),
+                        ]),
+                  ),
+                  Icon(Icons.chevron_right_rounded, size: 19, color: p.ink3),
+                ]),
+              ),
             ),
           ),
-        );
+
+          // ⚠️ THE ACTUAL STRIP - THE THINGS, NOT A COUNT OF THEM.
+          //
+          // This was one row saying "3 added this week", which is a receipt.
+          // The spec asks for a strip of what she added, and the difference is
+          // the whole point of the section: a number tells her she was
+          // productive, the things themselves show her what she made. Three
+          // chips carrying her own words is what makes an album feel like it
+          // is growing; "3" is what makes it feel like a tally.
+          if (mine.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            SizedBox(
+              height: 64,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                itemCount: mine.length,
+                separatorBuilder: (_, _) => const SizedBox(width: 8),
+                itemBuilder: (context, i) =>
+                    _JournalChip(entry: mine[i], p: p, onTap: open),
+              ),
+            ),
+          ],
+        ]);
       },
     );
   }
