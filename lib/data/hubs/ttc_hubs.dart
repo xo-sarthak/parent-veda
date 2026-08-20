@@ -373,7 +373,34 @@ final HubConfig kTtcMindBody = HubConfig(
       hue: 42,
       surfaceId: 'ttc_ritual',
     ),
+    // ⚠️ THIS HUB WAS ONE DOOR, WHICH MEANT ITS SCREEN NEVER RENDERED — the
+    // tile opened `ttc_ritual` directly (see §3 of HUB-BUILD-SPEC). That was
+    // right while the practice was all this bracket had.
+    //
+    // The workbook's Content cell for it names three things: "Stress &
+    // fertility, meditation, preconception garbh sanskar." Two of those are
+    // now written, and a read reachable only from inside a daily-practice
+    // screen is the kind of burial this whole restructure exists to remove.
+    // Two doors, so the hub screen now shows — doing, and understanding.
+    HubNeed(
+      label: _en('Understand stress and calm'),
+      blurb: _en('What the evidence says about stress and conceiving, and '
+          'what garbh sanskar does and does not claim.'),
+      mark: IntentMark.bodyMark,
+      hue: 268,
+      surfaceId: 'ttc_read/ttc_read_stress_fertility',
+    ),
   ],
+  // ⚠️ THE CLOSING OFFER IS THE FREE COURSE, and it is the only place in the
+  // stage where a closing offer costs nothing. `ttc_course_garbh` is the
+  // workbook's acquisition hook — putting it at the foot of the calmest hub,
+  // priced at zero, is exactly the placement it was designed for.
+  closing: HubClosing(
+    label: _en('The free garbh sanskar course'),
+    blurb: _en('Eight short sessions for both of you, taught rather than '
+        'described. No fee.'),
+    action: kTtcActConsult,
+  ),
 );
 
 /// All seven TTC problem hubs.

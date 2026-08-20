@@ -312,7 +312,11 @@ final List<Bracket> kTtcBrackets = [
         hi: 'Stress aur fertility, roz ka abhyas, aur conceive se pehle ka garbh '
             'sanskar — shanti taiyaari hai, dabaav nahi.'),
     layers: {
-      BracketLayer.content: BracketLayerSpec.live(['ttc_chapter']),
+      BracketLayer.content: BracketLayerSpec.live([
+        'ttc_chapter',
+        'ttc_read/ttc_read_stress_fertility',
+        'ttc_read/ttc_read_garbh_sanskar',
+      ]),
       // The one bracket in the stage whose Activities layer the workbook
       // actively wants — "rides light preconception spine" — and `ttc_ritual`
       // is exactly that spine.
@@ -327,9 +331,11 @@ final List<Bracket> kTtcBrackets = [
       // an acquisition hook, and a paid eight-class yoga pack is neither free
       // nor garbh sanskar. Marking it live would let the door promise a free
       // hook and open a ₹ price.
-      BracketLayer.course: BracketLayerSpec(
-          state: LayerState.notReady,
-          reason: 'Preconception garbh sanskar (FREE acquisition hook)'),
+      // Was notReady, and the note under it was right to refuse the yoga pack
+      // as a substitute: the workbook asks for a FREE hook and a paid
+      // eight-class pack is neither free nor garbh sanskar. `ttc_course_garbh`
+      // is now the actual thing — eight sessions, both partners, priceMinor 0.
+      BracketLayer.course: BracketLayerSpec.live(['ttc_prepare']),
       BracketLayer.consult:
           BracketLayerSpec(state: LayerState.notCore, reason: 'Not core'),
       BracketLayer.extras: BracketLayerSpec(

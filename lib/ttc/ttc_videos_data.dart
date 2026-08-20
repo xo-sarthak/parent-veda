@@ -407,6 +407,67 @@ final List<PvVideoSlot> kTtcVideos = [
     readNext: ['ttc_read_loss_recovery'],
     surfaceNext: ['ttc_community'],
   ),
+
+  // ---------------------------------------------------------------------------
+  //  Mind & body
+  // ---------------------------------------------------------------------------
+  PvVideoSlot(
+    id: 'ttc_vid_stress_fertility',
+    hue: 42,
+    title: _en('"Just relax" — why that advice is wrong'),
+    why: _en('What the evidence actually shows about stress and conceiving, '
+        'and why the advice does damage.'),
+    seconds: 276,
+    expert: _en('Dr. Sharanya Menon'),
+    expertRole: _en('Perinatal psychologist'),
+    chapters: [
+      PvVideoChapter(at: 0, label: _en('What everyone says, and why')),
+      PvVideoChapter(at: 58, label: _en('What the studies actually found')),
+      PvVideoChapter(at: 148, label: _en('The one real exception')),
+      PvVideoChapter(at: 214, label: _en('So what is a practice for')),
+    ],
+    takeaways: [
+      _en('Emotional distress before treatment was not associated with '
+          'whether it worked, across 14 studies.'),
+      _en('Severe sustained stress can suppress ovulation — everyday worry '
+          'does not.'),
+      _en('A practice is worth doing because it makes the waiting bearable, '
+          'which is a complete reason.'),
+    ],
+    readNext: ['ttc_read_stress_fertility'],
+    surfaceNext: ['ttc_ritual'],
+  ),
+
+  // ⚠️ A SERIES, NOT A SINGLE FILM — `episodeCount` drives the playlist
+  // treatment on the placeholder. This is the free course the workbook asks
+  // for, so its cover has to read as a course rather than as one video.
+  PvVideoSlot(
+    id: 'ttc_vid_garbh_preconception',
+    hue: 42,
+    title: _en('Preconception garbh sanskar, taught'),
+    why: _en('The eight sessions, for both of you — the practice done rather '
+        'than described.'),
+    seconds: 2160,
+    expert: _en('Anjali Deshmukh'),
+    expertRole: _en('Yoga and breathwork lead'),
+    chapters: [
+      PvVideoChapter(at: 0, label: _en('What this is, and is not')),
+      PvVideoChapter(at: 240, label: _en('Breath, the first week')),
+      PvVideoChapter(at: 660, label: _en('Stillness, and why it is short')),
+      PvVideoChapter(at: 1080, label: _en('Sound, and reading aloud')),
+      PvVideoChapter(at: 1500, label: _en('The conversation, for both of you')),
+      PvVideoChapter(at: 1860, label: _en('Keeping it when you miss a day')),
+    ],
+    takeaways: [
+      _en('Five to fifteen minutes, and consistency matters more than '
+          'duration.'),
+      _en('Both partners, together — that is what makes it different from '
+          'everything else in this stage.'),
+      _en('No belief required, and no outcome promised.'),
+    ],
+    readNext: ['ttc_read_garbh_sanskar'],
+    surfaceNext: ['ttc_ritual'],
+  ),
 ];
 
 /// The slot lookup the reader is handed.

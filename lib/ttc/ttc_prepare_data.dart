@@ -67,7 +67,23 @@ class TtcOffering {
   String title(bool hi) => hi ? titleHi : titleEn;
   String body(bool hi) => hi ? bodyHi : bodyEn;
 
-  String get priceLabel => '₹${(priceMinor / 100).round()}';
+  /// True when the thing costs nothing.
+  ///
+  /// ⚠️ ADDED FOR THE WORKBOOK'S ONE FREE OFFERING, and it is not cosmetic.
+  /// The Mind-body row asks for "Preconception garbh sanskar (FREE acquisition
+  /// hook)" — an offering whose whole purpose is that it costs nothing. Without
+  /// this, `priceLabel` renders it as "₹0", which reads as a pricing bug rather
+  /// than as an invitation and would quietly destroy the only acquisition hook
+  /// in the stage.
+  bool get isFree => priceMinor == 0;
+
+  String get priceLabel =>
+      isFree ? 'Free' : '₹${(priceMinor / 100).round()}';
+
+  /// Hinglish label, because the price is chrome rather than content and the
+  /// rest of this stage speaks Hinglish.
+  String priceLabelIn(bool hi) =>
+      isFree ? (hi ? 'Muft' : 'Free') : priceLabel;
 }
 
 /// The nine categories, in the order the master document lists them.
@@ -288,6 +304,40 @@ const List<TtcOffering> ttcOfferings = [
         'Sperm takes about ninety days to make and an egg about the same to mature. This is a programme for both of you across exactly that window - sleep, food, movement, and the two habits with the clearest evidence behind them.',
     bodyHi:
         'Sperm banne mein lagbhag nabbe din lagte hain aur egg pakne mein bhi lagbhag utne hi. Ye programme aap dono ke liye theek usi window ka hai - neend, khaana, movement, aur wo do aadatein jinke saboot sabse saaf hain.',
+    forCouple: true,
+  ),
+  // ---- the one free thing in the catalogue ----------------------------------
+  //
+  // ⚠️ THE WORKBOOK ASKS FOR THIS EXPLICITLY: Mind-body prep → Course →
+  // "Preconception garbh sanskar (FREE acquisition hook)". It is the only
+  // zero-price entry here and that is the entire point of it — the stage's
+  // thirteen other offerings are priced, and this is the one that lets someone
+  // meet a ParentVeda expert without paying first.
+  //
+  // ⚠️ IT PROMISES NO OUTCOME. Not conception, and nothing about a child who
+  // does not exist yet. See `ttc_read_garbh_sanskar` for the reasoning; the
+  // copy below is written to the same line.
+  TtcOffering(
+    id: 'ttc_course_garbh',
+    category: 'mental',
+    kind: 'masterclass',
+    titleEn: 'Preconception garbh sanskar',
+    titleHi: 'Conceive se pehle ka garbh sanskar',
+    bodyEn:
+        'Eight short sessions, for both of you, taught rather than described. '
+        'Breath, stillness, sound, conversation and gratitude - the practice as '
+        'preparation, in whichever framework suits you. It will not make a '
+        'pregnancy happen and it does not claim to. It is a way to spend the '
+        'waiting that is calming rather than corrosive. Free, and it stays free.',
+    bodyHi:
+        'Aath chhoti sessions, dono ke liye, sirf batayi nahi - sikhayi gayi. '
+        'Saans, thehraav, dhwani, baatcheet aur shukr - abhyas taiyaari ke roop '
+        'mein, jis bhi soch mein aapko theek lage. Ye pregnancy nahi karwaata, '
+        'aur aisa daava bhi nahi karta. Ye intezaar ko kaatne ka ek shaant '
+        'tareeka hai. Muft hai, aur muft hi rahega.',
+    expertId: 'ttc_yoga_lead',
+    priceMinor: 0,
+    sessions: 8,
     forCouple: true,
   ),
 ];
