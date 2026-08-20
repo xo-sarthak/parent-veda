@@ -37,6 +37,7 @@ import '../ttc/ttc_prepare_data.dart';
 import '../services/expert_store.dart';
 import 'booking_models.dart';
 import 'booking_store.dart';
+import '../data/mind_mood_data.dart';
 
 class BookingCatalog {
   BookingCatalog._();
@@ -75,6 +76,20 @@ class BookingCatalog {
     }
     for (final s in kSpecialists) {
       list.add(_fromSpecialist(s));
+    }
+    // MIND & MOOD — the only paid things in the wellbeing section.
+    //
+    // ⚠️ THIS WAS THE FOURTH WIRING GATE OF THE REVIEW. `mm_talk_tab.dart`
+    // carried a comment reading "wire this to lib/booking/ when this ships",
+    // and built its own booking sheet in the meantime. So the app had two
+    // booking flows: the real one, with entitlements, seat caps and a history
+    // that spans every stage - and a second, parallel one, in the section
+    // where a woman is at her most vulnerable and least able to absorb a
+    // payment that goes nowhere.
+    //
+    // Nothing failed. The placeholder sheet looked correct.
+    for (final o in kMmTalkOfferings) {
+      list.add(_fromMindMood(o));
     }
     // TRYING-TO-CONCEIVE side — the Prepare tab of the stage before pregnancy.
     // Same engine again, so a fertility consult booked while trying and a
@@ -278,6 +293,53 @@ class BookingCatalog {
             : null,
         recordingAccess: kind == OfferingKind.masterclass,
         discussionThread: kind == OfferingKind.cohort,
+      ),
+    );
+  }
+
+  /// A Mind & Mood paid offering -> a real bookable Offering.
+  ///
+  /// ⚠️ THE MAPPING IS TWO CONSULTS AND A CLASS PACK, and the third is the
+  /// interesting one.
+  ///
+  ///   · Counselling and one-to-one consultation are both `consult`: 1:1 with
+  ///     a professional, one credit, pick a slot from their calendar. They
+  ///     differ in price and in who the expert is, not in shape.
+  ///   · The ongoing check-in is a `classPack` - buy several sessions, spend
+  ///     them across a window. That is exactly what "steady support across the
+  ///     rest of the pregnancy" means, and modelling it as a subscription
+  ///     would have been wrong in a way that costs her money: a subscription
+  ///     bills again whether or not she used it, and this is a section whose
+  ///     users have bad months.
+  ///
+  /// ⚠️ AND THE CREDITS OUTLIVE THE MONTH THEY WERE BOUGHT IN. 120 days on a
+  /// four-session pack, not 30. A woman who buys ongoing support during a hard
+  /// stretch and then feels well enough to skip three weeks must not lose what
+  /// she paid for as a penalty for improving.
+  static Offering _fromMindMood(MmTalkOffering o) {
+    final isPack = o.kind == MmTalkOfferingKind.checkin;
+    return Offering(
+      id: 'off_mm_${o.id}',
+      stage: ServiceStage.pregnancy,
+      kind: isPack ? OfferingKind.classPack : OfferingKind.consult,
+      format: SessionFormat.liveOneToOne,
+      catalogId: o.id,
+      title: o.title.en,
+      // ⚠️ NO NAMED EXPERT. Every other offering in this catalogue names its
+      // instructor; these deliberately do not. A woman booking mental-health
+      // support is matched to whoever is available and appropriate, and
+      // putting a face on the card before that match exists would promise a
+      // specific person she may not get.
+      expertId: 'mm_counsellor',
+      priceMinor: (o.priceInr * 100).round(),
+      grant: EntitlementGrant(
+        credits: isPack ? 4 : 1,
+        validFor: isPack ? const Duration(days: 120) : const Duration(days: 30),
+        // ⚠️ NO DISCUSSION THREAD, EVEN ON THE PACK. Cohorts get a thread
+        // because the value is the group. This is one woman and one
+        // counsellor, and a persistent thread would be an unmonitored channel
+        // carrying exactly the disclosures that need a human on the other end.
+        discussionThread: false,
       ),
     );
   }

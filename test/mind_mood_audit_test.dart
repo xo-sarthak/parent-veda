@@ -40,6 +40,7 @@ Future<void> _pump(WidgetTester t, Widget w) async {
 }
 
 void main() {
+  _calmAudio();
   TestWidgetsFlutterBinding.ensureInitialized();
   SharedPreferences.setMockInitialValues({});
 
@@ -283,5 +284,38 @@ void main() {
         expect(o.whoFor.en.trim(), isNotEmpty, reason: o.id);
       }
     });
+  });
+}
+
+// =============================================================================
+//  Calm audio — the placeholder is the player, in its file-less state
+// -----------------------------------------------------------------------------
+//  ⚠️ THE ASSERTION THAT MATTERS IS THE NEGATIVE ONE. A row with no file must
+//  not be tappable. It is easy to "improve" a dead play button later by giving
+//  it a snackbar that says coming soon, and that is worse than nothing: it
+//  teaches a woman mid-panic-attack that pressing play produces a message
+//  instead of sound.
+// =============================================================================
+
+void _calmAudio() {
+  test('every calm-audio row declares its readiness explicitly', () {
+    expect(kMmCalmAudio, isNotEmpty);
+    for (final a in kMmCalmAudio) {
+      // isReady is derived from asset, so this locks the two in step: a file
+      // that lands without flipping isReady, or vice versa, is a broken row.
+      expect(a.isReady, a.asset != null, reason: a.id);
+    }
+  });
+
+  test('a row without a file claims no asset to play', () {
+    // ⚠️ NOT AN ASSERTION THAT THEY ARE ALL EMPTY. This passes today because
+    // the four R2 files have not landed, and it must keep passing on the day
+    // they do - what it forbids is the half-state where a row says it is ready
+    // and has nothing to play, which is the only combination that fails
+    // silently, at the worst possible moment, on a real phone.
+    for (final a in kMmCalmAudio.where((x) => x.isReady)) {
+      expect(a.asset, isNotNull);
+      expect(a.asset!.trim(), isNotEmpty, reason: a.id);
+    }
   });
 }

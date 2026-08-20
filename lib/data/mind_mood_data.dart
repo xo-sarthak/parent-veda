@@ -36,16 +36,65 @@ LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
 // =============================================================================
 //  The crisis helpline - ONE constant, so a placeholder can never ship quietly
 // =============================================================================
-//  ⚠️ REQUIRED_TO_CONFIRM ⚠️
-//  KIRAN is India's real 24x7 government mental health helpline (toll-free),
-//  used here so the crisis path is never wired to a fake number even in a
-//  first pass. BUT the product owner must confirm this is the number we want
-//  to send a mother to - a partner counselling line, once one exists, may be
-//  the better front door. Whoever actions this: change ONE constant here and
-//  every crisis surface in the app updates together.
-const String kCrisisHelplineName = 'KIRAN Mental Health Helpline'; // REQUIRED_TO_CONFIRM
-const String kCrisisHelplineNumber = '18005990019'; // REQUIRED_TO_CONFIRM
-const String kCrisisHelplineHours = '24x7, toll free'; // REQUIRED_TO_CONFIRM
+//  ⚠️ STILL REQUIRED_TO_CONFIRM. Verified against public sources on
+//  2026-08-20; NOT yet confirmed by the product owner. Do not treat the
+//  research below as sign-off.
+//
+//  ---------------------------------------------------------------------------
+//  ⚠️ THIS WAS KIRAN (1800-599-0019) AND KIRAN HAS BEEN MERGED AWAY.
+//  ---------------------------------------------------------------------------
+//  KIRAN was real when it was wired here - a Ministry of Social Justice
+//  helpline launched in 2020 - which is why the first pass used it rather than
+//  inventing a number. It has since been merged into Tele-MANAS, the Ministry
+//  of Health's national programme, and government portals now redirect KIRAN's
+//  number to it.
+//
+//  ⚠️ THAT IS THE WHOLE ARGUMENT FOR CHECKING A HELPLINE RATHER THAN TRUSTING
+//  ONE. Nothing in this repo could have caught it. The number was real, the
+//  constant was correct, the screen worked, no test could fail - and a woman
+//  in crisis would have been dialling a service that had been folded into
+//  another one. A helpline is the one constant in an app that can go stale
+//  without anybody touching the code.
+//
+//  ---------------------------------------------------------------------------
+//  WHY TELE-MANAS, BEYOND IT BEING THE SURVIVOR
+//  ---------------------------------------------------------------------------
+//    · **14416 is five digits.** KIRAN's was eleven. The number is dialled by
+//      someone whose hands are shaking, from a screen she is reading through
+//      tears, and short codes are what people can hold in their head long
+//      enough to type. This is the single biggest practical difference.
+//    · Government of India, Ministry of Health, part of the National Mental
+//      Health Programme and run with NIMHANS.
+//    · 24x7, free, English plus twenty-odd regional languages, which matters
+//      enormously for an India-first product.
+//    · It explicitly covers suicide prevention and domestic violence, not only
+//      general counselling.
+//
+//  ⚠️ BOTH NUMBERS REACH IT AND THE SHORT ONE IS THE ONE WE DIAL. The
+//  toll-free long form (1800-891-4416) is kept below because a short code can
+//  fail on some VoIP and international-roaming setups, and a mother abroad or
+//  on a soft-SIM must not be left with nothing.
+//
+//  Whoever actions the confirmation: change these constants and every crisis
+//  surface in the app updates together.
+//
+//  Sources checked 2026-08-20: telemanas.mohfw.gov.in; PIB release
+//  PRID 1866498 (launch, 10 Oct 2022); Vikaspedia's KIRAN page, which is where
+//  the merge is stated.
+const String kCrisisHelplineName = 'Tele-MANAS'; // REQUIRED_TO_CONFIRM
+const String kCrisisHelplineNumber = '14416'; // REQUIRED_TO_CONFIRM
+
+/// ⚠️ THE FALLBACK, NOT A SECOND OPTION ON SCREEN. Same service. Shown only
+/// where the short code may not connect; offering a woman in crisis two
+/// numbers to choose between is a decision she should not have to make.
+const String kCrisisHelplineNumberAlt = '18008914416'; // REQUIRED_TO_CONFIRM
+
+const String kCrisisHelplineHours =
+    '24x7, free, in English and 20 Indian languages'; // REQUIRED_TO_CONFIRM
+
+/// Kept for revert, and as the record of what was here before the merge.
+// const String kCrisisHelplineNameKiran = 'KIRAN Mental Health Helpline';
+// const String kCrisisHelplineNumberKiran = '18005990019';
 
 /// India's single emergency number. Real, not a placeholder - shown only for
 /// "you or your baby are in danger right now", never as the primary CTA.
@@ -244,11 +293,34 @@ class MmCalmAudio {
       {required this.id,
       required this.title,
       required this.subtitle,
-      required this.durationLabel});
+      required this.durationLabel,
+      this.asset});
   final String id;
   final LocalizedText title;
   final LocalizedText subtitle;
   final LocalizedText durationLabel;
+
+  /// The bundled asset path, or null while the file does not exist yet.
+  ///
+  /// ⚠️ NULL IS A STATE, NOT AN OVERSIGHT, and the row reads it. With an asset
+  /// the row is a working player; without one it is a placeholder that occupies
+  /// the same geometry and is visibly not tappable. That is the rule
+  /// `pv_placeholders.dart` was written for - "what is missing is the FILE, and
+  /// only the file" - applied to sound instead of to video.
+  ///
+  /// ⚠️ WHY A FIELD RATHER THAN A NAMING CONVENTION. The tempting version is
+  /// `'audio/calm/$id.mp3'` computed on the fly, and it is wrong in the one way
+  /// that matters: it can never be false. Every row would claim to be playable,
+  /// and the failure would arrive as silence when a mother presses play during
+  /// a panic attack. A field can say "not yet"; a convention cannot.
+  ///
+  /// ⚠️ THESE FOUR ARE STILL NULL - the files are not in the repo. They are
+  /// destined for Cloudflare R2 with the ragas, and when they land, filling in
+  /// four strings here turns four placeholders into four players with no other
+  /// change. Nothing else needs touching.
+  final String? asset;
+
+  bool get isReady => asset != null;
 }
 
 final List<MmCalmAudio> kMmCalmAudio = [
@@ -297,6 +369,20 @@ extension MmArticleGroupMeta on MmArticleGroup {
         MmArticleGroup.moreThanMood => _en('Gently, and only where it is '
             'useful to know: what it looks like when a feeling has become '
             'more than a passing mood, and what to do about it.'),
+        // ⚠️ FIVE PAGES, NOT THE BRIEF'S EIGHT, AND THAT IS SETTLED RATHER
+        // THAN OUTSTANDING. Confirmed by the product owner 2026-08-20.
+        //
+        // Three of the brief's topics were merged into pairs: unsolicited
+        // advice with family pressure, relationship changes with intimacy
+        // changes, body image with self-esteem. Each pair is genuinely one
+        // conversation - a woman reading about her changing body and one
+        // reading about how she feels about it are the same woman on the same
+        // evening - and splitting them yields two thin pages saying the same
+        // thing twice.
+        //
+        // Same reasoning the conditions library uses: padding a page to look
+        // as complete as its neighbours is dishonest rather than thorough.
+        // Do not "finish" this to eight without reopening the decision.
         MmArticleGroup.everydayCare => _en('The ordinary things that shape '
             'how you feel, day to day.'),
       };

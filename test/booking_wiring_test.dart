@@ -11,8 +11,10 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/booking/booking_catalog.dart';
 import 'package:parentveda/booking/booking_models.dart';
 import 'package:parentveda/booking/booking_store.dart';
+import 'package:parentveda/data/mind_mood_data.dart';
 
 void main() {
+  _mindMood();
   final cat = BookingCatalog.instance;
   final store = BookingStore.instance;
   setUp(store.resetAll);
@@ -67,5 +69,74 @@ void main() {
     expect(b, isNotNull);
     expect(store.upcoming().single.title, o.title);
     expect(store.ownsRecording(o.id), isTrue);
+  });
+}
+
+// =============================================================================
+//  Mind & Mood — the fourth wiring gate of this review
+// -----------------------------------------------------------------------------
+//  `mm_talk_tab.dart` carried a comment saying "wire this to lib/booking/ when
+//  this section is ready" and built its own booking sheet in the meantime. So
+//  the app had two booking flows, and the parallel one scheduled nothing while
+//  showing a warm confirmation.
+//
+//  ⚠️ NOTHING COULD HAVE CAUGHT THAT. The placeholder compiled, rendered and
+//  read correctly. These tests are the thing that would have: they assert the
+//  ids the screen actually looks up resolve to real offerings, so the day
+//  somebody renames an id in `mind_mood_data.dart`, a test fails instead of a
+//  booking silently falling back to the dead sheet.
+// =============================================================================
+
+void _mindMood() {
+  final cat = BookingCatalog.instance;
+
+  // The screen builds this string. If the prefix here and the prefix there ever
+  // disagree, every Mind & Mood booking silently degrades to the old sheet.
+  String idFor(String catalogId) => 'off_mm_$catalogId';
+
+  test('every Mind & Mood offering the screen can open resolves', () {
+    for (final o in kMmTalkOfferings) {
+      final real = cat.offeringById(idFor(o.id));
+      expect(real, isNotNull,
+          reason: 'mm offering ${o.id} has no catalogue entry, so the Talk tab '
+              'falls back to the placeholder sheet that books nothing');
+      expect(real!.stage, ServiceStage.pregnancy);
+      expect(cat.slotsFor(real.id), isNotEmpty,
+          reason: 'a sheet with no slots is a dead end for a woman who has '
+              'just decided she needs to talk to someone');
+    }
+  });
+
+  test('the ongoing check-in is a pack of four, not a subscription', () {
+    final pack = cat.offeringById(idFor('ongoing_checkin'));
+    expect(pack, isNotNull);
+    expect(pack!.kind, OfferingKind.classPack);
+    expect(pack.grant.credits, 4);
+    // ⚠️ THE POINT OF THE 120 DAYS. A month's validity would take back what she
+    // paid for as a penalty for having a good few weeks. Assert the floor, not
+    // the exact number, so tuning the window does not fail the test but
+    // shortening it below a pregnancy-shaped horizon does.
+    //
+    // ⚠️ AND `validFor` IS NULLABLE, WHERE NULL MEANS NEVER EXPIRES. So the
+    // null check is not defensive noise - it is the difference between a pack
+    // that lasts four months and one we accidentally gave away forever.
+    expect(pack.grant.validFor, isNotNull);
+    expect(pack.grant.validFor!.inDays, greaterThanOrEqualTo(90));
+  });
+
+  test('one-to-one support carries no discussion thread', () {
+    for (final o in kMmTalkOfferings) {
+      final real = cat.offeringById(idFor(o.id))!;
+      // A persistent thread here would be an unmonitored channel carrying
+      // exactly the disclosures that need a human on the other end.
+      expect(real.grant.discussionThread, isFalse, reason: real.title);
+    }
+  });
+
+  test('price survives the rupee-to-minor-unit conversion', () {
+    for (final o in kMmTalkOfferings) {
+      expect(cat.offeringById(idFor(o.id))!.priceMinor, o.priceInr * 100,
+          reason: '${o.id} is charged the wrong amount');
+    }
   });
 }

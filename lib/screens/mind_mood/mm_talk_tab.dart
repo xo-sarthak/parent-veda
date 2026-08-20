@@ -8,11 +8,18 @@
 //  below rather than re-implementing the sheet). Nowhere else in Mind & Mood
 //  imports anything from this file's paid layer.
 //
-//  ⚠️ BOOKING IS A PLACEHOLDER SCHEDULING HOOK. Two taps - "Book" then
-//  "Request this" - produce a warm confirmation and nothing is actually
-//  scheduled. Wiring to the real booking engine (`lib/booking/`) is future
-//  work; building a second, parallel payment/entitlement path in a first
-//  pass on the app's most sensitive section was the wrong risk to take.
+//  ⚠️ BOOKING GOES THROUGH THE REAL ENGINE (`lib/booking/`) - entitlements,
+//  seat caps, and one booking history that spans every stage. It did not, for
+//  a while: this header used to say booking was a placeholder and that wiring
+//  it up was "future work", and the section shipped with its own parallel
+//  sheet that produced a warm confirmation and scheduled nothing.
+//
+//  ⚠️ THAT COMMENT IS WHY IT LASTED. A note saying "wire this later" reads,
+//  to the next person, as a decision somebody already made and is tracking.
+//  Nobody was. The three offerings now resolve through `BookingCatalog` as
+//  `off_mm_<id>`, and `test/booking_wiring_test.dart` fails if that mapping
+//  ever breaks - because nothing else could catch it: the placeholder
+//  compiled, rendered, and read correctly right up to the part that mattered.
 //
 //  ⚠️ THE SELF-CHECK SCREENER NEVER SHOWS A NUMBER. `mmScreenerGuidance`
 //  returns a sentence, not a score - see mind_mood_data.dart.
@@ -26,6 +33,8 @@ import '../../theme/pv_fonts.dart';
 import '../tools/ask_veda_screen.dart';
 import '../v2/v2_palette.dart';
 import 'mm_crisis_path.dart';
+import '../../booking/booking_catalog.dart';
+import '../post_pregnancy/booking_sheet.dart';
 
 class MmTalkTab extends StatelessWidget {
   const MmTalkTab({super.key, required this.controller});
@@ -381,7 +390,7 @@ class _ScreenerResult extends StatelessWidget {
 }
 
 // =============================================================================
-//  Paid offerings + the placeholder 2-tap booking hook
+//  Paid offerings -> the real booking engine
 // =============================================================================
 
 class _OfferingCard extends StatelessWidget {
@@ -474,13 +483,28 @@ void showCounsellingBookingSheet(BuildContext context) {
   _showBookingSheet(context, offering);
 }
 
-/// Tap 1: this sheet, showing what she is booking. Tap 2: "Request this"
-/// below, which shows a warm confirmation.
+/// Opens the app's real booking flow for a Mind & Mood offering.
 ///
-/// ⚠️ PLACEHOLDER SCHEDULING HOOK. Nothing is actually scheduled or charged
-/// - wire this to `lib/booking/` (BookingStore/BookingCatalog) when this
-/// section is ready for real payment + entitlement flow.
+/// ⚠️ THIS USED TO OPEN A SECOND, PARALLEL BOOKING SHEET, and the comment
+/// above it said "wire this to lib/booking/ when this section is ready".
+/// Nobody did. So the app had two booking flows: the real one - entitlements,
+/// seat caps through the Supabase RPC, a history that spans every stage - and
+/// a local one that showed a warm confirmation and scheduled nothing.
+///
+/// ⚠️ WHY THAT WAS WORSE HERE THAN IT WOULD BE ANYWHERE ELSE. A woman reaching
+/// this screen has read six articles about her own mind and decided she needs
+/// a person. Telling her it is booked when it is not is the one place in the
+/// product where a soft failure costs something that cannot be refunded.
+///
+/// Falls back to the old sheet ONLY if the offering somehow has no catalogue
+/// entry, so a mapping mistake degrades to the previous behaviour rather than
+/// to a dead button.
 void _showBookingSheet(BuildContext context, MmTalkOffering offering) {
+  final real = BookingCatalog.instance.offeringById('off_mm_${offering.id}');
+  if (real != null) {
+    showBookingSheet(context, real);
+    return;
+  }
   showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,

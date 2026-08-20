@@ -28,6 +28,7 @@ import '../../widgets/pv_placeholders.dart';
 import '../v2/v2_palette.dart';
 import 'mm_breathing_screen.dart';
 import 'mm_crisis_path.dart';
+import '../../services/raga_audio_store.dart';
 
 class MmFeelTab extends StatelessWidget {
   const MmFeelTab({super.key});
@@ -460,6 +461,32 @@ class _BreathingCard extends StatelessWidget {
   }
 }
 
+// =============================================================================
+//  A calm-audio row - a real player when the file exists, an honest
+//  placeholder when it does not
+// -----------------------------------------------------------------------------
+//  ⚠️ THIS USED TO BE A ONE-LINE ROW WITH "COMING SOON" ON THE RIGHT, which is
+//  precisely the shape `pv_placeholders.dart` exists to argue against. That
+//  file's rule - "a placeholder occupies the real geometry; what is missing is
+//  the FILE, and only the file" - had been applied to every video in this
+//  section and to none of the audio. So the videos could be reviewed before
+//  they existed and the audio could not.
+//
+//  ⚠️ THE ROW NOW READS `audio.isReady` AND BRANCHES, which is the part worth
+//  keeping. It is not "a placeholder today, rewritten later": it is the
+//  finished player, running in the state where its file is missing. When the
+//  four R2 files land, `mind_mood_data.dart` gains four strings and this widget
+//  is not touched at all. A placeholder you have to delete to ship is a second
+//  implementation; a placeholder that is the real thing with an empty input is
+//  a state.
+//
+//  ⚠️ AND IT SHARES THE ONE APP-WIDE PLAYER. `RagaAudioStore` is a singleton
+//  for the reason written at the top of that file: sound is global, there is
+//  one room and one pair of ears, and four widgets each owning a player is how
+//  "there is no way to pause it" happened. Starting rain here stops a raga -
+//  that is the correct behaviour, not a collision to work around.
+// =============================================================================
+
 class _AudioRow extends StatelessWidget {
   const _AudioRow({required this.audio, required this.p});
   final MmCalmAudio audio;
@@ -475,47 +502,98 @@ class _AudioRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final tint = v2BlockTint(344, p);
-    return Semantics(
-      label: 'Audio coming soon: ${audio.title.now}',
-      child: Container(
-        padding: const EdgeInsets.all(13),
-        decoration: BoxDecoration(
-          color: p.surfaceAlt,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(children: [
-          Container(
-            width: 42,
-            height: 42,
-            alignment: Alignment.center,
-            decoration:
-                BoxDecoration(color: tint, borderRadius: BorderRadius.circular(12)),
-            child: Icon(_icons[audio.id] ?? Icons.graphic_eq_rounded,
-                size: 20, color: p.ink2),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(audio.title.now,
-                    style: pvFraunces(
-                        fontSize: 14.5,
-                        fontWeight: FontWeight.w600,
-                        color: p.ink1)),
-                Text(audio.subtitle.now,
-                    style: pvManrope(fontSize: 11.5, color: p.ink3)),
-              ],
+    final store = RagaAudioStore.instance;
+
+    return ListenableBuilder(
+      listenable: store,
+      builder: (context, _) {
+        final ready = audio.isReady;
+        final mine = ready && store.asset == audio.asset;
+        final playing = mine && store.isPlaying;
+
+        return Semantics(
+          // ⚠️ THE SCREEN READER MUST NOT SAY "BUTTON" ON A ROW THAT CANNOT BE
+          // PRESSED. `button: ready` is what keeps the placeholder honest to
+          // someone who never sees it.
+          button: ready,
+          label: ready
+              ? '${playing ? 'Pause' : 'Play'} ${audio.title.now}'
+              : 'Coming soon: ${audio.title.now}',
+          child: Material(
+            color: Colors.transparent,
+            child: InkWell(
+              borderRadius: BorderRadius.circular(16),
+              // ⚠️ NULL onTap WHEN THERE IS NO FILE. Not an empty callback, and
+              // not a snackbar saying "coming soon" - a play control that
+              // absorbs a press and does nothing teaches her that presses do
+              // nothing, and she carries that lesson to the rest of the app.
+              onTap: ready
+                  ? () => store.toggle(audio.asset!,
+                      title: audio.title.now, loop: true)
+                  : null,
+              child: Container(
+                padding: const EdgeInsets.all(13),
+                decoration: BoxDecoration(
+                  color: p.surfaceAlt,
+                  borderRadius: BorderRadius.circular(16),
+                  // The playing row is marked by its border, not by moving or
+                  // resizing - a list that reflows while she is breathing is
+                  // the opposite of what this tab is for.
+                  border: playing
+                      ? Border.all(color: p.ink3.withValues(alpha: 0.45))
+                      : null,
+                ),
+                child: Row(children: [
+                  Container(
+                    width: 42,
+                    height: 42,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                        color: tint, borderRadius: BorderRadius.circular(12)),
+                    child: Icon(
+                        playing
+                            ? Icons.pause_rounded
+                            : (_icons[audio.id] ?? Icons.graphic_eq_rounded),
+                        size: 20,
+                        color: p.ink2),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(audio.title.now,
+                            style: pvFraunces(
+                                fontSize: 14.5,
+                                fontWeight: FontWeight.w600,
+                                color: p.ink1)),
+                        Text(
+                            playing
+                                ? 'Playing · ${audio.durationLabel.now}'
+                                : audio.subtitle.now,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: pvManrope(fontSize: 11.5, color: p.ink3)),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  if (!ready)
+                    Text('COMING SOON',
+                        style: pvManrope(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.8,
+                            color: p.ink3))
+                  else
+                    Icon(playing ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                        size: 22, color: p.ink2),
+                ]),
+              ),
             ),
           ),
-          Text('COMING SOON',
-              style: pvManrope(
-                  fontSize: 9,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.8,
-                  color: p.ink3)),
-        ]),
-      ),
+        );
+      },
     );
   }
 }
