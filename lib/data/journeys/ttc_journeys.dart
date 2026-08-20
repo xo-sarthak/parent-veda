@@ -588,9 +588,10 @@ final JourneyConfig kTtcLossRecoveryLibrary = JourneyConfig(
         JourneyElement(
           type: SolutionType.read,
           title: _en('Physical recovery, in plain terms'),
-          value: _en('What usually happens to your body in the weeks '
-              'after, and roughly how long it takes.'),
-          owed: true,
+          value: _en('What usually happens over the next few weeks, and the '
+              'small number of things that need a doctor today.'),
+          meta: _en('8 MIN'),
+          surfaceId: 'ttc_read/ttc_read_loss_recovery',
         ),
       ],
     ),
@@ -600,9 +601,10 @@ final JourneyConfig kTtcLossRecoveryLibrary = JourneyConfig(
         JourneyElement(
           type: SolutionType.read,
           title: _en('On trying again'),
-          value: _en('What doctors usually advise about timing, and why it '
-              'is a guideline rather than a rule.'),
-          owed: true,
+          value: _en('What the evidence says about waiting, and the part no '
+              'evidence can answer.'),
+          meta: _en('8 MIN'),
+          surfaceId: 'ttc_read/ttc_read_trying_again',
         ),
       ],
       note: _en('This is a guideline, not a deadline.'),

@@ -17,6 +17,7 @@ import 'package:parentveda/services/bracket_resolver.dart';
 import 'package:parentveda/screens/ttc/ttc_surface_router.dart';
 import 'package:parentveda/services/parenting_surfaces.dart';
 import 'package:parentveda/services/ttc_surfaces.dart';
+import 'package:parentveda/ttc/ttc_reads_data.dart';
 import 'package:parentveda/services/life_stage_store.dart';
 
 void main() {
@@ -171,6 +172,26 @@ void main() {
         for (final id in liveSurfaceIds(b)) {
           expect(id.startsWith('ttc_'), isTrue,
               reason: '${b.id} points at "$id" — TTC ids are ttc_-prefixed');
+
+          // ⚠️ A LONG-FORM READ IS A REAL DESTINATION, resolved by PREFIX.
+          //
+          // `ttc_surface_router.dart` answers `ttc_read/<id>` out of
+          // `kTtcReads` rather than as a hand-written case, so that adding an
+          // article makes it reachable with no router change. That also means
+          // `ttcSurfaceLabel` — which reads a static list — cannot see it, and
+          // this test would read a live bracket layer as pointing nowhere.
+          //
+          // Checked against the library rather than by accepting the prefix
+          // blindly, so a bracket naming an article that does not exist still
+          // fails. That is the case this test is actually for. Same fix as
+          // `problem_hub_test.dart`, and the same reasoning `pp_section/`
+          // already carries there.
+          if (id.startsWith('ttc_read/')) {
+            expect(ttcReadById(id.substring('ttc_read/'.length)), isNotNull,
+                reason: '${b.id} points at "$id", which is not a real read');
+            continue;
+          }
+
           expect(ttcSurfaceLabel(id, hinglish: false), isNotNull,
               reason: '${b.id} points at "$id", which ttc_surfaces does not '
                   'declare');

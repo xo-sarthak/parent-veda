@@ -265,10 +265,13 @@ final List<Bracket> kTtcBrackets = [
         hi: 'Sharir ka theek hona, phir se koshish kab safe hai, aur us hisse ke '
             'liye sahara jiska koi timeline nahi hota.'),
     layers: {
-      BracketLayer.content: BracketLayerSpec(
-          state: LayerState.notReady,
-          reason:
-              'Physical recovery, when it is safe to try again, emotional support'),
+      // Was notReady, and was the last `notReady` content layer in the stage.
+      // Two reads now carry the workbook's three topics: `ttc_read_loss_recovery`
+      // (physical recovery) and `ttc_read_trying_again` (when it is safe, plus
+      // the emotional half — one decision rather than two, because they are
+      // asked in the same breath and answered by different people).
+      BracketLayer.content: BracketLayerSpec.live(
+          ['ttc_read/ttc_read_loss_recovery', 'ttc_read/ttc_read_trying_again']),
       BracketLayer.activities:
           BracketLayerSpec(state: LayerState.notApplicable, reason: 'Not a fit'),
       BracketLayer.tools:

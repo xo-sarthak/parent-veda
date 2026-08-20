@@ -375,6 +375,38 @@ final List<PvVideoSlot> kTtcVideos = [
     readNext: ['ttc_read_heat_habits'],
     surfaceNext: ['ttc_partner'],
   ),
+
+  // ---------------------------------------------------------------------------
+  //  After a loss — ONE film, on the practical half only
+  // ---------------------------------------------------------------------------
+  //  ⚠️ NO FILM ON "ON TRYING AGAIN", DELIBERATELY. A play control at the top
+  //  of a page about whether she is ready to try again is the wrong texture —
+  //  it makes the page feel produced at the moment it most needs to feel
+  //  written. The physical half carries the video for this bracket.
+  PvVideoSlot(
+    id: 'ttc_vid_loss_recovery',
+    hue: 26,
+    title: _en('What the next few weeks look like'),
+    why: _en('Bleeding, hormones and when a cycle returns — the practical '
+        'part, explained once so you do not have to look it up at night.'),
+    seconds: 264,
+    expert: _en('Dr. Ananya Rao'),
+    expertRole: _en('Gynaecologist · 14 years'),
+    chapters: [
+      PvVideoChapter(at: 0, label: _en('The bleeding, and how long')),
+      PvVideoChapter(at: 62, label: _en('Why a test can stay positive')),
+      PvVideoChapter(at: 132, label: _en('When the cycle comes back')),
+      PvVideoChapter(at: 198, label: _en('The signs that need a hospital')),
+    ],
+    takeaways: [
+      _en('Bleeding usually settles within one to two weeks.'),
+      _en('A positive test for a few weeks afterwards is the hormone '
+          'clearing, not a continuing pregnancy.'),
+      _en('Ovulation often returns before the first period does.'),
+    ],
+    readNext: ['ttc_read_loss_recovery'],
+    surfaceNext: ['ttc_community'],
+  ),
 ];
 
 /// The slot lookup the reader is handed.
