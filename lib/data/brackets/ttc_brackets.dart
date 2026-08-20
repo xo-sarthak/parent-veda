@@ -230,9 +230,11 @@ final List<Bracket> kTtcBrackets = [
           BracketLayerSpec(state: LayerState.notApplicable, reason: 'Not a fit'),
       BracketLayer.tools:
           BracketLayerSpec(state: LayerState.notApplicable, reason: 'Not a fit'),
-      BracketLayer.products: BracketLayerSpec(
-          state: LayerState.notReady,
-          reason: 'Male fertility supplements (careful)'),
+      // Was notReady. `ttc_supplements` now carries two entries framed for him
+      // — zinc and CoQ10 — each stating plainly that the evidence for
+      // antioxidant supplements here is weak, which is the workbook's
+      // "(careful)" honoured rather than ignored.
+      BracketLayer.products: BracketLayerSpec.live(['ttc_supplements']),
       // ⚑ The workbook wanted a module inside the conception course; a
       // STANDALONE shipped instead — `ttc_course_male`, "The half nobody talks
       // about". Live, because the thing she is promised exists and opens.

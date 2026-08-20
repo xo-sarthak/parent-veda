@@ -480,12 +480,18 @@ final JourneyConfig kTtcSpermHealth = JourneyConfig(
     JourneyStep(
       question: _en('Is this even about him, or could it be both of us?'),
       elements: [
+        // ⚠️ THE FIGURE WAS RESTATED TO MATCH THE READ. The step said "a
+        // third his, a third hers, a third both", the article says "a male
+        // factor is involved in roughly half" — both are common framings and
+        // they are arithmetically compatible (his-alone plus both), but a tile
+        // and the page it opens must not appear to disagree.
         JourneyElement(
           type: SolutionType.read,
-          title: _en("Whose 'side' is it, really"),
-          value: _en('In roughly a third of cases the factor is his, a '
-              "third hers, a third both or unclear."),
-          owed: true,
+          title: _en('Whose "side" is it, really'),
+          value: _en('A male factor is involved in about half of couples — '
+              'and his half is the fastest thing to check.'),
+          meta: _en('8 MIN'),
+          surfaceId: 'ttc_read/ttc_read_whose_side',
         ),
       ],
       note: _en("Nothing here is about deciding who's 'the reason'. It's "
@@ -497,9 +503,10 @@ final JourneyConfig kTtcSpermHealth = JourneyConfig(
         JourneyElement(
           type: SolutionType.read,
           title: _en('Heat, habits and time'),
-          value: _en('Smoking, alcohol, heat, weight and stress — what the '
-              'evidence says moves the number, and by how much.'),
-          owed: true,
+          value: _en('Three levers with real evidence, what each is worth, '
+              'and how long before any of it shows.'),
+          meta: _en('8 MIN'),
+          surfaceId: 'ttc_read/ttc_read_heat_habits',
         ),
       ],
     ),
@@ -509,9 +516,10 @@ final JourneyConfig kTtcSpermHealth = JourneyConfig(
         JourneyElement(
           type: SolutionType.read,
           title: _en('What a semen analysis actually involves'),
-          value: _en("A common, quick test — what it checks, and why it's "
-              'nothing to be embarrassed about.'),
-          owed: true,
+          value: _en('How it is done, and why "below normal" does not mean '
+              'what it looks like it means.'),
+          meta: _en('9 MIN'),
+          surfaceId: 'ttc_read/ttc_read_semen_analysis',
         ),
       ],
     ),
@@ -528,9 +536,9 @@ final JourneyConfig kTtcSpermHealth = JourneyConfig(
         JourneyElement(
           type: SolutionType.product,
           title: _en('Supplements worth considering'),
-          value: _en("A short, honest list — most of what's sold here does "
-              'very little.'),
-          owed: true,
+          value: _en('Zinc and CoQ10, framed for him — and honest that the '
+              'evidence here is weak.'),
+          surfaceId: 'ttc_supplements',
         ),
       ],
     ),

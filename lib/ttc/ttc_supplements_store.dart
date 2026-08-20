@@ -129,6 +129,29 @@ const List<TtcSuggestedSupplement> ttcSuggestedSupplements = [
     noteHi:
         'Egg aur sperm quality ke liye study hua hai, khaaskar pentiis ke baad. Ummeed jagata hai, sabit nahi hua - chemist se nahi, doctor se poochhein.',
   ),
+  // ⚠️ A SECOND CoQ10 ENTRY, FRAMED FOR HIM, AND NOT A DUPLICATE.
+  //
+  // `forPartner` is a bool, so an item belongs to one list or the other — and
+  // the entry above never reached his, which meant the suggested list for him
+  // held exactly one item while the workbook asks for "male fertility
+  // supplements". The framing genuinely differs too: for her it is egg quality
+  // over thirty-five, for him it is sperm parameters. Same molecule, different
+  // reason to consider it, so two honest entries beat one hedged one.
+  TtcSuggestedSupplement(
+    name: 'CoQ10',
+    dose: 'As advised',
+    forPartner: true,
+    noteEn:
+        'Some evidence for sperm count and motility, more so where a result '
+        'is already low. Worth far less than stopping tobacco - and the '
+        'evidence for antioxidant supplements in male infertility is weak '
+        'rather than absent.',
+    noteHi:
+        'Sperm count aur motility ke liye kuch saboot hai, khaaskar jab result '
+        'pehle se kam ho. Tambaku chhodne se bahut kam faayda - aur male '
+        'infertility mein antioxidant supplements ka saboot kamzor hai, na ki '
+        'nahi hai.',
+  ),
   TtcSuggestedSupplement(
     name: 'Zinc',
     dose: 'As advised',

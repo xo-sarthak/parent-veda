@@ -297,6 +297,84 @@ final List<PvVideoSlot> kTtcVideos = [
     readNext: ['ttc_read_preconception_tests'],
     surfaceNext: ['ttc_tests'],
   ),
+
+  // ---------------------------------------------------------------------------
+  //  His side
+  // ---------------------------------------------------------------------------
+  PvVideoSlot(
+    id: 'ttc_vid_whose_side',
+    hue: 186,
+    title: _en('The half that gets investigated last'),
+    why: _en('A male factor is involved in about half of couples — and his '
+        'test takes three days against her three months.'),
+    seconds: 288,
+    expert: _en('Dr. Vikram Nair'),
+    expertRole: _en('Andrologist'),
+    chapters: [
+      PvVideoChapter(at: 0, label: _en('Why the order is usually wrong')),
+      PvVideoChapter(at: 66, label: _en('Count, movement, shape')),
+      PvVideoChapter(at: 158, label: _en('The eleven-week cycle')),
+      PvVideoChapter(at: 232, label: _en('What the test does not measure')),
+    ],
+    takeaways: [
+      _en('Half of these cases involve him, and his half is the fastest to '
+          'check.'),
+      _en('Movement matters more than count.'),
+      _en('A sample reflects what his body was doing three months ago.'),
+    ],
+    readNext: ['ttc_read_whose_side'],
+    surfaceNext: ['ttc_tests'],
+  ),
+
+  PvVideoSlot(
+    id: 'ttc_vid_semen_analysis',
+    hue: 186,
+    title: _en('Reading a semen report without panicking'),
+    why: _en('What each number means, and why "below normal" is not the '
+        'verdict it looks like.'),
+    seconds: 342,
+    expert: _en('Dr. Vikram Nair'),
+    expertRole: _en('Andrologist'),
+    chapters: [
+      PvVideoChapter(at: 0, label: _en('Where the "normal" line comes from')),
+      PvVideoChapter(at: 84, label: _en('The four numbers that matter')),
+      PvVideoChapter(at: 176, label: _en('The long words, translated')),
+      PvVideoChapter(at: 258, label: _en('Why the repeat is the real test')),
+    ],
+    takeaways: [
+      _en('The reference limits are the fifth percentile of men who fathered '
+          'children naturally.'),
+      _en('One in twenty men who conceived without help would score below '
+          'them.'),
+      _en('An abnormal first result is repeated before anyone acts on it.'),
+    ],
+    readNext: ['ttc_read_semen_analysis'],
+    surfaceNext: ['ttc_records'],
+  ),
+
+  PvVideoSlot(
+    id: 'ttc_vid_heat_habits',
+    hue: 186,
+    title: _en('Three things that actually change his numbers'),
+    why: _en('Tobacco, heat and time — what each is worth, and how long '
+        'before any of it shows.'),
+    seconds: 306,
+    expert: _en('Dr. Vikram Nair'),
+    expertRole: _en('Andrologist'),
+    chapters: [
+      PvVideoChapter(at: 0, label: _en('Tobacco, including the chewed kind')),
+      PvVideoChapter(at: 88, label: _en('Heat, and the cheap fixes')),
+      PvVideoChapter(at: 168, label: _en('Alcohol, weight and steroids')),
+      PvVideoChapter(at: 246, label: _en('Why nothing shows for three months')),
+    ],
+    takeaways: [
+      _en('Gutka and khaini count as tobacco, and are often not counted.'),
+      _en('Heat is the cheapest lever: a table, not a lap.'),
+      _en('Any change takes about three months to reach a test.'),
+    ],
+    readNext: ['ttc_read_heat_habits'],
+    surfaceNext: ['ttc_partner'],
+  ),
 ];
 
 /// The slot lookup the reader is handed.
