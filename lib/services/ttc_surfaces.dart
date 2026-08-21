@@ -65,6 +65,7 @@ const List<TtcSurface> kTtcSurfaces = [
       'PCOS symptom checker'),
   TtcSurface('ttc_precheck', 'Pre-pregnancy checklist',
       'Pregnancy se pehle ki checklist'),
+  TtcSurface('ttc_bmi', 'BMI calculator', 'BMI calculator'),
   TtcSurface('ttc_nutrition', 'Eating for fertility', 'Fertility ke liye khana'),
   TtcSurface('ttc_supplements', 'Supplements', 'Supplements'),
   TtcSurface('ttc_tracker', 'Daily log', 'Roz ka log'),

@@ -425,8 +425,13 @@ final List<PrecheckItem> kPrecheckItems = [
         'returning to is a modest five per cent — not a target weight, and not '
         'a reason to postpone trying for a year.'),
     readId: 'ttc_read_three_months_before',
+    // ⚠️ THE CALCULATOR IS OFFERED, AND THE ITEM STILL CARRIES NO NUMBER.
+    // The checklist item is about a conversation; the calculator is one input
+    // to it. Reading a number does not complete this item — see
+    // `autoCompletable`, which stays false.
+    surfaceId: 'ttc_bmi',
     medicalReview: _en('⚠️ The five per cent figure, and that no BMI number or '
-        'target weight appears anywhere.'),
+        'target weight appears anywhere in the item itself.'),
   ),
 
   // ---- DENTAL ---------------------------------------------------------------

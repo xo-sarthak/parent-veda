@@ -33,6 +33,7 @@ import 'ttc_medication_screen.dart';
 import 'ttc_nutrition_screen.dart';
 import 'ttc_partner_screen.dart';
 import 'ttc_pcos_check_screen.dart';
+import 'ttc_bmi_screen.dart';
 import 'ttc_precheck_screen.dart';
 import 'ttc_prepare_screen.dart';
 import 'ttc_products_screen.dart';
@@ -123,6 +124,11 @@ Widget? _ttcStaticSurface(String id) => switch (id) {
       // PCOS checker, the vaccination list, supplements and medicines, so it
       // opens knowing what she has already done.
       'ttc_precheck' => const TtcPrecheckScreen(),
+      // ⚠️ SOUTH ASIAN THRESHOLDS ARE PRIMARY HERE. See the head of
+      // `ttc_bmi_rules.dart` — reading an Indian woman against European
+      // cut-offs is the specific thing `ttc_read_three_months_before` already
+      // tells her is wrong.
+      'ttc_bmi' => const TtcBmiScreen(),
       'ttc_nutrition' => const TtcNutritionScreen(),
       'ttc_supplements' => const TtcSupplementsScreen(),
       // `ttc_tracker` is deliberately absent: `TtcTrackerScreen` requires a

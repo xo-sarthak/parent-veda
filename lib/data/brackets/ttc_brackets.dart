@@ -196,7 +196,7 @@ final List<Bracket> kTtcBrackets = [
       // carries the weight item — with no BMI figure, no target and no
       // calculator, for the reason written at the journey's BMI slot.
       BracketLayer.tools: BracketLayerSpec.live(
-          ['ttc_precheck', 'ttc_vaccinations', 'ttc_tests']),
+          ['ttc_precheck', 'ttc_bmi', 'ttc_vaccinations', 'ttc_tests']),
       BracketLayer.products:
           BracketLayerSpec.live(['ttc_supplements', 'ttc_products']),
       BracketLayer.course: BracketLayerSpec(
