@@ -2053,40 +2053,58 @@ Everything left after building the seven doors against
 phone. Nothing here blocks a build; three of the five are content or production
 rather than code.
 
-## 15.1 The six-day window is explained in two places
+## 15.1 Two surfaces share some facts, and can drift apart
 
-The fact appears in seven files. That is not the problem — most of them are a
-single restatement inside something else, and a daily card saying "the window is
-roughly six days" is not a second source of truth.
+⚠️ **This entry has been wrong twice, and both wrong versions are worth keeping
+here, because the mistake is the reusable part.**
 
-Two of them **explain** it, at length, independently:
+**First version: "the chapter copy is unreachable."** False.
+`ttc_journey_map_screen.dart:180` opens any chapter, so a woman can browse to
+Trying Together whenever she likes.
+
+**Second version: "a door cannot aim into a chapter, so it needs
+`ttc_chapter/<id>`."** Also false, and this one had a fix attached to it, which
+is worse. **No door anywhere opens the chapter reader.** The hubs and journeys
+point only at `ttc_read/…`; `ttc_chapter` appears in three brackets' `content`
+declaration — a data-model line, not a rendered door — and on the home's "where
+you are" card. Nothing was trying to aim, so there was nothing to fix.
+
+**What both versions got wrong was the category.** A chapter and an article are
+not two attempts at the same thing:
+
+| | what it answers | when she meets it |
+|---|---|---|
+| **chapter** | *where am I right now* | because the engine has her there |
+| **article** | *what about this topic* | because she went looking |
+
+Chapters are TTC's version of pregnancy weeks and parenting phases — a position
+in time, part of a narrative she is living. An article is reference, complete,
+on demand. Every stage in this app has both, and they are supposed to. Judging
+one against the other is like calling a week page a duplicate of a condition
+page.
+
+**So the architecture is right and nothing here needs building.** What is
+genuinely true is much smaller:
+
+The six-day window is *explained* in two places, by different hands, reviewed at
+different times:
 
 | where | reached by |
 |---|---|
 | `ttc_reads_data.dart:712, 734` | Fertile window → Improve my chances → "Timing, and the advice worth putting down" |
-| `ttc_chapter_data.dart:315, 336` | home hero → Me — **only** while the engine has her in `tryingTogether` |
+| `ttc_chapter_data.dart:315, 336` | Journey map → Trying Together → Me |
 
-Both also put down the lie-still-afterwards myth, separately.
+Both also put down the lie-still-afterwards myth, separately. **They can drift.**
+Edit one and the other keeps saying the old thing, with nothing failing
+anywhere — and the clinical review that covered the chapter did not cover the
+article.
 
-The duplication is deliberate. The chapter reader is a *sequence*, not an
-addressable surface: `ttc_chapter` opens whichever chapter she is currently in,
-so a woman in the waiting days who taps the fertile-window door and wants the
-myths gets a different chapter entirely. Writing the article was the only way to
-make the content reachable from the door that promises it. The content was never
-missing — it was unreachable, which is the failure this repo keeps a gate for.
+That is a content-operations rule, not a code change: **edit both or neither.**
+`grep -rn "six day" lib/ttc/` finds every mention; the two above are the ones
+that explain rather than restate.
 
-The cost is real: two texts can drift, and the clinical review that covered the
-chapter did not cover the article. The fix is not to delete either. It is to
-make chapter sections addressable (`ttc_chapter/<id>`) so a door opens one
-directly, then decide per topic which survives. The chapter reader is the most
-clinically reviewed surface in the stage and was not going to be rewritten in
-the middle of a content pass.
-
-Until then, **edit both or neither.** `grep -rn "six day" lib/ttc/` finds every
-copy; the two above are the ones that matter.
-
-The full reasoning is also in a comment at `ttc_reads_data.dart:454`, next to
-the article it produced.
+**Do not re-raise this as an architecture problem.** It has been escalated twice
+already and dissolved both times.
 
 ## 15.2 Video slot ids collide across journeys
 
@@ -2147,10 +2165,26 @@ Asia-Pacific, ICMR and NICE 2023. More recent ICMR material gives **27.5**. The
 two disagree by enough to move a real woman between categories, and this app
 tells her which one she is in.
 
-It is flagged in `kBmiReviewRegister` and it needs the same named clinician
-§14.0 is waiting on. Shipping 25.0 in the meantime is the conservative choice —
-it puts more women into a "worth a conversation" band than 27.5 would, and the
-copy in that band is explicitly a conversation-starter rather than a verdict.
+**Decided 2026-08-21 — the FRAMING, not the number.** Both standards keep being
+shown, because showing one alone hides that a threshold is a choice someone made
+rather than a fact about her body. But **South Asian stays primary**: the
+audience is Indian, the international band reads Indian bodies badly, and a
+screen that leads with the international number is quietly telling an Indian
+woman she is fine at a weight the guidance for her population does not agree
+about. The label carries the standard's name so the reader can see which lens
+she is being read through.
+
+**Still open, and narrowed to one question: is the South Asian obesity cut-off
+25.0 or 27.5?** Nothing about the audience settles that — both numbers come from
+guidance written for this audience, and they disagree. It needs the same named
+clinician §14.0 is waiting on, and it is the highest-value question on that list
+because it is the only one where the answer changes what a specific woman is
+told about herself.
+
+Shipping 25.0 meanwhile is the conservative side: it puts MORE women into a
+"worth a conversation" band than 27.5 would, and the copy in that band is
+explicitly a conversation-starter rather than a verdict. Erring toward "worth
+asking a doctor" is the safer error for a tool that must never diagnose.
 
 **Do not change the number without changing the register entry with it.**
 
