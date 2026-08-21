@@ -76,7 +76,7 @@ class GarbhDailyScreen extends StatelessWidget {
             id: 'shravan',
             name: 'Shravan',
             tag: 'Listening',
-            today: shravanForDay(cd).title.en,
+            today: shravanForDay(cd).title.now,
             icon: Icons.music_note_rounded,
             accent: const Color(0xFF6B5B95),
             open: () => ShravanScreen(controller: pregnancy, daily: true),
@@ -85,7 +85,19 @@ class GarbhDailyScreen extends StatelessWidget {
             id: 'samvad',
             name: 'Samvad',
             tag: 'Talking to your baby',
-            today: promptForDay(cd, tri).text.en,
+            // ⚠️ `.title.now`, AND BOTH HALVES OF THAT MATTER.
+            //
+            // `.title` because this row is a LABEL: two lines of Fraunces with
+            // an ellipsis. It used to be `.text`, which for trimester two is a
+            // whole story to read aloud, so the label read "Round and round
+            // the garden hums a gentle bee. Buzz, buzz,…" — the practice
+            // named by a fragment of itself. Nothing failed; the row rendered
+            // perfectly, with the wrong field in it.
+            //
+            // `.now` because this is DISPLAY, not identity. `.en` on a rendered
+            // string is the mistake CLAUDE.md counts — it hands a mother who
+            // chose Hindi an English line on a screen that is otherwise hers.
+            today: promptForDay(cd, tri).title.now,
             icon: Icons.record_voice_over_rounded,
             accent: const Color(0xFF9C5F51),
             // ⚠️ THE DAILY ARRIVAL IS NOW THE RECORD-FIRST SCREEN, not the
@@ -115,7 +127,7 @@ class GarbhDailyScreen extends StatelessWidget {
             id: 'buddhi',
             name: 'Buddhi',
             tag: 'Just for you',
-            today: buddhiTodayLine(cd).en,
+            today: buddhiTodayLine(cd).now,
             icon: Icons.psychology_alt_outlined,
             accent: const Color(0xFF7A6E9B),
             open: () => GarbhBuddhiScreen(
@@ -131,7 +143,7 @@ class GarbhDailyScreen extends StatelessWidget {
             id: 'kriya',
             name: 'Kriya',
             tag: 'Breath and grounding',
-            today: kriyaForDay(cd).title.en,
+            today: kriyaForDay(cd).title.now,
             icon: Icons.spa_rounded,
             accent: const Color(0xFF8A6D3B),
             open: () => KriyaScreen(controller: pregnancy, daily: true),

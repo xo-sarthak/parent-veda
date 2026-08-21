@@ -244,43 +244,43 @@ final List<GarbhPractice> kKriya = [
 // (Old generic kSamvad prompts removed; replaced by these trimester sets.)
 
 final List<GarbhPrompt> kSamvadT1 = [
-  GarbhPrompt('aff1',
+  GarbhPrompt('aff1', _t('A word for today', 'आज का भाव'),
       _t('Little one, you are so wanted. I am becoming your mother, and my body already knows just what to do.', 'नन्ही जान, तुम्हें कितना चाहा गया है। मैं तुम्हारी माँ बन रही हूँ, और मेरा शरीर पहले से जानता है कि उसे क्या करना है।')),
-  GarbhPrompt('aff2',
+  GarbhPrompt('aff2', _t('My heart makes room', 'दिल जगह बनाता है'),
       _t('My darling, every single day my heart makes a little more room for you. I am strong, and I am yours.', 'मेरी जान, हर एक दिन मेरा दिल तुम्हारे लिए थोड़ी और जगह बना लेता है। मैं मज़बूत हूँ, और मैं तुम्हारी हूँ।')),
-  GarbhPrompt('aff3',
+  GarbhPrompt('aff3', _t('You are safe inside me', 'तुम मेरे भीतर सुरक्षित हो'),
       _t('Hello, tiny love. You are safe inside me. We are learning this journey together - you and I, side by side.', 'सुनो, मेरे नन्हे प्यार। तुम मेरे भीतर सुरक्षित हो। यह सफ़र हम दोनों मिलकर सीख रहे हैं — तुम और मैं, एक साथ।')),
-  GarbhPrompt('aff4',
+  GarbhPrompt('aff4', _t('I trust my body', 'मुझे अपने शरीर पर भरोसा है'),
       _t('Sweet baby, I welcome you with my whole heart. I trust my body, and I trust the gentle way you are growing.', 'मेरे प्यारे शिशु, मैं पूरे दिल से तुम्हारा स्वागत करती हूँ। मुझे अपने शरीर पर भरोसा है, और जिस नरमी से तुम बढ़ रहे हो, उस पर भी।')),
-  GarbhPrompt('aff5',
+  GarbhPrompt('aff5', _t('Calm, and ready', 'शांत हूँ, और तैयार'),
       _t('I am calm, and I am ready. Every change in me is making a soft, safe home for you, my little one.', 'मैं शांत हूँ, और मैं तैयार हूँ। मुझमें होने वाला हर बदलाव तुम्हारे लिए एक नरम, सुरक्षित घर बना रहा है, मेरी नन्ही जान।')),
-  GarbhPrompt('aff6',
+  GarbhPrompt('aff6', _t('Kind to myself today', 'आज खोद के साथ नरम'),
       _t('You are already loved beyond measure. Today I am kind to myself, so I can be kind to you.', 'तुमसे कितना प्यार है, इसका कोई नाप नहीं। आज मैं ख़ुद के साथ नरम हूँ, ताकि तुम्हारे साथ भी नरम रह सकूँ।')),
 ];
 
 final List<GarbhPrompt> kSamvadT2 = [
-  GarbhPrompt('scr1',
+  GarbhPrompt('scr1', _t('The tiny seed', 'नन्हा बीज'),
       _t("Once upon a time, there was a tiny seed… who dreamed of touching the SKY. 'I'm far too small!' it sighed. But the soft rain whispered, 'Just grow - one little leaf at a time.' And do you know what happened, my love? That tiny seed became a GREAT, tall tree!", 'बहुत पहले की बात है — एक नन्हा-सा बीज था… जो आसमान को छूने का सपना देखता था। \'मैं तो बहुत छोटा हूँ!\' उसने आह भरी। पर हल्की बारिश धीरे से बोली, \'बस बढ़ते रहो — एक बार में एक पत्ता।\' और पता है फिर क्या हुआ, मेरी जान? वही नन्हा बीज एक बहुत बड़ा, ऊँचा पेड़ बन गया!')),
-  GarbhPrompt('scr2',
+  GarbhPrompt('scr2', _t('Knock, knock!', 'खट, खट!'),
       _t("Knock, knock! Who's there? It's the morning sun, peeking through the window - 'Good morning, little one!' it calls. And the birds all answer, 'Tweet! Tweet! Wake UP - it's a beautiful day!'", 'खट, खट! कौन है भला? अरे, यह तो सुबह का सूरज है, खिड़की से झाँकता हुआ — \'सुप्रभात, नन्ही जान!\' वह पुकारता है। और सारी चिड़ियाँ जवाब देती हैं, \'चीं! चीं! उठो — कितना प्यारा दिन है!\'')),
-  GarbhPrompt('scr3',
+  GarbhPrompt('scr3', _t('Soft and low, bright and high', 'कभी धीमे, कभी चहककर'),
       _t("Listen… can you hear me? My voice goes soft and low… and then - bright and HIGH! This is how we'll talk, you and I. One day you'll giggle right back - and oh, how I cannot WAIT to hear it!", 'सुनो… मेरी आवाज़ सुनाई दे रही है? कभी मैं धीरे से बोलती हूँ, बहुत नरम… और फिर — एकदम चहककर, ऊँचे सुर में! ऐसे ही तो बातें करेंगे हम, तुम और मैं। एक दिन तुम खिलखिलाकर जवाब दोगे — और उस हँसी को सुनने का मुझे कितना इंतज़ार है!')),
-  GarbhPrompt('scr4',
+  GarbhPrompt('scr4', _t('The clever crow', 'चतुर कौआ'),
       _t("Let me tell you about a clever little crow. He was SO thirsty! He found a pot - but the water sat low, low, low. 'What shall I do?' he wondered… Then - plop! plop! PLOP! - in went the pebbles, and the water rose UP. Clever crow! We never give up, do we, my love?", 'सुनो, एक चतुर नन्हे कौवे की बात बताती हूँ। उसे बहुत, बहुत प्यास लगी थी! उसे एक घड़ा मिला — पर पानी नीचे, बहुत नीचे था। \'अब क्या करूँ?\' उसने सोचा… और फिर — छपाक! छपाक! छपाक! — कंकड़ गिरते गए, और पानी ऊपर आ गया। वाह, चतुर कौवा! हम भी हार नहीं मानते, है ना, मेरी जान?')),
-  GarbhPrompt('scr5',
+  GarbhPrompt('scr5', _t('The busy bee', 'मेहनती मधुमक्खी'),
       _t("Round and round the garden hums a gentle bee. Buzz, buzz, BUZZ! 'Hello, flowers!' she sings. And every flower nods - 'Hello, busy bee!' What a happy, humming, wonderful day.", 'बगिया में गोल-गोल घूमती एक नन्ही मधुमक्खी गुनगुनाती है। भन्न, भन्न, भन्न! \'नमस्ते, फूलो!\' वह गाती है। और हर फूल सिर हिलाकर कहता है — \'नमस्ते, मेहनती मधुमक्खी!\' कितना ख़ुश, कितना गुनगुनाता, कितना प्यारा दिन।')),
 ];
 
 final List<GarbhPrompt> kSamvadT3 = [
-  GarbhPrompt('vis1',
+  GarbhPrompt('vis1', _t('The day we meet', 'जिस दिन हम मिलेंगे'),
       _t('Close your eyes with me, little one. Picture the day we meet - soft light, gentle hands, and the voice you already know so well. We will do this together, as a team.', 'मेरे साथ आँखें बंद करो, नन्ही जान। उस दिन को देखो जब हम मिलेंगे — हल्की रोशनी, नरम हाथ, और वही आवाज़ जिसे तुम पहले से इतना पहचानते हो। हम यह साथ मिलकर करेंगे, एक टीम की तरह।')),
-  GarbhPrompt('vis2',
+  GarbhPrompt('vis2', _t('We move as one', 'हम एक होकर चलते हैं'),
       _t('Soon, my love, you will make your way toward my arms. I am strong, you are strong, and we move as one. I am right here, and I will welcome you.', 'जल्द ही, मेरी जान, तुम अपना रास्ता बनाते हुए मेरी बाँहों तक आओगे। मैं मज़बूत हूँ, तुम मज़बूत हो, और हम दोनों एक होकर चलते हैं। मैं यहीं हूँ, और मैं तुम्हारा स्वागत करूँगी।')),
-  GarbhPrompt('vis3',
+  GarbhPrompt('vis3', _t('The first time I hold you', 'पहली बार गोद में'),
       _t('Imagine it, sweet baby: the very first time I hold you on my chest. Your tiny breath and my steady heartbeat - the two sounds you have always known, finally together.', 'ज़रा सोचो, मेरे प्यारे शिशु — वह पहला पल जब मैं तुम्हें अपने सीने से लगाऊँगी। तुम्हारी नन्ही साँस और मेरे दिल की एकसार धड़कन — वही दो आवाज़ें जिन्हें तुम हमेशा से जानते हो, आख़िरकार एक साथ।')),
-  GarbhPrompt('vis4',
+  GarbhPrompt('vis4', _t('On your birth day', 'तुम्हारे जन्म के दिन'),
       _t('On your birth day, we are a team. When you are ready, you will show me the way, and I will breathe you gently into the world. I trust you, and I trust us.', 'तुम्हारे जन्म के दिन हम एक टीम हैं। जब तुम तैयार होगे, तुम मुझे रास्ता दिखाओगे, और मैं अपनी साँसों से तुम्हें नरमी से इस दुनिया में ले आऊँगी। मुझे तुम पर भरोसा है, और हम दोनों पर भी।')),
-  GarbhPrompt('vis5',
+  GarbhPrompt('vis5', _t('You are not arriving alone', 'तुम अकेले नहीं आ रहे'),
       _t('Picture us, little one - you nestled close, me holding you near. Whatever the day brings, we meet it together. You are not arriving alone; I am right here with you.', 'हम दोनों को देखो, नन्ही जान — तुम मुझसे सटे हुए, मैं तुम्हें अपने पास थामे हुए। वह दिन जो भी लेकर आए, हम उसका सामना साथ करेंगे। तुम अकेले नहीं आ रहे; मैं यहीं, तुम्हारे साथ हूँ।')),
 ];
 

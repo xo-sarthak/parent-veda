@@ -337,7 +337,7 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
                       image:
                           'https://images.unsplash.com/photo-1633411988188-6e63354a9019?w=200&h=200&fit=crop',
                       tag: 'Sacred listening',
-                      today: shravanForDay(cd).title.en,
+                      today: shravanForDay(cd).title.now,
                       icon: Icons.graphic_eq_rounded,
                       accent: const Color(0xFF9A7526),
                       done: store.isDone('shravan'),
@@ -357,7 +357,19 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
                       image:
                           'https://images.unsplash.com/photo-1541956799312-3f9df99e0006?w=200&h=200&fit=crop',
                       tag: 'Talking to your baby',
-                      today: promptForDay(cd, tri).text.en,
+                      // ⚠️ `.title.now`, AND BOTH HALVES OF THAT MATTER.
+                      //
+                      // `.title` because this row is a LABEL: two lines of Fraunces with
+                      // an ellipsis. It used to be `.text`, which for trimester two is a
+                      // whole story to read aloud, so the label read "Round and round
+                      // the garden hums a gentle bee. Buzz, buzz,…" — the practice
+                      // named by a fragment of itself. Nothing failed; the row rendered
+                      // perfectly, with the wrong field in it.
+                      //
+                      // `.now` because this is DISPLAY, not identity. `.en` on a rendered
+                      // string is the mistake CLAUDE.md counts — it hands a mother who
+                      // chose Hindi an English line on a screen that is otherwise hers.
+                      today: promptForDay(cd, tri).title.now,
                       icon: Icons.record_voice_over_rounded,
                       accent: const Color(0xFF9C5F51),
                       done: store.isDone('samvad'),
@@ -382,7 +394,7 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
                       image:
                           'https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=200&h=200&fit=crop',
                       tag: 'Just for you',
-                      today: buddhiTodayLine(cd).en,
+                      today: buddhiTodayLine(cd).now,
                       icon: Icons.psychology_alt_outlined,
                       accent: const Color(0xFF7A6E9B),
                       done: store.isDone('buddhi'),
@@ -408,7 +420,7 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
                       image:
                           'https://images.unsplash.com/photo-1485808269728-77bb07c059a8?w=200&h=200&fit=crop',
                       tag: 'Breath and grounding',
-                      today: kriyaForDay(cd).title.en,
+                      today: kriyaForDay(cd).title.now,
                       icon: Icons.spa_rounded,
                       accent: const Color(0xFF8A6D3B),
                       done: store.isDone('kriya'),

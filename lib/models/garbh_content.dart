@@ -132,8 +132,27 @@ class GarbhPractice {
 
 @immutable
 class GarbhPrompt {
-  const GarbhPrompt(this.id, this.text);
+  const GarbhPrompt(this.id, this.title, this.text);
   final String id;
+
+  /// ⚠️ A SHORT NAME FOR THE PROMPT, AND IT EXISTS BECAUSE ITS ABSENCE
+  /// SHIPPED A STORY WHERE A HEADING BELONGS.
+  ///
+  /// Every other pillar hands the daily row a TITLE — `shravanForDay().title`,
+  /// `kriyaForDay().title`. Samvad had no title to hand, so both daily
+  /// surfaces passed `text` instead, and `text` for trimester two is a whole
+  /// story meant to be read aloud. The row renders two lines with an ellipsis,
+  /// so a mother opening the app met "Round and round the garden hums a gentle
+  /// bee. Buzz, buzz,…" as the label of her practice — a story fragment
+  /// standing where a name should be.
+  ///
+  /// It is a POSITIONAL parameter, deliberately. Optional-and-named would let
+  /// the next prompt be added without one and quietly reintroduce the bug;
+  /// positional-and-required means the compiler asks.
+  final LocalizedText title;
+
+  /// The full prompt — the affirmation, story or visualisation she reads
+  /// aloud. Correct to render in full on a prompt card; never as a row label.
   final LocalizedText text;
 }
 

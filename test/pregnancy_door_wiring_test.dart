@@ -20,6 +20,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:parentveda/data/garbh_data.dart';
 
 String _read(String path) {
   final f = File(path);
@@ -127,6 +128,50 @@ void main() {
         expect(guard, lessThan(journeyCall),
             reason: 'The case must sit ABOVE the journey guard, or the journey '
                 'wins and she meets steps with no content.');
+      }
+    });
+  });
+
+  group('A daily row is labelled, not narrated', () {
+    // Found on a device: the Samvad row on the V3 landing read "Round and
+    // round the garden hums a gentle bee. Buzz, buzz," - the trimester-two
+    // story, truncated by the row's own ellipsis. Nothing failed. The row
+    // rendered perfectly with the wrong field in it, because Samvad was the
+    // one pillar with no title to give.
+    test('every Samvad prompt has a title that is not its text', () {
+      final all = [...kSamvadT1, ...kSamvadT2, ...kSamvadT3];
+      expect(all, isNotEmpty);
+
+      for (final p in all) {
+        expect(p.title.en.trim(), isNotEmpty, reason: '${p.id} has no title');
+        expect(p.title.hi.trim(), isNotEmpty,
+            reason: '${p.id} has no Hindi title - this renders with .now, so a '
+                'missing Hindi title shows English to a Hindi user');
+        expect(p.title.en, isNot(equals(p.text.en)),
+            reason: '${p.id} uses its body as its title');
+
+        // ⚠️ THE LENGTH BOUND IS THE ACTUAL GUARD. A title merely being a
+        // different string would pass while still being a sentence; the row
+        // gives it two lines of 15px Fraunces. Anything past ~40 characters
+        // is prose wearing a label's clothes, which is exactly what shipped.
+        expect(p.title.en.length, lessThanOrEqualTo(40),
+            reason: '${p.id} title is too long for a two-line row label: '
+                '"${p.title.en}"');
+      }
+    });
+
+    test('the daily rows pass .now, never .en', () {
+      // ⚠️ `.en` IS IDENTITY, `.now` IS DISPLAY - the rule CLAUDE.md says has
+      // been broken eight times. These rows are rendered text, so `.en` hands
+      // a mother who chose Hindi an English line. The type system cannot see
+      // it: both sides are LocalizedText and both compile.
+      for (final path in const [
+        'lib/screens/home_v3_screen.dart',
+        'lib/screens/garbh_daily_screen.dart',
+      ]) {
+        final src = _read(path);
+        expect(RegExp(r'today: [^,]*\.en,').hasMatch(src), isFalse,
+            reason: '$path passes an identity string to a rendered row.');
       }
     });
   });
