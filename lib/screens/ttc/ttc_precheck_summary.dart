@@ -13,6 +13,8 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+
+import '../../widgets/global_ask_fab.dart';
 import 'package:flutter/services.dart';
 
 import '../../localization/app_language.dart';
@@ -85,7 +87,7 @@ class TtcPrecheckSummaryScreen extends StatelessWidget {
               ),
               Expanded(
                 child: ListView(
-                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 44),
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, kAskFabReserve + 24),
                   children: [
                     Text(
                         t("You don't need to have everything perfect.",

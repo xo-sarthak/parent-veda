@@ -49,6 +49,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../../widgets/global_ask_fab.dart';
+
 import '../../../localization/app_language.dart';
 import '../../../theme/pv_fonts.dart';
 import '../../../widgets/pv_placeholders.dart';
@@ -129,7 +131,7 @@ class _JourneyScreenState extends State<JourneyScreen> {
           ),
           body: ListView(
             controller: _sc,
-            padding: const EdgeInsets.fromLTRB(18, 8, 18, 44),
+            padding: const EdgeInsets.fromLTRB(18, 8, 18, kAskFabReserve + 24),
             children: [
               Text(config.intro.of(lang),
                   style:
@@ -285,7 +287,40 @@ class _JourneyScreenState extends State<JourneyScreen> {
                 color: p.ink1)),
       ),
 
-      if (reads.isNotEmpty) ...[
+      // ⚠️ ONE READ IS A ROW, TWO OR MORE ARE A GRID — AND THIS WAS WRONG ON
+      // THE DEVICE.
+      //
+      // Walked on a phone, a step holding a single article rendered as a
+      // half-width tile with the other half empty. The reasoning behind that
+      // was sound in isolation (a lone tile stretched to full width gets a
+      // cover at twice the size and reads as "this one matters more"), but the
+      // result looked like a layout bug rather than a decision.
+      //
+      // A grid of one is not a grid. `PvReadPlaceholder` is the app's existing
+      // full-width article row — cover on the left, title and reason on the
+      // right — and it is exactly the right shape for an article standing
+      // alone. See the note in `pv_read_tile.dart`: the row was never wrong,
+      // it is simply for a different situation.
+      if (reads.length == 1) ...[
+        PvReadPlaceholder(
+          title: reads.first.title.of(lang),
+          subtitle: reads.first.value.of(lang),
+          readingTime: reads.first.meta?.of(lang),
+          hue: 206,
+          slotId: 'journey/${config.doorId}/${reads.first.title.en}',
+          onTap: reads.first.owed
+              ? null
+              : () {
+                  final e = reads.first;
+                  if (e.action != null) {
+                    widget.onAction(context, e.action!);
+                  } else if (e.surfaceId != null) {
+                    widget.onSurface(context, e.surfaceId!);
+                  }
+                },
+        ),
+        const SizedBox(height: 14),
+      ] else if (reads.length > 1) ...[
         _grid([
           for (final e in reads)
             PvReadTile(
@@ -331,7 +366,9 @@ class _JourneyScreenState extends State<JourneyScreen> {
             subtitle: e.value.of(lang),
             duration: e.meta?.of(lang),
             hue: 344,
-            slotId: 'journey/${config.doorId}/${e.title.en}',
+            // The declared slot when the film is real data; the generated
+            // one only when it is not. See `JourneyElement.videoSlot`.
+            slotId: e.videoSlot ?? 'journey/${config.doorId}/${e.title.en}',
             onTap: e.owed
                 ? null
                 : () {

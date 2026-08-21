@@ -21,6 +21,8 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+
+import '../../widgets/global_ask_fab.dart';
 import 'package:flutter/services.dart';
 
 import '../../localization/app_language.dart';
@@ -80,7 +82,7 @@ class TtcPcosCheckResultScreen extends StatelessWidget {
               ),
               Expanded(
                 child: ListView(
-                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 44),
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, kAskFabReserve + 24),
                   children: r.stopped
                       ? _stoppedBody(context, p, lang, t, r)
                       : _patternBody(context, p, lang, t, r, store),
@@ -538,7 +540,7 @@ class TtcPcosDoctorSummaryScreen extends StatelessWidget {
               ),
               Expanded(
                 child: ListView(
-                  padding: const EdgeInsets.fromLTRB(20, 12, 20, 44),
+                  padding: const EdgeInsets.fromLTRB(20, 12, 20, kAskFabReserve + 24),
                   children: [
                     Text(t('Your summary', 'Aapka summary'),
                         style: pvFraunces(

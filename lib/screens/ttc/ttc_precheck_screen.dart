@@ -18,6 +18,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/global_ask_fab.dart';
+
 import '../../localization/app_language.dart';
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_precheck_data.dart';
@@ -32,7 +34,16 @@ import 'ttc_surface_router.dart';
 const double kPrecheckHue = 104;
 
 class TtcPrecheckScreen extends StatefulWidget {
-  const TtcPrecheckScreen({super.key});
+  const TtcPrecheckScreen({super.key, this.openSection});
+
+  /// Which section to land on, expanded, skipping the intro.
+  ///
+  /// ⚠️ EXISTS SO A DOOR CAN POINT AT THE PART OF THE CHECKLIST IT PROMISED.
+  /// The Getting-ready journey's "habits worth building" step wants the
+  /// Lifestyle section specifically — dropping her at the top of a
+  /// twenty-two-item list and expecting her to find it is the arrival problem
+  /// the male-fertility door already had once.
+  final PrecheckSection? openSection;
 
   @override
   State<TtcPrecheckScreen> createState() => _TtcPrecheckScreenState();
@@ -41,7 +52,9 @@ class TtcPrecheckScreen extends StatefulWidget {
 class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
   bool _started = false;
   final Set<String> _openItems = {};
-  final Set<PrecheckSection> _openSections = {PrecheckSection.folate};
+  late final Set<PrecheckSection> _openSections = {
+    widget.openSection ?? PrecheckSection.folate
+  };
 
   TtcPrecheckStore get _store => TtcPrecheckStore.instance;
 
@@ -51,7 +64,9 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
     _store.load().then((_) {
       if (!mounted) return;
       _store.markOpened();
-      setState(() => _started = _store.everOpened);
+      // A door that named a section has already made the decision the intro
+      // exists to prompt.
+      setState(() => _started = _store.everOpened || widget.openSection != null);
     });
   }
 
@@ -129,7 +144,7 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
       V2Palette p, String Function(String, String) t, PrecheckContext c) {
     final known = _knownLines(t, c);
     return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, kAskFabReserve + 24),
       children: [
         Text(
             t("Getting ready doesn't have to mean doing everything.",
@@ -270,7 +285,7 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
     final sections = PrecheckSection.values;
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 4, 20, 44),
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, kAskFabReserve + 24),
       children: [
         _CountBar(p: p, t: t, counts: counts),
         const SizedBox(height: 24),

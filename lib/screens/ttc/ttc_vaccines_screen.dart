@@ -32,6 +32,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/global_ask_fab.dart';
+
 import '../../localization/app_language.dart';
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_vaccine_store.dart';
@@ -86,7 +88,7 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
               _bar(p, t),
               Expanded(
                 child: ListView(
-                  padding: const EdgeInsets.fromLTRB(20, 4, 20, 48),
+                  padding: const EdgeInsets.fromLTRB(20, 4, 20, kAskFabReserve + 24),
                   children: [
                     Text(
                         t('Vaccinations before trying',

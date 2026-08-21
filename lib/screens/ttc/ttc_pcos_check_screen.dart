@@ -22,6 +22,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/global_ask_fab.dart';
+
 import '../../localization/app_language.dart';
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_pcos_check_data.dart';
@@ -149,7 +151,7 @@ class _TtcPcosCheckScreenState extends State<TtcPcosCheckScreen> {
 
       Expanded(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 26, 20, 40),
+          padding: const EdgeInsets.fromLTRB(20, 26, 20, kAskFabReserve + 24),
           children: [
             Text(q.prompt.of(lang),
                 style: pvFraunces(
@@ -281,7 +283,7 @@ class _Intro extends StatelessWidget {
       ),
       Expanded(
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 6, 20, 40),
+          padding: const EdgeInsets.fromLTRB(20, 6, 20, kAskFabReserve + 24),
           children: [
             Text(t('PCOS', 'PCOS'),
                 style: pvManrope(

@@ -17,6 +17,8 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+
+import '../../widgets/global_ask_fab.dart';
 import 'package:flutter/services.dart';
 
 import '../../localization/app_language.dart';
@@ -170,7 +172,7 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
   // ---------------------------------------------------------------------------
 
   Widget _intro(V2Palette p, String Function(String, String) t) => ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, kAskFabReserve + 24),
         children: [
           Text(t("Let's put one number in context.",
               'Ek number ko sahi sandarbh mein rakhte hain.'),
@@ -225,7 +227,7 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
       V2Palette p, AppLanguage lang, String Function(String, String) t) {
     final metric = _store.heightUnit == BmiHeightUnit.cm;
     return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 40),
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, kAskFabReserve + 24),
       children: [
         if (_store.hasSavedMeasurements) ...[
           Container(
@@ -394,7 +396,7 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
     final secondary = categoriseBmi(calc.bmi, kBmiSecondaryStandard);
 
     return ListView(
-      padding: const EdgeInsets.fromLTRB(20, 8, 20, 44),
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, kAskFabReserve + 24),
       children: [
         Text(t('Your BMI', 'Aapka BMI'),
             style: pvManrope(

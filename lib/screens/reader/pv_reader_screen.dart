@@ -46,6 +46,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/global_ask_fab.dart';
+
 import '../../localization/app_language.dart';
 import '../../models/pv_read.dart';
 import '../../models/pv_video_slot.dart';
@@ -272,7 +274,7 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
             Expanded(
               child: ListView(
                 controller: _sc,
-                padding: const EdgeInsets.only(top: 10, bottom: 56),
+                padding: const EdgeInsets.only(top: 10, bottom: kAskFabReserve + 24),
                 children: [
                   // ---- THE MASTHEAD ----------------------------------------
                   //
