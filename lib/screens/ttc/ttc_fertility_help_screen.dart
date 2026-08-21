@@ -165,13 +165,27 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
                     'koshish jaari rakhna theek hai ya kisi se milna behtar.'),
             style: pvFraunces(fontSize: 16.5, height: 1.58, color: p.ink2)),
         const SizedBox(height: 18),
-        Text(
-            t(
-                'This does not diagnose infertility, and it does not predict '
-                    'whether you will conceive.',
-                'Ye infertility ka diagnosis nahi karta, aur ye nahi batata ki '
-                    'aap conceive karengi ya nahi.'),
-            style: pvManrope(fontSize: 13.5, height: 1.6, color: p.ink3)),
+
+        // ---- THE DISCLAIMER, BEFORE SHE STARTS ----------------------------
+        //
+        // It used to sit at the foot, below both buttons, with a shorter
+        // paraphrase of itself up here. Two problems, one fix.
+        //
+        // The first is order: a limit stated after the button is a limit
+        // stated after the decision. She reads down, taps "Check my
+        // readiness", and never returns to the last paragraph.
+        //
+        // The second is a collision worth understanding, because it will
+        // recur. `kAskFabReserve` at the bottom of a scroll view reserves
+        // room so the LAST row is not stranded under the floating Ask Veda
+        // button. That works only when the content is tall enough to scroll.
+        // On a short page the content simply ends wherever it ends — which on
+        // this screen was inside the FAB's band, with the safety sentence
+        // half-covered. Padding cannot push up what was never pushed down.
+        // The reliable answer on a short page is to not put anything that
+        // must be read in the bottom-right corner at all.
+        Text(kFertilityHelpDisclaimer.of(lang),
+            style: pvManrope(fontSize: 13, height: 1.6, color: p.ink3)),
         const SizedBox(height: 24),
 
         // ---- WHAT WE ALREADY KNOW -----------------------------------------
@@ -261,9 +275,6 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
             label: t('I already want to speak to someone',
                 'Main pehle se hi kisi se baat karna chahti hoon'),
             onTap: _openSummary),
-        const SizedBox(height: 18),
-        Text(kFertilityHelpDisclaimer.of(lang),
-            style: pvManrope(fontSize: 12, height: 1.6, color: p.ink3)),
       ],
     );
   }

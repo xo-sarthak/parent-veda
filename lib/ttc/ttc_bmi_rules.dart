@@ -409,12 +409,12 @@ LocalizedText _bandBody(BmiCategory cat) {
         'nutrition, those are the things worth raising with a doctor.'),
     BmiBand.over => _en('Your BMI is above the standard adult range '
         '${southAsian ? 'used for South Asian populations' : 'used '
-            'internationally'}. ⚠️ BMI alone cannot tell you how healthy you '
+            'internationally'}. BMI alone cannot tell you how healthy you '
         'are, and it cannot tell you whether you will have difficulty '
         'conceiving. It is a starting point for a conversation, not a '
         'conclusion.'),
     BmiBand.obese => _en('Your BMI falls in the obesity category used in '
-        'standard adult classifications. ⚠️ This is a screening category, not '
+        'standard adult classifications. This is a screening category, not '
         'a diagnosis. Some pregnancy risks are higher at this BMI, which makes '
         'a preconception conversation worth having — and it says nothing about '
         'whether you can have a healthy pregnancy.'),

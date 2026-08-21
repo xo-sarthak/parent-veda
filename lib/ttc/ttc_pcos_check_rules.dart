@@ -346,14 +346,14 @@ LocalizedText _body(
     return _en('Hormonal contraception sets the bleed rather than letting a '
         'cycle run, and a recent birth or breastfeeding changes cycles for '
         'entirely ordinary reasons. Either way, what you have described cannot '
-        'be read as evidence about ovulation — in either direction. ⚠️ That is '
+        'be read as evidence about ovulation — in either direction. That is '
         'not the same as nothing being there. If you have other symptoms, or '
         'if your cycles were irregular before, those are still worth raising.');
   }
 
   return switch (level) {
     PcosLevel.none => _en('From what you have entered, your answers do not '
-        'show a pattern of the kind commonly associated with PCOS. ⚠️ That is '
+        'show a pattern of the kind commonly associated with PCOS. That is '
         'not the same as ruling it out — this is a description of what you '
         'reported, not a test. If you are having difficulty conceiving, plenty '
         'of things other than PCOS can be involved, and that is a separate and '
@@ -364,14 +364,14 @@ LocalizedText _body(
         'and things like this are common and often mean nothing. A couple of '
         'tracked cycles would tell you far more than another questionnaire.'),
     PcosLevel.discuss => _en('More than one part of what you described can '
-        'occur together in PCOS or with irregular ovulation. ⚠️ This does not '
+        'occur together in PCOS or with irregular ovulation. This does not '
         'diagnose anything — the same combination has other explanations, '
         'including thyroid and raised prolactin, both ruled out with a simple '
         'blood test. What it does mean is that there is something specific to '
         'take to a doctor, rather than a vague worry.'),
     PcosLevel.soon => _en('What you described suggests your cycle may not be '
         'completing predictably, and that is worth raising now rather than '
-        'waiting for it to settle. ⚠️ The usual advice to try for a year first '
+        'waiting for it to settle. The usual advice to try for a year first '
         'assumes predictable ovulation — if yours is not predictable, that '
         'assumption does not hold and the year was never your number. Irregular '
         'ovulation is also one of the most treatable things in fertility '
@@ -411,11 +411,58 @@ List<LocalizedText> pcosDetailLines(PcosInterpretation r) {
         'They help a doctor work out whether PCOS, another hormonal cause, or '
         'something else entirely is affecting ovulation.'));
   }
+  // ---- THE EMPTY CASE IS NOT ONE CASE ---------------------------------------
+  //
+  // ⚠️ A BUG WORTH KEEPING THE EXPLANATION OF, because the shape of it recurs
+  // anywhere a summary is derived from one input and a verdict from another.
+  //
+  // Three domains reading quiet used to produce a single fallback line: "if
+  // your periods are regular and nothing else concerns you, that is genuinely
+  // reassuring". That is true when the LEVEL is also quiet. It is false, and
+  // badly so, when the level came from somewhere the domains cannot see.
+  //
+  // Two routes do exactly that. `alreadyTold` sets `soon` because a doctor has
+  // said PCOS or anovulation — her own symptom answers may be entirely
+  // unremarkable and the clinician's word still outranks them. Fertility
+  // pressure does something similar. Both left a result reading, in order:
+  //
+  //     "your cycle may not be completing predictably ... worth raising now"
+  //     "if your periods are regular ... that is genuinely reassuring"
+  //
+  // The two paragraphs came from different functions, each correct about its
+  // own input, and neither could see the other. Nothing failed. It reached the
+  // phone, and it reached exactly the woman who has already been given a
+  // diagnosis — the one with the least room for a mixed message.
+  //
+  // The rule this leaves behind: a derived summary must branch on the SAME
+  // verdict the headline branched on, or it is free to contradict it.
   if (out.isEmpty) {
-    out.add(_en('If your periods are regular and nothing else concerns you, '
-        'that is genuinely reassuring as far as it goes. Fertility can be '
-        'affected by many things beyond PCOS, so difficulty conceiving is '
-        'still worth a conversation on its own terms.'));
+    // The same trap once more, from the other direction. A capped reading is
+    // forced down to `watch`, so a level-only branch would land on the
+    // reassurance line — directly under a body paragraph that has just said
+    // these answers cannot be read as evidence in either direction.
+    if (r.cappedByContext) {
+      out.add(_en('While the pill is setting your bleed, or while things are '
+          'still settling after a birth, a symptom questionnaire cannot tell '
+          'you much either way. A few cycles once that changes will say far '
+          'more than answering this again.'));
+      return out;
+    }
+    out.add(switch (r.level) {
+      // Her answers were unremarkable but the verdict was not. Say why, rather
+      // than reassuring her against it.
+      PcosLevel.soon || PcosLevel.discuss => _en('Nothing in the symptoms you '
+          'described stood out on its own. What moves this is what you have '
+          'already been told, or how long you have been trying — and that '
+          'outranks a questionnaire. It is worth going in with the cycle '
+          'history you have.'),
+      // Quiet answers, quiet verdict, and the reassurance is earned.
+      PcosLevel.watch || PcosLevel.none => _en('If your periods are regular '
+          'and nothing else concerns you, that is genuinely reassuring as far '
+          'as it goes. Fertility can be affected by many things beyond PCOS, '
+          'so difficulty conceiving is still worth a conversation on its own '
+          'terms.'),
+    });
   }
   return out;
 }

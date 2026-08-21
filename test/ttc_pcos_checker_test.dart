@@ -17,6 +17,74 @@ import 'package:parentveda/screens/ttc/ttc_pcos_check_result.dart'
     show kPcosDoctorQuestions;
 
 void main() {
+  // ===========================================================================
+  group('the result never argues with itself', () {
+    // The headline and the detail lines are produced by two functions reading
+    // two different things: `_body` branches on the LEVEL, `pcosDetailLines`
+    // on which symptom DOMAINS spoke. When a level comes from somewhere the
+    // domains cannot see, the two drift apart — and the drift is silent,
+    // because each half is correct about its own input.
+    test('a woman already told she has PCOS is not then reassured', () {
+      final r = interpretPcos({
+        'q_redflag': 'none',
+        'q_pregnancy': 'no',
+        'q_contraception': 'no',
+        'q_postpartum': 'no',
+        // Her own symptom answers are entirely unremarkable.
+        'q_predictable': 'always',
+        'q_gap': 'no',
+        'q_hair_growth': 'none',
+        'q_acne': 'none',
+        // But a doctor has already said the word, and that outranks all of it.
+        'q_told_anov': 'yes',
+      });
+      expect(r.level, PcosLevel.soon);
+
+      final lines = pcosDetailLines(r).map((l) => l.en).join(' ');
+      expect(lines, isNot(contains('genuinely reassuring')),
+          reason: 'the detail line reassured her directly underneath a body '
+              'paragraph telling her to raise it now');
+    });
+
+    test('and neither is a woman whose cycle we admitted we cannot read', () {
+      final r = interpretPcos({
+        'q_redflag': 'none',
+        'q_pregnancy': 'no',
+        // The pill sets the bleed, so "regular periods" describes the
+        // medication rather than her.
+        'q_contraception': 'yes',
+        'q_predictable': 'always',
+        'q_gap': 'no',
+        'q_hair_growth': 'none',
+        'q_acne': 'none',
+      });
+      expect(r.cappedByContext, isTrue);
+
+      final lines = pcosDetailLines(r).map((l) => l.en).join(' ');
+      expect(lines, isNot(contains('genuinely reassuring')),
+          reason: 'a capped reading is an absence of evidence, and an absence '
+              'of evidence must never be rendered as good news');
+    });
+
+    test('but a genuinely quiet reading still says so', () {
+      // The reassurance is not banned — it is earned. Removing it entirely
+      // would be the opposite failure: a checker that can only ever worry.
+      final r = interpretPcos({
+        'q_redflag': 'none',
+        'q_pregnancy': 'no',
+        'q_contraception': 'no',
+        'q_postpartum': 'no',
+        'q_predictable': 'always',
+        'q_gap': 'no',
+        'q_hair_growth': 'none',
+        'q_acne': 'none',
+      });
+      expect(r.level, PcosLevel.none);
+      expect(pcosDetailLines(r).map((l) => l.en).join(' '),
+          contains('genuinely reassuring'));
+    });
+  });
+
   group('safety comes first and ends the check', () {
     test('a red flag produces no pattern at all', () {
       final r = interpretPcos({

@@ -203,7 +203,7 @@ final List<TtcVaccine> kTtcVaccines = [
         'before it, so this is one to know about now and ask for later.'),
     schedule: _en('One dose in each pregnancy, between 27 and 36 weeks. FOGSI '
         'has recommended it since 2014.'),
-    note: _en('⚠️ The commonest confusion in India. Having had two doses of TT '
+    note: _en('The commonest confusion in India. Having had two doses of TT '
         'does not cover whooping cough, and you can still have Tdap afterwards '
         '— it is a different vaccine doing a different job, not a double dose '
         'to worry about.'),

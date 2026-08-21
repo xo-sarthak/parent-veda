@@ -317,7 +317,7 @@ final List<PcosCheckerQuestion> kPcosQuestions = [
         'cervical mucus?'),
     summaryLabel: _en('Cervical mucus'),
     whyWeAsk: _en('Clear, slippery, stretchy mucus in the days before '
-        'ovulation is a real sign. ⚠️ Not noticing it does not mean you are '
+        'ovulation is a real sign. Not noticing it does not mean you are '
         'not ovulating — most people have never been told to look.'),
     options: [
       PcosCheckerOption(id: 'most', label: _en('Yes, most cycles')),

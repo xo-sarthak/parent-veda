@@ -292,7 +292,7 @@ final List<PrecheckItem> kPrecheckItems = [
     title: _en('The blood tests worth doing once'),
     why: _en('Haemoglobin, thyroid, vitamin D, B12, blood sugar — cheap, '
         'commonly abnormal here, and correctable with a tablet.'),
-    whatToDo: _en('One blood draw covers all of them. ⚠️ Not everyone needs '
+    whatToDo: _en('One blood draw covers all of them. Not everyone needs '
         'every test — your doctor decides which apply to you.'),
     surfaceId: 'ttc_tests',
     readId: 'ttc_read_preconception_tests',
@@ -313,7 +313,7 @@ final List<PrecheckItem> kPrecheckItems = [
     // ⚠️ THE SINGLE MOST SAFETY-CRITICAL LINE IN THIS FEATURE.
     whatToDo: _en('Take a list of everything you take — prescriptions, '
         'over-the-counter, supplements, herbal and ayurvedic preparations — to '
-        'a doctor or pharmacist. ⚠️ Do not stop a prescribed medicine on your '
+        'a doctor or pharmacist. Do not stop a prescribed medicine on your '
         'own.'),
     askDoctor: _en('Are any of my current medicines something I should review '
         'before pregnancy?'),
@@ -458,7 +458,7 @@ final List<PrecheckItem> kPrecheckItems = [
         'here regardless of family history, because carriers have no symptoms '
         'and it only means anything as a pair.'),
     whatToDo: _en('Tell your doctor about any inherited condition in either '
-        'family. ⚠️ Not everyone needs genetic testing — they decide whether '
+        'family. Not everyone needs genetic testing — they decide whether '
         'carrier screening or counselling applies to you.'),
     askDoctor: _en('Given our family histories, is carrier screening worth '
         'doing?'),
@@ -506,7 +506,7 @@ final List<PrecheckItem> kPrecheckItems = [
     why: _en('Several ordinary medicines affect sperm production — some for '
         'hair loss, some psychiatric, and anything containing testosterone, '
         'which suppresses production rather than helping it.'),
-    whatToDo: _en('Worth him mentioning what he takes at any appointment. ⚠️ '
+    whatToDo: _en('Worth him mentioning what he takes at any appointment. '
         'Not a reason to stop anything on his own.'),
     readId: 'ttc_read_whose_side',
   ),

@@ -2150,7 +2150,7 @@ final List<PvRead> kTtcReads = [
     evidence: _en('Cost ranges reflect prices published by Indian fertility '
         'clinics and treatment aggregators during 2026, and are given as '
         'ranges because pricing varies widely by city, clinic and inclusions. '
-        '⚠️ Note the source honestly: almost all fertility pricing in India is '
+        'Note the source honestly: almost all fertility pricing in India is '
         'published by the clinics that sell the treatment, so these figures '
         'are a sanity check against a quotation you are given — never a '
         'substitute for one in writing. Checked August 2026.'),
@@ -4359,7 +4359,7 @@ final List<PvRead> kTtcReads = [
         'and Indian tradition as commonly practised, rather than any single '
         'text. Evidence for the components — breathing practice, meditation '
         'and yoga improving psychological outcomes in fertility populations — '
-        'from meta-analyses of mind-body interventions. ⚠️ We are not aware of '
+        'from meta-analyses of mind-body interventions. We are not aware of '
         'controlled evidence for the practice as a whole, and none is claimed '
         'here. Reviewed August 2026.'),
 
