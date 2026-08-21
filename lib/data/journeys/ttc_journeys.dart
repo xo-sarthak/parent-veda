@@ -167,6 +167,11 @@ final JourneyConfig kTtcPcosLibrary = JourneyConfig(
     JourneyStep(
       question: _en('What is actually happening in my body?'),
       elements: [
+        // ⚠️ NAMES THE DECLARED FILM. Without `videoSlot` this placeholder
+        // generates its own id from the door and the title, while the same
+        // intended film sits in `ttc_videos_data.dart` as
+        // `ttc_vid_pcos_explained` and heads the PCOS article. One upload would
+        // have filled one surface and left the other a placeholder forever.
         JourneyElement(
           type: SolutionType.watch,
           title: _en('PCOS, explained in five minutes'),
@@ -174,6 +179,7 @@ final JourneyConfig kTtcPcosLibrary = JourneyConfig(
               'doctor.'),
           meta: _en('5 MIN'),
           owed: true,
+          videoSlot: 'ttc_vid_pcos_explained',
         ),
       ],
     ),
@@ -315,12 +321,17 @@ final JourneyConfig kTtcFertilityReadinessCheck = JourneyConfig(
     JourneyStep(
       question: _en('Where do I honestly stand?'),
       elements: [
+        // ⚠️ THE LAST PLACEHOLDER IN THE STAGE, AND IT IS NOW REAL. It opens
+        // already knowing how long she has been trying, what her cycles look
+        // like and what her PCOS check found — so it asks only what nothing
+        // else can answer, and often that is two questions.
         JourneyElement(
           type: SolutionType.tool,
           title: _en('The honest self-check'),
-          value: _en('A few straightforward questions, to help you see your '
-              'own situation clearly.'),
-          owed: true,
+          value: _en('It already knows most of this. A couple of questions, '
+              'then a straight answer — never a probability.'),
+          meta: _en('2 MIN'),
+          surfaceId: 'ttc_fertility_help',
         ),
       ],
     ),
@@ -454,12 +465,29 @@ final JourneyConfig kTtcPreconceptionReadiness = JourneyConfig(
     JourneyStep(
       question: _en('What small habits actually help, day to day?'),
       elements: [
+        // ⚠️ THE WORKBOOK'S ACTIVITIES CELL HERE IS THREE WORDS — "Light
+        // habit-building" — AND IT SPECIFIES NO MECHANISM.
+        //
+        // TTC already has three surfaces doing this: the checklist's Lifestyle
+        // section holds the decisions, the Tools hub holds Sleep, Movement,
+        // Stress and Lifestyle trackers for the repetition, and `ttc_ritual` is
+        // the mind-body half. A fifth habit surface would be exactly the
+        // inventory sprawl the bracket restructure removed.
+        //
+        // So this was never a missing feature. It was a missing route.
         JourneyElement(
           type: SolutionType.activity,
           title: _en('Habits worth building now'),
-          value: _en('Sleep, movement and stress — the ordinary things that '
-              'quietly help most.'),
-          owed: true,
+          value: _en('Sleep, movement, alcohol and tobacco — decide where you '
+              'stand on each, in one place.'),
+          surfaceId: 'ttc_precheck/lifestyle',
+        ),
+        JourneyElement(
+          type: SolutionType.tool,
+          title: _en('Track the ones you are working on'),
+          value: _en('Sleep, movement and stress each have a tracker, for when '
+              'a decision needs repeating.'),
+          surfaceId: 'ttc_tools',
         ),
       ],
     ),

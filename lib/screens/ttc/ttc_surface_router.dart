@@ -28,12 +28,14 @@ import 'ttc_care_circle_screen.dart';
 import 'ttc_chapter_screen.dart';
 import 'ttc_community_screen.dart';
 import 'ttc_cycle_screens.dart';
+import 'ttc_fertility_help_screen.dart';
 import 'ttc_journal_screen.dart';
 import 'ttc_medication_screen.dart';
 import 'ttc_nutrition_screen.dart';
 import 'ttc_partner_screen.dart';
 import 'ttc_pcos_check_screen.dart';
 import 'ttc_bmi_screen.dart';
+import '../../ttc/ttc_precheck_data.dart';
 import 'ttc_precheck_screen.dart';
 import 'ttc_prepare_screen.dart';
 import 'ttc_products_screen.dart';
@@ -42,6 +44,7 @@ import 'ttc_strings.dart';
 import 'ttc_ritual_screen.dart';
 import 'ttc_supplements_screen.dart';
 import 'ttc_tests_screen.dart';
+import 'ttc_tools_screen.dart';
 import 'ttc_treatment_screen.dart';
 import 'ttc_vaccines_screen.dart';
 
@@ -80,8 +83,33 @@ Widget? ttcScreenForSurface(String id) {
     );
   }
 
+  // ---- the checklist, opened on a named section ---------------------------
+  //
+  // Same prefix pattern as `ttc_read/` and parenting's `pp_section/`, resolved
+  // against the enum rather than accepting the suffix blindly — so a door
+  // naming a section that does not exist still fails.
+  const precheckPrefix = 'ttc_precheck/';
+  if (id.startsWith(precheckPrefix)) {
+    final name = id.substring(precheckPrefix.length);
+    final match = PrecheckSection.values.where((s) => s.name == name);
+    if (match.isEmpty) return null;
+    return TtcPrecheckScreen(openSection: match.first);
+  }
+
   return _ttcStaticSurface(id);
 }
+
+/// Opens a surface by id from anywhere in the stage.
+///
+/// The Tools hub uses this rather than naming screen classes itself. The reason
+/// is one-definition-of-where: a door in `ttc_hubs.dart`, a step in
+/// `ttc_journeys.dart` and a tile in the Tools hub all mean the same
+/// destination, and if each constructs its own `MaterialPageRoute` then the
+/// route *name* — which `global_ask_fab.dart` reads to decide which Ask Veda to
+/// open — drifts between them. Routing every entrance through one function
+/// means the surface id IS the route name, always.
+void openTtcSurface(BuildContext context, String surfaceId) =>
+    _push(context, surfaceId);
 
 /// Pushes another surface from inside the reader.
 ///
@@ -129,6 +157,12 @@ Widget? _ttcStaticSurface(String id) => switch (id) {
       // cut-offs is the specific thing `ttc_read_three_months_before` already
       // tells her is wrong.
       'ttc_bmi' => const TtcBmiScreen(),
+      // The Tools hub — 21 built tiles, including the Sleep, Movement, Stress
+      // and Lifestyle trackers the Getting-ready habits step hands her to.
+      'ttc_tools' => const TtcToolsScreen(),
+      // The Infertility Tools cell — the last notReady in the stage. A
+      // readiness read, never a probability: see `ttc_fertility_help_rules`.
+      'ttc_fertility_help' => const TtcFertilityHelpScreen(),
       'ttc_nutrition' => const TtcNutritionScreen(),
       'ttc_supplements' => const TtcSupplementsScreen(),
       // `ttc_tracker` is deliberately absent: `TtcTrackerScreen` requires a

@@ -146,9 +146,11 @@ final List<Bracket> kTtcBrackets = [
       BracketLayer.content: BracketLayerSpec.live(['ttc_treatment']),
       BracketLayer.activities:
           BracketLayerSpec(state: LayerState.notCore, reason: 'Not core'),
-      BracketLayer.tools: BracketLayerSpec(
-          state: LayerState.notReady,
-          reason: "'See a specialist?' readiness checklist"),
+      // Was the last notReady cell in the stage: "'See a specialist?'
+      // readiness checklist". It ships, and it reads her trying time, her
+      // cycles and her PCOS result before asking anything.
+      BracketLayer.tools: BracketLayerSpec.live(
+          ['ttc_fertility_help', 'ttc_tests', 'ttc_records']),
       // The workbook's refusal, and nothing shipped behind it — so this one is a
       // true `notApplicable`. Selling anything on this screen would be the
       // single worst placement in the product.
@@ -190,8 +192,12 @@ final List<Bracket> kTtcBrackets = [
             'vaccinations jo koshish shuru karne se pehle karwa lene chahiye.'),
     layers: {
       BracketLayer.content: BracketLayerSpec.live(['ttc_nutrition', 'ttc_tests']),
-      BracketLayer.activities: BracketLayerSpec(
-          state: LayerState.notReady, reason: 'Light habit-building'),
+      // Was notReady: "Light habit-building". Not built as a new surface — the
+      // checklist's Lifestyle section holds the decisions and the Tools hub
+      // holds the trackers, so this was a routing gap rather than a missing
+      // feature. See the note at the journey's habits step.
+      BracketLayer.activities:
+          BracketLayerSpec.live(['ttc_precheck/lifestyle', 'ttc_tools']),
       // Was notReady: "Pre-pregnancy checklist, BMI". The checklist ships and
       // carries the weight item — with no BMI figure, no target and no
       // calculator, for the reason written at the journey's BMI slot.

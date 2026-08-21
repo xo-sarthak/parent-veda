@@ -197,7 +197,10 @@ final HubConfig kTtcInfertility = HubConfig(
           'to see someone.'),
       mark: IntentMark.questionMark,
       hue: 206,
-      action: kTtcActFertilityReadinessCheck,
+      // Was `kTtcActFertilityReadinessCheck` — a declared action with a
+      // not-yet-built destination. The self-check ships, so the door opens it
+      // directly rather than routing through a journey that only wrapped it.
+      surfaceId: 'ttc_fertility_help',
     ),
     HubNeed(
       label: _en('Understand my tests & treatment'),

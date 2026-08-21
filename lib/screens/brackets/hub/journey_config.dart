@@ -47,6 +47,7 @@ class JourneyElement {
     this.action,
     this.meta,
     this.owed = false,
+    this.videoSlot,
   });
 
   final SolutionType type;
@@ -64,6 +65,20 @@ class JourneyElement {
 
   /// "6 MIN", "CALCULATOR" — appended to the type chip.
   final LocalizedText? meta;
+
+  /// The declared film this element is a placeholder for.
+  ///
+  /// ⚠️ EXISTS BECAUSE ONE FILM WAS ABOUT TO GET TWO IDS. Without it,
+  /// `journey_screen.dart` generates a slot id from the door and the title —
+  /// `journey/ttc_pcos_library/PCOS, explained in five minutes` — while the
+  /// same intended film is declared in the stage's video data as
+  /// `ttc_vid_pcos_explained` and used by an article. Whoever uploaded the file
+  /// would map it to one id, and the other surface would stay a placeholder
+  /// forever, silently, because nothing fails.
+  ///
+  /// Naming the slot here makes one film one id. Null keeps the old generated
+  /// behaviour, which is right for a placeholder that has no declared entry.
+  final String? videoSlot;
 
   /// ⚠️ TRUE MEANS THE PROMISE IS REAL AND THE THING IS NOT BUILT.
   ///
