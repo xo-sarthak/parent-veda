@@ -12,6 +12,8 @@
 	<string>ParentVeda lets you add photos to your journal memories.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>ParentVeda saves your Memory cards to your photo gallery.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>ParentVeda can add the place to a journal entry you are writing, only when you tap to use it. It is never used to track you.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>ParentVeda lets you capture photo memories for your journal.</string>
 	<key>CFBundleDevelopmentRegion</key>

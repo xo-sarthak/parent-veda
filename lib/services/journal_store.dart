@@ -50,6 +50,36 @@ class JournalStore extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// One-time, on read: an old "Note for baby" becomes an ordinary memory.
+  ///
+  /// ⚠️ THIS REWRITES SOMETHING SHE ALREADY WROTE, WHICH IS NORMALLY THE THING
+  /// NOT TO DO — and it is done here because the product owner said the type
+  /// was on trial and is being retired. Worth being precise about what is and
+  /// is not touched:
+  ///
+  ///   · Her words, her photos, her date, her week and her id are untouched.
+  ///     Only the `type` changes, which is the label above the card and the
+  ///     colour of its chip.
+  ///   · Nothing is deleted. An entry that was a note for her baby is still
+  ///     the entry she wrote; it simply files under the one kind that remains.
+  ///
+  /// ⚠️ IT DOES NOT TOUCH THE FATHER'S. He still creates this type from his own
+  /// screens, into `FatherJournalStore`, and the review did not ask to change
+  /// his app. Two stores is what makes that separation free — a single shared
+  /// store would have forced a choice between breaking his feature and leaving
+  /// hers half-migrated.
+  ///
+  /// ⚠️ AND IT RUNS ON READ RATHER THAN AS A ONE-SHOT WITH A FLAG. A flag needs
+  /// somewhere to live and a way to be correct after a reinstall or a restore
+  /// from the cloud; converting on the way in is idempotent by construction —
+  /// a converted entry has nothing left to convert — and it also catches an old
+  /// entry arriving later from a cloud sync, which a startup-only pass would
+  /// miss entirely.
+  JournalEntry _migrated(JournalEntry e) =>
+      e.type == JournalEntryType.noteForBaby
+          ? e.retyped(JournalEntryType.memory)
+          : e;
+
   Future<void> init() async {
     if (_loaded) return;
     try {
@@ -57,7 +87,8 @@ class JournalStore extends ChangeNotifier {
       final raw = prefs.getString(_key);
       if (raw != null) {
         for (final e in (jsonDecode(raw) as List)) {
-          _manual.add(JournalEntry.fromJson(Map<String, dynamic>.from(e)));
+          _manual.add(_migrated(
+              JournalEntry.fromJson(Map<String, dynamic>.from(e))));
         }
       }
     } catch (_) {/* start empty */}

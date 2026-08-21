@@ -423,9 +423,27 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
 
             // ---- MY JOURNAL --------------------------------------------------
             //
-            // Also restored. Four verbs, not a prompt — she arrives already
-            // knowing whether she wants to write, photograph or speak, and the
-            // job of this card is to not stand between her and that.
+            // ⚠️ TWO DOORS NOW, NOT FOUR — AND THE REVIEW ASKED FOR THIS
+            // EXPLICITLY: "Note for Baby should be removed, add a photo should
+            // be removed. Record Voice should be called Add a voice note."
+            //
+            // The instruction was applied to the compose screen and NOT to this
+            // section, which is the surface the review named ("My Journal
+            // Section on landing page"). It sat unchanged for the rest of the
+            // pass, and it was not in the backlog either — the four tiles read
+            // as finished work from every angle except comparing them to the
+            // sentence that asked for them.
+            //
+            // ⚠️ WHY TWO IS BETTER THAN FOUR HERE, beyond being what was asked:
+            // "Add a photo" was never a different KIND of entry — the compose
+            // screen takes photos with or without words, so it was one door
+            // leading where the other already went. Four tiles implied four
+            // outcomes and delivered two.
+            //
+            // And the remaining pair is a real distinction: writing and
+            // speaking are different acts, not different formats. A woman who
+            // does not want to type is not looking for a smaller version of the
+            // writing screen.
             V3SectionHead(
                 eyebrow: 'My journal',
                 title: 'Something for your baby, when it grows up',
@@ -438,31 +456,48 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
               // different colours still read as one system.
               actions: [
                 V3QuickAction(
-                    icon: Icons.edit_note_rounded,
+                    // ⚠️ A NEUTRAL ICON, PER THE REVIEW: "its icon should
+                    // reflect that either user can write or upload pics or
+                    // something neutral". A pencil promises typing, and this
+                    // screen takes a photograph with no words at all.
+                    icon: Icons.auto_stories_outlined,
                     mark: V3DailyMark.memory,
                     hue: 42,
-                    label: 'Write a\nmemory',
+                    label: 'Add a\nmemory',
                     onTap: () => openJournalText(
                         context, pregnancy, JournalEntryType.memory)),
-                V3QuickAction(
-                    icon: Icons.favorite_border_rounded,
-                    mark: V3DailyMark.note,
-                    hue: 344,
-                    label: 'Note for\nbaby',
-                    onTap: () => openJournalText(
-                        context, pregnancy, JournalEntryType.noteForBaby)),
-                V3QuickAction(
-                    icon: Icons.photo_camera_outlined,
-                    mark: V3DailyMark.photo,
-                    hue: 206,
-                    label: 'Add a\nphoto',
-                    onTap: () => openJournalAddPhoto(context, pregnancy)),
                 V3QuickAction(
                     icon: Icons.mic_none_rounded,
                     mark: V3DailyMark.voice,
                     hue: 268,
-                    label: 'Record\nvoice',
+                    label: 'Add a\nvoice note',
                     onTap: () => openJournalRecordVoice(context, pregnancy)),
+
+                // ⚠️ REMOVED, KEPT FOR REVERT — repo rule, and both are one
+                // uncomment away.
+                //
+                // "Note for baby" is gone from HER landing page only. The
+                // father's app still creates the type from his own screens and
+                // his own store, and the review did not ask to touch that.
+                // Existing entries are migrated — see `JournalStore`.
+                //
+                // V3QuickAction(
+                //     icon: Icons.favorite_border_rounded,
+                //     mark: V3DailyMark.note,
+                //     hue: 344,
+                //     label: 'Note for\nbaby',
+                //     onTap: () => openJournalText(
+                //         context, pregnancy, JournalEntryType.noteForBaby)),
+                //
+                // "Add a photo" led to the same compose screen the first tile
+                // opens, which now takes photo-only entries.
+                //
+                // V3QuickAction(
+                //     icon: Icons.photo_camera_outlined,
+                //     mark: V3DailyMark.photo,
+                //     hue: 206,
+                //     label: 'Add a\nphoto',
+                //     onTap: () => openJournalAddPhoto(context, pregnancy)),
               ],
               onOpenAll: () => Navigator.of(context).push(MaterialPageRoute(
                   builder: (_) => JournalScreen(controller: pregnancy))),
@@ -783,7 +818,10 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
     final journey = journeyFor(action);
     if (journey != null) {
       Navigator.of(context).push(MaterialPageRoute<void>(
-        settings: RouteSettings(name: 'journey/' + action),
+        // ⚠️ THE ROUTE NAME IS LOAD-BEARING (CLAUDE.md): `global_ask_fab`
+        // and others detect which stage is on screen from it, so a name
+        // that does not interpolate is not a cosmetic bug.
+        settings: RouteSettings(name: 'journey/$action'),
         builder: (_) => JourneyScreen(
           config: journey,
           onSurface: _openSurfaceScreen,

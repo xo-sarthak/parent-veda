@@ -104,6 +104,15 @@ class JournalEntry {
       ? audioUrls
       : (audioUrl != null && audioUrl!.isNotEmpty ? [audioUrl!] : const []);
 
+  /// ⚠️ `clearPlace` EXISTS FOR THE SAME REASON `clearScanId` DOES ON
+  /// `ScanReport`, and the shape is worth recognising rather than rediscovering:
+  /// **a nullable field makes `copyWith` ambiguous.** There is no way to tell
+  /// "she deleted the place" from "she did not mention it" — both arrive as
+  /// `place: null` — so without this flag, clearing a place is simply not
+  /// expressible and an edit silently keeps a label she just removed.
+  ///
+  /// A named boolean rather than a sentinel object: shorter to read at the call
+  /// site, and a reviewer does not have to know what the sentinel means.
   JournalEntry copyWith({
     String? title,
     String? description,
@@ -111,6 +120,7 @@ class JournalEntry {
     List<String>? audioUrls,
     String? customTag,
     String? place,
+    bool clearPlace = false,
   }) =>
       JournalEntry(
         id: id,
@@ -122,11 +132,37 @@ class JournalEntry {
         imageUrls: imageUrls ?? this.imageUrls,
         audioUrls: audioUrls ?? this.audioUrls,
         customTag: customTag ?? this.customTag,
-        place: place ?? this.place,
+        place: clearPlace ? null : (place ?? this.place),
         tags: tags,
         isAutomatic: isAutomatic,
         createdAt: createdAt,
         updatedAt: DateTime.now(),
+      );
+
+  /// The same entry, filed under a different kind.
+  ///
+  /// ⚠️ NOT PART OF `copyWith`, DELIBERATELY. `type` is close to identity here —
+  /// it decides the label, the chip colour and which filter finds the entry —
+  /// and putting it in `copyWith` alongside `title` would make changing it look
+  /// like an ordinary edit. It has exactly one caller, the retirement of
+  /// `noteForBaby`, and a named method keeps that visible at the call site.
+  ///
+  /// `updatedAt` deliberately does NOT move: she did not edit this, we did.
+  JournalEntry retyped(JournalEntryType to) => JournalEntry(
+        id: id,
+        type: to,
+        title: title,
+        description: description,
+        date: date,
+        weekNumber: weekNumber,
+        imageUrls: imageUrls,
+        audioUrls: audioUrls,
+        customTag: customTag,
+        place: place,
+        tags: tags,
+        isAutomatic: isAutomatic,
+        createdAt: createdAt,
+        updatedAt: updatedAt,
       );
 
   Map<String, dynamic> toJson() => {

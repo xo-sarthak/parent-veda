@@ -21,6 +21,13 @@
     <!-- Exact-time reminders (Android 12+). USE_EXACT_ALARM auto-grants for
          testing now; before a Play Store launch, drop USE_EXACT_ALARM and rely
          on SCHEDULE_EXACT_ALARM + the runtime request (Play flags USE_EXACT). -->
+    <!-- Journal entries can be labelled with a place. COARSE ONLY, and never
+         background: a journal needs a neighbourhood, not a doorstep, and asking
+         for precise location would be asking for more than the feature uses.
+         On Android 12+ a user can downgrade a fine request to coarse anyway, so
+         requesting fine buys a worse prompt and the same data.
+         Requested at the moment she taps "Use my location", never at launch. -->
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
     <application

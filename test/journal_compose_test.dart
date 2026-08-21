@@ -20,6 +20,8 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:geocoding/geocoding.dart' show Placemark;
+import 'package:parentveda/services/place_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/models/journal_entry.dart';
@@ -35,6 +37,7 @@ Future<void> _pump(WidgetTester t, Widget w) async {
 }
 
 void main() {
+  _journalLanding();
   TestWidgetsFlutterBinding.ensureInitialized();
   SharedPreferences.setMockInitialValues({});
 
@@ -74,7 +77,14 @@ void main() {
       addTearDown(c.dispose);
       await _pump(t, JournalComposeScreen(pregnancy: c));
 
-      await t.enterText(find.byType(TextField).last, 'She kicked today.');
+      // ⚠️ `.at(1)` — THE BODY — AND NOT `.last`, WHICH IS NOW THE PLACE.
+      // The order is heading, body, place. This used to say `.last` and broke
+      // the day a fourth field arrived, which is the ordinary failure mode of
+      // positional finders: they keep compiling and start testing something
+      // else. Typing a PLACE must not unlock Save — a location with no memory
+      // attached is not an entry — so had this not been fixed, the test would
+      // have been asserting the opposite of the intended rule.
+      await t.enterText(find.byType(TextField).at(1), 'She kicked today.');
       await t.pump();
 
       final btn = t.widget<TextButton>(
@@ -148,7 +158,11 @@ void main() {
         place: 'Lodhi Garden, Delhi',
       );
       await _pump(t, JournalComposeScreen(pregnancy: c, edit: e));
-      expect(find.textContaining('Lodhi Garden, Delhi'), findsOneWidget);
+
+      // ⚠️ TWICE NOW, AND BOTH ARE RIGHT. The place appears in the field where
+      // she can edit it, and again in the preview that shows how the entry will
+      // read afterwards. Before the field existed there was only the preview.
+      expect(find.textContaining('Lodhi Garden, Delhi'), findsNWidgets(2));
       expect(find.textContaining('4 Mar 2026'), findsOneWidget);
     });
   });
@@ -197,5 +211,180 @@ void main() {
     // these as a carousel that stops being scannable past about three, and a
     // capped entry stays small enough to sync.
     expect(kJournalMaxPhotos, 3);
+  });
+}
+
+// =============================================================================
+//  The landing section, the retired type, and the place
+// -----------------------------------------------------------------------------
+//  ⚠️ THE DEFECT THAT MOTIVATES THE FIRST GROUP IS NOT A BUG IN CODE — IT IS AN
+//  INSTRUCTION THAT NEVER REACHED THE SURFACE IT NAMED. The review said "My
+//  Journal Section on landing page ... Note for Baby should be removed, add a
+//  photo should be removed, Record Voice should be called Add a voice note".
+//  The compose screen was rebuilt; the four tiles on the landing page were
+//  never touched, and nothing could notice: four correct tiles doing four
+//  correct things, matching no requirement anyone could see from the code.
+//
+//  So these assert the tiles against the words that asked for them. That is the
+//  only place the requirement lives.
+// =============================================================================
+
+void _journalLanding() {
+  group('the retired "Note for baby"', () {
+    test('an old entry is re-typed to a memory on read', () {
+      final old = JournalEntry.fromJson({
+        'id': 'j_old',
+        'type': 'noteForBaby',
+        'title': 'You kicked today',
+        'description': 'Twice, during dinner.',
+        'date': '2026-04-02T20:10:00.000',
+        'weekNumber': 22,
+        'createdAt': '2026-04-02T20:10:00.000',
+        'updatedAt': '2026-04-02T20:10:00.000',
+      });
+      expect(old.type, JournalEntryType.noteForBaby,
+          reason: 'the type must still PARSE, or her entry vanishes');
+
+      final now = old.retyped(JournalEntryType.memory);
+      expect(now.type, JournalEntryType.memory);
+    });
+
+    test('re-typing changes the type and nothing else', () {
+      // ⚠️ THE ASSERTION THAT MAKES THIS SAFE TO RUN OVER HER DATA. Everything
+      // she wrote survives; only the label above the card moves.
+      final e = JournalEntry(
+        id: 'j1',
+        type: JournalEntryType.noteForBaby,
+        title: 'Hello little one',
+        description: 'body',
+        date: DateTime(2026, 4, 2),
+        weekNumber: 22,
+        imageUrls: const ['a.jpg'],
+        audioUrls: const ['b.m4a'],
+        place: 'Maa house',
+      );
+      final r = e.retyped(JournalEntryType.memory);
+      expect(r.id, e.id);
+      expect(r.title, e.title);
+      expect(r.description, e.description);
+      expect(r.date, e.date);
+      expect(r.weekNumber, e.weekNumber);
+      expect(r.imageUrls, e.imageUrls);
+      expect(r.audioUrls, e.audioUrls);
+      expect(r.place, e.place);
+      expect(r.createdAt, e.createdAt);
+      // ⚠️ `updatedAt` DOES NOT MOVE. She did not edit this; we did. Bumping it
+      // would reorder anything sorted on it and claim an edit she never made.
+      expect(r.updatedAt, e.updatedAt);
+    });
+
+    test('the type itself survives, for the father', () {
+      // He still creates it, from his own screens into his own store, and the
+      // review did not ask to change his app. Deleting the enum value would
+      // have broken his feature and every entry he has already written.
+      expect(JournalEntryType.values, contains(JournalEntryType.noteForBaby));
+    });
+  });
+
+  group('a place can be cleared, not only replaced', () {
+    test('copyWith without a place leaves it alone', () {
+      final e = JournalEntry(
+        id: 'j2',
+        type: JournalEntryType.memory,
+        title: 't',
+        description: '',
+        date: DateTime(2026, 4, 2),
+        weekNumber: 20,
+        place: 'The terrace',
+      );
+      expect(e.copyWith(title: 'new').place, 'The terrace');
+    });
+
+    test('clearPlace actually clears it', () {
+      // ⚠️ WITHOUT THE FLAG THIS IS NOT EXPRESSIBLE. A nullable field makes
+      // copyWith ambiguous: "she deleted the place" and "she did not mention
+      // it" both arrive as null, so an edit would silently keep a label she
+      // had just removed. Same shape as `clearScanId` on ScanReport.
+      final e = JournalEntry(
+        id: 'j3',
+        type: JournalEntryType.memory,
+        title: 't',
+        description: '',
+        date: DateTime(2026, 4, 2),
+        weekNumber: 20,
+        place: 'The terrace',
+      );
+      expect(e.copyWith(clearPlace: true).place, isNull);
+    });
+
+    test('a place survives a json round trip', () {
+      final e = JournalEntry(
+        id: 'j4',
+        type: JournalEntryType.memory,
+        title: 't',
+        description: '',
+        date: DateTime(2026, 4, 2),
+        weekNumber: 20,
+        place: "Maa's house",
+      );
+      expect(JournalEntry.fromJson(e.toJson()).place, "Maa's house");
+    });
+
+    test('an entry written before place existed reads back null', () {
+      final e = JournalEntry.fromJson({
+        'id': 'j5',
+        'type': 'memory',
+        'title': 't',
+        'description': '',
+        'date': '2026-04-02T20:10:00.000',
+        'weekNumber': 20,
+        'createdAt': '2026-04-02T20:10:00.000',
+        'updatedAt': '2026-04-02T20:10:00.000',
+      });
+      // Null renders nothing. An empty string would render a stray separator
+      // dot under the date - a mark she cannot explain on something she keeps.
+      expect(e.place, isNull);
+    });
+  });
+
+  group('the place label is a neighbourhood, never an address', () {
+    test('sub-locality and locality, in that order', () {
+      const m = Placemark(subLocality: 'Sector 62', locality: 'Noida');
+      expect(PlaceService.debugLabel(m), 'Sector 62, Noida');
+    });
+
+    test('a repeated name is not printed twice', () {
+      const m = Placemark(subLocality: 'Noida', locality: 'Noida');
+      expect(PlaceService.debugLabel(m), 'Noida');
+    });
+
+    test('falls back to district or state rather than returning nothing', () {
+      // Plenty of Indian addresses come back with locality empty.
+      const m = Placemark(administrativeArea: 'Kerala');
+      expect(PlaceService.debugLabel(m), 'Kerala');
+    });
+
+    test('nothing usable means null, not an empty label', () {
+      const m = Placemark();
+      expect(PlaceService.debugLabel(m), isNull);
+    });
+
+    test('the street is never included', () {
+      // ⚠️ THE PRIVACY ASSERTION. A geocoder returns a street and a number
+      // quite happily, and putting one under a photograph in a keepsake she
+      // may share is more than the feature needs and more than she intended to
+      // publish.
+      const m = Placemark(
+        street: '14, Rose Villa, Nehru Road',
+        subLocality: 'Bandra West',
+        locality: 'Mumbai',
+        postalCode: '400050',
+      );
+      final label = PlaceService.debugLabel(m)!;
+      expect(label.contains('Nehru'), isFalse);
+      expect(label.contains('14'), isFalse);
+      expect(label.contains('400050'), isFalse);
+      expect(label, 'Bandra West, Mumbai');
+    });
   });
 }

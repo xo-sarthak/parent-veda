@@ -46,6 +46,7 @@ import 'package:image_picker/image_picker.dart';
 
 import '../localization/app_language.dart';
 import '../models/journal_entry.dart';
+import '../services/place_service.dart';
 import '../services/journal_store.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/pv_fonts.dart';
@@ -110,6 +111,17 @@ class JournalComposeScreen extends StatefulWidget {
 }
 
 class _JournalComposeScreenState extends State<JournalComposeScreen> {
+  /// Typed by her, or filled by the location button and then editable.
+  ///
+  /// ⚠️ ONE FIELD FOR BOTH SOURCES, AND THAT IS THE DESIGN. There is no
+  /// path where the app stamps a place on an entry without it passing
+  /// through a box she can see and change first.
+  late final TextEditingController _place =
+      // An edit re-opens with whatever place it already had, so saving
+      // without touching the field cannot quietly drop it.
+      TextEditingController(text: widget.edit?.place ?? '');
+  bool _locating = false;
+
   late final TextEditingController _heading =
       TextEditingController(text: widget.edit?.title ?? '');
   late final TextEditingController _body =
@@ -127,6 +139,7 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
   @override
   void dispose() {
     _heading.dispose();
+    _place.dispose();
     _body.dispose();
     super.dispose();
   }
@@ -203,6 +216,10 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
         title: title,
         description: heading.isNotEmpty ? body : '',
         imageUrls: _photos,
+        place: _placeOrNull,
+        // Emptying the box removes the place. See `clearPlace` on the model
+        // for why this flag has to exist at all.
+        clearPlace: _placeOrNull == null,
       ));
     } else {
       final entry = JournalEntry(
@@ -216,6 +233,7 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
         date: _stamp,
         weekNumber: widget.pregnancy.currentWeek,
         imageUrls: _photos,
+        place: _placeOrNull,
       );
       if (widget.onAdd != null) {
         await widget.onAdd!(entry);
@@ -226,6 +244,45 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
 
     if (!mounted) return;
     Navigator.of(context).pop();
+  }
+
+  /// Empty means "no place", not an empty string on the entry.
+  ///
+  /// ⚠️ THE DIFFERENCE IS VISIBLE TO HER. `JournalEntry.place` renders nothing
+  /// when null; an empty string would render a stray separator dot under the
+  /// date — a mark she cannot explain, on something she is keeping.
+  String? get _placeOrNull {
+    final t = _place.text.trim();
+    return t.isEmpty ? null : t;
+  }
+
+  Future<void> _fillPlace() async {
+    if (_locating) return;
+    setState(() => _locating = true);
+    final res = await PlaceService.current();
+    if (!mounted) return;
+    setState(() => _locating = false);
+
+    if (res.ok) {
+      // ⚠️ IT FILLS THE BOX; IT DOES NOT SAVE. She reads what it wrote and can
+      // replace "Sector 62, Noida" with "Maa's house" before this ever reaches
+      // an entry.
+      _place.text = res.label!;
+      return;
+    }
+
+    // ⚠️ THREE FAILURES, THREE SENTENCES. Telling a woman to enable a setting
+    // that is already enabled is its own small insult, and "something went
+    // wrong" tells her nothing she can act on.
+    final msg = switch (res.failure) {
+      PlaceFailure.denied =>
+        'No problem — you can type the place instead.',
+      PlaceFailure.serviceOff =>
+        'Location is switched off on this phone. You can type the place instead.',
+      _ => 'Could not find the place just now. You can type it instead.',
+    };
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(msg)));
   }
 
   @override
@@ -339,7 +396,13 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
           // She is choosing what to keep; seeing that the date, time and place
           // travel with it is part of that decision, and it is also the only
           // honest way to show that place is currently blank.
-          _MetaPreview(stamp: _stamp, place: widget.edit?.place),
+          _PlaceField(
+            controller: _place,
+            busy: _locating,
+            onUseLocation: _fillPlace,
+          ),
+          const SizedBox(height: 14),
+          _MetaPreview(stamp: _stamp, place: _placeOrNull),
 
           if (!_canSave) ...[
             const SizedBox(height: 18),
@@ -451,5 +514,105 @@ class _AddTile extends StatelessWidget {
           ),
           child: Icon(Icons.add_rounded, color: _ink3),
         ),
+      );
+}
+
+/// Where this happened — typed, or filled from the phone and then edited.
+///
+/// ⚠️ THE TEXT FIELD IS THE FEATURE; THE BUTTON IS A CONVENIENCE ON TOP. A
+/// journal is not a check-in. What belongs under an entry is "Maa's house" or
+/// "Apollo, 3rd floor" — words she chose — and a reverse-geocoded "Sector 62,
+/// Noida" is accurate while saying almost nothing she would want to read in ten
+/// years. So location fills the box and she keeps the last word.
+///
+/// ⚠️ AND NOTHING IS EVER STAMPED WITHOUT PASSING THROUGH THIS BOX. There is no
+/// path in the app where a place reaches a saved entry without appearing here
+/// first, where she can see it and change it. That is the whole privacy design,
+/// and it is a property of the wiring rather than a promise in a policy.
+class _PlaceField extends StatelessWidget {
+  const _PlaceField({
+    required this.controller,
+    required this.busy,
+    required this.onUseLocation,
+  });
+
+  final TextEditingController controller;
+  final bool busy;
+  final VoidCallback onUseLocation;
+
+  @override
+  Widget build(BuildContext context) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(children: [
+            Icon(Icons.place_outlined, size: 15, color: _ink3),
+            const SizedBox(width: 8),
+            // ⚠️ FLEXIBLE, AND THE LABEL IS WHAT YIELDS. This row overflowed by
+            // 54px at 384 wide - a caught-in-test version of the narrow-phone
+            // bug. The button carries an action and must never truncate; the
+            // label is a question she can still read at half length.
+            Flexible(
+              child: Text('Where was this?',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                      color: _ink2)),
+            ),
+            const SizedBox(width: 8),
+            // ⚠️ NOT A TOGGLE, AND NOT ON BY DEFAULT. A one-shot button means
+            // the permission prompt appears at the moment she asked for it,
+            // which is the only moment it makes sense — and it means location
+            // is never read for an entry she did not ask to label.
+            TextButton.icon(
+              onPressed: busy ? null : onUseLocation,
+              style: TextButton.styleFrom(
+                padding: const EdgeInsets.symmetric(horizontal: 10),
+                minimumSize: const Size(0, 32),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              ),
+              icon: busy
+                  ? const SizedBox(
+                      width: 12,
+                      height: 12,
+                      child: CircularProgressIndicator(strokeWidth: 2))
+                  : Icon(Icons.my_location_rounded, size: 14, color: _ink2),
+              label: Text(busy ? 'Finding…' : 'Use location',
+                  style: pvManrope(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w700,
+                      color: _ink2)),
+            ),
+          ]),
+          const SizedBox(height: 6),
+          TextField(
+            controller: controller,
+            textCapitalization: TextCapitalization.sentences,
+            style: pvManrope(fontSize: 14, color: _ink1),
+            decoration: InputDecoration(
+              // The hint is doing real work: it tells her the field wants a
+              // name she would use, not an address.
+              hintText: "Maa's house, the terrace, Apollo…",
+              hintStyle: pvManrope(fontSize: 13.5, color: _ink3),
+              filled: true,
+              fillColor: _surface,
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide(color: _line),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide(color: _line),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(14),
+                borderSide: BorderSide(color: _ink3, width: 1.4),
+              ),
+            ),
+          ),
+        ],
       );
 }

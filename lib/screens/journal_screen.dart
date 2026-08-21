@@ -645,6 +645,26 @@ class _JournalScreenState extends State<JournalScreen> {
                               fontSize: 10.5,
                               fontWeight: FontWeight.w600,
                               color: AppTheme.neutral400)),
+                      // ⚠️ THE PLACE, ONLY WHEN THERE IS ONE. The compose
+                      // screen has always shown date, time and place together;
+                      // the saved card showed the first two and dropped the
+                      // third, so a label she typed disappeared the moment she
+                      // saved. Null renders nothing rather than an empty row.
+                      if ((e.place ?? '').trim().isNotEmpty)
+                        ConstrainedBox(
+                          // Bounded, because a typed place can be any length
+                          // and this column sits beside the title. One line,
+                          // ellipsised, rather than a card that grows.
+                          constraints: const BoxConstraints(maxWidth: 110),
+                          child: Text(e.place!.trim(),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              textAlign: TextAlign.end,
+                              style: pvManrope(
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppTheme.neutral400)),
+                        ),
                     ],
                   ),
                 ],
