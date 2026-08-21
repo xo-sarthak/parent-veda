@@ -431,12 +431,23 @@ final JourneyConfig kTtcPreconceptionReadiness = JourneyConfig(
     JourneyStep(
       question: _en('Is my weight going to make a difference?'),
       elements: [
+        // ⚠️ THE BMI SLOT IS ANSWERED BY THE CHECKLIST, NOT BY A BMI TOOL.
+        //
+        // The workbook's Tools cell reads "Pre-pregnancy checklist, BMI", and
+        // the checklist carries the weight item — deliberately with no BMI
+        // number, no target and no calculator. Weight affects ovulation at
+        // both ends, the evidence supports a modest five per cent rather than
+        // reaching a figure, and BMI reads Indian bodies badly. A calculator
+        // here would produce a number that means less than the sentence it
+        // replaced, on the one topic in this stage most likely to be heard as
+        // blame.
         JourneyElement(
           type: SolutionType.tool,
-          title: _en('A simple BMI check'),
-          value: _en('Where you stand, and whether it is worth doing '
-              'anything about before you start.'),
-          owed: true,
+          title: _en('Your pre-pregnancy checklist'),
+          value: _en('What you have already covered, what is still worth '
+              'discussing, and your next three steps.'),
+          meta: _en('CHECKLIST'),
+          surfaceId: 'ttc_precheck',
         ),
       ],
     ),

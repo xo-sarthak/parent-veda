@@ -192,8 +192,11 @@ final List<Bracket> kTtcBrackets = [
       BracketLayer.content: BracketLayerSpec.live(['ttc_nutrition', 'ttc_tests']),
       BracketLayer.activities: BracketLayerSpec(
           state: LayerState.notReady, reason: 'Light habit-building'),
-      BracketLayer.tools: BracketLayerSpec(
-          state: LayerState.notReady, reason: 'Pre-pregnancy checklist, BMI'),
+      // Was notReady: "Pre-pregnancy checklist, BMI". The checklist ships and
+      // carries the weight item — with no BMI figure, no target and no
+      // calculator, for the reason written at the journey's BMI slot.
+      BracketLayer.tools: BracketLayerSpec.live(
+          ['ttc_precheck', 'ttc_vaccinations', 'ttc_tests']),
       BracketLayer.products:
           BracketLayerSpec.live(['ttc_supplements', 'ttc_products']),
       BracketLayer.course: BracketLayerSpec(

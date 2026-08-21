@@ -33,6 +33,7 @@ import 'ttc_medication_screen.dart';
 import 'ttc_nutrition_screen.dart';
 import 'ttc_partner_screen.dart';
 import 'ttc_pcos_check_screen.dart';
+import 'ttc_precheck_screen.dart';
 import 'ttc_prepare_screen.dart';
 import 'ttc_products_screen.dart';
 import 'ttc_records_screen.dart';
@@ -118,6 +119,10 @@ Widget? _ttcStaticSurface(String id) => switch (id) {
       // The workbook's PCOS Tools cell, other half. `ttc_cycle` was always the
       // tracker; this is the checker that sat beside it as notReady.
       'ttc_pcos_check' => const TtcPcosCheckScreen(),
+      // The workbook's Getting-ready Tools cell. Reads across CycleStore, the
+      // PCOS checker, the vaccination list, supplements and medicines, so it
+      // opens knowing what she has already done.
+      'ttc_precheck' => const TtcPrecheckScreen(),
       'ttc_nutrition' => const TtcNutritionScreen(),
       'ttc_supplements' => const TtcSupplementsScreen(),
       // `ttc_tracker` is deliberately absent: `TtcTrackerScreen` requires a
