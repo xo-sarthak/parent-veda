@@ -8,12 +8,72 @@
 
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:parentveda/data/hubs/hub_registry.dart';
 import 'package:parentveda/data/journeys/journey_registry.dart';
 import 'package:parentveda/data/hubs/ttc_hubs.dart';
 import 'package:parentveda/data/journeys/ttc_journeys.dart';
 import 'package:parentveda/screens/brackets/hub/hub_solution_cards.dart';
 
 void main() {
+  // ===========================================================================
+  group('two cards on one screen never lead to the same place', () {
+    // The rule, in the user's words: "no to different cards should lead at the
+    // same page". It matters more than it sounds. A hub or a journey step is
+    // read as a MENU — every row is a promise that something different is
+    // behind it. Two rows onto one destination is not a harmless duplicate; it
+    // teaches her that tapping is unreliable, and the next row she does not
+    // tap is the one she needed.
+    //
+    // It is also exactly the kind of thing that creeps in from the other end.
+    // A journey step is written from a checklist of slots to fill; when one
+    // article answers two of the slots, splitting it across two tiles keeps
+    // the one-to-one map with the checklist and quietly breaks this. See the
+    // comment in `ttc_journeys.dart` at "How long is 'long enough'".
+    //
+    // Scoped to ONE screen on purpose. The same surface reachable from the
+    // Tools hub AND from a journey step is correct and deliberate — the hub is
+    // the index, the journey is the recommendation, and she arrives at each in
+    // a different frame of mind.
+    test('within a journey, no surface is offered twice', () {
+      for (final j in kAllJourneys.values) {
+        final seen = <String, String>{};
+        for (final s in j.steps) {
+          for (final e in s.elements) {
+            final id = e.surfaceId;
+            if (id == null) continue;
+            expect(seen.containsKey(id), isFalse,
+                reason: '${j.doorId}: "$id" is behind both '
+                    '"${seen[id]}" and "${e.title.en}"');
+            seen[id] = e.title.en;
+          }
+        }
+      }
+    });
+
+    test('within a hub, no two doors open the same surface or action', () {
+      for (final h in kHubsByBracket.values) {
+        final seenSurface = <String, String>{};
+        final seenAction = <String, String>{};
+        for (final n in h.needs) {
+          final id = n.surfaceId;
+          if (id != null) {
+            expect(seenSurface.containsKey(id), isFalse,
+                reason: '${h.bracketId}: surface "$id" is behind both '
+                    '"${seenSurface[id]}" and "${n.label.en}"');
+            seenSurface[id] = n.label.en;
+          }
+          final a = n.action;
+          if (a != null) {
+            expect(seenAction.containsKey(a), isFalse,
+                reason: '${h.bracketId}: action "$a" is behind both '
+                    '"${seenAction[a]}" and "${n.label.en}"');
+            seenAction[a] = n.label.en;
+          }
+        }
+      }
+    });
+  });
+
   group('every journey is a walk that ends', () {
     test('each one says what "done" means', () {
       for (final j in kAllJourneys.values) {

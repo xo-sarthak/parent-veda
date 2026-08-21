@@ -108,7 +108,7 @@ void main() {
       // Coverage of the master document's tools is asserted by NAME in
       // ttc_tools_test.dart, which is the promise that actually matters - this
       // number is only here so a tile cannot vanish unnoticed.
-      expect(TtcToolsScreen.toolCount, 21);
+      expect(TtcToolsScreen.toolCount, 26);
     });
 
     testWidgets('all nine Prepare categories render', (tester) async {

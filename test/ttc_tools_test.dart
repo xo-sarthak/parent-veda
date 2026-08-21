@@ -72,6 +72,12 @@ void main() {
         'partner', 'mood', 'stress', 'lifestyle', 'journal',
         'supplement', 'medication', 'test', 'report', 'record', 'appointment',
         'movement', 'nutrition', 'journey', 'can i', 'worth knowing',
+        // The five checks the level-map checklist added. Each was reachable
+        // only from inside one journey step before this, which is the
+        // contextual entrance, not an index. A woman told "you might have
+        // PCOS" opens Tools and looks for the word.
+        'pcos', 'weight and fertility', 'specialist', 'vaccination',
+        'checklist',
       ]) {
         expect(names, contains(capability),
             reason: '"$capability" is no longer findable in the hub');
@@ -88,7 +94,13 @@ void main() {
       // The rule the number is standing in for has not changed: a tile must
       // lead somewhere that is genuinely its own. Splitting when that becomes
       // true is the same rule as merging when it is not.
-      expect(TtcToolsScreen.toolCount, 21);
+      //
+      // 21 -> 26: the PCOS check, the BMI reading, the "see a specialist?"
+      // self-check, Vaccinations and the pre-pregnancy checklist. Each has its
+      // own screen; none of them is a second door onto a screen already listed
+      // here. `Weight and fertility` sits beside `Weight` on purpose - one
+      // logs a series, one reads a single number against South Asian cut-offs.
+      expect(TtcToolsScreen.toolCount, 26);
     });
 
     test('supplements and medication are not the same destination', () {

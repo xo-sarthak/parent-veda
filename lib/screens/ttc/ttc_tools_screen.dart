@@ -32,6 +32,7 @@ import 'ttc_records_screen.dart';
 import 'ttc_strings.dart';
 import 'ttc_medication_screen.dart';
 import 'ttc_supplements_screen.dart';
+import 'ttc_surface_router.dart';
 import 'ttc_tests_screen.dart';
 import 'ttc_tracker_screen.dart';
 
@@ -88,8 +89,11 @@ class TtcToolGroup {
   String title(bool hi) => hi ? titleHi : titleEn;
 }
 
-/// The twenty-two tools named in the master document, §2.7, grouped the way the
-/// pregnancy hub groups its own.
+/// The tools named in the master document, §2.7, plus the five checks the
+/// level-map checklist added later, grouped the way the pregnancy hub groups
+/// its own.
+///
+/// The count is not the invariant - findability is. See `ttc_tools_test.dart`.
 final List<TtcToolGroup> ttcToolGroups = [
   TtcToolGroup(
     titleEn: 'Your body',
@@ -154,6 +158,48 @@ final List<TtcToolGroup> ttcToolGroups = [
         descEn: 'Hours, and how they felt',
         descHi: 'Ghante, aur kaisa laga',
         open: (c) => openTtcTracker(c, 'sleep'),
+      ),
+      // ---- the four checks, listed where she goes looking for them ---------
+      //
+      // These were reachable only from inside a journey step. That is the
+      // contextual entrance and it is the better one - she meets the checker
+      // at the moment the question occurs to her. But it is not the only way
+      // anyone arrives: a woman who has been told "you might have PCOS" opens
+      // Tools and searches for the word, and finding nothing concludes we do
+      // not have it. The hub is the INDEX; the journey is the recommendation.
+      // Both must exist, and the hub's own rule at the top of this file
+      // already said so - "a tool she has never opened must still teach her it
+      // exists".
+      TtcTool(
+        id: 'pcos_check',
+        icon: Icons.checklist_rtl_rounded,
+        nameEn: 'PCOS symptom check',
+        nameHi: 'PCOS symptom check',
+        descEn: 'Questions worth taking to a doctor',
+        descHi: 'Doctor ko dikhane layak sawaal',
+        open: (c) => openTtcSurface(c, 'ttc_pcos_check'),
+      ),
+      TtcTool(
+        id: 'bmi',
+        // Deliberately NOT the same destination as the Weight tracker beside
+        // it: that one logs a series over months, this one reads a single
+        // number against South Asian cut-offs and says what it does and does
+        // not mean for fertility. Two tiles, two pages, two questions.
+        icon: Icons.straighten_rounded,
+        nameEn: 'Weight and fertility',
+        nameHi: 'Wazan aur fertility',
+        descEn: 'What a BMI does and does not say',
+        descHi: 'BMI kya kehta hai, kya nahi',
+        open: (c) => openTtcSurface(c, 'ttc_bmi'),
+      ),
+      TtcTool(
+        id: 'fertility_help',
+        icon: Icons.support_agent_outlined,
+        nameEn: 'See a specialist?',
+        nameHi: 'Specialist se milein?',
+        descEn: 'Whether it is time yet',
+        descHi: 'Kya ab waqt hai',
+        open: (c) => openTtcSurface(c, 'ttc_fertility_help'),
       ),
     ],
   ),
@@ -252,6 +298,15 @@ final List<TtcToolGroup> ttcToolGroups = [
             settings: const RouteSettings(name: 'ttc/tests'))),
       ),
       TtcTool(
+        id: 'vaccinations',
+        icon: Icons.vaccines_outlined,
+        nameEn: 'Vaccinations',
+        nameHi: 'Vaccinations',
+        descEn: 'What to sort before, not during',
+        descHi: 'Pehle nipta lein, baad mein nahi',
+        open: (c) => openTtcSurface(c, 'ttc_vaccinations'),
+      ),
+      TtcTool(
         id: 'records',
         icon: Icons.folder_shared_outlined,
         nameEn: 'Records & reports',
@@ -312,6 +367,15 @@ final List<TtcToolGroup> ttcToolGroups = [
         descEn: 'The everyday worries, settled',
         descHi: 'Rozmarra ki chinta, hal',
         open: openTtcCanI,
+      ),
+      TtcTool(
+        id: 'precheck',
+        icon: Icons.fact_check_outlined,
+        nameEn: 'Pre-pregnancy checklist',
+        nameHi: 'Pre-pregnancy checklist',
+        descEn: 'The three months before',
+        descHi: 'Pehle ke teen mahine',
+        open: (c) => openTtcSurface(c, 'ttc_precheck'),
       ),
       TtcTool(
         id: 'guide',
