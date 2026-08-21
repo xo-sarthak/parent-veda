@@ -23,6 +23,7 @@
 import 'package:flutter/material.dart';
 import 'mind_mood/mind_mood_home_screen.dart';
 import 'nutrition/nutrition_home_screen.dart';
+import 'nutrition/nutrition_stage_screen.dart';
 import 'belly_skin/belly_skin_home_screen.dart';
 import 'conditions/conditions_home_screen.dart';
 import '../theme/pv_fonts.dart';
@@ -59,7 +60,8 @@ import 'v2/v2_palette.dart';
 import 'v2/v2_sections.dart';
 import '../data/garbh_data.dart';
 import '../services/garbh_store.dart';
-import 'garbh_screen.dart' show ShravanScreen, SamvadScreen, KriyaScreen;
+import 'garbh_screen.dart' show ShravanScreen, SamvadScreen, KriyaScreen, gameForPuzzle;
+import 'garbh_buddhi_screen.dart';
 import '../models/journal_entry.dart';
 import '../services/medicine_store.dart';
 import '../services/reminder_store.dart';
@@ -343,11 +345,18 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
                           builder: (_) => ShravanScreen(
                               controller: pregnancy, daily: true))),
                     ),
+                    // ⚠️ NAMED 'Samvad', NOT 'Samvad & Vichara'. Vichara was
+                    // not renamed away, it was REPLACED - its Sacred Insights
+                    // and Uplifting Vibrations shelves duplicated Samvad and
+                    // Shravan, so as a pillar it was two copies wearing a
+                    // third name. The daily screen has said 'Samvad' since;
+                    // this row kept the old compound name and was the only
+                    // place in the app still implying Vichara exists.
                     GarbhPillarRow(
-                      name: 'Samvad & Vichara',
+                      name: 'Samvad',
                       image:
                           'https://images.unsplash.com/photo-1541956799312-3f9df99e0006?w=200&h=200&fit=crop',
-                      tag: 'Womb talk',
+                      tag: 'Talking to your baby',
                       today: promptForDay(cd, tri).text.en,
                       icon: Icons.record_voice_over_rounded,
                       accent: const Color(0xFF9C5F51),
@@ -356,14 +365,52 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
                           builder: (_) => SamvadScreen(
                               controller: pregnancy, daily: true))),
                     ),
+                    // ⚠️ THE PILLAR THAT WAS MISSING, AND WHY NOTHING CAUGHT
+                    // IT. Buddhi was built properly - its own screen, its own
+                    // place on the wheel, its own row on the daily screen with
+                    // a comment explaining why it exists. This landing block
+                    // was simply never updated to match. Nothing failed,
+                    // nothing was internally inconsistent, and no test could
+                    // see it: three correct pillars, doing three correct
+                    // things, in a list that happened to be short.
+                    //
+                    // ⚠️ IT IS THE ONE PILLAR THAT IS NOT FOR THE BABY, which
+                    // is why its tag says so out loud rather than describing a
+                    // practice. See garbh_buddhi_screen.dart.
+                    GarbhPillarRow(
+                      name: 'Buddhi',
+                      image:
+                          'https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=200&h=200&fit=crop',
+                      tag: 'Just for you',
+                      today: buddhiTodayLine(cd).en,
+                      icon: Icons.psychology_alt_outlined,
+                      accent: const Color(0xFF7A6E9B),
+                      done: store.isDone('buddhi'),
+                      onTap: () => Navigator.of(context).push(MaterialPageRoute(
+                          builder: (_) => GarbhBuddhiScreen(
+                                controller: pregnancy,
+                                daily: true,
+                                onOpenPuzzle: (ctx, puzzle) =>
+                                    Navigator.of(ctx).push(MaterialPageRoute(
+                                        builder: (_) => gameForPuzzle(
+                                            puzzle, pregnancy,
+                                            markComplete: true))),
+                              ))),
+                    ),
+                    // ⚠️ ACCENT AND TAG NOW MATCH THE DAILY SCREEN. This row
+                    // carried #3F6E62 and 'Breath & grounding' against the
+                    // daily screen's #8A6D3B and 'Breath and grounding' - the
+                    // same pillar wearing two colours in one app, which is the
+                    // kind of drift that only shows up when someone puts the
+                    // two screens side by side.
                     GarbhPillarRow(
                       name: 'Kriya',
                       image:
                           'https://images.unsplash.com/photo-1485808269728-77bb07c059a8?w=200&h=200&fit=crop',
-                      tag: 'Breath & grounding',
+                      tag: 'Breath and grounding',
                       today: kriyaForDay(cd).title.en,
                       icon: Icons.spa_rounded,
-                      accent: const Color(0xFF3F6E62),
+                      accent: const Color(0xFF8A6D3B),
                       done: store.isDone('kriya'),
                       onTap: () => Navigator.of(context).push(MaterialPageRoute(
                           builder: (_) =>
@@ -798,9 +845,28 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
       case kPgActSkinConcern:
         push(bellySkinHomeScreen(controller: pregnancy), 'belly_skin');
         return;
-      case kPgActNutritionFlag:
       case kPgActNutritionMain:
         push(nutritionHomeScreen(pregnancy: pregnancy), 'nutrition');
+        return;
+      // ⚠️ THE TWO NUTRITION DOORS USED TO SHARE THIS CASE, AND THAT MADE THE
+      // SECOND ONE A LIE. "What should I eat?" and "Something has been
+      // flagged" are different questions from different people — one is
+      // planning dinner, the other was handed a number at an appointment —
+      // and both landed on the same generic nutrition home. Two doors with
+      // one destination teach her the labels do not mean anything.
+      //
+      // ⚠️ THE JOURNEY IS NOT THE ANSWER EITHER, WHICH IS WHY THIS IS NOT
+      // SIMPLY A DELETED CASE. `kPgNutritionFlag` is registered and would
+      // take over the moment this case is removed — but two of its three
+      // steps are `owed: true`, so she would arrive at promises with nothing
+      // behind them. Falling through would look like a fix and ship a worse
+      // screen.
+      //
+      // So it opens the condition tab of "Food for my stage", where
+      // `kConditionGuides` already covers gestational diabetes, anaemia and
+      // thyroid — the flags this door names in its own blurb.
+      case kPgActNutritionFlag:
+        push(const NutritionStageScreen(initialTab: 1), 'nutrition_condition');
         return;
       // Mind & Mood replaces the two placeholder mood actions, which used to
       // fall back to the reads library because no mood surface existed.

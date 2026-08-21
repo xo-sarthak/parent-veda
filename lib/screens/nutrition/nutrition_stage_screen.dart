@@ -28,7 +28,20 @@ import '../../widgets/pv_placeholders.dart';
 import '../v2/v2_palette.dart';
 
 class NutritionStageScreen extends StatefulWidget {
-  const NutritionStageScreen({super.key});
+  const NutritionStageScreen({super.key, this.initialTab = 0});
+
+  /// ⚠️ WHICH TAB TO LAND ON, AND IT EXISTS FOR ONE REAL CALLER.
+  ///
+  /// The hub has two nutrition doors: "What should I eat?" and "Something has
+  /// been flagged". They were opening the SAME screen, so a mother who tapped
+  /// the second one — because a number came up at an appointment — landed on
+  /// generic everyday nutrition and had to find the condition tab herself.
+  /// Two doors that lead to the same place teach her that the labels do not
+  /// mean anything, which is worse than one door.
+  ///
+  /// Defaulting to 0 means every existing caller is unchanged; only the door
+  /// that is ABOUT a condition passes 1.
+  final int initialTab;
 
   @override
   State<NutritionStageScreen> createState() => _NutritionStageScreenState();
@@ -36,7 +49,8 @@ class NutritionStageScreen extends StatefulWidget {
 
 class _NutritionStageScreenState extends State<NutritionStageScreen>
     with SingleTickerProviderStateMixin {
-  late final TabController _tab = TabController(length: 2, vsync: this);
+  late final TabController _tab =
+      TabController(length: 2, vsync: this, initialIndex: widget.initialTab);
 
   @override
   void dispose() {
