@@ -57,6 +57,9 @@ import '../../services/life_stage_store.dart';
 import '../../services/ttc_surfaces.dart';
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_chapter.dart';
+import '../../ttc/ttc_daily_data.dart';
+import '../../ttc/ttc_products_data.dart';
+import '../../ttc/ttc_ritual_store.dart';
 import '../../ttc/ttc_store.dart';
 import '../brackets/bracket_screen.dart';
 import '../v2/v2_block_grid.dart';
@@ -66,11 +69,18 @@ import '../v2/v3_daily.dart';
 import '../v2/v3_daily_art.dart';
 import '../v2/v3_hero_chrome.dart';
 import '../v2/v3_hero_field.dart';
+import 'ttc_chapter_screen.dart';
 import 'ttc_common.dart';
+import 'ttc_insight_screen.dart';
 import 'ttc_journey_map_screen.dart';
+import 'ttc_partner_screen.dart';
+import 'ttc_products_screen.dart';
 import 'ttc_profile_screen.dart';
+import 'ttc_ritual_screen.dart';
 import 'ttc_strings.dart';
 import 'ttc_surface_router.dart';
+import 'ttc_today_parts.dart';
+import 'ttc_transition_screen.dart';
 
 /// The four chapters' hues, on the same controlled-pastel wheel every other
 /// stage uses.
@@ -186,23 +196,62 @@ class TtcHomeV3 extends StatelessWidget {
                   const SizedBox(height: 32),
 
                   // ---- PRACTICE --------------------------------------------
+                  //
+                  // ⚠️ A LINK TO THE RITUAL IS NOT THE RITUAL, and the mistake
+                  // is already written up in `ttc_today_screen.dart`: "density
+                  // work has to know the difference between something you read
+                  // and something you use."
+                  //
+                  // V3 shipped this as one `_LinkCard` opening the ritual
+                  // screen. Same destination, so it passes a reachability
+                  // check — and it still removed the thing the card is FOR.
+                  // On V1 she can tick a part off from the home, see 2/5, and
+                  // see a streak. On V3 completing anything cost a screen.
+                  //
+                  // That is not a cosmetic difference in an A/B. Ritual
+                  // completion would have read as lower on V3 for a reason
+                  // that has nothing to do with which home she prefers, and
+                  // the toggle would have "proved" it.
                   _pad(_Head(
-                      eyebrow: hinglish ? 'Aaj' : 'Today',
-                      title: hinglish ? 'Ek chhota abhyas' : 'One small practice',
+                      eyebrow: TtcS.current().dailyRitual,
+                      title: TtcS.current().dailyRitualTitle,
                       p: p)),
                   const SizedBox(height: 12),
-                  _pad(_LinkCard(
-                    title: hinglish ? 'Aaj ka abhyas' : "Today's practice",
-                    body: hinglish
-                        ? 'Saans, thoda movement, ya bas paanch minute shaant. '
-                            'Isse kuch "hasil" nahi karna — yeh sirf aapke liye hai.'
-                        : 'Breath, a little movement, or five quiet minutes. '
-                            'Nothing to achieve here — this part is only for you.',
-                    p: p,
-                    hue: 42,
-                    mark: V3DailyMark.capsule,
-                    onTap: () => _openSurface(context, 'ttc_ritual'),
-                  )),
+                  _pad(_RitualCardV3(p: p, hinglish: hinglish, chapter: chapter)),
+                  const SizedBox(height: 32),
+
+                  // ---- TODAY ------------------------------------------------
+                  //
+                  // ⚠️ FIVE GATES V1 HAD AND V3 DID NOT. The insight, the myth,
+                  // today's nutrition, today's movement and today's pick were
+                  // all reachable from the V1 home and from nowhere on this
+                  // one. That is the V1/V3 toggle failing its own premise: it
+                  // is an A/B on how the home LOOKS, so anything only one side
+                  // can reach makes the comparison about coverage instead.
+                  //
+                  // ⚠️ A ROW GROUP, NOT FIVE CARDS, and the reason is the same
+                  // one written into `ttc_today_screen.dart`: a row is a line
+                  // you scan, a card is a small article you have to read. Five
+                  // more `_LinkCard`s here would have doubled the page's height
+                  // to carry five sentences. The insight keeps a card because
+                  // it is the one item that is genuinely an article.
+                  //
+                  // ⚠️ V1'S OWN TWO STRINGS, NOT NEW ONES. The eyebrow above
+                  // already reads "TODAY" for the practice section, and a
+                  // second "TODAY" under it read as a rendering fault. Reaching
+                  // for `todaysJourney` / `todaysJourneyTitle` fixes it and
+                  // costs nothing: they are the exact labels V1 puts over this
+                  // exact group, so the two homes now name the same block the
+                  // same way — which is what makes flipping the pill a
+                  // comparison rather than a re-orientation.
+                  _pad(_Head(
+                      eyebrow: TtcS.current().todaysJourney,
+                      title: TtcS.current().todaysJourneyTitle,
+                      p: p)),
+                  const SizedBox(height: 12),
+                  _pad(_InsightCardV3(p: p, hinglish: hinglish)),
+                  const SizedBox(height: 10),
+                  _pad(_TodayRows(p: p, hinglish: hinglish)),
                   const SizedBox(height: 32),
 
                   // ---- READING ---------------------------------------------
@@ -219,6 +268,20 @@ class TtcHomeV3 extends StatelessWidget {
                     mark: V3DailyMark.note,
                     onTap: () => _openSurface(context, 'ttc_chapter'),
                   )),
+                  const SizedBox(height: 10),
+
+                  // ⚠️ THE THREE TABS, WHICH THE CARD ABOVE CANNOT REACH.
+                  // `ttc_chapter` opens the reader at its DEFAULT tab, so V3
+                  // could reach "Me" and nothing else. V1 put Me / Us / What's
+                  // next in the hero, exactly where pregnancy puts Baby /
+                  // Mother / What's next.
+                  //
+                  // They are not in this hero because the V3 field is a
+                  // photographic surface carrying a spine chip and one large
+                  // number — three chrome circles on it is the gradient-and-
+                  // shortcut hero V3 exists to replace. Hung off the chapter
+                  // card instead, which is the thing they are shortcuts INTO.
+                  _pad(_ChapterTabs(p: p, chapter: chapter)),
                   const SizedBox(height: 32),
 
                   // ---- JOURNAL ---------------------------------------------
@@ -290,8 +353,39 @@ class TtcHomeV3 extends StatelessWidget {
                     mark: V3DailyMark.capsule,
                     onTap: () => _openSurface(context, 'ttc_prepare'),
                   )),
+                  const SizedBox(height: 26),
+
+                  // ---- THE DOOR OUT ----------------------------------------
+                  //
+                  // ⚠️ THE ONLY WAY TO LEAVE THIS STAGE, and V3 did not have
+                  // it. A positive test on the V3 home had nowhere to go: she
+                  // would have had to flip back to V1 to tell the app she is
+                  // pregnant, which is not a thing anyone would work out.
+                  //
+                  // Understated on purpose, and it keeps V1's rule: no
+                  // celebration styling, no tint block, no eyebrow. It is a
+                  // door, and it must never read as "why haven't you tested?".
+                  _pad(_TestDoor(p: p)),
+                  const SizedBox(height: 22),
+
+                  // ⚠️ EVERY TOOL CARRIES THIS AND THE BUSIEST SCREEN DID NOT
+                  // — which is backwards, because Today is where an estimate is
+                  // read fastest and questioned least. Same words as V1, in
+                  // this palette.
+                  _pad(_HomeDisclaimer(p: p)),
                 ]),
               ],
+            ),
+
+            // ---- THE DEV SWITCH --------------------------------------------
+            //
+            // TESTING-ONLY Her | Him pill, at the same coordinates `TtcPage`
+            // floats it for V1 (right 14, bottom 96) so it does not appear to
+            // move when the toggle is flipped. Remove before launch, with V1's.
+            Positioned(
+              right: 14,
+              bottom: 96,
+              child: ttcModePill(TtcS.current(), him: false),
             ),
 
             // ---- THE NAV ---------------------------------------------------
@@ -852,6 +946,576 @@ class _LinkCard extends StatelessWidget {
                   style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
             ]),
           ),
+        ]),
+      ),
+    );
+  }
+}
+
+// =============================================================================
+//  The gates V1 had and V3 did not
+// -----------------------------------------------------------------------------
+//  Everything below is a V1 home component restated in the V3 palette. None of
+//  it is new product: same data, same destinations, same words where the words
+//  were already right. The V1/V3 pill is an A/B on how the home LOOKS, and the
+//  moment one side can reach something the other cannot, the comparison stops
+//  being about that.
+//
+//  ⚠️ THE DESTINATIONS ARE SHARED, NOT COPIED. `showTtcRowSheet`,
+//  `TtcInsightScreen`, `openTtcChapter`, `openTtcProducts` and
+//  `recordPositiveTest` are the same functions V1 calls. A second set styled
+//  for V3 would be two things to keep in step, and this file already carries a
+//  comment about a `_Head` that drifted a colour by being copied once.
+// =============================================================================
+
+/// Today's insight — the one item here that is genuinely an article.
+class _InsightCardV3 extends StatelessWidget {
+  const _InsightCardV3({required this.p, required this.hinglish});
+
+  final V2Palette p;
+  final bool hinglish;
+
+  @override
+  Widget build(BuildContext context) {
+    final insight = ttcPickForToday(ttcInsights);
+    final tint = v2BlockTint(206, p);
+    return InkWell(
+      onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+        builder: (_) => TtcInsightScreen(insight: insight),
+        settings: const RouteSettings(name: 'ttc/insight'),
+      )),
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 15, 16, 15),
+        decoration: BoxDecoration(
+          color: p.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: p.line),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            // ⚠️ THE SHIPPED STRING, NOT A HAND-TYPED COPY OF IT. The literal
+            // here was 'TODAY’S INSIGHT' with a curly apostrophe while
+            // `todaysInsight` carries a straight one — visually identical,
+            // never equal, and it also meant the Hinglish half was a second
+            // translation of a string that already had one.
+            Text(TtcS.current().todaysInsight.toUpperCase(),
+                style: pvManrope(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.3,
+                    color: p.action)),
+            const Spacer(),
+            Text(TtcS.current().readSeconds(insight.readTime(hinglish)),
+                style: pvManrope(
+                    fontSize: 11, fontWeight: FontWeight.w700, color: p.ink3)),
+          ]),
+          const SizedBox(height: 9),
+          Text(insight.title(hinglish),
+              style: pvFraunces(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  height: 1.25,
+                  letterSpacing: -0.3,
+                  color: p.ink1)),
+          const SizedBox(height: 7),
+          Text(insight.body(hinglish).split('\n\n').first,
+              maxLines: 3,
+              overflow: TextOverflow.ellipsis,
+              style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
+          const SizedBox(height: 12),
+          // The one takeaway — the part meant to survive the day. Kept from V1
+          // because it is the reason this is a card and not a row.
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: tint,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Text(insight.takeaway(hinglish),
+                style: pvManrope(
+                    fontSize: 13,
+                    height: 1.45,
+                    fontWeight: FontWeight.w700,
+                    color: p.ink1)),
+          ),
+        ]),
+      ),
+    );
+  }
+}
+
+/// Today's myth, nutrition, movement and pick — four rows in one card.
+class _TodayRows extends StatelessWidget {
+  const _TodayRows({required this.p, required this.hinglish});
+
+  final V2Palette p;
+  final bool hinglish;
+
+  @override
+  Widget build(BuildContext context) {
+    final hi = hinglish;
+    final t = TtcS.current();
+    // ⚠️ THE SAME OFFSETS AS V1. `ttcPickForToday` is a deterministic
+    // day-of-year rotation, so an offset is not decoration — it is what stops
+    // the myth and the movement being drawn from the same index every day.
+    // Change one here and the two homes show different things on the same
+    // morning, which is the one thing an A/B toggle must not do.
+    final myth = ttcPickForToday(ttcMyths, offset: 3);
+    final n = ttcPickForToday(ttcNutrition, offset: 1);
+    final m = ttcPickForToday(ttcMovements, offset: 2);
+    final product = ttcPickForToday(ttcProducts, offset: 4);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: p.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: p.line),
+      ),
+      child: Column(children: [
+        _Row(
+          p: p,
+          hue: 42,
+          icon: Icons.lightbulb_outline_rounded,
+          eyebrow: t.todaysMyth,
+          title: myth.myth(hi),
+          onTap: () => showTtcRowSheet(
+            context,
+            eyebrow: t.todaysMyth,
+            title: myth.myth(hi),
+            body: [
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: ttcPanel,
+                  borderRadius: BorderRadius.circular(ttcCardRadius),
+                ),
+                child: Text(myth.truth(hi),
+                    style: ttcBody(14, color: ttcTitleInk, h: 1.65)),
+              ),
+            ],
+          ),
+        ),
+        _Row(
+          p: p,
+          hue: 104,
+          icon: Icons.restaurant_rounded,
+          eyebrow: t.todaysNutrition,
+          title: n.meal(hi),
+          onTap: () => showTtcRowSheet(
+            context,
+            eyebrow: n.nutrient(hi),
+            title: n.meal(hi),
+            body: [
+              Text(n.why(hi), style: ttcBody(14, color: ttcInk, h: 1.7)),
+              const SizedBox(height: 16),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(15),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFDF6EC),
+                  borderRadius: BorderRadius.circular(ttcCardRadius),
+                ),
+                child: Text(n.indian(hi),
+                    style: ttcBody(13.5, color: ttcBrown, h: 1.6)),
+              ),
+            ],
+          ),
+        ),
+        _Row(
+          p: p,
+          hue: 160,
+          icon: Icons.directions_walk_rounded,
+          eyebrow: t.todaysMovement,
+          title: m.title(hi),
+          meta: m.minutes > 0 ? t.minutes(m.minutes) : null,
+          onTap: () => showTtcRowSheet(
+            context,
+            eyebrow: t.todaysMovement,
+            title: m.title(hi),
+            body: [
+              Text(m.body(hi), style: ttcBody(14, color: ttcInk, h: 1.7)),
+            ],
+          ),
+        ),
+        _Row(
+          p: p,
+          hue: 344,
+          icon: Icons.shopping_bag_outlined,
+          eyebrow: t.todaysPick,
+          title: product.name(hi),
+          meta: product.priceEn,
+          last: true,
+          onTap: () => openTtcProducts(context),
+        ),
+      ]),
+    );
+  }
+}
+
+class _Row extends StatelessWidget {
+  const _Row({
+    required this.p,
+    required this.hue,
+    required this.icon,
+    required this.eyebrow,
+    required this.title,
+    required this.onTap,
+    this.meta,
+    this.last = false,
+  });
+
+  final V2Palette p;
+  final double hue;
+
+  // ⚠️ A LINE ICON, NOT A `V3DailyMark`. The five marks are deliberately
+  // abstract — they are wallpaper for a section, and on a card the size of the
+  // journal's they read as texture. At 21px in a row they stop being abstract
+  // and start being WRONG: `capsule` is a pill beside a plate of food and
+  // `photo` is a picture frame beside a supplement. V3's hub and journey rows
+  // already use line icons for the same reason.
+  final IconData icon;
+  final String eyebrow;
+  final String title;
+  final String? meta;
+  final bool last;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final tint = v2BlockTint(hue, p);
+    return InkWell(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(14, 13, 14, 13),
+        decoration: BoxDecoration(
+          border: last ? null : Border(bottom: BorderSide(color: p.line)),
+        ),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          Container(
+            width: 34,
+            height: 34,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: tint,
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: Icon(icon,
+                size: 18,
+                color: HSLColor.fromColor(tint)
+                    .withSaturation(0.46)
+                    .withLightness(0.42)
+                    .toColor()),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(eyebrow.toUpperCase(),
+                  style: pvManrope(
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.1,
+                      color: p.ink3)),
+              const SizedBox(height: 3),
+              Text(title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvFraunces(
+                      fontSize: 15.5,
+                      fontWeight: FontWeight.w600,
+                      height: 1.25,
+                      letterSpacing: -0.2,
+                      color: p.ink1)),
+            ]),
+          ),
+          if (meta != null && meta!.isNotEmpty) ...[
+            const SizedBox(width: 10),
+            Text(meta!,
+                style: pvManrope(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w700,
+                    color: p.ink3)),
+          ],
+          const SizedBox(width: 6),
+          Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
+        ]),
+      ),
+    );
+  }
+}
+
+/// Me · Us · What's next — the chapter reader's three tabs, as shortcuts.
+class _ChapterTabs extends StatelessWidget {
+  const _ChapterTabs({required this.p, required this.chapter});
+
+  final V2Palette p;
+  final TtcChapter chapter;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = TtcS.current();
+    Widget chip(String label, IconData icon, TtcChapterTab tab) => Expanded(
+          child: InkWell(
+            onTap: () => openTtcChapter(context, chapter, tab: tab),
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              padding: const EdgeInsets.symmetric(vertical: 11),
+              decoration: BoxDecoration(
+                color: p.surface,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: p.line),
+              ),
+              child: Column(children: [
+                Icon(icon, size: 18, color: p.action),
+                const SizedBox(height: 6),
+                Text(label,
+                    style: pvManrope(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w700,
+                        color: p.ink2)),
+              ]),
+            ),
+          ),
+        );
+
+    return Row(children: [
+      chip(t.shortcutMe, Icons.self_improvement_rounded, TtcChapterTab.me),
+      const SizedBox(width: 9),
+      chip(t.shortcutUs, Icons.favorite_border_rounded, TtcChapterTab.us),
+      const SizedBox(width: 9),
+      chip(t.shortcutNext, Icons.event_available_outlined, TtcChapterTab.next),
+    ]);
+  }
+}
+
+/// The door out of the stage. Never a prompt to test.
+class _TestDoor extends StatelessWidget {
+  const _TestDoor({required this.p});
+
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = TtcS.current();
+    return InkWell(
+      onTap: () => recordPositiveTest(context),
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          // No tint block and no fill — see the section comment. The border
+          // alone is what makes it a door rather than an offer.
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: p.line),
+        ),
+        child: Row(children: [
+          Icon(Icons.auto_awesome_outlined, size: 18, color: p.ink3),
+          const SizedBox(width: 12),
+          Expanded(
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(t.transitionRecord,
+                  style: pvManrope(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w700,
+                      color: p.ink1)),
+              const SizedBox(height: 2),
+              Text(t.transitionRecordBody,
+                  style:
+                      pvManrope(fontSize: 11.5, height: 1.45, color: p.ink3)),
+            ]),
+          ),
+        ]),
+      ),
+    );
+  }
+}
+
+/// The estimates disclaimer, in this palette.
+class _HomeDisclaimer extends StatelessWidget {
+  const _HomeDisclaimer({required this.p});
+
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) =>
+      Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Icon(Icons.info_outline_rounded, size: 15, color: p.ink3),
+        const SizedBox(width: 9),
+        Expanded(
+          child: Text(TtcS.current().estimatesDisclaimer,
+              style: pvManrope(fontSize: 11.5, height: 1.5, color: p.ink3)),
+        ),
+      ]);
+}
+
+/// The daily ritual — done from here, not merely linked to.
+///
+/// ⚠️ TWO TAP TARGETS PER ROW, AND THAT IS THE DESIGN. The tick completes; the
+/// row opens the ritual at that part. Completing must never require reading
+/// first — a woman who already knows what "today's breath" means should not
+/// have to open a page to say she did it. V1 makes the same split for the same
+/// reason.
+///
+/// ⚠️ ITS OWN `ListenableBuilder`. The page's top-level builder listens to
+/// `TtcStore` and `TtcLang` only, so a tick would have changed the store and
+/// repainted nothing. Scoping the listener to this card also means ticking one
+/// item does not rebuild the doors, the reads and the journal.
+class _RitualCardV3 extends StatelessWidget {
+  const _RitualCardV3(
+      {required this.p, required this.hinglish, required this.chapter});
+
+  final V2Palette p;
+  final bool hinglish;
+  final TtcChapter chapter;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = TtcS.current();
+    final items = ttcRituals[chapter] ?? const <TtcRitualItem>[];
+
+    return ListenableBuilder(
+      listenable: TtcRitualStore.instance,
+      builder: (context, _) {
+        final store = TtcRitualStore.instance;
+        final done = store.completedToday();
+        final streak = store.streak();
+
+        return Container(
+          padding: const EdgeInsets.fromLTRB(16, 15, 16, 6),
+          decoration: BoxDecoration(
+            color: p.surface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: p.line),
+          ),
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Expanded(
+                child: Text(t.dailyRitualBody,
+                    style:
+                        pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
+              ),
+              const SizedBox(width: 12),
+              Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                Text('$done/${store.total}',
+                    style: pvFraunces(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: -0.4,
+                        color: p.action)),
+                // ⚠️ A STREAK WITH NOTHING ATTACHED TO IT. No colour, no
+                // warning, no "you lost it" state anywhere in the product —
+                // this is the stage built to remove pressure, and a streak
+                // that can be broken is the commonest way an app puts it back.
+                if (streak > 0)
+                  Text(t.dayStreak(streak),
+                      style: pvManrope(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w700,
+                          color: p.ink3)),
+              ]),
+            ]),
+            const SizedBox(height: 14),
+            for (var i = 0; i < items.length; i++)
+              _RitualRow(
+                p: p,
+                hinglish: hinglish,
+                item: items[i],
+                done: store.isDone(items[i].part),
+                last: i == items.length - 1,
+                onToggle: () => TtcRitualStore.instance.toggle(items[i].part),
+                onOpen: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    builder: (_) =>
+                        TtcRitualScreen(chapter: chapter, focus: items[i].part),
+                    settings: const RouteSettings(name: 'ttc/ritual'),
+                  ),
+                ),
+              ),
+          ]),
+        );
+      },
+    );
+  }
+}
+
+class _RitualRow extends StatelessWidget {
+  const _RitualRow({
+    required this.p,
+    required this.hinglish,
+    required this.item,
+    required this.done,
+    required this.last,
+    required this.onToggle,
+    required this.onOpen,
+  });
+
+  final V2Palette p;
+  final bool hinglish;
+  final TtcRitualItem item;
+  final bool done;
+  final bool last;
+  final VoidCallback onToggle;
+  final VoidCallback onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onOpen,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.only(bottom: 12),
+        margin: EdgeInsets.only(bottom: last ? 0 : 12),
+        decoration: BoxDecoration(
+          border: last ? null : Border(bottom: BorderSide(color: p.line)),
+        ),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          GestureDetector(
+            onTap: onToggle,
+            behavior: HitTestBehavior.opaque,
+            child: Padding(
+              // Generous around a 22px circle: this is the smallest target on
+              // the home and the one most often tapped one-handed.
+              padding: const EdgeInsets.only(right: 12, top: 1, bottom: 4),
+              child: Container(
+                width: 22,
+                height: 22,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: done ? p.action : Colors.transparent,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                      color: done ? p.action : p.line, width: 1.6),
+                ),
+                child: done
+                    ? const Icon(Icons.check_rounded,
+                        size: 13, color: Colors.white)
+                    : null,
+              ),
+            ),
+          ),
+          Expanded(
+            child:
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(item.part.title(hinglish),
+                  style: pvManrope(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w700,
+                      color: p.ink1)),
+              const SizedBox(height: 2),
+              Text(item.text(hinglish),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style:
+                      pvManrope(fontSize: 12.5, height: 1.45, color: p.ink2)),
+            ]),
+          ),
+          const SizedBox(width: 8),
+          Icon(Icons.chevron_right_rounded, size: 18, color: p.ink3),
         ]),
       ),
     );
