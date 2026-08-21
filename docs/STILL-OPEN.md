@@ -3,7 +3,7 @@
 Everything parked, undecided, or half-built — in one place, so nothing gets
 quietly dropped between sessions.
 
-**Last updated:** 2026-07-29
+**Last updated:** 2026-08-21
 
 ## How to use this file
 
@@ -2042,6 +2042,137 @@ question that routes to the crisis screen. Export is written and ready at
 The whole library — `lib/data/conditions_data.dart` — was written from research,
 not reviewed. `callNow` lists are the highest-stakes part: they decide what makes
 a mother pick up the phone today, and both directions are harmful.
+
+
+---
+
+# 15. TTC V3 — the level-map pass
+
+Everything left after building the seven doors against
+`parentveda-level-map-checklist.xlsx` and then walking the built stage on a
+phone. Nothing here blocks a build; three of the five are content or production
+rather than code.
+
+## 15.1 The six-day window is explained in two places
+
+The fact appears in seven files. That is not the problem — most of them are a
+single restatement inside something else, and a daily card saying "the window is
+roughly six days" is not a second source of truth.
+
+Two of them **explain** it, at length, independently:
+
+| where | reached by |
+|---|---|
+| `ttc_reads_data.dart:712, 734` | Fertile window → Improve my chances → "Timing, and the advice worth putting down" |
+| `ttc_chapter_data.dart:315, 336` | home hero → Me — **only** while the engine has her in `tryingTogether` |
+
+Both also put down the lie-still-afterwards myth, separately.
+
+The duplication is deliberate. The chapter reader is a *sequence*, not an
+addressable surface: `ttc_chapter` opens whichever chapter she is currently in,
+so a woman in the waiting days who taps the fertile-window door and wants the
+myths gets a different chapter entirely. Writing the article was the only way to
+make the content reachable from the door that promises it. The content was never
+missing — it was unreachable, which is the failure this repo keeps a gate for.
+
+The cost is real: two texts can drift, and the clinical review that covered the
+chapter did not cover the article. The fix is not to delete either. It is to
+make chapter sections addressable (`ttc_chapter/<id>`) so a door opens one
+directly, then decide per topic which survives. The chapter reader is the most
+clinically reviewed surface in the stage and was not going to be rewritten in
+the middle of a content pass.
+
+Until then, **edit both or neither.** `grep -rn "six day" lib/ttc/` finds every
+copy; the two above are the ones that matter.
+
+The full reasoning is also in a comment at `ttc_reads_data.dart:454`, next to
+the article it produced.
+
+## 15.2 Video slot ids collide across journeys
+
+`PvVideoSlot` ids were unique per read, not per journey step, so two steps in
+different journeys could resolve the same slot and show the same film under two
+different headings. Partly fixed: `JourneyElement` now carries an explicit
+`videoSlot`, which makes the mapping stated rather than derived.
+
+What is still open is the other half — nothing asserts that a slot is claimed by
+at most one step. `test/journey_test.dart` now has the shape to copy: the
+"two cards on one screen never lead to the same place" pair does exactly this
+for surfaces. It wants the same check for slots, and it is worth doing before
+any real film is cut, because after that the collision is a re-shoot rather than
+a config edit.
+
+## 15.3 Fifteen video slots have no film — PRODUCTION, not code
+
+Every slot in `lib/ttc/ttc_videos_data.dart` has `url: null`, which is the one
+flag the reader and the journey renderer read. Chapters and takeaways are
+already written for each, deliberately: they were written *before* filming so
+they brief the shoot rather than describe it afterwards.
+
+The placeholder is a real designed state, not an empty box — it says COMING
+SOON, shows the runtime, and names what the film will cover. So this is
+plug-and-play: drop a URL in, the slot goes live, no other change.
+
+Blocked on hosting. Self-hosted MP4/HLS per the Watch engine decision — Supabase
+Storage now, Bunny or Cloudflare later. **YouTube is dead and is not to be
+re-proposed.**
+
+## 15.4 Eight products have no buy path — PRODUCTION, not code
+
+The product cards in the TTC journeys research honestly and then stop. The
+affiliate link is the missing half, and it is a commercial decision (which
+network, what disclosure line) before it is a code one. `lib/brand/` already
+holds the archetypes this has to be expressed through; see §13.0 for the
+attribution rule it inherits.
+
+## 15.5 The new TTC surfaces are local-only
+
+`TtcPcosCheckStore`, `TtcPrecheckStore`, `TtcBmiStore`, `TtcFertilityHelpStore`
+and `TtcVaccineStore` all persist to `shared_preferences` and none of them
+writes to Supabase. Reinstall and the answers are gone.
+
+This is the same agreed position as §9.7 — TTC takes no new schema while the UI
+is still moving — and it is stated here rather than discovered later. Two of
+them matter more than the others when it does get done: the PCOS check and the
+readiness self-check produce a **doctor summary** she may well be relying on
+having, and losing that on a new phone is worse than losing a BMI number.
+
+Closing it is the `CloudSyncedStore` pattern already used elsewhere, one table
+per store or one `user_state` key each. Decide which when TTC schema opens.
+
+## 15.6 The South Asian obesity threshold is not settled
+
+`kBmiObeseCutSouthAsian = 25.0` in `lib/ttc/ttc_bmi_rules.dart`, per WHO
+Asia-Pacific, ICMR and NICE 2023. More recent ICMR material gives **27.5**. The
+two disagree by enough to move a real woman between categories, and this app
+tells her which one she is in.
+
+It is flagged in `kBmiReviewRegister` and it needs the same named clinician
+§14.0 is waiting on. Shipping 25.0 in the meantime is the conservative choice —
+it puts more women into a "worth a conversation" band than 27.5 would, and the
+copy in that band is explicitly a conversation-starter rather than a verdict.
+
+**Do not change the number without changing the register entry with it.**
+
+## 15.7 The FAB still covers body text mid-scroll
+
+Distinct from §9.5, which is about the *end* of a list. `kAskFabReserve` fixes
+that case and TTC uses it everywhere. What it cannot fix is a long prose screen
+where, at some scroll positions, the 56px circle simply sits on top of a line of
+text — and a reader is nothing but long prose.
+
+Padding cannot help: the FAB is not in layout, and on a short page there is
+nothing to push down at all. That last case bit the see-a-specialist screen,
+where it covered three lines of the safety disclaimer; the local fix was to move
+the disclaimer above the buttons, which was the right change for its own reasons.
+
+The real answers are a product call, not a bug fix: hide the FAB while scrolling
+down and bring it back on scroll-up, or suppress it by route name on reading
+surfaces the way `kPremiereRoute` and `kCallRoute` already are. The second is
+cheaper and worse — a reading screen is exactly where a question occurs to her.
+
+Not urgent. Written down because it will be re-noticed on every device walk
+otherwise.
 
 ---
 
