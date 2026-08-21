@@ -456,6 +456,19 @@ class ScanDetailScreen extends StatelessWidget {
               // jobs: this one is practical and read before the day; that one
               // is the parameter-by-parameter reference, read afterwards with
               // the paper in her hand.
+              //
+              // ⚠️ THIS ROW USED TO CARRY THE SAME SENTENCE AS THE CARD ABOVE —
+              // "Every reading on the report, explained" — and it was not
+              // merely a duplicate. It was the WRONG one: those words describe
+              // the parameter table, which is what the OTHER link opens. This
+              // row opens the full page with what-it-is, why, when, preparation
+              // and procedure expanded, and the parameters collapsed.
+              //
+              // ⚠️ SO A MOTHER TAPPING BOTH GOT THE SAME PROMISE AND TWO
+              // DIFFERENT PAGES, and the one that matched the promise was the
+              // one she had already scrolled past. The fix is not
+              // disambiguation — it is a label that is true, which turns out to
+              // read as a different offer anyway, because it is one.
               Material(
                 color: p.surfaceAlt,
                 borderRadius: BorderRadius.circular(16),
@@ -471,8 +484,8 @@ class ScanDetailScreen extends StatelessWidget {
                       Expanded(
                         child: Text(
                             const LocalizedText(
-                                    en: 'Every reading on the report, explained',
-                                    hi: 'रिपोर्ट की हर reading, समझाई हुई')
+                                    en: 'What this scan is, and how to prepare',
+                                    hi: 'यह scan क्या है, और तैयारी कैसे करें')
                                 .of(lang),
                             style: pvManrope(
                                 fontSize: 13.5,

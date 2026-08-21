@@ -29,6 +29,7 @@ import 'package:parentveda/data/conditions_data.dart';
 import 'package:parentveda/data/prepare_data.dart';
 import 'package:parentveda/screens/prepare/consultations_screen.dart';
 import 'package:parentveda/data/hubs/pregnancy_hubs.dart';
+import 'package:parentveda/data/journeys/journey_registry.dart';
 import 'package:parentveda/data/journeys/pregnancy_journeys.dart';
 import 'package:parentveda/screens/conditions/condition_detail_screen.dart';
 import 'package:parentveda/screens/conditions/conditions_home_screen.dart';
@@ -46,6 +47,7 @@ Future<void> _pump(WidgetTester t, Widget w) async {
 }
 
 void main() {
+  _conditionLibraryHasADoor();
   _widenedSignals();
   TestWidgetsFlutterBinding.ensureInitialized();
   SharedPreferences.setMockInitialValues({});
@@ -521,4 +523,64 @@ void _widenedSignals() {
     }
   });
 
+}
+
+// =============================================================================
+//  The condition library has a door — the wiring gate, as an assertion
+// -----------------------------------------------------------------------------
+//  ⚠️ THE DEFECT: `conditionsHomeScreen(...)` had ZERO call sites in the app.
+//  Twenty-seven condition pages, a search, grouped shelves, a two-way "add to
+//  my journey", a consult offer at the foot of twenty-five of them, and a full
+//  test file — reachable by nothing.
+//
+//  ⚠️ WHY EVERY EXISTING TEST PASSED. They construct `ConditionDetailScreen`
+//  and `ConditionsHomeScreen` directly, which is the right way to test what a
+//  screen renders and says nothing at all about whether she can get to it. That
+//  gap is exactly the wiring gate CLAUDE.md names, and it is why "test counts
+//  are not evidence that a feature is reachable" is written there.
+//
+//  ⚠️ THE MECHANISM IS WORTH KEEPING. `_hubAction` calls `journeyFor(action)`
+//  BEFORE its switch and returns early if a journey exists. So registering a
+//  journey in `kPregnancyJourneys` silently overrides the switch — from another
+//  file, with nothing at the switch to indicate it. The superseded journey was
+//  never unregistered when the library replaced it, so the switch-case for this
+//  door had never once run.
+//
+//  These assert the two halves that must stay true together: the door is not
+//  claimed by a journey, and the destination it falls through to exists.
+// =============================================================================
+
+void _conditionLibraryHasADoor() {
+  test('no journey intercepts the condition-library door', () {
+    // ⚠️ THE ASSERTION THAT ACTUALLY CATCHES THE BUG. If someone re-registers
+    // `kPgUnderstandCondition`, the library goes dark again and nothing else in
+    // the suite notices - the journey renders perfectly well.
+    expect(journeyFor(kPgActConditionLibrary), isNull,
+        reason: 'a registered journey wins over the switch, so the library '
+            'would be unreachable again');
+  });
+
+  test('the superseded journey is out of the registry, not deleted', () {
+    // Comment out, never delete: the config still compiles and can be restored.
+    // What must not happen is it being restored INTO the registry by accident.
+    for (final j in kPregnancyJourneys.values) {
+      expect(j.doorId, isNot(kPgActConditionLibrary), reason: j.title.en);
+    }
+  });
+
+  test('the hub door still points at the library action', () {
+    // The other half. If the door's action were renamed, the test above would
+    // keep passing while the door led nowhere.
+    final doors = kPgComplications.needs.map((n) => n.action).toList();
+    expect(doors, contains(kPgActConditionLibrary));
+  });
+
+  test('the library screen builds from its documented entry point', () {
+    // `conditionsHomeScreen(pregnancy:)` is the form the integrator note names,
+    // and the form the dispatch now calls. A zero-argument variant existed and
+    // is the wrong one.
+    final c = PregnancyController();
+    addTearDown(c.dispose);
+    expect(conditionsHomeScreen(pregnancy: c), isA<ConditionsHomeScreen>());
+  });
 }

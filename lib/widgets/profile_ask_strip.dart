@@ -236,6 +236,17 @@ class _ProfileAskStripState extends State<ProfileAskStrip> {
 //  swapping the two will not compile. Two adjacent Strings would have.
 
 /// Conditions — for the symptom / weight / reports screens.
+///
+/// ⚠️ NO CALLERS AS OF 2026-08-21, AND THAT IS DELIBERATE RATHER THAN ROT. All
+/// three call sites are commented out per the review: "we don't want this 'Has
+/// your doctor mentioned any of the following' section at all." The builder
+/// stays so restoring any of them is an uncomment.
+///
+/// ⚠️ SHE CAN STILL DECLARE HER CONDITIONS — this was the thing to check before
+/// switching it off, because a strip is not the only door to the field it
+/// fills. `pregnancy_profile_screen.dart` still shows the same chips, and a
+/// condition page's "Add to my journey" writes the same signal. What is gone is
+/// being ASKED mid-screen, not the ability to answer.
 ProfileAskStrip pregHealthStrip(AppLanguage lang, String surface) =>
     ProfileAskStrip(
       lang: lang,

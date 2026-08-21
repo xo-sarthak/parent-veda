@@ -674,9 +674,42 @@ final JourneyConfig kPgNutritionFlag = JourneyConfig(
 );
 
 /// Every pregnancy journey, keyed by the door that opens it.
+///
+/// ⚠️ REGISTRATION IS NAVIGATION HERE, AND THAT IS WHY THIS LIST IS DANGEROUS.
+/// `_hubAction` calls `journeyFor(action)` BEFORE its switch, so a journey
+/// listed here silently wins over whatever the switch would have done. Adding a
+/// door to this list is not "making a journey available" — it is overriding the
+/// destination, from a different file, with nothing at the switch to say so.
 final Map<String, JourneyConfig> kPregnancyJourneys = {
   for (final j in [
-    kPgUnderstandCondition,
+    // ⚠️ `kPgUnderstandCondition` IS UNREGISTERED — 2026-08-21. This is the
+    // fix for a wiring gate that had made an entire section of the app
+    // unreachable, and the mechanism is worth reading twice.
+    //
+    // `ConditionsHomeScreen` and its 27 condition pages superseded this
+    // journey. The comment above the journey said so, and said exactly what to
+    // do: "The integrator must change that dispatch to open
+    // conditionsHomeScreen(pregnancy: pregnancy)". Nobody did. The journey
+    // stayed in this list, `journeyFor` kept winning, and the switch-case for
+    // `kPgActConditionLibrary` never ran.
+    //
+    // ⚠️ SO THE LIBRARY HAD NO DOOR. `conditionsHomeScreen(...)` had ZERO call
+    // sites anywhere in the app — twenty-seven pages, a search, grouped
+    // shelves, a two-way "add to my journey", a consult offer, and a full test
+    // file, reachable by nothing. Every test passed, because tests construct
+    // the screen directly; the wiring gate CLAUDE.md names is precisely the gap
+    // between "this works" and "she can get here".
+    //
+    // ⚠️ AND THE COMMENT DESCRIBING THE FIX IS WHY IT SURVIVED. It read as a
+    // handover somebody was tracking. That is now the fourth time in this
+    // review a note about pending work functioned as reassurance instead of a
+    // warning. A note like that should name what is broken until it lands.
+    //
+    // Kept in the file and out of this list, per comment-out-never-delete: the
+    // journey still compiles and restoring it is one uncomment — which would
+    // also, note, un-fix this.
+    //
+    // kPgUnderstandCondition,
     kPgSkinConcern,
     kPgTrackReadings,
     kPgBirthPrep,

@@ -868,10 +868,20 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
       case kPgActTrackReadings:
         _openSurfaceScreen(context, 'weight');
 
-      // The condition library is the tests/scans/reports reference, which
-      // already carries conditions alongside scans.
+      // ⚠️ THE CONDITION LIBRARY, AND THIS LINE NEVER RAN UNTIL 2026-08-21.
+      //
+      // It used to send her to the tests/scans reference — correct when written,
+      // superseded when `ConditionsHomeScreen` was built — and it was moot
+      // either way, because `journeyFor(action)` above returned a registered
+      // journey for this door and returned early. Both the old destination and
+      // the new one were unreachable; the journey won.
+      //
+      // ⚠️ A ROUTE NAME OF ITS OWN. 'conditions' rather than 'tests_scans',
+      // because route names are load-bearing in this app (CLAUDE.md) and a
+      // screen filing itself under another screen's name is how a detector
+      // starts answering the wrong question about which stage is on screen.
       case kPgActConditionLibrary:
-        _openSurfaceScreen(context, 'tests_scans');
+        push(conditionsHomeScreen(pregnancy: pregnancy), 'conditions');
 
       // "Prepare for birth" = the birth-prep reading plus the bag tool; the
       // birthing classes are its closing offer, not its entry.

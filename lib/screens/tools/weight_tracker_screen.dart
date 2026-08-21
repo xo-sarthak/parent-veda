@@ -17,7 +17,8 @@ import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/tools_store.dart';
 import '../../theme/app_theme.dart';
-import '../../widgets/profile_ask_strip.dart';
+// Kept for revert alongside the commented-out `pregHealthStrip` call below.
+// import '../../widgets/profile_ask_strip.dart';
 
 class WeightTrackerScreen extends StatefulWidget {
   const WeightTrackerScreen({super.key, required this.controller});
@@ -282,7 +283,27 @@ class _Dashboard extends StatelessWidget {
         // read, so this is a relevant moment to ask. It sits on the
         // DASHBOARD rather than the one-time setup flow - a strip that
         // asks once, ever, is wasted on a screen she visits once.
-        pregHealthStrip(controller.language, 'weight_tracker'),
+        // ⚠️ OFF, KEPT FOR REVERT — the review said "at all".
+        //
+        // Full quote: "In Symptoms it was showing 'Has your doctor mentioned
+        // any of the following' — when I selected no, it stopped showing. We
+        // don't want this 'Has your doctor mentioned any of the following'
+        // section at all."
+        //
+        // ⚠️ IT WAS FIRST READ AS "REMOVE IT FROM SYMPTOMS", AND THAT READING
+        // WOULD HAVE CHANGED NOTHING SHE EXPERIENCES. `ProfileAskStrip` is
+        // ONE-SHOT APP-WIDE: once she answers or dismisses it anywhere, it
+        // never appears again. So a mother who opened the weight tracker
+        // before Symptoms would still meet the question, and the only effect
+        // of a partial removal is which screen she happens to meet it on.
+        //
+        // ⚠️ THE GENERAL LESSON: **a one-shot prompt has no per-screen
+        // meaning.** Reasoning about it screen by screen — "it is relevant
+        // here, less so there" — quietly assumes she sees it on each, and
+        // she does not. Deciding where a global thing belongs is deciding
+        // whether it exists.
+        //
+        // pregHealthStrip(controller.language, 'weight_tracker'),
         // Hero: current weight (or empty state).
         Container(
           padding: const EdgeInsets.all(22),
