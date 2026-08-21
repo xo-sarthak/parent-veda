@@ -197,9 +197,15 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
     final video = v2VideoFor(week);
     final products = v2ProductsFor(week, activeDay);
 
-    final insight = (day?.grow.remember.en.trim().isNotEmpty ?? false)
-        ? day!.grow.remember.en
-        : (day?.grow.insight.en ?? '');
+    // ⚠️ `.now` ON BOTH THE TEST AND THE VALUE, AND THE TEST IS THE SUBTLE
+    // HALF. This picked `remember` when its ENGLISH was non-empty and then
+    // displayed it — so on a day where `remember` is written in English but
+    // not yet in Hindi, a Hindi reader got the branch chosen for her by a
+    // language she is not reading, and then got it in English. Checking one
+    // language and rendering another is how a fallback stops falling back.
+    final remember = day?.grow.remember.now.trim() ?? '';
+    final insight =
+        remember.isNotEmpty ? remember : (day?.grow.insight.now ?? '');
 
     final name = pregnancy.motherName.trim();
 
@@ -249,7 +255,9 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
                 subtitle: _dayLine(week, activeDay),
                 week: week,
                 day: activeDay,
-                learning: day.babyLearning.en,
+                // ⚠️ DISPLAY, so `.now`. This lands in a `Text(learning)` in
+                  // v3_sections.dart — rendered prose, not an identity.
+                  learning: day.babyLearning.now,
                 p: p,
                 onTap: () => _open(context, 'weekly_snapshot'),
                 // ⚠️ A PUSH, NOT A TAB SWITCH. `_open` routes through
