@@ -24,6 +24,12 @@ class _FoodMealPlanScreenState extends State<FoodMealPlanScreen> {
   int _days = 1; // 1 = Today, 3 = 3-Day, 7 = Weekly
   int _regen = 0;
 
+  /// null = All. Not persisted on purpose: this is a browsing filter for one
+  /// visit, while the household's veg-only switch in `FoodStore` is the
+  /// setting that should survive. Two persisted diet settings would be able to
+  /// disagree with each other.
+  String? _diet;
+
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
   void _push(Widget s) => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => s));
 
@@ -46,6 +52,8 @@ class _FoodMealPlanScreenState extends State<FoodMealPlanScreen> {
 
             const SizedBox(height: 18),
             _pad(_rangeToggle()),
+            const SizedBox(height: 14),
+            _pad(_dietRow()),
             const SizedBox(height: 16),
             _pad(_regenButton()),
 
@@ -61,6 +69,50 @@ class _FoodMealPlanScreenState extends State<FoodMealPlanScreen> {
       ),
     );
   }
+
+  /// ⚠️ A SCROLLING ROW, NOT A SEGMENTED CONTROL. Five options at 390dp
+  /// inside a pill would give each about 68dp — "Non-veg" does not fit, and
+  /// the range toggle right above it is a segmented control, so a second one
+  /// would read as the same kind of choice. These are chips, which is what the
+  /// rest of the food module uses for filters.
+  Widget _dietRow() => SizedBox(
+        height: 34,
+        child: ListView(
+          scrollDirection: Axis.horizontal,
+          padding: EdgeInsets.zero,
+          children: [
+            for (final (label, value) in const [
+              ('All', null),
+              ('Veg', 'veg'),
+              ('Egg', 'egg'),
+              ('Non-veg', 'nonveg'),
+              ('Vegan', 'vegan'),
+            ]) ...[
+              GestureDetector(
+                onTap: () => setState(() => _diet = value),
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  margin: const EdgeInsets.only(right: 8),
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: _diet == value ? ppPurple : Colors.white,
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(
+                        color: _diet == value ? ppPurple : ppHair),
+                  ),
+                  // The label follows the ground — see the sleep-timer fix in
+                  // pp_sounds_screen.dart for the same bug shipped once.
+                  child: Text(label,
+                      style: ppBody(12.5,
+                          color: _diet == value ? Colors.white : ppInk,
+                          w: FontWeight.w700)),
+                ),
+              ),
+            ],
+          ],
+        ),
+      );
 
   Widget _rangeToggle() => Container(
         padding: const EdgeInsets.all(4),
@@ -114,7 +166,7 @@ class _FoodMealPlanScreenState extends State<FoodMealPlanScreen> {
       );
 
   Widget _dayCard(int d) {
-    final plan = planForDay(d + _regen * 7);
+    final plan = planForDay(d + _regen * 7, diet: _diet);
     return Container(
       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(18), border: Border.all(color: ppHair)),
       clipBehavior: Clip.antiAlias,

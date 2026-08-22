@@ -74,7 +74,21 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('Development journey'), findsOneWidget);
-    expect(find.text('Emerging now'), findsOneWidget);
+    // ⚠️ `findsWidgets`, NOT `findsOneWidget`, AND THE REASON IS A LESSON
+    // ABOUT LAZY LISTS RATHER THAN A LOOSENED ASSERTION.
+    //
+    // "Emerging now" has ALWAYS appeared twice on this screen: once as a
+    // summary line in the snapshot hero, once as the section heading. This
+    // used to pass because the heading sat below the fold, and a `ListView`
+    // does not build children it has not scrolled to — so the finder saw one
+    // widget because the other did not exist yet.
+    //
+    // The parenting feedback moved the emerging cards to the top of the page,
+    // so the heading is now built on first frame and the count is two. The
+    // screen did not get worse; the test was reading a viewport artefact as a
+    // fact about the widget tree. Any `findsOneWidget` over a scrollable is
+    // making the same bet.
+    expect(find.text('Emerging now'), findsWidgets);
 
     // Scroll an emerging milestone card into view and tap it to open the detail
     // sheet; confirm its "Why it matters" section renders.
@@ -84,7 +98,20 @@ void main() {
     // differently and the card can be only partly on screen when tapped.
     await tester.ensureVisible(find.text('Rolling over'));
     await tester.pumpAndSettle();
+    // ⚠️ TAPPING A CARD NOW FLIPS IT INSTEAD OF OPENING THE SHEET, which is
+    // the parenting feedback's ask: "as user clicks it flips with details
+    // about it". The detail sheet is still there, one step further in, behind
+    // "Learn more" on the back face.
+    //
+    // Written as flip-then-open rather than jumping straight to the sheet,
+    // because the two-step IS the behaviour under test. A test that reached
+    // the sheet another way would pass while the flip was broken.
     await tester.tap(find.text('Rolling over'));
+    await tester.pumpAndSettle();
+    expect(find.text('What this looks like'), findsOneWidget,
+        reason: 'the card did not turn over');
+
+    await tester.tap(find.text('Learn more').first);
     await tester.pumpAndSettle();
     expect(find.text('Why it matters'), findsOneWidget);
   });

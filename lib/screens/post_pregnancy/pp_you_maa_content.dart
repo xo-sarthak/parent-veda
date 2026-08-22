@@ -148,6 +148,16 @@ final PpArea _howAreYou = PpArea(
       format: 'ROUTE',
       bands: _allBands,
       blocks: [
+        // ⚠️ ADDED IN THE S07-S11 PASS. This area had no video at all, and
+        // the doc asks for one in every sub-section - spelled out in the
+        // early sections, then pointed at the prompt once it became
+        // repetitive.
+        PpVideoSlot(
+          title: 'When it is more than tiredness',
+          subtitle: 'A counsellor on the difference between the baby blues and something that needs help, said without alarm.',
+          minutes: '6 MIN',
+          slotId: 'you/more_than_tired',
+        ),
         PpIntro('You opened the right thing. Nothing you are about to read is '
             'going to judge you, and nothing here is going to tell you that you '
             'are a danger to your baby.'),
@@ -406,6 +416,16 @@ final PpArea _yourBody = PpArea(
       format: 'FLAGGED CALLOUT',
       bands: _allBands,
       blocks: [
+        // ⚠️ ADDED IN THE S07-S11 PASS. This area had no video at all, and
+        // the doc asks for one in every sub-section - spelled out in the
+        // early sections, then pointed at the prompt once it became
+        // repetitive.
+        PpVideoSlot(
+          title: 'What your body is doing, week by week',
+          subtitle: 'Bleeding, stitches, the first period, and the things nobody warned you about.',
+          minutes: '7 MIN',
+          slotId: 'you/body_recovery',
+        ),
         PpIntro('Almost everything you will feel after birth is ordinary '
             'healing. A small number of things are not, and every one of them is '
             'much easier to treat early. This page exists so you never have to '
@@ -3571,6 +3591,16 @@ const PpArea _feedingYourself = PpArea(
       format: 'ARTICLE',
       bands: _allBands,
       blocks: [
+        // ⚠️ ADDED IN THE S07-S11 PASS. This area had no video at all, and
+        // the doc asks for one in every sub-section - spelled out in the
+        // early sections, then pointed at the prompt once it became
+        // repetitive.
+        PpVideoSlot(
+          title: 'Eating when you have no hands free',
+          subtitle: 'What actually helps recovery and supply, and how to eat it one-handed.',
+          minutes: '5 MIN',
+          slotId: 'you/eating_postpartum',
+        ),
         PpIntro('You are healing a wound the size of a plate inside you, '
             'replacing lost blood, and if you are feeding her you are producing '
             'most of a litre of milk a day. That is a serious job and it needs '
@@ -4804,6 +4834,16 @@ const PpArea _thePeopleAroundYou = PpArea(
       format: 'ARTICLE',
       bands: _early,
       blocks: [
+        // ⚠️ ADDED IN THE S07-S11 PASS. This area had no video at all, and
+        // the doc asks for one in every sub-section - spelled out in the
+        // early sections, then pointed at the prompt once it became
+        // repetitive.
+        PpVideoSlot(
+          title: 'Visitors, and how to have fewer of them',
+          subtitle: 'The sentences that work on family without a fight.',
+          minutes: '4 MIN',
+          slotId: 'you/visitors',
+        ),
         PpIntro('A newborn in an Indian family means a stream of people at the '
             'door, and every one of them is happy for you. It is also, right '
             'now, work you are doing on top of everything else.'),
@@ -6202,6 +6242,16 @@ const PpArea _theCircle = PpArea(
       format: 'ARTICLE',
       bands: _allBands,
       blocks: [
+        // ⚠️ ADDED IN THE S07-S11 PASS. This area had no video at all, and
+        // the doc asks for one in every sub-section - spelled out in the
+        // early sections, then pointed at the prompt once it became
+        // repetitive.
+        PpVideoSlot(
+          title: 'Other mothers, at the same point',
+          subtitle: 'What the circle is, and what happens in it.',
+          minutes: '3 MIN',
+          slotId: 'you/the_circle',
+        ),
         PpIntro('A small, moderated group of mothers whose babies are roughly '
             'the age of yours. Not a forum, not a feed, and not a place anyone '
             'is selling anything.'),

@@ -28,10 +28,17 @@ class DevelopmentCheckinScreen extends StatelessWidget {
         child: AnimatedBuilder(
           animation: _s,
           builder: (context, _) {
-            final answered = kCheckIns.where((q) => _s.checkInAnswer(q.text) != null).length;
-            final yeses = kCheckIns.where((q) => _s.checkInAnswer(q.text) == true).length;
-            final notYet = kCheckIns.where((q) => _s.checkInAnswer(q.text) == false).length;
-            final allDone = answered == kCheckIns.length;
+            // ⚠️ THE QUESTIONS FOLLOW HIS AGE. They used to be one fixed list
+            // written for a four-month-old, asked of every parent — so the
+            // mother of a two-year-old was asked whether he smiles back and
+            // brings his hands together at his chest. Age comes from the
+            // profile; she is never asked for it.
+            final questions =
+                checkInsForAge(ChildProfileStore.instance.ageInMonths);
+            final answered = questions.where((q) => _s.checkInAnswer(q.text) != null).length;
+            final yeses = questions.where((q) => _s.checkInAnswer(q.text) == true).length;
+            final notYet = questions.where((q) => _s.checkInAnswer(q.text) == false).length;
+            final allDone = answered == questions.length;
             return ListView(
               padding: const EdgeInsets.only(top: 12, bottom: 40),
               children: [
@@ -44,14 +51,14 @@ class DevelopmentCheckinScreen extends StatelessWidget {
                 _pad(Text('A few soft questions - just to understand where he is. There are no right answers, no scores, and no comparing.', style: ppBody(14, h: 1.5))),
 
                 const SizedBox(height: 20),
-                _pad(Column(children: [for (final q in kCheckIns) _question(q)])),
+                _pad(Column(children: [for (final q in questions) _question(q)])),
 
                 if (allDone) ...[
                   const SizedBox(height: 8),
                   _pad(_reflection(context, yeses, notYet)),
                 ] else ...[
                   const SizedBox(height: 8),
-                  _pad(Text('${kCheckIns.length - answered} to go - answer them however feels true today.', style: ppBody(12.5, color: ppMuted))),
+                  _pad(Text('${questions.length - answered} to go - answer them however feels true today.', style: ppBody(12.5, color: ppMuted))),
                 ],
               ],
             );

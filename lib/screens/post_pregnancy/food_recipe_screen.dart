@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'article_reader_screen.dart';
 import 'food_common.dart';
 import 'food_shopping_screen.dart';
+import '../../widgets/pv_placeholders.dart';
 import 'pp_common.dart';
 import 'pp_food_data.dart';
 import 'pp_products_data.dart';
@@ -55,6 +56,23 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
             _pad(Text(ppFill(r.subtitle), style: ppBody(14, h: 1.5))),
             const SizedBox(height: 12),
             _pad(_dietServesRow()),
+            const SizedBox(height: 18),
+            // ⚠️ THE VIDEO CAME UP FROM THE FOOT OF THE PAGE. It was one row
+            // in the links list below — under the steps, the mistakes and the
+            // storage notes — which is the one place a parent standing at a
+            // hob will never scroll to. Feedback: "add video at top of all
+            // recipes".
+            //
+            // ⚠️ AND IT RENDERS FOR EVERY RECIPE, NOT ONLY THE FIVE THAT HAVE
+            // A FILE. Twenty-three of twenty-eight recipes have no
+            // `relatedVideoId`, and showing the block on five of them would
+            // make the video look like a property of those dishes rather than
+            // something the section is still filming. The placeholder carries
+            // the real 16:9 geometry and says so plainly, which is the
+            // established pattern here — a placeholder you delete to ship is a
+            // second implementation; one that is the real component with an
+            // empty input is a state.
+            _pad(_recipeVideo()),
             const SizedBox(height: 16),
             // WHY first, timings second. A parent decides whether to cook it on
             // the strength of what it does for the baby - the 15-minute block
@@ -125,6 +143,35 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
       );
 
   // ---- diet marker · serves · immunity ------------------------------------
+  /// The demonstration, at the top where a cooking parent will see it.
+  Widget _recipeVideo() {
+    final id = r.relatedVideoId;
+    if (id != null) {
+      final v = watchVideoById(id);
+      return PvVideoPlaceholder(
+        title: v.title,
+        subtitle: 'Watch it made, start to finish',
+        duration: '${(v.seconds / 60).ceil()} min',
+        hue: 104,
+        flat: true,
+        onTap: () => _push(
+            v.quick ? QuickLearnScreen(startId: v.id) : WatchPlayerScreen(video: v)),
+      );
+    }
+    // ⚠️ `slotId` IS THE WIRING, WRITTEN DOWN AT THE MOMENT THE SLOT IS
+    // CREATED rather than worked out again when the file arrives. Same
+    // convention as PpVideoSlot on the section pages.
+    return PvVideoPlaceholder(
+      title: '${r.title}, step by step',
+      subtitle: 'The texture to aim for, and the one bit that is easy to '
+          'get wrong.',
+      duration: '4 min',
+      hue: 104,
+      flat: true,
+      slotId: 'food/recipe/${r.id}',
+    );
+  }
+
   Widget _dietServesRow() => Wrap(
         spacing: 12,
         runSpacing: 8,

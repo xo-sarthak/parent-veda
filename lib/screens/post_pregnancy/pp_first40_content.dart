@@ -416,6 +416,16 @@ final PpSection kPpFirst40Section = PpSection(
           subtitle: 'Newborn danger signs, and what to do about each one.',
           format: 'FLAGGED QUICK-REFERENCE',
           blocks: [
+        // ⚠️ ADDED IN THE S07-S11 PASS. This area had no video at all, and
+        // the doc asks for one in every sub-section - spelled out in the
+        // early sections, then pointed at the prompt once it became
+        // repetitive.
+        PpVideoSlot(
+          title: 'The signs that mean go now',
+          subtitle: 'A paediatrician says them out loud, slowly, in the order you would notice them.',
+          minutes: '6 MIN',
+          slotId: 'first40/red_flags',
+        ),
             PpIntro('Almost everything a newborn does is normal, which is '
                 'exactly why the short list of things that are not deserves its '
                 'own page. Read it once while you are calm.'),
@@ -648,6 +658,16 @@ final PpSection kPpFirst40Section = PpSection(
           subtitle: 'Dry, uncovered, and nothing on it.',
           format: 'STEP-LIST',
           blocks: [
+        // ⚠️ ADDED IN THE S07-S11 PASS. This area had no video at all, and
+        // the doc asks for one in every sub-section - spelled out in the
+        // early sections, then pointed at the prompt once it became
+        // repetitive.
+        PpVideoSlot(
+          title: 'Cord care, without the fear',
+          subtitle: 'What to do, what to leave alone, and what a normal cord looks like on day four.',
+          minutes: '4 MIN',
+          slotId: 'first40/cord_care',
+        ),
             PpIntro('The cord stump looks alarming and needs almost nothing '
                 'from you. Keeping it dry and open to the air is the whole '
                 'treatment, and it works better than anything you could put on '
@@ -2126,6 +2146,16 @@ final PpSection kPpFirst40Section = PpSection(
           subtitle: 'Four things. Nothing to log, nothing to keep up with.',
           format: 'CHART-CARD',
           blocks: [
+        // ⚠️ ADDED IN THE S07-S11 PASS. This area had no video at all, and
+        // the doc asks for one in every sub-section - spelled out in the
+        // early sections, then pointed at the prompt once it became
+        // repetitive.
+        PpVideoSlot(
+          title: 'The ten-second check',
+          subtitle: 'Breathing, colour, feeding, nappies. What you are actually looking at, shown on a real newborn.',
+          minutes: '4 MIN',
+          slotId: 'first40/quick_check',
+        ),
             PpIntro('You do not need to record every feed to know he is fine. '
                 'Four quick checks a day answer almost every newborn worry, and '
                 'the rest of the day you can just hold him.'),
@@ -2725,6 +2755,16 @@ final PpSection kPpFirst40Section = PpSection(
           subtitle: 'What it can answer, and what it will hand to a doctor.',
           format: 'CARDS',
           blocks: [
+        // ⚠️ ADDED IN THE S07-S11 PASS. This area had no video at all, and
+        // the doc asks for one in every sub-section - spelled out in the
+        // early sections, then pointed at the prompt once it became
+        // repetitive.
+        PpVideoSlot(
+          title: 'What other mothers ask in the first week',
+          subtitle: 'The six questions that come up most, answered plainly.',
+          minutes: '7 MIN',
+          slotId: 'first40/common_questions',
+        ),
             PpIntro('At 3am, with a baby doing something you have never seen '
                 'before, you need an answer in your own words rather than a '
                 'search results page. Type the question as you would say it.'),
@@ -2792,6 +2832,16 @@ final PpSection kPpFirst40Section = PpSection(
               'it.',
           format: 'CARDS',
           blocks: [
+        // ⚠️ ADDED IN THE S07-S11 PASS. This area had no video at all, and
+        // the doc asks for one in every sub-section - spelled out in the
+        // early sections, then pointed at the prompt once it became
+        // repetitive.
+        PpVideoSlot(
+          title: 'What the jaapa course covers',
+          subtitle: 'A look at the whole forty days before you decide whether it is for you.',
+          minutes: '3 MIN',
+          slotId: 'first40/course_preview',
+        ),
             PpIntro('A digital jaapa: the whole first forty days taught in '
                 'order, by people who do this for a living. It exists because '
                 'most families cannot arrange a knowledgeable jaapa maid, and '
@@ -2877,6 +2927,16 @@ final PpSection kPpFirst40Section = PpSection(
           subtitle: 'A short list, and a longer list of things to skip.',
           format: 'CARDS',
           blocks: [
+        // ⚠️ ADDED IN THE S07-S11 PASS. This area had no video at all, and
+        // the doc asks for one in every sub-section - spelled out in the
+        // early sections, then pointed at the prompt once it became
+        // repetitive.
+        PpVideoSlot(
+          title: 'What you actually need in the first forty days',
+          subtitle: 'The short list, and the long list of things you were told to buy and will not use.',
+          minutes: '5 MIN',
+          slotId: 'first40/essentials',
+        ),
             PpIntro('The newborn shopping lists doing the rounds are mostly '
                 'written by people selling things. A newborn needs remarkably '
                 'little, and you need more than the lists admit.'),

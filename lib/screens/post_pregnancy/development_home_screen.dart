@@ -14,6 +14,7 @@ import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
 import 'pp_child_profile.dart';
 
 import 'development_activity_screen.dart';
+import 'development_all_activities_screen.dart';
 import 'development_area_screen.dart';
 import 'development_checkin_screen.dart';
 import 'development_common.dart';
@@ -30,7 +31,16 @@ class DevelopmentHomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final focus = todaysFocus();
-    final activities = kDevActivities.take(4).toList();
+    // ⚠️ WAS `kDevActivities.take(4)` — the first four in authored order,
+    // for every child at every age. A parent of a three-week-old and a parent
+    // of a four-year-old were shown the same four things to try. Nothing
+    // failed and nothing looked wrong; a stable list even reads as curated.
+    // The age was in `ChildProfileStore` the whole time.
+    final forAge = activitiesForAge(ChildProfileStore.instance.ageInMonths);
+    // ⚠️ FALLS BACK TO THE FULL LIST IF HIS AGE HAS NOTHING TAGGED. An empty
+    // "try together today" reads as a broken screen, and the section's rule is
+    // that a feature is never hidden — only its content changes.
+    final activities = (forAge.isEmpty ? kDevActivities : forAge).take(4).toList();
     return Scaffold(
       backgroundColor: ppBg,
       body: SafeArea(
@@ -56,9 +66,14 @@ class DevelopmentHomeScreen extends StatelessWidget {
 
             // 2 - the four windows (same as the My Child snapshot; no progress bars)
             const SizedBox(height: 30),
-            _pad(devSectionHeader('Every part of him, growing')),
+            // ⚠️ RENAMED. "Every part of him, growing" is a lovely phrase and
+            // it does not tell a reader what the four tiles below are. The
+            // feedback asked for "something which is easy to understand for
+            // anyone reading" — a heading is signage, not a line of poetry,
+            // and the poetry already lives in the paragraph above it.
+            _pad(devSectionHeader('The four ways he is growing')),
             const SizedBox(height: 4),
-            _pad(Text('Four windows into how he grows - tap any to go deeper.', style: ppBody(12.5, color: ppMuted))),
+            _pad(Text('His thinking, his body, his words, his feelings. Tap any to go deeper.', style: ppBody(12.5, color: ppMuted))),
             const SizedBox(height: 16),
             _pad(Column(children: [
               _domainCard(context, Icons.psychology_outlined, 'Brain', devAreaById('cognitive')),
@@ -77,6 +92,23 @@ class DevelopmentHomeScreen extends StatelessWidget {
             _pad(Text('Small, joyful things that support exactly where he is.', style: ppBody(12.5, color: ppMuted))),
             const SizedBox(height: 16),
             _pad(Column(children: [for (final a in activities) DevActivityCard(activity: a, onTap: () => _push(context, DevelopmentActivityScreen(activity: a)))])),
+            // ⚠️ ONLY WHEN THERE IS ACTUALLY A FIFTH. A "see all" that opens a
+            // screen holding the same four is a tap that exists because the
+            // code has a list in it — the same rule `_openArea` follows when it
+            // opens a single page directly instead of listing one row.
+            if (forAge.length > activities.length) ...[
+              const SizedBox(height: 14),
+              _pad(GestureDetector(
+                onTap: () => _push(context, const DevelopmentAllActivitiesScreen()),
+                behavior: HitTestBehavior.opaque,
+                child: Row(children: [
+                  Text('See all ${forAge.length} for his age',
+                      style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
+                  const SizedBox(width: 6),
+                  const Icon(Icons.arrow_forward_rounded, size: 15, color: ppPurple),
+                ]),
+              )),
+            ],
 
             // check-in
             const SizedBox(height: 26),

@@ -116,6 +116,12 @@ final PpSection kPpPottySection = PpSection(
     // =========================================================================
     PpArea(
       id: 'the_real_shape',
+  // ⚠️ PINNED ABOVE THE GRID. Feedback: "since 'how long does this actually
+  // take' is a constant and like a tool, it should look different from other
+  // articles." It is not one shelf among seven — it is the honest answer the
+  // whole section is reframed around, and the thing a parent should read
+  // before she picks a method. See `PpArea.pinned`.
+  pinned: true,
       mark: IntentMark.listMark,
       title: 'How long does this actually take?',
       blurb: 'The honest timeline, from the first su-su to dry nights.',
@@ -127,6 +133,15 @@ final PpSection kPpPottySection = PpSection(
           subtitle: 'One chart, and no rushing',
           format: 'CHART-CARD',
           blocks: [
+        // ⚠️ ADDED IN THE S06 PASS — this area had no video, and the
+        // feedback asks that video, tools and expert booking all get the
+        // treatment the earlier sections got.
+        PpVideoSlot(
+          title: 'How long this really takes',
+          subtitle: 'A paediatrician on the honest timeline, and why "trained by six months" is a different claim from the one it sounds like.',
+          minutes: '5 MIN',
+          slotId: 'potty/real_timeline',
+        ),
             PpIntro('Toilet learning is not one event you get through in a '
                 'weekend. It is a long, slow conversation that starts with you '
                 'reading her signals and ends, years later, with her going on '
@@ -1448,6 +1463,21 @@ final PpSection kPpPottySection = PpSection(
           subtitle: 'A picture on the wall, not a scoreboard',
           format: 'ACTIVITY',
           blocks: [
+        // ⚠️ ADDED IN THE S06 PASS — this area had no video, and the
+        // feedback asks that video, tools and expert booking all get the
+        // treatment the earlier sections got.
+        // ⚠️ NOT `potty/routine_walkthrough` — that slot already exists in
+        // "Starting out, day by day" with its own title, and
+        // `pp_section_test.dart` correctly refuses to let one slot id mean two
+        // different videos. A shared id would have meant one file arriving and
+        // silently filling two unrelated players.
+        PpVideoSlot(
+          title: 'Teaching the toy, and the chart',
+          subtitle: 'The two activities that do the most work, shown with a '
+              'child who is not in the mood.',
+          minutes: '3 MIN',
+          slotId: 'potty/activities_together',
+        ),
             PpIntro('A toddler cannot hold five steps in her head, but she can '
                 'read five pictures. Half an hour with a paper and sketch pens '
                 'gives her something to follow without an adult narrating.'),

@@ -38,8 +38,10 @@ class _FoodBuilderScreenState extends State<FoodBuilderScreen> {
   String? _otherTime;
   final Set<String> _otherHas = {};
 
-  /// Veg / non-veg / vegan. Filtering the suggestions to what she would
-  /// actually serve matters more here than anywhere else in the app.
+  /// Any / veg / egg / non-veg / vegan. Filtering the suggestions to what she
+  /// would actually serve matters more here than anywhere else in the app —
+  /// and eggetarian is a real Indian category, not a rounding error between
+  /// the other two.
   String _diet = 'Any';
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
@@ -47,10 +49,16 @@ class _FoodBuilderScreenState extends State<FoodBuilderScreen> {
 
   void _build() => setState(() {
         final all = buildMeals(meal: _meal, maxMinutes: _minutes, has: _has);
+        // ⚠️ 'Non-veg' NO LONGER MEANS "not vegetarian". It used to be
+        // `!veg`, which quietly included every egg dish — so a parent
+        // filtering for meat got egg bhurji, and a parent avoiding meat had no
+        // way to ask for egg at all. Each chip now names exactly one shelf.
         _results = switch (_diet) {
           'Veg' => all.where((m) => m.recipe.veg).toList(),
           'Vegan' => all.where((m) => m.recipe.vegan).toList(),
-          'Non-veg' => all.where((m) => !m.recipe.veg).toList(),
+          'Egg' => all.where((m) => m.recipe.egg).toList(),
+          'Non-veg' =>
+            all.where((m) => !m.recipe.veg && !m.recipe.egg).toList(),
           _ => all,
         };
       });
@@ -152,9 +160,10 @@ class _FoodBuilderScreenState extends State<FoodBuilderScreen> {
             // 4 - what she would actually serve. Suggesting a chicken khichdi
             // to a vegetarian family is worse than suggesting nothing.
             const SizedBox(height: 22),
-            _pad(_label('4 · Veg, non-veg or vegan?')),
+            _pad(_label('4 · What would you actually serve?')),
             const SizedBox(height: 10),
-            _pad(_chips(const ['Any', 'Veg', 'Non-veg', 'Vegan'],
+            // 'Any' first so the default is visibly the widest, then narrowing.
+            _pad(_chips(const ['Any', 'Veg', 'Egg', 'Non-veg', 'Vegan'],
                 (s) => _diet == s, (s) => setState(() => _diet = s))),
 
             const SizedBox(height: 24),

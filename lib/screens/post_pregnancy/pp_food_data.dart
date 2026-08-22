@@ -57,7 +57,8 @@ class FoodRecipe {
     required this.healthierNote,
     required this.tags,
     required this.ingredientKeys,
-    this.vegan = false, // veg AND vegan (no dairy/egg); drives the 3-way diet mark
+    this.vegan = false, // veg AND vegan (no dairy/egg)
+    this.egg = false, // eggetarian: not veg, and not non-veg either
     this.immunity = false, // immunity-booster tag/filter
     this.serves = 2,
     this.situations = const {}, // sick-day situations this dish helps with
@@ -93,6 +94,21 @@ class FoodRecipe {
   final Set<String> tags; // search / nutrition tags
   final Set<String> ingredientKeys; // canonical keys for the Smart Meal Builder
   final bool vegan;
+
+  /// ⚠️ EGGETARIAN IS ITS OWN CATEGORY IN INDIA, AND LEAVING IT OUT WAS A
+  /// REAL MISFILING RATHER THAN A MISSING FILTER.
+  ///
+  /// The model had `veg` and `vegan` only, so `diet` had three outcomes and an
+  /// egg dish had to be one of them. Egg bhurji was `veg: false`, which put it
+  /// under "Non-veg" — next to chicken and fish. A vegetarian household that
+  /// eats eggs (a very large share of Indian families, and the reason
+  /// "eggetarian" is a word here at all) would filter to Veg and never see the
+  /// one high-protein weaning breakfast in the library.
+  ///
+  /// So this is not "add a chip". A wrong bucket hides food from the people it
+  /// was written for, and the filter was merely the symptom.
+  final bool egg;
+
   final bool immunity;
   final int serves;
   final Set<String> situations; // sick-day situations (Constipation / Fever / …)
@@ -103,10 +119,26 @@ class FoodRecipe {
   final String? relatedCommunity;
 
   int get totalMin => prepMin + cookMin;
-  String get vegLabel => veg ? 'Veg' : 'Non-veg';
 
-  /// 'veg' | 'vegan' | 'nonveg' - drives the diet filter + the diet marker.
-  String get diet => vegan ? 'vegan' : (veg ? 'veg' : 'nonveg');
+  /// ⚠️ ORDER MATTERS AND IT IS NOT ALPHABETICAL. Vegan is checked first
+  /// because a vegan dish is also vegetarian, and egg before the veg/non-veg
+  /// split because an egg dish is neither in the sense the filter means.
+  String get vegLabel => vegan
+      ? 'Vegan'
+      : egg
+          ? 'Egg'
+          : veg
+              ? 'Veg'
+              : 'Non-veg';
+
+  /// 'veg' | 'vegan' | 'egg' | 'nonveg' - drives the diet filter and the marker.
+  String get diet => vegan
+      ? 'vegan'
+      : egg
+          ? 'egg'
+          : veg
+              ? 'veg'
+              : 'nonveg';
 }
 
 /// One "nutrition focus of the day" - the educational strength.
@@ -639,7 +671,13 @@ const List<FoodRecipe> kFoodRecipes = [
     category: 'Breakfast',
     slot: 'Breakfast',
     ageTag: '9–12 mo',
+    // ⚠️ `veg: false` STAYS — an egg is not vegetarian, and the vegOnly
+    // switch must keep excluding it. `egg: true` is what moves it out of the
+    // "Non-veg" bucket it was sharing with chicken and fish. The two flags
+    // answer different questions: veg is "may a vegetarian eat this", egg is
+    // "which shelf does it live on".
     veg: false,
+    egg: true,
     prepMin: 5,
     cookMin: 7,
     difficulty: 'Easy',
@@ -1375,11 +1413,35 @@ const Map<String, List<String>> _slotNeighbours = {
   'Dinner': ['Lunch'],
 };
 
-Map<String, FoodRecipe> planForDay(int dayIndex) {
+/// ⚠️ `diet` IS A FILTER THE PLAN ACCEPTS, NOT A NEW PREFERENCE STORE.
+///
+/// Feedback: "in meal plan section, give filters for veg non veg, egg, vegan,
+/// all." The obvious implementation is a second persisted setting beside
+/// `FoodStore.vegOnly` — and then two switches can disagree, and the day one
+/// says veg while the other says non-veg is a bug nobody can reproduce.
+///
+/// So this is a per-screen filter passed in, layered ON TOP of the household's
+/// `vegOnly` switch rather than replacing it. A vegetarian household that asks
+/// for "Non-veg" here still gets nothing, which is correct: the household
+/// setting is the harder constraint and a browsing filter must not quietly
+/// override it.
+///
+/// `null` means no narrowing, which is the 'All' chip.
+Map<String, FoodRecipe> planForDay(int dayIndex, {String? diet}) {
   final vegOnly = FoodStore.instance.vegOnly;
 
+  bool matchesDiet(FoodRecipe r) => switch (diet) {
+        'veg' => r.veg,
+        'vegan' => r.vegan,
+        'egg' => r.egg,
+        // Not `!veg`: that silently included every egg dish.
+        'nonveg' => !r.veg && !r.egg,
+        _ => true,
+      };
+
   List<FoodRecipe> poolFor(String s) {
-    bool ok(FoodRecipe r) => !r.comfortOnly && (!vegOnly || r.veg);
+    bool ok(FoodRecipe r) =>
+        !r.comfortOnly && (!vegOnly || r.veg) && matchesDiet(r);
     final own = foodCatalog.where((r) => r.slot == s && ok(r)).toList();
     // A WEEKLY plan drawn from a pool of two is the same dinner four times, so
     // top up thin slots from their neighbours. Dinner currently has only two
@@ -1391,6 +1453,10 @@ Map<String, FoodRecipe> planForDay(int dayIndex) {
     }
     final merged = [...own, ...extra];
     if (merged.isNotEmpty) return merged;
+    // ⚠️ STILL `ok`, NOT THE WHOLE CATALOGUE. This last resort already
+    // respected vegOnly and now respects the diet filter too — dropping the
+    // predicate here would put chicken on a screen filtered to Veg, which is
+    // the worst possible place for a fallback to be generous.
     return foodCatalog.where(ok).toList();
   }
 
@@ -1557,6 +1623,32 @@ class FoodStore extends ChangeNotifier with CloudSyncedStore {
 
   void clearPurchased() {
     _shopping.removeWhere((_, purchased) => purchased);
+    notifyListeners();
+  }
+
+  /// ⚠️ REMOVING ONE LINE WAS SIMPLY MISSING, AND THAT IS THE WHOLE BUG.
+  ///
+  /// Reported as "once the shopping list is cleared by user, it is not getting
+  /// removed ... this is happening after clicking add ingredients to shopping
+  /// list". Nothing was broken: `clearPurchased` works, the store persists,
+  /// and the screen rebuilds. The list simply had NO DELETE. Adding a recipe
+  /// put twelve lines in, and the only way to get one out was to tick it
+  /// bought — lying to the app about having bought coriander — and then find
+  /// the clear link, which itself only appears once something is ticked.
+  ///
+  /// The general shape is worth keeping: a feature can be complete in every
+  /// direction it was designed for and still be a trap, because ADD was
+  /// specified and REMOVE was never named. Nothing fails; the data just
+  /// accumulates.
+  void removeLine(String line) {
+    if (_shopping.remove(line) != null) notifyListeners();
+  }
+
+  /// Empty the list, bought or not. Separate from [clearPurchased] on purpose:
+  /// one is "tidy up what I have done", the other is "start again".
+  void clearShopping() {
+    if (_shopping.isEmpty) return;
+    _shopping.clear();
     notifyListeners();
   }
 }

@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'pp_products_data.dart';
 import 'product_detail_screen.dart';
 import 'development_activity_screen.dart';
+import '../../widgets/pv_placeholders.dart';
 import 'pp_common.dart';
 import 'pp_development_data.dart';
 
@@ -69,6 +70,29 @@ class DevStageDetailScreen extends StatelessWidget {
             )),
 
             const SizedBox(height: 20),
+            // ⚠️ VIDEO ON TOP, per the standing rule for every section in this
+            // review. A skill is the single best case for it: "cause and
+            // effect" or "pincer grasp" described in two paragraphs is abstract,
+            // and fifteen seconds of a real baby doing it is not.
+            //
+            // `slotId` carries the area and the skill, so the file that arrives
+            // later has an unambiguous home. Slugged from the skill name
+            // because `DevStage` has no id of its own — noted rather than
+            // silently relied on: if `DevStage` ever gains one, use it, because
+            // a name is copy and copy gets edited.
+            const SizedBox(height: 22),
+            _pad(PvVideoPlaceholder(
+              title: '${stage.name}, shown',
+              subtitle: 'What it looks like in a real child, and what you can '
+                  'do alongside it.',
+              duration: '3 min',
+              hue: 268,
+              flat: true,
+              slotId: 'development/skill/${area.id}/'
+                  '${stage.name.toLowerCase().replaceAll(RegExp('[^a-z0-9]+'), '_')}',
+            )),
+
+            const SizedBox(height: 26),
             _pad(Text('What it is', style: ppJakarta(16))),
             const SizedBox(height: 8),
             _pad(Text(stage.meaning, style: ppBody(14.5, color: ppInk, h: 1.6))),

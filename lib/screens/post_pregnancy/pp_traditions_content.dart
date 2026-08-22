@@ -168,6 +168,16 @@ final PpArea _whatsNow = PpArea(
       format: 'CHART-CARD',
       bands: ['newborn'],
       blocks: [
+        // ⚠️ ADDED IN THE S07-S11 PASS. This area had no video at all, and
+        // the doc asks for one in every sub-section - spelled out in the
+        // early sections, then pointed at the prompt once it became
+        // repetitive.
+        PpVideoSlot(
+          title: 'The ceremonies of the first year',
+          subtitle: 'What each one is for, when it usually happens, and what nobody tells you to arrange.',
+          minutes: '6 MIN',
+          slotId: 'traditions/first_year_ceremonies',
+        ),
         PpIntro('In the first weeks a lot of names get thrown around. Chatti, '
             'namkaran, jhula, the first outing. Here they are in the order they '
             'usually come, with the day each one tends to fall on.'),

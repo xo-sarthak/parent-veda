@@ -68,7 +68,7 @@ class WonderWeekScreen extends StatelessWidget {
                   const SizedBox(height: 26),
                   Text('AARAV IS IN', style: ppBody(11, color: _lav, w: FontWeight.w700).copyWith(letterSpacing: 1.2)),
                   const SizedBox(height: 8),
-                  Text('Leap 4', style: ppFraunces(44, color: Colors.white, h: 1.0)),
+                  Text('Phase 4', style: ppFraunces(44, color: Colors.white, h: 1.0)),
                   const SizedBox(height: 6),
                   Text('The World of Events', style: ppBody(15, color: const Color(0xFFCFC7DA))),
                   const SizedBox(height: 26),
@@ -122,7 +122,7 @@ class WonderWeekScreen extends StatelessWidget {
                       Text('"NAZAR LAG GAYI?"', style: ppBody(11, color: const Color(0xFFC6295A), w: FontWeight.w700).copyWith(letterSpacing: 0.6)),
                     ]),
                     const SizedBox(height: 8),
-                    Text("Clingy and crying more? It's not the evil eye - it's Leap 4's fussiness, and it passes. This is growth.",
+                    Text("Clingy and crying more? It's not the evil eye - it's Phase 4's fussiness, and it passes. This is growth.",
                         style: ppFraunces(17, h: 1.45)),
                   ]),
                 )),
@@ -166,7 +166,7 @@ class WonderWeekScreen extends StatelessWidget {
                   () => _push(context, const GrowthActivityScreen()), top: true)),
               _pad(_link(context, 'Nuskha', ppBrown, 'Ajwain potli for leap-time sniffles',
                   () => _push(context, const RemedyDetailScreen()), top: true)),
-              _pad(_link(context, 'Room', ppPurple, 'Parents in Leap 4 right now',
+              _pad(_link(context, 'Room', ppPurple, 'Parents in Phase 4 right now',
                   () => _push(context, const CommunityScreen()), top: true, bottom: true)),
 
               // timeline
@@ -176,7 +176,7 @@ class WonderWeekScreen extends StatelessWidget {
               _pad(Row(children: [
                 _seg('1–3', 'done', flex: 10, bg: ppPanel, fg: ppPurple),
                 const SizedBox(width: 8),
-                _seg('Leap 4', 'now', flex: 14, bg: ppPurple, fg: Colors.white, subFg: const Color(0xFFD8C8EA)),
+                _seg('Phase 4', 'now', flex: 14, bg: ppPurple, fg: Colors.white, subFg: const Color(0xFFD8C8EA)),
                 const SizedBox(width: 8),
                 _seg('5', '~6 wks', flex: 10, outline: true),
                 const SizedBox(width: 8),
@@ -208,7 +208,7 @@ class WonderWeekScreen extends StatelessWidget {
                   child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                     const Icon(Icons.ios_share_rounded, size: 16, color: Colors.white),
                     const SizedBox(width: 8),
-                    Flexible(child: Text("Share “${ChildProfileStore.instance.nameMid}'s in Leap 4”", style: ppBody(14, color: Colors.white, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                    Flexible(child: Text("Share “${ChildProfileStore.instance.nameMid}'s in Phase 4”", style: ppBody(14, color: Colors.white, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
                   ]),
                 ),
               ),

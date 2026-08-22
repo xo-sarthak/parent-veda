@@ -130,6 +130,17 @@ final PpSection kPpHealthSection = PpSection(
     // worry" far more than they search any article, so fever is a DECISION they
     // arrive with, not a topic they browse. It takes an age and a temperature
     // and returns one of three answers, none of which is a diagnosis.
+    // ⚠️ A TOOL, BECAUSE IT IS A FORM RATHER THAN A READ. Feedback: the
+    // emergency card "should appear like a card on the screen, which user will
+    // click to enter details". As a page inside the emergency area it looked
+    // like an article about emergency cards; as a tool it is the thing itself.
+    PpSectionTool(
+      label: 'Create your emergency card',
+      blurb: 'Weight, blood group, allergies and two numbers, on one screen '
+          'anybody can open. Five minutes, once.',
+      surfaceId: 'pp_emergency_card',
+      icon: Icons.contact_emergency_outlined,
+    ),
     PpSectionTool(
       label: 'Fever check',
       blurb: 'His age and his temperature, and a straight answer: see a doctor '
@@ -266,15 +277,30 @@ final PpArea _emergency = PpArea(
         ),
         PpWhenLine('Any age. This page never age-bands, because a red flag at '
             'six weeks is a red flag at six years.'),
-        // REQUIRED_REVIEW: the emergency numbers. 112 is the national emergency
-        // number; 108 is the ambulance number in most, not all, states. Confirm
-        // the wording before release, and confirm we are not implying an
-        // ambulance is always the faster option.
-        PpIndiaNote('112 reaches the national emergency line and 108 reaches an '
-            'ambulance in most states. In heavy city traffic a car often gets '
-            'there first, so start moving while somebody else makes the call. '
-            'Know the nearest hospital with a paediatric emergency, not just the '
-            'nearest hospital.'),
+        // ⚠️ THE NUMBERS WERE QUESTIONED AND THEY ARE CORRECT, SO THEY STAY.
+        //
+        // Feedback: "please add Indian emergency numbers and mention it is
+        // india's, not 108 / 112, I think they are not for India." They ARE
+        // India's. 112 is the national single emergency number (ERSS, live
+        // since 2019); 108 is the state ambulance line across most of India;
+        // 102 is the free ambulance used mainly for maternity and infants;
+        // 1098 is Childline. None of them is a foreign number.
+        //
+        // Changing correct emergency numbers because they looked unfamiliar is
+        // the single most dangerous edit available on this screen, so the fix
+        // is the half of the request that was right: the copy never SAID they
+        // were India's. It does now, and 102 and 1098 are added.
+        //
+        // Logged as D3 in docs/PARENTING-REVIEW.md for confirmation. The
+        // REQUIRED_REVIEW flag stays until a clinician signs off the wording,
+        // not the digits.
+        PpIndiaNote('These are the Indian numbers. 112 is the national emergency '
+            'line and reaches police, fire or ambulance. 108 reaches an '
+            'ambulance in most states, and 102 is the free ambulance used '
+            'mainly for mothers and infants. 1098 is Childline. In heavy city '
+            'traffic a car often gets there first, so start moving while '
+            'somebody else makes the call. Know the nearest hospital with a '
+            'paediatric emergency, not just the nearest hospital.'),
         PpVideoSlot(
           title: 'The signs that mean go now',
           subtitle: 'Breathing trouble, a fit, and the glass test for a rash, '
@@ -289,6 +315,15 @@ final PpArea _emergency = PpArea(
         ),
       ],
     ),
+    /* ⚠️ REMOVED FROM THIS AREA BY FEEDBACK, KEPT FOR REVERT.
+       "rest all should be removed"
+       The instruction was that "Is this an emergency" should hold only
+       the go-now triage, and that with one page left it should open
+       straight into it rather than showing a list of one.
+       Clinic-or-hospital: a real decision, but not the one this door is for.
+       The content is intact here; if it is wanted, it belongs in a
+       calmer area rather than behind a red door.
+
     PpPage(
       id: 'health_clinic_or_hospital',
       title: 'Clinic, or hospital?',
@@ -343,6 +378,16 @@ final PpArea _emergency = PpArea(
         ),
       ],
     ),
+    */
+    /* ⚠️ REMOVED FROM THIS AREA BY FEEDBACK, KEPT FOR REVERT.
+       "rest all should be removed"
+       The instruction was that "Is this an emergency" should hold only
+       the go-now triage, and that with one page left it should open
+       straight into it rather than showing a list of one.
+       What to say when you call: useful, and it is not triage.
+       The content is intact here; if it is wanted, it belongs in a
+       calmer area rather than behind a red door.
+
     PpPage(
       id: 'health_calling_doctor',
       title: 'What to say when you call the doctor',
@@ -401,45 +446,7 @@ final PpArea _emergency = PpArea(
         ),
       ],
     ),
-    PpPage(
-      id: 'health_emergency_card',
-      title: 'The card you want to already have',
-      format: 'RECORDS',
-      blocks: [
-        PpIntro('Somebody else may be the one who takes him in: a grandparent, a '
-            'neighbour, the person at the creche. The emergency card is for '
-            'them, not for you.'),
-        PpSteps([
-          PpStep('Put his current weight in it',
-              'Update it every time he is weighed. Almost every emergency dose '
-              'is calculated from weight, and a guess costs time.'),
-          PpStep('Put his blood group in it',
-              'Ask at the next visit if you do not know it.'),
-          PpStep('List every allergy and every regular medicine',
-              'Including the inhaler, the drops, and anything ayurvedic. It all '
-              'counts.'),
-          PpStep('Two numbers, not one',
-              'You, and one person who is reachable when you are not.'),
-          PpStep('Add the paediatrician and the hospital you chose',
-              'Name, number, and which hospital you would go to at night.'),
-        ], heading: 'Five minutes, once'),
-        PpCallout(
-          'Show the card to whoever looks after him when you are out, today. A '
-          'card nobody knows about is a card nobody opens.',
-          kind: PpCalloutKind.safety,
-        ),
-        PpWhenLine('Fill it in this week. Update the weight at every growth '
-            'check.'),
-        PpIndiaNote('If he is with dadi or nani during the day, write the card '
-            'out on paper too and stick it inside a kitchen cupboard. Not '
-            'everybody in the house will open an app in a panic.'),
-        PpLink(
-          'Open the emergency card',
-          surfaceId: 'pp_emergency_card',
-          blurb: 'Fill it in once, keep it current.',
-        ),
-      ],
-    ),
+    */
   ],
 );
 
@@ -2248,6 +2255,15 @@ final PpArea _otherIllness = PpArea(
       title: 'Ear pain and ear infections',
       format: 'ARTICLE',
       blocks: [
+        // ⚠️ ADDED IN THE S03 PASS — this area had no video at all.
+        // Placed on the page in the area that most needs showing rather
+        // than telling; the renderer hoists it to the top.
+        PpVideoSlot(
+          title: 'Is it an ear infection, and how would I know',
+          subtitle: 'The signs that separate a grumpy teething night from an ear that needs seeing, shown on a real child.',
+          minutes: '5 MIN',
+          slotId: 'health/ear_pain',
+        ),
         PpIntro('Ear pain is the classic 2am problem: it wakes a child who was '
             'fine, it hurts a great deal, and it usually appears a few days '
             'into a cold.'),
@@ -2532,6 +2548,15 @@ final PpArea _notSure = PpArea(
       title: 'Something is off and you cannot name it',
       format: 'FLOW',
       blocks: [
+        // ⚠️ ADDED IN THE S03 PASS — this area had no video at all.
+        // Placed on the page in the area that most needs showing rather
+        // than telling; the renderer hoists it to the top.
+        PpVideoSlot(
+          title: 'When something is off and you cannot name it',
+          subtitle: 'A paediatrician on what to watch for over 24 hours, and what is worth a call before that.',
+          minutes: '6 MIN',
+          slotId: 'health/something_off',
+        ),
         PpIntro('Off his feeds, not himself, crying more, sleeping oddly, and no '
             'single symptom to point at. That instinct is worth taking '
             'seriously, and it is a hard thing to search for.'),
@@ -2558,11 +2583,22 @@ final PpArea _notSure = PpArea(
         ),
         PpWhenLine('Any age. Use it when the worry has lasted more than a day '
             'and has not resolved itself.'),
+        // ⚠️ TWO FIXES IN ONE BLOCK, AND THE SECOND ONE IS THE IMPORTANT
+        // ONE.
+        //
+        // The link opened `pp_find_help`, a search box over a browse list. It
+        // now opens the questions it always promised.
+        //
+        // And the blurb promised "the likely cause". That was never built, and
+        // it must not be: inferring a cause from three taps is a diagnosis,
+        // which this app does not do at any price. The words now describe what
+        // the screen does — route to a kind of person — rather than what would
+        // have sounded more impressive.
         PpLink(
           'Work out which help you need',
-          surfaceId: 'pp_find_help',
-          blurb: 'A few questions, then the likely cause and the right kind of '
-              'expert.',
+          surfaceId: 'pp_find_help_triage',
+          blurb: 'Two questions, then the right kind of expert for what you '
+              'are seeing.',
         ),
         PpConsult(
           title: 'Speak to a paediatrician tonight',
@@ -2975,6 +3011,15 @@ final PpArea _growth = PpArea(
       title: 'What a percentile actually means',
       format: 'SHORT ARTICLE',
       blocks: [
+        // ⚠️ ADDED IN THE S03 PASS — this area had no video at all.
+        // Placed on the page in the area that most needs showing rather
+        // than telling; the renderer hoists it to the top.
+        PpVideoSlot(
+          title: 'What a percentile actually means',
+          subtitle: 'Why the 25th is not a worse score than the 75th, drawn on a real chart.',
+          minutes: '4 MIN',
+          slotId: 'health/percentiles',
+        ),
         PpIntro('Percentiles cause more anxiety than any other number in '
             'paediatrics, mostly because they sound like marks out of a '
             'hundred. They are not.'),
@@ -3089,6 +3134,56 @@ final PpArea _records = PpArea(
       'getting more out of a short appointment.',
   hue: 210,
   pages: [
+    // ⚠️ MOVED HERE FROM THE EMERGENCY AREA, NOT DELETED. Feedback
+    // trimmed "Is this an emergency" to the triage page alone so it opens
+    // directly. This explainer is the wrong thing to meet in a panic and
+    // the right thing to read on a calm evening, which is what this area
+    // is. The card itself is now also a tool, so it is reachable in one
+    // tap without reading anything.
+    PpPage(
+      id: 'health_emergency_card',
+      // ⚠️ NAMED AS THE ACTION, NOT AS THE OBJECT. It read "The card you
+      // want to already have" — true, evocative, and it describes a thing
+      // rather than telling her what to do, so it read as an article about
+      // emergency cards. Feedback: it should say create one and look like
+      // something to tap.
+      title: 'Create your emergency card',
+      format: 'TAKES 5 MINUTES',
+      blocks: [
+        PpIntro('Somebody else may be the one who takes him in: a grandparent, a '
+            'neighbour, the person at the creche. The emergency card is for '
+            'them, not for you.'),
+        PpSteps([
+          PpStep('Put his current weight in it',
+              'Update it every time he is weighed. Almost every emergency dose '
+              'is calculated from weight, and a guess costs time.'),
+          PpStep('Put his blood group in it',
+              'Ask at the next visit if you do not know it.'),
+          PpStep('List every allergy and every regular medicine',
+              'Including the inhaler, the drops, and anything ayurvedic. It all '
+              'counts.'),
+          PpStep('Two numbers, not one',
+              'You, and one person who is reachable when you are not.'),
+          PpStep('Add the paediatrician and the hospital you chose',
+              'Name, number, and which hospital you would go to at night.'),
+        ], heading: 'Five minutes, once'),
+        PpCallout(
+          'Show the card to whoever looks after him when you are out, today. A '
+          'card nobody knows about is a card nobody opens.',
+          kind: PpCalloutKind.safety,
+        ),
+        PpWhenLine('Fill it in this week. Update the weight at every growth '
+            'check.'),
+        PpIndiaNote('If he is with dadi or nani during the day, write the card '
+            'out on paper too and stick it inside a kitchen cupboard. Not '
+            'everybody in the house will open an app in a panic.'),
+        PpLink(
+          'Open the emergency card',
+          surfaceId: 'pp_emergency_card',
+          blurb: 'Fill it in once, keep it current.',
+        ),
+      ],
+    ),
     PpPage(
       id: 'rec_wallet',
       title: 'Everything in one place',
@@ -3144,6 +3239,15 @@ final PpArea _records = PpArea(
       title: 'Getting the most out of seven minutes',
       format: 'STEP-LIST',
       blocks: [
+        // ⚠️ ADDED IN THE S03 PASS — this area had no video at all.
+        // Placed on the page in the area that most needs showing rather
+        // than telling; the renderer hoists it to the top.
+        PpVideoSlot(
+          title: 'Seven minutes with the doctor, used well',
+          subtitle: 'What to bring, what to ask first, and the one question parents leave for the doorway.',
+          minutes: '5 MIN',
+          slotId: 'health/doctor_visit',
+        ),
         PpIntro('A busy paediatric OPD gives you a few minutes. Preparation is '
             'the difference between leaving with answers and remembering your '
             'real question in the car park.'),

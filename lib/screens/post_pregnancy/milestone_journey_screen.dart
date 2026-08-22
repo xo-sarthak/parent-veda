@@ -40,7 +40,12 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
           animation: _store,
           builder: (context, _) {
             final emerging = _store.emerging;
-            final achieved = _store.achieved;
+            // ⚠️ `final achieved = _store.achieved;` USED TO BE HERE. It fed
+            // the "Recently celebrated" block, which the feedback removed
+            // and which is commented out below. Restoring that block means
+            // restoring this line too — written down because an
+            // uncommented block referring to a deleted variable is a
+            // confusing way to find that out.
             final soon = _store.comingSoon;
             return ListView(
               padding: const EdgeInsets.only(top: 12, bottom: 48),
@@ -58,46 +63,70 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
                 // whole map to find it makes them give up before logging it.
                 const SizedBox(height: 14),
                 ppToolPad(_quickLog()),
-
+                // ⚠️ EMERGING LEADS THE PAGE NOW. Feedback: "the first thing
+                // that should come in this page is basically cards with
+                // different colours for Movement, talking, thinking etc."
+                //
+                // It used to sit third, under the snapshot hero and the domain
+                // explorer, so the answer to "what is happening with my child
+                // right now" was two screens of chrome down.
                 const SizedBox(height: 26),
+                ppToolPad(Row(children: [
+                  const Icon(Icons.spa_outlined, size: 17, color: ppPurple),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text('Emerging now', style: ppJakarta(17))),
+                  Text('tap any card', style: ppBody(12, color: ppMuted)),
+                ])),
+                const SizedBox(height: 6),
+                ppToolPad(Text('Skills that often blossom around ${ChildProfileStore.instance.ageLabel}. Tap a card to turn it over.', style: ppBody(13))),
+                const SizedBox(height: 14),
+                if (emerging.isEmpty)
+                  ppToolPad(ppEmptyCard(Icons.spa_outlined, 'A quiet stretch — a lovely time to simply enjoy each other. New skills will surface soon.'))
+                else
+                  ppToolPad(Column(children: [
+                    for (final m in emerging)
+                      MilestoneFlipCard(
+                        milestone: m,
+                        observed: _store.isObserved(m.id),
+                        observedLabel:
+                            _store.isObserved(m.id) ? _obsDateLabel(m.id) : null,
+                        onSeen: () => _openObserveSheet(m),
+                        onDetail: () => _openDetail(m),
+                      ),
+                  ])),
+
+                // ⚠️ "DEVELOPMENT INSIGHT" AND "RECENTLY CELEBRATED" REMOVED BY
+                // FEEDBACK: "No Development Insight needed, No Recently
+                // Celebrated". Both builders survive further down, so restoring
+                // either is uncommenting this block.
+                //
+                // The celebration itself is not lost: marking a milestone still
+                // opens the memory sheet and still writes a dated note. What is
+                // gone is a second list of the same events on the same screen.
+                /*
+                const SizedBox(height: 24),
+                ppToolPad(ppInsightCard(_insight(), tag: 'Development insight')),
+                const SizedBox(height: 26),
+                ppToolPad(Row(children: [
+                  const Icon(Icons.celebration_outlined, size: 17, color: ppPurple),
+                  const SizedBox(width: 8),
+                  Expanded(child: Text('Recently celebrated', style: ppJakarta(17))),
+                  Text('NN noticed', style: ppBody(12, color: ppMuted)),
+                ])),
+                const SizedBox(height: 14),
+                ppToolPad(Column(children: [for (final m in achieved.take(4)) _achievedRow(m)])),
+                */
+
+                // ⚠️ THE DOMAIN EXPLORER MOVED BELOW THE CARDS, not away.
+                // Browsing by area is a real second question; it just is not
+                // the first one a parent has.
+                const SizedBox(height: 28),
                 ppToolPad(ppSectionHead('Explore by area')),
                 const SizedBox(height: 4),
                 ppToolPad(Text('Development happens across all of these at once.', style: ppBody(13))),
                 const SizedBox(height: 14),
                 _domainRow(),
 
-                const SizedBox(height: 28),
-                ppToolPad(Row(children: [
-                  const Icon(Icons.spa_outlined, size: 17, color: ppPurple),
-                  const SizedBox(width: 8),
-                  Expanded(child: Text('Emerging now', style: ppJakarta(17))),
-                  Text('you may notice', style: ppBody(12, color: ppMuted)),
-                ])),
-                const SizedBox(height: 6),
-                ppToolPad(Text('Skills that often blossom around ${ChildProfileStore.instance.ageLabel}.', style: ppBody(13))),
-                const SizedBox(height: 14),
-                if (emerging.isEmpty)
-                  ppToolPad(ppEmptyCard(Icons.spa_outlined, 'A quiet stretch — a lovely time to simply enjoy each other. New skills will surface soon.'))
-                else
-                  ppToolPad(Column(children: [for (final m in emerging) _card(m)])),
-
-                const SizedBox(height: 24),
-                ppToolPad(ppInsightCard(_insight(), tag: 'Development insight')),
-
-                const SizedBox(height: 26),
-                ppToolPad(Row(children: [
-                  const Icon(Icons.celebration_outlined, size: 17, color: ppPurple),
-                  const SizedBox(width: 8),
-                  Expanded(child: Text('Recently celebrated', style: ppJakarta(17))),
-                  Text('${_store.observedCount} noticed', style: ppBody(12, color: ppMuted)),
-                ])),
-                const SizedBox(height: 14),
-                if (achieved.isEmpty)
-                  ppToolPad(ppEmptyCard(Icons.celebration_outlined, 'Nothing marked yet — and that is fine. When you notice something lovely, tap "I\'ve seen this" to keep it as a memory.'))
-                else
-                  ppToolPad(Column(children: [for (final m in achieved.take(4)) _achievedRow(m)])),
-
-                const SizedBox(height: 26),
                 ppToolPad(Row(children: [
                   const Icon(Icons.wb_twilight_rounded, size: 17, color: ppPurple),
                   const SizedBox(width: 8),
@@ -403,6 +432,10 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
     );
   }
 
+  /* ⚠️ KEPT FOR REVERT — used only by the commented-out
+     "Recently celebrated" block above. Commented rather than deleted so restoring
+     that section does not mean rewriting this too.
+
   Widget _achievedRow(Milestone m) {
     final meta = kDomainMeta[m.domain]!;
     return GestureDetector(
@@ -433,6 +466,7 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
       ),
     );
   }
+  */
 
   Widget _soonRow(Milestone m) {
     final meta = kDomainMeta[m.domain]!;
@@ -616,6 +650,10 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
   }
 
   // ---- helpers ------------------------------------------------------------
+  /* ⚠️ KEPT FOR REVERT — used only by the commented-out
+     "Development insight" block above. Commented rather than deleted so restoring
+     that section does not mean rewriting this too.
+
   String _insight() {
     final e = _store.emerging.length;
     final name = _store.name;
@@ -627,6 +665,7 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
     }
     return 'A calmer developmental stretch. These pauses let new skills consolidate — there is nothing to push.';
   }
+  */
 
   String _obsDateLabel(String id) {
     final o = _store.observation(id);
@@ -639,5 +678,218 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
     if (o == null) return '';
     final when = 'Noticed ${ppShortDate(o.date)}';
     return o.note != null ? '$when · ${o.note}' : when;
+  }
+}
+
+/// A milestone card that turns over.
+///
+/// ⚠️ THE FLIP IS THE FEEDBACK, AND IT EARNS ITS KEEP RATHER THAN DECORATING.
+/// "Show on card the milestone name, image and time when it should be
+/// achieved/emerging like range, and as user clicks it flips with details
+/// about it."
+///
+/// The old card showed the title, the range AND three lines of description at
+/// once, then offered "Learn more" for the rest. So the front was already
+/// half-detail, which made a column of them long and same-y. Splitting it puts
+/// one glanceable thing per side: what and when in front, what it looks like
+/// behind.
+///
+/// ⚠️ THE "I HAVE SEEN THIS" CONTROL DOES NOT FLIP WITH THE CARD. It sits under
+/// the turning face, visible on both sides, because it is the action a parent
+/// arrives wanting and hiding it behind a flip would cost more than the
+/// animation gains. The feedback asks for it "below the card", which is also
+/// simply correct.
+///
+/// ⚠️ `Matrix4.rotationY` NEEDS A PERSPECTIVE ENTRY, AND THE BACK FACE HAS TO
+/// BE COUNTER-ROTATED. Without `..setEntry(3, 2, 0.0012)` the card scales
+/// instead of turning; without handling the back separately its content renders
+/// mirrored, which reads as a rendering bug rather than as a card.
+class MilestoneFlipCard extends StatefulWidget {
+  const MilestoneFlipCard({
+    super.key,
+    required this.milestone,
+    required this.observed,
+    required this.onSeen,
+    required this.onDetail,
+    this.observedLabel,
+  });
+
+  final Milestone milestone;
+  final bool observed;
+  final String? observedLabel;
+  final VoidCallback onSeen;
+  final VoidCallback onDetail;
+
+  @override
+  State<MilestoneFlipCard> createState() => _MilestoneFlipCardState();
+}
+
+class _MilestoneFlipCardState extends State<MilestoneFlipCard> {
+  bool _back = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final meta = kDomainMeta[widget.milestone.domain]!;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: ppHair),
+        boxShadow: const [
+          BoxShadow(
+              color: Color(0x0F6A30B6),
+              blurRadius: 18,
+              spreadRadius: -14,
+              offset: Offset(0, 8)),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(children: [
+        GestureDetector(
+          onTap: () => setState(() => _back = !_back),
+          behavior: HitTestBehavior.opaque,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 420),
+            switchInCurve: Curves.easeOutCubic,
+            switchOutCurve: Curves.easeInCubic,
+            transitionBuilder: (child, anim) {
+              final isBack = child.key == const ValueKey('back');
+              return AnimatedBuilder(
+                animation: anim,
+                builder: (context, _) {
+                  final t = isBack ? (1 - anim.value) : -(1 - anim.value);
+                  return Transform(
+                    alignment: Alignment.center,
+                    transform: Matrix4.identity()
+                      ..setEntry(3, 2, 0.0012)
+                      ..rotateY(t * 3.14159 / 2),
+                    child: child,
+                  );
+                },
+              );
+            },
+            child: _face(
+                _back ? const ValueKey('back') : const ValueKey('front'), meta,
+                back: _back),
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 15),
+          child: widget.observed ? _noticed() : _seenButton(),
+        ),
+      ]),
+    );
+  }
+
+  Widget _noticed() => Row(children: [
+        const Icon(Icons.check_circle_rounded, size: 18, color: ppPurple),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+              widget.observedLabel == null
+                  ? 'Noticed'
+                  : 'Noticed ${widget.observedLabel}',
+              style: ppBody(12.5, color: ppPurple, w: FontWeight.w700)),
+        ),
+        GestureDetector(
+          onTap: widget.onDetail,
+          behavior: HitTestBehavior.opaque,
+          child: Text('Details',
+              style: ppBody(12, color: ppMuted, w: FontWeight.w600)),
+        ),
+      ]);
+
+  // ⚠️ OPENS THE MEMORY SHEET, NOT A CHECKBOX. Feedback: "if user clicks on it
+  // then open the memory you are opening to allow user to add memory".
+  // `_openObserveSheet` already asks what she saw and keeps it with a date; a
+  // tick that recorded only a boolean would throw away the one part she will
+  // ever want to read again.
+  Widget _seenButton() => GestureDetector(
+        onTap: widget.onSeen,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          height: 42,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+              color: ppPurple, borderRadius: BorderRadius.circular(12)),
+          child: Text('I have seen this',
+              style: ppBody(13, color: Colors.white, w: FontWeight.w700)),
+        ),
+      );
+
+  Widget _face(Key key, DomainMeta meta, {required bool back}) {
+    final m = widget.milestone;
+    return Container(
+      key: key,
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 14),
+      child: back
+          ? Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('What this looks like',
+                  style: ppBody(11, color: meta.ink, w: FontWeight.w800)),
+              const SizedBox(height: 8),
+              Text(m.desc, style: ppBody(13.5, h: 1.55)),
+              const SizedBox(height: 12),
+              // ⚠️ `Flexible`, NOT A BARE `Text` + `Spacer`. The first version
+              // overflowed by 2.5px at the narrow end — caught by a widget
+              // test rather than by looking, which is the only way a 2.5px
+              // overflow ever gets caught. Two fixed-width strings either side
+              // of a Spacer have no give at all; letting the hint shrink does.
+              Row(children: [
+                Flexible(
+                  child: Text('Tap to turn back',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: ppBody(11.5, color: ppMuted)),
+                ),
+                const SizedBox(width: 10),
+                const Spacer(),
+                GestureDetector(
+                  onTap: widget.onDetail,
+                  behavior: HitTestBehavior.opaque,
+                  child: Text('Learn more',
+                      style: ppBody(12, color: ppPurple, w: FontWeight.w700)),
+                ),
+              ]),
+            ])
+          : Row(children: [
+              // ⚠️ THE DOMAIN WELL IS THE "IMAGE" UNTIL THERE IS ONE. The
+              // feedback asks for a picture on the card. There is no milestone
+              // art in the app, and a grey rectangle would be a placeholder
+              // somebody has to delete later. A tinted well carrying the
+              // domain's own mark is a finished treatment that a photograph
+              // can replace without this widget changing.
+              Container(
+                width: 56,
+                height: 56,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                    color: meta.tint, borderRadius: BorderRadius.circular(14)),
+                child: Icon(meta.icon, size: 25, color: meta.ink),
+              ),
+              const SizedBox(width: 13),
+              Expanded(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(meta.label.toUpperCase(),
+                          style:
+                              ppBody(10, color: meta.ink, w: FontWeight.w800)),
+                      const SizedBox(height: 5),
+                      Text(m.title,
+                          style: ppJakarta(15.5),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis),
+                      const SizedBox(height: 5),
+                      Text('Usually ${m.ageRangeLabel}',
+                          style: ppBody(12, color: ppMuted)),
+                    ]),
+              ),
+              const Icon(Icons.flip_camera_android_outlined,
+                  size: 16, color: ppMuted),
+            ]),
+    );
   }
 }

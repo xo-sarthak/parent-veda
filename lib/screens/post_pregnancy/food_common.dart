@@ -58,10 +58,18 @@ Widget vegDot(bool veg) => Container(
 /// the merged model): a bordered square with a filled circle (veg), a leaf
 /// (vegan) or a triangle (non-veg). Functional iconography, so the colours stay.
 Widget foodDietMark(String diet, {double size = 13}) {
-  final c = diet == 'nonveg' ? _nonVeg : _veg;
+  // ⚠️ EGG TAKES THE NON-VEG COLOUR AND ITS OWN SHAPE, WHICH IS HOW THE
+  // PACKETS DO IT. An Indian food label marks eggetarian with the brown/red
+  // square rather than the green one — it is not vegetarian — but a family
+  // that eats eggs needs to tell it apart from chicken at a glance. Colour
+  // says "not veg", shape says "which kind", and the two carry different
+  // information rather than repeating each other.
+  final c = (diet == 'nonveg' || diet == 'egg') ? _nonVeg : _veg;
   final Widget inner;
   if (diet == 'vegan') {
     inner = Icon(Icons.eco, size: size * 0.66, color: c);
+  } else if (diet == 'egg') {
+    inner = Icon(Icons.egg_outlined, size: size * 0.72, color: c);
   } else if (diet == 'nonveg') {
     inner = Icon(Icons.arrow_drop_up, size: size * 0.98, color: c);
   } else {

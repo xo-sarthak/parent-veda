@@ -151,9 +151,9 @@ const List<WatchVideo> kWatchVideos = [
     why:
         'The clinginess and broken naps aren’t a step back, they’re a leap forward. See what your baby is working out about cause and effect right now.',
     seed: 2,
-    relatedArticle: 'Leap 4, decoded',
+    relatedArticle: 'Phase 4, decoded',
     relatedActivity: 'Reach-for-the-ring',
-    relatedCommunity: 'Leap 4 support',
+    relatedCommunity: 'Phase 4 support',
   ),
   WatchVideo(
     id: 'solids101',
@@ -213,7 +213,7 @@ const List<WatchVideo> kWatchVideos = [
         'Your baby is learning language long before he speaks. See how everyday narration and back-and-forth “conversations” build his ear for it.',
     seed: 6,
     relatedActivity: 'Narrate your day',
-    relatedArticle: 'Leap 4, decoded',
+    relatedArticle: 'Phase 4, decoded',
   ),
   WatchVideo(
     id: 'fevercalm',

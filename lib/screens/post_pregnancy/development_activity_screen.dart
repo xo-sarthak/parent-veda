@@ -9,6 +9,7 @@
 import 'package:flutter/material.dart';
 
 import 'development_area_screen.dart';
+import '../../widgets/pv_placeholders.dart';
 import 'pp_common.dart';
 import 'pp_development_data.dart';
 
@@ -50,6 +51,21 @@ class DevelopmentActivityScreen extends StatelessWidget {
               ]),
             ),
             const SizedBox(height: 18),
+            // ⚠️ VIDEO ABOVE THE ACTIONS. An activity is a thing you DO with
+            // your hands while holding a baby, which is the worst possible
+            // thing to learn from a numbered list read off a screen. Feedback
+            // asked for the same treatment as every other page.
+            const SizedBox(height: 18),
+            _pad(PvVideoPlaceholder(
+              title: '${activity.title}, done together',
+              subtitle: 'A parent and child doing it, at real speed.',
+              duration: '2 min',
+              hue: 268,
+              flat: true,
+              slotId: 'development/activity/${activity.id}',
+            )),
+
+            const SizedBox(height: 20),
             _pad(_actions(area.accent)),
             const SizedBox(height: 20),
 
@@ -111,8 +127,24 @@ class DevelopmentActivityScreen extends StatelessWidget {
         animation: DevStore.instance,
         builder: (context, _) {
           final saved = DevStore.instance.isSaved(activity.id);
-          final done = DevStore.instance.isCompleted(activity.id);
           return Row(children: [
+            // ⚠️ "WE DID THIS" REMOVED BY FEEDBACK, AND IT FITS THE SECTION'S
+            // OWN RULE RATHER THAN FIGHTING IT.
+            //
+            // Development is explicitly a COMPANION and not a tracker — the
+            // home screen says "not a checklist to tick off" three lines
+            // above. A primary, full-width, accent-filled button asking a
+            // parent to confirm she played with her child made the page a
+            // checklist anyway, and the completed state gave the activity a
+            // pass/fail it was never supposed to have.
+            //
+            // ⚠️ THE STORE KEEPS `toggleComplete` AND `isCompleted`. Nothing
+            // else reads them today, so they are unused rather than wrong, and
+            // ripping the persistence out would destroy anything a parent has
+            // already marked. Kept commented below so restoring is one
+            // uncomment; the "save" control beside it is untouched, because
+            // saving for later is help and confirming is homework.
+            /*
             Expanded(
               child: GestureDetector(
                 onTap: () => DevStore.instance.toggleComplete(activity.id),
@@ -124,12 +156,14 @@ class DevelopmentActivityScreen extends StatelessWidget {
                   child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                     Icon(done ? Icons.check_circle_rounded : Icons.check_rounded, size: 18, color: done ? accent : Colors.white),
                     const SizedBox(width: 8),
-                    Text(done ? 'We did this' : 'We did this', style: ppBody(13.5, color: done ? accent : Colors.white, w: FontWeight.w700)),
+                    Text('We did this', style: ppBody(13.5, color: done ? accent : Colors.white, w: FontWeight.w700)),
                   ]),
                 ),
               ),
             ),
             const SizedBox(width: 12),
+            */
+            const Spacer(),
             GestureDetector(
               onTap: () => DevStore.instance.toggleSave(activity.id),
               behavior: HitTestBehavior.opaque,

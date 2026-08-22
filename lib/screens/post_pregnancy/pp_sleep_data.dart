@@ -235,7 +235,7 @@ class SleepStore extends ChangeNotifier {
   List<(String, String)> get correlations => const [
         ('Sleep + Feeding', 'A cluster-feeding evening can mean a longer first stretch after.'),
         ('Sleep + Growth', 'Growth spurts sometimes bring extra waking for a few nights.'),
-        ('Sleep + Leaps', 'Developmental leaps can unsettle sleep, then it re-steadies.'),
+        ('Sleep + Phases', 'Developmental phases can unsettle sleep, then it re-steadies.'),
         ('Sleep + Vaccinations', 'A vaccine day can shorten naps briefly — usually back to normal within a day or two.'),
       ];
 

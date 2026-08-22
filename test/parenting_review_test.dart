@@ -26,10 +26,55 @@ String _read(String p) => File(p).readAsStringSync();
 
 /// Strip comment lines before asserting something is ABSENT — every removal
 /// here is a comment, so a naive search finds the thing it is checking is gone.
-String _code(String src) => src
-    .split('\n')
-    .where((l) => !l.trimLeft().startsWith('//'))
-    .join('\n');
+/// The source with comments removed, so an assertion cannot pass against code
+/// that no longer runs.
+///
+/// ⚠️ IT USED TO STRIP ONLY `//` LINES, AND THAT MADE IT LIE. This repo's
+/// convention is comment-out-never-delete, and a large removal is archived as
+/// a `/* ... */` block — which this helper happily kept. So the twenty-one
+/// assertions built on it were only checking that a string exists SOMEWHERE in
+/// the file, including inside a block explaining why the thing was removed.
+///
+/// Caught when "Ways to help it along" was archived out of the area screen by
+/// the parenting feedback and this file stayed green. A test that passes
+/// against commented-out code is worse than no test: it reports that a screen
+/// still does something it stopped doing, which is exactly the gap the wiring
+/// gate exists to close.
+///
+/// ⚠️ THE SAME BLIND SPOT EXISTS IN SEVEN OTHER TEST FILES. Every one of them
+/// filters on `startsWith('//')` alone. Not fixed here, because changing them
+/// blind could turn assertions red for reasons unrelated to this pass — logged
+/// as D6 in docs/PARENTING-REVIEW.md instead.
+String _code(String src) {
+  final out = StringBuffer();
+  var inBlock = false;
+  for (final raw in src.split('\n')) {
+    var line = raw;
+    // Block comments first: a `//` inside a `/* */` is not a line comment, and
+    // a `/*` after code on the same line still opens a block.
+    while (line.isNotEmpty) {
+      if (inBlock) {
+        final close = line.indexOf('*/');
+        if (close < 0) {
+          line = '';
+        } else {
+          line = line.substring(close + 2);
+          inBlock = false;
+        }
+      } else {
+        final open = line.indexOf('/*');
+        if (open < 0) break;
+        out.write(line.substring(0, open));
+        line = line.substring(open + 2);
+        inBlock = true;
+      }
+    }
+    if (inBlock) continue;
+    if (line.trimLeft().startsWith('//')) continue;
+    out.writeln(line);
+  }
+  return out.toString();
+}
 
 /// Does `screen` still put this copy on the page?
 ///
@@ -322,18 +367,45 @@ void main() {
           _code(_read('lib/screens/post_pregnancy/development_area_screen.dart'));
       final timeline = area.indexOf('skills timeline');
       expect(timeline, greaterThan(-1));
+      // ⚠️ 'Ways to help it along' IS NO LONGER ON THIS PAGE, and that is the
+      // parenting feedback rather than a regression: "Ways to help it along
+      // should be in each of the sections ... but it won't be there as a
+      // generic section on the page listing the skill timeline."
+      //
+      // The bullets were keyed to whichever skill was `current`, so on an area
+      // page they sat under a heading that implied the whole domain while
+      // describing one skill. Asserted on the skill page below instead, which
+      // is where they are unambiguous.
       for (final section in [
-        'Ways to help it along',
         'Try together',
         "'Watch'",
         "'Learn'",
-        'Explore products',
+        // ⚠️ WAS 'Explore products'. Renamed to "Recommended for this
+        // phase" by the parenting feedback pass: "Say Recommended Products for
+        // This Phase instead of explore products." A shop verb on a page about
+        // a child's development read as a catalogue; the narrower name says
+        // these were chosen for where he is.
+        //
+        // The assertion this test actually makes — that the rail sits AFTER
+        // the skills timeline — is unchanged. Only the label moved.
+        'Recommended for this phase',
       ]) {
         final at = area.indexOf(section);
         expect(at, greaterThan(-1), reason: '$section missing');
         expect(at, greaterThan(timeline),
             reason: '$section should sit after the skills timeline');
       }
+    });
+
+    test('ways to help it along lives on the skill page', () {
+      // The other half of the move. Without this, "removed from the area page"
+      // and "removed from the app" look identical to the suite.
+      final skill =
+          _code(_read('lib/screens/post_pregnancy/dev_stage_detail_screen.dart'));
+      expect(skill.contains('Ways to help it along'), isTrue,
+          reason: 'The section was taken off the area page on the '
+              'understanding that the skill page still carries it. It does '
+              'not, so the content is now unreachable.');
     });
 
     test('every area has help bullets to show', () {

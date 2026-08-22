@@ -340,10 +340,37 @@ class MilestoneStore extends ChangeNotifier {
       .where((m) => !isObserved(m.id) && _ageMonths >= m.loMonths - 1 && _ageMonths <= m.hiMonths)
       .toList();
 
-  /// Coming soon = typical range opens after the child's age.
-  List<Milestone> get comingSoon =>
-      kMilestones.where((m) => !isObserved(m.id) && m.loMonths > _ageMonths).toList()
-        ..sort((a, b) => a.loMonths.compareTo(b.loMonths));
+  /// Coming soon = opens after his age, is not already emerging, and is close
+  /// enough to be worth knowing about.
+  ///
+  /// ⚠️ IT USED TO OVERLAP `emerging`, AND THE ARITHMETIC IS WORTH SEEING.
+  /// `emerging` starts one month EARLY (`_ageMonths >= m.loMonths - 1`) so a
+  /// skill appears just before its window opens. `comingSoon` took everything
+  /// with `loMonths > _ageMonths`. For any milestone whose range opens next
+  /// month both are true, so the same skill was printed twice on one screen,
+  /// once under "you may notice this now" and once under "a soft look ahead".
+  ///
+  /// Reported as "currently it mentions same milestones which are emerging",
+  /// and it is the kind of bug two correct-looking one-line getters produce
+  /// without either of them being wrong on its own. Excluding by ID rather
+  /// than by re-deriving the boundary means the two can never drift apart
+  /// again: whatever `emerging` decides, this is the complement of it.
+  ///
+  /// ⚠️ AND A SIX-MONTH HORIZON, per the feedback. Without it this listed
+  /// every remaining milestone up to five years — a four-month-old's parent
+  /// scrolling toward "rides a tricycle". A look ahead is reassuring; the
+  /// whole road is a workload.
+  List<Milestone> get comingSoon {
+    final alreadyEmerging = emerging.map((m) => m.id).toSet();
+    return kMilestones
+        .where((m) =>
+            !isObserved(m.id) &&
+            !alreadyEmerging.contains(m.id) &&
+            m.loMonths > _ageMonths &&
+            m.loMonths <= _ageMonths + 6)
+        .toList()
+      ..sort((a, b) => a.loMonths.compareTo(b.loMonths));
+  }
 
   /// Foundations = typical range has passed (whether or not marked).
   List<Milestone> get foundations =>

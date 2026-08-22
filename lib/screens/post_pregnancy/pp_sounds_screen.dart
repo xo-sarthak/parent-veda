@@ -200,8 +200,26 @@ class _TimerRow extends StatelessWidget {
                       border:
                           Border.all(color: current == d ? p.action : p.line),
                     ),
+                    // ⚠️ THE LABEL FOLLOWS THE GROUND. Selecting an option
+                    // filled the chip with `p.action` and left the text at
+                    // `p.ink2` — near-black on violet, which measures around
+                    // 1.6:1 and reads as the text having vanished. Reported
+                    // as "when changing time, the purple colour is hiding
+                    // the text", which is exactly what it looks like.
+                    //
+                    // The general shape is worth keeping: a selected state
+                    // that changes the BACKGROUND has to change the
+                    // FOREGROUND in the same breath. Nothing warns about it —
+                    // both colours are valid, the widget compiles, and the
+                    // unselected state (which is what a reviewer looks at)
+                    // is perfectly fine.
                     child: Text(label,
-                        style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w500, height: 1.55, color: p.ink2)),
+                        style: pvManrope(
+                            fontSize: 12.5,
+                            fontWeight:
+                                current == d ? FontWeight.w700 : FontWeight.w500,
+                            height: 1.55,
+                            color: current == d ? Colors.white : p.ink2)),
                   ),
                 ),
               ),

@@ -191,7 +191,7 @@ const List<ReadArticle> kReadArticles = [
   ),
   ReadArticle(
     id: 'leap4',
-    title: 'Leap 4, decoded: what the fussiness means',
+    title: 'Phase 4, decoded: what the fussiness means',
     teaser: 'The clinginess isn’t a step back. It’s a window opening.',
     whyToday: 'Fussy, clingy, everything-off days often mean a mental leap. Knowing what he’s working on turns frustration into fascination.',
     collection: 'brain',
@@ -211,14 +211,14 @@ const List<ReadArticle> kReadArticles = [
       ReadSection(
         heading: 'The world of events',
         paragraphs: [
-          'Around four months, babies enter what’s often called Leap 4, “the world of events”. For the first time, your baby grasps that one thing leads smoothly to another: your hand reaches, and the toy moves. Cause, meet effect.',
+          'Around four months, babies enter what’s often called Phase 4, “the world of events”. For the first time, your baby grasps that one thing leads smoothly to another: your hand reaches, and the toy moves. Cause, meet effect.',
           'It sounds small. It is enormous. The whole world suddenly has a logic to it, and taking that in is genuinely disorienting, which is exactly why he clings a little tighter to the person who makes him feel safe: you.',
         ],
       ),
       ReadSection(
         heading: 'How to walk through it together',
         paragraphs: [
-          'Leaps pass, and a new skill usually appears on the far side, a first roll, a new sound, a longer gaze. Until then, more closeness helps, not less. Slow, narrated play, “here comes the ball… and it rolls”, gives his new understanding something to chew on.',
+          'Phases pass, and a new skill usually appears on the far side, a first roll, a new sound, a longer gaze. Until then, more closeness helps, not less. Slow, narrated play, “here comes the ball… and it rolls”, gives his new understanding something to chew on.',
         ],
         tip: ReadTip(
           'Narrate the cause and effect',

@@ -21,7 +21,12 @@
 
 import 'package:flutter/material.dart';
 
+import '../../widgets/pv_placeholders.dart';
 import 'pp_common.dart';
+import 'pp_product_widgets.dart';
+import 'pp_products_data.dart';
+import 'pp_tools_kit.dart';
+import 'products_discovery_screen.dart';
 import 'pp_phases_data.dart';
 
 class PhaseDetailScreen extends StatelessWidget {
@@ -87,6 +92,27 @@ class PhaseDetailScreen extends StatelessWidget {
 
             // ---- working on ----
             const SizedBox(height: 26),
+            // ⚠️ THE VIDEO GOES AT THE TOP, per the standing feedback for every
+            // section. `AgePhase.videoId` has existed since this screen was
+            // built and is null on all twenty phases — declared and never
+            // populated, which is the same shape as the consult roles and the
+            // phase productIds below.
+            //
+            // So it renders the real player when there is a file and the real
+            // placeholder when there is not, rather than rendering nothing and
+            // hiding the gap. `slotId` names the wiring at the moment the slot
+            // is created.
+            const SizedBox(height: 20),
+            _pad(PvVideoPlaceholder(
+              title: '${p.name}, in five minutes',
+              subtitle: 'What is happening for him now, and what helps.',
+              duration: '5 min',
+              hue: 268,
+              flat: true,
+              slotId: 'development/phase/${p.number}',
+            )),
+
+            const SizedBox(height: 24),
             _pad(Text('What he is working on', style: ppJakarta(18))),
             const SizedBox(height: 12),
             _pad(Column(children: [
@@ -174,6 +200,68 @@ class PhaseDetailScreen extends StatelessWidget {
                 ]),
               )),
             ],
+
+            // ---- FAQs ----------------------------------------------------
+            // ⚠️ REUSES THE WRITTEN, AGE-BANDED ANSWERS rather than authoring
+            // twenty new sets. `ppLearnBlock` opens `ppFaqSheet`, which now
+            // prefers `pp_faq_data.dart` over corpus search, and those answers
+            // already change with the child's age — so the same four questions
+            // read differently on a three-month phase and a three-year one.
+            // Twenty hand-written FAQ sets would be twenty things to keep true.
+            const SizedBox(height: 26),
+            _pad(ppLearnBlock(context, const [
+              'Why do babies develop at such different rates?',
+              'What does "serve and return" mean?',
+              'How can I support development through play?',
+              'When is a wait-and-see, and when to ask?',
+            ])),
+
+            // ---- products ------------------------------------------------
+            // ⚠️ AN INVITATION, NOT INVENTED PICKS. The feedback asks for a
+            // recommended-products section with a see-more. `AgePhase` has a
+            // `productIds` field and it is EMPTY on all twenty phases, and
+            // `PpProduct` carries no age or stage, so there is no honest way to
+            // derive "products for this phase" in code.
+            //
+            // Fabricating a rail by category would be a recommendation the app
+            // cannot stand behind, on a page a parent is reading to work out
+            // whether her child is fine. So the section renders as a real way
+            // in to the catalogue, and becomes a curated rail the moment
+            // `productIds` is filled — the rendering below is already written
+            // for that case.
+            //
+            // Empty-but-present rather than hidden, per the repo rule that a
+            // feature is never hidden and only its empty copy changes.
+            const SizedBox(height: 26),
+            _pad(Row(children: [
+              Expanded(child: Text('Things that help at this stage', style: ppJakarta(16.5))),
+            ])),
+            const SizedBox(height: 6),
+            _pad(Text(
+                p.productIds.isEmpty
+                    ? 'Nothing is picked out for this phase yet. The full '
+                        'catalogue is organised by what you are solving.'
+                    : 'Chosen for where he is now.',
+                style: ppBody(12.5, color: ppMuted, h: 1.5))),
+            const SizedBox(height: 12),
+            if (p.productIds.isNotEmpty)
+              _pad(Column(children: [
+                for (final id in p.productIds.take(3))
+                  PpProductCard(productById(id)),
+              ])),
+            _pad(GestureDetector(
+              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                settings: const RouteSettings(name: 'pp/products'),
+                builder: (_) => const ProductsDiscoveryScreen(),
+              )),
+              behavior: HitTestBehavior.opaque,
+              child: Row(children: [
+                Text(p.productIds.isEmpty ? 'Browse products' : 'See all for this stage',
+                    style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
+                const SizedBox(width: 6),
+                const Icon(Icons.arrow_forward_rounded, size: 15, color: ppPurple),
+              ]),
+            )),
 
             const SizedBox(height: 22),
             _pad(Text(

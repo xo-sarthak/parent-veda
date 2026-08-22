@@ -36,6 +36,7 @@ import 'leap_definition_screen.dart';
 import 'pp_child_profile.dart';
 import 'multichild_sheet.dart';
 import 'pp_common.dart';
+import 'pp_expert_link.dart';
 import 'daily_tip_popup.dart';
 import 'pp_saved_hub_screen.dart';
 import 'pp_daily_tips.dart';
@@ -857,12 +858,12 @@ class _MyChildScreenState extends State<MyChildScreen> {
     final String status;
     if (inLeap) {
       status = next != null
-          ? 'A fussy stretch now, calm before Leap ${next.number}.'
+          ? 'A fussy stretch now, calm before Phase ${next.number}.'
           : 'A fussy stretch now.';
     } else {
       status = next != null
-          ? 'A calm stretch, next leap around week ${next.startWeek.round()}.'
-          : 'Past the last big leap.';
+          ? 'A calm stretch, next phase around week ${next.startWeek.round()}.'
+          : 'Past the last big phase.';
     }
 
     return ppCard(
@@ -872,7 +873,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
         Row(children: [
           Text('LEAP JOURNEY', style: ppBody(10.5, color: ppMuted, w: FontWeight.w800).copyWith(letterSpacing: 1.0)),
           const Spacer(),
-          Text('Leap ${leap.number} of $total', style: ppBody(11, color: ppPurple, w: FontWeight.w800)),
+          Text('Phase ${leap.number} of $total', style: ppBody(11, color: ppPurple, w: FontWeight.w800)),
         ]),
         const SizedBox(height: 12),
         Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
@@ -1048,12 +1049,12 @@ class _MyChildScreenState extends State<MyChildScreen> {
     final String status;
     if (inLeap) {
       status = next != null
-          ? 'A fussy stretch now, calm before Leap ${next.number}.'
+          ? 'A fussy stretch now, calm before Phase ${next.number}.'
           : 'A fussy stretch now.';
     } else {
       status = next != null
-          ? 'A calm stretch, next leap around week ${next.startWeek.round()}.'
-          : 'Past the last big leap.';
+          ? 'A calm stretch, next phase around week ${next.startWeek.round()}.'
+          : 'Past the last big phase.';
     }
 
     return GestureDetector(
@@ -1063,7 +1064,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
         Row(children: [
           Text('LEAP JOURNEY', style: ppBody(10.5, color: w70, w: FontWeight.w800).copyWith(letterSpacing: 1.0)),
           const Spacer(),
-          Text('Leap ${leap.number} of $total', style: ppBody(10.5, color: Colors.white, w: FontWeight.w800)),
+          Text('Phase ${leap.number} of $total', style: ppBody(10.5, color: Colors.white, w: FontWeight.w800)),
           // Makes it evident the whole bar is tappable — opens the full timeline.
           const SizedBox(width: 2),
           const Icon(Icons.chevron_right_rounded, size: 15, color: w70),
@@ -1520,7 +1521,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
               const SizedBox(height: 12),
               Text(v.title, style: ppJakarta(16)),
               const SizedBox(height: 6),
-              Text('${v.durationLabel} · ${v.expert.name}', style: ppBody(12.5, color: ppMuted, h: 1.4)),
+              PpExpertName(v.expert, prefix: '${v.durationLabel} · ', style: ppBody(12.5, color: ppMuted, h: 1.4)),
               // WATCH BUTTON REMOVED from the phase video card, per the
               // review. The whole card is already a tap target that opens the
               // player — the thumbnail, the title and the row all call open()
@@ -1962,7 +1963,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
                 const SizedBox(height: 8),
                 Text(v.title, style: ppJakarta(13).copyWith(height: 1.25), maxLines: 2, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 3),
-                Text('${v.durationLabel} · ${v.expert.name}', style: ppBody(11, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
+                PpExpertName(v.expert, prefix: '${v.durationLabel} · ', style: ppBody(11, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
               ]),
             ),
           ),

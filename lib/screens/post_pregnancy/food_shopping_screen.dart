@@ -59,16 +59,31 @@ class FoodShoppingScreen extends StatelessWidget {
                     ]),
                   )),
                   const SizedBox(height: 16),
-                  if (lines.length - left > 0)
-                    _pad(GestureDetector(
-                      onTap: store.clearPurchased,
+                  // ⚠️ TWO ACTIONS, BECAUSE THEY ANSWER DIFFERENT QUESTIONS.
+                  // "Clear purchased" is tidying after a shop and only makes
+                  // sense once something is ticked. "Empty the list" is
+                  // starting again, and it has to be available even when
+                  // nothing is ticked — which is exactly the state a parent is
+                  // in when she has just added the wrong recipe's ingredients.
+                  _pad(Row(children: [
+                    if (lines.length - left > 0) ...[
+                      GestureDetector(
+                        onTap: store.clearPurchased,
+                        behavior: HitTestBehavior.opaque,
+                        child: Row(children: [
+                          const Icon(Icons.delete_sweep_outlined, size: 18, color: ppSoft),
+                          const SizedBox(width: 8),
+                          Text('Clear ${lines.length - left} purchased', style: ppBody(13, color: ppSoft, w: FontWeight.w700)),
+                        ]),
+                      ),
+                      const Spacer(),
+                    ],
+                    GestureDetector(
+                      onTap: store.clearShopping,
                       behavior: HitTestBehavior.opaque,
-                      child: Row(children: [
-                        const Icon(Icons.delete_sweep_outlined, size: 18, color: ppSoft),
-                        const SizedBox(width: 8),
-                        Text('Clear ${lines.length - left} purchased', style: ppBody(13, color: ppSoft, w: FontWeight.w700)),
-                      ]),
-                    )),
+                      child: Text('Empty the list', style: ppBody(13, color: ppMuted, w: FontWeight.w700)),
+                    ),
+                  ])),
                   const SizedBox(height: 16),
                   _pad(Text('Grocery delivery integration is coming - for now this is your checklist.', style: ppBody(11.5, color: ppMuted, h: 1.5))),
                 ],
@@ -102,6 +117,23 @@ class FoodShoppingScreen extends StatelessWidget {
             Expanded(
               child: Text(line,
                   style: ppBody(14, color: purchased ? ppMuted : ppInk, w: FontWeight.w500).copyWith(decoration: purchased ? TextDecoration.lineThrough : null)),
+            ),
+            // ⚠️ A REMOVE ON EVERY ROW, NOT A SWIPE. A swipe-to-delete is
+            // the tidier gesture and it is invisible — there is nothing on
+            // screen that says the row can go, which is precisely how this
+            // list came to feel like items could not be removed. A visible
+            // control is the fix for a discoverability bug.
+            //
+            // 40x40 hit area on a 16px glyph: below 40 it competes with the
+            // row's own tap-to-tick and she deletes what she meant to tick.
+            GestureDetector(
+              onTap: () => FoodStore.instance.removeLine(line),
+              behavior: HitTestBehavior.opaque,
+              child: const SizedBox(
+                width: 40,
+                height: 40,
+                child: Icon(Icons.close_rounded, size: 16, color: ppMuted),
+              ),
             ),
           ]),
         ),

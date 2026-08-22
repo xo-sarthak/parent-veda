@@ -67,7 +67,7 @@ class _LeapCalendarScreenState extends State<LeapCalendarScreen> {
             const SizedBox(height: 18),
             _pad(ppEyebrow('The Wonder Weeks', color: ppPurple)),
             const SizedBox(height: 8),
-            _pad(Text('Leap calendar', style: ppFraunces(30, h: 1.1))),
+            _pad(Text('Phase calendar', style: ppFraunces(30, h: 1.1))),
             const SizedBox(height: 6),
             _pad(Text('Every mental leap of the first two years, mapped to ${child.nameMid}\'s own dates. He is in ${kLeaps[curIdx].label} right now.',
                 style: ppBody(14, h: 1.55))),
@@ -88,16 +88,16 @@ class _LeapCalendarScreenState extends State<LeapCalendarScreen> {
 
             // full list
             const SizedBox(height: 30),
-            _pad(Text('All leaps', style: ppJakarta(17))),
+            _pad(Text('All phases', style: ppJakarta(17))),
             const SizedBox(height: 6),
-            _pad(Text('Tap any leap to read what it means.', style: ppBody(12.5, color: ppMuted))),
+            _pad(Text('Tap any phase to read what it means.', style: ppBody(12.5, color: ppMuted))),
             const SizedBox(height: 14),
             _pad(Column(children: [
               for (int i = 0; i < kLeaps.length; i++) _listRow(kLeaps[i], i, curIdx),
             ])),
 
             const SizedBox(height: 24),
-            _pad(Text("Timings are approximate - every baby's leaps arrive a week or two either side.",
+            _pad(Text("Timings are approximate - every baby's phases arrive a week or two either side.",
                 textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.5))),
           ],
         ),

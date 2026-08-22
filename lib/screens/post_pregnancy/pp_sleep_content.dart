@@ -459,7 +459,7 @@ final PpArea _nightWaking = PpArea(
             [
               '6 to 12 months',
               '0 to 3 a night',
-              'Leaps, teeth, and looking for you. Feeds may or may not still '
+              'Phases, teeth, and looking for you. Feeds may or may not still '
                   'be needed.'
             ],
             [
@@ -1975,6 +1975,19 @@ final PpArea _worries = PpArea(
       format: 'SHORT ARTICLE',
       bands: ['nb', 'm3_6', 'm6_12'],
       blocks: [
+        // ⚠️ ADDED IN THE S01 PASS — "review once more, where the video has
+        // not been added, please add video wherever it feels correct." This
+        // area had six pages and no video at all, and this is the page that
+        // earns one: the transfer is a PHYSICAL technique, and a paragraph
+        // describing the order of head and bottom is exactly the thing a
+        // fifteen-second demonstration does better than any prose can.
+        PpVideoSlot(
+          title: 'The drowsy transfer, shown slowly',
+          subtitle: 'Bottom first, head supported and last, and the pause '
+              'before you let go. Filmed at real speed.',
+          minutes: '4 MIN',
+          slotId: 'sleep/drowsy_transfer',
+        ),
         PpIntro('She sleeps beautifully in your arms and wakes within minutes '
             'of being put down. This is one of the most common things new '
             'parents ask about, and one of the most normal.'),
@@ -2369,6 +2382,18 @@ final PpArea _music = PpArea(
       title: 'Does music actually help babies sleep?',
       format: 'HONEST ARTICLE',
       blocks: [
+        // ⚠️ ADDED IN THE S01 PASS. The area had no video, and this page
+        // carries the section's one genuine safety point — the volume limit,
+        // which the text says "nobody mentions". A number in a paragraph is
+        // read past; a demonstration of how loud is too loud, next to a phone
+        // at arm's length, is the version that changes what she does tonight.
+        PpVideoSlot(
+          title: 'How loud is too loud, actually',
+          subtitle: 'Where to put the speaker, and what the safe level sounds '
+              'like next to a cot.',
+          minutes: '3 MIN',
+          slotId: 'sleep/sound_volume',
+        ),
         PpIntro('Partly yes, and not in the way it is usually sold. Some of '
             'this has real evidence behind it, some of it is marketing, and '
             'one part of it is a genuine safety issue nobody mentions.'),

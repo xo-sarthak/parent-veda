@@ -9,6 +9,7 @@
 //  - no points, streaks or badges. Nothing here depends on the pregnancy app.
 // =============================================================================
 
+import 'pp_grow_activities.dart';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -178,11 +179,11 @@ const List<DevArea> kDevAreas = [
     nextActivityId: 'peekaboo',
     relatedVideoId: 'leap4brain',
     journey: [
-      DevStage('Notices contrast', 'mastered', 'Fixes on bold patterns and faces.', 'The very first attention-building.'),
-      DevStage('Follows a moving toy', 'mastered', 'Tracks something across his view.', 'Visual attention and prediction.'),
-      DevStage('Cause & effect', 'current', 'Grasps that his hand makes the toy move.', 'Where thinking begins.', activities: ['peekaboo', 'highcontrast']),
-      DevStage('Object permanence', 'next', 'Begins to sense things exist when hidden.', 'Why peekaboo becomes magic.', activities: ['peekaboo']),
-      DevStage('Simple problem solving', 'future', 'Reaches around a barrier for a toy.', 'Early planning and persistence.'),
+      DevStage('Notices contrast', 'mastered', 'He locks onto bold edges — black and white, a striped cushion, the line of your hairline against your face. Colour and fine detail come later; right now it is contrast that his eyes can actually resolve.', 'This is attention being built from nothing. Before he can learn anything about the world he has to be able to hold his gaze on one part of it, and a strong edge is the easiest thing to hold onto.'),
+      DevStage('Follows a moving toy', 'mastered', 'His eyes travel with something as you move it across him, and after a while his head follows too. Slow and close works far better than fast and far.', 'Tracking is the first time he predicts rather than reacts — his eyes arrive where the toy is going, not where it was. That same prediction is what later lets him reach for it.'),
+      DevStage('Cause & effect', 'current', 'He works out that HE did that. A hand swipes, the rattle sounds; a kick lands, the pram toy swings. You will see him do it again on purpose, watching to check it happens twice.', 'This is the beginning of thinking rather than sensing. It is also the first time he learns he has an effect on the world, which is the foundation of both confidence and every experiment he will ever run.', activities: ['peekaboo', 'highcontrast']),
+      DevStage('Object permanence', 'next', 'A toy under a cloth stops being gone and starts being hidden. Early on he looks where it disappeared; later he lifts the cloth to check.', 'It changes what absence means. It is why peekaboo becomes hilarious rather than alarming — and, a little later, it is also why you leaving the room becomes worth protesting about. Both come from the same new idea.', activities: ['peekaboo']),
+      DevStage('Simple problem solving', 'future', 'He wants a toy, something is in the way, and instead of giving up or crying he goes around it. A cushion gets pushed aside, an arm reaches past a leg.', 'Two things are happening at once: he is holding a goal in mind, and he is trying a second route when the first fails. Persistence is not a personality trait yet, it is a skill, and this is it being practised.'),
     ],
   ),
   DevArea(
@@ -206,11 +207,11 @@ const List<DevArea> kDevAreas = [
     relatedArticle: 'Talking to your baby before they can talk',
     relatedVideoId: 'babbling',
     journey: [
-      DevStage('Cooing', 'mastered', 'Soft vowel sounds, aah, ooh.', 'The first voice play.'),
-      DevStage('Musical babble', 'current', 'Squeals, raspberries, sing-song sounds.', 'Rehearsing conversation’s music.', activities: ['narrate', 'song']),
-      DevStage('Turn-taking', 'next', 'Waits, then “answers” you.', 'The back-and-forth of real talk.', activities: ['narrate']),
-      DevStage('Babble with consonants', 'future', '“Ba-ba”, “da-da” appear.', 'Building blocks of first words.'),
-      DevStage('First words', 'future', 'A meaningful “mama”, “dada”.', 'Language, arrived.'),
+      DevStage('Cooing', 'mastered', 'Soft open vowels — aah, ooh, ngah — usually aimed at your face when he is calm and fed and you are close enough for him to see you properly.', 'These are not random noises. He is discovering that he owns the sound, and that making it brings your face closer. That is the whole shape of a conversation, learned before a single word.'),
+      DevStage('Musical babble', 'current', 'Squeals, raspberries, growls and long sing-song runs. It rises and falls like speech without any of the words being real yet.', 'He is rehearsing the MUSIC of language before the vocabulary: the rhythm and the melody of the language he hears at home. A baby in a Hindi-speaking house babbles with a different tune from one in an English-speaking house, long before either says a word.', activities: ['narrate', 'song']),
+      DevStage('Turn-taking', 'next', 'You say something, he waits, and then he answers. Leave a gap and he fills it; talk over him and he stops.', 'This is the single most useful thing he learns about talking, and it is entirely about your pauses rather than your words. Conversation is a rhythm first and a vocabulary second.', activities: ['narrate']),
+      DevStage('Babble with consonants', 'future', 'Ba-ba, da-da, ma-ma arrive and get repeated endlessly. At first they mean nothing at all, however much everyone in the house insists otherwise.', 'Consonants need lips, tongue and breath working together, so this is a physical achievement as much as a language one. The syllables he practises now are the ones his first real words will be made of.'),
+      DevStage('First words', 'future', 'One sound starts meaning one thing, reliably — the same noise for milk, or for the dog, every time. It often is not a word an adult would recognise.', 'The leap is not the pronunciation, it is the idea that a sound can STAND FOR something that is not present. Understanding runs well ahead of speaking here: he knows far more words than he can say, and that gap is normal.'),
     ],
   ),
   DevArea(
@@ -233,12 +234,12 @@ const List<DevArea> kDevAreas = [
     nextActivityId: 'tummy_play',
     relatedVideoId: 'tummytime',
     journey: [
-      DevStage('Head control', 'mastered', 'Holds his head steady and lifts it.', 'The foundation for everything.'),
-      DevStage('Pushes up on forearms', 'mastered', 'Lifts chest during tummy time.', 'Building upper-body strength.'),
-      DevStage('Rolling', 'current', 'Rocks and rolls tummy-to-back any day now.', 'His first way to move himself.', activities: ['tummy_play', 'roll_help']),
-      DevStage('Sitting with support', 'next', 'Props upright, wobbling but proud.', 'A whole new view of the world.'),
-      DevStage('Crawling', 'future', 'The floor becomes his to explore.', 'Independence takes off.'),
-      DevStage('Standing & walking', 'future', 'Pulls up, cruises, then those first steps.', 'The big one.'),
+      DevStage('Head control', 'mastered', 'His head stops needing your hand. He holds it steady when upright, and lifts it while lying on his front.', 'Almost everything else waits on this. He cannot look around, reach, sit or feed himself until his head is stable, so this is less a milestone than the platform the others are built on.'),
+      DevStage('Pushes up on forearms', 'mastered', 'On his tummy he plants his elbows and lifts his chest clear of the floor, and can hold it there long enough to look around.', 'It builds the shoulders, back and neck that rolling and crawling will need, and it changes what he can see: from a nose-to-the-mat view to the whole room. Short, frequent stretches beat one long one.'),
+      DevStage('Rolling', 'current', 'Rocking turns into a roll — usually tummy to back first, because it takes less strength, and back to tummy weeks or months later.', 'It is the first time he changes where he is without anyone carrying him, and the first real reason to stop leaving him alone on a bed or sofa. Independence and hazard arrive on the same afternoon.', activities: ['tummy_play', 'roll_help']),
+      DevStage('Sitting with support', 'next', 'Propped on cushions or on your leg he holds himself upright, wobbling, and topples cheerfully. Unsupported sitting follows once his trunk catches up.', 'Sitting frees his hands. Lying down, a baby needs his arms for stability; upright, both hands can explore at once, which is why so much fine-motor progress arrives just after he can sit.'),
+      DevStage('Crawling', 'future', 'Commando shuffling, bottom-scooting, rolling across a room, or a textbook hands-and-knees crawl. All of them count, and some babies skip it entirely and go straight to pulling up.', 'The point is self-directed movement, not the style. He can now decide where to be, which changes how he learns: the world stops being what you bring him and becomes what he goes and finds.'),
+      DevStage('Standing & walking', 'future', 'He pulls up on furniture, cruises sideways along it, and eventually lets go. First steps are wide, stiff-armed and short.', 'The range here is enormous — anywhere from nine to eighteen months is ordinary — and early walking predicts nothing about later ability. What he gains is his hands: a walking child can carry something to you.'),
     ],
   ),
   DevArea(
@@ -256,10 +257,10 @@ const List<DevArea> kDevAreas = [
     nextActivityId: 'reach_ring',
     relatedVideoId: 'leap4brain',
     journey: [
-      DevStage('Hands to midline', 'mastered', 'Brings hands together at his chest.', 'Discovering his own hands.'),
-      DevStage('Reaching & grasping', 'current', 'Swipes at, then grabs, a toy.', 'Aiming with intent.', activities: ['reach_ring', 'texture']),
-      DevStage('Transfers hand to hand', 'next', 'Passes a toy between hands.', 'Coordination across the body.'),
-      DevStage('Pincer grasp', 'future', 'Picks up tiny things with finger and thumb.', 'The key to self-feeding.'),
+      DevStage('Hands to midline', 'mastered', 'He brings both hands together in front of his chest, usually finds them with his eyes, and often takes them straight to his mouth.', 'Working across the middle of the body is harder than it sounds and it is a prerequisite for anything two-handed. It is also how he discovers his hands are HIS, which is the beginning of a body he owns.'),
+      DevStage('Reaching & grasping', 'current', 'Swiping near a toy becomes a deliberate reach, and then a closed fist around it. Aim is poor at first, and improves fast with practice.', 'Reaching is eye and hand agreeing about where something is. It is also his first tool for satisfying his own curiosity: until now, whatever he wanted to examine had to be brought to him.', activities: ['reach_ring', 'texture']),
+      DevStage('Transfers hand to hand', 'next', 'A toy in one hand gets passed to the other, often with a pause in the middle while both hands hold it.', 'It needs the two halves of his brain to cooperate, and it doubles what he can do: one hand can hold while the other explores. Most self-feeding depends on this without anyone noticing.'),
+      DevStage('Pincer grasp', 'future', 'Finger and thumb close on something small — a pea, a crumb, a bit of thread off the floor. It starts raking and refines to a neat pinch.', 'This is the hand becoming precise, and it is what makes real self-feeding possible. It is also why floor sweeping matters more from now on: anything he can pinch, he can lift, and anything he can lift goes in his mouth.'),
     ],
   ),
   DevArea(
@@ -281,10 +282,10 @@ const List<DevArea> kDevAreas = [
     ],
     relatedVideoId: 'mumwellness',
     journey: [
-      DevStage('Social smile', 'mastered', 'Smiles on purpose at the people he loves.', 'The first true connection.'),
-      DevStage('Borrowing your calm', 'current', 'Settles with your steady presence.', 'Learning that big feelings pass.', activities: ['song']),
-      DevStage('Expressing delight', 'next', 'Belly laughs and squeals of joy.', 'A widening emotional range.'),
-      DevStage('Self-soothing begins', 'future', 'Finds a thumb or a lovey to settle.', 'Early independence in feelings.'),
+      DevStage('Social smile', 'mastered', 'A smile aimed at a person, in response to a face or a voice, rather than the fleeting smiles of sleep and wind that came before it.', 'It is the first thing he does purely to connect, with nothing to gain. For most parents it is also the moment the exhausting early weeks start paying something back, which matters more than anyone admits.'),
+      DevStage('Borrowing your calm', 'current', 'When he is upset your steady voice and unhurried hands settle him — not instantly, and not every time, but noticeably.', 'A baby cannot calm himself yet, so he uses yours. Every time it works he learns that big feelings end, which is the thing he will eventually be able to do alone. It is also why your own calm is worth protecting.', activities: ['song']),
+      DevStage('Expressing delight', 'next', 'Belly laughs, squeals, kicking with excitement — and repeating whatever caused it, looking at you to do it again.', 'His feelings stop being only comfort and distress and start having range. Sharing the joy is the new part: the laugh is aimed at you, not just produced near you.'),
+      DevStage('Self-soothing begins', 'future', 'A thumb, a fist, a corner of cloth, turning his head away from too much. Small, unglamorous strategies that take the edge off.', 'These are his first tools for managing himself, and they arrive alongside your comfort rather than replacing it. Needing you and having a thumb are not in competition.'),
     ],
   ),
   DevArea(
@@ -301,10 +302,10 @@ const List<DevArea> kDevAreas = [
     seed: 6,
     nextActivityId: 'peekaboo',
     journey: [
-      DevStage('Prefers faces', 'mastered', 'Drawn to faces above all else.', 'People matter most.'),
-      DevStage('Social back-and-forth', 'current', 'Smiles and “talks” to get a response.', 'The dance of connection.', activities: ['peekaboo', 'narrate']),
-      DevStage('Enjoys games', 'next', 'Peekaboo and “gonna get you” delight him.', 'Shared joy and anticipation.'),
-      DevStage('Stranger awareness', 'future', 'Prefers familiar people, wary of new ones.', 'A sign of secure attachment.'),
+      DevStage('Prefers faces', 'mastered', 'Given anything else to look at, he chooses a face — and yours above the others. Eye contact holds longer than it did.', 'Faces are where everything social begins, and he is wired to find them before he is wired for anything else. In a joint family this is also how he sorts the people around him into familiar and new.'),
+      DevStage('Social back-and-forth', 'current', 'He smiles or vocalises AT you, waits, and brightens when you answer. Stop answering and he tries harder, then gives up.', 'This is serve and return, the single best-supported thing in early development, and it needs nothing but your attention. What builds his brain here is that the answer comes back, not what the answer is.', activities: ['peekaboo', 'narrate']),
+      DevStage('Enjoys games', 'next', 'Peekaboo, this-little-piggy, gonna-get-you. He starts anticipating the ending and laughing before it arrives.', 'Anticipating means he is holding a sequence in mind and predicting what comes next. The delight is real, and so is the thinking underneath it.'),
+      DevStage('Stranger awareness', 'future', 'New faces get a long stare, a turned-away head, or tears — including with relatives he was happy with last month.', 'It looks like a step backwards and it is the opposite: he can now tell his people from everyone else, which is exactly what attachment is. In a house with many visitors this can be hard on everyone, and it passes.'),
     ],
   ),
   DevArea(
@@ -321,9 +322,9 @@ const List<DevArea> kDevAreas = [
     seed: 7,
     nextActivityId: 'texture',
     journey: [
-      DevStage('Sensory delight', 'current', 'Loves contrast, texture and new sounds.', 'The raw material of imagination.', activities: ['texture', 'highcontrast']),
-      DevStage('Exploring with mouth & hands', 'next', 'Everything is investigated.', 'Learning by doing.'),
-      DevStage('Cause-and-effect play', 'future', 'Bangs, drops, and shakes to see what happens.', 'Experimenting like a little scientist.'),
+      DevStage('Sensory delight', 'current', 'He seeks out texture, contrast, light and sound — a steel bowl, a crumpled dupatta, sunlight through a curtain.', 'Everything he will later imagine is built from things he has actually felt. The ordinary house is better material than most toys, and free.', activities: ['texture', 'highcontrast']),
+      DevStage('Exploring with mouth & hands', 'next', 'Everything goes in the mouth, and gets turned over, banged and dropped on the way there.', 'His mouth has more nerve endings than his fingers do, so mouthing is genuine investigation rather than a habit to stop. It does mean small objects and floor sweeping need real attention now.'),
+      DevStage('Cause-and-effect play', 'future', 'Deliberate banging, dropping, shaking and posting — and doing it again immediately to see whether the same thing happens.', 'Repetition is the experiment, not boredom. He is testing whether the world is reliable, and dropping a spoon forty times is how you find out.'),
     ],
   ),
   DevArea(
@@ -339,9 +340,9 @@ const List<DevArea> kDevAreas = [
     brainNote: 'The first flickers of independence, small self-soothing that grows into big self-reliance.',
     seed: 8,
     journey: [
-      DevStage('Hands to mouth', 'current', 'Finds and mouths his own hands.', 'The very first self-soothing.'),
-      DevStage('Holds during feeds', 'next', 'Rests a hand on the bottle or breast.', 'Participating in his own care.'),
-      DevStage('Finger foods', 'future', 'Feeds himself soft bits (from ~6 months).', 'A big leap in independence.'),
+      DevStage('Hands to mouth', 'current', 'He finds his own hands and takes them to his mouth on purpose, rather than by accident.', 'It is his first act of self-comfort, and the first thing he does for himself without waiting for anyone. Small, and genuinely a beginning.'),
+      DevStage('Holds during feeds', 'next', 'A hand rests on the bottle, or pats and holds while feeding at the breast. Not taking over, just joining in.', 'Feeding stops being something done to him and starts being something he takes part in. That shift, not the grip, is the skill.'),
+      DevStage('Finger foods', 'future', 'He picks up soft pieces himself and gets some of them in. Most of it ends up on the floor, the chair and him.', 'Self-feeding is fine motor, judgement and appetite all at once, and the mess is not a side effect of learning it — it IS the learning. Letting him do it badly is faster than doing it for him.'),
     ],
   ),
 ];
@@ -488,7 +489,36 @@ const List<(String, String)> kLookAheadPicks = [
 ];
 
 // ---- gentle check-ins -------------------------------------------------------
-const List<CheckInQ> kCheckIns = [
+/// ⚠️ THE CHECK-IN ASKED EVERY PARENT THE SAME SIX QUESTIONS, AND THEY WERE
+/// WRITTEN FOR A FOUR-MONTH-OLD.
+///
+/// "Does he push up on his forearms during tummy time?", "Does he smile back?",
+/// "Does he bring his hands together at his chest?" — asked of the parent of a
+/// two-year-old, unchanged. Nothing failed: six real questions rendered, the
+/// answers saved, the reflection at the end read warmly. It was simply the
+/// wrong conversation.
+///
+/// Feedback: "check if 'Let us see how your baby is doing' is actually age
+/// dependent or not, if not, make it age dependent based on current age of the
+/// child that we will anyways always know so no input needed from mother."
+///
+/// ⚠️ SIX QUESTIONS PER BAND, ONE PER DOMAIN, AND THE SHAPE IS DELIBERATE. The
+/// reflection at the end counts yeses against domains, so a band with five
+/// questions or two from one area would quietly skew it. Same six areas every
+/// time; only the observation changes.
+///
+/// ⚠️ EVERY QUESTION IS SOMETHING SHE CAN SEE THIS WEEK, and none of them is a
+/// threshold. "Does he" and "have you noticed", never "should he by now" — the
+/// screen says out loud that there are no right answers, and the questions
+/// have to be written so that stays true.
+///
+/// ⚠️ THE TEXT IS THE STORAGE KEY. `DevStore.checkInAnswer(q.text)` keys on the
+/// question string, so answers are naturally per-question and a child who ages
+/// into a new band starts that band fresh rather than inheriting ticks from a
+/// question nobody asked. That is the right behaviour, and it is a side effect
+/// of the key rather than a decision — worth knowing before anyone "tidies"
+/// the key into an id.
+const List<CheckInQ> kCheckIns0to6 = [
   CheckInQ('gross_motor', 'Does he push up on his forearms during tummy time?'),
   CheckInQ('social', 'Does he smile back when you smile at him?'),
   CheckInQ('language', 'Does he turn toward your voice or new sounds?'),
@@ -497,10 +527,163 @@ const List<CheckInQ> kCheckIns = [
   CheckInQ('emotional', 'Does he settle more easily in your arms?'),
 ];
 
+const List<CheckInQ> kCheckIns6to12 = [
+  CheckInQ('gross_motor', 'Can he sit without you holding him?'),
+  CheckInQ('social', 'Does he look for you when you leave the room?'),
+  CheckInQ('language', 'Does he babble strings of sounds, like ba-ba or da-da?'),
+  CheckInQ('fine_motor', 'Does he pass a toy from one hand to the other?'),
+  CheckInQ('cognitive', 'Does he look for a toy after you hide it under a cloth?'),
+  CheckInQ('emotional', 'Does he calm faster when you pick him up than when someone else does?'),
+];
+
+const List<CheckInQ> kCheckIns1to2 = [
+  CheckInQ('gross_motor', 'Is he pulling up, cruising along furniture, or walking?'),
+  CheckInQ('social', 'Does he bring something over to show you?'),
+  CheckInQ('language', 'Does he use a few words, even unclear ones, that mean something?'),
+  CheckInQ('fine_motor', 'Does he pick up small pieces of food with finger and thumb?'),
+  CheckInQ('cognitive', 'Does he follow a simple ask, like giving you the spoon?'),
+  CheckInQ('emotional', 'Does he look at your face to check before trying something new?'),
+];
+
+const List<CheckInQ> kCheckIns2to3 = [
+  CheckInQ('gross_motor', 'Does he run, and climb onto low furniture?'),
+  CheckInQ('social', 'Does he play alongside other children, even without joining in?'),
+  CheckInQ('language', 'Does he put two words together, like more milk?'),
+  CheckInQ('fine_motor', 'Does he scribble, and turn the pages of a book?'),
+  CheckInQ('cognitive', 'Does he pretend, like feeding a doll or talking on a phone?'),
+  CheckInQ('emotional', 'Does he show a strong opinion about what he wants?'),
+];
+
+const List<CheckInQ> kCheckIns3plus = [
+  CheckInQ('gross_motor', 'Does he jump with both feet, or pedal a tricycle?'),
+  CheckInQ('social', 'Does he take turns in a game, even with reminders?'),
+  CheckInQ('language', 'Can someone outside the family understand most of what he says?'),
+  CheckInQ('fine_motor', 'Does he hold a crayon in his fingers rather than his fist?'),
+  CheckInQ('cognitive', 'Does he ask why, and want a real answer?'),
+  CheckInQ('emotional', 'Can he name a feeling, like happy, sad or angry?'),
+];
+
+/// The six questions that fit a child of [months].
+List<CheckInQ> checkInsForAge(int months) {
+  if (months < 6) return kCheckIns0to6;
+  if (months < 12) return kCheckIns6to12;
+  if (months < 24) return kCheckIns1to2;
+  if (months < 36) return kCheckIns2to3;
+  return kCheckIns3plus;
+}
+
+/// ⚠️ KEPT AS AN ALIAS, NOT DELETED. `kCheckIns` was the whole API and other
+/// code may still read it; pointing it at the youngest band preserves the old
+/// behaviour exactly for anything not yet passing an age.
+const List<CheckInQ> kCheckIns = kCheckIns0to6;
+
 // ---- lookups ----------------------------------------------------------------
 DevArea devAreaById(String id) => kDevAreas.firstWhere((a) => a.id == id, orElse: () => kDevAreas.first);
 DevActivity devActivityById(String id) => kDevActivities.firstWhere((a) => a.id == id, orElse: () => kDevActivities.first);
 List<DevActivity> activitiesForArea(String areaId) => kDevActivities.where((a) => a.areaId == areaId).toList();
+
+/// ⚠️ THE ACTIVITY LIST WAS NEVER AGE-AWARE, AND NOTHING SAID SO.
+///
+/// The development home showed `kDevActivities.take(4)` — the first four in
+/// authored order, for every child at every age. A parent of a three-week-old
+/// and a parent of a four-year-old were handed the same four things to try.
+/// Nothing failed: every activity is real, every card renders, and the list
+/// even looks curated because it is stable.
+///
+/// Feedback: "check if 'Let us see how your baby is doing' is actually age
+/// dependent or not, if not, make it age dependent based on current age of the
+/// child that we will anyways always know so no input needed from mother, this
+/// will come from system." That last clause is the design rule this app already
+/// has — derive, never ask — and the age was sitting in `ChildProfileStore`
+/// the whole time.
+///
+/// ⚠️ THE RANGE IS PARSED FROM `ageTag` RATHER THAN STORED SEPARATELY. The
+/// tags are already authored ('3–6 mo', '0–12 mo') and are the string the card
+/// displays, so a second numeric field would be a copy that can disagree with
+/// the label a parent reads. Parsing is the cost of keeping one source.
+({int lo, int hi})? devAgeRange(String ageTag) {
+  final m = RegExp(r'(\d+)\s*[–—-]\s*(\d+)').firstMatch(ageTag);
+  if (m == null) return null;
+  var lo = int.parse(m.group(1)!);
+  var hi = int.parse(m.group(2)!);
+
+  // ⚠️ THE UNIT IS IN THE TAG AND IT IS NOT ALWAYS MONTHS. `kDevActivities`
+  // is entirely "9–12 mo"; `kGrowExtraActivities` uses "4–5 yr" for anything
+  // past two. Parsing the digits alone would read "4–5 yr" as four to five
+  // MONTHS — so a four-year-old's parent would be offered preschool activities
+  // labelled for her four-month-old, and a genuine four-month-old would get
+  // them too.
+  //
+  // It would not have crashed, and it would not have looked wrong: the cards
+  // are real, the ages are printed correctly on them, and only the FILTER
+  // would be lying. Worth handling before the second store is wired in rather
+  // than after.
+  final tag = ageTag.toLowerCase();
+  final inYears = tag.contains('yr') || tag.contains('year');
+  if (inYears) {
+    lo *= 12;
+    hi *= 12;
+    // "4–5 yr" means up to the fifth birthday, so the upper bound is the last
+    // month before it rather than the month of it. Without this a 60-month-old
+    // matches both "4–5 yr" and "5–6 yr".
+    hi += 11;
+  }
+  return (lo: lo, hi: hi);
+}
+
+/// Activities that fit a child of [months].
+///
+/// ⚠️ AN UNPARSEABLE TAG IS INCLUDED, NOT EXCLUDED. A typo in a range must
+/// not make an activity vanish silently; showing it to the wrong age is a
+/// smaller harm than a library that quietly shrinks.
+List<DevActivity> activitiesForAge(int months) {
+  // ⚠️ WRITTEN OUT RATHER THAN AS A COLLECTION-IF, AND THE FIRST VERSION WAS
+  // A REAL BUG THAT A TEST CAUGHT.
+  //
+  // It read:
+  //     if (devAgeRange(a.ageTag) case final r?)
+  //       if (months >= r.lo && months <= r.hi) a
+  //     else
+  //       a,
+  //
+  // The `else` binds to the INNER `if`, not to the pattern match — the
+  // dangling-else problem, alive and well in Dart's collection syntax. So any
+  // activity whose range parsed but did NOT contain the age fell through to
+  // `else a` and was included anyway. The filter compiled, analysed clean, and
+  // returned every activity at every age: the exact bug it was written to fix,
+  // reintroduced by the fix.
+  //
+  // Nothing on screen would have shown it, because the output of a broken
+  // filter over a good library is still a screen full of good activities.
+  // ⚠️ BOTH STORES, AND MISSING THE SECOND ONE WAS THE WHOLE OF "D5".
+  //
+  // This read `kDevActivities` alone — eight activities, every one tagged
+  // inside 0–12 months — so `activitiesForAge(30)` returned nothing and the
+  // conclusion was "the library stops at twelve months, somebody needs to
+  // write toddler content".
+  //
+  // `kGrowExtraActivities` has been sitting beside it the whole time with 39
+  // more, spanning 0–3 months to 4–5 years. The Development build prompt says
+  // so in one line: "activities LIVE -> pp_activities + pp_grow_activities
+  // (GrowStore: 39 extra grow activities)".
+  //
+  // So it was never a content gap. It was the same wiring gate this review
+  // keeps finding: real content, correct, and not reachable from the place
+  // that needed it. The tell was that the missing content was suspiciously
+  // shaped — a library that stops dead at exactly twelve months is a filter
+  // artefact, not an editorial decision.
+  final out = <DevActivity>[];
+  for (final a in [...kDevActivities, ...kGrowExtraActivities]) {
+    final r = devAgeRange(a.ageTag);
+    if (r == null) {
+      out.add(a); // fail open: a bad tag must not hide real content
+    } else if (months >= r.lo && months <= r.hi) {
+      out.add(a);
+    }
+  }
+  return out;
+}
+
 
 /// Today's one highlighted area (a real engine would rotate/personalise).
 DevArea todaysFocus() => devAreaById('language');

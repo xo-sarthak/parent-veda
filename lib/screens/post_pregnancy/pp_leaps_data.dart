@@ -63,7 +63,12 @@ class Leap {
   final List<String> productIds;
 
   /// "Leap 4" — the short header label.
-  String get label => 'Leap $number';
+  /// ⚠️ 'Phase', NOT 'Phase'. This getter is what every chip, header and
+  /// strip renders, so it is the whole rename in one line. The IDS below
+  /// stay 'leap4brain' and 'leap4' on purpose: they are persisted keys and
+  /// lookup strings, and a noun a parent reads is a different thing from a
+  /// key the app matches on.
+  String get label => 'Phase $number';
 
   /// The date this leap's window opens/closes, for a given date of birth.
   DateTime startDate(DateTime dob) => dob.add(Duration(days: (startWeek * 7).round()));
@@ -115,7 +120,7 @@ const List<Leap> kLeaps = [
     sections: [
       LeapSection('What is changing', [
         'A newborn spends his first weeks in a soft, blurry world. Around five weeks, his senses sharpen almost overnight: he sees a little further, hears a little more clearly, and begins to notice the difference between one smell, one voice, one face and another.',
-        'All of this arriving at once is a lot to take in. That is why this first leap often brings extra crying and a strong need to be held — the world has simply turned up its volume.',
+        'All of this arriving at once is a lot to take in. That is why this first phase often brings extra crying and a strong need to be held — the world has simply turned up its volume.',
       ]),
       LeapSection('How to walk through it together', [
         'There is nothing to fix here, only to comfort. Hold him close, keep his world calm and unhurried, and let him study your face — it is the most interesting thing in the room.',
@@ -176,7 +181,7 @@ const List<Leap> kLeaps = [
     readCollection: 'play',
     sections: [
       LeapSection('What is changing', [
-        'Until now the world moved in jumps for your baby. In this leap he begins to perceive smooth, gradual change — a voice sliding up and down, a hand moving in one flowing arc, the light softening at dusk.',
+        'Until now the world moved in jumps for your baby. In this phase he begins to perceive smooth, gradual change — a voice sliding up and down, a hand moving in one flowing arc, the light softening at dusk.',
         'His own body follows suit. Jerky newborn movements give way to smoother reaching, turning and wriggling.',
       ]),
       LeapSection('How to walk through it together', [
@@ -209,14 +214,14 @@ const List<Leap> kLeaps = [
     productIds: ['dozy'],
     sections: [
       LeapSection('The world of events', [
-        'Around four months, babies enter what is often called Leap 4 — “the world of events”. For the first time, your baby grasps that one thing leads smoothly to another: your hand reaches, and the toy moves.',
+        'Around four months, babies enter what is often called Phase 4 — “the world of events”. For the first time, your baby grasps that one thing leads smoothly to another: your hand reaches, and the toy moves.',
         'It sounds small. It is enormous. The whole world suddenly has a logic to it — and taking that in is genuinely disorienting, which is exactly why he clings a little tighter to the person who makes him feel safe: you.',
       ]),
       LeapSection('“Nazar lag gayi?” — probably not', [
-        'Clingy and crying more, off his feeds and sleep? In many homes the first thought is the evil eye. It is almost always just Leap 4’s fussiness — and it passes. This is growth, not misfortune.',
+        'Clingy and crying more, off his feeds and sleep? In many homes the first thought is the evil eye. It is almost always just Phase 4’s fussiness — and it passes. This is growth, not misfortune.',
       ]),
       LeapSection('How to walk through it together', [
-        'Leaps pass, and a new skill usually appears on the far side — a first roll, a new sound, a longer gaze. Until then, more closeness helps, not less.',
+        'Phases pass, and a new skill usually appears on the far side — a first roll, a new sound, a longer gaze. Until then, more closeness helps, not less.',
         'Slow, narrated play — “here comes the ball… and it rolls” — gives his new understanding something to chew on. Name the cause and the effect out loud, and you hand him words for the very thing his brain is discovering.',
       ]),
     ],
@@ -244,7 +249,7 @@ const List<Leap> kLeaps = [
     productIds: ['dozy'],
     sections: [
       LeapSection('The world of relationships', [
-        'In this leap your baby begins to grasp the idea of distance — that things (and people) can be near or far, and that the space between them can change. He can now sense that you might move away from him.',
+        'In this phase your baby begins to grasp the idea of distance — that things (and people) can be near or far, and that the space between them can change. He can now sense that you might move away from him.',
         'That new understanding is the root of the first real separation anxiety. It is not a step back; it is a sign he has worked out just how much you matter.',
       ]),
       LeapSection('How to walk through it together', [
@@ -370,7 +375,7 @@ const List<Leap> kLeaps = [
       ]),
       LeapSection('How to walk through it together', [
         'Offer safe choices so his new sense of agency has somewhere to go: “this cup or that one?”. Keep the important limits kind, clear and consistent.',
-        'Tantrums often arrive with this leap — big feelings meeting a brain that cannot yet manage them. Get low, stay calm, and lend him yours.',
+        'Tantrums often arrive with this phase — big feelings meeting a brain that cannot yet manage them. Get low, stay calm, and lend him yours.',
       ]),
     ],
   ),

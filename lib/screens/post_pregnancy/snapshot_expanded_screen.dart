@@ -72,7 +72,7 @@ class SnapshotExpandedScreen extends StatelessWidget {
                         gradient: LinearGradient(
                             begin: Alignment.topCenter, end: Alignment.bottomCenter, colors: [Colors.transparent, Color(0x802F2C30)]),
                       ),
-                      child: Text('${ChildProfileStore.instance.name} this month - a guide to Leap 4', style: ppBody(13, color: Colors.white, w: FontWeight.w600)),
+                      child: Text('${ChildProfileStore.instance.name} this month - a guide to Phase 4', style: ppBody(13, color: Colors.white, w: FontWeight.w600)),
                     ),
                   ),
                 ]),
@@ -83,7 +83,7 @@ class SnapshotExpandedScreen extends StatelessWidget {
             _pad(Text('Where ${ChildProfileStore.instance.nameMid} is right now', style: ppFraunces(30, h: 1.15))),
             const SizedBox(height: 10),
             _pad(Text(
-                'Four windows into a 4-month-old, mid-Leap 4. Every baby moves at his own pace - these are what to look for, not a scorecard.',
+                'Four windows into a 4-month-old, mid-Phase 4. Every baby moves at his own pace - these are what to look for, not a scorecard.',
                 style: ppBody(14, h: 1.6))),
 
             const SizedBox(height: 24),
@@ -91,7 +91,7 @@ class SnapshotExpandedScreen extends StatelessWidget {
                 'His hands have found each other - he clasps them at his chest, swipes at dangling toys, and pushes up on the floor. A first roll from tummy to back could arrive any day.',
                 first: true)),
             _pad(_window('Cognitive',
-                "He's piecing together that one thing leads to another - following your hand all the way to the toy it reaches for. Cause, meet effect. This is the heart of Leap 4.")),
+                "He's piecing together that one thing leads to another - following your hand all the way to the toy it reaches for. Cause, meet effect. This is the heart of Phase 4.")),
             _pad(_window('Social',
                 'Your face is the best thing in his world. He beams at you across a room, and has just discovered that a laugh earns a laugh back.')),
             _pad(_window('Language',

@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 
 import 'pp_child_profile.dart';
 import 'pp_common.dart';
+import 'pp_expert_link.dart';
 import 'pp_leaps_data.dart';
 import 'pp_products_data.dart';
 import 'pp_reading_data.dart';
@@ -189,7 +190,7 @@ class LeapDefinitionScreen extends StatelessWidget {
             _pad(ppSectionDivider()),
             _pad(Text('Watch', style: ppJakarta(17))),
             const SizedBox(height: 12),
-            if (video == null) _pad(_soonNote('A video for this leap is coming.')),
+            if (video == null) _pad(_soonNote('A video for this phase is coming.')),
             if (video != null) ...[
               _pad(GestureDetector(
                 onTap: () => _push(context, WatchPlayerScreen(video: video)),
@@ -203,7 +204,7 @@ class LeapDefinitionScreen extends StatelessWidget {
                     Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Text(video.title, style: ppBody(14, color: ppInk, w: FontWeight.w700), maxLines: 2, overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 2),
-                      Text('${video.durationLabel} · ${video.expert.name}', style: ppBody(12, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
+                      PpExpertName(video.expert, prefix: '${video.durationLabel} · ', style: ppBody(12, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
                     ])),
                     const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
                   ]),
@@ -218,7 +219,7 @@ class LeapDefinitionScreen extends StatelessWidget {
             _pad(Text('Read more', style: ppJakarta(17))),
             const SizedBox(height: 12),
             if (articles.isEmpty)
-              _pad(_soonNote('Reads for this leap are being written.')),
+              _pad(_soonNote('Reads for this phase are being written.')),
             if (articles.isNotEmpty) ...[
               const SizedBox(height: 12),
               for (final a in articles)
@@ -248,7 +249,7 @@ class LeapDefinitionScreen extends StatelessWidget {
             _pad(Text('Might help', style: ppJakarta(17))),
             const SizedBox(height: 12),
             if (products.isEmpty)
-              _pad(_soonNote('Picks for this leap are on the way.')),
+              _pad(_soonNote('Picks for this phase are on the way.')),
             if (products.isNotEmpty) ...[
               const SizedBox(height: 12),
               for (final p in products)

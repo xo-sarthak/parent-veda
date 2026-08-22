@@ -18,6 +18,7 @@ import 'development_activity_screen.dart';
 // devWordPill retired with the confusing "Growing" tag. Kept for revert.
 // import 'development_common.dart';
 import 'pp_common.dart';
+import 'pp_expert_link.dart';
 import 'pp_development_data.dart';
 import 'pp_products_data.dart';
 import 'pp_reading_data.dart';
@@ -120,20 +121,18 @@ class DevelopmentAreaScreen extends StatelessWidget {
               for (final s in area.journey) _skillBox(context, s),
             ])),
 
-            // WAYS TO HELP IT ALONG — asked for by the review, and the one
-            // section of the five that was genuinely missing here.
+            // ⚠️ `..._helpSection(area)` USED TO BE HERE and was removed by
+            // the parenting feedback — "Ways to help it along should be in
+            // each of the sections, but it won't be there as a generic
+            // section on the page listing the skill timeline."
             //
-            // The bullets already existed (helpBulletsFor, in
-            // pp_development_data.dart) and were only rendered on the
-            // individual skill page. So a parent who opened "Brain" and did
-            // not tap further got the timeline and three shopping-ish rails,
-            // and never the part that says what to actually DO. It is now
-            // above "Go deeper", because doing beats browsing.
+            // The bullets are keyed to whichever skill is CURRENT, so on this
+            // page they appeared under a heading that implied the whole
+            // domain while describing one skill. `dev_stage_detail_screen`
+            // already renders them per skill, correctly labelled, one tap in.
             //
-            // Keyed to the skill he is on RIGHT NOW rather than the area in
-            // general — the same area gives different advice at four months
-            // and at four years.
-            ..._helpSection(area),
+            // The builder is commented out at the foot of this file with the
+            // full history, including why an earlier review added it here.
 
             // go deeper - three rails
             _pad(ppSectionDivider()),
@@ -161,7 +160,12 @@ class DevelopmentAreaScreen extends StatelessWidget {
             if (reads.isEmpty) _pad(_emptyRail('Reads for this area are on the way.')) else _readRail(context, reads),
 
             const SizedBox(height: 24),
-            _railHeader(context, 'Explore products', products.isEmpty ? null : () => _push(context, ProductsCategoryScreen(category: productCat))),
+            // ⚠️ NAMED FOR THIS PHASE, NOT FOR BROWSING. "Explore products" is a
+            // shop verb on a page about a child's development; the feedback
+            // asked for "Recommended Products for This Phase", which is
+            // narrower and therefore more trustworthy — it says these were
+            // chosen for where he is, not that there is a catalogue.
+            _railHeader(context, 'Recommended for this phase', products.isEmpty ? null : () => _push(context, ProductsCategoryScreen(category: productCat))),
             const SizedBox(height: 12),
             if (products.isEmpty) _pad(_emptyRail('Product picks for this area are on the way.')) else _productRail(context, products),
           ],
@@ -171,6 +175,28 @@ class DevelopmentAreaScreen extends StatelessWidget {
   }
 
   // ---- ways to help it along ----------------------------------------------
+  /* ⚠️ REMOVED FROM THE AREA PAGE BY FEEDBACK, KEPT FOR REVERT — AND THIS
+     ONE REVERSES AN EARLIER REVIEW, WHICH IS WORTH SAYING OUT LOUD.
+
+     The comment below records why it was ADDED: an earlier pass found that a
+     parent who opened "Brain" and did not tap further got the timeline and
+     three rails and never the part that says what to DO. That was true.
+
+     The current feedback asks for the opposite placement: "Ways to help it
+     along should be a separate section outside, it should be in each of the
+     sections like cause and effect will have it, but it won't be there as a
+     generic section on the page listing brain or other skill timeline."
+
+     Both are defensible and they cannot both ship. The deciding argument is
+     that the area page's bullets were keyed to whichever skill happened to be
+     `current`, so a page titled "Brain" gave advice about ONE skill under a
+     heading that implied the whole domain. On the skill page the same bullets
+     are unambiguous, and `dev_stage_detail_screen.dart:95` already renders
+     them there — so nothing is lost, it is one tap further in and correctly
+     labelled.
+
+     Restoring is uncommenting this and its call site.
+
   List<Widget> _helpSection(DevArea area) {
     // The skill he is actually on. Falls back to the first entry rather than
     // returning nothing: an area with no 'current' skill is a data gap, and a
@@ -221,6 +247,7 @@ class DevelopmentAreaScreen extends StatelessWidget {
       )),
     ];
   }
+  */
 
   // ---- skill box ----------------------------------------------------------
   Widget _skillBox(BuildContext context, DevStage s) {
@@ -325,7 +352,7 @@ class DevelopmentAreaScreen extends StatelessWidget {
                   const SizedBox(height: 9),
                   Text(v.title, style: ppJakarta(13.5).copyWith(height: 1.25), maxLines: 2, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 3),
-                  Text(v.expert.name, style: ppBody(11.5, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  PpExpertName(v.expert, style: ppBody(11.5, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
                 ]),
               ),
             );

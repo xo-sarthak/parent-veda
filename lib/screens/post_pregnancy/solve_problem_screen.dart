@@ -48,7 +48,7 @@ class SolveProblemScreen extends StatelessWidget {
             _pad(Text('The 4-month sleep regression', style: ppFraunces(31, h: 1.15))),
             const SizedBox(height: 14),
             _pad(Text(
-                "Around now, his sleep cycles reorganise into mature, adult-like patterns with lighter phases he briefly surfaces from. Layered on top of Leap 4's clinginess, bedtime can fall apart almost overnight. It's development, not regression - and it's temporary.",
+                "Around now, his sleep cycles reorganise into mature, adult-like patterns with lighter phases he briefly surfaces from. Layered on top of Phase 4's clinginess, bedtime can fall apart almost overnight. It's development, not regression - and it's temporary.",
                 style: ppBody(15, h: 1.65))),
 
             _pad(ppSectionDivider()),

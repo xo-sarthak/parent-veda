@@ -2094,6 +2094,16 @@ const PpArea _storyTime = PpArea(
       format: 'SHORT ARTICLE',
       bands: ['baby', 'one'],
       blocks: [
+        // ⚠️ ADDED IN THE S07-S11 PASS. This area had no video at all, and
+        // the doc asks for one in every sub-section - spelled out in the
+        // early sections, then pointed at the prompt once it became
+        // repetitive.
+        PpVideoSlot(
+          title: 'How to tell a story to a baby who cannot talk yet',
+          subtitle: 'Voice, pace and the pauses. It is less about the story than about the back-and-forth.',
+          minutes: '4 MIN',
+          slotId: 'early_learning/telling_a_story',
+        ),
         PpIntro('He does not follow the plot and it does not matter. What he is '
             'getting is your voice, your closeness and the shape of language.'),
         PpArticle([
@@ -2236,6 +2246,16 @@ const PpArea _bedtimeTales = PpArea(
       subtitle: 'Little bedtime tales',
       format: 'STORY',
       blocks: [
+        // ⚠️ ADDED IN THE S07-S11 PASS. This area had no video at all, and
+        // the doc asks for one in every sub-section - spelled out in the
+        // early sections, then pointed at the prompt once it became
+        // repetitive.
+        PpVideoSlot(
+          title: 'The sleepy elephant, read aloud',
+          subtitle: 'A calm bedtime reading to listen to together, or to borrow the pace from.',
+          minutes: '6 MIN',
+          slotId: 'early_learning/read_bedtime',
+        ),
         PpIntro('A very short story about being tired and being carried home. '
             'About two minutes to tell.'),
         PpArticle([
@@ -2654,6 +2674,16 @@ const PpArea _panchatantra = PpArea(
       subtitle: 'Panchatantra',
       format: 'STORY',
       blocks: [
+        // ⚠️ ADDED IN THE S07-S11 PASS. This area had no video at all, and
+        // the doc asks for one in every sub-section - spelled out in the
+        // early sections, then pointed at the prompt once it became
+        // repetitive.
+        PpVideoSlot(
+          title: 'The monkey and the crocodile, told properly',
+          subtitle: 'The Panchatantra story as a grandmother tells it, not as a summary.',
+          minutes: '7 MIN',
+          slotId: 'early_learning/read_panchatantra',
+        ),
         PpIntro('A story about a friendship, a betrayal, and a monkey who keeps '
             'his head when he most needs it. About four minutes.'),
         PpArticle([
@@ -3177,6 +3207,16 @@ const PpArea _jataka = PpArea(
       subtitle: 'Jataka tales',
       format: 'STORY',
       blocks: [
+        // ⚠️ ADDED IN THE S07-S11 PASS. This area had no video at all, and
+        // the doc asks for one in every sub-section - spelled out in the
+        // early sections, then pointed at the prompt once it became
+        // repetitive.
+        PpVideoSlot(
+          title: 'The monkey king who made himself the bridge',
+          subtitle: 'A Jataka tale read aloud, with the ending left to sit.',
+          minutes: '6 MIN',
+          slotId: 'early_learning/read_jataka',
+        ),
         PpIntro('A leader who puts himself last. One of the best known of these '
             'stories, and one of the kindest.'),
         PpArticle([
@@ -3616,6 +3656,16 @@ const PpArea _birbal = PpArea(
       subtitle: 'Akbar and Birbal',
       format: 'STORY',
       blocks: [
+        // ⚠️ ADDED IN THE S07-S11 PASS. This area had no video at all, and
+        // the doc asks for one in every sub-section - spelled out in the
+        // early sections, then pointed at the prompt once it became
+        // repetitive.
+        PpVideoSlot(
+          title: 'How Birbal made the line shorter',
+          subtitle: 'Told at the speed a four-year-old can follow, with the pause before the answer.',
+          minutes: '5 MIN',
+          slotId: 'early_learning/read_birbal',
+        ),
         PpIntro('The most famous of them all, and the shortest. Two minutes, '
             'and a lesson a child will use at school.'),
         PpArticle([
@@ -4035,6 +4085,16 @@ const PpArea _tenali = PpArea(
       subtitle: 'Tenali Rama',
       format: 'STORY',
       blocks: [
+        // ⚠️ ADDED IN THE S07-S11 PASS. This area had no video at all, and
+        // the doc asks for one in every sub-section - spelled out in the
+        // early sections, then pointed at the prompt once it became
+        // repetitive.
+        PpVideoSlot(
+          title: 'Tenali Rama and the thieves in the garden',
+          subtitle: 'Read aloud, with the joke given room to land.',
+          minutes: '5 MIN',
+          slotId: 'early_learning/read_tenali',
+        ),
         PpIntro('Tenali gets his garden dug and watered by the very people who '
             'came to rob him, without ever getting out of bed.'),
         PpArticle([
@@ -4301,6 +4361,16 @@ const PpArea _worldTales = PpArea(
       subtitle: 'Stories from around the world',
       format: 'STORY',
       blocks: [
+        // ⚠️ ADDED IN THE S07-S11 PASS. This area had no video at all, and
+        // the doc asks for one in every sub-section - spelled out in the
+        // early sections, then pointed at the prompt once it became
+        // repetitive.
+        PpVideoSlot(
+          title: 'The lion and the mouse, read aloud',
+          subtitle: 'A short one for a child who is nearly asleep.',
+          minutes: '4 MIN',
+          slotId: 'early_learning/read_world',
+        ),
         PpIntro('The best first moral story there is. Short, only two '
             'characters, and easy to act out afterwards.'),
         PpArticle([
@@ -5568,6 +5638,16 @@ const PpArea _earlySkills = PpArea(
       format: 'ARTICLE',
       bands: _fromTwo,
       blocks: [
+        // ⚠️ ADDED IN THE S07-S11 PASS. This area had no video at all, and
+        // the doc asks for one in every sub-section - spelled out in the
+        // early sections, then pointed at the prompt once it became
+        // repetitive.
+        PpVideoSlot(
+          title: 'What comes before writing',
+          subtitle: 'Why scribbling, tearing paper and picking up daal matter more than holding a pencil correctly.',
+          minutes: '5 MIN',
+          slotId: 'early_learning/prewriting',
+        ),
         PpIntro('Writing sits on top of about four years of other work. If you '
             'skip that work and start with letters, the letters are harder and '
             'they stay harder.'),

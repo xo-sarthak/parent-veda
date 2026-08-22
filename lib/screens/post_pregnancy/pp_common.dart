@@ -22,6 +22,7 @@ import 'grow_home_screen.dart';
 import 'pp_child_profile.dart';
 import 'community_screen.dart';
 import 'parenting_veda.dart';
+import 'pp_faq_data.dart';
 import 'course_detail_screen.dart';
 import 'courses_screen.dart';
 import 'pp_courses_data.dart';
@@ -572,9 +573,23 @@ Widget ppProductRow(BuildContext context, String title, String desc, String pric
 // bouncing to a search screen. Offers a follow-up in Ask Veda underneath.
 void ppFaqSheet(BuildContext context, String question) {
   final VedaAnswerView v = parentingVedaAnswer(question);
-  final answer = v.answer.trim().isNotEmpty
-      ? v.answer.trim()
-      : 'Here\'s the short version - and you can ask Veda for more detail below.';
+
+  // ⚠️ A WRITTEN ANSWER WINS OVER A SEARCHED ONE, AND THE ORDER IS THE FIX.
+  //
+  // This used to ask the corpus search first. For the sixteen questions the
+  // trackers actually print, the search found nothing and returned "I don't
+  // have a confident answer for that yet" — so the app asked a parent a
+  // question it had chosen, and then said it did not know. Search is right
+  // for an unpredictable query and wrong for a fixed list authored in our
+  // own source.
+  //
+  // Age comes from the profile, never from a question to the mother.
+  final written =
+      ppFaqAnswer(question, ChildProfileStore.instance.ageInMonths);
+  final answer = written ??
+      (v.answer.trim().isNotEmpty
+          ? v.answer.trim()
+          : 'Here\'s the short version - and you can ask Veda for more detail below.');
   showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,

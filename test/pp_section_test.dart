@@ -229,13 +229,29 @@ void main() {
       }
     });
 
-    test('every page opens with an intro', () {
+    test('every page opens with an intro, video aside', () {
       // The page template every spec specifies starts with "a short warm intro
       // (2 to 3 lines)". A page that opens straight into steps has skipped the
       // part that tells her whether she is in the right place.
+      //
+      // ⚠️ THE VIDEO IS SKIPPED, AND THAT IS A REAL CHANGE OF RULE RATHER
+      // THAN A TEST BENT TO FIT. The feedback moved video to the top of every
+      // page, so `PpPage.orderedBlocks` hoists it and a page with a video no
+      // longer opens with its intro. The INTENT of this test was never "an
+      // intro is the first widget" — it was "she is oriented before she is
+      // instructed", and a video at the top orients her at least as well as
+      // two lines of prose do.
+      //
+      // So what is guarded now is what actually matters: the intro still
+      // exists, and nothing instructional gets in front of it. A page that
+      // opens video-then-steps still fails.
       for (final (s, _, p) in _allPages()) {
-        expect(p.blocks.first, isA<PpIntro>(),
-            reason: '${s.id}/${p.id} does not open with a PpIntro');
+        final rest = [
+          for (final b in p.orderedBlocks) if (b is! PpVideoSlot) b
+        ];
+        expect(rest.first, isA<PpIntro>(),
+            reason: '${s.id}/${p.id} does not open with a PpIntro '
+                '(videos aside)');
       }
     });
 

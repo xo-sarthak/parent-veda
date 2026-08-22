@@ -49,6 +49,7 @@
 //  ⚠️ ENGLISH ONLY FOR NOW, plain `String`, per the standing instruction.
 // =============================================================================
 
+import 'package:flutter/material.dart' show Icons;
 import 'pp_age_bands.dart';
 import '../brackets/hub/hub_intent_art.dart';
 import 'pp_content.dart';
@@ -209,6 +210,16 @@ final PpSection kPpDevelopmentSection = PpSection(
         ),
 
         // ---------------------------------------------------------------------
+        /* ⚠️ REMOVED BY FEEDBACK, KEPT FOR REVERT.
+           "Remove the six kinds of growing section." The six-domain split is still
+           the app's internal model — the per-domain pages below all use it —
+           but naming the taxonomy to a parent turned it into six things to
+           be graded on, which is the exact anxiety this section exists to
+           reduce.
+           Commented rather than deleted, per comment-out-never-delete:
+           the writing is good and the decision is editorial, so bringing
+           it back is uncommenting rather than rewriting.
+
         PpPage(
           id: 'dev_six_domains',
           title: 'The six kinds of growing',
@@ -257,6 +268,7 @@ final PpSection kPpDevelopmentSection = PpSection(
                 blurb: 'Matched to where your child is today.'),
           ],
         ),
+        */
 
         // ---------------------------------------------------------------------
         PpPage(
@@ -266,6 +278,18 @@ final PpSection kPpDevelopmentSection = PpSection(
           format: 'FLAGGED CALLOUT, one per area',
           bands: _all,
           blocks: [
+            // ⚠️ ADDED BY FEEDBACK: "also have a video when something is
+            // genuinely worth checking section". This is the page a worried
+            // parent opens, and a person saying it out loud calmly does more
+            // than a list can — the tone of the delivery IS half the content
+            // here, and tone is the one thing prose cannot carry.
+            PpVideoSlot(
+              title: 'When to wait, and when to ask',
+              subtitle: 'A developmental paediatrician on the difference '
+                  'between a slow start and a real flag, said plainly.',
+              minutes: '7 MIN',
+              slotId: 'development/worth_checking',
+            ),
             PpIntro('Wide ranges are the truth, and so is this: a small number '
                 'of specific things are worth a proper look, and looking early '
                 'helps. None of the lines below is a diagnosis or a label. '
@@ -289,77 +313,31 @@ final PpSection kPpDevelopmentSection = PpSection(
               kind: PpCalloutKind.doctor,
               title: 'The one that never waits: losing a skill',
             ),
-            PpCallout(
-              // ⚠️ "WORTH ASKING ABOUT" DID NOT SAY WHOM TO ASK.
-              //
-              // Caught by `test/pp_section_test.dart`, which asserts every
-              // doctor callout names someone to go to. Every sibling callout on
-              // this page says "paediatrician"; this one said only "worth asking
-              // about", which raises a real worry and leaves her holding it. A
-              // callout that names a symptom and stops has made the anxiety and
-              // given it nowhere to go, which is the opposite of what this
-              // section is for.
-              'Big movements. Worth raising with your paediatrician if your '
-                  'baby is not holding '
-                  'their head steady by about 4 months, is not sitting without '
-                  'support by about 9 months, is not standing while holding on '
-                  'by about 12 months, or is not walking by about 18 months. '
-                  'Also mention it if one side of the body seems much stronger '
-                  'than the other, or if your baby feels very stiff or very '
-                  'floppy to hold.',
-              kind: PpCalloutKind.doctor,
-              title: 'Gross motor',
-            ),
-            PpCallout(
-              'Hands. Worth raising with your paediatrician if your baby is not reaching for '
-                  'things by about 5 months, is not moving a toy from one hand '
-                  'to the other by about 8 months, or is still not picking up '
-                  'small pieces of food with finger and thumb by about 12 '
-                  'months. A strong preference for one hand before 18 months '
-                  'is also worth a mention.',
-              kind: PpCalloutKind.doctor,
-              title: 'Fine motor',
-            ),
-            PpCallout(
-              'Language. Worth raising with your paediatrician if your baby is not making sounds '
-                  'back at you by about 4 months, is not babbling strings like '
-                  '"bababa" by about 9 months, has no single words by about 16 '
-                  'months, or is not putting two words together by about 2 '
-                  'years. Ask for a hearing check as part of the same visit, '
-                  'because hearing is the commonest reason and the easiest to '
-                  'treat.',
-              kind: PpCalloutKind.doctor,
-              title: 'Language',
-            ),
-            PpCallout(
-              'Being with people. Worth raising with your paediatrician if your baby does not '
-                  'smile back at you by about 3 months, does not look where '
-                  'you point or point things out to you by about 12 to 15 '
-                  'months, rarely brings you things to show you, or does not '
-                  'respond to their own name by about 12 months.',
-              kind: PpCalloutKind.doctor,
-              title: 'Social and emotional',
-            ),
-            PpCallout(
-              'Working things out. Worth raising with your paediatrician if your baby does not '
-                  'follow a moving object with their eyes by about 3 months, '
-                  'shows no interest in a toy that has just been hidden by '
-                  'about 12 months, or does not use everyday objects the way '
-                  'they are used, such as holding a phone to the ear, by about '
-                  '2 years.',
-              kind: PpCalloutKind.doctor,
-              title: 'Cognitive',
-            ),
-            PpCallout(
-              'Doing it alone. Worth raising with your paediatrician if your baby cannot bring '
-                  'food to their own mouth by about 12 months, or is not '
-                  'trying to help with simple things like pushing an arm '
-                  'through a sleeve by about 2 years. Feeding that is '
-                  'consistently difficult, with coughing or choking, belongs '
-                  'in the same conversation.',
-              kind: PpCalloutKind.doctor,
-              title: 'Self-care',
-            ),
+            // ⚠️ SIX ALERT BOXES BECAME ONE CARD BLOCK, AND THE COMPLAINT WAS
+            // ABOUT THE COLOUR ONLY BECAUSE THE COLOUR IS WHAT YOU SEE FIRST.
+            // Feedback: "improve the representation of this page, orange the
+            // way it is feels off, should look much better."
+            //
+            // `PpCalloutKind.doctor` renders coral on purpose — see-a-doctor
+            // must never be buried. But SEVEN of them stacked turned a page
+            // about reassurance into a wall of warnings, and a signal used
+            // seven times in a row stops being a signal. Coral is now reserved
+            // for the one flag that genuinely never waits (losing a skill,
+            // kept above as a callout); the six per-area notes read as a calm
+            // card block instead.
+            //
+            // ⚠️ NOT A SINGLE WORD OF THE CONTENT CHANGED. The text in each
+            // card is the text that was in each box, lifted verbatim. This is
+            // a representation fix, and mixing a rewrite into it would make
+            // the diff impossible to review for a clinician.
+            PpCards([
+              PpCard('Gross motor', 'Big movements. Worth raising with your paediatrician if your baby is not holding their head steady by about 4 months, is not sitting without support by about 9 months, is not standing while holding on by about 12 months, or is not walking by about 18 months. Also mention it if one side of the body seems much stronger than the other, or if your baby feels very stiff or very floppy to hold.'),
+              PpCard('Fine motor', 'Hands. Worth raising with your paediatrician if your baby is not reaching for things by about 5 months, is not moving a toy from one hand to the other by about 8 months, or is still not picking up small pieces of food with finger and thumb by about 12 months. A strong preference for one hand before 18 months is also worth a mention.'),
+              PpCard('Language', 'Language. Worth raising with your paediatrician if your baby is not making sounds back at you by about 4 months, is not babbling strings like "bababa" by about 9 months, has no single words by about 16 months, or is not putting two words together by about 2 years. Ask for a hearing check as part of the same visit, because hearing is the commonest reason and the easiest to treat.'),
+              PpCard('Social and emotional', 'Being with people. Worth raising with your paediatrician if your baby does not smile back at you by about 3 months, does not look where you point or point things out to you by about 12 to 15 months, rarely brings you things to show you, or does not respond to their own name by about 12 months.'),
+              PpCard('Cognitive', 'Working things out. Worth raising with your paediatrician if your baby does not follow a moving object with their eyes by about 3 months, shows no interest in a toy that has just been hidden by about 12 months, or does not use everyday objects the way they are used, such as holding a phone to the ear, by about 2 years.'),
+              PpCard('Self-care', 'Doing it alone. Worth raising with your paediatrician if your baby cannot bring food to their own mouth by about 12 months, or is not trying to help with simple things like pushing an arm through a sleeve by about 2 years. Feeding that is consistently difficult, with coughing or choking, belongs in the same conversation.'),
+            ], heading: 'By area, worth mentioning at the next visit', hue: 160),
             PpWhenLine('Bring any of these to your child’s next routine '
                 'visit, or sooner if it is the lost-skill line above.'),
             PpIndiaNote('Your paediatrician is the right first door. If they '
@@ -433,6 +411,20 @@ final PpSection kPpDevelopmentSection = PpSection(
         ),
 
         // ---------------------------------------------------------------------
+        /* ⚠️ REMOVED BY FEEDBACK, KEPT FOR REVERT.
+           "In check my child's development section — delete Your cousin baby was
+           walking by now section."
+           ⚠️ WORTH KNOWING WHAT THIS COSTS. This file's own header calls the
+           joint-family comparison "the actual emotional problem this section
+           solves". Removing the page does not remove the problem — it is
+           still answered by "The normal range is much wider than you think"
+           and by the India note on that page, which is where a parent meets
+           it without having to open a page named after the sentence that
+           upset her.
+           Commented rather than deleted, per comment-out-never-delete:
+           the writing is good and the decision is editorial, so bringing
+           it back is uncommenting rather than rewriting.
+
         PpPage(
           id: 'dev_comparison_pressure',
           title: '"Your cousin’s baby was walking by now"',
@@ -508,6 +500,7 @@ final PpSection kPpDevelopmentSection = PpSection(
                 blurb: 'Windows for every milestone, in one place.'),
           ],
         ),
+        */
       ],
     ),
 
@@ -1467,7 +1460,7 @@ final PpSection kPpDevelopmentSection = PpSection(
               kind: PpCalloutKind.doctor,
               title: 'What a leap does not explain',
             ),
-            PpLink('Your baby’s leap calendar',
+            PpLink('Your baby’s phase calendar',
                 surfaceId: 'pp_leaps',
                 blurb: 'Which window is open now, and what tends to arrive '
                     'after it.'),
@@ -1810,6 +1803,16 @@ final PpSection kPpDevelopmentSection = PpSection(
     // =========================================================================
     //  What changed? — the Development subset of the existing feature
     // =========================================================================
+    /* ⚠️ REMOVED BY FEEDBACK, KEPT FOR REVERT.
+       "Something About My Child Has Changed section — please delete, it is
+       anyways there as tool."
+       Correct: `PpSectionTool('Something has changed' → pp_what_changed)` at
+       the foot of this file opens the same screen. The area and the tool were
+       two doors on one page leading to one place, which is the same defect as
+       the two nutrition doors and the two development activity links found
+       earlier in this pass. The tool is the right survivor — What Changed is
+       something you USE, not something you read.
+
     PpArea(
       id: 'something_changed',
       mark: IntentMark.blocksMark,
@@ -1858,8 +1861,21 @@ final PpSection kPpDevelopmentSection = PpSection(
         ),
       ],
     ),
+    */
   ],
   tools: [
+    // ⚠️ FIRST TOOL, BECAUSE IT IS THE SECTION'S OWN QUESTION. "Is my child
+    // on track?" is the title of the first area and the thing a parent came to
+    // find out; it was answered by four articles about why the question is
+    // hard. The articles are still there and still worth reading — this just
+    // stops them being the only answer.
+    PpSectionTool(
+      label: 'Where he is right now',
+      blurb: 'Usually settled by now, emerging now, and the next two or three '
+          'months. Three groups, never a score.',
+      surfaceId: 'pp_on_track',
+      icon: Icons.checklist_rtl_outlined,
+    ),
     PpSectionTool(
       label: 'What is emerging for my child right now',
       blurb: 'Every milestone as a window, never a checklist and never a '
@@ -1873,7 +1889,7 @@ final PpSection kPpDevelopmentSection = PpSection(
       surfaceId: 'pp_development',
     ),
     PpSectionTool(
-      label: 'Your baby’s leap calendar',
+      label: 'Your baby’s phase calendar',
       blurb: 'Which window is open now, held as a helpful lens rather than a '
           'law.',
       surfaceId: 'pp_leaps',
