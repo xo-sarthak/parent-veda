@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'learning_home_screen.dart';
 import 'pp_channels_data.dart';
 import 'pp_common.dart';
+import 'pp_expert_link.dart';
 import 'pp_experts_data.dart';
 import 'pp_watch_data.dart';
 import 'provider_profile_screen.dart';
@@ -102,7 +103,7 @@ class _WatchChannelScreenState extends State<WatchChannelScreen> {
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 4),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text(e.name, style: ppFraunces(23, h: 1.1), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  PpExpertName(e, style: ppFraunces(23, h: 1.1), underline: false, maxLines: 1, overflow: TextOverflow.ellipsis),
                   const SizedBox(height: 3),
                   Text(channel.handle, style: ppBody(12.5, color: ppMuted, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
                 ]),

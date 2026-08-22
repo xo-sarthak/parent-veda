@@ -12,6 +12,8 @@ import 'package:flutter/material.dart';
 
 import 'course_lesson_screen.dart';
 import 'pp_common.dart';
+import 'pp_experts_data.dart';
+import 'pp_expert_link.dart';
 import 'pp_courses_data.dart';
 
 class CourseDetailScreen extends StatelessWidget {
@@ -88,7 +90,28 @@ class CourseDetailScreen extends StatelessWidget {
               child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 const Icon(Icons.verified_user_outlined, size: 17, color: ppPurple),
                 const SizedBox(width: 11),
-                Expanded(child: Text('${course.expert}. Scripted from research and reviewed before anything reaches you.', style: ppBody(13, color: ppInk, h: 1.55))),
+                Expanded(
+                  // ⚠️ BUILT FROM THE ROSTER, NOT FROM PROSE. `course.expert`
+                  // was a whole sentence typed into the content file, which is
+                  // why two of the four had drifted: a wrong surname and a
+                  // wrong specialty, neither of them checkable.
+                  //
+                  // Now the name and the credential both come from the expert
+                  // record, and the name opens the profile. The prose field
+                  // stays as the fallback for a course with no id yet.
+                  child: course.vettedById.isEmpty
+                      ? Text(
+                          '${course.expert}. Scripted from research and reviewed before anything reaches you.',
+                          style: ppBody(13, color: ppInk, h: 1.55))
+                      : PpExpertName(
+                          expertById(course.vettedById),
+                          prefix: 'Vetted by ',
+                          suffix:
+                              ', ${expertById(course.vettedById).credential}. Scripted from research and reviewed before anything reaches you.',
+                          style: ppBody(13, color: ppInk, h: 1.55),
+                          maxLines: 6,
+                        ),
+                ),
               ]),
             )),
 

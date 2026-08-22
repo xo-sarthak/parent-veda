@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import '../../brand/brand_models.dart';
 import '../../brand/presented_by.dart';
 import 'pp_common.dart';
+import 'provider_profile_screen.dart';
 import 'pp_journeys_data.dart';
 
 class JourneysScreen extends StatelessWidget {
@@ -157,7 +158,7 @@ class JourneyDetailScreen extends StatelessWidget {
                 )),
                 if (journey.expertHookPresent) ...[
                   const SizedBox(height: 18),
-                  _pad(_expert()),
+                  _pad(_expert(context)),
                 ],
                 const SizedBox(height: 20),
                 _pad(started ? _resume(context, today) : _startButton(context)),
@@ -182,20 +183,57 @@ class JourneyDetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _expert() => Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(16)),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            const Icon(Icons.verified_outlined, size: 15, color: ppPurple),
-            const SizedBox(width: 7),
-            ppEyebrow('Who wrote this', color: ppPurple),
-          ]),
-          const SizedBox(height: 10),
-          Text(journey.expertName, style: ppJakarta(14)),
-          Text(journey.expertRole, style: ppBody(12)),
+  /// ⚠️ THE NAME OPENS THE PROFILE NOW. It used to be two lines of plain
+  /// `Text` — a credit that looked exactly like every other clickable expert
+  /// in the app and did nothing. Reported directly: "in courses we have the
+  /// doctor name, when you click you can see their profile, but that isn't
+  /// happening for a lot of sections."
+  ///
+  /// ⚠️ AND THE WHOLE CARD IS THE TARGET, NOT THE NAME. A name-sized tap
+  /// zone is about 120x18 and needs to be found before it can be hit; the card
+  /// is already a visual unit and reads as one thing. The chevron is what says
+  /// it is tappable, because nothing else on this card would.
+  Widget _expert(BuildContext context) {
+    final e = journey.expert;
+    final card = Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+          color: ppPanel, borderRadius: BorderRadius.circular(16)),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          const Icon(Icons.verified_outlined, size: 15, color: ppPurple),
+          const SizedBox(width: 7),
+          ppEyebrow('Who wrote this', color: ppPurple),
         ]),
-      );
+        const SizedBox(height: 10),
+        Row(children: [
+          Expanded(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(e?.name ?? '', style: ppJakarta(14)),
+                  Text(journey.expertRole, style: ppBody(12)),
+                ]),
+          ),
+          // Only when there is somewhere to go.
+          if (e != null) ...[
+            const SizedBox(width: 10),
+            const Icon(Icons.chevron_right_rounded, size: 20, color: ppPurple),
+          ],
+        ]),
+      ]),
+    );
+
+    if (e == null) return card;
+    return GestureDetector(
+      onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+        settings: RouteSettings(name: 'pp/expert/${e.id}'),
+        builder: (_) => ProviderProfileScreen(expert: e),
+      )),
+      behavior: HitTestBehavior.opaque,
+      child: card,
+    );
+  }
 
   Widget _startButton(BuildContext context) => SizedBox(
         width: double.infinity,

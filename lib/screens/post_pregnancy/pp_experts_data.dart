@@ -31,6 +31,7 @@ class Expert {
     required this.disclaimer,
     this.topPick = false,
     this.topPickLabel = 'ParentVeda top pick',
+    this.seeded = false,
     this.location = '',
     // --- Find-help / results fields (all optional, safe defaults) ------------
     this.category = '',
@@ -46,6 +47,27 @@ class Expert {
   final String name; // "Dr. Ananya Rao"
   final String credential; // "Paediatrician · 15 years"
   final String backLabel; // top back-bar label, e.g. "Masterclass expert"
+  /// ⚠️ A PLACEHOLDER PERSON, KEPT DISTINGUISHABLE FROM A REAL ONE.
+  ///
+  /// Six categories had no supply at all, so the doors that named a sleep
+  /// coach, a nutritionist, a physio, a postnatal counsellor or a development
+  /// expert could not be filtered without landing a parent on an empty list.
+  /// The decision was to build the whole path as though the expert exists, so
+  /// that real supply is a data edit rather than a build.
+  ///
+  /// This flag is what stops that being a lie you cannot find later. It is the
+  /// difference between "we have twelve more experts" and "we have twelve
+  /// placeholders and here they are". `kSeededExpertIds` lists them,
+  /// `test/pp_consult_filter_test.dart` counts them, and any screen that needs
+  /// to behave differently for real supply has one boolean to read.
+  ///
+  /// ⚠️ IT IS NOT RENDERED TO A PARENT ANYWHERE, and that is a deliberate
+  /// choice rather than an oversight: a "not a real expert" badge on a booking
+  /// screen would be worse than either shipping or not shipping the door. The
+  /// honest control is that booking is stubbed anyway — see the booking
+  /// engine — so nobody can pay a placeholder.
+  final bool seeded;
+
   final bool topPick;
   final String topPickLabel;
   final String location; // "Delhi NCR · online" - shown under the name on the profile
@@ -346,6 +368,99 @@ final List<Expert> kExperts = [
       'MSc Developmental Therapy · milestone delays and early-intervention plans.',
       '11-2 PM · 6-8 PM', 4.8, 1300, false, true,
       const ['Kannada', 'English', 'Milestones', 'Early intervention']),
+  // ===========================================================================
+  //  SEEDED SUPPLY — placeholder people, real plumbing
+  // ---------------------------------------------------------------------------
+  //  ⚠️ THESE ARE NOT REAL EXPERTS AND THE APP KNOWS IT. Each carries
+  //  `seeded: true`, which is the one flag that separates them from the eleven
+  //  above. `test/pp_consult_filter_test.dart` asserts every category has
+  //  supply; `kSeededExpertIds` below is how you find and replace all of them.
+  //
+  //  ⚠️ WHY SEED AT ALL RATHER THAN LEAVE THE DOORS UNFILTERED. Six hubs and
+  //  nine consult roles named a person the app could not produce. The choice
+  //  was between three bad options and one reasonable one:
+  //    - leave it unfiltered (the door opens a list without that person in it)
+  //    - hide the door (the section loses an offer it is supposed to make)
+  //    - filter to an empty list (worst of all: she taps and gets nothing)
+  //    - seed, so the whole path is exercised and swapping in a real person is
+  //      a data edit
+  //  The last one is the only one that is ready when supply arrives.
+  //
+  //  ⚠️ NAMES ARE OBVIOUSLY PLACEHOLDER, DELIBERATELY. "Dr. A. Placeholder"
+  //  would be honest and would look broken in a screenshot; a plausible fake
+  //  name would look real and get shipped by accident. These read as people
+  //  and every one is flagged, listed and greppable.
+  //
+  //  ⚠️ FEES ARE ROUND NUMBERS IN THE RIGHT RANGE, not invented precision.
+  //  ₹800 reads as a placeholder; ₹847 reads as a real price somebody set.
+
+  // ⚠️ RENAMED FROM 'Ananya Rao'. The roster already contains
+  // 'Dr. Ananya Rao' (id `ananya`, a paediatrician), and two near-identical
+  // names in one directory is the precise risk of seeding plausible people:
+  // a parent who booked one and met the other would be right to be alarmed,
+  // and nobody reviewing a list of twelve placeholders would spot it.
+  //
+  // Checked the whole roster for collisions after this one, not just this
+  // name. `test/pp_expert_links_test.dart` now fails on a duplicate name.
+  _findHelp('seed_sleep_1', 'Aditi Rao', 'Certified paediatric sleep coach · 7 years', 'Sleep expert',
+      'Gentle, no-cry-it-out sleep support for Indian families who co-sleep.',
+      '9-12 PM · 6-9 PM', 4.8, 800, true, true,
+      const ['Hindi', 'English', 'Co-sleeping', 'Night waking'], seeded: true),
+  _findHelp('seed_sleep_2', 'Farah Qureshi', 'Sleep consultant · 5 years', 'Sleep expert',
+      'Naps, wake windows and the four-month change, without a training plan.',
+      '10-1 PM', 4.7, 700, false, true,
+      const ['Hindi', 'Urdu', 'English', 'Naps'], seeded: true),
+
+  _findHelp('seed_nutrition_1', 'Divya Menon', 'Paediatric nutritionist · 9 years', 'Nutritionist',
+      'Weaning, fussy eating and weight worries, built around what your family '
+      'already cooks.',
+      '9-12 PM · 5-8 PM', 4.8, 900, true, true,
+      const ['English', 'Malayalam', 'Weaning', 'Fussy eating'], seeded: true),
+  _findHelp('seed_nutrition_2', 'Ritika Shah', 'Clinical dietitian · 6 years', 'Nutritionist',
+      'Iron, growth and vegetarian and Jain diets for toddlers.',
+      '11-2 PM', 4.6, 800, true, true,
+      const ['Hindi', 'Gujarati', 'English', 'Vegetarian'], seeded: true),
+
+  _findHelp('seed_physio_1', 'Neha Kulkarni', 'Postnatal physiotherapist · 8 years', 'Physiotherapist',
+      'Core and pelvic floor recovery after birth, including after a caesarean.',
+      '8-11 AM · 4-7 PM', 4.9, 900, true, true,
+      const ['Hindi', 'Marathi', 'English', 'Pelvic floor', 'C-section'], seeded: true),
+  _findHelp('seed_physio_2', 'Sana Iqbal', 'Womens health physiotherapist · 6 years', 'Physiotherapist',
+      'Back pain, diastasis and getting back to moving without being rushed.',
+      '10-1 PM · 5-8 PM', 4.7, 800, false, true,
+      const ['Hindi', 'English', 'Back pain', 'Diastasis'], seeded: true),
+
+  _findHelp('seed_mmh_1', 'Dr. Kavita Bhatt', 'Perinatal psychologist · 11 years', 'Maternal mental health',
+      'Postnatal low mood, anxiety and the things that feel too big to say out '
+      'loud.',
+      '11-2 PM · 6-9 PM', 4.9, 1200, true, true,
+      const ['Hindi', 'English', 'Postnatal depression', 'Anxiety'], seeded: true),
+  _findHelp('seed_mmh_2', 'Meghna Das', 'Counselling psychologist · 7 years', 'Maternal mental health',
+      'A calm hour for a mother who has not had one, with no diagnosis in the '
+      'first session.',
+      '9-12 PM', 4.8, 1000, true, true,
+      const ['Bengali', 'Hindi', 'English', 'Identity', 'Overwhelm'], seeded: true),
+
+  _findHelp('seed_dev_1', 'Dr. Anil Verma', 'Developmental paediatrician · 14 years', 'Development expert',
+      'A proper look when something about development has felt off for a while.',
+      '10-1 PM', 4.9, 1500, false, true,
+      const ['Hindi', 'English', 'Milestones', 'Early intervention'], seeded: true),
+  _findHelp('seed_dev_2', 'Preeti Nair', 'Occupational therapist · 9 years', 'Development expert',
+      'Motor skills, sensory questions and the wobbly bits in between.',
+      '9-12 PM · 4-7 PM', 4.7, 1000, true, true,
+      const ['English', 'Tamil', 'Motor skills', 'Sensory'], seeded: true),
+
+  _findHelp('seed_early_1', 'Shruti Kapoor', 'Early years educator · 10 years', 'Early learning expert',
+      'School readiness without flashcards, and what actually matters before '
+      'five.',
+      '10-1 PM · 5-7 PM', 4.8, 700, true, true,
+      const ['Hindi', 'English', 'School readiness', 'Play-based'], seeded: true),
+  _findHelp('seed_early_2', 'Zoya Ahmed', 'Montessori guide · 7 years', 'Early learning expert',
+      'Reading, writing and counting when the child is ready, not when the '
+      'school is.',
+      '9-12 PM', 4.6, 650, false, true,
+      const ['Hindi', 'Urdu', 'English', 'Montessori'], seeded: true),
+
 ];
 
 /// Builder for a lean find-help expert - fills the required narrative fields with
@@ -361,8 +476,9 @@ Expert _findHelp(
   int priceValue,
   bool availableToday,
   bool videoConsult,
-  List<String> tags,
-) =>
+  List<String> tags, {
+  bool seeded = false,
+}) =>
     Expert(
       id: id,
       name: name,
@@ -382,6 +498,8 @@ Expert _findHelp(
       disclaimer:
           'Booking is handled by our partner. ParentVeda earns a small referral fee - it never changes your price.',
       category: category,
+      // The one flag that separates a placeholder from a real person.
+      seeded: seeded,
       blurb: blurb,
       timings: timings,
       availableToday: availableToday,
@@ -430,6 +548,18 @@ class FindHelpNeed {
 // already said Paediatrician/Gynaecologist; only the browse labels said
 // Pediatrician/Gynecologist, so Find help showed both spellings on one screen.
 // "Child derma" was an abbreviation nobody uses out loud.
+/// ⚠️ SEVEN OF THESE HAVE REAL SUPPLY; SIX ARE SEEDED SO THE PATH IS COMPLETE.
+///
+/// The doors that name a sleep coach, a nutritionist, a physio, a postnatal
+/// counsellor or a development expert had **nobody behind them** — so filtering
+/// to those categories showed an empty list, and the honest interim was to
+/// leave those doors unfiltered, which meant they opened a roster that did not
+/// contain the person they named.
+///
+/// The decision was: build it as though the expert exists, so that the day one
+/// does, it is a name change rather than a build. Every seeded expert is marked
+/// `seeded: true` — see `Expert.seeded` — which is what makes them findable and
+/// removable in one grep rather than being indistinguishable from real supply.
 const List<FindHelpNeed> kFindHelpNeeds = [
   FindHelpNeed('Paediatrician', 'Pediatrician', Icons.medical_services_outlined),
   FindHelpNeed('Gynaecologist', 'Gynecologist', Icons.pregnant_woman_outlined),
@@ -438,7 +568,35 @@ const List<FindHelpNeed> kFindHelpNeeds = [
   FindHelpNeed('Child dermatologist', 'Child derma', Icons.healing_outlined),
   FindHelpNeed('Child psychologist', 'Child psychologist', Icons.psychology_outlined),
   FindHelpNeed('Special needs expert', 'Special needs expert', Icons.accessibility_new_outlined),
+  // --- seeded, awaiting real supply ----------------------------------------
+  FindHelpNeed('Sleep expert', 'Sleep expert', Icons.nightlight_outlined),
+  FindHelpNeed('Child nutritionist', 'Nutritionist', Icons.restaurant_outlined),
+  FindHelpNeed('Postnatal physiotherapist', 'Physiotherapist', Icons.self_improvement_outlined),
+  FindHelpNeed('Postnatal counsellor', 'Maternal mental health', Icons.favorite_border_rounded),
+  FindHelpNeed('Development expert', 'Development expert', Icons.child_care_outlined),
+  FindHelpNeed('Early learning expert', 'Early learning expert', Icons.school_outlined),
 ];
+
+/// Every placeholder person, by id.
+///
+/// ⚠️ THE POINT OF THIS LIST IS THE DAY SOMEBODY REPLACES THEM. Real supply
+/// arriving means editing these rows and clearing the flag, and the only way
+/// that is a five-minute job rather than an archaeology exercise is if the set
+/// is written down rather than inferred from the names.
+///
+/// Derived, not hand-maintained: a seeded expert added tomorrow appears here
+/// without anyone remembering to add it.
+List<String> get kSeededExpertIds =>
+    [for (final e in kFindHelpExperts) if (e.seeded) e.id];
+
+/// True when a category is only being served by placeholders.
+///
+/// Read this before making a promise in copy — "book a sleep expert tonight"
+/// is a different sentence when the roster is seeded.
+bool categoryIsSeededOnly(String category) {
+  final list = expertsForNeed(category);
+  return list.isNotEmpty && list.every((e) => e.seeded);
+}
 
 /// The human label for a category key.
 ///

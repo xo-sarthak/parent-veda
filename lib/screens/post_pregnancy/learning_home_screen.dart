@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 
 import 'learning_detail_screen.dart';
 import 'pp_common.dart';
+import 'pp_expert_link.dart';
 import 'pp_experts_data.dart';
 import 'pp_learning_data.dart';
 import 'pp_section_extras.dart';
@@ -301,7 +302,7 @@ class _LearningHomeScreenState extends State<LearningHomeScreen> {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(p.title, style: ppJakarta(16), maxLines: 2, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 4),
-                Text('${p.instructor.name} · ${_metaLine(p)}',
+                PpExpertName(p.instructor, suffix: ' · ${_metaLine(p)}',
                     style: ppBody(12.5, color: ppSoft), maxLines: 1, overflow: TextOverflow.ellipsis),
               ]),
             ),

@@ -24,6 +24,7 @@ class Course {
     required this.tagline,
     required this.about,
     required this.expert,
+    this.vettedById = '',
     required this.ageTag,
     required this.accent,
     required this.lessons,
@@ -33,7 +34,22 @@ class Course {
   final String title; // "Play & Brain"
   final String tagline;
   final String about;
-  final String expert; // vetted by
+  /// ⚠️ PROSE, AND IT HAS ALREADY DRIFTED TWICE. Kept as the fallback for
+  /// a course with no `vettedById`, and no new course should use it.
+  ///
+  /// Two of the four strings below were wrong against the roster: "Dr. Kabir
+  /// Menon" is "Dr. Kabir Sen", and "Dr. Meher Shah, Paediatric Physio" is a
+  /// paediatric SLEEP consultant. Nothing could have caught either, because a
+  /// sentence is not checkable against anything.
+  final String expert; // vetted by (legacy prose)
+
+  /// The person who vetted this, by id.
+  ///
+  /// ⚠️ AN ID SO THE NAME AND THE ROLE BOTH COME FROM ONE PLACE. The screen
+  /// renders `Vetted by NAME, CREDENTIAL` from the roster entry, so a
+  /// specialty cannot drift out of a content file the way it did here, and the
+  /// name can open the profile.
+  final String vettedById;
   final String ageTag; // "3–6 months"
   final Color accent;
   final List<CourseLesson> lessons;
@@ -54,6 +70,7 @@ const List<Course> kCourses = [
     about:
         'A short, practical course on what your baby is working out right now - cause and effect, object permanence, hand-eye coordination - and the simple, everyday play that supports each one. No flashcards, no pressure; just the "why" behind the games.',
     expert: 'Vetted by Dr. Ananya Rao, Paediatrician',
+    vettedById: 'ananya',
     ageTag: '3–6 months',
     accent: _violet,
     lessons: [
@@ -71,6 +88,7 @@ const List<Course> kCourses = [
     about:
         'Every big movement builds on the last. This course walks the physical journey - head control, rolling, sitting, crawling - with the gentle, joyful practice that helps each one arrive in its own time.',
     expert: 'Vetted by Dr. Meher Shah, Paediatric Physio',
+    vettedById: 'meher',
     ageTag: '2–12 months',
     accent: _amber,
     lessons: [
@@ -87,6 +105,7 @@ const List<Course> kCourses = [
     about:
         'Your baby is learning language now, in the everyday back-and-forth. This course shows how narration, "serve and return", and simple songs wire the brain for talking - months before real words appear.',
     expert: 'Vetted by Dr. Kabir Menon, Speech & Language',
+    vettedById: 'kabir',
     ageTag: '3–12 months',
     accent: _rose,
     lessons: [
@@ -103,6 +122,7 @@ const List<Course> kCourses = [
     about:
         'A calm, no-cry course through the science of infant sleep and the 4-month shift. Learn what is actually happening, what genuinely helps, and how to build a wind-down your baby can rely on.',
     expert: 'Vetted by Dr. Meher Shah, Paediatric Sleep',
+    vettedById: 'meher',
     ageTag: '3–6 months',
     accent: _blue,
     lessons: [

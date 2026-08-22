@@ -34,6 +34,7 @@ import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
 
 import 'learning_detail_screen.dart';
 import 'pp_common.dart';
+import 'pp_expert_link.dart';
 import 'pp_experts_data.dart';
 import 'pp_explore_kit.dart';
 import 'pp_learning_data.dart';
@@ -331,7 +332,7 @@ class CourseCard extends StatelessWidget {
             maxLines: 2,
             overflow: TextOverflow.ellipsis),
         const SizedBox(height: 5),
-        Text(e.name,
+        PpExpertName(e,
             style: ppBody(11, color: ppSoft, w: FontWeight.w700),
             maxLines: 1,
             overflow: TextOverflow.ellipsis),
@@ -398,7 +399,8 @@ class CourseResultRow extends StatelessWidget {
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis),
               const SizedBox(height: 3),
-              Text('${courseKindLabel(program.kind)} · ${e.name}',
+              PpExpertName(e,
+                  prefix: '${courseKindLabel(program.kind)} · ',
                   style: ppBody(11.5, color: ppMuted),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis),
@@ -609,7 +611,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                       size: 15, color: ppMuted),
                   const SizedBox(width: 7),
                   Expanded(
-                    child: Text(e.name,
+                    child: PpExpertName(e,
                         style: ppBody(12.5, color: ppSoft, w: FontWeight.w700),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis),
@@ -681,7 +683,7 @@ class _CourseDetailScreenState extends State<CourseDetailScreen> {
                           child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(e.name, style: ppJakarta(14.5)),
+                                PpExpertName(e, style: ppJakarta(14.5)),
                                 const SizedBox(height: 3),
                                 Text(e.credential,
                                     style: ppBody(12, color: ppMuted)),

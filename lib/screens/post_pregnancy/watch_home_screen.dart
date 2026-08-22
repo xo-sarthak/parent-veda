@@ -18,6 +18,7 @@ import 'pp_child_profile.dart';
 
 import 'pp_channels_data.dart';
 import 'pp_common.dart';
+import 'pp_expert_link.dart';
 import 'pp_section_extras.dart';
 import 'pp_experts_data.dart';
 import 'pp_watch_data.dart';
@@ -155,7 +156,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
           const SizedBox(height: 8),
           Text(v.title, style: ppJakarta(13).copyWith(height: 1.25), maxLines: 2, overflow: TextOverflow.ellipsis),
           const SizedBox(height: 4),
-          Text('${v.expert.name} · ${v.seconds}s',
+          PpExpertName(v.expert, suffix: ' · ${v.seconds}s',
               style: ppBody(11, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
         ]),
       );
@@ -359,7 +360,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
             const SizedBox(width: 14),
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(e.name, style: ppJakarta(14.5), maxLines: 1, overflow: TextOverflow.ellipsis),
+                PpExpertName(e, style: ppJakarta(14.5), maxLines: 1, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 3),
                 Text(channel.statsLine, style: ppBody(12, color: ppSoft), maxLines: 1, overflow: TextOverflow.ellipsis),
               ]),
@@ -489,7 +490,7 @@ class _WatchHomeScreenState extends State<WatchHomeScreen> {
             child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
               Center(child: Container(width: 38, height: 4, decoration: BoxDecoration(color: ppLine, borderRadius: BorderRadius.circular(2)))),
               const SizedBox(height: 18),
-              Text(e.name, style: ppFraunces(24, h: 1.15)),
+              PpExpertName(e, style: ppFraunces(24, h: 1.15), underline: false),
               const SizedBox(height: 5),
               Text(e.credential, style: ppBody(13.5, color: ppPurple, w: FontWeight.w700)),
               const SizedBox(height: 4),

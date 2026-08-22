@@ -46,6 +46,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/remote/cloud_synced_store.dart';
 import 'pp_common.dart';
+import 'pp_expert_link.dart';
 import 'pp_daily_tips.dart';
 import 'pp_watch_data.dart';
 import 'watch_player_screen.dart';
@@ -409,7 +410,7 @@ class _DailyTipSheetState extends State<_DailyTipSheet> {
           const SizedBox(height: 14),
           Text(v.title, style: ppFraunces(24, h: 1.12)),
           const SizedBox(height: 8),
-          Text('${v.durationLabel} · ${v.expert.name}',
+          PpExpertName(v.expert, prefix: '${v.durationLabel} · ',
               style: ppBody(12.5, color: ppMuted)),
           const SizedBox(height: 10),
           Text(v.why, style: ppBody(14, h: 1.6)),

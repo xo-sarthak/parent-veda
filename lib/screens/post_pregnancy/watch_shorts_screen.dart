@@ -13,6 +13,7 @@
 import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
+import 'pp_expert_link.dart';
 import 'pp_watch_data.dart';
 import 'watch_channel_screen.dart';
 
@@ -168,7 +169,7 @@ class _WatchShortsScreenState extends State<WatchShortsScreen> {
                           child: const PpStriped(height: 34),
                         ),
                         const SizedBox(width: 10),
-                        Flexible(child: Text(v.expert.name, style: ppBody(13, color: Colors.white, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                        Flexible(child: PpExpertName(v.expert, style: ppBody(13, color: Colors.white, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
                       ]),
                     ),
                   ),

@@ -15,6 +15,7 @@
 //  ask a real person. Non-diagnostic throughout.
 // =============================================================================
 
+import 'pp_experts_data.dart';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
@@ -54,7 +55,7 @@ class Journey {
     required this.subtitle,
     required this.about,
     required this.days,
-    this.expertName = '',
+    this.expertId = '',
     this.expertRole = '',
   });
 
@@ -63,12 +64,30 @@ class Journey {
   final String subtitle;
   final String about;
   final List<JourneyDay> days;
-  final String expertName;
+  /// ⚠️ AN ID, NOT A NAME, AND THE CHANGE IS THE WHOLE POINT.
+  ///
+  /// This was `expertName: 'Priya Nair'` — a loose string. Priya Nair is not in
+  /// `kFindHelpExperts` at all, so the journey credited a person the app has
+  /// never heard of and the name could not open a profile because there was
+  /// nothing behind it to open.
+  ///
+  /// Reported as: "in courses we have the doctor name, when you click you can
+  /// see their profile, but that isn't happening for a lot of sections."
+  ///
+  /// A name typed into a content file cannot be checked against anything. An
+  /// id can, and `test/pp_expert_links_test.dart` does exactly that — so a
+  /// journey crediting somebody who does not exist now fails a build instead
+  /// of shipping a dead tap.
+  final String expertId;
+
   final String expertRole;
+
+  /// The expert, resolved. Null when this journey credits nobody.
+  Expert? get expert => expertId.isEmpty ? null : expertById(expertId);
 
   int get length => days.length;
   JourneyDay dayAt(int n) => days[(n - 1).clamp(0, days.length - 1)];
-  bool get expertHookPresent => expertName.isNotEmpty;
+  bool get expertHookPresent => expertId.isNotEmpty;
 }
 
 // =============================================================================
@@ -80,8 +99,12 @@ const Journey kBreastfeedingJourney = Journey(
   subtitle: 'One short read at a time, through the stretch that decides most of it.',
   about:
       'Most breastfeeding difficulty happens in the first month, and most of it is ordinary and fixable. This is thirty short reads — one a day — covering what actually happens, in the order it usually happens. It is self-paced: miss a week and nothing is lost, because there is nothing here to fail.',
-  expertName: 'Priya Nair',
-  expertRole: 'Lactation consultant · wrote this journey for ParentVeda',
+  // ⚠️ A REAL ROSTER ENTRY. 'Priya Nair' was invented in this file and
+  // existed nowhere else; Shalini Gupta is the IBCLC already in
+  // `kFindHelpExperts`, which means the credit, the profile and the booking
+  // are now the same person rather than three unrelated facts.
+  expertId: 'shalini',
+  expertRole: 'IBCLC lactation consultant · wrote this journey for ParentVeda',
   days: [
     // ---- Week 1 · the first days ------------------------------------------
     JourneyDay(
