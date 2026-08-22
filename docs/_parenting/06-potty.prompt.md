@@ -1,0 +1,114 @@
+# S06 Potty Training - VERBATIM build prompt from 'Feedback on parenting Section (3).xlsx', row 6
+# Read this ONLY when the doc file for this section says to check the prompt.
+
+# ParentVeda — Toilet Learning (Potty) Section: End-to-End Build Prompt
+
+Build this section end to end. It is reframed around the actual Indian practice (elimination communication / the su-su cue method), NOT the Western "potty training at 2-3 with a 3-day blitz" model. This bracket is almost entirely notReady in the app today, so most of it is a genuine content + commerce build; there are no live tools to reuse here. Do not build video files; use the existing player with placeholder entries.
+
+The app is Flutter (653 Dart files, 104 stores). The section is age-banded: it reads the child's age (`ChildProfileStore`) and surfaces the matching band first, so a newborn parent sees the gentle su-su intro, a 2-year parent sees the real training content, and a 4-year parent sees night-dryness. Reconcile cells: notReady = build; LIVE = reuse (compare feature, pp_experts, pp_courses, pp_what_changed, player, booking engine); notApplicable = never render. Build to the new hub model (only Scans & tests exists in it today).
+
+---
+
+## 0. Context and rules (apply to everything)
+
+ParentVeda is India-first, calm, evidence-first, anti-anxiety, no misinformation.
+- Simple, warm, plain-English and Hinglish where noted. No jargon. No em dashes.
+- REFRAME, do not import: this is toilet learning the Indian way. Lead with elimination communication / su-su cue training, the practice most Indian families (and grandmothers) already use, not the Western readiness-blitz model.
+- Honest on the science (no-misinformation pillar): EC/su-su is communication and fewer diapers, NOT independent toileting; a young baby held over a potty is not "trained." Independent toileting usually is not solid until around age 3. Night dryness lags day dryness by months or years and that is normal. Never oversell "trained by 6 months."
+- Never shame accidents or regressions. Composure message throughout: accidents are learning, not failure.
+- No judgment between the diaper-using family and the su-su/grandmother family. Blend both.
+- India-first: su-su cue, grandmother method, Indian-style squat toilet, joint family and helpers, travel/outside-home reality.
+- Free: all content and activities. Paid: only the low-ticket masterclass and the light problem-case consult.
+- Every band/major area has its own explainer video (existing player + placeholder entry). No area text-only.
+- No filler: every page genuinely useful on its own, or dropped, not padded.
+- FORMATS are explicit in brackets and mandatory: build each as that type. Every article uses the fixed skeleton: why / what to do (steps) / what NOT to do (cards) / when to worry (flagged callout) / age note + related page. Every activity is a named page: what it is / how to do it (steps) / when to use / age. Never render a page as one long paragraph.
+
+---
+
+## 1. What exists (reuse) vs build
+
+Bracket `parenting_potty`: content notReady, activities notReady, tools notApplicable (none), products notReady (potty seat, training pants), course notReady (short masterclass, low ticket), consult notReady (light).
+- REUSE: the compare feature (`compare` + `PpCompareStore`) for "which potty" choices; `pp_experts` for the light problem-case consult; `pp_courses` for the masterclass; `pp_what_changed` (its Tummy concern "hasn't pooped in a few days" links to the withholding page); the `pp_watch` player; the booking engine + `BookingStore`; `ProductStore`/`RecoStore` for commerce; `ChildProfileStore` for age-banding.
+- BUILD: all content, the named activities, the age-banding logic, the commerce surfaces, the masterclass, the light consult wiring, and content tags (hub-model blocker).
+- Known gaps to handle, not assume: `PpProduct` has no image field (degrade gracefully, flag image seeding); consult supply is mock (seed real); shared placeholder component does not exist (build once).
+
+---
+
+## 2. BAND A (0-12 months): Elimination communication, the su-su way
+The India-native core, honestly framed as diaper-reduction and communication, not "trained."
+
+- **What is su-su / potty cue training?** [ARTICLE] — why: the traditional Indian cue method; how it works: reading signals, the su-su sound, timing after feeds and naps; honest limit callout: this is communication and fewer diapers, not independent toileting yet; age note 0-12m; related: signals page.
+- **How to read your baby's signals** [ARTICLE, skeleton] — the signs (restlessness, pausing, going quiet, facial change) / what to do (offer the potty position, make the sound) / what not to do (don't force, don't hold too long) / when it's just not the moment / age 0-12m.
+- **The grandmother method vs diapers** [ARTICLE] — the real family tension: elders' early cue-training vs disposable-diaper life; how to blend both, no judgment either way. India note explicit.
+- **Diaper-free time and rash** [SHORT ARTICLE] — the honest benefit (more diaper-free time links to less rash and more regular bowels); links to Belly & Skin diaper-rash content.
+- Video placeholder: grandmother/expert showing cue-based holding and the sound.
+- Commerce: potty/basin, waterproof floor mat.
+
+## 3. BAND B (1-3 years): Toilet learning (main training band)
+
+### Getting ready
+- **Readiness signs** [ARTICLE, skeleton] — signs (dry longer, interest in the toilet, telling you after then before) / when it's too early / no rush / honest note that independence usually isn't solid till ~3 / age 1.5-3y.
+- **Su-su vs child-led vs 3-day: which fits your family** [COMPARISON] — the three real approaches side by side, no dogma, choose by household.
+
+### How to do it
+- **Introducing the potty** [STEP-LIST] — sit clothed first, name it, link to routine.
+- **The daily routine** [STEP-LIST] — potty after waking, after meals, before bath, before bed.
+- **Words and cues** [SHORT ARTICLE] — one family word, consistent across grandparents and helpers.
+- **Indian-toilet / squat reality** [ARTICLE] — training for the Indian-style toilet, the squat position (which research notes aids elimination), travel and outside-home.
+- **Boys vs girls, small differences** [SHORT ARTICLE].
+
+### When it's bumpy
+- **Accidents are normal** [ARTICLE, skeleton] — why / stay composed, clean up matter-of-factly / never shame or punish / age note.
+- **Regressions** [ARTICLE] — triggers (new sibling, travel, illness, daycare), why, that they pass.
+- **Holding, withholding, and constipation** [ARTICLE + FLAGGED CALLOUT] — the health-edge page: refusing to poop, painful poops, holding -> honest see-a-doctor line; links to Health constipation and to what_changed "hasn't pooped in a few days."
+- **Fear of the toilet / potty refusal** [SHORT ARTICLE].
+
+### Activities (named)
+- **Potty routine chart** [ACTIVITY] — a visual step chart (pants down, sit, wipe, flush, wash hands); how to use it; age 2+.
+- **Sit-and-read potty time** [ACTIVITY] — a couple of books by the potty to make sitting calm and unhurried; age 2+.
+- **Teach the toy** [ACTIVITY] — child shows a doll/soft toy how to use the potty; age 2.5+.
+- Video placeholder: calm real-parent potty-routine walkthrough.
+
+## 4. BAND C (3-6 years): Staying dry and night training
+- **Night training and staying dry** [ARTICLE, skeleton] — day first, night lags, honest timeline, what helps / age 3-6y.
+- **Bedwetting** [ARTICLE + FLAGGED CALLOUT] — common up to 5+, usually not a problem, when it's worth a doctor.
+- **Wiping and hygiene independence** [STEP-LIST].
+- **Public-toilet and school-readiness toileting** [SHORT ARTICLE].
+- Commerce: training underwear, waterproof sheets, step stool, travel potty.
+
+---
+
+## 5. Commerce (contextual, honest, compare-backed)
+Surface via `pp_products`/`ProductStore`/`RecoStore` on the matching page, never in a wall, never on the constipation/bedwetting health-flag callouts. Items: potty seat / Indian-style potty, training pants and underwear, waterproof bed sheets and mats, step stool, travel potty, potty-time books. For any "which potty / which training pants" choice, use the EXISTING compare feature (`compare` + `PpCompareStore`); check existing compare guides first and extend before adding new. `PpProduct` has no image field yet: degrade gracefully, flag image seeding.
+
+## 6. Videos [reuse pp_watch / player]
+One per band/major area, each a placeholder entry (title, length, slot id): su-su cue demo (A), calm potty-routine walkthrough (B), night-training explainer (C). Build the shared placeholder component once if any content is notReady.
+
+## 7. Paid layer
+- **Short potty-training masterclass** [NEW, low-ticket, `pp_courses`] — the systematic how-to paid piece; surface on Band B.
+- **Light problem-case consult** [NEW, `pp_experts`] — only for withholding, severe regression, or bedwetting past the usual age; routes to a pediatrician. Keep light; seed real supply, wire to booking engine. Not a heavy consult category.
+All content and activities stay free.
+
+## 8. What changed? [reuse pp_what_changed]
+Link its Tummy concern "hasn't pooped in a few days" to the withholding/constipation page. No new concerns needed; do not rebuild.
+
+## 9. Guardrails (most important here)
+- Reframe around the Indian practice; don't default to Western potty-training.
+- Honest on the science: EC/su-su is communication and fewer diapers, not independent training; independence ~3; night dryness lags; no overselling.
+- Never shame accidents or regressions.
+- Real health edge on withholding/constipation and bedwetting: honest see-a-doctor, don't pathologize the normal.
+- No judgment between the diaper family and the su-su/grandmother family.
+
+## 10. Build output expected
+- All three bands built in full as defined, every page in its specified FORMAT with the fixed article skeleton and named activities, real warm placeholder copy, no filler, no lorem ipsum, dropped rather than padded where thin.
+- Age-banding via `ChildProfileStore`: newborn sees su-su intro, toddler sees training, preschooler sees night dryness; the right band leads, others browsable.
+- Reframed content honest to the science and to Indian practice; health-edge callouts (withholding, bedwetting) visible and never carrying commerce.
+- Commerce contextual and compare-backed via existing features; image-gap handled; nothing on health-flag pages.
+- Masterclass (low-ticket) and light consult wired to existing course/booking systems with real supply seeded.
+- Video placeholders per band; shared placeholder component built once.
+- Content tags added (hub-model blocker); section built to the new hub model.
+
+Build band by band, then the tool-less content and commerce, reconciling each cell: notReady = build, LIVE = reuse, notApplicable = never render.
+
+## 11. Pre-build flag for Ishaan/Deepti
+The reframe rests on cultural and web research, not a Semrush pull. Before or alongside build, run a keyword check on real India terms (potty training, su su training, toilet training age, baby potty, potty seat, Hindi variants) to confirm whether this is a full section or a lighter thread and which pages carry the volume. Treat page depth as adjustable once that data is in.

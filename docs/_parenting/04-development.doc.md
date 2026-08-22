@@ -1,0 +1,21 @@
+# S04 Development - VERBATIM from 'Parenting Side Of App - feedbacks.docx'
+# Do not paraphrase. This file is the instruction.
+
+- Same feedback wherever there are list of articles shown in a section , convert them to card with cpover to make the age feel good. Nothing changes in content, just the look and feel of the tab ewhich opens to content page
+  - Whereever there a=re tool or expert booking option shown, show it differently from other sections, may be make them look like expert call section and Tool section like some cover mage or some way differently as done in previous ections. Maintain consistency from prevoois section same changes.
+  - In check my child’s development section – Delete Your cosin baby was walking by now section
+  - If the conten t needs to change by age, it is not happening by chnafging the tabs from First 6 month sto anything else.
+  - Is my child on track should be an easy checklist. Based on the age of the child, show what all should have been achieved, what is coking up now and hat shall be in next 2-3 months.  Make the representation great, so it look aazig and easy  to read. – Also keep video, tools an masterclass should remain but show amstrerclass as master class with cover image etc, tools shoudlbe shown in separate section and should e shown as tools.
+  - Remove the sox kidn of growing section
+  - Also have a video when something is genuinely worth checing section – Also imprve the representation of this page, Organge  te way is it fele soff, should look much better.
+  - In how play builds the brain section – Tools things to do together today & More activities by aeeas landing to same page, what was ecpetced mif it was suppose to be different make it different.
+  - We are calling leaps phases, please do it everywhere
+  - What is emerging for my child section: The first thing that should come in this page is bsiclly card with different colots for Movement Ands, talking, THiing etc. whatever field you want to divide milestone sin and then show on card the Milestoen nae, Image and time when it should be achieved/emerging liekrange and as user click sit it flips with detaiols about it, The have he just did something- Find it. Also it should open Allw users t mark I have seen below the card and if user click son it ten open the mempry you are opening to allow user to add memory No Development Insight needed, No Recently Celebrated Coming Soonb aan come as it is coming now, but currently it mention same milestone swhich are emerging. In Coming soon we should only show next 6 motnhs milestones.
+  - Learn While You track should simply say FAQs. Also currently the answers are not there for question, add properl answers. And again it should change based on child age.
+  - Something About My Child Has Changed section.- Please delete, ot is anywhays there as tool.
+  - Help My Child Develop Section: The development Map- Each one should open in one page with video on top and details below, well explained in points and FAQ vbelow it and products recoended section below it with see more option to see all products for that stage,
+  - Every Part Of Him Growing -and its sub title, we should call it something which is easy to understand for anyone readin and each of Brain Phsycial language Emotuional section contet needs to b uimproved so yjat main focus is non Skills Timeline Ways to help it along should be separet section outside, it should be in each of the section like cause and effect will have it, but ot wnt be tehre as genric section on oage listing brain o r other skill timeline. Saye Recoemdned Prodycits for This Phase instread of explore products.
+  - Each Skill page, need need better exolantion on what it is Why It matter, Ways to help ti alog – Also a video on top. Same with each Try TOgetehr Activity each pageRemoev We did this button. What youwill need and How to do it should be bettwe, not more verbose but better explained whn needed.
+  - Check if Lets see how your baby is doing is actually age dependent or not, I not, make it age dependent based on current age of child that we will anyways aleays know so no input needed formother, this will come from system.
+  - Also below 4 activities the
+  - r eshoudl be see all optin showing other activities that can be done at this age too.
