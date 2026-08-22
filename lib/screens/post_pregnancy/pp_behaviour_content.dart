@@ -54,7 +54,10 @@
 //  ⚠️ ENGLISH ONLY FOR NOW. Plain `String`, never `LocalizedText`.
 // =============================================================================
 
+import 'package:flutter/material.dart' show Icons;
 import 'pp_age_bands.dart';
+import 'pp_behaviour_bands.dart';
+import 'pp_behaviour_more.dart';
 import '../brackets/hub/hub_intent_art.dart';
 import 'pp_content.dart';
 import 'pp_section_screen.dart';
@@ -571,6 +574,8 @@ const PpArea _crying = PpArea(
 //  so is most of the help.
 // =============================================================================
 
+const List<String> _bandB = ['toddler_1', 'toddler_2'];
+
 const PpArea _firstFeelings = PpArea(
   id: 'first_feelings',
   mark: IntentMark.listMark,
@@ -586,6 +591,18 @@ const PpArea _firstFeelings = PpArea(
       format: 'ARTICLE',
       bands: _toddler,
       blocks: [
+        // ⚠️ ADDED IN THE S05 PASS — this area had no video at all,
+        // and the feedback opens with "wherever video is needed in any
+        // sub section, add it at top". Behaviour is the section where a
+        // demonstration earns the most: tone of voice and what a parent
+        // does with her hands are most of the technique, and neither
+        // survives being written down.
+        PpVideoSlot(
+          title: 'A tantrum, and what to do in it',
+          subtitle: 'Filmed in a real kitchen: staying close, saying almost nothing, and what happens after.',
+          minutes: '5 MIN',
+          slotId: 'behaviour/tantrum_moment',
+        ),
         PpIntro('Somewhere around the first birthday your child starts wanting '
             'things very much and having almost no way to say so. That gap is '
             'where tantrums live.'),
@@ -763,6 +780,161 @@ const PpArea _firstFeelings = PpArea(
             'it out loud with them once.'),
       ],
     ),
+
+    // -------------------------------------------------------------------------
+    //  ⚠️ THE THREE PAGES B2 SPECIFIES AND THE BUILD NEVER HAD. The area had
+    //  "the first tantrums" and stopped, so a parent mid-tantrum got the
+    //  explanation and not the method. These are the method.
+    PpPage(
+      id: 'beh_tantrum_or_meltdown',
+      title: 'Tantrum, or meltdown?',
+      format: 'SHORT ARTICLE',
+      bands: _bandB,
+      blocks: [
+        PpIntro('They look the same from outside and they are not the same '
+            'thing. Getting it wrong is the difference between a storm that '
+            'passes in four minutes and one that lasts forty.'),
+        PpTable(
+          heading: 'The difference, in the moment',
+          columns: ['', 'A tantrum', 'A meltdown'],
+          rows: [
+            ['What set it off', 'A no. Something he wanted and did not get.',
+                'Too much. Noise, people, tiredness, hunger stacked up.'],
+            ['Is he checking on you',
+                'Usually yes. There is a glance.',
+                'No. He is not really in the room with you.'],
+            ['What ends it',
+                'Time, and the answer not changing.',
+                'Less input. Fewer people, less light, less talking.'],
+            ['What makes it worse',
+                'Negotiating, or giving in halfway.',
+                'Questions. Reasoning. Anyone new arriving to help.'],
+          ],
+        ),
+        PpArticle(heading: 'Why the label matters', [
+          'A tantrum is communication: he wants something and this is his '
+              'strongest available argument. Holding the limit calmly is the '
+              'whole job.',
+          'A meltdown is not an argument at all. His nervous system has run '
+              'out of room, and there is nothing to hold a line against. '
+              'Treating it like a tantrum by being firmer adds one more thing '
+              'to a system that is already full.',
+          'A child who has frequent meltdowns rather than tantrums, well past '
+              'the age most children have stopped, is worth mentioning to your '
+              'paediatrician. Not because it is a problem, but because sensory '
+              'overwhelm has real strategies and they help.',
+        ]),
+        PpWhenLine('One to five, with meltdowns lasting longer into '
+            'childhood than tantrums do.'),
+        PpLink('What to do in either one',
+            pageId: 'beh_tantrum_steps',
+            blurb: 'The five steps, in order.'),
+      ],
+    ),
+
+    PpPage(
+      id: 'beh_tantrum_steps',
+      title: 'The five steps, in the moment',
+      format: 'STEP-LIST',
+      bands: _bandB,
+      blocks: [
+        PpVideoSlot(
+          title: 'All five, in one real tantrum',
+          subtitle: 'Filmed start to finish, including the part where nothing '
+              'seems to be working.',
+          minutes: '5 MIN',
+          slotId: 'behaviour/five_steps',
+        ),
+        PpIntro('Short enough to remember while it is happening, which is the '
+            'only test that matters. Safe, calm, present, name it, reconnect.'),
+        PpSteps([
+          PpStep('1. Safe',
+              'Move anything hard, or move him. Nothing else matters until '
+              'this is done, and it takes four seconds.'),
+          PpStep('2. Calm',
+              'Yours, not his. Sit down if you can. Your body is the '
+              'regulating thing in the room and it works whether or not he '
+              'looks at you.'),
+          PpStep('3. Present',
+              'Close enough to touch, quiet enough to be ignored. Not talking. '
+              'This step feels like doing nothing and is most of the work.'),
+          PpStep('4. Name it, once, when the volume drops',
+              '"You wanted the biscuit. You are so upset." Not before the '
+              'peak: nothing goes in during it.'),
+          PpStep('5. Reconnect, and move on',
+              'A hug if he wants one, then the next ordinary thing. No '
+              'debrief, no lesson, no making him say sorry for the feeling.'),
+        ], heading: 'The five'),
+        PpCards([
+          PpCard('The answer does not change',
+              'Not halfway, not at minute eight. Changing it once teaches that '
+              'minute eight is where the answer changes.'),
+          PpCard('It is allowed to take a while',
+              'Four to fifteen minutes is ordinary. Doing this right does not '
+              'make it short, it makes it end properly.'),
+          PpCard('You will lose it sometimes',
+              'Repair afterwards. "I shouted. That was not about you." He '
+              'learns more from that than from a tantrum handled perfectly.'),
+        ], heading: 'Three things that make it work', hue: 128),
+        PpWhenLine('One to four.'),
+        PpLink('The exact words',
+            surfaceId: 'pp_scripts',
+            blurb: 'For the supermarket, the park, and the phone.'),
+      ],
+    ),
+
+    PpPage(
+      id: 'beh_tantrum_public',
+      title: 'When it happens in front of everyone',
+      format: 'ARTICLE',
+      bands: _bandB,
+      blocks: [
+        PpIntro('The technique does not change in a shop or at a function. What '
+            'changes is that you are now managing your own embarrassment as '
+            'well, and that is the part worth planning for.'),
+        PpArticle(heading: 'The honest bit', [
+          'Most of what makes a public tantrum unbearable is the audience, and '
+              'most of the audience is not judging you. The ones who have had '
+              'children remember it; the ones who have not do not matter.',
+          'The pressure to end it FAST is what causes the mistake. Giving in to '
+              'stop the noise works once and costs you every future outing, '
+              'because he has learned that the shop is where the answer '
+              'changes.',
+        ]),
+        PpSteps([
+          PpStep('Move, if you can, before you talk',
+              'Out of the aisle, to the side of the hall, into a corridor. '
+              'Fewer eyes helps you both.'),
+          PpStep('Go quiet rather than firm',
+              'A whisper draws less attention than a hiss, and works better.'),
+          PpStep('Say the same thing you would say at home',
+              '"I am here. We will wait." The audience does not get a '
+              'different script.'),
+          PpStep('Leave if it is not settling',
+              'Abandoning a half-full trolley is allowed. It is a bad twenty '
+              'minutes, not a bad decision.'),
+          PpStep('Say nothing to the audience',
+              'You owe nobody an explanation, and explaining in front of him '
+              'teaches him he is a problem being apologised for.'),
+        ], heading: 'What to do'),
+        PpCards([
+          PpCard('Do not bargain to buy quiet',
+              'It is the single most expensive thing on this page.'),
+          PpCard('Do not threaten to leave him there',
+              'It ends it fast because it frightens him.'),
+          PpCard('Do not apologise for him to onlookers',
+              'He hears it, and it is the sentence he remembers.'),
+        ], heading: 'What not to do', hue: 128),
+        PpWhenLine('One to four.'),
+        PpIndiaNote('At a wedding or a family function there will be advice, '
+            'and somebody will offer to take him. Sometimes handing him to a '
+            'person he adores genuinely helps and is not a failure. Sometimes '
+            'a new pair of arms is one more input, and it is fine to say "give '
+            'us five minutes".'),
+        PpLink('The words for exactly this',
+            surfaceId: 'pp_scripts'),
+      ],
+    ),
   ],
 );
 
@@ -785,6 +957,18 @@ const PpArea _theNoYear = PpArea(
       format: 'ARTICLE',
       bands: _olderToddlerAndUp,
       blocks: [
+        // ⚠️ ADDED IN THE S05 PASS — this area had no video at all,
+        // and the feedback opens with "wherever video is needed in any
+        // sub section, add it at top". Behaviour is the section where a
+        // demonstration earns the most: tone of voice and what a parent
+        // does with her hands are most of the technique, and neither
+        // survives being written down.
+        PpVideoSlot(
+          title: 'When no is the answer to everything',
+          subtitle: 'Why two-year-olds refuse things they want, and what actually moves them.',
+          minutes: '4 MIN',
+          slotId: 'behaviour/the_no_year',
+        ),
         PpIntro('Around two, a child works out that she is a separate person '
             'with her own opinion. No is her practising that.'),
         PpArticle([
@@ -906,6 +1090,18 @@ const PpArea _rulesAndOthers = PpArea(
       format: 'ARTICLE',
       bands: ['preschool'],
       blocks: [
+        // ⚠️ ADDED WHEN SCREEN TIME MOVED OUT TO ITS OWN DOOR. This area
+        // held the only video in it, so retiring that page left the area
+        // bare. Worth noting as a general hazard: moving a page can take a
+        // section's only video with it, and nothing complains.
+        PpVideoSlot(
+          title: 'Why small children lie',
+          subtitle: 'A child psychologist on why it is a milestone rather '
+              'than a character problem, and what to do at the moment it '
+              'happens.',
+          minutes: '5 MIN',
+          slotId: 'behaviour/lying',
+        ),
         PpIntro('The first lies are a developmental milestone, uncomfortable as '
             'that is to read. She has worked out that you cannot see inside her '
             'head.'),
@@ -951,6 +1147,16 @@ const PpArea _rulesAndOthers = PpArea(
         PpWhenLine('First lies from about 3, common through 4 and 5.'),
       ],
     ),
+    /* ⚠️ MOVED OUT TO ITS OWN DOOR, KEPT FOR REVERT.
+       The prompt gives screen time its own door with four pages; it was one
+       page filed under "lying, back-talk and screens". `kBehScreens` in
+       pp_behaviour_more.dart now carries it properly.
+
+       Retired rather than left in place, because two screen-time entries in
+       one section is the duplicate-door problem this review has now found
+       three times elsewhere. If the new door is ever dropped, uncomment this
+       so the content does not vanish with it.
+
     PpPage(
       id: 'screens',
       title: 'Screens, and the fight to turn them off',
@@ -958,6 +1164,18 @@ const PpArea _rulesAndOthers = PpArea(
       format: 'ARTICLE',
       bands: ['preschool'],
       blocks: [
+        // ⚠️ ADDED IN THE S05 PASS — this area had no video at all,
+        // and the feedback opens with "wherever video is needed in any
+        // sub section, add it at top". Behaviour is the section where a
+        // demonstration earns the most: tone of voice and what a parent
+        // does with her hands are most of the technique, and neither
+        // survives being written down.
+        PpVideoSlot(
+          title: 'Ending screen time without a meltdown',
+          subtitle: 'The warning, the timer, and the thing to move to next.',
+          minutes: '4 MIN',
+          slotId: 'behaviour/screen_transition',
+        ),
         PpIntro('Almost every screen argument is about the ending, not the '
             'watching. Fix the ending and most of it goes.'),
         PpArticle([
@@ -999,6 +1217,7 @@ const PpArea _rulesAndOthers = PpArea(
             'with the family rather than ten corrections in front of her.'),
       ],
     ),
+    */
     PpPage(
       id: 'siblings',
       title: 'The fighting between them',
@@ -1071,10 +1290,43 @@ const PpSection kPpBehaviourSection = PpSection(
   title: 'Behaviour',
   intro: 'Why she does it, what to do in the moment, and the words to use.',
   bandSet: kPpChildBands,
+  // ⚠️ ORDER IS THE SPEC'S ORDER, NOT THE FILE'S. Band A first, then the
+  // toddler doors in the sequence the prompt lays them out, then Band C. The
+  // band chooser narrows what LEADS; this list decides what a parent scrolling
+  // past her own band meets next, and "crying" then "three to six" then
+  // "tantrums" would read as a section assembled by whoever wrote it last.
   areas: [
-    _crying,
-    _firstFeelings,
-    _theNoYear,
-    _rulesAndOthers,
+    _crying, // Band A, A1–A6, built in full and untouched
+    kBehZiddi, // B1 — the dominant India door, previously absent
+    _firstFeelings, // B2 — tantrums and first hitting
+    _theNoYear, // B3 — the specific behaviours
+    _rulesAndOthers, // B3 — lying, siblings
+    kBehSpecific, // B3 — the "he keeps doing this" lookup door
+    kBehScreens, // B4 — screens as its own door, per the prompt
+    kBehDiscipline, // B5 — previously absent
+    kBehCalm, // the regulation activities
+    kBehOlderChild, // Band C — previously absent
+  ],
+  // ⚠️ THE SECTION HAD NO TOOLS AT ALL, while this file's header said
+  // "nine areas plus three tools". The header was describing the spec rather
+  // than the build — which is the most expensive kind of comment, because it
+  // reads as a description of what shipped.
+  tools: [
+    PpSectionTool(
+      label: 'What to say when…',
+      blurb: 'The exact words for the moment you are in, and what to leave '
+          'unsaid. Search it while it is happening.',
+      surfaceId: 'pp_scripts',
+      icon: Icons.chat_bubble_outline_rounded,
+    ),
+    // Reused, not rebuilt — the spec is explicit that What Changed carries the
+    // behaviour subset and must not be duplicated here.
+    PpSectionTool(
+      label: 'Something has changed',
+      blurb: 'Started biting, head-banging, suddenly clingy. Work through it '
+          'calmly.',
+      surfaceId: 'pp_what_changed',
+      icon: Icons.swap_horiz_rounded,
+    ),
   ],
 );
