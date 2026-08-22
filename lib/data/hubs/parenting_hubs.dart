@@ -117,6 +117,19 @@ final HubConfig kPpSleep = HubConfig(
     blurb: _en('Book a 1:1 if the nights are wearing you down more than the '
         'day can fix.'),
     action: kPpActConsult,
+    // ⚠️ THIS WAS UNFILTERED FOR ONE PASS, AND THE HISTORY IS THE USEFUL PART.
+    //
+    // The symmetric change to Feeding's lactation filter was written, then
+    // REVERTED, because there was no sleep expert in the roster at all —
+    // filtering to a category nobody had would have matched nobody and fallen
+    // back to the full list, so the screen would look identical while the code
+    // claimed a filter. That silent-success shape is the thing worth
+    // remembering.
+    //
+    // Sleep supply is now seeded (`Expert.seeded`), so the filter is real and
+    // the path is exercised end to end. When a real sleep coach is signed,
+    // nothing here changes.
+    surfaceId: 'pp_experts/Sleep expert',
   ),
 );
 
@@ -158,6 +171,12 @@ final HubConfig kPpFeeding = HubConfig(
     label: _en('Talk to a lactation expert'),
     blurb: _en('Book a 1:1 about latch, supply, or the switch to solids.'),
     action: kPpActConsult,
+    // ⚠️ FILTERED. The label names one person; the unfiltered roster
+    // offered eleven, including a child psychologist and a paediatrician.
+    // The string must match `Expert.category` exactly — guarded by
+    // `test/pp_consult_filter_test.dart`, because a typo here fails silently
+    // by falling back to the full list, which looks like it worked.
+    surfaceId: 'pp_experts/Lactation expert',
   ),
 );
 
@@ -240,6 +259,10 @@ final HubConfig kPpDevelopment = HubConfig(
     blurb: _en('Book a 1:1 if something feels off track. A second, '
         'reassuring opinion.'),
     action: kPpActConsult,
+    // ⚠️ "A specialist" means a developmental paediatrician or an OT, and
+    // the unfiltered roster opens with a lactation consultant. Seeded supply,
+    // so the path is real today and a signed expert is a data edit.
+    surfaceId: 'pp_experts/Development expert',
   ),
 );
 
@@ -268,6 +291,19 @@ final HubConfig kPpBehaviour = HubConfig(
       action: kPpActBehaviour,
     ),
   ],
+  // ⚠️ NO CLOSING OFFER HERE, AND IT IS A CONSTRAINT RATHER THAN AN
+  // OVERSIGHT. A closing was added in this pass along with five others, and
+  // `problem_hub_test.dart` immediately rejected it: **a one-door hub never
+  // renders a hub screen at all.** The tile opens the door's destination
+  // directly, so a closing offer on it is config that can never be seen.
+  //
+  // That is worth knowing before anyone adds one again. Behaviour has exactly
+  // one door, so the place to offer a child psychologist is inside the section
+  // — which it already does, via `PpConsult(role: 'psychologist')` on the
+  // pages where a red flag is actually being discussed. That is a better
+  // position for it anyway: offered at the moment it is relevant rather than
+  // as a permanent footer.
+
 );
 
 // -----------------------------------------------------------------------------
@@ -309,6 +345,17 @@ final HubConfig kPpPotty = HubConfig(
       action: kPpActPottyTraining,
     ),
   ],
+  // ⚠️ ADDED: THIS HUB HAD NO EXPERT OFFER AT ALL. The doc asks that
+  // the expert be shown differently so it stops being ignored; six hubs
+  // had nothing to show. Supply for this category is seeded rather than
+  // real — see `Expert.seeded` — so the whole path works today and a real
+  // person is a data edit.
+  closing: HubClosing(
+    label: _en('Talk to a paediatrician about it'),
+    blurb: _en('Book a 1:1 if there is holding, pain, or a regression that is not settling. Light and specific, not a course.'),
+    action: kPpActConsult,
+    surfaceId: 'pp_experts/Pediatrician',
+  ),
 );
 
 // -----------------------------------------------------------------------------
@@ -349,6 +396,17 @@ final HubConfig kPpEarlyLearning = HubConfig(
       action: kPpActSchoolReadiness,
     ),
   ],
+  // ⚠️ ADDED: THIS HUB HAD NO EXPERT OFFER AT ALL. The doc asks that
+  // the expert be shown differently so it stops being ignored; six hubs
+  // had nothing to show. Supply for this category is seeded rather than
+  // real — see `Expert.seeded` — so the whole path works today and a real
+  // person is a data edit.
+  closing: HubClosing(
+    label: _en('Talk to an early learning expert'),
+    blurb: _en('Book a 1:1 about school readiness, or about whether any of it needs to be happening yet.'),
+    action: kPpActConsult,
+    surfaceId: 'pp_experts/Early learning expert',
+  ),
 );
 
 // -----------------------------------------------------------------------------
@@ -379,6 +437,17 @@ final HubConfig kPpFirst40 = HubConfig(
       action: kPpActFirst40Days,
     ),
   ],
+  // ⚠️ NO CLOSING OFFER: THIS HUB HAS ONE DOOR, SO IT NEVER RENDERS A HUB
+  // SCREEN. The tile opens the door's destination directly, which means a
+  // closing offer here is config nobody can ever see.
+  //
+  // One was added in this pass along with five others and `problem_hub_test`
+  // rejected it immediately. Recording the reason rather than just deleting
+  // it, because "add an expert offer to every hub" is a reasonable-sounding
+  // instruction that is wrong for a quarter of them — and the section's own
+  // `PpConsult` blocks are the right home anyway: offered where the need is
+  // being discussed, not as a permanent footer.
+
 );
 
 // -----------------------------------------------------------------------------
@@ -426,6 +495,11 @@ final HubConfig kPpMaternal = HubConfig(
     blurb: _en('Book a 1:1 about the pelvic floor, healing, or simply how you are '
         'feeling.'),
     action: kPpActConsult,
+    // ⚠️ FILTERED NOW THAT THE CATEGORY HAS SUPPLY. It was opening the
+    // whole roster from a door that names one kind of person.
+    // A postnatal counsellor. The door says "your own recovery" and the roster
+    // otherwise opens with a child dermatologist, which is not it. Seeded supply.
+    surfaceId: 'pp_experts/Maternal mental health',
   ),
 );
 
@@ -497,6 +571,17 @@ final HubConfig kPpTraditional = HubConfig(
       action: kPpActTradition,
     ),
   ],
+  // ⚠️ NO CLOSING OFFER: THIS HUB HAS ONE DOOR, SO IT NEVER RENDERS A HUB
+  // SCREEN. The tile opens the door's destination directly, which means a
+  // closing offer here is config nobody can ever see.
+  //
+  // One was added in this pass along with five others and `problem_hub_test`
+  // rejected it immediately. Recording the reason rather than just deleting
+  // it, because "add an expert offer to every hub" is a reasonable-sounding
+  // instruction that is wrong for a quarter of them — and the section's own
+  // `PpConsult` blocks are the right home anyway: offered where the need is
+  // being discussed, not as a permanent footer.
+
 );
 
 /// Every parenting hub — all eleven brackets.

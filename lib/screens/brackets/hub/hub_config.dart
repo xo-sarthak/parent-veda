@@ -205,14 +205,50 @@ class HubConfig {
 }
 
 /// One offer at the foot of a hub — today, always a consult.
+/// A tool surfaced on the hub itself.
+///
+/// ⚠️ DEFINED HERE RATHER THAN REUSING `PpSectionTool`, and the reason is
+/// direction of dependency. This hub renders pregnancy, TTC and parenting; if
+/// it imported the parenting section model, the generic screen would depend on
+/// one stage's data layer and could never be used without it. The caller maps
+/// its own tools into this shape, which is three fields wide and costs
+/// nothing.
+class HubTool {
+  const HubTool({
+    required this.label,
+    required this.blurb,
+    required this.surfaceId,
+  });
+
+  final LocalizedText label;
+  final LocalizedText blurb;
+
+  /// ⚠️ MUST RESOLVE THROUGH THE ROUTER. A tool tile that leads nowhere is
+  /// worse than no tile — exactly what the wiring gate exists to catch.
+  final String surfaceId;
+}
+
 class HubClosing {
   const HubClosing({
     required this.label,
     required this.blurb,
     required this.action,
+    this.surfaceId,
   });
 
   final LocalizedText label;
   final LocalizedText blurb;
   final String action;
+
+  /// ⚠️ WHEN SET, THIS WINS OVER `action`, AND THAT IS THE POINT.
+  ///
+  /// Every hub's closing offer used to fire the same generic consult action,
+  /// which opens the whole expert roster. But the label is specific — "Talk
+  /// to a lactation expert", "Talk to a sleep expert" — so the generic
+  /// destination contradicts the words the reader just tapped.
+  ///
+  /// A surface id can carry the filter (`pp_experts/Lactation expert`) where a
+  /// bare action string cannot, without giving every hub its own action
+  /// constant. `action` stays required so nothing loses its fallback.
+  final String? surfaceId;
 }

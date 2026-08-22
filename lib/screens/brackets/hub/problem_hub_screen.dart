@@ -62,6 +62,7 @@ class ProblemHubScreen extends StatelessWidget {
     required this.onSurface,
     required this.onAction,
     this.listenTo,
+    this.tools = const [],
   });
 
   final HubConfig config;
@@ -70,6 +71,19 @@ class ProblemHubScreen extends StatelessWidget {
   final void Function(BuildContext, String surfaceId) onSurface;
   final void Function(BuildContext, String action) onAction;
   final Listenable? listenTo;
+
+  /// ⚠️ TOOLS BELONG ON THE HUB, NOT BURIED A LEVEL DOWN.
+  ///
+  /// Feedback: "Move tools out of Help My Child Sleep section and bring it out
+  /// on main Sleep section above Talk to Sleep expert." They were living
+  /// inside the section screen behind one of the two doors, so a mother who
+  /// wanted the sleep log had to first pick the door about a problem she might
+  /// not have.
+  ///
+  /// They sit BETWEEN the doors and the closing offer on purpose. Above the
+  /// doors they would compete with the reason she opened the app; below the
+  /// consult they would be an afterthought under a paid offer.
+  final List<HubTool> tools;
 
   @override
   Widget build(BuildContext context) {
@@ -147,6 +161,7 @@ class ProblemHubScreen extends StatelessWidget {
                 const SizedBox(height: 16),
                 _pad(_Doors(
                     config: config,
+                    tools: tools,
                     p: p,
                     lang: lang,
                     onSurface: onSurface,
@@ -350,12 +365,14 @@ class _UrgentStrip extends StatelessWidget {
 class _Doors extends StatelessWidget {
   const _Doors(
       {required this.config,
+      required this.tools,
       required this.p,
       required this.lang,
       required this.onSurface,
       required this.onAction});
 
   final HubConfig config;
+  final List<HubTool> tools;
   final V2Palette p;
   final AppLanguage lang;
   final void Function(BuildContext, String) onSurface;
@@ -375,22 +392,74 @@ class _Doors extends StatelessWidget {
                 }),
             if (n != config.needs.last) const SizedBox(height: 10),
           ],
-          // The closing offer, visually subordinate to every door above it.
+          // ---- tools ---------------------------------------------------
+          // ⚠️ LABELLED, AND DELIBERATELY NOT DOOR-SHAPED. The note asks
+          // that this "should be easily identifiable, shouldn't feel like the
+          // What do you need section". A door is a pastel well with a drawn
+          // mark; these are hairline rows under a heading. Different
+          // vocabulary is what makes them read as a different KIND of thing
+          // rather than as three more doors she has to choose between.
+          if (tools.isNotEmpty) ...[
+            const SizedBox(height: 26),
+            Row(children: [
+              Text('TOOLS',
+                  style: pvManrope(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.3,
+                      color: p.action.withValues(alpha: 0.85))),
+              const SizedBox(width: 10),
+              Expanded(child: Container(height: 1, color: p.line)),
+            ]),
+            const SizedBox(height: 12),
+            for (final t in tools) ...[
+              _HubTool(tool: t, p: p, lang: lang, onTap: () => onSurface(context, t.surfaceId)),
+              if (t != tools.last) const SizedBox(height: 9),
+            ],
+          ],
+
+          // The closing offer.
           if (config.closing != null) ...[
             const SizedBox(height: 22),
             _Closing(
                 closing: config.closing!,
                 p: p,
                 lang: lang,
-                onTap: () => onAction(context, config.closing!.action)),
+                onTap: () {
+                  final c = config.closing!;
+                  if (c.surfaceId != null) {
+                    return onSurface(context, c.surfaceId!);
+                  }
+                  onAction(context, c.action);
+                }),
           ],
         ],
       );
 }
 
-/// ⚠️ NOT A DOOR, AND IT MUST NOT LOOK LIKE ONE. No pastel well, no drawn mark
-/// — those are the vocabulary of "this is a way in". This is a plain row with a
-/// hairline, so it reads as an offer she can take or ignore.
+/// The closing offer — the 1:1 consult.
+///
+/// ⚠️ THIS USED TO BE A PLAIN HAIRLINE ROW, ON THE ARGUMENT THAT AN OFFER
+/// SHOULD BE VISUALLY SUBORDINATE TO EVERY DOOR ABOVE IT. That argument was
+/// principled and it was wrong in practice, and the feedback says why in one
+/// sentence: "Talk to an expert should be shown differently, maybe with a
+/// cover image, so that it is not ignored the way it is being ignored now,
+/// looking just like a line at the bottom."
+///
+/// Subordinate turned out to mean invisible. A row of small text under two
+/// large doors is not modest, it is skipped — and this is the one surface on
+/// the hub where a mother who genuinely needs a person finds one.
+///
+/// ⚠️ SO IT IS A CARD, BUT STILL NOT A DOOR. It keeps a cover panel and a
+/// named action, and it deliberately does NOT take the door's pastel well and
+/// full-width drawn mark. Three kinds of thing on this screen — ways in,
+/// things you use, a person you can book — and each has to look like its own
+/// kind or the hierarchy stops meaning anything.
+///
+/// ⚠️ THE COVER IS DRAWN, NOT PHOTOGRAPHED. Same reasoning as the section
+/// cards: a real image can drop in later without this widget changing, and a
+/// tinted panel with `askDoctor` on it is a finished cover rather than a
+/// placeholder for one.
 class _Closing extends StatelessWidget {
   const _Closing(
       {required this.closing,
@@ -404,34 +473,129 @@ class _Closing extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
+  Widget build(BuildContext context) {
+    final tint = v2BlockTint(268, p);
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: p.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: p.line),
+        ),
+        child: IntrinsicHeight(
+          child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            // The cover panel.
+            Container(
+              width: 96,
+              color: tint,
+              padding: const EdgeInsets.all(19),
+              child: HubIntentArt(mark: IntentMark.askDoctor, tint: tint),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(15, 15, 13, 15),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(closing.label.of(lang),
+                        style: pvFraunces(
+                            fontSize: 16.5,
+                            fontWeight: FontWeight.w600,
+                            height: 1.2,
+                            letterSpacing: -0.35,
+                            color: p.ink1)),
+                    const SizedBox(height: 5),
+                    Text(closing.blurb.of(lang),
+                        style: pvManrope(
+                            fontSize: 12.5, height: 1.45, color: p.ink2)),
+                    const SizedBox(height: 10),
+                    Row(children: [
+                      Text('Book a 1:1',
+                          style: pvManrope(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.3,
+                              color: p.action)),
+                      const SizedBox(width: 4),
+                      Icon(Icons.arrow_forward_rounded,
+                          size: 14, color: p.action),
+                    ]),
+                  ],
+                ),
+              ),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
+/// A tool on the hub.
+///
+/// ⚠️ IT MUST NOT LOOK LIKE A DOOR AND IT MUST NOT LOOK LIKE THE CLOSING
+/// OFFER, which is a narrower gap than it sounds. A door is a pastel well with
+/// a drawn mark; the closing offer is a card with a cover. This is a hairline
+/// row with a small square glyph well and a right chevron — the vocabulary of
+/// "a thing you use", sitting under a labelled rule that names it as such.
+class _HubTool extends StatelessWidget {
+  const _HubTool(
+      {required this.tool,
+      required this.p,
+      required this.lang,
+      required this.onTap});
+
+  final HubTool tool;
+  final V2Palette p;
+  final AppLanguage lang;
+  final VoidCallback onTap;
+
+  @override
   Widget build(BuildContext context) => InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(16),
         child: Container(
-          padding: const EdgeInsets.fromLTRB(16, 15, 14, 15),
+          padding: const EdgeInsets.fromLTRB(13, 12, 12, 13),
           decoration: BoxDecoration(
-            color: p.surface,
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: p.line),
+            color: p.surfaceAlt,
+            borderRadius: BorderRadius.circular(16),
           ),
           child: Row(children: [
+            Container(
+              width: 34,
+              height: 34,
+              decoration: BoxDecoration(
+                color: p.surface,
+                borderRadius: BorderRadius.circular(11),
+                border: Border.all(color: p.line),
+              ),
+              child: Icon(Icons.handyman_outlined, size: 17, color: p.action),
+            ),
+            const SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(closing.label.of(lang),
+                  Text(tool.label.of(lang),
                       style: pvManrope(
-                          fontSize: 14,
+                          fontSize: 13.5,
                           fontWeight: FontWeight.w700,
                           color: p.ink1)),
-                  const SizedBox(height: 3),
-                  Text(closing.blurb.of(lang),
+                  const SizedBox(height: 2),
+                  Text(tool.blurb.of(lang),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
                       style: pvManrope(
-                          fontSize: 12.5, height: 1.4, color: p.ink3)),
+                          fontSize: 12, height: 1.4, color: p.ink3)),
                 ],
               ),
             ),
-            Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
+            const SizedBox(width: 8),
+            Icon(Icons.chevron_right_rounded, size: 19, color: p.ink3),
           ]),
         ),
       );

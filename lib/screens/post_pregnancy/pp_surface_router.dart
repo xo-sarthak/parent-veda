@@ -49,6 +49,11 @@ import 'milestone_journey_screen.dart';
 import 'nuskhe_screen.dart';
 import 'problem_solver_screen.dart';
 import 'products_discovery_screen.dart';
+import 'pp_experts_data.dart' show kFindHelpNeeds;
+import 'development_all_activities_screen.dart';
+import 'on_track_checklist_screen.dart';
+import 'scripts_library_screen.dart';
+import 'find_help_triage_screen.dart';
 import 'provider_results_screen.dart';
 import 'reading_home_screen.dart';
 import 'sleep_journey_screen.dart';
@@ -69,7 +74,63 @@ import 'yoga_home_screen.dart';
 /// at real screens), so it is handed this same function. That recursion is fine
 /// and bounded: a section never contains another section.
 Widget? ppScreenForSurface(String id) {
+  // ⚠️ `pp_experts/<category>` OPENS THE ROSTER ALREADY FILTERED.
+  //
+  // Feedback: "Talk to a lactation expert should land user to 1 on 1 call with
+  // lactation expert filter applied." It was opening the whole roster — the
+  // paediatrician, the sleep coach, the child psychologist and the lactation
+  // consultants together — from a door that had just named one of them. This
+  // is the same defect the pregnancy side fixed on its scan and nutrition
+  // consults, and it is worth stating the general form: landing on the right
+  // SCREEN with the wrong LIST is a failure the wiring gate does not catch,
+  // because the tap works.
+  //
+  // An unknown category falls through to the unfiltered roster rather than a
+  // blank screen — wrong-but-useful beats right-but-empty, and
+  // `test/pp_consult_filter_test.dart` fails on a category that matches no
+  // expert, so a typo is caught in CI and not by a parent.
+  const expertPrefix = 'pp_experts/';
+  if (id.startsWith(expertPrefix)) {
+    final category = id.substring(expertPrefix.length);
+    for (final n in kFindHelpNeeds) {
+      if (n.category == category) return ProviderResultsScreen(need: n);
+    }
+    return const ProviderResultsScreen();
+  }
+
   const sectionPrefix = 'pp_section/';
+  if (id.startsWith(sectionPrefix)) {
+    // ⚠️ `pp_section/<bracketId>/<areaId>` OPENS STRAIGHT INTO ONE AREA.
+    //
+    // Added because Potty's two hub doors — "Is she ready yet?" and "Start and
+    // manage potty training" — both resolved to the bare section id and
+    // therefore to the same landing. Third time this review has found that
+    // shape, and always the same cause: the section was addressable and the
+    // area was not.
+    final rest = id.substring(sectionPrefix.length);
+    final slash = rest.indexOf('/');
+    if (slash > 0) {
+      final section = ppSectionFor(rest.substring(0, slash));
+      if (section != null) {
+        return PpSectionScreen(
+          section: section,
+          // Same handler the bare-section branch below uses. Kept inline
+          // rather than hoisted, because hoisting it would mean a top-level
+          // function that pushes routes, and the two call sites are twelve
+          // lines apart.
+          onSurface: (context, surfaceId) {
+            final screen = ppScreenForSurface(surfaceId);
+            if (screen == null) return;
+            Navigator.of(context).push(MaterialPageRoute<void>(
+              settings: RouteSettings(name: surfaceId),
+              builder: (_) => screen,
+            ));
+          },
+          initialAreaId: rest.substring(slash + 1),
+        );
+      }
+    }
+  }
   if (id.startsWith(sectionPrefix)) {
     final section = ppSectionFor(id.substring(sectionPrefix.length));
     if (section == null) return null;
@@ -185,7 +246,27 @@ Widget? _ppScreenFor(String id) => switch (id) {
       // links into a section that opens itself.
       'pp_development' => const DevelopmentHomeScreen(),
       'pp_milestones' => const MilestoneJourneyScreen(),
-      'pp_activities' => const DevelopmentHomeScreen(),
+      // ⚠️ THE CHECKLIST THE AREA'S TITLE PROMISES. "Is my child on track?"
+      // opened four articles; this is the answer. Separate from
+      // `pp_milestones` on purpose — that screen is about noticing and
+      // celebrating one skill, this one is about seeing the whole shape at a
+      // glance, and merging them would make both worse.
+      'pp_on_track' => const OnTrackChecklistScreen(),
+      // ⚠️ THE BEHAVIOUR SECTION'S STANDOUT TOOL, and until now the section
+      // had NO tools at all — its own file header claimed "nine areas plus
+      // three tools" while the section registered four areas and none. The
+      // header was describing the spec, not the build.
+      'pp_scripts' => const ScriptsLibraryScreen(),
+      // ⚠️ WAS ALSO `DevelopmentHomeScreen`, WHICH MADE TWO DIFFERENT LINKS
+      // ONE DESTINATION. On "How play builds the brain", "Things to do
+      // together today" (pp_development) and "More activities, by area"
+      // (pp_activities) sat one line apart and opened the same screen —
+      // reported as exactly that. Two labels with one answer teach a reader
+      // that the labels do not mean anything.
+      //
+      // The by-area screen now exists, so the id finally has its own home:
+      // grouped by the four ways he is growing, filtered to his age.
+      'pp_activities' => const DevelopmentAllActivitiesScreen(),
 
       // ---- Learn ------------------------------------------------------------
       'pp_read' => const ReadingHomeScreen(),
@@ -200,6 +281,11 @@ Widget? _ppScreenFor(String id) => switch (id) {
       // ---- People -----------------------------------------------------------
       'pp_experts' => const ProviderResultsScreen(),
       'pp_find_help' => const ProblemSolverScreen(),
+      // ⚠️ THE QUESTIONS VERSION. `pp_find_help` stays exactly as it was —
+      // it is the Explore drawer's entry and a search box is the right thing
+      // there. This is the surface a link may use when it promised to NARROW
+      // rather than to search.
+      'pp_find_help_triage' => const FindHelpTriageScreen(),
 
       // ---- Mother -----------------------------------------------------------
       // The same yoga screen the Explore drawer opens, filtered to the

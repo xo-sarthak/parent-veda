@@ -28,6 +28,7 @@ import 'reading_home_screen.dart';
 import 'what_changed_screen.dart';
 import '../../data/hubs/parenting_hubs.dart';
 import '../brackets/hub/hub_owed_screen.dart';
+import '../brackets/hub/hub_config.dart';
 import '../brackets/hub/problem_hub_screen.dart';
 import '../../data/hubs/hub_registry.dart';
 
@@ -61,6 +62,7 @@ import 'pp_phases_data.dart';
 import 'pp_products_data.dart';
 import 'pp_reading_data.dart';
 import 'pp_section_registry.dart';
+import 'pp_section_screen.dart' show PpSectionTool;
 import 'pp_surface_router.dart';
 import 'pp_watch_data.dart';
 
@@ -498,12 +500,34 @@ class _PpHomeV3State extends State<PpHomeV3> {
         }
         return;
       }
+      // ⚠️ THE HUB'S TOOLS ARE READ FROM THE SECTION, NOT DECLARED TWICE.
+      //
+      // Feedback: tools should sit on the main section screen above "Talk to
+      // an expert", rather than inside one of the doors. The obvious way to do
+      // that is to add a tools list to `HubConfig` — and then every tool
+      // exists in two files, and the day somebody adds one to the section it
+      // silently does not appear on the hub. `ppSectionFor` already keys on
+      // the same `bracketId` the hub carries, so there is exactly one list.
+      //
+      // Empty for any bracket with no built section yet, which renders as no
+      // tools block at all rather than an empty heading.
+      final section = ppSectionFor(bracketId);
+      final hubTools = [
+        for (final t in section?.tools ?? const <PpSectionTool>[])
+          HubTool(
+            label: LocalizedText(en: t.label, hi: t.label),
+            blurb: LocalizedText(en: t.blurb, hi: t.blurb),
+            surfaceId: t.surfaceId,
+          ),
+      ];
+
       Navigator.of(context).push(MaterialPageRoute<void>(
         settings: RouteSettings(name: 'hub/' + bracketId),
         builder: (_) => ProblemHubScreen(
           config: hub,
           bracket: b,
           lang: lang,
+          tools: hubTools,
           listenTo: V2PaletteStore.instance,
           onSurface: _openSurface,
           onAction: _hubAction,
@@ -549,12 +573,36 @@ class _PpHomeV3State extends State<PpHomeV3> {
       kPpActTradition: 'parenting_traditional',
       kPpActFeedingProblem: 'parenting_feeding',
       kPpActSchoolReadiness: 'parenting_early_learning',
+      // ⚠️ THESE TWO USED TO BE IDENTICAL, and the feedback caught it: "Is My
+      // Child Ready and Start & Manage Potty Training both are opening to same
+      // sections". Both mapped to the bare section id, so two differently
+      // worded questions got one landing page.
+      //
+      // Left in this map as the FALLBACK — if either area id ever stops
+      // existing, the door still opens the right section rather than nothing.
+      // The specific destinations are set just below.
       kPpActPottyReadiness: 'parenting_potty',
       kPpActPottyTraining: 'parenting_potty',
       kPpActFirst40Days: 'parenting_first_40',
       kPpActMaternalRecovery: 'parenting_maternal',
       kPpActMaternalConcern: 'parenting_maternal',
     };
+    // ⚠️ DOORS THAT NAME A SPECIFIC AREA, RATHER THAN A SECTION.
+    //
+    // A hub door is a question. When two doors ask different questions the
+    // answers have to differ, and until now the only thing the router could
+    // address was a whole section. Third instance of that shape in this
+    // review, after Nutrition and Development.
+    const areaForAction = <String, String>{
+      kPpActPottyReadiness: 'parenting_potty/getting_ready',
+      kPpActPottyTraining: 'parenting_potty/how_to_do_it',
+    };
+    final areaTarget = areaForAction[action];
+    if (areaTarget != null) {
+      _openSurface(context, 'pp_section/$areaTarget');
+      return;
+    }
+
     final sectionId = sectionForAction[action];
     if (sectionId != null && ppSectionFor(sectionId) != null) {
       _openSurface(context, 'pp_section/' + sectionId);

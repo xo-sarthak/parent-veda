@@ -49,6 +49,8 @@ class PpArea {
     this.hue = 268,
     this.mark = IntentMark.listMark,
     this.toolSurfaceId,
+    this.cover,
+    this.pinned = false,
   });
 
   final String id;
@@ -88,6 +90,39 @@ class PpArea {
   /// An area that IS a tool rather than reading — the sleep log, the quick
   /// check. Opens through the router instead of listing pages.
   final String? toolSurfaceId;
+
+  /// ⚠️ RENDERED ABOVE THE GRID, FULL WIDTH, AS ONE WIDE CARD.
+  ///
+  /// For the area that is not one shelf among several but the honest answer
+  /// the whole section is built around — Potty's "how long does this actually
+  /// take", which the feedback describes as "a constant, and like a tool
+  /// should look different from other articles".
+  ///
+  /// It is a presentation flag rather than a new concept: a pinned area is
+  /// still an area, still band-filtered, still opens the same way. Making it a
+  /// separate model would have meant every section screen learning about two
+  /// kinds of thing.
+  ///
+  /// At most one per section, by convention rather than by assertion — two
+  /// pinned areas is just a second grid with a different card, which defeats
+  /// the point of pinning either.
+  final bool pinned;
+
+  /// ⚠️ NULL IS A STATE, NOT AN OVERSIGHT.
+  ///
+  /// The feedback asks for these tiles to become cards "like we have reels on
+  /// Insta ... with Title written and a cover image put". Photography for
+  /// eleven sections does not exist yet, and waiting for it would mean either
+  /// shipping nothing or shipping a grey rectangle that has to be replaced by
+  /// a different widget later.
+  ///
+  /// So the card is the FINISHED component running in its file-less state: a
+  /// null cover paints the section's own tinted ground with its drawn mark,
+  /// which is a real cover rather than a placeholder for one. When a
+  /// photograph arrives, this becomes an asset path and no widget is touched.
+  /// Same seam as `MmCalmAudio.asset` on the pregnancy side, for the same
+  /// reason — a placeholder you delete to ship is a second implementation.
+  final String? cover;
 
   bool inBand(String band) => bands.isEmpty || bands.contains(band);
 
@@ -159,7 +194,25 @@ class PpSectionTool {
 // =============================================================================
 
 class PpSectionScreen extends StatefulWidget {
-  const PpSectionScreen({super.key, required this.section, this.onSurface});
+  const PpSectionScreen({
+    super.key,
+    required this.section,
+    this.onSurface,
+    this.initialAreaId,
+  });
+
+  /// ⚠️ OPENS STRAIGHT INTO ONE AREA, AND IT EXISTS BECAUSE TWO HUB DOORS
+  /// WERE LANDING IN THE SAME PLACE.
+  ///
+  /// Potty's hub offers "Is she ready yet?" and "Start and manage potty
+  /// training" and both resolved to `pp_section/parenting_potty` — the same
+  /// landing, so two differently-worded questions got one identical answer.
+  /// That is the third time this review has found that exact shape (Nutrition,
+  /// Development, and here), and it is always the same cause: a section id is
+  /// easy to route to and an area id was not addressable.
+  ///
+  /// Null keeps the old behaviour exactly.
+  final String? initialAreaId;
 
   final PpSection section;
   final void Function(BuildContext context, String surfaceId)? onSurface;
@@ -178,6 +231,26 @@ class _PpSectionScreenState extends State<PpSectionScreen> {
   void initState() {
     super.initState();
     _band = s.bandSet?.active.id;
+
+    // ⚠️ DEEP LINK AFTER THE FIRST FRAME, NOT DURING IT. Pushing a route from
+    // `initState` throws — there is no Navigator context yet — and doing it in
+    // `build` would re-fire on every rebuild, including every band change.
+    //
+    // The landing is still built underneath, deliberately: she arrives inside
+    // the area she asked for and Back takes her to the section rather than out
+    // of it, which is what a door should feel like.
+    final target = widget.initialAreaId;
+    if (target == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      final area = s.areas.where((a) => a.id == target).firstOrNull;
+      // An unknown id lands on the section landing rather than throwing. It is
+      // a routing typo, and a parent should meet it as "the right section"
+      // rather than as a crash. `test/pp_potty_doors_test.dart` catches it in
+      // CI instead.
+      if (area == null) return;
+      _openArea(context, area, _band ?? '');
+    });
   }
 
   @override
@@ -268,15 +341,35 @@ class _PpSectionScreenState extends State<PpSectionScreen> {
                 const SizedBox(height: 26),
 
                 // ---- the areas ------------------------------------------------
-                for (final a in areas) ...[
-                  _AreaTile(
+                // ⚠️ CARDS, NOT ROWS — and `_AreaTile` is kept below rather
+                // than deleted, per comment-out-never-delete. Reverting is
+                // swapping this grid back for the loop it replaced.
+                // ⚠️ THE PINNED AREA, IF THERE IS ONE, SITS ABOVE THE GRID AS A
+                // WIDE CARD. See `PpArea.pinned`. Filtered out of the grid
+                // below so it does not appear twice.
+                for (final a in areas.where((a) => a.pinned)) ...[
+                  _PinnedAreaCard(
                     area: a,
-                    band: band,
                     p: p,
                     onTap: () => _openArea(context, a, band),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 14),
                 ],
+
+                _PpCardGrid(children: [
+                  for (final a in areas.where((a) => !a.pinned))
+                    _PpCoverCard(
+                      title: a.title,
+                      meta: a.pagesFor(band).length > 1
+                          ? '${a.pagesFor(band).length} PAGES'
+                          : null,
+                      hue: a.hue,
+                      mark: a.mark,
+                      cover: a.cover,
+                      p: p,
+                      onTap: () => _openArea(context, a, band),
+                    ),
+                ]),
 
                 // ⚠️ AN EMPTY BAND STILL SAYS SOMETHING. It should not happen —
                 // the tests forbid it — but if content is ever band-tagged wrong,
@@ -293,6 +386,23 @@ class _PpSectionScreenState extends State<PpSectionScreen> {
                         style: pvManrope(fontSize: 14, fontWeight: FontWeight.w500, height: 1.55, color: p.ink2)),
                   ),
 
+                // ---- the tools -----------------------------------------------
+                // ⚠️ THE TOOLS MOVED UP TO THE HUB. Feedback: "Move tools out
+                // of Help My Child Sleep section and bring it out on main
+                // Sleep section above Talk to Sleep expert." They were here,
+                // behind one of the hub's two doors, so a mother who wanted
+                // the sleep log had to first pick the door about a problem she
+                // might not have. `pp_home_v3.dart` now reads
+                // `ppSectionFor(bracketId).tools` and hands them to
+                // `ProblemHubScreen`, so this list is still the ONE place
+                // tools are declared — only the screen that renders them
+                // changed.
+                //
+                // ⚠️ LEAVING THIS BLOCK ACTIVE WOULD HAVE SHOWN THEM TWICE,
+                // which is the failure mode of "add it there" without also
+                // removing it here. Kept commented, per comment-out-never-
+                // delete, so reverting is uncommenting.
+/*
                 // ---- the tools ------------------------------------------------
                 if (s.tools.isNotEmpty) ...[
                   const SizedBox(height: 30),
@@ -314,6 +424,7 @@ class _PpSectionScreenState extends State<PpSectionScreen> {
                     const SizedBox(height: 9),
                   ],
                 ],
+*/
               ],
             ),
           ),
@@ -333,10 +444,31 @@ class _PpSectionScreenState extends State<PpSectionScreen> {
   bool _bandChangesNothing(PpSection section) {
     final set = section.bandSet;
     if (set == null || set.bands.length < 2) return false;
-    List<String> shown(String b) =>
-        [for (final a in section.areas) if (a.inBand(b)) a.id];
-    final first = shown(set.bands.first.id).join('|');
-    return set.bands.every((b) => shown(b.id).join('|') == first);
+
+    // ⚠️ THE SIGNATURE INCLUDES PAGE COUNTS, AND THAT MATTERS FOR A WHOLE
+    // SECTION.
+    //
+    // The first version compared only WHICH AREAS were visible. Development
+    // tags none of its areas — all five are worth opening at any age — but it
+    // tags most of its PAGES, so switching band changes what is behind every
+    // tile without changing the tiles themselves. By the old comparison that
+    // is "nothing changes", so the section printed "everything here is worth
+    // reading at any age" underneath chips that were quietly doing real work.
+    //
+    // Reported as "if the content needs to change by age, it is not happening
+    // by changing the tabs". The chips were changing it; the screen was
+    // telling her they were not, and the card labels ("6 PAGES") are the thing
+    // that actually shifts.
+    //
+    // Traditions still gets the note, correctly: it leaves pages untagged on
+    // purpose, so its counts really are identical across every band.
+    String signature(String b) => [
+          for (final a in section.areas)
+            if (a.inBand(b)) '${a.id}:${a.pagesFor(b).length}',
+        ].join('|');
+
+    final first = signature(set.bands.first.id);
+    return set.bands.every((b) => signature(b.id) == first);
   }
 
   void _openArea(BuildContext context, PpArea a, String band) {
@@ -442,56 +574,38 @@ class _AreaScreen extends StatelessWidget {
                           height: 1.6,
                           color: pal.ink2)),
                   const SizedBox(height: 26),
-                  for (final page in pages) ...[
-                    InkWell(
-                      onTap: () =>
-                          Navigator.of(context).push(MaterialPageRoute<void>(
-                        settings: RouteSettings(
-                            name: 'pp/${section.id}/page/${page.id}'),
-                        builder: (_) => PpContentPage(
-                          page: page,
-                          onSurface: onSurface,
-                          onPage: onPage,
-                        ),
-                      )),
-                      borderRadius: BorderRadius.circular(18),
-                      child: Container(
-                        padding: const EdgeInsets.fromLTRB(16, 15, 14, 16),
-                        decoration: BoxDecoration(
-                          color: pal.surface,
-                          borderRadius: BorderRadius.circular(18),
-                          border: Border.all(color: pal.line),
-                        ),
-                        child: Row(children: [
-                          Expanded(
-                            child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(page.title,
-                                      style: pvFraunces(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                          height: 1.25,
-                                          color: pal.ink1)),
-                                  if (page.subtitle != null) ...[
-                                    const SizedBox(height: 5),
-                                    Text(page.subtitle!,
-                                        style: pvManrope(
-                                            fontSize: 12.5,
-                                            fontWeight: FontWeight.w500,
-                                            height: 1.5,
-                                            color: pal.ink2)),
-                                  ],
-                                ]),
+                  // ⚠️ THE SAME CARD ONE LEVEL DOWN, because the note says
+                  // so explicitly: "when user clicks and inside it also each
+                  // small section that is there become a card". A library
+                  // that changes its vocabulary between the shelf and the
+                  // shelf's contents reads as two products.
+                  //
+                  // ⚠️ THE HUE WALKS PER CARD rather than repeating the
+                  // area's. Sixteen identical tinted cards is a wall; a
+                  // 17-degree step keeps them recognisably one family while
+                  // giving the eye somewhere to land. 17 because it is
+                  // coprime with 360, so a long list never repeats a tint
+                  // next to itself.
+                  _PpCardGrid(children: [
+                    for (final (i, page) in pages.indexed)
+                      _PpCoverCard(
+                        title: page.title,
+                        meta: page.format,
+                        hue: (area.hue + i * 17) % 360,
+                        mark: area.mark,
+                        p: pal,
+                        onTap: () =>
+                            Navigator.of(context).push(MaterialPageRoute<void>(
+                          settings: RouteSettings(
+                              name: 'pp/${section.id}/page/${page.id}'),
+                          builder: (_) => PpContentPage(
+                            page: page,
+                            onSurface: onSurface,
+                            onPage: onPage,
                           ),
-                          const SizedBox(width: 10),
-                          Icon(Icons.arrow_forward_rounded,
-                              size: 17, color: pal.ink3),
-                        ]),
+                        )),
                       ),
-                    ),
-                    const SizedBox(height: 10),
-                  ],
+                  ]),
                 ],
               ),
             ),
@@ -577,6 +691,12 @@ class _BandChip extends StatelessWidget {
       );
 }
 
+/* ⚠️ KEPT FOR REVERT — the row-shaped area tile the cover cards
+   replaced. The feedback asked for reels-shaped cards with a title and a
+   cover; if that lands badly on a real phone, restoring this widget and
+   the `for (final a in areas)` loop in the landing is the whole revert.
+   Commented rather than deleted, per the repo rule.
+
 class _AreaTile extends StatelessWidget {
   const _AreaTile(
       {required this.area,
@@ -657,6 +777,245 @@ class _AreaTile extends StatelessWidget {
   }
 }
 
+/// A 9:16 cover card — the shape the feedback asked for, in one place.
+///
+/// ⚠️ ONE COMPONENT FOR AREAS AND FOR PAGES, AND THAT IS THE POINT. The
+/// note says the change applies "everywhere there is a list of articles shown
+/// in a tab", for every section, and asks explicitly for consistency with what
+/// came before. Two card widgets that merely look alike drift within a week;
+/// the second one gets a radius nudged and nobody sees both screens at once.
+///
+/// ⚠️ 9:16 IS THE ASK, AND IT COSTS SOMETHING WORTH NAMING. A reels-shaped
+/// card at two columns is about 300pt tall on a 390pt phone, so three rows
+/// fill a screen where the old list showed six. That is the trade the feedback
+/// is making on purpose: fewer things visible, each one recognisable. It is
+/// the right call for a library you browse and would be the wrong one for a
+/// list you scan, which is why the tools below deliberately did NOT become
+/// cards.
+///
+/// ⚠️ THE TITLE SITS ON A SCRIM, NOT ON THE IMAGE. Once a real photograph
+/// lands here the text has to stay legible over whatever the crop contains,
+/// and a scrim that only appears "when needed" is a scrim nobody tested. It is
+/// always there, and light enough that the tinted state does not look dimmed.
+*/
+
+/// The pinned area: one wide card above the grid.
+///
+/// ⚠️ IT MUST NOT BE A BIGGER VERSION OF THE COVER CARD. The point of pinning
+/// is that this area is a different KIND of thing — the honest answer the
+/// section is built around, rather than one shelf among several — and scaling
+/// the same card up says "more important" without saying "different".
+///
+/// So: horizontal rather than 9:16, a tinted panel rather than a cover, and a
+/// label that names what it is. The feedback for Potty puts it exactly: "how
+/// long does this actually take is a constant, and like a tool should look
+/// different from other articles".
+class _PinnedAreaCard extends StatelessWidget {
+  const _PinnedAreaCard(
+      {required this.area, required this.p, required this.onTap});
+
+  final PpArea area;
+  final V2Palette p;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final tint = v2BlockTint(area.hue, p);
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: p.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: p.line),
+        ),
+        child: IntrinsicHeight(
+          child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Container(
+              width: 84,
+              color: tint,
+              padding: const EdgeInsets.all(17),
+              child: HubIntentArt(mark: area.mark, tint: tint),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(15, 15, 13, 15),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('START HERE',
+                        style: pvManrope(
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w800,
+                                color: p.action)
+                            .copyWith(letterSpacing: 1.1)),
+                    const SizedBox(height: 6),
+                    Text(area.title,
+                        style: pvFraunces(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
+                            height: 1.18,
+                            letterSpacing: -0.35,
+                            color: p.ink1)),
+                    const SizedBox(height: 5),
+                    Text(area.blurb,
+                        style: pvManrope(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w500,
+                            height: 1.5,
+                            color: p.ink2)),
+                  ],
+                ),
+              ),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
+class _PpCoverCard extends StatelessWidget {
+  const _PpCoverCard({
+    required this.title,
+    required this.hue,
+    required this.mark,
+    required this.p,
+    required this.onTap,
+    this.meta,
+    this.cover,
+  });
+
+  final String title;
+  final String? meta;
+  final double hue;
+  final IntentMark mark;
+  final String? cover;
+  final V2Palette p;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final tint = v2BlockTint(hue, p);
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: AspectRatio(
+        aspectRatio: 9 / 16,
+        child: Container(
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            color: tint,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: p.line),
+          ),
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // The cover. A file when there is one, the section's own drawn
+              // mark when there is not.
+              if (cover != null)
+                Image.asset(cover!, fit: BoxFit.cover,
+                    // A missing file degrades to the tinted state rather than
+                    // to Flutter's grey error box, which on a content card
+                    // reads as a broken app.
+                    errorBuilder: (_, _, _) => const SizedBox.shrink())
+              else
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(26, 26, 26, 96),
+                  child: Opacity(
+                    opacity: 0.55,
+                    child: HubIntentArt(mark: mark, tint: tint),
+                  ),
+                ),
+
+              // The scrim, then the words.
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  padding: const EdgeInsets.fromLTRB(13, 34, 13, 13),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        tint.withValues(alpha: 0),
+                        tint.withValues(alpha: 0.92),
+                        tint,
+                      ],
+                      stops: const [0, 0.55, 1],
+                    ),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title,
+                          maxLines: 4,
+                          overflow: TextOverflow.ellipsis,
+                          style: pvFraunces(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              height: 1.2,
+                              letterSpacing: -0.35,
+                              color: p.ink1)),
+                      if (meta != null) ...[
+                        const SizedBox(height: 6),
+                        Text(meta!,
+                            style: pvManrope(
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 1.1,
+                                color: p.ink3)),
+                      ],
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// The grid the cards sit in.
+///
+/// ⚠️ `GridView` IS DELIBERATELY NOT USED. These grids live inside a
+/// `ListView`, and a nested scrollable needs `shrinkWrap` plus
+/// `NeverScrollableScrollPhysics` to behave — which lays out every child on
+/// every frame of the parent's scroll. A `Wrap` of fixed-width children costs
+/// nothing and cannot fight the outer scroll.
+class _PpCardGrid extends StatelessWidget {
+  const _PpCardGrid({required this.children});
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) => LayoutBuilder(
+        builder: (context, c) {
+          const gap = 11.0;
+          final w = (c.maxWidth - gap) / 2;
+          return Wrap(
+            spacing: gap,
+            runSpacing: gap,
+            children: [
+              for (final child in children) SizedBox(width: w, child: child),
+            ],
+          );
+        },
+      );
+}
+
+/* ⚠️ KEPT FOR REVERT — the section screen's own tool row. The tools now
+   render on the hub (see `_HubTool` in problem_hub_screen.dart), so this is
+   unused rather than wrong. It comes back with the commented block above.
+
 class _ToolTile extends StatelessWidget {
   const _ToolTile({required this.tool, required this.p, this.onTap});
   final PpSectionTool tool;
@@ -698,3 +1057,4 @@ class _ToolTile extends StatelessWidget {
         ),
       );
 }
+*/

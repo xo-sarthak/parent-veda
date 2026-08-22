@@ -335,8 +335,75 @@ class PpConsult extends PpBlock {
   final String title;
   final String whoFor;
   final String surfaceId;
+
+  /// Who this consult is actually for.
+  ///
+  /// ⚠️ THIS WAS RECORDED AND NEVER READ, WHICH IS THE WIRING GATE IN ITS
+  /// quietest form. Forty-eight consult blocks across the parenting content
+  /// carry a role — 'pediatrician', 'lactation', 'speech' — and every one of
+  /// them opened `pp_experts`, the whole roster. The data knew exactly who it
+  /// wanted; the tap threw it away. Nothing failed, no test could see it, and
+  /// the only symptom was a parent reading "talk to a paediatrician tonight"
+  /// and landing on a list that opens with a physiotherapist.
+  ///
+  /// [surface] is what fixes it, and it is deliberately a getter here rather
+  /// than a fix at each of the forty-eight call sites.
   final String? role;
+
+  /// The surface this consult should open: filtered when the role maps to a
+  /// real expert category, the plain roster when it does not.
+  ///
+  /// ⚠️ AN UNMAPPED ROLE FALLS BACK RATHER THAN FAILING, AND THAT IS
+  /// DELIBERATE BUT NOT FREE. Ten of the fourteen roles in the content —
+  /// physio, sleep, nutrition, maternal_mental_health and the group ones —
+  /// have no expert in `kFindHelpExperts` at all. Filtering to them would show
+  /// an empty list, which is worse than an unfiltered one for a parent who
+  /// needs somebody now. `test/pp_consult_filter_test.dart` prints the unmapped
+  /// set so the gap is visible rather than silently absorbed.
+  String get surface {
+    if (surfaceId != 'pp_experts') return surfaceId;
+    final category = kPpConsultRoleToCategory[role];
+    return category == null ? surfaceId : 'pp_experts/$category';
+  }
 }
+
+/// Consult role -> `Expert.category`.
+///
+/// ⚠️ BOTH SPELLINGS OF PAEDIATRICIAN ARE HERE ON PURPOSE. The content uses
+/// 'pediatrician' eight times and 'paediatrician' once. Normalising the
+/// content would be tidier and would also be a silent behaviour change in a
+/// file somebody is still editing; mapping both costs one line and cannot
+/// regress.
+/// ⚠️ EVERY ROLE IN THE CONTENT NOW MAPS. Nine of the fourteen used to fall
+/// through to the unfiltered roster because the categories they wanted had no
+/// supply. Rather than leave the pipeline half-built until people exist, the
+/// missing categories were seeded (`Expert.seeded`) and the map completed — so
+/// the day a real sleep coach or nutritionist is signed, nothing here changes.
+///
+/// ⚠️ THE GROUP ROLES DELIBERATELY POINT AT THE SAME CATEGORY AS THEIR 1:1
+/// EQUIVALENT. `group_physio` is a physiotherapist running a group; it is a
+/// FORMAT, not a different profession, and giving it its own category would
+/// mean seeding a second roster of the same people. If group sessions ever need
+/// their own supply, that is a booking-engine concern rather than a directory
+/// one.
+const Map<String, String> kPpConsultRoleToCategory = {
+  // real supply
+  'pediatrician': 'Pediatrician',
+  'paediatrician': 'Pediatrician',
+  'lactation': 'Lactation expert',
+  'speech': 'Speech therapist',
+  'psychologist': 'Child psychologist',
+  // seeded supply — see kSeededExpertIds
+  'sleep': 'Sleep expert',
+  'nutrition': 'Nutritionist',
+  'physio': 'Physiotherapist',
+  'group_physio': 'Physiotherapist',
+  'maternal_mental_health': 'Maternal mental health',
+  'group_mental_health': 'Maternal mental health',
+  'development': 'Development expert',
+  'early_learning': 'Early learning expert',
+  'school_readiness': 'Early learning expert',
+};
 
 // =============================================================================
 //  A PAGE
@@ -360,8 +427,40 @@ class PpPage {
   final String title;
   final String? subtitle;
 
-  /// The blocks, in order. Order is authored, never sorted.
+  /// The blocks, in authored order.
+  ///
+  /// ⚠️ ONE EXCEPTION, AND IT IS DELIBERATE: `orderedBlocks` HOISTS THE
+  /// VIDEO. Feedback, repeated for every parenting section: "in all sections
+  /// where a video is added, move it to top of the page." So the renderer
+  /// reads `orderedBlocks`, not this list.
+  ///
+  /// It is done in ONE place rather than by re-authoring every page, because
+  /// re-ordering by hand across eleven sections is a change nobody can verify
+  /// and one somebody will forget on the next page they write. Hoisting in the
+  /// renderer means a page authored tomorrow obeys the rule without being told.
   final List<PpBlock> blocks;
+
+  /// The blocks as the reader meets them: video first, everything else in the
+  /// order it was written.
+  ///
+  /// ⚠️ STABLE, NOT MERELY FILTERED. Both halves keep their relative
+  /// authored order, so a page with two videos shows them in the order they
+  /// were written and the prose beneath is untouched. A `sort` with a
+  /// comparator would have been shorter and is not stable in Dart for small
+  /// lists in any guaranteed way — two partitions are.
+  List<PpBlock> get orderedBlocks {
+    final video = [for (final b in blocks) if (b is PpVideoSlot) b];
+    if (video.isEmpty) return blocks;
+    return [
+      ...video,
+      for (final b in blocks) if (b is! PpVideoSlot) b,
+    ];
+  }
+
+  /// True when this page has no video at all. Read by
+  /// `test/pp_video_coverage_test.dart`, which lists the gaps rather than
+  /// letting them be discovered one screen at a time.
+  bool get hasVideo => blocks.any((b) => b is PpVideoSlot);
 
   /// Which age bands this page belongs to. Empty means every band.
   ///
@@ -436,7 +535,10 @@ class PpContentPage extends StatelessWidget {
                   style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w500, height: 1.55, color: p.ink2)),
             ],
             const SizedBox(height: 22),
-            for (final b in page.blocks) ...[
+            // ⚠️ `orderedBlocks`, NOT `blocks` — the video is hoisted to the
+            // top here rather than re-authored into position on every page.
+            // See PpPage.orderedBlocks for why it is one place and not many.
+            for (final b in page.orderedBlocks) ...[
               _render(context, b),
               SizedBox(height: _gapAfter(b)),
             ],
@@ -529,6 +631,21 @@ class PpBlockView extends StatelessWidget {
     if (b is PpIndiaNote) return _indiaNote(b, p);
     if (b is PpVideoSlot) return _video(b, p);
     if (b is PpAudioSlot) return _audio(b, p);
+    // ⚠️ A MASTERCLASS LINK IS RENDERED AS A MASTERCLASS, NOT AS A ROW.
+    //
+    // Feedback: "masterclass should remain but show masterclass as a master
+    // class with cover image etc." Nine `PpLink`s across the parenting content
+    // point at `pp_courses`, and every one of them rendered as the same grey
+    // row as "see the sleep log" — so the paid, taught, hour-long thing looked
+    // exactly like a cross-reference and read as one.
+    //
+    // Detected on the DESTINATION rather than on a new block type, so all nine
+    // change at once and a tenth written tomorrow is right without being told.
+    // The alternative — a `PpMasterclass` block — would have meant editing nine
+    // call sites and remembering the rule forever.
+    if (b is PpLink && b.surfaceId == 'pp_courses') {
+      return _masterclass(context, b, p);
+    }
     if (b is PpLink) return _link(context, b, p);
     if (b is PpConsult) return _consult(context, b, p);
     return const SizedBox.shrink();
@@ -918,6 +1035,84 @@ class PpBlockView extends StatelessWidget {
     );
   }
 
+  /// A masterclass, with a cover.
+  ///
+  /// ⚠️ THE COVER IS DRAWN, NOT PHOTOGRAPHED, for the same reason as the
+  /// section cards: there is no course art in the app, and a grey rectangle is
+  /// a placeholder somebody has to delete later. A tinted panel with a play
+  /// mark is a finished treatment that an image can replace without this
+  /// widget changing.
+  ///
+  /// ⚠️ AND IT SAYS "MASTERCLASS" OUT LOUD. The label alone was doing that
+  /// work in prose ("a masterclass on play and early development"), which is
+  /// exactly the kind of thing a reader skims past. The eyebrow makes the kind
+  /// of thing legible before the sentence is read.
+  Widget _masterclass(BuildContext context, PpLink b, V2Palette p) {
+    final tint = v2BlockTint(268, p);
+    return InkWell(
+      onTap: onSurface == null
+          ? null
+          : () => onSurface!(context, b.surfaceId!),
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: p.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: p.line),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          // The cover.
+          Container(
+            height: 96,
+            width: double.infinity,
+            color: tint,
+            alignment: Alignment.center,
+            child: Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: p.surface.withValues(alpha: 0.9),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(Icons.play_arrow_rounded, size: 24, color: p.action),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(15, 13, 15, 15),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('MASTERCLASS',
+                      style: pvManrope(
+                              fontSize: 9.5,
+                              fontWeight: FontWeight.w800,
+                              color: p.action)
+                          .copyWith(letterSpacing: 1.1)),
+                  const SizedBox(height: 6),
+                  Text(b.label,
+                      style: pvFraunces(
+                          fontSize: 16.5,
+                          fontWeight: FontWeight.w600,
+                          height: 1.2,
+                          letterSpacing: -0.35,
+                          color: p.ink1)),
+                  if (b.blurb != null) ...[
+                    const SizedBox(height: 5),
+                    Text(b.blurb!,
+                        style: pvManrope(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w500,
+                            height: 1.5,
+                            color: p.ink2)),
+                  ],
+                ]),
+          ),
+        ]),
+      ),
+    );
+  }
+
   Widget _consult(BuildContext context, PpConsult b, V2Palette p) => Container(
         padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
         decoration: BoxDecoration(
@@ -941,7 +1136,8 @@ class PpBlockView extends StatelessWidget {
           GestureDetector(
             onTap: onSurface == null
                 ? null
-                : () => onSurface!(context, b.surfaceId),
+                // ⚠️ `b.surface`, NOT `b.surfaceId` — the role decides.
+                : () => onSurface!(context, b.surface),
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
               decoration: BoxDecoration(
