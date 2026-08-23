@@ -112,21 +112,27 @@ void main() {
     }
   });
 
-  test('a one-door hub carries no consult offer', () {
-    // ⚠️ DUPLICATES A RULE IN `problem_hub_test.dart` ON PURPOSE, because
-    // this file is where somebody will be adding closings.
+  test('a one-door hub consult offer must name a surface', () {
+    // ⚠️ THIS RULE INVERTED, AND THE ORIGINAL WAS RIGHT WHEN WRITTEN.
     //
-    // A one-door hub never renders a hub screen — the tile opens the door's
-    // destination directly — so a closing offer on it is config nobody can
-    // see. Five were added in this pass and three of them had to come straight
-    // back out. The rule is not obvious from looking at a HubConfig, which is
-    // exactly why it needs to fail loudly rather than be remembered.
+    // It said a one-door hub must carry NO closing, because such a hub never
+    // renders a hub screen — the tile opens its door's destination directly.
+    // True of the hub, false of the bracket: the door lands on
+    // `PpSectionScreen`, which now draws the closing (and the section's tools)
+    // when it is the top screen. See `pp_section_tools_test.dart` for what that
+    // fixed — seventeen tools that were declared and drawn by nothing.
+    //
+    // What survives is the narrower constraint: that screen has no `onAction`,
+    // so a closing it draws has to route by SURFACE. A card whose tap does
+    // nothing is worse than no card.
     for (final h in hubs()) {
       if (h.needs.length > 1) continue;
-      expect(h.closing, isNull,
-          reason: '${h.bracketId} has one door, so its consult offer would '
-              'never render. Put it on a PpConsult inside the section instead, '
-              'where it appears at the moment it is relevant.');
+      final c = h.closing;
+      if (c == null) continue;
+      expect(c.surfaceId, isNotNull,
+          reason: '${h.bracketId} has one door, so its consult offer is drawn '
+              'by the section screen — which has no onAction and would render '
+              'a card that does nothing when tapped.');
     }
   });
 

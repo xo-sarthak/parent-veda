@@ -413,7 +413,7 @@ class _Doors extends StatelessWidget {
             ]),
             const SizedBox(height: 12),
             for (final t in tools) ...[
-              _HubTool(tool: t, p: p, lang: lang, onTap: () => onSurface(context, t.surfaceId)),
+              HubToolRow(tool: t, p: p, lang: lang, onTap: () => onSurface(context, t.surfaceId)),
               if (t != tools.last) const SizedBox(height: 9),
             ],
           ],
@@ -421,7 +421,7 @@ class _Doors extends StatelessWidget {
           // The closing offer.
           if (config.closing != null) ...[
             const SizedBox(height: 22),
-            _Closing(
+            HubClosingCard(
                 closing: config.closing!,
                 p: p,
                 lang: lang,
@@ -460,9 +460,14 @@ class _Doors extends StatelessWidget {
 /// cards: a real image can drop in later without this widget changing, and a
 /// tinted panel with `askDoctor` on it is a finished cover rather than a
 /// placeholder for one.
-class _Closing extends StatelessWidget {
-  const _Closing(
-      {required this.closing,
+///
+/// ⚠️ PUBLIC for the same reason as [HubToolRow]: the four one-door brackets
+/// reach their section screen without ever passing through a hub, so until now
+/// they were the only brackets with no route to an expert at all.
+class HubClosingCard extends StatelessWidget {
+  const HubClosingCard(
+      {super.key,
+      required this.closing,
       required this.p,
       required this.lang,
       required this.onTap});
@@ -542,9 +547,23 @@ class _Closing extends StatelessWidget {
 /// a drawn mark; the closing offer is a card with a cover. This is a hairline
 /// row with a small square glyph well and a right chevron — the vocabulary of
 /// "a thing you use", sitting under a labelled rule that names it as such.
-class _HubTool extends StatelessWidget {
-  const _HubTool(
-      {required this.tool,
+/// One tool, drawn as a hairline row rather than as a door.
+///
+/// ⚠️ PUBLIC, AND SHARED WITH `PpSectionScreen`. Tools used to render only
+/// here, which was correct right up until four parenting brackets turned out
+/// never to reach this screen at all: a hub with ONE door opens that door's
+/// destination directly, so Behaviour, Health, First 40 Days and Traditional
+/// stranded seventeen tools between them with no screen to draw them on.
+///
+/// The fix is one widget rendered from two places, not a second tool
+/// vocabulary written on the section screen. A tool has to look like a tool
+/// wherever a parent meets it -- that sameness IS the affordance, and the
+/// symptom that started this was a parent noticing one door "opens in a very
+/// different ui than others".
+class HubToolRow extends StatelessWidget {
+  const HubToolRow(
+      {super.key,
+      required this.tool,
       required this.p,
       required this.lang,
       required this.onTap});
@@ -573,7 +592,8 @@ class _HubTool extends StatelessWidget {
                 borderRadius: BorderRadius.circular(11),
                 border: Border.all(color: p.line),
               ),
-              child: Icon(Icons.handyman_outlined, size: 17, color: p.action),
+              child: Icon(tool.icon ?? Icons.handyman_outlined,
+                  size: 17, color: p.action),
             ),
             const SizedBox(width: 12),
             Expanded(

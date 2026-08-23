@@ -18,6 +18,7 @@ import 'package:parentveda/services/ttc_surfaces.dart';
 import 'package:parentveda/ttc/ttc_reads_data.dart';
 import 'package:parentveda/services/parenting_surfaces.dart';
 import 'package:parentveda/data/hubs/ttc_hubs.dart';
+import 'package:parentveda/data/hubs/hub_registry.dart';
 import 'package:parentveda/data/hubs/parenting_hubs.dart';
 import 'package:parentveda/data/hubs/pregnancy_hubs.dart';
 import 'package:parentveda/data/hubs/scans_hub.dart';
@@ -174,15 +175,71 @@ void main() {
       }
     });
 
-    // ⚠️ A ONE-DOOR HUB MUST NOT CARRY A CLOSING OFFER. It has no screen to
-    // show it on — the tile opens the door's destination directly — so a
-    // closing there is silently dead config.
-    test('one-door hubs declare no closing offer', () {
+    // ⚠️ THIS TEST USED TO ASSERT THE OPPOSITE, AND THE INVERSION IS THE
+    // POINT.
+    //
+    // It read "a one-door hub must not carry a closing offer", on the ground
+    // that such a hub has no screen to show it on. The premise was half right:
+    // the HUB screen never renders, but the door lands on `PpSectionScreen`,
+    // which now draws the closing when it is the top screen. The old rule was
+    // therefore enforcing a limitation of the renderer as if it were a rule
+    // about the config — and worse, it made the correct fix look like a
+    // regression.
+    //
+    // What still has to hold is narrower and real: this screen has no
+    // `onAction`, so a closing it draws must name a SURFACE. A closing that
+    // routes only by action would render a card whose tap does nothing, which
+    // is strictly worse than no card.
+    test('a one-door hub closing must route by surface, and only where a '
+        'section can draw it', () {
       for (final h in kAllHubs) {
         if (h.needs.length > 1) continue;
-        expect(h.closing, isNull,
-            reason: '${h.bracketId} opens directly, so its closing offer would '
-                'never render');
+        final c = h.closing;
+        if (c == null) continue;
+        expect(ppSectionFor(h.bracketId), isNotNull,
+            reason: '${h.bracketId} has one door and a closing offer, but no '
+                'section screen exists to draw that offer on');
+        expect(c.surfaceId, isNotNull,
+            reason: '${h.bracketId}: a section screen has no onAction, so this '
+                'closing would draw a card that does nothing when tapped');
+      }
+    });
+
+    // ⚠️ THE DEFECT THAT STARTED THIS: SEVENTEEN TOOLS DRAWN BY NOTHING.
+    //
+    // Tools moved off the section screen and up onto the hub. Correct for the
+    // seven parenting brackets that render a hub — and silently wrong for the
+    // four that do not, because a one-door hub opens its door's destination
+    // directly. Behaviour, Health, First 40 Days and Traditional declared 2, 9,
+    // 4 and 2 tools respectively, every one of them routable, every one of them
+    // unreachable.
+    //
+    // Nothing failed. `flutter analyze` was clean, the tools resolved through
+    // the router, and a test asserting "every tool's surface exists" passed
+    // happily — because resolvability was never the thing that was broken.
+    // This is the wiring gate in its purest form: the only symptom reached a
+    // parent, who reported it as one bracket "opening in a very different ui
+    // than others".
+    test('every bracket with tools has a screen that will draw them', () {
+      for (final h in kAllHubs) {
+        final section = ppSectionFor(h.bracketId);
+        if (section == null || section.tools.isEmpty) continue;
+        if (showsHubScreen(h.bracketId)) continue; // the hub draws them
+
+        // No hub screen, so the section screen is the only candidate — which
+        // means the door has to actually LAND on the section screen. A
+        // one-door bracket whose door goes somewhere else entirely would
+        // strand its tools exactly as before, and that is the shape this
+        // guards.
+        final sole = soleDoorOf(h.bracketId);
+        expect(sole, isNotNull, reason: h.bracketId);
+        final landsOnSection = sole!.surfaceId?.startsWith('pp_section/') ==
+                true ||
+            sole.action != null;
+        expect(landsOnSection, isTrue,
+            reason: '${h.bracketId} has ${section.tools.length} tools, no hub '
+                'screen to draw them, and a door that does not land on its '
+                'section screen either');
       }
     });
 

@@ -291,19 +291,31 @@ final HubConfig kPpBehaviour = HubConfig(
       action: kPpActBehaviour,
     ),
   ],
-  // ⚠️ NO CLOSING OFFER HERE, AND IT IS A CONSTRAINT RATHER THAN AN
-  // OVERSIGHT. A closing was added in this pass along with five others, and
-  // `problem_hub_test.dart` immediately rejected it: **a one-door hub never
-  // renders a hub screen at all.** The tile opens the door's destination
-  // directly, so a closing offer on it is config that can never be seen.
+  // ⚠️ THIS COMMENT USED TO SAY A CLOSING HERE COULD NEVER RENDER, AND
+  // IT WAS RIGHT AT THE TIME. A one-door hub opens its door's destination
+  // directly, so nothing drew a closing offer — `problem_hub_test.dart`
+  // rejected one on exactly that ground.
   //
-  // That is worth knowing before anyone adds one again. Behaviour has exactly
-  // one door, so the place to offer a child psychologist is inside the section
-  // — which it already does, via `PpConsult(role: 'psychologist')` on the
-  // pages where a red flag is actually being discussed. That is a better
-  // position for it anyway: offered at the moment it is relevant rather than
-  // as a permanent footer.
-
+  // What was actually wrong was the premise, not the config. The four one-door
+  // brackets land on `PpSectionScreen`, and that screen was drawing neither the
+  // closing NOR the section's own tools — seventeen tools across the four,
+  // declared and routable and drawn by nothing. The screen now renders both
+  // when it is the top screen. So a closing here is live config, and the test
+  // has been inverted to say so.
+  //
+  // Kept alongside, unchanged: `PpConsult(role: 'psychologist')` inside the
+  // pages where a red flag is being discussed. The two are not duplicates —
+  // that one is offered at the moment it is relevant, this one is the standing
+  // "if none of this is enough" that every other bracket ends on.
+  closing: HubClosing(
+    label: _en('Talk to a child psychologist'),
+    blurb: _en('When it is not a phase, or when handling it is taking more '
+        'out of you than you have to give.'),
+    action: kPpActConsult,
+    // Real supply, not a filter that matches nobody: two child psychologists
+    // are in the roster today.
+    surfaceId: 'pp_experts/Child psychologist',
+  ),
 );
 
 // -----------------------------------------------------------------------------
@@ -437,16 +449,22 @@ final HubConfig kPpFirst40 = HubConfig(
       action: kPpActFirst40Days,
     ),
   ],
-  // ⚠️ NO CLOSING OFFER: THIS HUB HAS ONE DOOR, SO IT NEVER RENDERS A HUB
-  // SCREEN. The tile opens the door's destination directly, which means a
-  // closing offer here is config nobody can ever see.
+  // ⚠️ NO CLOSING OFFER, AND THE REASON HAS CHANGED — WHICH IS WHY THIS
+  // COMMENT IS BEING REWRITTEN RATHER THAN LEFT.
   //
-  // One was added in this pass along with five others and `problem_hub_test`
-  // rejected it immediately. Recording the reason rather than just deleting
-  // it, because "add an expert offer to every hub" is a reasonable-sounding
-  // instruction that is wrong for a quarter of them — and the section's own
-  // `PpConsult` blocks are the right home anyway: offered where the need is
-  // being discussed, not as a permanent footer.
+  // It used to read "a one-door hub never renders a hub screen, so a closing
+  // here can never be seen". That was true of the hub and false of the
+  // bracket: the door lands on `PpSectionScreen`, which now draws the closing
+  // (and the section's tools) whenever it is the top screen. So the mechanical
+  // objection is gone.
+  //
+  // It stays absent on a PRODUCT ground instead, which is the more durable
+  // one: the first forty days are the weeks a mother is most reachable and
+  // least able to judge an offer, and a permanent "book someone" footer under
+  // day-by-day recovery reads as selling into exhaustion. The section's own
+  // `PpConsult` blocks already offer a lactation consultant on the pages about
+  // feeding and a doctor on the pages about jaundice — at the moment the need
+  // is real, which is the only time this bracket should ask.
 
 );
 

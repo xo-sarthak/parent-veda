@@ -518,6 +518,9 @@ class _PpHomeV3State extends State<PpHomeV3> {
             label: LocalizedText(en: t.label, hi: t.label),
             blurb: LocalizedText(en: t.blurb, hi: t.blurb),
             surfaceId: t.surfaceId,
+            // The section already chose an icon for every tool; the hub row
+            // used to throw it away and draw a spanner nine times on Health.
+            icon: t.icon,
           ),
       ];
 

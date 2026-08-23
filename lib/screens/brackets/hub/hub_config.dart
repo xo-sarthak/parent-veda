@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 // =============================================================================
 //  HubConfig — a problem hub described as data
 // -----------------------------------------------------------------------------
@@ -218,10 +219,20 @@ class HubTool {
     required this.label,
     required this.blurb,
     required this.surfaceId,
+    this.icon,
   });
 
   final LocalizedText label;
   final LocalizedText blurb;
+
+  /// The tool's own icon.
+  ///
+  /// Optional, because the row has a sane default. It exists because
+  /// `PpSectionTool` has always declared one -- a moon for the sleep check, a
+  /// speech bubble for the scripts library -- and the hub row discarded it and
+  /// drew a spanner on all of them. Nine health tools reading as nine
+  /// identical spanners is a list, not a set of tools.
+  final IconData? icon;
 
   /// ⚠️ MUST RESOLVE THROUGH THE ROUTER. A tool tile that leads nowhere is
   /// worse than no tile — exactly what the wiring gate exists to catch.

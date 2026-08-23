@@ -32,7 +32,11 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/pv_fonts.dart';
+import '../../data/hubs/hub_registry.dart';
+import '../../localization/app_language.dart';
+import '../brackets/hub/hub_config.dart';
 import '../brackets/hub/hub_intent_art.dart';
+import '../brackets/hub/problem_hub_screen.dart';
 import '../v2/v2_palette.dart';
 import 'pp_age_bands.dart';
 import 'pp_child_profile.dart';
@@ -224,6 +228,15 @@ class PpSectionScreen extends StatefulWidget {
 class _PpSectionScreenState extends State<PpSectionScreen> {
   PpSection get s => widget.section;
 
+  /// The closing offer's surface, when this screen is the one that has to show
+  /// it. Null whenever a hub screen exists to show it instead, or when the
+  /// closing routes by action rather than by surface.
+  String? get _closingSurface {
+    if (showsHubScreen(s.id)) return null;
+    return hubFor(s.id)?.closing?.surfaceId;
+  }
+
+
   /// Which band is selected. Starts at the child's own — see `PpBandSet.ordered`.
   String? _band;
 
@@ -385,6 +398,88 @@ class _PpSectionScreenState extends State<PpSectionScreen> {
                         'Nothing here for this age yet. Try another age above.',
                         style: pvManrope(fontSize: 14, fontWeight: FontWeight.w500, height: 1.55, color: p.ink2)),
                   ),
+
+                // ---- tools and the expert offer, WHEN THIS IS THE TOP SCREEN --
+                // ⚠️ THE CONDITION IS THE WHOLE POINT, AND ITS ABSENCE COST
+                // SEVENTEEN TOOLS.
+                //
+                // Tools were moved off this screen and up onto the hub, which
+                // was right for the brackets that HAVE a hub screen. Four do
+                // not: a hub with a single door opens that door's destination
+                // directly, so Behaviour, Health, First 40 Days and Traditional
+                // land a parent straight here. Their tools were declared, were
+                // routable, were tested for resolvability -- and were drawn by
+                // nothing. Health alone stranded nine.
+                //
+                // Reported from the outside as the symptom it is: Behaviour
+                // "opens in a very different ui than others". It was not a
+                // styling drift. The screen was genuinely missing a section
+                // every other bracket shows.
+                //
+                // ⚠️ ASK THE REGISTRY, DO NOT LIST THE FOUR. `showsHubScreen`
+                // already answers "does this bracket render a hub?", and it is
+                // the same function `pp_home_v3` branches on. A hardcoded list
+                // here would be a second copy of that decision, and the day a
+                // fifth door is added to Health the two would disagree
+                // silently -- tools drawn twice, which is how this block came
+                // to be commented out in the first place.
+                if (!showsHubScreen(s.id)) ...[
+                  if (s.tools.isNotEmpty) ...[
+                    const SizedBox(height: 30),
+                    Row(children: [
+                      Text('TOOLS',
+                          style: pvManrope(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.3,
+                              color: p.action.withValues(alpha: 0.85))),
+                      const SizedBox(width: 10),
+                      Expanded(child: Container(height: 1, color: p.line)),
+                    ]),
+                    const SizedBox(height: 12),
+                    for (final t in s.tools) ...[
+                      HubToolRow(
+                        tool: HubTool(
+                          // ⚠️ BOTH SIDES IDENTICAL ON PURPOSE, and it is not
+                          // `_t(x, x)` sloppiness: `PpSectionTool` carries a
+                          // plain `String`, because parenting is not migrated
+                          // to Hindi yet. Wrapping it keeps ONE tool row for
+                          // both screens instead of a second widget that takes
+                          // strings, and the language genuinely cannot change
+                          // what renders until that content is translated.
+                          label: LocalizedText(en: t.label, hi: t.label),
+                          blurb: LocalizedText(en: t.blurb, hi: t.blurb),
+                          surfaceId: t.surfaceId,
+                          icon: t.icon,
+                        ),
+                        p: p,
+                        lang: AppLanguage.english,
+                        onTap: () => widget.onSurface
+                            ?.call(context, t.surfaceId),
+                      ),
+                      if (t != s.tools.last) const SizedBox(height: 9),
+                    ],
+                  ],
+
+                  // ⚠️ AND THE EXPERT OFFER, WHICH THESE FOUR ALSO NEVER HAD.
+                  // Every hub-screen bracket ends on "talk to someone". These
+                  // four ended on the last card of a grid. Read from the hub so
+                  // the offer is declared once, beside the doors it closes.
+                  //
+                  // Only a closing that names a SURFACE renders here: this
+                  // screen has no `onAction`, and quietly drawing a card whose
+                  // tap does nothing is worse than not drawing it.
+                  if (_closingSurface != null) ...[
+                    const SizedBox(height: 22),
+                    HubClosingCard(
+                      closing: hubFor(s.id)!.closing!,
+                      p: p,
+                      lang: AppLanguage.english,
+                      onTap: () =>
+                          widget.onSurface?.call(context, _closingSurface!),
+                    ),
+                  ],
+                ],
 
                 // ---- the tools -----------------------------------------------
                 // ⚠️ THE TOOLS MOVED UP TO THE HUB. Feedback: "Move tools out
