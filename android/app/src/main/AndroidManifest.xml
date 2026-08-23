@@ -8,6 +8,27 @@
     <!-- Live video consults/classes (LiveKit / WebRTC): camera + audio routing. -->
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
+    <!-- A CONSULTATION HAS TO SURVIVE THE PHONE, and these are what that costs.
+
+         WAKE_LOCK: a video call is mostly listening, and listening does not
+         touch the screen. Without this the display sleeps mid-consultation.
+         Held only for the length of the call (see CallScreen.initState).
+
+         FOREGROUND_SERVICE + the CAMERA and MICROPHONE subtypes: from Android
+         14 an app that leaves the foreground loses camera and microphone
+         capture outright unless it is running a foreground service that
+         declares those types. Without them, checking a message mid-call ends
+         the call — and it ends it silently, which is worse.
+
+         BLUETOOTH_CONNECT: from Android 12 this is what audio routing to a
+         headset needs. A mother taking a consultation on earphones is the
+         ordinary case, not the exotic one. -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_CAMERA" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <!-- Saving a Memory card to the gallery on Android 9 and below (gal). API 29+
          uses scoped storage and needs no permission. -->
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"

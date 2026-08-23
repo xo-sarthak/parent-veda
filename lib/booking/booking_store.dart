@@ -210,6 +210,10 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
 
   /// The very next session across both stages, or null. What a home-screen
   /// "your next class" card reads.
+  /// One booking by its id, or null. The map has always been keyed this way;
+  /// nothing outside the store could reach it.
+  Booking? byId(String id) => _bookings[id];
+
   Booking? get nextUp {
     final u = upcoming();
     return u.isEmpty ? null : u.first;
@@ -421,6 +425,42 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
     return cancel(bookingId);
   }
 
+  /// The DOCTOR's version: cancel, or mark a no-show, for a booking they host.
+  ///
+  /// Returns the server's own status code — 'ok', 'already_cancelled',
+  /// 'not_your_patient', … — so the caller can say what actually happened
+  /// instead of guessing.
+  ///
+  /// WHY IT DOES NOT REUSE [cancel]. That method is local-only and keyed on
+  /// this device's `_bookings` map, which never contains a booking made on the
+  /// parent's phone. The doctor app calling it therefore wrote nothing and
+  /// returned false for every real appointment, while the screen announced a
+  /// cancellation. It is kept for the parent's own path, where the row IS local
+  /// and the optimistic update is correct.
+  ///
+  /// [expert_cancel_booking] (0077) is authorised through my_expert_ids(), so
+  /// there is nothing to check here — asking the database is the check.
+  ///
+  /// The local mirror is updated only on 'ok', and only if this device happens
+  /// to hold the row (it usually does not). `DoctorRoster.refresh()` is what
+  /// actually repaints the doctor's list, from the server.
+  Future<String> expertResolve(String bookingId, DoctorOutcome outcome) async {
+    final code = await SupabaseRepo.expertCancelBooking(bookingId, outcome.wire);
+    if (code == 'ok') {
+      final b = _bookings[bookingId];
+      if (b != null) {
+        _bookings[bookingId] = b.copyWith(
+          status: outcome == DoctorOutcome.cancelled
+              ? BookingStatus.cancelled
+              : BookingStatus.missed,
+        );
+        _save();
+        notifyListeners();
+      }
+    }
+    return code;
+  }
+
   /// Cancel an upcoming booking and refund its credit. Returns true if a
   /// booking was cancelled.
   bool cancel(String bookingId, {bool refundCredit = true}) {
@@ -448,9 +488,39 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
     return matches.isEmpty ? null : matches.first;
   }
 
+  /// Ask the SERVER to settle past bookings from attendance evidence, then
+  /// re-read them.
+  ///
+  /// `settle_my_bookings` (0078) marks each ended booking attended or missed
+  /// depending on whether a `consult_sessions` row shows this user actually
+  /// joined the room. That is the fact [_reconcileStatuses] below has always
+  /// had to guess at, and guessed wrong in the one direction that matters: a
+  /// consultation nobody joined was written into her history as ATTENDED.
+  ///
+  /// Best-effort and offline-safe: if it does not run, [_reconcileStatuses]
+  /// still runs locally and the app behaves exactly as it did before. The
+  /// server's answer simply overwrites the guess on the next sync, because it
+  /// is the better one — and `refreshFromServer` already treats the cloud
+  /// status as authoritative.
+  Future<void> settleAttendance() async {
+    final n = await SupabaseRepo.settleMyBookings();
+    if (n > 0) {
+      debugPrint('[booking] settled $n past booking(s) from attendance');
+      await refreshFromServer();
+    }
+  }
+
   /// Move past bookings out of "upcoming": anything whose session has ended is
-  /// marked attended (we cannot yet know real attendance, so ended == attended;
-  /// the RPC will carry true attendance later). Runs at startup.
+  /// marked attended.
+  ///
+  /// ⚠️ THIS IS THE FALLBACK NOW, NOT THE TRUTH. It cannot know whether anyone
+  /// joined, so it assumes ended == attended — which writes "attended" into a
+  /// mother's permanent history for a consultation nobody turned up to, and is
+  /// why `BookingStatus.missed` had never once been written.
+  ///
+  /// [settleAttendance] above asks the server, which does know. This stays
+  /// because it runs at startup with no network and keeps the list sane
+  /// offline; where the two disagree, the server wins on the next sync.
   void _reconcileStatuses() {
     final now = DateTime.now().toUtc();
     var changed = false;

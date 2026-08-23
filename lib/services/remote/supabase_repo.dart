@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -430,9 +432,22 @@ class SupabaseRepo {
 
   /// Select every row of a public-read table (no user_id filter) — for shared
   /// catalogue-style tables like doctor_availability. Empty on any failure.
-  static Future<List<Map<String, dynamic>>> selectAll(String table) async {
+  ///
+  /// [orderBy] is optional because most callers genuinely do not care. Where a
+  /// caller reduces many rows to one — "the prescription for this booking" —
+  /// it very much does: without an ORDER BY, Postgres may return the rows in
+  /// any order it likes, and a last-write-wins loop over an unordered result
+  /// picks an arbitrary winner. That is not a rare race, it is every read.
+  static Future<List<Map<String, dynamic>>> selectAll(
+    String table, {
+    String? orderBy,
+    bool ascending = true,
+  }) async {
     try {
-      final rows = await _client.from(table).select();
+      final q = _client.from(table).select();
+      final rows = orderBy == null
+          ? await q
+          : await q.order(orderBy, ascending: ascending);
       return List<Map<String, dynamic>>.from(rows);
     } catch (_) {
       return const [];
@@ -488,12 +503,106 @@ class SupabaseRepo {
     } catch (_) {/* best-effort */}
   }
 
+  /// The DOCTOR's cancel / no-show (0077). Returns the server's status code.
+  ///
+  /// Deliberately NOT fire-and-forget, unlike its neighbours. Everywhere else
+  /// in this file a swallowed error costs a sync that the next refresh repairs.
+  /// Here it would cost the truth of a sentence shown to a clinician —
+  /// "Cancelled. The parent has their credit back." — about a mother who is
+  /// still expecting them. So the outcome comes back and the caller decides
+  /// what to say.
+  ///
+  /// 'error' rather than a throw: the caller's job is to pick a message, and a
+  /// network failure and a refused write both mean "do not claim it worked".
+  static Future<String> expertCancelBooking(
+    String bookingId,
+    String outcome,
+  ) async {
+    if (userId == null) return 'not_authenticated';
+    try {
+      final res = await _client.rpc('expert_cancel_booking', params: {
+        'p_booking_id': bookingId,
+        'p_outcome': outcome,
+      });
+      return res?.toString() ?? 'error';
+    } catch (e) {
+      debugPrint('[booking] expert_cancel_booking failed: $e');
+      return 'error';
+    }
+  }
+
+  // ---- consult attendance (0078) -------------------------------------------
+  //
+  // Fire-and-forget on purpose, unlike expertCancelBooking above, and the
+  // difference is worth being explicit about: a lost attendance row costs
+  // exactly the accuracy we had before the table existed, whereas a lost
+  // cancellation costs a mother sitting in an empty room. Different stakes,
+  // different error policy.
+
+  /// Record that this user is in the room. Returns the session id to hand to
+  /// [recordConsultLeave], or null if the server refused or was unreachable.
+  static Future<String?> recordConsultJoin(
+    String sessionId,
+    String bookingId,
+  ) async {
+    if (userId == null) return null;
+    try {
+      final res = await _client.rpc('record_consult_join', params: {
+        'p_id': sessionId,
+        'p_booking_id': bookingId,
+      });
+      return res?.toString();
+    } catch (e) {
+      debugPrint('[consult] record_consult_join failed: $e');
+      return null;
+    }
+  }
+
+  static Future<void> recordConsultLeave(String sessionId) async {
+    if (userId == null) return;
+    try {
+      await _client.rpc('record_consult_leave', params: {'p_id': sessionId});
+    } catch (_) {/* best-effort; see above */}
+  }
+
+  /// Ask the server to settle past bookings from attendance evidence.
+  /// Returns how many it settled.
+  static Future<int> settleMyBookings() async {
+    if (userId == null) return 0;
+    try {
+      final res = await _client.rpc('settle_my_bookings');
+      return (res as num?)?.toInt() ?? 0;
+    } catch (e) {
+      debugPrint('[booking] settle_my_bookings failed: $e');
+      return 0;
+    }
+  }
+
   /// Invoke a Supabase EDGE function (Deno), used for the Razorpay order +
   /// signature-verify flow — the Key Secret lives in the function's env, never
   /// here. Returns the decoded JSON map, or null on any failure (offline, the
   /// function not deployed, an error status) so the caller can fall back to the
   /// no-charge preview instead of stranding the user.
   static Future<Map<String, dynamic>?> invokeEdge(
+    String name,
+    Map<String, dynamic> body,
+  ) async =>
+      (await invokeEdgeResult(name, body)).data;
+
+  /// The same call, but keeping the REFUSAL instead of throwing it away.
+  ///
+  /// [invokeEdge] collapses every failure to null, which is right for the
+  /// Razorpay callers — they have a no-charge preview to fall back to and no
+  /// use for the reason. It is wrong for joining a call, where the server
+  /// knows something the app cannot work out for itself: *why* the door is
+  /// shut. "Your consultation opens at 4:50 PM" and "this session is not
+  /// yours" are different sentences, and only the server can tell them apart.
+  ///
+  /// This is the same lesson as `0075`'s header, one layer up: when a call can
+  /// fail for several reasons and you keep only its result, you have thrown
+  /// away the diagnosis and kept the symptom. [invokeEdge] still exists and
+  /// still behaves identically, so nothing that was happy with null changes.
+  static Future<EdgeResult> invokeEdgeResult(
     String name,
     Map<String, dynamic> body,
   ) async {
@@ -509,21 +618,60 @@ class SupabaseRepo {
         // The body is the server's own refusal — it is not secret, it is the
         // explanation. Log it.
         debugPrint('[edge] $name -> ${res.status} ${res.data}');
-        return null;
+        return EdgeResult(status: res.status, data: _asMap(res.data));
       }
       final data = res.data;
-      if (data is Map) return Map<String, dynamic>.from(data);
+      if (data is Map) {
+        return EdgeResult(status: res.status, data: Map<String, dynamic>.from(data));
+      }
       debugPrint('[edge] $name -> 200 but not a map: ${res.data}');
-      return null;
+      return EdgeResult(status: res.status);
     } on FunctionException catch (e) {
       // Newer supabase_flutter THROWS on non-2xx rather than returning a
       // status, so the branch above never runs and the reason vanished into
       // the catch-all. Both paths now say the same thing.
       debugPrint('[edge] $name -> ${e.status} ${e.details ?? e.reasonPhrase}');
-      return null;
+      return EdgeResult(status: e.status, data: _asMap(e.details));
     } catch (e) {
       debugPrint('[edge] $name threw: $e');
-      return null;
+      // Status 0 is "we never reached the server" — offline, DNS, a dead
+      // socket. Distinct from any status the server chose, which matters:
+      // one is worth a Retry button, the others are not.
+      return const EdgeResult(status: 0);
     }
   }
+
+  /// The refusal bodies arrive as a Map on one path and a JSON string on the
+  /// other, depending on which failure mode fired. Normalise once, here,
+  /// rather than at every call site.
+  static Map<String, dynamic>? _asMap(Object? raw) {
+    if (raw is Map) return Map<String, dynamic>.from(raw);
+    if (raw is String && raw.trim().startsWith('{')) {
+      try {
+        final decoded = jsonDecode(raw);
+        if (decoded is Map) return Map<String, dynamic>.from(decoded);
+      } catch (_) {
+        // Not JSON after all. The debugPrint above already carried it.
+      }
+    }
+    return null;
+  }
+}
+
+/// What an edge function actually answered: the HTTP status, and the decoded
+/// body whether it succeeded or refused.
+///
+/// [status] is 0 when the request never reached the server at all.
+@immutable
+class EdgeResult {
+  const EdgeResult({required this.status, this.data});
+
+  final int status;
+  final Map<String, dynamic>? data;
+
+  bool get ok => status >= 200 && status < 300;
+  bool get offline => status == 0;
+
+  /// The server's own word for what went wrong, when it gave one.
+  String? get reason => (data?['reason'] ?? data?['error'])?.toString();
 }

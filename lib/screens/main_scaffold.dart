@@ -41,6 +41,7 @@ import 'prepare/prepare_hub_screen.dart';
 import 'tools_hub_screen.dart';
 import 'weekly_card_stack_screen.dart';
 import '../services/usage_events.dart';
+import '../booking/prescription_watch.dart';
 
 /// The five pregnancy tabs, in nav order, as usage surfaces.
 ///
@@ -130,6 +131,14 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
   void didChangeAppLifecycleState(AppLifecycleState state) {
     if (state == AppLifecycleState.resumed) {
       ContentRegistry.refreshAll();
+      // And ask whether a doctor has written a prescription since she last
+      // looked. This is the only moment the app finds out: `prescriptions` is
+      // polled, not pushed, and before this the answer only ever surfaced to a
+      // parent who happened to open My Bookings and scroll to Past.
+      //
+      // Self-throttling and silent when logged out, so this call site can stay
+      // a single unconditional line.
+      PrescriptionWatch.instance.check();
     }
   }
 

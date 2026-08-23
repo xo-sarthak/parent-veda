@@ -440,15 +440,139 @@ Fix it when programmes next get touched, or leave it: the field note is enough
 for a column edited once a quarter, and it is not enough for one edited every
 time a clinician signs up. That difference is the whole reason `0074` exists.
 
-## 5.2 One-to-many programmes — not built at all
+## 5.2 One-to-many programmes — not built at all, and now itemised
 
 Masterclasses and cohorts. The single biggest reason the admin panel will be
 needed, and why 1:1 was built first: 1:1 needs no panel.
+
+**Deliberately untouched by the consultation pass (2026-08-23).** That pass
+audited the whole live-call surface and then fixed only the 1:1 half, guarding
+every change on `capacity == 1` so a group booking takes the pre-existing code
+path unchanged. `test/consult_call_test.dart` pins that guard. Nothing below was
+altered, disabled, or removed — including copy that promises things we do not
+yet deliver, which stays because it describes what we intend to give.
+
+What the audit found, so none of it has to be rediscovered:
+
+1. **A group call renders exactly one other person.**
+   `call_screen.dart` — `_remote` is `remoteParticipants.values.first`. No grid,
+   no tile widget, no participant list, no count, no active-speaker detection.
+   In a fifty-seat masterclass the attendee sees one arbitrary participant, very
+   often not the host; everyone else is invisible while their audio still plays.
+
+2. **Every attendee publishes.** The token grants `canPublish: true` to
+   everyone (`livekit-token/index.ts`) and the client turns camera and mic on at
+   connect. Fifty mothers join and fifty are live. No `canPublishSources`, no
+   lobby, no mute-all, no removal, no host controls of any kind.
+   `0076` now carries a `role` and a `capacity` in the token metadata, so the
+   publish rules have something to key on — but **`canPublish` was deliberately
+   left at `true`**, because narrowing it is exactly the change that would alter
+   group behaviour.
+
+3. **A host has no route into their own room.** `join_room_for_booking` and
+   `join_context_for_booking` both resolve the room *from a booking*, and a
+   teacher has no booking — they did not buy a seat. There is no UI either:
+   `doctor_home_screen._sessionRow` is an inert `Container` with no
+   `GestureDetector`, and group sessions never appear in
+   `DoctorAppointmentsScreen`, which filters to `upcomingConsults`.
+   **So a masterclass can be bought and joined, and cannot be hosted.**
+
+4. **"Recording to keep" and "private discussion group" are sold and do not
+   exist.** `booking_sheet.dart` renders both as purchase perks;
+   `BookingStore.ownsRecording()` and `ownsDiscussion()` have **zero call
+   sites**; there is no LiveKit egress, no recordings table, no player, no
+   thread screen. `booking_sheet.dart` also tells her *"Your recording is in My
+   Bookings"* — there is no recording section there.
+   Same failure as `brand-studio-lessons` (absence-only tests hiding a dead
+   flagship), and `booking_wiring_test.dart` repeats it: it asserts one-to-one
+   support has *no* discussion thread and never asserts the feature exists for
+   anything that does.
+
+5. **Group seat counts are fiction.** `booking_catalog.dart` generates
+   `seatsTaken: 40 + seed % 45` for a masterclass and `18 + seed % 25` for a
+   cohort, from a hash. The server row starts at `booked = 0`. "60 seats left"
+   is a deterministic invention.
+
+6. **`Room()` has no `RoomOptions` in the group path.** The consult path now
+   sets `adaptiveStream` and `dynacast`; at fifty participants they stop being
+   optional.
 
 ## 5.3 Gaps on the 1:1 side
 
 Cancel/reschedule from the **parent** side · an in-app notification centre
 (waiting on Firebase) · no-show from the parent's view.
+
+**Closed by the consultation pass (2026-08-23)** — recorded so this list stays
+a list of what is open:
+
+- Role in the session (`0076`), so both apps can say who is on the call.
+- The join window enforced on both sides — `joinableAt()` had no callers and
+  the server never looked at the clock at all.
+- A pre-join green room, with the camera/mic permission asked where a refusal
+  can be explained.
+- Real connection states: reconnecting, weak line, ended, retry, rejoin. A
+  dropped call used to render as "Waiting for Dr. Neha to join".
+- The consult clock starts when the second person arrives, warns five minutes
+  from the end, and stops on disconnect.
+- Wakelock, Android foreground-service permissions, iOS background audio, and
+  usage strings that mention consultations rather than journalling.
+- The doctor's Cancel / Mark-no-show actually writing something (`0077`) — they
+  called a local-only method that no-opped for every real booking and toasted
+  success anyway.
+- Attendance from evidence rather than the clock (`0078`), which is what
+  finally writes `BookingStatus.missed`.
+- Prescriptions: the prescriber named, an arrival notification, top billing in
+  My Bookings while fresh, a one-tap copy into Health → Prescriptions and the
+  medicine tracker, the doctor's form prefilled so it stops inviting duplicates,
+  and a write that no longer reports success when signed out.
+
+### Still open on the 1:1 side after that pass
+
+- ~~**Doctor schedules are device-local.**~~ **WRONG — RETRACTED 2026-08-23,
+  the same day it was written.** This claimed a parent never sees a doctor's
+  real hours. She does, and has since `0033`. The whole path exists:
+  `DoctorScheduleStore.save()` upserts to `doctor_schedule`; the read policy is
+  `using (true)` *specifically* so a parent can see when a doctor is free;
+  `syncFromServer()` pulls every row; and **`lib/main.dart:191-193` calls it in
+  the PARENT app at startup**, after `Supabase.initialize` has already restored
+  the session — so there is not even a race.
+
+  Worth keeping as a worked example of the failure this repo keeps hitting from
+  the *other* direction. The wiring gate says "grep the call site before
+  claiming something is done". The mirror of it is just as expensive: the audit
+  read `DoctorScheduleStore` (local map, `shared_preferences`) and
+  `booking_catalog._fromSchedule` (reads that map in-process), concluded
+  "device-local", and never grepped `syncFromServer`. Two files agreed with each
+  other and the third file — the one that wires them — was never opened.
+  **Grep the call site before declaring something MISSING, not only before
+  declaring it done.**
+
+  The one real residue is freshness, and it is small: the sync runs once per app
+  launch, so a doctor who publishes new hours while a parent's app is already
+  open is not seen until the next launch. Adding it to `ContentRegistry` (which
+  already refreshes on app resume) would close that. Not urgent — clinic hours
+  are not edited hourly.
+- **A doctor no-show is not detected.** `settle_my_bookings()` (`0078`) marks a
+  session attended when the *parent* joined; if she joined and the clinician
+  never did, it still reads "attended" — better than before, not the whole
+  truth, and the case that most deserves a refund. Needs the counterpart's
+  attendance to be trustworthy, i.e. LiveKit webhooks.
+- **No in-call chat, screen share, or post-call notes/rating.**
+  `canPublishData: true` is already granted and the data channel is unused.
+  `ConsultResolution.freeReschedule` is computed and read by no UI.
+- **A prescription cannot be amended or deleted** — `0032` grants no UPDATE or
+  DELETE to anybody. The doctor's form now prefills and warns, but a wrong dose
+  is still permanent.
+- **No frequency field** on a consult prescription, though the parent's own
+  medication form has one; doctors fold it into free-text Dosage.
+- **A prescription is tied to an account, not a child.** A parent with two
+  children gets an unattributed script.
+- **The whole consult surface is English-only and unmarked.** `call_screen.dart`
+  is worse — it is *mixed*, with three `S.now` strings among hardcoded English.
+  None of it carries `_en(`, so every audit in the repo counts this surface as
+  finished. See CLAUDE.md on why that is the `can_i_data` failure mode.
+- `health_guide_screen.dart` still ships a static mockup with a hardcoded
+  *"Prescribed by Dr. Ananya Rao in Jan 2026"*.
 
 ---
 

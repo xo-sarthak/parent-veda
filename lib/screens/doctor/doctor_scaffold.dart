@@ -11,6 +11,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../../booking/prescription.dart';
 import '../../doctor/doctor_reminders.dart';
 import '../../doctor/doctor_roster.dart';
 import '../../doctor/doctor_session.dart';
@@ -85,7 +86,16 @@ class _DoctorScaffoldState extends State<DoctorScaffold>
   }
 
   Future<void> _refreshRoster() async {
-    await DoctorRoster.instance.refresh();
+    // Prescriptions ride along with the roster, and for the same reason. Every
+    // screen in the doctor app decides what to SAY about a past consult from
+    // `PrescriptionStore.hasFor()` — "needs a prescription", "write" vs "view",
+    // and now whether the form opens prefilled. A store that had never loaded
+    // answered false to all of it, which is not a missing badge: it is the app
+    // telling a doctor to write something they have already written.
+    await Future.wait([
+      DoctorRoster.instance.refresh(),
+      PrescriptionStore.instance.refresh(),
+    ]);
     if (!mounted) return;
     // A missed consultation is the worst outcome in the product - the parent
     // waited, paid, and nobody came. Re-arming on every refresh is safe: the

@@ -1227,7 +1227,127 @@ It lives as `kDeleteAccountKeyword`, a plain const. **The dialog renders it as a
 hint so she is told what to type; only the constant decides whether it matched.**
 Rendering and comparing are different jobs even when they use the same word.
 
-## 15. Reading list, in order
+## 15. What a refusal owes the caller
+
+Four patterns from the consultation pass (`0076`–`0078`). They are all the same
+idea seen from different angles: **a system that can fail several ways must say
+which one, to whoever can act on it — and must not say anything else.**
+
+### (a) A narrow return type is a privacy policy. Widening it needs an argument.
+
+`0075` returns the slot id and deliberately nothing else, and says why: *"a
+caller cannot select a column a function does not return."*
+
+`0076` needed more — the caller's role, the capacity, the session window —
+because the token signer's question grew from "which room?" to "which room, as
+whom?". The test for whether that is a leak is not "is this more data" but
+**"does the caller already hold this fact?"**:
+
+| field | already theirs? |
+|---|---|
+| `role` | a fact about themself |
+| `capacity` | a property of the thing they booked, already on screen |
+| `starts` / `ends` | on their own booking row |
+| `counterpart` | already shown by the catalogue / `expert_roster()` |
+
+Every one, yes. So the return grew because the question grew, not because the
+guard loosened. Write that argument in the migration header — the next person
+to widen it will read `0075`'s reasoning first and needs to know why this was
+allowed.
+
+### (b) Null for ownership, a reason for the clock.
+
+`0075` answers `null` for every refusal so booking ids cannot be probed. `0076`
+keeps that for ownership and deliberately breaks it for the time window:
+
+```sql
+if v_owner = v_uid then v_role := 'parent';
+elsif ... then v_role := 'expert';
+else return null;                      -- indistinguishable, on purpose
+end if;
+
+if v_capacity = 1 and v_now < v_starts - interval '10 minutes' then
+  return jsonb_build_object('ok', false, 'reason', 'too_early',
+                            'opens_utc', ...);   -- explained, on purpose
+end if;
+```
+
+**The order is the argument.** By the time the clock is checked, ownership is
+already established — so "it opens at 4:50 PM" tells the caller nothing they do
+not own. Collapsing it into `null` would have sent the app back to one message
+for six causes, which is the exact failure `0075`'s header exists to describe.
+
+The client half matters as much. `SupabaseRepo.invokeEdge` collapses everything
+to `null`, which is right for the Razorpay callers — they have a fallback and no
+use for the reason. `invokeEdgeResult` keeps the status and body for callers
+that must explain themselves. Two functions, not one with a flag: the Razorpay
+path genuinely does not want to know.
+
+### (c) A success message must be produced by the thing that succeeded.
+
+The doctor app's Cancel called `BookingStore.cancel()` — a **local** method that
+returns false when the booking is not in this device's map, which is every
+booking made on the parent's phone. It wrote nothing, and the screen said:
+
+> "Cancelled. The parent has their credit back."
+
+Nothing was cancelled. No credit moved. Nobody found out until a mother sat
+waiting.
+
+The bug is not the wrong method. It is that the toast was written **beside the
+call** rather than **derived from its result**, so it stayed true about an
+intention long after the action beneath it had become a no-op. `0077` therefore
+returns a status string rather than raising, and every message is a branch on
+it:
+
+```dart
+final code = await BookingStore.instance.expertResolve(b.id, outcome);
+switch (code) {
+  case 'ok':                 _toast('Cancelled. The parent has their credit back.');
+  case 'already_cancelled':  _toast('This consultation was already cancelled.');
+  case 'not_your_patient':   _toast('Not on your roster. Pull to refresh and retry.');
+  default:                   _toast('Could not update this consultation.');
+}
+```
+
+Note what the default does **not** say. Returning rather than raising is the
+same choice `0055` and `0075` made, for the same reason — a `raise` discards
+everything the transaction wrote — with a second benefit here: a raise gives the
+caller one failure, and a status string gives it five it can word differently.
+
+### (d) Do not infer a fact you could record.
+
+`BookingStatus` has declared `missed` since the engine was built, and nothing
+ever wrote it, because attendance was inferred:
+
+```dart
+// we cannot yet know real attendance, so ended == attended
+```
+
+So a consultation nobody joined went into a mother's permanent history as
+**attended**. That record is what every later decision reads: whether a credit
+was consumed, whether a refund is owed, what "6 consultations" on a sponsor
+dashboard counts.
+
+`0078` records the fact instead — `consult_sessions`, one row per person per
+room, written through a definer function authorised exactly like the room
+itself. `settle_my_bookings()` then settles from evidence.
+
+Two things worth copying from it:
+
+- **The client mints the row id**, like booking and prescription ids, so a
+  rejoin after a dropped connection re-writes the same row instead of logging a
+  second arrival. Rejoining is the *normal* case in a video call.
+- **The known gap is stated in the header, not hidden.** It marks a session
+  attended when the parent joined; if she joined and the doctor never did, that
+  still reads "attended". Detecting that needs LiveKit webhooks, which do not
+  exist yet. A comment saying so is worth more than a `TODO`, because it says
+  what the correct version *is*.
+
+The general rule: an inference is a guess wearing the clothes of a fact. If the
+thing you are guessing at happened inside your own app, record it.
+
+## 16. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
 2. `0011_user_state.sql` — the KV escape hatch.
@@ -1250,3 +1370,11 @@ Rendering and comparing are different jobs even when they use the same word.
 13. `lib/services/auth/session_watch.dart` + `pending_profile.dart` +
     `supabase/functions/delete-account/index.ts` — the four auth failures that
     leave no trace, and the confirm-before-you-discard write (§14).
+14. `0075_join_room_for_booking.sql` → `0076_join_context_for_booking.sql` —
+    read them in that order. The first argues that a narrow return type IS the
+    privacy policy; the second widens it and has to earn every field (§15a),
+    and breaks the null-for-everything rule exactly once, on purpose (§15b).
+15. `0077_expert_cancel_booking.sql` — a status string instead of a raise, so
+    the app can only claim what actually happened (§15c).
+16. `0078_consult_sessions.sql` — recording a fact the app was inferring, and
+    naming in the header the part it still cannot do (§15d).

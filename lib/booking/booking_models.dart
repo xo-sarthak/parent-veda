@@ -77,6 +77,28 @@ enum SessionFormat { liveGroup, liveOneToOne, recorded }
 /// what a history row shows, and what "you have an upcoming class" keys off.
 enum BookingStatus { upcoming, attended, missed, cancelled }
 
+/// How a clinician closed an appointment that did not happen.
+///
+/// Two outcomes, because the money differs and the reason is not symmetric:
+/// a doctor cancelling is nobody's fault but ours, so the credit returns
+/// whatever the hour; a parent not turning up spends it, because the clinician
+/// held and kept the time. Enforced server-side in `expert_cancel_booking`
+/// (0077) — this is only the word the app sends.
+///
+/// [missed] is also what finally writes `BookingStatus.missed`, which has been
+/// declared since the engine was built and never set by anything.
+enum DoctorOutcome {
+  cancelled,
+  missed;
+
+  /// The value the RPC expects. Spelled out rather than `name` so a rename on
+  /// this side cannot silently change what the database is told.
+  String get wire => switch (this) {
+        DoctorOutcome.cancelled => 'cancelled',
+        DoctorOutcome.missed => 'missed',
+      };
+}
+
 // ---------------------------------------------------------------------------
 //  Offering — the booking-layer view of a catalogue item
 // ---------------------------------------------------------------------------

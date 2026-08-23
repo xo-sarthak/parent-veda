@@ -82,13 +82,19 @@ class NotificationService {
 
   /// Fire a notification immediately - a quick way to confirm notifications
   /// work at all on this device, independent of scheduling/timing.
+  /// [id] defaults to the diagnostic slot. Pass a real one for anything a user
+  /// is meant to keep: notifications with the same id REPLACE each other, so
+  /// two prescriptions arriving together would collapse into one otherwise.
+  /// Ids are banded per feature — see [_reminderId] callers — so features never
+  /// overwrite each other's.
   Future<void> showNow({
     String title = 'ParentVeda',
     String body = "Test notification - you're all set ✅",
+    int id = 999001,
   }) async {
     if (!_ready) await init();
     try {
-      await _plugin.show(999001, title, body, _details);
+      await _plugin.show(id, title, body, _details);
     } catch (_) {/* best-effort */}
   }
 

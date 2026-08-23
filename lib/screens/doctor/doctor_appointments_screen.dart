@@ -20,7 +20,7 @@ import 'package:flutter/material.dart';
 import '../../theme/app_theme.dart';
 
 import '../../booking/booking_models.dart';
-import '../../booking/call_screen.dart';
+import '../../booking/call_prejoin_screen.dart';
 import '../../booking/booking_store.dart';
 import '../../booking/prescription.dart';
 import '../../doctor/consult_policy.dart';
@@ -47,6 +47,13 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
   void initState() {
     super.initState();
     DoctorRoster.instance.refresh();
+    // AND the prescriptions. This used to run only in pull-to-refresh, so on
+    // every cold start `hasFor()` was false for everything: the summary line
+    // announced that N past consults "still need a prescription", each Past
+    // row offered "Write prescription", and a doctor following that prompt
+    // wrote a second copy of one they had already sent. The list was inviting
+    // the duplicate it then could not show.
+    PrescriptionStore.instance.refresh();
   }
 
   static bool _isToday(DateTime d) {
@@ -281,7 +288,16 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                       // Doctor mode is reachable inside the PARENT build too,
                       // where the Ask FAB floats above the Navigator.
                       settings: const RouteSettings(name: kCallRoute),
-                      builder: (_) => CallScreen(
+                      // The green room, for the clinician too. A doctor about
+                      // to appear in someone's living room deserves the same
+                      // look at their own camera the parent now gets — and it
+                      // is where the camera/mic permission question belongs.
+                      //
+                      // Safe to send every row here: this list is
+                      // upcomingConsults, so everything on it is 1:1. Group
+                      // sessions are the inert rows on the home screen and
+                      // still have no way into a room at all.
+                      builder: (_) => CallPrejoinScreen(
                         bookingId: b.id,
                         title: b.title,
                         // The doctor announces themselves, and waits for the
@@ -289,6 +305,7 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
                         // neither side has to see "Guest".
                         displayName: _myName(),
                         waitingFor: patient.name.isEmpty ? null : patient.name,
+                        startsUtc: b.startsUtc,
                       ),
                     ),
                   ),
@@ -448,24 +465,53 @@ class _DoctorAppointmentsScreenState extends State<DoctorAppointmentsScreen> {
         ),
       );
 
-  void _cancelAsDoctor(Booking b) {
-    final r = ConsultPolicy.doctorCancels(b);
-    BookingStore.instance.cancel(b.id, refundCredit: r.creditReturned);
-    DoctorReminders.instance.cancelFor(b.id);
-    DoctorRoster.instance.refresh();
-    if (!mounted) return;
-    setState(() {});
-    _toast('Cancelled. The parent has their credit back.');
-  }
+  Future<void> _cancelAsDoctor(Booking b) => _resolve(b, DoctorOutcome.cancelled);
 
-  void _markNoShow(Booking b) {
-    final r = ConsultPolicy.parentNoShow(b);
-    // The slot is spent, not refunded: the doctor held the time and turned up.
-    BookingStore.instance.cancel(b.id, refundCredit: r.creditReturned);
+  Future<void> _markNoShow(Booking b) => _resolve(b, DoctorOutcome.missed);
+
+  /// Cancel, or mark a no-show — through the SERVER, and only claiming it
+  /// happened if it did.
+  ///
+  /// WHAT THIS REPLACES, because it is worth naming precisely. Both actions
+  /// used to call `BookingStore.instance.cancel(...)`, which is the LOCAL
+  /// method: it looks the booking up in this device's `_bookings` map and
+  /// returns false when it is not there. A booking made on the PARENT's phone
+  /// is never in that map — the doctor app only learns of it through
+  /// `expert_roster()` — so for every real appointment it wrote nothing at all,
+  /// and then a toast said "Cancelled. The parent has their credit back."
+  ///
+  /// The parent still had the appointment. The seat was still taken. No credit
+  /// came back, and nobody found out until she sat waiting.
+  ///
+  /// The lesson is in the shape, not the API: the message was written beside
+  /// the CALL instead of derived from its RESULT, so it stayed true about an
+  /// intention long after the action beneath it had become a no-op. Everything
+  /// below is said only on the strength of what the server answered.
+  Future<void> _resolve(Booking b, DoctorOutcome outcome) async {
+    final code = await BookingStore.instance.expertResolve(b.id, outcome);
     DoctorReminders.instance.cancelFor(b.id);
+    await DoctorRoster.instance.refresh();
     if (!mounted) return;
     setState(() {});
-    _toast('Marked as a no-show. You are still paid for this slot.');
+
+    switch (code) {
+      case 'ok':
+        _toast(outcome == DoctorOutcome.cancelled
+            ? 'Cancelled. The parent has their credit back.'
+            : 'Marked as a no-show. You are still paid for this slot.');
+      case 'already_cancelled':
+        _toast('This consultation was already cancelled.');
+      case 'already_missed':
+        _toast('This consultation was already marked a no-show.');
+      case 'not_your_patient':
+        _toast('This booking is not on your roster. Pull to refresh and retry.');
+      case 'not_authenticated':
+        _toast('You are signed out. Sign in and try again.');
+      default:
+        // Includes a network failure and an unapplied migration. The important
+        // part is what it does NOT say: that anything was cancelled.
+        _toast('Could not update this consultation. Please try again.');
+    }
   }
 
   void _toast(String m) => ScaffoldMessenger.of(context)

@@ -133,6 +133,20 @@ dependencies:
   # with a token minted by the livekit-token edge function (the API Secret lives
   # in Supabase, never here).
   livekit_client: ^2.3.0
+
+  # Keeps the screen awake for the length of a consultation. Without it the
+  # display sleeps during any quiet stretch — which on a video call with a
+  # doctor is most of the listening — and on Android that also risks the app
+  # being backgrounded, where capture is killed outright (see the foreground
+  # service permissions in AndroidManifest.xml).
+  wakelock_plus: ^1.2.8
+
+  # Camera and microphone consent, asked BEFORE the call rather than during it.
+  # livekit_client will request them implicitly, but a refusal then surfaces as
+  # a generic connect failure with no way back — the pre-join screen needs to
+  # ask, explain, and offer a route to Settings.
+  permission_handler: ^11.3.1
+
   play_install_referrer: ^0.5.0
   qr_flutter: ^4.1.0
   mobile_scanner: ^7.4.0

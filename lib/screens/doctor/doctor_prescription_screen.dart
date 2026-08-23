@@ -9,6 +9,7 @@
 import 'package:flutter/material.dart';
 
 import '../../booking/prescription.dart';
+import '../../doctor/doctor_session.dart';
 import '../post_pregnancy/pp_common.dart';
 
 class DoctorPrescriptionScreen extends StatefulWidget {
@@ -51,6 +52,46 @@ class _DoctorPrescriptionScreenState extends State<DoctorPrescriptionScreen> {
   final _advice = TextEditingController();
   bool _saving = false;
 
+  /// True when this booking already had a prescription when the screen opened.
+  ///
+  /// It matters twice: the form is PREFILLED rather than blank, and the button
+  /// says "Update" rather than "Send".
+  bool _amending = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _prefill();
+  }
+
+  /// THE DUPLICATE THIS PREVENTS.
+  ///
+  /// Appointments flips its label to "View prescription" once one exists, and
+  /// then pushed this identical, EMPTY form. A doctor tapping "view" saw a
+  /// blank page, reasonably concluded nothing had been written, typed it again
+  /// and saved — which minted a second `rx_` id and inserted a SECOND ROW
+  /// (0032 has no unique constraint on booking_id). The parent then saw
+  /// whichever of the two came back first.
+  ///
+  /// Showing what is already there fixes the cause rather than the symptom.
+  void _prefill() {
+    final existing =
+        PrescriptionStore.instance.forBooking(widget.bookingId);
+    if (existing == null) return;
+    _amending = true;
+    _advice.text = existing.advice;
+    if (existing.items.isNotEmpty) {
+      _rows.clear();
+      for (final it in existing.items) {
+        final r = _Row();
+        r.med.text = it.medicine;
+        r.dose.text = it.dosage;
+        r.dur.text = it.duration;
+        _rows.add(r);
+      }
+    }
+  }
+
   @override
   void dispose() {
     for (final r in _rows) {
@@ -79,14 +120,21 @@ class _DoctorPrescriptionScreenState extends State<DoctorPrescriptionScreen> {
       bookingId: widget.bookingId,
       items: items,
       advice: _advice.text.trim(),
+      // So the parent's copy can name who prescribed it. The server sets the
+      // authoritative value; this only keeps the local mirror honest.
+      expertId: DoctorSession.instance.expertId ?? '',
     );
     if (!mounted) return;
     setState(() => _saving = false);
     if (ok) {
-      _snack('Prescription sent to the parent.');
+      _snack(_amending
+          ? 'Prescription updated for the parent.'
+          : 'Prescription sent to the parent.');
       Navigator.of(context).maybePop();
     } else {
-      _snack('Could not save. Check your connection and try again.');
+      // Includes the case that used to report success: signed out, so nothing
+      // was written at all. See PrescriptionStore.write.
+      _snack('Could not save. Check you are signed in, then try again.');
     }
   }
 
@@ -109,7 +157,8 @@ class _DoctorPrescriptionScreenState extends State<DoctorPrescriptionScreen> {
                 const SizedBox(height: 16),
                 ppEyebrow('Prescription', color: ppPurple),
                 const SizedBox(height: 8),
-                Text('Write a prescription', style: ppFraunces(26, h: 1.1)),
+                Text(_amending ? 'Update the prescription' : 'Write a prescription',
+                    style: ppFraunces(26, h: 1.1)),
                 const SizedBox(height: 6),
                 Text('For ${widget.title}.',
                     style: ppBody(13, color: ppSoft)),
@@ -156,7 +205,9 @@ class _DoctorPrescriptionScreenState extends State<DoctorPrescriptionScreen> {
                   alignment: Alignment.center,
                   decoration: BoxDecoration(
                       color: ppPurple, borderRadius: BorderRadius.circular(16)),
-                  child: Text(_saving ? 'Sending…' : 'Send prescription',
+                  child: Text(_saving
+                      ? (_amending ? 'Updating…' : 'Sending…')
+                      : (_amending ? 'Update prescription' : 'Send prescription'),
                       style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
                 ),
               ),

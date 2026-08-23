@@ -509,7 +509,28 @@ Expert _findHelp(
     );
 
 /// Lookup by id; falls back to the first expert (Dr. Neha Sharma).
+///
+/// ⚠️ THAT FALLBACK IS A REAL NAME. For an id this catalogue does not know,
+/// this hands back a different, living doctor — the same shape of defect
+/// already recorded against `doctorInfoById()`, where a partner organisation
+/// would have seen a stranger's name presented as its own.
+///
+/// It is tolerable where the result is decoration (an avatar, a "with…" line
+/// that is cosmetic). It is NOT tolerable anywhere the name is a CLAIM about
+/// who did something — an attribution, an author, a prescriber. Use
+/// [expertByIdOrNull] there and render nothing rather than the wrong person.
 Expert expertById(String id) => kExperts.firstWhere((e) => e.id == id, orElse: () => kExperts.first);
+
+/// Lookup by id with no fallback, for callers that must not name the wrong
+/// person. Null means "we do not know who this is", which is a printable fact;
+/// somebody else's name is not.
+Expert? expertByIdOrNull(String id) {
+  if (id.isEmpty) return null;
+  for (final e in kExperts) {
+    if (e.id == id) return e;
+  }
+  return null;
+}
 
 /// Lookup by display name - tolerant of the "Dr." prefix and punctuation.
 /// Returns null when no seed profile matches, so callers can skip the link

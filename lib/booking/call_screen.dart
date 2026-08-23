@@ -40,6 +40,36 @@
 //  place the convention would actively hurt.
 //
 // -----------------------------------------------------------------------------
+//  WHAT IS GUARDED, AND WHY IT MATTERS MORE THAN IT LOOKS
+// -----------------------------------------------------------------------------
+//  This screen serves TWO products: a 1:1 consultation and a group class. Only
+//  the first has been designed. The second renders `remoteParticipants.first`
+//  and nothing else, which in a fifty-seat masterclass shows one arbitrary
+//  attendee — a known, recorded gap, deliberately left alone for now.
+//
+//  So every behaviour added for consultations is gated on `_isConsult`, which
+//  is `CallJoin.capacity == 1` — the same number the SERVER uses for the same
+//  distinction (book_slot, 0029). Gated: the identity chips' role half, the
+//  both-present clock, the near-end warning, the leave confirmation, and
+//  treating one departure as the end of the call.
+//
+//  `capacity == 0` means "the server did not say" — the pre-0076 fallback path
+//  — and counts as NOT a consult, so an unknown session keeps old behaviour
+//  rather than acquiring rules it has never been tested under.
+//
+// -----------------------------------------------------------------------------
+//  IDENTITY COMES FROM THE SESSION, NOT FROM THE CALL SITE
+// -----------------------------------------------------------------------------
+//  The token used to carry a user id and a display name and no role, so doctor
+//  and parent received byte-identical credentials and this screen could not
+//  tell you which side of the call you were on. `join_context_for_booking`
+//  (0076) now supplies the role; see call_session.dart.
+//
+//  The name and role are drawn ON the video, OUTSIDE the chrome that fades.
+//  That is the whole point: the chrome hides five seconds into a settled call,
+//  which is precisely when the screen used to stop identifying anybody.
+//
+// -----------------------------------------------------------------------------
 //  AUDIO GOES TO THE SPEAKER, ON PURPOSE
 // -----------------------------------------------------------------------------
 //  Android routes WebRTC audio to the EARPIECE by default — correct for a phone
@@ -57,10 +87,12 @@ import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 import 'package:livekit_client/livekit_client.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../services/remote/supabase_repo.dart';
 import '../theme/app_theme.dart';
 import '../localization/app_language.dart';
+import 'call_session.dart';
 
 // ---- palette -----------------------------------------------------------------
 // A call screen is dark whatever the rest of the app does — video reads better
@@ -81,10 +113,27 @@ class CallScreen extends StatefulWidget {
     required this.title,
     this.displayName,
     this.waitingFor,
+    this.join,
+    this.startCameraOn = true,
+    this.startMicOn = true,
   });
 
   final String bookingId;
   final String title;
+
+  /// A join already fetched by the pre-join screen.
+  ///
+  /// When present the room opens immediately — no second token round trip, and
+  /// no spinner on a screen the user has already been looking at. When absent
+  /// (a group session, or any caller that has not been moved to the pre-join
+  /// flow) this screen fetches its own, exactly as it always did.
+  final CallJoin? join;
+
+  /// What the pre-join toggles decided. Defaults reproduce the old behaviour —
+  /// camera and microphone both live the moment you arrive — so any caller that
+  /// does not set them is unaffected.
+  final bool startCameraOn;
+  final bool startMicOn;
 
   /// The name the OTHER side sees over your video. Sent to the token function,
   /// which stamps it into the LiveKit JWT — so it is a LABEL, never a
@@ -101,15 +150,46 @@ class CallScreen extends StatefulWidget {
   State<CallScreen> createState() => _CallScreenState();
 }
 
-class _CallScreenState extends State<CallScreen> {
+/// What the screen is doing, as one value rather than three booleans that can
+/// disagree with each other.
+///
+/// The old screen had `_connecting` and `_error` and nothing else, so a room
+/// that dropped mid-call had no state to move to: it stayed in the "connected"
+/// branch, rendering a frozen last frame with a running clock and a green
+/// "live" dot. Every one of those said the call was fine.
+enum _Phase { connecting, live, reconnecting, ended, failed }
+
+class _CallScreenState extends State<CallScreen> with WidgetsBindingObserver {
   Room? _room;
-  bool _connecting = true;
+  EventsListener<RoomEvent>? _events;
+
+  _Phase _phase = _Phase.connecting;
   String? _error;
 
-  bool _micOn = true;
-  bool _camOn = true;
+  /// Set when the room closed for a reason worth naming — the other person
+  /// hung up, or the connection was lost for good.
+  String? _endedBecause;
+
+  /// The join context: our own role, the counterpart, the session window, and
+  /// crucially the CAPACITY that decides whether any of this pass's behaviour
+  /// applies at all.
+  CallJoin? _join;
+
+  /// The single guard. False for a group session, false for anything joined
+  /// through the pre-0076 fallback — and in both of those cases every new
+  /// behaviour below stays switched off and the screen behaves as it did
+  /// before this work.
+  bool get _isConsult => _join?.isConsult ?? false;
+
+  late bool _micOn = widget.startMicOn;
+  late bool _camOn = widget.startCameraOn;
   bool _speakerOn = true;
   bool _frontCamera = true;
+
+  /// The other side's connection quality, when LiveKit reports it. A frozen
+  /// picture and a bad line look identical from the sofa; only one of them is
+  /// worth telling someone about.
+  ConnectionQuality _remoteQuality = ConnectionQuality.unknown;
 
   /// Which video is large. Tapping the small card swaps them — the standard
   /// way to check your own framing mid-call without leaving the screen.
@@ -128,6 +208,20 @@ class _CallScreenState extends State<CallScreen> {
   Timer? _tick;
   Duration _elapsed = Duration.zero;
 
+  /// When the SECOND person arrived. The consult clock is measured from here,
+  /// not from connect.
+  ///
+  /// The old timer started the moment you connected, which meant a parent who
+  /// joined eight minutes early greeted her doctor with a clock already reading
+  /// 08:00 — of a consultation she had paid thirty minutes for. The screen's own
+  /// header says the timer exists because "a consult is a bought, fixed number
+  /// of minutes and both sides deserve to see them going"; it was measuring the
+  /// wrong thing to say it.
+  DateTime? _bothPresentAt;
+
+  /// Fired once, five minutes from the scheduled end.
+  bool _warnedNearEnd = false;
+
   static const _selfW = 108.0;
   static const _selfH = 152.0;
   static const _margin = 14.0;
@@ -135,35 +229,99 @@ class _CallScreenState extends State<CallScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    // A consultation is exactly the situation the screen timeout was invented
+    // for and is exactly wrong about: long stretches of listening without a
+    // touch. Held for the whole screen, released in dispose.
+    WakelockPlus.enable().catchError((Object e) {
+      debugPrint('[call] wakelock unavailable: $e');
+    });
     _connect();
   }
 
+  /// Camera capture is stopped while the app is in the background and resumed
+  /// when it returns.
+  ///
+  /// Politeness and battery, but mostly honesty: without this the camera keeps
+  /// publishing while she is reading a message in another app, and the doctor
+  /// keeps watching a room she believes she has stepped away from. Audio is
+  /// deliberately left alone — stepping out of the app to check a date should
+  /// not drop you out of the conversation.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final lp = _room?.localParticipant;
+    if (lp == null || !_camOn) return;
+    if (state == AppLifecycleState.resumed) {
+      lp.setCameraEnabled(true).catchError((Object e) {
+        debugPrint('[call] camera resume failed: $e');
+        return null;
+      });
+    } else if (state == AppLifecycleState.paused) {
+      lp.setCameraEnabled(false).catchError((Object e) {
+        debugPrint('[call] camera pause failed: $e');
+        return null;
+      });
+    }
+  }
+
   Future<void> _connect() async {
+    setState(() {
+      _phase = _Phase.connecting;
+      _error = null;
+    });
     try {
       // The id is logged because a refusal is ambiguous without it: a booking
       // that only ever existed on this phone and one the server cancelled look
       // identical from here.
-      debugPrint('[call] joining bookingId=${widget.bookingId} '
-          'as uid=${SupabaseRepo.userId}');
-      final res = await SupabaseRepo.invokeEdge('livekit-token', {
-        'bookingId': widget.bookingId,
-        if (widget.displayName != null) 'name': widget.displayName,
-      });
-      final url = res?['url'] as String?;
-      final token = res?['token'] as String?;
-      if (url == null || token == null) {
+      debugPrint('[call] joining bookingId=${widget.bookingId}');
+
+      // The pre-join screen has usually done this already. Fetching again would
+      // mint a second token for the same session for no reason.
+      var join = widget.join ?? _join;
+      if (join == null) {
+        final (fetched, failure) = await CallSession.fetchJoin(
+          bookingId: widget.bookingId,
+          displayName: widget.displayName,
+        );
+        if (!mounted) return;
+        if (failure != null) {
+          setState(() {
+            _phase = _Phase.failed;
+            _error = _failureCopy(failure);
+          });
+          return;
+        }
+        join = fetched;
+      }
+      if (join == null) {
         setState(() {
-          _connecting = false;
-          _error = 'Could not join this session. Make sure you are signed in '
-              'and try again a few minutes before it starts.';
+          _phase = _Phase.failed;
+          _error = 'Could not join this session. Please try again.';
         });
         return;
       }
+      _join = join;
 
-      final room = Room();
-      await room.connect(url, token);
-      await room.localParticipant?.setCameraEnabled(true);
-      await room.localParticipant?.setMicrophoneEnabled(true);
+      // adaptiveStream and dynacast let LiveKit stop sending video nobody is
+      // looking at. At two participants the saving is small; the reason to turn
+      // them on now is that they are the difference between a class working and
+      // a class melting a phone, and a flag that is only ever exercised in the
+      // feature that needs it most is a flag nobody has tested.
+      final room = Room(
+        roomOptions: const RoomOptions(adaptiveStream: true, dynacast: true),
+      );
+
+      // SUBSCRIBE BEFORE CONNECTING. Events fired during connect — a
+      // participant already in the room, an immediate failure — are missed by a
+      // listener attached afterwards, and "the doctor was already there" is the
+      // single most likely case in a consultation where one side is punctual.
+      final events = room.createListener();
+      _wireEvents(events);
+      _events = events;
+
+      await room.connect(join.url, join.token);
+      await room.localParticipant?.setCameraEnabled(widget.startCameraOn);
+      await room.localParticipant?.setMicrophoneEnabled(widget.startMicOn);
 
       // AFTER connecting: the audio session only exists once there is a track
       // to route, so calling this earlier is a no-op that looks like it worked.
@@ -177,20 +335,177 @@ class _CallScreenState extends State<CallScreen> {
       }
       setState(() {
         _room = room;
-        _connecting = false;
+        _phase = _Phase.live;
       });
-      _tick = Timer.periodic(const Duration(seconds: 1), (_) {
-        if (mounted) setState(() => _elapsed += const Duration(seconds: 1));
-      });
+      _noteIfBothPresent();
+      _recordJoin();
+      _tick = Timer.periodic(const Duration(seconds: 1), (_) => _onTick());
     } catch (e) {
       debugPrint('[call] connect failed: $e');
       if (mounted) {
         setState(() {
-          _connecting = false;
+          _phase = _Phase.failed;
           _error = 'Something went wrong joining the call.';
         });
       }
     }
+  }
+
+  /// The states the screen could not previously observe.
+  ///
+  /// `room.addListener` alone gives a change notification with no reason
+  /// attached, which is why a dropped call used to be indistinguishable from a
+  /// quiet one. These are the reasons.
+  void _wireEvents(EventsListener<RoomEvent> events) {
+    events
+      ..on<ParticipantConnectedEvent>((_) {
+        if (!mounted) return;
+        _noteIfBothPresent();
+        setState(() {});
+      })
+      ..on<ParticipantDisconnectedEvent>((_) {
+        if (!mounted) return;
+        // In a consult there is exactly one other person, so their leaving IS
+        // the end of the call and should say so. In a class it is one of fifty
+        // and means nothing — hence the guard.
+        if (_isConsult && _remote == null) {
+          setState(() {
+            _phase = _Phase.ended;
+            _endedBecause = '$_remoteName left the call.';
+          });
+          _tick?.cancel();
+        } else {
+          setState(() {});
+        }
+      })
+      ..on<RoomReconnectingEvent>((_) {
+        if (!mounted) return;
+        setState(() => _phase = _Phase.reconnecting);
+      })
+      ..on<RoomReconnectedEvent>((_) {
+        if (!mounted) return;
+        setState(() => _phase = _Phase.live);
+      })
+      ..on<RoomDisconnectedEvent>((e) {
+        if (!mounted) return;
+        debugPrint('[call] disconnected: ${e.reason}');
+        _tick?.cancel();
+        setState(() {
+          _phase = _Phase.ended;
+          _endedBecause = e.reason == DisconnectReason.clientInitiated
+              ? null
+              : 'The connection to the call was lost.';
+        });
+      })
+      ..on<ParticipantConnectionQualityUpdatedEvent>((e) {
+        if (!mounted || e.participant is LocalParticipant) return;
+        setState(() => _remoteQuality = e.connectionQuality);
+      });
+  }
+
+  /// The id of this device's attendance row, once the server has one.
+  String? _sessionRowId;
+
+  /// TELLING THE SERVER SOMEBODY TURNED UP.
+  ///
+  /// Until this existed, attendance was inferred from the clock — a booking
+  /// whose end time had passed was written into the parent's history as
+  /// "attended", whether or not a single person had joined, and
+  /// `BookingStatus.missed` was never written by anything at all.
+  ///
+  /// The id is minted HERE, not by the server, for the same reason booking and
+  /// prescription ids are: rejoining after a dropped connection is the normal
+  /// case in a video call, and a client-minted id makes the retry write the
+  /// same row instead of logging a second arrival.
+  void _recordJoin() {
+    if (_sessionRowId != null) return; // a rejoin is the same attendance
+    final id = 'cs_${widget.bookingId}_${DateTime.now().microsecondsSinceEpoch}';
+    _sessionRowId = id;
+    SupabaseRepo.recordConsultJoin(id, widget.bookingId)
+        .catchError((Object e) {
+      debugPrint('[call] attendance not recorded: $e');
+      return null;
+    });
+  }
+
+  void _recordLeave() {
+    final id = _sessionRowId;
+    if (id == null) return;
+    _sessionRowId = null;
+    SupabaseRepo.recordConsultLeave(id).catchError((Object e) {
+      debugPrint('[call] leave not recorded: $e');
+    });
+  }
+
+  /// Starts the consult clock the first time both people are in the room.
+  void _noteIfBothPresent() {
+    if (_bothPresentAt != null) return;
+    if (_remote == null) return;
+    _bothPresentAt = DateTime.now();
+    _elapsed = Duration.zero;
+  }
+
+  void _onTick() {
+    if (!mounted) return;
+    setState(() {
+      // Before the other person arrives there is nothing to count. A group
+      // session keeps the old behaviour — count from connect — because a class
+      // has no "both present" moment to wait for.
+      if (!_isConsult || _bothPresentAt != null) {
+        _elapsed += const Duration(seconds: 1);
+      }
+    });
+
+    // Five minutes out from the end of what was bought. Said once, quietly,
+    // and only for a consult: a class overrunning is the host's business.
+    final ends = _join?.endsUtc;
+    if (_isConsult && !_warnedNearEnd && ends != null && _remote != null) {
+      final left = ends.difference(DateTime.now().toUtc());
+      if (!left.isNegative && left.inMinutes <= 5) {
+        _warnedNearEnd = true;
+        _showNearEndNotice();
+      }
+    }
+  }
+
+  void _showNearEndNotice() {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('About 5 minutes left in this consultation.'),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: _panel,
+        duration: const Duration(seconds: 4),
+      ),
+    );
+  }
+
+  String _failureCopy(CallJoinFailure f) => switch (f.kind) {
+        CallRefusal.tooEarly => f.opensUtc != null
+            ? 'This consultation opens at ${_clockAt(f.opensUtc!)}, ten minutes '
+                'before it starts.'
+            : 'This consultation has not opened yet. You can join ten minutes '
+                'before it starts.',
+        CallRefusal.ended =>
+          'This consultation has ended. You can book a follow-up from My '
+              'Bookings.',
+        CallRefusal.notYours =>
+          'This session is not available. It may have been cancelled, or it '
+              'belongs to a different account.',
+        CallRefusal.notSignedIn =>
+          'Please sign in as the account that booked this session.',
+        CallRefusal.offline =>
+          'You appear to be offline. A video consultation needs a working '
+              'connection.',
+        CallRefusal.serverError =>
+          'Something went wrong on our side. Please try again in a moment.',
+      };
+
+  String _clockAt(DateTime utc) {
+    final d = utc.toLocal();
+    final h = d.hour % 12 == 0 ? 12 : d.hour % 12;
+    final m = d.minute.toString().padLeft(2, '0');
+    return '$h:$m ${d.hour < 12 ? 'AM' : 'PM'}';
   }
 
   Future<void> _applySpeaker(bool on) async {
@@ -207,11 +522,57 @@ class _CallScreenState extends State<CallScreen> {
     if (mounted) setState(() {});
   }
 
+  /// Leaving, with one question first.
+  ///
+  /// The red pill used to hang up on the first tap. That is right for a call
+  /// you can restart by tapping a contact; it is wrong for a bought
+  /// consultation with a clinician, where the same accident costs money and
+  /// requires the other person to still be there when you come back.
+  ///
+  /// The confirmation is only for a live consult. A class, a call that has
+  /// already ended, and a connection that never came up all leave immediately —
+  /// asking "are you sure?" about a call that is already over is noise.
+  Future<void> _confirmLeave() async {
+    if (!_isConsult || _phase != _Phase.live) {
+      await _leave();
+      return;
+    }
+    final go = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: _panel,
+        title: const Text('Leave this consultation?',
+            style: TextStyle(color: Colors.white, fontSize: 17)),
+        content: Text(
+          _remote == null
+              ? 'You can rejoin from My Bookings while the session is running.'
+              : 'You are still connected to $_remoteName. You can rejoin from '
+                  'My Bookings while the session is running.',
+          style: const TextStyle(color: Colors.white70, height: 1.5),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Stay'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Leave', style: TextStyle(color: _danger)),
+          ),
+        ],
+      ),
+    );
+    if (go == true) await _leave();
+  }
+
   Future<void> _leave() async {
+    _recordLeave();
     final r = _room;
     _room = null;
     _tick?.cancel();
     _chromeTimer?.cancel();
+    await _events?.dispose();
+    _events = null;
     r?.removeListener(_refresh);
     await r?.disconnect();
     await r?.dispose();
@@ -220,8 +581,17 @@ class _CallScreenState extends State<CallScreen> {
 
   @override
   void dispose() {
+    // Covers the exits that are not the red pill — a back gesture on a class,
+    // the process being torn down, a route popped from elsewhere. Without it a
+    // session would show a join and no leave, and read as still running.
+    _recordLeave();
+    WidgetsBinding.instance.removeObserver(this);
+    WakelockPlus.disable().catchError((Object e) {
+      debugPrint('[call] wakelock release: $e');
+    });
     _tick?.cancel();
     _chromeTimer?.cancel();
+    _events?.dispose();
     final r = _room;
     r?.removeListener(_refresh);
     r?.disconnect();
@@ -272,7 +642,74 @@ class _CallScreenState extends State<CallScreen> {
     final r = _remote;
     if (r != null && r.name.isNotEmpty) return r.name;
     final who = widget.waitingFor?.trim();
-    return (who != null && who.isNotEmpty) ? who : 'the other person';
+    if (who != null && who.isNotEmpty) return who;
+    final fromServer = _join?.counterpart.trim() ?? '';
+    if (fromServer.isNotEmpty) return fromServer;
+    return 'the other person';
+  }
+
+  /// The other participant's role, read from the metadata the server stamped
+  /// into their token.
+  ///
+  /// Not inferred from ours. "I am the parent, therefore they are the doctor"
+  /// holds today only because a consult has exactly two people — it stops being
+  /// true the moment anything else joins, and a badge that is right by
+  /// coincidence is a badge that will be wrong later.
+  CallRole get _remoteRole => CallSession.roleFromMetadata(_remote?.metadata);
+
+  CallRole get _myRole => _join?.role ?? CallRole.unknown;
+
+  /// A name with its role beside it, drawn ON the video and outside the chrome
+  /// that auto-hides.
+  ///
+  /// This is the fix for the complaint that you cannot tell who is who. The
+  /// only name on screen used to live in the top bar, which disappears five
+  /// seconds into a settled call — so for almost the whole consultation the
+  /// screen said nothing about who was on it. Meet, Zoom and WhatsApp all keep
+  /// a persistent label for the same reason.
+  Widget _nameChip(String name, CallRole role, {bool compact = false}) {
+    final label = role.label;
+    return Container(
+      padding: EdgeInsets.symmetric(
+          horizontal: compact ? 7 : 10, vertical: compact ? 3 : 5.5),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.55),
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        Flexible(
+          child: Text(
+            name,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+                color: Colors.white,
+                fontSize: compact ? 10.5 : 12.5,
+                fontWeight: FontWeight.w600),
+          ),
+        ),
+        // Omitted rather than guessed when the role is unknown — a group
+        // session and the pre-0076 fallback both land here.
+        if (label.isNotEmpty) ...[
+          SizedBox(width: compact ? 4 : 6),
+          Container(
+            width: 3,
+            height: 3,
+            decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.45)),
+          ),
+          SizedBox(width: compact ? 4 : 6),
+          Text(
+            label,
+            style: TextStyle(
+                color: role.isExpert ? _accent : Colors.white70,
+                fontSize: compact ? 10 : 11.5,
+                fontWeight: FontWeight.w700),
+          ),
+        ],
+      ]),
+    );
   }
 
   // ---- controls -------------------------------------------------------------
@@ -331,7 +768,12 @@ class _CallScreenState extends State<CallScreen> {
   /// what the parent BOUGHT and reads correctly everywhere else — it is only
   /// redundant on the one screen where the name is already the headline.
   String get _statusLine {
-    final state = _remote == null ? 'Waiting' : _clock;
+    // The clock only appears once there is something to count. In a consult
+    // that is the moment the second person arrives (see _bothPresentAt); until
+    // then the line says "Waiting", because a timer running against an empty
+    // room is telling the user a number about nothing.
+    final counting = !_isConsult || _bothPresentAt != null;
+    final state = (_remote == null || !counting) ? 'Waiting' : _clock;
     final name = _remoteName.trim();
     var what = widget.title.trim();
     if (name.isNotEmpty && name != 'the other person') {
@@ -355,17 +797,32 @@ class _CallScreenState extends State<CallScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: _bg,
-      body: _connecting
-          ? _status('Joining ${widget.title}…', spinner: true)
-          : _error != null
-              ? _status(_error!)
-              : _callView(),
+    // A hardware back press during a live consult goes through the same
+    // question as the red pill. Without this the confirmation is trivially
+    // bypassed by the one gesture people make without looking.
+    return PopScope(
+      canPop: !(_isConsult && _phase == _Phase.live),
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) _confirmLeave();
+      },
+      child: Scaffold(
+        backgroundColor: _bg,
+        body: switch (_phase) {
+          _Phase.connecting =>
+            _status('Joining ${widget.title}…', spinner: true),
+          _Phase.failed => _status(
+              _error ?? 'Something went wrong joining the call.',
+              retry: true,
+            ),
+          _Phase.ended => _endedView(),
+          _Phase.live || _Phase.reconnecting => _callView(),
+        },
+      ),
     );
   }
 
-  Widget _status(String msg, {bool spinner = false}) => SafeArea(
+  Widget _status(String msg, {bool spinner = false, bool retry = false}) =>
+      SafeArea(
         child: Center(
           child: Padding(
             padding: const EdgeInsets.all(32),
@@ -385,27 +842,85 @@ class _CallScreenState extends State<CallScreen> {
                       color: Colors.white70, fontSize: 15, height: 1.55)),
               if (!spinner) ...[
                 const SizedBox(height: 24),
-                GestureDetector(
-                  onTap: () => Navigator.of(context).maybePop(),
-                  behavior: HitTestBehavior.opaque,
-                  child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 26, vertical: 13),
-                    decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.12),
-                        borderRadius: BorderRadius.circular(12)),
-                    child: Text(S.now.uiClose,
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600)),
-                  ),
-                ),
+                // A dead end with one Close button was the whole vocabulary
+                // here, for six different causes. Where trying again could
+                // plausibly work, offer it.
+                if (retry) ...[
+                  _pillButton('Try again', _connect, filled: true),
+                  const SizedBox(height: 10),
+                ],
+                _pillButton(S.now.uiClose, () => Navigator.of(context).maybePop()),
               ],
             ]),
           ),
         ),
       );
+
+  /// The call is over. Previously this state did not exist: the screen either
+  /// stayed frozen on a dead room or popped with no explanation, so "the doctor
+  /// hung up" and "your Wi-Fi died" looked the same and neither was said.
+  Widget _endedView() => SafeArea(
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(32),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              const Icon(Icons.call_end_rounded, size: 40, color: Colors.white38),
+              const SizedBox(height: 20),
+              const Text('Call ended',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 19,
+                      fontWeight: FontWeight.w700)),
+              if (_endedBecause != null) ...[
+                const SizedBox(height: 8),
+                Text(_endedBecause!,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        color: Colors.white54, fontSize: 13.5, height: 1.5)),
+              ],
+              if (_bothPresentAt != null) ...[
+                const SizedBox(height: 14),
+                Text('You spoke for $_clockLabel',
+                    style: const TextStyle(color: Colors.white70, fontSize: 13)),
+              ],
+              const SizedBox(height: 26),
+              // Rejoining is the common case after a dropped connection, and
+              // there was no way to do it without backing out to a list.
+              _pillButton('Rejoin', _connect, filled: true),
+              const SizedBox(height: 10),
+              _pillButton('Done', () => Navigator.of(context).maybePop()),
+            ]),
+          ),
+        ),
+      );
+
+  Widget _pillButton(String label, VoidCallback onTap, {bool filled = false}) =>
+      Semantics(
+        button: true,
+        label: label,
+        child: GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 13),
+            decoration: BoxDecoration(
+                color: filled ? _accent : Colors.white.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12)),
+            child: Text(label,
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600)),
+          ),
+        ),
+      );
+
+  String get _clockLabel {
+    final m = _elapsed.inMinutes;
+    final s = _elapsed.inSeconds % 60;
+    if (m == 0) return '$s seconds';
+    return m == 1 ? '1 minute' : '$m minutes';
+  }
 
   Widget _callView() {
     final remoteTrack = _videoOf(_remote);
@@ -454,6 +969,41 @@ class _CallScreenState extends State<CallScreen> {
 
         _selfCard(pos, cardTrack, box),
 
+        // WHO IS THE BIG PICTURE. Persistent, and deliberately NOT inside the
+        // chrome that fades: for most of a settled call the chrome is hidden,
+        // which is exactly when the screen used to carry no identification at
+        // all. Sits above the control bar so it never collides with it.
+        Positioned(
+          left: 18,
+          right: 140, // clear of the self card's landing corner
+          bottom: MediaQuery.of(context).padding.bottom + 108,
+          child: Align(
+            alignment: Alignment.centerLeft,
+            child: _nameChip(
+              _selfIsMain ? 'You' : _remoteName,
+              _selfIsMain ? _myRole : _remoteRole,
+            ),
+          ),
+        ),
+
+        // Reconnecting, and a weak line, both said out loud. Neither state
+        // existed before; a dropped call simply froze while the timer kept
+        // running and the status dot stayed green.
+        if (_phase == _Phase.reconnecting)
+          _banner(
+            icon: Icons.wifi_tethering_rounded,
+            text: 'Reconnecting…',
+            color: _waiting,
+          )
+        else if (_remote != null &&
+            (_remoteQuality == ConnectionQuality.poor ||
+                _remoteQuality == ConnectionQuality.lost))
+          _banner(
+            icon: Icons.signal_cellular_alt_rounded,
+            text: 'Weak connection — video may freeze',
+            color: _waiting,
+          ),
+
         // POSITIONED, not just aligned. Stack(fit: StackFit.expand) forces
         // every NON-positioned child to fill the stack — so the top bar's Row
         // became full-height and centred its own contents, planting the
@@ -487,6 +1037,39 @@ class _CallScreenState extends State<CallScreen> {
       ]);
     });
   }
+
+  /// A thin notice pinned under the top bar. Always visible — a connection
+  /// problem is the one thing that must not hide with the chrome, because the
+  /// user's next move (wait, or give up and phone) depends on knowing it.
+  Widget _banner({
+    required IconData icon,
+    required String text,
+    required Color color,
+  }) =>
+      Positioned(
+        top: MediaQuery.of(context).padding.top + 74,
+        left: 0,
+        right: 0,
+        child: Center(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 7),
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.62),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: color.withValues(alpha: 0.55)),
+            ),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Icon(icon, size: 14, color: color),
+              const SizedBox(width: 7),
+              Text(text,
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600)),
+            ]),
+          ),
+        ),
+      );
 
   /// The full-bleed area when there is no video for it: nobody has joined yet,
   /// or they have their camera off. Those are different facts and the screen
@@ -587,6 +1170,43 @@ class _CallScreenState extends State<CallScreen> {
                       color: Colors.white38,
                       size: 24),
                 ),
+
+              // THE SIGNIFIER THAT WAS MISSING.
+              //
+              // Tapping this card to swap has always worked. Nothing said so —
+              // it was a bare video rectangle — so it read as "a small block
+              // you cannot make bigger", which is exactly how it was reported.
+              // The interaction did not need building; the invitation did.
+              Positioned(
+                left: 6,
+                top: 6,
+                child: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.5),
+                    borderRadius: BorderRadius.circular(7),
+                  ),
+                  child: const Icon(Icons.swap_horiz_rounded,
+                      size: 13, color: Colors.white),
+                ),
+              ),
+
+              // And who this small one is, for the same reason the big one is
+              // labelled: so neither picture is ever anonymous.
+              Positioned(
+                left: 5,
+                right: 5,
+                bottom: 5,
+                child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: _nameChip(
+                    _selfIsMain ? _remoteName : 'You',
+                    _selfIsMain ? _remoteRole : _myRole,
+                    compact: true,
+                  ),
+                ),
+              ),
+
               if (!_micOn && !_selfIsMain)
                 Positioned(
                   right: 6,
@@ -726,7 +1346,7 @@ class _CallScreenState extends State<CallScreen> {
                       button: true,
                       label: S.now.uiLeaveCall,
                       child: GestureDetector(
-                        onTap: _leave,
+                        onTap: _confirmLeave,
                         behavior: HitTestBehavior.opaque,
                         child: Container(
                           width: 74,

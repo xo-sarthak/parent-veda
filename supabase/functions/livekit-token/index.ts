@@ -10,10 +10,16 @@
 //  SLOT, so the mother and the expert of the same session land in the same room
 //  automatically.
 //
-//  That gate lives in POSTGRES, not here — join_room_for_booking() in 0075.
-//  This file signs a JWT and nothing else, which is the only thing that has to
-//  happen outside the database. It holds no service-role credential; read 0075
-//  for why it used to, and what that cost.
+//  That gate lives in POSTGRES, not here — join_context_for_booking() in 0076
+//  (which succeeded join_room_for_booking() in 0075; that one is kept as the
+//  fallback for a half-finished deploy). This file signs a JWT and nothing
+//  else, which is the only thing that has to happen outside the database. It
+//  holds no service-role credential; read 0075 for why it used to, and what
+//  that cost.
+//
+//  0076 also gives it the caller's ROLE, which is stamped into the token as
+//  `metadata` and echoed in the response. Before that, doctor and parent got
+//  byte-identical tokens and neither app could tell you who was on the call.
 //
 //  DEPLOY:
 //    supabase functions deploy livekit-token
@@ -46,6 +52,21 @@ const json = (body: unknown, status = 200) => {
     status,
     headers: { ...cors, "Content-Type": "application/json" },
   });
+};
+
+// What join_context_for_booking (0076) answers with. `ok: false` is a CLOCK
+// refusal and carries a reason; the ownership refusals never reach here at all
+// because the database returns null for those.
+type JoinContext = {
+  ok: boolean;
+  reason?: string;
+  slot_id?: string;
+  role?: "parent" | "expert";
+  capacity?: number;
+  starts_utc?: string;
+  ends_utc?: string;
+  counterpart?: string;
+  opens_utc?: string;
 };
 
 // --- minimal JWT (HS256), the format LiveKit expects -----------------------
@@ -102,10 +123,10 @@ serve(async (req) => {
     const { data: { user } } = await authClient.auth.getUser();
     if (!user) return json({ error: "not authenticated" }, 401);
 
-    // AUTHORISE — in the database, not here. join_room_for_booking (0075) is
-    // security definer and answers with the SLOT ID if this caller may join
-    // (the parent who booked it, or the expert hosting it via my_expert_ids),
-    // and null otherwise.
+    // AUTHORISE — in the database, not here. join_context_for_booking (0076)
+    // is security definer and answers with the SLOT ID *and the caller's ROLE*
+    // if this caller may join (the parent who booked it, or the expert hosting
+    // it via my_expert_ids), and null otherwise.
     //
     // THIS USED TO USE A SERVICE-ROLE CLIENT and it is why joining was broken:
     // the elevated client could not read the table, the `error` was discarded
@@ -115,23 +136,82 @@ serve(async (req) => {
     // there is no second way to be unauthenticated here.
     //
     // It is also less authority: this function can no longer read any row in
-    // any table, only ask one yes/no question about one booking.
-    const { data: slotId, error: authErr } = await authClient
-      .rpc("join_room_for_booking", { p_booking_id: bookingId });
+    // any table, only ask one question about one booking.
+    //
+    // WHY THE FALLBACK BELOW EXISTS. A migration and an edge function deploy
+    // are two commands, run by a human, in some order. If this function ships
+    // first, `join_context_for_booking` does not exist yet and every join
+    // would 500 — a self-inflicted outage on the one path that was working.
+    // Falling back to 0075's narrower answer means the worst case of a
+    // half-finished deploy is "no role metadata", which the app already
+    // tolerates, rather than "nobody can join".
+    let ctx: JoinContext | null = null;
 
-    // Keep the error. A failed CALL and a refused ANSWER are different facts
-    // and must not share a message — conflating them is the exact bug above.
-    if (authErr) {
-      return json({
-        error: "authorisation lookup failed",
-        detail: authErr.message,
-        hint: "is migration 0075 applied?",
-      }, 500);
-    }
-    if (!slotId) {
+    const { data: ctxRaw, error: ctxErr } = await authClient
+      .rpc("join_context_for_booking", { p_booking_id: bookingId });
+
+    if (ctxErr) {
+      // Distinguish "not deployed yet" from "genuinely broken". Postgres
+      // reports an unknown function as 42883; anything else is a real fault
+      // and must not be silently papered over by the fallback.
+      const undeployed = ctxErr.code === "42883" ||
+        /join_context_for_booking/.test(ctxErr.message ?? "");
+      if (!undeployed) {
+        return json({
+          error: "authorisation lookup failed",
+          detail: ctxErr.message,
+          hint: "is migration 0076 applied?",
+        }, 500);
+      }
+
+      console.warn("livekit-token: 0076 not applied, falling back to 0075");
+      const { data: slotId, error: legacyErr } = await authClient
+        .rpc("join_room_for_booking", { p_booking_id: bookingId });
+
+      // Keep the error. A failed CALL and a refused ANSWER are different facts
+      // and must not share a message — conflating them is the exact bug above.
+      if (legacyErr) {
+        return json({
+          error: "authorisation lookup failed",
+          detail: legacyErr.message,
+          hint: "is migration 0075 applied?",
+        }, 500);
+      }
+      if (!slotId) return json({ error: "not your session", bookingId }, 403);
+
+      // No role, no capacity, no window — exactly the pre-0076 behaviour.
+      ctx = { ok: true, slot_id: String(slotId) };
+    } else if (!ctxRaw) {
       // Deliberately one message for "no such booking" and "not yours": the
       // database returns null for both so ids cannot be probed from here.
       return json({ error: "not your session", bookingId }, 403);
+    } else {
+      ctx = ctxRaw as JoinContext;
+    }
+
+    // A CLOCK refusal, unlike an ownership refusal, is safe to explain — by
+    // the time the database checked the time it had already established the
+    // caller owns this booking. Pass the reason and the timestamp straight
+    // through so the app can say "opens at 4:50 PM" instead of one generic
+    // sentence covering six unrelated causes.
+    if (ctx.ok === false) {
+      return json({
+        error: "outside session window",
+        reason: ctx.reason,
+        opensUtc: ctx.opens_utc,
+        startsUtc: ctx.starts_utc,
+        endsUtc: ctx.ends_utc,
+      }, 403);
+    }
+
+    // Belt and braces: an `ok: true` with no slot id cannot happen — 0076
+    // builds them in the same jsonb_build_object — but the room name is the
+    // one value where being wrong is silent. `bkroom_undefined` is a VALID
+    // LiveKit room, so the two parties would each sit alone in it, connected,
+    // waiting for someone who is in the identical room on the other device.
+    const slotId = ctx.slot_id;
+    if (!slotId) {
+      return json({ error: "no room for this booking", bookingId }, 500);
     }
 
     // WHOSE NAME GOES OVER THE VIDEO.
@@ -163,13 +243,55 @@ serve(async (req) => {
     // Same slot -> same room, so both parties meet.
     const room = `bkroom_${slotId}`;
     const now = Math.floor(Date.now() / 1000);
+
+    // HOW LONG THE TOKEN IS GOOD FOR.
+    //
+    // It was a flat four hours for everything, which for a 30-minute consult
+    // means a credential that outlives its session by seven times. Tie it to
+    // the session the caller actually bought, plus a generous tail so an
+    // overrunning consult and a mid-call reconnect both still work.
+    //
+    // Only for consults. A class keeps the old four hours, because narrowing
+    // it would change group behaviour and that is a separate pass.
+    const isConsult = ctx.capacity === 1;
+    let exp = now + 4 * 3600;
+    if (isConsult && ctx.ends_utc) {
+      const endsSec = Math.floor(Date.parse(ctx.ends_utc) / 1000);
+      // Never SHORTER than half an hour from now: a token that expires while
+      // someone is still connecting is a worse failure than a slightly long one.
+      if (Number.isFinite(endsSec)) {
+        exp = Math.max(endsSec + 30 * 60, now + 30 * 60);
+      }
+    }
+
+    // ROLE TRAVELS WITH THE SESSION, NOT WITH THE CALL SITE.
+    //
+    // Before this, the apps inferred "am I the doctor or the parent?" from
+    // which screen happened to push the call and what strings it passed as
+    // widget arguments. That is not an identity, it is a coincidence — and it
+    // is why the two apps looked identical in a call.
+    //
+    // LiveKit hands `metadata` to every participant about every other
+    // participant, so stamping it here means both sides learn each other's
+    // role from the server that already verified it, with no extra round trip
+    // and nothing the client can assert about itself.
+    //
+    // NOTE: canPublish stays true for everyone. Deriving publish rights from
+    // role is the correct end state, but it would change what happens in a
+    // group class — and group calls are deliberately untouched in this pass.
     const token = await signJwt(
       {
-        exp: now + 4 * 3600, // good for the session
+        exp,
         iss: LK_KEY,
         nbf: now,
         sub: user.id, // participant identity
         name: display.slice(0, 40),
+        metadata: JSON.stringify({
+          role: ctx.role ?? "",
+          capacity: ctx.capacity ?? 0,
+          startsUtc: ctx.starts_utc ?? "",
+          endsUtc: ctx.ends_utc ?? "",
+        }),
         video: {
           room,
           roomJoin: true,
@@ -181,7 +303,19 @@ serve(async (req) => {
       LK_SECRET,
     );
 
-    return json({ url: LK_URL, token, room });
+    return json({
+      url: LK_URL,
+      token,
+      room,
+      // Echoed for the app: it needs the role and the window to lay the call
+      // screen out BEFORE the room connects, and reading its own JWT to find
+      // out would mean parsing a credential to learn a fact we already know.
+      role: ctx.role ?? "",
+      capacity: ctx.capacity ?? 0,
+      startsUtc: ctx.starts_utc ?? "",
+      endsUtc: ctx.ends_utc ?? "",
+      counterpart: ctx.counterpart ?? "",
+    });
   } catch (e) {
     console.error("livekit-token threw", e);
     return json({ error: String(e) }, 500);

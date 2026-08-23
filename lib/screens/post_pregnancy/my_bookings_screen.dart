@@ -8,10 +8,15 @@
 //  the whole point of one engine — each carrying a small tag so she can tell
 //  which journey a session belongs to.
 //
-//  The live-call button is intentionally honest: until a joinUrl exists (the
-//  Zoom decision is still open) a session in its join window shows "Link coming"
-//  rather than a dead button. Everything else — credits, reminders, cancel —
-//  is fully live today.
+//  STALE NOTE, CORRECTED. This used to say a session shows "Link coming" until
+//  a joinUrl exists, "while the Zoom decision is still open". Both are history:
+//  the call is LiveKit and in-app, and there is no link at all — the room is
+//  derived from the booking's slot server-side, so the two parties converge
+//  without one. `Booking.joinUrl` survives as a null field for that reason.
+//
+//  What the button is honest about NOW is the clock. A consultation is joinable
+//  from ten minutes before until it ends, and outside that it says when it
+//  opens; a class stays joinable throughout, unchanged. See _upcomingCard.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -19,8 +24,10 @@ import 'package:flutter/material.dart';
 import '../../booking/booking_catalog.dart';
 import '../../booking/booking_models.dart';
 import '../../booking/booking_store.dart';
+import '../../booking/call_prejoin_screen.dart';
 import '../../booking/call_screen.dart';
 import '../../booking/prescription.dart';
+import '../../booking/prescription_watch.dart';
 import '../../services/notification_service.dart';
 import '../../widgets/global_ask_fab.dart' show kCallRoute;
 import 'problem_solver_screen.dart';
@@ -52,12 +59,17 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
     // is the clearest possible statement of "show me my bookings", so it is the
     // right moment to ask the server rather than trust whatever is cached.
     BookingStore.instance.refreshFromServer();
+    // And settle anything that has finished, from whether she actually joined
+    // rather than from the clock alone. See BookingStore.settleAttendance.
+    BookingStore.instance.settleAttendance();
   }
 
   Future<void> _pullToRefresh() async {
     await Future.wait([
       BookingStore.instance.refreshFromServer(),
-      PrescriptionStore.instance.refresh(),
+      BookingStore.instance.settleAttendance(),
+      // force: a deliberate pull is exactly the moment to skip the throttle.
+      PrescriptionWatch.instance.check(force: true),
     ]);
   }
 
@@ -124,6 +136,14 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                     style: ppBody(14, h: 1.5))),
                 const SizedBox(height: 22),
 
+                // A FRESH PRESCRIPTION, ABOVE EVERYTHING.
+                //
+                // Its only home used to be a link on a row in the PAST list,
+                // below credits, below every upcoming session. Something a
+                // doctor wrote this morning about medicine to take today does
+                // not belong at the bottom of a history.
+                ..._freshPrescription(),
+
                 if (credits.isNotEmpty) ...[
                   _pad(_sectionLabel('Credits')),
                   const SizedBox(height: 10),
@@ -158,6 +178,74 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
         ),
       ),
     );
+  }
+
+  /// How long a prescription counts as "fresh" and gets top billing.
+  ///
+  /// Seven days is roughly the length of a short course, and long enough that a
+  /// mother who did not open the app for a few days still finds it waiting
+  /// rather than filed. After that it is history, and history has a section.
+  static const _freshFor = Duration(days: 7);
+
+  List<Widget> _freshPrescription() {
+    final now = DateTime.now().toUtc();
+    Prescription? newest;
+    Booking? forBooking;
+    for (final b in BookingStore.instance.bookings()) {
+      final rx = PrescriptionStore.instance.forBooking(b.id);
+      if (rx == null) continue;
+      if (now.difference(rx.createdUtc) > _freshFor) continue;
+      if (newest == null || rx.createdUtc.isAfter(newest.createdUtc)) {
+        newest = rx;
+        forBooking = b;
+      }
+    }
+    if (newest == null || forBooking == null) return const [];
+
+    final rx = newest;
+    final b = forBooking;
+    final n = rx.items.where((i) => !i.isEmpty).length;
+    return [
+      _pad(GestureDetector(
+        onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+            builder: (_) =>
+                PrescriptionViewScreen(prescription: rx, title: b.title))),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
+          decoration: BoxDecoration(
+            color: ppPurple.withValues(alpha: 0.07),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: ppPurple.withValues(alpha: 0.22)),
+          ),
+          child: Row(children: [
+            const Icon(Icons.medication_outlined, size: 20, color: ppPurple),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Your prescription is ready',
+                        style: ppJakarta(14.5, color: ppTitleInk)),
+                    const SizedBox(height: 3),
+                    Text(
+                      n == 0
+                          ? 'Advice from ${b.title}'
+                          : n == 1
+                              ? '1 medicine · ${b.title}'
+                              : '$n medicines · ${b.title}',
+                      style: ppBody(12, color: ppSoft),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ]),
+            ),
+            const Icon(Icons.chevron_right_rounded, size: 20, color: ppPurple),
+          ]),
+        ),
+      )),
+      const SizedBox(height: 18),
+    ];
   }
 
   Widget _sectionLabel(String t) => Text(t.toUpperCase(),
@@ -195,11 +283,33 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
 
   // ---- upcoming -------------------------------------------------------------
 
+  /// Is this booking a one-to-one consultation?
+  ///
+  /// The switch for everything that changed in the consult pass. A class takes
+  /// the path it always took — including the always-joinable behaviour below,
+  /// which is wrong for a consult and is deliberately still there for a class.
+  bool _isConsult(Booking b) =>
+      BookingCatalog.instance.offeringById(b.offeringId)?.kind ==
+      OfferingKind.consult;
+
   Widget _upcomingCard(Booking b) {
-    // Any upcoming booking can be joined (a "waiting room" model) — friendlier
-    // than a strict 10-min gate, and it makes the call testable before a slot's
-    // real time. Tighten to b.joinableAt(now) later if you want a hard window.
-    final joinable = b.isUpcoming;
+    // WHY THIS IS NOW TWO RULES.
+    //
+    // It used to be `b.isUpcoming` for everything, with a note saying to
+    // tighten it later. `isUpcoming` is a pure STATUS check, and the list this
+    // card is built from has already filtered to future sessions — so the
+    // condition was always true, every upcoming booking showed a live
+    // "Join now", and the `Reminder set` branch below was unreachable.
+    //
+    // For a class that is harmless and arguably friendly. For a consult it
+    // meant a parent could walk into her doctor's room three weeks early, sit
+    // alone with a running timer, and be told the app was "waiting for Dr.
+    // Neha" — for an appointment that had not happened. Booking.joinableAt()
+    // has described the right window all along and had no callers.
+    //
+    // The server agrees with this rule rather than trusting it: 0076 refuses a
+    // consult outside the same window. This is the affordance, not the gate.
+    final joinable = _isConsult(b) ? b.joinableAt(DateTime.now()) : b.isUpcoming;
     return ppCard(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -240,9 +350,15 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
 
   Widget _joinButton(Booking b, bool joinable) {
     // "Join now" is live in the join window — the LiveKit room is derived from
-    // the booking server-side, so no link is needed. Outside the window it's a
-    // quiet "Reminder set".
-    final label = joinable ? 'Join now' : 'Reminder set';
+    // the booking server-side, so no link is needed.
+    //
+    // Outside the window it used to read "Reminder set", which was both
+    // unreachable (see _upcomingCard) and a claim rather than an answer: it
+    // told her what WE had done instead of what SHE can do. Now the closed
+    // state says when the door opens, which is the only thing she wants from
+    // a button she cannot press. The 1-hour reminder is still scheduled — see
+    // _scheduleReminders — it just no longer has to be the button's excuse.
+    final label = joinable ? 'Join now' : _opensLabel(b);
     final icon = joinable
         ? Icons.videocam_rounded
         : Icons.notifications_active_outlined;
@@ -269,6 +385,22 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
     );
   }
 
+  /// What the button says when the room is not open yet.
+  ///
+  /// A time, not a status. "Opens 4:50 PM" answers the question; "Reminder set"
+  /// answers a different one nobody asked.
+  String _opensLabel(Booking b) {
+    if (!b.isUpcoming) return 'Closed';
+    final opens = b.startsUtc.subtract(const Duration(minutes: 10));
+    final wait = opens.difference(DateTime.now().toUtc());
+    if (wait.isNegative) return 'Closed';
+    if (wait.inMinutes < 60) {
+      final m = wait.inMinutes < 1 ? 1 : wait.inMinutes;
+      return 'Opens in $m min';
+    }
+    return 'Opens ${_timeLabel(b.startsUtc.subtract(const Duration(minutes: 10)))}';
+  }
+
   void _openCall(Booking b) {
     // Who she is waiting for, by name. Derived from the offering rather than
     // stored on the booking: the booking records WHAT was bought, and the
@@ -278,13 +410,28 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
     final who = (expertId == null || expertId.isEmpty)
         ? null
         : expertById(expertId).name;
+
+    // A CONSULTATION GETS A DOOR BEFORE THE ROOM.
+    //
+    // Camera and microphone consent, a look at yourself, and the choice of what
+    // the doctor sees — all before going live, rather than discovering the
+    // answer by being on air. A class keeps the straight-to-room path: nothing
+    // about group sessions is being changed in this pass.
+    final consult = _isConsult(b);
+
     Navigator.of(context).push(
       MaterialPageRoute<void>(
         // Named so GlobalAskFab suppresses itself — it floats above the
         // Navigator and would otherwise sit on the doctor's face.
         settings: const RouteSettings(name: kCallRoute),
-        builder: (_) =>
-            CallScreen(bookingId: b.id, title: b.title, waitingFor: who),
+        builder: (_) => consult
+            ? CallPrejoinScreen(
+                bookingId: b.id,
+                title: b.title,
+                waitingFor: who,
+                startsUtc: b.startsUtc,
+              )
+            : CallScreen(bookingId: b.id, title: b.title, waitingFor: who),
       ),
     );
   }

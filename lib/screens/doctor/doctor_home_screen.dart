@@ -10,7 +10,7 @@
 import 'package:flutter/material.dart';
 
 import '../../booking/booking_models.dart';
-import '../../booking/call_screen.dart';
+import '../../booking/call_prejoin_screen.dart';
 import '../../doctor/doctor_directory.dart';
 import '../../doctor/doctor_roster.dart';
 import '../../care_partner/care_partner_models.dart';
@@ -233,16 +233,48 @@ class DoctorHomeScreen extends StatelessWidget {
   Widget _callCard(BuildContext context, Booking b) => ppCard(
         padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            const Icon(Icons.person_outline_rounded, size: 18, color: ppPurple),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Text(b.title,
-                  style: ppJakarta(15, color: ppTitleInk),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis),
-            ),
-          ]),
+          // THE PATIENT, NOT THE PRODUCT.
+          //
+          // This printed `b.title`, which for a consultation reads
+          // "Consult · Dr. Neha Sharma" — so a doctor's own dashboard listed
+          // their own name over and over under a person icon, and never said
+          // who was actually coming. Appointments was fixed for this; the
+          // dashboard, which is the screen they look at first, was not.
+          //
+          // Same roster lookup Appointments uses, so the two cannot drift.
+          Builder(builder: (_) {
+            final patient =
+                DoctorRoster.instance.patientFor(b.id, stage: b.stage);
+            final context = patient.contextLine(b.startsUtc);
+            return Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(top: 1),
+                    child: Icon(Icons.person_outline_rounded,
+                        size: 18, color: ppPurple),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(patient.name,
+                              style: ppJakarta(15, color: ppTitleInk),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis),
+                          if (context.isNotEmpty)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 2),
+                              child: Text(context,
+                                  style: ppBody(12, color: ppSoft),
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis),
+                            ),
+                        ]),
+                  ),
+                ]);
+          }),
           const SizedBox(height: 6),
           Row(children: [
             const Icon(Icons.event_rounded, size: 14, color: ppSoft),
@@ -256,13 +288,17 @@ class DoctorHomeScreen extends StatelessWidget {
               child: GestureDetector(
                 onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
                     settings: const RouteSettings(name: kCallRoute),
-                    builder: (_) => CallScreen(
+                    // Through the green room, same as Appointments. This card
+                    // is today's CONSULT — group sessions are the inert rows
+                    // further down and are untouched.
+                    builder: (_) => CallPrejoinScreen(
                           bookingId: b.id,
                           title: b.title,
                           displayName: _myName(),
                           waitingFor: DoctorRoster.instance
                               .patientFor(b.id, stage: b.stage)
                               .name,
+                          startsUtc: b.startsUtc,
                         ))),
                 behavior: HitTestBehavior.opaque,
                 child: Container(

@@ -2,10 +2,14 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>audio</string>
+	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>ParentVeda uses the microphone so you can record voice notes in your journal.</string>
+	<string>ParentVeda uses the microphone for your live video consultations with doctors and experts, and so you can record voice notes in your journal.</string>
 	<key>NSSpeechRecognitionUsageDescription</key>
 	<string>ParentVeda uses speech recognition to turn your spoken words into journal text.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
@@ -15,7 +19,7 @@
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>ParentVeda can add the place to a journal entry you are writing, only when you tap to use it. It is never used to track you.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>ParentVeda lets you capture photo memories for your journal.</string>
+	<string>ParentVeda uses the camera for your live video consultations with doctors and experts, and so you can capture photo memories for your journal.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
