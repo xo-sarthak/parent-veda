@@ -10,6 +10,8 @@
 import 'package:flutter/material.dart';
 
 import '../../booking/booking_models.dart';
+import '../../booking/booking_catalog.dart';
+import '../../booking/server_slots.dart';
 import '../../booking/call_prejoin_screen.dart';
 import '../../doctor/doctor_directory.dart';
 import '../../doctor/doctor_roster.dart';
@@ -19,7 +21,10 @@ import '../../doctor/doctor_session.dart';
 import '../post_pregnancy/pp_common.dart';
 import '../post_pregnancy/pp_experts_data.dart';
 import '../../widgets/global_ask_fab.dart' show kCallRoute;
-import 'doctor_availability_screen.dart';
+// Retired: the old weekly grid. Its data lands in `doctor_availability`,
+// which the booking path does not read. Kept for revert.
+// import 'doctor_availability_screen.dart';
+import 'doctor_schedule_screen.dart';
 import 'doctor_prescription_screen.dart';
 
 class DoctorHomeScreen extends StatelessWidget {
@@ -89,13 +94,33 @@ class DoctorHomeScreen extends StatelessWidget {
               const SizedBox(height: 22),
               _pad(_sectionLabel('Your sessions')),
               const SizedBox(height: 10),
-              for (final o in sessions) _pad(_sessionRow(o)),
+              for (final o in sessions) _pad(_sessionRow(context, o)),
             ],
 
             const SizedBox(height: 22),
+            // TWO DOORS, TWO DIFFERENT SCREENS — and only one of them reached a
+            // parent.
+            //
+            // The nav tab labelled "Availability" opens DoctorScheduleScreen,
+            // which saves to `doctor_schedule` and IS what generates the slots
+            // a parent is offered. This card opened DoctorAvailabilityScreen —
+            // the retired weekly grid, which writes to `doctor_availability`,
+            // a table nothing in the booking path reads.
+            //
+            // So a doctor's hours reached parents or vanished depending on
+            // which of two identically-named entrances they happened to use.
+            // Nothing errored; the retired screen saved perfectly well, to
+            // somewhere with no readers.
+            //
+            // Retiring a screen means retiring its DOORS. This one was missed
+            // because doctor_scaffold's import was commented out and this file
+            // has its own.
+            //
+            // Kept for revert:
+            //   builder: (_) => const DoctorAvailabilityScreen(),
             _pad(GestureDetector(
               onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
-                  builder: (_) => const DoctorAvailabilityScreen())),
+                  builder: (_) => const DoctorScheduleScreen())),
               behavior: HitTestBehavior.opaque,
               child: _availabilityCard(),
             )),
@@ -346,15 +371,65 @@ class DoctorHomeScreen extends StatelessWidget {
         ]),
       );
 
-  Widget _sessionRow(Offering o) => Container(
-        margin: const EdgeInsets.only(bottom: 8),
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: ppHair),
-        ),
-        child: Row(children: [
+  /// A class this expert runs — and, at last, a way into it.
+  ///
+  /// THIS ROW USED TO BE A DEAD END. It was a bare Container: an icon, a title
+  /// and the word "Masterclass". No GestureDetector, no date, no start button.
+  /// Group sessions also never appeared in Appointments, which filters to
+  /// consults. So the product could sell a masterclass, let forty parents join
+  /// it, and offer the teacher no route in at all — every join function
+  /// resolved a room FROM A BOOKING, and a host has no booking at their own
+  /// class.
+  ///
+  /// `open_session_room` (0079) is the front door; this is the handle on it.
+  Widget _sessionRow(BuildContext context, Offering o) {
+    // sessionSlotsFor, NOT slotsFor. The parent-facing one drops slots that are
+    // full or already running, which is right for somebody choosing a seat and
+    // catastrophic for the person teaching: it would take the host's session
+    // away at the exact moment it started, and hide a sold-out class from the
+    // one person who has to turn up to it.
+    final slots = BookingCatalog.instance.sessionSlotsFor(o.id);
+    final next = slots.isEmpty ? null : slots.first;
+
+    final now = DateTime.now().toUtc();
+
+    // HAS ANYBODY ACTUALLY BOOKED THIS?
+    //
+    // It decides what the date means. A generated class date is `now + 5..8
+    // days`, recomputed every time it is read — so it is ALWAYS in the future
+    // and a window check against it can never open. That is why this button
+    // could never light up, even once everything behind it worked.
+    //
+    // `booking_slots.starts_utc` is written once and never moves, so:
+    //
+    //   the ledger has a row -> that is the real date; hold the host to it.
+    //   no row               -> nobody has booked. There is no appointment to
+    //                           be late for, and the host may go live now.
+    //
+    // See ServerSlotStore. The real scheduling of programmes is admin-panel
+    // work (STILL-OPEN §5.1c); until it exists, the first real event IS the
+    // schedule.
+    final scheduled = next != null && ServerSlotStore.instance.isReal(next.id);
+
+    // Half an hour of lead, against the ten minutes an attendee gets: a teacher
+    // who can only enter when their students can is a teacher always setting up
+    // in public. The server holds the same rule (0079); this only decides
+    // whether the button looks live.
+    final openable = next != null &&
+        (!scheduled ||
+            (now.isAfter(next.startsUtc.subtract(const Duration(minutes: 30))) &&
+                now.isBefore(next.endsUtc.add(const Duration(minutes: 15)))));
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      padding: const EdgeInsets.fromLTRB(15, 13, 15, 13),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: ppHair),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
           Icon(
               o.kind == OfferingKind.cohort
                   ? Icons.groups_outlined
@@ -371,6 +446,91 @@ class DoctorHomeScreen extends StatelessWidget {
           Text(o.kind == OfferingKind.cohort ? 'Cohort' : 'Masterclass',
               style: ppBody(11, color: ppMuted, w: FontWeight.w700)),
         ]),
+        if (next != null) ...[
+          const SizedBox(height: 8),
+          Row(children: [
+            Icon(scheduled ? Icons.event_rounded : Icons.podcasts_rounded,
+                size: 14, color: ppSoft),
+            const SizedBox(width: 6),
+            Expanded(
+              child: Text(
+                // Only claim a date when there IS one. Printing the generated
+                // placeholder would tell a teacher their class is next Friday
+                // when in truth nobody has booked and it happens when they say.
+                scheduled
+                    ? '${_when(next.startsUtc)} · ${next.booked} of ${next.capacity} booked'
+                    : 'No bookings yet · start whenever you are ready',
+                style: ppBody(12, color: ppSoft),
+              ),
+            ),
+          ]),
+          const SizedBox(height: 10),
+          GestureDetector(
+            onTap: openable
+                ? () => Navigator.of(context).push(MaterialPageRoute<void>(
+                      settings: const RouteSettings(name: kCallRoute),
+                      builder: (_) => CallPrejoinScreen(
+                        // A host has no booking id. The slot IS the session.
+                        bookingId: '',
+                        title: o.title,
+                        displayName: _myName(),
+                        waitingFor: o.title,
+                        startsUtc: scheduled ? next.startsUtc : now,
+                        // An unbooked class is seeded AT THE MOMENT the host
+                        // starts it, not at the generated placeholder date —
+                        // otherwise open_session_room would write a row saying
+                        // the session is next Friday and then refuse to open it
+                        // for another five days.
+                        hostSlot: scheduled ? next : _startingNow(next, now),
+                      ),
+                    ))
+                : null,
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              height: 40,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: openable ? ppPurple : ppPanel,
+                borderRadius: BorderRadius.circular(11),
+              ),
+              child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                Icon(
+                    openable
+                        ? Icons.podcasts_rounded
+                        : Icons.schedule_rounded,
+                    size: 16,
+                    color: openable ? Colors.white : ppSoft),
+                const SizedBox(width: 7),
+                Text(
+                  openable
+                      ? (scheduled ? 'Start session' : 'Go live')
+                      : 'Opens 30 min before',
+                  style: ppBody(13,
+                      color: openable ? Colors.white : ppSoft,
+                      w: FontWeight.w700),
+                ),
+              ]),
+            ),
+          ),
+        ],
+      ]),
+    );
+  }
+
+  /// The same slot, dated NOW — for a class nobody has booked.
+  ///
+  /// The generated date is a placeholder that moves every day, so seeding the
+  /// ledger with it would write a lie into the one row that is supposed to be
+  /// authoritative. Starting the session IS the schedule, for as long as
+  /// programmes have no real one.
+  static Slot _startingNow(Slot s, DateTime now) => Slot(
+        id: s.id,
+        offeringId: s.offeringId,
+        expertId: s.expertId,
+        startsUtc: now,
+        durationMin: s.durationMin,
+        capacity: s.capacity,
+        booked: s.booked,
       );
 
   Widget _availabilityCard() => Container(

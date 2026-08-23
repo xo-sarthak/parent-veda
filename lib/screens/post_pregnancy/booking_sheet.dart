@@ -21,7 +21,11 @@ import '../../booking/booking_catalog.dart';
 import '../../booking/booking_models.dart';
 import '../../booking/booking_store.dart';
 import '../../booking/payment_service.dart';
-import '../../doctor/doctor_availability.dart';
+// Retired: DoctorAvailability is the old weekly-grid store, replaced by
+// DoctorSchedule. Nothing in the slot path reads it. Kept for revert.
+// import '../../doctor/doctor_availability.dart';
+import '../../booking/server_slots.dart';
+import '../../doctor/doctor_schedule_store.dart';
 import 'my_bookings_screen.dart';
 import 'pp_common.dart';
 
@@ -55,9 +59,30 @@ class _BookingSheetState extends State<_BookingSheet> {
     super.initState();
     // For a consult, pull the doctor's real availability so the slots shown are
     // the times THEY set, not the generated fallback. Rebuilds when it lands.
+    //
+    // ⚠️ THIS USED TO SYNC THE WRONG STORE, and the comment above is exactly
+    // why it went unnoticed: it described the right intention next to the wrong
+    // object. It called DoctorAvailability.syncFromServer() — the RETIRED
+    // weekly-grid store, replaced by DoctorSchedule. `booking_catalog.dart`
+    // contains no reference to DoctorAvailability at all; consult slots come
+    // from DoctorScheduleStore (`hasSetUp`, then `_fromSchedule`).
+    //
+    // So the one moment freshness actually matters — a parent looking at a
+    // doctor's times, about to pick one — fetched a table nothing renders, and
+    // the slots on screen stayed as stale as whenever the app last launched.
+    //
+    // Nothing failed. The wrong data arrived successfully.
+    //
+    // Kept for revert:
+    //   DoctorAvailability.instance.syncFromServer();
     if (o.kind == OfferingKind.consult) {
-      DoctorAvailability.instance.syncFromServer();
+      DoctorScheduleStore.instance.syncFromServer();
     }
+    // And the REAL seat counts, for every kind. The numbers on a group slot
+    // used to be generated from a hash of the offering id — see ServerSlotStore
+    // — so "60 seats left" was a stable fiction rather than a fact about the
+    // ledger a buyer is about to join.
+    ServerSlotStore.instance.refresh();
   }
 
   /// Buy → Razorpay checkout (order + pay + verify) → mint the entitlement.
@@ -86,8 +111,14 @@ class _BookingSheetState extends State<_BookingSheet> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: Listenable.merge(
-          [BookingStore.instance, DoctorAvailability.instance]),
+      // Same swap as initState, and it has to be both: syncing the right store
+      // while listening to the old one would fetch fresh slots and never
+      // repaint them. Kept for revert: DoctorAvailability.instance.
+      animation: Listenable.merge([
+        BookingStore.instance,
+        DoctorScheduleStore.instance,
+        ServerSlotStore.instance,
+      ]),
       builder: (context, _) {
         return SafeArea(
           top: false,

@@ -1347,7 +1347,127 @@ Two things worth copying from it:
 The general rule: an inference is a guess wearing the clothes of a fact. If the
 thing you are guessing at happened inside your own app, record it.
 
-## 16. Reading list, in order
+## 16. A permission a client grants itself is not a permission
+
+From the group-session pass (`0079`, `livekit-moderate`). Two rules, and the
+second is the one that is easy to get wrong for years.
+
+### (a) Enforce where the thing being protected lives.
+
+A masterclass token granted `canPublish: true` to everyone, and the client
+turned the camera on at connect — so fifty attendees were fifty live video
+feeds. The tempting fix is a client-side one: *don't* turn the camera on for an
+attendee. It looks identical in testing and it is not the same thing at all.
+
+The camera is published to the **media server**, so the media server is the only
+thing that can refuse it. A client that politely declines to publish is a client
+that could be modified to publish anyway, and the first person to notice would
+be forty parents in someone's living room. So the permission is decided in
+Postgres, stamped into the token, and enforced by LiveKit:
+
+```
+capacity = 1   parent | expert     -> can_publish = true   (a conversation)
+capacity > 1   attendee | host     -> host only            (a broadcast)
+```
+
+The client still receives `canPublish` — but as a **mirror**, used to lay the
+screen out and to avoid offering a button that cannot work. Never as the
+enforcement.
+
+Same reasoning for the host controls. "Mute everyone" cannot be a local button:
+a LiveKit client governs its own tracks and nobody else's, so the best a phone
+can do is *ask* forty clients to mute themselves — which a modified one ignores
+and an offline one never hears. `livekit-moderate` mutes at the server through
+the RoomService API, using an admin token scoped to **one room** and living
+**sixty seconds**. Slower, and true.
+
+The general form: **if you cannot state which component would refuse a
+determined attacker, you have written a suggestion, not a permission.**
+
+### (b) A number shown to a buyer must come from the ledger.
+
+`booking_catalog` generated group seat counts like this:
+
+```dart
+capacity: 100, seatsTaken: 40 + seed % 45   // seed = hash of the offering id
+```
+
+Stable between reads — which is precisely what made it convincing — and
+unrelated to whether one person had booked or none had. The server row mean­while
+started at `booked = 0` and counted only real bookings, so the two numbers were
+never the same number and the one a buyer saw was the invented one.
+
+This survived because it never *looked* wrong. A fabricated number that changes
+would be caught in a day; a deterministic one reads as data forever.
+
+The fix has a shape worth reusing when server truth meets a synchronous UI:
+`slotsFor()` is called from `build` and cannot await, so `ServerSlotStore` pulls
+into memory and the read stays synchronous — the same pattern as
+`DoctorScheduleStore`. And the fallback is **zero, not a guess**: a slot the
+server has never heard of has no bookings, because `booking_slots` self-seeds.
+Understating can only ever offer a seat that turns out to be gone, which
+`book_slot` refuses atomically anyway. Overstating sells a room that is not
+there.
+
+### (c) A value recomputed from `now` is not a schedule.
+
+The one the review nearly missed, and the best example in the file of a bug
+that is invisible in every single reading.
+
+A one-off class generated its date like this:
+
+```dart
+final local = from.toLocal().add(Duration(days: daysAhead));  // daysAhead = 5 + seed % 4
+```
+
+Read it on the 23rd and the class is on the 28th. Read it on the 24th and the
+**same slot, same id** is on the 29th. Every individual read is plausible; the
+date is always a sensible near-future evening. Only comparing two reads taken on
+different days shows it, and nothing ever did.
+
+What that cost, in order of severity:
+
+- **The class never arrives.** It is permanently five days away.
+- **It could therefore never be hosted.** The host's "start session" gate is
+  `now >= start - 30min`, against a start that is always five days ahead. Every
+  other piece of hosting — the room, the token, the role, the permissions — was
+  built and correct, and the button could not light up.
+- A parent who booked "Saturday" was shown "Sunday" the next morning.
+
+The tell, worth recognising anywhere: **a generated value that depends on `now`
+is a projection, and a projection cannot be an appointment.** An appointment has
+to be written down once.
+
+It already was. `booking_slots.starts_utc` is set on first booking and never
+moves, so the fix is to let the row win the moment it exists — and when it does
+not exist, to say so rather than to guess:
+
+```
+row exists -> that is the date, and the seat count
+no row     -> nobody has booked. The generated date is a PLACEHOLDER and is
+              labelled as one ("No bookings yet - start whenever you are
+              ready"), and the host going live seeds the row at that moment.
+```
+
+That last branch is also the honest description of where the product is:
+masterclasses have no scheduling system yet (STILL-OPEN §5.1c), so until they
+do, the first real event *is* the schedule. Better to say that in the UI than to
+print a confident date nobody chose.
+
+**Two smaller rules fell out of the same review**, both the same shape — a
+filter that is right for one audience and wrong for another:
+
+- `slotsFor()` drops slots that are full or already running. Correct for a
+  buyer; it would have taken a host's session away at the instant it began, and
+  hidden a sold-out class from the person teaching it. Hence
+  `sessionSlotsFor()`.
+- `record_consult_join` looks its argument up in `booking_bookings`. Passing a
+  SLOT id found nothing, returned null and wrote no row — no error anywhere.
+  Attendance for a class records against the booking; a host has no booking and
+  nothing to settle, so nothing is recorded, deliberately rather than by
+  accident.
+
+## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
 2. `0011_user_state.sql` — the KV escape hatch.
@@ -1378,3 +1498,10 @@ thing you are guessing at happened inside your own app, record it.
     the app can only claim what actually happened (§15c).
 16. `0078_consult_sessions.sql` — recording a fact the app was inferring, and
     naming in the header the part it still cannot do (§15d).
+17. `0079_group_sessions.sql` + `supabase/functions/livekit-moderate/` — a
+    permission decided in Postgres and enforced by the media server, and the
+    host controls that could only ever have lived on a server (§16a). Read
+    `open_session_room` for the case where the actor holds no row to be
+    authorised against — a host has no booking at their own class.
+18. `lib/booking/server_slots.dart` — server truth meeting a synchronous `build`,
+    and why the fallback is zero rather than a plausible guess (§16b).

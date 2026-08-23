@@ -440,62 +440,96 @@ Fix it when programmes next get touched, or leave it: the field note is enough
 for a column edited once a quarter, and it is not enough for one edited every
 time a clinician signs up. That difference is the whole reason `0074` exists.
 
-## 5.2 One-to-many programmes — not built at all, and now itemised
+## 5.2 One-to-many programmes — BUILT 2026-08-23, with two things parked
 
-Masterclasses and cohorts. The single biggest reason the admin panel will be
-needed, and why 1:1 was built first: 1:1 needs no panel.
+Masterclasses and cohorts. Six defects were itemised here after the
+consultation audit; five are closed and the sixth is deliberately parked.
 
-**Deliberately untouched by the consultation pass (2026-08-23).** That pass
-audited the whole live-call surface and then fixed only the 1:1 half, guarding
-every change on `capacity == 1` so a group booking takes the pre-existing code
-path unchanged. `test/consult_call_test.dart` pins that guard. Nothing below was
-altered, disabled, or removed — including copy that promises things we do not
-yet deliver, which stays because it describes what we intend to give.
+**What the group pass built** (`0079`, `livekit-moderate`,
+`lib/booking/group_call_screen.dart`):
 
-What the audit found, so none of it has to be rediscovered:
+1. **A host can get into their own class.** Every join function resolved a room
+   FROM A BOOKING, and a host has no booking — they did not buy a seat at their
+   own masterclass. `open_session_room()` (0079) is their front door: it
+   verifies them through `my_expert_ids()`, self-seeds the slot if nobody has
+   booked yet (same pattern as `book_slot`), and opens **30 minutes early**
+   against an attendee's ten, so a teacher can set up before anyone arrives.
+   `doctor_home_screen._sessionRow` — an inert `Container` with no
+   `GestureDetector` — is now the handle on it.
+2. **Attendees arrive silent.** `canPublish` is no longer an unconditional
+   `true`: the database decides it (`can_publish`, 0079) and the token enforces
+   it, so a modified client cannot grant itself a camera in someone's class.
+   `canPublishData` stays on for everyone — that is the hand-raise and the Q&A.
+3. **A class renders as a class.** `GroupCallScreen` is a separate screen, so
+   the 1:1 path is untouched. Speaker view rather than a grid: the host holds
+   the stage, promoted speakers get a filmstrip, everyone else is a name in the
+   participant list. A grid of forty tiles of forty people who cannot speak and
+   have no camera on is forty pictures of nothing.
+4. **Host controls that are real.** Mute-all, remove, invite-to-speak and
+   end-for-everyone go through the `livekit-moderate` edge function, which
+   holds the API secret, asks Postgres one question (`can_moderate_slot`) and
+   calls LiveKit's RoomService. They **cannot** be done client-side: a client
+   governs its own tracks and nobody else's, so a local "mute everyone" can
+   only ask forty clients to mute themselves — ignored by a modified one,
+   unheard by an offline one, and the host would be looking at a muted-looking
+   list while a live kitchen carried on being broadcast.
+   Promotion is live, with no reconnect: the alternative is dropping someone
+   out of a class in order to let them speak in it.
+5. **A class has a date that stays still.** Found in review, and it was the
+   deeper reason a masterclass could not be hosted. A one-off slot is generated
+   as `now + 5..8 days`, recomputed on every read — so asked on the 23rd the
+   class fell on the 28th, and asked on the 24th the SAME SLOT (same id) fell
+   on the 29th. The class never arrived; a parent who booked "Saturday" was
+   shown "Sunday" the next morning; and a host's start-time was permanently
+   five days in the future, so the Start button could never light up no matter
+   what was built behind it.
+   `booking_slots.starts_utc` is written once and never moves, so it is now the
+   date whenever a row exists. With no row nobody has booked, the generated
+   date stays an honest placeholder, and the host may **go live whenever** —
+   seeding the row at that moment. Which is honest about where the product is:
+   programmes have no scheduling system yet (§5.1c), so until they do, the
+   first real event IS the schedule.
+   `sessionSlotsFor()` also exists now because `slotsFor()` drops slots that
+   are full or already running — right for a buyer, and it would have taken a
+   host's session away at the exact moment it began.
 
-1. **A group call renders exactly one other person.**
-   `call_screen.dart` — `_remote` is `remoteParticipants.values.first`. No grid,
-   no tile widget, no participant list, no count, no active-speaker detection.
-   In a fifty-seat masterclass the attendee sees one arbitrary participant, very
-   often not the host; everyone else is invisible while their audio still plays.
+6. **Seat counts come from the ledger.** `booking_catalog` generated
+   `seatsTaken: 40 + seed % 45` from a hash of the offering id — stable between
+   reads, which is exactly what made it convincing, and unrelated to whether
+   anybody had booked. `ServerSlotStore` reads `booking_slots` and
+   `slotsFor()` merges it. A slot the server has never heard of now reads as
+   **zero taken**, which is the truth.
+   ⚠️ This is visible: a new class that used to advertise "60 seats left" now
+   says all of them are. That was social proof, and it was invented; reverting
+   is a one-line change in `_withRealSeatCount` if it is wanted back as an
+   explicit marketing decision rather than an accident.
+7. **`RoomOptions`** — `adaptiveStream` and `dynacast` on, which at forty
+   participants is the difference between a class and a melted phone.
 
-2. **Every attendee publishes.** The token grants `canPublish: true` to
-   everyone (`livekit-token/index.ts`) and the client turns camera and mic on at
-   connect. Fifty mothers join and fifty are live. No `canPublishSources`, no
-   lobby, no mute-all, no removal, no host controls of any kind.
-   `0076` now carries a `role` and a `capacity` in the token metadata, so the
-   publish rules have something to key on — but **`canPublish` was deliberately
-   left at `true`**, because narrowing it is exactly the change that would alter
-   group behaviour.
+8. **Group attendance is recorded against the booking.** Also found in review:
+   the first cut passed the SLOT id to `record_consult_join`, which looks its
+   argument up in `booking_bookings` — so it found nothing, returned null, and
+   wrote no row, silently. `settle_my_bookings` would not have matched it
+   either. Attendees now record against their booking; a host has no booking
+   and nothing to settle, so nothing is recorded for them, deliberately rather
+   than by accident.
 
-3. **A host has no route into their own room.** `join_room_for_booking` and
-   `join_context_for_booking` both resolve the room *from a booking*, and a
-   teacher has no booking — they did not buy a seat. There is no UI either:
-   `doctor_home_screen._sessionRow` is an inert `Container` with no
-   `GestureDetector`, and group sessions never appear in
-   `DoctorAppointmentsScreen`, which filters to `upcomingConsults`.
-   **So a masterclass can be bought and joined, and cannot be hosted.**
+### Still parked, on purpose
 
-4. **"Recording to keep" and "private discussion group" are sold and do not
-   exist.** `booking_sheet.dart` renders both as purchase perks;
-   `BookingStore.ownsRecording()` and `ownsDiscussion()` have **zero call
-   sites**; there is no LiveKit egress, no recordings table, no player, no
-   thread screen. `booking_sheet.dart` also tells her *"Your recording is in My
-   Bookings"* — there is no recording section there.
-   Same failure as `brand-studio-lessons` (absence-only tests hiding a dead
-   flagship), and `booking_wiring_test.dart` repeats it: it asserts one-to-one
-   support has *no* discussion thread and never asserts the feature exists for
-   anything that does.
+- **Recordings.** `EntitlementGrant.recordingAccess` is granted for
+  masterclasses, `booking_sheet.dart` sells *"recording to keep"* and says
+  *"Your recording is in My Bookings"*, and `BookingStore.ownsRecording()`
+  still has **zero call sites**. Nothing records anything: there is no LiveKit
+  egress, no storage bucket, no player. This needs decisions that are not
+  engineering ones — where recordings live, how long they are kept, and what
+  that storage costs per class — so it is a separate piece of work.
+  **The copy stays**, deliberately: it describes what we intend to give.
+- **The discussion thread.** Same shape. `ownsDiscussion()` has zero call
+  sites and the buy sheet advertises *"private discussion group"*. Not built.
 
-5. **Group seat counts are fiction.** `booking_catalog.dart` generates
-   `seatsTaken: 40 + seed % 45` for a masterclass and `18 + seed % 25` for a
-   cohort, from a hash. The server row starts at `booked = 0`. "60 seats left"
-   is a deterministic invention.
-
-6. **`Room()` has no `RoomOptions` in the group path.** The consult path now
-   sets `adaptiveStream` and `dynacast`; at fifty participants they stop being
-   optional.
+`0054_programmes.sql` and `§5.1c` (registering programmes in Directus, making
+the masterclass host a dropdown rather than a typed id) are unchanged and still
+the admin-panel work.
 
 ## 5.3 Gaps on the 1:1 side
 

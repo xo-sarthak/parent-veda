@@ -22,6 +22,7 @@ import 'screens/post_pregnancy/pp_milestones_data.dart';
 import 'screens/post_pregnancy/pp_sleep_data.dart';
 import 'screens/post_pregnancy/pp_vaccine_data.dart';
 import 'screens/post_pregnancy/pp_journeys_data.dart';
+import 'booking/server_slots.dart';
 import 'services/auth/session_watch.dart';
 import 'services/family_profile.dart';
 import 'services/profile_analytics.dart';
@@ -191,6 +192,10 @@ class _ParentVedaAppState extends State<ParentVedaApp>
     DoctorScheduleStore.instance
         .init()
         .then((_) => DoctorScheduleStore.instance.syncFromServer());
+    // Real seat counts for every bookable slot. Without this the group classes
+    // show a number generated from a hash of the offering id rather than the
+    // one the booking ledger holds — see ServerSlotStore.
+    ServerSlotStore.instance.refresh();
     // Load Can I? saved-questions persistence.
     CanIStore.instance.init();
     // Load Garbh Sanskar Journey persistence (favorites, reflective tally).

@@ -26,6 +26,7 @@ import '../../booking/booking_models.dart';
 import '../../booking/booking_store.dart';
 import '../../booking/call_prejoin_screen.dart';
 import '../../booking/call_screen.dart';
+import '../../booking/group_call_screen.dart';
 import '../../booking/prescription.dart';
 import '../../booking/prescription_watch.dart';
 import '../../services/notification_service.dart';
@@ -292,6 +293,12 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
       BookingCatalog.instance.offeringById(b.offeringId)?.kind ==
       OfferingKind.consult;
 
+  /// A masterclass or a cohort — one voice and an audience, not a conversation.
+  bool _isGroupSession(Booking b) {
+    final kind = BookingCatalog.instance.offeringById(b.offeringId)?.kind;
+    return kind == OfferingKind.masterclass || kind == OfferingKind.cohort;
+  }
+
   Widget _upcomingCard(Booking b) {
     // WHY THIS IS NOW TWO RULES.
     //
@@ -309,7 +316,15 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
     //
     // The server agrees with this rule rather than trusting it: 0076 refuses a
     // consult outside the same window. This is the affordance, not the gate.
-    final joinable = _isConsult(b) ? b.joinableAt(DateTime.now()) : b.isUpcoming;
+    // AND THE SAME RULE NOW COVERS A CLASS. 0079 applies the window to group
+    // sessions too — before it, a masterclass booked for next Thursday could be
+    // "joined" today, alone, forever. Leaving the button always-live would mean
+    // a cheerful "Join now" that the server answers with a refusal.
+    //
+    // Anything that is neither keeps `isUpcoming`, unchanged.
+    final joinable = (_isConsult(b) || _isGroupSession(b))
+        ? b.joinableAt(DateTime.now())
+        : b.isUpcoming;
     return ppCard(
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 12),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -411,13 +426,20 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
         ? null
         : expertById(expertId).name;
 
-    // A CONSULTATION GETS A DOOR BEFORE THE ROOM.
+    // THREE DOORS, BECAUSE THERE ARE THREE KINDS OF ROOM.
     //
-    // Camera and microphone consent, a look at yourself, and the choice of what
-    // the doctor sees — all before going live, rather than discovering the
-    // answer by being on air. A class keeps the straight-to-room path: nothing
-    // about group sessions is being changed in this pass.
+    // A CONSULT gets a green room first: camera and microphone consent, a look
+    // at yourself, and the choice of what the doctor sees — decided before
+    // going live rather than discovered by being on air.
+    //
+    // A CLASS goes straight in, and that is not laziness. An attendee at a
+    // masterclass cannot publish anything, so there is no camera to check, no
+    // microphone to test, and no permission to ask for. A green room with no
+    // decisions in it is a delay pretending to be a step.
+    //
+    // Anything else keeps the original path untouched.
     final consult = _isConsult(b);
+    final group = _isGroupSession(b);
 
     Navigator.of(context).push(
       MaterialPageRoute<void>(
@@ -431,7 +453,13 @@ class _MyBookingsScreenState extends State<MyBookingsScreen> {
                 waitingFor: who,
                 startsUtc: b.startsUtc,
               )
-            : CallScreen(bookingId: b.id, title: b.title, waitingFor: who),
+            : group
+                ? GroupCallScreen(
+                    title: b.title,
+                    bookingId: b.id,
+                    hostName: who,
+                  )
+                : CallScreen(bookingId: b.id, title: b.title, waitingFor: who),
       ),
     );
   }

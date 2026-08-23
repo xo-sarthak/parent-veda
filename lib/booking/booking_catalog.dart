@@ -30,6 +30,7 @@ import '../data/prepare_data.dart';
 import '../doctor/doctor_availability.dart'; // retired, kept for revert
 import '../doctor/doctor_schedule.dart';
 import '../doctor/doctor_schedule_store.dart';
+import 'server_slots.dart';
 import '../screens/post_pregnancy/pp_experts_data.dart';
 import '../screens/post_pregnancy/pp_learning_data.dart';
 import '../screens/post_pregnancy/pp_yoga_data.dart';
@@ -127,8 +128,80 @@ class BookingCatalog {
     if (o == null) return const [];
     final at = (now ?? DateTime.now()).toUtc();
     return _generate(o, at)
+        .map(_withServerTruth)
         .where((s) => s.startsUtc.isAfter(at) && !s.isFull)
         .toList()
+      ..sort((a, b) => a.startsUtc.compareTo(b.startsUtc));
+  }
+
+  /// Replace GENERATED facts with the ones the ledger actually holds.
+  ///
+  /// Two of them, and both were invented:
+  ///
+  /// * the SEAT COUNT — `40 + seed % 45` from a hash of the offering id, so
+  ///   "60 seats left" was a stable function of a string, never related to
+  ///   whether anybody had booked;
+  /// * the DATE — a one-off class is generated as `now + 5..8 days`, so it was
+  ///   always five days away from whenever you asked. Ask on the 23rd and the
+  ///   class is on the 28th; ask on the 24th and the SAME SLOT is on the 29th.
+  ///   The class never arrived, a parent was shown a different day each
+  ///   morning, and a host's start-time was permanently in the future.
+  ///
+  /// `booking_slots.starts_utc` is written once and never moves, so once the
+  /// row exists it is the date. See ServerSlotStore for why "no row" means
+  /// "nobody has booked" rather than "unknown".
+  static Slot _withServerTruth(Slot s) {
+    final real = ServerSlotStore.instance.forSlot(s.id);
+
+    // NO ROW MEANS NO BOOKINGS, WHICH IS ZERO — not "unknown, so keep the
+    // number we made up". `booking_slots` self-seeds, so the absence of a row
+    // is itself the fact. Returning `s` here would quietly hand back the
+    // hash-generated `40 + seed % 45` the whole change exists to remove; the
+    // test that caught it is in group_call_test.
+    //
+    // The DATE is different: with no row there is no real date either, so the
+    // generated placeholder stands. It is the host's "go live whenever" case.
+    if (real == null) {
+      return s.booked == 0
+          ? s
+          : Slot(
+              id: s.id,
+              offeringId: s.offeringId,
+              expertId: s.expertId,
+              startsUtc: s.startsUtc,
+              durationMin: s.durationMin,
+              capacity: s.capacity,
+              booked: 0,
+              joinUrl: s.joinUrl,
+            );
+    }
+
+    final starts = real.startsUtc ?? s.startsUtc;
+    if (real.booked == s.booked && starts == s.startsUtc) return s;
+    return Slot(
+      id: s.id,
+      offeringId: s.offeringId,
+      expertId: s.expertId,
+      startsUtc: starts,
+      durationMin: s.durationMin,
+      capacity: s.capacity,
+      booked: real.booked.clamp(0, s.capacity),
+      joinUrl: s.joinUrl,
+    );
+  }
+
+  /// Every slot for an offering, INCLUDING ones that are full or already
+  /// running. What a HOST needs.
+  ///
+  /// [slotsFor] deliberately drops both — a parent must not be offered a
+  /// sold-out seat or a class that has started. Applying the same filter to the
+  /// host would take their session away at the exact moment it began, and hide
+  /// a sold-out class from the person teaching it.
+  List<Slot> sessionSlotsFor(String offeringId, {DateTime? now}) {
+    final o = offeringById(offeringId);
+    if (o == null) return const [];
+    final at = (now ?? DateTime.now()).toUtc();
+    return _generate(o, at).map(_withServerTruth).toList()
       ..sort((a, b) => a.startsUtc.compareTo(b.startsUtc));
   }
 

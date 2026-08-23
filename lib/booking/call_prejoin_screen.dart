@@ -41,8 +41,10 @@ import 'package:permission_handler/permission_handler.dart';
 
 import '../theme/app_theme.dart';
 import '../widgets/global_ask_fab.dart' show kCallRoute;
+import 'booking_models.dart';
 import 'call_screen.dart';
 import 'call_session.dart';
+import 'group_call_screen.dart';
 
 const _bg = Color(0xFF0E0D12);
 const _panel = Color(0xFF17151E);
@@ -57,10 +59,20 @@ class CallPrejoinScreen extends StatefulWidget {
     this.displayName,
     this.waitingFor,
     this.startsUtc,
+    this.hostSlot,
   });
 
   final String bookingId;
   final String title;
+
+  /// Set when this is a HOST opening their own class.
+  ///
+  /// A host holds no booking, so there is no booking id to fetch a token with —
+  /// the slot descriptor goes instead, and `open_session_room` (0079) seeds the
+  /// slot if the class has no bookings yet. Everything else on this screen is
+  /// identical, and deliberately so: a teacher about to appear in front of
+  /// forty people wants the camera check at least as much as a doctor does.
+  final Slot? hostSlot;
 
   /// The name the other side sees. A LABEL, never a credential — identity is
   /// the `sub` claim, which the server sets from the verified session.
@@ -144,10 +156,14 @@ class _CallPrejoinScreenState extends State<CallPrejoinScreen> {
     // Fetch the token BEFORE showing a Join button. If the session has not
     // opened yet, or is not this caller's, that is the whole answer and there
     // is no point previewing a camera for a call that cannot happen.
-    final (join, failure) = await CallSession.fetchJoin(
-      bookingId: widget.bookingId,
-      displayName: widget.displayName,
-    );
+    final slot = widget.hostSlot;
+    final (join, failure) = slot != null
+        ? await CallSession.fetchHostJoin(
+            slot: slot, displayName: widget.displayName)
+        : await CallSession.fetchJoin(
+            bookingId: widget.bookingId,
+            displayName: widget.displayName,
+          );
     if (!mounted) return;
 
     if (failure != null) {
@@ -210,15 +226,24 @@ class _CallPrejoinScreenState extends State<CallPrejoinScreen> {
     await Navigator.of(context).pushReplacement(
       MaterialPageRoute<void>(
         settings: const RouteSettings(name: kCallRoute),
-        builder: (_) => CallScreen(
-          bookingId: widget.bookingId,
-          title: widget.title,
-          displayName: widget.displayName,
-          waitingFor: widget.waitingFor,
-          join: join,
-          startCameraOn: _camOn,
-          startMicOn: _micOn,
-        ),
+        // A class and a consult are different rooms with different rules, so
+        // they are different screens. The server has already said which this
+        // is — capacity — and the client does not get a second opinion.
+        builder: (_) => join.isGroup
+            ? GroupCallScreen(
+                title: widget.title,
+                join: join,
+                hostName: widget.waitingFor,
+              )
+            : CallScreen(
+                bookingId: widget.bookingId,
+                title: widget.title,
+                displayName: widget.displayName,
+                waitingFor: widget.waitingFor,
+                join: join,
+                startCameraOn: _camOn,
+                startMicOn: _micOn,
+              ),
       ),
     );
   }
@@ -378,6 +403,7 @@ class _CallPrejoinScreenState extends State<CallPrejoinScreen> {
   }
 
   Widget _readyView() {
+    final hosting = widget.hostSlot != null;
     final who = (widget.waitingFor?.trim().isNotEmpty ?? false)
         ? widget.waitingFor!.trim()
         : (_join?.counterpart.trim().isNotEmpty ?? false)
@@ -440,7 +466,7 @@ class _CallPrejoinScreenState extends State<CallPrejoinScreen> {
       Padding(
         padding: const EdgeInsets.fromLTRB(24, 4, 24, 0),
         child: Column(children: [
-          Text('You are joining $who',
+          Text(hosting ? 'You are hosting $who' : 'You are joining $who',
               textAlign: TextAlign.center,
               style: const TextStyle(
                   color: Colors.white, fontSize: 15.5, fontWeight: FontWeight.w600)),
@@ -475,7 +501,10 @@ class _CallPrejoinScreenState extends State<CallPrejoinScreen> {
 
       Padding(
         padding: const EdgeInsets.fromLTRB(24, 6, 24, 22),
-        child: _wideButton(_joining ? 'Joining…' : 'Join now',
+        child: _wideButton(
+            _joining
+                ? (hosting ? 'Starting…' : 'Joining…')
+                : (hosting ? 'Start session' : 'Join now'),
             _joining ? null : _join_),
       ),
     ]);

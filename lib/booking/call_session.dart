@@ -37,6 +37,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 
 import '../services/remote/supabase_repo.dart';
+import 'booking_models.dart';
 
 /// Which side of the call this participant is on.
 ///
@@ -44,23 +45,47 @@ import '../services/remote/supabase_repo.dart';
 /// role, and so does a 1:1 call joined through the pre-0076 fallback path. The
 /// UI must degrade to "no role shown" rather than guess — a wrong badge on a
 /// clinician is worse than no badge.
-enum CallRole { parent, expert, unknown }
+/// Four values, not two, and the fourth pair is what makes a class a class.
+///
+/// A consult is a CONVERSATION — two equal parties, both publishing. A class
+/// is a BROADCAST — one voice and an audience. The role therefore carries both
+/// facts at once, who you are and which product you are in, so a screen can
+/// switch on it directly instead of pairing a role with a capacity check at
+/// every call site.
+///
+///     capacity == 1   parent   | expert
+///     capacity  > 1   attendee | host
+enum CallRole { parent, expert, attendee, host, unknown }
 
 extension CallRoleX on CallRole {
   bool get isExpert => this == CallRole.expert;
   bool get isParent => this == CallRole.parent;
+  bool get isHost => this == CallRole.host;
+  bool get isAttendee => this == CallRole.attendee;
+
+  /// Whoever is running the room — the doctor in a consult, the teacher in a
+  /// class. What the layout gives the big tile to.
+  bool get leadsTheRoom => this == CallRole.expert || this == CallRole.host;
 
   /// The word shown beside a name on a tile. Empty for [unknown], which the
   /// chip then omits entirely.
+  ///
+  /// 'Attendee' is deliberately absent. In a class of forty, labelling every
+  /// tile "Attendee" says nothing anyone needed to know and turns the one
+  /// label that matters — Host — into noise.
   String get label => switch (this) {
         CallRole.expert => 'Doctor',
         CallRole.parent => 'Parent',
+        CallRole.host => 'Host',
+        CallRole.attendee => '',
         CallRole.unknown => '',
       };
 
   static CallRole parse(Object? raw) => switch (raw?.toString()) {
         'expert' => CallRole.expert,
         'parent' => CallRole.parent,
+        'host' => CallRole.host,
+        'attendee' => CallRole.attendee,
         _ => CallRole.unknown,
       };
 }
@@ -109,7 +134,9 @@ class CallJoin {
     required this.url,
     required this.token,
     required this.room,
+    this.slotId = '',
     this.role = CallRole.unknown,
+    this.canPublish = true,
     this.capacity = 0,
     this.startsUtc,
     this.endsUtc,
@@ -120,8 +147,24 @@ class CallJoin {
   final String token;
   final String room;
 
+  /// The slot this room belongs to. What moderation is addressed to, because a
+  /// host has no booking to name.
+  final String slotId;
+
   /// This device's own role, decided by the server.
   final CallRole role;
+
+  /// May this device turn its camera and microphone on at all?
+  ///
+  /// False for an attendee at a masterclass. Note this is a MIRROR of what the
+  /// token already enforces, not the enforcement itself — the media server
+  /// honours the token and a modified client cannot argue with it. It exists
+  /// so the screen can lay itself out correctly before connecting, and so the
+  /// controls that would not work are not offered.
+  ///
+  /// Defaults to true, which is the pre-0079 shape: an old server that does
+  /// not send the field gets the behaviour it has always had.
+  final bool canPublish;
 
   /// Seats on the slot. **This is the consult-vs-class switch**, and it is the
   /// same number the server uses for the same purpose (`book_slot`, 0029): a
@@ -145,6 +188,9 @@ class CallJoin {
   /// both-present clock — is gated on this. A class takes the code path it
   /// took before any of this existed.
   bool get isConsult => capacity == 1;
+
+  /// A masterclass or a cohort — one voice and an audience.
+  bool get isGroup => capacity > 1;
 
   /// How long the session was sold for, when known.
   Duration? get scheduledLength => (startsUtc != null && endsUtc != null)
@@ -170,6 +216,49 @@ class CallSession {
         'name': displayName,
     });
 
+    return _readJoin(res);
+  }
+
+  /// The HOST's way into their own class.
+  ///
+  /// A host holds no booking — they did not buy a seat at their own
+  /// masterclass — so every booking-based route was closed to them. Before
+  /// this, a masterclass could be bought and joined and simply **could not be
+  /// taught**; the only way in would have been handing the teacher one of
+  /// their attendees' booking ids.
+  ///
+  /// The slot descriptor travels with the request because the slot row may not
+  /// exist yet: `booking_slots` self-seeds on first booking (0029), so a class
+  /// nobody has booked has no row to point a room at. `open_session_room`
+  /// (0079) creates it — after checking, against `my_expert_ids()`, that the
+  /// caller may host it. A caller can only ever open a room for an expert they
+  /// already are.
+  static Future<(CallJoin?, CallJoinFailure?)> fetchHostJoin({
+    required Slot slot,
+    String? displayName,
+  }) async {
+    if (!SupabaseRepo.isLoggedIn) {
+      return (null, const CallJoinFailure(CallRefusal.notSignedIn));
+    }
+
+    final res = await SupabaseRepo.invokeEdgeResult('livekit-token', {
+      'slotId': slot.id,
+      'offeringId': slot.offeringId,
+      'expertId': slot.expertId,
+      'startsUtc': slot.startsUtc.toUtc().toIso8601String(),
+      'durationMin': slot.durationMin,
+      'capacity': slot.capacity,
+      if (displayName != null && displayName.trim().isNotEmpty)
+        'name': displayName,
+    });
+
+    return _readJoin(res);
+  }
+
+  /// Turn an edge-function answer into a join, or into the REASON it is not
+  /// one. Shared by the booking route and the host route: they differ entirely
+  /// in how authorisation is decided and not at all in how the answer reads.
+  static (CallJoin?, CallJoinFailure?) _readJoin(EdgeResult res) {
     if (res.offline) {
       return (null, const CallJoinFailure(CallRefusal.offline));
     }
@@ -208,7 +297,9 @@ class CallSession {
         url: url,
         token: token,
         room: d?['room']?.toString() ?? '',
+        slotId: d?['slotId']?.toString() ?? '',
         role: CallRoleX.parse(d?['role']),
+        canPublish: d?['canPublish'] != false,
         capacity: (d?['capacity'] as num?)?.toInt() ?? 0,
         startsUtc: _utc(d?['startsUtc']),
         endsUtc: _utc(d?['endsUtc']),
@@ -237,5 +328,72 @@ class CallSession {
     final s = raw?.toString();
     if (s == null || s.isEmpty) return null;
     return DateTime.tryParse(s)?.toUtc();
+  }
+}
+
+/// The host controls, which only exist because they run on the SERVER.
+///
+/// A LiveKit client governs its own tracks and nobody else's, so a "mute
+/// everyone" button on the host's phone could at best ASK forty clients to
+/// mute themselves — ignored by a modified one, unheard by an offline one, and
+/// the host would be looking at a muted-looking list while somebody's kitchen
+/// carried on being broadcast. That is worse than no button: it is a promise
+/// the product cannot keep, in the one moment a teacher needs certainty.
+///
+/// So every method here is a round trip to `livekit-moderate`, which holds the
+/// API secret, asks Postgres one question (`can_moderate_slot`) and then talks
+/// to LiveKit's RoomService. Slower than a local toggle, and true.
+class CallModeration {
+  CallModeration._();
+
+  /// Silence every microphone in the room except the caller's own.
+  /// Returns how many tracks were actually muted, or null if it failed.
+  static Future<int?> muteAll(String slotId) async {
+    final res = await _call(slotId, 'muteAll');
+    if (res == null) return null;
+    return (res['muted'] as num?)?.toInt() ?? 0;
+  }
+
+  /// Let one attendee speak — or take it back.
+  ///
+  /// Live, with no reconnect. The alternative would be minting a new token and
+  /// rejoining, which means dropping someone out of a class in order to let
+  /// them speak in it.
+  static Future<bool> setCanSpeak(
+    String slotId,
+    String identity, {
+    required bool allow,
+  }) async {
+    final res = await _call(
+      slotId,
+      allow ? 'allowSpeak' : 'denySpeak',
+      identity: identity,
+    );
+    return res != null;
+  }
+
+  static Future<bool> remove(String slotId, String identity) async =>
+      await _call(slotId, 'remove', identity: identity) != null;
+
+  /// End the class for everyone, rather than leaving an audience in a room
+  /// with nobody teaching.
+  static Future<bool> endRoom(String slotId) async =>
+      await _call(slotId, 'endRoom') != null;
+
+  static Future<Map<String, dynamic>?> _call(
+    String slotId,
+    String action, {
+    String? identity,
+  }) async {
+    final res = await SupabaseRepo.invokeEdgeResult('livekit-moderate', {
+      'slotId': slotId,
+      'action': action,
+      'identity': ?identity,
+    });
+    if (!res.ok) {
+      debugPrint('[moderate] $action -> ${res.status} ${res.reason}');
+      return null;
+    }
+    return res.data ?? const {};
   }
 }
