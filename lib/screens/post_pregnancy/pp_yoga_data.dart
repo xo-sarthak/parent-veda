@@ -72,7 +72,20 @@ class YogaClass {
   final String id;
   final String title;
   final String category; // -> YogaCategory.id
+  /// ⚠️ THIS IS A JOIN KEY, NOT JUST A LABEL. `expertByName` resolves it to a
+  /// roster entry in `lib/experts/yoga_experts.dart`, which is what makes the
+  /// instructor row on a class open her real profile. Renaming a teacher here
+  /// without renaming her there does not break the build — it silently drops
+  /// her back to the old class-derived screen.
+  /// `test/expert_link_coverage_test.dart` fails first.
   final String instructorName;
+
+  /// ⚠️ MUST BE IDENTICAL ON EVERY CLASS THE SAME TEACHER TEACHES. Nisha Pillai
+  /// used to be a "Yoga & Breathwork Guide" on six classes and a "Meditation &
+  /// Breathwork Guide" on four, because each class was authored on its own and
+  /// nothing compared them. Her roster entry is now the description of record;
+  /// this is the short version that fits on a card, and there is one of it.
+  /// Asserted by `test/expert_link_coverage_test.dart`.
   final String instructorCredential;
   final String instructorBio;
   final List<String> instructorFocus;
@@ -207,7 +220,7 @@ const List<YogaClass> kYogaClasses = [
     title: 'Evening Wind-Down',
     category: 'yoga',
     instructorName: 'Nisha Pillai',
-    instructorCredential: 'Yoga & Breathwork Guide · 8 yrs',
+    instructorCredential: 'Yoga, Breathwork & Meditation · 8 yrs',
     rating: 4.8,
     reviewsCount: 460,
     mode: YogaMode.recorded,
@@ -409,7 +422,7 @@ const List<YogaClass> kYogaClasses = [
     title: 'Baby-in-Arms Flow',
     category: 'postnatal',
     instructorName: 'Nisha Pillai',
-    instructorCredential: 'Yoga & Breathwork Guide · 8 yrs',
+    instructorCredential: 'Yoga, Breathwork & Meditation · 8 yrs',
     rating: 4.6,
     reviewsCount: 142,
     mode: YogaMode.recorded,
@@ -545,7 +558,7 @@ const List<YogaClass> kYogaClasses = [
     title: 'Pranayama Basics',
     category: 'breathing',
     instructorName: 'Nisha Pillai',
-    instructorCredential: 'Yoga & Breathwork Guide · 8 yrs',
+    instructorCredential: 'Yoga, Breathwork & Meditation · 8 yrs',
     rating: 4.8,
     reviewsCount: 512,
     mode: YogaMode.recorded,
@@ -567,7 +580,7 @@ const List<YogaClass> kYogaClasses = [
     title: '3-Minute Calm Breath',
     category: 'breathing',
     instructorName: 'Nisha Pillai',
-    instructorCredential: 'Yoga & Breathwork Guide · 8 yrs',
+    instructorCredential: 'Yoga, Breathwork & Meditation · 8 yrs',
     rating: 4.7,
     reviewsCount: 340,
     mode: YogaMode.recorded,
@@ -591,7 +604,7 @@ const List<YogaClass> kYogaClasses = [
     title: 'Guided Meditation Circle',
     category: 'meditation',
     instructorName: 'Nisha Pillai',
-    instructorCredential: 'Meditation & Breathwork Guide · 8 yrs',
+    instructorCredential: 'Yoga, Breathwork & Meditation · 8 yrs',
     rating: 4.9,
     reviewsCount: 198,
     mode: YogaMode.liveGroup,
@@ -613,7 +626,7 @@ const List<YogaClass> kYogaClasses = [
     title: '1:1 Meditation Coaching',
     category: 'meditation',
     instructorName: 'Nisha Pillai',
-    instructorCredential: 'Meditation & Breathwork Guide · 8 yrs',
+    instructorCredential: 'Yoga, Breathwork & Meditation · 8 yrs',
     rating: 5.0,
     reviewsCount: 40,
     mode: YogaMode.liveOneToOne,
@@ -635,7 +648,7 @@ const List<YogaClass> kYogaClasses = [
     title: 'Sleep-Story Meditation',
     category: 'meditation',
     instructorName: 'Nisha Pillai',
-    instructorCredential: 'Meditation & Breathwork Guide · 8 yrs',
+    instructorCredential: 'Yoga, Breathwork & Meditation · 8 yrs',
     rating: 4.8,
     reviewsCount: 620,
     mode: YogaMode.recorded,
@@ -657,7 +670,7 @@ const List<YogaClass> kYogaClasses = [
     title: 'Meditation for New Mothers',
     category: 'meditation',
     instructorName: 'Nisha Pillai',
-    instructorCredential: 'Meditation & Breathwork Guide · 8 yrs',
+    instructorCredential: 'Yoga, Breathwork & Meditation · 8 yrs',
     rating: 4.7,
     reviewsCount: 276,
     mode: YogaMode.recorded,

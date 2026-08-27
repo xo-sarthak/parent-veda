@@ -231,8 +231,11 @@ class _CoursesCohortsScreenState extends State<CoursesCohortsScreen> {
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(p.title.now, style: pvTitleStyle(16), maxLines: 2, overflow: TextOverflow.ellipsis),
                 const SizedBox(height: 4),
-                Text('${p.instructorName} · ${_metaLine(p)}',
-                    style: pvBody(kSoft, 12.5), maxLines: 1, overflow: TextOverflow.ellipsis),
+                // `.en`: the roster key. The rendered value would stop
+                // matching the moment a mother switched language, and the
+                // symptom would be a name that silently stopped being tappable.
+                pvExpertName(p.instructorName.en,
+                    suffix: ' · ${_metaLine(p)}', style: pvBody(kSoft, 12.5)),
               ]),
             ),
             const SizedBox(width: 10),

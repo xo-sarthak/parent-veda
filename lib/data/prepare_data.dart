@@ -117,7 +117,7 @@ final List<Masterclass> kMasterclasses = [
         _t('What labour really feels like - breathing, pain relief, C-section prep, and the emotional readiness no one talks about. One live evening that changes how you walk into the delivery room.', 'लेबर असल में कैसा लगता है — साँस, दर्द से राहत, C-section की तैयारी, और वह मन की तैयारी जिसकी बात कोई नहीं करता। एक live शाम, जो बदल देती है कि आप delivery room में किस भरोसे के साथ जाती हैं।'),
     facts: [QuickFact(_same('90 min'), _t('live', 'लाइव')), QuickFact(_t('Sun 13 Jul', 'रवि 13 Jul'), _t('8:00 pm', 'रात 8:00')), QuickFact(_t('Forever', 'हमेशा के लिए'), _t('recording', 'रिकॉर्डिंग'))],
     coaches: [
-      Coach(_same('Dr. Ananya Rao'), _t('Obstetrician · 15 years', 'Obstetrician · 15 साल'),
+      Coach(_same('Dr. Aparna Joshi'), _t('Obstetrician · 15 years', 'Obstetrician · 15 साल'),
           _t("Has delivered over 3,000 babies across Delhi's leading hospitals. Known for calm, plain-language guidance.", 'दिल्ली के बड़े अस्पतालों में 3,000 से ज़्यादा शिशुओं की डिलीवरी करा चुकी हैं। शांत, सीधी-सादी भाषा में समझाने के लिए जानी जाती हैं।')),
       Coach(_same('Deepti Sharma'), _t('Doula & birth coach', 'Doula और birth coach'),
           _t('Has supported 400+ births. Brings the emotional side - fear, partners, and staying in control.', '400+ जन्मों में साथ रह चुकी हैं। भावनात्मक पक्ष सामने लाती हैं — डर, partner, और खुद पर पकड़ बनाए रखना।')),
@@ -254,7 +254,7 @@ class Specialist {
   final String id;
   final IconData icon;
   final LocalizedText role; // "Obstetrician"
-  final LocalizedText name; // "Dr. Ananya Rao"
+  final LocalizedText name; // "Dr. Aparna Joshi"
   final LocalizedText cred; // "MBBS, MD (OB-GYN)" / "RD"
   final LocalizedText fromPrice; // "from ₹999"
   final String consultPrice; // "₹999"
@@ -272,7 +272,7 @@ final List<Specialist> kSpecialists = [
     id: 'sp_ob',
     icon: Icons.medical_services_outlined,
     role: _same('Obstetrician'),
-    name: _same('Dr. Ananya Rao'),
+    name: _same('Dr. Aparna Joshi'),
     cred: _t('MBBS, MD (OB-GYN) · 15 yrs', 'MBBS, MD (OB-GYN) · 15 साल'),
     fromPrice: _t('from ₹999', '₹999 से'),
     consultPrice: '₹999',
@@ -861,7 +861,7 @@ final List<PrepProgram> _kPrepCourses = [
   PrepProgram(
     id: 'course_pregnancy_guide',
     kind: PrepKind.course,
-    instructorName: _same('Dr. Ananya Rao'),
+    instructorName: _same('Dr. Aparna Joshi'),
     instructorRole: _t('Obstetrician · 15 yrs', 'Obstetrician · 15 साल'),
     instructorBio:
         _t("Senior obstetrician with 3,000+ deliveries. She scripts and hosts ParentVeda's flagship guide in calm, plain language.", '3,000+ डिलीवरी का अनुभव रखने वाली वरिष्ठ obstetrician। ParentVeda की सबसे बड़ी guide वही लिखती और पेश करती हैं, शांत और सीधी भाषा में।'),
@@ -1116,6 +1116,27 @@ PrepProgram? programById(String id) {
     if (p.id == id) return p;
   }
   return null;
+}
+
+/// Everything in Prepare that [instructorName] leads.
+///
+/// ⚠️ `.en`, NOT `.now`, AND THIS IS THE RULE FROM CLAUDE.md IN ITS PUREST
+/// FORM. A person's name is IDENTITY here — it is the key this joins on, the
+/// same key `expertByName` normalises against. Matching the rendered value
+/// would mean the expert profile listed her programmes in English and listed
+/// nothing at all in Hindi, silently, with nothing failing to compile. Every
+/// name in this file happens to be `_same(...)`, so today both sides agree;
+/// that is a coincidence of the data and not a reason to depend on it.
+///
+/// Normalised rather than compared raw so "Dr. Aparna Joshi" still matches
+/// itself across a stray double space or a missing full stop — the same
+/// normalisation `expertByName` uses, deliberately, so the two lookups cannot
+/// disagree about who somebody is.
+List<PrepProgram> prepProgramsByInstructor(String instructorName) {
+  String norm(String s) => s.toLowerCase().replaceAll(RegExp('[^a-z]'), '');
+  final key = norm(instructorName);
+  if (key.isEmpty) return const [];
+  return prepCatalogue().where((p) => norm(p.instructorName.en) == key).toList();
 }
 
 // =============================================================================

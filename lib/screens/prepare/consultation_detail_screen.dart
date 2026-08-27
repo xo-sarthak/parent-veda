@@ -7,6 +7,7 @@
 import 'package:flutter/material.dart';
 
 import '../../data/prepare_data.dart';
+import '../../experts/expert_link.dart';
 import 'prepare_common.dart';
 import '../../localization/app_language.dart';
 
@@ -73,6 +74,19 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
                 const SizedBox(width: 8),
                 _chip(str.prepVideoCall),
               ]),
+
+              // ⚠️ A LINK, NOT A REPLACEMENT. This page is the BOOKING page —
+              // it owns the slot picker, the price and the pay flow, and the
+              // "About" and "she can help with" blocks below are the case for
+              // buying THIS consult. The profile answers a different question
+              // ("who is she, and what else does she do here"), so both exist
+              // and neither is a duplicate of the other.
+              //
+              // Every other surface in the app now opens the same profile from
+              // a doctor's name. Leaving the one page that is entirely ABOUT a
+              // doctor as the exception is how an affordance stops being
+              // learnable.
+              _profileLink(s.name.en),
 
               _divider(),
               _title(str.prepAbout(s.name.now.split(' ').take(2).join(' '))),
@@ -155,6 +169,41 @@ class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
         decoration: BoxDecoration(color: kPanel, borderRadius: BorderRadius.circular(999)),
         child: Text(t, style: pvBody(kSoft, 12).copyWith(fontWeight: FontWeight.w600)),
       );
+
+  /// "Qualifications, experience & everything she leads →"
+  ///
+  /// Renders NOTHING when the specialist has no roster entry, rather than a
+  /// disabled-looking row. An affordance that is present but inert is the
+  /// defect this change set removes; an absent one is merely a profile we have
+  /// not written yet.
+  Widget _profileLink(String name) {
+    final expert = expertByName(name);
+    if (expert == null) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: 16),
+      child: GestureDetector(
+        onTap: () => openExpertProfile(context, expert),
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+          decoration: BoxDecoration(
+            color: kPanel,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: kBorder),
+          ),
+          child: Row(children: [
+            const Icon(Icons.workspace_premium_outlined, size: 17, color: kPurple),
+            const SizedBox(width: 11),
+            Expanded(
+              child: Text('Qualifications, experience & everything she leads',
+                  style: pvBody(kInk, 13).copyWith(fontWeight: FontWeight.w600)),
+            ),
+            const Icon(Icons.chevron_right_rounded, size: 18, color: kPurple),
+          ]),
+        ),
+      ),
+    );
+  }
 
   Widget _divider() => const Padding(
       padding: EdgeInsets.symmetric(vertical: 22), child: Divider(height: 1, color: Color(0xFFE4E2E5)));

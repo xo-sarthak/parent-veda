@@ -7,11 +7,25 @@
 import 'package:flutter/material.dart';
 
 import '../../data/prepare_data.dart';
+import '../../experts/expert_link.dart';
 import '../../services/prepare_store.dart';
 import 'prepare_common.dart';
 import 'prepare_video_screen.dart';
 import '../../widgets/pv_placeholders.dart';
 import '../../localization/app_language.dart';
+
+/// Who teaches the birthing course.
+///
+/// ⚠️ A CONSTANT RATHER THAN A LITERAL IN THE WIDGET, because it is now a KEY
+/// as well as a label: it is what the roster is searched with. A name typed
+/// inline in one place is a name that can be edited in one place and quietly
+/// stop matching anybody, and the symptom of that is not a crash — it is a row
+/// that silently stops being tappable. Naming it makes the join visible and
+/// makes it greppable from `kExperts`.
+///
+/// The course itself has no data model with an instructor on it
+/// (`BirthingClass` is a video row), so this is the whole join.
+const String kBirthingInstructor = 'Meera Nair';
 
 class BirthingClassesScreen extends StatelessWidget {
   const BirthingClassesScreen({super.key, required this.lang});
@@ -124,30 +138,55 @@ class BirthingClassesScreen extends StatelessWidget {
                     const SizedBox(height: 6),
                     Text(s.uiClassesSelfPacedVideo, style: pvBody(kSoft, 13)),
                     const SizedBox(height: 14),
-                    Row(children: [
-                      pvAvatar(34),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text.rich(
-                          TextSpan(children: [
-                            // The instructor's name is a name - identical in
-                            // both languages - so it leads in both, and the
-                            // localized remainder carries the grammar. Hindi
-                            // puts "ke saath" AFTER the name, so a leading
-                            // "With " span would have had to translate to an
-                            // empty string.
-                            const TextSpan(
-                                text: 'Meera Nair',
-                                style: TextStyle(color: kInk, fontWeight: FontWeight.w700)),
-                            TextSpan(text: s.prepCertifiedChildbirthEducator),
-                            TextSpan(
-                                text: s.prepObReviewed,
-                                style: const TextStyle(color: kMuted)),
-                          ]),
-                          style: pvBody(kSoft, 13),
+                    // ⚠️ THE WHOLE ROW IS THE TAP TARGET, NOT THE NAME ALONE,
+                    // and that is the opposite of what `PpExpertName` does on
+                    // a video card. The difference is whether the row has a
+                    // competing job. A video card's row plays the video, so
+                    // only the name's glyphs may respond; this row does
+                    // nothing else, so a name-sized target inside it would
+                    // just be a target people miss.
+                    //
+                    // Guarded on a resolved expert rather than wrapped
+                    // unconditionally: a tap that opens nothing is the defect
+                    // this whole change exists to remove, so if "Meera Nair"
+                    // ever stops matching a roster entry the row goes back to
+                    // being plain text instead of becoming a dead button.
+                    // `test/expert_link_coverage_test.dart` fails first.
+                    Builder(builder: (context) {
+                      final expert = expertByName(kBirthingInstructor);
+                      final row = Row(children: [
+                        pvAvatar(34),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text.rich(
+                            TextSpan(children: [
+                              // The instructor's name is a name - identical in
+                              // both languages - so it leads in both, and the
+                              // localized remainder carries the grammar. Hindi
+                              // puts "ke saath" AFTER the name, so a leading
+                              // "With " span would have had to translate to an
+                              // empty string.
+                              TextSpan(
+                                  text: kBirthingInstructor,
+                                  style: TextStyle(
+                                      color: kInk,
+                                      fontWeight: FontWeight.w700,
+                                      decoration: expert == null ? null : TextDecoration.underline,
+                                      decorationThickness: 0.6)),
+                              TextSpan(text: s.prepCertifiedChildbirthEducator),
+                              TextSpan(
+                                  text: s.prepObReviewed,
+                                  style: const TextStyle(color: kMuted)),
+                            ]),
+                            style: pvBody(kSoft, 13),
+                          ),
                         ),
-                      ),
-                    ]),
+                        if (expert != null)
+                          const Icon(Icons.chevron_right_rounded, size: 18, color: kMuted),
+                      ]);
+                      if (expert == null) return row;
+                      return PpExpertTapRow(expert: expert, child: row);
+                    }),
                     const SizedBox(height: 18),
                     const Divider(height: 1, color: Color(0xFFF0EBF5)),
                     const SizedBox(height: 16),

@@ -88,6 +88,22 @@ class ExpertStore extends ContentStore<Expert> {
       // ParentVeda+, never from a string an editor typed. Publishing a row
       // makes someone appear; it does not invent time for them.
       timings: row['takes_consults'] == false ? '' : 'By schedule',
+
+      // ⚠️ THE CREDENTIALS BLOCK IS NOT MAPPED, AND THAT IS A GAP, NOT A
+      // DESIGN. `qualifications`, `experience`, `practises_at`, `registration`
+      // and `memberships` were added to `Expert` on 2026-08-27 for the expert
+      // profile; `expert_profiles` has no columns for them yet, so a doctor
+      // published from the panel today gets a profile with no degrees on it
+      // while a bundled seed expert has three.
+      //
+      // Left absent rather than faked from `blurb`. It would have been easy to
+      // split the blurb on its first "·" — most of them begin "MBBS, DCH · …" —
+      // and it would have been wrong: a credential is a CLAIM about a real
+      // clinician, and the app must never compute one. A missing qualification
+      // shows nothing; a derived one is us asserting a degree nobody verified.
+      //
+      // The migration is written up in docs/STILL-OPEN.md. Until it lands, the
+      // honest read of a panel-published expert is "credentials not recorded".
       availableToday: true,
       videoConsult: row['video_consult'] != false,
       priceValue: rupees,

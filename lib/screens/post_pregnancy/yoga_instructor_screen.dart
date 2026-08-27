@@ -1,12 +1,29 @@
 // =============================================================================
-//  YogaInstructorScreen — the teacher behind the class
+//  YogaInstructorScreen — SUPERSEDED 2026-08-27, kept as a fallback
 // -----------------------------------------------------------------------------
-//  For a live class, and especially a 1:1, the instructor IS the product — you
-//  are booking a person, not a video. The class detail had their bio inline but
-//  no way to open THEM: who they are, what they focus on, their rating, and
-//  every other class they teach. Tapping the instructor row on a class now
-//  opens this, built entirely from data already on the YogaClass (name,
-//  credential, bio, focus, rating) plus classesByInstructor for their roster.
+//  ⚠️ THIS IS NO LONGER THE PAGE A TEACHER'S NAME OPENS. Tapping an instructor
+//  now opens the app's one expert profile (`ProviderProfileScreen`), the same
+//  page reached from Prepare, from a masterclass and from Find help. This is
+//  only reached if a teacher's name resolves to nobody in the roster, which
+//  `test/expert_link_coverage_test.dart` prevents.
+//
+//  ⚠️ WHY IT HAD TO GO, STATED PLAINLY BECAUSE IT IS THE GENERAL LESSON: it
+//  built a PERSON out of a PRODUCT. Everything on it came off whichever
+//  `YogaClass` you happened to arrive from — the bio was that class's
+//  `instructorBio`, the credential was that class's copy of it, and the rating
+//  and review count were THAT CLASS'S, presented under her name as though they
+//  were hers. So Nisha Pillai was a "Yoga & Breathwork Guide" rated 4.6 from
+//  one door and a "Meditation & Breathwork Guide" rated 4.9 from another. Two
+//  pages, both claiming to be about her, disagreeing.
+//
+//  A profile assembled from the thing you clicked is not a profile; it is the
+//  thing you clicked, wearing a person's name. The fix was to give teachers
+//  their own records (`lib/experts/yoga_experts.dart`) so the page is about
+//  her and the class page is about the class.
+//
+//  Original intent, still true and now served better elsewhere: for a live
+//  class, and especially a 1:1, the instructor IS the product — you are booking
+//  a person, not a video.
 // =============================================================================
 
 import 'package:flutter/material.dart';

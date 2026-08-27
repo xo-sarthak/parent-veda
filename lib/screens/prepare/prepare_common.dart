@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 
 import '../../booking/booking_catalog.dart';
 import '../../services/prepare_store.dart';
+import '../../experts/expert_link.dart';
 import '../post_pregnancy/booking_sheet.dart';
 import '../../theme/pv_fonts.dart';
 import '../../localization/app_language.dart';
@@ -301,6 +302,124 @@ Widget pvAvatar(double size) => Container(
       clipBehavior: Clip.antiAlias,
       child: const PvStriped(height: 100, colorA: kBorder, colorB: kStripeB),
     );
+
+// =============================================================================
+//  PvExpertRow — a named coach, in Prepare, that actually opens
+// -----------------------------------------------------------------------------
+//  ⚠️ THE BUG THIS ENDS. Every paid surface in Prepare named the person leading
+//  it — "Meet your coach" on a masterclass, "Your coach" on a cohort, "Your
+//  instructor" on a course — and not one of those names did anything when
+//  tapped. Meanwhile Yoga, two taps away in the same tab, opened a teacher's
+//  page. Reported as: "if I click on any cohort and courses like a master class
+//  and I see the coach, I'm not able to click on that coach profile… but in
+//  Yoga I can."
+//
+//  An affordance that works in one place and not the next is worse than one
+//  that never works. A name that is never tappable teaches "names are not
+//  links" once; a name that is tappable in some places teaches nothing, and
+//  every dead one reads as the app being broken. Parenting learned this the
+//  same way — see `pp_expert_link.dart`, written after twenty-two of
+//  twenty-eight names turned out to be dead.
+//
+//  ⚠️ A WIDGET, NOT FOUR HAND-WRITTEN GestureDetectors. Four screens showed
+//  this row and each had its own markup, which is why they had drifted apart
+//  (two showed a bio, one showed a fixed sentence, one showed nothing). One
+//  widget means the tap, the chevron and the "does this person exist" question
+//  are decided once, and the fifth screen written next month gets it free.
+//
+//  ⚠️ IT RESOLVES THE PERSON BEFORE IT OFFERS THE TAP. `expertByName` returns
+//  null for a name with no roster entry, and this renders a plain, un-tappable
+//  row in that case rather than `expertById`'s fallback — which hands back a
+//  DIFFERENT REAL DOCTOR for an unknown id. Opening a stranger's profile under
+//  the coach's name is a worse bug than the dead tap it would be fixing.
+class PvExpertRow extends StatelessWidget {
+  const PvExpertRow({
+    super.key,
+    required this.name,
+    required this.role,
+    this.bio = '',
+    this.avatar = 56,
+  });
+
+  /// The displayed name, and the key the roster is searched with.
+  final String name;
+
+  /// The one-line role beneath it ("Doula & birth coach").
+  final String role;
+
+  /// An optional sentence about her on THIS offering. Kept where it says
+  /// something the profile does not — why she is on this particular class —
+  /// and dropped where it merely repeated her profile blurb.
+  final String bio;
+
+  final double avatar;
+
+  @override
+  Widget build(BuildContext context) {
+    final expert = expertByName(name);
+    final row = Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        pvAvatar(avatar),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(name, style: pvTitleStyle(15)),
+            const SizedBox(height: 1),
+            Text(role, style: pvBody(kPurple, 12).copyWith(fontWeight: FontWeight.w600)),
+            if (bio.trim().isNotEmpty) ...[
+              const SizedBox(height: 7),
+              Text(bio, style: pvBody(kSoft, 13).copyWith(height: 1.55)),
+            ],
+            if (expert != null) ...[
+              const SizedBox(height: 8),
+              Row(mainAxisSize: MainAxisSize.min, children: [
+                // English literal, not an `S` entry. New copy is English only
+                // as of 2026-08-27 (CLAUDE.md, "New work is English"), and
+                // adding a `_p(en, hi)` pair here would have meant writing
+                // Hindi nobody asked for.
+                Text('View full profile',
+                    style: pvBody(kPurple, 12).copyWith(fontWeight: FontWeight.w700)),
+                const SizedBox(width: 2),
+                const Icon(Icons.chevron_right_rounded, size: 16, color: kPurple),
+              ]),
+            ],
+          ]),
+        ),
+      ],
+    );
+    if (expert == null) return row;
+    return GestureDetector(
+      onTap: () => openExpertProfile(context, expert),
+      behavior: HitTestBehavior.opaque,
+      child: row,
+    );
+  }
+}
+
+/// A coach's name inside a card's meta line, with the NAME tappable and
+/// nothing else.
+///
+/// ⚠️ THE CARD KEEPS ITS JOB. `PvExpertRow` above makes a whole block tappable
+/// because that block is only about her; a catalogue card is not — it opens the
+/// masterclass. Nesting a second full-width tap zone over it would steal the
+/// card's own tap, so only the name's glyphs respond. That is what
+/// `PpExpertName`'s `TapGestureRecognizer` buys and why it is not an `InkWell`.
+///
+/// [prefix] and [suffix] carry the surrounding grammar ("with ", " · 90 min"),
+/// so a localised sentence keeps its word order with one live word inside it.
+///
+/// Renders plain text when the name matches nobody. A dead tap is the bug being
+/// fixed here; a plain name is just a name.
+Widget pvExpertName(String name,
+    {String prefix = '', String suffix = '', TextStyle? style}) {
+  final expert = expertByName(name);
+  if (expert == null) {
+    return Text('$prefix$name$suffix',
+        style: style, maxLines: 1, overflow: TextOverflow.ellipsis);
+  }
+  return PpExpertName(expert, style: style, prefix: prefix, suffix: suffix);
+}
 
 // ---- bottom "sticky bar" fade backing --------------------------------------
 const BoxDecoration pvBottomFade = BoxDecoration(

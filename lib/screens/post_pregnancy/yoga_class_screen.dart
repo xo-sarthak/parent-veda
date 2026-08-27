@@ -13,6 +13,8 @@ import 'package:flutter/material.dart';
 import '../../booking/booking_catalog.dart';
 import 'booking_sheet.dart';
 import 'pp_common.dart';
+import 'pp_expert_link.dart';
+import 'pp_experts_data.dart';
 import 'pp_yoga_data.dart';
 import 'yoga_common.dart';
 import 'yoga_instructor_screen.dart';
@@ -85,8 +87,24 @@ class YogaClassScreen extends StatelessWidget {
                   // instructor
                   const SizedBox(height: 20),
                   _pad(_instructorRow(context)),
-                  const SizedBox(height: 14),
-                  _pad(_instructorAbout(context)),
+
+                  // ⚠️ THE "About <name>" CARD THAT SAT HERE IS GONE, ON
+                  // PURPOSE, AND THIS IS THE CHANGE THE REPORT ASKED FOR:
+                  // "there is then no separate need to provide an About Aditi
+                  // Verma section below the name itself".
+                  //
+                  // It duplicated the profile the row directly above it opens —
+                  // same bio, same focus chips, same "also teaches" list — and
+                  // it existed only because there was nowhere else to put them
+                  // when the profile was a thin, yoga-only page built from one
+                  // class. Now that every teacher has a real profile, keeping
+                  // this made the class page longer and taught a mother that
+                  // the row above it was not worth tapping.
+                  //
+                  // Kept for revert: `_instructorAbout` is commented out below
+                  // rather than deleted, along with `YogaInstructorScreen`.
+                  // const SizedBox(height: 14),
+                  // _pad(_instructorAbout(context)),
 
                   // quick facts
                   const SizedBox(height: 20),
@@ -175,13 +193,35 @@ class YogaClassScreen extends StatelessWidget {
   }
 
   // ---- instructor ---------------------------------------------------------
-  // Tappable now — opens the teacher's profile. For a class (and especially a
-  // 1:1) you are booking the person, so being able to open who they are matters.
+  // Tappable — opens the teacher's profile. For a class (and especially a 1:1)
+  // you are booking the person, so being able to open who they are matters.
+  //
+  // ⚠️ IT NOW OPENS THE APP'S ONE EXPERT PROFILE, NOT `YogaInstructorScreen`.
+  // That screen built a teacher out of whichever CLASS you happened to arrive
+  // from — her bio was `cls.instructorBio`, her rating was THAT class's rating,
+  // her credential was that class's copy of it. So the same teacher looked
+  // different depending on the door: Nisha Pillai was a "Yoga & Breathwork
+  // Guide" from one class and a "Meditation & Breathwork Guide" from another,
+  // and her rating changed between 4.6 and 4.9 while the profile claimed to be
+  // about her rather than about the class.
+  //
+  // A profile assembled from the thing you clicked is not a profile. Every
+  // teacher now has a roster entry (`lib/experts/yoga_experts.dart`) and this
+  // opens that — the same page a mother reaches from Prepare, from a
+  // masterclass, or from Find help.
+  //
+  // Falls back to the old screen when a name has no roster entry, so an
+  // unrostered teacher added tomorrow degrades to what shipped yesterday
+  // instead of to a dead tap. `test/expert_link_coverage_test.dart` fails if
+  // that fallback is ever actually needed.
   Widget _instructorRow(BuildContext context) {
     final tint = yogaTint(cls.seed + 2);
+    final expert = expertByName(cls.instructorName);
     return GestureDetector(
-      onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
-          builder: (_) => YogaInstructorScreen(source: cls))),
+      onTap: () => expert != null
+          ? openExpertProfile(context, expert)
+          : Navigator.of(context).push(MaterialPageRoute<void>(
+              builder: (_) => YogaInstructorScreen(source: cls))),
       behavior: HitTestBehavior.opaque,
       child: Row(children: [
         Container(
@@ -209,6 +249,13 @@ class YogaClassScreen extends StatelessWidget {
   /// Who the trainer is, in enough depth to book them. For a one-to-one this
   /// matters more than the class description does - the session is only as
   /// good as the person running it.
+  ///
+  /// ⚠️ SUPERSEDED 2026-08-27 BY THE SHARED EXPERT PROFILE, KEPT FOR REVERT.
+  /// Un-comment the two lines in `build` to bring it back. Left compiling
+  /// rather than commented out as a block so that a rename or a signature
+  /// change elsewhere breaks it loudly here instead of leaving a stale
+  /// comment that no longer compiles the day somebody wants it back.
+  // ignore: unused_element
   Widget _instructorAbout(BuildContext context) {
     final others = classesByInstructor(cls.instructorName, excludeId: cls.id);
     if (cls.instructorBio.isEmpty && others.isEmpty) return const SizedBox.shrink();

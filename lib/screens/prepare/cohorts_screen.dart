@@ -72,14 +72,14 @@ class CohortsScreen extends StatelessWidget {
                     pvAvatar(34),
                     const SizedBox(width: 10),
                     Expanded(
-                      child: Text.rich(
-                        TextSpan(children: [
-                          pvText(s.uiWith),
-                          TextSpan(
-                              text: featured.coachName?.now ?? s.prepYourCoachFallback,
-                              style: const TextStyle(color: kInk, fontWeight: FontWeight.w700)),
-                          pvText(s.uiChildbirthEducator),
-                        ]),
+                      // The name is the only live word in the sentence; the
+                      // card itself still opens the cohort. `.en` is the
+                      // lookup key, and the fallback string ("your coach") is
+                      // nobody, so it resolves to null and renders plain.
+                      child: pvExpertName(
+                        featured.coachName?.en ?? s.prepYourCoachFallback,
+                        prefix: s.uiWith,
+                        suffix: s.uiChildbirthEducator,
                         style: pvBody(kSoft, 13),
                       ),
                     ),

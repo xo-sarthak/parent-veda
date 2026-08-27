@@ -1,98 +1,43 @@
 // =============================================================================
-//  Experts / doctors - shared data for the reusable profile (parenting)
+//  Experts / doctors - the app's single registry of people
 // -----------------------------------------------------------------------------
-//  Every masterclass, cohort, course or local service is led by a named expert.
-//  This backs a single reusable profile screen (ProviderProfileScreen, the
-//  S18·detail layout) so tapping any expert - anywhere - opens their page. A
-//  handful of seed profiles for now; real experts slot in here later without
-//  touching any screen. Kept inside the post_pregnancy module (fully isolated).
+//  Every masterclass, cohort, course, class or local service is led by a named
+//  expert. This backs a single reusable profile screen (ProviderProfileScreen,
+//  the S18·detail layout) so tapping any expert - anywhere - opens their page.
+//
+//  ⚠️ THE HEADER USED TO SAY "kept inside the post_pregnancy module (fully
+//  isolated)" AND THAT STOPPED BEING TRUE SOME TIME AGO. `lib/booking/`,
+//  `lib/services/expert_store.dart`, `prescription_bridge` and the doctor app
+//  all read this file, and as of 2026-08-27 so does the Pregnancy stage. The
+//  `Expert` type itself has moved to `lib/experts/expert.dart`, which is
+//  re-exported below; the two non-Parenting rosters are appended at the bottom
+//  of `kExperts`.
+//
+//  Isolation was never the property that mattered here — a person is not a
+//  stage. What matters is that there is exactly ONE list, because every lookup
+//  in the app reads it and a second list is how a doctor ends up existing on
+//  four screens out of five.
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
-/// One expert/doctor, shaped to fill the profile layout.
-class Expert {
-  const Expert({
-    required this.id,
-    required this.name,
-    required this.credential,
-    required this.backLabel,
-    required this.rating,
-    required this.reviewsCount,
-    required this.mid,
-    required this.fee,
-    required this.whyHeading,
-    required this.why,
-    required this.tags,
-    required this.reviews,
-    required this.ctaPrice,
-    required this.ctaSub,
-    required this.ctaLabel,
-    required this.disclaimer,
-    this.topPick = false,
-    this.topPickLabel = 'ParentVeda top pick',
-    this.seeded = false,
-    this.location = '',
-    // --- Find-help / results fields (all optional, safe defaults) ------------
-    this.category = '',
-    this.blurb = '',
-    this.timings = '',
-    this.availableToday = true,
-    this.videoConsult = false,
-    this.priceValue = 0,
-    this.ratingValue = 0,
-  });
+import '../../experts/expert.dart';
+import '../../experts/pregnancy_experts.dart';
+import '../../experts/yoga_experts.dart';
 
-  final String id;
-  final String name; // "Dr. Ananya Rao"
-  final String credential; // "Paediatrician · 15 years"
-  final String backLabel; // top back-bar label, e.g. "Masterclass expert"
-  /// ⚠️ A PLACEHOLDER PERSON, KEPT DISTINGUISHABLE FROM A REAL ONE.
-  ///
-  /// Six categories had no supply at all, so the doors that named a sleep
-  /// coach, a nutritionist, a physio, a postnatal counsellor or a development
-  /// expert could not be filtered without landing a parent on an empty list.
-  /// The decision was to build the whole path as though the expert exists, so
-  /// that real supply is a data edit rather than a build.
-  ///
-  /// This flag is what stops that being a lie you cannot find later. It is the
-  /// difference between "we have twelve more experts" and "we have twelve
-  /// placeholders and here they are". `kSeededExpertIds` lists them,
-  /// `test/pp_consult_filter_test.dart` counts them, and any screen that needs
-  /// to behave differently for real supply has one boolean to read.
-  ///
-  /// ⚠️ IT IS NOT RENDERED TO A PARENT ANYWHERE, and that is a deliberate
-  /// choice rather than an oversight: a "not a real expert" badge on a booking
-  /// screen would be worse than either shipping or not shipping the door. The
-  /// honest control is that booking is stubbed anyway — see the booking
-  /// engine — so nobody can pay a placeholder.
-  final bool seeded;
-
-  final bool topPick;
-  final String topPickLabel;
-  final String location; // "Delhi NCR · online" - shown under the name on the profile
-  final String rating; // "4.9"
-  final String reviewsCount; // "1,020 reviews"
-  final (String, String) mid; // (value, label) - e.g. ("12k+", "parents taught")
-  final (String, String) fee; // (value, label) - e.g. ("₹1,499", "per class")
-  final String whyHeading; // "Why ParentVeda picks her"
-  final String why; // paragraph
-  final List<String> tags; // languages & specialties
-  final List<(String, String, String)> reviews; // (name, who, quote)
-  final String ctaPrice; // "₹1,499"
-  final String ctaSub; // "via ParentVeda"
-  final String ctaLabel; // "View sessions"
-  final String disclaimer;
-
-  // --- Find-help / results fields (optional; power the "Browse by need" flow) -
-  final String category; // maps to a FindHelpNeed, e.g. "Pediatrician"
-  final String blurb; // 1-2 line qualification desc for the results card
-  final String timings; // e.g. "9-12 PM · 4-6 PM"
-  final bool availableToday;
-  final bool videoConsult;
-  final int priceValue; // numeric mirror of the fee, for price sorting
-  final double ratingValue; // numeric mirror of the rating, for rating sorting
-}
+// ⚠️ THE `Expert` TYPE NOW LIVES IN `lib/experts/expert.dart`, AND THIS FILE
+// RE-EXPORTS IT.
+//
+// It was moved the day the Pregnancy stage started naming the same people.
+// A type that both stages, the booking engine, the doctor app and the content
+// store depend on cannot live inside one stage's folder — that is how the
+// other stage ends up inventing a second, uncheckable one, which is exactly
+// what had happened (`Coach`, `Specialist`, and three loose `instructorName`
+// strings in `lib/data/prepare_data.dart`).
+//
+// The re-export is what made the move cost nothing: ~30 files import `Expert`
+// from here and not one of them had to change.
+export '../../experts/expert.dart';
 
 // Not `const` because the find-help roster below is built via _findHelp(...);
 // the existing seed entries remain const-constructible literals.
@@ -100,6 +45,15 @@ final List<Expert> kExperts = [
   // The original Problem Solver provider - keeps the S18·detail screen identical.
   Expert(
     id: 'neha',
+    qualifications: [
+      'MBBS — Lady Hardinge Medical College, New Delhi',
+      'MD (Paediatrics) — Maulana Azad Medical College',
+      'Diploma in Child Health (DCH)',
+    ],
+    experience: '12 years in general paediatrics',
+    practisesAt: 'Consultant Paediatrician — Max Smart Super Speciality, Saket',
+    registration: 'DMC Reg. 51872',
+    memberships: ['Indian Academy of Paediatrics'],
     location: 'Greater Kailash, Delhi',
     name: 'Dr. Neha Sharma',
     credential: 'Paediatrician · 12 years',
@@ -133,6 +87,15 @@ final List<Expert> kExperts = [
   // Masterclass + featured expert.
   Expert(
     id: 'ananya',
+    qualifications: [
+      'MBBS — Grant Medical College, Mumbai',
+      'MD (Paediatrics) — KEM Hospital, Mumbai',
+      'Certified paediatric sleep practitioner',
+    ],
+    experience: '15 years · 12,000+ parents taught',
+    practisesAt: 'Consultant Paediatrician — Delhi NCR, and ParentVeda masterclasses',
+    registration: 'DMC Reg. 39204',
+    memberships: ['Indian Academy of Paediatrics'],
     location: 'Delhi NCR · online sessions',
     name: 'Dr. Ananya Rao',
     credential: 'Paediatrician · 15 years',
@@ -166,6 +129,15 @@ final List<Expert> kExperts = [
   // Cohort coach.
   Expert(
     id: 'meher',
+    qualifications: [
+      'MBBS — Seth GS Medical College, Mumbai',
+      'Certified Paediatric Sleep Consultant — Family Sleep Institute',
+      'Trained in responsive, no-cry-it-out sleep methods',
+    ],
+    experience: '8 years · 60+ cohorts led',
+    practisesAt: 'Independent sleep practice, Mumbai',
+    registration: 'MMC Reg. 2011/04/1882',
+    memberships: ['Indian Academy of Paediatrics'],
     location: 'Mumbai · online cohorts',
     blurb: 'Paediatric sleep consultant · gentle, no-cry-it-out sleep. Has coached 60+ small cohorts of Indian families.',
     name: 'Dr. Meher Shah',
@@ -193,6 +165,15 @@ final List<Expert> kExperts = [
   // Masterclass - Wonder Weeks.
   Expert(
     id: 'kabir',
+    qualifications: [
+      'MA Clinical Psychology — Christ University, Bengaluru',
+      'MPhil Child & Adolescent Psychology — NIMHANS',
+      'Trained in developmental leaps and infant behaviour',
+    ],
+    experience: '12 years in child psychology',
+    practisesAt: 'Independent practice, Bengaluru',
+    registration: 'RCI Reg. A-41207',
+    memberships: ['Rehabilitation Council of India'],
     location: 'Bengaluru · online',
     name: 'Dr. Kabir Sen',
     credential: 'Child psychologist · 12 years',
@@ -225,6 +206,14 @@ final List<Expert> kExperts = [
   // Masterclass - baby-proofing.
   Expert(
     id: 'meera',
+    qualifications: [
+      'MSc Child Development — Lady Irwin College, New Delhi',
+      'Certified Child Safety Educator — Safe Kids Worldwide',
+      'Paediatric first-aid and CPR instructor',
+    ],
+    experience: '10 years teaching home safety and first aid',
+    practisesAt: 'ParentVeda workshops · independent practice, New Delhi',
+    memberships: ['Indian Association for Child Safety'],
     location: 'Chennai · home visits + online',
     blurb: 'Certified child-safety educator · room-by-room baby-proofing for Indian and joint-family homes.',
     name: 'Meera Iyer',
@@ -251,6 +240,15 @@ final List<Expert> kExperts = [
   // Masterclass - starting solids.
   Expert(
     id: 'ritu',
+    qualifications: [
+      'MSc Clinical Nutrition & Dietetics — SNDT University, Mumbai',
+      'Registered Dietitian (RD) — Indian Dietetic Association',
+      'Certified in maternal and paediatric nutrition',
+    ],
+    experience: '10 years · prenatal, infant and toddler nutrition',
+    practisesAt: 'Independent practice, Mumbai',
+    registration: 'IDA RD Reg. 4471',
+    memberships: ['Indian Dietetic Association'],
     location: 'Delhi NCR · online',
     blurb: 'Paediatric nutritionist · calm, mess-friendly first foods with an Indian-first, allergy-safe order.',
     name: 'Ritu Malhotra',
@@ -461,6 +459,22 @@ final List<Expert> kExperts = [
       '9-12 PM', 4.6, 650, false, true,
       const ['Hindi', 'Urdu', 'English', 'Montessori'], seeded: true),
 
+  // ===========================================================================
+  //  The other two stages' people.
+  // ---------------------------------------------------------------------------
+  //  ⚠️ ONE REGISTRY, NOT THREE, AND THE SPREAD IS THE WHOLE MECHANISM.
+  //
+  //  `expertById`, `expertByName`, `BookingCatalog`, `prescription_bridge` and
+  //  `mergedExperts()` all read `kExperts` and nothing else. A second list
+  //  somewhere would mean each of those had to learn about it, and the one
+  //  that got missed would be a doctor who exists on four screens out of five —
+  //  the exact failure `mergedExperts()`'s own doc comment warns about.
+  //
+  //  So Pregnancy's roster and the shared movement roster append here. The
+  //  lists live in `lib/experts/` because they are not Parenting's; this file
+  //  is only where the single registry happens to be assembled.
+  ...kPregnancyExperts,
+  ...kYogaExperts,
 ];
 
 /// Builder for a lean find-help expert - fills the required narrative fields with

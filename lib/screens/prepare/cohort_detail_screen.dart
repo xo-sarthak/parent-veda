@@ -6,6 +6,7 @@
 import 'package:flutter/material.dart';
 
 import '../../data/prepare_data.dart';
+import '../../experts/expert_link.dart';
 import 'prepare_common.dart';
 import '../../localization/app_language.dart';
 
@@ -75,18 +76,19 @@ class CohortDetailScreen extends StatelessWidget {
                 _divider(),
                 _title(s.prepYourCoach),
                 const SizedBox(height: 14),
-                Row(children: [
-                  pvAvatar(56),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                      Text(c.coachName!.now, style: pvTitleStyle(15)),
-                      const SizedBox(height: 2),
-                      Text(s.uiLeadsEveryLiveSession,
-                          style: pvBody(kSoft, 13).copyWith(height: 1.5)),
-                    ]),
-                  ),
-                ]),
+                // `.en` is the roster key, `.now` is the label — see the note
+                // on `_coach` in masterclass_detail_screen.dart.
+                //
+                // The old row put "Leads every live session" where a role
+                // belongs, which is not who she is, it is what the cohort is.
+                // Her actual credential now comes from the one place it is
+                // written down, and the sentence about the cohort moves to the
+                // bio line where it was always describing this programme.
+                PvExpertRow(
+                  name: c.coachName!.en,
+                  role: expertByName(c.coachName!.en)?.credentialNow ?? '',
+                  bio: s.uiLeadsEveryLiveSession,
+                ),
               ],
 
               if (c.reviews.isNotEmpty) ...[

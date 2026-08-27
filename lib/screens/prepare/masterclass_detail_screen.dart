@@ -218,21 +218,28 @@ class MasterclassDetailScreen extends StatelessWidget {
         ]),
       );
 
-  Widget _coach(Coach c) => Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          pvAvatar(56),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(c.name.now, style: pvTitleStyle(15)),
-              const SizedBox(height: 1),
-              Text(c.role.now, style: pvBody(kPurple, 12).copyWith(fontWeight: FontWeight.w600)),
-              const SizedBox(height: 7),
-              Text(c.bio.now, style: pvBody(kSoft, 13).copyWith(height: 1.55)),
-            ]),
-          ),
-        ],
+  // ⚠️ `.en` FOR THE LOOKUP, `.now` FOR THE LABEL, AND THE TWO ARE NOT
+  // INTERCHANGEABLE. `PvExpertRow` searches the roster with `name`, so it has
+  // to receive the IDENTITY value — the rendered one would find nobody the
+  // moment a mother switched to Hindi, and the coach would silently stop being
+  // tappable with nothing failing to compile. This is the `.en`/`.now` trap
+  // CLAUDE.md counts eight instances of.
+  //
+  // The bio STAYS here, unlike the "About <name>" block that was removed from
+  // the yoga class page. It is not the same content: this sentence says why she
+  // is on THIS masterclass ("brings the emotional side — fear, partners"),
+  // which her profile does not and should not say. What was removed elsewhere
+  // was a verbatim restatement of the profile, under a row that already opened
+  // the profile.
+  //
+  // ⚠️ THE ROW IS THE TARGET HERE, NOT JUST THE NAME. Unlike `PpExpertName` on
+  // a video card, this block has no competing job — the whole thing is about
+  // her, so the whole thing responds. A name-sized tap target inside a
+  // three-line block is a target most people miss.
+  Widget _coach(Coach c) => PvExpertRow(
+        name: c.name.en,
+        role: c.role.now,
+        bio: c.bio.now,
       );
 
   Widget _testimonial(Testimonial t) => Container(

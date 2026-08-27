@@ -2366,6 +2366,105 @@ cheaper and worse — a reading screen is exactly where a question occurs to her
 Not urgent. Written down because it will be re-noticed on every device walk
 otherwise.
 
+## 16.0 An expert profile the panel cannot fill — OPENED 2026-08-27
+
+`Expert` gained a credentials block on 2026-08-27 — `qualifications`,
+`experience`, `practisesAt`, `registration`, `memberships` — because the expert
+profile was reading as a credit rather than a profile. Reported as: *"when I
+click on the profile what I see about this doctor should be a bit more in
+depth… qualifications, what she is, what she does."*
+
+**`expert_profiles` has no columns for any of it.** So the picture today is
+split down the middle:
+
+| Where the expert comes from | What her profile shows |
+|---|---|
+| Bundled seed (`lib/experts/*.dart`, the six Parenting entries) | Degrees, years, hospital, council registration, memberships |
+| Published from the panel (`ExpertStore`) | Name, credential line, blurb — and an absent credentials block |
+
+`ExpertStore.fromMap` deliberately does not fake it. Most find-help blurbs open
+with the degrees (`'MBBS, DCH · newborn care…'`) and splitting on the first `·`
+would have filled the block for free. That was rejected: **a credential is a
+claim about a real clinician, and the app must never compute one.** A missing
+qualification shows nothing; a derived one is ParentVeda asserting a degree
+nobody verified, on a screen where a mother is deciding whether to trust a
+doctor with her baby.
+
+What the migration needs:
+
+1. `expert_profiles.qualifications` (`text[]`), `experience` (`text`),
+   `practises_at` (`text`), `registration` (`text`), `memberships` (`text[]`).
+2. `ExpertStore.fromMap` and `toCacheMap` to carry all five. ⚠️ **Both, or
+   neither** — a field read by `fromMap` and missing from `toCacheMap` is
+   correct before a restart and empty after one, which is the note already on
+   `toCacheMap`.
+3. Directus fields on the Experts collection, in the same batched pass as the
+   rest (see the Directus setup memory).
+4. **An operator step, not a code step:** registration numbers are shown and
+   never verified by the app. The profile prints them under a plain
+   "Registration" label with no tick and no "verified" wording, precisely so
+   nothing implies we checked. Someone has to actually check them before a real
+   clinician goes live.
+
+Also still open, and smaller: the ~40 find-help doctors have no credentials
+block at all. They are lean placeholder rows whose degrees live in `blurb`, and
+they should get real records when real supply replaces them — the same day
+`kSeededExpertIds` empties out.
+
+---
+
+## 16.1 Reviews on an expert profile are Parenting-shaped
+
+`Expert.reviews` is `List<(String, String, String)>` — plain English tuples. The
+Pregnancy roster added on 2026-08-27 therefore ships with `reviews: const []`
+and the profile hides the block, even though the same mothers' reviews already
+exist, bilingually, on the consultation and masterclass pages a tap away
+(`Review` in `lib/data/prepare_data.dart`, `LocalizedText` on every field).
+
+Nothing is wrong on screen — a hidden empty block is correct behaviour. But a
+Pregnancy expert's profile is quieter than it needs to be, and the fix is not a
+copy-paste: it is deciding whether `Expert.reviews` becomes a real type shared
+with `Review`, which touches ~30 importers of a shipped stage. Parked
+deliberately rather than done badly under a UI change.
+
+---
+
+## 16.2 TTC names people the roster has never heard of — OPEN
+
+Pregnancy, Parenting and the shared yoga marketplace all resolve a named person
+to one profile as of 2026-08-27. **TTC does not**, and it is worth being precise
+about why, because it is two different problems wearing one label.
+
+**TTC's paid offerings name nobody.** `TtcOffering` carries an `expertId`
+(`ttc_dr_fertility`, `ttc_dr_gynae`, `ttc_dr_androl`, `ttc_yoga_lead`,
+`ttc_nutritionist`, `ttc_psychologist`) and **nothing in `kExperts` has those
+ids**, so `ttc_prepare_screen.dart` renders no name at all. That is not a dead
+tap — there is nothing to tap. Fixing it means writing six real people, which
+is content, not wiring, and it should happen alongside whoever will actually
+take those consultations.
+
+**TTC's reads and videos name people who are the wrong people.** Eight TTC
+articles and several videos are credited to `Dr. Ananya Rao` — who exists, and
+is Parenting's **paediatrician**, whose subject is infant sleep and
+vaccinations. `Dr. Vikram Nair` and `Dr. Sharanya Menon` exist nowhere.
+
+⚠️ **This is why those bylines were deliberately NOT made tappable in the same
+pass.** Wiring them would have been two lines and would have made the app worse:
+tapping a fertility article's author would have opened a paediatrician's
+profile, which is the `expert_roster` / `doctorInfoById` defect — a real
+person's name presented as somebody else's — reintroduced on purpose. The
+existing `pp_expert_links_test` already argues exactly this point: *"a journey
+written by a lactation consultant and credited to a paediatrician is a smaller
+error than an invented person and it is still a wrong one."*
+
+The fix is a content decision before it is a code one: TTC needs its own
+fertility specialist, andrologist and counsellor, and the thirteen bylines need
+reassigning to them. Once those exist with ids, TTC joins the same seam
+(`lib/experts/expert_link.dart`) that Pregnancy did, and
+`test/expert_link_coverage_test.dart` gains a TTC group.
+
+---
+
 ---
 
 **None of the above blocks a build.** All of it blocks being comfortable, and

@@ -183,21 +183,14 @@ class ProgramDetailScreen extends StatelessWidget {
               const SizedBox(height: 26),
               _pad(Text(p.isLive ? s.prepYourCoach : s.prepYourInstructor, style: pvTitleStyle(18))),
               const SizedBox(height: 14),
-              _pad(Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                pvAvatar(64),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text(p.instructorName.now, style: pvTitleStyle(16)),
-                    const SizedBox(height: 2),
-                    Text(p.instructorRole.now, style: pvBody(kPurple, 12).copyWith(fontWeight: FontWeight.w600)),
-                    if (p.instructorBio.en.isNotEmpty) ...[
-                      const SizedBox(height: 8),
-                      Text(p.instructorBio.now, style: pvBody(kSoft, 13).copyWith(height: 1.55)),
-                    ],
-                  ]),
-                ),
-              ])),
+              // `.en` is the roster key, `.now` is the label — see the note on
+              // `_coach` in masterclass_detail_screen.dart.
+              _pad(PvExpertRow(
+                name: p.instructorName.en,
+                role: p.instructorRole.now,
+                bio: p.instructorBio.en.isEmpty ? '' : p.instructorBio.now,
+                avatar: 64,
+              )),
 
               // recorded-course lessons
               if (p.lessons.isNotEmpty) ...[

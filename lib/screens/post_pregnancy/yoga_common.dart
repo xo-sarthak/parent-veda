@@ -12,7 +12,30 @@
 import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
+import 'pp_expert_link.dart';
+import 'pp_experts_data.dart';
 import 'pp_yoga_data.dart';
+
+/// A class card's "· Aditi Verma" line, with the NAME tappable and nothing else.
+///
+/// ⚠️ THE NAME IS THE TARGET, NOT THE CARD. A class card already has a job —
+/// it opens the class — so wrapping it in a second tap zone would steal that.
+/// `PpExpertName` uses a `TapGestureRecognizer` on just the name's glyphs for
+/// exactly this case; see its file header.
+///
+/// Falls back to plain text for a teacher with no roster entry, because a tap
+/// that opens nothing is the defect, not the fix. `expertByName` returns null
+/// rather than `expertById`'s first-expert fallback, which would put a
+/// stranger's profile behind her name.
+Widget yogaInstructorLine(YogaClass cls,
+    {String prefix = '', String suffix = '', TextStyle? style}) {
+  final expert = expertByName(cls.instructorName);
+  if (expert == null) {
+    return Text('$prefix${cls.instructorName}$suffix',
+        style: style, maxLines: 1, overflow: TextOverflow.ellipsis);
+  }
+  return PpExpertName(expert, style: style, prefix: prefix, suffix: suffix);
+}
 
 // Gentle placeholder tints, varied by seed so a rail doesn't read as flat.
 const List<(Color, Color)> _kYogaTints = [
@@ -196,10 +219,9 @@ class YogaBigCard extends StatelessWidget {
                       style: ppBody(11.5, color: Colors.white, w: FontWeight.w700)),
                   const SizedBox(width: 6),
                   Flexible(
-                    child: Text('· ${cls.instructorName}',
-                        style: ppBody(11.5, color: Colors.white.withValues(alpha: 0.85)),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis),
+                    child: yogaInstructorLine(cls,
+                        prefix: '· ',
+                        style: ppBody(11.5, color: Colors.white.withValues(alpha: 0.85))),
                   ),
                 ]),
                 const SizedBox(height: 12),
@@ -256,8 +278,8 @@ class YogaListCard extends StatelessWidget {
               const SizedBox(height: 8),
               Text(cls.title, style: ppJakarta(15).copyWith(height: 1.2), maxLines: 2, overflow: TextOverflow.ellipsis),
               const SizedBox(height: 4),
-              Text('${cls.instructorName} · ${cls.categoryInfo.title}',
-                  style: ppBody(12, color: ppSoft), maxLines: 1, overflow: TextOverflow.ellipsis),
+              yogaInstructorLine(cls,
+                  suffix: ' · ${cls.categoryInfo.title}', style: ppBody(12, color: ppSoft)),
               const SizedBox(height: 6),
               Row(children: [
                 yogaStars(cls.rating, cls.reviewsCount, showCount: false),
