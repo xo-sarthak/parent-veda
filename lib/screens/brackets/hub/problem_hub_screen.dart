@@ -47,6 +47,7 @@ import 'package:flutter/material.dart';
 import '../../../localization/app_language.dart';
 import '../../../models/bracket.dart';
 import '../../../theme/pv_fonts.dart';
+import '../../../widgets/pv_placeholders.dart';
 import '../../v2/v2_palette.dart';
 import '../../v2/v3_bracket_art.dart';
 import '../../v2/v3_hero_field.dart';
@@ -262,12 +263,33 @@ class _Hero extends StatelessWidget {
                             color: p.ink1)),
                   ),
                   const SizedBox(height: 9),
-                  ConstrainedBox(
-                    constraints: const BoxConstraints(maxWidth: 300),
-                    child: Text(config.heroSupport.of(lang),
-                        style: pvManrope(
-                            fontSize: 13.5, height: 1.45, color: p.ink2)),
-                  ),
+                  // ⚠️ THE FILM REPLACES THE LINE, IT DOES NOT JOIN IT. Both
+                  // answer "what does this problem area cover", and showing
+                  // both doubles the hero's height to carry one fact. The line
+                  // is not lost — it becomes the placeholder's subtitle, and
+                  // the day a real file lands it is what the thumbnail says.
+                  //
+                  // ⚠️ NULL ON EVERY NON-TTC HUB, so pregnancy and parenting
+                  // render exactly what they rendered before. See the field's
+                  // note in `hub_config.dart` for why this is data rather than
+                  // a flag the shared screen reads.
+                  if (config.heroVideoSlot case final slot?)
+                    Padding(
+                      padding: const EdgeInsets.only(right: 4, top: 2),
+                      child: PvVideoPlaceholder(
+                        title: config.hero.of(lang),
+                        subtitle: config.heroSupport.of(lang),
+                        hue: bracket.hue,
+                        slotId: slot,
+                      ),
+                    )
+                  else
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 300),
+                      child: Text(config.heroSupport.of(lang),
+                          style: pvManrope(
+                              fontSize: 13.5, height: 1.45, color: p.ink2)),
+                    ),
                 ]),
           ),
         ),

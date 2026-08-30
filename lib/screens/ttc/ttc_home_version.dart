@@ -19,7 +19,9 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/app_theme.dart';
+import 'ttc_common.dart';
 import 'ttc_home_v3.dart';
+import 'ttc_intro_flow.dart';
 import 'ttc_today_screen.dart';
 
 enum TtcHomeVersion {
@@ -45,8 +47,57 @@ class TtcHomeVersionStore extends ChangeNotifier {
 }
 
 /// What the splash and the stage doors push instead of `TtcTodayScreen`.
-class TtcHomeScreen extends StatelessWidget {
+///
+/// ⚠️ IT ALSO OWNS THE FIRST-RUN GATE, and this is the only place that can. The
+/// introduction has to run on ARRIVING IN THE STAGE — which is not the same
+/// moment as signing up, because a woman can reach TTC from the pregnancy
+/// home's doorway months after creating an account. Every route into the stage
+/// goes through this widget (`openTtc`, the splash, the profile's stage switch),
+/// so gating here is what makes "once, on first arrival" actually mean that.
+///
+/// ⚠️ AND IT GATES BOTH VERSIONS, NOT JUST V3. The rest of this batch is V3-only
+/// by instruction; the introduction is not a home design, it is the stage's
+/// front door, and a woman toggled onto V1 who has never seen the stage needs it
+/// just as much. Nothing it writes is V3-specific — a period date, a journey
+/// start and a pathway are read by V1's screens identically.
+class TtcHomeScreen extends StatefulWidget {
   const TtcHomeScreen({super.key});
+
+  @override
+  State<TtcHomeScreen> createState() => _TtcHomeScreenState();
+}
+
+class _TtcHomeScreenState extends State<TtcHomeScreen> {
+  /// null = still asking `shared_preferences`.
+  ///
+  /// ⚠️ THREE STATES, NOT TWO. Rendering the home while the answer is unknown
+  /// and swapping to the introduction a frame later is the flicker every
+  /// first-run flow ships with once; holding an empty ground for one frame is
+  /// invisible and correct.
+  bool? _introOwed;
+
+  @override
+  void initState() {
+    super.initState();
+    TtcIntroGate.owed().then((owed) {
+      if (mounted) setState(() => _introOwed = owed);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (_introOwed == null) {
+      return const Scaffold(backgroundColor: ttcBg, body: SizedBox.shrink());
+    }
+    if (_introOwed == true) {
+      return TtcIntroFlow(onDone: () => setState(() => _introOwed = false));
+    }
+    return const _TtcHomeBody();
+  }
+}
+
+class _TtcHomeBody extends StatelessWidget {
+  const _TtcHomeBody();
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
@@ -61,7 +112,13 @@ class TtcHomeScreen extends StatelessWidget {
           // this stage's bottom-right corner is already spoken for — and a
           // control that switches the experiment must not sit under the thing
           // it is being compared against.
-          const Positioned(left: 16, bottom: 96, child: _Pill()),
+          // Top right, like the other two stages. See the note in
+          // pp_home_version.dart for why the bottom strip was the wrong place
+          // for it in the first place.
+          Positioned(
+              right: 14,
+              top: MediaQuery.of(context).viewPadding.top + 56,
+              child: const _Pill()),
         ]),
       );
 }

@@ -104,10 +104,26 @@ void main() {
       expect(t.profileHinglish, isNot(t.profileEnglish));
     });
 
-    test('and the fold/unfold pair on the fertility window differs', () {
+    // ⚠️ RETIRED WITH THE FOLD IT GUARDED. "See the whole cycle" was removed
+    // from the fertility window screen — the screen now shows only the window
+    // itself, and the whole month lives on the calendar and the cycle
+    // companion. The strings are commented out in `ttc_strings.dart` rather
+    // than deleted, and this comes back with them.
+    //
+    // The class of bug it caught is real and still worth catching elsewhere: a
+    // toggle whose two labels are the same word reads as a dead control.
+    //
+    // test('and the fold/unfold pair on the fertility window differs', () {
+    //   for (final hi in [false, true]) {
+    //     final t = TtcS(hi);
+    //     expect(t.windowSeeWhole, isNot(t.windowHideWhole));
+    //   }
+    // });
+
+    test('the two paging arrows on the fertility window differ', () {
       for (final hi in [false, true]) {
         final t = TtcS(hi);
-        expect(t.windowSeeWhole, isNot(t.windowHideWhole));
+        expect(t.windowNextCycle, isNot(t.windowPrevCycle));
       }
     });
   });

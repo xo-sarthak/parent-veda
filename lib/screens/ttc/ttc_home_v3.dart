@@ -56,9 +56,12 @@ import '../../services/bracket_resolver.dart';
 import '../../services/life_stage_store.dart';
 import '../../services/ttc_surfaces.dart';
 import '../../theme/pv_fonts.dart';
+
 import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_daily_data.dart';
+import '../../ttc/ttc_fertile_window.dart';
 import '../../ttc/ttc_products_data.dart';
+import '../../ttc/ttc_reads_data.dart';
 import '../../ttc/ttc_ritual_store.dart';
 import '../../ttc/ttc_store.dart';
 import '../brackets/bracket_screen.dart';
@@ -69,6 +72,7 @@ import '../v2/v3_daily.dart';
 import '../v2/v3_daily_art.dart';
 import '../v2/v3_hero_chrome.dart';
 import '../v2/v3_hero_field.dart';
+import 'ttc_calendar_screen.dart' show ttcFactsFor, TtcDayFacts;
 import 'ttc_chapter_screen.dart';
 import 'ttc_common.dart';
 import 'ttc_insight_screen.dart';
@@ -80,7 +84,10 @@ import 'ttc_ritual_screen.dart';
 import 'ttc_strings.dart';
 import 'ttc_surface_router.dart';
 import 'ttc_today_parts.dart';
+import 'ttc_today_screen.dart' show logTtcPeriod;
+import 'ttc_tracker_screen.dart' show openTtcTracker;
 import 'ttc_transition_screen.dart';
+import '../../widgets/pv_nav_bar.dart';
 
 /// The four chapters' hues, on the same controlled-pastel wheel every other
 /// stage uses.
@@ -136,26 +143,61 @@ class TtcHomeV3 extends StatelessWidget {
               // opaque 56px circle. See docs/STILL-OPEN.md §9.4.
               padding: const EdgeInsets.only(bottom: ttcBottomInset),
               children: [
-                _Hero(
+                // ---- THE CYCLE HEADER ---------------------------------------
+                //
+                // ⚠️ THIS REPLACED THE CHAPTER HERO, AND THE TRADE IS WORTH
+                // NAMING. The old hero led on "Day 6 in this chapter" — a fact
+                // about where she is that is true on every pathway and never a
+                // prediction, which is why it was chosen. It was also the
+                // answer to a question almost nobody opens the app asking.
+                //
+                // What she opens the app asking is "where am I in this cycle,
+                // and when are my days". So the header now leads on the week
+                // and the window, and the chapter survives as the chip above
+                // them — same destination, less of the screen.
+                //
+                // ⚠️ NOTHING THE HERO REACHED BECAME UNREACHABLE. Profile is
+                // the avatar, the journey map is the chapter chip, the cycle
+                // companion is the cycle-day line, and the calendar — which the
+                // hero never reached at all — is the icon on the right. See the
+                // wiring gate in CLAUDE.md; the reason this list is written out
+                // is that a replaced hero is exactly where a door goes missing.
+                _CycleHeader(
                   today: today,
                   p: p,
                   hinglish: hinglish,
-                  onSpine: () => Navigator.of(context).push(MaterialPageRoute(
+                  onChapter: () => Navigator.of(context).push(MaterialPageRoute(
                       settings: const RouteSettings(name: 'ttc/journey_map'),
                       builder: (_) => const TtcJourneyMapScreen())),
-                  // TTC's saved things are its reads; there is no saved hub in
-                  // this stage yet, so the bookmark opens the chapter reader
-                  // where saving actually happens rather than a screen that
-                  // does not exist.
-                  onSaved: () => _openSurface(context, 'ttc_chapter'),
+                  onCycle: () => _openSurface(context, 'ttc_cycle'),
+                  onCalendar: () => _openSurface(context, 'ttc_calendar'),
                   onProfile: () => openTtcProfile(context),
                 ),
                 _Sheet(p: p, children: [
                   const SizedBox(height: 26),
 
-                  // ---- THE DOORS -------------------------------------------
+                  // ---- THE DAILY STORIES ------------------------------------
+                  //
+                  // The five daily items, as a scrollable rail of circles
+                  // rather than a card and four rows. Same five destinations,
+                  // same deterministic day-of-year rotation — see `_DailyRail`
+                  // for why the offsets had to be preserved exactly.
                   _pad(_Head(
-                      eyebrow: hinglish ? 'Kahan jaana hai' : 'Where to go',
+                      eyebrow: hinglish ? 'Aaj ke liye' : 'My daily insights',
+                      title: hinglish ? 'Aaj ki baatein' : 'Today',
+                      p: p)),
+                  const SizedBox(height: 14),
+                  _DailyRail(p: p, hinglish: hinglish),
+                  const SizedBox(height: 32),
+
+                  // ---- THE DOORS -------------------------------------------
+                  //
+                  // ⚠️ NO EYEBROW ANY MORE. "WHERE TO GO" over "Start anywhere"
+                  // was a label explaining a label — the title already says
+                  // what the grid is for, and the eyebrow only earned its place
+                  // when this section was buried in the middle of the page.
+                  _pad(_Head(
+                      eyebrow: '',
                       title: hinglish ? 'Kahin se bhi shuru karein' : 'Start anywhere',
                       p: p)),
                   const SizedBox(height: 14),
@@ -183,17 +225,30 @@ class TtcHomeV3 extends StatelessWidget {
                   // day held only a menu. The doors cover what she comes
                   // LOOKING for; the sections cover the cycle she is actually
                   // in. Both, always.
-                  _pad(_Head(
-                      eyebrow: hinglish ? 'Aapki rhythm' : 'Your rhythm',
-                      title: hinglish ? 'Aaj kahan hain aap' : 'Where you are today',
-                      p: p)),
-                  const SizedBox(height: 12),
-                  _pad(_SpineCard(
-                      today: today,
-                      p: p,
-                      hinglish: hinglish,
-                      onTap: () => _openSurface(context, 'ttc_cycle'))),
-                  const SizedBox(height: 32),
+                  //
+                  // ⚠️ THE SPINE IS NOW THE HEADER, NOT A CARD IN THE SHEET —
+                  // which is why this section is commented out rather than
+                  // deleted. `_CycleHeader` states the same three things this
+                  // card did (where she is in the cycle, whether we may
+                  // estimate at all, and the way into the cycle companion) and
+                  // states them above the fold instead of a screen down.
+                  //
+                  // Kept for revert: if the header experiment comes off, this
+                  // block and `_SpineCard` go back together. The rule that
+                  // matters either way is the one in the card's own doc
+                  // comment — position, never probability.
+                  //
+                  // _pad(_Head(
+                  //     eyebrow: hinglish ? 'Aapki rhythm' : 'Your rhythm',
+                  //     title: hinglish ? 'Aaj kahan hain aap' : 'Where you are today',
+                  //     p: p)),
+                  // const SizedBox(height: 12),
+                  // _pad(_SpineCard(
+                  //     today: today,
+                  //     p: p,
+                  //     hinglish: hinglish,
+                  //     onTap: () => _openSurface(context, 'ttc_cycle'))),
+                  // const SizedBox(height: 32),
 
                   // ---- PRACTICE --------------------------------------------
                   //
@@ -212,11 +267,29 @@ class TtcHomeV3 extends StatelessWidget {
                   // completion would have read as lower on V3 for a reason
                   // that has nothing to do with which home she prefers, and
                   // the toggle would have "proved" it.
-                  _pad(_Head(
-                      eyebrow: TtcS.current().dailyRitual,
-                      title: TtcS.current().dailyRitualTitle,
+                  //
+                  // ⚠️ RENAMED, NOT REBUILT. The card, the store, the streak
+                  // and the five parts are untouched; only the words over them
+                  // changed. What the section always was — a few minutes a day
+                  // of preparation before conception — had been labelled
+                  // "Daily ritual", which says when it happens and nothing
+                  // about what it is for.
+                  //
+                  // ⚠️ "GARBHADHANA SAMSKARA", NOT "GARBH SANSKAR". The two
+                  // name different things and the difference is the whole point
+                  // of this section: Garbh Sanskar is the PREGNANCY practice
+                  // and ParentVeda already ships it, five pillars deep, in the
+                  // pregnancy stage. Garbhadhana Samskara is the older,
+                  // narrower idea of preparing *before* conception. Using the
+                  // pregnancy name here would promise a woman who has not
+                  // conceived the pregnancy feature — and would make the two
+                  // stages look like the same screen twice.
+                  _pad(_SectionIntro(
+                      title: TtcS.current().samskarTitle,
+                      subtitle: TtcS.current().samskarSubtitle,
+                      body: TtcS.current().samskarBody,
                       p: p)),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   _pad(_RitualCardV3(p: p, hinglish: hinglish, chapter: chapter)),
                   const SizedBox(height: 32),
 
@@ -244,20 +317,57 @@ class TtcHomeV3 extends StatelessWidget {
                   // exact group, so the two homes now name the same block the
                   // same way — which is what makes flipping the pill a
                   // comparison rather than a re-orientation.
+                  //
+                  // ⚠️ THIS BLOCK MOVED TO THE TOP OF THE PAGE AS `_DailyRail`.
+                  // The five items and their five destinations are unchanged —
+                  // what changed is that they are now circles above the doors
+                  // instead of a card and four rows below them.
+                  //
+                  // Kept for revert, and the coverage argument above still
+                  // applies to whichever shape is live: five gates V1 has, V3
+                  // has to have. `test/ttc_home_v3_parity_test.dart` is what
+                  // actually holds that, and it passes against the rail because
+                  // the rail reuses these exact strings as its captions.
+                  //
+                  // _pad(_Head(
+                  //     eyebrow: TtcS.current().todaysJourney,
+                  //     title: TtcS.current().todaysJourneyTitle,
+                  //     p: p)),
+                  // const SizedBox(height: 12),
+                  // _pad(_InsightCardV3(p: p, hinglish: hinglish)),
+                  // const SizedBox(height: 10),
+                  // _pad(_TodayRows(p: p, hinglish: hinglish)),
+                  // const SizedBox(height: 32),
+
+                  // ---- RECOMMENDED PRODUCTS --------------------------------
+                  //
+                  // ⚠️ A RAIL, AND IT SITS ABOVE THE READS RATHER THAN AT THE
+                  // FOOT. The page still does not CLOSE on a shop — see the
+                  // People section's note, which is the rule this obeys — but
+                  // "today's pick" as a single row was the only commerce on the
+                  // home and it was doing the job badly: one product, chosen by
+                  // a day-of-year rotation, with no way to see the others
+                  // without leaving.
+                  //
+                  // ⚠️ NEVER A PRODUCT THAT CLAIMS TO IMPROVE HER ODDS. The
+                  // catalogue's own `whyEn` is what renders here, and every
+                  // entry in `ttc_products_data.dart` carries a "look for" and
+                  // a "watch out" for exactly this reason. A supplement rail on
+                  // a fertility home is one careless subtitle away from being a
+                  // claim, which is why the card shows the category and the
+                  // price and not a benefit.
                   _pad(_Head(
-                      eyebrow: TtcS.current().todaysJourney,
-                      title: TtcS.current().todaysJourneyTitle,
+                      eyebrow: hinglish ? 'Saman' : 'Worth having',
+                      title: hinglish ? 'Aapke liye' : 'Recommended for you',
                       p: p)),
-                  const SizedBox(height: 12),
-                  _pad(_InsightCardV3(p: p, hinglish: hinglish)),
-                  const SizedBox(height: 10),
-                  _pad(_TodayRows(p: p, hinglish: hinglish)),
+                  const SizedBox(height: 14),
+                  _ProductRail(p: p, hinglish: hinglish),
                   const SizedBox(height: 32),
 
-                  // ---- READING ---------------------------------------------
+                  // ---- RECOMMENDED READS -----------------------------------
                   _pad(_Head(
                       eyebrow: hinglish ? 'Padhne ke liye' : 'To read',
-                      title: hinglish ? 'Is chapter ke baare mein' : 'About this chapter',
+                      title: hinglish ? 'Aapke chapter ke liye' : 'Recommended reads',
                       p: p)),
                   const SizedBox(height: 12),
                   _pad(_LinkCard(
@@ -282,9 +392,26 @@ class TtcHomeV3 extends StatelessWidget {
                   // shortcut hero V3 exists to replace. Hung off the chapter
                   // card instead, which is the thing they are shortcuts INTO.
                   _pad(_ChapterTabs(p: p, chapter: chapter)),
+                  const SizedBox(height: 14),
+
+                  // ⚠️ THE LIBRARY, WHICH THE CHAPTER CARD ALSO CANNOT REACH.
+                  // `kTtcReads` is the largest body of content in the stage and
+                  // the home linked to none of it — the chapter reader is a
+                  // different thing written for a different moment. The rail is
+                  // the read equivalent of the door grid: a way in, not a feed.
+                  _ReadRail(p: p, hinglish: hinglish),
                   const SizedBox(height: 32),
 
                   // ---- JOURNAL ---------------------------------------------
+                  //
+                  // ⚠️ KEPT, THOUGH THE REORDER DID NOT ASK FOR IT. The section
+                  // list this page was rebuilt against names the header, the
+                  // stories, the doors, the samskar, products, reads, experts
+                  // and the way out — and not the journal. Dropping it was the
+                  // wrong reading: `ttc_journal` has no other entrance on this
+                  // home, so removing the section would not have moved it, it
+                  // would have deleted it. Placed after the reads and before
+                  // the people, which is where it interrupts least.
                   //
                   // ⚠️ LITERALLY PREGNANCY'S WIDGET, not a third copy of it.
                   // Same marks, same hues, same outlined button. Only the two
@@ -338,7 +465,7 @@ class TtcHomeV3 extends StatelessWidget {
                   // that there is a person, not that there is a price.
                   _pad(_Head(
                       eyebrow: hinglish ? 'Log' : 'People',
-                      title: hinglish ? 'Kisi se baat karni ho to' : 'If you want to talk to someone',
+                      title: hinglish ? 'Expert se baat karein' : 'Talk to experts',
                       p: p)),
                   const SizedBox(height: 12),
                   _pad(_LinkCard(
@@ -384,7 +511,10 @@ class TtcHomeV3 extends StatelessWidget {
             // move when the toggle is flipped. Remove before launch, with V1's.
             Positioned(
               right: 14,
-              bottom: 96,
+              // Same fix as the version pill on the opposite corner: a literal
+              // 96 sits behind the tab bar wherever the device has a system
+              // navigation inset. See `pvNavClearance`.
+              bottom: pvNavClearance(context),
               child: ttcModePill(TtcS.current(), him: false),
             ),
 
@@ -415,7 +545,7 @@ class TtcHomeV3 extends StatelessWidget {
               right: 14,
               bottom: 14,
               child: SafeArea(
-                  top: false, child: TtcBottomNav(active: 0)),
+                  top: false, child: TtcBottomNav(active: 0, v3: true)),
             ),
           ]),
         );
@@ -594,147 +724,603 @@ class TtcHomeV3 extends StatelessWidget {
 Widget _pad(Widget child) =>
     Padding(padding: const EdgeInsets.symmetric(horizontal: 18), child: child);
 
+// =============================================================================
+//  The cycle header
 // -----------------------------------------------------------------------------
-//  The hero
-// -----------------------------------------------------------------------------
+//  The week, the window, and the two things she came to do.
+//
+//  ---------------------------------------------------------------------------
+//  ⚠️ THE BIG LINE IS A TIMING ESTIMATE AND IT IS NEVER A PROBABILITY
+//  ---------------------------------------------------------------------------
+//
+//  The obvious headline for a fertility home — the one every competitor
+//  prints — is a chance. This one states WHEN, never HOW LIKELY, and the
+//  distinction is not stylistic:
+//
+//    · "Your fertile days open in 5 days" is a timing estimate built from a
+//      logged period and an assumed luteal phase. The app already makes it, on
+//      the cycle companion and the window screen, and it is honest about being
+//      an estimate.
+//    · A percentage attached to her, this cycle, is a personalised probability.
+//      Forbidden outright — CLAUDE.md, and `test/ttc_clinical_review_test.dart`
+//      scans source for it rather than trusting a seed list.
+//
+// ⚠️ AND THE SCANNER READS COMMENTS TOO, WHICH IS WHY THAT SECOND BULLET IS
+// DESCRIBED RATHER THAN QUOTED. Writing the forbidden sentence out as an
+// example of what not to do failed the test, correctly: a regex cannot tell an
+// illustration from a claim, and a comment is one careless copy-paste from
+// being a string. Describe the shape, never type the line.
+//
+//  ⚠️ AND IT REFUSES, LOUDLY, IN THREE CASES. Nothing logged, a clinic holding
+//  the timing, or an engine that has declined to estimate all produce a
+//  SENTENCE rather than a number. `ttcFertileWindowNow` returns null for the
+//  last two and the header says which. The failure this prevents is the one
+//  already written up in `TtcNoEstimate`: "ovulation around day 40" appearing
+//  on five screens from a single unlogged gap.
+//
+//  ⚠️ TWO ACTIONS, NOT SEVEN. Edit period dates and check symptoms — the two
+//  things that make every estimate on this page better, and nothing else. A
+//  header is the most valuable strip on a screen and the most tempting place
+//  to put a row of shortcuts; a row of shortcuts is what the V3 field exists to
+//  replace.
+// =============================================================================
 
-class _Hero extends StatelessWidget {
-  const _Hero(
-      {required this.today,
-      required this.p,
-      required this.hinglish,
-      required this.onSpine,
-      required this.onSaved,
-      required this.onProfile});
+class _CycleHeader extends StatelessWidget {
+  const _CycleHeader({
+    required this.today,
+    required this.p,
+    required this.hinglish,
+    required this.onChapter,
+    required this.onCycle,
+    required this.onCalendar,
+    required this.onProfile,
+  });
 
   final TtcToday today;
   final V2Palette p;
   final bool hinglish;
-  final VoidCallback onSpine;
-  final VoidCallback onSaved;
+  final VoidCallback onChapter;
+  final VoidCallback onCycle;
+  final VoidCallback onCalendar;
   final VoidCallback onProfile;
+
+  static const _months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December',
+  ];
 
   @override
   Widget build(BuildContext context) {
-    final chapter = today.chapter;
-    final logged = today.noEstimate != TtcNoEstimate.noPeriodLogged;
+    final t = TtcS.current();
+    final now = DateTime.now();
 
-    return SizedBox(
-      height: 300,
-      child: SafeArea(
-        bottom: false,
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(22, 18, 22, 22),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // ⚠️ NO "OF 4". Parenting's eyebrow reads "PHASE 1 OF 20" because
-              // parenting's phases run once, in order, and end. TTC chapters
-              // come round again with every cycle, so a denominator would draw
-              // a finish line across something that loops.
-              //
-              // ink2 rather than ink3, for the reason written out in
-              // pp_home_v3.dart: a grey calibrated for a neutral ground loses
-              // contrast on a tinted one faster than it loses lightness.
-              Align(
-                alignment: Alignment.centerRight,
-                child: V3HeroChrome(
-                  tone: V3HeroTone.onField,
-                  p: p,
-                  onSaved: onSaved,
-                  onProfile: onProfile,
-                ),
-              ),
-              const Spacer(),
-              // ⚠️ THE EYEBROW IS THE DOOR TO THE JOURNEY MAP. Same move as the
-              // other two stages, and it lands hardest here: TTC's chapters
-              // RECUR, so "where am I in the whole thing" is the question this
-              // stage generates most often and had no answer to on V3.
-              //
-              // No denominator in the label — see the hero note. The chip says
-              // which chapter, never which of how many.
-              V3SpineChip(
-                label: chapter.title(hinglish).toUpperCase(),
-                tone: V3HeroTone.onField,
+    return SafeArea(
+      bottom: false,
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(18, 10, 18, 20),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          // ---- avatar · date · calendar ------------------------------------
+          Row(children: [
+            _RoundButton(
+                icon: Icons.person_outline_rounded,
                 p: p,
-                onTap: onSpine,
-              ),
-              const SizedBox(height: 10),
-              if (logged) ...[
-                Text(
-                    hinglish
-                        ? 'Din ${today.daysIntoChapter}'
-                        : 'Day ${today.daysIntoChapter}',
-                    style: pvFraunces(
-                        fontSize: 42,
-                        fontWeight: FontWeight.w600,
-                        height: 1.05,
-                        letterSpacing: -1.3,
-                        color: p.ink1)),
-                const SizedBox(height: 2),
-                Text(
-                    hinglish
-                        ? 'is chapter mein, ${today.chapterLength} mein se'
-                        : 'in this chapter, of about ${today.chapterLength}',
-                    style: pvManrope(
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.3,
-                        color: p.ink2)),
-              ] else ...[
-                // ⚠️ THE INVITATION, NOT A ZERO. "Day 0" is what the parenting
-                // hero shipped with for a fortnight and it is worse here: a
-                // number implies we are counting something, and before a period
-                // is logged we are counting nothing. `noPeriodLogged` is a real
-                // state with its own sentence.
-                Text(hinglish ? 'Shuruaat' : 'Start here',
-                    style: pvFraunces(
-                        fontSize: 38,
-                        fontWeight: FontWeight.w600,
-                        height: 1.05,
-                        letterSpacing: -1.2,
-                        color: p.ink1)),
-                const SizedBox(height: 2),
-                Text(
-                    hinglish
-                        ? 'Apna last period log karein, phir yahan aapki rhythm dikhegi'
-                        : 'Log your last period, and your rhythm shows up here',
-                    style: pvManrope(
-                        fontSize: 13.5,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.3,
-                        height: 1.4,
-                        color: p.ink2)),
-              ],
-              const SizedBox(height: 14),
-              // The one forward-looking line, and it names a TRIGGER rather
-              // than a date. `nextUp` is the string the hero test guards.
-              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Container(
-                  margin: const EdgeInsets.only(top: 6),
-                  width: 6,
-                  height: 6,
-                  decoration: BoxDecoration(
-                      color: p.ink2.withValues(alpha: 0.5),
-                      shape: BoxShape.circle),
-                ),
-                const SizedBox(width: 9),
-                Expanded(
-                  child: Text(chapter.nextUp(hinglish),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: pvManrope(
-                          fontSize: 13.5, height: 1.45, color: p.ink2)),
-                ),
-              ]),
-            ],
+                onTap: onProfile,
+                semantic: t.profileTitle),
+            const Spacer(),
+            Text('${now.day} ${_months[now.month - 1]}',
+                style: pvManrope(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.1,
+                    color: p.ink1)),
+            const Spacer(),
+            // ⚠️ THE CALENDAR HAD NO ENTRANCE ON THIS HOME AT ALL before the
+            // header. It was a nav tab and nothing else, which meant the one
+            // screen showing a whole month of her own logs was reachable only
+            // by knowing which of five icons it hid behind.
+            _RoundButton(
+                icon: Icons.calendar_today_rounded,
+                p: p,
+                onTap: onCalendar,
+                semantic: t.tabCalendar),
+          ]),
+          const SizedBox(height: 16),
+
+          // ---- the week ----------------------------------------------------
+          _WeekStrip(p: p, hinglish: hinglish, onTap: onCalendar),
+          const SizedBox(height: 20),
+
+          // ---- which chapter -----------------------------------------------
+          V3SpineChip(
+            label: today.chapter.title(hinglish).toUpperCase(),
+            tone: V3HeroTone.onField,
+            p: p,
+            onTap: onChapter,
           ),
-        ),
+          const SizedBox(height: 12),
+
+          // ---- the window, or the honest refusal ---------------------------
+          _WindowLine(today: today, p: p, hinglish: hinglish, onTap: onCycle),
+          const SizedBox(height: 18),
+
+          // ---- the two actions ---------------------------------------------
+          Row(children: [
+            Expanded(
+              child: _HeaderAction(
+                label: t.headerEditPeriod,
+                icon: Icons.water_drop_outlined,
+                p: p,
+                filled: true,
+                onTap: () => logTtcPeriod(context),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: _HeaderAction(
+                label: t.headerCheckSymptoms,
+                icon: Icons.favorite_border_rounded,
+                p: p,
+                filled: false,
+                // ⚠️ THE SYMPTOMS TRACKER BY ID, not `ttc_tracker` — the
+                // surface router deliberately refuses that id because
+                // `TtcTrackerScreen` needs to be told WHICH tracker and
+                // dropping her into an arbitrary one is the wrong-screen
+                // failure it exists to prevent. See the comment in
+                // `ttc_surface_router.dart`.
+                onTap: () => openTtcTracker(context, 'symptoms'),
+              ),
+            ),
+          ]),
+        ]),
       ),
     );
   }
 }
+
+/// The seven days around today.
+///
+/// ⚠️ IT READS `ttcFactsFor`, THE CALENDAR'S OWN ENGINE. Every marker here —
+/// period start, fertile day, ovulation, expected period, "something logged" —
+/// is the same function the month grid calls, so a day cannot be coral in the
+/// header and plain in the calendar. Re-deriving them from `CycleStore` would
+/// have been four lines shorter and the two would have drifted the first time
+/// either changed.
+class _WeekStrip extends StatelessWidget {
+  const _WeekStrip(
+      {required this.p, required this.hinglish, required this.onTap});
+
+  final V2Palette p;
+  final bool hinglish;
+  final VoidCallback onTap;
+
+  static const _dayLetters = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
+  @override
+  Widget build(BuildContext context) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    // Today sits fourth of seven, so there is always context on both sides.
+    final first = today.subtract(const Duration(days: 3));
+
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          for (var i = 0; i < 7; i++)
+            _WeekDay(
+              date: DateTime(first.year, first.month, first.day + i),
+              isToday: i == 3,
+              letter: _dayLetters[
+                  (DateTime(first.year, first.month, first.day + i).weekday -
+                          1) %
+                      7],
+              p: p,
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _WeekDay extends StatelessWidget {
+  const _WeekDay({
+    required this.date,
+    required this.isToday,
+    required this.letter,
+    required this.p,
+  });
+
+  final DateTime date;
+  final bool isToday;
+  final String letter;
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) {
+    final TtcDayFacts facts = ttcFactsFor(date);
+
+    // ⚠️ INTENSITY AND SHAPE, NOT A TRAFFIC LIGHT. Same rule the day bars on
+    // the window screen follow: a period day is a filled coral disc, a fertile
+    // day is a soft teal disc, an expected period is a dashed outline. A
+    // greyscale screenshot and a colour-blind eye both still read it, which a
+    // red-amber-green week would not.
+    final isFertile = facts.fertility != null &&
+        facts.fertility != FertilityLevel.low;
+
+    Color? fill;
+    Color? ring;
+    if (facts.isPeriodStart) {
+      fill = ttcCoral;
+    } else if (isFertile) {
+      fill = ttcFertilityTint(facts.fertility!);
+    } else if (facts.isExpectedPeriod) {
+      ring = ttcCoral;
+    }
+
+    final onFill = fill == ttcCoral ? Colors.white : p.ink1;
+
+    return Column(children: [
+      Text(letter,
+          style: pvManrope(
+              fontSize: 10.5,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.6,
+              color: p.ink3)),
+      const SizedBox(height: 7),
+      Container(
+        width: 34,
+        height: 34,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: fill,
+          shape: BoxShape.circle,
+          border: ring != null
+              ? Border.all(color: ring, width: 1.4)
+              : isToday
+                  ? Border.all(color: p.action, width: 2)
+                  : null,
+        ),
+        child: Text('${date.day}',
+            style: pvManrope(
+                fontSize: 13.5,
+                fontWeight: isToday ? FontWeight.w900 : FontWeight.w700,
+                color: fill != null ? onFill : p.ink1)),
+      ),
+      const SizedBox(height: 5),
+      // A single dot for "you logged something here" — the calendar's own
+      // `calendarLogged` marker, at week scale.
+      SizedBox(
+        height: 5,
+        child: facts.loggedTrackers.isEmpty && facts.journalEntries.isEmpty
+            ? null
+            : Container(
+                width: 4,
+                height: 4,
+                decoration:
+                    BoxDecoration(color: p.action, shape: BoxShape.circle)),
+      ),
+    ]);
+  }
+}
+
+/// The one big line: when her days are, or why we will not say.
+class _WindowLine extends StatelessWidget {
+  const _WindowLine(
+      {required this.today,
+      required this.p,
+      required this.hinglish,
+      required this.onTap});
+
+  final TtcToday today;
+  final V2Palette p;
+  final bool hinglish;
+  final VoidCallback onTap;
+
+  static const _short = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  ];
+  static String _fmt(DateTime d) => '${d.day} ${_short[d.month - 1]}';
+
+  @override
+  Widget build(BuildContext context) {
+    final t = TtcS.current();
+
+    // ---- the refusals, in order of authority -------------------------------
+    if (today.noEstimate == TtcNoEstimate.noPeriodLogged) {
+      return _block(t.headerStartHere, t.headerStartHereBody);
+    }
+    if (today.clinicInvolved) {
+      return _block(t.headerClinicHolds, t.headerClinicHoldsBody);
+    }
+
+    final window = ttcFertileWindowNow();
+    if (window == null) {
+      return _block(t.headerNoEstimate, t.headerNoEstimateBody);
+    }
+
+    // ---- the estimate ------------------------------------------------------
+    final headline = window.openNow
+        ? t.headerWindowOpenNow
+        : t.headerWindowOpensIn(window.daysUntilOpen);
+
+    // ⚠️ A PROJECTED WINDOW SAYS SO. `cyclesAhead > 0` means this cycle's
+    // window has already closed and we have rolled forward on an ASSUMED cycle
+    // length — a guess resting on a guess. Presenting that with the same
+    // confidence as the current cycle's window is the exact overreach
+    // `TtcNoEstimate` exists to stop.
+    final sub = window.cyclesAhead > 0
+        ? t.headerWindowProjected(
+            _fmt(window.opensOn), _fmt(window.closesOn))
+        : t.headerWindowDates(_fmt(window.opensOn), _fmt(window.closesOn));
+
+    return _block(headline, sub, cycleDay: today.cycleDay);
+  }
+
+  Widget _block(String headline, String body, {int? cycleDay}) {
+    final t = TtcS.current();
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(headline,
+            style: pvFraunces(
+                fontSize: 30,
+                fontWeight: FontWeight.w600,
+                height: 1.12,
+                letterSpacing: -1,
+                color: p.ink1)),
+        const SizedBox(height: 6),
+        Text(body,
+            style: pvManrope(fontSize: 13.5, height: 1.45, color: p.ink2)),
+        if (cycleDay != null) ...[
+          const SizedBox(height: 8),
+          Row(children: [
+            Text(t.headerCycleDay(cycleDay),
+                style: pvManrope(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w800,
+                    color: p.action)),
+            const SizedBox(width: 4),
+            Icon(Icons.arrow_forward_rounded, size: 14, color: p.action),
+          ]),
+        ],
+      ]),
+    );
+  }
+}
+
+class _RoundButton extends StatelessWidget {
+  const _RoundButton(
+      {required this.icon,
+      required this.p,
+      required this.onTap,
+      required this.semantic});
+
+  final IconData icon;
+  final V2Palette p;
+  final VoidCallback onTap;
+  final String semantic;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: semantic,
+        child: InkWell(
+          onTap: onTap,
+          customBorder: const CircleBorder(),
+          child: Container(
+            width: 38,
+            height: 38,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: p.surface.withValues(alpha: 0.85),
+              shape: BoxShape.circle,
+              border: Border.all(color: p.line),
+            ),
+            child: Icon(icon, size: 18, color: p.ink2),
+          ),
+        ),
+      );
+}
+
+class _HeaderAction extends StatelessWidget {
+  const _HeaderAction({
+    required this.label,
+    required this.icon,
+    required this.p,
+    required this.filled,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final V2Palette p;
+  final bool filled;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(999),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 12),
+          decoration: BoxDecoration(
+            color: filled ? p.surface : p.surface.withValues(alpha: 0.55),
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: filled ? p.surface : p.line),
+          ),
+          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+            Icon(icon, size: 16, color: p.action),
+            const SizedBox(width: 7),
+            Flexible(
+              child: Text(label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w800,
+                      color: p.ink1)),
+            ),
+          ]),
+        ),
+      );
+}
+
+// -----------------------------------------------------------------------------
+//  The hero
+// -----------------------------------------------------------------------------
+
+// ⚠️ SUPERSEDED BY `_CycleHeader`, KEPT FOR REVERT.
+//
+// The chapter hero: a spine chip, "Day 6 in this chapter", and the one
+// forward-looking line. Every clinical argument in it still stands — no
+// denominator, no countdown to an outcome, an invitation rather than a zero
+// — and the header that replaced it obeys all three. What changed is which
+// question the top of the page answers: "where am I in this chapter" became
+// "where am I in this cycle, and when are my days".
+//
+// Uncomment this and re-point the `_CycleHeader(...)` call in `build` to put
+// it back; nothing else moved.
+// class _Hero extends StatelessWidget {
+//   const _Hero(
+//       {required this.today,
+//       required this.p,
+//       required this.hinglish,
+//       required this.onSpine,
+//       required this.onSaved,
+//       required this.onProfile});
+//
+//   final TtcToday today;
+//   final V2Palette p;
+//   final bool hinglish;
+//   final VoidCallback onSpine;
+//   final VoidCallback onSaved;
+//   final VoidCallback onProfile;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final chapter = today.chapter;
+//     final logged = today.noEstimate != TtcNoEstimate.noPeriodLogged;
+//
+//     return SizedBox(
+//       height: 300,
+//       child: SafeArea(
+//         bottom: false,
+//         child: Padding(
+//           padding: const EdgeInsets.fromLTRB(22, 18, 22, 22),
+//           child: Column(
+//             mainAxisAlignment: MainAxisAlignment.end,
+//             crossAxisAlignment: CrossAxisAlignment.start,
+//             children: [
+//               // ⚠️ NO "OF 4". Parenting's eyebrow reads "PHASE 1 OF 20" because
+//               // parenting's phases run once, in order, and end. TTC chapters
+//               // come round again with every cycle, so a denominator would draw
+//               // a finish line across something that loops.
+//               //
+//               // ink2 rather than ink3, for the reason written out in
+//               // pp_home_v3.dart: a grey calibrated for a neutral ground loses
+//               // contrast on a tinted one faster than it loses lightness.
+//               Align(
+//                 alignment: Alignment.centerRight,
+//                 child: V3HeroChrome(
+//                   tone: V3HeroTone.onField,
+//                   p: p,
+//                   onSaved: onSaved,
+//                   onProfile: onProfile,
+//                 ),
+//               ),
+//               const Spacer(),
+//               // ⚠️ THE EYEBROW IS THE DOOR TO THE JOURNEY MAP. Same move as the
+//               // other two stages, and it lands hardest here: TTC's chapters
+//               // RECUR, so "where am I in the whole thing" is the question this
+//               // stage generates most often and had no answer to on V3.
+//               //
+//               // No denominator in the label — see the hero note. The chip says
+//               // which chapter, never which of how many.
+//               V3SpineChip(
+//                 label: chapter.title(hinglish).toUpperCase(),
+//                 tone: V3HeroTone.onField,
+//                 p: p,
+//                 onTap: onSpine,
+//               ),
+//               const SizedBox(height: 10),
+//               if (logged) ...[
+//                 Text(
+//                     hinglish
+//                         ? 'Din ${today.daysIntoChapter}'
+//                         : 'Day ${today.daysIntoChapter}',
+//                     style: pvFraunces(
+//                         fontSize: 42,
+//                         fontWeight: FontWeight.w600,
+//                         height: 1.05,
+//                         letterSpacing: -1.3,
+//                         color: p.ink1)),
+//                 const SizedBox(height: 2),
+//                 Text(
+//                     hinglish
+//                         ? 'is chapter mein, ${today.chapterLength} mein se'
+//                         : 'in this chapter, of about ${today.chapterLength}',
+//                     style: pvManrope(
+//                         fontSize: 13.5,
+//                         fontWeight: FontWeight.w700,
+//                         letterSpacing: 0.3,
+//                         color: p.ink2)),
+//               ] else ...[
+//                 // ⚠️ THE INVITATION, NOT A ZERO. "Day 0" is what the parenting
+//                 // hero shipped with for a fortnight and it is worse here: a
+//                 // number implies we are counting something, and before a period
+//                 // is logged we are counting nothing. `noPeriodLogged` is a real
+//                 // state with its own sentence.
+//                 Text(hinglish ? 'Shuruaat' : 'Start here',
+//                     style: pvFraunces(
+//                         fontSize: 38,
+//                         fontWeight: FontWeight.w600,
+//                         height: 1.05,
+//                         letterSpacing: -1.2,
+//                         color: p.ink1)),
+//                 const SizedBox(height: 2),
+//                 Text(
+//                     hinglish
+//                         ? 'Apna last period log karein, phir yahan aapki rhythm dikhegi'
+//                         : 'Log your last period, and your rhythm shows up here',
+//                     style: pvManrope(
+//                         fontSize: 13.5,
+//                         fontWeight: FontWeight.w700,
+//                         letterSpacing: 0.3,
+//                         height: 1.4,
+//                         color: p.ink2)),
+//               ],
+//               const SizedBox(height: 14),
+//               // The one forward-looking line, and it names a TRIGGER rather
+//               // than a date. `nextUp` is the string the hero test guards.
+//               Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+//                 Container(
+//                   margin: const EdgeInsets.only(top: 6),
+//                   width: 6,
+//                   height: 6,
+//                   decoration: BoxDecoration(
+//                       color: p.ink2.withValues(alpha: 0.5),
+//                       shape: BoxShape.circle),
+//                 ),
+//                 const SizedBox(width: 9),
+//                 Expanded(
+//                   child: Text(chapter.nextUp(hinglish),
+//                       maxLines: 2,
+//                       overflow: TextOverflow.ellipsis,
+//                       style: pvManrope(
+//                           fontSize: 13.5, height: 1.45, color: p.ink2)),
+//                 ),
+//               ]),
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
 
 // -----------------------------------------------------------------------------
 //  Shared shapes — identical to parenting's, different content
@@ -794,13 +1380,20 @@ class _Head extends StatelessWidget {
         // The real fix is a shared `_Head`; it is not shared today because the
         // three take different label types. Until then this comment is the
         // guard.
-        Text(eyebrow.toUpperCase(),
-            style: pvManrope(
-                fontSize: 11,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 1.4,
-                color: p.action)),
-        const SizedBox(height: 5),
+        //
+        // ⚠️ AN EMPTY EYEBROW RENDERS NOTHING, rather than an empty line. The
+        // doors section dropped its eyebrow when it moved up the page, and
+        // without this guard a blank `Text` still reserved its line height and
+        // its 5px gap — a gap nobody could account for by reading the call.
+        if (eyebrow.isNotEmpty) ...[
+          Text(eyebrow.toUpperCase(),
+              style: pvManrope(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.4,
+                  color: p.action)),
+          const SizedBox(height: 5),
+        ],
         Text(title,
             style: pvFraunces(
                 fontSize: 22,
@@ -811,81 +1404,132 @@ class _Head extends StatelessWidget {
       ]);
 }
 
-/// The cycle spine, as one card.
+/// Title, subtitle, then a paragraph — for a section that has to explain itself
+/// before it can be used.
 ///
-/// ⚠️ IT SHOWS POSITION AND REFUSES TO SHOW PROBABILITY. `fertility` is a level
-/// this app is allowed to name; a percentage is not, and neither is anything
-/// that reads as a target. When confidence is unknown the card says the app has
-/// nothing to lean on rather than printing an estimate anyway — the exact
-/// failure `TtcNoEstimate` was added to stop, after "ovulation around day 40"
-/// appeared on five screens from a single unlogged gap.
-class _SpineCard extends StatelessWidget {
-  const _SpineCard(
-      {required this.today,
-      required this.p,
-      required this.hinglish,
-      required this.onTap});
+/// ⚠️ THE ONLY SECTION ON THIS PAGE THAT EARNS THREE LEVELS. Every other head
+/// is an eyebrow and a title, because every other section is self-evident from
+/// the thing under it: a grid of doors, a rail of products, a journal. The
+/// samskar is not. "Daily Preconception Samskar" over five tick-boxes is a
+/// phrase most people meet for the first time here, and a section whose name
+/// needs a sentence should be given the sentence rather than left to be
+/// guessed at from the tasks.
+class _SectionIntro extends StatelessWidget {
+  const _SectionIntro(
+      {required this.title,
+      required this.subtitle,
+      required this.body,
+      required this.p});
 
-  final TtcToday today;
+  final String title;
+  final String subtitle;
+  final String body;
   final V2Palette p;
-  final bool hinglish;
-  final VoidCallback onTap;
-
-  String get _line {
-    if (today.noEstimate == TtcNoEstimate.noPeriodLogged) {
-      return hinglish
-          ? 'Abhi tak kuch log nahi hua. Pehla period log karte hi cycle yahan banna shuru ho jayega.'
-          : 'Nothing logged yet. Log one period and your cycle starts taking shape here.';
-    }
-    if (today.clinicInvolved) {
-      // ⚠️ WE DEFER, WE DO NOT COMPUTE. When a clinic owns the timing, an app
-      // estimate beside it is a second opinion she did not ask for. Truth
-      // hierarchy: treating clinician outranks ParentVeda's calculation by six
-      // places.
-      return hinglish
-          ? 'Aapki clinic timing sambhaal rahi hai. Hum yahan sirf aapke saath chal rahe hain — apna hisaab nahi laga rahe.'
-          : 'Your clinic is holding the timing. We are keeping you company here, '
-              'not running our own numbers alongside theirs.';
-    }
-    if (today.confidence == OvulationConfidence.unknown) {
-      return hinglish
-          ? 'Abhi itna record nahi hai ki hum kuch keh sakein. Jaise-jaise aap log karengi, yeh saaf hota jayega.'
-          : 'Not enough logged yet for us to say anything useful. It gets clearer as you go.';
-    }
-    return hinglish
-        ? 'Cycle day ${today.cycleDay}. Aapki rhythm, jitna abhi tak pata hai.'
-        : 'Cycle day ${today.cycleDay}. Your rhythm, as far as we know it.';
-  }
 
   @override
-  Widget build(BuildContext context) => InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
-          decoration: BoxDecoration(
-            color: p.surface,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: p.line),
-          ),
-          child:
-              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(_line,
-                style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)),
-            const SizedBox(height: 12),
-            Row(children: [
-              Text(hinglish ? 'Cycle kholein' : 'Open your cycle',
-                  style: pvManrope(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: p.action)),
-              const SizedBox(width: 4),
-              Icon(Icons.arrow_forward_rounded, size: 15, color: p.action),
-            ]),
-          ]),
-        ),
-      );
+  Widget build(BuildContext context) =>
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(title,
+            style: pvFraunces(
+                fontSize: 22,
+                fontWeight: FontWeight.w600,
+                height: 1.2,
+                letterSpacing: -0.5,
+                color: p.ink1)),
+        const SizedBox(height: 4),
+        Text(subtitle,
+            style: pvManrope(
+                fontSize: 13,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.2,
+                color: p.action)),
+        const SizedBox(height: 9),
+        Text(body,
+            style: pvManrope(fontSize: 13.5, height: 1.55, color: p.ink2)),
+      ]);
 }
+
+// ⚠️ SUPERSEDED BY `_CycleHeader` + `_WindowLine`, KEPT FOR REVERT.
+//
+// The rule this card was written around is the one that matters and it has
+// been carried into the header verbatim: it shows POSITION and refuses to
+// show PROBABILITY, and when confidence is unknown it says the app has
+// nothing to lean on rather than printing an estimate anyway.
+// /// The cycle spine, as one card.
+// ///
+// /// ⚠️ IT SHOWS POSITION AND REFUSES TO SHOW PROBABILITY. `fertility` is a level
+// /// this app is allowed to name; a percentage is not, and neither is anything
+// /// that reads as a target. When confidence is unknown the card says the app has
+// /// nothing to lean on rather than printing an estimate anyway — the exact
+// /// failure `TtcNoEstimate` was added to stop, after "ovulation around day 40"
+// /// appeared on five screens from a single unlogged gap.
+// class _SpineCard extends StatelessWidget {
+//   const _SpineCard(
+//       {required this.today,
+//       required this.p,
+//       required this.hinglish,
+//       required this.onTap});
+//
+//   final TtcToday today;
+//   final V2Palette p;
+//   final bool hinglish;
+//   final VoidCallback onTap;
+//
+//   String get _line {
+//     if (today.noEstimate == TtcNoEstimate.noPeriodLogged) {
+//       return hinglish
+//           ? 'Abhi tak kuch log nahi hua. Pehla period log karte hi cycle yahan banna shuru ho jayega.'
+//           : 'Nothing logged yet. Log one period and your cycle starts taking shape here.';
+//     }
+//     if (today.clinicInvolved) {
+//       // ⚠️ WE DEFER, WE DO NOT COMPUTE. When a clinic owns the timing, an app
+//       // estimate beside it is a second opinion she did not ask for. Truth
+//       // hierarchy: treating clinician outranks ParentVeda's calculation by six
+//       // places.
+//       return hinglish
+//           ? 'Aapki clinic timing sambhaal rahi hai. Hum yahan sirf aapke saath chal rahe hain — apna hisaab nahi laga rahe.'
+//           : 'Your clinic is holding the timing. We are keeping you company here, '
+//               'not running our own numbers alongside theirs.';
+//     }
+//     if (today.confidence == OvulationConfidence.unknown) {
+//       return hinglish
+//           ? 'Abhi itna record nahi hai ki hum kuch keh sakein. Jaise-jaise aap log karengi, yeh saaf hota jayega.'
+//           : 'Not enough logged yet for us to say anything useful. It gets clearer as you go.';
+//     }
+//     return hinglish
+//         ? 'Cycle day ${today.cycleDay}. Aapki rhythm, jitna abhi tak pata hai.'
+//         : 'Cycle day ${today.cycleDay}. Your rhythm, as far as we know it.';
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) => InkWell(
+//         onTap: onTap,
+//         borderRadius: BorderRadius.circular(20),
+//         child: Container(
+//           padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
+//           decoration: BoxDecoration(
+//             color: p.surface,
+//             borderRadius: BorderRadius.circular(20),
+//             border: Border.all(color: p.line),
+//           ),
+//           child:
+//               Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+//             Text(_line,
+//                 style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)),
+//             const SizedBox(height: 12),
+//             Row(children: [
+//               Text(hinglish ? 'Cycle kholein' : 'Open your cycle',
+//                   style: pvManrope(
+//                       fontSize: 13,
+//                       fontWeight: FontWeight.w700,
+//                       color: p.action)),
+//               const SizedBox(width: 4),
+//               Icon(Icons.arrow_forward_rounded, size: 15, color: p.action),
+//             ]),
+//           ]),
+//         ),
+//       );
+// }
 
 /// A titled card with a drawn mark. The shape every "one thing" section on the
 /// other two stages uses.
@@ -968,87 +1612,34 @@ class _LinkCard extends StatelessWidget {
 //  comment about a `_Head` that drifted a colour by being copied once.
 // =============================================================================
 
-/// Today's insight — the one item here that is genuinely an article.
-class _InsightCardV3 extends StatelessWidget {
-  const _InsightCardV3({required this.p, required this.hinglish});
+// =============================================================================
+//  The three rails
+// =============================================================================
 
-  final V2Palette p;
-  final bool hinglish;
-
-  @override
-  Widget build(BuildContext context) {
-    final insight = ttcPickForToday(ttcInsights);
-    final tint = v2BlockTint(206, p);
-    return InkWell(
-      onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
-        builder: (_) => TtcInsightScreen(insight: insight),
-        settings: const RouteSettings(name: 'ttc/insight'),
-      )),
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(16, 15, 16, 15),
-        decoration: BoxDecoration(
-          color: p.surface,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: p.line),
-        ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            // ⚠️ THE SHIPPED STRING, NOT A HAND-TYPED COPY OF IT. The literal
-            // here was 'TODAY’S INSIGHT' with a curly apostrophe while
-            // `todaysInsight` carries a straight one — visually identical,
-            // never equal, and it also meant the Hinglish half was a second
-            // translation of a string that already had one.
-            Text(TtcS.current().todaysInsight.toUpperCase(),
-                style: pvManrope(
-                    fontSize: 10,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.3,
-                    color: p.action)),
-            const Spacer(),
-            Text(TtcS.current().readSeconds(insight.readTime(hinglish)),
-                style: pvManrope(
-                    fontSize: 11, fontWeight: FontWeight.w700, color: p.ink3)),
-          ]),
-          const SizedBox(height: 9),
-          Text(insight.title(hinglish),
-              style: pvFraunces(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  height: 1.25,
-                  letterSpacing: -0.3,
-                  color: p.ink1)),
-          const SizedBox(height: 7),
-          Text(insight.body(hinglish).split('\n\n').first,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-              style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
-          const SizedBox(height: 12),
-          // The one takeaway — the part meant to survive the day. Kept from V1
-          // because it is the reason this is a card and not a row.
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: tint,
-              borderRadius: BorderRadius.circular(14),
-            ),
-            child: Text(insight.takeaway(hinglish),
-                style: pvManrope(
-                    fontSize: 13,
-                    height: 1.45,
-                    fontWeight: FontWeight.w700,
-                    color: p.ink1)),
-          ),
-        ]),
-      ),
-    );
-  }
-}
-
-/// Today's myth, nutrition, movement and pick — four rows in one card.
-class _TodayRows extends StatelessWidget {
-  const _TodayRows({required this.p, required this.hinglish});
+/// The five daily items, as circles.
+///
+/// ⚠️ THE SAME FIVE DESTINATIONS AND THE SAME FIVE OFFSETS as the card-and-rows
+/// group this replaced. `ttcPickForToday` is a deterministic day-of-year
+/// rotation, so an offset is not decoration — it is what stops the myth and the
+/// movement being drawn from the same index every morning. Change one here and
+/// V1 and V3 show different content on the same day, which is the one thing an
+/// A/B toggle must not do.
+///
+/// ⚠️ THE CAPTIONS ARE THE SHIPPED STRINGS. `todaysInsight`, `todaysMyth`,
+/// `todaysNutrition`, `todaysMovement`, `todaysPick` — not new labels that mean
+/// the same thing. Two reasons: the Hinglish halves already exist, and
+/// `test/ttc_home_v3_parity_test.dart` finds these five by text to prove V3
+/// still reaches what V1 reaches. A hand-typed copy would look identical and
+/// fail the test, which is precisely the failure already written up against
+/// `todaysInsight`'s curly apostrophe.
+///
+/// ⚠️ DRAWN MARKS, NOT PHOTOGRAPHS. The reference this shape came from uses
+/// image thumbnails; we have no per-item art and inventing an asset pipeline
+/// for five rotating items is not the job. `V3DailyArt` in a tinted disc is the
+/// stage's existing visual language and degrades honestly — see the note in
+/// docs/STILL-OPEN.md if real thumbnails are ever commissioned.
+class _DailyRail extends StatelessWidget {
+  const _DailyRail({required this.p, required this.hinglish});
 
   final V2Palette p;
   final bool hinglish;
@@ -1057,195 +1648,650 @@ class _TodayRows extends StatelessWidget {
   Widget build(BuildContext context) {
     final hi = hinglish;
     final t = TtcS.current();
-    // ⚠️ THE SAME OFFSETS AS V1. `ttcPickForToday` is a deterministic
-    // day-of-year rotation, so an offset is not decoration — it is what stops
-    // the myth and the movement being drawn from the same index every day.
-    // Change one here and the two homes show different things on the same
-    // morning, which is the one thing an A/B toggle must not do.
+
+    final insight = ttcPickForToday(ttcInsights);
     final myth = ttcPickForToday(ttcMyths, offset: 3);
     final n = ttcPickForToday(ttcNutrition, offset: 1);
     final m = ttcPickForToday(ttcMovements, offset: 2);
     final product = ttcPickForToday(ttcProducts, offset: 4);
 
-    return Container(
-      decoration: BoxDecoration(
-        color: p.surface,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: p.line),
+    return SizedBox(
+      height: 128,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 18),
+        children: [
+          _Story(
+            caption: t.todaysInsight,
+            hue: 206,
+            mark: V3DailyMark.note,
+            p: p,
+            onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+              builder: (_) => TtcInsightScreen(insight: insight),
+              settings: const RouteSettings(name: 'ttc/insight'),
+            )),
+          ),
+          _Story(
+            caption: t.todaysMyth,
+            hue: 42,
+            mark: V3DailyMark.voice,
+            p: p,
+            onTap: () => showTtcRowSheet(
+              context,
+              eyebrow: t.todaysMyth,
+              title: myth.myth(hi),
+              body: [
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: ttcPanel,
+                    borderRadius: BorderRadius.circular(ttcCardRadius),
+                  ),
+                  child: Text(myth.truth(hi),
+                      style: ttcBody(14, color: ttcTitleInk, h: 1.65)),
+                ),
+              ],
+            ),
+          ),
+          _Story(
+            caption: t.todaysNutrition,
+            hue: 104,
+            mark: V3DailyMark.capsule,
+            p: p,
+            onTap: () => showTtcRowSheet(
+              context,
+              eyebrow: n.nutrient(hi),
+              title: n.meal(hi),
+              body: [
+                Text(n.why(hi), style: ttcBody(14, color: ttcInk, h: 1.7)),
+                const SizedBox(height: 16),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFDF6EC),
+                    borderRadius: BorderRadius.circular(ttcCardRadius),
+                  ),
+                  child: Text(n.indian(hi),
+                      style: ttcBody(13.5, color: ttcBrown, h: 1.6)),
+                ),
+              ],
+            ),
+          ),
+          _Story(
+            caption: t.todaysMovement,
+            hue: 160,
+            mark: V3DailyMark.memory,
+            p: p,
+            onTap: () => showTtcRowSheet(
+              context,
+              eyebrow: t.todaysMovement,
+              title: m.title(hi),
+              body: [
+                Text(m.body(hi), style: ttcBody(14, color: ttcInk, h: 1.7)),
+              ],
+            ),
+          ),
+          _Story(
+            caption: t.todaysPick,
+            hue: 344,
+            mark: V3DailyMark.photo,
+            p: p,
+            // The product rail below shows the catalogue; this circle keeps the
+            // one rotating pick V1 has, so the two homes still agree.
+            onTap: () => openTtcProducts(context),
+            tooltip: product.name(hi),
+          ),
+        ],
       ),
-      child: Column(children: [
-        _Row(
-          p: p,
-          hue: 42,
-          icon: Icons.lightbulb_outline_rounded,
-          eyebrow: t.todaysMyth,
-          title: myth.myth(hi),
-          onTap: () => showTtcRowSheet(
-            context,
-            eyebrow: t.todaysMyth,
-            title: myth.myth(hi),
-            body: [
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  color: ttcPanel,
-                  borderRadius: BorderRadius.circular(ttcCardRadius),
-                ),
-                child: Text(myth.truth(hi),
-                    style: ttcBody(14, color: ttcTitleInk, h: 1.65)),
-              ),
-            ],
-          ),
-        ),
-        _Row(
-          p: p,
-          hue: 104,
-          icon: Icons.restaurant_rounded,
-          eyebrow: t.todaysNutrition,
-          title: n.meal(hi),
-          onTap: () => showTtcRowSheet(
-            context,
-            eyebrow: n.nutrient(hi),
-            title: n.meal(hi),
-            body: [
-              Text(n.why(hi), style: ttcBody(14, color: ttcInk, h: 1.7)),
-              const SizedBox(height: 16),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFDF6EC),
-                  borderRadius: BorderRadius.circular(ttcCardRadius),
-                ),
-                child: Text(n.indian(hi),
-                    style: ttcBody(13.5, color: ttcBrown, h: 1.6)),
-              ),
-            ],
-          ),
-        ),
-        _Row(
-          p: p,
-          hue: 160,
-          icon: Icons.directions_walk_rounded,
-          eyebrow: t.todaysMovement,
-          title: m.title(hi),
-          meta: m.minutes > 0 ? t.minutes(m.minutes) : null,
-          onTap: () => showTtcRowSheet(
-            context,
-            eyebrow: t.todaysMovement,
-            title: m.title(hi),
-            body: [
-              Text(m.body(hi), style: ttcBody(14, color: ttcInk, h: 1.7)),
-            ],
-          ),
-        ),
-        _Row(
-          p: p,
-          hue: 344,
-          icon: Icons.shopping_bag_outlined,
-          eyebrow: t.todaysPick,
-          title: product.name(hi),
-          meta: product.priceEn,
-          last: true,
-          onTap: () => openTtcProducts(context),
-        ),
-      ]),
     );
   }
 }
 
-class _Row extends StatelessWidget {
-  const _Row({
-    required this.p,
+/// One circle and its caption.
+class _Story extends StatelessWidget {
+  const _Story({
+    required this.caption,
     required this.hue,
-    required this.icon,
-    required this.eyebrow,
-    required this.title,
+    required this.mark,
+    required this.p,
     required this.onTap,
-    this.meta,
-    this.last = false,
+    this.tooltip,
   });
 
-  final V2Palette p;
+  final String caption;
   final double hue;
-
-  // ⚠️ A LINE ICON, NOT A `V3DailyMark`. The five marks are deliberately
-  // abstract — they are wallpaper for a section, and on a card the size of the
-  // journal's they read as texture. At 21px in a row they stop being abstract
-  // and start being WRONG: `capsule` is a pill beside a plate of food and
-  // `photo` is a picture frame beside a supplement. V3's hub and journey rows
-  // already use line icons for the same reason.
-  final IconData icon;
-  final String eyebrow;
-  final String title;
-  final String? meta;
-  final bool last;
+  final V3DailyMark mark;
+  final V2Palette p;
   final VoidCallback onTap;
+  final String? tooltip;
 
   @override
   Widget build(BuildContext context) {
     final tint = v2BlockTint(hue, p);
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.fromLTRB(14, 13, 14, 13),
-        decoration: BoxDecoration(
-          border: last ? null : Border(bottom: BorderSide(color: p.line)),
-        ),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
-          Container(
-            width: 34,
-            height: 34,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: tint,
-              borderRadius: BorderRadius.circular(11),
+    return Semantics(
+      button: true,
+      label: tooltip == null ? caption : '$caption — $tooltip',
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: SizedBox(
+          width: 82,
+          child: Column(children: [
+            Container(
+              width: 66,
+              height: 66,
+              padding: const EdgeInsets.all(15),
+              decoration: BoxDecoration(
+                color: tint,
+                shape: BoxShape.circle,
+                // The ring is what makes it read as a story rather than a
+                // button. Same tint, one step darker, so it never becomes a
+                // second colour to account for.
+                border: Border.all(
+                    color: HSLColor.fromColor(tint)
+                        .withSaturation(0.42)
+                        .withLightness(0.72)
+                        .toColor(),
+                    width: 2),
+              ),
+              child: V3DailyArt(mark: mark, tint: tint),
             ),
-            child: Icon(icon,
-                size: 18,
-                color: HSLColor.fromColor(tint)
-                    .withSaturation(0.46)
-                    .withLightness(0.42)
-                    .toColor()),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(eyebrow.toUpperCase(),
-                  style: pvManrope(
-                      fontSize: 9.5,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.1,
-                      color: p.ink3)),
-              const SizedBox(height: 3),
-              Text(title,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: pvFraunces(
-                      fontSize: 15.5,
-                      fontWeight: FontWeight.w600,
-                      height: 1.25,
-                      letterSpacing: -0.2,
-                      color: p.ink1)),
-            ]),
-          ),
-          if (meta != null && meta!.isNotEmpty) ...[
-            const SizedBox(width: 10),
-            Text(meta!,
+            const SizedBox(height: 8),
+            Text(caption.toUpperCase(),
+                maxLines: 2,
+                textAlign: TextAlign.center,
+                overflow: TextOverflow.ellipsis,
                 style: pvManrope(
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w700,
-                    color: p.ink3)),
-          ],
-          const SizedBox(width: 6),
-          Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
-        ]),
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 0.7,
+                    height: 1.35,
+                    color: p.ink2)),
+          ]),
+        ),
       ),
     );
   }
 }
+
+/// Products worth having, as a rail.
+class _ProductRail extends StatelessWidget {
+  const _ProductRail({required this.p, required this.hinglish});
+
+  final V2Palette p;
+  final bool hinglish;
+
+  @override
+  Widget build(BuildContext context) {
+    // Four, taken off the same deterministic rotation the daily pick uses so
+    // the rail is stable within a day and moves between them.
+    final picks = [
+      for (var i = 0; i < 4; i++) ttcPickForToday(ttcProducts, offset: 4 + i),
+    ];
+
+    return SizedBox(
+      height: 158,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 18),
+        itemCount: picks.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 11),
+        itemBuilder: (context, i) {
+          final product = picks[i];
+          final tint = v2BlockTint((344 + (i * 24)) % 360, p);
+          return InkWell(
+            onTap: () => openTtcProducts(context),
+            borderRadius: BorderRadius.circular(18),
+            child: Container(
+              width: 158,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: p.surface,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: p.line),
+              ),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 34,
+                      height: 34,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                          color: tint, borderRadius: BorderRadius.circular(11)),
+                      child: Icon(Icons.shopping_bag_outlined,
+                          size: 17,
+                          color: HSLColor.fromColor(tint)
+                              .withSaturation(0.46)
+                              .withLightness(0.42)
+                              .toColor()),
+                    ),
+                    const SizedBox(height: 11),
+                    Text(product.name(hinglish),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: pvFraunces(
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w600,
+                            height: 1.25,
+                            letterSpacing: -0.2,
+                            color: p.ink1)),
+                    const Spacer(),
+                    // ⚠️ CATEGORY AND PRICE, NEVER A BENEFIT. See the section
+                    // comment: a one-line claim under a supplement on a
+                    // fertility home is the shortest route this product has to
+                    // an implied promise about her odds.
+                    Text(product.category.toUpperCase(),
+                        style: pvManrope(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.9,
+                            color: p.ink3)),
+                    const SizedBox(height: 3),
+                    Text(product.priceEn,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: pvManrope(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w700,
+                            color: p.ink2)),
+                  ]),
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+/// Reads from the stage library, as a rail.
+class _ReadRail extends StatelessWidget {
+  const _ReadRail({required this.p, required this.hinglish});
+
+  final V2Palette p;
+  final bool hinglish;
+
+  @override
+  Widget build(BuildContext context) {
+    if (kTtcReads.isEmpty) return const SizedBox.shrink();
+    final picks = [
+      for (var i = 0; i < 4 && i < kTtcReads.length; i++)
+        kTtcReads[(_dayOfYear() + i) % kTtcReads.length],
+    ];
+
+    return SizedBox(
+      height: 150,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 18),
+        itemCount: picks.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 11),
+        itemBuilder: (context, i) {
+          final read = picks[i];
+          final tint = v2BlockTint(read.hue, p);
+          return InkWell(
+            onTap: () =>
+                openTtcSurface(context, '$kTtcReadPrefix${read.id}'),
+            borderRadius: BorderRadius.circular(18),
+            child: Container(
+              width: 196,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: p.surface,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: p.line),
+              ),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                          color: tint,
+                          borderRadius: BorderRadius.circular(999)),
+                      child: Text(
+                          (hinglish ? read.kicker.hi : read.kicker.en)
+                              .toUpperCase(),
+                          style: pvManrope(
+                              fontSize: 8.5,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 0.8,
+                              color: HSLColor.fromColor(tint)
+                                  .withSaturation(0.46)
+                                  .withLightness(0.34)
+                                  .toColor())),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(hinglish ? read.title.hi : read.title.en,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: pvFraunces(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600,
+                            height: 1.25,
+                            letterSpacing: -0.25,
+                            color: p.ink1)),
+                    const Spacer(),
+                    Row(children: [
+                      Text(TtcS.current().readOpen,
+                          style: pvManrope(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w800,
+                              color: p.action)),
+                      const SizedBox(width: 3),
+                      Icon(Icons.arrow_forward_rounded,
+                          size: 13, color: p.action),
+                    ]),
+                  ]),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  /// Same day-of-year rotation `ttcPickForToday` uses, so the reads rail turns
+  /// over on the same schedule as everything else on this page rather than on
+  /// one of its own.
+  static int _dayOfYear() {
+    final now = DateTime.now();
+    return now.difference(DateTime(now.year, 1, 1)).inDays;
+  }
+}
+
+// ⚠️ SUPERSEDED BY `_DailyRail`, KEPT FOR REVERT. Same insight, same
+// destination, same `ttcPickForToday(ttcInsights)` rotation — as a circle in
+// the rail rather than a card with the takeaway inlined.
+//
+// ⚠️ THE ONE THING THE RAIL DOES NOT CARRY is the takeaway panel: the
+// sentence meant to survive the day, readable without opening anything. It
+// is still on `TtcInsightScreen`, one tap in. If the rail is kept, that is
+// the loss to weigh.
+// /// Today's insight — the one item here that is genuinely an article.
+// class _InsightCardV3 extends StatelessWidget {
+//   const _InsightCardV3({required this.p, required this.hinglish});
+//
+//   final V2Palette p;
+//   final bool hinglish;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final insight = ttcPickForToday(ttcInsights);
+//     final tint = v2BlockTint(206, p);
+//     return InkWell(
+//       onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+//         builder: (_) => TtcInsightScreen(insight: insight),
+//         settings: const RouteSettings(name: 'ttc/insight'),
+//       )),
+//       borderRadius: BorderRadius.circular(20),
+//       child: Container(
+//         padding: const EdgeInsets.fromLTRB(16, 15, 16, 15),
+//         decoration: BoxDecoration(
+//           color: p.surface,
+//           borderRadius: BorderRadius.circular(20),
+//           border: Border.all(color: p.line),
+//         ),
+//         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+//           Row(children: [
+//             // ⚠️ THE SHIPPED STRING, NOT A HAND-TYPED COPY OF IT. The literal
+//             // here was 'TODAY’S INSIGHT' with a curly apostrophe while
+//             // `todaysInsight` carries a straight one — visually identical,
+//             // never equal, and it also meant the Hinglish half was a second
+//             // translation of a string that already had one.
+//             Text(TtcS.current().todaysInsight.toUpperCase(),
+//                 style: pvManrope(
+//                     fontSize: 10,
+//                     fontWeight: FontWeight.w800,
+//                     letterSpacing: 1.3,
+//                     color: p.action)),
+//             const Spacer(),
+//             Text(TtcS.current().readSeconds(insight.readTime(hinglish)),
+//                 style: pvManrope(
+//                     fontSize: 11, fontWeight: FontWeight.w700, color: p.ink3)),
+//           ]),
+//           const SizedBox(height: 9),
+//           Text(insight.title(hinglish),
+//               style: pvFraunces(
+//                   fontSize: 18,
+//                   fontWeight: FontWeight.w600,
+//                   height: 1.25,
+//                   letterSpacing: -0.3,
+//                   color: p.ink1)),
+//           const SizedBox(height: 7),
+//           Text(insight.body(hinglish).split('\n\n').first,
+//               maxLines: 3,
+//               overflow: TextOverflow.ellipsis,
+//               style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
+//           const SizedBox(height: 12),
+//           // The one takeaway — the part meant to survive the day. Kept from V1
+//           // because it is the reason this is a card and not a row.
+//           Container(
+//             width: double.infinity,
+//             padding: const EdgeInsets.all(12),
+//             decoration: BoxDecoration(
+//               color: tint,
+//               borderRadius: BorderRadius.circular(14),
+//             ),
+//             child: Text(insight.takeaway(hinglish),
+//                 style: pvManrope(
+//                     fontSize: 13,
+//                     height: 1.45,
+//                     fontWeight: FontWeight.w700,
+//                     color: p.ink1)),
+//           ),
+//         ]),
+//       ),
+//     );
+//   }
+// }
+
+// ⚠️ SUPERSEDED BY `_DailyRail`, KEPT FOR REVERT. The four rows and their
+// four `ttcPickForToday` offsets (myth 3, nutrition 1, movement 2, pick 4)
+// moved into the rail UNCHANGED — see the warning there about why those
+// numbers are load-bearing rather than arbitrary.
+// /// Today's myth, nutrition, movement and pick — four rows in one card.
+// class _TodayRows extends StatelessWidget {
+//   const _TodayRows({required this.p, required this.hinglish});
+//
+//   final V2Palette p;
+//   final bool hinglish;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final hi = hinglish;
+//     final t = TtcS.current();
+//     // ⚠️ THE SAME OFFSETS AS V1. `ttcPickForToday` is a deterministic
+//     // day-of-year rotation, so an offset is not decoration — it is what stops
+//     // the myth and the movement being drawn from the same index every day.
+//     // Change one here and the two homes show different things on the same
+//     // morning, which is the one thing an A/B toggle must not do.
+//     final myth = ttcPickForToday(ttcMyths, offset: 3);
+//     final n = ttcPickForToday(ttcNutrition, offset: 1);
+//     final m = ttcPickForToday(ttcMovements, offset: 2);
+//     final product = ttcPickForToday(ttcProducts, offset: 4);
+//
+//     return Container(
+//       decoration: BoxDecoration(
+//         color: p.surface,
+//         borderRadius: BorderRadius.circular(20),
+//         border: Border.all(color: p.line),
+//       ),
+//       child: Column(children: [
+//         _Row(
+//           p: p,
+//           hue: 42,
+//           icon: Icons.lightbulb_outline_rounded,
+//           eyebrow: t.todaysMyth,
+//           title: myth.myth(hi),
+//           onTap: () => showTtcRowSheet(
+//             context,
+//             eyebrow: t.todaysMyth,
+//             title: myth.myth(hi),
+//             body: [
+//               Container(
+//                 width: double.infinity,
+//                 padding: const EdgeInsets.all(15),
+//                 decoration: BoxDecoration(
+//                   color: ttcPanel,
+//                   borderRadius: BorderRadius.circular(ttcCardRadius),
+//                 ),
+//                 child: Text(myth.truth(hi),
+//                     style: ttcBody(14, color: ttcTitleInk, h: 1.65)),
+//               ),
+//             ],
+//           ),
+//         ),
+//         _Row(
+//           p: p,
+//           hue: 104,
+//           icon: Icons.restaurant_rounded,
+//           eyebrow: t.todaysNutrition,
+//           title: n.meal(hi),
+//           onTap: () => showTtcRowSheet(
+//             context,
+//             eyebrow: n.nutrient(hi),
+//             title: n.meal(hi),
+//             body: [
+//               Text(n.why(hi), style: ttcBody(14, color: ttcInk, h: 1.7)),
+//               const SizedBox(height: 16),
+//               Container(
+//                 width: double.infinity,
+//                 padding: const EdgeInsets.all(15),
+//                 decoration: BoxDecoration(
+//                   color: const Color(0xFFFDF6EC),
+//                   borderRadius: BorderRadius.circular(ttcCardRadius),
+//                 ),
+//                 child: Text(n.indian(hi),
+//                     style: ttcBody(13.5, color: ttcBrown, h: 1.6)),
+//               ),
+//             ],
+//           ),
+//         ),
+//         _Row(
+//           p: p,
+//           hue: 160,
+//           icon: Icons.directions_walk_rounded,
+//           eyebrow: t.todaysMovement,
+//           title: m.title(hi),
+//           meta: m.minutes > 0 ? t.minutes(m.minutes) : null,
+//           onTap: () => showTtcRowSheet(
+//             context,
+//             eyebrow: t.todaysMovement,
+//             title: m.title(hi),
+//             body: [
+//               Text(m.body(hi), style: ttcBody(14, color: ttcInk, h: 1.7)),
+//             ],
+//           ),
+//         ),
+//         _Row(
+//           p: p,
+//           hue: 344,
+//           icon: Icons.shopping_bag_outlined,
+//           eyebrow: t.todaysPick,
+//           title: product.name(hi),
+//           meta: product.priceEn,
+//           last: true,
+//           onTap: () => openTtcProducts(context),
+//         ),
+//       ]),
+//     );
+//   }
+// }
+//
+// class _Row extends StatelessWidget {
+//   const _Row({
+//     required this.p,
+//     required this.hue,
+//     required this.icon,
+//     required this.eyebrow,
+//     required this.title,
+//     required this.onTap,
+//     this.meta,
+//     this.last = false,
+//   });
+//
+//   final V2Palette p;
+//   final double hue;
+//
+//   // ⚠️ A LINE ICON, NOT A `V3DailyMark`. The five marks are deliberately
+//   // abstract — they are wallpaper for a section, and on a card the size of the
+//   // journal's they read as texture. At 21px in a row they stop being abstract
+//   // and start being WRONG: `capsule` is a pill beside a plate of food and
+//   // `photo` is a picture frame beside a supplement. V3's hub and journey rows
+//   // already use line icons for the same reason.
+//   final IconData icon;
+//   final String eyebrow;
+//   final String title;
+//   final String? meta;
+//   final bool last;
+//   final VoidCallback onTap;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final tint = v2BlockTint(hue, p);
+//     return InkWell(
+//       onTap: onTap,
+//       child: Container(
+//         padding: const EdgeInsets.fromLTRB(14, 13, 14, 13),
+//         decoration: BoxDecoration(
+//           border: last ? null : Border(bottom: BorderSide(color: p.line)),
+//         ),
+//         child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+//           Container(
+//             width: 34,
+//             height: 34,
+//             alignment: Alignment.center,
+//             decoration: BoxDecoration(
+//               color: tint,
+//               borderRadius: BorderRadius.circular(11),
+//             ),
+//             child: Icon(icon,
+//                 size: 18,
+//                 color: HSLColor.fromColor(tint)
+//                     .withSaturation(0.46)
+//                     .withLightness(0.42)
+//                     .toColor()),
+//           ),
+//           const SizedBox(width: 12),
+//           Expanded(
+//             child:
+//                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+//               Text(eyebrow.toUpperCase(),
+//                   style: pvManrope(
+//                       fontSize: 9.5,
+//                       fontWeight: FontWeight.w800,
+//                       letterSpacing: 1.1,
+//                       color: p.ink3)),
+//               const SizedBox(height: 3),
+//               Text(title,
+//                   maxLines: 2,
+//                   overflow: TextOverflow.ellipsis,
+//                   style: pvFraunces(
+//                       fontSize: 15.5,
+//                       fontWeight: FontWeight.w600,
+//                       height: 1.25,
+//                       letterSpacing: -0.2,
+//                       color: p.ink1)),
+//             ]),
+//           ),
+//           if (meta != null && meta!.isNotEmpty) ...[
+//             const SizedBox(width: 10),
+//             Text(meta!,
+//                 style: pvManrope(
+//                     fontSize: 11.5,
+//                     fontWeight: FontWeight.w700,
+//                     color: p.ink3)),
+//           ],
+//           const SizedBox(width: 6),
+//           Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
+//         ]),
+//       ),
+//     );
+//   }
+// }
 
 /// Me · Us · What's next — the chapter reader's three tabs, as shortcuts.
 class _ChapterTabs extends StatelessWidget {

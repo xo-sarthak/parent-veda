@@ -77,10 +77,34 @@ const String kTtcActPreconceptionReadiness = 'ttc_preconception_readiness';
 const String kTtcActLossRecoveryLibrary = 'ttc_loss_recovery_library';
 
 // -----------------------------------------------------------------------------
+//  ⚠️ EVERY HUB BELOW CARRIES A `heroVideoSlot`, AND ONLY TTC's DO
+// -----------------------------------------------------------------------------
+//  The spec: "Add video at top of each door screen. So when for eg user clicks
+//  on fertile window, the section which says 'Trying to Conceive. Understand…'
+//  gets replaced by a video."
+//
+//  That section is `hero` + `heroSupport` on these configs, so the change is
+//  seven lines of DATA rather than a rewrite of a screen pregnancy and
+//  parenting also render. `ProblemHubScreen` shows the placeholder where the
+//  slot is set and the support line where it is not, which means the other two
+//  stages are untouched byte for byte — and adopting the pattern later costs
+//  them one field each, not a migration.
+//
+//  ⚠️ NO FILES EXIST FOR ANY OF THESE. Seven placeholders at real 16:9
+//  geometry, not tappable, carrying the id a real film will be mapped to. That
+//  is the rule at the head of `pv_placeholders.dart`: a placeholder occupies
+//  the real geometry, and what is missing is the file and only the file.
+//  Tracked in docs/STILL-OPEN.md §17.1 — and note that it is seven films in
+//  two languages, which is a content commitment worth costing before
+//  commissioning.
+// -----------------------------------------------------------------------------
+
+// -----------------------------------------------------------------------------
 //  1. Conceiving & fertile window — 2 doors
 // -----------------------------------------------------------------------------
 final HubConfig kTtcConceiving = HubConfig(
   bracketId: 'ttc_conceiving',
+  heroVideoSlot: 'ttc_conceiving_intro',
   template: HubTemplate.trackerLed,
   coreQuestion:
       'How do I find my fertile window, and what actually helps this cycle?',
@@ -123,6 +147,7 @@ final HubConfig kTtcConceiving = HubConfig(
 //  programme cohort — earns its place rather than being filler.
 final HubConfig kTtcPcos = HubConfig(
   bracketId: 'ttc_pcos',
+  heroVideoSlot: 'ttc_pcos_intro',
   template: HubTemplate.trackerLed,
   coreQuestion: 'What does PCOS mean for me, and how do I manage it while '
       'trying to conceive?',
@@ -177,6 +202,7 @@ final HubConfig kTtcPcos = HubConfig(
 //  because we are selling it.
 final HubConfig kTtcInfertility = HubConfig(
   bracketId: 'ttc_infertility',
+  heroVideoSlot: 'ttc_infertility_intro',
   // ⚠️ NOT decisionCommerce. That template names the buying-guide shape, and
   // this hub bans commerce outright three lines above. A template that says
   // 'commerce' on the one hub where products are notApplicable is exactly the
@@ -245,6 +271,7 @@ final HubConfig kTtcInfertility = HubConfig(
 //  so there is no foot to put an offer on. See §3 of the spec.
 final HubConfig kTtcPreconceptionHealth = HubConfig(
   bracketId: 'ttc_preconception_health',
+  heroVideoSlot: 'ttc_preconception_health_intro',
   template: HubTemplate.learnAndPlan,
   coreQuestion: 'What should I be doing before we start trying?',
   hero: _en('Getting your body ready, before you start trying.'),
@@ -268,6 +295,7 @@ final HubConfig kTtcPreconceptionHealth = HubConfig(
 // -----------------------------------------------------------------------------
 final HubConfig kTtcMaleFertility = HubConfig(
   bracketId: 'ttc_male_fertility',
+  heroVideoSlot: 'ttc_male_fertility_intro',
   template: HubTemplate.learnAndPlan,
   coreQuestion: 'What does sperm health depend on, and how do we improve '
       'it?',
@@ -320,6 +348,7 @@ final HubConfig kTtcMaleFertility = HubConfig(
 //  encouragement, nothing implying a timeline she is behind on.
 final HubConfig kTtcAfterLoss = HubConfig(
   bracketId: 'ttc_after_loss',
+  heroVideoSlot: 'ttc_after_loss_intro',
   template: HubTemplate.afterALoss,
   coreQuestion: 'What does my body need to recover, and when — if ever — do '
       'we try again?',
@@ -362,6 +391,7 @@ final HubConfig kTtcAfterLoss = HubConfig(
 //  ⚠️ NO CLOSING, DELIBERATELY — one door means the hub screen is never shown.
 final HubConfig kTtcMindBody = HubConfig(
   bracketId: 'ttc_mind_body',
+  heroVideoSlot: 'ttc_mind_body_intro',
   template: HubTemplate.practiceLed,
   coreQuestion: 'What can we do today that helps, without adding pressure?',
   hero: _en('A few quiet minutes, today.'),

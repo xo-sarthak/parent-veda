@@ -282,7 +282,7 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
   Widget _list(V2Palette p, AppLanguage lang, String Function(String, String) t,
       PrecheckContext c) {
     final counts = _store.counts(c);
-    final sections = PrecheckSection.values;
+    final sections = ttcVisiblePrecheckSections;
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 4, 20, kAskFabReserve + 24),

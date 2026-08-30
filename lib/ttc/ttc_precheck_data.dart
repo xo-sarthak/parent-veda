@@ -96,6 +96,41 @@ enum PrecheckSection {
   practical,
 }
 
+/// The sections the checklist actually renders.
+///
+/// ⚠️ "PREPARING TOGETHER" IS HIDDEN, NOT REMOVED, and the difference is
+/// load-bearing in three separate ways:
+///
+///   · **The enum value is an IDENTITY.** `PrecheckStore` persists ticks
+///     against `section.name` in `shared_preferences` and syncs them to
+///     Supabase. Deleting `PrecheckSection.partner` would strand every couple
+///     who has already ticked "His side of it" — the row survives, and nothing
+///     can ever read it again. Same class of trap as `AppLanguage.hinglish`.
+///   · **Its two items are still real.** `partner_health` and `partner_meds`
+///     carry the male-factor fact this stage most needs a woman to hear, and
+///     both still have their reads and their `ttc_partner` surface. The
+///     partner screen is where that content lives now; it did not stop
+///     existing because a section stopped being drawn.
+///   · **`ttc_precheck/partner` still resolves.** The surface router matches
+///     on the enum, so a door or a journey step naming that section opens it
+///     directly. Hiding it from the list is not the same as making it
+///     unreachable, and that is deliberate — see the wiring gate.
+///
+/// To put it back: return `PrecheckSection.values` here. Nothing else changed.
+const List<PrecheckSection> ttcVisiblePrecheckSections = [
+  PrecheckSection.folate,
+  PrecheckSection.health,
+  PrecheckSection.medicines,
+  PrecheckSection.vaccines,
+  PrecheckSection.lifestyle,
+  PrecheckSection.body,
+  PrecheckSection.dental,
+  PrecheckSection.family,
+  PrecheckSection.history,
+  // PrecheckSection.partner,
+  PrecheckSection.practical,
+];
+
 extension PrecheckSectionCopy on PrecheckSection {
   LocalizedText get title => switch (this) {
         PrecheckSection.folate => _en('Folic acid & nutrition'),

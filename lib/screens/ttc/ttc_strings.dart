@@ -103,6 +103,95 @@ class TtcS {
   String get tabCalendar => _p('Calendar', 'Calendar');
   String get tabCommunity => _p('Community', 'Community');
 
+  // ---- the V3 tab set -------------------------------------------------------
+  //
+  // ⚠️ V3 ONLY. V1 keeps Today · Prepare · Tools · Calendar · Community, and
+  // the reason the two differ is written out at the nav in `ttc_common.dart`.
+  String get tabCourses => _p('Courses', 'Courses');
+  String get tabTalkToExpert => _p('Talk to expert', 'Expert se baat');
+  String get tabMore => _p('More', 'Aur');
+
+  // ---- the More screen ------------------------------------------------------
+  String get moreTitle => _p('More', 'Aur');
+  String get moreIntro => _p(
+      'Everything that is not on the four tabs, in one place.',
+      'Jo cheezein chaar tabs par nahi hain, sab yahan.');
+  String get moreYourCycle => _p('Your cycle', 'Aapka cycle');
+  String get moreEverythingPaid =>
+      _p('All programmes and sessions', 'Saare programmes aur sessions');
+  String get moreEverythingPaidBody => _p(
+      'Yoga, nutrition, mental wellness, assessments, partner workshops, IVF support and lifestyle programmes — as well as the courses and consultations on their own tabs.',
+      'Yoga, khaan-paan, mann ki sehat, jaanch, partner workshops, IVF support aur lifestyle programmes — saath mein courses aur consultations bhi.');
+
+  // ---- the first-run flow ---------------------------------------------------
+  //
+  // ⚠️ EVERY QUESTION SAYS WHAT THE ANSWER UNLOCKS. CLAUDE.md: "Derive, never
+  // ask. Only ask for what is genuinely unknowable, and say what the answer
+  // unlocks." A question that does not explain itself reads as data collection,
+  // which on a fertility app is the reading most likely to be right.
+  String get introSkip => _p('Skip', 'Chhodein');
+  String get introContinue => _p('Continue', 'Aage badhein');
+  String get introRatherNotSay => _p("I'd rather not say", 'Nahi batana chahti');
+  String get introDontKnow => _p("I don't know", 'Mujhe nahi pata');
+
+  String get introLanguageTitle =>
+      _p('Which language suits you?', 'Aapko kaunsi bhasha theek lagegi?');
+  String get introLanguageBody => _p(
+      'You can change this any time from your profile.',
+      'Ise aap kabhi bhi profile se badal sakti hain.');
+
+  String get introVideoTitle =>
+      _p('Before you start', 'Shuru karne se pehle');
+  String get introVideoBody => _p(
+      'Two minutes on what this stage is for, so the rest of the app makes sense.',
+      'Do minute — yeh stage kis liye hai, taaki baaki app samajh mein aaye.');
+  /// ⚠️ THE FILM'S NAME, NOT THE SCREEN'S. These were briefly the same string,
+  /// which put "Before you start" on the heading and again on the thumbnail
+  /// under it. A page title says where you are; a video title says what the
+  /// video is — and when they are identical the thumbnail is carrying no
+  /// information at all.
+  String get introVideoLabel => _p(
+      'Trying to conceive, explained', 'Trying to conceive, samjhaaya gaya');
+  String get introVideoComing => _p(
+      'The film for this is being made. What it covers is below.',
+      'Iska video banaya ja raha hai. Ismein kya hoga, neeche likha hai.');
+
+  /// The film's contents, as words, until the film exists.
+  List<String> get introVideoPoints => hinglish
+      ? const [
+          'Fertile din kya hote hain, aur unki timing kyun sabse zyada maayne rakhti hai.',
+          'Kya sach mein farak daalta hai — aur kaunsi cheezein sirf shor hain.',
+          'Kis cheez se bachna hai, aur kis baat ki chinta nahi karni.',
+          'Doctor ke paas kab jaana samajhdaari hai — pehle nahi, baad mein bhi nahi.',
+        ]
+      : const [
+          'What the fertile window actually is, and why the timing of it matters more than anything else you can control.',
+          'What genuinely helps — and which of the things you have read are noise.',
+          'What to avoid, and what is not worth worrying about.',
+          'When seeing a doctor is the sensible next step, rather than earlier or later.',
+        ];
+
+  String get introPeriodTitle =>
+      _p('When did your last period start?', 'Aapka pichhla period kab shuru hua?');
+  String get introPeriodBody => _p(
+      'This one date is what your cycle, your fertile days and most of this stage are built from. Nothing else can stand in for it.',
+      'Yahi ek date se aapka cycle, aapke fertile din aur is stage ka zyadatar hissa banta hai. Iski jagah aur kuch nahi le sakta.');
+  String get introPickDate => _p('Pick the date', 'Date chunein');
+  String introDatePicked(String date) =>
+      _p('Last period: $date', 'Pichhla period: $date');
+
+  String get introTryingTitle =>
+      _p('How long have you been trying?', 'Aap kab se koshish kar rahi hain?');
+  String get introTryingBody => _p(
+      'This is only used to know when it is worth suggesting you see someone — not to judge how it is going.',
+      'Yeh sirf yeh jaanne ke liye hai ki kab kisi se milne ki salaah dena theek hoga — yeh aankne ke liye nahi ki kya chal raha hai.');
+
+  String get introPathTitle =>
+      _p('Is a clinic involved?', 'Kya koi clinic isme shaamil hai?');
+  String get introPathBody => _p(
+      'If your treatment decides the timing, we will not put our own estimate next to theirs. This is the answer that stops that happening.',
+      'Agar aapka treatment timing tay karta hai, to hum uske saath apna alag andaaza nahi rakhenge. Yeh jawab wahi rokta hai.');
+
   // ---- greetings ------------------------------------------------------------
   String get goodMorning => _p('Good morning', 'Suprabhat');
   String get goodAfternoon => _p('Good afternoon', 'Namaste');
@@ -216,6 +305,95 @@ class TtcS {
   String get videoComing => _p(
       'Video is being filmed for this chapter.',
       'Is chapter ke liye video banaya ja raha hai.');
+
+  // ---- the cycle header on the V3 home --------------------------------------
+  //
+  // ⚠️ EVERY LINE HERE STATES *WHEN*, NEVER *HOW LIKELY*. A fertility header is
+  // the single most tempting surface in this product to print a chance on, and
+  // the rule is absolute — see CLAUDE.md's clinical invariants and
+  // `test/ttc_clinical_review_test.dart`, which scans this file's source rather
+  // than a list of banned phrases.
+  //
+  // ⚠️ THREE OF THESE ARE REFUSALS, AND THEY ARE FIRST-CLASS COPY. "Nothing
+  // logged", "your clinic holds this" and "not enough to say" are not error
+  // states to be tidied away — they are the honest answer in three genuinely
+  // common situations, and each one gets the same typographic weight as an
+  // estimate so that saying nothing never looks like a broken screen.
+  String get headerEditPeriod => _p('Edit period dates', 'Period dates badlein');
+  String get headerCheckSymptoms => _p('Check symptoms', 'Symptoms dekhein');
+
+  String get headerStartHere => _p('Start here', 'Shuruaat');
+  String get headerStartHereBody => _p(
+      'Add the date your last period started, and your cycle takes shape here.',
+      'Pichhle period ki date daalein, aur aapka cycle yahan banna shuru ho jayega.');
+
+  /// ⚠️ WE DEFER, WE DO NOT COMPUTE. Truth hierarchy: a treating clinician
+  /// outranks ParentVeda's calculation by six places, so when a clinic is
+  /// running the cycle the header carries their authority, not a second opinion
+  /// beside it.
+  String get headerClinicHolds =>
+      _p('Your clinic holds this', 'Yeh aapki clinic dekh rahi hai');
+  String get headerClinicHoldsBody => _p(
+      'They are running the timing this cycle. We are keeping you company, not running our own numbers alongside theirs.',
+      'Is cycle ki timing wo sambhaal rahe hain. Hum bas aapke saath hain — apna alag hisaab nahi laga rahe.');
+
+  String get headerNoEstimate =>
+      _p('Not enough to say yet', 'Abhi kehna theek nahi');
+  String get headerNoEstimateBody => _p(
+      'There is a gap in what has been logged, so an estimate here would be a guess. It gets clearer as you go.',
+      'Log mein thoda gap hai, isliye abhi koi estimate sirf andaaza hoga. Jaise-jaise aap log karengi, saaf hota jayega.');
+
+  String get headerWindowOpenNow =>
+      _p('Your fertile days are here', 'Aapke fertile din chal rahe hain');
+  String headerWindowOpensIn(int days) => _p(
+      days == 1 ? 'Your fertile days open tomorrow' : 'Your fertile days open in $days days',
+      days == 1 ? 'Fertile din kal se' : 'Fertile din $days din mein');
+  String headerWindowDates(String from, String to) =>
+      _p('$from to $to', '$from se $to tak');
+
+  /// ⚠️ SAYS "EXPECTED" OUT LOUD. This renders only when the current cycle's
+  /// window has already closed and the app has rolled forward on an assumed
+  /// cycle length — a projection resting on an estimate. Printing it in the
+  /// same words as a live window is the overreach `TtcNoEstimate` exists to
+  /// prevent.
+  String headerWindowProjected(String from, String to) => _p(
+      'Expected around $from to $to, based on your usual cycle',
+      'Andaaza $from se $to, aapke aam cycle ke hisaab se');
+
+  String headerCycleDay(int day) => _p('Cycle day $day', 'Cycle day $day');
+
+  String get readOpen => _p('Read', 'Padhein');
+
+  // ---- the daily practice ---------------------------------------------------
+  //
+  // ⚠️ "GARBHADHANA SAMSKARA" AND NOT "GARBH SANSKAR", DELIBERATELY, and the
+  // two must not be collapsed by a later tidy-up. Garbh Sanskar is the
+  // PREGNANCY practice — ParentVeda ships it four pillars deep in the pregnancy
+  // stage — and using its name on a woman who has not conceived promises her a
+  // feature she cannot reach and makes two stages look like one screen twice.
+  // Garbhadhana Samskara is the older, narrower idea this section actually is:
+  // preparing both parents *before* conception.
+  //
+  // ⚠️ AND THE BODY MAKES NO CAUSAL CLAIM. "A steadier place to begin from" is
+  // as far as it goes. Not "improves your chances of a healthy baby", which is
+  // a claim about outcome that nothing in this app is entitled to make — the
+  // subtitle's "Improve your chances" is a general framing with no number and
+  // no personalisation attached, and it stays on the right side of the line
+  // only while the body under it stays honest about what five minutes can do.
+  String get samskarTitle =>
+      _p('Daily Preconception Samskar', 'Roz ka Preconception Samskar');
+  String get samskarSubtitle =>
+      _p('Improve your chances', 'Apne mauke behtar karein');
+  String get samskarBody => _p(
+      'Ayurveda has a name for the months before a child is conceived — '
+          'Garbhadhana Samskara, the preparing of both parents rather than only '
+          'the pregnancy that follows. These few minutes a day are that idea, '
+          'kept small: a steadier body, a quieter head, and a calmer place to '
+          'begin from.',
+      'Bachcha conceive karne se pehle ke mahinon ka Ayurveda mein ek naam hai — '
+          'Garbhadhana Samskara, yaani sirf pregnancy ki nahi, dono parents ki '
+          'taiyari. Roz ke yeh chand minute wahi soch hain, bilkul simple: '
+          'sthir sharir, shaant dimaag, aur shuru karne ke liye ek behtar jagah.');
 
   String get dailyRitual => _p('Daily ritual', 'Roz ka ritual');
   String get dailyRitualTitle =>
@@ -981,13 +1159,32 @@ class TtcS {
       : days == 1
           ? 'Opens tomorrow'
           : 'Opens in $days days';
+  /// ⚠️ NO LONGER RENDERED ANYWHERE, KEPT DELIBERATELY.
+  ///
+  /// The window screen never shows a passed window now — it rolls forward to
+  /// the next one instead, so there is nothing left for this to label. Kept
+  /// because the string is correct and the day something does need to say it
+  /// (a past-cycle review, say) retyping it would produce a second, slightly
+  /// different sentence.
   String get windowClosed =>
       _p('This cycle\'s window has passed', 'Is cycle ki window nikal gayi');
 
-  /// The whole cycle, kept but folded away.
-  String get windowSeeWhole =>
-      _p('See the whole cycle', 'Poora cycle dekhein');
-  String get windowHideWhole => _p('Hide the whole cycle', 'Poora cycle chhupayein');
+  /// A window she has paged forward to, rather than the one she is in.
+  String get windowExpected => _p('Expected', 'Andaaza');
+  String get windowProjectedNote => _p(
+      'Based on your usual cycle length, not on anything logged for this month yet.',
+      'Aapke aam cycle ki lambai ke hisaab se — is mahine ka abhi kuch log nahi hua hai.');
+  String get windowNextCycle => _p('Next cycle', 'Agla cycle');
+  String get windowPrevCycle => _p('Previous cycle', 'Pichhla cycle');
+
+  // ⚠️ THE WHOLE-CYCLE FOLD IS RETIRED — see the note in
+  // `ttc_cycle_screens.dart`. Commented out rather than deleted so the pair
+  // comes back together if the fold does.
+  //
+  // /// The whole cycle, kept but folded away.
+  // String get windowSeeWhole =>
+  //     _p('See the whole cycle', 'Poora cycle dekhein');
+  // String get windowHideWhole => _p('Hide the whole cycle', 'Poora cycle chhupayein');
 
   /// Shown under the grid when the fertile run does not fit in this month.
   String continuesInto(String month) => hinglish

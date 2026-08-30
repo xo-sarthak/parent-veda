@@ -158,6 +158,7 @@ class HubConfig {
     required this.needs,
     this.urgent,
     this.closing,
+    this.heroVideoSlot,
   });
 
   /// Must match a `Bracket.id`. The renderer looks the bracket up and asks the
@@ -177,6 +178,25 @@ class HubConfig {
   /// The line under the heading (§4). One sentence on what this problem area
   /// covers — it is what lets the four doors below be short.
   final LocalizedText heroSupport;
+
+  /// A film that answers the hero's question, shown in place of [heroSupport].
+  ///
+  /// ⚠️ OPTIONAL, AND EVERY EXISTING HUB LEAVES IT NULL. Pregnancy and
+  /// parenting are unchanged, byte for byte, because the difference is DATA on
+  /// the config rather than a flag on the renderer. That distinction is the
+  /// whole reason this is a field:
+  ///
+  ///   · A `bool showVideo` on `ProblemHubScreen` would make the shared screen
+  ///     know which stage it is rendering, which is the direction of dependency
+  ///     this file's `HubTool` comment already refuses.
+  ///   · A field means a stage opts in by writing its own content, and a stage
+  ///     that has no film simply has nothing to write.
+  ///
+  /// ⚠️ IT REPLACES THE SUPPORT LINE, IT DOES NOT SIT ABOVE IT. Both say the
+  /// same thing — what this problem area covers — and showing both is the
+  /// duplication that makes a hero twice as tall to carry one fact. The line
+  /// survives as the placeholder's subtitle until a real file lands.
+  final String? heroVideoSlot;
 
   final LocalizedText needsTitle;
 

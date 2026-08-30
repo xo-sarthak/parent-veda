@@ -96,16 +96,95 @@ void main() {
       expect(find.text('Low'), findsNothing);
     });
 
-    testWidgets('the whole cycle is still available, folded', (tester) async {
+    // ⚠️ THE FOLD IS GONE, AND SO IS THE TEST THAT GUARDED IT. "See the whole
+    // cycle" opened a list in which forty-odd rows said "Low" — the exact wall
+    // this screen was rebuilt to remove, kept one tap away. The whole month is
+    // still reachable, on the calendar and the cycle companion, which are the
+    // two screens that exist to show a month.
+    //
+    // Replaced by the three below, which guard what the screen does instead.
+
+    testWidgets('every row is a date and a weekday, not a cycle-day number',
+        (tester) async {
       logCleanHistory();
       await pumpWindow(tester);
-      expect(find.text('See the whole cycle'), findsOneWidget);
+      // "22 Aug" over "Wed" — the units she plans in. A bare "17" is how the
+      // engine thinks and means nothing without counting from a period start.
+      expect(find.textContaining(RegExp(r'^\d+ [A-Z][a-z]{2}$')), findsWidgets);
+      expect(
+          find.byWidgetPredicate((w) =>
+              w is Text &&
+              const ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                  .contains(w.data)),
+          findsWidgets);
+    });
 
-      await tester.tap(find.text('See the whole cycle'));
+    testWidgets('the rows cover exactly the range the summary names',
+        (tester) async {
+      logCleanHistory();
+      await pumpWindow(tester);
+
+      // The headline reads "<from> to <to>". Both endpoints must also appear
+      // as rows — before this, the bars were a "not Low" filter arrived at
+      // independently, so the card could start on a day the headline never
+      // mentioned and nothing on screen explained the gap.
+      final headline = tester
+          .widgetList<Text>(find.textContaining(' to '))
+          .map((w) => w.data)
+          .firstWhere((s) => s != null && RegExp(r'\d+ [A-Z][a-z]{2} to ').hasMatch(s));
+      final parts = headline!.split(' to ');
+      expect(find.text(parts.first), findsWidgets,
+          reason: 'the day the summary says it opens has no row');
+      expect(find.text(parts.last), findsWidgets,
+          reason: 'the day the summary says it closes has no row');
+    });
+
+    testWidgets('she can page forward to the next cycles', (tester) async {
+      logCleanHistory();
+      await pumpWindow(tester);
+
+      final before = tester
+          .widgetList<Text>(find.textContaining(' to '))
+          .map((w) => w.data)
+          .firstWhere((s) => s != null && RegExp(r'\d+ [A-Z][a-z]{2} to ').hasMatch(s));
+
+      await tester.tap(find.bySemanticsLabel('Next cycle'));
       await tester.pumpAndSettle();
-      // Some people want it. It is a choice now, not the first thing she meets.
-      expect(find.text('Low'), findsWidgets);
-      expect(find.text('Hide the whole cycle'), findsOneWidget);
+
+      final after = tester
+          .widgetList<Text>(find.textContaining(' to '))
+          .map((w) => w.data)
+          .firstWhere((s) => s != null && RegExp(r'\d+ [A-Z][a-z]{2} to ').hasMatch(s));
+
+      expect(after, isNot(before), reason: 'the arrow did not move the window');
+      // ⚠️ AND IT SAYS IT IS A GUESS. A projected window applies her usual
+      // cycle length to an estimated ovulation day; presenting that as
+      // confidently as the current cycle is the overreach `TtcNoEstimate`
+      // exists to prevent.
+      expect(find.text('Expected'), findsOneWidget);
+      expect(find.textContaining('usual cycle length'), findsOneWidget);
+    });
+  });
+
+  // ===========================================================================
+  //  A window she can still act on
+  // ---------------------------------------------------------------------------
+  //  A closed window is a chance she missed, drawn in exactly the same shape as
+  //  one she can still use. The screen now rolls forward instead.
+  group('never a window that has already closed', () {
+    testWidgets('a cycle whose window has passed shows the next one',
+        (tester) async {
+      // A period long enough ago that ovulation and the window are behind her.
+      final now = DateTime.now();
+      CycleStore.instance
+        ..logPeriodStart(now.subtract(const Duration(days: 56)))
+        ..logPeriodStart(now.subtract(const Duration(days: 28)))
+        ..logPeriodStart(now.subtract(const Duration(days: 26)));
+
+      await pumpWindow(tester);
+
+      // Whatever else it says, it must not say the window has gone.
+      expect(find.textContaining('has passed'), findsNothing);
     });
   });
 
@@ -121,7 +200,8 @@ void main() {
       TtcStore.instance.setPath(TtcPath.ivf);
       await pumpWindow(tester);
       expect(find.text('Your fertile days'), findsNothing);
-      expect(find.text('See the whole cycle'), findsNothing);
+      // The fold this once guarded is retired; the assertion that matters on a
+      // clinic cycle is that no window is drawn at all, which is the line above.
     });
   });
 

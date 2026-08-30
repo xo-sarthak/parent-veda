@@ -26,6 +26,7 @@ import '../../ttc/ttc_chapter.dart';
 import '../../widgets/global_ask_fab.dart';
 import 'ttc_calendar_screen.dart';
 import 'ttc_community_screen.dart';
+import 'ttc_more_screen.dart';
 import 'ttc_prepare_screen.dart';
 import 'ttc_profile_screen.dart';
 import 'ttc_strings.dart';
@@ -571,6 +572,63 @@ void openTtcTab(BuildContext context, int index) {
   }
 }
 
+/// V3's tab navigation: Today · Courses · Tools · Talk to expert · More.
+///
+/// ⚠️ THIS IS A SECOND TAB SET AND THAT DESERVES AN ARGUMENT, because the file
+/// two hundred lines up says the opposite. `TtcBottomNav`'s own comment
+/// explains why V1 and V3 shared five tabs: an A/B on how the home LOOKS is
+/// unreadable if the navigation moves at the same time, and CLAUDE.md forbids
+/// per-pathway navigation outright.
+///
+/// Both still stand where they applied. What changed is what V3 IS. It stopped
+/// being a second skin on the same product and became the design the stage is
+/// moving to, with V1 kept as the revert path rather than as the other arm of
+/// a live experiment. A destination the new design has no room for is a product
+/// decision, not a variable to control for.
+///
+/// ⚠️ THE CLAUDE.md RULE IS NOT BENT BY THIS, and the distinction is worth
+/// keeping straight because it will come up again. "No per-pathway navigation"
+/// means two WOMEN must not see different tabs — personalisation changes
+/// content, ranking and order, never structure. Everyone on V3 sees these five;
+/// everyone on V1 sees those five; nobody is routed to one by a profile.
+///
+/// ⚠️ AND THE PARITY TEST NO LONGER COVERS THE NAV. `ttc_home_v3_parity_test`
+/// asserts the two HOMES reach the same places, which is still true and still
+/// worth holding. It says nothing about the tab bars, so the thing keeping
+/// Calendar, Community and seven paid categories reachable on V3 is
+/// `TtcMoreScreen` and the note at the head of that file. Read it before
+/// changing this switch.
+void openTtcTabV3(BuildContext context, int index) {
+  final nav = Navigator.of(context);
+  nav.popUntil((r) => r.isFirst || r.settings.name == ttcHomeRoute);
+  switch (index) {
+    // ⚠️ SCOPED TO ONE CATEGORY EACH, not the whole of Prepare. Unscoped, both
+    // tabs opened the same nine-category screen and the labels lied about where
+    // they went — the same mistake already fixed once for the consult button in
+    // `ttc_home_v3.dart`'s `kTtcActConsult`.
+    case 1:
+      nav.push(MaterialPageRoute<void>(
+          builder: (_) => const TtcPrepareScreen(onlyCategory: 'courses'),
+          settings: const RouteSettings(name: 'ttc/courses')));
+      break;
+    case 2:
+      nav.push(MaterialPageRoute<void>(
+          builder: (_) => const TtcToolsScreen(),
+          settings: const RouteSettings(name: 'ttc/tools')));
+      break;
+    case 3:
+      nav.push(MaterialPageRoute<void>(
+          builder: (_) => const TtcPrepareScreen(onlyCategory: 'consults'),
+          settings: const RouteSettings(name: 'ttc/consults')));
+      break;
+    case 4:
+      nav.push(MaterialPageRoute<void>(
+          builder: (_) => const TtcMoreScreen(),
+          settings: const RouteSettings(name: 'ttc/more')));
+      break;
+  }
+}
+
 /// Opens the TTC stage from anywhere (the doorway on the pregnancy Home).
 void openTtc(BuildContext context) {
   Navigator.of(context).push(MaterialPageRoute<void>(
@@ -622,10 +680,22 @@ bool leaveTtcForPregnancy(NavigatorState nav) {
 /// component shape - active tab expands into a filled pill with icon AND label,
 /// so the parent always knows what each tab is.
 class TtcBottomNav extends StatelessWidget {
-  const TtcBottomNav({super.key, required this.active, this.slate = false});
+  const TtcBottomNav(
+      {super.key, required this.active, this.slate = false, this.v3 = false});
 
-  /// 0 = Today · 1 = Prepare · 2 = Tools · 3 = Calendar · 4 = Community
+  /// V1: 0 = Today · 1 = Prepare · 2 = Tools · 3 = Calendar · 4 = Community
+  /// V3: 0 = Today · 1 = Courses · 2 = Tools · 3 = Talk to expert · 4 = More
   final int active;
+
+  /// V3's tab set instead of V1's.
+  ///
+  /// ⚠️ A FLAG ON THE SHARED BAR, NOT A SECOND BAR. The pill, the spacing, the
+  /// shadow, the active treatment and the `pvNavClearance` behaviour are the
+  /// parts that must never differ between the two versions — those are chrome,
+  /// and chrome drifting is what the shared `PvNavBar` was extracted to stop.
+  /// Only the five destinations differ, so only the five destinations are
+  /// behind the flag. See `openTtcTabV3` for why they differ at all.
+  final bool v3;
 
   /// The partner's palette. Same five destinations, his colours.
   ///
@@ -646,8 +716,22 @@ class TtcBottomNav extends StatelessWidget {
     Icons.groups_rounded,
   ];
 
+  /// V3's icons. Tabs 0 and 2 are deliberately identical to V1's — Today and
+  /// Tools mean the same thing in both, and a woman who flips the version pill
+  /// should not have to re-find them.
+  static const List<IconData> _iconsV3 = [
+    Icons.home_rounded,
+    Icons.school_rounded,
+    Icons.widgets_rounded,
+    Icons.chat_bubble_outline_rounded,
+    Icons.more_horiz_rounded,
+  ];
+
   static List<String> _labels(TtcS t) =>
       [t.tabToday, t.tabPrepare, t.tabTools, t.tabCalendar, t.tabCommunity];
+
+  static List<String> _labelsV3(TtcS t) =>
+      [t.tabToday, t.tabCourses, t.tabTools, t.tabTalkToExpert, t.tabMore];
 
   // ⚠️ NOW A THIN ADAPTER OVER `PvNavBar`. This bar was the furthest behind of
   // the three: it both re-flowed the row on every tap AND kept a saturated
@@ -656,13 +740,14 @@ class TtcBottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = TtcS.current();
-    final labels = _labels(t);
+    final labels = v3 ? _labelsV3(t) : _labels(t);
+    final icons = v3 ? _iconsV3 : _icons;
     return PvNavBar(
       items: [
-        for (var i = 0; i < _icons.length; i++) PvNavItem(_icons[i], labels[i]),
+        for (var i = 0; i < icons.length; i++) PvNavItem(icons[i], labels[i]),
       ],
       activeIndex: active,
-      onTap: (i) => openTtcTab(context, i),
+      onTap: (i) => v3 ? openTtcTabV3(context, i) : openTtcTab(context, i),
       accent: slate ? ttcSlate : ttcPurple,
     );
   }

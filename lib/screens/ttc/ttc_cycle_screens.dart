@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 
 import '../../ttc/cycle_store.dart';
 import '../../ttc/ttc_chapter.dart';
+import '../../ttc/ttc_fertile_window.dart';
 import '../../ttc/ttc_store.dart';
 import 'ttc_common.dart';
 import 'ttc_strings.dart';
@@ -598,7 +599,25 @@ class TtcFertilityWindowScreen extends StatefulWidget {
 }
 
 class _TtcFertilityWindowScreenState extends State<TtcFertilityWindowScreen> {
-  bool _wholeCycleOpen = false;
+  // ⚠️ "SEE THE WHOLE CYCLE" IS GONE — `_wholeCycleOpen` and its fold went with
+  // it. Kept as a comment rather than deleted, with the strings, because the
+  // argument for it was never silly: some people do want the whole month.
+  //
+  // What killed it is that it was answering a question this screen is not for.
+  // The screen is "when are my days"; the whole cycle is "what does every day
+  // score", and on real data forty-odd of those rows say "Low". A scrollable
+  // list of Low is what an anxious reader sees as a list of days she failed.
+  // The cycle companion and the calendar both still show the full month.
+  //
+  // bool _wholeCycleOpen = false;
+
+  /// How many cycles forward she has paged, via the arrow on the summary.
+  ///
+  /// ⚠️ ZERO IS "THE ONE SHE CAN ACT ON", NOT "THIS CALENDAR MONTH". The
+  /// projection resolves to the window that is open now or the next one — never
+  /// one that has closed — so paging forward from zero means the cycle after
+  /// the soonest useful one. See `ttc_fertile_window.dart`.
+  int _cyclesAhead = 0;
 
   @override
   Widget build(BuildContext context) {
@@ -608,8 +627,10 @@ class _TtcFertilityWindowScreenState extends State<TtcFertilityWindowScreen> {
         final t = TtcS.current();
         final store = TtcStore.instance;
         final today = store.today;
-        const engine = TtcChapterEngine();
-        final state = store.state();
+        // The engine and the journey state used to be read here to score every
+        // day of the cycle inline. Both moved behind `ttcFertilityOnDate`, so
+        // the two halves of this screen can no longer disagree about which days
+        // are in the window — which they could, and briefly did.
 
         return Scaffold(
           backgroundColor: ttcBg,
@@ -652,71 +673,38 @@ class _TtcFertilityWindowScreenState extends State<TtcFertilityWindowScreen> {
                     // said "Low". For an anxious reader that is a scrollable
                     // list of failure, and the one sentence she came for was
                     // never written down anywhere.
-                    _WindowSummary(today: today, t: t),
+                    //
+                    // ⚠️ NEVER A WINDOW THAT HAS CLOSED. `ttcFertileWindowNow`
+                    // rolls forward when this cycle's has passed - the long
+                    // reason is at the head of `ttc_fertile_window.dart`, and
+                    // the short one is that a passed window is a chance she
+                    // missed, drawn in exactly the same shape as one she can
+                    // still use.
+                    _WindowSummary(
+                      t: t,
+                      cyclesAhead: _cyclesAhead,
+                      onStep: (delta) => setState(() {
+                        // Six ahead, per the note on the arrow. Clamped rather
+                        // than wrapped: paging past the end should stop, not
+                        // silently return her to this month.
+                        _cyclesAhead = (_cyclesAhead + delta).clamp(0, 5);
+                      }),
+                    ),
                     const SizedBox(height: 18),
 
                     // The window itself, as one picture. Keeping that idea from
                     // the original - "the width is the point" is the reassuring
                     // fact here - but seven adjacent bars show width, where
                     // fifty-four bury it.
+                    //
+                    // ⚠️ THE ROWS NOW COVER EXACTLY THE RANGE THE SUMMARY NAMES
+                    // ABOVE THEM, and are labelled with the same dates. Before
+                    // this they were cycle-day numbers filtered by "not Low",
+                    // which is a different set arrived at a different way - so
+                    // the card could legitimately start on a day the headline
+                    // did not mention, and nothing on screen explained why.
                     ttcSectionTitle(t.fertilityAcross),
-                    TtcCard(
-                      child: Column(children: [
-                        for (var day = 1; day <= today.cycleLength; day++)
-                          if (engine.fertilityFor(state, day) != null &&
-                              engine.fertilityFor(state, day) !=
-                                  FertilityLevel.low)
-                            _DayBar(
-                              day: day,
-                              level: engine.fertilityFor(state, day)!,
-                              isToday: day == today.cycleDay,
-                              isOvulation: day == today.estimatedOvulationDay,
-                              t: t,
-                            ),
-                      ]),
-                    ),
-                    const SizedBox(height: 14),
-
-                    // The rest of the cycle is still available - some people
-                    // want to see it - but folded, so it is a choice rather
-                    // than the first thing she meets.
-                    GestureDetector(
-                      onTap: () =>
-                          setState(() => _wholeCycleOpen = !_wholeCycleOpen),
-                      behavior: HitTestBehavior.opaque,
-                      child: Row(children: [
-                        Text(
-                            _wholeCycleOpen
-                                ? t.windowHideWhole
-                                : t.windowSeeWhole,
-                            style: ttcBody(12.5,
-                                color: ttcPurple, w: FontWeight.w800)),
-                        const SizedBox(width: 3),
-                        Icon(
-                            _wholeCycleOpen
-                                ? Icons.expand_less_rounded
-                                : Icons.expand_more_rounded,
-                            size: 18,
-                            color: ttcPurple),
-                      ]),
-                    ),
-                    if (_wholeCycleOpen) ...[
-                      const SizedBox(height: 12),
-                      TtcCard(
-                        child: Column(children: [
-                          for (var day = 1; day <= today.cycleLength; day++)
-                            if (engine.fertilityFor(state, day) != null)
-                              _DayBar(
-                                day: day,
-                                level: engine.fertilityFor(state, day)!,
-                                isToday: day == today.cycleDay,
-                                isOvulation:
-                                    day == today.estimatedOvulationDay,
-                                t: t,
-                              ),
-                        ]),
-                      ),
-                    ],
+                    _WindowBars(cyclesAhead: _cyclesAhead, t: t),
                   ],
                 ],
                 const SizedBox(height: 16),
@@ -735,10 +723,19 @@ class _TtcFertilityWindowScreenState extends State<TtcFertilityWindowScreen> {
 /// Stated in DATES, not cycle days. "Days 35 to 41" is how the engine thinks;
 /// "12 to 18 August" is how someone plans a week.
 class _WindowSummary extends StatelessWidget {
-  const _WindowSummary({required this.today, required this.t});
+  const _WindowSummary({
+    required this.t,
+    required this.cyclesAhead,
+    required this.onStep,
+  });
 
-  final TtcToday today;
   final TtcS t;
+
+  /// How many cycles past the soonest actionable one she has paged.
+  final int cyclesAhead;
+
+  /// +1 / -1 from the arrows.
+  final void Function(int delta) onStep;
 
   static const _m = [
     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
@@ -748,22 +745,18 @@ class _WindowSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final start = CycleStore.instance.lastPeriodStart;
-    final ov = today.estimatedOvulationDay;
-    if (start == null || ov == null) return const SizedBox.shrink();
+    final window = ttcWindowAhead(cyclesAhead);
+    if (window == null) return const SizedBox.shrink();
 
-    // Sperm survive about five days, the egg about one.
-    final opensDay = ov - 5;
-    final closesDay = ov + 1;
-    DateTime dateOf(int cycleDay) =>
-        start.add(Duration(days: cycleDay - 1));
-
-    final cycleDay = today.cycleDay ?? 0;
-    final status = cycleDay > closesDay
-        ? t.windowClosed
-        : cycleDay >= opensDay
+    // ⚠️ THE CHIP NEVER SAYS "CLOSED" ANY MORE, because a closed window is
+    // never what is on screen. It says open-now, or how long until this one
+    // opens, or — once she has paged forward — that she is looking at a
+    // projection rather than at this cycle.
+    final status = window.cyclesAhead > 0
+        ? t.windowExpected
+        : window.openNow
             ? t.windowOpenNow
-            : t.windowOpensIn(opensDay - cycleDay);
+            : t.windowOpensIn(window.daysUntilOpen);
 
     return Container(
       padding: const EdgeInsets.all(18),
@@ -794,13 +787,129 @@ class _WindowSummary extends StatelessWidget {
           ),
         ]),
         const SizedBox(height: 9),
-        Text(t.windowRange(_fmt(dateOf(opensDay)), _fmt(dateOf(closesDay))),
-            style: ttcFraunces(24, w: FontWeight.w600, color: Colors.white)),
+        Row(children: [
+          Expanded(
+            child: Text(
+                t.windowRange(_fmt(window.opensOn), _fmt(window.closesOn)),
+                style: ttcFraunces(24, w: FontWeight.w600, color: Colors.white)),
+          ),
+          // ---- the arrows ------------------------------------------------
+          //
+          // ⚠️ SIX CYCLES AND NO FURTHER. Each step forward multiplies one
+          // assumption — that her next cycle is the same length as her usual —
+          // by another, so the tenth projected window is arithmetic rather than
+          // information. Six months is already the horizon most people plan
+          // over, and stopping there is honest about what the estimate is worth.
+          _StepArrow(
+            icon: Icons.chevron_left_rounded,
+            enabled: cyclesAhead > 0,
+            semantic: t.windowPrevCycle,
+            onTap: () => onStep(-1),
+          ),
+          const SizedBox(width: 2),
+          _StepArrow(
+            icon: Icons.chevron_right_rounded,
+            enabled: cyclesAhead < 5,
+            semantic: t.windowNextCycle,
+            onTap: () => onStep(1),
+          ),
+        ]),
         const SizedBox(height: 8),
-        Text('${t.windowPeakDay} · ${_fmt(dateOf(ov))}',
+        Text('${t.windowPeakDay} · ${_fmt(window.peakOn)}',
             style: ttcBody(12.5,
                 color: Colors.white.withValues(alpha: 0.92),
                 w: FontWeight.w700)),
+        // ⚠️ A PROJECTION SAYS SO, IN WORDS, ON THE CARD. Not only in the chip
+        // — a chip is read once and then stops being read, and these dates look
+        // exactly as confident as the current cycle's.
+        if (window.cyclesAhead > 0) ...[
+          const SizedBox(height: 10),
+          Text(t.windowProjectedNote,
+              style: ttcBody(11.5,
+                  color: Colors.white.withValues(alpha: 0.82), h: 1.45)),
+        ],
+      ]),
+    );
+  }
+}
+
+/// One of the two paging arrows on the summary.
+class _StepArrow extends StatelessWidget {
+  const _StepArrow({
+    required this.icon,
+    required this.enabled,
+    required this.semantic,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final bool enabled;
+  final String semantic;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        enabled: enabled,
+        label: semantic,
+        child: InkWell(
+          onTap: enabled ? onTap : null,
+          customBorder: const CircleBorder(),
+          child: Container(
+            width: 32,
+            height: 32,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: Colors.white.withValues(alpha: enabled ? 0.2 : 0.07),
+            ),
+            child: Icon(icon,
+                size: 20,
+                color: Colors.white.withValues(alpha: enabled ? 1 : 0.35)),
+          ),
+        ),
+      );
+}
+
+/// The window, one row per date.
+///
+/// ⚠️ DATES AND WEEKDAYS, NOT CYCLE DAYS. "Day 17" is how the engine thinks and
+/// it is nearly useless for planning a week — she has to count forward from a
+/// period start to place it. "22 Aug (Wed)" is the same fact in the units she
+/// already lives in, and it is what the summary above already speaks in, so the
+/// two halves of the screen finally agree.
+class _WindowBars extends StatelessWidget {
+  const _WindowBars({required this.cyclesAhead, required this.t});
+
+  final int cyclesAhead;
+  final TtcS t;
+
+  @override
+  Widget build(BuildContext context) {
+    final window = ttcWindowAhead(cyclesAhead);
+    if (window == null) return const SizedBox.shrink();
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    return TtcCard(
+      child: Column(children: [
+        for (final date in window.days)
+          if (ttcFertilityOnDate(window, date) case final level?)
+            _DayBar(
+              date: date,
+              level: level,
+              // ⚠️ ONLY THE REAL TODAY. On a projected window no row is today,
+              // and marking one would be a small lie that reads as a large one.
+              isToday: window.cyclesAhead == 0 &&
+                  date.year == today.year &&
+                  date.month == today.month &&
+                  date.day == today.day,
+              isOvulation: date.year == window.peakOn.year &&
+                  date.month == window.peakOn.month &&
+                  date.day == window.peakOn.day,
+              t: t,
+            ),
       ]),
     );
   }
@@ -808,18 +917,24 @@ class _WindowSummary extends StatelessWidget {
 
 class _DayBar extends StatelessWidget {
   const _DayBar({
-    required this.day,
+    required this.date,
     required this.level,
     required this.isToday,
     required this.isOvulation,
     required this.t,
   });
 
-  final int day;
+  final DateTime date;
   final FertilityLevel level;
   final bool isToday;
   final bool isOvulation;
   final TtcS t;
+
+  static const _m = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  ];
+  static const _wd = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   @override
   Widget build(BuildContext context) {
@@ -836,12 +951,23 @@ class _DayBar extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(children: [
+        // ⚠️ THE DATE IS WIDER THAN THE NUMBER IT REPLACED, and that is the
+        // cost of the change: "22 Aug (Wed)" needs 76px where "17" needed 26,
+        // so the bar itself is shorter. Worth it — the bar shows relative
+        // width, which survives being narrower, and the label is the half she
+        // actually plans around.
         SizedBox(
-          width: 26,
-          child: Text('$day',
-              style: ttcBody(11.5,
-                  color: isToday ? ttcPurple : ttcMuted,
-                  w: isToday ? FontWeight.w900 : FontWeight.w600)),
+          width: 76,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('${date.day} ${_m[date.month - 1]}',
+                style: ttcBody(12,
+                    color: isToday ? ttcPurple : ttcInk,
+                    w: isToday ? FontWeight.w900 : FontWeight.w700)),
+            Text(_wd[(date.weekday - 1) % 7],
+                style: ttcBody(10.5,
+                    color: isToday ? ttcPurple : ttcMuted,
+                    w: FontWeight.w600)),
+          ]),
         ),
         Expanded(
           child: Stack(children: [

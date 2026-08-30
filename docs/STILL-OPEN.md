@@ -2467,5 +2467,60 @@ reassigning to them. Once those exist with ids, TTC joins the same seam
 
 ---
 
+## 17.0 The V3 TTC rebuild left three things parked — OPENED 2026-08-30
+
+The Trying-to-Conceive home, the fertile-window door, the tab bar and the
+first-run flow were rebuilt against a handwritten spec benchmarked on iMumz
+(entry flow), Mylo (language and the "I don't know" escape) and Flo (the cycle
+header and the daily rail). Three things could not be finished in code — two of
+them are content, and the third is a decision.
+
+### 17.1 Nine video slots are declared and none has a file — PRODUCTION, not code
+
+Every slot renders `PvVideoPlaceholder` — real 16:9 geometry, the title in the
+type it will use, and deliberately **not tappable**, so nobody taps a play
+control that plays nothing. What is missing is the file and only the file.
+
+* **The introduction**, first screen after language in `ttc_intro_flow.dart`.
+  Two slots, not one: `ttc_intro_en` and `ttc_intro_hi`, chosen by the language
+  picked one screen earlier. A single id would have guaranteed English audio for
+  a Hindi user the day the files landed.
+* **One per door screen** — seven, `<bracketId>_intro`, declared on the TTC hub
+  configs in `lib/data/hubs/ttc_hubs.dart`. `ProblemHubScreen` shows the film
+  where a slot is set and the old support line where it is not, so pregnancy and
+  parenting are untouched. `test/ttc_intro_flow_test.dart` holds both halves of
+  that: every TTC hub has a slot, and no other stage's does.
+
+**Nine films in two languages is eighteen assets.** Worth costing before
+commissioning, and worth asking whether the seven door films should be shorter
+than the introduction.
+
+All of it needs self-hosted MP4/HLS. **YouTube is dead** — tested to exhaustion
+on 2026-07-12, systemically blocked, code removed. Supabase Storage now, Bunny
+or Cloudflare later, same as the Watch engine.
+
+
+### 17.2 The daily rail has drawn marks where the reference has photographs
+
+`_DailyRail` in `ttc_home_v3.dart` renders five circles using `V3DailyArt` in a
+tinted disc — the stage's existing visual language. The reference uses image
+thumbnails. Real per-item art would need an asset pipeline for five items that
+rotate daily by day-of-year, which is a content commitment, not a widget. The
+current form degrades honestly and needs no assets; revisit if the rail tests
+well.
+
+### 17.3 V3 is still behind the dev toggle, and everything above is inside it
+
+`TtcHomeVersionStore` defaults to `v1`. The whole of this rebuild — header,
+rail, reordered sections, the new tab bar — is only visible after tapping **V3**
+on the pill top-right. The first-run flow is the exception: it gates at
+`TtcHomeScreen`, so it runs on both versions.
+
+**Making V3 the default is a product decision and has not been taken.** V1 is
+the most clinically-reviewed screen in the app, held by four test files, and
+promoting a replacement is not something to do as a side effect of a UI batch.
+
+---
+
 **None of the above blocks a build.** All of it blocks being comfortable, and
 14.2 and 14.4 are the two that reach a mother at her worst moment.
