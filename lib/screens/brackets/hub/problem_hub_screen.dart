@@ -199,8 +199,33 @@ class _Hero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mark = bracketMarkFor(bracket.id);
+
+    // ⚠️ A HERO WITH A FILM IN IT CANNOT BE 272dp TALL, AND CANNOT USE A
+    // `Spacer` EITHER. This shipped broken and the device said so in yellow
+    // stripes: "BOTTOM OVERFLOWED BY 140 PIXELS" on every TTC door.
+    //
+    // The mechanism is worth keeping, because the obvious fix does not work.
+    // The hero was a fixed 272 with a `Spacer()` pushing the eyebrow and title
+    // to the bottom; a full-width 16:9 placeholder is about 180dp on top of a
+    // back button, an eyebrow and a title, which is 140 more than there is.
+    //
+    // "So remove the fixed height and let it size to its content" — no. A
+    // `Spacer` is a flexible child, and a flexible child inside an unbounded
+    // column has nothing to be flexible against, so that trades a visible
+    // overflow for a layout assertion. The two have to change together:
+    //
+    //   · no film → fixed 272, `Spacer`, exactly as pregnancy and parenting
+    //     have always rendered it. Byte-identical.
+    //   · film    → height driven by the content, `mainAxisSize.min`, and a
+    //     plain gap where the `Spacer` was.
+    //
+    // A computed constant (272 + 140) was the other option and is worse: the
+    // number is only right for a one-line hero title, and three of these hubs
+    // wrap to two.
+    final hasFilm = config.heroVideoSlot != null;
+
     return SizedBox(
-      height: 272,
+      height: hasFilm ? null : 272,
       child: Stack(children: [
         Positioned(
           right: -26,
@@ -223,6 +248,11 @@ class _Hero extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(20, 8, 22, 20),
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                // Shrink-wrap only when the film is driving the height; the
+                // no-film path keeps `max` so the `Spacer` below still has a
+                // bounded box to expand into.
+                mainAxisSize:
+                    hasFilm ? MainAxisSize.min : MainAxisSize.max,
                 children: [
                   Align(
                     alignment: Alignment.centerLeft,
@@ -240,7 +270,11 @@ class _Hero extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const Spacer(),
+                  // The `Spacer` is what pushes the title to the foot of a
+                  // fixed-height hero. With a film there is no spare height to
+                  // distribute and no bounded box to distribute it in, so it
+                  // becomes an ordinary gap.
+                  if (hasFilm) const SizedBox(height: 20) else const Spacer(),
                   // The bracket name is the eyebrow; the hero is the problem in
                   // her language (§5.1). ink2 on a tinted field — a grey
                   // calibrated for a neutral ground loses contrast on a
@@ -277,8 +311,10 @@ class _Hero extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(right: 4, top: 2),
                       child: PvVideoPlaceholder(
-                        title: config.hero.of(lang),
-                        subtitle: config.heroSupport.of(lang),
+                        title: (config.heroVideoTitle ?? config.heroSupport)
+                            .of(lang),
+                        overlayTitle: true,
+                        subtitle: null,
                         hue: bracket.hue,
                         slotId: slot,
                       ),

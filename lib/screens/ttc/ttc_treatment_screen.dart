@@ -24,6 +24,8 @@ import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_store.dart';
 import '../../ttc/ttc_treatment_store.dart';
 import 'ttc_common.dart';
+import 'ttc_ivf_readiness_screen.dart' show kIvfHue;
+import 'ttc_tool_chrome.dart';
 import 'ttc_strings.dart';
 
 void openTtcTreatment(BuildContext context) {
@@ -48,30 +50,44 @@ class TtcTreatmentScreen extends StatelessWidget {
         final cycle = store.cycle;
         final next = cycle.next;
 
-        return Scaffold(
-          backgroundColor: ttcBg,
-          body: SafeArea(
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(
-                  ttcGutter, 8, ttcGutter, ttcBottomInset),
-              children: [
-                TtcBackBar(title: t.treatmentTitle),
-                const SizedBox(height: 16),
-                Text(t.treatmentIntro, style: ttcBody(14, h: 1.6)),
-                const SizedBox(height: 20),
+        // ⚠️ V3 CHROME, AND THE CONTENT UNDERNEATH IS UNCHANGED. This screen
+        // was already the best-reasoned tool in the door — see the note on the
+        // next-milestone card about why the countdown is second and smaller.
+        // What was old was the shell: a flat `ttcBg`, a back bar, and a purple
+        // gradient block at the top.
+        //
+        // A tool reached from a focus page has to look like it belongs to the
+        // page that sent her. `TtcToolScaffold` is the shared shell every TTC
+        // tool now wears — see `ttc_tool_chrome.dart`.
+        return TtcToolScaffold(
+          hue: kIvfHue,
+          eyebrow: t.treatmentTitle,
+          // ⚠️ THE HERO ANSWERS "WHAT AM I LOOKING AT", not "what is this
+          // called". A tool opened mid-cycle at speed needs the sentence, not
+          // the label — the label is the eyebrow above it.
+          title: 'The dates your\nclinic gave you.',
+          intro: t.treatmentIntro,
+          children: [
+                const SizedBox(height: 22),
 
                 // The next milestone, made large - it is the one thing she
                 // opens this screen to check.
                 if (next != null) ...[
-                  Container(
+                  // ⚠️ FLAT, NOT A DIAGONAL GRADIENT. The two-stop purple wash
+                  // was the loudest object in the stage, on a screen someone
+                  // opens while anxious. It is also the exact texture that was
+                  // called out on the video placeholders: a gradient reads as
+                  // decoration, and decoration on a date she is dreading is the
+                  // wrong register.
+                  //
+                  // Solid `ttcPurple` keeps every bit of the emphasis — this is
+                  // still the only filled block on the page — and loses the
+                  // shine.
+                  ttcToolPad(Container(
                     padding: const EdgeInsets.all(20),
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(ttcCardRadius),
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [ttcPurple, ttcPurpleDeep],
-                      ),
+                      borderRadius: BorderRadius.circular(20),
+                      color: ttcPurple,
                     ),
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -108,7 +124,7 @@ class TtcTreatmentScreen extends StatelessWidget {
                                   color: Colors.white.withValues(alpha: 0.9),
                                   h: 1.5)),
                         ]),
-                  ),
+                  )),
                   const SizedBox(height: 20),
                 ],
 
@@ -122,24 +138,24 @@ class TtcTreatmentScreen extends StatelessWidget {
                 // the whole ownership model, the two questions, the treatment
                 // cycle, the trigger reminders and the beta countdown were
                 // unreachable code with forty-seven passing tests over the top.
-                const TtcPathChooser(),
+                ttcToolPad(const TtcPathChooser()),
                 const SizedBox(height: 20),
 
                 // Asked here rather than at signup: this is where she has come
                 // BECAUSE the app stopped predicting, so it is the one moment
                 // the questions obviously earn their place.
-                const TtcPathwayQuestions(),
+                ttcToolPad(const TtcPathwayQuestions()),
                 const SizedBox(height: 20),
 
-                ttcSectionTitle(t.treatmentDates),
+                ttcToolPad(ttcSectionTitle(t.treatmentDates)),
                 for (final step in TtcTreatmentStep.values) ...[
-                  _StepRow(step: step, at: cycle[step], t: t),
+                  ttcToolPad(_StepRow(step: step, at: cycle[step], t: t)),
                   const SizedBox(height: 10),
                 ],
 
                 const SizedBox(height: 14),
                 if (cycle[TtcTreatmentStep.trigger] != null)
-                  TtcCard(
+                  ttcToolPad(TtcCard(
                     color: ttcPanel,
                     child: Row(children: [
                       const Icon(Icons.notifications_active_outlined,
@@ -150,11 +166,11 @@ class TtcTreatmentScreen extends StatelessWidget {
                             style: ttcBody(12.5, h: 1.5)),
                       ),
                     ]),
-                  ),
+                  )),
 
                 const SizedBox(height: 16),
                 if (store.hasDates)
-                  GestureDetector(
+                  ttcToolPad(GestureDetector(
                     onTap: () => _confirmClear(context, t),
                     behavior: HitTestBehavior.opaque,
                     child: Center(
@@ -165,21 +181,22 @@ class TtcTreatmentScreen extends StatelessWidget {
                                 color: ttcMuted, w: FontWeight.w700)),
                       ),
                     ),
-                  ),
+                  )),
 
                 const SizedBox(height: 14),
-                Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  const Icon(Icons.info_outline_rounded,
-                      size: 15, color: ttcMuted),
-                  const SizedBox(width: 9),
-                  Expanded(
-                    child: Text(t.treatmentDisclaimer,
-                        style: ttcBody(11.5, color: ttcMuted, h: 1.5)),
-                  ),
-                ]),
-              ],
-            ),
-          ),
+                ttcToolPad(Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Icon(Icons.info_outline_rounded,
+                          size: 15, color: ttcMuted),
+                      const SizedBox(width: 9),
+                      Expanded(
+                        child: Text(t.treatmentDisclaimer,
+                            style: ttcBody(11.5, color: ttcMuted, h: 1.5)),
+                      ),
+                    ])),
+                const SizedBox(height: 26),
+          ],
         );
       },
     );

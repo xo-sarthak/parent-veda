@@ -28,12 +28,18 @@ import 'ttc_care_circle_screen.dart';
 import 'ttc_chapter_screen.dart';
 import 'ttc_community_screen.dart';
 import 'ttc_cycle_screens.dart';
-import 'ttc_fertility_help_screen.dart';
 import 'ttc_journal_screen.dart';
 import 'ttc_medication_screen.dart';
 import 'ttc_nutrition_screen.dart';
 import 'ttc_partner_screen.dart';
-import 'ttc_pcos_check_screen.dart';
+// ⚠️ `ttc_pcos_check_screen.dart` IS NOT IMPORTED ANY MORE, and reverting the
+// retired checker therefore needs two lines rather than one: this import back,
+// and the commented case below uncommented. Keeping an unused import to make it
+// one line would have meant an analyzer warning living in the tree forever to
+// save someone five seconds — and a warning nobody can fix is how a project
+// learns to stop reading warnings.
+import 'ttc_ivf_readiness_screen.dart';
+import 'ttc_pcos_stand_screen.dart';
 import 'ttc_bmi_screen.dart';
 import '../../ttc/ttc_precheck_data.dart';
 import 'ttc_precheck_screen.dart';
@@ -41,12 +47,14 @@ import 'ttc_prepare_screen.dart';
 import 'ttc_products_screen.dart';
 import 'ttc_records_screen.dart';
 import 'ttc_strings.dart';
+import 'ttc_symptom_log_screen.dart';
 import 'ttc_ritual_screen.dart';
 import 'ttc_supplements_screen.dart';
 import 'ttc_tests_screen.dart';
 import 'ttc_tools_screen.dart';
 import 'ttc_treatment_screen.dart';
 import 'ttc_vaccines_screen.dart';
+import 'ttc_window_screen.dart';
 
 /// The prefix that opens a long-form read.
 ///
@@ -128,7 +136,17 @@ Widget? _ttcStaticSurface(String id) => switch (id) {
       // ---- The cycle spine ---------------------------------------------------
       'ttc_cycle' => const TtcCycleScreen(),
       'ttc_ovulation' => const TtcOvulationScreen(),
-      'ttc_window' => const TtcFertilityWindowScreen(),
+      // ⚠️ THE DESIGNED SCREEN. Built from `Fertility Window.dc.html` in the
+      // "fertile window tool" design project — structure 1b, with 1a's ranked
+      // day list as the default graphic behind a toggle.
+      //
+      // ⚠️ `TtcFertilityWindowScreen` IN `ttc_cycle_screens.dart` IS NO LONGER
+      // REACHED, and is left in place rather than deleted. It is the pre-design
+      // version and it still holds the reasoning for two rules the new screen
+      // keeps — never showing a window that has closed, and replacing the whole
+      // six-day model on a clinic-run cycle. Read those notes before changing
+      // either behaviour here.
+      'ttc_window' => const TtcWindowScreen(),
       'ttc_calendar' => const TtcCalendarScreen(),
 
       // ---- Learning ----------------------------------------------------------
@@ -147,7 +165,28 @@ Widget? _ttcStaticSurface(String id) => switch (id) {
       'ttc_vaccinations' => const TtcVaccinesScreen(),
       // The workbook's PCOS Tools cell, other half. `ttc_cycle` was always the
       // tracker; this is the checker that sat beside it as notReady.
-      'ttc_pcos_check' => const TtcPcosCheckScreen(),
+      //
+      // ⚠️ THE ID NOW OPENS "WHERE DO I STAND", NOT THE 20-QUESTION CHECKER.
+      //
+      // The id is kept rather than replaced because it is an IDENTITY: it is
+      // named by `ttc_brackets.dart`, a journey step, the Tools hub and
+      // `ttc_surfaces.dart`, and it is the route name `global_ask_fab.dart`
+      // reads. Renaming it would mean touching five files to change nothing a
+      // user can see.
+      //
+      // What changed is what it opens. The short flow asks eight questions
+      // instead of twenty and writes its answers into the SAME
+      // `TtcPcosCheckStore` — see `PcosStandAnswers.writeThrough` — so the BMI
+      // screen, the pre-check rules and the fertility-help store all keep
+      // reading a check that is still there.
+      //
+      // ⚠️ THE OLD SCREEN IS COMMENTED, NOT DELETED, per CLAUDE.md. Its data,
+      // rules, store and result screen are all untouched on disk. To revert:
+      // restore the `ttc_pcos_check_screen.dart` import and swap the two lines
+      // below.
+      //
+      // 'ttc_pcos_check' => const TtcPcosCheckScreen(),
+      'ttc_pcos_check' => const TtcPcosStandScreen(),
       // The workbook's Getting-ready Tools cell. Reads across CycleStore, the
       // PCOS checker, the vaccination list, supplements and medicines, so it
       // opens knowing what she has already done.
@@ -160,9 +199,44 @@ Widget? _ttcStaticSurface(String id) => switch (id) {
       // The Tools hub — 21 built tiles, including the Sleep, Movement, Stress
       // and Lifestyle trackers the Getting-ready habits step hands her to.
       'ttc_tools' => const TtcToolsScreen(),
-      // The Infertility Tools cell — the last notReady in the stage. A
-      // readiness read, never a probability: see `ttc_fertility_help_rules`.
-      'ttc_fertility_help' => const TtcFertilityHelpScreen(),
+      // The Infertility Tools cell. A readiness read, never a probability: see
+      // `ttc_fertility_help_rules`.
+      //
+      // ⚠️ THE ID NOW OPENS THE REBUILT FLOW, AND THE ENGINE UNDERNEATH IS THE
+      // SAME ONE. Same pattern as `ttc_pcos_check`: the surface id is an
+      // identity — named by `ttc_brackets.dart`, a journey step and the Tools
+      // hub, and read as a route name by `global_ask_fab.dart` — so it stays.
+      //
+      // What changed is the front and the output. `TtcIvfReadinessScreen` asks
+      // six questions including two the old flow never did (his semen test, and
+      // a cycle answer she can see and correct), and it reads
+      // `FertilityHelpContext` — the shipped assembly of what the app already
+      // knows — rather than rebuilding it.
+      //
+      // ⚠️ THE BRIEF ASKED FOR A FULL REPLACEMENT ON A FALSE PREMISE. It
+      // describes the shipped tool as a three-question check missing age and
+      // duration. On disk it asks age and derives duration from
+      // `TtcStore.daysTrying`, and its rules file carries a NICE-cited referral
+      // threshold and an urgent fertility-preservation route. Throwing that away
+      // to satisfy a description of it would have lost reviewed clinical work.
+      //
+      // ⚠️ OLD SCREEN COMMENTED, NOT DELETED, per CLAUDE.md. To revert: restore
+      // the `ttc_fertility_help_screen.dart` import and swap the two lines.
+      // `TtcFertilityHelpSummary` goes with it — nothing else reaches it.
+      //
+      // 'ttc_fertility_help' => const TtcFertilityHelpScreen(),
+      'ttc_fertility_help' => const TtcIvfReadinessScreen(),
+      // ⚠️ ADDED SO A TILE CAN NAME THE LOGGER. It was reachable only by a
+      // direct `MaterialPageRoute` from the home's "Check symptoms" button, so
+      // a focus-page tile that wanted it had nothing to point at — and the PCOS
+      // door's "Log your symptoms" tile ended up pointing at the Tools HUB
+      // instead. A tile whose title names one screen and whose id opens another
+      // is the wrong-screen failure this stage keeps writing tests about, and I
+      // wrote it.
+      //
+      // Registering it here also means the route NAME is the surface id, which
+      // is what `global_ask_fab.dart` reads to decide which Ask Veda opens.
+      'ttc_symptom_log' => const TtcSymptomLogScreen(),
       'ttc_nutrition' => const TtcNutritionScreen(),
       'ttc_supplements' => const TtcSupplementsScreen(),
       // `ttc_tracker` is deliberately absent: `TtcTrackerScreen` requires a

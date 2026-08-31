@@ -46,6 +46,19 @@ dependencies:
   # runtime dependency), not under dev_dependencies.
   google_fonts: ^6.2.1
 
+  # Charts. Used first by the TTC logger's weight and basal-temperature cards,
+  # which draw a sparkline of her own readings in place of a "View chart" row
+  # that opened the same cycle report three separate buttons already opened.
+  #
+  # ⚠️ THE FIRST PLOTTING PACKAGE IN THIS REPO, and every chart before it was a
+  # hand-written `CustomPainter` — deliberately, because most of them draw one
+  # series against cycle PHASES rather than against a numeric axis, which is a
+  # bespoke shape no library ships. Those stay as they are; nothing is being
+  # migrated. This earns its place on the two charts that genuinely are ordinary
+  # time series, where the work is axis labels, tick spacing, gap handling and
+  # touch targets — all of it fiddly, all of it solved.
+  fl_chart: ^1.2.0
+
   # Share sheet for the "Forward to Partner via WhatsApp" CTA + Memories share.
   share_plus: ^10.1.4
 

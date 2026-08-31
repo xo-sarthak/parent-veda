@@ -242,17 +242,50 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
               // switch instead of a father toggle that would do nothing.
               // One control in one place, rather than two competing for the
               // same corner.
+              // ⚠️ THE TWO PILLS SPLIT APART HERE, AND THEY HAD TO.
+              //
+              // One `Positioned` used to render EITHER the Mom|Dad switch (on
+              // Classic) or the version switch (on V3), because only one is
+              // ever on screen. That was true and it stopped being useful the
+              // moment the version switch moved to the top right: the two now
+              // want different corners, and a single slot can only have one.
+              //
+              // Mom|Dad stays in the bottom strip — it is a father-preview
+              // affordance, used once a session. The version switch goes to the
+              // top right, where `today_home_screen` also puts its copy, so the
+              // control does not move when you press it.
               if (AppNav.instance.index == 0)
-                Positioned(
-                  right: 14,
-                  bottom: 96,
-                  child: ListenableBuilder(
-                    listenable: TodayVersionStore.instance,
-                    builder: (context, _) =>
-                        TodayVersionStore.instance.version == TodayVersion.classic
-                            ? _modePill(fatherMode)
-                            : const _V3Pill(),
-                  ),
+                ListenableBuilder(
+                  listenable: TodayVersionStore.instance,
+                  builder: (context, _) =>
+                      TodayVersionStore.instance.version == TodayVersion.classic
+                          // ⚠️ BACK TO THE LITERAL 96, DELIBERATELY, AND NOT
+                          // AN OVERSIGHT LEFT BEHIND BY THE CLEARANCE WORK.
+                          //
+                          // The version pill had to move because it was being
+                          // swallowed by the tab bar. Mom|Dad never was — it
+                          // sat here happily, and raising it with everything
+                          // else just moved a control that was already fine.
+                          // Restored to exactly where it has always been.
+                          ? Positioned(
+                              right: 14,
+                              bottom: 96,
+                              child: _modePill(fatherMode),
+                            )
+                          // ⚠️ NOTHING ON V3, AND THAT IS THE FIX FOR A
+                          // DUPLICATE I CREATED. `TodayHomeScreen` renders its
+                          // own Classic|V3 pill in EVERY version, including V3,
+                          // and it now sits top-right. This slot used to put a
+                          // second pill in the bottom strip, where the two
+                          // never met; moving both to the same corner would
+                          // have stacked one exactly on the other.
+                          //
+                          // Kept for revert:
+                          //   : Positioned(
+                          //       right: 14,
+                          //       top: MediaQuery.of(context).viewPadding.top + 56,
+                          //       child: const _V3Pill()),
+                          : const SizedBox.shrink(),
                 ),
             ],
           ),
@@ -311,6 +344,7 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
 /// Testing chrome, same as the pill it replaces. It shows only on the
 /// experimental homes, so there is never a moment where both a father toggle
 /// and a version toggle are fighting for the same corner.
+// ignore: unused_element
 class _V3Pill extends StatelessWidget {
   const _V3Pill();
 

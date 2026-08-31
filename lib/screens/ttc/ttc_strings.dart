@@ -319,6 +319,79 @@ class TtcS {
   // states to be tidied away — they are the honest answer in three genuinely
   // common situations, and each one gets the same typographic weight as an
   // estimate so that saying nothing never looks like a broken screen.
+  // ---- the symptom logger ---------------------------------------------------
+  String get logToday => _p('Today', 'Aaj');
+  String get logSearch => _p('Search', 'Search');
+  String get logCategories => _p('Categories', 'Categories');
+  String get logEdit => _p('Edit', 'Edit');
+  String get logFeelingToday =>
+      _p('What are you feeling today?', 'Aaj kaisa lag raha hai?');
+  String get logNotRecorded => _p('Not recorded', 'Record nahi kiya');
+  String get logViewChart => _p('View chart', 'Chart dekhein');
+  String get editCategoriesTitle => _p('Edit categories', 'Categories badlein');
+  String get editCategoriesBody => _p(
+      'Turn off anything you do not want to log. You can turn it back on whenever you like.',
+      'Jo log nahi karna, use band kar dein. Kabhi bhi wapas chalu kar sakti hain.');
+  String get editCategoriesKeeps => _p(
+      'Turning a category off only hides it here. Days you already logged stay exactly where they are, and come back with it.',
+      'Category band karne se wo sirf yahan chhup jaati hai. Jo din pehle log ho chuke hain, wo waise hi rehte hain.');
+  String get logOnThisDay => _p('On this day', 'Is din');
+  String get logInvite => _p(
+      'Tap whatever fits. Nothing is required, and there is no wrong answer — a few cycles of this is what turns "I think this happens sometimes" into something you can show a doctor.',
+      'Jo theek lage, tap karein. Kuch zaroori nahi hai. Kuch cycles ka record hi wo cheez banta hai jo aap doctor ko dikha sakein.');
+  String get logDisclaimer => _p(
+      'This records what you noticed. It never interprets it, and it is never a diagnosis. In the two weeks before a period is due, early pregnancy and an approaching period feel identical — they are the same hormone — so nothing here can tell you which it is.',
+      'Ye sirf record karta hai. Iska matlab nahi nikaalta, aur ye kabhi diagnosis nahi hai.');
+
+  // ---- the cycle report -----------------------------------------------------
+  //
+  // ⚠️ EVERY EMPTY STATE HERE IS WRITTEN AS CAREFULLY AS THE FULL ONE, because
+  // the empty states are what most people see. A report that says "no data"
+  // teaches her the feature is broken; one that says what it will show her the
+  // moment she gives it something teaches her what it is for.
+  String get reportTitle => _p('Your cycle report', 'Aapki cycle report');
+  String get reportShort => _p('Cycle report', 'Cycle report');
+  String get reportChosenCycle => _p('Chosen cycle', 'Chuna hua cycle');
+  String get reportKeyPeriod => _p('Period', 'Period');
+  String get reportKeyLogged => _p('You logged', 'Aapne log kiya');
+  String get reportThisCycle => _p('This cycle, day by day', 'Ye cycle, din-ba-din');
+  String get reportChanges => _p('Changes during the cycle', 'Cycle ke dauraan badlaav');
+  String get reportWhatYouLogged => _p('What you logged', 'Aapne kya log kiya');
+  String get reportWeight => _p('Weight', 'Vazan');
+  String get reportTemperature => _p('Temp', 'Temp');
+  String get reportNoNumbers => _p(
+      'Add a weight or a morning temperature on any day and a chart appears here. Neither is required — this works on symptoms alone.',
+      'Kisi bhi din vazan ya subah ka temperature daalein, yahan chart aa jayega. Dono zaroori nahi hain.');
+
+  String get reportNoPeriod => _p('This fills in as you log', 'Aap log karengi, ye bharta jayega');
+  String get reportNoPeriodBody => _p(
+      'Add the date your last period started, then tap whatever you feel on a few days. A cycle later, this page shows you what your own body does — which is the thing worth taking to a doctor.',
+      'Pehle apne pichhle period ki date daalein, phir kuch dinon mein jo mehsoos ho tap karein. Ek cycle baad ye page dikhayega ki aapka apna sharir kya karta hai.');
+
+  String get reportClinicTitle => _p('Your clinic is running this cycle', 'Ye cycle aapki clinic dekh rahi hai');
+  String get reportClinicBody => _p(
+      'So we are not drawing our own phases over it. Everything you logged is still here, day by day — take it to your appointment.',
+      'Isliye hum apne phases nahi bana rahe. Aapne jo bhi log kiya wo yahan hai, din-ba-din — apne appointment mein le jaayein.');
+
+  String get reportNoEstimateTitle => _p('Not enough to place the phases', 'Phases batane ke liye kaafi nahi');
+  String get reportNoEstimateBody => _p(
+      'There is a gap in what has been logged, so putting fertile days on this chart would be a guess. Your days are all still here — the colours come back once a couple of cycles are recorded.',
+      'Log mein gap hai, isliye fertile din batana sirf andaaza hoga. Aapke din yahan hain — do-ek cycle log hone par rang wapas aa jayenge.');
+
+  String get reportThinTitle => _p('A start', 'Shuruaat');
+  String get reportThinBody => _p(
+      'A couple of days is not a pattern yet, and that is fine. Most of what this page can tell you needs about a cycle of logging — there is nothing to catch up on.',
+      'Do-teen din se pattern nahi banta, aur ye theek hai. Is page ko kuch kehne ke liye lagbhag ek cycle chahiye.');
+
+  String get reportDisclaimer => _p(
+      'This describes what you recorded. It does not interpret it, and it is never a diagnosis. If something here worries you, it is exactly the kind of thing worth showing a doctor.',
+      'Ye sirf batata hai ki aapne kya record kiya. Iska matlab nahi nikaalta, aur ye kabhi diagnosis nahi hai.');
+
+  String get logMeasurements => _p('Numbers, if you take them', 'Numbers, agar aap lete hain');
+  String get logWeight => _p('Weight', 'Vazan');
+  String get logTemp => _p('Morning temperature', 'Subah ka temperature');
+  String get logViewReport => _p('See your cycle report', 'Apni cycle report dekhein');
+
   String get headerEditPeriod => _p('Edit period dates', 'Period dates badlein');
   String get headerCheckSymptoms => _p('Check symptoms', 'Symptoms dekhein');
 
@@ -1081,6 +1154,18 @@ class TtcS {
 
   // ---- profile --------------------------------------------------------------
   String get profileTitle => _p('Profile', 'Profile');
+  String get profileYourChapter => _p('Your chapter', 'Aapka chapter');
+  String get profileJourneyMap =>
+      _p('See the whole journey map', 'Poora journey map dekhein');
+  String get profileTesting => _p('Testing', 'Testing');
+  String get profileHomeVersion => _p('Home version', 'Home version');
+  String get profileHomeVersionBody => _p(
+      'Current is what ships. V3 is the rebuilt home — the cycle header, the daily circles and the new tabs. Not saved between launches.',
+      'Current wahi hai jo abhi live hai. V3 naya home hai. Launch ke beech save nahi hota.');
+  String get profileViewAs => _p('View as', 'Kis roop mein');
+  String get profileViewAsBody => _p(
+      "Her side or his. For testing the partner's half without a second account.",
+      'Uska hissa ya unka. Doosre account ke bina partner ka half dekhne ke liye.');
   String get profileLanguage => _p('Language', 'Bhasha');
   String get profileEnglish => _p('English', 'English');
   String get profileHinglish => _p('Hinglish', 'Hinglish');
@@ -1093,8 +1178,12 @@ class TtcS {
   /// what is true rather than offering a button that does nothing.
   String get profilePartner => _p('Your partner', 'Aapka partner');
   String get profilePartnerSoon => _p(
-      'Pairing his phone to this journey is being built. For now the Her / Him switch on Today shows you both sides.',
-      'Unke phone ko is journey se jodna abhi ban raha hai. Filhaal Today par Her / Him switch se dono taraf dikhti hai.');
+      // ⚠️ THE SWITCH IS NOT ON TODAY ANY MORE. This sentence pointed at a
+      // control that had moved two screens away — the exact failure mode of
+      // copy that names a location: it stays confidently wrong and nothing
+      // fails. Now it points at the section directly below it.
+      'Pairing his phone to this journey is being built. For now the View as switch under Testing, below, shows you both sides.',
+      'Unke phone ko is journey se jodna abhi ban raha hai. Filhaal neeche Testing mein "View as" switch se dono taraf dikhti hai.');
 
   /// Testing only, and labelled so - exactly like the pregnancy Profile's
   /// "Reset to Week 20 - testing" and "Enter doctor mode - testing".

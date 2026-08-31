@@ -328,7 +328,7 @@ class _TtcIntroFlowState extends State<TtcIntroFlow> {
           // control that plays nothing.
           PvVideoPlaceholder(
             title: t.introVideoLabel,
-            subtitle: t.introVideoComing,
+            overlayTitle: true,
             duration: '2 MIN',
             hue: 268,
             slotId: ttcIntroVideoSlotId(TtcLang.instance.hinglish),

@@ -73,7 +73,12 @@ class TtcTodayScreen extends StatelessWidget {
           tab: 0,
           // TESTING-ONLY Her | Him switch, mirroring the pregnancy shell's
           // Mom | Dad pill. Remove before launch.
-          overlay: ttcModePill(t, him: false),
+          // ⚠️ THE HER | HIM PILL MOVED TO PROFILE, with the version toggle.
+          // A sandbox control floating over the product is the easiest thing
+          // to reach and the worst thing to look at — it sat on the FAB's
+          // clearance and turned up in every screenshot.
+          //
+          // overlay: ttcModePill(t, him: false),
           header: const TtcHeader(),
           children: [
             // Pregnancy has "WEEKLY SNAPSHOT" above its hero and parenting has
@@ -553,6 +558,34 @@ Future<void> logTtcPeriod(BuildContext context) async {
     firstDate: now.subtract(const Duration(days: 400)),
     lastDate: now,
     helpText: TtcS.current().logPeriodTitle,
+    // ⚠️ A WHITE PICKER, NOT A PURPLE ONE. The app's `colorScheme.primary` is
+    // ttcPurple, and Material fills the date picker's whole header with it —
+    // so a control that is otherwise plain system furniture arrived as a
+    // saturated purple slab that matched nothing on the V3 screens.
+    //
+    // Overridden here rather than in the app theme deliberately: this is the
+    // only picker in the stage, and changing `primary` globally to fix one
+    // dialog would recolour every button in three stages.
+    builder: (context, child) => Theme(
+      data: Theme.of(context).copyWith(
+        datePickerTheme: DatePickerThemeData(
+          backgroundColor: Colors.white,
+          surfaceTintColor: Colors.transparent,
+          headerBackgroundColor: Colors.white,
+          headerForegroundColor: ttcTitleInk,
+          dayForegroundColor: WidgetStateProperty.resolveWith((s) =>
+              s.contains(WidgetState.selected) ? Colors.white : ttcInk),
+          dayBackgroundColor: WidgetStateProperty.resolveWith((s) =>
+              s.contains(WidgetState.selected) ? ttcPurple : Colors.transparent),
+          todayForegroundColor:
+              WidgetStateProperty.all(ttcPurple),
+          todayBorder: const BorderSide(color: ttcPurple),
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24)),
+        ),
+      ),
+      child: child!,
+    ),
   );
   if (picked == null) return;
 

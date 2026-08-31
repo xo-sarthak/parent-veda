@@ -48,7 +48,32 @@ class PvVideoPlaceholder extends StatelessWidget {
     this.onTap,
     this.episodeCount = 1,
     this.flat = false,
+    this.overlayTitle = false,
   });
+
+  /// Put the title INSIDE the 16:9 frame and drop the strip beneath it.
+  ///
+  /// ⚠️ THE STRIP IS THE PROBLEM THIS SOLVES, and the objection was precise:
+  /// *"that white strip looked so odd… it's just increasing the space of the
+  /// video placeholder. When I think of a real video there will be a thumbnail
+  /// and everything."*
+  ///
+  /// That is exactly right, and it is a placeholder-specific failure. On a card
+  /// in a rail the strip is correct — a title under a thumbnail is how a video
+  /// list works. At the head of a page, where the thumbnail is already the
+  /// hero, the strip adds sixty vertical points of white to say something the
+  /// heading two lines above it has usually just said. Worse, it makes the
+  /// placeholder TALLER than the real video will be, so the layout everyone is
+  /// reviewing is not the layout that ships.
+  ///
+  /// So: title over the thumbnail behind a scrim, the way every video player
+  /// does it, and the card becomes exactly its own 16:9.
+  ///
+  /// ⚠️ OPT-IN, DEFAULT OFF. Pregnancy and parenting use this widget inside
+  /// fixed-height horizontal rails — the comment further down about a subtitle
+  /// overflowing the Feel tab's card by 165px is what happens when this card's
+  /// height changes under a layout that assumed it. Their cards are untouched.
+  final bool overlayTitle;
 
   /// Drops the diagonal gradient for a single flat tint and a hairline.
   ///
@@ -114,15 +139,27 @@ class PvVideoPlaceholder extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Container(
+          // ⚠️ NO BORDER, AND THE SHADOW DEFINES THE EDGE INSTEAD.
+          //
+          // This carried a 1px `p.line` hairline, which is calibrated for the
+          // neutral ground the reader sits on. On the hub hero — a tinted
+          // gradient — the same hairline has contrast on the dark side of the
+          // gradient and none on the light side, so the card appeared to have
+          // an edge on two corners and not on the other two. Reported as
+          // "out of focus and not symmetric", which is exactly what a border
+          // that fades across its own length looks like.
+          //
+          // A shadow does not have this problem: it darkens whatever is behind
+          // it, so it reads equally on white, on a tint and on a photograph.
+          // Slightly deepened here to carry the edge on its own.
           decoration: BoxDecoration(
             color: p.surface,
             borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: p.line),
             boxShadow: [
               BoxShadow(
-                color: const Color(0xFFD0C8DC).withValues(alpha: 0.45),
-                blurRadius: 14,
-                offset: const Offset(0, 3),
+                color: const Color(0xFFB9AECB).withValues(alpha: 0.42),
+                blurRadius: 18,
+                offset: const Offset(0, 4),
               ),
             ],
           ),
@@ -211,9 +248,67 @@ class PvVideoPlaceholder extends StatelessWidget {
                           ]),
                         ),
                       ),
+                    // ⚠️ THE SCRIM EXISTS ONLY WHERE TYPE SITS ON THE IMAGE.
+                    // A full-frame scrim would dim the whole thumbnail to
+                    // protect two lines; a top band protects the type and
+                    // leaves the picture alone.
+                    if (overlayTitle)
+                      Positioned(
+                        left: 0,
+                        right: 0,
+                        top: 0,
+                        child: Container(
+                          height: 96,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [
+                                Colors.black.withValues(alpha: 0.52),
+                                Colors.black.withValues(alpha: 0),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    if (overlayTitle)
+                      Positioned(
+                        left: 12,
+                        right: 12,
+                        top: 10,
+                        child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              if (!_live)
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 3),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white
+                                        .withValues(alpha: 0.92),
+                                    borderRadius: BorderRadius.circular(999),
+                                  ),
+                                  child: Text('COMING SOON',
+                                      style: pvManrope(
+                                          fontSize: 8.5,
+                                          fontWeight: FontWeight.w800,
+                                          letterSpacing: 0.9,
+                                          color: deep)),
+                                ),
+                              const SizedBox(height: 7),
+                              Text(title,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: pvManrope(
+                                      fontSize: 15,
+                                      fontWeight: FontWeight.w800,
+                                      height: 1.25,
+                                      color: Colors.white)),
+                            ]),
+                      ),
                     // ⚠️ HONEST, NOT HIDDEN. Looking real is not pretending to
                     // be real.
-                    if (!_live)
+                    if (!_live && !overlayTitle)
                       Positioned(
                         left: 10,
                         top: 10,
@@ -237,6 +332,7 @@ class PvVideoPlaceholder extends StatelessWidget {
               ),
 
               // ---- THE HEADING, IN THE TYPE IT WILL USE ----------------------
+              if (!overlayTitle)
               Padding(
                 padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
                 child: Column(

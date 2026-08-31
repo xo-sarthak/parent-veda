@@ -667,9 +667,29 @@ final JourneyConfig kTtcLossRecoveryLibrary = JourneyConfig(
 );
 
 /// Every TTC journey, keyed by the door that opens it.
+///
+/// ⚠️ `kTtcImproveChances` IS OUT, BECAUSE ITS DOOR IS GONE. It was opened by
+/// the "Improve my chances this cycle" card on the conceiving hub, and that hub
+/// no longer exists — the bracket opens `TtcFocusScreen` directly now. A
+/// journey registered against a door nobody can reach is unreachable code that
+/// still looks live in this list, which is the exact thing the wiring gate in
+/// CLAUDE.md exists to catch.
+///
+/// ⚠️ NOTHING IT REACHED WAS LOST, and that was checked destination by
+/// destination rather than assumed:
+///
+///   · `ttc_window` — section one of the focus page, as the tool.
+///   · `ttc_read_how_conception_works` — section one, as an article.
+///   · `ttc_read_timing_myths` — under "How often is best", and also still on
+///     the preconception checklist.
+///   · `ttc_products` — the ovulation-kit tile.
+///   · `ttc_calendar` — the home header and the More tab.
+///
+/// The journey config stays defined above so restoring it is uncommenting one
+/// line, and so the four steps it sequenced are on record.
 final Map<String, JourneyConfig> kTtcJourneys = {
   for (final j in [
-    kTtcImproveChances,
+    // kTtcImproveChances,
     kTtcPcosLibrary,
     kTtcFertilityReadinessCheck,
     kTtcPreconceptionReadiness,

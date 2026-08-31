@@ -161,6 +161,35 @@ const List<TtcProduct> ttcProducts = [
         'India mein bina prescription bikne wale doses bahut alag-alag hote hain, aur is list mein ye zyada mehngi cheezon mein hai. Chemist se pehle doctor se poochhein - imaandaar baat ye hai ki saboot itne mazboot nahi ki bina salaah ke bahut paisa lagaya jaye.',
     priceEn: '₹800 – ₹2,500 a month',
   ),
+  // ⚠️ ADDED FOR THE PCOS PAGE, AND IT IS THE ONE SUPPLEMENT ON THIS LIST WITH
+  // A GUIDELINE'S OPINION ATTACHED. The 2023 international PCOS guideline
+  // grades inositol as limited evidence and asks that it be described as
+  // experimental — so that is what `watchOut` says, in those words, rather
+  // than the softer "promising" this list uses elsewhere.
+  //
+  // ⚠️ THE DOSE TRAP IS THE POINT OF `lookFor`. Almost every product sold for
+  // this in India contains a fraction of the amount the trials used, and the
+  // number on the front of the box is frequently the combined weight of a
+  // blend. A buyer who does not know that overpays for nothing.
+  TtcProduct(
+    id: 'myo_inositol',
+    category: 'supplements',
+    nameEn: 'Myo-inositol',
+    nameHi: 'Myo-inositol',
+    whyEn:
+        'The one PCOS supplement with real trials behind it. Studied for insulin sensitivity and more regular ovulation - promising, not established.',
+    whyHi:
+        'PCOS ka wo ek supplement jiske peeche asli trials hain. Insulin sensitivity aur zyada regular ovulation ke liye study hua - ummeed jagata hai, sabit nahi.',
+    lookForEn:
+        'Check the myo-inositol figure on the back, not the total on the front. The trials used about four grams a day, and many products carry a fraction of that in a blend.',
+    lookForHi:
+        'Peeche likha myo-inositol ka number dekhein, aage ka total nahi. Trials mein roz kareeb chaar gram tha, aur bahut products blend mein uska thoda hissa hi rakhte hain.',
+    watchOutEn:
+        'The international PCOS guideline still calls this experimental, so treat it as something worth trying rather than a treatment. Give it three months, and tell your doctor - it affects insulin, which matters if you are on metformin.',
+    watchOutHi:
+        'International PCOS guideline abhi bhi ise experimental kehti hai, isliye ise ilaaj nahi, aazmane laayak cheez maanein. Teen mahine dein, aur doctor ko batayein - ye insulin par asar karta hai, jo metformin lene par maayne rakhta hai.',
+    priceEn: '₹700 – ₹2,000 a month',
+  ),
   TtcProduct(
     id: 'zinc',
     category: 'supplements',

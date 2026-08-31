@@ -48,6 +48,8 @@ import 'package:flutter/material.dart';
 import '../../models/medication.dart';
 import '../../services/medicine_store.dart';
 import 'ttc_common.dart';
+import 'ttc_ivf_readiness_screen.dart' show kIvfHue;
+import 'ttc_tool_chrome.dart';
 import 'ttc_strings.dart';
 
 void openTtcMedication(BuildContext context) {
@@ -68,15 +70,23 @@ class TtcMedicationScreen extends StatelessWidget {
         final t = TtcS.current();
         final meds = MedicineStore.instance.activeMeds;
 
-        return Scaffold(
-          backgroundColor: ttcBg,
-          body: SafeArea(
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(
-                  ttcGutter, 8, ttcGutter, ttcBottomInset),
-              children: [
-                TtcBackBar(title: t.medTitle),
-                const SizedBox(height: 16),
+        // ⚠️ V3 CHROME, SHELL ONLY. Every list, dialog and store call below is
+        // untouched. A tool reached from a focus page has to look like it
+        // belongs to the page that sent her, and this one still wore a flat
+        // ground and a back bar. See `ttc_tool_chrome.dart`.
+        //
+        // ⚠️ NO `action` HERE, UNLIKE RECORDS AND APPOINTMENTS. This screen's
+        // add already lives beside the section title it belongs to, and it
+        // changes with the empty state — an invitation when there is nothing,
+        // a quiet link when there is. Lifting it into the hero would break
+        // that, and would put two adds on one screen.
+        return TtcToolScaffold(
+          hue: kIvfHue,
+          eyebrow: t.medTitle,
+          title: 'What to take, and when.',
+          intro: t.medNoAdvice,
+          children: [
+                const SizedBox(height: 22),
 
                 // A feature is never hidden: the empty state is an invitation,
                 // and it says what this is FOR rather than that it is empty.
@@ -124,9 +134,8 @@ class TtcMedicationScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 14),
                 TtcDisclaimer(t: t),
-              ],
-            ),
-          ),
+                const SizedBox(height: 26),
+          ],
         );
       },
     );

@@ -59,35 +59,38 @@ import '../../theme/pv_fonts.dart';
 
 import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_daily_data.dart';
+import '../../ttc/ttc_log_store.dart';
 import '../../ttc/ttc_fertile_window.dart';
+import '../../ttc/ttc_focus_data.dart';
 import '../../ttc/ttc_products_data.dart';
 import '../../ttc/ttc_reads_data.dart';
 import '../../ttc/ttc_ritual_store.dart';
 import '../../ttc/ttc_store.dart';
+import '../../ttc/ttc_symptom_data.dart';
 import '../brackets/bracket_screen.dart';
 import '../v2/v2_block_grid.dart';
 import '../v2/v2_palette.dart';
 import '../v2/v3_bracket_art.dart';
 import '../v2/v3_daily.dart';
 import '../v2/v3_daily_art.dart';
-import '../v2/v3_hero_chrome.dart';
 import '../v2/v3_hero_field.dart';
-import 'ttc_calendar_screen.dart' show ttcFactsFor, TtcDayFacts;
 import 'ttc_chapter_screen.dart';
+import 'ttc_focus_screen.dart';
 import 'ttc_common.dart';
+import 'ttc_cycle_report_screen.dart';
+import 'ttc_daily_insights.dart';
 import 'ttc_insight_screen.dart';
 import 'ttc_journey_map_screen.dart';
-import 'ttc_partner_screen.dart';
+import 'ttc_symptom_mark.dart';
 import 'ttc_products_screen.dart';
 import 'ttc_profile_screen.dart';
 import 'ttc_ritual_screen.dart';
 import 'ttc_strings.dart';
+import 'ttc_symptom_log_screen.dart';
 import 'ttc_surface_router.dart';
 import 'ttc_today_parts.dart';
 import 'ttc_today_screen.dart' show logTtcPeriod;
-import 'ttc_tracker_screen.dart' show openTtcTracker;
 import 'ttc_transition_screen.dart';
-import '../../widgets/pv_nav_bar.dart';
 
 /// The four chapters' hues, on the same controlled-pastel wheel every other
 /// stage uses.
@@ -110,14 +113,141 @@ double _chapterHue(TtcChapter c) => switch (c) {
 
 int _chapterNumber(TtcChapter c) => TtcChapter.values.indexOf(c) + 1;
 
-class TtcHomeV3 extends StatelessWidget {
+class TtcHomeV3 extends StatefulWidget {
   const TtcHomeV3({super.key});
 
   @override
+  State<TtcHomeV3> createState() => _TtcHomeV3State();
+}
+
+class _TtcHomeV3State extends State<TtcHomeV3>
+    with WidgetsBindingObserver {
+  /// The day the page is describing.
+  ///
+  /// ⚠️ THIS IS WHY THE SCREEN BECAME STATEFUL, and the change it enables was
+  /// asked for three times before it landed: *"I'm not able to go back at a
+  /// date."* The strip drew seven days and every one of them was decoration —
+  /// tapping did nothing, so the only way to see what she logged on Tuesday was
+  /// the calendar, two screens away.
+  ///
+  /// Now one date owns the page: the heading names it, the cards are computed
+  /// for it, and the rail's rotating content is picked for it. That is the
+  /// difference between a home that shows today and a home you can walk.
+  ///
+  /// ⚠️ NORMALISED TO MIDNIGHT ON EVERY WRITE. A `DateTime.now()` carries a
+  /// time, so `selected == today` is false four milliseconds after launch and
+  /// the "Today" label silently becomes a date. Every assignment goes through
+  /// `_dayOnly`.
+  DateTime _selected = _dayOnly(DateTime.now());
+
+  /// The day this screen currently believes it is.
+  ///
+  /// ⚠️ "TODAY" WAS CAPTURED ONCE AND NEVER RECHECKED, AND THAT WAS A REAL BUG.
+  /// Reported as the highlight *"still at 30th August"* while the clock said the
+  /// 31st, and the mechanism is worth writing down because it is a whole class
+  /// of mistake rather than one line.
+  ///
+  /// `_selected` was a field initialiser and the strip's window anchor was set
+  /// in `initState`. Both run exactly once, when the screen is first built. A
+  /// phone left on the home overnight — or, far more commonly, backgrounded at
+  /// 11pm and reopened at 8am, because Android keeps the state alive — never
+  /// runs either again. So the selection ring stayed on yesterday.
+  ///
+  /// What made it look inconsistent rather than merely stale is that the OTHER
+  /// half of the strip reads the clock on every build: `isToday` compares each
+  /// date against `DateTime.now()`, so the bold number had already moved to the
+  /// 31st while the ring was still around the 30th. **A screen that reads the
+  /// clock in one place and caches it in another will disagree with itself, and
+  /// only ever after midnight — which is why nobody catches it by looking.**
+  DateTime _today = _dayOnly(DateTime.now());
+
+  static DateTime _dayOnly(DateTime d) => DateTime(d.year, d.month, d.day);
+
+  @override
+  void initState() {
+    super.initState();
+    // Resume is the moment that matters. A phone that has been in a pocket
+    // since last night fires this and nothing else.
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _rollOver();
+  }
+
+  /// Move the screen on if the date has changed under it.
+  ///
+  /// ⚠️ IT ONLY DRAGS THE SELECTION IF SHE WAS STANDING ON THE OLD TODAY. If
+  /// she had deliberately tapped back to the 26th and left the app open, moving
+  /// her to the 31st on resume would be the screen overruling a choice she
+  /// made — and she would have no idea why the cards changed. Advancing a
+  /// default is correct; advancing a decision is not.
+  void _rollOver() {
+    final now = _dayOnly(DateTime.now());
+    if (now == _today) return;
+    setState(() {
+      final wasOnToday = _selected == _today;
+      _today = now;
+      if (wasOnToday) _selected = now;
+    });
+  }
+
+  void _select(DateTime day) => setState(() => _selected = _dayOnly(day));
+
+  /// "Today", "Yesterday", "Tomorrow", or "28 August".
+  ///
+  /// ⚠️ THE RELATIVE WORDS ONLY REACH ONE DAY OUT. "Two days ago" is a phrase
+  /// people have to do arithmetic on; a date is not. Anything further than
+  /// yesterday or tomorrow gets named, which is also what makes the heading
+  /// change *visibly* as she walks the strip — three "days ago" variants in a
+  /// row would look like the same screen.
+  ///
+  /// ⚠️ ENGLISH ONLY, DELIBERATELY, even though the eyebrow above it still has
+  /// a Hindi side. New copy is English unless Hindi is asked for — CLAUDE.md,
+  /// decided 2026-08-27 — and the Latin-script Hindi this file's older strings
+  /// use was dropped as a house style. Writing three more of it to look
+  /// consistent would be spreading a convention that is being retired. The
+  /// shipped pairs stay; this is not one.
+  static String _dayTitle(DateTime day) {
+    final today = _dayOnly(DateTime.now());
+    final diff = day.difference(today).inDays;
+    if (diff == 0) return 'Today';
+    if (diff == -1) return 'Yesterday';
+    if (diff == 1) return 'Tomorrow';
+    return '${day.day} ${_CycleHeader._months[day.month - 1]}';
+  }
+
+  @override
   Widget build(BuildContext context) {
+    // ⚠️ A SECOND CHECK, AND NOT A REDUNDANT ONE. The lifecycle observer covers
+    // the common case; this covers a screen that is simply rebuilt for another
+    // reason — a store notifying, the language flipping — after midnight
+    // without the app ever having been backgrounded. Cheap, and it means the
+    // stale state cannot survive any repaint.
+    //
+    // Deferred, because `build` must not call `setState`.
+    if (_dayOnly(DateTime.now()) != _today) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _rollOver();
+      });
+    }
+
     final p = V2PaletteStore.instance.current;
     return AnimatedBuilder(
-      animation: Listenable.merge([TtcStore.instance, TtcLang.instance]),
+      // ⚠️ `TtcLogStore` IS IN THIS LIST NOW. Without it, logging a symptom and
+      // coming back showed the old strip and the old cards — the exact
+      // complaint that started this pass: *"I actually am not able to see it in
+      // the home screen."* The markers read that store, so the page has to
+      // rebuild when it changes.
+      animation: Listenable.merge(
+          [TtcStore.instance, TtcLang.instance, TtcLogStore.instance]),
       builder: (context, _) {
         final hinglish = TtcLang.instance.hinglish;
         final today = TtcStore.instance.today;
@@ -166,6 +296,9 @@ class TtcHomeV3 extends StatelessWidget {
                   today: today,
                   p: p,
                   hinglish: hinglish,
+                  selected: _selected,
+                  todayDate: _today,
+                  onSelectDay: _select,
                   onChapter: () => Navigator.of(context).push(MaterialPageRoute(
                       settings: const RouteSettings(name: 'ttc/journey_map'),
                       builder: (_) => const TtcJourneyMapScreen())),
@@ -176,19 +309,36 @@ class TtcHomeV3 extends StatelessWidget {
                 _Sheet(p: p, children: [
                   const SizedBox(height: 26),
 
-                  // ---- THE DAILY STORIES ------------------------------------
+                  // ---- THE DAILY INSIGHTS ----------------------------------
                   //
-                  // The five daily items, as a scrollable rail of circles
-                  // rather than a card and four rows. Same five destinations,
-                  // same deterministic day-of-year rotation — see `_DailyRail`
-                  // for why the offsets had to be preserved exactly.
+                  // ⚠️ THE TITLE IS THE SELECTED DATE, NOT THE WORD "TODAY".
+                  // Asked for precisely: *"it says my daily insights today, I
+                  // go behind the date, my daily insights yesterday, my daily
+                  // insights 28th August."*
+                  //
+                  // That is a small string and a large idea. A heading that
+                  // says "Today" above cards computed for last Tuesday is a
+                  // screen lying about its own contents, and it is the kind of
+                  // lie nobody files a bug for — they just stop trusting the
+                  // numbers. Naming the day is what makes the strip above it
+                  // feel connected to the cards below rather than being two
+                  // widgets that happen to share a screen.
                   _pad(_Head(
-                      eyebrow: hinglish ? 'Aaj ke liye' : 'My daily insights',
-                      title: hinglish ? 'Aaj ki baatein' : 'Today',
+                      eyebrow:
+                          hinglish ? 'Aaj ke liye' : 'My daily insights',
+                      title: _dayTitle(_selected),
                       p: p)),
                   const SizedBox(height: 14),
-                  _DailyRail(p: p, hinglish: hinglish),
-                  const SizedBox(height: 32),
+
+                  // ⚠️ CARDS, NOT CIRCLES — and the circles are kept below,
+                  // commented, per the revert rule. The rail of six identical
+                  // bubbles could only ever say the NAME of a thing; a
+                  // rectangle has room for the answer as well, which is what
+                  // turns "today's insight" into "Cycle day 8". See
+                  // `ttc_daily_insights.dart` for which cards a day earns.
+                  _InsightRail(
+                      p: p, hinglish: hinglish, selected: _selected),
+                  const SizedBox(height: 26),
 
                   // ---- THE DOORS -------------------------------------------
                   //
@@ -504,20 +654,27 @@ class TtcHomeV3 extends StatelessWidget {
               ],
             ),
 
-            // ---- THE DEV SWITCH --------------------------------------------
+            // ⚠️ THE DEV SWITCH MOVED TO PROFILE. It sat bottom-right over
+            // the door grid and the FAB clearance, and appeared in every
+            // screenshot of the product. Profile is the one surface both
+            // versions and both partners share, which is what makes it
+            // the only place a version toggle can actually live.
             //
-            // TESTING-ONLY Her | Him pill, at the same coordinates `TtcPage`
-            // floats it for V1 (right 14, bottom 96) so it does not appear to
-            // move when the toggle is flipped. Remove before launch, with V1's.
-            Positioned(
-              right: 14,
-              // Same fix as the version pill on the opposite corner: a literal
-              // 96 sits behind the tab bar wherever the device has a system
-              // navigation inset. See `pvNavClearance`.
-              bottom: pvNavClearance(context),
-              child: ttcModePill(TtcS.current(), him: false),
-            ),
-
+//             // ---- THE DEV SWITCH --------------------------------------------
+//             //
+//             // TESTING-ONLY Her | Him pill, at the same coordinates `TtcPage`
+//             // floats it for V1 (right 14, bottom 96) so it does not appear to
+//             // move when the toggle is flipped. Remove before launch, with V1's.
+//             Positioned(
+//               right: 14,
+//               // Same fix as the version pill on the opposite corner: a literal
+//               // 96 sits behind the tab bar wherever the device has a system
+//               // navigation inset. See `pvNavClearance`.
+//               bottom: pvNavClearance(context),
+//               child: ttcModePill(TtcS.current(), him: false),
+//             ),
+//
+//
             // ---- THE NAV ---------------------------------------------------
             //
             // ⚠️ V3 SHIPPED WITHOUT ONE, AND THAT WAS THE LARGEST HOLE IN IT.
@@ -557,6 +714,30 @@ class TtcHomeV3 extends StatelessWidget {
     final b = bracketById(id);
     if (b == null) return;
     final hinglish = TtcLang.instance.hinglish;
+
+    // ⚠️ A FOCUS PAGE SHORT-CIRCUITS THE HUB, AND IT IS CHECKED FIRST.
+    //
+    // Conceiving used to open a hub asking "What do you need?" with three
+    // answers — the fertile-window tool, "Improve my chances this cycle", and a
+    // consult. The middle one opened a four-step journey whose FIRST step was
+    // the fertile-window tool sitting next to it, so the menu was offering a
+    // choice between a thing and a wrapper around the same thing.
+    //
+    // So there is no middle menu any more. The tool is section one of the page,
+    // the reading is its body, the consult is its last tile.
+    //
+    // ⚠️ FIRST, NOT LAST, so a bracket that has both a focus page and a hub
+    // config cannot depend on which happens to be found. Six of seven TTC
+    // brackets still have no focus page and still open hubs, correctly — a hub
+    // is right when an area really is several separate errands.
+    final focus = ttcFocusPageFor(id);
+    if (focus != null) {
+      Navigator.of(context).push(MaterialPageRoute<void>(
+        settings: RouteSettings(name: 'ttc/focus/$id'),
+        builder: (_) => TtcFocusScreen(page: focus, bracket: b),
+      ));
+      return;
+    }
 
     // ⚠️ THE HUB REGISTRY DECIDES, NOT THIS SCREEN.
     //
@@ -709,16 +890,25 @@ class TtcHomeV3 extends StatelessWidget {
     }
   }
 
-  void _openSurface(BuildContext context, String id) {
-    final screen = ttcScreenForSurface(id);
-    // Null is a real answer — see the router. Nothing happens rather than
-    // something wrong.
-    if (screen == null) return;
-    Navigator.of(context).push(MaterialPageRoute(
-      settings: RouteSettings(name: id),
-      builder: (_) => screen,
-    ));
-  }
+}
+
+/// Push whichever screen a TTC surface id names.
+///
+/// ⚠️ TOP-LEVEL, NOT A METHOD ON THE STATE, and the move was forced rather than
+/// tidy-minded: the insight-card router is a top-level function, so a private
+/// method on `_TtcHomeV3State` was out of its reach. It touches no instance
+/// state — context in, navigation out — so there was never a reason for it to
+/// be one, and being top-level means every widget in this file can reach a
+/// surface without threading a callback down through four constructors.
+void _openSurface(BuildContext context, String id) {
+  final screen = ttcScreenForSurface(id);
+  // Null is a real answer — see the router. Nothing happens rather than
+  // something wrong.
+  if (screen == null) return;
+  Navigator.of(context).push(MaterialPageRoute(
+    settings: RouteSettings(name: id),
+    builder: (_) => screen,
+  ));
 }
 
 Widget _pad(Widget child) =>
@@ -770,6 +960,9 @@ class _CycleHeader extends StatelessWidget {
     required this.today,
     required this.p,
     required this.hinglish,
+    required this.selected,
+    required this.todayDate,
+    required this.onSelectDay,
     required this.onChapter,
     required this.onCycle,
     required this.onCalendar,
@@ -779,6 +972,26 @@ class _CycleHeader extends StatelessWidget {
   final TtcToday today;
   final V2Palette p;
   final bool hinglish;
+
+  /// The day the whole page is describing. Owned by the screen, not by the
+  /// strip — the heading and the cards below need it too, and a selection that
+  /// lived inside the strip would leave them stuck on today.
+  final DateTime selected;
+
+  /// ⚠️ PASSED IN, NOT READ FROM THE CLOCK HERE. Three widgets on this screen
+  /// need to agree about which day is today, and the moment any of them asks
+  /// `DateTime.now()` for itself, they can disagree — which is exactly the bug
+  /// the state's `_today` field exists to fix. One source, threaded down.
+  ///
+  /// ⚠️ `todayDate`, NOT `today`, BECAUSE `today` IS ALREADY TAKEN on this
+  /// widget — by `TtcToday`, the store's snapshot of her journey state. Two
+  /// completely different meanings of the same word, and the compiler caught
+  /// the collision only because they happen to be different types. Worth the
+  /// clumsier name.
+  final DateTime todayDate;
+
+  final ValueChanged<DateTime> onSelectDay;
+
   final VoidCallback onChapter;
   final VoidCallback onCycle;
   final VoidCallback onCalendar;
@@ -807,7 +1020,18 @@ class _CycleHeader extends StatelessWidget {
                 onTap: onProfile,
                 semantic: t.profileTitle),
             const Spacer(),
-            Text('${now.day} ${_months[now.month - 1]}',
+            // ⚠️ THE SELECTED DAY, NOT `now`. It read `DateTime.now()`, which
+            // was right when the strip was decoration and became a second
+            // contradiction the moment it was not: tap back three days and the
+            // cards moved, the heading moved, and the date at the top of the
+            // screen sat there still saying today.
+            //
+            // The year appears only when the selection leaves the current one,
+            // because "30 August" is unambiguous in August and actively
+            // misleading the following January.
+            Text(
+                '${selected.day} ${_months[selected.month - 1]}'
+                '${selected.year == now.year ? '' : ' ${selected.year}'}',
                 style: pvManrope(
                     fontSize: 15,
                     fontWeight: FontWeight.w800,
@@ -827,30 +1051,57 @@ class _CycleHeader extends StatelessWidget {
           const SizedBox(height: 16),
 
           // ---- the week ----------------------------------------------------
-          _WeekStrip(p: p, hinglish: hinglish, onTap: onCalendar),
+          _WeekStrip(
+              p: p,
+              selected: selected,
+              today: todayDate,
+              onSelect: onSelectDay),
           const SizedBox(height: 20),
 
           // ---- which chapter -----------------------------------------------
-          V3SpineChip(
-            label: today.chapter.title(hinglish).toUpperCase(),
-            tone: V3HeroTone.onField,
-            p: p,
-            onTap: onChapter,
-          ),
-          const SizedBox(height: 12),
+          //
+          // ⚠️ MOVED TO PROFILE. "Knowing your rhythm" was a chip above the big
+          // line; it is now a row under "Your chapter" in Profile, which is
+          // also the only door to the journey map on this version.
+          //
+          // The cost is worth restating because it is not small: which chapter
+          // she is in was always visible and is now two taps away, on a stage
+          // whose chapters RECUR and which therefore generates that question
+          // constantly. Reachability is intact, which is the non-negotiable
+          // part — see the wiring gate.
+          //
+          // V3SpineChip(
+          //   label: today.chapter.title(hinglish).toUpperCase(),
+          //   tone: V3HeroTone.onField,
+          //   p: p,
+          //   onTap: onChapter,
+          // ),
+          // const SizedBox(height: 12),
 
           // ---- the window, or the honest refusal ---------------------------
           _WindowLine(today: today, p: p, hinglish: hinglish, onTap: onCycle),
           const SizedBox(height: 18),
 
           // ---- the two actions ---------------------------------------------
+          //
+          // ⚠️ BOTH FILLED NOW. One was `p.surface` and the other
+          // `p.surface.withValues(alpha: 0.55)` with a border — a hierarchy
+          // nobody asked for, and it broke the thing below: *"our check symptom
+          // button is a little bit less saturated than the log button, so make
+          // it the same, so that this effect that we are trying to achieve for
+          // the future can be implemented way better."*
+          //
+          // Exactly the problem. If one control is permanently at 55% opacity,
+          // then dimming a control to say "not available" says nothing — the
+          // reader cannot tell a disabled button from the button that always
+          // looked like that. **A resting state that borrows the disabled
+          // state's only signal leaves you with no disabled state.**
           Row(children: [
             Expanded(
               child: _HeaderAction(
                 label: t.headerEditPeriod,
                 icon: Icons.water_drop_outlined,
                 p: p,
-                filled: true,
                 onTap: () => logTtcPeriod(context),
               ),
             ),
@@ -860,14 +1111,41 @@ class _CycleHeader extends StatelessWidget {
                 label: t.headerCheckSymptoms,
                 icon: Icons.favorite_border_rounded,
                 p: p,
-                filled: false,
-                // ⚠️ THE SYMPTOMS TRACKER BY ID, not `ttc_tracker` — the
-                // surface router deliberately refuses that id because
-                // `TtcTrackerScreen` needs to be told WHICH tracker and
-                // dropping her into an arbitrary one is the wrong-screen
-                // failure it exists to prevent. See the comment in
-                // `ttc_surface_router.dart`.
-                onTap: () => openTtcTracker(context, 'symptoms'),
+                // ⚠️ A DAY THAT HAS NOT HAPPENED CANNOT BE LOGGED. Asked for
+                // directly — *"I should not be able to log symptoms in future
+                // dates"* — and it is the right rule for a reason beyond
+                // tidiness: this store is what the cycle report reads, and a
+                // symptom recorded against next Tuesday would sit in her
+                // history as a fact about a day nobody has lived.
+                //
+                // Disabled, not hidden. A control that vanishes on some dates
+                // makes the row jump as she walks the strip, and she would have
+                // to work out why. Dimmed, it says "not this day" and stays
+                // where her thumb expects it.
+                enabled: !selected.isAfter(todayDate),
+                // ⚠️ THE SELECTED DAY, NOT TODAY. Reported as *"if I go back to
+                // 29th August and click Check symptoms, it opens the symptoms
+                // for the current day."* It did: the push named no date, so the
+                // logger defaulted to `DateTime.now()`.
+                //
+                // That is the worst class of bug on a logging screen, because
+                // it is silent and it CORRUPTS. She thinks she is recording
+                // Saturday, the row lands on Monday, and every surface reading
+                // this store — the strip, the report, the calendar — is now
+                // confidently wrong about her body.
+                //
+                // ⚠️ THE NEW LOGGER, NOT `TtcTrackerScreen`. The generic
+                // tracker rendered six five-point sliders, which asked her to
+                // GRADE feelings she had already had and gave nothing back.
+                // `TtcSymptomLogScreen` writes to the same tracker id, so the
+                // calendar, the day strip and everything else reading
+                // `symptoms` keeps working across the change.
+                onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute<void>(
+                        settings:
+                            const RouteSettings(name: 'ttc/symptom_log'),
+                        builder: (_) =>
+                            TtcSymptomLogScreen(day: selected))),
               ),
             ),
           ]),
@@ -877,130 +1155,372 @@ class _CycleHeader extends StatelessWidget {
   }
 }
 
-/// The seven days around today.
+/// The day strip - scrollable, tappable, and marked with what she logged.
 ///
-/// ⚠️ IT READS `ttcFactsFor`, THE CALENDAR'S OWN ENGINE. Every marker here —
-/// period start, fertile day, ovulation, expected period, "something logged" —
-/// is the same function the month grid calls, so a day cannot be coral in the
-/// header and plain in the calendar. Re-deriving them from `CycleStore` would
-/// have been four lines shorter and the two would have drifted the first time
-/// either changed.
-class _WeekStrip extends StatelessWidget {
+/// ⚠️ IT READS `ttcFactsFor`, THE CALENDAR'S OWN ENGINE. Every marker here -
+/// period start, fertile day, ovulation, expected period - is the same function
+/// the month grid calls, so a day cannot be coral in the header and plain in
+/// the calendar. Re-deriving them from `CycleStore` would have been four lines
+/// shorter and the two would have drifted the first time either changed.
+///
+/// ---------------------------------------------------------------------------
+///  ⚠️ THE THREE THINGS THIS DID NOT DO, AND WHY EACH MATTERED
+/// ---------------------------------------------------------------------------
+///
+/// It rendered seven fixed days with today at index 3, the whole row wrapped in
+/// one `GestureDetector` that opened the calendar, and a 4px dot for "something
+/// logged". Every part of that was a near-miss:
+///
+///  1. **You could not go back.** Three days of history, and no way to reach a
+///     fourth without leaving the screen. *"I'm not able to go back at a
+///     date."* Now it is a `ListView` over ~26 weeks of past.
+///
+///  2. **The days were not tappable - the ROW was.** Tapping Tuesday did not
+///     select Tuesday, it opened the calendar. That is the worst kind of dead
+///     control: it responds, so it feels wired, and it takes you somewhere
+///     else. The calendar keeps its own button in the row above.
+///
+///  3. **A 4px dot cannot say WHAT.** *"How? Using emojis and stuff."* The dot
+///     answered "did you log?" when the question is "what did I log?" - and it
+///     is the same colour for a day of cramps and a day of joy.
+///
+/// ⚠️ SIX DAYS OF FUTURE, NOT ZERO AND NOT A MONTH. Enough to see the fertile
+/// tint arriving, which is the single most useful forward-looking thing this
+/// strip does. Further out and it becomes a planner for days that have not
+/// happened, on a screen whose subject is how she feels.
+class _WeekStrip extends StatefulWidget {
   const _WeekStrip(
-      {required this.p, required this.hinglish, required this.onTap});
+      {required this.p,
+      required this.selected,
+      required this.today,
+      required this.onSelect});
 
   final V2Palette p;
-  final bool hinglish;
-  final VoidCallback onTap;
+  final DateTime selected;
 
+  /// The screen's single idea of today. See `_TtcHomeV3State._today`.
+  final DateTime today;
+
+  final ValueChanged<DateTime> onSelect;
+
+  @override
+  State<_WeekStrip> createState() => _WeekStripState();
+}
+
+class _WeekStripState extends State<_WeekStrip> {
   static const _dayLetters = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
+  /// ~26 weeks back. Long enough that nobody hits the end while browsing, short
+  /// enough that the list is 187 cheap items rather than an infinite builder
+  /// whose scroll offset has to be computed from an epoch.
+  static const _daysBack = 180;
+  static const _daysForward = 6;
+  static const _slot = 46.0;
+
+  final _sc = ScrollController();
+  bool _centred = false;
+
+  /// ⚠️ NOT `late final` ANY MORE. It was, and it was set from
+  /// `DateTime.now()` in `initState` — so the 187-day window was anchored to
+  /// whichever day the screen was first opened on and stayed there. After
+  /// midnight the strip's last cell was five days ahead instead of six, and
+  /// its idea of "today" was a day behind the numbers it was drawing.
+  late DateTime _first = widget.today.subtract(const Duration(days: _daysBack));
+
+  @override
+  void didUpdateWidget(_WeekStrip old) {
+    super.didUpdateWidget(old);
+    if (old.today != widget.today) {
+      // Re-anchor, and let it re-centre once: on the morning after, landing on
+      // today is what she wants, and it is also the only moment where moving
+      // the scroll position under her is not rude.
+      setState(() {
+        _first = widget.today.subtract(const Duration(days: _daysBack));
+        _centred = false;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _sc.dispose();
+    super.dispose();
+  }
+
+  /// Put the selected day on screen after the first layout.
+  ///
+  /// ⚠️ ONCE, NOT ON EVERY BUILD. `_centred` is the guard, and it is load
+  /// bearing: re-centring on every build would yank the strip back under her
+  /// thumb the instant she scrolled, because a scroll rebuilds nothing but a
+  /// tap rebuilds everything. It is also why this cannot be
+  /// `initialScrollOffset` - the viewport width is not known until layout, and
+  /// centring needs it.
+  void _centre(double viewport) {
+    if (_centred || !_sc.hasClients) return;
+    _centred = true;
+    final index = widget.selected.difference(_first).inDays;
+    final target = (index * _slot) - (viewport / 2) + (_slot / 2);
+    _sc.jumpTo(target.clamp(0.0, _sc.position.maxScrollExtent));
+  }
 
   @override
   Widget build(BuildContext context) {
+    // ⚠️ THE LIVE CLOCK, NOT `widget.today`, FOR THE TODAY MARKER.
+    //
+    // The parent keeps a `_today` and refreshes it on resume, which is right
+    // for deciding what the page is ABOUT. But the previous version of this
+    // line read that cached value, so if it ever failed to refresh, the marker
+    // for today was wrong too — and a strip that is confidently wrong about
+    // which day it is, is worse than one that is merely stale.
+    //
+    // The window anchor still comes from the parent (`_first`), so the list
+    // does not reshuffle under a scroll. Only the "which of these is today"
+    // question is answered from the clock, every build, unconditionally.
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
-    // Today sits fourth of seven, so there is always context on both sides.
-    final first = today.subtract(const Duration(days: 3));
+    const count = _daysBack + _daysForward + 1;
 
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          for (var i = 0; i < 7; i++)
-            _WeekDay(
-              date: DateTime(first.year, first.month, first.day + i),
-              isToday: i == 3,
-              letter: _dayLetters[
-                  (DateTime(first.year, first.month, first.day + i).weekday -
-                          1) %
-                      7],
-              p: p,
-            ),
-        ],
-      ),
-    );
+    return LayoutBuilder(builder: (context, box) {
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => _centre(box.maxWidth));
+
+      return SizedBox(
+        height: 84,
+        child: ListView.builder(
+          controller: _sc,
+          scrollDirection: Axis.horizontal,
+          itemCount: count,
+          padding: EdgeInsets.zero,
+          itemBuilder: (context, i) {
+            final date = DateTime(_first.year, _first.month, _first.day + i);
+            return _WeekDay(
+              // ⚠️ A KEY PER DATE, SO A TEST CAN TAP ONE. Finding a day by its
+              // number does not work here: the list spans six months, so `29`
+              // is ambiguous the moment two months' worth is built, and the
+              // cards below can print a bare number too — a cycle day of 8 and
+              // the 8th of the month are the same string on one screen.
+              key: ValueKey('ttc_day_${date.year}-${date.month}-${date.day}'),
+              date: date,
+              isToday: date == today,
+              isSelected: date == widget.selected,
+              isFuture: date.isAfter(today),
+              letter: _dayLetters[(date.weekday - 1) % 7],
+              p: widget.p,
+              width: _slot,
+              onTap: () => widget.onSelect(date),
+            );
+          },
+        ),
+      );
+    });
   }
 }
 
 class _WeekDay extends StatelessWidget {
   const _WeekDay({
+    super.key,
     required this.date,
     required this.isToday,
+    required this.isSelected,
+    required this.isFuture,
     required this.letter,
     required this.p,
+    required this.width,
+    required this.onTap,
   });
 
   final DateTime date;
   final bool isToday;
+  final bool isSelected;
+  final bool isFuture;
   final String letter;
+  final V2Palette p;
+  final double width;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    // =========================================================================
+    //  ⚠️ THE STRIP DRAWS ONE THING: WHICH DAY IS TODAY.
+    // -------------------------------------------------------------------------
+    //  Everything the cycle knows — period starts, fertile days, an expected
+    //  period — is COMMENTED OUT BELOW, kept for revert, and it comes back when
+    //  the distinction is designed properly against the reference. Asked for
+    //  directly: *"in future I will be letting you mark the distinction like
+    //  the competitor app does. But you don't have to do it right now."*
+    //
+    //  ⚠️ AND THE REASON IT HAD TO COME OFF NOW IS WORTH KEEPING. Three rounds
+    //  were lost to "the pink circle is stuck on the 30th", and every round the
+    //  answer was the same: there was more than one pink circle. First a filled
+    //  coral disc for a logged period start sitting beside the today marker;
+    //  then, after that became a ring, a coral RING on the 30th sitting beside
+    //  today's disc. Each time the extra mark was correct, data-driven, and
+    //  completely indistinguishable from "the today marker has not moved".
+    //
+    //  **A second marker in the same colour as the primary one is not extra
+    //  information, it is a bug the reader can see and you cannot.** The strip
+    //  is a date picker first. It shows the date.
+    // =========================================================================
+
+    // final TtcDayFacts facts = ttcFactsFor(date);
+    //
+    // final isFertile =
+    //     facts.fertility != null && facts.fertility != FertilityLevel.low;
+    //
+    // if (facts.isPeriodStart) {
+    //   ring = ttcCoral;
+    // } else if (isFertile) {
+    //   fill = ttcFertilityTint(facts.fertility!);
+    // } else if (facts.isExpectedPeriod) {
+    //   ring = ttcCoral.withValues(alpha: 0.55);
+    // }
+
+    // ⚠️ NO `ring` VARIABLE ANY MORE. It only ever carried cycle data, and the
+    // commented block above is where that lives until it is designed properly.
+    // Leaving it declared-but-always-null gets an analyzer warning and, worse,
+    // reads as though something might still set it.
+    Color? fill;
+
+    // ⚠️ THE ONE MARK ON THE STRIP. Filled coral, on today, every day.
+    if (isToday) fill = ttcCoral;
+
+    // ⚠️ SELECTION IS A RING, NEVER A FILL — except on today, which already has
+    // one. Filling the selected day would overwrite the one piece of
+    // information on the strip that is not ours to overwrite: tap a period day
+    // and the coral vanishes, so the day you are LOOKING at becomes the only
+    // day whose facts you cannot see. Selection is a cursor, not a fact.
+    final selectedRing = isSelected && !isToday ? p.action : null;
+    final onFill =
+        fill == null ? p.ink1 : (fill == ttcCoral ? Colors.white : p.ink1);
+
+    final marks = ttcDayMarkers(date);
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: SizedBox(
+        width: width,
+        child: Column(children: [
+          // ⚠️ THE WORD, NOT JUST THE COLOUR. A weekday letter is the same
+          // glyph on every seventh cell, so "T" over today carries no
+          // information at all. Replacing it removes the last way to misread
+          // which cell is the current one — and it costs nothing, because the
+          // letter it replaces was the least useful mark on the strip.
+          Text(isToday ? 'TODAY' : letter,
+              maxLines: 1,
+              overflow: TextOverflow.visible,
+              style: pvManrope(
+                  fontSize: isToday ? 8 : 10.5,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: isToday ? 0.4 : 0.6,
+                  // A future day is dimmer, so the strip has a visible "now"
+                  // edge without a divider drawn between two dates.
+                  color: isToday
+                      ? ttcCoral
+                      : isFuture
+                          ? p.ink3.withValues(alpha: 0.5)
+                          : p.ink3)),
+          const SizedBox(height: 6),
+          Container(
+            width: 34,
+            height: 34,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: fill,
+              shape: BoxShape.circle,
+              border: selectedRing != null
+                  ? Border.all(color: selectedRing, width: 2.2)
+                  : null,
+            ),
+            child: Text('${date.day}',
+                style: pvManrope(
+                    fontSize: 13.5,
+                    fontWeight: isSelected || isToday
+                        ? FontWeight.w900
+                        : FontWeight.w700,
+                    color: fill != null
+                        ? onFill
+                        : isToday
+                            ? p.action
+                            : isFuture
+                                ? p.ink3
+                                : p.ink1)),
+          ),
+          const SizedBox(height: 4),
+
+          // ---- WHAT SHE LOGGED --------------------------------------------
+          //
+          // ⚠️ THE ASYMMETRY IS THE FEATURE, and it was asked for twice:
+          // *"if I'm not on a date but a symptom was logged on that particular
+          // date, it shows a heart below that date. The moment I'm on that date
+          // it shows the symptom icons."*
+          //
+          // Which is a genuinely good interaction rather than a decorative one.
+          // Thirty days of symptom icons at 15pt is noise nobody can parse;
+          // thirty hearts is a scannable answer to "when have I been logging?"
+          // - and the detail arrives on the one day you asked about.
+          SizedBox(
+            height: 18,
+            child: marks.shown.isEmpty
+                ? null
+                : isSelected
+                    ? _MarkRow(marks: marks, p: p)
+                    : Icon(Icons.favorite_rounded,
+                        size: 10, color: ttcCoral.withValues(alpha: 0.75)),
+          ),
+        ]),
+      ),
+    );
+  }
+}
+
+/// The logged symptoms under the selected date: two of them, then a count.
+class _MarkRow extends StatelessWidget {
+  const _MarkRow({required this.marks, required this.p});
+
+  final ({List<TtcSymptom> shown, int more}) marks;
   final V2Palette p;
 
   @override
   Widget build(BuildContext context) {
-    final TtcDayFacts facts = ttcFactsFor(date);
+    // ⚠️ TWO BUBBLES *OR* ONE BUBBLE AND A COUNT. Never two and a count: at
+    // a 46pt slot width that is 16 + 2 + 16 + 2 + 14 = 50, which overflows.
+    // Four pixels of overflow from exactly this arithmetic - a fixed number of
+    // fixed-width children in a fixed-width box - is a mistake already made
+    // once on the logging screen this strip feeds.
+    final showTwo = marks.more == 0 && marks.shown.length >= 2;
+    final bubbles = marks.shown.take(showTwo ? 2 : 1).toList();
+    final overflow = marks.more + (marks.shown.length - bubbles.length);
 
-    // ⚠️ INTENSITY AND SHAPE, NOT A TRAFFIC LIGHT. Same rule the day bars on
-    // the window screen follow: a period day is a filled coral disc, a fertile
-    // day is a soft teal disc, an expected period is a dashed outline. A
-    // greyscale screenshot and a colour-blind eye both still read it, which a
-    // red-amber-green week would not.
-    final isFertile = facts.fertility != null &&
-        facts.fertility != FertilityLevel.low;
-
-    Color? fill;
-    Color? ring;
-    if (facts.isPeriodStart) {
-      fill = ttcCoral;
-    } else if (isFertile) {
-      fill = ttcFertilityTint(facts.fertility!);
-    } else if (facts.isExpectedPeriod) {
-      ring = ttcCoral;
-    }
-
-    final onFill = fill == ttcCoral ? Colors.white : p.ink1;
-
-    return Column(children: [
-      Text(letter,
-          style: pvManrope(
-              fontSize: 10.5,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.6,
-              color: p.ink3)),
-      const SizedBox(height: 7),
-      Container(
-        width: 34,
-        height: 34,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: fill,
-          shape: BoxShape.circle,
-          border: ring != null
-              ? Border.all(color: ring, width: 1.4)
-              : isToday
-                  ? Border.all(color: p.action, width: 2)
-                  : null,
-        ),
-        child: Text('${date.day}',
+    return Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+      for (final s in bubbles) ...[
+        Builder(builder: (_) {
+          final tint = v2BlockTint(s.hue % 360, p);
+          final deep = HSLColor.fromColor(tint)
+              .withSaturation(0.5)
+              .withLightness(0.38)
+              .toColor();
+          return Container(
+            width: 18,
+            height: 18,
+            alignment: Alignment.center,
+            decoration:
+                BoxDecoration(color: tint, shape: BoxShape.circle),
+            // ⚠️ 18, NOT 16, AND THE TWO EXTRA POINTS ARE THE WHOLE REASON THE
+            // DRAWN FACE WORKS HERE. An emoji is a full-colour glyph and stays
+            // legible at almost any size; two hairlines and two dots do not.
+            // At 16 the mark inside was 9pt and the mouth curve closed up into
+            // a smudge. 18 gives it 12, which is the floor — see the stroke
+            // note in `ttc_mood_face.dart`.
+            child: TtcSymptomMark(symptom: s, size: 12, ink: deep),
+          );
+        }),
+        const SizedBox(width: 2),
+      ],
+      if (overflow > 0)
+        Text('+$overflow',
             style: pvManrope(
-                fontSize: 13.5,
-                fontWeight: isToday ? FontWeight.w900 : FontWeight.w700,
-                color: fill != null ? onFill : p.ink1)),
-      ),
-      const SizedBox(height: 5),
-      // A single dot for "you logged something here" — the calendar's own
-      // `calendarLogged` marker, at week scale.
-      SizedBox(
-        height: 5,
-        child: facts.loggedTrackers.isEmpty && facts.journalEntries.isEmpty
-            ? null
-            : Container(
-                width: 4,
-                height: 4,
-                decoration:
-                    BoxDecoration(color: p.action, shape: BoxShape.circle)),
-      ),
+                fontSize: 9, fontWeight: FontWeight.w800, color: p.ink2)),
     ]);
   }
 }
@@ -1131,42 +1651,63 @@ class _HeaderAction extends StatelessWidget {
     required this.label,
     required this.icon,
     required this.p,
-    required this.filled,
     required this.onTap,
+    this.enabled = true,
   });
 
   final String label;
   final IconData icon;
   final V2Palette p;
-  final bool filled;
   final VoidCallback onTap;
 
+  /// False on a day that has not happened yet.
+  ///
+  /// ⚠️ ONE OPACITY ON THE WHOLE CONTROL, NOT THREE DIMMED COLOURS. Fading the
+  /// fill, the icon and the label separately means three values to keep in step
+  /// and a result that never quite reads as one object going quiet. `Opacity`
+  /// over the finished button is both simpler and more honest about what is
+  /// being said: this entire thing is not available.
+  final bool enabled;
+
   @override
-  Widget build(BuildContext context) => InkWell(
-        onTap: onTap,
+  Widget build(BuildContext context) {
+    final button = Container(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      decoration: BoxDecoration(
+        color: p.surface,
         borderRadius: BorderRadius.circular(999),
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            color: filled ? p.surface : p.surface.withValues(alpha: 0.55),
-            borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: filled ? p.surface : p.line),
-          ),
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Icon(icon, size: 16, color: p.action),
-            const SizedBox(width: 7),
-            Flexible(
-              child: Text(label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: pvManrope(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w800,
-                      color: p.ink1)),
-            ),
-          ]),
+      ),
+      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Icon(icon, size: 16, color: p.action),
+        const SizedBox(width: 7),
+        Flexible(
+          child: Text(label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: pvManrope(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w800,
+                  color: p.ink1)),
         ),
-      );
+      ]),
+    );
+
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      label: label,
+      child: InkWell(
+        // ⚠️ A NULL CALLBACK, NOT AN `onTap` THAT RETURNS EARLY. `InkWell` reads
+        // null as "not tappable" and stops drawing a ripple, so the control
+        // stops *feeling* pressable as well as looking it. A guard inside the
+        // callback would still flash a ripple on every tap, which is the app
+        // saying "yes" and then doing nothing.
+        onTap: enabled ? onTap : null,
+        borderRadius: BorderRadius.circular(999),
+        child: enabled ? button : Opacity(opacity: 0.42, child: button),
+      ),
+    );
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -1638,6 +2179,502 @@ class _LinkCard extends StatelessWidget {
 /// for five rotating items is not the job. `V3DailyArt` in a tinted disc is the
 /// stage's existing visual language and degrades honestly — see the note in
 /// docs/STILL-OPEN.md if real thumbnails are ever commissioned.
+// =============================================================================
+//  THE DAILY INSIGHTS RAIL
+// -----------------------------------------------------------------------------
+//  ⚠️ RECTANGLES WITH ANSWERS ON THEM, REPLACING SIX IDENTICAL CIRCLES.
+//
+//  The old rail is kept below, commented, per the revert rule. What it could
+//  not do is the whole reason this exists: a 66pt circle with a caption under
+//  it has room for the NAME of a thing and nothing else. Six of them in a row
+//  is a menu — every item the same size, the same shape, the same weight, and
+//  none of them telling you anything until you tap.
+//
+//  A card has a second line, so "today's insight" can become the insight,
+//  "cycle day" can become "8", and the fertility band can be a word rather than
+//  a colour you have to remember the key for. The screen starts answering
+//  questions instead of listing where answers might be.
+//
+//  ⚠️ THE SET IS COMPUTED FOR THE SELECTED DAY. `ttcInsightsFor` decides which
+//  contextual cards a day has earned; this widget appends the five evergreen
+//  ones. That order matters — what is unusual about this day first, what is
+//  true every day last.
+//
+//  ⚠️ AND THE EVERGREEN FIVE ARE NOT OPTIONAL. `ttc_home_v3_parity_test.dart`
+//  asserts that today's insight, myth, nutrition, movement and pick are all
+//  reachable from V3, because they are reachable from V1 and the Current | V3
+//  pill is meant to compare two DESIGNS, not two feature sets. Dropping one
+//  here because the card looked redundant would make the A/B measure the wrong
+//  thing. Their rotation offsets (0/3/1/2/4) are also preserved exactly, so
+//  both homes show the same item on the same day.
+// =============================================================================
+class _InsightRail extends StatelessWidget {
+  const _InsightRail(
+      {required this.p, required this.hinglish, required this.selected});
+
+  final V2Palette p;
+  final bool hinglish;
+  final DateTime selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final hi = hinglish;
+    final t = TtcS.current();
+
+    // ⚠️ `now: selected`, WHICH IS THE POINT. `ttcPickForToday` already took an
+    // optional date - it was only ever called without one. Threading the
+    // selected day through means walking back through the strip walks back
+    // through the content too, so yesterday's insight is genuinely yesterday's
+    // rather than today's under a different heading.
+    final insight = ttcPickForToday(ttcInsights, now: selected);
+    final myth = ttcPickForToday(ttcMyths, now: selected, offset: 3);
+    final n = ttcPickForToday(ttcNutrition, now: selected, offset: 1);
+    final m = ttcPickForToday(ttcMovements, now: selected, offset: 2);
+    final product = ttcPickForToday(ttcProducts, now: selected, offset: 4);
+
+    final cards = <TtcInsightCard>[
+      ...ttcInsightsFor(selected),
+      TtcInsightCard(
+        id: 'insight',
+        eyebrow: t.todaysInsight,
+        value: insight.title(hi),
+        hue: 206,
+        art: TtcInsightArt.note,
+        go: TtcInsightGo.insight,
+      ),
+      TtcInsightCard(
+        id: 'myth',
+        eyebrow: t.todaysMyth,
+        value: myth.myth(hi),
+        hue: 42,
+        art: TtcInsightArt.balance,
+        go: TtcInsightGo.myth,
+      ),
+      TtcInsightCard(
+        id: 'nutrition',
+        eyebrow: t.todaysNutrition,
+        value: n.meal(hi),
+        caption: n.nutrient(hi),
+        hue: 104,
+        art: TtcInsightArt.meal,
+        go: TtcInsightGo.nutrition,
+      ),
+      TtcInsightCard(
+        id: 'movement',
+        eyebrow: t.todaysMovement,
+        value: m.title(hi),
+        hue: 160,
+        art: TtcInsightArt.move,
+        go: TtcInsightGo.movement,
+      ),
+      // ⚠️ THE REPORT IS ON THE RAIL BY REQUEST - *"have it as a button in
+      // daily insights"* - and the placement earns it. It was a button at the
+      // FOOT of the logging screen: the payoff for logging, reachable only by
+      // going back into the thing you had just finished doing.
+      TtcInsightCard(
+        id: 'report',
+        eyebrow: t.reportShort,
+        value: 'What your cycle shows',
+        hue: 268,
+        art: TtcInsightArt.ring,
+        go: TtcInsightGo.report,
+      ),
+      TtcInsightCard(
+        id: 'pick',
+        eyebrow: t.todaysPick,
+        value: product.name(hi),
+        hue: 344,
+        art: TtcInsightArt.product,
+        go: TtcInsightGo.products,
+      ),
+    ];
+
+    return SizedBox(
+      // ⚠️ 112, AND THE NUMBER IS MEASURED OFF THE REFERENCE RATHER THAN
+      // GUESSED AT — twice now, because the first pass at "smaller" was still
+      // too big. In the screenshot each card is about 31% of the screen width
+      // and very close to square: on a 360dp phone that is roughly 111 x 113.
+      //
+      // Ours are 100 x 112, deliberately a little under. Three at 100 plus two
+      // 8pt gaps is 316 inside a 324pt gutter, so three fit whole AND there is
+      // slack — *"so that three can fit with a bit of space available still."*
+      // Landing exactly on 108 would fill the row edge to edge, and a rail that
+      // ends flush at the screen edge gives no hint that it scrolls.
+      //
+      // A `SizedBox` around a rail must equal its tallest child. Reserve more
+      // and the surplus lands on top of the section gap below as a hole; this
+      // rail has already shipped that bug once at 128 around a 104pt child.
+      height: 112,
+      child: ListView.builder(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 18),
+        itemCount: cards.length,
+        itemBuilder: (context, i) => Padding(
+          padding: EdgeInsets.only(right: i == cards.length - 1 ? 0 : 8),
+          child: _InsightTile(
+            card: cards[i],
+            p: p,
+            onTap: () => _openInsight(context, cards[i], hi, selected,
+                insight: insight, myth: myth, n: n, m: m),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Every destination a card can have, in one place.
+///
+/// ⚠️ AN EXHAUSTIVE SWITCH ON PURPOSE. `TtcInsightGo` is a plain enum and Dart
+/// will warn on a missing case, which is the cheapest possible version of the
+/// wiring gate: adding a card kind that goes nowhere becomes a compile-time
+/// complaint rather than a tile that does nothing on a device three weeks from
+/// now. This stage has shipped correct-but-unreachable code before.
+void _openInsight(
+  BuildContext context,
+  TtcInsightCard card,
+  bool hi,
+  DateTime selected, {
+  required TtcInsight insight,
+  required TtcMyth myth,
+  required TtcNutrition n,
+  required TtcMovement m,
+}) {
+  switch (card.go) {
+    case TtcInsightGo.window:
+      _openSurface(context, 'ttc_window');
+    case TtcInsightGo.cycle:
+      _openSurface(context, 'ttc_cycle');
+    case TtcInsightGo.products:
+      openTtcProducts(context);
+    case TtcInsightGo.report:
+      Navigator.of(context).push(MaterialPageRoute<void>(
+        settings: const RouteSettings(name: 'ttc/cycle_report'),
+        builder: (_) => const TtcCycleReportScreen(),
+      ));
+    case TtcInsightGo.logger:
+      // ⚠️ OPENS ON THE SELECTED DAY, not on today. A card that says "how did
+      // that day feel?" and then opens a form dated today would write her
+      // answer to the wrong date - silently, and in the one store the calendar,
+      // the strip and the report all read.
+      Navigator.of(context).push(MaterialPageRoute<void>(
+        settings: const RouteSettings(name: 'ttc/symptom_log'),
+        builder: (_) => TtcSymptomLogScreen(day: selected),
+      ));
+    case TtcInsightGo.insight:
+      Navigator.of(context).push(MaterialPageRoute<void>(
+        settings: const RouteSettings(name: 'ttc/insight'),
+        builder: (_) => TtcInsightScreen(insight: insight),
+      ));
+    case TtcInsightGo.myth:
+      showTtcRowSheet(
+        context,
+        eyebrow: TtcS.current().todaysMyth,
+        title: myth.myth(hi),
+        body: [
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: ttcPanel,
+              borderRadius: BorderRadius.circular(ttcCardRadius),
+            ),
+            child: Text(myth.truth(hi),
+                style: ttcBody(14, color: ttcTitleInk, h: 1.65)),
+          ),
+        ],
+      );
+    case TtcInsightGo.nutrition:
+      showTtcRowSheet(
+        context,
+        eyebrow: n.nutrient(hi),
+        title: n.meal(hi),
+        body: [
+          Text(n.why(hi), style: ttcBody(14, color: ttcInk, h: 1.7)),
+          const SizedBox(height: 16),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(15),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFDF6EC),
+              borderRadius: BorderRadius.circular(ttcCardRadius),
+            ),
+            child: Text(n.indian(hi),
+                style: ttcBody(13.5, color: ttcBrown, h: 1.6)),
+          ),
+        ],
+      );
+    case TtcInsightGo.movement:
+      showTtcRowSheet(
+        context,
+        eyebrow: TtcS.current().todaysMovement,
+        title: m.title(hi),
+        body: [Text(m.body(hi), style: ttcBody(14, color: ttcInk, h: 1.7))],
+      );
+  }
+}
+
+/// One card: a tinted block with the answer written on it.
+///
+/// ⚠️ NO WHITE HALF ANY MORE. It was a tinted head over a white body, and the
+/// note back was *"we definitely don't need this white division of it. It
+/// should stay just as the texture... it can be written inside of it as well."*
+///
+/// Which is right, and the reasoning that produced the split was wrong in a way
+/// worth naming. The argument had been that a white body puts the answer on the
+/// highest-contrast surface on the screen. True in isolation, and it ignored
+/// what the split costs: a horizontal seam across every card in the rail, so
+/// eight cards read as sixteen shapes. The eye counts edges, and doubling the
+/// edges is what made a rail of small blocks feel heavy at any size.
+///
+/// The tints here are already pale — `v2BlockTint` is a controlled-pastel wheel
+/// — so ink on one of them clears contrast comfortably. The contrast argument
+/// was solving a problem the palette had already solved.
+///
+/// ⚠️ AND SMALLER — 100 x 112, down from 158 x 168 via 118 x 132. See the
+/// rail's note for where the number came from; the short version is that three
+/// cards per screen is what makes a rail read as a rail rather than as a stack
+/// of panels you swipe.
+///
+/// ⚠️ EVERYTHING INSIDE SHRANK WITH THE BOX, WHICH IS THE PART THAT IS EASY TO
+/// SKIP. A card resized without its type resized is not a smaller card, it is
+/// the same card clipping its own contents — and `maxLines` hides that as
+/// ellipses rather than as an overflow anyone would notice.
+class _InsightTile extends StatelessWidget {
+  const _InsightTile(
+      {required this.card, required this.p, required this.onTap});
+
+  static const double width = 100;
+  static const double height = 112;
+
+  final TtcInsightCard card;
+  final V2Palette p;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    // ⚠️ `% 360` IS NOT DEFENSIVE PADDING. `v2BlockTint` asserts hue <= 360,
+    // and a symptom hue arriving from the data file has already tripped it once
+    // in this stage. A hue is an angle; wrapping it is the correct arithmetic.
+    final tint = v2BlockTint(card.hue % 360, p);
+    final deep = HSLColor.fromColor(tint)
+        .withSaturation(0.45)
+        .withLightness(0.34)
+        .toColor();
+
+    return Semantics(
+      button: true,
+      label: '${card.eyebrow}: ${card.value}',
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          width: width,
+          height: height,
+          decoration: BoxDecoration(
+            color: tint,
+            borderRadius: BorderRadius.circular(18),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Stack(children: [
+            // The mark fills the block and is cropped by its edge, the same
+            // device the focus rail uses. With the white body gone it has the
+            // whole card to sit in, so it can be quieter and still register.
+            Positioned.fill(
+              child: CustomPaint(
+                  painter: _InsightMark(
+                      art: card.art, ink: deep.withValues(alpha: 0.5))),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 9, 10, 9),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(card.eyebrow.toUpperCase(),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: pvManrope(
+                            fontSize: 7.5,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.6,
+                            height: 1.25,
+                            color: deep)),
+                    const Spacer(),
+                    Text(card.value,
+                        maxLines: card.caption == null ? 4 : 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: pvJakarta(
+                            fontSize: _valueSize(card.value),
+                            fontWeight: FontWeight.w800,
+                            height: 1.2,
+                            color: p.ink1)),
+                    if (card.caption != null) ...[
+                      const SizedBox(height: 3),
+                      Text(card.caption!,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: pvManrope(
+                              fontSize: 8.5,
+                              height: 1.25,
+                              color: p.ink2.withValues(alpha: 0.85))),
+                    ],
+                  ]),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
+
+  /// ⚠️ THE SIZE FOLLOWS THE LENGTH, and this is the one piece of type on the
+  /// card that could not be a constant. The same slot holds "8" and "Cut back
+  /// on chai to two cups" - a size that suits the sentence makes the number
+  /// look like a label, and a size that suits the number turns the sentence
+  /// into four ellipsised lines. Three steps, chosen at the lengths where the
+  /// text stops fitting rather than at round numbers.
+  ///
+  /// ⚠️ ALL THREE CAME DOWN WITH THE CARD, TWICE. 30/19/14.5 at 158pt became
+  /// 26/16/12.5 at 118, and is 22/14/11 at 100 — a type scale that does not
+  /// shrink with its container is how a resize turns into an overflow, or (with
+  /// `maxLines` set, as here) into silent ellipses that nobody files a bug for.
+  static double _valueSize(String v) {
+    if (v.length <= 3) return 22;
+    if (v.length <= 12) return 14;
+    return 11;
+  }
+}
+
+/// The drawn mark in a card's head.
+///
+/// ⚠️ DRAWN, NOT AN ICON FONT AND NOT AN ASSET. Same reason the rest of this
+/// stage paints its own art: an icon at this size reads as a button affordance,
+/// and these are not buttons in the head - they are the card's texture. Each
+/// mark is a few strokes tuned to sit behind the eyebrow without competing
+/// with it, which no shipped icon set does.
+class _InsightMark extends CustomPainter {
+  const _InsightMark({required this.art, required this.ink});
+
+  final TtcInsightArt art;
+  final Color ink;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final stroke = Paint()
+      ..color = ink.withValues(alpha: 0.5)
+      ..strokeWidth = 2
+      ..strokeCap = StrokeCap.round
+      ..style = PaintingStyle.stroke;
+    final fill = Paint()..color = ink.withValues(alpha: 0.32);
+
+    // Anchored bottom-right, so the eyebrow at top-left never collides with it
+    // regardless of how many lines the eyebrow takes.
+    final cx = size.width - 22;
+    final cy = size.height - 20;
+
+    // ⚠️ SCALED ABOUT ITS OWN CENTRE, NOT REDRAWN AT NEW NUMBERS. The geometry
+    // below was tuned inside a 158 x 168 card; the card is now 100 x 112, so
+    // every radius and bar length is proportionally half again too big and the
+    // mark starts crowding the value text. Rewriting thirty constants would
+    // have to be redone the next time the card moves — a single transform about
+    // the anchor keeps the drawing and its position independent.
+    canvas.save();
+    canvas.translate(cx, cy);
+    canvas.scale(0.72);
+    canvas.translate(-cx, -cy);
+
+    switch (art) {
+      case TtcInsightArt.level:
+        // Three ascending bars: the shape of a band getting stronger.
+        for (var i = 0; i < 3; i++) {
+          final h = 9.0 + i * 8;
+          canvas.drawRRect(
+              RRect.fromRectAndRadius(
+                  Rect.fromLTWH(cx - 12 + i * 11, cy + 6 - h, 7, h),
+                  const Radius.circular(3)),
+              fill);
+        }
+      case TtcInsightArt.number:
+      case TtcInsightArt.ring:
+        // An open ring - a cycle, with the gap saying it is not finished.
+        canvas.drawArc(Rect.fromCircle(center: Offset(cx, cy), radius: 15),
+            -1.9, 4.9, false, stroke);
+        canvas.drawCircle(Offset(cx + 13, cy - 8), 3.2, fill);
+      case TtcInsightArt.symptom:
+        // A pulse: quiet, one peak, quiet.
+        final path = Path()..moveTo(cx - 20, cy);
+        path.lineTo(cx - 8, cy);
+        path.lineTo(cx - 3, cy - 13);
+        path.lineTo(cx + 3, cy + 8);
+        path.lineTo(cx + 8, cy);
+        path.lineTo(cx + 20, cy);
+        canvas.drawPath(path, stroke);
+      case TtcInsightArt.droplet:
+        final path = Path()
+          ..moveTo(cx, cy - 17)
+          ..quadraticBezierTo(cx + 14, cy - 1, cx, cy + 13)
+          ..quadraticBezierTo(cx - 14, cy - 1, cx, cy - 17)
+          ..close();
+        canvas.drawPath(path, fill);
+      case TtcInsightArt.note:
+        // Lines of text, shortening - a page of something to read.
+        for (var i = 0; i < 4; i++) {
+          canvas.drawLine(Offset(cx - 18, cy - 12 + i * 8),
+              Offset(cx + 18 - i * 7, cy - 12 + i * 8), stroke);
+        }
+      case TtcInsightArt.balance:
+        // Two pans on a beam: the myth on one side, the fact on the other.
+        canvas.drawLine(Offset(cx - 19, cy - 8), Offset(cx + 19, cy - 8),
+            stroke);
+        canvas.drawLine(Offset(cx, cy - 8), Offset(cx, cy + 12), stroke);
+        canvas.drawCircle(Offset(cx - 14, cy + 2), 5, fill);
+        canvas.drawCircle(Offset(cx + 14, cy + 2), 5, fill);
+      case TtcInsightArt.log:
+        canvas.drawCircle(Offset(cx, cy), 15, stroke);
+        canvas.drawLine(Offset(cx - 7, cy), Offset(cx + 7, cy), stroke);
+        canvas.drawLine(Offset(cx, cy - 7), Offset(cx, cy + 7), stroke);
+      case TtcInsightArt.meal:
+        // A bowl.
+        canvas.drawArc(Rect.fromCircle(center: Offset(cx, cy - 2), radius: 16),
+            0.15, 2.85, false, stroke);
+        canvas.drawLine(Offset(cx - 18, cy - 2), Offset(cx + 18, cy - 2),
+            stroke);
+        canvas.drawCircle(Offset(cx, cy - 12), 3.5, fill);
+      case TtcInsightArt.move:
+        // A stride.
+        canvas.drawCircle(Offset(cx + 2, cy - 16), 4.5, fill);
+        canvas.drawLine(Offset(cx + 2, cy - 11), Offset(cx - 2, cy + 1),
+            stroke);
+        canvas.drawLine(Offset(cx - 2, cy + 1), Offset(cx - 11, cy + 11),
+            stroke);
+        canvas.drawLine(Offset(cx - 2, cy + 1), Offset(cx + 9, cy + 11),
+            stroke);
+      case TtcInsightArt.product:
+        canvas.drawRRect(
+            RRect.fromRectAndRadius(
+                Rect.fromLTWH(cx - 15, cy - 12, 30, 26),
+                const Radius.circular(5)),
+            fill);
+        canvas.drawLine(Offset(cx - 15, cy - 4), Offset(cx + 15, cy - 4),
+            stroke);
+    }
+    canvas.restore();
+  }
+
+  @override
+  bool shouldRepaint(_InsightMark old) =>
+      old.art != art || old.ink != ink;
+}
+
+// =============================================================================
+//  KEPT FOR REVERT - the circle rail this replaced
+// -----------------------------------------------------------------------------
+//  Six 66pt bubbles with captions under them. Same six destinations as the
+//  cards above, so nothing was lost by commenting it out; what it could not do
+//  was carry the answer as well as the label, or change from one day to the
+//  next. If the cards turn out to be too heavy for the top of the home, this
+//  goes back with a one-line swap in `_TtcHomeV3State.build`.
+// =============================================================================
+/*
 class _DailyRail extends StatelessWidget {
   const _DailyRail({required this.p, required this.hinglish});
 
@@ -1655,8 +2692,13 @@ class _DailyRail extends StatelessWidget {
     final m = ttcPickForToday(ttcMovements, offset: 2);
     final product = ttcPickForToday(ttcProducts, offset: 4);
 
+    // ⚠️ 104, MEASURED, NOT GUESSED. A circle (66) + gap (8) + a two-line
+    // caption (~26) is 100, so 128 left 28dp of nothing under every bubble —
+    // which landed on top of the section gap below and read on the device as a
+    // hole between the rail and "Start anywhere". A `SizedBox` around a rail
+    // has to be sized to the rail's tallest child, not rounded up for comfort.
     return SizedBox(
-      height: 128,
+      height: 104,
       child: ListView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -1732,6 +2774,22 @@ class _DailyRail extends StatelessWidget {
                 Text(m.body(hi), style: ttcBody(14, color: ttcInk, h: 1.7)),
               ],
             ),
+          ),
+          // ⚠️ THE REPORT LIVES IN THE DAILY RAIL, and that placement was a
+          // decision rather than convenience. It was a button at the FOOT of
+          // the logging screen — the payoff for logging, reachable only by
+          // going back into the thing you had just finished doing. Here it sits
+          // beside the day's content, which is where someone looks when they
+          // want to know what the app has made of their week.
+          _Story(
+            caption: t.reportShort,
+            hue: 160,
+            mark: V3DailyMark.note,
+            p: p,
+            onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+              settings: const RouteSettings(name: 'ttc/cycle_report'),
+              builder: (_) => const TtcCycleReportScreen(),
+            )),
           ),
           _Story(
             caption: t.todaysPick,
@@ -1816,6 +2874,8 @@ class _Story extends StatelessWidget {
   }
 }
 
+*/
+
 /// Products worth having, as a rail.
 class _ProductRail extends StatelessWidget {
   const _ProductRail({required this.p, required this.hinglish});
@@ -1832,12 +2892,16 @@ class _ProductRail extends StatelessWidget {
     ];
 
     return SizedBox(
-      height: 158,
+      // ⚠️ SAME ARITHMETIC AS THE FOCUS RAIL, SAME FIX. 18 + 158 + 11 + 158 is
+      // 345, and the gap that follows pushes the third card to 356 — four
+      // points visible on a 360pt screen, which reads as a clipping bug rather
+      // than as an invitation to swipe. 142 wide with a 10pt gap leaves 38.
+      height: 150,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 18),
         itemCount: picks.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 11),
+        separatorBuilder: (_, _) => const SizedBox(width: 10),
         itemBuilder: (context, i) {
           final product = picks[i];
           final tint = v2BlockTint((344 + (i * 24)) % 360, p);
@@ -1845,8 +2909,8 @@ class _ProductRail extends StatelessWidget {
             onTap: () => openTtcProducts(context),
             borderRadius: BorderRadius.circular(18),
             child: Container(
-              width: 158,
-              padding: const EdgeInsets.all(14),
+              width: 142,
+              padding: const EdgeInsets.all(13),
               decoration: BoxDecoration(
                 color: p.surface,
                 borderRadius: BorderRadius.circular(18),

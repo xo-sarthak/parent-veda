@@ -629,6 +629,63 @@ void openTtcTabV3(BuildContext context, int index) {
   }
 }
 
+/// Which V3 tab a route belongs under.
+///
+/// ⚠️ THIS EXISTS BECAUSE THE NAV BAR WAS REVERTING TO V1's TABS. Reported as
+/// *"the bottom navigation should stay consistent. It changes when I click on
+/// something else, it reverts back to the old navigation bar"* — and it did,
+/// on every screen except two.
+///
+/// The mechanism is worth writing down because the bug is a shape, not a typo.
+/// `TtcBottomNav.v3` was a constructor flag defaulting to false, so which tab
+/// set you saw depended on whether the screen you happened to be on had
+/// remembered to pass it. Exactly two had: the V3 home and More. Everything
+/// reached through `TtcPage` — Tools, Courses, Consults, and every other tab
+/// screen in the stage — inherited the default and drew V1's five tabs under a
+/// V3 app.
+///
+/// **A default that is wrong for most callers is not a default, it is a trap.**
+/// The version is global state, already in `TtcHomeVersionStore`, and a widget
+/// that can read the answer should never be asking each caller to supply it.
+/// So the flag became nullable and null now means "ask the store" — which is
+/// what every caller wanted and none of them could say.
+///
+/// ⚠️ THE ACTIVE INDEX HAD THE SAME PROBLEM, one layer down and much easier to
+/// miss. `TtcPage(tab: 3)` means Calendar in V1 and "Talk to expert" in V3, so
+/// simply fixing the tab SET would have left Calendar highlighting a tab it has
+/// nothing to do with. The index is a V1 index; it has to be translated, not
+/// reused.
+///
+/// Route names are the right key for that because this codebase already treats
+/// them as load-bearing — `global_ask_fab.dart` picks which Ask Veda to open by
+/// reading one.
+int ttcV3ActiveFor(String? route, int v1Active) {
+  switch (route) {
+    case ttcHomeRoute:
+      return 0;
+    case 'ttc/courses':
+      return 1;
+    case 'ttc/tools':
+      return 2;
+    case 'ttc/consults':
+      return 3;
+    case 'ttc/more':
+      return 4;
+  }
+  // ⚠️ EVERYTHING ELSE FALLS TO "MORE", WHICH IS THE TRUTH RATHER THAN A
+  // FALLBACK. V3 dropped Calendar and Community as tabs and reaches them —
+  // along with Journal, Profile and the unscoped Prepare — through `More`. So
+  // "More" really is the tab those screens live under.
+  //
+  // Today and Tools keep their own index because they mean the same thing in
+  // both versions, which is also why they were given identical icons.
+  return switch (v1Active) {
+    0 => 0,
+    2 => 2,
+    _ => 4,
+  };
+}
+
 /// Opens the TTC stage from anywhere (the doorway on the pregnancy Home).
 void openTtc(BuildContext context) {
   Navigator.of(context).push(MaterialPageRoute<void>(
@@ -681,13 +738,14 @@ bool leaveTtcForPregnancy(NavigatorState nav) {
 /// so the parent always knows what each tab is.
 class TtcBottomNav extends StatelessWidget {
   const TtcBottomNav(
-      {super.key, required this.active, this.slate = false, this.v3 = false});
+      {super.key, required this.active, this.slate = false, this.v3});
 
   /// V1: 0 = Today · 1 = Prepare · 2 = Tools · 3 = Calendar · 4 = Community
   /// V3: 0 = Today · 1 = Courses · 2 = Tools · 3 = Talk to expert · 4 = More
   final int active;
 
-  /// V3's tab set instead of V1's.
+  /// V3's tab set instead of V1's. **Null means ask `TtcHomeVersionStore`,**
+  /// which is what almost every caller wants.
   ///
   /// ⚠️ A FLAG ON THE SHARED BAR, NOT A SECOND BAR. The pill, the spacing, the
   /// shadow, the active treatment and the `pvNavClearance` behaviour are the
@@ -695,7 +753,12 @@ class TtcBottomNav extends StatelessWidget {
   /// and chrome drifting is what the shared `PvNavBar` was extracted to stop.
   /// Only the five destinations differ, so only the five destinations are
   /// behind the flag. See `openTtcTabV3` for why they differ at all.
-  final bool v3;
+  ///
+  /// ⚠️ IT USED TO DEFAULT TO `false` AND THAT WAS THE BUG. Only two screens
+  /// passed it, so every other screen in the stage drew V1's tabs under a V3
+  /// app — see `ttcV3ActiveFor` for the full account. An override is still
+  /// accepted for the two screens that know their own answer, and for tests.
+  final bool? v3;
 
   /// The partner's palette. Same five destinations, his colours.
   ///
@@ -739,16 +802,31 @@ class TtcBottomNav extends StatelessWidget {
   // and slate palette are preserved by passing them in.
   @override
   Widget build(BuildContext context) {
-    final t = TtcS.current();
-    final labels = v3 ? _labelsV3(t) : _labels(t);
-    final icons = v3 ? _iconsV3 : _icons;
-    return PvNavBar(
-      items: [
-        for (var i = 0; i < icons.length; i++) PvNavItem(icons[i], labels[i]),
-      ],
-      activeIndex: active,
-      onTap: (i) => v3 ? openTtcTabV3(context, i) : openTtcTab(context, i),
-      accent: slate ? ttcSlate : ttcPurple,
+    // Listening rather than reading once, so flipping the version pill in
+    // Profile repaints every bar already on the stack instead of leaving the
+    // old tab set behind on whatever was underneath it.
+    return ListenableBuilder(
+      listenable: TtcHomeVersionStore.instance,
+      builder: (context, _) {
+        final t = TtcS.current();
+        final onV3 = v3 ??
+            TtcHomeVersionStore.instance.version == TtcHomeVersion.v3;
+        final labels = onV3 ? _labelsV3(t) : _labels(t);
+        final icons = onV3 ? _iconsV3 : _icons;
+        final index = onV3
+            ? ttcV3ActiveFor(ModalRoute.of(context)?.settings.name, active)
+            : active;
+        return PvNavBar(
+          items: [
+            for (var i = 0; i < icons.length; i++)
+              PvNavItem(icons[i], labels[i]),
+          ],
+          activeIndex: index,
+          onTap: (i) =>
+              onV3 ? openTtcTabV3(context, i) : openTtcTab(context, i),
+          accent: slate ? ttcSlate : ttcPurple,
+        );
+      },
     );
   }
 }

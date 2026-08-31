@@ -143,8 +143,12 @@ class _TodayHomeScreenState extends State<TodayHomeScreen> {
           // at the same height on opposite sides, which reads as chrome rather
           // than as content.
           Positioned(
-            bottom: 96,
-            left: 16,
+            // Top right, matching V3's. The version toggle must not MOVE when
+            // it is used — it is the one control that is on screen in both
+            // versions, and a switch that jumps to the other end of the screen
+            // when you press it reads as two different controls.
+            top: MediaQuery.of(context).viewPadding.top + 56,
+            right: 14,
             // TWO CONTROLS, STACKED, ONE CORNER.
             //
             // ⚠️ The version pill is STILL NEEDED and that is not sentiment:

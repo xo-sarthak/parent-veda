@@ -17,6 +17,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/screens/ttc/ttc_partner_screen.dart';
+import 'package:parentveda/screens/ttc/ttc_profile_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/screens/ttc/ttc_today_screen.dart';
 import 'package:parentveda/ttc/cycle_store.dart';
@@ -167,7 +168,12 @@ void main() {
     });
 
     testWidgets('the dev switch is reachable from both sides', (tester) async {
-      await pumpTall(tester, const TtcTodayScreen());
+      // ⚠️ IT LIVES IN PROFILE NOW, and Profile is precisely why that works:
+      // it is the one surface on both versions AND both partners' shells, so a
+      // control for crossing between them can only live there. Pinned to her
+      // Today, the switch was unreachable from his half of the product except
+      // by going back.
+      await pumpTall(tester, const TtcProfileScreen());
       expect(find.text(const TtcS(false).partnerHim), findsOneWidget);
       TtcPartnerMode.instance.on = true;
       await tester.pump();

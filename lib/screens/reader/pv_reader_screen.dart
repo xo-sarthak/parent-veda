@@ -83,9 +83,23 @@ class PvReaderScreen extends StatefulWidget {
     this.openSurface,
     this.openAction,
     this.readTitle,
+    this.hero,
   });
 
   final PvRead read;
+
+  /// An optional picture above the masthead.
+  ///
+  /// ⚠️ A WIDGET, NOT A URL, AND THAT KEEPS THE READER STAGE-NEUTRAL. This
+  /// screen renders pregnancy, parenting and TTC; if it took an image URL it
+  /// would own the fallback behaviour, the sizing and the licence question for
+  /// all three. Taking a widget means the caller decides what a hero IS — TTC
+  /// hands it a photograph that degrades to drawn art — and the reader only
+  /// decides where it goes.
+  ///
+  /// ⚠️ NULL EVERYWHERE ELSE, so pregnancy and parenting render exactly the
+  /// masthead they always have. Same data-not-flag move as the hub's film.
+  final Widget? hero;
 
   /// ⚠️ PASSED IN, NEVER READ FROM A GLOBAL. TTC's language flag is `TtcLang`,
   /// pregnancy's is `AppLanguage` on the controller, and reading the wrong one
@@ -139,16 +153,31 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
     _sc.addListener(_onScroll);
     _store.load();
 
-    // Resume where she left off — but only from a position that is genuinely
-    // mid-read. Jumping her to 3% is worse than starting at the top, and
-    // jumping her to 97% of a piece she finished is worse still.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted || !_sc.hasClients) return;
-      final p = _store.progressOf(a.id);
-      if (p > 0.05 && p < 0.92) {
-        _sc.jumpTo(p * _sc.position.maxScrollExtent);
-      }
-    });
+    // ⚠️ RESUME IS OFF. AN ARTICLE ALWAYS OPENS AT THE TOP.
+    //
+    // This restored her last position on any read she was between 5% and 92%
+    // through, and the reasoning below still holds in the abstract — jumping
+    // someone to 3% is worse than the top, and to 97% worse still.
+    //
+    // What it did in practice is what got it removed: reported as "it starts
+    // from the center, which makes no sense". And that is the real cost of
+    // resume on SHORT content. On a 2,500-word piece, coming back to where you
+    // stopped is a kindness. On a 700-word piece with a picture at the top, it
+    // means the reader never sees the header, cannot tell whether they opened
+    // the right article, and has to scroll UP to orient — which nobody does,
+    // because scrolling up looks like leaving.
+    //
+    // If it comes back it should be conditional on length, and it should show
+    // a "jump to where you were" control rather than moving her silently.
+    // Silent repositioning is the part that reads as a bug.
+    //
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   if (!mounted || !_sc.hasClients) return;
+    //   final p = _store.progressOf(a.id);
+    //   if (p > 0.05 && p < 0.92) {
+    //     _sc.jumpTo(p * _sc.position.maxScrollExtent);
+    //   }
+    // });
   }
 
   @override
@@ -276,6 +305,51 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                 controller: _sc,
                 padding: const EdgeInsets.only(top: 10, bottom: kAskFabReserve + 24),
                 children: [
+                  // ---- THE PICTURE, WHERE THERE IS ONE ---------------------
+                  //
+                  // ⚠️ 132pt, FULL BLEED, AND THE TITLE IS *NOT* ON IT.
+                  //
+                  // The first version was 210pt with the title reversed out
+                  // over a scrim. That looks handsome in a mockup and costs
+                  // more than it earns on a phone: at 210 the picture plus the
+                  // byline filled the first screen, so the reader arrived at an
+                  // article and could not see a word of the article. Type over
+                  // a photograph also has to survive whatever the photograph
+                  // does, which means a scrim, which means dimming the picture
+                  // to protect two lines of text.
+                  //
+                  // 132 with the title beneath solves both: the photo is
+                  // decoration and behaves like it, the title is type on a page
+                  // and is set as such, and the body starts on screen one. That
+                  // last point is the whole test of an article header.
+                  //
+                  // ⚠️ EDGE TO EDGE, not inset with a radius. An inset picture
+                  // reads as a card ABOUT the article; a full-bleed one reads
+                  // as the top of it.
+                  if (widget.hero case final hero?) ...[
+                    SizedBox(
+                      height: 132,
+                      width: double.infinity,
+                      // Half-speed parallax, clamped so an overscroll bounce
+                      // cannot drag the image out of its frame. Scoped to this
+                      // subtree, so a 2,000-word article is not relaying out on
+                      // every frame of a scroll.
+                      child: ClipRect(
+                        child: AnimatedBuilder(
+                          animation: _sc,
+                          builder: (context, child) {
+                            final off = _sc.hasClients ? _sc.offset : 0.0;
+                            return Transform.translate(
+                                offset: Offset(0, (off * 0.4).clamp(0.0, 132.0)),
+                                child: child);
+                          },
+                          child: hero,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 14),
+                  ],
+
                   // ---- THE MASTHEAD ----------------------------------------
                   //
                   // ⚠️ EDITORIAL, NOT DECORATED. No tinted panel, no gradient,
@@ -288,12 +362,32 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                   // they separate "what this is" from "who says so" from "the
                   // argument", which on a clinical page is the distinction that
                   // decides whether she trusts it.
-                  _pad(Text(a.kicker.of(_lang).toUpperCase(),
-                      style: _meta(s, color: s.accent))),
-                  const SizedBox(height: 14),
+                  // ⚠️ THE KICKER IS COMMENTED OUT, NOT DELETED.
+                  //
+                  // "FERTILE WINDOW" in purple caps sat above the title of
+                  // every article in the stage, and the objection to it was
+                  // exactly right: an article is not owned by the section it
+                  // was opened from. The same piece is reachable from the
+                  // checklist, from a journey step, from search and from
+                  // another article's read-next — and on every one of those the
+                  // kicker named a place the reader had not been.
+                  //
+                  // It also cost a full line of the most valuable space on the
+                  // screen to say something the reader already knew.
+                  //
+                  // Kept because a kicker is right where a piece really does
+                  // belong to one series, which is how the parenting stage uses
+                  // it. `PvRead.kicker` stays on the model for that reason.
+                  //
+                  // _pad(Text(a.kicker.of(_lang).toUpperCase(),
+                  //     style: _meta(s, color: s.accent))),
+                  // const SizedBox(height: 14),
+                  // ⚠️ 24, NOT 32, WHERE THERE IS A PICTURE ABOVE IT. A
+                  // 32pt title under a 132pt photo pushes the byline off the
+                  // fold and undoes the reason the photo was shortened.
                   _pad(Text(a.title.of(_lang),
                       style: pvFraunces(
-                          fontSize: 32 * _fs,
+                          fontSize: (widget.hero == null ? 32 : 24) * _fs,
                           height: 1.12,
                           fontWeight: FontWeight.w600,
                           letterSpacing: -0.4,
@@ -306,16 +400,14 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                   // re-read. Roman, one step down in colour, does the same job.
                   _pad(Text(a.teaser.of(_lang),
                       style: pvFraunces(
-                          fontSize: 17.5 * _fs,
-                          height: 1.55,
+                          fontSize: (widget.hero == null ? 17.5 : 14.5) * _fs,
+                          height: 1.5,
                           color: s.soft))),
-                  const SizedBox(height: 22),
-                  _pad(Divider(color: s.rule, height: 1)),
-                  const SizedBox(height: 13),
+                  SizedBox(height: widget.hero == null ? 22 : 14),
                   _pad(_byline(s)),
-                  const SizedBox(height: 13),
+                  const SizedBox(height: 14),
                   _pad(Divider(color: s.rule, height: 1)),
-                  const SizedBox(height: 26),
+                  SizedBox(height: widget.hero == null ? 26 : 16),
 
                   // ---- THE LEDE --------------------------------------------
                   //
@@ -375,7 +467,7 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                     _pad(Text(_t('What you can do with this', 'Ab iska kya karein'),
                         style: _heading(s))),
                     const SizedBox(height: 12),
-                    for (final n in a.nextSteps) _pad(_nextStep(s, n)),
+                    _pad(_nextStepGrid(s, a.nextSteps)),
                     const SizedBox(height: 14),
                   ],
 
@@ -450,32 +542,64 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
   /// ⚠️ NO AVATAR. The circle held a generic person glyph, which is a picture
   /// of nobody — it added 34dp and a shape without adding a fact. On a clinical
   /// page the credential IS the identity, so the credential gets the space.
-  Widget _byline(_Skin s) => Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(a.author.of(_lang),
-                      style: pvJakarta(
-                          fontSize: 13.5,
-                          fontWeight: FontWeight.w700,
-                          color: s.ink)),
-                  const SizedBox(height: 3),
-                  Text(a.authorRole.of(_lang),
-                      style:
-                          pvManrope(fontSize: 12, height: 1.4, color: s.soft)),
-                ]),
-          ),
-          const SizedBox(width: 12),
-          Padding(
-            padding: const EdgeInsets.only(top: 1),
-            child: Text('${a.minutes} ${_t('MIN READ', 'MIN')}',
-                style: _meta(s)),
-          ),
-        ],
-      );
+  /// Avatar, name, and everything else on one line.
+  ///
+  /// ⚠️ ONE META LINE, NOT THREE STACKED FACTS. This was a name, a role on its
+  /// own line, and a "6 MIN READ" pushed out to the right margin — three
+  /// separate things competing above the fold, and the read time so far from
+  /// the name it read as a section label.
+  ///
+  /// Role, review date and read time are all the same KIND of information:
+  /// reasons to trust this and know what it costs you. Collapsed into one
+  /// muted line they take one row instead of three and read as a single
+  /// credential.
+  ///
+  /// ⚠️ INITIALS, NOT A PHOTOGRAPH. There are no author photographs in this
+  /// product and inventing an avatar image pipeline for a byline is not the
+  /// job. Initials in a tinted circle is the convention every publication with
+  /// this problem already uses, and it degrades to nothing if a name is ever
+  /// missing.
+  Widget _byline(_Skin s) {
+    final name = a.author.of(_lang);
+    final initials = name
+        .replaceAll(RegExp(r'^(Dr\.?|Prof\.?)\s+', caseSensitive: false), '')
+        .split(RegExp(r'\s+'))
+        .where((w) => w.isNotEmpty)
+        .take(2)
+        .map((w) => w[0].toUpperCase())
+        .join();
+
+    return Row(children: [
+      Container(
+        width: 30,
+        height: 30,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+            color: s.accent.withValues(alpha: 0.16), shape: BoxShape.circle),
+        child: Text(initials,
+            style: pvManrope(
+                fontSize: 11.5, fontWeight: FontWeight.w800, color: s.accent)),
+      ),
+      const SizedBox(width: 10),
+      Expanded(
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(name,
+                  style: pvJakarta(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: s.ink)),
+              const SizedBox(height: 1),
+              Text(
+                  '${a.authorRole.of(_lang)} \u00B7 '
+                  '${a.minutes} ${_t('min', 'min')}',
+                  maxLines: 2,
+                  style: pvManrope(fontSize: 11, height: 1.35, color: s.soft)),
+            ]),
+      ),
+    ]);
+  }
 
   /// The scale-setter, as a lede rather than as a card.
   ///
@@ -683,8 +807,36 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
 
   // ---- the furniture -------------------------------------------------------
 
+  /// An aside set between rules, not a coloured box.
+  ///
+  /// ⚠️ THE BOX WAS THE PROBLEM, NOT THE COLOUR — and the objection said so
+  /// precisely: *"initially if you look in the article reader that we have, it
+  /// looks very clean and minimalistic... and suddenly these things come and it
+  /// just ruins it. Now this is not an issue with it being purple. It's an
+  /// issue with the structure."*
+  ///
+  /// That is exactly right, and it is worth naming the mechanism because the
+  /// instinct that produced it is a common one. This was a filled panel with a
+  /// 3px coloured bar down its left edge and a 16pt corner radius — three
+  /// separate devices, all saying "this is a different KIND of thing". On a
+  /// page whose entire visual argument is quiet type on a plain ground, a
+  /// filled rounded rectangle is the loudest object present. It does not read
+  /// as emphasis; it reads as a component from a different app that landed
+  /// mid-paragraph. The left bar makes it worse by adding a vertical the page
+  /// has nowhere else, so it looks pinned on rather than set in.
+  ///
+  /// A magazine solves this with rules and space, which is what the reader
+  /// already uses around the byline. So: a hairline above, the note, a hairline
+  /// below. No fill, no radius, no border. The aside is separated by the same
+  /// device the rest of the page is separated by, so it belongs to it.
+  ///
+  /// ⚠️ TONE SURVIVES AS AN ICON AND A RULE WEIGHT. It still has to be possible
+  /// to tell "worth knowing" from "call someone" at a glance — an urgent
+  /// callout that looks identical to a note is a safety problem, not a style
+  /// one. Urgent gets a heavier top rule in its own colour; the others get the
+  /// page's own hairline. One signal, no container.
   Widget _callout(_Skin s, PvCallout c) {
-    final (Color bar, IconData icon) = switch (c.tone) {
+    final (Color tone, IconData icon) = switch (c.tone) {
       PvCalloutTone.note => (s.accent, Icons.info_outline_rounded),
       PvCalloutTone.reassure =>
         (const Color(0xFF3F9E7C), Icons.favorite_border_rounded),
@@ -693,31 +845,34 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
       PvCalloutTone.urgent =>
         (const Color(0xFFC98A25), Icons.phone_in_talk_outlined),
     };
+    final urgent = c.tone == PvCalloutTone.urgent;
 
-    return Container(
-      padding: const EdgeInsets.fromLTRB(15, 14, 15, 15),
-      decoration: BoxDecoration(
-        color: s.panel,
-        borderRadius: BorderRadius.circular(16),
-        border: Border(left: BorderSide(color: bar, width: 3)),
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          Icon(icon, size: 17, color: bar),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(c.title.of(_lang),
-                style: pvJakarta(
-                    fontSize: 14.5 * _fs,
-                    fontWeight: FontWeight.w700,
-                    color: s.ink)),
-          ),
-        ]),
-        const SizedBox(height: 8),
-        Text(c.body.of(_lang),
-            style: pvManrope(fontSize: 14 * _fs, height: 1.62, color: s.soft)),
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Container(
+          height: urgent ? 1.6 : 1,
+          color: urgent ? tone.withValues(alpha: 0.45) : s.rule),
+      const SizedBox(height: 13),
+      Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: Icon(icon, size: 15, color: tone),
+        ),
+        const SizedBox(width: 9),
+        Expanded(
+          child: Text(c.title.of(_lang),
+              style: pvJakarta(
+                  fontSize: 14.5 * _fs,
+                  height: 1.35,
+                  fontWeight: FontWeight.w700,
+                  color: s.ink)),
+        ),
       ]),
-    );
+      const SizedBox(height: 7),
+      Text(c.body.of(_lang),
+          style: pvManrope(fontSize: 14 * _fs, height: 1.62, color: s.soft)),
+      const SizedBox(height: 14),
+      Container(height: 1, color: s.rule),
+    ]);
   }
 
   /// An open aside, not a dropdown.
@@ -852,7 +1007,27 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            Icon(Icons.verified_outlined, size: 16, color: s.soft),
+            // ⚠️ THE FILLED BADGE, IN BLUE, BECAUSE THAT GLYPH IS ALREADY
+            // LEARNED. Asked for directly: *"make it dark blue like the way we
+            // have on Instagram or something, so that it lets the user
+            // understand that hey, it's a verified situation."*
+            //
+            // Which is the right instinct and worth stating as a rule: a
+            // convention every user already carries in from another app is
+            // worth more than a house style nobody has learned yet. Outlined
+            // and grey, this was a decorative tick that read as a bullet. The
+            // filled blue mark says "checked by someone" before a word of the
+            // label is read — and this block is the one place on the page where
+            // that claim is literally true.
+            //
+            // The blue lifts on a dark ground so it stays a badge rather than
+            // a smudge; the same hue at the same value would disappear against
+            // #17151C.
+            Icon(Icons.verified_rounded,
+                size: 16,
+                color: s.bg.computeLuminance() < 0.4
+                    ? const Color(0xFF52A9F5)
+                    : const Color(0xFF1668C1)),
             const SizedBox(width: 8),
             Text(_t('WHERE THIS COMES FROM', 'YE KAHAN SE AAYA'),
                 style: _meta(s)),
@@ -897,31 +1072,166 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
 
   // ---- the foot ------------------------------------------------------------
 
-  Widget _nextStep(_Skin s, PvReadNextStep n) => Padding(
-        padding: const EdgeInsets.only(bottom: 10),
-        child: SolutionCard(
-          type: switch (n.kind) {
-            PvNextKind.read => SolutionType.read,
-            PvNextKind.watch => SolutionType.watch,
-            PvNextKind.tool => SolutionType.tool,
-            PvNextKind.activity => SolutionType.activity,
-            PvNextKind.product => SolutionType.product,
-            PvNextKind.course => SolutionType.course,
-            PvNextKind.consult => SolutionType.consult,
-          },
-          title: n.title,
-          value: n.value,
-          p: V2PaletteStore.instance.current,
-          lang: _lang,
-          onTap: () {
-            if (n.action != null) {
-              widget.openAction?.call(context, n.action!);
-            } else if (n.surfaceId != null) {
-              widget.openSurface?.call(context, n.surfaceId!);
-            }
-          },
+  /// The things to do with this article, as blocks rather than as list rows.
+  ///
+  /// ⚠️ THIS DROPPED `SolutionCard`, AND THE REASON IS THE ICON WELL. Asked for
+  /// directly - *"the representation of these two tools, do it in the same way
+  /// that is happening on the initial doors... that representation of that
+  /// thumbnail"* - and the specific thing being reacted to was the 52pt rounded
+  /// square holding the icon, filled with a vertical two-stop gradient. A
+  /// gradient is a texture, and a texture inside a page made entirely of flat
+  /// type and hairlines is the one element that looks like it came from
+  /// somewhere else.
+  ///
+  /// ⚠️ THE SHARED COMPONENT IS UNTOUCHED. `SolutionCard` still renders exactly
+  /// as it did on every hub in Pregnancy and Parenting, where it is correct - a
+  /// dense list of many options wants a compact row with a strong left anchor.
+  /// The change is that the READER no longer uses it. Editing the shared card
+  /// to satisfy one surface would have moved the gradient complaint to three
+  /// screens nobody was looking at, which is the trade this repo has made
+  /// before and paid for.
+  ///
+  /// ⚠️ AND THE ONE-LINE REASON SURVIVES ONTO THE FACE. The focus-page tile
+  /// drops its blurb because tapping it opens a sheet that shows it. Here
+  /// tapping opens the tool directly, so a dropped reason is a reason nobody
+  /// ever reads - and `SolutionCard`'s own contract says a card with a title
+  /// and no reason is just a link. It is set small and muted under the title.
+  ///
+  /// Two across, because two is what makes a pair read as a SET rather than as
+  /// two unrelated buttons stacked. A third wraps to the next row and sits
+  /// half-width, which looks deliberate; a full-width third would not.
+  Widget _nextStepGrid(_Skin s, List<PvReadNextStep> steps) {
+    const gap = 10.0;
+    final rows = <Widget>[];
+    for (var i = 0; i < steps.length; i += 2) {
+      final pair = steps.skip(i).take(2).toList();
+      rows.add(Padding(
+        padding: EdgeInsets.only(bottom: i + 2 < steps.length ? gap : 0),
+        // ⚠️ NO `CrossAxisAlignment.stretch` HERE — IT CRASHES. `stretch` tells
+        // each child to take the Row's full cross-axis extent, which means the
+        // Row must first KNOW its own height. Inside a `Column` inside a
+        // `ListView` the height is unbounded, so the Row hands its children
+        // `h=Infinity` and layout throws `BoxConstraints forces an infinite
+        // height`, taking the whole article down with it.
+        //
+        // The fix is not `IntrinsicHeight` — the tiles already declare
+        // `_nextStep`'s own fixed height, so they are equal without being told
+        // to be, and the default `start` alignment is correct. Reaching for
+        // `stretch` was solving a problem that did not exist and creating one
+        // that did.
+        child: Row(children: [
+          for (var j = 0; j < pair.length; j++) ...[
+            if (j > 0) const SizedBox(width: gap),
+            Expanded(child: _nextStep(s, pair[j])),
+          ],
+          // Keeps a lone trailing tile half-width instead of letting it stretch
+          // into a shape no other tile on the page has.
+          if (pair.length == 1) ...[
+            const SizedBox(width: gap),
+            const Expanded(child: SizedBox.shrink()),
+          ],
+        ]),
+      ));
+    }
+    return Column(children: rows);
+  }
+
+  Widget _nextStep(_Skin s, PvReadNextStep n) {
+    final type = switch (n.kind) {
+      PvNextKind.read => SolutionType.read,
+      PvNextKind.watch => SolutionType.watch,
+      PvNextKind.tool => SolutionType.tool,
+      PvNextKind.activity => SolutionType.activity,
+      PvNextKind.product => SolutionType.product,
+      PvNextKind.course => SolutionType.course,
+      PvNextKind.consult => SolutionType.consult,
+    };
+
+    final p = V2PaletteStore.instance.current;
+    final tint = v2BlockTint(type.hue % 360, p);
+    final deep = HSLColor.fromColor(tint)
+        .withSaturation(0.46)
+        .withLightness(0.34)
+        .toColor();
+
+    return InkWell(
+      onTap: () {
+        if (n.action != null) {
+          widget.openAction?.call(context, n.action!);
+        } else if (n.surfaceId != null) {
+          widget.openSurface?.call(context, n.surfaceId!);
+        }
+      },
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        height: 172,
+        decoration: BoxDecoration(
+          color: tint,
+          borderRadius: BorderRadius.circular(18),
         ),
-      );
+        clipBehavior: Clip.antiAlias,
+        child: Stack(children: [
+          // ⚠️ THE MARK IS THE PICTURE, cropped by the block's own edge rather
+          // than sitting in a well of its own. Same device as the focus rail:
+          // it fills the space an illustration will eventually take, at an
+          // alpha low enough that the title never has to fight it.
+          Positioned(
+            right: -22,
+            bottom: -14,
+            child: Icon(type.icon,
+                size: 108, color: Colors.white.withValues(alpha: 0.42)),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(13),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.82),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      Icon(type.icon, size: 10, color: deep),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(type.chip(_lang),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: pvManrope(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.6,
+                                color: deep)),
+                      ),
+                    ]),
+                  ),
+                  const Spacer(),
+                  Text(n.title.of(_lang),
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvFraunces(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w600,
+                          height: 1.22,
+                          letterSpacing: -0.3,
+                          color: p.ink1)),
+                  const SizedBox(height: 5),
+                  Text(n.value.of(_lang),
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvManrope(
+                          fontSize: 10.5,
+                          height: 1.32,
+                          color: p.ink2.withValues(alpha: 0.9))),
+                ]),
+          ),
+        ]),
+      ),
+    );
+  }
 
   Widget _readNext(_Skin s, String id) {
     final title = widget.readTitle?.call(id);

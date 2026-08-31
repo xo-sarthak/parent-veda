@@ -411,6 +411,22 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
   final Set<PregPriority> _pregPriorities = {};
   DietPreference? _diet;
   Parity? _parity;
+  /// Her date of birth, asked once at onboarding and read everywhere.
+  ///
+  /// ⚠️ THE DATE, NOT THE AGE. An age is correct for at most a year and then
+  /// silently wrong — and "silently" is the problem, because nothing would fail.
+  /// A woman who onboards at 34 and gets reassuring copy for the next three
+  /// birthdays is the exact failure the clinical thresholds exist to prevent.
+  /// Store the fact that does not change; derive the number that does.
+  ///
+  /// ⚠️ AND IT LIVES HERE RATHER THAN IN A TOOL, because two tools already want
+  /// it. The IVF readiness check asks for an age band as its first question; the
+  /// PCOS self-read has a referral rule it cannot fire without one. Left to
+  /// themselves that is the same question asked twice, in two vocabularies,
+  /// with no guarantee the answers agree. `FamilyProfileStore` is the app-wide
+  /// profile and this is an app-wide fact.
+  DateTime? _dob;
+
   /// Only consulted for trying-to-conceive; pregnancy and parenting are derived.
   JourneyStage? _declaredStage;
   final Set<ProfileField> _asked = {}; // fields already prompted (don't nag)
@@ -433,6 +449,30 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
   bool get nicu => _nicu;
   bool get multiple => _multiple;
   bool get onboarded => _onboarded;
+
+  DateTime? get dob => _dob;
+
+  /// Her age in whole years, or null if we have never been told.
+  ///
+  /// ⚠️ COMPUTED ON EVERY READ, AND THAT IS THE POINT. See [_dob].
+  ///
+  /// ⚠️ THE BIRTHDAY EDGE IS HANDLED, and it is the kind of arithmetic that is
+  /// wrong in a lot of shipped code: subtracting years alone makes someone a
+  /// year older on 1 January rather than on their birthday. Someone born in
+  /// November is 34 until November, not from the New Year — and a clinical rule
+  /// that hinges on 35 must not fire two months early.
+  int? get age {
+    final d = _dob;
+    if (d == null) return null;
+    final now = DateTime.now();
+    var years = now.year - d.year;
+    if (now.month < d.month || (now.month == d.month && now.day < d.day)) {
+      years -= 1;
+    }
+    // A future or absurd date is bad input rather than a person, and returning
+    // a negative age would quietly disable every rule that reads this.
+    return years < 0 || years > 120 ? null : years;
+  }
 
   bool hasCondition(HealthCondition c) => _conditions.contains(c);
   bool wants(Priority p) => _priorities.contains(p);
@@ -867,6 +907,11 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
     _nicu = m['nicu'] == true;
     _multiple = m['multiple'] == true;
     _onboarded = m['onboarded'] == true;
+    // ⚠️ `tryParse`, NOT `parse`. A malformed stored value must leave her
+    // profile loadable — the alternative is a throw during startup that empties
+    // everything else in it too.
+    final rawDob = m['dob'];
+    _dob = rawDob is String ? DateTime.tryParse(rawDob) : null;
     _feedings
       ..clear()
       ..addAll(_decode(m['feedings'], FeedingMethod.values));
@@ -952,8 +997,28 @@ class FamilyProfileStore extends ChangeNotifier with CloudSyncedStore {
         'diet': _diet?.name,
         'parity': _parity?.name,
         'stage': _declaredStage?.name,
+        // ⚠️ DATE ONLY, NO TIME, NO ZONE. `toIso8601String()` on a local
+        // DateTime would carry a time that means nothing here and would shift a
+        // birthday across a zone change. Ten characters, unambiguous.
+        'dob': _dob == null
+            ? null
+            : '${_dob!.year.toString().padLeft(4, '0')}-'
+                '${_dob!.month.toString().padLeft(2, '0')}-'
+                '${_dob!.day.toString().padLeft(2, '0')}',
         'perChild': {..._perChild, _bucketId: _childBucket()},
       };
+
+  /// Record her date of birth. Asked at onboarding; changeable in Profile.
+  ///
+  /// ⚠️ NULL IS A LEGITIMATE VALUE. Clearing it has to be possible — someone who
+  /// entered the wrong year should be able to remove it rather than being stuck
+  /// with a number that changes what the app tells her about her own fertility.
+  /// Every rule that reads [age] already handles null, because null is the
+  /// state the app has been in until now.
+  Future<void> setDob(DateTime? value) async {
+    _dob = value == null ? null : DateTime(value.year, value.month, value.day);
+    await _save(field: 'dob', value: value == null ? null : 'set');
+  }
 
   /// [field]/[value] are for analytics only. Firing from HERE rather than from
   /// each screen means a new consumer cannot forget to report a change - the

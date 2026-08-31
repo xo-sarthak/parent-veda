@@ -4001,7 +4001,21 @@ class S {
   String get uiFewQuietMinutesFocused => _p('A few quiet minutes of focused calm.', 'कुछ शांत मिनट, पूरी तरह ठहरे हुए।');
   String get uiNothingSelectedYetTap => _p('Nothing selected yet. Tap Customize to choose what to read to your baby.', 'अभी कुछ नहीं चुना। शिशु को क्या सुनाना है, यह चुनने के लिए "अपने हिसाब से" दबाइए।');
   String get uiDone => _p('Done', 'हो गया');
-  String get uiPostPregnancy => _p('Post-Pregnancy', 'जन्म के बाद');
+  /// ⚠️ THE DOORWAY SAYS "PARENTING", NOT "POST-PREGNANCY".
+  ///
+  /// The stage is called post-pregnancy internally — the folder, the classes,
+  /// the `pp_` prefix all keep that name and should, because renaming an
+  /// identity for a copy change is how a codebase ends up with two words for
+  /// one thing.
+  ///
+  /// But "Post-Pregnancy" describes the door from the pregnancy side of the
+  /// product, which is precisely the side the person walking through it is
+  /// leaving. What is on the other side is parenting. A doorway is named after
+  /// where it goes.
+  ///
+  /// The Devanagari was already right — जन्म के बाद is "after the birth",
+  /// which names the destination rather than the departure.
+  String get uiPostPregnancy => _p('Parenting', 'जन्म के बाद');
   String get uiBabySArrivedStep => _p('Baby\'s arrived? Step into the parenting app', 'शिशु आ गया? परवरिश वाले ऐप में चलिए');
   String get uiBest => _p('BEST', 'सबसे बेहतर');
   String get uiBudget => _p('BUDGET', 'कम दाम');

@@ -76,7 +76,23 @@ class PpHomeScreen extends StatelessWidget {
           // experiment being covered by the thing it is meant to be compared
           // against. Pregnancy puts its version pill bottom-left for the same
           // reason.
-          const Positioned(left: 16, bottom: 96, child: _Pill()),
+          // ⚠️ TOP RIGHT, NOT FLOATING AT THE BOTTOM — and the bottom was not
+          // a near miss that wanted nudging.
+          //
+          // The floating pill lived in the bottom strip, which on this screen
+          // is the busiest real estate in the app: the tab bar sits there, the
+          // Ask FAB sits there, and the bar's height moves with the device's
+          // system navigation inset. Two attempts at clearing it produced a
+          // control that was correct on one handset and invisible on the next.
+          //
+          // The top strip has none of those problems: nothing floats over it,
+          // its offset depends on one inset we can read exactly, and the eye
+          // is already there because the header is. `+56` puts it clear of the
+          // header's own icon row rather than on top of it.
+          Positioned(
+              right: 14,
+              top: MediaQuery.of(context).viewPadding.top + 56,
+              child: const _Pill()),
         ]);
       },
     );

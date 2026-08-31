@@ -2475,7 +2475,7 @@ first-run flow were rebuilt against a handwritten spec benchmarked on iMumz
 header and the daily rail). Three things could not be finished in code — two of
 them are content, and the third is a decision.
 
-### 17.1 Nine video slots are declared and none has a file — PRODUCTION, not code
+### 17.1 Eleven video slots are declared and none has a file — PRODUCTION, not code
 
 Every slot renders `PvVideoPlaceholder` — real 16:9 geometry, the title in the
 type it will use, and deliberately **not tappable**, so nobody taps a play
@@ -2485,15 +2485,19 @@ control that plays nothing. What is missing is the file and only the file.
   Two slots, not one: `ttc_intro_en` and `ttc_intro_hi`, chosen by the language
   picked one screen earlier. A single id would have guaranteed English audio for
   a Hindi user the day the files landed.
-* **One per door screen** — seven, `<bracketId>_intro`, declared on the TTC hub
+* **One per door screen** — six, `<bracketId>_intro`, declared on the TTC hub
   configs in `lib/data/hubs/ttc_hubs.dart`. `ProblemHubScreen` shows the film
   where a slot is set and the old support line where it is not, so pregnancy and
   parenting are untouched. `test/ttc_intro_flow_test.dart` holds both halves of
   that: every TTC hub has a slot, and no other stage's does.
+* **The conceiving focus page** — `ttc_conceiving_intro` at the top of the page,
+  plus two films inside it: `ttc_video_sperm_health` and `ttc_video_pressure`.
+  Held by `test/ttc_focus_page_test.dart`, which asserts no two tiles share a
+  slot — two films on one id means one of them can never be delivered.
 
-**Nine films in two languages is eighteen assets.** Worth costing before
-commissioning, and worth asking whether the seven door films should be shorter
-than the introduction.
+**Eleven films is a real content bill**, and more if the introduction is made in
+both languages. Worth costing before commissioning, and worth asking whether the
+door films should be much shorter than the introduction.
 
 All of it needs self-hosted MP4/HLS. **YouTube is dead** — tested to exhaustion
 on 2026-07-12, systemically blocked, code removed. Supabase Storage now, Bunny

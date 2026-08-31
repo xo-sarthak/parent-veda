@@ -18,6 +18,7 @@
 
 import 'package:flutter/material.dart';
 
+
 import '../../theme/app_theme.dart';
 import 'ttc_common.dart';
 import 'ttc_home_v3.dart';
@@ -107,18 +108,25 @@ class _TtcHomeBody extends StatelessWidget {
             TtcHomeVersion.v1 => const TtcTodayScreen(),
             TtcHomeVersion.v3 => const TtcHomeV3(),
           },
-          // ⚠️ LEFT AND HIGH, not bottom-right. TTC's Ask FAB has its own
-          // clearance rules — `test/ttc_fab_clearance_test.dart` exists because
-          // this stage's bottom-right corner is already spoken for — and a
-          // control that switches the experiment must not sit under the thing
-          // it is being compared against.
-          // Top right, like the other two stages. See the note in
-          // pp_home_version.dart for why the bottom strip was the wrong place
-          // for it in the first place.
-          Positioned(
-              right: 14,
-              top: MediaQuery.of(context).viewPadding.top + 56,
-              child: const _Pill()),
+          // ⚠️ ON `Current` ONLY. V3 CARRIES IT IN PROFILE INSTEAD.
+          //
+          // Asymmetric on purpose, and the asymmetry is the whole point:
+          //
+          //   · **Current is what boots.** A toggle that only exists inside V3
+          //     is unreachable from the version that actually opens, so V3
+          //     would be a feature nobody could find. It has to float here.
+          //   · **V3 is the design being evaluated.** A sandbox pill parked
+          //     over it appears in every screenshot and sits on the door grid
+          //     and the FAB clearance, so on that side it belongs in Profile —
+          //     where it is one tap from the avatar and out of the picture.
+          //
+          // Both are reachable. Only the placement differs, and it differs
+          // because the two versions are being looked at for different reasons.
+          if (TtcHomeVersionStore.instance.version == TtcHomeVersion.v1)
+            Positioned(
+                right: 14,
+                top: MediaQuery.of(context).viewPadding.top + 56,
+                child: const _Pill()),
         ]),
       );
 }

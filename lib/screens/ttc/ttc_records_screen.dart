@@ -21,6 +21,8 @@ import '../../ttc/ttc_records_store.dart';
 import '../../ttc/ttc_tests_data.dart';
 import 'ttc_attachments.dart';
 import 'ttc_common.dart';
+import 'ttc_ivf_readiness_screen.dart' show kIvfHue;
+import 'ttc_tool_chrome.dart';
 import 'ttc_strings.dart';
 
 void openTtcRecords(BuildContext context, {bool resultsOnly = false}) {
@@ -59,33 +61,37 @@ class _TtcRecordsScreenState extends State<TtcRecordsScreen> {
           records = records.where((r) => r.forPartner == _partner).toList();
         }
 
-        return Scaffold(
-          backgroundColor: ttcBg,
-          body: SafeArea(
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(
-                  ttcGutter, 8, ttcGutter, ttcBottomInset),
-              children: [
-                TtcBackBar(
-                  title: widget.resultsOnly ? t.recordsReports : t.recordsTitle,
-                  trailing: GestureDetector(
-                    onTap: () => _add(context),
-                    behavior: HitTestBehavior.opaque,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 13, vertical: 8),
-                      decoration: BoxDecoration(
-                          color: ttcPurple,
-                          borderRadius: BorderRadius.circular(999)),
-                      child: Text(t.recordsAdd,
-                          style: ttcBody(12,
-                              color: Colors.white, w: FontWeight.w800)),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(t.recordsIntro, style: ttcBody(13.5, h: 1.6)),
-                const SizedBox(height: 18),
+        // ⚠️ V3 CHROME, SHELL ONLY. Every list, dialog and store call below is
+        // untouched — a tool reached from a focus page has to look like it
+        // belongs to the page that sent her, and this one still wore a flat
+        // ground and a back bar. See `ttc_tool_chrome.dart`.
+        //
+        // ⚠️ "ADD" MOVED INTO THE HERO RATHER THAN INTO THE SHEET. It was the
+        // back bar's trailing widget; dropping it in as the first row of the
+        // list would put a control above the content it acts on. The hero's
+        // `action` slot is where it belongs — top right, opposite the way out,
+        // exactly where it already was.
+        return TtcToolScaffold(
+          hue: kIvfHue,
+          eyebrow: widget.resultsOnly ? t.recordsReports : t.recordsTitle,
+          title: 'Every result and letter, in one place.',
+          intro: t.recordsIntro,
+          action: GestureDetector(
+            onTap: () => _add(context),
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
+              decoration: BoxDecoration(
+                  color: ttcPurple,
+                  borderRadius: BorderRadius.circular(999)),
+              child: Text(t.recordsAdd,
+                  style: ttcBody(12,
+                      color: Colors.white, w: FontWeight.w800)),
+            ),
+          ),
+          children: [
+                const SizedBox(height: 22),
 
                 // Both people, together, by default.
                 Container(
@@ -128,9 +134,8 @@ class _TtcRecordsScreenState extends State<TtcRecordsScreen> {
                         style: ttcBody(11.5, color: ttcMuted, h: 1.5)),
                   ),
                 ]),
-              ],
-            ),
-          ),
+                const SizedBox(height: 26),
+          ],
         );
       },
     );

@@ -159,6 +159,7 @@ class HubConfig {
     this.urgent,
     this.closing,
     this.heroVideoSlot,
+    this.heroVideoTitle,
   });
 
   /// Must match a `Bracket.id`. The renderer looks the bracket up and asks the
@@ -197,6 +198,17 @@ class HubConfig {
   /// duplication that makes a hero twice as tall to carry one fact. The line
   /// survives as the placeholder's subtitle until a real file lands.
   final String? heroVideoSlot;
+
+  /// ⚠️ THE FILM'S NAME, NOT THE HERO'S. Without this the placeholder was handed
+  /// `hero`, so the door screen printed "PCOS, without the panic." as its
+  /// heading and again on the thumbnail directly beneath it. A page title says
+  /// where you are; a video title says what the video is, and when they are the
+  /// same string the thumbnail carries no information at all.
+  ///
+  /// This is the fourth time that mistake has been made in this codebase. If
+  /// you are about to pass an existing on-screen string into a placeholder,
+  /// don't.
+  final LocalizedText? heroVideoTitle;
 
   final LocalizedText needsTitle;
 

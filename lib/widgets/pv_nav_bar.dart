@@ -166,3 +166,72 @@ class PvNavBar extends StatelessWidget {
     );
   }
 }
+
+// =============================================================================
+//  Clearance for anything that floats above the tab bar
+// -----------------------------------------------------------------------------
+//  ⚠️ THE BUG THIS FIXES: every floating control in the app was pinned at a
+//  hardcoded `bottom: 96`, and on a real phone the version toggle sat BEHIND
+//  the navigation bar. Reported as "the toggle to switch to version 3 is not
+//  visible, it's behind the navigation bar at the bottom."
+//
+//  96 was not a wrong guess, it was a guess that only held on one device. The
+//  bar does not sit at the bottom of the screen — it sits above the SYSTEM
+//  inset, and that inset is not a constant:
+//
+//      gesture navigation   ~24dp
+//      three-button nav     ~48dp
+//      no software nav       0dp
+//
+//  So the bar's top edge lands anywhere between 77 and 125 from the bottom of
+//  the stack, and a control pinned at 96 is comfortably clear on one handset
+//  and half-swallowed on the next. Nothing errors, nothing overflows; the
+//  control is simply painted underneath an opaque white pill.
+//
+//  ⚠️ IT IS ALSO A PAINT-ORDER TRAP, and the two stages behave differently.
+//  In `main_scaffold` the pill is a sibling of the bar and drawn after it, so
+//  the overlap merely looks wrong. In parenting and TTC the pill lives INSIDE
+//  the page, which the floating bar is drawn on top of — so there the overlap
+//  genuinely hides it. Same offset, two different symptoms, which is why this
+//  was easy to look at and not see.
+//
+//  The measurements below mirror `PvNavBar.build` and `PvTabBar.build` exactly.
+//  If either changes its padding, change it here — they are one component's
+//  geometry described in two places, and that is the cost of not being able to
+//  measure a widget that has not been laid out yet.
+// =============================================================================
+
+/// Height of the bar itself: icon 22 + gap 3 + an 11pt label line, inside the
+/// item's 2dp and the container's 10dp vertical padding.
+const double _kNavBarHeight = 22 + 3 + 15 + (2 * 2) + (10 * 2);
+
+/// The gap `PvTabBar` leaves under the bar.
+const double _kNavBarBottomInset = 14;
+
+/// The distance from the bottom of a full-screen `Stack` at which a floating
+/// control clears the tab bar, on THIS device.
+///
+/// Use it instead of a literal for anything in the bottom strip — version
+/// pills, testing toggles, an Ask FAB.
+///
+/// [gap] is the breathing room above the bar.
+///
+/// ⚠️ THE DEFAULT IS DELIBERATELY GENEROUS, because a tight one was still
+/// reported as hidden on a real device after the inset maths was corrected.
+/// The remaining variables are ones this helper cannot see from here — a
+/// larger text scale grows the bar's label line, and the shadow under the bar
+/// extends past its box. Rather than keep chasing a number that must be exactly
+/// right, this clears the bar by an obvious margin: the pill is testing chrome
+/// that comes out before launch, so sitting a little high costs nothing and
+/// being invisible costs a build.
+///
+/// ⚠️ `viewPadding`, NOT `padding`. `MediaQuery.padding` collapses to zero once
+/// an ancestor `SafeArea` has consumed the inset, so a control inside one would
+/// compute a clearance that ignores the system bar entirely — which is the
+/// original bug with extra steps. `viewPadding` reports the physical inset
+/// whoever else has already handled it.
+double pvNavClearance(BuildContext context, {double gap = 78}) =>
+    MediaQuery.of(context).viewPadding.bottom +
+    _kNavBarBottomInset +
+    _kNavBarHeight +
+    gap;

@@ -25,6 +25,8 @@ import '../../booking/booking_store.dart';
 import '../../ttc/ttc_journal_store.dart';
 import '../../ttc/ttc_records_store.dart';
 import 'ttc_common.dart';
+import 'ttc_ivf_readiness_screen.dart' show kIvfHue;
+import 'ttc_tool_chrome.dart';
 import 'ttc_journal_screen.dart';
 import 'ttc_strings.dart';
 
@@ -97,33 +99,33 @@ class TtcAppointmentsScreen extends StatelessWidget {
             entries.where((e) => !e.startsUtc.isAfter(now)).toList().reversed;
         final questions = TtcJournalStore.instance.doctorQuestions;
 
-        return Scaffold(
-          backgroundColor: ttcBg,
-          body: SafeArea(
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(
-                  ttcGutter, 8, ttcGutter, ttcBottomInset),
-              children: [
-                TtcBackBar(
-                  title: t.appointmentsTitle,
-                  trailing: GestureDetector(
-                    onTap: () => addTtcAppointment(context),
-                    behavior: HitTestBehavior.opaque,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 13, vertical: 8),
-                      decoration: BoxDecoration(
-                          color: ttcPurple,
-                          borderRadius: BorderRadius.circular(999)),
-                      child: Text(t.appointmentsAdd,
-                          style: ttcBody(12,
-                              color: Colors.white, w: FontWeight.w800)),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 16),
-                Text(t.appointmentsIntro, style: ttcBody(13.5, h: 1.6)),
-                const SizedBox(height: 20),
+        // ⚠️ V3 CHROME, SHELL ONLY. Every list, dialog and store call below is
+        // untouched. A tool reached from a focus page has to look like it
+        // belongs to the page that sent her, and this one still wore a flat
+        // ground and a back bar. See `ttc_tool_chrome.dart`.
+        return TtcToolScaffold(
+          hue: kIvfHue,
+          eyebrow: t.appointmentsTitle,
+          // Monitoring scans arrive at short notice, which is the whole reason
+          // this screen exists during a treatment cycle.
+          title: 'Where you have to be, and when.',
+          intro: t.appointmentsIntro,
+          action: GestureDetector(
+            onTap: () => addTtcAppointment(context),
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
+              decoration: BoxDecoration(
+                  color: ttcPurple,
+                  borderRadius: BorderRadius.circular(999)),
+              child: Text(t.appointmentsAdd,
+                  style: ttcBody(12,
+                      color: Colors.white, w: FontWeight.w800)),
+            ),
+          ),
+          children: [
+                const SizedBox(height: 22),
 
                 ttcSectionTitle(t.calendarUpcoming),
                 if (upcoming.isEmpty)
@@ -211,9 +213,8 @@ class TtcAppointmentsScreen extends StatelessWidget {
                       : 'This holds only what you or ParentVeda added. Nothing is pulled from your clinic automatically.',
                   style: ttcBody(11.5, color: ttcMuted, h: 1.5),
                 ),
-              ],
-            ),
-          ),
+                const SizedBox(height: 26),
+          ],
         );
       },
     );

@@ -19,6 +19,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/screens/ttc/ttc_common.dart';
+import 'package:parentveda/screens/ttc/ttc_profile_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/screens/ttc/ttc_today_screen.dart';
 import 'package:parentveda/services/life_stage_store.dart';
@@ -89,8 +90,12 @@ void main() {
     });
 
     testWidgets('and both appear on the switch', (tester) async {
+      // ⚠️ THE SWITCH MOVED TO PROFILE, so this pumps Profile. The invariant is
+      // unchanged and is the reason the test exists: a two-way control whose
+      // halves read the same word is a control you cannot tell the state of.
+      // Where it lives is a product decision; that it says two things is not.
       TtcLang.instance.hinglish = true;
-      await pumpTall(tester, const TtcTodayScreen());
+      await pumpTall(tester, const TtcProfileScreen());
       const t = TtcS(true);
       expect(find.text(t.partnerHer), findsOneWidget);
       expect(find.text(t.partnerHim), findsOneWidget);

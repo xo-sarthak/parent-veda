@@ -188,15 +188,39 @@ void main() {
       // to coral - which is what made TTC read pink beside pregnancy, whose
       // hero runs primary500 to primary700. One constant now, so the next card
       // cannot quietly pick its own.
+      //
+      // ⚠️ IT READS THE WHOLE `colors: [...]` BLOCK, NOT ONE LINE, and that
+      // change made it STRICTER rather than looser. Line-based, it saw only
+      // gradients written on a single line: a two-line purple-to-lilac card
+      // would have had `colors: [` on its own line, failed for having no deep
+      // constant on THAT line, and been "fixed" by whoever hit it next by
+      // reformatting rather than by changing the colour. Parsing the block
+      // means the assertion is about the stops, which is what the rule is
+      // actually about.
+      //
+      // ⚠️ AND A WHITE SCRIM IS EXEMPT, NARROWLY. A transparent-to-white fade
+      // over an illustration is a legibility device, not a tint: it makes no
+      // hue choice at all and cannot drift anything pink. The exemption is
+      // white-only on purpose — the moment a stop names a colour, the rule
+      // applies again.
       final dir = Directory('lib/screens/ttc');
       final offenders = <String>[];
+      final gradient = RegExp(r'colors:\s*\[([^\]]*)\]', dotAll: true);
+
       for (final f in dir.listSync().whereType<File>()) {
         if (!f.path.endsWith('.dart')) continue;
-        for (final line in f.readAsLinesSync()) {
-          if (!line.contains('colors: [')) continue;
-          final ok = line.contains('ttcPurpleDeep') ||
-              line.contains('ttcSlateDeep');
-          if (!ok) offenders.add('${f.uri.pathSegments.last}: ${line.trim()}');
+        final src = f.readAsStringSync();
+        for (final m in gradient.allMatches(src)) {
+          final stops = m.group(1)!;
+          final whiteOnly = !RegExp(r'(ttc[A-Z]\w*|Color\(|Colors\.(?!white))')
+              .hasMatch(stops);
+          if (whiteOnly) continue;
+          final ok = stops.contains('ttcPurpleDeep') ||
+              stops.contains('ttcSlateDeep');
+          if (!ok) {
+            offenders.add(
+                '${f.uri.pathSegments.last}: ${stops.replaceAll(RegExp(r"\s+"), " ").trim()}');
+          }
         }
       }
       expect(offenders, isEmpty,

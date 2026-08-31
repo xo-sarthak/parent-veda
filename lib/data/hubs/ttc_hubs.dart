@@ -148,6 +148,7 @@ final HubConfig kTtcConceiving = HubConfig(
 final HubConfig kTtcPcos = HubConfig(
   bracketId: 'ttc_pcos',
   heroVideoSlot: 'ttc_pcos_intro',
+  heroVideoTitle: _en('What PCOS is doing to your cycle'),
   template: HubTemplate.trackerLed,
   coreQuestion: 'What does PCOS mean for me, and how do I manage it while '
       'trying to conceive?',
@@ -203,6 +204,7 @@ final HubConfig kTtcPcos = HubConfig(
 final HubConfig kTtcInfertility = HubConfig(
   bracketId: 'ttc_infertility',
   heroVideoSlot: 'ttc_infertility_intro',
+  heroVideoTitle: _en('When waiting stops being the answer'),
   // ⚠️ NOT decisionCommerce. That template names the buying-guide shape, and
   // this hub bans commerce outright three lines above. A template that says
   // 'commerce' on the one hub where products are notApplicable is exactly the
@@ -272,6 +274,7 @@ final HubConfig kTtcInfertility = HubConfig(
 final HubConfig kTtcPreconceptionHealth = HubConfig(
   bracketId: 'ttc_preconception_health',
   heroVideoSlot: 'ttc_preconception_health_intro',
+  heroVideoTitle: _en('The months before you start trying'),
   template: HubTemplate.learnAndPlan,
   coreQuestion: 'What should I be doing before we start trying?',
   hero: _en('Getting your body ready, before you start trying.'),
@@ -296,6 +299,7 @@ final HubConfig kTtcPreconceptionHealth = HubConfig(
 final HubConfig kTtcMaleFertility = HubConfig(
   bracketId: 'ttc_male_fertility',
   heroVideoSlot: 'ttc_male_fertility_intro',
+  heroVideoTitle: _en('His half of it, in four minutes'),
   template: HubTemplate.learnAndPlan,
   coreQuestion: 'What does sperm health depend on, and how do we improve '
       'it?',
@@ -349,6 +353,7 @@ final HubConfig kTtcMaleFertility = HubConfig(
 final HubConfig kTtcAfterLoss = HubConfig(
   bracketId: 'ttc_after_loss',
   heroVideoSlot: 'ttc_after_loss_intro',
+  heroVideoTitle: _en('Trying again, at your own pace'),
   template: HubTemplate.afterALoss,
   coreQuestion: 'What does my body need to recover, and when — if ever — do '
       'we try again?',
@@ -392,6 +397,7 @@ final HubConfig kTtcAfterLoss = HubConfig(
 final HubConfig kTtcMindBody = HubConfig(
   bracketId: 'ttc_mind_body',
   heroVideoSlot: 'ttc_mind_body_intro',
+  heroVideoTitle: _en('Five quiet minutes, and why they help'),
   template: HubTemplate.practiceLed,
   coreQuestion: 'What can we do today that helps, without adding pressure?',
   hero: _en('A few quiet minutes, today.'),
@@ -436,9 +442,24 @@ final HubConfig kTtcMindBody = HubConfig(
   ),
 );
 
-/// All seven TTC problem hubs.
+/// The TTC problem hubs — six, since conceiving became a focus page.
+///
+/// ⚠️ `kTtcConceiving` IS DELIBERATELY NOT IN THIS LIST, and it is commented
+/// out of it rather than deleted. Tapping that bracket now opens
+/// `TtcFocusScreen` directly — one scrollable page whose first section IS the
+/// fertile-window tool — so the hub has no entrance left. Registering an
+/// unreachable config would leave a second, diverging description of the same
+/// area for the next person to edit by mistake.
+///
+/// The config itself stays defined above for two reasons: its `heroVideoSlot`
+/// records the film that area is owed, and if the single-page experiment comes
+/// off, putting the hub back is uncommenting one line here.
+///
+/// ⚠️ THE ONE THING TO CHECK IF YOU RESTORE IT: `_openBracket` tests for a
+/// focus page BEFORE it looks for a hub, so restoring this line alone changes
+/// nothing. Remove the page from `kTtcFocusPages` too, or the hub stays dark.
 final List<HubConfig> kTtcHubs = [
-  kTtcConceiving,
+  // kTtcConceiving,
   kTtcPcos,
   kTtcInfertility,
   kTtcPreconceptionHealth,
