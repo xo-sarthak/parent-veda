@@ -2524,6 +2524,103 @@ on the pill top-right. The first-run flow is the exception: it gates at
 the most clinically-reviewed screen in the app, held by four test files, and
 promoting a replacement is not something to do as a side effect of a UI batch.
 
+## 18.0 PCOS and IVF are built; what is parked — OPENED 2026-08-31
+
+Both doors are focus pages now and both are wired, tested and committed
+(`0edc26c`). Nothing below blocks a build. It is recorded here because most of
+it is a decision or an asset rather than code, and because a session that picks
+this up later will not otherwise know which deviations were deliberate.
+
+### 18.1 The IVF readiness tool persists nothing — DEFECT, small
+
+`TtcIvfReadinessScreen` reads `FertilityHelpContext` — how long she has been
+trying, her cycle spread, what her PCOS check found — and writes **nothing
+back**. So every visit re-asks all six questions, and
+`TtcFertilityHelpStore.hasCompleted` never becomes true.
+
+Nothing downstream breaks, because the only two readers of that store are the
+retired screens. But re-doing a questionnaire she already did is the exact
+friction the rebuild existed to remove.
+
+**The fix is written already, one door over.** `PcosStandAnswers.writeThrough`
+maps a short flow's answers onto the shipped store's question ids; IVF needs
+the same, against `TtcFertilityHelpStore`. Mind the mapping: `q_trying` has
+five options (`not_trying / starting / under6 / six_twelve / over12`) and the
+new flow has four bands.
+
+### 18.2 Three IVF tiles are a different format from the brief — DECISION
+
+`ivf_rebuild.pdf` marks these Article; they shipped as carousel and myth cards,
+because each is step-shaped or belief-shaped rather than essay-shaped:
+
+* "What a package leaves out" — carousel
+* "Is egg retrieval painful?" — carousel
+* "Can I work through a cycle?" — myth vs fact
+
+Each converts to an article in an hour if that is wanted. Related: the brief
+asks for the consult to be "shown across" the sections and it appears once, in
+the first section — deliberate, because repeating a paid tile down a page is
+how a help page starts to feel like a funnel.
+
+### 18.3 The clinical line appears on both IVF graphics, not one — DELIBERATE
+
+"The shape ranks the days against each other. It is not a probability." sits
+under both the list and the curve on the fertility window screen. The design
+puts it under the curve only. It stayed on both because 1a's own column header
+reads **"Chance on that day"** above bars of varying width, which is the same
+invitation to read a probability — arguably the line is needed more there.
+
+### 18.4 The fertility window screen is violet; its door is rose — DECISION
+
+Built from the Claude Design project, whose `accentHue` defaults to **273**;
+everything on the screen derives from it. The `ttc_conceiving` bracket whose
+tile opens it is **hue 344**. So the tile is rose and the screen is violet — a
+discontinuity invisible in the design file, where the screen is shown alone.
+
+Related, and the sharper half: `--pv-action` is `#6A30B6`, hue ≈272 — the ramp
+hue. The design system's own rule is that the action colour is *"spent at
+decision points… NEVER a surface, a card fill"*, and the ramp fills seven bars
+and a curve area directly under an eyebrow set in it. It may be fine — the ramp
+runs at 34–52% saturation against the brand's ~59%, so it reads as a tint
+family. It is recorded because it is the same tension the design's own note
+raises about the screen it replaced.
+
+### 18.5 PCOS is waiting on designs, not on code
+
+The user is designing Cycle Companion, the calendar and the tests library, and
+will hand them over to be wired. **Do not redesign these** — implement what
+arrives. The symptom logger and the "Where do I stand" self-read are already
+signed off and need no design.
+
+One mechanical item is genuinely outstanding: `ttc_pcos_stand_screen.dart`
+predates `ttc_tool_chrome.dart` and still carries its own copies of the hero,
+sheet, question card, pills and buttons. They are identical today, which is
+exactly the state that drifts — the chrome's header says "change both, or
+change neither" until it is folded in. Held on purpose while designs are in
+flight, because restructuring a working screen mid-redesign is churn.
+
+### 18.6 Assets owed, not code
+
+* `ttc_pcos_intro` — "PCOS in five minutes", also the PCOS page hero
+* `ttc_pcos_movement` — "Gentle movement for PCOS"
+* `ttc_infertility_intro` — the IVF page hero
+* `ttc_ivf_cycle_walkthrough` — "An IVF cycle, start to finish"
+* `ttc_ivf_two_week_wait` — "Getting through the two-week wait"
+
+All five render honest coming-soon placeholders at real 16:9, so no layout
+shifts when files land. See 17.1, which this extends rather than replaces.
+
+### 18.7 Date of birth is stored and one thing still reads nothing
+
+`FamilyProfileStore` now holds `dob` and derives `age` on every read, and the
+PCOS nudge fires at six months from 35 off it. **Nothing collects it yet** —
+onboarding is where the user intends to ask. Until then `age` is null on every
+device and that branch stays quiet, which is the behaviour it had before.
+
+The IVF readiness flow still asks age as its own first question. Once
+onboarding writes a DOB, that question can prefill from it rather than being
+asked twice across two doors.
+
 ---
 
 **None of the above blocks a build.** All of it blocks being comfortable, and
