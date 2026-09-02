@@ -42,22 +42,52 @@ void main() {
     TtcLang.instance.hinglish = false;
   });
 
+  /// The eleven starts, as days before today. Named singly below where a test
+  /// needs to point at one row rather than at the shape as a whole.
+  const kDefectStarts = [101, 94, 80, 26, 22, 20, 19, 14, 11, 5, 2];
+
+  /// The row the 54 days belong to — the cycle that ran across the unlogged
+  /// month. `kBeforeTheGap - kAfterTheGap` is 54, and that is the whole
+  /// fixture.
+  const kBeforeTheGap = 80;
+
+  /// The row on the far side of it, which the screen used to blame for the gap.
+  const kAfterTheGap = 26;
+
+  /// The oldest start. Seven days to the next one, so it is not counted.
+  const kFirstStart = 101;
+
+  DateTime ago(int days) {
+    final d = DateTime.now().subtract(Duration(days: days));
+    return DateTime(d.year, d.month, d.day);
+  }
+
   /// The exact history that produced "ovulation around day 40" on a device.
+  ///
+  /// ⚠️ RELATIVE, AND IT USED TO BE ABSOLUTE. The eleven dates were written
+  /// down as they came off the device — 17 April, 24 April, 8 May, then a
+  /// 54-day gap. Every other fixture in this file pairs its dates with an
+  /// explicit `state(on:)`, so the clock never enters and absolute dates are
+  /// harmless. The widget test below is the exception: it renders
+  /// `TtcTodayScreen`, which reads `DateTime.now()` itself, so the cycle day on
+  /// screen depended on the day the suite happened to run.
+  ///
+  /// It fired on 2 September 2026, when 25 July became cycle day 40 and the
+  /// screen's ordinary "Cycle day 40" readout tripped an assertion written to
+  /// catch the phrase "ovulation around day 40". It passed again the next
+  /// morning — which is worse than failing permanently, because a test that
+  /// fails one day a month gets shrugged at rather than fixed, and this one
+  /// guards a clinical defect. It also cost a session: a handoff blamed the
+  /// failure on an unrelated change, which is exactly what a test that depends
+  /// on the date does to whoever sees it next.
+  ///
+  /// Only the GAPS ever mattered — the 54-day one especially — so the offsets
+  /// below preserve them exactly and hang them off today. The most recent start
+  /// sits two days back, which puts today on cycle day 3, the same position the
+  /// old fixed reference date of 27 July described.
   void logTheRealDefect() {
-    for (final d in [
-      DateTime(2026, 4, 17),
-      DateTime(2026, 4, 24),
-      DateTime(2026, 5, 8),
-      DateTime(2026, 7, 1), // 54-day gap - nothing logged in between
-      DateTime(2026, 7, 5),
-      DateTime(2026, 7, 7),
-      DateTime(2026, 7, 8),
-      DateTime(2026, 7, 13),
-      DateTime(2026, 7, 16),
-      DateTime(2026, 7, 22),
-      DateTime(2026, 7, 25),
-    ]) {
-      CycleStore.instance.logPeriodStart(d);
+    for (final daysAgo in kDefectStarts) {
+      CycleStore.instance.logPeriodStart(ago(daysAgo));
     }
   }
 
@@ -71,7 +101,7 @@ void main() {
 
     test('and we no longer publish a number built on it', () {
       logTheRealDefect();
-      final s = TtcStore.instance.state(on: DateTime(2026, 7, 27));
+      final s = TtcStore.instance.state();
       expect(engine.hasUnreliableHistory(s), isTrue);
       expect(engine.estimatedOvulationDay(s), isNull,
           reason: 'this is where "ovulation around day 40" came from');
@@ -80,7 +110,7 @@ void main() {
 
     test('so no fertility grade rides on it either', () {
       logTheRealDefect();
-      final s = TtcStore.instance.state(on: DateTime(2026, 7, 27));
+      final s = TtcStore.instance.state();
       expect(engine.fertilityFor(s, engine.cycleDay(s)), isNull);
     });
 
@@ -94,7 +124,11 @@ void main() {
           MaterialApp(key: UniqueKey(), home: const TtcTodayScreen()));
       await tester.pumpAndSettle();
       expect(find.textContaining('looks off'), findsWidgets);
-      expect(find.textContaining('day 40'), findsNothing);
+      // ⚠️ THE PHRASE, NOT THE NUMBER. "day 40" also matches the ordinary
+      // cycle-day readout Today prints small under its header, which is a
+      // perfectly correct thing for it to say. What must never come back is the
+      // estimate that was built on an unlogged month.
+      expect(find.textContaining('ovulation around day'), findsNothing);
     });
   });
 
@@ -171,31 +205,27 @@ void main() {
   group('the list and the stats can no longer disagree', () {
     test('a cycle belongs to the date it BEGAN on', () {
       logTheRealDefect();
-      // The 54 days ran from 8 May to 1 July, so they are the cycle that began
-      // on 8 May. Attributing them to 1 July instead is what made the screen
-      // print "54 days · Not counted · too close to the entry before it" - the
-      // number describing one cycle and the verdict another.
-      final may = CycleStore.instance.cycleFrom(DateTime(2026, 5, 8));
-      expect(may?.days, 54);
-      expect(may?.counted, isTrue);
+      // The 54 days ran from the row before the gap to the row after it, so
+      // they belong to the cycle that BEGAN before it. Attributing them to the
+      // later row instead is what made the screen print "54 days · Not counted
+      // · too close to the entry before it" - the number describing one cycle
+      // and the verdict describing another.
+      final across = CycleStore.instance.cycleFrom(ago(kBeforeTheGap));
+      expect(across?.days, 54);
+      expect(across?.counted, isTrue);
     });
 
     test('the length shown and the verdict shown are the same fact', () {
       logTheRealDefect();
       // Every row, not just the interesting one: whatever number a row prints,
       // its counted-ness must be about THAT number.
-      for (final start in [
-        DateTime(2026, 4, 17),
-        DateTime(2026, 4, 24),
-        DateTime(2026, 5, 8),
-        DateTime(2026, 7, 1),
-        DateTime(2026, 7, 5),
-      ]) {
-        final c = CycleStore.instance.cycleFrom(start)!;
+      for (final daysAgo in kDefectStarts.take(5)) {
+        final c = CycleStore.instance.cycleFrom(ago(daysAgo))!;
         final plausible = c.days >= CycleStore.minPlausibleCycleDays &&
             c.days <= CycleStore.maxPlausibleCycleDays;
         expect(c.counted, plausible,
-            reason: '$start printed ${c.days} days but judged otherwise');
+            reason: '$daysAgo days ago printed ${c.days} days but judged '
+                'otherwise');
       }
     });
 
@@ -203,10 +233,10 @@ void main() {
       logTheRealDefect();
       // These two were shown with the "counted" dot while the average above
       // them excluded both - the list contradicting the statistic beside it.
-      expect(CycleStore.instance.cycleFrom(DateTime(2026, 4, 17))?.counted,
-          isFalse, reason: '7 days');
-      expect(CycleStore.instance.cycleFrom(DateTime(2026, 7, 1))?.counted,
-          isFalse, reason: '4 days');
+      expect(CycleStore.instance.cycleFrom(ago(kFirstStart))?.counted, isFalse,
+          reason: '7 days');
+      expect(CycleStore.instance.cycleFrom(ago(kAfterTheGap))?.counted, isFalse,
+          reason: '4 days');
     });
 
     test('a too-LONG gap is not explained as too close', () {

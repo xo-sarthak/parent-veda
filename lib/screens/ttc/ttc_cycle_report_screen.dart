@@ -32,8 +32,12 @@ import 'package:flutter/material.dart';
 
 import '../../ttc/ttc_cycle_report.dart';
 import '../v2/v2_palette.dart';
+import '../../theme/pv_fonts.dart';
 import 'ttc_common.dart';
+import 'ttc_cycle_companion.dart' show kTtcCompanionHue, showTtcPeriodLogSheet;
+import 'ttc_cycle_report_states.dart';
 import 'ttc_cycle_report_v3.dart';
+import 'ttc_surface_router.dart';
 import 'ttc_strings.dart';
 import 'ttc_tool_chrome.dart';
 
@@ -47,6 +51,10 @@ class TtcCycleReportScreen extends StatefulWidget {
 class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
   int _index = 0;
   bool _showTemp = false;
+
+  /// Whether the ⓘ panel is open. Not remembered between visits — it is an
+  /// aside, and one she has read once she does not need reopened for her.
+  bool _about = false;
 
   /// ⚠️ THE DIAL, AND IT IS NOT REMEMBERED BETWEEN VISITS. A stored preference
   /// here would be a setting nobody set — she picks a picture to answer the
@@ -64,7 +72,6 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
   @override
   Widget build(BuildContext context) {
     final t = TtcS.current();
-    final p = V2PaletteStore.instance.current;
     final r = ttcBuildCycleReport(index: _index);
 
     // ⚠️ THE V3 PICTURES RENDER FOR ONE STATE, ON PURPOSE. The design project
@@ -98,6 +105,153 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
       return _v3(context, t, r, spans);
     }
 
+    // ⚠️ AND THE OTHER THREE ARE DESIGNED NOW TOO, so the screen no longer has
+    // two chromes depending on her data. Turn 2 of the design project drew
+    // nothing-logged, no-estimate and clinic-held; each gets the same hero,
+    // the same picker and the same sheet as the cycle that can be drawn.
+    return _states(context, t, r);
+  }
+
+  /// The three states where there is no cycle to draw.
+  ///
+  /// ⚠️ ALL THREE SHARE THE SHELL AND DIFFER IN THE SHEET, which is the point:
+  /// a refusal that changed the whole screen would read as a different feature
+  /// rather than as this one having nothing to say this month.
+  Widget _states(BuildContext context, TtcS t, TtcCycleReport r) {
+    final clinic = r.state == TtcReportState.clinicHeld;
+    final empty = r.state == TtcReportState.noPeriod;
+    final facts = TtcReportFacts.read();
+
+    final (String chip, String title) = switch (r.state) {
+      TtcReportState.noPeriod => ('No cycle yet', t.reportNoPeriod),
+      TtcReportState.clinicHeld => (ttcClinicChip(), t.reportClinicTitle),
+      _ => ('Your dates are here', t.reportNoEstimateTitle),
+    };
+
+    return TtcToolScaffold(
+      // ⚠️ THE FIELD VARIANT CHANGES WITH THE STATE, from the design: 1 on the
+      // empty page, 3 where we will not estimate, 5 where a clinic is running
+      // it. One composition for every state would make three different
+      // situations look like one screen that failed to load.
+      hue: kTtcCompanionHue,
+      variant: switch (r.state) {
+        TtcReportState.noPeriod => 1,
+        TtcReportState.clinicHeld => 5,
+        _ => 3,
+      },
+      eyebrow: t.reportTitle,
+      title: title,
+      action: IconButton(
+        icon: const Icon(Icons.info_outline_rounded, size: 21),
+        color: ttcMuted,
+        onPressed: () => setState(() => _about = !_about),
+      ),
+      heroLead: _CyclePicker(
+        // ⚠️ THE PICKER STAYS, DIMMED, ON THE EMPTY PAGE. Removing it would
+        // change the shape of the header between states, and she would have to
+        // work out whether this is the same screen. It says "No cycles yet"
+        // and does nothing, which is honest.
+        label: empty
+            ? 'No cycles yet'
+            : r.start == null
+                ? ''
+                : '${_fmt(r.start!)} – ${_fmt(r.end!)}',
+        canGoBack: !empty && _index + 1 < r.cyclesAvailable,
+        canGoForward: !empty && _index > 0,
+        onBack: () => setState(() => _index++),
+        onForward: () => setState(() => _index--),
+      ),
+      children: [
+        ttcToolPad(Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 22),
+            Text(chip.toUpperCase(),
+                style: pvManrope(
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.1,
+                    color: ttcMuted)),
+            const SizedBox(height: 18),
+            if (_about) ...[
+              TtcReportAbout(text: ttcReportAboutText(clinic: clinic)),
+              const SizedBox(height: 22),
+            ],
+            if (empty)
+              TtcReportEmptyBody(onLog: () => _openLog(context))
+            else if (clinic)
+              TtcReportRefusalBody(
+                report: r,
+                facts: facts,
+                eyebrow: 'Who is guiding this cycle',
+                title: 'Your doctor is timing this one',
+                body: 'You have marked this as a treatment cycle. Your clinic '
+                    'is scanning you and choosing the dates, and they can see '
+                    'things this page never will.',
+                body2: 'So we are not putting our estimate next to theirs. '
+                    'Nothing is wrong with your dates — they are all below, '
+                    'and the four stretches come back the month after your '
+                    'treatment cycle ends.',
+                actionLabel: 'Prepare questions for your next visit',
+                onAction: () => _openSurface(context, 'ttc_appointments'),
+                footLabel: 'This cycle is not a treatment cycle',
+                onFoot: () => _openSurface(context, 'ttc_profile'),
+                footNote: 'Your rhythm numbers are your own history and keep '
+                    'updating. They are not an estimate for this cycle.',
+              )
+            else
+              TtcReportRefusalBody(
+                report: r,
+                facts: facts,
+                eyebrow: 'Why there are no phases',
+                title: 'We would rather not guess',
+                // ⚠️ THE ACTUAL NUMBER, READ FROM HER DATA. The design writes
+                // 46 days because that is what its fixture held. A refusal that
+                // cannot name the gap it is refusing over is asking to be
+                // taken on trust, on the one screen that is explaining why it
+                // will not do that itself.
+                body: facts.longestGap == null
+                    ? 'There is not enough here yet to place the four '
+                        'stretches on a cycle.'
+                    : 'One gap in your dates runs ${facts.longestGap} days. '
+                        'That is long enough to be a month that went unlogged '
+                        'rather than a cycle that really lasted that long.',
+                body2: 'If we averaged it in, the fertile days we drew would '
+                    'be off by more than a week. So we have left the four '
+                    'stretches off this cycle rather than show you dates we do '
+                    'not believe.',
+                actionLabel: 'Fill in the missing month',
+                onAction: () => _openLog(context),
+                note: facts.longestGap == null
+                    ? null
+                    : 'If you did have a ${facts.longestGap}-day cycle, leave '
+                        'it as it is — two more periods will settle the number '
+                        'on their own.',
+                footLabel: 'Open the Cycle Companion',
+                onFoot: () => _openSurface(context, 'ttc_cycle'),
+                footNote: 'Estimates come from your own dates and are never a '
+                    'diagnosis. A cycle that stays irregular is worth a '
+                    "doctor's read.",
+              ),
+            const SizedBox(height: 10),
+          ],
+        )),
+      ],
+    );
+  }
+
+  void _openLog(BuildContext context) => showTtcPeriodLogSheet(context);
+
+  void _openSurface(BuildContext context, String id) =>
+      openTtcSurface(context, id);
+
+  /// ⚠️ THE OLD BODY, KEPT FOR REVERT PER CLAUDE.md. It was the plain-list
+  /// treatment every state wore before turn 2 of the design: a back bar, the
+  /// picker, a `_Note` panel for the two refusals and the chart card. Nothing
+  /// reaches it now.
+  // ignore: unused_element
+  Widget _legacyBody(BuildContext context, TtcS t, V2Palette p,
+      TtcCycleReport r) {
     return Scaffold(
       backgroundColor: ttcBg,
       body: SafeArea(

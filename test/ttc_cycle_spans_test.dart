@@ -237,13 +237,42 @@ void main() {
       }
     });
 
-    testWidgets('a refusal still gets the old body, deliberately',
+    testWidgets('a clinic-run cycle refuses, and says who is guiding',
         (tester) async {
       midCycle();
       TtcStore.instance.setPath(TtcPath.ivf);
       await pump(tester);
+
       expect(find.text('Dial'), findsNothing,
           reason: 'phases were drawn over a cycle a clinician is directing');
+      expect(find.text('Your doctor is timing this one'), findsOneWidget);
+      // ⚠️ HER DAYS AND HER HISTORY BOTH SURVIVE THE REFUSAL. Refusing to
+      // interpret is not refusing to show.
+      expect(find.text('The days you logged'), findsOneWidget);
+      expect(find.text('Your rhythm so far'), findsOneWidget);
+    });
+
+    testWidgets('nothing logged teaches instead of apologising',
+        (tester) async {
+      await pump(tester);
+      expect(find.text('A picture of one month'), findsOneWidget);
+      expect(find.text('Today gets a name'), findsOneWidget,
+          reason: 'the empty state did not say what the first date buys');
+      // The picker stays, dimmed, so the header does not change shape.
+      expect(find.text('No cycles yet'), findsOneWidget);
+    });
+
+    testWidgets('and the two refusals do not share a reason', (tester) async {
+      // ⚠️ THE ONE THING THAT MUST NOT BE FLATTENED. Both withhold the phases;
+      // one is "we cannot say" about her data and the other is "it is not ours
+      // to say" about her clinic. Getting them the wrong way round blames a
+      // woman's logging for her clinic's involvement.
+      midCycle();
+      TtcStore.instance.setPath(TtcPath.ivf);
+      await pump(tester);
+      expect(find.text('We would rather not guess'), findsNothing);
+      expect(find.textContaining('unlogged'), findsNothing,
+          reason: 'the clinic state explained itself as a data problem');
     });
   });
 
