@@ -72,6 +72,11 @@
 // The constant rather than the literal because `'ttc_consult'` is an IDENTITY —
 // it is matched by the action router, and a second copy of it here is a second
 // place for it to drift.
+// ⚠️ `show IconData`, NARROWED FOR THE SAME REASON THE HUB IMPORT BELOW IS.
+// One class off the material library, named, so a data file does not quietly
+// acquire a UI framework.
+import 'package:flutter/material.dart' show IconData;
+
 import '../screens/ttc/ttc_illustrations.dart';
 import 'focus/ttc_focus_conceiving.dart';
 import 'focus/ttc_focus_ivf.dart';
@@ -91,6 +96,9 @@ enum TtcTileFormat {
   mythFact,
   product,
   booking,
+  recipe,
+  community,
+  infographic,
 }
 
 extension TtcTileFormatCopy on TtcTileFormat {
@@ -105,6 +113,9 @@ extension TtcTileFormatCopy on TtcTileFormat {
         TtcTileFormat.mythFact => 'Myth vs fact',
         TtcTileFormat.product => 'Product',
         TtcTileFormat.booking => 'Booking',
+        TtcTileFormat.recipe => 'Recipe',
+        TtcTileFormat.community => 'Community',
+        TtcTileFormat.infographic => 'Infographic',
       };
 
   /// ⚠️ THE TWO THAT COST MONEY SAY SO ON THE TILE, not at the checkout.
@@ -234,6 +245,68 @@ final class TtcArticleTile extends TtcTile {
   TtcTileFormat get format => TtcTileFormat.article;
 }
 
+/// One side of an infographic's comparison.
+class TtcInfographicColumn {
+  const TtcInfographicColumn(
+      {required this.label, required this.points, this.hue});
+
+  /// What this side IS. Short — it sits above the points in a half-width box.
+  final String label;
+
+  /// WARNING: THREE OR FOUR, NEVER MORE. A fifth point is the moment this
+  /// stopped being one frame, and the format's whole promise is that it is one
+  /// frame. Nothing enforces the count in code because a number in a lint
+  /// invites arguing with the number; the rule is in the header of
+  /// `ttc_infographic_screen.dart` and in this sentence.
+  final List<String> points;
+
+  /// The column's own tint. Two different hues is what makes the comparison
+  /// read as two things rather than one list split in half.
+  final double? hue;
+}
+
+/// One frame that answers its own title. No swiping.
+///
+/// WARNING: ONE SLIDE, AND THAT IS THE DEFINITION RATHER THAN A PREFERENCE.
+/// Asked for exactly that way: *"infographic only consists of 1 slide, so keep
+/// that in mind — in one slide provide required info."*
+///
+/// So there is no `cards` list and no `slides` here, deliberately: there is
+/// nowhere for a second frame to go, and a subject that needs one was never an
+/// infographic. Both tiles that use it are "X or Y" questions, which is the
+/// shape a single frame beats a carousel at — the two halves sit side by side,
+/// so the difference IS the picture rather than something the reader has to
+/// carry across a swipe.
+final class TtcInfographicTile extends TtcTile {
+  const TtcInfographicTile({
+    required super.title,
+    required super.blurb,
+    required this.headline,
+    required this.left,
+    required this.right,
+    this.footnote,
+    this.reviewedBy,
+  });
+
+  /// The answer, in one line, above the comparison.
+  ///
+  /// WARNING: NOT A RESTATEMENT OF THE TITLE. The title is the question she
+  /// tapped; a headline that repeats it spends her first look on nothing.
+  final String headline;
+
+  final TtcInfographicColumn left;
+  final TtcInfographicColumn right;
+
+  /// What to do about it. On a clinical comparison this is where the reader
+  /// stops being merely better informed.
+  final String? footnote;
+
+  final String? reviewedBy;
+
+  @override
+  TtcTileFormat get format => TtcTileFormat.infographic;
+}
+
 /// A few cards, swiped.
 final class TtcCarouselTile extends TtcTile {
   const TtcCarouselTile(
@@ -332,6 +405,56 @@ final class TtcProductTile extends TtcTile {
   TtcTileFormat get format => TtcTileFormat.product;
 }
 
+/// A dish, on the app's own recipe page.
+///
+/// WARNING: A NINTH FORMAT, AND THE HEADER OF THIS FILE ARGUES FOR PAYING THAT
+/// COST RATHER THAN AVOIDING IT. The alternative was a `TtcToolTile` pointing
+/// at the recipe screen, which compiles and is wrong in the one way this stage
+/// cannot afford: the chip would read "Tool" over a dish. The chip is the
+/// promise about what happens when she taps, and eight of the twenty-five tiles
+/// on a page are content -- a chip that lies is worse than a missing format.
+///
+/// WARNING: AND IT REUSES THE SHIPPED RECIPE PAGE, NOT A TTC COPY OF ONE.
+/// `RecipeDetailScreen` already scales ingredients to a chosen serving count,
+/// lists steps and carries a nutrition glance. Asked for directly: *"we have
+/// recipe page format so do that."*
+final class TtcRecipeTile extends TtcTile {
+  const TtcRecipeTile(
+      {required super.title, required super.blurb, required this.recipeId});
+
+  /// Must exist in `kRecipes`. Held by `ttc_focus_page_test.dart` for the same
+  /// reason every other id here is: a tile whose id is wrong renders perfectly
+  /// and does nothing.
+  final String recipeId;
+
+  @override
+  TtcTileFormat get format => TtcTileFormat.recipe;
+}
+
+/// A room full of other people going through the same thing.
+///
+/// WARNING: A TENTH FORMAT FOR ONE TILE, AND THE SAME ARGUMENT AS THE NINTH.
+/// The alternative was a `TtcToolTile` pointing at the community screen, which
+/// compiles and puts the chip "Tool" over "PCOS circle". A circle of people is
+/// not a tool, and the chip is the promise about what happens when she taps --
+/// on a page where eight tiles are content and two cost money, a chip that
+/// misdescribes its destination is the one thing the format system exists to
+/// prevent.
+///
+/// WARNING: AND THE COMMUNITY IS NEVER A SOURCE. Ask Veda's own rule, and it
+/// holds here too: this tile opens a room, it does not answer a question. No
+/// clinical claim on this page may point at it.
+final class TtcCommunityTile extends TtcTile {
+  const TtcCommunityTile(
+      {required super.title, required super.blurb, required this.surfaceId});
+
+  /// Resolved by `ttcScreenForSurface`, like a tool's.
+  final String surfaceId;
+
+  @override
+  TtcTileFormat get format => TtcTileFormat.community;
+}
+
 /// A paid course.
 final class TtcMasterclassTile extends TtcTile {
   const TtcMasterclassTile(
@@ -367,10 +490,113 @@ final class TtcBookingTile extends TtcTile {
 /// and starts being organised by how we happened to build it — which is the
 /// content-management view of a product, and it is never the reader's.
 class TtcFocusSection {
-  const TtcFocusSection({required this.heading, required this.tiles});
+  const TtcFocusSection({
+    required this.heading,
+    required this.tiles,
+    this.group,
+  });
 
   final String heading;
   final List<TtcTile> tiles;
+
+  /// Which [TtcFocusGroup] this section appears under, on a page that has them.
+  ///
+  /// ⚠️ THE SECTION NAMES ITS GROUP, NOT THE OTHER WAY ROUND. The obvious model
+  /// is a group holding a list of sections, or a list of the headings it owns.
+  /// Both let a section belong to two groups, or to none, and neither failure
+  /// looks like anything — the section simply renders twice, or vanishes.
+  ///
+  /// Naming it from this side makes both impossible: there is one field, so
+  /// there is one answer. `test/ttc_focus_groups_test.dart` then only has to
+  /// check that the id exists, which is a question with a yes or a no.
+  ///
+  /// Null on every page that is one long scroll, which is all of them but PCOS.
+  final String? group;
+}
+
+/// One card in the selector rail at the top of a grouped page.
+///
+/// ⚠️ THIS IS THE SHAPE THAT WAS ASKED FOR AFTER SEEING FLO, AND IT OVERRULES
+/// THE NOTE THAT USED TO SIT AT THE HEAD OF `ttc_focus_pcos.dart`.
+///
+/// The original brief asked for five sub-tabs and that was set aside, on the
+/// grounds that a tab is a decision she has to make before she is allowed to
+/// see anything. That reasoning was about a **tab bar** — a row of words where
+/// picking one hides the other four and nothing tells you what is behind them.
+///
+/// This is not that. The selector is a horizontal rail of picture cards, in the
+/// same language as every other rail on the page, and it is the FIRST thing
+/// under the hero: she scrolls past all five before she chooses, so the choice
+/// is made after seeing the options rather than before. That is the difference
+/// the earlier objection was actually pointing at, and it is now handled.
+///
+/// ⚠️ ROLLED OUT TO PCOS ONLY, ON PURPOSE. The other doors keep the single
+/// scroll until this has been seen on a device. `groups` being null is not a
+/// migration waiting to finish — it is the other shape, still correct.
+class TtcFocusGroup {
+  const TtcFocusGroup({
+    required this.id,
+    required this.label,
+    required this.icon,
+    required this.hue,
+    this.toolSurfaceId,
+  });
+
+  /// Matched against [TtcFocusSection.group].
+  final String id;
+
+  /// The words on the card. Short — it sits under an icon in a 150pt box.
+  final String label;
+
+  /// The line mark in the tab's well.
+  ///
+  /// ⚠️ AN ICON IS BACK, AND THE THIRD TIME IT IS IN A WELL. Two earlier
+  /// attempts were rejected — a bare Material glyph in the corner of a white
+  /// card (*"you have just used the icons basic icons"*) and a drawn mark in a
+  /// tinted disc copied off the home rail (*"a lot of wasted space on that
+  /// tab"*). Both put a picture on a tab and let it float.
+  ///
+  /// The design that was chosen — 4b of the PCOS Mode Switcher project — does
+  /// something different with it: a 34pt well, filled, at the top of a 108pt
+  /// square, with the label and its count anchored to the bottom. The mark is
+  /// not decoration floating in space; it is one of two things holding the box
+  /// apart. That is the kit's own icon-well vocabulary, and it is why the same
+  /// glyph reads as deliberate here and did not before.
+  final IconData icon;
+
+  /// The tab's own hue — its fill when resting, and its well when lit.
+  ///
+  /// ⚠️ THERE IS NO ICON FIELD, AND TWO ATTEMPTS AT ONE WERE REMOVED.
+  ///
+  /// First a Material glyph, which came back as *"you have just used the icons
+  /// basic icons, I don't like it"* — a stock icon in a stage where every other
+  /// picture is hand-drawn reads as the placeholder nobody replaced. Then a
+  /// drawn `V3DailyArt` mark in a tinted disc, copied from the home's daily
+  /// rail, which came back as *"a lot of wasted space on that tab… it's all
+  /// white behind, that's why it looks very empty."*
+  ///
+  /// Both notes are the same note, and it is about SIZE rather than artwork. A
+  /// picture forces the tab into a card, a card needs a box, and five boxes of
+  /// mostly-empty white across the top of a page is a lot of screen spent on
+  /// navigation. A tab is a word you press. So the tab is a pill sized to its
+  /// word, and the hue is the only decoration left — as a 5pt dot when the tab
+  /// is resting and as the whole fill when it is lit.
+  ///
+  /// ⚠️ TAKEN FROM `V2BlockHues` WHERE ONE FITS, for the reason the cycle phase
+  /// colours are: a hue in this app already means something, and inventing a
+  /// sixth family for one rail would put the door slightly out of tune with
+  /// every other surface she has seen.
+  final double hue;
+
+  /// When set, this group shows one tool inline instead of a list of sections.
+  ///
+  /// ⚠️ INLINE, NOT A TILE THAT OPENS THE TOOL. "Where do I stand" used to be a
+  /// section holding a card you tapped to leave the page. Asked for directly:
+  /// *"that tab of tool that you created won't be needed — when the person
+  /// clicks on where do I stand, the tool will appear."* A card in front of a
+  /// tool, inside a group whose only content is that tool, is a door in front
+  /// of a door.
+  final String? toolSurfaceId;
 }
 
 /// One problem area, as one scrollable page.
@@ -382,6 +608,9 @@ class TtcFocusPage {
     this.heroVideoSlot,
     this.heroVideoTitle,
     this.headline,
+    this.groups,
+    this.heroImageUrl,
+    this.heroBlurb,
   });
 
   /// Which bracket tile opens this. Matches a `Bracket.id`.
@@ -419,6 +648,33 @@ class TtcFocusPage {
   final TtcMasterclassTile? headline;
 
   final List<TtcFocusSection> sections;
+
+  /// The selector rail under the hero. Null on a page that is one long scroll.
+  ///
+  /// ⚠️ THE SECTIONS STAY THE SOURCE OF TRUTH EVEN HERE. Grouping changes which
+  /// of them are on screen at once; it does not move content into a second
+  /// structure. `allTiles` therefore still walks every tile on the page whether
+  /// it is grouped or not, so `ttc_focus_page_test.dart` keeps checking that a
+  /// tile in a group nobody has selected still points at something real — which
+  /// is the tile most likely to rot, because it is the one least often seen.
+  final List<TtcFocusGroup>? groups;
+
+  /// A photograph behind the hero, with the title set over it.
+  ///
+  /// ⚠️ A URL IN DATA, AND THE DRAWN FIELD IS THE FALLBACK, exactly as
+  /// `TtcArticleTile.imageUrl` already works. Local-first is absolute: on a
+  /// dead connection the hero renders the V3 field it always had and the page
+  /// is still finished, rather than showing a grey box where a face should be.
+  final String? heroImageUrl;
+
+  /// One plain sentence under the title, over the photograph.
+  ///
+  /// ⚠️ WHAT THE CONDITION IS, IN ONE LINE — "PCOS is a condition where hormone
+  /// imbalance affects how the ovaries work." Not a welcome, not a promise
+  /// about the page. Someone who arrived here from a search result may not know
+  /// the definition, and making her tap a card to get it is a page that assumes
+  /// its own subject.
+  final String? heroBlurb;
 
   /// Every tile on the page, in reading order. What the reachability test walks.
   List<TtcTile> get allTiles =>

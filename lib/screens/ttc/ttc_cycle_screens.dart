@@ -19,6 +19,7 @@ import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_fertile_window.dart';
 import '../../ttc/ttc_store.dart';
 import 'ttc_common.dart';
+import 'ttc_cycle_companion.dart';
 import 'ttc_strings.dart';
 import 'ttc_today_screen.dart' show logTtcPeriod;
 import 'ttc_treatment_screen.dart';
@@ -27,6 +28,26 @@ import 'ttc_treatment_screen.dart';
 //  Cycle Companion
 // =============================================================================
 
+// ⚠️ THE ENTRY, AND NOTHING MORE. `ttc_cycle` is opened from twelve places —
+// the TTC home (four call sites), the fertility-help screen, the PCOS door's
+// Track group, a hub, two journey steps and two brackets — and the surface id
+// is read as a route name by `global_ask_fab.dart`. So the class stays exactly
+// where it was and the rebuild happens behind it.
+//
+// ⚠️ THE OLD BODY IS COMMENTED OUT BELOW, NOT DELETED, per CLAUDE.md. It was
+// two numbers and a list with no picture of a cycle on it, and its degradation
+// was genuinely good — one cycle is not an average, one observation is not a
+// range, an untrustworthy history shows no numbers at all. All three rules
+// survive in `_RhythmCard` and the refusal body; the old code is kept so the
+// comparison can be made rather than remembered.
+class TtcCycleScreen extends StatelessWidget {
+  const TtcCycleScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) => const TtcCycleCompanionScreen();
+}
+
+/*
 class TtcCycleScreen extends StatelessWidget {
   const TtcCycleScreen({super.key});
 
@@ -316,6 +337,8 @@ class _PeriodRow extends StatelessWidget {
     return '${d.day} ${m[d.month - 1]} ${d.year}';
   }
 }
+
+*/
 
 // =============================================================================
 //  Ovulation Companion

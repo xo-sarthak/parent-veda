@@ -80,7 +80,11 @@ class SkillingPreviewScreen extends StatelessWidget {
         // Same structure as parenting and TTC: the field is the PAGE's surface
         // and does not scroll; the content sheet slides over it.
         Positioned.fill(
-          child: V3HeroField(accent: accent, ground: p.ground, variant: 3),
+          child: V3HeroField(
+              accent: accent,
+              ground: p.ground,
+              variant: 3,
+              chroma: v3FieldChroma(258)),
         ),
         ListView(padding: EdgeInsets.zero, children: [
           _Hero(p: p, count: brackets.length),

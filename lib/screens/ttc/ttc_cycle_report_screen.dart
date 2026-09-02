@@ -33,7 +33,9 @@ import 'package:flutter/material.dart';
 import '../../ttc/ttc_cycle_report.dart';
 import '../v2/v2_palette.dart';
 import 'ttc_common.dart';
+import 'ttc_cycle_report_v3.dart';
 import 'ttc_strings.dart';
+import 'ttc_tool_chrome.dart';
 
 class TtcCycleReportScreen extends StatefulWidget {
   const TtcCycleReportScreen({super.key});
@@ -46,6 +48,13 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
   int _index = 0;
   bool _showTemp = false;
 
+  /// ⚠️ THE DIAL, AND IT IS NOT REMEMBERED BETWEEN VISITS. A stored preference
+  /// here would be a setting nobody set — she picks a picture to answer the
+  /// question in front of her, not to declare how she likes cycle reports. If
+  /// it turns out people flip it every single time, that is the evidence for
+  /// persisting it, and there is none yet.
+  TtcCycleView _view = TtcCycleView.dial;
+
   static const _m = [
     'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
@@ -57,6 +66,37 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
     final t = TtcS.current();
     final p = V2PaletteStore.instance.current;
     final r = ttcBuildCycleReport(index: _index);
+
+    // ⚠️ THE V3 PICTURES RENDER FOR ONE STATE, ON PURPOSE. The design project
+    // drew a cycle that has a period, an estimate and four stretches — the
+    // `ready` state. The other four (nothing logged, a clinic running the
+    // cycle, an estimate refused, almost nothing logged) have not been designed
+    // yet and are keeping the treatment they already ship, which is reviewed
+    // copy that works.
+    //
+    // Building them on the new chrome would mean inventing a hero line for
+    // "your clinic is running this cycle" — and a screen that says a phase in
+    // 40pt type above a panel explaining that we may not name a phase is a
+    // contradiction, not a gap. Recorded in `docs/STILL-OPEN.md` §18.
+    // ⚠️ GATED ON THE PICTURE BEING DRAWABLE, NOT ON `ready`. The first cut
+    // asked for `state == ready`, and that was a real bug with a very quiet
+    // symptom: almost nobody saw the new report.
+    //
+    // `ready` degrades to `thin` the moment fewer than three days in the cycle
+    // have ANYTHING logged — a symptom, a weight, a temperature. That is most
+    // people most months, and it is the correct rule for whether we have
+    // findings worth printing. It has nothing to do with whether we can draw
+    // the cycle: the ring, the calendar and the four stops need a period and an
+    // estimate, and `thin` has both.
+    //
+    // So the two questions are separated. `spans.isNotEmpty` answers "can we
+    // draw this cycle" — it is already empty on every refusal — and the
+    // findings section answers itself further down by rendering nothing.
+    final spans = ttcCyclePhaseSpans(index: _index);
+    if (spans.isNotEmpty &&
+        (r.state == TtcReportState.ready || r.state == TtcReportState.thin)) {
+      return _v3(context, t, r, spans);
+    }
 
     return Scaffold(
       backgroundColor: ttcBg,
@@ -157,6 +197,206 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
     );
   }
 
+  /// The `ready` report, drawn from the Cycle Report design project.
+  ///
+  /// ⚠️ THE HERO TAKES THE CURRENT STRETCH'S COLOUR, not the stage accent. That
+  /// is `V3HeroField`'s own instruction — one colour decision, so the field
+  /// behind the page and the arc she is standing on cannot disagree. On a
+  /// screen whose entire job is "where am I in this", two different colours
+  /// meaning the same moment would be the one mistake worth avoiding.
+  Widget _v3(
+    BuildContext context,
+    TtcS t,
+    TtcCycleReport r,
+    List<TtcPhaseSpan> spans,
+  ) {
+    final here = spans.firstWhere(
+      (s) => s.status == TtcSpanStatus.here,
+      orElse: () => spans.first,
+    );
+    final today = spans.any((s) => s.status == TtcSpanStatus.here)
+        ? DateTime.now()
+        : null;
+
+    final hasSeries =
+        r.withWeight.length >= 2 || r.withTemp.length >= 2;
+
+    return TtcToolScaffold(
+      hue: here.phase.hue,
+      variant: 2,
+      eyebrow: t.reportTitle,
+      title: _heroLine(here.phase),
+      intro: 'One whole cycle, start to finish. The four stretches are '
+          'estimated from the dates you log, and they move as you log more.',
+      action: IconButton(
+        icon: const Icon(Icons.info_outline_rounded, size: 21),
+        color: ttcMuted,
+        onPressed: () => _showDisclaimer(context, t),
+      ),
+      heroLead: _CyclePicker(
+        label: r.start == null ? '' : '${_fmt(r.start!)} – ${_fmt(r.end!)}',
+        canGoBack: _index + 1 < r.cyclesAvailable,
+        canGoForward: _index > 0,
+        onBack: () => setState(() => _index++),
+        onForward: () => setState(() => _index--),
+      ),
+      children: [
+        ttcToolPad(Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 22),
+
+            // ---- the picture, and the choice of picture ------------------
+            Row(children: [
+              Expanded(
+                child: Text(
+                    _view == TtcCycleView.dial
+                        ? 'One whole cycle, start to finish'
+                        : t.reportThisCycle,
+                    style: ttcJakarta(16)),
+              ),
+              const SizedBox(width: 10),
+              TtcCycleViewToggle(
+                view: _view,
+                onPick: (v) => setState(() => _view = v),
+              ),
+            ]),
+            const SizedBox(height: 6),
+            Text(
+                _view == TtcCycleView.dial
+                    ? 'The ring is one cycle. It begins at the top on day 1 — '
+                        'the first day of your period — and moves clockwise, '
+                        'one step per day.'
+                    : 'Every day of this cycle, in order. The colour of a day '
+                        'says which stretch it belongs to.',
+                style: ttcBody(13, h: 1.55)),
+            const SizedBox(height: 18),
+
+            TtcCard(
+              child: Column(children: [
+                // ⚠️ ONE KEY, NOT TWO. Swapping the picture must not swap the
+                // meaning of the colours underneath it, or the toggle stops
+                // being two views of one thing and becomes two screens.
+                if (_view == TtcCycleView.dial)
+                  TtcCycleRing(spans: spans, today: today)
+                else
+                  TtcCycleGrid(spans: spans, report: r, today: today),
+                const SizedBox(height: 18),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: TtcPhaseLegend(
+                      spans: spans,
+                      loggedDots: _view == TtcCycleView.calendar),
+                ),
+              ]),
+            ),
+            const SizedBox(height: 24),
+
+            // ---- the four stops -----------------------------------------
+            ttcSectionTitle('The four stretches, in order'),
+            TtcCard(child: TtcCycleTimeline(spans: spans)),
+            const SizedBox(height: 10),
+            Text(
+                'These four stretches are estimated from the dates you log. '
+                'They move as you log more.',
+                style: ttcBody(11.5, color: ttcMuted, h: 1.5)),
+            const SizedBox(height: 24),
+
+            // ---- changes during the cycle -------------------------------
+            //
+            // ⚠️ KEPT, NOT REPLACED. The design demotes weight and temperature
+            // to one line offering to accept them. That line is right when
+            // there is nothing to show and wrong the moment there is — this
+            // chart carries its own axis, unit, date ticks, phase bands and
+            // marker rows, and throwing it away would take a reviewed reading
+            // of her month with it. So: the invitation when empty, the chart
+            // when not.
+            //
+            // ⚠️ AND ONE HEADING ACROSS BOTH BRANCHES. The empty branch used to
+            // borrow "What you logged", which is the heading the FINDINGS
+            // section below already carries — so a month with no numbers but
+            // some symptoms printed the same heading twice, a few inches apart,
+            // over two different things.
+            //
+            // The general rule, and this screen's own file header states it:
+            // an empty state belongs INSIDE the thing that is empty, not as a
+            // section of its own. Changes-during-the-cycle is one section that
+            // is sometimes full and sometimes an invitation; it is never a
+            // different section.
+            ttcSectionTitle(t.reportChanges),
+            if (hasSeries) ...[
+              _CycleCard(
+                report: r,
+                p: V2PaletteStore.instance.current,
+                showTemp: _showTemp,
+                onPickSeries: (v) => setState(() => _showTemp = v),
+                showLegend: false,
+              ),
+              const SizedBox(height: 24),
+            ] else ...[
+              TtcCard(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text('Morning temperature and weight',
+                          style: ttcJakarta(14)),
+                      const SizedBox(height: 6),
+                      Text(t.reportNoNumbers,
+                          style: ttcBody(12.5, color: ttcMuted, h: 1.5)),
+                    ]),
+              ),
+              const SizedBox(height: 24),
+            ],
+
+            // ---- what it adds up to -------------------------------------
+            //
+            // ⚠️ SILENCE IS THE CORRECT OUTPUT OF A REPORT WITH NOTHING TO
+            // REPORT, and below a week of logging there is nothing honest to
+            // say — see the note in `ttc_cycle_report.dart`. `thin` gets one
+            // quiet line instead, because an absent section on a screen that
+            // just drew a full cycle reads as something failing to load.
+            if (r.state == TtcReportState.thin && _notes(r).isEmpty) ...[
+              ttcSectionTitle(t.reportWhatYouLogged),
+              _Note(title: t.reportThinTitle, body: t.reportThinBody),
+              const SizedBox(height: 10),
+            ],
+            if (_notes(r).isNotEmpty) ...[
+              ttcSectionTitle(t.reportWhatYouLogged),
+              for (final f in _notes(r)) ...[
+                TtcCard(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(f.headline,
+                            style: ttcFraunces(16,
+                                w: FontWeight.w600, color: ttcTitleInk)),
+                        const SizedBox(height: 5),
+                        Text(f.detail, style: ttcBody(13, h: 1.55)),
+                      ]),
+                ),
+                const SizedBox(height: 10),
+              ],
+            ],
+            const SizedBox(height: 10),
+          ],
+        )),
+      ],
+    );
+  }
+
+  /// The one Fraunces line in the hero.
+  ///
+  /// ⚠️ IT NAMES WHERE SHE IS AND STOPS THERE. The design's line is "You are in
+  /// your fertile days" — a position, not an instruction and not an assessment.
+  /// Nothing here may grow into what she should therefore do, which is the
+  /// sentence a fertility app is always one edit away from writing.
+  static String _heroLine(TtcPhase phase) => switch (phase) {
+        TtcPhase.period => 'You are in your period days',
+        TtcPhase.beforeWindow => 'You are before your fertile window',
+        TtcPhase.fertileWindow => 'You are in your fertile days',
+        TtcPhase.afterWindow => 'You are in the waiting days',
+      };
+
   List<TtcFinding> _notes(TtcCycleReport r) {
     final length = ttcCycleLengthNote();
     return [...r.findings, ?length];
@@ -222,12 +462,18 @@ class _CycleCard extends StatelessWidget {
     required this.p,
     required this.showTemp,
     required this.onPickSeries,
+    this.showLegend = true,
   });
 
   final TtcCycleReport report;
   final V2Palette p;
   final bool showTemp;
   final void Function(bool) onPickSeries;
+
+  /// ⚠️ OFF ON THE V3 REPORT, WHERE THE RING OR THE GRID ABOVE ALREADY CARRIES
+  /// THE KEY. Two legends for the same four colours on one scroll is not twice
+  /// the help — it is a reader checking whether they say the same thing.
+  final bool showLegend;
 
   @override
   Widget build(BuildContext context) {
@@ -286,17 +532,19 @@ class _CycleCard extends StatelessWidget {
           Text(t.reportNoNumbers, style: ttcBody(12.5, color: ttcMuted, h: 1.5)),
         ],
 
-        const SizedBox(height: 14),
-        ttcDivider(),
-        const SizedBox(height: 12),
+        if (showLegend) ...[
+          const SizedBox(height: 14),
+          ttcDivider(),
+          const SizedBox(height: 12),
 
-        // ---- the legend, which is what makes the bands mean anything ----
-        Wrap(spacing: 14, runSpacing: 7, children: [
-          for (final phase in TtcPhase.values)
-            _Key(colour: v2BlockTint(phase.hue, p), label: phase.label),
-          _Key(colour: ttcCoral, label: t.reportKeyPeriod, dot: true),
-          _Key(colour: ttcTitleInk, label: t.reportKeyLogged, dot: true),
-        ]),
+          // ---- the legend, which is what makes the bands mean anything ----
+          Wrap(spacing: 14, runSpacing: 7, children: [
+            for (final phase in TtcPhase.values)
+              _Key(colour: v2BlockTint(phase.hue, p), label: phase.label),
+            _Key(colour: ttcCoral, label: t.reportKeyPeriod, dot: true),
+            _Key(colour: ttcTitleInk, label: t.reportKeyLogged, dot: true),
+          ]),
+        ],
       ]),
     );
   }

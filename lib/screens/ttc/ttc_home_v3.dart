@@ -264,7 +264,8 @@ class _TtcHomeV3State extends State<TtcHomeV3>
               child: V3HeroField(
                   accent: accent,
                   ground: p.ground,
-                  variant: _chapterNumber(chapter)),
+                  variant: _chapterNumber(chapter),
+                  chroma: v3FieldChroma(_chapterHue(chapter))),
             ),
             ListView(
               // ⚠️ ROOM FOR THE NAV AND THE ASK FAB. `ttcBottomInset` is what

@@ -47,6 +47,26 @@ anything*, on a subject where most people arriving do not yet know which tab
 their question belongs to. Tab names become **section headings**, which is where
 they were doing their real work anyway.
 
+> ⚠️ **AMENDED 2026-09-02, FOR PCOS ONLY.** The PCOS door now opens on a
+> photograph and a **horizontal rail of five selector cards**, and shows one
+> group at a time. Asked for directly, after Flo.
+>
+> This is not the tab bar the rule forbids, and the distinction is the whole
+> point of keeping both sentences. A tab bar lights one word, hides four, and
+> tells you nothing about what is behind them — you choose blind, which is what
+> the objection above is actually about. The selector is a rail of picture cards
+> in the same language as every other rail on the page, sitting first under the
+> hero: she reads all five, then picks. The choice is made *after* seeing the
+> options.
+>
+> **The rule still stands for a tab bar, and still stands for the other four
+> doors.** PCOS is being checked on a device first. Do not roll this out, and do
+> not revert it — `test/ttc_focus_groups_test.dart` asserts both halves.
+>
+> Mechanically: `TtcFocusGroup` on the page, `group:` on each section, and
+> `TtcFocusGroup.toolSurfaceId` for a group that renders a tool inline instead
+> of a rail of tiles. A page with `groups: null` renders exactly as before.
+
 **Do not build an intermediate menu.** The conceiving door used to open a
 three-card chooser; it was removed. A door opens onto content.
 

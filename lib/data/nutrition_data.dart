@@ -1599,6 +1599,55 @@ const List<({String tag, String label})> kRecipeFilters = [
 ];
 
 final List<Recipe> kRecipes = [
+  // ---------------------------------------------------------------------------
+  //  PCOS
+  // ---------------------------------------------------------------------------
+  //  WARNING: TAGGED `pcos`, AND THAT IS THE ONLY THING THAT MAKES IT A PCOS
+  //  RECIPE. There is no separate PCOS catalogue and there should not be: the
+  //  recipe page, the servings scaler, the ingredient maths and the nutrition
+  //  glance are all built once and shared, and a second list would be a second
+  //  place for the format to drift.
+  //
+  //  WARNING: NO CALORIE TARGET, NO PORTION RULE, NO "INSTEAD OF" SWAP. PCOS
+  //  content in this app may never carry a weight or diet target -- the same
+  //  rule the self-check flow is held to. The glance states what is in the
+  //  dish, which is a fact about the food and not an instruction about her.
+  Recipe(
+    id: 'pcos_moong_chilla',
+    name: _en('Moong dal chilla with curd'),
+    whyNow: _en('A savoury pancake built on protein and fibre rather than '
+        'refined flour, which is the change that steadies energy through the '
+        'morning.'),
+    region: RecipeRegion.panIndian,
+    tags: const ['pcos', 'protein', 'fibre', 'insulin'],
+    defaultServings: 2,
+    ingredients: [
+      RecipeIngredient(
+          name: _en('Split green moong dal, soaked 4 hours'),
+          qtyPerServing: 50,
+          unit: 'g'),
+      RecipeIngredient(
+          name: _en('Onion, finely chopped'), qtyPerServing: 0.5, unit: 'pcs'),
+      RecipeIngredient(
+          name: _en('Spinach, chopped'), qtyPerServing: 25, unit: 'g'),
+      RecipeIngredient(
+          name: _en('Green chilli'), qtyPerServing: 0.5, unit: 'pcs'),
+      RecipeIngredient(
+          name: _en('Cumin seeds'), qtyPerServing: 0.25, unit: 'tsp'),
+      RecipeIngredient(name: _en('Ghee'), qtyPerServing: 1, unit: 'tsp'),
+      RecipeIngredient(name: _en('Curd'), qtyPerServing: 0.5, unit: 'cup'),
+    ],
+    steps: [
+      _en('Drain the soaked moong dal and grind it with the green chilli and '
+          'a little water into a pourable batter.'),
+      _en('Stir in the onion, spinach, cumin and salt.'),
+      _en('Heat a pan, brush it with ghee, and spread a ladle of batter thin.'),
+      _en('Cook until the edges lift, turn once, and cook the other side.'),
+      _en('Serve hot with curd on the side.'),
+    ],
+    nutritionGlance: const ['Protein 14g', 'Fibre 6g', 'Whole dal, no refined flour'],
+    videoTitle: 'Cook along: moong dal chilla',
+  ),
   Recipe(
     id: 'bengali_macher_jhol',
     name: _en('Bengali macher jhol'),

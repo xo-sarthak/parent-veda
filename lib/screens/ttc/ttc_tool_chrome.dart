@@ -72,10 +72,11 @@ class TtcToolScaffold extends StatelessWidget {
     required this.hue,
     required this.eyebrow,
     required this.title,
-    required this.intro,
     required this.children,
+    this.intro,
     this.variant = 2,
     this.action,
+    this.heroLead,
   });
 
   final double hue;
@@ -87,7 +88,20 @@ class TtcToolScaffold extends StatelessWidget {
   final String title;
 
   /// One Manrope sentence. What it will and will not do.
-  final String intro;
+  ///
+  /// WARNING: NULLABLE, AND THE EXCEPTION IS NARROW. It used to be required, on
+  /// the argument at the head of this class: on a screen that could be mistaken
+  /// for a diagnostic quiz, "this is not a diagnosis" arriving at the end
+  /// arrives after she has already decided what the screen was.
+  ///
+  /// That argument is about a screen that ASKS. A RESULT has already been
+  /// framed -- she read the intro on the way in and answered eight questions
+  /// under it -- and inventing a second sentence to satisfy a required
+  /// parameter would put copy on the page to please a constructor.
+  ///
+  /// So: leave it out only where nothing is being asked. On a tool's first
+  /// screen a missing intro is a missing sentence, not a null.
+  final String? intro;
 
   /// Everything inside the sheet.
   final List<Widget> children;
@@ -108,6 +122,19 @@ class TtcToolScaffold extends StatelessWidget {
   /// a list, because a hero with two actions in it is a toolbar.
   final Widget? action;
 
+  /// Sits in the hero between the close row and the eyebrow.
+  ///
+  /// ⚠️ FOR A CHOICE THAT SCOPES EVERYTHING BELOW IT, and for nothing else. The
+  /// cycle report opens on one cycle out of several and its ◀ ▶ picker decides
+  /// what every card underneath is about — a control like that cannot sit in
+  /// the sheet, because then the page has already begun answering before she
+  /// has said which question she is asking.
+  ///
+  /// It is deliberately not a general "put anything here" slot. A hero with a
+  /// stack of controls in it is a toolbar, which is the thing `TtcToolClose`
+  /// exists to avoid. One widget, and it should be a scope, not an action.
+  final Widget? heroLead;
+
   @override
   Widget build(BuildContext context) {
     final p = V2PaletteStore.instance.current;
@@ -121,7 +148,10 @@ class TtcToolScaffold extends StatelessWidget {
       body: Stack(children: [
         Positioned.fill(
           child: V3HeroField(
-              accent: accent, ground: p.ground, variant: variant),
+              accent: accent,
+              ground: p.ground,
+              variant: variant,
+              chroma: v3FieldChroma(hue % 360)),
         ),
         ListView(
           padding: const EdgeInsets.only(bottom: ttcBottomInset),
@@ -140,6 +170,10 @@ class TtcToolScaffold extends StatelessWidget {
                           action!,
                         ],
                       ]),
+                      if (heroLead != null) ...[
+                        const SizedBox(height: 14),
+                        heroLead!,
+                      ],
                       const SizedBox(height: 14),
                       Text(eyebrow.toUpperCase(),
                           style: pvManrope(
@@ -155,10 +189,12 @@ class TtcToolScaffold extends StatelessWidget {
                               height: 1.2,
                               letterSpacing: -0.5,
                               color: p.ink1)),
-                      const SizedBox(height: 10),
-                      Text(intro,
-                          style: pvManrope(
-                              fontSize: 13.5, height: 1.6, color: p.ink2)),
+                      if (intro case final line?) ...[
+                        const SizedBox(height: 10),
+                        Text(line,
+                            style: pvManrope(
+                                fontSize: 13.5, height: 1.6, color: p.ink2)),
+                      ],
                     ]),
               ),
             ),
@@ -505,14 +541,36 @@ class TtcToolPrimary extends StatelessWidget {
           padding: const EdgeInsets.symmetric(vertical: 15),
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: ttcPurple,
+            // ⚠️ WHITE WITH A HAIRLINE. NOT THE ACCENT, AND NOT FILLED.
+            //
+            // This was `ttcPurple` and it was the stage's odd one out. The rule
+            // is already written down on `_QuietButton` at the foot of the
+            // symptom logger — *"ONE BUTTON TREATMENT ON THIS STAGE: white with
+            // a hairline"* — and restated as a direct instruction: the buttons
+            // are not purple.
+            //
+            // The reasoning behind that rule is the design system's own: the
+            // accent is spent at decision points and never laid down as a
+            // SURFACE. A full-width filled bar is a surface whatever it does
+            // when tapped, and on a page of pale tinted blocks it is also the
+            // loudest object present — which puts the emphasis on the control
+            // rather than on what the reader came to read.
+            //
+            // ⚠️ THIS CHANGED `ttc_ivf_readiness_screen.dart` TOO, which was
+            // the only other caller. That is the point of folding rather than
+            // forking: the PCOS tool had already been corrected to white by
+            // hand, and leaving the shared one purple would have meant two TTC
+            // tools with two different primary buttons and a rule that only
+            // one of them followed.
+            color: Colors.white,
             borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: ttcLine),
           ),
           child: Text(label,
               style: pvManrope(
-                  fontSize: 14.5,
+                  fontSize: 14,
                   fontWeight: FontWeight.w800,
-                  color: Colors.white)),
+                  color: ttcTitleInk)),
         ),
       );
 }

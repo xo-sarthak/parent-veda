@@ -332,5 +332,84 @@ void main() {
       await pump(tester, TtcPcosChecklistScreen(result: r));
       expect(find.text(kPcosChecklistDisclaimer), findsOneWidget);
     });
+
+    // =========================================================================
+    //  ⚠️ AN ANSWER CAN BE TAKEN BACK, AND FOR A WHILE IT COULD NOT.
+    //
+    //  Reported as *"if I click on an option, I should be able to deselect it —
+    //  if I select it then it just does not go back."* On most forms that is an
+    //  irritation. Here it contradicted the screen's own promise: every
+    //  question is optional, `pcosBuildStand` is built to take a half-filled
+    //  form, and the page says in as many words "you can leave any of these
+    //  blank" — while the first tap on any question locked it.
+    //
+    //  Asserted on the tick rather than on the fill, because the tick is the
+    //  part that says an answer is HELD. A test on the tint would pass against
+    //  a block that merely looked selected.
+    // =========================================================================
+    testWidgets('an answer can be tapped off again', (tester) async {
+      await pump(tester, const TtcPcosStandScreen());
+
+      // ⚠️ ASSERTED ON WEIGHT, NOT ON THE FILL, AND NOT ON A TICK.
+      //
+      // Not the fill, for the reason the first version of this test gave: a
+      // tint assertion passes against a block that merely LOOKS chosen, so it
+      // proves the paint and not the state.
+      //
+      // Not a tick either, any more. Single-choice questions dropped the
+      // checkbox — a checkbox promises you may pick several and seven of these
+      // eight questions were breaking that promise on the second tap. Weight is
+      // what is left that changes with the answer rather than beside it.
+      FontWeight? weightOf(String label) =>
+          tester.widget<Text>(find.text(label)).style?.fontWeight;
+
+      const option = 'Mostly 21 to 35 days';
+      expect(find.text(option), findsOneWidget);
+      expect(weightOf(option), FontWeight.w600,
+          reason: 'nothing is prefilled with no logs, so it starts unchosen');
+
+      await tester.tap(find.text(option));
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(weightOf(option), FontWeight.w800);
+
+      await tester.tap(find.text(option));
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(weightOf(option), FontWeight.w600,
+          reason: 'a second tap clears the answer');
+    });
+
+    testWidgets('and a single-choice question draws no checkbox',
+        (tester) async {
+      // ⚠️ THE RULE, HELD DIRECTLY. A checkbox is a promise that more than one
+      // answer may be given. Only the hair-area picker can keep it, and it is
+      // the only place on the page one may appear — the seven single-choice
+      // questions must not, chosen or not.
+      await pump(tester, const TtcPcosStandScreen());
+      expect(find.byIcon(Icons.check_rounded), findsNothing);
+
+      await tester.tap(find.text('Mostly 21 to 35 days'));
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(find.byIcon(Icons.check_rounded), findsNothing,
+          reason: 'a single-choice answer grew a checkbox when chosen');
+    });
+
+    // The one question where "answered" is two fields rather than one, so the
+    // toggle had to be written by hand — see the call site's note.
+    testWidgets('and so can "Haven\'t noticed" on the hair question',
+        (tester) async {
+      await pump(tester, const TtcPcosStandScreen());
+
+      // Two blocks carry this label (Q3's multi-select and Q4/Q5's degree
+      // ladder), so the hair one is taken by position rather than by text.
+      final none = find.text("Haven't noticed").first;
+
+      await tester.tap(none);
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(find.byIcon(Icons.check_rounded), findsOneWidget);
+
+      await tester.tap(none);
+      await tester.pump(const Duration(milliseconds: 200));
+      expect(find.byIcon(Icons.check_rounded), findsNothing);
+    });
   });
 }

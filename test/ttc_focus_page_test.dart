@@ -31,6 +31,7 @@ import 'package:parentveda/screens/ttc/ttc_focus_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_surface_router.dart';
 import 'package:parentveda/ttc/ttc_focus_data.dart';
 import 'package:parentveda/ttc/ttc_prepare_data.dart';
+import 'package:parentveda/data/nutrition_data.dart' show kRecipes;
 import 'package:parentveda/ttc/ttc_products_data.dart';
 import 'package:parentveda/ttc/ttc_reads_data.dart';
 
@@ -153,6 +154,18 @@ void main() {
       for (final tile in page.allTiles.whereType<TtcProductTile>()) {
         expect(ttcProducts.any((p) => p.id == tile.productId), isTrue,
             reason: '"${tile.title}" points at product "${tile.productId}"');
+      }
+    });
+
+    test('every recipe id exists in the catalogue', () {
+      // ⚠️ THE NEWEST ID AND THEREFORE THE LIKELIEST TO ROT. A recipe tile
+      // renders a perfect card from its own title and blurb whatever is
+      // underneath it; `openTtcFocusTile` then throws on the tap. Better here
+      // than on a phone.
+      for (final tile in page.allTiles.whereType<TtcRecipeTile>()) {
+        expect(kRecipes.any((r) => r.id == tile.recipeId), isTrue,
+            reason: '"${tile.title}" points at recipe "${tile.recipeId}", '
+                'which is not in kRecipes');
       }
     });
 

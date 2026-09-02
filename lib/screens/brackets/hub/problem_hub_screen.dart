@@ -131,7 +131,11 @@ class ProblemHubScreen extends StatelessWidget {
             // over it. Identical to every V3 home — a gradient that ENDS is
             // what made the old bracket screen read as faded.
             Positioned.fill(
-              child: V3HeroField(accent: tint, ground: p.ground, variant: 1),
+              child: V3HeroField(
+                  accent: tint,
+                  ground: p.ground,
+                  variant: 1,
+                  chroma: v3FieldChroma(bracket.hue)),
             ),
             ListView(padding: EdgeInsets.zero, children: [
               _Hero(

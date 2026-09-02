@@ -30,8 +30,8 @@ import 'package:flutter/material.dart';
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_pcos_stand.dart';
 import '../v2/v2_palette.dart';
-import '../v2/v3_hero_field.dart';
 import 'ttc_common.dart';
+import 'ttc_tool_chrome.dart';
 import 'ttc_pcos_check_screen.dart' show kPcosHue;
 import 'ttc_prepare_screen.dart';
 
@@ -43,6 +43,52 @@ class TtcPcosStandScreen extends StatefulWidget {
 }
 
 class _TtcPcosStandScreenState extends State<TtcPcosStandScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return const TtcToolScaffold(
+      hue: kPcosHue,
+      variant: 2,
+      eyebrow: kPcosStandEyebrow,
+      title: kPcosStandTitle,
+      intro: kPcosStandIntro,
+      children: [TtcPcosStandBody()],
+    );
+  }
+}
+
+/// The tool's eyebrow, title and its "what this is not" line.
+///
+/// ⚠️ CONSTANTS BECAUSE TWO SURFACES SAY THEM NOW. The tool has its own screen
+/// AND renders inline inside the PCOS door, and the third of these is the
+/// sentence that stops the flow reading as a diagnostic quiz. Two typed copies
+/// of a safety line become two lines that say different things.
+const String kPcosStandEyebrow = 'WHERE DO I STAND';
+const String kPcosStandTitle = 'A read of your own pattern.';
+const String kPcosStandIntro =
+    'No score, no match, no verdict. Just your pattern in plain words, and '
+    'what is worth taking to a doctor.';
+
+/// The eight questions and the button, with no frame of their own.
+///
+/// ⚠️ EXTRACTED SO THE PCOS DOOR CAN SHOW THE TOOL IN PLACE. Selecting "Where
+/// do I stand" on that page used to open this screen; it now renders these
+/// questions under the selector rail with no navigation at all. What could NOT
+/// come with it is the chrome — a close button on a page you did not navigate
+/// to is a control that lies about where it goes, and a second hero field under
+/// the door's own photograph is two backgrounds arguing.
+///
+/// ⚠️ THE SPLIT IS FRAME FROM CONTENT, AND NOTHING ELSE MOVED. Same eight
+/// questions, same wording, same prefill, same progress hairline, same result.
+/// `docs/STILL-OPEN.md` §18.5 says this screen is signed off and must not be
+/// redesigned; it has not been. It has been given a second container.
+class TtcPcosStandBody extends StatefulWidget {
+  const TtcPcosStandBody({super.key});
+
+  @override
+  State<TtcPcosStandBody> createState() => _TtcPcosStandBodyState();
+}
+
+class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
   final _a = PcosStandAnswers();
   late final PcosCycleFacts _facts = pcosCycleFacts();
 
@@ -74,67 +120,16 @@ class _TtcPcosStandScreenState extends State<TtcPcosStandScreen> {
   @override
   Widget build(BuildContext context) {
     final p = V2PaletteStore.instance.current;
-    final accent = v2BlockTint(kPcosHue, p);
 
-    return Scaffold(
-      backgroundColor: p.ground,
-      body: Stack(children: [
-        // ⚠️ THE V3 FIELD, NOT A FLAT `ttcBg`. Every other screen this tool is
-        // reached from — the focus page, the home, the reader — sits on this
-        // field with a sheet sliding over it. A questionnaire on a plain white
-        // ground reads as a form that belongs to a different app, which is
-        // exactly the feeling this flow exists to avoid.
-        Positioned.fill(
-          child: V3HeroField(
-              accent: accent, ground: p.ground, variant: 2),
-        ),
-        ListView(
-          padding: const EdgeInsets.only(bottom: ttcBottomInset),
-          children: [
-            SafeArea(
-              bottom: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(18, 4, 18, 18),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _RoundClose(p: p),
-                      const SizedBox(height: 14),
-                      Text('WHERE DO I STAND',
-                          style: pvManrope(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1.3,
-                              color: p.ink2)),
-                      const SizedBox(height: 8),
-                      Text('A read of your own pattern.',
-                          style: pvFraunces(
-                              fontSize: 27,
-                              fontWeight: FontWeight.w600,
-                              height: 1.18,
-                              letterSpacing: -0.5,
-                              color: p.ink1)),
-                      const SizedBox(height: 10),
-                      // ⚠️ THE DISCLAIMER IS IN THE HERO, NOT AT THE FOOT. On a
-                      // screen that could be mistaken for a diagnostic quiz,
-                      // "this is not a diagnosis" arriving after eight
-                      // questions arrives after she has already decided what
-                      // the screen is.
-                      Text(
-                          'No score, no match, no verdict. Just your pattern '
-                          'in plain words, and what is worth taking to a '
-                          'doctor.',
-                          style: pvManrope(
-                              fontSize: 13.5, height: 1.6, color: p.ink2)),
-                    ]),
-              ),
-            ),
-            _Sheet(p: p, children: [
-              const SizedBox(height: 22),
-
-              // ---- what we already know ------------------------------------
-              _pad(_FactsCard(facts: _facts, p: p)),
-              const SizedBox(height: 20),
+    return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+              // WARNING: 8, NOT 22. This gap was written when the tool owned a
+              // whole screen and had a hero above it. Inline under the door's
+              // tab rail it is the second gap in a row, and two gaps read as
+              // one large empty band -- "in between the tabs above and the
+              // eight short questions, space is being wasted".
+              const SizedBox(height: 8),
 
               // ⚠️ A PROGRESS HAIRLINE, NOT "3 OF 8". A counter on a health
               // questionnaire is a debt statement — it tells her how much is
@@ -142,17 +137,20 @@ class _TtcPcosStandScreenState extends State<TtcPcosStandScreen> {
               // exactly what that feels like. A filling line answers the same
               // question without putting a number on the remainder, and it
               // moves visibly on every tap, which is the part that reassures.
-              _pad(_Progress(done: _answered, total: 8, p: p)),
-              const SizedBox(height: 18),
+              ttcToolPad(TtcToolProgress(
+                  done: _answered,
+                  total: 8,
+                  startLabel: 'EIGHT SHORT QUESTIONS')),
+              const SizedBox(height: 12),
 
-              _pad(_Q(
+              ttcToolPad(TtcToolQuestion(
+                hue: kPcosHue,
                 n: 1,
                 title: 'How long are your cycles usually?',
                 note: _facts.suggestedLength == null
                     ? null
                     : 'Filled in from your logs. Change it if that looks '
                         'wrong.',
-                p: p,
                 child: _Chips<PcosCycleLength>(
                   value: _a.cycleLength,
                   options: const {
@@ -166,75 +164,86 @@ class _TtcPcosStandScreenState extends State<TtcPcosStandScreen> {
                 ),
               )),
 
-              _pad(_Q(
+              ttcToolPad(TtcToolQuestion(
+                hue: kPcosHue,
                 n: 2,
                 title: 'Have you gone 3 months or more without a period in '
                     'the last year?',
                 note: 'Leaving aside pregnancy, breastfeeding or birth '
                     'control.',
-                p: p,
                 child: _YesNo(
                     value: _a.longGaps,
                     onTap: (v) => _set(() => _a.longGaps = v),
                     p: p),
               )),
 
-              _pad(_Q(
+              ttcToolPad(TtcToolQuestion(
+                hue: kPcosHue,
                 n: 3,
                 title: 'Have you noticed extra hair growth anywhere?',
                 note: 'Tap every area that applies.',
-                p: p,
                 child: _AreaPicker(
                   selected: _a.hairAreas,
                   checked: _a.hairChecked,
+                  // ⚠️ THE ONLY QUESTION WHERE DESELECT NEEDED THINKING, because
+                  // "answered" here is two fields rather than one. `hairChecked`
+                  // means she replied at all; `hairAreas` means where. So
+                  // "Haven't noticed" is checked-and-empty, and unticking the
+                  // last area has to take `hairChecked` down with it — otherwise
+                  // clearing her areas would silently light up "Haven't
+                  // noticed", which is a different answer than the one she just
+                  // withdrew.
                   onToggle: (h) => _set(() {
-                    _a.hairChecked = true;
                     _a.hairAreas.contains(h)
                         ? _a.hairAreas.remove(h)
                         : _a.hairAreas.add(h);
+                    _a.hairChecked = _a.hairAreas.isNotEmpty;
                   }),
                   onNone: () => _set(() {
-                    _a.hairChecked = true;
+                    // Tapping it while it is already the answer clears the
+                    // question, the same as every other block on the page.
+                    final wasNone = _a.hairChecked && _a.hairAreas.isEmpty;
                     _a.hairAreas.clear();
+                    _a.hairChecked = !wasNone;
                   }),
                   p: p,
                 ),
               )),
 
-              _pad(_Q(
+              ttcToolPad(TtcToolQuestion(
+                hue: kPcosHue,
                 n: 4,
                 title: 'Any hair thinning or loss?',
-                p: p,
                 child: _Degree(
                     value: _a.thinning,
                     onTap: (v) => _set(() => _a.thinning = v),
                     p: p),
               )),
 
-              _pad(_Q(
+              ttcToolPad(TtcToolQuestion(
+                hue: kPcosHue,
                 n: 5,
                 title: 'Acne for 6 months or more that skincare did not fix?',
-                p: p,
                 child: _Degree(
                     value: _a.acne,
                     onTap: (v) => _set(() => _a.acne = v),
                     p: p),
               )),
 
-              _pad(_Q(
+              ttcToolPad(TtcToolQuestion(
+                hue: kPcosHue,
                 n: 6,
                 title: 'Darker, thicker skin on your neck, armpits or belly?',
-                p: p,
                 child: _YesNo(
                     value: _a.skinDarkening,
                     onTap: (v) => _set(() => _a.skinDarkening = v),
                     p: p),
               )),
 
-              _pad(_Q(
+              ttcToolPad(TtcToolQuestion(
+                hue: kPcosHue,
                 n: 7,
                 title: 'How long have you been trying?',
-                p: p,
                 child: _Chips<PcosTrying>(
                   value: _a.trying,
                   options: const {
@@ -248,11 +257,11 @@ class _TtcPcosStandScreenState extends State<TtcPcosStandScreen> {
                 ),
               )),
 
-              _pad(_Q(
+              ttcToolPad(TtcToolQuestion(
+                hue: kPcosHue,
                 n: 8,
                 title: 'Has your mother or sister been told they have PCOS?',
                 note: 'Optional.',
-                p: p,
                 child: _Chips<PcosFamily>(
                   value: _a.family,
                   options: const {
@@ -266,7 +275,7 @@ class _TtcPcosStandScreenState extends State<TtcPcosStandScreen> {
               )),
 
               const SizedBox(height: 6),
-              _pad(_Primary(
+              _pad(TtcToolPrimary(
                 label: 'See my read',
                 onTap: () {
                   // ⚠️ FIRE AND FORGET, LIKE EVERY OTHER WRITE IN THIS APP.
@@ -288,12 +297,26 @@ class _TtcPcosStandScreenState extends State<TtcPcosStandScreen> {
                   textAlign: TextAlign.center,
                   style: pvManrope(
                       fontSize: 11.5, height: 1.5, color: p.ink3))),
+
+              // ---- what we already know, AFTER the asking -------------------
+              //
+              // WARNING: THIS USED TO OPEN THE FLOW AND IT COST TOO MUCH ROOM.
+              // The intent was sound — show what the app already knows so the
+              // screen does not feel like starting from nothing, and so it does
+              // not ask twice. But on a 360pt phone it pushed the second
+              // question below the fold, which is the one thing this flow must
+              // not do: the whole argument for one scroll over a wizard is that
+              // she can SEE the ask is short. Reported exactly that way: "I
+              // cannot even see the second question."
+              //
+              // Below the button it still does both jobs. The prefill on Q1 is
+              // what actually stops the double-asking; this card only explains
+              // where that prefill came from, and an explanation is worth more
+              // once someone has met the thing being explained.
+              const SizedBox(height: 30),
+              _pad(_FactsCard(facts: _facts, p: p)),
               const SizedBox(height: 24),
-            ]),
-          ],
-        ),
-      ]),
-    );
+        ]);
   }
 }
 
@@ -306,98 +329,6 @@ void _openConsults(BuildContext context) =>
 
 Widget _pad(Widget child) =>
     Padding(padding: const EdgeInsets.symmetric(horizontal: 18), child: child);
-
-/// The sheet every V3 page slides over its field.
-class _Sheet extends StatelessWidget {
-  const _Sheet({required this.p, required this.children});
-
-  final V2Palette p;
-  final List<Widget> children;
-
-  @override
-  Widget build(BuildContext context) => Container(
-        constraints: BoxConstraints(
-            minHeight: MediaQuery.sizeOf(context).height * 0.72),
-        decoration: BoxDecoration(
-          color: p.ground,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.10),
-              blurRadius: 24,
-              offset: const Offset(0, -6),
-            ),
-          ],
-        ),
-        child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start, children: children),
-      );
-}
-
-class _RoundClose extends StatelessWidget {
-  const _RoundClose({required this.p});
-
-  final V2Palette p;
-
-  @override
-  Widget build(BuildContext context) => Semantics(
-        button: true,
-        label: 'Close',
-        child: InkWell(
-          onTap: () => Navigator.of(context).maybePop(),
-          borderRadius: BorderRadius.circular(999),
-          child: Container(
-            width: 38,
-            height: 38,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-                color: p.surface.withValues(alpha: 0.9),
-                shape: BoxShape.circle),
-            child: Icon(Icons.close_rounded, size: 19, color: p.ink1),
-          ),
-        ),
-      );
-}
-
-/// A filling hairline. Not a counter — see the note at its call site.
-class _Progress extends StatelessWidget {
-  const _Progress({required this.done, required this.total, required this.p});
-
-  final int done;
-  final int total;
-  final V2Palette p;
-
-  @override
-  Widget build(BuildContext context) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(done == 0 ? 'EIGHT SHORT QUESTIONS' : 'KEEP GOING',
-              style: pvManrope(
-                  fontSize: 9.5,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.1,
-                  color: p.ink3)),
-          const SizedBox(height: 8),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(999),
-            child: Stack(children: [
-              Container(height: 4, color: p.line),
-              // `LayoutBuilder`-free: a fractional box is enough, and it
-              // animates without needing the parent's width.
-              FractionallySizedBox(
-                widthFactor: total == 0 ? 0 : done / total,
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 260),
-                  curve: Curves.easeOut,
-                  height: 4,
-                  color: ttcPurple,
-                ),
-              ),
-            ]),
-          ),
-        ],
-      );
-}
 
 /// What her logs already say, shown before the first question.
 ///
@@ -461,103 +392,61 @@ class TtcPcosStandResultScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final p = V2PaletteStore.instance.current;
-    final accent = v2BlockTint(kPcosHue, p);
-
-    return Scaffold(
-      backgroundColor: p.ground,
-      body: Stack(children: [
-        Positioned.fill(
-          child:
-              V3HeroField(accent: accent, ground: p.ground, variant: 3),
-        ),
-        ListView(
-          padding: const EdgeInsets.only(bottom: ttcBottomInset),
-          children: [
-            SafeArea(
-              bottom: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(18, 4, 18, 18),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _RoundClose(p: p),
-                      const SizedBox(height: 14),
-                      Text('YOUR READ',
-                          style: pvManrope(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1.3,
-                              color: p.ink2)),
-                      const SizedBox(height: 8),
-                      // ⚠️ THIS IS WHERE A MATCH PERCENTAGE WOULD GO, and the
-                      // absence is the design. It is the first place the eye
-                      // lands on a result screen, so what sits here decides
-                      // what the whole flow was. A sentence about what she is
-                      // holding, rather than a verdict about her body.
-                      Text('Here is what you told us,\nsaid back plainly.',
-                          style: pvFraunces(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w600,
-                              height: 1.2,
-                              letterSpacing: -0.5,
-                              color: p.ink1)),
-                    ]),
-              ),
-            ),
-            _Sheet(p: p, children: [
+    return TtcToolScaffold(
+      hue: kPcosHue,
+      variant: 3,
+      eyebrow: 'Your read',
+      title: 'Here is what you told us,\nsaid back plainly.',
+      children: [
               const SizedBox(height: 24),
 
-              _pad(_BlockHead(
+              _pad(TtcToolBlockHead(
                   label: 'What your cycle looks like',
-                  mark: _StandMark.cycle,
                   hue: 206,
-                  p: p)),
+                  mark: _standPainter(_StandMark.cycle, 206))),
               const SizedBox(height: 10),
-              _pad(_Block(text: result.cycleLine, hue: 206, p: p)),
+              _pad(TtcToolBlock(text: result.cycleLine, hue: 206)),
 
               if (result.noticed.isNotEmpty) ...[
                 const SizedBox(height: 26),
-                _pad(_BlockHead(
+                _pad(TtcToolBlockHead(
                     label: 'What else you shared',
-                    mark: _StandMark.noticed,
                     hue: 42,
-                    p: p)),
+                    mark: _standPainter(_StandMark.noticed, 42))),
                 const SizedBox(height: 10),
                 // ⚠️ ONE CARD PER LINE, NOT A BULLET LIST. Four observations
                 // run together as bullets read as a case being assembled;
                 // separated, each stays what it is — one thing worth
                 // mentioning, with its own edges.
                 for (final line in result.noticed) ...[
-                  _pad(_Block(text: line, hue: 42, p: p)),
+                  _pad(TtcToolBlock(text: line, hue: 42)),
                   const SizedBox(height: 8),
                 ],
               ],
 
               const SizedBox(height: 26),
-              _pad(_BlockHead(
+              _pad(TtcToolBlockHead(
                   label: 'What is worth doing next',
-                  mark: _StandMark.next,
                   hue: 160,
-                  p: p)),
+                  mark: _standPainter(_StandMark.next, 160))),
               const SizedBox(height: 10),
-              _pad(_Block(text: result.always, hue: 160, p: p)),
+              _pad(TtcToolBlock(text: result.always, hue: 160)),
               if (result.nudge != null) ...[
                 const SizedBox(height: 8),
                 // The nudge is the only card on the page that carries a border,
                 // and that is the entire escalation this tool is allowed. No
                 // red, no icon, no alarm word.
-                _pad(_Block(
-                    text: result.nudge!, hue: 42, p: p, outlined: true)),
+                _pad(TtcToolBlock(
+                    text: result.nudge!, hue: 42, outlined: true)),
               ],
 
               const SizedBox(height: 20),
-              _pad(_Primary(
+              _pad(TtcToolPrimary(
                 label: 'Talk to a PCOS specialist',
                 onTap: () => _openConsults(context),
               )),
               const SizedBox(height: 10),
-              _pad(_Secondary(
+              _pad(TtcToolSecondary(
                 label: 'What to take to your doctor',
                 onTap: () => Navigator.of(context).push(
                     MaterialPageRoute<void>(
@@ -568,12 +457,9 @@ class TtcPcosStandResultScreen extends StatelessWidget {
               )),
 
               const SizedBox(height: 22),
-              _pad(_PrivacyLine(p: p)),
+              _pad(const TtcToolPrivacyLine()),
               const SizedBox(height: 26),
-            ]),
-          ],
-        ),
-      ]),
+      ],
     );
   }
 }
@@ -597,49 +483,14 @@ class TtcPcosChecklistScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = V2PaletteStore.instance.current;
-    final accent = v2BlockTint(kPcosHue, p);
 
-    return Scaffold(
-      backgroundColor: p.ground,
-      body: Stack(children: [
-        Positioned.fill(
-          child:
-              V3HeroField(accent: accent, ground: p.ground, variant: 4),
-        ),
-        ListView(
-          padding: const EdgeInsets.only(bottom: ttcBottomInset),
-          children: [
-            SafeArea(
-              bottom: false,
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(18, 4, 18, 18),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _RoundClose(p: p),
-                      const SizedBox(height: 14),
-                      Text('APPOINTMENT NOTES',
-                          style: pvManrope(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1.3,
-                              color: p.ink2)),
-                      const SizedBox(height: 8),
-                      Text('What to take to\nyour doctor.',
-                          style: pvFraunces(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w600,
-                              height: 1.2,
-                              letterSpacing: -0.5,
-                              color: p.ink1)),
-                      const SizedBox(height: 10),
-                      Text('Screenshot this, or read it out. It is four lines.',
-                          style: pvManrope(
-                              fontSize: 13.5, height: 1.6, color: p.ink2)),
-                    ]),
-              ),
-            ),
-            _Sheet(p: p, children: [
+    return TtcToolScaffold(
+      hue: kPcosHue,
+      variant: 4,
+      eyebrow: 'Appointment notes',
+      title: 'What to take to\nyour doctor.',
+      intro: 'Screenshot this, or read it out. It is four lines.',
+      children: [
               const SizedBox(height: 24),
               _pad(Container(
                 width: double.infinity,
@@ -690,84 +541,37 @@ class TtcPcosChecklistScreen extends StatelessWidget {
                     ]),
               )),
               const SizedBox(height: 18),
-              _pad(_Primary(
+              _pad(TtcToolPrimary(
                 label: 'Talk to a PCOS specialist',
                 onTap: () => _openConsults(context),
               )),
               const SizedBox(height: 22),
-              _pad(_PrivacyLine(p: p)),
+              _pad(const TtcToolPrivacyLine()),
               const SizedBox(height: 26),
-            ]),
-          ],
-        ),
-      ]),
+      ],
     );
   }
-}
-
-/// "This stays on your phone. It is not a medical record."
-///
-/// ⚠️ A COMPONENT BECAUSE IT APPEARS TWICE AND MUST NOT DRIFT. The spec asks
-/// for the result to be "stored privately and labelled clearly as not a medical
-/// record", and a sentence typed out at two call sites is a sentence that ends
-/// up saying two things.
-class _PrivacyLine extends StatelessWidget {
-  const _PrivacyLine({required this.p});
-
-  final V2Palette p;
-
-  @override
-  Widget build(BuildContext context) =>
-      Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Icon(Icons.lock_outline_rounded, size: 15, color: p.ink3),
-        const SizedBox(width: 9),
-        Expanded(
-          child: Text(
-              'This stays on your phone. It is not a medical record.',
-              style:
-                  pvManrope(fontSize: 11.5, height: 1.5, color: p.ink3)),
-        ),
-      ]);
 }
 
 /// Which mark a result block carries.
 enum _StandMark { cycle, noticed, next }
 
-/// A block heading with its drawn mark.
-class _BlockHead extends StatelessWidget {
-  const _BlockHead(
-      {required this.label,
-      required this.mark,
-      required this.hue,
-      required this.p});
-
-  final String label;
-  final _StandMark mark;
-  final double hue;
-  final V2Palette p;
-
-  @override
-  Widget build(BuildContext context) {
-    final tint = v2BlockTint(hue, p);
-    final deep = HSLColor.fromColor(tint)
+/// The drawn mark for a result block, in that block's own deep ink.
+///
+/// WARNING: A FUNCTION, BECAUSE `TtcToolBlockHead` TAKES A PAINTER RATHER THAN
+/// AN ENUM. The private head this replaced knew about `_StandMark` and derived
+/// the ink itself; the shared one is deliberately more general — it accepts any
+/// `CustomPainter`, so a tool can draw whatever it needs — which means the
+/// derivation moves here instead of being lost with the class.
+_StandMarkPainter _standPainter(_StandMark mark, double hue) {
+  final tint = v2BlockTint(hue % 360, V2PaletteStore.instance.current);
+  return _StandMarkPainter(
+    mark: mark,
+    ink: HSLColor.fromColor(tint)
         .withSaturation(0.45)
         .withLightness(0.38)
-        .toColor();
-    return Row(children: [
-      Container(
-        width: 30,
-        height: 30,
-        decoration: BoxDecoration(color: tint, shape: BoxShape.circle),
-        child: CustomPaint(painter: _StandMarkPainter(mark: mark, ink: deep)),
-      ),
-      const SizedBox(width: 11),
-      Expanded(
-        child: Text(label,
-            style: pvJakarta(
-                fontSize: 17, fontWeight: FontWeight.w700, color: p.ink1)),
-      ),
-    ]);
-  }
+        .toColor(),
+  );
 }
 
 /// Three marks, drawn rather than iconned — same reason as the symptom set.
@@ -828,83 +632,19 @@ class _StandMarkPainter extends CustomPainter {
 //  Furniture
 // -----------------------------------------------------------------------------
 
-/// One question, as a card with a numbered chip.
-///
-/// ⚠️ THE NUMBER IS THE POINT OF THE CHIP. Eight unnumbered cards in a scroll
-/// read as an undifferentiated wall; numbered, the scroll has a spine and she
-/// can see at a glance that question six is nearly the end. It is the same job
-/// the progress hairline does, said a second way — and on a long scroll the
-/// hairline is off screen most of the time.
-class _Q extends StatelessWidget {
-  const _Q({
-    required this.n,
-    required this.title,
-    required this.child,
-    required this.p,
-    this.note,
-  });
-
-  final int n;
-  final String title;
-  final String? note;
-  final Widget child;
-  final V2Palette p;
-
-  @override
-  Widget build(BuildContext context) {
-    final tint = v2BlockTint(kPcosHue, p);
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.fromLTRB(16, 15, 16, 16),
-      decoration: BoxDecoration(
-        color: p.surface,
-        borderRadius: BorderRadius.circular(20),
-        // A hairline rather than a shadow: eight stacked shadows on one scroll
-        // is a page that looks like it is hovering.
-        border: Border.all(color: p.line),
-      ),
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Container(
-            width: 22,
-            height: 22,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(color: tint, shape: BoxShape.circle),
-            child: Text('$n',
-                style: pvManrope(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w800,
-                    color: p.ink1)),
-          ),
-          const SizedBox(width: 11),
-          Expanded(
-            child: Text(title,
-                style: pvJakarta(
-                    fontSize: 15.5,
-                    fontWeight: FontWeight.w700,
-                    height: 1.32,
-                    color: p.ink1)),
-          ),
-        ]),
-        if (note != null) ...[
-          const SizedBox(height: 7),
-          Padding(
-            padding: const EdgeInsets.only(left: 33),
-            child: Text(note!,
-                style: pvManrope(
-                    fontSize: 12, height: 1.45, color: p.ink3)),
-          ),
-        ],
-        const SizedBox(height: 14),
-        child,
-      ]),
-    );
-  }
-}
-
-/// A single-choice chip set. Generic so the four question shapes share one
+/// A single-choice option set. Generic so the four question shapes share one
 /// control rather than four near-identical ones.
+///
+/// ⚠️ `onTap` TAKES A NULLABLE, AND THAT IS THE DESELECT. Reported as *"if I
+/// click on an option, I should be able to deselect it — if I select it then it
+/// just does not go back."* Which was true, and on this screen it was worse
+/// than an inconvenience: every question here is optional, the result builds
+/// from a half-filled form on purpose, and yet the first tap on any question
+/// was irreversible. The screen offered "you can leave any of these blank" and
+/// then would not let her go back to blank.
+///
+/// The toggle lives in [_Options] rather than at the eight call sites, so a
+/// question added later cannot forget it.
 class _Chips<T> extends StatelessWidget {
   const _Chips(
       {required this.value,
@@ -914,20 +654,20 @@ class _Chips<T> extends StatelessWidget {
 
   final T? value;
   final Map<T, String> options;
-  final ValueChanged<T> onTap;
+
+  /// Null means "she tapped the answer that was already chosen" — clear it.
+  final ValueChanged<T?> onTap;
   final V2Palette p;
 
   @override
-  Widget build(BuildContext context) => Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: [
+  Widget build(BuildContext context) => _Options(
+        p: p,
+        items: [
           for (final e in options.entries)
-            _Pill(
+            _Opt(
                 label: e.value,
                 on: value == e.key,
-                onTap: () => onTap(e.key),
-                p: p),
+                onTap: () => onTap(value == e.key ? null : e.key)),
         ],
       );
 }
@@ -936,7 +676,7 @@ class _YesNo extends StatelessWidget {
   const _YesNo({required this.value, required this.onTap, required this.p});
 
   final PcosYesNo? value;
-  final ValueChanged<PcosYesNo> onTap;
+  final ValueChanged<PcosYesNo?> onTap;
   final V2Palette p;
 
   @override
@@ -956,7 +696,7 @@ class _Degree extends StatelessWidget {
   const _Degree({required this.value, required this.onTap, required this.p});
 
   final PcosDegree? value;
-  final ValueChanged<PcosDegree> onTap;
+  final ValueChanged<PcosDegree?> onTap;
   final V2Palette p;
 
   @override
@@ -993,148 +733,204 @@ class _AreaPicker extends StatelessWidget {
   final V2Palette p;
 
   @override
-  Widget build(BuildContext context) => Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: [
-          _Pill(
+  Widget build(BuildContext context) => _Options(
+        p: p,
+        items: [
+          _Opt(
               label: "Haven't noticed",
               on: checked && selected.isEmpty,
               onTap: onNone,
-              p: p),
+              tick: true),
           for (final h in PcosHairArea.values)
-            _Pill(
+            _Opt(
                 label: h.label,
                 on: selected.contains(h),
                 onTap: () => onToggle(h),
-                p: p),
+                tick: true),
         ],
       );
 }
 
-class _Pill extends StatelessWidget {
-  const _Pill(
+/// One option, before it is laid out. A record would do; a tiny class keeps the
+/// three fields named at every call site.
+class _Opt {
+  const _Opt(
       {required this.label,
       required this.on,
       required this.onTap,
-      required this.p});
+      this.tick = false});
 
   final String label;
   final bool on;
   final VoidCallback onTap;
-  final V2Palette p;
 
-  @override
-  Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 130),
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-          decoration: BoxDecoration(
-            color: on ? v2BlockTint(288, p) : ttcPanel,
-            borderRadius: BorderRadius.circular(999),
-            border: on ? Border.all(color: ttcPurple, width: 1.5) : null,
-          ),
-          child: Text(label,
-              style: pvManrope(
-                  fontSize: 13,
-                  fontWeight: on ? FontWeight.w800 : FontWeight.w600,
-                  color: ttcTitleInk)),
-        ),
-      );
+  /// Whether this block draws a checkbox.
+  ///
+  /// WARNING: ONLY ON A QUESTION THAT CAN HOLD SEVERAL ANSWERS, which here is
+  /// the hair-area picker and nothing else. The first cut ticked every block on
+  /// the page, reasoning that with deselect available every question is "none
+  /// or one" and so behaves like a set of checkboxes. That is true of the
+  /// MECHANICS and wrong about the READING: a checkbox is a promise that you
+  /// may choose more than one, and seven questions made that promise and then
+  /// broke it on the second tap.
+  ///
+  /// Said plainly: "check boxes are only necessary when there are more than one
+  /// choices." The fill and the border already say a single-choice block is
+  /// chosen, which is what it looked like before the ticks arrived.
+  final bool tick;
 }
 
-class _Block extends StatelessWidget {
-  const _Block(
-      {required this.text,
-      required this.hue,
-      required this.p,
-      this.outlined = false});
+/// The answers to one question, as blocks that fill the row.
+///
+/// ⚠️ THIS REPLACED A `Wrap` OF PILLS, AND THE WRAP IS WHY THE PAGE FELT EMPTY.
+/// Reported as *"eight short questions… a lot of spaces again, being wasted"*,
+/// and a `Wrap` of label-sized pills is the mechanism: every row ended wherever
+/// the last pill happened to fit and left a ragged strip of nothing down the
+/// right-hand side of all eight questions. Nobody wrote that space; it was the
+/// residue of laying out by content width.
+///
+/// So the row is divided instead of filled. Every option in a row is the same
+/// width, the row always reaches both edges, and — the part that actually
+/// recovers the space — **a short last row stretches rather than leaving a
+/// gap**: four options in three columns puts one full-width block underneath,
+/// not one small one with two-thirds of a row beside it.
+///
+/// ⚠️ THE COLUMN COUNT COMES FROM THE LONGEST LABEL, NOT FROM THE COUNT. Three
+/// across for "Yes / No / Not sure", two across for "Often longer than 35". A
+/// fixed three would wrap the long ones onto two lines and a fixed two would
+/// waste half a row on the short ones — the choice has to follow the words.
+class _Options extends StatelessWidget {
+  const _Options({required this.items, required this.p});
 
-  final String text;
-  final double hue;
+  final List<_Opt> items;
   final V2Palette p;
 
-  /// Used by the nudge, and by nothing else. The entire escalation vocabulary
-  /// of this tool is one hairline.
-  final bool outlined;
+  static const double _gap = 8;
 
   @override
   Widget build(BuildContext context) {
-    final tint = v2BlockTint(hue, p);
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: tint,
-        borderRadius: BorderRadius.circular(18),
-        border: outlined
-            ? Border.all(
-                color: HSLColor.fromColor(tint)
-                    .withSaturation(0.45)
-                    .withLightness(0.55)
-                    .toColor(),
-                width: 1.5)
-            : null,
+    final longest =
+        items.fold<int>(0, (n, o) => o.label.length > n ? o.label.length : n);
+    // ⚠️ NINE, NOT TWELVE, AND THE THREE CHARACTERS WERE MEASURED. A block is
+    // not all label: 22pt of padding, an 18pt mark and a 9pt gap come off the
+    // column before a word is drawn, so a third of 354pt leaves about 64pt of
+    // text. "Not sure" wrapped at twelve. The count has to be chosen against
+    // the space the label actually gets, not against the column.
+    final cols = longest <= 9 ? 3 : 2;
+
+    final rows = <Widget>[];
+    for (var i = 0; i < items.length; i += cols) {
+      final end = (i + cols) < items.length ? (i + cols) : items.length;
+      final slice = items.sublist(i, end);
+      rows.add(
+        // ⚠️ `IntrinsicHeight` BUYS ONE THING AND IT IS WORTH THE PASS: every
+        // block in a row is as tall as the tallest. Without it a label that
+        // wraps to two lines leaves its neighbours short and the row reads as
+        // broken — which is what the first cut of this did to "Yes / No / Not
+        // sure". It is an extra layout pass over three small boxes, not over a
+        // list, so the usual objection to it does not apply here.
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (var j = 0; j < slice.length; j++) ...[
+                if (j > 0) const SizedBox(width: _gap),
+                // ⚠️ `Expanded`, WHICH IS WHAT FILLS THE LAST ROW. Four options
+                // in three columns leaves one on its own, and it now spans the
+                // full width instead of sitting in a third of it with the other
+                // two-thirds empty. That gap, repeated down eight questions,
+                // was the wasted space this control was rebuilt to recover.
+                Expanded(child: _OptionBlock(opt: slice[j], p: p)),
+              ],
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Column(children: [
+      for (var i = 0; i < rows.length; i++) ...[
+        if (i > 0) const SizedBox(height: _gap),
+        rows[i],
+      ],
+    ]);
+  }
+}
+
+/// One answer. A block, not a pill.
+///
+/// ⚠️ THE MARK IS WHAT FILLS IT. A pill grown into a rectangle is a bigger
+/// empty pill — the same trap the group tabs on the focus page fell into twice.
+/// The 18pt rounded square on the left gives the block a left edge with
+/// something in it, and it does a second job the pill could not: it says
+/// out loud that an answer can be turned OFF again. A tinted pill with no
+/// control on it looks like a state the screen chose; a box with a tick in it
+/// looks like a thing you can untick, which is now true.
+///
+/// ⚠️ A SQUARE ON SINGLE-CHOICE QUESTIONS TOO, WHICH USUALLY MEANS "MANY". It
+/// is the honest shape here: with deselect, every question on this page really
+/// is "none or one" rather than "exactly one", and a radio that cannot be
+/// cleared is the control this screen just stopped being.
+class _OptionBlock extends StatelessWidget {
+  const _OptionBlock({required this.opt, required this.p});
+
+  final _Opt opt;
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) {
+    final on = opt.on;
+    return Semantics(
+      selected: on,
+      button: true,
+      label: opt.label,
+      child: GestureDetector(
+        onTap: opt.onTap,
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 130),
+          padding: const EdgeInsets.fromLTRB(11, 11, 11, 11),
+          decoration: BoxDecoration(
+            color: on ? v2BlockTint(288, p) : ttcPanel,
+            borderRadius: BorderRadius.circular(14),
+            // WARNING: NOT `ttcPurple`. Same call as the button below — the
+            // accent is spent at decision points, not used to outline eight
+            // questions' worth of blocks.
+            border: Border.all(
+                color: on ? ttcTitleInk : Colors.transparent, width: 1.5),
+          ),
+          child: Row(children: [
+            if (opt.tick) ...[
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 130),
+                width: 18,
+                height: 18,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: on ? ttcTitleInk : Colors.transparent,
+                  borderRadius: BorderRadius.circular(5),
+                  border: on ? null : Border.all(color: ttcLine, width: 1.5),
+                ),
+                child: on
+                    ? const Icon(Icons.check_rounded,
+                        size: 13, color: Colors.white)
+                    : null,
+              ),
+              const SizedBox(width: 9),
+            ],
+            Expanded(
+              child: Text(opt.label,
+                  textAlign: opt.tick ? TextAlign.start : TextAlign.center,
+                  style: pvManrope(
+                      fontSize: 12.5,
+                      height: 1.25,
+                      fontWeight: on ? FontWeight.w800 : FontWeight.w600,
+                      color: ttcTitleInk)),
+            ),
+          ]),
+        ),
       ),
-      child: Text(text,
-          style: pvManrope(fontSize: 14.5, height: 1.62, color: p.ink1)),
     );
   }
 }
 
-class _Primary extends StatelessWidget {
-  const _Primary({required this.label, required this.onTap});
-
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) => InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(999),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 15),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: ttcPurple,
-            borderRadius: BorderRadius.circular(999),
-          ),
-          child: Text(label,
-              style: pvManrope(
-                  fontSize: 14.5,
-                  fontWeight: FontWeight.w800,
-                  color: Colors.white)),
-        ),
-      );
-}
-
-class _Secondary extends StatelessWidget {
-  const _Secondary({required this.label, required this.onTap});
-
-  final String label;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) => InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(999),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 15),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: ttcLine),
-          ),
-          child: Text(label,
-              style: pvManrope(
-                  fontSize: 14.5,
-                  fontWeight: FontWeight.w800,
-                  color: ttcTitleInk)),
-        ),
-      );
-}

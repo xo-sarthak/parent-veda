@@ -24,6 +24,18 @@ import '../services/remote/supabase_repo.dart';
 import 'ttc_chapter.dart';
 import 'ttc_sync.dart';
 
+/// Recorded against a period that had not finished when she logged it.
+///
+/// WARNING: A SENTINEL RATHER THAN A NULL, BECAUSE THE TWO MEAN DIFFERENT
+/// THINGS AND BOTH ARE COMMON. Null is "she has not said"; this is "she said,
+/// and the answer was that it is still going". A screen that collapsed them
+/// would ask a question she has already answered.
+///
+/// Negative so no arithmetic mistakes it for a length: any code that averages
+/// or sums bleed days has to exclude it deliberately, and a sum that quietly
+/// went down is easier to notice than one that quietly went up.
+const int kBleedStillOn = -1;
+
 class CycleStore extends ChangeNotifier with TtcSyncedStore {
   CycleStore._() {
     _load();
@@ -33,6 +45,7 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
   static const _periodsKey = 'ttc_period_starts';
   static const _lhKey = 'ttc_lh_positive';
   static const _bbtKey = 'ttc_temp_shift';
+  static const _bleedKey = 'ttc_bleed_days';
 
   /// First days of logged periods, oldest first. The only cycle fact we store.
   final List<DateTime> _periodStarts = [];
@@ -43,6 +56,19 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
   /// Cycle day a sustained temperature rise was seen, per cycle start.
   final Map<String, int> _tempShift = {};
 
+  /// How many days she bled, per cycle start (ISO date key).
+  ///
+  /// WARNING: STORED SEPARATELY FROM THE START DATE, NOT ALONGSIDE IT. A period
+  /// start is a fact she is sure of the day she logs it; the length is a fact
+  /// she does not have yet. Putting them in one record would mean either
+  /// blocking the log until the bleeding stops, or writing a length nobody
+  /// measured -- and the second is what the cycle report has been doing all
+  /// along, assuming five days to draw its first band.
+  ///
+  /// A missing key means "not answered", which is not the same as
+  /// [kBleedStillOn]. Both are legitimate and they read differently on screen.
+  final Map<String, int> _bleedDays = {};
+
   bool _loaded = false;
   bool get isLoaded => _loaded;
 
@@ -50,6 +76,10 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
 
   /// Period starts, oldest first. Copied so callers cannot mutate our state.
   List<DateTime> get periodStarts => List.unmodifiable(_periodStarts);
+
+  /// Bleeding days for the period that began on [start], or null if she has
+  /// not said. [kBleedStillOn] means it had not finished when she logged it.
+  int? bleedDaysFor(DateTime start) => _bleedDays[_key(_dayOnly(start))];
 
   /// The current cycle's first day, or null before anything is logged.
   DateTime? get lastPeriodStart =>
@@ -145,6 +175,89 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
     notifyListeners();
   }
 
+  /// Records how many days a period lasted.
+  ///
+  /// [days] is a count, [kBleedStillOn] while it is ongoing, or null to clear.
+  /// Silently ignores a start that is not logged, so a stale screen cannot
+  /// create an orphan record keyed to a date the list does not hold.
+  void logBleedDays(DateTime start, int? days) {
+    final d = _dayOnly(start);
+    if (!_periodStarts.any((e) => _sameDay(e, d))) return;
+    if (days == null) {
+      _bleedDays.remove(_key(d));
+    } else {
+      _bleedDays[_key(d)] = days;
+    }
+    _persist();
+    notifyListeners();
+  }
+
+  /// Moves a logged period from one day to another, keeping what hangs off it.
+  ///
+  /// WARNING: A MOVE, NOT A DELETE AND AN ADD. Doing it as two operations
+  /// silently drops the bleed length, the LH strip and the temperature shift,
+  /// because all three are keyed by the start date and `removePeriodStart`
+  /// clears them on the way out. Correcting a date by one day would quietly
+  /// erase everything she recorded about that cycle -- and nothing would look
+  /// wrong afterwards, which is the worst shape a data loss can take.
+  void movePeriodStart(DateTime from, DateTime to) {
+    final a = _dayOnly(from);
+    final b = _dayOnly(to);
+    if (_sameDay(a, b)) return;
+    if (!_periodStarts.any((e) => _sameDay(e, a))) return;
+    if (_periodStarts.any((e) => _sameDay(e, b))) return;
+
+    final bleed = _bleedDays.remove(_key(a));
+    final lh = _lhPositive.remove(_key(a));
+    final temp = _tempShift.remove(_key(a));
+
+    _periodStarts
+      ..removeWhere((e) => _sameDay(e, a))
+      ..add(b)
+      ..sort();
+    if (bleed != null) _bleedDays[_key(b)] = bleed;
+    if (lh != null) _lhPositive[_key(b)] = lh;
+    if (temp != null) _tempShift[_key(b)] = temp;
+
+    _persist();
+    // The old row has to be told to go, or a union merge pulls it back.
+    _deleteCycleFromCloud(a).catchError((_) {});
+    notifyListeners();
+  }
+
+  /// Everything hanging off a period start, so a removal can be put back.
+  ///
+  /// WARNING: THIS EXISTS FOR UNDO AND IT IS WHY UNDO IS HONEST. Restoring only
+  /// the date would give her back a row that had lost its bleed length -- an
+  /// undo that does not undo. Callers capture this BEFORE removing.
+  ({int? bleed, int? lh, int? temp}) detailsFor(DateTime start) {
+    final k = _key(_dayOnly(start));
+    return (bleed: _bleedDays[k], lh: _lhPositive[k], temp: _tempShift[k]);
+  }
+
+  /// Puts a removed period back, with what it carried.
+  void restorePeriodStart(
+    DateTime day, {
+    int? bleed,
+    int? lh,
+    int? temp,
+  }) {
+    final d = _dayOnly(day);
+    if (_periodStarts.any((e) => _sameDay(e, d))) return;
+    _periodStarts
+      ..add(d)
+      ..sort();
+    if (bleed != null) _bleedDays[_key(d)] = bleed;
+    if (lh != null) _lhPositive[_key(d)] = lh;
+    if (temp != null) _tempShift[_key(d)] = temp;
+    _persist();
+    // WARNING: AND IT HAS TO GO BACK UP. `removePeriodStart` deletes the cloud
+    // row explicitly, so a local-only restore would be undone by the next sync
+    // -- the row would reappear for a second and then vanish again.
+    pushToCloud().catchError((_) {});
+    notifyListeners();
+  }
+
   /// Removes a logged period start - a mis-tap must always be undoable.
   void removePeriodStart(DateTime day) {
     final d = _dayOnly(day);
@@ -153,6 +266,7 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
     if (_periodStarts.length == before) return;
     _lhPositive.remove(_key(d));
     _tempShift.remove(_key(d));
+    _bleedDays.remove(_key(d));
     _persist();
     // Deleting has to reach the cloud explicitly: a union merge would otherwise
     // pull the removed period straight back on the next sync.
@@ -193,6 +307,7 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
     _periodStarts.clear();
     _lhPositive.clear();
     _tempShift.clear();
+    _bleedDays.clear();
     _loaded = true;
     notifyListeners();
   }
@@ -216,6 +331,9 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
       _tempShift
         ..clear()
         ..addAll(_decodeMap(p.getStringList(_bbtKey)));
+      _bleedDays
+        ..clear()
+        ..addAll(_decodeMap(p.getStringList(_bleedKey)));
     } catch (_) {/* keep defaults - a storage failure is never a crash */}
     _loaded = true;
     notifyListeners();
@@ -321,6 +439,7 @@ class CycleStore extends ChangeNotifier with TtcSyncedStore {
           _periodsKey, _periodStarts.map((d) => d.toIso8601String()).toList());
       await p.setStringList(_lhKey, _encodeMap(_lhPositive));
       await p.setStringList(_bbtKey, _encodeMap(_tempShift));
+      await p.setStringList(_bleedKey, _encodeMap(_bleedDays));
     } catch (_) {/* best-effort */}
   }
 

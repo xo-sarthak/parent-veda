@@ -2589,14 +2589,32 @@ raises about the screen it replaced.
 
 The user is designing Cycle Companion, the calendar and the tests library, and
 will hand them over to be wired. **Do not redesign these** — implement what
-arrives. The symptom logger and the "Where do I stand" self-read are already
-signed off and need no design.
+arrives. The symptom logger is signed off and needs no design.
 
-One mechanical item is genuinely outstanding: `ttc_pcos_stand_screen.dart`
+**⚠️ "Where do I stand" is no longer signed off — reopened 2026-09-02 and
+reworked on request.** Four things changed and they are worth knowing before
+touching it again:
+
+* **The option controls are blocks, not pills** (`_OptionBlock`), laid out by
+  `_Options`, which divides the row instead of wrapping to content width. The
+  ragged right-hand margin down all eight questions was the reported
+  "space being wasted"; a short last row now stretches to fill.
+* **An answer can be tapped off again.** Every question was optional and
+  irreversible at the same time, which contradicted the screen's own "you can
+  leave any of these blank". Held by two tests in `ttc_pcos_stand_test.dart`.
+* **The question cards were tightened**, not redesigned — padding and gaps
+  only, ~60pt back across the eight.
+* **The group rail on the PCOS door is squarish tabs**, tinted at rest and
+  carrying a second line that says what is inside
+  (`_GroupTab` in `ttc_focus_screen.dart`). This is the *third* attempt at a
+  square tab there; the first two failed because they were white and empty, and
+  that note is on the widget.
+
+One mechanical item is still genuinely outstanding: `ttc_pcos_stand_screen.dart`
 predates `ttc_tool_chrome.dart` and still carries its own copies of the hero,
-sheet, question card, pills and buttons. They are identical today, which is
-exactly the state that drifts — the chrome's header says "change both, or
-change neither" until it is folded in. Held on purpose while designs are in
+sheet, question card, option blocks and buttons. They are close to identical,
+which is exactly the state that drifts — the chrome's header says "change both,
+or change neither" until it is folded in. Held on purpose while designs are in
 flight, because restructuring a working screen mid-redesign is churn.
 
 ### 18.6 Assets owed, not code
@@ -2625,3 +2643,418 @@ asked twice across two doors.
 
 **None of the above blocks a build.** All of it blocks being comfortable, and
 14.2 and 14.4 are the two that reach a mother at her worst moment.
+
+## 19.0 The cycle report was rebuilt from the design project — OPENED 2026-09-02
+
+`Cycle Report.dc.html` drew three artboards. Two ship, one was mined for a
+part, and the screen it replaced is still doing most of the work. Nothing below
+blocks a build.
+
+**Where it is in the app:** TTC home (V3) → the daily rail → the **Cycle report**
+circle. Also from an insight card on the same home, and from the foot of the
+symptom logger, **See your cycle report**.
+
+### 19.1 The dial and the calendar both ship; the road did not — DECISION
+
+1a and 1b are the same cycle drawn two ways, so both render behind a
+`TtcCycleViewToggle` — **Dial** first, calendar one tap away. The choice is not
+remembered between visits: a picture is chosen to answer the question in front
+of her, not to declare a preference, and a stored setting nobody set is worse
+than a default. If people flip it every single time, that is the evidence for
+persisting it, and there is none yet.
+
+1c, **the road**, was not built. Its proportional bar said what the ring and the
+grid already say. Its **timeline was lifted out and now appears under both**
+pictures in place of the flat four-card list each of them had — connected stops,
+numbered, carrying each stretch's length and whether it is done, now or ahead.
+That was the user's own pick from the artboard.
+
+### 19.2 The bands are stronger than `v2BlockTint` — DELIBERATE DEVIATION
+
+The door playbook says `v2BlockTint(hue, p)` for every tint. `ttc_phase_colours.dart`
+does not, and the reasoning was checked on screen before it was written.
+
+`v2BlockTint` keeps only the hue and stamps 32% saturation / 91% lightness. That
+is right for a tinted block behind a heading, where four are never asked to be
+told apart. Four ring arcs at a 16pt stroke and twenty-eight calendar squares
+are a different job — there the colour **is** the information. Compared side by
+side, the wash puts the four stretches within a couple of points of each other.
+
+So: **the repo's hues, unchanged** — 344 / 206 / 160 / 268, three of them the
+app's own `V2BlockHues` — at the design's saturation and lightness. The hue
+question turned out to be empty; 344 against the design's 350 resolves as
+`#EFE1E5` vs `#EFE1E3`.
+
+The accessors take a `TtcPhase`, never a hue, so they cannot spread into
+ordinary cards and leave the app with two answers to "how tinted is a tinted
+block". **If a second colour-coded diagram wants this treatment, give it its own
+narrow accessor rather than widening these.**
+
+### 19.3 Four of the five report states are undesigned and keep what they ship
+
+The design drew one state — a cycle with a period, an estimate and four
+stretches. `TtcReportState` has five. The other four (nothing logged,
+clinic-held, no estimate, thin) **render exactly as they did before**, on the old
+chrome, with their existing reviewed copy.
+
+That means the screen has two different frames depending on her data, which is a
+real wart and is why it is written down. It is not resolvable in code: a hero
+line for clinic-held would have to name a phase in 40pt type above a panel
+explaining that naming a phase is not ours to do. **The user is designing these.**
+
+### 19.4 What the design has that the screen does not
+
+* **The bottom nav** on all three artboards — a canvas convention. The report is
+  pushed from three places and has never had one.
+* **The spine chip** ("Cycle day 12") above the hero title. The ring's centre
+  already reads "Day 12 · of 28 · 31 Aug", and a second copy two inches above it
+  is one more thing to keep in agreement. Restore it if the chip is wanted.
+* **A temperature or weight line drawn across the ring**, which the design's
+  fact block promises in words — *"add either on any day and a line appears
+  across the ring"* — but never draws. **Not built, and the promise is still on
+  screen**, per the standing rule that aspirational copy stays. What ships
+  instead: the existing chart, kept as its own section below the timeline
+  whenever there are two or more readings. It carries an axis, a unit, date
+  ticks, phase bands and marker rows, and throwing it away to honour a fact
+  block would have cost a reviewed reading of her month.
+
+### 19.5 One shared file gained one parameter
+
+`TtcToolScaffold` in `ttc_tool_chrome.dart` — shared with the other door
+sessions — has a new optional `heroLead`. It is for a control that **scopes
+everything below it**, which is why the cycle picker cannot live in the sheet:
+the page would begin answering before she has said which cycle she is asking
+about. It is deliberately one widget and not a list; a hero with a stack of
+controls is the toolbar `TtcToolClose` exists to avoid.
+
+### 19.6 `TtcCycleReport.days` and `ttcCyclePhaseSpans` answer different questions
+
+Worth writing down because conflating them cost a round trip. `days` is **what
+she logged**, so it stops at today and should. The four stretches are **the
+shape of the cycle**, known in full the moment a period is logged, because they
+are arithmetic on the estimated ovulation day and the cycle length. Today's date
+does one job in them: it decides which stretch carries "You are here".
+
+`test/ttc_cycle_spans_test.dart` holds the distinction — its fixtures put today
+mid-cycle on purpose and assert about the part that is ahead, because a test run
+on a finished cycle would not have caught it.
+
+
+### 19.7 The field's chroma is equalised across every hue — 2026-09-02
+
+`V3HeroField` used one recipe for every hue: `HSL(hue, .58, .62)` on the deep
+stop. HSL saturation is not chroma, so measured as CIELAB C* that recipe gave
+**32 for the clinical blue and 68 for the PCOS magenta** — more than twice the
+colour, from the same integer in code. Invisible on a small tinted block, and
+the loudest thing on screen when the field *is* the page surface.
+
+A first fix damped a 280–320 band to a flat 0.62. It was half an answer:
+Fertile Window at 273 sits outside that band at C* 67, so two of the three
+screens still disagreed, and a band only ever covers the hues someone has
+already complained about.
+
+`v3FieldChroma(hue)` now **solves** for the saturation that lands any hue on a
+target C* of 26, and returns it as a fraction of the recipe's own. Nothing is
+special-cased and no hue is named, so a hue nobody has drawn yet is already
+handled. The target sits below the quietest hue the app had, so equalising also
+lightens — which is the other half of what was asked.
+
+* **Hues are untouched.** 288 is still 288; every `v2BlockTint` on every page is
+  byte-identical. Only the full-page wash spends less.
+* Wired at all nine `V3HeroField` call sites.
+* ⚠️ **Every stage's field moved, not only TTC.** Parenting, pregnancy, skilling
+  and the hubs all render quieter now. That is the intent — one rule, one look —
+  but it has only been seen on TTC. Worth a pass over the other stages on a
+  device.
+
+### 19.8 Checkboxes are single-purpose again — 2026-09-02
+
+"Where do I stand" briefly drew a checkbox on every option. The reasoning was
+that with deselect available each question is "none or one" and so behaves like
+a set of checkboxes — true of the mechanics, wrong about the reading. **A
+checkbox promises you may choose more than one**, and seven of the eight
+questions broke that promise on the second tap.
+
+Only the hair-area picker, the one genuine multi-select, ticks now.
+`test/ttc_pcos_stand_test.dart` holds both halves: deselect still works, and a
+single-choice option never grows a checkbox.
+
+Related, same pass: the tool's action is white with a hairline and an ink label
+— `_QuietButton`'s treatment from the symptom logger, whose own header already
+declared it *"one button treatment on this stage"*. That screen had been the odd
+one out since it shipped, first in the accent and then in ink.
+
+### 19.9 The grouped page's sheet must fill the screen — FIXED
+
+Ungrouped, the focus page is eleven sections and the sheet always outgrew its
+`minHeight` of 0.72 screens. Grouped, it shows **one** group — Track is a single
+rail — so the sheet stopped short, the list ended with it, and the hero field
+was left showing under the last card.
+
+Two separate causes, both now closed and both worth knowing because they recur:
+
+* `minHeightFactor` is **1** on a grouped page. A full viewport is the smallest
+  number that cannot fail, because the hero has already been scrolled past by
+  the time the sheet's foot is reachable.
+* `Transform.translate` **moves paint and not layout**. Lifting the sheet over
+  the photographic hero left its painted bottom edge 38pt above where the layout
+  thought it ended. `_Sheet.extraBottom` repays exactly that, and
+  `kTtcHeroOverlap` is used at both ends so the two cannot drift.
+
+### 19.10 ⚠️ `ttc_data_chain_test` is a DATE BOMB, not a regression
+
+Recorded because a handoff this session guessed wrong about it, and the next
+person will guess the same way.
+
+`test/ttc_data_chain_test.dart` › *"and Today says WHY rather than showing a
+hole"* logs a period on the hardcoded date **25 July 2026** and then renders
+`TtcTodayScreen` against the **real** clock. On 2 September 2026 that is cycle
+day 40, the screen correctly prints "Cycle day 40", and the test's
+`find.textContaining('day 40'), findsNothing` catches it.
+
+That assertion exists to prove the old *"ovulation around day 40"* defect never
+returns. It is matching an ordinary cycle-day readout by calendar coincidence.
+
+* It is **not** caused by the cycle-report work, the PCOS work, or the chroma
+  work. `ttc_today_screen.dart` imports none of those files.
+* **It passes again the next day**, which is worse than failing permanently.
+
+The fix is to assert on the phrasing (`'ovulation around day'`) or to freeze the
+clock in that test. Not done — it guards a clinical defect and belongs to
+whoever owns that file.
+
+
+## 20.0 Cycle Companion rebuilt, and `CycleStore` learned a new fact — 2026-09-02
+
+Built from the "Cycle Companion" design project. **Where to look:** anywhere
+that opens `ttc_cycle` — the TTC home, the PCOS door's Track group, the
+fertility-help screen, the Tools hub.
+
+### 20.1 Period LENGTH is captured for the first time
+
+`CycleStore` stored start dates and nothing else, so "how long is my period"
+was unanswerable and the cycle report banded its first stretch off
+`kTtcAssumedBleedDays` — a hardcoded five standing in for data.
+
+It now holds `_bleedDays`, keyed by start date like the LH and temperature
+signals already were. Chips (3/4/5/6/7+) rather than an end date, decided before
+the screen was designed: a count is one tap, it works when she logs three days
+late, and it is exactly what the picture needs. `kBleedStillOn` is a separate
+sentinel because "she has not said" and "she said, and it is ongoing" are
+different answers and both are common.
+
+`kTtcAssumedBleedDays` is now a **fallback**, not the rule — `ttcBleedDaysFor`
+prefers what she recorded, and falls back while a period is still going, because
+a band that lengthens each morning would be the app inventing the fact it is
+waiting for.
+
+⚠️ **Cloud sync does not carry bleed days yet.** They persist locally and
+survive a restart, but `pushToCloud` / `pullFromCloud` were not extended, so a
+second device sees the dates and not the lengths. Nothing breaks — the fallback
+covers it — but it is a real gap.
+
+### 20.2 Two operations that lose data silently, and the guards for them
+
+Both are worth knowing because the obvious implementation of each is wrong.
+
+* **Correcting a date** as a remove-then-add drops the bleed length, the LH
+  strip and the temperature shift, because all three are keyed by the start
+  date and `removePeriodStart` clears them on the way out. Nudging a date by one
+  day would erase everything she recorded about that cycle, and nothing would
+  look wrong afterwards. `movePeriodStart` carries them across; the test asserts
+  the counter-example too.
+* **Undo** that restores only the date gives back a row that lost its length.
+  `detailsFor` captures what hangs off a period BEFORE it is removed, and
+  `restorePeriodStart` puts it back — and re-pushes to cloud, because the
+  removal deleted that row explicitly and a local-only restore would be undone
+  by the next sync.
+
+Swipe-and-undo was chosen over a confirm sheet: a confirm taxes every delete to
+protect against the rare mistake, an undo taxes only the mistake.
+
+### 20.3 Her rhythm survives a refusal — a mistake caught by an old test
+
+The first cut showed the rhythm numbers only in the healthy state. A test
+fixture months in the past then failed, and it was right to: an overdue cycle
+stops the estimate dead, and her last four cycle lengths are exactly as true
+that day as the day before. **Refusing to draw THIS cycle is not a reason to
+stop stating her history.** The numbers are withheld only when the engine has
+called the history itself untrustworthy, which is what the screen this replaced
+already had right.
+
+Related, same pass: the refusal card's "Your rhythm" placeholder and the rhythm
+section carried the same label, so the words appeared twice — once over an
+explanation and once over the numbers whose absence it was explaining. The
+placeholder now shows only when there really are no numbers.
+
+### 20.4 Reused rather than rebuilt
+
+The ring is `TtcCycleRing`, built for the report; the four stretches come from
+`ttcCyclePhaseSpans`; the colours are `ttcPhaseBand` / `ttcPhaseMark` /
+`ttcPhaseInk`. Asked for directly — *"we already have ring colors, so use what
+we have"*. Two screens drawing one cycle from one source cannot disagree
+about it.
+
+The one new drawing is `_DaysGrid`, and the reason it is not `TtcCycleGrid` is
+worth keeping: the report's grid runs cycle day 1..28 in order, which is right
+for reading a cycle as a cycle. This one sits under dates she recognises, so it
+starts on the correct weekday and carries the month where it turns over. Same
+colours, same spans, different question.
+
+### 20.5 Still open on this screen
+
+* **Symptoms, temperature and LH readings are still not shown here.** All three
+  are stored and all three are absent — the brief listed them and this pass did
+  not reach them. The report shows the first two.
+* **The old screen body is commented out, not deleted**, in
+  `ttc_cycle_screens.dart`, so the comparison can be made rather than
+  remembered.
+* **Not seen on a device.**
+
+
+## 21.0 PCOS, finished against its brief — 2026-09-02
+
+`pcos_rebuild.pdf` steps 1–5 and Part 2 are complete. What follows is what is
+genuinely left, what was closed, and the deviations that are decided so nobody
+re-opens them.
+
+### 21.1 ⚠️ NOBODY CAN SEE ANY OF IT — the one real blocker
+
+`ttcFocusPageFor` is called from **one place**, `ttc_home_v3.dart`, and
+`TtcHomeVersionStore` defaults to **v1**. So on a real device the PCOS door does
+not exist.
+
+⚠️ **AND IT IS NOT THAT V1 SHOWS AN OLDER PCOS — V1 SHOWS NO PCOS AT ALL.** This
+was written the wrong way round first, and the correction matters because it
+changes the decision. `bracketsFor(LifeStage.tryingToConceive)` — the "Start
+anywhere" grid, the only surface that lists problem areas — appears in
+`ttc_home_v3.dart` and nowhere else. Every stage is the same: the bracket grid
+is a V3 construct. V1's tabs are Today · Prepare · Tools · Calendar · Community,
+and none of them reaches a bracket.
+
+So `kTtcPcos` (the hub config) and `kTtcActPcosLibrary` (the accordion) exist in
+the code and **nothing on V1 opens them**.
+
+**To see the difference:** TTC → the You tab → the `V1 | V3` pill
+(`ttc_profile_screen.dart` line ~444). On V3 the home carries the bracket grid
+and PCOS is in it; on V1 there is no grid and no way in.
+
+Two consequences:
+
+* The brief's **step 4** — "remove the old accordion and the double-rendered
+  sections" — is moot rather than pending. The accordion is already
+  unreachable; there is nothing to remove from a user's path. Deleting the code
+  is hygiene, not product.
+* **Promoting V3 takes nothing away from anyone.** For PCOS it is purely
+  additive: V1 users have no door today and would gain one. The general caution
+  in §17.3 still applies to the rest of the home — V1 is the most
+  clinically-reviewed screen in the app — but the PCOS half of that decision has
+  no downside to weigh.
+
+⚠️ **And nothing inside the V3 door leads backwards.** Audited tile by tile: the
+page reaches four surfaces (`ttc_cycle`, `ttc_symptom_log`, `ttc_pcos_check`,
+`ttc_community`), twelve reads, one recipe, one offering, one consult action and
+three video slots. `ttc_pcos_check` resolves to `TtcPcosStandScreen`, with the
+older `TtcPcosCheckScreen` commented out in the router. `kTtcActPcosLibrary`
+appears zero times on the page.
+
+### 21.2 §18.5 is CLOSED — and two of its three items were never PCOS
+
+It listed three designs owed: Cycle Companion, the calendar, the tests library.
+
+* **Cycle Companion** — built (§20).
+* **The calendar and the tests library** — **dropped from this list on purpose.**
+  They were on it because they sat in the PCOS Track group; following the
+  brief's own step 2 list, both were removed from that group. Neither appears
+  anywhere in PCOS now. They are general TTC tools reached from the home, the
+  More screen, journey steps and other brackets, and redesigning them is a job
+  about those tools rather than about finishing PCOS.
+
+**The mechanical item is now DONE.** `ttc_pcos_stand_screen.dart` predated
+`ttc_tool_chrome.dart` and carried its own copies of the shell, the close
+button, the progress hairline, the question card, the result block, its heading,
+the privacy line and both buttons. All nine are gone; the screen wears the
+shared chrome. 1,140 lines → 936, and no behaviour changed on it.
+
+Two things came out of the fold that are worth keeping:
+
+* **`TtcToolScaffold.intro` is nullable now.** It was required on a stated
+  argument — on a screen that could be mistaken for a diagnostic quiz, "this is
+  not a diagnosis" arriving at the end arrives too late. That argument is about
+  a screen that ASKS. The RESULT screen has already been framed, and inventing a
+  second sentence to satisfy a constructor would be copy on the page to please
+  the compiler. **Leave it out only where nothing is being asked.**
+* **`TtcToolPrimary` is white with a hairline, not `ttcPurple`.** The rule was
+  already written on `_QuietButton` — *"one button treatment on this stage"* —
+  and restated directly: the buttons are not purple. The accent is spent at
+  decision points, never laid down as a surface, and a full-width filled bar is
+  a surface whatever it does when tapped.
+
+  ⚠️ **This changed `ttc_ivf_readiness_screen.dart` as well**, the only other
+  caller. That is the point of folding rather than forking — the PCOS tool had
+  already been corrected by hand, and leaving the shared one purple would have
+  meant two TTC tools with two primary buttons and a rule only one obeyed. It
+  has not been looked at on a device.
+
+### 21.2b One duplication is left, and it is the stand screen being AHEAD
+
+`_Options` / `_OptionBlock` / `_Opt` stayed private, and so did the four
+controls built on them (`_Chips`, `_YesNo`, `_Degree`, `_AreaPicker`). The
+shared equivalents are `TtcToolPill` and `TtcToolChoice`, which lay options out
+as a `Wrap` of label-sized pills — the exact thing that was rejected on this
+screen: *"eight short questions… a lot of spaces again, being wasted."* The
+private set divides the row instead, so a short last row stretches rather than
+leaving two-thirds empty, and it drops the checkbox on single-choice questions.
+
+So this is not drift to correct downwards. **Promoting the private set into
+`ttc_tool_chrome.dart` would fix the same wasted space on IVF readiness**, the
+only other caller — but it is a visible change to that screen's questions and it
+is a design call rather than hygiene. Left for a decision.
+
+### 21.3 Infographic is a format, and it is one frame
+
+Added because the brief marks two tiles Infographic and no such format existed,
+so both shipped as six-card carousels. The rule came with the request:
+*"infographic only consists of 1 slide — in one slide provide required info."*
+
+`TtcInfographicTile` therefore has **no `cards` and no `slides`** — there is
+nowhere for a second frame to go, and a subject that needs one was never an
+infographic. Both tiles are "X or Y" questions, which is the shape a single
+frame beats a carousel at: the halves sit side by side, so the difference is the
+picture rather than something carried across a swipe.
+
+`ttc_focus_groups_test.dart` holds the only rule that can still be broken —
+two to four points a column, and a headline that never merely repeats the title.
+
+⚠️ **"Hair changes, explained" stays a carousel.** The brief marks it *Guide*,
+not Infographic, and a guide is genuinely step-shaped. Do not sweep it in.
+
+### 21.4 Owed, and not code
+
+Four assets. All four render honest coming-soon placeholders at real geometry,
+so nothing shifts when files land.
+
+* `ttc_pcos_intro` — "PCOS in five minutes"
+* `ttc_pcos_movement` — "Gentle movement for PCOS"
+* `ttc_pcos_food_insulin` — "Food, insulin and PCOS" *(added 2026-09-02; the
+  brief says "reuse existing" and no such film exists anywhere in the repo)*
+* **The hero photograph** — currently a placeholder Unsplash URL, one line in
+  `ttc_focus_pcos.dart`
+
+### 21.5 Decided deviations — do not re-open
+
+* **Guide → carousel.** No Guide format; a guide is step-shaped and a carousel
+  is that.
+* **Recipe → a real recipe** on the shipped `RecipeDetailScreen`, added as the
+  ninth tile format. **Community** is the tenth, and **Infographic** the
+  eleventh. Each was added rather than borrowing `TtcToolTile`, because the chip
+  is the promise about what happens when she taps.
+* **"Your realistic odds with PCOS" → "Conceiving with PCOS, realistically."** A
+  possessive plus a probability word is the banned construction, and
+  `ttc_clinical_review_test.dart` scans source for it.
+* **Track uses a rail, not full-width cards.** The brief asks for tool-style
+  cards; asked and answered — leave it as a rail.
+* **The five groups are a selector rail, not a tab bar.** See §1 of the door
+  playbook, amended.
+* **The card's title sits ON the image**, up to four lines, rather than below it
+  at two.

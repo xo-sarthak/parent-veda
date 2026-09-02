@@ -18,26 +18,35 @@
 // =============================================================================
 
 import '../../data/hubs/ttc_hubs.dart' show kTtcActConsult;
+import 'package:flutter/material.dart' show Icons;
+
 import '../ttc_focus_data.dart';
 
 // =============================================================================
 //  PCOS, without the panic
 // -----------------------------------------------------------------------------
-//  ⚠️ ELEVEN SECTIONS ON ONE SCROLL, NOT FIVE SUB-TABS. The brief specified a
-//  tab bar inside the focus area — Understand / Where do I stand / What helps /
-//  Trying with PCOS / Track — and that was set aside deliberately in favour of
-//  the shape the conceiving page already uses.
+//  ⚠️ THE ONLY GROUPED DOOR. Every other focus page is one long scroll; this
+//  one opens on a photograph and a rail of five cards — Understand / Where do
+//  I stand / What helps / Trying with PCOS / Track — and shows one group at a
+//  time. Asked for after seeing Flo, and to be checked on a device here before
+//  it goes anywhere else.
 //
-//  The reasoning is the same one that removed the conceiving hub's three-card
-//  menu: a tab is a decision she has to make before she is allowed to see
-//  anything, on a subject where most people arriving do not yet know which of
-//  the five their question belongs to. "Is this PCOS or my thyroid" and "will
-//  I be able to have children" are the two commonest reasons anyone opens this
-//  door, and they live in different tabs.
+//  ⚠️ THIS REVERSES WHAT USED TO BE WRITTEN HERE, AND THE REVERSAL IS NARROW.
+//  The note this replaces argued against the brief's five sub-tabs: a tab is a
+//  decision she has to make before she is allowed to see anything, on a subject
+//  where most people arriving do not know which of the five their question
+//  belongs to. That objection was about a TAB BAR — a row of words where one is
+//  lit, the other four are hidden, and nothing says what is behind them.
 //
-//  The tab names survive as SECTION headings, which is where they were always
-//  doing their real work — they are good labels for groups of content and a
-//  poor gate in front of it.
+//  The selector is not that. It is a horizontal rail of picture cards in the
+//  same language as every other rail on the page, sitting first under the hero,
+//  so all five are read before one is chosen. The choice is made after seeing
+//  the options rather than before, which is exactly what the old objection was
+//  asking for.
+//
+//  ⚠️ SO DO NOT "FIX" THIS BACK. The door playbook's rule against sub-tabs
+//  still holds for a tab bar and still holds for the other four doors. It does
+//  not hold here. `docs/TTC-DOOR-BUILD.md` §1 has been amended to say so.
 //
 //  ⚠️ AND THE SECTIONS ARE PLAIN QUESTIONS WHERE THEY CAN BE. Same rule as the
 //  conceiving page: the format never becomes a heading, and a heading she might
@@ -54,8 +63,73 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
   intro: 'PCOS, without the panic. What it means for your body, and what '
       'helps while you are trying.',
 
-  heroVideoSlot: 'ttc_pcos_intro',
-  heroVideoTitle: 'What PCOS is doing to your cycle',
+  // ⚠️ THE FILM CAME OFF THE TOP, AND IT WAS ALREADY DOWN THE PAGE. The same
+  // slot was the hero AND the first tile in "What is PCOS, really?", so the
+  // page opened on a coming-soon placeholder and then offered the identical
+  // placeholder again two sections later. Removing it from the hero loses
+  // nothing; the tile below is where the PDF lists it.
+  //
+  // heroVideoSlot: 'ttc_pcos_intro',
+  // heroVideoTitle: 'What PCOS is doing to your cycle',
+
+  // ⚠️ A PLACEHOLDER PHOTOGRAPH, TO BE SWAPPED. Same shape the product
+  // catalogue and the conceiving page already use. The V3 field renders behind
+  // it, so a dead connection gives the hero this page has always had rather
+  // than a grey box — local-first is absolute.
+  heroImageUrl:
+      'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=900&h=700&fit=crop',
+  heroBlurb: 'PCOS is a condition where a hormone imbalance changes how the '
+      'ovaries work. It is common, it varies a lot from person to person, and '
+      'it is managed rather than cured.',
+
+  // ---------------------------------------------------------------------------
+  //  The selector rail — five cards under the hero, Understand first
+  // ---------------------------------------------------------------------------
+  // ⚠️ FIVE HUES, ONE EACH, AND THEY ARE THE APP'S OWN. 206 is `V2BlockHues.
+  // scans` (the clinical blue), 344 `.watch`, 104 `.practice`, 42 `.read`. Only
+  // Track's 160 is off the grid, and it is the same green the cycle report
+  // gives the fertile stretch — the one place in this stage green already means
+  // "your own logged data".
+  //
+  // ⚠️ THE ORDER IS THE PDF'S NUMBERED LIST AND IS NOT A RANKING. Understand is
+  // first because it is where someone who has just been told a word lands, not
+  // because it matters most.
+  groups: [
+    TtcFocusGroup(
+        id: 'understand',
+        label: 'Understand',
+        icon: Icons.menu_book_outlined,
+        hue: 206),
+    // ⚠️ THE TOOL ITSELF, NOT A CARD THAT OPENS IT. See `TtcFocusGroup.
+    // toolSurfaceId` — a tile in front of a tool, inside a group whose only
+    // content is that tool, is a door in front of a door.
+    TtcFocusGroup(
+        id: 'stand',
+        label: 'Where do I stand',
+        icon: Icons.center_focus_weak_outlined,
+        hue: 344,
+        toolSurfaceId: 'ttc_pcos_check'),
+    TtcFocusGroup(
+        id: 'helps',
+        label: 'What helps',
+        icon: Icons.eco_outlined,
+        hue: 104),
+    TtcFocusGroup(
+        id: 'trying',
+        label: 'Trying with PCOS',
+        icon: Icons.favorite_border_rounded,
+        hue: 42),
+    TtcFocusGroup(
+        id: 'track',
+        // ⚠️ "Track", NOT "Keep track of it". The design's mock data uses the
+        // longer name and the section inside this group is already called
+        // "Keep track of it" — so the tab and the heading under it would say
+        // the same words twice, which is the repetition the group heading was
+        // deleted to stop.
+        label: 'Track',
+        icon: Icons.calendar_today_outlined,
+        hue: 160),
+  ],
 
   // ⚠️ POPULATED BUT NOT DRAWN, exactly as on the conceiving page. The paid
   // masterclass was asked to come off the top of the focus pages for now and
@@ -74,6 +148,7 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
     // -------------------------------------------------------------------------
     TtcFocusSection(
       heading: 'What is PCOS, really?',
+      group: 'understand',
       tiles: [
         TtcVideoTile(
           title: 'PCOS in five minutes',
@@ -107,85 +182,78 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
 
     TtcFocusSection(
       heading: 'Is it PCOS, or something else?',
+      group: 'understand',
       tiles: [
-        TtcCarouselTile(
+        // WARNING: AN INFOGRAPHIC, WHICH IS ONE FRAME. This was six carousel
+        // cards, and the brief always marked it Infographic -- the format did
+        // not exist, so it became the nearest thing that did. The six beats
+        // were a build-up to a comparison, and a comparison is what a single
+        // frame does better than any number of slides: both halves are on
+        // screen at once, so the difference is the picture rather than
+        // something to remember across a swipe.
+        TtcInfographicTile(
           title: 'PCOS or ovarian cysts',
           blurb: 'Two different things with one confusing name.',
-          coverTitle: 'PCOS or ovarian cysts?',
-          coverBlurb: 'The word in the name is the problem.',
-          coverHue: 288,
-          cards: [
-            TtcCarouselCard(
-              title: 'The "cysts" in polycystic are not cysts.',
-              body: 'They are follicles — the small fluid sacs every ovary '
-                  'makes each month, each holding an immature egg.',
-            ),
-            TtcCarouselCard(
-              title: 'In PCOS there are simply more of them than usual.',
-              body: 'They are not growths, they are not dangerous, and they '
-                  'are not removed.',
-            ),
-            TtcCarouselCard(
-              title: 'An ovarian cyst is a different thing entirely.',
-              body: 'A single fluid-filled sac, usually much larger, and most '
-                  'often harmless and temporary on its own.',
-            ),
-            TtcCarouselCard(
-              title: 'Most ovarian cysts resolve without treatment.',
-              body: 'They are common, frequently found by accident, and '
-                  'usually watched rather than acted on.',
-            ),
-            TtcCarouselCard(
-              title: 'A scan alone does not diagnose PCOS.',
-              body: 'Plenty of people have ovaries that look like this with no '
-                  'other feature of PCOS at all.',
-            ),
-            TtcCarouselCard(
-              title: 'Which is why the diagnosis needs two of three things.',
-              body: 'Irregular ovulation, signs of raised androgens, and the '
-                  'scan — with other causes excluded first.',
-            ),
-          ],
+          headline: 'The "cysts" in polycystic are not cysts at all.',
+          left: TtcInfographicColumn(
+            label: 'What a scan sees in PCOS',
+            hue: 288,
+            points: [
+              'Follicles — the small fluid sacs every ovary makes each month, '
+                  'each holding an immature egg.',
+              'In PCOS there are simply more of them than usual.',
+              'Not growths, not dangerous, and not removed.',
+            ],
+          ),
+          right: TtcInfographicColumn(
+            label: 'An ovarian cyst',
+            hue: 206,
+            points: [
+              'A single fluid-filled sac, usually much larger.',
+              'Common, and often found by accident.',
+              'Most resolve on their own and are watched rather than acted on.',
+            ],
+          ),
+          footnote: 'A scan alone does not diagnose PCOS — plenty of people '
+              'have ovaries that look like this and no other feature of it. '
+              'The diagnosis needs two of three things: irregular ovulation, '
+              'signs of raised androgens, and the scan, with other causes '
+              'excluded first.',
           reviewedBy: 'Reviewed by Dr. Ananya Rao, Gynaecologist',
         ),
-        TtcCarouselTile(
+        TtcInfographicTile(
           title: 'PCOS or thyroid',
           blurb: 'One blood test separates them, and it is often skipped.',
-          coverTitle: 'PCOS or thyroid?',
-          coverBlurb: 'They look alike from the outside.',
-          coverHue: 206,
-          cards: [
-            TtcCarouselCard(
-              title: 'Both can make periods irregular or disappear.',
-              body: 'Which is why the two are so often confused before anyone '
-                  'has tested anything.',
-            ),
-            TtcCarouselCard(
-              title: 'Both can cause tiredness, hair changes and weight '
-                  'change.',
-              body: 'The overlap is real, and it is not something you can '
-                  'reason your way through at home.',
-            ),
-            TtcCarouselCard(
-              title: 'A thyroid problem is found with a single blood test.',
-              body: 'TSH, sometimes with T3 and T4. Cheap, quick, and widely '
-                  'available.',
-            ),
-            TtcCarouselCard(
-              title: 'And treated, it often settles cycles on its own.',
-              body: 'Which is why it is checked before anyone concludes PCOS.',
-            ),
-            TtcCarouselCard(
-              title: 'You can have both.',
-              body: 'A normal thyroid does not rule out PCOS, and PCOS does '
-                  'not rule out a thyroid problem.',
-            ),
-            TtcCarouselCard(
-              title: 'If nobody has checked yours, ask.',
-              body: 'It is a reasonable question and a one-line addition to a '
-                  'blood form.',
-            ),
-          ],
+          headline: 'They look alike from the outside. One blood test tells '
+              'them apart.',
+          left: TtcInfographicColumn(
+            label: 'What overlaps',
+            hue: 42,
+            points: [
+              'Periods that are irregular or absent.',
+              'Tiredness, hair changes, weight change.',
+              'Enough overlap that you cannot reason it out at home.',
+            ],
+          ),
+          right: TtcInfographicColumn(
+            label: 'What separates them',
+            hue: 206,
+            points: [
+              'A thyroid problem shows on one blood test — TSH, sometimes with '
+                  'T3 and T4.',
+              'Treated, it often settles cycles on its own.',
+              'PCOS has no single test. It is a pattern, and thyroid is ruled '
+                  'out first.',
+            ],
+          ),
+          // WARNING: "YOU CAN HAVE BOTH" IS NOT A DETAIL TO CUT. A comparison
+          // reads as either-or unless it says otherwise, and a woman told she
+          // has PCOS can stop asking about her thyroid on exactly that
+          // reasoning.
+          footnote: 'You can have both — a normal thyroid does not rule out '
+              'PCOS, and PCOS does not rule out a thyroid problem. If nobody '
+              'has checked yours, ask. It is a one-line addition to a blood '
+              'form and it is often skipped.',
           reviewedBy: 'Reviewed by Dr. Ananya Rao, Gynaecologist',
         ),
         TtcCarouselTile(
@@ -239,46 +307,54 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
     ),
 
     // -------------------------------------------------------------------------
-    //  Where do I stand
+    //  Where do I stand — NOT A SECTION ANY MORE
     // -------------------------------------------------------------------------
-    //  ⚠️ A SECTION OF ITS OWN, WITH ONE TILE IN IT. Every other section here
-    //  holds three or four, and the imbalance is the point: this is the only
-    //  thing on the page that reads HER data back, and burying it as the fourth
-    //  card in a rail would make it look like another article.
-    TtcFocusSection(
-      heading: 'Where do I stand?',
-      tiles: [
-        TtcToolTile(
-          title: 'A read of your own pattern',
-          blurb: 'Eight short questions and your logged cycles, turned into '
-              'plain words and notes for your doctor. No score, no verdict.',
-          surfaceId: 'ttc_pcos_check',
-        ),
-        TtcToolTile(
-          title: 'Cycle Companion',
-          blurb: 'The log the read above is built from. Three months of dates '
-              'changes what it can say.',
-          surfaceId: 'ttc_cycle',
-        ),
-      ],
-    ),
+    //  ⚠️ IT IS A GROUP THAT RENDERS THE TOOL ITSELF. This used to be a section
+    //  holding a tile called "A read of your own pattern" which you tapped to
+    //  leave the page. Selecting the group now shows the questions in place —
+    //  `TtcFocusGroup.toolSurfaceId` on the `stand` entry above.
+    //
+    //  The old reasoning for giving it a section of its own still stands and is
+    //  now served better: this is the only thing on the page that reads HER
+    //  data back, so it gets its own card in the selector rather than being the
+    //  fourth tile in somebody else's rail.
+    //
+    //  Its second tile, Cycle Companion, moved to "Keep track of it" — it is a
+    //  log, and the group it was propping up no longer holds tiles.
 
     // -------------------------------------------------------------------------
     //  What helps
     // -------------------------------------------------------------------------
     TtcFocusSection(
       heading: 'What should I be eating?',
+      group: 'helps',
       tiles: [
+        // WARNING: A FIFTH OWED FILM. The brief marks this "reuse existing" and
+        // there is no such film anywhere in the repo -- the phrase describes
+        // what the author expected to find, not what is there. It renders the
+        // honest 16:9 placeholder like the other four, so nothing shifts when
+        // the file lands. Recorded in `docs/STILL-OPEN.md` 18.6.
+        TtcVideoTile(
+          title: 'Food, insulin and PCOS',
+          blurb: 'Why the same meal lands differently, and what that changes.',
+          slotId: 'ttc_pcos_food_insulin',
+          duration: '4 MIN',
+        ),
         TtcArticleTile(
           title: 'What changes the curve, nothing banned',
           blurb: 'Insulin is the lever worth understanding, and none of it '
               'requires giving up rice.',
           readId: 'ttc_read_pcos_insulin',
         ),
-        TtcArticleTile(
-          title: 'PCOS-friendly Indian meals',
-          blurb: 'Ordinary food, put together in a way that helps.',
-          readId: 'ttc_read_pcos_food',
+        // WARNING: A REAL RECIPE ON THE REAL RECIPE PAGE, NOT AN ARTICLE ABOUT
+        // RECIPES. This shipped as prose because the tile union had no recipe
+        // format; the brief always said Recipe, and an article that describes
+        // meals is the shape of a thing nobody cooks from.
+        TtcRecipeTile(
+          title: 'Moong dal chilla with curd',
+          blurb: 'Protein and fibre instead of refined flour. Scales to the '
+              'number you are cooking for.',
+          recipeId: 'pcos_moong_chilla',
         ),
         TtcMythTile(
           title: 'Is rice really the enemy?',
@@ -295,6 +371,7 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
 
     TtcFocusSection(
       heading: 'Do supplements actually do anything?',
+      group: 'helps',
       tiles: [
         TtcArticleTile(
           title: 'Inositol: what is shown to help',
@@ -322,6 +399,7 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
 
     TtcFocusSection(
       heading: 'What about movement, sleep and weight?',
+      group: 'helps',
       tiles: [
         TtcArticleTile(
           title: 'Weight and PCOS, said kindly',
@@ -348,6 +426,7 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
     // -------------------------------------------------------------------------
     TtcFocusSection(
       heading: 'How does PCOS affect conceiving?',
+      group: 'trying',
       tiles: [
         TtcArticleTile(
           title: 'PCOS and ovulation',
@@ -403,6 +482,7 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
 
     TtcFocusSection(
       heading: 'What happens if we need treatment?',
+      group: 'trying',
       tiles: [
         TtcArticleTile(
           title: 'What treatment usually looks like',
@@ -432,35 +512,115 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
     //  plainly they are things you use rather than things you read.
     TtcFocusSection(
       heading: 'Keep track of it',
+      group: 'track',
+      // WARNING: THESE FIVE, IN THIS ORDER, ARE THE BRIEF'S OWN LIST. The tab
+      // had drifted to four tools -- two from the brief and two invented -- and
+      // was missing the three items that are not tools at all. Asked for
+      // directly: *"those 3 points haven't been followed... just follow what's
+      // in the pdf."*
+      //
+      // WARNING: SO TRACK IS NOT A TOOLS DRAWER, and the brief is clearer about
+      // that than the old list was. Two tools, one way back to her read, one
+      // quiet clinical card, one room of people. That mix is the point: the
+      // group is "keep track of it", and keeping track includes knowing when to
+      // stop tracking and go and see someone.
       tiles: [
         TtcToolTile(
+          title: 'Cycle Companion',
+          blurb: 'The log your read is built from. Three months of dates '
+              'changes what it can say.',
+          surfaceId: 'ttc_cycle',
+        ),
+        TtcToolTile(
           title: 'Log your symptoms',
+          // WARNING: WAS `ttc_tools`, WHICH OPENED THE TOOLS HUB. The tile said
+          // "log your symptoms" and delivered a menu -- reachable, wrong, and
+          // exactly the failure this stage tests for.
           blurb: 'Cycle, skin, hair and how you felt. This is what the read '
-              'above gets better from.',
-          // ⚠️ WAS `ttc_tools`, WHICH OPENED THE TOOLS HUB. The tile said "log
-          // your symptoms" and delivered a menu — reachable, wrong, and exactly
-          // the failure this stage tests for.
+              'gets better from.',
           surfaceId: 'ttc_symptom_log',
         ),
         TtcToolTile(
-          title: 'Your calendar',
-          blurb: 'A month at a time, with everything you have logged on it.',
-          surfaceId: 'ttc_calendar',
+          title: 'What your cycle shows',
+          blurb: 'Your logged months, read back as a pattern in plain words.',
+          surfaceId: 'ttc_pcos_check',
         ),
-        TtcToolTile(
-          title: 'Tests worth asking about',
-          blurb: 'Thyroid, prolactin, glucose and the rest — what each one '
-              'answers and what it costs in India.',
-          surfaceId: 'ttc_tests',
+        // WARNING: QUIET, AND THE BRIEF SAYS SO TWICE. "Calm card, quiet, not
+        // alarming." So: no red, no warning mark, no urgency, and every slide
+        // ends at a booking rather than at a fear. The strongest it gets is
+        // "worth booking a check" -- the same ceiling the self-read is held to.
+        //
+        // A carousel rather than an article because it is four short things to
+        // notice, and a 700-word read on when to be worried is a read nobody
+        // finishes and everybody skims for the frightening part.
+        TtcCarouselTile(
+          title: 'When to see a doctor',
+          blurb: 'Four things worth a check, and none of them are emergencies.',
+          coverTitle: 'When to see a doctor',
+          coverBlurb: 'Not urgent. Just worth booking.',
+          coverHue: 206,
+          reviewedBy: 'Reviewed by a gynaecologist',
+          cards: [
+            TtcCarouselCard(
+              title: 'Your periods have stopped for three months or more',
+              body: 'Leaving aside pregnancy, breastfeeding and birth control. '
+                  'A long gap has many causes and a doctor can find which one.',
+              hue: 344,
+            ),
+            TtcCarouselCard(
+              title: 'You have been trying for a year, or six months if you '
+                  'are 35 or older',
+              body: 'These are the points at which a fertility check is usual. '
+                  'It is a starting conversation, not a last resort.',
+              hue: 206,
+            ),
+            TtcCarouselCard(
+              title: 'Something changed and it has stayed changed',
+              body: 'Hair, skin, weight or your cycle behaving differently for '
+                  'a few months is worth mentioning, even if each thing on its '
+                  'own seems small.',
+              hue: 42,
+            ),
+            TtcCarouselCard(
+              title: 'You are worried',
+              body: 'That is reason enough. You do not need a symptom list to '
+                  'be allowed to ask someone.',
+              hue: 160,
+            ),
+          ],
+        ),
+        TtcCommunityTile(
+          title: 'PCOS circle',
+          blurb: 'Other people managing PCOS, in their own words.',
+          surfaceId: 'ttc_community',
         ),
       ],
     ),
+
+    // WARNING: COMMENTED OUT, NOT DELETED, per CLAUDE.md. Two tools that were
+    // in this group and are not in the brief. Neither is stranded -- the
+    // calendar is reachable from the home, the More screen, a journey step and
+    // two brackets; the tests library from the home, a journey step and four
+    // brackets. Restoring them is uncommenting two tiles.
+    //
+    //   TtcToolTile(
+    //     title: 'Your calendar',
+    //     blurb: 'A month at a time, with everything you have logged on it.',
+    //     surfaceId: 'ttc_calendar',
+    //   ),
+    //   TtcToolTile(
+    //     title: 'Tests worth asking about',
+    //     blurb: 'Thyroid, prolactin, glucose and the rest - what each one '
+    //         'answers and what it costs in India.',
+    //     surfaceId: 'ttc_tests',
+    //   ),
 
     // -------------------------------------------------------------------------
     //  Get help — the page closes on a person, not a price
     // -------------------------------------------------------------------------
     TtcFocusSection(
       heading: 'Talk to someone who knows PCOS',
+      group: 'trying',
       tiles: [
         TtcBookingTile(
           title: 'Talk to a PCOS specialist',

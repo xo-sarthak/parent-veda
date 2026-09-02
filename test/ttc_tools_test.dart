@@ -338,8 +338,12 @@ void main() {
     });
 
     testWidgets('the cycle screen invites a first period', (tester) async {
+      // ⚠️ THE WORDS MOVED, THE BEHAVIOUR DID NOT. The rebuilt Companion opens
+      // its empty state on a named invitation rather than a generic CTA — the
+      // assertion still holds that a screen with no data offers the one action
+      // that changes that.
       await pumpTall(tester, const TtcCycleScreen());
-      expect(find.text(const TtcS(false).logPeriodCta), findsWidgets);
+      expect(find.text('Add a period date'), findsOneWidget);
     });
 
     testWidgets('with cycles logged it shows the average and range',
@@ -349,9 +353,15 @@ void main() {
         ..logPeriodStart(DateTime(2026, 5, 29))
         ..logPeriodStart(DateTime(2026, 6, 28));
       await pumpTall(tester, const TtcCycleScreen());
-      // 28 and 30 → average 29, range 28-30.
+      // 28 and 30 → usual 29, spread 28 to 30.
+      //
+      // ⚠️ THIS FIXTURE IS MONTHS IN THE PAST, WHICH MAKES IT THE INTERESTING
+      // CASE RATHER THAN A STALE ONE. The current cycle is long overdue, so the
+      // engine refuses to estimate and the Companion shows its no-estimate
+      // body — and her rhythm numbers must still be there. Refusing to draw
+      // THIS cycle is not a reason to stop stating her history.
       expect(find.text('29 days'), findsOneWidget);
-      expect(find.text('28–30 days'), findsOneWidget);
+      expect(find.text('28 to 30 days'), findsOneWidget);
     });
 
     testWidgets('a logged LH positive is reflected back', (tester) async {

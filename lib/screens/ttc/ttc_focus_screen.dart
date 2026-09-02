@@ -40,14 +40,19 @@
 //  that is the disclaimer.
 // =============================================================================
 
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../data/hubs/ttc_hubs.dart' show kTtcActConsult;
 import '../../localization/app_language.dart';
 import '../../models/bracket.dart';
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_focus_data.dart';
+import '../../data/nutrition_data.dart' show kRecipes;
 import '../../ttc/ttc_prepare_data.dart';
+import '../nutrition/nutrition_recipes_screen.dart' show RecipeDetailScreen;
 import '../../widgets/pv_placeholders.dart';
 import '../v2/v2_palette.dart';
 import '../v2/v3_bracket_art.dart';
@@ -57,6 +62,7 @@ import '../../ttc/ttc_videos_data.dart';
 import '../reader/pv_reader_screen.dart';
 import 'ttc_common.dart';
 import 'ttc_illustrations.dart';
+import 'ttc_infographic_screen.dart';
 import 'ttc_story_screen.dart';
 import 'ttc_prepare_screen.dart';
 import 'ttc_products_screen.dart';
@@ -87,7 +93,15 @@ const double kTtcRailGap = 10;
 /// budget Indian handsets report. Anything that fits here fits everywhere.
 const double kPvNarrowestScreen = 360;
 
-class TtcFocusScreen extends StatelessWidget {
+/// How far the sheet is pulled up over a photographic hero.
+///
+/// ⚠️ IT EXISTS TWICE BY NECESSITY — as space added at the foot of the hero and
+/// as the distance the sheet is lifted — so it is one number, not two that have
+/// to be kept equal by hand. Get them out of step and either the pink field
+/// reappears in the sheet's rounded corners or the page grows a gap.
+const double kTtcHeroOverlap = 38;
+
+class TtcFocusScreen extends StatefulWidget {
   const TtcFocusScreen({super.key, required this.page, required this.bracket});
 
   final TtcFocusPage page;
@@ -98,6 +112,23 @@ class TtcFocusScreen extends StatelessWidget {
   /// tile reading "Fertile window", and the mismatch reads as having landed on
   /// the wrong screen.
   final Bracket bracket;
+
+  @override
+  State<TtcFocusScreen> createState() => _TtcFocusScreenState();
+}
+
+class _TtcFocusScreenState extends State<TtcFocusScreen> {
+  /// Which selector card is lit. Ignored on a page with no groups.
+  ///
+  /// ⚠️ NOT PERSISTED, AND IT RESETS TO THE FIRST GROUP EVERY TIME THE DOOR IS
+  /// OPENED. "Understand" is the right place to land for someone arriving at
+  /// PCOS, and remembering that she last read "What helps" would drop the next
+  /// visitor into the middle of the subject — including the visitor who is the
+  /// same person a month later with a different question.
+  int _group = 0;
+
+  TtcFocusPage get page => widget.page;
+  Bracket get bracket => widget.bracket;
 
   @override
   Widget build(BuildContext context) {
@@ -118,7 +149,11 @@ class TtcFocusScreen extends StatelessWidget {
             // The field is the page's surface and does not scroll — the same
             // structure every V3 screen uses.
             Positioned.fill(
-              child: V3HeroField(accent: tint, ground: p.ground, variant: 1),
+              child: V3HeroField(
+                  accent: tint,
+                  ground: p.ground,
+                  variant: 1,
+                  chroma: v3FieldChroma(hue)),
             ),
             ListView(
               // ⚠️ NO BOTTOM PADDING HERE — THE SHEET OWNS THE CLEARANCE.
@@ -136,6 +171,110 @@ class TtcFocusScreen extends StatelessWidget {
                     title: title,
                     eyebrow: bracket.title.of(lang),
                     bracket: bracket),
+                if (page.groups case final groups?)
+                  _Sheet(
+                      p: p,
+                      // WARNING: A FULL SCREEN, NOT 0.72, AND THIS IS THE OTHER
+                      // HALF OF THE BOTTOM BUG.
+                      //
+                      // Ungrouped, this page is eleven sections and the sheet
+                      // always outgrew its minimum. Grouped, it shows ONE group
+                      // -- Track is a single rail -- so the sheet stopped
+                      // short, the list ended with it, and the field was left
+                      // showing under the last card.
+                      //
+                      // A full viewport is the smallest number that cannot
+                      // fail: the hero has already been scrolled past by the
+                      // time the sheet's foot is reachable, so a sheet at least
+                      // as tall as the screen always reaches the bottom of it,
+                      // on any device, for any group.
+                      minHeightFactor: 1,
+                      children: [
+                    const SizedBox(height: 22),
+
+                    // ---- the selector, first thing under the hero --------
+                    //
+                    // ⚠️ A RAIL, NOT A TAB BAR, AND THE DIFFERENCE IS THE WHOLE
+                    // ARGUMENT. A tab bar lights one word and hides four; you
+                    // choose before you know what you are choosing between.
+                    // These are picture cards in the same language as every
+                    // other rail on this page — she reads all five, then picks.
+                    // The objection that kept sub-tabs out of this stage was
+                    // about choosing blind, and this is not that.
+                    _GroupRail(
+                      page: page,
+                      groups: groups,
+                      selected: _group,
+                      p: p,
+                      onPick: (i) => setState(() => _group = i),
+                    ),
+                    const SizedBox(height: 26),
+
+                    // ⚠️ THE GROUP'S NAME IS NOT REPEATED HERE, AND IT WAS.
+                    // Tapping the card marked "Understand" and then reading the
+                    // word "Understand" underneath it tells her nothing she did
+                    // not just do — and on the tool group it pushed the second
+                    // question off the bottom of the screen, which is a real
+                    // cost paid for a label. The lit card IS the heading.
+                    //
+                    // _pad(Text(groups[_group].label, ...)),
+
+                    // ---- either one tool, or this group's sections -------
+                    //
+                    // ⚠️ THE TOOL RENDERS HERE, NOT BEHIND A TILE. "Where do I
+                    // stand" used to be a card you tapped to leave the page.
+                    // A card in front of a tool, inside a group whose only
+                    // content is that tool, is a door in front of a door.
+                    if (groups[_group].toolSurfaceId case final surface?)
+                      ttcInlineToolFor(surface) ??
+                          _pad(Text(TtcS.current().estimatesDisclaimer,
+                              style: pvManrope(
+                                  fontSize: 12, height: 1.5, color: p.ink3)))
+                    else
+                      for (final section in page.sections
+                          .where((s) => s.group == groups[_group].id)) ...[
+                        _pad(Text(section.heading,
+                            style: pvFraunces(
+                                fontSize: 21,
+                                fontWeight: FontWeight.w600,
+                                height: 1.2,
+                                letterSpacing: -0.45,
+                                color: p.ink1))),
+                        const SizedBox(height: 13),
+                        SizedBox(
+                          height: _TileCard.height,
+                          child: ListView.separated(
+                            scrollDirection: Axis.horizontal,
+                            padding: const EdgeInsets.symmetric(horizontal: 18),
+                            itemCount: section.tiles.length,
+                            separatorBuilder: (_, _) =>
+                                const SizedBox(width: kTtcRailGap),
+                            itemBuilder: (context, i) => _TileCard(
+                                tile: section.tiles[i],
+                                p: p,
+                                hue: hue,
+                                index: i),
+                          ),
+                        ),
+                        const SizedBox(height: 26),
+                      ],
+
+                    _pad(Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Icon(Icons.info_outline_rounded,
+                              size: 15, color: p.ink3),
+                          const SizedBox(width: 9),
+                          Expanded(
+                            child: Text(TtcS.current().estimatesDisclaimer,
+                                style: pvManrope(
+                                    fontSize: 11.5,
+                                    height: 1.5,
+                                    color: p.ink3)),
+                          ),
+                        ])),
+                      ]),
+                if (page.groups == null)
                 _Sheet(p: p, children: [
                   const SizedBox(height: 24),
 
@@ -323,8 +462,96 @@ class _Hero extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final mark = bracketMarkFor(bracket.id);
+    final photo = page.heroImageUrl;
 
-    return Stack(children: [
+    // WARNING: `Clip.none`, WHICH IS WHAT LETS THE PICTURE RUN PAST THE HERO.
+    // See the note on the photo layer below — the whole overlap depends on this
+    // Stack not trimming its children to its own box, and the default does.
+    return Stack(clipBehavior: Clip.none, children: [
+      // ⚠️ THE PHOTOGRAPH IS A LAYER OVER THE FIELD, NOT A REPLACEMENT FOR IT.
+      // `errorBuilder` and `loadingBuilder` both return nothing, so a dead
+      // connection or a bad URL leaves exactly the hero this page has always
+      // had rather than a grey box where a face should be. Local-first is
+      // absolute, and here that means the offline version is a finished design
+      // rather than a fallback anyone would recognise as one.
+      // WARNING: `bottom: -kTtcHeroOverlap`, AND THIS REPLACED A
+      // `Transform.translate` THAT COULD NEVER HAVE WORKED.
+      //
+      // The sheet's rounded top corners are two holes, and something deliberate
+      // has to be behind them or the field shows through — reported as a pink
+      // border in the corners. The first fix dragged the SHEET up over the
+      // hero with a transform and then tried to pay the height back by growing
+      // the sheet.
+      //
+      // That is arithmetically impossible and it is worth writing down why,
+      // because it looks like it should work. A transform moves paint and not
+      // layout, so a sheet lifted by 38 paints its bottom edge 38 above its
+      // layout box. Growing the sheet by 38 to compensate grows the scroll
+      // extent by 38 as well, so the gap at the foot of the list survives at
+      // exactly its old size. The compensation chases itself. Any fix that
+      // stays inside the scrolled child has this shape.
+      //
+      // So the overlap moves to the layer that can afford it. The photograph is
+      // laid out 38 BELOW the hero's own box and simply paints there; the hero
+      // keeps its true height, the sheet is laid out immediately after it with
+      // no transform at all, and — because a list paints its children in order
+      // — the sheet covers the overflow with its rounded edge over picture
+      // rather than over field. Nothing is owed at the bottom because nothing
+      // was borrowed.
+      if (photo != null)
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: -kTtcHeroOverlap,
+          child: Image.network(
+            photo,
+            fit: BoxFit.cover,
+            alignment: Alignment.topCenter,
+            errorBuilder: (_, _, _) => const SizedBox.shrink(),
+            loadingBuilder: (context, child, progress) =>
+                progress == null ? child : const SizedBox.shrink(),
+          ),
+        ),
+      // ⚠️ A DARK SCRIM ONLY, AND IT NEVER FADES TO THE PAGE COLOUR.
+      //
+      // The first version ended this gradient on `p.ground`, so the bottom of
+      // the photograph washed out into a pale haze under the type — reported
+      // exactly that way: *"that white mist coming out from the bottom of the
+      // image"*, and the text over it stopped being readable. It is an easy
+      // mistake to make and worth naming: fading a photo into the page colour
+      // looks like a clean seam in a design file and looks like fog on a phone,
+      // because a real photograph has its own values down there and the fade
+      // lands on top of them rather than replacing them.
+      //
+      // The seam is not this gradient's job anyway. The sheet below is pulled
+      // up over the picture and its own rounded edge is the seam.
+      //
+      // Type over a photograph is unreadable about half the time and you cannot
+      // know which half, so the scrim stays — just dark, and heaviest where the
+      // words are.
+      if (photo != null)
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: -kTtcHeroOverlap,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  Colors.black.withValues(alpha: 0.52),
+                  Colors.black.withValues(alpha: 0.30),
+                  Colors.black.withValues(alpha: 0.34),
+                ],
+                stops: const [0, 0.62, 1],
+              ),
+            ),
+          ),
+        ),
+      if (photo == null)
       Positioned(
         right: -26,
         top: 52,
@@ -365,26 +592,67 @@ class _Hero extends StatelessWidget {
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                // ⚠️ THE PHOTOGRAPH IS GIVEN ROOM HERE, AND NOWHERE ELSE.
+                //
+                // The hero is a Stack whose size comes from this column, so the
+                // only way to make the picture bigger is to make the column
+                // taller — there is no height to set on the image itself. Asked
+                // for as *"the image can take a little bit more space, I won't
+                // mind… so that the text also fits well"*, and the two halves
+                // of that are the same lever: a taller hero shows more
+                // photograph AND stops the eyebrow, the title and the blurb
+                // being crammed against the back button.
+                //
+                // A fraction of the screen rather than a constant, because a
+                // literal that looks generous on a 780pt phone eats a 640pt one
+                // — the same class of mistake as the hardcoded `bottom: 96`
+                // that `pvNavClearance` exists to undo.
+                SizedBox(
+                    height: photo == null
+                        ? 20
+                        : MediaQuery.sizeOf(context).height * 0.10),
                 Text(eyebrow.toUpperCase(),
                     style: pvManrope(
                         fontSize: 11,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.4,
-                        color: p.ink2)),
+                        color: photo == null
+                            ? p.ink2
+                            : Colors.white.withValues(alpha: 0.82))),
                 const SizedBox(height: 8),
                 // ⚠️ THE AREA'S NAME, NOT A QUESTION — and the same string as
                 // the tile, so tapping one name never lands on another.
+                //
+                // ⚠️ IT STAYS THE BRACKET'S NAME EVEN ON A GROUPED PAGE. The
+                // selected group is named lower down, in the sheet, above its
+                // own sections. Putting "Understand" up here instead would mean
+                // the hero changed identity every time she tapped a card, and
+                // the one thing a hero has to do is say which door she is
+                // standing in.
                 ConstrainedBox(
-                  constraints: const BoxConstraints(maxWidth: 252),
+                  constraints: const BoxConstraints(maxWidth: 300),
                   child: Text(title,
                       style: pvFraunces(
-                          fontSize: 27,
+                          fontSize: photo == null ? 27 : 30,
                           fontWeight: FontWeight.w600,
                           height: 1.15,
                           letterSpacing: -0.6,
-                          color: p.ink1)),
+                          color: photo == null ? p.ink1 : Colors.white)),
                 ),
+                if (page.heroBlurb case final blurb?) ...[
+                  const SizedBox(height: 12),
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 330),
+                    child: Text(blurb,
+                        style: pvManrope(
+                            fontSize: 13.5,
+                            height: 1.55,
+                            color: photo == null
+                                ? p.ink2
+                                : Colors.white.withValues(alpha: 0.92))),
+                  ),
+                  const SizedBox(height: 6),
+                ],
                 if (page.heroVideoSlot case final slot?) ...[
                   const SizedBox(height: 9),
                   // No file exists yet. `PvVideoPlaceholder` holds the real
@@ -431,16 +699,392 @@ class _Hero extends StatelessWidget {
   }
 }
 
+/// The five tabs under the hero on a grouped page.
+///
+/// ⚠️ THIS IS OPTION 4b OF THE "PCOS MODE SWITCHER" DESIGN PROJECT, and it is
+/// the fourth shape this control has taken. The three before it are worth
+/// keeping in one place, because each was rejected for a different reason and
+/// the reasons together are the spec:
+///
+///   1. **A glyph on a white card** — *"you have just used the icons basic
+///      icons, I don't like it."*
+///   2. **A drawn mark in a tinted disc**, copied off the home's daily rail —
+///      *"a lot of wasted space on that tab… it's all white behind, that's why
+///      it looks very empty."*
+///   3. **A pill sized to its label** — the retreat from 2, and rejected on
+///      sight: *"I did not want it to be like a pill design. I want them to be
+///      blocks, obviously tabs."*
+///
+/// The design's own reading of that history is the useful one: *"the box was
+/// never the problem; the problem was five identical pastel boxes in a single
+/// clipped row, with nothing saying which one is on."* So 4b keeps the
+/// rectangle and the pastel and fixes the three things that were actually
+/// wrong — a mark so each box reads as a place rather than a colour, a
+/// selected state that goes white and raised against flat neighbours, and a
+/// row that stops cutting words in half.
+///
+/// ⚠️ 108pt SQUARE, AND THE SQUARE IS LOAD-BEARING. It is what lets "Where do
+/// I stand" wrap to two lines INSIDE the box instead of being clipped by the
+/// screen edge. A pill has to grow sideways to hold a long name; a square
+/// grows downward, where there is room. Three and a bit are visible at 360pt.
+class _GroupRail extends StatefulWidget {
+  const _GroupRail({
+    required this.page,
+    required this.groups,
+    required this.selected,
+    required this.p,
+    required this.onPick,
+  });
+
+  final TtcFocusPage page;
+  final List<TtcFocusGroup> groups;
+  final int selected;
+  final V2Palette p;
+  final ValueChanged<int> onPick;
+
+  /// 108 box + 2 above + 8 below, so the selected box's shadow has somewhere to
+  /// fall without being clipped by the rail's own bounds.
+  static const double height = 118;
+  static const double box = 108;
+
+  @override
+  State<_GroupRail> createState() => _GroupRailState();
+}
+
+class _GroupRailState extends State<_GroupRail> {
+  final _controller = ScrollController();
+  late List<GlobalKey> _keys =
+      List.generate(widget.groups.length, (_) => GlobalKey());
+
+  @override
+  void didUpdateWidget(covariant _GroupRail old) {
+    super.didUpdateWidget(old);
+    if (old.groups.length != widget.groups.length) {
+      _keys = List.generate(widget.groups.length, (_) => GlobalKey());
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  /// ⚠️ TAPPING PULLS THE BOX INTO VIEW, which the design calls for and which
+  /// matters more than it sounds. A half-visible box at the right edge is
+  /// tappable, and without this it stays half-visible after being tapped — so
+  /// the one tab that is definitely being read is the one the reader can see
+  /// least of.
+  void _pick(int i) {
+    widget.onPick(i);
+    final ctx = _keys[i].currentContext;
+    if (ctx == null) return;
+    Scrollable.ensureVisible(
+      ctx,
+      duration: const Duration(milliseconds: 260),
+      curve: Curves.easeOut,
+      alignment: 0.5,
+    );
+  }
+
+  /// The second line. Counted, never typed.
+  ///
+  /// ⚠️ A HAND-WRITTEN COUNT GOES STALE SILENTLY — nothing fails, the number is
+  /// simply wrong, and it is wrong on the one line whose whole job is to be
+  /// trusted before a tap.
+  String _inside(TtcFocusGroup g) {
+    if (g.toolSurfaceId != null) return 'Quick check';
+    final n = widget.page.sections
+        .where((s) => s.group == g.id)
+        .fold(0, (t, s) => t + s.tiles.length);
+    return n == 1 ? '1 thing' : '$n things';
+  }
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+        height: _GroupRail.height,
+        // ⚠️ BOTH EDGES FADE RATHER THAN CUT. The design's own diagnosis of the
+        // screen it replaced was "a half-cut chip on the left, a half-cut chip
+        // on the right, and no way to know there were five". A hard edge reads
+        // as a clipping bug; a fade reads as more to come, which is the thing
+        // the reader actually needs to know.
+        child: ShaderMask(
+          shaderCallback: (rect) => const LinearGradient(
+            begin: Alignment.centerLeft,
+            end: Alignment.centerRight,
+            colors: [
+              Color(0x00000000),
+              Color(0xFF000000),
+              Color(0xFF000000),
+              Color(0x00000000),
+            ],
+            stops: [0, 0.045, 0.88, 1],
+          ).createShader(rect),
+          blendMode: BlendMode.dstIn,
+          child: ListView.separated(
+            controller: _controller,
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.fromLTRB(18, 2, 18, 8),
+            itemCount: widget.groups.length,
+            separatorBuilder: (_, _) => const SizedBox(width: 10),
+            itemBuilder: (context, i) => _GroupTab(
+              key: _keys[i],
+              group: widget.groups[i],
+              inside: _inside(widget.groups[i]),
+              selected: i == widget.selected,
+              p: widget.p,
+              onTap: () => _pick(i),
+            ),
+          ),
+        ),
+      );
+}
+
+
+/// The hue at full depth — the selected tab's fill.
+///
+/// ⚠️ SOLVED FOR CONTRAST, NOT PICKED. See the note on [_GroupTab]. The target
+/// is 4.8:1 against white: a little over the 4.5 floor, because the label sits
+/// at 12.5pt and the count at 10.5pt, and a floor met exactly is a floor that
+/// fails the moment someone nudges a size.
+Color _deepFor(double hue) {
+  const target = 4.8;
+  const saturation = 0.44;
+
+  double luminance(double lightness) {
+    final c = HSLColor.fromAHSL(1, hue % 360, saturation, lightness).toColor();
+    double channel(double v) => v <= 0.03928
+        ? v / 12.92
+        : math.pow((v + 0.055) / 1.055, 2.4).toDouble();
+    return 0.2126 * channel(c.r) +
+        0.7152 * channel(c.g) +
+        0.0722 * channel(c.b);
+  }
+
+  var lo = 0.05;
+  var hi = 0.70;
+  for (var i = 0; i < 24; i++) {
+    final mid = (lo + hi) / 2;
+    // Darker means more contrast, so a mid that is too pale moves the ceiling.
+    if (1.05 / (luminance(mid) + 0.05) < target) {
+      hi = mid;
+    } else {
+      lo = mid;
+    }
+  }
+  return HSLColor.fromAHSL(1, hue % 360, saturation, (lo + hi) / 2).toColor();
+}
+
+/// One tab. A filled square with a marked well, a name and a count.
+///
+/// ⚠️ SELECTION IS THE TAB'S OWN HUE GOING DEEP. NO PURPLE, ANYWHERE.
+///
+/// The design file marks the chosen box with a white fill and a violet 1.5pt
+/// edge. That shipped once and came straight back: *"can we have better
+/// highlighting over selected one, as in not turning purple or purple outline,
+/// find a better way."*
+///
+/// The objection is right twice over. Purple is the stage ACCENT — it means
+/// "this is the action" — and putting it on whichever tab happens to be open
+/// says the open tab is a thing to press, which is the one thing it is not. And
+/// it is a fifth colour arriving on a control that already has five: five hues
+/// resting, then a sixth to say which is on.
+///
+/// So the hue does the work instead. Every tab carries its group's colour
+/// already; the chosen one simply **takes that colour at full depth** and wears
+/// white type, while the others stay at the pale tint. One hue, two strengths,
+/// no new colour introduced — the same relationship `V3DailyArt` uses between a
+/// tinted well and its mark, and `ttcPhaseMark` between a band and its dot.
+///
+/// It also reads better than an outline for a plain physical reason: a 1.5pt
+/// edge is 1.5pt of signal that disappears at arm's length or in sunlight,
+/// while a solid block of colour is the whole box.
+///
+/// ⚠️ THE DEEP LIGHTNESS IS SOLVED PER HUE, NOT FIXED. A single lightness looks
+/// consistent in code and is not: at L .42 white type clears 4.5:1 on the blue
+/// and the rose and fails it on the sage, the sand and the teal — measured at
+/// 3.4, 3.9 and 3.4. Yellow-greens carry far more luminance than blues at the
+/// same number, which is the same trap as `v3FieldChroma`, one channel over.
+///
+/// [_deepFor] therefore solves for the lightness that puts every hue at the
+/// same contrast against white. The five fills are different colours of equal
+/// weight, and a group added later is legible without anyone checking.
+///
+/// ⚠️ IT STILL ANSWERS THE FINGER. Asked for separately and kept through every
+/// reshape, because it is the only feedback that arrives before the rebuild:
+///
+///   · **It shrinks while held** — a control that does not move under a thumb
+///     reads as a picture of a control.
+///   · **The phone ticks** — `selectionClick`, the light one a picker uses.
+///     `mediumImpact` would be a notification, and changing tab is not an
+///     event.
+///   · **Fill, edge and shadow cross-fade** over 180ms, so the selection moves
+///     rather than teleports and the eye can follow which box took it.
+class _GroupTab extends StatefulWidget {
+  const _GroupTab({
+    super.key,
+    required this.group,
+    required this.inside,
+    required this.selected,
+    required this.p,
+    required this.onTap,
+  });
+
+  final TtcFocusGroup group;
+
+  /// The second line — "8 things", "Quick check". Counted by the rail.
+  final String inside;
+
+  final bool selected;
+  final V2Palette p;
+  final VoidCallback onTap;
+
+  @override
+  State<_GroupTab> createState() => _GroupTabState();
+}
+
+class _GroupTabState extends State<_GroupTab> {
+  bool _held = false;
+
+  void _hold(bool v) {
+    if (_held != v && mounted) setState(() => _held = v);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final p = widget.p;
+    final on = widget.selected;
+    final tint = v2BlockTint(widget.group.hue % 360, p);
+    final deep = _deepFor(widget.group.hue);
+
+    return Semantics(
+      selected: on,
+      button: true,
+      label: '${widget.group.label}, ${widget.inside}',
+      child: GestureDetector(
+        onTapDown: (_) => _hold(true),
+        onTapCancel: () => _hold(false),
+        onTapUp: (_) => _hold(false),
+        onTap: on
+            ? null
+            : () {
+                HapticFeedback.selectionClick();
+                widget.onTap();
+              },
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedScale(
+          scale: _held ? 0.95 : 1,
+          duration: const Duration(milliseconds: 110),
+          curve: Curves.easeOut,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOut,
+            width: _GroupRail.box,
+            height: _GroupRail.box,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: on ? deep : tint,
+              borderRadius: BorderRadius.circular(16),
+              // ⚠️ NO BORDER IN EITHER STATE. An outline was the old signal and
+              // it is gone; leaving a transparent one behind would keep 1.5pt
+              // of padding that only one state ever used, and the two would sit
+              // at different sizes.
+              boxShadow: on
+                  ? [
+                      // The shadow is the hue's own, not black. A coloured
+                      // block casting a grey shadow reads as a sticker on the
+                      // page rather than a part of it.
+                      BoxShadow(
+                        color: deep.withValues(alpha: 0.30),
+                        blurRadius: 16,
+                        offset: const Offset(0, 5),
+                      ),
+                    ]
+                  : null,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  width: 34,
+                  height: 34,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    // ⚠️ THE WELL STAYS PALE IN BOTH STATES, which is what
+                    // keeps the mark readable once the box goes dark. Filling
+                    // it with the tint would put a pastel on a deep ground of
+                    // the same hue — two neighbouring values of one colour,
+                    // which is the hardest pair for an eye to separate.
+                    color: Colors.white.withValues(alpha: on ? 0.92 : 0.72),
+                    borderRadius: BorderRadius.circular(11),
+                  ),
+                  child: Icon(widget.group.icon,
+                      size: 20, color: on ? deep : p.ink2),
+                ),
+                // ⚠️ `Flexible`, BECAUSE A LONG NAME IS THE POINT OF THE SQUARE.
+                // "Where do I stand" wraps to two lines here; without this the
+                // column overflows by a few points and paints a stripe.
+                Flexible(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(widget.group.label,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: pvManrope(
+                              fontSize: 12.5,
+                              height: 1.2,
+                              letterSpacing: -0.2,
+                              fontWeight:
+                                  on ? FontWeight.w800 : FontWeight.w600,
+                              color: on ? Colors.white : p.ink2)),
+                      const SizedBox(height: 2),
+                      Text(widget.inside,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: pvManrope(
+                              fontSize: 10.5,
+                              fontWeight: FontWeight.w700,
+                              color: on
+                                  ? Colors.white.withValues(alpha: 0.82)
+                                  : p.ink3)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _Sheet extends StatelessWidget {
-  const _Sheet({required this.p, required this.children});
+  const _Sheet({
+    required this.p,
+    required this.children,
+    this.minHeightFactor = 0.72,
+  });
 
   final V2Palette p;
   final List<Widget> children;
 
+  /// ⚠️ ZERO WHEN A SLIVER IS ALREADY SIZING THIS. `SliverFillRemaining` hands
+  /// the sheet at least the rest of the viewport, so a second minimum here
+  /// would fight it and win on short pages — which is the gap this parameter
+  /// exists to close, arrived at from the other direction.
+  final double minHeightFactor;
+
+
   @override
   Widget build(BuildContext context) => Container(
         constraints: BoxConstraints(
-            minHeight: MediaQuery.sizeOf(context).height * 0.72),
+            minHeight:
+                MediaQuery.sizeOf(context).height * minHeightFactor),
         decoration: BoxDecoration(
           color: p.ground,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
@@ -575,6 +1219,9 @@ IconData iconForFormat(TtcTileFormat format) => switch (format) {
     TtcTileFormat.mythFact => Icons.balance_rounded,
     TtcTileFormat.product => Icons.shopping_bag_outlined,
     TtcTileFormat.booking => Icons.event_available_outlined,
+    TtcTileFormat.recipe => Icons.restaurant_outlined,
+    TtcTileFormat.community => Icons.forum_outlined,
+    TtcTileFormat.infographic => Icons.insights_outlined,
   };
 
 /// Opens whatever a tile is.
@@ -588,6 +1235,35 @@ void openTtcFocusTile(BuildContext context, TtcTile tile, double hue) {
     // ---- the tool: opened, never rebuilt --------------------------------
     case TtcToolTile(:final surfaceId):
       openTtcSurface(context, surfaceId);
+
+    // ---- one frame, no swiping ------------------------------------------
+    case TtcInfographicTile():
+      Navigator.of(context).push(MaterialPageRoute<void>(
+        settings: const RouteSettings(name: 'ttc/infographic'),
+        builder: (_) => TtcInfographicScreen(tile: tile, hue: hue),
+      ));
+
+    // ---- a room, not an answer ------------------------------------------
+    case TtcCommunityTile(:final surfaceId):
+      openTtcSurface(context, surfaceId);
+
+    // ---- a dish, on the app's own recipe page ---------------------------
+    //
+    // ⚠️ `RecipeDetailScreen`, NOT A TTC RECIPE SCREEN. It already scales every
+    // ingredient to a chosen serving count, lists the steps and carries a
+    // nutrition glance; a second one styled for this stage would be a second
+    // thing to keep in step for no gain the reader can see.
+    //
+    // ⚠️ AND A MISSING ID FAILS LOUDLY HERE. `firstWhere` throws rather than
+    // returning a blank page, because a recipe tile that opens nothing is the
+    // exact silent failure `ttc_focus_page_test.dart` exists to catch — better
+    // it dies in a test than renders an empty screen on a phone.
+    case TtcRecipeTile(:final recipeId):
+      Navigator.of(context).push(MaterialPageRoute<void>(
+        settings: const RouteSettings(name: 'ttc/recipe'),
+        builder: (_) => RecipeDetailScreen(
+            recipe: kRecipes.firstWhere((r) => r.id == recipeId)),
+      ));
 
     // ---- reading --------------------------------------------------------
     case TtcArticleTile(:final readId, :final art, :final imageUrl):

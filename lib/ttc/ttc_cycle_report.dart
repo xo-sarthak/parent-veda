@@ -47,6 +47,7 @@
 
 import 'ttc_chapter.dart';
 import 'cycle_store.dart';
+import 'ttc_fertile_window.dart';
 import 'ttc_log_store.dart';
 import 'ttc_store.dart';
 import 'ttc_symptom_data.dart';
@@ -74,6 +75,62 @@ extension TtcPhaseCopy on TtcPhase {
         TtcPhase.fertileWindow => 160,
         TtcPhase.afterWindow => 268,
       };
+}
+
+/// Days of bleeding assumed when she has not told us.
+///
+/// ⚠️ FOR DRAWING A BAND, AND FOR NOTHING ELSE. It is never shown as a number,
+/// never fed to the engine, and never presented as her period length. It exists
+/// so the first stretch on a picture has an edge.
+///
+/// ⚠️ AND IT IS NOW A FALLBACK RATHER THAN THE RULE. `CycleStore.bleedDaysFor`
+/// holds what she actually recorded, and every caller here prefers it. This
+/// number is what the picture uses on a cycle she logged before the question
+/// existed, or chose not to answer — which is most of them today and fewer of
+/// them every month.
+const int kTtcAssumedBleedDays = 5;
+
+/// The bleed length to band a cycle with: hers if she said, the assumption if
+/// not, and the assumption while a period is still going.
+///
+/// ⚠️ "STILL ON" FALLS BACK RATHER THAN DRAWING A BAND THAT GROWS. A period she
+/// has marked ongoing has no length yet, and painting one that lengthens each
+/// morning would be the app inventing a fact it is waiting for.
+int ttcBleedDaysFor(DateTime start) {
+  final logged = CycleStore.instance.bleedDaysFor(start);
+  if (logged == null || logged == kBleedStillOn || logged < 1) {
+    return kTtcAssumedBleedDays;
+  }
+  return logged;
+}
+
+/// Which stretch a cycle day falls in.
+///
+/// ⚠️ ONE PREDICATE, BECAUSE THREE PICTURES NOW DRAW THE SAME FOUR STRETCHES.
+/// The day-by-day list, the ring and the timeline each need this answer, and
+/// three inline copies of `ov - 5` is precisely how the fertile-window header
+/// and its door screen once disagreed about the same week — see the note at the
+/// head of `ttc_fertile_window.dart`, whose constants this borrows rather than
+/// restating.
+///
+/// ⚠️ THE ORDER OF THE TESTS IS LOAD-BEARING. Period wins first. On a short
+/// cycle the assumed bleed days and the window can overlap, and a day that is
+/// both must read as the period — a picture that paints day 4 as fertile while
+/// she is bleeding is one she will not trust again.
+TtcPhase ttcPhaseForCycleDay(
+  int cycleDay,
+  int ovulationDay, {
+  int bleedDays = kTtcAssumedBleedDays,
+}) {
+  if (cycleDay <= bleedDays) return TtcPhase.period;
+  if (cycleDay >= ovulationDay - ttcWindowOpensBeforeOvulation &&
+      cycleDay <= ovulationDay + ttcWindowClosesAfterOvulation) {
+    return TtcPhase.fertileWindow;
+  }
+  if (cycleDay < ovulationDay - ttcWindowOpensBeforeOvulation) {
+    return TtcPhase.beforeWindow;
+  }
+  return TtcPhase.afterWindow;
 }
 
 /// Which report she gets. Closed, and the screen must handle all of them.
@@ -198,6 +255,7 @@ TtcCycleReport ttcBuildCycleReport({int index = 0}) {
   final start = _dayOnly(starts[pos]);
 
   final today = _dayOnly(DateTime.now());
+  final bleed = ttcBleedDaysFor(start);
   final nextStart = pos + 1 < starts.length ? _dayOnly(starts[pos + 1]) : null;
   final length = store.today.cycleLength;
   var end = nextStart?.subtract(const Duration(days: 1)) ??
@@ -221,17 +279,11 @@ TtcCycleReport ttcBuildCycleReport({int index = 0}) {
 
   TtcPhase? phaseFor(int cycleDay) {
     if (reportState == TtcReportState.clinicHeld ||
-        reportState == TtcReportState.noEstimate) {
+        reportState == TtcReportState.noEstimate ||
+        ov == null) {
       return null;
     }
-    // Five days of bleeding is the working assumption for banding only. It is
-    // never shown as a number and never used by the engine.
-    if (cycleDay <= 5) return TtcPhase.period;
-    if (ov != null && cycleDay >= ov - 5 && cycleDay <= ov + 1) {
-      return TtcPhase.fertileWindow;
-    }
-    if (ov != null && cycleDay < ov - 5) return TtcPhase.beforeWindow;
-    return TtcPhase.afterWindow;
+    return ttcPhaseForCycleDay(cycleDay, ov, bleedDays: bleed);
   }
 
   // ---- gather --------------------------------------------------------------
@@ -392,6 +444,144 @@ TtcFinding? ttcCycleLengthNote() {
     detail: 'Your recent cycles have averaged $usual days. Cycles vary, and '
         'a few days either way is ordinary.',
   );
+}
+
+// =============================================================================
+//  The four stretches, as a whole cycle
+// -----------------------------------------------------------------------------
+//  ⚠️ THIS IS A DIFFERENT QUESTION FROM [TtcCycleReport.days], AND CONFLATING
+//  THE TWO COST A ROUND TRIP. The day list is *what she logged*, so it stops at
+//  today — you cannot plot a weight nobody has stood on a scale for. The four
+//  stretches are *the shape of the cycle*, which is known in full the moment a
+//  period is logged, because it is arithmetic on two numbers the engine already
+//  has: the estimated ovulation day and the cycle length.
+//
+//  So the last stretch being in the future is not a shortage of data. Today's
+//  date does exactly one job here — it decides which stretch carries "You are
+//  here". Everything else is the same before and after it happens.
+//
+//  ⚠️ IT IS A TIMING ESTIMATE AND NEVER A PROBABILITY. Dates and lengths only.
+//  Nothing in [TtcPhaseSpan] may grow a field that reads as a chance, a score
+//  or a ranking of one stretch against another — CLAUDE.md's clinical
+//  invariants, and the same rule stated at the head of `ttc_fertile_window.dart`
+//  whose window constants this shares.
+//
+//  ⚠️ AND IT REFUSES ON THE SAME TERMS THE REPORT DOES. Empty when a clinic
+//  holds the cycle or the engine will not estimate, so a caller cannot draw
+//  bands we are not entitled to draw. Structural, not a flag to remember.
+// =============================================================================
+
+/// Where a stretch sits relative to today.
+enum TtcSpanStatus { done, here, ahead }
+
+extension TtcSpanStatusCopy on TtcSpanStatus {
+  /// The word on the meta line, after the dates and the length.
+  String get label => switch (this) {
+        TtcSpanStatus.done => 'done',
+        TtcSpanStatus.here => 'now',
+        TtcSpanStatus.ahead => 'ahead',
+      };
+}
+
+/// One stretch of a cycle, with real dates at both ends.
+class TtcPhaseSpan {
+  const TtcPhaseSpan({
+    required this.phase,
+    required this.firstDay,
+    required this.lastDay,
+    required this.firstCycleDay,
+    required this.lastCycleDay,
+    required this.status,
+    this.dayInto,
+  });
+
+  final TtcPhase phase;
+  final DateTime firstDay;
+  final DateTime lastDay;
+  final int firstCycleDay;
+  final int lastCycleDay;
+  final TtcSpanStatus status;
+
+  /// 1-based position of today inside this stretch. Null unless [status] is
+  /// [TtcSpanStatus.here] — "day 3 of 7" is only meaningful while she is in it.
+  final int? dayInto;
+
+  int get days => lastCycleDay - firstCycleDay + 1;
+}
+
+/// The four stretches of the cycle [index] back from the current one.
+///
+/// Empty when phases are not ours to draw. Fewer than four is a legitimate
+/// answer, not a bug: on a short cycle the assumed bleed days can swallow
+/// "Before your window" entirely, and drawing a stretch of zero days to keep
+/// the count at four would be inventing one.
+List<TtcPhaseSpan> ttcCyclePhaseSpans({int index = 0}) {
+  final cycle = CycleStore.instance;
+  final store = TtcStore.instance;
+  final starts = [...cycle.periodStarts]..sort();
+  if (starts.isEmpty) return const [];
+
+  final pos = starts.length - 1 - index;
+  if (pos < 0) return const [];
+  final start = _dayOnly(starts[pos]);
+
+  // ⚠️ THE SAME REFUSALS AS THE REPORT, READ THE SAME WAY. Asked at the END of
+  // the cycle being drawn rather than today, so paging back to a cycle that was
+  // clinic-run answers about that cycle rather than about this morning.
+  final nextStart = pos + 1 < starts.length ? _dayOnly(starts[pos + 1]) : null;
+  final length = nextStart != null
+      ? nextStart.difference(start).inDays
+      : store.today.cycleLength;
+  if (length < 1) return const [];
+
+  final last = start.add(Duration(days: length - 1));
+  const engine = TtcChapterEngine();
+  final ov = engine.estimatedOvulationDay(store.state(on: last));
+  if (ov == null) return const [];
+  if (!store.today.behaviour.showsFertilityWindow) return const [];
+
+  // Where today falls. Outside the cycle entirely is the ordinary case for a
+  // cycle she has paged back to.
+  final todayCycleDay = _dayOnly(DateTime.now()).difference(start).inDays + 1;
+
+  // ---- consecutive runs of one phase -------------------------------------
+  final out = <TtcPhaseSpan>[];
+  final bleed = ttcBleedDaysFor(start);
+  var runStart = 1;
+  var runPhase = ttcPhaseForCycleDay(1, ov, bleedDays: bleed);
+
+  void close(int runEnd) {
+    final TtcSpanStatus status;
+    int? into;
+    if (todayCycleDay < runStart) {
+      status = TtcSpanStatus.ahead;
+    } else if (todayCycleDay > runEnd) {
+      status = TtcSpanStatus.done;
+    } else {
+      status = TtcSpanStatus.here;
+      into = todayCycleDay - runStart + 1;
+    }
+    out.add(TtcPhaseSpan(
+      phase: runPhase,
+      firstDay: start.add(Duration(days: runStart - 1)),
+      lastDay: start.add(Duration(days: runEnd - 1)),
+      firstCycleDay: runStart,
+      lastCycleDay: runEnd,
+      status: status,
+      dayInto: into,
+    ));
+  }
+
+  for (var day = 2; day <= length; day++) {
+    final phase = ttcPhaseForCycleDay(day, ov, bleedDays: bleed);
+    if (phase == runPhase) continue;
+    close(day - 1);
+    runStart = day;
+    runPhase = phase;
+  }
+  close(length);
+
+  return out;
 }
 
 DateTime _dayOnly(DateTime d) => DateTime(d.year, d.month, d.day);

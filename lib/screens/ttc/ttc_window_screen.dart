@@ -181,6 +181,7 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
                 accent: v2BlockTint(kWindowHue, p),
                 ground: p.ground,
                 variant: 2,
+                chroma: v3FieldChroma(kWindowHue),
               ),
             ),
             ListView(

@@ -271,3 +271,25 @@ Widget? _ttcStaticSurface(String id) => switch (id) {
 
       _ => null,
     };
+
+/// The same tool, with no frame of its own, for a page that shows it in place.
+///
+/// ⚠️ A SECOND MAP AND NOT A FLAG ON THE FIRST, BECAUSE THESE ANSWER DIFFERENT
+/// QUESTIONS. `ttcScreenForSurface` returns something you can push — it owns a
+/// Scaffold, a background and a way out. This returns something you can drop
+/// into a page that already has all three. A tool that has been split into a
+/// frame and a body appears in both; a tool that has not appears only in the
+/// first, and gets null here rather than an unusable screen embedded in a page.
+///
+/// ⚠️ NULL IS THE NORMAL ANSWER, and callers must handle it. Twenty-odd
+/// surfaces exist and exactly one has been split so far.
+///
+/// ⚠️ AND IT LIVES HERE RATHER THAN IN THE FOCUS SCREEN so that surface ids are
+/// resolved in one file. A second place that maps `'ttc_pcos_check'` to a
+/// widget is a second place for that string to go stale — and a stale id here
+/// fails the way this repo's worst bugs fail: the tile renders, and nothing
+/// happens.
+Widget? ttcInlineToolFor(String surfaceId) => switch (surfaceId) {
+      'ttc_pcos_check' => const TtcPcosStandBody(),
+      _ => null,
+    };
