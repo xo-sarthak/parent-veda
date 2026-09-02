@@ -44,6 +44,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/pv_fonts.dart';
 import 'v2_palette.dart';
+import '../../services/stage_gateway.dart';
 
 /// Where the chip is sitting, which decides its colours.
 ///
@@ -137,7 +138,7 @@ class V3SpineChip extends StatelessWidget {
 /// profile from their V3 homes, while pregnancy had both. Three stage homes
 /// disagreeing about whether an account exists is the kind of asymmetry a
 /// mother reads as the app being half-finished, because it is.
-class V3HeroChrome extends StatelessWidget {
+class V3HeroChrome extends StatefulWidget {
   const V3HeroChrome({
     super.key,
     required this.tone,
@@ -160,14 +161,31 @@ class V3HeroChrome extends StatelessWidget {
   final String initial;
 
   @override
+  State<V3HeroChrome> createState() => _V3HeroChromeState();
+}
+
+class _V3HeroChromeState extends State<V3HeroChrome> {
+  /// ⚠️ THE WHOLE REASON THIS BECAME A StatefulWidget. `showMenu` positions
+  /// against the overlay, so the avatar's box has to be MEASURED — and a key
+  /// created inside `build` is a new key on every rebuild, which means the
+  /// element it points at is never the one on screen when the menu opens. It
+  /// has to outlive the build, so it lives here.
+  final GlobalKey _avatarKey = GlobalKey();
+
+  @override
   Widget build(BuildContext context) {
+    final tone = widget.tone;
+    final p = widget.p;
+    final onSaved = widget.onSaved;
+    final initial = widget.initial;
     final onPhoto = tone == V3HeroTone.onPhoto;
     final fg = onPhoto ? Colors.white : p.ink1;
     final bg = onPhoto
         ? Colors.white.withValues(alpha: 0.18)
         : Colors.white.withValues(alpha: 0.62);
 
-    Widget button(Widget child, VoidCallback onTap) => Material(
+    Widget button(Widget child, VoidCallback onTap, {Key? boxKey}) => Material(
+          key: boxKey,
           color: bg,
           shape: const CircleBorder(),
           clipBehavior: Clip.antiAlias,
@@ -180,17 +198,36 @@ class V3HeroChrome extends StatelessWidget {
     return Row(mainAxisSize: MainAxisSize.min, children: [
       if (onSaved != null) ...[
         button(Icon(Icons.bookmark_border_rounded, size: 19, color: fg),
-            onSaved!),
+            onSaved),
         const SizedBox(width: 8),
       ],
-      if (onProfile != null)
+      // ⚠️ THIS BUTTON NOW OPENS THE THREE STAGES, NOT A PROFILE, AND THAT IS
+      // A FIX RATHER THAN A REPURPOSING.
+      //
+      // On pregnancy V3 it was wired to `_open(context, 'journal')`, and every
+      // destination in `_open` that is not a tab does one thing: it sets
+      // `TodayVersionStore` back to Classic. So tapping the avatar on V3 threw
+      // you out of V3 and onto the old home — reported as "when I click on that
+      // button for the profile I am coming back to the classic home screen".
+      // It was not navigating to a profile at all; it was leaving the version
+      // you were looking at.
+      //
+      // What the header actually needed was the one thing an app of three
+      // stages has no control for anywhere: a way to move between them. So the
+      // avatar opens a small anchored menu with the three doors.
+      //
+      // The profile itself is not lost. It lives on the Classic home, which is
+      // one tap away on the version toggle now sitting in the same corner —
+      // and the old button's own behaviour was to send you there anyway.
+      if (widget.onProfile != null)
         button(
           initial.isEmpty
               ? Icon(Icons.person_outline_rounded, size: 19, color: fg)
               : Text(initial.toUpperCase(),
                   style: pvJakarta(
                       fontSize: 15, fontWeight: FontWeight.w700, color: fg)),
-          onProfile!,
+          () => showStageDoorMenu(context, _avatarKey),
+          boxKey: _avatarKey,
         ),
     ]);
   }
