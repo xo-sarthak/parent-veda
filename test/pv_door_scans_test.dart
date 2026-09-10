@@ -24,6 +24,8 @@ import 'package:parentveda/data/reads/pregnancy_reads.dart';
 import 'package:parentveda/data/report_findings_data.dart';
 import 'package:parentveda/data/scan_questions_data.dart';
 import 'package:parentveda/data/tests_scans_reports_data.dart';
+import 'package:parentveda/screens/brackets/scan_timeline_screen.dart'
+    show kScanRun;
 import 'package:parentveda/screens/doors/pv_door_router.dart';
 import 'package:parentveda/screens/doors/pv_door_screen.dart';
 import 'package:parentveda/services/pregnancy_controller.dart';
@@ -337,6 +339,48 @@ void main() {
           .toList();
       expect(tiles.length, 1);
       expect(tiles.single, isA<PvDoorToolTile>());
+    });
+
+    test('every scan card carries the week range the brief annotates', () {
+      // ⚠️ THE BRIEF PUTS A WEEK RANGE BESIDE EVERY SCAN and the first build
+      // read those as identification rather than as copy. They are both: she
+      // is on a tab called "before you go", and "which of these is mine, now"
+      // is the question the card has to answer without being tapped.
+      const expected = {
+        'blood_tests': 'Weeks 6–10',
+        'dating_scan': 'Weeks 6–9',
+        'nt_scan': 'Weeks 11–13',
+        'nipt': 'Weeks 10–14',
+        'anomaly_scan': 'Weeks 18–22',
+        'ogtt': 'Weeks 24–28',
+        'growth_scan': 'Weeks 28–36',
+        'doppler': 'Weeks 30–40',
+        'gbs': 'Weeks 35–37',
+      };
+      for (final t in door.allTiles) {
+        if (t is! PvDoorScanTile) continue;
+        expect(t.meta, expected[t.scanId],
+            reason: '${t.title} shows the wrong week range.');
+      }
+    });
+
+    test('those week ranges agree with the timeline', () {
+      // ⚠️ THE DRIFT THIS CATCHES IS SILENT AND WOULD BE BELIEVED. The card and
+      // the timeline are two places showing the same fact, and a card reading
+      // "Weeks 11–13" beside a timeline row reading "Week 12–14" is the app
+      // disagreeing with itself about her pregnancy. Neither would fail to
+      // render.
+      //
+      // The card's copy is typed rather than derived, because `kScanRun` lives
+      // in a screen file and a data file must not import one. So the agreement
+      // is asserted instead.
+      final runs = {for (final (id, f, t) in kScanRun) id: 'Weeks $f–$t'};
+      for (final t in door.allTiles) {
+        if (t is! PvDoorScanTile) continue;
+        expect(t.meta, runs[t.scanId],
+            reason: '${t.title}: the card says "${t.meta}", the timeline says '
+                '"${runs[t.scanId]}".');
+      }
     });
 
     test('the closing line is the timeline footer, kept', () {

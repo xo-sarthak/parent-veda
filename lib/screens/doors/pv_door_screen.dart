@@ -574,12 +574,24 @@ class _RailCard extends StatelessWidget {
           ),
           clipBehavior: Clip.antiAlias,
           child: Stack(children: [
-            // The mark, large and quiet, sitting where an illustration would.
+            // The mark, sitting where an illustration would.
+            //
+            // ⚠️ QUIETER AND SMALLER THAN THE TTC ORIGINAL'S, BECAUSE THIS RAIL
+            // IS NOT THAT RAIL. Over there most tiles carry their own drawn art
+            // and the format glyph is the exception; here every tile falls back
+            // to it — and nine scans are all one format, so the rail came out
+            // as nine identical grey pages separated only by a title and a 22°
+            // hue step. Seen on a phone, 2026-09-10.
+            //
+            // The fix is not a bigger difference between marks, it is a smaller
+            // mark: at 96 and 0.34 it reads as a texture the hue sits in rather
+            // than as the subject of the card, and the words become the thing
+            // you look at. The week range does the actual distinguishing.
             Positioned(
-              right: -26,
-              bottom: 20,
+              right: -22,
+              bottom: 22,
               child: Icon(pvDoorFormatIcon(tile.format),
-                  size: 118, color: Colors.white.withValues(alpha: 0.5)),
+                  size: 96, color: Colors.white.withValues(alpha: 0.34)),
             ),
             Padding(
               padding: const EdgeInsets.all(13),
@@ -611,12 +623,27 @@ class _RailCard extends StatelessWidget {
                     ]),
                   ),
                   const Spacer(),
-                  // ⚠️ TITLE ONLY ON THE FACE. The blurb still exists on every
-                  // tile and still does its job on a wide row; on a 142pt block
-                  // it would take the title from four lines to one and turn a
-                  // scannable rail into a wall.
+                  // ⚠️ THE ONE FACT ABOVE THE TITLE, WHERE THERE IS ONE. On the
+                  // scans rail this is the week range, and it is what makes a
+                  // card answer "is this one mine, now" without being tapped.
+                  // See `PvDoorTile.meta`.
+                  if (tile.meta case final meta?) ...[
+                    Text(meta.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: pvManrope(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.8,
+                            color: deep.withValues(alpha: 0.85))),
+                    const SizedBox(height: 4),
+                  ],
+                  // ⚠️ TITLE ONLY ON THE FACE, BESIDES THAT. The blurb still
+                  // exists on every tile and still does its job on a wide row;
+                  // on a 142pt block it would take the title from four lines to
+                  // one and turn a scannable rail into a wall.
                   Text(tile.title,
-                      maxLines: 4,
+                      maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                       style: pvFraunces(
                           fontSize: 14.5,

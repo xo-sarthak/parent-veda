@@ -33,10 +33,22 @@
 //  It already exists app-wide — the floating sparkle button and the "Still
 //  worried? Ask Veda" prompt at the foot of content pages. The brief is
 //  explicit: do not add it as a card, do not build a second entry point, do not
-//  change how it looks. The only thing owed is that when it is opened from a
-//  scan page or a result page it receives that page's context, which
-//  `global_ask_fab.dart` already does by reading the route name — which is why
-//  every surface below is opened with `RouteSettings(name:)` set.
+//  change how it looks.
+//
+//  ⚠️ SO THERE IS NO ASK VEDA TILE ON THIS DOOR, AND THE CONTEXT IS PASSED ONE
+//  LEVEL IN — WHICH IS WHERE THE BRIEF ASKS FOR IT. Its words: *"when it is
+//  opened from a scan page or a result page, it receives that page's context."*
+//  A door is neither of those; it is a landing.
+//
+//  ⚠️ AND THE FAB CANNOT CARRY THAT CONTEXT. An earlier note here claimed the
+//  route name was enough. It is not: `FabRouteObserver` reads route names only
+//  to pick WHICH STAGE'S Ask Veda opens — TTC, parenting or pregnancy — and
+//  carries no payload. The result half already worked
+//  (`ReportArticleScreen._askVeda` passes the finding); the scan half did not
+//  exist and was added on `scan_detail_screen.dart`.
+//
+//  The route names below still matter, for the stage routing and for the
+//  suppression list. They are simply not the whole mechanism.
 //
 //  ---------------------------------------------------------------------------
 //  ⚠️ FIVE TABS, AND THE FIRST IS THE DEFAULT
@@ -95,12 +107,30 @@ final PvDoorPage kScansDoor = PvDoorPage(
   heroBlurb: 'What is coming, what you have already had, and what the report '
       'says.',
 
-  // ⚠️ A PLACEHOLDER PHOTOGRAPH, TO BE SWAPPED. Same shape the TTC doors use.
-  // The V3 field and the bracket mark render behind it, so a dead connection
-  // gives the hero this area has always had rather than a grey box — local-
-  // first is absolute.
-  heroImageUrl:
-      'https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=900&h=700&fit=crop',
+  // ⚠️ NO PHOTOGRAPH, AND THAT IS A CORRECTION RATHER THAN AN OMISSION.
+  //
+  // A stock Unsplash id went in here as a placeholder, matching what the TTC
+  // doors do. On the phone it turned out to be a Western clinic with
+  // "UROLOGIC ONCOLOGY BRANCH" legible on the doctor's badge — over the words
+  // "Your scans, in one place", on an Indian pregnancy app.
+  //
+  // ⚠️ THE LESSON IS ABOUT PLACEHOLDERS, NOT ABOUT THIS URL. A drawn
+  // placeholder announces itself; a REAL PHOTOGRAPH of the wrong thing does
+  // not. It reads as a considered choice at a glance and is only caught by
+  // someone looking at the pixels — which is exactly why it survived analyze,
+  // the whole suite and a render test. A photographic placeholder is the one
+  // kind that can ship a lie.
+  //
+  // So the hero falls back to the V3 field and this bracket's own drawn mark —
+  // the `photo == null` path in `_Hero`, which is a finished design rather
+  // than a fallback anyone would recognise as one. Local-first is absolute and
+  // this is the same rule pointing at art.
+  //
+  // ⚠️ ONE LINE TO RESTORE, once a real photograph exists — an Indian
+  // sonography room, or a mother holding a report. See STILL-OPEN §33.6.
+  //
+  // heroImageUrl:
+  //     'https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=900&h=700&fit=crop',
 
   closingLine: 'Not every pregnancy needs every test. This is the usual run, '
       'not a rule.',
@@ -222,21 +252,25 @@ final PvDoorPage kScansDoor = PvDoorPage(
           title: 'Blood tests',
           blurb: 'The first set of blood tests, and what each one is for.',
           scanId: 'blood_tests',
+          meta: 'Weeks 6–10',
         ),
         PvDoorScanTile(
           title: 'Dating scan',
           blurb: 'Confirms how many weeks you are, and your due date.',
           scanId: 'dating_scan',
+          meta: 'Weeks 6–9',
         ),
         PvDoorScanTile(
           title: 'NT scan',
           blurb: "Checks the baby's early growth and development.",
           scanId: 'nt_scan',
+          meta: 'Weeks 11–13',
         ),
         PvDoorScanTile(
           title: 'NIPT',
           blurb: 'A blood test that checks for some conditions early.',
           scanId: 'nipt',
+          meta: 'Weeks 10–14',
         ),
       ],
     ),
@@ -249,11 +283,13 @@ final PvDoorPage kScansDoor = PvDoorPage(
           title: 'Anomaly scan',
           blurb: 'The detailed scan that checks the baby from head to toe.',
           scanId: 'anomaly_scan',
+          meta: 'Weeks 18–22',
         ),
         PvDoorScanTile(
           title: 'Sugar test (OGTT)',
           blurb: 'Checks for pregnancy diabetes.',
           scanId: 'ogtt',
+          meta: 'Weeks 24–28',
         ),
       ],
     ),
@@ -266,16 +302,19 @@ final PvDoorPage kScansDoor = PvDoorPage(
           title: 'Growth scan',
           blurb: 'Checks how the baby is growing, and how much fluid there is.',
           scanId: 'growth_scan',
+          meta: 'Weeks 28–36',
         ),
         PvDoorScanTile(
           title: 'Doppler scan',
           blurb: 'Checks the blood flow to the baby.',
           scanId: 'doppler',
+          meta: 'Weeks 30–40',
         ),
         PvDoorScanTile(
           title: 'Group B Strep',
           blurb: 'A swab that checks for a common bacteria before birth.',
           scanId: 'gbs',
+          meta: 'Weeks 35–37',
         ),
       ],
     ),

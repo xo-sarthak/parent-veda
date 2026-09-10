@@ -74,6 +74,8 @@ import '../prepare/consultations_screen.dart';
 // PvReadPlaceholder until real reads are attached.
 // import '../read_reader_screen.dart';
 import '../report_screen.dart';
+import '../../widgets/global_ask_fab.dart' show kAskVedaRoute;
+import '../tools/ask_veda_screen.dart';
 import '../tools/scans_appointments_screen.dart';
 import '../tools/tests_scans_reports_screen.dart';
 import '../v2/v2_palette.dart';
@@ -449,6 +451,58 @@ class ScanDetailScreen extends StatelessWidget {
                     ConsultationsScreen(
                         lang: lang, onlyRole: kScanConsultRole),
                     'consults'),
+              ),
+              const SizedBox(height: 10),
+
+              // ---- Ask Veda, carrying which scan she is standing in ---------
+              //
+              // ⚠️ THE ONE THING THE SCANS BRIEF ASKS OF ASK VEDA, AND IT WAS
+              // THE HALF THAT WAS MISSING. The instruction is narrow and worth
+              // quoting: *"make sure that when it is opened from a scan page or
+              // a result page, it receives that page's context (which scan, or
+              // which finding)."*
+              //
+              // The RESULT half already worked — `ReportArticleScreen._askVeda`
+              // has passed `finding.name` as `initialQuery` since it was built.
+              // The SCAN half did not exist at all: there was no Ask Veda entry
+              // point on this page, so the only way in was the floating sparkle
+              // button, which opens the pregnancy Ask Veda with nothing in it.
+              //
+              // ⚠️ AND THE FAB CANNOT DO THIS ON ITS OWN. `FabRouteObserver`
+              // reads route names, but only to pick WHICH STAGE'S Ask Veda
+              // opens — TTC, parenting or pregnancy. It carries no per-page
+              // payload and should not: a route name is an identity, not a
+              // question, and teaching the FAB to reverse-engineer a scan id
+              // from a string would put that mapping somewhere nothing tests.
+              //
+              // So the page hands over its own context, exactly as the finding
+              // page does. Two call sites, one pattern, no shared file touched.
+              //
+              // ⚠️ `.en`, NOT `.of(lang)`, AND THIS IS THE `.now` TRAP.
+              // `initialQuery` is not display text — it is sent to the Ask Veda
+              // service as the question. The corpus and the retrieval index are
+              // English, so handing over the Devanagari label would search for a
+              // string the index does not contain and come back empty. Same
+              // rule CLAUDE.md states: `.en` is identity, `.now` is display.
+              SolutionCard(
+                type: SolutionType.read,
+                title: LocalizedText(
+                    en: 'Still worried? Ask Veda about ${scan.name.en}',
+                    hi: 'अभी भी चिंता है? Veda से ${scan.name.en} के बारे में '
+                        'पूछिए'),
+                value: const LocalizedText(
+                    en: 'Ask anything about this scan, in your own words.',
+                    hi: 'इस scan के बारे में अपने शब्दों में कुछ भी पूछिए।'),
+                p: p,
+                lang: lang,
+                onTap: () => _push(
+                    context,
+                    AskVedaScreen(
+                        controller: pregnancy, initialQuery: scan.name.en),
+                    // ⚠️ THE FAB'S OWN CONSTANT, so the floating sparkle
+                    // suppresses itself over the screen it opens. A literal
+                    // here would float an Ask Veda button on top of Ask Veda.
+                    kAskVedaRoute),
               ),
               const SizedBox(height: 26),
 

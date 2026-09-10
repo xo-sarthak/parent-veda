@@ -119,6 +119,7 @@ sealed class PvDoorTile {
   const PvDoorTile({
     required this.title,
     required this.blurb,
+    this.meta,
     this.comingSoon = false,
   });
 
@@ -139,6 +140,28 @@ sealed class PvDoorTile {
   /// does the explaining: "Checks the baby's early growth and development", not
   /// "nuchal translucency measurement".
   final String blurb;
+
+  /// A short fact set above the title on a card. "Weeks 6–10".
+  ///
+  /// ⚠️ ADDED AFTER SEEING THE RAIL ON A PHONE, AND IT FIXES TWO THINGS AT
+  /// ONCE.
+  ///
+  /// The brief annotates every scan with its week range — `"Blood tests"
+  /// (weeks 6-10)`, `"NT scan" (weeks 11-13)` — and the first build read those
+  /// as identification rather than as copy, so they did not reach the card.
+  /// That was arguably defensible on its own. What settled it is what the rail
+  /// looked like: nine cards of the same format, so the same fallback mark on
+  /// every one, distinguished only by a title and a 22° hue step. Nine grey
+  /// pages in a row.
+  ///
+  /// The week range is the line that makes each card its own thing AND is the
+  /// question she is actually asking on a tab called "before you go" — *which
+  /// of these is mine, now*. The brief had it and the card did not.
+  ///
+  /// ⚠️ IT IS NOT THE BLURB. The blurb says what the scan does and is often
+  /// contracted by the brief word for word; this says when. Both fit because
+  /// the blurb does not render on a rail card.
+  final String? meta;
 
   /// The content behind this does not exist yet.
   ///
@@ -162,6 +185,7 @@ final class PvDoorToolTile extends PvDoorTile {
     required super.title,
     required super.blurb,
     required this.surfaceId,
+    super.meta,
     super.comingSoon,
   });
 
@@ -192,6 +216,7 @@ final class PvDoorScanTile extends PvDoorTile {
     required super.title,
     required super.blurb,
     required this.scanId,
+    super.meta,
     super.comingSoon,
   });
 
@@ -222,6 +247,7 @@ final class PvDoorGuideTile extends PvDoorTile {
     required super.blurb,
     required this.readId,
     this.atHeading,
+    super.meta,
     super.comingSoon,
   });
 
@@ -253,6 +279,7 @@ final class PvDoorMythTile extends PvDoorTile {
     required super.title,
     required super.blurb,
     required this.readId,
+    super.meta,
     super.comingSoon,
   });
 
@@ -280,12 +307,14 @@ final class PvDoorReadTile extends PvDoorTile {
     required super.title,
     required super.blurb,
     required String this.surfaceId,
+    super.meta,
   }) : super(comingSoon: false);
 
   /// The piece is not written. The card draws at full size and does not tap.
   const PvDoorReadTile.comingSoon({
     required super.title,
     required super.blurb,
+    super.meta,
   })  : surfaceId = null,
         super(comingSoon: true);
 
@@ -307,6 +336,7 @@ final class PvDoorChecklistTile extends PvDoorTile {
     required super.title,
     required super.blurb,
     required this.surfaceId,
+    super.meta,
     super.comingSoon,
   });
 
@@ -327,6 +357,7 @@ final class PvDoorTalkTile extends PvDoorTile {
     required super.title,
     required super.blurb,
     required this.surfaceId,
+    super.meta,
     super.comingSoon,
   });
 
