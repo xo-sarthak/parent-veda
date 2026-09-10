@@ -347,7 +347,12 @@ final List<BsPage> kBsPages = [
   BsPage(
     id: 'pg_linea_nigra',
     area: BsArea.pigmentation,
-    title: _en('The linea nigra (the dark line)'),
+    // ⚠️ RETITLED PLAIN-FIRST, AND IT IS THE ONLY CONTENT CHANGE THIS DOOR
+    // MAKES. The locked rule across the pregnancy briefs is that a medical name
+    // may lead a page title only where it is the word on her report; "linea
+    // nigra" is not — it is the word an article taught her. So the plain phrase
+    // leads and the name follows in brackets. The page body is untouched.
+    title: _en('The dark line (linea nigra)'),
     videoTitle: _en('Why a line appears down your belly'),
     videoSubtitle: _en('A normal pigment line that fades after birth'),
     videoDuration: _en('2 MIN'),
@@ -365,7 +370,8 @@ final List<BsPage> kBsPages = [
   BsPage(
     id: 'pg_melasma',
     area: BsArea.pigmentation,
-    title: _en('Melasma (the pregnancy mask)'),
+    // ⚠️ RETITLED PLAIN-FIRST. See the note on `pg_linea_nigra`.
+    title: _en('The pregnancy mask (melasma)'),
     videoTitle: _en('The patches on the face, explained'),
     videoSubtitle: _en('Why sunscreen matters more here than anywhere else'),
     videoDuration: _en('4 MIN'),

@@ -27,11 +27,35 @@ import '../theme/pv_fonts.dart';
 enum _BumpFilter { all, t1, t2, t3, captioned, favorites }
 
 class BumpJourneyScreen extends StatefulWidget {
-  const BumpJourneyScreen({super.key, required this.controller});
+  const BumpJourneyScreen(
+      {super.key, required this.controller, this.embedded = false});
   final PregnancyController controller;
+
+  /// Rendered inside a door's tab rather than as a screen of its own.
+  ///
+  /// ⚠️ THE FAB AND THE APP-BAR ACTIONS HAVE NO HOME INLINE, and that is the
+  /// whole difficulty with embedding this one. The timeline and the locker were
+  /// lists; this is a list plus a floating add button plus two app-bar actions,
+  /// and dropping them would leave a keepsake tab you cannot add a photo to.
+  ///
+  /// So the embedded form renders the same children and gives those actions a
+  /// non-floating home at the foot. It is not new UI — it is the same
+  /// `_addFlow` and the same compare, reached by a row instead of by a FAB.
+  final bool embedded;
 
   @override
   State<BumpJourneyScreen> createState() => _BumpJourneyScreenState();
+}
+
+/// The bump keepsake, without a Scaffold. See [BumpJourneyScreen.embedded].
+class BumpJourneyBody extends StatelessWidget {
+  const BumpJourneyBody({super.key, required this.controller});
+
+  final PregnancyController controller;
+
+  @override
+  Widget build(BuildContext context) =>
+      BumpJourneyScreen(controller: controller, embedded: true);
 }
 
 class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
@@ -54,6 +78,37 @@ class _BumpJourneyScreenState extends State<BumpJourneyScreen> {
     final s = S(p.language);
     final all = BumpStore.instance.photos;
     final filtered = all.where(_matches).toList();
+
+    if (widget.embedded) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (all.isEmpty)
+            _empty(s)
+          else ...[
+            _progressCard(s, all),
+            const SizedBox(height: 14),
+            _bookEntry(s),
+            const SizedBox(height: 14),
+            _filters(s),
+            const SizedBox(height: 8),
+            if (!BumpStore.instance.hasWeek(p.currentWeek))
+              _captureThisWeek(s),
+            ..._timeline(s, filtered),
+          ],
+          const SizedBox(height: 16),
+          // ⚠️ THE FAB'S JOB, GIVEN A ROW. Inline there is nothing to float
+          // over, and a keepsake tab with no way to add a photo is a keepsake
+          // tab that only ever shows an empty state.
+          _EmbeddedActions(
+            s: s,
+            canCompare: all.length >= 2,
+            onAdd: () => _addFlow(s),
+            onCompare: () => _openCompare(all),
+          ),
+        ],
+      );
+    }
 
     return Scaffold(
       backgroundColor: AppTheme.surfaceContainer,
@@ -876,4 +931,51 @@ class _BumpCompareScreenState extends State<_BumpCompareScreen> {
           ),
         ],
       );
+}
+
+
+/// The add and compare actions, for the embedded form.
+///
+/// ⚠️ IT DUPLICATES NO LOGIC. Both callbacks are the screen's own `_addFlow`
+/// and `_openCompare`; this is only where they are pressed.
+class _EmbeddedActions extends StatelessWidget {
+  const _EmbeddedActions({
+    required this.s,
+    required this.canCompare,
+    required this.onAdd,
+    required this.onCompare,
+  });
+
+  final S s;
+  final bool canCompare;
+  final VoidCallback onAdd;
+  final VoidCallback onCompare;
+
+  @override
+  Widget build(BuildContext context) => Row(children: [
+        Expanded(
+          child: FilledButton.icon(
+            onPressed: onAdd,
+            icon: const Icon(Icons.photo_camera_rounded, size: 18),
+            label: Text(s.bumpAddPhoto),
+            style: FilledButton.styleFrom(
+              backgroundColor: AppTheme.secondary500,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 14),
+            ),
+          ),
+        ),
+        if (canCompare) ...[
+          const SizedBox(width: 10),
+          OutlinedButton.icon(
+            onPressed: onCompare,
+            icon: const Icon(Icons.compare_rounded, size: 18),
+            label: Text(s.bumpThenNow),
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(
+                  vertical: 14, horizontal: 14),
+            ),
+          ),
+        ],
+      ]);
 }

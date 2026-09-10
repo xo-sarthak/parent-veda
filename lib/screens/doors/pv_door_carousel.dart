@@ -861,7 +861,26 @@ class _PvDoorCard extends StatelessWidget {
     // fade over the last half step before it is what makes the crossing
     // invisible rather than merely unlikely to be noticed.
     final misted = a <= 1 ? 1 - 0.08 * a : 0.92 - 0.20 * (a - 1);
-    final seam = ((count / 2 - a) / 0.5).clamp(0.0, 1.0);
+
+    // ⚠️ AN EVEN RING HAS A CARD RESTING EXACTLY ON THE SEAM, AND FADING IT
+    // WOULD HIDE A WHOLE TAB — 2026-09-10, found building a FOUR-tab door.
+    //
+    // On a five-ring no card ever sits at `count / 2` (2.5), so the fade above
+    // only ever bites mid-crossing. On a four-ring one card always sits at
+    // exactly 2.0, which is the wrap point — so the same formula rendered it at
+    // zero, and Belly & skin came out as three cards under four dots.
+    //
+    // The trade, stated honestly: with the fade off, a card genuinely crossing
+    // during a drag flips sides visibly instead of doing it under cover. It
+    // happens at |o| ≈ 2, which is x ≈ ±170 — inside the track's own edge mask,
+    // at 0.6 scale, mid-gesture. A visible flip there costs less than a tab
+    // that is simply not on screen at rest.
+    //
+    // ⚠️ SO AN ODD NUMBER OF TABS IS STILL THE BETTER SHAPE, and five is what
+    // every other door has. This makes four work; it does not make four equal.
+    final seam = count.isEven
+        ? 1.0
+        : ((count / 2 - a) / 0.5).clamp(0.0, 1.0);
     final opacity = (misted * seam).clamp(0.0, 1.0);
 
     if (opacity == 0) return const SizedBox.shrink();
