@@ -138,6 +138,29 @@ voice_samples/
 .DS_Store
 Thumbs.db
 
+# Office lock files. Excel drops a hidden "~$Name.xlsx" beside any workbook
+# you have open, recording who holds it, and deletes it on a clean close. It
+# is invisible in Explorer, so it only ever shows up at `git add` time - and
+# the door-content workbooks in docs/content-brief/ get opened often.
+~$*
+
+# Content-brief output. Everything in this folder except the README is
+# RENDERED, not written: the .xlsx by tools/*_door_content_xlsx.py and
+# tools/content_overview_xlsx.py, the .pdf by tools/content_inventory.py and
+# tools/parenting_content_brief.py. All of those are tracked, so the output is
+# one command away and a binary nobody diffs is pure history weight - 42 MB of
+# it for the PDFs alone. The generators are the source; the renders stay local.
+#
+# The CSVs under research/content-inventory/ are deliberately NOT ignored.
+# They are text, they diff, and the README treats them as the source the PDFs
+# are merely a layout of - so a bad parse shows up in review instead of hiding
+# inside a binary.
+#
+# Scoped to this folder on purpose: research/competitors/*-critical-reviews.xlsx
+# are hand-curated analysis, not output, and stay tracked.
+docs/content-brief/*.xlsx
+docs/content-brief/*.pdf
+
 # design-sync (Claude Design)
 .ds-sync/
 ds-bundle/

@@ -1,0 +1,22 @@
+stage,area,tap_path,item,kind,count,size_or_aspect,placeholder_now,version,source_file,notes
+shared,Brackets — parenting,parenting home > bracket picker,Intent mark per bracket,icon-art,11,"square, in a well",drawn-placeholder,shared,lib/screens/brackets/hub/hub_intent_art.dart,Drawn in code today.
+shared,Brackets — pregnancy,pregnancy home > bracket picker,Intent mark per bracket,icon-art,10,"square, in a well",drawn-placeholder,shared,lib/screens/brackets/hub/hub_intent_art.dart,Drawn in code today.
+shared,Brackets — ttc,ttc home > bracket picker,Intent mark per bracket,icon-art,7,"square, in a well",drawn-placeholder,shared,lib/screens/brackets/hub/hub_intent_art.dart,Drawn in code today.
+shared,Booking — experts,any stage > consult > Dr. Aparna Joshi,Expert photograph — Dr. Aparna Joshi,avatar,1,square,blank,shared,lib/experts/pregnancy_experts.dart,
+shared,Booking — experts,any stage > consult > Deepti Sharma,Expert photograph — Deepti Sharma,avatar,1,square,blank,shared,lib/experts/pregnancy_experts.dart,
+shared,Booking — experts,any stage > consult > Meera Nair,Expert photograph — Meera Nair,avatar,1,square,blank,shared,lib/experts/pregnancy_experts.dart,
+shared,Booking — experts,any stage > consult > Dr. Kabir Rao,Expert photograph — Dr. Kabir Rao,avatar,1,square,blank,shared,lib/experts/pregnancy_experts.dart,
+shared,Booking — experts,any stage > consult > Sana Khan,Expert photograph — Sana Khan,avatar,1,square,blank,shared,lib/experts/pregnancy_experts.dart,
+shared,Booking — experts,any stage > consult > Dr. Neha Verma,Expert photograph — Dr. Neha Verma,avatar,1,square,blank,shared,lib/experts/pregnancy_experts.dart,
+shared,Booking — experts,any stage > consult > Kavya Menon,Expert photograph — Kavya Menon,avatar,1,square,blank,shared,lib/experts/pregnancy_experts.dart,
+shared,Booking — experts,any stage > consult > Aditi Verma,Expert photograph — Aditi Verma,avatar,1,square,blank,shared,lib/experts/yoga_experts.dart,
+shared,Booking — experts,any stage > consult > Radhika Menon,Expert photograph — Radhika Menon,avatar,1,square,blank,shared,lib/experts/yoga_experts.dart,
+shared,Booking — experts,any stage > consult > Nisha Pillai,Expert photograph — Nisha Pillai,avatar,1,square,blank,shared,lib/experts/yoga_experts.dart,
+shared,Booking — experts,any stage > consult > Farah Sheikh,Expert photograph — Farah Sheikh,avatar,1,square,blank,shared,lib/experts/yoga_experts.dart,
+shared,Booking — experts,any stage > consult > Kavya Reddy,Expert photograph — Kavya Reddy,avatar,1,square,blank,shared,lib/experts/yoga_experts.dart,
+shared,Booking — experts,any stage > consult > Meghna Rao,Expert photograph — Meghna Rao,avatar,1,square,blank,shared,lib/experts/yoga_experts.dart,
+shared,Booking — experts,any stage > consult > Sana Kapoor,Expert photograph — Sana Kapoor,avatar,1,square,blank,shared,lib/experts/yoga_experts.dart,
+shared,Community,Community,Room icons,icon-art,39,"square, in a well",blank,shared,lib/data/community_data.dart,"The rooms carry a decorative emoji each, which breaks the app's own no-decorative-emoji rule."
+shared,Brand — launch promo,app open,Sponsor carousel artwork,photo,4,full-width modal,blank,shared,lib/data/promo_data.dart,Placeholder brands until real sponsors are signed.
+shared,Brand — partners,various,Partner logos,logo,7,PNG,real-asset,shared,assets/brand/partners/,"REAL FILES, but DEMO BRANDS: apollo, cetaphil, fisher_price, himalaya, nestle, pampers, philips_avent. Not signed customers."
+shared,Brand — ParentVeda,app-wide,ParentVeda marks,logo,3,transparent PNG,real-asset,shared,assets/brand/,REAL.

@@ -1,0 +1,13 @@
+stage,area,tap_path,item,kind,count,size_or_aspect,placeholder_now,version,source_file,notes
+skilling,The twelve skills,Explore (debug) > Skilling preview > Focus & attention,Intent mark — Focus & attention,icon-art,1,"square, in a well",drawn-placeholder,new,lib/screens/v2/v3_skill_art.dart,
+skilling,The twelve skills,Explore (debug) > Skilling preview > Confidence & public speaking,Intent mark — Confidence & public speaking,icon-art,1,"square, in a well",drawn-placeholder,new,lib/screens/v2/v3_skill_art.dart,
+skilling,The twelve skills,Explore (debug) > Skilling preview > Communication & articulation,Intent mark — Communication & articulation,icon-art,1,"square, in a well",drawn-placeholder,new,lib/screens/v2/v3_skill_art.dart,
+skilling,The twelve skills,Explore (debug) > Skilling preview > Critical thinking & first principles,Intent mark — Critical thinking & first principles,icon-art,1,"square, in a well",drawn-placeholder,new,lib/screens/v2/v3_skill_art.dart,
+skilling,The twelve skills,Explore (debug) > Skilling preview > Values & character,Intent mark — Values & character,icon-art,1,"square, in a well",drawn-placeholder,new,lib/screens/v2/v3_skill_art.dart,
+skilling,The twelve skills,Explore (debug) > Skilling preview > Maths ability,Intent mark — Maths ability,icon-art,1,"square, in a well",drawn-placeholder,new,lib/screens/v2/v3_skill_art.dart,
+skilling,The twelve skills,Explore (debug) > Skilling preview > Coding & AI literacy,Intent mark — Coding & AI literacy,icon-art,1,"square, in a well",drawn-placeholder,new,lib/screens/v2/v3_skill_art.dart,
+skilling,The twelve skills,Explore (debug) > Skilling preview > Reading habit,Intent mark — Reading habit,icon-art,1,"square, in a well",drawn-placeholder,new,lib/screens/v2/v3_skill_art.dart,
+skilling,The twelve skills,Explore (debug) > Skilling preview > Creativity & expression,Intent mark — Creativity & expression,icon-art,1,"square, in a well",drawn-placeholder,new,lib/screens/v2/v3_skill_art.dart,
+skilling,The twelve skills,Explore (debug) > Skilling preview > Emotional intelligence & resilience,Intent mark — Emotional intelligence & resilience,icon-art,1,"square, in a well",drawn-placeholder,new,lib/screens/v2/v3_skill_art.dart,
+skilling,The twelve skills,"Explore (debug) > Skilling preview > Meditation, yoga & mindfulness","Intent mark — Meditation, yoga & mindfulness",icon-art,1,"square, in a well",drawn-placeholder,new,lib/screens/v2/v3_skill_art.dart,
+skilling,The twelve skills,Explore (debug) > Skilling preview > Memory & learning how to learn,Intent mark — Memory & learning how to learn,icon-art,1,"square, in a well",drawn-placeholder,new,lib/screens/v2/v3_skill_art.dart,

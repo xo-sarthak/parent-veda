@@ -1,0 +1,158 @@
+stage,area,tap_path,placeholder_type,item,count,what_is_needed_from_us,current_state,version,source_file
+preg,Narration (audio),Home > any passage > listen,audio/narration,"Hindi narration, 5,684 passages",4885,A Hindi voice recording per passage. The manifest lists every passage the app can speak; only some are recorded. The rest stream from R2 when they exist,"799 of 5,684 recorded (14%)",shared,assets/narration/manifest_hi.json
+preg,Narration (audio),Home > any passage > listen,audio/narration,English narration,5684,"An English voice set, if English narration is wanted at all. None exists",none,shared,assets/narration/
+preg,Mind and mood,Explore > Mind and mood > SOS > MmSosStep,meditation,MmSosStep,1,A voice recording for this step,placeholder,shared,lib/data/mind_mood_data.dart
+preg,Mind and mood,Explore > Mind and mood > SOS > MmSosStep,meditation,MmSosStep,1,A voice recording for this step,placeholder,shared,lib/data/mind_mood_data.dart
+preg,Mind and mood,Explore > Mind and mood > SOS > MmSosStep,meditation,MmSosStep,1,A voice recording for this step,placeholder,shared,lib/data/mind_mood_data.dart
+preg,Mind and mood,Explore > Mind and mood > SOS > MmSosStep,meditation,MmSosStep,1,A voice recording for this step,placeholder,shared,lib/data/mind_mood_data.dart
+preg,Mind and mood,Explore > Mind and mood > SOS > MmSosStep,meditation,MmSosStep,1,A voice recording for this step,placeholder,shared,lib/data/mind_mood_data.dart
+preg,Mind and mood,Explore > Mind and mood > SOS > MmSosStep,meditation,MmSosStep,1,A voice recording for this step,placeholder,shared,lib/data/mind_mood_data.dart
+preg,Mind and mood,Explore > Mind and mood > SOS > MmSosStep,meditation,MmSosStep,1,A voice recording for this step,placeholder,shared,lib/data/mind_mood_data.dart
+preg,Mind and mood,Explore > Mind and mood > SOS > MmSosStep,meditation,MmSosStep,1,A voice recording for this step,placeholder,shared,lib/data/mind_mood_data.dart
+preg,Mind and mood,Explore > Mind and mood > MmAffirmation,meditation,MmAffirmation,1,"A voice recording, if these are spoken",placeholder,shared,lib/data/mind_mood_extras.dart
+preg,Mind and mood,Explore > Mind and mood > MmAffirmation,meditation,MmAffirmation,1,"A voice recording, if these are spoken",placeholder,shared,lib/data/mind_mood_extras.dart
+preg,Mind and mood,Explore > Mind and mood > MmAffirmation,meditation,MmAffirmation,1,"A voice recording, if these are spoken",placeholder,shared,lib/data/mind_mood_extras.dart
+preg,Mind and mood,Explore > Mind and mood > MmAffirmation,meditation,MmAffirmation,1,"A voice recording, if these are spoken",placeholder,shared,lib/data/mind_mood_extras.dart
+preg,Mind and mood,Explore > Mind and mood > MmAffirmation,meditation,MmAffirmation,1,"A voice recording, if these are spoken",placeholder,shared,lib/data/mind_mood_extras.dart
+preg,Mind and mood,Explore > Mind and mood > MmAffirmation,meditation,MmAffirmation,1,"A voice recording, if these are spoken",placeholder,shared,lib/data/mind_mood_extras.dart
+preg,Mind and mood,Explore > Mind and mood > MmAffirmation,meditation,MmAffirmation,1,"A voice recording, if these are spoken",placeholder,shared,lib/data/mind_mood_extras.dart
+preg,Mind and mood,Explore > Mind and mood > MmAffirmation,meditation,MmAffirmation,1,"A voice recording, if these are spoken",placeholder,shared,lib/data/mind_mood_extras.dart
+preg,Mind and mood,Explore > Mind and mood > MmAffirmation,meditation,MmAffirmation,1,"A voice recording, if these are spoken",placeholder,shared,lib/data/mind_mood_extras.dart
+preg,Mind and mood,Explore > Mind and mood > MmAffirmation,meditation,MmAffirmation,1,"A voice recording, if these are spoken",placeholder,shared,lib/data/mind_mood_extras.dart
+preg,Mind and mood,Explore > Mind and mood > MmAffirmation,meditation,MmAffirmation,1,"A voice recording, if these are spoken",placeholder,shared,lib/data/mind_mood_extras.dart
+preg,Mind and mood,Explore > Mind and mood > MmAffirmation,meditation,MmAffirmation,1,"A voice recording, if these are spoken",placeholder,shared,lib/data/mind_mood_extras.dart
+preg,Spiritual reading,Explore > Spiritual reading > Hinduism,data source,Hinduism,1,A knowledgeable reviewer for this tradition specifically,placeholder,shared,lib/data/spiritual_reading_data.dart
+preg,Spiritual reading,Explore > Spiritual reading > Islam,data source,Islam,1,A knowledgeable reviewer for this tradition specifically,placeholder,shared,lib/data/spiritual_reading_data.dart
+preg,Spiritual reading,Explore > Spiritual reading > Sikhism,data source,Sikhism,1,A knowledgeable reviewer for this tradition specifically,placeholder,shared,lib/data/spiritual_reading_data.dart
+preg,Spiritual reading,Explore > Spiritual reading > Christianity,data source,Christianity,1,A knowledgeable reviewer for this tradition specifically,placeholder,shared,lib/data/spiritual_reading_data.dart
+preg,Spiritual reading,Explore > Spiritual reading > Jainism,data source,Jainism,1,A knowledgeable reviewer for this tradition specifically,placeholder,shared,lib/data/spiritual_reading_data.dart
+preg,Spiritual reading,Explore > Spiritual reading > Buddhism,data source,Buddhism,1,A knowledgeable reviewer for this tradition specifically,placeholder,shared,lib/data/spiritual_reading_data.dart
+preg,Spiritual reading,Explore > Spiritual reading > Others,data source,Others,1,A knowledgeable reviewer for this tradition specifically,placeholder,shared,lib/data/spiritual_reading_data.dart
+preg,Read to baby,Home > daily > Read to baby > The Little Cloud Who Loved to Rain,audio/narration,The Little Cloud Who Loved to Rain,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > Mira and the Sleepy Moon,audio/narration,Mira and the Sleepy Moon,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > The Elephant Who Shared His Shade,audio/narration,The Elephant Who Shared His Shade,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > The Smallest Seed,audio/narration,The Smallest Seed,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > Bunny's Lost Button,audio/narration,Bunny's Lost Button,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > The Star That Came to Visit,audio/narration,The Star That Came to Visit,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > The River and the Stone,audio/narration,The River and the Stone,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > Little Owl Learns to Wait,audio/narration,Little Owl Learns to Wait,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > The Kind Little Boat,audio/narration,The Kind Little Boat,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > Mango for Everyone,audio/narration,Mango for Everyone,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > The Firefly's Little Light,audio/narration,The Firefly's Little Light,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > Tortoise Takes His Time,audio/narration,Tortoise Takes His Time,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > The Blanket of Stars,audio/narration,The Blanket of Stars,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > Pip the Curious Sparrow,audio/narration,Pip the Curious Sparrow,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > The Two Little Streams,audio/narration,The Two Little Streams,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > The Gentle Giant,audio/narration,The Gentle Giant,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > Sleepy Time Song,audio/narration,Sleepy Time Song,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > Counting Stars,audio/narration,Counting Stars,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > The Rain's Lullaby,audio/narration,The Rain's Lullaby,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > Tiny Toes,audio/narration,Tiny Toes,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > Moonbeam Boat,audio/narration,Moonbeam Boat,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > The Garden's Asleep,audio/narration,The Garden's Asleep,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > Whispering Wind,audio/narration,Whispering Wind,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > My Little Wonder,audio/narration,My Little Wonder,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > Cradle of Leaves,audio/narration,Cradle of Leaves,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > Slow the Day,audio/narration,Slow the Day,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > Tiny Heartbeat,audio/narration,Tiny Heartbeat,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > Dreamland Train,audio/narration,Dreamland Train,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > Bumble's Lullaby,audio/narration,Bumble's Lullaby,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > Snug as Can Be,audio/narration,Snug as Can Be,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > The Sleepy Sea,audio/narration,The Sleepy Sea,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,"Home > daily > Read to baby > Goodnight, Everything",audio/narration,"Goodnight, Everything",1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > You are loved,audio/narration,You are loved,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > Grow gently,audio/narration,Grow gently,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > You are safe,audio/narration,You are safe,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > A wish for joy,audio/narration,A wish for joy,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > Brave and kind,audio/narration,Brave and kind,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > Our little blessing,audio/narration,Our little blessing,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > Sweet dreams,audio/narration,Sweet dreams,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > You are enough,audio/narration,You are enough,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > A calm heart,audio/narration,A calm heart,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > The world is waiting,audio/narration,The world is waiting,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > Held in love,audio/narration,Held in love,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > A wish for strength,audio/narration,A wish for strength,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > You belong,audio/narration,You belong,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > Gentle beginnings,audio/narration,Gentle beginnings,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > Loved beyond measure,audio/narration,Loved beyond measure,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Read to baby,Home > daily > Read to baby > A blessing for the journey,audio/narration,A blessing for the journey,1,"A recording, if these are also spoken",placeholder,shared,lib/data/read_to_baby_data.dart
+preg,Paid services,Prepare tab > Yoga > YogaSession,paid offering (yoga),YogaSession,1,A real instructor and a filmed session — yoga cannot be taught in text,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Yoga > YogaSession,paid offering (yoga),YogaSession,1,A real instructor and a filmed session — yoga cannot be taught in text,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Yoga > YogaSession,paid offering (yoga),YogaSession,1,A real instructor and a filmed session — yoga cannot be taught in text,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Yoga > YogaSession,paid offering (yoga),YogaSession,1,A real instructor and a filmed session — yoga cannot be taught in text,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Yoga > YogaSession,paid offering (yoga),YogaSession,1,A real instructor and a filmed session — yoga cannot be taught in text,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Yoga > YogaSession,paid offering (yoga),YogaSession,1,A real instructor and a filmed session — yoga cannot be taught in text,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Yoga > YogaSession,paid offering (yoga),YogaSession,1,A real instructor and a filmed session — yoga cannot be taught in text,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Yoga > YogaSession,paid offering (yoga),YogaSession,1,A real instructor and a filmed session — yoga cannot be taught in text,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Yoga > YogaSession,paid offering (yoga),YogaSession,1,A real instructor and a filmed session — yoga cannot be taught in text,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Yoga > YogaSession,paid offering (yoga),YogaSession,1,A real instructor and a filmed session — yoga cannot be taught in text,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Yoga > YogaSession,paid offering (yoga),YogaSession,1,A real instructor and a filmed session — yoga cannot be taught in text,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Yoga > YogaSession,paid offering (yoga),YogaSession,1,A real instructor and a filmed session — yoga cannot be taught in text,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Yoga > YogaSession,paid offering (yoga),YogaSession,1,A real instructor and a filmed session — yoga cannot be taught in text,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Yoga > YogaSession,paid offering (yoga),YogaSession,1,A real instructor and a filmed session — yoga cannot be taught in text,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Yoga > YogaSession,paid offering (yoga),YogaSession,1,A real instructor and a filmed session — yoga cannot be taught in text,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Yoga > YogaSession,paid offering (yoga),YogaSession,1,A real instructor and a filmed session — yoga cannot be taught in text,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Yoga > YogaSession,paid offering (yoga),YogaSession,1,A real instructor and a filmed session — yoga cannot be taught in text,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Yoga > YogaSession,paid offering (yoga),YogaSession,1,A real instructor and a filmed session — yoga cannot be taught in text,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Yoga > YogaSession,paid offering (yoga),YogaSession,1,A real instructor and a filmed session — yoga cannot be taught in text,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Yoga > YogaSession,paid offering (yoga),YogaSession,1,A real instructor and a filmed session — yoga cannot be taught in text,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Yoga > YogaSession,paid offering (yoga),YogaSession,1,A real instructor and a filmed session — yoga cannot be taught in text,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Birthing classes > BirthingClass,paid offering,BirthingClass,1,"A real educator, a syllabus, a price and a schedule",placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Birthing classes > BirthingClass,paid offering,BirthingClass,1,"A real educator, a syllabus, a price and a schedule",placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Birthing classes > BirthingClass,paid offering,BirthingClass,1,"A real educator, a syllabus, a price and a schedule",placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Birthing classes > BirthingClass,paid offering,BirthingClass,1,"A real educator, a syllabus, a price and a schedule",placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Birthing classes > BirthingClass,paid offering,BirthingClass,1,"A real educator, a syllabus, a price and a schedule",placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Birthing classes > BirthingClass,paid offering,BirthingClass,1,"A real educator, a syllabus, a price and a schedule",placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Nutrition > NutriOption,paid offering,NutriOption,1,A real dietitian and a real price,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Nutrition > NutriOption,paid offering,NutriOption,1,A real dietitian and a real price,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Nutrition > NutriOption,paid offering,NutriOption,1,A real dietitian and a real price,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Nutrition > NutriOption,paid offering,NutriOption,1,A real dietitian and a real price,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Nutrition > NutriOption,paid offering,NutriOption,1,A real dietitian and a real price,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Nutrition > NutriOption,paid offering,NutriOption,1,A real dietitian and a real price,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Nutrition > NutriOption,paid offering,NutriOption,1,A real dietitian and a real price,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Nutrition > NutriOption,paid offering,NutriOption,1,A real dietitian and a real price,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Nutrition > NutriOption,paid offering,NutriOption,1,A real dietitian and a real price,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Nutrition > NutriOption,paid offering,NutriOption,1,A real dietitian and a real price,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Nutrition > NutriOption,paid offering,NutriOption,1,A real dietitian and a real price,placeholder,shared,lib/data/prepare_data.dart
+preg,Paid services,Prepare tab > Nutrition > NutriOption,paid offering,NutriOption,1,A real dietitian and a real price,placeholder,shared,lib/data/prepare_data.dart
+preg,Products,Tools > Products > ComfyBump Full-Body Pillow,product entry,ComfyBump Full-Body Pillow,1,"A real SKU, brand, MRP, link and photography",placeholder,shared,lib/data/product_data.dart
+preg,Products,Tools > Products > Snug Wedge Pillow,product entry,Snug Wedge Pillow,1,"A real SKU, brand, MRP, link and photography",placeholder,shared,lib/data/product_data.dart
+preg,Products,Tools > Products > CloudNest Adjustable Pillow,product entry,CloudNest Adjustable Pillow,1,"A real SKU, brand, MRP, link and photography",placeholder,shared,lib/data/product_data.dart
+preg,Products,Tools > Products > VedaGlow Belly Butter,product entry,VedaGlow Belly Butter,1,"A real SKU, brand, MRP, link and photography",placeholder,shared,lib/data/product_data.dart
+preg,Products,Tools > Products > PureSkin Calm Oil,product entry,PureSkin Calm Oil,1,"A real SKU, brand, MRP, link and photography",placeholder,shared,lib/data/product_data.dart
+preg,Products,Tools > Products > EverySoft Lotion,product entry,EverySoft Lotion,1,"A real SKU, brand, MRP, link and photography",placeholder,shared,lib/data/product_data.dart
+preg,Products,Tools > Products > EasyGrow Maternity Leggings,product entry,EasyGrow Maternity Leggings,1,"A real SKU, brand, MRP, link and photography",placeholder,shared,lib/data/product_data.dart
+preg,Products,Tools > Products > Bloom Nursing Dress,product entry,Bloom Nursing Dress,1,"A real SKU, brand, MRP, link and photography",placeholder,shared,lib/data/product_data.dart
+preg,Products,Tools > Products > DailyEase Maternity Kurti,product entry,DailyEase Maternity Kurti,1,"A real SKU, brand, MRP, link and photography",placeholder,shared,lib/data/product_data.dart
+preg,Products,Tools > Products > SteadyBump Support Band,product entry,SteadyBump Support Band,1,"A real SKU, brand, MRP, link and photography",placeholder,shared,lib/data/product_data.dart
+preg,Products,Tools > Products > LiteHold Belly Band,product entry,LiteHold Belly Band,1,"A real SKU, brand, MRP, link and photography",placeholder,shared,lib/data/product_data.dart
+preg,Products,Tools > Products > FlexCore Maternity Belt,product entry,FlexCore Maternity Belt,1,"A real SKU, brand, MRP, link and photography",placeholder,shared,lib/data/product_data.dart
+preg,Products,Tools > Products > FreshStep Compression Socks,product entry,FreshStep Compression Socks,1,"A real SKU, brand, MRP, link and photography",placeholder,shared,lib/data/product_data.dart
+preg,Products,Tools > Products > DayLite Support Socks,product entry,DayLite Support Socks,1,"A real SKU, brand, MRP, link and photography",placeholder,shared,lib/data/product_data.dart
+preg,Products,Tools > Products > AeroFlow Medical Socks,product entry,AeroFlow Medical Socks,1,"A real SKU, brand, MRP, link and photography",placeholder,shared,lib/data/product_data.dart
+preg,Products,Tools > Products > SoftClip Nursing Bra,product entry,SoftClip Nursing Bra,1,"A real SKU, brand, MRP, link and photography",placeholder,shared,lib/data/product_data.dart
+preg,Products,Tools > Products > DayEase Nursing Bra,product entry,DayEase Nursing Bra,1,"A real SKU, brand, MRP, link and photography",placeholder,shared,lib/data/product_data.dart
+preg,Products,Tools > Products > Bloom Seamless Nursing Bra,product entry,Bloom Seamless Nursing Bra,1,"A real SKU, brand, MRP, link and photography",placeholder,shared,lib/data/product_data.dart
+preg,Products,Tools > Products > GentleFlow Electric Pump,product entry,GentleFlow Electric Pump,1,"A real SKU, brand, MRP, link and photography",placeholder,shared,lib/data/product_data.dart
+preg,Products,Tools > Products > EasyHand Manual Pump,product entry,EasyHand Manual Pump,1,"A real SKU, brand, MRP, link and photography",placeholder,shared,lib/data/product_data.dart
+preg,Products,Tools > Products > DualEase Double Pump,product entry,DualEase Double Pump,1,"A real SKU, brand, MRP, link and photography",placeholder,shared,lib/data/product_data.dart
+preg,Products,Tools > Products > DreamWrap Muslin Swaddle,product entry,DreamWrap Muslin Swaddle,1,"A real SKU, brand, MRP, link and photography",placeholder,shared,lib/data/product_data.dart
+preg,Products,Tools > Products > CozyCotton Swaddle Pack,product entry,CozyCotton Swaddle Pack,1,"A real SKU, brand, MRP, link and photography",placeholder,shared,lib/data/product_data.dart
+preg,Products,Tools > Products > SnugZip Swaddle Sack,product entry,SnugZip Swaddle Sack,1,"A real SKU, brand, MRP, link and photography",placeholder,shared,lib/data/product_data.dart
+preg,Garbh Sanskar,Home > Garbh Sanskar > Shravan > Morning Calm Raga,raga/music track,Morning Calm Raga,1,"A licensed or recorded raga, full length, rights cleared for app use",placeholder,shared,lib/data/garbh_data.dart
+preg,Garbh Sanskar,Home > Garbh Sanskar > Shravan > Baby Bonding Raga,raga/music track,Baby Bonding Raga,1,"A licensed or recorded raga, full length, rights cleared for app use",placeholder,shared,lib/data/garbh_data.dart
+preg,Garbh Sanskar,Home > Garbh Sanskar > Shravan > Evening Raga,raga/music track,Evening Raga,1,"A licensed or recorded raga, full length, rights cleared for app use",placeholder,shared,lib/data/garbh_data.dart
+preg,Garbh Sanskar,Home > Garbh Sanskar > Shravan > Sleep Raga,raga/music track,Sleep Raga,1,"A licensed or recorded raga, full length, rights cleared for app use",placeholder,shared,lib/data/garbh_data.dart
+preg,Garbh Sanskar,Home > Garbh Sanskar > Shravan > Relaxation Raga,raga/music track,Relaxation Raga,1,"A licensed or recorded raga, full length, rights cleared for app use",placeholder,shared,lib/data/garbh_data.dart
+preg,Garbh Sanskar,Home > Garbh Sanskar > Shravan > Gentle Rain,raga/music track,Gentle Rain,1,"A licensed or recorded raga, full length, rights cleared for app use",placeholder,shared,lib/data/garbh_data.dart
+preg,Garbh Sanskar,Home > Garbh Sanskar > Shravan > Ocean Waves,raga/music track,Ocean Waves,1,"A licensed or recorded raga, full length, rights cleared for app use",placeholder,shared,lib/data/garbh_data.dart
+preg,Garbh Sanskar,Home > Garbh Sanskar > Shravan > Forest Morning,raga/music track,Forest Morning,1,"A licensed or recorded raga, full length, rights cleared for app use",placeholder,shared,lib/data/garbh_data.dart
+preg,Garbh Sanskar,Home > Garbh Sanskar > Shravan > Temple Bells,raga/music track,Temple Bells,1,"A licensed or recorded raga, full length, rights cleared for app use",placeholder,shared,lib/data/garbh_data.dart
+preg,Garbh Sanskar,Home > Garbh Sanskar > Shravan > Body Awareness Journey,raga/music track,Body Awareness Journey,1,"A licensed or recorded raga, full length, rights cleared for app use",placeholder,shared,lib/data/garbh_data.dart
+preg,Weekly — films,Home > this week > What the anomaly scan actually looks at,video production,What the anomaly scan actually looks at,1,A film for this slot; none is defined for pregnancy the way TTC defines sixteen,placeholder,shared,lib/data/content_slots.dart
+preg,Weekly — films,Home > this week > Going in for the anomaly scan,video production,Going in for the anomaly scan,1,A film for this slot; none is defined for pregnancy the way TTC defines sixteen,placeholder,shared,lib/data/content_slots.dart
+preg,Weekly — films,"Home > this week > Your first scan, start to finish",video production,"Your first scan, start to finish",1,A film for this slot; none is defined for pregnancy the way TTC defines sixteen,placeholder,shared,lib/data/content_slots.dart
+preg,Weekly — films,"Home > this week > The NT scan, and what a screening result is",video production,"The NT scan, and what a screening result is",1,A film for this slot; none is defined for pregnancy the way TTC defines sixteen,placeholder,shared,lib/data/content_slots.dart
+preg,Weekly — films,"Home > this week > The glucose test, and getting through it",video production,"The glucose test, and getting through it",1,A film for this slot; none is defined for pregnancy the way TTC defines sixteen,placeholder,shared,lib/data/content_slots.dart
+preg,Weekly — films,Home > this week > What a sonographer can and cannot tell you,video production,What a sonographer can and cannot tell you,1,A film for this slot; none is defined for pregnancy the way TTC defines sixteen,placeholder,shared,lib/data/content_slots.dart
+preg,Weekly — films,Home > this week > Your report came back with a note on it,video production,Your report came back with a note on it,1,A film for this slot; none is defined for pregnancy the way TTC defines sixteen,placeholder,shared,lib/data/content_slots.dart

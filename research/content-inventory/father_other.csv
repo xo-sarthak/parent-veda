@@ -1,0 +1,5 @@
+stage,area,tap_path,placeholder_type,item,count,what_is_needed_from_us,current_state,version,source_file
+father,Tales,Father home > Tales,audio/narration,61 tales,61,"His voice reading each tale, if audio is wanted on his side",text only,shared,lib/data/father/father_tales.dart
+father,Daily,Father home,coming-soon feature,The missing daily content,258,"A decision first: is his home daily or weekly? If daily, 258 day entries are missing. If weekly, the 37 week files need to be four times their current length",1 day exists,shared,lib/data/father/fatherDailyContent.json
+father,Films,Father home > Weekly,video production,Films for his side,0,A decision on whether he gets his own films or shares hers. He has a weekly videos carousel and no catalogue,not defined,unsure,lib/screens/father/
+father,Pairing,pairing-code flow,onboarding copy,The pairing explanation,1,The words that explain pairing to a father who was handed a code,placeholder,shared,lib/screens/father/
