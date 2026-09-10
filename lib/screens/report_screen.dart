@@ -64,9 +64,30 @@ bool canFilterReport(String id) =>
     _kReportFilters.any((f) => f.$1 == id);
 
 class ReportScreen extends StatefulWidget {
-  const ReportScreen({super.key, required this.controller, this.initialReport});
+  const ReportScreen(
+      {super.key,
+      required this.controller,
+      this.initialReport,
+      this.embedded = false});
 
   final PregnancyController controller;
+
+  /// Rendered inside another page rather than as a screen of its own.
+  ///
+  /// ⚠️ A FLAG ON THE EXISTING SCREEN RATHER THAN A SECOND WIDGET, and this is
+  /// the one place in this build where that was the right call. The timeline
+  /// and the locker split cleanly into a body, because their content is a list
+  /// of children. This screen's content is inseparable from its state — the
+  /// picked filters, the search delegate, the intersection — so a body widget
+  /// would either duplicate that state or become a second stateful class
+  /// wrapping the first.
+  ///
+  /// What the flag actually changes is small and is only chrome: no `Scaffold`,
+  /// no app bar, no page padding, and the intro line drops because the door's
+  /// hero has already said what this is. Every filter, every topic and every
+  /// tap is identical, which is what keeps this a rendering flag rather than a
+  /// second mode.
+  final bool embedded;
 
   /// ⚠️ THE REPORT SHE ARRIVED FROM, PRE-SELECTED.
   ///
@@ -149,17 +170,40 @@ class _ReportScreenState extends State<ReportScreen> {
     final text = Theme.of(context).textTheme;
     final popular = _apply(
         kReportPopular.map(reportById).whereType<ReportFinding>().toList());
+
+    // ⚠️ THE POPULAR SIX ARE REMOVED FROM "ALL TOPICS", AND THAT IS A FIX.
+    //
+    // `all` was every finding, sorted — including the six directly above it —
+    // so breech, cord around neck, low-lying placenta, pregnancy diabetes,
+    // preeclampsia and low fluid each appeared twice on one screen, a few
+    // hundred points apart. Reported from a walk-through of the built door.
+    //
+    // It is worth naming why it survived review for so long: neither list is
+    // wrong on its own. "Popular topics" is correct, "All topics" is literally
+    // correct, and the duplication only exists in the space between two
+    // headings that are each accurate. A list that means "all" and a list that
+    // means "some of these" cannot both be complete AND disjoint, and the
+    // reader's expectation is the second one — she reads the page top to
+    // bottom and expects the second heading to continue rather than restart.
+    //
+    // ⚠️ ONLY WHILE UNFILTERED. With a report chip on, "Popular topics" is
+    // itself filtered and may be empty or nearly so, and subtracting a
+    // near-empty list from the one below it would hide topics for no reason
+    // she could see. The heading also changes to "Topics on these reports" in
+    // that state, which no longer promises completeness.
+    final hidePopular = _picked.isEmpty;
     final all = _apply([...kReportFindings]
-      ..sort((a, b) => a.name.of(lang).compareTo(b.name.of(lang))));
-    return Scaffold(
-      backgroundColor: AppTheme.scaffoldBackground,
-      appBar: AppBar(title: Text(s.rTitle)),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(18, 8, 18, 28),
-        children: [
-          Text(s.rSubtitle,
-              style: text.bodyLarge?.copyWith(color: AppTheme.neutral600, height: 1.4)),
-          const SizedBox(height: 18),
+      ..sort((a, b) => a.name.of(lang).compareTo(b.name.of(lang))))
+        .where((f) => !hidePopular || !kReportPopular.contains(f.id))
+        .toList(growable: false);
+
+    final body = <Widget>[
+          if (!embedded) ...[
+            Text(s.rSubtitle,
+                style: text.bodyLarge
+                    ?.copyWith(color: AppTheme.neutral600, height: 1.4)),
+            const SizedBox(height: 18),
+          ],
           _SearchBar(hint: s.rSearchHint, onTap: () => _search(context, lang)),
 
           // ---- THE REPORT FILTER --------------------------------------------
@@ -250,8 +294,15 @@ class _ReportScreenState extends State<ReportScreen> {
             Text(
                 // The heading has to stop saying "All topics" once a filter is
                 // on, or the screen contradicts itself in its own heading.
+                //
+                // ⚠️ AND IT SAYS "More topics" WHILE UNFILTERED, BECAUSE IT NO
+                // LONGER SHOWS ALL OF THEM. Removing the popular six from this
+                // list without changing the heading would leave a heading that
+                // promises everything above a list missing six entries — which
+                // is the same class of untruth as the duplication it replaced,
+                // pointing the other way.
                 _picked.isEmpty
-                    ? s.rAllTopics
+                    ? (lang.isEnglish ? 'More topics' : 'और विषय')
                     : (lang.isEnglish
                         ? 'Topics on these reports'
                         : 'इन रिपोर्टों के विषय'),
@@ -265,10 +316,27 @@ class _ReportScreenState extends State<ReportScreen> {
             ),
             const SizedBox(height: 10),
           ],
-        ],
+    ];
+
+    // ⚠️ EMBEDDED RETURNS A COLUMN, NOT A LIST. A scrolling widget inside
+    // another scrolling widget is either unbounded or a nested scroll nobody
+    // can drive with a thumb. The door's own `ListView` does the scrolling.
+    if (embedded) {
+      return Column(
+          crossAxisAlignment: CrossAxisAlignment.start, children: body);
+    }
+
+    return Scaffold(
+      backgroundColor: AppTheme.scaffoldBackground,
+      appBar: AppBar(title: Text(s.rTitle)),
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(18, 8, 18, 28),
+        children: body,
       ),
     );
   }
+
+  bool get embedded => widget.embedded;
 }
 
 /// One report filter. Selected state is colour + weight, matching `PvNavBar`'s

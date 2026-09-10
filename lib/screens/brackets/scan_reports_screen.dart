@@ -55,13 +55,61 @@ import 'scan_report_viewer_screen.dart';
 
 LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
 
-class ScanReportsScreen extends StatefulWidget {
+/// The locker, on its own screen.
+///
+/// ⚠️ THIS IS NOW A WRAPPER, AND THE MOVE WAS ADDITIVE. Everything it used to
+/// do lives in [ScanReportsBody]; this keeps the app bar, the ground and the
+/// route so nothing that already opens `scans/reports` changed. The body was
+/// split out so the Scans door can render the locker IN PLACE on its "My
+/// reports" tab — the brief calls that tab a tool screen, and the locker is the
+/// tool.
+class ScanReportsScreen extends StatelessWidget {
   const ScanReportsScreen({super.key, required this.pregnancy});
 
   final PregnancyController pregnancy;
 
   @override
-  State<ScanReportsScreen> createState() => _ScanReportsScreenState();
+  Widget build(BuildContext context) {
+    final lang = S.current;
+    return AnimatedBuilder(
+      animation: V2PaletteStore.instance,
+      builder: (context, _) {
+        final p = V2PaletteStore.instance.current;
+        return Scaffold(
+          backgroundColor: p.ground,
+          appBar: AppBar(
+            backgroundColor: p.ground,
+            surfaceTintColor: Colors.transparent,
+            elevation: 0,
+            foregroundColor: p.ink1,
+            title: Text(_en('My reports').of(lang),
+                style: pvManrope(
+                    fontSize: 16, fontWeight: FontWeight.w700, color: p.ink1)),
+          ),
+          body: ListView(
+            padding: const EdgeInsets.fromLTRB(18, 8, 18, 40),
+            children: [ScanReportsBody(pregnancy: pregnancy)],
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// The locker itself — the rows, the empty state and the add flow — without a
+/// Scaffold or an app bar.
+///
+/// ⚠️ A COLUMN, NOT A LIST, for the reason [ScanTimelineBody] gives: a
+/// scrolling widget inside another scrolling widget is either unbounded or a
+/// nested scroll nobody can drive with a thumb. Whoever renders this does the
+/// scrolling.
+class ScanReportsBody extends StatefulWidget {
+  const ScanReportsBody({super.key, required this.pregnancy});
+
+  final PregnancyController pregnancy;
+
+  @override
+  State<ScanReportsBody> createState() => _ScanReportsScreenState();
 }
 
 /// What the "Which one is this?" sheet settles: a title, and optionally a scan.
@@ -81,7 +129,7 @@ class _ReportNaming {
   final String? scanId;
 }
 
-class _ScanReportsScreenState extends State<ScanReportsScreen> {
+class _ScanReportsScreenState extends State<ScanReportsBody> {
   @override
   void initState() {
     super.initState();
@@ -100,22 +148,9 @@ class _ScanReportsScreenState extends State<ScanReportsScreen> {
         final store = ScanReportsStore.instance;
         final reports = store.reports;
 
-        return Scaffold(
-          backgroundColor: p.ground,
-          appBar: AppBar(
-            backgroundColor: p.ground,
-            surfaceTintColor: Colors.transparent,
-            elevation: 0,
-            foregroundColor: p.ink1,
-            title: Text(_en('My reports').of(lang),
-                style: pvManrope(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                    color: p.ink1)),
-          ),
-          body: ListView(
-            padding: const EdgeInsets.fromLTRB(18, 8, 18, 40),
-            children: [
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
               if (reports.isEmpty)
                 _Empty(p: p, lang: lang)
               else ...[
@@ -168,8 +203,7 @@ class _ScanReportsScreenState extends State<ScanReportsScreen> {
               //             'copy, the next doctor will ask.')
               //         .of(lang),
               //     style: pvManrope(fontSize: 12, height: 1.5, color: p.ink3)),
-            ],
-          ),
+          ],
         );
       },
     );

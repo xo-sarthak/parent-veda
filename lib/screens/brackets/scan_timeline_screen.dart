@@ -98,17 +98,9 @@ class ScanTimelineScreen extends StatelessWidget {
     final lang = S.current;
 
     return AnimatedBuilder(
-      animation:
-          Listenable.merge([ScansStore.instance, V2PaletteStore.instance]),
+      animation: V2PaletteStore.instance,
       builder: (context, _) {
         final p = V2PaletteStore.instance.current;
-        final store = ScansStore.instance;
-        final week = pregnancy.currentWeek;
-
-        // ⚠️ COMPUTED ONCE, FOR THE WHOLE LIST. "Next" is the only state here
-        // that a row cannot work out on its own — it depends on every row above
-        // it — which is why it is not inside `_placeOf`.
-        final nextId = _nextId(week, store);
 
         return Scaffold(
           backgroundColor: p.ground,
@@ -125,45 +117,94 @@ class ScanTimelineScreen extends StatelessWidget {
           ),
           body: ListView(
             padding: const EdgeInsets.fromLTRB(18, 6, 18, 40),
-            children: [
-              _WhereYouAre(pregnancy: pregnancy, p: p, lang: lang),
-              const SizedBox(height: 14),
-              _Legend(p: p, lang: lang),
-              const SizedBox(height: 18),
-              Container(
-                clipBehavior: Clip.antiAlias,
-                decoration: BoxDecoration(
-                  color: p.surface,
-                  borderRadius: BorderRadius.circular(18),
-                  border: Border.all(color: p.line),
-                ),
-                child: Column(children: [
-                  for (final (id, from, to) in kScanRun) ...[
-                    _TimelineRow(
-                      scan: _byId(id),
-                      from: from,
-                      to: to,
-                      where: _placeOf(id, from, to, week, store, nextId),
-                      booked: _bookedFor(id, store),
-                      p: p,
-                      lang: lang,
-                      pregnancy: pregnancy,
-                    ),
-                    if (id != kScanRun.last.$1)
-                      Divider(
-                          height: 1, thickness: 1, color: p.line, indent: 58),
-                  ],
-                ]),
-              ),
-              const SizedBox(height: 18),
-              Text(
-                  _en('Not every pregnancy needs every test on this list, and '
-                          'your doctor may add one that is not here. This is '
-                          'the usual run, not a rule.')
-                      .of(lang),
-                  style: pvManrope(fontSize: 12, height: 1.5, color: p.ink3)),
-            ],
+            children: [ScanTimelineBody(pregnancy: pregnancy)],
           ),
+        );
+      },
+    );
+  }
+}
+
+/// The timeline itself, without a Scaffold or an app bar.
+///
+/// ⚠️ EXTRACTED SO THE SCANS DOOR CAN RENDER IT IN PLACE, and the extraction is
+/// a MOVE rather than a rewrite — every child below is the same child, in the
+/// same order, with the same spacing. The screen above still exists, still
+/// routes at `scans/timeline`, and still looks identical, because it now
+/// renders this.
+///
+/// The door needs this because its "My scans" tab IS the timeline: the brief
+/// calls that tab "a tool screen, not a rail", and a card in front of a tool
+/// inside a tab whose whole content is that tool is a door in front of a door.
+///
+/// ⚠️ IT IS A COLUMN, NOT A LIST. A scrolling widget inside another scrolling
+/// widget is either unbounded or a nested scroll nobody can drive with a thumb.
+/// The door's own `ListView` does the scrolling; this just lays out.
+class ScanTimelineBody extends StatelessWidget {
+  const ScanTimelineBody({super.key, required this.pregnancy});
+
+  final PregnancyController pregnancy;
+
+  @override
+  Widget build(BuildContext context) {
+    final lang = S.current;
+
+    return AnimatedBuilder(
+      animation:
+          Listenable.merge([ScansStore.instance, V2PaletteStore.instance]),
+      builder: (context, _) {
+        final p = V2PaletteStore.instance.current;
+        final store = ScansStore.instance;
+        final week = pregnancy.currentWeek;
+
+        // ⚠️ COMPUTED ONCE, FOR THE WHOLE LIST. "Next" is the only state here
+        // that a row cannot work out on its own — it depends on every row above
+        // it — which is why it is not inside `_placeOf`.
+        final nextId = _nextId(week, store);
+
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _WhereYouAre(pregnancy: pregnancy, p: p, lang: lang),
+            const SizedBox(height: 14),
+            _Legend(p: p, lang: lang),
+            const SizedBox(height: 18),
+            Container(
+              clipBehavior: Clip.antiAlias,
+              decoration: BoxDecoration(
+                color: p.surface,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: p.line),
+              ),
+              child: Column(children: [
+                for (final (id, from, to) in kScanRun) ...[
+                  _TimelineRow(
+                    scan: _byId(id),
+                    from: from,
+                    to: to,
+                    where: _placeOf(id, from, to, week, store, nextId),
+                    booked: _bookedFor(id, store),
+                    p: p,
+                    lang: lang,
+                    pregnancy: pregnancy,
+                  ),
+                  if (id != kScanRun.last.$1)
+                    Divider(
+                        height: 1, thickness: 1, color: p.line, indent: 58),
+                ],
+              ]),
+            ),
+            const SizedBox(height: 18),
+            // ⚠️ THE FOOTER LINE IS UNCHANGED, AND THE BRIEF SAYS SO IN SO MANY
+            // WORDS: "Keep the footer line as-is". It is the sentence that
+            // stops the timeline reading as a checklist she is behind on.
+            Text(
+                _en('Not every pregnancy needs every test on this list, and '
+                        'your doctor may add one that is not here. This is '
+                        'the usual run, not a rule.')
+                    .of(lang),
+                style: pvManrope(fontSize: 12, height: 1.5, color: p.ink3)),
+          ],
         );
       },
     );

@@ -1,0 +1,415 @@
+// =============================================================================
+//  The Scans door is reachable, and so is everything on it
+// -----------------------------------------------------------------------------
+//  ⚠️ THIS IS THE WIRING GATE, AND IT IS THE ONE TEST THIS REPO MOST NEEDS.
+//
+//  Correct-but-unreachable code is the failure ParentVeda has actually hit, and
+//  a content door is the worst place for it: a tile is a title, a blurb and a
+//  chip, and NONE OF THAT FAILS TO RENDER if the id underneath it is wrong. A
+//  dead card looks exactly like a live one until somebody taps it.
+//
+//  So every assertion below is about reachability rather than about shape:
+//  every read id resolves, every surface opens something, every scan id is in
+//  the library, and the widget that draws the tabs is actually the widget the
+//  door builds.
+//
+//  ⚠️ AND IT WALKS `kPvDoorPages`, NOT THE SCANS DOOR BY NAME. The next seven
+//  briefs inherit every gate here the moment they are registered, and nobody
+//  has to remember to add them.
+// =============================================================================
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:parentveda/data/doors/pv_door_data.dart';
+import 'package:parentveda/data/reads/pregnancy_reads.dart';
+import 'package:parentveda/data/report_findings_data.dart';
+import 'package:parentveda/data/scan_questions_data.dart';
+import 'package:parentveda/data/tests_scans_reports_data.dart';
+import 'package:parentveda/screens/doors/pv_door_router.dart';
+import 'package:parentveda/screens/doors/pv_door_screen.dart';
+import 'package:parentveda/services/pregnancy_controller.dart';
+
+void main() {
+  group('every door is wired', () {
+    test('the registry is not empty', () {
+      // The reverse mistake: a passing suite over zero doors proves nothing,
+      // and every assertion below is vacuously true on an empty list.
+      expect(kPvDoorPages, isNotEmpty);
+      expect(pvDoorPageFor('pregnancy_scans_tests'), isNotNull);
+    });
+
+    test('bracket ids are unique', () {
+      final ids = kPvDoorPages.map((d) => d.bracketId).toList();
+      expect(ids.toSet().length, ids.length,
+          reason: 'Two doors on one bracket means the second never opens — '
+              'the lookup returns the first match.');
+    });
+
+    test('every section belongs to a group that exists', () {
+      // ⚠️ A SECTION IN NO TAB LOOKS LIKE NOTHING. It does not throw, does not
+      // render and does not warn; the content is simply gone, and the only way
+      // to notice is to count the cards on a device.
+      for (final door in kPvDoorPages) {
+        final groupIds = door.groups.map((g) => g.id).toSet();
+        for (final s in door.sections) {
+          expect(groupIds, contains(s.group),
+              reason: '${door.bracketId}: section "${s.heading}" names group '
+                  '"${s.group}", which does not exist.');
+        }
+      }
+    });
+
+    test('every group has something in it', () {
+      // A tab with no sections and no inline tool is a card that opens an
+      // empty page — which is worse than a missing tab, because she chose it.
+      for (final door in kPvDoorPages) {
+        for (final g in door.groups) {
+          final hasSections = door.sectionsOf(g.id).isNotEmpty;
+          expect(hasSections || g.inlineSurfaceId != null, isTrue,
+              reason: '${door.bracketId}: tab "${g.label}" is empty.');
+        }
+      }
+    });
+
+    test('group ids are unique within a door', () {
+      for (final door in kPvDoorPages) {
+        final ids = door.groups.map((g) => g.id).toList();
+        expect(ids.toSet().length, ids.length,
+            reason: '${door.bracketId} has two tabs with one id, so one tab\'s '
+                'sections render under the other.');
+      }
+    });
+
+    test('every inline surface resolves to a body', () {
+      // ⚠️ A SURFACE THE INLINE MAP DOES NOT KNOW RENDERS NOTHING AT ALL, and
+      // on a tool tab that is the entire tab.
+      final c = PregnancyController();
+      for (final door in kPvDoorPages) {
+        for (final g in door.groups) {
+          if (g.inlineSurfaceId case final s?) {
+            expect(pvDoorInlineToolFor(s, c), isNotNull,
+                reason: '${door.bracketId}: tab "${g.label}" declares inline '
+                    'tool "$s" and nothing builds it.');
+          }
+        }
+      }
+    });
+
+    test('every pinned red flag opens somewhere and says something', () {
+      for (final door in kPvDoorPages) {
+        for (final g in door.groups) {
+          if (g.pinnedRedFlag case final f?) {
+            expect(f.lines, isNotEmpty,
+                reason: '${door.bracketId}: an empty red flag is a coral box '
+                    'with a heading.');
+            expect(pvDoorSurfaceResolves(f.surfaceId), isTrue,
+                reason: '${door.bracketId}: the flag points at '
+                    '"${f.surfaceId}", which opens nothing.');
+          }
+        }
+      }
+    });
+  });
+
+  group('every tile opens something real', () {
+    test('article tiles name a scan in the library', () {
+      for (final door in kPvDoorPages) {
+        for (final t in door.allTiles) {
+          if (t is! PvDoorScanTile) continue;
+          expect(kTestsScans.any((s) => s.id == t.scanId), isTrue,
+              reason: '"${t.title}" points at scan "${t.scanId}", which is not '
+                  'in kTestsScans. The card renders perfectly and does '
+                  'nothing.');
+        }
+      }
+    });
+
+    test('guide and myth tiles name a read that exists', () {
+      for (final door in kPvDoorPages) {
+        for (final t in door.allTiles) {
+          final id = switch (t) {
+            PvDoorGuideTile(:final readId) => readId,
+            PvDoorMythTile(:final readId) => readId,
+            _ => null,
+          };
+          if (id == null) continue;
+          expect(pregnancyReadById(id), isNotNull,
+              reason: '"${t.title}" points at read "$id", which is not in '
+                  'kPregnancyReads.');
+        }
+      }
+    });
+
+    test('a myth tile opens a read whose first section IS the myth', () {
+      // ⚠️ THE CHIP IS A PROMISE ABOUT LENGTH AS WELL AS KIND. "Myth vs fact"
+      // promises a claim and a correction; opening seven hundred words with
+      // the correction buried in section three is a chip that lies. So the
+      // claim has to be in the first screenful, and this is what holds it.
+      for (final door in kPvDoorPages) {
+        for (final t in door.allTiles) {
+          if (t is! PvDoorMythTile) continue;
+          final read = pregnancyReadById(t.readId)!;
+          expect(read.sections.first.mythFact, isNotNull,
+              reason: '"${t.title}" wears the myth chip, but '
+                  '${read.id}\'s opening section carries no myth block.');
+        }
+      }
+    });
+
+    test('every tool, checklist, talk and read tile resolves', () {
+      for (final door in kPvDoorPages) {
+        for (final t in door.allTiles) {
+          final id = switch (t) {
+            PvDoorToolTile(:final surfaceId) => surfaceId,
+            PvDoorChecklistTile(:final surfaceId) => surfaceId,
+            PvDoorTalkTile(:final surfaceId) => surfaceId,
+            PvDoorReadTile(:final surfaceId) => surfaceId,
+            _ => null,
+          };
+          if (id == null) continue; // the coming-soon read, which has none
+          expect(pvDoorSurfaceResolves(id), isTrue,
+              reason: '"${t.title}" points at surface "$id", which the router '
+                  'does not know. It opens nothing, silently.');
+        }
+      }
+    });
+
+    test('every declared surface actually builds a screen', () {
+      // ⚠️ TWO SEPARATE CLAIMS, AND THE FIRST ONE ALONE IS NOT ENOUGH.
+      // `pvDoorSurfaceResolves` is a hand-kept list, so it can say yes about an
+      // id the builder has never heard of — which is the exact shape of a test
+      // that passes while the feature is dead.
+      final c = PregnancyController();
+      for (final door in kPvDoorPages) {
+        for (final t in door.allTiles) {
+          final id = switch (t) {
+            PvDoorToolTile(:final surfaceId) => surfaceId,
+            PvDoorChecklistTile(:final surfaceId) => surfaceId,
+            PvDoorTalkTile(:final surfaceId) => surfaceId,
+            PvDoorReadTile(:final surfaceId) => surfaceId,
+            _ => null,
+          };
+          if (id == null) continue;
+          expect(pvDoorScreenFor(id, c), isNotNull,
+              reason: '"$id" is on the resolves list and builds no screen.');
+        }
+      }
+    });
+
+    test('a coming-soon tile has no destination, and the rest all do', () {
+      for (final door in kPvDoorPages) {
+        for (final t in door.allTiles) {
+          if (t is PvDoorReadTile && t.comingSoon) {
+            expect(t.surfaceId, isNull,
+                reason: '"${t.title}" says coming soon and points somewhere. '
+                    'One of the two is wrong.');
+          }
+        }
+      }
+    });
+
+    test('every tile has a blurb, and no blurb repeats its title', () {
+      // A tile whose title has to carry the whole explanation ends up as a
+      // sentence in bold; a blurb that restates the title spends the one line
+      // that was meant to say what she gets.
+      for (final door in kPvDoorPages) {
+        for (final t in door.allTiles) {
+          expect(t.blurb.trim(), isNotEmpty, reason: '"${t.title}" has none.');
+          expect(t.blurb.toLowerCase().trim(),
+              isNot(equals(t.title.toLowerCase().trim())),
+              reason: '"${t.title}" repeats itself.');
+        }
+      }
+    });
+  });
+
+  group('the Scans door matches the brief', () {
+    late PvDoorPage door;
+
+    setUp(() => door = pvDoorPageFor('pregnancy_scans_tests')!);
+
+    test('five sub-tabs, My scans first', () {
+      expect(door.groups.length, 5);
+      expect(door.groups.first.id, kScansTabMine);
+      expect(door.groups.map((g) => g.label), [
+        'My scans',
+        'Understand a scan',
+        'Understand a result',
+        'My reports',
+        'Talk',
+      ]);
+    });
+
+    test('sub-tabs 1 and 4 are tool screens, not rails', () {
+      // The brief says so by name: "Do not render Sub-tabs 1 or 4 as card
+      // rails."
+      for (final id in [kScansTabMine, kScansTabReports]) {
+        final g = door.groups.firstWhere((g) => g.id == id);
+        expect(g.layout, PvDoorLayout.stack,
+            reason: '"${g.label}" is a tool screen and must not be a rail.');
+        expect(g.inlineSurfaceId, isNotNull,
+            reason: '"${g.label}" is a tool screen with no tool on it.');
+      }
+    });
+
+    test('sub-tabs 2, 3 and 5 are card rails', () {
+      for (final id in [kScansTabScan, kScansTabResult, kScansTabTalk]) {
+        final g = door.groups.firstWhere((g) => g.id == id);
+        expect(g.layout, PvDoorLayout.rails);
+      }
+    });
+
+    test('all nine scans are on Understand a scan, in trimester order', () {
+      final scans = [
+        for (final s in door.sectionsOf(kScansTabScan))
+          for (final t in s.tiles)
+            if (t is PvDoorScanTile) t.scanId,
+      ];
+      expect(scans, [
+        'blood_tests',
+        'dating_scan',
+        'nt_scan',
+        'nipt',
+        'anomaly_scan',
+        'ogtt',
+        'growth_scan',
+        'doppler',
+        'gbs',
+      ]);
+    });
+
+    test('the six card lines the brief writes out are verbatim', () {
+      // ⚠️ THE BRIEF GIVES THESE IN QUOTES, so they are a contract rather than
+      // a suggestion — they are the plain lines that pair with a medical title,
+      // and they are the whole of the language rule in practice.
+      const expected = {
+        'NT scan': "Checks the baby's early growth and development.",
+        'NIPT': 'A blood test that checks for some conditions early.',
+        'Anomaly scan':
+            'The detailed scan that checks the baby from head to toe.',
+        'Sugar test (OGTT)': 'Checks for pregnancy diabetes.',
+        'Doppler scan': 'Checks the blood flow to the baby.',
+        'Group B Strep':
+            'A swab that checks for a common bacteria before birth.',
+      };
+      final byTitle = {for (final t in door.allTiles) t.title: t.blurb};
+      expected.forEach((title, blurb) {
+        expect(byTitle[title], blurb, reason: '$title has drifted.');
+      });
+    });
+
+    test('the Talk tab pins the red flag and nothing else does', () {
+      // ⚠️ ONCE, AND ONLY ON TALK. `scans_hub_v2.dart` removed the urgent strip
+      // from the old landing because "nobody discovers an emergency by
+      // scrolling" and a records screen should not be alarming for the
+      // thousands of people who are fine. That argument is honoured by keeping
+      // the flag off the four tabs somebody browsing would open.
+      final pinned =
+          door.groups.where((g) => g.pinnedRedFlag != null).toList();
+      expect(pinned.length, 1);
+      expect(pinned.single.id, kScansTabTalk);
+    });
+
+    test('the pinned flag shows the whole urgent list, untrimmed', () {
+      // A red-flag list is shown whole or not at all. Shoulder-tip pain is the
+      // classic sign of a ruptured ectopic, it sounds like nothing, and it is
+      // the entry a layout compromise would drop first.
+      final flag = door.groups
+          .firstWhere((g) => g.id == kScansTabTalk)
+          .pinnedRedFlag!;
+      expect(flag.lines.length, kScanUrgentSignsEn.length);
+      expect(flag.lines, kScanUrgentSignsEn);
+    });
+
+    test('Ask Veda is not a card anywhere on the door', () {
+      // The brief: do not add it as a card, do not build a new entry point.
+      for (final t in door.allTiles) {
+        expect(t.title.toLowerCase(), isNot(contains('ask veda')));
+        expect(t.blurb.toLowerCase(), isNot(contains('ask veda')));
+      }
+    });
+
+    test('the report tool appears once, not twice', () {
+      // ⚠️ SINGLE SOURCE. The brief says it in two places: "Your report, line
+      // by line" is one tool shown in My reports and linked from scan pages,
+      // never duplicated. Two tiles naming it would be the copy it forbids.
+      final tiles = door.allTiles
+          .where((t) => t.title == 'Your report, line by line')
+          .toList();
+      expect(tiles.length, 1);
+      expect(tiles.single, isA<PvDoorToolTile>());
+    });
+
+    test('the closing line is the timeline footer, kept', () {
+      expect(door.closingLine, isNotNull);
+      expect(door.closingLine!.toLowerCase(), contains('not a rule'));
+    });
+
+    test('the hero line the brief asks to keep is kept', () {
+      expect(door.heroTitle, 'Your scans, in one place.');
+    });
+  });
+
+  group('the decoder no longer shows a topic twice', () {
+    test('the popular six are a subset of all findings', () {
+      // The premise of the fix: "All topics" contained the popular six, so each
+      // appeared under both headings a few hundred points apart. If this ever
+      // stops being true, the subtraction in `report_screen.dart` is removing
+      // nothing and the fix has quietly become a no-op.
+      for (final id in kReportPopular) {
+        expect(kReportFindings.any((f) => f.id == id), isTrue,
+            reason: '$id is popular and is not in the library.');
+      }
+    });
+
+    test('breech and cord around neck are among the six', () {
+      // The two the brief names by hand. Named here so the test says what it
+      // is protecting rather than only how.
+      expect(kReportPopular, contains('breech'));
+      expect(kReportPopular, contains('nuchal_cord'));
+    });
+  });
+
+  group('the appointment checklist', () {
+    test('question ids are unique', () {
+      // ⚠️ THE IDS ARE PERSISTED BY `ScanQuestionsStore`. A duplicate would
+      // make two rows tick together, which looks like a rendering bug and is a
+      // data one.
+      final ids = kScanQuestionsFlat.map((q) => q.id).toList();
+      expect(ids.toSet().length, ids.length);
+    });
+
+    test('every group has questions and every question has words', () {
+      for (final g in kScanQuestions) {
+        expect(g.questions, isNotEmpty, reason: '"${g.heading}" is empty.');
+        for (final q in g.questions) {
+          expect(q.text.trim(), isNotEmpty);
+        }
+      }
+    });
+
+    test('every question is a question', () {
+      // The whole format's promise: these are things to say out loud in a room,
+      // not statements or instructions.
+      for (final q in kScanQuestionsFlat) {
+        expect(q.text.trim().endsWith('?'), isTrue,
+            reason: '"${q.text}" is not phrased as a question.');
+      }
+    });
+  });
+
+  group('the format chips', () {
+    test('every format has a label and an icon', () {
+      for (final f in PvDoorFormat.values) {
+        expect(f.label.trim(), isNotEmpty);
+        expect(pvDoorFormatIcon(f), isNotNull);
+      }
+    });
+
+    test('no two formats share a label', () {
+      final labels = PvDoorFormat.values.map((f) => f.label).toList();
+      expect(labels.toSet().length, labels.length,
+          reason: 'Two chips reading the same word promise the same thing and '
+              'do different things.');
+    });
+  });
+}

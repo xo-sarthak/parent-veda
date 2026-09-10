@@ -70,7 +70,13 @@ import 'journal_screen.dart';
 import 'reminders_screen.dart' show showMedReminderEditor;
 import 'tools/medicine_tracker_screen.dart';
 import 'brackets/bracket_screen.dart';
-import 'brackets/scans_hub_screen.dart';
+import '../data/doors/pv_door_data.dart';
+import 'doors/pv_door_screen.dart';
+// ⚠️ COMMENTED WITH THE PUSH IT SERVED, KEPT FOR REVERT. `ScansHubScreen` and
+// both of its configs still ship and still have their tests; see the note at
+// `_openBracket`. Restoring the old landing is uncommenting this line and the
+// five below it.
+// import 'brackets/scans_hub_screen.dart';
 import '../services/bracket_resolver.dart';
 import '../services/surface_router.dart';
 import 'v2/v3_bracket_art.dart';
@@ -762,25 +768,54 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
     final b = bracketById(bracketId);
     if (b == null) return; // wiring test makes this unreachable
 
-    // ⚠️ ONE BRACKET HAS GRADUATED FROM THE GENERIC SCREEN.
+    // ⚠️ A BRACKET WITH A DOOR OPENS ITS DOOR, AND THIS IS CHECKED FIRST.
     //
-    // Scans & tests is the highest-volume bracket in the product, and the only
-    // one whose demand data splits into two incompatible needs — anomaly scan
-    // ~135,000 (calm, planning) and ectopic ~74,000 (frightened, 2am). A
-    // layer-ordered list cannot put an emergency above a library, so this one
-    // gets a hand-built hub. See docs/SCANS-FLOW-SCREENS.md.
+    // A door is the five-sub-tab page — `PvDoorScreen` over a `PvDoorPage` —
+    // and it replaces the LANDING an area used to have, not the screens under
+    // it. Scans & tests is the first; the other seven briefs land here as data
+    // and this branch does not change again.
     //
-    // Everything else still opens `BracketScreen`, and that is the intended
-    // steady state rather than a backlog: a bracket earns a bespoke screen when
-    // its volume justifies one. The resolver stays the chokepoint either way —
-    // the hub asks `canRender()` exactly as the generic screen does.
-    if (bracketId == kScansBracketId) {
+    // It is checked before the hub registry on purpose: an area that has both
+    // has a door because somebody decided the hub was the wrong shape for it,
+    // and falling through to the hub would silently keep the shape that was
+    // replaced.
+    if (pvDoorPageFor(bracketId) case final door?) {
       Navigator.of(context).push(MaterialPageRoute<void>(
+        // ⚠️ THE ROUTE NAME IS UNCHANGED FROM THE HUB'S. `global_ask_fab.dart`
+        // reads it to decide which Ask Veda opens, so renaming it while
+        // replacing the screen would have moved the FAB's context without
+        // anything failing.
         settings: const RouteSettings(name: 'bracket/scans'),
-        builder: (_) => ScansHubScreen(bracket: b, pregnancy: pregnancy),
+        builder: (_) => PvDoorScreen(
+            page: door, bracket: b, pregnancy: pregnancy),
       ));
       return;
     }
+
+    // ⚠️ THE OLD SCANS HUB, COMMENTED OUT AND STILL SHIPPING — 2026-09-10.
+    //
+    // `ScansHubScreen` was Scans & tests' landing: a hero over a "What do you
+    // need?" list, behind a V1 | V2 pill. V1 was six doors from the
+    // reconciliation Excel's six journey steps; V2 was three. Both are replaced
+    // by the door above, and asked to be commented rather than deleted.
+    //
+    // Nothing about them was removed. `scans_hub_screen.dart`,
+    // `scans_hub.dart`, `scans_hub_v2.dart` and `scans_hub_version.dart` are
+    // all still on disk with their tests, so restoring the toggle is
+    // uncommenting these five lines.
+    //
+    // ⚠️ AND EVERY DESTINATION THEY OPENED IS STILL REACHABLE. The timeline,
+    // the locker, the decoder, the nine scan pages and the urgent screen are
+    // all on the door, most of them one tap earlier than before. What went is
+    // the menu in front of them.
+    //
+    // if (bracketId == kScansBracketId) {
+    //   Navigator.of(context).push(MaterialPageRoute<void>(
+    //     settings: const RouteSettings(name: 'bracket/scans'),
+    //     builder: (_) => ScansHubScreen(bracket: b, pregnancy: pregnancy),
+    //   ));
+    //   return;
+    // }
 
     // ⚠️ EVERY OTHER BRACKET NOW GOES THROUGH THE HUB REGISTRY.
     //

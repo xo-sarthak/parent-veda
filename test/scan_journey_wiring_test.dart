@@ -165,7 +165,23 @@ void main() {
       await _pump(t, ReportScreen(controller: c, initialReport: 'gdm'));
 
       expect(canFilterReport('gdm'), isFalse);
-      expect(find.text('All topics'), findsOneWidget);
+
+      // ⚠️ "More topics", NOT "All topics" — CHANGED 2026-09-10, AND THE
+      // ASSERTION'S INTENT IS UNCHANGED. This test is about an unfilterable id
+      // degrading to the FULL library rather than to an empty one, and the
+      // heading is how it reads that state off the screen.
+      //
+      // The unfiltered list stopped being "all" when the popular six were
+      // removed from it: they were rendered twice, once under each heading, a
+      // few hundred points apart. The heading had to move with the list — a
+      // heading promising everything over a list missing six entries is the
+      // same untruth as the duplication, pointing the other way. See the note
+      // in `report_screen.dart`.
+      expect(find.text('More topics'), findsOneWidget);
+
+      // And the thing this test actually cares about: nothing was filtered
+      // out, so the library is at full size minus the six shown above it.
+      expect(find.text('Popular topics'), findsOneWidget);
     });
 
     test('every scan in the run either filters, or is known not to', () {

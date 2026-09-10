@@ -39,8 +39,49 @@ const List<BoxShadow> _soft = [
 // ===========================================================================
 
 class TestsScansReportsScreen extends StatefulWidget {
-  const TestsScansReportsScreen({super.key, required this.controller});
+  const TestsScansReportsScreen({
+    super.key,
+    required this.controller,
+    this.openParameters = false,
+    this.testsOnly = false,
+    this.title,
+    this.intro,
+  });
+
   final PregnancyController controller;
+
+  /// Open a chosen scan with its parameter table already expanded.
+  ///
+  /// ⚠️ THIS IS THE "Your report, line by line" RESLOT, AND IT IS WHY THE TOOL
+  /// STAYED SINGLE-SOURCE. The Scans door's My-reports tab needs that parameter
+  /// table, and reaching it needs a scan to be chosen first — which this screen
+  /// already asks, with filters, in the app's own language.
+  ///
+  /// The alternative was a second picker built inside the door. It would have
+  /// been a second list of the same nine scans, drifting the day one is added,
+  /// to answer a question this screen answers already.
+  ///
+  /// ⚠️ DEFAULT FALSE, SO EVERY EXISTING CALLER IS UNCHANGED. `tests_scans`
+  /// still opens the library exactly as it did.
+  final bool openParameters;
+
+  /// Hide the Findings & Conditions half.
+  ///
+  /// ⚠️ ONLY WHERE THE QUESTION IS "which report are you holding". A finding is
+  /// not a report and cannot be one — offering "Breech Position" in answer to
+  /// that question sends her to a page about a diagnosis when she is holding a
+  /// piece of paper. Everywhere else both halves stay, because the library IS
+  /// both halves.
+  final bool testsOnly;
+
+  /// Override the app-bar title and the line under it.
+  ///
+  /// ⚠️ NULL EVERYWHERE BUT THE RESLOT. A screen reached as "Your report, line
+  /// by line" that heads itself "Tests, Scans & Reports" reads as having landed
+  /// somewhere else — the single most disorienting thing a navigation can do,
+  /// and the exact mismatch `TtcFocusPage` deleted its own title field over.
+  final String? title;
+  final String? intro;
 
   @override
   State<TestsScansReportsScreen> createState() =>
@@ -60,7 +101,7 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
       backgroundColor: AppTheme.surfaceContainer,
       appBar: AppBar(
         backgroundColor: AppTheme.surfaceContainer,
-        title: Text(s.tsrTitle,
+        title: Text(widget.title ?? s.tsrTitle,
             style: pvJakarta(
                 fontWeight: FontWeight.w700, color: AppTheme.primary900)),
       ),
@@ -90,17 +131,27 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
           //
           // pregHealthStrip(p.language, 'tests_scans_reports'),
           Text(
-            'A calm library of the tests, scans and findings you may meet in '
-            'pregnancy - what each one means, and how to read your report.',
+            widget.intro ??
+                'A calm library of the tests, scans and findings you may meet '
+                    'in pregnancy - what each one means, and how to read your '
+                    'report.',
             style: pvManrope(
                 fontSize: 13.5, height: 1.5, color: AppTheme.neutral600),
           ),
           const SizedBox(height: 16),
-          _sectionToggle(),
-          const SizedBox(height: 14),
+          // ⚠️ THE TOGGLE GOES WHEN THERE IS NOTHING TO TOGGLE TO. A two-tab
+          // control with one live tab is a control that lies about having a
+          // choice behind it.
+          if (!widget.testsOnly) ...[
+            _sectionToggle(),
+            const SizedBox(height: 14),
+          ],
           _filterChips(),
           const SizedBox(height: 16),
-          if (_section == 0) ..._testsList() else ..._findingsList(),
+          if (widget.testsOnly || _section == 0)
+            ..._testsList()
+          else
+            ..._findingsList(),
         ],
       ),
     );
@@ -198,9 +249,18 @@ class _TestsScansReportsScreenState extends State<TestsScansReportsScreen> {
           title: t.name.now,
           subtitle: t.altName?.now,
           badge: t.tag.badge.now,
+          // ⚠️ THE SAME SCREEN EITHER WAY — only the section it lands on
+          // changes. This is what keeps "Your report, line by line" one tool
+          // shown in two places rather than two copies of one table.
           onTap: () => Navigator.of(context).push(MaterialPageRoute(
-              builder: (_) =>
-                  TestScanDetailScreen(info: t, controller: p))),
+              settings: RouteSettings(
+                  name: widget.openParameters
+                      ? 'scans/parameters'
+                      : 'scans/library/detail'),
+              builder: (_) => TestScanDetailScreen(
+                  info: t,
+                  controller: p,
+                  openParameters: widget.openParameters))),
         ),
     ];
   }
