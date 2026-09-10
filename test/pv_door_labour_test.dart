@@ -1,0 +1,279 @@
+// =============================================================================
+//  The Labour prep door: tools first, safety in her voice
+// -----------------------------------------------------------------------------
+//  The reachability gates live in `pv_door_scans_test.dart`, which walks
+//  `kPvDoorPages`; this door inherited them on registration.
+//
+//  What is here is the three things this brief adds that no other has:
+//
+//    · **The voice rule.** It names two lines and gives their replacements, and
+//      it is entirely a property of strings — nothing about a legal-notice
+//      disclaimer fails to compile.
+//    · **Tools-first ordering.** The default tab is a timer because near the
+//      due date somebody opens a tool, not a read.
+//    · **What is owed.** This area promises more than it has written. The
+//      coming-soon cards are the honest treatment, and a card that quietly
+//      became tappable without content behind it would be the failure.
+// =============================================================================
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:parentveda/data/doors/pv_door_data.dart';
+import 'package:parentveda/data/prepare_data.dart';
+import 'package:parentveda/data/reads/pregnancy_reads.dart';
+import 'package:parentveda/localization/app_language.dart';
+import 'package:parentveda/screens/doors/pv_door_router.dart';
+import 'package:parentveda/services/pregnancy_controller.dart';
+
+void main() {
+  late PvDoorPage door;
+  setUp(() => door = pvDoorPageFor('pregnancy_labour')!);
+
+  group('tools first', () {
+    test('five sub-tabs, the timer first', () {
+      // ⚠️ THE ORDERING IS THE BRIEF'S ARGUMENT, NOT A PREFERENCE: "near the
+      // due date people open a tool, not a read."
+      expect(door.groups.length, 5);
+      expect(door.groups.first.id, kLabourTabTimer);
+      expect(door.groups.map((g) => g.label), [
+        'Contraction timer',
+        'Hospital bag',
+        'Understand the birth',
+        'For your partner',
+        'Talk and learn',
+      ]);
+    });
+
+    test('sub-tabs 1 and 2 are not rails', () {
+      // The brief's DO NOT list says so by name.
+      for (final id in [kLabourTabTimer, kLabourTabBag]) {
+        final g = door.groups.firstWhere((g) => g.id == id);
+        expect(g.layout, PvDoorLayout.stack);
+      }
+    });
+
+    test('sub-tabs 3, 4 and 5 are rails', () {
+      for (final id in [kLabourTabBirth, kLabourTabPartner, kLabourTabTalk]) {
+        final g = door.groups.firstWhere((g) => g.id == id);
+        expect(g.layout, PvDoorLayout.rails);
+      }
+    });
+
+    test('the timer is the first card on the first tab', () {
+      // ⚠️ ONE TAP FROM OPENING THE DOOR, WHICH IS THE POINT OF THE ORDER. If
+      // anything is ever added above it, somebody in early labour scrolls.
+      final first = door.sectionsOf(kLabourTabTimer).first.tiles.first;
+      expect(first, isA<PvDoorToolTile>());
+      expect((first as PvDoorToolTile).surfaceId, kLabourSurfaceTimer);
+    });
+
+    test('neither tool is embedded, and that is deliberate', () {
+      // ⚠️ THE ONE DELIBERATE DEVIATION FROM THIS ENGINE'S OWN RULE. Every
+      // other tool tab renders its tool in place; these two do not, because a
+      // live timer with save-on-pop and a packer with a pinned alert bar both
+      // lose real behaviour inside somebody else's scroll. The reasoning is in
+      // `pv_door_labour.dart`; this holds the decision so it is not "tidied"
+      // back by someone reading only the rule.
+      for (final id in [kLabourTabTimer, kLabourTabBag]) {
+        final g = door.groups.firstWhere((g) => g.id == id);
+        expect(g.inlineSurfaceId, isNull,
+            reason: '${g.label} embeds a tool that owns its screen — see the '
+                'note in pv_door_labour.dart before changing this.');
+      }
+    });
+  });
+
+  group('the voice rule', () {
+    test('the timer disclaimer speaks to her, in both languages', () {
+      // ⚠️ THE BRIEF NAMES THIS LINE AND GIVES THE REPLACEMENT. Both sides
+      // moved together: a rewritten English beside a stale Hindi would leave
+      // the Hindi build carrying the legal framing on a safety notice.
+      final en = S(AppLanguage.english);
+      final hi = S(AppLanguage.hinglish);
+
+      expect(en.ctDisclaimerTitle,
+          "We can't tell you if it's labour, but your doctor can");
+      expect(en.ctDisclaimerTitle.toLowerCase(),
+          isNot(contains('not a diagnosis')));
+
+      // The corporate opening is gone from both, and the safety is not.
+      expect(en.ctDisclaimerBody, isNot(contains('is not a medical')));
+      expect(hi.ctDisclaimerBody, isNot(contains('डायग्नोस्टिक सेवा')));
+      expect(en.ctDisclaimerBody, contains('Only your doctor or midwife can'));
+      expect(en.ctDisclaimerBody,
+          contains('even if the pattern here looks calm'));
+
+      // And the Hindi is Devanagari, not Latin-script Hindi.
+      expect(hi.ctDisclaimerTitle, isNot(equals(en.ctDisclaimerTitle)));
+      expect(RegExp(r'[ऀ-ॿ]').hasMatch(hi.ctDisclaimerTitle), isTrue,
+          reason: 'the Hindi title must be Devanagari');
+    });
+
+    test('both safety notes are on the door, and they differ', () {
+      // The brief gives two different lines — one about what a timer cannot
+      // tell her, one about calling anyway. Using one for both would drop half
+      // of what it asked for.
+      final timer =
+          door.groups.firstWhere((g) => g.id == kLabourTabTimer).note;
+      final talk = door.groups.firstWhere((g) => g.id == kLabourTabTalk).note;
+      expect(timer, isNotNull);
+      expect(talk, isNotNull);
+      expect(timer, isNot(equals(talk)));
+      expect(timer!, contains("can't tell you if it's labour"));
+      expect(talk!, contains('even if this screen looks calm'));
+    });
+
+    test('they are notes, not red flags', () {
+      // A safety caution is not an emergency. The flag treatment is coral and
+      // urgent; spending it here would spend an alarm on a standing note.
+      for (final g in door.groups) {
+        expect(g.pinnedRedFlag, isNull);
+      }
+    });
+
+    test('nothing on this door reads like a notice', () {
+      const corporate = [
+        'parentveda is not',
+        'not a medical or diagnostic',
+        'terms and conditions',
+        'shall not be liable',
+        'for informational purposes',
+      ];
+      final strings = <String>[
+        door.heroTitle,
+        door.heroBlurb,
+        ?door.closingLine,
+        for (final g in door.groups) ...[g.label, ?g.note],
+        for (final s in door.sections) s.heading,
+        for (final t in door.allTiles) ...[t.title, t.blurb],
+      ];
+      for (final s in strings) {
+        for (final phrase in corporate) {
+          expect(s.toLowerCase(), isNot(contains(phrase)),
+              reason: '"$s" reads like a notice.');
+        }
+      }
+    });
+
+    test('no bare jargon in a heading or a card we wrote', () {
+      // "C-section" is kept — the brief says so, people know it. "Braxton
+      // Hicks" is not: the brief allows it ONLY as a linked page title in
+      // Complications, never as a label we write.
+      final ours = <String>[
+        for (final g in door.groups) g.label,
+        for (final s in door.sections) s.heading,
+        for (final t in door.allTiles) ...[t.title, t.blurb],
+      ];
+      for (final s in ours) {
+        expect(s.toLowerCase(), isNot(contains('braxton')),
+            reason: '"$s" names Braxton Hicks as a label we wrote.');
+      }
+    });
+  });
+
+  group('what is owed is owed honestly', () {
+    test('every coming-soon card opens nothing', () {
+      for (final t in door.allTiles) {
+        if (!t.comingSoon) continue;
+        expect(t, isNot(isA<PvDoorToolTile>()),
+            reason: '"${t.title}" says coming soon and is a tool.');
+        if (t is PvDoorReadTile) expect(t.surfaceId, isNull);
+      }
+    });
+
+    test('the videos and the owed reads are marked, not faked', () {
+      final soon = [for (final t in door.allTiles) if (t.comingSoon) t.title];
+      expect(soon, containsAll(<String>[
+        'The contraction timer, in two minutes',
+        'Labour, start to finish',
+        'If it becomes a C-section',
+        'The first hour after birth',
+        'What your partner should actually do',
+        'What labour is actually like, and your options',
+      ]));
+    });
+
+    test('the birth-plan card is absent, and it is meant to be', () {
+      // ⚠️ THE BRIEF ASKS FOR IT AND THE CODEBASE SAYS NO. `pregnancy_journeys`
+      // removed that step with a note — "the birth-plan tool does not exist, so
+      // the step promised a page and delivered a grey card". Re-adding the card
+      // would reverse a considered decision silently. Recorded in STILL-OPEN
+      // §37; if the tool is ever built, this test is the thing to delete.
+      for (final t in door.allTiles) {
+        expect(t.title.toLowerCase(), isNot(contains('birth plan')),
+            reason: 'the birth-plan tool still does not exist.');
+      }
+    });
+
+    test('only one read is new, and it is the pain-relief primer', () {
+      final reads = [
+        for (final r in kPregnancyReads)
+          if (r.id.startsWith('preg_labour_')) r.id,
+      ];
+      expect(reads, ['preg_labour_read_pain_relief']);
+
+      for (final t in door.allTiles) {
+        if (t is! PvDoorGuideTile) continue;
+        expect(t.readId, 'preg_labour_read_pain_relief');
+      }
+    });
+  });
+
+  group('single source, three times', () {
+    test('the practice-contractions page is linked, not restated', () {
+      final tile = door.allTiles.firstWhere(
+          (t) => t is PvDoorEntryTile && t.library == PvDoorLibrary.finding);
+      expect((tile as PvDoorEntryTile).entryId, 'braxton_hicks');
+      expect(pvDoorEntryResolves(tile.library, tile.entryId), isTrue);
+    });
+
+    test('the partner class opens the course, not a second video', () {
+      final tile = door.allTiles
+          .firstWhere((t) => t.title == 'Your partner as birth support');
+      expect((tile as PvDoorToolTile).surfaceId, kLabourSurfaceCourse);
+    });
+
+    test('the partner packing list opens the bag, not a second list', () {
+      final tile = door.allTiles.firstWhere(
+          (t) => t.title == 'What to pack for whoever comes with you');
+      expect((tile as PvDoorToolTile).surfaceId, kLabourSurfaceBag);
+    });
+
+    test('all six classes exist behind the course card', () {
+      // ⚠️ THE CARD PROMISES SIX AND THE PRICE. Both are read off
+      // `kBirthingClasses` and `prepare_data.dart` rather than retyped, so this
+      // asserts the promise still matches the data.
+      expect(kBirthingClasses.length, 6);
+      expect(kBirthingClasses.first.free, isTrue,
+          reason: 'the card says the first class is free.');
+      final titles = kBirthingClasses.map((c) => c.title.en).toList();
+      expect(titles[4], contains('partner'));
+      expect(titles[5].toLowerCase(), contains('golden hour'));
+    });
+
+    test('the course card names the price on its face', () {
+      // This app's rule: a tile that costs money is legible as such BEFORE she
+      // taps. A shop tile that looks like an article is a dark pattern whether
+      // or not anyone meant it that way.
+      final tile =
+          door.allTiles.firstWhere((t) => t.title == 'Complete Birthing Course');
+      expect(tile.blurb, contains('₹1,499'));
+    });
+  });
+
+  group('every surface builds', () {
+    test('each one a tile names', () {
+      final c = PregnancyController();
+      for (final t in door.allTiles) {
+        final id = switch (t) {
+          PvDoorToolTile(:final surfaceId) => surfaceId,
+          PvDoorTalkTile(:final surfaceId) => surfaceId,
+          PvDoorChecklistTile(:final surfaceId) => surfaceId,
+          _ => null,
+        };
+        if (id == null) continue;
+        expect(pvDoorScreenFor(id, c), isNotNull,
+            reason: '"${t.title}" opens nothing.');
+      }
+    });
+  });
+}

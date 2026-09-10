@@ -2373,12 +2373,29 @@ class S {
   String get ctAboutBody => _p(
       'A contraction is your womb tightening and then relaxing. Not every tightening is labour. "Braxton Hicks" (practice) contractions are common and usually harmless - they tend to be irregular, do not get stronger or closer together, and often ease when you rest, change position or drink water. True labour contractions tend to get longer, stronger and closer together over time, and do not fade. To time one: tap when it starts, and again when it ends.',
       'संकुचन यानी आपकी बच्चेदानी का कसना और फिर ढीला होना। हर कसाव प्रसव नहीं होता। "Braxton Hicks" (अभ्यास वाले) संकुचन आम और अक्सर हानिरहित होते हैं — ये अनियमित होते हैं, न तेज़ होते हैं न पास-पास आते हैं, और आराम करने, करवट बदलने या पानी पीने पर अक्सर कम हो जाते हैं। असली प्रसव के संकुचन समय के साथ लंबे, तेज़ और पास-पास होते जाते हैं, और कम नहीं होते। समय नापने के लिए: शुरू होने पर टैप कीजिए, और ख़त्म होने पर फिर टैप कीजिए।');
-  // The not-a-medical-app disclaimer (kept clearly visible).
-  String get ctDisclaimerTitle =>
-      _p('A timer, not a diagnosis', 'एक टाइमर, निदान नहीं');
+  // ⚠️ THE SAFETY IS UNCHANGED; ONLY THE CORPORATE FRAMING WENT — 2026-09-10.
+  //
+  // The Labour prep brief's voice rule: *"Every line the user reads is spoken TO
+  // her, warmly, like an app talks to a person, NEVER like a legal notice."* It
+  // names these two lines and gives the replacement.
+  //
+  // What changed: the heading "A timer, not a diagnosis" became the sentence it
+  // was trying to say, and the body lost its opening "ParentVeda is not a
+  // medical or diagnostic service." Everything after that is untouched — it was
+  // already written to her, and its closing line is the brief's own second
+  // human line word for word.
+  //
+  // ⚠️ BOTH SIDES MOVED TOGETHER. This is shipped Devanagari, and a rewritten
+  // English beside a stale Hindi is worse than either: the Hindi build would
+  // still carry the legal framing the brief asked to remove, on a safety
+  // notice. `midwife` stays Latin because the surrounding string already has it
+  // that way — shipped content is the tiebreaker.
+  String get ctDisclaimerTitle => _p(
+      "We can't tell you if it's labour, but your doctor can",
+      'यह प्रसव है या नहीं, यह हम नहीं बता सकते — आपकी डॉक्टर बता सकती हैं');
   String get ctDisclaimerBody => _p(
-      'ParentVeda is not a medical or diagnostic service. This tool only records your contractions and shows the pattern - it cannot confirm that you are in labour, or rule it out. Only your doctor or midwife can. If anything feels off, contact them, even if the pattern here looks calm.',
-      'ParentVeda कोई मेडिकल या डायग्नोस्टिक सेवा नहीं है। यह टूल सिर्फ़ आपके संकुचन दर्ज करके पैटर्न दिखाता है — यह न प्रसव की पुष्टि कर सकता है, न इनकार। सिर्फ़ आपकी डॉक्टर या midwife ही यह कह सकती हैं। अगर कुछ ठीक न लगे, तो उनसे संपर्क कीजिए — चाहे यहाँ पैटर्न शांत ही क्यों न दिखे।');
+      'This tool only records your contractions and shows the pattern - it cannot confirm that you are in labour, or rule it out. Only your doctor or midwife can. If anything feels off, contact them, even if the pattern here looks calm.',
+      'यह टूल सिर्फ़ आपके संकुचन दर्ज करके पैटर्न दिखाता है — यह न प्रसव की पुष्टि कर सकता है, न इनकार। सिर्फ़ आपकी डॉक्टर या midwife ही यह कह सकती हैं। अगर कुछ ठीक न लगे, तो उनसे संपर्क कीजिए — चाहे यहाँ पैटर्न शांत ही क्यों न दिखे।');
   // Universal "always consult" line shown under every (non-urgent) assessment.
   String get ctAlwaysConsult => _p(
       'Timing cannot confirm or rule out labour. If you are unsure, or something does not feel right, contact your doctor or midwife - even now.',
