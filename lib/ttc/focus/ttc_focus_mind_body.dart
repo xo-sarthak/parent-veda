@@ -168,7 +168,8 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
         // halves restate the article's opening argument.
         TtcMythTile(
           title: 'Stop thinking about it and it will happen',
-          blurb: 'The most common piece of advice, and the least useful.',
+          blurb: 'The advice everyone gives, and what the evidence actually '
+              'says.',
           myth: 'If you stop thinking about it, you will conceive.',
           fact: 'The largest analyses find that emotional distress before '
               'treatment does not determine whether it works. The advice also '
@@ -178,7 +179,8 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
         ),
         TtcGuideTile(
           title: 'Where stress does have a real effect',
-          blurb: 'The narrow places it genuinely matters, stated honestly.',
+          blurb: 'The one honest exception, and why it is not the everyday '
+              'worry of trying.',
           readId: _kStress,
           atHeading: 'Where stress does have a real effect',
         ),
@@ -195,25 +197,36 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
               'does not claim.',
           readId: _kGarbh,
         ),
-        // ⚠️ RETITLED FROM THE BRIEF'S "Preconception garbh sanskar, taught",
-        // AND A TEST CAUGHT IT. The article above is "Preconception garbh
-        // sanskar, honestly" — both cards then opened with the same three
-        // words, and on a horizontal rail that reads as one card printed
-        // twice rather than as an article and a film.
+        // ⚠️ THE BRIEF'S TITLE FOR THIS CARD IS "Preconception garbh sanskar,
+        // taught", AND IT CANNOT BE USED. Tried on 2026-09-10 and reverted the
+        // same day, because it fails `ttc_focus_page_test.dart`'s rule that no
+        // two tiles in one section may open with the same three words — the
+        // article directly above is "Preconception garbh sanskar, honestly".
         //
-        // Renaming the TILE is allowed where renaming the article is not: the
-        // brief locks the two articles and the course by name, and marks the
-        // films only `reuse`. The film keeps its catalogue title in
-        // `ttc_videos_data.dart`; this is the card in front of it.
+        // That rule is not a house preference. It was added on 2026-09-03 after
+        // two pairs shipped in Getting ready and the user reported both **on
+        // sight** as one card printed twice. Taking an exemption here would
+        // reintroduce, deliberately, the exact thing that was complained about.
+        //
+        // What `reuse` actually protects is the ITEM, and the item is
+        // untouched: the film's own title in `ttc_videos_data.dart` is still
+        // "Preconception garbh sanskar, taught". This is the card in front of
+        // it, and it keeps the brief's load-bearing word — taught — while
+        // opening on three different words.
+        //
+        // Recorded as a real conflict between the brief and a shipped
+        // invariant in `docs/STILL-OPEN.md` §32.8 rather than settled quietly.
         TtcVideoTile(
-          title: 'Taught, rather than described',
-          blurb: 'The eight sessions of garbh sanskar, done with you.',
+          title: 'The eight sessions, taught',
+          blurb: 'Garbh sanskar done with you rather than described. Both of '
+              'you, and nothing to believe in.',
           slotId: 'ttc_vid_garbh_preconception',
           duration: '36 MIN',
         ),
         TtcMythTile(
           title: 'Does it make a smarter baby?',
-          blurb: 'The claim the whole market is built on.',
+          blurb: 'What the tradition can reasonably claim, and what it '
+              'cannot.',
           myth: 'Doing this shapes your baby\'s intelligence and nature.',
           fact: 'No. There is no controlled evidence that any preconception '
               'practice changes a child\'s intelligence or temperament, and '
@@ -223,7 +236,8 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
         ),
         TtcGuideTile(
           title: 'And if you are not religious',
-          blurb: 'Belief is optional. The practice works without it.',
+          blurb: 'The practice works without the framework, and nothing about '
+              'it is diminished.',
           readId: _kGarbh,
           atHeading: 'What it is good for',
         ),
@@ -236,18 +250,22 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
       tiles: [
         TtcGuideTile(
           title: 'What a daily practice is for',
-          // ⚠️ "Not a better chance" WAS THE ORIGINAL, AND THE SCANNER WAS
-          // RIGHT TO REJECT IT. The sentence denies the claim — but it denies
-          // it by printing it, and a card skimmed on a rail leaves "better
-          // chance" on the page beside a practice. Denials that quote the claim
-          // are how a position erodes without anybody writing something false.
-          blurb: 'Not an outcome. Something more useful than that.',
+          // ⚠️ "Not a better chance" WAS AN EARLIER ATTEMPT, AND THE SCANNER
+          // WAS RIGHT TO REJECT IT. The sentence denies the claim — but it
+          // denies it by printing it, and a card skimmed on a rail leaves
+          // "better chance" on the page beside a practice. Denials that quote
+          // the claim are how a position erodes without anybody writing
+          // something false.
+          //
+          // The brief's own line does the same work without the phrase, which
+          // is why it is the brief's line and not a third attempt at mine.
+          blurb: 'Not to make it happen. What it is genuinely good for.',
           readId: _kStress,
           atHeading: 'So what is a daily practice actually for',
         ),
         TtcGuideTile(
           title: 'Five minutes, and not as a target',
-          blurb: 'Why the number is small on purpose.',
+          blurb: 'Keep it short enough that missing a day costs nothing.',
           readId: _kStress,
           atHeading: 'So what is a daily practice actually for',
         ),
@@ -287,15 +305,23 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
           slotId: 'ttc_vid_mind_longer_session',
           duration: '25 MIN',
         ),
-        // ⚠️ REUSE, AND IT IS FREE. `ttc_prepare` is where the course lives.
-        // It is a `TtcDoTile` rather than a `TtcMasterclassTile` because the
-        // masterclass chip is the app's paid marker — see `isPaid` — and this
-        // course costs nothing. A free thing wearing the paid chip is the one
-        // labelling mistake this area cannot afford.
+        // ⚠️ REUSE, AND IT IS FREE. It is a `TtcDoTile` rather than a
+        // `TtcMasterclassTile` because the masterclass chip is the app's paid
+        // marker — see `isPaid` — and this course costs nothing. A free thing
+        // wearing the paid chip is the one labelling mistake this area cannot
+        // afford.
+        //
+        // ⚠️ IT OPENED `ttc_prepare` UNTIL 2026-09-10, AND THAT WAS THE WIRING
+        // GATE FAILING QUIETLY. `ttc_prepare` is the Prepare catalogue, where
+        // the course was one card DESCRIBING eight sessions at a price of zero.
+        // So a tile whose own blurb says "taught properly rather than
+        // described" landed on the description — reachable, tappable, wrong, and
+        // invisible to any test that only asks whether the tile opens
+        // something. `ttc_garbh_course` is the course itself.
         TtcDoTile(
           title: 'The free garbh sanskar course, eight sessions',
           blurb: 'Both of you, taught properly rather than described. No fee.',
-          surfaceId: 'ttc_prepare',
+          surfaceId: 'ttc_garbh_course',
         ),
       ],
     ),
@@ -399,7 +425,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
         ),
         TtcGuideTile(
           title: 'Ways to stay calm',
-          blurb: 'What a practice is for, in the article that argues it.',
+          blurb: 'What actually helps during the waiting.',
           readId: _kStress,
           atHeading: 'So what is a daily practice actually for',
         ),
@@ -415,7 +441,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
       tiles: [
         TtcGuideTile(
           title: 'What to say to people who keep offering this advice',
-          blurb: 'One short sentence that ends it without a fight.',
+          blurb: 'And how to protect the two of you from it.',
           readId: _kStress,
           atHeading: 'The people around you',
         ),

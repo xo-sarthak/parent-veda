@@ -19,6 +19,7 @@
 //  thing to write and the hardest thing to remember exists.
 // =============================================================================
 
+import 'ttc_garbh_course_store.dart';
 import 'ttc_log_store.dart';
 import 'ttc_practice_data.dart';
 
@@ -138,3 +139,57 @@ void ttcSetHabitTick(String field, bool on, {DateTime? day}) {
 //  fail at during the one part of her life where she is already keeping score
 //  of something she cannot control. `test/ttc_mind_body_test.dart` asserts that
 //  neither this file nor the screens contain the word.
+
+// -----------------------------------------------------------------------------
+//  What Today actually shows — her practice if she built one, else the rotation
+// -----------------------------------------------------------------------------
+//  ⚠️ THESE ARE SEPARATE FUNCTIONS RATHER THAN A FLAG ON `ttcPracticeOfTheDay`,
+//  AND THE REASON IS THAT THE ROTATION HAS TO STAY PURE. `ttcPracticeOfTheDay`
+//  is a function of the date and nothing else — a reinstall gives the same card,
+//  a test gives the same card, and `ttc_mind_body_test.dart` asserts exactly
+//  that. Reaching into a store from inside it would make all three untrue.
+//
+//  So the rotation stays a calendar and the preference sits in front of it.
+//
+//  ⚠️ WHY A PREFERENCE EXISTS AT ALL, given the rebuild brief says Today rotates
+//  daily. The course brief is equally explicit that session 8 *"must WRITE the
+//  user's picks into their Today tab"* and that the course *"must end by
+//  producing their practice"*. Both are satisfied by making the rotation the
+//  DEFAULT rather than the only behaviour: someone who has never opened the
+//  course sees exactly what the rebuild describes, and someone who has just
+//  spent eight sessions deciding what she likes is not handed a different card
+//  the next morning. Today's header says which of the two is on screen, and
+//  `TtcGarbhCourseStore.clearDailyPractice` hands it back.
+
+/// Today's movement — her chosen one if session 8 set it, otherwise the day's.
+TtcPractice ttcTodaysMove({DateTime? on, int offset = 0}) {
+  final chosen = TtcGarbhCourseStore.instance.moveId;
+  if (chosen != null) {
+    final p = ttcPracticeById(chosen);
+    // Resolved rather than trusted: a stored id whose practice has since been
+    // renamed falls back to the rotation instead of showing an empty card.
+    if (p != null && p.kind == TtcPracticeKind.move) return p;
+  }
+  return ttcPracticeOfTheDay(TtcPracticeKind.move, on: on, offset: offset);
+}
+
+/// Today's breath or calm — same rule.
+TtcPractice ttcTodaysBreathe({DateTime? on, int offset = 0}) {
+  final chosen = TtcGarbhCourseStore.instance.breatheId;
+  if (chosen != null) {
+    final p = ttcPracticeById(chosen);
+    if (p != null && p.kind == TtcPracticeKind.breathe) return p;
+  }
+  return ttcPracticeOfTheDay(TtcPracticeKind.breathe, on: on, offset: offset);
+}
+
+/// True when Today is showing something she chose rather than something the
+/// calendar chose. Drives one line of copy and nothing else.
+///
+/// ⚠️ IT ASKS THE STORE, NOT THE TWO CARDS. Comparing the rendered ids against
+/// the rotation looks equivalent and is wrong roughly one day in six: her chosen
+/// card and the day's card are sometimes the same card, and on that day the line
+/// would flip to "the rotation" underneath a practice she picked herself.
+bool get ttcTodayIsHerPractice =>
+    TtcGarbhCourseStore.instance.moveId != null ||
+    TtcGarbhCourseStore.instance.breatheId != null;

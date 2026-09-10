@@ -83,6 +83,10 @@ const List<TtcSurface> kTtcSurfaces = [
 
   // ---- Mind and body --------------------------------------------------------
   TtcSurface('ttc_ritual', "Today's practice", 'Aaj ka abhyas'),
+  // Both columns carry the same words: "garbh sanskar" is the term in either
+  // language, and the rest of the label is the course's own name.
+  TtcSurface('ttc_garbh_course', 'Preconception garbh sanskar',
+      'Preconception garbh sanskar'),
   TtcSurface('ttc_journal', 'Journal', 'Journal'),
 
   // ---- Partner --------------------------------------------------------------

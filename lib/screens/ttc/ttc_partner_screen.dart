@@ -24,7 +24,10 @@ import 'package:flutter/material.dart';
 import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_daily_data.dart';
 import '../../ttc/ttc_journal_store.dart';
+import '../../ttc/ttc_log_store.dart';
+import '../../ttc/ttc_mind_today.dart';
 import '../../ttc/ttc_partner_data.dart';
+import '../../ttc/ttc_practice_data.dart';
 import '../../ttc/ttc_store.dart';
 import 'ttc_askveda_screen.dart';
 import 'ttc_chapter_screen.dart';
@@ -33,6 +36,7 @@ import 'ttc_insight_screen.dart';
 import 'ttc_journal_screen.dart';
 import 'ttc_journey_map_screen.dart';
 import 'ttc_strings.dart';
+import 'ttc_surface_router.dart';
 
 class TtcPartnerTodayScreen extends StatelessWidget {
   const TtcPartnerTodayScreen({super.key});
@@ -44,6 +48,8 @@ class TtcPartnerTodayScreen extends StatelessWidget {
         TtcStore.instance,
         TtcJournalStore.instance,
         TtcLang.instance,
+        // His two practice cards carry a done state, and it is his own row.
+        TtcLogStore.instance,
       ]),
       builder: (context, _) {
         final t = TtcS.current();
@@ -89,6 +95,20 @@ class TtcPartnerTodayScreen extends StatelessWidget {
 
             _MissionCard(mission: mission, t: t),
             const SizedBox(height: 12),
+            // ⚠️ THE HALF OF MIND & BODY'S BRIEF THAT WAS LOGIC WITH NO CALLER
+            // — WIRED 2026-09-10. Its Today spec says *"Both partners see
+            // Today. Their picked cards may differ. Either can complete alone,
+            // and it does not count against the other."* `kTtcPartnerOffset`
+            // and the `offset` parameter existed and were tested from the
+            // start; nothing called them, so his half of the practice did not
+            // exist. Recorded honestly in `docs/STILL-OPEN.md` §28.7 rather
+            // than claimed, and now closed.
+            //
+            // It sits directly under the mission because both are "a thing to
+            // do today", and above supporting her because his own half coming
+            // last is the exact failure this screen's header warns about.
+            const _PracticeCard(),
+            const SizedBox(height: 12),
             _SupportCard(brief: brief, t: t),
             const SizedBox(height: 12),
             // Understanding before advice, and her body before his. He was
@@ -105,6 +125,99 @@ class TtcPartnerTodayScreen extends StatelessWidget {
           ],
         );
       },
+    );
+  }
+}
+
+/// His two practices for today, from the same library hers come from.
+///
+/// ⚠️ THE OFFSET IS THE WHOLE POINT, AND IT IS NOT DECORATION. `ttcPracticeOfTheDay`
+/// takes an `offset` of half a library, so on any given day his movement and
+/// hers are different cards. The brief asks for that deliberately: two people
+/// handed the identical instruction at breakfast are doing an exercise class,
+/// and two people who each have their own thing to do and can compare notes are
+/// doing this together.
+///
+/// ⚠️ AND HIS DONE STATE IS HIS OWN ROW. `ttcSetPracticeDone` writes into
+/// `TtcLogStore` on the device it is running on, so nothing here can mark her
+/// day complete or leave her a card she did not open. *"Either can complete
+/// alone, and it does not count against the other"* holds by construction
+/// rather than by a check — with one caveat worth knowing: the Mom|Dad pill is
+/// a TESTING switch on a single device, so flipping it does not swap the store
+/// underneath. In the real product his half arrives through the pairing code on
+/// his own install, and the rows are separate because the devices are.
+class _PracticeCard extends StatelessWidget {
+  const _PracticeCard();
+
+  @override
+  Widget build(BuildContext context) {
+    final move =
+        ttcPracticeOfTheDay(TtcPracticeKind.move, offset: kTtcPartnerOffset);
+    final breathe =
+        ttcPracticeOfTheDay(TtcPracticeKind.breathe, offset: kTtcPartnerOffset);
+
+    return _SlateCard(
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text('A FEW MINUTES, YOURS',
+            style: ttcBody(10, color: ttcSlateAmber, w: FontWeight.w800)),
+        const SizedBox(height: 6),
+        // ⚠️ IT SAYS THE CARDS ARE NOT HERS, BECAUSE HE WILL ASSUME THEY ARE.
+        // Everything else on this screen is about her; a practice card with no
+        // such line reads as a chore she has set him.
+        Text('Different cards from hers, on purpose. Nothing here is counting, '
+            'and neither of you is waiting on the other.',
+            style: ttcBody(13, color: ttcSlateSoft, h: 1.6)),
+        const SizedBox(height: 14),
+        _PracticeRow(practice: move),
+        const SizedBox(height: 10),
+        _PracticeRow(practice: breathe),
+      ]),
+    );
+  }
+}
+
+class _PracticeRow extends StatelessWidget {
+  const _PracticeRow({required this.practice});
+  final TtcPractice practice;
+
+  @override
+  Widget build(BuildContext context) {
+    final done = ttcPracticeDoneToday(practice.kind);
+
+    return GestureDetector(
+      onTap: () => openTtcSurface(context, 'ttc_practice/${practice.id}'),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.all(13),
+        decoration: BoxDecoration(
+          color: ttcSlatePanel,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Row(children: [
+          Icon(
+              practice.kind == TtcPracticeKind.move
+                  ? Icons.self_improvement_rounded
+                  : Icons.air_rounded,
+              size: 18,
+              color: ttcSlate),
+          const SizedBox(width: 11),
+          Expanded(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(practice.title,
+                      style: ttcBody(13.5,
+                          color: ttcSlateInk, w: FontWeight.w700, h: 1.3)),
+                  const SizedBox(height: 3),
+                  Text(practice.duration,
+                      style: ttcBody(11.5, color: ttcSlateSoft)),
+                ]),
+          ),
+          const SizedBox(width: 8),
+          Icon(done ? Icons.check_circle_rounded : Icons.arrow_forward_rounded,
+              size: 17, color: ttcSlate),
+        ]),
+      ),
     );
   }
 }

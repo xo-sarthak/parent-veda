@@ -32,6 +32,15 @@
 /// either a hub action or an offering id; `openTtcFocusTile` resolves both.
 const String kTtcOfferingAndrologist = 'ttc_consult_androl';
 
+/// The free eight-session course, by id.
+///
+/// ⚠️ NAMED BECAUSE IT IS THE ONE OFFERING THAT IS NOT A BOOKING. Everything
+/// else in this catalogue buys you a seat at a time with a person; this is a
+/// self-paced course with no slot, no expert to meet and nothing to pay, and
+/// `TtcOfferingScreen` sends it to `TtcGarbhCourseScreen` rather than drawing a
+/// price of zero above an empty slot list.
+const String kTtcOfferingGarbhCourse = 'ttc_course_garbh';
+
 class TtcOffering {
   const TtcOffering({
     required this.id,

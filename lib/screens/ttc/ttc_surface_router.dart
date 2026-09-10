@@ -17,6 +17,7 @@
 import 'package:flutter/material.dart';
 
 import '../../localization/app_language.dart';
+import '../../ttc/ttc_garbh_course.dart';
 import '../../ttc/ttc_practice_data.dart';
 import '../../ttc/ttc_reads_data.dart';
 import '../../ttc/ttc_store.dart';
@@ -53,6 +54,7 @@ import 'ttc_records_screen.dart';
 import 'ttc_strings.dart';
 import 'ttc_symptom_log_screen.dart';
 import 'ttc_mind_today_screen.dart';
+import 'ttc_garbh_course_screen.dart';
 import 'ttc_practice_screen.dart';
 import 'ttc_ritual_screen.dart';
 import 'ttc_supplements_screen.dart';
@@ -125,6 +127,20 @@ Widget? ttcScreenForSurface(String id) {
     final practice = ttcPracticeById(id.substring(practicePrefix.length));
     if (practice == null) return null;
     return TtcPracticeScreen(practice: practice);
+  }
+
+  // ---- one session of the free garbh sanskar course -----------------------
+  //
+  // ⚠️ SAME PATTERN AGAIN, AND SAME REASON. Eight sessions is eight switch
+  // entries that differ only by which const they name. Resolved against
+  // `kTtcCourseSessions` rather than trusted, so a deep link to a session that
+  // has been renumbered opens nothing rather than opening session 3 as if it
+  // were session 5.
+  const coursePrefix = 'ttc_garbh_course/';
+  if (id.startsWith(coursePrefix)) {
+    final session = ttcCourseSessionById(id.substring(coursePrefix.length));
+    if (session == null) return null;
+    return TtcCourseSessionScreen(session: session);
   }
 
   return _ttcStaticSurface(id);
@@ -328,6 +344,11 @@ Widget? _ttcStaticSurface(String id) => switch (id) {
 
       // ---- People ------------------------------------------------------------
       'ttc_prepare' => const TtcPrepareScreen(),
+      // ⚠️ THE FREE COURSE IS A SURFACE, NOT A CATALOGUE ROW. It used to be
+      // reached only as `ttc_prepare` — the shelf its offering sits on — so the
+      // door's "taught properly rather than described" tile landed on a
+      // description. See `ttc_garbh_course_screen.dart`.
+      'ttc_garbh_course' => const TtcGarbhCourseScreen(),
       'ttc_community' => const TtcCommunityScreen(),
       'ttc_care_circle' => const TtcCareCircleScreen(),
 

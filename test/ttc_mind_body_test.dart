@@ -19,6 +19,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:parentveda/data/hubs/hub_registry.dart';
 import 'package:parentveda/services/bracket_resolver.dart';
 import 'package:parentveda/screens/ttc/ttc_focus_screen.dart';
+import 'package:parentveda/screens/ttc/ttc_practice_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_surface_router.dart';
 import 'package:parentveda/ttc/focus/ttc_focus_mind_body.dart';
 import 'package:parentveda/ttc/ttc_focus_data.dart';
@@ -457,6 +458,79 @@ void main() {
       // Today is open, so its own content is on screen rather than a rail.
       expect(find.text("TODAY'S MOVEMENT"), findsOneWidget);
       expect(find.text(page.closingLine!), findsOneWidget);
+    });
+  });
+
+  // ===========================================================================
+  //  ⚠️ THE TAB WAS CORRECT AND LOOKED BROKEN, WHICH NO TEST HERE COULD SEE.
+  //  Reported as "the user interface looks very bad starting from today's
+  //  movement". Everything above passed throughout: the right practice, the
+  //  right copy, no streak, the tool rendering in place of a rail. What was
+  //  wrong was geometry — the focus screen insets its own children by 18 and
+  //  hands a group tool through untouched, and this one did not inset itself,
+  //  so every card on the default tab of this door ran edge to edge under
+  //  headings that did not.
+  //
+  //  These are the cheapest possible guards against that returning: where the
+  //  content starts, and whether anything overflows at the narrowest width we
+  //  design for. Neither is a substitute for looking at it.
+  group('Today is laid out like the page it sits inside', () {
+    Future<void> pumpDoor(WidgetTester tester, {double width = 360}) async {
+      tester.view.physicalSize = Size(width, 4000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+      final bracket = bracketById('ttc_mind_body')!;
+      await tester.pumpWidget(
+          MaterialApp(home: TtcFocusScreen(page: page, bracket: bracket)));
+      await tester.pump(const Duration(milliseconds: 400));
+    }
+
+    testWidgets('its cards sit in the page gutter, not against the edge',
+        (tester) async {
+      await pumpDoor(tester);
+      expect(tester.takeException(), isNull);
+
+      // The heading and the card under it have to start at the same x. That is
+      // the entire bug, stated as an assertion.
+      final heading =
+          tester.getTopLeft(find.text("TODAY'S MOVEMENT")).dx;
+      final title = tester.getTopLeft(
+          find.text(ttcTodaysMove().title, skipOffstage: false));
+      expect(heading, greaterThan(0),
+          reason: 'the label is flush against the screen edge');
+      // The card's own inner padding puts its title a little further in than
+      // the heading; what must never happen is the card starting LEFT of it.
+      expect(title.dx, greaterThanOrEqualTo(heading),
+          reason: "today's movement card is outdented past its own heading — "
+              'the tab is drawing without the page gutter again');
+    });
+
+    testWidgets('nothing overflows at 360dp', (tester) async {
+      // ⚠️ 360 IS THE NARROWEST SCREEN THIS APP IS DESIGNED AGAINST, and the
+      // door's own tests run at 1200 where a wide row cannot show up. Both of
+      // Today's practice blocks carry a duration AND a setting on one line,
+      // which is the row most likely to run out of space.
+      await pumpDoor(tester);
+      expect(tester.takeException(), isNull);
+    });
+
+    testWidgets('every practice card opens and renders at 360dp',
+        (tester) async {
+      // ⚠️ TWELVE SCREENS THROUGH ONE WIDGET, so an overflow on the one card
+      // nobody opens is an overflow nobody sees. The body scan is the reason
+      // this exists: its player is the only one that grows with its caption.
+      for (final practice in kTtcPractices) {
+        tester.view.physicalSize = const Size(360, 4000);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.reset);
+        await tester.pumpWidget(
+            MaterialApp(home: TtcPracticeScreen(practice: practice)));
+        await tester.pump(const Duration(milliseconds: 400));
+        expect(tester.takeException(), isNull,
+            reason: '${practice.id} does not render at phone width');
+        expect(find.text(practice.skipIf), findsOneWidget,
+            reason: '${practice.id} hides its "skip it if" note');
+      }
     });
   });
 }

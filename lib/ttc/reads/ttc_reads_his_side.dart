@@ -639,6 +639,39 @@ final List<PvRead> kTtcReadsHisSide = [
         ),
       ),
 
+      // ⚠️ ADDED 2026-09-10, BECAUSE ANOTHER DOOR WAS POINTING AT IT.
+      // Mind & body's sleep guide ends with *"See the sleep section in His side
+      // for his half"* — a cross-reference to a section that did not exist.
+      // The two honest options were to delete the sentence or to write the
+      // section; the material is real (sleep and testosterone), it belongs on
+      // the page already titled "Heat, habits and time", and pointing that
+      // sentence at the nearest existing article instead would have been the
+      // failure `reuse-only-the-thing-itself` describes.
+      PvReadSection(
+        heading: _en('Sleep, and the shift work question'),
+        paragraphs: [
+          _en('Sperm production runs on the same daily hormonal rhythm '
+              'everything else does, and that rhythm is set by sleep and by '
+              'light. Sustained short sleep is associated with lower '
+              'testosterone, which is the mechanism people usually mean when '
+              'they say sleep matters here.'),
+          _en('Regular timing does more than total hours. Going to bed within '
+              'the same hour most nights is worth more than sleeping long on '
+              'some nights and short on others, and the part that sets the '
+              'clock is the hour you get up rather than the hour you turn the '
+              'light off.'),
+          _en('Night shifts and frequently rotating shifts are the version of '
+              'this with real evidence behind it, and they are rarely asked '
+              'about at an appointment. If either of you works them, mention '
+              'it — not because it is the reason this is taking time, but '
+              'because it is relevant and nobody will think to ask.'),
+          _en('And the honest limit: bad sleep is not why this has not '
+              'happened. It is worth fixing because it makes the months '
+              'easier and the rest of this list easier to keep, which is a '
+              'complete reason on its own.'),
+        ],
+      ),
+
       PvReadSection(
         heading: _en('What three months actually looks like'),
         paragraphs: [

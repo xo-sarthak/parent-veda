@@ -479,7 +479,9 @@ final List<PvRead> kTtcReadsMindBody = [
         title: _en('The free preconception garbh sanskar course'),
         value: _en('Eight short sessions, both of you, no fee — the practice '
             'taught properly rather than described.'),
-        surfaceId: 'ttc_prepare',
+        // Was 'ttc_prepare' — the catalogue the course is LISTED in, not the
+        // course. See the note on the door's Go deeper tile.
+        surfaceId: 'ttc_garbh_course',
       ),
       PvReadNextStep(
         kind: PvNextKind.activity,
@@ -600,6 +602,23 @@ final List<PvRead> kTtcReadsMindBody = [
         ],
       ),
 
+      // ⚠️ THE BRIEF'S OWN CLOSING SECTION, AND IT WAS MISSING. *"This is not
+      // only her."* The FAQ below covered his sleep, which is not the same
+      // thing: a question at the foot of the page is something you go looking
+      // for, and the point of this section is that she should not have to.
+      PvReadSection(
+        heading: _en('Both of you'),
+        paragraphs: [
+          _en('This is not only her. Sleep affects sperm production too, '
+              'through the same hormonal rhythm, and it gets asked about far '
+              'less on his side than on hers.'),
+          _en('It is also the practical argument for doing it together: a '
+              'fixed bedtime is much easier to keep when both people are '
+              'keeping it, and almost impossible when one of you is still up '
+              'with the television on.'),
+        ],
+      ),
+
       PvReadSection(
         heading: _en('What is worth trying'),
         bullets: [
@@ -675,6 +694,15 @@ final List<PvRead> kTtcReadsMindBody = [
         title: _en('Fixing a bedtime you will actually keep'),
         value: _en('The practical half of this, in one short page.'),
         surfaceId: 'ttc_read/ttc_read_bedtime',
+      ),
+      // His half, and it is the section His side gained in order to be pointed
+      // at rather than the nearest article that would have done.
+      PvReadNextStep(
+        kind: PvNextKind.read,
+        title: _en('His sleep, and the shift work question'),
+        value: _en('The same rhythm on his side, and the one thing worth '
+            'mentioning at an appointment.'),
+        surfaceId: 'ttc_read/ttc_read_heat_habits',
       ),
     ],
 
@@ -763,6 +791,50 @@ final List<PvRead> kTtcReadsMindBody = [
               'and it is the reason a bad night becomes a bad week. Twenty '
               'minutes here means roughly twenty minutes as it feels, not '
               'twenty minutes measured.'),
+        ],
+      ),
+
+      // ⚠️ TWO SECTIONS THE BRIEF CALLS OUT AND THIS GUIDE DID NOT HAVE, and
+      // the first of them is the one it describes as *"the part most advice
+      // ignores"*. A bedtime page written for somebody living in a flat of two
+      // is a bedtime page that does not apply to most of the people reading
+      // it here.
+      PvReadSection(
+        heading: _en('If you live with family'),
+        paragraphs: [
+          _en('Most bedtime advice quietly assumes the household is yours to '
+              'run. If dinner is at ten because that is when it has always '
+              'been, or the television is on in a room you have to walk '
+              'through, a private bedtime is not a matter of willpower — it '
+              'is a matter of a schedule you did not set.'),
+          _en('What works is being plain rather than apologetic. Saying that '
+              'you are both trying to sleep earlier for health reasons is '
+              'true, it needs no further explanation, and it does not invite '
+              'the follow-up question that "we are trying" always does.'),
+        ],
+        bullets: [
+          _en('Agree a dinner time with whoever cooks, rather than announcing '
+              'a bedtime. Dinner is the thing that actually moves.'),
+          _en('Move the phones out of the bedroom. Nobody else needs to be '
+              'involved in that one, and it is the change that does the most.'),
+          _en('Accept the nights it will not hold — a guest, a festival, '
+              'somebody unwell. Two or three nights a week closer to a '
+              'regular time is a real improvement.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('If one of you works shifts'),
+        paragraphs: [
+          _en('A fixed bedtime may not be possible, and pretending otherwise '
+              'is not useful. What is available is a consistent pattern '
+              'within the shift rather than across the week: the same routine '
+              'before sleep, the room genuinely dark if you are sleeping in '
+              'the day, and meals at roughly the same points of your own '
+              'cycle rather than the household\'s.'),
+          _en('Mention the shift work at your next appointment. It is one of '
+              'the few sleep patterns with a real association behind it, and '
+              'it is almost never asked about.'),
         ],
       ),
 
@@ -938,6 +1010,33 @@ final List<PvRead> kTtcReadsMindBody = [
         ],
       ),
 
+      // ⚠️ THE BRIEF NAMES THESE AS THE HARDEST DAYS AND THIS GUIDE HAD
+      // NOTHING ON THEM. Everything above is written for one question from one
+      // person; a wedding is the same question from nine people in a row, in
+      // front of each other, and the advice that works there is different —
+      // it is logistical rather than verbal, and all of it has to be decided
+      // before you arrive.
+      PvReadSection(
+        heading: _en('Before a wedding or a festival'),
+        paragraphs: [
+          _en('These are the hardest days, because everybody is in one place '
+              'and the questions arrive as a group rather than one at a time. '
+              'Deciding how to handle it on the day, while upset, is much '
+              'harder than deciding it on the way there.'),
+        ],
+        bullets: [
+          _en('Decide how long you are staying before you go, and say it out '
+              'loud to each other.'),
+          _en('Agree a signal between the two of you for wanting out of a '
+              'conversation. It does not have to be subtle; it has to be '
+              'agreed.'),
+          _en('Accept in advance that you might leave early, so that leaving '
+              'early is a plan rather than a failure.'),
+          _en('Decide who takes which room. Whoever\'s family it is, is the '
+              'one who answers.'),
+        ],
+      ),
+
       PvReadSection(
         heading: _en('And the advice, when it comes anyway'),
         paragraphs: [
@@ -1075,6 +1174,22 @@ final List<PvRead> kTtcReadsMindBody = [
           _en('He reads one thing. One, chosen, not a folder.'),
           _en('A fixed time to talk about it, so it stops arriving at eleven '
               'at night and stops being present at every other hour.'),
+          // ⚠️ THE BRIEF'S OWN POINT, AND IT IS SHARPER THAN THE ONE ABOVE.
+          // *"Pick a time to talk that is not the moment a period arrives.
+          // That is the worst possible time and it is when it usually comes
+          // up."* A fixed time is the mechanism; this is the specific hour to
+          // avoid, and it is the hour the conversation nearly always happens.
+          _en('And not on the day a period arrives. That is the worst hour to '
+              'have any version of this conversation, and it is the hour it '
+              'usually gets had.'),
+          // ⚠️ THE CROSS-REFERENCE THE PRACTICE LIBRARY WAS BUILT FOR. The
+          // brief: *"Do things together that are not about trying. The couple
+          // part of the daily practice exists for this reason."* Naming it
+          // here is the difference between a card sitting in a library and a
+          // card somebody has a reason to open.
+          _en('Something the two of you do together that is not about trying. '
+              'Ten slow breaths in the same room is the whole of it — the '
+              'couple part of the daily practice exists for exactly this.'),
         ],
       ),
 
@@ -1097,6 +1212,18 @@ final List<PvRead> kTtcReadsMindBody = [
       PvReadSection(
         heading: _en('And a warning about the fix that backfires'),
         paragraphs: [
+          // ⚠️ THE BRIEF'S "what tends not to work", WHICH THIS SECTION DID NOT
+          // HAVE. It warned about scheduling — a real and different failure —
+          // and said nothing about the framing that causes the commonest one.
+          // Worth keeping because the symptom is not refusal, which is what
+          // people watch for; it is agreement followed by nothing.
+          _en('Before the specific one: two framings reliably fail. Putting it '
+              'as his turn, and putting it as a test of whether he is serious '
+              'about this. Both are understandable and both put him on the '
+              'defensive, and the response is almost never a refusal — it is '
+              'delay. Next month, after this project, once work settles. '
+              'Nothing moves, and the resentment builds on both sides while it '
+              'does not.'),
           _en('The most common attempt is scheduling — telling him which days '
               'matter and when. It is completely reasonable and it is the one '
               'thing most likely to make him withdraw further, because it '

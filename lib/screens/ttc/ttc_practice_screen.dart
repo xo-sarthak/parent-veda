@@ -24,11 +24,19 @@ import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_log_store.dart';
 import '../../ttc/ttc_mind_today.dart';
 import '../../ttc/ttc_practice_data.dart';
-import 'ttc_common.dart';
+import '../v2/v2_palette.dart';
+import 'ttc_mind_today_screen.dart' show kTtcMoveHue, kTtcBreatheHue;
 import 'ttc_practice_player.dart';
 import 'ttc_tool_chrome.dart';
 
 /// The hue for this area. 42 is the bracket's own, from `ttc_brackets.dart`.
+///
+/// ⚠️ KEPT, AND NO LONGER WHAT THIS SCREEN OPENS IN. A practice now takes the
+/// hue of its own library — 104 for Move, 206 for Breathe — because that is the
+/// colour of the block she tapped on Today. Landing sand-coloured after tapping
+/// a sage block reads as having arrived somewhere else, and the whole point of
+/// a do-it screen is that opening the card and doing the practice are one
+/// motion. The door itself is still 42; a practice is a room inside it.
 const double kTtcMindHue = 42;
 
 class TtcPracticeScreen extends StatefulWidget {
@@ -55,36 +63,61 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final p = widget.practice;
+    final pr = widget.practice;
 
     return AnimatedBuilder(
       animation: TtcLogStore.instance,
       builder: (context, _) {
-        final done = ttcPracticeDoneToday(p.kind);
+        final done = ttcPracticeDoneToday(pr.kind);
+
+        final pal = V2PaletteStore.instance.current;
+        final hue = widget.practice.kind == TtcPracticeKind.move
+            ? kTtcMoveHue
+            : kTtcBreatheHue;
+        final tint = v2BlockTint(hue, pal);
+        final deep = HSLColor.fromColor(tint)
+            .withSaturation(0.44)
+            .withLightness(0.36)
+            .toColor();
 
         return TtcToolScaffold(
-          hue: kTtcMindHue,
-          eyebrow: p.kind == TtcPracticeKind.move ? 'MOVE' : 'BREATHE AND CALM',
-          title: p.title,
-          intro: p.blurb,
+          hue: hue,
+          eyebrow:
+              pr.kind == TtcPracticeKind.move ? 'MOVE' : 'BREATHE AND CALM',
+          title: pr.title,
+          intro: pr.blurb,
           children: [
             // ---- how long, and where ---------------------------------
+            //  ⚠️ THE WHOLE SHEET IS PADDED HERE RATHER THAN LINE BY LINE.
+            //  `TtcToolScaffold` hands its children straight into the sheet, so
+            //  every row below used to be responsible for its own inset and one
+            //  of them always forgets. `ttcToolPad` around the column is one
+            //  place to be wrong instead of fifteen.
+            ttcToolPad(Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
             Row(children: [
-              const Icon(Icons.schedule_rounded, size: 15, color: ttcSoft),
+              Icon(Icons.schedule_rounded, size: 15, color: pal.ink3),
               const SizedBox(width: 7),
-              Text(p.duration,
-                  style: ttcBody(13, color: ttcSoft, w: FontWeight.w700)),
+              Text(pr.duration,
+                  style: pvManrope(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: pal.ink2)),
               const SizedBox(width: 12),
-              const Icon(Icons.place_outlined, size: 15, color: ttcSoft),
+              Icon(Icons.place_outlined, size: 15, color: pal.ink3),
               const SizedBox(width: 7),
               Expanded(
-                child: Text(p.setting,
-                    style: ttcBody(13, color: ttcSoft, w: FontWeight.w700)),
+                child: Text(pr.setting,
+                    style: pvManrope(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: pal.ink2)),
               ),
             ]),
 
             const SizedBox(height: 20),
-            TtcPracticeSession(practice: p),
+            TtcPracticeSession(practice: pr),
             const SizedBox(height: 24),
 
             // ---- the steps -------------------------------------------
@@ -94,7 +127,7 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
                       fontSize: 10.5,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.4,
-                      color: ttcMuted)),
+                      color: pal.ink3)),
               const Spacer(),
               // ⚠️ BACK ONE STEP, WHICH THE BRIEF NAMES. On a floor practice the
               // commonest thing that happens is missing a line and needing it
@@ -107,17 +140,30 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
               const SizedBox(width: 6),
               _StepNudge(
                   icon: Icons.keyboard_arrow_down_rounded,
-                  enabled: _step < p.steps.length - 1,
+                  enabled: _step < pr.steps.length - 1,
                   onTap: () => setState(() => _step++)),
             ]),
             const SizedBox(height: 12),
 
-            for (var i = 0; i < p.steps.length; i++) ...[
+            //  ⚠️ THE LIVE STEP IS A FILLED ROW, NOT A BOLDER FONT. Weight
+            //  alone is what this had, and on a floor practice the phone is
+            //  arm's length away on the mat: at that distance w700 against w400
+            //  in the same colour is not a difference you can find without
+            //  reading. A tinted row with a filled number is findable in a
+            //  glance, which is the only interaction this list ever gets.
+            for (var i = 0; i < pr.steps.length; i++) ...[
               GestureDetector(
                 onTap: () => setState(() => _step = i),
                 behavior: HitTestBehavior.opaque,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 9),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 140),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 11, horizontal: 11),
+                  margin: const EdgeInsets.only(bottom: 4),
+                  decoration: BoxDecoration(
+                    color: i == _step ? tint : Colors.transparent,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
                   child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -126,26 +172,28 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
                           height: 24,
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
-                            color: i == _step ? ttcPurple : ttcPanel,
+                            color: i == _step ? deep : pal.surfaceAlt,
                             borderRadius: BorderRadius.circular(999),
                           ),
                           child: Text('${i + 1}',
-                              style: ttcBody(11,
+                              style: pvManrope(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w800,
                                   color:
-                                      i == _step ? Colors.white : ttcTitleInk,
-                                  w: FontWeight.w800)),
+                                      i == _step ? Colors.white : pal.ink2)),
                         ),
                         const SizedBox(width: 11),
                         Expanded(
-                          child: Text(p.steps[i],
+                          child: Text(pr.steps[i],
                               // ⚠️ NO `maxLines`, ANYWHERE IN THIS LIST. The
                               // brief: the step text "must survive the largest
                               // accessibility text size". A clipped instruction
                               // is worse than a long screen.
-                              style: ttcBody(13.5,
-                                  color: i == _step ? ttcTitleInk : ttcInk,
-                                  h: 1.55,
-                                  w: i == _step
+                              style: pvManrope(
+                                  fontSize: 13.5,
+                                  height: 1.55,
+                                  color: i == _step ? pal.ink1 : pal.ink2,
+                                  fontWeight: i == _step
                                       ? FontWeight.w700
                                       : FontWeight.w400)),
                         ),
@@ -155,16 +203,17 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
             ],
 
             // ---- which side, where sides matter ----------------------
-            if (p.anim case TtcFigureAnim(sides: true)) ...[
+            if (pr.anim case TtcFigureAnim(sides: true)) ...[
               const SizedBox(height: 6),
               Row(children: [
-                const Icon(Icons.swap_horiz_rounded, size: 15, color: ttcSoft),
+                Icon(Icons.swap_horiz_rounded, size: 15, color: pal.ink3),
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
                       'This one changes sides. Do the whole thing on one side, '
                       'then the other.',
-                      style: ttcBody(12.5, color: ttcSoft, h: 1.5)),
+                      style: pvManrope(
+                          fontSize: 12.5, height: 1.5, color: pal.ink2)),
                 ),
               ]),
             ],
@@ -177,16 +226,23 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
             // separates them: one general line on the practice tab, and a
             // specific caution on each card. Repeating the general one twelve
             // times is what stops it being read.
+            //  ⚠️ WARM, NOT ALARMING, AND NOT THE PALETTE'S OWN HUE EITHER. A
+            //  caution painted in the practice's colour disappears into the
+            //  page; painted red it reads as a red flag, which this is not —
+            //  "put a cushion under the knees" is not a reason to call anyone.
+            //  Sand (42) is the stage's caution tint and is used here for the
+            //  same reason the door uses it for paid blocks: distinct without
+            //  being loud.
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: ttcCoralTint,
+                color: v2BlockTint(42, pal),
                 borderRadius: BorderRadius.circular(16),
               ),
               child: Row(crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Icon(Icons.info_outline_rounded,
-                        size: 16, color: ttcBrown),
+                    Icon(Icons.info_outline_rounded,
+                        size: 16, color: pal.ink2),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Column(
@@ -197,11 +253,13 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
                                     fontSize: 9.5,
                                     fontWeight: FontWeight.w800,
                                     letterSpacing: 1,
-                                    color: ttcBrown)),
+                                    color: pal.ink2)),
                             const SizedBox(height: 5),
-                            Text(p.skipIf,
-                                style:
-                                    ttcBody(12.5, color: ttcBrown, h: 1.55)),
+                            Text(pr.skipIf,
+                                style: pvManrope(
+                                    fontSize: 12.5,
+                                    height: 1.55,
+                                    color: pal.ink1)),
                           ]),
                     ),
                   ]),
@@ -218,28 +276,31 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
             // it into days she let something down. There is no streak; see
             // `ttc_mind_today.dart`.
             GestureDetector(
-              onTap: () => ttcSetPracticeDone(p.kind, !done),
+              onTap: () => ttcSetPracticeDone(pr.kind, !done),
               behavior: HitTestBehavior.opaque,
-              child: Container(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 140),
                 height: 52,
                 alignment: Alignment.center,
                 decoration: BoxDecoration(
-                  color: done ? ttcPanel : ttcPurple,
+                  color: done ? pal.surfaceAlt : deep,
                   borderRadius: BorderRadius.circular(16),
-                  border: done ? Border.all(color: ttcBorder) : null,
+                  border: done ? Border.all(color: pal.line) : null,
                 ),
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
                   Icon(done ? Icons.check_rounded : Icons.circle_outlined,
-                      size: 17, color: done ? ttcTitleInk : Colors.white),
+                      size: 17, color: done ? pal.ink1 : Colors.white),
                   const SizedBox(width: 9),
                   Text(done ? 'Done today' : 'Mark done today',
-                      style: ttcBody(14.5,
-                          color: done ? ttcTitleInk : Colors.white,
-                          w: FontWeight.w700)),
+                      style: pvManrope(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w700,
+                          color: done ? pal.ink1 : Colors.white)),
                 ]),
               ),
             ),
             const SizedBox(height: 10),
+                ])),
           ],
         );
       },
@@ -255,20 +316,23 @@ class _StepNudge extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
-        onTap: enabled ? onTap : null,
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          width: 30,
-          height: 30,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: ttcPanel,
-            borderRadius: BorderRadius.circular(999),
-          ),
-          child: Icon(icon,
-              size: 18,
-              color: enabled ? ttcTitleInk : ttcMuted.withValues(alpha: 0.5)),
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    return GestureDetector(
+      onTap: enabled ? onTap : null,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        width: 30,
+        height: 30,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(
+          color: p.surfaceAlt,
+          borderRadius: BorderRadius.circular(999),
         ),
-      );
+        child: Icon(icon,
+            size: 18,
+            color: enabled ? p.ink1 : p.ink3.withValues(alpha: 0.45)),
+      ),
+    );
+  }
 }

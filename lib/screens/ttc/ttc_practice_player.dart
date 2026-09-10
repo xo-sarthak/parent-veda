@@ -31,7 +31,52 @@ import 'package:flutter/material.dart';
 
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_practice_data.dart';
-import 'ttc_common.dart';
+import '../v2/v2_palette.dart';
+import 'ttc_mind_today_screen.dart' show kTtcMoveHue, kTtcBreatheHue;
+
+// -----------------------------------------------------------------------------
+//  The two colours every player draws with
+// -----------------------------------------------------------------------------
+//  ⚠️ RESOLVED ONCE AND PASSED DOWN, NOT READ IN SIX PAINTERS. These used to be
+//  the fixed TTC tool tokens — a violet circle and a lilac ring — which is why
+//  a breathing practice opened from a sand-coloured door looked like a screen
+//  borrowed from somewhere else. The accent is now the practice's OWN hue, the
+//  same one its block wears on Today, so the card you tapped and the circle you
+//  get are the same colour.
+//
+//  A painter cannot read an inherited widget, so this travels as a value rather
+//  than through the tree.
+class TtcPracticeSkin {
+  const TtcPracticeSkin({required this.p, required this.accent});
+
+  final V2Palette p;
+
+  /// The moving part: the circle, the arc, the count.
+  final Color accent;
+
+  /// The still part behind it. A hairline, never a shadow.
+  Color get track => p.line;
+
+  /// The skin for one practice, from the palette on screen.
+  factory TtcPracticeSkin.of(TtcPractice practice) => TtcPracticeSkin.atHue(
+      practice.kind == TtcPracticeKind.move ? kTtcMoveHue : kTtcBreatheHue);
+
+  /// The calm end of the pair, for a sit that belongs to no library.
+  factory TtcPracticeSkin.breathe() => TtcPracticeSkin.atHue(kTtcBreatheHue);
+
+  factory TtcPracticeSkin.atHue(double hue) {
+    final p = V2PaletteStore.instance.current;
+    return TtcPracticeSkin(
+      p: p,
+      // The block tint is a pale wash — right behind large type, far too weak
+      // for a 5pt arc — so the accent is that hue taken down to ink strength.
+      accent: HSLColor.fromColor(v2BlockTint(hue, p))
+          .withSaturation(0.44)
+          .withLightness(0.36)
+          .toColor(),
+    );
+  }
+}
 
 /// Where a session is, in whole seconds.
 ///
@@ -64,10 +109,38 @@ class _Clock {
 }
 
 /// The shared session shell: a player, a ring, and pause / restart.
+///
+/// ⚠️ TWO WAYS IN, AND THE SECOND ONE IS WHY THIS TAKES AN ANIM RATHER THAN A
+/// PRACTICE. The garbh sanskar course asks twice for a plain sit with a ring
+/// behind nothing at all — session 1's two minutes of sitting still, session 3's
+/// five minutes of attention on the breath — and neither is a card in the
+/// library, because neither is a thing you would put on Today. Building a second
+/// timer for them would be a second clock to keep in step with this one; the
+/// brief's instruction for the whole course is *"Reuse, do not rebuild."*
+///
+/// So the widget holds what it actually draws with, and `TtcPracticeSession.sit`
+/// is the door for anything that has a duration and no card.
 class TtcPracticeSession extends StatefulWidget {
-  const TtcPracticeSession({super.key, required this.practice});
+  TtcPracticeSession({super.key, required TtcPractice practice})
+      : anim = practice.anim,
+        steps = practice.steps,
+        skinFor = (() => TtcPracticeSkin.of(practice));
 
-  final TtcPractice practice;
+  /// A ring, a clock, and nothing else. For a sit the course asks for.
+  TtcPracticeSession.sit({super.key, required int seconds})
+      : anim = TtcTimerAnim(seconds: seconds),
+        steps = const [],
+        skinFor = (() => TtcPracticeSkin.breathe());
+
+  final TtcPracticeAnim anim;
+
+  /// Only the body scan reads these — it names the part it is lighting.
+  final List<String> steps;
+
+  /// ⚠️ A CLOSURE, NOT A COLOUR. The palette can change under a running session
+  /// (the ground switcher repaints the whole app), so the skin has to be
+  /// resolved in `build` rather than captured in the constructor.
+  final TtcPracticeSkin Function() skinFor;
 
   @override
   State<TtcPracticeSession> createState() => TtcPracticeSessionState();
@@ -77,7 +150,7 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
   final _clock = _Clock();
   Timer? _ticker;
 
-  int get _total => widget.practice.anim.seconds;
+  int get _total => widget.anim.seconds;
   int get _left => (_total - _clock.elapsed.inSeconds).clamp(0, _total);
 
   @override
@@ -105,25 +178,36 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
 
   @override
   Widget build(BuildContext context) {
-    final anim = widget.practice.anim;
+    final skin = widget.skinFor();
+    final p = skin.p;
+    final anim = widget.anim;
     final done = _left == 0 && _clock.elapsed.inSeconds > 0;
     final t = _clock.elapsed.inMilliseconds / 1000.0;
     final progress = _total == 0 ? 0.0 : (t / _total).clamp(0.0, 1.0);
 
     return Column(children: [
-      SizedBox(
-        height: 232,
+      // ⚠️ A MINIMUM, NOT A FIXED HEIGHT, AND IT WAS FIXED UNTIL 2026-09-10.
+      // Five of the six players are a ring with something small in the middle
+      // and fit 232 forever. The body scan is the odd one: it is a Column of a
+      // figure AND the name of the body part currently lit, and that caption
+      // wraps to as many lines as the step needs — three, at the largest
+      // accessibility sizes, which pushed the whole Column past a hard 232 and
+      // striped the screen. A floor is enough to stop a breathing circle
+      // jumping between phases, and nothing needs a ceiling.
+      ConstrainedBox(
+        constraints: const BoxConstraints(minHeight: 232),
         child: Center(
           child: switch (anim) {
             TtcBreathAnim() => _Breath(
                 spec: anim, seconds: t, progress: progress,
-                running: _clock.running),
+                running: _clock.running, skin: skin),
             TtcBodyScanAnim() =>
-              _BodyScan(steps: widget.practice.steps, progress: progress),
-            TtcListenAnim() => _Listen(seconds: t, progress: progress),
-            TtcFigureAnim() =>
-              _Figure(spec: anim, progress: progress),
-            TtcTimerAnim() => _PlainTimer(left: _left, progress: progress),
+              _BodyScan(steps: widget.steps, progress: progress, skin: skin),
+            TtcListenAnim() =>
+              _Listen(seconds: t, progress: progress, skin: skin),
+            TtcFigureAnim() => _Figure(progress: progress, skin: skin),
+            TtcTimerAnim() =>
+              _PlainTimer(left: _left, progress: progress, skin: skin),
           },
         ),
       ),
@@ -139,9 +223,9 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
             padding: const EdgeInsets.symmetric(horizontal: 24),
             alignment: Alignment.center,
             decoration: BoxDecoration(
-              color: _clock.running ? ttcPanel : ttcPurple,
+              color: _clock.running ? p.surfaceAlt : skin.accent,
               borderRadius: BorderRadius.circular(999),
-              border: _clock.running ? Border.all(color: ttcBorder) : null,
+              border: _clock.running ? Border.all(color: p.line) : null,
             ),
             child: Row(mainAxisSize: MainAxisSize.min, children: [
               Icon(
@@ -151,7 +235,7 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
                           ? Icons.replay_rounded
                           : Icons.play_arrow_rounded,
                   size: 19,
-                  color: _clock.running ? ttcTitleInk : Colors.white),
+                  color: _clock.running ? p.ink1 : Colors.white),
               const SizedBox(width: 8),
               Text(
                   _clock.running
@@ -159,9 +243,10 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
                       : done
                           ? 'Again'
                           : 'Start',
-                  style: ttcBody(14.5,
-                      color: _clock.running ? ttcTitleInk : Colors.white,
-                      w: FontWeight.w700)),
+                  style: pvManrope(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w700,
+                      color: _clock.running ? p.ink1 : Colors.white)),
             ]),
           ),
         ),
@@ -174,7 +259,7 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
         // and the reasoning goes further than the animation: praise for
         // finishing is what makes not finishing a failure.
         Text('That is the whole thing.',
-            style: ttcBody(13, color: ttcSoft, h: 1.5)),
+            style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
       ],
     ]);
   }
@@ -191,12 +276,14 @@ class _Breath extends StatelessWidget {
       {required this.spec,
       required this.seconds,
       required this.progress,
-      required this.running});
+      required this.running,
+      required this.skin});
 
   final TtcBreathAnim spec;
   final double seconds;
   final double progress;
   final bool running;
+  final TtcPracticeSkin skin;
 
   /// Where in one cycle we are, and how far through that phase.
   (_Phase, double, int) _at() {
@@ -244,7 +331,10 @@ class _Breath extends StatelessWidget {
         height: 210,
         child: CustomPaint(
           painter: _RingPainter(
-              progress: progress, twoMarkers: spec.twoMarkers),
+              progress: progress,
+              twoMarkers: spec.twoMarkers,
+              accent: skin.accent,
+              track: skin.track),
         ),
       ),
       // ⚠️ A SQUARE FOR BOX BREATHING. "This one is naturally a square, not a
@@ -257,24 +347,28 @@ class _Breath extends StatelessWidget {
           width: 132,
           height: 132,
           decoration: BoxDecoration(
-            color: ttcPurple.withValues(alpha: 0.14),
+            color: skin.accent.withValues(alpha: 0.13),
             shape: spec.square ? BoxShape.rectangle : BoxShape.circle,
             borderRadius: spec.square ? BorderRadius.circular(18) : null,
-            border: Border.all(color: ttcPurple.withValues(alpha: 0.5), width: 2),
+            border:
+                Border.all(color: skin.accent.withValues(alpha: 0.5), width: 2),
           ),
         ),
       ),
       Column(mainAxisSize: MainAxisSize.min, children: [
         Text(running ? word : 'Ready',
-            style: ttcBody(13.5, color: ttcTitleInk, w: FontWeight.w800)),
+            style: pvManrope(
+                fontSize: 13.5,
+                fontWeight: FontWeight.w800,
+                color: skin.p.ink1)),
         const SizedBox(height: 4),
         Text(running ? '$count' : '',
             style: pvFraunces(
-                fontSize: 30, fontWeight: FontWeight.w600, color: ttcPurple)),
+                fontSize: 30, fontWeight: FontWeight.w600, color: skin.accent)),
         if (spec.countTo != null && running) ...[
           const SizedBox(height: 2),
           Text('Breath ${rounds.clamp(1, spec.countTo!)} of ${spec.countTo}',
-              style: ttcBody(11.5, color: ttcSoft)),
+              style: pvManrope(fontSize: 11.5, color: skin.p.ink2)),
         ],
         // ⚠️ THE SIDE, BECAUSE THE PRACTICE IS ABOUT WHICH SIDE. Alternate
         // nostril breathing with no indication of which nostril is a diagram of
@@ -287,7 +381,10 @@ class _Breath extends StatelessWidget {
                   : (rounds.isOdd
                       ? 'Out through the RIGHT'
                       : 'Out through the LEFT'),
-              style: ttcBody(11.5, color: ttcSoft, w: FontWeight.w700)),
+              style: pvManrope(
+                  fontSize: 11.5,
+                  fontWeight: FontWeight.w700,
+                  color: skin.p.ink2)),
         ],
       ]),
     ]);
@@ -300,9 +397,11 @@ class _Breath extends StatelessWidget {
 
 /// Attention moving down the body, one named part at a time.
 class _BodyScan extends StatelessWidget {
-  const _BodyScan({required this.steps, required this.progress});
+  const _BodyScan(
+      {required this.steps, required this.progress, required this.skin});
   final List<String> steps;
   final double progress;
+  final TtcPracticeSkin skin;
 
   @override
   Widget build(BuildContext context) {
@@ -317,7 +416,9 @@ class _BodyScan extends StatelessWidget {
         height: 150,
         child: CustomPaint(
           painter: _FigurePainter(
-              highlight: body.isEmpty ? 0 : i / body.length),
+              highlight: body.isEmpty ? 0 : i / body.length,
+              accent: skin.accent,
+              line: skin.track),
         ),
       ),
       const SizedBox(height: 12),
@@ -325,7 +426,7 @@ class _BodyScan extends StatelessWidget {
         width: 260,
         child: Text(body.isEmpty ? '' : body[i],
             textAlign: TextAlign.center,
-            style: ttcBody(13, color: ttcTitleInk, h: 1.4)),
+            style: pvManrope(fontSize: 13, height: 1.4, color: skin.p.ink1)),
       ),
     ]);
   }
@@ -333,9 +434,11 @@ class _BodyScan extends StatelessWidget {
 
 /// A soft pulse and a ring. No audio is bundled — she brings her own.
 class _Listen extends StatelessWidget {
-  const _Listen({required this.seconds, required this.progress});
+  const _Listen(
+      {required this.seconds, required this.progress, required this.skin});
   final double seconds;
   final double progress;
+  final TtcPracticeSkin skin;
 
   @override
   Widget build(BuildContext context) {
@@ -344,7 +447,11 @@ class _Listen extends StatelessWidget {
       SizedBox(
         width: 210,
         height: 210,
-        child: CustomPaint(painter: _RingPainter(progress: progress)),
+        child: CustomPaint(
+            painter: _RingPainter(
+                progress: progress,
+                accent: skin.accent,
+                track: skin.track)),
       ),
       Transform.scale(
         scale: pulse,
@@ -354,8 +461,8 @@ class _Listen extends StatelessWidget {
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             gradient: RadialGradient(colors: [
-              ttcPurple.withValues(alpha: 0.28),
-              ttcPurple.withValues(alpha: 0.04),
+              skin.accent.withValues(alpha: 0.28),
+              skin.accent.withValues(alpha: 0.04),
             ]),
           ),
         ),
@@ -363,7 +470,10 @@ class _Listen extends StatelessWidget {
       Padding(
         padding: const EdgeInsets.only(top: 96),
         child: Text('Play your own',
-            style: ttcBody(11.5, color: ttcSoft, w: FontWeight.w700)),
+            style: pvManrope(
+                fontSize: 11.5,
+                fontWeight: FontWeight.w700,
+                color: skin.p.ink2)),
       ),
     ]);
   }
@@ -371,9 +481,9 @@ class _Listen extends StatelessWidget {
 
 /// A drawn figure when one exists, and an honest placeholder until then.
 class _Figure extends StatelessWidget {
-  const _Figure({required this.spec, required this.progress});
-  final TtcFigureAnim spec;
+  const _Figure({required this.progress, required this.skin});
   final double progress;
+  final TtcPracticeSkin skin;
 
   @override
   Widget build(BuildContext context) {
@@ -382,22 +492,36 @@ class _Figure extends StatelessWidget {
     // that dropping a file in is a data edit. The package is not added yet
     // because adding a dependency for six files that do not exist is how a
     // pubspec collects things nobody uses.
+    //
+    // ⚠️ WHAT THE PLACEHOLDER SHOWS WAS THE HALF THAT LOOKED UNFINISHED. It
+    // was a grey icon and the sentence "Follow the steps below" -- an apology,
+    // in the largest object on the screen, on six of the twelve cards. The mark
+    // is now a wash rather than a subject, the ring it sits in is real
+    // information, and the two words left are an instruction rather than a
+    // notice about something missing. Nothing is invented: there is still no
+    // figure here, and no pretending there is one.
     return Stack(alignment: Alignment.center, children: [
       SizedBox(
         width: 210,
         height: 210,
-        child: CustomPaint(painter: _RingPainter(progress: progress)),
+        child: CustomPaint(
+            painter: _RingPainter(
+                progress: progress,
+                accent: skin.accent,
+                track: skin.track)),
       ),
+      Icon(Icons.self_improvement_rounded,
+          size: 104, color: skin.accent.withValues(alpha: 0.10)),
       Column(mainAxisSize: MainAxisSize.min, children: [
-        Icon(Icons.self_improvement_rounded,
-            size: 58, color: ttcPurple.withValues(alpha: 0.35)),
-        const SizedBox(height: 10),
-        SizedBox(
-          width: 190,
-          child: Text('Follow the steps below.',
-              textAlign: TextAlign.center,
-              style: ttcBody(12.5, color: ttcSoft, h: 1.45)),
-        ),
+        Text('Follow the steps',
+            style: pvManrope(
+                fontSize: 12.5,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.3,
+                color: skin.p.ink2)),
+        const SizedBox(height: 4),
+        Text('as you go',
+            style: pvManrope(fontSize: 12.5, color: skin.p.ink3)),
       ]),
     ]);
   }
@@ -405,9 +529,11 @@ class _Figure extends StatelessWidget {
 
 /// Ten minutes, and nothing else.
 class _PlainTimer extends StatelessWidget {
-  const _PlainTimer({required this.left, required this.progress});
+  const _PlainTimer(
+      {required this.left, required this.progress, required this.skin});
   final int left;
   final double progress;
+  final TtcPracticeSkin skin;
 
   @override
   Widget build(BuildContext context) {
@@ -417,11 +543,15 @@ class _PlainTimer extends StatelessWidget {
       SizedBox(
         width: 210,
         height: 210,
-        child: CustomPaint(painter: _RingPainter(progress: progress)),
+        child: CustomPaint(
+            painter: _RingPainter(
+                progress: progress,
+                accent: skin.accent,
+                track: skin.track)),
       ),
       Text('$m:${s.toString().padLeft(2, '0')}',
           style: pvFraunces(
-              fontSize: 40, fontWeight: FontWeight.w600, color: ttcTitleInk)),
+              fontSize: 40, fontWeight: FontWeight.w600, color: skin.p.ink1)),
     ]);
   }
 }
@@ -431,8 +561,14 @@ class _PlainTimer extends StatelessWidget {
 // =============================================================================
 
 class _RingPainter extends CustomPainter {
-  const _RingPainter({required this.progress, this.twoMarkers = false});
+  const _RingPainter(
+      {required this.progress,
+      required this.accent,
+      required this.track,
+      this.twoMarkers = false});
   final double progress;
+  final Color accent;
+  final Color track;
   final bool twoMarkers;
 
   @override
@@ -446,7 +582,7 @@ class _RingPainter extends CustomPainter {
         Paint()
           ..style = PaintingStyle.stroke
           ..strokeWidth = 5
-          ..color = ttcBorder);
+          ..color = track);
 
     canvas.drawArc(
         Rect.fromCircle(center: c, radius: r),
@@ -457,7 +593,7 @@ class _RingPainter extends CustomPainter {
           ..style = PaintingStyle.stroke
           ..strokeWidth = 5
           ..strokeCap = StrokeCap.round
-          ..color = ttcPurple);
+          ..color = accent);
 
     // ⚠️ TWO MARKERS FOR THE ONE PRACTICE THAT IS FOR TWO PEOPLE. It is a small
     // thing and it is the only thing on screen that says "this one is not
@@ -466,27 +602,33 @@ class _RingPainter extends CustomPainter {
     for (var i = 0; i < dots; i++) {
       final a = -math.pi / 2 + 2 * math.pi * progress + (i * 0.22);
       canvas.drawCircle(c + Offset(math.cos(a) * r, math.sin(a) * r), 6,
-          Paint()..color = ttcPurple);
+          Paint()..color = accent);
     }
   }
 
   @override
   bool shouldRepaint(_RingPainter old) =>
-      old.progress != progress || old.twoMarkers != twoMarkers;
+      old.progress != progress ||
+      old.twoMarkers != twoMarkers ||
+      old.accent != accent ||
+      old.track != track;
 }
 
 /// A body outline with one region lit. [highlight] runs 0 (head) → 1 (feet).
 class _FigurePainter extends CustomPainter {
-  const _FigurePainter({required this.highlight});
+  const _FigurePainter(
+      {required this.highlight, required this.accent, required this.line});
   final double highlight;
+  final Color accent;
+  final Color line;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final line = Paint()
+    final stroke = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.4
       ..strokeCap = StrokeCap.round
-      ..color = ttcBorder;
+      ..color = line;
 
     final cx = size.width / 2;
     final top = 14.0;
@@ -494,21 +636,24 @@ class _FigurePainter extends CustomPainter {
 
     // head, spine, arms, legs — deliberately schematic. It is a position
     // indicator, not an anatomy drawing.
-    canvas.drawCircle(Offset(cx, top + 10), 10, line);
-    canvas.drawLine(Offset(cx, top + 22), Offset(cx, bottom - 34), line);
-    canvas.drawLine(Offset(cx - 26, top + 40), Offset(cx + 26, top + 40), line);
+    canvas.drawCircle(Offset(cx, top + 10), 10, stroke);
+    canvas.drawLine(Offset(cx, top + 22), Offset(cx, bottom - 34), stroke);
+    canvas.drawLine(Offset(cx - 26, top + 40), Offset(cx + 26, top + 40), stroke);
     canvas.drawLine(
-        Offset(cx, bottom - 34), Offset(cx - 18, bottom), line);
+        Offset(cx, bottom - 34), Offset(cx - 18, bottom), stroke);
     canvas.drawLine(
-        Offset(cx, bottom - 34), Offset(cx + 18, bottom), line);
+        Offset(cx, bottom - 34), Offset(cx + 18, bottom), stroke);
 
     final y = top + (bottom - top) * highlight.clamp(0.0, 1.0);
     canvas.drawCircle(
         Offset(cx, y),
         17,
-        Paint()..color = ttcPurple.withValues(alpha: 0.20));
+        Paint()..color = accent.withValues(alpha: 0.20));
   }
 
   @override
-  bool shouldRepaint(_FigurePainter old) => old.highlight != highlight;
+  bool shouldRepaint(_FigurePainter old) =>
+      old.highlight != highlight ||
+      old.accent != accent ||
+      old.line != line;
 }

@@ -22,6 +22,7 @@ import '../../ttc/ttc_prepare_data.dart';
 import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_store.dart';
 import 'ttc_common.dart';
+import 'ttc_garbh_course_screen.dart';
 import 'ttc_strings.dart';
 
 class TtcPrepareScreen extends StatelessWidget {
@@ -163,6 +164,17 @@ class TtcOfferingScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ⚠️ ONE OFFERING IS NOT A BOOKING, AND THE REDIRECT LIVES HERE RATHER THAN
+    // AT THE FOUR CALL SITES. The free garbh sanskar course has no slot, no
+    // expert to meet and nothing to pay, so this screen drew it as a ₹0 price
+    // tag, a "Buy" button and an empty slot list — which is exactly the "price,
+    // upsell or locked session" its own brief forbids. Four places construct
+    // this screen (the shelf, two focus tiles, Ask Veda and the semen report);
+    // guarding each one is four chances to miss the fifth.
+    if (offering.id == kTtcOfferingGarbhCourse) {
+      return const TtcGarbhCourseScreen();
+    }
+
     return AnimatedBuilder(
       animation: Listenable.merge([BookingStore.instance, TtcLang.instance]),
       builder: (context, _) {
