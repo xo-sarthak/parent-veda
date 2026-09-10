@@ -50,6 +50,7 @@ import 'package:flutter/material.dart';
 import '../../data/doors/pv_door_data.dart';
 import '../../models/bracket.dart';
 import '../../services/pregnancy_controller.dart';
+import '../../data/conditions_data.dart' show ConditionsStore;
 import '../../services/scan_reports_store.dart';
 import '../../services/scans_store.dart';
 import '../../theme/pv_fonts.dart';
@@ -148,6 +149,12 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
         V2PaletteStore.instance,
         ScansStore.instance,
         ScanReportsStore.instance,
+        // ⚠️ ADDED WITH THE COMPLICATIONS DOOR. Its first tab renders the
+        // conditions search inline, and the two-way door writes to this store —
+        // so without it, answering the gate leaves the tab showing the gate.
+        // The list grows by one line per door that renders a stateful tool
+        // inline, and forgetting a line looks like a frozen tab.
+        ConditionsStore.instance,
       ]),
       builder: (context, _) {
         final p = V2PaletteStore.instance.current;
@@ -206,6 +213,8 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                       p: p,
                       onTap: () => openPvDoorSurface(
                           context, flag.surfaceId, widget.pregnancy),
+                      onLine: (conditionId) => openPvDoorConditionPage(
+                          context, conditionId, widget.pregnancy),
                     )),
                     const SizedBox(height: 22),
                   ],
@@ -760,11 +769,17 @@ class _WideTile extends StatelessWidget {
 /// earns attention by sitting above everything rather than by being loud.
 class _PinnedRedFlag extends StatelessWidget {
   const _PinnedRedFlag(
-      {required this.flag, required this.p, required this.onTap});
+      {required this.flag,
+      required this.p,
+      required this.onTap,
+      required this.onLine});
 
   final PvDoorRedFlag flag;
   final V2Palette p;
   final VoidCallback onTap;
+
+  /// Opens the condition page behind one line, where that line has one.
+  final void Function(String conditionId) onLine;
 
   @override
   Widget build(BuildContext context) => GestureDetector(
@@ -794,26 +809,60 @@ class _PinnedRedFlag extends StatelessWidget {
                 ),
               ]),
               const SizedBox(height: 12),
+              // ⚠️ A LINE WITH ITS OWN PAGE IS ITS OWN TARGET, and it has to
+              // stop the tap reaching the box behind it — otherwise a tap on
+              // "the baby moving less than usual" would open the general
+              // screen rather than the page that line was assembled from.
+              // `GestureDetector` on the row does that by consuming the
+              // gesture; the box's own handler only ever sees the gaps.
               for (final line in flag.lines) ...[
-                Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Padding(
-                    padding: const EdgeInsets.only(top: 7, right: 9),
-                    child: Container(
-                      width: 4,
-                      height: 4,
-                      decoration: const BoxDecoration(
-                          color: kPvUrgentInk, shape: BoxShape.circle),
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(line,
-                        style: pvManrope(
-                            fontSize: 13, height: 1.55, color: p.ink1)),
-                  ),
-                ]),
-                const SizedBox(height: 7),
+                GestureDetector(
+                  onTap: line.conditionId == null
+                      ? null
+                      : () => onLine(line.conditionId!),
+                  behavior: HitTestBehavior.opaque,
+                  child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 7, right: 9),
+                          child: Container(
+                            width: 4,
+                            height: 4,
+                            decoration: const BoxDecoration(
+                                color: kPvUrgentInk, shape: BoxShape.circle),
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(line.text,
+                              style: pvManrope(
+                                  fontSize: 13, height: 1.55, color: p.ink1)),
+                        ),
+                        // The mark that says this line goes somewhere. Only on
+                        // the lines that do.
+                        if (line.conditionId != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 2, left: 6),
+                            child: Icon(Icons.chevron_right_rounded,
+                                size: 16,
+                                color: kPvUrgentInk.withValues(alpha: 0.7)),
+                          ),
+                      ]),
+                ),
+                const SizedBox(height: 9),
               ],
-              const SizedBox(height: 4),
+              // ⚠️ THE BRIEF'S OWN SENTENCE, WHERE A FLAG CARRIES ONE. It sits
+              // above the "see all" link because it qualifies the LIST, not the
+              // link — "this tells you when to call and never replaces calling
+              // a doctor or going in".
+              if (flag.footer case final footer?) ...[
+                const SizedBox(height: 4),
+                Text(footer,
+                    style: pvManrope(
+                        fontSize: 12, height: 1.55, color: p.ink2)),
+                const SizedBox(height: 10),
+              ] else
+                const SizedBox(height: 4),
               Text('See all of these',
                   style: pvManrope(
                       fontSize: 12.5,

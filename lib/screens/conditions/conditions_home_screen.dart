@@ -133,10 +133,20 @@ class _ConditionsHomeScreenState extends State<ConditionsHomeScreen> {
 //  name at this point would push her toward typing something frightening
 //  before she has even seen that the section is calm.
 class _DoorGate extends StatelessWidget {
-  const _DoorGate({required this.p, required this.lang, required this.onAnswered});
+  const _DoorGate(
+      {required this.p,
+      required this.lang,
+      required this.onAnswered,
+      this.embedded = false});
   final V2Palette p;
   final AppLanguage lang;
   final VoidCallback onAnswered;
+
+  /// ⚠️ DROPS THE `Center` AND THE INNER SCROLL. On its own screen the gate is
+  /// the whole body and centring it is right. Inside a door it is one block in
+  /// somebody else's list, and a `SingleChildScrollView` there is a nested
+  /// scroll nobody can drive with a thumb.
+  final bool embedded;
 
   void _choose(ConditionDoorAnswer a) {
     ConditionsStore.instance.setDoor(a);
@@ -144,8 +154,8 @@ class _DoorGate extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) => Center(
-        child: SingleChildScrollView(
+  Widget build(BuildContext context) {
+    final body = Padding(
           padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 30),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             Text(
@@ -197,8 +207,11 @@ class _DoorGate extends StatelessWidget {
               onTap: () => _choose(ConditionDoorAnswer.curious),
             ),
           ]),
-        ),
-      );
+        );
+
+    if (embedded) return body;
+    return Center(child: SingleChildScrollView(child: body));
+  }
 }
 
 // -----------------------------------------------------------------------------
@@ -215,7 +228,15 @@ class _Browse extends StatelessWidget {
     required this.onToggleSeeMore,
     required this.onChangeDoor,
     required this.onOpen,
+    this.embedded = false,
   });
+
+  /// Rendered inside a door's own scroll rather than as a screen body.
+  ///
+  /// ⚠️ A COLUMN, NOT A LIST, when embedded. A scrolling widget inside another
+  /// scrolling widget is either unbounded or a nested scroll nobody can drive
+  /// with a thumb — the same rule `ScanTimelineBody` follows.
+  final bool embedded;
 
   final V2Palette p;
   final AppLanguage lang;
@@ -236,9 +257,7 @@ class _Browse extends StatelessWidget {
         final results =
             searching ? kAllConditions.where((c) => c.matches(query)).toList() : const <ConditionEntry>[];
 
-        return ListView(
-          padding: const EdgeInsets.fromLTRB(18, 8, 18, 44),
-          children: [
+        final children = <Widget>[
             _DoorChip(store: store, p: p, lang: lang, onTap: onChangeDoor),
             const SizedBox(height: 16),
             _SearchField(controller: search, p: p, lang: lang),
@@ -275,7 +294,13 @@ class _Browse extends StatelessWidget {
                       SolutionCard(
                         type: SolutionType.read,
                         title: c.name,
-                        value: c.reassurance,
+                        // ⚠️ THE PLAIN LINE, NOT THE REASSURANCE — the brief asks for it
+                        // under every name in a browse list, and it is the
+                        // better line for scanning. "Pregnancy sugar goes high"
+                        // tells her whether this row is hers in three words;
+                        // the reassurance is two lines answering a question she
+                        // has not asked yet, and it still opens the page.
+                        value: c.plainLine,
                         p: p,
                         lang: lang,
                         onTap: () => onOpen(c),
@@ -293,7 +318,13 @@ class _Browse extends StatelessWidget {
                     SolutionCard(
                       type: SolutionType.read,
                       title: c.name,
-                      value: c.reassurance,
+                      // ⚠️ THE PLAIN LINE, NOT THE REASSURANCE — the brief asks for it
+                        // under every name in a browse list, and it is the
+                        // better line for scanning. "Pregnancy sugar goes high"
+                        // tells her whether this row is hers in three words;
+                        // the reassurance is two lines answering a question she
+                        // has not asked yet, and it still opens the page.
+                        value: c.plainLine,
                       p: p,
                       lang: lang,
                       onTap: () => onOpen(c),
@@ -310,7 +341,13 @@ class _Browse extends StatelessWidget {
                     SolutionCard(
                       type: SolutionType.read,
                       title: c.name,
-                      value: c.reassurance,
+                      // ⚠️ THE PLAIN LINE, NOT THE REASSURANCE — the brief asks for it
+                        // under every name in a browse list, and it is the
+                        // better line for scanning. "Pregnancy sugar goes high"
+                        // tells her whether this row is hers in three words;
+                        // the reassurance is two lines answering a question she
+                        // has not asked yet, and it still opens the page.
+                        value: c.plainLine,
                       p: p,
                       lang: lang,
                       onTap: () => onOpen(c),
@@ -343,7 +380,13 @@ class _Browse extends StatelessWidget {
                         SolutionCard(
                           type: SolutionType.read,
                           title: c.name,
-                          value: c.reassurance,
+                          // ⚠️ THE PLAIN LINE, NOT THE REASSURANCE — the brief asks for it
+                        // under every name in a browse list, and it is the
+                        // better line for scanning. "Pregnancy sugar goes high"
+                        // tells her whether this row is hers in three words;
+                        // the reassurance is two lines answering a question she
+                        // has not asked yet, and it still opens the page.
+                        value: c.plainLine,
                           p: p,
                           lang: lang,
                           onTap: () => onOpen(c),
@@ -355,7 +398,93 @@ class _Browse extends StatelessWidget {
                 ],
               ],
             ],
-          ],
+          ];
+
+        if (embedded) {
+          return Column(
+              crossAxisAlignment: CrossAxisAlignment.start, children: children);
+        }
+        return ListView(
+          padding: const EdgeInsets.fromLTRB(18, 8, 18, 44),
+          children: children,
+        );
+      },
+    );
+  }
+}
+
+/// The search screen, without a Scaffold or an app bar.
+///
+/// ⚠️ EXTRACTED SO THE COMPLICATIONS DOOR CAN RENDER IT IN PLACE. Its brief
+/// calls sub-tab 1 "a search screen, NOT a rail", and the search bar, the "My
+/// doctor told me" chip and the Most-common list ARE that tab — a card in front
+/// of them would be a door in front of a door.
+///
+/// ⚠️ AND THE TWO-WAY DOOR COMES WITH IT. `_DoorGate` is not chrome: it asks
+/// whether this visit is diagnosed-real or curiosity, and the answer changes
+/// what the whole area shows. Rendering the browse without it would let a door
+/// bypass a question the screen exists to ask.
+class ConditionsHomeBody extends StatefulWidget {
+  const ConditionsHomeBody({super.key, required this.pregnancy});
+
+  final PregnancyController pregnancy;
+
+  @override
+  State<ConditionsHomeBody> createState() => _ConditionsHomeBodyState();
+}
+
+class _ConditionsHomeBodyState extends State<ConditionsHomeBody> {
+  final _search = TextEditingController();
+  bool _seeMore = false;
+  bool _showGate = false;
+
+  @override
+  void initState() {
+    super.initState();
+    ConditionsStore.instance.init();
+  }
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
+  void _openCondition(ConditionEntry e) {
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      settings: RouteSettings(name: 'conditions/${e.id}'),
+      builder: (_) =>
+          ConditionDetailScreen(entry: e, pregnancy: widget.pregnancy),
+    ));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final lang = widget.pregnancy.language;
+
+    return AnimatedBuilder(
+      animation: ConditionsStore.instance,
+      builder: (context, _) {
+        final p = V2PaletteStore.instance.current;
+        final store = ConditionsStore.instance;
+
+        if (!store.answered || _showGate) {
+          return _DoorGate(
+              p: p,
+              lang: lang,
+              embedded: true,
+              onAnswered: () => setState(() => _showGate = false));
+        }
+        return _Browse(
+          p: p,
+          lang: lang,
+          store: store,
+          search: _search,
+          seeMore: _seeMore,
+          embedded: true,
+          onToggleSeeMore: () => setState(() => _seeMore = !_seeMore),
+          onChangeDoor: () => setState(() => _showGate = true),
+          onOpen: _openCondition,
         );
       },
     );
@@ -465,7 +594,13 @@ class _SearchResults extends StatelessWidget {
           SolutionCard(
             type: SolutionType.read,
             title: c.name,
-            value: c.reassurance,
+            // ⚠️ THE PLAIN LINE, NOT THE REASSURANCE — the brief asks for it
+                        // under every name in a browse list, and it is the
+                        // better line for scanning. "Pregnancy sugar goes high"
+                        // tells her whether this row is hers in three words;
+                        // the reassurance is two lines answering a question she
+                        // has not asked yet, and it still opens the page.
+                        value: c.plainLine,
             p: p,
             lang: lang,
             onTap: () => onOpen(c),

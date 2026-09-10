@@ -30,13 +30,14 @@ import 'package:parentveda/services/pregnancy_controller.dart';
 /// The narrowest screen this app is designed against.
 const Size _phone = Size(360, 780);
 
-Future<void> _pump(WidgetTester tester) async {
+Future<void> _pump(WidgetTester tester,
+    [String bracketId = 'pregnancy_scans_tests']) async {
   tester.view.physicalSize = _phone;
   tester.view.devicePixelRatio = 1.0;
   addTearDown(tester.view.reset);
 
-  final door = pvDoorPageFor('pregnancy_scans_tests')!;
-  final bracket = bracketById('pregnancy_scans_tests')!;
+  final door = pvDoorPageFor(bracketId)!;
+  final bracket = bracketById(bracketId)!;
 
   await tester.pumpWidget(MaterialApp(
     home: PvDoorScreen(
@@ -52,6 +53,8 @@ Future<void> _pump(WidgetTester tester) async {
 }
 
 void main() {
+  _everyDoor();
+
   testWidgets('the door opens on My scans, with the timeline on it',
       (tester) async {
     await _pump(tester);
@@ -127,8 +130,8 @@ void main() {
     // ⚠️ EVERY LINE, NOT A SELECTION. Shoulder-tip pain is the classic sign of
     // a ruptured ectopic and is the entry a layout compromise drops first.
     for (final line in kScanUrgentSignsEn) {
-      expect(find.text(line), findsOneWidget,
-          reason: 'a red-flag line is missing: $line');
+      expect(find.text(line.text), findsOneWidget,
+          reason: 'a red-flag line is missing: ${line.text}');
     }
   });
 
@@ -178,4 +181,77 @@ void main() {
           reason: 'tab "${door.groups[i].label}" overflows at 360dp.');
     }
   });
+}
+
+// =============================================================================
+//  Every door, not just the first
+// -----------------------------------------------------------------------------
+//  ⚠️ THESE WALK `kPvDoorPages`, so a door registered later inherits them
+//  without anybody remembering. The data tests already do that; this is the
+//  same guarantee for the things only a real build can show — a tab that draws
+//  nothing, or a rail that overflows at phone width.
+// =============================================================================
+
+void _everyDoor() {
+  for (final door in kPvDoorPages) {
+    final name = door.bracketId;
+
+    testWidgets('$name opens on its first tab and draws it', (tester) async {
+      await _pump(tester, name);
+      expect(find.text(door.heroTitle), findsOneWidget);
+      expect(find.byKey(kPvDoorCarouselKey), findsOneWidget);
+      for (var i = 0; i < door.groups.length; i++) {
+        expect(find.byKey(pvDoorDotKey(i)), findsOneWidget);
+      }
+    });
+
+    testWidgets('$name: every tab draws its own sections', (tester) async {
+      await _pump(tester, name);
+      for (var i = 0; i < door.groups.length; i++) {
+        if (i > 0) {
+          await tester.tap(find.byKey(pvDoorDotKey(i)));
+          await tester.pump();
+          await tester.pump(const Duration(milliseconds: 500));
+        }
+        final g = door.groups[i];
+        for (final s in door.sectionsOf(g.id)) {
+          expect(find.text(s.heading), findsOneWidget,
+              reason: '$name / "${g.label}": section "${s.heading}" is not on '
+                  'screen while that tab is open.');
+        }
+      }
+    });
+
+    testWidgets('$name: nothing overflows at 360dp on any tab',
+        (tester) async {
+      await _pump(tester, name);
+      for (var i = 0; i < door.groups.length; i++) {
+        if (i > 0) {
+          await tester.tap(find.byKey(pvDoorDotKey(i)));
+          await tester.pump();
+          await tester.pump(const Duration(milliseconds: 500));
+        }
+        expect(tester.takeException(), isNull,
+            reason: '$name / "${door.groups[i].label}" overflows at 360dp.');
+      }
+    });
+
+    testWidgets('$name: every pinned flag renders every line', (tester) async {
+      await _pump(tester, name);
+      for (var i = 0; i < door.groups.length; i++) {
+        final flag = door.groups[i].pinnedRedFlag;
+        if (flag == null) continue;
+        if (i > 0) {
+          await tester.tap(find.byKey(pvDoorDotKey(i)));
+          await tester.pump();
+          await tester.pump(const Duration(milliseconds: 500));
+        }
+        expect(find.text(flag.title), findsOneWidget);
+        for (final line in flag.lines) {
+          expect(find.text(line.text), findsOneWidget,
+              reason: '$name: a red-flag line is missing: ${line.text}');
+        }
+      }
+    });
+  }
 }

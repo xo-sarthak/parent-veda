@@ -43,9 +43,16 @@ import '../../data/doors/pv_door_data.dart';
 import '../../data/reads/pregnancy_reads.dart';
 import '../../data/tests_scans_reports_data.dart';
 import '../../services/pregnancy_controller.dart';
+import '../../data/conditions_data.dart';
+import '../../data/report_findings_data.dart';
+import '../../models/report_finding.dart';
+import '../conditions/condition_detail_screen.dart';
+import '../conditions/conditions_home_screen.dart';
+import '../brackets/same_day_signs_screen.dart';
 import '../brackets/scan_detail_screen.dart';
 import '../brackets/scan_next_screen.dart';
-import '../brackets/scan_questions_screen.dart';
+import '../../data/checklists/pv_checklist.dart';
+import '../brackets/pv_checklist_screen.dart';
 import '../brackets/scan_reports_screen.dart';
 import '../brackets/scan_timeline_screen.dart';
 import '../brackets/scan_urgent_screen.dart';
@@ -61,7 +68,12 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
       kScansSurfaceReports => ScanReportsScreen(pregnancy: c),
       kScansSurfaceDecoder => ReportScreen(controller: c),
       kScansSurfaceUrgent => const ScanUrgentScreen(),
-      kScansSurfaceQuestions => ScanQuestionsScreen(pregnancy: c),
+      // ⚠️ THE GENERIC CHECKLIST SCREEN, GIVEN THIS DOOR'S HUE. The list knows
+      // what it is about (it reads `ScansStore` itself); the door decides what
+      // colour it wears, so a checklist opened from Scans is blue and the same
+      // widget opened from Complications is teal.
+      kScansSurfaceQuestions => PvChecklistScreen(
+          checklist: pvChecklistById('scan_questions')!, hue: 206),
       kScansSurfaceConsult => ConsultationsScreen(lang: c.language),
 
       // ⚠️ THE RESLOT, AND IT IS THE SAME TOOL — NOT A COPY OF IT.
@@ -91,8 +103,35 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
               'the usual range, and what it means when yours sits outside it.',
         ),
 
+      // ---- Complications & conditions -------------------------------------
+      kCondSurfaceFind => ConditionsHomeScreen(pregnancy: c),
+      kCondSurfaceSameDay => SameDaySignsScreen(pregnancy: c),
+
+      // ⚠️ "Add a condition to my journey" OPENS THE SEARCH, AND THAT IS THE
+      // REUSE THE BRIEF ASKS FOR. Its words: *"reuse the existing 'Add to my
+      // journey' action"* — and that action lives ON a condition page, because
+      // adding one requires having chosen one. From a door there is no
+      // condition yet, so the honest route is the screen that picks one, where
+      // the button then does exactly what it always did. Building a second
+      // adder here would be a second way to write the same set.
+      kCondSurfaceJourney => ConditionsHomeScreen(pregnancy: c),
+
+      kCondSurfaceQuestions => PvChecklistScreen(
+          checklist: pvChecklistById('condition_questions')!, hue: 186),
+
       _ => null,
     };
+
+/// Open one condition page directly. Used by a pinned flag's per-line taps.
+void openPvDoorConditionPage(
+    BuildContext context, String conditionId, PregnancyController c) {
+  final entry = _conditionById(conditionId);
+  if (entry == null) return;
+  Navigator.of(context).push(MaterialPageRoute<void>(
+    settings: RouteSettings(name: 'conditions/$conditionId'),
+    builder: (_) => ConditionDetailScreen(entry: entry, pregnancy: c),
+  ));
+}
 
 /// The tool a group renders IN PLACE, or null when it is not an inline tool.
 ///
@@ -107,6 +146,11 @@ Widget? pvDoorInlineToolFor(String id, PregnancyController c) => switch (id) {
       // `ReportScreen.embedded`: the decoder's content is inseparable from its
       // filter state, so a body would either duplicate that state or wrap it.
       kScansSurfaceDecoder => ReportScreen(controller: c, embedded: true),
+      // ⚠️ THE SEARCH SCREEN *AND* THE TWO-WAY DOOR. `ConditionsHomeBody`
+      // renders the gate when she has not answered it yet, which is right: the
+      // question changes what the whole area offers, and a door that skipped it
+      // would bypass something the screen exists to ask.
+      kCondSurfaceFind => ConditionsHomeBody(pregnancy: c),
       _ => null,
     };
 
@@ -164,6 +208,34 @@ void openPvDoorTile(
         builder: (_) => ScanDetailScreen(scan: scan, pregnancy: c),
       ));
 
+    // ---- one condition, on the page Complications owns ---------------------
+    case PvDoorConditionTile(:final conditionId):
+      final entry = _conditionById(conditionId);
+      if (entry == null) return; // caught by the wiring test, never by a user
+      Navigator.of(context).push(MaterialPageRoute<void>(
+        // ⚠️ THE PAGE'S OWN ROUTE NAME, unchanged from when it was reached
+        // through the conditions home. Ask Veda's context comes off this, and
+        // so does the single-source claim: there is one route per condition,
+        // however many doors point at it.
+        settings: RouteSettings(name: 'conditions/$conditionId'),
+        builder: (_) => ConditionDetailScreen(entry: entry, pregnancy: c),
+      ));
+
+    // ---- one finding, on the report-shaped page Scans owns -----------------
+    //
+    // ⚠️ THE SECOND LIBRARY, DELIBERATELY. See
+    // `docs/PREGNANCY-DOOR-BUILD.md` §4a — one page per QUESTION, not one page
+    // per word. Complications links here for the two subjects it does not own
+    // rather than growing a copy of them.
+    case PvDoorFindingTile(:final findingId):
+      final finding = _findingById(findingId);
+      if (finding == null) return;
+      Navigator.of(context).push(MaterialPageRoute<void>(
+        settings: RouteSettings(name: 'report/$findingId'),
+        builder: (_) =>
+            ReportArticleScreen(finding: finding, controller: c),
+      ));
+
     // ---- reading ------------------------------------------------------------
     case PvDoorGuideTile(:final readId, :final atHeading):
       openPvDoorRead(context, readId, c, atHeading: atHeading);
@@ -204,6 +276,22 @@ void openPvDoorRead(
   ));
 }
 
+/// The condition entry for an id, or null.
+ConditionEntry? _conditionById(String id) {
+  for (final e in kAllConditions) {
+    if (e.id == id) return e;
+  }
+  return null;
+}
+
+/// The report finding for an id, or null.
+ReportFinding? _findingById(String id) {
+  for (final f in kReportFindings) {
+    if (f.id == id) return f;
+  }
+  return null;
+}
+
 /// The scan library entry for an id, or null.
 TestScanInfo? _scanById(String id) {
   for (final s in kTestsScans) {
@@ -221,7 +309,11 @@ bool pvDoorSurfaceResolves(String id) => switch (id) {
       kScansSurfaceUrgent ||
       kScansSurfaceQuestions ||
       kScansSurfaceConsult ||
-      kScansSurfaceParameters =>
+      kScansSurfaceParameters ||
+      kCondSurfaceFind ||
+      kCondSurfaceSameDay ||
+      kCondSurfaceJourney ||
+      kCondSurfaceQuestions =>
         true,
       _ => false,
     };

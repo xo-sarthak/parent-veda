@@ -1,143 +1,85 @@
 // =============================================================================
-//  What to ask at your next scan — the checklist
+//  A checklist — tick it, take it in, send it
 // -----------------------------------------------------------------------------
-//  Sub-tab 5's one new card. The brief: "[Checklist] NEW, shareable."
+//  One screen for every door's "before your appointment" tab. It renders a
+//  `PvChecklist` and knows nothing about scans or conditions; what it is about
+//  comes from the list's own `subject()`, which reads that area's store.
 //
-//  ⚠️ IT NAMES HER NEXT SCAN, AND THAT IS THE WHOLE DIFFERENCE BETWEEN THIS AND
-//  A LIST OF QUESTIONS. The same twenty lines under a heading reading "What to
-//  ask at your next scan" is a leaflet; under "Your anomaly scan, weeks 18–22"
-//  it is hers. The next scan is worked out from the timeline she already keeps
-//  — nothing is asked for, which is CLAUDE.md's derive-never-ask rule in the
-//  place it is cheapest to honour.
-//
-//  When there is no next scan — everything ticked off, or a fresh install with
-//  no due date — the heading falls back and the list still works. An empty
-//  state here is not a special case; it is the same screen with one line less.
+//  ⚠️ GENERALISED FROM `ScanQuestionsScreen` AT THE SECOND CALLER. See the
+//  header of `pv_checklist.dart` for why that timing rather than the third.
 //
 //  ---------------------------------------------------------------------------
 //  ⚠️ IT NEVER SCORES, RANKS OR CONGRATULATES
 //  ---------------------------------------------------------------------------
 //
-//  No progress bar, no "4 of 18", no streak. A counter on a list of things you
-//  are nervous enough to write down is a debt statement — the same reason the
-//  door playbook forbids "3 of 8" on a health questionnaire and the reason the
-//  brief's DO NOT list ends with "do not add a streak or gamification".
+//  No progress bar, no "4 of 18", no streak. A counter on a list of things
+//  somebody is nervous enough to write down is a debt statement — the same
+//  reason the door playbook forbids "3 of 8" on a health questionnaire, and the
+//  reason both briefs' DO NOT lists end with "no streak or gamification".
 //
-//  The count that IS shown is on the share button, and it is there because it
-//  is the one place a number is useful: it says how long the message you are
-//  about to send will be.
+//  The count that IS shown sits on the share button, because that is the one
+//  place a number is useful: it says how long the message is about to be.
 //
 //  ---------------------------------------------------------------------------
 //  ⚠️ SHARE IS A TEXT MESSAGE, NOT A DOCUMENT
 //  ---------------------------------------------------------------------------
 //
-//  `Share.share` with plain text, through the OS sheet — so it lands in
-//  WhatsApp, which is where it will actually go. A PDF would look more finished
-//  and would be worse: she wants to paste this into a chat with her husband or
-//  her mother, or read it off her own screen in a corridor, and a downloaded
-//  file does neither.
+//  `Share.share` with plain text through the OS sheet, so it lands in WhatsApp,
+//  which is where it will actually go. A PDF would look more finished and would
+//  be worse: she wants to paste this into a chat with her husband or her
+//  mother, or read it off her own screen in a corridor, and a downloaded file
+//  does neither.
 // =============================================================================
 
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
-import '../../data/scan_questions_data.dart';
-import '../../data/tests_scans_reports_data.dart';
-import '../../services/pregnancy_controller.dart';
-import '../../services/scan_questions_store.dart';
-import '../../services/scans_store.dart';
+import '../../data/checklists/pv_checklist.dart';
+import '../../services/pv_checklist_store.dart';
+import '../../services/pv_checklist_subjects.dart';
 import '../../theme/pv_fonts.dart';
 import '../doors/pv_door_chrome.dart';
 import '../v2/v2_palette.dart';
-import 'scan_timeline_screen.dart' show kScanRun;
 
-/// The scans bracket's hue.
-const double _hue = 206;
+class PvChecklistScreen extends StatefulWidget {
+  const PvChecklistScreen({
+    super.key,
+    required this.checklist,
+    required this.hue,
+  });
 
-class ScanQuestionsScreen extends StatefulWidget {
-  const ScanQuestionsScreen({super.key, required this.pregnancy});
+  final PvChecklist checklist;
 
-  final PregnancyController pregnancy;
+  /// The door's own hue, so a checklist opened from Scans is blue and one
+  /// opened from Complications is teal. Passed in rather than stored on the
+  /// list: the same checklist could sit on two doors, and it should look like
+  /// wherever she came from.
+  final double hue;
 
   @override
-  State<ScanQuestionsScreen> createState() => _ScanQuestionsScreenState();
+  State<PvChecklistScreen> createState() => _PvChecklistScreenState();
 }
 
-class _ScanQuestionsScreenState extends State<ScanQuestionsScreen> {
+class _PvChecklistScreenState extends State<PvChecklistScreen> {
+  PvChecklist get list => widget.checklist;
+
   @override
   void initState() {
     super.initState();
-    ScanQuestionsStore.instance.init();
-  }
-
-  /// The scan she is heading for, by name, or null.
-  ///
-  /// ⚠️ THE SAME RULE THE TIMELINE USES, AND IT IS DELIBERATELY NOT SHARED AS
-  /// CODE. The timeline's `_nextId` decides which row is marked NEXT and reads
-  /// the scan run in clinical order; this reads her booked appointments first,
-  /// because a woman opening a checklist called "your next scan" means the one
-  /// she has a date for, not the one the schedule says is due.
-  ///
-  /// Two different questions that usually have the same answer. Merging them
-  /// would mean one of the two screens quietly starts answering the other's.
-  (String, String)? _nextScan() {
-    final store = ScansStore.instance;
-
-    // 1. Something she has actually booked, soonest first.
-    final booked = <(DateTime, TestScanInfo)>[];
-    for (final a in store.appointments) {
-      final d = DateTime.tryParse(a.dateIso);
-      if (d == null) continue;
-      if (d.difference(DateTime.now()).inDays < -1) continue;
-      final m = _match(a.title);
-      if (m != null) booked.add((d, m));
-    }
-    if (booked.isNotEmpty) {
-      booked.sort((x, y) => x.$1.compareTo(y.$1));
-      final s = booked.first.$2;
-      return (s.name.en, _weeksFor(s.id));
-    }
-
-    // 2. Otherwise the first scan in the run she has not marked done.
-    for (final (id, from, to) in kScanRun) {
-      if (store.isCompleted(id)) continue;
-      for (final s in kTestsScans) {
-        if (s.id == id) return (s.name.en, 'weeks $from–$to');
-      }
-    }
-    return null;
-  }
-
-  String _weeksFor(String id) {
-    for (final (rid, from, to) in kScanRun) {
-      if (rid == id) return 'weeks $from–$to';
-    }
-    return '';
-  }
-
-  TestScanInfo? _match(String title) {
-    final t = title.toLowerCase();
-    for (final s in kTestsScans) {
-      if (t.contains(s.name.en.toLowerCase())) return s;
-      for (final a in s.aliases) {
-        if (t.contains(a.en.toLowerCase())) return a.en.isEmpty ? null : s;
-      }
-    }
-    return null;
+    PvChecklistStore.instance.init(list.id);
   }
 
   Future<void> _share() async {
-    final store = ScanQuestionsStore.instance;
-    final next = _nextScan();
+    final store = PvChecklistStore.instance;
 
-    // ⚠️ TICKED ONLY, AND THE ORDER IS THE PAGE'S. Sharing the whole list would
-    // be sharing a leaflet; sharing them in tick order would arrive as whatever
+    // ⚠️ TICKED ONLY, AND IN THE PAGE'S ORDER. Sharing the whole list would be
+    // sharing a leaflet; sharing in tick order would arrive as whatever
     // sequence she happened to tap. Reading the page's own order back means the
-    // message looks like the screen.
+    // message looks like the screen she just filled in.
     final lines = <String>[];
-    for (final g in kScanQuestions) {
+    for (final g in list.groups) {
       final picked =
-          g.questions.where((q) => store.isTicked(q.id)).toList();
+          g.items.where((q) => store.isTicked(list.id, q.id)).toList();
       if (picked.isEmpty) continue;
       lines.add('');
       lines.add(g.heading);
@@ -147,41 +89,46 @@ class _ScanQuestionsScreenState extends State<ScanQuestionsScreen> {
     }
     if (lines.isEmpty) return;
 
-    final header = next == null
-        ? 'What to ask at my next scan'
-        : 'What to ask at my ${next.$1} (${next.$2})';
+    final subject = list.subject?.call();
+    final header = subject == null
+        ? list.shareHeader
+        : '${list.shareHeader} — $subject';
 
     await Share.share('$header\n${lines.join('\n')}');
   }
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
+        // ⚠️ THE SUBJECT'S OWN STORE IS LISTENED TO, NOT JUST THE TICKS.
+        // `subject()` reads `ScansStore` or `ConditionsStore`, so a scan marked
+        // done or a condition added while this screen is open changes the
+        // heading — and without this the title would go stale in place, which
+        // is the inline-tool bug one level up.
         animation: Listenable.merge([
-          ScanQuestionsStore.instance,
-          ScansStore.instance,
+          PvChecklistStore.instance,
           V2PaletteStore.instance,
+          ...pvChecklistSubjectStores,
         ]),
         builder: (context, _) {
           final p = V2PaletteStore.instance.current;
-          final store = ScanQuestionsStore.instance;
-          final next = _nextScan();
+          final store = PvChecklistStore.instance;
+          final count = store.count(list.id);
+          final subject = list.subject?.call();
 
           return PvDoorToolScaffold(
-            hue: _hue,
-            eyebrow: 'Before your appointment',
-            title: next == null
-                ? 'What to ask at your next scan'
-                : 'What to ask at your ${next.$1}',
-            intro: next == null
-                ? 'Tick what matters to you, and take the list in with you. '
-                    'Nothing here is a test — they are questions your doctor '
-                    'is used to answering.'
-                : 'Coming up around ${next.$2}. Tick what matters to you and '
-                    'take the list in with you — these are questions your '
-                    'doctor is used to answering.',
-            action: store.count == 0 ? null : _ShareBar(p: p, count: store.count, onTap: _share),
+            hue: widget.hue,
+            eyebrow: list.eyebrow,
+            title: subject == null
+                ? list.title
+                : (list.subjectTitle?.call(subject) ?? list.title),
+            intro: subject == null
+                ? list.intro
+                : (list.subjectIntro?.call(subject) ?? list.intro),
+            action: count == 0
+                ? null
+                : _ShareBar(p: p, count: count, onTap: _share),
             children: [
-              for (final g in kScanQuestions) ...[
+              for (final g in list.groups) ...[
                 pvDoorPad(Text(g.heading,
                     style: pvFraunces(
                         fontSize: 19,
@@ -190,12 +137,13 @@ class _ScanQuestionsScreenState extends State<ScanQuestionsScreen> {
                         letterSpacing: -0.4,
                         color: p.ink1))),
                 const SizedBox(height: 11),
-                for (final q in g.questions) ...[
-                  pvDoorPad(_QuestionRow(
-                    question: q,
-                    ticked: store.isTicked(q.id),
+                for (final q in g.items) ...[
+                  pvDoorPad(_ItemRow(
+                    item: q,
+                    hue: widget.hue,
+                    ticked: store.isTicked(list.id, q.id),
                     p: p,
-                    onTap: () => store.toggle(q.id),
+                    onTap: () => store.toggle(list.id, q.id),
                   )),
                   const SizedBox(height: 8),
                 ],
@@ -205,15 +153,15 @@ class _ScanQuestionsScreenState extends State<ScanQuestionsScreen> {
               // ⚠️ THE INVITATION, NOT A BLANK. Nothing ticked means the share
               // bar is not there, and a screen whose only action has silently
               // vanished reads as broken. One line says where it went.
-              if (store.count == 0)
+              if (count == 0)
                 pvDoorPad(Text(
                     'Tick a few and a share button appears, so you can send '
                     'the list to yourself or to whoever is coming with you.',
                     style: pvManrope(
                         fontSize: 12.5, height: 1.55, color: p.ink3))),
-              if (store.count > 0)
+              if (count > 0)
                 pvDoorPad(GestureDetector(
-                  onTap: store.clear,
+                  onTap: () => store.clear(list.id),
                   behavior: HitTestBehavior.opaque,
                   child: Text('Clear all',
                       style: pvManrope(
@@ -225,7 +173,7 @@ class _ScanQuestionsScreenState extends State<ScanQuestionsScreen> {
               pvDoorPad(PvDoorDisclaimer(p: p)),
               // Clearance for the pinned share bar, so the last row is
               // reachable rather than sitting under it.
-              if (store.count > 0) const SizedBox(height: 64),
+              if (count > 0) const SizedBox(height: 64),
             ],
           );
         },
@@ -234,29 +182,31 @@ class _ScanQuestionsScreenState extends State<ScanQuestionsScreen> {
 
 /// One question. A tick, and the words.
 ///
-/// ⚠️ THE WHOLE ROW IS THE TARGET, NOT THE BOX. A 22pt checkbox is under every
+/// ⚠️ THE WHOLE ROW IS THE TARGET, NOT THE BOX. A 20pt checkbox is under every
 /// touch minimum, and a list where the words are inert teaches that the words
 /// are not the thing — on a screen whose entire content is sentences.
-class _QuestionRow extends StatelessWidget {
-  const _QuestionRow({
-    required this.question,
+class _ItemRow extends StatelessWidget {
+  const _ItemRow({
+    required this.item,
+    required this.hue,
     required this.ticked,
     required this.p,
     required this.onTap,
   });
 
-  final ScanQuestion question;
+  final PvChecklistItem item;
+  final double hue;
   final bool ticked;
   final V2Palette p;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final tint = v2BlockTint(_hue, p);
+    final tint = v2BlockTint(hue % 360, p);
     return Semantics(
       checked: ticked,
       button: true,
-      label: question.text,
+      label: item.text,
       child: GestureDetector(
         onTap: onTap,
         behavior: HitTestBehavior.opaque,
@@ -265,8 +215,8 @@ class _QuestionRow extends StatelessWidget {
           padding: const EdgeInsets.fromLTRB(14, 13, 14, 13),
           decoration: BoxDecoration(
             // ⚠️ A TICKED ROW GOES TINTED, NOT GREYED OUT. Greying says "done
-            // with, ignore" — which is the opposite of what a ticked question
-            // means here. It is the one she is definitely asking.
+            // with, ignore" — the opposite of what a ticked question means
+            // here. It is the one she is definitely asking.
             color: ticked ? tint : p.surface,
             borderRadius: BorderRadius.circular(16),
             border: Border.all(color: ticked ? Colors.transparent : p.line),
@@ -289,7 +239,7 @@ class _QuestionRow extends StatelessWidget {
             ),
             const SizedBox(width: 12),
             Expanded(
-              child: Text(question.text,
+              child: Text(item.text,
                   style: pvManrope(
                       fontSize: 13.5,
                       height: 1.45,
@@ -314,8 +264,7 @@ class _ShareBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        padding: EdgeInsets.fromLTRB(
-            kPvDoorGutter, 12, kPvDoorGutter,
+        padding: EdgeInsets.fromLTRB(kPvDoorGutter, 12, kPvDoorGutter,
             12 + MediaQuery.paddingOf(context).bottom),
         decoration: BoxDecoration(
           color: p.ground,

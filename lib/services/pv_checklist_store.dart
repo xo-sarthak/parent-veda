@@ -1,5 +1,5 @@
 // =============================================================================
-//  ScanQuestionsStore — which questions she has ticked to take in with her
+//  PvChecklistStore — which questions she has ticked to take in with her
 // -----------------------------------------------------------------------------
 //  The smallest store in the app, and it is a store rather than screen state
 //  for one reason: the brief calls "What to ask at your next scan" a CHECKLIST,
@@ -25,7 +25,7 @@
 //  second. See CLAUDE.md: usage analytics in this app records which room, never
 //  what was in it, and this is the same instinct one layer down.
 //
-//  ⚠️ IDS, NOT TEXT. The set holds question ids from `kScanQuestions`. Storing
+//  ⚠️ IDS, NOT TEXT. The set holds `PvChecklistItem.id`s. Storing
 //  the sentence would strand every tick the day a question is reworded — and
 //  worse, it would silently keep a tick against text that no longer exists, so
 //  the count would be right and the list would be short.
@@ -34,60 +34,73 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ScanQuestionsStore extends ChangeNotifier {
-  ScanQuestionsStore._();
-  static final ScanQuestionsStore instance = ScanQuestionsStore._();
+class PvChecklistStore extends ChangeNotifier {
+  PvChecklistStore._();
+  static final PvChecklistStore instance = PvChecklistStore._();
 
-  static const _key = 'scan_questions_ticked';
+  /// ⚠️ ONE KEY PER CHECKLIST, AND THE SCANS ONE KEEPS ITS ORIGINAL STRING.
+  /// `scan_questions_ticked` already shipped; changing it would silently empty
+  /// the list of anybody who had started one, and an emptied checklist looks
+  /// exactly like a checklist never used.
+  static String _keyFor(String id) =>
+      id == 'scan_questions' ? 'scan_questions_ticked' : 'checklist_${id}_ticked';
 
-  final Set<String> _ticked = {};
-  bool _loaded = false;
+  /// Ticked ids, per checklist.
+  final Map<String, Set<String>> _ticked = {};
+  final Set<String> _loaded = {};
 
-  /// Which question ids are ticked. Unmodifiable — callers ask, they do not
-  /// reach in.
-  Set<String> get ticked => Set.unmodifiable(_ticked);
+  /// Which question ids are ticked on [list]. Unmodifiable — callers ask, they
+  /// do not reach in.
+  Set<String> ticked(String list) =>
+      Set.unmodifiable(_ticked[list] ?? const <String>{});
 
-  bool isTicked(String id) => _ticked.contains(id);
+  bool isTicked(String list, String id) =>
+      _ticked[list]?.contains(id) ?? false;
 
-  int get count => _ticked.length;
+  int count(String list) => _ticked[list]?.length ?? 0;
 
   /// ⚠️ IDEMPOTENT, AND IT RETURNS EARLY RATHER THAN RELOADING. Every screen
   /// that shows the checklist calls this in `initState`; without the guard, a
   /// second visit would re-read prefs and notify for no change.
-  Future<void> init() async {
-    if (_loaded) return;
+  Future<void> init(String list) async {
+    if (_loaded.contains(list)) return;
     try {
       final prefs = await SharedPreferences.getInstance();
-      _ticked.addAll(prefs.getStringList(_key) ?? const []);
+      _ticked
+          .putIfAbsent(list, () => <String>{})
+          .addAll(prefs.getStringList(_keyFor(list)) ?? const []);
     } catch (_) {
       // Start empty. A store that cannot read its cache is a store with no
       // ticks yet, never a crash — local-first is absolute.
     }
-    _loaded = true;
+    _loaded.add(list);
     notifyListeners();
   }
 
-  Future<void> toggle(String id) async {
-    if (!_ticked.remove(id)) _ticked.add(id);
+  Future<void> toggle(String list, String id) async {
+    final set = _ticked.putIfAbsent(list, () => <String>{});
+    if (!set.remove(id)) set.add(id);
     notifyListeners();
-    await _save();
+    await _save(list);
   }
 
-  Future<void> clear() async {
-    if (_ticked.isEmpty) return;
-    _ticked.clear();
+  Future<void> clear(String list) async {
+    final set = _ticked[list];
+    if (set == null || set.isEmpty) return;
+    set.clear();
     notifyListeners();
-    await _save();
+    await _save(list);
   }
 
   /// ⚠️ NOTIFY FIRST, WRITE AFTER. A checkbox that waits for a disk write
   /// before it moves reads as a laggy app on a budget handset, and there is
   /// nothing to roll back to if the write fails — the tick is already the
   /// truth in memory.
-  Future<void> _save() async {
+  Future<void> _save(String list) async {
     try {
       final prefs = await SharedPreferences.getInstance();
-      await prefs.setStringList(_key, _ticked.toList());
+      await prefs.setStringList(
+          _keyFor(list), (_ticked[list] ?? const <String>{}).toList());
     } catch (_) {
       // Fire and forget, the same as every cloud write in this repo. The cost
       // is stated honestly: a failed write loses the ticks on next launch, and

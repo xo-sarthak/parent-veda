@@ -4542,3 +4542,433 @@ plain timer.
   but nothing keeps the screen awake, which needs a plugin. Correctness is
   there; the convenience is not.
 * **Clinical read** on the area's six new pieces (§28.4) — unchanged.
+
+---
+
+## 32.0 Mind & body, second pass — the tab that looked wrong, and the course that was never built — 2026-09-10
+
+Two things, from re-executing the three Mind & body PDFs against what shipped on
+2026-09-05.
+
+The report was *"the user interface looks very bad starting from today's
+movement"*. Everything §28 and §31 asserted was still true — right practice,
+right copy, no streak, tool rendering in place of a rail — and the tab still
+looked broken, because **none of what was wrong was content**.
+
+| File | What changed |
+|---|---|
+| `lib/screens/ttc/ttc_mind_today_screen.dart` | Redrawn in the door's palette; insets itself; `padded` flag |
+| `lib/screens/ttc/ttc_practice_player.dart` | `TtcPracticeSkin`; `.sit()`; player height is a minimum |
+| `lib/screens/ttc/ttc_practice_screen.dart` | Palette throughout; live step is a filled row; practice hue |
+| `lib/ttc/ttc_garbh_course.dart` | **New.** The eight sessions, as data |
+| `lib/ttc/ttc_garbh_course_store.dart` | **New.** Opened sessions, and session 8's picks |
+| `lib/screens/ttc/ttc_garbh_course_screen.dart` | **New.** The course, and one session |
+| `lib/ttc/ttc_mind_today.dart` | `ttcTodaysMove` / `ttcTodaysBreathe` sit in front of the rotation |
+| `lib/ttc/reads/ttc_reads_mind_body.dart` | Three sections the guides brief specifies and the guides lacked |
+| `lib/ttc/reads/ttc_reads_his_side.dart` | The sleep section another door was already pointing at |
+| `lib/ttc/focus/ttc_focus_mind_body.dart` | The eight promote blurbs, as the brief writes them |
+| `lib/screens/ttc/ttc_partner_screen.dart` | His Today, at last — see 32.8 |
+| `test/ttc_garbh_course_test.dart` | **New**, 25 |
+| `test/ttc_mind_body_test.dart` | +3 — geometry and phone-width render |
+
+### 32.1 Three mechanical reasons a correct screen looked broken
+
+Worth keeping separately from "it was restyled", because each is a rule rather
+than a matter of taste and each can come back.
+
+1. **No horizontal padding.** `TtcFocusScreen` wraps its own children in `_pad`
+   (18) and hands a GROUP TOOL through **untouched** — on the assumption the
+   tool insets itself, which `TtcPcosStandBody` does via `ttcToolPad` and this
+   did not. So every card on the door's DEFAULT tab ran edge to edge under
+   headings that did not. *The general fact: whenever one widget renders another
+   widget's content in place of its own, the gutter has to belong to exactly one
+   of them, and which one has to be written down.*
+2. **The wrong palette entirely.** Today painted in the fixed TTC tool tokens —
+   `ttcPurple` on `Colors.white` — while the door around it paints in
+   `V2PaletteStore.instance.current` at the bracket's hue. A violet card on a
+   sand page is not a card that needs restyling; it is a card from another
+   screen. The practice detail screens and all six players had the same fault.
+3. **Flat white boxes where the door uses tinted blocks.** The two practices are
+   the most important objects on the door and were the plainest things on it.
+
+### 32.2 The free course was a description of itself
+
+`ttc_focus_mind_body.dart`'s Go deeper tile read *"taught properly rather than
+described"* and opened `ttc_prepare` — the **catalogue** the course is listed
+in, where it was one card describing eight sessions at a price of zero, above a
+Buy button and an empty slot list. Reachable, tappable, wrong.
+
+**This is the wiring gate's blind spot, and it is worth naming.** Every existing
+test asked whether the tile opened *something*. It did. What no test asked was
+whether the thing it opened was the thing the tile promised — and in general no
+test can. What `ttc_garbh_course_test.dart` does instead is assert the
+*specific* destination by type, which is only possible because somebody looked
+once.
+
+Four call sites construct `TtcOfferingScreen`, so the redirect for the free
+course lives **inside** it rather than at each of them.
+
+### 32.3 The rotation and session 8 disagree, and both are honoured
+
+The rebuild brief: Today rotates a card a day. The course brief: session 8
+*"must WRITE the user's picks into their Today tab"*. Both, as written, cannot
+be true at once.
+
+Resolved by making the rotation the **default** rather than the only behaviour.
+`ttcPracticeOfTheDay` stays a pure function of the date — the tests that assert
+a reinstall gives the same card still hold — and `ttcTodaysMove` /
+`ttcTodaysBreathe` sit in front of it, consulting the store. Someone who never
+opens the course sees exactly what the rebuild describes. Someone who has just
+spent eight sessions deciding what she likes is not handed a different card the
+next morning. Today says which of the two is on screen, and offers the way back.
+
+### 32.4 Three sections the guides brief specifies and the guides did not have
+
+Not restyling — missing content, found by reading
+`ParentVeda_Mindbody_new_guides.pdf` against the shipped prose:
+
+* **"If you live with family"** and **"If one of you works shifts"** in *Fixing
+  a bedtime you will actually keep*. The brief calls the first *"the part most
+  advice ignores"*, and it is right: a bedtime page written for a flat of two
+  does not apply to most people reading it here.
+* **"Before a wedding or a festival"** in *When family keeps asking*. The rest
+  of that guide answers one question from one person; a wedding is the same
+  question from nine people in front of each other, and the advice is
+  logistical rather than verbal.
+
+### 32.5 A cross-reference to a section that did not exist
+
+The sleep guide's brief ends *"See the sleep section in His side for his half."*
+There is no sleep section in His side. Pointing that sentence at the nearest
+existing article would have been exactly the failure that
+`reuse-only-the-thing-itself` describes, so **the section was written** — added
+to `ttc_read_heat_habits`, which is already titled "Heat, habits and time" and
+is where a habit with real evidence behind it belongs.
+
+### 32.6 Judgement calls worth knowing about
+
+* **The practice detail screen now opens in its library's hue** (104 Move, 206
+  Breathe) rather than the door's 42. Tapping a sage block and landing on a sand
+  page reads as having arrived somewhere else. `kTtcMindHue` is kept and
+  documented rather than deleted.
+* **The step list's live row is filled, not merely bolder.** On a floor practice
+  the phone is at arm's length on the mat, and w700 against w400 in the same
+  colour is not a difference you can find at that distance.
+* **The movement placeholder no longer apologises.** It was a grey icon and the
+  words "Follow the steps below" — an apology in the largest object on screen,
+  on six of the twelve cards. Still no figure, still no pretending there is one.
+* **The player's height is a minimum, not a fixed 232.** The body scan is a
+  Column of a figure *and* the name of the part currently lit, and that caption
+  wraps; at the largest accessibility sizes it striped the screen.
+* **Progress on the course is a sentence, not a bar.** "3 of 8" is a debt
+  statement on a course whose closing note is that there is nothing to keep up
+  with.
+
+### 32.7 Still owed
+
+* **Clinical read** on the eight sessions, on top of the six pieces at §28.7.
+  Nothing in the course is a new clinical claim, but nobody qualified has read
+  it.
+* **Session 4's audio.** "Listen to a short calm piece" — we bundle no audio, on
+  the same reasoning as `mb_listen` (§28.3): the choice is personal and often
+  religious. The session says "play your own", which is honest and is also less
+  than the brief pictures.
+* **The five Rive files** (§31.5) — unchanged, and session 5 now wants them too.
+* **The partner's Today is still not wired** (§28.7) — unchanged.
+  `kTtcPartnerOffset` remains logic without a caller.
+* **A wake-lock for the ten-minute walk** (§31.6) — unchanged.
+* **`ttc_mind_today` as a pushed route was a naked Column** until this pass — no
+  scaffold, no ground, no way back. It now has `TtcToolScaffold`. Nothing links
+  to it yet, so this was fixed on the way past rather than because it broke.
+
+---
+
+### 32.8 Recheck against the three PDFs — two gaps closed, one conflict left open
+
+The pass above was re-walked card by card against the briefs' own lists. Three
+things came out of it.
+
+**The partner's Today is now wired.** The rebuild brief's STEP 3 says *"Both
+partners see Today. Their picked cards may differ. Either can complete alone,
+and it does not count against the other."* `kTtcPartnerOffset` and the `offset`
+parameter existed and were tested from the first build, and nothing called them
+— recorded honestly at §28.7 rather than claimed, and open ever since. His
+Today now carries a practice card directly under his mission, half a library
+away from hers, in the Slate palette.
+
+One caveat that is worth knowing rather than fixing: the Mom|Dad pill is a
+**testing** switch on a single device, so flipping it does not swap
+`TtcLogStore` underneath. In the real product his half arrives through the
+pairing code on his own install, and the rows are separate because the devices
+are. "It does not count against the other" therefore holds by construction in
+production and not in the dev toggle.
+
+**Three points the guides brief specifies, missing from *Bringing him into
+this*.** "Do things together that are not about trying" — which is the sentence
+that gives the couple practice card a reason to be opened; "not on the day a
+period arrives"; and the framing warning under *what tends not to work*, whose
+symptom is not refusal but delay. The guide's own warning was about scheduling,
+which is a different and also real failure, so all four now sit together.
+
+**The one conflict, and it is left open on purpose.** The brief's sub-tab map
+titles the film card *"Preconception garbh sanskar, taught"*. That cannot ship:
+the article directly above it is *"Preconception garbh sanskar, honestly"*, and
+`ttc_focus_page_test.dart` forbids two tiles in one section opening with the
+same three words.
+
+That rule is not a house preference. It was added 2026-09-03 after two such
+pairs shipped in Getting ready and **both were reported on sight** as one card
+printed twice. Taking an exemption for this pair would deliberately reintroduce
+the thing that was complained about, so the card reads *"The eight sessions,
+taught"* — the brief's load-bearing word, three different opening words — and
+the film's own title in `ttc_videos_data.dart` is untouched, which is what
+`reuse` actually protects.
+
+**Yours to settle:** whether the brief's exact title matters more than the
+rail's duplicate-reading rule. Nothing else in the three PDFs is unimplemented
+except the items listed at §32.7.
+
+**Deviations worth naming, all small:**
+
+* **Box breathing runs 64s, not the brief's "total 60s".** Four whole rounds of
+  4-4-4-4 is 64, and the card's own step 5 says *"Do four rounds, which is about
+  one minute."* Cutting the fourth round short at 12 seconds to hit a round
+  number would contradict the instruction on the same screen.
+* **Session 3's five-minute sit gets a plain ring**, where the brief pictures a
+  seated outline figure with a light at the point of attention. No such
+  component exists; the body-scan figure moves DOWN the body, which is the other
+  half of that session. The timer is the honest fallback and the session works
+  without it, which the brief requires anyway.
+* **Session 4 bundles no audio** — see §32.7.
+
+---
+
+## 33.0 Scans & tests becomes the first pregnancy door — 2026-09-10
+
+Built from `ParentVeda_Scans_and_tests_rebuild.pdf`. First of eight pregnancy
+briefs, and the first pregnancy area to take the five-sub-tab shape the TTC
+doors use. The playbook is `docs/PREGNANCY-DOOR-BUILD.md`; this records the
+decisions that are arguable and the things still owed.
+
+### 33.1 A second door engine, and why it is not a merge
+
+The TTC focus engine — `TtcFocusPage` + `TtcFocusScreen` — is the same idea,
+built first, and it is welded to TTC by its **payloads**: an article names an id
+in `kTtcReads`, a tool names a surface only `ttcScreenForSurface` resolves, a
+product names a row in the TTC catalogue. Pregnancy's own destinations — a scan
+page, the report locker, the decoder — have no way to be expressed over there.
+
+So there are two engines sharing a shape. What they genuinely share is already
+shared and stage-neutral: `V2Palette`, `V3HeroField`, `V3BracketArt`, `PvRead`,
+`PvReaderScreen`, `pv_placeholders` — which is what lets a pregnancy door look
+identical to a TTC door without either file importing the other.
+
+**The cost, stated honestly: the coverflow's geometry now exists twice.** Design
+4a's numbers are in `ttc_focus_screen.dart` and again in `pv_door_carousel.dart`.
+If the design moves, both move.
+
+**The seam for merging them later**, and it is small: the carousel reads exactly
+four things off a group — `label`, `icon`, `hue`, and a pre-computed count line
+— so a shared version takes those four values rather than a model. Lift the
+model and the renderer to a stage-neutral home and give each stage an injected
+resolver for reads and surfaces, the way `PvReaderScreen` already takes
+`openRead` / `openSurface`. That is a one-import change per TTC file. **Not
+attempted now** because TTC is being worked on in parallel and a shared-file
+edit is everybody's conflict.
+
+### 33.2 Two briefs disagree about the red flag, and both are right
+
+`scans_hub_v2.dart` deleted the urgent strip with the strongest argument made
+about that hub: *nobody discovers an emergency by scrolling.* A woman with
+one-sided pain is not browsing her scan records; putting the warning there does
+not reach her, it only makes a records screen alarming for the thousands of
+people who are fine.
+
+This brief pins "Call your doctor if" back. Both hold, because they are about
+different places: that argument was about a strip at the top of a **landing**,
+which every visitor met before anything else. This is one tab of five, named
+**Talk**, which somebody opens because they are already thinking about reaching a
+person. It is nowhere else on the door, so the woman checking when her next scan
+is never meets it.
+
+### 33.3 The heading had to move with the list
+
+The brief asks to remove the duplicate topics — breech and cord around neck
+appear twice in the decoder. They do: `all` was every finding including the
+popular six directly above it.
+
+Worth noticing why it survived review. **Neither list is wrong on its own.**
+"Popular topics" is correct and "All topics" is literally correct; the
+duplication exists only in the space between two headings that are each
+accurate. A list meaning *all* and a list meaning *some of these* cannot both be
+complete and disjoint.
+
+So the six are subtracted **and the heading changed to "More topics"** — a
+heading promising everything over a list missing six entries is the same untruth
+pointing the other way. Only while unfiltered: with a chip on, "Popular topics"
+is itself filtered and subtracting a near-empty list would hide topics for no
+visible reason.
+
+### 33.4 Two of the six new pieces were marked "short" and are not
+
+The brief marks "What to keep, and why" and "Take it to your appointment" as
+short guides. They are full `PvRead`s at the same floor as everything else —
+four sections, 600+ words, an FAQ, named sources, an urgent when-to-see-someone.
+
+The floor was kept rather than argued with: these sit on a rail beside nine rich
+scan pages, and a two-paragraph card there does not read as concise, it reads as
+the one nobody finished. Where a subject genuinely had less to say the answer
+was to find the substance it was missing — what a lab actually keeps and for how
+long, what a receipt is worth at an insurance desk — not to pad it.
+
+### 33.5 Judgement calls worth knowing about
+
+* **"Add a report" is not a card.** The brief lists it as a `[Tool]` on My
+  reports. The locker rendered above it already carries its own add button, and
+  a card whose tap does what the button six points above it does is the
+  door-in-front-of-a-door again. The locker **is** "Add a report".
+* **"A word on the report you do not know" opens the decoder's SEARCH**, not the
+  decoder. The decoder is already on screen above that card — its chips and
+  topic lists are the tab — so a card opening the same screen again would be a
+  link to where she is standing.
+* **The hero keeps "Your scans, in one place." over an eyebrow reading "SCANS &
+  TESTS".** `TtcFocusPage` deliberately has no title field, because that screen
+  once shipped headed "Getting pregnant" behind a tile reading "Fertile window".
+  The drift is prevented here a different way: the exact words on the tile she
+  tapped are still on screen, above the sentence.
+* **The appointment checklist does not count anything.** No progress bar, no
+  "4 of 18", no streak. A counter on a list of things you are nervous enough to
+  write down is a debt statement. The one number shown is on the share button,
+  where it says how long the message will be.
+* **Its ticks are local and deliberately not synced.** Every other store in this
+  stage registers with `SyncRegistry`. What she is nervous enough to ask about
+  is a more sensitive signal than most of what this app stores and has no
+  clinical value to anyone later; there is also nothing to merge. If it is ever
+  synced, that is a decision about privacy first and plumbing second.
+
+### 33.6 Still owed
+
+* **Clinical read on the six new pieces.** Nothing in them is a new clinical
+  claim and every figure is sourced, but nobody qualified has read them.
+* **"What the scan person can and cannot tell you" has no content.** It is the
+  one COMING SOON card on the door. `content_slots.dart` has declared it for
+  this bracket for months and nothing has been written. It is a four-minute
+  read: why they go quiet, why they will not discuss the sex, and who gives you
+  the result — and two thirds of that is already written inside
+  `preg_scan_read_sex_law`, so it is closer to done than it looks.
+* **The hero photograph is an Unsplash placeholder**, same as every TTC door's.
+  Swapping it is one URL in `pv_door_scans.dart`.
+* **The cost ranges carry September 2026 and will rot.** They are duplicated in
+  spirit with `kScanCost`, which is the per-scan source; if one moves, move both.
+* **`ScanQuestionsStore` has no cloud shape** — see §33.5. Deliberate, recorded
+  here so it reads as a decision rather than an omission.
+* **The seven other pregnancy briefs.** They are data files now, plus whatever
+  tools each one asks for. `docs/PREGNANCY-DOOR-BUILD.md` §2 lists the three
+  shared lines each will touch.
+
+---
+
+## 34.0 Complications & conditions, the second pregnancy door — 2026-09-10
+
+Built from `ParentVeda_Complications_rebuild_clean.pdf`. Five sub-tabs on the
+same engine as Scans; the engine itself needed two new tile types and one new
+field, and nothing else.
+
+### 34.1 The brief said "never keep a second copy" and the app has eleven
+
+`kAllConditions` (27 deep 8-part pages) and `kReportFindings` (27
+reassurance-first 7-part pages) both exist. Six subjects share an id outright —
+`anemia`, `breech`, `fibroids`, `high_bp`, `preeclampsia`, `rh_negative` — and
+five more share a subject under different ids. Two cards this brief names by
+hand, "Cord looped around the neck" and "Placenta sitting low", exist ONLY as
+findings, so its own browse rail cannot be built from Complications alone.
+
+**Decided: one page per QUESTION, not one page per word.** Conditions answer
+"my doctor said I have X"; findings answer "my report says X". A woman holding a
+report at 11pm and a woman whose obstetrician has just told her the same word
+want different objects — the first wants to know whether to panic, the second
+wants to know what happens now. Collapsing them makes one of those two readers
+worse off and it is not obvious which.
+
+So the brief's rule reads as **never a second copy of the same ANSWER**, the
+door links across for the two subjects it does not own, and the rule is written
+into `docs/PREGNANCY-DOOR-BUILD.md` §4a so it is not re-litigated per door.
+
+**The alternative was considered and rejected on cost, not principle:** merging
+would mean reconciling two clinical voices per subject and re-pointing the Scans
+decoder — a door shipped hours earlier on a brief that said reuse it.
+
+⚠️ **The test enforces the boundary rather than the split.** `and they are the
+two Complications does not own` asserts that a finding tile is used ONLY where
+no condition page answers the same question. Add a `nuchal_cord` condition page
+and it fails, which is correct: at that point somebody has to decide whether
+both answers are genuinely needed.
+
+### 34.2 Four cards marked "reslot" were new work
+
+The brief moves "When blood pressure gets dangerous", "Handling pregnancy sugar
+in India", "The daily thyroid tablet" and "Iron, from food and tablets" out of
+their condition pages as `[Guide] reslot`. None existed at that depth:
+`ConditionEntry.management` is one ~40-word paragraph, and the blood-pressure
+one is `high_bp.callNow` — four bullet lines.
+
+A Guide chip promises a thing you act on, and opening a forty-word paragraph
+from one is the chip lying about length. So they are written properly, to the
+same floor as everything else. **Six new articles on this door**, with the two
+the brief already called new.
+
+The paragraphs they grew from are untouched. Somebody reading the gestational
+diabetes page still wants a short answer about management in place.
+
+### 34.3 A plain line on every condition, not just the ten named
+
+The brief gives plain one-liners for ten conditions and asks that each browse
+row show one. `ConditionEntry.plainLine` is **required**, and all 27 are filled —
+the brief's ten verbatim, the rest to the same pattern.
+
+Optional would have been worse: a list where some rows explain themselves and
+some do not, with the silent ones being exactly the rarer conditions, where a
+mother is least likely to know the word.
+
+The browse rows now show `plainLine` where they showed `reassurance`. The
+reassurance still renders on the page; in a list it was two lines answering a
+question she has not asked yet.
+
+### 34.4 Judgement calls worth knowing about
+
+* **"Add a condition to my journey" opens the search screen.** The brief says
+  reuse the existing "Add to my journey" action — and that action lives ON a
+  condition page, because adding one requires having chosen one. From a door
+  there is no condition yet. Building a second adder would be a second way to
+  write the same set.
+* **Two pinned flags on one door.** The assembled same-day list on the safety
+  tab, the stage's standing pregnancy list on Talk. Different lists, different
+  questions. §12 of the playbook.
+* **Sub-tab 1 carries no cards.** All three things the brief lists for it — the
+  search, the "My doctor told me" chip, the Most-common list — are the inline
+  screen. A fourth card would be something the brief did not ask for.
+* **The two-way door renders inside the tab.** `_DoorGate` asks whether the
+  visit is diagnosed-real or curiosity, and the answer changes what the area
+  offers. A door that skipped it would bypass a question the screen exists to
+  ask.
+* **The checklist system was generalised at its second caller**, not its third.
+  See §11 of the playbook. `scan_questions_ticked` is kept as the scans list's
+  preference key so nobody mid-list lost their ticks.
+
+### 34.5 Still owed
+
+* **Clinical read on the six new articles**, on top of the six at §33.6. Nothing
+  in them is a new clinical claim and every figure is sourced, but nobody
+  qualified has read them.
+* **Clinical read on the assembled same-day list.** It is assembled from
+  reviewed pages by construction and the test proves the provenance — but the
+  five-line SELECTION is an editorial act nobody clinical has signed off.
+* **The 17 conditions not on the browse rail** are reachable only through
+  sub-tab 1's search and Most-common list. That is the brief's own shape and it
+  means miscarriage, preeclampsia, cholestasis and HELLP are search-only. Worth
+  a look on a device before deciding it is right.
+* **`plainLine` for the 17 unnamed conditions is mine, not the brief's.** They
+  follow the pattern and they have not been reviewed against the brief's voice.
+* **No photograph on either door's hero.** See §33.6.
+* **Six briefs left.** Belly and skin, Garbh Sanskar (two), Labour prep, Mind
+  and mood, Nutrition.

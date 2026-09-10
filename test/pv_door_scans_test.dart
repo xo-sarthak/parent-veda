@@ -22,7 +22,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/data/doors/pv_door_data.dart';
 import 'package:parentveda/data/reads/pregnancy_reads.dart';
 import 'package:parentveda/data/report_findings_data.dart';
-import 'package:parentveda/data/scan_questions_data.dart';
+import 'package:parentveda/data/checklists/pv_checklist.dart';
 import 'package:parentveda/data/tests_scans_reports_data.dart';
 import 'package:parentveda/screens/brackets/scan_timeline_screen.dart'
     show kScanRun;
@@ -414,30 +414,25 @@ void main() {
   });
 
   group('the appointment checklist', () {
-    test('question ids are unique', () {
-      // ⚠️ THE IDS ARE PERSISTED BY `ScanQuestionsStore`. A duplicate would
-      // make two rows tick together, which looks like a rendering bug and is a
-      // data one.
-      final ids = kScanQuestionsFlat.map((q) => q.id).toList();
-      expect(ids.toSet().length, ids.length);
+    // ⚠️ THE GENERIC ASSERTIONS MOVED TO `pv_door_complications_test.dart` when
+    // the checklist system was generalised — id uniqueness, question phrasing
+    // and store-key stability now run over EVERY checklist rather than over
+    // this one. What stays here is what is specific to the scans list.
+    test('it still has its four groups, in visit order', () {
+      expect(kScanQuestionsChecklist.groups.map((g) => g.heading), [
+        'Before the day',
+        'About this scan',
+        'When I get the report',
+        'What happens next',
+      ]);
     });
 
-    test('every group has questions and every question has words', () {
-      for (final g in kScanQuestions) {
-        expect(g.questions, isNotEmpty, reason: '"${g.heading}" is empty.');
-        for (final q in g.questions) {
-          expect(q.text.trim(), isNotEmpty);
-        }
-      }
-    });
-
-    test('every question is a question', () {
-      // The whole format's promise: these are things to say out loud in a room,
-      // not statements or instructions.
-      for (final q in kScanQuestionsFlat) {
-        expect(q.text.trim().endsWith('?'), isTrue,
-            reason: '"${q.text}" is not phrased as a question.');
-      }
+    test('it names her next scan when there is one', () {
+      // The derivation itself is exercised on a device and by the store; what
+      // this holds is that the hook exists at all. A checklist with no
+      // `subject` is a leaflet, and the difference is the whole design.
+      expect(kScanQuestionsChecklist.subject, isNotNull);
+      expect(kScanQuestionsChecklist.subjectTitle, isNotNull);
     });
   });
 

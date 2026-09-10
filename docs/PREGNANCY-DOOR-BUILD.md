@@ -132,6 +132,48 @@ Three rules that fall out, each of which has already cost time somewhere:
 
 ---
 
+## 4a. Two condition libraries, and why both stay — DECIDED 2026-09-10
+
+You will find the same subject written twice, and it is not a bug to clean up.
+
+| | `kAllConditions` (`conditions_data.dart`) | `kReportFindings` (`report_findings_data.dart`) |
+|---|---|---|
+| Answers | "my doctor said I have X" | "my report says X" |
+| Shape | 8 parts: what it is, how common in India, symptoms, call-now vs monitor, tests to confirm, management in India, baby impact, FAQ | 7 parts, reassurance-first: what it means, how common, what happens next, when it is discussed, questions to ask, things to remember, a fixed reassurance |
+| Voice | management-led | reassurance-led |
+| Owned by | Complications & conditions | Scans & tests (the decoder) |
+
+Six subjects share an id outright — `anemia`, `breech`, `fibroids`, `high_bp`,
+`preeclampsia`, `rh_negative`. Five more share a subject under different ids:
+`gdm`/`gestational_diabetes`, `placenta_previa`/`low_lying_placenta`,
+`low_amniotic_fluid`/`low_fluid`, `iugr`/`small_baby`,
+`polyhydramnios`/`high_fluid`.
+
+**The rule: one page per QUESTION, not one page per word.** A woman holding a
+report that says "breech" at 11pm and a woman whose obstetrician has just told
+her the baby is breech want different objects — the first wants to know whether
+to panic, the second wants to know what happens now. Collapsing them would make
+one of those two readers worse off, and it is not obvious which.
+
+So when the Complications brief says *"never keep a second copy of a
+condition"*, read it as **never a second copy of the same ANSWER**. Two answers
+to two questions are two pages.
+
+**In practice:**
+
+- A door links to the library that matches the question its tab is asking.
+- Complications does not own `nuchal_cord` or `low_lying_placenta` — neither
+  exists in `kAllConditions` — so its "when it usually comes up" rail links to
+  the findings library for those two. That is the rule working, not an
+  exception to it.
+- **Never copy an entry between the two files.** If a subject genuinely needs
+  both voices, it gets an entry in each, written for its own question, and the
+  pair is recorded in `test/pv_door_complications_test.dart`.
+
+Do not re-litigate this per door. If it ever changes, it changes here first.
+
+---
+
 ## 5. The formats
 
 Seven, and adding an eighth is deliberate work: a value on `PvDoorFormat`, a
@@ -253,3 +295,58 @@ falling through would silently keep the shape that was replaced.
 - **do not run git.** Provide the commands with explicit file paths.
 - Report: files changed, what was reused vs newly written, and **every tile with
   no content behind it yet** — named, not summarised.
+
+---
+
+## 11. Checklists are shared now — DECIDED 2026-09-10
+
+Every brief has a "before your appointment" tab, so the second one generalised
+the system rather than copying it.
+
+| What | Where |
+|---|---|
+| The model + registry | `lib/data/checklists/pv_checklist.dart` |
+| Your list | `lib/data/checklists/pv_checklist_<area>.dart` |
+| The store (all lists) | `lib/services/pv_checklist_store.dart` |
+| The screen (all lists) | `lib/screens/brackets/pv_checklist_screen.dart` |
+
+Adding one is a data file, one entry in `kPvChecklists`, and one router case.
+**Do not write a checklist screen.**
+
+Three things to get right:
+
+* **`PvChecklistItem.id` is an identity.** It is persisted. Reword the text
+  freely; renaming an id empties somebody's list *silently* — the row comes back
+  unticked and looks like it was never ticked.
+* **`subject()` is what makes it hers.** It derives what the list is about from
+  the area's own store — the next scan, the condition she added — so the heading
+  reads "What to ask at your anomaly scan" rather than "…at your next scan".
+  Returning null is a real answer and the list still works completely.
+* **If your `subject()` reads a new store, add it to
+  `pvChecklistSubjectStores`.** One line. Forget it and the heading goes stale
+  in place, which looks like nothing.
+
+**No counters.** No progress bar, no "4 of 18", no streak. A counter on a list
+of things somebody is nervous enough to write down is a debt statement, and
+every brief's DO NOT list ends with this.
+
+---
+
+## 12. Two flags on one door is legitimate
+
+Complications pins two: the assembled same-day condition list on its safety tab,
+and the stage's standing pregnancy list on Talk. They are different lists
+answering different questions, and collapsing them would either put
+condition-specific lines on a general warning or drop the general ones from a
+safety tab.
+
+**Where a brief asks for a red flag "assembled from existing content", assemble
+it.** `same_day_signs_data.dart` is the worked example: each line names the
+condition whose own CALL NOW section it came from, and
+`pv_door_complications_test.dart` asserts that condition really says it. A
+red-flag list typed fresh into a data file has had none of the clinical review
+the pages passed, and it sits *above* all of them in the reader's attention.
+
+`PvDoorFlagLine.conditionId` gives a line its own destination where it has one.
+Null means the flag as a whole owns the destination — which is right for
+symptoms of a pregnancy rather than of a named condition.

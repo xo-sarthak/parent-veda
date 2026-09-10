@@ -67,9 +67,12 @@
 
 import 'package:flutter/material.dart' show IconData;
 
+import '../same_day_signs_data.dart';
 import '../scan_extras.dart' show kScanUrgentSigns;
+import 'pv_door_complications.dart';
 import 'pv_door_scans.dart';
 
+export 'pv_door_complications.dart';
 export 'pv_door_scans.dart';
 
 /// What kind of thing a tile is. Drives the chip, the icon and the tap.
@@ -224,6 +227,63 @@ final class PvDoorScanTile extends PvDoorTile {
   /// reason every other id here is held: a tile whose id is wrong renders
   /// perfectly and does nothing.
   final String scanId;
+
+  @override
+  PvDoorFormat get format => PvDoorFormat.article;
+}
+
+/// One condition, on the deep page Complications owns.
+///
+/// ⚠️ A TYPE OF ITS OWN RATHER THAN A TOOL POINTING AT A SURFACE, for the
+/// reason `PvDoorScanTile` gives: `conditionId` must exist in `kAllConditions`,
+/// which a test can check, where a surface string can only be checked by the
+/// router agreeing to know it.
+///
+/// ⚠️ AND THE TITLE LEADS WITH THE PLAIN PHRASE. This is the one tile type
+/// whose title breaks the "medical name may be a title" rule ON PURPOSE — the
+/// Complications brief says a browse card puts the plain phrase FIRST and the
+/// medical name in brackets after it: "Placenta sitting low (low-lying
+/// placenta)". A medical name stands alone only on the page itself.
+final class PvDoorConditionTile extends PvDoorTile {
+  const PvDoorConditionTile({
+    required super.title,
+    required super.blurb,
+    required this.conditionId,
+    super.meta,
+    super.comingSoon,
+  });
+
+  /// Must exist in `kAllConditions`.
+  final String conditionId;
+
+  @override
+  PvDoorFormat get format => PvDoorFormat.article;
+}
+
+/// One finding, on the report-shaped page the Scans decoder owns.
+///
+/// ⚠️ THE SECOND LIBRARY, AND IT IS NOT A DUPLICATE. See
+/// `docs/PREGNANCY-DOOR-BUILD.md` §4a: `kAllConditions` answers "my doctor said
+/// I have X" and `kReportFindings` answers "my report says X". Two questions,
+/// two pages, one rule — **one page per question, not one page per word.**
+///
+/// ⚠️ IT EXISTS BECAUSE COMPLICATIONS DOES NOT OWN EVERYTHING ITS BRIEF LISTS.
+/// "Cord looped around the neck" and "Placenta sitting low" are named on its
+/// browse rail and neither is in `kAllConditions` — they only exist as
+/// findings. Linking across is the rule working rather than an exception to it;
+/// the alternative was copying two entries between the files, which is the one
+/// thing §4a forbids outright.
+final class PvDoorFindingTile extends PvDoorTile {
+  const PvDoorFindingTile({
+    required super.title,
+    required super.blurb,
+    required this.findingId,
+    super.meta,
+    super.comingSoon,
+  });
+
+  /// Must exist in `kReportFindings`.
+  final String findingId;
 
   @override
   PvDoorFormat get format => PvDoorFormat.article;
@@ -422,15 +482,48 @@ class PvDoorRedFlag {
     required this.title,
     required this.lines,
     required this.surfaceId,
+    this.footer,
   });
 
   final String title;
 
   /// The signs themselves, referenced from their one home.
-  final List<String> lines;
+  final List<PvDoorFlagLine> lines;
 
   /// Where "see all of this properly" goes.
   final String surfaceId;
+
+  /// One sentence under the list.
+  ///
+  /// ⚠️ ADDED FOR A LINE THE COMPLICATIONS BRIEF ASKS FOR BY NAME: *"State
+  /// plainly this tells you when to call and never replaces calling a doctor or
+  /// going in."* It is content, so it lives in the data rather than in the
+  /// renderer — a sentence typed into a shared widget is a sentence that
+  /// appears on somebody else's warning.
+  final String? footer;
+}
+
+/// One line on a pinned flag, and optionally where it goes.
+///
+/// ⚠️ THE PER-LINE DESTINATION EXISTS FOR ONE BRIEF'S ONE INSTRUCTION —
+/// *"Each line opens the fuller page"* — and it is nullable because the other
+/// flag on the app does not work that way. The pregnancy urgent list is seven
+/// symptoms with one shared destination; the same-day condition list is five
+/// lines each assembled from a different condition's own call-now section, and
+/// each belongs back at that page.
+///
+/// ⚠️ A NULL TARGET IS NOT A DISABLED LINE. It means the flag as a whole has
+/// the destination, which is what `PvDoorRedFlag.surfaceId` is for. Both flags
+/// are fully usable; only the granularity differs.
+class PvDoorFlagLine {
+  const PvDoorFlagLine(this.text, {this.conditionId});
+
+  /// What she reads. Plain — never a bare medical word, which the Complications
+  /// brief forbids on a red-flag line specifically.
+  final String text;
+
+  /// The condition page this line opens, when it has one of its own.
+  final String? conditionId;
 }
 
 /// How a group lays its sections out.
@@ -600,6 +693,7 @@ class PvDoorPage {
 /// no longer compiles.
 final List<PvDoorPage> kPvDoorPages = [
   kScansDoor,
+  kComplicationsDoor,
 ];
 
 /// The door for a bracket, or null when that bracket still opens a hub.
@@ -642,6 +736,27 @@ final PvDoorRedFlag kPregnancyUrgentFlag = PvDoorRedFlag(
 /// choice can be read, so `.now` here would freeze whatever the store happened
 /// to hold at that moment. The door is English by policy; the flag renders the
 /// English.
-final List<String> kScanUrgentSignsEn = [
-  for (final s in kScanUrgentSigns) s.en,
+final List<PvDoorFlagLine> kScanUrgentSignsEn = [
+  // ⚠️ NO PER-LINE TARGET, AND THAT IS CORRECT FOR THIS LIST. These are
+  // symptoms of a pregnancy rather than of a named condition — bleeding does
+  // not have "a page"; it has an urgent screen, which the flag as a whole
+  // opens. See `PvDoorFlagLine.conditionId`.
+  for (final s in kScanUrgentSigns) PvDoorFlagLine(s.en),
 ];
+
+/// The Complications door's assembled same-day list.
+///
+/// ⚠️ EVERY LINE IS DRAWN FROM A CONDITION'S OWN CALL NOW SECTION and opens
+/// that page. See `same_day_signs_data.dart` for why assembling rather than
+/// authoring is the strictest rule on that door: a red-flag list typed fresh
+/// into a data file has had none of the clinical review the twenty-seven
+/// condition pages passed, and it would sit above all of them.
+final PvDoorRedFlag kSameDayFlag = PvDoorRedFlag(
+  title: 'Signs to get help the same day',
+  lines: [
+    for (final s in kSameDaySigns)
+      PvDoorFlagLine(s.line, conditionId: s.conditionId),
+  ],
+  surfaceId: 'conditions/same_day',
+  footer: kSameDayFooter,
+);

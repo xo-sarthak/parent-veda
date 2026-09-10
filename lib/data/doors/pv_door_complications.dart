@@ -1,0 +1,378 @@
+// =============================================================================
+//  Complications & conditions — the door
+// -----------------------------------------------------------------------------
+//  Built from `ParentVeda_Complications_rebuild_clean.pdf`, 30 Aug 2026. Second
+//  of the eight pregnancy briefs.
+//
+//  ---------------------------------------------------------------------------
+//  ⚠️ THE LANGUAGE RULE IS STRICTER HERE THAN ANYWHERE ELSE IN THE APP
+//  ---------------------------------------------------------------------------
+//
+//  The brief states it exactly: *"A medical name appears ONLY as the title of a
+//  condition page, because that is what a user matches to their doctor's words.
+//  Directly under that title sits one plain line saying what it is. Every OTHER
+//  heading, label, section name and card we write has no jargon at all. In a
+//  browse list, the plain line leads and the medical name follows in brackets,
+//  not the other way round."*
+//
+//  So every card title below reads "Pregnancy sugar goes high (gestational
+//  diabetes)" and never the reverse. The page it opens is still titled
+//  "Gestational diabetes", which is where a name belongs — that is the word on
+//  her prescription. `ConditionEntry.plainLine` is the line under it, and
+//  `test/pv_door_complications_test.dart` holds every one of them.
+//
+//  ⚠️ THIS IS THE ONE PLACE A DOOR TITLE MAY CARRY A MEDICAL WORD AT ALL, and
+//  only in brackets, and only second.
+//
+//  ---------------------------------------------------------------------------
+//  ⚠️ SINGLE SOURCE, READ CORRECTLY
+//  ---------------------------------------------------------------------------
+//
+//  The brief: *"this area OWNS every condition. Other areas link to these
+//  pages. Never keep a second copy of a condition anywhere."*
+//
+//  Taken literally that collides with a fact of the codebase: `kAllConditions`
+//  and `kReportFindings` both exist, ~11 subjects appear in both, and two cards
+//  this brief names by hand — "Cord looped around the neck" and "Placenta
+//  sitting low" — exist ONLY as findings.
+//
+//  The rule as applied, decided 2026-09-10 and written up in
+//  `docs/PREGNANCY-DOOR-BUILD.md` §4a: **one page per QUESTION, not one page
+//  per word.** `kAllConditions` answers "my doctor said I have X";
+//  `kReportFindings` answers "my report says X". Two questions, two pages, and
+//  never a second copy of the same ANSWER.
+//
+//  So Sub-tab 2 links across for those two, using `PvDoorFindingTile`. Copying
+//  the entries between the files is the one thing §4a forbids outright.
+//
+//  ---------------------------------------------------------------------------
+//  ⚠️ FIVE TABS, AND THE FIRST IS THE DEFAULT
+//  ---------------------------------------------------------------------------
+//
+//    1. Find a condition      search, chip, most common     [search screen]
+//    2. When it usually comes up  browse without the name   [card rails]
+//    3. Get help now          the safety tab                [pinned + rails]
+//    4. Living with it        the day to day                [card rails]
+//    5. Talk                  a pinned flag, then people    [card rails]
+//
+//  186 is the bracket's own teal. The other four hues are `V2BlockHues` values
+//  already in use elsewhere in the stage; 344 is on "Get help now" because it
+//  is the closest thing the grid has to an alarm without being a red.
+// =============================================================================
+
+import 'package:flutter/material.dart' show Icons;
+
+import 'pv_door_data.dart';
+
+/// Surfaces this door opens. Constants because each becomes a route NAME, and
+/// `global_ask_fab.dart` reads route names.
+const String kCondSurfaceFind = 'conditions/find';
+const String kCondSurfaceSameDay = 'conditions/same_day';
+const String kCondSurfaceJourney = 'conditions/journey';
+const String kCondSurfaceQuestions = 'conditions/questions';
+const String kCondSurfaceUrgent = 'scans/urgent';
+const String kCondSurfaceConsult = 'consults';
+
+/// ⚠️ IT POINTS AT THE SCANS DOOR'S LOCKER, ON PURPOSE. The brief's own words
+/// for the card: *"'Keep your reports for this' links to My reports in Scans
+/// (single source)."* One locker, reached from two doors — which is the same
+/// rule as the conditions themselves, pointing the other way.
+const String kCondSurfaceReports = 'scans/reports';
+
+const String kCondTabFind = 'find';
+const String kCondTabWhen = 'when';
+const String kCondTabHelp = 'help';
+const String kCondTabLiving = 'living';
+const String kCondTabTalk = 'talk';
+
+final PvDoorPage kComplicationsDoor = PvDoorPage(
+  bracketId: 'pregnancy_complications',
+
+  heroTitle: 'What your doctor is managing.',
+  heroBlurb: 'Every condition explained in plain words — what it is, what '
+      'happens next, and when to call.',
+
+  // ⚠️ NO PHOTOGRAPH. Same call as the Scans door, and for a stronger reason
+  // here: a stock photograph attached to a page about complications is the
+  // worst possible place for a picture of the wrong thing. The V3 field and
+  // this bracket's own drawn mark are a finished hero. See
+  // `pv_door_scans.dart` for the placeholder lesson in full.
+
+  // ⚠️ THE FRAME LINE FROM THE CONDITION PAGES, AT THE FOOT OF THE DOOR. Every
+  // condition page opens with "This helps you understand what your doctor is
+  // managing. It does not replace them." The brief says that line stays
+  // untouched, and a door that leads to twenty-seven of those pages should say
+  // the same thing before she gets there.
+  closingLine: 'This helps you understand what your doctor is managing. It '
+      'does not replace them.',
+
+  groups: [
+    // -------------------------------------------------------------------------
+    //  1. Find a condition — the search screen, inline
+    // -------------------------------------------------------------------------
+    //  ⚠️ THE SEARCH SCREEN IS THE TAB, NOT A CARD THAT OPENS IT. The brief
+    //  calls it "a search screen, NOT a rail", and the search bar, the "My
+    //  doctor told me" chip and the Most-common list ARE that tab.
+    //
+    //  ⚠️ AND THE TWO-WAY DOOR COMES WITH IT. `_DoorGate` asks whether this
+    //  visit is diagnosed-real or curiosity, and the answer changes what the
+    //  area offers. Rendering the browse without it would let the door bypass a
+    //  question the screen exists to ask.
+    PvDoorGroup(
+      id: kCondTabFind,
+      label: 'Find a condition',
+      icon: Icons.search_rounded,
+      hue: 186,
+      inlineSurfaceId: kCondSurfaceFind,
+      inlineLabel: 'Search',
+      layout: PvDoorLayout.stack,
+    ),
+
+    PvDoorGroup(
+      id: kCondTabWhen,
+      label: 'When it comes up',
+      icon: Icons.calendar_month_outlined,
+      hue: 26,
+      note: 'Nobody gets all of these, and most pregnancies get none of them. '
+          'This is when each one tends to show up, not a list to expect.',
+    ),
+
+    // -------------------------------------------------------------------------
+    //  3. Get help now — the safety tab
+    // -------------------------------------------------------------------------
+    //  ⚠️ THE PINNED FLAG HERE IS THE ASSEMBLED ONE, NOT THE SCANS LIST. See
+    //  `same_day_signs_data.dart`: five plain lines, each drawn from a
+    //  condition's own CALL NOW section, each opening that page. The brief is
+    //  emphatic that it is assembled and never authored.
+    PvDoorGroup(
+      id: kCondTabHelp,
+      label: 'Get help now',
+      icon: Icons.emergency_outlined,
+      hue: 344,
+      pinnedRedFlag: kSameDayFlag,
+    ),
+
+    PvDoorGroup(
+      id: kCondTabLiving,
+      label: 'Living with it',
+      icon: Icons.wb_sunny_outlined,
+      hue: 42,
+    ),
+
+    // -------------------------------------------------------------------------
+    //  5. Talk
+    // -------------------------------------------------------------------------
+    //  ⚠️ THE GENERAL PREGNANCY FLAG, WHICH IS THE ONE THE BRIEF MEANS BY
+    //  "When to call your doctor" [Red flag] reuse. Get-help-now carries the
+    //  assembled condition list; this carries the stage's standing one, which
+    //  is the same object the Scans door pins. Two flags on one door, and they
+    //  are not the same list — one is about conditions, one is about pregnancy.
+    PvDoorGroup(
+      id: kCondTabTalk,
+      label: 'Talk',
+      icon: Icons.chat_bubble_outline_rounded,
+      hue: 160,
+      pinnedRedFlag: kPregnancyUrgentFlag,
+    ),
+  ],
+
+  sections: [
+    // =========================================================================
+    //  SUB-TAB 1 · Find a condition
+    // -------------------------------------------------------------------------
+    //  No cards. The brief lists three things for this tab and all three —
+    //  search, the chip, the Most-common list — are the inline screen. Adding a
+    //  card beside them would be a fourth thing the brief did not ask for.
+    // =========================================================================
+
+    // =========================================================================
+    //  SUB-TAB 2 · When it usually comes up
+    // -------------------------------------------------------------------------
+    //  ⚠️ LINKS, NOT COPIES. Every tile here opens a page that already exists;
+    //  the brief says "group by linking" and the DO NOT list repeats it.
+    // =========================================================================
+    PvDoorSection(
+      group: kCondTabWhen,
+      heading: 'Early months',
+      tiles: [
+        PvDoorConditionTile(
+          title: 'Pregnancy in the wrong place (ectopic)',
+          blurb: 'Rare, urgent, and treatable when it is caught early.',
+          conditionId: 'ectopic',
+        ),
+        PvDoorConditionTile(
+          title: 'Severe vomiting (hyperemesis)',
+          blurb: 'Far past ordinary morning sickness, and treatable.',
+          conditionId: 'hyperemesis',
+        ),
+        PvDoorConditionTile(
+          title: 'Thyroid gland off (thyroid in pregnancy)',
+          blurb: 'Common here, and fixed with a daily tablet.',
+          conditionId: 'thyroid',
+        ),
+        PvDoorConditionTile(
+          title: 'Low blood, low iron (anemia)',
+          blurb: 'The commonest finding in an Indian pregnancy.',
+          conditionId: 'anemia',
+        ),
+      ],
+    ),
+
+    PvDoorSection(
+      group: kCondTabWhen,
+      heading: 'Middle months',
+      tiles: [
+        PvDoorConditionTile(
+          title: 'Pregnancy sugar goes high (gestational diabetes)',
+          blurb: 'Usually no symptoms at all, which is why everyone is tested.',
+          conditionId: 'gdm',
+        ),
+        // ⚠️ THE FINDINGS LIBRARY, AND IT IS THE RULE WORKING. There is no
+        // low-lying placenta in `kAllConditions` — the nearest entry is
+        // `placenta_previa`, which is the more serious version and a different
+        // page. Linking to the finding is honest; copying it here is what §4a
+        // forbids.
+        PvDoorFindingTile(
+          title: 'Placenta sitting low (low-lying placenta)',
+          blurb: 'Common at the mid-pregnancy scan, and it usually moves up.',
+          findingId: 'low_lying_placenta',
+        ),
+        PvDoorConditionTile(
+          title: 'PCOS in pregnancy',
+          blurb: 'Something you had before, watched a little more closely now.',
+          conditionId: 'pcos',
+        ),
+      ],
+    ),
+
+    PvDoorSection(
+      group: kCondTabWhen,
+      heading: 'Later months',
+      tiles: [
+        PvDoorConditionTile(
+          title: 'Blood pressure needs watching (high BP)',
+          blurb: 'Mostly managed with closer check-ups, sometimes a tablet.',
+          conditionId: 'high_bp',
+        ),
+        PvDoorConditionTile(
+          title: 'Baby lying feet-down (breech)',
+          blurb: 'Common until late on, and there is time for it to turn.',
+          conditionId: 'breech',
+        ),
+        PvDoorConditionTile(
+          title: 'Less water around the baby (low fluid)',
+          blurb: 'Found on a scan, and watched with more scans.',
+          conditionId: 'low_amniotic_fluid',
+        ),
+        // ⚠️ FINDINGS AGAIN, and the brief names this card by hand. Cord around
+        // the neck exists only as something a report says — no condition page
+        // was ever written for it, and one written now would be a second copy
+        // of an answer that already exists.
+        PvDoorFindingTile(
+          title: 'Cord looped around the neck (cord around neck)',
+          blurb: 'Very common, and usually not a problem at all.',
+          findingId: 'nuchal_cord',
+        ),
+      ],
+    ),
+
+    // =========================================================================
+    //  SUB-TAB 3 · Get help now
+    // =========================================================================
+    PvDoorSection(
+      group: kCondTabHelp,
+      heading: 'Know these three',
+      tiles: [
+        PvDoorGuideTile(
+          title: 'When blood pressure gets dangerous',
+          blurb: 'The signs that mean today, not your next appointment.',
+          readId: 'preg_cond_read_bp_dangerous',
+        ),
+        PvDoorGuideTile(
+          title: 'Bleeding in pregnancy',
+          blurb: 'What is usually fine, what is not, and why you call either '
+              'way.',
+          readId: 'preg_cond_read_bleeding',
+        ),
+        PvDoorGuideTile(
+          title: 'When the baby moves less',
+          blurb: 'Do not wait, and do not count first.',
+          readId: 'preg_cond_read_less_movement',
+        ),
+      ],
+    ),
+
+    // =========================================================================
+    //  SUB-TAB 4 · Living with it
+    // =========================================================================
+    PvDoorSection(
+      group: kCondTabLiving,
+      heading: 'The day to day',
+      tiles: [
+        PvDoorGuideTile(
+          title: 'Handling pregnancy sugar in India',
+          blurb: 'Rice, roti, festivals — what actually shifts the numbers.',
+          readId: 'preg_cond_read_sugar_india',
+        ),
+        PvDoorGuideTile(
+          title: 'The daily thyroid tablet',
+          blurb: 'When to take it, and what stops it working.',
+          readId: 'preg_cond_read_thyroid_tablet',
+        ),
+        PvDoorGuideTile(
+          title: 'Iron, from food and tablets',
+          blurb: 'Why they upset your stomach, and what helps them work.',
+          readId: 'preg_cond_read_iron',
+        ),
+      ],
+    ),
+
+    PvDoorSection(
+      group: kCondTabLiving,
+      heading: 'Keep track of it',
+      tiles: [
+        PvDoorToolTile(
+          title: 'Add a condition to my journey',
+          blurb: 'Put it on your own list, so it is the first thing here next '
+              'time.',
+          surfaceId: kCondSurfaceJourney,
+        ),
+        // ⚠️ ONE LOCKER, TWO DOORS. The brief's own instruction: link to My
+        // reports in Scans, single source. A second locker here would be two
+        // places a report could be and one place she would look.
+        PvDoorToolTile(
+          title: 'Keep your reports for this',
+          blurb: 'Your report locker, in Scans & tests. A photo is enough.',
+          surfaceId: kCondSurfaceReports,
+        ),
+      ],
+    ),
+
+    // =========================================================================
+    //  SUB-TAB 5 · Talk
+    // =========================================================================
+    PvDoorSection(
+      group: kCondTabTalk,
+      heading: 'Talk to someone',
+      tiles: [
+        PvDoorTalkTile(
+          title: 'Have a doctor explain your condition',
+          blurb: 'Book a 1:1 with a gynaecologist and go through it together.',
+          surfaceId: kCondSurfaceConsult,
+        ),
+      ],
+    ),
+
+    PvDoorSection(
+      group: kCondTabTalk,
+      heading: 'Before your appointment',
+      tiles: [
+        PvDoorChecklistTile(
+          title: 'What to ask about your condition',
+          blurb: 'Tick what matters to you, and take the list in with you.',
+          surfaceId: kCondSurfaceQuestions,
+        ),
+      ],
+    ),
+  ],
+);

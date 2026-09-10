@@ -75,6 +75,31 @@ class ConditionDetailScreen extends StatelessWidget {
           body: ListView(
             padding: const EdgeInsets.fromLTRB(18, 8, 18, 44),
             children: [
+              // ---- the plain line, directly under the title ----------------
+              //
+              // ⚠️ THE BRIEF'S LANGUAGE RULE, IN THE ONE PLACE IT IS LOAD-
+              // BEARING. Its words: *"A medical name appears ONLY as the title
+              // of a condition page, because that is what a user matches to
+              // their doctor's words. Directly under that title sits one plain
+              // line saying what it is."*
+              //
+              // The title is in the app bar, so "directly under it" is here —
+              // the first thing in the body, above even the frame note. A
+              // mother who has been handed the word "hyperemesis" and typed it
+              // in should read "severe pregnancy vomiting" before she reads
+              // anything else, including our disclaimer.
+              //
+              // ⚠️ IT IS NOT `whatItIs`, WHICH IS A PARAGRAPH FURTHER DOWN.
+              // This is a label; that is an explanation. Both exist and neither
+              // replaces the other.
+              Text(entry.plainLine.of(lang),
+                  style: pvManrope(
+                      fontSize: 15,
+                      height: 1.5,
+                      fontWeight: FontWeight.w600,
+                      color: p.ink2)),
+              const SizedBox(height: 18),
+
               // ---- the permanent frame, on every page, before content -----
               _FrameNote(p: p, lang: lang),
               const SizedBox(height: 22),

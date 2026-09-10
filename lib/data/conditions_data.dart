@@ -97,6 +97,7 @@ class ConditionEntry {
   const ConditionEntry({
     required this.id,
     required this.name,
+    required this.plainLine,
     required this.group,
     this.aliases = const [],
     required this.whatItIs,
@@ -118,7 +119,35 @@ class ConditionEntry {
   });
 
   final String id;
+
+  /// The medical name, and the ONLY place one is allowed to stand alone.
+  ///
+  /// ⚠️ THE COMPLICATIONS BRIEF STATES THE RULE EXACTLY: *"A medical name
+  /// appears ONLY as the title of a condition page, because that is what a user
+  /// matches to their doctor's words."* Every other heading, label and card we
+  /// write is plain. In a browse list the plain phrase leads and the medical
+  /// name follows in brackets — never the other way round.
   final LocalizedText name;
+
+  /// One plain line saying what it is, in the words she would use.
+  ///
+  /// ⚠️ REQUIRED, NOT OPTIONAL, AND THAT IS THE WHOLE POINT. The brief asks for
+  /// it under every title and under every browse row. Making it optional would
+  /// mean a list where some rows explain themselves and some do not — and the
+  /// ones that do not would be exactly the rarer conditions, where a mother is
+  /// least likely to know the word.
+  ///
+  /// ⚠️ TEN OF THESE ARE THE BRIEF'S OWN WORDS, VERBATIM — gestational diabetes
+  /// through cord around neck. They are a contract, held by
+  /// `test/pv_door_complications_test.dart`. The rest are written to the same
+  /// pattern: what it is, in one breath, no jargon, no reassurance. The
+  /// reassurance is a separate field doing a separate job.
+  ///
+  /// ⚠️ IT IS NOT `whatItIs`. That is a paragraph and it is the first thing on
+  /// the page; this is a label. "Pregnancy sugar goes high" is not a summary of
+  /// the paragraph, it is the sentence somebody would say out loud.
+  final LocalizedText plainLine;
+
   final ConditionGroup group;
 
   /// Other words she might type into the search box for this condition.
@@ -219,6 +248,7 @@ final List<ConditionEntry> kCommonConditions = [
   ConditionEntry(
     id: 'gdm',
     name: _en('Gestational diabetes'),
+    plainLine: _en('Pregnancy sugar goes high.'),
     group: ConditionGroup.common,
     aliases: ['gdm', 'blood sugar', 'sugar in pregnancy', 'diabetes'],
     whatItIs: _en('Gestational diabetes means your blood sugar has gone above '
@@ -285,6 +315,7 @@ final List<ConditionEntry> kCommonConditions = [
   ConditionEntry(
     id: 'thyroid',
     name: _en('Thyroid in pregnancy'),
+    plainLine: _en('The neck gland is off, fixed with a daily tablet.'),
     group: ConditionGroup.common,
     aliases: ['thyroid', 'tsh', 'hypothyroid', 'hyperthyroid'],
     whatItIs: _en('Your thyroid gland can run slightly under or over its '
@@ -347,6 +378,7 @@ final List<ConditionEntry> kCommonConditions = [
   ConditionEntry(
     id: 'anemia',
     name: _en('Anemia'),
+    plainLine: _en('Low blood, low iron.'),
     group: ConditionGroup.common,
     aliases: ['anemia', 'anaemia', 'low hemoglobin', 'iron deficiency', 'hb low'],
     whatItIs: _en('Anemia means your haemoglobin, the part of your blood that '
@@ -406,6 +438,7 @@ final List<ConditionEntry> kCommonConditions = [
   ConditionEntry(
     id: 'pcos',
     name: _en('PCOS and pregnancy'),
+    plainLine: _en('A hormone imbalance you had before, watched more closely now.'),
     group: ConditionGroup.common,
     aliases: ['pcos', 'pcod', 'polycystic ovaries'],
     whatItIs: _en('If you had PCOS before conceiving, it does not go away in '
@@ -458,6 +491,7 @@ final List<ConditionEntry> kCommonConditions = [
   ConditionEntry(
     id: 'hyperemesis',
     name: _en('Hyperemesis'),
+    plainLine: _en('Severe pregnancy vomiting.'),
     group: ConditionGroup.common,
     aliases: ['hyperemesis', 'hg', 'severe vomiting', 'severe nausea'],
     whatItIs: _en('Hyperemesis gravidarum is morning sickness taken much '
@@ -520,6 +554,7 @@ final List<ConditionEntry> kCommonConditions = [
   ConditionEntry(
     id: 'placenta_previa',
     name: _en('Low-lying placenta / placenta previa'),
+    plainLine: _en('The placenta is sitting low.'),
     group: ConditionGroup.common,
     aliases: ['placenta previa', 'low lying placenta', 'previa'],
     whatItIs: _en('Your placenta has attached low in the womb, partly or '
@@ -576,6 +611,7 @@ final List<ConditionEntry> kCommonConditions = [
   ConditionEntry(
     id: 'high_bp',
     name: _en('High BP in pregnancy'),
+    plainLine: _en('Blood pressure needs watching.'),
     group: ConditionGroup.common,
     aliases: [
       'high bp',
@@ -644,6 +680,7 @@ final List<ConditionEntry> kCommonConditions = [
   ConditionEntry(
     id: 'ectopic',
     name: _en('Ectopic pregnancy'),
+    plainLine: _en('The pregnancy is growing in the wrong place.'),
     group: ConditionGroup.common,
     aliases: ['ectopic', 'tubal pregnancy'],
     whatItIs: _en('An ectopic pregnancy means the fertilised egg has '
@@ -705,6 +742,7 @@ final List<ConditionEntry> kHighAnxietyConditions = [
   ConditionEntry(
     id: 'miscarriage',
     name: _en('Miscarriage / pregnancy loss'),
+    plainLine: _en('A pregnancy that ends on its own, early.'),
     group: ConditionGroup.highAnxiety,
     aliases: ['miscarriage', 'pregnancy loss', 'bleeding early pregnancy'],
     whatItIs: _en('A miscarriage is the loss of a pregnancy before 20 weeks. '
@@ -777,6 +815,7 @@ final List<ConditionEntry> kHighAnxietyConditions = [
   ConditionEntry(
     id: 'preeclampsia',
     name: _en('Preeclampsia'),
+    plainLine: _en('High blood pressure that starts to affect the rest of you.'),
     group: ConditionGroup.highAnxiety,
     aliases: ['preeclampsia', 'pre eclampsia', 'toxemia'],
     whatItIs: _en('Preeclampsia is raised blood pressure after 20 weeks '
@@ -862,6 +901,7 @@ final List<ConditionEntry> kPlacentaBleedingConditions = [
   ConditionEntry(
     id: 'placental_abruption',
     name: _en('Placental abruption'),
+    plainLine: _en('The placenta starts coming away too early.'),
     group: ConditionGroup.placentaBleeding,
     aliases: ['abruption', 'placenta separation'],
     whatItIs: _en('The placenta has started to separate from the wall of '
@@ -904,6 +944,7 @@ final List<ConditionEntry> kPlacentaBleedingConditions = [
   ConditionEntry(
     id: 'iugr',
     name: _en('IUGR (baby growing slowly)'),
+    plainLine: _en('The baby is measuring smaller than expected.'),
     group: ConditionGroup.placentaBleeding,
     aliases: ['iugr', 'fgr', 'small baby', 'growth restriction'],
     whatItIs: _en('IUGR means your baby is measuring smaller than expected '
@@ -948,6 +989,7 @@ final List<ConditionEntry> kPlacentaBleedingConditions = [
   ConditionEntry(
     id: 'low_amniotic_fluid',
     name: _en('Low amniotic fluid'),
+    plainLine: _en('Less water around the baby.'),
     group: ConditionGroup.placentaBleeding,
     aliases: ['oligohydramnios', 'low fluid', 'low amniotic fluid'],
     whatItIs: _en('Oligohydramnios means the fluid cushioning your baby is '
@@ -990,6 +1032,7 @@ final List<ConditionEntry> kPlacentaBleedingConditions = [
   ConditionEntry(
     id: 'polyhydramnios',
     name: _en('Polyhydramnios'),
+    plainLine: _en('More water around the baby than usual.'),
     group: ConditionGroup.placentaBleeding,
     aliases: ['polyhydramnios', 'excess fluid', 'too much fluid'],
     whatItIs: _en('Polyhydramnios means there is more amniotic fluid around '
@@ -1039,6 +1082,7 @@ final List<ConditionEntry> kPositionCervixConditions = [
   ConditionEntry(
     id: 'breech',
     name: _en('Breech baby'),
+    plainLine: _en('The baby is lying feet-down.'),
     group: ConditionGroup.positionCervix,
     aliases: ['breech', 'baby position', 'bottom first'],
     whatItIs: _en('Breech means your baby is positioned bottom or feet-first '
@@ -1077,6 +1121,7 @@ final List<ConditionEntry> kPositionCervixConditions = [
   ConditionEntry(
     id: 'cervical_incompetence',
     name: _en('Cervical incompetence'),
+    plainLine: _en('The neck of the womb opens too early.'),
     group: ConditionGroup.positionCervix,
     aliases: ['cervical incompetence', 'weak cervix', 'cervical insufficiency'],
     whatItIs: _en('This means your cervix begins to open earlier than it '
@@ -1132,6 +1177,7 @@ final List<ConditionEntry> kDiscomfortConditions = [
   ConditionEntry(
     id: 'uti',
     name: _en('UTI (urine infection)'),
+    plainLine: _en('A water infection — burning, and going often.'),
     group: ConditionGroup.discomforts,
     aliases: ['uti', 'urine infection', 'urinary tract infection'],
     whatItIs: _en('A urinary tract infection — a bacterial infection, most '
@@ -1174,6 +1220,7 @@ final List<ConditionEntry> kDiscomfortConditions = [
   ConditionEntry(
     id: 'piles',
     name: _en('Piles (haemorrhoids)'),
+    plainLine: _en('Swollen veins around the back passage.'),
     group: ConditionGroup.discomforts,
     aliases: ['piles', 'hemorrhoids', 'haemorrhoids'],
     whatItIs: _en('Piles are swollen veins around the anus, common in '
@@ -1212,6 +1259,7 @@ final List<ConditionEntry> kDiscomfortConditions = [
   ConditionEntry(
     id: 'varicose_veins',
     name: _en('Varicose veins'),
+    plainLine: _en('Swollen, achy veins in the legs.'),
     group: ConditionGroup.discomforts,
     aliases: ['varicose veins', 'leg veins', 'swollen veins'],
     whatItIs: _en('Enlarged, bulging veins, usually in the legs, caused by '
@@ -1255,6 +1303,7 @@ final List<ConditionEntry> kSpecialistConditions = [
   ConditionEntry(
     id: 'fibroids',
     name: _en('Fibroids in pregnancy'),
+    plainLine: _en('Harmless lumps in the wall of the womb.'),
     group: ConditionGroup.specialist,
     aliases: ['fibroids', 'uterine fibroids'],
     whatItIs: _en('Fibroids are non-cancerous growths in the wall of the '
@@ -1298,6 +1347,7 @@ final List<ConditionEntry> kSpecialistConditions = [
   ConditionEntry(
     id: 'icp_cholestasis',
     name: _en('ICP / cholestasis'),
+    plainLine: _en('Itching caused by the liver, usually worst on hands and feet.'),
     group: ConditionGroup.specialist,
     aliases: ['icp', 'cholestasis', 'itching pregnancy', 'liver itching'],
     whatItIs: _en('Intrahepatic cholestasis of pregnancy is a liver '
@@ -1344,6 +1394,7 @@ final List<ConditionEntry> kSpecialistConditions = [
   ConditionEntry(
     id: 'hellp',
     name: _en('HELLP syndrome'),
+    plainLine: _en('A severe form of high blood pressure that affects blood and liver.'),
     group: ConditionGroup.specialist,
     aliases: ['hellp', 'hellp syndrome'],
     whatItIs: _en('HELLP is a severe, fast-moving complication related to '
@@ -1385,6 +1436,7 @@ final List<ConditionEntry> kSpecialistConditions = [
   ConditionEntry(
     id: 'vasa_previa',
     name: _en('Vasa previa'),
+    plainLine: _en('Blood vessels crossing the exit of the womb.'),
     group: ConditionGroup.specialist,
     aliases: ['vasa previa'],
     whatItIs: _en('Vasa previa means unprotected fetal blood vessels are '
@@ -1426,6 +1478,7 @@ final List<ConditionEntry> kSpecialistConditions = [
   ConditionEntry(
     id: 'rh_negative',
     name: _en('Rh negative pregnancy'),
+    plainLine: _en('Your blood type needs one injection to protect the baby.'),
     group: ConditionGroup.specialist,
     aliases: ['rh negative', 'rhesus negative', 'anti-d'],
     whatItIs: _en('If your blood group is Rh negative and your baby\'s is Rh '
@@ -1481,6 +1534,7 @@ final List<ConditionEntry> kPreExistingConditions = [
   ConditionEntry(
     id: 'pre_existing',
     name: _en('Pregnancy with a pre-existing condition'),
+    plainLine: _en('Something you already had, now managed alongside pregnancy.'),
     group: ConditionGroup.preExisting,
     aliases: [
       'type 1 diabetes',
@@ -1549,6 +1603,7 @@ final List<ConditionEntry> kSeasonalConditions = [
   ConditionEntry(
     id: 'covid_pregnancy',
     name: _en('COVID in pregnancy'),
+    plainLine: _en('Covid while pregnant, and what changes.'),
     group: ConditionGroup.seasonal,
     aliases: ['covid', 'coronavirus', 'covid-19'],
     whatItIs: _en('Catching COVID-19 while pregnant. For most vaccinated, '
@@ -1596,6 +1651,7 @@ final List<ConditionEntry> kSeasonalConditions = [
   ConditionEntry(
     id: 'dengue_pregnancy',
     name: _en('Dengue in pregnancy'),
+    plainLine: _en('Dengue while pregnant, and what changes.'),
     group: ConditionGroup.seasonal,
     aliases: ['dengue', 'dengue fever'],
     whatItIs: _en('A mosquito-borne viral fever. In pregnancy it needs '
