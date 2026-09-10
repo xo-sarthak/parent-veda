@@ -177,3 +177,35 @@ design-kit/dist/
 # added ~110 MB to history. Keep them local; the curated *-critical-reviews.xlsx
 # analysis files are small and stay tracked.
 research/competitors/**/*_reviews_raw.csv
+
+# Door maps and the app flow map. RENDERED, not written: tools/door_map.py,
+# tools/skilling_door_map.py and tools/buying_door_map.py lay the section
+# content out as one HTML page each and print it to PDF, so the reader can
+# see a door whole. Thirty-five files and counting, two per section, and
+# every one of them buried real changes in `git status`.
+#
+# Same rule as docs/content-brief/: the generators are the source and are
+# tracked; the renders are one command away and stay local. The *.md design
+# prompts beside them are authored and are NOT covered - they diff, and they
+# are what the maps are made from.
+#
+# Matched by name rather than by folder on purpose. docs/BOTTOM-NAV-MAP.* and
+# docs/TTC-Master.pdf are already tracked and stay so; a bare docs/*.pdf would
+# hide the next such file added by hand.
+*-DOOR-MAP.html
+*-DOOR-MAP.pdf
+docs/APP-FLOW-MAP.html
+docs/APP-FLOW-MAP.pdf
+
+# Claude Design prompts. The briefs handed to claude.ai/design to draw a
+# screen - input to a design tool, not app work, and the screens they
+# produced are what got built. They are kept next to the repo because the
+# next prompt is usually written by reading the last one, but they do not
+# belong in `git status` and they do not belong in history.
+#
+# The prompts that were committed BEFORE this rule (docs/*-PROMPT.md and
+# docs/_parenting/*.prompt.md) stay where they are; ignoring a path never
+# untracks it, and moving them would only churn history. New prompts go in
+# this folder. The audits and inventories beside them in docs/ are app
+# planning and stay tracked.
+docs/design-prompts/

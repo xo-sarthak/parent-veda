@@ -1,0 +1,195 @@
+/* =============================================================================
+   door_map.css -- the printable door-map sheet
+   -----------------------------------------------------------------------------
+   Shared by every docs/*-DOOR-MAP.pdf so eleven documents cannot drift into
+   eleven designs. Point sizes throughout, because the only target is A4 print.
+
+   Two colour conventions carry meaning and should not be repurposed:
+     * purple  = ParentVeda, and anything routable by name
+     * coral   = a doctor callout in the content, or a finding in the commentary
+   ========================================================================== */
+
+@page { size: A4 portrait; margin: 15mm 13mm 16mm; }
+
+:root{
+  --ink:#201c24; --body:#3d3747; --mute:#6f6878; --faint:#9a93a6;
+  --line:#e2dde8; --hair:#eeeaf2; --paper:#faf8fb;
+  --pv:#6a30b6; --pv-soft:#f3eefa;
+  --doc:#b3123c; --doc-soft:#fdf0f3;
+  --myth:#8a6410; --myth-soft:#fdf7e9;
+  --safe:#1c6b52; --safe-soft:#eef7f3;
+  --tool:#1f5d94; --tool-soft:#eef4fa;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; color:var(--body); background:#fff;
+  font-family:Manrope,-apple-system,"Segoe UI",sans-serif;
+  font-size:9.2pt; line-height:1.52;
+  -webkit-print-color-adjust:exact; print-color-adjust:exact;
+}
+h1,h2,h3{font-family:Fraunces,Georgia,serif; color:var(--ink); margin:0; font-weight:600}
+h1{font-size:31pt; line-height:1.04; letter-spacing:-1pt}
+h2{font-size:18pt; line-height:1.1; letter-spacing:-.45pt}
+h3{font-size:12.5pt; line-height:1.18; letter-spacing:-.25pt}
+h4{font-family:Manrope; font-size:9.6pt; font-weight:800; color:var(--ink); margin:0; letter-spacing:-.1pt}
+p{margin:0}
+
+.break{page-break-before:always}
+.keep{page-break-inside:avoid; break-inside:avoid}
+.stack{display:flex; flex-direction:column; gap:7pt}
+.rule{height:1px; background:var(--line); margin:9pt 0}
+
+/* ---------- cover ---------- */
+.cover{height:242mm; display:flex; flex-direction:column; justify-content:center}
+.cover .kicker{font-size:8pt; font-weight:800; letter-spacing:2.2pt; text-transform:uppercase; color:var(--pv); margin-bottom:14pt}
+.cover h1{margin-bottom:12pt}
+.cover .lede{font-size:11.5pt; line-height:1.5; color:var(--body); max-width:135mm}
+.cover .meta{margin-top:26pt; font-size:8pt; color:var(--mute); line-height:1.9}
+.cover .meta b{color:var(--ink); font-weight:700}
+.coverstat{display:flex; gap:15pt; margin-top:22pt; flex-wrap:wrap}
+.coverstat div{border-left:2px solid var(--pv); padding-left:9pt}
+.coverstat .n{font-family:Fraunces; font-size:19pt; color:var(--ink); line-height:1}
+.coverstat .l{font-size:7pt; font-weight:800; letter-spacing:1.1pt; text-transform:uppercase; color:var(--mute); margin-top:3pt}
+
+/* ---------- section heads ---------- */
+.sec{margin:0 0 11pt}
+.sec .num{font-family:"IBM Plex Mono"; font-size:8pt; font-weight:600; color:var(--pv); letter-spacing:.5pt}
+.sec h2{margin-top:2pt}
+.sec .sub{font-size:9.6pt; color:var(--mute); margin-top:5pt; max-width:152mm}
+
+/* ---------- chips / ids ---------- */
+.id{
+  font-family:"IBM Plex Mono"; font-size:7.4pt; font-weight:500;
+  background:var(--paper); border:1px solid var(--line); border-radius:3pt;
+  padding:.5pt 3pt; color:var(--pv); white-space:nowrap;
+}
+.chip{
+  display:inline-block; font-size:6.6pt; font-weight:800; letter-spacing:.9pt;
+  text-transform:uppercase; padding:1.6pt 5pt; border-radius:99pt;
+  background:var(--pv-soft); color:var(--pv); vertical-align:1.5pt;
+}
+.chip.g{background:#eef2ee; color:#3c5c3c}
+.chip.b{background:var(--tool-soft); color:var(--tool)}
+.chip.r{background:var(--doc-soft); color:var(--doc)}
+.chip.n{background:#f2f0f4; color:var(--mute)}
+
+/* ---------- tree ---------- */
+.tree{
+  font-family:"IBM Plex Mono"; font-size:7.6pt; line-height:1.62;
+  background:var(--paper); border:1px solid var(--line); border-radius:5pt;
+  padding:11pt 12pt; white-space:pre; overflow:hidden; color:var(--ink);
+}
+.tree b{color:var(--pv); font-weight:600}
+.tree i{color:var(--mute); font-style:normal}
+.tree u{color:var(--doc); text-decoration:none}
+
+/* ---------- tables ---------- */
+table{border-collapse:collapse; width:100%; font-size:8.4pt; margin:0}
+th{
+  text-align:left; font-size:6.8pt; font-weight:800; letter-spacing:1pt;
+  text-transform:uppercase; color:var(--mute); padding:0 7pt 4pt 0;
+  border-bottom:1px solid var(--line); vertical-align:bottom;
+}
+td{padding:4.5pt 7pt 4.5pt 0; border-bottom:1px solid var(--hair); vertical-align:top; line-height:1.45}
+td:last-child,th:last-child{padding-right:0}
+.tbl-note{font-size:7.6pt; color:var(--mute); margin-top:5pt; line-height:1.5}
+
+/* ---------- level cards ---------- */
+.lvl{border:1px solid var(--line); border-radius:6pt; padding:10pt 11pt; background:#fff}
+.lvl .hd{display:flex; gap:8pt; align-items:baseline; margin-bottom:4pt}
+.lvl .hd .lb{
+  font-family:"IBM Plex Mono"; font-size:6.8pt; font-weight:600; color:var(--faint);
+  letter-spacing:.4pt; white-space:nowrap;
+}
+.lvl .hd h4{flex:1}
+.lvl .blurb{font-size:8.8pt; color:var(--mute); margin-top:3pt; line-height:1.5}
+.lvl .route{font-size:8pt; color:var(--mute); margin-top:6pt; line-height:1.55}
+
+/* ---------- page block ---------- */
+.pg{margin:0 0 14pt}
+.pg > .pghd{
+  border-left:2.5pt solid var(--pv); padding:0 0 0 8pt; margin-bottom:7pt;
+  page-break-after:avoid; break-after:avoid;
+}
+.pg .pgnum{font-family:"IBM Plex Mono"; font-size:7.2pt; font-weight:600; color:var(--faint)}
+.pg h3{margin-top:1pt}
+.pg .pgsub{font-size:8.6pt; color:var(--mute); font-style:italic; margin-top:2pt}
+.pgmeta{margin-top:4pt}
+
+.blk{margin:0 0 7pt}
+.blkh{
+  font-size:6.8pt; font-weight:800; letter-spacing:1.1pt; text-transform:uppercase;
+  color:var(--faint); margin:0 0 3pt;
+}
+.intro{font-size:9.4pt; color:var(--ink); line-height:1.55; font-weight:500}
+.para{margin:0 0 4.5pt}
+.para:last-child{margin-bottom:0}
+
+ol.steps{margin:0; padding-left:0; list-style:none; counter-reset:s}
+ol.steps li{counter-increment:s; position:relative; padding-left:16pt; margin-bottom:4.5pt}
+ol.steps li::before{
+  content:counter(s); position:absolute; left:0; top:.5pt;
+  font-family:"IBM Plex Mono"; font-size:7pt; font-weight:600; color:#fff;
+  background:var(--pv); width:11pt; height:11pt; border-radius:99pt;
+  display:flex; align-items:center; justify-content:center;
+}
+ol.steps li b{color:var(--ink); font-weight:700}
+ol.steps li span{display:block; color:var(--mute); font-size:8.4pt; margin-top:1pt}
+
+ul.cards,ul.script{margin:0; padding:0; list-style:none}
+ul.cards li{padding-left:9pt; border-left:1.5pt solid var(--hair); margin-bottom:4.5pt}
+ul.cards li b{color:var(--ink); font-weight:700; display:block}
+ul.cards li span{color:var(--mute); font-size:8.4pt}
+
+/* a script box: the words to say, and the words not to */
+ul.script li{
+  padding:6pt 9pt; margin-bottom:5pt; border-radius:5pt;
+  background:var(--safe-soft); border-left:2.5pt solid var(--safe);
+}
+ul.script li b{color:var(--ink); font-weight:700; display:block; font-size:9pt}
+ul.script li span{display:block; color:var(--mute); font-size:8.2pt; margin-top:2pt}
+ul.script li span.not{color:var(--doc)}
+
+.callout{
+  border-radius:5pt; padding:7.5pt 9pt; font-size:8.6pt; line-height:1.5;
+  background:var(--pv-soft); border-left:2.5pt solid var(--pv); color:var(--ink);
+}
+.callout .ct{font-size:6.8pt; font-weight:800; letter-spacing:1.1pt; text-transform:uppercase; display:block; margin-bottom:2.5pt; color:var(--pv)}
+.callout.doc{background:var(--doc-soft); border-color:var(--doc)} .callout.doc .ct{color:var(--doc)}
+.callout.myth{background:var(--myth-soft); border-color:var(--myth)} .callout.myth .ct{color:var(--myth)}
+.callout.safe{background:var(--safe-soft); border-color:var(--safe)} .callout.safe .ct{color:var(--safe)}
+
+.when,.india{font-size:8.4pt; line-height:1.5; padding-left:9pt; border-left:1.5pt solid var(--line)}
+.when b,.india b{
+  font-size:6.8pt; font-weight:800; letter-spacing:1.1pt; text-transform:uppercase;
+  color:var(--faint); display:block; margin-bottom:1.5pt;
+}
+
+.slot{
+  border:1px dashed var(--line); border-radius:5pt; padding:7pt 9pt;
+  background:var(--paper); font-size:8.4pt;
+}
+.slot .st{font-size:6.8pt; font-weight:800; letter-spacing:1.1pt; text-transform:uppercase; color:var(--faint)}
+.slot b{color:var(--ink); display:block; margin-top:2pt}
+.slot span{color:var(--mute); display:block; margin-top:1pt}
+.slot .sid{font-family:"IBM Plex Mono"; font-size:7.2pt; color:var(--pv); margin-top:3pt; display:block}
+
+.lnk{
+  font-size:8.4pt; padding:6pt 9pt; border-radius:5pt; background:var(--tool-soft);
+  border-left:2.5pt solid var(--tool);
+}
+.lnk b{color:var(--ink)}
+.lnk .to{font-family:"IBM Plex Mono"; font-size:7.2pt; color:var(--tool)}
+.lnk span{display:block; color:var(--mute); margin-top:1pt}
+.lnk.consult{background:#f7f2ee; border-color:#a6633a}
+.lnk.consult .to{color:#a6633a}
+
+.note{
+  font-size:8.2pt; line-height:1.55; color:var(--mute);
+  background:var(--paper); border:1px solid var(--line); border-radius:5pt; padding:8pt 10pt;
+}
+.note b{color:var(--ink)}
+.note.warn{background:var(--doc-soft); border-color:#f0cdd6; color:#6d3a49}
+.note.warn b{color:var(--doc)}
+
+.foot{font-size:7.4pt; color:var(--faint); margin-top:10pt; line-height:1.6}
