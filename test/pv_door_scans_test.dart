@@ -23,7 +23,6 @@ import 'package:parentveda/data/doors/pv_door_data.dart';
 import 'package:parentveda/data/reads/pregnancy_reads.dart';
 import 'package:parentveda/data/report_findings_data.dart';
 import 'package:parentveda/data/checklists/pv_checklist.dart';
-import 'package:parentveda/data/tests_scans_reports_data.dart';
 import 'package:parentveda/screens/brackets/scan_timeline_screen.dart'
     show kScanRun;
 import 'package:parentveda/screens/doors/pv_door_router.dart';
@@ -113,14 +112,30 @@ void main() {
   });
 
   group('every tile opens something real', () {
-    test('article tiles name a scan in the library', () {
+    test('every library entry tile names an id that exists', () {
+      // ⚠️ ONE ASSERTION FOR NINE LIBRARIES, and it grew from three separate
+      // ones when the tile classes collapsed into `PvDoorEntryTile`. A new
+      // library inherits this the moment a door uses it.
       for (final door in kPvDoorPages) {
         for (final t in door.allTiles) {
-          if (t is! PvDoorScanTile) continue;
-          expect(kTestsScans.any((s) => s.id == t.scanId), isTrue,
-              reason: '"${t.title}" points at scan "${t.scanId}", which is not '
-                  'in kTestsScans. The card renders perfectly and does '
-                  'nothing.');
+          if (t is! PvDoorEntryTile) continue;
+          expect(pvDoorEntryResolves(t.library, t.entryId), isTrue,
+              reason: '"${t.title}" points at ${t.library.name} '
+                  '"${t.entryId}", which is not in that library. The card '
+                  'renders perfectly and does nothing.');
+        }
+      }
+    });
+
+    test('every library entry keeps a route name', () {
+      // The FAB reads route names to pick which stage's Ask Veda opens and to
+      // suppress itself, so an empty name is a silently wrong sparkle button.
+      for (final door in kPvDoorPages) {
+        for (final t in door.allTiles) {
+          if (t is! PvDoorEntryTile) continue;
+          final route = pvDoorEntryRoute(t.library, t.entryId);
+          expect(route.trim(), isNotEmpty);
+          expect(route, isNot(contains('null')));
         }
       }
     });
@@ -222,6 +237,90 @@ void main() {
         }
       }
     });
+
+    test('no card title repeats the heading it sits under', () {
+      // ⚠️ THE SAME FAULT AS ABOVE, ONE LEVEL UP, AND IT HAS SHIPPED TWICE.
+      // "Fasting" under "Fasting", then "Diet charts" under "Ready-made diet
+      // charts" — both found by looking at a phone, because a card whose words
+      // are the words a centimetre above it reads as a label for the rail
+      // rather than a thing you tap.
+      for (final door in kPvDoorPages) {
+        for (final s in door.sections) {
+          final heading = s.heading.toLowerCase().trim();
+          for (final t in s.tiles) {
+            expect(t.title.toLowerCase().trim(), isNot(equals(heading)),
+                reason: '"${t.title}" repeats its own heading.');
+          }
+        }
+      }
+    });
+  });
+
+  group('every door wears a photograph, and it was looked at', () {
+    // ⚠️ THIS GROUP CANNOT CHECK THE THING THAT ACTUALLY MATTERS, AND SAYING
+    // SO IS THE POINT OF THE COMMENT. The failure this area has really had was
+    // a real photograph OF THE WRONG THING — a Western urology clinic with the
+    // department legible on a badge, under "Your scans, in one place". No
+    // assertion reachable from Dart can see that. `flutter analyze`, the whole
+    // suite and a render test all passed with it in place.
+    //
+    // So the guarantee lives in the process, written down in
+    // `pv_door_scans.dart`: download the file, open it, and reject anything
+    // carrying signage, a uniform, a badge or a building. Two candidates were
+    // rejected that way on 2026-09-10.
+    //
+    // What CAN be held is the shape around it — that every door has one, that
+    // they are distinct, and that the URL is a fixed-size crop rather than a
+    // full-resolution original on a phone connection.
+    test('every door has one', () {
+      for (final door in kPvDoorPages) {
+        expect(door.heroImageUrl, isNotNull,
+            reason: '${door.bracketId} falls back to the drawn mark.');
+      }
+    });
+
+    test('no two doors wear the same photograph', () {
+      final urls = [for (final d in kPvDoorPages) d.heroImageUrl];
+      expect(urls.toSet().length, urls.length,
+          reason: 'two doors would look like one screen.');
+    });
+
+    test('each is asked for at a phone-sized crop', () {
+      // A hero is roughly 360x300 logical. Asking the CDN for the original is
+      // several megabytes over an Indian mobile connection for a picture that
+      // gets painted at a tenth of the size — and the hero silently renders
+      // nothing while it loads, so the cost is paid in a blank hero.
+      for (final door in kPvDoorPages) {
+        final url = door.heroImageUrl!;
+        expect(url, contains('w=900'), reason: '${door.bracketId} is uncropped.');
+        expect(url, contains('fit=crop'), reason: '${door.bracketId} is uncropped.');
+      }
+    });
+  });
+
+  group('a tile that costs money says so on its face', () {
+    // ⚠️ FOUND ON A PHONE WITH A PASSING TEST ALREADY IN PLACE. The Labour
+    // door's own test asserted the price was in the course card's BLURB — and
+    // a rail card draws the badge, `meta` and the title, never the blurb. The
+    // assertion was true and the price was invisible.
+    //
+    // The general shape, which is worth more than this rule: asserting that a
+    // string exists on a model is not asserting that it reaches a screen. When
+    // the claim is "she can see X before she taps", the assertion has to name
+    // the field the widget actually paints.
+    test('every price is in a field the card renders', () {
+      final rupee = RegExp(r'₹');
+      for (final door in kPvDoorPages) {
+        for (final t in door.allTiles) {
+          if (!rupee.hasMatch(t.blurb)) continue;
+          expect(t.meta, isNotNull,
+              reason: '"${t.title}" names a price only in its blurb, which a '
+                  'rail card does not draw.');
+          expect(rupee.hasMatch(t.meta!), isTrue,
+              reason: '"${t.title}" has a meta line that omits the price.');
+        }
+      }
+    });
   });
 
   group('the Scans door matches the brief', () {
@@ -264,7 +363,8 @@ void main() {
       final scans = [
         for (final s in door.sectionsOf(kScansTabScan))
           for (final t in s.tiles)
-            if (t is PvDoorScanTile) t.scanId,
+            if (t is PvDoorEntryTile && t.library == PvDoorLibrary.scan)
+              t.entryId,
       ];
       expect(scans, [
         'blood_tests',
@@ -358,8 +458,8 @@ void main() {
         'gbs': 'Weeks 35–37',
       };
       for (final t in door.allTiles) {
-        if (t is! PvDoorScanTile) continue;
-        expect(t.meta, expected[t.scanId],
+        if (t is! PvDoorEntryTile || t.library != PvDoorLibrary.scan) continue;
+        expect(t.meta, expected[t.entryId],
             reason: '${t.title} shows the wrong week range.');
       }
     });
@@ -376,10 +476,10 @@ void main() {
       // is asserted instead.
       final runs = {for (final (id, f, t) in kScanRun) id: 'Weeks $f–$t'};
       for (final t in door.allTiles) {
-        if (t is! PvDoorScanTile) continue;
-        expect(t.meta, runs[t.scanId],
+        if (t is! PvDoorEntryTile || t.library != PvDoorLibrary.scan) continue;
+        expect(t.meta, runs[t.entryId],
             reason: '${t.title}: the card says "${t.meta}", the timeline says '
-                '"${runs[t.scanId]}".');
+                '"${runs[t.entryId]}".');
       }
     });
 

@@ -249,6 +249,136 @@ class PvDoorToolScaffold extends StatelessWidget {
       );
 }
 
+
+/// One full-width row in the door's card language.
+///
+/// ⚠️ THIS IS `_WideTile` PROMOTED, AND THE REASON IT MOVED HERE IS A SCREEN
+/// THAT IS NOT A DOOR. The Complications door renders `ConditionsHomeBody`
+/// inline, and that body drew its rows with `SolutionCard` — the pre-V3 hub
+/// card, with a hard blue glyph tile and a bare small-caps `READ` floating
+/// under the text. Beside the door's own rows it read as a screen from an
+/// older version of the app pasted into a new one. Seen on a phone,
+/// 2026-09-10.
+///
+/// ⚠️ SO THE ROW IS THE SHARED THING, NOT THE TILE MODEL. Taking plain values
+/// rather than a `PvDoorTile` is what lets a screen that has never heard of the
+/// door engine wear its language — an embedded body has `ConditionEntry`s, not
+/// tiles, and asking it to build tiles it does not otherwise need would be
+/// making the caller adapt to the widget.
+///
+/// ⚠️ AND THE HUE STAYS THE CALLER'S. `SolutionType.read` is blue on every hub
+/// in the app, deliberately — "she learns the colour once". Changing the SHAPE
+/// to the door's is what was asked for; changing the colour as well would
+/// break a rule that has nothing to do with this.
+class PvDoorRow extends StatelessWidget {
+  const PvDoorRow({
+    super.key,
+    required this.p,
+    required this.hue,
+    required this.icon,
+    required this.chip,
+    required this.title,
+    required this.blurb,
+    this.onTap,
+    this.dimmed = false,
+  });
+
+  final V2Palette p;
+
+  /// Drives the glyph tile's tint and the chip's ink.
+  final double hue;
+
+  final IconData icon;
+
+  /// The small pill under the text — "Article", "Tool", "Coming soon".
+  final String chip;
+
+  final String title;
+  final String blurb;
+
+  final VoidCallback? onTap;
+
+  /// A coming-soon row: the same row a shade back, and not tappable.
+  final bool dimmed;
+
+  @override
+  Widget build(BuildContext context) {
+    final tint = v2BlockTint(hue, p);
+    final deep = HSLColor.fromColor(tint)
+        .withSaturation(0.46)
+        .withLightness(0.34)
+        .toColor();
+
+    return InkWell(
+      // ⚠️ A DIMMED ROW DOES NOT RESPOND TO A TAP. A tap that does nothing
+      // teaches that taps do nothing, which spreads doubt to the rows that
+      // work.
+      onTap: dimmed ? null : onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: Opacity(
+        opacity: dimmed ? 0.62 : 1,
+        child: PvDoorCard(
+          p: p,
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Container(
+              width: 38,
+              height: 38,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: tint,
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icon, size: 18, color: deep),
+            ),
+            const SizedBox(width: 13),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title,
+                      style: pvFraunces(
+                          fontSize: 16.5,
+                          fontWeight: FontWeight.w600,
+                          height: 1.25,
+                          letterSpacing: -0.3,
+                          color: p.ink1)),
+                  const SizedBox(height: 4),
+                  Text(blurb,
+                      style: pvManrope(
+                          fontSize: 13, height: 1.45, color: p.ink2)),
+                  const SizedBox(height: 9),
+                  // ⚠️ THE CHIP IS A BORDERED CAPSULE, NOT LOOSE SMALL CAPS.
+                  // The old hub card set the type in coloured letters with
+                  // nothing around them, which reads as a fourth line of copy;
+                  // an outlined pill reads as a label about the row.
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: p.ground,
+                      borderRadius: BorderRadius.circular(999),
+                      border: Border.all(color: p.line),
+                    ),
+                    child: Text(chip,
+                        style: pvManrope(
+                            fontSize: 9.5,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.8,
+                            color: p.ink3)),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 6),
+            if (!dimmed)
+              Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
 /// A white card with a hairline. The door's one container.
 ///
 /// ⚠️ A HAIRLINE, NOT A SHADOW, AND IT IS NOT A PREFERENCE. Eight stacked

@@ -40,6 +40,7 @@ import '../../services/pregnancy_controller.dart';
 import '../../theme/pv_fonts.dart';
 import '../brackets/hub/hub_solution_cards.dart';
 import '../brackets/hub/problem_hub_screen.dart' show HubPill;
+import '../doors/pv_door_chrome.dart' show PvDoorRow;
 import '../v2/v2_palette.dart';
 import 'condition_detail_screen.dart';
 
@@ -218,6 +219,46 @@ class _DoorGate extends StatelessWidget {
 //  Browse — search, the common 8, the two quiet high-anxiety links, and
 //  "see more" grouped behind a toggle
 // -----------------------------------------------------------------------------
+/// One condition, in the door's row language.
+///
+/// ⚠️ THIS REPLACES `SolutionCard` ON THIS SCREEN ONLY, AND THE DISTINCTION
+/// MATTERS. `SolutionCard` is the pre-V3 hub card and it is still correct on
+/// every hub that has not been rebuilt as a door — it is not deprecated, it is
+/// simply not what this screen wears any more, because this screen is now
+/// rendered INSIDE the Complications door. Beside the door's own rows the old
+/// card read as a screen from an older version of the app. Seen on a phone,
+/// 2026-09-10.
+///
+/// ⚠️ "ARTICLE", NOT "READ", BECAUSE THE DOOR ALREADY SAYS SO. A condition page
+/// reached from the Complications rails is a `PvDoorEntryTile` over
+/// `PvDoorLibrary.condition`, whose format is `article`. The same page reached
+/// through this browse list is the same page, and two chips for one destination
+/// is exactly the drift `PvDoorFormat`'s chip rule exists to stop.
+///
+/// ⚠️ THE HUE IS STILL THE READ BLUE. `SolutionType.read.hue` is 206 on every
+/// hub in the app so she learns the colour once. The shape changed; the colour
+/// is not this change's business.
+Widget _conditionRow({
+  required ConditionEntry c,
+  required V2Palette p,
+  required AppLanguage lang,
+  required VoidCallback onTap,
+}) =>
+    PvDoorRow(
+      p: p,
+      hue: SolutionType.read.hue,
+      icon: Icons.article_outlined,
+      chip: 'Article',
+      title: c.name.of(lang),
+      // ⚠️ THE PLAIN LINE, NOT THE REASSURANCE. The brief asks for it under
+      // every name in a browse list and it is the better line for scanning:
+      // "Pregnancy sugar goes high" tells her whether this row is hers in three
+      // words. The reassurance is two lines answering a question she has not
+      // asked yet, and it is still there on the page itself.
+      blurb: c.plainLine.of(lang),
+      onTap: onTap,
+    );
+
 class _Browse extends StatelessWidget {
   const _Browse({
     required this.p,
@@ -291,16 +332,8 @@ class _Browse extends StatelessWidget {
                   lang: lang,
                   cards: [
                     for (final c in store.addedConditions)
-                      SolutionCard(
-                        type: SolutionType.read,
-                        title: c.name,
-                        // ⚠️ THE PLAIN LINE, NOT THE REASSURANCE — the brief asks for it
-                        // under every name in a browse list, and it is the
-                        // better line for scanning. "Pregnancy sugar goes high"
-                        // tells her whether this row is hers in three words;
-                        // the reassurance is two lines answering a question she
-                        // has not asked yet, and it still opens the page.
-                        value: c.plainLine,
+                      _conditionRow(
+                        c: c,
                         p: p,
                         lang: lang,
                         onTap: () => onOpen(c),
@@ -315,20 +348,12 @@ class _Browse extends StatelessWidget {
                 lang: lang,
                 cards: [
                   for (final c in kCommonConditions)
-                    SolutionCard(
-                      type: SolutionType.read,
-                      title: c.name,
-                      // ⚠️ THE PLAIN LINE, NOT THE REASSURANCE — the brief asks for it
-                        // under every name in a browse list, and it is the
-                        // better line for scanning. "Pregnancy sugar goes high"
-                        // tells her whether this row is hers in three words;
-                        // the reassurance is two lines answering a question she
-                        // has not asked yet, and it still opens the page.
-                        value: c.plainLine,
-                      p: p,
-                      lang: lang,
-                      onTap: () => onOpen(c),
-                    ),
+                    _conditionRow(
+                        c: c,
+                        p: p,
+                        lang: lang,
+                        onTap: () => onOpen(c),
+                      ),
                 ],
               ),
               const SizedBox(height: 26),
@@ -338,20 +363,12 @@ class _Browse extends StatelessWidget {
                 lang: lang,
                 cards: [
                   for (final c in kHighAnxietyConditions)
-                    SolutionCard(
-                      type: SolutionType.read,
-                      title: c.name,
-                      // ⚠️ THE PLAIN LINE, NOT THE REASSURANCE — the brief asks for it
-                        // under every name in a browse list, and it is the
-                        // better line for scanning. "Pregnancy sugar goes high"
-                        // tells her whether this row is hers in three words;
-                        // the reassurance is two lines answering a question she
-                        // has not asked yet, and it still opens the page.
-                        value: c.plainLine,
-                      p: p,
-                      lang: lang,
-                      onTap: () => onOpen(c),
-                    ),
+                    _conditionRow(
+                        c: c,
+                        p: p,
+                        lang: lang,
+                        onTap: () => onOpen(c),
+                      ),
                 ],
               ),
               const SizedBox(height: 22),
@@ -377,20 +394,12 @@ class _Browse extends StatelessWidget {
                     lang: lang,
                     cards: [
                       for (final c in entry.value)
-                        SolutionCard(
-                          type: SolutionType.read,
-                          title: c.name,
-                          // ⚠️ THE PLAIN LINE, NOT THE REASSURANCE — the brief asks for it
-                        // under every name in a browse list, and it is the
-                        // better line for scanning. "Pregnancy sugar goes high"
-                        // tells her whether this row is hers in three words;
-                        // the reassurance is two lines answering a question she
-                        // has not asked yet, and it still opens the page.
-                        value: c.plainLine,
-                          p: p,
-                          lang: lang,
-                          onTap: () => onOpen(c),
-                        ),
+                        _conditionRow(
+                        c: c,
+                        p: p,
+                        lang: lang,
+                        onTap: () => onOpen(c),
+                      ),
                     ],
                   ),
                   if (entry.key != kSeeMoreGroups.keys.last)
@@ -543,6 +552,19 @@ class _SearchField extends StatelessWidget {
               style: pvManrope(fontSize: 14, color: p.ink1),
               decoration: InputDecoration(
                 isDense: true,
+                // ⚠️ `filled: false` IS LOAD-BEARING AND LOOKS REDUNDANT.
+                // `app_theme.dart` sets `filled: true` with a grey
+                // `surfaceContainer` on every `InputDecoration` in the app, and
+                // `border: InputBorder.none` removes the OUTLINE, not the FILL.
+                // So this field painted a grey rounded rect INSIDE the white
+                // pill its own Container had already drawn — one search bar
+                // that read as two. Seen on a phone, 2026-09-10.
+                //
+                // The general shape: a widget that draws its own chrome has to
+                // switch OFF the theme's, not merely avoid adding to it. A
+                // theme default is applied unless overridden, and "I set a
+                // different border" is not an override of "fill".
+                filled: false,
                 border: InputBorder.none,
                 hintText: const LocalizedText(
                         en: 'Search a condition',
@@ -591,20 +613,12 @@ class _SearchResults extends StatelessWidget {
       lang: lang,
       cards: [
         for (final c in results)
-          SolutionCard(
-            type: SolutionType.read,
-            title: c.name,
-            // ⚠️ THE PLAIN LINE, NOT THE REASSURANCE — the brief asks for it
-                        // under every name in a browse list, and it is the
-                        // better line for scanning. "Pregnancy sugar goes high"
-                        // tells her whether this row is hers in three words;
-                        // the reassurance is two lines answering a question she
-                        // has not asked yet, and it still opens the page.
-                        value: c.plainLine,
-            p: p,
-            lang: lang,
-            onTap: () => onOpen(c),
-          ),
+          _conditionRow(
+                        c: c,
+                        p: p,
+                        lang: lang,
+                        onTap: () => onOpen(c),
+                      ),
       ],
     );
   }

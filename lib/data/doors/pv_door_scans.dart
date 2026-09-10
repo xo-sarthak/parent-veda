@@ -107,30 +107,32 @@ final PvDoorPage kScansDoor = PvDoorPage(
   heroBlurb: 'What is coming, what you have already had, and what the report '
       'says.',
 
-  // ⚠️ NO PHOTOGRAPH, AND THAT IS A CORRECTION RATHER THAN AN OMISSION.
+  // ⚠️ THE PHOTOGRAPH IS BACK, AND THE PROCESS THAT PUT IT THERE IS THE POINT.
   //
-  // A stock Unsplash id went in here as a placeholder, matching what the TTC
-  // doors do. On the phone it turned out to be a Western clinic with
-  // "UROLOGIC ONCOLOGY BRANCH" legible on the doctor's badge — over the words
-  // "Your scans, in one place", on an Indian pregnancy app.
+  // The first id here was a stock placeholder chosen from a description. On the
+  // phone it turned out to be a Western clinic with "UROLOGIC ONCOLOGY BRANCH"
+  // legible on the doctor's badge — over the words "Your scans, in one place",
+  // on an Indian pregnancy app. It survived `flutter analyze`, the whole suite
+  // and a render test, because none of those look at pixels.
   //
-  // ⚠️ THE LESSON IS ABOUT PLACEHOLDERS, NOT ABOUT THIS URL. A drawn
-  // placeholder announces itself; a REAL PHOTOGRAPH of the wrong thing does
-  // not. It reads as a considered choice at a glance and is only caught by
-  // someone looking at the pixels — which is exactly why it survived analyze,
-  // the whole suite and a render test. A photographic placeholder is the one
-  // kind that can ship a lie.
+  // ⚠️ SO THE RULE IS NOT "NO PHOTOGRAPHS". IT IS "LOOK AT IT FIRST." A drawn
+  // placeholder announces itself; a real photograph of the wrong thing does
+  // not — it reads as a considered choice at a glance. A photographic
+  // placeholder is the one kind of placeholder that can ship a lie, and the
+  // only defence is downloading the file and opening it before wiring the URL.
+  // Every hero on every pregnancy door was chosen that way on 2026-09-10:
+  // fetched, viewed, and two candidates rejected for exactly the fault above.
   //
-  // So the hero falls back to the V3 field and this bracket's own drawn mark —
-  // the `photo == null` path in `_Hero`, which is a finished design rather
-  // than a fallback anyone would recognise as one. Local-first is absolute and
-  // this is the same rule pointing at art.
+  // ⚠️ AND THE SUBJECTS ARE CHOSEN TO CARRY NO INSTITUTION. Hands, a bump, a
+  // report, a plate — never a building, a badge, a wall poster or a uniform.
+  // A photograph with signage in it is a photograph of somebody else's
+  // hospital, and there is no crop that makes that ours.
   //
-  // ⚠️ ONE LINE TO RESTORE, once a real photograph exists — an Indian
-  // sonography room, or a mother holding a report. See STILL-OPEN §33.6.
-  //
-  // heroImageUrl:
-  //     'https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=900&h=700&fit=crop',
+  // This one: a woman holding her scan printout against her bump. It is the
+  // exact object this door is about, and there is nothing in the frame that
+  // belongs to a country.
+  heroImageUrl:
+      'https://images.unsplash.com/photo-1654931800911-7a9cfb3b7c17?w=900&h=700&fit=crop',
 
   closingLine: 'Not every pregnancy needs every test. This is the usual run, '
       'not a rule.',
@@ -248,28 +250,32 @@ final PvDoorPage kScansDoor = PvDoorPage(
       group: kScansTabScan,
       heading: 'First three months',
       tiles: [
-        PvDoorScanTile(
+        PvDoorEntryTile(
           title: 'Blood tests',
           blurb: 'The first set of blood tests, and what each one is for.',
-          scanId: 'blood_tests',
+          library: PvDoorLibrary.scan,
+          entryId: 'blood_tests',
           meta: 'Weeks 6–10',
         ),
-        PvDoorScanTile(
+        PvDoorEntryTile(
           title: 'Dating scan',
           blurb: 'Confirms how many weeks you are, and your due date.',
-          scanId: 'dating_scan',
+          library: PvDoorLibrary.scan,
+          entryId: 'dating_scan',
           meta: 'Weeks 6–9',
         ),
-        PvDoorScanTile(
+        PvDoorEntryTile(
           title: 'NT scan',
           blurb: "Checks the baby's early growth and development.",
-          scanId: 'nt_scan',
+          library: PvDoorLibrary.scan,
+          entryId: 'nt_scan',
           meta: 'Weeks 11–13',
         ),
-        PvDoorScanTile(
+        PvDoorEntryTile(
           title: 'NIPT',
           blurb: 'A blood test that checks for some conditions early.',
-          scanId: 'nipt',
+          library: PvDoorLibrary.scan,
+          entryId: 'nipt',
           meta: 'Weeks 10–14',
         ),
       ],
@@ -279,16 +285,18 @@ final PvDoorPage kScansDoor = PvDoorPage(
       group: kScansTabScan,
       heading: 'Middle three months',
       tiles: [
-        PvDoorScanTile(
+        PvDoorEntryTile(
           title: 'Anomaly scan',
           blurb: 'The detailed scan that checks the baby from head to toe.',
-          scanId: 'anomaly_scan',
+          library: PvDoorLibrary.scan,
+          entryId: 'anomaly_scan',
           meta: 'Weeks 18–22',
         ),
-        PvDoorScanTile(
+        PvDoorEntryTile(
           title: 'Sugar test (OGTT)',
           blurb: 'Checks for pregnancy diabetes.',
-          scanId: 'ogtt',
+          library: PvDoorLibrary.scan,
+          entryId: 'ogtt',
           meta: 'Weeks 24–28',
         ),
       ],
@@ -298,22 +306,25 @@ final PvDoorPage kScansDoor = PvDoorPage(
       group: kScansTabScan,
       heading: 'Last three months',
       tiles: [
-        PvDoorScanTile(
+        PvDoorEntryTile(
           title: 'Growth scan',
           blurb: 'Checks how the baby is growing, and how much fluid there is.',
-          scanId: 'growth_scan',
+          library: PvDoorLibrary.scan,
+          entryId: 'growth_scan',
           meta: 'Weeks 28–36',
         ),
-        PvDoorScanTile(
+        PvDoorEntryTile(
           title: 'Doppler scan',
           blurb: 'Checks the blood flow to the baby.',
-          scanId: 'doppler',
+          library: PvDoorLibrary.scan,
+          entryId: 'doppler',
           meta: 'Weeks 30–40',
         ),
-        PvDoorScanTile(
+        PvDoorEntryTile(
           title: 'Group B Strep',
           blurb: 'A swab that checks for a common bacteria before birth.',
-          scanId: 'gbs',
+          library: PvDoorLibrary.scan,
+          entryId: 'gbs',
           meta: 'Weeks 35–37',
         ),
       ],

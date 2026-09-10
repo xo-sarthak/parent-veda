@@ -4856,8 +4856,16 @@ long, what a receipt is worth at an insurance desk — not to pad it.
   read: why they go quiet, why they will not discuss the sex, and who gives you
   the result — and two thirds of that is already written inside
   `preg_scan_read_sex_law`, so it is closer to done than it looks.
-* **The hero photograph is an Unsplash placeholder**, same as every TTC door's.
-  Swapping it is one URL in `pv_door_scans.dart`.
+* **The hero photographs are hotlinked Unsplash URLs, not bundled assets.** All
+  five pregnancy doors now carry one (`heroImageUrl`), each downloaded and
+  looked at before wiring — see the header of `pv_door_scans.dart` for why that
+  step is the whole rule. Two candidates were rejected on 2026-09-10 for
+  carrying a US clinic's signage, which is the same fault that shipped once
+  already. What is still owed: they are a NETWORK dependency in a local-first
+  app. The failure mode is benign — `errorBuilder` returns nothing and the
+  drawn V3 hero shows instead — but on a slow connection the hero is blank for
+  a beat. Bundling them under `assets/doors/` is the fix, and it needs the
+  licence line recorded per image.
 * **The cost ranges carry September 2026 and will rot.** They are duplicated in
   spirit with `kScanCost`, which is the per-scan source; if one moves, move both.
 * **`ScanQuestionsStore` has no cloud shape** — see §33.5. Deliberate, recorded
@@ -4969,6 +4977,421 @@ question she has not asked yet.
   a look on a device before deciding it is right.
 * **`plainLine` for the 17 unnamed conditions is mine, not the brief's.** They
   follow the pattern and they have not been reviewed against the brief's voice.
-* **No photograph on either door's hero.** See §33.6.
+* ~~**No photograph on either door's hero.**~~ Both now carry one — 2026-09-10.
+  See §33.6 for what is still owed about how they are served.
 * **Six briefs left.** Belly and skin, Garbh Sanskar (two), Labour prep, Mind
   and mood, Nutrition.
+
+---
+
+## 35.0 Nutrition & diet, the third pregnancy door — 2026-09-10
+
+Built from `ParentVeda_Nutrition_rebuild.pdf`. The most reuse of the three by a
+wide margin: roughly seventy cards declared, and exactly two things written.
+
+Its brief opens with a box headed *"nothing here is a new page to build"* and
+closes with a rule no other brief has: *"If you cannot find a page that this map
+says to reuse, STOP and list it in your output rather than creating a new one."*
+Walking the code first found every list it names. Three things it did not know
+are below.
+
+### 35.1 The tile model collapsed before this door was written
+
+Nutrition needs six more "one id, one lookup, one push" tile types — nutrients,
+diet stages, diet conditions, recipes, charts, fasting. Added as classes that
+would have been seventeen tile types by door eight.
+
+`PvDoorScanTile`, `PvDoorConditionTile` and `PvDoorFindingTile` became one
+`PvDoorEntryTile` carrying a `PvDoorLibrary` enum. Three classes to one, six
+avoided, and one router case instead of nine.
+
+**And it is not the config object this file's own header forbids.** That rule is
+about a tile with several INDEPENDENT payload fields where most combinations are
+illegal and constructible. This has one payload field and one selector; the only
+error possible is an id not in its library, which no type system catches and the
+wiring test does. What is lost is the compiler naming an unhandled case — worth
+it at nine libraries, not worth it at three.
+
+### 35.2 Three things the brief did not know
+
+* **An eleventh condition guide exists.** "Overweight in pregnancy" is in
+  `kConditionGuides` and absent from the brief's list of ten. It is on the rail:
+  this door REPLACED the landing, so showing ten of eleven would make the
+  eleventh unreachable — the wiring gate pointing the other way.
+* **Fasting topics are not pages.** All eight are title-and-paragraph rows
+  rendered inline on `FastingScreen`, not tappable, with no detail screen. So
+  the door carries ONE fasting card rather than eight pointing at one
+  destination. **This is the item the brief asked to have listed.**
+* **The fourth paid tier is "Book a consultation"**, not "Book one session". The
+  brief says do not change the labels, so it keeps its own.
+
+### 35.3 A dead coming-soon that Complications had already made live
+
+`_ComplicationsLink`, at the foot of every diet-condition page, read *"More on
+this, and related warning signs, lives in Complications, coming soon"* and was
+deliberately not tappable — correct when it was written, because there was no
+Complications screen. There is one now, shipped hours earlier.
+
+**This is the inverse of the failure the wiring gate exists for**, and it is
+harder to find: a real destination sitting behind a card that says it does not
+exist. Nothing is broken, nothing fails, and it stays wrong until somebody
+remembers.
+
+> **The general lesson: a coming-soon marker is a claim with an expiry date, and
+> nothing expires it. When a thing ships, grep for what promised it.**
+
+Seven guides now link — six the brief names plus `constipation_piles`, which the
+brief said owns its content and has no page. `piles` exists. Walking the code
+beat the brief.
+
+### 35.4 Single source, read so it does not destroy content
+
+The brief: *"the diet card LINKS to that Complications page and does not restate
+the condition."* Read as "the card opens Complications instead", that throws away
+the eating advice — the one thing somebody taps for on a nutrition door.
+
+It was also unnecessary. Every `ConditionGuide` is already pure diet — "pair
+carbs with protein", "iron-rich foods: dal, greens" — with no symptoms, no tests
+and no management. The rule was satisfied by construction; only the link was
+missing. So the card opens the diet page and the diet page's footer opens the
+condition.
+
+### 35.5 Judgement calls worth knowing about
+
+* **Cravings folded into the food checker**, which is the brief's own call. Two
+  bodies in one scroll, nothing merged — each keeps its own state. The seam is a
+  heading that says why the badges change from Safe/Limit/Avoid to Yes/In small
+  amounts.
+* **The four paid tiers are rendered, not re-carded.** `ExpertOptionsBlock` IS
+  the four tiers with its own header and booking sheet; four cards beside it
+  would be four copies of its rows, and "keep the tiers exactly as they are" is
+  easiest to guarantee by not retyping them.
+* **The disclaimer is a NOTE, not a red flag.** The flag treatment is coral and
+  urgent; spending that on a disclaimer spends an alarm on a caveat.
+* **Cards are built from the libraries, not typed.** Seventy hand-written cards
+  is seventy chances for a label to drift from the page it opens, invisibly.
+* **"Add this to your plate now" is one read with four sections**, not four
+  cards. She sees the stage she is in; the other three would be noise on a rail
+  already carrying the four existing stage guides.
+
+### 35.6 Still owed
+
+* **Nutrition has not been walked on a handset.** Scans and Complications were;
+  the device came off before this one. Sub-tab 1 is the piece to look at — it is
+  the longest inline body in the app, two screens in one scroll.
+* **Eight fasting pages.** See §35.2. Each `FastingTopic` has a title and a body
+  and would make a small page easily; the brief forbade building them, so the
+  decision is the user's.
+* **Clinical read** on `preg_diet_read_add_now`, on top of the twelve at §33.6
+  and §34.5.
+* **`_firstSentence` trims seventy blurbs from page summaries.** They read well
+  today; nobody has checked all seventy by eye.
+* **Five briefs left.** Belly and skin, Garbh Sanskar (two), Labour prep, Mind
+  and mood.
+
+---
+
+## 36.0 Belly & skin, the fourth pregnancy door — 2026-09-10
+
+Built from `ParentVeda_Belly_and_skin_rebuild.pdf`. The brief's own summary is
+*"this area needs almost no rebuild"*, and it was right: nineteen reads, the
+Ingredient Safety Checker, the itching screen and the bump keepsake all existed
+and were carried whole.
+
+### 36.1 Four tabs, and the first brief to argue against the shape
+
+*"There is no paid consult here and only one real medical flag (the
+itching-of-palms-and-soles warning), which is better kept prominent inside the
+Itching read than pulled into a thin Talk tab."*
+
+That is the right call and worth recording as a precedent: **a fifth tab built
+to match the other doors is the content-management view of a product** —
+organised by how we happened to build the last one rather than by what this area
+has.
+
+### 36.2 An even ring hid a whole tab, and only a device or a render test finds it
+
+The carousel's seam fade exists for the frame where a card flips from one side
+of the ring to the other. On a five-ring no card ever rests at that distance. On
+a **four**-ring one always does — so the fourth card rendered at zero opacity and
+the door came out as three cards under four dots.
+
+Fixed by skipping the fade on even rings. **The trade, stated honestly:** a card
+genuinely crossing during a drag now flips sides visibly instead of doing it
+under cover. It happens at x ≈ ±170, inside the track's own edge mask, at 0.6
+scale, mid-gesture — a smaller cost than a tab that is not on screen at rest.
+
+⚠️ **Five is still the better shape.** This makes four work; it does not make
+four equal. Worth a look on a handset before the next even-numbered door.
+
+### 36.3 A survey that "found" a gap the source did not have
+
+An early pass here reported two pages missing a `videoSubtitle` and supplied
+them from the brief. Both already had one, and the words added were
+**byte-identical** to the words already there — the regex that found the gap
+assumed a field order the file does not always keep.
+
+> **Worth remembering as a shape: a survey that reads source with a regex will
+> find gaps the source does not have, and the fix looks like ordinary content
+> work.** It only failed because Dart rejects a duplicate named argument. Had
+> the field been a list, it would have shipped a silent duplicate.
+
+### 36.4 Judgement calls worth knowing about
+
+* **Rails are built from `kBsPages`, not listed.** The brief says the named
+  cards are "the visible ones, not the full inventory" and adds "+ any other
+  reads already built". A hand-typed list would have shipped exactly the named
+  cards and quietly dropped anything added later — on a door that replaced the
+  only route those pages had.
+* **The card line is the page's own `videoSubtitle`.** `BsPage` has no blurb
+  field; what it has is the film's one-liner, and those ARE the brief's card
+  lines verbatim on all nineteen — its map was written from this field. So no
+  new copy is written anywhere on this door.
+* **The bump keepsake gained an embedded form with real actions.** Its add is a
+  FAB and its compare is an app-bar action, neither of which has a home inline —
+  so the embedded body gives both a row at the foot. Same `_addFlow`, same
+  `_openCompare`; only where they are pressed changed. Without it the tab would
+  have been a keepsake you cannot add a photo to.
+* **The two retitles are the only content change**, exactly as the brief says.
+
+### 36.5 Still owed
+
+* **Neither Nutrition nor Belly & skin has been walked on a handset.** The
+  device came off mid-Nutrition. Two things to look at first: Nutrition's
+  sub-tab 1 (the longest inline body in the app — two screens in one scroll) and
+  this door's four-card ring (§36.2).
+* **The embedded bump actions are untested on a device.** The button row is new
+  placement of existing actions and has only been checked by the render test.
+* **`BsArea.itching` is an enum value with no `BsPage`.** The itching read is
+  its own screen, which is why the door carries a tool card rather than a
+  library entry for it. Harmless, and worth knowing before somebody adds a
+  nineteenth page expecting it to appear on the Itching rail.
+* **Four briefs left.** Garbh Sanskar (two), Labour prep, Mind and mood — plus
+  Symptoms, which this brief names as the last pregnancy area and which has no
+  PDF in the folder yet.
+
+---
+
+## 37.0 Labour prep, the fifth pregnancy door — 2026-09-10
+
+Built from `ParentVeda_Labour_prep_rebuild.pdf`. The first tools-first door: the
+default tab is a timer, not a read, because near the due date somebody opens the
+app to DO something.
+
+**A rule worth keeping from it: a door's default tab is whichever one somebody
+opens the app for.** Scans opens on the timeline, Complications on the search,
+this on the timer. Never the most important content — the thing she came to do.
+
+### 37.1 Two tools are cards, not inline, and it is the engine's one deviation
+
+Every other tool tab renders its tool in place. These two do not.
+
+The contraction timer is a phase machine with a live session, a `PopScope` that
+saves when you leave it, voice guidance, a safety sheet, a history screen, and an
+interface that is one enormous button. Embedded it would sit below a carousel
+inside a scrolling page: **the save-on-pop never fires because you never pop**,
+three app-bar actions including the safety check have nowhere to live, and a
+woman timing a contraction has to scroll to find the button.
+
+The packer adds a second reason — it carries a `bottomNavigationBar`, the pinned
+"Labour started?" alert the brief names, and a bottom bar has no meaning inside
+somebody else's scroll.
+
+> **So the test is not "is it a tool", it is "is it a list".** A tool whose
+> content is a list embeds. A tool that owns the screen — a timer, a camera,
+> anything with a live session or a pinned bar — gets a card and keeps its
+> screen. The tab is still not a rail, which is what the briefs actually forbid.
+
+`pv_door_labour_test.dart` holds this so it is not "tidied" back by someone
+reading only the rule.
+
+### 37.2 The voice rule cost one bilingual edit
+
+The brief: *"Every line the user reads is spoken TO her, warmly… NEVER like a
+legal notice."* It names the offender: the timer's disclaimer, headed "A timer,
+not a diagnosis" over a body opening "ParentVeda is not a medical or diagnostic
+service."
+
+Rewritten in `app_language.dart` — **heading and first sentence only, in both
+languages**, with every word of the actual safety untouched. Its closing line
+turned out to be the brief's own second human line already, word for word.
+
+⚠️ **Both sides moved together.** A rewritten English beside a stale Hindi would
+leave the Hindi build carrying the legal framing on a safety notice. `midwife`
+stays Latin because the surrounding string already has it that way — shipped
+content is the tiebreaker, per the bilingual skill.
+
+### 37.3 The birth-plan card is absent, and the brief asked for it
+
+The brief marks *"Your birth plan, and how to make one"* as `[Guide] reuse
+(pulled out of the old accordion)`. There is no accordion and no birth-plan
+content. `pregnancy_journeys.dart` REMOVED that step, with a note saying why —
+*"The birth-plan tool does not exist, so the step promised a page and delivered
+a grey card."*
+
+That was a considered decision by somebody who had seen the grey card. Re-adding
+the card here would reverse it silently, so **it is omitted and this is the
+record.** It is the user's call: build the tool, or leave the card out.
+
+### 37.4 Six coming-soon cards, and the area says so itself
+
+This is the first door where most of a tab is owed. The videos and reads are
+declared in `kPgBirthPrep` as `owed: true` elements, or as `JourneyRead`s whose
+`surfaceId` is — in the model's own words — *"Null until a real article exists
+behind it."*
+
+They hold their place at full size and do not tap. The alternative was a rail of
+three where the brief describes six, and a door that quietly forgets what the
+area promised. CLAUDE.md: aspirational copy stays; the gap is recorded.
+
+### 37.5 A thing that looked like a bug and was not
+
+`PrepProgram(course_birthprep).lessons` lists **four** lessons while its
+`durationLabel` says "6 lessons". That looked like the missing classes 5 and 6.
+
+It is not: the real six-class list is `kBirthingClasses`, a separate model, and
+all six are there exactly as the brief names them with class 1 free. **Two
+parallel lists describe the same course** — worth knowing, and not this door's
+to reconcile.
+
+### 37.6 Still owed
+
+* ~~**Three doors now unwalked on a handset**~~ — walked 2026-09-10, see §38.
+* **The six owed pieces** at §37.4 — two videos and four reads. The area
+  promises them on the door now, which makes the debt visible rather than
+  larger.
+* **The birth-plan tool** — see §37.3.
+* **Clinical read** on `preg_labour_read_pain_relief`, on top of the thirteen at
+  §33.6, §34.5 and §35.6. This one has the most figures in it: the epidural
+  cost range, the caesarean myth correction, and the anaesthetist-availability
+  framing.
+* **Three briefs left.** Garbh Sanskar (two PDFs, a coupled pair) and Mind and
+  mood. Symptoms has no PDF yet.
+
+
+---
+
+## 38.0 Walking Nutrition, Belly & skin and Labour prep on a phone — 2026-09-10
+
+Galaxy S21 FE, 1080x2340, `--flavor parent`. Every tab of all three doors, plus
+a log tailed for `RenderFlex` / overflow / exception the whole time.
+
+**No exceptions and no overflows.** The engine held: the even-ring seam fix
+(§36.2) draws all four Belly & skin cards, the long inline `CanIEatBody` scrolls
+as one body, and `_EmbeddedActions` renders on the bump keepsake. What the walk
+found instead was seven things that are only visible on glass.
+
+### 38.1 What was fixed
+
+* **One sentence, three times.** Nutrition's Talk tab printed its area
+  disclaimer as the tab note, again as the door's `closingLine`, and a third
+  time in the engine's `PvDoorDisclaimer` immediately below — which says the
+  stronger version anyway. Labour prep did the same with one literal constant
+  used as both `note` and `closingLine`.
+  *Two fixes, deliberately different.* The engine now skips a closing line that
+  is **identical** to the open tab's note; Nutrition's line, which merely said
+  the same thing in other words, was dropped in the data. An engine cannot tell
+  that two differently worded cautions mean the same thing, and one that
+  guessed would start hiding lines somebody wrote on purpose.
+  **The general shape: a safety line repeated is a safety line devalued.** Three
+  statements of one caution read as boilerplate and get skipped.
+
+* **"Read" wore a magnifying glass.** `PvDoorFormat.read` mapped to
+  `Icons.search_rounded` — reasoned, because a read is a lookup. On Belly &
+  skin, where nineteen of twenty-two cards are reads, that mark paints at 96pt
+  behind every one of them and the tab reads as a wall of search boxes. Now
+  `find_in_page_outlined`. **An icon chosen for what it MEANS has to be checked
+  for what it LOOKS LIKE at the size and repetition it ships at.**
+
+* **A rail of one.** Four sections across the three doors held a single tile,
+  and a horizontal rail of one card is a 142pt block with two-thirds of the row
+  empty beside it — which reads as content that failed to load. Single-tile
+  sections now render as wide rows whatever their tab's layout says, which also
+  buys back the blurb a rail card cannot afford.
+
+* **A price nobody could see, under a passing test.** The Birthing Course card
+  is the one paid tile on Labour prep, and its ₹1,499 lived in the blurb. A rail
+  card draws the badge, `meta` and the title — never the blurb. So
+  `pv_door_labour_test.dart` asserted "the card names the price on its face",
+  the assertion was true, and the face said "Complete Birthing Course" and
+  nothing else. The price moved to `meta`, and a registry-wide test now requires
+  any tile with a ₹ in its blurb to carry it in `meta` too.
+  **Asserting a string exists on a model is not asserting it reaches a screen.**
+
+* **A card that repeated its own heading.** "Diet charts" under "Ready-made diet
+  charts" — the second time this has shipped (the first was "Fasting" under
+  "Fasting"). Renamed to "Browse every chart", and there is now a registry-wide
+  test for it.
+
+* **"What he can actually do."** Two cards below that heading say "whoever comes
+  with you", which is the careful phrase and was written on purpose. The heading
+  assumed a husband. Now "What your partner can actually do".
+
+* **One search bar that looked like two.** The Complications and Cravings
+  search fields each draw their own white pill and then set
+  `border: InputBorder.none` on the `TextField` inside it. That removes the
+  OUTLINE and not the FILL — and `app_theme.dart` sets `filled: true` with a
+  grey `surfaceContainer` on every `InputDecoration` in the app. So a grey
+  rounded rect painted inside the white pill, starting just right of the
+  magnifier. Both now pass `filled: false`.
+  **A widget that draws its own chrome has to switch the theme's OFF, not
+  merely avoid adding to it.** A theme default applies unless overridden, and
+  setting a different `border` is not an override of `fill`.
+
+* **Every door has a hero photograph again** — see §38.2.
+
+### 38.2 The photographs, and the process that is the actual guarantee
+
+All five pregnancy doors now set `heroImageUrl`. The Scans door had one removed
+in §33 because it turned out to be a Western urology clinic with the department
+legible on a badge, under the words "Your scans, in one place".
+
+**The rule that came out of that is not "no photographs". It is "look at it
+first."** Every image here was fetched to disk and opened before its URL was
+written into a Dart file. Two candidates were rejected on exactly the old fault:
+a US clinic with a wall poster and a lab brand in frame, and a second with an ID
+badge. Subjects are chosen to carry no institution — hands, a bump, a report, a
+plate; never a building, a uniform or signage.
+
+| Door | Subject |
+|---|---|
+| Scans & tests | A woman holding her scan printout against her bump |
+| Complications | Hands on a bump in window light, black and white — the quietest of the five, because this is the door somebody opens worried |
+| Nutrition | A South Indian veg thali on a banana leaf — the blurb says "for an Indian kitchen" and the picture has to agree with the sentence |
+| Belly & skin | An Indian woman in late pregnancy, hand on her bump, outdoors |
+| Labour prep | Hands cradling a very late bump before a wooden door |
+
+`pv_door_scans_test.dart` holds the shape around them — every door has one, no
+two are the same, each is requested at a `w=900&fit=crop` crop — and says in its
+own comment that it cannot check the thing that actually matters.
+
+### 38.3 What the walk found and did NOT fix
+
+These need a decision rather than a patch.
+
+* **The bump keepsake is in the old palette.** Sub-tab 4 of Belly & skin renders
+  `BumpJourneyBody` in place, and it arrives with hot-coral buttons and a
+  purple-to-pink gradient banner on a calm cream V3 door. Every other inline
+  tool is palette-driven. Recolouring it is a change to a shipped screen that
+  also lives in Tools, so it is not this pass's call.
+* **Sub-tab 1 of Nutrition is 64 food rows long before the Cravings heading.**
+  The fold is the brief's own instruction and the seam heading is there, but a
+  woman who came for cravings scrolls past every food in the app to reach them.
+* **"Pre-pregnancy" is the second card under "Food for your stage"** on the
+  Pregnancy door. All four stage guides are on the rail, which is the brief;
+  whether the pre-conception one belongs on this stage's rail is a content call.
+* **"What actually happens" on Labour prep is three coming-soon cards and
+  nothing else** — an entire section greyed out, on the tab a woman opens to
+  understand birth. Honest, and the thinnest tab in the area. See §37.4.
+* **The Ask Veda FAB permanently covers the third card of every rail.** It does
+  not scroll, so it sits over the same screen position on every door. Global,
+  pre-existing, and louder on a rail layout than on a list.
+* **The Classic/V3 pill on the V3 home covers the Nutrition tile's icon.** Also
+  pre-existing, also global, and it sits on a door tile.
+* **~30 other `InputBorder.none` fields carry the same latent fault.** Grep
+  `InputBorder.none` in `lib/screens/`: every one of them is a field that draws
+  its own chrome, and any that also draws its own background is painting the
+  theme's grey inside it. Two were fixed because they are on these doors. The
+  rest are shipped screens where the grey may well be the intended look — this
+  is a sweep somebody should do deliberately with a phone, not a find-and-
+  replace.

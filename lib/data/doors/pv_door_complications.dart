@@ -92,11 +92,19 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
   heroBlurb: 'Every condition explained in plain words — what it is, what '
       'happens next, and when to call.',
 
-  // ⚠️ NO PHOTOGRAPH. Same call as the Scans door, and for a stronger reason
-  // here: a stock photograph attached to a page about complications is the
-  // worst possible place for a picture of the wrong thing. The V3 field and
-  // this bracket's own drawn mark are a finished hero. See
-  // `pv_door_scans.dart` for the placeholder lesson in full.
+  // ⚠️ THE QUIETEST PHOTOGRAPH OF THE FIVE, ON PURPOSE. This is the door about
+  // things that can go wrong, and the picture at the top of it is doing tone
+  // before it does subject. A clinical scene here — a cuff, a machine, a
+  // uniform — would put a woman who came in worried in front of a picture of
+  // being ill.
+  //
+  // So: hands resting on a bump in window light, black and white, nobody's
+  // face, nothing in the frame that belongs to a hospital. Chosen by looking
+  // at it; two candidates for this slot were rejected first, one a US clinic
+  // with a wall poster and a lab brand legible in it. See
+  // `pv_door_scans.dart` for why that is the failure that matters.
+  heroImageUrl:
+      'https://images.unsplash.com/photo-1704388159994-98f3889483e8?w=900&h=700&fit=crop',
 
   // ⚠️ THE FRAME LINE FROM THE CONDITION PAGES, AT THE FOOT OF THE DOOR. Every
   // condition page opens with "This helps you understand what your doctor is
@@ -195,25 +203,29 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
       group: kCondTabWhen,
       heading: 'Early months',
       tiles: [
-        PvDoorConditionTile(
+        PvDoorEntryTile(
           title: 'Pregnancy in the wrong place (ectopic)',
           blurb: 'Rare, urgent, and treatable when it is caught early.',
-          conditionId: 'ectopic',
+          library: PvDoorLibrary.condition,
+          entryId: 'ectopic',
         ),
-        PvDoorConditionTile(
+        PvDoorEntryTile(
           title: 'Severe vomiting (hyperemesis)',
           blurb: 'Far past ordinary morning sickness, and treatable.',
-          conditionId: 'hyperemesis',
+          library: PvDoorLibrary.condition,
+          entryId: 'hyperemesis',
         ),
-        PvDoorConditionTile(
+        PvDoorEntryTile(
           title: 'Thyroid gland off (thyroid in pregnancy)',
           blurb: 'Common here, and fixed with a daily tablet.',
-          conditionId: 'thyroid',
+          library: PvDoorLibrary.condition,
+          entryId: 'thyroid',
         ),
-        PvDoorConditionTile(
+        PvDoorEntryTile(
           title: 'Low blood, low iron (anemia)',
           blurb: 'The commonest finding in an Indian pregnancy.',
-          conditionId: 'anemia',
+          library: PvDoorLibrary.condition,
+          entryId: 'anemia',
         ),
       ],
     ),
@@ -222,25 +234,28 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
       group: kCondTabWhen,
       heading: 'Middle months',
       tiles: [
-        PvDoorConditionTile(
+        PvDoorEntryTile(
           title: 'Pregnancy sugar goes high (gestational diabetes)',
           blurb: 'Usually no symptoms at all, which is why everyone is tested.',
-          conditionId: 'gdm',
+          library: PvDoorLibrary.condition,
+          entryId: 'gdm',
         ),
         // ⚠️ THE FINDINGS LIBRARY, AND IT IS THE RULE WORKING. There is no
         // low-lying placenta in `kAllConditions` — the nearest entry is
         // `placenta_previa`, which is the more serious version and a different
         // page. Linking to the finding is honest; copying it here is what §4a
         // forbids.
-        PvDoorFindingTile(
+        PvDoorEntryTile(
           title: 'Placenta sitting low (low-lying placenta)',
           blurb: 'Common at the mid-pregnancy scan, and it usually moves up.',
-          findingId: 'low_lying_placenta',
+          library: PvDoorLibrary.finding,
+          entryId: 'low_lying_placenta',
         ),
-        PvDoorConditionTile(
+        PvDoorEntryTile(
           title: 'PCOS in pregnancy',
           blurb: 'Something you had before, watched a little more closely now.',
-          conditionId: 'pcos',
+          library: PvDoorLibrary.condition,
+          entryId: 'pcos',
         ),
       ],
     ),
@@ -249,29 +264,33 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
       group: kCondTabWhen,
       heading: 'Later months',
       tiles: [
-        PvDoorConditionTile(
+        PvDoorEntryTile(
           title: 'Blood pressure needs watching (high BP)',
           blurb: 'Mostly managed with closer check-ups, sometimes a tablet.',
-          conditionId: 'high_bp',
+          library: PvDoorLibrary.condition,
+          entryId: 'high_bp',
         ),
-        PvDoorConditionTile(
+        PvDoorEntryTile(
           title: 'Baby lying feet-down (breech)',
           blurb: 'Common until late on, and there is time for it to turn.',
-          conditionId: 'breech',
+          library: PvDoorLibrary.condition,
+          entryId: 'breech',
         ),
-        PvDoorConditionTile(
+        PvDoorEntryTile(
           title: 'Less water around the baby (low fluid)',
           blurb: 'Found on a scan, and watched with more scans.',
-          conditionId: 'low_amniotic_fluid',
+          library: PvDoorLibrary.condition,
+          entryId: 'low_amniotic_fluid',
         ),
         // ⚠️ FINDINGS AGAIN, and the brief names this card by hand. Cord around
         // the neck exists only as something a report says — no condition page
         // was ever written for it, and one written now would be a second copy
         // of an answer that already exists.
-        PvDoorFindingTile(
+        PvDoorEntryTile(
           title: 'Cord looped around the neck (cord around neck)',
           blurb: 'Very common, and usually not a problem at all.',
-          findingId: 'nuchal_cord',
+          library: PvDoorLibrary.finding,
+          entryId: 'nuchal_cord',
         ),
       ],
     ),

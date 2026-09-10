@@ -350,3 +350,179 @@ the pages passed, and it sits *above* all of them in the reader's attention.
 `PvDoorFlagLine.conditionId` gives a line its own destination where it has one.
 Null means the flag as a whole owns the destination — which is right for
 symptoms of a pregnancy rather than of a named condition.
+
+---
+
+## 13. Four tabs is allowed, and it costs one line
+
+Three doors have five tabs; Belly & skin has four, because it has no paid
+consult and one medical flag that belongs inside a read. **A fifth tab built to
+match the other doors is organising by how we happened to build the last one.**
+
+If your brief argues for four, take it — and know that an **even ring puts one
+card exactly on the carousel's seam**, where the crossing fade would render it
+at zero. `pv_door_carousel.dart` skips the fade for even counts; the trade is a
+visible flip mid-drag at the screen edge. Five remains the better shape.
+
+---
+
+## 14. Build rails from the library, not from the brief's list
+
+Every brief so far says some version of *"the cards named are the visible ones,
+not the full inventory"*. Take it literally:
+
+```dart
+List<PvDoorTile> _readsIn(BsArea area) => [
+      for (final p in kBsPages) if (p.area == area) PvDoorEntryTile(...),
+    ];
+```
+
+A hand-typed list ships exactly the named cards and **quietly drops anything
+added later** — on a door that replaced the only route those pages had. And
+assert coverage in the test against the library, never against a number:
+"as many cards as there are nutrients" fails the day a thirteenth is added;
+"twelve cards" passes forever while it sits unreachable.
+
+**Take the card's line from the page too.** Every area has a field that is
+already its one-liner — `videoSubtitle` on `BsPage`, `summary` on a
+`ConditionGuide`, `whatItDoes` on a `NutrientGuide`. Using it means no new copy
+on a reuse door, and a card that cannot drift from what it opens.
+
+---
+
+## 15. When a thing ships, grep for what promised it
+
+Building Nutrition found `_ComplicationsLink` at the foot of every diet page
+reading *"lives in Complications, coming soon"* and deliberately not tappable —
+correct when written, and wrong from the moment the Complications door shipped
+hours earlier.
+
+**This is the wiring gate inverted, and it is harder to find.** The usual
+failure is a card pointing at nothing, which a test can catch. This is a real
+destination behind a card that says it does not exist: nothing breaks, nothing
+fails, and it stays wrong until somebody remembers.
+
+A coming-soon marker is a claim with an expiry date and nothing expires it. When
+you finish a door, `grep -rn "coming soon"` for anything that was waiting on it.
+
+---
+
+## 16. Embed a tool only if its content is a list
+
+Four tool tabs embed cleanly — the scans timeline, the report locker, the
+conditions search, the bump keepsake. Two do not, and Labour prep is where the
+rule got its edge:
+
+> **The test is not "is it a tool", it is "is it a list".**
+
+A tool whose content is a list embeds. A tool that **owns the screen** gets a
+card and keeps its screen. The tells:
+
+* a **live session** — a timer, a recorder, anything you can be mid-way through
+* a **`PopScope`** that saves on exit; embedded, it never fires
+* a **`bottomNavigationBar`** or pinned bar; it has no meaning in someone's scroll
+* **app-bar actions** with nowhere else to live
+* an interface that is **one big control**, which scrolling ruins
+
+`PvDoorLayout.stack` with a wide tool card is still not a rail, which is what
+every brief actually forbids. Say so in the door file and hold it in the test,
+or somebody reading only §3 will "fix" it back.
+
+---
+
+## 17. The default tab is what she opens the app FOR
+
+Not the most important content, and not the first thing in the brief's list.
+Scans opens on the timeline, Complications on the search, Labour prep on the
+timer — *"near the due date people open a tool, not a read."*
+
+---
+
+## 18. Rewriting a shipped bilingual string
+
+Some briefs ask for copy changes on strings that already ship in Devanagari.
+When that happens:
+
+1. **Load the `parentveda-bilingual` skill first.** CLAUDE.md requires it for
+   editing shipped Hindi, and a safety notice is the worst place to guess.
+2. **Move both sides together.** A rewritten English beside a stale Hindi leaves
+   the Hindi build carrying whatever the brief asked to remove.
+3. **Change the least you can.** On the timer disclaimer that was a heading and
+   one sentence; the rest was already written to her.
+4. **Shipped content is the tiebreaker** on script questions — `midwife` stayed
+   Latin because the surrounding string already had it that way.
+
+
+---
+
+## 19. The hero photograph: look at it, or do not use it
+
+**Every door sets `heroImageUrl`, and the URL goes in only after somebody has
+opened the actual file.** Not the caption, not the search result's alt text —
+the pixels.
+
+This exists because it failed once. A stock id was chosen from a description
+and shipped as the Scans hero. On a phone it was a Western urology clinic with
+**"UROLOGIC ONCOLOGY BRANCH" legible on the doctor's badge**, under the words
+"Your scans, in one place", in an Indian pregnancy app. `flutter analyze`
+passed. The whole suite passed. A render test that draws the hero passed.
+
+> **A photographic placeholder is the only kind of placeholder that can ship a
+> lie.** A drawn placeholder announces itself. A real photograph of the wrong
+> thing reads as a considered choice at a glance, and nothing in the toolchain
+> looks at images.
+
+The working procedure, which is the actual guarantee:
+
+1. Find candidates by search, but treat the caption as a lead, not a fact.
+2. `curl` each one to disk at the crop you will ship (`?w=900&h=700&fit=crop`).
+3. **Open it.** Reject on sight anything carrying signage, a wall poster, a
+   uniform, an ID badge, a lab brand or a recognisable building.
+4. Only then write the URL into the Dart file, with a comment saying what the
+   subject is and why it suits that door.
+
+**Choose subjects that carry no institution.** Hands, a bump, a report, a
+plate — never a room. There is no crop that turns somebody else's hospital into
+ours. On the five pregnancy doors, two candidates were rejected at step 3 on
+exactly this fault.
+
+`pv_door_scans_test.dart` holds the shape around it — every door has one, no
+two are the same, each is a phone-sized crop — and says in its own comment that
+it cannot check the thing that matters. That comment is load-bearing: it stops
+the next person reading a green suite as evidence the picture is right.
+
+## 20. What only a phone can tell you
+
+Three doors were walked on a handset on 2026-09-10 with a log tailed for
+exceptions. **Zero exceptions, zero overflows — and seven real defects.** None
+of them was the kind a test finds, and each is a shape worth carrying:
+
+* **A safety line repeated is a safety line devalued.** One caution appeared
+  three times on a single tab (tab note, closing line, engine disclaimer).
+  Each was individually correct. Together they read as boilerplate.
+* **An icon chosen for what it MEANS must be checked for what it LOOKS LIKE**
+  at the size and repetition it ships at. `read` → a magnifying glass was sound
+  reasoning; nineteen of them at 96pt is a wall of search boxes.
+* **A rail of one is a rail that lies.** A horizontal rail says "there is more
+  sideways." With one card it says that beside two-thirds of an empty row, and
+  reads as content that failed to load. Single-tile sections render as wide
+  rows regardless of their tab's layout.
+* **Asserting a string is on a model is not asserting it reaches a screen.**
+  The one paid tile's price lived in `blurb`; rail cards do not draw `blurb`.
+  The test said "the card names the price on its face" and passed, and the face
+  was blank. When the claim is "she sees X before she taps", name the field the
+  widget paints.
+* **A card title must earn its line against the heading above it.** "Diet
+  charts" under "Ready-made diet charts" is invisible. This has now shipped
+  twice; there is a registry-wide test for it.
+* **Copy contradicts itself across a screen's height.** A heading said "he"
+  two cards above a blurb that said "whoever comes with you". The careful
+  phrase was written on purpose; the heading had not been checked against it.
+* **A reused body brings its own palette.** An inline tool from before V3
+  arrives with the old brand colours on a calm V3 door. Reuse-in-place buys
+  the behaviour, not the styling.
+* **A widget that draws its own chrome must switch the theme's OFF.** Two
+  search bars drew a white pill and set `border: InputBorder.none` inside it.
+  `app_theme.dart` sets `filled: true` app-wide, and `border` is not `fill`, so
+  each painted a grey rectangle inside its own white pill and read as two
+  controls. A theme default applies unless *that* property is overridden.

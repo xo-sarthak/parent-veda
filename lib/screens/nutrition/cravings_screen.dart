@@ -30,9 +30,19 @@ import '../v2/v2_palette.dart';
 import 'craving_detail_screen.dart';
 
 class CravingsScreen extends StatefulWidget {
-  const CravingsScreen({super.key, required this.pregnancy});
+  const CravingsScreen(
+      {super.key, required this.pregnancy, this.embedded = false});
 
   final PregnancyController pregnancy;
+
+  /// Rendered inside another page's scroll rather than as a screen.
+  ///
+  /// ⚠️ A FLAG RATHER THAN A SEPARATE BODY WIDGET, and the reason is the same
+  /// one `ReportScreen.embedded` gives: this screen's content is inseparable
+  /// from its state — the search controller and the trimester it derives — so a
+  /// body widget would either duplicate that state or wrap this class anyway.
+  /// The flag changes chrome only.
+  final bool embedded;
 
   @override
   State<CravingsScreen> createState() => _CravingsScreenState();
@@ -53,11 +63,13 @@ class _CravingsScreenState extends State<CravingsScreen> {
       animation: Listenable.merge([V2PaletteStore.instance, _search]),
       builder: (context, _) {
         final p = V2PaletteStore.instance.current;
-        final week = widget.pregnancy.currentWeek;
-        final tri = _trimesterOf(week);
-        final q = _search.text.trim();
-        final items =
-            kCravingItems.where((c) => c.matches(q)).toList(growable: false);
+
+        // ⚠️ THE WEEK, THE TRIMESTER AND THE FILTERED LIST ALL MOVED INTO
+        // `_body`, WHICH IS WHERE THEY ARE USED. They were computed here when
+        // `build` drew the list directly; leaving them behind would be three
+        // values derived twice per frame and, worse, two places for the
+        // trimester boundary to be written.
+        if (widget.embedded) return _body(context, p);
 
         return Scaffold(
           backgroundColor: p.ground,
@@ -75,6 +87,24 @@ class _CravingsScreenState extends State<CravingsScreen> {
             top: false,
             child: ListView(
               padding: const EdgeInsets.fromLTRB(18, 4, 18, 32),
+              children: [_body(context, p)],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  /// The cravings list, the stage banner and the About-cravings cards, without
+  /// a Scaffold. See [CravingsBody].
+  Widget _body(BuildContext context, V2Palette p) {
+    final week = widget.pregnancy.currentWeek;
+    final tri = _trimesterOf(week);
+    final q = _search.text.trim();
+    final items =
+        kCravingItems.where((c) => c.matches(q)).toList(growable: false);
+    return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                     'Tap what you are craving. Every answer below is for where '
@@ -138,12 +168,27 @@ class _CravingsScreenState extends State<CravingsScreen> {
                   ],
                 ],
               ],
-            ),
-          ),
         );
-      },
-    );
   }
+}
+
+/// The cravings list and the About-cravings cards, without a Scaffold.
+///
+/// ⚠️ IT IS THE SAME STATE CLASS, REACHED A DIFFERENT WAY. `CravingsScreen`
+/// owns the search controller and the trimester derivation, and both are needed
+/// by the body — so rather than duplicating them, the body IS the screen with
+/// its chrome suppressed. `embedded` is the flag; nothing else differs.
+///
+/// The Nutrition brief folds cravings into "Can I eat this?" because it is the
+/// same question — *"can I have this"* — asked about a different kind of thing.
+class CravingsBody extends StatelessWidget {
+  const CravingsBody({super.key, required this.pregnancy});
+
+  final PregnancyController pregnancy;
+
+  @override
+  Widget build(BuildContext context) =>
+      CravingsScreen(pregnancy: pregnancy, embedded: true);
 }
 
 int _trimesterOf(int week) {
@@ -232,6 +277,19 @@ class _Search extends StatelessWidget {
               style: pvManrope(fontSize: 14, color: p.ink1),
               decoration: InputDecoration(
                 isDense: true,
+                // ⚠️ `filled: false` IS LOAD-BEARING AND LOOKS REDUNDANT.
+                // `app_theme.dart` sets `filled: true` with a grey
+                // `surfaceContainer` on every `InputDecoration` in the app, and
+                // `border: InputBorder.none` removes the OUTLINE, not the FILL.
+                // So this field painted a grey rounded rect INSIDE the white
+                // pill its own Container had already drawn — one search bar
+                // that read as two. Seen on a phone, 2026-09-10.
+                //
+                // The general shape: a widget that draws its own chrome has to
+                // switch OFF the theme's, not merely avoid adding to it. A
+                // theme default is applied unless overridden, and "I set a
+                // different border" is not an override of "fill".
+                filled: false,
                 border: InputBorder.none,
                 hintText: 'What are you craving?',
                 hintStyle: pvManrope(fontSize: 14, color: p.ink3),
