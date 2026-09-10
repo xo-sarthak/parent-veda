@@ -45,22 +45,60 @@ LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
 //  Context
 // -----------------------------------------------------------------------------
 
-enum FertilityAgeBand { under30, thirtyToThirtyFive, thirtySixToThirtyNine, forty }
+/// The age bands, and there is exactly one set of them.
+///
+/// ⚠️ CHANGED 2026-09-03 TO THE BANDS THE BRIEF ASKS FOR: under 35 / 35-37 /
+/// 38-40 / over 40. They were under 30 / 30-35 / 36-39 / 40+.
+///
+/// This existed as TWO enums — these bands in the engine and an identical-in-
+/// purpose `IvfAge` on the screen — with different cut points, so a woman's
+/// answer on the live screen could not be written into the store behind it
+/// without guessing which side of a boundary she fell. "Under 35" is both
+/// "under 30" and "30 to 35"; there is no honest translation, and the fix for
+/// that is not a cleverer mapping, it is one set of bands. `IvfAge` is retired.
+///
+/// ⚠️ AND THIS BAND NOW OVER-REFERS BY UP TO ONE YEAR, DELIBERATELY.
+///
+/// NICE refers at presentation from **36**. The band is **35 to 37**, so it
+/// straddles that line and cannot tell a 35-year-old from a 36-year-old. One of
+/// two errors is unavoidable:
+///
+///   * treat the band as referring  → a 35-year-old is offered a conversation
+///     the guidance would not have offered her yet;
+///   * treat it as not referring    → a 36- and a 37-year-old are NOT offered
+///     one the guidance says they should have.
+///
+/// The first costs an unnecessary appointment. The second delays care for
+/// exactly the people the rule exists to catch, and this tool's own promise is
+/// that it "only says whether a conversation is worth having". Where it is
+/// unsure it leans toward the conversation. So: refers from 35.
+///
+/// If that year ever needs to be exact, the answer is not a fifth band — it is
+/// a date of birth. `FamilyProfileStore` already holds `dob` and derives `age`;
+/// nothing collects it yet. With a real age, this rule reads 36 and the
+/// reassurance rule reads 35, both correct, with nothing translated between
+/// them. See `docs/STILL-OPEN.md` §18.7.
+enum FertilityAgeBand { under35, thirtyFiveTo37, thirtyEightTo40, over40 }
 
 extension FertilityAgeBandCopy on FertilityAgeBand {
   LocalizedText get label => switch (this) {
-        FertilityAgeBand.under30 => _en('Under 30'),
-        FertilityAgeBand.thirtyToThirtyFive => _en('30 to 35'),
-        FertilityAgeBand.thirtySixToThirtyNine => _en('36 to 39'),
-        FertilityAgeBand.forty => _en('40 or over'),
+        FertilityAgeBand.under35 => _en('Under 35'),
+        FertilityAgeBand.thirtyFiveTo37 => _en('35 to 37'),
+        FertilityAgeBand.thirtyEightTo40 => _en('38 to 40'),
+        FertilityAgeBand.over40 => _en('Over 40'),
       };
 
-  /// ⚠️ 36 IS THE LINE, NOT 35. NICE refers at presentation from 36 — and the
-  /// commonest error in fertility copy is to write 35, which pushes a whole
-  /// year-band into a category the guidance does not put them in.
-  bool get refersAtPresentation =>
-      this == FertilityAgeBand.thirtySixToThirtyNine ||
-      this == FertilityAgeBand.forty;
+  /// See the enum's own note: 35, not 36, and the reason is which error is
+  /// survivable.
+  bool get refersAtPresentation => this != FertilityAgeBand.under35;
+
+  /// The point where the tool stops saying "it is early yet, keep going".
+  ///
+  /// Same boundary as [refersAtPresentation] now that there is one set of
+  /// bands. It is kept as a separate name because the two are separate ideas —
+  /// "guidance says refer" and "stop reassuring" — and if a date of birth ever
+  /// arrives they part company again at 36 and 35.
+  bool get holdsBackReassurance => this != FertilityAgeBand.under35;
 }
 
 enum FertilityCarePathway { notStarted, evaluated, currentlyInCare }

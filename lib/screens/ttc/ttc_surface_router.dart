@@ -17,6 +17,7 @@
 import 'package:flutter/material.dart';
 
 import '../../localization/app_language.dart';
+import '../../ttc/ttc_practice_data.dart';
 import '../../ttc/ttc_reads_data.dart';
 import '../../ttc/ttc_store.dart';
 import '../../ttc/ttc_videos_data.dart';
@@ -42,12 +43,17 @@ import 'ttc_ivf_readiness_screen.dart';
 import 'ttc_pcos_stand_screen.dart';
 import 'ttc_bmi_screen.dart';
 import '../../ttc/ttc_precheck_data.dart';
+import 'ttc_tracker_screen.dart';
+import 'ttc_semen_report_screen.dart';
+import 'ttc_shop_v3.dart';
 import 'ttc_precheck_screen.dart';
 import 'ttc_prepare_screen.dart';
 import 'ttc_products_screen.dart';
 import 'ttc_records_screen.dart';
 import 'ttc_strings.dart';
 import 'ttc_symptom_log_screen.dart';
+import 'ttc_mind_today_screen.dart';
+import 'ttc_practice_screen.dart';
 import 'ttc_ritual_screen.dart';
 import 'ttc_supplements_screen.dart';
 import 'ttc_tests_screen.dart';
@@ -102,6 +108,23 @@ Widget? ttcScreenForSurface(String id) {
     final match = PrecheckSection.values.where((s) => s.name == name);
     if (match.isEmpty) return null;
     return TtcPrecheckScreen(openSection: match.first);
+  }
+
+  // ---- one practice from the Mind & body library --------------------------
+  //
+  // ⚠️ TWELVE CARDS, ONE ROUTE. Same prefix pattern as `ttc_read/` above, and
+  // for the same reason: the alternative is twelve entries in the static switch
+  // that differ only by which const they name, and a thirteenth practice then
+  // needs a code change instead of a data change.
+  //
+  // Resolved against the library rather than trusted, so a tile naming a
+  // practice that does not exist opens NOTHING. That is the wiring gate, and
+  // `ttc_mind_body_test.dart` walks every Do tile on the door through it.
+  const practicePrefix = 'ttc_practice/';
+  if (id.startsWith(practicePrefix)) {
+    final practice = ttcPracticeById(id.substring(practicePrefix.length));
+    if (practice == null) return null;
+    return TtcPracticeScreen(practice: practice);
   }
 
   return _ttcStaticSurface(id);
@@ -191,6 +214,33 @@ Widget? _ttcStaticSurface(String id) => switch (id) {
       // PCOS checker, the vaccination list, supplements and medicines, so it
       // opens knowing what she has already done.
       'ttc_precheck' => const TtcPrecheckScreen(),
+
+      // ⚠️ THE MERGED TRACKER ITSELF, NOT A MENU IN FRONT OF IT — 2026-09-04.
+      //
+      // This used to open `TtcHabitsScreen`, a list of four trackers, because
+      // the four had not been merged. They are one tracker now, so the list
+      // would be a door in front of a door — the exact shape the focus-page
+      // rebuild removed everywhere else. `ttc_habits_screen.dart` is kept on
+      // disk and no longer routed.
+      'ttc_habits' => ttcTrackerScreenFor('habits'),
+      // ⚠️ HIS TRACKER, BY NAME — 2026-09-06. His side's "What he can track"
+      // opened `ttc_tools`, the whole hub, where his tracker is one tile among
+      // hers. The brief says "Tool (reuse, private, his side)"; this id opens
+      // the partner-health tracker and nothing else. Same shape as
+      // `ttc_habits` above, and for the same reason: `TtcTrackerScreen` needs
+      // a specific tracker, so the surface names one.
+      'ttc_partner_health' => ttcTrackerScreenFor('partner_health'),
+
+      // ⚠️ THE V3 PRODUCT FLOW. `ttc_products` below still resolves to the flat
+      // research library and still carries Ask Veda's deep links — two
+      // surfaces over one catalogue, deliberately, until the old one is
+      // retired. See the head of `ttc_shop_v3.dart`.
+      'ttc_shop' => const TtcShopScreen(),
+
+      // ⚠️ THE ONE NET-NEW SURFACE IN THE HIS-SIDE REBUILD. It explains a
+      // semen report against the WHO 2021 limits and never gives a verdict —
+      // see the head of `ttc_semen_reading.dart` for the rules it holds.
+      'ttc_semen_report' => const TtcSemenReportScreen(),
       // ⚠️ SOUTH ASIAN THRESHOLDS ARE PRIMARY HERE. See the head of
       // `ttc_bmi_rules.dart` — reading an Indian woman against European
       // cut-offs is the specific thing `ttc_read_three_months_before` already
@@ -251,6 +301,21 @@ Widget? _ttcStaticSurface(String id) => switch (id) {
       'ttc_appointments' => const TtcAppointmentsScreen(),
 
       // ---- Mind and body -----------------------------------------------------
+      // Mind & body's "Today" — a do-it screen, reached as a group tool. See
+      // `ttc_mind_today_screen.dart` for why it is not a card rail.
+      'ttc_mind_today' => const TtcMindTodayScreen(),
+
+      // ⚠️ KEPT, NOT RETIRED — and this is the one the brief asks to remove.
+      // *"Remove any orphaned route to the old ritual or old landing."* The
+      // ROUTE is orphaned from the door: the Mind & body focus page carries no
+      // tile pointing here, and `ttcFocusPageFor` is checked before hubs, so
+      // the old two-door hub no longer opens either.
+      //
+      // It is still reachable from `ttc_brackets.dart`'s Activities layer,
+      // which the workbook wants live for this bracket, and from
+      // `ttc_journeys.dart`. Deleting the surface would break both. So the
+      // door's entrance is gone and the screen is not — see
+      // `docs/STILL-OPEN.md` §28 for the decision that is actually owed here.
       'ttc_ritual' => TtcRitualScreen(chapter: TtcStore.instance.today.chapter),
       'ttc_journal' => const TtcJournalScreen(),
 
@@ -291,5 +356,9 @@ Widget? _ttcStaticSurface(String id) => switch (id) {
 /// happens.
 Widget? ttcInlineToolFor(String surfaceId) => switch (surfaceId) {
       'ttc_pcos_check' => const TtcPcosStandBody(),
+      // Mind & body's Today. Rendered INSIDE the tab rather than pushed, which
+      // is the whole point of a do-it screen: opening the door is opening the
+      // practice, with nothing in between.
+      'ttc_mind_today' => const TtcMindTodayBody(),
       _ => null,
     };

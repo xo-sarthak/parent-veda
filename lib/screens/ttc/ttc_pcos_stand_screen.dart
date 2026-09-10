@@ -447,7 +447,7 @@ class TtcPcosStandResultScreen extends StatelessWidget {
               )),
               const SizedBox(height: 10),
               _pad(TtcToolSecondary(
-                label: 'What to take to your doctor',
+                label: 'What to take with you',
                 onTap: () => Navigator.of(context).push(
                     MaterialPageRoute<void>(
                         settings:
@@ -482,64 +482,29 @@ class TtcPcosChecklistScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final p = V2PaletteStore.instance.current;
 
     return TtcToolScaffold(
       hue: kPcosHue,
       variant: 4,
       eyebrow: 'Appointment notes',
-      title: 'What to take to\nyour doctor.',
+      title: 'What to take\nwith you.',
       intro: 'Screenshot this, or read it out. It is four lines.',
       children: [
               const SizedBox(height: 24),
-              _pad(Container(
-                width: double.infinity,
-                padding: const EdgeInsets.fromLTRB(20, 20, 20, 18),
-                decoration: BoxDecoration(
-                  color: p.surface,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: p.line),
-                ),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      for (var i = 0; i < result.checklist.length; i++) ...[
-                        if (i > 0) ...[
-                          const SizedBox(height: 15),
-                          Divider(color: p.line, height: 1),
-                          const SizedBox(height: 15),
-                        ],
-                        Text(result.checklist[i].label.toUpperCase(),
-                            style: pvManrope(
-                                fontSize: 9.5,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 0.9,
-                                color: p.ink3)),
-                        const SizedBox(height: 6),
-                        Text(result.checklist[i].value,
-                            style: pvJakarta(
-                                fontSize: 15.5,
-                                fontWeight: FontWeight.w600,
-                                height: 1.45,
-                                color: p.ink1)),
-                      ],
-                      const SizedBox(height: 18),
-                      Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(13),
-                        decoration: BoxDecoration(
-                          color: p.ground,
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(kPcosChecklistDisclaimer,
-                            style: pvManrope(
-                                fontSize: 12.5,
-                                height: 1.55,
-                                fontWeight: FontWeight.w700,
-                                color: p.ink2)),
-                      ),
-                    ]),
-              )),
+              // ⚠️ THE SHARED CARD, NOT A LOCAL COPY OF IT — FOLDED IN
+              // 2026-09-03. This screen predates `ttc_tool_chrome.dart` and
+              // carried its own byte-identical version of the notes card: same
+              // padding, same 9.5pt letter-spaced label, same divider, same
+              // tinted disclaimer block at the foot.
+              //
+              // Two identical implementations of one appointment note is the
+              // state that drifts, and it drifts in the worst place — the two
+              // doors would slowly print a woman's own notes in two different
+              // shapes, and she has no way to know which one her doctor is
+              // used to reading. One card, both doors.
+              _pad(TtcToolNotesCard(
+                  rows: result.checklist,
+                  disclaimer: kPcosChecklistDisclaimer)),
               const SizedBox(height: 18),
               _pad(TtcToolPrimary(
                 label: 'Talk to a PCOS specialist',
@@ -660,11 +625,11 @@ class _Chips<T> extends StatelessWidget {
   final V2Palette p;
 
   @override
-  Widget build(BuildContext context) => _Options(
+  Widget build(BuildContext context) => TtcToolOptions(
         p: p,
         items: [
           for (final e in options.entries)
-            _Opt(
+            TtcToolOption(
                 label: e.value,
                 on: value == e.key,
                 onTap: () => onTap(value == e.key ? null : e.key)),
@@ -733,204 +698,21 @@ class _AreaPicker extends StatelessWidget {
   final V2Palette p;
 
   @override
-  Widget build(BuildContext context) => _Options(
+  Widget build(BuildContext context) => TtcToolOptions(
         p: p,
         items: [
-          _Opt(
+          TtcToolOption(
               label: "Haven't noticed",
               on: checked && selected.isEmpty,
               onTap: onNone,
               tick: true),
           for (final h in PcosHairArea.values)
-            _Opt(
+            TtcToolOption(
                 label: h.label,
                 on: selected.contains(h),
                 onTap: () => onToggle(h),
                 tick: true),
         ],
       );
-}
-
-/// One option, before it is laid out. A record would do; a tiny class keeps the
-/// three fields named at every call site.
-class _Opt {
-  const _Opt(
-      {required this.label,
-      required this.on,
-      required this.onTap,
-      this.tick = false});
-
-  final String label;
-  final bool on;
-  final VoidCallback onTap;
-
-  /// Whether this block draws a checkbox.
-  ///
-  /// WARNING: ONLY ON A QUESTION THAT CAN HOLD SEVERAL ANSWERS, which here is
-  /// the hair-area picker and nothing else. The first cut ticked every block on
-  /// the page, reasoning that with deselect available every question is "none
-  /// or one" and so behaves like a set of checkboxes. That is true of the
-  /// MECHANICS and wrong about the READING: a checkbox is a promise that you
-  /// may choose more than one, and seven questions made that promise and then
-  /// broke it on the second tap.
-  ///
-  /// Said plainly: "check boxes are only necessary when there are more than one
-  /// choices." The fill and the border already say a single-choice block is
-  /// chosen, which is what it looked like before the ticks arrived.
-  final bool tick;
-}
-
-/// The answers to one question, as blocks that fill the row.
-///
-/// ⚠️ THIS REPLACED A `Wrap` OF PILLS, AND THE WRAP IS WHY THE PAGE FELT EMPTY.
-/// Reported as *"eight short questions… a lot of spaces again, being wasted"*,
-/// and a `Wrap` of label-sized pills is the mechanism: every row ended wherever
-/// the last pill happened to fit and left a ragged strip of nothing down the
-/// right-hand side of all eight questions. Nobody wrote that space; it was the
-/// residue of laying out by content width.
-///
-/// So the row is divided instead of filled. Every option in a row is the same
-/// width, the row always reaches both edges, and — the part that actually
-/// recovers the space — **a short last row stretches rather than leaving a
-/// gap**: four options in three columns puts one full-width block underneath,
-/// not one small one with two-thirds of a row beside it.
-///
-/// ⚠️ THE COLUMN COUNT COMES FROM THE LONGEST LABEL, NOT FROM THE COUNT. Three
-/// across for "Yes / No / Not sure", two across for "Often longer than 35". A
-/// fixed three would wrap the long ones onto two lines and a fixed two would
-/// waste half a row on the short ones — the choice has to follow the words.
-class _Options extends StatelessWidget {
-  const _Options({required this.items, required this.p});
-
-  final List<_Opt> items;
-  final V2Palette p;
-
-  static const double _gap = 8;
-
-  @override
-  Widget build(BuildContext context) {
-    final longest =
-        items.fold<int>(0, (n, o) => o.label.length > n ? o.label.length : n);
-    // ⚠️ NINE, NOT TWELVE, AND THE THREE CHARACTERS WERE MEASURED. A block is
-    // not all label: 22pt of padding, an 18pt mark and a 9pt gap come off the
-    // column before a word is drawn, so a third of 354pt leaves about 64pt of
-    // text. "Not sure" wrapped at twelve. The count has to be chosen against
-    // the space the label actually gets, not against the column.
-    final cols = longest <= 9 ? 3 : 2;
-
-    final rows = <Widget>[];
-    for (var i = 0; i < items.length; i += cols) {
-      final end = (i + cols) < items.length ? (i + cols) : items.length;
-      final slice = items.sublist(i, end);
-      rows.add(
-        // ⚠️ `IntrinsicHeight` BUYS ONE THING AND IT IS WORTH THE PASS: every
-        // block in a row is as tall as the tallest. Without it a label that
-        // wraps to two lines leaves its neighbours short and the row reads as
-        // broken — which is what the first cut of this did to "Yes / No / Not
-        // sure". It is an extra layout pass over three small boxes, not over a
-        // list, so the usual objection to it does not apply here.
-        IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              for (var j = 0; j < slice.length; j++) ...[
-                if (j > 0) const SizedBox(width: _gap),
-                // ⚠️ `Expanded`, WHICH IS WHAT FILLS THE LAST ROW. Four options
-                // in three columns leaves one on its own, and it now spans the
-                // full width instead of sitting in a third of it with the other
-                // two-thirds empty. That gap, repeated down eight questions,
-                // was the wasted space this control was rebuilt to recover.
-                Expanded(child: _OptionBlock(opt: slice[j], p: p)),
-              ],
-            ],
-          ),
-        ),
-      );
-    }
-
-    return Column(children: [
-      for (var i = 0; i < rows.length; i++) ...[
-        if (i > 0) const SizedBox(height: _gap),
-        rows[i],
-      ],
-    ]);
-  }
-}
-
-/// One answer. A block, not a pill.
-///
-/// ⚠️ THE MARK IS WHAT FILLS IT. A pill grown into a rectangle is a bigger
-/// empty pill — the same trap the group tabs on the focus page fell into twice.
-/// The 18pt rounded square on the left gives the block a left edge with
-/// something in it, and it does a second job the pill could not: it says
-/// out loud that an answer can be turned OFF again. A tinted pill with no
-/// control on it looks like a state the screen chose; a box with a tick in it
-/// looks like a thing you can untick, which is now true.
-///
-/// ⚠️ A SQUARE ON SINGLE-CHOICE QUESTIONS TOO, WHICH USUALLY MEANS "MANY". It
-/// is the honest shape here: with deselect, every question on this page really
-/// is "none or one" rather than "exactly one", and a radio that cannot be
-/// cleared is the control this screen just stopped being.
-class _OptionBlock extends StatelessWidget {
-  const _OptionBlock({required this.opt, required this.p});
-
-  final _Opt opt;
-  final V2Palette p;
-
-  @override
-  Widget build(BuildContext context) {
-    final on = opt.on;
-    return Semantics(
-      selected: on,
-      button: true,
-      label: opt.label,
-      child: GestureDetector(
-        onTap: opt.onTap,
-        behavior: HitTestBehavior.opaque,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 130),
-          padding: const EdgeInsets.fromLTRB(11, 11, 11, 11),
-          decoration: BoxDecoration(
-            color: on ? v2BlockTint(288, p) : ttcPanel,
-            borderRadius: BorderRadius.circular(14),
-            // WARNING: NOT `ttcPurple`. Same call as the button below — the
-            // accent is spent at decision points, not used to outline eight
-            // questions' worth of blocks.
-            border: Border.all(
-                color: on ? ttcTitleInk : Colors.transparent, width: 1.5),
-          ),
-          child: Row(children: [
-            if (opt.tick) ...[
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 130),
-                width: 18,
-                height: 18,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: on ? ttcTitleInk : Colors.transparent,
-                  borderRadius: BorderRadius.circular(5),
-                  border: on ? null : Border.all(color: ttcLine, width: 1.5),
-                ),
-                child: on
-                    ? const Icon(Icons.check_rounded,
-                        size: 13, color: Colors.white)
-                    : null,
-              ),
-              const SizedBox(width: 9),
-            ],
-            Expanded(
-              child: Text(opt.label,
-                  textAlign: opt.tick ? TextAlign.start : TextAlign.center,
-                  style: pvManrope(
-                      fontSize: 12.5,
-                      height: 1.25,
-                      fontWeight: on ? FontWeight.w800 : FontWeight.w600,
-                      color: ttcTitleInk)),
-            ),
-          ]),
-        ),
-      ),
-    );
-  }
 }
 

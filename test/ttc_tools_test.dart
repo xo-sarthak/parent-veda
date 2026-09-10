@@ -20,6 +20,7 @@ import 'package:parentveda/screens/ttc/ttc_tracker_screen.dart';
 import 'package:parentveda/ttc/cycle_store.dart';
 import 'package:parentveda/ttc/ttc_journal_store.dart' show TtcAuthor;
 import 'package:parentveda/ttc/ttc_log_store.dart';
+import 'package:parentveda/ttc/ttc_reads_data.dart';
 import 'package:parentveda/ttc/ttc_store.dart';
 import 'package:parentveda/ttc/ttc_supplements_store.dart';
 import 'package:parentveda/ttc/ttc_tests_data.dart';
@@ -62,9 +63,21 @@ void main() {
       //
       // Counting tiles would have blocked that merge; what actually matters is
       // that no capability stopped being findable by the word she looks for.
+      // ⚠️ DESCRIPTIONS COUNT NOW, AND THE REASON IS THE HABIT MERGE — 2026-09-04.
+      //
+      // Sleep, Stress, Lifestyle and Movement had a tile each. They are fields
+      // inside one `habits` tracker now, and one tile cannot be called all four
+      // things — so searching titles alone said four capabilities had vanished
+      // when none had.
+      //
+      // The rule this test protects is "no capability stops being findable by
+      // the word she looks for". A tile's description is where she looks
+      // second and it is on the same screen, so it satisfies the rule. What
+      // would NOT satisfy it is a capability named nowhere in the hub at all.
       final names = [
         for (final g in ttcToolGroups)
-          for (final t in g.tools) '${t.nameEn} ${t.nameHi}'
+          for (final t in g.tools)
+            '${t.nameEn} ${t.nameHi} ${t.descEn} ${t.descHi}'
       ].join(' ').toLowerCase();
 
       for (final capability in [
@@ -100,7 +113,12 @@ void main() {
       // own screen; none of them is a second door onto a screen already listed
       // here. `Weight and fertility` sits beside `Weight` on purpose - one
       // logs a series, one reads a single number against South Asian cut-offs.
-      expect(TtcToolsScreen.toolCount, 26);
+      //
+      // ⚠️ 26 -> 23 ON 2026-09-04. Sleep, Stress, Lifestyle and Movement became
+      // one `habits` tracker, so four tiles became one. Four fewer tiles, one
+      // more, and not a single capability lost — all four are named on the new
+      // tile and the findability test above asserts it.
+      expect(TtcToolsScreen.toolCount, 23);
     });
 
     test('supplements and medication are not the same destination', () {
@@ -317,10 +335,142 @@ void main() {
       expect(TtcLogStore.instance.valueFor('mood', 'mood')!.value, 2);
     });
 
-    testWidgets('an empty tracker invites rather than showing a blank list',
+    // =========================================================================
+    //  ⚠️ THE HABIT MERGE, AND THE HALF THAT CAN LOSE SOMEBODY'S DATA
+    // -------------------------------------------------------------------------
+    //  Sleep, Movement, Stress and Lifestyle became one `habits` tracker on
+    //  2026-09-04. `TtcLogStore` keys rows `tracker/field/day`, so without a
+    //  remap every night of sleep anybody had logged would still be in the file
+    //  and invisible in the app — a silent loss, on a store whose whole promise
+    //  is that it records what she tells it.
+    // =========================================================================
+    test('the four old tracker ids fold into habits', () {
+      for (final old in ['sleep', 'exercise', 'stress', 'lifestyle']) {
+        expect(ttcMergedTracker(old), 'habits', reason: old);
+      }
+    });
+
+    test('and nothing else moves', () {
+      for (final other in ['symptoms', 'weight', 'mood', 'partner_health']) {
+        expect(ttcMergedTracker(other), other, reason: other);
+      }
+      expect(ttcMergedTracker('habits'), 'habits');
+    });
+
+    test('the merged tracker carries every field the four had', () {
+      final habits = ttcTrackerById('habits')!;
+      final ids = habits.fields.map((f) => f.id).toSet();
+      for (final f in [
+        'hours', 'quality', // sleep
+        'minutes', 'kind', // movement
+        'stress', // stress
+        'caffeine', 'alcohol', 'smoking', 'water', // lifestyle
+      ]) {
+        expect(ids, contains(f), reason: '"$f" was dropped in the merge');
+      }
+    });
+
+    test('no two fields collide, which is the only reason the merge is safe',
+        () {
+      // If two of the four trackers had shared a field id, remapping the
+      // tracker half of the key would land one row on another and lose it.
+      // They did not — and this asserts it stays true if fields are added.
+      final habits = ttcTrackerById('habits')!;
+      final ids = habits.fields.map((f) => f.id).toList();
+      expect(ids.toSet().length, ids.length);
+    });
+
+    test('the stress field references Mind and body, and does not copy it', () {
+      // ⚠️ THE REBUILD BRIEF'S STEP 5c. Getting ready is the single source for
+      // before-you-start body prep; it does NOT own stress, which belongs to
+      // Mind and body. So the field names that area's read by id and the
+      // article stays edited in exactly one place.
+      final stress = ttcTrackerById('habits')!
+          .fields
+          .firstWhere((f) => f.id == 'stress');
+      expect(stress.readId, 'ttc_read_stress_fertility');
+      expect(ttcReadById(stress.readId!), isNotNull,
+          reason: 'the field points at a read that is not in the library, so '
+              'the link renders and opens nothing');
+    });
+
+    test('and no other field claims to be explained by somebody else', () {
+      // One field in nine carries a link. If that ever becomes most of them,
+      // the tracker has turned into a reading list.
+      final linked = ttcTrackerById('habits')!
+          .fields
+          .where((f) => f.readId != null)
+          .length;
+      expect(linked, 1);
+    });
+
+    testWidgets('the link names the read, so renaming the article renames it',
         (tester) async {
-      await pumpTall(tester, TtcTrackerScreen(tracker: ttcTrackerById('sleep')!));
-      expect(find.text(const TtcS(false).trackerEmptyTitle), findsOneWidget);
+      await pumpTall(
+          tester, TtcTrackerScreen(tracker: ttcTrackerById('habits')!));
+      // The "Read:" prefix went when the link became a proper tappable row —
+      // a chevron and the action violet say "this opens something" better than
+      // a word did, and the title alone is what the read is called.
+      final title = ttcReadById('ttc_read_stress_fertility')!.title.en;
+      expect(find.text(title), findsOneWidget);
+    });
+
+    test('the old four are gone from the catalogue, not just from the hub', () {
+      for (final old in ['sleep', 'exercise', 'stress', 'lifestyle']) {
+        expect(ttcTrackerById(old), isNull,
+            reason: '$old still resolves, so two doors open one room');
+      }
+    });
+
+    // ⚠️ THE EMPTY INVITE WAS ON THE HISTORY LIST, AND THE HISTORY LIST IS
+    // GONE — 2026-09-04. Thirty day-cards were replaced by "Look back", which
+    // is reached from the header rather than sitting under the fields, so
+    // there is no longer a blank list on this screen to invite anything into.
+    //
+    // The rule underneath it survives and matters more here than it did: an
+    // untouched tracker must read as an invitation rather than as a form. That
+    // is now one sentence at the top of the sheet, before anything is asked
+    // for, and it is the most important copy on the screen — nine empty fields
+    // read as nine things she has failed to do unless something says otherwise
+    // first.
+    testWidgets('an untouched tracker gives permission before it asks',
+        (tester) async {
+      await pumpTall(
+          tester, TtcTrackerScreen(tracker: ttcTrackerById('habits')!));
+      expect(
+          find.text('Write down as much or as little as you like. One thing '
+              'is enough.'),
+          findsOneWidget);
+    });
+
+    testWidgets('and looking back is offered without being the screen',
+        (tester) async {
+      await pumpTall(
+          tester, TtcTrackerScreen(tracker: ttcTrackerById('habits')!));
+      expect(find.text('Look back'), findsOneWidget);
+      await tester.tap(find.text('Look back'));
+      await tester.pumpAndSettle();
+      expect(find.text('Looking back'), findsOneWidget);
+      // The rule the strip exists under: it describes, it never assesses.
+      expect(
+          find.text('A blank space is a day you did not write anything down.'),
+          findsOneWidget);
+    });
+
+    testWidgets('a scale stays on one row; named choices may wrap',
+        (tester) async {
+      // The design wraps both. A five-option ORDERED scale wraps 4 + 1 on a
+      // 354pt sheet, which makes its far end look like a separate control —
+      // the exact bug the screen this replaced had already fixed once.
+      await pumpTall(
+          tester, TtcTrackerScreen(tracker: ttcTrackerById('habits')!));
+      // The stress scale is None → Severe, and "Severe" is the far end that
+      // used to be orphaned.
+      final first = tester.getTopLeft(find.text('None').first);
+      final last = tester.getTopLeft(find.text('Severe').first);
+      expect(last.dy, closeTo(first.dy, 1.0),
+          reason: 'the far end of the stress scale dropped to its own line');
+      expect(last.dx, greaterThan(first.dx));
     });
   });
 

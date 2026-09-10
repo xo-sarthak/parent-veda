@@ -111,7 +111,34 @@ class TtcFertileWindow {
 /// Never a window that has closed — see the header note. Returns null when the
 /// app is not entitled to an estimate at all, which is a real answer and must
 /// be rendered as words rather than as an empty chart.
-TtcFertileWindow? ttcFertileWindowNow({DateTime? on}) {
+/// [ignoreOwnership] skips refusal (1) ONLY.
+///
+/// ⚠️ ONE CALLER, AND IT IS A PRODUCT DECISION RATHER THAN A CLINICAL ONE —
+/// 2026-09-05. The home hero passes it. Asked for directly and repeatedly, after
+/// four rounds of the hero showing a clinic refusal instead of a cycle message:
+/// *"I don't want hero section to display what it was displaying… not that IVF
+/// and everything. Because it's not happening right now and we will figure out
+/// a way about it."*
+///
+/// The reasoning behind that is sound and worth writing down rather than
+/// arguing with: `ownership` is derived from `path.defaultMedicated`, which is
+/// a guess from a LABEL she tapped once, and `setPath` clears both of her real
+/// answers so the guess always wins. The flag says "a clinic is running this
+/// cycle" on the strength of a tap, not on anything anybody told us. The hero
+/// is being asked not to act on a guess.
+///
+/// ⚠️ WHAT IT DOES **NOT** CHANGE, AND THIS IS THE PART THAT MATTERS. Nothing
+/// else in the app passes it. The cycle companion still refuses, the calendar
+/// still refuses, `Inferable` is untouched, and the whole clinical suite — the
+/// 36 tests that correctly rejected a global version of this change on the same
+/// day — still runs green. And the hero still leads on her clinic's own dates
+/// wherever they exist, because those outrank everything we compute.
+///
+/// ⚠️ THE PROPER FIX IS AT THE DOOR, NOT HERE: ownership should follow her
+/// ANSWERS, never a pathway default. That is `docs/STILL-OPEN.md` §30 and it is
+/// the reason this parameter is a named exception with one call site rather
+/// than a change to the rule.
+TtcFertileWindow? ttcFertileWindowNow({DateTime? on, bool ignoreOwnership = false}) {
   final store = TtcStore.instance;
   final today = store.today;
 
@@ -123,8 +150,15 @@ TtcFertileWindow? ttcFertileWindowNow({DateTime? on}) {
   //
   // All three are `null`, not a fallback, because the difference between them
   // is a difference in what to SAY, and only the caller knows the screen.
-  if (!today.behaviour.showsFertilityWindow) return null;
-  final ov = today.estimatedOvulationDay;
+  if (!ignoreOwnership && !today.behaviour.showsFertilityWindow) return null;
+  // ⚠️ THE GATE IS IN TWO PLACES, AND THE FIRST ATTEMPT ONLY MOVED ONE.
+  // `showsFertilityWindow` above is the obvious one; `estimatedOvulationDay` is
+  // the real one — the engine computes `ov`, then publishes null whenever a
+  // clinic owns the timing. Skipping the first check alone changed nothing, and
+  // the test suite said so by continuing to pass.
+  final ov =
+      ignoreOwnership ? today.rawOvulationDay ?? today.estimatedOvulationDay
+                      : today.estimatedOvulationDay;
   final start = CycleStore.instance.lastPeriodStart;
   if (ov == null || start == null) return null;
 

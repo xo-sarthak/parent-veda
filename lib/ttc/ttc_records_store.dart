@@ -115,24 +115,50 @@ class TtcRecord {
     );
   }
 
-  TtcRecord copyWith({List<String>? attachments}) => TtcRecord(
+  /// ⚠️ ONLY THE FIELDS SOMETHING ACTUALLY EDITS. `value`/`unit` exist because
+  /// a photo-first record can be completed later ("Type it"); `forPartner`
+  /// because whose result it is was moved off the add form and onto a quiet
+  /// correction line. The rest are deliberately absent — a record's identity,
+  /// its label and its date are not things a screen may quietly rewrite.
+  TtcRecord copyWith({
+    List<String>? attachments,
+    String? value,
+    String? unit,
+    bool? forPartner,
+  }) =>
+      TtcRecord(
         id: id,
         testId: testId,
         label: label,
-        value: value,
-        unit: unit,
+        value: value ?? this.value,
+        unit: unit ?? this.unit,
         takenOn: takenOn,
         note: note,
-        forPartner: forPartner,
+        forPartner: forPartner ?? this.forPartner,
         attachments: attachments ?? this.attachments,
       );
 }
 
 class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
   TtcRecordsStore._() {
-    _load();
+    _loading = _load();
   }
   static final TtcRecordsStore instance = TtcRecordsStore._();
+
+  late final Future<void> _loading;
+
+  /// Resolves once the cached rows are in memory.
+  ///
+  /// ⚠️ ADDED FOR A WRITE THAT CAN ARRIVE BEFORE THE FIRST READ — 2026-09-06.
+  /// The store loads in its constructor, asynchronously, and `_load` does
+  /// `_items..clear()..addAll(cached)`. A caller that constructs the instance
+  /// and calls `add` in the same breath — "Read your semen report" saving a
+  /// result is the first such caller — races it: the new row goes into
+  /// `_items`, then the load completes and clears it, and the report the
+  /// screen said it kept is gone. Awaiting this first is the fix. Screens
+  /// that only read never needed it, because a listener rebuild follows the
+  /// load's `notifyListeners`.
+  Future<void> ensureLoaded() => _loading;
 
   static const _key = 'ttc_records';
 

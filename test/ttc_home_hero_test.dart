@@ -32,11 +32,15 @@ import 'package:parentveda/screens/ttc/ttc_common.dart';
 import 'package:parentveda/screens/ttc/ttc_journey_map_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/screens/ttc/ttc_today_parts.dart';
+import 'package:parentveda/screens/ttc/ttc_home_v3.dart';
 import 'package:parentveda/screens/ttc/ttc_today_screen.dart';
 import 'package:parentveda/services/life_stage_store.dart';
 import 'package:parentveda/ttc/cycle_store.dart';
 import 'package:parentveda/ttc/ttc_chapter.dart';
+import 'package:parentveda/ttc/ttc_fertile_window.dart';
+import 'package:parentveda/ttc/ttc_home_hero.dart';
 import 'package:parentveda/ttc/ttc_store.dart';
+import 'package:parentveda/ttc/ttc_treatment_store.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -267,6 +271,602 @@ void main() {
       final bar = text.substring(text.indexOf('class TtcChapterBar'));
       expect(bar, contains('if (active)'),
           reason: 'segments fill cumulatively again');
+    });
+  });
+
+  // ===========================================================================
+  //  The hero speaks on every day of the cycle — 2026-09-05
+  // ---------------------------------------------------------------------------
+  //  ⚠️ THE BUG THIS GROUP EXISTS FOR WAS INVISIBLE TO EVERY TEST ABOVE. The
+  //  hero had five states and the estimate one only distinguished "window open"
+  //  from "window opens in N days". Once the window closed, the engine rolled
+  //  forward to NEXT cycle's window and the hero said "expected around 20 Sep
+  //  to 25 Sep" for the entire two-week wait — a fortnight of one unchanging
+  //  sentence about a cycle she was not in.
+  //
+  //  Nothing failed. Every individual state rendered correctly. The hole was in
+  //  the coverage, which is why these walk a whole synthetic cycle DAY BY DAY
+  //  rather than checking a handful of interesting days.
+  // ===========================================================================
+  group('the hero says something different as the cycle turns', () {
+    /// Put her on `cycleDay` of a 28-day cycle by backdating the last period.
+    ///
+    /// ⚠️ THE TWO HISTORICAL STARTS ARE PINNED TO THE CURRENT ONE, NOT TO
+    /// TODAY, AND THE FIRST VERSION OF THIS HARNESS GOT IT WRONG. Backdating
+    /// them from `DateTime.now()` while the current start moved meant the GAPS
+    /// between logged periods changed on every iteration — so the store
+    /// recomputed her usual cycle length as 28, then 27, then 26, and the
+    /// window slid a day earlier each time.
+    ///
+    /// The test then failed with "the last fertile day fired on 2 days", which
+    /// reads exactly like an off-by-one in the state machine and was not. Worth
+    /// remembering: when a test that walks a range fails at one point in the
+    /// range, suspect the fixture before the code.
+    void onCycleDay(int cycleDay) {
+      final start = DateTime.now().subtract(Duration(days: cycleDay - 1));
+      CycleStore.instance
+        ..resetForTest()
+        ..logPeriodStart(start.subtract(const Duration(days: 56)))
+        ..logPeriodStart(start.subtract(const Duration(days: 28)))
+        ..logPeriodStart(start);
+    }
+
+    test('no day of a 28-day cycle falls through to a refusal', () {
+      // The whole point. A refusal on day 20 of a perfectly well-logged cycle
+      // is the app saying "not enough to say yet" to somebody who has told it
+      // everything it asked for.
+      for (var day = 1; day <= 28; day++) {
+        onCycleDay(day);
+        final line = ttcHomeHeroLine();
+        expect(
+            const {
+              TtcHeroState.startHere,
+              TtcHeroState.clinicHolds,
+              TtcHeroState.noEstimate,
+            },
+            isNot(contains(line.state)),
+            reason: 'day $day of a fully logged cycle refuses to say anything');
+      }
+    });
+
+    test('and it covers the loop, not just the fertile half', () {
+      // Every state the arithmetic can reach must actually be reached inside
+      // one ordinary cycle. A state that never fires is dead copy nobody will
+      // notice is wrong.
+      final seen = <TtcHeroState>{};
+      for (var day = 1; day <= 32; day++) {
+        onCycleDay(day);
+        seen.add(ttcHomeHeroLine().state);
+      }
+      expect(
+          seen,
+          containsAll(const [
+            TtcHeroState.windowOpensIn,
+            TtcHeroState.windowOpen,
+            TtcHeroState.windowLastDay,
+            TtcHeroState.waiting,
+            TtcHeroState.periodDue,
+            TtcHeroState.periodLate,
+          ]),
+          reason: 'a state in the loop is unreachable in a 28-day cycle. Seen: '
+              '$seen');
+    });
+
+    test('the last fertile day is exactly one day', () {
+      var lastDays = 0;
+      for (var day = 1; day <= 28; day++) {
+        onCycleDay(day);
+        if (ttcHomeHeroLine().state == TtcHeroState.windowLastDay) lastDays++;
+      }
+      expect(lastDays, 1,
+          reason: '"your fertile days end today" fired on $lastDays days');
+    });
+
+    test('the countdown to the period only ever goes down', () {
+      // ⚠️ A COUNTDOWN THAT GOES BACK UP IS WORSE THAN NO COUNTDOWN. It happens
+      // when the day arithmetic is off by one across a boundary, and somebody
+      // watching it daily notices immediately.
+      int? previous;
+      for (var day = 15; day <= 28; day++) {
+        onCycleDay(day);
+        final line = ttcHomeHeroLine();
+        if (line.state != TtcHeroState.waiting) continue;
+        if (previous != null) {
+          expect(line.days, lessThan(previous),
+              reason: 'the wait counted up between day ${day - 1} and $day');
+        }
+        previous = line.days;
+      }
+      expect(previous, isNotNull, reason: 'the wait never appeared');
+    });
+
+    test('the window count includes today and never reads zero', () {
+      for (var day = 1; day <= 28; day++) {
+        onCycleDay(day);
+        final line = ttcHomeHeroLine();
+        if (line.state != TtcHeroState.windowOpen) continue;
+        expect(line.days, greaterThanOrEqualTo(2),
+            reason: 'a window with fewer than two days left is the LAST day, '
+                'and has its own state and its own sentence');
+      }
+    });
+
+    test('a refusal never prints a cycle day', () {
+      // A cycle day under "not enough to say yet" is the same overreach in
+      // smaller type — it says we do know where she is, having just said we do
+      // not.
+      CycleStore.instance.resetForTest();
+      final line = ttcHomeHeroLine();
+      expect(line.state, TtcHeroState.startHere);
+      expect(line.cycleDay, isNull);
+    });
+  });
+
+  // ===========================================================================
+  group('the wait counts to a period, never to a test', () {
+    test('no state promises an outcome', () {
+      // ⚠️ THE LINE THE REFERENCE APP CROSSES AND WE DO NOT. Flo's hero says
+      // "Time for a pregnancy test in 10 days" here. That is a countdown to a
+      // verdict, and it is the shape that makes a fortnight worse.
+      //
+      // Scanned rather than reasoned about, because the tempting version of
+      // this change is one word.
+      final copy = [
+        for (var days = 1; days <= 14; days++) ...[
+          TtcS.current().headerWaiting(days),
+          TtcS.current().headerPeriodLate(days),
+        ],
+        TtcS.current().headerWaitingBody,
+        TtcS.current().headerPeriodDue,
+        TtcS.current().headerPeriodDueBody,
+        TtcS.current().headerPeriodLateBody,
+        TtcS.current().headerWindowLastDay,
+        TtcS.current().headerWindowLastDayBody,
+      ].join(' ').toLowerCase();
+
+      expect(RegExp(r'\btest in \d|\bin \d+ days? (until|to) (a |your )?test')
+          .hasMatch(copy), isFalse,
+          reason: 'the hero has grown a countdown to a pregnancy test');
+      expect(RegExp(r'chance|odds|likelihood|probabilit').hasMatch(copy),
+          isFalse,
+          reason: 'the hero has grown a chance framing');
+      expect(RegExp(r'fingers crossed|good luck|hopefully|this could be')
+          .hasMatch(copy), isFalse,
+          reason: 'the hero has started hoping out loud, which makes the '
+              'month it does not happen worse');
+    });
+
+    test('a missed period is not called late', () {
+      // "Late" implies a schedule she failed to keep, and most people read it
+      // as a hint. Neither is ours to say.
+      for (var d = 1; d <= 10; d++) {
+        expect(TtcS.current().headerPeriodLate(d).toLowerCase(),
+            isNot(contains('late')));
+      }
+    });
+  });
+
+  // ===========================================================================
+  //  The hero follows the day strip — 2026-09-05
+  // ---------------------------------------------------------------------------
+  //  ⚠️ THE REST OF THE HEADER ALREADY DID. The date above it, the insight
+  //  cards, the symptom sheet and the two actions all took `selected`; only the
+  //  hero read today. So standing on the 3rd gave a page about the 3rd with one
+  //  sentence about the 5th in the middle of it, and nothing said which was
+  //  which.
+  // ===========================================================================
+  group('the hero follows the selected day', () {
+    void onCycleDay(int cycleDay) {
+      final start = DateTime.now().subtract(Duration(days: cycleDay - 1));
+      CycleStore.instance
+        ..resetForTest()
+        ..logPeriodStart(start.subtract(const Duration(days: 56)))
+        ..logPeriodStart(start.subtract(const Duration(days: 28)))
+        ..logPeriodStart(start);
+    }
+
+    test('a day back in the same cycle describes THAT day', () {
+      // The reference behaviour, exactly: on the last fertile day the hero says
+      // it ends today; standing two days earlier it says today and 2 more.
+      onCycleDay(15);
+      final today = ttcHomeHeroLine();
+      final twoBack =
+          ttcHomeHeroLine(on: DateTime.now().subtract(const Duration(days: 2)));
+
+      expect(today.state, isNot(twoBack.state),
+          reason: 'the hero said the same thing on two different days of the '
+              'window, which is the bug');
+      expect(twoBack.cycleDay, today.cycleDay! - 2);
+    });
+
+    test('no argument still means today', () {
+      // The whole existing suite depends on this, and so does the screen on
+      // first build before anything is tapped.
+      onCycleDay(12);
+      final a = ttcHomeHeroLine();
+      final b = ttcHomeHeroLine(on: DateTime.now());
+      expect(a.state, b.state);
+      expect(a.days, b.days);
+      expect(a.cycleDay, b.cycleDay);
+    });
+
+    test('the cycle day tracks the selection, one per day', () {
+      onCycleDay(20);
+      for (var back = 0; back < 6; back++) {
+        final line = ttcHomeHeroLine(
+            on: DateTime.now().subtract(Duration(days: back)));
+        expect(line.cycleDay, 20 - back);
+      }
+    });
+
+    test('an earlier cycle names its day, from her own logs', () {
+      // ⚠️ THIS ASSERTED A BARE REFUSAL UNTIL 2026-09-05, AND THE REFUSAL WAS
+      // OVER-APPLIED. Reported: "why are we still on past cycle?" — the hero
+      // said "An earlier cycle" and stopped, which tells her nothing she did
+      // not already know from having scrolled there.
+      //
+      // Her cycle DAY in a past cycle is the date minus whichever logged period
+      // contained it. That is arithmetic on her own data and is exactly as true
+      // for August as for today.
+      onCycleDay(10);
+      // 40 days back lands inside the cycle that started 28 days before this
+      // one, on its 26th day.
+      final line = ttcHomeHeroLine(
+          on: DateTime.now().subtract(const Duration(days: 40)));
+      expect(line.state, TtcHeroState.pastCycle);
+      expect(line.days, 26,
+          reason: 'the day of that cycle, counted from the period she was '
+              'actually in');
+      expect(line.date, isNotNull, reason: 'it must name which cycle');
+    });
+
+    test('and still no fertile window, and no grade, for a past cycle', () {
+      // ⚠️ THE HALF THAT STAYS REFUSED. A window for a past cycle needs an
+      // ovulation estimate for a cycle whose signals are gone — a guess she has
+      // no way to identify as one. And the reference app's pairing of a past
+      // day number with "low chances of getting pregnant" is the personalised
+      // probability CLAUDE.md forbids, which does not become allowed by being
+      // in the past.
+      onCycleDay(10);
+      final line = ttcHomeHeroLine(
+          on: DateTime.now().subtract(const Duration(days: 40)));
+      expect(
+          const {
+            TtcHeroState.windowOpensIn,
+            TtcHeroState.windowOpen,
+            TtcHeroState.windowLastDay,
+          },
+          isNot(contains(line.state)));
+      final copy = (TtcS.current().headerPastCycleDay(17) +
+              TtcS.current().headerPastCycleBodyOn('3 Aug'))
+          .toLowerCase();
+      expect(RegExp(r'chance|odds|likelihood|low|high').hasMatch(copy), isFalse,
+          reason: 'the past-cycle hero has grown a fertility grade');
+    });
+
+    test('earlier than anything logged has no day to name', () {
+      onCycleDay(10);
+      final line = ttcHomeHeroLine(
+          on: DateTime.now().subtract(const Duration(days: 400)));
+      expect(line.state, TtcHeroState.pastCycle);
+      expect(line.days, 0);
+    });
+
+    test('a future day is never called late', () {
+      // The strip runs six days forward. On day 26 of a 28-day cycle, +6 is
+      // arithmetically overdue and factually has not happened.
+      onCycleDay(26);
+      for (var ahead = 1; ahead <= 6; ahead++) {
+        final line = ttcHomeHeroLine(
+            on: DateTime.now().add(Duration(days: ahead)));
+        expect(line.state, isNot(TtcHeroState.periodLate),
+            reason: '+$ahead days is in the future and was called late');
+        expect(line.state, isNot(TtcHeroState.periodDue));
+      }
+    });
+
+    test('and a future day inside the window still reads as the window', () {
+      onCycleDay(9);
+      final line =
+          ttcHomeHeroLine(on: DateTime.now().add(const Duration(days: 2)));
+      expect(
+          const {
+            TtcHeroState.windowOpensIn,
+            TtcHeroState.windowOpen,
+            TtcHeroState.windowLastDay,
+          },
+          contains(line.state));
+    });
+  });
+
+  // ===========================================================================
+  //  A clinic-run cycle still gets a hero that moves — 2026-09-05
+  // ---------------------------------------------------------------------------
+  //  ⚠️ THIS GROUP EXISTS BECAUSE THE WHOLE SUITE WAS GREEN WHILE THE FEATURE
+  //  WAS DEAD. Nine states were added and tested the day before; not one test
+  //  set up a clinic-run account, and on such an account an early return above
+  //  all of them meant the hero said "Your clinic holds this" every day
+  //  forever. Reported from a device: *"this is the line that I keep seeing
+  //  again and again, nothing changes."*
+  //
+  //  The lesson is about which ACCOUNT a test runs as, not which state it
+  //  checks. Every test above ran as the default pathway, so every one of them
+  //  agreed with every other one and none of them touched the branch that
+  //  mattered.
+  // ===========================================================================
+  group('a clinic on the cycle does not freeze the hero', () {
+    /// ⚠️ A PAST CLINIC DATE IS SEEDED ON PURPOSE — UPDATED 2026-09-05 WHEN
+    /// THE TREATMENT STATES LANDED. This group tests the FALL-THROUGH: a clinic
+    /// owns the timing, and either there are no upcoming dates or they have all
+    /// been and gone. With no dates at all the hero is now an invitation to add
+    /// them, which is a better answer and a different test.
+    ///
+    /// The precedence, once, so nobody has to reconstruct it: her clinic's next
+    /// date → the invitation to add one → the cycle-day line. Only the last of
+    /// those is `clinicHolds`.
+    void seedClinicCycle(int cycleDay) {
+      final start = DateTime.now().subtract(Duration(days: cycleDay - 1));
+      CycleStore.instance
+        ..resetForTest()
+        ..logPeriodStart(start.subtract(const Duration(days: 56)))
+        ..logPeriodStart(start.subtract(const Duration(days: 28)))
+        ..logPeriodStart(start);
+      TtcStore.instance.setPath(TtcPath.ivf);
+      TtcTreatmentStore.instance
+        ..clearCycle()
+        ..setDate(TtcTreatmentStep.retrieval,
+            DateTime.now().subtract(const Duration(days: 40)));
+    }
+
+    tearDown(() {
+      TtcTreatmentStore.instance.clearCycle();
+      TtcStore.instance.setPath(TtcPath.natural);
+    });
+
+    // ⚠️ FOUR TESTS WERE DELETED FROM HERE ON 2026-09-05, AND SAYING WHY
+    // MATTERS MORE THAN KEEPING THEM. They asserted that a clinic-run cycle
+    // produces `clinicHolds` — "it carries her cycle day", "it says something
+    // different every day", "it follows the strip too". All three were written
+    // the day before, to hold a fix that made the refusal at least MOVE.
+    //
+    // That fix is obsolete because the refusal is gone. A clinic account now
+    // gets the same cycle messages as everybody else, so tests pinning it to
+    // the refusal were pinning the very thing that was being complained about.
+    // Rewriting them as "it says something different every day" against the new
+    // states would duplicate the cycle-walk group above, which already does it
+    // for every day of a 28-day cycle.
+    test('the fertile window IS reachable on the hero now — by decision', () {
+      // ⚠️ THIS INVERTED ON 2026-09-05, AND IT IS A PRODUCT DECISION RATHER
+      // THAN A DISCOVERY. It asserted that no window state could appear while a
+      // clinic held the timing, which was the rule everywhere.
+      //
+      // It still IS the rule everywhere except one surface. The hero passes
+      // `ignoreOwnership` — see `ttcFertileWindowNow` for the full reasoning —
+      // because `ownership` is derived from `path.defaultMedicated`, a guess
+      // from a label tapped once, and `setPath` clears her real answers so the
+      // guess always wins. Four rounds of the hero showing a clinic refusal to
+      // an account with no treatment is what settled it.
+      //
+      // What has NOT changed is asserted immediately below.
+      for (var day = 1; day <= 15; day++) {
+        seedClinicCycle(day);
+        final line = ttcHomeHeroLine();
+        expect(line.state, isNot(TtcHeroState.clinicHolds),
+            reason: 'day $day still refuses instead of speaking');
+      }
+    });
+
+    test('and no OTHER surface gained a window', () {
+      // The invariant the 36 clinical tests protect, kept: `estimatedOvulationDay`
+      // is still withheld, so the cycle companion, the calendar and `Inferable`
+      // all still refuse. Only `rawOvulationDay` is readable, and only the hero
+      // reads it.
+      seedClinicCycle(10);
+      expect(TtcStore.instance.today.estimatedOvulationDay, isNull,
+          reason: 'the published estimate leaked past the ownership gate');
+      expect(ttcFertileWindowNow(), isNull,
+          reason: 'the ungated call now returns a window for a clinic cycle');
+    });
+
+    test('and the hero never carries the long clinic paragraph', () {
+      // It is good writing in the wrong slot: a headline that has to say
+      // something new every morning cannot be a two-line explanation of our
+      // position. The reasoning lives on `TtcTreatmentEntryCard`, which is
+      // where somebody asking "why is there no estimate" actually goes.
+      expect(TtcS.current().headerClinicHoldsShort.length, lessThan(60),
+          reason: 'the clinic line has grown back into a paragraph');
+    });
+  });
+
+  // ===========================================================================
+  //  The day strip's marker follows the selection — 2026-09-05
+  // ===========================================================================
+  group('the coral disc is the cursor, and today is still findable', () {
+    // ⚠️ `TtcHomeV3`, NOT `TtcTodayScreen`. The first version of this group
+    // pumped the helper the rest of this file uses and found neither the strip
+    // nor the word TODAY, because they live on a different screen. Two failing
+    // assertions that both looked like the feature was broken; neither had
+    // rendered it.
+    Future<void> pumpHome(WidgetTester tester) async {
+      tester.view.physicalSize = const Size(360, 2400);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(const MaterialApp(home: TtcHomeV3()));
+      await tester.pump(const Duration(milliseconds: 400));
+      expect(tester.takeException(), isNull);
+    }
+
+    testWidgets('no day cell paints a selection ring any more', (tester) async {
+      // ⚠️ ASSERTED AS AN ABSENCE, WHICH IS THE ONLY WAY TO HOLD A REMOVAL.
+      // "I don't need that purple outline" is the kind of instruction the next
+      // person quietly undoes while adding a focus state.
+      //
+      // ⚠️ AND SCOPED TO THE STRIP. The first version walked every circular
+      // Container on the screen and failed on the two round header buttons,
+      // which have always had a hairline border and have nothing to do with
+      // this. A scan wide enough to catch anything catches the wrong thing.
+      await pumpHome(tester);
+
+      final n = DateTime.now();
+      final cells =
+          find.byKey(ValueKey('ttc_day_${n.year}-${n.month}-${n.day}'));
+      expect(cells, findsOneWidget, reason: 'the strip did not render');
+
+      final inCell = tester.widgetList<Container>(
+          find.descendant(of: cells, matching: find.byType(Container)));
+      for (final c in inCell) {
+        final d = c.decoration;
+        if (d is BoxDecoration && d.shape == BoxShape.circle) {
+          expect(d.border, isNull,
+              reason: 'a day cell has grown a ring back');
+        }
+      }
+    });
+
+    testWidgets('today keeps a mark that is not the disc', (tester) async {
+      // The requirement that came with the change: *"keep the today marked as
+      // where it is so that I know what day is today"*. With the disc free to
+      // follow the selection, today is held by the word above it and by the
+      // colour of its digits.
+      await pumpHome(tester);
+      expect(find.text('TODAY'), findsOneWidget,
+          reason: 'the permanent mark on today has gone, and the disc is not '
+              'permanent any more');
+    });
+  });
+
+  // ===========================================================================
+  //  The hero leads on her clinic's calendar — 2026-09-05
+  // ---------------------------------------------------------------------------
+  //  ⚠️ THE FIX FOR THE COMPLAINT THAT HAD TO BE MADE FOUR TIMES. When a clinic
+  //  owned the timing the hero SUBTRACTED the fertile window and put nothing in
+  //  its place, so the biggest type on the home screen said "Your clinic holds
+  //  this" every day forever — to somebody who had an egg retrieval booked and
+  //  wanted to know when.
+  // ===========================================================================
+  group('a treatment cycle leads on the next clinic date', () {
+    void seedTreatment(Map<TtcTreatmentStep, DateTime> dates) {
+      final start = DateTime.now().subtract(const Duration(days: 8));
+      CycleStore.instance
+        ..resetForTest()
+        ..logPeriodStart(start.subtract(const Duration(days: 56)))
+        ..logPeriodStart(start.subtract(const Duration(days: 28)))
+        ..logPeriodStart(start);
+      TtcStore.instance.setPath(TtcPath.ivf);
+      TtcTreatmentStore.instance.clearCycle();
+      dates.forEach(TtcTreatmentStore.instance.setDate);
+    }
+
+    tearDown(() {
+      TtcTreatmentStore.instance.clearCycle();
+      TtcStore.instance.setPath(TtcPath.natural);
+    });
+
+    test('the next step, counted down to', () {
+      seedTreatment({
+        TtcTreatmentStep.retrieval:
+            DateTime.now().add(const Duration(days: 3)),
+        TtcTreatmentStep.transfer:
+            DateTime.now().add(const Duration(days: 8)),
+      });
+      final line = ttcHomeHeroLine();
+      expect(line.state, TtcHeroState.treatmentSoon);
+      expect(line.step, TtcTreatmentStep.retrieval,
+          reason: 'it picked a later step over the nearer one');
+      expect(line.days, 3);
+    });
+
+    test('a step falling today says today, not "in 0 days"', () {
+      seedTreatment({TtcTreatmentStep.trigger: DateTime.now()});
+      expect(ttcHomeHeroLine().state, TtcHeroState.treatmentToday);
+    });
+
+    test('the beta test is named by date and never counted down to', () {
+      // ⚠️ THE RULE: count down to things she DOES, name the date of things
+      // that JUDGE. A trigger shot is an action and a shrinking number helps
+      // her prepare. The beta is a verdict, and the largest type on the screen
+      // counting towards it is the shape that makes a wait worse — the same
+      // reason the natural hero counts to a period, never to a test.
+      seedTreatment({
+        TtcTreatmentStep.betaTest: DateTime.now().add(const Duration(days: 9)),
+      });
+      final line = ttcHomeHeroLine();
+      expect(line.state, TtcHeroState.treatmentBeta);
+      expect(line.date, isNotNull);
+      expect(TtcS.current().headerBetaOn('18 Sep'), isNot(contains('9 days')));
+    });
+
+    test('no dates at all falls through to the cycle message', () {
+      // ⚠️ THIS TEST ASSERTED THE OPPOSITE YESTERDAY, AND THE OPPOSITE WAS
+      // WRONG. It expected an "Add your clinic dates" hero, built on the
+      // empty-state rule — a feature is never hidden. That rule is right and
+      // this was the wrong place to apply it: the hero is the first thing she
+      // reads every morning, not a feature's shelf, and an account that only
+      // has a treatment path because of one stray tap got a clinic sentence in
+      // the largest type on the screen for its trouble.
+      //
+      // Her clinic's calendar leads the hero when it has something to say and
+      // says nothing when it does not.
+      seedTreatment({});
+      final line = ttcHomeHeroLine();
+      expect(
+          const {
+            TtcHeroState.windowOpensIn,
+            TtcHeroState.windowOpen,
+            TtcHeroState.windowLastDay,
+            TtcHeroState.waiting,
+            TtcHeroState.periodDue,
+            TtcHeroState.periodLate,
+          },
+          contains(line.state),
+          reason: 'a treatment account with no dates still gets a clinic '
+              'sentence instead of its cycle');
+    });
+
+    test('it follows the strip, like everything else on the page', () {
+      seedTreatment({
+        TtcTreatmentStep.retrieval:
+            DateTime.now().add(const Duration(days: 4)),
+      });
+      final back =
+          ttcHomeHeroLine(on: DateTime.now().subtract(const Duration(days: 2)));
+      expect(back.days, 6,
+          reason: 'the hero answered "what is next" from the clock while the '
+              'rest of the page answered from the selection');
+    });
+
+    test('every date behind her falls through rather than printing a past one',
+        () {
+      // A cycle whose dates have all passed is BETWEEN cycles. Printing the
+      // last one as though it were coming is worse than saying nothing.
+      seedTreatment({
+        TtcTreatmentStep.retrieval:
+            DateTime.now().subtract(const Duration(days: 5)),
+      });
+      final line = ttcHomeHeroLine();
+      expect(
+          const {
+            TtcHeroState.treatmentToday,
+            TtcHeroState.treatmentSoon,
+            TtcHeroState.treatmentBeta,
+          },
+          isNot(contains(line.state)));
+    });
+
+    test('and it still never publishes a fertile window', () {
+      // The invariant the whole ownership model exists for, kept through all
+      // of this.
+      seedTreatment({
+        TtcTreatmentStep.retrieval:
+            DateTime.now().add(const Duration(days: 2)),
+      });
+      expect(
+          const {
+            TtcHeroState.windowOpensIn,
+            TtcHeroState.windowOpen,
+            TtcHeroState.windowLastDay,
+          },
+          isNot(contains(ttcHomeHeroLine().state)));
     });
   });
 }

@@ -88,11 +88,18 @@ void main() {
       }
     });
 
-    test('the three that were indistinguishable no longer are', () {
+    // ⚠️ TWO OF THE THREE NO LONGER EXIST — 2026-09-04. Stress and Lifestyle
+    // were merged into the `habits` tracker, so the tile trio this guarded is
+    // now Mood and one habits tile. The rule it was protecting is broader than
+    // those three names, and it is worth keeping as the broader rule: no two
+    // tiles in the hub may describe themselves identically, because a tile
+    // whose description could belong to another tile has not said what tapping
+    // it does.
+    test('no two tiles describe themselves the same way', () {
       final all = [for (final g in ttcToolGroups) ...g.tools];
-      String d(String id) => all.firstWhere((t) => t.id == id).desc(false);
-      expect({d('mood'), d('stress'), d('lifestyle')}.length, 3,
-          reason: 'these read as the same tool three times');
+      final descs = [for (final t in all) t.desc(false).toLowerCase()];
+      expect(descs.toSet().length, descs.length,
+          reason: 'two tiles read as the same tool');
     });
 
     testWidgets('and each tile offers an explicit action', (tester) async {

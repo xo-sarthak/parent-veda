@@ -23,6 +23,15 @@
 /// One thing a couple can buy while trying. Kept as plain data so the booking
 /// engine can derive an Offering from it without this file importing the
 /// engine, and so the display copy stays editable from Directus later.
+/// The andrologist consultation, by id.
+///
+/// ⚠️ NAMED BECAUSE HIS SIDE OPENS IT DIRECTLY. The door's two Talk tiles used
+/// `kTtcActConsult`, which opens the consults shelf — three cards, his the
+/// third. The brief says "Consult (andrologist)", so the tile names the
+/// offering and the tap lands on the person. A `TtcTalkTile.action` may be
+/// either a hub action or an offering id; `openTtcFocusTile` resolves both.
+const String kTtcOfferingAndrologist = 'ttc_consult_androl';
+
 class TtcOffering {
   const TtcOffering({
     required this.id,
@@ -131,7 +140,7 @@ const List<TtcOffering> ttcOfferings = [
         'Irregular cycles, dardnaak periods, PCOS, endometriosis, ya koshish shuru karne se pehle ek pre-conception check ke liye.',
   ),
   TtcOffering(
-    id: 'ttc_consult_androl',
+    id: kTtcOfferingAndrologist,
     category: 'consults',
     kind: 'consult',
     sessions: 1,

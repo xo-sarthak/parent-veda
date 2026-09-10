@@ -465,5 +465,21 @@ final List<HubConfig> kTtcHubs = [
   kTtcPreconceptionHealth,
   kTtcMaleFertility,
   kTtcAfterLoss,
-  kTtcMindBody,
+  // ⚠️ `kTtcMindBody` IS OUT — 2026-09-05, and commented rather than deleted
+  // for the same reason `kTtcConceiving` above is. The brief says *"remove any
+  // orphaned route to the old ritual or old landing"*, and this list is the
+  // landing's only entrance: `_openBracket` checks `ttcFocusPageFor` first, so
+  // with the focus page registered this hub was already unreachable. Leaving it
+  // in the list would keep a second, diverging description of the area for the
+  // next person to edit by mistake.
+  //
+  // The config itself stays defined above — its `heroVideoSlot` records the
+  // film that area is owed — and putting it back is uncommenting one line, plus
+  // removing the page from `kTtcFocusPages`, or the hub stays dark.
+  //
+  // ⚠️ THE `ttc_ritual` SCREEN IS NOT RETIRED WITH IT. The old five-part
+  // ritual is still reachable from the bracket's Activities layer and from
+  // `ttc_journeys.dart`, both of which the workbook wants live. Only the DOOR
+  // is gone. See `docs/STILL-OPEN.md` §28 for the decision still owed there.
+  // kTtcMindBody,
 ];

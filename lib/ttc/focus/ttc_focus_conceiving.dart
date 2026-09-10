@@ -17,6 +17,8 @@
 //  resolve at a glance.
 // =============================================================================
 
+import 'package:flutter/material.dart' show Icons;
+
 import '../../screens/ttc/ttc_illustrations.dart';
 import '../ttc_focus_data.dart';
 
@@ -35,8 +37,85 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
   intro: 'Some things really help. Some things do not. '
       'You do not need to do everything.',
 
-  heroVideoSlot: 'ttc_conceiving_intro',
-  heroVideoTitle: 'What actually helps, in two minutes',
+  // ⚠️ THE FILM CAME OFF THE TOP — 2026-09-04, and for the same reason it came
+  // off PCOS and IVF: `ttc_conceiving_intro` has no entry in
+  // `ttc_videos_data.dart` at all. It is a bare slot id, so the hero opened on
+  // a coming-soon box — the first thing on the first door of the stage.
+  //
+  // ⚠️ AND NOTHING IS ORPHANED BY REMOVING IT. This is the check that mattered:
+  // the four TTC films that ARE written and chaptered (`ttc_vid_whose_side`
+  // and the rest) each have a tile somewhere. This one never did. Commenting
+  // out a hero whose slot names a real film would have hidden the film; this
+  // one names nothing, so there is nothing to relocate. The declaration in
+  // `ttc_hubs.dart:107` is untouched and still works if the page is ever
+  // unregistered.
+  //
+  // heroVideoSlot: 'ttc_conceiving_intro',
+  // heroVideoTitle: 'What actually helps, in two minutes',
+
+  // ⚠️ SWAPPED 2026-09-06. The placeholder that shipped here turned out, when
+  // actually looked at, to be a black-and-white portrait of a crying child —
+  // which is what "a placeholder, to be swapped" costs when the swap waits.
+  // This one is a cluster of pink buds about to open: a window of days that
+  // is about to be, warm, and dark enough round the edges for the white type
+  // to sit on it under the scrim. The V3 field still renders behind it, so a
+  // dead connection gives the hero rather than a grey box.
+  heroImageUrl:
+      'https://images.unsplash.com/photo-1779635163668-61db66b24fc7?w=900&h=700&fit=crop',
+  heroBlurb: 'About six days in each cycle are the ones that count. Everything '
+      'on this page is either about finding them, or about the things people '
+      'worry about that turn out not to matter.',
+
+  // ---------------------------------------------------------------------------
+  //  The selector rail — five cards under the hero, the window first
+  // ---------------------------------------------------------------------------
+  // ⚠️ THE RAIL NOW CARRIES THE ARGUMENT THE SCROLL USED TO CARRY. Two
+  // orderings in this file were load-bearing and had to survive the change of
+  // shape, because in a grouped page nothing is "further down" any more — a
+  // tab is either on the rail or it is not.
+  //
+  //   · His before hers. A male factor is involved in about half of couples
+  //     who take longer than expected, and in this market almost all of the
+  //     advice, testing and blame lands on her. As sections, "What he should
+  //     do" merely came first in a scroll most people never finished. As a
+  //     TAB it sits on the rail, permanently, at the same size as hers —
+  //     which states the point more plainly than the old order did.
+  //
+  //   · The doctor last. The page used to end on a consultation because
+  //     CLAUDE.md says anything clinical routes calmly to a doctor. A tab
+  //     cannot be "the end", so it is the last card on the rail and always one
+  //     tap away instead of one long scroll away.
+  //
+  // ⚠️ HUES ARE THE APP'S OWN, as on PCOS: 344 `V2BlockHues.watch`, 42
+  // `.read`, 104 `.practice`, 206 the clinical blue. 186 is the cyan His side
+  // already uses for him, which is the one cross-door consistency worth having.
+  groups: [
+    TtcFocusGroup(
+        id: 'window',
+        label: 'Your window',
+        icon: Icons.center_focus_weak_outlined,
+        hue: 344),
+    TtcFocusGroup(
+        id: 'trying',
+        label: 'How to try',
+        icon: Icons.favorite_border_rounded,
+        hue: 42),
+    TtcFocusGroup(
+        id: 'his',
+        label: 'What he can do',
+        icon: Icons.self_improvement_outlined,
+        hue: 186),
+    TtcFocusGroup(
+        id: 'hers',
+        label: 'What she can do',
+        icon: Icons.eco_outlined,
+        hue: 104),
+    TtcFocusGroup(
+        id: 'doctor',
+        label: 'See a doctor',
+        icon: Icons.medical_services_outlined,
+        hue: 206),
+  ],
 
   headline: TtcMasterclassTile(
     title: 'How to improve your chances of getting pregnant',
@@ -48,6 +127,7 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
     // -------------------------------------------------------------------------
     TtcFocusSection(
       heading: 'When should we have sex?',
+      group: 'window',
       tiles: [
         // ⚠️ THE TOOL IS SECTION ONE, WHICH IS THE WHOLE MERGE. It used to be
         // one of three cards on a menu in front of this page. It is the thing
@@ -117,6 +197,7 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
     // -------------------------------------------------------------------------
     TtcFocusSection(
       heading: 'How many times should we try?',
+      group: 'trying',
       tiles: [
         // The timing read already answers this exactly — every one to two
         // days across the window, and why saving it up does not help.
@@ -142,6 +223,7 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
     //  article here would bury three clean "no"s in six paragraphs.
     TtcFocusSection(
       heading: 'Which sex position is best?',
+      group: 'trying',
       tiles: [
         TtcMythTile(
           title: 'Do positions matter?',
@@ -172,13 +254,42 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
     ),
 
     // -------------------------------------------------------------------------
-    //  ⚠️ HIS SECTION COMES BEFORE HERS, AND THAT ORDER IS THE POINT. A male
-    //  factor is involved in about half of couples who take longer than
+    //  ⚠️ MOVED UP INTO "How to try" — 2026-09-04. It used to sit between
+    //  hers and the doctor, which is where a scroll put it and not where it
+    //  belongs: "does stress stop pregnancy?" is the third of three
+    //  myth-corrections about the act of trying, beside "does more sex help?"
+    //  and "does position matter?". Grouping made the mis-filing visible.
+    //
+    //  ⚠️ AND IT IS NOT UNDER "What she can do", WHICH WAS THE NEAR MISS.
+    //  Filing stress under her is the same reflex this page exists to correct.
+    TtcFocusSection(
+      heading: 'Does stress stop pregnancy?',
+      group: 'trying',
+      tiles: [
+        TtcArticleTile(
+          title: 'Can stress stop it?',
+          blurb: 'Not the way people tell you it does.',
+          readId: 'ttc_read_stress_fertility',
+        ),
+        TtcVideoTile(
+          title: 'If you feel too much pressure',
+          blurb: 'For the months that feel heavy.',
+          slotId: 'ttc_video_pressure',
+          duration: '5 MIN',
+        ),
+      ],
+    ),
+
+    // -------------------------------------------------------------------------
+    //  ⚠️ HIS IS ITS OWN TAB NOW, AND IT SITS BEFORE HERS ON THE RAIL. The
+    //  argument is unchanged and is written out at the `groups` list above: a
+    //  male factor is involved in about half of couples who take longer than
     //  expected, and in this market almost all of the advice, testing and blame
-    //  lands on her. Putting his three things first is the cheapest correction
-    //  this page can make.
+    //  lands on her. What changed is that it used to depend on somebody
+    //  scrolling far enough to notice the order.
     TtcFocusSection(
       heading: 'What he should do',
+      group: 'his',
       tiles: [
         // ⚠️ REWRITTEN FROM A TIP LIST INTO AN EXPLAINER, and that was the
         // note: "the slides should make sense, not look like generic 'smoking
@@ -261,12 +372,33 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
           slotId: 'ttc_video_sperm_health',
           duration: '4 MIN',
         ),
+        // ⚠️ REFERENCED FROM HIS SIDE, NOT COPIED HERE — the his-side rebuild's
+        // Step 5a, and the third of the three pointers it names. His side is
+        // the OWNER of male-factor content; Getting ready and IVF already name
+        // its reads by id and this door did not, which left the one section
+        // about him with no way through to the area written about him.
+        //
+        // Nothing below is a second copy of any prose. Editing the article in
+        // His side updates it here, because there is only ever one of it.
+        TtcArticleTile(
+          title: 'Whose "side" is it, really',
+          blurb: 'About half of couples having difficulty have a male factor '
+              'somewhere in it — very often alongside a female one.',
+          readId: 'ttc_read_whose_side',
+        ),
+        TtcArticleTile(
+          title: 'Heat, habits and time',
+          blurb: 'The three levers that genuinely move sperm health, including '
+              'the smokeless tobacco nobody counts.',
+          readId: 'ttc_read_heat_habits',
+        ),
       ],
     ),
 
     // -------------------------------------------------------------------------
     TtcFocusSection(
       heading: 'What she should do',
+      group: 'hers',
       tiles: [
         TtcCarouselTile(
           title: '3 things for her',
@@ -304,33 +436,43 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
           blurb: '400 mcg a day, starting before you conceive.',
           readId: 'ttc_read_folic_acid',
         ),
-      ],
-    ),
-
-    // -------------------------------------------------------------------------
-    TtcFocusSection(
-      heading: 'Does stress stop pregnancy?',
-      tiles: [
+        // ⚠️ REFERENCED FROM GETTING READY, NOT COPIED HERE — the rebuild
+        // brief's Step 5b, and the rule that keeps this section from drifting.
+        //
+        // Getting ready is the single source for before-you-start body prep:
+        // diet, folic acid, weight and habits are DEFINED there. These tiles
+        // name the same read ids, so editing an article in that door updates it
+        // in this one because there is only ever one of it. Nothing below is a
+        // second copy of any prose.
+        //
+        // Why show them here at all: somebody in the fertile-window door is
+        // asking "what should I be doing", and answering "go to another door"
+        // is a worse answer than answering the question. Each area is allowed
+        // to feel complete; what is not allowed is two versions of the same
+        // paragraph.
         TtcArticleTile(
-          title: 'Can stress stop it?',
-          blurb: 'Not the way people tell you it does.',
-          readId: 'ttc_read_stress_fertility',
+          title: 'What to cut before trying',
+          blurb: 'Three things worth changing, and a longer list you can stop '
+              'feeling guilty about.',
+          readId: 'ttc_read_what_to_cut',
         ),
-        TtcVideoTile(
-          title: 'If you feel too much pressure',
-          blurb: 'For the months that feel heavy.',
-          slotId: 'ttc_video_pressure',
-          duration: '5 MIN',
+        TtcArticleTile(
+          title: 'Weight, said kindly',
+          blurb: 'What it actually does, why direction beats any destination, '
+              'and no numbers at all.',
+          readId: 'ttc_read_weight_kindly',
         ),
       ],
     ),
 
     // -------------------------------------------------------------------------
-    //  ⚠️ THE PAGE ENDS BY ROUTING TO A PERSON. CLAUDE.md: anything clinical
-    //  ends with a disclaimer and routes calmly to a doctor. It closes on the
-    //  consult rather than on the shop for the same reason the V3 home does.
+    //  ⚠️ THE LAST CARD ON THE RAIL ROUTES TO A PERSON. CLAUDE.md: anything
+    //  clinical ends with a disclaimer and routes calmly to a doctor. A grouped
+    //  page has no "end" to close on, so the rule is carried by rail position
+    //  instead — last card, always one tap away rather than one scroll away.
     TtcFocusSection(
       heading: 'When should we see a doctor?',
+      group: 'doctor',
       tiles: [
         TtcArticleTile(
           title: 'Trying for many months?',

@@ -13,17 +13,45 @@
 //  The product never interprets a result. It stores what the report said, shows
 //  the library's plain-language explanation next to it, and hands the whole
 //  thing to a doctor.
+//
+//  ---------------------------------------------------------------------------
+//  REBUILT 2026-09-03 FROM THE "TTC RECORDS" DESIGN PROJECT
+//  ---------------------------------------------------------------------------
+//
+//  This file is now the frame. Everything inside it lives in
+//  `ttc_records_v2.dart`, because the redesign is a different reading of the
+//  same data rather than a different feature: same store, same records, same
+//  attachments, grouped by test instead of listed by date.
+//
+//  What changed, and why each one was a defect rather than a taste:
+//
+//  * **Grouped, not listed.** Two AMH results a year apart used to be two
+//    unrelated cards, possibly screens apart, and the one thing worth knowing —
+//    which way it moved — was invisible. See `ttc_records_grouping.dart`.
+//  * **The Both/Her/Him segmented control became a count line and a small
+//    filter.** Ownership belongs on the row, not in a control above it; three
+//    segments spent a third of the first screen answering a question nobody
+//    had asked yet.
+//  * **Adding is photo-first.** The old dialog wanted a label, a value, a unit
+//    and a date before it would save anything — which is why reports stayed in
+//    her gallery. Now the camera opens straight from Add, and the only required
+//    field is the date, prefilled with today.
+//  * **The attachment can finally be opened.** The app has stored file refs
+//    since records shipped and had never once displayed one: the folder held
+//    her reports and could not show them.
+//
+//  The old flat list and the old add dialog are kept below, commented out per
+//  the house rule, so the previous behaviour is one revert away.
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
+import '../../ttc/ttc_records_grouping.dart';
 import '../../ttc/ttc_records_store.dart';
-import '../../ttc/ttc_tests_data.dart';
-import 'ttc_attachments.dart';
 import 'ttc_common.dart';
-import 'ttc_ivf_readiness_screen.dart' show kIvfHue;
-import 'ttc_tool_chrome.dart';
+import 'ttc_records_v2.dart';
 import 'ttc_strings.dart';
+import 'ttc_tool_chrome.dart';
 
 void openTtcRecords(BuildContext context, {bool resultsOnly = false}) {
   Navigator.of(context).push(MaterialPageRoute<void>(
@@ -44,7 +72,7 @@ class TtcRecordsScreen extends StatefulWidget {
 }
 
 class _TtcRecordsScreenState extends State<TtcRecordsScreen> {
-  /// null = both. Otherwise filter by whose result it is.
+  /// null = everyone. Otherwise narrow to one person's results.
   bool? _partner;
 
   @override
@@ -53,78 +81,91 @@ class _TtcRecordsScreenState extends State<TtcRecordsScreen> {
       animation: Listenable.merge([TtcRecordsStore.instance, TtcLang.instance]),
       builder: (context, _) {
         final t = TtcS.current();
-        var records = TtcRecordsStore.instance.records;
-        if (widget.resultsOnly) {
-          records = records.where((r) => r.testId != null).toList();
-        }
-        if (_partner != null) {
-          records = records.where((r) => r.forPartner == _partner).toList();
-        }
+        final groups = ttcGroupedRecords(resultsOnly: widget.resultsOnly);
+        final total = groups.fold<int>(0, (n, g) => n + g.count);
+        final his = groups
+            .where((g) => g.forPartner)
+            .fold<int>(0, (n, g) => n + g.count);
+        final soon = _nextAppointment();
 
-        // ⚠️ V3 CHROME, SHELL ONLY. Every list, dialog and store call below is
-        // untouched — a tool reached from a focus page has to look like it
-        // belongs to the page that sent her, and this one still wore a flat
-        // ground and a back bar. See `ttc_tool_chrome.dart`.
-        //
-        // ⚠️ "ADD" MOVED INTO THE HERO RATHER THAN INTO THE SHEET. It was the
-        // back bar's trailing widget; dropping it in as the first row of the
-        // list would put a control above the content it acts on. The hero's
-        // `action` slot is where it belongs — top right, opposite the way out,
-        // exactly where it already was.
         return TtcToolScaffold(
-          hue: kIvfHue,
+          hue: kTtcRecordsHue,
           eyebrow: widget.resultsOnly ? t.recordsReports : t.recordsTitle,
           title: 'Every result and letter, in one place.',
           intro: t.recordsIntro,
+          // ⚠️ WHITE WITH A HAIRLINE, NOT A FILLED PURPLE PILL. It was
+          // `ttcPurple`, which is the one thing this stage stopped doing: a
+          // solid brand-coloured control shouts, and this one was the loudest
+          // object on a screen whose entire job is to be calm about medical
+          // results.
           action: GestureDetector(
-            onTap: () => _add(context),
+            onTap: () => showTtcRecordAdd(context),
             behavior: HitTestBehavior.opaque,
             child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
               decoration: BoxDecoration(
-                  color: ttcPurple,
-                  borderRadius: BorderRadius.circular(999)),
-              child: Text(t.recordsAdd,
-                  style: ttcBody(12,
-                      color: Colors.white, w: FontWeight.w800)),
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: ttcBorder),
+              ),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                const Icon(Icons.add_rounded, size: 15, color: ttcTitleInk),
+                const SizedBox(width: 5),
+                Text(t.recordsAdd,
+                    style:
+                        ttcBody(12, color: ttcTitleInk, w: FontWeight.w800)),
+              ]),
             ),
           ),
           children: [
-                const SizedBox(height: 22),
+            ttcToolPad(Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 20),
 
-                // Both people, together, by default.
-                Container(
-                  padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(
-                      color: ttcPanel,
-                      borderRadius: BorderRadius.circular(999)),
-                  child: Row(children: [
-                    _seg(t.recordsBoth, _partner == null,
-                        () => setState(() => _partner = null)),
-                    _seg(t.testForHer, _partner == false,
-                        () => setState(() => _partner = false)),
-                    _seg(t.testForHim, _partner == true,
-                        () => setState(() => _partner = true)),
+                // ⚠️ A COUNT LINE, NOT A CONTROL. It states what is here and
+                // whose it is in one sentence. The filter beside it is a quiet
+                // chip rather than three segments, because narrowing to one
+                // person is something she does occasionally and the default is
+                // right almost always.
+                if (total > 0) ...[
+                  Row(children: [
+                    Expanded(
+                      child: Text(_countLine(total, his),
+                          style: ttcBody(12.5, color: ttcSoft, h: 1.4)),
+                    ),
+                    const SizedBox(width: 10),
+                    _WhoseChip(
+                      whose: _partner,
+                      onPick: (v) => setState(() => _partner = v),
+                    ),
                   ]),
+                  const SizedBox(height: 18),
+                ],
+
+                TtcRecordsBody(
+                  onlyPartner: _partner,
+                  resultsOnly: widget.resultsOnly,
                 ),
+
+                // ⚠️ THE WAITING-ROOM DOOR, AND IT ONLY EXISTS WHEN THERE IS
+                // SOMETHING TO WALK INTO. An "into the appointment" link on a
+                // folder with nothing in it, or with no appointment booked, is
+                // a control advertising a moment that is not happening.
+                //
+                // It sits below the records rather than above them because it
+                // is the thing she reaches for last - in the corridor, with the
+                // folder already filled.
+                if (total > 0 && soon != null) ...[
+                  const SizedBox(height: 20),
+                  _IntoTheAppointment(
+                    appointment: soon,
+                    onTap: () =>
+                        showTtcRecordsForAppointment(context, appointment: soon),
+                  ),
+                ],
+
                 const SizedBox(height: 18),
-
-                if (records.isEmpty)
-                  TtcEmpty(
-                    icon: Icons.description_outlined,
-                    title: t.recordsEmptyTitle,
-                    body: t.recordsEmptyBody,
-                    cta: t.recordsAdd,
-                    onTap: () => _add(context),
-                  )
-                else
-                  for (final r in records) ...[
-                    _RecordCard(record: r, t: t),
-                    const SizedBox(height: 11),
-                  ],
-
-                const SizedBox(height: 14),
                 Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   const Icon(Icons.info_outline_rounded,
                       size: 15, color: ttcMuted),
@@ -135,34 +176,139 @@ class _TtcRecordsScreenState extends State<TtcRecordsScreen> {
                   ),
                 ]),
                 const SizedBox(height: 26),
+              ],
+            )),
           ],
         );
       },
     );
   }
 
-  Widget _seg(String label, bool on, VoidCallback onTap) => Expanded(
-        child: GestureDetector(
-          onTap: onTap,
-          behavior: HitTestBehavior.opaque,
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 170),
-            alignment: Alignment.center,
-            padding: const EdgeInsets.symmetric(vertical: 10),
-            decoration: BoxDecoration(
-              color: on ? Colors.white : Colors.transparent,
-              borderRadius: BorderRadius.circular(999),
-              boxShadow: on ? ttcCardShadow : null,
-            ),
-            child: Text(label,
-                style: ttcBody(12.5,
-                    color: on ? ttcTitleInk : ttcSoft, w: FontWeight.w800)),
-          ),
-        ),
-      );
+  /// The appointment worth carrying the folder into: the next one, and only
+  /// while it is close enough to be the reason she opened this.
+  ///
+  /// Seven days is the window because a scan booked next month is not a reason
+  /// to gather results today, and a link that is always there stops being a
+  /// prompt and becomes furniture.
+  TtcAppointment? _nextAppointment() {
+    final soon = TtcAppointmentsStore.instance.upcoming;
+    if (soon.isEmpty) return null;
+    final first = soon.first;
+    return first.startsLocal.difference(DateTime.now()).inDays <= 7
+        ? first
+        : null;
+  }
 
-  Future<void> _add(BuildContext context) => addTtcRecord(context);
+  /// "15 results · You 11 · Partner 4", and the honest short forms of it.
+  ///
+  /// A split is only printed when there is a split. "You 11 · Partner 0" states
+  /// an absence nobody asked about, on a screen where his absence from the
+  /// folder is a sore point rather than a statistic.
+  String _countLine(int total, int his) {
+    final head = '$total ${total == 1 ? 'result' : 'results'}';
+    if (his == 0) return head;
+    if (his == total) return '$head · all Partner';
+    return '$head · You ${total - his} · Partner $his';
+  }
 }
+
+/// The one row that turns a folder into something you hand over.
+class _IntoTheAppointment extends StatelessWidget {
+  const _IntoTheAppointment({required this.appointment, required this.onTap});
+
+  final TtcAppointment appointment;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final d = appointment.startsLocal;
+    final today = DateTime.now();
+    final isToday =
+        d.year == today.year && d.month == today.month && d.day == today.day;
+
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(15),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(ttcCardRadius),
+          border: Border.all(color: ttcBorder),
+        ),
+        child: Row(children: [
+          Expanded(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(isToday ? 'For today' : 'Before ${ttcRecordDate(d)}',
+                      style: ttcBody(11,
+                          color: ttcMuted, w: FontWeight.w800)),
+                  const SizedBox(height: 5),
+                  Text(appointment.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: ttcJakarta(14.5)),
+                  const SizedBox(height: 4),
+                  Text('The most recent results, in one card you can hand over.',
+                      style: ttcBody(12.5, color: ttcSoft, h: 1.45)),
+                ]),
+          ),
+          const SizedBox(width: 10),
+          const Icon(Icons.chevron_right_rounded, size: 20, color: ttcMuted),
+        ]),
+      ),
+    );
+  }
+}
+
+/// The filter, as one word that cycles rather than as a row of segments.
+class _WhoseChip extends StatelessWidget {
+  const _WhoseChip({required this.whose, required this.onPick});
+
+  final bool? whose;
+  final ValueChanged<bool?> onPick;
+
+  @override
+  Widget build(BuildContext context) {
+    const order = <bool?>[null, false, true];
+    final label = whose == null ? 'Everyone' : ttcWhose(whose!);
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => onPick(order[(order.indexOf(whose) + 1) % order.length]),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(12, 7, 9, 7),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: ttcBorder),
+        ),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Text(label,
+              style: ttcBody(12, color: ttcTitleInk, w: FontWeight.w800)),
+          const SizedBox(width: 3),
+          const Icon(Icons.expand_more_rounded, size: 15, color: ttcMuted),
+        ]),
+      ),
+    );
+  }
+}
+
+// =============================================================================
+//  KEPT FOR REVERT - the flat list and the old add dialog
+// -----------------------------------------------------------------------------
+//  Superseded on 2026-09-03 by the grouped screen above and by
+//  `showTtcRecordAdd` in `ttc_records_v2.dart`. Nothing calls either any more.
+//
+//  Left whole rather than deleted, per the house rule, and for one specific
+//  reason: the argument for the date-ordered list is real — option 1b in the
+//  design project — because she remembers "the tests before the last cycle"
+//  rather than "my AMH readings". If recency turns out to matter more than
+//  direction, going back should be an uncomment, not a rewrite.
+// =============================================================================
+
+/*
 
 class _RecordCard extends StatelessWidget {
   const _RecordCard({required this.record, required this.t});
@@ -501,3 +647,4 @@ Widget _field(TextEditingController c, String hint, {bool autofocus = false}) =>
         ),
       ),
     );
+*/

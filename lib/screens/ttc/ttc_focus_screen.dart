@@ -41,14 +41,17 @@
 // =============================================================================
 
 import 'dart:math' as math;
+import 'dart:ui' show ImageFilter;
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../data/hubs/ttc_hubs.dart' show kTtcActConsult;
 import '../../localization/app_language.dart';
+import '../../models/pv_read.dart';
 import '../../models/bracket.dart';
 import '../../theme/pv_fonts.dart';
+import '../../services/bracket_resolver.dart';
 import '../../ttc/ttc_focus_data.dart';
 import '../../data/nutrition_data.dart' show kRecipes;
 import '../../ttc/ttc_prepare_data.dart';
@@ -65,7 +68,10 @@ import 'ttc_illustrations.dart';
 import 'ttc_infographic_screen.dart';
 import 'ttc_story_screen.dart';
 import 'ttc_prepare_screen.dart';
-import 'ttc_products_screen.dart';
+// Kept for revert: the flat library this door no longer opens. See the note on
+// the TtcProductTile case below.
+// import 'ttc_products_screen.dart';
+import 'ttc_shop_v3.dart';
 import 'ttc_strings.dart';
 import 'ttc_today_parts.dart' show showTtcRowSheet;
 import 'ttc_surface_router.dart';
@@ -201,13 +207,30 @@ class _TtcFocusScreenState extends State<TtcFocusScreen> {
                     // other rail on this page — she reads all five, then picks.
                     // The objection that kept sub-tabs out of this stage was
                     // about choosing blind, and this is not that.
-                    _GroupRail(
-                      page: page,
-                      groups: groups,
-                      selected: _group,
-                      p: p,
-                      onPick: (i) => setState(() => _group = i),
-                    ),
+                    //
+                        // ⚠️ EXCEPT ON ONE DOOR. Fertile window runs the coverflow
+                        // from design 4a instead — all five on a 3D track, one
+                        // forward and the rest receding into mist — which is a
+                        // real step back toward the shape the paragraph above
+                        // rejects. It was chosen with that named, and it is
+                        // gated to one bracket so the comparison can be made on a
+                        // handset rather than argued. See [_GroupCarousel].
+                        if (page.bracketId == kTtcCarouselBracketId)
+                          _GroupCarousel(
+                            page: page,
+                            groups: groups,
+                            selected: _group,
+                            p: p,
+                            onPick: (i) => setState(() => _group = i),
+                          )
+                        else
+                          _GroupRail(
+                            page: page,
+                            groups: groups,
+                            selected: _group,
+                            p: p,
+                            onPick: (i) => setState(() => _group = i),
+                          ),
                     const SizedBox(height: 26),
 
                     // ⚠️ THE GROUP'S NAME IS NOT REPEATED HERE, AND IT WAS.
@@ -218,6 +241,72 @@ class _TtcFocusScreenState extends State<TtcFocusScreen> {
                     // cost paid for a label. The lit card IS the heading.
                     //
                     // _pad(Text(groups[_group].label, ...)),
+
+                        // ---- a pinned red flag, above everything -----------
+                    //
+                        // ⚠️ ABOVE THE RAILS AND NEVER IN AN ACCORDION. Two areas
+                        // need a warning that is read before anything is chosen —
+                        // heavy bleeding after a loss, and thoughts of self-harm.
+                        // A rail is a browse surface; a woman scanning cards for
+                        // the one that matches her situation has already been
+                        // asked to make a choice, and neither of these should wait
+                        // for one.
+                    //
+                        // The text is the article's own `whenToSeeSomeone`. See
+                        // `TtcFocusGroup.pinnedRedFlagReadId`.
+                        for (final rid in groups[_group].pinnedRedFlagReadIds)
+                          if (ttcReadById(rid) case final read?) ...[
+                            _pad(
+                              _PinnedRedFlag(
+                                callout: read.whenToSeeSomeone,
+                                lang: TtcLang.instance.hinglish
+                                    ? AppLanguage.hinglish
+                                    : AppLanguage.english,
+                                p: p,
+                              ),
+                            ),
+                            const SizedBox(height: 22),
+                          ],
+
+                        // ---- a note that belongs to the tab, if it has one ---
+                    //
+                        // ⚠️ ABOVE THE RAILS AND BELOW THE FLAGS. A practical
+                        // caution sits under a clinical one when both are present,
+                        // because the order is the order of consequence. Quiet
+                        // type: it is a standing note, not news.
+                        if (groups[_group].note case final note?) ...[
+                          _pad(
+                            Container(
+                              padding: const EdgeInsets.all(13),
+                              decoration: BoxDecoration(
+                                color: p.ink1.withValues(alpha: 0.04),
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Icon(
+                                    Icons.info_outline_rounded,
+                                    size: 15,
+                                    color: p.ink3,
+                                  ),
+                                  const SizedBox(width: 9),
+                                  Expanded(
+                                    child: Text(
+                                      note,
+                                      style: pvManrope(
+                                        fontSize: 12,
+                                        height: 1.5,
+                                        color: p.ink2,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 20),
+                        ],
 
                     // ---- either one tool, or this group's sections -------
                     //
@@ -258,6 +347,25 @@ class _TtcFocusScreenState extends State<TtcFocusScreen> {
                         ),
                         const SizedBox(height: 26),
                       ],
+
+                        // ⚠️ THE CLOSING LINE, UNDER WHATEVER TAB IS OPEN. "Shown
+                        // once" in the brief means once per page, not once per tab
+                        // — a line that appears only under the last tab is a line
+                        // most people never see. See `TtcFocusPage.closingLine`.
+                        if (page.closingLine case final line?) ...[
+                          _pad(
+                            Text(
+                              line,
+                              style: pvFraunces(
+                                fontSize: 15.5,
+                                fontWeight: FontWeight.w500,
+                                height: 1.5,
+                                color: p.ink2,
+                          ),
+                        ),
+                          ),
+                          const SizedBox(height: 22),
+                        ],
 
                     _pad(Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -511,7 +619,7 @@ class _Hero extends StatelessWidget {
             errorBuilder: (_, _, _) => const SizedBox.shrink(),
             loadingBuilder: (context, child, progress) =>
                 progress == null ? child : const SizedBox.shrink(),
-          ),
+        ),
         ),
       // ⚠️ A DARK SCRIM ONLY, AND IT NEVER FADES TO THE PAGE COLOUR.
       //
@@ -547,9 +655,9 @@ class _Hero extends StatelessWidget {
                   Colors.black.withValues(alpha: 0.34),
                 ],
                 stops: const [0, 0.62, 1],
-              ),
             ),
           ),
+        ),
         ),
       if (photo == null)
       Positioned(
@@ -793,7 +901,20 @@ class _GroupRailState extends State<_GroupRail> {
   /// simply wrong, and it is wrong on the one line whose whole job is to be
   /// trusted before a tap.
   String _inside(TtcFocusGroup g) {
-    if (g.toolSurfaceId != null) return 'Quick check';
+    // ⚠️ "Quick check" WAS WRITTEN FOR THE ONLY TOOL GROUP THAT EXISTED. PCOS's
+    // "Where do I stand" IS a quick check, so hard-coding the words was fine
+    // while it was the only one. Mind & body's Today is a tool group too, and
+    // it is not a check of anything — it is two practices and two ticks.
+    //
+    // Same shape as the `pinnedRedFlagReadId` singular: a value inferred from
+    // the first caller. Named per surface now rather than guessed from the
+    // fact that a surface exists.
+    if (g.toolSurfaceId case final s?) {
+      return switch (s) {
+        'ttc_mind_today' => 'Today',
+        _ => 'Quick check',
+      };
+    }
     final n = widget.page.sections
         .where((s) => s.group == g.id)
         .fold(0, (t, s) => t + s.tiles.length);
@@ -802,6 +923,7 @@ class _GroupRailState extends State<_GroupRail> {
 
   @override
   Widget build(BuildContext context) => SizedBox(
+    key: kTtcGroupRailKey,
         height: _GroupRail.height,
         // ⚠️ BOTH EDGES FADE RATHER THAN CUT. The design's own diagnosis of the
         // screen it replaced was "a half-cut chip on the left, a half-cut chip
@@ -836,7 +958,7 @@ class _GroupRailState extends State<_GroupRail> {
               onTap: () => _pick(i),
             ),
           ),
-        ),
+            ),
       );
 }
 
@@ -1050,7 +1172,9 @@ class _GroupTabState extends State<_GroupTab> {
                               fontWeight: FontWeight.w700,
                               color: on
                                   ? Colors.white.withValues(alpha: 0.82)
-                                  : p.ink3)),
+                              : p.ink3,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -1061,6 +1185,1232 @@ class _GroupTabState extends State<_GroupTab> {
       ),
     );
   }
+}
+
+// =============================================================================
+//  _GroupCarousel — the tabs as design 4a's coverflow, "mist falloff"
+// -----------------------------------------------------------------------------
+//  Design source: "Health Cards Options" turn 4, option **4a** — "Carousel ·
+//  mist falloff", which is 3a revised from a device shot. Five cards on one 3D
+//  track, ALL FIVE ON SCREEN: the chosen one flat and forward, and the row
+//  receding on both sides in three steps — the neighbour at 0.80 scale and 92%
+//  opacity, the one behind it at 0.60 and 72%, each pushed further out and
+//  tilted a little more, with a light blur that grows with depth and a tint
+//  that deepens as it recedes, so distance never means invisible. Both edges of
+//  the track fade to 45%, so the far cards soften rather than being sliced by
+//  the screen. Under the track, five dots. On each card, 3a's layered mark —
+//  a soft radial disc, two hairline arcs, a dot cluster and a hairline horizon,
+//  each rotated a little differently per group, with the group's icon at the
+//  centre — and the mark drifts a few points sideways as its card turns.
+//
+//  ⚠️ WHAT 4a CHANGED FROM 3a, so the numbers below are read as decisions:
+//
+//    · the far pair is no longer hidden. 3a faded everything past the
+//      neighbours to nothing, which made the dot row the only route to two of
+//      five groups. 4a keeps them on the track, small and misted, so every
+//      group is visible from every position. The dot row stays, as a counter
+//      and a one-tap route to the back of the ladder.
+//    · the cards are smaller — 172×132, was 196×150 — and the track shorter,
+//      146 instead of 160, because on the device the neighbours were nearly
+//      the size of the centre and the row read as three competing cards.
+//    · the track CLIPS AND FADES at its edges, where 3a let the neighbour
+//      overhang the screen. A card cut off by the phone's edge is a card cut
+//      off; a card softening into mist is distance.
+//    · the ring on the front card is a soft tinted rim, not a hard outline in
+//      the deep hue.
+//
+//  It runs on ONE door. `kTtcCarouselBracketId` gates it to Fertile window; the
+//  other six keep [_GroupRail], which is live code and not a revert stub.
+//
+//  ---------------------------------------------------------------------------
+//  ⚠️ THREE WAYS TO BUILD THIS THAT DO NOT WORK, ALL OF THEM TRIED HERE FIRST
+//  ---------------------------------------------------------------------------
+//
+//  Every one of them compiles, renders, and looks plausible in a still frame.
+//  They are written down because the failure in each case is invisible until
+//  the thing is in a hand.
+//
+//  **1. `AnimatedContainer(transform: …)`.** The obvious move, and it destroys
+//  the effect. `Matrix4Tween` interpolates by calling `Matrix4.decompose` —
+//  translation, quaternion, scale — which has nowhere to put a perspective row.
+//  So every intermediate frame is drawn FLAT, and the cards slide about in 2D
+//  before snapping into depth at the end. The lesson generalises: a matrix
+//  tween is an affine tween, and perspective is not affine.
+//
+//  **2. Reordering `Stack` children without keys.** The cards have to be
+//  painted far-to-near (a `Stack` has no z-index, so paint order IS the
+//  z-index), and that order changes every time the selection moves. With no
+//  keys, Flutter matches children by slot: the element in slot 0 is reused for
+//  whichever card is now furthest away, so its state and its animation belong
+//  to the previous occupant. Nothing travels — the tiles simply change. This is
+//  the bug that made the first cut of this screen read as having no motion at
+//  all, and it needs both fixes together, because (1) hides it.
+//
+//  **3. Discrete state plus a transition.** 3a itself is written this way
+//  because CSS has to be: an integer index, and `transition: transform .45s` to
+//  cover the jump. Ported literally it gives a control that ignores the finger
+//  until a threshold trips and then animates on its own — which is a slideshow,
+//  not a track.
+//
+//  So: ONE `double` is the state. [_position] is the fractional index of the
+//  card in the middle; every card's transform, opacity, scale, tilt, blur and
+//  tint are computed from it each frame, and dragging moves it directly. 4a's
+//  numbers are the values at whole positions, and the in-between frames are the
+//  thing CSS was approximating.
+//
+//  **4. `Transform(filterQuality: …)` while moving.** Flutter's own cure for
+//  text shimmering under an animated scale — `ScaleTransition` does it — and
+//  it was tried here for exactly that. With a `filterQuality` set, the card is
+//  drawn flat into a bitmap and the matrix goes through `ImageFilter.matrix`
+//  instead of the canvas. On the device that bitmap path did NOT draw the
+//  perspective the vector path draws: the neighbours came out larger and
+//  further apart, the back pair further still. Switching it on for the glide
+//  and off at rest then meant the track settled, and then settled AGAIN as the
+//  render path swapped under it — and any swipe that ended on a cancelled drag
+//  left the flag on, so some rests kept the wrong geometry. Two layouts at
+//  rest, chosen by the gesture that got you there. Screenshots 2026-09-07.
+//
+//  The general fact: a widget that renders one way in motion and another at
+//  rest has two geometries, and every difference between the two paths is a
+//  "settle" the eye will see. Pick one path.
+//
+//  ---------------------------------------------------------------------------
+//  The geometry, and why it is CSS's rather than an approximation of it
+//  ---------------------------------------------------------------------------
+//
+//  4a writes the transform per step `a = |o|`, with `s = sign(o)`:
+//
+//      translateX(s · (96 + (a−1)·74))   — 0, ±96, ±170
+//      translateZ(−a · 60)               — 0, −60, −120
+//      translateY(a · 8)                 — the ladder steps down as it recedes
+//      rotateY(−s · (24 + (a−1)·8)deg)   — 0, ∓24°, ∓32°
+//      rotateX(a ? 3deg : 0)
+//      scale(1, .8, .6)
+//
+//  under `perspective: 1000px`, where `o` is the signed distance round the
+//  ring. Every one of those is a straight line between its whole-step values,
+//  and [_CarouselCard] evaluates the line rather than the steps — so `scale` is
+//  `1 − 0.2·a` throughout, and the sideways travel changes slope at `a = 1`
+//  (96 for the first step, 74 for the second) exactly as 4a's table does.
+//
+//  Two things have to be right for that to survive the port:
+//
+//   1. **Multiplication order.** CSS applies a transform list left-to-right as
+//      matrix multiplication — `T · Ry · Rx · S`. Matrix4's cascade
+//      post-multiplies in the same order, so `..translate()..rotateY()
+//      ..rotateX()..scale()` is not merely similar to the CSS, it is the same
+//      matrix.
+//
+//   2. **The sign on the perspective entry.** Flutter's usual flip-card recipe
+//      is `setEntry(3, 2, 0.001)`, which gives `w = 1 + z/1000` — positive z
+//      recedes. CSS is `w = 1 - z/d`, where positive z comes TOWARD you. Using
+//      the Flutter idiom with CSS's numbers therefore inverts the depth: the
+//      neighbours come forward and the chosen card sinks. That still animates
+//      and still looks deliberate, so it would not have been caught by looking
+//      at it. `-1 / 1000` keeps CSS's convention, which is what lets every
+//      other number in the design be copied across unchanged.
+//
+//  With CSS's convention restored, `Matrix4.rotateY` and `rotateX` match CSS's
+//  signs for free — both send a point at +x toward −z, and a point at +y (the
+//  card's foot) toward +z — so the tilts are written exactly as 4a has them.
+//
+//  The blur is applied INSIDE the transform, as CSS does: `filter` is rendered
+//  in the element's own space and the transform is applied to the result, so a
+//  card at 0.6 scale carries a blur that is 0.6 as wide on screen. Putting the
+//  `ImageFiltered` outside the `Transform` would blur in screen space and the
+//  far cards would be softer than the design.
+//
+//  The general fact, worth more than this screen: porting a transform is not
+//  porting the numbers. It is porting the numbers PLUS the coordinate
+//  convention they were written against, and the convention is the half nobody
+//  writes down.
+// =============================================================================
+
+/// The one door that opens on the carousel.
+const String kTtcCarouselBracketId = 'ttc_conceiving';
+
+/// ⚠️ THESE KEYS EXIST SO THE WIRING CAN BE ASSERTED, AND THAT IS THE ONLY
+/// REASON. Two shapes of the same control now ship side by side behind a
+/// bracket id; without a marker, a test can prove `kTtcCarouselBracketId` says
+/// `'ttc_conceiving'` and prove nothing at all about which widget the door
+/// actually builds — the exact "correct but unreachable" shape this repo keeps
+/// hitting. `ttc_focus_carousel_test.dart` reads both.
+const Key kTtcGroupCarouselKey = Key('ttc-group-carousel');
+const Key kTtcGroupRailKey = Key('ttc-group-rail');
+
+/// One dot, addressable. The far pair sits at the back of the ladder, two
+/// swipes away by drag, so the dot is the only one-tap route to it.
+Key ttcCarouselDotKey(int i) => ValueKey('ttc-carousel-dot-$i');
+
+/// One side of the track — `-1` for the card on the left, `1` for the right.
+///
+/// Named rather than found by position because the zones are transparent, and a
+/// test aiming at a coordinate would be asserting the geometry by accident.
+Key ttcCarouselZoneKey(int step) => ValueKey('ttc-carousel-zone-$step');
+
+/// Card size. 4a draws a 172×132 landscape card in a 390pt frame — down from
+/// 3a's 196×150, because on the device the neighbours were nearly the size of
+/// the centre and the row read as three competing cards.
+///
+/// ⚠️ FIXED, NOT PROPORTIONAL. At 360pt — the narrowest screen this app is
+/// designed against, [kPvNarrowestScreen] — the back pair run past the edge of
+/// the track and are cut by its mask, which fades to 45% there so the cut
+/// reads as mist rather than as an edge. Pinching the numbers until all five
+/// fit would flatten the ladder into a row.
+const double kTtcCarouselCardWidth = 172;
+const double kTtcCarouselCardHeight = 132;
+
+/// The track's height — 4a's 146 — and where in it the cards sit. The cards are
+/// laid out 4pt down and step down a further 8 per place round the ring, so
+/// the back pair sit lowest; the shadow under the front card takes the rest.
+const double kTtcCarouselTrackHeight = 146;
+const double _cardTop = 4;
+
+/// 4a's edge fade: 45% at the edge, 82% a tenth of the way in, solid across
+/// the middle 44%. The values are the design's; they are what makes the back
+/// pair soften into the sheet rather than stop at the screen.
+const List<double> _edgeFadeStops = [0, .10, .28, .72, .90, 1];
+const List<double> _edgeFadeAlphas = [.45, .82, 1, 1, .82, .45];
+
+class _GroupCarousel extends StatefulWidget {
+  const _GroupCarousel({
+    required this.page,
+    required this.groups,
+    required this.selected,
+    required this.p,
+    required this.onPick,
+  });
+
+  final TtcFocusPage page;
+  final List<TtcFocusGroup> groups;
+  final int selected;
+  final V2Palette p;
+  final ValueChanged<int> onPick;
+
+  /// The track, 4a's 12pt under it, and the dot row with its tap padding. One
+  /// number, so the sheet's spacing does not have to know the parts — the same
+  /// reason [_GroupRail.height] is 118 and not 108.
+  ///
+  /// The dot row is 5pt of dot inside 7pt of transparent target above and
+  /// below, so the 12pt gap in the design is 5pt of spacer plus the top 7.
+  static const double height =
+      kTtcCarouselTrackHeight + _dotGap + _CarouselDots.height;
+
+  static const double _dotGap = 12 - _CarouselDots.tapPad;
+
+  @override
+  State<_GroupCarousel> createState() => _GroupCarouselState();
+}
+
+class _GroupCarouselState extends State<_GroupCarousel>
+    with SingleTickerProviderStateMixin {
+  /// ⚠️ THE WHOLE STATE OF THE TRACK, AND IT IS A `double` ON PURPOSE.
+  ///
+  /// The fractional index of the card in the middle. At 1.0 the second card is
+  /// square on; at 1.5 the track is exactly halfway between two cards, with
+  /// both turned 16° and neither in front. Dragging writes to it directly, so
+  /// the cards follow the finger instead of waiting for it to finish.
+  ///
+  /// It is allowed outside `[0, count)` while a drag or a settle is running —
+  /// `_offsetOf` wraps, so −0.4 and 4.6 describe the same picture. It is
+  /// normalised on settle, so it cannot wander after a hundred swipes.
+  late double _position = widget.selected.toDouble();
+
+  /// ⚠️ BUILT IN `initState`, NOT `late final`. A `late final` controller is
+  /// only constructed on first use — and if the door is opened and closed
+  /// without the track ever moving, that first use is `dispose()` itself, which
+  /// then builds a `Ticker` against an element that is already deactivated and
+  /// throws "Looking up a deactivated widget's ancestor is unsafe". A lazy
+  /// field whose initialiser reads the element tree is a lazy field that can
+  /// run at the worst possible moment.
+  late final AnimationController _settle;
+  late final CurvedAnimation _curve;
+
+  /// Where the current settle started and where it is going. Plain fields, not
+  /// a `Tween` rebuilt per settle — see the note on [_settleTo].
+  double _from = 0;
+  double _to = 0;
+
+  int get _count => widget.groups.length;
+
+  @override
+  void initState() {
+    super.initState();
+    _settle = AnimationController(
+      vsync: this,
+      // 4a's .48s, and it is the number that makes the track feel like objects
+      // rather than a slideshow: long enough to read the turn, short enough
+      // that a second swipe never has to wait.
+      duration: const Duration(milliseconds: 480),
+    );
+    // Leaves fast, arrives slowly — 4a's cubic-bezier(.2,.8,.2,1), so the eye
+    // can follow which card took the middle instead of finding it there.
+    _curve = CurvedAnimation(parent: _settle, curve: Curves.easeOutCubic);
+    // ⚠️ ONE LISTENER, ADDED ONCE. The first cut built a fresh `Tween` and
+    // called `addListener` inside `_settleTo`, which never removed the previous
+    // one — so a door left open through twenty swipes was running twenty
+    // `setState`s per frame, all writing the same value. Nothing looked wrong;
+    // it just got slower the longer you stayed.
+    _settle.addListener(
+        () => setState(() => _position = _from + (_to - _from) * _curve.value));
+    // ⚠️ AND THE NORMALISATION THE DOC COMMENT ON [_position] HAS ALWAYS
+    // CLAIMED, WHICH UNTIL NOW DID NOT EXIST. Every settle target is
+    // `_position + _offsetOf(target)` — the short way round, which is what
+    // makes the ring a ring — so the position moves by ±1 per step and NEVER
+    // comes back. Swipe one way six times and it is at 6, or −6.
+    //
+    // Nothing about the cards notices, because `_offsetOf` wraps: 6 and 1
+    // describe the same picture, exactly. So the bug hid behind the very
+    // mechanism that makes the loop work, and it took a two-lap test to see —
+    // one step from a fresh position is always correct.
+    //
+    // What it broke was downstream: [_CarouselDots] reduced its distance with
+    // `if (o > n/2) o = n - o`, which is only right while the position is
+    // inside one lap. At −6 that returns a negative distance for every dot,
+    // every dot clamps to fully lit, and the counter stops naming the open
+    // card. Both halves are fixed — the position is brought back into
+    // `[0, count)` here, and the dots no longer assume it.
+    _settle.addStatusListener((status) {
+      if (status != AnimationStatus.completed) return;
+      final wrapped = _position - _count * (_position / _count).floorToDouble();
+      if (wrapped == _position) return;
+      // Subtracting whole laps changes nothing on screen — every offset is
+      // taken modulo the count — so this is invisible, which is the point.
+      setState(() => _position = _from = _to = wrapped);
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant _GroupCarousel old) {
+    super.didUpdateWidget(old);
+    if (old.selected == widget.selected) return;
+    // The selection can move from outside — a rebuild with a different door,
+    // or the parent answering our own [_land]. Glide to it rather than
+    // jumping — and ONLY if the track is not already on its way there.
+    //
+    // ⚠️ THE FIRST CUT SPUN THE RING, AND EVERY TEST PASSED. `_land` settles
+    // the short way round and tells the parent; the parent rebuilds; this ran
+    // `_settleTo(widget.selected.toDouble())` — to 4.0 as a plain number, from
+    // a position near 0. The settle it replaced was going 0 → −1, one card
+    // left; the new one went 0 → 4, four cards right, through every card on
+    // the track. The end state was right, so the content tests passed, and
+    // the dot row landed on the right dot. It only showed on a handset, as a
+    // track that "wasn't a loop".
+    //
+    // Two rules fall out. A settle target is a position on an unbounded line,
+    // never an index — so it is always `_position + _offsetOf(index)`, the
+    // short way round. And an instruction that says where we already are, or
+    // where we are already going, is not a new instruction.
+    final heading = _settle.isAnimating ? _to : _position;
+    final headingIndex = ((heading.round() % _count) + _count) % _count;
+    if (headingIndex != widget.selected) {
+      _settleTo(_position + _offsetOf(widget.selected));
+    }
+  }
+
+  @override
+  void dispose() {
+    _curve.dispose();
+    _settle.dispose();
+    super.dispose();
+  }
+
+  /// The signed distance from the middle of the track to card [i], the short
+  /// way round the ring.
+  ///
+  /// ⚠️ IT WRAPS, so card five is one step from card one rather than four. That
+  /// is 3a's behaviour and it is what makes the track continuous — without it
+  /// the last card is a wall, and a fan of cards with a wall at one end is a
+  /// list drawn in perspective.
+  double _offsetOf(int i) {
+    final half = _count / 2;
+    var o = i - _position;
+    while (o > half) {
+      o -= _count;
+    }
+    while (o < -half) {
+      o += _count;
+    }
+    return o;
+  }
+
+  /// Glide the track to [target] and tell the screen which card won.
+  ///
+  /// ⚠️ THE TWEEN RUNS ON THE POSITION, NOT ON THE MATRIX. See failure (1) in
+  /// the header: interpolating the matrix itself flattens every frame between
+  /// the two ends, because a matrix tween decomposes and perspective does not
+  /// survive being decomposed. Interpolating the one number the matrix is built
+  /// from means every frame is a real perspective frame.
+  void _settleTo(double target) {
+    _from = _position;
+    _to = target;
+    _settle
+      ..reset()
+      ..forward();
+  }
+
+  /// ⚠️ EVERY ROUTE TO A NEW CARD GOES THROUGH HERE — a zone, a dot, the end of
+  /// a drag — so the haptic cannot be wired to two of the three and forgotten
+  /// on the last. `selectionClick` is the light one a picker uses;
+  /// `mediumImpact` would read as a notification, and changing tab is not one.
+  void _land(int i) {
+    final target = ((i % _count) + _count) % _count;
+    // Settle even when the group has not changed: a drag that did not travel
+    // far enough still has to put the track back where it was.
+    _settleTo(_position + _offsetOf(target));
+    if (target == widget.selected) return;
+    HapticFeedback.selectionClick();
+    widget.onPick(target);
+  }
+
+  void _step(int direction) => _land(widget.selected + direction);
+
+  // ---- the drag -------------------------------------------------------------
+  //
+  // ⚠️ THE TRACK FOLLOWS THE FINGER. 4a advances a whole card once a 28pt
+  // threshold trips, because CSS cannot do better; ported literally that gives
+  // a control which ignores you and then moves by itself. Here the drag writes
+  // straight to [_position], so the cards turn as the thumb moves and the
+  // gesture can be taken back halfway.
+
+  void _dragStart(DragStartDetails _) {
+    _settle.stop();
+    _dragFrom = _position;
+  }
+
+  /// Where the track was when the finger landed, so [_dragEnd] can tell a
+  /// drag that has already crossed into the next card from one that has not.
+  double _dragFrom = 0;
+
+  void _dragUpdate(DragUpdateDetails d) {
+    // ⚠️ A CARD'S WIDTH OF FINGER IS A CARD'S WORTH OF TURN. The first cut
+    // divided by the neighbour's 96pt of sideways travel, so the front card
+    // tracked the neighbour's centre exactly — and a thumb's ordinary swipe,
+    // 250pt or so, spun the ring two and a half cards. Faithful, and twitchy.
+    // Dividing by the card's own width means the card under the thumb moves
+    // with the thumb, which is the thing a finger actually expects, and a
+    // full swipe is one card with a little to spare.
+    setState(() => _position -= d.delta.dx / kTtcCarouselCardWidth);
+  }
+
+  void _dragEnd(DragEndDetails d) {
+    // ⚠️ A FLICK COUNTS AS ONE CARD, NEVER MORE, which is what stops a fast,
+    // short swipe dying halfway — and what stops a fast, long one overshooting.
+    // Velocity is in points per second; three cards' worth a second is about
+    // the speed at which a gesture reads as a throw rather than a nudge. The
+    // flick is only added if the drag has not already crossed into the next
+    // card, so a long throw lands one card on, not two.
+    final v = d.velocity.pixelsPerSecond.dx;
+    final crossed = _position.round() - _dragFrom.round();
+    final flick = v.abs() > kTtcCarouselCardWidth * 3 && crossed == 0
+        ? (v < 0 ? 1 : -1)
+        : 0;
+    _land(_position.round() + flick);
+  }
+
+  /// Indices sorted far-to-near.
+  ///
+  /// A `Stack` has no z-index, so PAINT ORDER IS THE Z-INDEX — this sort is the
+  /// whole of 4a's `z: 10 - a`. See failure (2) in the header for why every
+  /// card that comes out of here must also carry a key.
+  List<int> _paintOrder() {
+    final order = List<int>.generate(_count, (i) => i);
+    order.sort((a, b) => _offsetOf(b).abs().compareTo(_offsetOf(a).abs()));
+    return order;
+  }
+
+  /// The second line. Counted, never typed — same rule and same reason as
+  /// [_GroupRailState._inside], which see.
+  String _inside(TtcFocusGroup g) {
+    if (g.toolSurfaceId case final s?) {
+      return switch (s) {
+        'ttc_mind_today' => 'Today',
+        _ => 'Quick check',
+      };
+    }
+    final n = widget.page.sections
+        .where((s) => s.group == g.id)
+        .fold(0, (t, s) => t + s.tiles.length);
+    return n == 1 ? '1 thing' : '$n things';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final p = widget.p;
+
+    return SizedBox(
+      key: kTtcGroupCarouselKey,
+      height: _GroupCarousel.height,
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onHorizontalDragStart: _dragStart,
+        onHorizontalDragUpdate: _dragUpdate,
+        onHorizontalDragEnd: _dragEnd,
+        onHorizontalDragCancel: () => _land(_position.round()),
+        child: Column(
+          children: [
+            SizedBox(
+              height: kTtcCarouselTrackHeight,
+              child: Stack(
+                children: [
+                  // ---- the picture ---------------------------------------
+                  //
+                  // ⚠️ THE TRACK CLIPS, AND THE CLIP IS DRESSED AS MIST. 3a let
+                  // the neighbour overhang the screen and called the overhang
+                  // the design; 4a masks the track instead — `mask-image:
+                  // linear-gradient(90deg, .45, .82 10%, 1 28%, 1 72%, .82
+                  // 90%, .45)` — so the back pair fade into the sheet at the
+                  // sides rather than being sliced by the phone.
+                  //
+                  // Why `ClipRect` AND `ShaderMask`, when CSS needs only the
+                  // mask: a CSS mask is clipped to the element's box, so a
+                  // pixel outside the track is simply not drawn. Flutter's
+                  // `ShaderMask` draws its gradient over the widget's own
+                  // rect and leaves anything painted OUTSIDE that rect alone
+                  // — so without the clip, the part of a far card that runs
+                  // past the track's edge would come through at full
+                  // strength, sharp, exactly where the design wants it
+                  // faintest. The clip is the half of `mask-image` that
+                  // Flutter does not do for you.
+                  //
+                  // `BlendMode.dstIn` keeps the child's colour and multiplies
+                  // its alpha by the gradient's — the card is the destination
+                  // and the gradient is the source, and "in" keeps the
+                  // destination where the source is.
+                  //
+                  // ⚠️ AND NOTHING HERE TAKES A TAP. A perspective-transformed
+                  // widget in Flutter is tappable somewhere other than where it
+                  // is painted: `RenderTransform` paints with the full matrix
+                  // but hit-tests through `PointerEvent.removePerspective-
+                  // Transform`, which clears only row 2 and column 2 — and
+                  // `rotateY` couples x into z, leaving a residue at entry
+                  // [3][0] that nothing strips. Measured on the neighbour card,
+                  // a tap aimed at the middle of the label lands about 18pt to
+                  // its right in card-local space, past the end of a short
+                  // word. So the track is a picture, and the untransformed
+                  // zones below take the taps.
+                  //
+                  // The general fact: painting and hit testing are two passes
+                  // over the same tree that do not have to agree, and 3D is
+                  // where they stop agreeing.
+                  Positioned.fill(
+                    child: IgnorePointer(
+                      child: ClipRect(
+                        child: ShaderMask(
+                          blendMode: BlendMode.dstIn,
+                          shaderCallback: (rect) => LinearGradient(
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                            stops: _edgeFadeStops,
+                            colors: [
+                              for (final a in _edgeFadeAlphas)
+                                Colors.black.withValues(alpha: a),
+                            ],
+                          ).createShader(rect),
+                          child: Padding(
+                            padding: const EdgeInsets.only(top: _cardTop),
+                            child: Stack(
+                              alignment: Alignment.topCenter,
+                              children: [
+                                for (final i in _paintOrder())
+                                  _CarouselCard(
+                                    // ⚠️ THE KEY IS LOAD-BEARING, NOT
+                                    // TIDINESS. The list above is re-sorted
+                                    // every frame; without an identity,
+                                    // Flutter reuses each slot's element for
+                                    // whatever card now occupies it. See
+                                    // failure (2) in the header.
+                                    key: ValueKey(widget.groups[i].id),
+                                    group: widget.groups[i],
+                                    inside: _inside(widget.groups[i]),
+                                    offset: _offsetOf(i),
+                                    count: _count,
+                                    index: i,
+                                    held: _heldStep != 0 &&
+                                        _offsetOf(i).round() == _heldStep,
+                                    p: p,
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+
+                  // ---- the two side targets ------------------------------
+                  //
+                  // The middle is the width of the front card, which sits at
+                  // z 0 and is therefore drawn at its true size — the one card
+                  // whose painted width IS [kTtcCarouselCardWidth]. The sides
+                  // take whatever the screen has left, so on a narrow phone
+                  // they stay usable rather than shrinking with the
+                  // foreshortened card they stand for.
+                  Positioned.fill(
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: _CarouselZone(
+                            key: ttcCarouselZoneKey(-1),
+                            step: -1,
+                            group: widget.groups[_indexAt(-1)],
+                            onHold: _hold,
+                            onTap: () => _step(-1),
+                          ),
+                        ),
+                        // ⚠️ INERT ON PURPOSE, AND STILL PRESENT. The front
+                        // card is already chosen, so there is nothing for a tap
+                        // to do — but the gap has to exist to stop the side
+                        // zones meeting in the middle, where a tap on the front
+                        // card would swing the track sideways for no reason the
+                        // reader could name.
+                        const SizedBox(width: kTtcCarouselCardWidth),
+                        Expanded(
+                          child: _CarouselZone(
+                            key: ttcCarouselZoneKey(1),
+                            step: 1,
+                            group: widget.groups[_indexAt(1)],
+                            onHold: _hold,
+                            onTap: () => _step(1),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: _GroupCarousel._dotGap),
+            _CarouselDots(
+              groups: widget.groups,
+              position: _position,
+              selected: widget.selected,
+              p: p,
+              onPick: _land,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// Which side is being pressed, so the card behind it can answer the finger.
+  ///
+  /// −1 or +1 while a side zone is held, 0 otherwise. It lives up here rather
+  /// than in the card because the zone and the card it presses are now two
+  /// different widgets — the cost of the hit-testing note above, paid in one
+  /// field.
+  int _heldStep = 0;
+
+  void _hold(int v) {
+    if (_heldStep != v && mounted) setState(() => _heldStep = v);
+  }
+
+  /// The group [step] places round the ring from the chosen one.
+  int _indexAt(int step) => (widget.selected + step + _count) % _count;
+}
+
+/// One side of the track: a transparent target that brings the card on that
+/// side forward.
+///
+/// ⚠️ IT CARRIES THE SEMANTICS FOR THE CARD IT STANDS FOR. The cards themselves
+/// sit under an `IgnorePointer` and are no longer buttons, so without this a
+/// screen reader would find a track it could not operate. The label names the
+/// group the tap would open, not "previous" or "next" — a direction is only
+/// useful to someone who can already see what is on either side.
+class _CarouselZone extends StatelessWidget {
+  const _CarouselZone({
+    super.key,
+    required this.step,
+    required this.group,
+    required this.onHold,
+    required this.onTap,
+  });
+
+  final int step;
+  final TtcFocusGroup group;
+  final ValueChanged<int> onHold;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: group.label,
+        onTap: onTap,
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTapDown: (_) => onHold(step),
+          onTapCancel: () => onHold(0),
+          onTapUp: (_) => onHold(0),
+          onTap: onTap,
+        ),
+      );
+}
+
+// =============================================================================
+//  The layered mark
+// -----------------------------------------------------------------------------
+//  3a's turn-3 note, in full: *"the flat tint blob is replaced by a layered
+//  mark — a soft radial disc, two hairline concentric arcs, a small dot cluster
+//  and a hairline horizon, each rotated a little differently per category, with
+//  the kit icon still at the centre."*
+//
+//  Five parts, drawn in a 96×96 space and painted at 86, all of them from the
+//  group's own hue:
+//
+//    · a radial disc, r 33, lit off-centre at (38%, 30%) — light → mid
+//    · a hairline ring, r 41, at 22% — the disc's edge, a little outside it
+//    · a broken arc across the top, r 39, at 34%, dashed 86-on 200-off
+//    · a second arc under it, r 34, at 28%, springing the other way
+//    · three dots of falling size, at 50% / 35% / 28%
+//
+//  and outside the rotation, a horizon: a shallow curve across the foot at 30%.
+//
+//  ⚠️ THE ROTATION IS PER GROUP AND IT IS THE WHOLE TRICK. `i * 26 - 12`
+//  degrees. Five cards carrying the SAME drawing in five colours read as one
+//  thing tinted five ways; the same drawing turned five ways reads as five
+//  places. It costs one number and it is the difference between a palette and
+//  a set of marks.
+//
+//  ⚠️ AND THE DOT CLUSTER IS SEEDED PER GROUP, NOT RANDOM. 3a lists the six
+//  coordinates by hand. A `Random()` here would redraw the mark on every
+//  rebuild — the card would shimmer as the track moved, which is the kind of
+//  thing that gets diagnosed as a rendering bug three months later.
+// =============================================================================
+
+/// 3a's hand-listed dot positions, per group: (x, y) three times over.
+const List<List<double>> _kMarkDots = [
+  [74, 24, 84, 40, 66, 12],
+  [22, 26, 12, 42, 32, 15],
+  [72, 74, 84, 60, 62, 86],
+  [26, 72, 14, 58, 36, 84],
+  [76, 46, 86, 62, 70, 30],
+];
+
+/// The mark's palette, straight off 3a: the same hue at four strengths.
+///
+/// ⚠️ NOT ROUTED THROUGH `v2BlockTint`. Those are the app's BLOCK tints, solved
+/// for a large flat panel; the mark needs a light and a mid that sit within a
+/// few percent of each other or the disc turns into a bullseye. These are the
+/// design's own numbers, and the only one that leaves this file is the deep —
+/// which stays [_deepFor], because it is the one that has to clear 4.5:1
+/// against white type on the front card.
+Color _markLight(double h) => HSLColor.fromAHSL(1, h % 360, 0.46, 0.93).toColor();
+Color _markMid(double h) => HSLColor.fromAHSL(1, h % 360, 0.30, 0.82).toColor();
+// Kept for revert: 3a's card field was `_markLight → _markTint`, fixed per
+// card. 4a's field deepens with distance instead, so [_CarouselCard] now
+// computes both stops from the card's own offset and this stop went unused.
+// Color _markTint(double h) => HSLColor.fromAHSL(1, h % 360, 0.32, 0.91).toColor();
+
+class _CarouselMark extends CustomPainter {
+  const _CarouselMark({required this.hue, required this.index});
+
+  final double hue;
+  final int index;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    // Everything below is written in 3a's 96-unit space and scaled once, so the
+    // numbers in the code are the numbers in the design file.
+    canvas.scale(size.width / 96);
+    final deep = _deepFor(hue);
+    final d = _kMarkDots[index % _kMarkDots.length];
+    const c = Offset(48, 48);
+
+    Paint hair(double width, double opacity) => Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = width
+      ..strokeCap = StrokeCap.round
+      ..color = deep.withValues(alpha: opacity);
+
+    canvas.save();
+    canvas.translate(c.dx, c.dy);
+    canvas.rotate((index * 26 - 12) * math.pi / 180);
+    canvas.translate(-c.dx, -c.dy);
+
+    // The disc, lit from up and to the left.
+    canvas.drawCircle(
+      c,
+      33,
+      Paint()
+        ..shader = RadialGradient(
+          center: const Alignment(-0.24, -0.40), // 3a's cx 38% cy 30%
+          radius: 0.78,
+          colors: [_markLight(hue), _markMid(hue)],
+        ).createShader(Rect.fromCircle(center: c, radius: 33)),
+    );
+
+    // The ring just outside it.
+    canvas.drawCircle(c, 41, hair(1, 0.22));
+
+    // A broken arc over the top. 3a dashes it 86-on 200-off, which on a 39pt
+    // half-circumference (≈123) means it stops about two thirds of the way
+    // across — an arc that trails off rather than closing.
+    canvas.drawArc(Rect.fromCircle(center: c, radius: 39), math.pi,
+        math.pi * (86 / 123), false, hair(1.25, 0.34));
+
+    // And a second, springing the other way underneath.
+    //
+    // ⚠️ ITS CENTRE IS NOT THE MARK'S CENTRE. 3a writes it as an SVG arc
+    // command — `M18 66 A34 34 0 0 0 78 66` — which gives two endpoints and a
+    // radius and lets the renderer solve for the middle. A 60-unit chord at
+    // radius 34 puts that middle 16 units off the chord, at (48, 50), and
+    // sweep-flag 0 says take the half that bulges downward. Drawing it around
+    // (48, 48) instead is two units of drift that reads as the lower arc not
+    // quite belonging to the disc.
+    canvas.drawArc(
+        Rect.fromCircle(center: const Offset(48, 50), radius: 34),
+        151.93 * math.pi / 180,
+        -123.86 * math.pi / 180,
+        false,
+        hair(1, 0.28));
+
+    // The cluster: three dots of falling size and falling weight.
+    for (final (i, r, a) in [(0, 4.5, 0.50), (1, 2.4, 0.35), (2, 1.4, 0.28)]) {
+      canvas.drawCircle(Offset(d[i * 2], d[i * 2 + 1]), r,
+          Paint()..color = deep.withValues(alpha: a));
+    }
+    canvas.restore();
+
+    // ⚠️ THE HORIZON IS OUTSIDE THE ROTATION, and 3a puts it there on purpose.
+    // Everything else turns; this one line stays level on all five cards, so
+    // the marks read as five views of one place rather than five unrelated
+    // drawings. Turning it with the rest loses that instantly.
+    canvas.drawPath(
+      Path()
+        ..moveTo(4, 82)
+        ..quadraticBezierTo(48, 70, 92, 80),
+      hair(1, 0.30),
+    );
+  }
+
+  @override
+  bool shouldRepaint(_CarouselMark old) =>
+      old.hue != hue || old.index != index;
+}
+
+/// One card on the track — a drawing, at a position on a ring.
+///
+/// ⚠️ STATELESS, AND REBUILT EVERY FRAME OF A DRAG. It holds no animation of
+/// its own: [offset] arrives already interpolated and the card just draws where
+/// that says. Anything animating in here would be a second clock running
+/// against the track's, and the one that loses is whichever finished last.
+class _CarouselCard extends StatelessWidget {
+  const _CarouselCard({
+    super.key,
+    required this.group,
+    required this.inside,
+    required this.offset,
+    required this.count,
+    required this.index,
+    required this.held,
+    required this.p,
+  });
+
+  final TtcFocusGroup group;
+
+  /// The second line — "8 things", "Quick check". Counted by the carousel.
+  final String inside;
+
+  /// Signed distance from the middle of the track, fractional while it moves.
+  final double offset;
+
+  /// How many cards are on the ring. Sets where the far side is — the one
+  /// place a card has to vanish, because it is about to reappear on the other
+  /// side. See the opacity note in [build].
+  final int count;
+
+  /// Position in the door's group list. Seeds the mark, so a group's drawing is
+  /// the same every time it is looked at.
+  final int index;
+
+  /// Whether the zone in front of this card is being pressed. Pushed down from
+  /// the track rather than held here, because the finger never lands on this
+  /// widget — see the hit-testing note in [_GroupCarouselState.build].
+  final bool held;
+
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) {
+    final o = offset;
+    final a = o.abs();
+    final s = o.sign;
+    final h = group.hue % 360;
+    final deep = _deepFor(group.hue);
+
+    // ⚠️ EVERY ONE OF THESE IS CONTINUOUS IN `o`. At a == 0 they are 4a's
+    // chosen-card values, at a == 1 its neighbour values and at a == 2 its
+    // back-pair values; the frames between are what a CSS transition would have
+    // produced and what the finger is actually dragging through.
+    //
+    // Where 4a's table is a straight line — scale drops 0.2 a step, z 60, y 8 —
+    // the line is written once. Where it bends at the neighbour — the sideways
+    // travel is 96 for the first step and 74 for the second, the turn 24° then
+    // 8° more — `_ladder` bends with it.
+    final near = (1 - a).clamp(0.0, 1.0); // 1 in the middle, 0 at a neighbour
+    final one = a.clamp(0.0, 1.0); // the first step, saturating
+    double ladder(double first, double rest) =>
+        a <= 1 ? first * a : first + rest * (a - 1);
+
+    // ⚠️ NO PRESS-SCALE ANY MORE, AND IT WAS A JITTER. `held` used to multiply
+    // this by 0.95 while a side zone was pressed — instantly, no tween. But a
+    // zone's `onTapDown` also fires at the START OF A SWIPE, once the finger
+    // has sat for the press timeout, and is cancelled the moment the drag
+    // wins: the neighbour shrank a twentieth and popped back before the
+    // track had moved a point. On a tap it was shrink, pop, then glide —
+    // three movements for one gesture. 4a has no press state; the turn is
+    // the feedback. `held` still arrives, so the plumbing stays for a
+    // tweened version if one is ever wanted:
+    //   final scale = (1 - 0.2 * a) * (held ? 0.95 : 1);
+    final scale = 1 - 0.2 * a;
+
+    // ⚠️ NOTHING IS HIDDEN — THAT IS THE WHOLE OF 4a — EXCEPT AT THE SEAM.
+    // The design's opacities are 1, .92, .72 and every card on a five-ring is
+    // within two steps of the middle, so all five are drawn. But the ring has a
+    // far side, at |o| = count/2, where a card stops being "two to the right"
+    // and becomes "two to the left" in one frame, and its x flips sign. On a
+    // five-ring that point is behind the mask's edge and mostly off screen; the
+    // fade over the last half step before it is what makes the crossing
+    // invisible rather than merely unlikely to be noticed.
+    final misted = a <= 1 ? 1 - 0.08 * a : 0.92 - 0.20 * (a - 1);
+    final seam = ((count / 2 - a) / 0.5).clamp(0.0, 1.0);
+    final opacity = (misted * seam).clamp(0.0, 1.0);
+
+    if (opacity == 0) return const SizedBox.shrink();
+
+    // See the header note for why the perspective entry is negative.
+    final m = Matrix4.identity()
+      ..setEntry(3, 2, -1 / 1000)
+      ..translateByDouble(s * ladder(96, 74), 8 * a, -60 * a, 1)
+      ..rotateY(-s * ladder(24, 8) * math.pi / 180)
+      ..rotateX(3 * one * math.pi / 180)
+      ..scaleByDouble(scale, scale, 1, 1);
+
+    // 4a's `filter: blur(a·1.1px)`. A CSS blur radius is a Gaussian sigma, so
+    // the number crosses over unchanged.
+    //
+    // ⚠️ THE `saturate(1.05 | 1.15)` HALF OF THAT FILTER IS NOT APPLIED. It
+    // cost a `ColorFiltered` layer per receding card — four offscreen passes a
+    // frame on top of the four blurs — for a shift the eye cannot find next
+    // to the tint deepening in [field] below. On a mid-range phone the
+    // layers, not the maths, are what turn a glide into a stutter, and a
+    // stutter reads as jitter. Kept for revert:
+    //   final saturate = a <= 1 ? 1 + 0.05 * a : 1.05 + 0.10 * (a - 1);
+    //   … ColorFiltered(colorFilter: ColorFilter.matrix(_saturation(saturate)))
+    final blur = 1.1 * a;
+
+    // 4a's "tint that deepens as it recedes": the same 150° two-stop field 3a
+    // drew, with both stops walking darker and a touch more saturated per
+    // step — `hsl(h 32+3a% 94−7a%)` to `hsl(h 26+5a% 91−10a%)`.
+    // `linear-gradient(150deg, …)` measures clockwise from straight up, so the
+    // line runs (sin150, −cos150) = (0.5, 0.866) — down and to the right.
+    final field = LinearGradient(
+      begin: const Alignment(-0.5, -0.866),
+      end: const Alignment(0.5, 0.866),
+      colors: [
+        HSLColor.fromAHSL(1, h, 0.32 + 0.03 * a, 0.94 - 0.07 * a).toColor(),
+        HSLColor.fromAHSL(1, h, 0.26 + 0.05 * a, 0.91 - 0.10 * a).toColor(),
+      ],
+    );
+
+    // ⚠️ A SOFT RIM, NOT A HARD RING, AND THIS IS 4a REVISING 3a. 3a drew the
+    // front card's border in the group's deep hue; 4a's note is *"ring is a
+    // soft tinted rim rather than a hard outline"* — `hsl(h 32% 62% / .55)` in
+    // front, `hsl(h 24% (60−4a)% / .32)` behind. Both are the group's own hue
+    // at two strengths, so [_GroupTab]'s objection to a purple outline still
+    // does not apply; what changed is that the rim no longer competes with the
+    // geometry for the job of saying which card is forward.
+    final rim = Color.lerp(
+      HSLColor.fromAHSL(0.32, h, 0.24, 0.60 - 0.04 * a).toColor(),
+      HSLColor.fromAHSL(0.55, h, 0.32, 0.62).toColor(),
+      near,
+    )!;
+
+    Widget card = SizedBox(
+      width: kTtcCarouselCardWidth,
+      height: kTtcCarouselCardHeight,
+      child: DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: field,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: rim, width: 1),
+          boxShadow: near > 0
+              ? [
+                  // 4a's `0 10px 26px −12px hsl(h 34% 42% / .38)`, on the
+                  // front card only. The hue's own shadow, not black: a
+                  // coloured block casting a grey shadow reads as a sticker
+                  // on the page rather than a part of it.
+                  BoxShadow(
+                    color: HSLColor.fromAHSL(0.38 * near, h, 0.34, 0.42)
+                        .toColor(),
+                    blurRadius: 26,
+                    spreadRadius: -12,
+                    offset: const Offset(0, 10),
+                  ),
+                ]
+              : null,
+        ),
+        // ⚠️ A STACK, NOT A COLUMN, AND THE FIRST CUT GOT THIS WRONG.
+        // Stacking the mark above the text made them share the card's
+        // height: a 74pt mark and a two-line name like "What he can do" do
+        // not both fit under each other, and the card painted an overflow
+        // stripe.
+        //
+        // The Column was the mistake, not the sizes. The design's own words
+        // are that the mark "sits in a FIELD rather than on a patch" — it is
+        // the card's surface, not an item stacked on top of one, so the name
+        // lies over its lower edge and neither has to give way. It is also
+        // what lets the mark bleed off the edge.
+        child: Stack(
+          clipBehavior: Clip.none,
+          children: [
+            // 4a's mark: 74pt, top-right, `margin: -1px -3px 0 0` inside
+            // `padding: 11px 13px 13px` — so 10 from the top and 10 from the
+            // right, with the ring round the disc running just past the
+            // corner. And it drifts: `translateX(−s·a·7px)`, a few points
+            // against the turn, so the drawing slides across its card as the
+            // card comes round. 4a: *"the mark drifts a few px as cards
+            // rotate."*
+            Positioned(
+              top: 10,
+              right: 10,
+              width: 74,
+              height: 74,
+              child: Transform.translate(
+                offset: Offset(-o * 7, 0),
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Positioned.fill(
+                      child: CustomPaint(
+                        painter: _CarouselMark(hue: group.hue, index: index),
+                      ),
+                    ),
+                    // The group's own icon, at the centre of its mark — "with
+                    // the kit icon still at the centre", and the thing that
+                    // keeps the drawing a TAB rather than decoration.
+                    Transform.translate(
+                      offset: const Offset(-2, -3),
+                      child: Icon(group.icon, size: 26, color: deep),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              left: 13,
+              right: 13,
+              bottom: 13,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(group.label,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvFraunces(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          height: 1.2,
+                          letterSpacing: -0.3,
+                          color: p.ink1)),
+                  const SizedBox(height: 3),
+                  // ⚠️ THE COUNT FADES WITH DISTANCE, THE NAME DOES NOT.
+                  // 4a hides a neighbour's whole label, which works there
+                  // because its art carries the identity on its own. Ours
+                  // has to keep the name — a nameless neighbour is a
+                  // coloured rectangle, and she would have to swipe to find
+                  // out what she was swiping to. The count is the part that
+                  // is only useful once you have chosen, so it is the part
+                  // that goes.
+                  Opacity(
+                    opacity: near,
+                    child: Text(inside,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: pvManrope(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: deep.withValues(alpha: 0.75))),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    // ---- the mist ----------------------------------------------------------
+    //
+    // ⚠️ THE FRONT CARD GETS NO FILTER LAYER AT ALL. `ImageFiltered` renders
+    // its child into an offscreen layer and composites it back, every frame
+    // of a drag. At a == 0 that would be a blur of zero and still cost the
+    // layer. So the card that is looked at most is the plain widget, and the
+    // filter only exists on the cards that are actually receding.
+    //
+    // The order matters and is CSS's: `filter` is applied in the card's own
+    // space and the transform to the filtered result, so the filter sits
+    // INSIDE the `Transform` — see the header. `TileMode.decal` is what lets a
+    // blurred card's edges soften into nothing; the default clamp would smear
+    // its edge pixels outward into a hard, slightly wider rectangle.
+    if (a > 0.01) {
+      card = ImageFiltered(
+        imageFilter: ImageFilter.blur(
+            sigmaX: blur, sigmaY: blur, tileMode: TileMode.decal),
+        child: card,
+      );
+    }
+
+    return Opacity(
+      opacity: opacity,
+      child: Transform(
+        transform: m,
+        // ⚠️ CENTRE, AND IT IS NOT COSMETIC — IT IS WHERE THE VANISHING POINT
+        // GOES. CSS puts `perspective` on the PARENT, so every card recedes
+        // toward one point at the middle of the track. Flutter has no parent
+        // perspective: the entry rides in each card's own matrix, so the
+        // vanishing point sits at that card's `alignment`.
+        //
+        // The two only agree because every card is laid out at the SAME place —
+        // the `Stack` centres them all and the matrix does the displacing — so
+        // "the centre of this card" and "the centre of the track" are the same
+        // point. Give the cards real positions instead of transforms and each
+        // one starts receding toward itself, which looks like five separate
+        // animations rather than one track.
+        alignment: Alignment.center,
+        // ⚠️ NO `filterQuality`, ON PURPOSE. See failure (4) in the header.
+        child: card,
+      ),
+    );
+  }
+}
+
+// Kept for revert: the saturate half of 4a's filter, dropped for the layer it
+// cost — see the note on `blur` in [_CarouselCard.build].
+// /// CSS `saturate(s)` as a 4×5 colour matrix — the SVG/CSS filter definition,
+// /// weighting the channels by the same luminance coefficients (.213/.715/.072)
+// /// the browser uses, so 4a's `saturate(1.15)` lands the same colour here.
+// ///
+// /// At `s = 1` it is the identity; above 1 each channel is pushed away from the
+// /// pixel's luminance, which is what "more saturated" means arithmetically.
+// List<double> _saturation(double s) {
+//   final r = 0.213 * (1 - s);
+//   final g = 0.715 * (1 - s);
+//   final b = 0.072 * (1 - s);
+//   return [
+//     r + s, g, b, 0, 0, //
+//     r, g + s, b, 0, 0, //
+//     r, g, b + s, 0, 0, //
+//     0, 0, 0, 1, 0,
+//   ];
+// }
+
+/// The counter under the track.
+///
+/// ⚠️ IT IS NOT DECORATION. On the flat rail every tab is on screen, so a dot
+/// row would only repeat what the eye already has — which is why [_GroupRail]
+/// has none and this does. Here two of five are small, misted and half off the
+/// track, and this is the thing that says plainly how many there are and which
+/// one is open.
+///
+/// It is also tappable. A dot is a smaller target than a card, but it is the
+/// shortest route to the far pair, which otherwise takes two swipes to reach.
+///
+/// ⚠️ THE LIT DOT STRETCHES WITH THE TRACK, not after it. It reads [position],
+/// the same fractional number the cards do, so halfway through a drag the pill
+/// is halfway between two dots. A dot row that waits for the gesture to finish
+/// and then jumps is the tell that a carousel is a slideshow.
+class _CarouselDots extends StatelessWidget {
+  const _CarouselDots({
+    required this.groups,
+    required this.position,
+    required this.selected,
+    required this.p,
+    required this.onPick,
+  });
+
+  final List<TtcFocusGroup> groups;
+  final double position;
+  final int selected;
+  final V2Palette p;
+  final ValueChanged<int> onPick;
+
+  /// 4a's dot: 5pt tall, 5 wide at rest and 18 lit.
+  static const double dot = 5;
+  static const double lit = 18;
+
+  /// Transparent target above and below the painted dot.
+  static const double tapPad = 7;
+
+  static const double height = dot + 2 * tapPad;
+
+  @override
+  Widget build(BuildContext context) => Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          for (var i = 0; i < groups.length; i++)
+            Builder(builder: (context) {
+              // How much of the lit state this dot is holding right now. The
+              // ring wraps, so the distance has to as well, or dot five and
+              // dot one would hand over by travelling through the middle.
+              //
+              // ⚠️ MODULO FIRST, AND THAT IS THE WHOLE OF A SHIPPED BUG. This
+              // was `(i - position).abs()` reduced by `if (o > n/2) o = n - o`,
+              // which is correct only while `position` is inside one lap — and
+              // the track's position legitimately leaves it, because each step
+              // settles the short way round rather than to an index. Six steps
+              // in one direction put it at ±6, `n - o` went NEGATIVE, `1 - o`
+              // came out above 1, and every dot clamped to fully lit.
+              //
+              // Dart's `%` on a double returns a non-negative result for a
+              // positive divisor, so one modulo puts the distance in `[0, n)`
+              // for any position at all, and the fold after it in `[0, n/2]`.
+              // The position is also normalised on settle now, so this is
+              // belt and braces — deliberately, because the last version of
+              // this line was correct-given-an-invariant that nothing checked.
+              final n = groups.length;
+              var o = (i - position) % n;
+              if (o > n / 2) o = n - o;
+              final on = (1 - o).clamp(0.0, 1.0);
+              return Padding(
+                key: ttcCarouselDotKey(i),
+                padding: const EdgeInsets.symmetric(horizontal: 3),
+                child: Semantics(
+                  selected: i == selected,
+                  button: true,
+                  label: groups[i].label,
+                  child: GestureDetector(
+                    onTap: () => onPick(i),
+                    behavior: HitTestBehavior.opaque,
+                    // ⚠️ THE PAINTED DOT IS 5pt AND THE TARGET IS NOT. A 5pt
+                    // hit box is far under any touch minimum; the transparent
+                    // padding carries the tap and the dot only draws it.
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: tapPad),
+                      child: SizedBox(
+                        width: dot + (lit - dot) * on,
+                        height: dot,
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            // The lit dot takes the group's own deep hue, so
+                            // the counter changes colour with the card it
+                            // points at. One hue, two strengths — the rail's
+                            // rule, kept.
+                            color: Color.lerp(p.ink1.withValues(alpha: 0.14),
+                                _deepFor(groups[i].hue), on),
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
+        ],
+      );
 }
 
 class _Sheet extends StatelessWidget {
@@ -1095,7 +2445,7 @@ class _Sheet extends StatelessWidget {
               offset: const Offset(0, -6),
             ),
           ],
-        ),
+            ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           ...children,
           // The nav pill and the Ask FAB both float over this.
@@ -1213,6 +2563,20 @@ String? photoForTile(TtcTile tile) => switch (tile) {
 IconData iconForFormat(TtcTileFormat format) => switch (format) {
     TtcTileFormat.masterclass => Icons.school_outlined,
     TtcTileFormat.tool => Icons.tune_rounded,
+  // A pair of shoes rather than a slider: the difference between a thing you
+  // operate and a thing you do for six weeks.
+  TtcTileFormat.practice => Icons.directions_run_rounded,
+  TtcTileFormat.checklist => Icons.checklist_rtl_rounded,
+  // A book with a bookmark rather than a plain page: something you come back
+  // to and use, not something you read once.
+  TtcTileFormat.guide => Icons.menu_book_outlined,
+  // An arrow leaving a box — the only tile whose tap takes you off this
+  // door, and the icon is the one part of the card that can say so before
+  // she reads the words.
+  TtcTileFormat.door => Icons.open_in_new_rounded,
+  // A message rather than a calendar: the promise is a conversation, not a
+  // slot. Same engine underneath as `booking`.
+  TtcTileFormat.talk => Icons.chat_bubble_outline_rounded,
     TtcTileFormat.article => Icons.article_outlined,
     TtcTileFormat.carousel => Icons.view_carousel_outlined,
     TtcTileFormat.video => Icons.play_circle_outline_rounded,
@@ -1235,6 +2599,27 @@ void openTtcFocusTile(BuildContext context, TtcTile tile, double hue) {
     // ---- the tool: opened, never rebuilt --------------------------------
     case TtcToolTile(:final surfaceId):
       openTtcSurface(context, surfaceId);
+
+    // ---- something to practise: same push, different promise ------------
+    case TtcDoTile(:final surfaceId):
+      openTtcSurface(context, surfaceId);
+
+    // ---- another door entirely ------------------------------------------
+    //
+    // ⚠️ IT RESOLVES BEFORE IT PUSHES. `ttcFocusPageFor` returns null for a
+    // bracket with no focus page, and an unknown bracket id would otherwise
+    // build a screen against a null page. Returning is the wiring gate: a card
+    // naming a door that does not exist opens nothing, loudly, in the test.
+    case TtcDoorTile(:final bracketId):
+      final page = ttcFocusPageFor(bracketId);
+      final bracket = bracketById(bracketId);
+      if (page == null || bracket == null) return;
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          settings: RouteSettings(name: 'ttc/focus/$bracketId'),
+          builder: (_) => TtcFocusScreen(page: page, bracket: bracket),
+        ),
+      );
 
     // ---- one frame, no swiping ------------------------------------------
     case TtcInfographicTile():
@@ -1266,7 +2651,12 @@ void openTtcFocusTile(BuildContext context, TtcTile tile, double hue) {
       ));
 
     // ---- reading --------------------------------------------------------
-    case TtcArticleTile(:final readId, :final art, :final imageUrl):
+    case TtcArticleTile(
+      :final readId,
+      :final art,
+      :final imageUrl,
+      :final atHeading,
+    ):
       // ⚠️ ONE ARTICLE FORMAT, AND ONLY ONE. Every article tile opens
       // `PvReaderScreen` — the reader the rest of the app uses. There is no
       // lighter second reader any more: it existed for four tiles whose answer
@@ -1278,7 +2668,14 @@ void openTtcFocusTile(BuildContext context, TtcTile tile, double hue) {
       // the format requires (four sections, a contents, an FAQ, sourcing, a
       // when-to-see-someone) rather than the format being lowered to the
       // content. `body` and `moreReadId` are gone from the model with it.
-      openTtcArticle(context, readId!, art: art, imageUrl: imageUrl, hue: hue);
+      openTtcArticle(
+        context,
+        readId!,
+        art: art,
+        imageUrl: imageUrl,
+        hue: hue,
+        atHeading: atHeading,
+      );
 
     case TtcCarouselTile(
         :final cards,
@@ -1362,10 +2759,69 @@ void openTtcFocusTile(BuildContext context, TtcTile tile, double hue) {
       );
 
     // ---- the two that cost money ----------------------------------------
-    case TtcProductTile(:final productId):
+    // ⚠️ V3 DOORS OPEN THE NEW PRODUCT PAGE — CHANGED 2026-09-03.
+    //
+    // It used to push `TtcProductsScreen` with a `focusId`, which opened the
+    // whole flat library scrolled to one entry. That was right when the library
+    // was the only product surface; it is not right from a focus page, where
+    // the tile named ONE product and answering with a list of ten is the
+    // "middle menu" this whole rebuild removed everywhere else.
+    //
+    // ⚠️ AND THE OLD SCREEN IS UNTOUCHED. It stays on disk, stays routed at
+    // `ttc_products`, and Ask Veda's deep links still land there — asked for
+    // directly: only the V3 doors move. Both read `ttcProducts`, so there is
+    // one catalogue under two surfaces and no copy of any text in either.
+    // ---- something to buy: one product, or the whole shelf --------------
+    //
+    // ⚠️ BOTH FORMS, BECAUSE THE SHELF FORM IS THE ONE THAT WAS MISSING. See
+    // the note on `TtcProductTile`: a brief row meaning "open the supplements
+    // shelf" had nowhere to go and shipped as a tool pointing at the
+    // supplements tracker.
+    case TtcProductTile(:final productId?):
+      openTtcProductPage(context, productId);
+
+    case TtcProductTile(:final category?):
       Navigator.of(context).push(MaterialPageRoute<void>(
-        settings: const RouteSettings(name: 'ttc/products'),
-        builder: (_) => TtcProductsScreen(focusId: productId),
+          settings: RouteSettings(name: 'ttc/shop/$category'),
+          builder: (_) => TtcShelfScreen(category: category),
+        ),
+      );
+
+    // Unreachable: the two constructors guarantee one of the pair is set.
+    case TtcProductTile():
+      openTtcShop(context);
+
+    // ---- a guide: the article reader, a truer chip ----------------------
+    case TtcGuideTile(:final readId, :final atHeading):
+      openTtcArticle(context, readId, hue: hue, atHeading: atHeading);
+
+    // ---- a checklist: same push as a tool, a truer chip -----------------
+    case TtcChecklistTile(:final surfaceId):
+      openTtcSurface(context, surfaceId);
+
+    // ---- a person, reached by asking ------------------------------------
+    //
+    // Same destination as a booking tile and the same guard. Only the chip
+    // differs, because "Talk" and "Booking" are different promises to somebody
+    // who has not started trying yet.
+    case TtcTalkTile(:final action):
+      // ⚠️ AN OFFERING ID OPENS THAT OFFERING — 2026-09-06. His side's Talk
+      // tiles name the andrologist consultation rather than the consults
+      // shelf, because the brief says "Consult (andrologist)" and a shelf
+      // with his card third on it is not that. Same null rule as the
+      // masterclass below: an unknown id opens nothing, loudly, in the test.
+      if (ttcOfferingById(action) case final offering?) {
+        Navigator.of(context).push(MaterialPageRoute<void>(
+          settings: RouteSettings(name: 'ttc/offering/$action'),
+          builder: (_) => TtcOfferingScreen(offering: offering),
+        ));
+        return;
+      }
+      if (action != kTtcActConsult) return;
+      Navigator.of(context).push(
+        MaterialPageRoute<void>(
+          settings: const RouteSettings(name: 'ttc/consults'),
+          builder: (_) => const TtcPrepareScreen(onlyCategory: 'consults'),
       ));
 
     case TtcMasterclassTile(:final offeringId):
@@ -1786,13 +3242,13 @@ class _CarouselState extends State<_Carousel> {
                         child: SingleChildScrollView(
                           child: Text(card.body,
                               style: ttcBody(13.5, color: ttcInk, h: 1.65)),
-                        ),
+                      ),
                       ),
                     ]),
               ),
             );
           },
-        ),
+      ),
       ),
       const SizedBox(height: 14),
       Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -1864,6 +3320,7 @@ void openTtcArticle(
   TtcArt? art,
   String? imageUrl,
   required double hue,
+  String? atHeading,
 }) {
   final read = ttcReadById(readId);
   // Null is a real answer — an unknown id opens nothing rather than the wrong
@@ -1881,6 +3338,7 @@ void openTtcArticle(
     builder: (_) => PvReaderScreen(
       read: read,
       lang: lang,
+        openAtHeading: atHeading,
       resolveVideo: ttcVideoBySlot,
       readTitle: ttcReadTitle,
       openRead: (context, id) => openTtcSurface(context, '$kTtcReadPrefix$id'),
@@ -1890,4 +3348,61 @@ void openTtcArticle(
           : TtcHeroArt(art: art, tint: tint, imageUrl: imageUrl),
     ),
   ));
+}
+
+/// A red flag, pinned above a group's rails.
+///
+/// ⚠️ NOT RED, AND THAT IS DELIBERATE ON THIS AREA IN PARTICULAR. `danger` in
+/// this design system is reserved for destructive confirmation, never urgency,
+/// and a scarlet block on a screen opened days after a miscarriage shouts at
+/// somebody who is already frightened. It is the coral tint every other urgent
+/// callout in this stage uses, and it earns attention by sitting above
+/// everything rather than by being loud.
+class _PinnedRedFlag extends StatelessWidget {
+  const _PinnedRedFlag({
+    required this.callout,
+    required this.lang,
+    required this.p,
+  });
+
+  final PvCallout callout;
+  final AppLanguage lang;
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) => Container(
+    width: double.infinity,
+    padding: const EdgeInsets.all(18),
+    decoration: BoxDecoration(
+      color: ttcCoralTint,
+      borderRadius: BorderRadius.circular(20),
+    ),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            const Icon(Icons.info_outline_rounded, size: 18, color: ttcCoral),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                callout.title.of(lang),
+                style: pvJakarta(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w700,
+                  height: 1.3,
+                  color: p.ink1,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Text(
+          callout.body.of(lang),
+          style: pvManrope(fontSize: 13.5, height: 1.6, color: p.ink1),
+        ),
+      ],
+    ),
+  );
 }

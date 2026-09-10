@@ -101,11 +101,6 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
       children: [
         const SizedBox(height: 22),
 
-        if (derived) ...[
-          ttcToolPad(_FromYourLogs(ctx: _ctx)),
-          const SizedBox(height: 20),
-        ],
-
         ttcToolPad(TtcToolProgress(done: _answered, total: 6)),
         const SizedBox(height: 18),
 
@@ -119,10 +114,12 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
           // and an interrogation.
           note: 'Age changes how soon a conversation is useful, and nothing '
               'else on this screen.',
-          child: TtcToolChoice<IvfAge>(
+          child: TtcToolChoice<FertilityAgeBand>(
             value: _a.age,
             hue: kIvfHue,
-            options: {for (final v in IvfAge.values) v: v.label},
+            options: {
+              for (final v in FertilityAgeBand.values) v: v.label.en
+            },
             onTap: (v) => _set(() => _a.age = v),
           ),
         )),
@@ -217,13 +214,39 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
         )),
 
         const SizedBox(height: 6),
+        // ⚠️ MOVED BELOW THE QUESTIONS ON 2026-09-03, ON REQUEST. It used to
+        // open the screen, and opening a six-question tool with a paragraph
+        // about what the app already knows delays the first question for
+        // everybody in order to explain two pre-selected chips.
+        //
+        // Nothing is lost by the move: questions 2 and 3 each carry their own
+        // "Filled in from your journey — change it if that looks wrong" note,
+        // which is where that explanation actually belongs. Down here the block
+        // does the other job it was always doing — showing her that the answers
+        // she gave sit on top of a history the app kept, rather than in a void.
+        if (derived) ...[
+          ttcToolPad(_FromYourLogs(ctx: _ctx)),
+          const SizedBox(height: 20),
+        ],
+
         ttcToolPad(TtcToolPrimary(
           label: 'See what this means',
-          onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
-            settings: const RouteSettings(name: 'ttc/ivf_readiness_result'),
-            builder: (_) => TtcIvfReadinessResultScreen(
-                result: ivfBuildReadiness(_a, _ctx)),
-          )),
+          // ⚠️ SAVED ON THE WAY THROUGH, NOT ON THE WAY IN. Writing each answer
+          // as it is tapped would record a half-finished questionnaire and set
+          // `hasCompleted` on somebody who abandoned it. The moment she asks
+          // what it means is the moment she has finished.
+          //
+          // Fire-and-forget: the push must not wait on shared_preferences, and
+          // a failed local write is not a reason to withhold her result. Same
+          // trade the rest of this stage makes.
+          onTap: () {
+            _a.writeThrough(TtcFertilityHelpStore.instance);
+            Navigator.of(context).push(MaterialPageRoute<void>(
+              settings: const RouteSettings(name: 'ttc/ivf_readiness_result'),
+              builder: (_) => TtcIvfReadinessResultScreen(
+                  result: ivfBuildReadiness(_a, _ctx)),
+            ));
+          },
         )),
         const SizedBox(height: 14),
         ttcToolPad(Builder(builder: (context) {
@@ -392,7 +415,7 @@ class TtcIvfReadinessResultScreen extends StatelessWidget {
           )),
           const SizedBox(height: 10),
           ttcToolPad(TtcToolSecondary(
-            label: 'What to bring to that conversation',
+            label: 'What to take with you',
             onTap: () => _openNotes(context, result),
           )),
         ] else ...[
@@ -419,6 +442,22 @@ class TtcIvfReadinessResultScreen extends StatelessWidget {
   }
 }
 
+/// ⚠️ THE SAME NAME AS THE PCOS ONE, AND THAT IS THE POINT — 2026-09-03.
+///
+/// These two screens do one job: turn what she just answered into four or six
+/// lines she can screenshot and hold up. They were called "What to take to your
+/// doctor" and "What to bring to that conversation", which is two names for one
+/// thing — and a person who meets both learns the app has two features here
+/// when it has one.
+///
+/// **"What to take with you"** is the wording both now use, and it is neither
+/// of the originals on purpose. "To your doctor" presumes she has one, which is
+/// exactly what the IVF readiness tool exists to establish she may not; "that
+/// conversation" is an abstraction, and the thing she is actually doing is
+/// taking a page into a room.
+///
+/// Both screens also now render the SAME card — `TtcToolNotesCard` — rather
+/// than two copies of it. See the note in `ttc_pcos_stand_screen.dart`.
 class TtcIvfNotesScreen extends StatelessWidget {
   const TtcIvfNotesScreen({super.key, required this.result});
 
@@ -429,7 +468,7 @@ class TtcIvfNotesScreen extends StatelessWidget {
         hue: kIvfHue,
         variant: 4,
         eyebrow: 'Appointment notes',
-        title: 'What to bring to\nthat conversation.',
+        title: 'What to take\nwith you.',
         intro: 'Screenshot this, or read it out. Six lines, all of them yours.',
         children: [
           const SizedBox(height: 24),

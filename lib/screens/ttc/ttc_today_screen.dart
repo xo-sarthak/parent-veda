@@ -558,6 +558,9 @@ Future<void> logTtcPeriod(BuildContext context) async {
     firstDate: now.subtract(const Duration(days: 400)),
     lastDate: now,
     helpText: TtcS.current().logPeriodTitle,
+    // Spelled out, so the typed field says which order it wants rather than
+    // making her find out by being rejected.
+    fieldHintText: 'dd/mm/yyyy',
     // ⚠️ A WHITE PICKER, NOT A PURPLE ONE. The app's `colorScheme.primary` is
     // ttcPurple, and Material fills the date picker's whole header with it —
     // so a control that is otherwise plain system furniture arrived as a
@@ -573,12 +576,54 @@ Future<void> logTtcPeriod(BuildContext context) async {
           surfaceTintColor: Colors.transparent,
           headerBackgroundColor: Colors.white,
           headerForegroundColor: ttcTitleInk,
-          dayForegroundColor: WidgetStateProperty.resolveWith((s) =>
-              s.contains(WidgetState.selected) ? Colors.white : ttcInk),
+          // ⚠️ THE DISABLED CASE WAS MISSING, AND THAT IS WHY THE CALENDAR
+          // FELT DEAD — FIXED 2026-09-05. Reported as *"I cannot select dates
+          // in calendar"*.
+          //
+          // `lastDate` is today, because a period start is always in the past.
+          // So roughly half of the visible month is disabled — and this
+          // resolver returned `ttcInk` for every state that was not `selected`,
+          // which includes `disabled`. Future days therefore rendered in the
+          // SAME ink as selectable ones, and tapping them did nothing.
+          //
+          // Nothing was broken. The picker was working exactly as told and
+          // giving the reader no way to know which half of it was alive, which
+          // from the outside is indistinguishable from a frozen screen.
+          //
+          // ⚠️ WORTH GENERALISING: overriding a `WidgetStateProperty` with a
+          // single-condition ternary silently flattens every state you did not
+          // name. `selected` was named; `disabled` was not; the default the
+          // override replaced had handled both.
+          dayForegroundColor: WidgetStateProperty.resolveWith((s) {
+            if (s.contains(WidgetState.disabled)) {
+              return ttcMuted.withValues(alpha: 0.55);
+            }
+            return s.contains(WidgetState.selected) ? Colors.white : ttcInk;
+          }),
           dayBackgroundColor: WidgetStateProperty.resolveWith((s) =>
               s.contains(WidgetState.selected) ? ttcPurple : Colors.transparent),
-          todayForegroundColor:
-              WidgetStateProperty.all(ttcPurple),
+          // ⚠️ PURPLE ON PURPLE — FIXED 2026-09-05. Reported: *"the whole
+          // purple thing covers the date, I don't know which date it is… on the
+          // current date seems very poor."*
+          //
+          // `WidgetStateProperty.all` returns the same colour for EVERY state,
+          // so today's digits stayed purple even when today was the selected
+          // day — and the selected day's background is purple. The number went
+          // invisible on exactly one cell: the one people look at first.
+          //
+          // Same shape as the disabled-days bug two lines up, and the same
+          // lesson: `.all()` and single-condition ternaries flatten the states
+          // you did not name. The default they replace handled them.
+          todayForegroundColor: WidgetStateProperty.resolveWith((s) {
+            if (s.contains(WidgetState.selected)) return Colors.white;
+            if (s.contains(WidgetState.disabled)) {
+              return ttcMuted.withValues(alpha: 0.55);
+            }
+            return ttcPurple;
+          }),
+          // And no ring around a filled cell — a border in the fill's own
+          // colour is invisible, and in any other colour it is a second mark on
+          // the one day that already has one.
           todayBorder: const BorderSide(color: ttcPurple),
           shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(24)),

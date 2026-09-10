@@ -21,11 +21,13 @@ import 'package:parentveda/screens/ttc/ttc_can_i_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_community_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_nutrition_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_records_screen.dart';
+import 'package:parentveda/screens/ttc/ttc_records_v2.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/services/community_store.dart';
 import 'package:parentveda/ttc/ttc_can_i_data.dart';
 import 'package:parentveda/ttc/ttc_daily_data.dart';
 import 'package:parentveda/ttc/ttc_journal_store.dart';
+import 'package:parentveda/ttc/ttc_records_grouping.dart';
 import 'package:parentveda/ttc/ttc_records_store.dart';
 import 'package:parentveda/ttc/ttc_tests_data.dart';
 
@@ -121,7 +123,11 @@ void main() {
 
     testWidgets('the screen invites when empty', (tester) async {
       await pumpTall(tester, const TtcRecordsScreen());
-      expect(find.text(const TtcS(false).recordsEmptyTitle), findsOneWidget);
+      // The empty state argues for the first entry rather than announcing an
+      // absence, and the fastest first entry is a photograph of the paper she
+      // is already holding - so the camera is the primary action.
+      expect(find.byType(TtcRecordsEmpty), findsOneWidget);
+      expect(find.text('Photograph a report'), findsOneWidget);
     });
 
     testWidgets('Reports shows only library results, Records shows everything',
@@ -135,7 +141,33 @@ void main() {
 
       await pumpTall(tester, const TtcRecordsScreen(resultsOnly: true));
       expect(find.text('My own note'), findsNothing);
-      expect(find.text('AMH'), findsOneWidget);
+      // "AMH" now appears twice on purpose: once as her filed row, once in the
+      // coverage block below it, which lists the same library by name. The row
+      // is the one that matters here.
+      expect(find.text('AMH'), findsWidgets);
+    });
+
+    testWidgets('grouping puts the direction on the row, before any tap',
+        (tester) async {
+      TtcRecordsStore.instance
+        ..add(
+            label: 'AMH',
+            testId: 'amh',
+            value: '2.1',
+            unit: 'ng/mL',
+            takenOn: DateTime(2025, 3, 4))
+        ..add(
+            label: 'AMH',
+            testId: 'amh',
+            value: '1.2',
+            unit: 'ng/mL',
+            takenOn: DateTime(2026, 8, 18));
+
+      await pumpTall(tester, const TtcRecordsScreen());
+      // One row, not two cards - and the older reading is quoted on it, which
+      // is the whole argument of the redesign.
+      expect(find.text('2 readings'), findsOneWidget);
+      expect(find.textContaining('first was 2.1 ng/mL'), findsOneWidget);
     });
 
     testWidgets("a library result carries the test's plain-language note",
@@ -143,7 +175,96 @@ void main() {
       TtcRecordsStore.instance
           .add(label: 'AMH', testId: 'amh', value: '2.1', takenOn: DateTime.now());
       await pumpTall(tester, const TtcRecordsScreen());
+
+      // It moved from the list row to the result she opens. A list of fifteen
+      // paragraphs is not read; one paragraph on the result in front of her is.
+      await tester.tap(find.text('AMH').first);
+      await tester.pumpAndSettle();
       expect(find.text(ttcTestById('amh')!.reading(false)), findsOneWidget);
+    });
+
+    testWidgets('a photo-only record can still be completed later',
+        (tester) async {
+      // Photo-first adding is only kind if there is a way back to finish the
+      // record. Without "Type it" the fastest path to filing also permanently
+      // produces a row that can never show a value or join a trend.
+      final r = TtcRecordsStore.instance
+          .add(label: 'Thyroid panel', takenOn: DateTime(2026, 1, 8));
+
+      await pumpTall(tester, const TtcRecordsScreen());
+      expect(find.text('Type it'), findsOneWidget);
+
+      await tester.tap(find.text('Type it'));
+      await tester.pumpAndSettle();
+      await tester.enterText(find.byType(TextField).first, '3.4');
+      await tester.tap(find.text('Save it'));
+      await tester.pumpAndSettle();
+
+      expect(
+          TtcRecordsStore.instance.records
+              .firstWhere((e) => e.id == r.id)
+              .value,
+          '3.4');
+    });
+
+    test('the coverage block names what is not added, never what is missing',
+        () {
+      // "Missing" is a judgement about the clinician looking after her.
+      // "Not added" is a fact about this app's folder.
+      TtcRecordsStore.instance
+          .add(label: 'AMH', testId: 'amh', takenOn: DateTime(2026, 6, 1));
+      final c = ttcRecordCoverage();
+      expect(c.added.any((t) => t.id == 'amh'), isTrue);
+      expect(c.notAdded, isNotEmpty);
+      expect(c.total, ttcTests.length);
+    });
+
+    testWidgets('the appointment card appears only when there is one, soon',
+        (tester) async {
+      TtcRecordsStore.instance
+          .add(label: 'AMH', value: '1.2', takenOn: DateTime(2026, 8, 18));
+
+      // A folder with results but no appointment offers no door.
+      await pumpTall(tester, const TtcRecordsScreen());
+      expect(find.textContaining('hand over'), findsNothing);
+
+      // One booked next month is not a reason to gather results today.
+      TtcAppointmentsStore.instance.add(
+          title: 'Dr Menon, follow-up',
+          startsLocal: DateTime.now().add(const Duration(days: 40)));
+      await pumpTall(tester, const TtcRecordsScreen());
+      expect(find.textContaining('hand over'), findsNothing);
+
+      TtcAppointmentsStore.instance.add(
+          title: 'Dr Menon, review',
+          startsLocal: DateTime.now().add(const Duration(days: 2)));
+      await pumpTall(tester, const TtcRecordsScreen());
+      expect(find.textContaining('hand over'), findsOneWidget);
+
+      await tester.tap(find.text('Dr Menon, review'));
+      await tester.pumpAndSettle();
+      // The sheet ends on what is NOT in it - the line that stops a summary
+      // being mistaken for the whole file.
+      expect(find.text('NOT IN HERE'), findsOneWidget);
+    });
+
+    test('a change is arithmetic on her own two readings, or it is nothing',
+        () {
+      final newer = TtcRecordsStore.instance
+          .add(label: 'AMH', value: '1.2', unit: 'ng/mL', takenOn: DateTime(2026, 8, 1));
+      final older = TtcRecordsStore.instance
+          .add(label: 'AMH', value: '2.1', unit: 'ng/mL', takenOn: DateTime(2025, 3, 1));
+      expect(ttcReadingChange(newer, older), '0.9 lower');
+
+      // Different units, a text result, or no number at all: say nothing
+      // rather than say something wrong.
+      final other = TtcRecordsStore.instance
+          .add(label: 'AMH', value: '2.1', unit: 'pmol/L', takenOn: DateTime(2025, 1, 1));
+      expect(ttcReadingChange(newer, other), isNull);
+
+      final words = TtcRecordsStore.instance
+          .add(label: 'HSG', value: 'both tubes open', takenOn: DateTime(2026, 2, 6));
+      expect(ttcReadingChange(words, older), isNull);
     });
   });
 

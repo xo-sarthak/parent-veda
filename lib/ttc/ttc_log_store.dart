@@ -44,6 +44,49 @@ class TtcLogValue {
   String get key => '$tracker/$field/$dayKey';
 }
 
+// =============================================================================
+//  ⚠️ THE HABIT MERGE — 2026-09-04
+// -----------------------------------------------------------------------------
+//  Sleep, movement, stress and lifestyle became one `habits` tracker. This
+//  store keys every row `tracker/field/day`, so the merge is a rename of the
+//  first third of the key — and without this map, every night of sleep anybody
+//  has already logged would still be in the file and invisible in the app.
+//
+//  ⚠️ IT IS APPLIED ON READ, NOT AS A ONE-OFF REWRITE, AND THAT IS THE WHOLE
+//  DESIGN. A migrate-once-on-upgrade flag looks tidier and is wrong here for
+//  two reasons:
+//
+//    1. The cloud table keys on the tracker id too. A device that migrated
+//       locally would pull `sleep/hours/...` back from Postgres on the next
+//       sync and the old rows would reappear, permanently, on every device
+//       that had ever synced.
+//    2. A one-off migration runs once and can only be got wrong once. This
+//       runs every time, is idempotent, and a device that skipped the upgrade
+//       — restored from a backup, reinstalled, whatever — is handled by the
+//       same code path rather than by a flag nobody will remember to check.
+//
+//  The cost is that the old ids survive in `shared_preferences` and in
+//  Postgres. That is deliberate: nothing is destroyed, and a revert is
+//  deleting this map rather than restoring from a backup nobody took.
+//
+//  ⚠️ FIELD IDS WERE UNIQUE ACROSS ALL FOUR, which is the only reason this is
+//  safe. `hours`, `quality`, `minutes`, `kind`, `stress`, `caffeine`,
+//  `alcohol`, `smoking`, `water` — no two collided, so no row can land on
+//  another. If a future merge is proposed where two field ids DO collide, this
+//  approach does not work and the fields have to be renamed first.
+// =============================================================================
+
+const Map<String, String> kTtcHabitMerge = {
+  'sleep': 'habits',
+  'exercise': 'habits',
+  'stress': 'habits',
+  'lifestyle': 'habits',
+};
+
+/// The tracker id a row belongs under today.
+String ttcMergedTracker(String tracker) =>
+    kTtcHabitMerge[tracker] ?? tracker;
+
 class TtcLogStore extends ChangeNotifier with TtcSyncedStore {
   TtcLogStore._() {
     _load();
@@ -168,13 +211,20 @@ class TtcLogStore extends ChangeNotifier with TtcSyncedStore {
           final m = jsonDecode(row);
           if (m is! Map) continue;
           final v = TtcLogValue(
-            tracker: m['t'] as String,
+            // ⚠️ REMAPPED ON THE WAY IN. A row saved under `sleep` before the
+            // habit merge is read back under `habits`, so nothing anybody
+            // logged disappears. See `kTtcHabitMerge`.
+            tracker: ttcMergedTracker(m['t'] as String),
             field: m['f'] as String,
             dayKey: m['d'] as String,
             value: (m['v'] as num).toDouble(),
             note: m['n'] as String?,
           );
-          _values[v.key] = v;
+          // ⚠️ `putIfAbsent`, NOT `[]=`. Two old rows can now land on one key —
+          // for instance a device that logged `sleep/hours` and later logged
+          // `habits/hours` on the same day. First one in wins, and since the
+          // list is read in save order that is the newer write.
+          _values.putIfAbsent(v.key, () => v);
         } catch (_) {/* a corrupt row is dropped, not fatal */}
       }
     } catch (_) {/* keep defaults */}
@@ -202,13 +252,17 @@ class TtcLogStore extends ChangeNotifier with TtcSyncedStore {
       final value = row['value'];
       if (tracker is! String || field is! String || day == null) continue;
       if (value is! num) continue;
-      final key = '$tracker/$field/$day';
+      // ⚠️ AND ON THE WAY IN FROM POSTGRES, for the reason written on
+      // `kTtcHabitMerge`: the cloud table keys on the tracker id too, so
+      // without this every sync would re-introduce the pre-merge ids.
+      final merged = ttcMergedTracker(tracker);
+      final key = '$merged/$field/$day';
       // Union: a value logged offline is kept rather than overwritten by an
       // older cloud row for the same day.
       _values.putIfAbsent(
         key,
         () => TtcLogValue(
-          tracker: tracker,
+          tracker: merged,
           field: field,
           dayKey: day,
           value: value.toDouble(),

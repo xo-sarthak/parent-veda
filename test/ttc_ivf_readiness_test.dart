@@ -17,6 +17,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:parentveda/screens/ttc/ttc_ivf_readiness_screen.dart';
 import 'package:parentveda/ttc/cycle_store.dart';
 import 'package:parentveda/ttc/ttc_fertility_help_rules.dart';
+import 'package:parentveda/ttc/ttc_fertility_help_store.dart';
 import 'package:parentveda/ttc/ttc_ivf_readiness.dart';
 
 void main() {
@@ -31,7 +32,7 @@ void main() {
   /// below starts from this and changes one thing — which is what makes the
   /// assertions about that one thing.
   IvfReadinessAnswers safe() => IvfReadinessAnswers()
-    ..age = IvfAge.under35
+    ..age = FertilityAgeBand.under35
     ..trying = IvfTrying.underSix
     ..cycles = IvfCycles.regular
     ..conditionsChecked = true
@@ -91,7 +92,7 @@ void main() {
   group('the age and duration hinges hold at exactly 35 and 40', () {
     test('35 to 37 with six months earns the conversation', () {
       final a = safe()
-        ..age = IvfAge.thirtyFiveTo37
+        ..age = FertilityAgeBand.thirtyFiveTo37
         ..trying = IvfTrying.sixToTwelve;
       expect(verdictOf(a), IvfVerdict.nowByAge);
     });
@@ -101,19 +102,19 @@ void main() {
       // ⚠️ THE RULE WITH THE SHARPEST EDGE IN THE SPEC: never tell someone 35
       // or over to keep waiting. Under six months there is no positive reason
       // to refer — so the answer must be the neutral default, not reassurance.
-      final a = safe()..age = IvfAge.thirtyFiveTo37;
+      final a = safe()..age = FertilityAgeBand.thirtyFiveTo37;
       expect(verdictOf(a), isNot(IvfVerdict.keepTrying));
     });
 
     test('38 to 40 behaves the same as 35 to 37', () {
       final a = safe()
-        ..age = IvfAge.thirtyEightTo40
+        ..age = FertilityAgeBand.thirtyEightTo40
         ..trying = IvfTrying.sixToTwelve;
       expect(verdictOf(a), IvfVerdict.nowByAge);
     });
 
     test('over 40 is "soon", regardless of duration', () {
-      final a = safe()..age = IvfAge.over40;
+      final a = safe()..age = FertilityAgeBand.over40;
       expect(verdictOf(a), IvfVerdict.soon);
       expect(ivfBuildReadiness(a, empty).timing.toLowerCase(),
           contains('soon'));
@@ -183,7 +184,7 @@ void main() {
     test('even with every red flag set', () {
       final a = safe()
         ..check = IvfCheck.inItNow
-        ..age = IvfAge.over40
+        ..age = FertilityAgeBand.over40
         ..cycles = IvfCycles.longGaps
         ..semen = IvfSemen.issue
         ..conditions = {'pcos', 'endo'};
@@ -237,7 +238,7 @@ void main() {
         'likely to conceive',
       ];
 
-      for (final age in IvfAge.values) {
+      for (final age in FertilityAgeBand.values) {
         for (final trying in IvfTrying.values) {
           for (final cycles in IvfCycles.values) {
             for (final semen in IvfSemen.values) {
@@ -273,9 +274,9 @@ void main() {
 
     test('and no path ever says keep waiting to someone 35 or over', () {
       for (final age in [
-        IvfAge.thirtyFiveTo37,
-        IvfAge.thirtyEightTo40,
-        IvfAge.over40
+        FertilityAgeBand.thirtyFiveTo37,
+        FertilityAgeBand.thirtyEightTo40,
+        FertilityAgeBand.over40
       ]) {
         for (final trying in IvfTrying.values) {
           for (final cycles in IvfCycles.values) {
@@ -348,6 +349,84 @@ void main() {
       await pump(tester, TtcIvfReadinessResultScreen(result: r));
       await pump(tester, TtcIvfNotesScreen(result: r));
       expect(find.text(kIvfChecklistDisclaimer), findsOneWidget);
+    });
+  });
+
+  // ===========================================================================
+  group('answering it once is answering it', () {
+    setUp(() async {
+      SharedPreferences.setMockInitialValues({});
+      await TtcFertilityHelpStore.instance.reset();
+    });
+
+    test('the six answers land in the shipped store', () async {
+      final a = IvfReadinessAnswers()
+        ..age = FertilityAgeBand.thirtyFiveTo37
+        ..trying = IvfTrying.overAYear
+        ..cycles = IvfCycles.irregular
+        ..conditionsChecked = true
+        ..conditions = {'pcos'}
+        ..semen = IvfSemen.issue
+        ..check = IvfCheck.past;
+
+      final store = TtcFertilityHelpStore.instance;
+      await a.writeThrough(store);
+
+      expect(store.answerFor('age'), 'thirtyFiveTo37');
+      expect(store.answerFor('pathway'), 'done');
+      expect(store.answerFor('conditions'), 'pcos');
+      expect(store.answerFor('partner'), 'yes');
+      // The whole point: a second visit does not start from nothing.
+      expect(store.hasCompleted, isTrue);
+    });
+
+    test('nothing she was never asked is answered for her', () async {
+      final a = IvfReadinessAnswers()..age = FertilityAgeBand.under35;
+      final store = TtcFertilityHelpStore.instance;
+      await a.writeThrough(store);
+
+      // This flow asks six of the store's ten questions. Writing a default into
+      // a clinical question she never saw would put a "no" in her mouth in the
+      // one place it decides whether she is told to see somebody.
+      for (final id in ['miscarriages', 'pain', 'pelvic', 'cancer']) {
+        expect(store.answerFor(id), isNull, reason: id);
+      }
+      expect(store.missingQuestionIds, contains('cancer'));
+    });
+
+    test("'not sure' is not recorded as an answer", () async {
+      final a = IvfReadinessAnswers()
+        ..conditionsChecked = true
+        ..conditionsUnsure = true
+        ..semen = IvfSemen.notSure;
+      final store = TtcFertilityHelpStore.instance;
+      await a.writeThrough(store);
+
+      // The store can hold named conditions or an explicit "none". It has no
+      // way to hold "she does not know", and writing "none" would turn an
+      // absence of information into information.
+      expect(store.answerFor('conditions'), isNull);
+      // And an undone or unclear semen test is not a clean one - writing "no"
+      // would clear a red flag on the strength of a test nobody has run.
+      expect(store.answerFor('partner'), isNull);
+    });
+
+    test('a normal semen test does clear the concern', () async {
+      final a = IvfReadinessAnswers()..semen = IvfSemen.normal;
+      final store = TtcFertilityHelpStore.instance;
+      await a.writeThrough(store);
+      expect(store.answerFor('partner'), 'no');
+    });
+
+    test("'in it right now' maps onto the store's own word", () async {
+      // `pathway` is switched on as a raw string, so an enum's `.name` would
+      // fall through to notStarted silently - a wrong answer that never
+      // announces itself.
+      final a = IvfReadinessAnswers()..check = IvfCheck.inItNow;
+      final store = TtcFertilityHelpStore.instance;
+      await a.writeThrough(store);
+      expect(store.answerFor('pathway'), 'current');
+      expect(store.context.pathway, FertilityCarePathway.currentlyInCare);
     });
   });
 }

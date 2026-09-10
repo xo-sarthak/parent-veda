@@ -49,6 +49,9 @@ class TtcField {
     this.lowHi = '',
     this.highEn = '',
     this.highHi = '',
+    this.readId,
+    this.group,
+    this.start,
   });
 
   final String id;
@@ -69,6 +72,49 @@ class TtcField {
   final String lowHi;
   final String highEn;
   final String highHi;
+
+  /// The piece that explains this field, where another area of the stage owns
+  /// the subject.
+  ///
+  /// ⚠️ A REFERENCE BY ID, NEVER A COPY — the rebuild brief's Step 5. Getting
+  /// ready is the single source for before-you-start body prep; it is NOT the
+  /// owner of stress, which belongs to Mind and body. So the stress field names
+  /// that area's read id and the article stays edited in exactly one place.
+  ///
+  /// ⚠️ AND IT IS ON THE FIELD, NOT THE TRACKER. The brief says "the 'Track
+  /// what you're working on' STRESS PIECE references the Mind and body
+  /// content" — one field of nine, not the whole tracker. A tracker-level link
+  /// would put a stress article at the top of a screen where eight of the nine
+  /// rows are about something else.
+  ///
+  /// Null on every other field, and that is the normal case: a field explains
+  /// itself unless somebody else owns the subject.
+  final String? readId;
+
+  /// The eyebrow this field sits under.
+  ///
+  /// ⚠️ IN THE DATA, NOT IN THE SCREEN. The design groups nine fields under
+  /// four headings — Sleep, Movement, Stress, Cutting down — and the obvious
+  /// shortcut is to hard-code those four in the widget. That would make the
+  /// tracker screen know about one tracker, which is the one thing it has
+  /// never done: it renders any tracker from a definition, and eight of them
+  /// used to share it.
+  ///
+  /// Null means no eyebrow, which is every other tracker: they have one or two
+  /// fields and grouping them would be ceremony.
+  final String? group;
+
+  /// Where a stepper lands on its first tap.
+  ///
+  /// ⚠️ NOT `min`, AND THE DIFFERENCE IS THE WHOLE POINT OF IT. Minutes moved
+  /// starts at 0 and steps by 5, so a first tap on `+` from `min` gives "5
+  /// minutes" and eleven more taps are needed to reach a walk. The design
+  /// starts it at 20 — the answer somebody is most likely to be reaching for —
+  /// and every other value is one or two taps either side of it.
+  ///
+  /// Null falls back to `min`, which is right for a field with no obvious
+  /// middle.
+  final double? start;
 
   String label(bool hi) => hi ? labelHi : labelEn;
   String low(bool hi) => hi ? lowHi : lowEn;
@@ -265,6 +311,285 @@ const List<TtcTracker> ttcTrackers = [
   ),
 
   // ---------------------------------------------------------------------------
+
+  // ---------------------------------------------------------------------------
+  TtcTracker(
+    id: 'mood',
+    iconKey: 'mood',
+    titleEn: 'Mood',
+    titleHi: 'Mood',
+    subtitleEn: 'However today actually was',
+    subtitleHi: 'Aaj jaisa bhi raha',
+    whyEn:
+        'This is not here to be improved. It is here because months blur together, and being able to see that the hard days cluster - around the waiting, around a period, around a family gathering - makes them easier to prepare for and much easier to explain to someone else.',
+    whyHi:
+        'Ye yahan "behtar karne" ke liye nahi hai. Ye isliye hai kyunki mahine aapas mein ghul-mil jaate hain, aur ye dekh paana ki mushkil din kab ikatthe aate hain - intezaar ke aas-paas, period ke aas-paas, kisi family function ke aas-paas - unke liye taiyaar rehna aasaan bana deta hai, aur kisi ko samjhana usse bhi aasaan.',
+    fields: [
+      TtcField(
+        id: 'mood',
+        labelEn: 'Today',
+        labelHi: 'Aaj',
+        kind: TtcFieldKind.scale,
+        choicesEn: _moodEn,
+        choicesHi: _moodHi,
+        lowEn: 'Very low',
+        lowHi: 'Bahut kam',
+        highEn: 'Really good',
+        highHi: 'Bahut achha',
+      ),
+    ],
+  ),
+
+  // ---------------------------------------------------------------------------
+
+  // ---------------------------------------------------------------------------
+
+  // ---------------------------------------------------------------------------
+  TtcTracker(
+    id: 'partner_health',
+    iconKey: 'partner',
+    titleEn: 'Partner Health',
+    titleHi: 'Partner ki sehat',
+    subtitleEn: 'Half the picture',
+    subtitleHi: 'Aadhi tasveer',
+    whyEn:
+        'A male factor is involved in roughly forty to fifty per cent of couples who struggle, and sperm takes about ninety days to make - so what is recorded here today shows up around three months from now.\n\nThis exists because in most Indian clinics the woman is investigated first, through tests that are slower, costlier and more invasive. This is the other half.',
+    whyHi:
+        'Jo couples mushkil jhelte hain unmein lagbhag chalis se pachas pratishat mein mard ka factor hota hai, aur sperm banne mein lagbhag nabbe din lagte hain - toh aaj jo yahan record hota hai, wo teen mahine baad dikhta hai.\n\nYe isliye hai kyunki zyadatar Indian clinics mein pehle aurat ke test hote hain - jo dheere, mehnge aur zyada takleefdeh hote hain. Ye doosra aadha hissa hai.',
+    forPartner: true,
+    fields: [
+      TtcField(
+        id: 'sleep',
+        labelEn: 'Hours slept',
+        labelHi: 'Kitne ghante soye',
+        kind: TtcFieldKind.number,
+        unit: 'hrs',
+        min: 0,
+        max: 14,
+        step: 0.5,
+      ),
+      TtcField(
+        id: 'alcohol',
+        group: 'Cutting down',
+        labelEn: 'Alcohol today',
+        labelHi: 'Aaj sharab',
+        kind: TtcFieldKind.choice,
+        choicesEn: ['None', '1 drink', '2 drinks', 'More than 2'],
+        choicesHi: ['Bilkul nahi', '1 drink', '2 drink', '2 se zyada'],
+      ),
+      TtcField(
+        id: 'smoking',
+        group: 'Cutting down',
+        labelEn: 'Smoked today',
+        labelHi: 'Aaj smoke kiya',
+        kind: TtcFieldKind.choice,
+        choicesEn: ['No', 'Yes'],
+        choicesHi: ['Nahi', 'Haan'],
+      ),
+      TtcField(
+        id: 'heat',
+        labelEn: 'Long heat exposure - hot bath, sauna, laptop on lap',
+        labelHi: 'Lambi garmi - garam nahaana, sauna, god par laptop',
+        kind: TtcFieldKind.choice,
+        choicesEn: ['No', 'Yes'],
+        choicesHi: ['Nahi', 'Haan'],
+      ),
+      TtcField(
+        id: 'movement',
+        labelEn: 'Moved today',
+        labelHi: 'Aaj movement kiya',
+        kind: TtcFieldKind.choice,
+        choicesEn: ['No', 'A walk', 'A proper session'],
+        choicesHi: ['Nahi', 'Tehla', 'Poora session'],
+      ),
+    ],
+  ),
+
+  // ---------------------------------------------------------------------------
+  // ===========================================================================
+  //  ⚠️ ONE HABIT TRACKER, MERGED FROM FOUR — 2026-09-04
+  // ---------------------------------------------------------------------------
+  //  `getting_ready_rebuild.pdf` asks for "ONE tracker, reuse and consolidate
+  //  the separate sleep/movement/stress trackers". It shipped first as one
+  //  DESTINATION listing four trackers, which is a menu wearing a tracker's
+  //  name — logging sleep took two taps and nothing was actually consolidated.
+  //  Merged properly on request, and the Tools hub now carries one tile where
+  //  it carried four.
+  //
+  //  ⚠️ THE OLD FOUR ARE COMMENTED OUT BELOW, NOT DELETED, and their FIELD IDS
+  //  ARE PRESERVED EXACTLY. `hours`, `quality`, `minutes`, `kind`, `stress`,
+  //  `caffeine`, `alcohol`, `smoking`, `water` — all nine were unique across
+  //  the four trackers, which is the only reason this merge is a rename of the
+  //  tracker half of the key and nothing more. Had two of them collided, every
+  //  logged row for one would have had to be rewritten or lost.
+  //
+  //  ⚠️ AND EXISTING DATA MOVES WITH IT. `TtcLogStore` keys every row
+  //  `tracker/field/day`, so a merge without a migration silently hides every
+  //  night of sleep anybody has already logged. See `kTtcHabitMerge` in
+  //  `ttc_log_store.dart` — it remaps on local load AND on the way in from
+  //  Postgres, because the cloud table keys on the tracker id too and would
+  //  otherwise re-introduce the old ids on every pull.
+  //
+  //  ⚠️ FIELD ORDER IS THE ORDER SHE LIVES THEM. Sleep and movement first
+  //  because they are what the section tells her to work on; the three she is
+  //  cutting down next; water last because it is the least consequential thing
+  //  here and putting it first would say otherwise.
+  // ===========================================================================
+  TtcTracker(
+    id: 'habits',
+    iconKey: 'lifestyle',
+    titleEn: "What you're working on",
+    titleHi: 'Aap jis par kaam kar rahe hain',
+    subtitleEn: 'A record, not a report card',
+    subtitleHi: 'Ek record, report card nahi',
+    whyEn:
+        'Sleep, movement and cutting down are the habits with the clearest evidence behind them while trying. This is here so you can see what you have actually been doing. There is no score, no streak and nothing here to beat - log the ones you care about and leave the rest blank.',
+    whyHi:
+        'Neend, movement aur kam karna - koshish ke dauraan inhi aadaton ke peeche sabse saaf saboot hain. Ye isliye hai ki aap dekh sakein ki aapne asal mein kya kiya - number dene ke liye nahi. Jo aapko theek lage wahi log karein, baaki chhod dein.',
+    fields: [
+      TtcField(
+        id: 'hours',
+        group: 'Sleep',
+        start: 7,
+        labelEn: 'Hours slept',
+        labelHi: 'Kitne ghante soye',
+        kind: TtcFieldKind.number,
+        unit: 'hrs',
+        min: 0,
+        max: 14,
+        step: 0.5,
+      ),
+      TtcField(
+        id: 'quality',
+        group: 'Sleep',
+        labelEn: 'How it felt',
+        labelHi: 'Kaisi lagi',
+        kind: TtcFieldKind.scale,
+        choicesEn: _qualityEn,
+        choicesHi: _qualityHi,
+        lowEn: 'Poor',
+        lowHi: 'Kharaab',
+        highEn: 'Deep',
+        highHi: 'Gehri',
+      ),
+      TtcField(
+        id: 'minutes',
+        group: 'Movement',
+        start: 20,
+        labelEn: 'Minutes moved',
+        labelHi: 'Kitne minute',
+        kind: TtcFieldKind.number,
+        unit: 'min',
+        min: 0,
+        max: 300,
+        step: 5,
+      ),
+      TtcField(
+        id: 'kind',
+        group: 'Movement',
+        labelEn: 'What kind',
+        labelHi: 'Kis tarah ka',
+        kind: TtcFieldKind.choice,
+        choicesEn: ['Walk', 'Yoga', 'Strength', 'Stretch', 'Rest day'],
+        choicesHi: ['Tehalna', 'Yoga', 'Strength', 'Stretch', 'Aaram ka din'],
+      ),
+      TtcField(
+        id: 'stress',
+        group: 'Stress',
+        // ⚠️ MIND AND BODY OWNS THIS SUBJECT, AND THE LINK SAYS SO. Getting
+        // ready records the number; the piece explaining what stress does and
+        // does not do to fertility lives one door over and is referenced by id.
+        readId: 'ttc_read_stress_fertility',
+        labelEn: 'How heavy today felt',
+        labelHi: 'Aaj kitna bhaari laga',
+        kind: TtcFieldKind.scale,
+        choicesEn: _lowToHighEn,
+        choicesHi: _lowToHighHi,
+        lowEn: 'Light',
+        lowHi: 'Halka',
+        highEn: 'Very heavy',
+        highHi: 'Bahut bhaari',
+      ),
+      // ⚠️ TWO FIELDS ADDED FOR MIND & BODY'S "Today" — 2026-09-05, and they
+      // are added HERE rather than given their own store on purpose.
+      //
+      // Today shows two habit ticks: "In bed by about eleven" and "Home-cooked
+      // meals today". The quick build is a boolean in a new store beside the
+      // Today screen. That would give the app two places a sleep habit is
+      // recorded — this tracker and that store — and the woman who ticks it on
+      // Today would not see it in "What you're working on", which is the
+      // screen whose entire job is showing her what she has been doing.
+      //
+      // So the tick writes into the tracker that already owns habits. One
+      // record, two surfaces, and the food one satisfies the brief's rule that
+      // this area "references Getting ready, does not own or teach food" — it
+      // records the fact and teaches nothing.
+      TtcField(
+        id: 'bedtime',
+        group: 'Sleep',
+        labelEn: 'In bed by about eleven',
+        labelHi: 'Kareeb gyarah baje tak bistar par',
+        kind: TtcFieldKind.choice,
+        choicesEn: ['No', 'Yes'],
+        choicesHi: ['Nahi', 'Haan'],
+      ),
+      TtcField(
+        id: 'homecooked',
+        group: 'Food',
+        labelEn: 'Home-cooked meals today',
+        labelHi: 'Aaj ghar ka khana',
+        kind: TtcFieldKind.choice,
+        choicesEn: ['No', 'Some', 'Mostly'],
+        choicesHi: ['Nahi', 'Kuch', 'Zyadatar'],
+      ),
+      TtcField(
+        id: 'caffeine',
+        group: 'Cutting down',
+        labelEn: 'Caffeine today',
+        labelHi: 'Aaj caffeine',
+        kind: TtcFieldKind.choice,
+        choicesEn: ['None', '1 cup', '2 cups', '3 cups', 'More than 3'],
+        choicesHi: ['Bilkul nahi', '1 cup', '2 cup', '3 cup', '3 se zyada'],
+      ),
+      TtcField(
+        id: 'alcohol',
+        labelEn: 'Alcohol today',
+        labelHi: 'Aaj sharab',
+        kind: TtcFieldKind.choice,
+        choicesEn: ['None', '1 drink', '2 drinks', 'More than 2'],
+        choicesHi: ['Bilkul nahi', '1 drink', '2 drink', '2 se zyada'],
+      ),
+      TtcField(
+        id: 'smoking',
+        labelEn: 'Smoke today - yours or around you',
+        labelHi: 'Aaj smoke - apna ya aas-paas ka',
+        kind: TtcFieldKind.choice,
+        choicesEn: ['None', 'Passive only', 'Yes'],
+        choicesHi: ['Bilkul nahi', 'Sirf passive', 'Haan'],
+      ),
+      TtcField(
+        id: 'water',
+        group: 'Cutting down',
+        start: 1,
+        labelEn: 'Glasses of water',
+        labelHi: 'Paani ke glass',
+        kind: TtcFieldKind.number,
+        unit: 'glasses',
+        min: 0,
+        max: 20,
+      ),
+    ],
+  ),
+
+  // ===========================================================================
+  //  KEPT FOR REVERT — the four this replaced
+  // ---------------------------------------------------------------------------
+  //  Uncommenting these alone is NOT a revert: the rows have moved under the
+  //  `habits` tracker id and `kTtcHabitMerge` keeps moving them. Reverting
+  //  means removing that map as well, and accepting that anything logged since
+  //  the merge stays where it is.
+  // ===========================================================================
+  /*
   TtcTracker(
     id: 'sleep',
     iconKey: 'sleep',
@@ -301,36 +626,38 @@ const List<TtcTracker> ttcTrackers = [
       ),
     ],
   ),
-
-  // ---------------------------------------------------------------------------
   TtcTracker(
-    id: 'mood',
-    iconKey: 'mood',
-    titleEn: 'Mood',
-    titleHi: 'Mood',
-    subtitleEn: 'However today actually was',
-    subtitleHi: 'Aaj jaisa bhi raha',
+    id: 'exercise',
+    iconKey: 'exercise',
+    titleEn: 'Movement',
+    titleHi: 'Movement',
+    subtitleEn: 'Not fitness - movement',
+    subtitleHi: 'Fitness nahi - movement',
     whyEn:
-        'This is not here to be improved. It is here because months blur together, and being able to see that the hard days cluster - around the waiting, around a period, around a family gathering - makes them easier to prepare for and much easier to explain to someone else.',
+        'Moderate regular activity supports hormone balance, insulin sensitivity and sleep, and it helps notably in PCOS. Around thirty minutes most days is the usual recommendation, and a brisk walk counts.\n\nThe other end is real too: very intense training, especially with under-eating, can stop ovulation altogether. This is why there is no goal here to beat.',
     whyHi:
-        'Ye yahan "behtar karne" ke liye nahi hai. Ye isliye hai kyunki mahine aapas mein ghul-mil jaate hain, aur ye dekh paana ki mushkil din kab ikatthe aate hain - intezaar ke aas-paas, period ke aas-paas, kisi family function ke aas-paas - unke liye taiyaar rehna aasaan bana deta hai, aur kisi ko samjhana usse bhi aasaan.',
+        'Moderate regular activity hormone balance, insulin sensitivity aur neend ko support karti hai, aur PCOS mein khaas madad karti hai. Zyadatar dino mein lagbhag tees minute aam salaah hai, aur tez chalna bhi ginta hai.\n\nDoosra sira bhi asli hai: bahut tez training, khaaskar kam khaane ke saath, ovulation poori tarah rok sakti hai. Isiliye yahan koi goal nahi hai jise "beat" karna ho.',
     fields: [
       TtcField(
-        id: 'mood',
-        labelEn: 'Today',
-        labelHi: 'Aaj',
-        kind: TtcFieldKind.scale,
-        choicesEn: _moodEn,
-        choicesHi: _moodHi,
-        lowEn: 'Very low',
-        lowHi: 'Bahut kam',
-        highEn: 'Really good',
-        highHi: 'Bahut achha',
+        id: 'minutes',
+        labelEn: 'Minutes moved',
+        labelHi: 'Kitne minute',
+        kind: TtcFieldKind.number,
+        unit: 'min',
+        min: 0,
+        max: 300,
+        step: 5,
+      ),
+      TtcField(
+        id: 'kind',
+        labelEn: 'What kind',
+        labelHi: 'Kis tarah ka',
+        kind: TtcFieldKind.choice,
+        choicesEn: ['Walk', 'Yoga', 'Strength', 'Stretch', 'Rest day'],
+        choicesHi: ['Tehalna', 'Yoga', 'Strength', 'Stretch', 'Aaram ka din'],
       ),
     ],
   ),
-
-  // ---------------------------------------------------------------------------
   TtcTracker(
     id: 'stress',
     iconKey: 'stress',
@@ -357,8 +684,6 @@ const List<TtcTracker> ttcTrackers = [
       ),
     ],
   ),
-
-  // ---------------------------------------------------------------------------
   TtcTracker(
     id: 'lifestyle',
     iconKey: 'lifestyle',
@@ -406,99 +731,7 @@ const List<TtcTracker> ttcTrackers = [
       ),
     ],
   ),
-
-  // ---------------------------------------------------------------------------
-  TtcTracker(
-    id: 'partner_health',
-    iconKey: 'partner',
-    titleEn: 'Partner Health',
-    titleHi: 'Partner ki sehat',
-    subtitleEn: 'Half the picture',
-    subtitleHi: 'Aadhi tasveer',
-    whyEn:
-        'A male factor is involved in roughly forty to fifty per cent of couples who struggle, and sperm takes about ninety days to make - so what is recorded here today shows up around three months from now.\n\nThis exists because in most Indian clinics the woman is investigated first, through tests that are slower, costlier and more invasive. This is the other half.',
-    whyHi:
-        'Jo couples mushkil jhelte hain unmein lagbhag chalis se pachas pratishat mein mard ka factor hota hai, aur sperm banne mein lagbhag nabbe din lagte hain - toh aaj jo yahan record hota hai, wo teen mahine baad dikhta hai.\n\nYe isliye hai kyunki zyadatar Indian clinics mein pehle aurat ke test hote hain - jo dheere, mehnge aur zyada takleefdeh hote hain. Ye doosra aadha hissa hai.',
-    forPartner: true,
-    fields: [
-      TtcField(
-        id: 'sleep',
-        labelEn: 'Hours slept',
-        labelHi: 'Kitne ghante soye',
-        kind: TtcFieldKind.number,
-        unit: 'hrs',
-        min: 0,
-        max: 14,
-        step: 0.5,
-      ),
-      TtcField(
-        id: 'alcohol',
-        labelEn: 'Alcohol today',
-        labelHi: 'Aaj sharab',
-        kind: TtcFieldKind.choice,
-        choicesEn: ['None', '1 drink', '2 drinks', 'More than 2'],
-        choicesHi: ['Bilkul nahi', '1 drink', '2 drink', '2 se zyada'],
-      ),
-      TtcField(
-        id: 'smoking',
-        labelEn: 'Smoked today',
-        labelHi: 'Aaj smoke kiya',
-        kind: TtcFieldKind.choice,
-        choicesEn: ['No', 'Yes'],
-        choicesHi: ['Nahi', 'Haan'],
-      ),
-      TtcField(
-        id: 'heat',
-        labelEn: 'Long heat exposure - hot bath, sauna, laptop on lap',
-        labelHi: 'Lambi garmi - garam nahaana, sauna, god par laptop',
-        kind: TtcFieldKind.choice,
-        choicesEn: ['No', 'Yes'],
-        choicesHi: ['Nahi', 'Haan'],
-      ),
-      TtcField(
-        id: 'movement',
-        labelEn: 'Moved today',
-        labelHi: 'Aaj movement kiya',
-        kind: TtcFieldKind.choice,
-        choicesEn: ['No', 'A walk', 'A proper session'],
-        choicesHi: ['Nahi', 'Tehla', 'Poora session'],
-      ),
-    ],
-  ),
-
-  // ---------------------------------------------------------------------------
-  TtcTracker(
-    id: 'exercise',
-    iconKey: 'exercise',
-    titleEn: 'Movement',
-    titleHi: 'Movement',
-    subtitleEn: 'Not fitness - movement',
-    subtitleHi: 'Fitness nahi - movement',
-    whyEn:
-        'Moderate regular activity supports hormone balance, insulin sensitivity and sleep, and it helps notably in PCOS. Around thirty minutes most days is the usual recommendation, and a brisk walk counts.\n\nThe other end is real too: very intense training, especially with under-eating, can stop ovulation altogether. This is why there is no goal here to beat.',
-    whyHi:
-        'Moderate regular activity hormone balance, insulin sensitivity aur neend ko support karti hai, aur PCOS mein khaas madad karti hai. Zyadatar dino mein lagbhag tees minute aam salaah hai, aur tez chalna bhi ginta hai.\n\nDoosra sira bhi asli hai: bahut tez training, khaaskar kam khaane ke saath, ovulation poori tarah rok sakti hai. Isiliye yahan koi goal nahi hai jise "beat" karna ho.',
-    fields: [
-      TtcField(
-        id: 'minutes',
-        labelEn: 'Minutes moved',
-        labelHi: 'Kitne minute',
-        kind: TtcFieldKind.number,
-        unit: 'min',
-        min: 0,
-        max: 300,
-        step: 5,
-      ),
-      TtcField(
-        id: 'kind',
-        labelEn: 'What kind',
-        labelHi: 'Kis tarah ka',
-        kind: TtcFieldKind.choice,
-        choicesEn: ['Walk', 'Yoga', 'Strength', 'Stretch', 'Rest day'],
-        choicesHi: ['Tehalna', 'Yoga', 'Strength', 'Stretch', 'Aaram ka din'],
-      ),
-    ],
-  ),
+  */
 ];
 
 TtcTracker? ttcTrackerById(String id) {

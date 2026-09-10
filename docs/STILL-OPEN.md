@@ -2531,36 +2531,124 @@ Both doors are focus pages now and both are wired, tested and committed
 it is a decision or an asset rather than code, and because a session that picks
 this up later will not otherwise know which deviations were deliberate.
 
-### 18.1 The IVF readiness tool persists nothing — DEFECT, small
+### 18.1 ~~The IVF readiness tool persists nothing~~ — FIXED 2026-09-03
 
-`TtcIvfReadinessScreen` reads `FertilityHelpContext` — how long she has been
-trying, her cycle spread, what her PCOS check found — and writes **nothing
-back**. So every visit re-asks all six questions, and
-`TtcFertilityHelpStore.hasCompleted` never becomes true.
+It read `FertilityHelpContext` to prefill two questions and wrote nothing back,
+so every visit re-asked all six and `hasCompleted` never became true. It worked
+perfectly and remembered nothing.
 
-Nothing downstream breaks, because the only two readers of that store are the
-retired screens. But re-doing a questionnaire she already did is the exact
-friction the rebuild existed to remove.
+**What blocked it was two sets of age bands, and the ruling was to stop having
+two of anything.** The live screen used the brief's bands (under 35 / 35-37 /
+38-40 / over 40); the engine behind it used its own (under 30 / 30-35 / 36-39 /
+40+). "Under 35" is both "under 30" and "30 to 35", so no honest mapping
+existed.
 
-**The fix is written already, one door over.** `PcosStandAnswers.writeThrough`
-maps a short flow's answers onto the shipped store's question ids; IVF needs
-the same, against `TtcFertilityHelpStore`. Mind the mapping: `q_trying` has
-five options (`not_trying / starting / under6 / six_twelve / over12`) and the
-new flow has four bands.
+**The brief's bands are now the system.** `FertilityAgeBand` carries them,
+`IvfAge` is retired, and `IvfReadinessAnswers.writeThrough` saves through to
+`TtcFertilityHelpStore` on the way to the result — modelled on
+`PcosStandAnswers.writeThrough`, deliberately the same shape.
 
-### 18.2 Three IVF tiles are a different format from the brief — DECISION
+Three rules inside the write-through, each held by a test:
 
-`ivf_rebuild.pdf` marks these Article; they shipped as carousel and myth cards,
-because each is step-shaped or belief-shaped rather than essay-shaped:
+* **Only what she answered.** The flow asks six of the store's ten questions;
+  `miscarriages`, `pain`, `pelvic` and `cancer` stay untouched. A default in a
+  clinical question she never saw is a "no" she never said, feeding a rule that
+  decides whether she is told to see somebody.
+* **"Not sure" is not an answer.** The store can hold named conditions or an
+  explicit "none" and has no way to hold "she does not know"; writing "none"
+  would convert an absence of information into information. Same for an undone
+  or unclear semen test — only a found issue becomes `yes`, only a normal result
+  becomes `no`.
+* **`pathway` is written as the store's own word** (`current` / `done`), not an
+  enum's `.name`, because it is switched on as a raw string and a mismatch would
+  fall through to `notStarted` silently.
 
-* "What a package leaves out" — carousel
-* "Is egg retrieval painful?" — carousel
-* "Can I work through a cycle?" — myth vs fact
+⚠️ **AND THE REFERRAL RULE NOW OVER-REFERS BY UP TO ONE YEAR, ON PURPOSE.**
+NICE refers at presentation from 36; the band is 35-37, so 36 sits inside a band
+and the rule cannot be exact. Referring from 35 costs an unnecessary
+appointment. Not referring until 38 delays care for the 36- and 37-year-olds the
+rule exists to catch. This tool's own promise is that it "only says whether a
+conversation is worth having", so where it is unsure it leans toward the
+conversation.
 
-Each converts to an article in an hour if that is wanted. Related: the brief
-asks for the consult to be "shown across" the sections and it appears once, in
-the first section — deliberate, because repeating a paid tile down a page is
-how a help page starts to feel like a funnel.
+**If that year ever needs to be exact, the answer is a date of birth, not a
+fifth band.** `FamilyProfileStore` already holds `dob`; nothing collects it yet
+(§18.7). With a real age the referral rule reads 36 and the reassurance rule
+reads 35, both correct, with nothing translated between them.
+
+### 18.2 ~~Three IVF tiles are a different format from the brief~~ — CLOSED 2026-09-03
+
+**This note was stale and was repeated as current on 2026-09-03. Correcting it
+here rather than deleting it, because the mistake is the useful part.**
+
+All three shipped as articles and have done since the IVF rebuild:
+
+* "What a package leaves out" → `ttc_read_ivf_package`
+* "Is egg retrieval painful?" → `ttc_read_ivf_retrieval`
+* "Can I work through a cycle?" → `ttc_read_ivf_working`
+
+The carousel and myth-card versions are commented out beneath each one in
+`ttc_focus_ivf.dart`, kept for revert. I wrote this section on 2026-08-31,
+converted the tiles the same week, and then read the section back as fact.
+**The file was right and the note was wrong** — which is the whole hazard of a
+parked-items doc: it is trusted precisely because nobody re-checks it.
+
+**Still true, and still the user's call:** the brief asks for the consult to be
+"shown across" the sections, and it appears **once** — `TtcBookingTile`, one
+instance, in the first section. Deliberate: repeating a paid tile down a help
+page is how it starts to feel like a funnel.
+
+### 18.2a "How to read a clinic's success rate" — WRITTEN 2026-09-03
+
+**Correction first.** I described this as "the last item in the IVF brief with
+no tile and no content". There **was** a tile — a six-card `TtcCarouselTile` in
+the *How do we choose a clinic?* section — and I wrote the article without
+seeing it, then filed it under *money*, briefly giving the door two tiles with
+the same title. Both mistakes are the same one: reporting from a summary rather
+than from the file. Same failure as 18.2 below, in the same session.
+
+Now resolved: the article sits **where the carousel was**, in *How do we choose
+a clinic?*, and the carousel is commented out beneath it, kept for revert.
+
+The six cards were right about *what* to ask and had nowhere to put the *why*.
+"Per transfer excludes every cycle that never reached one" is true and is not
+enough — somebody comparing two clinics needs to hold all six questions at once
+while looking at two numbers, and a swipe deck can only show her one.
+
+**The scope is the safety, and it is one sentence:** it teaches the *measures*
+and never applies them. No benchmark figure, no clinic named, no personal
+chance; every quantity relational (higher, wider, smaller) rather than numeric,
+because a number in an article becomes a target on a screenshot.
+
+It covers what "success" is counting (positive test / clinical pregnancy / live
+birth / cumulative — four things wearing one word), what the denominator does
+(per cycle started vs per collection vs per transfer, each step dropping the
+people for whom things went least well), case-mix and why an overall figure is
+the least useful one on the page, small-sample wobble, and what a rate cannot
+see at all — including that a clinic taking difficult cases looks worse on
+paper for doing something generous.
+
+⚠️ **Clinical read still owed**, with the three articles written the same week.
+The byline is inherited, not earned.
+
+### 18.2b Date of birth would make the age rule exact — THE FIX, NOT YET BUILT
+
+Kept in the plainest form, because it is the answer to a question that will be
+asked again:
+
+> **The only way to make it exact is to ask for date of birth once at sign-up —
+> then it knows she's 36, not "35 to 37", and the question disappears. That's
+> already half-built and waiting on onboarding.**
+
+The question it disappears is 18.1's: the referral rule wants 36, the band is
+35-37, and a band cannot tell them apart, so the rule over-refers by up to a
+year on purpose. With a real age there is no band to translate — the referral
+rule reads 36, the reassurance rule reads 35, both correct.
+
+**Half-built means:** `FamilyProfileStore` holds `dob` and derives `age` on
+every read. Nothing collects it. See §18.7, and note it pays twice — the IVF
+readiness flow currently asks age as its own first question, which it would stop
+doing.
 
 ### 18.3 The clinical line appears on both IVF graphics, not one — DELIBERATE
 
@@ -3058,3 +3146,1399 @@ so nothing shifts when files land.
   playbook, amended.
 * **The card's title sits ON the image**, up to four lines, rather than below it
   at two.
+
+---
+
+## 22.0 Records rebuilt from the design project — 2026-09-03
+
+`TTC Records.dc.html` (project `a08f49db`) drew eight options. Six were built —
+**1a, 1d, 1e, 1f, 1g, 1h** — and two were deliberately not. What follows is what
+is open, what was refused, and what only the user can decide.
+
+The code lives in three files:
+
+| File | What it holds |
+|---|---|
+| `lib/ttc/ttc_records_grouping.dart` | The grouping, the coverage count, and the change/gap arithmetic. No widgets. |
+| `lib/screens/ttc/ttc_records_v2.dart` | Every screen and sheet: the list body, the trend, the detail, the viewer, add, "Type it", the appointment card. |
+| `lib/screens/ttc/ttc_records_screen.dart` | The frame only. The old flat list and the old add dialog are commented out below it, kept for revert. |
+
+**Where to look in the app:** TTC → Tools → **Health Records** (or **Reports**,
+which is the same folder narrowed to library results).
+
+---
+
+### 22.1 Two designs drawn and not taken — NOT DEFECTS
+
+Both are recorded at the head of `ttc_records_v2.dart` with the argument, so
+going back is a decision rather than an archaeology exercise.
+
+* **1b — the date spine.** The same records kept in date order under a month
+  spine. Its argument is real: she remembers "the tests before the last cycle",
+  not "my AMH readings". It lost to 1a because recency is one question and 1a
+  answers three (has this changed, what is not here, whose is this). **If
+  recency turns out to matter more than direction, 1b is the design to go
+  back to** — and the old flat list is still in the file.
+* **1c — the dot chart.** Lost to 1d on data shape, not on taste. This library
+  holds a thyroid panel with a photo and no number, an HSG whose result is a
+  sentence, and a semen analysis that is three values in one result. A chart
+  renders none of them.
+
+### 22.2 "Share as PDF" — BUILT 2026-09-03
+
+Built, not parked. I called this a big piece of work and it was not: the
+machinery already ships and is used in six places. `pdf: ^3.11.1`,
+`printing: ^5.13.4` and `share_plus` are all in `pubspec.yaml`, and
+`lib/services/pdf_fonts.dart` already solves the hard part (loading a font set
+that has Devanagari, and refusing rather than exporting empty boxes).
+
+`lib/services/ttc_records_pdf.dart` follows `diet_chart_pdf.dart` exactly.
+**Where to look:** the appointment card at the foot of Health Records → the
+sheet → **Share as PDF**, top right.
+
+Three decisions inside it are worth knowing:
+
+* **The sheet shows six results; the PDF carries everything.** Not an
+  inconsistency. The sheet is read over her shoulder in ninety seconds. The PDF
+  is read by a clinician who has never met her, alone, and a medical summary
+  that silently stops at six is an omission that can change a decision without
+  anybody knowing it happened.
+* **Photos travel with it,** one captioned page each. A summary that says
+  "photo saved" and does not carry the photo is worse than one that never
+  mentioned it — the reader now knows a document exists and cannot see it.
+* **A PDF attachment cannot be embedded as an image and is named rather than
+  dropped**, under "Files that could not travel". An absence you can see is a
+  different thing from an absence you cannot.
+
+### 22.3 The viewer cannot brighten the screen — ONE DEPENDENCY, USER'S CALL
+
+The design raises screen brightness when a report opens, which is right: a lab
+sheet photographed under a tube light is read at arm's length by somebody else.
+
+**What it actually needs:** the `screen_brightness` package, and nothing else.
+It sets *window* brightness rather than system brightness, so there is no
+Android permission and no iOS entitlement, and the OS restores the phone's own
+setting when the app leaves the foreground. Roughly ten lines — set on push,
+reset on pop.
+
+**Why it is not already in:** it is a new third-party dependency on the
+render path of a medical document, and adding one without asking is not this
+repo's habit. Say yes and it takes one pass.
+
+Until then the label is deliberately **not** shown — a screen claiming to have
+brightened itself when it has not is worse than one that says nothing. Noted in
+the class doc on `TtcSheetViewer`.
+
+### 22.4 NAMES — DECIDED, NOT YET BUILT (2026-09-03)
+
+**Decision: the app will ask for names at sign-in, hers and her partner's.**
+When the partner signs in on his own device, he is asked for his.
+
+Nothing in the app collects an adult name today. `ChildProfileStore.instance.name`
+exists for the parenting stage and there is no equivalent for either parent —
+so ownership currently reads **"You"** and **"Partner"** via `ttcWhose()` in
+`ttc_records_v2.dart`.
+
+**What changes when names land**, in one place each:
+
+| Where | Today | With names |
+|---|---|---|
+| `ttcWhose(bool)` | `'You'` / `'Partner'` | the two names |
+| Row leading mark | no avatar | the design's two-letter monogram (AA / RS) |
+| PDF "Whose" column | `Her` / `Partner` | the two names |
+| Appointment sheet | unattributed rows | attributed rows |
+
+`ttcWhose()` is the single seam — every one of those reads it or would. The
+monogram is the only new drawing, and the design already specifies it.
+
+**Still open inside the decision:** what happens when the partner never signs
+in. A name asked of her *about* him is a different thing from a name he gave,
+and only one of those should appear on a document leaving the phone. Worth
+settling before the sign-in screen is written, not after.
+
+### 22.5 What the rebuild fixed that was never filed as a bug
+
+Worth writing down, because none of these were on any list:
+
+* **The app has stored attachment refs since records shipped and had never once
+  displayed one.** The folder held her reports and could only show their
+  filenames. `TtcSheetViewer` is the first time a saved report is visible.
+* **A photo-only record could be created and never completed.** `TtcRecord`
+  has always defaulted `value` to `''`, so a record with no number was already
+  representable — there was simply no way back to type one in. "Type it" on the
+  row and "Type the number" on the detail screen close it, and
+  `TtcRecord.copyWith` learned `value`/`unit`/`forPartner` for exactly that.
+* **The library's plain-language note nearly went missing.** The old card
+  printed it beside every library result. The redesign has no room for it on a
+  row, so it moved to the detail screen under "What this test measures" —
+  a move, recorded, rather than a silent regression.
+
+### 22.6 The interpretation rule, restated because this screen is where it breaks
+
+Nothing in these three files interprets a value. No normal range, no high or
+low, no colour that means anything. A trend of her own three readings with the
+dates on them is a **description**; the same three with a shaded band behind
+them is a second opinion from a phone.
+
+`ttcReadingChange()` returns **null** — says nothing — wherever the arithmetic
+would not be honest: a text result, a photographed result with no number, or two
+readings in different units. It is the same shape as every other refusal in this
+stage: structural, not a flag somebody can flip.
+
+Two tests hold it (`test/ttc_care_test.dart`), and the coverage block says
+**"not added"** rather than "missing", because "missing" is a judgement about
+the clinician looking after her and "not added" is a fact about this folder.
+
+### 22.7 Reading a report photograph — HELD 2026-09-03, deliberately
+
+**Held, not rejected.** Nothing is to be built for this until the decision below
+is made, because it means changing `C:\Projects\parentveda-askveda` — a second
+repo — and that is not a thing to start sideways out of a records screen.
+
+**What prompted it:** the empty state's first copy read *"One photograph today,
+and in a year this screen answers the questions a consultation opens with."* It
+sounded like upload-and-get-insights and was read that way immediately. The copy
+is fixed (see the comment on `TtcRecordsEmpty`), but the question it raised is a
+real one and worth answering properly rather than dropping.
+
+#### The rule, already decided one product over — do not re-litigate it
+
+The parenting Health Wallet asked for exactly this: upload a prescription,
+auto-detect medicines, auto-create reminders. §5.10 settled it:
+
+> **Extraction is fine. Silent creation is the problem.** A misread dose becomes
+> a recurring alarm telling a parent to give the wrong amount of the right drug,
+> on time, with the app's authority behind it.
+
+Records is the same shape. A folder that files **12 ng/mL** when the sheet said
+**1.2** is that failure in different clothes, and worse in one way: the number
+then travels into a PDF and gets handed to a clinician.
+
+**So whatever is built: extracted text is a DRAFT, never a saved value.** It
+lands in a confirm step and nothing enters the folder until a person has read it
+back against the paper.
+
+#### Extending it — a record knows whether a human checked it
+
+Asked for on 2026-09-03 and worth writing down while the reason is fresh.
+
+A record should carry **whether its value was confirmed by a person**, and say
+so on the row. Not for liability — the disclaimer already covers that, and a
+disclaimer is not a design. For the reader:
+
+* A number she typed and a number a camera guessed are **different kinds of
+  fact**, and the truth hierarchy in this app already says so — her own
+  observation sits above ParentVeda's calculation, and an OCR reading is
+  squarely a calculation.
+* The one moment it matters is the handover. An unconfirmed value going into
+  the PDF, unmarked, is the app asserting something no human ever checked to a
+  clinician who cannot tell the difference.
+
+**Shape:** one nullable bool on `TtcRecord` (`confirmedByPerson`), defaulting to
+true for everything typed by hand — every record that exists today was typed, so
+the migration is "old rows are confirmed" and there is no backfill. The PDF marks
+the unconfirmed ones. Nothing else changes.
+
+#### The on-device question, answered
+
+**Samsung's camera OCR is Samsung's.** It is a vendor feature in their camera and
+gallery apps; no third-party app can call it, and a Redmi or a Motorola does not
+have it. That is why "the phone can already do this" does not translate into
+"the app can already do this".
+
+**What an app can use:**
+
+| Route | Where the model lives | Works on every device? |
+|---|---|---|
+| ML Kit, **bundled** | Inside our APK | Yes — same behaviour on a ₹8,000 Redmi as on a Galaxy S24 |
+| ML Kit, **Play-Services-delivered** | Downloaded once, on first use | Needs Play Services and one online moment |
+| Apple Vision (iOS) | Built into iOS 13+ | Yes, on iOS, at zero size cost |
+
+Bundling is the one that removes the variability entirely, and the price is app
+size: roughly **4–5 MB** on Android for the Latin-script model, more on iOS
+depending on which pods come along. **Latin script only** — fine here, because
+Indian lab reports are printed in English; Devanagari would be a second model.
+
+⚠️ **Numbers above are from documentation, not from a build of this app.**
+Measure the real APK delta before committing to it.
+
+#### The part that is actually hard, and it is not the OCR
+
+OCR returns **lines of text**. A lab report is a **table** — test name, value,
+unit, reference range, sometimes two columns and a letterhead. Turning
+
+```
+S. ANTI-MULLERIAN HORMONE (AMH)    1.2    ng/mL    1.0 - 4.0
+```
+
+into `{test: AMH, value: 1.2, unit: ng/mL}` is parsing, and it is where this
+either works or quietly produces nonsense. Two ways:
+
+* **Regex against `ttcTests`** — eleven known names, on-device, free, no
+  document leaves the phone. Fails on layouts it has not seen, and *fails
+  visibly*: it finds nothing and she types it, which is the flow that already
+  exists.
+* **An LLM in the AskVeda service** — handles messy layouts, and sends a medical
+  document to a server to save someone thirty seconds of typing.
+
+**Recommendation, for when this is picked up: on-device ML Kit + regex + the
+confirm step.** A lab report is among the most private things she owns; this
+route means it never leaves the phone, costs **$0 / ₹0** per scan, and works in
+a clinic basement with no signal.
+
+**The cheap experiment that decides it:** photograph five real Indian lab
+reports and see what on-device OCR returns. If regex can find the eleven test
+names in those five, the LLM route is not needed and no cross-repo work
+happens at all. That test costs an afternoon and no money, and it should happen
+before anything is written in either repo.
+
+#### If it ever goes to AskVeda, this is what that repo owes
+
+Written down now so it is a handover and not a gap — the same discipline
+CLAUDE.md requires for any two-repo change:
+
+* An endpoint taking an image and returning
+  `{test_name, value, unit, taken_on}` **with per-field confidence**.
+* Confidence is not decoration: the confirm screen should pre-select what it is
+  sure of and leave the rest blank rather than guessing into a field.
+* It must be able to answer **"I could not read this"**. A service that always
+  returns something will eventually return something wrong with the same
+  confidence as something right.
+* Nothing about interpretation. It transcribes. Ranges, flags and verdicts are
+  not its job and are not anybody's job in this product.
+
+---
+
+## 23.0 Getting ready, built from the brief — 2026-09-03
+
+Fourth door on the PCOS/IVF shape, from `getting_ready_rebuild.pdf`.
+
+**Where to look:** TTC home → **Getting ready**. Five tabs, Diet first.
+
+| File | What it is |
+|---|---|
+| `lib/ttc/focus/ttc_focus_getting_ready.dart` | The page: 5 groups, 7 sections, 17 tiles |
+| `lib/ttc/reads/ttc_reads_getting_ready.dart` | +4 new articles |
+| `lib/screens/ttc/ttc_habits_screen.dart` | "Track what you're working on" |
+
+---
+
+### 23.1 The brief's central worry was already solved — STEP 5 WAS FREE
+
+The rebuild asks whether the content model can point many cards at one item,
+and says to build that first if it cannot. **It can, and it never worked any
+other way.** A tile carries a `readId` / `surfaceId` / `productId` — an
+identifier, never a copy of the text. The article lives once in `kTtcReads`;
+any number of tiles on any number of pages may name it.
+
+`ttc_focus_page_test.dart` enforces the other half: every id on every page must
+resolve, so a card pointing at renamed content fails the build rather than
+rendering perfectly and doing nothing.
+
+Step 5b is live: the fertile-window door's "What she should do" now also carries
+`ttc_read_what_to_cut` and `ttc_read_weight_kindly` alongside the two read ids
+it already shared. Not copies — the same ids.
+
+### 23.2 The carrier screening article — WRITTEN AND WIRED. THIS ENTRY WAS STALE
+
+⚠️ **CORRECTED 2026-09-05, and the staleness did real damage.** Everything
+below the line was true when written and stopped being true later the same day:
+`ttc_read_carrier_screening` exists in `ttc_reads_getting_ready.dart`, it is
+about thalassemia carrier screening (HbA2 by HPLC), and
+`ttc_focus_getting_ready.dart:279` carries a tile that opens it. Nothing is
+waiting on anybody.
+
+Because this entry still said otherwise, "confirm the carrier screening test"
+was reported to the user on 2026-09-05 as the **first blocker** in a summary of
+what the TTC doors still need. It was not a blocker and had not been one for a
+day.
+
+**This is the third time in this stage that a stale `STILL-OPEN` entry has been
+repeated as fact** (see §18.2 and §24.7). The pattern is always the same and it
+is worth naming: this document is trusted precisely because it is the place
+things are written down, so nobody re-derives it — which makes a wrong line here
+more expensive than a wrong line in code, where the compiler or a test would
+disagree. **When closing an item, edit its section. Do not only add a new one
+further down.**
+
+The original entry, kept because it records why the article was held at first:
+
+---
+
+### ~~23.2 The carrier screening article is NOT written — WAITING ON YOU~~
+
+The brief lists *"The carrier screening that matters in India"* and says, in its
+own words, to confirm which screen is meant with the content author before it
+goes into copy. It reads like **thalassemia carrier screening**, and "reads
+like" is not good enough when naming a medical test to somebody who may go and
+order it.
+
+**So there is no tile and no placeholder.** A card whose article does not exist
+opens nothing, and the reachability test would fail the build — correctly.
+
+**What is needed from you:** confirm the test. If it is thalassemia carrier
+screening (HbA2 / HPLC), say so and it is written the same day. It is a real
+gap for an India-first product — carrier frequency is high in several
+communities here and it is the one preconception test most Western guidance
+does not emphasise.
+
+Partly covered meanwhile: `ttc_read_preconception_tests` carries a "Being a
+carrier is not being ill" section, so the subject is not absent from the door.
+
+### 23.3 The habit trackers WERE merged — DONE 2026-09-04, this entry was stale
+
+⚠️ **CORRECTED 2026-09-05. Second stale entry in this section** — see §23.2 for
+the first, and the rule that came out of it: *when closing an item, edit its
+section; do not only add a new one further down.*
+
+The merge shipped the day after this was written. `kTtcHabitMerge` in
+`ttc_log_store.dart` maps `sleep` / `exercise` / `stress` / `lifestyle` onto
+`habits`, **applied on read rather than as a one-off rewrite** — because the
+cloud table keys on the tracker id too, so a device that migrated locally would
+pull the old rows straight back on the next sync. Nothing is destroyed; a revert
+is deleting the map. It is safe only because the nine field ids were unique
+across all four trackers, which is written down there.
+
+The original entry follows, because its reasoning is why the merge took the
+shape it did:
+
+---
+
+### ~~23.3 The habit trackers were NOT merged — DELIBERATE DEVIATION~~
+
+The brief says "ONE tracker, reuse and consolidate the separate
+sleep/movement/stress trackers". **One destination was built; the stores were
+not merged.**
+
+`TtcLogStore` keys every entry as `tracker/field/day`. Merging three ids into
+one either strands every row a user has already logged or needs a migration
+that rewrites her history — on a store whose whole promise is that it records
+without judging. A shipped store with real entries is not a thing to restructure
+for a layout.
+
+So `ttc_habits` gathers four trackers (sleep, exercise, stress, **and
+lifestyle** — alcohol and tobacco live there, and the brief names those as two
+of the four habits) in one place, each still writing where it always wrote.
+Nothing migrated, and the Tools hub keeps all eight.
+
+**If they should genuinely become one tracker, that is a data decision with a
+migration attached and it needs saying explicitly.**
+
+⚠️ **No streaks, no score, no "3 of 4 today".** Habit UI reaches for those by
+reflex, and every one turns "I did not sleep well" into a failure — on a screen
+opened by somebody already wondering whether her body is the problem. Each row
+shows days recorded, which is a fact about her logging rather than a verdict.
+
+### 23.4 A twelfth tile format — `TtcDoTile`, chip "Do"
+
+Same argument the ninth and tenth were added under: the alternative was
+`TtcToolTile` putting the chip **"Tool"** over "Habits worth building now". A
+tool is something you operate and put down; sleep and movement are things you do
+for weeks. The chip is the promise about what happens when she taps.
+
+The sealed union made both call sites fail to compile the moment it was added,
+which is the point of it.
+
+### 23.5 Three test assertions were quietly gates on future doors
+
+Worth recording as a pattern, because it happened three times in one build:
+
+* `ttc_focus_page_test.dart` — "every carousel has cards" and "every video
+  declares a slot" each opened with `expect(..., isNotEmpty)`. Written when the
+  group was pinned to conceiving; once it started iterating every page, those
+  became **"every door must contain a carousel and a film, forever"**. Getting
+  ready has no carousel and that is correct. Both re-homed to the pinned
+  conceiving group as "this page uses both".
+* `ttc_focus_groups_test.dart` — "the conceiving door is still one long scroll"
+  looped every page *skipping pcos and infertility*, so any new grouped door
+  failed it. Now names conceiving directly, and a genuinely useful guard was
+  added in its place: **a grouped page must tag every section**, since an
+  untagged section on a grouped page renders under no tab at all.
+
+The shape of the mistake: a rule written while there were three of something
+becomes a rule about the fourth. Worth watching for on door five.
+
+### 23.6 What was reused, and what the door gained
+
+**Reused, unchanged:** `ttc_read_three_months_before`, `ttc_read_folic_acid`,
+`ttc_read_preconception_tests`, `ttc_read_stress_fertility` (Mind and body stays
+its owner), `ttc_read_whose_side` (His side stays its owner), and the surfaces
+`ttc_nutrition`, `ttc_supplements`, `ttc_vaccinations`, `ttc_tests`,
+`ttc_precheck`, `ttc_precheck/lifestyle`.
+
+**New articles:** `ttc_read_what_to_cut`, `ttc_read_supplement_timing`,
+`ttc_read_weight_kindly`, `ttc_read_coming_off_birth_control`,
+`ttc_read_meds_and_conditions`.
+
+**Two films stopped being invisible.** `ttc_vid_three_months_before` and
+`ttc_vid_preconception_tests` were already written, chaptered and waiting on
+files in `ttc_videos_data.dart`, and were reachable from nowhere — this area had
+no page to put them on. Still placeholders; still owed the actual footage.
+
+**Added, not in the brief:** a "Keep the reports together" tile pointing at
+Records. A door that sends somebody to order six tests and offers nowhere to put
+the results creates a shoebox of paper.
+
+⚠️ **Clinical read owed on the four new articles**, as with the IVF set. The
+byline is inherited from the door, not earned on these.
+
+### 23.7 The journey it replaces is untouched
+
+`kTtcPreconceptionReadiness` in `ttc_journeys.dart` — six steps, ten elements,
+every one of them re-slotted into the new page. It stays on disk and stays
+registered; `ttcFocusPageFor` is checked before hubs and journeys, so the page
+wins. Nothing was deleted to make room, and reverting is removing one line from
+`kTtcFocusPages`.
+
+The hub's `kTtcActPreconceptionReadiness` "coming soon" branch in
+`ttc_home_v3.dart` is now unreachable through the bracket. Left in place — it is
+the fallback if the page is ever unregistered.
+
+---
+
+## 24.0 The TTC product flow, from the design project — 2026-09-03
+
+Three screens — categories, shelf, product — built from "ParentVeda Product
+Flow" and wired **only into the V3 doors**, as asked.
+
+**Where to look:** any V3 door → a product tile → the product page → "Everything
+in {category}" → the shelf → "The other shelves" → categories. Surface id
+`ttc_shop`.
+
+| File | What it is |
+|---|---|
+| `lib/screens/ttc/ttc_shop_v3.dart` | All three screens, one set of components |
+| `lib/ttc/ttc_products_data.dart` | The model grew 6 fields; a tenth product added |
+| `test/ttc_shop_test.dart` | 27 tests — honesty, plus the five in §24.8 about how it draws |
+
+---
+
+### 24.1 The old product surfaces are untouched — INSTRUCTION, NOT OVERSIGHT
+
+The brief says three screens replace nine across all stages. They do not.
+`products_screen.dart`, the five parenting surfaces and the Guide hub are all
+still live and unedited. Asked for directly: *"apply this screen or wire the
+screen only for the trying-to-conceive V3 ones. Don't mess around the old
+random product screens."*
+
+`ttc_products_screen.dart` also stays, still routed at `ttc_products`, because
+Ask Veda's deep links land there (`ttcprod_folic` → its `focusId`). Two surfaces
+over one catalogue is the drift risk, and it survives here only because both
+read `ttcProducts` and neither holds a copy of any text.
+
+**Open:** whether the old flat library retires once Ask Veda's pointers are
+repointed. Not urgent, and not to be done quietly.
+
+### 24.2 `pvScore /100` was NOT ported — and this is the important one
+
+The parenting design puts a big number at the top as its "one large true fact":
+**88/100**, with "92% of parents recommend" and "86% of experts say buy".
+
+**None of those three exist for TTC and none can be honestly derived.** There is
+no review corpus, no expert panel and no rating history behind these ten
+entries. A 0–100 figure computed from nothing would be the most
+authoritative-looking thing on the page and the least true.
+
+**Replaced by `TtcEvidence` — strong / mixed / thin — which is a real fact and
+the more useful one.** For a fertility product the question is almost never "is
+this a good bottle", it is "does this do anything". Held by a test.
+
+### 24.3 There is no Buy button — MISSING DATA, NOT A REFUSAL
+
+The design's sticky buy bar and affiliate interstitial are the sharpest things
+in it, and the interstitial's last line — *"it never changes what we recommend
+or how we rate a product"* — is the whole reason a trust-first page may carry a
+Buy button at all.
+
+**`TtcProduct` has no retailer, no URL and no affiliate relationship.** A Buy
+button that opens nothing is worse than none, and building the interstitial now
+would be a screen nothing can reach. The sticky bar carries price and Compare.
+
+**Needs, before it can be built:** a retailer/URL field, an affiliate decision,
+and the Brand Studio rules applied (rank floor, never a score bonus, never the
+top slot, research pages stay clean).
+
+### 24.4 A tenth product was added, and it is the one we say no to
+
+`fertility_blend` — *"A 'fertility blend' multivitamin"*, band **skip**,
+evidence **thin**.
+
+The data file's header has claimed since it shipped that *"several of them exist
+mainly to talk a couple out of buying something"*. **None of the nine actually
+did** — every one was worth buying in some circumstance, which made the honesty
+structural rather than visible. A shelf where nothing is ever rated "generally
+not needed" cannot be told apart from a shelf with no way to say it.
+
+`ttc_read_supplement_timing` already says this in prose. Saying it on the shelf,
+where the money is spent, is worth more. No brand is named and the "what's good"
+column is honestly filled rather than left empty to make the point.
+
+Held by a test: at least one product must carry `skip`, and it must be readable
+on the shelf.
+
+### 24.5 Four blocks render as honest empties, not as invention
+
+* **Ratings** — no corpus. The block states what it will hold, and is not
+  tappable.
+* **Research** — the evidence band is real and the reads carry sources;
+  per-product study cards would mean summarising trials nobody here has read.
+* **Photography** — the hatch block at the real 230pt, so nothing reflows when
+  photographs land. **Ten product photographs are owed.**
+* **Ingredients** — dropped entirely. It is a skincare block; a folic acid
+  tablet's ingredient list is folic acid.
+
+### 24.6 What is genuinely thin, and worth saying out loud
+
+**The catalogue is ten items across five categories** — Books and Wellness hold
+one each. The shelf grid, the compare tray and the filter both work and are
+barely exercised at this size.
+
+That is not a bug and the fix is not padding. If the shelf is to feel like a
+shelf, the honest additions are things people in this stage actually buy:
+prenatal multivitamins (as a band, not a blend), pregnancy test strips in bulk,
+period-tracking thermometers, his-side supplements, and a wellness shelf that
+is mostly `skip`. **Each needs the same treatment as the ten: a band, an
+evidence rating, and a caveat that is never empty.**
+
+### 24.7 Not built from the design, and why
+
+* **Search with recent + popular** — the categories screen has no search. Ten
+  products across five rows is a list you read, not a corpus you search.
+* **A price filter** — STALE ABOVE, CORRECTED 2026-09-04. The shelf no longer
+  has a chip row; it has a Filters **button** opening a sheet over three real
+  dimensions (band, evidence, whose it is) plus a separate sort control, which
+  is what the design specifies and what I should have built the first time.
+  Brand became a field, so a brand filter is now possible and simply is not
+  built. **Price still is not filtered, deliberately** — four bands over ten
+  items leaves two empty and one holding everything.
+* **Related guides rail** — a product does not yet know which reads relate to
+  it. Worth adding as a `readIds` field; it is the cheapest real improvement on
+  this list.
+* **Loading skeletons** — everything is compiled-in constants. There is no load.
+
+---
+
+### 24.8 The three device-visible defects, and why the suite was green — 2026-09-04
+
+Reported from screenshots after two rounds of me fixing the wrong thing:
+*"yellow lines still visible, search bar still not fixed and for compare see in
+app we have a whole compare screen already present."* All three were real, all
+three shipped past a full green run, and each fails in a way worth writing down
+because the mechanism is general.
+
+**1. The amber underlines were never an overflow.** I read them as
+`RenderFlex` overflow twice and fixed two genuine but unrelated overflows.
+Flutter draws a **dashed amber underline under every string** in a region that
+has no `Material` ancestor, and **yellow-and-black diagonal hatching along one
+edge** for overflow. In a screenshot they are both "yellow marks near text".
+The compare bar, the compare pill and the sticky buy bar are all `Positioned`
+children of a `Stack` that is a *sibling* of the `Scaffold`, so nothing above
+them supplies one. Each is now wrapped in `Material(type:
+MaterialType.transparency)`, which costs nothing and also gives them ink
+splashes.
+
+**2. `border: InputBorder.none` is not an override of an input theme.** The
+app's global `InputDecorationTheme` sets `filled: true` with
+`scheme.surfaceContainer` plus its own focused border
+(`lib/theme/app_theme.dart:489`). A widget-level `border:` replaces only the
+*fallback* — `enabledBorder` and `focusedBorder` still come from the theme, and
+`filled` is untouched. That is why a field explicitly asked to be plain
+rendered as a lilac panel with a purple ring inside a white bar. Every slot the
+theme fills now has to be turned off by name.
+
+**3. Compare is a screen now, not a bottom sheet** — `TtcCompareScreen`, built
+on `ProductsCompareScreen`'s anatomy: three states (nothing / one / two
+picked), overview cards you can remove in place, one column-divided table over
+the *union* of the two spec lists, and a buy bar per product. The shop entry's
+compare row also opened nothing below two picked, which reads as a dead control
+and was reported as one; it opens at any count now, because there is a useful
+page at zero and at one.
+
+**OPEN — the parenting compare screen could not simply be pushed, and the fix
+for that is a refactor nobody has approved.** `ProductsCompareScreen` is typed
+on `PpProduct`, reads `PpCompareStore`, calls `openPpTab(context, 4)` in its
+empty state, and is painted in `ppPurple` on `ppBg`. Converting a `TtcProduct`
+across drops `band` and `evidence` — the two facts the TTC shelf exists to show
+— and seeding `PpCompareStore` with TTC items would surface them on the
+parenting product cards, which read the same store. So there are now two
+comparison screens over one layout.
+
+The honest resolution is to lift the layout into one widget both stages hand
+their own products to. It edits shipped parenting code, so it waits for a
+decision rather than riding along in a bug-fix pass. **Until then, a change to
+either comparison has to be made in both.**
+
+### 24.9 Still no "Add to cart" — NOT AN OMISSION
+
+Asked for directly. There is no cart in the app: no store, no line items, no
+quantity, no checkout, and every buy control in every stage hands off to a
+retailer. A button that adds to a basket nobody can open is worse than no
+button. **Needs a decision:** either a real basket (a store, a screen, a
+persisted list, and a hand-off that carries several products at once), or
+"Buy now" stays the only commit action. The second is what ships today.
+
+---
+
+## 25.0 His side, rebuilt from the brief — 2026-09-04
+
+Fifth door on the PCOS/IVF/Getting-ready shape, from `his_side_rebuild.pdf`.
+Two parts: the restructure, and the one net-new tool.
+
+**Where to look:** TTC home → **His side**. Five tabs, Understand first.
+
+| File | What it is |
+|---|---|
+| `lib/ttc/focus/ttc_focus_his_side.dart` | The page: 5 groups, 9 sections, 16 tiles |
+| `lib/ttc/ttc_semen_limits.dart` | The WHO 2021 reference limits, as data |
+| `lib/ttc/ttc_semen_reading.dart` | The tool's logic. No widgets in it |
+| `lib/screens/ttc/ttc_semen_report_screen.dart` | The tool's screen |
+| `lib/ttc/reads/ttc_reads_his_side.dart` | +4 articles |
+| `test/ttc_his_side_test.dart` | 34 tests, all about safety rather than layout |
+
+---
+
+### 25.1 The WHO numbers stopped being prose — THE IMPORTANT STRUCTURAL CHANGE
+
+Until now the four reference limits existed in exactly one place: a bullet list
+inside `ttc_read_semen_analysis`, doctor-written and reviewed as prose. Correct,
+while nothing computed with them.
+
+The tool computes with them. The obvious move was to type `16 / 42 / 30 / 4`
+into it, and it is the wrong one — **two copies of a clinical threshold in one
+app is how an article and a tool quietly disagree after a guideline update.**
+The brief says so: *"pull the reference limits from the same doctor-reviewed
+source the articles use, do not hardcode independent numbers."*
+
+So the numbers moved into `ttc_semen_limits.dart` and **the article's bullets
+are now generated from them.** One edit, both places. A test asserts every
+figure still appears in the article's rendered text.
+
+The framings moved with the numbers rather than being left behind: the
+strict-morphology caveat and the progressive-motility remark are fields on the
+limit, so no caller can render a comparison without them.
+
+### 25.2 The tool's rules are the tests, not the prose
+
+`ttcReadSemenReport` is one pure function with five routes. Every rule from the
+brief is asserted:
+
+* **No verdict, on any path.** Nine shapes of entry are run through a banned-
+  phrase scan — "you are fertile", "infertile", "your chance", "score". And
+  structurally: `TtcSemenReading` has no field a score could live in.
+* **Order is the safety.** A red flag beats good numbers; a red flag beats
+  azoospermia; azoospermia beats a low number. A man with a lump and a normal
+  count must be told about the lump, and a repeat suggested first would delay
+  it. ⚠️ **Reordering those branches is a clinical change, not a refactor.**
+* **A single low number is never a conclusion.** First test → repeat. Repeat →
+  have both read together, never a third.
+* **Exactly at the limit is in the usual range**, not below. Held for
+  morphology at 4, where it matters most.
+* **The abstinence flag survives good numbers** — a sample produced after
+  twelve days is not comparable to the reference limits whatever it said.
+* **Never advise stopping a prescribed medicine.** Testosterone is one of the
+  four red flags, and "stop taking it" is exactly what a man reads into that.
+
+### 25.3 The three original articles were not touched — DELIBERATE
+
+Step 7 says migrate without losing content, and the brief is emphatic that this
+is the strongest material in the stage: doctor-authored, WHO 2021, India
+specifics (gutka and khaini named rather than "tobacco", real INR costs).
+
+**So they were reused whole rather than split.** A section lifted out of an
+argument reads as a fragment, and the argument is the part that took a doctor to
+write. The four new pieces are written alongside them.
+
+⚠️ **Clinical read owed on the four new articles.** They carry Dr. Vikram Nair's
+byline, inherited from the door rather than earned on these.
+
+### 25.4 What is single-sourced, and the one reference that was missing
+
+* **His side owns male-factor content.** Getting ready's "His part" and IVF's
+  tests card already named its reads by id. **The fertile-window door did
+  not** — its one section about him had no way through to the area written
+  about him. Two referencing tiles added there.
+* **"Keep his reports with yours" and IVF's "Keep your reports together" are
+  one surface** (`ttc_records`) shown in two doors. Held by a test that also
+  fails if one door lists it twice.
+* **"The half nobody talks about" is one offering id**, on the headline and in
+  tab three.
+* **"His emotional side" is a door.** A `TtcDoorTile` to `ttc_mind_body`, the
+  area itself, not one of its articles (it was `ttc_read_stress_fertility`
+  until 2026-09-06). The brief: *"do not build stress content here."*
+
+### 25.5 Brought back to the brief — 2026-09-06
+
+The first build substituted the nearest existing thing for several tiles the
+brief named. The user's rule, now in the door's header comment: **reuse only
+what IS the thing, or can be made so with a small change. Never pick the
+closest thing and put it there because it sounds like what was asked.** Every
+substitution below was undone against that rule.
+
+| Brief | Was | Now |
+|---|---|---|
+| "What three months looks like" — Guide, the 12-week plan | article tile opening `ttc_read_heat_habits` | `TtcGuideTile` → `ttc_read_three_months`, written: day one, weeks 1 / 2–6 / 7–11 / 12 |
+| "Zinc and CoQ10, honestly" — Article + Product | a product shelf only | `ttc_read_zinc_coq10` written (Cochrane, the MOXI trial, trial doses, INR), shelf beside it |
+| "The case for testing early" — short card that bridges into tab 2 | opened `ttc_read_semen_analysis`, same as tab 2's first tile | `ttc_read_case_for_testing` written; read-next is the test article, next step is the tool |
+| "Reasons to be seen sooner" — calm red-flag card (reuse callout) | absent | `pinnedRedFlagReadIds: ['ttc_read_whose_side']` on the Talk group. The doctor's own callout, one copy, visible without opening anything |
+| "What he can track" — Tool, private, his side | `ttc_tools`, the whole hub | new surface `ttc_partner_health` → the partner-health tracker, directly |
+| "Talk / Consult (andrologist)" ×2 | `kTtcActConsult`, the consults shelf | `kTtcOfferingAndrologist` (`ttc_consult_androl`); `openTtcFocusTile` resolves an offering id on a Talk tile |
+| Step 7, "remove the accordions" | three `collapsible: true` sections | unfolded; content untouched |
+| Tool: volume input | in the logic, not on the form — a dead field | asked, optional, reported with no line |
+| Tool: abstinence "in days" | five buckets, "under 2" stored as 1 | a number of days |
+| Tool: "Keep his reports with yours (saves it)" | opened the folder, saved nothing | writes a `TtcRecord` (`testId: 'semen'`, `forPartner: true`, value = every number in report order, note = first/repeat + abstinence), once per reading, then opens the folder. `TtcRecordsStore.ensureLoaded()` added — see below |
+| Tool: "opens the andrologist consult" | consults shelf | the offering, with the shelf as fallback if it is ever removed |
+| Tool: usual range → "point to couple-level readiness in IVF and IUI" | one sentence, no link | `coupleReadiness` on the reading; a quiet gateway card in the IVF hue opens the IVF door, whose first tab is "Is it time to get help?" |
+
+**Why `ensureLoaded` exists** — a general fact, not a local fix. The records
+store loads its cache in its constructor, asynchronously, and the load does
+`_items..clear()..addAll(cached)`. Any caller that constructs the singleton and
+writes in the same breath races that clear: the new row goes in, the load
+completes, the row is gone. Every earlier caller was a screen that only read,
+so a listener rebuild after the load hid the race. The tool is the first
+write-before-read caller, and it lost its record until the write awaited the
+load. A store that can be written should expose its load as a future.
+
+**Still deliberate:**
+
+* **The three original articles are reused whole** (§25.3). The brief's "split
+  the long articles into the rails" is met by the seven written pieces around
+  them rather than by cutting the doctor's argument into fragments.
+* **The masterclass points at `ttc_partner_workshop`.** There is no
+  `ttc_course_male` offering. Rename it in the catalogue if "The half nobody
+  talks about" should be its public name.
+* **Tab 5 (Talk) stays separate**, with the red-flag card now pinned on it.
+* **The bridge is content, not a tab switch.** "The case for testing early"
+  ends where tab 2 begins; it does not change the selected tab on tap, because
+  no tile on any door does and a tile that navigates the page it sits on would
+  be a new kind of thing.
+
+### 25.6 What is left — and it is no longer code
+
+**Audited 2026-09-06 against `his_side_rebuild.pdf` line by line: every step of
+Part 1 and every rule of Part 2 is built, wired and tested.** Ten reads exist,
+all twenty tile targets resolve, the three referenced film slots are defined,
+both supplement products are in the shelf, `test/ttc_his_side_test.dart` passes
+at 48. What remains needs a camera, a photographer or a doctor — not an editor.
+
+**Three films, not two.** `ttc_vid_whose_side` (288s), `ttc_vid_semen_analysis`
+(342s) and `ttc_vid_heat_habits` (306s) — 15 minutes 36 seconds, 12 chapters,
+all written with expert names and takeaways. The third is the hero of
+`ttc_read_heat_habits` rather than a door tile, which is why an earlier version
+of this section undercounted it. **No film exists for any of them**, and the
+tiles render `PvVideoPlaceholder` honestly rather than a play control that
+plays nothing (`PvVideoSlot.isLive` is false while `url` is null).
+
+**One hero photograph.** `heroImageUrl` is an Unsplash placeholder. The brief
+for this door is specific about the frame: a couple, not a lone man and not a
+woman — see the two corrections in the door's header comment.
+
+⚠️ **Seven of the ten reads claim a clinical review that never happened.**
+Three originals say *"reviewed August 2026"* and were genuinely written by a
+doctor. The four of 2026-09-04 and the three of 2026-09-06 carry the same
+byline shape — four say August, three say September — and **none of the seven
+has been past a clinician.** That is a byline asserting a review that did not
+occur, which is worse than no byline. Either get the read or strip the date.
+`ttc_read_zinc_coq10` is the most perishable: it quotes trial doses and Indian
+retail prices.
+
+**Twenty rail-card illustrations**, part of the 170 across all seven doors.
+Every tile is a flat tinted block today.
+
+**Two small decisions, neither blocking:**
+
+* The tool saves the record dated **today**. A "date on the report" input is
+  the one field the brief's save could still want, since a report is often
+  weeks old by the time it is typed in.
+* The masterclass points at `ttc_partner_workshop`. Rename it in the catalogue
+  if *"The half nobody talks about"* should be its public name.
+
+---
+
+## 26.0 After a loss, rebuilt from the brief — 2026-09-04
+
+Sixth door, and the one that departs from the shape on purpose.
+
+**Where to look:** TTC home → **After a loss**. Four tabs, **Your body** first.
+
+| File | What it is |
+|---|---|
+| `lib/ttc/focus/ttc_focus_after_loss.dart` | The page: 4 groups, 6 sections, 11 tiles |
+| `lib/screens/reader/pv_reader_screen.dart` | `openAtHeading` — the mechanism behind "promote" |
+| `lib/ttc/ttc_focus_data.dart` | `atHeading` on Guide/Article; `pinnedRedFlagReadId` on a group |
+| `test/ttc_after_loss_test.dart` | 13 tests, mostly about invisible failures |
+
+---
+
+### 26.1 "Promote" needed a mechanism, or it would have been a lie
+
+The brief asks for six cards that reference a **section** of an existing
+article — single source, shown twice, never copied.
+
+Built with `readId` alone, all six open the same article **at the top**, and a
+woman who tapped *"Rh status and retained tissue"* is left scrolling two
+thousand words for the paragraph she was promised. That is worse than a copy,
+because it looks like it worked.
+
+So `PvReaderScreen` gained `openAtHeading`, and the tiles gained `atHeading`.
+**It matches on heading text, not an index** — an index silently points at the
+wrong section the day somebody inserts a paragraph, and a wrong section is
+unnoticeable in review. A heading that no longer exists opens at the top, which
+is the safe failure, and a test asserts every anchor still resolves so it is not
+also a silent one.
+
+### 26.2 Three deliberate departures from the other doors
+
+* **"Your body" is the default tab.** Every other door opens on explanation.
+  Days after a loss the first need is physical reassurance and the hospital red
+  flag, not causes.
+* ⚠️ **There is no tool, and there must not be one.** The only candidate is a
+  recovery tracker, and turning miscarriage recovery into a number to log is the
+  one place a tool does harm rather than help. Held by a test that fails if any
+  group grows a `toolSurfaceId` or any tool tile appears.
+* **Nothing is sold from the top.** Every other door carries a course in the
+  headline slot; this page has none. The cohort sits last, on the Support tab,
+  described as four sessions with people and carrying no price — which is the
+  bracket's own stated rule, "reached through a person, not a product row".
+
+### 26.3 The red flags are pinned, and they are the articles' own words
+
+Two tabs pin a callout above their rails. **The group names a read; the screen
+renders that read's `whenToSeeSomeone`.** Typing the words onto the group would
+put a clinical warning in two places — the doctor-reviewed article and a data
+file nobody reviews — and the day they diverge, the one on the landing is the
+one she reads first.
+
+⚠️ **The Support flag carries the self-harm routing**, which the brief says
+must not be lost or buried. Rendering the callout whole rather than an excerpt
+is what guarantees that, and a test asserts the sentence is still in it.
+
+### 26.4 Three cards the brief lists that are NOT built, each with a reason
+
+* **"What recurrent-loss investigation looks like"** — that content is the third
+  *paragraph* of "When investigation is worth asking for", not a section of its
+  own. A second card would anchor to the same heading and land in the same
+  place, which is exactly the fake promotion the anchor exists to prevent.
+  **Fixing it means splitting a doctor-reviewed article**, which the brief's own
+  rules forbid. Your call: split the article, or drop the card.
+* **The optional "On trying again" video** — there is one loss video slot in the
+  catalogue and it is already used. Inventing a second id would put a
+  coming-soon card on the page that no file can ever be mapped to. One entry in
+  `ttc_videos_data.dart` away.
+* **The bleeding infographic** — `TtcInfographicTile` requires two real columns
+  and there is no empty state, correctly. An infographic about normal bleeding
+  after a miscarriage is clinical content a doctor writes.
+
+  **The slot is not empty.** It carries the article's own "The bleeding"
+  section, promoted — the exact material the infographic will illustrate. When
+  the picture is supplied, the guide steps aside.
+
+### 26.5 Written rather than stubbed — two myth cards
+
+`TtcMythTile` needs both halves to exist, so the two new micro-cards were
+written rather than placeheld:
+
+* **"You can ovulate before your first period"** — from the callout inside the
+  recovery article. It is the piece of information most often left unsaid, and
+  finding out afterwards is worse than reading it.
+* **"A miscarriage is not a pattern"** — one loss does not change the odds for
+  the next pregnancy.
+
+Both restate material the articles already carry, in the myth/fact shape the
+brief asked for. ⚠️ **These two are the only new prose in the area, and they
+have not had a clinical read.** Everything else is the two Dr. Ananya Rao
+articles, untouched.
+
+### 26.6 Still owed
+
+* **The old landing route.** The brief says to remove the now-orphaned route to
+  "Understand recovery & trying again". The focus page is checked before hubs,
+  so the bracket already opens the new page — but the hub config and its
+  `kTtcActLossRecoveryLibrary` action are still in `ttc_hubs.dart`. Left in
+  place as the fallback if the page is unregistered; **worth deciding whether it
+  retires.**
+* **One hero photograph.** Unsplash placeholder, same as three other doors.
+* **The closing line** the brief specifies — *"This settles when you know your
+  body is recovering normally…"* — is not rendered. `TtcFocusPage` has no
+  closing-line slot, and adding one for a single door is a change worth asking
+  about rather than assuming.
+
+---
+
+## 27.0 The fertile-window door caught up to the shape — 2026-09-05
+
+The first door built in the stage was the last one still on the old format.
+Asked for directly: *"the fertile window, that first door is using the old
+format. If you compare it with PCOS and IVF… implement the current format on
+it. Structure wise."* Structure only — no copy was rewritten and no tile was
+added or removed.
+
+**Where to look:** TTC home → **Conceiving & the fertile window**. Five tabs,
+Your window first.
+
+| File | What changed |
+|---|---|
+| `lib/ttc/focus/ttc_focus_conceiving.dart` | `groups` added, seven sections tagged, one moved |
+| `lib/ttc/ttc_focus_data.dart` | A stale comment on `TtcFocusSection.group` |
+| `test/ttc_focus_groups_test.dart` | The guard test inverted; three new |
+| `test/ttc_focus_page_test.dart` | Two assertions that were right for a scroll |
+
+---
+
+### 27.1 The two orderings were arguments, and a rail does not have an order
+
+This is the part worth reading. Two comments in the file were **load-bearing
+rationale attached to section order**:
+
+* *"HIS SECTION COMES BEFORE HERS, AND THAT ORDER IS THE POINT"* — a male
+  factor is involved in about half of couples who take longer than expected,
+  and in this market the advice, the testing and the blame land on her.
+* *"THE PAGE ENDS BY ROUTING TO A PERSON"* — CLAUDE.md's rule that anything
+  clinical routes calmly to a doctor.
+
+**In a grouped page neither sentence can be true, because nothing is "further
+down" any more.** A tab is on the rail or it is not. Restructuring silently
+would have left two comments explaining an order that no longer existed — the
+worst kind of stale, because it reads as a reason and enforces nothing.
+
+So both were re-homed onto **rail position**, which is stronger than what they
+had: his tab sits before hers on a rail that is permanently visible at the same
+size, rather than first in a scroll most people never finish; the doctor is the
+last card and always one tap away rather than one long scroll away. Both are
+now **asserted in `ttc_focus_groups_test.dart`**, because a rationale nothing
+enforces is a rationale that quietly goes.
+
+**The general lesson:** when a comment justifies an *ordering*, changing the
+container invalidates the comment. Grep for the rationale, not just the code.
+
+### 27.2 Grouping made one mis-filing visible
+
+"Does stress stop pregnancy?" sat fifth, between what she should do and the
+doctor. It is the third of three myth-corrections about the act of trying —
+beside "does more sex help?" and "does position matter?" — and it only sat where
+it sat because a scroll has room for anything. It moved into **How to try**.
+
+⚠️ **The near miss: it is NOT under "What she can do".** Filing stress under her
+is precisely the reflex the door's own his-before-hers argument exists to
+correct. There is a test for it.
+
+### 27.3 The hero film came off, and nothing was orphaned
+
+`ttc_conceiving_intro` was the page's hero video. **It has no entry in
+`ttc_videos_data.dart` at all** — a bare slot id, so the first door of the stage
+opened on a coming-soon box. Commented out, matching PCOS and IVF.
+
+The check that mattered before removing it: the four TTC films that *are*
+written and chaptered each have a tile somewhere. This one never did, so there
+was no film to relocate. The declaration in `ttc_hubs.dart:107` is untouched and
+still works if the page is ever unregistered.
+
+### 27.4 The guard test inverted, and that is the test working
+
+`ttc_focus_groups_test.dart` carried *"the conceiving door is still one long
+scroll"*, guarding against the door drifting into the grouped shape as
+somebody's tidy-up. The shape has now been asked for, so the guard was
+**re-decided rather than deleted** — it became the mirror question: has any door
+drifted *back* to a plain scroll, stranding its `group` tags?
+
+### 27.5 Still owed
+
+* **A fifth hero photograph.** This door now carries an Unsplash placeholder
+  like the other four, so the count in §24–26 goes from four to five.
+* Nothing else. No copy was touched, no tile added, no read written.
+
+---
+
+## 28.0 Mind & body, rebuilt — the stage is complete — 2026-09-05
+
+Seventh and last TTC door, from `ParentVeda_Mindbody_rebuild_final.pdf`
+(30 Aug 2026). **Every bracket in the stage now opens a focus page and none
+opens a hub.**
+
+**Where to look:** TTC home → **Mind & body**. Five tabs, **Today** first, and
+Today is a do-it screen rather than a rail.
+
+| File | What it is |
+|---|---|
+| `lib/ttc/focus/ttc_focus_mind_body.dart` | The door: 5 groups, 11 sections |
+| `lib/ttc/ttc_practice_data.dart` | The 12 practices, defined once |
+| `lib/ttc/ttc_mind_today.dart` | Rotation + done-today. No widgets, no store |
+| `lib/screens/ttc/ttc_mind_today_screen.dart` | The do-it screen |
+| `lib/screens/ttc/ttc_practice_screen.dart` | One screen for all 12 practices |
+| `lib/ttc/reads/ttc_reads_mind_body.dart` | +4 guides |
+| `test/ttc_mind_body_test.dart` | 24 tests, mostly about the position |
+
+---
+
+### 28.1 The brief asks for something arithmetic cannot give — SAY IT PLAINLY
+
+*"Rotate so the same card does not repeat within seven days."* Each library
+holds **six** cards. Seven days without a repeat needs seven distinct cards;
+with six, the seventh day must repeat one. Pigeonhole, not an implementation
+problem.
+
+Built as the strongest thing available: a strict cycle through all six before
+any returns — **no repeat within six days**, with the gap always exactly six
+rather than random. A shuffle-with-memory was rejected because it can serve the
+same card on three consecutive Mondays, and somebody who only practises at the
+weekend then sees one card forever.
+
+**To get to seven: one more card in each library.** That is the whole fix.
+
+### 28.2 Six of the twelve durations are OURS, not the brief's
+
+The brief gives a time for five cards ("3 min" ×3, "ten-minute walk",
+"two-minute" ×2) and is silent on the rest. A Do card without a time cannot be
+planned around — "have I got time for this before work" is the only question
+anyone asks of one — so these were filled in and are listed here for
+correction:
+
+| Practice | Ours |
+|---|---|
+| Hip openers: butterfly and slow lunge | 5 min |
+| Slow sun salutation, three rounds | 6 min |
+| Long out-breath, in four out six | 3 min |
+| Alternate nostril breathing | 4 min |
+| Box breathing | 3 min |
+| Ten slow breaths together | 2 min |
+
+### 28.3 "Two-minute calm listen" was built without audio, deliberately
+
+The title reads as a guided audio track, and we have no audio pipeline in this
+stage. Rather than ship a card that opens a coming-soon box, it is built as an
+**attention practice** — sit still, find the furthest sound, then the nearest,
+move between them. That is a legitimate reading of the name, it needs no asset,
+and it works today. **If an audio track was intended, this one needs rebuilding
+rather than adjusting.**
+
+### 28.4 Two myth cards are written out, and the brief says promote
+
+`TtcMythTile` needs both halves as literal strings, so there is no way to point
+one at a section and have it render. "Stop thinking about it and it will happen"
+and "Does it make a smarter baby?" both restate material the two locked articles
+already carry. Same compromise as the two After-a-loss myth cards. ⚠️ **With the
+four new guides, that is six pieces of new prose in this area owed a clinical
+read.**
+
+### 28.5 What the model gained, and why each was on the second asking
+
+Three changes to shared code, and none of them was built for this door alone:
+
+* **`TtcFocusPage.closingLine`.** After a loss asked for a closing line on
+  2026-09-04 and was refused (§26.6) — one caller does not justify a field on a
+  shared model. Mind & body asked in the same words, so it is a field now, and
+  **After a loss can have its line by filling it in.**
+* **`TtcFocusGroup.pinnedRedFlagReadIds` is a list.** It was singular, which fit
+  After a loss only because that door wanted its two flags on two different
+  tabs. Mind & body wants both on Talk, from two different articles. *A field
+  whose cardinality was inferred from the first caller; the second caller is
+  where you find out.*
+* **`TtcDoorTile`, the 16th format.** The first tile whose destination is
+  another focus area rather than a piece of content. Only "His part of this"
+  needs it. ⚠️ **The brief marks nine cards `reference` and eight of them are
+  NOT this** — they are ordinary Article tiles carrying Getting ready's own
+  `readId`, which is what single-sourcing actually looks like. There is no
+  "Reference" chip, because that word describes our content model rather than
+  what happens when she taps.
+
+### 28.6 The old landing is gone; the old ritual screen is not
+
+`kTtcMindBody` is commented out of `kTtcHubs`, so the two-door hub has no
+entrance. `ttc_ritual` — the five-part "Trying Together" ritual — **still
+exists and is still routed**, because it is reachable from the bracket's
+Activities layer (which the workbook wants live) and from `ttc_journeys.dart`.
+
+**Open:** whether the ritual retires. It is now a screen with no door in front
+of it, reached only from two registries. The five parts it teaches are covered
+by the new practice library; what it has that the library does not is the
+couple-together framing. **Needs a decision.**
+
+### 28.7 Still owed
+
+* **Clinical read on six pieces** — four guides (§28.4) plus two myth cards.
+* **One hero photograph.** Unsplash placeholder, the sixth owed.
+* **One film** — `ttc_vid_mind_longer_session`, written and chaptered, awaiting
+  footage. Brings the stage's owed films to five.
+* **The partner's Today is not wired.** The brief says *"Both partners see
+  Today. Their picked cards may differ."* `ttcPracticeOfTheDay` takes an
+  `offset` and `kTtcPartnerOffset` exists and is tested, but nothing on the
+  partner surface calls it. **The logic is done and unreached — the wiring gate,
+  recorded rather than claimed.**
+
+---
+
+## 29.0 The home hero: fixed height, and it speaks all cycle — 2026-09-05
+
+From three Flo screenshots: *"the homescreen hero is fixed in size i mean height
+wise and then the message also keeps on changing, which we lack… i guess mostly
+its a loop."* Both were real, and the second was the bigger one.
+
+| File | What changed |
+|---|---|
+| `lib/ttc/ttc_home_hero.dart` | **New.** The state machine, pure, no strings |
+| `lib/screens/ttc/ttc_strings.dart` | 8 new strings for the four new states |
+| `lib/screens/ttc/ttc_home_v3.dart` | `_WindowLine` chooses words; fixed height |
+| `test/ttc_home_hero_test.dart` | +9, walking a whole cycle day by day |
+
+---
+
+### 29.1 The hero went quiet for half of every cycle, and no test noticed
+
+It had five states, four of them refusals. The fifth said either "your fertile
+days are here" or "your fertile days open in N days". **The moment the window
+closed, `ttcFertileWindowNow` rolled forward onto NEXT cycle's window** — so
+from then until her period arrived, roughly a fortnight, the hero said
+*"Expected around 20 Sep to 25 Sep, based on your usual cycle"* and did not
+change again.
+
+Fourteen days of one unchanging sentence about a cycle she is not in yet, at the
+point in the month she is thinking about this most. **Nothing failed.** Every
+individual state rendered correctly; the hole was in the coverage. That is why
+the new tests walk all 28 days rather than checking interesting ones.
+
+Four states added, so the loop now closes: `windowOpen` (with days remaining),
+`windowLastDay`, `waiting`, `periodDue`, `periodLate`.
+
+### 29.2 What we did NOT copy from the reference, and why
+
+Two of Flo's three hero lines are unavailable to us, and neither is a matter of
+house style:
+
+* **"Best chances of conceiving"** is a chance framing on the home screen — a
+  personalised probability by implication, forbidden by CLAUDE.md and scanned
+  for by `ttc_clinical_review_test.dart`. Ours says WHEN, never HOW LIKELY:
+  *"Your fertile days end today"* carries the same information and promises
+  nothing.
+* **"Time for a pregnancy test in 10 days"** is a countdown to an OUTCOME, which
+  `ttc_home_hero_test.dart` already forbade for the chapter copy. It turns the
+  second week of the wait into a number getting smaller. **We count to her
+  period instead** — the same arithmetic pointed at a cycle event rather than a
+  verdict on her.
+
+Also refused: the word **"late"**. It implies a schedule she failed to keep and
+most people read it as a hint. The state says *"3 days past your usual length"*.
+There is a test.
+
+### 29.3 The height, and the thing fixing it alone would not have fixed
+
+`blockHeight = 146`, measured against the worst case (two lines of headline, two
+of body, plus the cycle-day row) rather than a typical one. The headline runs to
+one line on most days and two on others, so the strip, the buttons and
+everything below them sat at a different height depending on where in her cycle
+she was.
+
+⚠️ **A fixed box is not enough on its own.** With the footer left to flow, "Cycle
+day 14" still hopped by a line between days *inside* a box that no longer
+changed size. It is pinned to the bottom with a `Spacer`.
+
+### 29.4 A regression I introduced, and the test that caught it
+
+Replacing the open-window body with the new count dropped the dates — "1 Sep to
+6 Sep" — which is the line that lets somebody plan a week.
+`ttc_daily_insights_test.dart` failed on it. The body now carries both: they
+answer different questions and there is room.
+
+### 29.5 The hero follows the strip — CLOSED SAME DAY, from the screenshots
+
+⚠️ **This was §29.5's open question and the answer was already in the
+screenshots.** I asked whether the hero should follow the selected day. Looking
+again at the reference: its strip sits on the **3rd** while TODAY is the **5th**,
+and the hero reads *"today and 2 more days"*; move the strip to the 5th and the
+same hero reads *"end today"*. It follows. The user's answer was one line: *"i
+shared screenshot of flo see how they did, i guess they do and we can follow
+same."*
+
+Worth noting how the question arose. **Everything else in that header already
+followed the selection** — the date above it, the insight cards
+(`ttcPickForToday(now: selected)`), the symptom sheet, and the two actions,
+which already dim on a future day (`enabled: !selected.isAfter(todayDate)`). The
+hero was the single widget still reading today, so standing on the 3rd produced
+a page about the 3rd with one sentence about the 5th in the middle of it, and
+nothing on screen said which was which.
+
+**The mechanism.** `TtcFertileWindow` carries `openNow` and `daysUntilOpen`,
+both measured from today — using them is what pinned the hero. It also carries
+`opensCycleDay` / `closesCycleDay`, which are *within-cycle* numbers describing
+the same window in a frame that does not move. The state machine now compares
+the selected day's cycle day against those.
+
+Two states were added, and both exist to stop the change from lying:
+
+* **`pastCycle`** — a selected day in an EARLIER cycle. We estimate ovulation
+  for the cycle she is in, from that cycle's signals. Reconstructing a window
+  for two months ago means assuming her usual length and her usual luteal phase
+  and printing the result as history; she would have no way to tell it from one
+  we actually estimated. So it refuses, and prints no cycle day.
+* **`periodExpectedBy`** — a FUTURE day at or past the expected period. The
+  strip runs six days forward, so on day 26 of a 28-day cycle she can select a
+  day the arithmetic calls overdue and the calendar calls Thursday. *"3 days
+  past your usual length"* is false about a day that has not happened.
+
+
+### 29.7 The whole thing was dead on a clinic-run account — 2026-09-05
+
+Reported from the device, after §29.1–29.5 shipped: *"nothing changed as i said…
+Still your clinic holds. This is the line that I keep seeing again and again,
+nothing changes."*
+
+Correct. `ttcHomeHeroLine` opened with an early return on `clinicInvolved`, ABOVE
+every state added the day before. On an account where a clinic runs the timing —
+which is every IVF and IUI pathway — the hero could not reach any of them.
+
+⚠️ **The field's own doc comment forbids exactly what I did with it.**
+`ttc_chapter.dart:222`:
+
+> *Convenience for the many surfaces that only care "is anyone else involved?" —
+> a card heading, a disclaimer. **Anything that changes what is COMPUTED must use
+> `behaviour` instead.***
+
+And the refusal it was trying to enforce **was already enforced one layer down**:
+`ttcFertileWindowNow` opens with `if (!today.behaviour.showsFertilityWindow)
+return null`. The guard was not merely misplaced; it was redundant. Removing it
+loses nothing — a test now walks all 28 days of a clinic-run cycle and asserts no
+window state is reachable.
+
+**What a clinic actually forbids is a prediction, not a fact.** Her cycle day is
+her own logged period subtracted from the date — the one number on that screen
+that is hers rather than ours. So a clinic-run cycle now leads on **"Cycle day
+9"**, which moves every morning, with the clinic note as one short line beneath.
+The old two-line body is commented out, kept for revert: it is good writing in a
+slot that has to say something new daily, and the reasoning it carries already
+lives on `TtcTreatmentEntryCard`, where somebody asking "why is there no
+estimate" actually goes.
+
+⚠️ **THE SUITE WAS GREEN THE WHOLE TIME, AND THAT IS THE PART WORTH KEEPING.**
+Nine states, tested day by day across a whole cycle — and every one of those
+tests ran as the DEFAULT pathway. They all agreed with each other and none of
+them touched the branch that mattered. The gap was not which state was checked;
+it was **which account the test ran as**. There is now a clinic-pathway group.
+
+### 29.8 The gap above the buttons — which end the slack sits at
+
+Also reported: *"the spacing also is like weird… a lot of spaces there between
+that heading and the entry date row."*
+
+The fixed block was 146 with content top-aligned and a `Spacer` pushing the
+cycle-day footer down. On a one-line headline with no footer — which is exactly
+what the clinic state was — most of the box was empty, immediately above the two
+buttons.
+
+**A fixed box always has slack on short days; that is the price of the page not
+jumping.** The fix is not how much slack there is but which end it sits at. It is
+140 now and bottom-aligned, so the leftover height falls between the day strip
+and the text, where the strip already has air, instead of between the text and
+the buttons, where it reads as a hole. Same pixels, and only one arrangement
+looks like a mistake.
+
+### 29.6 Still open
+
+* **Only the TTC home hero changed.** Pregnancy and parenting heroes are
+  untouched and have their own shapes.
+* **The reference dims future-day actions and we already do** — worth knowing
+  it was not part of this change; `enabled: !selected.isAfter(todayDate)` was
+  already there.
+
+---
+
+## 31.0 The twelve practice cards, with players — 2026-09-05
+
+From `ParentVeda_Mindbody_twelve_practice_cards.pdf` (30 Aug 2026): full content
+for every card in Mind & body's practice tab, plus an animation spec.
+
+**Where to look:** TTC home → Mind & body → **The practice** → any card.
+
+| File | What changed |
+|---|---|
+| `lib/ttc/ttc_practice_data.dart` | Rewritten to the brief; `TtcPracticeAnim` union |
+| `lib/screens/ttc/ttc_practice_player.dart` | **New.** Five players |
+| `lib/screens/ttc/ttc_practice_screen.dart` | Rebuilt around the player |
+| `lib/ttc/ttc_focus_data.dart` | `TtcFocusGroup.note` |
+| `test/ttc_mind_body_test.dart` | 28 tests, +5 |
+
+---
+
+### 31.1 Four of my six invented durations were wrong, and all six erred LONG
+
+§28.2 recorded that the first brief timed only five cards and that I filled the
+other six from judgement. All twelve are now stated, and the breathing practices
+are **one minute**, where I had written three and four.
+
+Every guess was too long, which is not a coincidence: **a three-minute practice
+feels more substantial to write than a one-minute one.** The brief is shorter on
+purpose — a minute is what somebody actually does. Worth remembering the next
+time a gap gets filled by judgement: the bias has a direction.
+
+### 31.2 The safety line was on twelve cards; it belongs on one tab
+
+The brief puts this in a heading — *"Safety line shown once on the practice tab,
+not on every card"* — and the first build put it on all twelve, which is the
+reflex. A warning repeated on every card stops being read by the third one, and
+each card already carries its own specific `skipIf`, which is different every
+time and therefore still read.
+
+This is what `TtcFocusGroup.note` was added for. ⚠️ **It is deliberately NOT a
+`pinnedRedFlagReadId`** — that renders a doctor-written `whenToSeeSomeone`
+callout from a real article ("go to a hospital today, not tomorrow"). This is a
+practical caution about stretching with no article behind it, and dressing it as
+a clinical red flag spends that alarm on the wrong thing.
+
+### 31.3 The honest split the brief draws, kept
+
+*"The six breathing cards can be built completely in code, today, with no
+artwork. The six movement cards need drawn figure animation, which Claude Code
+cannot produce."*
+
+**Built and working now** — one breathing component, configured per card, exactly
+as asked:
+
+| Card | Configuration |
+|---|---|
+| Long out-breath | in 4s, out 6s, 60s |
+| Box breathing | 4/4/4/4, 64s, **traces a square** |
+| Alternate nostril | 4/4, 90s, names the live nostril |
+| Ten breaths together | in 4s out 6s, counts 1–10, **two ring markers** |
+| Body relaxation | outline figure, region lit by the current step, 120s |
+| Calm listen | pulsing light + 120s ring, **no bundled audio** |
+
+**Scaffolded, awaiting artwork** — `TtcFigureAnim.assetPath` is read from the
+card's data, so a Rive/Lottie file drops in with no code change. The Rive package
+is deliberately **not** in `pubspec.yaml` yet: adding a dependency for six files
+that do not exist is how a pubspec collects things nobody uses.
+
+### 31.4 One deliberate departure: the step list does not advance on a timer
+
+The brief asks for *"a step list that advances on a timer with the current step
+highlighted"*. It advances on a **tap** instead, with forward/back controls and
+the session ring still running the clock.
+
+The reason is the brief's own shared rule: *"No countdown pressure… Leaving
+mid-way is fine."* A list that moves on its own is a countdown by another name —
+it takes the step away while you are still in it, and on a floor practice you are
+not looking at the phone when it happens. **Say if you want it timed; it is one
+field.**
+
+### 31.5 The five animations to commission
+
+⚠️ **`ttcAnimationsOwed()` derives this list from the data** rather than anybody
+maintaining it — a hand-written list is wrong the first time a card changes.
+There is a test on it.
+
+| Card | Loop | View |
+|---|---|---|
+| Loosen-up: neck, shoulders, side bends | ~30s, loops | Front |
+| Cat and cow, then child's pose | loops on a breath cue | Side |
+| Hip openers: butterfly and slow lunge | two-part, both sides | Side |
+| Legs up the wall | held pose, very little motion | Side |
+| Slow sun salutation | full sequence, longest of the six | Side |
+
+"A ten-minute walk" needs no figure, on the brief's own instruction — it is a
+plain timer.
+
+### 31.6 Still owed
+
+* **The five Rive files** above.
+* **A wake-lock for the ten-minute walk.** The brief asks for a timer that
+  "keeps running when the screen locks". The clock is wall-clock arithmetic
+  rather than a counter, so it is *correct* after the screen sleeps and wakes —
+  but nothing keeps the screen awake, which needs a plugin. Correctness is
+  there; the convenience is not.
+* **Clinical read** on the area's six new pieces (§28.4) — unchanged.

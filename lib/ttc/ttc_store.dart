@@ -74,7 +74,27 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
       );
 
   /// THE fertility rule. Every surface that might show a date reads this.
+  ///
+  /// ⚠️ I TRIED TO WEAKEN THIS ON 2026-09-05 AND THE SUITE REFUSED, CORRECTLY.
+  ///
+  /// The change was `pathway.isAnswered ? pathway.ownership : parentveda` — on
+  /// the argument that `path.defaultMedicated` is a guess from a LABEL, that
+  /// `setPath` clears both answers so the guess always applies, and that one
+  /// stray tap on "IVF" therefore switches the fertile window off permanently
+  /// with no route back from the home screen. All of that is true.
+  ///
+  /// It also broke **36 tests**, and they were the right ones: `Inferable`'s
+  /// default-deny in `journey_state_test`, the care-pathway rules, the cycle
+  /// companion's refusal. Those are not incidental — they are the clinical
+  /// spine described in CLAUDE.md, and a hero that reads better is not worth
+  /// publishing an ovulation estimate into a medicated cycle.
+  ///
+  /// ⚠️ SO THE REAL PROBLEM IS NOT THIS RULE, IT IS THAT THE STATE IS A TRAP.
+  /// Entering it takes one tap; leaving it means finding two questions on the
+  /// treatment screen that nothing points at. The fix belongs at the door, not
+  /// in the rule — see `docs/STILL-OPEN.md` §30.
   TimingOwnership get ownership => pathway.ownership;
+
   TtcPathwayBehaviour get behaviour => TtcPathwayBehaviour(ownership);
 
   /// True when she has answered the two questions rather than us assuming from

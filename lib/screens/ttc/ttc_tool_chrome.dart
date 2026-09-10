@@ -48,6 +48,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
@@ -77,9 +78,30 @@ class TtcToolScaffold extends StatelessWidget {
     this.variant = 2,
     this.action,
     this.heroLead,
+    this.scrollController,
+    this.chroma,
   });
 
   final double hue;
+
+  /// How saturated the tinted field behind the sheet is.
+  ///
+  /// ⚠️ NULL MEANS THE STAGE DEFAULT, AND ALMOST EVERYTHING SHOULD LEAVE IT
+  /// NULL. `v3FieldChroma` solves for one CIELAB C* across every hue so that a
+  /// rose door and a teal door feel equally strong — which is the right rule
+  /// for content areas that sit beside each other in a list.
+  ///
+  /// The shop is the exception it was written for. Its field came out flat
+  /// beside the design's own bright pink, and a product surface is the one
+  /// place in this stage that is allowed to look inviting rather than calm.
+  /// Reported as "stop using such dull colors".
+  final double? chroma;
+
+  /// ⚠️ OPTIONAL, AND ONLY THE PRODUCT PAGE PASSES ONE. The design's sticky
+  /// buy bar "appears on scroll", which means something outside has to know
+  /// the offset. Everything else leaves this null and gets the ListView's own
+  /// controller exactly as before.
+  final ScrollController? scrollController;
 
   /// Small, letterspaced, above the title. The tool's name.
   final String eyebrow;
@@ -151,9 +173,10 @@ class TtcToolScaffold extends StatelessWidget {
               accent: accent,
               ground: p.ground,
               variant: variant,
-              chroma: v3FieldChroma(hue % 360)),
+              chroma: chroma ?? v3FieldChroma(hue % 360)),
         ),
         ListView(
+          controller: scrollController,
           padding: const EdgeInsets.only(bottom: ttcBottomInset),
           children: [
             SafeArea(
@@ -393,23 +416,24 @@ class TtcToolPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final p = V2PaletteStore.instance.current;
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 130),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        // Same treatment as `_ToolOptionBlock`: white with a hairline at
+        // rest, ink when chosen. See the header there.
         decoration: BoxDecoration(
-          color: on ? v2BlockTint(hue % 360, p) : ttcPanel,
+          color: on ? ttcTitleInk : Colors.white,
           borderRadius: BorderRadius.circular(999),
-          border: on ? Border.all(color: ttcPurple, width: 1.5) : null,
+          border: Border.all(color: on ? ttcTitleInk : ttcLine, width: 1.5),
         ),
         child: Text(label,
             style: pvManrope(
                 fontSize: 13,
                 fontWeight: on ? FontWeight.w800 : FontWeight.w600,
-                color: ttcTitleInk)),
+                color: on ? Colors.white : ttcTitleInk)),
       ),
     );
   }
@@ -428,23 +452,297 @@ class TtcToolChoice<T> extends StatelessWidget {
 
   final T? value;
   final Map<T, String> options;
-  final ValueChanged<T> onTap;
+
+  /// ⚠️ NULLABLE NOW. Tapping the chosen answer clears it, so a question is
+  /// never a trap — the same rule the PCOS self-read is held to, and it has to
+  /// be here rather than at each call site or a question added later forgets.
+  final ValueChanged<T?> onTap;
   final double hue;
 
   @override
-  Widget build(BuildContext context) => Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: [
+  Widget build(BuildContext context) => TtcToolOptions(
+        p: V2PaletteStore.instance.current,
+        hue: hue,
+        items: [
           for (final e in options.entries)
-            TtcToolPill(
+            TtcToolOption(
                 label: e.value,
                 on: value == e.key,
-                onTap: () => onTap(e.key),
-                hue: hue),
+                onTap: () => onTap(value == e.key ? null : e.key)),
         ],
       );
 }
+
+
+// =============================================================================
+//  Choosing an answer
+// -----------------------------------------------------------------------------
+//  ⚠️ PROMOTED OUT OF `ttc_pcos_stand_screen.dart`, WHERE IT WAS AHEAD OF THIS
+//  FILE RATHER THAN BEHIND IT. The shared control used to be `TtcToolPill` in a
+//  `Wrap`, and two separate complaints landed on it from two different screens:
+//
+//    · **The wasted space.** A wrap of label-sized pills ends every row
+//      wherever the last one happens to fit, leaving a ragged strip down the
+//      right of every question — *"a lot of spaces again, being wasted."*
+//    · **The purple.** A chosen pill took a `ttcPurple` border. The accent is
+//      spent at decision points and never used to outline eight questions'
+//      worth of blocks — *"I can see a purple bar which isn't what we are
+//      following right now to select an option."*
+//
+//  So the row is DIVIDED rather than filled: every block in a row is the same
+//  width, the row reaches both edges, and a short last row stretches instead of
+//  leaving a gap. Selection is the block's own tint with an ink edge, never the
+//  accent.
+//
+//  ⚠️ AND THE CHECKBOX IS SINGLE-PURPOSE. A tick is a promise that more than
+//  one answer may be given. See [TtcToolOption.tick].
+// =============================================================================
+
+/// One option, before it is laid out. A record would do; a tiny class keeps the
+/// three fields named at every call site.
+class TtcToolOption {
+  const TtcToolOption(
+      {required this.label,
+      required this.on,
+      required this.onTap,
+      this.tick = false});
+
+  final String label;
+  final bool on;
+  final VoidCallback onTap;
+
+  /// Whether this block draws a checkbox.
+  ///
+  /// WARNING: ONLY ON A QUESTION THAT CAN HOLD SEVERAL ANSWERS, which here is
+  /// the hair-area picker and nothing else. The first cut ticked every block on
+  /// the page, reasoning that with deselect available every question is "none
+  /// or one" and so behaves like a set of checkboxes. That is true of the
+  /// MECHANICS and wrong about the READING: a checkbox is a promise that you
+  /// may choose more than one, and seven questions made that promise and then
+  /// broke it on the second tap.
+  ///
+  /// Said plainly: "check boxes are only necessary when there are more than one
+  /// choices." The fill and the border already say a single-choice block is
+  /// chosen, which is what it looked like before the ticks arrived.
+  final bool tick;
+}
+
+
+/// The answers to one question, as blocks that fill the row.
+///
+/// ⚠️ THIS REPLACED A `Wrap` OF PILLS, AND THE WRAP IS WHY THE PAGE FELT EMPTY.
+/// Reported as *"eight short questions… a lot of spaces again, being wasted"*,
+/// and a `Wrap` of label-sized pills is the mechanism: every row ended wherever
+/// the last pill happened to fit and left a ragged strip of nothing down the
+/// right-hand side of all eight questions. Nobody wrote that space; it was the
+/// residue of laying out by content width.
+///
+/// So the row is divided instead of filled. Every option in a row is the same
+/// width, the row always reaches both edges, and — the part that actually
+/// recovers the space — **a short last row stretches rather than leaving a
+/// gap**: four options in three columns puts one full-width block underneath,
+/// not one small one with two-thirds of a row beside it.
+///
+/// ⚠️ THE COLUMN COUNT COMES FROM THE LONGEST LABEL, NOT FROM THE COUNT. Three
+/// across for "Yes / No / Not sure", two across for "Often longer than 35". A
+/// fixed three would wrap the long ones onto two lines and a fixed two would
+/// waste half a row on the short ones — the choice has to follow the words.
+class TtcToolOptions extends StatelessWidget {
+  const TtcToolOptions({
+    super.key,
+    required this.items,
+    required this.p,
+    this.hue = 288,
+  });
+
+  final List<TtcToolOption> items;
+  final V2Palette p;
+
+  /// The tint a chosen block takes.
+  ///
+  /// ⚠️ DEFAULTED, NOT REQUIRED, BECAUSE THIS CONTROL WAS DESIGNED ON ONE
+  /// SCREEN. 288 is the PCOS violet it grew up in; every other tool passes its
+  /// own hue, and the default is there so a call site that forgets gets a
+  /// deliberate colour rather than a compile error nobody reads.
+  final double hue;
+
+  static const double _gap = 8;
+
+  @override
+  Widget build(BuildContext context) {
+    final longest =
+        items.fold<int>(0, (n, o) => o.label.length > n ? o.label.length : n);
+    // ⚠️ NINE, NOT TWELVE, AND THE THREE CHARACTERS WERE MEASURED. A block is
+    // not all label: 22pt of padding, an 18pt mark and a 9pt gap come off the
+    // column before a word is drawn, so a third of 354pt leaves about 64pt of
+    // text. "Not sure" wrapped at twelve. The count has to be chosen against
+    // the space the label actually gets, not against the column.
+    final cols = longest <= 9 ? 3 : 2;
+
+    final rows = <Widget>[];
+    for (var i = 0; i < items.length; i += cols) {
+      final end = (i + cols) < items.length ? (i + cols) : items.length;
+      final slice = items.sublist(i, end);
+      rows.add(
+        // ⚠️ `IntrinsicHeight` BUYS ONE THING AND IT IS WORTH THE PASS: every
+        // block in a row is as tall as the tallest. Without it a label that
+        // wraps to two lines leaves its neighbours short and the row reads as
+        // broken — which is what the first cut of this did to "Yes / No / Not
+        // sure". It is an extra layout pass over three small boxes, not over a
+        // list, so the usual objection to it does not apply here.
+        IntrinsicHeight(
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (var j = 0; j < slice.length; j++) ...[
+                if (j > 0) const SizedBox(width: _gap),
+                // ⚠️ `Expanded`, WHICH IS WHAT FILLS THE LAST ROW. Four options
+                // in three columns leaves one on its own, and it now spans the
+                // full width instead of sitting in a third of it with the other
+                // two-thirds empty. That gap, repeated down eight questions,
+                // was the wasted space this control was rebuilt to recover.
+                Expanded(child: _ToolOptionBlock(opt: slice[j], p: p, hue: hue)),
+              ],
+            ],
+          ),
+        ),
+      );
+    }
+
+    return Column(children: [
+      for (var i = 0; i < rows.length; i++) ...[
+        if (i > 0) const SizedBox(height: _gap),
+        rows[i],
+      ],
+    ]);
+  }
+}
+
+
+/// One answer. A block, not a pill.
+///
+/// ⚠️ THE MARK IS WHAT FILLS IT. A pill grown into a rectangle is a bigger
+/// empty pill — the same trap the group tabs on the focus page fell into twice.
+/// The 18pt rounded square on the left gives the block a left edge with
+/// something in it, and it does a second job the pill could not: it says
+/// out loud that an answer can be turned OFF again. A tinted pill with no
+/// control on it looks like a state the screen chose; a box with a tick in it
+/// looks like a thing you can untick, which is now true.
+///
+/// ⚠️ A SQUARE ON SINGLE-CHOICE QUESTIONS TOO, WHICH USUALLY MEANS "MANY". It
+/// is the honest shape here: with deselect, every question on this page really
+/// is "none or one" rather than "exactly one", and a radio that cannot be
+/// cleared is the control this screen just stopped being.
+///
+/// ---------------------------------------------------------------------------
+/// ⚠️ ONE SELECTION TREATMENT FOR EVERY TOOL — 2026-09-06
+/// ---------------------------------------------------------------------------
+///
+/// Until now a resting block was `ttcPanel` — a grey with a violet cast — and a
+/// chosen block took the DOOR'S HUE as a fill. On His side that hue is teal,
+/// so the report came back as: *"initially it's like purple, I click on it, it
+/// gets a blue background"*. Both halves were true. The resting grey read as
+/// purple beside white cards, and "the chosen answer takes the door's colour"
+/// meant three tools with three different chosen colours and none of them
+/// looking chosen so much as coloured in.
+///
+/// So the block now follows the rule the buttons already follow — *white with
+/// a hairline* at rest — and a chosen block is INK: dark fill, white text. Not
+/// the accent, not a hue, the same ink the titles are set in. It is
+/// unmistakably "this one", it is identical on PCOS, IVF and His side, and
+/// nothing on the page is coloured by which door you came in through.
+///
+/// And it answers the finger: the block scales down while pressed and clicks
+/// once on release. A control that changes colour 130ms after the tap, with
+/// nothing between, was the "not very responsive" in the same report.
+class _ToolOptionBlock extends StatefulWidget {
+  const _ToolOptionBlock(
+      {required this.opt, required this.p, required this.hue});
+
+  final TtcToolOption opt;
+  final V2Palette p;
+
+  /// Kept on the signature so no call site changes; no longer drawn. See the
+  /// header — a chosen answer is ink on every tool, not the door's colour.
+  final double hue;
+
+  @override
+  State<_ToolOptionBlock> createState() => _ToolOptionBlockState();
+}
+
+class _ToolOptionBlockState extends State<_ToolOptionBlock> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final opt = widget.opt;
+    final on = opt.on;
+    return Semantics(
+      selected: on,
+      button: true,
+      label: opt.label,
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _pressed = true),
+        onTapCancel: () => setState(() => _pressed = false),
+        onTapUp: (_) => setState(() => _pressed = false),
+        onTap: () {
+          HapticFeedback.selectionClick();
+          opt.onTap();
+        },
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedScale(
+          scale: _pressed ? 0.965 : 1,
+          duration: const Duration(milliseconds: 90),
+          curve: Curves.easeOut,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 160),
+            curve: Curves.easeOutCubic,
+            padding: const EdgeInsets.fromLTRB(11, 12, 11, 12),
+            decoration: BoxDecoration(
+              color: on ? ttcTitleInk : Colors.white,
+              borderRadius: BorderRadius.circular(14),
+              border: Border.all(
+                  color: on ? ttcTitleInk : ttcLine, width: 1.5),
+            ),
+            child: Row(children: [
+              if (opt.tick) ...[
+                AnimatedContainer(
+                  duration: const Duration(milliseconds: 160),
+                  width: 18,
+                  height: 18,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: on ? Colors.white : Colors.transparent,
+                    borderRadius: BorderRadius.circular(5),
+                    border: on ? null : Border.all(color: ttcLine, width: 1.5),
+                  ),
+                  child: on
+                      ? const Icon(Icons.check_rounded,
+                          size: 13, color: ttcTitleInk)
+                      : null,
+                ),
+                const SizedBox(width: 9),
+              ],
+              Expanded(
+                child: AnimatedDefaultTextStyle(
+                  duration: const Duration(milliseconds: 160),
+                  textAlign: opt.tick ? TextAlign.start : TextAlign.center,
+                  style: pvManrope(
+                      fontSize: 12.5,
+                      height: 1.25,
+                      fontWeight: on ? FontWeight.w800 : FontWeight.w600,
+                      color: on ? Colors.white : ttcTitleInk),
+                  child: Text(opt.label),
+                ),
+              ),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 
 /// A tinted block of prose in a result.
 class TtcToolBlock extends StatelessWidget {

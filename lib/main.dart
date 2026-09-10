@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/services.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -408,6 +409,24 @@ class _ParentVedaAppState extends State<ParentVedaApp>
     return MaterialApp(
       title: 'ParentVeda',
       debugShowCheckedModeBanner: false,
+
+      // ⚠️ DAY-MONTH-YEAR, EVERYWHERE, AND IT IS PINNED RATHER THAN INHERITED.
+      //
+      // With no delegates the app ran on `DefaultMaterialLocalizations`, which
+      // is en_US: every date picker's typed field was `mm/dd/yyyy`. In India
+      // that is not a preference, it is a wrong answer — 05/09 reads as 5
+      // September to everybody using this app, and the field was parsing it as
+      // 9 May.
+      //
+      // ⚠️ `en_GB` RATHER THAN LETTING THE DEVICE DECIDE. A device set to
+      // en_US would put the app back where it started, and a date order that
+      // depends on a phone setting is a bug that only some users can see. The
+      // app's own Hindi is not Flutter localisation at all — it is
+      // `AppLanguage` and `_p(en, hi)` — so pinning this affects date and time
+      // formatting and nothing else.
+      locale: const Locale('en', 'GB'),
+      supportedLocales: const [Locale('en', 'GB'), Locale('en', 'IN')],
+      localizationsDelegates: GlobalMaterialLocalizations.delegates,
       theme: AppTheme.lightFor(_controller.language),
       darkTheme: AppTheme.dark,
       themeMode: ThemeMode.light,

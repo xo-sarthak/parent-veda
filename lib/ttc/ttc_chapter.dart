@@ -172,6 +172,7 @@ class TtcToday {
     required this.cycleDay,
     required this.cycleLength,
     required this.estimatedOvulationDay,
+    this.rawOvulationDay,
     required this.confidence,
     required this.fertility,
     required this.daysIntoChapter,
@@ -195,6 +196,30 @@ class TtcToday {
 
   /// Why it is null, so a screen can say so instead of showing a hole.
   final TtcNoEstimate noEstimate;
+
+  /// The ovulation day BEFORE the ownership gate, for the home hero only.
+  ///
+  /// ⚠️ THIS IS NOT A SECOND CLINICAL ESTIMATE AND MUST NOT BECOME ONE. The
+  /// engine already computes `ov` to place a couple in the right chapter — the
+  /// waiting days are just as real during an IVF cycle — and then withholds it
+  /// from `estimatedOvulationDay` so no screen can show a date that might
+  /// contradict a clinic. That rule is right and is unchanged: everything that
+  /// reads `estimatedOvulationDay` still gets null.
+  ///
+  /// ⚠️ EXACTLY ONE SURFACE READS THIS, AND ONLY BECAUSE IT WAS ASKED FOR.
+  /// After four rounds of the home hero showing a clinic refusal instead of a
+  /// cycle message: *"the hero section will display something else… not that
+  /// IVF and everything, because it's not happening right now."* The reasoning
+  /// is sound — `ownership` comes from `path.defaultMedicated`, a guess from a
+  /// label she tapped once, and `setPath` clears her real answers so the guess
+  /// always wins.
+  ///
+  /// ⚠️ IF YOU ARE ABOUT TO USE THIS ANYWHERE ELSE, DON'T. The gate exists so
+  /// a clinic is never contradicted, and a second caller is how a one-screen
+  /// exception becomes the behaviour. `docs/STILL-OPEN.md` §30 has the proper
+  /// fix, which is to derive ownership from her ANSWERS rather than a pathway
+  /// default — at which point this field is deleted.
+  final int? rawOvulationDay;
 
   final OvulationConfidence confidence;
 
@@ -442,6 +467,7 @@ class TtcChapterEngine {
         cycleDay: day,
         cycleLength: len,
         estimatedOvulationDay: publishedOv,
+      rawOvulationDay: ov,
         confidence: conf,
         noEstimate: why,
         fertility: fert,
@@ -460,6 +486,7 @@ class TtcChapterEngine {
         cycleDay: day,
         cycleLength: len,
         estimatedOvulationDay: publishedOv,
+        rawOvulationDay: ov,
         confidence: conf,
         noEstimate: why,
         fertility: fert,
@@ -480,6 +507,7 @@ class TtcChapterEngine {
         cycleDay: day,
         cycleLength: len,
         estimatedOvulationDay: publishedOv,
+        rawOvulationDay: ov,
         confidence: conf,
         noEstimate: why,
         fertility: fert,
@@ -496,6 +524,7 @@ class TtcChapterEngine {
         cycleDay: day,
         cycleLength: len,
         estimatedOvulationDay: publishedOv,
+        rawOvulationDay: ov,
         confidence: conf,
         noEstimate: why,
         fertility: fert,
@@ -517,6 +546,7 @@ class TtcChapterEngine {
       // clinic cycle reached the waiting days and got a published ovulation
       // day plus the non-clinic card. The IVF defect, alive in one branch.
       estimatedOvulationDay: publishedOv,
+      rawOvulationDay: ov,
       confidence: conf,
       noEstimate: why,
       fertility: fert,

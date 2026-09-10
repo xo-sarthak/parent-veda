@@ -55,25 +55,26 @@
 // =============================================================================
 
 import 'ttc_fertility_help_rules.dart';
+import 'ttc_fertility_help_store.dart';
 
 // -----------------------------------------------------------------------------
 //  The six questions
 // -----------------------------------------------------------------------------
 
-enum IvfAge { under35, thirtyFiveTo37, thirtyEightTo40, over40 }
-
-extension IvfAgeCopy on IvfAge {
-  String get label => switch (this) {
-        IvfAge.under35 => 'Under 35',
-        IvfAge.thirtyFiveTo37 => '35 to 37',
-        IvfAge.thirtyEightTo40 => '38 to 40',
-        IvfAge.over40 => 'Over 40',
-      };
-
-  /// ⚠️ THE POINT WHERE WE STOP SAYING "KEEP WAITING". See the header for why
-  /// this is 35 while the engine's referral hinge is 36.
-  bool get holdsBackReassurance => this != IvfAge.under35;
-}
+// ⚠️ `IvfAge` IS GONE — RETIRED 2026-09-03. Age is `FertilityAgeBand`, from
+// `ttc_fertility_help_rules.dart`, and this screen now uses the same enum the
+// engine behind it stores.
+//
+// It was a separate enum with the brief's cut points (under 35 / 35-37 /
+// 38-40 / over 40) sitting in front of an engine with different ones (under 30
+// / 30-35 / 36-39 / 40+). Two sets of bands meant her answer here could not be
+// saved there without guessing which side of a boundary she fell on — "Under
+// 35" is both "under 30" and "30 to 35" — so the tool re-asked all six
+// questions on every visit rather than guess.
+//
+// The brief's bands won and the engine moved onto them. Nothing translates any
+// more, because there is nothing to translate. `holdsBackReassurance` moved
+// onto `FertilityAgeBand` unchanged.
 
 enum IvfTrying { underSix, sixToTwelve, overAYear, overTwoYears }
 
@@ -142,7 +143,7 @@ const List<({String id, String label, bool flag})> kIvfKnownConditions = [
 ];
 
 class IvfReadinessAnswers {
-  IvfAge? age;
+  FertilityAgeBand? age;
   IvfTrying? trying;
   IvfCycles? cycles;
 
@@ -174,6 +175,69 @@ class IvfReadinessAnswers {
   }
 
   bool get hasFlag => flags.isNotEmpty;
+
+  /// Save what she just answered into the shipped store, so the next visit does
+  /// not ask again.
+  ///
+  /// ⚠️ THIS IS THE FIX FOR THE DEFECT IN `docs/STILL-OPEN.md` §18.1. The tool
+  /// READ from `TtcFertilityHelpStore` to pre-fill two questions and wrote
+  /// nothing back, so every visit re-asked all six and `hasCompleted` never
+  /// became true. It worked perfectly and remembered nothing — the exact
+  /// friction the rebuild existed to remove.
+  ///
+  /// Modelled on `PcosStandAnswers.writeThrough`, one door over. Same shape on
+  /// purpose: two short flows feeding two shipped stores should not be two
+  /// different mechanisms.
+  ///
+  /// ⚠️ IT WRITES ONLY WHAT SHE ACTUALLY ANSWERED, AND THAT IS THE WHOLE RULE.
+  /// The store holds ten question ids; this flow asks six. `miscarriages`,
+  /// `pain`, `pelvic` and `cancer` are NOT touched, so they stay unanswered and
+  /// `missingQuestionIds` still names them. Writing a default into a clinical
+  /// question she was never asked would put words in her mouth in the one place
+  /// it matters — a "no" she never said, feeding a rule that decides whether
+  /// she is told to see somebody.
+  Future<void> writeThrough(TtcFertilityHelpStore store) async {
+    if (age != null) await store.answer('age', age!.name);
+
+    // ⚠️ 'past' AND 'current' ARE THE STORE'S WORDS, NOT AN ENUM'S NAME.
+    // `_answers['pathway']` is switched on as a raw string in
+    // `TtcFertilityHelpStore.context`; sending `IvfCheck.past.name` would fall
+    // through the switch to `notStarted` silently, which is a wrong answer that
+    // never announces itself.
+    if (check != null) {
+      await store.answer(
+          'pathway',
+          switch (check!) {
+            IvfCheck.no => 'not_started',
+            IvfCheck.past => 'done',
+            IvfCheck.inItNow => 'current',
+          });
+    }
+
+    // Conditions share ids with the store already (`pcos`, `endo`, `thyroid`,
+    // `miscarriage`, `pelvic`), so this is a copy rather than a mapping.
+    //
+    // "Not sure" is deliberately NOT written. The store models a set of named
+    // conditions and an explicit "none"; it has no way to hold "she does not
+    // know", and recording that as "none" would convert an absence of
+    // information into information. Left unanswered, which is true.
+    if (conditionsChecked && !conditionsUnsure) {
+      await store.answer(
+          'conditions', conditions.isEmpty ? 'none' : conditions.join(','));
+    }
+
+    // ⚠️ ONLY A FOUND ISSUE BECOMES "YES". `notDone` and `notSure` are not
+    // "no" — they are the absence of a test — and the store's `partnerConcern`
+    // is read as a red flag. A "no" here would quietly clear a flag on the
+    // strength of a test nobody has done.
+    if (semen == IvfSemen.issue) {
+      await store.answer('partner', 'yes');
+    } else if (semen == IvfSemen.normal) {
+      await store.answer('partner', 'no');
+    }
+
+    await store.complete();
+  }
 
   /// ⚠️ WHAT COUNTS AS ENOUGH TO REASSURE SOMEONE. Deliberately strict: the
   /// only branch that says "keep trying" requires every one of these to be
@@ -280,7 +344,7 @@ IvfReadinessResult ivfBuildReadiness(
     IvfReadinessAnswers a, FertilityHelpContext ctx) {
   // ---- Block 1: where she is ----------------------------------------------
   final bits = <String>[];
-  if (a.age != null) bits.add('You are ${a.age!.label.toLowerCase()}');
+  if (a.age != null) bits.add('You are ${a.age!.label.en.toLowerCase()}');
   if (a.trying != null) {
     bits.add(a.trying == IvfTrying.underSix
         ? 'and have been trying less than six months'
@@ -317,7 +381,7 @@ IvfReadinessResult ivfBuildReadiness(
             '${_join(a.flags)}. That is not a verdict on anything; it is a '
             'reason a specialist would want to look sooner rather than later.'
       ),
-    _ when a.age == IvfAge.over40 => (
+    _ when a.age == FertilityAgeBand.over40 => (
         IvfVerdict.soon,
         'It is worth speaking to someone soon. Over 40, the usual advice to '
             'wait and see does not apply, and an early conversation keeps more '
@@ -333,7 +397,7 @@ IvfReadinessResult ivfBuildReadiness(
             'rather than waiting the full year.'
       ),
     _
-        when a.age == IvfAge.under35 &&
+        when a.age == FertilityAgeBand.under35 &&
             (a.trying?.overAYearOrMore ?? false) =>
       (
         IvfVerdict.nowByDuration,
@@ -363,7 +427,7 @@ IvfReadinessResult ivfBuildReadiness(
     // ⚠️ THE REASSURING BRANCH IS THE NARROWEST ONE. It requires every answer
     // to be present AND her to be under 35 — see `enoughToReassure` for the
     // first half and the branch above for why the second half is not optional.
-    _ when a.age == IvfAge.under35 && a.enoughToReassure => (
+    _ when a.age == FertilityAgeBand.under35 && a.enoughToReassure => (
         IvfVerdict.keepTrying,
         'It is reasonable to keep trying for now. Most couples in this '
             'situation conceive within a year, and nothing you have told us '
@@ -391,7 +455,7 @@ IvfReadinessResult ivfBuildReadiness(
     timing: timing,
     openDoor: openDoor,
     checklist: [
-      (label: 'My age', value: a.age?.label ?? 'Not answered'),
+      (label: 'My age', value: a.age?.label.en ?? 'Not answered'),
       (
         label: 'How long we have been trying',
         value: a.trying?.label ?? 'Not answered'

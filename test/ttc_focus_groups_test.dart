@@ -94,6 +94,12 @@ void main() {
   SharedPreferences.setMockInitialValues({});
 
   final pcos = kTtcFocusPages.firstWhere((p) => p.bracketId == 'ttc_pcos');
+  final ivf =
+      kTtcFocusPages.firstWhere((p) => p.bracketId == 'ttc_infertility');
+
+  /// ⚠️ EVERY GROUPED PAGE, NOT JUST THE FIRST ONE. These checks were written
+  /// for PCOS and the second grouped door would otherwise inherit none of them.
+  final grouped = [pcos, ivf];
 
   // ===========================================================================
   group('every section reaches a group, and every group reaches content', () {
@@ -104,20 +110,34 @@ void main() {
           reason: 'Understand must be first — it is the default landing group');
     });
 
+    test('IVF is grouped too, in the brief order', () {
+      expect(ivf.groups, isNotNull);
+      expect([for (final g in ivf.groups!) g.label], [
+        'Understand',
+        'Should I get help?',
+        'Money and clinics',
+        'Going through it',
+        'Track',
+      ]);
+    });
+
     test('no section is orphaned', () {
-      final ids = pcos.groups!.map((g) => g.id).toSet();
-      for (final s in pcos.sections) {
+      for (final page in grouped) {
+      final ids = page.groups!.map((g) => g.id).toSet();
+      for (final s in page.sections) {
         expect(s.group, isNotNull,
             reason: '"${s.heading}" has no group, so it renders nowhere');
         expect(ids, contains(s.group),
             reason: '"${s.heading}" points at group "${s.group}", which does '
                 'not exist — the section is unreachable and nothing throws');
       }
+      }
     });
 
     test('no group is empty', () {
-      for (final g in pcos.groups!) {
-        final owned = pcos.sections.where((s) => s.group == g.id).length;
+      for (final page in grouped) {
+        for (final g in page.groups!) {
+        final owned = page.sections.where((s) => s.group == g.id).length;
         if (g.toolSurfaceId != null) {
           // ⚠️ A TOOL GROUP HOLDS NO SECTIONS. If one gained sections they
           // would be silently invisible, because the tool branch wins.
@@ -127,6 +147,7 @@ void main() {
         } else {
           expect(owned, greaterThan(0),
               reason: '"${g.label}" is a card that opens onto nothing');
+          }
         }
       }
     });
@@ -233,17 +254,87 @@ void main() {
 
   // ===========================================================================
   group('the other doors are untouched', () {
-    test('only PCOS is grouped', () {
+    // ⚠️ NAMED, NOT "EVERY PAGE EXCEPT THE ONES I KNOW ABOUT" — 2026-09-03.
+    //
+    // This used to loop `kTtcFocusPages` skipping pcos and infertility, which
+    // read as "the rollout is partial" and behaved as "no door may ever be
+    // grouped again without editing this test". Getting ready was asked for in
+    // the grouped shape and tripped it on the day it was added.
+    //
+    // The real intent was always about ONE page: conceiving has not been asked
+    // for and must not drift into the shape as a tidy-up. So it says that.
+    //
+    // Same slip as the two in `ttc_focus_page_test.dart`, and worth noticing
+    // as a pattern: a rule written while there were three of something quietly
+    // becomes a rule about the fourth.
+    // ⚠️ THIS TEST INVERTED ON 2026-09-04, AND THAT IS THE TEST WORKING.
+    //
+    // It read "the conceiving door is still one long scroll", guarding against
+    // the door drifting into the grouped shape as somebody's tidy-up. Then the
+    // shape was asked for directly — *"the fertile window, that first door is
+    // using the old format. If you compare it with PCOS and IVF … implement
+    // the current format on it"* — so the thing it guarded stopped being true
+    // by decision rather than by drift.
+    //
+    // Worth being precise about what changed and what did not. The guard was
+    // never "conceiving must never be grouped"; it was "not without being
+    // asked". A test that encodes a decision has to be re-decided, not
+    // deleted, and the file it pointed at is the record of that.
+    //
+    // What it becomes is the mirror: all six doors are grouped now, so the
+    // question worth asking is whether any door has drifted BACK to a plain
+    // scroll — which would strand its sections' `group` tags.
+    test('every door is grouped, conceiving included', () {
       for (final page in kTtcFocusPages) {
-        if (page.bracketId == 'ttc_pcos') continue;
-        expect(page.groups, isNull,
-            reason: '${page.bracketId} was grouped too. This shape is being '
-                'checked on PCOS first, on purpose — see the head of '
-                'ttc_focus_pcos.dart');
-        expect(page.sections.every((s) => s.group == null), isTrue,
-            reason: '${page.bracketId} has sections tagged with a group but no '
-                'groups to render them, so they draw in the plain order and '
-                'the tag is a lie waiting to be believed');
+        expect(page.groups, isNotNull,
+            reason: '${page.bracketId} has no selector rail. Every door in the '
+                'stage carries one; a plain scroll is now the odd shape and '
+                'needs a stated reason, not a silent one');
+        expect(page.groups!.length, greaterThanOrEqualTo(3),
+            reason: '${page.bracketId} has a rail of fewer than three cards, '
+                'which is a rail that did not need to exist');
+      }
+    });
+
+    test('conceiving kept the two orderings the scroll used to carry', () {
+      // Both were load-bearing arguments written as comments on section order,
+      // and section order stops meaning anything once a rail exists. They are
+      // carried by RAIL POSITION now, so they are asserted here — a comment
+      // explaining an order nothing enforces is how the order quietly goes.
+      final ids = [for (final g in kTtcConceivingFocus.groups!) g.id];
+      expect(ids.indexOf('his'), lessThan(ids.indexOf('hers')),
+          reason: 'his tab moved after hers. A male factor is involved in '
+              'about half of couples who take longer than expected, and in '
+              'this market the advice and the blame already land on her');
+      expect(ids.last, 'doctor',
+          reason: 'the door no longer ends on a person. CLAUDE.md: anything '
+              'clinical routes calmly to a doctor');
+    });
+
+    test('the stress section is not filed under her', () {
+      // The near miss when the door was grouped. "Does stress stop pregnancy?"
+      // is a myth-correction about trying, and filing it under what SHE can do
+      // is the same reflex the door exists to correct.
+      final stress = kTtcConceivingFocus.sections
+          .firstWhere((s) => s.heading.startsWith('Does stress'));
+      expect(stress.group, 'trying');
+    });
+
+    test('a grouped page tags every one of its sections', () {
+      // The replacement for what the loop above was really guarding: not
+      // "which doors may be grouped", but "a page must not be half-grouped".
+      // An untagged section on a grouped page renders in no tab at all.
+      for (final page in kTtcFocusPages) {
+        if (page.groups == null) continue;
+        final ids = page.groups!.map((g) => g.id).toSet();
+        for (final s in page.sections) {
+          expect(s.group, isNotNull,
+              reason: '${page.bracketId}: section "${s.heading}" has no group, '
+                  'so it appears under no tab');
+          expect(ids, contains(s.group),
+              reason: '${page.bracketId}: section "${s.heading}" names group '
+                  '"${s.group}", which this page does not have');
+        }
       }
     });
   });

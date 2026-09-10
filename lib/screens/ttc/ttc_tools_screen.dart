@@ -150,6 +150,29 @@ final List<TtcToolGroup> ttcToolGroups = [
         descHi: 'Ek number, faisla nahi',
         open: (c) => openTtcTracker(c, 'weight'),
       ),
+      // ⚠️ ONE TILE WHERE THERE WERE FOUR — 2026-09-04. Sleep, Stress,
+      // Lifestyle and Movement each had their own tile and their own tracker;
+      // they are one `habits` tracker now, so four tiles pointing at four
+      // screens would be four doors into one room. The three commented out
+      // below are kept for revert, and reverting them means removing
+      // `kTtcHabitMerge` too — see the note on it.
+      TtcTool(
+        id: 'habits',
+        icon: Icons.self_improvement_outlined,
+        nameEn: "What you're working on",
+        nameHi: 'Aap jis par kaam kar rahe hain',
+        // ⚠️ THE DESCRIPTION NAMES ALL FOUR, AND THAT IS A FINDABILITY RULE
+        // RATHER THAN A STYLE CHOICE. `ttc_tools_test.dart` asserts that every
+        // capability the master document names stays findable by the word she
+        // would look for — and merging four trackers into one removed the
+        // words Sleep, Stress, Lifestyle and Movement from the hub entirely.
+        // The capabilities did not go anywhere; they are fields now. So the
+        // tile has to say so.
+        descEn: 'Sleep, movement, stress and lifestyle',
+        descHi: 'Neend, movement, stress aur lifestyle',
+        open: (c) => openTtcTracker(c, 'habits'),
+      ),
+      /*
       TtcTool(
         id: 'sleep',
         icon: Icons.bedtime_outlined,
@@ -159,6 +182,7 @@ final List<TtcToolGroup> ttcToolGroups = [
         descHi: 'Ghante, aur kaisa laga',
         open: (c) => openTtcTracker(c, 'sleep'),
       ),
+      */
       // ---- the four checks, listed where she goes looking for them ---------
       //
       // These were reachable only from inside a journey step. That is the
@@ -225,6 +249,7 @@ final List<TtcToolGroup> ttcToolGroups = [
         descHi: 'Din asal mein kaisa tha',
         open: (c) => openTtcTracker(c, 'mood'),
       ),
+      /*
       TtcTool(
         id: 'stress',
         icon: Icons.spa_outlined,
@@ -234,6 +259,8 @@ final List<TtcToolGroup> ttcToolGroups = [
         descHi: 'Kya bojh mehsoos ho raha',
         open: (c) => openTtcTracker(c, 'stress'),
       ),
+      */
+      /*
       TtcTool(
         id: 'lifestyle',
         icon: Icons.wb_sunny_outlined,
@@ -243,6 +270,7 @@ final List<TtcToolGroup> ttcToolGroups = [
         descHi: 'Aadatein jinme chhota badlaav',
         open: (c) => openTtcTracker(c, 'lifestyle'),
       ),
+      */
       TtcTool(
         id: 'journal',
         icon: Icons.edit_note_rounded,
@@ -330,6 +358,7 @@ final List<TtcToolGroup> ttcToolGroups = [
     titleEn: 'Plan and learn',
     titleHi: 'Plan aur seekhein',
     tools: [
+      /*
       TtcTool(
         id: 'exercise',
         icon: Icons.directions_walk_rounded,
@@ -339,6 +368,7 @@ final List<TtcToolGroup> ttcToolGroups = [
         descHi: 'Jo movement madad kare',
         open: (c) => openTtcTracker(c, 'exercise'),
       ),
+      */
       TtcTool(
         id: 'nutrition',
         icon: Icons.restaurant_outlined,

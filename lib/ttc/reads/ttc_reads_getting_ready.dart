@@ -772,4 +772,1052 @@ final List<PvRead> kTtcReadsGettingReady = [
         'on antenatal care; RCOG and NHS preconception folic acid guidance; '
         'Cochrane review of periconceptional folate supplementation.'),
   ),
+  // ===========================================================================
+  //  ⚠️ WRITTEN 2026-09-03 FOR THE GETTING-READY REBUILD
+  // ---------------------------------------------------------------------------
+  //  The door's brief asked for five new pieces. Four are here; the fifth —
+  //  "The carrier screening that matters in India" — is deliberately NOT
+  //  written. The brief itself says to confirm which screen is meant before it
+  //  goes into copy, and naming a specific medical test is the one place in
+  //  this door where guessing is not a style choice. See docs/STILL-OPEN.md.
+  //
+  //  ⚠️ AND NONE OF THESE SCARE ANYBODY INTO ANYTHING. This is the calmest
+  //  door in the stage — nobody here has a problem yet, they are getting ready
+  //  — so the tone that works in the IVF door would be wrong in this one. Every
+  //  piece below says what is worth doing, says plainly what does not matter
+  //  much, and none of them implies that a delay is her fault.
+  // ===========================================================================
+
+  PvRead(
+    id: 'ttc_read_what_to_cut',
+    hue: 104,
+    kicker: _en('Getting ready'),
+    title: _en('What to cut before trying'),
+    teaser: _en('A short list, and it is shorter than the internet suggests. '
+        'Three things that genuinely matter, and several that do not.'),
+    scaleSetter: _en('Most of what circulates as "must give up before trying" '
+        'has little behind it, and worrying about all of it is its own cost. '
+        'Three changes have real evidence. The rest of this piece is mostly '
+        'about the things you can stop feeling guilty about.'),
+    author: _en('Dr. Meera Krishnan'),
+    authorRole: _en('Fertility specialist, 16 years, reviewed August 2026'),
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en('There is a version of getting ready that turns into a list of '
+              'bans, and it makes people miserable without making them more '
+              'likely to conceive. This is the other version.'),
+          _en('Three things are worth changing, and they are worth changing '
+              'for both of you rather than for her alone. Everything after '
+              'that is optional, and some of it is folklore.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Smoking, and being around it'),
+        paragraphs: [
+          _en('This is the one with the least argument around it. Smoking '
+              'affects fertility in both partners — it is associated with '
+              'taking longer to conceive, with lower egg reserve, and with '
+              'poorer sperm quality and movement. It also raises the risk of '
+              'miscarriage once a pregnancy starts.'),
+          _en('Second-hand smoke counts. Somebody who does not smoke but '
+              'shares a home or a car with somebody who does is still exposed, '
+              'which is one of several reasons this is not a woman-only item.'),
+          _en('Stopping is genuinely difficult and willpower is not the whole '
+              'story. Nicotine replacement, prescribed support and quitlines '
+              'exist because stopping unaided works for a minority. If you '
+              'have tried and it did not hold, that is the usual outcome of '
+              'trying alone, not a verdict on you.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Alcohol, honestly'),
+        paragraphs: [
+          _en('The clear part first: once pregnant, no amount is established as '
+              'safe, and since a pregnancy is not visible for several weeks, '
+              'guidance in most countries is to stop while trying rather than '
+              'to stop on a positive test.'),
+          _en('The less clear part: whether light drinking affects how quickly '
+              'you conceive is genuinely contested. Heavy drinking is '
+              'associated with taking longer; the evidence at low levels is '
+              'mixed, and honest guidance says so rather than inventing '
+              'certainty to make the advice tidier.'),
+          _en('What that means in practice is that cutting down is worth '
+              'doing, and that a glass at a wedding four months ago is not '
+              'something to lie awake about. For him, heavy drinking is '
+              'associated with poorer semen quality; ordinary amounts are less '
+              'clear there too.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Caffeine, in moderation rather than not at all'),
+        paragraphs: [
+          _en('Most guidance lands on limiting rather than stopping. The '
+              'commonly cited ceiling is about 200 mg a day in pregnancy, '
+              'which is roughly two mugs of instant coffee — and Indian filter '
+              'coffee and strong tea both count toward it.'),
+          _en('It is worth knowing what else carries it. Cola, energy drinks, '
+              'green tea and dark chocolate all contribute, and several '
+              'over-the-counter painkillers contain caffeine without saying so '
+              'loudly on the front.'),
+          _en('Going to zero is not required and going cold turkey usually '
+              'produces three days of headache, which helps nobody. Cutting '
+              'from four cups to two is the change that matters.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('The things you can stop worrying about'),
+        paragraphs: [
+          _en('Spicy food does not affect fertility. Papaya and pineapple do '
+              'not either, in the amounts a person eats — the enzyme stories '
+              'attached to both come from laboratory quantities, not from a '
+              'bowl of fruit.'),
+          _en('Ordinary exercise is good for you and does not need to stop. '
+              'Warm baths are fine for her; heat matters more for him, and '
+              'even there the effect is modest and reversible.'),
+          _en('Sex does not need rationing to "save up" — for most couples, '
+              'every day or every other day around the fertile window is fine, '
+              'and abstaining for long stretches does not improve anything.'),
+          _en('And none of this is a reason to audit the last six months. What '
+              'you did before you decided to try is not a factor you can '
+              'change and is very unlikely to be the reason for anything.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What to do about the things you cannot cut'),
+        paragraphs: [
+          _en('Some exposures are not lifestyle choices. Working with solvents, '
+              'pesticides, some paints, lead or certain industrial chemicals '
+              'is worth mentioning to a doctor, because the answer may be '
+              'protective equipment or a temporary change rather than leaving '
+              'a job.'),
+          _en('The same is true of prescribed medicines. Do not stop anything '
+              'you were told to take in order to be "clean" before trying — '
+              'the risk of stopping a medicine that manages a real condition is '
+              'usually larger than the risk of continuing it. That is a '
+              'conversation, not a decision to make alone.'),
+        ],
+      ),
+    ],
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('Do not stop a prescribed medicine to prepare'),
+      body: _en('If you take something regularly — for thyroid, blood '
+          'pressure, epilepsy, diabetes, mental health or anything else — talk '
+          'to the doctor who prescribed it before changing a thing. Some are '
+          'swapped for a different one before pregnancy, some are continued '
+          'unchanged, and stopping suddenly is the option that is almost never '
+          'right. If you are trying to stop smoking or drinking and it is not '
+          'holding, ask for help rather than trying harder alone.'),
+    ),
+    faqs: [
+      PvReadFaq(
+        question: _en('Does he have to stop too?'),
+        answer: _en('For smoking, yes, and for the same reasons plus one more: '
+            'she is exposed to it. For alcohol, heavy drinking is worth '
+            'cutting. Beyond that, doing it together mostly helps because it '
+            'is easier than doing it alone.'),
+      ),
+      PvReadFaq(
+        question: _en('How long before trying should I change things?'),
+        answer: _en('Sperm take roughly two to three months to develop, so '
+            'changes on his side show up on about that timescale. On her side '
+            'there is no waiting period — earlier is better and starting today '
+            'is fine.'),
+      ),
+      PvReadFaq(
+        question: _en('I drank before I knew I was pregnant. What now?'),
+        answer: _en('Tell your doctor, honestly, and then stop. This is common, '
+            'the doctor has heard it many times, and the useful response is '
+            'stopping now rather than counting backwards.'),
+      ),
+    ],
+    evidence: _en('NICE CG156 (fertility problems: assessment and treatment); '
+        'NHS preconception guidance; RCOG statements on alcohol and on '
+        'smoking in pregnancy; the UK Chief Medical Officers’ alcohol '
+        'guidelines; EFSA opinion on caffeine intake. Reviewed August 2026.'),
+    readNext: ['ttc_read_three_months_before'],
+  ),
+
+  PvRead(
+    id: 'ttc_read_supplement_timing',
+    hue: 104,
+    kicker: _en('Getting ready'),
+    title: _en('When to start what, and how early'),
+    teaser: _en('Folic acid has a deadline that has already passed by the time '
+        'most people find out. Almost nothing else does.'),
+    scaleSetter: _en('This is a timing question rather than a shopping list. '
+        'One supplement genuinely needs to be started before you conceive, a '
+        'couple are worth checking your levels for, and most of the rest are '
+        'sold on hope. Nothing here replaces asking a doctor what YOU need.'),
+    author: _en('Dr. Meera Krishnan'),
+    authorRole: _en('Fertility specialist, 16 years, reviewed August 2026'),
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en('The supplement aisle is designed to make you feel late. Most of '
+              'it is not urgent and some of it is not useful — but one thing '
+              'genuinely is time-sensitive, and it is worth separating that '
+              'from everything else.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Folic acid: at least a month before, ideally three'),
+        paragraphs: [
+          _en('This is the one with a real deadline. The neural tube — which '
+              'becomes the brain and spinal cord — closes in the first few '
+              'weeks, often before a period is missed. Folic acid has to '
+              'already be in your system when that happens, which is why '
+              'starting on a positive test is starting late.'),
+          _en('Guidance is to begin at least one month before conception and '
+              'to continue through the first twelve weeks. Three months ahead '
+              'is a comfortable margin rather than a requirement.'),
+          _en('The standard amount is 400 micrograms daily. A higher dose is '
+              'advised for some people — a previous pregnancy affected by a '
+              'neural tube defect, diabetes, epilepsy medication, certain '
+              'absorption conditions, and higher body weight in some guidance '
+              '— and that is a prescription decision, not a shelf decision.'),
+          _en('If you are already pregnant and have not been taking it, start '
+              'today. Later is better than not at all, and nobody needs a '
+              'lecture about the weeks already gone.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Vitamin D: worth checking, not worth guessing'),
+        paragraphs: [
+          _en('Deficiency is common in India despite the sunshine, for reasons '
+              'that are mostly about indoor work, clothing and air quality '
+              'rather than about latitude. Supplementation in pregnancy is '
+              'widely advised.'),
+          _en('The honest position: a blood test tells you where you actually '
+              'are, and the dose for somebody genuinely deficient is different '
+              'from a maintenance amount. This is one worth asking about '
+              'rather than choosing off a shelf, and the test is inexpensive.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Iron and B12: test first, in India especially'),
+        paragraphs: [
+          _en('Anaemia is common enough among Indian women that it is worth '
+              'knowing your numbers before pregnancy rather than discovering '
+              'them at a first antenatal visit. Correcting it beforehand is '
+              'easier than correcting it while pregnant and nauseous.'),
+          _en('B12 deficiency is common in long-term vegetarian and vegan '
+              'diets, which describes a great many households here. It is '
+              'straightforward to test and straightforward to correct.'),
+          _en('Iron is the one supplement where more is clearly not better. '
+              'Taking it without a reason can cause real problems, so this is a '
+              'test-then-treat item rather than a take-it-just-in-case one.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What is sold to you and does not have much behind it'),
+        paragraphs: [
+          _en('Fertility blends, most antioxidant combinations, and a long tail '
+              'of branded preconception formulas are sold on the strength of '
+              'plausible-sounding ingredients rather than on evidence that they '
+              'help people conceive.'),
+          _en('That does not make them harmful. It makes them expensive, and it '
+              'makes the guilt attached to not buying them unearned. If a blend '
+              'contains 400 mcg of folic acid and you would otherwise take a '
+              'folic acid tablet, it is a more costly way to do the same '
+              'thing.'),
+          _en('One caution that matters: vitamin A in high doses, especially as '
+              'retinol, is not safe in pregnancy. Check any multivitamin for '
+              'it, and be careful of general-purpose supplements not made for '
+              'people who might conceive.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Reading the strip, before you buy it'),
+        paragraphs: [
+          _en('Two units appear on these boxes and they are a thousand times '
+              'apart. Folic acid is measured in micrograms — written mcg or '
+              'ug — and the standard amount is 400 of them. A box printed in '
+              'milligrams showing 5 mg is a prescription-strength tablet, not '
+              'a stronger version of the same thing, and it is meant for '
+              'specific situations rather than for general use.'),
+          _en('Combination products vary widely. Two boxes both labelled '
+              '"preconception" can contain quite different things, so it is '
+              'worth turning the box over and reading what is actually in it '
+              'rather than trusting the word on the front.'),
+          _en('Check for vitamin A, listed as retinol or as retinyl palmitate. '
+              'General multivitamins sometimes carry amounts that are not '
+              'appropriate for somebody who might conceive, and it is not '
+              'always flagged.'),
+          _en('One practical thing: keep the box, or photograph it. At an '
+              'appointment "a white tablet, some kind of multivitamin" is not '
+              'information a doctor can act on, and the label takes two '
+              'seconds to show.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('And his side, on his own timescale'),
+        paragraphs: [
+          _en('Sperm take roughly two to three months to develop, so anything '
+              'he changes shows up on that timescale rather than immediately. '
+              'That is an argument for starting early, not for panicking about '
+              'the last two months.'),
+          _en('The evidence for male fertility supplements is weaker than the '
+              'marketing suggests. A reasonable diet, less alcohol, no '
+              'smoking and reasonable sleep are better established than any '
+              'capsule.'),
+        ],
+      ),
+    ],
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('Ask before taking a higher dose of anything'),
+      body: _en('If you have diabetes, epilepsy, coeliac disease, a previous '
+          'pregnancy affected by a neural tube defect, or take medicines that '
+          'affect folate, your folic acid dose may need to be several times '
+          'the standard one — and that is prescribed, not chosen. Equally, do '
+          'not take iron or high-dose vitamin A without being told to. If you '
+          'are already taking something and are unsure, bring the actual box '
+          'to your next appointment rather than describing it.'),
+    ),
+    faqs: [
+      PvReadFaq(
+        question: _en('I started folic acid late. Have I ruined something?'),
+        answer: _en('No. Start now and continue through the first twelve '
+            'weeks. Most people who conceive without planning start late, and '
+            'most pregnancies are fine. It is a reason to start today, not a '
+            'reason to look backwards.'),
+      ),
+      PvReadFaq(
+        question: _en('Do I need a special preconception multivitamin?'),
+        answer: _en('Not necessarily. What you need is folic acid, plus '
+            'anything a blood test says you are short of. A multivitamin is '
+            'convenient; it is not automatically better, and it is worth '
+            'checking it does not contain high-dose vitamin A.'),
+      ),
+      PvReadFaq(
+        question: _en('How long before trying should I start?'),
+        answer: _en('One month minimum for folic acid, three is comfortable. '
+            'For anything based on a blood test, allow enough time to test and '
+            'then correct — a couple of months is realistic.'),
+      ),
+    ],
+    evidence: _en('NICE NG201 (antenatal care); WHO antenatal care '
+        'recommendations; RCOG and NHS preconception guidance; ICMR-NIN '
+        'dietary guidelines for Indians and national data on anaemia '
+        'prevalence; Cochrane reviews of periconceptional folate and of '
+        'antioxidants for male subfertility. Reviewed August 2026.'),
+    readNext: ['ttc_read_folic_acid'],
+  ),
+  // ⚠️ THE ONE WITH NO NUMBERS IN IT, AND THAT IS THE BRIEF, NOT A STYLE.
+  // The door's spec says "Weight before pregnancy, said kindly — Article (no
+  // numbers)". So there is no BMI figure, no target, no range and no threshold
+  // anywhere below, and the same rule already governs the pre-pregnancy
+  // checklist's weight item and the `ttc_bmi` surface.
+  //
+  // The reason is not squeamishness. A number on this subject is read as a
+  // verdict on her body by someone who is already anxious about it, and a
+  // number she cannot reach becomes a reason to stop trying rather than a
+  // reason to see somebody. What actually helps is the shape of the effect and
+  // the direction of travel — which is what this piece gives.
+  PvRead(
+    id: 'ttc_read_weight_kindly',
+    hue: 104,
+    kicker: _en('Getting ready'),
+    title: _en('Weight before pregnancy, said kindly'),
+    teaser: _en('Weight does affect fertility. It is also the subject people '
+        'are hurt by most often, and the useful version of this conversation '
+        'has no target in it.'),
+    scaleSetter: _en('There is no number in this piece on purpose. Weight is '
+        'one factor among several, it moves the odds rather than deciding '
+        'anything, and a target you cannot reach is worse than no target at '
+        'all. What helps is direction, and even a modest change in the right '
+        'direction does more than most people expect.'),
+    author: _en('Dr. Meera Krishnan'),
+    authorRole: _en('Fertility specialist, 16 years, reviewed August 2026'),
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en('Most people arriving at this subject have already been told '
+              'something about it, usually bluntly, often by somebody who was '
+              'not asked. So the first thing worth saying is that weight is '
+              'one factor among several, that plenty of people conceive at '
+              'every size, and that nothing here is a judgement about whether '
+              'you deserve a baby.'),
+          _en('The second thing is that it does matter, and pretending '
+              'otherwise would be its own kind of unkindness.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What weight actually does, mechanically'),
+        paragraphs: [
+          _en('Fat tissue is not inert — it produces oestrogen. Carrying more '
+              'of it changes the hormonal signal reaching the ovaries, and in '
+              'some people that disrupts ovulation, which shows up as '
+              'irregular or absent periods.'),
+          _en('Carrying very little does the same thing from the other '
+              'direction. Below a certain point the body treats reproduction as '
+              'something to postpone, and periods become irregular or stop. '
+              'This is why the conversation is not only about being heavier.'),
+          _en('Insulin resistance is the other mechanism, and it is the one '
+              'that connects this subject to PCOS. It is common, it is '
+              'treatable, and it responds to change more readily than most '
+              'people are told.'),
+          _en('And it affects both of you. Weight is associated with sperm '
+              'quality too, which is one of several places in this stage where '
+              'a burden gets put on one person and belongs to two.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Why the direction matters more than the destination'),
+        paragraphs: [
+          _en('Here is the part that usually goes missing. A relatively small '
+              'change in weight can restore ovulation in someone whose cycles '
+              'had become irregular. Not a transformation — a modest, '
+              'sustainable shift.'),
+          _en('That matters because the version of this advice that people '
+              'usually receive implies a long project with a distant finish '
+              'line, and a distant finish line is exactly what makes somebody '
+              'give up in week three. The useful framing is that the benefit '
+              'starts early, and it does not require arriving anywhere in '
+              'particular.'),
+          _en('It is also why crash dieting works against you. Losing weight '
+              'very fast disrupts cycles in its own right, and the weight '
+              'usually returns. Slow and boring is not a compromise here; it '
+              'is the version that works.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What actually helps, in an Indian kitchen'),
+        paragraphs: [
+          _en('Nothing exotic and nothing imported. More of the meal made of '
+              'vegetables and dal, whole grains in place of refined ones where '
+              'that is practical, and fewer fried snacks and sweets between '
+              'meals — which in most households is where the surprise sits, '
+              'not in the main meals.'),
+          _en('Movement that you will actually keep doing beats an intense plan '
+              'you will abandon. A daily walk that happens is worth more than a '
+              'gym membership that does not.'),
+          _en('Sleep is the one people leave out. Short sleep affects appetite '
+              'regulation directly, and it is usually easier to fix than diet.'),
+          _en('And if there is a reason behind the weight — thyroid, PCOS, a '
+              'medicine that causes gain — then treating the reason is the '
+              'work, and effort spent on willpower instead is effort wasted.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('When the scale is not moving'),
+        paragraphs: [
+          _en('This is where most people stop, and it is worth knowing what is '
+              'actually happening. Weight is a poor week-to-week measure — it '
+              'moves with water, with salt, with where you are in your cycle, '
+              'and with what you ate yesterday. A flat week is not evidence '
+              'that nothing is working.'),
+          _en('More importantly, the things that matter for ovulation do not '
+              'wait for the scale. Better insulin sensitivity from regular '
+              'movement, and better sleep, are doing their work whether or not '
+              'the number has changed. Cycles sometimes become more regular '
+              'before any substantial weight change at all, which is a strong '
+              'argument for watching your periods rather than the scale.'),
+          _en('So if you want something to track, track the first day of each '
+              'period. It is the measure that is actually connected to what '
+              'you are trying to do, and it does not make anybody feel worse '
+              'on a Tuesday morning.'),
+          _en('And plateaus are normal rather than a sign of failure. Bodies '
+              'adjust; progress in this direction is rarely a straight line, '
+              'and stopping at the first flat stretch is what turns a slow '
+              'change into no change.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('If you are already being treated unkindly about this'),
+        paragraphs: [
+          _en('Some clinics apply a weight threshold before offering treatment, '
+              'and being told to come back lighter, with no help offered about '
+              'how, is a common and demoralising experience.'),
+          _en('You are allowed to ask what the threshold is for, whether it is '
+              'a clinical requirement or a policy, and what support is '
+              'available. You are allowed to seek a second opinion. And you are '
+              'allowed to say that the way it was said was not helpful.'),
+          _en('If food has become something you fight with — restricting, '
+              'bingeing, or thinking about it constantly — that is worth '
+              'raising with a doctor in its own right, before and separately '
+              'from any conversation about conceiving.'),
+        ],
+      ),
+    ],
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('Some of this is not about willpower'),
+      body: _en('If your periods have become irregular or stopped, if weight '
+          'has changed considerably without a change in what you eat, or if '
+          'you have symptoms like persistent tiredness, hair thinning or cold '
+          'intolerance, ask for thyroid and PCOS checks rather than trying '
+          'harder. And if your relationship with food or with your body has '
+          'become distressing, please tell a doctor — that is a health matter '
+          'in itself and deserves care, whether or not you are trying to '
+          'conceive.'),
+    ),
+    faqs: [
+      PvReadFaq(
+        question: _en('Do I have to reach a particular weight before trying?'),
+        answer: _en('There is no single number that applies to everybody, '
+            'which is why this piece does not print one. Some clinics use '
+            'thresholds for specific treatments; that is a conversation to have '
+            'with the clinic. For trying naturally, direction matters more than '
+            'arriving anywhere.'),
+      ),
+      PvReadFaq(
+        question: _en('Can I be too thin for this?'),
+        answer: _en('Yes. Below a certain point cycles become irregular or '
+            'stop, and the fix is the opposite of what most advice assumes. If '
+            'your periods have stopped and you are lean or exercising heavily, '
+            'that is worth seeing somebody about.'),
+      ),
+      PvReadFaq(
+        question: _en('Should I lose weight quickly to save time?'),
+        answer: _en('No. Rapid loss disrupts cycles by itself and rarely '
+            'holds. A steady change you can maintain is both kinder and more '
+            'effective, and the benefit begins well before any destination.'),
+      ),
+    ],
+    evidence: _en('NICE CG156 (fertility problems) and NICE guidance on weight '
+        'management before pregnancy; RCOG and WHO statements on preconception '
+        'care; evidence on modest weight change and restoration of ovulation '
+        'in anovulatory infertility. No thresholds, targets or BMI figures are '
+        'stated here by editorial decision. Reviewed August 2026.'),
+    readNext: ['ttc_read_three_months_before'],
+  ),
+
+  PvRead(
+    id: 'ttc_read_coming_off_birth_control',
+    hue: 104,
+    kicker: _en('Getting ready'),
+    title: _en('Coming off birth control'),
+    teaser: _en('What returns quickly, what takes a while, and why the phrase '
+        '"let it clear out of your system" is doing you no favours.'),
+    scaleSetter: _en('For most methods, fertility returns quickly — sometimes '
+        'immediately. The main exception is the contraceptive injection, and it '
+        'is a genuinely long one. Nothing here needs a waiting period "to '
+        'flush it out"; that idea is folklore and it costs people months.'),
+    author: _en('Dr. Meera Krishnan'),
+    authorRole: _en('Fertility specialist, 16 years, reviewed August 2026'),
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en('Two beliefs cause most of the trouble here. The first is that '
+              'you must wait several months for contraception to "leave your '
+              'system" before it is safe to try. The second is that long use '
+              'causes lasting infertility. Neither is supported.'),
+          _en('What is true is that different methods return you to your own '
+              'cycle on very different timescales, and knowing which one you '
+              'were on changes what to expect.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('The pill, the patch and the ring'),
+        paragraphs: [
+          _en('Ovulation usually returns quickly after stopping — for many '
+              'people within the first cycle or two. It is entirely possible to '
+              'conceive before having a single period in between, which is '
+              'worth knowing if you were planning to count from one.'),
+          _en('The first bleed after stopping is often not a normal period, and '
+              'the first few cycles can be irregular while your own rhythm '
+              'reasserts itself. That is settling, not a problem.'),
+          _en('There is no need to wait a set number of months before trying. '
+              'The older advice to wait three cycles was mostly about making '
+              'dating a pregnancy easier, not about safety, and scans have made '
+              'that argument redundant.'),
+          _en('One thing the pill can mask: if your cycles were irregular '
+              'before you started it, they may well be irregular again '
+              'afterwards. That is the underlying pattern reappearing rather '
+              'than the pill having caused something.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Coils, implants and the injection'),
+        paragraphs: [
+          _en('A copper or hormonal coil is removed and fertility returns '
+              'essentially straight away. The same is true of an implant once '
+              'it is taken out.'),
+          _en('The contraceptive injection is the real exception. It can take '
+              'many months after the last dose before ovulation returns, and '
+              'for some people close to a year or more. This is a delay, not '
+              'damage — it does not reduce your eventual fertility — but if you '
+              'are on it and thinking about trying in the near future, that is '
+              'a conversation to have sooner rather than later.'),
+          _en('Emergency contraception does not affect future fertility at '
+              'all, and does not need any waiting period.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What it may have been hiding'),
+        paragraphs: [
+          _en('A bleed on the combined pill is not a period. It is a '
+              'withdrawal bleed that happens because the hormones pause, which '
+              'is why it tends to be lighter, shorter and more punctual than '
+              'anything your own body produces. Losing that predictability is '
+              'the change people find most disorienting, and it is not a '
+              'problem — it is your own cycle, which was never that tidy.'),
+          _en('Symptoms often come back with it. Period pain, heavier '
+              'bleeding, premenstrual mood changes and acne are all commonly '
+              'suppressed by hormonal contraception, and their return is the '
+              'underlying pattern reappearing rather than something new going '
+              'wrong.'),
+          _en('That matters for one specific reason. If the pill was '
+              'originally prescribed for painful or heavy periods, for acne or '
+              'for irregular cycles, then the thing it was managing is still '
+              'there. Severe period pain in particular is worth investigating '
+              'properly rather than enduring — it is one of the ways '
+              'endometriosis goes unnoticed for years, and the years matter '
+              'more when you are trying to conceive.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What to do in the gap'),
+        paragraphs: [
+          _en('Start folic acid before you stop contraception rather than '
+              'after. It needs to be in your system before conception, and '
+              'since conception can happen sooner than expected here, earlier '
+              'is genuinely better.'),
+          _en('If you want to know your own cycle again, start noting the first '
+              'day of each period. That single fact is what almost every later '
+              'question depends on, and it costs nothing to record.'),
+          _en('Give yourself a few cycles before drawing conclusions about '
+              'regularity. Judging your cycle on the first one after stopping '
+              'is like judging a road by its first ten metres.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('When the pause is worth asking about'),
+        paragraphs: [
+          _en('If your period has not returned within about three months of '
+              'stopping the pill, a coil or an implant, that is worth raising. '
+              'It is usually something ordinary — thyroid, PCOS, stress, weight '
+              'change — and finding out is quicker than waiting.'),
+          _en('The injection is judged differently, because a long wait is '
+              'expected rather than surprising. Even so, if you are past a year '
+              'from your last dose with nothing, ask.'),
+          _en('And the usual timelines still apply once your cycles are back. '
+              'Time trying is counted from when you started trying, not from '
+              'when you stopped contraception.'),
+        ],
+      ),
+    ],
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('When to ask rather than wait'),
+      body: _en('See a doctor if your periods have not returned about three '
+          'months after stopping the pill, a coil or an implant; if they '
+          'return but are very irregular after several cycles; if you have '
+          'severe pain, unusually heavy bleeding, or bleeding between periods; '
+          'or if you are on the contraceptive injection and hoping to conceive '
+          'within the next year — that last one is worth planning early rather '
+          'than discovering late.'),
+    ),
+    faqs: [
+      PvReadFaq(
+        question: _en('Do I need to wait for it to leave my system?'),
+        answer: _en('No. That idea has no basis for any of these methods. The '
+            'only genuine wait is the contraceptive injection, and that is '
+            'about ovulation returning rather than about anything clearing '
+            'out.'),
+      ),
+      PvReadFaq(
+        question: _en('I was on the pill for ten years. Has that harmed me?'),
+        answer: _en('Long use is not associated with reduced fertility '
+            'afterwards. What long use does do is hide what your own cycle was '
+            'like, so anything irregular that appears afterwards is usually '
+            'something that was there before.'),
+      ),
+      PvReadFaq(
+        question: _en('Can I get pregnant before my first period?'),
+        answer: _en('Yes. Ovulation comes before a period, so it is quite '
+            'possible to conceive in the first cycle after stopping. Start '
+            'folic acid before you stop rather than after.'),
+      ),
+      PvReadFaq(
+        question: _en('My cycles are irregular now. Is that the pill?'),
+        answer: _en('The first few cycles are commonly irregular while things '
+            'settle. Beyond that, it is more often the pattern you had before '
+            'the pill becoming visible again — which is worth investigating '
+            'rather than waiting out.'),
+      ),
+    ],
+    evidence: _en('NICE CG156; FSRH (Faculty of Sexual and Reproductive '
+        'Healthcare) guidance on return of fertility after contraception; NHS '
+        'contraception guidance; WHO medical eligibility criteria. Reviewed '
+        'August 2026.'),
+    readNext: ['ttc_read_how_conception_works'],
+  ),
+
+  PvRead(
+    id: 'ttc_read_meds_and_conditions',
+    hue: 104,
+    kicker: _en('Getting ready'),
+    title: _en('Medicines and conditions to check with a doctor'),
+    teaser: _en('The appointment worth having before you start — and the one '
+        'decision you should not make on your own.'),
+    scaleSetter: _en('The single most important sentence here is: do not stop '
+        'a prescribed medicine to get ready. Some are changed before pregnancy, '
+        'some are continued exactly as they are, and stopping suddenly is '
+        'almost never the right answer. A well-controlled condition going into '
+        'pregnancy is worth far more than a clean-sounding medicine list.'),
+    author: _en('Dr. Meera Krishnan'),
+    authorRole: _en('Fertility specialist, 16 years, reviewed August 2026'),
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en('There is a reflex, once people decide to try, to strip back to '
+              'nothing — stop the tablets, come off everything, start clean. '
+              'It comes from a good instinct and it is the most common '
+              'avoidable mistake in this part of the journey.'),
+          _en('An uncontrolled condition is a risk to a pregnancy in a way that '
+              'a well-chosen medicine usually is not. The work is not stopping '
+              'things; it is having one conversation with the person who '
+              'prescribed them, early enough that any change has time to '
+              'settle.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('The conditions worth reviewing before you start'),
+        paragraphs: [
+          _en('Thyroid, either direction. Thyroid function affects ovulation '
+              'and early pregnancy, targets are often different in pregnancy '
+              'from outside it, and doses commonly need adjusting. If you are '
+              'on thyroid medication, this is the single most worthwhile '
+              'pre-pregnancy check.'),
+          _en('Diabetes, including diabetes managed with tablets rather than '
+              'insulin. Control before conception matters more than control '
+              'after, because the earliest weeks are when it counts most, and '
+              'the folic acid dose is often higher.'),
+          _en('Epilepsy. Some seizure medicines carry real risks in pregnancy '
+              'and others are much safer, so this is one where a planned switch '
+              'well beforehand is genuinely valuable. It is also one where '
+              'stopping unilaterally is dangerous — an uncontrolled seizure is '
+              'a serious event for both of you.'),
+          _en('High blood pressure, autoimmune conditions such as lupus, '
+              'inflammatory bowel disease and rheumatoid arthritis. In most of '
+              'these, being stable before conceiving is the goal, and several '
+              'of the medicines used are compatible with pregnancy.'),
+          _en('Mental health treatment. Stopping an antidepressant that is '
+              'working, in order to prepare, is a decision with its own '
+              'substantial risks — for her and for a pregnancy. It deserves the '
+              'same careful conversation as any other medicine and not a '
+              'quiet, unilateral stop.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Medicines specifically worth asking about'),
+        paragraphs: [
+          _en('Some are known to be unsafe in pregnancy and are usually changed '
+              'in advance — certain blood pressure medicines, some acne '
+              'treatments, methotrexate, warfarin and several epilepsy drugs '
+              'are the ones most often named. If you take any of these, the '
+              'appointment is worth making before you start trying, not after '
+              'a positive test.'),
+          _en('Over-the-counter is not automatically safe. Long-term '
+              'anti-inflammatory painkillers can interfere with ovulation, and '
+              'high-dose vitamin A supplements are not safe in pregnancy.'),
+          _en('Ayurvedic, homeopathic and herbal preparations count as '
+              'medicines for this conversation. Many are fine; some are not '
+              'well studied, and a few heavy-metal contamination problems have '
+              'been documented in unregulated products. Mention what you take '
+              'rather than assuming a doctor only wants to hear about '
+              'allopathic drugs.'),
+          _en('Bring the actual boxes to the appointment. Names are easy to '
+              'mix up, doses are easy to misremember, and a strip in a bag '
+              'settles both in ten seconds.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('How to ask, so the appointment is useful'),
+        paragraphs: [
+          _en('Say plainly that you are planning to conceive and roughly when. '
+              '"We are hoping to start trying in a few months" changes what a '
+              'doctor considers, and it is easy to leave unsaid out of '
+              'awkwardness.'),
+          _en('Ask three things: does anything I take need changing, does '
+              'anything need changing in advance rather than at a positive '
+              'test, and does anything about my condition change the folic acid '
+              'dose I should be on.'),
+          _en('Ask who to contact when you do conceive, and whether you should '
+              'be seen sooner than a first routine antenatal appointment. For '
+              'several of the conditions above, the answer is yes.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('And his medicines count too'),
+        paragraphs: [
+          _en('A few medicines affect sperm production or function, including '
+              'some used for hair loss and testosterone in particular — '
+              'testosterone supplementation suppresses sperm production, which '
+              'surprises people who assumed it did the opposite.'),
+          _en('If he takes anything regularly and you are planning to conceive, '
+              'it is worth a mention at his own appointment rather than being '
+              'raised for the first time at a fertility clinic a year later.'),
+        ],
+      ),
+    ],
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('Never stop a prescribed medicine to prepare for pregnancy'),
+      body: _en('Do not stop or reduce anything you were prescribed — for '
+          'thyroid, epilepsy, diabetes, blood pressure, mental health or '
+          'anything else — without speaking to the doctor who prescribed it. '
+          'An uncontrolled condition is a greater risk than almost any '
+          'well-chosen medicine, and some medicines are dangerous to stop '
+          'abruptly. If you have already stopped something, say so plainly at '
+          'the appointment; that is information, not a confession.'),
+    ),
+    faqs: [
+      PvReadFaq(
+        question: _en('Should I stop everything before we start trying?'),
+        answer: _en('No. Ask instead. Some medicines are swapped ahead of time, '
+            'many are continued unchanged, and stopping suddenly is the option '
+            'that is almost never right.'),
+      ),
+      PvReadFaq(
+        question: _en('How far ahead should I book this appointment?'),
+        answer: _en('A few months is comfortable, because any medicine change '
+            'needs time to settle and be checked. If that has already passed, '
+            'go anyway — sooner is better than never.'),
+      ),
+      PvReadFaq(
+        question: _en('Do I need to mention Ayurvedic medicines?'),
+        answer: _en('Yes. They are medicines for this purpose. Many are fine, '
+            'some are not well studied, and a doctor can only account for what '
+            'they are told about.'),
+      ),
+      PvReadFaq(
+        question: _en('I am on an antidepressant. Do I have to come off it?'),
+        answer: _en('Not automatically, and this is one to discuss rather than '
+            'decide alone. Untreated depression in pregnancy carries its own '
+            'real risks, and the choice is a balance a psychiatrist or GP can '
+            'help you weigh.'),
+      ),
+    ],
+    evidence: _en('NICE NG201 (antenatal care) and NICE guidance on epilepsy, '
+        'diabetes and antenatal mental health; RCOG preconception care '
+        'statements; MHRA valproate safety guidance; UK Teratology Information '
+        'Service principles on medicine use around conception; published '
+        'reports of heavy-metal contamination in some unregulated herbal '
+        'preparations. Reviewed August 2026.'),
+    readNext: ['ttc_read_preconception_tests'],
+  ),
+  // ===========================================================================
+  //  ⚠️ THE MOST INDIA-SPECIFIC ARTICLE IN THIS DOOR, AND THE ONE MOST WESTERN
+  //  PRECONCEPTION ADVICE LEAVES OUT ENTIRELY.
+  //
+  //  Written 2026-09-03, after the test was confirmed. The brief listed it as
+  //  "The carrier screening that matters in India" and said to confirm exactly
+  //  which screen was meant before it went into copy, because naming a medical
+  //  test is a place to be precise. Confirmed: thalassemia carrier screening,
+  //  by HbA2 on HPLC.
+  //
+  //  ⚠️ THE TONE IS THE HARD PART. Two people who are both carriers are facing
+  //  a genuinely serious conversation, and the same article is read by a very
+  //  large number of people for whom the answer will be "you are not a carrier,
+  //  that is the end of it". So it has to be accurate enough to matter and calm
+  //  enough not to frighten the majority into a test they will misread.
+  //
+  //  ⚠️ AND CARRIER IS NOT ILL. Stated early and repeated, because "carrier"
+  //  and "thalassemia" are one word apart in most people's heads and the
+  //  distance between them is enormous.
+  //
+  //  ⚠️ THE ONE-IN-FOUR IS MENDELIAN INHERITANCE, NOT A PERSONALISED
+  //  PROBABILITY. This stage never computes a chance for a specific woman. The
+  //  recurrence risk for two carriers is a fact of genetics that every
+  //  counsellor states, framed here as what a counsellor will explain rather
+  //  than as a number about her — and the article routes to that counsellor
+  //  rather than doing their job.
+  // ===========================================================================
+  PvRead(
+    id: 'ttc_read_carrier_screening',
+    hue: 206,
+    kicker: _en('Getting ready'),
+    title: _en('The carrier screening that matters in India'),
+    teaser: _en('One inexpensive blood test, done once, that most Western '
+        'preconception advice never mentions — and that matters here more '
+        'than almost anywhere.'),
+    scaleSetter: _en('Thalassemia carrier screening is a routine blood test. '
+        'Most people who take it are not carriers and never think about it '
+        'again. It is on this list because India has more children born with '
+        'thalassemia major than any other country, because being a carrier '
+        'causes no symptoms at all, and because the test only changes anything '
+        'if it is done BEFORE a pregnancy rather than during one.'),
+    author: _en('Dr. Meera Krishnan'),
+    authorRole: _en('Fertility specialist, 16 years, reviewed August 2026'),
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en('If you have read a Western checklist of things to do before '
+              'trying, this was probably not on it. That is not an oversight '
+              'on their part — carrier frequencies differ enormously between '
+              'populations, and in India this one is high enough that it '
+              'belongs near the top.'),
+          _en('The whole thing is one blood test, it costs less than a '
+              'restaurant meal, and for most people the result ends the '
+              'conversation.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Being a carrier is not being ill'),
+        paragraphs: [
+          _en('This is the sentence to hold on to, because "carrier" and '
+              '"thalassemia" sit one word apart and the distance between them '
+              'is enormous.'),
+          _en('A thalassemia carrier — you may also see it written as '
+              'thalassemia trait or thalassemia minor — is a healthy person. '
+              'No treatment, no restrictions, no shortened life, usually no '
+              'symptoms at all. Many carriers reach middle age without ever '
+              'knowing.'),
+          _en('What a carrier sometimes has is slightly small red blood cells '
+              'and mild anaemia that does not respond to iron. That matters '
+              'for a practical reason: it is frequently mistaken for iron '
+              'deficiency and treated with iron tablets for years, which does '
+              'nothing useful and, taken long enough without a genuine '
+              'deficiency, is not harmless.'),
+          _en('So if you have been told you are "always a little anaemic" and '
+              'iron has never really fixed it, this test answers a question '
+              'you have already been asking.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Why it matters before a pregnancy rather than during'),
+        paragraphs: [
+          _en('One carrier and one non-carrier cannot have a child with '
+              'thalassemia major. This only becomes a serious conversation '
+              'when BOTH partners are carriers — which is why it is a couple\'s '
+              'test rather than a woman\'s test.'),
+          _en('Where both are carriers, a genetic counsellor will explain what '
+              'the inheritance means: in each pregnancy, independently, there '
+              'is a one-in-four chance of a child with thalassemia major, a '
+              'one-in-two chance of a carrier like the parents, and a '
+              'one-in-four chance of neither. Those are the numbers of '
+              'inheritance rather than a prediction about you, and they do not '
+              'change from one pregnancy to the next.'),
+          _en('Thalassemia major is a serious lifelong condition requiring '
+              'regular blood transfusions from infancy. It is treatable and '
+              'people live with it; nobody pretends it is a small thing.'),
+          _en('And the reason the timing matters: a couple who know before '
+              'conceiving have options that a couple who find out at twenty '
+              'weeks do not. Those options are a genetic counsellor\'s to '
+              'explain, not an app\'s, and they exist.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('The actual test, and the order to do it in'),
+        paragraphs: [
+          _en('Start with a complete blood count — the ordinary CBC most '
+              'people have had many times. What a doctor looks at is the size '
+              'of the red cells: a low MCV or MCH is the flag that says look '
+              'further.'),
+          _en('The test that answers it is haemoglobin electrophoresis or HPLC, '
+              'usually reported as HbA2. A raised HbA2 indicates beta '
+              'thalassemia trait. Ask for it by name — HbA2 by HPLC — because '
+              '"anaemia panel" means different things at different labs.'),
+          _en('Test one partner first, usually whoever is having other '
+              'preconception bloods done anyway. If that comes back negative, '
+              'you are finished. If it is positive, the other partner is '
+              'tested, and only if BOTH are carriers does anything further '
+              'follow.'),
+          _en('It is inexpensive and widely available across India, and it is a '
+              'once-in-a-lifetime test. Your result does not change.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Who should be especially sure to do it'),
+        paragraphs: [
+          _en('Everybody planning a pregnancy in India can reasonably have it, '
+              'and several national programmes recommend exactly that. Some '
+              'situations make it more pressing.'),
+          _en('Carrier rates are higher in some communities than others — '
+              'among them Sindhi, Punjabi, Gujarati, Bengali and several '
+              'others. Sickle cell trait, which is screened the same way, is '
+              'more common in central and tribal India. If you know your '
+              'community carries either, treat this as a definite rather than '
+              'a maybe.'),
+          _en('Anyone with a family history of thalassemia, of sickle cell '
+              'disease, or of a relative who needed regular transfusions as a '
+              'child. Anyone whose parents were related by blood, which raises '
+              'the chance both partners carry the same variant.'),
+          _en('And anyone with long-standing mild anaemia that iron has never '
+              'corrected — for that person the test is worth doing whether or '
+              'not a pregnancy is being planned.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What a result actually means, in plain terms'),
+        paragraphs: [
+          _en('Not a carrier: nothing to do, and the question is closed for '
+              'life.'),
+          _en('You are a carrier and your partner is not: your children may be '
+              'carriers like you, and no child will have thalassemia major '
+              'from the two of you. It is worth writing down so a future '
+              'doctor knows, and worth mentioning to siblings, because carrier '
+              'status runs in families.'),
+          _en('Both of you are carriers: this is the conversation to have with '
+              'a genetic counsellor, before conceiving rather than after. Ask '
+              'to be referred; do not try to work it out from the internet, '
+              'and do not let anybody rush you.'),
+          _en('One thing to be careful of: a normal HbA2 does not rule out '
+              'every form. Alpha thalassemia and some rarer variants need '
+              'different tests, and a doctor who sees small red cells with a '
+              'normal HbA2 will know to look further. That is another reason '
+              'to take the result to somebody rather than reading it alone.'),
+        ],
+      ),
+    ],
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('Ask for a genetic counsellor, not for an opinion'),
+      body: _en('If both of you are carriers, ask your doctor to refer you to '
+          'a genetic counsellor before you start trying. That is a specific '
+          'referral and it is available in most Indian cities. Do not act on '
+          'anything you have read here or anywhere else without it. And if you '
+          'have been taking iron for years for anaemia nobody has explained, '
+          'ask for this test before taking any more — iron for an anaemia that '
+          'is not iron deficiency does no good and can do harm.'),
+    ),
+    faqs: [
+      PvReadFaq(
+        question: _en('I feel completely fine. Do I still need it?'),
+        answer: _en('Yes, and that is the point of it. Carriers feel fine — '
+            'that is what makes carrier status invisible until two carriers '
+            'have a child together.'),
+      ),
+      PvReadFaq(
+        question: _en('Do both of us have to be tested?'),
+        answer: _en('Only if the first result is positive. Test one of you; if '
+            'that is negative you are done. It is a couple\'s test in what it '
+            'means, not in what it costs.'),
+      ),
+      PvReadFaq(
+        question: _en('Is it expensive?'),
+        answer: _en('No. It is one of the cheaper tests on any preconception '
+            'list, it is available across India, and it is done once in a '
+            'lifetime.'),
+      ),
+      PvReadFaq(
+        question: _en('We are already pregnant. Is it too late?'),
+        answer: _en('It is not too late to be tested, and it is worth doing '
+            'now rather than waiting. Options differ from those available '
+            'before conceiving, and a genetic counsellor is the person to '
+            'explain them. Go sooner rather than later.'),
+      ),
+      PvReadFaq(
+        question: _en('What if we are both carriers?'),
+        answer: _en('Ask for a genetic counsellor before you start trying. '
+            'There are real options and they are theirs to explain properly. '
+            'What is not useful is deciding anything from a search result at '
+            'midnight.'),
+      ),
+    ],
+    evidence: _en('ICMR guidance on haemoglobinopathy screening in India; the '
+        'National Health Mission Guidelines for Prevention and Control of '
+        'Haemoglobinopathies (thalassemia and sickle cell disease); Thalassemia '
+        'International Federation guidelines on carrier screening and genetic '
+        'counselling; WHO estimates of carrier prevalence by region; NICE and '
+        'RCOG guidance on antenatal haemoglobinopathy screening. Community '
+        'prevalence varies widely and no figure for any individual community '
+        'is stated here. Reviewed August 2026.'),
+    readNext: ['ttc_read_preconception_tests'],
+  ),
 ];

@@ -491,4 +491,674 @@ final List<PvRead> kTtcReadsMindBody = [
 
     readNext: ['ttc_read_stress_fertility'],
   ),
+
+  // ===========================================================================
+  //  MIND & BODY — the four guides the rebuild adds
+  // ===========================================================================
+  //  ⚠️ THESE FOUR ARE THE ONLY NEW PROSE IN THE AREA, AND THEY HAVE NOT HAD A
+  //  CLINICAL READ. The rebuild brief marks eleven cards `reuse` or `promote`
+  //  and nine `reference` — all of those point at writing that already exists
+  //  and was already reviewed. Only these four are marked `new`, and the byline
+  //  below is inherited from the door rather than earned on them. Same standing
+  //  debt as the Getting ready and His side batches; see `docs/STILL-OPEN.md`.
+  //
+  //  ⚠️ THE SLEEP PIECE IS THE ONE TO WATCH. "Why sleep matters when you are
+  //  trying" is one careless sentence away from a fertility claim, and the
+  //  claim would be the exact thing the area's position note refuses. What the
+  //  evidence supports is narrow — sustained shift work and very short sleep
+  //  are ASSOCIATED with cycle irregularity — and it is stated as narrowly as
+  //  that, with the honest reason for caring about sleep put first: it is what
+  //  everything else in a hard month rests on.
+
+  PvRead(
+    id: 'ttc_read_sleep_trying',
+    hue: 42,
+    kicker: _en('Mind & body'),
+    title: _en('Why sleep matters when you are trying'),
+    teaser: _en('Not because it makes conception happen. Because everything '
+        'else you are trying to do gets harder without it.'),
+
+    scaleSetter: _en('Short sleep does not stop you conceiving, and nobody '
+        'should add it to the list of things they are doing wrong. It is on '
+        'this page because sleep is the thing every other habit here rests '
+        'on — and because it is one of the few things in this process you can '
+        'actually change this week.'),
+
+    author: _en('Dr. Sharanya Menon'),
+    authorRole: _en('Perinatal psychologist · reviewed August 2026'),
+
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en('Sleep advice arrives in this part of life the same way every '
+              'other piece of advice does — as one more thing you are '
+              'presumably failing at. So it is worth saying at the start what '
+              'this page is not doing. It is not telling you that your sleep '
+              'is the reason, and it is not offering eight hours as a target '
+              'to hit and then feel bad about.'),
+          _en('It is here for a plainer reason. Almost everything else this '
+              'area suggests — moving a bit, eating at home, being civil to '
+              'your family, wanting your partner near you — is markedly '
+              'harder on four hours than on seven. Sleep is not one habit '
+              'among several. It is the one the others sit on.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('What is actually known, and what is not'),
+        paragraphs: [
+          _en('The honest summary is narrower than most articles suggest. '
+              'Sustained night-shift work and persistently very short sleep '
+              'have been associated with more irregular cycles in large '
+              'observational studies. Associated is the operative word: those '
+              'studies cannot separate the sleep from the stress, the light, '
+              'the eating times or the job that comes with all four.'),
+          _en('What has not been shown is that an ordinary run of late nights '
+              'changes whether a healthy couple conceives. If you have been '
+              'sleeping badly through the worry of this, that is a consequence '
+              'of what you are going through, not a cause of it.'),
+          _en('There is one exception worth knowing about rather than worrying '
+              'about. If your cycles have become irregular or stopped '
+              'altogether during a long period of shift work or severe sleep '
+              'disruption, that is worth showing a doctor — not because sleep '
+              'is the certain cause, but because irregular cycles have several '
+              'causes and they look the same from outside.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('The part nobody argues about'),
+        paragraphs: [
+          _en('Sleep sets how the next day goes, and the next day is where all '
+              'of this actually happens. Tired people eat differently — more '
+              'sugar, later, and less of whatever they had planned. Tired '
+              'people move less. Tired people drink a bit more in the evening '
+              'to come down. And tired people are far worse at absorbing a '
+              'remark from a relative without it ruining the afternoon.'),
+          _en('None of that is a moral failing and all of it is predictable. '
+              'If you fix nothing else this month, fixing the hour you go to '
+              'bed quietly improves four other things without you having to '
+              'think about any of them.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('And it is worse in this particular month'),
+        paragraphs: [
+          _en('Trying to conceive has a specific effect on sleep that ordinary '
+              'sleep advice does not account for. The waiting happens at '
+              'night. The two weeks after ovulation, the night before a test, '
+              'the night after a period arrives — these are when the thinking '
+              'gets loudest, and they arrive on a schedule.'),
+          _en('That means bad sleep here is often not a habit problem at all. '
+              'It is grief and anticipation turning up at eleven at night '
+              'because that is the first moment of the day with nothing in it. '
+              'Treating that as sleep hygiene will not touch it. What helps is '
+              'usually having somewhere else to put the thinking — a '
+              'conversation, something written down, or a practice that gives '
+              'the mind one small thing to hold instead.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('What is worth trying'),
+        bullets: [
+          _en('Pick a bedtime and hold the wake-up time, not the bedtime. The '
+              'hour you get up is what actually moves your body clock.'),
+          _en('Get outside in daylight in the first hour or two you are awake, '
+              'even for a few minutes. This does more than anything you can do '
+              'at night.'),
+          _en('Stop searching at a fixed hour. Forums and symptom-checking '
+              'after ten at night have never once helped anybody sleep.'),
+          _en('If you are lying awake for more than twenty minutes, get up and '
+              'sit somewhere dim until you are sleepy. Staying in bed teaches '
+              'you that bed is where you think.'),
+          _en('Do not chase lost sleep at the weekend by four hours. An hour '
+              'is fine; four resets the clock you have just built.'),
+        ],
+      ),
+    ],
+
+    faqs: [
+      PvReadFaq(
+        question: _en('I work nights. Is that a problem?'),
+        answer: _en('It is worth mentioning to your doctor, particularly if '
+            'your cycles are irregular, because shift work is one of the few '
+            'sleep patterns with a real association in the research. It is not '
+            'a reason to leave your job, and nobody can tell you it is why '
+            'this is taking time. Anchoring light and meals to a consistent '
+            'pattern on the days you are not on shift helps more than trying '
+            'to sleep like a day worker on your days off.'),
+      ),
+      PvReadFaq(
+        question: _en('Is a sleeping tablet safe while trying?'),
+        answer: _en('That is a question for whoever would prescribe it, and it '
+            'is a reasonable question to ask rather than something to feel bad '
+            'about needing. What is worth knowing is that over-the-counter '
+            'sleep aids and herbal preparations are not automatically the '
+            'safer choice simply because nobody prescribed them — several are '
+            'unstudied in this context, which is not the same as being safe.'),
+      ),
+      PvReadFaq(
+        question: _en('Does his sleep matter too?'),
+        answer: _en('The same practical argument applies to him, and it gets '
+            'asked about far less. Sustained poor sleep is associated with '
+            'lower testosterone, and it affects everything around this in the '
+            'same way it does for you — drinking, mood, and whether either of '
+            'you has any appetite for the process.'),
+      ),
+    ],
+
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('When sleep is a symptom, not a habit'),
+      body: _en('Speak to a doctor rather than trying harder if you have been '
+          'unable to sleep for more than two or three weeks, if you are waking '
+          'very early every morning and cannot get back to sleep, if you are '
+          'exhausted all day despite spending long enough in bed, if your '
+          'partner has noticed you stop breathing or gasp in your sleep, or if '
+          'you have been drinking to get to sleep. And today, not at the next '
+          'appointment, if you have had thoughts of harming yourself — tell '
+          'someone you trust as well as a professional.'),
+    ),
+
+    evidence: _en('Associations between night-shift work, very short sleep '
+        'duration and menstrual irregularity are drawn from large '
+        'observational cohorts, which cannot establish cause. No effect of '
+        'ordinary sleep variation on conception is claimed here and we are not '
+        'aware of evidence that would support one. Sleep timing guidance '
+        'follows standard behavioural sleep practice. Reviewed August 2026.'),
+
+    nextSteps: [
+      PvReadNextStep(
+        kind: PvNextKind.activity,
+        title: _en('Fixing a bedtime you will actually keep'),
+        value: _en('The practical half of this, in one short page.'),
+        surfaceId: 'ttc_read/ttc_read_bedtime',
+      ),
+    ],
+
+    readNext: ['ttc_read_bedtime', 'ttc_read_stress_fertility'],
+  ),
+
+  // ---------------------------------------------------------------------------
+
+  PvRead(
+    id: 'ttc_read_bedtime',
+    hue: 42,
+    kicker: _en('Mind & body'),
+    title: _en('Fixing a bedtime you will actually keep'),
+    teaser: _en('Most bedtimes fail for the same three reasons. None of them '
+        'is willpower.'),
+
+    scaleSetter: _en('A bedtime you keep four nights a week is worth more than '
+        'a perfect one you abandon by Wednesday. Everything below is written '
+        'for the version of you who is tired and does not feel like it, '
+        'because that is the version who decides.'),
+
+    author: _en('Dr. Sharanya Menon'),
+    authorRole: _en('Perinatal psychologist · reviewed August 2026'),
+
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en('Almost everybody who wants an earlier night has already tried '
+              'the obvious thing: decide on eleven, and then be in bed at '
+              'eleven. It works for a few days and then stops, and the usual '
+              'explanation is that you did not want it enough.'),
+          _en('That explanation is wrong and it is worth dropping, because it '
+              'is also the reason people stop trying. Bedtimes fail for '
+              'structural reasons, and each of the three has a fix that is not '
+              'about trying harder.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('Reason one: the evening has no ending'),
+        paragraphs: [
+          _en('Most late nights are not a decision to stay up. They are the '
+              'absence of a decision to stop — the day simply runs on until '
+              'you notice it is half past midnight. Nothing marked the end of '
+              'it.'),
+          _en('So give the evening an ending that is not getting into bed. '
+              'Something small and repeatable that happens at the same time: '
+              'the kitchen gets tidied, the phone goes on to charge in another '
+              'room, the light in the main room goes off. The point is not the '
+              'task. The point is that something has closed, and everything '
+              'after it is heading for sleep.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('Reason two: you are owed an hour'),
+        paragraphs: [
+          _en('If the whole day belonged to work, family and everybody else, '
+              'the hour after everyone is asleep is often the only hour that '
+              'is yours. Going to bed early means giving that up, and no '
+              'amount of knowing about sleep makes a person volunteer to give '
+              'up the only free hour they had.'),
+          _en('This is the reason most bedtimes really fail, and it does not '
+              'yield to discipline. What works is moving the hour rather than '
+              'deleting it — taking it in the morning, or earlier in the '
+              'evening before the day closes, so that going to bed is not the '
+              'same thing as being finished.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('Reason three: bed became where you think'),
+        paragraphs: [
+          _en('If you have spent several weeks lying in the dark going over '
+              'cycle dates, then bed is now a place your mind associates with '
+              'thinking. That association builds quickly and it does not care '
+              'how tired you are.'),
+          _en('Breaking it is uncomfortable and reliable: if you are awake and '
+              'thinking for more than about twenty minutes, get up. Sit '
+              'somewhere dim and dull until you feel sleepy, then go back. It '
+              'costs a few bad nights and it works, because it stops teaching '
+              'your body that bed is for staying awake in.'),
+          _en('Do not check the time while you are doing it, and do not '
+              'calculate how much sleep is left. That arithmetic is the thing '
+              'that turns being awake into being anxious about being awake, '
+              'and it is the reason a bad night becomes a bad week. Twenty '
+              'minutes here means roughly twenty minutes as it feels, not '
+              'twenty minutes measured.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('What to change first'),
+        paragraphs: [
+          _en('Pick one of these and leave the rest. A list of five changes '
+              'attempted at once is a list abandoned by the weekend, and the '
+              'first one below does most of the work on its own.'),
+          _en('It is also worth knowing roughly how long this takes, because '
+              'most people give up at the point it is about to work. Shifting '
+              'a body clock is a matter of a week or two of consistent '
+              'mornings, not a matter of a few good nights — and the first '
+              'three or four days usually feel worse rather than better, '
+              'because you are getting up earlier without yet falling asleep '
+              'earlier. That is the change working, not failing.'),
+        ],
+        bullets: [
+          _en('Move the wake-up time, not the bedtime. Getting up within the '
+              'same half hour every day is what shifts the clock; the bedtime '
+              'follows within a week or two on its own.'),
+          _en('Shift by fifteen minutes, not by an hour. An hour is a change '
+              'you will notice and resist. Fifteen minutes is one you will '
+              'not.'),
+          _en('Choose the ending ritual before you choose the bedtime.'),
+          _en('Expect to break it. A bedtime is not a streak and there is '
+              'nothing here counting — miss three nights and the fourth is '
+              'not harder than it would have been.'),
+        ],
+      ),
+    ],
+
+    faqs: [
+      PvReadFaq(
+        question: _en('We go to bed at different times. Does that matter?'),
+        answer: _en('Not for sleep itself — plenty of couples keep different '
+            'hours perfectly well. It matters if it means you have stopped '
+            'having any part of the day together, which happens easily during '
+            'a long stretch of trying and is worth noticing before it becomes '
+            'the normal arrangement.'),
+      ),
+      PvReadFaq(
+        question: _en('What about the phone, honestly?'),
+        answer: _en('The blue light is the least of it. The real problem is '
+            'that a phone in bed reliably delivers the one thing guaranteed to '
+            'wake you up in this particular month — a forum, a symptom search, '
+            'or somebody\'s announcement. Charging it in another room is not '
+            'about the screen; it is about what is on it.'),
+      ),
+      PvReadFaq(
+        question: _en('I am fine on six hours. Do I need to change?'),
+        answer: _en('A small number of people genuinely are, and if you wake '
+            'up without an alarm feeling rested, you are probably one of them. '
+            'The test is not the number. It is whether you are relying on '
+            'caffeine to be functional and crashing at the weekend.'),
+      ),
+    ],
+
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('When this needs more than a routine'),
+      body: _en('See a doctor rather than adjusting your evening if you have '
+          'not slept properly for weeks, if you wake very early and cannot get '
+          'back to sleep, if you are sleeping enough hours and still exhausted '
+          'all day, or if someone has noticed you stop breathing or gasp at '
+          'night. And speak to someone today, not at the next appointment, if '
+          'the nights have become a time you have thoughts of harming '
+          'yourself.'),
+    ),
+
+    evidence: _en('Behavioural guidance here follows standard practice for '
+        'insomnia — consistent wake time, stimulus control, and gradual '
+        'shifting — which is the first-line approach recommended ahead of '
+        'medication. No claim is made about sleep and conception; see the '
+        'companion piece for what the evidence on that does and does not '
+        'support. Reviewed August 2026.'),
+
+    readNext: ['ttc_read_sleep_trying', 'ttc_read_stress_fertility'],
+  ),
+
+  // ---------------------------------------------------------------------------
+
+  PvRead(
+    id: 'ttc_read_family_asking',
+    hue: 42,
+    kicker: _en('Mind & body'),
+    title: _en('When family keeps asking'),
+    teaser: _en('What to say, what you owe them, and how to stop the question '
+        'arriving every week.'),
+
+    scaleSetter: _en('You are not obliged to explain your body to anybody, '
+        'including people who love you. That is worth saying plainly, because '
+        'most of the strain here comes from feeling that you are.'),
+
+    author: _en('Dr. Sharanya Menon'),
+    authorRole: _en('Perinatal psychologist · reviewed August 2026'),
+
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en('In most Indian families this is not a private process. The '
+              'question arrives at weddings, on calls, in kitchens, and from '
+              'people who would be genuinely upset to know they were hurting '
+              'you. That combination — constant, well-meant, and impossible to '
+              'answer — is what makes it so wearing.'),
+          _en('There is no sentence that makes people stop asking forever. '
+              'There are sentences that end the conversation without a fight, '
+              'and a couple of decisions that make the whole thing smaller.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('Decide with him first, not in the room'),
+        paragraphs: [
+          _en('The single most useful thing is agreeing in advance — before '
+              'the next gathering rather than during it — what is shared and '
+              'what is not. Whether anyone knows you are trying. Whether '
+              'anyone knows you are seeing a doctor. Whether either set of '
+              'parents is told before the other.'),
+          _en('The reason to do this early is that most of the damage happens '
+              'when one of you answers on behalf of both without knowing what '
+              'the other wanted said. That is how a private thing becomes '
+              'public in one sentence, and it is nobody\'s fault when it has '
+              'never been discussed.'),
+          _en('It also decides who answers. Agreeing that questions to her go '
+              'to him, and questions about his family go to him, takes a '
+              'surprising amount of weight off — largely because in practice '
+              'almost all of the asking is aimed at her.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('Have one sentence ready'),
+        paragraphs: [
+          _en('The sentence does not need to be clever and should not be a '
+              'debate. It needs to be short, warm enough not to start a fight, '
+              'and finished — nothing left dangling for a follow-up question.'),
+          _en('The reason to decide it in advance is that the question never '
+              'arrives at a convenient moment. It comes in a room full of '
+              'people, or in the middle of something else, and whatever you '
+              'produce on the spot will be either sharper than you meant or so '
+              'vague that it invites a second question. Having one line ready '
+              'means you are not composing anything while upset.'),
+          _en('Say it the same way every time, including to people you like. '
+              'A sentence that varies by who asked is a sentence people compare '
+              'notes on, and the version somebody got is then read as how much '
+              'you trust them.'),
+        ],
+        bullets: [
+          _en('"We will tell you when there is news." Warm, closed, and it '
+              'concedes nothing.'),
+          _en('"We are seeing someone about it, and we would rather not '
+              'discuss it." Works when they already suspect, and stops advice '
+              'without inviting sympathy.'),
+          _en('"That is between us — but how are you?" The most reliable one. '
+              'People asked about themselves rarely come back to it.'),
+          _en('"Please do not ask me that again." For the person who has '
+              'ignored the other three. It is allowed.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('Decide who is allowed to ask'),
+        paragraphs: [
+          _en('There is usually a much shorter list of people whose asking you '
+              'actually mind than it feels like at three in the afternoon '
+              'after a family lunch. Naming it — to yourself, or out loud with '
+              'him — changes how the next question lands, because you are no '
+              'longer answering everybody at once.'),
+          _en('Everyone else can be handled with the same sentence every time, '
+              'said in the same tone, without you having to decide anything in '
+              'the moment. Deciding in the moment is what is exhausting.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('And the advice, when it comes anyway'),
+        paragraphs: [
+          _en('Some of it will be harmless and some of it will not be. Herbal '
+              'preparations bought without a doctor, fasting, and anything '
+              'sold as purifying or detoxifying are not neutral just because a '
+              'relative recommended them — several interact with medication '
+              'and some are not safe in early pregnancy.'),
+          _en('You do not have to argue about any of it. "Our doctor is '
+              'handling that" is a complete answer and it is one almost nobody '
+              'contradicts.'),
+        ],
+      ),
+    ],
+
+    faqs: [
+      PvReadFaq(
+        question: _en('They mean well. Am I being unfair?'),
+        answer: _en('Meaning well and causing harm are not opposites, and you '
+            'can hold both without a verdict on anybody. Protecting a couple '
+            'from constant commentary is a legitimate thing to do — it is not '
+            'rudeness, and it is not ingratitude.'),
+      ),
+      PvReadFaq(
+        question: _en('Should we tell them we are having treatment?'),
+        answer: _en('There is no right answer and it is genuinely yours to '
+            'decide. What is worth thinking about is that telling people '
+            'usually swaps one kind of asking for another — the question stops '
+            'being whether, and becomes how it went this month. Some people '
+            'find the support worth it and some find that far harder.'),
+      ),
+      PvReadFaq(
+        question: _en('What if it is his family and he will not say anything?'),
+        answer: _en('This is common and it is worth raising as a request '
+            'rather than an accusation, because it usually is not indifference '
+            '— it is a person who has never had to manage his own family '
+            'before and does not know how. Agreeing that he handles his side '
+            'and you handle yours is a fair division and an easier '
+            'conversation than asking him to defend you.'),
+      ),
+    ],
+
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('When this is more than family being difficult'),
+      body: _en('Speak to someone if the pressure at home has become constant '
+          'criticism, if you are being blamed for not conceiving, if you are '
+          'being made to take anything you have not agreed to, or if you are '
+          'afraid of someone in your household. And today, not at the next '
+          'appointment, if you have had thoughts of harming yourself — tell a '
+          'person you trust as well as a professional. There is a psychologist '
+          'inside this app, and there are free helplines if that is easier.'),
+    ),
+
+    evidence: _en('This is practical and psychological guidance rather than a '
+        'clinical topic, drawn from standard approaches to boundary-setting in '
+        'infertility counselling. The caution about unprescribed herbal '
+        'preparations reflects known interaction and safety uncertainty rather '
+        'than any claim about efficacy. Reviewed August 2026.'),
+
+    readNext: ['ttc_read_stress_fertility', 'ttc_read_bringing_him_in'],
+  ),
+
+  // ---------------------------------------------------------------------------
+
+  PvRead(
+    id: 'ttc_read_bringing_him_in',
+    hue: 42,
+    kicker: _en('Mind & body'),
+    title: _en('Bringing him into this'),
+    teaser: _en('Why it usually ends up being her project, and what actually '
+        'changes that.'),
+
+    scaleSetter: _en('If this has become one person\'s job, that is the '
+        'ordinary outcome of how the whole subject is arranged rather than a '
+        'verdict on him or on your marriage. It is also one of the few things '
+        'here you can change without anybody\'s permission.'),
+
+    author: _en('Dr. Sharanya Menon'),
+    authorRole: _en('Perinatal psychologist · reviewed August 2026'),
+
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en('In most couples one person is carrying this — tracking the '
+              'dates, booking the appointments, reading at night, and '
+              'absorbing the questions. It is almost always her, and it is '
+              'rarely the result of anybody deciding it should be.'),
+          _en('It happens because everything around this points at her. The '
+              'appointments are hers. The tests start with her. The advice '
+              'arrives addressed to her. By the time anyone notices, he has '
+              'become a person who is told what is happening rather than a '
+              'person it is happening to, and that is difficult to reverse '
+              'with a single conversation.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('The half that is genuinely his'),
+        paragraphs: [
+          _en('A male factor is involved in about half of couples who take '
+              'longer than expected, either on its own or alongside something '
+              'on her side. That is the fact that changes the conversation, '
+              'and most couples have never been told it.'),
+          _en('It matters here for a specific reason: it is very hard to ask '
+              'somebody to share the weight of a problem he has been given no '
+              'reason to think is his. A semen analysis is quick, cheap and '
+              'the least invasive test in the whole process, and in many '
+              'couples it is done last or not at all.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('What actually shifts it'),
+        paragraphs: [
+          _en('Asking him to care more does not work, and it is usually not '
+              'true that he does not. What works is transferring specific '
+              'things rather than describing a feeling.'),
+          _en('The distinction matters more than it sounds. "I need you to be '
+              'more involved" is a statement about how you feel, and the only '
+              'available reply is either an apology or a defence — neither of '
+              'which moves anything the following week. "Will you book your '
+              'test" is a task with an owner and a date, and it is the kind of '
+              'request that gets done.'),
+          _en('Transferring one thing completely also works better than '
+              'splitting several. A job that is half his is still a job you '
+              'are tracking, and tracking it is most of the weight.'),
+        ],
+        bullets: [
+          _en('One thing that is entirely his — booking his own test, or '
+              'handling his own family\'s questions. Not helping with yours; '
+              'owning one.'),
+          _en('He comes to one appointment. Not as support — as somebody the '
+              'appointment is also about.'),
+          _en('He reads one thing. One, chosen, not a folder.'),
+          _en('A fixed time to talk about it, so it stops arriving at eleven '
+              'at night and stops being present at every other hour.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('Why he may be quiet, and why that is not indifference'),
+        paragraphs: [
+          _en('Men in this situation are asked about it very rarely — by '
+              'doctors, by families, by friends. A person nobody asks generally '
+              'concludes that his part is to stay steady and not add to it, '
+              'and from the outside that is indistinguishable from not '
+              'minding.'),
+          _en('It is also true that a possible problem he has not tested for '
+              'is easier to leave untested, and that this is fear rather than '
+              'avoidance of you. Saying the half-of-couples fact out loud tends '
+              'to help more than any appeal, because it moves the test from an '
+              'accusation to a normal step.'),
+        ],
+      ),
+
+      PvReadSection(
+        heading: _en('And a warning about the fix that backfires'),
+        paragraphs: [
+          _en('The most common attempt is scheduling — telling him which days '
+              'matter and when. It is completely reasonable and it is the one '
+              'thing most likely to make him withdraw further, because it '
+              'turns him into a task on a calendar.'),
+          _en('Where it has already happened, the way back is usually to stop '
+              'announcing the days for a cycle or two. Nothing is lost by it: '
+              'every one to two days across the week does as well as timing '
+              'anything precisely, which means the calendar was never worth '
+              'what it cost.'),
+          _en('This is worth saying to him rather than doing quietly. A month '
+              'in which you stop mentioning dates, without explaining why, '
+              'reads from his side as you having given up or withdrawn — which '
+              'is the opposite of what is happening and a much harder thing to '
+              'come back from than the original problem.'),
+        ],
+      ),
+    ],
+
+    faqs: [
+      PvReadFaq(
+        question: _en('He says he does not want to talk about it. Now what?'),
+        answer: _en('Ask for a bounded version rather than a general one — ten '
+            'minutes on Sunday rather than "we need to talk about this". A '
+            'person who has refused an open-ended conversation will often '
+            'agree to a short one with an end, because what he is declining is '
+            'usually the endlessness rather than the subject.'),
+      ),
+      PvReadFaq(
+        question: _en('Is it fair to ask him to test before I do?'),
+        answer: _en('It is more than fair; it is the cheaper and less invasive '
+            'order, and several clinics do it that way as standard. If yours '
+            'has not suggested it, asking is reasonable.'),
+      ),
+      PvReadFaq(
+        question: _en('We have stopped enjoying any of this. Is that normal?'),
+        answer: _en('It is extremely common and it is one of the more '
+            'treatable parts. Sex that has become a scheduled procedure stops '
+            'being something either person wants, and the usual first step is '
+            'taking the calendar out of it for a while rather than trying '
+            'harder inside it.'),
+      ),
+    ],
+
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('When to bring in a third person'),
+      body: _en('Speak to a professional together if this has become an '
+          'argument you have every month, if either of you has stopped wanting '
+          'any physical closeness at all, if one of you is drinking more to '
+          'get through it, or if either of you has been low or unable to '
+          'function for more than a couple of weeks. And today, not at the '
+          'next appointment, if either of you has had thoughts of harming '
+          'yourself.'),
+    ),
+
+    evidence: _en('The proportion of couples with a contributing male factor '
+        'follows standard infertility epidemiology as reflected in major '
+        'clinical guidance. Guidance on shared decision-making and on the '
+        'effect of scheduled intercourse on couple distress follows '
+        'infertility counselling practice. No claim is made that any of this '
+        'changes the chance of conceiving. Reviewed August 2026.'),
+
+    readNext: ['ttc_read_stress_fertility', 'ttc_read_family_asking'],
+  ),
 ];

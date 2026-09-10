@@ -404,11 +404,128 @@ class TtcS {
   /// outranks ParentVeda's calculation by six places, so when a clinic is
   /// running the cycle the header carries their authority, not a second opinion
   /// beside it.
+  /// ⚠️ THE HERO LEADS ON HER CYCLE DAY NOW, EVEN ON A CLINIC-RUN CYCLE —
+  /// 2026-09-05. It used to lead on "Your clinic holds this" and hold it there
+  /// every single day, which is what got reported: *"this is the line that I
+  /// keep seeing again and again, nothing changes."*
+  ///
+  /// A clinic forbids us a PREDICTION. It does not forbid a fact, and her cycle
+  /// day is the one number on this screen that is hers rather than ours — her
+  /// logged period subtracted from the date. So the headline moves daily and
+  /// the clinic note becomes one short line under it.
+  String headerCycleDayBig(int day) => _p('Cycle day $day', 'Cycle day $day');
+
+  // ---------------------------------------------------------------------------
+  //  The hero, split three ways — 2026-09-05
+  // ---------------------------------------------------------------------------
+  //  ⚠️ THE SHAPE IS THE POINT, AND IT IS WHY OURS READ AS BLAND. The
+  //  reference app's hero is three sizes: a small lead-in, ONE huge phrase, and
+  //  a quiet explainer. Ours was a single medium headline plus a body, so the
+  //  one piece of information she opened the app for — *when* — was set in the
+  //  same type as everything around it and had to be read rather than seen.
+  //
+  //  Splitting it costs nothing and changes the whole screen: "Your fertile
+  //  days" small, then **end today** enormous. Same words, same honesty, and
+  //  now answerable from across the room.
+  //
+  //  ⚠️ THE BIG SLOT TAKES THE ANSWER, NEVER THE SUBJECT. "end today", "today
+  //  and 2 more days", "in 3 days". If the big line ever reads as a topic
+  //  rather than an answer, the split has been used backwards.
+  String get leadFertileDays => _p('Your fertile days', 'Aapke fertile din');
+
+  /// The verb that finishes the lead-in, so the two halves read as one
+  /// sentence across the size change: "Your fertile days open" / "in 3 days".
+  String get headerOpenVerb => _p(' open', ' shuru');
+  String get headerAreVerb => _p(' are', '');
+  String get leadPeriodMayStart =>
+      _p('Your period may start', 'Period shuru ho sakta hai');
+  String get leadPastUsual =>
+      _p('Past your usual length by', 'Aam length se aage');
+  String get leadYouAreOn => _p('You are on', 'Aap hain');
+  String get leadBetaOn => _p('Beta test on', 'Beta test');
+
+  String bigInDays(int days) => _p(
+      days == 1 ? 'tomorrow' : 'in $days days',
+      days == 1 ? 'kal' : '$days din mein');
+  String get bigToday => _p('today', 'aaj');
+  String get bigEndToday => _p('end today', 'aaj khatam');
+  String bigDays(int days) =>
+      _p(days == 1 ? 'a day' : '$days days', days == 1 ? 'ek din' : '$days din');
+
+  /// "today and 2 more days" — the reference app's own phrasing, and the one
+  /// that cannot be misread about whether today counts.
+  String bigTodayAndMore(int days) => _p(
+      days <= 1
+          ? 'today'
+          : days == 2
+              ? 'today and tomorrow'
+              : 'today and ${days - 1} more days',
+      days <= 1
+          ? 'aaj'
+          : days == 2
+              ? 'aaj aur kal'
+              : 'aaj aur ${days - 1} din');
+
+  // ---------------------------------------------------------------------------
+  //  Her clinic's calendar, carried — 2026-09-05
+  // ---------------------------------------------------------------------------
+  //  ⚠️ NONE OF THESE IS A PREDICTION AND NONE NEEDS A HEDGE. Every other
+  //  estimate on this screen says "may" or "around" because it is ours. These
+  //  are dates a clinic named and she already knows; hedging somebody else's
+  //  appointment would read as us doubting her clinic.
+  String headerStepToday(String step) => _p('$step today', 'Aaj $step');
+  String get headerStepTodayBody => _p(
+      'From the dates you entered. Your clinic decides everything about it — we are only holding the calendar.',
+      'Aapki daali hui dates se. Iske baare mein sab kuch aapki clinic tay karti hai — hum sirf calendar rakh rahe hain.');
+
+  String headerStepIn(String step, int days) => _p(
+      days == 1 ? '$step tomorrow' : '$step in $days days',
+      days == 1 ? 'Kal $step' : '$days din mein $step');
+  String get headerStepInBody => _p(
+      'The next date from your clinic. Tap to see the whole cycle.',
+      'Clinic ki agli date. Poora cycle dekhne ke liye tap karein.');
+
+  /// ⚠️ NAMED, NEVER COUNTED DOWN TO. See `TtcHeroState.treatmentBeta`:
+  /// count down to things she does, name the date of things that judge.
+  String headerBetaOn(String date) =>
+      _p('Beta test on $date', '$date ko beta test');
+  String get headerBetaOnBody => _p(
+      'The blood test that gives the real answer. Nothing before it tells you anything, including a home test.',
+      'Wo blood test jo asli jawab deta hai. Usse pehle kuch bhi kuch nahi batata — ghar ka test bhi nahi.');
+
+  String get headerTreatmentEmpty =>
+      _p('Add your clinic dates', 'Clinic ki dates daalein');
+  String get headerTreatmentEmptyBody => _p(
+      'Enter them once and the next one leads this screen every morning — with the thing people forget to ask about it.',
+      'Ek baar daal dein, phir har subah agli date yahin sabse upar dikhegi — uske saath wo baat bhi jo poochhna log bhool jaate hain.');
+
+  /// ⚠️ THE WAY OUT, ON THE SENTENCE THAT TRAPS HER. Choosing a treatment
+  /// path takes one tap and switches the fertile window off; getting back
+  /// meant finding two questions on a screen nothing points at. So the line
+  /// that delivers the bad news is also the door.
+  String get headerNotOnTreatment =>
+      _p('Not on treatment? Change this ›', 'Treatment par nahi? Yahan badlein ›');
+
+  String get headerClinicHoldsShort => _p(
+      'Your clinic is running the timing this cycle.',
+      'Is cycle ki timing aapki clinic dekh rahi hai.');
+
+  String get headerNoEstimateShort => _p(
+      'Not enough logged to estimate your days this cycle.',
+      'Abhi itna log nahi hua ki is cycle ke din bata sakein.');
+
   String get headerClinicHolds =>
       _p('Your clinic holds this', 'Yeh aapki clinic dekh rahi hai');
-  String get headerClinicHoldsBody => _p(
-      'They are running the timing this cycle. We are keeping you company, not running our own numbers alongside theirs.',
-      'Is cycle ki timing wo sambhaal rahe hain. Hum bas aapke saath hain — apna alag hisaab nahi laga rahe.');
+
+  // Kept for revert: the hero's old two-line clinic body. It is good writing
+  // and it is the wrong length for a headline slot that has to say something
+  // different every morning — the reasoning it carries belongs in
+  // `TtcTreatmentEntryCard` on the cycle screen, which is where somebody asking
+  // "why is there no estimate" actually goes.
+  //
+  // String get headerClinicHoldsBody => _p(
+  //     'They are running the timing this cycle. We are keeping you company, not running our own numbers alongside theirs.',
+  //     'Is cycle ki timing wo sambhaal rahe hain. Hum bas aapke saath hain — apna alag hisaab nahi laga rahe.');
 
   String get headerNoEstimate =>
       _p('Not enough to say yet', 'Abhi kehna theek nahi');
@@ -432,6 +549,110 @@ class TtcS {
   String headerWindowProjected(String from, String to) => _p(
       'Expected around $from to $to, based on your usual cycle',
       'Andaaza $from se $to, aapke aam cycle ke hisaab se');
+
+  /// ⚠️ THE WINDOW'S REMAINING DAYS, AND IT COUNTS TODAY. "Today and 2 more
+  /// days" is three days including this one — the phrasing the reference app
+  /// uses, and the one that cannot be misread. "2 days left" is ambiguous about
+  /// whether today counts, and being ambiguous about which days matter is the
+  /// one thing this line must not be.
+  String headerWindowOpenFor(int days) => _p(
+      days <= 1
+          ? 'Today'
+          : days == 2
+              ? 'Today and tomorrow'
+              : 'Today and ${days - 1} more days',
+      days <= 1
+          ? 'Aaj'
+          : days == 2
+              ? 'Aaj aur kal'
+              : 'Aaj aur ${days - 1} din');
+
+  /// ⚠️ THE COUNT AND THE DATES, TOGETHER. Replacing the dates with the
+  /// count was a regression and a test caught it: "1 Sep to 6 Sep" is the line
+  /// that lets somebody plan a week, and "today and 2 more days" is the line
+  /// that tells her where she is in it. They answer different questions and the
+  /// body has room for both.
+  String headerWindowOpenBody(int days, String from, String to) =>
+      '${headerWindowOpenFor(days)} · ${headerWindowDates(from, to)}';
+
+  String get headerWindowLastDay =>
+      _p('Your fertile days end today', 'Aaj fertile din khatam');
+  String get headerWindowLastDayBody => _p(
+      'The last day of the window this cycle. Nothing is lost if today is not a day that suits you.',
+      'Is cycle ke window ka aakhri din. Agar aaj theek nahi lagta, koi nuksaan nahi.');
+
+  // ---------------------------------------------------------------------------
+  //  The two-week wait — the half of the cycle the hero used to skip
+  // ---------------------------------------------------------------------------
+  //  ⚠️ THESE THREE COUNT TO A PERIOD, NEVER TO A TEST. The reference app puts
+  //  "Time for a pregnancy test in 10 days" here and it is the single most
+  //  effective way to make a fortnight worse: a number getting smaller, pointed
+  //  at a verdict. A period is the same arithmetic pointed at a cycle event.
+  //
+  //  ⚠️ AND NONE OF THEM HOPES OUT LOUD. No "fingers crossed", no "this could
+  //  be your month". The chapter copy for the waiting days already sets the
+  //  tone — "or the next cycle, both are fine" — and it is guarded by a test.
+  String headerWaiting(int days) => _p(
+      days == 1 ? 'Your period may start tomorrow' : 'Your period may start in $days days',
+      days == 1 ? 'Period kal shuru ho sakta hai' : 'Period $days din mein shuru ho sakta hai');
+  String get headerWaitingBody => _p(
+      'The window has closed for this cycle. There is nothing to do now but the ordinary things.',
+      'Is cycle ka window band ho gaya. Ab bas roz waale kaam — aur kuch nahi.');
+
+  String get headerPeriodDue =>
+      _p('Your period may start today', 'Period aaj shuru ho sakta hai');
+  String get headerPeriodDueBody => _p(
+      'Based on your usual cycle length. A few days either way is ordinary.',
+      'Aapke aam cycle ke hisaab se. Do-chaar din aage-peechhe aam baat hai.');
+
+  /// ⚠️ "NOT ARRIVED", NOT "LATE". Late implies a schedule she has missed,
+  /// and the word does two things at once here: it makes an ordinary variation
+  /// sound like a fault, and it is read by most people as a hint. Neither is
+  /// something we are entitled to say.
+  String headerPeriodLate(int days) => _p(
+      days == 1 ? 'A day past your usual length' : '$days days past your usual length',
+      days == 1 ? 'Aam length se ek din aage' : 'Aam length se $days din aage');
+  String get headerPeriodLateBody => _p(
+      'Cycles move, and a week either side of the usual is common. If it has been more than a week, a test is worth doing — and worth mentioning to a doctor if cycles keep shifting.',
+      'Cycle badalte rehte hain, hafte bhar ka farak aam hai. Agar hafte se zyada ho gaya to test kar lena theek hai — aur cycle baar-baar badal rahe hon to doctor ko batayein.');
+
+  /// ⚠️ A REFUSAL FOR AN EARLIER CYCLE, NOT A RECONSTRUCTION. We estimate
+  /// ovulation for the cycle she is in, from that cycle's signals. Rebuilding a
+  /// window for two months ago would mean assuming her usual length and her
+  /// usual luteal phase and printing the result as history — an invention she
+  /// would have no way to identify.
+  String get leadEarlierCycle =>
+      _p('In an earlier cycle', 'Ek pichhle cycle mein');
+
+  /// The day she was on in the cycle she was actually in.
+  ///
+  /// ⚠️ A FACT, NOT A RECONSTRUCTION. It is the date minus whichever logged
+  /// period contained it. What stays refused for a past cycle is the fertile
+  /// window — that needs an ovulation estimate for a cycle whose signals are
+  /// gone, and the reference app's pairing of a past day number with "low
+  /// chances of getting pregnant" is the probability claim we do not make in
+  /// any tense.
+  String headerPastCycleDay(int day) => _p('Day $day', 'Din $day');
+  String headerPastCycleBodyOn(String started) => _p(
+      'That cycle started on $started. Fertile days are worked out for the '
+      'cycle you are in, so there is no window to show this far back.',
+      'Wo cycle $started ko shuru hua tha. Fertile din us cycle ke nikalte hain '
+      'jismein aap abhi hain, isliye itna peechhe window nahi dikhta.');
+
+  String get headerPastCycle =>
+      _p('An earlier cycle', 'Pichhla cycle');
+  String get headerPastCycleBody => _p(
+      'We work out fertile days for the cycle you are in, so we do not have an estimate this far back. What you logged on this day is below.',
+      'Hum fertile din us cycle ke nikalte hain jismein aap abhi hain, isliye itna peechhe ka estimate nahi hai. Us din aapne jo log kiya tha wo neeche hai.');
+
+  /// ⚠️ A FUTURE DAY IS NEVER "LATE". The strip runs six days forward, so on
+  /// day 26 of a 28-day cycle she can land on a day the arithmetic calls
+  /// overdue and the calendar calls Thursday.
+  String get headerPeriodExpectedBy =>
+      _p('Your period may have started', 'Period shuru ho chuka ho sakta hai');
+  String get headerPeriodExpectedByBody => _p(
+      'By this day, going on your usual cycle length. Log it when it arrives and everything here re-draws around the real date.',
+      'Aapke aam cycle ke hisaab se is din tak. Jab aaye tab log kar dein — sab kuch asli date ke hisaab se dobara ban jayega.');
 
   String headerCycleDay(int day) => _p('Cycle day $day', 'Cycle day $day');
 

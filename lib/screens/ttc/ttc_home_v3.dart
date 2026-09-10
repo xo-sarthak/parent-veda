@@ -73,6 +73,8 @@ import '../v2/v2_palette.dart';
 import '../v2/v3_bracket_art.dart';
 import '../v2/v3_daily.dart';
 import '../v2/v3_daily_art.dart';
+import '../../ttc/ttc_home_hero.dart';
+import '../../ttc/ttc_treatment_store.dart';
 import '../v2/v3_hero_field.dart';
 import 'ttc_chapter_screen.dart';
 import 'ttc_focus_screen.dart';
@@ -1057,7 +1059,7 @@ class _CycleHeader extends StatelessWidget {
               selected: selected,
               today: todayDate,
               onSelect: onSelectDay),
-          const SizedBox(height: 20),
+          const SizedBox(height: 12),
 
           // ---- which chapter -----------------------------------------------
           //
@@ -1080,7 +1082,17 @@ class _CycleHeader extends StatelessWidget {
           // const SizedBox(height: 12),
 
           // ---- the window, or the honest refusal ---------------------------
-          _WindowLine(today: today, p: p, hinglish: hinglish, onTap: onCycle),
+          // ⚠️ `selected`, NOT TODAY. Everything else in this header already
+          // followed the strip — the date above it, the insight cards, the
+          // symptom sheet, and the two actions, which dim on a future day. The
+          // hero alone described today, so standing on the 3rd gave a page
+          // about the 3rd with one sentence about the 5th in the middle of it.
+          _WindowLine(
+              today: today,
+              p: p,
+              hinglish: hinglish,
+              selected: selected,
+              onTap: onCycle),
           const SizedBox(height: 18),
 
           // ---- the two actions ---------------------------------------------
@@ -1285,9 +1297,61 @@ class _WeekStripState extends State<_WeekStrip> {
       WidgetsBinding.instance
           .addPostFrameCallback((_) => _centre(box.maxWidth));
 
+      final selIndex =
+          widget.selected.difference(_first).inDays.toDouble();
+
       return SizedBox(
         height: 84,
-        child: ListView.builder(
+        child: Stack(children: [
+          // ⚠️ THE CORAL DISC IS ONE WIDGET THAT MOVES, NOT A PROPERTY OF A
+          // CELL — 2026-09-05. Asked for directly: *"I don't need that purple
+          // outline… instead take that pink background. Have a good motion. It
+          // seems sliding through to that particular date."*
+          //
+          // Drawn per-cell it can only ever appear and disappear: the old cell
+          // repaints without it and the new one repaints with it, which is a
+          // cut, not a move. Lifting it out of the list and translating it is
+          // what makes the same pixels read as one object travelling to the day
+          // you tapped.
+          //
+          // ⚠️ IT SITS *UNDER* THE LIST, WHICH IS WHY THE NUMBER STILL SHOWS.
+          // The cells paint no background of their own, so the disc shows
+          // through and each date's own digits draw on top of it. Painted over
+          // the list it would cover the number it is meant to highlight.
+          //
+          // ⚠️ AND IT TRACKS TWO THINGS AT ONCE. The `AnimatedBuilder` on the
+          // scroll controller keeps it glued to its date while the strip is
+          // dragged (instantly, no easing — a marker that lags behind a scroll
+          // looks broken); the `TweenAnimationBuilder` eases only the change of
+          // SELECTION. One of those must be immediate and the other must not,
+          // which is why they are two separate animations and not one.
+          Positioned(
+            left: 0,
+            top: 20,
+            child: AnimatedBuilder(
+              animation: _sc,
+              builder: (context, _) => TweenAnimationBuilder<double>(
+                tween: Tween<double>(end: selIndex),
+                duration: const Duration(milliseconds: 260),
+                curve: Curves.easeOutCubic,
+                builder: (context, v, child) => Transform.translate(
+                  offset: Offset(
+                      v * _slot -
+                          (_sc.hasClients ? _sc.offset : 0) +
+                          (_slot - 34) / 2,
+                      0),
+                  child: child,
+                ),
+                child: Container(
+                  width: 34,
+                  height: 34,
+                  decoration: const BoxDecoration(
+                      color: ttcCoral, shape: BoxShape.circle),
+                ),
+              ),
+            ),
+          ),
+          ListView.builder(
           controller: _sc,
           scrollDirection: Axis.horizontal,
           itemCount: count,
@@ -1312,6 +1376,7 @@ class _WeekStripState extends State<_WeekStrip> {
             );
           },
         ),
+        ]),
       );
     });
   }
@@ -1376,23 +1441,24 @@ class _WeekDay extends StatelessWidget {
     //   ring = ttcCoral.withValues(alpha: 0.55);
     // }
 
-    // ⚠️ NO `ring` VARIABLE ANY MORE. It only ever carried cycle data, and the
-    // commented block above is where that lives until it is designed properly.
-    // Leaving it declared-but-always-null gets an analyzer warning and, worse,
-    // reads as though something might still set it.
-    Color? fill;
-
-    // ⚠️ THE ONE MARK ON THE STRIP. Filled coral, on today, every day.
-    if (isToday) fill = ttcCoral;
-
-    // ⚠️ SELECTION IS A RING, NEVER A FILL — except on today, which already has
-    // one. Filling the selected day would overwrite the one piece of
-    // information on the strip that is not ours to overwrite: tap a period day
-    // and the coral vanishes, so the day you are LOOKING at becomes the only
-    // day whose facts you cannot see. Selection is a cursor, not a fact.
-    final selectedRing = isSelected && !isToday ? p.action : null;
-    final onFill =
-        fill == null ? p.ink1 : (fill == ttcCoral ? Colors.white : p.ink1);
+    // ⚠️ NO `fill` AND NO `selectedRing` — 2026-09-05. THE CELL DRAWS NO
+    // BACKGROUND AT ALL ANY MORE.
+    //
+    // It used to paint coral on today and a purple ring on the selection. The
+    // ring is gone because it was asked to go — *"I don't need that purple
+    // outline… instead take that pink background"* — and the coral is gone from
+    // here because it now lives in `_WeekStrip` as one disc that slides. See
+    // the note there for why a per-cell fill can only cut and never move.
+    //
+    // ⚠️ WHAT THIS COSTS, AND HOW IT IS PAID. The old arrangement had one
+    // permanent, unmissable mark on today. With the disc following the
+    // selection, today has no fill whenever you are looking at another day —
+    // and *"keep the today marked as where it is so that I know what day is
+    // today"* is the requirement. It is paid twice: the word TODAY sits above
+    // it in coral instead of a weekday letter, and its digits stay coral while
+    // every other unselected day is ink. Two marks, neither of them a disc, so
+    // neither can be confused with the cursor.
+    final onDisc = isSelected;
 
     final marks = ttcDayMarkers(date);
 
@@ -1407,7 +1473,15 @@ class _WeekDay extends StatelessWidget {
           // information at all. Replacing it removes the last way to misread
           // which cell is the current one — and it costs nothing, because the
           // letter it replaces was the least useful mark on the strip.
-          Text(isToday ? 'TODAY' : letter,
+          // ⚠️ A FIXED 14 SO THE DISC KNOWS WHERE THE CIRCLE STARTS. The
+          // sliding marker is positioned from outside this cell, so its `top`
+          // is arithmetic over this row's height plus the gap below it. Left to
+          // the font, that height changes with the text scale and the disc
+          // drifts off the number on exactly the devices whose owners cannot
+          // read it anyway.
+          SizedBox(
+            height: 14,
+            child: Text(isToday ? 'TODAY' : letter,
               maxLines: 1,
               overflow: TextOverflow.visible,
               style: pvManrope(
@@ -1421,31 +1495,28 @@ class _WeekDay extends StatelessWidget {
                       : isFuture
                           ? p.ink3.withValues(alpha: 0.5)
                           : p.ink3)),
+          ),
           const SizedBox(height: 6),
-          Container(
+          SizedBox(
             width: 34,
             height: 34,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: fill,
-              shape: BoxShape.circle,
-              border: selectedRing != null
-                  ? Border.all(color: selectedRing, width: 2.2)
-                  : null,
+            child: Center(
+              child: Text('${date.day}',
+                  style: pvManrope(
+                      fontSize: 13.5,
+                      fontWeight: isSelected || isToday
+                          ? FontWeight.w900
+                          : FontWeight.w700,
+                      // White on the disc; coral on today when the disc is
+                      // elsewhere; dimmer ahead of today; ordinary ink behind.
+                      color: onDisc
+                          ? Colors.white
+                          : isToday
+                              ? ttcCoral
+                              : isFuture
+                                  ? p.ink3
+                                  : p.ink1)),
             ),
-            child: Text('${date.day}',
-                style: pvManrope(
-                    fontSize: 13.5,
-                    fontWeight: isSelected || isToday
-                        ? FontWeight.w900
-                        : FontWeight.w700,
-                    color: fill != null
-                        ? onFill
-                        : isToday
-                            ? p.action
-                            : isFuture
-                                ? p.ink3
-                                : p.ink1)),
           ),
           const SizedBox(height: 4),
 
@@ -1532,11 +1603,16 @@ class _WindowLine extends StatelessWidget {
       {required this.today,
       required this.p,
       required this.hinglish,
+      required this.selected,
       required this.onTap});
 
   final TtcToday today;
   final V2Palette p;
   final bool hinglish;
+
+  /// The day the strip is standing on. Not always today.
+  final DateTime selected;
+
   final VoidCallback onTap;
 
   static const _short = [
@@ -1545,71 +1621,338 @@ class _WindowLine extends StatelessWidget {
   ];
   static String _fmt(DateTime d) => '${d.day} ${_short[d.month - 1]}';
 
+  /// ⚠️ THE TALLEST THE BLOCK EVER GETS, AND IT IS FIXED — 2026-09-05.
+  ///
+  /// Reported: *"the homescreen hero is fixed in size i mean height wise"*. It
+  /// was not, and the effect is worse than it sounds. The headline runs to one
+  /// line on most days and two on others, so the strip, the two buttons and
+  /// everything below them sat at a different height depending on where in her
+  /// cycle she was — the page rearranged itself between days, and between the
+  /// day she selected on the strip and today.
+  ///
+  /// Fixing the height costs a little whitespace on short days and buys a page
+  /// whose furniture is in the same place every morning. That is the right
+  /// trade for a screen somebody opens daily for a year.
+  ///
+  /// ⚠️ MEASURED AGAINST THE WORST CASE, NOT A TYPICAL ONE. Two lines of
+  /// 30pt Fraunces at 1.12 (67), the gap (6), two lines of 13.5pt Manrope at
+  /// 1.45 (39), the gap (8) and the cycle-day row (18) — 138, rounded up.
+  /// `ttc_home_hero_test.dart` renders every state and fails on an overflow, so
+  /// a longer string cannot quietly start clipping.
+  /// ⚠️ 140, AND THE CONTENT HUGS THE BOTTOM OF IT — CORRECTED 2026-09-05.
+  ///
+  /// The first version was 146 with the content top-aligned and a `Spacer`
+  /// pushing the cycle-day footer down. On a state with a one-line headline and
+  /// no footer that left most of the box empty, directly above the two buttons,
+  /// and it was reported as exactly that: *"a lot of spaces there between that
+  /// heading and the entry date row."*
+  ///
+  /// ⚠️ THE FIX IS WHICH END THE SLACK SITS AT, NOT HOW MUCH THERE IS. A fixed
+  /// box always has slack on short days — that is the price of the page not
+  /// jumping. Top-aligned, the slack falls between the text and the buttons,
+  /// where it reads as a hole. Bottom-aligned, it falls between the day strip
+  /// and the text, where the strip already has air and it reads as breathing
+  /// room. Same pixels, and only one of them looks like a mistake.
+  /// ⚠️ 176 SINCE THE LEAD-IN GREW — 2026-09-05, AND THE NUMBER IS MEASURED
+  /// RATHER THAN REASONED. I estimated 160 from line heights and the render
+  /// test failed with "A RenderFlex overflowed by 14 pixels" at 360pt — the
+  /// narrow width the insight tests deliberately use, where a lead-in wraps a
+  /// word earlier than arithmetic on font sizes suggests.
+  ///
+  /// Third time this session that a height computed from type metrics was
+  /// wrong at phone width, and the same lesson each time: the render test is
+  /// the measurement, the arithmetic is the guess. The block got taller because
+  /// its contents did, which is the opposite of the earlier problem: the height
+  /// was reserving room that nothing filled. Now a lead at 23 and an answer at
+  /// 44 occupy most of it on every state.
+  ///
+  /// Worst case that actually occurs is a two-line lead with a one-line answer
+  /// ("Past your usual length by" / "3 days") or a one-line lead with a
+  /// two-line answer ("Your fertile days are" / "today and 2 more days") —
+  /// about 150 either way. The pairing that would overflow, a two-line lead AND
+  /// a two-line answer, cannot happen: the long leads all take short answers.
+  ///
+  /// The note below is the history, kept because the reasoning still applies.
+  ///
+  /// ⚠️ 136, AND CENTRED — THIRD ATTEMPT, 2026-09-05. The first was 146
+  /// top-aligned, which put the slack between the text and the buttons and was
+  /// reported as a hole. The second was 140 bottom-aligned, then 172 when the
+  /// type grew — which moved the same hole ABOVE the text, between the strip
+  /// and the headline, and was reported again.
+  ///
+  /// The mistake both times was reserving room for the worst case and then
+  /// arguing about which end the leftover sits at. 172 fitted a two-line big
+  /// line plus a lead plus two lines of sub — a combination that never occurs.
+  /// The real worst case is a two-line big line with a one-line sub and no
+  /// lead: 86 + 8 + 18 = 112, or a one-line big with a lead and a two-line sub:
+  /// 20 + 2 + 43 + 8 + 36 = 109. 136 covers both with a little air.
+  ///
+  /// Centred, so the ~25 of slack on a short day splits either side and is
+  /// invisible instead of pooling at one end. Measure the worst case that
+  /// HAPPENS, not the worst case the layout can express.
+  static const double blockHeight = 150;
+
   @override
   Widget build(BuildContext context) {
     final t = TtcS.current();
 
-    // ---- the refusals, in order of authority -------------------------------
-    if (today.noEstimate == TtcNoEstimate.noPeriodLogged) {
-      return _block(t.headerStartHere, t.headerStartHereBody);
-    }
-    if (today.clinicInvolved) {
-      return _block(t.headerClinicHolds, t.headerClinicHoldsBody);
-    }
+    // ⚠️ THE DECISION IS NOT MADE HERE ANY MORE. `ttcHomeHeroLine()` returns
+    // a state and a number; this only chooses words. The refusals, the truth
+    // hierarchy and the whole cycle loop live in `ttc_home_hero.dart`, where
+    // they can be walked day by day in a test without pumping a widget.
+    final line = ttcHomeHeroLine(on: selected);
 
-    final window = ttcFertileWindowNow();
-    if (window == null) {
-      return _block(t.headerNoEstimate, t.headerNoEstimateBody);
-    }
+    // ⚠️ THREE PARTS, NOT TWO — 2026-09-05. A small lead-in, ONE huge phrase,
+    // and a quiet explainer. See `ttc_strings.dart` for why the split is the
+    // whole difference between this hero and a bland one: the answer she opened
+    // the app for now arrives in type she can read across the room, instead of
+    // being set in the same size as the sentence explaining it.
+    //
+    // ⚠️ THE BIG SLOT TAKES THE ANSWER, NEVER THE SUBJECT. "end today", "in 3
+    // days", "today and 2 more days". If it ever reads as a topic, the split
+    // has been used backwards.
+    final (lead, big, sub) = switch (line.state) {
+      TtcHeroState.startHere =>
+        ('', t.headerStartHere, t.headerStartHereBody),
 
-    // ---- the estimate ------------------------------------------------------
-    final headline = window.openNow
-        ? t.headerWindowOpenNow
-        : t.headerWindowOpensIn(window.daysUntilOpen);
+      // ⚠️ THE SUB-LINE IS AN EXIT, NOT AN EXPLANATION. This state is a trap:
+      // one tap on a path label sets it, `setPath` clears her two answers so
+      // the pathway default applies, and the only way back is two questions on
+      // the treatment screen that nothing on this page points at. It was hit
+      // repeatedly during testing and read, correctly, as the app being stuck.
+      //
+      // The rule underneath is right and stays — we do not publish a window
+      // into a cycle a clinic may be running. What was wrong is that the
+      // sentence delivering that refusal was a dead end. It is now the door,
+      // and the whole block already opens the treatment screen.
+      TtcHeroState.clinicHolds => (
+          t.leadYouAreOn,
+          t.headerCycleDayBig(line.days),
+          t.headerNotOnTreatment,
+        ),
+      TtcHeroState.noEstimate => line.days > 0
+          ? (t.leadYouAreOn, t.headerCycleDayBig(line.days),
+              t.headerNoEstimateShort)
+          : ('', t.headerNoEstimate, t.headerNoEstimateBody),
 
-    // ⚠️ A PROJECTED WINDOW SAYS SO. `cyclesAhead > 0` means this cycle's
-    // window has already closed and we have rolled forward on an ASSUMED cycle
-    // length — a guess resting on a guess. Presenting that with the same
-    // confidence as the current cycle's window is the exact overreach
-    // `TtcNoEstimate` exists to stop.
-    final sub = window.cyclesAhead > 0
-        ? t.headerWindowProjected(
-            _fmt(window.opensOn), _fmt(window.closesOn))
-        : t.headerWindowDates(_fmt(window.opensOn), _fmt(window.closesOn));
+      // ---- the window ----------------------------------------------------
+      TtcHeroState.windowOpensIn => (
+          t.leadFertileDays + t.headerOpenVerb,
+          t.bigInDays(line.days),
+          _dates(),
+        ),
+      TtcHeroState.windowOpen => (
+          t.leadFertileDays + t.headerAreVerb,
+          t.bigTodayAndMore(line.days),
+          _dates(),
+        ),
+      TtcHeroState.windowLastDay => (
+          t.leadFertileDays,
+          t.bigEndToday,
+          t.headerWindowLastDayBody,
+        ),
 
-    return _block(headline, sub, cycleDay: today.cycleDay);
+      // ---- the wait ------------------------------------------------------
+      TtcHeroState.waiting => (
+          t.leadPeriodMayStart,
+          t.bigInDays(line.days),
+          t.headerWaitingBody,
+        ),
+      TtcHeroState.periodDue => (
+          t.leadPeriodMayStart,
+          t.bigToday,
+          t.headerPeriodDueBody,
+        ),
+      TtcHeroState.periodLate => (
+          t.leadPastUsual,
+          t.bigDays(line.days),
+          t.headerPeriodLateBody,
+        ),
+      TtcHeroState.periodExpectedBy => (
+          '',
+          t.headerPeriodExpectedBy,
+          t.headerPeriodExpectedByBody,
+        ),
+
+      // ---- her clinic's calendar -----------------------------------------
+      TtcHeroState.treatmentToday => (
+          line.step!.label(hinglish),
+          t.bigToday,
+          t.headerStepTodayBody,
+        ),
+      TtcHeroState.treatmentSoon => (
+          line.step!.label(hinglish),
+          t.bigInDays(line.days),
+          t.headerStepInBody,
+        ),
+      TtcHeroState.treatmentBeta => (
+          t.leadBetaOn,
+          _fmt(line.date!),
+          t.headerBetaOnBody,
+        ),
+
+      // ⚠️ `days == 0` MEANS EARLIER THAN ANYTHING SHE HAS LOGGED, which is
+      // the one case where there genuinely is no day to name.
+      TtcHeroState.pastCycle => line.days > 0
+          ? (
+              t.leadEarlierCycle,
+              t.headerPastCycleDay(line.days),
+              t.headerPastCycleBodyOn(_fmt(line.date!)),
+            )
+          : ('', t.headerPastCycle, t.headerPastCycleBody),
+    };
+
+    // ⚠️ THE TAP FOLLOWS THE SENTENCE. The hero has always opened the cycle
+    // companion, which is the right destination for a window and the wrong one
+    // for "Egg retrieval in 3 days" — that belongs to the treatment screen,
+    // which is where the dates live and where they are edited. A headline that
+    // opens somewhere unrelated to what it says is a door in the wrong wall.
+    const treatment = {
+      TtcHeroState.clinicHolds,
+      TtcHeroState.treatmentToday,
+      TtcHeroState.treatmentSoon,
+      TtcHeroState.treatmentBeta,
+    };
+
+    return _block(lead, big, sub,
+        openTreatment: treatment.contains(line.state));
   }
 
-  Widget _block(String headline, String body, {int? cycleDay}) {
+  // Kept for revert: `_openBody` joined the count and the dates into one
+  // sentence for the body slot. The three-part hero puts the count in the BIG
+  // slot and the dates in the sub-line, so the two no longer share a string.
+  //
+  // String _openBody(int days) { ... }
+
+  /// The window's own dates, and it still says "expected" when projected.
+  ///
+  /// ⚠️ `ignoreOwnership: true`, LIKE THE HERO ABOVE IT — AND FORGETTING IT
+  /// HERE PRODUCED A VISIBLE BUG ON THE DEVICE. The headline read "Your fertile
+  /// days open / in 8 days" while this returned '' — so the sub-line was blank
+  /// and the ⓘ sat alone at the right of an empty row.
+  ///
+  /// Two calls to the same function, one bypassing the gate and one not, is a
+  /// mismatch nothing catches: both are valid Dart, both compile, and the only
+  /// symptom is a missing line under a headline that renders perfectly.
+  String _dates() {
     final t = TtcS.current();
-    return GestureDetector(
-      onTap: onTap,
+    final w = ttcFertileWindowNow(ignoreOwnership: true);
+    if (w == null) return '';
+    return w.cyclesAhead > 0
+        ? t.headerWindowProjected(_fmt(w.opensOn), _fmt(w.closesOn))
+        : t.headerWindowDates(_fmt(w.opensOn), _fmt(w.closesOn));
+  }
+
+  Widget _block(String lead, String big, String sub,
+      {bool openTreatment = false}) {
+    return Builder(builder: (context) => GestureDetector(
+      onTap: openTreatment
+          ? () => openTtcSurface(context, 'ttc_treatment')
+          : onTap,
       behavior: HitTestBehavior.opaque,
-      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(headline,
-            style: pvFraunces(
-                fontSize: 30,
-                fontWeight: FontWeight.w600,
-                height: 1.12,
-                letterSpacing: -1,
-                color: p.ink1)),
-        const SizedBox(height: 6),
-        Text(body,
-            style: pvManrope(fontSize: 13.5, height: 1.45, color: p.ink2)),
-        if (cycleDay != null) ...[
-          const SizedBox(height: 8),
-          Row(children: [
-            Text(t.headerCycleDay(cycleDay),
-                style: pvManrope(
-                    fontSize: 12.5,
-                    fontWeight: FontWeight.w800,
-                    color: p.action)),
-            const SizedBox(width: 4),
-            Icon(Icons.arrow_forward_rounded, size: 14, color: p.action),
-          ]),
-        ],
-      ]),
-    );
+      child: SizedBox(
+        height: blockHeight,
+        child: FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.centerLeft,
+        child: SizedBox(
+        width: 330,
+        child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // ---- the lead-in ---------------------------------------
+              //
+              // ⚠️ IT CAN BE EMPTY, AND THEN IT TAKES NO ROOM. Four states —
+              // the invitation, the two refusals and a future day — are a
+              // complete sentence on their own, and a lead-in invented to fill
+              // the slot would be copy written to satisfy a layout.
+              if (lead.isNotEmpty) ...[
+                // ⚠️ AND THE WHOLE COLUMN SCALES DOWN RATHER THAN OVERFLOWING.
+              // Three separate heights this session were computed from font
+              // metrics and each was wrong at some width — the last one failed
+              // the 360pt render test by 14 pixels. `BoxFit.scaleDown` only
+              // acts when the content genuinely does not fit, so on a normal
+              // phone nothing is scaled at all and on a narrow one the hero
+              // shrinks a little instead of clipping. It ends a class of bug
+              // rather than another instance of it.
+              //
+              // ⚠️ BIG TOO, AND IN THE SAME FACE AS THE ANSWER — 2026-09-05.
+                // Asked for: *"can we have 'Your fertile days open' also
+                // written in big text so tht the hero section looks filling."*
+                //
+                // It was 14.5pt Manrope against a 40pt Fraunces answer — a
+                // caption above a headline, two different voices, and a hero
+                // that was mostly empty because only one of its three lines had
+                // any weight. At 23pt Fraunces the two halves read as ONE
+                // sentence that happens to grow at the important word, which is
+                // what the reference does and what makes its hero feel full
+                // without being taller.
+                //
+                // ⚠️ LIGHTER, NOT JUST SMALLER. w500 against the answer's w600,
+                // and `ink2` against `ink1`. If the lead-in matched the answer
+                // in weight as well as face, the size difference alone would
+                // not be enough to say which half is the answer.
+                Text(lead,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: pvFraunces(
+                        fontSize: 23,
+                        fontWeight: FontWeight.w500,
+                        height: 1.15,
+                        letterSpacing: -0.5,
+                        color: p.ink2)),
+                const SizedBox(height: 2),
+              ],
+
+              // ---- the answer ----------------------------------------
+              //
+              // ⚠️ 40pt AGAINST THE OLD 30. This is the change, and everything
+              // else here is arrangement around it. At 30 the answer was set in
+              // the same weight as the page it sat on and had to be READ; at 40
+              // it is seen before it is read, which is what a hero is for.
+              //
+              // Two lines, because "today and 2 more days" is the longest thing
+              // it ever has to say and it must not shrink to fit.
+              Text(big,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvFraunces(
+                      fontSize: 44,
+                      fontWeight: FontWeight.w600,
+                      height: 1.06,
+                      letterSpacing: -1.6,
+                      color: p.ink1)),
+              const SizedBox(height: 8),
+
+              // ---- the explainer, with the way in --------------------
+              //
+              // ⚠️ THE ⓘ REPLACED A SEPARATE "Cycle day 5" FOOTER ROW. That row
+              // was the visible door to the cycle companion, so removing it
+              // needed a replacement rather than a deletion — the wiring gate.
+              // The whole block has always been tappable; the mark is what says
+              // so. The cycle day itself did not go anywhere: it is the first
+              // insight card, six lines down this same screen.
+              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Expanded(
+                  child: Text(sub,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvManrope(
+                          fontSize: 13, height: 1.4, color: p.ink2)),
+                ),
+                const SizedBox(width: 8),
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Icon(Icons.info_outline_rounded,
+                      size: 15, color: p.ink3),
+                ),
+              ]),
+            ]),
+        ),
+        ),
+      ),
+    ));
   }
 }
 

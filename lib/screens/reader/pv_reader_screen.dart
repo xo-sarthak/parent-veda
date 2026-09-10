@@ -84,6 +84,7 @@ class PvReaderScreen extends StatefulWidget {
     this.openAction,
     this.readTitle,
     this.hero,
+    this.openAtHeading,
   });
 
   final PvRead read;
@@ -100,6 +101,25 @@ class PvReaderScreen extends StatefulWidget {
   /// ⚠️ NULL EVERYWHERE ELSE, so pregnancy and parenting render exactly the
   /// masthead they always have. Same data-not-flag move as the hub's film.
   final Widget? hero;
+
+  /// Open scrolled to the section whose heading matches this, exactly.
+  ///
+  /// ⚠️ THE MECHANISM BEHIND "PROMOTE", AND WITHOUT IT PROMOTION IS A LIE.
+  ///
+  /// The After-a-loss rebuild asks for six cards that "reference a section
+  /// inside one of the two existing articles — single source, shown twice,
+  /// never copied". Built with `readId` alone, all six open the same article at
+  /// the top, and a woman who tapped "Rh status and retained tissue" is left
+  /// scrolling a two-thousand-word piece looking for the paragraph she was
+  /// promised. That is worse than a copy, because it looks like it worked.
+  ///
+  /// Matching on the heading TEXT rather than an index is deliberate: an index
+  /// silently points at the wrong section the day somebody inserts a paragraph,
+  /// and a wrong section is unnoticeable in review. A heading that no longer
+  /// exists simply opens at the top, which is the safe failure — and
+  /// `ttc_after_loss_test.dart` asserts every anchor still resolves, so it does
+  /// not fail silently either.
+  final String? openAtHeading;
 
   /// ⚠️ PASSED IN, NEVER READ FROM A GLOBAL. TTC's language flag is `TtcLang`,
   /// pregnancy's is `AppLanguage` on the controller, and reading the wrong one
@@ -178,6 +198,19 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
     //     _sc.jumpTo(p * _sc.position.maxScrollExtent);
     //   }
     // });
+
+    // ⚠️ AND THIS IS NOT RESUME. The note above is about restoring a position
+    // she left — silent, invisible, and reported as a bug. This is the
+    // opposite: she tapped a card that named a section, and arriving at that
+    // section is the thing she asked for. It only ever fires when a caller
+    // passed a heading.
+    final heading = widget.openAtHeading;
+    if (heading == null) return;
+    final i = a.sections.indexWhere((s) => s.heading?.en == heading);
+    if (i < 0) return; // A heading that no longer exists opens at the top.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) _jumpTo(i);
+    });
   }
 
   @override

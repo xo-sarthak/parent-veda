@@ -360,8 +360,21 @@ void main() {
       // checkbox — a checkbox promises you may pick several and seven of these
       // eight questions were breaking that promise on the second tap. Weight is
       // what is left that changes with the answer rather than beside it.
-      FontWeight? weightOf(String label) =>
-          tester.widget<Text>(find.text(label)).style?.fontWeight;
+      //
+      // ⚠️ READ OFF THE `AnimatedDefaultTextStyle` AROUND THE TEXT — 2026-09-06.
+      // The option block now animates its label between ink and white, so the
+      // weight lives on the animated style wrapper and the `Text` itself has
+      // none. Same assertion, one widget up.
+      FontWeight? weightOf(String label) => tester
+          .widget<AnimatedDefaultTextStyle>(find
+              .ancestor(
+                  of: find.text(label),
+                  matching: find.byType(AnimatedDefaultTextStyle))
+              // The nearest one — the block's own. Further up the tree the
+              // scaffold has its own animated styles.
+              .first)
+          .style
+          .fontWeight;
 
       const option = 'Mostly 21 to 35 days';
       expect(find.text(option), findsOneWidget);

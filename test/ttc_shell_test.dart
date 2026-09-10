@@ -108,7 +108,12 @@ void main() {
       // Coverage of the master document's tools is asserted by NAME in
       // ttc_tools_test.dart, which is the promise that actually matters - this
       // number is only here so a tile cannot vanish unnoticed.
-      expect(TtcToolsScreen.toolCount, 26);
+      //
+      // ⚠️ 26 -> 23 ON 2026-09-04. Sleep, Stress, Lifestyle and Movement became
+      // one `habits` tracker, so four tiles became one. Four fewer tiles, one
+      // more, and not a single capability lost — all four are named on the new
+      // tile and the findability test above asserts it.
+      expect(TtcToolsScreen.toolCount, 23);
     });
 
     testWidgets('all nine Prepare categories render', (tester) async {

@@ -79,6 +79,10 @@ import 'package:flutter/material.dart' show IconData;
 
 import '../screens/ttc/ttc_illustrations.dart';
 import 'focus/ttc_focus_conceiving.dart';
+import 'focus/ttc_focus_after_loss.dart';
+import 'focus/ttc_focus_mind_body.dart';
+import 'focus/ttc_focus_getting_ready.dart';
+import 'focus/ttc_focus_his_side.dart';
 import 'focus/ttc_focus_ivf.dart';
 import 'focus/ttc_focus_pcos.dart';
 
@@ -99,6 +103,11 @@ enum TtcTileFormat {
   recipe,
   community,
   infographic,
+  practice,
+  checklist,
+  talk,
+  guide,
+  door,
 }
 
 extension TtcTileFormatCopy on TtcTileFormat {
@@ -107,6 +116,10 @@ extension TtcTileFormatCopy on TtcTileFormat {
   String get label => switch (this) {
         TtcTileFormat.masterclass => 'Masterclass',
         TtcTileFormat.tool => 'Tool',
+        TtcTileFormat.practice => 'Do',
+        TtcTileFormat.checklist => 'Checklist',
+        TtcTileFormat.guide => 'Guide',
+        TtcTileFormat.talk => 'Talk',
         TtcTileFormat.article => 'Article',
         TtcTileFormat.carousel => 'Carousel',
         TtcTileFormat.video => 'Video',
@@ -116,16 +129,45 @@ extension TtcTileFormatCopy on TtcTileFormat {
         TtcTileFormat.recipe => 'Recipe',
         TtcTileFormat.community => 'Community',
         TtcTileFormat.infographic => 'Infographic',
+        // ⚠️ "Elsewhere", NOT "Reference". The chip is a promise about what
+        // the tap does, and "reference" is a word from our content model that
+        // means nothing to a reader. "Elsewhere" says the one thing she needs
+        // to know before tapping: this leaves the door you are on.
+        TtcTileFormat.door => 'Elsewhere',
       };
 
-  /// ⚠️ THE TWO THAT COST MONEY SAY SO ON THE TILE, not at the checkout.
+  /// ⚠️ WHAT PARENTVEDA CHARGES FOR — and a product is not on that list.
   ///
-  /// A shop tile that looks like a free tile is the pattern this stage is most
-  /// exposed to: eight of the twenty-five tiles on the conceiving page are
-  /// content, and the two that are not must be legible as such before she taps,
-  /// not after. Read by the renderer to pick a different treatment entirely.
-  bool get isPaid =>
-      this == TtcTileFormat.masterclass || this == TtcTileFormat.product;
+  /// The rule it enforces is still right: a tile that costs money must be
+  /// legible as such BEFORE she taps, not at a checkout. Eight of the
+  /// twenty-five tiles on the conceiving page are content, and the ones that
+  /// are not have to declare themselves.
+  ///
+  /// ⚠️ `product` WAS IN THIS LIST AND WAS REMOVED — 2026-09-03.
+  ///
+  /// It made a product card render in the amber paid treatment with its chip
+  /// reading **"Paid"** instead of **"Product"** — the same treatment a
+  /// masterclass gets. Reported plainly: *"Cards out there like product instead
+  /// of paid, showing it differently as if it's a course or some specialty. It
+  /// is a product. That's it. We can have a product tag."*
+  ///
+  /// And it was wrong in substance, not only in style. **ParentVeda does not
+  /// sell these, does not earn from them and is not paid to list them** — there
+  /// is no cart, no retailer and no affiliate relationship in this stage. A
+  /// product tile opens a research page carrying an indicative price range and
+  /// an honest recommendation band, one of which reads "generally not needed".
+  /// Marking that "Paid" told the reader we were charging for it, which is the
+  /// opposite of what the page says.
+  ///
+  /// It also flattened the distinction the chip exists to draw: "Paid" over a
+  /// product and "Paid" over a masterclass are the same words for two entirely
+  /// different transactions — one is a course we sell, the other is a bottle
+  /// somebody else sells.
+  ///
+  /// If this stage ever gains affiliate links, that is a **disclosure on the
+  /// product page** — the interstitial the design specifies — and still not a
+  /// price tag on the card. See `docs/STILL-OPEN.md` §24.3.
+  bool get isPaid => this == TtcTileFormat.masterclass;
 }
 
 /// One card inside a carousel.
@@ -204,7 +246,11 @@ final class TtcArticleTile extends TtcTile {
     this.moreReadId,
     this.art,
     this.imageUrl,
+    this.atHeading,
   });
+
+  /// Open the read scrolled to this section. See `TtcGuideTile.atHeading`.
+  final String? atHeading;
 
   /// The hero picture, used BOTH as the card's thumbnail on the rail and as the
   /// header of the piece itself. One image in two places on purpose — watching
@@ -395,14 +441,125 @@ final class TtcMythTile extends TtcTile {
 }
 
 /// Something to buy.
+/// Something to buy — either one product, or a whole shelf of them.
+///
+/// ⚠️ THE SHELF FORM WAS MISSING AND IT COST A REBUILD. 2026-09-03.
+///
+/// This tile could only ever name ONE product. So a brief row reading
+/// *"Folic acid and preconception supplements — Product"* — which plainly means
+/// "open the supplements shelf" — had no form to be built in, and it went out
+/// as `TtcToolTile(surfaceId: 'ttc_supplements')` instead. That surface is the
+/// supplements TRACKER: a record of what she took today. Tapping a card about
+/// what to buy landed on a compliance grid.
+///
+/// Reported bluntly, and correctly: *"It was a product section to buy
+/// something. What you have wired in is 'what medication was taken'. How does
+/// that make any sense?"*
+///
+/// The lesson is not "read the brief harder". A model that cannot express what
+/// a brief asks for will get a near-miss substituted for it, every time,
+/// because the person building it reaches for the closest thing that compiles.
+/// The fix is the missing form.
 final class TtcProductTile extends TtcTile {
+  /// One product, straight to its page.
   const TtcProductTile(
-      {required super.title, required super.blurb, required this.productId});
+      {required super.title, required super.blurb, required this.productId})
+      : category = null;
 
-  final String productId;
+  /// A whole shelf — every product in one category, ranked, with the
+  /// recommendation band on each card.
+  const TtcProductTile.shelf(
+      {required super.title, required super.blurb, required this.category})
+      : productId = null;
+
+  /// Exactly one of these is set, and which one decides where it opens.
+  final String? productId;
+  final String? category;
 
   @override
   TtcTileFormat get format => TtcTileFormat.product;
+}
+
+/// A guide — a piece written to be USED rather than read through.
+///
+/// ⚠️ IT OPENS THE SAME READER AS AN ARTICLE, AND ONLY THE CHIP DIFFERS. That
+/// is deliberate and it is the whole justification: the format system's rule in
+/// this file is that a chip is the promise about what happens when she taps,
+/// and "Article" over "The carrier screening that matters in India" promises
+/// something to read on a train. It is not that — it is a thing you act on,
+/// take to a doctor, and ask for by name.
+///
+/// ⚠️ AND IT WAS BUILT AS AN ARTICLE FIRST, ON PURPOSE. The brief's format
+/// column said Guide; its Step 2 said "formats and badges as before, plus Do
+/// and Talk", and Guide was not among them. Rather than invent a chip nobody
+/// had asked for — the exact habit that put four wrong formats on this door —
+/// it shipped as an Article with the deviation written into the brief table,
+/// and the badge was added when it was asked for.
+///
+/// The content standard is identical to an article's: a `PvRead`, four
+/// sections, a contents, an FAQ, sourcing and a when-to-see-someone. A guide is
+/// not a lower bar wearing a different word.
+final class TtcGuideTile extends TtcTile {
+  const TtcGuideTile({
+    required super.title,
+    required super.blurb,
+    required this.readId,
+    this.atHeading,
+  });
+
+  /// Must exist in `kTtcReads`, exactly like an article's.
+  final String readId;
+
+  /// Open the read scrolled to this section, matched on the heading text.
+  ///
+  /// ⚠️ THIS IS WHAT MAKES "PROMOTE" REAL. The After-a-loss rebuild asks for
+  /// cards that reference a SECTION of an existing article — single source,
+  /// shown twice, never copied. Without an anchor, six such cards all open one
+  /// article at the top and the woman who tapped "Rh status and retained
+  /// tissue" is left hunting through two thousand words for the paragraph she
+  /// was promised.
+  ///
+  /// See `PvReaderScreen.openAtHeading` for why it matches on text rather than
+  /// on an index.
+  final String? atHeading;
+
+  @override
+  TtcTileFormat get format => TtcTileFormat.guide;
+}
+
+/// A checklist — a thing with items you tick, not a tool you operate.
+///
+/// ⚠️ THE BRIEF NAMES THIS FORMAT AND IT WAS BUILT AS `Tool`. The chip is the
+/// promise about what happens when she taps, and "Tool" over "Your
+/// pre-pregnancy checklist" describes the wrong kind of object — a checklist is
+/// something you come back to and add to, not something you use once.
+final class TtcChecklistTile extends TtcTile {
+  const TtcChecklistTile(
+      {required super.title, required super.blurb, required this.surfaceId});
+
+  final String surfaceId;
+
+  @override
+  TtcTileFormat get format => TtcTileFormat.checklist;
+}
+
+/// Time with a person, reached by asking rather than by booking a slot.
+///
+/// ⚠️ THE BRIEF ASKS FOR THIS FORMAT BY NAME — "plus Do : run and Talk :
+/// message" — and it was built as `TtcBookingTile`, whose chip reads "Booking".
+/// The two are not the same promise. "Booking" says a calendar and a slot;
+/// "Talk" says a person and a conversation, which is what "Talk to someone
+/// before you start" is offering somebody who has not started trying yet.
+final class TtcTalkTile extends TtcTile {
+  const TtcTalkTile(
+      {required super.title, required super.blurb, required this.action});
+
+  /// A hub action, resolved by the caller — the same booking engine underneath.
+  /// Only the promise on the card differs.
+  final String action;
+
+  @override
+  TtcTileFormat get format => TtcTileFormat.talk;
 }
 
 /// A dish, on the app's own recipe page.
@@ -453,6 +610,63 @@ final class TtcCommunityTile extends TtcTile {
 
   @override
   TtcTileFormat get format => TtcTileFormat.community;
+}
+
+/// Something to practise, rather than something to read or operate.
+///
+/// WARNING: A TWELFTH FORMAT, AND THE SAME ARGUMENT AS THE NINTH AND TENTH.
+/// The alternative was `TtcToolTile` pointing at the checklist's lifestyle
+/// section, which compiles and puts the chip "Tool" over "Habits worth building
+/// now". Sleep, movement and cutting down are not a tool — a tool is a thing
+/// you operate and put down, and these are things you do for weeks. The chip is
+/// the promise about what happens when she taps, and on a page of twenty tiles
+/// a chip that misdescribes its destination is precisely what the format system
+/// exists to prevent.
+///
+/// WARNING: AND IT NEVER SCORES OR GRADES. Habit content in a fertility app is
+/// one careless step from a streak, and a streak turns "I did not sleep well"
+/// into a failure at the exact moment somebody is already blaming her body. The
+/// tiles open the checklist and the trackers, which record without ranking.
+final class TtcDoTile extends TtcTile {
+  const TtcDoTile(
+      {required super.title, required super.blurb, required this.surfaceId});
+
+  /// Resolved by `ttcScreenForSurface`, exactly like a tool's — the difference
+  /// is what the chip promises, not how it opens.
+  final String surfaceId;
+
+  @override
+  TtcTileFormat get format => TtcTileFormat.practice;
+}
+
+/// A card that opens a DIFFERENT door.
+///
+/// ⚠️ A SIXTEENTH FORMAT, AND THE HEADER OF THIS FILE ARGUES FOR JUSTIFYING
+/// EACH ONE. This is the first tile whose destination is not a piece of content
+/// or a surface but another focus area, and nothing already here can express
+/// that: `TtcToolTile` would promise a tool, `TtcGuideTile` needs a `readId`.
+///
+/// ⚠️ AND MOST OF THE BRIEF'S "reference" CARDS ARE *NOT* THIS. Mind & body's
+/// brief marks nine cards `reference` — "opens an item owned by another focus
+/// area, do not re-teach it here". Eight of them name an ARTICLE that Getting
+/// ready owns, and the honest build for those is an ordinary `TtcArticleTile`
+/// carrying Getting ready's own `readId`: same article, one copy, and the chip
+/// says "Article", which is what actually happens when she taps.
+///
+/// Only "His part of this" genuinely points at an AREA rather than a piece, and
+/// that is the card this format exists for. Adding a "Reference" chip for the
+/// other eight would have been a chip that describes our content model instead
+/// of describing the tap — nobody outside this repo knows what a reference is.
+final class TtcDoorTile extends TtcTile {
+  const TtcDoorTile(
+      {required super.title, required super.blurb, required this.bracketId});
+
+  /// Must resolve through `ttcFocusPageFor`. An unknown id opens nothing, which
+  /// `ttc_mind_body_test.dart` checks for — the wiring gate, again.
+  final String bracketId;
+
+  @override
+  TtcTileFormat get format => TtcTileFormat.door;
 }
 
 /// A paid course.
@@ -510,7 +724,11 @@ class TtcFocusSection {
   /// there is one answer. `test/ttc_focus_groups_test.dart` then only has to
   /// check that the id exists, which is a question with a yes or a no.
   ///
-  /// Null on every page that is one long scroll, which is all of them but PCOS.
+  /// ⚠️ STALE ABOVE, CORRECTED 2026-09-04. This said "null on every page that
+  /// is one long scroll, which is all of them but PCOS", which was true for
+  /// about a day. All six doors carry a rail now, so a null here means a
+  /// section on a grouped page that renders in NO tab — the failure
+  /// `ttc_focus_groups_test.dart` checks for, and one that looks like nothing.
   final String? group;
 }
 
@@ -540,9 +758,60 @@ class TtcFocusGroup {
     required this.icon,
     required this.hue,
     this.toolSurfaceId,
+    this.pinnedRedFlagReadIds = const [],
+    this.note,
   });
 
+  /// One line above this group's rails.
+  ///
+  /// ⚠️ ADDED FOR A SAFETY LINE THAT MUST APPEAR EXACTLY ONCE. Mind & body's
+  /// practice brief puts it in a heading: *"Safety line shown once on the
+  /// practice tab, not on every card."* Twelve cards, one warning — and the
+  /// reflex build is to put it on all twelve, which is what the first version
+  /// did.
+  ///
+  /// ⚠️ IT IS NOT A `pinnedRedFlagReadId` AND THE DIFFERENCE MATTERS. A
+  /// pinned flag renders a doctor-written `whenToSeeSomeone` callout from a
+  /// real article — "go to a hospital today, not tomorrow". This is a
+  /// practical caution about stretching, it has no article behind it, and
+  /// dressing it as a clinical red flag would spend that alarm on the wrong
+  /// thing. Quieter type, quieter box, no urgency.
+  ///
+  /// ⚠️ AND IT IS NOT A SECTION. A section would need tiles; this is one
+  /// sentence that belongs to the tab rather than to anything in it.
+  final String? note;
+
   /// Matched against [TtcFocusSection.group].
+  /// A read whose `whenToSeeSomeone` is pinned above this group's rails.
+  ///
+  /// ⚠️ IT NAMES A READ, IT DOES NOT CARRY TEXT — and that is the whole design.
+  /// The After-a-loss rebuild asks for two red-flag cards "always visible,
+  /// never inside an accordion", and the obvious build is to type the words
+  /// onto the group. That would put a clinical warning in two places: the
+  /// article that a doctor wrote and reviewed, and a data file nobody reviews.
+  /// The day one is updated they disagree, and the one on the landing is the
+  /// one she reads first.
+  ///
+  /// So the group names the read, the screen renders that read's OWN callout,
+  /// and there is exactly one copy of the sentence "go to a hospital today, not
+  /// tomorrow".
+  ///
+  /// ⚠️ A LIST SINCE 2026-09-05, AND THE SINGULAR WAS A LUCKY FIT. After a
+  /// loss needed two pinned flags and happened to want them on two DIFFERENT
+  /// tabs, so one-per-group carried it. Mind & body's Talk tab wants both of
+  /// its flags — "when this is more than the strain of waiting" and "where a
+  /// practice is not the right answer" — on the same tab, from two different
+  /// articles, and the singular field could not say that.
+  ///
+  /// Worth noticing as a pattern: a field whose cardinality was inferred from
+  /// the first caller. The second caller is where you find out.
+  ///
+  /// ⚠️ AND THE SELF-HARM LINE TRAVELS WITH IT. The Support tab's flag carries
+  /// "if you have thoughts of harming yourself… tell someone today", which the
+  /// brief says explicitly must not be lost or buried. Rendering the callout
+  /// whole rather than an excerpt is what guarantees that.
+  final List<String> pinnedRedFlagReadIds;
+
   final String id;
 
   /// The words on the card. Short — it sits under an icon in a 150pt box.
@@ -611,7 +880,27 @@ class TtcFocusPage {
     this.groups,
     this.heroImageUrl,
     this.heroBlurb,
+    this.closingLine,
   });
+
+  /// One sentence at the foot of the door, under whichever tab is open.
+  ///
+  /// ⚠️ BUILT ON THE SECOND ASKING, AND THE FIRST REFUSAL WAS RIGHT. After a
+  /// loss asked for a closing line on 2026-09-04 and it was held — see
+  /// `docs/STILL-OPEN.md` §26.6 — because adding a field to a shared model for
+  /// exactly one caller is how a page model turns into a config object that can
+  /// express more states than the product has. One door wanting something is a
+  /// special case; two doors wanting it is a shape.
+  ///
+  /// Mind & body asked for one in the same words ("one gentle closing line for
+  /// the area, shown once"), so it is a field now, and After a loss can have
+  /// its line by filling it in.
+  ///
+  /// ⚠️ "SHOWN ONCE" MEANS ONCE PER PAGE, NOT ONCE PER TAB. It renders below
+  /// the sections of whatever group is open, so somebody who only ever opens
+  /// Today still reads it. A line that appears only under the last tab is a
+  /// line most people never see.
+  final String? closingLine;
 
   /// Which bracket tile opens this. Matches a `Bracket.id`.
   final String bracketId;
@@ -691,10 +980,22 @@ class TtcFocusPage {
 //  file; see the header of any file in `focus/`.
 // =============================================================================
 
-const List<TtcFocusPage> kTtcFocusPages = [
+// ⚠️ `final`, NOT `const`, SINCE MIND & BODY — 2026-09-05. That door builds
+// its twelve practice tiles from `ttc_practice_data.dart` with a function
+// rather than typing them out, and Dart will not call a function in a const
+// list. The alternative was a second copy of every practice title, which is the
+// duplication that door's brief forbids most loudly.
+//
+// Nothing outside reads this as a const, so the change is invisible. Worth
+// knowing only if you add a page and wonder why `const` no longer compiles.
+final List<TtcFocusPage> kTtcFocusPages = [
   kTtcConceivingFocus,
   kTtcPcosFocus,
   kTtcIvfFocus,
+  kTtcGettingReadyFocus,
+  kTtcHisSideFocus,
+  kTtcAfterLossFocus,
+  kTtcMindBodyFocus,
 ];
 
 /// The page for a bracket, or null when that bracket still uses a hub.

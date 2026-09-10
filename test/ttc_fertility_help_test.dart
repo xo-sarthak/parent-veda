@@ -70,28 +70,41 @@ void main() {
   group('the thresholds match the article', () {
     test('twelve months under 36 reaches "may see specialist"', () {
       final r = evaluateFertilityHelp(
-          _ctx(daysTrying: 380, ageBand: FertilityAgeBand.thirtyToThirtyFive));
+          _ctx(daysTrying: 380, ageBand: FertilityAgeBand.under35));
       expect(r.state, FertilityHelpState.maySeeSpecialist);
     });
 
     test('eleven months under 36 does not', () {
       final r = evaluateFertilityHelp(
-          _ctx(daysTrying: 330, ageBand: FertilityAgeBand.thirtyToThirtyFive));
+          _ctx(daysTrying: 330, ageBand: FertilityAgeBand.under35));
       expect(r.state, FertilityHelpState.keepTrying);
     });
 
     test('36 and over refers at presentation, with no waiting period', () {
-      // ⚠️ 36, NOT 35. The commonest error in fertility copy is to write 35,
-      // which sweeps a whole year-band into a category NICE does not put them
-      // in.
+      // ⚠️ THIS PAIR CHANGED ON 2026-09-03 AND THE CHANGE IS THE POINT.
+      //
+      // It used to assert "36, not 35" — NICE refers at presentation from 36,
+      // and writing 35 sweeps a whole year-band into a category the guidance
+      // does not put them in. That was right while the bands were under 30 /
+      // 30-35 / 36-39 / 40+, because 36 was a boundary.
+      //
+      // The bands are now under 35 / 35-37 / 38-40 / over 40, from the brief,
+      // and 36 sits INSIDE a band. So the rule cannot be exact any more, and
+      // the choice is which error to make: refer a 35-year-old the guidance
+      // would not have referred yet, or fail to refer a 36- and 37-year-old it
+      // says should be. The first costs an appointment. The second delays care
+      // for the people the rule exists to catch.
+      //
+      // It refers from 35. If that year ever needs to be exact the answer is a
+      // date of birth, not a fifth band — see the enum's own note.
       final r = evaluateFertilityHelp(
-          _ctx(daysTrying: 30, ageBand: FertilityAgeBand.thirtySixToThirtyNine));
+          _ctx(daysTrying: 30, ageBand: FertilityAgeBand.thirtyFiveTo37));
       expect(r.state, FertilityHelpState.maySeeSpecialist);
     });
 
-    test('35 is still inside the waiting period', () {
+    test('under 35 is still inside the waiting period', () {
       final r = evaluateFertilityHelp(
-          _ctx(daysTrying: 30, ageBand: FertilityAgeBand.thirtyToThirtyFive));
+          _ctx(daysTrying: 30, ageBand: FertilityAgeBand.under35));
       expect(r.state, FertilityHelpState.keepTrying);
     });
   });
@@ -124,7 +137,7 @@ void main() {
 
     test('one miscarriage alone is not a dont-wait', () {
       final r = evaluateFertilityHelp(
-          _ctx(miscarriages: 1, ageBand: FertilityAgeBand.under30));
+          _ctx(miscarriages: 1, ageBand: FertilityAgeBand.under35));
       expect(r.state, FertilityHelpState.keepTrying,
           reason: 'the threshold is two, and one loss is not a pattern');
     });
@@ -137,7 +150,7 @@ void main() {
       // twelve-month rule was never hers.
       final r = evaluateFertilityHelp(_ctx(
           daysTrying: 90,
-          ageBand: FertilityAgeBand.under30,
+          ageBand: FertilityAgeBand.under35,
           irregular: true,
           cyclesLogged: 4,
           shortest: 29,
@@ -148,7 +161,7 @@ void main() {
     test('a dont-wait situation beats a may-see one', () {
       final r = evaluateFertilityHelp(_ctx(
           daysTrying: 400,
-          ageBand: FertilityAgeBand.forty,
+          ageBand: FertilityAgeBand.over40,
           partner: true));
       expect(r.state, FertilityHelpState.dontWait);
     });
@@ -208,8 +221,8 @@ void main() {
       ];
       final contexts = [
         _ctx(),
-        _ctx(daysTrying: 400, ageBand: FertilityAgeBand.thirtyToThirtyFive),
-        _ctx(daysTrying: 30, ageBand: FertilityAgeBand.forty),
+        _ctx(daysTrying: 400, ageBand: FertilityAgeBand.under35),
+        _ctx(daysTrying: 30, ageBand: FertilityAgeBand.over40),
         _ctx(irregular: true, cyclesLogged: 4, shortest: 29, longest: 47),
         _ctx(cancer: true),
         _ctx(pathway: FertilityCarePathway.currentlyInCare),
@@ -264,7 +277,7 @@ void main() {
       // ⚠️ THE MOST IMPORTANT SENTENCE IN THE TOOL. Left unsaid, she supplies
       // it herself, and what she supplies is "I need IVF".
       final r = evaluateFertilityHelp(
-          _ctx(daysTrying: 400, ageBand: FertilityAgeBand.thirtyToThirtyFive));
+          _ctx(daysTrying: 400, ageBand: FertilityAgeBand.under35));
       expect(r.notMeaning.en.toLowerCase(), contains('does not mean you need ivf'));
     });
 

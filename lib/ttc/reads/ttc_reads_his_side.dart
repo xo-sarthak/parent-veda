@@ -25,6 +25,7 @@
 
 import '../../localization/app_language.dart';
 import '../../models/pv_read.dart';
+import '../ttc_semen_limits.dart';
 
 // ⚠️ PRIVATE AND DUPLICATED PER FILE, ON PURPOSE. Sharing one public helper
 // would mean renaming `_en` at well over a thousand call sites for no gain; one
@@ -175,10 +176,9 @@ final List<PvRead> kTtcReadsHisSide = [
       ),
 
       PvReadSection(
-        // ⚠️ FOLDS. Genuinely useful, and not the thing she opened this for.
-        collapsible: true,
-        summary: _en('Varicocele, infections, hormones and blockages — the '
-            'causes that are found, and which are fixable.'),
+        // ⚠️ UNFOLDED 2026-09-06 — Step 7 of the brief: "remove the
+        // accordions". Was collapsible with a summary line; the section is
+        // unchanged, it simply no longer starts shut.
         heading: _en('What actually causes a low result'),
         paragraphs: [
           _en('A varicocele is the commonest finding — enlarged veins in the '
@@ -344,14 +344,23 @@ final List<PvRead> kTtcReadsHisSide = [
               'are the ones most Indian labs now print. They are worth having '
               'in front of you, with the caveat above firmly attached.'),
         ],
+        // ⚠️ GENERATED FROM `kTtcSemenLimits`, NOT TYPED HERE — 2026-09-04.
+        //
+        // These four bullets WERE the app's only copy of the WHO 2021 limits,
+        // and they were hand-written prose. "Read your semen report" now
+        // computes against the same four numbers, and two copies of a clinical
+        // threshold in one app is how an article and a tool end up quietly
+        // disagreeing after a guideline update.
+        //
+        // The words are preserved: each limit carries its own `plain` and
+        // `note`, so the strict-morphology caveat and the
+        // progressive-motility remark are still here — they moved into the
+        // data rather than being dropped. `ttc_his_side_test.dart` asserts
+        // every figure still appears in this article's rendered text.
         bullets: [
-          _en('Concentration — 16 million per millilitre or above.'),
-          _en('Total motility — 42 per cent or above moving at all.'),
-          _en('Progressive motility — 30 per cent or above moving forwards. '
-              'This is usually the most informative single number.'),
-          _en('Normal forms (morphology) — 4 per cent or above. Yes, four. '
-              'The measurement is deliberately strict and a result of 5 per '
-              'cent is normal, not borderline.'),
+          for (final l in kTtcSemenLimits)
+            _en('${l.name} — ${l.limitText} or above.'
+                '${l.note == null ? '' : ' ${l.note}'}'),
           _en('Volume, pH and vitality are also reported; vitality is only '
               'assessed when motility is low.'),
         ],
@@ -414,11 +423,9 @@ final List<PvRead> kTtcReadsHisSide = [
       ),
 
       PvReadSection(
-        // ⚠️ FOLDS. Ordered tests he may be sent for next — useful when it
-        // happens, and premature worry when it has not.
-        collapsible: true,
-        summary: _en('DNA fragmentation, hormone panels and scans — what gets '
-            'ordered next, and which are worth paying for.'),
+        // ⚠️ UNFOLDED 2026-09-06 — Step 7 of the brief: "remove the
+        // accordions". Was collapsible with a summary line; the section is
+        // unchanged, it simply no longer starts shut.
         heading: _en('If the first test is abnormal'),
         paragraphs: [
           _en('A repeat, first, usually after about three months — which is '
@@ -659,11 +666,9 @@ final List<PvRead> kTtcReadsHisSide = [
       ),
 
       PvReadSection(
-        // ⚠️ FOLDS. Real, and reading it before there is a reason to is how a
-        // page like this creates worry rather than removing it.
-        collapsible: true,
-        summary: _en('Medicines and exposures that affect sperm, and are '
-            'almost never mentioned at an appointment.'),
+        // ⚠️ UNFOLDED 2026-09-06 — Step 7 of the brief: "remove the
+        // accordions". Was collapsible with a summary line; the section is
+        // unchanged, it simply no longer starts shut.
         heading: _en('Things worth mentioning to a doctor'),
         paragraphs: [
           _en('Several ordinary medicines affect sperm production and almost '
@@ -759,5 +764,1248 @@ final List<PvRead> kTtcReadsHisSide = [
     ],
 
     readNext: ['ttc_read_whose_side'],
+  ),
+  // ===========================================================================
+  //  ⚠️ WRITTEN 2026-09-04 FOR THE HIS-SIDE REBUILD
+  // ---------------------------------------------------------------------------
+  //  The brief splits one long article into rails and asks for four pieces the
+  //  door did not have. They are written rather than extracted, because the
+  //  originals were built as sections of an argument and a section lifted out
+  //  of one reads as a fragment.
+  //
+  //  What did NOT change: `ttc_read_semen_analysis`, `ttc_read_whose_side` and
+  //  `ttc_read_heat_habits` keep every doctor attribution, every WHO figure,
+  //  the India specifics and the callouts. Step 7 of the brief is explicit —
+  //  do not water it down — and the safest way to honour that was to leave
+  //  them alone.
+  //
+  //  ⚠️ AND NONE OF THESE FOUR STATES A THRESHOLD OF ITS OWN. Where a number
+  //  is needed it comes from `kTtcSemenLimits`, the same source the tool
+  //  computes against and the same one the original article now generates its
+  //  bullets from.
+  // ===========================================================================
+
+  // ⚠️ THE ONE THE BRIEF SAYS MUST NOT STAY BURIED, AND IT WAS BURIED.
+  //
+  // "No sperm found" currently exists as a paragraph inside a longer piece. It
+  // is the single result that needs a specialist rather than a repeat, it is
+  // the sentence a man is most likely to read alone at midnight, and it is the
+  // one where the true information is far more hopeful than the phrase sounds.
+  //
+  // So it gets its own card and leads with the hope, because withholding that
+  // until an appointment would be accurate and cruel.
+  PvRead(
+    id: 'ttc_read_azoospermia',
+    hue: 186,
+    kicker: _en('His side'),
+    title: _en('If no sperm is found'),
+    teaser: _en('It is not the end of the road, and it is the one result that '
+        'goes to a specialist rather than to a second sample.'),
+    scaleSetter: _en('Azoospermia means no sperm were seen in the sample. It '
+        'is uncommon, it is frightening to read, and it is very often not what '
+        'it sounds like: in many men sperm are being made and cannot get out, '
+        'and in many others they can be retrieved directly. This is the one '
+        'result where the next step is an andrologist rather than a repeat.'),
+    author: _en('Dr. Vikram Nair'),
+    authorRole: _en('Andrologist, 14 years, reviewed August 2026'),
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en('If that is what your report says, the first thing worth knowing '
+              'is that the word describes one sample on one day. The second is '
+              'that it is not one condition — it is two quite different '
+              'situations that happen to look the same on a slide, and telling '
+              'them apart is most of what the next appointment is for.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Made but blocked, or not being made'),
+        paragraphs: [
+          _en('Obstructive azoospermia means sperm are being produced normally '
+              'and cannot reach the sample — a blockage somewhere along the '
+              'way. Causes include an infection years ago, surgery in '
+              'childhood, an absent vas deferens present from birth, or a '
+              'vasectomy. In many of these, sperm can be retrieved, and some '
+              'blockages can be repaired surgically.'),
+          _en('Non-obstructive azoospermia means production itself is low or '
+              'absent. Even here, sperm are frequently found in the testis '
+              'when a surgeon looks for them, and used in IVF with ICSI.'),
+          _en('The distinction is not one you can make from the report. It '
+              'takes an examination, hormone bloods and sometimes a scan, and '
+              'that is exactly the appointment to ask for.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What the appointment usually involves'),
+        paragraphs: [
+          _en('A physical examination, which sounds trivial and is not — a '
+              'missing vas deferens or a varicocele is found by hand in a '
+              'minute.'),
+          _en('Blood tests, usually FSH and testosterone, which say a good deal '
+              'about whether production is happening.'),
+          _en('A repeat sample, done properly, because occasionally a small '
+              'number of sperm are found on a second look and that changes '
+              'everything about the plan.'),
+          _en('Genetic tests in some cases — karyotype and Y-chromosome '
+              'microdeletion — which matter for what is likely to be found and '
+              'for what it means for a child.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Two things worth not doing tonight'),
+        paragraphs: [
+          _en('Do not buy anything. There is a large market in supplements '
+              'sold to men with this result and nothing on it changes an '
+              'obstruction or restores absent production.'),
+          _en('Do not conclude anything about your marriage, your body or what '
+              'is possible from a word on a page. This is the point at which '
+              'men '
+              'most often stop talking, and it is the point at which talking '
+              'matters most — to her, and to somebody qualified.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Telling her, and telling nobody else'),
+        paragraphs: [
+          _en('This is the point at which men most reliably go silent, and the '
+              'silence does more damage than the result. She has almost '
+              'certainly been through a series of tests already, some of them '
+              'uncomfortable and most of them public in a way yours was not, '
+              'and she is not fragile about this in the way you are imagining.'),
+          _en('What she will notice, and quickly, is that something has '
+              'changed and you are not saying what. A couple can absorb a '
+              'difficult result together. What is much harder to absorb is one '
+              'person quietly carrying something and the other guessing at '
+              'it.'),
+          _en('Beyond her, tell nobody until you have seen a specialist. Not '
+              'because it is shameful — it is not — but because you do not yet '
+              'know what you are telling them. "No sperm were found in one '
+              'sample and we are seeing somebody" is a true sentence. Anything '
+              'more definite is one you would be inventing, and it will come '
+              'back to you from relatives for years.'),
+          _en('And if you find yourself unable to talk about it at all, or not '
+              'sleeping, or avoiding her, that is worth saying to a doctor in '
+              'its own right. Men are offered counselling in fertility care far '
+              'less often than women are, and they are not offered it because '
+              'nobody asks.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('And the honest limits'),
+        paragraphs: [
+          _en('Not every man with this result will have sperm retrieved. Some '
+              'will not, and that is a real outcome that deserves saying '
+              'rather than glossing over.'),
+          _en('What is also true is that a great many men who read this word '
+              'first assume it means nothing is possible, and for most of them '
+              'that is wrong. The distance between "no sperm in this sample" '
+              'and "no path from here" is very large, and only a specialist '
+              'can tell you where on it you are.'),
+        ],
+      ),
+    ],
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('This one goes to an andrologist, not to a repeat'),
+      body: _en('Ask your doctor to refer you to an andrologist or a urologist '
+          'with a fertility interest, and go sooner rather than later — some '
+          'causes are time-sensitive and all of them are easier to plan around '
+          'early. Go sooner still if you have pain, swelling or a lump in a '
+          'testis, or if you take testosterone or anabolic steroids: '
+          'testosterone suppresses sperm production, and that is one of the '
+          'few genuinely reversible causes on this list. Do not stop it '
+          'yourself — take it to whoever prescribed it.'),
+    ),
+    faqs: [
+      PvReadFaq(
+        question: _en('Does this mean we cannot have a child?'),
+        answer: _en('No. It means this sample had none, and the reason has to '
+            'be established before anybody can say anything about what is '
+            'possible. Retrieval works for many men, and some blockages are '
+            'repairable.'),
+      ),
+      PvReadFaq(
+        question: _en('Should I repeat the test first?'),
+        answer: _en('A repeat is usually done, but as part of the workup rather '
+            'than instead of it. Book the specialist; they will arrange the '
+            'repeat alongside the examination and the bloods.'),
+      ),
+      PvReadFaq(
+        question: _en('Is it something I did?'),
+        answer: _en('Almost never. The common causes are congenital, from an '
+            'old infection or surgery, or genetic. Heat and lifestyle affect '
+            'counts; they do not usually produce this result.'),
+      ),
+    ],
+    evidence: _en('WHO laboratory manual for the examination and processing of '
+        'human semen, sixth edition, 2021; EAU Guidelines on Sexual and '
+        'Reproductive Health (male infertility); AUA/ASRM guidance on the '
+        'evaluation of azoospermia; NICE CG156. Reviewed August 2026.'),
+    readNext: ['ttc_read_semen_analysis'],
+  ),
+
+  // ⚠️ A GLOSSARY, AND A GLOSSARY IS A REAL FORMAT RATHER THAN A LAZY ONE. A
+  // semen report is a page of Latin and abbreviations handed over with no
+  // explanation, and every one of those words has a plain meaning somebody
+  // could have said out loud. This is that list.
+  PvRead(
+    id: 'ttc_read_report_words',
+    hue: 186,
+    kicker: _en('His side'),
+    title: _en('The words on the report, in plain English'),
+    teaser: _en('Every term on the page, said the way somebody would say it. '
+        'No numbers to pass, no verdicts.'),
+    scaleSetter: _en('A semen report is written for a laboratory, not for the '
+        'person it is about. Most of what looks alarming on it is a naming '
+        'convention: a word ending in "-spermia" is simply a description of '
+        'one measurement being low, not a diagnosis of anything.'),
+    author: _en('Dr. Vikram Nair'),
+    authorRole: _en('Andrologist, 14 years, reviewed August 2026'),
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en('You will not need all of this. Read the two or three lines that '
+              'match what is printed on yours and ignore the rest.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('The four numbers with reference lines'),
+        paragraphs: [
+          _en('These are the four the reference limits apply to. The limits '
+              'themselves are the fifth percentile of men whose partners '
+              'conceived within a year — not a pass mark.'),
+        ],
+        bullets: [
+          for (final l in kTtcSemenLimits)
+            _en('${l.name} — ${l.plain} Reference line: ${l.limitText} or '
+                'above.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('The other things it measures'),
+        bullets: [
+          _en('Volume — how much semen there was, in millilitres. Reported, and '
+              'not one of the four. A very low volume with everything else '
+              'normal is worth mentioning to a doctor.'),
+          _en('pH — how acidic or alkaline. Almost always normal, and only of '
+              'interest alongside a low volume.'),
+          _en('Vitality — the share alive. Only measured when motility is low, '
+              'to tell "not moving" apart from "not alive".'),
+          _en('Liquefaction time — semen is thick when produced and thins '
+              'within about twenty minutes. A long liquefaction time is '
+              'occasionally relevant.'),
+          _en('Round cells or leucocytes — other cells present. A high count '
+              'sometimes suggests infection and is worth asking about.'),
+          _en('Agglutination — sperm sticking together. Occasionally points to '
+              'antibodies.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('The -spermia words, and what each one is describing'),
+        paragraphs: [
+          _en('These are the terms most likely to send somebody to a search '
+              'engine at midnight. Each one is a label for one measurement '
+              'being below a line, and none of them is a diagnosis on its own.'),
+        ],
+        bullets: [
+          _en('Oligozoospermia — concentration below the line. "Few sperm".'),
+          _en('Asthenozoospermia — motility below the line. "Slow sperm".'),
+          _en('Teratozoospermia — normal forms below the line. "Oddly shaped".'),
+          _en('Oligoasthenoteratozoospermia (OAT) — all three at once. It is a '
+              'long word for a common combination, not a rare disease.'),
+          _en('Azoospermia — no sperm seen in the sample. The one that goes to '
+              'a specialist rather than a repeat, and it has its own piece in '
+              'this section.'),
+          _en('Cryptozoospermia — none seen at first, a few found after the '
+              'sample is spun down. Better news than azoospermia.'),
+          _en('Normozoospermia — everything at or above the reference lines.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Why the labels sound worse than the findings'),
+        paragraphs: [
+          _en('The naming convention is the problem. Medicine builds these '
+              'words by stacking Greek roots onto "-zoospermia", so a modest '
+              'reduction in three measurements becomes '
+              '"oligoasthenoteratozoospermia" — twenty-eight letters '
+              'describing something extremely common. The word looks like a '
+              'rare disease and describes an ordinary finding.'),
+          _en('Nothing in that vocabulary is graded, either. There is no mild, '
+              'moderate or severe built into the term: a concentration a '
+              'fraction under the line and one far under it attract exactly '
+              'the same word. So the label tells you which measurement was '
+              'below a reference line, and nothing whatsoever about how far.'),
+          _en('That is worth holding on to before you search any of them. A '
+              'search engine will return the worst version of every one of '
+              'these words, because the worst version is what gets written '
+              'about.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Two things Indian reports do differently'),
+        paragraphs: [
+          _en('Many laboratories here still print reference columns from the '
+              'fifth WHO edition, or from their own internal ranges, alongside '
+              'the result. The older numbers are higher, so the same sample can '
+              'read as below the line on one report and within it on another. '
+              'Ask which edition the reference column is from; the numbers in '
+              'this section are the 2021 sixth edition.'),
+          _en('And a good many reports add a comment or an impression at the '
+              'foot — a sentence of interpretation written by whoever signed '
+              'it. That line is worth reading and worth taking to your '
+              'appointment, but it is one professional\'s reading of one '
+              'sample and not a diagnosis either.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What the report does not say'),
+        paragraphs: [
+          _en('It does not say whether you are fertile. There is no such test — '
+              'the only proof of fertility is a pregnancy, and plenty of men '
+              'with results below a line have fathered children.'),
+          _en('It does not say whose "fault" anything is. About half of couples '
+              'having difficulty have a male factor involved, very often '
+              'alongside a female one, and the word fault does not appear '
+              'anywhere useful in this subject.'),
+          _en('And it does not say what to do. That is a conversation with '
+              'somebody who can put these numbers next to an examination, your '
+              'history and her side of it.'),
+        ],
+      ),
+    ],
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('Take the sheet, not the summary'),
+      body: _en('When you see anybody about this, bring the printed report '
+          'rather than a number you remembered. If the report mentions no '
+          'sperm found, a very low volume, or a high white-cell count, say so '
+          'when you book — those change how soon you should be seen. And see '
+          'somebody promptly rather than repeating first if you have pain, '
+          'swelling or a lump in a testis, difficulty with erections or '
+          'ejaculation, or if you take testosterone or anabolic steroids.'),
+    ),
+    faqs: [
+      PvReadFaq(
+        question: _en('My morphology is 4 per cent. Is that terrible?'),
+        answer: _en('No — it is normal. The measurement is deliberately strict '
+            'and the reference line is 4 per cent, so 4 is at the line and 5 '
+            'is comfortably above it. This number alarms more men than any '
+            'other on the page and it should not.'),
+      ),
+      PvReadFaq(
+        question: _en('The report has a long Latin word on it. Is it serious?'),
+        answer: _en('Usually it is a label for one number being below a line, '
+            'described above. The length of the word says nothing about the '
+            'seriousness of the finding.'),
+      ),
+      PvReadFaq(
+        question: _en('Different labs, different reference values. Why?'),
+        answer: _en('Some labs still print older WHO editions, and a few print '
+            'their own. Ask which edition the reference column is from — the '
+            'numbers here are the 2021 sixth edition.'),
+      ),
+    ],
+    evidence: _en('WHO laboratory manual for the examination and processing of '
+        'human semen, sixth edition, 2021, including its nomenclature; EAU '
+        'Guidelines on Sexual and Reproductive Health; NICE CG156. Reference '
+        'limits on this page are generated from the same source the rest of '
+        'this section uses. Reviewed August 2026.'),
+    readNext: ['ttc_read_semen_analysis', 'ttc_read_azoospermia'],
+  ),
+
+  // ⚠️ TWO PIECES RATHER THAN ONE, BECAUSE THE TWO READERS ARE NOT THE SAME
+  // PERSON. A man with a normal result is looking for permission to stop
+  // worrying and needs to be told, gently, what it does not cover. A man with
+  // an abnormal one is frightened and needs the variability explained before
+  // anything else. One article addressed to both would fail both.
+  PvRead(
+    id: 'ttc_read_result_normal',
+    hue: 186,
+    kicker: _en('His side'),
+    title: _en('If the result is normal'),
+    teaser: _en('What a normal semen analysis actually rules out, and the two '
+        'things it does not.'),
+    scaleSetter: _en('A result with everything at or above the reference lines '
+        'is genuinely good news and it is worth having. It rules out the '
+        'commonest male causes. What it does not do is prove fertility, or '
+        'mean the question is closed if you have been trying for a while — and '
+        'the commonest mistake after a normal result is to stop looking.'),
+    author: _en('Dr. Vikram Nair'),
+    authorRole: _en('Andrologist, 14 years, reviewed August 2026'),
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en('Take the good news first, because men are oddly reluctant to. A '
+              'normal analysis means the numbers most likely to be the problem '
+              'are not the problem. That is a real answer and it took one '
+              'test to get.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What it rules out'),
+        paragraphs: [
+          _en('Low concentration, poor movement and abnormal shape are, '
+              'between them, most of what a semen analysis is looking for. All '
+              'three being in the usual range means the ordinary male-factor '
+              'explanations are unlikely.'),
+          _en('It also means a repeat is not the next step. Repeating a normal '
+              'test is a common way to spend money and months without '
+              'learning anything.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What "normal" is measured against'),
+        paragraphs: [
+          _en('It is worth knowing what the lines you cleared actually are. '
+              'They are the fifth percentile of men whose partners conceived '
+              'within a year — meaning one man in twenty who fathered a child '
+              'naturally would have scored below them.'),
+          _en('That cuts both ways, and the second way is the useful one. '
+              'Clearing them is not a distinction; a great many men do. And '
+              'being under one of them is not a disqualification, because one '
+              'in twenty fathers was.'),
+          _en('So "normal" here means "not in the group worth investigating '
+              'first". It is a screening line, not a grade, and it was never '
+              'designed to tell an individual man anything about himself.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('The two things it does not do'),
+        paragraphs: [
+          _en('It does not prove fertility. There is no test that does — the '
+              'only proof is a pregnancy. A semen analysis measures what can '
+              'be measured in a laboratory, and fertilisation involves rather '
+              'more than that.'),
+          _en('And it does not close the question if you have been trying a '
+              'while. Sperm DNA fragmentation, hormonal issues and structural '
+              'problems can sit behind a normal-looking count, and none of '
+              'them appear on a routine analysis. If a year has gone by, the '
+              'conversation moves to the couple rather than to either of you '
+              'alone.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What "a while" actually means'),
+        paragraphs: [
+          _en('The usual definition is a year of regular unprotected sex, or '
+              'six months if she is 35 or over. Those numbers are not '
+              'arbitrary: most couples who are going to conceive without help '
+              'do so within a year, so a year is the point at which looking '
+              'further stops being premature.'),
+          _en('If you are inside that window with a normal analysis, the '
+              'honest answer is that there is nothing more to do and waiting '
+              'is not passivity. If you are past it, a normal result does not '
+              'change the timeline — it changes who the next questions are '
+              'about.'),
+          _en('It is also worth knowing that a normal result on his side and a '
+              'normal set of results on hers is a common and frustrating '
+              'place to end up. Unexplained infertility is a real category, it '
+              'is not a euphemism for "we did not look properly", and there '
+              'are treatment paths for it.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('The conversation a normal result opens'),
+        paragraphs: [
+          _en('The useful question after a normal analysis is not "what else '
+              'can we test on him" — it is "what should we be looking at as a '
+              'couple". Timing across her fertile window, her cycles, whether '
+              'she is ovulating, whether her tubes are open: those are the '
+              'next things, and most of them are quick.'),
+          _en('This is also the moment to say out loud that the test happened '
+              'and what it showed. A surprising number of couples reach a '
+              'clinic where he has had an analysis, it was fine, and nobody '
+              'mentioned it — so it gets repeated.'),
+          _en('And keep the report. A clinic will want the actual sheet, with '
+              'the laboratory name and the date on it, not a number remembered '
+              'from a year ago.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What to do with a normal result'),
+        paragraphs: [
+          _en('File it. It is a piece of information a clinic will ask for, '
+              'and a report that was on a phone is worth more than one that '
+              'was in a drawer.'),
+          _en('Keep the habits that are worth keeping anyway — sleep, not '
+              'smoking, the heat business — because sperm are produced '
+              'continuously and today\'s result describes the last eleven '
+              'weeks rather than a permanent state.'),
+          _en('And take the pressure off her. A normal male result frequently '
+              'gets read, by everybody involved, as confirmation that the '
+              'problem must be hers. It is not: about half of couples having '
+              'difficulty have a male factor somewhere in the picture, and '
+              'plenty have no identified cause at all.'),
+        ],
+      ),
+    ],
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('A normal result is not a reason to wait indefinitely'),
+      body: _en('If you have been trying for a year — or six months if she is '
+          '35 or over — a normal semen analysis is a reason to move the '
+          'conversation to both of you, not a reason to keep waiting. And see '
+          'somebody regardless of this result if you have pain, swelling or a '
+          'lump in a testis, difficulty with erections or ejaculation, or if '
+          'you take testosterone or anabolic steroids.'),
+    ),
+    faqs: [
+      PvReadFaq(
+        question: _en('Should I repeat it to be sure?'),
+        answer: _en('Not usually. Repeating a normal result rarely changes '
+            'anything, and the time is better spent on the couple-level '
+            'questions.'),
+      ),
+      PvReadFaq(
+        question: _en('So the problem must be with her?'),
+        answer: _en('No, and this is the conclusion to be most careful about. '
+            'A normal analysis rules out the common male causes and not the '
+            'uncommon ones, and a great many couples have no identified cause '
+            'on either side.'),
+      ),
+      PvReadFaq(
+        question: _en('Is there a better test I should ask for?'),
+        answer: _en('Sperm DNA fragmentation testing exists and is sometimes '
+            'used after recurrent loss or failed IVF. It is not a routine '
+            'next step after a normal analysis, and it is a conversation with '
+            'a specialist rather than something to order online.'),
+      ),
+    ],
+    evidence: _en('WHO laboratory manual, sixth edition, 2021; NICE CG156 '
+        '(fertility problems); EAU Guidelines on Sexual and Reproductive '
+        'Health; ESHRE guidance on unexplained infertility. Reviewed August '
+        '2026.'),
+    readNext: ['ttc_read_semen_analysis'],
+  ),
+
+  PvRead(
+    id: 'ttc_read_result_abnormal',
+    hue: 186,
+    kicker: _en('His side'),
+    title: _en('If the first test is abnormal'),
+    teaser: _en('One low number is a reason to repeat, not a conclusion — and '
+        'the reason why is the most useful thing on this page.'),
+    scaleSetter: _en('Semen parameters vary enormously between samples from '
+        'the same man. The same person can land either side of a reference '
+        'line a fortnight apart, for reasons as ordinary as a fever six weeks '
+        'ago. That is why nothing is decided on one test, and why the next '
+        'step is almost always a second one done properly.'),
+    author: _en('Dr. Vikram Nair'),
+    authorRole: _en('Andrologist, 14 years, reviewed August 2026'),
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en('If a number came back below a line, the feeling is usually some '
+              'combination of shame and finality, and neither is warranted by '
+              'what you are holding. What you are holding is one measurement '
+              'of one sample on one day.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Why one test decides nothing'),
+        paragraphs: [
+          _en('Production takes about eleven weeks, so a sample reflects what '
+              'was happening two to three months ago. A fever, an illness, a '
+              'stretch of very poor sleep or a course of certain medicines in '
+              'that window shows up now and may be gone by the next one.'),
+          _en('Collection matters too. A sample produced after a very short or '
+              'very long gap, kept too cool or too warm, or with part of it '
+              'lost, will not represent you fairly. The standard gap is two to '
+              'seven days.'),
+          _en('And the variation is not small. Studies measuring the same men '
+              'repeatedly find swings large enough to cross reference lines in '
+              'both directions, which is precisely why guidance asks for two '
+              'samples before anything is concluded.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What to do next, in order'),
+        paragraphs: [
+          _en('Book the repeat. Most clinics suggest leaving a few weeks — '
+              'longer if you were ill around the first one — and doing it at '
+              'the same laboratory so the two are comparable.'),
+          _en('Do the collection to the instructions. Two to seven days since '
+              'the last ejaculation, the whole sample collected, kept close to '
+              'body temperature, and to the lab quickly. More results are '
+              'ruined by collection than by biology.'),
+          _en('Then have both read together by an andrologist. Two reports side '
+              'by side say considerably more than either alone, and that '
+              'reading is the appointment worth paying for.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What is worth changing meanwhile, and what is not'),
+        paragraphs: [
+          _en('Worth doing: stopping smoking and smokeless tobacco, cutting '
+              'heavy drinking, treating a fever properly, keeping laptops off '
+              'your lap and long hot baths shorter. These have evidence behind '
+              'them and the timescale is the same eleven weeks.'),
+          _en('Not worth doing: buying a fertility supplement stack on the '
+              'strength of one report. The evidence for antioxidant '
+              'supplements in male subfertility is weak, and this section says '
+              'so in its own piece rather than selling you something.'),
+          _en('And do not stop a prescribed medicine because you have read '
+              'that it might affect sperm. Some do; the answer is a '
+              'conversation with whoever prescribed it, never a unilateral '
+              'stop.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What a repeat is really for'),
+        paragraphs: [
+          _en('It is easy to read a repeat as the app or the doctor stalling. '
+              'It is the opposite. A single sample gives you a number with no '
+              'idea how much of it is you and how much is the fortnight you '
+              'happened to have. Two samples give you a range, and a range is '
+              'the thing an andrologist can actually reason about.'),
+          _en('That is why guidance in most countries asks for two before '
+              'anything is concluded, and why a clinic that changes a plan on '
+              'the strength of one report is moving faster than the evidence '
+              'allows.'),
+          _en('It is also why the second sample is worth doing properly rather '
+              'than quickly. Same laboratory, the standard two-to-seven-day '
+              'gap, the whole sample collected, kept near body temperature and '
+              'delivered promptly. A badly collected repeat has cost you the '
+              'comparison you were trying to make.'),
+          _en('And if you were unwell in the weeks before the first one — a '
+              'fever in particular — say so when you book. It may be worth '
+              'leaving longer than usual, because what you are trying to '
+              'measure is you rather than the flu you had in March.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('If the repeat is also low'),
+        paragraphs: [
+          _en('Then you have a pattern rather than a reading, and that is '
+              'genuinely useful. It moves the conversation to why — an '
+              'examination, hormone bloods, sometimes a scan — and to what the '
+              'options are, which for most men are considerably wider than '
+              'they expect.'),
+          _en('A low count is not a closed door. IUI, IVF and ICSI exist '
+              'precisely for this, and ICSI works with very small numbers of '
+              'sperm. That is a conversation to have when you get there, not '
+              'tonight.'),
+        ],
+      ),
+    ],
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('Some results skip the repeat'),
+      body: _en('See a doctor rather than arranging another sample if the '
+          'report found no sperm at all, or if you have pain, swelling or a '
+          'lump in a testis, very little or no semen when you ejaculate, '
+          'difficulty with erections or ejaculation, or if you take '
+          'testosterone or anabolic steroids. Testosterone suppresses sperm '
+          'production — do not stop it yourself, take it to whoever prescribed '
+          'it.'),
+    ),
+    faqs: [
+      PvReadFaq(
+        question: _en('How long should I wait before repeating?'),
+        answer: _en('Usually a few weeks, and longer if you were ill around '
+            'the first sample. Ask the clinic — and use the same laboratory so '
+            'the two are comparable.'),
+      ),
+      PvReadFaq(
+        question: _en('Does a low number mean we need IVF?'),
+        answer: _en('Not on its own, and not from one test. Plenty of couples '
+            'with a low first result conceive naturally, and where treatment '
+            'is needed it is not always the most involved kind.'),
+      ),
+      PvReadFaq(
+        question: _en('Should I tell her?'),
+        answer: _en('Yes. This is the point at which men most often go quiet, '
+            'and the silence is harder on a couple than the number is. She is '
+            'already having every test going; you are not protecting her by '
+            'carrying this alone.'),
+      ),
+    ],
+    evidence: _en('WHO laboratory manual, sixth edition, 2021, including its '
+        'guidance on repeat sampling and within-subject variability; NICE '
+        'CG156; EAU Guidelines on Sexual and Reproductive Health; Cochrane '
+        'review of antioxidants for male subfertility. Reviewed August 2026.'),
+    readNext: ['ttc_read_semen_analysis', 'ttc_read_heat_habits'],
+  ),
+
+  // ===========================================================================
+  //  ⚠️ WRITTEN 2026-09-06 — THE THREE PIECES THE FIRST REBUILD SUBSTITUTED
+  // ---------------------------------------------------------------------------
+  //  The first pass at this door (2026-09-04) pointed three tiles at the
+  //  nearest existing article rather than writing the piece the brief named:
+  //  "The case for testing early" opened the semen-analysis article, "What
+  //  three months looks like" opened the heat-and-habits article, and "Zinc
+  //  and CoQ10, honestly" was a product shelf with no article behind it.
+  //
+  //  The rule that replaced that, stated by the user and worth keeping: reuse
+  //  a piece only when it IS the piece. A card that promises a twelve-week
+  //  plan and opens an essay with a plan somewhere in section five has not
+  //  reused anything — it has substituted the closest thing and left the
+  //  reader to notice.
+  //
+  //  So these three are written. The original articles are still untouched
+  //  and still referenced where they are the piece.
+  //
+  //  ⚠️ NONE OF THE THREE STATES A REFERENCE LIMIT. Where a number is needed
+  //  it comes from `kTtcSemenLimits`, and the abstinence window from the
+  //  same file — one source, the same one the tool computes against.
+  //
+  //  ⚠️ CLINICAL READ OWED. All three carry Dr. Vikram Nair's byline because
+  //  the door does; none has been past him. The supplement piece in
+  //  particular quotes trial doses and Indian retail prices, and both are
+  //  the kind of number that goes stale.
+  // ===========================================================================
+
+  // ---------------------------------------------------------------------------
+  //  The short card that bridges into tab 2
+  // ---------------------------------------------------------------------------
+  //  Short by design — the brief calls it "a short card", and the argument is
+  //  one paragraph long: the test is cheap, fast and answers half the
+  //  question, so the reason to wait a year is habit rather than sense. It
+  //  ends where tab 2 begins, with what the test involves and the tool.
+  PvRead(
+    id: 'ttc_read_case_for_testing',
+    hue: 186,
+    kicker: _en('His side'),
+    title: _en('The case for testing early'),
+    teaser: _en('One test, widely available, inexpensive — and it answers a '
+        'question a year of waiting cannot.'),
+    scaleSetter: _en('A semen analysis is the cheapest, fastest and least '
+        'invasive test in the whole of fertility. It costs a few hundred '
+        'rupees, takes a morning, and rules in or out roughly half of the '
+        'reasons a couple might be taking longer. The case for doing it early '
+        'is not that something is likely to be wrong. It is that finding out '
+        'is so easy.'),
+    author: _en('Dr. Vikram Nair'),
+    authorRole: _en('Andrologist · reviewed September 2026'),
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en('The usual order is her first. Months of cycle tracking, then '
+              'blood tests, then a scan, then a tube test — each slower, '
+              'costlier and more uncomfortable than the last. His test, which '
+              'could have been done on day one, tends to come after all of '
+              'that. The order is a habit, not a reason.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What it costs, and what it saves'),
+        paragraphs: [
+          _en('In most Indian cities the test costs between three hundred and '
+              'a thousand rupees at a diagnostic lab, the sample is given in '
+              'a private room or at home and delivered within the hour, and '
+              'the result is back in a day or two.'),
+          _en('What it saves is time. If his side is fine, the couple knows '
+              'it and the search narrows to things that can actually be '
+              'looked at. If it is not, they have found out in a week what '
+              'waiting would have taken a year to hint at — and because '
+              'sperm take about three months to respond to any change, every '
+              'month before finding out is a month that clock is not '
+              'running.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('When it is worth doing now rather than at a year'),
+        bullets: [
+          _en('Any time he has a known reason — an undescended testis as a '
+              'child, surgery or injury there, mumps after puberty, '
+              'chemotherapy, a swelling in the scrotum, or testosterone or '
+              'steroid use, past or present.'),
+          _en('At six months if her cycles are irregular or she is over '
+              'thirty-five, because the year rule assumes nothing else is '
+              'going on.'),
+          _en('Whenever the two of you would rather know than wait. There is '
+              'no minimum.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('How to raise it without it landing as blame'),
+        paragraphs: [
+          _en('The reason this test comes last is rarely medical. It is that '
+              'suggesting it sounds like an accusation, and most couples '
+              'would rather wait another six months than have that '
+              'conversation. It helps to say the true thing plainly: half of '
+              'these cases involve him, his test is the easy one, and doing '
+              'it first is the considerate order rather than the suspicious '
+              'one.'),
+          _en('If he is the one reading this: the sample is not a verdict on '
+              'anything, the result comes back to the two of you and nobody '
+              'else, and nobody at the lab is judging. If she is: the ask is '
+              '"let us do the easy test first", not "I think it is you". '
+              'Said that way, most men agree in a sentence.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What a year of waiting actually costs'),
+        paragraphs: [
+          _en('The standard advice is to try for a year before investigating, '
+              'and it is sensible advice for a couple with no reason to think '
+              'anything is wrong. It is less sensible once you notice what '
+              'the year contains: twelve cycles of hope and disappointment, '
+              'an age clock that runs regardless, and — if his side is part '
+              'of the answer — twelve months in which the one lever that '
+              'takes three months to move was never pulled.'),
+          _en('Doing his test early does not shorten the year for anyone '
+              'whose result is normal. It only means the year is spent '
+              'knowing rather than wondering, and that is worth a few hundred '
+              'rupees.'),
+        ],
+        bullets: [
+          _en('Have ready: the lab\'s name, how many days since he last '
+              'ejaculated, and any medicine or supplement he takes.'),
+          _en('If the sample is produced at home, it goes to the lab within '
+              'the hour, kept at body temperature — an inside pocket, not a '
+              'car seat.'),
+          _en('Ask for the printed report, not a phone summary. The tool in '
+              'the next tab reads the printed numbers.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What it does not do'),
+        paragraphs: [
+          _en('It does not say whether you will conceive. A normal result '
+              'rules out the commonest male causes and nothing more, and a '
+              'low result on one sample is a reason to repeat, not a '
+              'diagnosis. What the test involves, and how to read the report '
+              'when it comes back, is the whole of the next tab.'),
+        ],
+      ),
+    ],
+    faqs: [
+      PvReadFaq(
+        question: _en('Does he need a doctor to order it?'),
+        answer: _en('In most Indian cities, no — diagnostic labs run it on a '
+            'walk-in basis. A referral helps if insurance is involved, and '
+            'it is worth having somebody lined up to read the result '
+            'properly afterwards either way.'),
+      ),
+      PvReadFaq(
+        question: _en('Is it embarrassing?'),
+        answer: _en('Most men expect it to be worse than it is. A private '
+            'room at the lab, or a home sample in the lab\'s own container '
+            'delivered within the hour. The staff have seen a thousand of '
+            'these and will not remember his.'),
+      ),
+      PvReadFaq(
+        question: _en('Should he change anything before the test?'),
+        answer: _en('Two to seven days without ejaculation, no fever in the '
+            'previous few weeks if it can be helped, and tell the lab about '
+            'any medicine he takes. Do not stop anything to get a "better" '
+            'result — the point is a true one.'),
+      ),
+    ],
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('Do not wait for a test if'),
+      body: _en('A new lump, or pain and swelling in one testis, needs a '
+          'doctor this week, and it has nothing to do with fertility. So '
+          'does very little or no semen, or difficulty with erections or '
+          'ejaculation — those change what the test can even tell you, and '
+          'they are looked at first.'),
+    ),
+    evidence: _en('Male factor involvement in roughly half of couples with '
+        'difficulty conceiving, and semen analysis as the recommended '
+        'first-line male investigation, per NICE CG156 and ASRM and EAU '
+        'guidance. Indian lab pricing from the test library. Reviewed '
+        'September 2026.'),
+    nextSteps: [
+      PvReadNextStep(
+        kind: PvNextKind.tool,
+        title: _en('Read your semen report'),
+        value: _en('When the result is back — every number explained, no '
+            'verdict, and somebody to take it to.'),
+        surfaceId: 'ttc_semen_report',
+      ),
+    ],
+    readNext: ['ttc_read_semen_analysis', 'ttc_read_whose_side'],
+  ),
+
+  // ---------------------------------------------------------------------------
+  //  The twelve-week plan — a GUIDE, written to be used
+  // ---------------------------------------------------------------------------
+  //  The heat-and-habits article explains the three levers and has a
+  //  paragraph on why three months is the unit. This is the plan itself:
+  //  which week, which change, and why the repeat is booked on day one.
+  //  The article stays the explanation; this is the thing he does.
+  PvRead(
+    id: 'ttc_read_three_months',
+    hue: 186,
+    kicker: _en('His side'),
+    title: _en('What three months looks like'),
+    teaser: _en('The twelve-week plan: what to change in which week, and why '
+        'the repeat test is booked on day one.'),
+    scaleSetter: _en('Sperm are made continuously and take about eleven weeks '
+        'from start to finish, so the sample in any test reflects what his '
+        'body was doing three months ago. That is the deal this plan is '
+        'built on: anything changed today shows up around week twelve, and '
+        'nothing shows up before it. The plan is short because the list of '
+        'things with real evidence is short.'),
+    author: _en('Dr. Vikram Nair'),
+    authorRole: _en('Andrologist · reviewed September 2026'),
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en('This is not a programme with a product at the end of it. It '
+              'is three levers — tobacco in every form, heat, and the rest '
+              'of ordinary health — spread across twelve weeks in the order '
+              'that tends to survive contact with real life. Pick the two '
+              'that apply most to him rather than all of them; two kept is '
+              'worth more than five abandoned in week three.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Day one — book the repeat test'),
+        paragraphs: [
+          _en('Before changing anything, book the semen analysis for twelve '
+              'weeks from today. Booked at the start, it happens. Left until '
+              '"when things have settled", it does not — and a test done at '
+              'week six measures the old batch, which is the commonest '
+              'reason couples conclude that none of this works.'),
+        ],
+        bullets: [
+          _en('Same lab as the first test, so the two are comparable.'),
+          _en('Today\'s date noted in the reports folder, next to the first '
+              'result.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Week one — the structural changes'),
+        paragraphs: [
+          _en('The changes that are made once and then need no willpower.'),
+        ],
+        bullets: [
+          _en('Tobacco out of the house. Cigarettes, bidi, gutka, khaini and '
+              'paan masala all count, and the smokeless kinds are the ones '
+              'nobody asks about.'),
+          _en('The laptop onto a table. Hours on the lap is sustained heat '
+              'exactly where it matters.'),
+          _en('Hot baths shortened; saunas and steam rooms paused for the '
+              'twelve weeks.'),
+          _en('Looser underwear. A small effect, and it costs nothing.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Weeks two to six — the ones that need support'),
+        paragraphs: [
+          _en('These are habits rather than settings, so they need somebody '
+              'alongside — which is the point of doing this as a couple '
+              'rather than as his private project.'),
+        ],
+        bullets: [
+          _en('Alcohol down. Heavy and regular is the clear problem; the '
+              'occasional drink is not, and pretending otherwise makes the '
+              'plan fail sooner.'),
+          _en('Movement up. A walk most days is enough. Extreme endurance '
+              'training is not the aim and can work against it.'),
+          _en('Anything at work — heat, solvents, pesticides, long hours in '
+              'a hot cab — raised with somebody, or reduced where it can be.'),
+          _en('Every medicine, supplement or "gym" product he takes written '
+              'down for the appointment. Nothing stopped on his own.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Weeks seven to eleven — hold, and do not test'),
+        paragraphs: [
+          _en('The quiet stretch, and the one where most plans end. There is '
+              'no feedback yet, because the sperm being made now will not be '
+              'in a sample until week twelve. Two things help: the test is '
+              'already booked, and the two changes were chosen because they '
+              'could be kept.'),
+          _en('If something slips, it slips. Restarting a week later costs a '
+              'week. Deciding the plan has failed costs the whole three '
+              'months.'),
+        ],
+        mythFact: PvMythFact(
+          myth: _en('Six weeks is long enough to see a difference.'),
+          fact: _en('A sample at six weeks is measuring sperm that started '
+              'forming before anything changed. Nothing reliable shows until '
+              'about week twelve.'),
+        ),
+      ),
+      PvReadSection(
+        heading: _en('What to keep during the twelve weeks'),
+        paragraphs: [
+          _en('Two things, and both are for the appointment rather than for '
+              'the app. A short log — sleep, alcohol, tobacco, anything hot, '
+              'movement — so that "I cut down" has numbers behind it when the '
+              'second report is read; the partner-health tracker keeps it on '
+              'his own account, privately. And the first report, in the '
+              'reports folder beside the date the plan started, so the '
+              'andrologist at week twelve sees the before and the after on '
+              'one page.'),
+        ],
+        bullets: [
+          _en('A fever or a bad illness during the twelve weeks, with the '
+              'date. It can lower a sample for a whole cycle and is worth '
+              'mentioning before the second result is read.'),
+          _en('Any new medicine or supplement started, with the date, for '
+              'the same reason.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Week twelve — the repeat, read together'),
+        paragraphs: [
+          _en('Same lab, the standard two-to-seven-day window before the '
+              'sample, and then both reports taken to an andrologist '
+              'together. Two samples read side by side say far more than '
+              'either alone — and if the first was low and the second is '
+              'not, that is the pattern that tells you the changes were '
+              'real.'),
+          _en('If the second is also below a line, it is still not a '
+              'verdict. It is the point where a specialist looks for a '
+              'cause, which is a different and more useful question than a '
+              'third repeat.'),
+        ],
+      ),
+    ],
+    faqs: [
+      PvReadFaq(
+        question: _en('What if he cannot give up tobacco completely?'),
+        answer: _en('Less is genuinely better than the same, and the '
+            'smokeless kinds count as much as smoking. But this is the lever '
+            'with the most evidence behind it, so it is worth real effort '
+            'and real help — a doctor can prescribe support for stopping.'),
+      ),
+      PvReadFaq(
+        question: _en('Should he take a supplement during the twelve weeks?'),
+        answer: _en('Read the piece on zinc and CoQ10 first. The evidence is '
+            'weak, neither replaces anything above, and nothing here should '
+            'be bought instead of stopping tobacco.'),
+      ),
+      PvReadFaq(
+        question: _en('His first result was normal. Is this still worth '
+            'doing?'),
+        answer: _en('Yes, more gently. A normal result rules out the '
+            'commonest causes and says nothing about DNA damage, which '
+            'tobacco and heavy drinking raise and which matters for '
+            'miscarriage. Week one is worth doing regardless.'),
+      ),
+    ],
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('Some of this is not a lifestyle question'),
+      body: _en('If he has a lump, pain or swelling in a testis, very little '
+          'or no semen, difficulty with erections or ejaculation, or takes '
+          'testosterone or anabolic steroids in any form, see a doctor now '
+          'rather than starting a twelve-week plan. And never stop a '
+          'prescribed medicine on the strength of a plan — take the list to '
+          'the person who prescribed it.'),
+    ),
+    evidence: _en('Spermatogenesis of approximately 74 days plus epididymal '
+        'transit; measurable improvement in volume, concentration and total '
+        'count within about three months of stopping smoking; scrotal heat '
+        'and DNA fragmentation effects, from peer-reviewed reviews of '
+        'lifestyle factors in male fertility and EAU guidance. Reviewed '
+        'September 2026.'),
+    nextSteps: [
+      PvReadNextStep(
+        kind: PvNextKind.tool,
+        title: _en('What he can track'),
+        value: _en('Sleep, alcohol, tobacco, heat and movement — his own '
+            'log, on his own account.'),
+        surfaceId: 'ttc_partner_health',
+      ),
+      PvReadNextStep(
+        kind: PvNextKind.tool,
+        title: _en('Keep his reports with yours'),
+        value: _en('Both results in one folder, in date order, for the '
+            'appointment at week twelve.'),
+        surfaceId: 'ttc_records',
+      ),
+    ],
+    readNext: ['ttc_read_heat_habits', 'ttc_read_zinc_coq10'],
+  ),
+
+  // ---------------------------------------------------------------------------
+  //  Zinc and CoQ10, honestly
+  // ---------------------------------------------------------------------------
+  //  The one piece in this door that names a negative trial by name. The
+  //  brief asks for "weak-evidence" and the honest version of that is not
+  //  "some studies suggest" — it is the Cochrane summary and the one large
+  //  trial that found nothing, side by side, and then the doses and the
+  //  rupees so the reader can decide with the facts rather than the
+  //  packaging.
+  PvRead(
+    id: 'ttc_read_zinc_coq10',
+    hue: 186,
+    kicker: _en('His side'),
+    title: _en('Zinc and CoQ10, honestly'),
+    teaser: _en('The two supplements with any evidence at all — what the '
+        'evidence actually shows, what they cost, and what they cannot '
+        'replace.'),
+    scaleSetter: _en('There is a large industry selling men things for this '
+        'and a very short list with any evidence behind it. Zinc and '
+        'coenzyme Q10 are the two on that list. Neither is a treatment, '
+        'both are worth far less than stopping tobacco, and the honest '
+        'summary of the research is "possibly a little, on some numbers, in '
+        'some men". That is not nothing. It is also not what the packaging '
+        'says.'),
+    author: _en('Dr. Vikram Nair'),
+    authorRole: _en('Andrologist · reviewed September 2026'),
+    sections: [
+      PvReadSection(
+        paragraphs: [
+          _en('The theory is reasonable. Sperm are unusually exposed to '
+              'oxidative damage, both of these are antioxidants, and zinc in '
+              'particular is concentrated in semen and involved in making '
+              'sperm. The problem is not the theory but the trials, which '
+              'are small, short, mixed in what they measure, and mostly not '
+              'measuring the thing that matters — whether a baby is born.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What the research actually shows'),
+        paragraphs: [
+          _en('The largest independent review, by Cochrane, has looked at '
+              'antioxidant supplements for male subfertility several times. '
+              'Its conclusion is that they may increase the chance of a live '
+              'birth, but that the evidence is low-certainty — small trials, '
+              'at risk of bias, with wide margins. On semen numbers, some '
+              'trials show modest improvements in motility or concentration '
+              'and others show none.'),
+          _en('The one large, well-run trial — the MOXI trial in the United '
+              'States, published in 2020 — gave men a combined antioxidant '
+              'formula for three to six months against a placebo, and found '
+              'no difference in sperm numbers, DNA fragmentation or live '
+              'births. It is the single best piece of evidence there is, and '
+              'it is negative.'),
+          _en('Put together: possibly a small benefit on some parameters, no '
+              'reliable benefit on live birth, and nothing that comes close '
+              'to the effect of stopping tobacco or having a varicocele '
+              'looked at.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Zinc'),
+        bullets: [
+          _en('What it is: a mineral, concentrated in the prostate and '
+              'semen, needed to make sperm.'),
+          _en('When it plausibly helps: in men who are actually short of it '
+              '— a poor diet, heavy drinking, some gut conditions. In men '
+              'with normal levels the evidence is thin.'),
+          _en('The dose in trials: usually around 25 to 66 mg a day of '
+              'elemental zinc, for three months. More is not better — high '
+              'doses over time interfere with copper and cause nausea.'),
+          _en('Cost in India: roughly ₹100 to ₹300 a month for a plain zinc '
+              'tablet. The "male fertility" branded versions cost several '
+              'times that for the same mineral.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Coenzyme Q10'),
+        bullets: [
+          _en('What it is: a compound the body makes for producing energy in '
+              'cells, including the sperm tail.'),
+          _en('When it plausibly helps: on motility, in men whose motility '
+              'is the low number. Several small trials show a modest '
+              'improvement; none shows a difference in pregnancy.'),
+          _en('The dose in trials: 200 to 300 mg a day, for at least three '
+              'months, because that is one production cycle.'),
+          _en('Cost in India: roughly ₹400 to ₹1,200 a month depending on '
+              'brand. It is the more expensive of the two and the one with '
+              'the weaker case for taking it without a reason.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('The Indian shelf, specifically'),
+        paragraphs: [
+          _en('Most pharmacies here stock zinc as zinc sulphate or zinc '
+              'gluconate tablets, and the elemental zinc is printed in small '
+              'type — a 220 mg zinc sulphate tablet is about 50 mg of '
+              'elemental zinc, which is already at the top of the trial '
+              'range, so one a day is plenty. CoQ10 is sold as 100 mg or '
+              '300 mg capsules, mostly imported and priced accordingly. The '
+              'combined "male fertility" sachets and capsules are the same '
+              'two ingredients plus vitamins, sold at three to five times the '
+              'price, and their labels often do not state the elemental zinc '
+              'at all — which is the one number that matters for safety.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('What neither of them does'),
+        paragraphs: [
+          _en('Neither fixes a varicocele, an obstruction, a hormone problem '
+              'or the effect of testosterone. Neither reverses the DNA '
+              'damage from tobacco while the tobacco continues. And neither '
+              'is a reason to skip the repeat test or the specialist: a man '
+              'taking a supplement instead of finding out why a number was '
+              'low has bought three months of not knowing.'),
+        ],
+        mythFact: PvMythFact(
+          myth: _en('A "male fertility" supplement is a treatment for a low '
+              'count.'),
+          fact: _en('Zinc and CoQ10 are the two ingredients with any '
+              'evidence, the evidence is weak, and the branded '
+              'multi-ingredient stacks add nothing proven at several times '
+              'the price.'),
+        ),
+      ),
+      PvReadSection(
+        heading: _en('If you decide to take one'),
+        bullets: [
+          _en('Plain zinc or plain CoQ10, from a pharmacy, at the trial '
+              'doses above.'),
+          _en('For three months — one production cycle — and then the '
+              'repeat test, rather than indefinitely.'),
+          _en('Tell the doctor at the appointment. It matters for reading '
+              'the second result.'),
+          _en('Alongside the levers with real evidence, never instead of '
+              'them.'),
+        ],
+      ),
+    ],
+    faqs: [
+      PvReadFaq(
+        question: _en('Should he take both?'),
+        answer: _en('There is no good evidence that two is better than one, '
+            'and the MOXI trial, which combined several, found no benefit. '
+            'If motility is his low number, CoQ10 has the more specific '
+            'case; if his diet is poor or he drinks heavily, zinc.'),
+      ),
+      PvReadFaq(
+        question: _en('What about the branded fertility stacks?'),
+        answer: _en('Mostly the same two ingredients plus vitamins C and E, '
+            'selenium, L-carnitine and folate, at a much higher price. None '
+            'of the extras has better evidence than the two named here, and '
+            'some stacks exceed a safe zinc dose.'),
+      ),
+      PvReadFaq(
+        question: _en('Are there side effects?'),
+        answer: _en('Zinc at high doses causes nausea and, over months, '
+            'copper deficiency. CoQ10 is generally well tolerated; it can '
+            'interact with blood thinners, so anyone on warfarin should ask '
+            'first.'),
+      ),
+      PvReadFaq(
+        question: _en('Do they help if his result was normal?'),
+        answer: _en('No trial has shown that. A normal result is not '
+            'improved by a supplement, and the money is better spent on a '
+            'repeat test if there is any doubt.'),
+      ),
+    ],
+    whenToSeeSomeone: PvCallout(
+      tone: PvCalloutTone.urgent,
+      title: _en('A supplement is not the next step if'),
+      body: _en('If the report found no sperm, if any number was low on two '
+          'samples, or if he has a lump, pain or swelling in a testis, the '
+          'next step is an andrologist, not a pharmacy. And never stop a '
+          'prescribed medicine to make room for a supplement — ask the '
+          'person who prescribed it.'),
+    ),
+    evidence: _en('Cochrane review of antioxidants for male subfertility (de '
+        'Ligny and colleagues, 2022 update): low-certainty evidence of a '
+        'possible increase in live birth. Steiner and colleagues, Fertility '
+        'and Sterility 2020 (the MOXI trial): no effect of a combined '
+        'antioxidant formula on semen parameters, DNA fragmentation or live '
+        'birth. Trial doses and Indian retail pricing are approximate. '
+        'Reviewed September 2026.'),
+    nextSteps: [
+      PvReadNextStep(
+        kind: PvNextKind.product,
+        title: _en('Zinc and CoQ10, on the shelf'),
+        value: _en('Plain versions, at the trial doses, honestly labelled.'),
+        surfaceId: 'ttc_supplements',
+      ),
+    ],
+    readNext: ['ttc_read_heat_habits', 'ttc_read_three_months'],
   ),
 ];

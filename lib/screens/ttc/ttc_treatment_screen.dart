@@ -23,6 +23,7 @@ import 'package:flutter/material.dart';
 import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_store.dart';
 import '../../ttc/ttc_treatment_store.dart';
+import '../v2/v2_palette.dart';
 import 'ttc_common.dart';
 import 'ttc_ivf_readiness_screen.dart' show kIvfHue;
 import 'ttc_tool_chrome.dart';
@@ -548,8 +549,23 @@ class TtcPathChooser extends StatelessWidget {
                   padding:
                       const EdgeInsets.symmetric(horizontal: 15, vertical: 13),
                   decoration: BoxDecoration(
-                    color: path == current ? ttcPurple : ttcPanel,
+                    // ⚠️ THE PURPLE BAR IS GONE. Reported on sight: *"I can see
+                    // a purple bar which isn't what we are following right now
+                    // to select an option."* It was a full-width solid accent
+                    // block, which is the accent used as a surface — the one
+                    // thing the design system says it is never for.
+                    //
+                    // This is now the same treatment as the option blocks in
+                    // "Check my readiness" and "Where do I stand": the hue at
+                    // tint strength, an ink edge, ink type. One selection
+                    // language across every tool in the stage.
+                    color: path == current
+                        ? v2BlockTint(kIvfHue, V2PaletteStore.instance.current)
+                        : ttcPanel,
                     borderRadius: BorderRadius.circular(16),
+                    border: path == current
+                        ? Border.all(color: ttcTitleInk, width: 1.5)
+                        : null,
                   ),
                   child: Row(children: [
                     Expanded(
@@ -558,24 +574,33 @@ class TtcPathChooser extends StatelessWidget {
                           children: [
                             Text(path.label(hi),
                                 style: ttcBody(13.5,
-                                    color: path == current
-                                        ? Colors.white
-                                        : ttcInk,
+                                    color: ttcTitleInk,
                                     w: FontWeight.w700)),
                             if (path == TtcPath.natural) ...[
                               const SizedBox(height: 3),
+                              // ⚠️ ONE INK, BOTH STATES. This was white on the
+                              // selected row, which was correct while the row
+                              // was solid purple and invisible the moment it
+                              // became a pale tint — white on light blue, which
+                              // is how "no clinic involved with this cycle"
+                              // disappeared exactly when it was chosen.
+                              //
+                              // The general lesson is worth more than the fix:
+                              // a colour written as "white, because the
+                              // background is dark" is a colour that depends on
+                              // a fact stated somewhere else. When the two are
+                              // in different widgets, changing one silently
+                              // breaks the other and nothing fails.
                               Text(t.pathwayNaturalNote,
-                                  style: ttcBody(11,
-                                      color: path == current
-                                          ? Colors.white
-                                              .withValues(alpha: 0.85)
-                                          : ttcMuted)),
+                                  style: ttcBody(11, color: ttcSoft)),
                             ],
                           ]),
                     ),
-                    if (path == current)
-                      const Icon(Icons.check_rounded,
-                          size: 17, color: Colors.white),
+                    // ⚠️ NO TICK. Same leftover: a white check mark on a solid
+                    // block, now invisible on a pale one. It was never needed —
+                    // the fill and the ink edge already say which row is
+                    // chosen, and a tick beside them is a third signal for a
+                    // fact that two are already carrying.
                   ]),
                 ),
               ),
@@ -668,12 +693,19 @@ class _Question extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 9),
             decoration: BoxDecoration(
-              color: on ? ttcPurple : ttcPanel,
+              // ⚠️ THE TINT AND AN INK EDGE, NEVER THE ACCENT. Same call as the
+              // self-read tools: purple is spent at decision points and is not
+              // laid down as a fill. A solid violet chip beside a page of pale
+              // blocks is also simply the loudest thing on screen, which puts
+              // the emphasis on the control rather than the question.
+              color: on ? v2BlockTint(kIvfHue, V2PaletteStore.instance.current) : ttcPanel,
               borderRadius: BorderRadius.circular(999),
+              border:
+                  on ? Border.all(color: ttcTitleInk, width: 1.5) : null,
             ),
             child: Text(label,
                 style: ttcBody(12.5,
-                    color: on ? Colors.white : ttcSoft, w: FontWeight.w800)),
+                    color: on ? ttcTitleInk : ttcSoft, w: FontWeight.w800)),
           ),
         ),
       );

@@ -468,6 +468,41 @@ final List<PvVideoSlot> kTtcVideos = [
     readNext: ['ttc_read_garbh_sanskar'],
     surfaceNext: ['ttc_ritual'],
   ),
+
+  // ⚠️ THE ONE FILM THE MIND & BODY REBUILD ADDS, AND IT IS THE ONLY CARD ON
+  // that door with no existing source. Everything else there is `reuse`,
+  // `promote` or `reference`; the brief marks this one "new (20 to 30 min)".
+  //
+  // Written and chaptered here rather than left as a bare slot id, which is the
+  // pattern the other four owed TTC films follow — and the pattern the
+  // conceiving door's hero video did NOT follow, which is exactly why that one
+  // could be removed on 2026-09-05 without orphaning anything. A slot with
+  // chapters and takeaways is a commissioning brief; a bare id is a hole.
+  PvVideoSlot(
+    id: 'ttc_vid_mind_longer_session',
+    hue: 42,
+    title: _en('A longer session, for a day you have the time'),
+    why: _en('The short daily cards, joined up — movement, breath and stillness '
+        'in one sitting, at a pace nobody has to keep up with.'),
+    seconds: 1500,
+    expert: _en('Anjali Deshmukh'),
+    expertRole: _en('Yoga and breathwork lead'),
+    chapters: [
+      PvVideoChapter(at: 0, label: _en('Settling, and what this is not')),
+      PvVideoChapter(at: 180, label: _en('Loosening the neck and shoulders')),
+      PvVideoChapter(at: 540, label: _en('Hips, slowly')),
+      PvVideoChapter(at: 900, label: _en('Legs up the wall, and the breath')),
+      PvVideoChapter(at: 1200, label: _en('Ten minutes of stillness')),
+    ],
+    takeaways: [
+      _en('Once a week is the intention. It is not a replacement for the '
+          'daily few minutes, and skipping it costs nothing.'),
+      _en('Every part of this appears on its own as a short card — nothing '
+          'here is new, it is the same practices without stopping.'),
+      _en('Stop at any point. Leaving halfway through is a finished session.'),
+    ],
+    readNext: ['ttc_read_stress_fertility'],
+  ),
 ];
 
 /// The slot lookup the reader is handed.
