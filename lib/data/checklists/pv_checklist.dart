@@ -30,10 +30,13 @@
 //  form: where a doctor owns a decision we may help her PREPARE for it.
 // =============================================================================
 
+import '../../services/pregnancy_controller.dart';
 import 'pv_checklist_conditions.dart';
+import 'pv_checklist_nutrition.dart';
 import 'pv_checklist_scans.dart';
 
 export 'pv_checklist_conditions.dart';
+export 'pv_checklist_nutrition.dart';
 export 'pv_checklist_scans.dart';
 
 /// One question, in a group.
@@ -105,8 +108,15 @@ class PvChecklist {
   /// ⚠️ A FUNCTION IN A DATA FILE, WHICH MAKES THE REGISTRY `final` RATHER THAN
   /// `const`. That is the price of the list knowing about her without the
   /// screen knowing about scans, and it is the right way round: the screen
-  /// stays general, each checklist reads its own store.
-  final String? Function()? subject;
+  /// stays general, each checklist reads its own source.
+  ///
+  /// ⚠️ IT TAKES THE CONTROLLER, AND THE NUTRITION LIST IS WHY. The scans and
+  /// conditions subjects read singleton stores and ignore the argument; the
+  /// diet one needs her WEEK, and `PregnancyController` is deliberately not a
+  /// singleton in this app — it is passed. A subject that reached for a global
+  /// week would be the one place in the engine that guessed instead of being
+  /// told.
+  final String? Function(PregnancyController)? subject;
 
   /// Builds the heading from [subject]'s answer. "What to ask at your $s".
   final String Function(String subject)? subjectTitle;
@@ -122,6 +132,7 @@ class PvChecklist {
 final List<PvChecklist> kPvChecklists = [
   kScanQuestionsChecklist,
   kConditionQuestionsChecklist,
+  kDietQuestionsChecklist,
 ];
 
 /// Null is a real answer; the router opens nothing rather than guessing.

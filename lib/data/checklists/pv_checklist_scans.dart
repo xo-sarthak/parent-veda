@@ -19,6 +19,7 @@
 //  she needs at the desk somewhere in the middle.
 // =============================================================================
 
+import '../../services/pregnancy_controller.dart';
 import '../../services/scans_store.dart';
 import '../tests_scans_reports_data.dart';
 import '../../screens/brackets/scan_timeline_screen.dart' show kScanRun;
@@ -31,7 +32,7 @@ import 'pv_checklist.dart';
 /// order — and a woman opening a checklist called "your next scan" means the
 /// one she has a DATE for. Two questions that usually have the same answer;
 /// merging them would make one screen quietly start answering the other's.
-String? _nextScanName() {
+String? _nextScanName(PregnancyController _) {
   final store = ScansStore.instance;
 
   final booked = <(DateTime, TestScanInfo)>[];

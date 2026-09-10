@@ -55,15 +55,8 @@ Future<void> openFoodSearch(BuildContext context) async {
 //  Browse — "Can I eat this?"
 // ===========================================================================
 
-class FoodCheckScreen extends StatefulWidget {
+class FoodCheckScreen extends StatelessWidget {
   const FoodCheckScreen({super.key});
-
-  @override
-  State<FoodCheckScreen> createState() => _FoodCheckScreenState();
-}
-
-class _FoodCheckScreenState extends State<FoodCheckScreen> {
-  FoodCategory? _filter;
 
   @override
   Widget build(BuildContext context) {
@@ -71,9 +64,6 @@ class _FoodCheckScreenState extends State<FoodCheckScreen> {
       animation: V2PaletteStore.instance,
       builder: (context, _) {
         final p = V2PaletteStore.instance.current;
-        final items = _filter == null
-            ? kFoodEntries
-            : foodsByCategory(_filter!);
         return Scaffold(
           backgroundColor: p.ground,
           appBar: AppBar(
@@ -87,6 +77,47 @@ class _FoodCheckScreenState extends State<FoodCheckScreen> {
             top: false,
             child: ListView(
               padding: const EdgeInsets.fromLTRB(18, 4, 18, 28),
+              children: const [FoodCheckBody()],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// The food checker itself — search, most-searched, the category chips and the
+/// Safe/Limit/Avoid list — without a Scaffold or an app bar.
+///
+/// ⚠️ EXTRACTED SO THE NUTRITION DOOR CAN RENDER IT IN PLACE, and the
+/// extraction is a MOVE: same children, same order, same spacing. The screen
+/// above still exists, still routes, and still looks identical because it now
+/// renders this.
+///
+/// ⚠️ A COLUMN, NOT A LIST. A scrolling widget inside another scrolling widget
+/// is either unbounded or a nested scroll nobody can drive with a thumb — the
+/// rule `ScanTimelineBody` set and every body since has followed.
+class FoodCheckBody extends StatefulWidget {
+  const FoodCheckBody({super.key});
+
+  @override
+  State<FoodCheckBody> createState() => _FoodCheckBodyState();
+}
+
+class _FoodCheckBodyState extends State<FoodCheckBody> {
+  FoodCategory? _filter;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: V2PaletteStore.instance,
+      builder: (context, _) {
+        final p = V2PaletteStore.instance.current;
+        final items = _filter == null
+            ? kFoodEntries
+            : foodsByCategory(_filter!);
+        return Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _SearchBar(p: p, onTap: () => openFoodSearch(context)),
                 const SizedBox(height: 20),
@@ -143,8 +174,6 @@ class _FoodCheckScreenState extends State<FoodCheckScreen> {
                   const SizedBox(height: 10),
                 ],
               ],
-            ),
-          ),
         );
       },
     );

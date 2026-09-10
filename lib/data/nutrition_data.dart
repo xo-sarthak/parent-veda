@@ -1095,6 +1095,14 @@ final List<TrimesterGuide> kTrimesterGuides = [
 
 /// Condition pages. Each ends by pointing at a doctor or the dietician, never
 /// a diagnosis or a prescribed amount.
+/// Which library holds the fuller page about the condition itself.
+///
+/// ⚠️ TWO LIBRARIES, AND THE REASON IS `docs/PREGNANCY-DOOR-BUILD.md` §4a:
+/// `kAllConditions` answers "my doctor said I have X" and `kReportFindings`
+/// answers "my report says X". Twins only exists as the second, so its diet
+/// page points there. One page per question, not one page per word.
+enum ConditionLink { complication, finding }
+
 class ConditionGuide {
   const ConditionGuide({
     required this.id,
@@ -1102,6 +1110,8 @@ class ConditionGuide {
     required this.videoTitle,
     required this.summary,
     required this.guidance,
+    this.linkId,
+    this.linkLibrary = ConditionLink.complication,
   });
 
   final String id;
@@ -1111,6 +1121,31 @@ class ConditionGuide {
 
   /// Plain guidance, as short paragraphs.
   final List<LocalizedText> guidance;
+
+  /// The page that explains the CONDITION, where one exists.
+  ///
+  /// ⚠️ THIS IS THE SINGLE-SOURCE RULE, WIRED. The Nutrition brief: *"where a
+  /// condition also lives in Complications, the diet card LINKS to that
+  /// Complications page and does not restate the condition."*
+  ///
+  /// Every guide here is already pure diet advice — "pair carbs with protein",
+  /// "iron-rich foods: dal, greens" — with no symptoms, no tests and no
+  /// management. So the rule was satisfied by construction, and what was
+  /// MISSING was the link itself: `_ComplicationsLink` said "lives in
+  /// Complications, coming soon" and was not tappable, because when it was
+  /// written there was no Complications screen. There is now.
+  ///
+  /// ⚠️ AND THE DIET CARD STILL OPENS THE DIET PAGE. Reading the brief as "the
+  /// card opens Complications instead" would throw away the eating advice,
+  /// which is the one thing somebody taps for on a nutrition door. The link
+  /// belongs one level in, at the foot of the page, where "more about the
+  /// condition itself" is the next question rather than the first.
+  ///
+  /// Null where no page exists — healthy weight gain, underweight, brain foods
+  /// and overweight are diet-only, exactly as the brief says.
+  final String? linkId;
+
+  final ConditionLink linkLibrary;
 }
 
 final List<ConditionGuide> kConditionGuides = [
@@ -1132,6 +1167,7 @@ final List<ConditionGuide> kConditionGuides = [
           'This page explains the general approach; the numbers are theirs '
           'to set.'),
     ],
+    linkId: 'gdm',
   ),
   ConditionGuide(
     id: 'anemia_iron',
@@ -1150,6 +1186,7 @@ final List<ConditionGuide> kConditionGuides = [
       _en('If a supplement has been prescribed, food and supplement work '
           'together, one is not a substitute for the other.'),
     ],
+    linkId: 'anemia',
   ),
   ConditionGuide(
     id: 'thyroid',
@@ -1168,6 +1205,7 @@ final List<ConditionGuide> kConditionGuides = [
       _en('Diet supports thyroid health, it does not replace or adjust your '
           'prescribed dose, that stays with your doctor.'),
     ],
+    linkId: 'thyroid',
   ),
   ConditionGuide(
     id: 'pcos',
@@ -1185,6 +1223,7 @@ final List<ConditionGuide> kConditionGuides = [
       _en('Your doctor may watch your blood sugar a little more closely '
           'given a PCOS history, that is routine, not a sign of a problem.'),
     ],
+    linkId: 'pcos',
   ),
   ConditionGuide(
     id: 'high_bp_preeclampsia',
@@ -1202,6 +1241,7 @@ final List<ConditionGuide> kConditionGuides = [
           'you have been diagnosed with preeclampsia, this page is the '
           'general picture, not your specific plan.'),
     ],
+    linkId: 'high_bp',
   ),
   ConditionGuide(
     id: 'healthy_weight_gain',
@@ -1254,6 +1294,7 @@ final List<ConditionGuide> kConditionGuides = [
           'worth mentioning to your doctor rather than managing through diet '
           'alone.'),
     ],
+    linkId: 'piles',
   ),
   ConditionGuide(
     id: 'twins',
@@ -1271,6 +1312,8 @@ final List<ConditionGuide> kConditionGuides = [
       _en('Weight gain targets for twins are usually different from single '
           'pregnancy charts, ask your doctor what range applies to you.'),
     ],
+    linkId: 'twin_pregnancy',
+    linkLibrary: ConditionLink.finding,
   ),
   ConditionGuide(
     id: 'underweight',

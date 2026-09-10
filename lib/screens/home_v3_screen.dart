@@ -921,7 +921,8 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
       // `kConditionGuides` already covers gestational diabetes, anaemia and
       // thyroid — the flags this door names in its own blurb.
       case kPgActNutritionFlag:
-        push(const NutritionStageScreen(initialTab: 1), 'nutrition_condition');
+        push(NutritionStageScreen(initialTab: 1, pregnancy: pregnancy),
+            'nutrition_condition');
         return;
       // Mind & Mood replaces the two placeholder mood actions, which used to
       // fall back to the reads library because no mood surface existed.

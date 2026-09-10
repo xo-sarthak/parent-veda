@@ -21,14 +21,27 @@
 
 import 'package:flutter/material.dart';
 
+import '../../data/conditions_data.dart' show kAllConditions;
 import '../../data/nutrition_data.dart';
+import '../../data/report_findings_data.dart' show kReportFindings;
+import '../../services/pregnancy_controller.dart';
+import '../conditions/condition_detail_screen.dart' as pages;
+import '../report_screen.dart' show ReportArticleScreen;
 import '../../localization/app_language.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_placeholders.dart';
 import '../v2/v2_palette.dart';
 
 class NutritionStageScreen extends StatefulWidget {
-  const NutritionStageScreen({super.key, this.initialTab = 0});
+  const NutritionStageScreen(
+      {super.key, this.initialTab = 0, required this.pregnancy});
+
+  /// ⚠️ REQUIRED, AND IT ARRIVED WITH THE COMPLICATIONS LINK. The diet pages
+  /// under this one now open the condition page behind them, and both
+  /// destinations need a controller. Passing it down beats each leaf screen
+  /// reaching for a global — the same reason `PvReaderScreen` takes `lang`
+  /// rather than reading one.
+  final PregnancyController pregnancy;
 
   /// ⚠️ WHICH TAB TO LAND ON, AND IT EXISTS FOR ONE REAL CALLER.
   ///
@@ -84,7 +97,7 @@ class _NutritionStageScreenState extends State<NutritionStageScreen>
           ),
           body: TabBarView(controller: _tab, children: [
             _TrimesterList(p: p),
-            _ConditionList(p: p),
+            _ConditionList(p: p, pregnancy: widget.pregnancy),
           ]),
         );
       },
@@ -120,7 +133,9 @@ class _TrimesterList extends StatelessWidget {
 }
 
 class _ConditionList extends StatelessWidget {
-  const _ConditionList({required this.p});
+  const _ConditionList({required this.p, required this.pregnancy});
+
+  final PregnancyController pregnancy;
   final V2Palette p;
   @override
   Widget build(BuildContext context) {
@@ -135,7 +150,9 @@ class _ConditionList extends StatelessWidget {
               title: g.label.now,
               subtitle: g.summary.now,
               onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                builder: (_) => ConditionDetailScreen(guide: g),
+                builder: (_) =>
+                    ConditionDetailScreen(
+                        guide: g, pregnancy: pregnancy),
               )),
             ),
             const SizedBox(height: 10),
@@ -270,8 +287,10 @@ class _SampleDay extends StatelessWidget {
 // ===========================================================================
 
 class ConditionDetailScreen extends StatelessWidget {
-  const ConditionDetailScreen({super.key, required this.guide});
+  const ConditionDetailScreen(
+      {super.key, required this.guide, required this.pregnancy});
   final ConditionGuide guide;
+  final PregnancyController pregnancy;
 
   @override
   Widget build(BuildContext context) {
@@ -303,7 +322,7 @@ class ConditionDetailScreen extends StatelessWidget {
                 const SizedBox(height: 24),
                 const ExpertOptionsBlock(),
                 const SizedBox(height: 20),
-                const _ComplicationsLink(),
+                _ComplicationsLink(guide: guide, pregnancy: pregnancy),
               ],
             ),
           ),
@@ -313,28 +332,109 @@ class ConditionDetailScreen extends StatelessWidget {
   }
 }
 
-/// A pointer across to a Complications section. There is no Complications
-/// screen in the app yet, so this is honest rather than a dead tap — same
-/// rule `PvVideoPlaceholder` follows: it looks like where it will lead,
-/// carries a "coming soon" mark, and is not tappable, so nobody learns that
-/// taps in this app sometimes do nothing.
+/// A pointer across to the page that explains the condition itself.
+///
+/// ⚠️ IT WAS A DEAD "COMING SOON" AND COMPLICATIONS HAS SHIPPED — 2026-09-10.
+///
+/// The note this replaces read *"More on this, and related warning signs,
+/// lives in Complications, coming soon"* and was deliberately not tappable,
+/// because when it was written there was no Complications screen. There is
+/// now: twenty-seven condition pages behind a built door.
+///
+/// ⚠️ THE INVERSE OF THIS REPO'S USUAL FAILURE, AND WORTH NAMING. The wiring
+/// gate exists to catch a card pointing at nothing. This was a real
+/// destination sitting behind a card that said it did not exist yet — and that
+/// version of the bug is harder to find, because nothing is broken. It renders,
+/// it is honest about itself, and it stays wrong until somebody remembers.
+///
+/// The general lesson: a coming-soon marker is a claim with an expiry date, and
+/// nothing expires it. When a thing ships, grep for what promised it.
+///
+/// ⚠️ AND IT STILL DEGRADES HONESTLY. Four guides are diet-only — healthy
+/// weight gain, underweight, brain foods, overweight — and have no condition
+/// page at all. Those render nothing rather than a link to a page that would
+/// have to be invented.
 class _ComplicationsLink extends StatelessWidget {
-  const _ComplicationsLink();
+  const _ComplicationsLink({required this.guide, required this.pregnancy});
+
+  final ConditionGuide guide;
+  final PregnancyController pregnancy;
+
   @override
   Widget build(BuildContext context) {
     final p = V2PaletteStore.instance.current;
-    return Container(
-      padding: const EdgeInsets.fromLTRB(14, 13, 14, 13),
-      decoration: BoxDecoration(color: p.surfaceAlt, borderRadius: BorderRadius.circular(16)),
-      child: Row(children: [
-        Icon(Icons.medical_information_outlined, size: 18, color: p.ink3),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Text('More on this, and related warning signs, lives in Complications, coming soon.',
-              style: pvManrope(fontSize: 12, height: 1.4, color: p.ink3)),
+    final id = guide.linkId;
+    if (id == null) return const SizedBox.shrink();
+
+    return Material(
+      color: p.surfaceAlt,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () => openConditionFromDiet(context, guide, pregnancy),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(14, 13, 14, 13),
+          child: Row(children: [
+            Icon(Icons.medical_information_outlined, size: 18, color: p.ink3),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                  'This page is about what to eat. For the condition itself — '
+                  'what it is, what happens next and when to call — read '
+                  '${guide.label.now}.',
+                  style: pvManrope(fontSize: 12, height: 1.4, color: p.ink3)),
+            ),
+            Icon(Icons.chevron_right_rounded, size: 18, color: p.ink3),
+          ]),
         ),
-      ]),
+      ),
     );
+  }
+}
+
+/// Opens the page that explains the condition behind a diet guide.
+///
+/// ⚠️ IT IMPORTS THE DESTINATIONS DIRECTLY, AND THE ALTERNATIVE WAS WORSE.
+///
+/// The first version registered a callback from `pv_door_router.dart` at
+/// startup, to keep this file free of the conditions and report screens. That
+/// is a service locator, and its failure mode is the one this repo keeps
+/// hitting: forget the registration and the link renders, taps, and does
+/// nothing — silently, forever.
+///
+/// A direct import is a real dependency that the compiler checks, and this page
+/// is reached from two places (the door and the old nutrition home), both of
+/// which then get a working link without either remembering to wire it.
+///
+/// ⚠️ `as pages`, BECAUSE `ConditionDetailScreen` IS DEFINED IN THIS FILE TOO.
+/// One name, two real screens: this one is the DIET page, the imported one is
+/// the condition itself. See `docs/PREGNANCY-DOOR-BUILD.md` §4a.
+void openConditionFromDiet(BuildContext context, ConditionGuide guide,
+    PregnancyController controller) {
+  final id = guide.linkId;
+  if (id == null) return;
+
+  switch (guide.linkLibrary) {
+    case ConditionLink.complication:
+      for (final e in kAllConditions) {
+        if (e.id != id) continue;
+        Navigator.of(context).push(MaterialPageRoute<void>(
+          settings: RouteSettings(name: 'conditions/$id'),
+          builder: (_) =>
+              pages.ConditionDetailScreen(entry: e, pregnancy: controller),
+        ));
+        return;
+      }
+    case ConditionLink.finding:
+      for (final f in kReportFindings) {
+        if (f.id != id) continue;
+        Navigator.of(context).push(MaterialPageRoute<void>(
+          settings: RouteSettings(name: 'report/$id'),
+          builder: (_) =>
+              ReportArticleScreen(finding: f, controller: controller),
+        ));
+        return;
+      }
   }
 }
 

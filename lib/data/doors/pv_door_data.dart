@@ -69,10 +69,16 @@ import 'package:flutter/material.dart' show IconData;
 
 import '../same_day_signs_data.dart';
 import '../scan_extras.dart' show kScanUrgentSigns;
+import 'pv_door_belly_skin.dart';
 import 'pv_door_complications.dart';
+import 'pv_door_labour.dart';
+import 'pv_door_nutrition.dart';
 import 'pv_door_scans.dart';
 
+export 'pv_door_belly_skin.dart';
 export 'pv_door_complications.dart';
+export 'pv_door_labour.dart';
+export 'pv_door_nutrition.dart';
 export 'pv_door_scans.dart';
 
 /// What kind of thing a tile is. Drives the chip, the icon and the tap.
@@ -91,6 +97,12 @@ enum PvDoorFormat {
   mythFact,
   checklist,
   talk,
+  // ⚠️ ADDED FOR NUTRITION, AND EACH ONE HAS A CONCRETE READER. A recipe opens
+  // the app's own recipe page with its serving scaler; a chip reading "Guide"
+  // over a dish would be the chip lying about what the tap gives you, which is
+  // the one thing this enum exists to prevent.
+  recipe,
+  video,
 }
 
 extension PvDoorFormatCopy on PvDoorFormat {
@@ -111,6 +123,8 @@ extension PvDoorFormatCopy on PvDoorFormat {
         PvDoorFormat.mythFact => 'Myth vs fact',
         PvDoorFormat.checklist => 'Checklist',
         PvDoorFormat.talk => 'Talk',
+        PvDoorFormat.recipe => 'Recipe',
+        PvDoorFormat.video => 'Video',
       };
 }
 
@@ -202,91 +216,132 @@ final class PvDoorToolTile extends PvDoorTile {
   PvDoorFormat get format => PvDoorFormat.tool;
 }
 
-/// One scan or test, on the rich page the stage already ships for it.
+/// A library of pages this app already ships, and which lookup finds them.
 ///
-/// ⚠️ A TILE TYPE OF ITS OWN RATHER THAN A TOOL POINTING AT A SURFACE, and the
-/// reason is the wiring gate. `scanId` must exist in `kTestsScans`, which a
-/// test can check; a surface string like `scan/nt_scan` can only be checked by
-/// the router agreeing to know it, and a router that does not know an id
-/// returns null and the tile silently does nothing.
+/// ⚠️ THIS REPLACED THREE NEAR-IDENTICAL TILE CLASSES AND STOPPED SEVEN MORE
+/// BEING WRITTEN — 2026-09-10.
 ///
-/// ⚠️ AND THE CHIP SAYS "Article", WHICH IS WHAT THE BRIEF MARKS IT. The
-/// destination is a written piece about one scan — what it is, why it is done,
-/// how to prepare, what the report says. That is an article that happens to
-/// live in a data library rather than a reads library.
-final class PvDoorScanTile extends PvDoorTile {
-  const PvDoorScanTile({
-    required super.title,
-    required super.blurb,
-    required this.scanId,
-    super.meta,
-    super.comingSoon,
-  });
+/// `PvDoorScanTile`, `PvDoorConditionTile` and `PvDoorFindingTile` were the
+/// same class three times: one id, one lookup, one push. Nutrition needs six
+/// more of them — nutrients, diet stages, diet conditions, recipes, diet
+/// charts, fasting topics — and at that point the pattern is not a set of
+/// types, it is a table with a column missing.
+///
+/// ⚠️ AND THIS IS NOT THE CONFIG OBJECT THE HEADER OF THIS FILE FORBIDS.
+/// Read that rule carefully: it is about a tile with SEVERAL INDEPENDENT
+/// PAYLOAD FIELDS, where most combinations are illegal and constructible — a
+/// myth tile carrying a `productId` and no `fact`. This has exactly one payload
+/// field and one selector, so there is no combination to get wrong. The only
+/// error possible is an id that is not in its library, and no type system
+/// catches that; `test/pv_door_*_test.dart` does.
+///
+/// What is lost is the compiler naming an unhandled case. What is gained is
+/// that adding a library is one enum value, one lookup and one push, instead of
+/// a class, a case and a test per destination.
+enum PvDoorLibrary {
+  /// `kTestsScans` — one scan or test, on its rich page.
+  scan,
 
-  /// Must exist in `kTestsScans`. Held by `test/pv_door_scans_test.dart` for the
-  /// reason every other id here is held: a tile whose id is wrong renders
-  /// perfectly and does nothing.
-  final String scanId;
+  /// `kAllConditions` — "my doctor said I have X".
+  condition,
 
-  @override
-  PvDoorFormat get format => PvDoorFormat.article;
+  /// `kReportFindings` — "my report says X". See
+  /// `docs/PREGNANCY-DOOR-BUILD.md` §4a for why both exist.
+  finding,
+
+  /// `kNutrientGuides` — one of the twelve nutrients.
+  nutrient,
+
+  /// `kTrimesterGuides` — what to eat before, and in each third.
+  dietStage,
+
+  /// `kConditionGuides` — eating for a condition. NOT [condition]: this is the
+  /// DIET page, and where Complications owns the condition itself the brief
+  /// says link there instead of restating it.
+  dietCondition,
+
+  /// `kRecipes` — a dish, on the app's own recipe page.
+  recipe,
+
+  /// `kDietCharts` — a three-day plan.
+  dietChart,
+
+  /// `kFastingByOccasion` + `kFastingGeneral` — fasting, safely.
+  fasting,
+
+  /// `kBsPages` — one skin or belly read.
+  bellySkin,
 }
 
-/// One condition, on the deep page Complications owns.
-///
-/// ⚠️ A TYPE OF ITS OWN RATHER THAN A TOOL POINTING AT A SURFACE, for the
-/// reason `PvDoorScanTile` gives: `conditionId` must exist in `kAllConditions`,
-/// which a test can check, where a surface string can only be checked by the
-/// router agreeing to know it.
-///
-/// ⚠️ AND THE TITLE LEADS WITH THE PLAIN PHRASE. This is the one tile type
-/// whose title breaks the "medical name may be a title" rule ON PURPOSE — the
-/// Complications brief says a browse card puts the plain phrase FIRST and the
-/// medical name in brackets after it: "Placenta sitting low (low-lying
-/// placenta)". A medical name stands alone only on the page itself.
-final class PvDoorConditionTile extends PvDoorTile {
-  const PvDoorConditionTile({
-    required super.title,
-    required super.blurb,
-    required this.conditionId,
-    super.meta,
-    super.comingSoon,
-  });
-
-  /// Must exist in `kAllConditions`.
-  final String conditionId;
-
-  @override
-  PvDoorFormat get format => PvDoorFormat.article;
+extension PvDoorLibraryCopy on PvDoorLibrary {
+  /// The chip a tile from this library wears.
+  ///
+  /// ⚠️ THE FORMAT BELONGS TO THE LIBRARY, NOT TO THE TILE. Every page in
+  /// `kNutrientGuides` is the same kind of object, so a nutrient tile that
+  /// declared its own chip would be a chance to declare the wrong one. The
+  /// briefs agree with this: they mark whole rails `[Guide]` or `[Article]`,
+  /// never card by card.
+  PvDoorFormat get format => switch (this) {
+        // A scan page is a written piece about one scan — what it is, why, how
+        // to prepare, what the report says. The brief marks all nine [Article].
+        PvDoorLibrary.scan => PvDoorFormat.article,
+        PvDoorLibrary.condition => PvDoorFormat.article,
+        PvDoorLibrary.finding => PvDoorFormat.article,
+        // A nutrient, a stage and a diet-condition page are all things you act
+        // on — what it does, which everyday foods give it to you, whether you
+        // need a supplement. The nutrition brief marks every one [Guide].
+        PvDoorLibrary.nutrient => PvDoorFormat.guide,
+        PvDoorLibrary.dietStage => PvDoorFormat.guide,
+        PvDoorLibrary.dietCondition => PvDoorFormat.guide,
+        PvDoorLibrary.fasting => PvDoorFormat.guide,
+        // ⚠️ "Read", NOT "Guide". The Belly & skin brief marks every one of its
+        // nineteen pages [Read], and it is the right word: these explain what
+        // is happening to her skin rather than handing her something to do.
+        PvDoorLibrary.bellySkin => PvDoorFormat.read,
+        PvDoorLibrary.recipe => PvDoorFormat.recipe,
+        // A chart is a three-day plan you open, filter and download. That is a
+        // tool, not a read.
+        PvDoorLibrary.dietChart => PvDoorFormat.tool,
+      };
 }
 
-/// One finding, on the report-shaped page the Scans decoder owns.
+/// One page from a library the app already ships.
 ///
-/// ⚠️ THE SECOND LIBRARY, AND IT IS NOT A DUPLICATE. See
-/// `docs/PREGNANCY-DOOR-BUILD.md` §4a: `kAllConditions` answers "my doctor said
-/// I have X" and `kReportFindings` answers "my report says X". Two questions,
-/// two pages, one rule — **one page per question, not one page per word.**
-///
-/// ⚠️ IT EXISTS BECAUSE COMPLICATIONS DOES NOT OWN EVERYTHING ITS BRIEF LISTS.
-/// "Cord looped around the neck" and "Placenta sitting low" are named on its
-/// browse rail and neither is in `kAllConditions` — they only exist as
-/// findings. Linking across is the rule working rather than an exception to it;
-/// the alternative was copying two entries between the files, which is the one
-/// thing §4a forbids outright.
-final class PvDoorFindingTile extends PvDoorTile {
-  const PvDoorFindingTile({
+/// ⚠️ THE ID MUST EXIST IN ITS LIBRARY, and that is what the wiring test
+/// checks. A tile whose id is wrong renders perfectly — a title, a blurb and a
+/// chip — and does nothing.
+final class PvDoorEntryTile extends PvDoorTile {
+  const PvDoorEntryTile({
     required super.title,
     required super.blurb,
-    required this.findingId,
+    required this.library,
+    required this.entryId,
     super.meta,
     super.comingSoon,
   });
 
-  /// Must exist in `kReportFindings`.
-  final String findingId;
+  final PvDoorLibrary library;
+  final String entryId;
 
   @override
-  PvDoorFormat get format => PvDoorFormat.article;
+  PvDoorFormat get format => library.format;
+}
+
+/// A film. None of them exist yet.
+///
+/// ⚠️ IT IS ALWAYS COMING SOON TODAY, AND THAT IS HONEST RATHER THAN LAZY.
+/// `PvVideoPlaceholder` holds real 16:9 geometry, a real title and a
+/// "coming soon" mark, and is not tappable — so the page can be judged now and
+/// only the file is missing. The rule is at the head of `pv_placeholders.dart`.
+final class PvDoorVideoTile extends PvDoorTile {
+  const PvDoorVideoTile({
+    required super.title,
+    required super.blurb,
+    super.meta,
+  }) : super(comingSoon: true);
+
+  @override
+  PvDoorFormat get format => PvDoorFormat.video;
 }
 
 /// A guide — a piece written to be USED rather than read through.
@@ -694,6 +749,9 @@ class PvDoorPage {
 final List<PvDoorPage> kPvDoorPages = [
   kScansDoor,
   kComplicationsDoor,
+  kNutritionDoor,
+  kBellySkinDoor,
+  kLabourDoor,
 ];
 
 /// The door for a bracket, or null when that bracket still opens a hub.

@@ -43,10 +43,28 @@ import '../../data/doors/pv_door_data.dart';
 import '../../data/reads/pregnancy_reads.dart';
 import '../../data/tests_scans_reports_data.dart';
 import '../../services/pregnancy_controller.dart';
+import '../../theme/pv_fonts.dart';
+import '../v2/v2_palette.dart';
 import '../../data/conditions_data.dart';
+import '../../data/belly_skin_data.dart';
+import '../../data/nutrition_data.dart';
 import '../../data/report_findings_data.dart';
-import '../../models/report_finding.dart';
+import '../belly_skin/bs_article_screen.dart';
+import '../belly_skin/bs_itching_screen.dart';
+import '../belly_skin/ingredient_checker_screen.dart';
+import '../bump_journey_screen.dart';
 import '../conditions/condition_detail_screen.dart';
+import '../nutrition/diet_charts_screen.dart';
+import '../nutrition/can_i_eat_body.dart';
+import '../nutrition/fasting_screen.dart';
+import '../nutrition/nutrients_screen.dart';
+import '../nutrition/nutrition_recipes_screen.dart';
+// ⚠️ PREFIXED, BECAUSE `ConditionDetailScreen` EXISTS TWICE IN THIS APP. One is
+// the Complications page ("my doctor said I have X"); the other is the DIET
+// page for the same condition ("what to eat for it"). Two real screens with one
+// name — a pre-existing clash this file is simply the first to import both
+// sides of. See `docs/PREGNANCY-DOOR-BUILD.md` §4a for why both exist.
+import '../nutrition/nutrition_stage_screen.dart' as diet;
 import '../conditions/conditions_home_screen.dart';
 import '../brackets/same_day_signs_screen.dart';
 import '../brackets/scan_detail_screen.dart';
@@ -56,7 +74,10 @@ import '../brackets/pv_checklist_screen.dart';
 import '../brackets/scan_reports_screen.dart';
 import '../brackets/scan_timeline_screen.dart';
 import '../brackets/scan_urgent_screen.dart';
+import '../prepare/birthing_classes_screen.dart';
 import '../prepare/consultations_screen.dart';
+import '../tools/contraction_tracker_screen.dart';
+import '../tools/ready_for_birth_screen.dart';
 import '../reader/pv_reader_screen.dart';
 import '../report_screen.dart';
 import '../tools/tests_scans_reports_screen.dart';
@@ -73,7 +94,9 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
       // colour it wears, so a checklist opened from Scans is blue and the same
       // widget opened from Complications is teal.
       kScansSurfaceQuestions => PvChecklistScreen(
-          checklist: pvChecklistById('scan_questions')!, hue: 206),
+          checklist: pvChecklistById('scan_questions')!,
+          hue: 206,
+          pregnancy: c),
       kScansSurfaceConsult => ConsultationsScreen(lang: c.language),
 
       // ⚠️ THE RESLOT, AND IT IS THE SAME TOOL — NOT A COPY OF IT.
@@ -116,8 +139,43 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
       // adder here would be a second way to write the same set.
       kCondSurfaceJourney => ConditionsHomeScreen(pregnancy: c),
 
+      // ---- Labour prep ----------------------------------------------------
+      //
+      // ⚠️ ALL FOUR ARE THE STAGE'S OWN SURFACES, already resolved by
+      // `surface_router.dart` for the hub that used to open them. Naming them
+      // again here rather than delegating keeps the door's list explicit — the
+      // wiring test walks it, and a surface that quietly stopped resolving
+      // upstream would otherwise fail on a phone rather than in CI.
+      kLabourSurfaceTimer => ContractionTrackerScreen(controller: c),
+      kLabourSurfaceBag => ReadyForBirthScreen(controller: c),
+      kLabourSurfaceCourse => BirthingClassesScreen(lang: c.language),
+
+      // ---- Belly & skin ---------------------------------------------------
+      kBsSurfaceChecker => const IngredientCheckerScreen(),
+      kBsSurfaceItching => BsItchingScreen(pregnancy: c),
+      kBsSurfaceRitual => BumpJourneyScreen(controller: c),
+
+      // ---- Nutrition & diet -----------------------------------------------
+      // ⚠️ THE SAME BODY THE TAB RENDERS, GIVEN A SCAFFOLD. A door surface has
+      // to resolve to a pushable screen as well as to an inline body — the
+      // wiring test builds both — and for this one the screen is the body plus
+      // chrome. `FoodCheckScreen` is still the standalone checker; this is the
+      // folded pair the brief asks for.
+      kDietSurfaceCanIEat => _CanIEatScreen(pregnancy: c),
+      kDietSurfaceRecipes => const NutritionRecipesScreen(),
+      kDietSurfaceCharts => DietChartsScreen(pregnancy: c),
+      kDietSurfaceFasting => const FastingScreen(),
+      kDietSurfaceBigger => const NutrientsScreen(),
+      kDietSurfaceExperts => const _DieticiansScreen(),
+      kDietSurfaceQuestions => PvChecklistScreen(
+          checklist: pvChecklistById('diet_questions')!,
+          hue: 104,
+          pregnancy: c),
+
       kCondSurfaceQuestions => PvChecklistScreen(
-          checklist: pvChecklistById('condition_questions')!, hue: 186),
+          checklist: pvChecklistById('condition_questions')!,
+          hue: 186,
+          pregnancy: c),
 
       _ => null,
     };
@@ -125,11 +183,12 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
 /// Open one condition page directly. Used by a pinned flag's per-line taps.
 void openPvDoorConditionPage(
     BuildContext context, String conditionId, PregnancyController c) {
-  final entry = _conditionById(conditionId);
-  if (entry == null) return;
+  final screen =
+      pvDoorEntryScreen(PvDoorLibrary.condition, conditionId, c);
+  if (screen == null) return;
   Navigator.of(context).push(MaterialPageRoute<void>(
     settings: RouteSettings(name: 'conditions/$conditionId'),
-    builder: (_) => ConditionDetailScreen(entry: entry, pregnancy: c),
+    builder: (_) => screen,
   ));
 }
 
@@ -151,6 +210,15 @@ Widget? pvDoorInlineToolFor(String id, PregnancyController c) => switch (id) {
       // question changes what the whole area offers, and a door that skipped it
       // would bypass something the screen exists to ask.
       kCondSurfaceFind => ConditionsHomeBody(pregnancy: c),
+      // ⚠️ THE FOOD CHECKER AND CRAVINGS, FOLDED. The brief's own call — same
+      // "can I have this" question, two kinds of object. See `CanIEatBody`.
+      kDietSurfaceCanIEat => CanIEatBody(pregnancy: c),
+      // ⚠️ THE FOUR PAID TIERS, RENDERED RATHER THAN RE-CARDED. Keeping the
+      // tiers exactly as they are is easiest to guarantee by not retyping them.
+      kDietSurfaceExperts => const diet.ExpertOptionsBlock(),
+      // ⚠️ THE KEEPSAKE IS THE TAB. `BumpJourneyScreen` is a Scaffold, so the
+      // inline form is its body — see `BumpJourneyBody`.
+      kBsSurfaceRitual => BumpJourneyBody(controller: c),
       _ => null,
     };
 
@@ -197,44 +265,28 @@ void openPvDoorTile(
       // Null only on the coming-soon form, which returned above.
       if (surfaceId != null) openPvDoorSurface(context, surfaceId, c);
 
-    // ---- one scan, on the page the stage already ships ----------------------
-    case PvDoorScanTile(:final scanId):
-      final scan = _scanById(scanId);
-      if (scan == null) return; // caught by the wiring test, never by a user
-      Navigator.of(context).push(MaterialPageRoute<void>(
-        // ⚠️ THE SCAN PAGE'S OWN ROUTE NAME, unchanged from when it was reached
-        // through the hub. Ask Veda's context comes off this.
-        settings: const RouteSettings(name: 'scans/detail'),
-        builder: (_) => ScanDetailScreen(scan: scan, pregnancy: c),
-      ));
-
-    // ---- one condition, on the page Complications owns ---------------------
-    case PvDoorConditionTile(:final conditionId):
-      final entry = _conditionById(conditionId);
-      if (entry == null) return; // caught by the wiring test, never by a user
-      Navigator.of(context).push(MaterialPageRoute<void>(
-        // ⚠️ THE PAGE'S OWN ROUTE NAME, unchanged from when it was reached
-        // through the conditions home. Ask Veda's context comes off this, and
-        // so does the single-source claim: there is one route per condition,
-        // however many doors point at it.
-        settings: RouteSettings(name: 'conditions/$conditionId'),
-        builder: (_) => ConditionDetailScreen(entry: entry, pregnancy: c),
-      ));
-
-    // ---- one finding, on the report-shaped page Scans owns -----------------
+    // ---- one page from a library the app already ships ---------------------
     //
-    // ⚠️ THE SECOND LIBRARY, DELIBERATELY. See
-    // `docs/PREGNANCY-DOOR-BUILD.md` §4a — one page per QUESTION, not one page
-    // per word. Complications links here for the two subjects it does not own
-    // rather than growing a copy of them.
-    case PvDoorFindingTile(:final findingId):
-      final finding = _findingById(findingId);
-      if (finding == null) return;
+    // ⚠️ ONE CASE FOR NINE LIBRARIES. This replaced three near-identical cases
+    // and stopped six more being written — see `PvDoorLibrary`. The route name
+    // is the page's own, unchanged from however it was reached before, because
+    // Ask Veda's stage routing and the FAB's suppression list both read it.
+    case PvDoorEntryTile(:final library, :final entryId):
+      final screen = pvDoorEntryScreen(library, entryId, c);
+      if (screen == null) return; // caught by the wiring test, never by a user
       Navigator.of(context).push(MaterialPageRoute<void>(
-        settings: RouteSettings(name: 'report/$findingId'),
-        builder: (_) =>
-            ReportArticleScreen(finding: finding, controller: c),
+        settings: RouteSettings(name: pvDoorEntryRoute(library, entryId)),
+        builder: (_) => screen,
       ));
+
+    // ---- a film that does not exist yet ------------------------------------
+    //
+    // ⚠️ UNREACHABLE, AND DELIBERATELY PRESENT. `comingSoon` is true on every
+    // video tile, so `openPvDoorTile` returns before the switch. The case
+    // exists because the union is sealed and the compiler demands it — and
+    // because the day a film lands, this is where it plays.
+    case PvDoorVideoTile():
+      return;
 
     // ---- reading ------------------------------------------------------------
     case PvDoorGuideTile(:final readId, :final atHeading):
@@ -276,29 +328,106 @@ void openPvDoorRead(
   ));
 }
 
-/// The condition entry for an id, or null.
-ConditionEntry? _conditionById(String id) {
-  for (final e in kAllConditions) {
-    if (e.id == id) return e;
+/// The screen one library entry opens, or null when the id is not in it.
+///
+/// ⚠️ NULL IS A REAL ANSWER AND THE WIRING TEST MAKES IT UNREACHABLE. A bad id
+/// opens nothing rather than guessing at a near match — a wrong page is worse
+/// than none, because it looks like it worked.
+Widget? pvDoorEntryScreen(
+    PvDoorLibrary library, String id, PregnancyController c) {
+  switch (library) {
+    case PvDoorLibrary.scan:
+      for (final s in kTestsScans) {
+        if (s.id == id) return ScanDetailScreen(scan: s, pregnancy: c);
+      }
+    case PvDoorLibrary.condition:
+      for (final e in kAllConditions) {
+        if (e.id == id) return ConditionDetailScreen(entry: e, pregnancy: c);
+      }
+    case PvDoorLibrary.finding:
+      for (final f in kReportFindings) {
+        if (f.id == id) {
+          return ReportArticleScreen(finding: f, controller: c);
+        }
+      }
+    case PvDoorLibrary.nutrient:
+      for (final n in kNutrientGuides) {
+        if (n.id == id) return NutrientDetailScreen(guide: n);
+      }
+    case PvDoorLibrary.dietStage:
+      for (final g in kTrimesterGuides) {
+        if (g.id == id) return diet.StageDetailScreen(guide: g);
+      }
+    case PvDoorLibrary.dietCondition:
+      for (final g in kConditionGuides) {
+        if (g.id == id) {
+          return diet.ConditionDetailScreen(guide: g, pregnancy: c);
+        }
+      }
+    case PvDoorLibrary.recipe:
+      for (final r in kRecipes) {
+        if (r.id == id) return RecipeDetailScreen(recipe: r);
+      }
+    case PvDoorLibrary.dietChart:
+      for (final ch in kDietCharts) {
+        if (ch.id == id) return DietChartScreen(chart: ch);
+      }
+    // ⚠️ THE ONLY LIBRARY WITH NO PER-ENTRY PAGE, AND THE BRIEF SAID TO SAY SO
+    // RATHER THAN BUILD ONE. `kFastingByOccasion` and `kFastingGeneral` are
+    // eight title-and-paragraph rows rendered INLINE on `FastingScreen`; they
+    // are not tappable and no detail screen exists.
+    //
+    // So the id is validated (a typo still fails the wiring test) and every
+    // fasting tile opens the screen that shows all eight. Eight cards each
+    // opening the same screen would be eight promises with one destination, so
+    // the door carries ONE card — see `pv_door_nutrition.dart`.
+    case PvDoorLibrary.bellySkin:
+      for (final page in kBsPages) {
+        if (page.id == id) return BsArticleScreen(page: page);
+      }
+    case PvDoorLibrary.fasting:
+      for (final t in [...kFastingByOccasion, ...kFastingGeneral]) {
+        if (t.id == id) return const FastingScreen();
+      }
   }
   return null;
 }
 
-/// The report finding for an id, or null.
-ReportFinding? _findingById(String id) {
-  for (final f in kReportFindings) {
-    if (f.id == id) return f;
-  }
-  return null;
-}
+/// The route name one library entry keeps.
+///
+/// ⚠️ EACH ONE IS THE PAGE'S OWN NAME FROM BEFORE THE DOORS EXISTED, because
+/// `global_ask_fab.dart` reads route names to pick which stage's Ask Veda opens
+/// and to suppress itself. Renaming one here would move the FAB's behaviour
+/// without anything failing.
+String pvDoorEntryRoute(PvDoorLibrary library, String id) =>
+    switch (library) {
+      PvDoorLibrary.scan => 'scans/detail',
+      PvDoorLibrary.condition => 'conditions/$id',
+      PvDoorLibrary.finding => 'report/$id',
+      PvDoorLibrary.nutrient => 'nutrition/nutrient/$id',
+      PvDoorLibrary.dietStage => 'nutrition/stage/$id',
+      PvDoorLibrary.dietCondition => 'nutrition/condition/$id',
+      PvDoorLibrary.recipe => 'nutrition/recipe/$id',
+      PvDoorLibrary.dietChart => 'nutrition/chart/$id',
+      PvDoorLibrary.fasting => 'nutrition/fasting/$id',
+      PvDoorLibrary.bellySkin => 'belly_skin/$id',
+    };
 
-/// The scan library entry for an id, or null.
-TestScanInfo? _scanById(String id) {
-  for (final s in kTestsScans) {
-    if (s.id == id) return s;
-  }
-  return null;
-}
+/// Whether a library id resolves at all. Used by the wiring test, which cannot
+/// build widgets for every entry on every door without a tester.
+bool pvDoorEntryResolves(PvDoorLibrary library, String id) => switch (library) {
+      PvDoorLibrary.scan => kTestsScans.any((e) => e.id == id),
+      PvDoorLibrary.condition => kAllConditions.any((e) => e.id == id),
+      PvDoorLibrary.finding => kReportFindings.any((e) => e.id == id),
+      PvDoorLibrary.nutrient => kNutrientGuides.any((e) => e.id == id),
+      PvDoorLibrary.dietStage => kTrimesterGuides.any((e) => e.id == id),
+      PvDoorLibrary.dietCondition => kConditionGuides.any((e) => e.id == id),
+      PvDoorLibrary.recipe => kRecipes.any((e) => e.id == id),
+      PvDoorLibrary.dietChart => kDietCharts.any((e) => e.id == id),
+      PvDoorLibrary.fasting =>
+        [...kFastingByOccasion, ...kFastingGeneral].any((e) => e.id == id),
+      PvDoorLibrary.bellySkin => kBsPages.any((e) => e.id == id),
+    };
 
 /// Whether a surface id opens anything at all. Used by the wiring test.
 bool pvDoorSurfaceResolves(String id) => switch (id) {
@@ -313,7 +442,98 @@ bool pvDoorSurfaceResolves(String id) => switch (id) {
       kCondSurfaceFind ||
       kCondSurfaceSameDay ||
       kCondSurfaceJourney ||
-      kCondSurfaceQuestions =>
+      kCondSurfaceQuestions ||
+      kDietSurfaceCanIEat ||
+      kDietSurfaceRecipes ||
+      kDietSurfaceCharts ||
+      kDietSurfaceFasting ||
+      kDietSurfaceBigger ||
+      kDietSurfaceExperts ||
+      kDietSurfaceQuestions ||
+      kBsSurfaceChecker ||
+      kBsSurfaceItching ||
+      kBsSurfaceRitual ||
+      kLabourSurfaceTimer ||
+      kLabourSurfaceBag ||
+      kLabourSurfaceCourse =>
         true,
       _ => false,
     };
+
+
+// -----------------------------------------------------------------------------
+//  Two small shells
+// -----------------------------------------------------------------------------
+//  ⚠️ THEY EXIST BECAUSE A SURFACE MUST RESOLVE BOTH WAYS. A door surface can
+//  be rendered inline on a tab AND pushed as a screen — the wiring test builds
+//  both for every surface a tile names — and two of the nutrition surfaces are
+//  bodies rather than screens. These give them chrome without giving them
+//  content: neither adds a word that is not already in the widget it wraps.
+
+class _CanIEatScreen extends StatelessWidget {
+  const _CanIEatScreen({required this.pregnancy});
+
+  final PregnancyController pregnancy;
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+        animation: V2PaletteStore.instance,
+        builder: (context, _) {
+          final p = V2PaletteStore.instance.current;
+          return Scaffold(
+            backgroundColor: p.ground,
+            appBar: AppBar(
+              backgroundColor: p.ground,
+              elevation: 0,
+              surfaceTintColor: Colors.transparent,
+              foregroundColor: p.ink1,
+              title: Text('Can I eat this?',
+                  style: pvFraunces(
+                      fontSize: 19,
+                      fontWeight: FontWeight.w600,
+                      color: p.ink1)),
+            ),
+            body: SafeArea(
+              top: false,
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(18, 4, 18, 32),
+                children: [CanIEatBody(pregnancy: pregnancy)],
+              ),
+            ),
+          );
+        },
+      );
+}
+
+class _DieticiansScreen extends StatelessWidget {
+  const _DieticiansScreen();
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+        animation: V2PaletteStore.instance,
+        builder: (context, _) {
+          final p = V2PaletteStore.instance.current;
+          return Scaffold(
+            backgroundColor: p.ground,
+            appBar: AppBar(
+              backgroundColor: p.ground,
+              elevation: 0,
+              surfaceTintColor: Colors.transparent,
+              foregroundColor: p.ink1,
+              title: Text('Our dieticians',
+                  style: pvFraunces(
+                      fontSize: 19,
+                      fontWeight: FontWeight.w600,
+                      color: p.ink1)),
+            ),
+            body: SafeArea(
+              top: false,
+              child: ListView(
+                padding: const EdgeInsets.fromLTRB(18, 8, 18, 32),
+                children: const [diet.ExpertOptionsBlock()],
+              ),
+            ),
+          );
+        },
+      );
+}

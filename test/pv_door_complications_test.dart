@@ -337,9 +337,11 @@ void main() {
   group('linking across the two libraries', () {
     test('the two finding tiles point at findings that exist', () {
       for (final t in door.allTiles) {
-        if (t is! PvDoorFindingTile) continue;
-        expect(kReportFindings.any((f) => f.id == t.findingId), isTrue,
-            reason: '"${t.title}" points at finding "${t.findingId}".');
+        if (t is! PvDoorEntryTile || t.library != PvDoorLibrary.finding) {
+          continue;
+        }
+        expect(kReportFindings.any((f) => f.id == t.entryId), isTrue,
+            reason: '"${t.title}" points at finding "${t.entryId}".');
       }
     });
 
@@ -350,7 +352,8 @@ void main() {
       // second copy the brief forbids, wearing a different class name.
       final linked = [
         for (final t in door.allTiles)
-          if (t is PvDoorFindingTile) t.findingId,
+          if (t is PvDoorEntryTile && t.library == PvDoorLibrary.finding)
+            t.entryId,
       ];
       expect(linked, ['low_lying_placenta', 'nuchal_cord']);
       for (final id in linked) {
@@ -362,9 +365,11 @@ void main() {
 
     test('every condition tile points at a condition that exists', () {
       for (final t in door.allTiles) {
-        if (t is! PvDoorConditionTile) continue;
-        expect(kAllConditions.any((c) => c.id == t.conditionId), isTrue,
-            reason: '"${t.title}" points at "${t.conditionId}".');
+        if (t is! PvDoorEntryTile || t.library != PvDoorLibrary.condition) {
+          continue;
+        }
+        expect(kAllConditions.any((c) => c.id == t.entryId), isTrue,
+            reason: '"${t.title}" points at "${t.entryId}".');
       }
     });
   });

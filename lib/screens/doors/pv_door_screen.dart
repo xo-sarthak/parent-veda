@@ -253,7 +253,22 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                             letterSpacing: -0.45,
                             color: p.ink1))),
                     const SizedBox(height: 13),
-                    if (group.layout == PvDoorLayout.stack)
+                    // ⚠️ A SECTION HOLDING ONE TILE IS NEVER A RAIL, WHATEVER
+                    // THE TAB'S LAYOUT SAYS. The comment below is the whole
+                    // argument and it does not stop at the tab boundary: a
+                    // rail says "there is more sideways", and a rail of one
+                    // says it while being visibly wrong — a 142pt card with
+                    // two-thirds of the row empty beside it, which reads as
+                    // content that failed to load. Seen on a phone on four
+                    // sections across three doors, 2026-09-10.
+                    //
+                    // ⚠️ AND IT BUYS THE BLURB BACK. A rail card cannot afford
+                    // one; a wide row shows it. So the sections that lose the
+                    // least by not being rails — the single-tool errands, the
+                    // one checklist before an appointment — are exactly the
+                    // ones that most needed the second line.
+                    if (group.layout == PvDoorLayout.stack ||
+                        section.tiles.length == 1)
                       // ⚠️ FULL-WIDTH ROWS, NOT A RAIL. A rail says "there is
                       // more sideways"; on a tab with a tool above it and two
                       // errands below, there is not.
@@ -301,7 +316,22 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                   // once" means once per page, not once per tab — a line that
                   // appears only under the last tab is a line most people never
                   // see.
-                  if (page.closingLine case final line?) ...[
+                  //
+                  // ⚠️ EXCEPT ON A TAB THAT ALREADY SAYS IT. Labour prep's area
+                  // note and its closing line are literally the same constant,
+                  // so its Talk tab printed one sentence at the top of the
+                  // screen and again at the bottom. Seen on a phone,
+                  // 2026-09-10.
+                  //
+                  // The check is identity, not similarity, and that is
+                  // deliberate: an engine cannot tell that two differently
+                  // worded cautions mean the same thing, and one that guessed
+                  // would start hiding lines somebody wrote on purpose. Where
+                  // the words merely overlap, the fix belongs in the data —
+                  // see `pv_door_nutrition.dart`, which dropped its closing
+                  // line for that reason.
+                  if (page.closingLine case final line?
+                      when line != group.note) ...[
                     pvDoorPad(Text(line,
                         style: pvFraunces(
                             fontSize: 15.5,
@@ -525,12 +555,26 @@ IconData pvDoorFormatIcon(PvDoorFormat format) => switch (format) {
       // A book with a bookmark rather than a plain page: something you come
       // back to and use, not something you read once.
       PvDoorFormat.guide => Icons.menu_book_outlined,
-      PvDoorFormat.read => Icons.search_rounded,
+      // ⚠️ A PAGE WITH A LENS ON IT, NOT A BARE LENS. A read is a lookup, so
+      // the magnifier was the reasoning — but on Belly & skin, where nineteen
+      // of twenty-two cards are reads, the mark paints at 96pt behind every
+      // one of them, and a wall of bare magnifying glasses reads as a wall of
+      // search boxes. Seen on a phone, 2026-09-10.
+      //
+      // The general shape: an icon chosen for what it MEANS has to be checked
+      // for what it LOOKS LIKE at the size and the repetition it actually
+      // ships at. `find_in_page` keeps the lookup idea and puts a document
+      // under it, so the card still says "something written".
+      PvDoorFormat.read => Icons.find_in_page_outlined,
       PvDoorFormat.mythFact => Icons.balance_rounded,
       PvDoorFormat.checklist => Icons.checklist_rtl_rounded,
       // A message rather than a calendar: the promise is a conversation, not a
       // slot.
       PvDoorFormat.talk => Icons.chat_bubble_outline_rounded,
+      // A plate, not a book. The chip promises the app's own recipe page with
+      // its serving scaler, and a book over a dish is the wrong promise.
+      PvDoorFormat.recipe => Icons.restaurant_outlined,
+      PvDoorFormat.video => Icons.play_circle_outline_rounded,
     };
 
 /// One card on a rail.
@@ -675,6 +719,13 @@ class _RailCard extends StatelessWidget {
 /// ⚠️ IT SHOWS THE BLURB AND THE RAIL CARD DOES NOT. There is room here, and on
 /// a tab with two or three rows the extra line is what stops them reading as an
 /// afterthought under the tool above.
+///
+/// ⚠️ THE DRAWING LIVES IN `PvDoorRow`, IN THE CHROME FILE, AND THIS IS ONLY
+/// THE ADAPTER. A screen embedded in a door — `ConditionsHomeBody` — needs the
+/// same row and holds `ConditionEntry`s rather than `PvDoorTile`s. Keeping the
+/// paint in a widget that takes plain values means the door's language is
+/// available to a caller that has never heard of the door engine, and the two
+/// cannot drift into looking almost the same.
 class _WideTile extends StatelessWidget {
   const _WideTile({
     required this.tile,
@@ -689,76 +740,16 @@ class _WideTile extends StatelessWidget {
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
-    final tint = v2BlockTint(hue, p);
-    final deep = HSLColor.fromColor(tint)
-        .withSaturation(0.46)
-        .withLightness(0.34)
-        .toColor();
-    final soon = tile.comingSoon;
-
-    return InkWell(
-      onTap: soon ? null : onTap,
-      borderRadius: BorderRadius.circular(18),
-      child: Opacity(
-        opacity: soon ? 0.62 : 1,
-        child: PvDoorCard(
-          p: p,
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Container(
-              width: 38,
-              height: 38,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: tint,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child:
-                  Icon(pvDoorFormatIcon(tile.format), size: 18, color: deep),
-            ),
-            const SizedBox(width: 13),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(tile.title,
-                      style: pvFraunces(
-                          fontSize: 16.5,
-                          fontWeight: FontWeight.w600,
-                          height: 1.25,
-                          letterSpacing: -0.3,
-                          color: p.ink1)),
-                  const SizedBox(height: 4),
-                  Text(tile.blurb,
-                      style: pvManrope(
-                          fontSize: 13, height: 1.45, color: p.ink2)),
-                  const SizedBox(height: 9),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                    decoration: BoxDecoration(
-                      color: p.ground,
-                      borderRadius: BorderRadius.circular(999),
-                      border: Border.all(color: p.line),
-                    ),
-                    child: Text(soon ? 'Coming soon' : tile.format.label,
-                        style: pvManrope(
-                            fontSize: 9.5,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.8,
-                            color: p.ink3)),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(width: 6),
-            if (!soon)
-              Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
-          ]),
-        ),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => PvDoorRow(
+        p: p,
+        hue: hue,
+        icon: pvDoorFormatIcon(tile.format),
+        chip: tile.comingSoon ? 'Coming soon' : tile.format.label,
+        title: tile.title,
+        blurb: tile.blurb,
+        dimmed: tile.comingSoon,
+        onTap: onTap,
+      );
 }
 
 /// The pinned red flag.

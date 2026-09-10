@@ -53,9 +53,13 @@
 import '../../localization/app_language.dart';
 import '../../models/pv_read.dart';
 import 'pregnancy_reads_conditions.dart';
+import 'pregnancy_reads_labour.dart';
+import 'pregnancy_reads_nutrition.dart';
 import 'pregnancy_reads_scans.dart';
 
 export 'pregnancy_reads_conditions.dart';
+export 'pregnancy_reads_labour.dart';
+export 'pregnancy_reads_nutrition.dart';
 export 'pregnancy_reads_scans.dart';
 
 /// Every pregnancy read, in door order.
@@ -66,6 +70,8 @@ export 'pregnancy_reads_scans.dart';
 final List<PvRead> kPregnancyReads = [
   ...kPregnancyReadsScans,
   ...kPregnancyReadsConditions,
+  ...kPregnancyReadsNutrition,
+  ...kPregnancyReadsLabour,
 ];
 
 /// Lookup by id. Null is a real answer — the door router opens nothing rather

@@ -102,7 +102,19 @@ void main() {
       expect(i, greaterThan(-1));
       final body = home.substring(i, i + 260);
 
-      expect(body.contains('NutritionStageScreen(initialTab: 1)'), isTrue,
+      // ⚠️ IT MATCHES THE ARGUMENT, NOT THE WHOLE CALL — CHANGED 2026-09-10.
+      // This read `NutritionStageScreen(initialTab: 1)` as one literal and
+      // broke the day the screen gained a `pregnancy:` parameter, which is a
+      // test failing over a signature rather than over the behaviour it names.
+      //
+      // The claim is that the flagged door lands on the CONDITION tab, and
+      // `initialTab: 1` is the whole of that claim. Asserting both halves
+      // separately survives the next parameter and still fails if the tab
+      // index changes or the screen is swapped.
+      expect(body.contains('NutritionStageScreen('), isTrue,
+          reason: 'The flagged door must still open the nutrition stage '
+              'screen.');
+      expect(body.contains('initialTab: 1'), isTrue,
           reason: 'The flagged door must open the "By condition" tab, not the '
               'trimester tab she would have to leave.');
     });

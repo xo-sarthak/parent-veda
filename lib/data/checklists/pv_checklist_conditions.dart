@@ -34,6 +34,7 @@
 //  red-flag line."* A checklist item is a label.
 // =============================================================================
 
+import '../../services/pregnancy_controller.dart';
 import '../conditions_data.dart';
 import 'pv_checklist.dart';
 
@@ -43,7 +44,7 @@ import 'pv_checklist.dart';
 /// one she added first in the heading, and the questions below serve both — see
 /// the note above on why they are condition-agnostic. Listing two in a title
 /// makes a heading that wraps to three lines and says less.
-String? _addedConditionName() {
+String? _addedConditionName(PregnancyController _) {
   final added = ConditionsStore.instance.addedConditions;
   if (added.isEmpty) return null;
   // ⚠️ `.en`, NOT `.now`. This is composed into a title and into a shared

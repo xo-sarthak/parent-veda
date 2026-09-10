@@ -35,6 +35,7 @@ import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
 import '../../data/checklists/pv_checklist.dart';
+import '../../services/pregnancy_controller.dart';
 import '../../services/pv_checklist_store.dart';
 import '../../services/pv_checklist_subjects.dart';
 import '../../theme/pv_fonts.dart';
@@ -46,7 +47,13 @@ class PvChecklistScreen extends StatefulWidget {
     super.key,
     required this.checklist,
     required this.hue,
+    required this.pregnancy,
   });
+
+  /// ⚠️ PASSED IN, NOT REACHED FOR. `PvChecklist.subject` needs it — the diet
+  /// list reads her week — and `PregnancyController` is deliberately not a
+  /// singleton in this app.
+  final PregnancyController pregnancy;
 
   final PvChecklist checklist;
 
@@ -89,7 +96,7 @@ class _PvChecklistScreenState extends State<PvChecklistScreen> {
     }
     if (lines.isEmpty) return;
 
-    final subject = list.subject?.call();
+    final subject = list.subject?.call(widget.pregnancy);
     final header = subject == null
         ? list.shareHeader
         : '${list.shareHeader} — $subject';
@@ -113,7 +120,7 @@ class _PvChecklistScreenState extends State<PvChecklistScreen> {
           final p = V2PaletteStore.instance.current;
           final store = PvChecklistStore.instance;
           final count = store.count(list.id);
-          final subject = list.subject?.call();
+          final subject = list.subject?.call(widget.pregnancy);
 
           return PvDoorToolScaffold(
             hue: widget.hue,

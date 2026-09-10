@@ -98,7 +98,7 @@ class NutritionHomeScreen extends StatelessWidget {
                   title: 'Food for my stage',
                   blurb: 'By trimester, or by a condition you are managing.',
                   onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => const NutritionStageScreen(),
+                    builder: (_) => NutritionStageScreen(pregnancy: pregnancy),
                   )),
                 ),
                 const SizedBox(height: 10),
