@@ -291,6 +291,11 @@ class _Search extends StatelessWidget {
                 // different border" is not an override of "fill".
                 filled: false,
                 border: InputBorder.none,
+                // ⚠️ AND THE FOCUSED ONE. `border` is the fallback; the theme
+                // sets `focusedBorder` separately, so a focused field grew a
+                // purple ring inside its own white pill. Seen on a phone.
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
                 hintText: 'What are you craving?',
                 hintStyle: pvManrope(fontSize: 14, color: p.ink3),
               ),

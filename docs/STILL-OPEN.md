@@ -5479,3 +5479,133 @@ somebody's decision:**
 (they explain nothing clinical, but they are copy on a birth screen); and a
 decision on whether the summary should also offer "copy" beside "share" for
 people who paste it into a hospital's own form.
+
+---
+
+## 39.0 Sleep, the first parenting door — 2026-09-11
+
+Built from `ParentVeda_Sleep_rebuild.pdf`. The CONTENT is the parenting
+section engine (`PpSection` / `pp_content.dart`), rebuilt to the brief; the
+SHELL she opens it through is a parenting copy of the door the TTC and
+pregnancy doors wear — decided on a phone the same day, after the brief's
+own landing-and-library shape was built and seen (*"i need exact same
+structure ui as other doors"*). Nothing in the pregnancy engine
+(`pv_door_*`, `lib/screens/doors/`) was touched or imported; parenting has
+`lib/data/doors/pp_door_data.dart` + `pp_door_sleep.dart` and
+`lib/screens/post_pregnancy/doors/`, with the coverflow copied a third time
+and its seam finally taken (plain values, not a model).
+`test/pp_sleep_door_test.dart` holds both the brief's map and the shell as
+assertions.
+
+⚠️ **The brief said "do NOT flatten into pregnancy-style sub-tabs."** The
+user overrode that for the shell only, having seen both. The seven
+collections are intact as the section's areas; the door groups them on five
+tabs (`pp_door_sleep.dart` says which and why). The brief's landing items
+survive as tool rows (tracker on tab 1, Sleep Sounds on tab 5) and the
+closing row (Talk to a sleep expert, under every tab).
+
+### 39.1 What changed, in one list
+
+* **The age rule.** `PpSection.autoScope` (Sleep only) removes the band
+  chips and locks the library to her band; the landing says "FOR {name} ·
+  {band}" instead of offering a chooser. `rowMonths` on `PpTable` (her row
+  hoisted, tagged) and `PpChartCard` (marked in place) makes the night-waking
+  table, the naps-by-age table and the regression timeline lead with her
+  row. The "Is she sleeping enough?" tool and its six "check the range for
+  her exact age" links are gone (commented). The five age charts are one
+  title, "Her sleep right now"; auto-scope shows one.
+* **Four new block types** in `pp_content.dart`: `PpCarousel` (full-screen
+  story, `pp_story_screen.dart`, swipe-up opens a linked page),
+  `PpInteractive` (night step-through and walk-through checklist,
+  `pp_interactive_screen.dart`), `PpAnimation` and `PpIllustration` (drawn in
+  code, `pp_content_art.dart`). Three page flags: `toolSurfaceId`,
+  `linkedOnly`, `pinned`. All documented in `docs/PP-SECTION-PATTERN.md`.
+* **Reformats:** cycles → animation; settling, malish, swaddling → video
+  (three new slots); 3am → night interactive; sleep space → checklist
+  interactive; bed-sharing and back-to-sleep → labelled illustrations; the
+  worry set and the music myths → carousels.
+* **New:** wake windows tool (`pp_wake_windows`, `pp_wake_windows_screen.dart`,
+  numbers pinned to the tracker's by test), the overtired baby, sleep away
+  from home, dummy/soother, and *Where we stand on sleep training* — pinned,
+  with the push-back script. Night weaning and own cot/room already existed
+  under other titles and were moved and retitled, not rewritten.
+* **Merged/cut:** "The hour before bed" folded into the routine page; the
+  checker cut; "Log her sleep" no longer a tool row because it IS the hub's
+  second door. Sleep Sounds stays the one tool.
+* **Single source:** the collection 7 library page is now generated from
+  `kPpSoundCategories`, so the catalogue and the player cannot disagree. The
+  tanpura drone points at Garbh Sanskar's `raga_drone.wav` — the brief's
+  "shares assets with Shravan" — and is the first track that actually plays.
+
+### 39.2 Needs a decision
+
+* ~~Format badges on the hub landing~~ — moot: the Sleep tile opens the door
+  directly (`pp_home_v3._openBracket` consults `kPpDoors` before the hub),
+  and every door card and row carries its chip. `kPpSleep` (the hub config)
+  stays as the door's hero and closing source and is not rendered for Sleep.
+  The `PpSectionScreen` library for Sleep is likewise unreachable rather than
+  deleted: the router sends `pp_section/parenting_sleep[/area]` to the door,
+  on the tab that holds the area.
+* **The photo hero.** Nearly every "sleeping baby" stock photograph shows the
+  baby on her front, which is the one thing collection 5 says never to do.
+  The one in use (Hu Chen, Unsplash) is a close face and fist with the
+  position out of frame. Swap the URL in `pp_door_sleep.dart` if a better one
+  turns up; the rule in `PpDoor.heroImageUrl` is the constraint.
+* **The 4-month regression is now 3–6 months only** (was also newborn), and
+  8–10 months / toddler wobbles are likewise narrowed to their own bands,
+  because the brief says "the other regressions surface at their ages". The
+  cost: a parent at 2½ months cannot read ahead about the thing that hits at
+  3½. If that is wrong, the fix is the band tag, one line each.
+* **`pp_sleep_check` still resolves in the router.** Feeding's food chart
+  shares the screen, so the route stays; nothing in Sleep points at it. Leave,
+  or retire the Sleep half of the screen's copy.
+* **The other nine sections keep their age chips.** The brief says the age
+  rule is app-wide; it is one `autoScope: true` per section when each
+  section's own rebuild arrives, plus `rowMonths` on their age-arc tables.
+
+### 39.3 Owed
+
+* **Films for the new slots:** `sleep/where_we_stand` (3 min),
+  `sleep/malish_demo` (9 min), `sleep/swaddle_demo` (5 min). Plus the two the
+  brief calls "coming soon" that already had slots: the three-parents night
+  waking film and the regressions explainer.
+* **Artwork, optionally.** The cycle animation and both illustrations are
+  drawn in code and are the finished state; `PpIllustration.asset` replaces a
+  painter with a file and keeps the legend.
+* **Clinical read of the seven new pieces**, in particular the wake-window
+  spans past 12 months (the tracker only goes that far; the tool extends to
+  five years), the dummy page, and the stance page's summary of the
+  sleep-training evidence.
+* **Tracks the old library page listed and the player does not:** Aaja
+  Nindiya Aaja, Lalla Lalla Lori, Thaai Thaai, Raag Nilambari (present),
+  Raag Bageshri, Bansuri, several nature loops and stories. They are in the
+  kept-for-revert comment at the foot of `pp_sleep_content.dart`; if wanted,
+  they are added to `pp_sounds_data.dart` and appear on both screens.
+
+### 38.7 "Can I eat this?" rebuilt from the design — 2026-09-11
+
+The first Claude Design round-trip on the pregnancy doors. The prototype
+(`Can I Eat This.dc.html`, project 9df51a8c…) was read through `DesignSync`,
+checked against the brief's must-nots and the two models, and rebuilt as
+`lib/screens/nutrition/can_i_eat_body.dart` — self-contained now, no longer a
+stack of the two old bodies. Seven widget tests hold the design's promises.
+
+**What the design changed that is behaviour, not skin:** search filters in
+place (was a full-screen delegate); a food row expands in place (was a push);
+a craving expands with its recipe as a fact block (was a push). All three
+were the brief's own "not a new screen unless you can argue for it".
+
+**Two departures, both in the file header:** the food row also shows `myth`;
+the prototype's footer disclaimer is dropped because the door renders one.
+
+**Now a question:** `FoodCheckScreen` and `CravingsScreen` still exist as
+standalone screens (Tools hub, global search) and still wear the old
+presentation — a push-per-row list with emoji. Two UIs for one question.
+Either point them at the new body (and retire `FoodCheckBody`/`CravingsBody`
+— comment out, never delete) or accept the difference as "the door is the new
+front". Your call; the door tab does not depend on it.
+
+**Not owed, worth knowing:** the long-tail verdicts and foods the prototype
+placed to make the grouping legible are NOT what shipped — the body reads the
+real library, so nothing the design invented reached the app. The category
+names matched the library exactly.

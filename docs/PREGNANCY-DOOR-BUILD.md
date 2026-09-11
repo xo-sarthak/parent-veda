@@ -526,6 +526,13 @@ of them was the kind a test finds, and each is a shape worth carrying:
   `app_theme.dart` sets `filled: true` app-wide, and `border` is not `fill`, so
   each painted a grey rectangle inside its own white pill and read as two
   controls. A theme default applies unless *that* property is overridden.
+  And `border` is only the fallback: the theme sets `focusedBorder` on its
+  own, so the same field grew a purple ring the moment it was tapped. A
+  self-chromed `TextField` needs `filled: false`, `border`, `enabledBorder`
+  AND `focusedBorder` cleared — four properties, not one.
+* **A `Container` with `alignment` and no width takes the whole row.** Inside
+  a `Wrap`, that is one chip per line. Content-sized pills use a min-size
+  `Row` as the child, not `alignment`.
 
 
 ## 21. A tool that records a preference is the "prepare" case of ownership

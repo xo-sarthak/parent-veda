@@ -400,6 +400,10 @@ class _TextBoxState extends State<_TextBox> {
           // search field for the lesson.
           filled: false,
           border: InputBorder.none,
+          // `border` is the fallback; the theme sets `focusedBorder`
+          // separately, so without these a focused field grows a ring.
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
           hintText: widget.question.hint,
           hintStyle: pvManrope(fontSize: 13, height: 1.5, color: p.ink3),
         ),
