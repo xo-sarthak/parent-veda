@@ -279,6 +279,11 @@ void main() {
       // opens video-then-steps still fails.
       for (final (s, _, p) in _allPages()) {
         if (p.toolSurfaceId != null) continue; // a tool page renders no blocks
+        // A carousel or interactive page IS its block: the card opens the
+        // slides or the step-through directly, so there is no intro to open
+        // with. `test/pp_sleep_door_test.dart` asserts the shape.
+        final f = p.format?.toUpperCase();
+        if (f == 'CAROUSEL' || f == 'INTERACTIVE') continue;
         final rest = [
           for (final b in p.orderedBlocks) if (b is! PpVideoSlot) b
         ];

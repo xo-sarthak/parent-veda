@@ -141,26 +141,9 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
 
   // ---- navigation -----------------------------------------------------------
 
-  void _openPage(BuildContext context, PpPage page) {
-    if (page.toolSurfaceId != null) {
-      widget.onSurface(context, page.toolSurfaceId!);
-      return;
-    }
-    Navigator.of(context).push(MaterialPageRoute<void>(
-      settings: RouteSettings(name: 'pp/${section.id}/page/${page.id}'),
-      builder: (_) => PpContentPage(
-        page: page,
-        onSurface: widget.onSurface,
-        onPage: _openPageById,
-      ),
-    ));
-  }
-
-  void _openPageById(BuildContext context, String pageId) {
-    final target = section.pageById(pageId);
-    if (target == null) return;
-    _openPage(context, target);
-  }
+  /// One opener for every path — see `ppOpenPage`.
+  void _openPage(BuildContext context, PpPage page) =>
+      ppOpenPage(context, section, page, onSurface: widget.onSurface);
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(

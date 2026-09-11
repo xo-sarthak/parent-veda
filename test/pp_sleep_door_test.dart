@@ -222,6 +222,32 @@ void main() {
   });
 
   group('the reformats are real, not relabelled', () {
+    test('a carousel or interactive page is only its block: no page between the tap and the thing', () {
+      for (final p in _sleep.allPages) {
+        final f = p.format?.toUpperCase();
+        if (f == 'CAROUSEL') {
+          expect(p.blocks, hasLength(1), reason: '${p.id} carries prose nobody can reach');
+          expect(p.blocks.single, isA<PpCarousel>(), reason: p.id);
+        }
+        if (f == 'INTERACTIVE') {
+          expect(p.blocks, hasLength(1), reason: '${p.id} carries prose nobody can reach');
+          expect(p.blocks.single, isA<PpInteractive>(), reason: p.id);
+        }
+      }
+    });
+
+    test('a slide that links to a page links to a real one', () {
+      for (final p in _sleep.allPages) {
+        for (final c in p.blocks.whereType<PpCarousel>()) {
+          for (final card in c.cards) {
+            if (card.pageId == null) continue;
+            expect(_sleep.pageById(card.pageId!), isNotNull,
+                reason: '${p.id}: slide links to "${card.pageId}"');
+          }
+        }
+      }
+    });
+
     test('a VIDEO page has a video slot at its top', () {
       for (final id in ['gentle_settling', 'malish', 'swaddling', 'sleep_training_stance', 'bedtime_routine']) {
         final p = _page(id);
@@ -235,8 +261,6 @@ void main() {
       expect(i.kind, PpInteractiveKind.night);
       expect(i.items, hasLength(7), reason: 'the same seven steps');
       expect(_sleep.pageById(i.closingPageId!), isNotNull);
-      expect(_page('at_3am').blocks.whereType<PpSteps>(), isEmpty,
-          reason: 'the list is gone from the live page (kept in a comment)');
     });
 
     test('the sleep space is a walk-through checklist, in two groups', () {

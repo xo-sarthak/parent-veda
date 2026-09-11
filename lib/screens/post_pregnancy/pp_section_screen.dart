@@ -41,6 +41,71 @@ import '../v2/v2_palette.dart';
 import 'pp_age_bands.dart';
 import 'pp_child_profile.dart';
 import 'pp_content.dart';
+import 'pp_interactive_screen.dart';
+import 'pp_story_screen.dart';
+
+/// ⚠️ THE ONE WAY A PAGE OPENS, FROM ANY SCREEN.
+///
+/// A tool page opens its surface. A CAROUSEL page opens the story screen. An
+/// INTERACTIVE page opens the step-through. Everything else opens as content.
+/// The TTC doors state the rule this exists to keep: "tapping a piece of
+/// content should open that piece of content, full screen, every time" — a
+/// Carousel chip that lands on prose with a second card to tap is a chip that
+/// lied. It was true on the door and false on the library screen for one
+/// build; one function is how it stays true on both, and on the next screen
+/// somebody adds.
+void ppOpenPage(
+  BuildContext context,
+  PpSection section,
+  PpPage page, {
+  void Function(BuildContext, String)? onSurface,
+}) {
+  void openById(BuildContext ctx, String id) {
+    final target = section.pageById(id);
+    if (target == null) return;
+    ppOpenPage(ctx, section, target, onSurface: onSurface);
+  }
+
+  if (page.toolSurfaceId != null) {
+    onSurface?.call(context, page.toolSurfaceId!);
+    return;
+  }
+  final format = page.format?.toUpperCase();
+  final months = ChildProfileStore.instance.ageInMonths;
+  for (final b in page.blocks) {
+    if (b is PpCarousel && format == 'CAROUSEL') {
+      final cards = b.cardsFor(months);
+      if (cards.isEmpty) break;
+      Navigator.of(context).push(MaterialPageRoute<void>(
+        settings: RouteSettings(name: 'pp/${section.id}/story/${page.id}'),
+        builder: (_) => PpStoryScreen(
+          title: b.eyebrow ?? page.title,
+          cards: cards,
+          hue: b.hue,
+          coverTitle: b.coverTitle,
+          coverBlurb: b.coverBlurb,
+          onPage: openById,
+        ),
+      ));
+      return;
+    }
+    if (b is PpInteractive && format == 'INTERACTIVE') {
+      Navigator.of(context).push(MaterialPageRoute<void>(
+        settings: RouteSettings(name: 'pp/${section.id}/interactive/${page.id}'),
+        builder: (_) => PpInteractiveScreen(block: b, onPage: openById),
+      ));
+      return;
+    }
+  }
+  Navigator.of(context).push(MaterialPageRoute<void>(
+    settings: RouteSettings(name: 'pp/${section.id}/page/${page.id}'),
+    builder: (_) => PpContentPage(
+      page: page,
+      onSurface: onSurface,
+      onPage: openById,
+    ),
+  ));
+}
 
 /// One area within a section: a question, and the pages that answer it.
 class PpArea {
@@ -653,22 +718,8 @@ class _PpSectionScreenState extends State<PpSectionScreen> {
     ));
   }
 
-  void _openPage(BuildContext context, PpPage p) {
-    // A page that is a tool opens the tool. Same rule as a tool AREA, one
-    // level down — see `PpPage.toolSurfaceId`.
-    if (p.toolSurfaceId != null) {
-      widget.onSurface?.call(context, p.toolSurfaceId!);
-      return;
-    }
-    Navigator.of(context).push(MaterialPageRoute<void>(
-      settings: RouteSettings(name: 'pp/${s.id}/page/${p.id}'),
-      builder: (_) => PpContentPage(
-        page: p,
-        onSurface: widget.onSurface,
-        onPage: (ctx, id) => _openPageById(ctx, id),
-      ),
-    ));
-  }
+  void _openPage(BuildContext context, PpPage p) =>
+      ppOpenPage(context, s, p, onSurface: widget.onSurface);
 
   /// ⚠️ RESOLVES A `PpLink(pageId:)` AGAINST THIS SECTION.
   ///
@@ -705,20 +756,8 @@ class _AreaScreen extends StatelessWidget {
   /// A tool page opens its surface; any other page opens as content. The
   /// same branch `_PpSectionScreenState._openPage` takes, kept here because
   /// this screen pushes its own routes.
-  void _open(BuildContext context, PpPage page) {
-    if (page.toolSurfaceId != null) {
-      onSurface?.call(context, page.toolSurfaceId!);
-      return;
-    }
-    Navigator.of(context).push(MaterialPageRoute<void>(
-      settings: RouteSettings(name: 'pp/${section.id}/page/${page.id}'),
-      builder: (_) => PpContentPage(
-        page: page,
-        onSurface: onSurface,
-        onPage: onPage,
-      ),
-    ));
-  }
+  void _open(BuildContext context, PpPage page) =>
+      ppOpenPage(context, section, page, onSurface: onSurface);
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(

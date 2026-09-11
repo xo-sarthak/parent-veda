@@ -460,11 +460,18 @@ final PpArea _howMuch = PpArea(
       id: 'overtired_baby',
       title: 'The overtired baby',
       format: 'CAROUSEL',
+      // ⚠️ THIS PAGE IS ITS BLOCK. A Carousel card opens the slides, an
+      // Interactive card opens the step-through; there is no page between
+      // the tap and the thing, exactly as on the TTC doors. Decided on a
+      // phone, 2026-09-11. The intro and notes that sat around the block
+      // are kept below for revert and render nowhere.
       blocks: [
+        /* kept for revert: the page prose the direct-open replaced
         PpIntro('It sounds backwards, and every parent finds it out the hard '
             'way: a baby who has been awake too long does not go down easier. '
             'She goes down harder. Six slides on why, and how to catch her '
             'before it happens.'),
+        */
         PpCarousel(
           eyebrow: 'The overtired baby',
           hue: 206,
@@ -500,28 +507,39 @@ final PpArea _howMuch = PpArea(
                 'Short naps and a long last stretch usually mean overtired. '
                     'A late, long nap usually means the opposite. The log '
                     'tells you which.'),
-            PpCarouselCard(
+            // The page's "see her window" link, as the last slide: swipe up
+            // opens the tool.
+            PpCarouselCard.linked(
                 'Her window lengthens as she grows, and nothing you do sets '
                     'its pace.',
                 'Newborns manage about 45 minutes. By a year it is three to '
-                    'four hours. Wake windows shows hers.'),
+                    'four hours. Swipe up to see hers right now.',
+                pageId: 'wake_windows'),
           ],
         ),
+        /* kept for revert: the page prose the direct-open replaced
         PpCallout('Catch the window, and bedtime stops being a fight. That '
             'one habit does more than any settling technique on this '
             'section.'),
+        */
+        /* kept for revert: the page prose the direct-open replaced
         PpWhenLine('Matters most from about 6 weeks to 2 years, when the '
             'window is short and easy to miss. Older children show it as '
             'wildness at 6pm rather than crying.'),
+        */
+        /* kept for revert: the page prose the direct-open replaced
         PpIndiaNote('An evening full of visitors is the classic way to miss '
             'the window. Everyone wants to hold her, she is passed around, '
             'and by the time the house quietens she is past it. Claim her '
             'back at the first yawn.'),
+        */
+        /* kept for revert: the page prose the direct-open replaced
         PpLink(
           'See her window right now',
           surfaceId: 'pp_wake_windows',
           blurb: 'Shown for her age, with no numbers to enter.',
         ),
+        */
       ],
     ),
   ],
@@ -799,10 +817,17 @@ final PpArea _nightWaking = PpArea(
       title: 'What to do at 3am',
       subtitle: 'The short version, for when you cannot read',
       format: 'INTERACTIVE',
+      // ⚠️ THIS PAGE IS ITS BLOCK. A Carousel card opens the slides, an
+      // Interactive card opens the step-through; there is no page between
+      // the tap and the thing, exactly as on the TTC doors. Decided on a
+      // phone, 2026-09-11. The intro and notes that sat around the block
+      // are kept below for revert and render nowhere.
       blocks: [
+        /* kept for revert: the page prose the direct-open replaced
         PpIntro('It is the middle of the night and you are too tired to think. '
             'Tap through this, one step at a time, on a screen dark enough not '
             'to wake either of you. Most nights you will stop at step two.'),
+        */
         PpInteractive(
           kind: PpInteractiveKind.night,
           title: 'What to do at 3am',
@@ -859,6 +884,7 @@ final PpArea _nightWaking = PpArea(
           ],
         ),
         */
+        /* kept for revert: the page prose the direct-open replaced
         PpCards([
           PpCard('Keep the room dark',
               'One dim warm light if you must. Bright light tells her body it '
@@ -874,14 +900,21 @@ final PpArea _nightWaking = PpArea(
                   'alternating. Two half-slept people is worse than one '
                   'rested one.'),
         ], heading: 'And for you', hue: 206),
+        */
+        /* kept for revert: the page prose the direct-open replaced
         PpCallout('Keep 3am boring. Same dark, same quiet, same order every '
             'time. Boring is what teaches her that nothing interesting happens '
             'at night.'),
+        */
+        /* kept for revert: the page prose the direct-open replaced
         PpWhenLine('Use this from birth. It stops being needed somewhere in '
             'the second year for most children.'),
+        */
+        /* kept for revert: the page prose the direct-open replaced
         PpIndiaNote('If a grandmother or a helper shares the night duty, walk '
             'her through these seven steps once. A shared night only works if '
             'everyone does the same thing.'),
+        */
       ],
     ),
     PpPage(
@@ -1993,11 +2026,18 @@ final PpArea _gettingToSleep = PpArea(
       id: 'sleep_away_from_home',
       title: 'Sleep away from home',
       format: 'CAROUSEL',
+      // ⚠️ THIS PAGE IS ITS BLOCK. A Carousel card opens the slides, an
+      // Interactive card opens the step-through; there is no page between
+      // the tap and the thing, exactly as on the TTC doors. Decided on a
+      // phone, 2026-09-11. The intro and notes that sat around the block
+      // are kept below for revert and render nowhere.
       blocks: [
+        /* kept for revert: the page prose the direct-open replaced
         PpIntro('A wedding, a festival, a week at nani\'s, an overnight train. '
             'Her sleep will wobble and that is not a failure of planning. Six '
             'slides on what to protect, what to let go, and how to get back '
             'to normal afterwards.'),
+        */
         PpCarousel(
           eyebrow: 'Sleep away from home',
           hue: 26,
@@ -2035,22 +2075,38 @@ final PpArea _gettingToSleep = PpArea(
                     'routine, and change nothing else.',
                 'She has not learned a new habit in a week. She has had a '
                     'week. It settles.'),
+            // The page's "download the sound she sleeps to" link, as a slide:
+            // swipe up opens the library.
+            PpCarouselCard.linked(
+                'Before you go: download the two or three sounds she '
+                    'actually sleeps to.',
+                'A train has no network and a wedding has no quiet. Swipe up '
+                    'for the library.',
+                pageId: 'sleep_sounds_library'),
           ],
         ),
+        /* kept for revert: the page prose the direct-open replaced
         PpCallout('Late is fine. Different is the problem. A baby put down '
             'at 11pm with her own routine sleeps better than one put down at '
             '8pm with somebody else\'s.'),
+        */
+        /* kept for revert: the page prose the direct-open replaced
         PpWhenLine('Matters from about 3 months, once she has a routine to '
             'protect. Under 3 months she mostly sleeps anywhere, and that is '
             'the one advantage of a newborn at a wedding.'),
+        */
+        /* kept for revert: the page prose the direct-open replaced
         PpIndiaNote('Nobody at a family function will think less of you for '
             'taking her to a quiet room at her time. They will think less of '
             'the person who kept her up. Go.'),
+        */
+        /* kept for revert: the page prose the direct-open replaced
         PpLink(
           'Download the sound she sleeps to',
           surfaceId: 'pp_sleep_sounds',
           blurb: 'Two or three tracks, saved before you travel.',
         ),
+        */
       ],
     ),
   ],
@@ -2369,12 +2425,19 @@ final PpArea _safeSleep = PpArea(
       id: 'sleep_surface',
       title: 'Her sleep space, checked',
       format: 'INTERACTIVE',
+      // ⚠️ THIS PAGE IS ITS BLOCK. A Carousel card opens the slides, an
+      // Interactive card opens the step-through; there is no page between
+      // the tap and the thing, exactly as on the TTC doors. Decided on a
+      // phone, 2026-09-11. The intro and notes that sat around the block
+      // are kept below for revert and render nowhere.
       blocks: [
+        /* kept for revert: the page prose the direct-open replaced
         PpIntro('Two minutes, once. Tap through eleven checks and answer each '
             'one honestly; it ends on the short list of what to change. Then '
             'repeat it whenever she learns something new, because a baby who '
             'can roll, sit or stand can reach things she could not reach last '
             'month.'),
+        */
         PpInteractive(
           kind: PpInteractiveKind.checklist,
           title: 'Her sleep space, checked',
@@ -2430,6 +2493,7 @@ final PpArea _safeSleep = PpArea(
               'does not belong in her sleep space until she is one.',
         ),
         /* kept for revert: the cards the checklist replaced
+        /* kept for revert: the page prose the direct-open replaced
         PpCards([
           PpCard('Firm and flat',
               'A firm mattress that does not dip under her weight. Press it '
@@ -2447,6 +2511,7 @@ final PpArea _safeSleep = PpArea(
               'Same room as you for the first six to twelve months. Own '
                   'surface, or a safely set up bed.'),
         ], heading: 'The surface', hue: 152),
+        */
         PpCards([
           PpCard('Pillows and bolsters',
               'No pillow at all under one year. Bolsters are not a barrier and '
@@ -2468,16 +2533,22 @@ final PpArea _safeSleep = PpArea(
                   'then held in.'),
         ], heading: 'Clear away', hue: 152),
         */
+        /* kept for revert: the page prose the direct-open replaced
         PpCallout('The test is simple. If it is soft, loose, or can end up '
             'over her face, it does not belong in her sleep space until she is '
             'one.'),
+        */
+        /* kept for revert: the page prose the direct-open replaced
         PpWhenLine('Check it before she comes home, then again when she starts '
             'rolling, sitting and standing. The strict version applies for the '
             'first twelve months.'),
+        */
+        /* kept for revert: the page prose the direct-open replaced
         PpIndiaNote('The mosquito net is the one that gets forgotten. Use a '
             'frame net that stays tented well above her, not one draped over '
             'the cot that can sag onto her face, and check there is no gap she '
             'can get an arm or her head into.'),
+        */
       ],
     ),
     PpPage(
@@ -2646,10 +2717,17 @@ final PpArea _worries = PpArea(
       title: 'The worry set',
       subtitle: 'Four things that feel like problems, and mostly are not',
       format: 'CAROUSEL',
+      // ⚠️ THIS PAGE IS ITS BLOCK. A Carousel card opens the slides, an
+      // Interactive card opens the step-through; there is no page between
+      // the tap and the thing, exactly as on the TTC doors. Decided on a
+      // phone, 2026-09-11. The intro and notes that sat around the block
+      // are kept below for revert and render nowhere.
       blocks: [
+        /* kept for revert: the page prose the direct-open replaced
         PpIntro('Only sleeps on you. Naps for thirty minutes. Up at 5am. '
             'Sleeps all the time. Four worries, one slide each, and the '
             'full page behind every one if you want it.'),
+        */
         PpCarousel(
           eyebrow: 'The worry set',
           hue: 188,
@@ -2691,15 +2769,21 @@ final PpArea _worries = PpArea(
                 toMonths: 6),
           ],
         ),
+        /* kept for revert: the page prose the direct-open replaced
         PpCallout('None of these is a habit you created and none of them '
             'needs fixing tonight. If one of them has stopped feeling '
             'manageable, the full page behind it is where to start.'),
+        */
+        /* kept for revert: the page prose the direct-open replaced
         PpWhenLine('The slides that fit her age are the ones you see. Under '
             'a year, all four; from the second year, the early-waking one '
             'stays and the rest quietly go.'),
+        */
+        /* kept for revert: the page prose the direct-open replaced
         PpIndiaNote('Every one of these gets a theory in a joint family, and '
             'most of the theories are kind. The slides are what is actually '
             'true.'),
+        */
       ],
     ),
     PpPage(
