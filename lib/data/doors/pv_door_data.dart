@@ -499,10 +499,49 @@ class PvDoorSection {
     required this.heading,
     required this.tiles,
     required this.group,
+    this.lead,
   });
 
   final String heading;
   final List<PvDoorTile> tiles;
+
+  /// Which entry, if any, should be brought to the front for THIS woman.
+  ///
+  /// ⚠️ RANKING, NEVER STRUCTURE. CLAUDE.md's rule for personalisation is that
+  /// it may change content, ranking and order and never what exists — and a
+  /// rail is the same rail for everyone, with the same cards, whichever one
+  /// leads. This hook is that rule in its smallest form: given her week, it
+  /// names one `entryId` and the screen moves that tile to the front of the
+  /// rail's entry tiles. Nothing is hidden, nothing is added.
+  ///
+  /// ⚠️ A WEEK, NOT A CONTROLLER. Door data must not import the controller —
+  /// it is data, it is built once, and it is tested without a store behind
+  /// it. An `int` is what the section actually needs and the screen has it.
+  ///
+  /// ⚠️ AND IT HOISTS TO THE FIRST ENTRY TILE, NOT TO INDEX ZERO. Nutrition's
+  /// stage rail opens with "Add this to your plate now", which sits first on
+  /// purpose — it is the narrowest question — and a hoist that displaced it
+  /// would undo a decision made for a reason. See `PvDoorPage.tilesOf`.
+  final String? Function(int week)? lead;
+
+  /// The tiles as they should render for a woman at [week].
+  ///
+  /// Stable: everything keeps its order except the one tile [lead] names,
+  /// which moves to where the first entry tile was. With no [lead], or a lead
+  /// that names nothing on the rail, this IS [tiles].
+  List<PvDoorTile> tilesFor(int week) {
+    final id = lead?.call(week);
+    if (id == null) return tiles;
+    final at = tiles.indexWhere(
+        (t) => t is PvDoorEntryTile && t.entryId == id);
+    if (at < 0) return tiles;
+    final firstEntry = tiles.indexWhere((t) => t is PvDoorEntryTile);
+    if (at == firstEntry) return tiles;
+    final out = List<PvDoorTile>.of(tiles);
+    final hoisted = out.removeAt(at);
+    out.insert(firstEntry, hoisted);
+    return out;
+  }
 
   /// Which [PvDoorGroup] this section appears under.
   ///

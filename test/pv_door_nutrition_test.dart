@@ -121,6 +121,35 @@ void main() {
       expect(ids.toSet(), kTrimesterGuides.map((g) => g.id).toSet());
     });
 
+    test('pre-pregnancy is last on the rail, not second', () {
+      // Seen on a phone: the library is in life order and the rail copied it,
+      // so "Pre-pregnancy" was the second card on a door only pregnant women
+      // open. Still there — a woman planning a second baby uses it — but last.
+      final ids = _from(door, PvDoorLibrary.dietStage).map((t) => t.entryId);
+      expect(ids.toList(), ['t1', 't2', 't3', 'pre_pregnancy']);
+    });
+
+    test('her own trimester leads, and the narrow read stays first', () {
+      // ⚠️ RANKING, NEVER STRUCTURE. Same four cards at every week; only the
+      // order moves. And "Add this to your plate now" sits first regardless —
+      // the hoist goes to the first ENTRY tile, not to index zero.
+      final section = door.sections
+          .firstWhere((s) => s.heading == 'Food for your stage');
+      List<String> order(int week) => [
+            for (final t in section.tilesFor(week))
+              if (t is PvDoorEntryTile) t.entryId,
+          ];
+      expect(order(8), ['t1', 't2', 't3', 'pre_pregnancy']);
+      expect(order(20), ['t2', 't1', 't3', 'pre_pregnancy']);
+      expect(order(34), ['t3', 't1', 't2', 'pre_pregnancy']);
+      for (final w in [8, 20, 34]) {
+        expect(section.tilesFor(w).first, isA<PvDoorGuideTile>(),
+            reason: 'the narrow read leads at week $w');
+        expect(section.tilesFor(w).length, section.tiles.length,
+            reason: 'nothing is added or hidden at week $w');
+      }
+    });
+
     test('every condition guide, including the one the brief omits', () {
       // ⚠️ THE BRIEF LISTS TEN AND ELEVEN EXIST. "Overweight in pregnancy" is
       // the extra, and it is on the rail because this door REPLACED the

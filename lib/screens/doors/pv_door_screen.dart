@@ -244,7 +244,18 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                   ],
 
                   // ---- this tab's sections ------------------------------
-                  for (final section in page.sectionsOf(group.id)) ...[
+                  //
+                  // ⚠️ `tilesFor(week)`, NOT `tiles`. A section may name one
+                  // entry to lead for this woman — Nutrition's stage rail puts
+                  // her own trimester first. Same cards for everyone, in an
+                  // order that is hers. See `PvDoorSection.lead`.
+                  //
+                  // (The one-element inner `for` is Dart's only way to bind a
+                  // local inside a collection literal; it runs once.)
+                  for (final section in page.sectionsOf(group.id))
+                    for (final tiles in [
+                      section.tilesFor(widget.pregnancy.currentWeek)
+                    ]) ...[
                     pvDoorPad(Text(section.heading,
                         style: pvFraunces(
                             fontSize: 21,
@@ -268,11 +279,11 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                     // one checklist before an appointment — are exactly the
                     // ones that most needed the second line.
                     if (group.layout == PvDoorLayout.stack ||
-                        section.tiles.length == 1)
+                        tiles.length == 1)
                       // ⚠️ FULL-WIDTH ROWS, NOT A RAIL. A rail says "there is
                       // more sideways"; on a tab with a tool above it and two
                       // errands below, there is not.
-                      for (final tile in section.tiles) ...[
+                      for (final tile in tiles) ...[
                         pvDoorPad(_WideTile(
                           tile: tile,
                           p: p,
@@ -296,16 +307,16 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                           scrollDirection: Axis.horizontal,
                           padding: const EdgeInsets.symmetric(
                               horizontal: kPvDoorGutter),
-                          itemCount: section.tiles.length,
+                          itemCount: tiles.length,
                           separatorBuilder: (_, _) =>
                               const SizedBox(width: kPvRailGap),
                           itemBuilder: (context, i) => _RailCard(
-                            tile: section.tiles[i],
+                            tile: tiles[i],
                             p: p,
                             hue: hue,
                             index: i,
                             onTap: () => openPvDoorTile(
-                                context, section.tiles[i], widget.pregnancy),
+                                context, tiles[i], widget.pregnancy),
                           ),
                         ),
                       ),

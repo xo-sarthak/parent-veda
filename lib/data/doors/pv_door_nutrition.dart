@@ -246,18 +246,37 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
     PvDoorSection(
       group: kDietTabNow,
       heading: 'Food for your stage',
+      // ⚠️ HER OWN TRIMESTER LEADS THE GUIDES. Seen on a phone: "Pre-pregnancy"
+      // was the second card on the rail of a door only pregnant women open —
+      // not wrong (a woman planning a second baby uses it) but the wrong one
+      // to lead with. Same four cards for everyone; the order is hers. See
+      // `PvDoorSection.lead` for why this is ranking and not structure.
+      lead: (week) => week <= 13
+          ? 't1'
+          : week <= 27
+              ? 't2'
+              : 't3',
       tiles: [
         // ⚠️ THE ONE NEW READ ON THIS DOOR, AND IT SITS FIRST BECAUSE IT IS THE
         // NARROWEST QUESTION. The four stage guides beside it are long; this
         // answers "what do I add THIS month", which is what somebody actually
-        // wants at a rail.
+        // wants at a rail. The lead above hoists to the first ENTRY tile, so
+        // this stays where it is.
         PvDoorGuideTile(
           title: 'Add this to your plate now',
           blurb: 'One short list per stage. Not a diet — just what to add.',
           readId: 'preg_diet_read_add_now',
         ),
+        // ⚠️ TRIMESTERS FIRST, PRE-PREGNANCY LAST. `kTrimesterGuides` is in
+        // life order — before, first, second, third — which is right for the
+        // library and wrong for this rail. The static order is what a woman
+        // with no due date set sees; the lead above refines it once there is
+        // a week to go on.
         ..._tilesFor(PvDoorLibrary.dietStage, [
-          for (final g in kTrimesterGuides)
+          for (final g in [
+            ...kTrimesterGuides.where((g) => g.id != 'pre_pregnancy'),
+            ...kTrimesterGuides.where((g) => g.id == 'pre_pregnancy'),
+          ])
             (
               id: g.id,
               title: g.label.en,
