@@ -18,7 +18,10 @@ import '../models/report_finding.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
 import '../widgets/pv_placeholders.dart';
+import 'brackets/hub/hub_solution_cards.dart' show SolutionMeta, SolutionType;
+import 'doors/pv_door_chrome.dart' show PvDoorRow;
 import 'tools/ask_veda_screen.dart';
+import 'v2/v2_palette.dart';
 
 const Color _calm = Color(0xFF18A39B); // teal - calm, non-alarming accent
 const Color _reassure = Color(0xFF3FA56A); // soft green - "things to remember"
@@ -417,49 +420,51 @@ class _SearchBar extends StatelessWidget {
 }
 
 /// A topic / search-result row: name + optional alt name + chevron.
+/// The one-line version of a finding, for a row.
+///
+/// ⚠️ `whatItMeans` WITH ITS OPENING STRIPPED, NOT `altName`. The alt name is
+/// the medical alias — "Placenta Previa" under "Low-Lying Placenta" — which is
+/// the word on her report and belongs on the page, not on the row. The row's
+/// job is "is this one mine?", and the first sentence of what-it-means answers
+/// that in plain words. Every entry opens "This means …" / "इसका मतलब है कि …",
+/// so the prefix is dropped and the sentence stands on its own.
+String _plainLine(ReportFinding f, AppLanguage lang) {
+  var t = f.whatItMeans.of(lang).trim();
+  for (final p in const ['This means that ', 'This means ', 'इसका मतलब है कि ']) {
+    if (t.startsWith(p)) {
+      t = t.substring(p.length);
+      break;
+    }
+  }
+  final stop = RegExp(r'[.।]').firstMatch(t);
+  if (stop != null) t = t.substring(0, stop.end);
+  return t.isEmpty ? t : t[0].toUpperCase() + t.substring(1);
+}
+
+/// One finding, in the door's row language.
+///
+/// ⚠️ THIS SCREEN PREDATES V2 AND STILL DRAWS MOST OF ITSELF WITH `AppTheme`.
+/// Its rows, though, render inline on the Scans door's third tab, where every
+/// other row is a `PvDoorRow` — and the old teal-square row beside them read
+/// as a screen from an older version of the app. Seen on a phone, 2026-09-11.
+/// The row takes the live palette; the rest of this screen is left as it is,
+/// because bringing a whole pre-V2 screen up to the design language is a
+/// different job from making its rows match the door they sit in.
 class _TopicRow extends StatelessWidget {
   const _TopicRow({required this.finding, required this.lang, required this.onTap});
   final ReportFinding finding;
   final AppLanguage lang;
   final VoidCallback onTap;
   @override
-  Widget build(BuildContext context) {
-    final text = Theme.of(context).textTheme;
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-        decoration: BoxDecoration(
-          color: AppTheme.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppTheme.outlineVariant, width: 1),
-        ),
-        child: Row(children: [
-          Container(
-            width: 34,
-            height: 34,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: _calm.withValues(alpha: 0.12),
-              borderRadius: BorderRadius.circular(11),
-            ),
-            child: const Icon(Icons.description_outlined, color: _calm, size: 18),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(finding.name.of(lang),
-                  style: text.titleMedium?.copyWith(fontWeight: FontWeight.w700)),
-              if (finding.altName != null)
-                Text(finding.altName!.of(lang),
-                    style: text.labelSmall?.copyWith(color: AppTheme.neutral500)),
-            ]),
-          ),
-          const Icon(Icons.chevron_right_rounded, color: AppTheme.neutral400),
-        ]),
-      ),
-    );
-  }
+  Widget build(BuildContext context) => PvDoorRow(
+        p: V2PaletteStore.instance.current,
+        hue: SolutionType.read.hue,
+        icon: Icons.article_outlined,
+        chip: 'Article',
+        title: finding.name.of(lang),
+        blurb: _plainLine(finding, lang),
+        onTap: onTap,
+      );
 }
 
 // ===========================================================================

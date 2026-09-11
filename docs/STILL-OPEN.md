@@ -5365,6 +5365,22 @@ plate; never a building, a uniform or signage.
 two are the same, each is requested at a `w=900&fit=crop` crop — and says in its
 own comment that it cannot check the thing that actually matters.
 
+### 38.2a Scans and Complications re-walked after the engine changes — 2026-09-11
+
+The single-tile rule, the read icon and the closing-line skip all touch the
+engine under the two doors committed earlier. Both walked end to end on the
+handset: no exceptions, no overflows, and the single-tile rule is an
+improvement on Scans' Talk tab, whose two lone cards are now proper rows.
+
+Two more instances of the old-card fault turned up on Scans and were fixed the
+same way as the Complications browse list: the report tool's "Popular topics"
+rows (`report_screen.dart`, a pre-V2 screen whose rows now take the live
+palette while the rest of it is left alone) and the "Add a report" card in
+`scan_reports_screen.dart`, which sat directly above a `PvDoorRow` in a
+different card language. Every `SolutionCard` inside a door body is now gone;
+`SolutionCard` itself is untouched and still correct on the hubs that have not
+become doors.
+
 ### 38.3 What the walk found and did NOT fix
 
 These need a decision rather than a patch.

@@ -50,7 +50,8 @@ import '../../theme/pv_fonts.dart';
 import '../../widgets/storage_image.dart';
 import '../post_pregnancy/pp_attachments.dart';
 import '../v2/v2_palette.dart';
-import 'hub/hub_solution_cards.dart';
+import '../doors/pv_door_chrome.dart' show PvDoorRow;
+import 'hub/hub_solution_cards.dart' show SolutionMeta, SolutionType;
 import 'scan_report_viewer_screen.dart';
 
 LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
@@ -183,12 +184,19 @@ class _ScanReportsScreenState extends State<ScanReportsBody> {
                 ],
               ],
               const SizedBox(height: 22),
-              SolutionCard(
-                type: SolutionType.tool,
-                title: _en('Add a report'),
-                value: _en('Take a photo, or add a PDF.'),
+              // ⚠️ THE DOOR'S ROW, NOT THE HUB CARD. This body renders inline
+              // on the Scans door's fourth tab, directly above a `PvDoorRow`
+              // ("Your report, line by line") — and the old `SolutionCard`
+              // sat on top of it in a different card language, one above the
+              // other. Seen on a phone, 2026-09-11. Same fix as the
+              // Complications browse list; see `PvDoorRow`'s header.
+              PvDoorRow(
                 p: p,
-                lang: lang,
+                hue: SolutionType.tool.hue,
+                icon: Icons.tune_rounded,
+                chip: 'Tool',
+                title: _en('Add a report').of(lang),
+                blurb: _en('Take a photo, or add a PDF.').of(lang),
                 onTap: () => _add(context),
               ),
               const SizedBox(height: 20),
