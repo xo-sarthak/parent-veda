@@ -192,16 +192,17 @@ void main() {
       ]));
     });
 
-    test('the birth-plan card is absent, and it is meant to be', () {
-      // ⚠️ THE BRIEF ASKS FOR IT AND THE CODEBASE SAYS NO. `pregnancy_journeys`
-      // removed that step with a note — "the birth-plan tool does not exist, so
-      // the step promised a page and delivered a grey card". Re-adding the card
-      // would reverse a considered decision silently. Recorded in STILL-OPEN
-      // §37; if the tool is ever built, this test is the thing to delete.
-      for (final t in door.allTiles) {
-        expect(t.title.toLowerCase(), isNot(contains('birth plan')),
-            reason: 'the birth-plan tool still does not exist.');
-      }
+    test('the birth-plan card is present, and it is a tool', () {
+      // ⚠️ THIS TEST USED TO ASSERT THE OPPOSITE. The brief asked for the card
+      // and `pregnancy_journeys` had removed the step because the tool did not
+      // exist, so the door omitted it and recorded the conflict (STILL-OPEN
+      // §37.3). On 2026-09-11 the user decided: build it. The tool now exists
+      // and the card is a TOOL, not a guide — she needs somewhere to write it
+      // down, not another thing to read. `birth_plan_test.dart` holds the tool.
+      final tile =
+          door.allTiles.firstWhere((t) => t.title == 'Your birth plan');
+      expect(tile, isA<PvDoorToolTile>());
+      expect(tile.comingSoon, isFalse);
     });
 
     test('only one read is new, and it is the pain-relief primer', () {

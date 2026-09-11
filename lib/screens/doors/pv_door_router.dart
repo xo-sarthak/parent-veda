@@ -74,6 +74,7 @@ import '../brackets/pv_checklist_screen.dart';
 import '../brackets/scan_reports_screen.dart';
 import '../brackets/scan_timeline_screen.dart';
 import '../brackets/scan_urgent_screen.dart';
+import '../pregnancy/birth_plan_screen.dart';
 import '../prepare/birthing_classes_screen.dart';
 import '../prepare/consultations_screen.dart';
 import '../tools/contraction_tracker_screen.dart';
@@ -149,6 +150,7 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
       kLabourSurfaceTimer => ContractionTrackerScreen(controller: c),
       kLabourSurfaceBag => ReadyForBirthScreen(controller: c),
       kLabourSurfaceCourse => BirthingClassesScreen(lang: c.language),
+      kLabourSurfaceBirthPlan => BirthPlanScreen(pregnancy: c),
 
       // ---- Belly & skin ---------------------------------------------------
       kBsSurfaceChecker => const IngredientCheckerScreen(),
@@ -455,7 +457,8 @@ bool pvDoorSurfaceResolves(String id) => switch (id) {
       kBsSurfaceRitual ||
       kLabourSurfaceTimer ||
       kLabourSurfaceBag ||
-      kLabourSurfaceCourse =>
+      kLabourSurfaceCourse ||
+      kLabourSurfaceBirthPlan =>
         true,
       _ => false,
     };

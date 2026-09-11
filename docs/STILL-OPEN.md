@@ -5411,3 +5411,71 @@ These need a decision rather than a patch.
   rest are shipped screens where the grey may well be the intended look — this
   is a sweep somebody should do deliberately with a phone, not a find-and-
   replace.
+
+
+### 38.4 Decisions taken on the walk's findings — 2026-09-11
+
+* **Cravings under 64 food rows** → a UX redesign, not a reorder. Design
+  brief written: `docs/design-prompts/CAN-I-EAT-THIS-DESIGN-PROMPT.md`
+  (gitignored, as all prompts are). Nothing changes in code until it comes back.
+* **"Pre-pregnancy" on the stage rail** → kept, last on the rail, and her own
+  trimester leads via `PvDoorSection.lead` — the engine's first ranking hook.
+  Same four cards for everyone; the order is hers. Tested.
+* **The bump keepsake's palette** → a UX redesign of the whole inline body.
+  Brief: `docs/design-prompts/BUMP-RITUAL-DESIGN-PROMPT.md`.
+* **The birth-plan tool** → the brief asks for it, so it is built. Brief for
+  the screen: `docs/design-prompts/BIRTH-PLAN-DESIGN-PROMPT.md`; the model,
+  store and wiring are done now (see §38.5) and the screen is a plain working
+  version to be re-skinned when the design lands.
+
+### 38.5 ⏰ REMINDER — one format for articles and reads, when all eight pregnancy doors are done
+
+**The user wants a discussion before any more of this is decided, once
+Garbh Sanskar and Mind and mood are built.** Raise it then, unprompted.
+
+What is on the table: the app now has at least four ways to present a written
+piece — `PvReaderScreen` for `PvRead`s, the older article reader, the
+condition and scan detail screens, and the report tool's finding pages — and
+two words for it on the door ("Read" vs "Article", see `PvDoorFormat`'s own
+comment on why they were kept apart). On 2026-09-11 the Complications browse
+list was switched from a `READ` chip to `Article` to match the door's rails,
+and the user asked for that to be held as an open question rather than a
+precedent: *"I want to discuss a singular format to view article/reads."*
+
+So until that discussion: **do not unify readers, and do not rename chips
+further.** The choice made on 2026-09-11 stands only because it is
+consistent within one door.
+
+### 38.6 The birth plan exists — 2026-09-11
+
+Built on the user's decision (*"the PDF says it, so we need it"*):
+
+* `lib/data/birth_plan_data.dart` — six sections, twelve questions, every
+  choice phrased as a preference. A test refuses any label that opens as an
+  instruction and any string that leans ("safer", "recommended").
+* `lib/services/birth_plan_store.dart` — one JSON document in prefs, local
+  only and deliberately not synced (same reasoning as the checklists, plus:
+  the share sheet IS the sync, by her hand). Single-choice questions are
+  enforced by the store, not the screen.
+* `lib/screens/pregnancy/birth_plan_screen.dart` — the plain working version
+  on the door's tool chrome. **A Claude Design brief replaces it:**
+  `docs/design-prompts/BIRTH-PLAN-DESIGN-PROMPT.md`, written against the model
+  so the design cannot ask for what the data does not hold.
+* On the Labour prep door as a **tool** card between the pain-relief primer
+  and the owed options read. `pv_door_labour_test.dart`'s "absent" assertion
+  is now its opposite, with the history in the comment.
+
+**Two things it made possible and that are NOT done, because they reverse
+somebody's decision:**
+
+* **The journey step.** `pregnancy_journeys.dart` removed "Can I write it
+  down?" on review, because the tool did not exist. That reason is gone. It is
+  one uncomment with `surfaceId: kLabourSurfaceBirthPlan`. Your call.
+* **The hospital-bag item.** `ready_for_birth_data.dart` has
+  `docs_birthplan` — "Birth plan (if you have one)" — which could now open the
+  tool. The bag item model has no link field; adding one is small.
+
+**Still owed:** the designed screen; a clinical read of the section leads
+(they explain nothing clinical, but they are copy on a birth screen); and a
+decision on whether the summary should also offer "copy" beside "share" for
+people who paste it into a hospital's own form.

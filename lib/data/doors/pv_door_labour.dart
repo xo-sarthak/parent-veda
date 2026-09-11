@@ -32,18 +32,26 @@
 //  for word.
 //
 //  ---------------------------------------------------------------------------
-//  ⚠️ WHAT COULD NOT BE FOUND, LISTED RATHER THAN BUILT
+//  ⚠️ THE BIRTH PLAN: LISTED FIRST, THEN BUILT, AND THE ORDER MATTERS
 //  ---------------------------------------------------------------------------
 //
-//  **"Your birth plan, and how to make one" is not on this door.** The brief
-//  marks it `[Guide] reuse (pulled out of the old accordion)`. There is no
-//  accordion and no birth-plan content: `pregnancy_journeys.dart` REMOVED that
-//  step, with a note saying why — *"The birth-plan tool does not exist, so the
-//  step promised a page and delivered a grey card."*
+//  The brief marks *"Your birth plan, and how to make one"* as `[Guide] reuse
+//  (pulled out of the old accordion)`. There was no accordion and no content;
+//  `pregnancy_journeys.dart` had REMOVED the step that promised it — *"The
+//  birth-plan tool does not exist, so the step promised a page and delivered a
+//  grey card."* So on 2026-09-10 the card was omitted and the conflict was
+//  recorded in STILL-OPEN §37.3 as the user's call.
 //
-//  That was a considered decision by somebody who had seen the grey card, and
-//  re-adding the card here would reverse it silently. So the card is omitted and
-//  the conflict is recorded in STILL-OPEN §37. It is the user's call, not mine.
+//  On 2026-09-11 the user made it: *"the PDF says it, so we need it."* The tool
+//  now exists — `birth_plan_data.dart`, `BirthPlanStore`, `BirthPlanScreen` —
+//  and the card is on the rail below as a TOOL, not a guide, because what she
+//  needs is somewhere to write it down, not something else to read.
+//
+//  ⚠️ THE JOURNEY STEP IS NOT RESTORED HERE. `pregnancy_journeys.dart` removed
+//  two steps on review, and the review's reason was the grey card. That reason
+//  is gone; the decision was still somebody else's. Restoring the step is one
+//  uncomment with a `surfaceId` and it is listed in STILL-OPEN §38.6 as a
+//  question, not done as a side effect.
 //
 //  ---------------------------------------------------------------------------
 //  ⚠️ SIX COMING-SOON CARDS, AND THE BRIEF MARKS FIVE OF THEM ITSELF
@@ -84,6 +92,12 @@ const String kLabourSurfaceTimer = 'contractions';
 const String kLabourSurfaceBag = 'hospital_bag';
 const String kLabourSurfaceCourse = 'birthing_classes';
 const String kLabourSurfaceConsult = 'consults';
+
+/// ⚠️ A ROUTE NAME. `openPvDoorSurface` pushes with `RouteSettings(name: id)`,
+/// so this string is what the navigator stack shows — the same `area/thing`
+/// shape as `scans/…` and `conditions/…`, which is what anything reading the
+/// stack (the Ask Veda FAB's suppression list, a future deep link) matches on.
+const String kLabourSurfaceBirthPlan = 'labour/birth_plan';
 
 const String kLabourTabTimer = 'timer';
 const String kLabourTabBag = 'bag';
@@ -316,16 +330,23 @@ final PvDoorPage kLabourDoor = PvDoorPage(
               'leave until the day.',
           readId: 'preg_labour_read_pain_relief',
         ),
+        // ⚠️ THE TOOL SITS BETWEEN THE PRIMER AND THE OWED READ. She reads
+        // about pain relief, writes down what she is thinking, and the read
+        // about her options is the one still coming. The blurb is the journey
+        // step's own line, kept — it was the best sentence anyone wrote about
+        // this feature before it existed.
+        PvDoorToolTile(
+          title: 'Your birth plan',
+          blurb: 'One page your hospital can actually read at 3am. A '
+              'preference, not a promise.',
+          surfaceId: kLabourSurfaceBirthPlan,
+        ),
         PvDoorReadTile.comingSoon(
           title: 'What labour is actually like, and your options',
           blurb: 'Pain relief, positions, who is in the room — decided calmly '
               'now rather than mid-contraction.',
           meta: '5 MIN',
         ),
-        // ⚠️ "Your birth plan, and how to make one" IS DELIBERATELY ABSENT.
-        // See the header: the journey removed that step because the tool does
-        // not exist, and re-adding the card here would reverse a considered
-        // decision. Recorded in STILL-OPEN §37.
       ],
     ),
 

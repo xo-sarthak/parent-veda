@@ -526,3 +526,51 @@ of them was the kind a test finds, and each is a shape worth carrying:
   `app_theme.dart` sets `filled: true` app-wide, and `border` is not `fill`, so
   each painted a grey rectangle inside its own white pill and read as two
   controls. A theme default applies unless *that* property is overridden.
+
+
+## 21. A tool that records a preference is the "prepare" case of ownership
+
+The birth plan is the clearest example so far of CLAUDE.md's clinical
+ownership rule in a feature: where a clinician owns a decision, the app may
+**explain**, **remind**, or help her **prepare** — never recreate, reinterpret
+or compete. A birth plan is *prepare*, and it stays there by three properties
+that are each a test:
+
+* **Every option is a preference, never an instruction.** "I'd like…", "if
+  it's allowed", "ask about…". A label that opens with an imperative aimed at
+  the team fails the test — and would get the whole document ignored by an
+  Indian labour ward, which mostly does not take birth plans at all.
+* **No option leans.** Nothing says safer, recommended, better. The tool
+  records what she would prefer and is silent on what she should.
+* **The tick that matters is "talked this through with my doctor."** One per
+  section, after the answers. She can write anything; the conversation is
+  what makes it real. That tick is the ownership rule as a control.
+
+And the two rules every fill-in screen on the doors shares: **never a score or
+completion state** (two answers is a plan), and **output is a text message,
+not a document** (it goes to WhatsApp, to her partner, at 3am).
+
+**When a brief asks for a "guide" and what she needs is a place to write, build
+the place.** The Labour brief marked the birth plan `[Guide] reuse`. There was
+nothing to reuse and a guide would have been one more thing to read. The card
+on the door is a tool.
+
+## 22. Ranking is allowed; structure is not — `PvDoorSection.lead`
+
+The engine's first personalisation hook. A section may name one entry to bring
+to the front for this woman, given her week; the screen renders
+`section.tilesFor(week)` instead of `section.tiles`. Nutrition's stage rail
+uses it so her own trimester leads the four guides.
+
+Three properties, each deliberate:
+
+* **Same cards for everyone.** The hook reorders; it never hides or adds. That
+  is the line CLAUDE.md draws — personalisation changes content, ranking and
+  order, never what exists.
+* **A week, not a controller.** Door data must not import the controller; an
+  `int` is what the section needs and the screen has it. Data stays testable
+  without a store behind it.
+* **Hoist to the first entry tile, not to index zero.** The rail's first card
+  may be there for a reason ("Add this to your plate now" is the narrowest
+  question), and a hoist that displaced it would undo a decision made on
+  purpose.
