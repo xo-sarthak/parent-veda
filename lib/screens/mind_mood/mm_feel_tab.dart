@@ -183,23 +183,37 @@ class _SosCard extends StatelessWidget {
   }
 }
 
-void _openSosFlow(BuildContext context) {
+void _openSosFlow(BuildContext context) => openMmSosFlow(context);
+
+/// Open the 60-second grounding flow, counting the open for repeat detection.
+/// ⚠️ ONE ENTRY POINT. Three opens inside fifteen minutes surfaces the crisis
+/// path when the flow ends; a second caller that pushed the screen directly
+/// would skip that count, which is the one thing the count exists for.
+void openMmSosFlow(BuildContext context) {
   final crossedThreshold = MindMoodStore.instance.registerSosOpen();
   Navigator.of(context).push(MaterialPageRoute<void>(
     settings: const RouteSettings(name: 'mind_mood_sos'),
-    builder: (_) => _MmSosFlowScreen(offerCrisisAtEnd: crossedThreshold),
+    builder: (_) => MmSosFlowScreen(offerCrisisAtEnd: crossedThreshold),
   ));
 }
 
-class _MmSosFlowScreen extends StatefulWidget {
-  const _MmSosFlowScreen({required this.offerCrisisAtEnd});
+/// The flow as a screen, for a caller that pushes it itself (the door
+/// router). Counts the open the same way.
+Widget mmSosFlowScreen() =>
+    MmSosFlowScreen(offerCrisisAtEnd: MindMoodStore.instance.registerSosOpen());
+
+/// ⚠️ PUBLIC SINCE THE DOOR. "Calm note" on the door's Feel tab opens this
+/// through the router; the repeat-detection lives in `openMmSosFlow` so the
+/// router and the old tab count opens the same way.
+class MmSosFlowScreen extends StatefulWidget {
+  const MmSosFlowScreen({super.key, required this.offerCrisisAtEnd});
   final bool offerCrisisAtEnd;
 
   @override
-  State<_MmSosFlowScreen> createState() => _MmSosFlowScreenState();
+  State<MmSosFlowScreen> createState() => MmSosFlowScreenState();
 }
 
-class _MmSosFlowScreenState extends State<_MmSosFlowScreen> {
+class MmSosFlowScreenState extends State<MmSosFlowScreen> {
   int _step = 0;
   bool _done = false;
 

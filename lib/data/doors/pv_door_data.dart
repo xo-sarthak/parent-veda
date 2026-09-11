@@ -72,6 +72,7 @@ import '../scan_extras.dart' show kScanUrgentSigns;
 import 'pv_door_belly_skin.dart';
 import 'pv_door_complications.dart';
 import 'pv_door_labour.dart';
+import 'pv_door_mind.dart';
 import 'pv_door_nutrition.dart';
 import 'pv_door_scans.dart';
 
@@ -103,6 +104,11 @@ enum PvDoorFormat {
   // the one thing this enum exists to prevent.
   recipe,
   video,
+  // ⚠️ ADDED FOR MIND & MOOD. Its brief's format list has Audio beside Video,
+  // and four calming tracks sit on the Feel tab. A chip reading "Video" over
+  // a rain track would be the chip lying, which is the one thing this enum
+  // exists to prevent.
+  audio,
 }
 
 extension PvDoorFormatCopy on PvDoorFormat {
@@ -125,6 +131,7 @@ extension PvDoorFormatCopy on PvDoorFormat {
         PvDoorFormat.talk => 'Talk',
         PvDoorFormat.recipe => 'Recipe',
         PvDoorFormat.video => 'Video',
+        PvDoorFormat.audio => 'Audio',
       };
 }
 
@@ -271,6 +278,9 @@ enum PvDoorLibrary {
 
   /// `kBsPages` — one skin or belly read.
   bellySkin,
+
+  /// `kMmArticles` — one Mind & mood read, on `MmArticleScreen`.
+  mindRead,
 }
 
 extension PvDoorLibraryCopy on PvDoorLibrary {
@@ -298,6 +308,8 @@ extension PvDoorLibraryCopy on PvDoorLibrary {
         // nineteen pages [Read], and it is the right word: these explain what
         // is happening to her skin rather than handing her something to do.
         PvDoorLibrary.bellySkin => PvDoorFormat.read,
+        // The Mind & mood brief marks every one [Read].
+        PvDoorLibrary.mindRead => PvDoorFormat.read,
         PvDoorLibrary.recipe => PvDoorFormat.recipe,
         // A chart is a three-day plan you open, filter and download. That is a
         // tool, not a read.
@@ -342,6 +354,20 @@ final class PvDoorVideoTile extends PvDoorTile {
 
   @override
   PvDoorFormat get format => PvDoorFormat.video;
+}
+
+/// A calming track that is not in the repo yet — the same honest treatment
+/// as [PvDoorVideoTile]. The four Mind & mood tracks have `asset: null` on
+/// `MmCalmAudio` ("the files are not in the repo"), so the card says so.
+final class PvDoorAudioTile extends PvDoorTile {
+  const PvDoorAudioTile({
+    required super.title,
+    required super.blurb,
+    super.meta,
+  }) : super(comingSoon: true);
+
+  @override
+  PvDoorFormat get format => PvDoorFormat.audio;
 }
 
 /// A guide — a piece written to be USED rather than read through.
@@ -793,6 +819,7 @@ final List<PvDoorPage> kPvDoorPages = [
   kNutritionDoor,
   kBellySkinDoor,
   kLabourDoor,
+  kMindDoor,
 ];
 
 /// The door for a bracket, or null when that bracket still opens a hub.

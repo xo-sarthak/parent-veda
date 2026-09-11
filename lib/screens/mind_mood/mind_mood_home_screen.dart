@@ -1,4 +1,13 @@
 // =============================================================================
+//  ⚠️ RETIRED 2026-09-12, KEPT FOR REVERT. No caller opens this shell any more:
+//  the V3 home's bracket tile and its two mood actions open the Mind & mood
+//  DOOR (`lib/data/doors/pv_door_mind.dart`) — on Feel, and on Track for
+//  "Check how I am feeling", which fixes the duplication the brief names. The
+//  four tab widgets this shell composed are all still live: Track renders
+//  inline on the door, and the others' pieces (the breathing screen, the SOS
+//  flow, the screener, the article screen, the booking sheet) are what the
+//  door's cards open. Only the shell retired.
+// =============================================================================
 //  Mind & Mood - home shell (four tabs)
 // -----------------------------------------------------------------------------
 //  The most emotionally sensitive section in the app. This file only owns the

@@ -285,3 +285,4 @@ source for exactly this reason.
 | `docs/ADMIN-PANEL.md` | Everything waiting on Directus |
 | `docs/DIRECTUS-SETUP.md` | The panel runbook — collections, roles, the publish webhooks, and the two cross-repo handoffs |
 | `docs/PERSONALIZATION.md` | The personalisation engine's three layers |
+| `docs/DOOR-CONTENT-OWED.md` | Every page, film or track a door brief referenced that did not exist — the "STOP and list it" ledger, worked through at the end |

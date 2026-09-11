@@ -75,6 +75,19 @@ import '../brackets/scan_reports_screen.dart';
 import '../brackets/scan_timeline_screen.dart';
 import '../brackets/scan_urgent_screen.dart';
 import '../pregnancy/birth_plan_screen.dart';
+import '../../data/doors/pv_door_mind.dart';
+import '../../data/mind_mood_data.dart';
+import '../mind_mood/mm_article_screen.dart';
+import '../mind_mood/mm_breathing_screen.dart';
+import '../mind_mood/mm_crisis_path.dart';
+import '../mind_mood/mm_door_surfaces.dart';
+import '../mind_mood/mm_feel_tab.dart' show mmSosFlowScreen;
+import '../mind_mood/mm_talk_tab.dart' show MmScreenerScreen;
+import '../mind_mood/mm_track_tab.dart';
+import '../../data/mind_mood_extras.dart' show kMmPartnerArticle;
+import '../../services/bracket_resolver.dart' show bracketById;
+import 'pv_door_chrome.dart' show PvDoorToolScaffold;
+import 'pv_door_screen.dart' show PvDoorScreen;
 import '../prepare/birthing_classes_screen.dart';
 import '../prepare/consultations_screen.dart';
 import '../tools/contraction_tracker_screen.dart';
@@ -179,6 +192,21 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
           hue: 186,
           pregnancy: c),
 
+      // ---- Mind & mood ----------------------------------------------------
+      // ⚠️ THE AREA'S OWN SCREENS, REUSED WHOLE. The breathing circle, the
+      // grounding flow, the screener and the crisis path are shipped and keep
+      // their chrome; only the four in `mm_door_surfaces.dart` are new, and
+      // each of those wraps something that already existed.
+      kMindSurfaceReset => const MmHardDayResetScreen(),
+      kMindSurfaceCalmNote => mmSosFlowScreen(),
+      kMindSurfaceAffirmations => const MmAffirmationsScreen(),
+      kMindSurfaceTrack => _MindTrackScreen(pregnancy: c),
+      kMindSurfaceCheckIn => const MmScreenerScreen(),
+      kMindSurfaceCrisis => const MmCrisisPathScreen(),
+      kMindSurfaceHelplines => const MmHelplinesScreen(),
+      _ when id.startsWith('mind/breathe/') => _mindBreathe(id),
+      _ when id.startsWith('mind/offer/') => _mindOffer(id),
+
       _ => null,
     };
 
@@ -221,6 +249,10 @@ Widget? pvDoorInlineToolFor(String id, PregnancyController c) => switch (id) {
       // ⚠️ THE KEEPSAKE IS THE TAB. `BumpJourneyScreen` is a Scaffold, so the
       // inline form is its body — see `BumpJourneyBody`.
       kBsSurfaceRitual => BumpRitualBody(controller: c),
+      // ⚠️ THE TRACK TAB IS THE TOOL. "Do-it screens, not rails." The same
+      // widget the old landing showed, as a Column.
+      kMindSurfaceTrack => const MmTrackTab(embedded: true),
+
       _ => null,
     };
 
@@ -288,6 +320,10 @@ void openPvDoorTile(
     // exists because the union is sealed and the compiler demands it — and
     // because the day a film lands, this is where it plays.
     case PvDoorVideoTile():
+      return;
+
+    // Same as a film: the four calming tracks have no file yet.
+    case PvDoorAudioTile():
       return;
 
     // ---- reading ------------------------------------------------------------
@@ -387,6 +423,34 @@ Widget? pvDoorEntryScreen(
       for (final page in kBsPages) {
         if (page.id == id) return BsArticleScreen(page: page);
       }
+    // ⚠️ THE READ CARRIES ITS OWN LINK AND ITS OWN "TALK" FOOT, and both are
+    // injected here rather than imported by the screen — the article screen
+    // must not know how to open a door. The partner piece is not in
+    // `kMmArticles` (it is written to him, not her) so it is looked up
+    // separately, which is also why it cannot appear on a rail by accident.
+    case PvDoorLibrary.mindRead:
+      final a = id == kMmPartnerArticle.id ? kMmPartnerArticle : mmArticleById(id);
+      if (a == null) return null;
+      return MmArticleScreen(
+        article: a,
+        onOpenLink: a.linkLabel == null
+            ? null
+            : (ctx) {
+                if (a.linkArticleId case final aid?) {
+                  final screen = pvDoorEntryScreen(PvDoorLibrary.mindRead, aid, c);
+                  if (screen == null) return;
+                  Navigator.of(ctx).push(MaterialPageRoute<void>(
+                    settings: RouteSettings(
+                        name: pvDoorEntryRoute(PvDoorLibrary.mindRead, aid)),
+                    builder: (_) => screen,
+                  ));
+                } else if (a.linkDoor case final door?) {
+                  openPvDoorPage(ctx, door, c, group: a.linkGroup);
+                }
+              },
+        onTalk: (ctx) => openPvDoorSurface(
+            ctx, mindSurfaceOffer('perinatal_counselling'), c),
+      );
     case PvDoorLibrary.fasting:
       for (final t in [...kFastingByOccasion, ...kFastingGeneral]) {
         if (t.id == id) return const FastingScreen();
@@ -413,6 +477,7 @@ String pvDoorEntryRoute(PvDoorLibrary library, String id) =>
       PvDoorLibrary.dietChart => 'nutrition/chart/$id',
       PvDoorLibrary.fasting => 'nutrition/fasting/$id',
       PvDoorLibrary.bellySkin => 'belly_skin/$id',
+      PvDoorLibrary.mindRead => 'mind/read/$id',
     };
 
 /// Whether a library id resolves at all. Used by the wiring test, which cannot
@@ -429,6 +494,8 @@ bool pvDoorEntryResolves(PvDoorLibrary library, String id) => switch (library) {
       PvDoorLibrary.fasting =>
         [...kFastingByOccasion, ...kFastingGeneral].any((e) => e.id == id),
       PvDoorLibrary.bellySkin => kBsPages.any((e) => e.id == id),
+      PvDoorLibrary.mindRead =>
+        id == kMmPartnerArticle.id || mmArticleById(id) != null,
     };
 
 /// Whether a surface id opens anything at all. Used by the wiring test.
@@ -458,10 +525,68 @@ bool pvDoorSurfaceResolves(String id) => switch (id) {
       kLabourSurfaceTimer ||
       kLabourSurfaceBag ||
       kLabourSurfaceCourse ||
-      kLabourSurfaceBirthPlan =>
+      kLabourSurfaceBirthPlan ||
+      kMindSurfaceReset ||
+      kMindSurfaceCalmNote ||
+      kMindSurfaceAffirmations ||
+      kMindSurfaceTrack ||
+      kMindSurfaceCheckIn ||
+      kMindSurfaceCrisis ||
+      kMindSurfaceHelplines =>
         true,
+      _ when id.startsWith('mind/breathe/') =>
+        kMmBreathingExercises.any((e) => mindSurfaceBreathe(e.id) == id),
+      _ when id.startsWith('mind/offer/') =>
+        kMmTalkOfferings.any((o) => mindSurfaceOffer(o.id) == id),
       _ => false,
     };
+
+/// `mind/breathe/<id>` → the shared breathing circle on that exercise.
+Widget? _mindBreathe(String id) {
+  final exId = id.substring('mind/breathe/'.length);
+  for (final ex in kMmBreathingExercises) {
+    if (ex.id == exId) return MmBreathingScreen(exercise: ex);
+  }
+  return null;
+}
+
+/// `mind/offer/<id>` → one paid offering, price on its face.
+Widget? _mindOffer(String id) {
+  final oId = id.substring('mind/offer/'.length);
+  for (final o in kMmTalkOfferings) {
+    if (o.id == oId) return MmOfferingScreen(offering: o);
+  }
+  return null;
+}
+
+/// Open a door by bracket id, optionally on a tab. Used by a read that links
+/// across to another area — "Fear of labour" to Labour prep's birth tab.
+void openPvDoorPage(BuildContext context, String bracketId, PregnancyController c,
+    {String? group}) {
+  final page = pvDoorPageFor(bracketId);
+  final bracket = bracketById(bracketId);
+  if (page == null || bracket == null) return;
+  Navigator.of(context).push(MaterialPageRoute<void>(
+    settings: RouteSettings(name: 'door/$bracketId'),
+    builder: (_) => PvDoorScreen(
+        page: page, bracket: bracket, pregnancy: c, initialGroup: group),
+  ));
+}
+
+/// The Track tab as a pushable screen — a surface has to resolve both ways.
+class _MindTrackScreen extends StatelessWidget {
+  const _MindTrackScreen({required this.pregnancy});
+  final PregnancyController pregnancy;
+  @override
+  Widget build(BuildContext context) => PvDoorToolScaffold(
+        hue: 160,
+        eyebrow: 'Mind & mood',
+        title: 'How are you feeling today?',
+        intro: 'A mood word, never a score. Nothing here is graded and '
+            'nothing is shared.',
+        children: const [MmTrackTab(embedded: true)],
+      );
+}
 
 
 // -----------------------------------------------------------------------------

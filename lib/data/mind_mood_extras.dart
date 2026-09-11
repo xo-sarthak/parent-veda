@@ -76,26 +76,52 @@ class MmAffirmation {
 ///   · PERMISSION, NOT PERFORMANCE. Most of these give her permission to feel
 ///     what she already feels. An affirmation that sets a standard she is not
 ///     meeting makes a bad evening worse.
+/// ⚠️ THE BRIEF'S WHOLE ROTATING SET, VERBATIM — 2026-09-12. "For her, never
+/// about the baby." The earlier twelve are kept below, commented, for revert;
+/// they were written to the same three rules and read well, but the brief
+/// says use its copy exactly, and it does.
 final List<MmAffirmation> kMmAffirmations = [
-  MmAffirmation(_en('You are allowed to find this hard. It does not make you '
-      'ungrateful.')),
-  MmAffirmation(_en('This feeling is real, and it is also temporary. Both '
-      'things are true.')),
-  MmAffirmation(_en('You do not have to solve everything tonight.')),
-  MmAffirmation(_en('You are doing more than anyone can see, including you.')),
-  MmAffirmation(_en('Needing help is not the same as not coping.')),
-  MmAffirmation(_en('You are allowed to rest before you have earned it.')),
-  MmAffirmation(_en('A hard day is a hard day. It is not a verdict on the '
-      'kind of mother you will be.')),
-  MmAffirmation(_en('You can be frightened and still be doing this well.')),
-  MmAffirmation(_en('Your body is working very hard right now, even on the '
-      'days it does not feel like it.')),
-  MmAffirmation(_en('You are still yourself. Pregnancy has not replaced you.')),
-  MmAffirmation(_en('You are allowed to say no to advice you did not ask '
-      'for.')),
-  MmAffirmation(_en('Whatever you are feeling right now, you are not the only '
-      'one who has felt it.')),
+  MmAffirmation(_en('You are allowed to find this hard.')),
+  MmAffirmation(_en('You do not have to feel grateful every minute.')),
+  MmAffirmation(_en('Resting is doing something.')),
+  MmAffirmation(_en('You are already a good mother.')),
+  MmAffirmation(_en('One bad day is just one day.')),
+  MmAffirmation(_en('You do not owe anyone an explanation for how you feel.')),
+  MmAffirmation(_en('Your body knows what it is doing.')),
+  MmAffirmation(_en('It is okay to not be glowing.')),
+  MmAffirmation(_en('You can say no to a visit.')),
+  MmAffirmation(_en('Asking for help is not failing.')),
+  MmAffirmation(_en('You are more than this pregnancy.')),
+  MmAffirmation(_en('The people who matter are a short list.')),
+  MmAffirmation(_en('You are allowed to take up space.')),
+  MmAffirmation(_en('Feeling scared does not mean something is wrong.')),
+  MmAffirmation(_en('You do not have to do this the way anyone else did.')),
+  MmAffirmation(_en('Tired is not weak.')),
+  MmAffirmation(_en('You are doing enough.')),
+  MmAffirmation(_en('Some days you just get through, and that counts.')),
 ];
+
+// final List<MmAffirmation> kMmAffirmations = [
+//   MmAffirmation(_en('You are allowed to find this hard. It does not make you '
+//       'ungrateful.')),
+//   MmAffirmation(_en('This feeling is real, and it is also temporary. Both '
+//       'things are true.')),
+//   MmAffirmation(_en('You do not have to solve everything tonight.')),
+//   MmAffirmation(_en('You are doing more than anyone can see, including you.')),
+//   MmAffirmation(_en('Needing help is not the same as not coping.')),
+//   MmAffirmation(_en('You are allowed to rest before you have earned it.')),
+//   MmAffirmation(_en('A hard day is a hard day. It is not a verdict on the '
+//       'kind of mother you will be.')),
+//   MmAffirmation(_en('You can be frightened and still be doing this well.')),
+//   MmAffirmation(_en('Your body is working very hard right now, even on the '
+//       'days it does not feel like it.')),
+//   MmAffirmation(_en('You are still yourself. Pregnancy has not replaced you.')),
+//   MmAffirmation(_en('You are allowed to say no to advice you did not ask '
+//       'for.')),
+//   MmAffirmation(_en('Whatever you are feeling right now, you are not the only '
+//       'one who has felt it.')),
+// ];
+
 
 // -----------------------------------------------------------------------------
 //  Partner support
@@ -180,3 +206,33 @@ final MmArticle kMmPartnerArticle = MmArticle(
     'supporting her. It is usually what makes it possible.',
   ),
 );
+
+// -----------------------------------------------------------------------------
+//  A hard-day reset — the brief's 3.1, verbatim
+// -----------------------------------------------------------------------------
+//  "A short guided screen, about three minutes, using the breathing-circle
+//  component. No streak, nothing logged." Four steps, an intro and a close.
+//  The screen is `MmHardDayResetScreen`; this is only the words.
+
+class MmResetStep {
+  const MmResetStep(this.title, this.body);
+  final String title;
+  final String body;
+}
+
+const String kMmHardDayIntro =
+    'Some days just do not go well. This is a few minutes to set the day down before you sleep. You do not have to fix anything.';
+
+const List<MmResetStep> kMmHardDaySteps = [
+  MmResetStep('Put it down',
+      'Put the phone down for a minute once you start. Sit or lie however you are comfortable. Let your shoulders drop.'),
+  MmResetStep('Breathe',
+      'Breathe in slowly, and out, a little longer than the in. Do this a few times. Nothing to count, just a longer out than in.'),
+  MmResetStep('One kind thing',
+      'Now one small kind thing for yourself. A glass of water. Feet up. A message to the one person who makes you feel better. Pick one.'),
+  MmResetStep('Let the day go',
+      'Today was hard, and it is over now. Tomorrow is allowed to be completely different. You did enough by getting through it.'),
+];
+
+const String kMmHardDayClose =
+    'That is it. Nothing to log. Come back whenever a day gets heavy.';

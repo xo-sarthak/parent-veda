@@ -93,6 +93,7 @@ class PvDoorScreen extends StatefulWidget {
     required this.page,
     required this.bracket,
     required this.pregnancy,
+    this.initialGroup,
   });
 
   final PvDoorPage page;
@@ -105,12 +106,26 @@ class PvDoorScreen extends StatefulWidget {
 
   final PregnancyController pregnancy;
 
+  /// The tab to open on, by group id. Null opens the first.
+  ///
+  /// ⚠️ ADDED FOR MIND & MOOD'S DUPLICATION FIX. The V3 home has two actions,
+  /// "Check how I am feeling" and "Help me feel better", and both used to open
+  /// the same landing — the brief calls that out as a bug by name. They now
+  /// open this door on Track and on Feel respectively. One door, two front
+  /// doors into it; the tab is the whole difference.
+  final String? initialGroup;
+
   @override
   State<PvDoorScreen> createState() => _PvDoorScreenState();
 }
 
 class _PvDoorScreenState extends State<PvDoorScreen> {
-  int _group = 0;
+  late int _group = () {
+    final id = widget.initialGroup;
+    if (id == null) return 0;
+    final i = widget.page.groups.indexWhere((g) => g.id == id);
+    return i < 0 ? 0 : i;
+  }();
 
   PvDoorPage get page => widget.page;
   Bracket get bracket => widget.bracket;
@@ -573,6 +588,7 @@ IconData pvDoorFormatIcon(PvDoorFormat format) => switch (format) {
       // its serving scaler, and a book over a dish is the wrong promise.
       PvDoorFormat.recipe => Icons.restaurant_outlined,
       PvDoorFormat.video => Icons.play_circle_outline_rounded,
+      PvDoorFormat.audio => Icons.headphones_outlined,
     };
 
 /// One card on a rail.

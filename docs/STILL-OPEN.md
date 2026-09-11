@@ -5675,3 +5675,152 @@ someone to mark a scan a month ahead?"*) — and "Undo done" on done rows.
 the row is the one place for now. And Mind & mood — its PDF was never opened
 (`ParentVeda_Mind_and_mood_final.pdf`); the tile still opens the old landing
 whose eyebrow reads "Pregnancy mental health". Next.
+
+
+---
+
+## 40.0 Mind & mood, the sixth pregnancy door — 2026-09-12
+
+Built from `ParentVeda_Mind_and_mood_final.pdf`. The area was already the
+fullest in the stage (26 reads, a real breathing tool, a grounding flow, a
+screener, mood log, worry journal, three offerings, a crisis path), so the
+door is mostly a new front — plus a lot of verbatim copy.
+
+### 40.1 What the brief asked for and got
+
+* **The duplication bug, fixed.** "Check how I am feeling" and "Help me feel
+  better" both pushed the old landing. They open the door on Track and on
+  Feel now, through a new `PvDoorScreen.initialGroup`. The old landing is
+  retired in place. The eyebrow reads "Mind & mood", the tile's own words.
+* **Verbatim copy, all of it:** nine "Is this normal" reads rebuilt under new
+  titles; seven "What no one talks about" reads, new; "Fear of being a bad
+  mother" rebuilt; "Baby blues, or something more?" new; the same-day red flag
+  as the fourth tab's pinned flag; eighteen affirmations; the four-step
+  hard-day reset (was a coming-soon film, now a guided screen on the breathing
+  circle). Every read carries the byline from one constant. The test pins
+  first and last sentences.
+* **Do not drop anything.** The rails read `kMmArticles` by group; a test
+  asserts every read in the library is on the door and none sits on two tabs.
+  The six "more than a mood" reads moved to sub-tab 4, where the brief puts
+  perinatal depression; the five "everyday care" reads and the three unnamed
+  fears stay on Understand.
+* **Cross-links, not copies.** "Fear of labour" links to Labour prep's birth
+  tab, "Fear something is wrong" to Scans, "Bringing him in" to the partner
+  piece — through an injected callback so the article screen never learns
+  how to open a door. Every read also gets a "talk to someone" foot.
+
+### 40.2 What the brief asked for and could NOT get — STOPPED AND LISTED
+
+> Every door's such list now lives in one file, `docs/DOOR-CONTENT-OWED.md`,
+> to be tackled once at the end. This section is the story; that file is the
+> ledger.
+
+The brief's rule: *"Use that copy VERBATIM… If a referenced page is missing,
+STOP and list it."* Three `[new]` cards have no copy in section 3:
+
+* **Tell your doctor** [Guide new] — "How to raise it, with Ask Veda to word
+  it." No copy. **Coming soon on the door.** The prose is owed by whoever
+  writes the briefs; not written here.
+* **Your partner can feel this too** [Read new · optional] — no copy, marked
+  optional. **Omitted.** The existing partner piece is linked from "Bringing
+  him in" instead, which is where the brief points at it.
+* **Helpline numbers** [Guide new] — no prose, and none needed: it is the
+  numbers `mind_mood_data.dart` already holds (Tele-MANAS 14416 /
+  1800-891-4416, emergency 112). Built as a screen listing them. Those numbers
+  are still marked `REQUIRED_TO_CONFIRM` in the data file, as before.
+
+And one deliberate deviation: **no Ask Veda card on Talk**, same as Scans —
+the FAB is on every screen with the door's context.
+
+### 40.3 Not walked on a phone
+
+The other terminal held the device for this build. Every tab draws in the
+render test at 360dp, the four new screens pump without exception (one
+overflow was caught and fixed — the offering's price row), the reset walks
+its steps and the affirmations show one at a time. **Still owed: a handset
+walk**, the same as every other door got, before this one is called done.
+
+### 40.4 Still owed
+
+* The handset walk (§40.3).
+* "Tell your doctor" copy (§40.2).
+* Clinical review of the seventeen new/rebuilt reads and the red flag — the
+  brief names a reviewer and a date, but nobody here has read them.
+* The four calming tracks and five meditations are still coming-soon; the
+  brief says reference Garbh Sanskar's Shravan assets, which would be a
+  wiring job once those assets are in the repo.
+* **Two briefs left:** Garbh Sanskar (the coupled pair).
+
+---
+
+## 41.0 Feeding, the second parenting door — 2026-09-12
+
+Built from `ParentVeda_Feeding_rebuild.pdf` on the Sleep door's shell and
+rules (STILL-OPEN §39): content in `pp_feeding_content.dart`, the shell in
+`lib/data/doors/pp_door_feeding.dart`, the contract in
+`test/pp_feeding_door_test.dart`. Nothing in the pregnancy engine touched.
+
+### 41.1 What changed, in one list
+
+* **The age rule.** `autoScope: true`; "Can he eat this?" lost its age
+  chips and its "pick that first" line (answers for his age, says so once);
+  "What to feed at this age" is a new auto-scoped screen
+  (`pp_what_to_feed_screen.dart`) that MERGES the three surfaces the brief
+  named: his day of food (the `age_charts` pages for his band, rendered
+  through the same block renderer), the "Is he getting enough?" signs card
+  (read from `bf_how_often` by id), and the regional swaps page. The
+  collection is hidden on the door (`PpDoor.hiddenAreaIds`), not deleted —
+  it is the tool's data.
+* **Reformats:** latch and positions → video (positions gets its own slot);
+  bottle → video with a five-card glance; textures → a drawn four-katori
+  illustration; allergens → a checklist interactive (eight allergens, tick
+  what he has had, ends on the list still to do, closing routes to the
+  allergy page); choking prevention → a "cut it this way" illustration;
+  allergic reaction → a mild / call-now illustration plus three cards.
+  "Reading the growth chart" → a card that opens the Growth journey, where
+  the percentile read already lives (its duplicate prose kept for revert).
+* **New:** how much formula by age (chart, her row leads); setting up for
+  solids; constipation when solids start (→ Health); **If he chokes: what to
+  do** (video + the sequence, pinned as the Safe tab's red flag); gagging vs
+  choking (carousel); vitamin D and supplements.
+* **Links the brief asked for:** "not making enough" → feed tracker; sick
+  days → Health; constipation → Health; the choking page → the response.
+* **The door:** five tabs — Milk feeds (breast + formula, mastitis red flag,
+  Log his feeds), Starting solids (What to feed + Can he eat this lead the
+  rail), Cooking for him (Recipes), Growing well (weight gain + not eating,
+  Track his growth), Keeping it safe (choking response red flag). Closing:
+  lactation expert. Hero: NHN / Unsplash, a toddler upright in a high chair.
+* **One renderer fix seen on the phone:** a long chart-card value collapsed
+  the label to one letter per line; the row is now 5:7 and the value wraps.
+  Every section's chart cards benefit.
+
+### 41.2 Needs a decision
+
+* **The allergen tracker does not remember.** The brief says "an allergen
+  tracker: tick egg, peanut…". It is a walk-through (introduced / not yet)
+  that ends on the list still to do, and it forgets on close — the same
+  rule as the sleep-space checklist. A persistent tracker is a store, a
+  table and a sync contract; if the brief meant that, it is a small backend
+  job and this screen is its front.
+* **The three "what to feed" surfaces are one now,** and `pp_food_chart`
+  points at the new screen. `PpChartBrowserScreen` (the chooser version) is
+  kept and still routed for Sleep's old `pp_sleep_check`, which nothing
+  reaches. Retire it, or leave it as the engine for a section that has not
+  been rebuilt.
+* **"Baby not eating food" still holds `picky_sweet_packet`** ("He only wants
+  biscuits and chips") and the breast collection holds `bf_biting` — neither
+  is in the brief's map. Kept, per "do not drop reused pages this map did
+  not name".
+
+### 41.3 Owed
+
+* Films: `feeding/positions_demo` (8 min), `feeding/back_blows_demo`
+  (5 min). The latch, bottle, textures and choking-safety slots existed.
+* **Clinical review, and it is not optional here:** the choking response
+  sequence (back blows, chest thrusts, abdominal thrusts, CPR hand-off),
+  the formula amounts table, the allergen list and its high-risk caveat,
+  the vitamin D dose line. All marked REQUIRED_REVIEW in the file.
+* Artwork, optionally, for the three new drawn illustrations.
+* The handset walk covered the hero, the five tabs, the merged tool and
+  the chart fix; the interactive tracker and the two illustrations were
+  seen only in tests.

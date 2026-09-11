@@ -350,11 +350,21 @@ final List<MmCalmAudio> kMmCalmAudio = [
 //  Understand - article groups
 // =============================================================================
 
-enum MmArticleGroup { isThisNormal, fears, moreThanMood, everydayCare }
+/// ⚠️ THE READS' AUTHOR, ONE CONSTANT. The Mind & mood brief (2026-09-12) puts
+/// Dr Sharanya Menon's byline on every read in the area; the article screen
+/// renders it from here so a new read cannot forget it.
+const String kMmReadAuthor = 'Dr Sharanya Menon';
+const String kMmReadAuthorRole = 'Perinatal psychologist · reviewed Aug 2026';
+
+enum MmArticleGroup { isThisNormal, noOneTalksAbout, fears, moreThanMood, everydayCare }
 
 extension MmArticleGroupMeta on MmArticleGroup {
   LocalizedText get heading => switch (this) {
         MmArticleGroup.isThisNormal => _en('Is this normal?'),
+        // ⚠️ THE BRIEF'S OWN HEADING, INDIA-FIRST. Seven reads about the things
+        // a pregnancy here is lived inside of — the house, the in-laws, the
+        // nuskhe, log kya kahenge — that no clinical library ever names.
+        MmArticleGroup.noOneTalksAbout => _en('What no one talks about'),
         MmArticleGroup.fears => _en('Fears, named and answered'),
         MmArticleGroup.moreThanMood => _en('When it is more than a mood'),
         MmArticleGroup.everydayCare => _en('Everyday emotional care'),
@@ -363,6 +373,8 @@ extension MmArticleGroupMeta on MmArticleGroup {
   LocalizedText get intro => switch (this) {
         MmArticleGroup.isThisNormal => _en('The feelings that catch mothers '
             'by surprise, and almost always are not a problem.'),
+        MmArticleGroup.noOneTalksAbout => _en('The parts of pregnancy here '
+            'that everyone lives and nobody writes down.'),
         MmArticleGroup.fears => _en('The worries most women carry and rarely '
             'say out loud. Named here, so you know you are not the only '
             'one.'),
@@ -402,10 +414,23 @@ class MmArticle {
     this.signsToNotice,
     this.howToGetHelp,
     this.requiresReview = false,
+    this.linkLabel,
+    this.linkDoor,
+    this.linkGroup,
+    this.linkArticleId,
   });
 
   final String id;
   final MmArticleGroup group;
+
+  /// A single cross-link at the foot of the read, where the brief asks for
+  /// one — "Fear of labour" points at Labour prep, "Bringing him in" at the
+  /// partner piece. One of [linkDoor] (+ optional [linkGroup]) or
+  /// [linkArticleId]; never both.
+  final String? linkLabel;
+  final String? linkDoor;
+  final String? linkGroup;
+  final String? linkArticleId;
   final LocalizedText title;
 
   /// One line, shown on the article's card.
@@ -452,195 +477,514 @@ final List<MmArticle> kMmArticles = [
   MmArticle(
     id: 'mood_swings',
     group: MmArticleGroup.isThisNormal,
-    title: _en('Mood swings'),
-    teaser: _en('Up one hour, in tears the next. This is one of the most '
-        'common things pregnancy does.'),
+    // ⚠️ REBUILT 2026-09-12 FROM THE MIND & MOOD BRIEF, VERBATIM. The
+    // teaser is the read's own first sentence. The earlier body is kept
+    // below, commented, for revert.
+    title: _en('One minute okay, next minute not'),
+    teaser: _en('You were fine a moment ago.'),
     readingTime: _en('3 MIN'),
     hasStoryVideo: true,
     body: _en(
-      'Your hormone levels are changing faster than at almost any other '
-      'point in your life, and those same hormones sit close to the parts '
-      'of the brain that manage mood. A swing from laughing to tearful in '
-      'the space of an hour is not a sign anything is wrong with you, it is '
-      'a sign your body is doing a lot of chemical work in a short time.\n\n'
-      'It tends to be strongest in the first trimester, when the change is '
-      'sharpest, and again nearer the end, when your body is preparing for '
-      'birth. Many women find it eases in the middle months.\n\n'
-      'What helps most is not fighting it. Naming it out loud, "I am just '
-      'having a wobbly hour", takes some of the pressure off. If it is '
-      'making daily life hard most days rather than some days, that is '
-      'worth reading more about, and "When it is more than a mood" is '
-      'where to look.',
+      'You were fine a moment ago. Now your eyes are wet over an advert, '
+      'or you have snapped at someone who did nothing. This is not you '
+      'losing control. Your body is running on more hormones than it ever '
+      'has, and they move fast, so your mood moves with them. It settles '
+      'as the weeks pass, and more once the baby is here. You do not have '
+      'to explain every mood to the people around you. "I am alright, it '
+      'is just one of those days" is enough. If the low moods start '
+      'lasting whole days and do not lift, that is worth telling someone, '
+      'and the last tab shows you who.',
     ),
+    // id: 'mood_swings',
+    // group: MmArticleGroup.isThisNormal,
+    // title: _en('Mood swings'),
+    // teaser: _en('Up one hour, in tears the next. This is one of the most '
+    //     'common things pregnancy does.'),
+    // readingTime: _en('3 MIN'),
+    // hasStoryVideo: true,
+    // body: _en(
+    //   'Your hormone levels are changing faster than at almost any other '
+    //   'point in your life, and those same hormones sit close to the parts '
+    //   'of the brain that manage mood. A swing from laughing to tearful in '
+    //   'the space of an hour is not a sign anything is wrong with you, it is '
+    //   'a sign your body is doing a lot of chemical work in a short time.\n\n'
+    //   'It tends to be strongest in the first trimester, when the change is '
+    //   'sharpest, and again nearer the end, when your body is preparing for '
+    //   'birth. Many women find it eases in the middle months.\n\n'
+    //   'What helps most is not fighting it. Naming it out loud, "I am just '
+    //   'having a wobbly hour", takes some of the pressure off. If it is '
+    //   'making daily life hard most days rather than some days, that is '
+    //   'worth reading more about, and "When it is more than a mood" is '
+    //   'where to look.',
+    // ),
   ),
   MmArticle(
     id: 'crying_easily',
     group: MmArticleGroup.isThisNormal,
-    title: _en('Crying easily'),
-    teaser: _en('An advert, a song, a kind word from a stranger. Any of it '
-        'can set you off, and that is normal.'),
+    // ⚠️ REBUILT 2026-09-12 FROM THE MIND & MOOD BRIEF, VERBATIM. The
+    // teaser is the read's own first sentence. The earlier body is kept
+    // below, commented, for revert.
+    title: _en('Crying at everything'),
+    teaser: _en('Adverts, a song, the way someone looked at you, nothing at all.'),
     readingTime: _en('3 MIN'),
     body: _en(
-      'Pregnancy lowers the threshold for tears. Things that would once '
-      'have passed you by, a song on the radio, a stranger being kind, now '
-      'reach you faster and deeper. That is not a character change, it is '
-      'a hormonal one, and it fades as your body settles into each stage.\n\n'
-      'It can feel embarrassing in the moment, especially in front of '
-      'colleagues or family who do not expect it. It does not need '
-      'explaining every time. "I am a bit emotional today" is enough.\n\n'
-      'The distinction worth knowing is between tears that pass and leave '
-      'you feeling lighter, and a heaviness that does not lift. The first '
-      'is ordinary pregnancy. The second is worth a closer look.',
+      'Adverts, a song, the way someone looked at you, nothing at all. '
+      'The tears come easy right now and you cannot always find a reason. '
+      'That is normal in pregnancy and it does not mean something is '
+      'wrong with you. Crying is not a problem to fix. Let it come, it '
+      'usually passes in a few minutes and you feel lighter after. What '
+      'is worth watching is if the crying stops feeling like release and '
+      'starts feeling like you cannot stop, or it is there most days. '
+      'Then it is not just hormones, and it is worth a proper '
+      'conversation.',
     ),
+    // id: 'crying_easily',
+    // group: MmArticleGroup.isThisNormal,
+    // title: _en('Crying easily'),
+    // teaser: _en('An advert, a song, a kind word from a stranger. Any of it '
+    //     'can set you off, and that is normal.'),
+    // readingTime: _en('3 MIN'),
+    // body: _en(
+    //   'Pregnancy lowers the threshold for tears. Things that would once '
+    //   'have passed you by, a song on the radio, a stranger being kind, now '
+    //   'reach you faster and deeper. That is not a character change, it is '
+    //   'a hormonal one, and it fades as your body settles into each stage.\n\n'
+    //   'It can feel embarrassing in the moment, especially in front of '
+    //   'colleagues or family who do not expect it. It does not need '
+    //   'explaining every time. "I am a bit emotional today" is enough.\n\n'
+    //   'The distinction worth knowing is between tears that pass and leave '
+    //   'you feeling lighter, and a heaviness that does not lift. The first '
+    //   'is ordinary pregnancy. The second is worth a closer look.',
+    // ),
   ),
   MmArticle(
     id: 'irritability_anger',
     group: MmArticleGroup.isThisNormal,
-    title: _en('Irritability and anger'),
-    teaser: _en('Snapping at people you love, over things that would '
-        'usually not bother you.'),
+    // ⚠️ REBUILT 2026-09-12 FROM THE MIND & MOOD BRIEF, VERBATIM. The
+    // teaser is the read's own first sentence. The earlier body is kept
+    // below, commented, for revert.
+    title: _en('Short temper, and the guilt after'),
+    teaser: _en('Someone asks one more question, gives one more piece of advice, '
+        'and you snap.'),
     readingTime: _en('3 MIN'),
     body: _en(
-      'Anger is a less-talked-about pregnancy feeling than tears, but it is '
-      'just as common. Poor sleep, nausea, physical discomfort and the '
-      'sheer effort of growing a baby all shorten your fuse, and hormones '
-      'add to it.\n\n'
-      'It often lands hardest on the people closest to you, a partner, a '
-      'parent, because they are the ones around when the fuse runs out. '
-      'That is not a reflection of how you feel about them.\n\n'
-      'A short pause before responding, even ten seconds, helps more than '
-      'it sounds like it should. If anger is frequent enough that you '
-      'worry about it, or it frightens you, that is worth talking through '
-      'with someone rather than managing alone.',
+      'Someone asks one more question, gives one more piece of advice, '
+      'and you snap. Then you feel terrible about it for the rest of the '
+      'day. The snapping is the tiredness and the hormones talking. The '
+      'guilt after is you being a kind person. Neither makes you a bad '
+      'mother-to-be. You are allowed to say "I cannot take advice right '
+      'now, I just need a bit of quiet." You do not owe everyone patience '
+      'while you are growing a whole person. If the anger is scaring you, '
+      'or it is turning on you, that is a sign to talk to someone, and '
+      'there is no shame in it.',
     ),
+    // id: 'irritability_anger',
+    // group: MmArticleGroup.isThisNormal,
+    // title: _en('Irritability and anger'),
+    // teaser: _en('Snapping at people you love, over things that would '
+    //     'usually not bother you.'),
+    // readingTime: _en('3 MIN'),
+    // body: _en(
+    //   'Anger is a less-talked-about pregnancy feeling than tears, but it is '
+    //   'just as common. Poor sleep, nausea, physical discomfort and the '
+    //   'sheer effort of growing a baby all shorten your fuse, and hormones '
+    //   'add to it.\n\n'
+    //   'It often lands hardest on the people closest to you, a partner, a '
+    //   'parent, because they are the ones around when the fuse runs out. '
+    //   'That is not a reflection of how you feel about them.\n\n'
+    //   'A short pause before responding, even ten seconds, helps more than '
+    //   'it sounds like it should. If anger is frequent enough that you '
+    //   'worry about it, or it frightens you, that is worth talking through '
+    //   'with someone rather than managing alone.',
+    // ),
   ),
   MmArticle(
     id: 'feeling_disconnected',
     group: MmArticleGroup.isThisNormal,
-    title: _en('Feeling disconnected from the pregnancy'),
-    teaser: _en('Not feeling the rush of love you expected, or not feeling '
-        'much at all yet.'),
+    // ⚠️ REBUILT 2026-09-12 FROM THE MIND & MOOD BRIEF, VERBATIM. The
+    // teaser is the read's own first sentence. The earlier body is kept
+    // below, commented, for revert.
+    title: _en('Not feeling the bond yet'),
+    teaser: _en('Everyone assumes you fell in love with the baby the second you saw '
+        'two lines.'),
     readingTime: _en('4 MIN'),
     hasStoryVideo: true,
     body: _en(
-      'Some women feel connected to their pregnancy from the first missed '
-      'period. Many do not, and instead feel oddly separate from it for '
-      'weeks or months, especially before there is any movement to feel. '
-      'Neither is more correct than the other.\n\n'
-      'Connection often builds gradually rather than arriving all at once, '
-      'and it is not unusual for it to properly begin after the first '
-      'flutter of movement, or even after the birth itself. Feeling '
-      'disconnected now says nothing about the kind of mother you will '
-      'be.\n\n'
-      'If it comes with a general flatness about everything, not just the '
-      'pregnancy, that is worth reading about in "When it is more than a '
-      'mood".',
+      'Everyone assumes you fell in love with the baby the second you saw '
+      'two lines. Some mothers do. Plenty do not, and they carry a quiet '
+      'worry that something is missing in them. Nothing is. A bond is not '
+      'a switch, it grows, and for many women it grows after the baby is '
+      'born, not before. Talking to your bump, feeling the kicks, none of '
+      'it has to feel magical to be real. You are already doing the '
+      'loving part by looking after yourself. If not feeling it is making '
+      'you feel low or broken, that feeling is worth sharing. It is more '
+      'common than anyone admits.',
     ),
+    // id: 'feeling_disconnected',
+    // group: MmArticleGroup.isThisNormal,
+    // title: _en('Feeling disconnected from the pregnancy'),
+    // teaser: _en('Not feeling the rush of love you expected, or not feeling '
+    //     'much at all yet.'),
+    // readingTime: _en('4 MIN'),
+    // hasStoryVideo: true,
+    // body: _en(
+    //   'Some women feel connected to their pregnancy from the first missed '
+    //   'period. Many do not, and instead feel oddly separate from it for '
+    //   'weeks or months, especially before there is any movement to feel. '
+    //   'Neither is more correct than the other.\n\n'
+    //   'Connection often builds gradually rather than arriving all at once, '
+    //   'and it is not unusual for it to properly begin after the first '
+    //   'flutter of movement, or even after the birth itself. Feeling '
+    //   'disconnected now says nothing about the kind of mother you will '
+    //   'be.\n\n'
+    //   'If it comes with a general flatness about everything, not just the '
+    //   'pregnancy, that is worth reading about in "When it is more than a '
+    //   'mood".',
+    // ),
   ),
   MmArticle(
     id: 'guilt',
     group: MmArticleGroup.isThisNormal,
-    title: _en('Guilt'),
-    teaser: _en('For resting, for not feeling grateful enough, for a hundred '
-        'small things.'),
+    // ⚠️ REBUILT 2026-09-12 FROM THE MIND & MOOD BRIEF, VERBATIM. The
+    // teaser is the read's own first sentence. The earlier body is kept
+    // below, commented, for revert.
+    title: _en('The guilt that follows you around'),
+    teaser: _en('You ate the wrong thing.'),
     readingTime: _en('3 MIN'),
     body: _en(
-      'Guilt shows up in pregnancy in small, persistent ways: guilt for '
-      'needing to rest, guilt for not enjoying every moment, guilt for a '
-      'coffee or a bad night, guilt for feeling anything other than '
-      'grateful. It is one of the most common feelings mothers describe and '
-      'rarely say out loud.\n\n'
-      'A useful question to ask it is simple: would you judge a friend this '
-      'harshly for the same thing? Almost always the answer is no, and that '
-      'gap between how you treat yourself and how you would treat someone '
-      'you love is worth noticing.\n\n'
-      'Guilt that becomes a constant background hum, rather than something '
-      'that visits and passes, is covered in "When it is more than a '
-      'mood".',
+      'You ate the wrong thing. You skipped the walk. You felt annoyed at '
+      'the baby for making you sick. Guilt in pregnancy is loud and it is '
+      'rarely fair. One meal, one bad day, one moment of not feeling '
+      'grateful does not harm your baby. You are allowed to be a person '
+      'who gets things wrong and is still a good mother. If the guilt has '
+      'become a voice that will not stop, that lists everything you have '
+      'done wrong, that is worth telling someone. That is not conscience '
+      'anymore, and it is something we can help with.',
     ),
+    // id: 'guilt',
+    // group: MmArticleGroup.isThisNormal,
+    // title: _en('Guilt'),
+    // teaser: _en('For resting, for not feeling grateful enough, for a hundred '
+    //     'small things.'),
+    // readingTime: _en('3 MIN'),
+    // body: _en(
+    //   'Guilt shows up in pregnancy in small, persistent ways: guilt for '
+    //   'needing to rest, guilt for not enjoying every moment, guilt for a '
+    //   'coffee or a bad night, guilt for feeling anything other than '
+    //   'grateful. It is one of the most common feelings mothers describe and '
+    //   'rarely say out loud.\n\n'
+    //   'A useful question to ask it is simple: would you judge a friend this '
+    //   'harshly for the same thing? Almost always the answer is no, and that '
+    //   'gap between how you treat yourself and how you would treat someone '
+    //   'you love is worth noticing.\n\n'
+    //   'Guilt that becomes a constant background hum, rather than something '
+    //   'that visits and passes, is covered in "When it is more than a '
+    //   'mood".',
+    // ),
   ),
   MmArticle(
     id: 'pregnancy_brain',
     group: MmArticleGroup.isThisNormal,
-    title: _en('Pregnancy brain'),
-    teaser: _en('Forgetting words mid-sentence, walking into a room and '
-        'losing the reason why.'),
+    // ⚠️ REBUILT 2026-09-12 FROM THE MIND & MOOD BRIEF, VERBATIM. The
+    // teaser is the read's own first sentence. The earlier body is kept
+    // below, commented, for revert.
+    title: _en('Forgetting everything'),
+    teaser: _en('You walked into a room and forgot why.'),
     readingTime: _en('3 MIN'),
     body: _en(
-      'Forgetfulness and foggy thinking in pregnancy are real and well '
-      'documented, not something you are imagining or a sign of anything '
-      'wrong. Sleep changes, hormone shifts and simply having a great deal '
-      'on your mind all play a part.\n\n'
-      'It tends to be most noticeable in the third trimester and usually '
-      'improves after birth, though tiredness in the early weeks with a '
-      'newborn can keep it going a while longer.\n\n'
-      'Small systems help more than trying to remember harder: a note on '
-      'your phone, keys always in the same bowl, a list by the door. It is '
-      'a season, not a permanent change.',
+      'You walked into a room and forgot why. You have said the same '
+      'thing twice. You are sure you are getting slower. This is real, '
+      'people call it pregnancy brain, and it is your body putting its '
+      'energy elsewhere for a while. It is not a sign of anything lasting '
+      'and it comes back after. Write things down, keep one list, and be '
+      'kind to yourself about it. It is only worth a second look if the '
+      'fog comes with feeling low or not like yourself, in which case it '
+      'might not be the pregnancy alone.',
     ),
+    // id: 'pregnancy_brain',
+    // group: MmArticleGroup.isThisNormal,
+    // title: _en('Pregnancy brain'),
+    // teaser: _en('Forgetting words mid-sentence, walking into a room and '
+    //     'losing the reason why.'),
+    // readingTime: _en('3 MIN'),
+    // body: _en(
+    //   'Forgetfulness and foggy thinking in pregnancy are real and well '
+    //   'documented, not something you are imagining or a sign of anything '
+    //   'wrong. Sleep changes, hormone shifts and simply having a great deal '
+    //   'on your mind all play a part.\n\n'
+    //   'It tends to be most noticeable in the third trimester and usually '
+    //   'improves after birth, though tiredness in the early weeks with a '
+    //   'newborn can keep it going a while longer.\n\n'
+    //   'Small systems help more than trying to remember harder: a note on '
+    //   'your phone, keys always in the same bowl, a list by the door. It is '
+    //   'a season, not a permanent change.',
+    // ),
   ),
   MmArticle(
     id: 'overwhelm',
     group: MmArticleGroup.isThisNormal,
-    title: _en('Feeling overwhelmed'),
-    teaser: _en('Too much to think about, too many decisions, too little '
-        'time to feel ready.'),
+    // ⚠️ REBUILT 2026-09-12 FROM THE MIND & MOOD BRIEF, VERBATIM. The
+    // teaser is the read's own first sentence. The earlier body is kept
+    // below, commented, for revert.
+    title: _en('When it all feels like too much'),
+    teaser: _en('The appointments, the advice, the changes in your body, the worry '
+        'about money or work or the delivery, and everyone with an opinion.'),
     readingTime: _en('3 MIN'),
     hasStoryVideo: true,
     body: _en(
-      'Pregnancy arrives with a long list: appointments, decisions, things '
-      'to buy, things to learn, and often work and family to manage '
-      'alongside all of it. Feeling overwhelmed by the sheer size of that '
-      'list is common, and it does not mean you are not coping.\n\n'
-      'It often helps to separate "this week" from "the whole nine months" '
-      '. Almost nothing on the list actually needs deciding today, even '
-      'when it feels urgent.\n\n'
-      'If the overwhelm sits with you most of most days, rather than lifting '
-      'once the immediate task is done, "When it is more than a mood" is '
-      'worth a look.',
+      'The appointments, the advice, the changes in your body, the worry '
+      'about money or work or the delivery, and everyone with an opinion. '
+      'Some days it piles up and you just want it all to stop for a '
+      'minute. That feeling is not weakness, it is a lot, genuinely. You '
+      'are allowed to put some of it down. Pick the one thing that '
+      'matters today and let the rest wait. Say no to a visit. Hand '
+      'something to your partner. If the overwhelmed feeling is there '
+      'every day, or you are lying awake with it, do not sit with it '
+      'alone, the last tab shows you who to reach.',
     ),
+    // id: 'overwhelm',
+    // group: MmArticleGroup.isThisNormal,
+    // title: _en('Feeling overwhelmed'),
+    // teaser: _en('Too much to think about, too many decisions, too little '
+    //     'time to feel ready.'),
+    // readingTime: _en('3 MIN'),
+    // hasStoryVideo: true,
+    // body: _en(
+    //   'Pregnancy arrives with a long list: appointments, decisions, things '
+    //   'to buy, things to learn, and often work and family to manage '
+    //   'alongside all of it. Feeling overwhelmed by the sheer size of that '
+    //   'list is common, and it does not mean you are not coping.\n\n'
+    //   'It often helps to separate "this week" from "the whole nine months" '
+    //   '. Almost nothing on the list actually needs deciding today, even '
+    //   'when it feels urgent.\n\n'
+    //   'If the overwhelm sits with you most of most days, rather than lifting '
+    //   'once the immediate task is done, "When it is more than a mood" is '
+    //   'worth a look.',
+    // ),
   ),
   MmArticle(
     id: 'numb_no_joy',
     group: MmArticleGroup.isThisNormal,
-    title: _en('Feeling numb when you expected joy'),
-    teaser: _en('Everyone says this should be the happiest time, and you '
-        'mostly feel nothing.'),
+    // ⚠️ REBUILT 2026-09-12 FROM THE MIND & MOOD BRIEF, VERBATIM. The
+    // teaser is the read's own first sentence. The earlier body is kept
+    // below, commented, for revert.
+    title: _en('Numb, when everyone says you should be glowing'),
+    teaser: _en('Everyone is excited.'),
     readingTime: _en('4 MIN'),
     hasStoryVideo: true,
     body: _en(
-      'This one is quietly common and rarely spoken about, because '
-      'pregnancy is supposed to feel joyful and admitting it does not can '
-      'feel like a failure. It is not one. Feelings do not arrive on '
-      'schedule just because an occasion calls for them.\n\n'
-      'Numbness can come from exhaustion, from a pregnancy that followed a '
-      'hard journey to get here, from stress elsewhere in life taking up '
-      'all the emotional room, or simply because that is how you process '
-      'big change.\n\n'
-      'A flat, empty feeling that persists, rather than a quiet or delayed '
-      'one, is worth reading about in "When it is more than a mood", '
-      'specifically antenatal depression.',
+      'Everyone is excited. The family is planning. And you feel flat. '
+      'Nothing. Maybe even a bit trapped, and then guilty for feeling '
+      'trapped. Feeling numb when you are supposed to be happy is one of '
+      'the loneliest things in pregnancy, because you cannot say it out '
+      'loud without someone gasping. So here it is said plainly: it '
+      'happens, it does not mean you will not love your baby, and it is '
+      'not your fault. Numbness that stays is one of the clearer signs '
+      'that this is more than a mood, and it is exactly what a counsellor '
+      'is there for. Reaching out is not giving up.',
     ),
+    // id: 'numb_no_joy',
+    // group: MmArticleGroup.isThisNormal,
+    // title: _en('Feeling numb when you expected joy'),
+    // teaser: _en('Everyone says this should be the happiest time, and you '
+    //     'mostly feel nothing.'),
+    // readingTime: _en('4 MIN'),
+    // hasStoryVideo: true,
+    // body: _en(
+    //   'This one is quietly common and rarely spoken about, because '
+    //   'pregnancy is supposed to feel joyful and admitting it does not can '
+    //   'feel like a failure. It is not one. Feelings do not arrive on '
+    //   'schedule just because an occasion calls for them.\n\n'
+    //   'Numbness can come from exhaustion, from a pregnancy that followed a '
+    //   'hard journey to get here, from stress elsewhere in life taking up '
+    //   'all the emotional room, or simply because that is how you process '
+    //   'big change.\n\n'
+    //   'A flat, empty feeling that persists, rather than a quiet or delayed '
+    //   'one, is worth reading about in "When it is more than a mood", '
+    //   'specifically antenatal depression.',
+    // ),
   ),
   MmArticle(
     id: 'loneliness',
     group: MmArticleGroup.isThisNormal,
-    title: _en('Loneliness'),
-    teaser: _en('Surrounded by people, and still feeling like no one quite '
-        'understands.'),
+    // ⚠️ REBUILT 2026-09-12 FROM THE MIND & MOOD BRIEF, VERBATIM. The
+    // teaser is the read's own first sentence. The earlier body is kept
+    // below, commented, for revert.
+    title: _en('Lonely, even in a full house'),
+    teaser: _en('The house is full of people and you have never felt more alone.'),
     readingTime: _en('3 MIN'),
     body: _en(
-      'It is possible to be surrounded by a loving family and still feel '
-      'lonely in pregnancy, because what changes in your body and mind is '
-      'yours alone to carry, even when everyone around you is trying to '
-      'help.\n\n'
-      'It is especially common for a first pregnancy, when friends who '
-      'have not been through it cannot quite meet you where you are, or '
-      'when family is far away, or when a joint household leaves little '
-      'space that is only yours.\n\n'
-      'Other mothers, even ones you have not met yet, are often the '
-      'fastest route out of this particular loneliness. The Community '
-      'space in the app exists for exactly this.',
+      'The house is full of people and you have never felt more alone. '
+      'Everyone is focused on the baby, the plans, the rituals, and '
+      'nobody has really asked how you are doing inside. That loneliness '
+      'is real and it is common, especially when you are surrounded by '
+      'people who love you but do not quite see you. You are allowed to '
+      'want to be seen, not just checked on. Tell one person, the one '
+      'most likely to just listen, "I do not need advice, I just need you '
+      'to hear me today." And if there is no such person right now, the '
+      'community and the counsellor here are for exactly this.',
+    ),
+    // id: 'loneliness',
+    // group: MmArticleGroup.isThisNormal,
+    // title: _en('Loneliness'),
+    // teaser: _en('Surrounded by people, and still feeling like no one quite '
+    //     'understands.'),
+    // readingTime: _en('3 MIN'),
+    // body: _en(
+    //   'It is possible to be surrounded by a loving family and still feel '
+    //   'lonely in pregnancy, because what changes in your body and mind is '
+    //   'yours alone to carry, even when everyone around you is trying to '
+    //   'help.\n\n'
+    //   'It is especially common for a first pregnancy, when friends who '
+    //   'have not been through it cannot quite meet you where you are, or '
+    //   'when family is far away, or when a joint household leaves little '
+    //   'space that is only yours.\n\n'
+    //   'Other mothers, even ones you have not met yet, are often the '
+    //   'fastest route out of this particular loneliness. The Community '
+    //   'space in the app exists for exactly this.',
+    // ),
+  ),
+
+  // ---------------------------------------------------------------------------
+  //  What no one talks about - 7
+  // ---------------------------------------------------------------------------
+  //  ⚠️ NEW 2026-09-12, FROM THE MIND & MOOD BRIEF, VERBATIM. India-first: the
+  //  house, the in-laws, the nuskhe, the gender question, the secret months.
+  //  Not one of these appears in a clinical library, and every one of them is
+  //  lived by most of the women this app is for.
+  MmArticle(
+    id: 'policed_eating',
+    group: MmArticleGroup.noOneTalksAbout,
+    title: _en('When everyone polices what you eat and do'),
+    teaser: _en('No papaya.'),
+    readingTime: _en('3 MIN'),
+    body: _en(
+      'No papaya. Do not lift that. Sit down. Eat this, it is good for '
+      'the baby. Do not eat that, it is too hot. Everyone in the house '
+      'has become an expert on your body. Some of it is love, some of it '
+      'is old habit, and a lot of it is not backed by anything. You are '
+      'allowed to check what actually matters (the Can I? section has the '
+      'real answers) and gently let the rest go. "Doctor said it is fine" '
+      'is a full sentence. You do not have to argue, and you do not have '
+      'to obey either. It is still your body, even now.',
+    ),
+  ),
+  MmArticle(
+    id: 'log_kya_kahenge',
+    group: MmArticleGroup.noOneTalksAbout,
+    title: _en('Log kya kahenge'),
+    teaser: _en('So much of pregnancy here gets lived for other people.'),
+    readingTime: _en('3 MIN'),
+    body: _en(
+      'So much of pregnancy here gets lived for other people. What will '
+      'the neighbours say, what will the in-laws think, are we doing it '
+      'the right way, are we telling people at the right time. It is '
+      'exhausting to carry everyone\'s opinion on top of everything else. '
+      'Here is the quiet truth: most of those people will not remember '
+      'any of it in a year, and none of them are the ones growing this '
+      'baby or raising it. You are allowed to do this your way. The '
+      'people whose opinion actually matters are you, your partner, and '
+      'your doctor. That is a short list, and it is the right one.',
+    ),
+  ),
+  MmArticle(
+    id: 'secret_months',
+    group: MmArticleGroup.noOneTalksAbout,
+    title: _en('The secret months, carried alone'),
+    teaser: _en('Many couples do not tell anyone for the first three months, just '
+        'in case.'),
+    readingTime: _en('3 MIN'),
+    body: _en(
+      'Many couples do not tell anyone for the first three months, just '
+      'in case. It is a sensible custom, but it has a cost: you are going '
+      'through the sickness, the fear, the tiredness and the worry, and '
+      'you cannot tell a soul. That is a heavy secret to carry, '
+      'especially at work or in a full house. You are allowed to tell the '
+      'one or two people who make you feel safe, even in these early '
+      'weeks. A secret does not have to mean completely alone. And if the '
+      'early worry is keeping you up, the community here is anonymous, so '
+      'you can say it out loud without saying it out loud.',
+    ),
+  ),
+  MmArticle(
+    id: 'gender_everyones_business',
+    group: MmArticleGroup.noOneTalksAbout,
+    title: _en('When the baby\'s gender becomes everyone\'s business'),
+    teaser: _en('The law will not let anyone tell you, and that is a good thing, '
+        'but it does not stop people wondering out loud, dropping hints, or '
+        'making you feel like one answer would be better than the other.'),
+    readingTime: _en('3 MIN'),
+    body: _en(
+      'The law will not let anyone tell you, and that is a good thing, '
+      'but it does not stop people wondering out loud, dropping hints, or '
+      'making you feel like one answer would be better than the other. If '
+      'you have felt the weight of that, or felt a flicker of your own '
+      'hope and then guilt about it, you are not a bad person. You are a '
+      'person in a place where this still carries pressure. Your baby is '
+      'your baby. The people who make it about a gender are telling you '
+      'about themselves, not about your child. You do not have to carry '
+      'their preference as your worry.',
+    ),
+  ),
+  MmArticle(
+    id: 'no_corner_of_the_house',
+    group: MmArticleGroup.noOneTalksAbout,
+    title: _en('No corner of the house that\'s yours'),
+    teaser: _en('In a joint family, or even a small flat full of people, there may '
+        'be nowhere you can just close a door and be.'),
+    readingTime: _en('3 MIN'),
+    body: _en(
+      'In a joint family, or even a small flat full of people, there may '
+      'be nowhere you can just close a door and be. Everyone means well, '
+      'everyone is around, and you never get five minutes that are only '
+      'yours. That wears you down more than people realise. You are '
+      'allowed to take that space, even in small ways: a walk by '
+      'yourself, ten minutes in a room with the door shut, headphones on '
+      'with something calming. It is not rude, it is not acting '
+      'difficult, it is how you stay okay. The Feel tab has a few short '
+      'things for exactly those stolen ten minutes.',
+    ),
+  ),
+  MmArticle(
+    id: 'nuskhe_and_superstitions',
+    group: MmArticleGroup.noOneTalksAbout,
+    title: _en('When the nuskhe and the superstitions start'),
+    teaser: _en('Do not sit in the doorway.'),
+    readingTime: _en('3 MIN'),
+    body: _en(
+      'Do not sit in the doorway. Drink this so the baby is fair. Do this '
+      'so it is a boy, do that so the delivery is easy. Every family has '
+      'its nuskhe and its beliefs, and some are sweet, some are harmless, '
+      'and some quietly make you anxious or ashamed. You do not have to '
+      'follow the ones that worry you, and you do not have to fight the '
+      'ones that comfort people. When something makes you uneasy, you are '
+      'allowed to check it (Can I? and Ask Veda are there for that) and '
+      'then let it go. A belief that adds fear is not helping you, '
+      'whatever it promises.',
+    ),
+  ),
+  MmArticle(
+    id: 'bringing_him_in',
+    group: MmArticleGroup.noOneTalksAbout,
+    title: _en('Bringing him in, when he doesn\'t get it'),
+    teaser: _en('He is happy about the baby, but he does not feel the sickness, the '
+        'fear, the change in your body, so he does not always understand '
+        'why you are low or snappy or scared.'),
+    readingTime: _en('3 MIN'),
+    // "There is a short piece for him too on what actually helps" —
+    // `kMmPartnerArticle`, which already exists and is written to him.
+    linkLabel: 'The short piece for him',
+    linkArticleId: 'partner_support',
+    body: _en(
+      'He is happy about the baby, but he does not feel the sickness, the '
+      'fear, the change in your body, so he does not always understand '
+      'why you are low or snappy or scared. That gap is normal and it '
+      'does not mean he does not care. He often just does not know what '
+      'to do. Tell him the specific thing, not the whole feeling: sit '
+      'with me for ten minutes, handle your mother today, just listen, do '
+      'not fix it. Men here are rarely taught how to do this, so small '
+      'clear asks work better than hoping he will notice. There is a '
+      'short piece for him too on what actually helps.',
     ),
   ),
 
@@ -649,6 +993,12 @@ final List<MmArticle> kMmArticles = [
   // ---------------------------------------------------------------------------
   MmArticle(
     id: 'fear_labour',
+    // ⚠️ THE BRIEF: "Add a line linking across to Labour prep's 'what
+    // actually happens in labour', since knowing the process is the real
+    // thing that shrinks the fear." A link, not a copy.
+    linkLabel: 'What actually happens in labour',
+    linkDoor: 'pregnancy_labour',
+    linkGroup: 'birth',
     group: MmArticleGroup.fears,
     title: _en('Fear of labour'),
     teaser: _en('A fear strong enough to have its own name: tokophobia. You '
@@ -675,6 +1025,10 @@ final List<MmArticle> kMmArticles = [
   ),
   MmArticle(
     id: 'fear_something_wrong',
+    // The brief: links across to Scans & tests for the actual checks.
+    linkLabel: 'The scans that check, and when',
+    linkDoor: 'pregnancy_scans_tests',
+    linkGroup: 'understand',
     group: MmArticleGroup.fears,
     title: _en('Fear something is wrong with the baby'),
     teaser: _en('A worry that sits underneath everything, even when every '
@@ -727,24 +1081,47 @@ final List<MmArticle> kMmArticles = [
   MmArticle(
     id: 'fear_not_good_mother',
     group: MmArticleGroup.fears,
-    title: _en('Fear of not being a good mother'),
-    teaser: _en('"What if I am not cut out for this." Nearly every mother '
-        'has thought it.'),
+    // ⚠️ REBUILT 2026-09-12 FROM THE MIND & MOOD BRIEF, VERBATIM. The
+    // teaser is the read's own first sentence. The earlier body is kept
+    // below, commented, for revert.
+    title: _en('Fear of being a bad mother'),
+    teaser: _en('You are not even a mother yet and you are already sure you will '
+        'get it wrong.'),
     readingTime: _en('4 MIN'),
     hasExpertVideo: true,
     hasStoryVideo: true,
     body: _en(
-      'This fear is close to universal and rarely spoken about, because it '
-      'feels like admitting a weakness rather than what it actually is: a '
-      'sign that you care enough to worry about getting this right.\n\n'
-      'There is no version of motherhood that arrives fully formed on day '
-      'one. It is learned, mostly on the job, by every mother who has ever '
-      'done it, including the ones who look most certain from the outside.\n\n'
-      'If this fear is paired with a persistent sense of dread about the '
-      'baby arriving at all, rather than ordinary nerves, that combination '
-      'is worth reading about in "Antenatal depression" and "Pregnancy '
-      'anxiety".',
+      'You are not even a mother yet and you are already sure you will '
+      'get it wrong. You will be too tired, too impatient, too much like '
+      'someone in your own family you did not want to become. Almost '
+      'every thoughtful mother has this fear, and here is the thing: the '
+      'mothers who worry about being bad at it are almost never the ones '
+      'you would actually worry about. The fear is your care showing up '
+      'early. You do not have to have it all figured out. You will learn '
+      'the baby, the baby will learn you, and you will both be fine at it '
+      'in your own way. If this fear is constant and heavy, that is worth '
+      'talking through with someone.',
     ),
+    // id: 'fear_not_good_mother',
+    // group: MmArticleGroup.fears,
+    // title: _en('Fear of not being a good mother'),
+    // teaser: _en('"What if I am not cut out for this." Nearly every mother '
+    //     'has thought it.'),
+    // readingTime: _en('4 MIN'),
+    // hasExpertVideo: true,
+    // hasStoryVideo: true,
+    // body: _en(
+    //   'This fear is close to universal and rarely spoken about, because it '
+    //   'feels like admitting a weakness rather than what it actually is: a '
+    //   'sign that you care enough to worry about getting this right.\n\n'
+    //   'There is no version of motherhood that arrives fully formed on day '
+    //   'one. It is learned, mostly on the job, by every mother who has ever '
+    //   'done it, including the ones who look most certain from the outside.\n\n'
+    //   'If this fear is paired with a persistent sense of dread about the '
+    //   'baby arriving at all, rather than ordinary nerves, that combination '
+    //   'is worth reading about in "Antenatal depression" and "Pregnancy '
+    //   'anxiety".',
+    // ),
   ),
   MmArticle(
     id: 'fear_body_changes',
@@ -799,6 +1176,29 @@ final List<MmArticle> kMmArticles = [
   //  When it is more than a mood - 6
   //  ⚠️ REQUIRED_REVIEW on every article below. Draft wording only.
   // ---------------------------------------------------------------------------
+  MmArticle(
+    id: 'baby_blues_or_more',
+    group: MmArticleGroup.moreThanMood,
+    // ⚠️ NEW 2026-09-12, FROM THE BRIEF, VERBATIM — the read that opens the
+    // door's "When it is more than this" tab. The red flag beside it holds
+    // the signs; this is the sentence before them.
+    title: _en('Baby blues, or something more?'),
+    teaser: _en('Most mothers feel weepy, up and down and a bit raw in the first '
+        'days and weeks.'),
+    readingTime: _en('2 MIN'),
+    requiresReview: true,
+    body: _en(
+      'Most mothers feel weepy, up and down and a bit raw in the first '
+      'days and weeks. That is the baby blues, and it usually settles on '
+      'its own within about two weeks. What is different, and worth '
+      'taking seriously, is a low that does not lift, that is there most '
+      'of every day, that steals your sleep or your appetite or your '
+      'interest in everything. That is not a mood you have to wait out or '
+      'push through. It is common, it is not your fault, and it gets '
+      'better with the right help. The signs below tell you when to reach '
+      'out today.',
+    ),
+  ),
   MmArticle(
     id: 'antenatal_depression',
     group: MmArticleGroup.moreThanMood,

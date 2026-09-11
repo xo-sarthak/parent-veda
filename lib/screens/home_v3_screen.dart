@@ -21,7 +21,8 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'mind_mood/mind_mood_home_screen.dart';
+// import 'mind_mood/mind_mood_home_screen.dart'; // retired 2026-09-12 — the door
+import '../data/doors/pv_door_mind.dart' show kMindTabFeel, kMindTabTrack;
 import 'nutrition/nutrition_home_screen.dart';
 import 'nutrition/nutrition_stage_screen.dart';
 import 'belly_skin/belly_skin_home_screen.dart';
@@ -764,6 +765,19 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
   /// write-only with no read grant and its own stated rule is "which room, never
   /// what was in it" — logging `pregnancy_mental_health` would put a health
   /// signal into a log nothing can retract. One surface, no id, or none at all.
+  /// The Mind & mood door on a given tab. Two home actions and the bracket
+  /// tile all land here; only the tab differs.
+  void _openMindDoor(BuildContext context, String tab) {
+    final door = pvDoorPageFor('pregnancy_mental_health');
+    final b = bracketById('pregnancy_mental_health');
+    if (door == null || b == null) return; // wiring test makes this unreachable
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      settings: const RouteSettings(name: 'mind_mood'),
+      builder: (_) => PvDoorScreen(
+          page: door, bracket: b, pregnancy: pregnancy, initialGroup: tab),
+    ));
+  }
+
   void _openBracket(BuildContext context, String bracketId) {
     final b = bracketById(bracketId);
     if (b == null) return; // wiring test makes this unreachable
@@ -924,11 +938,18 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
         push(NutritionStageScreen(initialTab: 1, pregnancy: pregnancy),
             'nutrition_condition');
         return;
-      // Mind & Mood replaces the two placeholder mood actions, which used to
-      // fall back to the reads library because no mood surface existed.
+      // ⚠️ TWO ACTIONS, TWO TABS OF ONE DOOR — THE BUG THE MIND & MOOD BRIEF
+      // NAMES. "Check how I am feeling" and "Help me feel better" used to open
+      // the same landing. They now open the Mind & mood door on Track and on
+      // Feel respectively; the tab is the whole difference between them, and
+      // it is the difference she tapped for.
+      //
+      // ⚠️ THE ROUTE NAME IS THE OLD ONE. `global_ask_fab.dart` reads it.
       case kPgActMoodCheck:
+        _openMindDoor(context, kMindTabTrack);
+        return;
       case kPgActFeelBetter:
-        push(mindMoodHomeScreen(controller: pregnancy), 'mind_mood');
+        _openMindDoor(context, kMindTabFeel);
         return;
     }
 

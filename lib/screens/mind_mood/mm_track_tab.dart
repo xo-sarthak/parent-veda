@@ -21,7 +21,14 @@ import 'mm_crisis_path.dart';
 import 'mm_talk_tab.dart' show showCounsellingBookingSheet;
 
 class MmTrackTab extends StatefulWidget {
-  const MmTrackTab({super.key});
+  const MmTrackTab({super.key, this.embedded = false});
+
+  /// ⚠️ TRUE WHEN THE MIND & MOOD DOOR RENDERS THIS IN PLACE. The door's tab
+  /// is the tool — "do-it screens, not rails" — and a scrolling widget inside
+  /// the door's scroll is either unbounded or a nested scroll nobody can drive
+  /// with a thumb. Embedded, this is the same children in a `Column`; the
+  /// old landing keeps the `ListView`.
+  final bool embedded;
 
   @override
   State<MmTrackTab> createState() => _MmTrackTabState();
@@ -89,9 +96,7 @@ class _MmTrackTabState extends State<MmTrackTab> {
         final trend = _store.trend;
         final entries = _store.journalEntries;
 
-        return ListView(
-          padding: const EdgeInsets.fromLTRB(18, 6, 18, 40),
-          children: [
+        final children = <Widget>[
             Text('How are you feeling, today?',
                 style: pvFraunces(
                     fontSize: 20,
@@ -328,7 +333,15 @@ class _MmTrackTabState extends State<MmTrackTab> {
                 ),
               ],
             ],
-          ],
+          ];
+
+        if (widget.embedded) {
+          return Column(
+              crossAxisAlignment: CrossAxisAlignment.start, children: children);
+        }
+        return ListView(
+          padding: const EdgeInsets.fromLTRB(18, 6, 18, 40),
+          children: children,
         );
       },
     );

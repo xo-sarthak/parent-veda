@@ -611,3 +611,34 @@ Three properties, each deliberate:
   exact widget the preview shows — one `RepaintBoundary` around one card,
   used on screen, full screen and for the PNG. Two code paths for "preview"
   and "export" drift within a week.
+
+## 23. Verbatim copy is a contract, and "STOP and list it" is part of it
+
+The Mind & mood brief is the first to say *"use that copy VERBATIM… if a
+referenced page is missing, STOP and list it."* Two things follow that a
+builder will be tempted to skip:
+
+* **Verbatim means the test pins sentences.** `pv_door_mind_test.dart` checks
+  first and last sentences of rebuilt bodies, the whole affirmation list, the
+  four step titles, the five red-flag lines. A paraphrase compiles and renders;
+  only a string comparison catches it.
+* **A `[new]` card with no copy is a coming-soon card and a line in
+  STILL-OPEN, never a sentence you write.** Three of this brief's `[new]`
+  items had no section-3 text. One was data (helpline numbers — built from
+  the constants that existed), one was optional (omitted), one was prose
+  (coming soon). Writing "How to raise it with your doctor" yourself would
+  have been fast, plausible, and exactly the thing the brief forbids.
+* **The list lives in one place: `docs/DOOR-CONTENT-OWED.md`.** Every door's
+  STOP-and-list rows, coming-soon cards and omitted optionals, one section
+  per door, append-only, to be worked through once at the very end. A door's
+  STILL-OPEN section still records the story; the ledger records the row —
+  file, card title, outcome, what is owed. Add the door's section there in
+  the same commit as the door.
+
+## 24. Two front doors into one door — `PvDoorScreen.initialGroup`
+
+When a home has two actions that mean two different tabs of one area, they
+open the same door on different tabs. They do not open two screens, and they
+never open the same screen. Mind & mood's "Check how I am feeling" (Track)
+and "Help me feel better" (Feel) are the case; the brief called the old
+behaviour — both to one landing — "a bug", by name.

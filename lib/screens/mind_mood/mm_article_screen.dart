@@ -22,8 +22,21 @@ import '../v2/v2_palette.dart';
 import 'mm_talk_tab.dart' show showCounsellingBookingSheet;
 
 class MmArticleScreen extends StatelessWidget {
-  const MmArticleScreen({super.key, required this.article});
+  const MmArticleScreen({
+    super.key,
+    required this.article,
+    this.onOpenLink,
+    this.onTalk,
+  });
   final MmArticle article;
+
+  /// ⚠️ INJECTED, NOT IMPORTED. The read's one cross-link (Labour prep, Scans,
+  /// the partner piece) and its "talk to someone" foot both open things this
+  /// screen has no business knowing how to open — a door, a stage's router.
+  /// The Mind & mood door router passes both; the old landing passes neither
+  /// and simply shows no link. Same pattern as `PvReaderScreen`.
+  final void Function(BuildContext)? onOpenLink;
+  final void Function(BuildContext)? onTalk;
 
   @override
   Widget build(BuildContext context) {
@@ -66,6 +79,12 @@ class MmArticleScreen extends StatelessWidget {
                     fontWeight: FontWeight.w700,
                     letterSpacing: 0.6,
                     color: p.ink3)),
+            // ⚠️ THE BYLINE, ON EVERY READ — the Mind & mood brief: "Author on
+            // every read: Dr Sharanya Menon, Perinatal psychologist." One
+            // constant, so a new read cannot forget it.
+            const SizedBox(height: 10),
+            Text('$kMmReadAuthor · $kMmReadAuthorRole',
+                style: pvManrope(fontSize: 12, height: 1.4, color: p.ink2)),
             const SizedBox(height: 20),
             if (article.hasExpertVideo) ...[
               PvVideoPlaceholder(
@@ -107,12 +126,49 @@ class MmArticleScreen extends StatelessWidget {
               ),
               const SizedBox(height: 22),
             ],
+            // The read's one cross-link, where the brief asks for one.
+            if (article.linkLabel case final label? when onOpenLink != null) ...[
+              const SizedBox(height: 4),
+              _LinkRow(p: p, label: label, onTap: () => onOpenLink!(context)),
+              const SizedBox(height: 18),
+            ],
+            // ⚠️ "Each points to the last tab if a feeling needs a person." A
+            // quiet foot on every read, opening the counsellor.
+            if (onTalk != null) ...[
+              Container(height: 1, color: p.line),
+              const SizedBox(height: 14),
+              _LinkRow(
+                  p: p,
+                  label: 'If this feeling needs a person, talk to someone',
+                  onTap: () => onTalk!(context)),
+              const SizedBox(height: 22),
+            ],
             if (moreThanMood) _PaidFooter(p: p),
           ],
         ),
       ),
     );
   }
+}
+
+class _LinkRow extends StatelessWidget {
+  const _LinkRow({required this.p, required this.label, required this.onTap});
+  final V2Palette p;
+  final String label;
+  final VoidCallback onTap;
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Row(children: [
+          Expanded(
+            child: Text(label,
+                style: pvManrope(
+                    fontSize: 14, fontWeight: FontWeight.w700, color: p.action)),
+          ),
+          Icon(Icons.chevron_right_rounded, size: 20, color: p.action),
+        ]),
+      );
 }
 
 class _StructuredBlock extends StatelessWidget {

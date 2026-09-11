@@ -216,7 +216,7 @@ class _ScreenerCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
           settings: const RouteSettings(name: 'mind_mood_screener'),
-          builder: (_) => const _MmScreenerScreen(),
+          builder: (_) => const MmScreenerScreen(),
         )),
         child: Container(
           padding: const EdgeInsets.all(16),
@@ -250,13 +250,16 @@ class _ScreenerCard extends StatelessWidget {
   }
 }
 
-class _MmScreenerScreen extends StatefulWidget {
-  const _MmScreenerScreen();
+/// ⚠️ PUBLIC SINCE THE DOOR. The gentle check-in was a card on the old Talk
+/// tab; the brief reslots it to "When it is more than this", and the door
+/// router opens it by surface id.
+class MmScreenerScreen extends StatefulWidget {
+  const MmScreenerScreen({super.key});
   @override
-  State<_MmScreenerScreen> createState() => _MmScreenerScreenState();
+  State<MmScreenerScreen> createState() => MmScreenerScreenState();
 }
 
-class _MmScreenerScreenState extends State<_MmScreenerScreen> {
+class MmScreenerScreenState extends State<MmScreenerScreen> {
   int _index = 0;
   int _total = 0;
   bool _done = false;
