@@ -9,13 +9,32 @@
 //  eleven parallel sections stay one product is that none of them own a
 //  `SizedBox`. See pp_content.dart's own header for the full argument.
 //
-//  ⚠️ NO SLEEP TRAINING ANYWHERE. The spec is explicit and it is a market fact,
-//  not a preference: "near-zero India demand for sleep training and Indian
-//  families co-sleep by default with no decision-anxiety". So no cry-it-out and
-//  no ferberizing, and the phrase "sleep training" appears exactly once in
-//  user-facing copy: on the consult, where spec §11 requires it to be named and
-//  ruled out. Everywhere else it stays out of the reader's head rather than
-//  being introduced in order to be argued with.
+//  ⚠️ REBUILT 2026-09-11 FROM `ParentVeda_Sleep_rebuild.pdf`, THE V3 DOOR BRIEF.
+//  The library model stayed (landing, seven collections, the standalone
+//  tracker); what changed is the age rule, nine reformats, seven new pieces,
+//  two merges and one cut. The brief's marks are quoted at each page below so
+//  a reviewer can hold the file against the map. Three rules from it that the
+//  data now enforces rather than describes:
+//
+//    * **The app knows her age, so it never asks.** `autoScope: true` on the
+//      section removes the band chips; every age-arc table and timeline
+//      carries `rowMonths` so her row leads; the "Is she sleeping enough?"
+//      checker is gone because it existed only to turn an age into a range.
+//    * **Single source.** The tracker is "Log her sleep" is "Track and
+//      understand" — one surface, on the hub. Sleep Sounds is one library,
+//      `pp_sounds_data.dart`, and the collection 7 page is GENERATED from it
+//      rather than being a second list that drifts.
+//    * **No second copies.** The worry set is a carousel whose cards open the
+//      four canonical pages, which stay in the file as `linkedOnly`.
+//
+//  ⚠️ SLEEP TRAINING: WE NOW SAY WHERE WE STAND, ONCE, AND PIN IT. The first
+//  build kept the phrase out of the reader's head entirely, on the market
+//  fact that Indian families co-sleep by default. The rebuild reverses that
+//  deliberately: "Where we stand on sleep training" is pinned at the top of
+//  collection 4 and named brand-defining — gentle first, and why, plus the
+//  words to push back when family says "let her cry". Everywhere else the
+//  old rule still holds: no cry-it-out, no ferberizing, and the consult still
+//  names sleep training only to rule it out.
 //
 //  ⚠️ SAFE SLEEP IS HARM REDUCTION, NOT ABSTINENCE. This is the one place the
 //  section could actually cost a baby something, and the reasoning is worth
@@ -26,12 +45,14 @@
 //  of the nights where the answer really is a separate surface. Fewer absolutes,
 //  more babies on a firm flat surface with no quilt over their face.
 //
-//  ⚠️ THE AGE CARDS IN AREA 1 ARE THE DATA SOURCE FOR THE QUICK-CHECK TOOL.
-//  They are `PpChartCard`s with label/value rows precisely so `pp_sleep_check`
-//  can read them instead of a second copy of the numbers existing in a tool
-//  file. Two copies of a sleep range is two answers to the same question.
+//  ⚠️ THE AGE CARDS IN AREA 1 ARE STRUCTURED DATA, AND THAT STILL MATTERS. They
+//  were built as `PpChartCard`s with label/value rows so the quick-check tool
+//  could read them. The tool is gone — auto-scope made it redundant — but the
+//  cards stay structured, because `test/pp_sleep_check_test.dart` still proves
+//  every band has a card, and because the day someone wants the numbers in a
+//  second place (Ask Veda, a WhatsApp reply) they are rows, not prose.
 //
-//  English only for now, plain `String`, per the standing instruction.
+//  English only, plain `String`.
 // =============================================================================
 
 import 'package:flutter/material.dart' show Icons;
@@ -40,6 +61,7 @@ import 'pp_age_bands.dart';
 import '../brackets/hub/hub_intent_art.dart';
 import 'pp_content.dart';
 import 'pp_section_screen.dart';
+import 'pp_sounds_data.dart';
 
 // =============================================================================
 //  THE SECTION
@@ -50,6 +72,9 @@ final PpSection kPpSleepSection = PpSection(
   title: 'Sleep',
   intro: 'Helping your little one, and you, sleep better.',
   bandSet: kPpSleepBands,
+  // ⚠️ THE AGE RULE. No chips, no chooser; the library opens on her band and
+  // shows only that. See `PpSection.autoScope`.
+  autoScope: true,
   areas: [
     _howMuch,
     _nightWaking,
@@ -59,7 +84,17 @@ final PpSection kPpSleepSection = PpSection(
     _worries,
     _music,
   ],
+  // ⚠️ ONE TOOL ON THE LANDING, AND THE BRIEF SAYS WHY THE OTHER TWO WENT.
+  //
+  // "Removed from tools: 'Is she sleeping enough?' (merged into collection 1
+  // chart); 'Log her sleep' shown as = the tracker." The checker only turned
+  // an age into a range, and the app knows the age. The log IS the tracker,
+  // which is already the hub's second door ("Track & understand sleep"), so a
+  // tool row for it was the same surface offered twice on one screen.
+  //
+  // Both kept below for revert.
   tools: [
+    /*
     PpSectionTool(
       label: 'Is she sleeping enough?',
       blurb: 'Enter her age and see the normal range. Takes ten seconds.',
@@ -77,6 +112,7 @@ final PpSection kPpSleepSection = PpSection(
       surfaceId: 'pp_sleep',
       icon: Icons.edit_note_outlined,
     ),
+    */
     PpSectionTool(
       label: 'Sleep Sounds',
       blurb: 'Lori, white noise, rain, soft ragas and bedtime stories, '
@@ -86,6 +122,18 @@ final PpSection kPpSleepSection = PpSection(
     ),
   ],
 );
+
+/// The reassurance the old quick-check screen carried, now on the chart it
+/// merged into. One string, five pages, so it cannot drift between ages.
+const String _kRangeReassurance =
+    'Plenty of perfectly healthy babies sit outside these ranges. If she '
+    'wakes rested and is growing and feeding well, she is getting what she '
+    'needs.';
+
+/// The `(fromMonths, toMonths)` spans behind every age-arc table in this
+/// file, so "her row" is decided from one list rather than five. Matches
+/// `kPpSleepBands` exactly.
+const List<(int, int)> _kArc = [(0, 3), (3, 6), (6, 12), (12, 36), (36, 72)];
 
 // =============================================================================
 //  AREA 1 — How much sleep by age
@@ -105,8 +153,9 @@ final PpArea _howMuch = PpArea(
   pages: [
     PpPage(
       id: 'sleep_newborn',
-      title: 'Newborn sleep, 0 to 3 months',
-      format: 'CHART-CARD',
+      title: 'Her sleep right now',
+      subtitle: 'Newborn, 0 to 3 months',
+      format: 'CHART',
       bands: ['nb'],
       blocks: [
         PpIntro('Newborns sleep a lot, in short bursts, around the clock. '
@@ -135,17 +184,22 @@ final PpArea _howMuch = PpArea(
         PpIndiaNote('In a shared room she often settles faster, not slower. '
             'You do not need a separate nursery, and there is no evidence a '
             'baby sleeping in your room sleeps worse.'),
-        PpLink(
-          'Check the range for her exact age',
-          surfaceId: 'pp_sleep_check',
-          blurb: 'Enter her age in weeks or months, get the normal range.',
-        ),
+        PpCallout(_kRangeReassurance),
+        // ⚠️ THE CHECKER LINK IS GONE. The brief: "delete 'check the range
+        // for her exact age'". This page IS her exact age now. Kept for
+        // revert.
+        // PpLink(
+        //   'Check the range for her exact age',
+        //   surfaceId: 'pp_sleep_check',
+        //   blurb: 'Enter her age in weeks or months, get the normal range.',
+        // ),
       ],
     ),
     PpPage(
       id: 'sleep_3_6',
-      title: 'Sleep at 3 to 6 months',
-      format: 'CHART-CARD',
+      title: 'Her sleep right now',
+      subtitle: '3 to 6 months',
+      format: 'CHART',
       bands: ['m3_6'],
       blocks: [
         PpIntro('Something starts to look like a pattern now. Night sleep '
@@ -173,17 +227,22 @@ final PpArea _howMuch = PpArea(
         PpIndiaNote('If the household eats at 9pm, her bedtime will drift '
             'late. Rather than fight the whole house, keep the last 20 minutes '
             'before sleep quiet and dim, wherever that happens.'),
-        PpLink(
-          'Check the range for her exact age',
-          surfaceId: 'pp_sleep_check',
-          blurb: 'Enter her age in weeks or months, get the normal range.',
-        ),
+        PpCallout(_kRangeReassurance),
+        // ⚠️ THE CHECKER LINK IS GONE. The brief: "delete 'check the range
+        // for her exact age'". This page IS her exact age now. Kept for
+        // revert.
+        // PpLink(
+        //   'Check the range for her exact age',
+        //   surfaceId: 'pp_sleep_check',
+        //   blurb: 'Enter her age in weeks or months, get the normal range.',
+        // ),
       ],
     ),
     PpPage(
       id: 'sleep_6_12',
-      title: 'Sleep at 6 to 12 months',
-      format: 'CHART-CARD',
+      title: 'Her sleep right now',
+      subtitle: '6 to 12 months',
+      format: 'CHART',
       bands: ['m6_12'],
       blocks: [
         PpIntro('Most of her sleep has moved to the night by now. The day naps '
@@ -213,17 +272,22 @@ final PpArea _howMuch = PpArea(
         PpIndiaNote('Once she can pull to stand, check the bed and the room '
             'again. A baby who could not move last month can now reach the '
             'edge of the mattress.'),
-        PpLink(
-          'Check the range for her exact age',
-          surfaceId: 'pp_sleep_check',
-          blurb: 'Enter her age in weeks or months, get the normal range.',
-        ),
+        PpCallout(_kRangeReassurance),
+        // ⚠️ THE CHECKER LINK IS GONE. The brief: "delete 'check the range
+        // for her exact age'". This page IS her exact age now. Kept for
+        // revert.
+        // PpLink(
+        //   'Check the range for her exact age',
+        //   surfaceId: 'pp_sleep_check',
+        //   blurb: 'Enter her age in weeks or months, get the normal range.',
+        // ),
       ],
     ),
     PpPage(
       id: 'sleep_toddler',
-      title: 'Sleep for a 1 to 3 year old',
-      format: 'CHART-CARD',
+      title: 'Her sleep right now',
+      subtitle: 'Toddler, 1 to 3 years',
+      format: 'CHART',
       bands: ['tod'],
       blocks: [
         PpIntro('One long night and one afternoon nap is where most toddlers '
@@ -251,17 +315,22 @@ final PpArea _howMuch = PpArea(
         PpIndiaNote('Indian children often keep an afternoon nap longer than '
             'Western charts suggest, partly because of the afternoon heat and '
             'partly because the household naps too. That is fine.'),
-        PpLink(
-          'Check the range for her exact age',
-          surfaceId: 'pp_sleep_check',
-          blurb: 'Enter her age in months or years, get the normal range.',
-        ),
+        PpCallout(_kRangeReassurance),
+        // ⚠️ THE CHECKER LINK IS GONE. The brief: "delete 'check the range
+        // for her exact age'". This page IS her exact age now. Kept for
+        // revert.
+        // PpLink(
+        //   'Check the range for her exact age',
+        //   surfaceId: 'pp_sleep_check',
+        //   blurb: 'Enter her age in months or years, get the normal range.',
+        // ),
       ],
     ),
     PpPage(
       id: 'sleep_preschool',
-      title: 'Sleep for a 3 to 5 year old',
-      format: 'CHART-CARD',
+      title: 'Her sleep right now',
+      subtitle: 'Preschooler, 3 to 5 years',
+      format: 'CHART',
       bands: ['pre'],
       blocks: [
         PpIntro('Nights are long and mostly unbroken now. The nap goes '
@@ -288,22 +357,41 @@ final PpArea _howMuch = PpArea(
         PpIndiaNote('School or playgroup timings often decide the wake-up, so '
             'work backwards from that to set bedtime rather than forwards from '
             'dinner.'),
-        PpLink(
-          'Check the range for her exact age',
-          surfaceId: 'pp_sleep_check',
-          blurb: 'Enter her age in months or years, get the normal range.',
-        ),
+        PpCallout(_kRangeReassurance),
+        // ⚠️ THE CHECKER LINK IS GONE. The brief: "delete 'check the range
+        // for her exact age'". This page IS her exact age now. Kept for
+        // revert.
+        // PpLink(
+        //   'Check the range for her exact age',
+        //   surfaceId: 'pp_sleep_check',
+        //   blurb: 'Enter her age in months or years, get the normal range.',
+        // ),
       ],
     ),
+    // ⚠️ [reformat: was article+diagram] -> ANIMATION. "Short animation of the
+    // two cycle waves: she surfaces twice as often as you. Keep the comparison
+    // table." The animation carries what the four paragraphs said; the table
+    // stays; the prose is kept below for revert.
     PpPage(
       id: 'baby_vs_adult_sleep',
       title: 'Why her sleep is not like yours',
       subtitle: 'The reason she stirs, in plain terms',
-      format: 'SHORT ARTICLE + diagram',
+      format: 'ANIMATION',
       blocks: [
         PpIntro('Almost every worry about baby sleep gets smaller once you '
             'know this one thing: her sleep is built differently from yours, '
             'and it is supposed to be.'),
+        PpAnimation(
+          kind: PpAnimationKind.sleepCycles,
+          title: 'One night, two rhythms',
+          caption: 'Your cycle lasts about 90 minutes. Hers lasts 40 to 50. '
+              'Every crest is a surfacing, and she has about twice as many as '
+              'you do in the same night. You turn over and go back down '
+              'without noticing. She has not learned that yet, and it '
+              'arrives on its own, mostly in the second half of the first '
+              'year.',
+        ),
+        /* kept for revert: the article the animation replaced
         PpArticle([
           'Sleep runs in cycles. You go down through light sleep into deep '
               'sleep, come back up, and start again. At the top of each cycle '
@@ -321,6 +409,7 @@ final PpArea _howMuch = PpArea(
               'second half of the first year, and it arrives whether or not '
               'anyone taught it.',
         ]),
+        */
         PpTable(
           heading: 'One night, two kinds of sleeper',
           columns: ['', 'Your baby', 'You'],
@@ -351,6 +440,90 @@ final PpArea _howMuch = PpArea(
         ),
       ],
     ),
+
+    // ⚠️ [new] TOOL. "Her current happy-awake window, shown directly. A guide,
+    // not a stopwatch: watch her, not the clock." A tool page: the card opens
+    // `pp_wake_windows` and these blocks are never rendered. See
+    // `PpPage.toolSurfaceId`.
+    PpPage(
+      id: 'wake_windows',
+      title: 'Wake windows',
+      subtitle: 'How long she can happily stay awake right now',
+      format: 'TOOL',
+      toolSurfaceId: 'pp_wake_windows',
+      blocks: [],
+    ),
+
+    // ⚠️ [new] CAROUSEL. "The paradox: more overtired = harder to settle. How
+    // to catch the window."
+    PpPage(
+      id: 'overtired_baby',
+      title: 'The overtired baby',
+      format: 'CAROUSEL',
+      blocks: [
+        PpIntro('It sounds backwards, and every parent finds it out the hard '
+            'way: a baby who has been awake too long does not go down easier. '
+            'She goes down harder. Six slides on why, and how to catch her '
+            'before it happens.'),
+        PpCarousel(
+          eyebrow: 'The overtired baby',
+          hue: 206,
+          coverTitle: 'More tired is harder, not easier',
+          coverBlurb: 'The paradox that explains most bad bedtimes, and the '
+              'window that fixes it.',
+          cards: [
+            PpCarouselCard(
+                'When she is kept awake past her window, her body does not '
+                    'get sleepier. It gets wired.',
+                'Stress hormones rise to keep her going. They are the same '
+                    'ones that make you unable to sleep after a late night '
+                    'of work.'),
+            PpCarouselCard(
+                'An overtired baby fights sleep, wakes more in the night, '
+                    'and is up earlier in the morning.',
+                'All three at once, and the morning is the one that fools '
+                    'people into keeping her up later still.'),
+            PpCarouselCard(
+                'The window closes fast. The signs come before the crying, '
+                    'and they are quiet.',
+                'A long stare. Rubbing her eyes. Turning away from the toy. '
+                    'One yawn. That is the moment, not the meltdown twenty '
+                    'minutes later.'),
+            PpCarouselCard(
+                'If you have missed it, an earlier bedtime tonight does more '
+                    'than a later one.',
+                'Thirty minutes earlier, for a fortnight, is the counter-'
+                    'intuitive fix that works most often.'),
+            PpCarouselCard(
+                'Overtired and undertired can look the same at 7pm. The '
+                    'difference is the day before it.',
+                'Short naps and a long last stretch usually mean overtired. '
+                    'A late, long nap usually means the opposite. The log '
+                    'tells you which.'),
+            PpCarouselCard(
+                'Her window lengthens as she grows, and nothing you do sets '
+                    'its pace.',
+                'Newborns manage about 45 minutes. By a year it is three to '
+                    'four hours. Wake windows shows hers.'),
+          ],
+        ),
+        PpCallout('Catch the window, and bedtime stops being a fight. That '
+            'one habit does more than any settling technique on this '
+            'section.'),
+        PpWhenLine('Matters most from about 6 weeks to 2 years, when the '
+            'window is short and easy to miss. Older children show it as '
+            'wildness at 6pm rather than crying.'),
+        PpIndiaNote('An evening full of visitors is the classic way to miss '
+            'the window. Everyone wants to hold her, she is passed around, '
+            'and by the time the house quietens she is past it. Claim her '
+            'back at the first yawn.'),
+        PpLink(
+          'See her window right now',
+          surfaceId: 'pp_wake_windows',
+          blurb: 'Shown for her age, with no numbers to enter.',
+        ),
+      ],
+    ),
   ],
 );
 
@@ -373,7 +546,7 @@ final PpArea _nightWaking = PpArea(
     PpPage(
       id: 'why_babies_wake',
       title: 'Why babies wake',
-      format: 'CARDS',
+      format: 'CARDS', // [reuse]
       blocks: [
         PpIntro('Almost every night waking has an ordinary cause, and most of '
             'them are quick to check. Here are the common ones, in the order '
@@ -438,13 +611,16 @@ final PpArea _nightWaking = PpArea(
       id: 'normal_waking_by_age',
       title: 'What is normal night waking',
       subtitle: 'A page to scan, then relax',
-      format: 'COMPARISON TABLE',
+      // [reuse] [auto-scope]: "Leads with HER typical wakes; the age arc stays
+      // as context behind it." `rowMonths` hoists her row.
+      format: 'TABLE',
       blocks: [
         PpIntro('If you only want one thing from this section, it is this '
-            'table. Find her age, read across, and see that the night you had '
-            'is the night most parents at this age are having.'),
+            'table. Her row is at the top. Read across, and see that the night '
+            'you had is the night most parents at this age are having.'),
         PpTable(
           columns: ['Age', 'Typical wakes', 'Why'],
+          rowMonths: _kArc,
           rows: [
             [
               '0 to 3 months',
@@ -496,7 +672,11 @@ final PpArea _nightWaking = PpArea(
     PpPage(
       id: 'gentle_settling',
       title: 'Gentle ways to settle her',
-      format: 'STEP-LIST CARDS',
+      // [reformat: was step-list] -> VIDEO. "Physical skill: patting, shushing,
+      // upright hold, the transfer, on a real baby. Step-list becomes the
+      // companion." The slot below is hoisted to the top by the renderer; the
+      // five step-lists stay as what she reads after watching.
+      format: 'VIDEO',
       blocks: [
         PpIntro('Five ways to get her back down, all of them gentle and all of '
             'them fine to use while she sleeps next to you. Pick by what is '
@@ -610,14 +790,55 @@ final PpArea _nightWaking = PpArea(
         ),
       ],
     ),
+    // ⚠️ [reformat: was text list] -> INTERACTIVE. "One big step at a time,
+    // dark and dim, tap to advance. Not a long list to read in the dark." The
+    // seven steps are unchanged; they moved from a list into the step-through.
+    // The list is kept below for revert.
     PpPage(
       id: 'at_3am',
       title: 'What to do at 3am',
       subtitle: 'The short version, for when you cannot read',
-      format: 'SHORT TEXT / quick reference',
+      format: 'INTERACTIVE',
       blocks: [
         PpIntro('It is the middle of the night and you are too tired to think. '
-            'Run down this list. Most nights you will stop at step two.'),
+            'Tap through this, one step at a time, on a screen dark enough not '
+            'to wake either of you. Most nights you will stop at step two.'),
+        PpInteractive(
+          kind: PpInteractiveKind.night,
+          title: 'What to do at 3am',
+          blurb: 'Seven steps, one per screen, dark and dim. Tap to advance.',
+          items: [
+            PpInteractiveItem('Wait ten seconds',
+                'Babies grumble in their sleep. A good number of wakings end '
+                    'without you.'),
+            PpInteractiveItem('Hand on her chest, low shush',
+                'No lifting yet, no light, no talking.'),
+            PpInteractiveItem('Offer a feed',
+                'Under six months, this is almost always the answer and it '
+                    'is the fastest one.'),
+            PpInteractiveItem('Check the back of her neck',
+                'Sweaty, take a layer off. Cool, add one. Ignore her hands, '
+                    'they are always cold.'),
+            PpInteractiveItem('Check for a dirty nappy',
+                'Change a dirty one. Leave a merely wet one unless she is '
+                    'bothered.'),
+            PpInteractiveItem(
+                'Hold her upright against your shoulder for a few minutes',
+                'For wind and for the wakings that are only about wanting '
+                    'you.'),
+            PpInteractiveItem(
+                'Still going, and this is not like her? Check her over '
+                    'properly',
+                'Temperature, breathing, tummy, a wet nappy count for the '
+                    'day.'),
+          ],
+          closing: 'If she is inconsolable and this is not like her, read '
+              'the doctor page. Under three months, the bar for calling is '
+              'deliberately low.',
+          closingPageId: 'waking_doctor',
+          closingLabel: 'When night waking needs a doctor',
+        ),
+        /* kept for revert: the list the step-through replaced
         PpSteps(
           heading: 'In order',
           [
@@ -637,6 +858,7 @@ final PpArea _nightWaking = PpArea(
                     'the day. Then read the doctor page in this area.'),
           ],
         ),
+        */
         PpCards([
           PpCard('Keep the room dark',
               'One dim warm light if you must. Bright light tells her body it '
@@ -663,69 +885,9 @@ final PpArea _nightWaking = PpArea(
       ],
     ),
     PpPage(
-      id: 'night_weaning',
-      title: 'Gently dropping night feeds',
-      format: 'ARTICLE',
-      bands: ['m6_12', 'tod'],
-      blocks: [
-        PpIntro('If you want to stop feeding at night, it can be done slowly '
-            'and without anyone crying it out. And if you do not want to stop, '
-            'you do not have to. Plenty of children feed at night into their '
-            'second year and are perfectly well.'),
-        PpArticle(heading: 'When it makes sense to start', [
-          'Wait until she is over six months, eating solids reasonably well, '
-              'gaining weight along her own line, and healthy. Before that, '
-              'night feeds are food and not comfort.',
-          'It also has to be a calm few weeks. Not during teething, not during '
-              'an illness, not the week you travel, not the week she starts '
-              'creche. Choose a boring fortnight.',
-          'And be honest about who wants it. If night feeds are working for '
-              'you, there is no medical reason to stop them. If you are '
-              'exhausted and resentful, that is reason enough on its own.',
-        ]),
-        PpSteps(
-          heading: 'A gentle way to do it',
-          [
-            PpStep('Count what is actually happening first', 'Three or four nights of notes. Most parents are '
-                    'surprised by both the number and the times.'),
-            PpStep('Feed her more in the day', 'Move calories into daylight before you take them out '
-                    'of the night. An extra feed or meal in the afternoon.'),
-            PpStep('Pick the easiest feed to drop, not the hardest', 'Usually the one where she takes the least, or the one '
-                    'closest to morning.'),
-            PpStep('Shorten it a little every few nights', 'Two minutes less, or one side instead of two, or a '
-                    'little less in the bottle. Then a little less again.'),
-            PpStep('Replace the feed with the same comfort in another form', 'A hand on her chest, a cuddle, water for a toddler. '
-                    'She is not being refused, she is being answered '
-                    'differently.'),
-            PpStep('Let your partner take that waking for a few nights', 'She will look for the breast if the breast is in the '
-                    'room. This one step often does most of the work.'),
-            PpStep('Then start on the next feed', 'One feed per one to two weeks. Slower is genuinely '
-                    'faster here, because nothing has to be undone.'),
-          ],
-        ),
-        PpCallout('Going backwards is normal. A tooth, a fever or a bad week '
-            'will bring a feed back. Feed her, and start again when things are '
-            'calm. Nothing you did is wasted.'),
-        PpCallout(
-          'Check with your doctor before dropping night feeds if she was born '
-              'early or small, if her weight gain has been slow or has '
-              'flattened, or if she is under six months. Night feeds are '
-              'nutrition at that stage, not habit.',
-          kind: PpCalloutKind.doctor,
-          title: 'Ask first if any of this is true',
-        ),
-        PpWhenLine('From about 6 months at the earliest, more comfortably from '
-            '9 to 12 months. Allow four to six weeks for the whole thing.'),
-        PpIndiaNote('If you share a bed, she will smell milk all night. Moving '
-            'her to the far side of the bed, or having your partner sleep '
-            'between you for a fortnight, is often the gentlest version of '
-            'this whole plan.'),
-      ],
-    ),
-    PpPage(
       id: 'waking_doctor',
       title: 'When night waking needs a doctor',
-      format: 'FLAGGED CALLOUT',
+      format: 'RED FLAG', // [reuse]
       blocks: [
         PpIntro('Almost all night waking is ordinary. A small number of things '
             'are not, and they are worth knowing by heart so you never have to '
@@ -798,7 +960,10 @@ final PpArea _regressions = PpArea(
     PpPage(
       id: 'what_is_regression',
       title: 'What is a sleep regression',
-      format: 'SHORT ARTICLE + timeline',
+      // [reuse] [auto-scope]: "Article + timeline; auto-marks where she is."
+      // The timeline card's `rowMonths` does the marking. Video coming soon:
+      // the slot below is that promise.
+      format: 'ARTICLE',
       blocks: [
         PpIntro('A baby who was sleeping well starts waking every hour. '
             'Nothing has changed in the room, the routine or the feeding. This '
@@ -828,6 +993,10 @@ final PpArea _regressions = PpArea(
             ('18 months', 'Big feelings, big words, testing limits'),
             ('2 years', 'Dreams, fears, and giving up the cot'),
           ],
+          // ⚠️ SPANS, NOT POINTS, so "you are here" lands on the row she is
+          // approaching or inside. The gaps between the brief's ages are
+          // split so every month from birth to three has one row.
+          rowMonths: [(0, 6), (6, 8), (8, 11), (11, 15), (15, 22), (22, 36)],
           note: 'These ages are averages and your baby has not read them. Two '
               'weeks either side is normal, and some babies skip one entirely.',
           hue: 344,
@@ -863,8 +1032,10 @@ final PpArea _regressions = PpArea(
     PpPage(
       id: 'regression_4m',
       title: 'The 4 month regression',
+      // [reuse] [auto-scope]: "Shows in the 3-6mo band; the other regressions
+      // surface at their ages." Was also tagged newborn; the brief narrows it.
       format: 'ARTICLE',
-      bands: ['nb', 'm3_6'],
+      bands: ['m3_6'],
       blocks: [
         PpIntro('This is the one that catches parents out, because it usually '
             'arrives just after the first few good nights. It is also the only '
@@ -942,8 +1113,9 @@ final PpArea _regressions = PpArea(
     PpPage(
       id: 'regression_8_10m',
       title: 'The 8 to 10 month regression',
+      // Surfaces at its age. Was also tagged 3 to 6 months.
       format: 'ARTICLE',
-      bands: ['m3_6', 'm6_12'],
+      bands: ['m6_12'],
       blocks: [
         PpIntro('This one is loud and it is mostly about two things: her body '
             'learning to move, and her mind working out that you still exist '
@@ -1023,8 +1195,9 @@ final PpArea _regressions = PpArea(
     PpPage(
       id: 'regression_toddler',
       title: 'The toddler sleep wobbles, 18 months and 2 years',
+      // Surfaces at its age: 18 months and 2 years are the toddler band.
       format: 'ARTICLE',
-      bands: ['m6_12', 'tod', 'pre'],
+      bands: ['tod'],
       blocks: [
         PpIntro('Toddler sleep goes wrong for different reasons than baby '
             'sleep. It is less about her body and more about her having '
@@ -1103,6 +1276,70 @@ final PpArea _regressions = PpArea(
             'corner does more than asking everyone to be quiet.'),
       ],
     ),
+    PpPage(
+      id: 'night_weaning',
+      title: 'Night weaning, gently',
+      // ⚠️ [new] in the brief, but it already existed in collection 2 as
+      // "Gently dropping night feeds". Moved here and retitled, not rewritten:
+      // the brief's "shows from ~6mo, only once the doctor is happy with her
+      // weight, a slow no-battle taper" is exactly what this page already said.
+      format: 'ARTICLE',
+      bands: ['m6_12', 'tod'],
+      blocks: [
+        PpIntro('If you want to stop feeding at night, it can be done slowly '
+            'and without anyone crying it out. And if you do not want to stop, '
+            'you do not have to. Plenty of children feed at night into their '
+            'second year and are perfectly well.'),
+        PpArticle(heading: 'When it makes sense to start', [
+          'Wait until she is over six months, eating solids reasonably well, '
+              'gaining weight along her own line, and healthy. Before that, '
+              'night feeds are food and not comfort.',
+          'It also has to be a calm few weeks. Not during teething, not during '
+              'an illness, not the week you travel, not the week she starts '
+              'creche. Choose a boring fortnight.',
+          'And be honest about who wants it. If night feeds are working for '
+              'you, there is no medical reason to stop them. If you are '
+              'exhausted and resentful, that is reason enough on its own.',
+        ]),
+        PpSteps(
+          heading: 'A gentle way to do it',
+          [
+            PpStep('Count what is actually happening first', 'Three or four nights of notes. Most parents are '
+                    'surprised by both the number and the times.'),
+            PpStep('Feed her more in the day', 'Move calories into daylight before you take them out '
+                    'of the night. An extra feed or meal in the afternoon.'),
+            PpStep('Pick the easiest feed to drop, not the hardest', 'Usually the one where she takes the least, or the one '
+                    'closest to morning.'),
+            PpStep('Shorten it a little every few nights', 'Two minutes less, or one side instead of two, or a '
+                    'little less in the bottle. Then a little less again.'),
+            PpStep('Replace the feed with the same comfort in another form', 'A hand on her chest, a cuddle, water for a toddler. '
+                    'She is not being refused, she is being answered '
+                    'differently.'),
+            PpStep('Let your partner take that waking for a few nights', 'She will look for the breast if the breast is in the '
+                    'room. This one step often does most of the work.'),
+            PpStep('Then start on the next feed', 'One feed per one to two weeks. Slower is genuinely '
+                    'faster here, because nothing has to be undone.'),
+          ],
+        ),
+        PpCallout('Going backwards is normal. A tooth, a fever or a bad week '
+            'will bring a feed back. Feed her, and start again when things are '
+            'calm. Nothing you did is wasted.'),
+        PpCallout(
+          'Check with your doctor before dropping night feeds if she was born '
+              'early or small, if her weight gain has been slow or has '
+              'flattened, or if she is under six months. Night feeds are '
+              'nutrition at that stage, not habit.',
+          kind: PpCalloutKind.doctor,
+          title: 'Ask first if any of this is true',
+        ),
+        PpWhenLine('From about 6 months at the earliest, more comfortably from '
+            '9 to 12 months. Allow four to six weeks for the whole thing.'),
+        PpIndiaNote('If you share a bed, she will smell milk all night. Moving '
+            'her to the far side of the bed, or having your partner sleep '
+            'between you for a fortnight, is often the gentlest version of '
+            'this whole plan.'),
+      ],
+    ),
   ],
 );
 
@@ -1117,10 +1354,102 @@ final PpArea _gettingToSleep = PpArea(
   blurb: 'Routines, malish, and what to do when the whole house is awake.',
   hue: 26,
   pages: [
+    // ⚠️ [new] VIDEO, PINNED AT THE TOP. "Gentle first, and why; plus the words
+    // to push back when family says 'let her cry'. Brand-defining." This is
+    // the one place the section says the phrase on purpose. See the header.
+    PpPage(
+      id: 'sleep_training_stance',
+      title: 'Where we stand on sleep training',
+      subtitle: 'Gentle first, and the words for when family disagrees',
+      format: 'VIDEO',
+      pinned: true,
+      blocks: [
+        PpVideoSlot(
+          title: 'Where we stand on sleep training',
+          subtitle: 'Three minutes on why we start gentle, what the evidence '
+              'does and does not say, and how to answer "just let her cry".',
+          minutes: '3 MIN',
+          slotId: 'sleep/where_we_stand',
+          hue: 26,
+        ),
+        PpIntro('Sooner or later somebody will tell you to let her cry. A '
+            'relative, a neighbour, an app. You should know what we think '
+            'before that happens, so that it is your decision and not '
+            'theirs.'),
+        PpArticle(heading: 'Gentle first, and why', [
+          'We start gentle and we stay gentle for as long as gentle is '
+              'working. Everything in this section, from patting to slowly '
+              'using less help, keeps you in the room and responding. That is '
+              'not because the alternative is forbidden. It is because for '
+              'most Indian families, who share a room or a bed anyway, gentle '
+              'methods are the ones that actually fit the house and get '
+              'followed.',
+          'The evidence, honestly: structured methods that involve some '
+              'crying, done carefully at the right age, have not been shown '
+              'to harm children in the studies that exist. They have also not '
+              'been shown to make them sleep better a year later than children '
+              'whose parents did something gentler. The advantage they have '
+              'is speed, and the price is a few very hard nights for '
+              'everyone.',
+          'So our position is simple. Under six months, nobody should be left '
+              'to cry to sleep. After that, if gentle is not enough and the '
+              'nights are wearing you down, that is a conversation to have '
+              'with your doctor or a sleep consultant who will not push you, '
+              'not a decision to be made at 4am because a relative said so.',
+        ]),
+        PpScript(
+          heading: 'The words for when family says "let her cry"',
+          [
+            PpScriptLine(
+                say: 'We are doing it the gentle way, and it is working. Give '
+                    'us a few more weeks.',
+                notThis: 'You are wrong about this.',
+                why: 'A plan with a time on it ends the argument. A verdict '
+                    'starts a new one.'),
+            PpScriptLine(
+                say: 'The doctor said not before six months, so we are '
+                    'waiting.',
+                why: 'True, and it moves the disagreement out of the family '
+                    'and onto someone nobody argues with.'),
+            PpScriptLine(
+                say: 'I know you did it differently and your children are '
+                    'fine. This is the way we have chosen.',
+                notThis: 'That was harmful.',
+                why: 'You are not asking them to admit anything. You are '
+                    'asking them to let you parent.'),
+            PpScriptLine(
+                say: 'Could you take her for the first stretch tonight so I '
+                    'can sleep? That would help more than anything.',
+                why: 'The relative who wants to fix your nights usually also '
+                    'wants to help. Give them a way that is not advice.'),
+          ],
+        ),
+        PpCallout('You never have to defend responding to your baby. If '
+            'someone in the house needs a reason, "because it is working for '
+            'us" is a complete one.'),
+        PpWhenLine('This page is for any age. The six-month line is the one '
+            'thing in it that is a rule rather than a stance.'),
+        PpIndiaNote('"Rone do, aadat ho jayegi" comes from love and from a '
+            'generation that had less help and more babies. It is allowed to '
+            'be kindly meant and still not be what you do.'),
+        PpConsult(
+          title: 'Gentle infant sleep consultation',
+          whoFor: 'For when gentle is not enough on its own and you want a '
+              'plan from someone who will not push you toward crying it out. '
+              'Co-sleeping friendly.',
+          surfaceId: 'pp_experts',
+          role: 'sleep',
+        ),
+      ],
+    ),
+    // ⚠️ [reuse] [merge] VIDEO. "Already video + step-list. Absorb 'The hour
+    // before bed' as its wind-down section." The wind-down article and its
+    // cards now sit after the routine's steps; the separate page is kept
+    // commented below the malish page for revert.
     PpPage(
       id: 'bedtime_routine',
       title: 'A calming bedtime routine',
-      format: 'STEP-LIST + callout',
+      format: 'VIDEO',
       blocks: [
         PpIntro('A bedtime routine is not about discipline. It is a signal. '
             'The same few things in the same order tell her body that sleep is '
@@ -1148,6 +1477,45 @@ final PpArea _gettingToSleep = PpArea(
                     'I am here." That sentence becomes the switch.'),
           ],
         ),
+        // ---- merged in: 'The hour before bed' (was its own page) ----------
+        // "Most bedtime trouble is decided in the hour before bedtime, not
+        // at bedtime." The routine above is what happens at bedtime; this is
+        // the wind-down that makes it work.
+        PpArticle(heading: 'The hour before bed', [
+          'Light first, because it is the biggest one. Bright white light in '
+              'the evening tells her brain it is still daytime and delays the '
+              'melatonin that makes her sleepy. Turning off the tube light and '
+              'using one warm lamp for the last hour is a real intervention, '
+              'not a nicety.',
+          'Screens matter for two reasons and only one of them is the light. A '
+              'phone or a TV in the last hour is bright, yes, but it is also '
+              'exciting, and an excited brain takes 30 to 40 minutes to come '
+              'back down. For under-twos the advice is no screens at all in '
+              'the evening. For older children, off an hour before bed.',
+          'Then activity level. Rough play, tickling and chasing right before '
+              'bed produce a very happy child who then cannot sleep. Move the '
+              'wild play earlier and keep the last hour low and floor-based: '
+              'blocks, books, a slow bath.',
+          'One thing that is not on this list: keeping her up late to make her '
+              'sleep better. It almost never works. An overtired child is '
+              'harder to settle and wakes earlier, not later.',
+        ]),
+        PpCards([
+          PpCard('The tube light',
+              'One warm lamp instead, for the last hour. The single easiest '
+                  'change on this page.'),
+          PpCard('The TV in the living room',
+              'If it cannot go off, turn her away from it and take her to the '
+                  'quiet corner for the last 20 minutes.'),
+          PpCard('Phones, including yours',
+              'A screen held over her while she feeds is light straight into '
+                  'her eyes.'),
+          PpCard('Chasing, tickling and jhula games',
+              'Wonderful, and not after 7pm.'),
+          PpCard('Sugar and a big late meal',
+              'A full stomach and a heavy meal too close to sleep leaves her '
+                  'uncomfortable. Dinner about an hour before.'),
+        ], heading: 'What to turn down in the last hour', hue: 26),
         PpCallout('Keep it the same every night. The order matters far more '
             'than the contents. A routine she can predict is a routine that '
             'works, and it works on holiday, at nani-nana\'s house, and in a '
@@ -1174,6 +1542,8 @@ final PpArea _gettingToSleep = PpArea(
         ),
       ],
     ),
+    /* ⚠️ [merge] KEPT FOR REVERT. 'The hour before bed' is folded into the
+       routine above as its wind-down section. "Not a separate page."
     PpPage(
       id: 'wind_down',
       title: 'The hour before bed',
@@ -1228,11 +1598,26 @@ final PpArea _gettingToSleep = PpArea(
             'one dim corner, and that is enough.'),
       ],
     ),
+    */
+
+    // ⚠️ [reformat: was step-list] -> VIDEO. "Massage is shown, not read.
+    // Flagship India ritual; its own demonstrated video." The routine page's
+    // follow-along film includes malish in passing; this slot is the
+    // demonstration itself. The steps stay as the companion.
     PpPage(
       id: 'malish',
       title: 'Malish before sleep',
-      format: 'STEP-LIST',
+      format: 'VIDEO',
       blocks: [
+        PpVideoSlot(
+          title: 'Malish before sleep, demonstrated',
+          subtitle: 'Every stroke, slowly, on a real baby: legs, arms, chest, '
+              'the clockwise tummy, back and head. And the pressure that is '
+              'right.',
+          minutes: '9 MIN',
+          slotId: 'sleep/malish_demo',
+          hue: 26,
+        ),
         PpIntro('Malish is one of the few traditional practices with real '
             'evidence behind it. Babies who are massaged settle a little '
             'faster, cry a little less, and gain weight a little better. It is '
@@ -1304,7 +1689,7 @@ final PpArea _gettingToSleep = PpArea(
     PpPage(
       id: 'feeding_to_sleep',
       title: 'She only falls asleep on the feed',
-      format: 'ARTICLE',
+      format: 'ARTICLE', // [reuse] "Sleep-association angle. Links to Feeding."
       blocks: [
         PpIntro('You have probably been told this is a bad habit you will '
             'regret. It is worth knowing what is actually true, because the '
@@ -1358,12 +1743,19 @@ final PpArea _gettingToSleep = PpArea(
         PpIndiaNote('"Doodh pilake sula diya" gets said as a criticism in a lot '
             'of homes. It is not one. If it is working for you and she is '
             'growing well, you have nothing to defend.'),
+        // Link out, do not own: feed-to-sleep and the dream feed are Feeding's.
+        PpLink(
+          'Feeding, the whole section',
+          surfaceId: 'pp_section/parenting_feeding',
+          blurb: 'Night feeds, the dream feed, and when feeding is the '
+              'question rather than sleep.',
+        ),
       ],
     ),
     PpPage(
       id: 'day_night_confusion',
       title: 'She sleeps all day and is awake all night',
-      format: 'ARTICLE',
+      format: 'ARTICLE', // [reuse]
       bands: ['nb'],
       blocks: [
         PpIntro('In the first weeks a lot of babies have their nights and days '
@@ -1414,14 +1806,17 @@ final PpArea _gettingToSleep = PpArea(
     PpPage(
       id: 'dropping_naps',
       title: 'When naps drop away',
+      // [reuse] [auto-scope]: "Naps-by-age arc; auto-marks her stage."
       format: 'CHART',
       blocks: [
         PpIntro('Naps do not vanish overnight. They go one at a time, and each '
-            'transition brings two or three ragged weeks. Knowing which one is '
-            'due explains most sudden bedtime trouble.'),
+            'transition brings two or three ragged weeks. Her stage is at the '
+            'top of the table. Knowing which transition is due explains most '
+            'sudden bedtime trouble.'),
         PpTable(
           heading: 'Naps by age',
           columns: ['Age', 'Naps a day', 'What is changing'],
+          rowMonths: [(0, 3), (3, 6), (6, 9), (9, 12), (12, 18), (18, 36), (36, 72)],
           rows: [
             ['0 to 3 months', '4 to 5', 'No pattern at all yet, and that is '
                 'correct for this age'],
@@ -1472,7 +1867,7 @@ final PpArea _gettingToSleep = PpArea(
     PpPage(
       id: 'joint_family_sleep',
       title: 'Sleep in a joint family or a shared room',
-      format: 'ARTICLE',
+      format: 'ARTICLE', // [reuse] India-specific.
       blocks: [
         PpIntro('Most sleep advice quietly assumes a separate nursery, a dark '
             'room and a house that goes quiet at 8pm. If that is not your '
@@ -1533,6 +1928,131 @@ final PpArea _gettingToSleep = PpArea(
             'a second-best version of anything.'),
       ],
     ),
+    PpPage(
+      id: 'own_space',
+      title: 'Moving her to her own cot or room',
+      // ⚠️ [new] in the brief, but it already existed in collection 6 as
+      // "Moving her to her own bed or room". Moved here and retitled, not
+      // rewritten: "India-aware. No right age, family decides; what actually
+      // eases the move from your bed to her cot" is what it already says.
+      format: 'ARTICLE',
+      bands: ['m6_12', 'tod', 'pre'],
+      blocks: [
+        PpIntro('There is no age at which this has to happen. When you do want '
+            'to do it, doing it slowly and at a calm time makes almost all the '
+            'difference.'),
+        PpArticle(heading: 'What is going on', [
+          'Sharing your room for the first six to twelve months is actively '
+              'recommended, so there is nothing to hurry. After that it is a '
+              'family decision, not a milestone, and plenty of Indian children '
+              'share a room with their parents for years without any harm at '
+              'all.',
+          'The two things that make a move hard are doing it during something '
+              'else, and doing it all at once. A move that lands in the same '
+              'fortnight as a new sibling, a new school, potty training or a '
+              'trip is a move that will go badly for reasons that have nothing '
+              'to do with the room.',
+          'What she is actually losing is not the bed, it is you nearby. So '
+              'the trick is to change the bed and the room separately, so she '
+              'only ever loses one thing at a time.',
+        ]),
+        PpSteps(
+          heading: 'A gentle way to do it',
+          [
+            PpStep('Pick a calm fortnight', 'No illness, no travel, no new sibling, no new creche, '
+                    'no potty training in the same weeks.'),
+            PpStep('Let her own the new bed in the daytime first', 'A week of playing on it, reading on it, napping on '
+                    'it. Let her choose the sheet.'),
+            PpStep('Change the surface, not the room', 'Her own mattress or bed, still beside you. One change '
+                    'only.'),
+            PpStep('Then move the bed, in stages if the room allows', 'A little further away each few nights, or into the '
+                    'new room with you sleeping there at first.'),
+            PpStep('Keep the bedtime routine exactly the same', 'Same order, same words, same lori. The routine is '
+                    'what tells her nothing important has changed.'),
+            PpStep('Say what will happen and then do exactly that', '"I will sit here until you sleep, and I will be in '
+                    'the next room." Then be there. Trust is the whole '
+                    'mechanism.'),
+            PpStep('Expect to go back a step, and let that be fine', 'A bad week means one step back, not a failed move.'),
+          ],
+        ),
+        PpCallout('If she ends up in your bed at 3am most nights, that is not '
+            'a failed move. Many families settle at exactly this: she starts '
+            'in her bed and finishes in yours. If the bed is set up safely, '
+            'that is a perfectly good arrangement.'),
+        PpWhenLine('Any time after six to twelve months, and often much later. '
+            'Allow two to four weeks and pick a calm fortnight.'),
+        PpIndiaNote('There is often family pressure in both directions, to '
+            'move her out early or to keep her in for years. Neither is a '
+            'health question after the first year. It is yours to decide.'),
+      ],
+    ),
+
+    // ⚠️ [new] CAROUSEL. "Nani's house, a wedding, a festival, a train.
+    // Protect the routine, recover after."
+    PpPage(
+      id: 'sleep_away_from_home',
+      title: 'Sleep away from home',
+      format: 'CAROUSEL',
+      blocks: [
+        PpIntro('A wedding, a festival, a week at nani\'s, an overnight train. '
+            'Her sleep will wobble and that is not a failure of planning. Six '
+            'slides on what to protect, what to let go, and how to get back '
+            'to normal afterwards.'),
+        PpCarousel(
+          eyebrow: 'Sleep away from home',
+          hue: 26,
+          coverTitle: 'Protect the routine, not the schedule',
+          coverBlurb: 'Away from home, the clock will lose. The order of '
+              'things can still win.',
+          cards: [
+            PpCarouselCard(
+                'Pack the routine, not the bedtime. The same five steps in '
+                    'the same order work in any room.',
+                'Dim, change, feed, lori, the same last sentence. Twenty '
+                    'minutes she recognises, wherever it happens.'),
+            PpCarouselCard(
+                'Bring the three things that smell of home: her sheet, her '
+                    'sleep sack, and the sound she sleeps to.',
+                'Download the track before you leave. A train has no '
+                    'network and a wedding has no quiet.'),
+            PpCarouselCard(
+                'At a wedding, one adult owns her bedtime, and everyone else '
+                    'is allowed to be at the wedding.',
+                'Decide who before the baraat, not at 11pm. Swap the next '
+                    'night if it is more than one.'),
+            PpCarouselCard(
+                'At nani\'s house, agree the routine out loud on day one, '
+                    'kindly, and then let nani do it her way inside it.',
+                'Different hands are fine. A different order is what '
+                    'confuses her.'),
+            PpCarouselCard(
+                'On a train, feed and settle her in the berth you will be in '
+                    'all night. Do not start her somewhere and move her.',
+                'Lower berth, wall side, your body on the open side. A '
+                    'dupatta on the window hook makes a curtain.'),
+            PpCarouselCard(
+                'Coming home: expect two or three off nights, hold the '
+                    'routine, and change nothing else.',
+                'She has not learned a new habit in a week. She has had a '
+                    'week. It settles.'),
+          ],
+        ),
+        PpCallout('Late is fine. Different is the problem. A baby put down '
+            'at 11pm with her own routine sleeps better than one put down at '
+            '8pm with somebody else\'s.'),
+        PpWhenLine('Matters from about 3 months, once she has a routine to '
+            'protect. Under 3 months she mostly sleeps anywhere, and that is '
+            'the one advantage of a newborn at a wedding.'),
+        PpIndiaNote('Nobody at a family function will think less of you for '
+            'taking her to a quiet room at her time. They will think less of '
+            'the person who kept her up. Go.'),
+        PpLink(
+          'Download the sound she sleeps to',
+          surfaceId: 'pp_sleep_sounds',
+          blurb: 'Two or three tracks, saved before you travel.',
+        ),
+      ],
+    ),
   ],
 );
 
@@ -1552,17 +2072,57 @@ final PpArea _safeSleep = PpArea(
   blurb: 'Safer bed-sharing, back to sleep, and what to clear away.',
   hue: 152,
   pages: [
+    // ⚠️ [reformat: was article] -> ILLUSTRATION. "One labelled safe-setup
+    // picture + what to clear away. Keep the harm-reduction wording under
+    // it." The eight setup steps became the eight labels on the picture; the
+    // article and the step-list are kept below for revert. The two card
+    // groups (what raises the risk, what lowers it) and both callouts are the
+    // harm-reduction wording and stay exactly as they were.
     PpPage(
       id: 'safer_bed_sharing',
       title: 'Safer bed-sharing',
       subtitle: 'How to share a bed with fewer risks',
-      format: 'ARTICLE, harm-reduction framed',
+      format: 'ILLUSTRATION',
       blocks: [
         PpIntro('Most Indian families sleep with their baby, and that is not '
             'going to change because an app says otherwise. So here is the '
-            'useful version: how to do it more safely, what raises the risk, '
-            'and the small number of nights when she genuinely needs her own '
-            'surface.'),
+            'useful version: one picture of a bed set up more safely, what to '
+            'clear away, and the small number of nights when she genuinely '
+            'needs her own surface.'),
+        PpIllustration(
+          kind: PpIllustrationKind.safeBedSetup,
+          title: 'One bed, set up once',
+          labels: [
+            PpIllustrationLabel('Firm mattress, flat, no dip',
+                'Cotton or coir is good. Soft foam, a waterbed or a folded '
+                    'quilt as a bed are not.'),
+            PpIllustrationLabel('No gap between the bed and the wall',
+                'Flush against it, or pulled right away from it. The gap is '
+                    'the single most common serious hazard.'),
+            PpIllustrationLabel(
+                'On her back, beside you, not between two adults',
+                'Mother\'s side is safest. You stay aware of her in a way '
+                    'another adult usually does not.'),
+            PpIllustrationLabel('Pillows and bolsters away from her',
+                'Her head stays clear of your pillow. A bolster is not a '
+                    'barrier, it is a hazard.'),
+            PpIllustrationLabel('Her own light layer instead of a cover',
+                'A sleep sack or a light kurta-pyjama, so your blanket never '
+                    'needs to come over her.'),
+            PpIllustrationLabel('Your blanket no higher than your waist',
+                'On the side she is on.'),
+            PpIllustrationLabel('Hair tied back, no cords, no dupatta',
+                'Loose hair and drawstrings are a strangling risk at close '
+                    'quarters.'),
+            PpIllustrationLabel('A low bed, or a mattress on the floor',
+                'A firm mattress on the floor, away from walls and furniture, '
+                    'is one of the safest setups there is.'),
+          ],
+          caption: 'Nearly all bed-sharing risk comes from the surface and '
+              'the bedding, not from the sharing. One evening of rearranging '
+              'removes most of it.',
+        ),
+        /* kept for revert: the article and the step-list the picture replaced
         PpArticle(heading: 'Start with the bed itself', [
           'Nearly all bed-sharing risk comes from the surface and the bedding, '
               'not from the sharing. A firm mattress, no gap, no quilt over '
@@ -1604,6 +2164,7 @@ final PpArea _safeSleep = PpArea(
                     'furniture, is one of the safest setups there is.'),
           ],
         ),
+        */
         PpCards([
           PpCard('A soft or sagging mattress',
               'She can sink and her face can be covered. The single most '
@@ -1670,14 +2231,39 @@ final PpArea _safeSleep = PpArea(
         ),
       ],
     ),
+    // ⚠️ [reformat: was short article] -> ILLUSTRATION. "A simple visual:
+    // back is the way, every sleep." The four paragraphs became four labels;
+    // the prose is kept below for revert. Both callouts stay.
     PpPage(
       id: 'back_to_sleep',
       title: 'On her back, every sleep',
-      format: 'SHORT ARTICLE',
+      format: 'ILLUSTRATION',
       blocks: [
         PpIntro('This is the single most effective piece of safe sleep advice '
             'there is. Putting babies on their backs to sleep cut cot deaths '
             'by more than half in every country that ran the campaign.'),
+        PpIllustration(
+          kind: PpIllustrationKind.backToSleep,
+          title: 'Back is the way',
+          labels: [
+            PpIllustrationLabel('On her back, every sleep',
+                'Day naps included, by whoever puts her down. The risk sits '
+                    'with the unfamiliar position somebody else uses.'),
+            PpIllustrationLabel('Not on her side',
+                'She rolls onto her front from there easily.'),
+            PpIllustrationLabel('Not on her front',
+                'The position with the highest risk, and the deeper sleep it '
+                    'gives is exactly why.'),
+            PpIllustrationLabel('Once she rolls over herself, leave her',
+                'Usually four to six months. Put her down on her back; if she '
+                    'rolls, that is allowed. A clear surface is what matters '
+                    'by then.'),
+          ],
+          caption: 'Back sleeping flattens the back of the head a little in '
+              'some babies. It evens out once she sits and crawls. Awake, '
+              'watched tummy time is the answer to that, not front sleeping.',
+        ),
+        /* kept for revert: the article the picture replaced
         PpArticle([
           'On her back, for every sleep, day naps included, by whoever puts '
               'her down. That last part matters: many babies are put on their '
@@ -1696,6 +2282,7 @@ final PpArea _safeSleep = PpArea(
               'crawling. Plenty of tummy time while she is awake and watched '
               'is the answer to it, not front sleeping.',
         ]),
+        */
         PpCallout(
           'Myth: a baby on her back will choke if she brings up milk. She will '
               'not. A baby\'s airway is built so that milk drains away when she '
@@ -1715,12 +2302,23 @@ final PpArea _safeSleep = PpArea(
             'saying so plainly and kindly to whoever suggests it.'),
       ],
     ),
+    // ⚠️ [reformat: was step-list] -> VIDEO. "Physical skill + safety: the
+    // hip-safe wrap, and stopping the day she can roll." The steps stay as
+    // the companion under the film.
     PpPage(
       id: 'swaddling',
       title: 'Swaddling, and when to stop',
-      format: 'STEP-LIST',
+      format: 'VIDEO',
       bands: ['nb', 'm3_6'],
       blocks: [
+        PpVideoSlot(
+          title: 'The hip-safe swaddle, and the day to stop',
+          subtitle: 'The diamond fold, snug at the chest and loose at the '
+              'hips, on a real newborn. And what a first roll looks like.',
+          minutes: '5 MIN',
+          slotId: 'sleep/swaddle_demo',
+          hue: 152,
+        ),
         PpIntro('A snug wrap helps a lot of newborns settle, because it stops '
             'the startle reflex from waking them. Done loosely around the '
             'hips, arms in, and stopped at the right moment, it is a good '
@@ -1763,14 +2361,75 @@ final PpArea _safeSleep = PpArea(
             'loose hips is the change, and it is a small one.'),
       ],
     ),
+    // ⚠️ [reuse] as INTERACTIVE. "An interactive tap-through checklist.
+    // Already cards/checklist." The eleven cards are now eleven checks, each
+    // answered done or not yet, ending on what to change tonight. The cards
+    // are kept below for revert.
     PpPage(
       id: 'sleep_surface',
       title: 'Her sleep space, checked',
-      format: 'CARDS / CHECKLIST',
+      format: 'INTERACTIVE',
       blocks: [
-        PpIntro('Two minutes, once. Then repeat it whenever she learns '
-            'something new, because a baby who can roll, sit or stand can '
-            'reach things she could not reach last month.'),
+        PpIntro('Two minutes, once. Tap through eleven checks and answer each '
+            'one honestly; it ends on the short list of what to change. Then '
+            'repeat it whenever she learns something new, because a baby who '
+            'can roll, sit or stand can reach things she could not reach last '
+            'month.'),
+        PpInteractive(
+          kind: PpInteractiveKind.checklist,
+          title: 'Her sleep space, checked',
+          blurb: 'Eleven checks, done or not yet. Ends on what to fix.',
+          hue: 152,
+          items: [
+            PpInteractiveItem('Firm and flat',
+                'A firm mattress that does not dip under her weight. Press it '
+                    'with your palm. If your hand sinks, so does she.',
+                'The surface'),
+            PpInteractiveItem('A tight-fitting sheet, and nothing under it',
+                'No folded towel or extra padding beneath her for softness.',
+                'The surface'),
+            PpInteractiveItem('No gaps anywhere',
+                'Between the mattress and the cot sides, between the bed and '
+                    'the wall, between a cot and a bed pushed together.',
+                'The surface'),
+            PpInteractiveItem('Flat, not inclined',
+                'No wedge, no propping the mattress up, no sleeping in a car '
+                    'seat, bouncer or rocker. She can slump forward and block '
+                    'her own airway.',
+                'The surface'),
+            PpInteractiveItem('Her own space in your room',
+                'Same room as you for the first six to twelve months. Own '
+                    'surface, or a safely set up bed.',
+                'The surface'),
+            PpInteractiveItem('No pillows or bolsters',
+                'No pillow at all under one year. Bolsters are not a barrier '
+                    'and they are a hazard.',
+                'Clear away'),
+            PpInteractiveItem('No quilts, razai or loose blankets',
+                'Dress her in a light layer instead. If you use a blanket, it '
+                    'is thin, tucked in low, and no higher than her chest.',
+                'Clear away'),
+            PpInteractiveItem('No soft toys or bumpers',
+                'Nothing soft in the space until one year. Cot bumpers '
+                    'included, even the pretty ones.',
+                'Clear away'),
+            PpInteractiveItem('No cords, dupattas or mobile strings',
+                'Curtain cords, charger cables and hanging toys, all out of '
+                    'reach. Check the reach again when she starts standing.',
+                'Clear away'),
+            PpInteractiveItem('Nothing she can pull in on herself',
+                'A towel over the cot rail, clothes hung on the side, a '
+                    'mosquito net that can sag onto her face.',
+                'Clear away'),
+            PpInteractiveItem('No cigarette smoke, anywhere in the home',
+                'Not in the room, not on the balcony, not in the clothes she '
+                    'is then held in.',
+                'Clear away'),
+          ],
+          closing: 'If it is soft, loose, or can end up over her face, it '
+              'does not belong in her sleep space until she is one.',
+        ),
+        /* kept for revert: the cards the checklist replaced
         PpCards([
           PpCard('Firm and flat',
               'A firm mattress that does not dip under her weight. Press it '
@@ -1808,6 +2467,7 @@ final PpArea _safeSleep = PpArea(
               'Not in the room, not on the balcony, not in the clothes she is '
                   'then held in.'),
         ], heading: 'Clear away', hue: 152),
+        */
         PpCallout('The test is simple. If it is soft, loose, or can end up '
             'over her face, it does not belong in her sleep space until she is '
             'one.'),
@@ -1823,7 +2483,7 @@ final PpArea _safeSleep = PpArea(
     PpPage(
       id: 'overheating',
       title: 'Too warm, and how to tell',
-      format: 'SHORT ARTICLE',
+      format: 'ARTICLE', // [reuse]
       blocks: [
         PpIntro('In Indian homes overheating is a far more common problem than '
             'cold, and it matters, because being too warm is one of the known '
@@ -1887,7 +2547,7 @@ final PpArea _safeSleep = PpArea(
     PpPage(
       id: 'sids_calmly',
       title: 'SIDS, explained calmly',
-      format: 'ARTICLE',
+      format: 'ARTICLE', // [reuse] "Sensitive; text stays. Links to Health."
       blocks: [
         PpIntro('You may have heard the term and been frightened by it, '
             'possibly at 2am on the internet. Here is the honest picture: it '
@@ -1949,6 +2609,12 @@ final PpArea _safeSleep = PpArea(
         PpIndiaNote('Being in the same room as you, which most Indian families '
             'do anyway, is on the protective side of this list. So is '
             'breastfeeding. A lot of what your family already does is right.'),
+        PpLink(
+          'Health, the whole section',
+          surfaceId: 'pp_section/parenting_health',
+          blurb: 'For the depth on this, and for anything that is a health '
+              'question rather than a sleep one.',
+        ),
       ],
     ),
   ],
@@ -1957,22 +2623,90 @@ final PpArea _safeSleep = PpArea(
 // =============================================================================
 //  AREA 6 — Common sleep worries
 // -----------------------------------------------------------------------------
-//  One page per worry, all on the same template the spec asks for: what is
-//  going on, is it normal, what helps. The template is identical on purpose so
-//  a worried parent recognises the shape by the second page.
+//  ⚠️ [reformat: was 5 short articles] [reference] -> ONE CAROUSEL. "Swipe-
+//  through: only sleeps on me, naps only 30 min, up at 5am, sleeps all the
+//  time. Each links to its canonical page, no second copies."
+//
+//  So the collection shows three tiles: the worry set, snoring, and the new
+//  dummy page. The four worry articles are still here, unchanged, marked
+//  `linkedOnly` — they open from their slide (swipe up) and from nowhere
+//  else. Their template is still identical on purpose: what is going on, is
+//  it normal, what helps.
 // =============================================================================
 
 final PpArea _worries = PpArea(
   id: 'worries',
   mark: IntentMark.moodArc,
   title: 'The things that worry you',
-  blurb: 'The five or six sleep questions almost every parent asks.',
+  blurb: 'The sleep questions almost every parent asks, and the honest answers.',
   hue: 188,
   pages: [
     PpPage(
+      id: 'worry_set',
+      title: 'The worry set',
+      subtitle: 'Four things that feel like problems, and mostly are not',
+      format: 'CAROUSEL',
+      blocks: [
+        PpIntro('Only sleeps on you. Naps for thirty minutes. Up at 5am. '
+            'Sleeps all the time. Four worries, one slide each, and the '
+            'full page behind every one if you want it.'),
+        PpCarousel(
+          eyebrow: 'The worry set',
+          hue: 188,
+          coverTitle: 'Four worries, and what is true about each',
+          coverBlurb: 'Swipe through. Swipe up on any slide for the full '
+              'page.',
+          cards: [
+            PpCarouselCard.linked(
+                'She only sleeps on you. To a newborn you are the habitat, '
+                    'and a cool flat mattress is a different planet.',
+                'It gets better on its own between three and six months. '
+                    'Bottom first, head last, hand stays: the transfer that '
+                    'works.',
+                pageId: 'only_sleeps_on_me',
+                fromMonths: 0,
+                toMonths: 12),
+            PpCarouselCard.linked(
+                'Her naps are only 30 minutes. That is one sleep cycle, and '
+                    'around four months it is close to universal.',
+                'If she wakes cheerful and stays cheerful, the nap was '
+                    'enough. Look at her mood, not the clock.',
+                pageId: 'catnapping',
+                fromMonths: 0,
+                toMonths: 12),
+            PpCarouselCard.linked(
+                'She is up at 5am. Sleep pressure is lowest at dawn, so any '
+                    'small thing makes the waking stick.',
+                'Darker room, earlier bedtime, boring 5am. Later bedtime '
+                    'almost never fixes it.',
+                pageId: 'early_waking'),
+            PpCarouselCard.linked(
+                'She sleeps all the time. Usually she just needs sleep. '
+                    'What matters is feeds, wet nappies and weight.',
+                'In the first three weeks, wake her to feed if a stretch '
+                    'passes three hours. If those three are good, let her '
+                    'sleep.',
+                pageId: 'sleeping_too_much',
+                fromMonths: 0,
+                toMonths: 6),
+          ],
+        ),
+        PpCallout('None of these is a habit you created and none of them '
+            'needs fixing tonight. If one of them has stopped feeling '
+            'manageable, the full page behind it is where to start.'),
+        PpWhenLine('The slides that fit her age are the ones you see. Under '
+            'a year, all four; from the second year, the early-waking one '
+            'stays and the rest quietly go.'),
+        PpIndiaNote('Every one of these gets a theory in a joint family, and '
+            'most of the theories are kind. The slides are what is actually '
+            'true.'),
+      ],
+    ),
+    PpPage(
       id: 'only_sleeps_on_me',
       title: 'She only sleeps on me',
-      format: 'SHORT ARTICLE',
+      format: 'ARTICLE',
+      linkedOnly: true,
       bands: ['nb', 'm3_6', 'm6_12'],
       blocks: [
         // ⚠️ ADDED IN THE S01 PASS — "review once more, where the video has
@@ -2042,7 +2776,8 @@ final PpArea _worries = PpArea(
     PpPage(
       id: 'catnapping',
       title: 'Her naps are only 30 minutes',
-      format: 'SHORT ARTICLE',
+      format: 'ARTICLE',
+      linkedOnly: true,
       bands: ['nb', 'm3_6', 'm6_12'],
       blocks: [
         PpIntro('She goes down, sleeps 30 or 40 minutes, and is awake again. '
@@ -2094,7 +2829,8 @@ final PpArea _worries = PpArea(
     PpPage(
       id: 'early_waking',
       title: 'She is up at 5am',
-      format: 'SHORT ARTICLE',
+      format: 'ARTICLE',
+      linkedOnly: true,
       blocks: [
         PpIntro('Anything before 6am counts as early waking, and it is one of '
             'the most stubborn sleep problems there is. There are four usual '
@@ -2150,7 +2886,8 @@ final PpArea _worries = PpArea(
     PpPage(
       id: 'sleeping_too_much',
       title: 'She sleeps all the time, is that alright?',
-      format: 'SHORT ARTICLE',
+      format: 'ARTICLE',
+      linkedOnly: true,
       bands: ['nb', 'm3_6'],
       blocks: [
         PpIntro('A very sleepy baby usually just needs sleep, especially in the '
@@ -2205,63 +2942,9 @@ final PpArea _worries = PpArea(
       ],
     ),
     PpPage(
-      id: 'own_space',
-      title: 'Moving her to her own bed or room',
-      format: 'SHORT ARTICLE',
-      bands: ['m6_12', 'tod', 'pre'],
-      blocks: [
-        PpIntro('There is no age at which this has to happen. When you do want '
-            'to do it, doing it slowly and at a calm time makes almost all the '
-            'difference.'),
-        PpArticle(heading: 'What is going on', [
-          'Sharing your room for the first six to twelve months is actively '
-              'recommended, so there is nothing to hurry. After that it is a '
-              'family decision, not a milestone, and plenty of Indian children '
-              'share a room with their parents for years without any harm at '
-              'all.',
-          'The two things that make a move hard are doing it during something '
-              'else, and doing it all at once. A move that lands in the same '
-              'fortnight as a new sibling, a new school, potty training or a '
-              'trip is a move that will go badly for reasons that have nothing '
-              'to do with the room.',
-          'What she is actually losing is not the bed, it is you nearby. So '
-              'the trick is to change the bed and the room separately, so she '
-              'only ever loses one thing at a time.',
-        ]),
-        PpSteps(
-          heading: 'A gentle way to do it',
-          [
-            PpStep('Pick a calm fortnight', 'No illness, no travel, no new sibling, no new creche, '
-                    'no potty training in the same weeks.'),
-            PpStep('Let her own the new bed in the daytime first', 'A week of playing on it, reading on it, napping on '
-                    'it. Let her choose the sheet.'),
-            PpStep('Change the surface, not the room', 'Her own mattress or bed, still beside you. One change '
-                    'only.'),
-            PpStep('Then move the bed, in stages if the room allows', 'A little further away each few nights, or into the '
-                    'new room with you sleeping there at first.'),
-            PpStep('Keep the bedtime routine exactly the same', 'Same order, same words, same lori. The routine is '
-                    'what tells her nothing important has changed.'),
-            PpStep('Say what will happen and then do exactly that', '"I will sit here until you sleep, and I will be in '
-                    'the next room." Then be there. Trust is the whole '
-                    'mechanism.'),
-            PpStep('Expect to go back a step, and let that be fine', 'A bad week means one step back, not a failed move.'),
-          ],
-        ),
-        PpCallout('If she ends up in your bed at 3am most nights, that is not '
-            'a failed move. Many families settle at exactly this: she starts '
-            'in her bed and finishes in yours. If the bed is set up safely, '
-            'that is a perfectly good arrangement.'),
-        PpWhenLine('Any time after six to twelve months, and often much later. '
-            'Allow two to four weeks and pick a calm fortnight.'),
-        PpIndiaNote('There is often family pressure in both directions, to '
-            'move her out early or to keep her in for years. Neither is a '
-            'health question after the first year. It is yours to decide.'),
-      ],
-    ),
-    PpPage(
       id: 'noisy_breathing',
       title: 'She breathes noisily or snores in her sleep',
-      format: 'SHORT ARTICLE + doctor callout',
+      format: 'ARTICLE', // [reuse] "Short article + doctor callout. Links to Health."
       blocks: [
         PpIntro('Babies are noisy sleepers. Snuffles, squeaks, little grunts '
             'and irregular breathing are all normal, and most of it comes from '
@@ -2332,6 +3015,77 @@ final PpArea _worries = PpArea(
         PpIndiaNote('Mosquito coils, closed rooms and winter smoke make '
             'snuffly babies snufflier. A mesh screen and a mosquito net are '
             'better than a coil burning in the room she sleeps in.'),
+        PpLink(
+          'Health, the whole section',
+          surfaceId: 'pp_section/parenting_health',
+          blurb: 'Tonsils, adenoids, reflux and the rest of what noisy '
+              'breathing can be.',
+        ),
+      ],
+    ),
+    // ⚠️ [new] ARTICLE. "Honest pros and cons for sleep, safe use, letting it
+    // go later."
+    PpPage(
+      id: 'dummy_soother',
+      title: 'Dummy, soother and sleep',
+      format: 'ARTICLE',
+      blocks: [
+        PpIntro('A dummy is one of the few sleep aids with real evidence on '
+            'both sides of it. Here is the honest version, so that whether '
+            'you use one is a decision and not a guilt.'),
+        PpArticle(heading: 'What it does for sleep', [
+          'Sucking is calming, and a dummy gives her that without a feed. '
+              'Many babies settle faster with one and stay settled through '
+              'the small surfacings that would otherwise wake them. Offered '
+              'at sleep, it is also associated with a lower risk of SIDS, '
+              'though nobody is entirely sure why.',
+          'The cost is the 2am dummy hunt. Until she can find it and put it '
+              'back herself, usually somewhere after seven or eight months, '
+              'a dummy that falls out is a dummy you get up for. For some '
+              'babies that is several times a night, and for those babies '
+              'the dummy is not helping anyone sleep.',
+          'On feeding: if you are breastfeeding, wait until it is going well, '
+              'usually three to four weeks, before offering one. Earlier can '
+              'muddle her latch. On teeth and speech: no harm under two, and '
+              'a real but small effect on the bite if it goes on past three '
+              'or four.',
+        ]),
+        PpCards([
+          PpCard('Only at sleep, not all day',
+              'A sleep dummy stays a sleep cue. An all-day dummy becomes '
+                  'something to give up, and she talks less while it is in.'),
+          PpCard('Nothing tied to it, ever',
+              'No cord, no ribbon, no clip to her clothes at night. A cord in '
+                  'a cot is a strangling risk.'),
+          PpCard('One piece, the right size, checked for cracks',
+              'Replace it every month or two. A torn teat is a choking risk.'),
+          PpCard('Do not put it back once she is asleep',
+              'If it falls out and she stays asleep, leave it out. Only '
+                  'replace it if she wakes and wants it.'),
+          PpCard('Never dip it in anything',
+              'Honey, sugar and gripe water on a dummy are all still done, '
+                  'and all still a bad idea. Honey under one year is unsafe.'),
+        ], heading: 'Using one safely', hue: 188),
+        PpArticle(heading: 'Letting it go, later', [
+          'There is no hurry. Between one and two it is often the easiest, '
+              'because she has other ways to settle by then and not yet the '
+              'words to negotiate. Restrict it to sleep first, for a few '
+              'weeks, then to bedtime only, then choose a calm fortnight and '
+              'stop.',
+          'For a toddler who is attached, a story helps more than a rule. The '
+              'dummy goes to a new baby, or to the dummy fairy, or it is '
+              'planted and a small toy grows in its place. Three or four bad '
+              'nights is the usual price, and then it is done.',
+        ]),
+        PpCallout('A dummy is neither a failure nor a fix. If it helps her '
+            'settle and she is not waking you to replace it, use it. If it is '
+            'costing you more sleep than it saves, it is allowed to go.'),
+        PpWhenLine('From three to four weeks if breastfeeding, earlier if '
+            'not. Most useful up to about a year. Best let go between one '
+            'and two, and before three in any case.'),
+        PpIndiaNote('Older relatives are often against a dummy on principle '
+            'and for the thumb on the same principle. A thumb cannot be '
+            'given to the dummy fairy, which is the honest answer to that.'),
       ],
     ),
   ],
@@ -2377,10 +3131,13 @@ final PpArea _music = PpArea(
   blurb: 'What actually helps, what is myth, and the tracks to play tonight.',
   hue: 96,
   pages: [
+    // ⚠️ [reuse] ARTICLE. "Honest article; the 'what is myth' section becomes
+    // a myth-vs-truth carousel." The five cards are the five slides, each one
+    // the myth as it is said, then what is true. Cards kept below for revert.
     PpPage(
       id: 'does_music_help',
       title: 'Does music actually help babies sleep?',
-      format: 'HONEST ARTICLE',
+      format: 'ARTICLE',
       blocks: [
         // ⚠️ ADDED IN THE S01 PASS. The area had no video, and this page
         // carries the section's one genuine safety point — the volume limit,
@@ -2416,6 +3173,32 @@ final PpArea _music = PpArea(
               'no sudden changes in volume. This is why the traditional night '
               'ragas and simple lori work: they were built for exactly this.',
         ]),
+        PpCarousel(
+          eyebrow: 'Myth vs truth',
+          hue: 96,
+          cards: [
+            PpCarouselCard.myth('Classical music makes babies smarter',
+                'No. The famous study was on adults doing a spatial task and '
+                    'the effect did not last. Play it because it is calm, '
+                    'not because it is an investment.'),
+            PpCarouselCard.myth(
+                'Special sleep frequencies and binaural beats work',
+                'No evidence in babies. A fan does the same job for free.'),
+            PpCarouselCard.myth('Music can replace a bedtime routine',
+                'It cannot. It is one step inside a routine, and the routine '
+                    'is the part that works.'),
+            PpCarouselCard.myth(
+                'Playing something all night helps her sleep deeper',
+                'It does not, and continuous sound all night is the part '
+                    'with an actual downside. Low volume, timer on.'),
+            PpCarouselCard.myth(
+                'She needs it to sleep now, so we have created a problem',
+                'A sound cue is one of the easiest cues to travel with and '
+                    'to let go of later. Of all the sleep associations, this '
+                    'is the least troublesome one.'),
+          ],
+        ),
+        /* kept for revert: the cards the carousel replaced
         PpCards([
           PpCard('"Classical music makes babies smarter"',
               'No. The famous study was on adults doing a spatial task and the '
@@ -2434,6 +3217,7 @@ final PpArea _music = PpArea(
                   'let go of later. Of all the sleep associations, this is the '
                   'least troublesome one.'),
         ], heading: 'What is myth', hue: 96),
+        */
         PpCallout(
           'Keep the volume low, use the timer, and keep the speaker away from '
               'her head. As a rule: quieter than a normal conversation, at '
@@ -2474,6 +3258,75 @@ final PpArea _music = PpArea(
         ),
       ],
     ),
+    // ⚠️ [reference] AUDIO LIBRARY, GENERATED FROM THE PLAYER'S OWN DATA.
+    //
+    // "Sleep Sounds tool = the library in collection 7." This page used to be
+    // a second, hand-written list of twenty-five tracks with its own slot ids,
+    // and it had already drifted from `pp_sounds_data.dart`: different lori,
+    // different stories, two id namespaces for one library. Now the page is
+    // built from `kPpSoundCategories`, so the catalogue she reads here and
+    // the player she opens from it cannot disagree. The old list is kept at
+    // the foot of this file for revert.
+    //
+    // ⚠️ SHARES ASSETS WITH GARBH SANSKAR SHRAVAN. The brief settles the
+    // REQUIRED-CONFIRM the first build left open: same player
+    // (`RagaAudioStore`), same bundled files where they fit. The tanpura
+    // drone is the first — see `pp_sounds_data.dart`.
+    _soundsLibraryPage,
+  ],
+);
+
+/// The collection 7 library page, built from the player's categories.
+///
+/// A `final` rather than a `const` because it is derived. Every `PpAudioSlot`
+/// here carries the track's own `slotId`, so `test/pp_section_test.dart`'s
+/// one-id-one-title rule now holds across the page AND the player.
+final PpPage _soundsLibraryPage = PpPage(
+  id: 'sleep_sounds_library',
+  title: 'The Sleep Sounds library',
+  subtitle: 'Everything in the player, by category',
+  format: 'AUDIO LIBRARY',
+  blocks: [
+    const PpIntro('Five kinds of sound, and a note on which suits which age. '
+        'Play the same one every night rather than a different one each '
+        'evening. The timer switches everything off on its own.'),
+    for (final c in kPpSoundCategories) ...[
+      PpArticle(heading: c.label, [c.blurb]),
+      for (final t in c.tracks)
+        PpAudioSlot(
+          title: t.title,
+          category: c.label,
+          minutes: t.minutes.toUpperCase(),
+          slotId: t.slotId,
+        ),
+    ],
+    const PpCallout(
+      'Low volume, speaker away from her head, timer on. Quieter than a '
+      'normal conversation, at least two to three feet away, never in the '
+      'cot and never a phone on the pillow. Thirty to forty-five minutes, '
+      'then off.',
+      title: 'The same safety note, because it matters',
+    ),
+    const PpWhenLine('Newborns: white noise and womb sounds. Three months and '
+        'up: nature and ragas. Eighteen months and up: stories. Lori at any '
+        'age.'),
+    const PpIndiaNote('Download the two or three you actually use before you '
+        'travel. A train, a bus or nani\'s house is exactly where a familiar '
+        'sound earns its place, and exactly where the network will not be '
+        'there.'),
+    const PpLink(
+      'Open Sleep Sounds',
+      surfaceId: 'pp_sleep_sounds',
+      blurb: 'Pick a track, set the timer, and put the phone face down.',
+    ),
+  ],
+);
+
+/* ⚠️ KEPT FOR REVERT: the hand-written library page the generated one
+   replaced. Twenty-five tracks under `sleep_sounds/` ids that no longer
+   match the player. If the generated page ever lands badly, this is the
+   whole revert.
+
     PpPage(
       id: 'sleep_sounds_library',
       title: 'The Sleep Sounds library',
@@ -2687,5 +3540,4 @@ final PpArea _music = PpArea(
         ),
       ],
     ),
-  ],
-);
+*/

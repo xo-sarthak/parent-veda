@@ -130,9 +130,12 @@ class PpArea {
 
   bool inBand(String band) => bands.isEmpty || bands.contains(band);
 
-  /// Pages in this area that fit the given band.
+  /// Pages in this area that fit the given band and are listed.
+  ///
+  /// ⚠️ `linkedOnly` PAGES ARE NOT HERE. They resolve by id (`pageById`) and
+  /// open from a carousel or a link; they are never a tile. See `PpPage.linkedOnly`.
   List<PpPage> pagesFor(String band) =>
-      [for (final p in pages) if (p.inBand(band)) p];
+      [for (final p in pages) if (p.inBand(band) && !p.linkedOnly) p];
 }
 
 /// A whole section — one of the eleven parenting brackets.
@@ -145,10 +148,36 @@ class PpSection {
     this.subtitle,
     this.bandSet,
     this.tools = const [],
+    this.autoScope = false,
   });
 
   /// Matches the hub's `bracketId` so the router can find it.
   final String id;
+
+  /// ⚠️ THE AGE RULE: THE APP KNOWS HER AGE, SO IT DOES NOT ASK.
+  ///
+  /// The Sleep rebuild states it for the whole app and applies it to Sleep
+  /// first: "Remove every age chooser and every 'enter her age'. Other-age
+  /// content is hidden, not tucked one tap away. The tracker's 'Typical for N
+  /// weeks' is the correct pattern; match it."
+  ///
+  /// With this on, the band chips are not drawn, the section is locked to the
+  /// child's own band, and the landing says which age it is showing rather
+  /// than offering the others. The band SET stays exactly as it was — every
+  /// page keeps its tags, `bandSet.active` still decides — so turning this on
+  /// for a section is one line and turning it off again is the same line.
+  ///
+  /// ⚠️ A FLAG READ IN ONE PLACE, ON PURPOSE. Sleep is the first door rebuilt
+  /// under the rule; the other nine sections keep their chooser until their
+  /// own rebuild says otherwise. Flipping all ten at once from here would be
+  /// touching areas the brief said not to touch.
+  ///
+  /// ⚠️ THIS IS THE ONE PLACE PERSONALISATION HIDES STRUCTURE — and it is
+  /// still not structure. The seven collections are the same for every
+  /// parent; what is hidden is other-age CONTENT within them. That is the
+  /// line `test/landing_focus_test.dart` draws, and this stays on the right
+  /// side of it.
+  final bool autoScope;
 
   final String title;
   final String? subtitle;
@@ -276,7 +305,13 @@ class _PpSectionScreenState extends State<PpSectionScreen> {
       builder: (context, _) {
         final p = V2PaletteStore.instance.current;
         final bands = s.bandSet;
-        final band = _band ?? bands?.active.id ?? '';
+        // ⚠️ AUTO-SCOPE FOLLOWS THE CHILD, LIVE. `_band` is the chooser's
+        // memory; a section with no chooser reads the active band every
+        // build, so switching children on My Child re-scopes this screen
+        // without a tap.
+        final band = s.autoScope
+            ? bands?.active.id ?? ''
+            : _band ?? bands?.active.id ?? '';
         final areas = [
           for (final a in s.areas)
             if (a.inBand(band)) a,
@@ -295,8 +330,33 @@ class _PpSectionScreenState extends State<PpSectionScreen> {
                 const SizedBox(height: 9),
                 Text(s.intro, style: pvManrope(fontSize: 15, fontWeight: FontWeight.w500, height: 1.6, color: p.ink2)),
 
+                // ---- auto-scoped: say which age, offer no other -------------
+                //
+                // The tracker's "Typical for N weeks" line, in the library's
+                // vocabulary. It is a statement, not a control: there is
+                // nothing to tap, which is the whole of the age rule.
+                if (bands != null && s.autoScope) ...[
+                  const SizedBox(height: 16),
+                  Row(children: [
+                    Icon(Icons.child_care_outlined, size: 15, color: p.action),
+                    const SizedBox(width: 7),
+                    Expanded(
+                      child: Text(
+                          'FOR ${ChildProfileStore.instance.nameMid.toUpperCase()}'
+                          '  ·  ${bands.active.label.toUpperCase()}',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: pvManrope(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.1,
+                              color: p.action)),
+                    ),
+                  ]),
+                ],
+
                 // ---- the band chooser ----------------------------------------
-                if (bands != null) ...[
+                if (bands != null && !s.autoScope) ...[
                   const SizedBox(height: 22),
                   // ⚠️ HER CHILD'S BAND LEADS AND THE REST STAY REACHABLE.
                   // `ordered` puts hers first; nothing is removed.
@@ -593,15 +653,22 @@ class _PpSectionScreenState extends State<PpSectionScreen> {
     ));
   }
 
-  void _openPage(BuildContext context, PpPage p) =>
-      Navigator.of(context).push(MaterialPageRoute<void>(
-        settings: RouteSettings(name: 'pp/${s.id}/page/${p.id}'),
-        builder: (_) => PpContentPage(
-          page: p,
-          onSurface: widget.onSurface,
-          onPage: (ctx, id) => _openPageById(ctx, id),
-        ),
-      ));
+  void _openPage(BuildContext context, PpPage p) {
+    // A page that is a tool opens the tool. Same rule as a tool AREA, one
+    // level down — see `PpPage.toolSurfaceId`.
+    if (p.toolSurfaceId != null) {
+      widget.onSurface?.call(context, p.toolSurfaceId!);
+      return;
+    }
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      settings: RouteSettings(name: 'pp/${s.id}/page/${p.id}'),
+      builder: (_) => PpContentPage(
+        page: p,
+        onSurface: widget.onSurface,
+        onPage: (ctx, id) => _openPageById(ctx, id),
+      ),
+    ));
+  }
 
   /// ⚠️ RESOLVES A `PpLink(pageId:)` AGAINST THIS SECTION.
   ///
@@ -634,6 +701,24 @@ class _AreaScreen extends StatelessWidget {
   final List<PpPage> pages;
   final void Function(BuildContext, String)? onSurface;
   final void Function(BuildContext, String)? onPage;
+
+  /// A tool page opens its surface; any other page opens as content. The
+  /// same branch `_PpSectionScreenState._openPage` takes, kept here because
+  /// this screen pushes its own routes.
+  void _open(BuildContext context, PpPage page) {
+    if (page.toolSurfaceId != null) {
+      onSurface?.call(context, page.toolSurfaceId!);
+      return;
+    }
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      settings: RouteSettings(name: 'pp/${section.id}/page/${page.id}'),
+      builder: (_) => PpContentPage(
+        page: page,
+        onSurface: onSurface,
+        onPage: onPage,
+      ),
+    ));
+  }
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
@@ -669,6 +754,18 @@ class _AreaScreen extends StatelessWidget {
                           height: 1.6,
                           color: pal.ink2)),
                   const SizedBox(height: 26),
+                  // ⚠️ A PINNED PAGE SITS ABOVE THE GRID AS ONE WIDE CARD.
+                  // Same treatment as a pinned area, same reasoning — see
+                  // `PpPage.pinned`. Filtered out of the grid below.
+                  for (final page in pages.where((p) => p.pinned)) ...[
+                    _PinnedPageCard(
+                      page: page,
+                      area: area,
+                      p: pal,
+                      onTap: () => _open(context, page),
+                    ),
+                    const SizedBox(height: 14),
+                  ],
                   // ⚠️ THE SAME CARD ONE LEVEL DOWN, because the note says
                   // so explicitly: "when user clicks and inside it also each
                   // small section that is there become a card". A library
@@ -682,23 +779,15 @@ class _AreaScreen extends StatelessWidget {
                   // coprime with 360, so a long list never repeats a tint
                   // next to itself.
                   _PpCardGrid(children: [
-                    for (final (i, page) in pages.indexed)
+                    for (final (i, page)
+                        in pages.where((p) => !p.pinned).toList().indexed)
                       _PpCoverCard(
                         title: page.title,
                         meta: page.format,
                         hue: (area.hue + i * 17) % 360,
                         mark: area.mark,
                         p: pal,
-                        onTap: () =>
-                            Navigator.of(context).push(MaterialPageRoute<void>(
-                          settings: RouteSettings(
-                              name: 'pp/${section.id}/page/${page.id}'),
-                          builder: (_) => PpContentPage(
-                            page: page,
-                            onSurface: onSurface,
-                            onPage: onPage,
-                          ),
-                        )),
+                        onTap: () => _open(context, page),
                       ),
                   ]),
                 ],
@@ -962,6 +1051,91 @@ class _PinnedAreaCard extends StatelessWidget {
                             fontWeight: FontWeight.w500,
                             height: 1.5,
                             color: p.ink2)),
+                  ],
+                ),
+              ),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
+/// The pinned page: one wide card above an area's grid.
+///
+/// The area version's argument holds one level down: pinning says "a
+/// different kind of thing", not "more important", so it is horizontal, on a
+/// tinted panel, with a label. The Sleep rebuild pins "Where we stand on sleep
+/// training" at the top of its collection and calls it brand-defining; the
+/// card is what makes that visible before the title is read.
+class _PinnedPageCard extends StatelessWidget {
+  const _PinnedPageCard(
+      {required this.page,
+      required this.area,
+      required this.p,
+      required this.onTap});
+
+  final PpPage page;
+  final PpArea area;
+  final V2Palette p;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final tint = v2BlockTint(area.hue, p);
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        clipBehavior: Clip.antiAlias,
+        decoration: BoxDecoration(
+          color: p.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: p.line),
+        ),
+        child: IntrinsicHeight(
+          child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+            Container(
+              width: 84,
+              color: tint,
+              padding: const EdgeInsets.all(17),
+              child: HubIntentArt(mark: area.mark, tint: tint),
+            ),
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(15, 15, 13, 15),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                        [
+                          'START HERE',
+                          if (page.format != null) page.format!.toUpperCase(),
+                        ].join('  ·  '),
+                        style: pvManrope(
+                                fontSize: 9.5,
+                                fontWeight: FontWeight.w800,
+                                color: p.action)
+                            .copyWith(letterSpacing: 1.1)),
+                    const SizedBox(height: 6),
+                    Text(page.title,
+                        style: pvFraunces(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
+                            height: 1.18,
+                            letterSpacing: -0.35,
+                            color: p.ink1)),
+                    if (page.subtitle != null) ...[
+                      const SizedBox(height: 5),
+                      Text(page.subtitle!,
+                          style: pvManrope(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w500,
+                              height: 1.5,
+                              color: p.ink2)),
+                    ],
                   ],
                 ),
               ),

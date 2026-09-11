@@ -62,6 +62,8 @@ import 'pp_phases_data.dart';
 import 'pp_products_data.dart';
 import 'pp_reading_data.dart';
 import 'pp_section_registry.dart';
+import '../../data/doors/pp_door_data.dart';
+import 'doors/pp_door_screen.dart';
 import 'pp_section_screen.dart' show PpSectionTool;
 import 'pp_surface_router.dart';
 import 'pp_watch_data.dart';
@@ -482,6 +484,20 @@ class _PpHomeV3State extends State<PpHomeV3> {
   void _openBracket(BuildContext context, String bracketId) {
     final b = bracketById(bracketId);
     if (b == null) return;
+
+    // ⚠️ A DOOR, IF THIS BRACKET HAS ONE, AND IT OPENS DIRECTLY. Decided
+    // 2026-09-11: the parenting doors open the way the TTC and pregnancy
+    // doors open — hero, selector, rails — from the tile, with no hub screen
+    // in front. `kPpDoors` is parenting's own registry; a bracket that is not
+    // in it keeps its hub and library exactly as before.
+    final door = ppDoorFor(bracketId);
+    if (door != null) {
+      Navigator.of(context).push(MaterialPageRoute<void>(
+        settings: RouteSettings(name: 'pp_door/$bracketId'),
+        builder: (_) => PpDoorScreen(door: door, onSurface: _openSurface),
+      ));
+      return;
+    }
 
     // ⚠️ THE HUB REGISTRY DECIDES, NOT THIS SCREEN.
     //

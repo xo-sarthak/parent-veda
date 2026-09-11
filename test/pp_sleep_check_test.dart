@@ -84,6 +84,21 @@ void main() {
       }
     });
 
+    test('and every PAGE that is a tool resolves', () {
+      // `PpPage.toolSurfaceId`, added by the Sleep door rebuild for "Wake
+      // windows [Tool]" inside collection 1. Same guarantee as a tool area:
+      // the card opens a surface, so the surface had better exist.
+      for (final s in kPpSections) {
+        for (final p in s.allPages) {
+          final id = p.toolSurfaceId;
+          if (id == null) continue;
+          expect(ppScreenForSurface(id), isNotNull,
+              reason: '${s.id}/${p.id} is a tool page pointing at "$id", '
+                  'which the router cannot open');
+        }
+      }
+    });
+
     test('every PpLink surfaceId resolves', () {
       // ⚠️ THE BIG ONE. Hundreds of in-page links across the sections, every one
       // of them a hardcoded string. A link that stops resolving renders a dead

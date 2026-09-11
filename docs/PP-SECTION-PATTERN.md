@@ -263,6 +263,53 @@ the above across every section at once.
 | an audio track | `PpAudioSlot` | Renders as a real track row. Always give a `slotId`. |
 | soft link to a tool/page | `PpLink` | `surfaceId: null` renders honestly as SOON. |
 | the paid offer | `PpConsult` | `whoFor` is required. |
+| `[CAROUSEL]` | `PpCarousel` | Full-screen story, one idea per slide. `PpCarouselCard.linked(..., pageId:)` opens a sibling page on swipe-up; `.myth(myth, truth)` for myth-vs-truth. Cards can carry `fromMonths`/`toMonths`. |
+| `[INTERACTIVE]` | `PpInteractive` | `kind: night` = one big step per dark screen, tap to advance (the 3am page). `kind: checklist` = done / not yet per item, ends on what to fix. |
+| `[ANIMATION]` | `PpAnimation` | Drawn in code (`pp_content_art.dart`), not a slot. One `PpAnimationKind` per animation that exists. |
+| `[ILLUSTRATION]` | `PpIllustration` | One drawn picture with numbered badges; `labels` are the legend and the content. `asset:` replaces the painter when artwork arrives. |
+
+### The door shell (2026-09-11, Sleep first)
+
+A section can be given a **door** — the hero / coverflow / rails shell the
+TTC and pregnancy doors wear — by adding a `PpDoor` in
+`lib/data/doors/pp_door_<section>.dart` and one line in `kPpDoors`. The door
+holds NO content: five `PpDoorTab`s each name the section's `areaIds` they
+show (a rail per area, pages for her band), optional `tools` rows above the
+rails, an optional `redFlagPageId` pinned above everything, and the door's
+`closing` row. The home tile and every `pp_section/<id>` link then open the
+door; the library screen stays the engine for sections without one.
+
+### The door-rebuild additions (2026-09-11, Sleep first)
+
+Three page flags and one age device, all read by the section screen:
+
+* **`PpPage.toolSurfaceId`** — a page that IS a tool. Its card opens the
+  surface; `blocks` may be empty. Use when a brief puts a tool *inside* a
+  collection rather than on the landing.
+* **`PpPage.linkedOnly`** — exists, resolves by id, is never a tile. How a
+  carousel says "each card links to its canonical page, no second copies".
+* **`PpPage.pinned`** — one wide card above the area's grid, same treatment as
+  `PpArea.pinned`. For "pinned at the top".
+* **`PpSection.autoScope: true`** — the age rule. No band chips; the section
+  opens on her band and shows only that. Pair it with **`rowMonths`** on any
+  `PpTable` (her row hoisted to the top, tagged) or `PpChartCard` timeline
+  (her row marked in place) so age-arc content leads with her row.
+
+Constructor shapes for the new blocks:
+
+```dart
+PpCarousel(cards: [PpCarouselCard('The whole idea in one line', 'the payoff'),
+                   PpCarouselCard.linked('...', '...', pageId: 'sibling_page', fromMonths: 0, toMonths: 12),
+                   PpCarouselCard.myth('What people say', 'What is true')],
+           eyebrow: 'The worry set', coverTitle: '...', coverBlurb: '...', hue: 188)
+PpInteractive(kind: PpInteractiveKind.night, title: '...', blurb: '...',
+              items: [PpInteractiveItem('Step', 'detail', 'group heading')],
+              closing: '...', closingPageId: 'doctor_page', closingLabel: '...')
+PpAnimation(kind: PpAnimationKind.sleepCycles, title: '...', caption: '...')
+PpIllustration(kind: PpIllustrationKind.safeBedSetup, title: '...',
+               labels: [PpIllustrationLabel('Point', 'detail')], caption: '...')
+PpTable(columns: [...], rows: [...], rowMonths: [(0, 3), (3, 6), ...])   // her row leads
+```
 
 ---
 

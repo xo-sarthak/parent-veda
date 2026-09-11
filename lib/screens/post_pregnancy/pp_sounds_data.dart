@@ -30,11 +30,20 @@
 //  ⚠️ REQUIRED-CONFIRM, as asked: `kPpSoundsLibrarySource` below names the
 //  decision in one place so it is repointable rather than dispersed.
 //
+//  ⚠️ CONFIRMED 2026-09-11 BY THE SLEEP DOOR REBUILD, and the answer is both:
+//  the library stays its own (a bedtime story is not a prenatal practice),
+//  and the AUDIO ASSETS are shared with Garbh Sanskar Shravan wherever the
+//  same recording serves both — the tanpura drone first. The collection 7
+//  library page in `pp_sleep_content.dart` is now generated from this list,
+//  so this file is the single source for what the player holds.
+//
 //  ⚠️ EVERY TRACK IS A PLACEHOLDER. Titles, categories, lengths and slot ids are
 //  real; the files are not. `asset` is what a real file drops into.
 //
 //  ⚠️ ENGLISH ONLY FOR NOW.
 // =============================================================================
+
+import '../garbh_browse_screen.dart' show kGarbhRagaAsset;
 
 /// ⚠️ REQUIRED-CONFIRM. Which library this player draws from.
 ///
@@ -203,7 +212,18 @@ const List<PpSoundCategory> kPpSoundCategories = [
           title: 'Raga Nilambari',
           minutes: '25 min',
           note: 'The raga traditionally associated with sleep.'),
-      PpSoundTrack(id: 'raga_tanpura', title: 'Tanpura drone only', minutes: '45 min'),
+      // ⚠️ THE FIRST TRACK THAT PLAYS, AND IT IS SHRAVAN'S FILE. The Sleep
+      // door rebuild settles the REQUIRED-CONFIRM above: "Sleep Sounds audio
+      // shares assets with Garbh Sanskar Shravan." The tanpura drone Garbh
+      // Sanskar already ships (`kGarbhRagaAsset`) is exactly this track, so
+      // it is pointed at the same file rather than waiting for a second copy
+      // of the same recording. One player, one file, two libraries that
+      // name it.
+      PpSoundTrack(
+          id: 'raga_tanpura',
+          title: 'Tanpura drone only',
+          minutes: '45 min',
+          asset: kGarbhRagaAsset),
     ],
   ),
   PpSoundCategory(

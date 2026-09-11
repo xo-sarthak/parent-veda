@@ -55,6 +55,10 @@ import 'package:flutter/material.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_placeholders.dart';
 import '../v2/v2_palette.dart';
+import 'pp_child_profile.dart';
+import 'pp_content_art.dart';
+import 'pp_interactive_screen.dart';
+import 'pp_story_screen.dart';
 
 // =============================================================================
 //  THE BLOCKS
@@ -144,10 +148,47 @@ class PpCard {
 /// wraps into illegibility or pushes the page into a horizontal scroll, and a
 /// page body that scrolls sideways is a bug on every screen it touches.
 class PpTable extends PpBlock {
-  const PpTable({required this.columns, required this.rows, this.heading});
+  const PpTable({
+    required this.columns,
+    required this.rows,
+    this.heading,
+    this.rowMonths,
+  });
   final String? heading;
   final List<String> columns;
   final List<List<String>> rows;
+
+  /// ⚠️ THE AGE RULE, FOR AN AGE-ARC TABLE: HER ROW LEADS, THE REST IS CONTEXT.
+  ///
+  /// Sleep's rebuild states it for every age-arc table: "LEAD with her row;
+  /// the rest of the arc stays as context, not as a chooser." The app knows the
+  /// child's age, so a table that makes her find her own row in a list of six
+  /// is asking her for a fact it already holds.
+  ///
+  /// One `(fromMonths, toMonths)` span per row, parallel to `rows`, lower bound
+  /// inclusive and upper exclusive, the same convention as `PpBand`. Null keeps
+  /// the table exactly as it was: a plain table for content that is not an age
+  /// arc. Stated in months rather than band ids so a block does not need to
+  /// know which section it is in, and so the same table renders right in any
+  /// section whatever its band boundaries.
+  ///
+  /// The renderer hoists her row to the top and marks it. Nothing is removed,
+  /// which is the whole distinction the age rule rests on: other ages are still
+  /// there, below, as context. What changes is what she reads first.
+  final List<(int, int)>? rowMonths;
+
+  /// Index of the row the child is in right now, or null.
+  int? herRow(int months) => _herRow(rowMonths, months);
+}
+
+/// Shared by `PpTable` and `PpChartCard`: which span holds this age.
+int? _herRow(List<(int, int)>? spans, int months) {
+  if (spans == null) return null;
+  for (var i = 0; i < spans.length; i++) {
+    final (from, to) = spans[i];
+    if (months >= from && months < to) return i;
+  }
+  return null;
 }
 
 /// `[CHART-CARD]` — structured facts as a card, not prose.
@@ -163,6 +204,7 @@ class PpChartCard extends PpBlock {
     this.subtitle,
     this.note,
     this.hue = 206,
+    this.rowMonths,
   });
   final String title;
   final String? subtitle;
@@ -171,6 +213,13 @@ class PpChartCard extends PpBlock {
   /// The one-line "what's normal at this age" reassurance.
   final String? note;
   final double hue;
+
+  /// The age rule for a TIMELINE card ("When they typically hit"): her row is
+  /// marked in place rather than hoisted, because a timeline read out of order
+  /// is not a timeline. Same `(fromMonths, toMonths)` convention as `PpTable`.
+  final List<(int, int)>? rowMonths;
+
+  int? herRow(int months) => _herRow(rowMonths, months);
 }
 
 /// How loud a callout is.
@@ -406,6 +455,224 @@ const Map<String, String> kPpConsultRoleToCategory = {
 };
 
 // =============================================================================
+//  THE FORMATS THE DOOR REBUILDS ADDED
+// -----------------------------------------------------------------------------
+//  ⚠️ FOUR MORE BLOCK TYPES, EACH ONE NAMED BY A REBUILD BRIEF AND NONE OF THEM
+//  SPECULATIVE. The Sleep rebuild marks pages "[reformat: was step-list]" into
+//  Video, "[reformat: was text list]" into Interactive, "[reformat: was
+//  article+diagram]" into Animation, "[reformat: was article]" into
+//  Illustration, and "[reformat: was 5 short articles]" into Carousel. Video
+//  already existed. The other four did not, and a brief that says "the 3am page
+//  becomes a glanceable interactive" cannot be satisfied by a step-list with a
+//  different chip on it.
+//
+//  Each one follows the same shape as `PpVideoSlot`: the block is DATA, the
+//  page renders a launch card in the page's own vocabulary, and the experience
+//  itself is a full screen (`pp_story_screen.dart`, `pp_interactive_screen.dart`)
+//  or a drawn component (`pp_content_art.dart`). A carousel opened in a half
+//  sheet would tell her before she starts that what she tapped was minor; the
+//  TTC story screen makes that argument at length and it holds here.
+// =============================================================================
+
+/// `[CAROUSEL]` — a few cards, swiped, one idea per slide.
+///
+/// ⚠️ A CARD MAY LINK TO A SIBLING PAGE, AND THAT IS HOW "NO SECOND COPIES"
+/// IS KEPT. The worry set is four short articles that became one carousel;
+/// the brief says "each links to its canonical page, no second copies". So a
+/// slide is a summary with a `pageId`, and swiping up (or the visible "read
+/// the full page" pill) opens the article. The four articles stay where they
+/// are, unlisted, and the carousel is the only tile.
+class PpCarousel extends PpBlock {
+  const PpCarousel({
+    required this.cards,
+    this.coverTitle,
+    this.coverBlurb,
+    this.hue = 268,
+    this.eyebrow,
+  });
+
+  final List<PpCarouselCard> cards;
+
+  /// A title card before the first slide, so she knows how long this is and
+  /// what it covers before she is mid-argument. Null skips it.
+  final String? coverTitle;
+  final String? coverBlurb;
+  final double hue;
+
+  /// What the launch card calls this — "THE WORRY SET", "MYTH VS TRUTH".
+  final String? eyebrow;
+
+  /// The cards that fit this age. Empty spans fit everyone.
+  List<PpCarouselCard> cardsFor(int months) =>
+      [for (final c in cards) if (c.fits(months)) c];
+}
+
+class PpCarouselCard {
+  const PpCarouselCard(
+    this.title, [
+    this.body = '',
+  ]) : pageId = null,
+       myth = false,
+       fromMonths = null,
+       toMonths = null;
+
+  /// A slide that opens a fuller page on swipe-up.
+  const PpCarouselCard.linked(
+    this.title,
+    this.body, {
+    required this.pageId,
+    this.fromMonths,
+    this.toMonths,
+  }) : myth = false;
+
+  /// A myth stated, then what is true. The slide draws the two halves apart.
+  const PpCarouselCard.myth(this.title, this.body)
+      : pageId = null,
+        myth = true,
+        fromMonths = null,
+        toMonths = null;
+
+  /// ⚠️ THE WHOLE SLIDE, IN ONE LINE. A slide is a sentence that teaches one
+  /// thing, not a label over a paragraph. The TTC story format found this the
+  /// hard way and it is the difference between a carousel someone finishes and
+  /// one someone swipes past.
+  final String title;
+
+  /// The payoff line. Often short; sometimes empty.
+  final String body;
+
+  /// A sibling page this slide summarises.
+  final String? pageId;
+
+  /// Title is the myth, body is the truth.
+  final bool myth;
+
+  /// ⚠️ THE AGE RULE, PER SLIDE. A worry about a 30-minute nap is a 3-to-6-
+  /// month worry; a toddler's parent should not swipe past it. Same months
+  /// convention as `PpTable.rowMonths`. Null on both means every age.
+  final int? fromMonths;
+  final int? toMonths;
+
+  bool fits(int months) =>
+      (fromMonths == null || months >= fromMonths!) &&
+      (toMonths == null || months < toMonths!);
+}
+
+/// How an interactive behaves.
+enum PpInteractiveKind {
+  /// One big step per screen, dark and dim, tap to advance. For the page she
+  /// reads at 3am with one eye open. Not a list.
+  night,
+
+  /// One item per screen with "done" / "not yet", ending on the short list of
+  /// what to fix tonight. For a checklist that is walked, not read.
+  checklist,
+}
+
+/// `[INTERACTIVE]` — a step-through she taps, not a list she reads.
+class PpInteractive extends PpBlock {
+  const PpInteractive({
+    required this.kind,
+    required this.title,
+    required this.items,
+    this.blurb,
+    this.closing,
+    this.closingPageId,
+    this.closingLabel,
+    this.hue = 268,
+  });
+
+  final PpInteractiveKind kind;
+  final String title;
+
+  /// What the launch card says under the title.
+  final String? blurb;
+  final List<PpInteractiveItem> items;
+
+  /// The last screen. For the night kind: what to do if none of it worked.
+  /// For the checklist kind: shown above the "not yet" list.
+  final String? closing;
+
+  /// An optional page the last screen opens — the doctor page, typically.
+  final String? closingPageId;
+  final String? closingLabel;
+  final double hue;
+}
+
+class PpInteractiveItem {
+  const PpInteractiveItem(this.title, [this.detail, this.group]);
+  final String title;
+  final String? detail;
+
+  /// A heading the checklist kind groups items under ("The surface", "Clear
+  /// away"). Ignored by the night kind.
+  final String? group;
+}
+
+/// Which drawn animation. One value per animation that exists; add a value
+/// when a brief names one, never before.
+enum PpAnimationKind {
+  /// Two sleep-cycle waves, hers and yours. She surfaces twice as often.
+  sleepCycles,
+}
+
+/// `[ANIMATION]` — a short drawn animation with a caption.
+///
+/// ⚠️ DRAWN, NOT A SLOT. `PpVideoSlot` waits for a file. This does not: a
+/// two-wave cycle comparison is a `CustomPainter` and an `AnimationController`,
+/// and it is more honest to draw the thing the brief describes than to leave a
+/// 16:9 placeholder that says "animation coming". If a filmed version ever
+/// arrives it replaces the painter, and the block does not change.
+class PpAnimation extends PpBlock {
+  const PpAnimation({
+    required this.kind,
+    required this.title,
+    this.caption,
+  });
+  final PpAnimationKind kind;
+  final String title;
+  final String? caption;
+}
+
+/// Which drawn illustration.
+enum PpIllustrationKind {
+  /// One bed, set up safely, with the hazards numbered.
+  safeBedSetup,
+
+  /// On her back: the one position that is the way, beside the two that are
+  /// not.
+  backToSleep,
+}
+
+/// `[ILLUSTRATION]` — one labelled picture.
+///
+/// ⚠️ THE LABELS ARE THE CONTENT. A picture with numbered callouts and a
+/// numbered legend under it is what "one labelled safe-setup picture" means,
+/// and it is what a paragraph describing the same setup cannot be: glanceable.
+/// The painter places the numbers; the legend carries the words. An `asset`
+/// replaces the painter when artwork arrives and the legend stays put.
+class PpIllustration extends PpBlock {
+  const PpIllustration({
+    required this.kind,
+    required this.title,
+    required this.labels,
+    this.caption,
+    this.asset,
+  });
+  final PpIllustrationKind kind;
+  final String title;
+  final List<PpIllustrationLabel> labels;
+  final String? caption;
+  final String? asset;
+}
+
+class PpIllustrationLabel {
+  const PpIllustrationLabel(this.title, [this.detail]);
+  final String title;
+  final String? detail;
+}
+
+// =============================================================================
 //  A PAGE
 // =============================================================================
 
@@ -418,11 +685,36 @@ class PpPage {
     this.subtitle,
     this.bands = const [],
     this.format,
+    this.toolSurfaceId,
+    this.linkedOnly = false,
+    this.pinned = false,
   });
 
   /// Stable slug. Used for routing, saved items and slot ids, so it must not be
   /// derived from the title — a title is copy and copy gets edited.
   final String id;
+
+  /// ⚠️ A PAGE THAT IS A TOOL. Mirrors `PpArea.toolSurfaceId` one level down:
+  /// the Sleep rebuild puts "Wake windows [Tool]" INSIDE collection 1, beside
+  /// the chart and the animation, rather than on the landing. Its card opens
+  /// the surface directly; the blocks are never rendered and may be empty.
+  /// `test/pp_section_test.dart` exempts a tool page from "has blocks" and
+  /// "opens with an intro", and `test/pp_sleep_check_test.dart` asserts the
+  /// surface resolves.
+  final String? toolSurfaceId;
+
+  /// ⚠️ REACHABLE BY LINK, NOT LISTED. The page exists, resolves by id, keeps
+  /// its bands, and does not appear as a tile. This is how a carousel can say
+  /// "each card links to its canonical page, no second copies" without the
+  /// canonical pages also sitting beside it as four more tiles. `pagesFor`
+  /// excludes it; `allPages` and `pageById` do not.
+  final bool linkedOnly;
+
+  /// Sits above the area's grid as one wide card. At most one per area, by
+  /// convention. Same treatment and the same reasoning as `PpArea.pinned`:
+  /// "pinned at the top" is a brief instruction, and a first-in-the-grid card
+  /// does not say "different kind of thing", only "first".
+  final bool pinned;
 
   final String title;
   final String? subtitle;
@@ -631,6 +923,10 @@ class PpBlockView extends StatelessWidget {
     if (b is PpIndiaNote) return _indiaNote(b, p);
     if (b is PpVideoSlot) return _video(b, p);
     if (b is PpAudioSlot) return _audio(b, p);
+    if (b is PpCarousel) return _carousel(context, b, p);
+    if (b is PpInteractive) return _interactive(context, b, p);
+    if (b is PpAnimation) return PpAnimationView(block: b);
+    if (b is PpIllustration) return PpIllustrationView(block: b);
     // ⚠️ A MASTERCLASS LINK IS RENDERED AS A MASTERCLASS, NOT AS A ROW.
     //
     // Feedback: "masterclass should remain but show masterclass as a master
@@ -740,42 +1036,85 @@ class PpBlockView extends StatelessWidget {
         ],
       );
 
-  Widget _table(PpTable b, V2Palette p) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _heading(b.heading, p),
-          // ⚠️ THE TABLE SCROLLS, THE PAGE DOES NOT. See `PpTable`'s own note.
-          Container(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: p.line),
-            ),
-            clipBehavior: Clip.antiAlias,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: Column(children: [
-                // header
-                Container(
-                  color: p.surfaceAlt,
-                  child: Row(
-                    children: [
-                      for (final c in b.columns)
-                        _cell(c, bold: true, width: _colWidth(b), p: p),
-                    ],
-                  ),
-                ),
-                for (var r = 0; r < b.rows.length; r++)
-                  Container(
-                    color: r.isEven ? Colors.white : p.surfaceAlt,
-                    child: Row(children: [
-                      for (final c in b.rows[r]) _cell(c, width: _colWidth(b), p: p),
-                    ]),
-                  ),
-              ]),
-            ),
+  Widget _table(PpTable b, V2Palette p) {
+    // ⚠️ HER ROW LEADS. See `PpTable.rowMonths`. The order is computed here,
+    // once, from the child's age: hers first, then the rest in authored order.
+    // A table with no spans keeps its authored order untouched.
+    final hers = b.herRow(ChildProfileStore.instance.ageInMonths);
+    final order = [
+      ?hers,
+      for (var r = 0; r < b.rows.length; r++)
+        if (r != hers) r,
+    ];
+    final mark = ppTintFor(206);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _heading(b.heading, p),
+        // ⚠️ THE TABLE SCROLLS, THE PAGE DOES NOT. See `PpTable`'s own note.
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: p.line),
           ),
-        ],
+          clipBehavior: Clip.antiAlias,
+          child: SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Column(children: [
+              // header
+              Container(
+                color: p.surfaceAlt,
+                child: Row(
+                  children: [
+                    for (final c in b.columns)
+                      _cell(c, bold: true, width: _colWidth(b), p: p),
+                  ],
+                ),
+              ),
+              for (final (i, r) in order.indexed)
+                Container(
+                  color: r == hers
+                      ? mark
+                      : i.isEven
+                          ? Colors.white
+                          : p.surfaceAlt,
+                  child: Row(children: [
+                    for (final (c, text) in b.rows[r].indexed)
+                      c == 0 && r == hers
+                          ? _herCell(text, width: _colWidth(b), p: p)
+                          : _cell(text, width: _colWidth(b), p: p),
+                  ]),
+                ),
+            ]),
+          ),
+        ),
+      ],
+    );
+  }
+
+  /// The first cell of her row: the value, with the tag that says why it
+  /// leads. The tag reads "HER AGE NOW" rather than the child's name so the
+  /// cell keeps its width whatever she is called.
+  Widget _herCell(String text, {required double width, required V2Palette p}) =>
+      Container(
+        width: width,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 9),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('HER AGE NOW',
+              style: pvManrope(
+                  fontSize: 8.5,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.1,
+                  color: p.action)),
+          const SizedBox(height: 2),
+          Text(text,
+              style: pvManrope(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w800,
+                  height: 1.45,
+                  color: p.ink1)),
+        ]),
       );
 
   /// First column wider: it is the axis (an age band, a symptom), and the ones
@@ -797,6 +1136,10 @@ class PpBlockView extends StatelessWidget {
 
   Widget _chart(PpChartCard b, V2Palette p) {
     final tint = ppTintFor(b.hue);
+    // ⚠️ MARKED IN PLACE, NOT HOISTED. A timeline card keeps its order and
+    // says "you are here" on the row that holds her age. See
+    // `PpChartCard.rowMonths`.
+    final hers = b.herRow(ChildProfileStore.instance.ageInMonths);
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
       decoration: BoxDecoration(
@@ -810,21 +1153,53 @@ class PpBlockView extends StatelessWidget {
           Text(b.subtitle!, style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w500, height: 1.55, color: p.ink2)),
         ],
         const SizedBox(height: 14),
-        for (final (label, value) in b.rows) ...[
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                  child: Text(label,
-                      style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w500, height: 1.4, color: p.ink2))),
-              const SizedBox(width: 12),
-              // ⚠️ tabular figures, so a column of "11 to 14 hours" lines up.
-              Text(value,
-                  style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w800, height: 1.55, color: p.ink1)
-                      .copyWith(fontFeatures: const [
-                    FontFeature.tabularFigures(),
-                  ])),
-            ],
+        for (final (i, (label, value)) in b.rows.indexed) ...[
+          Container(
+            // Her row on a timeline: a white pane on the tinted card, with the
+            // tag beside the label. Rows that are not hers are drawn exactly
+            // as before.
+            padding: i == hers
+                ? const EdgeInsets.fromLTRB(10, 8, 10, 8)
+                : EdgeInsets.zero,
+            decoration: i == hers
+                ? BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.75),
+                    borderRadius: BorderRadius.circular(12),
+                  )
+                : null,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (i == hers)
+                          Text('YOU ARE HERE',
+                              style: pvManrope(
+                                  fontSize: 8.5,
+                                  fontWeight: FontWeight.w800,
+                                  letterSpacing: 1.1,
+                                  color: p.action)),
+                        Text(label,
+                            style: pvManrope(
+                                fontSize: 13.5,
+                                fontWeight: i == hers
+                                    ? FontWeight.w700
+                                    : FontWeight.w500,
+                                height: 1.4,
+                                color: i == hers ? p.ink1 : p.ink2)),
+                      ]),
+                ),
+                const SizedBox(width: 12),
+                // ⚠️ tabular figures, so a column of "11 to 14 hours" lines up.
+                Text(value,
+                    style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w800, height: 1.55, color: p.ink1)
+                        .copyWith(fontFeatures: const [
+                      FontFeature.tabularFigures(),
+                    ])),
+              ],
+            ),
           ),
           const SizedBox(height: 9),
         ],
@@ -975,6 +1350,152 @@ class PpBlockView extends StatelessWidget {
         length: b.minutes,
         slotId: b.slotId,
       );
+
+  /// The carousel's launch card: a tinted panel that says what it is, how long
+  /// it is, and opens the story screen. The slides themselves never render
+  /// inline — see the note at the head of the new formats.
+  Widget _carousel(BuildContext context, PpCarousel b, V2Palette p) {
+    final months = ChildProfileStore.instance.ageInMonths;
+    final cards = b.cardsFor(months);
+    if (cards.isEmpty) return const SizedBox.shrink();
+    final tint = v2BlockTint(b.hue, p);
+    final first = b.coverTitle ?? cards.first.title;
+    return InkWell(
+      onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+        settings: const RouteSettings(name: 'pp/story'),
+        builder: (_) => PpStoryScreen(
+          title: b.eyebrow ?? 'Swipe through',
+          cards: cards,
+          hue: b.hue,
+          coverTitle: b.coverTitle,
+          coverBlurb: b.coverBlurb,
+          onPage: onPage,
+        ),
+      )),
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 15, 16, 16),
+        decoration: BoxDecoration(
+          color: tint,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Expanded(
+              child: Text(
+                  '${(b.eyebrow ?? 'CAROUSEL').toUpperCase()}  ·  '
+                  '${cards.length} ${cards.length == 1 ? 'SLIDE' : 'SLIDES'}',
+                  style: pvManrope(
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.1,
+                      color: p.action)),
+            ),
+            Icon(Icons.swipe_rounded, size: 18, color: p.action),
+          ]),
+          const SizedBox(height: 8),
+          Text(first,
+              style: pvFraunces(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  height: 1.2,
+                  letterSpacing: -0.35,
+                  color: p.ink1)),
+          if (b.coverBlurb != null) ...[
+            const SizedBox(height: 5),
+            Text(b.coverBlurb!,
+                style: pvManrope(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w500,
+                    height: 1.5,
+                    color: p.ink2)),
+          ],
+          const SizedBox(height: 14),
+          // The segments: one per slide, the shape a story reader already
+          // knows how to read, drawn here so the card promises the format.
+          Row(children: [
+            for (var i = 0; i < cards.length; i++) ...[
+              Expanded(
+                child: Container(
+                  height: 3,
+                  decoration: BoxDecoration(
+                    color: p.ink1.withValues(alpha: i == 0 ? 0.55 : 0.18),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                ),
+              ),
+              if (i != cards.length - 1) const SizedBox(width: 4),
+            ],
+          ]),
+        ]),
+      ),
+    );
+  }
+
+  /// The interactive's launch card. The night kind is drawn dark, because the
+  /// card is the promise: tapping it at 3am should not open a white screen.
+  Widget _interactive(BuildContext context, PpInteractive b, V2Palette p) {
+    final night = b.kind == PpInteractiveKind.night;
+    final ground = night ? PpInteractiveScreen.nightGround : v2BlockTint(b.hue, p);
+    final ink = night ? Colors.white : p.ink1;
+    final ink2 = night ? Colors.white.withValues(alpha: 0.72) : p.ink2;
+    final accent = night ? PpInteractiveScreen.nightAccent : p.action;
+    final n = b.items.length;
+    return InkWell(
+      onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+        settings: const RouteSettings(name: 'pp/interactive'),
+        builder: (_) => PpInteractiveScreen(block: b, onPage: onPage),
+      )),
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 15, 16, 16),
+        decoration: BoxDecoration(
+          color: ground,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(
+              'INTERACTIVE  ·  $n ${night ? 'STEPS' : 'CHECKS'}',
+              style: pvManrope(
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.1,
+                  color: accent)),
+          const SizedBox(height: 8),
+          Text(b.title,
+              style: pvFraunces(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  height: 1.2,
+                  letterSpacing: -0.35,
+                  color: ink)),
+          if (b.blurb != null) ...[
+            const SizedBox(height: 5),
+            Text(b.blurb!,
+                style: pvManrope(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w500,
+                    height: 1.5,
+                    color: ink2)),
+          ],
+          const SizedBox(height: 14),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            decoration: BoxDecoration(
+              color: night ? Colors.white.withValues(alpha: 0.12) : p.action,
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Text(night ? 'Start, one step at a time' : 'Walk through it',
+                style: pvManrope(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    height: 1.4,
+                    color: Colors.white)),
+          ),
+        ]),
+      ),
+    );
+  }
 
   Widget _link(BuildContext context, PpLink b, V2Palette p) {
     // ⚠️ A `pageId` LINK WAS DEAD ON ARRIVAL, AND IT FAILED IN THE WORST WAY.

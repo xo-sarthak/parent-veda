@@ -38,6 +38,9 @@ import 'pp_chart_browser_screen.dart';
 import 'pp_feeding_content.dart';
 import 'products_compare_screen.dart';
 import 'pp_sounds_screen.dart';
+import 'pp_wake_windows_screen.dart';
+import '../../data/doors/pp_door_data.dart';
+import 'doors/pp_door_screen.dart';
 
 import '../product_guide/product_guide_hub_screen.dart';
 import 'baby_naming_home_screen.dart';
@@ -99,6 +102,35 @@ Widget? ppScreenForSurface(String id) {
   }
 
   const sectionPrefix = 'pp_section/';
+
+  // ⚠️ A SECTION WITH A DOOR OPENS ITS DOOR, NOT ITS LIBRARY. Every link that
+  // named the Sleep library (`pp_section/parenting_sleep`, or one of its
+  // areas) now lands on the door, on the tab that holds that area. The
+  // library screen stays the engine for the nine sections without a door;
+  // for Sleep it is unreachable rather than deleted, so a second shell never
+  // sits behind the first.
+  if (id.startsWith(sectionPrefix)) {
+    final rest = id.substring(sectionPrefix.length);
+    final slash = rest.indexOf('/');
+    final sectionId = slash > 0 ? rest.substring(0, slash) : rest;
+    final door = ppDoorFor(sectionId);
+    if (door != null) {
+      final area = slash > 0 ? rest.substring(slash + 1) : null;
+      return PpDoorScreen(
+        door: door,
+        initialTabId: area == null ? null : door.tabFor(area)?.id,
+        onSurface: (context, surfaceId) {
+          final screen = ppScreenForSurface(surfaceId);
+          if (screen == null) return;
+          Navigator.of(context).push(MaterialPageRoute<void>(
+            settings: RouteSettings(name: surfaceId),
+            builder: (_) => screen,
+          ));
+        },
+      );
+    }
+  }
+
   if (id.startsWith(sectionPrefix)) {
     // ⚠️ `pp_section/<bracketId>/<areaId>` OPENS STRAIGHT INTO ONE AREA.
     //
@@ -152,6 +184,9 @@ Widget? ppScreenForSurface(String id) {
 Widget? _ppScreenFor(String id) => switch (id) {
       // ---- New surfaces the sections need -----------------------------------
       'pp_sleep_sounds' => const PpSoundsScreen(),
+      // The Sleep door rebuild's one new tool. Opens on her window and asks
+      // for nothing — see the screen's own header for why it is not a timer.
+      'pp_wake_windows' => const PpWakeWindowsScreen(),
       // ⚠️ BOTH OF THESE ARE THE SAME SCREEN. They read their own section's
       // chart cards rather than holding a second copy of numbers that are marked
       // REQUIRED_REVIEW and expected to be corrected. Two bespoke screens would

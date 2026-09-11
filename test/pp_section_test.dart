@@ -76,6 +76,33 @@ Iterable<String> strings(PpBlock b) {
   if (b is PpAudioSlot) return [b.title];
   if (b is PpLink) return [b.label, ?b.blurb];
   if (b is PpConsult) return [b.title, b.whoFor];
+  // The door-rebuild formats. A carousel slide or an interactive step is
+  // user-visible copy like any card line, so the same rules apply to it.
+  if (b is PpCarousel) {
+    return [
+      ?b.coverTitle,
+      ?b.coverBlurb,
+      ?b.eyebrow,
+      for (final c in b.cards) ...[c.title, c.body],
+    ];
+  }
+  if (b is PpInteractive) {
+    return [
+      b.title,
+      ?b.blurb,
+      ?b.closing,
+      ?b.closingLabel,
+      for (final i in b.items) ...[i.title, ?i.detail, ?i.group],
+    ];
+  }
+  if (b is PpAnimation) return [b.title, ?b.caption];
+  if (b is PpIllustration) {
+    return [
+      b.title,
+      ?b.caption,
+      for (final l in b.labels) ...[l.title, ?l.detail],
+    ];
+  }
   return const [];
 }
 
@@ -148,8 +175,13 @@ void main() {
       }
     });
 
-    test('every page has blocks', () {
+    test('every page has blocks, or is a tool', () {
+      // ⚠️ A TOOL PAGE HAS NO BLOCKS AND THAT IS CORRECT. Its card opens a
+      // surface (`PpPage.toolSurfaceId`); the blocks are never rendered.
+      // `test/pp_sleep_check_test.dart` proves the surface resolves, which is
+      // the guarantee that matters for it.
       for (final (s, a, p) in _allPages()) {
+        if (p.toolSurfaceId != null) continue;
         expect(p.blocks, isNotEmpty,
             reason: '${s.id} / ${a.id} / ${p.id} renders an empty screen');
       }
@@ -246,6 +278,7 @@ void main() {
       // exists, and nothing instructional gets in front of it. A page that
       // opens video-then-steps still fails.
       for (final (s, _, p) in _allPages()) {
+        if (p.toolSurfaceId != null) continue; // a tool page renders no blocks
         final rest = [
           for (final b in p.orderedBlocks) if (b is! PpVideoSlot) b
         ];
