@@ -620,20 +620,22 @@ class PvDoorFlagLine {
   final String? conditionId;
 }
 
-/// How a group lays its sections out.
+/// What kind of tab a group is.
+///
+/// ⚠️ SEMANTIC, NOT VISUAL — SINCE 2026-09-11. This used to choose between a
+/// horizontal rail and full-width rows. The user's call on the phone: every
+/// section on every door is a card rail, so a woman learns one card and meets
+/// it everywhere. `stack` still says something true about the tab — the tool
+/// is the content and the sections under it are errands — and the briefs'
+/// "do not render Sub-tabs 1 or 4 as card rails" is still honoured in the only
+/// way that matters: those tabs lead with the tool, in place, and nothing sits
+/// in front of it. The errands beneath draw as rails like everything else.
 enum PvDoorLayout {
-  /// A heading and a horizontal scroll of cards. The default, and what the
-  /// brief calls a card rail.
+  /// A browse tab: headings and rails of cards, nothing inline above them.
   rails,
 
-  /// Full-width rows, stacked.
-  ///
-  /// ⚠️ THIS EXISTS BECAUSE THE BRIEF FORBIDS RAILS ON TWO TABS BY NAME — "Do
-  /// not render Sub-tabs 1 or 4 as card rails" — and it is right to. My scans
-  /// and My reports are TOOL SCREENS: the timeline or the locker is the
-  /// content, and the two or three things beside it are errands, not a library
-  /// to browse. A rail says "there is more sideways"; on a tab with three items
-  /// and a tool above them, there is not.
+  /// A tool tab: the inline tool is the content; sections beneath are errands.
+  /// Draws exactly like [rails] — the value is a description of the tab.
   stack,
 }
 

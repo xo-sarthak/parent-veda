@@ -141,9 +141,17 @@ class ScanTimelineScreen extends StatelessWidget {
 /// widget is either unbounded or a nested scroll nobody can drive with a thumb.
 /// The door's own `ListView` does the scrolling; this just lays out.
 class ScanTimelineBody extends StatelessWidget {
-  const ScanTimelineBody({super.key, required this.pregnancy});
+  const ScanTimelineBody(
+      {super.key, required this.pregnancy, this.showFooter = true});
 
   final PregnancyController pregnancy;
+
+  /// ⚠️ FALSE WHEN THE DOOR RENDERS THIS. The door's own closing line IS this
+  /// footer — the brief says keep it, the door keeps it under every tab — so
+  /// drawing it here as well put the same sentence twice, a centimetre apart,
+  /// at the foot of My scans. Seen on a phone, 2026-09-12. The standalone
+  /// screen has no door under it and keeps the footer.
+  final bool showFooter;
 
   @override
   Widget build(BuildContext context) {
@@ -194,16 +202,19 @@ class ScanTimelineBody extends StatelessWidget {
                 ],
               ]),
             ),
-            const SizedBox(height: 18),
-            // ⚠️ THE FOOTER LINE IS UNCHANGED, AND THE BRIEF SAYS SO IN SO MANY
-            // WORDS: "Keep the footer line as-is". It is the sentence that
-            // stops the timeline reading as a checklist she is behind on.
-            Text(
-                _en('Not every pregnancy needs every test on this list, and '
-                        'your doctor may add one that is not here. This is '
-                        'the usual run, not a rule.')
-                    .of(lang),
-                style: pvManrope(fontSize: 12, height: 1.5, color: p.ink3)),
+            if (showFooter) ...[
+              const SizedBox(height: 18),
+              // ⚠️ THE FOOTER LINE IS UNCHANGED, AND THE BRIEF SAYS SO IN SO
+              // MANY WORDS: "Keep the footer line as-is". It is the sentence
+              // that stops the timeline reading as a checklist she is behind
+              // on. Inside the door it is the door's closing line instead.
+              Text(
+                  _en('Not every pregnancy needs every test on this list, and '
+                          'your doctor may add one that is not here. This is '
+                          'the usual run, not a rule.')
+                      .of(lang),
+                  style: pvManrope(fontSize: 12, height: 1.5, color: p.ink3)),
+            ],
           ],
         );
       },
@@ -431,6 +442,42 @@ class _TimelineRow extends StatelessWidget {
                             fontSize: 11.5,
                             fontWeight: FontWeight.w600,
                             color: p.ink3)),
+                  ],
+                  // ⚠️ THE ONE WAY TO MARK A SCAN DONE FROM THE DOOR. Seen on
+                  // a phone, 2026-09-11: the passed row said "Not marked as
+                  // done", the Next screen said "mark a scan as done on your
+                  // timeline", and the timeline had no control — the only
+                  // callers of `markCompleted` were the old home and the
+                  // father's daily. A state the app names but cannot be put
+                  // into is a bug with a label on it.
+                  //
+                  // Text, not a button: it sits under the week range as a
+                  // quiet action, in the accent, so the row stays a row.
+                  // Done rows offer the reverse the same way.
+                  //
+                  // ⚠️ ONLY ONCE THE WINDOW HAS OPENED. The first cut put the
+                  // action on every row, and the user's reaction was the
+                  // right one: "how can I be asking someone to mark a scan a
+                  // month ahead as done?" A scan she cannot have had yet gets
+                  // no control; the day its window starts, it appears.
+                  if (isDone || from <= pregnancy.currentWeek) ...[
+                  const SizedBox(height: 7),
+                  GestureDetector(
+                    onTap: () => isDone
+                        ? ScansStore.instance.unmarkCompleted(s.id)
+                        : ScansStore.instance.markCompleted(
+                            scanId: s.id,
+                            journalTitle: s.name.of(lang),
+                            week: from),
+                    behavior: HitTestBehavior.opaque,
+                    child: Text(
+                        (isDone ? _en('Undo done') : _en('Mark as done'))
+                            .of(lang),
+                        style: pvManrope(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: isDone ? p.ink3 : p.action)),
+                  ),
                   ],
                   // Her own booking outranks the window — if she has a date,
                   // that is the answer to "when", not the range.

@@ -112,8 +112,13 @@ const String kLabourTabTalk = 'talk';
 /// is about what a timer cannot tell her, the area's is about calling anyway.
 /// Writing either twice would be two places for a safety line to drift.
 const String kLabourTimerNote =
-    "We can't tell you if it's labour, but your doctor can. If anything feels "
-    'off, call them, even if this screen looks calm.';
+    "We can't tell you if it's labour, but your doctor can.";
+// ⚠️ ONE SENTENCE, NOT TWO. It used to continue "If anything feels off, call
+// them, even if this screen looks calm" — which is `kLabourAreaNote` in
+// other words, and the door prints that as its closing line on the same tab
+// three cards down. Seen on a phone, 2026-09-12: the same caution twice in
+// one screen. The note now says the thing only this tab needs to say; the
+// closing line says the thing every tab does.
 
 const String kLabourAreaNote =
     'If anything feels off, call your doctor, even if this screen looks calm.';

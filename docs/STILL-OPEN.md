@@ -5609,3 +5609,69 @@ front". Your call; the door tab does not depend on it.
 placed to make the grouping legible are NOT what shipped — the body reads the
 real library, so nothing the design invented reached the app. The category
 names matched the library exactly.
+
+### 38.8 The bump ritual rebuilt from the design — 2026-09-11
+
+Second Claude Design round-trip. The board offered three main views; the
+user picked **1a**, it was built, and on the phone with real photos it read
+as a wall of full-width images. Rebuilt the same day as **1a's top over 1b's
+album** — header, add card and Then & Now, then trimester bands with a two-up
+grid read forward. The user's words: *"what if the person has done it for
+every week? They keep scrolling with such big images thrown at their face."*
+Recorded because it is the first time a board's chosen direction was
+overturned by the phone rather than by the brief. Built as
+`lib/screens/belly_skin/bump_ritual_screen.dart` — `BumpRitualBody` for the
+door tab and `BumpRitualScreen` (door-family chrome) for the four other
+callers. `bump_journey_screen.dart` is retired in place with a note, not
+deleted; `BumpStore` and `BumpBookScreen` are unchanged apart from the book
+screen's new `initialAction`.
+
+**Behaviour that is new, not skin:** "Save as one image" on Then & Now
+(`RepaintBoundary` → PNG → share sheet); the book sheet opening straight to
+download or print. Everything else is the shipped store under a new front.
+
+**Not carried over from the old screen, on purpose:** the trimester and
+"captioned" and "favourites" filters (the design has no filter — the timeline
+is the whole book, and favourites are marked on the photo, not filtered); the
+"capture this week?" nudge (the add card IS the nudge); the milestone trophies.
+If anyone misses the filters, they are one Wrap of chips over the same list.
+
+**Owed:** the moments' copy is English-only new copy per policy; the old
+screen's Hindi milestone strings (`jrHalfway` etc.) are no longer read from
+this screen. And a device check of Then & Now's share with two real photos —
+the test harness cannot render a `RepaintBoundary` to PNG.
+
+### 38.9 One card language, everywhere — 2026-09-12
+
+The user, walking every door: *"we should need to maintain symmetry."* Two
+engine rules reversed in one change:
+
+* **"Tool tabs get full-width rows"** (`PvDoorLayout.stack`) — gone as a
+  drawing instruction. The enum stays as a description of the tab.
+* **"A section of one tile gets a full-width row"** — gone. A rail of one is
+  a rail. The gutter it leaves costs less than a second card language.
+
+`_WideTile` is retired in place. `PvDoorRow` stays for the screens that are
+lists by nature INSIDE a door (Find a condition, the report tool's topics).
+`_RailCard` is promoted to `PvDoorRailCard` in the chrome so an embedded tool
+can draw the card without a tile — the reports locker's "Add a report" is the
+first. A render test now walks every tab of every door and fails if the rail
+count differs from the section count.
+
+**Two more repeated cautions found and fixed on the way:** My scans printed
+the timeline footer and the door's closing line (same sentence) back to back —
+the door's line is now the full footer, verbatim, and the embedded timeline
+does not draw its own; and Labour prep's timer note ended with the closing
+line's sentence, so the note is now one sentence.
+
+**And a bug older than the doors:** there was no way to mark a scan done. The
+timeline said "Not marked as done", the Next screen said "mark it on your
+timeline", and the only callers of `markCompleted` were the old home and the
+father's daily. Each timeline row now carries "Mark as done" — **only once its
+window has opened** (the first cut put it on every row; *"how can I be asking
+someone to mark a scan a month ahead?"*) — and "Undo done" on done rows.
+
+**Still open from this pass:** `ScanDetailScreen` has no done control either;
+the row is the one place for now. And Mind & mood — its PDF was never opened
+(`ParentVeda_Mind_and_mood_final.pdf`); the tile still opens the old landing
+whose eyebrow reads "Pregnancy mental health". Next.

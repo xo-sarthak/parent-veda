@@ -222,6 +222,31 @@ void _everyDoor() {
       }
     });
 
+    testWidgets('$name: every section is a rail, even a section of one',
+        (tester) async {
+      // ⚠️ SYMMETRY, AS A RULE. Decided on the phone, 2026-09-11: one card
+      // language on every section of every tab, so a rail of one card is
+      // still a rail. A full-width row anywhere under a section heading is
+      // the failure. `PvDoorLayout.stack` must not change this.
+      await _pump(tester, name);
+      for (var i = 0; i < door.groups.length; i++) {
+        if (i > 0) {
+          await tester.tap(find.byKey(pvDoorDotKey(i)));
+          await tester.pump();
+          await tester.pump(const Duration(milliseconds: 500));
+        }
+        final g = door.groups[i];
+        final sections = door.sectionsOf(g.id);
+        // The carousel is a custom gesture widget, not a ListView, so every
+        // horizontal ListView on screen is a section rail.
+        final rails = find.byWidgetPredicate((w) =>
+            w is ListView && w.scrollDirection == Axis.horizontal);
+        expect(rails, findsNWidgets(sections.length),
+            reason: '$name / "${g.label}": ${sections.length} sections must '
+                'draw ${sections.length} rails.');
+      }
+    });
+
     testWidgets('$name: nothing overflows at 360dp on any tab',
         (tester) async {
       await _pump(tester, name);

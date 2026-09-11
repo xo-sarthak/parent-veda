@@ -250,6 +250,151 @@ class PvDoorToolScaffold extends StatelessWidget {
 }
 
 
+/// Rail geometry. One set of numbers, so a rail on a door and a rail of one
+/// card inside an embedded tool cannot drift apart.
+const double kPvRailCardWidth = 142;
+const double kPvRailCardHeight = 176;
+const double kPvRailGap = 10;
+
+/// One card on a rail, in the door's language.
+///
+/// ⚠️ THIS IS `_RailCard` PROMOTED, FOR THE SAME REASON `PvDoorRow` WAS: a
+/// screen that renders INSIDE a door needs the door's card without holding a
+/// `PvDoorTile`. The user's rule on the phone, 2026-09-12: *"it should not be
+/// a tile, it should be the card representation we're having"* — said of the
+/// reports locker's "Add a report", which is not a tile on a door section but
+/// an action inside an embedded tool. Same card, plain values.
+class PvDoorRailCard extends StatelessWidget {
+  const PvDoorRailCard({
+    super.key,
+    required this.p,
+    required this.hue,
+    required this.icon,
+    required this.chip,
+    required this.title,
+    this.meta,
+    this.index = 0,
+    this.dimmed = false,
+    this.onTap,
+  });
+
+  final V2Palette p;
+  final double hue;
+  final IconData icon;
+
+  /// The badge, top-left — "Tool", "Article", "Coming soon".
+  final String chip;
+  final String title;
+
+  /// One fact above the title, where there is one — a week range, a price.
+  final String? meta;
+
+  /// Position in its rail. Each card steps the hue by 22° so a rail reads as
+  /// separate blocks rather than one slab.
+  final int index;
+
+  /// A coming-soon card: the same card a shade back, and not tappable.
+  final bool dimmed;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final tint = v2BlockTint((hue + index * 22) % 360, p);
+    final deep = HSLColor.fromColor(tint)
+        .withSaturation(0.46)
+        .withLightness(0.34)
+        .toColor();
+
+    return InkWell(
+      onTap: dimmed ? null : onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: Opacity(
+        opacity: dimmed ? 0.62 : 1,
+        child: Container(
+          width: kPvRailCardWidth,
+          decoration: BoxDecoration(
+            color: tint,
+            borderRadius: BorderRadius.circular(18),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: Stack(children: [
+            // The mark, quiet and large, where an illustration would sit.
+            Positioned(
+              right: -22,
+              bottom: 22,
+              child: Icon(icon,
+                  size: 96, color: Colors.white.withValues(alpha: 0.34)),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(13),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.82),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      Icon(icon, size: 10, color: deep),
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(chip,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: pvManrope(
+                                fontSize: 9,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 0.6,
+                                color: deep)),
+                      ),
+                    ]),
+                  ),
+                  const Spacer(),
+                  if (meta case final m?) ...[
+                    Text(m.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: pvManrope(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 0.8,
+                            color: deep.withValues(alpha: 0.85))),
+                    const SizedBox(height: 4),
+                  ],
+                  Text(title,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvFraunces(
+                          fontSize: 14.5,
+                          fontWeight: FontWeight.w600,
+                          height: 1.22,
+                          letterSpacing: -0.3,
+                          color: p.ink1)),
+                ],
+              ),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
+/// A rail holding one card inside an embedded tool — an action, not a
+/// section. Same height and gutter as a door rail so the two line up.
+class PvDoorSingleRail extends StatelessWidget {
+  const PvDoorSingleRail({super.key, required this.child});
+  final Widget child;
+  @override
+  Widget build(BuildContext context) => SizedBox(
+        height: kPvRailCardHeight,
+        child: Align(alignment: Alignment.centerLeft, child: child),
+      );
+}
+
 /// One full-width row in the door's card language.
 ///
 /// ⚠️ THIS IS `_WideTile` PROMOTED, AND THE REASON IT MOVED HERE IS A SCREEN

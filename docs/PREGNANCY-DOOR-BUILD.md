@@ -562,6 +562,25 @@ the place.** The Labour brief marked the birth plan `[Guide] reuse`. There was
 nothing to reuse and a guide would have been one more thing to read. The card
 on the door is a tool.
 
+## 21a. One card language, no exceptions — DECIDED 2026-09-12
+
+Every section on every tab of every door draws as a horizontal rail of the
+same card. Not "except tool tabs". Not "except a section of one". The two
+earlier rules that said otherwise were each reasoned and each wrong, for the
+same reason: they optimised one section and cost the whole door its
+coherence. A woman learns the card once and then meets it everywhere; the
+moment one section draws differently, she has to ask what the difference
+means, and it means nothing.
+
+What this does NOT cover: a screen that is a **list by nature** rendered inside
+a door — the conditions browse, the report tool's topics. Those are
+`PvDoorRow`s and stay so. An **action** inside an embedded tool (the locker's
+"Add a report") is a card, via `PvDoorRailCard` + `PvDoorSingleRail`.
+
+The test is `pv_door_renders_test.dart`'s "every section is a rail" — it
+counts horizontal `ListView`s per tab against sections per tab, for every
+door in the registry.
+
 ## 22. Ranking is allowed; structure is not — `PvDoorSection.lead`
 
 The engine's first personalisation hook. A section may name one entry to bring
@@ -581,3 +600,14 @@ Three properties, each deliberate:
   may be there for a reason ("Add this to your plate now" is the narrowest
   question), and a hoist that displaced it would undo a decision made on
   purpose.
+
+* **A board's direction is a hypothesis until it meets real photos.** The
+  bump ritual's chosen main view (one photo a page) was right on the board
+  and wrong on a phone with seven real four-by-fives in it. The album (two-up
+  in trimester bands) replaced it the same day. Build the picked direction,
+  put real data on a handset, and be ready to swap the timeline for the
+  album — the top of the screen usually survives, the list rarely does.
+* **What she sees is what she gets.** A share or export must render the
+  exact widget the preview shows — one `RepaintBoundary` around one card,
+  used on screen, full screen and for the PNG. Two code paths for "preview"
+  and "export" drift within a week.

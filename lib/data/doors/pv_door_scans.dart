@@ -134,8 +134,12 @@ final PvDoorPage kScansDoor = PvDoorPage(
   heroImageUrl:
       'https://images.unsplash.com/photo-1654931800911-7a9cfb3b7c17?w=900&h=700&fit=crop',
 
-  closingLine: 'Not every pregnancy needs every test. This is the usual run, '
-      'not a rule.',
+  // ⚠️ THE TIMELINE'S FULL FOOTER, VERBATIM. The brief says keep that line;
+  // the door keeps it here, under every tab, and the embedded timeline no
+  // longer draws its own — two copies a centimetre apart was the fault.
+  closingLine: 'Not every pregnancy needs every test on this list, and your '
+      'doctor may add one that is not here. This is the usual run, not a '
+      'rule.',
 
   groups: [
     // -------------------------------------------------------------------------

@@ -76,9 +76,8 @@ import 'pv_door_router.dart';
 //  it leaves four points of the third card visible, which reads as a clipping
 //  bug rather than as an invitation to swipe. A rail that fits exactly reads as
 //  a finished row and nobody swipes it at all.
-const double kPvRailCardWidth = 142;
-const double kPvRailCardHeight = 176;
-const double kPvRailGap = 10;
+// Rail geometry lives in pv_door_chrome.dart (`kPvRailCardWidth` etc.),
+// shared with the embedded tools that draw a card of their own.
 
 /// How far the sheet is pulled up over a photographic hero.
 ///
@@ -264,36 +263,24 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                             letterSpacing: -0.45,
                             color: p.ink1))),
                     const SizedBox(height: 13),
-                    // ⚠️ A SECTION HOLDING ONE TILE IS NEVER A RAIL, WHATEVER
-                    // THE TAB'S LAYOUT SAYS. The comment below is the whole
-                    // argument and it does not stop at the tab boundary: a
-                    // rail says "there is more sideways", and a rail of one
-                    // says it while being visibly wrong — a 142pt card with
-                    // two-thirds of the row empty beside it, which reads as
-                    // content that failed to load. Seen on a phone on four
-                    // sections across three doors, 2026-09-10.
+                    // ⚠️ EVERY SECTION IS A RAIL. ONE TILE, TWO TILES, A TOOL
+                    // TAB — A RAIL. Decided by the user on the phone,
+                    // 2026-09-11, and it reverses two earlier rules in this
+                    // file: "tool tabs get full-width rows" and "a section of
+                    // one tile gets a full-width row". Both were reasoned —
+                    // a rail says "there is more sideways", and a rail of one
+                    // card says it beside an empty gutter — and both broke
+                    // the thing that matters more on a phone: that every
+                    // door reads as ONE system. A woman learns the card once,
+                    // on the first rail she sees, and then meets it on every
+                    // section of every tab. The single wide row under the
+                    // scans timeline looked like a different app's list.
                     //
-                    // ⚠️ AND IT BUYS THE BLURB BACK. A rail card cannot afford
-                    // one; a wide row shows it. So the sections that lose the
-                    // least by not being rails — the single-tool errands, the
-                    // one checklist before an appointment — are exactly the
-                    // ones that most needed the second line.
-                    if (group.layout == PvDoorLayout.stack ||
-                        tiles.length == 1)
-                      // ⚠️ FULL-WIDTH ROWS, NOT A RAIL. A rail says "there is
-                      // more sideways"; on a tab with a tool above it and two
-                      // errands below, there is not.
-                      for (final tile in tiles) ...[
-                        pvDoorPad(_WideTile(
-                          tile: tile,
-                          p: p,
-                          hue: hue,
-                          onTap: () => openPvDoorTile(
-                              context, tile, widget.pregnancy),
-                        )),
-                        const SizedBox(height: 10),
-                      ]
-                    else
+                    // The user's words: *"we should need to maintain
+                    // symmetry."* So `PvDoorLayout` no longer changes what a
+                    // section draws — see its doc — and the one-tile rule is
+                    // gone. What a rail of one costs (a gutter) is smaller
+                    // than what it bought (a second card language).
                       // ⚠️ A HORIZONTAL RAIL PER SECTION, AND THE CARDS ARE
                       // DELIBERATELY CUT OFF AT THE RIGHT EDGE. Four sections
                       // holding nineteen stacked rows is a page you scroll for
@@ -589,6 +576,12 @@ IconData pvDoorFormatIcon(PvDoorFormat format) => switch (format) {
     };
 
 /// One card on a rail.
+///
+/// ⚠️ THE DRAWING LIVES IN `PvDoorRailCard`, IN THE CHROME FILE; THIS IS THE
+/// ADAPTER from a `PvDoorTile`. Promoted 2026-09-12 so an embedded tool (the
+/// reports locker's "Add a report") can draw the same card without a tile.
+/// The hue-step, the quiet 96pt mark, the meta line and the title-only face
+/// are all unchanged — see the chrome file for the reasoning on each.
 class _RailCard extends StatelessWidget {
   const _RailCard({
     required this.tile,
@@ -601,167 +594,69 @@ class _RailCard extends StatelessWidget {
   final PvDoorTile tile;
   final V2Palette p;
   final double hue;
-
-  /// Position in its rail. Drives the tint step — see below.
   final int index;
-
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
-    // ⚠️ EACH CARD STEPS THE HUE, so a rail reads as separate blocks rather
-    // than one long slab of the section's colour. With flat tints a uniform
-    // rail loses the card edges entirely and the eye stops counting them. 22°
-    // is enough to separate neighbours and small enough that the rail still
-    // belongs to its section.
-    final tint = v2BlockTint((hue + index * 22) % 360, p);
-    final deep = HSLColor.fromColor(tint)
-        .withSaturation(0.46)
-        .withLightness(0.34)
-        .toColor();
-    final soon = tile.comingSoon;
-
-    return InkWell(
-      // ⚠️ A COMING-SOON CARD DOES NOT RESPOND TO A TAP, and that is the
-      // honest treatment rather than a disabled one. A tap that does nothing
-      // teaches that taps do nothing; no ink, no ripple and a chip that says
-      // "Coming soon" teaches that this one is not ready.
-      onTap: soon ? null : onTap,
-      borderRadius: BorderRadius.circular(18),
-      child: Opacity(
-        opacity: soon ? 0.62 : 1,
-        child: Container(
-          width: kPvRailCardWidth,
-          decoration: BoxDecoration(
-            color: tint,
-            borderRadius: BorderRadius.circular(18),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Stack(children: [
-            // The mark, sitting where an illustration would.
-            //
-            // ⚠️ QUIETER AND SMALLER THAN THE TTC ORIGINAL'S, BECAUSE THIS RAIL
-            // IS NOT THAT RAIL. Over there most tiles carry their own drawn art
-            // and the format glyph is the exception; here every tile falls back
-            // to it — and nine scans are all one format, so the rail came out
-            // as nine identical grey pages separated only by a title and a 22°
-            // hue step. Seen on a phone, 2026-09-10.
-            //
-            // The fix is not a bigger difference between marks, it is a smaller
-            // mark: at 96 and 0.34 it reads as a texture the hue sits in rather
-            // than as the subject of the card, and the words become the thing
-            // you look at. The week range does the actual distinguishing.
-            Positioned(
-              right: -22,
-              bottom: 22,
-              child: Icon(pvDoorFormatIcon(tile.format),
-                  size: 96, color: Colors.white.withValues(alpha: 0.34)),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(13),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // The badge, top-left.
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withValues(alpha: 0.82),
-                      borderRadius: BorderRadius.circular(999),
-                    ),
-                    child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      Icon(pvDoorFormatIcon(tile.format),
-                          size: 10, color: deep),
-                      const SizedBox(width: 4),
-                      Flexible(
-                        child: Text(soon ? 'Coming soon' : tile.format.label,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: pvManrope(
-                                fontSize: 9,
-                                fontWeight: FontWeight.w800,
-                                letterSpacing: 0.6,
-                                color: deep)),
-                      ),
-                    ]),
-                  ),
-                  const Spacer(),
-                  // ⚠️ THE ONE FACT ABOVE THE TITLE, WHERE THERE IS ONE. On the
-                  // scans rail this is the week range, and it is what makes a
-                  // card answer "is this one mine, now" without being tapped.
-                  // See `PvDoorTile.meta`.
-                  if (tile.meta case final meta?) ...[
-                    Text(meta.toUpperCase(),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: pvManrope(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.8,
-                            color: deep.withValues(alpha: 0.85))),
-                    const SizedBox(height: 4),
-                  ],
-                  // ⚠️ TITLE ONLY ON THE FACE, BESIDES THAT. The blurb still
-                  // exists on every tile and still does its job on a wide row;
-                  // on a 142pt block it would take the title from four lines to
-                  // one and turn a scannable rail into a wall.
-                  Text(tile.title,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                      style: pvFraunces(
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w600,
-                          height: 1.22,
-                          letterSpacing: -0.3,
-                          color: p.ink1)),
-                ],
-              ),
-            ),
-          ]),
-        ),
-      ),
-    );
-  }
-}
-
-/// One full-width row, on a tool tab.
-///
-/// ⚠️ IT SHOWS THE BLURB AND THE RAIL CARD DOES NOT. There is room here, and on
-/// a tab with two or three rows the extra line is what stops them reading as an
-/// afterthought under the tool above.
-///
-/// ⚠️ THE DRAWING LIVES IN `PvDoorRow`, IN THE CHROME FILE, AND THIS IS ONLY
-/// THE ADAPTER. A screen embedded in a door — `ConditionsHomeBody` — needs the
-/// same row and holds `ConditionEntry`s rather than `PvDoorTile`s. Keeping the
-/// paint in a widget that takes plain values means the door's language is
-/// available to a caller that has never heard of the door engine, and the two
-/// cannot drift into looking almost the same.
-class _WideTile extends StatelessWidget {
-  const _WideTile({
-    required this.tile,
-    required this.p,
-    required this.hue,
-    required this.onTap,
-  });
-
-  final PvDoorTile tile;
-  final V2Palette p;
-  final double hue;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) => PvDoorRow(
+  Widget build(BuildContext context) => PvDoorRailCard(
         p: p,
         hue: hue,
+        index: index,
         icon: pvDoorFormatIcon(tile.format),
         chip: tile.comingSoon ? 'Coming soon' : tile.format.label,
         title: tile.title,
-        blurb: tile.blurb,
+        meta: tile.meta,
         dimmed: tile.comingSoon,
         onTap: onTap,
       );
 }
+
+// -----------------------------------------------------------------------------
+//  RETIRED 2026-09-11, KEPT FOR REVERT — the full-width row a door section
+//  used to draw on tool tabs and for one-tile sections. Every section is a
+//  rail now (see the renderer above). The row itself lives on as
+//  `PvDoorRow` in pv_door_chrome.dart, used by the screens that render INSIDE
+//  a door — the conditions browse, the report tool's topics, the reports
+//  locker's "Add a report" — which are lists by nature and stay lists.
+// -----------------------------------------------------------------------------
+//
+// /// One full-width row, on a tool tab.
+// ///
+// /// ⚠️ IT SHOWS THE BLURB AND THE RAIL CARD DOES NOT. There is room here, and on
+// /// a tab with two or three rows the extra line is what stops them reading as an
+// /// afterthought under the tool above.
+// ///
+// /// ⚠️ THE DRAWING LIVES IN `PvDoorRow`, IN THE CHROME FILE, AND THIS IS ONLY
+// /// THE ADAPTER. A screen embedded in a door — `ConditionsHomeBody` — needs the
+// /// same row and holds `ConditionEntry`s rather than `PvDoorTile`s. Keeping the
+// /// paint in a widget that takes plain values means the door's language is
+// /// available to a caller that has never heard of the door engine, and the two
+// /// cannot drift into looking almost the same.
+// class _WideTile extends StatelessWidget {
+//   const _WideTile({
+//     required this.tile,
+//     required this.p,
+//     required this.hue,
+//     required this.onTap,
+//   });
+//
+//   final PvDoorTile tile;
+//   final V2Palette p;
+//   final double hue;
+//   final VoidCallback onTap;
+//
+//   @override
+//   Widget build(BuildContext context) => PvDoorRow(
+//         p: p,
+//         hue: hue,
+//         icon: pvDoorFormatIcon(tile.format),
+//         chip: tile.comingSoon ? 'Coming soon' : tile.format.label,
+//         title: tile.title,
+//         blurb: tile.blurb,
+//         dimmed: tile.comingSoon,
+//         onTap: onTap,
+//       );
+// }
 
 /// The pinned red flag.
 ///

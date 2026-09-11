@@ -50,7 +50,7 @@ import '../../theme/pv_fonts.dart';
 import '../../widgets/storage_image.dart';
 import '../post_pregnancy/pp_attachments.dart';
 import '../v2/v2_palette.dart';
-import '../doors/pv_door_chrome.dart' show PvDoorRow;
+import '../doors/pv_door_chrome.dart' show PvDoorRailCard, PvDoorSingleRail;
 import 'hub/hub_solution_cards.dart' show SolutionMeta, SolutionType;
 import 'scan_report_viewer_screen.dart';
 
@@ -184,20 +184,22 @@ class _ScanReportsScreenState extends State<ScanReportsBody> {
                 ],
               ],
               const SizedBox(height: 22),
-              // ⚠️ THE DOOR'S ROW, NOT THE HUB CARD. This body renders inline
-              // on the Scans door's fourth tab, directly above a `PvDoorRow`
-              // ("Your report, line by line") — and the old `SolutionCard`
-              // sat on top of it in a different card language, one above the
-              // other. Seen on a phone, 2026-09-11. Same fix as the
-              // Complications browse list; see `PvDoorRow`'s header.
-              PvDoorRow(
-                p: p,
-                hue: SolutionType.tool.hue,
-                icon: Icons.tune_rounded,
-                chip: 'Tool',
-                title: _en('Add a report').of(lang),
-                blurb: _en('Take a photo, or add a PDF.').of(lang),
-                onTap: () => _add(context),
+              // ⚠️ THE DOOR'S RAIL CARD, NOT A ROW. This body renders inline
+              // on the Scans door's fourth tab, and the user's rule on the
+              // phone (2026-09-12) is one card language everywhere — a row
+              // here read as "the old design tile" beside the rails under it.
+              // A rail of one card is the door's own shape for a single
+              // action; `PvDoorSingleRail` keeps its height and gutter.
+              PvDoorSingleRail(
+                child: PvDoorRailCard(
+                  p: p,
+                  hue: SolutionType.tool.hue,
+                  icon: Icons.tune_rounded,
+                  chip: 'Tool',
+                  title: _en('Add a report').of(lang),
+                  meta: _en('Photo or PDF').of(lang),
+                  onTap: () => _add(context),
+                ),
               ),
               const SizedBox(height: 20),
               // ⚠️ OFF, KEPT FOR REVERT. It read "Clinics usually keep the
