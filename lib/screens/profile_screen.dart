@@ -44,7 +44,7 @@ import 'auth/auth_flow_screen.dart';
 import 'enterprise/activation_flow_screen.dart';
 import 'enterprise/employer_benefits_screen.dart';
 import '../services/entitlement_store.dart';
-import 'bump_journey_screen.dart';
+import 'belly_skin/bump_ritual_screen.dart';
 import '../services/father_preview.dart';
 import 'dear_baby_vault_screen.dart';
 import 'journal_screen.dart';
@@ -209,7 +209,7 @@ class ProfileScreen extends StatelessWidget {
                 accentBg: AppTheme.secondary50,
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => BumpJourneyScreen(controller: controller),
+                    builder: (_) => BumpRitualScreen(controller: controller),
                   ),
                 ),
               );

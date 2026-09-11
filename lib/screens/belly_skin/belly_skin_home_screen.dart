@@ -30,7 +30,7 @@ import '../../data/belly_skin_data.dart';
 import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/pv_fonts.dart';
-import '../bump_journey_screen.dart';
+import 'bump_ritual_screen.dart';
 import '../brackets/hub/hub_solution_cards.dart';
 import '../v2/v2_palette.dart';
 import 'bs_article_screen.dart';
@@ -73,7 +73,7 @@ class BellySkinHomeScreen extends StatelessWidget {
     if (controller != null) {
       Navigator.of(context).push(MaterialPageRoute<void>(
         settings: const RouteSettings(name: 'bump_journey'),
-        builder: (_) => BumpJourneyScreen(controller: controller!),
+        builder: (_) => BumpRitualScreen(controller: controller!),
       ));
       return;
     }

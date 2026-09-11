@@ -36,9 +36,17 @@ import '../widgets/storage_image.dart';
 import '../theme/pv_fonts.dart';
 import '../services/pdf_fonts.dart';
 
+/// What the book opens on. The bump ritual's book sheet lists the three
+/// things the book does as three rows; each one opens this screen and, for
+/// download and print, starts that action on the first frame rather than
+/// making her find the same button again.
+enum BumpBookAction { view, download, print }
+
 class BumpBookScreen extends StatefulWidget {
-  const BumpBookScreen({super.key, required this.lang});
+  const BumpBookScreen(
+      {super.key, required this.lang, this.initialAction = BumpBookAction.view});
   final AppLanguage lang;
+  final BumpBookAction initialAction;
 
   @override
   State<BumpBookScreen> createState() => _BumpBookScreenState();
@@ -66,6 +74,22 @@ class _BumpBookScreenState extends State<BumpBookScreen> {
       final p = _controller.page?.round() ?? 0;
       if (p != _page && mounted) setState(() => _page = p);
     });
+    // After the first frame so the ScaffoldMessenger and Navigator exist.
+    if (widget.initialAction != BumpBookAction.view) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        final photos = BumpStore.instance.photos;
+        if (photos.isEmpty) return;
+        switch (widget.initialAction) {
+          case BumpBookAction.download:
+            _download(photos);
+          case BumpBookAction.print:
+            _orderPrint();
+          case BumpBookAction.view:
+            break;
+        }
+      });
+    }
   }
 
   @override

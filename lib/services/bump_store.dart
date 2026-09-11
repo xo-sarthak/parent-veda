@@ -212,6 +212,16 @@ class BumpStore extends ChangeNotifier {
     await JournalStore.instance.deleteEntry('bump_$id');
   }
 
+  /// Test seam: replace the in-memory list without prefs or the cloud.
+  @visibleForTesting
+  void debugSeed(List<BumpPhoto> photos) {
+    _photos
+      ..clear()
+      ..addAll(photos);
+    _loaded = true;
+    notifyListeners();
+  }
+
   Future<void> _persist() async {
     try {
       final prefs = await SharedPreferences.getInstance();

@@ -17,7 +17,7 @@ import '../models/can_i_entry.dart';
 import '../models/symptom.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
-import 'bump_journey_screen.dart';
+import 'belly_skin/bump_ritual_screen.dart';
 import 'calendar_screen.dart';
 import 'can_i_screen.dart';
 import 'community_screen.dart';
@@ -97,7 +97,7 @@ class _GlobalSearchDelegate extends SearchDelegate<void> {
         _Dest(s.pclTitle, const ['checklist', 'product checklist', 'shopping'],
             Icons.checklist_rounded, (c) => ProductChecklistScreen(controller: c)),
         _Dest(s.bumpTitle, const ['bump', 'belly', 'photo', 'journey'],
-            Icons.pregnant_woman_rounded, (c) => BumpJourneyScreen(controller: c)),
+            Icons.pregnant_woman_rounded, (c) => BumpRitualScreen(controller: c)),
         _Dest(s.jrTitle, const ['journal', 'memory', 'diary', 'note'],
             Icons.menu_book_rounded, (c) => JournalScreen(controller: c)),
         _Dest(s.garbhToolTitle, const ['garbh', 'sanskar', 'ritual', 'spiritual'],

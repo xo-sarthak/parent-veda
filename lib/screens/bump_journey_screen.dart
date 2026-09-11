@@ -1,4 +1,13 @@
 // =============================================================================
+//  ⚠️ RETIRED 2026-09-11, KEPT FOR REVERT. No caller opens this screen any
+//  more: the Belly & skin door, the Tools hub, Profile, global search and the
+//  old landing all open `belly_skin/bump_ritual_screen.dart`, built from the
+//  Claude Design board for "The bump ritual". Everything this screen DID —
+//  capture, captions, favourites, delete, the journal mirror, the book — lives
+//  in `BumpStore` and `BumpBookScreen` and is unchanged; what retired is the
+//  presentation (the pre-V2 palette, the progress header, the trophy badges).
+//  Delete this file only once the new screen has shipped a release.
+// =============================================================================
 //  BumpJourneyScreen - "My Bump Journey" (a visual pregnancy timeline)
 // -----------------------------------------------------------------------------
 //  A warm, editorial, memory-book feel (not a gallery): a progress header, a

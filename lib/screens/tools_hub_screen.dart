@@ -15,7 +15,7 @@ import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
 import '../widgets/global_ask_fab.dart' show kAskFabReserve;
 import '../widgets/profile_ask_strip.dart';
-import 'bump_journey_screen.dart';
+import 'belly_skin/bump_ritual_screen.dart';
 import 'can_i_screen.dart';
 import 'father/father_journal_screen.dart';
 // father_stories_screen parked - the "Stories, Fables & Mythology" tile was
@@ -90,7 +90,7 @@ class ToolsHubScreen extends StatelessWidget {
           () => open(() => BabyMovementScreen(controller: controller)), priority: PregPriority.babyDevelopment),
       _Tool(s.bumpTitle, Icons.pregnant_woman_rounded,
           const Color(0xFFCB6F94),
-          () => open(() => BumpJourneyScreen(controller: controller))),
+          () => open(() => BumpRitualScreen(controller: controller))),
       _Tool(s.jrTitle, Icons.menu_book_rounded, const Color(0xFF8A6BBF),
           () => open(() => JournalScreen(controller: controller))),
       _Tool(s.rnTitle, Icons.local_library_rounded, AppTheme.secondary500,

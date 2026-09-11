@@ -52,7 +52,7 @@ import '../../data/report_findings_data.dart';
 import '../belly_skin/bs_article_screen.dart';
 import '../belly_skin/bs_itching_screen.dart';
 import '../belly_skin/ingredient_checker_screen.dart';
-import '../bump_journey_screen.dart';
+import '../belly_skin/bump_ritual_screen.dart';
 import '../conditions/condition_detail_screen.dart';
 import '../nutrition/diet_charts_screen.dart';
 import '../nutrition/can_i_eat_body.dart';
@@ -155,7 +155,7 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
       // ---- Belly & skin ---------------------------------------------------
       kBsSurfaceChecker => const IngredientCheckerScreen(),
       kBsSurfaceItching => BsItchingScreen(pregnancy: c),
-      kBsSurfaceRitual => BumpJourneyScreen(controller: c),
+      kBsSurfaceRitual => BumpRitualScreen(controller: c),
 
       // ---- Nutrition & diet -----------------------------------------------
       // ⚠️ THE SAME BODY THE TAB RENDERS, GIVEN A SCAFFOLD. A door surface has
@@ -201,7 +201,7 @@ void openPvDoorConditionPage(
 /// `Scaffold` nested inside the door's `ListView` would bring a second
 /// background, a second safe area and an unbounded height.
 Widget? pvDoorInlineToolFor(String id, PregnancyController c) => switch (id) {
-      kScansSurfaceTimeline => ScanTimelineBody(pregnancy: c),
+      kScansSurfaceTimeline => ScanTimelineBody(pregnancy: c, showFooter: false),
       kScansSurfaceReports => ScanReportsBody(pregnancy: c),
       // ⚠️ A FLAG RATHER THAN A BODY WIDGET, and the reason is on
       // `ReportScreen.embedded`: the decoder's content is inseparable from its
@@ -220,7 +220,7 @@ Widget? pvDoorInlineToolFor(String id, PregnancyController c) => switch (id) {
       kDietSurfaceExperts => const diet.ExpertOptionsBlock(),
       // ⚠️ THE KEEPSAKE IS THE TAB. `BumpJourneyScreen` is a Scaffold, so the
       // inline form is its body — see `BumpJourneyBody`.
-      kBsSurfaceRitual => BumpJourneyBody(controller: c),
+      kBsSurfaceRitual => BumpRitualBody(controller: c),
       _ => null,
     };
 
