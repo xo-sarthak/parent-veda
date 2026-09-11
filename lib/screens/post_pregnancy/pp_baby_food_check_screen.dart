@@ -44,6 +44,7 @@
 import 'package:flutter/material.dart';
 
 import 'pp_age_bands.dart';
+import 'pp_child_profile.dart';
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
 import 'pp_content.dart';
@@ -261,7 +262,15 @@ class PpBabyFoodCheckScreen extends StatefulWidget {
 
 class _PpBabyFoodCheckScreenState extends State<PpBabyFoodCheckScreen> {
   /// Derived from the profile, and changeable. See the note in the fever check.
-  late int _months = ppMonthsSinceBirth;
+  /// His age, read once on open. Never chosen — see the age rule.
+  final int _months = ppMonthsSinceBirth;
+
+  static String _bandLabel(int months) {
+    for (final b in kPpChildFoodBands) {
+      if (months >= b.$2 && months < b.$3) return b.$1;
+    }
+    return kPpChildFoodBands.last.$1;
+  }
   String _query = '';
 
   List<_Food> get _results {
@@ -295,10 +304,26 @@ class _PpBabyFoodCheckScreenState extends State<PpBabyFoodCheckScreen> {
                       style: pvFraunces(fontSize: 27, fontWeight: FontWeight.w600, height: 1.2, letterSpacing: -0.4, color: p.ink1)),
                   const SizedBox(height: 9),
                   Text(
-                      'The answer depends on his age, so pick that first. Type '
-                      'the food in English or in Hindi.',
+                      'A straight answer for his age. Type the food in '
+                      'English or in Hindi.',
                       style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w500, height: 1.6, color: p.ink2)),
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 12),
+                  // ⚠️ THE AGE RULE. The chips that asked her to "pick that
+                  // first" are gone (kept below for revert); the answer is
+                  // for his age, stated once, not chosen.
+                  Row(children: [
+                    Icon(Icons.child_care_outlined, size: 14, color: p.action),
+                    const SizedBox(width: 6),
+                    Text(
+                        'FOR ${ChildProfileStore.instance.nameMid.toUpperCase()}'
+                        '  ·  ${_bandLabel(_months).toUpperCase()}',
+                        style: pvManrope(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.1,
+                            color: p.action)),
+                  ]),
+                  /* kept for revert: the age chooser
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(children: [
@@ -312,6 +337,7 @@ class _PpBabyFoodCheckScreenState extends State<PpBabyFoodCheckScreen> {
                       ],
                     ]),
                   ),
+                  */
                   const SizedBox(height: 14),
                   TextField(
                     onChanged: (v) => setState(() => _query = v),
@@ -459,6 +485,7 @@ class _FoodCard extends StatelessWidget {
   }
 }
 
+// ignore: unused_element
 class _AgeChip extends StatelessWidget {
   const _AgeChip(
       {required this.label, required this.selected, required this.onTap});

@@ -51,6 +51,30 @@
 //  English only for now, plain `String`, per the standing instruction.
 // =============================================================================
 
+// =============================================================================
+//  ⚠️ REBUILT 2026-09-12 FROM `ParentVeda_Feeding_rebuild.pdf`, THE V3 DOOR
+//  BRIEF. Same treatment as Sleep: the age rule (`autoScope`, `rowMonths`, no
+//  "pick his age" anywhere), the format fixes the map marks, six new pieces,
+//  one merge. The brief's marks are quoted at each page a reviewer would
+//  want to hold against it. The door that shows this is
+//  `lib/data/doors/pp_door_feeding.dart`.
+//
+//  ⚠️ THE "WHAT TO FEED AT THIS AGE" COLLECTION IS MERGED INTO THE TOOL. The
+//  brief: three surfaces answered the same question — a landing tool, this
+//  collection, and the "is he getting enough?" signs. Now one auto-scoped
+//  tool (`pp_food_chart` -> `PpWhatToFeedScreen`) shows his day of food, the
+//  regional swaps and the signs. The collection's pages STAY in this file as
+//  the tool's data source (`ppChartPagesForBand` reads them), they are just
+//  not a rail on the door — `PpDoor.hiddenAreaIds` names it as merged, so a
+//  test can tell "merged" from "forgotten".
+//
+//  ⚠️ CHOKING IS THE SAFETY FIX THE BRIEF CALLS THE MOST IMPORTANT ON THE
+//  PARENTING SIDE. Prevention is a labelled "cut it this way" picture, not an
+//  article; the response ("If he chokes: what to do") is a new video page
+//  pinned as the red flag on the Safe tab; gagging vs choking is a carousel
+//  so the panic is stopped before it starts.
+// =============================================================================
+
 import 'package:flutter/material.dart' show Icons;
 
 import 'pp_age_bands.dart';
@@ -120,6 +144,8 @@ final PpSection kPpFeedingSection = PpSection(
   title: 'Feeding',
   intro: 'Milk, first foods, and the week he decides rice is the enemy.',
   bandSet: kPpFeedingBands,
+  // ⚠️ THE AGE RULE. No chips; every screen opens on his band.
+  autoScope: true,
   areas: [
     _breastfeeding,
     _formula,
@@ -136,8 +162,8 @@ final PpSection kPpFeedingSection = PpSection(
     // reason. Listed in the build report so the router gets an entry.
     PpSectionTool(
       label: 'Can he eat this?',
-      blurb: 'Type a food, get a straight answer for his age. Honey, cow milk, '
-          'nuts, salt, the lot.',
+      blurb: 'Type a food, get a straight answer for his age, no age to pick. '
+          'Honey, cow milk, nuts, salt, the lot.',
       surfaceId: 'pp_baby_food_check',
       icon: Icons.search_outlined,
     ),
@@ -146,8 +172,8 @@ final PpSection kPpFeedingSection = PpSection(
     // to the same question.
     PpSectionTool(
       label: 'What to feed at this age',
-      blurb: 'His age in, a day of food out. Veg and non-veg, with regional '
-          'swaps.',
+      blurb: 'His portions, a day of food, the signs he is getting enough, '
+          'and regional swaps. Shown for his age.',
       surfaceId: 'pp_food_chart',
       icon: Icons.event_note_outlined,
     ),
@@ -199,7 +225,10 @@ final PpArea _breastfeeding = PpArea(
       id: 'bf_latch',
       title: 'Getting the latch right',
       subtitle: 'The one thing that fixes most of the rest',
-      format: 'STEP-LIST',
+      // [reformat: was step-list] -> VIDEO. "The key one. A physical skill,
+      // shown on a real baby from several angles. Step-list stays as
+      // companion." The slot below is hoisted to the top by the renderer.
+      format: 'VIDEO',
       bands: ['milk', 'first_foods'],
       blocks: [
         PpIntro('A good latch is the difference between feeding that hurts and '
@@ -262,9 +291,19 @@ final PpArea _breastfeeding = PpArea(
     PpPage(
       id: 'bf_positions',
       title: 'Positions that actually work',
-      format: 'CARDS',
+      // [reformat: was cards] -> VIDEO. "Cradle, cross-cradle, rugby hold,
+      // lying down: spatial, show them." The cards stay as the companion.
+      format: 'VIDEO',
       bands: ['milk', 'first_foods'],
       blocks: [
+        PpVideoSlot(
+          title: 'Five positions, shown on a real mother',
+          subtitle: 'Cradle, cross cradle, rugby hold, side lying and laid '
+              'back, each set up from scratch, with where the pillows go.',
+          minutes: '8 MIN',
+          slotId: 'feeding/positions_demo',
+          hue: 206,
+        ),
         PpIntro('There is no correct position, only the one that gets a deep '
             'latch without wrecking your shoulders. Most mothers use two or '
             'three depending on the time of day.'),
@@ -308,7 +347,7 @@ final PpArea _breastfeeding = PpArea(
     PpPage(
       id: 'bf_how_often',
       title: 'How often, and how much',
-      format: 'SHORT ARTICLE',
+      format: 'ARTICLE',
       blocks: [
         PpIntro('Almost every worry here comes from not being able to see how '
             'much went in. A bottle has markings. A breast does not, so you '
@@ -376,7 +415,7 @@ final PpArea _breastfeeding = PpArea(
     PpPage(
       id: 'bf_supply',
       title: 'Making enough milk, and keeping it',
-      format: 'SHORT ARTICLE',
+      format: 'ARTICLE',
       blocks: [
         PpIntro('Milk supply runs on one rule: milk removed is milk made. '
             'Almost every real fix comes back to that sentence, and almost '
@@ -564,7 +603,7 @@ final PpArea _breastfeeding = PpArea(
     PpPage(
       id: 'bf_low_supply',
       title: 'It feels like I am not making enough',
-      format: 'ARTICLE',
+      format: 'ARTICLE', // [reuse] "links to the feed tracker"
       blocks: [
         PpIntro('This is the most common reason mothers stop feeding, and most '
             'of the time supply is fine and something else is going on. Both '
@@ -608,6 +647,11 @@ final PpArea _breastfeeding = PpArea(
           'anaemia if supply never established at all.',
           kind: PpCalloutKind.doctor,
           title: 'When low supply needs medical help',
+        ),
+        PpLink(
+          'Log his feeds for three days',
+          surfaceId: 'pp_feeding',
+          blurb: 'Times and sides on paper beat a feeling of empty.',
         ),
         PpConsult(
           title: 'Lactation consultation',
@@ -676,6 +720,9 @@ final PpArea _breastfeeding = PpArea(
       id: 'bf_mastitis',
       title: 'A hot, painful lump in the breast',
       subtitle: 'Blocked ducts and mastitis',
+      // [reuse] "Add a same-day red-flag: mastitis with fever needs a doctor
+      // today." The doctor callout below is that flag, and the door pins
+      // this page as the Milk tab's red flag so it sits above the rails.
       format: 'ARTICLE',
       blocks: [
         PpIntro('A blocked duct is a sore lump. Mastitis is that lump plus '
@@ -915,7 +962,7 @@ final PpArea _formula = PpArea(
     PpPage(
       id: 'formula_fed_is_fine',
       title: 'Fed is fine, and that is not a consolation prize',
-      format: 'SHORT ARTICLE',
+      format: 'ARTICLE',
       blocks: [
         PpIntro('If you are reading this at 2am feeling like you failed, start '
             'here. A fed baby, by whatever route, is the outcome that matters, '
@@ -1020,11 +1067,21 @@ final PpArea _formula = PpArea(
     PpPage(
       id: 'formula_prepare',
       title: 'Making up a bottle safely',
-      format: 'STEP-LIST',
+      // [reformat: was step-list] -> VIDEO. "Safety-critical (water temp,
+      // sterilising, ratio, timing). Demonstrated + a glanceable checklist."
+      // The slot is hoisted; the cards are the glance; the steps stay.
+      format: 'VIDEO',
       blocks: [
         PpIntro('This is the page with real stakes in it. Powdered formula is '
             'not sterile, so how you make the bottle matters as much as which '
             'tin it came from.'),
+        PpCards([
+          PpCard('Water at about 70C', 'Boiled, cooled no more than 30 minutes.'),
+          PpCard('Water first, then powder', 'Never the other way round.'),
+          PpCard('That tin\'s scoop, levelled', 'Never packed, never an extra.'),
+          PpCard('Cool fast, test on your wrist', 'Just warm, not hot.'),
+          PpCard('Two hours, then it goes', 'Never reheated, never saved.'),
+        ], heading: 'The glance, before the steps', hue: 32),
         PpSteps([
           PpStep('Wash your hands and the surface',
               'Soap and water, before you touch anything. This is the step '
@@ -1090,7 +1147,7 @@ final PpArea _formula = PpArea(
       id: 'formula_brands',
       title: 'Indian formula, compared honestly',
       subtitle: 'Review only. Nothing here is sponsored or sold.',
-      format: 'COMPARISON TABLE',
+      format: 'TABLE',
       blocks: [
         PpIntro('This is here because the information is hard to find honestly '
             'and very easy to find in an advertisement. Nothing on this page '
@@ -1176,7 +1233,7 @@ final PpArea _formula = PpArea(
     PpPage(
       id: 'formula_switching',
       title: 'Switching brands',
-      format: 'SHORT ARTICLE',
+      format: 'ARTICLE',
       blocks: [
         PpIntro('People switch formula far more often than they need to, '
             'usually chasing better sleep or less crying. Here is what a '
@@ -1265,7 +1322,7 @@ final PpArea _formula = PpArea(
     PpPage(
       id: 'formula_bottle_refusal',
       title: 'He will not take the bottle',
-      format: 'SHORT ARTICLE',
+      format: 'ARTICLE',
       blocks: [
         PpIntro('This one usually arrives about ten days before you go back to '
             'work, and it is genuinely stressful. Most babies do take a bottle '
@@ -1349,6 +1406,58 @@ final PpArea _formula = PpArea(
           'is something to push through alone.',
           kind: PpCalloutKind.doctor,
           title: 'Two things to watch while weaning',
+        ),
+      ],
+    ),
+    // ⚠️ [new] CHART. "Amounts per feed by age/weight. The breast side has
+    // 'how much'; the bottle side has no numbers." Framed as a guide, not a
+    // quota; her row leads.
+    //
+    // REQUIRED_REVIEW: every figure below. Standard ranges (roughly 150 ml
+    // per kg per day in the early months, falling as solids come in); confirm
+    // against current Indian paediatric guidance and the tin's own table.
+    PpPage(
+      id: 'formula_amounts',
+      title: 'How much formula, by age',
+      subtitle: 'A guide, not a quota',
+      format: 'CHART',
+      bands: ['milk', 'first_foods', 'm8_12'],
+      blocks: [
+        PpIntro('A bottle has markings, which is a blessing and a curse: you '
+            'can see what went in, so you start worrying about the number. '
+            'These are the usual ranges. He sets the amount, the tin sets the '
+            'ratio.'),
+        PpChartCard(
+          title: 'Per feed, and across a day',
+          subtitle: 'Most babies land inside these. Some sit outside and are '
+              'fine.',
+          rows: [
+            ('First week', '30 to 60 ml a feed, 8 to 10 feeds'),
+            ('2 to 4 weeks', '60 to 90 ml a feed, 7 to 9 feeds'),
+            ('1 to 3 months', '90 to 150 ml a feed, 6 to 8 feeds'),
+            ('3 to 6 months', '150 to 210 ml a feed, 5 to 6 feeds'),
+            ('6 to 9 months', '180 to 240 ml a feed, 4 to 5 feeds, solids starting'),
+            ('9 to 12 months', '180 to 240 ml a feed, 3 to 4 feeds, solids growing'),
+          ],
+          rowMonths: [(0, 1), (1, 1), (1, 3), (3, 6), (6, 9), (9, 12)],
+          note: 'The rough rule doctors use is about 150 ml for every kilo he '
+              'weighs, across a whole day, in the early months. A 4 kg baby '
+              'lands near 600 ml a day. It falls as food comes in.',
+          hue: 32,
+        ),
+        PpCallout('Feed to his hunger, not to the number. A baby who turns '
+            'away, slows down and relaxes his hands is done, whatever is '
+            'left in the bottle. A baby who finishes fast and is still '
+            'rooting can have a little more.'),
+        PpWhenLine('From birth to about a year, when cow milk as a drink can '
+            'begin and formula usually ends.'),
+        PpIndiaNote('Grandmothers count bottles the way they once counted '
+            'feeds, and a half-finished bottle reads as a problem. It is not. '
+            'What matters is wet nappies and the weight line.'),
+        PpLink(
+          'Log his feeds',
+          surfaceId: 'pp_feeding',
+          blurb: 'Amounts over a few days tell you more than any one bottle.',
         ),
       ],
     ),
@@ -1495,7 +1604,7 @@ final PpArea _startingSolids = PpArea(
       id: 'solids_spoon_or_blw',
       title: 'Spoon-feeding or letting him feed himself',
       subtitle: 'Both work. Most families do a bit of each.',
-      format: 'COMPARISON TABLE',
+      format: 'TABLE',
       blocks: [
         PpIntro('You will read that one of these is the modern way and the '
             'other is old fashioned. That is a marketing argument, not a '
@@ -1575,11 +1684,81 @@ final PpArea _startingSolids = PpArea(
         ),
       ],
     ),
+    // ⚠️ [reformat: was step-list] -> INTERACTIVE. "An allergen tracker: tick
+    // egg, peanut, etc. with the wait-and-watch guidance, not just a static
+    // list." Each allergen is one check — introduced, or not yet — and the
+    // walk ends on the ones still to do. The how-to lives in each item's
+    // detail so the guidance is read at the moment it is needed, not on a
+    // page before. Nothing is stored (see `pp_interactive_screen.dart`);
+    // a persistent tracker is on the ledger in STILL-OPEN.
+    //
+    // REQUIRED_REVIEW: early allergen introduction from around 6 months, the
+    // "keep it in the diet regularly" instruction, and the high-risk-baby
+    // caveat in the closing. Current international position; confirm Indian
+    // guidance specifically.
     PpPage(
       id: 'solids_allergens',
       title: 'Introducing allergens safely',
-      format: 'STEP-LIST',
+      format: 'INTERACTIVE',
       blocks: [
+        PpInteractive(
+          kind: PpInteractiveKind.checklist,
+          title: 'Introducing allergens safely',
+          blurb: 'The eight that matter, one at a time. Tick what he has had; '
+              'the rest is your list.',
+          hue: 96,
+          items: [
+            PpInteractiveItem(
+                'Cow\'s milk, cooked into food',
+                'A spoon of curd, or milk in a kheer or porridge. Not as a '
+                    'drink until one. Morning, at home, a quarter teaspoon on '
+                    'the lip first, then a small taste, then watch for two '
+                    'hours.',
+                'One at a time, morning, tiny first'),
+            PpInteractiveItem(
+                'Egg, well cooked',
+                'Hard-boiled yolk mashed into dal or khichdi. Never runny.',
+                'One at a time, morning, tiny first'),
+            PpInteractiveItem(
+                'Peanut, as a thin paste',
+                'A little smooth peanut paste stirred into dal or a thin '
+                    'peanut chutney. Never whole, never a spoonful of thick '
+                    'butter: that is a choking risk, separate from allergy.',
+                'One at a time, morning, tiny first'),
+            PpInteractiveItem(
+                'Tree nuts, ground',
+                'Badam or kaju ground to a powder, stirred in. Whole nuts '
+                    'wait until about five.',
+                'One at a time, morning, tiny first'),
+            PpInteractiveItem(
+                'Wheat',
+                'Soaked and squeezed roti, suji, dalia. Probably already in.',
+                'One at a time, morning, tiny first'),
+            PpInteractiveItem(
+                'Sesame, as til',
+                'Ground til in a khichdi or a thin til chutney.',
+                'One at a time, morning, tiny first'),
+            PpInteractiveItem(
+                'Soy',
+                'A little tofu mashed, or a spoon of cooked soya.',
+                'One at a time, morning, tiny first'),
+            PpInteractiveItem(
+                'Fish',
+                'Boneless, cooked soft, mashed into rice. Check twice for '
+                    'bones.',
+                'One at a time, morning, tiny first'),
+          ],
+          closing: 'Once one is in without a reaction, keep it in his diet a '
+              'couple of times a week; regular exposure is what keeps '
+              'tolerance. Ask your paediatrician first if he has severe '
+              'eczema, an existing food allergy or a strong family history. '
+              'And if he ever has swelling of the lips or face, difficulty '
+              'breathing, or goes floppy and pale after a food, call an '
+              'ambulance or get to a hospital immediately.',
+          closingPageId: 'safety_allergy',
+          closingLabel: 'What an allergic reaction looks like',
+        ),
+        /* kept for revert: the step-list page the tracker replaced
         PpIntro('The advice on this reversed in the last decade. Holding '
             'allergens back does not prevent allergy and may make it more '
             'likely, so the current approach is to introduce them early and '
@@ -1637,12 +1816,16 @@ final PpArea _startingSolids = PpArea(
           pageId: 'safety_allergy',
           blurb: 'Mild against serious, and what to do for each.',
         ),
+        */
       ],
     ),
     PpPage(
       id: 'solids_textures',
       title: 'Textures, stage by stage',
-      format: 'CHART-CARD',
+      // [reformat: was chart-card] -> ILLUSTRATION. "Show what each texture
+      // actually looks like (puree -> mash -> soft finger food -> chopped)."
+      // Four katoris, drawn; the chart card is kept below for revert.
+      format: 'ILLUSTRATION',
       blocks: [
         PpIntro('Texture matters more than most parents are told. A baby who '
             'stays on smooth puree too long often refuses lumps at a year, and '
@@ -1650,6 +1833,26 @@ final PpArea _startingSolids = PpArea(
             'months.'),
         // REQUIRED_REVIEW: the texture-by-age progression below, particularly
         // the 8 to 9 month window for introducing lumps and finger foods.
+        PpIllustration(
+          kind: PpIllustrationKind.solidsTextures,
+          title: 'What each stage looks like in the katori',
+          labels: [
+            PpIllustrationLabel('6 to 7 months: smooth and thin',
+                'Purees, dal water, loose ragi. Runs off the spoon.'),
+            PpIllustrationLabel('7 to 8 months: thicker, mashed, soft lumps',
+                'Fork-mashed, not blended. The lumps are the point.'),
+            PpIllustrationLabel('8 to 9 months: minced, and first finger food',
+                'Soft sticks the length of your little finger, squashable '
+                    'between finger and thumb.'),
+            PpIllustrationLabel('9 to 12 months: chopped family food',
+                'Most textures, self feeding. From a year, what the house '
+                    'eats, cut small and less spicy.'),
+          ],
+          caption: 'A guide, not a deadline. Move at his pace, but keep '
+              'moving: gagging while learning a new texture is normal and '
+              'noisy, and he stays pink. Choking is silent.',
+        ),
+        /* kept for revert: the chart card the picture replaced
         PpChartCard(
           title: 'What texture, at what age',
           subtitle: 'A guide, not a deadline. Move at his pace, but keep '
@@ -1667,6 +1870,7 @@ final PpArea _startingSolids = PpArea(
               'body protecting him. It is noisy and he stays pink. Choking is '
               'silent.',
         ),
+        */
         PpCards([
           PpCard('Thin it with what it was made with',
               'Dal water, milk or plain water. Not sugar syrup and not extra '
@@ -1701,7 +1905,7 @@ final PpArea _startingSolids = PpArea(
     PpPage(
       id: 'solids_annaprashan',
       title: 'Annaprashan, the first bite',
-      format: 'SHORT ARTICLE',
+      format: 'ARTICLE',
       blocks: [
         PpIntro('The first grain is a ceremony in most Indian families, and it '
             'is one of the nicer collisions between tradition and paediatrics. '
@@ -1743,6 +1947,113 @@ final PpArea _startingSolids = PpArea(
             'properly rather than as skipping it.'),
       ],
     ),
+    // ⚠️ [new] ARTICLE. "he can sit with support, high-chair basics, one calm
+    // mealtime a day."
+    PpPage(
+      id: 'solids_setup',
+      title: 'Setting up for solids',
+      subtitle: 'Sitting, the chair, and one calm mealtime',
+      format: 'ARTICLE',
+      bands: ['milk', 'first_foods'],
+      blocks: [
+        PpIntro('Before the first spoon, three small things make every meal '
+            'after it easier: he can sit, he has somewhere to sit, and there '
+            'is one mealtime a day nobody is rushing.'),
+        PpArticle([
+          'He is ready to sit for food when he can hold his head steady and '
+              'sit with support, usually around six months. Slumped in a '
+              'bouncer or lying back in your lap is not a safe position to '
+              'swallow in, whatever the age.',
+          'A high chair is useful and not essential. What matters is upright, '
+              'supported and at table height: a high chair with a footrest, '
+              'a booster strapped to a dining chair, or your lap with his '
+              'back against your chest. His feet want something to push '
+              'against; dangling feet make a wriggly eater.',
+          'Pick one meal a day, at a time he is awake, fed on milk an hour '
+              'before, and not tired. Late morning suits most babies. Sit '
+              'with him, put a little on the tray as well as on the spoon, '
+              'and expect most of it on the floor. The floor is where '
+              'learning to eat happens.',
+        ]),
+        PpCards([
+          PpCard('A small spoon, a small katori', 'Silicone or steel, not sharp-edged.'),
+          PpCard('A bib and a mat under the chair', 'Or an old dupatta. The mess is the method.'),
+          PpCard('A cloth, not wet wipes, for his face', 'Wipe at the end, not after every mouthful.'),
+          PpCard('Nothing on a screen', 'He needs to see the spoon and your face.'),
+        ], heading: 'What you actually need', hue: 96),
+        PpCallout('One calm mealtime a day beats three rushed ones. Milk is '
+            'still most of his food; this is practice.'),
+        PpWhenLine('From about 5 months, so the chair and the habit are ready '
+            'when he is. Solids themselves start at 6 months.'),
+        PpIndiaNote('A dadi or nani who feeds him on her lap, facing outwards '
+            'with his back against her, is doing it right. It is the lying '
+            'back and the walking about with a spoon that are worth changing.'),
+        PpLink(
+          'When to start, and how to begin',
+          pageId: 'solids_when',
+          blurb: 'The signs he is ready, and the first week.',
+        ),
+      ],
+    ),
+    // ⚠️ [new] ARTICLE. "why it happens, water/fibre, when to see the
+    // doctor." Links to Health.
+    PpPage(
+      id: 'solids_constipation',
+      title: 'Constipation when solids start',
+      format: 'ARTICLE',
+      bands: ['first_foods', 'm8_12'],
+      blocks: [
+        PpIntro('A baby who pooed after every feed now goes once in two days '
+            'and strains to do it. This is one of the commonest things '
+            'that happens in the first month of solids, and it is mostly '
+            'about the gut learning a new job.'),
+        PpArticle([
+          'Milk is almost entirely absorbed. Food is not, so for the first '
+              'time his gut has real work to do and real waste to move. '
+              'Firmer, less frequent stools are the normal result. It is '
+              'constipation only if the stools are hard pellets, he is in '
+              'pain passing them, or there is blood.',
+          'The usual causes are simple: not enough fluid now that food is '
+              'displacing milk, a lot of rice, banana, suji or refined '
+              'cereal, and very little fruit and vegetable. Iron-fortified '
+              'cereals and, later, cow milk in large amounts can add to it.',
+          'The fixes are simple too. Sips of water with meals from six '
+              'months. Fruit and vegetable purees every day: papaya, pear, '
+              'prune, peas, spinach in the dal. Swap some of the rice or '
+              'suji for ragi, oats or dalia. Keep the milk feeds going. '
+              'Bicycle his legs and a warm bath help a straining baby.',
+        ]),
+        PpCards([
+          PpCard('Papaya, pear, prune', 'The three that work most reliably. Stewed and mashed.'),
+          PpCard('Water with meals, from 6 months', 'Sips from a cup, not a bottle of it.'),
+          PpCard('Less rice and suji, more ragi and oats', 'Whole grain moves; refined grain sits.'),
+          PpCard('No honey, no castor oil, no home remedies', 'Honey is unsafe under one and the rest are not for babies.'),
+        ], heading: 'What helps', hue: 96),
+        PpCallout('Straining, going red and grunting with a soft stool at the '
+            'end of it is not constipation. It is a baby who has not yet '
+            'worked out how to relax the right muscles while pushing. It '
+            'passes.'),
+        PpCallout(
+          'See your paediatrician if there is blood in the stool, if he has '
+          'not passed stool for more than four days and is uncomfortable, if '
+          'he is vomiting or his tummy is swollen and hard, or if he was '
+          'constipated from birth rather than from solids. Do not give any '
+          'laxative or suppository without asking.',
+          kind: PpCalloutKind.doctor,
+          title: 'When it needs a doctor',
+        ),
+        PpWhenLine('Most common in the first 4 to 6 weeks of solids. Usually '
+            'settles within a fortnight of changing the food.'),
+        PpIndiaNote('Ghee in the dal genuinely helps, and it is one of the '
+            'traditional answers that stands up. Honey, jaggery water and a '
+            'drop of oil in the bottom are the ones that do not.'),
+        PpLink(
+          'Health, the whole section',
+          surfaceId: 'pp_section/parenting_health',
+          blurb: 'Tummy trouble, reflux, and when a stool needs looking at.',
+        ),
+      ],
+    ),
   ],
 );
 
@@ -1770,7 +2081,7 @@ final PpArea _ageCharts = PpArea(
     PpPage(
       id: 'chart_milk_only',
       title: 'Before 6 months, milk is the whole chart',
-      format: 'CHART-CARD',
+      format: 'CHART',
       bands: ['milk'],
       blocks: [
         PpIntro('There is no chart for this age because there is nothing to '
@@ -1811,7 +2122,7 @@ final PpArea _ageCharts = PpArea(
     PpPage(
       id: 'chart_6m',
       title: 'A day at 6 months',
-      format: 'CHART-CARD',
+      format: 'CHART',
       bands: ['first_foods'],
       blocks: [
         PpIntro('The first month of solids is about practice, not calories. '
@@ -1864,7 +2175,7 @@ final PpArea _ageCharts = PpArea(
     PpPage(
       id: 'chart_7m',
       title: 'A day at 7 months',
-      format: 'CHART-CARD',
+      format: 'CHART',
       bands: ['first_foods'],
       blocks: [
         PpIntro('Two meals now, and the texture gets thicker. This is the '
@@ -1916,7 +2227,7 @@ final PpArea _ageCharts = PpArea(
     PpPage(
       id: 'chart_8m',
       title: 'A day at 8 months',
-      format: 'CHART-CARD',
+      format: 'CHART',
       bands: ['m8_12'],
       blocks: [
         PpIntro('Finger food starts here. Expect most of it on the floor for a '
@@ -1968,7 +2279,7 @@ final PpArea _ageCharts = PpArea(
     PpPage(
       id: 'chart_9m',
       title: 'A day at 9 months',
-      format: 'CHART-CARD',
+      format: 'CHART',
       bands: ['m8_12'],
       blocks: [
         PpIntro('Three real meals now, and he eats more or less what the '
@@ -2019,7 +2330,7 @@ final PpArea _ageCharts = PpArea(
     PpPage(
       id: 'chart_10_12m',
       title: 'A day at 10 to 12 months',
-      format: 'CHART-CARD',
+      format: 'CHART',
       bands: ['m8_12'],
       blocks: [
         PpIntro('By his first birthday he should be eating family food, cut '
@@ -2070,7 +2381,7 @@ final PpArea _ageCharts = PpArea(
     PpPage(
       id: 'chart_toddler',
       title: 'A day for a toddler',
-      format: 'CHART-CARD',
+      format: 'CHART',
       bands: ['tod', 'big'],
       blocks: [
         PpIntro('From one year he eats what the house eats. The chart matters '
@@ -2127,7 +2438,7 @@ final PpArea _ageCharts = PpArea(
     PpPage(
       id: 'chart_nonveg_regional',
       title: 'Non-vegetarian and regional swaps',
-      format: 'CHART-CARD',
+      format: 'CHART',
       blocks: [
         PpIntro('Every chart in this area is written vegetarian by default '
             'because that is the most common Indian kitchen. Here is how to '
@@ -2351,7 +2662,7 @@ final PpArea _cooking = PpArea(
     PpPage(
       id: 'recipes_sick_days',
       title: 'What to feed when he is unwell',
-      format: 'SHORT ARTICLE',
+      format: 'ARTICLE',
       blocks: [
         PpIntro('Appetite disappears when a child is ill and that is normal. '
             'Fluids matter far more than food for a few days, and there is a '
@@ -2403,12 +2714,20 @@ final PpArea _cooking = PpArea(
           surfaceId: 'pp_what_changed',
           blurb: 'If the change was sudden, start here instead.',
         ),
+        // Link out, do not own: "when he is unwell" depth and Sick mode are
+        // Health's.
+        PpLink(
+          'Health, the whole section',
+          surfaceId: 'pp_section/parenting_health',
+          blurb: 'Fever, vomiting, dehydration, and when a sick day needs a '
+              'doctor.',
+        ),
       ],
     ),
     PpPage(
       id: 'recipes_batch',
       title: 'Cooking once, feeding all week',
-      format: 'STEP-LIST',
+      format: 'STEPS',
       blocks: [
         PpIntro('Nobody cooks a fresh baby meal five times a day for a year. '
             'A couple of hours on a Sunday covers most of the week, safely.'),
@@ -2672,10 +2991,23 @@ final PpArea _weightGain = PpArea(
         ),
       ],
     ),
+    // ⚠️ [reference] -> the Growth journey. "Lives with the Growth tracker's
+    // percentile reads; link, do not duplicate." The card opens the tracker,
+    // where the percentile read already is. The article this page carried
+    // is kept below for revert; it duplicated that read.
     PpPage(
       id: 'weight_chart_reading',
       title: 'Reading the growth chart without panic',
-      format: 'SHORT ARTICLE',
+      subtitle: 'In the Growth journey, beside his own curve',
+      format: 'ARTICLE',
+      toolSurfaceId: 'pp_growth',
+      blocks: [],
+    ),
+    /* kept for revert: the article the reference replaced
+    PpPage(
+      id: 'weight_chart_reading',
+      title: 'Reading the growth chart without panic',
+      format: 'ARTICLE',
       blocks: [
         PpIntro('A growth chart is the most useful and most misread piece of '
             'paper in your file. Ten minutes here saves a lot of unnecessary '
@@ -2714,6 +3046,7 @@ final PpArea _weightGain = PpArea(
         ),
       ],
     ),
+    */
   ],
 );
 
@@ -2808,7 +3141,7 @@ final PpArea _notEating = PpArea(
     PpPage(
       id: 'picky_who_decides',
       title: 'Who decides what, and who decides how much',
-      format: 'SHORT ARTICLE',
+      format: 'ARTICLE',
       blocks: [
         PpIntro('One idea sorts out more mealtimes than any recipe. You decide '
             'what is served, where and when. He decides whether he eats it and '
@@ -2983,7 +3316,7 @@ final PpArea _notEating = PpArea(
     PpPage(
       id: 'picky_sweet_packet',
       title: 'He only wants biscuits and chips',
-      format: 'SHORT ARTICLE',
+      format: 'ARTICLE',
       bands: ['tod', 'big'],
       blocks: [
         PpIntro('Packaged snacks are engineered to be more appealing than dal '
@@ -3047,11 +3380,40 @@ final PpArea _safety = PpArea(
     PpPage(
       id: 'safety_choking',
       title: 'Choking, and how to cut food so it does not happen',
-      format: 'ARTICLE',
+      // [reformat: was article] -> ILLUSTRATION. "A labelled 'cut it this
+      // way' visual (grapes, round foods). Text is the wrong medium for a
+      // choking-prevention page." The picture carries the cutting; the two
+      // safety callouts, the doctor callout and the film stay. Gagging vs
+      // choking moved to its own carousel. Prose kept below for revert.
+      format: 'ILLUSTRATION',
       blocks: [
         PpIntro('Read this page before he starts finger foods, not after. Most '
             'choking in small children happens with a short list of foods and '
             'a short list of situations, and both are avoidable.'),
+        PpIllustration(
+          kind: PpIllustrationKind.cutItThisWay,
+          title: 'Cut it this way',
+          labels: [
+            PpIllustrationLabel('Grapes and cherry tomatoes: quartered lengthways',
+                'Never whole, never halved into coins. A coin is exactly the '
+                    'shape of a small airway.'),
+            PpIllustrationLabel('Sausage, paneer, cheese: sticks, not coins',
+                'Slice lengthways, then chop. Finger-length sticks he can '
+                    'hold.'),
+            PpIllustrationLabel('Nuts: ground to powder',
+                'Never whole and never halved until about five. Nut butter '
+                    'spread thin, never by the spoon.'),
+            PpIllustrationLabel('Carrot, apple, hard fruit and veg: grated or cooked soft',
+                'Raw chunks wait. Steamed until it squashes between finger '
+                    'and thumb.'),
+            PpIllustrationLabel('Popcorn, boiled sweets, chikki, whole channa: not yet',
+                'The Indian snack list. These wait until about five.'),
+          ],
+          caption: 'The shapes that block an airway are round, firm and about '
+              'the size of a small child\'s throat. Change the shape and most '
+              'of the risk goes.',
+        ),
+        /* kept for revert: the article the picture replaced
         PpArticle([
           'Gagging and choking are different and confusing them causes a lot '
               'of unnecessary panic. Gagging is loud. He retches, his eyes '
@@ -3077,6 +3439,7 @@ final PpArea _safety = PpArea(
               'baby. A first-aid class run by a hospital takes one afternoon '
               'and is the best afternoon you will spend this year.',
         ]),
+        */
         PpCallout(
           'Cut round food lengthways, never into coins. Grapes and cherry '
           'tomatoes quartered lengthways. Sausage sliced lengthways then '
@@ -3110,6 +3473,11 @@ final PpArea _safety = PpArea(
           kind: PpCalloutKind.doctor,
           title: 'If he is actually choking',
         ),
+        PpLink(
+          'If he chokes: what to do',
+          pageId: 'safety_choking_response',
+          blurb: 'Back blows and chest thrusts, infant and older, on film.',
+        ),
         PpVideoSlot(
           title: 'Choking and safe textures, shown properly',
           subtitle: 'What gagging looks like against choking, how to cut every '
@@ -3123,7 +3491,7 @@ final PpArea _safety = PpArea(
     PpPage(
       id: 'safety_avoid_under_one',
       title: 'Foods to avoid before his first birthday',
-      format: 'FLAGGED CARDS',
+      format: 'CARDS',
       blocks: [
         PpIntro('Short list, and every item on it has a real reason. Once he '
             'turns one, most of these open up.'),
@@ -3179,11 +3547,49 @@ final PpArea _safety = PpArea(
     PpPage(
       id: 'safety_allergy',
       title: 'What an allergic reaction looks like',
-      format: 'ARTICLE',
+      // [reformat: was article] -> ILLUSTRATION. "Show it (hives, swelling)
+      // + a clear call-now block for breathing/face. Red-flag." The picture
+      // splits mild from call-now; the doctor callout is the block; three
+      // cards keep what the picture cannot show. Prose kept for revert.
+      format: 'ILLUSTRATION',
       blocks: [
         PpIntro('Most reactions to food are mild and settle. A small number '
             'are emergencies. Knowing which is which, before it happens, is '
             'the whole of this page.'),
+        PpIllustration(
+          kind: PpIllustrationKind.allergicReaction,
+          title: 'Mild, and call now',
+          labels: [
+            PpIllustrationLabel('Hives or red blotches, mostly round the mouth',
+                'Mild. Stop the food, watch him, call your doctor for advice.'),
+            PpIllustrationLabel('Some swelling of the lips, an itchy rash',
+                'Mild. Same: stop, watch, call for advice.'),
+            PpIllustrationLabel('A bit of vomiting or loose stools',
+                'Mild. Usually settles; note the food and the time.'),
+            PpIllustrationLabel('Swollen tongue or throat, noisy or hard breathing',
+                'CALL NOW. Ambulance, not the car, not wait-and-see.'),
+            PpIllustrationLabel('Hoarse cry, barking cough, wheeze',
+                'CALL NOW.'),
+            PpIllustrationLabel('Sudden pallor, floppy, collapse',
+                'CALL NOW.'),
+          ],
+          caption: 'Reactions show within minutes to two hours. Anything on '
+              'the face, the breathing or the colour is the emergency kind.',
+        ),
+        PpCards([
+          PpCard('Looks like allergy, is not',
+              'A red ring round the mouth after tomato, orange or strawberry '
+                  'is contact irritation. Loose stools after a new food are '
+                  'usually just a new food.'),
+          PpCard('Cow\'s milk protein allergy looks slower',
+              'Reflux that will not settle, blood or mucus in the stool, '
+                  'eczema that keeps flaring, poor weight gain. Diagnosed by '
+                  'a paediatrician, not by cutting dairy on a guess.'),
+          PpCard('After a real reaction',
+              'Do not test it again at home. Get it confirmed, ask what to '
+                  'keep in the house, and tell everybody who feeds him.'),
+        ], heading: 'Three things the picture cannot show', hue: 8),
+        /* kept for revert: the article the picture replaced
         PpArticle([
           'A mild reaction usually shows within minutes to two hours: hives or '
               'red blotches, especially around the mouth, an itchy rash, some '
@@ -3209,6 +3615,7 @@ final PpArea _safety = PpArea(
               'house, and tell everybody who feeds him, including the creche '
               'and the grandparents.',
         ]),
+        */
         PpCallout(
           'Call an ambulance immediately for swelling of the tongue or throat, '
           'noisy or difficult breathing, a hoarse cry, sudden pallor, '
@@ -3306,7 +3713,7 @@ final PpArea _safety = PpArea(
     PpPage(
       id: 'safety_water',
       title: 'When to start water',
-      format: 'SHORT ARTICLE',
+      format: 'ARTICLE',
       blocks: [
         PpIntro('Not before six months, whatever the weather. After that, '
             'freely and in an open cup. That is nearly the whole page, and the '
@@ -3357,6 +3764,188 @@ final PpArea _safety = PpArea(
           'at home with water alone.',
           kind: PpCalloutKind.doctor,
           title: 'Signs he is short of fluid',
+        ),
+      ],
+    ),
+    // ⚠️ [new] VIDEO, and the Safe tab's red flag. "The missing response:
+    // back blows, infant vs older, when to call. Prevention alone is not
+    // enough." The most important safety fix on the parenting side.
+    //
+    // REQUIRED_REVIEW: the whole sequence below against current paediatric
+    // first-aid guidance (Indian Academy of Pediatrics / resuscitation
+    // council wording), before this ships. It must be signed off by a
+    // clinician, not a reviewer.
+    PpPage(
+      id: 'safety_choking_response',
+      title: 'If he chokes: what to do',
+      subtitle: 'Back blows and chest thrusts, before you need them',
+      format: 'VIDEO',
+      blocks: [
+        PpVideoSlot(
+          title: 'If he chokes: back blows and chest thrusts',
+          subtitle: 'On a training doll, at real speed and then slowly: the '
+              'infant hold, the older child, and the moment to call.',
+          minutes: '5 MIN',
+          slotId: 'feeding/back_blows_demo',
+          hue: 8,
+        ),
+        PpIntro('Read this once now, calmly, and watch the film. Then make '
+            'everyone who feeds him watch it too. In a real choking you will '
+            'not be reading anything.'),
+        PpCallout(
+          'He is choking, not gagging, if he is SILENT: cannot cry, cannot '
+          'cough properly, may be going blue round the lips, face frightened '
+          'and no sound. If he is coughing loudly or crying, he has an airway: '
+          'do not slap his back, let him cough, stay with him.',
+          kind: PpCalloutKind.safety,
+          title: 'First: is it choking?',
+        ),
+        PpSteps([
+          PpStep('Shout for help and have someone call an ambulance',
+              'You start at the same time. Do not go looking for a phone '
+                  'first.'),
+          PpStep('Under one: lay him face down along your forearm',
+              'Head lower than his bottom, your hand supporting his jaw, not '
+                  'his throat. Rest your arm on your thigh.'),
+          PpStep('Five firm back blows',
+              'Heel of your hand between the shoulder blades. Firm, and '
+                  'check after each one whether it has come out.'),
+          PpStep('If not: turn him face up, five chest thrusts',
+              'Two fingers on the breastbone just below the nipple line, '
+                  'pushing down sharply. Not the tummy in a baby.'),
+          PpStep('Repeat: five back blows, five chest thrusts',
+              'Until it comes out, or he goes limp.'),
+          PpStep('Over one: back blows, then abdominal thrusts',
+              'Lean him forward, five back blows. If not, stand behind him, '
+                  'fist above the navel, pull sharply in and up, five times. '
+                  'Repeat.'),
+          PpStep('If he goes limp: start CPR and keep the phone on speaker',
+              'The ambulance call handler will talk you through it.'),
+        ], heading: 'The sequence'),
+        PpCallout(
+          'After any choking where you had to act, take him to a hospital '
+          'to be checked even if he seems completely fine. Abdominal thrusts '
+          'can injure; anything that went down the wrong way can too.',
+          kind: PpCalloutKind.doctor,
+          title: 'Afterwards, always',
+        ),
+        PpWhenLine('Learn it before the first finger food, around 8 months. A '
+            'hospital first-aid class takes one afternoon. Do it.'),
+        PpIndiaNote('Whoever is most often alone with him at mealtimes, the '
+            'maid, the grandmother, the older cousin, is the person who most '
+            'needs to have watched this. Show them, do not tell them.'),
+        PpLink(
+          'Gagging vs choking',
+          pageId: 'safety_gagging',
+          blurb: 'Six slides so you know the difference before it matters.',
+        ),
+        PpLink(
+          'Health, the whole section',
+          surfaceId: 'pp_section/parenting_health',
+          blurb: 'First-aid depth, and everything after an emergency.',
+        ),
+      ],
+    ),
+    // ⚠️ [new] CAROUSEL. "Gagging is normal and noisy; choking is silent.
+    // Stops the panic and teaches the real emergency."
+    PpPage(
+      id: 'safety_gagging',
+      title: 'Gagging vs choking',
+      format: 'CAROUSEL',
+      blocks: [
+        PpCarousel(
+          eyebrow: 'Gagging vs choking',
+          hue: 8,
+          coverTitle: 'Noisy is fine. Silent is the emergency.',
+          coverBlurb: 'The one distinction that stops the panic at the table.',
+          cards: [
+            PpCarouselCard(
+                'Gagging is loud. He retches, his eyes water, he goes red, '
+                    'and he sorts it out himself.',
+                'It is a reflex that protects him, and it is very common '
+                    'while he learns to eat.'),
+            PpCarouselCard(
+                'A gag reflex sits far forward in a baby\'s mouth. It fires '
+                    'early on purpose.',
+                'It moves back as he grows. Gagging at eight months is his '
+                    'body doing its job, not a sign the food was wrong.'),
+            PpCarouselCard(
+                'When he gags: do nothing. Do not pull the food out. Do not '
+                    'slap his back.',
+                'Stay calm and let him work it forward. A finger in his '
+                    'mouth can push it deeper.'),
+            PpCarouselCard(
+                'Choking is silent. No cry, no proper cough, a frightened '
+                    'face, and maybe blue round the lips.',
+                'Silence is the signal. This is the one you act on, now.'),
+            PpCarouselCard.linked(
+                'If he is silent: back blows, chest thrusts, and someone '
+                    'calling an ambulance at the same time.',
+                'Swipe up for the sequence and the film. Learn it before '
+                    'the first finger food.',
+                pageId: 'safety_choking_response'),
+            PpCarouselCard.linked(
+                'Most choking is avoidable: it is a short list of shapes and '
+                    'a short list of situations.',
+                'Round, firm and coin-shaped is the danger. Swipe up for how '
+                    'to cut it.',
+                pageId: 'safety_choking'),
+          ],
+        ),
+      ],
+    ),
+    // ⚠️ [new] ARTICLE. "India-relevant (indoor babies, exclusive
+    // breastfeeding). Iron is covered; Vitamin D is not."
+    //
+    // REQUIRED_REVIEW: the 400 IU figure and the "most exclusively breastfed
+    // babies" statement, against current IAP guidance.
+    PpPage(
+      id: 'safety_vitamin_d',
+      title: 'Vitamin D and supplements',
+      format: 'ARTICLE',
+      blocks: [
+        PpIntro('India has plenty of sun and a surprising amount of vitamin D '
+            'deficiency, in babies especially. It is the one supplement most '
+            'babies here are actually advised to take, and the one most '
+            'often forgotten.'),
+        PpArticle([
+          'Vitamin D is made in the skin from sunlight and it is what lets '
+              'the body use calcium for bones. Breast milk carries very '
+              'little of it. So an exclusively breastfed baby who spends his '
+              'days indoors, as most Indian babies do in the heat and the '
+              'first months, can run short without anyone doing anything '
+              'wrong.',
+          'That is why most paediatricians in India put breastfed babies on '
+              'vitamin D drops from the first weeks, usually about 400 IU a '
+              'day, and often continue through the first year. Formula is '
+              'fortified, so a fully formula-fed baby taking enough usually '
+              'does not need extra. Ask; do not guess.',
+          'Sun helps, but not the way it is usually done. Ten to fifteen '
+              'minutes of gentle morning sun on his arms and legs a few times '
+              'a week is useful. Midday sun on a baby is not: it burns him '
+              'long before it does anything for his bones.',
+          'Iron is the other one worth knowing about and it is covered on '
+              'its own page. Beyond vitamin D and iron, a healthy baby on '
+              'milk and then a varied diet does not need multivitamins, '
+              'tonics or growth powders, whatever the pharmacy shelf says.',
+        ]),
+        PpCards([
+          PpCard('Vitamin D drops', 'From the first weeks, if breastfed. Dose from the doctor.'),
+          PpCard('Iron', 'From about 6 months through food, sometimes drops. Doctor decides.'),
+          PpCard('Multivitamin tonics and growth powders', 'Not needed for a healthy baby. Marketing, mostly.'),
+          PpCard('Calcium', 'Comes from milk and, later, curd and dal. Rarely needed extra.'),
+        ], heading: 'What is worth giving, and what is not', hue: 8),
+        PpCallout('A supplement is a doctor decision, including the dose and '
+            'how long. The bottle from the chemist is not the prescription.'),
+        PpWhenLine('Vitamin D from the first weeks through the first year for '
+            'most breastfed babies. Review at each vaccination visit.'),
+        PpIndiaNote('Massage in the morning sun on the balcony is a '
+            'tradition that turns out to be doing exactly the right thing, '
+            'as long as it is early sun and not the noon glare.'),
+        PpLink(
+          'Iron and the nutrients that matter',
+          pageId: 'safety_iron',
+          blurb: 'The other supplement question, answered.',
         ),
       ],
     ),

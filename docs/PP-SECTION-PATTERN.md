@@ -275,7 +275,8 @@ TTC and pregnancy doors wear — by adding a `PpDoor` in
 `lib/data/doors/pp_door_<section>.dart` and one line in `kPpDoors`. The door
 holds NO content: five `PpDoorTab`s each name the section's `areaIds` they
 show (a rail per area, pages for her band), optional `tools` rows above the
-rails, an optional `redFlagPageId` pinned above everything, and the door's
+rails, an optional `redFlagPageId` pinned above everything, `hiddenAreaIds`
+for an area a brief merged into a tool (its pages stay as data), and the door's
 `closing` row. The home tile and every `pp_section/<id>` link then open the
 door; the library screen stays the engine for sections without one.
 

@@ -34,8 +34,10 @@
 
 import 'package:flutter/material.dart' show IconData;
 
+import 'pp_door_feeding.dart';
 import 'pp_door_sleep.dart';
 
+export 'pp_door_feeding.dart';
 export 'pp_door_sleep.dart';
 
 /// One parenting door: a shell over one section.
@@ -44,9 +46,16 @@ class PpDoor {
     required this.sectionId,
     required this.tabs,
     this.heroImageUrl,
+    this.hiddenAreaIds = const [],
     this.closing,
     this.disclaimer,
   });
+
+  /// Areas of the section this door deliberately does not show — because a
+  /// brief merged them into a tool and their pages are now that tool's data.
+  /// Named, so `test/pp_<door>_door_test.dart` can require every area to be
+  /// either on a tab or here, and a forgotten area still fails.
+  final List<String> hiddenAreaIds;
 
   /// A photograph behind the hero, as every pregnancy door has. Null keeps the
   /// V3 field and the bracket's mark, which is a finished hero and not a
@@ -154,6 +163,7 @@ class PpDoorClosing {
 /// screens exactly as before; adding a door is a data file and a line here.
 final List<PpDoor> kPpDoors = [
   kPpSleepDoor,
+  kPpFeedingDoor,
 ];
 
 PpDoor? ppDoorFor(String sectionId) {

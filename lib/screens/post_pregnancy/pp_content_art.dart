@@ -232,7 +232,9 @@ class _SleepCyclesPainter extends CustomPainter {
               color: p.ink1.withValues(alpha: 0.75))),
       textDirection: TextDirection.ltr,
     )..layout();
-    count.paint(canvas, Offset(right - count.width, top + rowH - count.height - 2));
+    // Top right, beside the row label: at the foot it sat over the last
+    // crests. Seen on a phone, 2026-09-11.
+    count.paint(canvas, Offset(right - count.width, top + 4));
   }
 
   @override
@@ -334,6 +336,12 @@ class PpIllustrationView extends StatelessWidget {
               _SafeBedPainter(p: p, badges: block.labels.length),
             PpIllustrationKind.backToSleep =>
               _BackToSleepPainter(p: p, badges: block.labels.length),
+            PpIllustrationKind.solidsTextures =>
+              _TexturesPainter(p: p, badges: block.labels.length),
+            PpIllustrationKind.cutItThisWay =>
+              _CutItPainter(p: p, badges: block.labels.length),
+            PpIllustrationKind.allergicReaction =>
+              _AllergyPainter(p: p, badges: block.labels.length),
           },
         ),
       );
@@ -416,9 +424,263 @@ abstract class _ScenePainter extends CustomPainter {
     }
   }
 
+  /// A green tick in a filled circle.
+  void tickAt(Canvas canvas, Offset at, double r) {
+    canvas.drawCircle(at, r * 1.4, Paint()..color = p.action);
+    final path = Path()
+      ..moveTo(at.dx - r * 0.6, at.dy)
+      ..lineTo(at.dx - r * 0.15, at.dy + r * 0.45)
+      ..lineTo(at.dx + r * 0.65, at.dy - r * 0.45);
+    canvas.drawPath(
+        path,
+        Paint()
+          ..color = Colors.white
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2.6
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round);
+  }
+
+  /// A quiet cross in a faint circle.
+  void crossAt(Canvas canvas, Offset at, double r) {
+    final paint = Paint()
+      ..color = p.ink1.withValues(alpha: 0.55)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.2
+      ..strokeCap = StrokeCap.round;
+    canvas.drawCircle(
+        at, r * 1.4, Paint()..color = p.ink1.withValues(alpha: 0.10));
+    canvas.drawLine(
+        at - Offset(r * 0.5, r * 0.5), at + Offset(r * 0.5, r * 0.5), paint);
+    canvas.drawLine(
+        at - Offset(r * 0.5, -r * 0.5), at + Offset(r * 0.5, -r * 0.5), paint);
+  }
+
+  /// A katori: a shallow bowl seen from slightly above.
+  void katori(Canvas canvas, Offset centre, double w) {
+    final rim = Rect.fromCenter(center: centre, width: w, height: w * 0.36);
+    final body = Path()
+      ..moveTo(rim.left, rim.center.dy)
+      ..quadraticBezierTo(rim.left + w * 0.1, rim.bottom + w * 0.32,
+          rim.center.dx, rim.bottom + w * 0.34)
+      ..quadraticBezierTo(rim.right - w * 0.1, rim.bottom + w * 0.32,
+          rim.right, rim.center.dy);
+    canvas.drawPath(body, Paint()..color = Colors.white);
+    canvas.drawPath(body, ink);
+    canvas.drawOval(rim, Paint()..color = Colors.white);
+    canvas.drawOval(rim, ink);
+  }
+
   @override
   bool shouldRepaint(covariant _ScenePainter old) =>
       old.p != p || old.badges != badges;
+}
+
+/// Four katoris left to right: smooth, mashed with lumps, soft sticks,
+/// chopped pieces. Four numbered points.
+class _TexturesPainter extends _ScenePainter {
+  _TexturesPainter({required super.p, required super.badges});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final bowl = w * 0.19;
+    final xs = [w * 0.15, w * 0.385, w * 0.615, w * 0.85];
+    final y = h * 0.48;
+    final fill = Paint()..color = p.ink1.withValues(alpha: 0.22);
+
+    for (final (i, x) in xs.indexed) {
+      katori(canvas, Offset(x, y), bowl);
+      final inner = Rect.fromCenter(
+          center: Offset(x, y), width: bowl * 0.78, height: bowl * 0.26);
+      switch (i) {
+        case 0:
+          canvas.drawOval(inner, fill);
+        case 1:
+          canvas.drawOval(inner, fill);
+          for (final d in [-0.22, 0.05, 0.25]) {
+            canvas.drawCircle(
+                Offset(x + bowl * d, y - bowl * 0.03), bowl * 0.05, ink);
+          }
+        case 2:
+          for (final d in [-0.2, 0.0, 0.2]) {
+            canvas.drawRRect(
+                RRect.fromRectAndRadius(
+                    Rect.fromCenter(
+                        center: Offset(x + bowl * d, y - bowl * 0.02),
+                        width: bowl * 0.13,
+                        height: bowl * 0.4),
+                    Radius.circular(bowl * 0.06)),
+                ink);
+          }
+        default:
+          for (final (dx, dy) in [
+            (-0.2, -0.06),
+            (0.0, 0.02),
+            (0.2, -0.05),
+            (-0.08, 0.1),
+            (0.12, 0.1)
+          ]) {
+            canvas.drawRRect(
+                RRect.fromRectAndRadius(
+                    Rect.fromCenter(
+                        center: Offset(x + bowl * dx, y + bowl * dy),
+                        width: bowl * 0.13,
+                        height: bowl * 0.13),
+                    Radius.circular(bowl * 0.03)),
+                ink);
+          }
+      }
+      badge(canvas, i + 1, Offset(x, y + bowl * 0.62));
+    }
+    canvas.drawLine(Offset(w * 0.1, h * 0.9), Offset(w * 0.9, h * 0.9), ink);
+    canvas.drawLine(Offset(w * 0.86, h * 0.86), Offset(w * 0.9, h * 0.9), ink);
+    canvas.drawLine(Offset(w * 0.86, h * 0.94), Offset(w * 0.9, h * 0.9), ink);
+  }
+}
+
+/// Left of each pair: the cut that is safe, ticked. Right: the shape that is
+/// not, crossed. Grape, stick, nut; 4 and 5 are legend-only points.
+class _CutItPainter extends _ScenePainter {
+  _CutItPainter({required super.p, required super.badges});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final r = h * 0.075;
+    final rows = [h * 0.2, h * 0.5, h * 0.8];
+
+    final y1 = rows[0];
+    for (final d in [-1.6, -0.55, 0.55, 1.6]) {
+      canvas.drawOval(
+          Rect.fromCenter(
+              center: Offset(w * 0.24 + r * d * 0.5, y1),
+              width: r * 0.45,
+              height: r * 1.8),
+          ink);
+    }
+    tickAt(canvas, Offset(w * 0.42, y1), r * 0.45);
+    for (final d in [-1.2, 0.0, 1.2]) {
+      canvas.drawCircle(Offset(w * 0.72 + r * d, y1), r * 0.5, ink);
+    }
+    crossAt(canvas, Offset(w * 0.9, y1), r * 0.45);
+    badge(canvas, 1, Offset(w * 0.06, y1));
+
+    final y2 = rows[1];
+    for (final d in [-0.5, 0.5]) {
+      canvas.drawRRect(
+          RRect.fromRectAndRadius(
+              Rect.fromCenter(
+                  center: Offset(w * 0.24 + r * d * 1.2, y2),
+                  width: r * 0.5,
+                  height: r * 2.2),
+              Radius.circular(r * 0.2)),
+          ink);
+    }
+    tickAt(canvas, Offset(w * 0.42, y2), r * 0.45);
+    for (final d in [-1.2, 0.0, 1.2]) {
+      canvas.drawOval(
+          Rect.fromCenter(
+              center: Offset(w * 0.72 + r * d, y2),
+              width: r * 1.1,
+              height: r * 0.5),
+          ink);
+    }
+    crossAt(canvas, Offset(w * 0.9, y2), r * 0.45);
+    badge(canvas, 2, Offset(w * 0.06, y2));
+
+    final y3 = rows[2];
+    final grain = Paint()..color = p.ink1.withValues(alpha: 0.5);
+    for (var i = 0; i < 9; i++) {
+      final dx = (i % 3 - 1) * r * 0.5;
+      final dy = (i ~/ 3 - 1) * r * 0.45;
+      canvas.drawCircle(Offset(w * 0.24 + dx, y3 + dy), r * 0.09, grain);
+    }
+    tickAt(canvas, Offset(w * 0.42, y3), r * 0.45);
+    canvas.drawOval(
+        Rect.fromCenter(
+            center: Offset(w * 0.72, y3), width: r * 1.5, height: r * 1.0),
+        ink);
+    crossAt(canvas, Offset(w * 0.9, y3), r * 0.45);
+    badge(canvas, 3, Offset(w * 0.06, y3));
+
+    badge(canvas, 4, Offset(w * 0.56, y1));
+    badge(canvas, 5, Offset(w * 0.56, y3));
+  }
+}
+
+/// One face: the mild signs numbered on the left, the call-now signs on the
+/// right under a coral band.
+class _AllergyPainter extends _ScenePainter {
+  _AllergyPainter({required super.p, required super.badges});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final c = Offset(w * 0.5, h * 0.5);
+    final r = h * 0.3;
+
+    canvas.drawRect(
+        Rect.fromLTWH(w * 0.5, 0, w * 0.5, h),
+        Paint()..color = const Color(0xFFFF5A79).withValues(alpha: 0.10));
+
+    canvas.drawCircle(c, r, Paint()..color = Colors.white);
+    canvas.drawCircle(c, r, ink);
+    canvas.drawCircle(Offset(c.dx - r * 0.35, c.dy - r * 0.2), r * 0.06, ink);
+    canvas.drawCircle(Offset(c.dx + r * 0.35, c.dy - r * 0.2), r * 0.06, ink);
+    canvas.drawArc(
+        Rect.fromCenter(
+            center: Offset(c.dx, c.dy + r * 0.35),
+            width: r * 0.7,
+            height: r * 0.4),
+        0.15,
+        2.8,
+        false,
+        ink);
+    final hive = Paint()..color = p.ink1.withValues(alpha: 0.3);
+    for (final (dx, dy) in [(-0.45, 0.35), (-0.55, 0.55), (-0.3, 0.62), (-0.62, 0.2)]) {
+      canvas.drawCircle(Offset(c.dx + r * dx, c.dy + r * dy), r * 0.07, hive);
+    }
+    canvas.drawOval(
+        Rect.fromCenter(
+            center: Offset(c.dx + r * 0.38, c.dy - r * 0.08),
+            width: r * 0.45,
+            height: r * 0.22),
+        ink);
+    canvas.drawOval(
+        Rect.fromCenter(
+            center: Offset(c.dx + r * 0.25, c.dy + r * 0.5),
+            width: r * 0.4,
+            height: r * 0.18),
+        ink);
+
+    badge(canvas, 1, Offset(w * 0.12, h * 0.28));
+    badge(canvas, 2, Offset(w * 0.12, h * 0.5));
+    badge(canvas, 3, Offset(w * 0.12, h * 0.72));
+    badge(canvas, 4, Offset(w * 0.88, h * 0.28));
+    badge(canvas, 5, Offset(w * 0.88, h * 0.5));
+    badge(canvas, 6, Offset(w * 0.88, h * 0.72));
+
+    void word(String text, Color colour, double cx) {
+      final tp = TextPainter(
+        text: TextSpan(
+            text: text,
+            style: pvManrope(
+                fontSize: 9,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.1,
+                color: colour)),
+        textDirection: TextDirection.ltr,
+      )..layout();
+      tp.paint(canvas, Offset(cx - tp.width / 2, h * 0.06));
+    }
+
+    word('MILD', p.action, w * 0.25);
+    word('CALL NOW', const Color(0xFFFF5A79), w * 0.75);
+  }
 }
 
 /// One bed, flush to the wall, a mother on her side, the baby on her back
@@ -499,7 +761,7 @@ class _BackToSleepPainter extends _ScenePainter {
 
     // Centre: on her back.
     baby(canvas, Offset(w * 0.34, h * 0.50), h * 0.11);
-    _tick(canvas, Offset(w * 0.50, h * 0.22), h * 0.06);
+    tickAt(canvas, Offset(w * 0.50, h * 0.22), h * 0.06);
 
     // Left, small: on her side (head drawn as a profile, arm down).
     final sideHead = Offset(w * 0.12, h * 0.58);
@@ -509,7 +771,7 @@ class _BackToSleepPainter extends _ScenePainter {
             Rect.fromLTWH(w * 0.10, h * 0.61, w * 0.05, h * 0.10),
             const Radius.circular(6)),
         ink);
-    _cross(canvas, Offset(w * 0.12, h * 0.36), h * 0.045);
+    crossAt(canvas, Offset(w * 0.12, h * 0.36), h * 0.045);
 
     // Right, small: on her front (face down, no face).
     final frontHead = Offset(w * 0.86, h * 0.60);
@@ -519,39 +781,11 @@ class _BackToSleepPainter extends _ScenePainter {
             Rect.fromLTWH(w * 0.70, h * 0.57, w * 0.13, h * 0.07),
             const Radius.circular(6)),
         ink);
-    _cross(canvas, Offset(w * 0.80, h * 0.36), h * 0.045);
+    crossAt(canvas, Offset(w * 0.80, h * 0.36), h * 0.045);
 
     badge(canvas, 1, Offset(w * 0.34, h * 0.86)); // on her back
     badge(canvas, 2, Offset(w * 0.12, h * 0.86)); // not on her side
     badge(canvas, 3, Offset(w * 0.80, h * 0.86)); // not on her front
     badge(canvas, 4, Offset(w * 0.60, h * 0.30)); // once she rolls herself
-  }
-
-  void _tick(Canvas canvas, Offset at, double r) {
-    canvas.drawCircle(at, r * 1.4, Paint()..color = p.action);
-    final path = Path()
-      ..moveTo(at.dx - r * 0.6, at.dy)
-      ..lineTo(at.dx - r * 0.15, at.dy + r * 0.45)
-      ..lineTo(at.dx + r * 0.65, at.dy - r * 0.45);
-    canvas.drawPath(
-        path,
-        Paint()
-          ..color = Colors.white
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = 2.6
-          ..strokeCap = StrokeCap.round
-          ..strokeJoin = StrokeJoin.round);
-  }
-
-  void _cross(Canvas canvas, Offset at, double r) {
-    final paint = Paint()
-      ..color = p.ink1.withValues(alpha: 0.55)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.2
-      ..strokeCap = StrokeCap.round;
-    canvas.drawCircle(at, r * 1.4,
-        Paint()..color = p.ink1.withValues(alpha: 0.10));
-    canvas.drawLine(at - Offset(r * 0.5, r * 0.5), at + Offset(r * 0.5, r * 0.5), paint);
-    canvas.drawLine(at - Offset(r * 0.5, -r * 0.5), at + Offset(r * 0.5, -r * 0.5), paint);
   }
 }

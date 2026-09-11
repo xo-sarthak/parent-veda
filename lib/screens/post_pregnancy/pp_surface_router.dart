@@ -35,10 +35,11 @@ import 'pp_fever_check_screen.dart';
 import 'pp_crisis_path_screen.dart';
 import 'pp_age_bands.dart';
 import 'pp_chart_browser_screen.dart';
-import 'pp_feeding_content.dart';
+// import 'pp_feeding_content.dart'; // only the chooser version needs it (kept for revert)
 import 'products_compare_screen.dart';
 import 'pp_sounds_screen.dart';
 import 'pp_wake_windows_screen.dart';
+import 'pp_what_to_feed_screen.dart';
 import '../../data/doors/pp_door_data.dart';
 import 'doors/pp_door_screen.dart';
 
@@ -201,6 +202,12 @@ Widget? _ppScreenFor(String id) => switch (id) {
               'ranges. If she wakes rested and is growing and feeding well, she '
               'is getting what she needs.',
         ),
+      // ⚠️ THE MERGED, AUTO-SCOPED TOOL. Was a `PpChartBrowserScreen` with an
+      // age chooser; the Feeding door rebuild merged the chart collection and
+      // the "is he getting enough?" signs into it and took the chooser away.
+      // The chooser version is kept below for revert.
+      'pp_food_chart' => const PpWhatToFeedScreen(),
+      /*
       'pp_food_chart' => PpChartBrowserScreen(
           sectionId: 'parenting_feeding',
           bands: kPpFeedingBands,
@@ -211,6 +218,7 @@ Widget? _ppScreenFor(String id) => switch (id) {
               'What matters is the pattern over a fortnight, not what he ate at '
               'lunch.',
         ),
+      */
 
       // ---- surfaces the sections named before they existed -------------------
       //

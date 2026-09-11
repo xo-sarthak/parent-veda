@@ -642,6 +642,16 @@ enum PpIllustrationKind {
   /// On her back: the one position that is the way, beside the two that are
   /// not.
   backToSleep,
+
+  /// Four katoris: puree, mash, soft finger food, chopped family food.
+  solidsTextures,
+
+  /// A grape quartered lengthways beside a grape cut into coins; sticks
+  /// beside coins; a nut ground beside a nut whole.
+  cutItThisWay,
+
+  /// A face: the mild signs on one side, the call-now signs on the other.
+  allergicReaction,
 }
 
 /// `[ILLUSTRATION]` — one labelled picture.
@@ -1167,10 +1177,17 @@ class PpBlockView extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   )
                 : null,
+            // ⚠️ THE LABEL KEEPS ITS COLUMN. With the value unconstrained, a
+            // long value ("From about 7 months once yolk is accepted") took
+            // the whole row and the label wrapped one letter per line —
+            // "C h i c k e n". Seen on a phone on the Feeding tool,
+            // 2026-09-12. Five parts label, seven parts value; the value
+            // wraps, the label does not collapse.
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
+                  flex: 5,
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -1193,11 +1210,15 @@ class PpBlockView extends StatelessWidget {
                 ),
                 const SizedBox(width: 12),
                 // ⚠️ tabular figures, so a column of "11 to 14 hours" lines up.
-                Text(value,
-                    style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w800, height: 1.55, color: p.ink1)
-                        .copyWith(fontFeatures: const [
-                      FontFeature.tabularFigures(),
-                    ])),
+                Expanded(
+                  flex: 7,
+                  child: Text(value,
+                      textAlign: TextAlign.end,
+                      style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w800, height: 1.55, color: p.ink1)
+                          .copyWith(fontFeatures: const [
+                        FontFeature.tabularFigures(),
+                      ])),
+                ),
               ],
             ),
           ),
