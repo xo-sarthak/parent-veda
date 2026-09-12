@@ -642,3 +642,33 @@ open the same door on different tabs. They do not open two screens, and they
 never open the same screen. Mind & mood's "Check how I am feeling" (Track)
 and "Help me feel better" (Feel) are the case; the brief called the old
 behaviour — both to one landing — "a bug", by name.
+
+## 25. A launcher tab switches tabs — `kPvDoorTabSurface`
+
+When a brief says a tab "only opens the tabs below, it does not repeat
+them", its cards carry `pvDoorTabSurface(groupId)` and the door screen
+switches instead of pushing. Pushing would put a second copy of a tab on
+top of the door that already has it. The router resolves the id as true and
+never builds a screen; the door's own test asserts each target tab exists.
+The card's chip is the destination's — "Audio" over "Shravan, today's raga"
+— because the tab it lands on opens with today's pick.
+
+## 26. A rail that reads a store — `PvDoorSection.inline`
+
+A door page is data, built once. When one rail depends on what she has
+saved (Garbh Sanskar's picked rituals), that section names a surface and a
+widget draws the rail in position, listening to the store. The widget must
+draw a horizontal `ListView` of `PvDoorRailCard`s at `kPvRailCardHeight` —
+the symmetry test counts rails per section and does not know the section is
+special, which is the point. Use `PvDoorGroup.inlineSurfaceId` for a tab
+that IS a tool; use this for one section among others.
+
+## 27. Two briefs for one area: read the code before believing either
+
+Garbh Sanskar's door brief said the area was "fully built"; its pillars
+brief said the pillars were placeholders. The code decided (§42.1 in
+STILL-OPEN). The rule that fell out: **a placeholder inside a working
+screen is not a coming-soon card.** A card opens a screen that exists, the
+screen's own honesty about its content is the screen's job, and the debt
+goes in `docs/DOOR-CONTENT-OWED.md` under the door as "built, placeholder
+inside" — not as a card that refuses to tap.

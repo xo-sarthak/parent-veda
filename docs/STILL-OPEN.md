@@ -5824,3 +5824,89 @@ rules (STILL-OPEN §39): content in `pp_feeding_content.dart`, the shell in
 * The handset walk covered the hero, the five tabs, the merged tool and
   the chart fix; the interactive tracker and the two illustrations were
   seen only in tests.
+
+---
+
+## 42.0 Garbh Sanskar, the seventh pregnancy door — 2026-09-12
+
+The last two briefs are a pair: `ParentVeda_Garbh_Sanskar_rebuild.pdf` puts
+a door on the area, `..._pillars_build.pdf` builds the four pillars behind it
+to final. The user chose door first, then pillars one at a time; this is the
+door. Not walked on a phone — the other terminal holds it.
+
+### 42.1 The two briefs disagree about the premise
+
+The door brief says *"this area is already fully built"*; the pillars brief
+says the four pillars *"are placeholders today"*. The code says the second:
+ten Shravan tracks and one bundled drone that all of them play; a Samvad
+narrator that is a "coming soon" line; a 4×4 Sudoku with three fixed boards;
+a "Guided Relaxation" that is a breathing pattern named `relax`. The
+recording, the daily picks, the games, the breathing circle, the ritual
+picker, the journal and the invite flow are real.
+
+So the door reuses everything as it is and **nothing on it is coming-soon**:
+every card opens a screen that exists, and the placeholder is inside the
+screen. That is the pillars job, and it is in `docs/DOOR-CONTENT-OWED.md` §7.
+
+### 42.2 What the engine grew, and why each one
+
+* **`kPvDoorTabSurface`** — a surface id that switches the door to one of
+  its own tabs instead of pushing. Today is a launcher (*"Today only opens
+  the tabs below, it does not repeat their libraries"*), and a push would
+  stack a second Listen on a door that has one. The screen intercepts it in
+  `_openTile`; the router resolves it as true and never builds a screen; the
+  Scans registry test skips these tiles and the door's own test checks the
+  target tab exists.
+* **`PvDoorSection.inline`** — a section whose rail a widget draws. "Whatever
+  is picked shows on Today" means the rail depends on `GarbhJournalStore`,
+  and a page built once cannot know it. `GarbhRitualRail` listens and draws
+  the picker card plus one card per picked ritual, as a horizontal ListView
+  of `PvDoorRailCard`s so the symmetry test counts it like any section.
+* **`PvDoorGroup.noteFor`** — the tab note as a function of her week. "Why
+  this week" is `garbhWeekReason(week)`, banded by what is forming.
+* **`PvDoorAudioTile` grew a live form** beside the coming-soon one, the
+  same pair as `PvDoorReadTile`. Mind & mood's four tracks use `.comingSoon`;
+  Shravan's ten open their player.
+* **`PvDoorFormat.game` / `PvDoorGameTile`** — the brief marks the puzzles
+  [Game], and "Tool" over Sudoku would be the chip lying.
+
+### 42.3 Calls made
+
+* **The one new item is the closing line.** The map puts "Where this comes
+  from" on My Journal; the brief's own box says *"one new note added at
+  AREA LEVEL"*. The closing line is the area-level note the engine has, so
+  it renders under every tab. It is the only copy in the door file that was
+  written rather than carried.
+* **STOP IF is the pinned flag on For you**, titled "Stop and call your
+  doctor today if...", the six lines from `_StopIfCard._signs` unchanged,
+  the safety note as its footer. It opens the Kriya screen.
+* **The honesty line is For you's tab note**, verbatim: "This one is for
+  you, and it will not make your baby cleverer."
+* **The six affirmations open the record-first screen** on that piece
+  (`GarbhSamvadDailyScreen.piece`), not the library's inline card. Her voice
+  is the point; a card that opened a page with no record button would have
+  demoted it.
+* **My Journal is the tab** (`GarbhJournalScreen(embedded: true)`): header,
+  the album by week, then write-a-letter and invite as two rail cards in a
+  horizontal scroll (not a ListView, so the tool tab counts no rails). The
+  "stays yours" sentence is the tab note.
+* **`garbh_daily` now opens the door.** `GarbhDailyScreen` is retired in
+  place, one commented line in `surface_router.dart`. The home's "Today's
+  Garbh Sanskar" block still opens each pillar's daily screen directly —
+  untouched, as the brief asks.
+* **Vichara's stories are not on the door.** The brief does not name them
+  and the retired landing had already dropped that pillar.
+* **Games opened from the rail do not mark the day done** (`markComplete:
+  false`) — the door keeps no score.
+
+### 42.4 Still owed
+
+* **The handset walk.** Today's tab-switch, the ritual rail growing as she
+  picks, the embedded journal, and whether the hero crop reads well.
+* **The four pillars to final** — the second brief. Order agreed with the
+  user: Kriya, Buddhi, Samvad, Shravan last. Audio hosting decided:
+  **Cloudflare R2** (zero egress; `NarrationService` already anticipates
+  it). What each pillar owes is the ledger's, not this file's — twelve rows
+  in `docs/DOOR-CONTENT-OWED.md` §7, one per job.
+* **All eight pregnancy briefs are now built.** The reminder at §38.5 — one
+  format for articles and reads — is due.

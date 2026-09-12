@@ -24,7 +24,10 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import '../screens/garbh_daily_screen.dart';
+// import '../screens/garbh_daily_screen.dart'; // retired in place, 2026-09-12
+import '../data/doors/pv_door_data.dart' show pvDoorPageFor;
+import '../screens/doors/pv_door_screen.dart';
+import 'bracket_resolver.dart' show bracketById;
 import 'tool_usage_store.dart';
 
 import '../localization/app_language.dart';
@@ -98,7 +101,16 @@ Widget? _screenFor(String id, PregnancyController c, AppLanguage lang) =>
       // The daily experience already existed — `ShravanScreen(daily: true)` —
       // and was reachable only from the Home screen. The surface id is called
       // `garbh_DAILY`; it now returns the daily thing.
-      'garbh_daily' => GarbhDailyScreen(pregnancy: c),
+      //
+      // ⚠️ AND NOW IT OPENS THE DOOR — 2026-09-12. Garbh Sanskar became the
+      // seventh pregnancy door (`pv_door_garbh.dart`), and its Today tab is
+      // the daily practice this surface promised: the four pillars, no score.
+      // `GarbhDailyScreen` is retired in place, kept for revert, and the door
+      // opens on Today by default so nothing that pointed here lands anywhere
+      // different in spirit. The route name stays the bracket's, as every
+      // door's does — `global_ask_fab.dart` reads it.
+      'garbh_daily' => _garbhDoor(c),
+      // 'garbh_daily' => GarbhDailyScreen(pregnancy: c), // kept for revert
 
       // ---- Prepare ---------------------------------------------------------
       'consults' => ConsultationsScreen(lang: lang),
@@ -134,3 +146,12 @@ Widget? _screenFor(String id, PregnancyController c, AppLanguage lang) =>
 
       _ => null,
     };
+
+/// The Garbh Sanskar door, on Today. Null only if the registry loses the
+/// door, which its own tests would catch first.
+Widget? _garbhDoor(PregnancyController c) {
+  final page = pvDoorPageFor('pregnancy_garbh');
+  final bracket = bracketById('pregnancy_garbh');
+  if (page == null || bracket == null) return null;
+  return PvDoorScreen(page: page, bracket: bracket, pregnancy: c);
+}

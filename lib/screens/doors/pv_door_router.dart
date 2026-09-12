@@ -84,6 +84,22 @@ import '../mind_mood/mm_door_surfaces.dart';
 import '../mind_mood/mm_feel_tab.dart' show mmSosFlowScreen;
 import '../mind_mood/mm_talk_tab.dart' show MmScreenerScreen;
 import '../mind_mood/mm_track_tab.dart';
+import '../../data/doors/pv_door_garbh.dart';
+import '../../data/garbh_data.dart' show kPuzzles, kriyaById, shravanById;
+import '../../data/read_to_baby_data.dart' show kReadAloudPieces, kRtbAffirmations;
+import '../../models/garbh_content.dart' show GarbhPrompt;
+import '../garbh_door_surfaces.dart';
+import '../garbh_journal_screen.dart';
+import '../garbh_ritual_screen.dart';
+import '../garbh_samvad_daily.dart';
+import '../garbh_screen.dart'
+    show
+        KriyaDetailScreen,
+        KriyaScreen,
+        SamvadScreen,
+        ShravanDetailScreen,
+        ShravanScreen,
+        gameForPuzzle;
 import '../../data/mind_mood_extras.dart' show kMmPartnerArticle;
 import '../../services/bracket_resolver.dart' show bracketById;
 import 'pv_door_chrome.dart' show PvDoorToolScaffold;
@@ -207,6 +223,26 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
       _ when id.startsWith('mind/breathe/') => _mindBreathe(id),
       _ when id.startsWith('mind/offer/') => _mindOffer(id),
 
+      // ---- Garbh Sanskar -------------------------------------------------
+      // ⚠️ EVERY ONE OF THESE EXISTED BEFORE THE DOOR. The area's screens,
+      // reused whole; two of them made public and one given a parameter so a
+      // card can open the thing it names. The pillars brief rebuilds what is
+      // BEHIND these ids and leaves the ids alone.
+      kGarbhSurfaceRitual => GarbhRitualScreen(controller: c),
+      kGarbhSurfaceListenToday => ShravanScreen(controller: c, daily: true),
+      kGarbhSurfaceReadToday => GarbhSamvadDailyScreen(
+          controller: c,
+          onOpenLibrary: () {}, // the door's own rail is the library
+        ),
+      kGarbhSurfaceRelax => KriyaDetailScreen(
+          practice: kriyaById('relax')!, controller: c),
+      kGarbhSurfaceKriya => KriyaScreen(controller: c, daily: true),
+      kGarbhSurfaceJournal => const GarbhJournalScreen(),
+      _ when id.startsWith('garbh/listen/') => _garbhListen(id, c),
+      _ when id.startsWith('garbh/read/piece/') => _garbhPiece(id, c),
+      _ when id.startsWith('garbh/read/shelf/') => _garbhShelf(id, c),
+      _ when id.startsWith('garbh/play/') => _garbhGame(id, c),
+
       _ => null,
     };
 
@@ -252,6 +288,11 @@ Widget? pvDoorInlineToolFor(String id, PregnancyController c) => switch (id) {
       // ⚠️ THE TRACK TAB IS THE TOOL. "Do-it screens, not rails." The same
       // widget the old landing showed, as a Column.
       kMindSurfaceTrack => const MmTrackTab(embedded: true),
+
+      // Garbh Sanskar: the journal IS the last tab; the ritual rail is the
+      // one section on Today that reads a store.
+      kGarbhSurfaceJournal => const GarbhJournalScreen(embedded: true),
+      kGarbhSurfaceRitualRail => GarbhRitualRail(pregnancy: c),
 
       _ => null,
     };
@@ -322,9 +363,13 @@ void openPvDoorTile(
     case PvDoorVideoTile():
       return;
 
-    // Same as a film: the four calming tracks have no file yet.
-    case PvDoorAudioTile():
-      return;
+    // A track: Mind & mood's four are coming-soon (returned above); Garbh
+    // Sanskar's open their player.
+    case PvDoorAudioTile(:final surfaceId):
+      if (surfaceId != null) openPvDoorSurface(context, surfaceId, c);
+
+    case PvDoorGameTile(:final surfaceId):
+      openPvDoorSurface(context, surfaceId, c);
 
     // ---- reading ------------------------------------------------------------
     case PvDoorGuideTile(:final readId, :final atHeading):
@@ -538,8 +583,84 @@ bool pvDoorSurfaceResolves(String id) => switch (id) {
         kMmBreathingExercises.any((e) => mindSurfaceBreathe(e.id) == id),
       _ when id.startsWith('mind/offer/') =>
         kMmTalkOfferings.any((o) => mindSurfaceOffer(o.id) == id),
+      kGarbhSurfaceRitual ||
+      kGarbhSurfaceListenToday ||
+      kGarbhSurfaceReadToday ||
+      kGarbhSurfaceRelax ||
+      kGarbhSurfaceKriya ||
+      kGarbhSurfaceJournal =>
+        true,
+      _ when id.startsWith('garbh/listen/') =>
+        shravanById(id.substring('garbh/listen/'.length)) != null,
+      _ when id.startsWith('garbh/read/piece/') => _garbhPieceFor(id) != null,
+      _ when id.startsWith('garbh/read/shelf/') => _garbhShelfFor(id) != null,
+      _ when id.startsWith('garbh/play/') => _garbhPuzzleFor(id) != null,
+      // ⚠️ A TAB OF THE SAME DOOR. The screen switches to it and nothing is
+      // pushed; the door's own test checks the tab exists on that page.
+      _ when id.startsWith(kPvDoorTabSurface) => true,
       _ => false,
     };
+
+// -----------------------------------------------------------------------------
+//  Garbh Sanskar lookups
+// -----------------------------------------------------------------------------
+
+/// `garbh/listen/<id>` → that track on its player.
+Widget? _garbhListen(String id, PregnancyController c) {
+  final a = shravanById(id.substring('garbh/listen/'.length));
+  if (a == null) return null;
+  return ShravanDetailScreen(audio: a, controller: c);
+}
+
+/// The affirmation a `garbh/read/piece/<slug>` names, as the prompt the
+/// record-first screen takes. Slug from the English title — an identity.
+GarbhPrompt? _garbhPieceFor(String id) {
+  final slug = id.substring('garbh/read/piece/'.length);
+  for (final p in kReadAloudPieces) {
+    if (p.category != kRtbAffirmations) continue;
+    if (garbhSlug(p.title.en) == slug) {
+      return GarbhPrompt('rtb_$slug', p.title, p.body);
+    }
+  }
+  return null;
+}
+
+Widget? _garbhPiece(String id, PregnancyController c) {
+  final piece = _garbhPieceFor(id);
+  if (piece == null) return null;
+  return GarbhSamvadDailyScreen(controller: c, piece: piece);
+}
+
+/// `garbh/read/shelf/<n>` → 0..3, or null for anything else.
+int? _garbhShelfFor(String id) {
+  final n = int.tryParse(id.substring('garbh/read/shelf/'.length));
+  return (n == null || n < 0 || n > 3) ? null : n;
+}
+
+/// `garbh/read/shelf/<n>` → the library open on that shelf.
+Widget? _garbhShelf(String id, PregnancyController c) {
+  final n = _garbhShelfFor(id);
+  if (n == null) return null;
+  return SamvadScreen(controller: c, initialTab: n);
+}
+
+/// `garbh/play/<slug>` → one of the four puzzles, by its English title.
+({String slug, int index})? _garbhPuzzleFor(String id) {
+  final slug = id.substring('garbh/play/'.length);
+  for (var i = 0; i < kPuzzles.length; i++) {
+    if (garbhSlug(kPuzzles[i].title.en) == slug) return (slug: slug, index: i);
+  }
+  return null;
+}
+
+Widget? _garbhGame(String id, PregnancyController c) {
+  final hit = _garbhPuzzleFor(id);
+  if (hit == null) return null;
+  // ⚠️ `markComplete: false`. The door keeps no score — the old landing's
+  // "Nothing here keeps score" — and a game opened from a rail is not "today's
+  // practice done".
+  return gameForPuzzle(kPuzzles[hit.index], c, markComplete: false);
+}
 
 /// `mind/breathe/<id>` → the shared breathing circle on that exercise.
 Widget? _mindBreathe(String id) {

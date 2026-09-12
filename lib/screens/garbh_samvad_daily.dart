@@ -60,9 +60,19 @@ class GarbhSamvadDailyScreen extends StatefulWidget {
     super.key,
     required this.controller,
     this.onOpenLibrary,
+    this.piece,
   });
 
   final PregnancyController controller;
+
+  /// A specific passage to read, instead of today's rotation.
+  ///
+  /// ⚠️ SINCE THE DOOR. Talk & read's affirmation rail — "You are loved",
+  /// "Grow gently" — opens each one HERE, on the record-first screen, rather
+  /// than on the library's inline card. The point of the section is her
+  /// voice; a card that opened a page with no record button would have quietly
+  /// demoted the one thing no other app can supply. Null means today's piece.
+  final GarbhPrompt? piece;
 
   /// The four shelves, below the fold. Passed in rather than imported so this
   /// screen does not reach into the 2,000-line pillar file.
@@ -101,6 +111,7 @@ class _GarbhSamvadDailyScreenState extends State<GarbhSamvadDailyScreen> {
   }
 
   GarbhPrompt get _todaysPiece {
+    if (widget.piece case final p?) return p;
     final pieces = samvadForTrimester(_trimester);
     final day = widget.controller.currentDay.clamp(1, 280);
     return pieces[(day - 1) % pieces.length];

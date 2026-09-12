@@ -317,7 +317,7 @@ final PvDoorPage kMindDoor = PvDoorPage(
       heading: 'Calming audio',
       tiles: [
         for (final a in kMmCalmAudio)
-          PvDoorAudioTile(
+          PvDoorAudioTile.comingSoon(
             title: a.title.en,
             blurb: a.subtitle.en,
             meta: a.durationLabel.en,

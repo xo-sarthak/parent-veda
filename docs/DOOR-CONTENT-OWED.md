@@ -6,9 +6,14 @@ creating a new one."* This file is where those lists live, across every door,
 so they can be worked through **once, at the very end**, instead of hunted out
 of eight STILL-OPEN sections.
 
-**What qualifies for a row here:** the brief pointed at a page, a film, a track
-or a card, and it did not exist. Nothing else — clinical reviews, handset walks,
-bundling hero photographs — stays in `docs/STILL-OPEN.md`, where it already is.
+**The split, in one line: this file holds ROWS, STILL-OPEN holds STORIES.**
+A row is here when the brief pointed at a page, a film, a track or a card and
+it did not exist — the thing that gets written, recorded, sourced or decided
+at the end. Everything else about a door (why a call was made, what the
+engine grew, phone-walk notes, clinical reviews, hero photographs) is
+STILL-OPEN's, and its "Still owed" lists POINT here rather than repeat a row.
+A content item written in both places is the failure this file exists to
+prevent.
 
 **How each row was handled on the door.** There are only three outcomes, and
 the Outcome column names which:
@@ -18,6 +23,7 @@ the Outcome column names which:
 | **Coming soon** | The card holds its place on the rail at full size and does not tap. Nothing on the rail moves the day the piece lands. This is the default — CLAUDE.md: aspirational copy stays; the gap is recorded. |
 | **Omitted** | The brief marked it optional and gave no copy. Not on the door. |
 | **Built from data** | The brief gave no prose because none was needed — the "page" is a list the app already held as constants. Built, but flagged where those constants are themselves unconfirmed. |
+| **Built, placeholder inside** | The card opens a screen that exists and works; what the screen holds is a stand-in (a drone for every raga, a 4×4 Sudoku). Not a coming-soon card — the screen's honesty about its content is the screen's job. Garbh Sanskar only. |
 
 **Rules for this file:**
 
@@ -101,9 +107,35 @@ Three `[new]` cards had no copy in the brief's section 3.
 
 STILL-OPEN §40.2, §40.4.
 
-### 7–8. Garbh Sanskar (two coupled briefs)
+### 7. Garbh Sanskar — `lib/data/doors/pv_door_garbh.dart`
 
-Not built yet. Section to be added when the pair is done.
+Two coupled briefs. The door (built 2026-09-12) reuses every screen as it
+is; the pillars brief builds what is BEHIND those screens to final. Nothing
+on the door is coming-soon — every card opens a screen that exists — so
+these rows are a fourth outcome, **built, placeholder inside**: the card
+taps, the screen works, and what it holds is a stand-in. Each row closes
+when its pillar is built to final (the pillars brief, pillar by pillar).
+
+| # | Card (brief's title) | Kind | Tab / section | Outcome | Owed |
+|---|---|---|---|---|---|
+| G1 | Morning Calm Raga, Baby Bonding Raga, Evening Raga, Sleep Raga, Relaxation Raga | Audio ×5 | Listen · "Ragas" | Built, placeholder inside | All five play `assets/audio/raga_drone.wav`. Royalty-free tracks (Pixabay / archive.org, licence verified), hosted on **Cloudflare R2**, read from a manifest (id, title, category, duration, sourceUrl, licence, attribution); background + offline playback. |
+| G2 | Gentle Rain, Ocean Waves, Forest Morning, Temple Bells | Audio ×4 | Listen · "Nature sounds" | Built, placeholder inside | Same drone. CC0 nature loops (Freesound / Pixabay), looped to length, same manifest. |
+| G3 | Body Awareness Journey | Guided audio · 9 min | Listen · "Guided" | Built, placeholder inside | Same drone. A spoken body scan — TTS through `NarrationService` for now, a recorded voice later by manifest edit. Shares Kriya's script engine. |
+| G4 | Today's passage — the narrator | Read + Record | Talk and read · "Today's pick" | Built, placeholder inside | Recording is real. "Or listen to the narrator" is a coming-soon line on `GarbhSamvadDailyScreen`; wire it to `NarrationService` (manifest → file, else on-device TTS). |
+| G5 | Affirmations and blessings, ~20 | Read | Talk and read · "Affirmations and blessings" | Built, six on the door | The library holds the brief's six; the pillars brief asks for about twenty, spoken to the baby, in the existing style. Writing job, allowed by that brief. |
+| G6 | Stories and fables, 6–8 | Read library | Talk and read · "More to read aloud" | Built | Check the shelf against the pillars brief: public-domain (Panchatantra, Aesop) or original, each readable aloud in a few minutes. Top up if short. |
+| G7 | Mantras and lullabies | Read + Audio library | Talk and read · "More to read aloud" | Built, partly | Each needs text, a simple transliteration and a one-line meaning; plus two or three original lullabies. No copyrighted lyrics. Audio side is G1's manifest. |
+| G8 | Spiritual reading, by tradition | Read library | Talk and read · "More to read aloud" | Built | Eight traditions exist. Verify every passage is a public-domain translation; default to none selected. |
+| G9 | Sudoku | Game | For you · "A few quiet minutes" | Built, placeholder inside | A 4×4 with three fixed boards. Brief: 9×9 easy default and a gentle 6×6, generator, validator, pencil notes, check, hint, no timer. |
+| G10 | Logic Puzzle | Game | For you · "A few quiet minutes" | Built | Check against the brief: a light nonogram or a small deduction grid, hints allowed. |
+| G11 | Guided Relaxation | Guided audio · 8 min | For you · "Breath and relaxation" | Built, placeholder inside | Today a breathing pattern named `relax`. Brief: a written head-to-toe progressive-relaxation script, narrated by TTS synced to a timer and a calm visual, optional background audio from Shravan, the current body part highlighted on an outline figure. Data-driven so a recorded voice replaces TTS with no code change. |
+| G12 | Breathing practices | Tool | For you · "Breath and relaxation" | Built, twice | `_BreathingScreen` (garbh) and `MmBreathingScreen` (Mind & mood) are two circles. Brief: one shared component, configured per practice (4-in 6-out; box 4-4-4-4), reused by Mind & mood and the TTC mind-body practice. |
+
+Not owed: the affirmation rail's six pieces, the recording flow, the ritual
+picker, Word Search and Memory Match, the journal and the invite flow — all
+real. STILL-OPEN §42.
+
+### 8. (folded into 7 — the pair is one area)
 
 ---
 
@@ -135,9 +167,11 @@ two.
 | Belly & skin | 0 | – | – | – | – |
 | Labour prep | 6 | 6 | – | – | – |
 | Mind & mood | 6 | 4 (M1, M4–M6) | 1 | 1 | – |
+| Garbh Sanskar | 12 | – | – | – | – (12 built-with-placeholder, the pillars brief) |
 | Feeding (parenting) | 4 | 2 | – | 2 | 1 (allergen tracker persistence) |
 
 Pregnancy, six doors: written pieces owed, in prose — **S1, L3, L4, L5, L6,
 M1**, six reads. Films — **N1, L1, L2, M4 ×3, M6 ×5**, eleven. Audio — **M5
-×4**. One decision: N2. One confirmation: M3's numbers. Garbh Sanskar to add.
+×4**. One decision: N2. One confirmation: M3's numbers. Garbh Sanskar: the
+pillars brief, twelve rows, none of them a coming-soon card.
 Parenting's totals are its terminal's to keep.

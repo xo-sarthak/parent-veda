@@ -130,6 +130,26 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
   PvDoorPage get page => widget.page;
   Bracket get bracket => widget.bracket;
 
+  /// Open a tile — or, when the tile names another tab of THIS door, switch
+  /// to it instead of pushing anything.
+  ///
+  /// ⚠️ THE LAUNCHER CASE, INTERCEPTED HERE AND NOWHERE ELSE. Garbh Sanskar's
+  /// Today tab is four cards that open the tabs below it, and the brief is
+  /// explicit that Today "does not repeat" those tabs. A push would stack a
+  /// second Listen on top of a door that already has one; a switch is what
+  /// the tab selector does when she taps it herself. Everything else goes to
+  /// the router, exactly as before.
+  void _openTile(PvDoorTile tile) {
+    final target = pvDoorTabTarget(tile);
+    if (target == null) {
+      openPvDoorTile(context, tile, widget.pregnancy);
+      return;
+    }
+    final i = page.groups.indexWhere((g) => g.id == target);
+    if (i < 0) return; // held by the door's own test, never seen by a user
+    setState(() => _group = i);
+  }
+
   /// The second line on a tab's card. Counted, never typed.
   ///
   /// ⚠️ A HAND-WRITTEN COUNT GOES STALE SILENTLY — nothing fails, the number is
@@ -238,7 +258,14 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                   // ⚠️ BELOW THE FLAG WHEN BOTH ARE PRESENT, because the order
                   // is the order of consequence. Quiet type: it is a standing
                   // note, not news.
-                  if (group.note case final note?) ...[
+                  //
+                  // ⚠️ `note ?? noteFor(week)`. Garbh Sanskar's "Why this
+                  // week" is about what is forming, so it is a function of
+                  // her week; every other door's note is a constant. Same
+                  // box either way.
+                  if (group.note ??
+                          group.noteFor?.call(widget.pregnancy.currentWeek)
+                      case final note?) ...[
                     pvDoorPad(_TabNote(note: note, p: p)),
                     const SizedBox(height: 20),
                   ],
@@ -303,6 +330,17 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                       // a page where every SECTION is reachable in one
                       // thumb-flick and the depth is sideways, where it costs
                       // nothing.
+                      //
+                      // ⚠️ AN INLINE SECTION DRAWS ITS OWN RAIL. The widget
+                      // behind it listens to a store the page cannot — see
+                      // `PvDoorSection.inline` — and it must draw a horizontal
+                      // `ListView` of `PvDoorRailCard`s, because the symmetry
+                      // test counts rails per section and does not know which
+                      // kind of section it is counting.
+                      if (section.inlineSurfaceId case final surface?)
+                        pvDoorInlineToolFor(surface, widget.pregnancy) ??
+                            const SizedBox(height: kPvRailCardHeight)
+                      else
                       SizedBox(
                         height: kPvRailCardHeight,
                         child: ListView.separated(
@@ -317,8 +355,7 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                             p: p,
                             hue: hue,
                             index: i,
-                            onTap: () => openPvDoorTile(
-                                context, tiles[i], widget.pregnancy),
+                            onTap: () => _openTile(tiles[i]),
                           ),
                         ),
                       ),
@@ -589,6 +626,8 @@ IconData pvDoorFormatIcon(PvDoorFormat format) => switch (format) {
       PvDoorFormat.recipe => Icons.restaurant_outlined,
       PvDoorFormat.video => Icons.play_circle_outline_rounded,
       PvDoorFormat.audio => Icons.headphones_outlined,
+      // A puzzle piece: played, not used.
+      PvDoorFormat.game => Icons.extension_outlined,
     };
 
 /// One card on a rail.

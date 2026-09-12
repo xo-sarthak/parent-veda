@@ -708,7 +708,7 @@ class ShravanScreen extends StatelessWidget {
 
     // Tools library: browse listening sessions month-by-month (opens on the
     // current month), each tappable; no mark-complete. (Old flat "all ragas"
-    // list kept in git history / _ShravanDetailScreen for revert.)
+    // list kept in git history / ShravanDetailScreen for revert.)
     if (!daily) {
       // ⚠️ TWO LIBRARY SHAPES, BEHIND A TOGGLE, ONE RENDERER EACH.
       //
@@ -828,8 +828,14 @@ class _ShravanHero extends StatelessWidget {
 }
 
 // A single raga's detail in the Tools library (player only - no mark-complete).
-class _ShravanDetailScreen extends StatelessWidget {
-  const _ShravanDetailScreen({required this.audio, required this.controller});
+/// One track, with its player.
+///
+/// ⚠️ PUBLIC SINCE THE DOOR. Listen's rails open a track here by surface id
+/// (`garbh/listen/<audio id>`), so the card she taps is the track she gets —
+/// not the month list the library opens on.
+class ShravanDetailScreen extends StatelessWidget {
+  const ShravanDetailScreen(
+      {super.key, required this.audio, required this.controller});
   final GarbhAudio audio;
   final PregnancyController controller;
   @override
@@ -1007,7 +1013,7 @@ class _ShravanLibraryState extends State<_ShravanLibrary> {
                       color: _accShravan),
                   onTap: () => _push(
                       context,
-                      _ShravanDetailScreen(
+                      ShravanDetailScreen(
                           audio: a, controller: widget.controller)),
                 ),
               ),
@@ -1292,8 +1298,20 @@ class _VicharaReader extends StatelessWidget {
 
 class SamvadScreen extends StatefulWidget {
   const SamvadScreen(
-      {super.key, required this.controller, this.daily = false, this.hubTitle});
+      {super.key,
+      required this.controller,
+      this.daily = false,
+      this.hubTitle,
+      this.initialTab = 0});
   final PregnancyController controller;
+
+  /// Which shelf to open on: 0 affirmations, 1 stories, 2 mantras and
+  /// lullabies, 3 spiritual reading.
+  ///
+  /// ⚠️ SINCE THE DOOR. Talk & read's "More to read aloud" rail is three
+  /// cards, one per shelf, and a card reading "Stories and fables" that opened
+  /// on affirmations would be the card lying. Same screen, one number.
+  final int initialTab;
 
   /// Daily (Home): today's speaking card + mark-complete. Tools (daily=false):
   /// the full library of speaking cards, browsable, no mark-complete.
@@ -1317,7 +1335,8 @@ class _SamvadScreenState extends State<SamvadScreen>
   @override
   void initState() {
     super.initState();
-    _tab = TabController(length: 4, vsync: this);
+    _tab = TabController(
+        length: 4, vsync: this, initialIndex: widget.initialTab.clamp(0, 3));
   }
 
   @override
@@ -2012,8 +2031,13 @@ List<Widget> _kriyaPracticeBody(BuildContext context, S s, TextTheme text,
 }
 
 // A single practice's detail in the Tools library (no mark-complete).
-class _KriyaDetailScreen extends StatelessWidget {
-  const _KriyaDetailScreen({required this.practice, required this.controller});
+/// One practice: what it is, its safety note, and "Begin".
+///
+/// ⚠️ PUBLIC SINCE THE DOOR. "Guided Relaxation" on the For you tab opens
+/// this on `kriyaById('relax')` by surface id.
+class KriyaDetailScreen extends StatelessWidget {
+  const KriyaDetailScreen(
+      {super.key, required this.practice, required this.controller});
   final GarbhPractice practice;
   final PregnancyController controller;
   @override
@@ -2055,7 +2079,7 @@ class _KriyaBreathingList extends StatelessWidget {
         for (final p in kKriya.where((x) => x.safeAtWeek(controller.currentWeek)))
           GestureDetector(
             onTap: () => _push(context,
-                _KriyaDetailScreen(practice: p, controller: controller)),
+                KriyaDetailScreen(practice: p, controller: controller)),
             child: Container(
               margin: const EdgeInsets.only(bottom: 16),
               decoration: BoxDecoration(

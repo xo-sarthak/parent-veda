@@ -71,6 +71,7 @@ import '../same_day_signs_data.dart';
 import '../scan_extras.dart' show kScanUrgentSigns;
 import 'pv_door_belly_skin.dart';
 import 'pv_door_complications.dart';
+import 'pv_door_garbh.dart';
 import 'pv_door_labour.dart';
 import 'pv_door_mind.dart';
 import 'pv_door_nutrition.dart';
@@ -109,6 +110,10 @@ enum PvDoorFormat {
   // a rain track would be the chip lying, which is the one thing this enum
   // exists to prevent.
   audio,
+  // ⚠️ ADDED FOR GARBH SANSKAR. Buddhi's four puzzles are marked [Game] in the
+  // brief, and "Tool" over Sudoku would be the chip lying about what the tap
+  // gives her — a tool is used and put down; a game is played.
+  game,
 }
 
 extension PvDoorFormatCopy on PvDoorFormat {
@@ -132,6 +137,7 @@ extension PvDoorFormatCopy on PvDoorFormat {
         PvDoorFormat.recipe => 'Recipe',
         PvDoorFormat.video => 'Video',
         PvDoorFormat.audio => 'Audio',
+        PvDoorFormat.game => 'Game',
       };
 }
 
@@ -356,18 +362,52 @@ final class PvDoorVideoTile extends PvDoorTile {
   PvDoorFormat get format => PvDoorFormat.video;
 }
 
-/// A calming track that is not in the repo yet — the same honest treatment
-/// as [PvDoorVideoTile]. The four Mind & mood tracks have `asset: null` on
-/// `MmCalmAudio` ("the files are not in the repo"), so the card says so.
+/// A track. Two forms, same pair as [PvDoorReadTile]: the default requires a
+/// surface and plays, the coming-soon form refuses one and does not.
+///
+/// ⚠️ THE COMING-SOON FORM CAME FIRST. Mind & mood's four calming tracks have
+/// `asset: null` on `MmCalmAudio` ("the files are not in the repo"), so the
+/// card says so. Garbh Sanskar's Shravan library has a player behind every
+/// track — it plays the bundled drone until the real files land, which is a
+/// placeholder INSIDE a working screen, not a missing screen — so its cards
+/// open. Which form a track takes is a fact about the screen, never a mood.
 final class PvDoorAudioTile extends PvDoorTile {
   const PvDoorAudioTile({
     required super.title,
     required super.blurb,
+    required String this.surfaceId,
     super.meta,
-  }) : super(comingSoon: true);
+  }) : super(comingSoon: false);
+
+  /// The file is not in the repo. Drawn at full size, not tappable.
+  const PvDoorAudioTile.comingSoon({
+    required super.title,
+    required super.blurb,
+    super.meta,
+  })  : surfaceId = null,
+        super(comingSoon: true);
+
+  /// Null only on the coming-soon form.
+  final String? surfaceId;
 
   @override
   PvDoorFormat get format => PvDoorFormat.audio;
+}
+
+/// A game — played, not used. Opens through the router like a tool.
+final class PvDoorGameTile extends PvDoorTile {
+  const PvDoorGameTile({
+    required super.title,
+    required super.blurb,
+    required this.surfaceId,
+    super.meta,
+    super.comingSoon,
+  });
+
+  final String surfaceId;
+
+  @override
+  PvDoorFormat get format => PvDoorFormat.game;
 }
 
 /// A guide — a piece written to be USED rather than read through.
@@ -526,10 +566,37 @@ class PvDoorSection {
     required this.tiles,
     required this.group,
     this.lead,
-  });
+  }) : inlineSurfaceId = null;
+
+  /// A section whose rail is drawn by a widget, not by tiles.
+  ///
+  /// ⚠️ FOR A RAIL WHOSE CARDS DEPEND ON A STORE. Garbh Sanskar's "Your own
+  /// practice" shows whichever rituals she has picked — Gita paath, Japa, a
+  /// Quran passage — and a page built once at startup cannot know that. The
+  /// widget behind [inlineSurfaceId] listens to the store and draws the rail
+  /// itself, in position, under this heading.
+  ///
+  /// ⚠️ IT MUST DRAW A RAIL. The symmetry test counts one horizontal
+  /// `ListView` per section on every tab; a widget here that draws a column
+  /// fails that test, which is the point of the test. `PvDoorRailCard` is the
+  /// card to use, and the cards must be the same height as every other rail.
+  ///
+  /// ⚠️ NOT `PvDoorGroup.inlineSurfaceId`. That renders ABOVE a tab's sections
+  /// and is for a tab that IS a tool. This is one section among others, in the
+  /// order the brief puts it, and it exists because the group form could not
+  /// put a dynamic rail third.
+  const PvDoorSection.inline({
+    required this.heading,
+    required String this.inlineSurfaceId,
+    required this.group,
+  })  : tiles = const [],
+        lead = null;
 
   final String heading;
   final List<PvDoorTile> tiles;
+
+  /// Null on every tile-backed section; set only by [PvDoorSection.inline].
+  final String? inlineSurfaceId;
 
   /// Which entry, if any, should be brought to the front for THIS woman.
   ///
@@ -677,6 +744,7 @@ class PvDoorGroup {
     this.layout = PvDoorLayout.rails,
     this.pinnedRedFlag,
     this.note,
+    this.noteFor,
   });
 
   /// Matched against [PvDoorSection.group].
@@ -704,6 +772,13 @@ class PvDoorGroup {
   /// not a rule". Dressing that as a clinical warning would spend the alarm on
   /// the wrong thing. Quieter type, quieter box, no urgency.
   final String? note;
+
+  /// The same note, when it depends on her week. Read only when [note] is
+  /// null. Garbh Sanskar's "Why this week" is the line for what is forming —
+  /// hearing, the nerve pathways for touch — and a page built once cannot
+  /// hold forty of them; a function of the week can. An `int`, not a
+  /// controller, for the reason `PvDoorSection.lead` gives.
+  final String Function(int week)? noteFor;
 
   /// A tool rendered IN PLACE, above this group's sections.
   ///
@@ -795,6 +870,45 @@ class PvDoorPage {
       [for (final s in sections) if (s.group == groupId) s];
 }
 
+// -----------------------------------------------------------------------------
+//  A tile that opens another tab of the same door
+// -----------------------------------------------------------------------------
+
+/// Prefix of a surface id that means "switch this door to the tab named after
+/// it" rather than "push a screen".
+///
+/// ⚠️ A LAUNCHER, WHICH IS WHAT GARBH SANSKAR'S TODAY TAB IS. The brief:
+/// *"Today only opens the tabs below, it does not repeat their libraries."* A
+/// card reading "Shravan, today's raga" switches the door to Listen, whose
+/// first rail is today's pick. Pushing a second copy of Listen on top of the
+/// door would leave her two levels deep inside one page.
+///
+/// The screen intercepts these before the router sees them; the router
+/// resolves them as true so the wiring tests hold, and never builds a screen.
+const String kPvDoorTabSurface = 'door/tab/';
+
+/// The surface id that opens [groupId] of the same door.
+String pvDoorTabSurface(String groupId) => '$kPvDoorTabSurface$groupId';
+
+/// The group a tile switches to, or null when it pushes a screen.
+String? pvDoorTabTarget(PvDoorTile tile) {
+  final id = switch (tile) {
+    PvDoorToolTile(:final surfaceId) => surfaceId,
+    PvDoorChecklistTile(:final surfaceId) => surfaceId,
+    PvDoorTalkTile(:final surfaceId) => surfaceId,
+    PvDoorGameTile(:final surfaceId) => surfaceId,
+    PvDoorReadTile(:final surfaceId) => surfaceId,
+    PvDoorAudioTile(:final surfaceId) => surfaceId,
+    PvDoorEntryTile() ||
+    PvDoorVideoTile() ||
+    PvDoorGuideTile() ||
+    PvDoorMythTile() =>
+      null,
+  };
+  if (id == null || !id.startsWith(kPvDoorTabSurface)) return null;
+  return id.substring(kPvDoorTabSurface.length);
+}
+
 // =============================================================================
 //  The registry
 // -----------------------------------------------------------------------------
@@ -820,6 +934,7 @@ final List<PvDoorPage> kPvDoorPages = [
   kBellySkinDoor,
   kLabourDoor,
   kMindDoor,
+  kGarbhDoor,
 ];
 
 /// The door for a bracket, or null when that bracket still opens a hub.

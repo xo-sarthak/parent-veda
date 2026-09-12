@@ -41,7 +41,10 @@ import '../data/garbh_rebuild_data.dart';
 import '../localization/app_language.dart';
 import '../services/raga_audio_store.dart';
 import '../theme/pv_fonts.dart';
+import 'doors/pv_door_chrome.dart'
+    show PvDoorRailCard, kPvRailCardHeight, kPvRailGap;
 import 'garbh_invite_screen.dart';
+import 'v2/v2_palette.dart';
 
 const _ink = Color(0xFF201C24); // V3 ink1
 const _muted = Color(0xFF6F6878); // V3 ink3
@@ -49,7 +52,16 @@ const _ground = Color(0xFFF5F3F6); // V3 ground
 const _accent = Color(0xFFB98A7E); // Samvad's warm rose - this is her voice
 
 class GarbhJournalScreen extends StatelessWidget {
-  const GarbhJournalScreen({super.key});
+  const GarbhJournalScreen({super.key, this.embedded = false});
+
+  /// ⚠️ TRUE WHEN THE GARBH SANSKAR DOOR RENDERS THIS IN PLACE. The door's
+  /// My Journal tab IS the journal — "tool screen, not a rail" — so this
+  /// returns the same content as a `Column` with no scaffold, no app bar and
+  /// no trailing note (the door's tab note carries that line). The two
+  /// actions, write a letter and invite someone, become rail cards in the
+  /// door's card language, for the reason the reports locker's "Add a report"
+  /// did: an action inside an embedded tool is still a card.
+  final bool embedded;
 
   @override
   Widget build(BuildContext context) {
@@ -58,6 +70,8 @@ class GarbhJournalScreen extends StatelessWidget {
       animation: store,
       builder: (context, _) {
         final byWeek = store.byWeek;
+
+        if (embedded) return _embeddedBody(context, store, byWeek);
 
         return Scaffold(
           backgroundColor: _ground,
@@ -241,6 +255,97 @@ class GarbhJournalScreen extends StatelessWidget {
       },
     );
   }
+}
+
+/// The journal as the door draws it: header, the album by week, then the two
+/// actions as a rail. See [GarbhJournalScreen.embedded].
+Widget _embeddedBody(BuildContext context, GarbhJournalStore store,
+    Map<int, List<GarbhJournalEntry>> byWeek) {
+  final p = V2PaletteStore.instance.current;
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      _Header(store: store),
+      const SizedBox(height: 24),
+      if (byWeek.isEmpty)
+        _EmptyAlbum()
+      else
+        for (final entry in byWeek.entries) ...[
+          _WeekHeading(week: entry.key, count: entry.value.length),
+          const SizedBox(height: 10),
+          for (final e in entry.value) ...[
+            _EntryRow(entry: e),
+            const SizedBox(height: 8),
+          ],
+          const SizedBox(height: 22),
+        ],
+      const SizedBox(height: 8),
+      // ⚠️ A RAIL, NOT A LISTVIEW. The symmetry test counts horizontal
+      // ListViews per SECTION, and this tab has none — it is a tool tab. A
+      // scroll view holding two cards keeps the card language without
+      // registering as a section.
+      SizedBox(
+        height: kPvRailCardHeight,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: Row(children: [
+            PvDoorRailCard(
+              p: p,
+              hue: 42,
+              icon: Icons.edit_note_rounded,
+              chip: 'Tool',
+              title: 'Write a letter to your baby',
+              index: 0,
+              onTap: () => _writeLetter(context),
+            ),
+            const SizedBox(width: kPvRailGap),
+            PvDoorRailCard(
+              p: p,
+              hue: 42,
+              icon: Icons.group_add_outlined,
+              chip: 'Tool',
+              title: 'Invite someone to record',
+              meta: 'PAPA, DADI, NANI',
+              index: 1,
+              onTap: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  settings: const RouteSettings(name: 'garbh/invite'),
+                  builder: (_) => const GarbhInviteScreen(),
+                ),
+              ),
+            ),
+          ]),
+        ),
+      ),
+    ],
+  );
+}
+
+/// The day-one empty state, shared by the screen and the embedded body.
+class _EmptyAlbum extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.fromLTRB(18, 20, 18, 20),
+        decoration: BoxDecoration(
+          color: _accent.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('Nothing here yet, and that is only today.',
+              style: pvFraunces(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
+                  height: 1.3,
+                  color: _ink)),
+          const SizedBox(height: 10),
+          Text(
+              'Every time you read something aloud, every raga you play, and '
+              'every message your family records lands here, filed under the '
+              'week it happened. By the time your baby arrives this is months '
+              'of your voice, kept.',
+              style: pvManrope(fontSize: 13.5, height: 1.6, color: _ink)),
+        ]),
+      );
 }
 
 /// A letter, written into the album under the current week.

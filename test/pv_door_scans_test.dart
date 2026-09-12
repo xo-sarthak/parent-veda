@@ -203,9 +203,14 @@ void main() {
             PvDoorChecklistTile(:final surfaceId) => surfaceId,
             PvDoorTalkTile(:final surfaceId) => surfaceId,
             PvDoorReadTile(:final surfaceId) => surfaceId,
+            PvDoorAudioTile(:final surfaceId) => surfaceId,
+            PvDoorGameTile(:final surfaceId) => surfaceId,
             _ => null,
           };
           if (id == null) continue;
+          // A tile that switches tab builds no screen by design — the door
+          // screen intercepts it. `pv_door_garbh_test` checks the tab exists.
+          if (pvDoorTabTarget(t) != null) continue;
           expect(pvDoorScreenFor(id, c), isNotNull,
               reason: '"$id" is on the resolves list and builds no screen.');
         }
