@@ -9,6 +9,8 @@
 //  whole and in her voice, and no score anywhere.
 // =============================================================================
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/data/doors/pv_door_data.dart';
@@ -244,6 +246,15 @@ void main() {
       expect(w, isA<PvDoorScreen>());
       expect((w as PvDoorScreen).page.bracketId, 'pregnancy_garbh');
     });
+  });
+
+  test('the journal store is loaded at startup — the phone found it was not',
+      () {
+    // `GarbhJournalStore.init()` existed and nothing called it, so rituals,
+    // the japa count and every recording saved and never loaded. A source
+    // check, because no widget test starts the app.
+    final main = File('lib/main.dart').readAsStringSync();
+    expect(main, contains('GarbhJournalStore.instance.init()'));
   });
 
   group('on a phone', () {

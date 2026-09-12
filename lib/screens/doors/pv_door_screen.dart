@@ -148,7 +148,20 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
     final i = page.groups.indexWhere((g) => g.id == target);
     if (i < 0) return; // held by the door's own test, never seen by a user
     setState(() => _group = i);
+    // ⚠️ AND BRING THE SELECTOR INTO VIEW. Found on the phone, 2026-09-12:
+    // the card she tapped sits a screen below the selector, so a switch
+    // with no scroll changed the content under her thumb and nothing she
+    // could see said which tab she was now on. The selector at the top of
+    // the screen is what says it — the same thing she sees when she picks
+    // a tab herself.
+    final ctx = _selectorAnchor.currentContext;
+    if (ctx != null) {
+      Scrollable.ensureVisible(ctx,
+          alignment: 0, duration: const Duration(milliseconds: 320));
+    }
   }
+
+  final GlobalKey _selectorAnchor = GlobalKey();
 
   /// The second line on a tab's card. Counted, never typed.
   ///
@@ -223,7 +236,8 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                   bracket: bracket,
                 ),
                 PvDoorSheet(p: p, children: [
-                  const SizedBox(height: 22),
+                  // ⚠️ THE ANCHOR A LAUNCHER CARD SCROLLS TO. See `_openTile`.
+                  SizedBox(key: _selectorAnchor, height: 22),
 
                   // ---- the selector, first thing under the hero ----------
                   PvDoorCarousel(

@@ -194,8 +194,9 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
       label: 'Listen',
       icon: Icons.headphones_outlined,
       hue: 42,
-      note: 'Shravan, listening. Her calm and a shared moment — nothing here '
-          'is a benefit to the baby, and nothing says it is.',
+      // Spoken TO her — "your calm", not "her calm". Read back on the phone.
+      note: 'Shravan, listening. Your calm, and a moment you share — nothing '
+          'here claims to be good for the baby, and nothing says it is.',
     ),
 
     // -------------------------------------------------------------------------

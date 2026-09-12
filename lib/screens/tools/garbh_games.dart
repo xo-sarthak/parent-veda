@@ -536,8 +536,13 @@ class _SudokuGameState extends State<SudokuGame> {
             ),
           ),
           // 1–4 pad + clear.
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 28),
+          //
+          // ⚠️ FIVE 56dp KEYS PLUS PADDING OVERFLOWED BY 26px ON A 360dp
+          // PHONE (seen 2026-09-12). A scroll view lets the row keep its key
+          // size on a narrow screen and centres it on a wide one.
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 18),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

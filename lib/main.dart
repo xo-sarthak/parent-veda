@@ -61,6 +61,7 @@ import 'services/cart_store.dart';
 import 'services/community_store.dart';
 import 'services/expert_follow_store.dart';
 import 'services/daily_store.dart';
+import 'data/garbh_rebuild_data.dart' show GarbhJournalStore;
 import 'services/garbh_store.dart';
 import 'services/product_store.dart';
 import 'services/read_next_store.dart';
@@ -201,6 +202,12 @@ class _ParentVedaAppState extends State<ParentVedaApp>
     CanIStore.instance.init();
     // Load Garbh Sanskar Journey persistence (favorites, reflective tally).
     GarbhStore.instance.init();
+    // ⚠️ AND THE JOURNAL STORE — her rituals, the japa count and every
+    // recording. Found on the phone 2026-09-12: `init()` existed and nothing
+    // called it, so the album saved and never loaded, and the first toggle
+    // after a restart overwrote the saved set with one item. Every screen
+    // that reads this store assumed somebody else had loaded it.
+    GarbhJournalStore.instance.init();
     // Load Community persistence (joins, likes, saves, votes, posts).
     CommunityStore.instance.init();
     // Load followed experts (Twitter-style following, experts only).

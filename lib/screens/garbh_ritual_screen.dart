@@ -239,6 +239,7 @@ class _RitualRow extends StatelessWidget {
                                   color: _muted)),
                         ]),
                   ),
+                  if (ritual.hasCounter && !on) const SizedBox(width: 10),
                   if (ritual.hasCounter && !on)
                     // Before she picks it, the row says what SHAPE it is, so
                     // the counter is not a surprise. After she picks it, the

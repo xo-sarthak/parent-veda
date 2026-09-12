@@ -22,6 +22,7 @@ import 'father/father_journal_screen.dart';
 // removed from Tools. Kept commented for revert.
 // import 'father/father_stories_screen.dart';
 import 'garbh_screen.dart';
+import '../services/surface_router.dart' show screenForSurface;
 import 'journal_screen.dart';
 import 'journey_map_screen.dart';
 import 'read_next_screen.dart';
@@ -81,8 +82,16 @@ class ToolsHubScreen extends StatelessWidget {
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => b()));
 
     final tools = <_Tool>[
+      // ⚠️ THE DOOR, NOT THE LIBRARY — 2026-09-12. Found on the phone: this
+      // tile still opened `GarbhScreen`, the "pick a pillar" menu the door
+      // replaced, so the area had two front doors and the older one was the
+      // one the Tools tab showed. Same screen as the home tile now; the
+      // library stays in the file for revert.
       _Tool(s.garbhToolTitle, Icons.spa_rounded, const Color(0xFFBE9C4E),
-          () => open(() => GarbhScreen(controller: controller)), priority: PregPriority.anxiety),
+          () => open(() =>
+              screenForSurface('garbh_daily', controller, controller.language) ??
+              GarbhScreen(controller: controller)),
+          priority: PregPriority.anxiety),
       _Tool(s.sprToolTitle, Icons.auto_stories_rounded, const Color(0xFF9A7BB5),
           () => open(() => SpiritualReadingScreen(controller: controller)), priority: PregPriority.anxiety),
       _Tool(s.babyMovementTracker, Icons.favorite_rounded,

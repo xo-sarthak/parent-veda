@@ -5732,7 +5732,7 @@ STOP and list it."* Three `[new]` cards have no copy in section 3:
 And one deliberate deviation: **no Ask Veda card on Talk**, same as Scans —
 the FAB is on every screen with the door's context.
 
-### 40.3 Not walked on a phone
+### 40.3 ~~Not walked on a phone~~ — walked 2026-09-12, see §42.4
 
 The other terminal held the device for this build. Every tab draws in the
 render test at 360dp, the four new screens pump without exception (one
@@ -5742,7 +5742,7 @@ walk**, the same as every other door got, before this one is called done.
 
 ### 40.4 Still owed
 
-* The handset walk (§40.3).
+* ~~The handset walk (§40.3).~~ Done; findings and fixes at §42.4.
 * "Tell your doctor" copy (§40.2).
 * Clinical review of the seventeen new/rebuilt reads and the red flag — the
   brief names a reviewer and a date, but nobody here has read them.
@@ -5899,10 +5899,38 @@ screen. That is the pillars job, and it is in `docs/DOOR-CONTENT-OWED.md` §7.
 * **Games opened from the rail do not mark the day done** (`markComplete:
   false`) — the door keeps no score.
 
-### 42.4 Still owed
+### 42.4 Walked on the phone — 2026-09-12, and what it found
 
-* **The handset walk.** Today's tab-switch, the ritual rail growing as she
-  picks, the embedded journal, and whether the hero crop reads well.
+Both owed walks done on the S21 FE: Garbh Sanskar and Mind & mood.
+
+* **A saved album that never loaded.** `GarbhJournalStore.init()` existed
+  and nothing called it. Her rituals, the japa count and every recording
+  were written to prefs and never read back after a restart — and because
+  the store's set was empty until loaded, the first toggle after a restart
+  overwrote the saved set with one item. Found because the ritual rail
+  showed no Japa after a reinstall. Wired in `main.dart` beside the sibling
+  stores; a source test pins it. This was live before the door.
+* **A launcher tap changed the content under her thumb and nothing said
+  which tab she was on.** The Today card sits a screen below the selector.
+  `_openTile` now scrolls the selector into view on a switch.
+* **The Tools tab still opened the old pillar menu.** `tools_hub_screen`'s
+  Garbh tile pushed `GarbhScreen` — the "pick a pillar" library the door
+  replaced — so the area had two front doors. It opens the door now.
+* **Sudoku's keypad overflowed by 26px** at this width. Horizontal scroll.
+* **The ritual picker's COUNTER badge touched the Japa blurb.** A gap.
+* **Mind & mood's hard-day reset printed its title twice** (scaffold and
+  intro heading) and showed "That is it. Nothing to log..." under the Start
+  button before she had started. The intro has no heading now, and the close
+  line is the last step's body only.
+* **Tele-MANAS's toll-free number** now reads 1800-891-4416 on the button;
+  the dial string is the untouched constant.
+* Listen's tab note said "her calm" — third person on a screen spoken to
+  her. Fixed.
+
+Seen and left: the global Ask Veda FAB sits over the right end of any
+full-width primary button (the reset's Start, Next) — app-wide, not a door
+thing. The Shravan player's honest "sample plays here" line and its emoji
+illustration are the pillars brief's.
 * **The four pillars to final** — the second brief. Order agreed with the
   user: Kriya, Buddhi, Samvad, Shravan last. Audio hosting decided:
   **Cloudflare R2** (zero egress; `NarrationService` already anticipates

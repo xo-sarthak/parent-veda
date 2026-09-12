@@ -73,7 +73,9 @@ class _MmHardDayResetScreenState extends State<MmHardDayResetScreen>
     final String heading;
     final String body;
     if (_at < 0) {
-      heading = 'A hard-day reset';
+      // ⚠️ NO HEADING ON THE INTRO. The scaffold's title is the same words
+      // a line above; seen on the phone as the title printed twice.
+      heading = '';
       body = kMmHardDayIntro;
     } else if (_at < kMmHardDaySteps.length) {
       heading = kMmHardDaySteps[_at].title;
@@ -137,14 +139,16 @@ class _MmHardDayResetScreenState extends State<MmHardDayResetScreen>
                         letterSpacing: 1.2,
                         color: p.ink3)),
               if (_at >= 0 && !last) const SizedBox(height: 8),
-              Text(heading,
-                  style: pvFraunces(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w600,
-                      height: 1.15,
-                      letterSpacing: -0.5,
-                      color: p.ink1)),
-              const SizedBox(height: 10),
+              if (heading.isNotEmpty) ...[
+                Text(heading,
+                    style: pvFraunces(
+                        fontSize: 24,
+                        fontWeight: FontWeight.w600,
+                        height: 1.15,
+                        letterSpacing: -0.5,
+                        color: p.ink1)),
+                const SizedBox(height: 10),
+              ],
               Text(body,
                   style: pvManrope(fontSize: 15, height: 1.6, color: p.ink1)),
             ],
@@ -175,15 +179,17 @@ class _MmHardDayResetScreenState extends State<MmHardDayResetScreen>
             ),
           ),
         ])),
-        // ⚠️ THE CLOSE IS ALSO THE DISCLAIMER. "Nothing to log. Come back
-        // whenever a day gets heavy." — the brief's own words, and no legal
-        // sentence under a screen whose whole point is that nothing is
-        // measured. Not drawn on the last step, where it is the body.
-        if (!last) ...[
-          const SizedBox(height: 22),
-          pvDoorPad(Text(kMmHardDayClose,
-              style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink3))),
-        ],
+        // ⚠️ NO FOOT BEFORE THE END. The close line ("That is it. Nothing to
+        // log...") used to sit under every step as a stand-in disclaimer,
+        // and on the phone it read as the screen ending before she had
+        // started. It is the last step's body, and only that. There is no
+        // legal sentence on this screen at all — nothing here is measured.
+        // (Kept for revert.)
+        // if (!last) ...[
+        //   const SizedBox(height: 22),
+        //   pvDoorPad(Text(kMmHardDayClose,
+        //       style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink3))),
+        // ],
       ],
     );
   }
@@ -347,7 +353,13 @@ class _NumberCard extends StatelessWidget {
           _Pill(p: p, label: 'Call $number', strong: true, onTap: () => onCall(number)),
           if (alt case final a?) ...[
             const SizedBox(height: 8),
-            _Pill(p: p, label: 'Or $a', strong: false, onTap: () => onCall(a)),
+            // Grouped for reading — 1800-891-4416 — while the dial string
+            // stays the constant, unformatted.
+            _Pill(
+                p: p,
+                label: 'Or ${_grouped(a)}',
+                strong: false,
+                onTap: () => onCall(a)),
           ],
         ]),
       );
@@ -471,4 +483,13 @@ class _Pill extends StatelessWidget {
                   color: strong ? p.ink1 : p.ink2)),
         ),
       );
+}
+
+/// An Indian toll-free number as people read it: 1800-891-4416. Anything
+/// that is not eleven digits starting 1800 is returned untouched.
+String _grouped(String n) {
+  if (n.length == 11 && n.startsWith('1800')) {
+    return '${n.substring(0, 4)}-${n.substring(4, 7)}-${n.substring(7)}';
+  }
+  return n;
 }
