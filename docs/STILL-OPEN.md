@@ -6024,3 +6024,53 @@ smarter / cleverer / brain / develop / healthier and the like.
   SHARED block asks for it; `RagaAudioStore` deliberately does not, and its
   header says why. Shravan's turn.
 * Three pillars left: Buddhi, Samvad, Shravan.
+
+---
+
+## 44.0 Buddhi to final — four games that are games — 2026-09-12
+
+Second of the four Garbh Sanskar pillars. Not walked on a phone — the
+other terminal holds it.
+
+### 44.1 What each one was, and is
+
+| Game | Was | Is |
+|---|---|---|
+| Word Search | 9×9, an 8-word pool, tap two ends, across/down | 10×10, a 40-word calm pool, drag or tap-tap, across/down/diagonal, new grid every open |
+| Sudoku | 4×4, three hand-typed boards | 9×9 easy by default, a gentle 6×6, generator with a uniqueness check, conflicts, pencil notes, Check, Hint, no timer |
+| Logic Puzzle | four multiple-choice questions | a nonogram (picross): ten hand-drawn 5×5/6×6 pictures, fill/cross modes, completed clues dim, Hint |
+| Memory Match | 8 emoji pairs | 8 pairs of line icons, moves counted quietly |
+
+**Custom, not a package**, all four — stated as the brief asks. A Sudoku
+generator with a uniqueness check is ~120 lines of pure Dart in
+`games/sudoku_engine.dart`, tested without a widget; a package would bring
+its own difficulty ladder and no 6×6. The nonogram is smaller.
+
+**None feeds My Journal.** `test/garbh_games_engine_test.dart` greps the
+four files for the journal store's name. Finishing may mark the pillar done
+for today (`markComplete`), which the door passes as false.
+
+### 44.2 Calls made
+
+* **Every generated Sudoku has exactly one solution** (cells are removed
+  only while the solver still finds one). That is what makes Hint the
+  truth for a cell and Check honest. Completion is still "full and
+  conflict-free", not equality with the stored answer.
+* **Nonogram pictures are hand-drawn, not generated.** Random grids make
+  valid puzzles but not satisfying ones. Solved means the clues are met;
+  the picture's name is shown only on finish, because before then it is the
+  answer.
+* **The games moved onto V3's neutrals with Buddhi's indigo.** They still
+  wore Garbh's pre-V3 cream and Vichara's green — the one Garbh surface
+  that never migrated. The shared chrome is `games/game_chrome.dart`.
+* **The old 4×4 and the quiz** are at the foot of `garbh_games.dart`,
+  commented, kept for revert; `SudokuGame` and `LogicGame` keep their names
+  so `gameForPuzzle` did not change.
+* **Sudoku's keypad scrolls** — ten keys do not fit 360dp (the 4×4's five
+  already overflowed; §42.4).
+
+### 44.3 Still owed
+
+* **The handset walk** — drag selection in Word Search, the 9×9 at phone
+  width (cell size, pencil marks legible), the nonogram's clue gutter.
+* Two pillars left: Samvad, Shravan.

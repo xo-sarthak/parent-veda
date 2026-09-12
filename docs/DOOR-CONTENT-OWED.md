@@ -126,8 +126,8 @@ when its pillar is built to final (the pillars brief, pillar by pillar).
 | G6 | Stories and fables, 6–8 | Read library | Talk and read · "More to read aloud" | Built | Check the shelf against the pillars brief: public-domain (Panchatantra, Aesop) or original, each readable aloud in a few minutes. Top up if short. |
 | G7 | Mantras and lullabies | Read + Audio library | Talk and read · "More to read aloud" | Built, partly | Each needs text, a simple transliteration and a one-line meaning; plus two or three original lullabies. No copyrighted lyrics. Audio side is G1's manifest. |
 | G8 | Spiritual reading, by tradition | Read library | Talk and read · "More to read aloud" | Built | Eight traditions exist. Verify every passage is a public-domain translation; default to none selected. |
-| G9 | Sudoku | Game | For you · "A few quiet minutes" | Built, placeholder inside | A 4×4 with three fixed boards. Brief: 9×9 easy default and a gentle 6×6, generator, validator, pencil notes, check, hint, no timer. |
-| G10 | Logic Puzzle | Game | For you · "A few quiet minutes" | Built | Check against the brief: a light nonogram or a small deduction grid, hints allowed. |
+| ~~G9~~ | ~~Sudoku~~ | Game | For you · "A few quiet minutes" | **Built to final** (Buddhi, 2026-09-12) | 9×9 easy / 6×6 gentle, unique-solution generator, pencil, Check, Hint. STILL-OPEN §44. |
+| ~~G10~~ | ~~Logic Puzzle~~ | Game | For you · "A few quiet minutes" | **Built to final** (Buddhi, 2026-09-12) | A nonogram, ten hand-drawn pictures, hints. Was a four-question quiz. STILL-OPEN §44. |
 | ~~G11~~ | ~~Guided Relaxation~~ | Guided audio · 8 min | For you · "Breath and relaxation" | **Built to final** (Kriya, 2026-09-12) | `GarbhRelaxationScreen` + `kKriyaRelaxation`: 13-step script, TTS via `KriyaNarrator`, figure highlight, optional Shravan raga. Still owed for the recording only: thirteen manifest entries under `kriya.relax.<step>` — no code. STILL-OPEN §43.2. |
 | ~~G12~~ | ~~Breathing practices~~ | Tool | For you · "Breath and relaxation" | **Built to final** (Kriya, 2026-09-12) | One `PvBreathingCircle` behind Garbh, Mind & mood and TTC; each area converts its model with `toBreathPattern()`. STILL-OPEN §43.1. |
 
@@ -167,7 +167,7 @@ two.
 | Belly & skin | 0 | – | – | – | – |
 | Labour prep | 6 | 6 | – | – | – |
 | Mind & mood | 6 | 4 (M1, M4–M6) | 1 | 1 | – |
-| Garbh Sanskar | 12 | – | – | – | – (10 built-with-placeholder open; G11, G12 closed by Kriya) |
+| Garbh Sanskar | 12 | – | – | – | – (8 open; G9–G12 closed by Kriya and Buddhi) |
 | Feeding (parenting) | 4 | 2 | – | 2 | 1 (allergen tracker persistence) |
 
 Pregnancy, six doors: written pieces owed, in prose — **S1, L3, L4, L5, L6,
