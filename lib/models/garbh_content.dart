@@ -14,6 +14,7 @@
 
 import 'package:flutter/material.dart';
 import '../localization/app_language.dart';
+import 'breath_pattern.dart';
 
 /// Shravan sub-kinds (just for the small label/icon).
 enum GarbhKind { raga, nature, guided }
@@ -85,6 +86,30 @@ class BreathPhase {
   final LocalizedText label; // "Breathe in", "Hold", "Breathe out", "Rest"
   final int seconds;
   final double scale;
+}
+
+/// The practice's phases as the shared circle reads them.
+///
+/// ⚠️ THE KIND IS INFERRED FROM THE SCALE SEQUENCE, so the data files do not
+/// change: a phase whose scale is larger than the one before it is an
+/// in-breath, smaller is an out-breath, the same is a hold — large or empty.
+/// `.now` on the label because the label is DISPLAY, the word on the screen
+/// in her language; nothing keys on it.
+extension GarbhPracticeBreath on GarbhPractice {
+  BreathPattern toBreathPattern() {
+    final steps = <BreathStep>[];
+    var prev = phases.last.scale;
+    for (final ph in phases) {
+      final kind = ph.scale > prev
+          ? BreathKind.expand
+          : ph.scale < prev
+              ? BreathKind.contract
+              : (ph.scale >= 0.75 ? BreathKind.hold : BreathKind.holdEmpty);
+      steps.add(BreathStep(ph.label.now, ph.seconds, kind));
+      prev = ph.scale;
+    }
+    return BreathPattern(steps);
+  }
 }
 
 @immutable

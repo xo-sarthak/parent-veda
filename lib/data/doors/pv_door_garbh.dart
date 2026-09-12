@@ -420,7 +420,8 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
       tiles: [
         PvDoorToolTile(
           title: 'Guided Relaxation',
-          blurb: 'Release tension, head to toe.',
+          blurb: 'A voice walks you down your body, head to toe, with a raga '
+              'underneath if you like.',
           meta: '8 MIN',
           surfaceId: kGarbhSurfaceRelax,
         ),

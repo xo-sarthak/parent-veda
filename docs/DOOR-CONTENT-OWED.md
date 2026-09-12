@@ -128,8 +128,8 @@ when its pillar is built to final (the pillars brief, pillar by pillar).
 | G8 | Spiritual reading, by tradition | Read library | Talk and read · "More to read aloud" | Built | Eight traditions exist. Verify every passage is a public-domain translation; default to none selected. |
 | G9 | Sudoku | Game | For you · "A few quiet minutes" | Built, placeholder inside | A 4×4 with three fixed boards. Brief: 9×9 easy default and a gentle 6×6, generator, validator, pencil notes, check, hint, no timer. |
 | G10 | Logic Puzzle | Game | For you · "A few quiet minutes" | Built | Check against the brief: a light nonogram or a small deduction grid, hints allowed. |
-| G11 | Guided Relaxation | Guided audio · 8 min | For you · "Breath and relaxation" | Built, placeholder inside | Today a breathing pattern named `relax`. Brief: a written head-to-toe progressive-relaxation script, narrated by TTS synced to a timer and a calm visual, optional background audio from Shravan, the current body part highlighted on an outline figure. Data-driven so a recorded voice replaces TTS with no code change. |
-| G12 | Breathing practices | Tool | For you · "Breath and relaxation" | Built, twice | `_BreathingScreen` (garbh) and `MmBreathingScreen` (Mind & mood) are two circles. Brief: one shared component, configured per practice (4-in 6-out; box 4-4-4-4), reused by Mind & mood and the TTC mind-body practice. |
+| ~~G11~~ | ~~Guided Relaxation~~ | Guided audio · 8 min | For you · "Breath and relaxation" | **Built to final** (Kriya, 2026-09-12) | `GarbhRelaxationScreen` + `kKriyaRelaxation`: 13-step script, TTS via `KriyaNarrator`, figure highlight, optional Shravan raga. Still owed for the recording only: thirteen manifest entries under `kriya.relax.<step>` — no code. STILL-OPEN §43.2. |
+| ~~G12~~ | ~~Breathing practices~~ | Tool | For you · "Breath and relaxation" | **Built to final** (Kriya, 2026-09-12) | One `PvBreathingCircle` behind Garbh, Mind & mood and TTC; each area converts its model with `toBreathPattern()`. STILL-OPEN §43.1. |
 
 Not owed: the affirmation rail's six pieces, the recording flow, the ritual
 picker, Word Search and Memory Match, the journal and the invite flow — all
@@ -167,7 +167,7 @@ two.
 | Belly & skin | 0 | – | – | – | – |
 | Labour prep | 6 | 6 | – | – | – |
 | Mind & mood | 6 | 4 (M1, M4–M6) | 1 | 1 | – |
-| Garbh Sanskar | 12 | – | – | – | – (12 built-with-placeholder, the pillars brief) |
+| Garbh Sanskar | 12 | – | – | – | – (10 built-with-placeholder open; G11, G12 closed by Kriya) |
 | Feeding (parenting) | 4 | 2 | – | 2 | 1 (allergen tracker persistence) |
 
 Pregnancy, six doors: written pieces owed, in prose — **S1, L3, L4, L5, L6,

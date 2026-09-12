@@ -5938,3 +5938,89 @@ illustration are the pillars brief's.
   in `docs/DOOR-CONTENT-OWED.md` §7, one per job.
 * **All eight pregnancy briefs are now built.** The reminder at §38.5 — one
   format for articles and reads — is due.
+
+---
+
+## 43.0 Kriya to final — one breathing circle, and a relaxation that is a session — 2026-09-12
+
+First of the four Garbh Sanskar pillars, from
+`ParentVeda_Garbh_Sanskar_pillars_build.pdf`. Not walked on a phone — the
+other terminal holds it.
+
+### 43.1 Three circles became one
+
+The brief: *"build the breathing as ONE reusable component... the SAME
+component the Mind & body preconception practice uses."* There were three:
+Garbh's `_BreathingScreen` (an AnimationController per phase, looping until
+Finish), Mind & mood's `MmBreathingScreen` (an async phase loop with a chosen
+duration) and TTC's `_Breath` (a stopwatch, a ring, a square for box
+breathing, a nostril side). Each correct; each a different breath.
+
+**`PvBreathingCircle` (`lib/widgets/breathing_circle.dart`) is stateless and
+clock-driven:** a `BreathPattern` and elapsed seconds in, the shape, the
+word and the count out. That is what made it shareable — each screen keeps
+its own session (loop until Finish; run for the chosen length; a stopwatch
+and a progress ring) and hands the circle the seconds. A widget that owned a
+clock would own the one thing the three screens do differently.
+
+**The three area models stay** (`BreathPhase`, `MmBreathPhase`,
+`TtcBreathAnim`) and each converts in one `toBreathPattern()`; renaming a
+model across three stages for a widget's convenience is the diff that loses
+a Hindi label. `test/breath_pattern_test.dart` holds each conversion.
+
+Two visible changes, both deliberate: **the count counts up** everywhere
+("one, two, three, four" — Garbh used to count down), and **Garbh's box
+breathing is a square** now, as TTC's always was.
+
+TTC's stick figure (`_FigurePainter`) moved with it, to
+`lib/widgets/figure_highlight.dart`, because the relaxation lights the same
+figure.
+
+### 43.2 Guided Relaxation is a session
+
+`GarbhRelaxationScreen` walks `kKriyaRelaxation`: thirteen steps, 480
+seconds, head to toe, the current part lit on the figure, the script printed
+under each heading and spoken through `KriyaNarrator`. Pause stops the voice
+and resume re-speaks the step from its first word (TTS engines do not resume
+mid-sentence); the clock is tick-accumulated so a pause is ticks that do not
+add, and so the widget test drives the whole eight minutes with `pump`.
+A raga underneath is optional and is Shravan's — `kShravan` through
+`RagaAudioStore`, the single player — so today it is the drone, and the day
+Shravan gets real files this gets them.
+
+**The narrator:** a file when the narration manifest lists one under the
+step's key, the device's TTS when not — `NarrationService`'s own pattern.
+Its own `FlutterTts` rather than `BabyVoiceService`, because that one is
+pitched 1.8 for the "your baby says" cards. **The manifest keys, for the
+recording:** `kriya.relax.settle`, `.face`, `.jaw`, `.neck`, `.arms`,
+`.chest`, `.belly`, `.back`, `.thighs`, `.calves`, `.feet`, `.whole`,
+`.return`. Thirteen entries in `assets/narration/manifest_hi.json` and the
+TTS is never used again.
+
+**The script is original and claims nothing.** The belly step says the baby
+is there and this rest is hers — and stops. The test greps every step for
+smarter / cleverer / brain / develop / healthier and the like.
+
+### 43.3 Boundaries kept
+
+* Mind & mood **links** to the relaxation (one card on Feel → Breathe,
+  `kGarbhSurfaceRelax`) and does not rebuild it; the test proves nothing on
+  that door is titled relaxation.
+* STOP IF and the safety note are on the relaxation's intro, above Begin;
+  the flag is `KriyaStopIfCard`, the same widget the Kriya screen draws.
+* No yoga pose is referenced, so nothing links to Yoga & fitness.
+* Nothing celebrates at the end. The close is the data's line.
+
+### 43.4 Still owed
+
+* **The handset walk** — the shared circle on all three screens (Garbh,
+  Mind & mood, TTC), the relaxation's voice at the chosen rate, the raga
+  underneath, the figure.
+* **A recorded voice** for the thirteen steps (manifest entries, no code).
+* **A drawn figure** (`KriyaRelaxation.figureAsset`; a Rive/Lottie player is
+  added to `PvFigureHighlight` the day a file exists — no player package for
+  a file nobody has drawn).
+* **Background playback that survives a locked screen** for the raga — the
+  SHARED block asks for it; `RagaAudioStore` deliberately does not, and its
+  header says why. Shravan's turn.
+* Three pillars left: Buddhi, Samvad, Shravan.

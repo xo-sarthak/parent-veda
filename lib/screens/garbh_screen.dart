@@ -24,6 +24,8 @@ import '../services/read_to_baby_store.dart';
 import '../services/samvad_pool.dart';
 import '../theme/app_theme.dart';
 import '../widgets/cards/raga_player.dart';
+import '../models/breath_pattern.dart';
+import '../widgets/breathing_circle.dart';
 // TalkComposerScreen parked - the Samvad record/write composer was removed when
 // "Read to your baby" folded into Samvad. Kept commented for revert.
 // import 'home_detail_screens.dart' show TalkComposerScreen;
@@ -32,6 +34,7 @@ import 'tools/garbh_games.dart';
 import '../theme/pv_fonts.dart';
 import '../data/garbh_rebuild_data.dart';
 import 'garbh_buddhi_screen.dart';
+import 'garbh_relaxation_screen.dart';
 
 // --- warm palette ---
 // =============================================================================
@@ -1889,7 +1892,9 @@ class KriyaScreen extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(18, 10, 18, 28),
         children:
             _kriyaPracticeBody(context, s, text, t, practice, lang,
-                daily: true, week: controller.currentWeek),
+                daily: true,
+                week: controller.currentWeek,
+                controller: controller),
       ),
     );
   }
@@ -1902,8 +1907,11 @@ class KriyaScreen extends StatelessWidget {
 /// feels wrong quite often and she has no way to tell which wrong this is.
 /// Naming the specific things removes the judgement call from someone who is
 /// mid-exercise and least able to make it.
-class _StopIfCard extends StatelessWidget {
-  const _StopIfCard();
+/// ⚠️ PUBLIC SINCE THE RELAXATION SCREEN, which draws the same list on its
+/// intro — one list, one widget, so the day a line changes it changes on
+/// both screens.
+class KriyaStopIfCard extends StatelessWidget {
+  const KriyaStopIfCard({super.key});
 
   static const _signs = [
     'Bleeding, or fluid leaking',
@@ -1971,7 +1979,9 @@ class _StopIfCard extends StatelessWidget {
 // breathing screen's markDone happen ONLY in daily mode.
 List<Widget> _kriyaPracticeBody(BuildContext context, S s, TextTheme text,
     int t, GarbhPractice practice, AppLanguage lang,
-    {required bool daily, required int week}) {
+    {required bool daily,
+    required int week,
+    required PregnancyController controller}) {
   return [
     if (daily) ...[
       Text(s.gsTodaysPractice,
@@ -2004,7 +2014,7 @@ List<Widget> _kriyaPracticeBody(BuildContext context, S s, TextTheme text,
     // the practice well. This is read DURING it, and it is the only content
     // on the screen that should interrupt what she is doing. Folding the two
     // together buries the symptoms that matter inside advice about posture.
-    const _StopIfCard(),
+    const KriyaStopIfCard(),
     const SizedBox(height: 16),
     SizedBox(
       width: double.infinity,
@@ -2012,8 +2022,15 @@ List<Widget> _kriyaPracticeBody(BuildContext context, S s, TextTheme text,
         style: FilledButton.styleFrom(
             backgroundColor: _accKriya,
             padding: const EdgeInsets.symmetric(vertical: 14)),
-        onPressed: () => _push(context,
-            _BreathingScreen(practice: practice, lang: lang, daily: daily)),
+        // ⚠️ `relax` IS A SESSION, NOT A BREATH — 2026-09-12. The guided
+        // relaxation has its own screen now (script, narration, figure); every
+        // other practice is a pattern on the shared circle.
+        onPressed: () => _push(
+            context,
+            practice.id == 'relax'
+                ? GarbhRelaxationScreen(pregnancy: controller, daily: daily)
+                : _BreathingScreen(
+                    practice: practice, lang: lang, daily: daily)),
         icon: const Icon(Icons.play_arrow_rounded, color: Colors.white),
         label:
             Text(s.gsStart, style: text.labelLarge?.copyWith(color: Colors.white)),
@@ -2051,7 +2068,9 @@ class KriyaDetailScreen extends StatelessWidget {
       child: ListView(
         padding: const EdgeInsets.fromLTRB(18, 12, 18, 28),
         children: _kriyaPracticeBody(context, s, text, t, practice, lang,
-            daily: false, week: controller.currentWeek),
+            daily: false,
+            week: controller.currentWeek,
+            controller: controller),
       ),
     );
   }
@@ -2224,88 +2243,33 @@ class _BreathingScreen extends StatefulWidget {
   State<_BreathingScreen> createState() => _BreathingScreenState();
 }
 
-class _BreathingScreenState extends State<_BreathingScreen>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _ctrl;
-  late Animation<double> _scale;
-  int _index = 0;
-  double _current = 0.5;
-  String _label = '';
-
-  List<BreathPhase> get _phases => widget.practice.phases;
-  BreathPhase get _phase => _phases[_index % _phases.length];
-
-  @override
-  void initState() {
-    super.initState();
-    _ctrl = AnimationController(vsync: this);
-    _ctrl.addStatusListener((st) {
-      if (st == AnimationStatus.completed && mounted) {
-        _index++;
-        _run();
-      }
-    });
-    _run();
-  }
-
-  void _run() {
-    final p = _phase;
-    _scale = Tween<double>(begin: _current, end: p.scale)
-        .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
-    _current = p.scale;
-    _label = p.label.now;
-    _ctrl
-      ..duration = Duration(seconds: p.seconds)
-      ..reset()
-      ..forward();
-    if (mounted) setState(() {});
-  }
-
-  @override
-  void dispose() {
-    _ctrl.dispose();
-    super.dispose();
-  }
+// ⚠️ THE CIRCLE IS `PvBreathingCircle` NOW — 2026-09-12, the Garbh pillars
+// brief: one breathing component, everywhere breath appears. This screen keeps
+// what was its own: it loops until she taps Finish, and marks Kriya done in
+// daily mode. The AnimationController-per-phase engine it had is below, kept
+// for revert. One visible change: the count counts UP now ("one, two, three,
+// four"), the way a person counts a breath — it used to count down.
+class _BreathingScreenState extends State<_BreathingScreen> {
+  late final BreathPattern _pattern = widget.practice.toBreathPattern();
 
   @override
   Widget build(BuildContext context) {
     final s = S(widget.lang);
-    final text = Theme.of(context).textTheme;
     return _PillarScaffold(
       title: widget.practice.title.now,
       child: Center(
         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-          AnimatedBuilder(
-            animation: _ctrl,
-            builder: (context, _) {
-              final v = _scale.value;
-              final remaining = (_phase.seconds * (1 - _ctrl.value)).ceil();
-              return Column(children: [
-                SizedBox(
-                  height: 260,
-                  width: 260,
-                  child: Center(
-                    child: Container(
-                      width: 120 + 130 * v,
-                      height: 120 + 130 * v,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: RadialGradient(colors: [
-                          _accKriya.withValues(alpha: 0.30),
-                          _accKriya.withValues(alpha: 0.10),
-                        ]),
-                      ),
-                      child: Text('$remaining',
-                          style: text.displaySmall?.copyWith(color: _ink, fontWeight: FontWeight.w300)),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 28),
-                Text(_label,
-                    style: text.headlineSmall?.copyWith(color: _ink, fontWeight: FontWeight.w700)),
-              ]);
-            },
+          PvBreathTicker(
+            running: true,
+            builder: (context, elapsed) => PvBreathingCircle(
+              pattern: _pattern,
+              elapsed: elapsed,
+              tint: _accKriya,
+              ink: _ink,
+              // Box breathing traces a square — the shape teaches the timing.
+              square: widget.practice.id == 'box',
+              size: 260,
+            ),
           ),
           const SizedBox(height: 40),
           OutlinedButton(
@@ -2328,6 +2292,112 @@ class _BreathingScreenState extends State<_BreathingScreen>
     );
   }
 }
+
+// ---- the engine this screen had, kept for revert ----------------------------
+// class _BreathingScreenState extends State<_BreathingScreen>
+//     with SingleTickerProviderStateMixin {
+//   late final AnimationController _ctrl;
+//   late Animation<double> _scale;
+//   int _index = 0;
+//   double _current = 0.5;
+//   String _label = '';
+//
+//   List<BreathPhase> get _phases => widget.practice.phases;
+//   BreathPhase get _phase => _phases[_index % _phases.length];
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//     _ctrl = AnimationController(vsync: this);
+//     _ctrl.addStatusListener((st) {
+//       if (st == AnimationStatus.completed && mounted) {
+//         _index++;
+//         _run();
+//       }
+//     });
+//     _run();
+//   }
+//
+//   void _run() {
+//     final p = _phase;
+//     _scale = Tween<double>(begin: _current, end: p.scale)
+//         .animate(CurvedAnimation(parent: _ctrl, curve: Curves.easeInOut));
+//     _current = p.scale;
+//     _label = p.label.now;
+//     _ctrl
+//       ..duration = Duration(seconds: p.seconds)
+//       ..reset()
+//       ..forward();
+//     if (mounted) setState(() {});
+//   }
+//
+//   @override
+//   void dispose() {
+//     _ctrl.dispose();
+//     super.dispose();
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final s = S(widget.lang);
+//     final text = Theme.of(context).textTheme;
+//     return _PillarScaffold(
+//       title: widget.practice.title.now,
+//       child: Center(
+//         child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+//           AnimatedBuilder(
+//             animation: _ctrl,
+//             builder: (context, _) {
+//               final v = _scale.value;
+//               final remaining = (_phase.seconds * (1 - _ctrl.value)).ceil();
+//               return Column(children: [
+//                 SizedBox(
+//                   height: 260,
+//                   width: 260,
+//                   child: Center(
+//                     child: Container(
+//                       width: 120 + 130 * v,
+//                       height: 120 + 130 * v,
+//                       alignment: Alignment.center,
+//                       decoration: BoxDecoration(
+//                         shape: BoxShape.circle,
+//                         gradient: RadialGradient(colors: [
+//                           _accKriya.withValues(alpha: 0.30),
+//                           _accKriya.withValues(alpha: 0.10),
+//                         ]),
+//                       ),
+//                       child: Text('$remaining',
+//                           style: text.displaySmall?.copyWith(color: _ink, fontWeight: FontWeight.w300)),
+//                     ),
+//                   ),
+//                 ),
+//                 const SizedBox(height: 28),
+//                 Text(_label,
+//                     style: text.headlineSmall?.copyWith(color: _ink, fontWeight: FontWeight.w700)),
+//               ]);
+//             },
+//           ),
+//           const SizedBox(height: 40),
+//           OutlinedButton(
+//             style: OutlinedButton.styleFrom(
+//               foregroundColor: _accKriya,
+//               side: const BorderSide(color: _accKriya, width: 1.4),
+//               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 13),
+//             ),
+//             onPressed: () {
+//               if (widget.daily) GarbhStore.instance.markDone('kriya');
+//               Navigator.of(context).pop();
+//               ScaffoldMessenger.of(context).showSnackBar(
+//                 SnackBar(content: Text('${s.gsWellDone} - ${s.gsWellDoneBody}')),
+//               );
+//             },
+//             child: Text(s.gsFinish),
+//           ),
+//         ]),
+//       ),
+//     );
+//   }
+// }
 
 // ===========================================================================
 //  Pillar 5 - Ahara

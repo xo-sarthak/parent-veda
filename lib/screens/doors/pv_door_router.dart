@@ -85,16 +85,16 @@ import '../mind_mood/mm_feel_tab.dart' show mmSosFlowScreen;
 import '../mind_mood/mm_talk_tab.dart' show MmScreenerScreen;
 import '../mind_mood/mm_track_tab.dart';
 import '../../data/doors/pv_door_garbh.dart';
-import '../../data/garbh_data.dart' show kPuzzles, kriyaById, shravanById;
+import '../../data/garbh_data.dart' show kPuzzles, shravanById;
 import '../../data/read_to_baby_data.dart' show kReadAloudPieces, kRtbAffirmations;
 import '../../models/garbh_content.dart' show GarbhPrompt;
 import '../garbh_door_surfaces.dart';
 import '../garbh_journal_screen.dart';
+import '../garbh_relaxation_screen.dart';
 import '../garbh_ritual_screen.dart';
 import '../garbh_samvad_daily.dart';
 import '../garbh_screen.dart'
     show
-        KriyaDetailScreen,
         KriyaScreen,
         SamvadScreen,
         ShravanDetailScreen,
@@ -234,8 +234,9 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
           controller: c,
           onOpenLibrary: () {}, // the door's own rail is the library
         ),
-      kGarbhSurfaceRelax => KriyaDetailScreen(
-          practice: kriyaById('relax')!, controller: c),
+      // ⚠️ THE SESSION ITSELF, since the pillars build — script, narration,
+      // figure. Not the practice detail in front of it.
+      kGarbhSurfaceRelax => GarbhRelaxationScreen(pregnancy: c),
       kGarbhSurfaceKriya => KriyaScreen(controller: c, daily: true),
       kGarbhSurfaceJournal => const GarbhJournalScreen(),
       _ when id.startsWith('garbh/listen/') => _garbhListen(id, c),

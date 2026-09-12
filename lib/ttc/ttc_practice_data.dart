@@ -32,6 +32,8 @@
 //  hurry.
 // =============================================================================
 
+import '../models/breath_pattern.dart';
+
 /// Which library a practice belongs to. Today picks one card from each.
 enum TtcPracticeKind { move, breathe }
 
@@ -98,6 +100,15 @@ final class TtcBreathAnim extends TtcPracticeAnim {
   final bool twoMarkers;
 
   int get cycle => inhale + hold + exhale + holdEmpty;
+
+  /// The same cycle as the shared circle reads it. See `BreathPattern`.
+  BreathPattern toBreathPattern() => BreathPattern([
+        BreathStep('Breathe in', inhale, BreathKind.expand),
+        if (hold > 0) BreathStep('Hold', hold, BreathKind.hold),
+        BreathStep('Breathe out', exhale, BreathKind.contract),
+        if (holdEmpty > 0)
+          BreathStep('Hold empty', holdEmpty, BreathKind.holdEmpty),
+      ]);
 }
 
 /// Attention moving down the body. No breathing circle.

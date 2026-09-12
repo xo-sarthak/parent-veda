@@ -84,6 +84,7 @@ import 'package:flutter/material.dart' show Icons;
 
 import '../mind_mood_data.dart';
 import 'pv_door_data.dart';
+import 'pv_door_garbh.dart' show kGarbhSurfaceRelax;
 
 // Tab ids. Route names hang off some of these — see the router.
 const String kMindTabFeel = 'feel';
@@ -288,6 +289,17 @@ final PvDoorPage kMindDoor = PvDoorPage(
             blurb: ex.description.en,
             surfaceId: mindSurfaceBreathe(ex.id),
           ),
+        // ⚠️ GARBH SANSKAR'S RELAXATION, LINKED NOT REBUILT. Both briefs draw
+        // the same boundary: the guided relaxation library "is the SINGLE
+        // SOURCE; Mind & mood links to it later, it is not rebuilt there."
+        // One card, Kriya's surface id, Kriya's screen.
+        const PvDoorToolTile(
+          title: 'Guided relaxation, head to toe',
+          blurb: 'Eight narrated minutes from Garbh Sanskar. Lie on your '
+              'side and let a voice do the rest.',
+          meta: '8 MIN',
+          surfaceId: kGarbhSurfaceRelax,
+        ),
         // "Watch-along versions (coming soon)."
         for (final ex in kMmBreathingExercises)
           PvDoorVideoTile(

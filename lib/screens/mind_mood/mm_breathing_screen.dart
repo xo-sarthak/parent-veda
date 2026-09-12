@@ -10,13 +10,20 @@
 //  - this screen knows nothing about which pattern it is running beyond the
 //  phase list it is handed, so a fourth pattern is a data change, not a
 //  rebuild of this screen.
+//
+//  ⚠️ THE CIRCLE IS `PvBreathingCircle` NOW — 2026-09-12, the Garbh pillars
+//  brief: one breathing component everywhere breath appears. This screen
+//  keeps its own session — the chosen duration, the running clock, the
+//  finish copy — and hands the shared circle its pattern and the seconds.
+//  The async phase loop and the private `_BreathCircle` it had are below,
+//  kept for revert.
 // =============================================================================
-
-import 'dart:async';
 
 import 'package:flutter/material.dart';
 
 import '../../data/mind_mood_data.dart';
+import '../../models/breath_pattern.dart';
+import '../../widgets/breathing_circle.dart';
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
 
@@ -28,86 +35,31 @@ class MmBreathingScreen extends StatefulWidget {
   State<MmBreathingScreen> createState() => _MmBreathingScreenState();
 }
 
-class _MmBreathingScreenState extends State<MmBreathingScreen>
-    with SingleTickerProviderStateMixin {
-  static const double _minScale = 0.55;
-  static const double _maxScale = 1.0;
-
-  late final AnimationController _scale = AnimationController(
-    vsync: this,
-    lowerBound: _minScale,
-    upperBound: _maxScale,
-    value: _minScale,
-  );
+class _MmBreathingScreenState extends State<MmBreathingScreen> {
+  late final BreathPattern _pattern = widget.exercise.toBreathPattern();
 
   int _durationSec = kMmBreathDurationsSec[0];
   bool _running = false;
-  bool _cancelled = false;
   bool _finished = false;
   int _elapsed = 0;
-  int _phaseIndex = 0;
-  Timer? _clock;
 
-  @override
-  void dispose() {
-    _cancelled = true;
-    _clock?.cancel();
-    _scale.dispose();
-    super.dispose();
-  }
-
-  Future<void> _start() async {
+  void _start() {
     setState(() {
       _running = true;
       _finished = false;
-      _cancelled = false;
       _elapsed = 0;
-      _phaseIndex = 0;
     });
-    _clock?.cancel();
-    _clock = Timer.periodic(const Duration(seconds: 1), (_) {
-      if (!mounted) return;
-      setState(() => _elapsed++);
-      if (_elapsed >= _durationSec && _running) {
-        _stop(completed: true);
-      }
-    });
-    await _runLoop();
   }
 
-  Future<void> _runLoop() async {
-    final phases = widget.exercise.phases;
-    while (!_cancelled && mounted && _elapsed < _durationSec) {
-      for (var i = 0; i < phases.length; i++) {
-        if (_cancelled || !mounted || _elapsed >= _durationSec) break;
-        setState(() => _phaseIndex = i);
-        final phase = phases[i];
-        switch (phase.action) {
-          case MmBreathAction.expand:
-            await _scale
-                .animateTo(_maxScale,
-                    duration: Duration(seconds: phase.seconds),
-                    curve: Curves.easeInOut)
-                .catchError((_) {});
-            break;
-          case MmBreathAction.contract:
-            await _scale
-                .animateTo(_minScale,
-                    duration: Duration(seconds: phase.seconds),
-                    curve: Curves.easeInOut)
-                .catchError((_) {});
-            break;
-          case MmBreathAction.hold:
-            await Future<void>.delayed(Duration(seconds: phase.seconds));
-            break;
-        }
-      }
-    }
+  /// Every frame from the ticker. The session ends itself at the chosen
+  /// length; a whole second is kept for the "left" line.
+  void _tick(double seconds) {
+    final whole = seconds.floor();
+    if (whole != _elapsed) setState(() => _elapsed = whole);
+    if (_running && seconds >= _durationSec) _stop(completed: true);
   }
 
   void _stop({bool completed = false}) {
-    _cancelled = true;
-    _clock?.cancel();
     if (!mounted) return;
     setState(() {
       _running = false;
@@ -177,20 +129,18 @@ class _MmBreathingScreenState extends State<MmBreathingScreen>
                     const SizedBox(height: 34),
                   ],
                   if (_running) ...[
-                    _BreathCircle(scale: _scale, tint: tint, ink: ink),
-                    const SizedBox(height: 28),
-                    AnimatedSwitcher(
-                      duration: const Duration(milliseconds: 250),
-                      child: Text(
-                        widget.exercise.phases[_phaseIndex].label.now,
-                        key: ValueKey(_phaseIndex),
-                        style: pvFraunces(
-                            fontSize: 22,
-                            fontWeight: FontWeight.w600,
-                            color: p.ink1),
+                    PvBreathTicker(
+                      running: _running,
+                      onTick: _tick,
+                      builder: (context, elapsed) => PvBreathingCircle(
+                        pattern: _pattern,
+                        elapsed: elapsed,
+                        tint: tint,
+                        ink: ink,
+                        square: widget.exercise.id == 'box',
                       ),
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 18),
                     Text(
                         '${_remainingLabel(_durationSec - _elapsed)} left',
                         style: pvManrope(fontSize: 12.5, color: p.ink3)),
@@ -212,7 +162,14 @@ class _MmBreathingScreenState extends State<MmBreathingScreen>
                         style: pvManrope(
                             fontSize: 13.5, height: 1.5, color: p.ink2)),
                   ] else ...[
-                    _BreathCircle(scale: _scale, tint: tint, ink: ink),
+                    PvBreathingCircle(
+                      pattern: _pattern,
+                      elapsed: 0,
+                      tint: tint,
+                      ink: ink,
+                      running: false,
+                      square: widget.exercise.id == 'box',
+                    ),
                   ],
                 ],
               ),
@@ -258,38 +215,40 @@ class _MmBreathingScreenState extends State<MmBreathingScreen>
   }
 }
 
-class _BreathCircle extends StatelessWidget {
-  const _BreathCircle({required this.scale, required this.tint, required this.ink});
-  final Animation<double> scale;
-  final Color tint;
-  final Color ink;
-
-  @override
-  Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: scale,
-      builder: (context, _) {
-        final size = 150 + (scale.value - 0.55) / 0.45 * 90;
-        return Container(
-          width: 240,
-          height: 240,
-          alignment: Alignment.center,
-          child: Container(
-            width: size,
-            height: size,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: RadialGradient(
-                colors: [tint.withValues(alpha: 0.9), tint.withValues(alpha: 0.35)],
-              ),
-              border: Border.all(color: ink.withValues(alpha: 0.25), width: 1.2),
-            ),
-          ),
-        );
-      },
-    );
-  }
-}
+// ⚠️ REPLACED BY `PvBreathingCircle` (lib/widgets/breathing_circle.dart),
+// 2026-09-12. Kept for revert.
+// class _BreathCircle extends StatelessWidget {
+//   const _BreathCircle({required this.scale, required this.tint, required this.ink});
+//   final Animation<double> scale;
+//   final Color tint;
+//   final Color ink;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return AnimatedBuilder(
+//       animation: scale,
+//       builder: (context, _) {
+//         final size = 150 + (scale.value - 0.55) / 0.45 * 90;
+//         return Container(
+//           width: 240,
+//           height: 240,
+//           alignment: Alignment.center,
+//           child: Container(
+//             width: size,
+//             height: size,
+//             decoration: BoxDecoration(
+//               shape: BoxShape.circle,
+//               gradient: RadialGradient(
+//                 colors: [tint.withValues(alpha: 0.9), tint.withValues(alpha: 0.35)],
+//               ),
+//               border: Border.all(color: ink.withValues(alpha: 0.25), width: 1.2),
+//             ),
+//           ),
+//         );
+//       },
+//     );
+//   }
+// }
 
 class _DurationChip extends StatelessWidget {
   const _DurationChip(

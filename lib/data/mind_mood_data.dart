@@ -30,6 +30,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../localization/app_language.dart';
+import '../models/breath_pattern.dart';
 
 LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
 
@@ -111,6 +112,26 @@ class MmBreathPhase {
   final LocalizedText label;
   final int seconds;
   final MmBreathAction action;
+}
+
+/// The exercise's phases as the shared circle reads them. A hold after an
+/// in-breath stays large; a hold after an out-breath stays small.
+extension MmBreathingExerciseBreath on MmBreathingExercise {
+  BreathPattern toBreathPattern() {
+    final steps = <BreathStep>[];
+    var large = false;
+    for (final ph in phases) {
+      final kind = switch (ph.action) {
+        MmBreathAction.expand => BreathKind.expand,
+        MmBreathAction.contract => BreathKind.contract,
+        MmBreathAction.hold => large ? BreathKind.hold : BreathKind.holdEmpty,
+      };
+      if (ph.action == MmBreathAction.expand) large = true;
+      if (ph.action == MmBreathAction.contract) large = false;
+      steps.add(BreathStep(ph.label.now, ph.seconds, kind));
+    }
+    return BreathPattern(steps);
+  }
 }
 
 class MmBreathingExercise {

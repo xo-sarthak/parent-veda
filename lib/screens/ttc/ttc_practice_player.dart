@@ -31,6 +31,8 @@ import 'package:flutter/material.dart';
 
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_practice_data.dart';
+import '../../widgets/breathing_circle.dart';
+import '../../widgets/figure_highlight.dart';
 import '../v2/v2_palette.dart';
 import 'ttc_mind_today_screen.dart' show kTtcMoveHue, kTtcBreatheHue;
 
@@ -269,8 +271,12 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
 //  The breathing component — built once, configured per card
 // =============================================================================
 
-enum _Phase { inhale, hold, exhale, holdEmpty }
-
+// ⚠️ THE CIRCLE ITSELF IS `PvBreathingCircle` NOW — 2026-09-12. This was the
+// first "one component, configured four ways" in the app, and the Garbh
+// pillars brief asked for one component across ALL areas, not one per stage.
+// What is TTC's stays here: the progress ring, the two markers, the count-to
+// line and the nostril side. The shape, the word and the count are the shared
+// widget's, fed the same stopwatch. The old body is in git.
 class _Breath extends StatelessWidget {
   const _Breath(
       {required this.spec,
@@ -285,45 +291,14 @@ class _Breath extends StatelessWidget {
   final bool running;
   final TtcPracticeSkin skin;
 
-  /// Where in one cycle we are, and how far through that phase.
-  (_Phase, double, int) _at() {
-    final cycle = spec.cycle.toDouble();
-    var p = cycle == 0 ? 0.0 : seconds % cycle;
-
-    if (p < spec.inhale) return (_Phase.inhale, p / spec.inhale, p.ceil());
-    p -= spec.inhale;
-    if (spec.hold > 0 && p < spec.hold) {
-      return (_Phase.hold, p / spec.hold, p.ceil());
-    }
-    if (spec.hold > 0) p -= spec.hold;
-    if (p < spec.exhale) return (_Phase.exhale, p / spec.exhale, p.ceil());
-    p -= spec.exhale;
-    return (_Phase.holdEmpty, spec.holdEmpty == 0 ? 1 : p / spec.holdEmpty,
-        p.ceil());
-  }
-
   @override
   Widget build(BuildContext context) {
-    final (phase, within, count) = _at();
-
-    // The figure is large on the in-breath and small on the out-breath, and
-    // holds where the practice holds. Nothing else on screen moves.
-    final scale = switch (phase) {
-      _Phase.inhale => 0.55 + 0.45 * within,
-      _Phase.hold => 1.0,
-      _Phase.exhale => 1.0 - 0.45 * within,
-      _Phase.holdEmpty => 0.55,
-    };
-
-    final word = switch (phase) {
-      _Phase.inhale => 'Breathe in',
-      _Phase.hold => 'Hold',
-      _Phase.exhale => 'Breathe out',
-      _Phase.holdEmpty => 'Hold empty',
-    };
-
-    final rounds =
-        spec.cycle == 0 ? 0 : (seconds / spec.cycle).floor() + 1;
+    final pattern = spec.toBreathPattern();
+    final m = pattern.at(seconds);
+    // Step 0 is always the in-breath; the rest of the nostril logic reads
+    // the cycle number, as before.
+    final inhaling = m.index == 0;
+    final rounds = m.cycle;
 
     return Stack(alignment: Alignment.center, children: [
       SizedBox(
@@ -337,56 +312,43 @@ class _Breath extends StatelessWidget {
               track: skin.track),
         ),
       ),
-      // ⚠️ A SQUARE FOR BOX BREATHING. "This one is naturally a square, not a
-      // circle" — four equal phases around four equal sides, so the shape is
-      // teaching the timing rather than decorating it.
-      AnimatedScale(
-        scale: scale,
-        duration: const Duration(milliseconds: 120),
-        child: Container(
-          width: 132,
-          height: 132,
-          decoration: BoxDecoration(
-            color: skin.accent.withValues(alpha: 0.13),
-            shape: spec.square ? BoxShape.rectangle : BoxShape.circle,
-            borderRadius: spec.square ? BorderRadius.circular(18) : null,
-            border:
-                Border.all(color: skin.accent.withValues(alpha: 0.5), width: 2),
-          ),
-        ),
+      PvBreathingCircle(
+        pattern: pattern,
+        elapsed: seconds,
+        tint: skin.accent,
+        ink: skin.p.ink1,
+        running: running,
+        // ⚠️ A SQUARE FOR BOX BREATHING. "This one is naturally a square, not
+        // a circle" — four equal phases around four equal sides.
+        square: spec.square,
+        size: 150,
+        below: !running
+            ? null
+            : Column(mainAxisSize: MainAxisSize.min, children: [
+                if (spec.countTo != null)
+                  Text(
+                      'Breath ${rounds.clamp(1, spec.countTo!)} of '
+                      '${spec.countTo}',
+                      style:
+                          pvManrope(fontSize: 11.5, color: skin.p.ink2)),
+                // ⚠️ THE SIDE, BECAUSE THE PRACTICE IS ABOUT WHICH SIDE.
+                // Alternate nostril breathing with no indication of which
+                // nostril is a diagram of ordinary breathing.
+                if (spec.nostrils)
+                  Text(
+                      inhaling
+                          ? (rounds.isOdd
+                              ? 'In through the LEFT'
+                              : 'In through the RIGHT')
+                          : (rounds.isOdd
+                              ? 'Out through the RIGHT'
+                              : 'Out through the LEFT'),
+                      style: pvManrope(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w700,
+                          color: skin.p.ink2)),
+              ]),
       ),
-      Column(mainAxisSize: MainAxisSize.min, children: [
-        Text(running ? word : 'Ready',
-            style: pvManrope(
-                fontSize: 13.5,
-                fontWeight: FontWeight.w800,
-                color: skin.p.ink1)),
-        const SizedBox(height: 4),
-        Text(running ? '$count' : '',
-            style: pvFraunces(
-                fontSize: 30, fontWeight: FontWeight.w600, color: skin.accent)),
-        if (spec.countTo != null && running) ...[
-          const SizedBox(height: 2),
-          Text('Breath ${rounds.clamp(1, spec.countTo!)} of ${spec.countTo}',
-              style: pvManrope(fontSize: 11.5, color: skin.p.ink2)),
-        ],
-        // ⚠️ THE SIDE, BECAUSE THE PRACTICE IS ABOUT WHICH SIDE. Alternate
-        // nostril breathing with no indication of which nostril is a diagram of
-        // ordinary breathing.
-        if (spec.nostrils && running) ...[
-          const SizedBox(height: 2),
-          Text(
-              phase == _Phase.inhale
-                  ? (rounds.isOdd ? 'In through the LEFT' : 'In through the RIGHT')
-                  : (rounds.isOdd
-                      ? 'Out through the RIGHT'
-                      : 'Out through the LEFT'),
-              style: pvManrope(
-                  fontSize: 11.5,
-                  fontWeight: FontWeight.w700,
-                  color: skin.p.ink2)),
-        ],
-      ]),
     ]);
   }
 }
@@ -411,15 +373,11 @@ class _BodyScan extends StatelessWidget {
     final i = (progress * body.length).floor().clamp(0, body.length - 1);
 
     return Column(mainAxisSize: MainAxisSize.min, children: [
-      SizedBox(
-        width: 210,
-        height: 150,
-        child: CustomPaint(
-          painter: _FigurePainter(
-              highlight: body.isEmpty ? 0 : i / body.length,
-              accent: skin.accent,
-              line: skin.track),
-        ),
+      // The shared figure — TTC drew it first, Kriya's relaxation reuses it.
+      PvFigureHighlight(
+        highlight: body.isEmpty ? 0 : i / body.length,
+        accent: skin.accent,
+        line: skin.track,
       ),
       const SizedBox(height: 12),
       SizedBox(
@@ -615,45 +573,47 @@ class _RingPainter extends CustomPainter {
 }
 
 /// A body outline with one region lit. [highlight] runs 0 (head) → 1 (feet).
-class _FigurePainter extends CustomPainter {
-  const _FigurePainter(
-      {required this.highlight, required this.accent, required this.line});
-  final double highlight;
-  final Color accent;
-  final Color line;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final stroke = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2.4
-      ..strokeCap = StrokeCap.round
-      ..color = line;
-
-    final cx = size.width / 2;
-    final top = 14.0;
-    final bottom = size.height - 10;
-
-    // head, spine, arms, legs — deliberately schematic. It is a position
-    // indicator, not an anatomy drawing.
-    canvas.drawCircle(Offset(cx, top + 10), 10, stroke);
-    canvas.drawLine(Offset(cx, top + 22), Offset(cx, bottom - 34), stroke);
-    canvas.drawLine(Offset(cx - 26, top + 40), Offset(cx + 26, top + 40), stroke);
-    canvas.drawLine(
-        Offset(cx, bottom - 34), Offset(cx - 18, bottom), stroke);
-    canvas.drawLine(
-        Offset(cx, bottom - 34), Offset(cx + 18, bottom), stroke);
-
-    final y = top + (bottom - top) * highlight.clamp(0.0, 1.0);
-    canvas.drawCircle(
-        Offset(cx, y),
-        17,
-        Paint()..color = accent.withValues(alpha: 0.20));
-  }
-
-  @override
-  bool shouldRepaint(_FigurePainter old) =>
-      old.highlight != highlight ||
-      old.accent != accent ||
-      old.line != line;
-}
+// ⚠️ MOVED TO `lib/widgets/figure_highlight.dart` as `PvFigurePainter`,
+// 2026-09-12. Kept for revert.
+// class _FigurePainter extends CustomPainter {
+//   const _FigurePainter(
+//       {required this.highlight, required this.accent, required this.line});
+//   final double highlight;
+//   final Color accent;
+//   final Color line;
+//
+//   @override
+//   void paint(Canvas canvas, Size size) {
+//     final stroke = Paint()
+//       ..style = PaintingStyle.stroke
+//       ..strokeWidth = 2.4
+//       ..strokeCap = StrokeCap.round
+//       ..color = line;
+//
+//     final cx = size.width / 2;
+//     final top = 14.0;
+//     final bottom = size.height - 10;
+//
+//     // head, spine, arms, legs — deliberately schematic. It is a position
+//     // indicator, not an anatomy drawing.
+//     canvas.drawCircle(Offset(cx, top + 10), 10, stroke);
+//     canvas.drawLine(Offset(cx, top + 22), Offset(cx, bottom - 34), stroke);
+//     canvas.drawLine(Offset(cx - 26, top + 40), Offset(cx + 26, top + 40), stroke);
+//     canvas.drawLine(
+//         Offset(cx, bottom - 34), Offset(cx - 18, bottom), stroke);
+//     canvas.drawLine(
+//         Offset(cx, bottom - 34), Offset(cx + 18, bottom), stroke);
+//
+//     final y = top + (bottom - top) * highlight.clamp(0.0, 1.0);
+//     canvas.drawCircle(
+//         Offset(cx, y),
+//         17,
+//         Paint()..color = accent.withValues(alpha: 0.20));
+//   }
+//
+//   @override
+//   bool shouldRepaint(_FigurePainter old) =>
+//       old.highlight != highlight ||
+//       old.accent != accent ||
+//       old.line != line;
+// }
