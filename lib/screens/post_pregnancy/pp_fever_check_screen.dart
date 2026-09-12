@@ -47,6 +47,7 @@
 import 'package:flutter/material.dart';
 
 import 'pp_age_bands.dart';
+import 'pp_health_red_flags.dart';
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
 import 'pp_content.dart';
@@ -76,7 +77,13 @@ const double _feverC = 38.0; // REQUIRED_REVIEW: 100.4 F
 const double _highC = 39.0; // REQUIRED_REVIEW: 102.2 F
 
 /// The red flags that outrank the thermometer entirely.
-// REQUIRED_REVIEW: this list, and whether anything is missing from it.
+///
+/// ⚠️ THE CANONICAL LIST, NOT A COPY. It was its own list here, worded a
+/// little differently from the Get help now page and the fever red-flags
+/// page; the Health door rebuild single-sourced all three. See
+/// `pp_health_red_flags.dart`. The old list is kept below for revert.
+const List<String> _redFlags = kPpGoNowSigns;
+/*
 const List<String> _redFlags = [
   'Breathing hard: ribs sucking in, nostrils flaring, or grunting',
   'A rash that does not fade when you press a glass on it',
@@ -87,6 +94,7 @@ const List<String> _redFlags = [
   'Cold, mottled or blue hands and feet',
   'Constant crying you cannot settle at all',
 ];
+*/
 
 class PpFeverCheckScreen extends StatefulWidget {
   const PpFeverCheckScreen({super.key});

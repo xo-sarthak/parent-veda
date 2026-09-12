@@ -35,9 +35,11 @@
 import 'package:flutter/material.dart' show IconData;
 
 import 'pp_door_feeding.dart';
+import 'pp_door_health.dart';
 import 'pp_door_sleep.dart';
 
 export 'pp_door_feeding.dart';
+export 'pp_door_health.dart';
 export 'pp_door_sleep.dart';
 
 /// One parenting door: a shell over one section.
@@ -112,8 +114,22 @@ class PpDoorTab {
     required this.areaIds,
     this.tools = const [],
     this.redFlagPageId,
+    this.jumpToTabId,
+    this.jumpTitle,
     this.note,
+    this.footer,
   });
+
+  /// ⚠️ A PINNED CARD THAT SWITCHES TAB. Health's default tab pins "Is this
+  /// an emergency?" which is a reference to the Get help now tab, not a
+  /// page: in a 2am panic the red flags are one tap from wherever she
+  /// landed. Drawn in the red-flag treatment, above everything.
+  final String? jumpToTabId;
+  final String? jumpTitle;
+
+  /// One human line under the rails — Get help now's "If he seems wrong to
+  /// you and a screen says otherwise, believe yourself."
+  final String? footer;
 
   final String id;
 
@@ -173,6 +189,7 @@ class PpDoorClosing {
 final List<PpDoor> kPpDoors = [
   kPpSleepDoor,
   kPpFeedingDoor,
+  kPpHealthDoor,
 ];
 
 PpDoor? ppDoorFor(String sectionId) {

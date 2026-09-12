@@ -101,10 +101,15 @@ void main() {
       expect(_page('safety_allergy').format, 'ILLUSTRATION');
       expect(_page('safety_allergy').blocks.whereType<PpCallout>()
           .any((c) => c.kind == PpCalloutKind.doctor), isTrue, reason: 'the call-now block');
+      // The choking response is canonical in Health now; Feeding's card
+      // opens that page directly.
       final response = _page('safety_choking_response');
       expect(response.format, 'VIDEO');
-      expect(response.orderedBlocks.first, isA<PpVideoSlot>());
-      expect(response.blocks.whereType<PpSteps>().single.steps.length, greaterThanOrEqualTo(6));
+      expect(response.toolSurfaceId, 'pp_page/parenting_health/health_choking_response');
+      expect(ppScreenForSurface(response.toolSurfaceId!), isNotNull);
+      final canonical = ppSectionFor('parenting_health')!.pageById('health_choking_response')!;
+      expect(canonical.orderedBlocks.first, isA<PpVideoSlot>());
+      expect(canonical.blocks.whereType<PpSteps>().single.steps.length, greaterThanOrEqualTo(6));
       final gag = _page('safety_gagging');
       expect(gag.format, 'CAROUSEL');
       expect(gag.blocks.single, isA<PpCarousel>());

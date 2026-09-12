@@ -50,12 +50,43 @@
 //  ⚠️ ENGLISH ONLY FOR NOW, plain String, per the standing instruction.
 // =============================================================================
 
+// =============================================================================
+//  ⚠️ REBUILT 2026-09-12 FROM `ParentVeda_Health_rebuild.pdf`, THE V3 DOOR
+//  BRIEF. The door is `lib/data/doors/pp_door_health.dart` — six tabs, on the
+//  brief's own call, the one door that does not fit the five-card selector.
+//  The age rule (`autoScope`), the reformats the map marks, one reframe, and
+//  four [NEW] safety pieces the brief says will be written by hand: those
+//  are `comingSoon` scaffolds, logged in `docs/DOOR-CONTENT-OWED.md`.
+//
+//  ⚠️ EIGHT THINGS SINGLE-SOURCED. The "go to hospital now" list is
+//  `kPpGoNowSigns` in `pp_health_red_flags.dart` and is read by the Get help
+//  now page, the fever red-flags page and the fever check's gate — it was
+//  three hand-written copies. Home remedies are one tool, opened filtered
+//  (`pp_nuskhe/<category>`); the per-illness remedy pages are cards that
+//  open it. The vaccination schedule is the tracker. Records, the emergency
+//  card and the doctor-visit companion are their tools. The "Not sure what
+//  is wrong" collection IS the What Changed flow, so it is hidden on the door
+//  and the tool leads.
+//
+//  ⚠️ THE CHOKING RESPONSE IS CANONICAL HERE. Feeding built it first
+//  (`safety_choking_response`); the Health brief says it belongs on Get help
+//  now and Feeding links to it. The page moved; Feeding's card now opens
+//  `pp_page/parenting_health/health_choking_response`.
+//
+//  ⚠️ THE DOSING PAGE IS REFRAMED, NOT SHIPPED. In-app mg-by-weight numbers
+//  were the thing the brand chose not to do; the page now teaches reading the
+//  dose on the bottle for his weight and the mistakes that cause overdose,
+//  and defers the number to the doctor and the label. The table is kept in a
+//  comment pending paediatric and legal sign-off.
+// =============================================================================
+
 import 'package:flutter/material.dart' show Icons;
 
 import 'pp_age_bands.dart';
 import '../brackets/hub/hub_intent_art.dart';
 import 'pp_content.dart';
 import 'pp_section_screen.dart';
+import 'pp_health_red_flags.dart';
 
 // =============================================================================
 //  THE BANDS
@@ -111,6 +142,8 @@ final PpSection kPpHealthSection = PpSection(
   intro: 'When something is wrong, a fast and calm answer. When nothing is '
       'wrong, the proof that nothing is wrong.',
   bandSet: kPpHealthBands,
+  // ⚠️ THE AGE RULE. No chips; the door opens on his band.
+  autoScope: true,
   areas: [
     _emergency,
     _fever,
@@ -170,13 +203,8 @@ final PpSection kPpHealthSection = PpSection(
       surfaceId: 'pp_health_home',
       icon: Icons.folder_shared_outlined,
     ),
-    PpSectionTool(
-      label: 'Emergency card, ready to show',
-      blurb: 'Blood group, allergies, weight, medicines and two numbers to call. '
-          'Openable without unlocking a folder.',
-      surfaceId: 'pp_emergency_card',
-      icon: Icons.emergency_outlined,
-    ),
+    // ⚠️ MERGED. "Create your emergency card" and "Emergency card, ready
+    // to show" were one tool listed twice. One entry, above.
     PpSectionTool(
       label: 'Before you see the doctor',
       blurb: 'Build the list of questions while you remember them, so the seven '
@@ -219,8 +247,12 @@ final PpArea _emergency = PpArea(
   pages: [
     PpPage(
       id: 'health_go_now',
-      title: 'Go now, or can it wait?',
-      format: 'FLAGGED REFERENCE',
+      title: 'Go to a hospital now',
+      // [reuse] [reference] THE canonical red-flag list. The callout below is
+      // `kPpGoNowSigns`, which the fever red flags and the fever check also read.
+      // The video and the three-speeds table that shared this page are their own
+      // cards now (the brief lists them separately); kept below for revert.
+      format: 'RED FLAG',
       blocks: [
         PpIntro('This is the fastest page in the app. If any line below matches '
             'what you are seeing, stop reading and go. Everything else in Health '
@@ -236,17 +268,12 @@ final PpArea _emergency = PpArea(
         //   * Any fit or seizure, including a first febrile fit.
         //   * Green or yellow vomit, and a swollen tender belly.
         PpCallout(
-          'Breathing hard: fast breaths, ribs sucking in under the chest, '
-          'nostrils flaring, or a grunt on every breath. Blue or grey lips, '
-          'tongue or face. A fit or seizure of any kind. Floppy, or you cannot '
-          'wake him properly. A fever of 100.4 F or 38 C in a baby under three '
-          'months. A rash that does not fade when you press a clear glass on it. '
-          'No urine for twelve hours. Green or yellow vomit with a swollen, '
-          'tender belly. Any of these is a hospital, now, not a phone call '
-          'first.',
+          kPpGoNowSigns.join('. ') + '. Any of these is a hospital, now, not '
+              'a phone call first.',
           kind: PpCalloutKind.doctor,
           title: 'Go to a hospital now',
         ),
+        /* kept for revert: the three-speeds table, now the interactive page
         PpTable(
           heading: 'The three speeds',
           columns: ['What you are seeing', 'How fast'],
@@ -267,6 +294,7 @@ final PpArea _emergency = PpArea(
             ['Teething, a nappy rash, one loose stool', 'Can wait'],
           ],
         ),
+        */
         PpCallout(
           'Take three things with you and you save fifteen minutes at the worst '
           'possible time: his medicines in their own boxes, his vaccination '
@@ -301,6 +329,7 @@ final PpArea _emergency = PpArea(
             'traffic a car often gets there first, so start moving while '
             'somebody else makes the call. Know the nearest hospital with a '
             'paediatric emergency, not just the nearest hospital.'),
+        /* kept for revert: the signs film, now its own card
         PpVideoSlot(
           title: 'The signs that mean go now',
           subtitle: 'Breathing trouble, a fit, and the glass test for a rash, '
@@ -308,6 +337,7 @@ final PpArea _emergency = PpArea(
           minutes: '5 MIN',
           slotId: 'health/when_to_rush',
         ),
+        */
         PpLink(
           'Open his emergency card',
           surfaceId: 'pp_emergency_card',
@@ -315,6 +345,160 @@ final PpArea _emergency = PpArea(
         ),
       ],
     ),
+    // [reuse] VIDEO. "The signs that mean go now." Split from the red-flag
+    // page so the brief's two cards are two cards.
+    PpPage(
+      id: 'health_signs_video',
+      title: 'The signs that mean go now',
+      format: 'VIDEO',
+      blocks: [
+        PpVideoSlot(
+          title: 'The signs that mean go now',
+          subtitle: 'Breathing trouble, a fit, and the glass test for a rash, '
+              'shown on real children.',
+          minutes: '5 MIN',
+          slotId: 'health/when_to_rush',
+        ),
+        PpIntro('Five minutes, watched once on a calm day, so that at 2am you '
+            'recognise what you are looking at instead of reading about it.'),
+        PpLink(
+          'Go to a hospital now',
+          pageId: 'health_go_now',
+          blurb: 'The list, for the night you need it.',
+        ),
+      ],
+    ),
+    // ⚠️ [reformat: table -> interactive] "Tap what you're seeing, get the
+    // speed (Now / Same day / Can wait). A decision aid used under stress;
+    // interactive beats a static table." One situation per slide, the speed
+    // as the payoff.
+    //
+    // REQUIRED_REVIEW: every row is a triage threshold; see the table it
+    // came from, kept in `health_go_now`.
+    PpPage(
+      id: 'health_three_speeds',
+      title: 'The three speeds',
+      subtitle: 'Now, same day, or can wait',
+      format: 'INTERACTIVE',
+      blocks: [
+        PpInteractive(
+          kind: PpInteractiveKind.checklist,
+          title: 'The three speeds',
+          blurb: 'What you are seeing, and how fast to move. One at a time.',
+          hue: 12,
+          items: [
+            PpInteractiveItem('Trouble breathing, a fit, unresponsive, blue lips', 'NOW. Hospital, and somebody calls on the way.'),
+            PpInteractiveItem('A newborn under three months with any fever', 'NOW. No home dose first; take him as he is.'),
+            PpInteractiveItem('Vomiting everything for more than eight hours', 'NOW. He cannot keep fluid in, and that is the emergency.'),
+            PpInteractiveItem('Loose motions with no urine and a dry mouth', 'NOW. That is dehydration, and ORS at home is no longer enough.'),
+            PpInteractiveItem('A fever that has run more than five days', 'SAME DAY. A blood test, not another guess.'),
+            PpInteractiveItem('Ear pain with fever, or discharge from an ear', 'SAME DAY. Usually treatable, and it hurts.'),
+            PpInteractiveItem('A rash with a fever he is otherwise well with', 'SAME DAY. And do the glass test first: if it does not fade, that is NOW.'),
+            PpInteractiveItem('A cold, a cough, a mild fever, still feeding', 'CAN WAIT. Fluids, rest, and a look each evening.'),
+            PpInteractiveItem('Teething, a nappy rash, one loose stool', 'CAN WAIT. Ordinary, and this area has a page for each.'),
+          ],
+          closing: 'If he seems wrong to you and none of these fit, that is a '
+              'reason on its own. Call.',
+          closingPageId: 'health_go_now',
+          closingLabel: 'The go-now list',
+        ),
+      ],
+    ),
+    // ⚠️ [new] VIDEO, CANONICAL HERE. Moved from Feeding, where it was built
+    // first; the Health brief says the choking response lives on Get help now
+    // and Feeding links to it. Copy unchanged from the Feeding build.
+    //
+    // REQUIRED_REVIEW: the whole sequence against current paediatric
+    // first-aid guidance before this ships. Signed off by a clinician.
+    PpPage(
+      id: 'health_choking_response',
+      title: 'If he chokes or can\'t breathe',
+      subtitle: 'Back blows and chest thrusts, before you need them',
+      format: 'VIDEO',
+      blocks: [
+        PpVideoSlot(
+          title: 'If he chokes: back blows and chest thrusts',
+          subtitle: 'On a training doll, at real speed and then slowly: the '
+              'infant hold, the older child, and the moment to call.',
+          minutes: '5 MIN',
+          slotId: 'feeding/back_blows_demo',
+          hue: 12,
+        ),
+        PpIntro('Read this once now, calmly, and watch the film. Then make '
+            'everyone who feeds him watch it too. In a real choking you will '
+            'not be reading anything.'),
+        PpCallout(
+          'He is choking, not gagging, if he is SILENT: cannot cry, cannot '
+          'cough properly, may be going blue round the lips, face frightened '
+          'and no sound. If he is coughing loudly or crying, he has an airway: '
+          'do not slap his back, let him cough, stay with him.',
+          kind: PpCalloutKind.safety,
+          title: 'First: is it choking?',
+        ),
+        PpSteps([
+          PpStep('Shout for help and have someone call an ambulance',
+              'You start at the same time. Do not go looking for a phone '
+                  'first.'),
+          PpStep('Under one: lay him face down along your forearm',
+              'Head lower than his bottom, your hand supporting his jaw, not '
+                  'his throat. Rest your arm on your thigh.'),
+          PpStep('Five firm back blows',
+              'Heel of your hand between the shoulder blades. Firm, and '
+                  'check after each one whether it has come out.'),
+          PpStep('If not: turn him face up, five chest thrusts',
+              'Two fingers on the breastbone just below the nipple line, '
+                  'pushing down sharply. Not the tummy in a baby.'),
+          PpStep('Repeat: five back blows, five chest thrusts',
+              'Until it comes out, or he goes limp.'),
+          PpStep('Over one: back blows, then abdominal thrusts',
+              'Lean him forward, five back blows. If not, stand behind him, '
+                  'fist above the navel, pull sharply in and up, five times. '
+                  'Repeat.'),
+          PpStep('If he goes limp: start CPR and keep the phone on speaker',
+              'The ambulance call handler will talk you through it.'),
+        ], heading: 'The sequence'),
+        PpCallout(
+          'After any choking where you had to act, take him to a hospital '
+          'to be checked even if he seems completely fine. Abdominal thrusts '
+          'can injure; anything that went down the wrong way can too.',
+          kind: PpCalloutKind.doctor,
+          title: 'Afterwards, always',
+        ),
+        PpWhenLine('Learn it before the first finger food, around 8 months. A '
+            'hospital first-aid class takes one afternoon. Do it.'),
+        PpIndiaNote('Whoever is most often alone with him at mealtimes, the '
+            'maid, the grandmother, the older cousin, is the person who most '
+            'needs to have watched this. Show them, do not tell them.'),
+        PpLink(
+          'Gagging vs choking, and how to cut food',
+          surfaceId: 'pp_section/parenting_feeding/safety',
+          blurb: 'Feeding owns prevention: the shapes, and the carousel.',
+        ),
+      ],
+    ),
+    // ⚠️ [new] SCAFFOLD. "If he has a fit: on his side, nothing in the mouth,
+    // time it, ambulance-if." The brief says the copy will be supplied for
+    // verbatim drop-in; the card holds its place. DOOR-CONTENT-OWED HL2.
+    PpPage(
+      id: 'health_fit',
+      title: 'If he has a fit',
+      subtitle: 'On his side, nothing in the mouth, time it',
+      format: 'VIDEO',
+      comingSoon: true,
+      blocks: [],
+    ),
+    // ⚠️ [new] SCAFFOLD. "Common accidents, fast: swallowed something (button
+    // battery / magnet = go now), a burn, a bad fall / head bump, something
+    // in the eye. First-minutes only." DOOR-CONTENT-OWED HL3.
+    PpPage(
+      id: 'health_accidents',
+      title: 'Common accidents, fast',
+      subtitle: 'The first minutes: swallowed, burned, fallen, in the eye',
+      format: 'CARDS',
+      comingSoon: true,
+      blocks: [],
+    ),
+
     /* ⚠️ REMOVED FROM THIS AREA BY FEEDBACK, KEPT FOR REVERT.
        "rest all should be removed"
        The instruction was that "Is this an emergency" should hold only
@@ -327,7 +511,7 @@ final PpArea _emergency = PpArea(
     PpPage(
       id: 'health_clinic_or_hospital',
       title: 'Clinic, or hospital?',
-      format: 'COMPARISON TABLE',
+      format: 'TABLE',
       blocks: [
         PpIntro('Half the delay in a sick child is not knowing where to go. This '
             'is the short version, worth reading once on a calm day.'),
@@ -391,7 +575,7 @@ final PpArea _emergency = PpArea(
     PpPage(
       id: 'health_calling_doctor',
       title: 'What to say when you call the doctor',
-      format: 'SCRIPT BOX',
+      format: 'SCRIPT',
       blocks: [
         PpIntro('A doctor on the phone is deciding one thing: does this child '
             'need to be seen, and how fast. Four sentences give her that. A long '
@@ -469,7 +653,7 @@ final PpArea _fever = PpArea(
     PpPage(
       id: 'fever_what_number',
       title: 'What the number actually means',
-      format: 'CHART-CARD',
+      format: 'CHART',
       blocks: [
         PpIntro('A fever is not an illness. It is the body turning the heat up '
             'to fight one, and it is usually working. The number tells you less '
@@ -528,11 +712,15 @@ final PpArea _fever = PpArea(
     PpPage(
       id: 'fever_reading',
       title: 'Reading a baby\'s temperature',
-      format: 'SHORT ARTICLE',
+      // [reformat: short article -> illustrated] "Where to measure, what's
+      // normal by route. A quick labelled how-to beats prose." The table stays;
+      // the prose is kept below for revert.
+      format: 'ILLUSTRATION',
       blocks: [
         PpIntro('Half of the fever questions doctors get are really measurement '
             'questions. Where you took it, and with what, changes the number by '
             'a whole degree.'),
+        /* kept for revert: the prose the picture replaced
         PpArticle([
           'A digital thermometer under the arm is the right instrument for a '
           'baby at home. It is cheap, it is accurate enough for the decision you '
@@ -549,6 +737,28 @@ final PpArea _fever = PpArea(
           'cannot yet be told to hold still. And never judge a fever by touching '
           'his forehead: a hand tells you he is warm, which you already knew.',
         ]),
+        */
+        PpIllustration(
+          kind: PpIllustrationKind.thermometerRoutes,
+          title: 'Where to take it',
+          labels: [
+            PpIllustrationLabel('Under the arm, digital: the one for home',
+                'Tip fully covered, arm held gently down, wait for the beep '
+                    'and a few seconds more. Every age.'),
+            PpIllustrationLabel('Forehead scanner: a quick look, then confirm',
+                'Drifts. Reads low if he is sweaty or near a fan. If it '
+                    'surprises you, check under the arm.'),
+            PpIllustrationLabel('Ear: over one year only',
+                'Wax and a narrow canal make it unreliable in babies.'),
+            PpIllustrationLabel('Mouth: over four or five',
+                'Only a child who can hold still, and nothing hot or cold to '
+                    'drink for fifteen minutes first.'),
+          ],
+          caption: 'Never a mercury thermometer, and never a hand on the '
+              'forehead: a hand tells you he is warm, which you already knew. '
+              'Report the number you saw and where you took it; do not add a '
+              'degree to correct it.',
+        ),
         PpTable(
           heading: 'Where to measure',
           columns: ['Method', 'Good for', 'Watch out for'],
@@ -593,7 +803,7 @@ final PpArea _fever = PpArea(
     PpPage(
       id: 'fever_under_3m',
       title: 'A fever in a baby under three months',
-      format: 'FLAGGED CALLOUT',
+      format: 'RED FLAG',
       bands: ['hb_nb'],
       blocks: [
         PpIntro('This page exists on its own because it is the one fever rule '
@@ -681,6 +891,29 @@ final PpArea _fever = PpArea(
           kind: PpCalloutKind.safety,
           title: 'Cold sponging makes it worse',
         ),
+        // [reuse] "Keep the article; lift the sponging myths into a small
+        // myth-vs-fact carousel."
+        PpCarousel(
+          eyebrow: 'Sponging myths',
+          hue: 28,
+          cards: [
+            PpCarouselCard.myth('Cold water or ice brings a fever down fastest',
+                'It makes him shiver, and shivering drives the temperature '
+                    'up. Lukewarm water, or nothing.'),
+            PpCarouselCard.myth('Rub spirit or alcohol on the skin',
+                'It is absorbed through a child\'s skin and it chills him. '
+                    'Never.'),
+            PpCarouselCard.myth('Cover him up and sweat it out',
+                'Wrapping a hot child traps heat. One thin cotton layer, and '
+                    'a sheet.'),
+            PpCarouselCard.myth('Wake him to sponge or to give a dose',
+                'Sleep is doing more for him than the reading would tell you. '
+                    'Let him sleep.'),
+            PpCarouselCard.myth('A wet cloth on the forehead treats the fever',
+                'It comforts him, which is worth doing. It does not treat '
+                    'anything. Keep the fluids going.'),
+          ],
+        ),
         PpCallout(
           'A fever that stays above 102 F after two doses of paracetamol given '
           'correctly, a child who will not drink, or a fever running past five '
@@ -699,21 +932,21 @@ final PpArea _fever = PpArea(
     ),
     PpPage(
       id: 'fever_dosing',
-      title: 'Paracetamol and ibuprofen: the typical ranges',
-      format: 'FLAGGED CALLOUT + TABLE',
+      title: 'Paracetamol and ibuprofen: reading the dose right',
+      // ⚠️ SAFETY REFRAME. The mg-by-weight table and the gaps-and-ceilings card
+      // are kept below in a comment and are NOT rendered. What stays is how to
+      // read the dose on the bottle for his weight, the mistakes that cause an
+      // overdose, and the two drugs to leave alone. The number is the doctor's
+      // and the label's. Do not restore the table without paediatric and legal
+      // sign-off.
+      format: 'RED FLAG',
       blocks: [
-        PpIntro('This page is here so you can check a number somebody has '
-            'already given you, and so you can spot the common mistakes. It is '
-            'not a prescription and it cannot be one.'),
-        PpCallout(
-          'These are typical ranges only. Your doctor decides your child\'s '
-          'dose, because it depends on his exact weight, his kidneys and liver, '
-          'and anything else he is taking. Confirm the amount and the gap with '
-          'your paediatrician or a pharmacist before you give it, and if he is '
-          'under three months, do not give either of these without being seen.',
-          kind: PpCalloutKind.doctor,
-          title: 'Confirm every dose with your doctor',
-        ),
+        PpIntro('This page will not tell you a number, on purpose. The dose '
+            'is on the bottle and with your doctor. What this page does is '
+            'help you read that number for his weight, and show you the '
+            'handful of mistakes that turn an ordinary fever syrup into an '
+            'overdose.'),
+        /* kept for revert: the mg-by-weight table; needs paediatric + legal sign-off
         PpTable(
           heading: 'Typical single doses, by weight',
           columns: ['Weight', 'Paracetamol, typical', 'Ibuprofen, typical'],
@@ -734,6 +967,8 @@ final PpArea _fever = PpArea(
             ['16 to 20 kg', '240 to 300 mg', '160 to 200 mg'],
           ],
         ),
+        */
+        /* kept for revert: the gaps-and-ceilings card; same sign-off
         PpChartCard(
           title: 'The gaps, and the ceilings',
           // REQUIRED_REVIEW: dosing intervals and daily maxima. Paracetamol
@@ -752,6 +987,42 @@ final PpArea _fever = PpArea(
               'missed one.',
           hue: 12,
         ),
+        */
+        PpSteps([
+          PpStep('Find his latest weight',
+              'The dose is by weight, not age. It is on his growth record, or '
+                  'weigh him with you and subtract.'),
+          PpStep('Find the strength on the label',
+              'Drops, syrup and stronger syrup are different bottles of the '
+                  'same drug. The mg per ml is printed on the front.'),
+          PpStep('Read his weight\'s row on that bottle\'s own table',
+              'Every box carries one. Use that row, for that bottle, and '
+                  'nothing you remember from a different bottle.'),
+          PpStep('Use the syringe or cup that came in that box',
+              'A kitchen spoon is not a dose. A different box\'s syringe is '
+                  'not either.'),
+          PpStep('Write the time down, and which drug',
+              'On the fridge, not in your head. It is the question you will '
+                  'be asked, and the mistake families make when two adults '
+                  'take turns.'),
+        ], heading: 'Reading the dose on the bottle for his weight'),
+        PpCards([
+          PpCard('Double dosing',
+              'Two adults, one night, nobody wrote it down. Paper on the '
+                  'fridge fixes it.'),
+          PpCard('Two brands, the same medicine',
+              'Crocin, Calpol, Dolo, Pyrigesic, Fepanil are all paracetamol. '
+                  'Two of them is two doses.'),
+          PpCard('Drops given like syrup',
+              'Baby drops are more than ten times as strong as the syrup. '
+                  'The same ml is a very different dose.'),
+          PpCard('A combination syrup on top',
+              'Many cold-and-cough syrups already contain paracetamol. Read '
+                  'the back before adding anything.'),
+          PpCard('The wrong syringe',
+              'A 5 ml syringe from another box, read as 1 ml. Only the one '
+                  'that came with the bottle.'),
+        ], heading: 'The mistakes that cause an overdose', hue: 12),
         PpArticle([
           'The most dangerous mistake in Indian homes is not the milligrams, it '
           'is the bottle. Paracetamol is sold as drops at 100 mg in 1 ml for '
@@ -799,7 +1070,7 @@ final PpArea _fever = PpArea(
     PpPage(
       id: 'fever_red_flags',
       title: 'Fever red flags: when to stop watching',
-      format: 'FLAGGED CALLOUT',
+      format: 'RED FLAG',
       blocks: [
         PpIntro('Most fevers are viral and settle in two or three days. These '
             'are the ones that do not, and the signs worth checking for once '
@@ -807,13 +1078,19 @@ final PpArea _fever = PpArea(
         // REQUIRED_REVIEW: every threshold in this callout, in particular the
         // five day duration, the "no urine in eight to twelve hours" figure,
         // and the febrile fit guidance below.
+        // [reuse] [reference] The canonical list, then the fever-specific
+        // lines. Not a third copy.
         PpCallout(
-          'Call or go if: he is under three months with any fever; he is '
-          'breathing fast or working hard to breathe; he has not passed urine in '
-          'eight to twelve hours; he is very drowsy or very hard to console; the '
-          'fever has run more than five days; a rash appears that does not fade '
-          'under a pressed glass; he has a stiff neck or hates the light; or he '
-          'simply looks wrong to you in a way you cannot explain.',
+          'Go now if any of these: ' + kPpGoNowSigns.join('; ') + '.',
+          kind: PpCalloutKind.doctor,
+          title: 'The go-now list',
+        ),
+        PpCallout(
+          'And for a fever specifically, call or go if: he is under three '
+          'months with any fever; he has not passed urine in eight to twelve '
+          'hours; he is very drowsy or very hard to console; the fever has '
+          'run more than five days; he has a stiff neck or hates the light; '
+          'or he simply looks wrong to you in a way you cannot explain.',
           kind: PpCalloutKind.doctor,
           title: 'Any one of these means a doctor',
         ),
@@ -854,8 +1131,11 @@ final PpArea _fever = PpArea(
     PpPage(
       id: 'fever_remedies',
       title: 'Home remedies for fever, honestly',
-      format: 'CARDS',
-      blocks: [
+      // [reference] -> the Home remedies tool, filtered to fever.
+      format: 'TOOL',
+      toolSurfaceId: 'pp_nuskhe/Fever',
+      blocks: [],
+      /* kept for revert: the per-illness remedy cards; the tool is the one source
         PpIntro('Every family has its fever nuskhe, and some of them are lovely. '
             'Here is which ones help, which only comfort, and the two you should '
             'stop.'),
@@ -901,7 +1181,7 @@ final PpArea _fever = PpArea(
           surfaceId: 'pp_nuskhe',
           blurb: 'Fever, cold, colic, teething, skin and sleep.',
         ),
-      ],
+      */
     ),
     PpPage(
       id: 'fever_long',
@@ -1081,7 +1361,9 @@ final PpArea _coughCold = PpArea(
     PpPage(
       id: 'cold_blocked_nose',
       title: 'Clearing a blocked nose',
-      format: 'STEP-LIST',
+      // [reformat: step-list -> video] "Saline drops + aspirator technique.
+      // Parents get this wrong from text." The slot is hoisted; the steps stay.
+      format: 'VIDEO',
       blocks: [
         PpIntro('A small baby breathes through his nose, so a blocked one means '
             'he cannot feed and cannot sleep. This is the single most useful '
@@ -1145,7 +1427,7 @@ final PpArea _coughCold = PpArea(
     PpPage(
       id: 'cough_syrups',
       title: 'Cough syrups: what is safe and what is not',
-      format: 'FLAGGED CALLOUT + TABLE',
+      format: 'RED FLAG',
       blocks: [
         PpIntro('This is the shelf where a well meant purchase can do real harm. '
             'The short version: most cough syrups do not help a small child, and '
@@ -1227,8 +1509,11 @@ final PpArea _coughCold = PpArea(
     PpPage(
       id: 'cough_remedies',
       title: 'Home remedies for cough and cold',
-      format: 'CARDS',
-      blocks: [
+      // [reference] -> the Home remedies tool, filtered to cold and cough.
+      format: 'TOOL',
+      toolSurfaceId: 'pp_nuskhe/Cold & cough',
+      blocks: [],
+      /* kept for revert: the per-illness remedy cards; the tool is the one source
         PpIntro('This is where Indian families start, and often they are right '
             'to. Here is what genuinely helps, what is comfort, and the two to '
             'stop.'),
@@ -1272,7 +1557,7 @@ final PpArea _coughCold = PpArea(
           blurb: 'Five remedies in this category, each marked safe, comfort '
               'only, or unsafe.',
         ),
-      ],
+      */
     ),
     PpPage(
       id: 'cough_breathing',
@@ -1426,7 +1711,9 @@ final PpArea _tummy = PpArea(
     PpPage(
       id: 'tummy_ors',
       title: 'ORS, made right',
-      format: 'STEP-LIST',
+      // [reformat: step-list -> video] "Wrong ratio is dangerous. Show the exact
+      // measure being made." The slot is hoisted; the steps stay as the companion.
+      format: 'VIDEO',
       blocks: [
         PpIntro('Oral rehydration salts save more children than almost anything '
             'else in medicine, and only when they are mixed correctly. Made too '
@@ -1499,11 +1786,15 @@ final PpArea _tummy = PpArea(
     PpPage(
       id: 'tummy_dehydration',
       title: 'Spotting dehydration early',
-      format: 'CHART-CARD',
+      // [reformat: chart-card -> illustrated] "Sunken eyes, no tears, dry mouth,
+      // few wet nappies, sunken soft spot. Visual, not a text chart." The chart
+      // is kept below for revert.
+      format: 'ILLUSTRATION',
       blocks: [
         PpIntro('This is the one thing to check every few hours in a child with '
             'loose motions or vomiting. It is quicker than a thermometer and it '
             'tells you far more.'),
+        /* kept for revert: the chart the picture replaced
         PpChartCard(
           title: 'The signs, in order of usefulness',
           // REQUIRED_REVIEW: EVERY LINE. Confirm the urine intervals we quote
@@ -1520,6 +1811,23 @@ final PpArea _tummy = PpArea(
           note: 'Wet nappies are the single most useful thing to count. Note a '
               'time, and check whether one has been wet since.',
           hue: 140,
+        ),
+        */
+        PpIllustration(
+          kind: PpIllustrationKind.dehydrationSigns,
+          title: 'The signs, where they show',
+          labels: [
+            PpIllustrationLabel('The soft spot, under one year: sunken, not flat'),
+            PpIllustrationLabel('Eyes: sunken, and crying without tears'),
+            PpIllustrationLabel('Mouth and tongue: dry and sticky rather than wet'),
+            PpIllustrationLabel('Nappies: fewer wet ones, or none in 6 to 8 hours',
+                'The single most useful thing to count. Note a time.'),
+            PpIllustrationLabel('Skin: pinched on the belly, it stays up for a moment'),
+            PpIllustrationLabel('How he is: quiet, floppy, hard to rouse, or very irritable'),
+          ],
+          caption: 'Count nappies rather than judging by how he looks. A '
+              'dehydrated child can look reasonably alright right up until he '
+              'suddenly does not.',
         ),
         PpCallout('Count nappies rather than judging by how he looks. A '
             'dehydrated child can look reasonably alright right up until he '
@@ -1656,6 +1964,12 @@ final PpArea _tummy = PpArea(
             'tummy and there is no good evidence they help. Water, fruit and '
             'time do, and an unlabelled churan given daily to a baby is a real '
             'risk.'),
+        // Boundary: Feeding owns constipation when solids start.
+        PpLink(
+          'Constipation when solids start',
+          surfaceId: 'pp_page/parenting_feeding/solids_constipation',
+          blurb: 'The first month of food, and why the poo changes. In Feeding.',
+        ),
       ],
     ),
     PpPage(
@@ -1741,11 +2055,15 @@ final PpArea _skin = PpArea(
     PpPage(
       id: 'skin_which_rash',
       title: 'Which rash is this?',
-      format: 'COMPARISON TABLE',
+      // [reformat: comparison table -> illustration] "Rashes are matched by
+      // eye. A labelled grid beats any table." The table is kept below for revert;
+      // the glass test callout stays.
+      format: 'ILLUSTRATION',
       blocks: [
         PpIntro('Most baby rashes are harmless and look alarming. This compares '
             'the common ones so you can tell which page to read next. It cannot '
             'tell you which one your child has.'),
+        /* kept for revert: the comparison table the grid replaced
         PpTable(
           heading: 'Side by side',
           columns: ['Rash', 'What it looks like', 'Where', 'Usual answer'],
@@ -1799,6 +2117,31 @@ final PpArea _skin = PpArea(
               'Usually settles. Breathing trouble is urgent',
             ],
           ],
+        ),
+        */
+        PpIllustration(
+          kind: PpIllustrationKind.rashGrid,
+          title: 'Which one is it?',
+          labels: [
+            PpIllustrationLabel('Baby acne: small pimples, no itch',
+                'Cheeks and forehead in the first weeks. Nothing; gone by three months.'),
+            PpIllustrationLabel('Heat rash: tiny pinpoint bumps',
+                'Neck folds, back, chest, under clothes. Cool him, loose cotton, less oil.'),
+            PpIllustrationLabel('Eczema: dry, rough, itchy patches',
+                'Cheeks first, then elbow and knee creases. Heavy moisturiser; a doctor for a flare.'),
+            PpIllustrationLabel('Cradle cap: greasy yellow scales',
+                'Scalp and eyebrows. Oil, soften, comb gently. Harmless.'),
+            PpIllustrationLabel('Nappy rash: red, sore, only where the nappy touches',
+                'Air, barrier cream, frequent changes.'),
+            PpIllustrationLabel('HFMD: small blisters, mouth ulcers, fever',
+                'Hands, feet, round the mouth, bottom. Fluids and pain relief; it passes.'),
+            PpIllustrationLabel('Chickenpox: itchy spots that blister then crust, in crops',
+                'Trunk first, then everywhere. Comfort, and keep him away from newborns.'),
+            PpIllustrationLabel('Hives: raised welts that move about and fade',
+                'Anywhere, hour to hour. Usually settles; breathing trouble is urgent.'),
+          ],
+          caption: 'None of these is the one that cannot wait. That one is '
+              'below: small flat spots that do not fade under a pressed glass.',
         ),
         PpCallout(
           'One rash cannot wait. Small flat red or purple spots that do NOT fade '
@@ -2023,7 +2366,7 @@ final PpArea _skin = PpArea(
     PpPage(
       id: 'skin_heat_rash',
       title: 'Prickly heat, and Indian summers',
-      format: 'SHORT ARTICLE',
+      format: 'ARTICLE',
       blocks: [
         PpIntro('Tiny bumps in the neck folds, across the back and under the '
             'clothes, in a baby who is hot. The most common rash in the country '
@@ -2313,7 +2656,7 @@ final PpArea _otherIllness = PpArea(
     PpPage(
       id: 'ill_eyes',
       title: 'Sticky eyes and eye discharge',
-      format: 'SHORT ARTICLE',
+      format: 'ARTICLE',
       blocks: [
         PpIntro('Crusty lashes in the morning are common and usually minor. The '
             'thing that decides how serious it is, is whether the white of the '
@@ -2473,7 +2816,24 @@ final PpArea _otherIllness = PpArea(
           surfaceId: 'pp_experts',
           role: 'pediatrician',
         ),
+        // Boundary: Feeding owns food-allergen introduction and what a
+        // reaction looks like; Health owns general allergy and anaphylaxis.
+        PpLink(
+          'What an allergic reaction looks like',
+          surfaceId: 'pp_page/parenting_feeding/safety_allergy',
+          blurb: 'Mild against call-now, as a picture. In Feeding.',
+        ),
       ],
+    ),
+    // ⚠️ [new] SCAFFOLD. "Teething, and why it does not cause a high fever:
+    // short myth-vs-fact carousel." Copy to be supplied; the card holds its
+    // place. DOOR-CONTENT-OWED HL4.
+    PpPage(
+      id: 'ill_teething_fever',
+      title: 'Teething, and why it does not cause a high fever',
+      format: 'CAROUSEL',
+      comingSoon: true,
+      blocks: [],
     ),
   ],
 );
@@ -2497,7 +2857,7 @@ final PpArea _notSure = PpArea(
     PpPage(
       id: 'ns_what_changed',
       title: 'Something suddenly different?',
-      format: 'FLOW',
+      format: 'TOOL',
       blocks: [
         PpIntro('When you can point at what changed but not at what it means, '
             'start here. It walks you through the likely reasons and leaves you '
@@ -2546,7 +2906,7 @@ final PpArea _notSure = PpArea(
     PpPage(
       id: 'ns_problem_solver',
       title: 'Something is off and you cannot name it',
-      format: 'FLOW',
+      format: 'TOOL',
       blocks: [
         // ⚠️ ADDED IN THE S03 PASS — this area had no video at all.
         // Placed on the page in the area that most needs showing rather
@@ -2634,8 +2994,15 @@ final PpArea _vaccines = PpArea(
     PpPage(
       id: 'vax_schedule',
       title: 'What is due, and when',
-      format: 'CHART',
-      blocks: [
+      // [merge] "This is the tool's own schedule view. Don't keep a separate
+      // chart; it is the tool."
+      format: 'TOOL',
+      toolSurfaceId: 'pp_vaccines',
+      // Its tool leads the tab; a second card for the same surface is the
+      // same thing twice. Kept, unlisted.
+      linkedOnly: true,
+      blocks: [],
+      /* kept for revert: the schedule chart; the tracker IS the schedule
         PpIntro('The Indian schedule, not a Western one. The visits are more '
             'frequent in the first year than parents expect, and most of them '
             'bundle several vaccines into one appointment.'),
@@ -2680,7 +3047,7 @@ final PpArea _vaccines = PpArea(
           blurb: 'What he has had, what is due next, and a reminder before it '
               'is.',
         ),
-      ],
+      */
     ),
     PpPage(
       id: 'vax_what_each',
@@ -2805,7 +3172,7 @@ final PpArea _vaccines = PpArea(
     PpPage(
       id: 'vax_catch_up',
       title: 'If you are behind',
-      format: 'SHORT ARTICLE',
+      format: 'ARTICLE',
       blocks: [
         PpIntro('A missed dose is a delay, not a disaster, and almost never a '
             'reason to start again. This comes up constantly and worries '
@@ -2854,7 +3221,7 @@ final PpArea _vaccines = PpArea(
     PpPage(
       id: 'vax_cost',
       title: 'Government hospital or private clinic, and what it costs',
-      format: 'COMPARISON TABLE',
+      format: 'TABLE',
       blocks: [
         PpIntro('This is asked far more often than it is answered honestly. '
             'Both routes are real, both are used by careful families, and the '
@@ -3009,7 +3376,7 @@ final PpArea _growth = PpArea(
     PpPage(
       id: 'growth_percentiles',
       title: 'What a percentile actually means',
-      format: 'SHORT ARTICLE',
+      format: 'ARTICLE',
       blocks: [
         // ⚠️ ADDED IN THE S03 PASS — this area had no video at all.
         // Placed on the page in the area that most needs showing rather
@@ -3065,7 +3432,7 @@ final PpArea _growth = PpArea(
     PpPage(
       id: 'growth_flags',
       title: 'Growth that needs a doctor',
-      format: 'FLAGGED CALLOUT',
+      format: 'RED FLAG',
       blocks: [
         PpIntro('Most growth worry is unnecessary. This is the short list that '
             'is not, so you know what you are actually watching for.'),
@@ -3148,8 +3515,14 @@ final PpArea _records = PpArea(
       // emergency cards. Feedback: it should say create one and look like
       // something to tap.
       title: 'Create your emergency card',
-      format: 'TAKES 5 MINUTES',
-      blocks: [
+      // [reuse] [merge] Create and show are one tool.
+      format: 'TOOL',
+      toolSurfaceId: 'pp_emergency_card',
+      // Its tool leads the tab; a second card for the same surface is the
+      // same thing twice. Kept, unlisted.
+      linkedOnly: true,
+      blocks: [],
+      /* kept for revert: the create-your-card page; the tool is the one surface
         PpIntro('Somebody else may be the one who takes him in: a grandparent, a '
             'neighbour, the person at the creche. The emergency card is for '
             'them, not for you.'),
@@ -3182,13 +3555,19 @@ final PpArea _records = PpArea(
           surfaceId: 'pp_emergency_card',
           blurb: 'Fill it in once, keep it current.',
         ),
-      ],
+      */
     ),
     PpPage(
       id: 'rec_wallet',
       title: 'Everything in one place',
-      format: 'RECORDS',
-      blocks: [
+      // [reuse] [reference] = the records dashboard.
+      format: 'TOOL',
+      toolSurfaceId: 'pp_health_home',
+      // Its tool leads the tab; a second card for the same surface is the
+      // same thing twice. Kept, unlisted.
+      linkedOnly: true,
+      blocks: [],
+      /* kept for revert: the records page; the dashboard holds records and ID documents
         PpIntro('Every family keeps health papers in a plastic folder that is '
             'never in the room where you need it. This is the same folder, on '
             'your phone, and it takes about twenty minutes to set up.'),
@@ -3232,12 +3611,12 @@ final PpArea _records = PpArea(
           blurb: 'Timeline, prescriptions, reports, medicines, allergies and '
               'visits.',
         ),
-      ],
+      */
     ),
     PpPage(
       id: 'rec_doctor_visit',
       title: 'Getting the most out of seven minutes',
-      format: 'STEP-LIST',
+      format: 'STEPS',
       blocks: [
         // ⚠️ ADDED IN THE S03 PASS — this area had no video at all.
         // Placed on the page in the area that most needs showing rather
@@ -3336,7 +3715,7 @@ final PpArea _prevention = PpArea(
     PpPage(
       id: 'prev_handwashing',
       title: 'The dull things that actually work',
-      format: 'SHORT ARTICLE',
+      format: 'ARTICLE',
       blocks: [
         PpIntro('Nothing in this section prevents illness as effectively as '
             'washing hands, and nothing is more boring to be told. Here is the '
@@ -3432,7 +3811,7 @@ final PpArea _prevention = PpArea(
     PpPage(
       id: 'prev_monsoon',
       title: 'Monsoon, and the season of illness',
-      format: 'SHORT ARTICLE',
+      format: 'ARTICLE',
       blocks: [
         PpIntro('Every Indian family knows the monsoon brings illness. Knowing '
             'which illnesses, and which precautions actually matter, makes the '
@@ -3487,7 +3866,7 @@ final PpArea _prevention = PpArea(
     PpPage(
       id: 'prev_pollution',
       title: 'Air pollution and small lungs',
-      format: 'SHORT ARTICLE',
+      format: 'ARTICLE',
       blocks: [
         PpIntro('In a lot of Indian cities this is a bigger health question for '
             'a child than any single illness, and it is one of the few where '
@@ -3541,7 +3920,9 @@ final PpArea _prevention = PpArea(
     PpPage(
       id: 'prev_medicine',
       title: 'How to give medicine to a baby',
-      format: 'STEP-LIST',
+      // [reformat: step-list -> video] "Syringe into the cheek, not the throat;
+      // positioning. Done wrong, this chokes babies." The slot is hoisted.
+      format: 'VIDEO',
       blocks: [
         PpIntro('Half of a prescription that never reaches the child is a '
             'prescription that did not work. Technique matters more than '

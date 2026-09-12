@@ -659,6 +659,15 @@ class PpAnimation extends PpBlock {
 
 /// Which drawn illustration.
 enum PpIllustrationKind {
+  /// Where to take a temperature: under the arm, forehead, ear, mouth.
+  thermometerRoutes,
+
+  /// A baby with the six dehydration signs numbered.
+  dehydrationSigns,
+
+  /// Eight rashes as a labelled grid of swatches.
+  rashGrid,
+
   /// One bed, set up safely, with the hazards numbered.
   safeBedSetup,
 
@@ -721,7 +730,18 @@ class PpPage {
     this.toolSurfaceId,
     this.linkedOnly = false,
     this.pinned = false,
+    this.comingSoon = false,
   });
+
+  /// ⚠️ A CARD THAT HOLDS ITS PLACE AND DOES NOT TAP. The pregnancy doors'
+  /// rule for a brief that names a piece and says the copy will be supplied
+  /// ("do not AI-generate it; build the scaffolding"): the card sits on the
+  /// rail at full size with a "Coming soon" chip, so nothing moves the day
+  /// the piece lands. The blocks may be empty; the page is exempt from the
+  /// content tests the way a tool page is. Logged in
+  /// `docs/DOOR-CONTENT-OWED.md`, and the test there fails if a coming-soon
+  /// page is not in the ledger.
+  final bool comingSoon;
 
   /// Stable slug. Used for routing, saved items and slot ids, so it must not be
   /// derived from the title — a title is copy and copy gets edited.

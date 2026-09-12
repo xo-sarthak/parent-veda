@@ -40,6 +40,7 @@ import 'products_compare_screen.dart';
 import 'pp_sounds_screen.dart';
 import 'pp_wake_windows_screen.dart';
 import 'pp_what_to_feed_screen.dart';
+import 'remedy_list_screen.dart';
 import '../../data/doors/pp_door_data.dart';
 import 'doors/pp_door_screen.dart';
 
@@ -100,6 +101,44 @@ Widget? ppScreenForSurface(String id) {
       if (n.category == category) return ProviderResultsScreen(need: n);
     }
     return const ProviderResultsScreen();
+  }
+
+  // ⚠️ `pp_page/<sectionId>/<pageId>` OPENS ONE PAGE OF ANOTHER SECTION.
+  //
+  // The Health rebuild makes the choking response canonical in Health and
+  // has Feeding link to it. A `PpLink(pageId:)` resolves only within its own
+  // section, so a cross-section reference needs a surface — and it should
+  // land on the PAGE, not on the other door's tab, or the parent reading
+  // about choking at the table gets a selector to work through first.
+  const pagePrefix = 'pp_page/';
+  if (id.startsWith(pagePrefix)) {
+    final rest = id.substring(pagePrefix.length);
+    final slash = rest.indexOf('/');
+    if (slash > 0) {
+      final section = ppSectionFor(rest.substring(0, slash));
+      final page = section?.pageById(rest.substring(slash + 1));
+      if (section != null && page != null) {
+        if (page.toolSurfaceId case final tool?) return ppScreenForSurface(tool);
+        return ppPageScreen(section, page, onSurface: (context, surfaceId) {
+          final screen = ppScreenForSurface(surfaceId);
+          if (screen == null) return;
+          Navigator.of(context).push(MaterialPageRoute<void>(
+            settings: RouteSettings(name: surfaceId),
+            builder: (_) => screen,
+          ));
+        });
+      }
+    }
+    return null;
+  }
+
+  // ⚠️ `pp_nuskhe/<category>` OPENS THE REMEDIES ALREADY FILTERED. The Health
+  // brief single-sources home remedies: "every per-illness remedy card
+  // elsewhere references this, filtered." The old per-illness card pages
+  // were second copies of the same remedies.
+  const nuskhePrefix = 'pp_nuskhe/';
+  if (id.startsWith(nuskhePrefix)) {
+    return RemedyListScreen(category: id.substring(nuskhePrefix.length));
   }
 
   const sectionPrefix = 'pp_section/';

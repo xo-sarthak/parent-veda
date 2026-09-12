@@ -59,25 +59,47 @@ void ppOpenPage(
   PpPage page, {
   void Function(BuildContext, String)? onSurface,
 }) {
+  if (page.toolSurfaceId != null) {
+    onSurface?.call(context, page.toolSurfaceId!);
+    return;
+  }
+  final (screen, kind) = _ppPageScreenAndKind(section, page, onSurface: onSurface);
+  Navigator.of(context).push(MaterialPageRoute<void>(
+    settings: RouteSettings(name: 'pp/${section.id}/$kind/${page.id}'),
+    builder: (_) => screen,
+  ));
+}
+
+/// The screen `ppOpenPage` would push for a page, without pushing it — so
+/// the router can hand a page in ANOTHER section back as a surface
+/// (`pp_page/<section>/<page>`). Tool pages have no screen of their own;
+/// resolve `toolSurfaceId` through the router instead.
+Widget ppPageScreen(
+  PpSection section,
+  PpPage page, {
+  void Function(BuildContext, String)? onSurface,
+}) =>
+    _ppPageScreenAndKind(section, page, onSurface: onSurface).$1;
+
+(Widget, String) _ppPageScreenAndKind(
+  PpSection section,
+  PpPage page, {
+  void Function(BuildContext, String)? onSurface,
+}) {
   void openById(BuildContext ctx, String id) {
     final target = section.pageById(id);
     if (target == null) return;
     ppOpenPage(ctx, section, target, onSurface: onSurface);
   }
 
-  if (page.toolSurfaceId != null) {
-    onSurface?.call(context, page.toolSurfaceId!);
-    return;
-  }
   final format = page.format?.toUpperCase();
   final months = ChildProfileStore.instance.ageInMonths;
   for (final b in page.blocks) {
     if (b is PpCarousel && format == 'CAROUSEL') {
       final cards = b.cardsFor(months);
       if (cards.isEmpty) break;
-      Navigator.of(context).push(MaterialPageRoute<void>(
-        settings: RouteSettings(name: 'pp/${section.id}/story/${page.id}'),
-        builder: (_) => PpStoryScreen(
+      return (
+        PpStoryScreen(
           title: b.eyebrow ?? page.title,
           cards: cards,
           hue: b.hue,
@@ -85,8 +107,8 @@ void ppOpenPage(
           coverBlurb: b.coverBlurb,
           onPage: openById,
         ),
-      ));
-      return;
+        'story',
+      );
     }
     if (b is PpInteractive && format == 'INTERACTIVE') {
       // ⚠️ AN INTERACTIVE IS A STORY. Decided on a phone, 2026-09-12: the
@@ -96,9 +118,8 @@ void ppOpenPage(
       // is the last slide, and swipes up to its page if it has one. The
       // step-through screen with the buttons is kept (`pp_interactive_
       // screen.dart`) for revert and is opened by nothing.
-      Navigator.of(context).push(MaterialPageRoute<void>(
-        settings: RouteSettings(name: 'pp/${section.id}/interactive/${page.id}'),
-        builder: (_) => PpStoryScreen(
+      return (
+        PpStoryScreen(
           title: b.title,
           cards: ppInteractiveAsSlides(b),
           hue: b.hue,
@@ -109,18 +130,14 @@ void ppOpenPage(
           dim: b.kind == PpInteractiveKind.night,
           onPage: openById,
         ),
-      ));
-      return;
+        'interactive',
+      );
     }
   }
-  Navigator.of(context).push(MaterialPageRoute<void>(
-    settings: RouteSettings(name: 'pp/${section.id}/page/${page.id}'),
-    builder: (_) => PpContentPage(
-      page: page,
-      onSurface: onSurface,
-      onPage: openById,
-    ),
-  ));
+  return (
+    PpContentPage(page: page, onSurface: onSurface, onPage: openById),
+    'page',
+  );
 }
 
 /// One area within a section: a question, and the pages that answer it.

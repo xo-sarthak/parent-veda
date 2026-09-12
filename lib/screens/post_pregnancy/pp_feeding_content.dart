@@ -3775,6 +3775,20 @@ final PpArea _safety = PpArea(
     // first-aid guidance (Indian Academy of Pediatrics / resuscitation
     // council wording), before this ships. It must be signed off by a
     // clinician, not a reviewer.
+    // ⚠️ [reference] -> HEALTH. The choking response was built here first;
+    // the Health door brief makes it canonical on Get help now ("Feeding
+    // links to it, does not keep its own copy"). This card opens that page
+    // directly. The page as it was built here is kept below for revert; the
+    // live copy is `health_choking_response` in `pp_health_content.dart`.
+    PpPage(
+      id: 'safety_choking_response',
+      title: 'If he chokes: what to do',
+      subtitle: 'Back blows and chest thrusts, in Health',
+      format: 'VIDEO',
+      toolSurfaceId: 'pp_page/parenting_health/health_choking_response',
+      blocks: [],
+    ),
+    /* kept for revert: the page before it moved to Health
     PpPage(
       id: 'safety_choking_response',
       title: 'If he chokes: what to do',
@@ -3846,6 +3860,7 @@ final PpArea _safety = PpArea(
         ),
       ],
     ),
+    */
     // ⚠️ [new] CAROUSEL. "Gagging is normal and noisy; choking is silent.
     // Stops the panic and teaches the real emergency."
     PpPage(

@@ -202,6 +202,18 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
               ),
               const SizedBox(height: 26),
 
+              // ---- a pinned jump to another tab ----------------------------
+              if (tab.jumpToTabId case final target?) ...[
+                ppDoorPad(_JumpCard(
+                  title: tab.jumpTitle ?? 'Is this an emergency?',
+                  p: p,
+                  onTap: () => setState(() => _tab = door.tabs
+                      .indexWhere((t) => t.id == target)
+                      .clamp(0, door.tabs.length - 1)),
+                )),
+                const SizedBox(height: 22),
+              ],
+
               // ---- a pinned red flag, above everything ---------------------
               if (redFlag != null) ...[
                 ppDoorPad(_PinnedRedFlag(
@@ -264,8 +276,11 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                       _CardSpec(
                         title: page.title,
                         meta: page.subtitle,
-                        chip: ppDoorChip(page.format),
+                        chip: page.comingSoon
+                            ? 'Coming soon'
+                            : ppDoorChip(page.format),
                         icon: ppDoorFormatIcon(page.format),
+                        soon: page.comingSoon,
                         onTap: () => _openPage(context, page),
                       ),
                   ]
@@ -290,6 +305,17 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                     ),
                 ],
                 const SizedBox(height: 26),
+              ],
+
+              // ---- the tab's footer, in a human voice ----------------------
+              if (tab.footer case final line?) ...[
+                ppDoorPad(Text(line,
+                    style: pvFraunces(
+                        fontSize: 15.5,
+                        fontWeight: FontWeight.w500,
+                        height: 1.5,
+                        color: p.ink2))),
+                const SizedBox(height: 22),
               ],
 
               // ---- the closing, under every tab ----------------------------
@@ -540,12 +566,18 @@ class _CardSpec {
     required this.icon,
     required this.onTap,
     this.meta,
+    this.soon = false,
   });
   final String title;
   final String? meta;
   final String chip;
   final IconData icon;
   final VoidCallback onTap;
+
+  /// A coming-soon card: full size, dimmed, and it does not respond to a tap
+  /// — a tap that does nothing teaches that taps do nothing, so there is no
+  /// ink and no ripple either.
+  final bool soon;
 }
 
 class _RailCard extends StatelessWidget {
@@ -573,9 +605,11 @@ class _RailCard extends StatelessWidget {
     final icon = spec.icon;
 
     return InkWell(
-      onTap: spec.onTap,
+      onTap: spec.soon ? null : spec.onTap,
       borderRadius: BorderRadius.circular(18),
-      child: Container(
+      child: Opacity(
+        opacity: spec.soon ? 0.62 : 1,
+        child: Container(
         width: kPpRailCardWidth,
         decoration: BoxDecoration(
           color: tint,
@@ -644,9 +678,47 @@ class _RailCard extends StatelessWidget {
             ),
           ),
         ]),
+        ),
       ),
     );
   }
+}
+
+/// The pinned jump card: the red-flag treatment, pointing at another tab.
+class _JumpCard extends StatelessWidget {
+  const _JumpCard({required this.title, required this.p, required this.onTap});
+  final String title;
+  final V2Palette p;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(18),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(15, 14, 13, 14),
+          decoration: BoxDecoration(
+            color: kPpUrgentTint,
+            borderRadius: BorderRadius.circular(18),
+            border: Border.all(color: kPpUrgentInk.withValues(alpha: 0.35)),
+          ),
+          child: Row(children: [
+            const Icon(Icons.flag_outlined, size: 18, color: kPpUrgentInk),
+            const SizedBox(width: 11),
+            Expanded(
+              child: Text(title,
+                  style: pvFraunces(
+                      fontSize: 16.5,
+                      fontWeight: FontWeight.w600,
+                      height: 1.22,
+                      letterSpacing: -0.3,
+                      color: p.ink1)),
+            ),
+            const SizedBox(width: 6),
+            Icon(Icons.arrow_forward_rounded, size: 20, color: kPpUrgentInk),
+          ]),
+        ),
+      );
 }
 
 /// The pinned red flag: the doctor page, coral, above the tab's content.

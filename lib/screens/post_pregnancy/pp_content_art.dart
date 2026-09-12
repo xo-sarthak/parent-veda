@@ -332,6 +332,12 @@ class PpIllustrationView extends StatelessWidget {
         color: Colors.white.withValues(alpha: 0.55),
         child: CustomPaint(
           painter: switch (block.kind) {
+            PpIllustrationKind.thermometerRoutes =>
+              _ThermometerPainter(p: p, badges: block.labels.length),
+            PpIllustrationKind.dehydrationSigns =>
+              _DehydrationPainter(p: p, badges: block.labels.length),
+            PpIllustrationKind.rashGrid =>
+              _RashGridPainter(p: p, badges: block.labels.length),
             PpIllustrationKind.safeBedSetup =>
               _SafeBedPainter(p: p, badges: block.labels.length),
             PpIllustrationKind.backToSleep =>
@@ -787,5 +793,154 @@ class _BackToSleepPainter extends _ScenePainter {
     badge(canvas, 2, Offset(w * 0.12, h * 0.86)); // not on her side
     badge(canvas, 3, Offset(w * 0.80, h * 0.86)); // not on her front
     badge(canvas, 4, Offset(w * 0.60, h * 0.30)); // once she rolls herself
+  }
+}
+
+/// A baby's head and shoulders, front on, with the four places a temperature
+/// is taken numbered: under the arm, forehead, ear, mouth.
+class _ThermometerPainter extends _ScenePainter {
+  _ThermometerPainter({required super.p, required super.badges});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final head = Offset(w * 0.5, h * 0.4);
+    final r = h * 0.24;
+
+    // Shoulders and arms, then the head over them.
+    final body = RRect.fromRectAndRadius(
+        Rect.fromLTWH(w * 0.22, h * 0.6, w * 0.56, h * 0.5),
+        Radius.circular(h * 0.16));
+    canvas.drawRRect(body, Paint()..color = Colors.white);
+    canvas.drawRRect(body, ink);
+    canvas.drawCircle(head, r, Paint()..color = Colors.white);
+    canvas.drawCircle(head, r, ink);
+    canvas.drawCircle(Offset(head.dx - r * 0.35, head.dy - r * 0.1), r * 0.06, ink);
+    canvas.drawCircle(Offset(head.dx + r * 0.35, head.dy - r * 0.1), r * 0.06, ink);
+    canvas.drawArc(
+        Rect.fromCenter(center: Offset(head.dx, head.dy + r * 0.4), width: r * 0.5, height: r * 0.3),
+        0.3, 2.5, false, ink);
+    // Ears.
+    canvas.drawOval(Rect.fromCenter(center: Offset(head.dx - r * 1.02, head.dy), width: r * 0.28, height: r * 0.5), ink);
+    canvas.drawOval(Rect.fromCenter(center: Offset(head.dx + r * 1.02, head.dy), width: r * 0.28, height: r * 0.5), ink);
+    // The thermometer, under the left arm.
+    canvas.drawLine(Offset(w * 0.3, h * 0.66), Offset(w * 0.22, h * 0.86), ink..strokeWidth = 3);
+    canvas.drawCircle(Offset(w * 0.22, h * 0.86), r * 0.12, Paint()..color = p.action);
+
+    badge(canvas, 1, Offset(w * 0.26, h * 0.72)); // under the arm
+    badge(canvas, 2, Offset(head.dx, head.dy - r * 0.62)); // forehead
+    badge(canvas, 3, Offset(head.dx + r * 1.3, head.dy)); // ear
+    badge(canvas, 4, Offset(head.dx, head.dy + r * 0.72)); // mouth
+  }
+}
+
+/// A baby, front on, with the dehydration signs numbered where they show:
+/// the soft spot, the eyes, the mouth, the nappy, the belly skin, and how he
+/// is.
+class _DehydrationPainter extends _ScenePainter {
+  _DehydrationPainter({required super.p, required super.badges});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final head = Offset(w * 0.5, h * 0.3);
+    final r = h * 0.18;
+
+    final body = RRect.fromRectAndRadius(
+        Rect.fromLTWH(w * 0.3, h * 0.46, w * 0.4, h * 0.44),
+        Radius.circular(h * 0.14));
+    canvas.drawRRect(body, Paint()..color = Colors.white);
+    canvas.drawRRect(body, ink);
+    canvas.drawCircle(head, r, Paint()..color = Colors.white);
+    canvas.drawCircle(head, r, ink);
+    // Eyes drawn a little hollow.
+    canvas.drawArc(Rect.fromCenter(center: Offset(head.dx - r * 0.35, head.dy), width: r * 0.3, height: r * 0.22), 3.3, 3.0, false, ink);
+    canvas.drawArc(Rect.fromCenter(center: Offset(head.dx + r * 0.35, head.dy), width: r * 0.3, height: r * 0.22), 3.3, 3.0, false, ink);
+    canvas.drawLine(Offset(head.dx - r * 0.2, head.dy + r * 0.45), Offset(head.dx + r * 0.2, head.dy + r * 0.45), ink);
+    // The nappy.
+    canvas.drawLine(Offset(w * 0.3, h * 0.76), Offset(w * 0.7, h * 0.76), ink);
+    // The skin pinch, a small tent on the belly.
+    final pinch = Path()
+      ..moveTo(w * 0.44, h * 0.66)
+      ..lineTo(w * 0.5, h * 0.6)
+      ..lineTo(w * 0.56, h * 0.66);
+    canvas.drawPath(pinch, ink);
+
+    badge(canvas, 4, Offset(w * 0.82, h * 0.8)); // urine
+    badge(canvas, 3, Offset(head.dx + r * 1.45, head.dy + r * 0.45)); // mouth
+    badge(canvas, 2, Offset(head.dx - r * 1.45, head.dy)); // tears / eyes
+    badge(canvas, 1, Offset(head.dx, head.dy - r * 1.3)); // soft spot
+    badge(canvas, 5, Offset(w * 0.18, h * 0.62)); // skin
+    badge(canvas, 6, Offset(w * 0.18, h * 0.86)); // how he is
+  }
+}
+
+/// Eight rashes as a grid of swatches, each drawn in its own hand: pimples,
+/// pinpoints, dry patches, greasy scales, a nappy zone, blisters, crusted
+/// crops, welts. Numbered to the legend.
+class _RashGridPainter extends _ScenePainter {
+  _RashGridPainter({required super.p, required super.badges});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    const cols = 4;
+    const rows = 2;
+    final cw = w / cols;
+    final ch = h / rows;
+    final dot = Paint()..color = p.ink1.withValues(alpha: 0.35);
+    final soft = Paint()..color = p.ink1.withValues(alpha: 0.12);
+
+    for (var i = 0; i < 8; i++) {
+      final cx = (i % cols) * cw;
+      final cy = (i ~/ cols) * ch;
+      final cell = Rect.fromLTWH(cx + 6, cy + 6, cw - 12, ch - 12);
+      canvas.drawRRect(RRect.fromRectAndRadius(cell, const Radius.circular(10)),
+          Paint()..color = Colors.white);
+      canvas.drawRRect(RRect.fromRectAndRadius(cell, const Radius.circular(10)), ink);
+      final c = cell.center;
+      final u = cell.width / 10;
+      switch (i) {
+        case 0: // baby acne: a few small pimples
+          for (final (dx, dy) in [(-2.0, -1.5), (0.5, -2.2), (1.8, 0.2), (-1.0, 1.4)]) {
+            canvas.drawCircle(Offset(c.dx + dx * u, c.dy + dy * u), u * 0.5, dot);
+          }
+        case 1: // heat rash: many pinpoints
+          for (var k = 0; k < 20; k++) {
+            canvas.drawCircle(Offset(c.dx + ((k % 5) - 2) * u * 0.9, c.dy + ((k ~/ 5) - 1.5) * u * 0.9), u * 0.16, dot);
+          }
+        case 2: // eczema: a dry rough patch
+          canvas.drawOval(Rect.fromCenter(center: c, width: u * 6, height: u * 4), soft);
+          for (var k = 0; k < 6; k++) {
+            canvas.drawLine(Offset(c.dx - u * 2 + k * u * 0.8, c.dy - u), Offset(c.dx - u * 2.4 + k * u * 0.8, c.dy + u), ink..strokeWidth = 1);
+          }
+        case 3: // cradle cap: greasy scales
+          for (final (dx, dy) in [(-1.8, -1.2), (0.2, -1.6), (1.6, -0.4), (-0.8, 0.6), (1.0, 1.2)]) {
+            canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(c.dx + dx * u, c.dy + dy * u), width: u * 1.6, height: u * 1.1), Radius.circular(u * 0.3)), soft);
+          }
+        case 4: // nappy rash: a red zone where the nappy sits
+          canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(c.dx, c.dy + u * 0.5), width: u * 6, height: u * 3.5), Radius.circular(u)), soft);
+          canvas.drawLine(Offset(c.dx - u * 3.5, c.dy - u * 1.5), Offset(c.dx + u * 3.5, c.dy - u * 1.5), ink);
+        case 5: // HFMD: small blisters
+          for (final (dx, dy) in [(-2.0, -1.0), (0.0, -1.8), (2.0, -0.8), (-1.0, 1.2), (1.2, 1.4)]) {
+            canvas.drawCircle(Offset(c.dx + dx * u, c.dy + dy * u), u * 0.55, Paint()..color = Colors.white);
+            canvas.drawCircle(Offset(c.dx + dx * u, c.dy + dy * u), u * 0.55, ink..strokeWidth = 1.5);
+          }
+        case 6: // chickenpox: crops, some crusted
+          for (final (dx, dy, crust) in [(-2.0, -1.4, false), (0.3, -2.0, true), (1.9, -0.2, false), (-1.2, 0.8, true), (1.0, 1.6, false), (-2.2, 1.8, false)]) {
+            canvas.drawCircle(Offset(c.dx + dx * u, c.dy + dy * u), u * 0.5, crust ? dot : soft);
+            canvas.drawCircle(Offset(c.dx + dx * u, c.dy + dy * u), u * 0.5, ink..strokeWidth = 1.2);
+          }
+        default: // hives: raised welts that move
+          for (final (dx, dy) in [(-1.6, -1.0), (1.2, -0.2), (-0.4, 1.4)]) {
+            canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(c.dx + dx * u, c.dy + dy * u), width: u * 3, height: u * 1.6), Radius.circular(u)), soft);
+            canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(c.dx + dx * u, c.dy + dy * u), width: u * 3, height: u * 1.6), Radius.circular(u)), ink..strokeWidth = 1.2);
+          }
+      }
+      badge(canvas, i + 1, Offset(cell.left + 14, cell.top + 14));
+    }
   }
 }

@@ -182,6 +182,7 @@ void main() {
       // the guarantee that matters for it.
       for (final (s, a, p) in _allPages()) {
         if (p.toolSurfaceId != null) continue;
+        if (p.comingSoon) continue; // a scaffold; the ledger holds it
         expect(p.blocks, isNotEmpty,
             reason: '${s.id} / ${a.id} / ${p.id} renders an empty screen');
       }
@@ -279,6 +280,7 @@ void main() {
       // opens video-then-steps still fails.
       for (final (s, _, p) in _allPages()) {
         if (p.toolSurfaceId != null) continue; // a tool page renders no blocks
+        if (p.comingSoon) continue; // a scaffold renders no blocks either
         // A carousel or interactive page IS its block: the card opens the
         // slides or the step-through directly, so there is no intro to open
         // with. `test/pp_sleep_door_test.dart` asserts the shape.
