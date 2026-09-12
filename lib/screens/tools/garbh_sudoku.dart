@@ -218,25 +218,17 @@ class _SudokuGameState extends State<SudokuGame> {
   Widget _pad() {
     final keys = <Widget>[
       for (var v = 1; v <= _size; v++)
-        GarbhGameKey(
-            label: '$v',
-            width: _size == 9 ? 34 : 44,
-            onTap: () => _put(v)),
+        GarbhGameKey(label: '$v', onTap: () => _put(v)),
       GarbhGameKey(
           label: '', icon: Icons.backspace_outlined, onTap: () => _put(0)),
     ];
-    // ⚠️ A SCROLL VIEW, NOT A ROW. Ten keys at 34dp plus gaps is 396dp —
-    // wider than a 360dp phone. The row keeps its key size and scrolls;
-    // on a wide screen it centres.
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      padding: const EdgeInsets.symmetric(horizontal: 18),
-      child: Row(children: [
-        for (var i = 0; i < keys.length; i++) ...[
-          if (i > 0) const SizedBox(width: 6),
-          keys[i],
-        ],
-      ]),
+    // ⚠️ A WRAP, NOT A SCROLL. The first version scrolled the ten keys in
+    // one row; on the phone the 8 and 9 sat under the Ask Veda FAB, and a
+    // keypad that needs scrolling is a keypad she cannot type on. Two rows
+    // fit 360dp with the right-hand keys clear of the FAB.
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(18, 0, 84, 0),
+      child: Wrap(spacing: 6, runSpacing: 6, children: keys),
     );
   }
 

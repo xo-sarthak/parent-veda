@@ -292,9 +292,12 @@ class _GarbhRelaxationScreenState extends State<GarbhRelaxationScreen> {
           tween: Tween(end: st.part),
           duration: const Duration(milliseconds: 900),
           curve: Curves.easeInOut,
+          // ⚠️ THE DISC IS INK, NOT THE TINT. At the tint's 20% over white
+          // the highlight was invisible on the phone (2026-09-13); a grey
+          // disc reads as "here" without shouting.
           builder: (context, v, _) => PvFigureHighlight(
             highlight: v,
-            accent: tint,
+            accent: p.ink2,
             line: p.ink3,
             asset: s.figureAsset,
             height: 170,

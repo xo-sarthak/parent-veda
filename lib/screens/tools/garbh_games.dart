@@ -220,13 +220,29 @@ class _WordSearchGameState extends State<WordSearchGame> {
               aspectRatio: 1,
               child: LayoutBuilder(builder: (context, box) {
                 final cell = box.maxWidth / _n;
+                // ⚠️ VERTICAL AND HORIZONTAL RECOGNISERS, NOT A PAN. Found on
+                // the phone (2026-09-13): a pan recogniser inside a ListView
+                // loses every vertical drag to the list's own scroll — the
+                // arena hands a vertical gesture to the vertical recogniser
+                // that claims it, and the pan never does. Declaring the same
+                // two axes the list declares makes the grid the inner member,
+                // and the inner member wins the tie. A diagonal drag is won
+                // by whichever axis moves first; the updates still carry the
+                // full position, so the line is still diagonal.
                 return GestureDetector(
-                  onPanStart: (d) =>
+                  behavior: HitTestBehavior.opaque,
+                  onVerticalDragStart: (d) =>
                       _dragStart(_cellAt(d.localPosition, cell)),
-                  onPanUpdate: (d) =>
+                  onVerticalDragUpdate: (d) =>
                       _dragUpdate(_cellAt(d.localPosition, cell)),
-                  onPanEnd: (_) => _dragEnd(),
-                  onPanCancel: _dragEnd,
+                  onVerticalDragEnd: (_) => _dragEnd(),
+                  onVerticalDragCancel: _dragEnd,
+                  onHorizontalDragStart: (d) =>
+                      _dragStart(_cellAt(d.localPosition, cell)),
+                  onHorizontalDragUpdate: (d) =>
+                      _dragUpdate(_cellAt(d.localPosition, cell)),
+                  onHorizontalDragEnd: (_) => _dragEnd(),
+                  onHorizontalDragCancel: _dragEnd,
                   child: Column(children: [
                     for (var r = 0; r < _n; r++)
                       Expanded(

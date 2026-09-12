@@ -6279,10 +6279,40 @@ what exists; a longer bonding raga is one more archive.org search.
   recording for the other. Found by the test; §43.2's key list is
   unchanged for the relaxation.
 
-### 46.3 Still owed
+### 46.3 Walked on the phone — 2026-09-13, all four pillars
 
-* **The handset walk** — streaming from archive.org on mobile data, the
-  cache landing, playback with the screen off, the credit line's fit.
+* **Shravan streams, caches, and keeps playing with the screen off.** A
+  first play streamed from archive.org within seconds, the real length
+  appeared (4:33), "Saving…" became "Saved offline" mid-track, and the
+  position ran on through a dark screen with the OS showing the app
+  holding media focus. **One bug:** the first build rebuilt the player on
+  the cached file the moment the download landed (keyed on the source),
+  and the old card's dispose stopped the stream mid-track. The source is
+  resolved once per mount now — the stream this time, the file next time.
+* **Kriya's relaxation** narrates each step (Google TTS, utterances in the
+  log), advances on time, pauses, ends. The raga underneath does play —
+  the OS's playback-config "idle" for the MediaPlayer was a red herring;
+  MediaPlayer's own "media started" fires at Begin and every twelve
+  seconds as the drone loops. The figure's highlight was invisible at the
+  tint's 20% over white; it is an ink-grey disc now.
+* **Buddhi:** the 9×9 fits 360dp with legible pencil marks; Hint fills the
+  selected cell. **Two bugs:** the keypad's 8 and 9 sat under the Ask Veda
+  FAB in a scrolling row (two rows now, clear of it), and **drag selection
+  in Word Search lost every vertical drag to the ListView** — a pan
+  recogniser never beats the parent scrollable's vertical one. Declaring
+  the grid's own vertical and horizontal recognisers makes it the inner
+  arena member, which wins the tie; across, down and diagonal all select.
+* **Samvad:** the mantra shelf shows script, transliteration, meaning and
+  source; Read aloud opens the record-first screen on the transliteration;
+  the narrator link speaks and flips to "Stop the narrator".
+* **The shared circle** on Mind & mood draws a square for box breathing,
+  word and count from the clock, "0:56 left".
+* Seen and left: the Ask Veda FAB still covers the right end of full-width
+  buttons everywhere (§42.4); the Kriya flag card's heading reads "STOP IF"
+  while the door's flag reads "Stop and call your doctor today if…" — the
+  same list, two headings.
+
+### 46.4 Still owed
 * **Cloudflare R2.** The user's chosen home. Nine `file` URLs in the
   manifest, once the files are uploaded; nothing else changes. The
   recordings should be re-encoded to one bitrate first (they arrive as

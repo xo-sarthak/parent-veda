@@ -43,7 +43,14 @@ const Color _muted = Color(0xFF6F6878);
 const Color _accShravan = Color(0xFFBE9C4E);
 
 /// The player for one Shravan track, on whatever the manifest says it is.
-class ShravanTrackPlayer extends StatelessWidget {
+///
+/// ⚠️ STATEFUL, BECAUSE THE SOURCE MUST NOT CHANGE UNDER HER. First version
+/// rebuilt the player on the cached file the moment the download landed,
+/// keyed on the source — and the stream she was listening to stopped
+/// mid-track (the old card's dispose stops what it owns; found on the phone,
+/// 2026-09-13). The source is resolved ONCE per mount: the stream this time,
+/// the file next time. A cache is for the next play, never the current one.
+class ShravanTrackPlayer extends StatefulWidget {
   const ShravanTrackPlayer({
     super.key,
     required this.audio,
@@ -57,6 +64,18 @@ class ShravanTrackPlayer extends StatelessWidget {
   final GarbhAudio audio;
   final PregnancyController controller;
   final bool daily;
+
+  @override
+  State<ShravanTrackPlayer> createState() => _ShravanTrackPlayerState();
+}
+
+class _ShravanTrackPlayerState extends State<ShravanTrackPlayer> {
+  GarbhAudio get audio => widget.audio;
+  PregnancyController get controller => widget.controller;
+  bool get daily => widget.daily;
+
+  /// Fixed the first time the library can answer; never changes after.
+  ({String source, bool isFile})? _playable;
 
   void _finished() {
     if (!daily) return;
@@ -97,7 +116,10 @@ class ShravanTrackPlayer extends StatelessWidget {
       animation: Listenable.merge([lib, RagaAudioStore.instance]),
       builder: (context, _) {
         final track = lib.trackFor(audio.id);
-        final playable = lib.playableFor(audio.id);
+        // Resolved once; see the class doc. Until the manifest has loaded
+        // this stays null and the drone draws, then the real player replaces
+        // it — before she has pressed anything.
+        final playable = _playable ??= lib.playableFor(audio.id);
         // ⚠️ THE FIRST PLAY IS THE DOWNLOAD. The stream she is hearing is
         // fetched again into the cache, so the second play needs no data.
         // "Save for offline" is the same call, made before pressing play.
@@ -126,11 +148,7 @@ class ShravanTrackPlayer extends StatelessWidget {
         final cached = lib.isCached(audio.id);
         final downloading = lib.isDownloading(audio.id);
         return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          // ⚠️ THE KEY IS THE SOURCE. When the download lands, the player is
-          // rebuilt on the file rather than the stream; a new key makes that
-          // a fresh widget so a half-played stream is not seeked into a file.
           RagaPlayer(
-            key: ValueKey(playable.source),
             title: track.title,
             subtitle: '${track.minutes} min',
             asset: playable.source,

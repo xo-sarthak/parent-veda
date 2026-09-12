@@ -300,10 +300,12 @@ class RagaAudioStore extends ChangeNotifier {
                 ? DeviceFileSource(asset)
                 : AssetSource(asset));
       }
-    } catch (_) {
+    } catch (e) {
       // ⚠️ A MISSING FILE MUST NOT CRASH THE ALBUM. A recording whose file has
       // been cleaned up by the OS throws here; the album stays usable and the
-      // row simply does not play.
+      // row simply does not play. Logged, because a silent player is the one
+      // failure nobody can see on a screen.
+      debugPrint('[raga] play failed for $asset: $e');
       _playing = false;
       notifyListeners();
     }
