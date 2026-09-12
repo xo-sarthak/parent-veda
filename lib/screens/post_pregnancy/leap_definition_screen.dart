@@ -21,8 +21,10 @@ import 'product_detail_screen.dart';
 import 'reading_reader_screen.dart';
 import 'watch_player_screen.dart';
 
-const List<String> _kMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-String _fmt(DateTime d) => '${d.day} ${_kMonths[d.month - 1]}';
+// The phase's own dates came off with the calendar's — see
+// leap_calendar_screen.dart. Kept for revert.
+// const List<String> _kMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+// String _fmt(DateTime d) => '${d.day} ${_kMonths[d.month - 1]}';
 
 class LeapDefinitionScreen extends StatelessWidget {
   const LeapDefinitionScreen({super.key, required this.leap});
@@ -55,8 +57,8 @@ class LeapDefinitionScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final child = ChildProfileStore.instance;
     final isCurrent = currentLeap(child).number == leap.number;
-    final start = leap.startDate(child.dob);
-    final end = leap.endDate(child.dob);
+    // final start = leap.startDate(child.dob);
+    // final end = leap.endDate(child.dob);
 
     final articles = leap.articleIds.map(readArticleById).toList();
     final products = leap.productIds.map(productById).toList();
@@ -99,7 +101,8 @@ class LeapDefinitionScreen extends StatelessWidget {
                 Row(children: [
                   const Icon(Icons.event_outlined, size: 15, color: Colors.white),
                   const SizedBox(width: 8),
-                  Flexible(child: Text('${_fmt(start)} – ${_fmt(end)}  ·  ${leap.monthsLabel}', style: ppBody(12.5, color: Colors.white.withValues(alpha: 0.92), w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                  // Flexible(child: Text('${_fmt(start)} – ${_fmt(end)}  ·  ${leap.monthsLabel}', style: ppBody(12.5, color: Colors.white.withValues(alpha: 0.92), w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                  Flexible(child: Text('${leap.aroundLabel}, give or take  ·  a lens, not a law', style: ppBody(12.5, color: Colors.white.withValues(alpha: 0.92), w: FontWeight.w600), maxLines: 1, overflow: TextOverflow.ellipsis)),
                 ]),
               ]),
             ),

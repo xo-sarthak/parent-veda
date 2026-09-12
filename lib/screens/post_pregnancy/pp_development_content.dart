@@ -130,6 +130,10 @@ final PpSection kPpDevelopmentSection = PpSection(
   intro: 'What is emerging, what helps, and when something is genuinely worth '
       'a second look. No scores, no scoreboard.',
   bandSet: kPpDevelopmentBands,
+  // ⚠️ THE AGE RULE. No chips; the door opens on his band. "Remove the five
+  // age tabs and the age chooser. Open on the child's age and show only
+  // that." The bands stay as the scoping, not as a picker.
+  autoScope: true,
   areas: [
     // =========================================================================
     //  DOOR 1 — Is my child on track?
@@ -275,7 +279,8 @@ final PpSection kPpDevelopmentSection = PpSection(
           id: 'dev_worth_checking',
           title: 'When something is genuinely worth checking',
           subtitle: 'The honest list, area by area',
-          format: 'FLAGGED CALLOUT, one per area',
+          // format: 'FLAGGED CALLOUT, one per area', // the sentence was the chip
+          format: 'FLAGGED CALLOUT',
           bands: _all,
           blocks: [
             // ⚠️ ADDED BY FEEDBACK: "also have a video when something is
@@ -1209,9 +1214,21 @@ final PpSection kPpDevelopmentSection = PpSection(
         PpPage(
           id: 'dev_tummy_time',
           title: 'Tummy time without the tears',
-          format: 'STEP-LIST',
+          // ⚠️ REFORMAT step-list > video, on the brief: "it is a body
+          // position, and a parent copies that from watching, not reading."
+          // The steps stay under the film; the film leads.
+          // format: 'STEP-LIST',
+          format: 'VIDEO',
           bands: ['dev_0_6', 'dev_6_12'],
           blocks: [
+            PpVideoSlot(
+              title: 'Tummy time, shown',
+              subtitle: 'On your chest, across your lap, then the floor: the '
+                  'three positions at real speed, and when to stop.',
+              minutes: '4 MIN',
+              slotId: 'development/tummy_time',
+              hue: 200,
+            ),
             PpIntro('Almost every baby protests tummy time at first, and '
                 'almost every parent thinks that means stop. Short and often '
                 'is the whole answer.'),
@@ -1475,6 +1492,30 @@ final PpSection kPpDevelopmentSection = PpSection(
     // =========================================================================
     //  DOOR 4 — Speech and language
     // =========================================================================
+    // =========================================================================
+    //  The one [NEW] page of the reissued brief, a scaffold until the copy
+    //  lands. "That corner of the app is blank today." Logged in
+    //  docs/DOOR-CONTENT-OWED.md; the ledger test holds it there.
+    // =========================================================================
+    PpArea(
+      id: 'feelings_play',
+      mark: IntentMark.stepsMark,
+      title: 'Feelings, and getting on with others',
+      blurb: 'Play for the part of growing that has no milestone chart.',
+      hue: 344,
+      pages: [
+        PpPage(
+          id: 'dev_feelings_activities',
+          title: 'Activities for feelings and getting on with others',
+          subtitle: 'Face-to-face play, naming feelings, and taking turns',
+          format: 'ARTICLE',
+          bands: _all,
+          comingSoon: true,
+          blocks: [],
+        ),
+      ],
+    ),
+
     PpArea(
       id: 'speech_language',
       mark: IntentMark.questionMark,
@@ -1869,18 +1910,22 @@ final PpSection kPpDevelopmentSection = PpSection(
     // find out; it was answered by four articles about why the question is
     // hard. The articles are still there and still worth reading — this just
     // stops them being the only answer.
+    // ⚠️ MERGED. "There are two milestone screens that show the same list
+    // two ways. Make it one." The Development journey absorbed the
+    // "usually settled by now" group, and `pp_on_track` now opens it too.
+    // Kept for revert.
+    // PpSectionTool(
+    //   label: 'What is emerging for my child right now',
+    //   blurb: 'Every milestone as a window, never a checklist and never a '
+    //       'score.',
+    //   surfaceId: 'pp_milestones',
+    // ),
     PpSectionTool(
       label: 'Where he is right now',
-      blurb: 'Usually settled by now, emerging now, and the next two or three '
-          'months. Three groups, never a score.',
-      surfaceId: 'pp_on_track',
-      icon: Icons.checklist_rtl_outlined,
-    ),
-    PpSectionTool(
-      label: 'What is emerging for my child right now',
-      blurb: 'Every milestone as a window, never a checklist and never a '
-          'score.',
+      blurb: 'Usually settled by now, emerging now, and a soft look ahead. '
+          'Windows, never a score.',
       surfaceId: 'pp_milestones',
+      icon: Icons.checklist_rtl_outlined,
     ),
     PpSectionTool(
       label: 'Things to do together today',

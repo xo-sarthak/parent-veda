@@ -56,7 +56,8 @@ import 'problem_solver_screen.dart';
 import 'products_discovery_screen.dart';
 import 'pp_experts_data.dart' show kFindHelpNeeds;
 import 'development_all_activities_screen.dart';
-import 'on_track_checklist_screen.dart';
+// import 'on_track_checklist_screen.dart'; // merged into the journey, kept for revert
+import 'development_checkin_screen.dart';
 import 'scripts_library_screen.dart';
 import 'find_help_triage_screen.dart';
 import 'provider_results_screen.dart';
@@ -333,7 +334,16 @@ Widget? _ppScreenFor(String id) => switch (id) {
       // `pp_milestones` on purpose — that screen is about noticing and
       // celebrating one skill, this one is about seeing the whole shape at a
       // glance, and merging them would make both worse.
-      'pp_on_track' => const OnTrackChecklistScreen(),
+      // ⚠️ MERGED INTO THE JOURNEY, 2026-09-12, on the Development brief:
+      // "two milestone screens that show the same list two ways. Make it
+      // one." The journey gained the "usually settled by now" group this
+      // one had and this one lacked the flip-cards and the search. The id
+      // stays so every link into it still lands. Kept for revert.
+      // 'pp_on_track' => const OnTrackChecklistScreen(),
+      'pp_on_track' => const MilestoneJourneyScreen(),
+      // The gentle check-in had no surface of its own; the hub pushed it
+      // directly. The door needs one.
+      'pp_dev_checkin' => const DevelopmentCheckinScreen(),
       // ⚠️ THE BEHAVIOUR SECTION'S STANDOUT TOOL, and until now the section
       // had NO tools at all — its own file header claimed "nine areas plus
       // three tools" while the section registered four areas and none. The

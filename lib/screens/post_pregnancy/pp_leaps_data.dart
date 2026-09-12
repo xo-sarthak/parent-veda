@@ -74,6 +74,25 @@ class Leap {
   DateTime startDate(DateTime dob) => dob.add(Duration(days: (startWeek * 7).round()));
   DateTime endDate(DateTime dob) => dob.add(Duration(days: (endWeek * 7).round()));
 
+  /// ⚠️ THE WINDOW AS AN AGE, NEVER A DATE. "Around 5 to 8 weeks", "around
+  /// 4 to 6 months". The Development brief: the calendar "still gives
+  /// exact-week dates, which your own early research said do not hold up.
+  /// Soften them to 'around this age'." `startDate`/`endDate` stay for
+  /// anything that still needs a real date (the phase alarm); the screens
+  /// no longer print one.
+  String get aroundLabel {
+    if (endWeek <= 13) {
+      return 'around ${startWeek.round()} to ${endWeek.round()} weeks';
+    }
+    // To the nearest half month: "2.5 to 3", never "2.5 to 3.2". A decimal
+    // place is the precision this label exists to give up.
+    String m(double w) => ((w / 4.345) * 2).round() / 2 == ((w / 4.345) * 2).round() ~/ 2
+        ? '${((w / 4.345) * 2).round() ~/ 2}'
+        : '${((w / 4.345) * 2).round() / 2}';
+
+    return 'around ${m(startWeek)} to ${m(endWeek)} months';
+  }
+
   /// Rough age-in-months label for the leap window (e.g. "≈4–6 months").
   String get monthsLabel {
     String m(double w) {

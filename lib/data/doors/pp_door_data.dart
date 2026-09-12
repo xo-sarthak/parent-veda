@@ -34,10 +34,12 @@
 
 import 'package:flutter/material.dart' show IconData;
 
+import 'pp_door_development.dart';
 import 'pp_door_feeding.dart';
 import 'pp_door_health.dart';
 import 'pp_door_sleep.dart';
 
+export 'pp_door_development.dart';
 export 'pp_door_feeding.dart';
 export 'pp_door_health.dart';
 export 'pp_door_sleep.dart';
@@ -118,7 +120,15 @@ class PpDoorTab {
     this.jumpTitle,
     this.note,
     this.footer,
+    this.toMonths,
   });
+
+  /// ⚠️ A TAB THAT DROPS AWAY WITH AGE. Development's "When will my baby..."
+  /// is scoped to the first two years and the brief is explicit that it
+  /// "drops away after 2, on purpose": a parent of a walking three-year-old
+  /// never sees "when will my baby roll over". The age rule applied to a
+  /// whole tab rather than a page. Null means every age.
+  final int? toMonths;
 
   /// ⚠️ A PINNED CARD THAT SWITCHES TAB. Health's default tab pins "Is this
   /// an emergency?" which is a reference to the Get help now tab, not a
@@ -190,6 +200,7 @@ final List<PpDoor> kPpDoors = [
   kPpSleepDoor,
   kPpFeedingDoor,
   kPpHealthDoor,
+  kPpDevelopmentDoor,
 ];
 
 PpDoor? ppDoorFor(String sectionId) {

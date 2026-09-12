@@ -16,9 +16,28 @@ import 'package:flutter/material.dart';
 import 'pp_child_profile.dart';
 import '../../brand/brand_models.dart';
 import '../../brand/presented_by.dart';
+import 'development_area_screen.dart';
 import 'pp_common.dart';
+import 'pp_development_data.dart';
 import 'pp_milestones_data.dart';
 import 'pp_tools_kit.dart';
+
+// ⚠️ THE FOUR AREAS OF GROWING, AS A CLOSER LOOK INSIDE THE TRACKER. The
+// Development brief (reissued): "Brain, Physical, Language and Emotional sit
+// inside the tracker as a way to look closer, not as the front of the
+// section." Each domain sheet ends with a way into the matching area page
+// (the timeline of skills and the go-deeper rails). Two datasets meet here
+// — the milestones behind this screen and the `DevArea` skills behind those
+// pages — and the join is by hand until they are one list; see
+// docs/DOOR-CONTENT-OWED.md.
+const Map<DevDomain, String> _kAreaForDomain = {
+  DevDomain.cognitive: 'cognitive',
+  DevDomain.grossMotor: 'gross_motor',
+  DevDomain.fineMotor: 'fine_motor',
+  DevDomain.language: 'language',
+  DevDomain.social: 'emotional',
+  DevDomain.selfCare: 'selfcare',
+};
 
 class MilestoneJourneyScreen extends StatefulWidget {
   const MilestoneJourneyScreen({super.key});
@@ -47,6 +66,13 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
             // uncommented block referring to a deleted variable is a
             // confusing way to find that out.
             final soon = _store.comingSoon;
+            // ⚠️ MERGED FROM "WHERE HE IS RIGHT NOW" (`pp_on_track`), which
+            // was this list shown a second way. Its one group this screen
+            // lacked: what is typically already there. Observed first, then
+            // every window that has closed; `foundations` excludes observed,
+            // so nothing counts twice. Framed as "usually settled", never
+            // "should be", and never totalled.
+            final settled = <Milestone>[..._store.achieved, ..._store.foundations];
             return ListView(
               padding: const EdgeInsets.only(top: 12, bottom: 48),
               children: [
@@ -95,6 +121,20 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
                       ),
                   ])),
 
+                // ---- usually settled by now, from the merged checklist -----
+                if (settled.isNotEmpty) ...[
+                  const SizedBox(height: 28),
+                  ppToolPad(Row(children: [
+                    const Icon(Icons.check_circle_outline_rounded, size: 17, color: ppPurple),
+                    const SizedBox(width: 8),
+                    Expanded(child: Text('Usually settled by now', style: ppJakarta(17))),
+                  ])),
+                  const SizedBox(height: 6),
+                  ppToolPad(Text('Typical windows that have already passed. Most children have these; some arrive later and still arrive. Tap the circle if you have seen it.', style: ppBody(13))),
+                  const SizedBox(height: 14),
+                  ppToolPad(Column(children: [for (final m in settled) _settledRow(m)])),
+                ],
+
                 // ⚠️ "DEVELOPMENT INSIGHT" AND "RECENTLY CELEBRATED" REMOVED BY
                 // FEEDBACK: "No Development Insight needed, No Recently
                 // Celebrated". Both builders survive further down, so restoring
@@ -136,6 +176,17 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
                 ppToolPad(Text('A soft look ahead — you may begin noticing these in the months to come. Never a deadline.', style: ppBody(13))),
                 const SizedBox(height: 14),
                 ppToolPad(Column(children: [for (final m in soon.take(4)) _soonRow(m)])),
+
+                // The merged checklist's closing line, kept word for word:
+                // the one sentence that makes the whole page safe to read.
+                const SizedBox(height: 8),
+                ppToolPad(Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(16)),
+                  child: Text(
+                      'A row you have not ticked is not a row he has missed. If a skill he had has gone away, or something has felt off for a while, that is worth mentioning to your paediatrician — not because of anything on this page, but because you noticed it.',
+                      style: ppBody(13, h: 1.55)),
+                )),
 
                 const SizedBox(height: 28),
                 ppToolPad(ppLearnBlock(context, const [
@@ -468,6 +519,37 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
   }
   */
 
+  /// A settled row: the domain colour as a bar, the window, and an empty
+  /// circle rather than an empty checkbox — a checkbox asks to be completed;
+  /// a circle simply is not filled yet. Tapping it opens the same memory
+  /// sheet as the flip-cards, so one dataset is written from every row.
+  Widget _settledRow(Milestone m) {
+    final meta = kDomainMeta[m.domain]!;
+    final ticked = _store.isObserved(m.id);
+    return GestureDetector(
+      onTap: () => ticked ? _openDetail(m) : _openObserveSheet(m),
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.fromLTRB(15, 13, 14, 13),
+        decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: ppHair)),
+        child: Row(children: [
+          Container(width: 4, height: 34, decoration: BoxDecoration(color: meta.ink, borderRadius: BorderRadius.circular(99))),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(m.title, style: ppBody(14, color: ppInk, w: FontWeight.w600)),
+              const SizedBox(height: 3),
+              Text('${meta.label} · usually ${m.ageRangeLabel.replaceFirst('Typically ', '')}', style: ppBody(11.5, color: ppMuted)),
+            ]),
+          ),
+          const SizedBox(width: 10),
+          Icon(ticked ? Icons.check_circle_rounded : Icons.circle_outlined, size: 19, color: ticked ? ppPurple : ppBorder),
+        ]),
+      ),
+    );
+  }
+
   Widget _soonRow(Milestone m) {
     final meta = kDomainMeta[m.domain]!;
     return Container(
@@ -529,9 +611,41 @@ class _MilestoneJourneyScreenState extends State<MilestoneJourneyScreen> {
               ]),
               const SizedBox(height: 16),
               for (final m in items) _card(m),
+              // ---- the closer look: this area's own page ----------------
+              const SizedBox(height: 6),
+              _lookCloser(ctx, d),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  /// The way from a domain's milestones into its area page — the skills
+  /// timeline and the Try-together / Watch / Learn rails. Replaces the
+  /// hub's four tiles as the front of the section.
+  Widget _lookCloser(BuildContext ctx, DevDomain d) {
+    final area = devAreaById(_kAreaForDomain[d]!);
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(ctx).pop();
+        Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => DevelopmentAreaScreen(area: area)));
+      },
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(16)),
+        child: Row(children: [
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('Look closer at ${area.name.toLowerCase()}', style: ppJakarta(14)),
+              const SizedBox(height: 3),
+              Text('His skills in this area, what is coming, and small things that help.', style: ppBody(12, color: ppMuted, h: 1.4)),
+            ]),
+          ),
+          const SizedBox(width: 8),
+          const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
+        ]),
       ),
     );
   }

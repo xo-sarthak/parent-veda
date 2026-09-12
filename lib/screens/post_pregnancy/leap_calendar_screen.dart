@@ -15,8 +15,15 @@ import 'pp_common.dart';
 import 'pp_leaps_data.dart';
 import 'leap_definition_screen.dart';
 
-const List<String> _kMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-String _fmt(DateTime d) => '${d.day} ${_kMonths[d.month - 1]}';
+// ⚠️ THE DATES CAME OFF, 2026-09-12. This screen printed each phase as his
+// own calendar window ("3 Oct – 27 Oct") and said "he is in Phase 4 right
+// now" — a precision the app's own research says the leap timing does not
+// have, on the one screen where the brand's honesty slipped. Each phase is
+// now an age ("around 4 to 6 months"), the caveat leads instead of trailing,
+// and "is" became "may be". The phases, names, sunny side and nazar line are
+// untouched. The date helpers are kept for revert.
+// const List<String> _kMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+// String _fmt(DateTime d) => '${d.day} ${_kMonths[d.month - 1]}';
 
 class LeapCalendarScreen extends StatefulWidget {
   const LeapCalendarScreen({super.key});
@@ -69,8 +76,19 @@ class _LeapCalendarScreenState extends State<LeapCalendarScreen> {
             const SizedBox(height: 8),
             _pad(Text('Phase calendar', style: ppFraunces(30, h: 1.1))),
             const SizedBox(height: 6),
-            _pad(Text('Every mental leap of the first two years, mapped to ${child.nameMid}\'s own dates. He is in ${kLeaps[curIdx].label} right now.',
+            // _pad(Text('Every mental leap of the first two years, mapped to ${child.nameMid}\'s own dates. He is in ${kLeaps[curIdx].label} right now.',
+            //     style: ppBody(14, h: 1.55))),
+            _pad(Text('The ten fussy-then-forward phases of the first twenty months, by the age they usually arrive. ${child.nameMid} may be in ${kLeaps[curIdx].label} around now.',
                 style: ppBody(14, h: 1.55))),
+            const SizedBox(height: 10),
+            // The caveat, in the header where it is read, not the footer
+            // where it was not.
+            _pad(Container(
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(color: ppPanel, borderRadius: BorderRadius.circular(14)),
+              child: Text("Timings are approximate: every baby's phases arrive weeks either side, and some are never noticed at all. A way to think about a fussy week, not a rule.",
+                  style: ppBody(12.5, h: 1.5)),
+            )),
 
             // horizontal timeline
             const SizedBox(height: 22),
@@ -96,9 +114,10 @@ class _LeapCalendarScreenState extends State<LeapCalendarScreen> {
               for (int i = 0; i < kLeaps.length; i++) _listRow(kLeaps[i], i, curIdx),
             ])),
 
-            const SizedBox(height: 24),
-            _pad(Text("Timings are approximate - every baby's phases arrive a week or two either side.",
-                textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.5))),
+            // Moved into the header above. Kept for revert.
+            // const SizedBox(height: 24),
+            // _pad(Text("Timings are approximate - every baby's phases arrive a week or two either side.",
+            //     textAlign: TextAlign.center, style: ppBody(12, color: ppMuted, h: 1.5))),
           ],
         ),
       ),
@@ -106,11 +125,11 @@ class _LeapCalendarScreenState extends State<LeapCalendarScreen> {
   }
 
   Widget _timelineCard(Leap l, int i, int curIdx) {
-    final child = ChildProfileStore.instance;
+    // final child = ChildProfileStore.instance; // only the dates read it
     final past = i < curIdx;
     final now = i == curIdx;
-    final start = l.startDate(child.dob);
-    final end = l.endDate(child.dob);
+    // final start = l.startDate(child.dob);
+    // final end = l.endDate(child.dob);
     final a = l.accent;
     return GestureDetector(
       onTap: () => _open(l),
@@ -126,17 +145,18 @@ class _LeapCalendarScreenState extends State<LeapCalendarScreen> {
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            Text(l.label, style: ppJakarta(15, color: now ? Colors.white : ppInk)),
+            Flexible(child: Text(l.label, style: ppJakarta(15, color: now ? Colors.white : ppInk), maxLines: 1, overflow: TextOverflow.ellipsis)),
             const Spacer(),
             if (now)
-              Text('NOW', style: ppBody(9.5, color: Colors.white, w: FontWeight.w800).copyWith(letterSpacing: 0.8))
+              Text('ABOUT NOW', style: ppBody(9.5, color: Colors.white, w: FontWeight.w800).copyWith(letterSpacing: 0.8))
             else if (past)
               const Icon(Icons.check_rounded, size: 15, color: ppMuted),
           ]),
           const SizedBox(height: 6),
           Text(l.name, style: ppBody(12.5, color: now ? Colors.white.withValues(alpha: 0.95) : ppSoft, w: FontWeight.w600, h: 1.3), maxLines: 2, overflow: TextOverflow.ellipsis),
           const Spacer(),
-          Text('${_fmt(start)} – ${_fmt(end)}', style: ppBody(11.5, color: now ? Colors.white.withValues(alpha: 0.9) : ppMuted, w: FontWeight.w600)),
+          // Text('${_fmt(start)} – ${_fmt(end)}', style: ppBody(11.5, color: now ? Colors.white.withValues(alpha: 0.9) : ppMuted, w: FontWeight.w600)),
+          Text(l.aroundLabel, style: ppBody(11.5, color: now ? Colors.white.withValues(alpha: 0.9) : ppMuted, w: FontWeight.w600)),
           const SizedBox(height: 3),
           Text(l.character, style: ppBody(10.5, color: now ? Colors.white.withValues(alpha: 0.8) : (past ? ppMuted : a), w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis),
         ]),
@@ -145,11 +165,11 @@ class _LeapCalendarScreenState extends State<LeapCalendarScreen> {
   }
 
   Widget _listRow(Leap l, int i, int curIdx) {
-    final child = ChildProfileStore.instance;
+    // final child = ChildProfileStore.instance; // only the dates read it
     final now = i == curIdx;
     final past = i < curIdx;
-    final start = l.startDate(child.dob);
-    final end = l.endDate(child.dob);
+    // final start = l.startDate(child.dob);
+    // final end = l.endDate(child.dob);
     final a = l.accent;
     return GestureDetector(
       onTap: () => _open(l),
@@ -177,11 +197,12 @@ class _LeapCalendarScreenState extends State<LeapCalendarScreen> {
                 Flexible(child: Text(l.name, style: ppBody(14.5, color: ppInk, w: FontWeight.w700), maxLines: 1, overflow: TextOverflow.ellipsis)),
                 if (now) ...[
                   const SizedBox(width: 8),
-                  Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: a, borderRadius: BorderRadius.circular(999)), child: Text('NOW', style: ppBody(9, color: Colors.white, w: FontWeight.w800))),
+                  Container(padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3), decoration: BoxDecoration(color: a, borderRadius: BorderRadius.circular(999)), child: Text('ABOUT NOW', style: ppBody(9, color: Colors.white, w: FontWeight.w800))),
                 ],
               ]),
               const SizedBox(height: 3),
-              Text('${_fmt(start)} – ${_fmt(end)}  ·  ${past ? 'behind him' : now ? 'happening now' : 'ahead'}',
+              // Text('${_fmt(start)} – ${_fmt(end)}  ·  ${past ? 'behind him' : now ? 'happening now' : 'ahead'}',
+              Text('${l.aroundLabel}  ·  ${past ? 'likely behind him' : now ? 'around now, give or take' : 'ahead'}',
                   style: ppBody(12, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
             ]),
           ),

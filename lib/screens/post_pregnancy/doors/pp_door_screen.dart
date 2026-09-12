@@ -69,6 +69,9 @@ IconData ppDoorFormatIcon(String? format) => switch (format?.toUpperCase()) {
       'CAROUSEL' => Icons.view_carousel_outlined,
       'INTERACTIVE' => Icons.touch_app_outlined,
       'VIDEO' => Icons.play_circle_outline_rounded,
+      'STEP-LIST' || 'STEPS' => Icons.format_list_numbered_rounded,
+      'FLAGGED CALLOUT' => Icons.flag_outlined,
+      'CONSULT' => Icons.chat_bubble_outline_rounded,
       'AUDIO LIBRARY' || 'AUDIO' => Icons.music_note_outlined,
       'RED FLAG' => Icons.flag_outlined,
       'TALK' => Icons.chat_bubble_outline_rounded,
@@ -107,11 +110,20 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
   late int _tab = () {
     final id = widget.initialTabId;
     if (id == null) return 0;
-    final i = widget.door.tabs.indexWhere((t) => t.id == id);
+    final i = _tabs.indexWhere((t) => t.id == id);
     return i < 0 ? 0 : i;
   }();
 
   PpDoor get door => widget.door;
+
+  /// The tabs for his age. See `PpDoorTab.toMonths`: a tab scoped to the
+  /// first two years is not on the selector for a three-year-old.
+  List<PpDoorTab> get _tabs => [
+        for (final t in door.tabs)
+          if (t.toMonths == null ||
+              ChildProfileStore.instance.ageInMonths < t.toMonths!)
+            t,
+      ];
   PpSection get section => ppSectionFor(door.sectionId)!;
 
   String get _band => section.bandSet?.active.id ?? '';
@@ -155,10 +167,17 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
   Widget _body(BuildContext context, V2Palette p) {
     final bracket = bracketById(door.sectionId);
     final hub = hubFor(door.sectionId);
-    final hue = bracket?.hue ?? door.tabs.first.hue;
+    final tabs = _tabs;
+    final hue = bracket?.hue ?? tabs.first.hue;
     final tint = v2BlockTint(hue, p);
-    final tab = door.tabs[_tab.clamp(0, door.tabs.length - 1)];
-    final rails = _railsFor(tab);
+    final tab = tabs[_tab.clamp(0, tabs.length - 1)];
+    // ⚠️ A TAB OF TOOLS ALONE STILL GETS A RAIL. The tools ride the first
+    // rail, so a tab with no area under it (Development's "The leaps" is
+    // one tool, the calendar) had nowhere to put them and drew nothing. It
+    // gets one rail, headed with the tab's own name.
+    final rails = _railsFor(tab).isNotEmpty || tab.tools.isEmpty
+        ? _railsFor(tab)
+        : [(PpArea(id: tab.id, title: tab.label, blurb: ''), const <PpPage>[])];
     final redFlag = tab.redFlagPageId == null
         ? null
         : section.pageById(tab.redFlagPageId!);
@@ -194,8 +213,8 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
 
               // ---- the selector, first thing under the hero ----------------
               PpDoorCarousel(
-                groups: door.tabs,
-                counts: [for (final t in door.tabs) _countFor(t)],
+                groups: tabs,
+                counts: [for (final t in tabs) _countFor(t)],
                 selected: _tab,
                 p: p,
                 onPick: (i) => setState(() => _tab = i),
@@ -207,9 +226,9 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                 ppDoorPad(_JumpCard(
                   title: tab.jumpTitle ?? 'Is this an emergency?',
                   p: p,
-                  onTap: () => setState(() => _tab = door.tabs
+                  onTap: () => setState(() => _tab = tabs
                       .indexWhere((t) => t.id == target)
-                      .clamp(0, door.tabs.length - 1)),
+                      .clamp(0, tabs.length - 1)),
                 )),
                 const SizedBox(height: 22),
               ],

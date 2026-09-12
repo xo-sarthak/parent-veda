@@ -280,6 +280,11 @@ for an area a brief merged into a tool (its pages stay as data), and the door's
 `closing` row. The home tile and every `pp_section/<id>` link then open the
 door; the library screen stays the engine for sections without one.
 
+Two additions from Development (2026-09-12): a tab may carry `toMonths`, and
+drops off the selector once her child is that old (the brief's "drops away
+after 2, on purpose"); and a tab with `tools` but no `areaIds` still draws
+one rail, headed with the tab's name (The leaps is one tool, the calendar).
+
 ### The door-rebuild additions (2026-09-11, Sleep first)
 
 Three page flags and one age device, all read by the section screen:
