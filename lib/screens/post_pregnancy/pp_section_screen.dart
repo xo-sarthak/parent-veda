@@ -41,7 +41,6 @@ import '../v2/v2_palette.dart';
 import 'pp_age_bands.dart';
 import 'pp_child_profile.dart';
 import 'pp_content.dart';
-import 'pp_interactive_screen.dart';
 import 'pp_story_screen.dart';
 
 /// ⚠️ THE ONE WAY A PAGE OPENS, FROM ANY SCREEN.
@@ -90,9 +89,26 @@ void ppOpenPage(
       return;
     }
     if (b is PpInteractive && format == 'INTERACTIVE') {
+      // ⚠️ AN INTERACTIVE IS A STORY. Decided on a phone, 2026-09-12: the
+      // carousel and the interactive are one design — cover, one idea per
+      // slide, tap right for next, tap left for back, chevrons — and the
+      // done / not-yet buttons are gone. Each step is a slide; the closing
+      // is the last slide, and swipes up to its page if it has one. The
+      // step-through screen with the buttons is kept (`pp_interactive_
+      // screen.dart`) for revert and is opened by nothing.
       Navigator.of(context).push(MaterialPageRoute<void>(
         settings: RouteSettings(name: 'pp/${section.id}/interactive/${page.id}'),
-        builder: (_) => PpInteractiveScreen(block: b, onPage: openById),
+        builder: (_) => PpStoryScreen(
+          title: b.title,
+          cards: ppInteractiveAsSlides(b),
+          hue: b.hue,
+          coverTitle: b.title,
+          coverBlurb: b.blurb,
+          // The brief's "dark and dim" for the 3am page: the same story, on
+          // a darker ground. Everything else stays in the day palette.
+          dim: b.kind == PpInteractiveKind.night,
+          onPage: openById,
+        ),
       ));
       return;
     }

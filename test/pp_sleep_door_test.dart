@@ -34,7 +34,6 @@ import 'package:parentveda/screens/post_pregnancy/doors/pp_door_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_age_bands.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_child_profile.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_content.dart';
-import 'package:parentveda/screens/post_pregnancy/pp_interactive_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_section_registry.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_section_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_sleep_data.dart';
@@ -486,7 +485,8 @@ void main() {
       }
       expect(find.text('Track and understand sleep'), findsOneWidget);
       expect(find.text('Her sleep right now'), findsOneWidget, reason: 'one chart, hers');
-      expect(find.text('Talk to a sleep expert'), findsOneWidget);
+      // Representation B on this door: a sentence with the label in it.
+      expect(find.textContaining('Talk to a sleep expert'), findsOneWidget);
       expect(find.textContaining('FOR YOUR BABY'), findsOneWidget, reason: 'the age line');
       for (final b in kPpSleepBands.bands) {
         expect(find.widgetWithText(GestureDetector, b.label), findsNothing,
@@ -536,25 +536,29 @@ void main() {
       expect(opened, 'catnapping');
     });
 
-    testWidgets('the night step-through shows one step at a time and advances on tap', (tester) async {
+    testWidgets('an interactive is a story: one step per slide, the doctor page last', (tester) async {
       final block = _page('at_3am').blocks.whereType<PpInteractive>().single;
-      await pump(tester, PpInteractiveScreen(block: block));
-      expect(find.text(block.items[0].title), findsOneWidget);
-      expect(find.text(block.items[1].title), findsNothing);
-      await tester.tap(find.text('Tap anywhere for the next step'));
+      final slides = ppInteractiveAsSlides(block);
+      expect(slides, hasLength(block.items.length + 1), reason: 'seven steps and the closing');
+      expect(slides.last.pageId, 'waking_doctor', reason: 'the closing swipes up to the doctor page');
+      await pump(tester, PpStoryScreen(
+        title: block.title, cards: slides, hue: block.hue,
+        coverTitle: block.title, coverBlurb: block.blurb,
+        dim: true, onPage: (_, _) {},
+      ));
+      expect(find.text(block.title), findsWidgets);
+      await tester.tap(find.byIcon(Icons.chevron_right_rounded));
       await tester.pumpAndSettle();
-      expect(find.text(block.items[1].title), findsOneWidget);
+      expect(find.text(block.items[0].title), findsOneWidget);
+      expect(find.text('Done'), findsNothing, reason: 'no buttons; it is a story');
+      expect(find.text('Not yet'), findsNothing);
     });
 
-    testWidgets('the checklist ends on what to fix', (tester) async {
+    test('the checklist kinds become stories too', () {
       final block = _page('sleep_surface').blocks.whereType<PpInteractive>().single;
-      await pump(tester, PpInteractiveScreen(block: block));
-      for (var i = 0; i < block.items.length; i++) {
-        await tester.tap(find.text(i == 2 ? 'Not yet' : 'Done'));
-        await tester.pumpAndSettle();
-      }
-      expect(find.text('TO CHANGE TONIGHT'), findsOneWidget);
-      expect(find.text(block.items[2].title), findsOneWidget);
+      final slides = ppInteractiveAsSlides(block);
+      expect(slides, hasLength(block.items.length + 1));
+      expect(slides.first.body, contains('The surface'), reason: 'the group rides in the body');
     });
   });
 }

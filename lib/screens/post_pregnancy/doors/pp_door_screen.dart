@@ -292,8 +292,40 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                 const SizedBox(height: 26),
               ],
 
-              // ---- the closing offer, under every tab ----------------------
-              if (door.closing case final c?) ...[
+              // ---- the closing, under every tab ----------------------------
+              //
+              // ⚠️ A LINE WHEN THE DOOR HAS ONE, THE CARD OTHERWISE. See
+              // `PpDoor.closingLine`.
+              if (door.closingLine case final line?) ...[
+                ppDoorPad(InkWell(
+                  onTap: door.closing == null
+                      ? null
+                      : () => widget.onSurface(context, door.closing!.surfaceId),
+                  borderRadius: BorderRadius.circular(12),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Text.rich(
+                      TextSpan(children: [
+                        TextSpan(text: line),
+                        if (door.closing != null)
+                          TextSpan(
+                              text: '  ${door.closing!.label} \u2192',
+                              style: pvManrope(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w800,
+                                  height: 1.5,
+                                  color: p.action)),
+                      ]),
+                      style: pvFraunces(
+                          fontSize: 15.5,
+                          fontWeight: FontWeight.w500,
+                          height: 1.5,
+                          color: p.ink2),
+                    ),
+                  ),
+                )),
+                const SizedBox(height: 22),
+              ] else if (door.closing case final c?) ...[
                 ppDoorPad(PpDoorRow(
                   p: p,
                   hue: hue,

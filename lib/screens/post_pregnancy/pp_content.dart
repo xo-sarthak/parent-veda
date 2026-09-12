@@ -599,6 +599,29 @@ class PpInteractive extends PpBlock {
   final double hue;
 }
 
+/// An interactive's items as story slides: one step per slide, the group
+/// name folded into the body where there is one, the closing as the last
+/// slide (linked to its page, if it names one).
+///
+/// ⚠️ THIS IS HOW AN INTERACTIVE RENDERS NOW. Decided on a phone,
+/// 2026-09-12: the carousel and the interactive are one design. The kinds
+/// still mean something — `night` is drawn on the dim ground — and the
+/// done / not-yet walk-through (`pp_interactive_screen.dart`) is kept for
+/// revert and opened by nothing.
+List<PpCarouselCard> ppInteractiveAsSlides(PpInteractive b) => [
+      for (final it in b.items)
+        PpCarouselCard(it.title, [
+          if (it.group != null) it.group!,
+          if (it.detail != null) it.detail!,
+        ].join('  ·  ')),
+      if (b.closing case final c?)
+        if (b.closingPageId case final id?)
+          PpCarouselCard.linked(c, b.closingLabel ?? 'Swipe up for the page',
+              pageId: id)
+        else
+          PpCarouselCard(c),
+    ];
+
 class PpInteractiveItem {
   const PpInteractiveItem(this.title, [this.detail, this.group]);
   final String title;
@@ -1465,7 +1488,15 @@ class PpBlockView extends StatelessWidget {
     return InkWell(
       onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
         settings: const RouteSettings(name: 'pp/interactive'),
-        builder: (_) => PpInteractiveScreen(block: b, onPage: onPage),
+        builder: (_) => PpStoryScreen(
+          title: b.title,
+          cards: ppInteractiveAsSlides(b),
+          hue: b.hue,
+          coverTitle: b.title,
+          coverBlurb: b.blurb,
+          dim: b.kind == PpInteractiveKind.night,
+          onPage: onPage,
+        ),
       )),
       borderRadius: BorderRadius.circular(20),
       child: Container(
@@ -1506,7 +1537,7 @@ class PpBlockView extends StatelessWidget {
               color: night ? Colors.white.withValues(alpha: 0.12) : p.action,
               borderRadius: BorderRadius.circular(999),
             ),
-            child: Text(night ? 'Start, one step at a time' : 'Walk through it',
+            child: Text(night ? 'Start, one step at a time' : 'Swipe through it',
                 style: pvManrope(
                     fontSize: 13,
                     fontWeight: FontWeight.w800,

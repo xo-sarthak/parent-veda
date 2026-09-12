@@ -48,8 +48,17 @@ class PpDoor {
     this.heroImageUrl,
     this.hiddenAreaIds = const [],
     this.closing,
+    this.closingLine,
     this.disclaimer,
   });
+
+  /// ⚠️ THE CLOSING AS ONE QUIET SENTENCE, NOT A CARD. The pregnancy door's
+  /// `closingLine`: a line under whatever tab is open, tappable as a whole
+  /// where `closing` gives it somewhere to go. Tried on Sleep first
+  /// (2026-09-12) so the two representations can be compared on a phone —
+  /// Feeding keeps the card until that is decided. When both are set, the
+  /// line is drawn and the card is not.
+  final String? closingLine;
 
   /// Areas of the section this door deliberately does not show — because a
   /// brief merged them into a tool and their pages are now that tool's data.

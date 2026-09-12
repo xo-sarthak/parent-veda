@@ -39,6 +39,10 @@ import '../v2/v2_palette.dart';
 import 'pp_content.dart';
 
 class PpStoryScreen extends StatefulWidget {
+  /// The dim ground. Not black: OLED black under white type is the harshest
+  /// contrast a screen can show, and this is read half asleep.
+  static const Color dimGround = Color(0xFF17203A);
+
   const PpStoryScreen({
     super.key,
     required this.title,
@@ -47,7 +51,12 @@ class PpStoryScreen extends StatefulWidget {
     this.coverTitle,
     this.coverBlurb,
     this.onPage,
+    this.dim = false,
   });
+
+  /// The brief's "dark and dim" for a story read at 3am: the same slides on
+  /// a deep ground with light type. Nothing else changes.
+  final bool dim;
 
   /// The eyebrow on every slide — what this carousel is.
   final String title;
@@ -113,9 +122,13 @@ class _PpStoryScreenState extends State<PpStoryScreen> {
       );
 
   Widget _body(BuildContext context, V2Palette p) {
-    final ground = v2BlockTint(_hueFor(_index), p);
+    final ground = widget.dim
+        ? PpStoryScreen.dimGround
+        : v2BlockTint(_hueFor(_index), p);
     final card = _slides[_index];
     final linked = card.pageId != null && widget.onPage != null;
+    final ink1 = widget.dim ? Colors.white : p.ink1;
+    final ink2 = widget.dim ? Colors.white.withValues(alpha: 0.7) : p.ink2;
 
     return Scaffold(
       backgroundColor: ground,
@@ -134,7 +147,7 @@ class _PpStoryScreenState extends State<PpStoryScreen> {
                     child: Container(
                       height: 3,
                       decoration: BoxDecoration(
-                        color: p.ink1.withValues(alpha: i <= _index ? 0.7 : 0.18),
+                        color: ink1.withValues(alpha: i <= _index ? 0.7 : 0.18),
                         borderRadius: BorderRadius.circular(999),
                       ),
                     ),
@@ -156,12 +169,12 @@ class _PpStoryScreenState extends State<PpStoryScreen> {
                             fontSize: 10.5,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 1.3,
-                            color: p.ink2)),
+                            color: ink2)),
                   ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close_rounded),
-                  color: p.ink1,
+                  color: ink1,
                   onPressed: () => Navigator.of(context).maybePop(),
                 ),
               ]),
@@ -188,6 +201,7 @@ class _PpStoryScreenState extends State<PpStoryScreen> {
                     itemBuilder: (context, i) => _Slide(
                       card: _slides[i],
                       p: p,
+                      dim: widget.dim,
                       isCover: _hasCover && i == 0,
                       position: _hasCover ? i : i + 1,
                       count: widget.cards.length,
@@ -283,6 +297,7 @@ class _Slide extends StatelessWidget {
     required this.card,
     required this.p,
     required this.isCover,
+    this.dim = false,
     required this.position,
     required this.count,
     required this.linked,
@@ -291,6 +306,7 @@ class _Slide extends StatelessWidget {
   final PpCarouselCard card;
   final V2Palette p;
   final bool isCover;
+  final bool dim;
 
   /// 1-based, excluding the cover.
   final int position;
@@ -301,14 +317,16 @@ class _Slide extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final ink = dim ? Colors.white : p.ink1;
+    final accent = dim ? const Color(0xFFB9C4F2) : p.action;
     final heading = pvFraunces(
         fontSize: isCover ? 30 : 26,
         fontWeight: FontWeight.w600,
         height: 1.18,
         letterSpacing: -0.6,
-        color: p.ink1);
+        color: ink);
     final body = pvManrope(
-        fontSize: 16, fontWeight: FontWeight.w500, height: 1.55, color: p.ink1);
+        fontSize: 16, fontWeight: FontWeight.w500, height: 1.55, color: ink);
 
     final eyebrow = isCover
         ? '$count ${count == 1 ? 'SLIDE' : 'SLIDES'}'
@@ -324,7 +342,7 @@ class _Slide extends StatelessWidget {
                 fontSize: 10,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.3,
-                color: p.action)),
+                color: accent)),
         const SizedBox(height: 14),
         // ⚠️ THE HEADING IS THE SLIDE. On a myth card it is the myth, set as
         // speech, so the reader hears it the way it is said to her.
@@ -337,7 +355,7 @@ class _Slide extends StatelessWidget {
                     fontSize: 10,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 1.3,
-                    color: p.action)),
+                    color: accent)),
             const SizedBox(height: 8),
           ],
           Text(card.body, style: body),
