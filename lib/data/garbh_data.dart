@@ -14,16 +14,21 @@ import '../localization/app_language.dart';
 // ---------------------------------------------------------------------------
 LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
 
+// ⚠️ MINUTES ARE THE MANIFEST'S — Shravan to final, 2026-09-12. Each track
+// is a real recording now (`assets/audio/shravan_manifest.json`) and the
+// lengths here are those recordings', rounded; `test/shravan_library_test`
+// holds the two in agreement. The brief's lengths (7, 7, 8, 10, 6, 15, 15,
+// 12, 8) were the shape of a library, not a promise about files.
 final List<GarbhAudio> kShravan = [
-  GarbhAudio(id: 'morning_raga', title: _t('Morning Calm Raga', 'प्रभात शांति राग'), subtitle: _t('Begin the day with calmness', 'दिन की शुरुआत शांति से कीजिए'), emoji: '🌅', minutes: 7, kind: GarbhKind.raga),
-  GarbhAudio(id: 'bonding_raga', title: _t('Baby Bonding Raga', 'शिशु से जुड़ाव का राग'), subtitle: _t('A melody to share with your baby', 'एक धुन, जो आप शिशु के साथ बाँट सकती हैं'), emoji: '💗', minutes: 7, kind: GarbhKind.raga),
-  GarbhAudio(id: 'evening_raga', title: _t('Evening Raga', 'संध्या राग'), subtitle: _t('Unwind as the day softens', 'दिन ढलते-ढलते मन भी हल्का कीजिए'), emoji: '🌙', minutes: 8, kind: GarbhKind.raga),
-  GarbhAudio(id: 'sleep_raga', title: _t('Sleep Raga', 'निद्रा राग'), subtitle: _t('Drift gently into rest', 'धीरे-धीरे नींद में उतर जाइए'), emoji: '😴', minutes: 10, kind: GarbhKind.raga),
-  GarbhAudio(id: 'relax_raga', title: _t('Relaxation Raga', 'विश्राम राग'), subtitle: _t('Let the tension melt away', 'तनाव को पिघलकर बह जाने दीजिए'), emoji: '🍃', minutes: 6, kind: GarbhKind.raga),
-  GarbhAudio(id: 'rain', title: _t('Gentle Rain', 'हल्की बारिश'), subtitle: _t('Soft, steady rainfall', 'नरम, लगातार बरसती बूँदें'), emoji: '🌧️', minutes: 15, kind: GarbhKind.nature),
-  GarbhAudio(id: 'ocean', title: _t('Ocean Waves', 'समुद्र की लहरें'), subtitle: _t('Slow rolling waves', 'धीरे-धीरे लुढ़कती लहरें'), emoji: '🌊', minutes: 15, kind: GarbhKind.nature),
-  GarbhAudio(id: 'forest', title: _t('Forest Morning', 'जंगल की सुबह'), subtitle: _t('Birdsong and a gentle breeze', 'चिड़ियों की चहचहाहट और हल्की हवा'), emoji: '🌲', minutes: 12, kind: GarbhKind.nature),
-  GarbhAudio(id: 'bells', title: _t('Temple Bells', 'मंदिर की घंटियाँ'), subtitle: _t('Soft, distant bells', 'दूर से आती धीमी घंटियाँ'), emoji: '🔔', minutes: 8, kind: GarbhKind.nature),
+  GarbhAudio(id: 'morning_raga', title: _t('Morning Calm Raga', 'प्रभात शांति राग'), subtitle: _t('Begin the day with calmness', 'दिन की शुरुआत शांति से कीजिए'), emoji: '🌅', minutes: 5, kind: GarbhKind.raga),
+  GarbhAudio(id: 'bonding_raga', title: _t('Baby Bonding Raga', 'शिशु से जुड़ाव का राग'), subtitle: _t('A melody to share with your baby', 'एक धुन, जो आप शिशु के साथ बाँट सकती हैं'), emoji: '💗', minutes: 3, kind: GarbhKind.raga),
+  GarbhAudio(id: 'evening_raga', title: _t('Evening Raga', 'संध्या राग'), subtitle: _t('Unwind as the day softens', 'दिन ढलते-ढलते मन भी हल्का कीजिए'), emoji: '🌙', minutes: 14, kind: GarbhKind.raga),
+  GarbhAudio(id: 'sleep_raga', title: _t('Sleep Raga', 'निद्रा राग'), subtitle: _t('Drift gently into rest', 'धीरे-धीरे नींद में उतर जाइए'), emoji: '😴', minutes: 12, kind: GarbhKind.raga),
+  GarbhAudio(id: 'relax_raga', title: _t('Relaxation Raga', 'विश्राम राग'), subtitle: _t('Let the tension melt away', 'तनाव को पिघलकर बह जाने दीजिए'), emoji: '🍃', minutes: 8, kind: GarbhKind.raga),
+  GarbhAudio(id: 'rain', title: _t('Gentle Rain', 'हल्की बारिश'), subtitle: _t('Soft, steady rainfall', 'नरम, लगातार बरसती बूँदें'), emoji: '🌧️', minutes: 7, kind: GarbhKind.nature),
+  GarbhAudio(id: 'ocean', title: _t('Ocean Waves', 'समुद्र की लहरें'), subtitle: _t('Slow rolling waves', 'धीरे-धीरे लुढ़कती लहरें'), emoji: '🌊', minutes: 11, kind: GarbhKind.nature),
+  GarbhAudio(id: 'forest', title: _t('Forest Morning', 'जंगल की सुबह'), subtitle: _t('Birdsong and a gentle breeze', 'चिड़ियों की चहचहाहट और हल्की हवा'), emoji: '🌲', minutes: 13, kind: GarbhKind.nature),
+  GarbhAudio(id: 'bells', title: _t('Temple Bells', 'मंदिर की घंटियाँ'), subtitle: _t('Soft, distant bells', 'दूर से आती धीमी घंटियाँ'), emoji: '🔔', minutes: 3, kind: GarbhKind.nature),
   GarbhAudio(id: 'bodyscan', title: _t('Body Awareness Journey', 'शरीर को महसूस करने की यात्रा'), subtitle: _t('A guided full-body relaxation', 'पूरे शरीर को शिथिल करने वाला निर्देशित अभ्यास'), emoji: '🧘', minutes: 9, kind: GarbhKind.guided),
 ];
 

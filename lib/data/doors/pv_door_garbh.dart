@@ -17,9 +17,10 @@
 //  The pillars brief: *"Shravan, Samvad, Buddhi and Kriya are placeholders
 //  today."* Walking the code, the second is right and the first is not:
 //
-//    · Shravan has ten tracks in data and ONE bundled file — every card plays
-//      the same tanpura drone (`raga_drone.wav`). The player, the daily pick,
-//      the why-line and skip-today are real.
+//    · Shravan HAD ten tracks in data and ONE bundled file — every card played
+//      the same tanpura drone. (Closed 2026-09-12: nine real recordings by
+//      named recordists via `assets/audio/shravan_manifest.json`, and the
+//      guided track is a narrated script.)
 //    · Samvad's recording is real and writes to My Journal; the narrator is a
 //      "coming soon" line on the record screen.
 //    · Buddhi's four games exist; Sudoku is a 4×4 with three fixed boards.
@@ -105,6 +106,7 @@ const String kGarbhSurfaceReadToday = 'garbh/read/today';
 const String kGarbhSurfaceRelax = 'garbh/relax';
 const String kGarbhSurfaceKriya = 'garbh/kriya';
 const String kGarbhSurfaceJournal = 'garbh/journal';
+const String kGarbhSurfaceCredits = 'garbh/listen/credits';
 
 /// `garbh/listen/<audio id>` — one track on its player.
 String garbhSurfaceListen(String audioId) => 'garbh/listen/$audioId';
@@ -343,6 +345,20 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
       group: kGarbhTabListen,
       heading: 'Guided',
       tiles: _tracks(GarbhKind.guided),
+    ),
+
+    // ⚠️ SINCE SHRAVAN TO FINAL: every track is a real recording by a named
+    // person, and the door says where they come from.
+    PvDoorSection(
+      group: kGarbhTabListen,
+      heading: 'Where these sounds come from',
+      tiles: [
+        PvDoorToolTile(
+          title: 'The people who recorded them',
+          blurb: 'Every track, its recordist, and where the original lives.',
+          surfaceId: kGarbhSurfaceCredits,
+        ),
+      ],
     ),
 
     // =========================================================================

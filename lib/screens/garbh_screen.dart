@@ -23,7 +23,7 @@ import '../services/read_to_baby_saved_store.dart';
 import '../services/read_to_baby_store.dart';
 import '../services/samvad_pool.dart';
 import '../theme/app_theme.dart';
-import '../widgets/cards/raga_player.dart';
+// import '../widgets/cards/raga_player.dart'; // drawn by ShravanTrackPlayer now
 import '../models/breath_pattern.dart';
 import '../widgets/breathing_circle.dart';
 // TalkComposerScreen parked - the Samvad record/write composer was removed when
@@ -36,6 +36,7 @@ import '../data/garbh_rebuild_data.dart';
 import 'garbh_buddhi_screen.dart';
 import 'garbh_relaxation_screen.dart';
 import 'garbh_samvad_daily.dart';
+import 'garbh_shravan_surfaces.dart';
 import '../data/samvad_mantras_data.dart';
 
 // --- warm palette ---
@@ -764,25 +765,13 @@ class ShravanScreen extends StatelessWidget {
           // filed as listening rather than counted as her voice. See
           // GarbhJournalStore.myVoiceSeconds for why that distinction is
           // load-bearing on the album header.
-          RagaPlayer(
-            title: audio.title.now,
-            subtitle: '${audio.minutes} min',
-            onFinished: () {
-              GarbhStore.instance.markDone('shravan');
-              GarbhJournalStore.instance.add(GarbhJournalEntry(
-                id: 'heard_${audio.id}_${DateTime.now().microsecondsSinceEpoch}',
-                kind: GarbhEntryKind.heard,
-                week: controller.currentWeek,
-                tsMs: DateTime.now().millisecondsSinceEpoch,
-                title: audio.title,
-                seconds: audio.minutes * 60,
-              ));
-            },
-          ),
-          const SizedBox(height: 8),
-          Text(s.gsSampleAudio,
-              textAlign: TextAlign.center,
-              style: text.labelSmall?.copyWith(color: _muted)),
+          //
+          // ⚠️ THE PLAYER READS THE MANIFEST NOW — Shravan to final,
+          // 2026-09-12. `ShravanTrackPlayer` plays the real track (streamed,
+          // then cached), shows who recorded it, and keeps the completion
+          // callback above in `daily` mode. With no manifest entry it draws
+          // the drone and the "sample" line, as this screen always did.
+          ShravanTrackPlayer(audio: audio, controller: controller, daily: true),
           const SizedBox(height: 16),
           _PracticeFoot(pillarId: 'shravan', accent: _accShravan, lang: lang),
           _SeeAll(
@@ -854,11 +843,18 @@ class ShravanDetailScreen extends StatelessWidget {
         children: [
           _ShravanHero(audio: audio, s: s),
           const SizedBox(height: 16),
-          RagaPlayer(title: audio.title.now, subtitle: '${audio.minutes} min'),
-          const SizedBox(height: 8),
-          Text(s.gsSampleAudio,
-              textAlign: TextAlign.center,
-              style: text.labelSmall?.copyWith(color: _muted)),
+          // The manifest's track, or the drone with its honest line.
+          ShravanTrackPlayer(audio: audio, controller: controller),
+          const SizedBox(height: 18),
+          Center(
+            child: TextButton.icon(
+              onPressed: () => _push(context, const ShravanCreditsScreen()),
+              icon: const Icon(Icons.info_outline_rounded,
+                  size: 16, color: _muted),
+              label: Text('Where these sounds come from',
+                  style: text.labelMedium?.copyWith(color: _muted)),
+            ),
+          ),
         ],
       ),
     );

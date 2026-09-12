@@ -87,7 +87,9 @@ import '../mind_mood/mm_track_tab.dart';
 import '../../data/doors/pv_door_garbh.dart';
 import '../../data/garbh_data.dart' show kPuzzles, shravanById;
 import '../../data/read_to_baby_data.dart' show kReadAloudPieces, kRtbAffirmations;
-import '../../models/garbh_content.dart' show GarbhPrompt;
+import '../../models/garbh_content.dart' show GarbhKind, GarbhPrompt;
+import '../../data/kriya_relaxation_data.dart' show kKriyaBodyAwareness;
+import '../garbh_shravan_surfaces.dart' show ShravanCreditsScreen;
 import '../garbh_door_surfaces.dart';
 import '../garbh_journal_screen.dart';
 import '../garbh_relaxation_screen.dart';
@@ -239,6 +241,7 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
       kGarbhSurfaceRelax => GarbhRelaxationScreen(pregnancy: c),
       kGarbhSurfaceKriya => KriyaScreen(controller: c, daily: true),
       kGarbhSurfaceJournal => const GarbhJournalScreen(),
+      kGarbhSurfaceCredits => const ShravanCreditsScreen(),
       _ when id.startsWith('garbh/listen/') => _garbhListen(id, c),
       _ when id.startsWith('garbh/read/piece/') => _garbhPiece(id, c),
       _ when id.startsWith('garbh/read/shelf/') => _garbhShelf(id, c),
@@ -589,7 +592,8 @@ bool pvDoorSurfaceResolves(String id) => switch (id) {
       kGarbhSurfaceReadToday ||
       kGarbhSurfaceRelax ||
       kGarbhSurfaceKriya ||
-      kGarbhSurfaceJournal =>
+      kGarbhSurfaceJournal ||
+      kGarbhSurfaceCredits =>
         true,
       _ when id.startsWith('garbh/listen/') =>
         shravanById(id.substring('garbh/listen/'.length)) != null,
@@ -606,10 +610,14 @@ bool pvDoorSurfaceResolves(String id) => switch (id) {
 //  Garbh Sanskar lookups
 // -----------------------------------------------------------------------------
 
-/// `garbh/listen/<id>` → that track on its player.
+/// `garbh/listen/<id>` → that track on its player. The guided track is a
+/// narrated script, so it opens the session, not a player.
 Widget? _garbhListen(String id, PregnancyController c) {
   final a = shravanById(id.substring('garbh/listen/'.length));
   if (a == null) return null;
+  if (a.kind == GarbhKind.guided) {
+    return GarbhRelaxationScreen(pregnancy: c, session: kKriyaBodyAwareness);
+  }
   return ShravanDetailScreen(audio: a, controller: c);
 }
 

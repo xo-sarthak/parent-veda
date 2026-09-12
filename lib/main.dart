@@ -63,6 +63,7 @@ import 'services/expert_follow_store.dart';
 import 'services/daily_store.dart';
 import 'data/garbh_rebuild_data.dart' show GarbhJournalStore;
 import 'services/garbh_store.dart';
+import 'services/shravan_library.dart';
 import 'services/product_store.dart';
 import 'services/read_next_store.dart';
 import 'services/father_content_controller.dart';
@@ -208,6 +209,9 @@ class _ParentVedaAppState extends State<ParentVedaApp>
     // after a restart overwrote the saved set with one item. Every screen
     // that reads this store assumed somebody else had loaded it.
     GarbhJournalStore.instance.init();
+    // Shravan's sound manifest and the list of tracks already saved offline.
+    // Same lesson as the line above: a lazy `init()` needs one owner.
+    ShravanLibrary.instance.init();
     // Load Community persistence (joins, likes, saves, votes, posts).
     CommunityStore.instance.init();
     // Load followed experts (Twitter-style following, experts only).

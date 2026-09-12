@@ -1,0 +1,104 @@
+{
+  "_about": "Shravan's sound library. One entry per GarbhAudio id in lib/data/garbh_data.dart. `file` is what plays (streamed, then cached on the device); `sourceUrl` is the page it came from; `licence` and `attribution` are shown on the credits screen. Replacing a track is editing this file. Every entry below is a named recordist's own work released under a public-domain dedication (CC0 / CC PD / Public Domain Mark) on archive.org. Direct archive.org links are the interim home; the intended home is Cloudflare R2 — swap `file`, nothing else. The guided track (`bodyscan`) is not a file: it is a narrated script, see kKriyaBodyAwareness.",
+  "tracks": [
+    {
+      "id": "morning_raga",
+      "title": "Morning Calm Raga",
+      "category": "raga",
+      "durationSec": 273,
+      "file": "https://archive.org/download/VeenaKinhalTributeToVeenaRajaRao/HaratanayaSree.mp3",
+      "sourceUrl": "https://archive.org/details/VeenaKinhalTributeToVeenaRajaRao",
+      "licence": "CC Public Domain Dedication",
+      "attribution": "Veena Kinhal — \"Haratanaya Sree\" in raga Nata, on the veena",
+      "note": "A composition of Veena Raja Rao, played by his daughter and student."
+    },
+    {
+      "id": "bonding_raga",
+      "title": "Baby Bonding Raga",
+      "category": "raga",
+      "durationSec": 171,
+      "file": "https://archive.org/download/VeenaKinhal-Mangala-MannaruKrshnageMangala-VasantaRaga/15mang.mp3",
+      "sourceUrl": "https://archive.org/details/VeenaKinhal-Mangala-MannaruKrshnageMangala-VasantaRaga",
+      "licence": "CC0 1.0",
+      "attribution": "Veena Kinhal — a mangala in raga Vasanta, on the veena (Michigan, 2009)",
+      "note": "A closing benediction. A shared moment; not a benefit to anyone."
+    },
+    {
+      "id": "evening_raga",
+      "title": "Evening Raga",
+      "category": "raga",
+      "durationSec": 812,
+      "file": "https://archive.org/download/LR_kIravANI/kiravani_vbr.mp3",
+      "sourceUrl": "https://archive.org/details/LR_kIravANI",
+      "licence": "CC Public Domain Dedication",
+      "attribution": "L. Ramakrishnan — alapana and tanam in raga Kiravani, on the veena",
+      "note": "Kiravani is an evening raga. Recorded at a home studio in Portland."
+    },
+    {
+      "id": "sleep_raga",
+      "title": "Sleep Raga",
+      "category": "raga",
+      "durationSec": 726,
+      "file": "https://archive.org/download/VeenaKinhalMichiganConcert-VeenaRajaRaoCentenaryYearCelebrations/07simh.mp3",
+      "sourceUrl": "https://archive.org/details/VeenaKinhalMichiganConcert-VeenaRajaRaoCentenaryYearCelebrations",
+      "licence": "CC Public Domain Dedication",
+      "attribution": "Veena Kinhal — \"Neekenduku dayaradu\" in raga Simhendramadhyamam, on the veena (Michigan, 2009)",
+      "note": "A late-evening raga."
+    },
+    {
+      "id": "relax_raga",
+      "title": "Relaxation Raga",
+      "category": "raga",
+      "durationSec": 508,
+      "file": "https://archive.org/download/shrInilotpalanayike/3AudioTrack.mp3",
+      "sourceUrl": "https://archive.org/details/shrInilotpalanayike",
+      "licence": "CC0 1.0",
+      "attribution": "L. Ramakrishnan — \"Shri Nilotpala Nayike\" (Dikshitar) in raga Nariritigaula, on the veena (Chennai, 2011)",
+      "note": ""
+    },
+    {
+      "id": "rain",
+      "title": "Gentle Rain",
+      "category": "nature",
+      "durationSec": 427,
+      "file": "https://archive.org/download/aporee_62755_72998/032120241728PMlightrainbirdsviaambics.mp3",
+      "sourceUrl": "https://archive.org/details/aporee_62755_72998",
+      "licence": "Public Domain Mark",
+      "attribution": "alfa00 — light rain and birds, Cappaduff, County Clare (radio aporee)",
+      "note": "Field recording; rain with birds under it."
+    },
+    {
+      "id": "ocean",
+      "title": "Ocean Waves",
+      "category": "nature",
+      "durationSec": 652,
+      "file": "https://archive.org/download/aporee_64627_74588/1179MSDABKIseawavesfromdistance2404301951.mp3",
+      "sourceUrl": "https://archive.org/details/aporee_64627_74588",
+      "licence": "Public Domain Mark",
+      "attribution": "Piotrek Zyla — sea waves from a distance, Dabki beach, Poland (radio aporee)",
+      "note": "Recorded from the middle of the beach, some way back from the water."
+    },
+    {
+      "id": "forest",
+      "title": "Forest Morning",
+      "category": "nature",
+      "durationSec": 785,
+      "file": "https://archive.org/download/aporee_66457_76841/birdrob.mp3",
+      "sourceUrl": "https://archive.org/details/aporee_66457_76841",
+      "licence": "Public Domain Mark",
+      "attribution": "maciej janasik — birds at the edge of a forest in fog, Mechlin, Poland (radio aporee)",
+      "note": "A quiet recording; the recordist suggests turning it up a little."
+    },
+    {
+      "id": "bells",
+      "title": "Temple Bells",
+      "category": "nature",
+      "durationSec": 176,
+      "file": "https://archive.org/download/aporee_51432_58687/09PiotrekZylaPrakrtiTempleBells.mp3",
+      "sourceUrl": "https://archive.org/details/aporee_51432_58687",
+      "licence": "Public Domain Mark",
+      "attribution": "Piotrek Zyla — evening prayer bells, Prakrti temple, New Delhi (radio aporee)",
+      "note": ""
+    }
+  ]
+}

@@ -144,7 +144,7 @@ class _GarbhRelaxationScreenState extends State<GarbhRelaxationScreen> {
       setState(() => _step = i);
       final st = s.steps[i];
       GarbhNarrator.instance
-          .speak(st.narrationKey, st.script, lang: widget.pregnancy.language);
+          .speak(s.narrationKeyFor(st), st.script, lang: widget.pregnancy.language);
     } else {
       setState(() {}); // the clock line
     }
@@ -155,7 +155,7 @@ class _GarbhRelaxationScreenState extends State<GarbhRelaxationScreen> {
       setState(() => _paused = false);
       final st = s.steps[_step.clamp(0, s.steps.length - 1)];
       GarbhNarrator.instance
-          .speak(st.narrationKey, st.script, lang: widget.pregnancy.language);
+          .speak(s.narrationKeyFor(st), st.script, lang: widget.pregnancy.language);
       _resumeBg();
     } else {
       setState(() => _paused = true);

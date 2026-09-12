@@ -6212,3 +6212,161 @@ platform channel in a widget test never completes — it does not throw.**
 `await`ing anything that reaches `flutter_tts` from a test body hangs for
 the framework's ten-minute limit. Fire, pump, assert on state; never await
 the plugin.
+
+---
+
+## 46.0 Shravan to final — nine real recordings, a manifest, and a cache — 2026-09-12
+
+The last of the four Garbh Sanskar pillars. Not walked on a phone — the
+other terminal holds it. The user's call: no audio files of their own; source
+them.
+
+### 46.1 Where the sound came from, and the rule that chose it
+
+Every track is on **archive.org**, by a **named recordist**, under a
+**public-domain dedication** (CC0, the old CC PD dedication, or the Public
+Domain Mark set by the recordist). Direct links, no login, no egress bill,
+each item's own page beside it as `sourceUrl`. The SHARED block's rule —
+*"When in doubt, leave it out"* — decided the rest:
+
+* Five Carnatic veena recordings: two by **L. Ramakrishnan** (Kiravani
+  alapana, "Shri Nilotpala Nayike"), three by **Veena Kinhal** (Nata,
+  Vasanta, Simhendramadhyamam). Both artists self-published these with a PD
+  dedication; the description names the concert or the studio.
+* Four field recordings from **radio aporee** contributors: light rain with
+  birds (alfa00, County Clare), sea waves from a distance (Piotrek Zyla,
+  Dabki), birds at a forest's edge in fog (maciej janasik, Mechlin), and
+  **evening prayer bells at Prakrti temple, New Delhi** (Piotrek Zyla).
+* Left out: every "Ravi Shankar collection" and Bollywood item marked
+  public-domain on archive.org (the mark is the uploader's, not the label's);
+  every item with no creator; a veena *tutorial*; Pixabay and Freesound
+  (downloads need an account). Two Taiwanese temple recordings with traffic
+  and voices in them lost to the Delhi bells.
+
+**Lengths are the recordings'**, not the brief's: `kShravan.minutes` was
+updated (5, 3, 14, 12, 8 / 7, 11, 13, 3) and a test holds it to the
+manifest. Sleep Raga at twelve minutes and Baby Bonding Raga at three are
+what exists; a longer bonding raga is one more archive.org search.
+
+### 46.2 What was built
+
+* **`assets/audio/shravan_manifest.json`** — one entry per track: id,
+  title, category, durationSec, `file` (what plays), `sourceUrl`, licence,
+  attribution, note. Replacing a track is editing this file.
+* **`ShravanLibrary`** — reads the manifest at startup (`main.dart`, the
+  journal-store lesson), answers what plays (a cached file, else the URL),
+  downloads to the app's support directory (`.part` then rename), lists
+  what is saved. Nothing throws to a screen; no entry means the drone.
+* **`RagaAudioStore`** plays URLs now (`isUrl`, stated by the caller, never
+  sniffed) and sets an **audio context** — Android `stayAwake` + media
+  usage, iOS playback category — so a track keeps playing with the screen
+  off. Manifest tracks do not loop; they end, which is what fires
+  `onFinished` and the journal's "what your baby heard".
+* **`ShravanTrackPlayer`** — one widget for the daily screen and the
+  library detail: the real player, the recordist's line under it, a "Save
+  for offline" pill. **The first play is the download**: the stream she
+  hears is fetched again into the cache, so the second play needs no data.
+  With no manifest entry it draws exactly what shipped — the drone and the
+  "sample" line.
+* **`ShravanCreditsScreen`** — every track's recordist, licence and source.
+  The brief asks for credits only for CC-BY; these are shown regardless.
+  A card on the door's Listen tab and a link on the detail screen open it.
+* **Body Awareness Journey is a script** (`kKriyaBodyAwareness`, nine
+  minutes, awareness not release) on the relaxation screen — the brief's
+  own allowance. The narration key now carries the SESSION id
+  (`kriya.body_awareness.<step>` / `kriya.relax.<step>`): both scripts have
+  a `face` and a `belly`, and a step-only key would have played one's
+  recording for the other. Found by the test; §43.2's key list is
+  unchanged for the relaxation.
+
+### 46.3 Still owed
+
+* **The handset walk** — streaming from archive.org on mobile data, the
+  cache landing, playback with the screen off, the credit line's fit.
+* **Cloudflare R2.** The user's chosen home. Nine `file` URLs in the
+  manifest, once the files are uploaded; nothing else changes. The
+  recordings should be re-encoded to one bitrate first (they arrive as
+  archive.org's VBR MP3s, 4–13 MB each).
+* **A media notification with lock-screen controls.** Playback survives a
+  locked screen now, but she cannot pause it from there. That is
+  `audio_service` (a foreground service, both platforms' config) and it is
+  the reason `RagaAudioStore`'s header waited. One more plugin, done
+  properly, or not at all.
+* **A longer Baby Bonding Raga** (three minutes today) if one turns up with
+  the same provenance.
+* **Background audio under the relaxation** — the raga chips on the
+  relaxation intro still play the drone (`_kShravanAsset`); the day they
+  read the manifest is a ten-line change in `garbh_relaxation_screen.dart`,
+  left for the walk so it is heard first.
+
+**All four pillars are built.** The Garbh Sanskar area is complete as
+briefed; the ledger's remaining rows are recordings and hosting, not code.
+
+---
+
+## 47.0 Development, the fourth parenting door — 2026-09-12
+
+Built to `Development_Parenting.pdf`, the **reissued** brief of 31 Aug 2026,
+which says on its last line that it replaces `ParentVeda_Development_rebuild.pdf`.
+The two disagree on every tab, so the user chose: reissued. The door is
+`lib/data/doors/pp_door_development.dart`; the contract is
+`test/pp_development_door_test.dart`. Not yet walked on a phone.
+
+### 47.1 What was found that the brief did not know
+
+* **Two datasets, not one.** The brief: "the four areas of growing are just a
+  closer look at that same list." The tracker (`pp_milestones`) runs on
+  `MilestoneStore` — 18 milestones in six domains; the Brain / Physical /
+  Language / Emotional pages run on `DevArea` skills in
+  `pp_development_data.dart`. Ticking in one does not tick the other. The
+  join is a hand map, `_kAreaForDomain` in `milestone_journey_screen.dart`,
+  and each domain sheet in the tracker now ends with "Look closer at
+  thinking" into the area page. Making them one list is a data job — logged
+  as DV2 in `docs/DOOR-CONTENT-OWED.md`.
+* **The check-in had no surface.** The hub pushed `DevelopmentCheckinScreen`
+  directly; the door needed an id. `pp_dev_checkin`, in the router.
+* **A tab of tools alone drew nothing.** The shell rides tools on the first
+  rail, and The leaps / Talk and check have no area under them. The shell now
+  synthesises one rail headed with the tab's name when a tab has tools and no
+  areas (`pp_door_screen.dart`, `_body`). Pregnancy's engine untouched.
+* **Two tabs are age-scoped as a whole.** "When will my baby..." is up to two
+  years ("drops away after 2, on purpose"), The leaps the first twenty months.
+  `PpDoorTab.toMonths`; the selector shows five, then four, for an older
+  child. A three-year-old's mother never sees "when will my baby roll over".
+
+### 47.2 The merges and the reframe
+
+* **One tracker.** `pp_on_track` (three groups) and `pp_milestones` (windows,
+  flip-cards, find-it search, explore by area) were one list two ways. The
+  journey survives; it gained the "Usually settled by now" group (observed
+  first, then closed windows; `foundations` excludes observed so nothing
+  counts twice) and the checklist's closing line word for word. `pp_on_track`
+  opens the journey; `OnTrackChecklistScreen` is kept, unreferenced.
+* **The hub beside the reassurance.** `pp_development` (today's pick, the
+  activities) is the one Tool on What to do, so a parent who opens the
+  activities is one swipe from "the normal range is much wider than you
+  think". The hub's own screen is unchanged.
+* **The leap dates came off.** The calendar printed his own dates ("3 Oct –
+  27 Oct") and "he is in Phase 4 right now". Now `Leap.aroundLabel` — "around
+  4 to 6 months", to the nearest half month — "may be in", "ABOUT NOW", and
+  the caveat in the header, not the footer. The phase detail page likewise.
+  `startDate`/`endDate` stay for the phase alarm. The library's honest leap
+  read (`dev_leaps_lens`) untouched, as the brief asks.
+* **Tummy time is a film first.** Slot `development/tummy_time`, the six
+  steps under it. DV3.
+
+### 47.3 Open, for the user
+
+* **Six tabs on a phone, again.** The brief's call; walk it and decide, as
+  with Health. If five, the merge is Talk and check into On track (the
+  checker as a tool there, the closing already everywhere).
+* **Order on Tab 1.** The shell puts tools first, so "Where he is right now"
+  leads the rail and the three reassurance reads follow. The brief lists the
+  reads first. The tracker IS the on-track answer, so this seems right; say
+  if the reads should lead.
+* **"Talk to a specialist" is the closing, not a Tab 6 card.** The closing
+  draws under every tab including Tab 6, so a second card there was the same
+  thing twice. If the tab should carry its own card, it is one `PpDoorTool`.
+* **The hub's two doors** (`kPpDevelopment` in `parenting_hubs.dart`) are
+  bypassed on V3 — the tile opens the door — and untouched for the older
+  home.

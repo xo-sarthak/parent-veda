@@ -12,7 +12,7 @@
 //  it: one step at a time, for [seconds], lighting [part] on the figure,
 //  speaking [script] through `GarbhNarrator`. A longer session, a different
 //  order, a step cut — data. A recorded voice — a line in the narration
-//  manifest under [narrationKey], and the TTS stops being used for that step
+//  manifest under `narrationKeyFor(step)`, and the TTS stops being used for that step
 //  the day the file is listed. Nothing in the screen names a step.
 //
 //  ⚠️ THE SCRIPT IS ORIGINAL, WRITTEN HERE, AND MAKES NO CLAIM. The pillars
@@ -61,20 +61,27 @@ class KriyaRelaxationStep {
   /// Where the figure lights up: 0 at the head, 1 at the feet, 0.5 for the
   /// whole body.
   final double part;
-
-  /// The key the narration manifest would carry a recording under.
-  String get narrationKey => 'kriya.relax.$id';
 }
 
 /// The session: title, intro, the steps, the close.
 class KriyaRelaxation {
   const KriyaRelaxation({
+    required this.id,
     required this.title,
     required this.intro,
     required this.steps,
     required this.close,
     this.figureAsset,
   });
+
+  /// Names the session in every narration key: `kriya.<id>.<step id>`.
+  ///
+  /// ⚠️ THE KEY IS THE SESSION'S, NOT THE STEP'S. Two scripts share step ids
+  /// — both have a `face`, a `belly`, a `return` — and a key computed from
+  /// the step alone would hand the relaxation's recorded "face" to the
+  /// body-awareness "face". Found by the test that checked the two key sets
+  /// did not collide.
+  final String id;
 
   final String title;
 
@@ -89,9 +96,13 @@ class KriyaRelaxation {
   final String? figureAsset;
 
   int get totalSeconds => steps.fold(0, (a, s) => a + s.seconds);
+
+  /// The key the narration manifest would carry a recording of [step] under.
+  String narrationKeyFor(KriyaRelaxationStep step) => 'kriya.$id.${step.id}';
 }
 
 const KriyaRelaxation kKriyaRelaxation = KriyaRelaxation(
+  id: 'relax',
   title: 'Guided Relaxation',
   intro: 'Eight minutes, head to toe. A voice walks you down your body, one '
       'part at a time, and asks each one to let go. You do not have to do it '
@@ -218,6 +229,138 @@ const KriyaRelaxation kKriyaRelaxation = KriyaRelaxation(
       script: 'When you are ready, and not before, wriggle your fingers and '
           'your toes. Take one deeper breath. Open your eyes slowly. Take '
           'your time getting up; roll to your side first.',
+    ),
+  ],
+);
+
+// -----------------------------------------------------------------------------
+//  Shravan's guided track — "Body Awareness Journey", nine minutes
+// -----------------------------------------------------------------------------
+//  The Shravan brief lists it under Guided: *"a spoken body-scan; you may use
+//  TTS for now, see Kriya, and reuse that here."* So it is the second script
+//  on the same session screen, not a sourced file — the one Shravan entry the
+//  audio manifest does not hold. Awareness rather than release: Kriya's
+//  relaxation asks each part to let go; this one only asks her to notice it.
+//  Same rules: side or propped, head to toe, no claim about the baby.
+const KriyaRelaxation kKriyaBodyAwareness = KriyaRelaxation(
+  id: 'body_awareness',
+  title: 'Body Awareness Journey',
+  intro: 'Nine minutes of noticing. A voice moves your attention down your '
+      'body, one part at a time, and asks nothing of any of them except that '
+      'you feel it is there.',
+  close: 'That is the journey. You were here the whole time.',
+  steps: [
+    KriyaRelaxationStep(
+      id: 'arrive',
+      title: 'Arrive',
+      part: 0.5,
+      seconds: 50,
+      script: 'Lie on your side with a pillow between your knees, or sit '
+          'propped up. Not flat on your back. Let your eyes close or soften. '
+          'Notice the weight of you on the surface beneath you, and the '
+          'places where you touch it. You do not have to change anything.',
+    ),
+    KriyaRelaxationStep(
+      id: 'head',
+      title: 'The top of your head',
+      part: 0.03,
+      seconds: 40,
+      script: 'Bring your attention to the very top of your head. You cannot '
+          'see it; you can only feel that it is there. Notice the scalp, and '
+          'whatever is under your hair. Warm, cool, tingling, nothing at '
+          'all. All of those are fine.',
+    ),
+    KriyaRelaxationStep(
+      id: 'face',
+      title: 'Your face',
+      part: 0.08,
+      seconds: 40,
+      script: 'Down to your forehead, your eyes behind their lids, your '
+          'cheeks. Notice the small muscles that hold an expression even when '
+          'nobody is looking. Notice your jaw, and whether it is holding '
+          'anything.',
+    ),
+    KriyaRelaxationStep(
+      id: 'neck',
+      title: 'Your neck and shoulders',
+      part: 0.2,
+      seconds: 40,
+      script: 'Your throat, the back of your neck, the tops of your '
+          'shoulders. Feel where the weight of your head is carried. Feel the '
+          'breath pass through your throat on its way in and out.',
+    ),
+    KriyaRelaxationStep(
+      id: 'arms',
+      title: 'Your arms and hands',
+      part: 0.3,
+      seconds: 45,
+      script: 'Travel down each arm to the hands. Notice the palm resting on '
+          'whatever it rests on, and the fingers, one by one if you like. '
+          'Feel the pulse in your fingertips if it is there to feel.',
+    ),
+    KriyaRelaxationStep(
+      id: 'chest',
+      title: 'Your chest',
+      part: 0.36,
+      seconds: 45,
+      script: 'Your chest, rising and falling on its own. Notice the pause '
+          'at the top of a breath and the pause at the bottom. Your heart is '
+          'in here, beating without being asked to.',
+    ),
+    KriyaRelaxationStep(
+      id: 'belly',
+      title: 'Your belly',
+      part: 0.46,
+      seconds: 55,
+      script: 'Your belly, and everything it holds. Notice its shape, its '
+          'warmth, the way it moves with your breath. Your baby is in here, '
+          'and this is a minute of simply being aware of that, with nothing '
+          'to do about it and nothing it has to mean.',
+    ),
+    KriyaRelaxationStep(
+      id: 'back',
+      title: 'Your back and hips',
+      part: 0.55,
+      seconds: 45,
+      script: 'The whole length of your back, from between your shoulder '
+          'blades to the base of your spine. Your hips, and the pillow '
+          'between your knees. Notice where you are held up, and where you '
+          'are simply resting.',
+    ),
+    KriyaRelaxationStep(
+      id: 'legs',
+      title: 'Your legs',
+      part: 0.7,
+      seconds: 45,
+      script: 'Down through your thighs, your knees, your calves. Notice any '
+          'heaviness, any lightness, any place that is warmer than the rest. '
+          'Notice without needing it to be different.',
+    ),
+    KriyaRelaxationStep(
+      id: 'feet',
+      title: 'Your feet',
+      part: 0.95,
+      seconds: 40,
+      script: 'Your ankles, the tops of your feet, the soles, the toes. The '
+          'furthest point from your head, and still you.',
+    ),
+    KriyaRelaxationStep(
+      id: 'whole',
+      title: 'All of you at once',
+      part: 0.5,
+      seconds: 50,
+      script: 'Now let your attention widen until it holds all of you at '
+          'once, head to feet, breathing. One body, resting, with a second '
+          'small one inside it. Stay here for a few breaths.',
+    ),
+    KriyaRelaxationStep(
+      id: 'return',
+      title: 'Coming back',
+      part: 0.5,
+      seconds: 45,
+      script: 'When you are ready, bring some movement into your fingers and '
+          'toes. Take a deeper breath. Open your eyes. Roll to your side '
+          'before you sit up, and take your time.',
     ),
   ],
 );

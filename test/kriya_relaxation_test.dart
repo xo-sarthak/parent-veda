@@ -66,8 +66,9 @@ void main() {
       expect(s.intro.toLowerCase(), isNot(contains('baby')));
     });
 
-    test('every step has a unique manifest key under one prefix', () {
-      final keys = s.steps.map((st) => st.narrationKey).toList();
+    test("every step has a unique manifest key under the session's prefix",
+        () {
+      final keys = s.steps.map(s.narrationKeyFor).toList();
       expect(keys.toSet().length, keys.length);
       for (final k in keys) {
         expect(k, startsWith('kriya.relax.'));

@@ -163,6 +163,30 @@ class RagaAudioStore extends ChangeNotifier {
     await _teardown(keepSleepTimer: true);
 
     final p = AudioPlayer();
+    // ⚠️ KEEPS PLAYING WITH THE SCREEN OFF — Shravan to final, 2026-09-12.
+    // The SHARED block: "background playback that keeps going when the
+    // screen locks". On Android that is `stayAwake` (WAKE_LOCK is in the
+    // manifest) and the media usage type; on iOS the playback category, with
+    // the `audio` background mode already in Info.plist. What this does NOT
+    // add is a media notification with lock-screen controls — that is a
+    // foreground service and a second plugin, and this file's header gives
+    // the reason it waits until it is done properly: a track she cannot stop
+    // from the lock screen is worse than one that stops. Owed; STILL-OPEN.
+    try {
+      await p.setAudioContext(AudioContext(
+        android: const AudioContextAndroid(
+          isSpeakerphoneOn: false,
+          stayAwake: true,
+          contentType: AndroidContentType.music,
+          usageType: AndroidUsageType.media,
+          audioFocus: AndroidAudioFocus.gain,
+        ),
+        iOS: AudioContextIOS(
+          category: AVAudioSessionCategory.playback,
+          options: const {},
+        ),
+      ));
+    } catch (_) {}
     // ⚠️ LOOP IS PER-TRACK, NOT A CONSTANT. A raga looping is the feature - it
     // is ambient sound meant to run under sleep. A JOURNAL RECORDING looping
     // is a small horror: her own voice, or her mother-in-law's blessing,
@@ -250,8 +274,16 @@ class RagaAudioStore extends ChangeNotifier {
   /// ⚠️ AND `loop` DEFAULTS TO TRUE because the first six years of callers were
   /// all ragas. A new caller passing neither gets the old behaviour, which is
   /// the right default for the thing this store was built for.
+  ///
+  /// ⚠️ `isUrl` LIKEWISE — Shravan to final, 2026-09-12. A manifest track
+  /// streams from its URL the first time and plays from the cached file after
+  /// that (`ShravanLibrary.playableFor` says which). Three source kinds, one
+  /// player, and the caller names the kind; the string is never sniffed.
   Future<void> toggle(String asset,
-      {String? title, bool isFile = false, bool loop = true}) async {
+      {String? title,
+      bool isFile = false,
+      bool isUrl = false,
+      bool loop = true}) async {
     try {
       await _ensure(asset, loop: loop);
       if (title != null) _title = title;
@@ -262,7 +294,11 @@ class RagaAudioStore extends ChangeNotifier {
       } else if (_position > Duration.zero) {
         await p.resume();
       } else {
-        await p.play(isFile ? DeviceFileSource(asset) : AssetSource(asset));
+        await p.play(isUrl
+            ? UrlSource(asset)
+            : isFile
+                ? DeviceFileSource(asset)
+                : AssetSource(asset));
       }
     } catch (_) {
       // ⚠️ A MISSING FILE MUST NOT CRASH THE ALBUM. A recording whose file has

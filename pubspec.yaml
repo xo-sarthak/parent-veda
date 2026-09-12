@@ -209,6 +209,7 @@ flutter:
     - lib/data/home/
     - lib/data/father/
     - assets/audio/raga_drone.wav
+    - assets/audio/shravan_manifest.json
     # Narration now streams from R2 (see NarrationService._sourceFor). Only the
     # MANIFEST ships in the app.
     #

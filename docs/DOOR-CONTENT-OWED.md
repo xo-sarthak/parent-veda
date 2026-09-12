@@ -118,9 +118,9 @@ when its pillar is built to final (the pillars brief, pillar by pillar).
 
 | # | Card (brief's title) | Kind | Tab / section | Outcome | Owed |
 |---|---|---|---|---|---|
-| G1 | Morning Calm Raga, Baby Bonding Raga, Evening Raga, Sleep Raga, Relaxation Raga | Audio ×5 | Listen · "Ragas" | Built, placeholder inside | All five play `assets/audio/raga_drone.wav`. Royalty-free tracks (Pixabay / archive.org, licence verified), hosted on **Cloudflare R2**, read from a manifest (id, title, category, duration, sourceUrl, licence, attribution); background + offline playback. |
-| G2 | Gentle Rain, Ocean Waves, Forest Morning, Temple Bells | Audio ×4 | Listen · "Nature sounds" | Built, placeholder inside | Same drone. CC0 nature loops (Freesound / Pixabay), looped to length, same manifest. |
-| G3 | Body Awareness Journey | Guided audio · 9 min | Listen · "Guided" | Built, placeholder inside | Same drone. A spoken body scan — TTS through `NarrationService` for now, a recorded voice later by manifest edit. Shares Kriya's script engine. |
+| ~~G1~~ | ~~Ragas ×5~~ | Audio ×5 | Listen · "Ragas" | **Built to final** (Shravan, 2026-09-12) | Five Carnatic veena recordings (L. Ramakrishnan ×2, Veena Kinhal ×3), public-domain dedications on archive.org, via `assets/audio/shravan_manifest.json`; streamed then cached. Owed: move the nine files to **Cloudflare R2** (nine URL edits). STILL-OPEN §46. |
+| ~~G2~~ | ~~Nature sounds ×4~~ | Audio ×4 | Listen · "Nature sounds" | **Built to final** (Shravan, 2026-09-12) | Four radio-aporee field recordings incl. Prakrti temple bells, New Delhi. Same manifest, same R2 move owed. |
+| ~~G3~~ | ~~Body Awareness Journey~~ | Guided · 9 min | Listen · "Guided" | **Built to final** (Shravan, 2026-09-12) | A nine-minute script (`kKriyaBodyAwareness`) on the relaxation screen, TTS via `GarbhNarrator`; recording owed as manifest entries under `kriya.body_awareness.<step>`. |
 | ~~G4~~ | ~~Today's passage — the narrator~~ | Read + Record | Talk and read · "Today's pick" | **Built to final** (Samvad, 2026-09-12) | `GarbhNarrator`: manifest recording else calm TTS. Recordings owed as manifest entries under `samvad.<piece id>` — no code. STILL-OPEN §45. |
 | ~~G5~~ | ~~Affirmations and blessings, ~20~~ | Read | Talk and read · "Affirmations and blessings" | **Built to final** (Samvad, 2026-09-12) | Twenty in the library (four new, English-only). |
 | ~~G6~~ | ~~Stories and fables, 6–8~~ | Read library | Talk and read · "More to read aloud" | **Built** (verified, Samvad) | Sixteen original stories, 40–400 words each, tested. |
@@ -167,14 +167,16 @@ two.
 | Belly & skin | 0 | – | – | – | – |
 | Labour prep | 6 | 6 | – | – | – |
 | Mind & mood | 6 | 4 (M1, M4–M6) | 1 | 1 | – |
-| Garbh Sanskar | 12 | – | – | – | – (3 open, all Shravan's: G1–G3) |
+| Garbh Sanskar | 12 | – | – | – | all twelve closed; owed now = recordings (manifest entries) and R2 hosting (nine URLs) |
 | Feeding (parenting) | 4 | 2 | – | 2 | 1 (allergen tracker persistence) |
 | Health (parenting) | 6 | 3 | – | 3 | 1 (dosing table sign-off) |
+| Development (parenting) | 4 | 1 | – | 3 | – (DV2 is a data job, logged) |
 
 Pregnancy, six doors: written pieces owed, in prose — **S1, L3, L4, L5, L6,
 M1**, six reads. Films — **N1, L1, L2, M4 ×3, M6 ×5**, eleven. Audio — **M5
-×4**. One decision: N2. One confirmation: M3's numbers. Garbh Sanskar: the
-pillars brief, twelve rows, none of them a coming-soon card.
+×4**. One decision: N2. One confirmation: M3's numbers. Garbh Sanskar: all
+twelve rows closed by the four pillars (2026-09-12); what remains there is
+recordings by manifest entry and nine URLs to R2.
 Parenting's totals are its terminal's to keep.
 
 ### P3. Health — `lib/data/doors/pp_door_health.dart`
@@ -192,3 +194,16 @@ coming-soon page is not in this table.
 | HL4 | `ill_teething_fever` — Teething, and why it does not cause a high fever | Carousel | Coming soon | Copy: a short myth-vs-fact carousel. |
 | HL5 | `fever_dosing` — Paracetamol and ibuprofen | Reframe | Built from data | The mg-by-weight table and the gaps card are in a comment. Restoring them needs paediatric + legal sign-off and a weight calculator the medical board owns. |
 | HL6 | Thermometer routes / dehydration signs / rash grid | Illustration | Built from data | Drawn in code; artwork can replace each painter via `PpIllustration.asset`. The rash grid especially wants photographs ("this is HFMD"). |
+
+### P4. Development — `lib/data/doors/pp_door_development.dart`
+
+Built to `Development_Parenting.pdf` (the reissue of 31 Aug 2026, which
+replaces `ParentVeda_Development_rebuild.pdf`). Almost everything was reuse,
+reslot or merge; the owed pieces are one write and one data job.
+
+| # | Card | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| DV1 | `dev_feelings_activities` — Activities for feelings and getting on with others | Article | Coming soon | Copy: co-regulation, connection, face-to-face, naming-feelings play, matched to his age. "That corner of the app is blank today." Supplied for drop-in, not auto-written. |
+| DV2 | The four areas of growing as "a closer look inside the tracker" | Data | Built from data | The brief assumes one milestone list behind the tracker and the area pages. There are two: `MilestoneStore` (18 milestones, six domains) behind the tracker and `DevArea` skills (`pp_development_data.dart`) behind Brain / Physical / Language / Emotional. The join is a hand map (`_kAreaForDomain` in `milestone_journey_screen.dart`). Making them one dataset — so ticking a skill in either place updates both — is a data job: one list, one store, both screens reading it. |
+| DV3 | `dev_tummy_time` — Tummy time without the tears | Film · 4 min | Built from data | Reformatted step-list > video; slot `development/tummy_time` needs the film. The steps stay under it. |
+| DV4 | The "done together" activity films | Film | Built from data | Every activity page's video is a placeholder today. The brief: "the thing to actually shoot, the 'doing it together' activity clips first." Seven explainer films on the reads likewise (`development/*` slots). |

@@ -113,9 +113,14 @@ void main() {
     test('Listen: today\'s pick, then every track by kind, in library order',
         () {
       final sections = door.sectionsOf(kGarbhTabListen);
-      expect(sections.map((s) => s.heading),
-          ["Today's pick", 'Ragas', 'Nature sounds', 'Guided']);
-      final onDoor = sections.skip(1).expand((s) => s.tiles).toList();
+      expect(sections.map((s) => s.heading), [
+        "Today's pick",
+        'Ragas',
+        'Nature sounds',
+        'Guided',
+        'Where these sounds come from', // since Shravan to final
+      ]);
+      final onDoor = sections.skip(1).take(3).expand((s) => s.tiles).toList();
       expect(onDoor.length, kShravan.length);
       for (final t in onDoor) {
         expect(t, isA<PvDoorAudioTile>());

@@ -43,12 +43,24 @@ class RagaPlayer extends StatefulWidget {
     required this.title,
     required this.subtitle,
     this.asset = 'audio/raga_drone.wav',
+    this.isFile = false,
+    this.isUrl = false,
+    this.loop = true,
     this.onFinished,
   });
 
   final String title;
   final String subtitle;
+
+  /// A bundled asset path by default; a device file or a URL when the caller
+  /// says so (Shravan's manifest tracks). See `RagaAudioStore.toggle`.
   final String asset;
+  final bool isFile;
+  final bool isUrl;
+
+  /// The drone loops; a real track ends. "Finishes on its own when the track
+  /// ends" is the SHARED block's rule, and `onFinished` depends on it.
+  final bool loop;
 
   /// ⚠️ FIRES WHEN THE TRACK REACHES ITS END, NOT WHEN PLAY IS PRESSED.
   ///
@@ -157,7 +169,11 @@ class _RagaPlayerState extends State<RagaPlayer>
           Row(
             children: [
               GestureDetector(
-                onTap: () => _audio.toggle(widget.asset),
+                onTap: () => _audio.toggle(widget.asset,
+                    title: widget.title,
+                    isFile: widget.isFile,
+                    isUrl: widget.isUrl,
+                    loop: widget.loop),
                 child: Container(
                   width: 54,
                   height: 54,
