@@ -10,7 +10,7 @@
 //
 //  ⚠️ EVERYTHING THE SESSION SAYS AND DOES IS IN THIS LIST. The screen walks
 //  it: one step at a time, for [seconds], lighting [part] on the figure,
-//  speaking [script] through `KriyaNarrator`. A longer session, a different
+//  speaking [script] through `GarbhNarrator`. A longer session, a different
 //  order, a step cut — data. A recorded voice — a line in the narration
 //  manifest under [narrationKey], and the TTS stops being used for that step
 //  the day the file is listed. Nothing in the screen names a step.

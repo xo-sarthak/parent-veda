@@ -35,6 +35,8 @@ import '../theme/pv_fonts.dart';
 import '../data/garbh_rebuild_data.dart';
 import 'garbh_buddhi_screen.dart';
 import 'garbh_relaxation_screen.dart';
+import 'garbh_samvad_daily.dart';
+import '../data/samvad_mantras_data.dart';
 
 // --- warm palette ---
 // =============================================================================
@@ -1327,7 +1329,17 @@ class SamvadScreen extends StatefulWidget {
   State<SamvadScreen> createState() => _SamvadScreenState();
 }
 
-typedef _SP = ({String? title, String body, String saveKey, String group});
+/// One shelf entry. [id] is the record-first screen's prompt id and the
+/// narration key's tail (`samvad.<id>`); [readAloud] is what she reads —
+/// for a mantra the transliteration, for everything else the body.
+typedef _SP = ({
+  String? title,
+  String body,
+  String saveKey,
+  String group,
+  String id,
+  String readAloud,
+});
 
 class _SamvadScreenState extends State<SamvadScreen>
     with SingleTickerProviderStateMixin {
@@ -1388,13 +1400,20 @@ class _SamvadScreenState extends State<SamvadScreen>
   }
 
   // ---- Content per section (record: title?, body, saveKey, group) ----------
+  /// `samvad.<id>` is the narration key; the piece's own key has the
+  /// `samvad.` prefix already, so strip it for the prompt id.
+  static String _rtbId(ReadAloudPiece p) =>
+      p.narrationKey.substring('samvad.'.length);
+
   List<_SP> _affirmationPieces() => [
         for (final p in readAloudByCategory(kRtbAffirmations))
           (
             title: p.title.now,
             body: p.body.now,
             saveKey: p.saveKey,
-            group: 'Affirmations & Blessings'
+            group: 'Affirmations & Blessings',
+            id: _rtbId(p),
+            readAloud: p.body.now,
           ),
       ];
 
@@ -1404,25 +1423,38 @@ class _SamvadScreenState extends State<SamvadScreen>
             title: p.title.now,
             body: p.body.now,
             saveKey: p.saveKey,
-            group: 'Stories & Fables'
+            group: 'Stories & Fables',
+            id: _rtbId(p),
+            readAloud: p.body.now,
           ),
       ];
 
-  // Mantras (this trimester's speaking cards) + lullabies (rhymes).
+  // ⚠️ MANTRAS ARE MANTRAS NOW — 2026-09-12, Samvad to final. This shelf
+  // used to show the trimester's speaking cards under the name "mantras";
+  // they are affirmations, and they still rotate as today's pick. The shelf
+  // is `kSamvadMantras` (traditional, public-domain, each with its script,
+  // a transliteration and a plain meaning) and then the original lullabies.
+  // The card shows all three lines; what she reads aloud is the
+  // transliteration.
   List<_SP> _mantraLullabyPieces() => [
-        for (final p in samvadForTrimester(_trimester))
+        for (final m in kSamvadMantras)
           (
-            title: null,
-            body: p.text.now,
-            saveKey: 'mantra_${p.id}',
-            group: 'Mantras & Lullabies'
+            title: m.title,
+            body: '${m.original}\n\n${m.transliteration}\n\n'
+                '${m.meaning}\n— ${m.source}',
+            saveKey: 'mantra_${m.id}',
+            group: 'Mantras & Lullabies',
+            id: 'mantra_${m.id}',
+            readAloud: m.readAloud,
           ),
         for (final p in readAloudByCategory(kRtbRhymes))
           (
             title: p.title.now,
             body: p.body.now,
             saveKey: p.saveKey,
-            group: 'Mantras & Lullabies'
+            group: 'Mantras & Lullabies',
+            id: _rtbId(p),
+            readAloud: p.body.now,
           ),
       ];
 
@@ -1439,7 +1471,10 @@ class _SamvadScreenState extends State<SamvadScreen>
             body: r.body.now,
             // .en: the saved hub keys on this - see SavedRtbPiece.key.
             saveKey: r.title.en,
-            group: tr.name.now
+            group: tr.name.now,
+            id: 'spiritual_${tr.id}_${i}_'
+                '${r.title.en.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '_')}',
+            readAloud: r.body.now,
           ));
         }
       }
@@ -1550,9 +1585,28 @@ class _SamvadScreenState extends State<SamvadScreen>
     final saved = ReadToBabySavedStore.instance.isSaved(p.saveKey);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       _samvadCard(text, p.body, title: p.title, compact: compact),
-      Align(
-        alignment: Alignment.centerLeft,
-        child: TextButton.icon(
+      Row(children: [
+        // ⚠️ READ ALOUD, FIRST — Samvad to final, 2026-09-12. Every shelf
+        // card opens the record-first screen on that piece: her voice, or the
+        // narrator. The library used to offer only Save, which made it a
+        // reading list; the point of the section is that she says it.
+        TextButton.icon(
+          onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(
+            settings: const RouteSettings(name: 'garbh/samvad/read'),
+            builder: (_) => GarbhSamvadDailyScreen(
+              controller: widget.controller,
+              piece: GarbhPrompt(
+                p.id,
+                LocalizedText(en: p.title ?? p.group, hi: p.title ?? p.group),
+                LocalizedText(en: p.readAloud, hi: p.readAloud),
+              ),
+            ),
+          )),
+          icon: const Icon(Icons.mic_none_rounded, size: 18, color: _accSamvad),
+          label: Text('Read aloud',
+              style: text.labelLarge?.copyWith(color: _accSamvad)),
+        ),
+        TextButton.icon(
           onPressed: () => ReadToBabySavedStore.instance
               .toggleSave(p.saveKey, p.body, p.group),
           icon: Icon(
@@ -1562,7 +1616,7 @@ class _SamvadScreenState extends State<SamvadScreen>
           label: Text(s.rtbSave,
               style: text.labelLarge?.copyWith(color: _accSamvad)),
         ),
-      ),
+      ]),
       if (compact) const SizedBox(height: 6),
     ]);
   }

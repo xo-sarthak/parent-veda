@@ -45,6 +45,7 @@ import '../data/garbh_data.dart';
 import '../models/garbh_content.dart';
 import '../data/garbh_rebuild_data.dart';
 import '../localization/app_language.dart';
+import '../services/garbh_narrator.dart';
 import '../services/garbh_store.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/pv_fonts.dart';
@@ -107,8 +108,15 @@ class _GarbhSamvadDailyScreenState extends State<GarbhSamvadDailyScreen> {
     _tick?.cancel();
     _rec.dispose();
     _player.dispose();
+    // A narrator left reading to an empty room is the audio bug this app has
+    // met before (see `RagaAudioStore`'s header).
+    GarbhNarrator.instance.stop();
     super.dispose();
   }
+
+  /// `samvad.<prompt id>` — a library piece's id already carries `rtb_`,
+  /// a mantra's `mantra_`, a trimester prompt's is bare.
+  String get _narrationKey => 'samvad.${_todaysPiece.id}';
 
   GarbhPrompt get _todaysPiece {
     if (widget.piece case final p?) return p;
@@ -195,7 +203,11 @@ class _GarbhSamvadDailyScreenState extends State<GarbhSamvadDailyScreen> {
       kind: GarbhEntryKind.myVoice,
       week: _week,
       tsMs: DateTime.now().millisecondsSinceEpoch,
-      title: _todaysPiece.text,
+      // ⚠️ THE TITLE, NOT THE TEXT — 2026-09-12. A story's text is two
+      // hundred words, and the album lists titles; twelve rows of a whole
+      // passage is an album she cannot read. `GarbhPrompt.title` exists for
+      // exactly this ("a short name for the prompt").
+      title: _todaysPiece.title,
       seconds: seconds,
       path: p,
     ));
@@ -382,20 +394,37 @@ class _GarbhSamvadDailyScreenState extends State<GarbhSamvadDailyScreen> {
 
             const SizedBox(height: 18),
             // ---- the narrator, quiet and secondary ------------------------
-            Center(
-              child: TextButton(
-                onPressed: () => ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                      content: Text(
-                          'The narrator recording is coming soon. Your own '
-                          'voice is the one your baby will know.')),
-                ),
-                child: Text('Or listen to the narrator read it',
-                    style: pvManrope(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w600,
-                        color: _muted)),
-              ),
+            //
+            // ⚠️ REAL SINCE SAMVAD TO FINAL, 2026-09-12. It was a snackbar
+            // saying "coming soon". `GarbhNarrator` plays a recording when
+            // the narration manifest lists one under `samvad.<piece id>`,
+            // and the device's own voice at a gentle pace when it does not —
+            // so a professional narrator replaces the TTS one passage at a
+            // time by editing the manifest. Still a text link, never a
+            // button of equal weight: see the header.
+            AnimatedBuilder(
+              animation: GarbhNarrator.instance,
+              builder: (context, _) {
+                final key = _narrationKey;
+                final speaking = GarbhNarrator.instance.speakingKey == key;
+                return Center(
+                  child: TextButton(
+                    onPressed: () => speaking
+                        ? GarbhNarrator.instance.stop()
+                        : GarbhNarrator.instance.speak(
+                            key, piece.text.of(lang),
+                            lang: lang),
+                    child: Text(
+                        speaking
+                            ? 'Stop the narrator'
+                            : 'Or listen to the narrator read it',
+                        style: pvManrope(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w600,
+                            color: speaking ? _accSamvad : _muted)),
+                  ),
+                );
+              },
             ),
 
             const SizedBox(height: 30),

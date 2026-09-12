@@ -1,7 +1,13 @@
 // =============================================================================
-//  KriyaNarrator — a recorded voice when there is one, a calm TTS when not
+//  GarbhNarrator — a recorded voice when there is one, a calm TTS when not
 // -----------------------------------------------------------------------------
-//  The relaxation's narration, one step at a time. Same shape as
+//  ⚠️ WAS `KriyaNarrator` FOR ONE COMMIT (a26a48a). Samvad needed the same
+//  thing the next day — "for NOW use on-device text-to-speech to read any
+//  passage aloud at a gentle pace, wired data-driven so a recorded narrator
+//  replaces it per passage later" — and two narrators with one job is the
+//  drift this file exists to prevent. One narrator, two pillars.
+//
+//  The relaxation's narration, one step at a time; a Samvad passage, whole. Same shape as
 //  `NarrationService`: a step has a key; if the narration manifest lists a
 //  file under it, the file plays; if not, the device speaks the script. A
 //  recorded professional voice therefore replaces the TTS one step at a time
@@ -31,9 +37,9 @@ import 'package:flutter_tts/flutter_tts.dart';
 import '../localization/app_language.dart';
 import 'narration_service.dart';
 
-class KriyaNarrator extends ChangeNotifier {
-  KriyaNarrator._();
-  static final KriyaNarrator instance = KriyaNarrator._();
+class GarbhNarrator extends ChangeNotifier {
+  GarbhNarrator._();
+  static final GarbhNarrator instance = GarbhNarrator._();
 
   final FlutterTts _tts = FlutterTts();
   bool _ready = false;

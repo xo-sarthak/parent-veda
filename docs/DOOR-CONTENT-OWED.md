@@ -121,14 +121,14 @@ when its pillar is built to final (the pillars brief, pillar by pillar).
 | G1 | Morning Calm Raga, Baby Bonding Raga, Evening Raga, Sleep Raga, Relaxation Raga | Audio ×5 | Listen · "Ragas" | Built, placeholder inside | All five play `assets/audio/raga_drone.wav`. Royalty-free tracks (Pixabay / archive.org, licence verified), hosted on **Cloudflare R2**, read from a manifest (id, title, category, duration, sourceUrl, licence, attribution); background + offline playback. |
 | G2 | Gentle Rain, Ocean Waves, Forest Morning, Temple Bells | Audio ×4 | Listen · "Nature sounds" | Built, placeholder inside | Same drone. CC0 nature loops (Freesound / Pixabay), looped to length, same manifest. |
 | G3 | Body Awareness Journey | Guided audio · 9 min | Listen · "Guided" | Built, placeholder inside | Same drone. A spoken body scan — TTS through `NarrationService` for now, a recorded voice later by manifest edit. Shares Kriya's script engine. |
-| G4 | Today's passage — the narrator | Read + Record | Talk and read · "Today's pick" | Built, placeholder inside | Recording is real. "Or listen to the narrator" is a coming-soon line on `GarbhSamvadDailyScreen`; wire it to `NarrationService` (manifest → file, else on-device TTS). |
-| G5 | Affirmations and blessings, ~20 | Read | Talk and read · "Affirmations and blessings" | Built, six on the door | The library holds the brief's six; the pillars brief asks for about twenty, spoken to the baby, in the existing style. Writing job, allowed by that brief. |
-| G6 | Stories and fables, 6–8 | Read library | Talk and read · "More to read aloud" | Built | Check the shelf against the pillars brief: public-domain (Panchatantra, Aesop) or original, each readable aloud in a few minutes. Top up if short. |
-| G7 | Mantras and lullabies | Read + Audio library | Talk and read · "More to read aloud" | Built, partly | Each needs text, a simple transliteration and a one-line meaning; plus two or three original lullabies. No copyrighted lyrics. Audio side is G1's manifest. |
-| G8 | Spiritual reading, by tradition | Read library | Talk and read · "More to read aloud" | Built | Eight traditions exist. Verify every passage is a public-domain translation; default to none selected. |
+| ~~G4~~ | ~~Today's passage — the narrator~~ | Read + Record | Talk and read · "Today's pick" | **Built to final** (Samvad, 2026-09-12) | `GarbhNarrator`: manifest recording else calm TTS. Recordings owed as manifest entries under `samvad.<piece id>` — no code. STILL-OPEN §45. |
+| ~~G5~~ | ~~Affirmations and blessings, ~20~~ | Read | Talk and read · "Affirmations and blessings" | **Built to final** (Samvad, 2026-09-12) | Twenty in the library (four new, English-only). |
+| ~~G6~~ | ~~Stories and fables, 6–8~~ | Read library | Talk and read · "More to read aloud" | **Built** (verified, Samvad) | Sixteen original stories, 40–400 words each, tested. |
+| ~~G7~~ | ~~Mantras and lullabies~~ | Read + Audio library | Talk and read · "More to read aloud" | **Built to final** (Samvad, 2026-09-12) | Eleven public-domain mantras/blessings + one folk lullaby with script, transliteration, meaning, source (`samvad_mantras_data.dart`); sixteen original lullabies alongside. Audio side stays G1's. |
+| ~~G8~~ | ~~Spiritual reading, by tradition~~ | Read library | Talk and read · "More to read aloud" | **Built** (verified, Samvad) | Seven traditions of original reflection, none on by default — the file's own decision, which the brief allows. |
 | ~~G9~~ | ~~Sudoku~~ | Game | For you · "A few quiet minutes" | **Built to final** (Buddhi, 2026-09-12) | 9×9 easy / 6×6 gentle, unique-solution generator, pencil, Check, Hint. STILL-OPEN §44. |
 | ~~G10~~ | ~~Logic Puzzle~~ | Game | For you · "A few quiet minutes" | **Built to final** (Buddhi, 2026-09-12) | A nonogram, ten hand-drawn pictures, hints. Was a four-question quiz. STILL-OPEN §44. |
-| ~~G11~~ | ~~Guided Relaxation~~ | Guided audio · 8 min | For you · "Breath and relaxation" | **Built to final** (Kriya, 2026-09-12) | `GarbhRelaxationScreen` + `kKriyaRelaxation`: 13-step script, TTS via `KriyaNarrator`, figure highlight, optional Shravan raga. Still owed for the recording only: thirteen manifest entries under `kriya.relax.<step>` — no code. STILL-OPEN §43.2. |
+| ~~G11~~ | ~~Guided Relaxation~~ | Guided audio · 8 min | For you · "Breath and relaxation" | **Built to final** (Kriya, 2026-09-12) | `GarbhRelaxationScreen` + `kKriyaRelaxation`: 13-step script, TTS via `GarbhNarrator`, figure highlight, optional Shravan raga. Still owed for the recording only: thirteen manifest entries under `kriya.relax.<step>` — no code. STILL-OPEN §43.2. |
 | ~~G12~~ | ~~Breathing practices~~ | Tool | For you · "Breath and relaxation" | **Built to final** (Kriya, 2026-09-12) | One `PvBreathingCircle` behind Garbh, Mind & mood and TTC; each area converts its model with `toBreathPattern()`. STILL-OPEN §43.1. |
 
 Not owed: the affirmation rail's six pieces, the recording flow, the ritual
@@ -167,11 +167,28 @@ two.
 | Belly & skin | 0 | – | – | – | – |
 | Labour prep | 6 | 6 | – | – | – |
 | Mind & mood | 6 | 4 (M1, M4–M6) | 1 | 1 | – |
-| Garbh Sanskar | 12 | – | – | – | – (8 open; G9–G12 closed by Kriya and Buddhi) |
+| Garbh Sanskar | 12 | – | – | – | – (3 open, all Shravan's: G1–G3) |
 | Feeding (parenting) | 4 | 2 | – | 2 | 1 (allergen tracker persistence) |
+| Health (parenting) | 6 | 3 | – | 3 | 1 (dosing table sign-off) |
 
 Pregnancy, six doors: written pieces owed, in prose — **S1, L3, L4, L5, L6,
 M1**, six reads. Films — **N1, L1, L2, M4 ×3, M6 ×5**, eleven. Audio — **M5
 ×4**. One decision: N2. One confirmation: M3's numbers. Garbh Sanskar: the
 pillars brief, twelve rows, none of them a coming-soon card.
 Parenting's totals are its terminal's to keep.
+
+### P3. Health — `lib/data/doors/pp_door_health.dart`
+
+The brief says the [NEW] copy will be supplied for verbatim drop-in ("do not
+AI-generate it; build the scaffolding"), so these are `comingSoon` cards that
+hold their place and do not tap. `test/pp_health_door_test.dart` fails if a
+coming-soon page is not in this table.
+
+| # | Card | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| HL1 | `health_choking_response` — If he chokes or can't breathe | Film · 5 min + steps | Built from data | Moved from Feeding (copy written there, REQUIRED_REVIEW); slot `feeding/back_blows_demo` still needs the film. Canonical here; Feeding's card opens it. |
+| HL2 | `health_fit` — If he has a fit | Video / illustrated | Coming soon | Copy: on his side, nothing in the mouth, time it, ambulance-if. |
+| HL3 | `health_accidents` — Common accidents, fast | Cards | Coming soon | Copy: swallowed something (button battery / magnet = go now), a burn, a bad fall or head bump, something in the eye. First minutes only. |
+| HL4 | `ill_teething_fever` — Teething, and why it does not cause a high fever | Carousel | Coming soon | Copy: a short myth-vs-fact carousel. |
+| HL5 | `fever_dosing` — Paracetamol and ibuprofen | Reframe | Built from data | The mg-by-weight table and the gaps card are in a comment. Restoring them needs paediatric + legal sign-off and a weight calculator the medical board owns. |
+| HL6 | Thermometer routes / dehydration signs / rash grid | Illustration | Built from data | Drawn in code; artwork can replace each painter via `PpIllustration.asset`. The rash grid especially wants photographs ("this is HFMD"). |

@@ -21,6 +21,7 @@ import '../localization/app_language.dart';
 /// [kRtbSpeaking] = the Garbh Samvad trimester speaking cards, folded in as a
 /// toggleable category when "Read to your baby" merged into Samvad.
 LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
+LocalizedText _same(String s) => LocalizedText(en: s, hi: s);
 
 const String kRtbSpeaking = 'speaking';
 const String kRtbStories = 'stories';
@@ -41,6 +42,11 @@ class ReadAloudPiece {
   /// English vanished in Hindi and came back on switching. See
   /// [SavedRtbPiece.key] and test/rtb_saved_identity_test.dart.
   String get saveKey => title.en;
+
+  /// The key a narration manifest would carry a recording under — from the
+  /// English title, an identity, never the displayed one.
+  String get narrationKey =>
+      'samvad.rtb_${title.en.toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '_')}';
 }
 
 final List<ReadAloudPiece> kReadAloudPieces = [
@@ -289,6 +295,38 @@ final List<ReadAloudPiece> kReadAloudPieces = [
       title: _t('A blessing for the journey', 'सफ़र के लिए एक आशीर्वाद'),
       body:
           _t("May good health follow you, may kindness surround you, and may you always know how very loved you are.", 'सेहत तुम्हारे साथ चले, भलाई तुम्हें घेरे रहे, और तुम्हें हमेशा पता रहे कि तुमसे कितना प्यार है।')),
+
+  // ⚠️ FOUR MORE, 2026-09-12 — the Garbh Sanskar pillars brief asks for
+  // "about 20" affirmations spoken to the baby, in the style already here.
+  // English only, per CLAUDE.md; `_same` because the field is LocalizedText.
+  ReadAloudPiece(
+      category: kRtbAffirmations,
+      title: _same('I am listening'),
+      body: _same(
+          'Little one, every flutter and every kick is you talking to me, and '
+          'I am listening. I do not need the words yet. I already know what '
+          'you mean.')),
+  ReadAloudPiece(
+      category: kRtbAffirmations,
+      title: _same('Take your time'),
+      body: _same(
+          'There is no hurry, my love. Grow at the pace that is yours. '
+          'Everything you need is already here, and so am I, for as long as '
+          'it takes.')),
+  ReadAloudPiece(
+      category: kRtbAffirmations,
+      title: _same('The sound of me'),
+      body: _same(
+          'This is my voice, little one. You will hear it every day, when I '
+          'am tired and when I am laughing, and one day you will turn towards '
+          'it and know it is me.')),
+  ReadAloudPiece(
+      category: kRtbAffirmations,
+      title: _same('We are a family already'),
+      body: _same(
+          'You are not on your way to us; you are already here, already ours. '
+          'The house is quieter than it will be, but it is waiting, and it is '
+          'yours.')),
 ];
 
 List<ReadAloudPiece> readAloudByCategory(String category) =>

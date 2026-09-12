@@ -10,7 +10,7 @@
 //
 //  ⚠️ THE SCREEN NAMES NO STEP. `kKriyaRelaxation` is walked, not typed
 //  here: the title, the seconds, the words and the figure position are the
-//  data's. A recorded voice arrives by manifest (see `KriyaNarrator`). A
+//  data's. A recorded voice arrives by manifest (see `GarbhNarrator`). A
 //  drawn figure arrives by `figureAsset`. The screen is the player.
 //
 //  ⚠️ THE SCRIPT IS PRINTED, NOT ONLY SPOKEN. TTC's rule for its practices
@@ -49,7 +49,7 @@ import '../data/garbh_data.dart';
 import '../data/kriya_relaxation_data.dart';
 import '../models/garbh_content.dart' show GarbhKind;
 import '../services/garbh_store.dart';
-import '../services/kriya_narrator.dart';
+import '../services/garbh_narrator.dart';
 import '../services/pregnancy_controller.dart';
 import '../services/raga_audio_store.dart';
 import '../theme/pv_fonts.dart';
@@ -143,7 +143,7 @@ class _GarbhRelaxationScreenState extends State<GarbhRelaxationScreen> {
     if (i != _step) {
       setState(() => _step = i);
       final st = s.steps[i];
-      KriyaNarrator.instance
+      GarbhNarrator.instance
           .speak(st.narrationKey, st.script, lang: widget.pregnancy.language);
     } else {
       setState(() {}); // the clock line
@@ -154,12 +154,12 @@ class _GarbhRelaxationScreenState extends State<GarbhRelaxationScreen> {
     if (_paused) {
       setState(() => _paused = false);
       final st = s.steps[_step.clamp(0, s.steps.length - 1)];
-      KriyaNarrator.instance
+      GarbhNarrator.instance
           .speak(st.narrationKey, st.script, lang: widget.pregnancy.language);
       _resumeBg();
     } else {
       setState(() => _paused = true);
-      KriyaNarrator.instance.pause();
+      GarbhNarrator.instance.pause();
       _pauseBg();
     }
   }
@@ -178,7 +178,7 @@ class _GarbhRelaxationScreenState extends State<GarbhRelaxationScreen> {
   }
 
   void _leaveSession() {
-    KriyaNarrator.instance.stop();
+    GarbhNarrator.instance.stop();
     WakelockPlus.disable().catchError((Object _) {});
     if (_startedBg) {
       RagaAudioStore.instance.stop();

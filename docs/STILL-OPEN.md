@@ -5980,7 +5980,7 @@ figure.
 
 `GarbhRelaxationScreen` walks `kKriyaRelaxation`: thirteen steps, 480
 seconds, head to toe, the current part lit on the figure, the script printed
-under each heading and spoken through `KriyaNarrator`. Pause stops the voice
+under each heading and spoken through `GarbhNarrator`. Pause stops the voice
 and resume re-speaks the step from its first word (TTS engines do not resume
 mid-sentence); the clock is tick-accumulated so a pause is ticks that do not
 add, and so the widget test drives the whole eight minutes with `pump`.
@@ -6074,3 +6074,141 @@ for today (`markComplete`), which the door passes as false.
 * **The handset walk** — drag selection in Word Search, the 9×9 at phone
   width (cell size, pencil marks legible), the nonogram's clue gutter.
 * Two pillars left: Samvad, Shravan.
+
+---
+
+## 42.0 Health, the third parenting door — 2026-09-12
+
+Built from `ParentVeda_Health_rebuild.pdf` on the door shell (§39). Content
+in `pp_health_content.dart`, the shell in `lib/data/doors/pp_door_health.dart`,
+the contract in `test/pp_health_door_test.dart`. Mostly a reslot: eleven
+collections, fifty-nine pages, all seven tools were already built. Decisions
+taken with the user before starting: **six tabs** (the brief's call, to be
+judged on a phone), **reframe** the dosing page, **scaffold** the four new
+safety pieces (the brief supplies their copy), and the door is the home.
+
+### 42.1 What changed, in one list
+
+* **Six tabs:** Something's wrong (default; fever, cough, tummy, rash,
+  other; tools Fever check + Something suddenly different; a pinned "Is this
+  an emergency?" that jumps to Tab 2) · Get help now (the canonical red
+  flag pinned; signs film; the three speeds as a story; emergency card
+  tool; choking response; two scaffolds; the "believe yourself" footer) ·
+  His shots · Growing well · Keeping him well · His records and the visit
+  (dashboard + emergency card + doctor visit as tools).
+* **Single source, done:** `kPpGoNowSigns` (`pp_health_red_flags.dart`) is
+  the one go-now list — the Get help now page, the fever red-flags page and
+  the fever check's gate all read it; the three hand-written copies are
+  merged and kept for revert. Home remedies open the one tool filtered
+  (`pp_nuskhe/<category>`); the two per-illness remedy pages are cards
+  that open it. The vaccination chart, the create-your-card page and the
+  records page are `linkedOnly` — their tools lead. "Not sure what is
+  wrong" is hidden — it IS the What Changed flow.
+* **Choking response is canonical in Health** (`health_choking_response`,
+  moved from Feeding with its copy); Feeding's card opens it through the
+  new `pp_page/<section>/<page>` surface, which opens one page of another
+  section without landing on that door's selector.
+* **Reformats:** thermometer routes, dehydration signs and the rash grid
+  are drawn illustrations; blocked nose, ORS and giving medicine lead with
+  video; the sponging myths are a carousel inside the fever article; the
+  three speeds are a story.
+* **The dosing reframe:** `fever_dosing` is now "reading the dose right" —
+  find his weight, the strength on the label, that bottle's own row, that
+  box's syringe, write it down — plus the five overdose mistakes. The
+  mg-by-weight table and the gaps card are in a comment and a test fails
+  if a dose range appears in live copy.
+* **Engine additions:** `PpPage.comingSoon` (a full-size card that does not
+  tap, chip "Coming soon", must be in the owed ledger or the test fails);
+  `PpDoorTab.jumpToTabId` / `footer`; the `pp_page/` and `pp_nuskhe/`
+  router prefixes; `ppPageScreen` so the router can hand back a page.
+
+### 42.2 Needs a decision
+
+* **Six tabs.** The coverflow was drawn for five; the sixth rides the ring.
+  Look at it on the phone; the merge the brief names, if five wins, is
+  Growing well into Keeping him well (one line in `pp_door_health.dart`).
+* **The fever check still has an age chooser.** The tool prefills his age
+  and lets it be changed, on a stated reason (a grandmother checking
+  another child). The brief names only the library tab bar. Left; say if
+  it should go.
+* **Hero photo:** CDC, Unsplash, a stethoscope check-up. Dated look. Swap
+  the URL if a better free one turns up.
+
+### 42.3 Owed
+
+* The four scaffolds' copy (HL2–HL4 in `docs/DOOR-CONTENT-OWED.md`) and the
+  back-blows film. **The go-now list needs a paediatrician** — it is now the
+  union of three lists, marked REQUIRED_REVIEW, and it is the most
+  consequential list in the parenting app.
+* The handset walk: the wireless connection dropped mid-install, so this
+  door has not been seen on a phone yet.
+
+---
+
+## 45.0 Samvad to final — the library is complete and the narrator speaks — 2026-09-12
+
+Third of the four Garbh Sanskar pillars. Not walked on a phone — the other
+terminal holds it. The user's call on the copy: write it, no review pass.
+
+### 45.1 What the survey found, and what was built
+
+Recording was already real and already filed by week. The library was
+larger than the brief assumed — 16 affirmations, 16 stories, 16 original
+lullabies, seven traditions of original reflections — so most of the brief's
+"write real content in all four tabs" was already there. What was not:
+
+* **Mantras.** The "Mantras & lullabies" shelf showed the trimester's
+  speaking cards under the word mantra. `samvad_mantras_data.dart` is the
+  real thing: eleven traditional, public-domain lines — Vedic, Upanishadic,
+  Pali, the Mool Mantar, the Basmala, the KJV blessing, one Hindustani folk
+  lullaby — each with its script, a transliteration, one plain line of
+  meaning and a named source. The transliteration is what she reads aloud
+  and what the narrator speaks (the Hindi voice cannot read Arabic or
+  Gurmukhi). "Chanda mama door ke" and "Lalla lalla lori" were left out on
+  purpose; the foot of the file says why.
+* **Four more affirmations** (twenty now), English-only by policy, in the
+  style already there.
+* **The narrator.** "Or listen to the narrator read it" was a snackbar
+  saying coming soon. It speaks now through `GarbhNarrator` — renamed from
+  `KriyaNarrator` the moment a second pillar needed it — a recording when
+  the manifest lists one under `samvad.<piece id>`, the device's voice at a
+  gentle pace when not. Still a text link under the record button, never a
+  button of equal weight.
+* **Read aloud from every shelf card.** The library offered only Save,
+  which made it a reading list; every card opens the record-first screen on
+  that piece now. A mantra opens on its transliteration, not its full card.
+* **The album lists titles.** A recording's journal entry was titled with
+  the whole passage — two hundred words for a story. `GarbhPrompt.title`
+  exists for exactly this and is what is written now.
+
+### 45.2 Manifest keys, for the recordings
+
+`samvad.rtb_<slug>` for every `ReadAloudPiece` (slug from the English
+title, e.g. `samvad.rtb_you_are_loved`), `samvad.mantra_<id>` for the
+eleven mantras, `samvad.<prompt id>` for the trimester speaking cards.
+`test/samvad_library_test.dart` proves every key is unique. Same manifest
+file as Kriya's, same replacement rule: a line per passage, no code.
+
+### 45.3 Kept, deliberately
+
+* Spiritual reading stays original reflection, no scripture quoted — its
+  file's decision — with the tradition off by default until she chooses;
+  the mantra shelf is the other half, the lines themselves. The brief
+  allowed either.
+* The trimester speaking cards still rotate as today's pick; they just
+  stopped being called mantras.
+
+### 45.4 Still owed
+
+* **The handset walk** — the narrator's voice on a mantra transliteration
+  (does en-IN TTS say "Om bhur bhuvah" acceptably), the three-line mantra
+  card, Read aloud from a story.
+* **Recordings** for the library — manifest entries.
+* **Hindi for the four new affirmations**, if ever asked for.
+* One pillar left: Shravan, on Cloudflare R2.
+
+A test lesson, written down because it cost ten minutes: **an un-mocked
+platform channel in a widget test never completes — it does not throw.**
+`await`ing anything that reaches `flutter_tts` from a test body hangs for
+the framework's ten-minute limit. Fire, pump, assert on state; never await
+the plugin.
