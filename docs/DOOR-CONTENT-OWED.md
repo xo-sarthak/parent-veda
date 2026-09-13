@@ -172,6 +172,7 @@ two.
 | Health (parenting) | 6 | 3 | – | 3 | 1 (dosing table sign-off) |
 | Development (parenting) | 4 | 1 | – | 3 | – (DV2 is a data job, logged) |
 | Behaviour (parenting) | 15 | 11 | – | 4 | – |
+| Potty (parenting) | 6 | 4 | – | 2 | – |
 
 Pregnancy, six doors: written pieces owed, in prose — **S1, L3, L4, L5, L6,
 M1**, six reads. Films — **N1, L1, L2, M4 ×3, M6 ×5**, eleven. Audio — **M5
@@ -234,3 +235,19 @@ places. `test/pp_behaviour_door_test.dart` fails if one is not in this table.
 | BH13 | `crying_too_much` — When the crying is too much | Interactive | Built from data | Rebuilt as the dark one-step-at-a-time story (Sleep's 3am pattern); the article is in a comment. Worth a clinical read of the eight screens. |
 | BH14 | `beh_balloon_breathing` — Balloon breathing | Animation | Built from data | The shared breathing circle on a 3-in / 5-out pattern (`kPpBalloonBreath`). No asset owed. |
 | BH15 | The fourteen films the brief marks | Film | Built from data | Every `behaviour/*` slot is a placeholder: ziddi, tantrums, five steps, no-year, throwing, anger, screens ×2, calm corner, filling the tank, no-hitting, big feelings, lying, crying curve. |
+
+### P6. Potty — `lib/data/doors/pp_door_potty.dart`
+
+Built to `Potty_Parenting.pdf`. "The content is lean and excellent, so this is
+almost all adding, plus one important re-tagging. No real cuts." Four new
+pieces as coming-soon cards, copy "written on your go"; one film.
+`test/pp_potty_door_test.dart` fails if a coming-soon page is not here.
+
+| # | Card | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| PT1 | `no_star_charts` — Why there are no star charts here | Short article | Coming soon | Brand-defining: the words to hold the line when the family is pushing stickers and sweets. Same shape as Sleep's "where we stand". |
+| PT2 | `three_day_method` — The three-day method, done safely | Article | Coming soon | Judgement call 2, the user's call: teach it. Who it suits, the shape, and the one risk built in (a child who starts holding it in). |
+| PT3 | `pull_ups` — Do pull-ups help or hurt? | Cards | Coming soon | One honest card. |
+| PT4 | `taking_longer` — If she is taking much longer than her friends | Cards | Coming soon | A calm pointer to Development and a paediatrician, without alarm. |
+| PT5 | `indian_toilet` — The Indian toilet, and going out | Film · 6 min | Built from data | Slot `potty/indian_toilet`: the supported squat, the balance, the bucket-and-mug, front to back. "The clearest missing video in the section." The wiping page points here. |
+| PT6 | The seven films the brief marks | Film | Built from data | Every `potty/*` slot is a placeholder: the timeline, cueing, readiness, the routine, accidents, the activities, dry nights. |

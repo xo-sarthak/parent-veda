@@ -102,6 +102,10 @@ final PpSection kPpPottySection = PpSection(
   id: 'parenting_potty',
   title: 'Toilet learning',
   subtitle: 'The su-su way, honestly told',
+  // ⚠️ THE AGE RULE. "Drop the three buttons at the top (Baby / 1 to 3 /
+  // 3 to 6) and open on where the child is now." The bands stay as the
+  // scoping; the chooser is gone.
+  autoScope: true,
   intro: 'In most Indian homes this starts long before any training does, with '
       'the su-su cue and a grandmother who already knows the timing. Here is '
       'that path, and the truth about how long each part really takes.',
@@ -532,6 +536,11 @@ final PpSection kPpPottySection = PpSection(
                 'good middle option, and it is what most Indian homes used '
                 'before disposables. It breathes, it tells you immediately '
                 'when it is wet, and it washes.'),
+            // The rash grid lives in Health; the words above describe what
+            // the pictures there show.
+            PpLink('Which rash is this? The pictures',
+                surfaceId: 'pp_page/parenting_health/skin_which_rash',
+                blurb: 'Nappy rash, yeast rash and the rest, side by side.'),
             PpLink('What changed with her skin or tummy?',
                 surfaceId: 'pp_what_changed',
                 blurb: 'Nappy rash, and the tummy signs worth checking.'),
@@ -548,11 +557,16 @@ final PpSection kPpPottySection = PpSection(
     // =========================================================================
     PpArea(
       id: 'getting_ready',
+      // ⚠️ WIDENED TO 3 TO 6 (the brief's judgement call 1, the user's call
+      // 2026-09-13): "age is a weak stand-in for potty stage. A 3 and a
+      // half year old could be nowhere near ready." A late starter needs
+      // the signs too.
       mark: IntentMark.schoolMark,
       title: 'Is she ready yet?',
       blurb: 'The real signs, and why there is no prize for early.',
       hue: 268,
-      bands: ['learning'],
+      // bands: ['learning'], // widened, see the area note
+      bands: ['learning', 'dry'],
       pages: [
         PpPage(
           id: 'readiness_signs',
@@ -768,6 +782,18 @@ final PpSection kPpPottySection = PpSection(
                     'Everything in this section stays free.'),
           ],
         ),
+        // ⚠️ [NEW], a scaffold. "The section refuses reward charts
+        // everywhere but never says why in one place. A short honest piece
+        // gives a parent the words to hold the line when the whole family
+        // is pushing stickers and sweets." Copy supplied, not generated.
+        PpPage(
+          id: 'no_star_charts',
+          title: 'Why there are no star charts here',
+          subtitle: 'The words for when the family is pushing stickers',
+          format: 'SHORT ARTICLE',
+          comingSoon: true,
+          blocks: [],
+        ),
       ],
     ),
 
@@ -776,11 +802,14 @@ final PpSection kPpPottySection = PpSection(
     // =========================================================================
     PpArea(
       id: 'how_to_do_it',
+      // ⚠️ WIDENED TO 3 TO 6. "A late starter in the 3 to 6 band still
+      // needs it." Every page here is about the how, not the age.
       mark: IntentMark.stepsMark,
       title: 'Starting out, day by day',
       blurb: 'The potty, the routine, the words, and the Indian toilet.',
       hue: 88,
-      bands: ['learning'],
+      // bands: ['learning'], // widened, see the area note
+      bands: ['learning', 'dry'],
       pages: [
         PpPage(
           id: 'introducing_potty',
@@ -949,8 +978,24 @@ final PpSection kPpPottySection = PpSection(
           id: 'indian_toilet',
           title: 'The Indian toilet, and going out',
           subtitle: 'Squatting, travel, and other people\'s bathrooms',
-          format: 'ARTICLE',
+          // ⚠️ [reformat: add a film]. "The squat, the balance, the bucket
+          // and mug, front to back: this is a physical skill the page itself
+          // calls 'the main event', and there is no film for it today. The
+          // clearest missing video in the section." The mug and front-to-back
+          // technique lives ONCE, here; the washing-and-wiping page points
+          // at this film rather than repeating it.
+          // format: 'ARTICLE',
+          format: 'VIDEO',
           blocks: [
+            PpVideoSlot(
+              title: 'The squat, the mug, and front to back',
+              subtitle: 'The supported squat with something to hold, the '
+                  'bucket-and-mug technique, front to back, shown on a real '
+                  'Indian toilet.',
+              minutes: '6 MIN',
+              slotId: 'potty/indian_toilet',
+              hue: 160,
+            ),
             PpIntro('Most children in India will use a squat toilet, a bucket '
                 'and mug, and a bathroom that is nothing like the one at home. '
                 'None of that is a complication to solve later. It is the main '
@@ -1071,6 +1116,25 @@ final PpSection kPpPottySection = PpSection(
                 'somewhere between 3 and 4.'),
           ],
         ),
+        // ⚠️ [NEW], two scaffolds. The three-day method is named on the
+        // comparison table and taught nowhere (judgement call 2, the user's
+        // call 2026-09-13: teach it, with the holding-it-in warning built
+        // in). Pull-ups: "a very common question, one honest card."
+        PpPage(
+          id: 'three_day_method',
+          title: 'The three-day method, done safely',
+          subtitle: 'Who it suits, and the one risk to watch for',
+          format: 'ARTICLE',
+          comingSoon: true,
+          blocks: [],
+        ),
+        PpPage(
+          id: 'pull_ups',
+          title: 'Do pull-ups help or hurt?',
+          format: 'CARDS',
+          comingSoon: true,
+          blocks: [],
+        ),
       ],
     ),
 
@@ -1079,11 +1143,16 @@ final PpSection kPpPottySection = PpSection(
     // =========================================================================
     PpArea(
       id: 'when_bumpy',
+      // ⚠️ WIDENED TO 3 TO 6. "Every one of these problems happens in the
+      // 3 to 6 band too": school-start regressions, older-child soiling
+      // from constipation, fear. A five-year-old's mother could not reach
+      // the withholding page before this.
       mark: IntentMark.chartLog,
       title: 'Accidents, refusals and going backwards',
       blurb: 'All of it normal. What to do, and the two things worth a doctor.',
       hue: 32,
-      bands: ['learning'],
+      // bands: ['learning'], // widened, see the area note
+      bands: ['learning', 'dry'],
       pages: [
         PpPage(
           id: 'accidents_are_normal',
@@ -1275,6 +1344,15 @@ final PpSection kPpPottySection = PpSection(
             ),
             PpWhenLine('Most common between 2 and 4 years. Usually settles in '
                 '2 to 6 weeks.'),
+            // The triggers are shared ground: a new baby, starting school,
+            // a leap. Cross-linked, not rewritten.
+            PpLink('A new baby, starting school: the behaviour side',
+                surfaceId: 'pp_section/parenting_behaviour',
+                blurb: 'Clinginess, going backwards, and the words to use.'),
+            PpLink('Is she going through a leap?',
+                surfaceId: 'pp_page/parenting_development/dev_leaps_lens',
+                blurb: 'The fussy-then-forward weeks that unsettle everything, '
+                    'potty included.'),
           ],
         ),
         PpPage(
@@ -1389,6 +1467,11 @@ final PpSection kPpPottySection = PpSection(
                 surfaceId: 'pp_what_changed',
                 blurb: 'Answer a few questions about her tummy and get a '
                     'clearer read on what is going on.'),
+            // Health owns the medical depth of constipation; this page is
+            // the potty side of it.
+            PpLink('Constipation, in full',
+                surfaceId: 'pp_page/parenting_health/tummy_constipation',
+                blurb: 'What helps, what does not, and when it needs a doctor.'),
           ],
         ),
         PpPage(
@@ -1435,6 +1518,17 @@ final PpSection kPpPottySection = PpSection(
             PpWhenLine('Most common between 2 and 3.5 years. Give any fix two '
                 'to three weeks before changing tack.'),
           ],
+        ),
+        // ⚠️ [NEW], a scaffold. "A short, calm pointer for the child who is
+        // well behind or has other delays, sending them to Development and
+        // a paediatrician without alarm."
+        PpPage(
+          id: 'taking_longer',
+          title: 'If she is taking much longer than her friends',
+          subtitle: 'A calm pointer, not a verdict',
+          format: 'CARDS',
+          comingSoon: true,
+          blocks: [],
         ),
       ],
     ),
@@ -1853,6 +1947,11 @@ final PpSection kPpPottySection = PpSection(
                         'main method.'),
               ],
             ),
+            // The technique is taught once, on the Indian-toilet page's film.
+            PpLink('The mug and front to back, shown',
+                pageId: 'indian_toilet',
+                blurb: 'The technique, on film. This page is about her doing '
+                    'it herself.'),
             PpCallout(
               'Expect this to be done badly for a while. A child who is '
               'criticised about wiping starts saying she has finished when she '

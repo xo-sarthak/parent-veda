@@ -6343,7 +6343,7 @@ Built to `Development_Parenting.pdf`, the **reissued** brief of 31 Aug 2026,
 which says on its last line that it replaces `ParentVeda_Development_rebuild.pdf`.
 The two disagree on every tab, so the user chose: reissued. The door is
 `lib/data/doors/pp_door_development.dart`; the contract is
-`test/pp_development_door_test.dart`. Not yet walked on a phone.
+`test/pp_development_door_test.dart`. Walked on a phone at day one; see 48.5.
 
 ### 47.1 What was found that the brief did not know
 
@@ -6410,7 +6410,7 @@ The two disagree on every tab, so the user chose: reissued. The door is
 
 Built to `Behaviour_Parenting.pdf` (31 Aug 2026). The door is
 `lib/data/doors/pp_door_behaviour.dart`; the contract is
-`test/pp_behaviour_door_test.dart`. Not yet walked on a phone.
+`test/pp_behaviour_door_test.dart`. Walked on a phone at day one; see 48.5.
 
 ### 48.1 The brief said "no tabs"; the door has five
 
@@ -6498,3 +6498,48 @@ him — gone, as the briefs ask). The unlock age is the earliest `fromMonths`
 of the tab's areas' bands. Behaviour at day one: Crying open, four locked.
 Seen on the phone.
 
+
+---
+
+## 49.0 Potty, the sixth parenting door — 2026-09-13
+
+Built to `Potty_Parenting.pdf`. The door is `lib/data/doors/pp_door_potty.dart`;
+the contract is `test/pp_potty_door_test.dart`. Walked on a phone at day one; see 49.3.
+
+### 49.1 The calls
+
+* **Five tabs** from seven areas, the user's from two options: How long, and
+  is she ready (the pinned timeline first, then readiness) · Catching the
+  su-su · Starting out (day by day, and the three activities) · Accidents
+  and going backwards · Dry nights, doing it herself. No tools on any tab,
+  no red flag, no quiz — the brief's stance, kept and tested.
+* **Widen** (judgement call 1): readiness, starting out and accidents now
+  carry `['learning', 'dry']`, so a four-year-old still training or
+  withholding reaches them; su-su stays baby-only, dry nights 3 to 6. The
+  door shows a baby's parent two tabs open and three locked (From 1 year ×2,
+  From 3 years); a two-year-old's has su-su gone and dry nights locked.
+* **The three-day method** (judgement call 2): a coming-soon page in
+  Starting out, PT2, copy to come with the holding-it-in warning built in.
+* **The two-door hub collapses** by the tile opening the door;
+  `kPpPotty`'s two doors and the `kPpActPotty*` arms on the home stay for
+  the older home.
+
+### 49.2 Single source, as links
+
+The Indian-toilet page leads with the one film (`potty/indian_toilet`) and
+the washing-and-wiping page points at it instead of teaching the mug twice.
+The yeast-rash line points at Health's rash grid; withholding at Health's
+constipation page; regressions at Behaviour and the leaps read. Four
+scaffolds: no star charts, three-day method, pull-ups, taking longer (PT1–4).
+
+### 49.3 Open
+
+* The Indian-toilet page's badge is now VIDEO (it leads with the film); the
+  other film-led pages here keep ARTICLE as the brief lists them. Say if the
+  badge should follow the film everywhere.
+* Walked on the phone at day one (2026-09-13): two tabs open, three locked,
+  pages render. One thing to know: the first tab is named "How long, and is
+  she ready", and for a baby only the timeline shows on it — readiness is
+  1 to 6, so its rail is hidden inside an open tab rather than locked. The
+  tab name over-promises for that one band; a rename to "How long this
+  takes" alone, or moving readiness to Starting out, are the two fixes.
