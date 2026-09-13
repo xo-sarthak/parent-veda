@@ -158,7 +158,16 @@ class ProductGuide {
     // or hides a guide. See docs/PERSONALIZATION.md.
     this.relevantWhen = const {},
     this.relatedIds = const [],
+    this.comingSoon = false,
   });
+
+  /// A GUIDE THAT HOLDS ITS PLACE AND DOES NOT OPEN. The What to buy brief
+  /// names eight guides a parent searches for that the shop does not have,
+  /// copy "unwritten until you say go". Each is a row on the hub with a
+  /// Coming soon chip, in the same file-less state the unshot expert films
+  /// use. The verdict, rating and copy fields are empty on purpose: a
+  /// placeholder guide has no verdict to fake.
+  final bool comingSoon;
 
   final String id;
   final String category; // 'Baby skincare', 'Feeding', 'Baby gear'…
@@ -543,6 +552,132 @@ const List<ProductGuide> kProductGuides = [
     ],
     relatedIds: ['baby_carrier'],
   ),
+
+  // ---------------------------------------------------------------------------
+  //  The eight the shop does not have yet: placeholders, strongest first.
+  //  Copy is supplied separately; nothing below is written. Logged in
+  //  docs/DOOR-CONTENT-OWED.md (P10).
+  // ---------------------------------------------------------------------------
+  ProductGuide(
+    id: 'before_baby_essentials',
+    category: 'Before the baby comes',
+    icon: Icons.checklist_rtl_outlined,
+    brand: '',
+    name: 'What you actually need, and what can wait',
+    reco: PgReco.recommended,
+    rating: PgRating(0, 0),
+    verdict: '',
+    beforeYouBuy: '',
+    bestFor: [],
+    whyLike: [],
+    watchOut: [],
+    comingSoon: true,
+  ),
+  ProductGuide(
+    id: 'things_to_skip',
+    category: 'Before the baby comes',
+    icon: Icons.do_not_disturb_on_outlined,
+    brand: '',
+    name: 'The things everyone buys that you can skip',
+    reco: PgReco.notRecommended,
+    rating: PgRating(0, 0),
+    verdict: '',
+    beforeYouBuy: '',
+    bestFor: [],
+    whyLike: [],
+    watchOut: [],
+    comingSoon: true,
+  ),
+  ProductGuide(
+    id: 'car_seat',
+    category: 'Baby gear',
+    icon: Icons.airline_seat_recline_extra_outlined,
+    brand: '',
+    name: 'Infant Car Seat',
+    reco: PgReco.highly,
+    rating: PgRating(0, 0),
+    verdict: '',
+    beforeYouBuy: '',
+    bestFor: [],
+    whyLike: [],
+    watchOut: [],
+    comingSoon: true,
+  ),
+  ProductGuide(
+    id: 'cot_mattress',
+    category: 'Baby gear',
+    icon: Icons.crib_outlined,
+    brand: '',
+    name: 'Cot, mattress and safe sleep',
+    reco: PgReco.recommended,
+    rating: PgRating(0, 0),
+    verdict: '',
+    beforeYouBuy: '',
+    bestFor: [],
+    whyLike: [],
+    watchOut: [],
+    comingSoon: true,
+  ),
+  ProductGuide(
+    id: 'cloth_or_disposable',
+    category: 'Nappies',
+    icon: Icons.layers_outlined,
+    brand: '',
+    name: 'Cloth or disposable, and the langot question',
+    reco: PgReco.considerations,
+    rating: PgRating(0, 0),
+    verdict: '',
+    beforeYouBuy: '',
+    bestFor: [],
+    whyLike: [],
+    watchOut: [],
+    comingSoon: true,
+  ),
+  ProductGuide(
+    id: 'mosquito_protection',
+    category: 'Health & safety',
+    icon: Icons.bug_report_outlined,
+    brand: '',
+    name: 'Keeping mosquitoes off a baby, safely',
+    reco: PgReco.recommended,
+    rating: PgRating(0, 0),
+    verdict: '',
+    beforeYouBuy: '',
+    bestFor: [],
+    whyLike: [],
+    watchOut: [],
+    comingSoon: true,
+  ),
+  ProductGuide(
+    id: 'second_hand',
+    category: 'Before the baby comes',
+    icon: Icons.recycling_outlined,
+    brand: '',
+    name: 'Second-hand and hand-me-downs: what is fine, and what to buy new',
+    reco: PgReco.considerations,
+    rating: PgRating(0, 0),
+    verdict: '',
+    beforeYouBuy: '',
+    bestFor: [],
+    whyLike: [],
+    watchOut: [],
+    comingSoon: true,
+  ),
+  ProductGuide(
+    id: 'season_born',
+    category: 'Before the baby comes',
+    icon: Icons.wb_sunny_outlined,
+    brand: '',
+    name: 'Buying for the season she is born in',
+    reco: PgReco.considerations,
+    rating: PgRating(0, 0),
+    verdict: '',
+    beforeYouBuy: '',
+    bestFor: [],
+    whyLike: [],
+    watchOut: [],
+    comingSoon: true,
+  ),
 ];
 
 // -----------------------------------------------------------------------------
@@ -576,9 +711,24 @@ const Map<String, String> kProductToGuide = {
   'baby_diapers': 'diapers',
   'baby_wipes': 'baby_wipes',
   'after_nursingbra': 'breast_pump', // nearest guide
+  // the parenting catalogue (pp_products_data.dart), by its own ids. The
+  // name-keyword fallback that used to sit under this map offered the
+  // steriliser guide to the anti-colic bottle (both "feeding") and nothing
+  // to the Steam Steriliser (spelt with an s, the guide with a z). An id
+  // cannot be spelt two ways.
+  'lotion': 'baby_lotion',
+  'babywash': 'baby_wash',
+  'steriliser': 'bottle_sterilizer',
+  'stroller': 'stroller',
+  'carrier': 'baby_carrier',
 };
 
-/// Find a Guide for a tapped product by its id, else by a keyword in its name.
+/// Find a Guide for a tapped product by its id, or by the explicit id map.
+///
+/// ⚠️ NO NAME MATCHING. The keyword fallback (last word of the guide's name,
+/// or its category word) matched loosely both ways — see `kProductToGuide`.
+/// A product with no id in the map has no guide, honestly. `name` is kept
+/// in the signature so call sites do not move; it is read by nothing.
 ProductGuide? guideForProduct({String? id, String? name}) {
   if (id != null) {
     final direct = pgById(id);
@@ -586,6 +736,7 @@ ProductGuide? guideForProduct({String? id, String? name}) {
     final mapped = kProductToGuide[id];
     if (mapped != null) return pgById(mapped);
   }
+  /* kept for revert: the loose name match
   if (name != null) {
     final n = name.toLowerCase();
     for (final g in kProductGuides) {
@@ -593,5 +744,6 @@ ProductGuide? guideForProduct({String? id, String? name}) {
       if (n.contains(key) || n.contains(g.category.toLowerCase())) return g;
     }
   }
+  */
   return null;
 }

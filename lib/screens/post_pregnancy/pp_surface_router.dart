@@ -37,6 +37,7 @@ import 'pp_age_bands.dart';
 import 'pp_chart_browser_screen.dart';
 // import 'pp_feeding_content.dart'; // only the chooser version needs it (kept for revert)
 import 'products_compare_screen.dart';
+import 'pp_products_data.dart' show ppPreloadCompare;
 import 'pp_sounds_screen.dart';
 import 'pp_wake_windows_screen.dart';
 import 'pp_what_to_feed_screen.dart';
@@ -136,10 +137,6 @@ Widget? ppScreenForSurface(String id) {
     return null;
   }
 
-  // ⚠️ `pp_nuskhe/<category>` OPENS THE REMEDIES ALREADY FILTERED. The Health
-  // brief single-sources home remedies: "every per-illness remedy card
-  // elsewhere references this, filtered." The old per-illness card pages
-  // were second copies of the same remedies.
   // ⚠️ `pp_community/<roomId>` OPENS ONE ROOM. The You, Maa section's
   // "open your circle" links were `null` surfaces for want of this; the
   // room is data in `community_data.dart`, the screen is the one every
@@ -152,6 +149,22 @@ Widget? ppScreenForSurface(String id) {
     }
     return const CommunityScreen();
   }
+  // ⚠️ `pp_compare/<shelf>` ARRIVES WITH THE SHELF LOADED. Seven links across
+  // Health and First 40 Days said "compare swaddles" and opened the compare
+  // tray empty, because the route took no argument. The tray is the Compare
+  // Manager's state, so the router seeds it: that shelf's products, up to the
+  // tray's limit, replacing whatever was there. The bare `pp_compare` keeps
+  // its empty state. (The What to buy brief, 2026-09-14.)
+  const comparePrefix = 'pp_compare/';
+  if (id.startsWith(comparePrefix)) {
+    final shelf = id.substring(comparePrefix.length);
+    ppPreloadCompare(shelf);
+    return const ProductsCompareScreen();
+  }
+  // ⚠️ `pp_nuskhe/<category>` OPENS THE REMEDIES ALREADY FILTERED. The Health
+  // brief single-sources home remedies: "every per-illness remedy card
+  // elsewhere references this, filtered." The old per-illness card pages
+  // were second copies of the same remedies.
   const nuskhePrefix = 'pp_nuskhe/';
   // ⚠️ `pp_what_changed/<entry>` OPENS THE ONE CHECKER PRE-FILTERED. The
   // Behaviour door's tool lands on the Behaviour and Mood concerns with the

@@ -6682,3 +6682,40 @@ old"); `PpDoor.aboutHer` flips them to "FOR YOU" and "when you are 2 months
 in". The cross-section windows are now tabled in PARENTING-DOORS-REVIEW.md
 on the user's ask.
 
+
+---
+
+## 53.0 What to buy — the shop, kept a shop — 2026-09-14
+
+Built to `What_to_buy_parenting.pdf`, which is explicit: "do not wrap it in a
+section, do not add tabs, do not merge the two doors." The user agreed; the
+tile stays the two-door hub (guides / catalogue). The contract is
+`test/pp_what_to_buy_test.dart`. Not walked on a phone yet.
+
+### 53.1 The three fixes
+
+* **The empty compare tray.** `pp_compare/<shelf>` in the router seeds the
+  Compare Manager with that shelf's products (up to the tray's two), so the
+  seven "compare swaddles / nappy rash creams / …" links from Health and
+  First 40 Days land loaded. Bare `pp_compare` keeps the empty state. Three
+  of the seven have no true shelf (nasal aspirators and cough-and-cold →
+  First aid; malish oils → Lotions), logged WB10.
+* **The chooser's wrong guide.** `guideForProduct` no longer matches on a
+  name keyword or a category word (that offered the steriliser guide to the
+  anti-colic bottle and nothing to the Steam Steriliser); it matches by id
+  and an explicit map, now including the parenting catalogue's own ids.
+  The old fallback is in a comment.
+* **The skip link.** Development's "Things worth buying, and things worth
+  skipping" points at the guides (`pp_product_guide`), where skipping lives.
+
+### 53.2 One source, a soft default, eight placeholders
+
+* The compare screen's "what actually matters" panel reads the shelf's
+  guidance card (`compareGuideForShelf`); `kCompareGuides`, the third
+  hand-written copy, is read by nothing and kept for revert.
+* Call 1 (soft-scope, agreed): the discovery grid sorts her stage's
+  categories first when no stage filter is chosen (`ppStageForMonths`);
+  nothing is hidden. Call 2 (near-empty shelves, agreed): owned as they are.
+* Eight placeholder guides (`ProductGuide.comingSoon`) hold rows on the hub
+  under a Coming soon chip and do not open; the guide contract test skips
+  them. WB1–WB8 in the ledger.

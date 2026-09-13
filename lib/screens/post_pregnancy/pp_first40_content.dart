@@ -3349,8 +3349,10 @@ final PpSection kPpFirst40Section = PpSection(
                 'especially for a very small or premature baby in the first '
                 'weeks, and coconut is an easy substitute nobody objects to for '
                 'long.'),
+            // [fix] carries its nearest shelf; there is no oils shelf yet
+            // (docs/PARENTING-DOORS-REVIEW.md).
             PpLink('Compare malish oils side by side',
-                surfaceId: 'pp_compare',
+                surfaceId: 'pp_compare/Lotions',
                 blurb: 'Ingredients, pressing, fragrance and price in one '
                     'table.'),
           ],
@@ -3417,8 +3419,9 @@ final PpSection kPpFirst40Section = PpSection(
                 'cotton, and they are better than most things sold in a box. '
                 'The only thing to check is that nothing has a long tie or a '
                 'loose end that can reach his face.'),
+            // [fix] carries its shelf, so the tray arrives loaded.
             PpLink('Compare swaddles',
-                surfaceId: 'pp_compare',
+                surfaceId: 'pp_compare/Sleepwear & sacks',
                 blurb: 'Fabric, sizing, hip room and price, side by side.'),
           ],
         ),

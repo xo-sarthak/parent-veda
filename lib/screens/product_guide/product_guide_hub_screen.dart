@@ -40,10 +40,11 @@ class _ProductGuideHubScreenState extends State<ProductGuideHubScreen> {
     final t = _q.trim().toLowerCase();
     if (t.isEmpty) return const [];
     return kProductGuides.where((g) =>
-        g.name.toLowerCase().contains(t) ||
+        !g.comingSoon &&
+        (g.name.toLowerCase().contains(t) ||
         g.category.toLowerCase().contains(t) ||
         g.brand.toLowerCase().contains(t) ||
-        g.bestFor.any((b) => b.toLowerCase().contains(t))).toList();
+        g.bestFor.any((b) => b.toLowerCase().contains(t)))).toList();
   }
 
   @override
@@ -210,8 +211,37 @@ class _ProductGuideHubScreenState extends State<ProductGuideHubScreen> {
     return out;
   }
 
+  Widget _soonRow(ProductGuide g) => Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: Opacity(
+          opacity: 0.6,
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16), border: Border.all(color: pgHair)),
+            child: Row(children: [
+              Container(
+                width: 46, height: 46, alignment: Alignment.center,
+                decoration: BoxDecoration(color: pgPanel, borderRadius: BorderRadius.circular(13)),
+                child: Icon(g.icon, size: 22, color: pgSoft),
+              ),
+              const SizedBox(width: 13),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(g.name, style: pgTitle(14.5), maxLines: 2, overflow: TextOverflow.ellipsis),
+                  const SizedBox(height: 3),
+                  Text('Coming soon', style: pgBody(11.5, color: pgSoft, w: FontWeight.w700)),
+                ]),
+              ),
+            ]),
+          ),
+        ),
+      );
+
   Widget _row(ProductGuide g) {
     final rc = pgRecoColor(g.reco.tone);
+    // A placeholder holds its row and does not open: no verdict to show, no
+    // page to land on. See `ProductGuide.comingSoon`.
+    if (g.comingSoon) return _soonRow(g);
     return Padding(
       padding: const EdgeInsets.only(bottom: 10),
       child: GestureDetector(

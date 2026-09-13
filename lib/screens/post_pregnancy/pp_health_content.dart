@@ -1418,7 +1418,7 @@ final PpArea _coughCold = PpArea(
         ),
         PpLink(
           'Compare nasal aspirators',
-          surfaceId: 'pp_compare',
+          surfaceId: 'pp_compare/First aid',
           blurb: 'Bulb, tube and battery types, and what each is actually like '
               'to use at 3am.',
         ),
@@ -1501,7 +1501,7 @@ final PpArea _coughCold = PpArea(
             'it. If the answer is "it is for cough", put it back.'),
         PpLink(
           'Compare cough and cold products for safety',
-          surfaceId: 'pp_compare',
+          surfaceId: 'pp_compare/First aid',
           blurb: 'Read the ingredient list rather than the label claim.',
         ),
       ],
@@ -2229,7 +2229,7 @@ final PpArea _skin = PpArea(
             'that anything is wrong with his immunity.'),
         PpLink(
           'Compare soothing creams and lotions',
-          surfaceId: 'pp_compare',
+          surfaceId: 'pp_compare/Lotions',
           blurb: 'What is worth putting on drying blisters, and what is not.',
         ),
       ],
@@ -2294,7 +2294,7 @@ final PpArea _skin = PpArea(
             'plastic cover during the day.'),
         PpLink(
           'Compare nappy rash creams',
-          surfaceId: 'pp_compare',
+          surfaceId: 'pp_compare/Rash creams',
           blurb: 'Which are true barriers, which are medicated, and which are '
               'just moisturiser.',
         ),
@@ -2358,7 +2358,7 @@ final PpArea _skin = PpArea(
             'the rest of him.'),
         PpLink(
           'Compare moisturisers and barrier creams',
-          surfaceId: 'pp_compare',
+          surfaceId: 'pp_compare/Rash creams',
           blurb: 'Ointment, cream or lotion, and what actually stays on.',
         ),
       ],

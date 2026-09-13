@@ -11,6 +11,7 @@
 
 import 'package:flutter/material.dart';
 
+import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_product_widgets.dart';
 import 'pp_products_data.dart';
@@ -104,6 +105,16 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreen> {
         break;
       default:
         list.sort((a, b) => b.rating.compareTo(a.rating));
+    }
+    // ⚠️ SOFT-SCOPE. With no stage chosen, what is relevant to her stage now
+    // comes first, in the order the sort already gave; nothing is removed.
+    // See `ppStageForMonths`.
+    if (_stage == null) {
+      final now = ppStageCategories(ppStageForMonths(ChildProfileStore.instance.ageInMonths));
+      list = [
+        ...list.where((p) => now.contains(p.category)),
+        ...list.where((p) => !now.contains(p.category)),
+      ];
     }
     return list;
   }

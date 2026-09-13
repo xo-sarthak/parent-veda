@@ -893,8 +893,10 @@ final PpSection kPpDevelopmentSection = PpSection(
               kind: PpCalloutKind.doctor,
               title: 'When walking is worth a check',
             ),
+            // [fix] "skip this" lives behind the guides door, not the grid.
             PpLink('Things worth buying, and things worth skipping',
-                surfaceId: 'pp_recos',
+                // surfaceId: 'pp_recos',
+                surfaceId: 'pp_product_guide',
                 blurb: 'A push toy is on the list. A seated walker is not.'),
           ],
         ),

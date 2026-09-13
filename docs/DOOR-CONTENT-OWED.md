@@ -176,6 +176,7 @@ two.
 | Early Learning (parenting) | 4 | 2 | – | 2 | – |
 | First 40 Days (parenting) | 11 | 3 | – | 4 | 1 (the day spine, FF10); FF1–FF2 closed into You |
 | You, Maa (parenting) | 6 | 2 | – | 3 | – |
+| What to buy (parenting) | 10 | 8 | – | 2 | – (call 2: shelves owned as they are) |
 
 Pregnancy, six doors: written pieces owed, in prose — **S1, L3, L4, L5, L6,
 M1**, six reads. Films — **N1, L1, L2, M4 ×3, M6 ×5**, eleven. Audio — **M5
@@ -306,3 +307,23 @@ coming-soon page is not here.
 | YM4 | The 11 feeling-films on the shelf | Film · ~55 min | Built from data | "The highest-value video set in the section: a mother needs to hear 'I feel nothing at all' said aloud by someone who has been there. Prioritise filming these." |
 | YM5 | The remaining 20 film slots | Film / animation | Built from data | The five pelvic-floor exercises (and "finding the right muscle" as an animation of the internal muscle, not a filmed body), six movement sessions, six recipes, two work films, one for the frightening thoughts route. |
 | YM6 | The recipes in the shared library | Data | Not done | The six healing-kitchen recipes should also be tagged postpartum in `pp_food`'s recipe library; today they are pages here that link to `pp_food`. |
+
+### P10. What to buy — the shop, not a door
+
+Built to `What_to_buy_parenting.pdf`, which says in plain words: do not
+rebuild, do not restructure, no tabs. So this is three link fixes, one
+single-source, a soft age default, and eight placeholder guides. The rows
+below are the placeholders; `test/pp_what_to_buy_test.dart` holds them.
+
+| # | Guide (`product_guide_data.dart`) | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| WB1 | `before_baby_essentials` — What you actually need, and what can wait | Guide | Coming soon | The single most searched buying question; the honest short list. |
+| WB2 | `things_to_skip` — The things everyone buys that you can skip | Guide | Coming soon | The walker, the changing table, shoes before walking, the wipe warmer, baby powder, the top-and-tail set. |
+| WB3 | `car_seat` — Infant Car Seat | Guide | Coming soon | The India version: never second-hand, rearward as long as possible. |
+| WB4 | `cot_mattress` — Cot, mattress and safe sleep | Guide | Coming soon | Firm and flat; in a co-sleeping home, do you need a cot at all. |
+| WB5 | `cloth_or_disposable` — Cloth or disposable, and the langot question | Guide | Coming soon | Money, environment, and where the langot still fits. |
+| WB6 | `mosquito_protection` — Keeping mosquitoes off a baby, safely | Guide | Coming soon | Nets vs plug-ins vs patches, and the ages each is alright from. |
+| WB7 | `second_hand` — Second-hand and hand-me-downs | Guide | Coming soon | The safety line: car seat, mattress, teats new; clothes, toys, cot frame fine. |
+| WB8 | `season_born` — Buying for the season she is born in | Guide | Coming soon | Light: a summer baby vs a winter one. |
+| WB9 | Four expert films on the nine guides | Film | Built from data | The card says "still being filmed" honestly; this is sponsored inventory, so a stub is a paid slot over nothing. |
+| WB10 | Three "compare" links with no true shelf | Catalogue | Built from data | Nasal aspirators and cough-and-cold products land on First aid; malish oils on Lotions. Real shelves would make the links honest. |

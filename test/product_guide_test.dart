@@ -112,17 +112,21 @@ void main() {
       return const SizedBox.shrink();
     }))));
 
-    // A matching name → the chooser sheet appears.
-    openProductWithGuideCheck(ctx, name: 'A gentle baby lotion', onOpenNormal: () => openedNormal = true);
+    // A product whose ID maps to a guide → the chooser sheet appears.
+    // (The What to buy brief, 2026-09-14: matching is by id and the explicit
+    // map only; a name keyword no longer counts — it offered the steriliser
+    // guide to the anti-colic bottle.)
+    openProductWithGuideCheck(ctx, id: 'lotion', name: 'A gentle baby lotion', onOpenNormal: () => openedNormal = true);
     await tester.pumpAndSettle();
     expect(find.text('How would you like to see this?'), findsOneWidget);
     expect(find.text('ParentVeda Product Guide'), findsWidgets);
     expect(openedNormal, isFalse);
 
-    // Dismiss, then a non-matching product → straight to normal, no sheet.
+    // Dismiss, then a product with no guide → straight to normal, no sheet,
+    // even when its name shares a word with a guide.
     await tester.tapAt(const Offset(20, 20)); // tap scrim to dismiss
     await tester.pumpAndSettle();
-    openProductWithGuideCheck(ctx, name: 'Random gadget 9000', onOpenNormal: () => openedNormal = true);
+    openProductWithGuideCheck(ctx, id: 'bottle', name: 'Anti-Colic Feeding Bottle', onOpenNormal: () => openedNormal = true);
     await tester.pumpAndSettle();
     expect(openedNormal, isTrue);
     expect(find.text('How would you like to see this?'), findsNothing);

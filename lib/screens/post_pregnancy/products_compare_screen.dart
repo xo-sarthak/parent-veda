@@ -588,7 +588,9 @@ class ProductsCompareScreen extends StatelessWidget {
   }
 
   Widget _beforeYouCompare(PpProduct a) {
-    final g = compareGuideFor(a.category);
+    // The shelf's guidance card is the one source; see `compareGuideForShelf`.
+    // final g = compareGuideFor(a.category);
+    final g = compareGuideForShelf(a.category, a.sub);
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(

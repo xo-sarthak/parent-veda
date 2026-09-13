@@ -924,6 +924,23 @@ const List<(String, IconData, Set<String>)> kPpConcerns = [
 ];
 
 // Life-stage entry points → the categories most relevant at that age.
+/// ⚠️ THE AGE RULE, SOFTENED FOR A SHOP (the What to buy brief, the user's
+/// call 2026-09-14). Everywhere else the rule hides other stages; a shop is
+/// the one place that would be wrong, because buying runs ahead of the baby.
+/// So: her stage, from the app's known age, used as a DEFAULT SORT (relevant
+/// now first) and never as a filter that removes anything.
+String ppStageForMonths(int months) {
+  if (months < 3) return kPpStages[0].$1;
+  if (months < 6) return kPpStages[1].$1;
+  if (months < 12) return kPpStages[2].$1;
+  if (months < 24) return kPpStages[3].$1;
+  return kPpStages[4].$1;
+}
+
+/// The categories that belong to a stage.
+Set<String> ppStageCategories(String stage) =>
+    kPpStages.firstWhere((s) => s.$1 == stage, orElse: () => kPpStages.first).$2;
+
 const List<(String, Set<String>)> kPpStages = [
   ('Newborn · 0–3m', {'Sleep', 'Skincare', 'Feeding', 'Health & Safety'}),
   ('3–6 months', {'Sleep', 'Play & Development', 'Feeding'}),
@@ -1296,6 +1313,35 @@ const Map<String, CompareGuide> kCompareGuides = {
 };
 
 CompareGuide compareGuideFor(String category) => kCompareGuides[category] ?? kCompareGuides['Sleep']!;
+
+/// Seed the compare tray with one shelf, so a "compare swaddles" link lands
+/// on swaddles and not on "no products selected yet". Clears what was there:
+/// the link named a shelf, and a tray holding last week's thermometer would
+/// contradict it. Unknown shelf: the tray is simply cleared.
+void ppPreloadCompare(String sub) {
+  final store = PpCompareStore.instance;
+  store.clear();
+  for (final p in productCatalog.where((p) => p.sub == sub)) {
+    if (store.isFull) break;
+    store.toggle(p);
+  }
+}
+
+/// ⚠️ ONE SOURCE FOR "WHAT TO LOOK FOR". The compare screen's "what actually
+/// matters" panel was a third hand-written copy of the buying advice (the
+/// guide, the shelf's guidance card, and this). It reads the shelf's guidance
+/// card now: look-for as what matters, the first avoid as the common mistake,
+/// the second as what to skip. `kCompareGuides` below is kept for revert and
+/// read by nothing.
+CompareGuide compareGuideForShelf(String category, String sub) {
+  final g = ppGuideFor(category, sub);
+  return CompareGuide(
+    whatMatters: g.lookFor,
+    oftenSkip: g.avoid.length > 1 ? g.avoid[1] : g.avoid.first,
+    mistake: g.avoid.first,
+    contextTip: g.line,
+  );
+}
 
 // =============================================================================
 //  Compare Manager - the dynamic comparison engine for the Products ecosystem.

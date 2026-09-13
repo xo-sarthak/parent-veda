@@ -74,6 +74,9 @@ void main() {
   group('the guide keeps its promises', () {
     test('every guide answers the 10-second question', () {
       for (final g in kProductGuides) {
+        // A coming-soon placeholder has no verdict to keep, on purpose; it
+        // holds a row on the hub and does not open. See ProductGuide.comingSoon.
+        if (g.comingSoon) continue;
         expect(g.verdict.trim(), isNotEmpty, reason: '${g.name} has no verdict');
         expect(g.verdict.split(' ').length, lessThanOrEqualTo(24),
             reason: '${g.name}: the verdict must be scannable, not a paragraph');
@@ -85,6 +88,7 @@ void main() {
 
     test('the honest look stays honest — and short', () {
       for (final g in kProductGuides) {
+        if (g.comingSoon) continue; // a placeholder praises nothing
         expect(g.watchOut.length, lessThanOrEqualTo(3),
             reason: '${g.name}: at most three things to watch out for');
         expect(g.whyLike.length, lessThanOrEqualTo(3),

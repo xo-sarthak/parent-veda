@@ -97,6 +97,19 @@ follows.
       cards are windows now). Walk that door once more and confirm it still
       reads as her recovery woven in.
 
+## What to buy (§53) — a shop, not a door
+
+- [ ] Three of the seven "compare" links have no true shelf: nasal
+      aspirators and cough-and-cold land on First aid, malish oils on
+      Lotions. Add those shelves, or reword the links?
+- [ ] The soft stage sort is silent (no "leading with her stage" line on
+      the grid). Say if it should announce itself.
+- [ ] WB9: four expert-film cards are sponsored inventory over films not
+      yet shot. Worth knowing before a slot is sold.
+- [ ] The placeholder guides show under new category headings ("Before the
+      baby comes", "Nappies") on the guides hub. Fine, or fold under the
+      existing three?
+
 ## Cross-section windows — where one door opens another's page
 
 Every place a card or link on one door opens a page that lives on another
@@ -131,7 +144,7 @@ safe-sleep drawing (First 40 Days), Feeding's latch film (First 40 Days).
 
 ## Every door
 
-- [ ] Copy for every coming-soon card: `DOOR-CONTENT-OWED.md` P1–P9.
+- [ ] Copy for every coming-soon card: `DOOR-CONTENT-OWED.md` P1–P10.
 - [ ] The films and audios in the same ledger; the 58 story recordings first.
 - [ ] The hub configs (`parenting_hubs.dart`) still describe the old two-door
       homes; the V3 tile bypasses them. Retire, or leave for the older home?
