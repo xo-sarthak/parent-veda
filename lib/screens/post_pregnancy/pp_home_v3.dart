@@ -615,6 +615,11 @@ class _PpHomeV3State extends State<PpHomeV3> {
     const areaForAction = <String, String>{
       kPpActPottyReadiness: 'parenting_potty/getting_ready',
       kPpActPottyTraining: 'parenting_potty/how_to_do_it',
+      // The Early Learning brief's one structural call: "Prepare for
+      // school" points at the school-readiness tab, not at the whole
+      // library, so the stories and activities are not behind a school
+      // button. 2026-09-13.
+      kPpActSchoolReadiness: 'parenting_early_learning/school',
     };
     final areaTarget = areaForAction[action];
     if (areaTarget != null) {

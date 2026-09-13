@@ -125,6 +125,9 @@ final PpSection kPpEarlyLearningSection = PpSection(
       'and being told stories. Here is what to do today, at his age, with what '
       'is already in your house.',
   bandSet: kPpEarlyLearningBands,
+  // ⚠️ THE AGE RULE. "Remove the five band tabs and the band chooser. App
+  // knows the age. Open on his band, show only his band, hide the others."
+  autoScope: true,
   areas: [
     _today,
     _montessori,
@@ -135,6 +138,7 @@ final PpSection kPpEarlyLearningSection = PpSection(
     _birbal,
     _tenali,
     _worldTales,
+    _rhymes, // [NEW] the collection the section had none of
     _habits,
     _earlySkills,
     _school,
@@ -5018,10 +5022,15 @@ const PpArea _habits = PpArea(
             'the one saying no, not you, and the fighting drops sharply.'),
         PpWhenLine('Turn taking from about two years. Genuine sharing from '
             'about four, and unevenly even then.'),
+        // ⚠️ THE OTHER VERSION, BY PAGE. Five habit pages also live in
+        // Behaviour; the brief keeps both ("build the habit calmly" here,
+        // "when it is going wrong right now" there) and cross-links them.
+        // The link lands on that page, not on the door.
         PpLink(
           'When sharing turns into hitting and grabbing',
-          surfaceId: 'pp_section/parenting_behaviour',
-          blurb: 'The Behaviour section handles the conflict itself.',
+          // surfaceId: 'pp_section/parenting_behaviour',
+          surfaceId: 'pp_page/parenting_behaviour/sharing',
+          blurb: 'The Behaviour side: what to do in the moment.',
         ),
       ],
     ),
@@ -5337,6 +5346,11 @@ const PpArea _habits = PpArea(
           pageId: 'st_jat_monkey_bridge',
           blurb: 'The monkey king who went last.',
         ),
+        PpLink(
+          'When he is unkind right now: hitting, or falling out with a friend',
+          surfaceId: 'pp_page/parenting_behaviour/beh_friendships',
+          blurb: 'The Behaviour side, for the moment itself.',
+        ),
       ],
     ),
     PpPage(
@@ -5386,6 +5400,11 @@ const PpArea _habits = PpArea(
             'turn instead of you, and the arguing drops away.'),
         PpWhenLine('Ten to thirty seconds from two years, a few minutes by four, '
             'and reliably by six.'),
+        PpLink(
+          'When waiting is already a fight',
+          surfaceId: 'pp_page/parenting_behaviour/sharing',
+          blurb: 'The Behaviour side: turns, grabbing, and the timer trick.',
+        ),
       ],
     ),
     PpPage(
@@ -5443,6 +5462,11 @@ const PpArea _habits = PpArea(
           pageId: 'st_world_cried_wolf',
           blurb: 'The boy who cried wolf.',
         ),
+        PpLink(
+          'When he has just told you a lie',
+          surfaceId: 'pp_page/parenting_behaviour/beh_older_lying',
+          blurb: 'The Behaviour side: what to say in the moment.',
+        ),
       ],
     ),
     PpPage(
@@ -5497,8 +5521,9 @@ const PpArea _habits = PpArea(
             'and are fine.'),
         PpLink(
           'When screens are already a daily fight',
-          surfaceId: 'pp_section/parenting_behaviour',
-          blurb: 'The Behaviour section handles the battles and the limits.',
+          // surfaceId: 'pp_section/parenting_behaviour',
+          surfaceId: 'pp_page/parenting_behaviour/beh_screen_ending',
+          blurb: 'The Behaviour side: ending it without a meltdown.',
         ),
       ],
     ),
@@ -5898,6 +5923,19 @@ const PpArea _earlySkills = PpArea(
         ),
       ],
     ),
+    // ⚠️ [NEW], a scaffold. "The push to start ABCs and English at two is
+    // intense in Indian homes. The section refuses worksheets everywhere,
+    // but does not yet give the parent the words to hold that line on
+    // language." Copy supplied, not generated.
+    PpPage(
+      id: 'skills_language',
+      title: 'English or the mother tongue, and when to start letters',
+      subtitle: 'The words to hold the line when the pressure starts at two',
+      format: 'ARTICLE',
+      bands: _fromOne,
+      comingSoon: true,
+      blocks: [],
+    ),
   ],
 );
 
@@ -5920,6 +5958,35 @@ const PpArea _earlySkills = PpArea(
 //  a parent actually loses sleep over: choosing the place, and the crying at the
 //  gate.
 // =============================================================================
+
+// =============================================================================
+//  [NEW] Rhymes and songs — the collection the section had none of
+// -----------------------------------------------------------------------------
+//  "The section has 58 stories and not one rhyme, and rhymes are half of
+//  early learning at this age." Audio-first like the stories, original or
+//  public-domain only. The collection is a scaffold until the copy and the
+//  recordings land; one card holds the place. Logged in
+//  docs/DOOR-CONTENT-OWED.md; the door test holds it there.
+// =============================================================================
+
+const PpArea _rhymes = PpArea(
+  id: 'rhymes',
+  mark: IntentMark.feedMark,
+  title: 'Rhymes and songs',
+  blurb: 'Action rhymes and songs in Hindi, English and the languages at '
+      'home, to listen to and do together.',
+  hue: 42,
+  pages: [
+    PpPage(
+      id: 'rhymes_collection',
+      title: 'Rhymes and songs',
+      subtitle: 'Clapping, actions and the tunes the house already knows',
+      format: 'AUDIO LIBRARY',
+      comingSoon: true,
+      blocks: [],
+    ),
+  ],
+);
 
 const PpArea _school = PpArea(
   id: 'school',

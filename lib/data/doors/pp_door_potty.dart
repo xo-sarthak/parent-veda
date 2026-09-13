@@ -7,9 +7,9 @@
 //  seven areas sit on five tabs the brief did not draw, on the user's call
 //  (2026-09-13):
 //
-//    How long, and is she ready   the pinned timeline, then readiness
+//    How long this takes          the pinned timeline, every stage
 //    Catching the su-su           the baby stage, real content not a wait
-//    Starting out                 day by day, and the three activities
+//    Starting out                 readiness, day by day, the activities
 //    Accidents and going backwards
 //    Dry nights, doing it herself
 //
@@ -36,12 +36,17 @@ final PpDoor kPpPottyDoor = PpDoor(
   heroImageUrl:
       'https://images.unsplash.com/photo-1780327065644-399075fb9e9b?w=900&h=700&fit=crop',
   tabs: const [
+    // ⚠️ THE TIMELINE ALONE. Readiness sat here first, and for a baby's
+    // parent the tab promised "is she ready" and showed one card — the
+    // readiness rail is 1 to 6 and hid inside an open tab instead of
+    // locking. Moved to Starting out (the user's call, 2026-09-13), where
+    // it locks cleanly with "From 1 year".
     PpDoorTab(
       id: 'how_long',
-      label: 'How long, and is she ready',
+      label: 'How long this takes',
       icon: Icons.timelapse_outlined,
       hue: 160,
-      areaIds: ['the_real_shape', 'getting_ready'],
+      areaIds: ['the_real_shape'],
     ),
     PpDoorTab(
       id: 'su_su',
@@ -55,7 +60,7 @@ final PpDoor kPpPottyDoor = PpDoor(
       label: 'Starting out',
       icon: Icons.stairs_outlined,
       hue: 28,
-      areaIds: ['how_to_do_it', 'things_to_do'],
+      areaIds: ['getting_ready', 'how_to_do_it', 'things_to_do'],
     ),
     PpDoorTab(
       id: 'bumpy',

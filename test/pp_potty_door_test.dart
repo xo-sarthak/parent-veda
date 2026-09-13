@@ -55,7 +55,8 @@ void main() {
     });
 
     test('the timeline leads the first tab, pinned and for every stage', () {
-      expect(door.tabs[0].areaIds.first, 'the_real_shape');
+      expect(door.tabs[0].areaIds, ['the_real_shape'], reason: 'the timeline alone; readiness locks with Starting out');
+      expect(door.tabs[2].areaIds.first, 'getting_ready');
       expect(_area('the_real_shape').bands, isEmpty, reason: 'all stages');
       expect(_listed('the_real_shape'), ['honest_timeline']);
       expect(_page('honest_timeline').format, 'CHART-CARD');
@@ -136,16 +137,17 @@ void main() {
       await tester.pumpWidget(MaterialApp(home: PpDoorScreen(key: const ValueKey(4), door: door, onSurface: (_, _) {})));
       await tester.pumpAndSettle();
       expect(find.text('How long this actually takes'), findsOneWidget, reason: 'the pinned timeline, for every stage');
-      expect(find.text('The signs she is ready'), findsNothing, reason: 'readiness is 1 to 6');
+      expect(find.text('The signs she is ready'), findsNothing, reason: 'readiness is 1 to 6, locked with Starting out');
       expect(find.textContaining('From 1 year'), findsNWidgets(2), reason: 'Starting out, Accidents');
       expect(find.textContaining('From 3 years'), findsOneWidget, reason: 'Dry nights');
       expect(find.text('Talk to a paediatrician about it'), findsOneWidget);
 
       _ageMonths(24);
-      await tester.pumpWidget(MaterialApp(home: PpDoorScreen(key: const ValueKey(24), door: door, onSurface: (_, _) {})));
+      await tester.pumpWidget(MaterialApp(
+          home: PpDoorScreen(key: const ValueKey(24), door: door, onSurface: (_, _) {}, initialTabId: 'starting_out')));
       await tester.pumpAndSettle();
       expect(find.text('Catching the su-su'), findsNothing, reason: 'grown past');
-      expect(find.text('The signs she is ready'), findsOneWidget);
+      expect(find.text('The signs she is ready'), findsOneWidget, reason: 'readiness leads Starting out');
       expect(find.textContaining('From 3 years'), findsOneWidget);
 
       _ageMonths(50);

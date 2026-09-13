@@ -287,7 +287,9 @@ one rail, headed with the tab's name (The leaps is one tool, the calendar).
 From Behaviour (2026-09-13): a tab whose areas all start after his age is on
 the selector LOCKED (misted, a lock, "From 1 year"; a panel instead of rails),
 after the open tabs; a tab he has grown past is gone. A tool can follow the
-read it belongs to with `PpDoorTool.afterPageId`. `PpAnimationKind.breathing` is the
+read it belongs to with `PpDoorTool.afterPageId`. When a brief's tab list is
+four, split the tab the code already holds as two areas (Early Learning's
+school tab) rather than run a four-ring. `PpAnimationKind.breathing` is the
 shared breathing circle; a brief that says "the breathing component" means it.
 
 ### The door-rebuild additions (2026-09-11, Sleep first)

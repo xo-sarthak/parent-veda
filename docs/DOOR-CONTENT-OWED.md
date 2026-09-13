@@ -173,6 +173,7 @@ two.
 | Development (parenting) | 4 | 1 | – | 3 | – (DV2 is a data job, logged) |
 | Behaviour (parenting) | 15 | 11 | – | 4 | – |
 | Potty (parenting) | 6 | 4 | – | 2 | – |
+| Early Learning (parenting) | 4 | 2 | – | 2 | – |
 
 Pregnancy, six doors: written pieces owed, in prose — **S1, L3, L4, L5, L6,
 M1**, six reads. Films — **N1, L1, L2, M4 ×3, M6 ×5**, eleven. Audio — **M5
@@ -251,3 +252,17 @@ pieces as coming-soon cards, copy "written on your go"; one film.
 | PT4 | `taking_longer` — If she is taking much longer than her friends | Cards | Coming soon | A calm pointer to Development and a paediatrician, without alarm. |
 | PT5 | `indian_toilet` — The Indian toilet, and going out | Film · 6 min | Built from data | Slot `potty/indian_toilet`: the supported squat, the balance, the bucket-and-mug, front to back. "The clearest missing video in the section." The wiping page points here. |
 | PT6 | The seven films the brief marks | Film | Built from data | Every `potty/*` slot is a placeholder: the timeline, cueing, readiness, the routine, accidents, the activities, dry nights. |
+
+### P7. Early Learning — `lib/data/doors/pp_door_early_learning.dart`
+
+Built to `Early_Learning_Parenting.pdf`. "Mostly an add and a re-front, not a
+teardown." Two scaffolds; the big owed item is recording, not writing.
+`test/pp_early_learning_door_test.dart` fails if a coming-soon page is not
+here.
+
+| # | Card | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| EL1 | `rhymes_collection` — Rhymes and songs | Audio library | Coming soon | A whole collection, audio-first like the stories: Hindi, English and regional action rhymes, original or public-domain only, never copyrighted lyrics. Pairs with "Clapping and dancing to a song". |
+| EL2 | `skills_language` — English or the mother tongue, and when to start letters | Article | Coming soon | The words to hold the line when the pressure to start ABCs at two starts. Copy supplied. |
+| EL3 | The 58 story audios | Audio | Built from data | Every story has a "listen" button and no recording. "A story library with no narration is half-built, so recording the story audio is the first job." |
+| EL4 | The 15 films | Film | Built from data | Every `early_learning/*` slot is a placeholder: tummy-time reach, pouring, spooning dal, the strokes before letters, brushing teeth, the Montessori corner, telling a story with no book, the six read-alouds, readiness, what comes before writing. |

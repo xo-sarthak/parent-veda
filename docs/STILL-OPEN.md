@@ -6508,9 +6508,9 @@ the contract is `test/pp_potty_door_test.dart`. Walked on a phone at day one; se
 
 ### 49.1 The calls
 
-* **Five tabs** from seven areas, the user's from two options: How long, and
-  is she ready (the pinned timeline first, then readiness) · Catching the
-  su-su · Starting out (day by day, and the three activities) · Accidents
+* **Five tabs** from seven areas, the user's from two options: How long this
+  takes (the pinned timeline) · Catching the su-su · Starting out (readiness,
+  day by day, and the three activities) · Accidents
   and going backwards · Dry nights, doing it herself. No tools on any tab,
   no red flag, no quiz — the brief's stance, kept and tested.
 * **Widen** (judgement call 1): readiness, starting out and accidents now
@@ -6541,5 +6541,45 @@ scaffolds: no star charts, three-day method, pull-ups, taking longer (PT1–4).
   pages render. One thing to know: the first tab is named "How long, and is
   she ready", and for a baby only the timeline shows on it — readiness is
   1 to 6, so its rail is hidden inside an open tab rather than locked. The
-  tab name over-promises for that one band; a rename to "How long this
-  takes" alone, or moving readiness to Starting out, are the two fixes.
+  tab name over-promised for that one band. **Decided:** readiness moved
+  to Starting out, the first tab is "How long this takes" alone.
+
+---
+
+## 50.0 Early Learning, the seventh parenting door — 2026-09-13
+
+Built to `Early_Learning_Parenting.pdf`. The door is
+`lib/data/doors/pp_door_early_learning.dart`; the contract is
+`test/pp_early_learning_door_test.dart`. Walked on a phone at day one; see 50.3.
+
+### 50.1 The calls
+
+* **Five tabs** from the brief's four, on the user's call: the school tab
+  split where the code already had two areas — Do something today · Stories
+  and rhymes · Good habits · Before letters and numbers · Starting school.
+  Everyday things at the front; the school tab is one of five, not the door.
+* **Call 1, split:** the old home's "Prepare for school" door now deep-links
+  to the school tab (`areaForAction` in `pp_home_v3.dart`); the V3 tile opens
+  the door on Do something today.
+* **Call 2, keep both:** the five habit twins (sharing, waiting, kindness,
+  truth, screens) stay here as build-the-habit pages and each links to its
+  Behaviour in-the-moment page by `pp_page/` (sharing → sharing, waiting →
+  sharing, kindness → beh_friendships, truth → beh_older_lying, screens →
+  beh_screen_ending). The two section-level links became page links.
+* **The activity picker is not a tool on the door.** The first tab's rail IS
+  the set for his age; a Tool card opening the same set was the door-and-tool
+  duplication the brief names. `pp_activities` still exists for the older
+  home and the links into it.
+
+### 50.2 Owed
+
+Two scaffolds (rhymes, the language page: EL1–EL2) and the real job, the 58
+story audios and 15 films (EL3–EL4). The tracker tool points at
+`pp_milestones`, the one tracker after Development's merge.
+
+### 50.3 Open
+
+* For a baby, three of five tabs are locked (habits from 1, before letters
+  from 2, school from 3). That is the content's own banding, seen on the
+  phone; if it reads as too much grey, the habits area's `_fromOne` is the
+  one worth questioning (a hand-washing habit starts before one).
