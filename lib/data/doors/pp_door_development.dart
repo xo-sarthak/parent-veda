@@ -49,12 +49,18 @@ final PpDoor kPpDevelopmentDoor = PpDoor(
         // were the same list shown two ways; the journey kept the flip-cards
         // and the search and gained the "usually settled by now" group. The
         // four areas of growing are its Explore-by-area, one tap deeper.
+        //
+        // ⚠️ READ, THEN THE TOOL FOR IT. The user's call (2026-09-13): the
+        // rail goes "The normal range is much wider than you think" then the
+        // tracker, "When something is genuinely worth checking" then the
+        // check-in, then the born-early read. Educate, then hand over.
         PpDoorTool(
           label: 'Where he is right now',
           blurb: 'His milestones as windows: usually settled by now, emerging '
               'now, and a soft look ahead. Never a score.',
           surfaceId: 'pp_milestones',
           icon: Icons.checklist_rtl_outlined,
+          afterPageId: 'dev_range_is_wide',
         ),
         PpDoorTool(
           label: 'A gentle check-in',
@@ -62,6 +68,7 @@ final PpDoor kPpDevelopmentDoor = PpDoor(
               'and it never says "all fine".',
           surfaceId: 'pp_dev_checkin',
           icon: Icons.spa_outlined,
+          afterPageId: 'dev_worth_checking',
         ),
       ],
       footer: 'A box you have not ticked is not one he has missed. One baby '

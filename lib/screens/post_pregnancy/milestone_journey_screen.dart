@@ -997,7 +997,9 @@ class _MilestoneFlipCardState extends State<MilestoneFlipCard> {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 5),
-                      Text('Usually ${m.ageRangeLabel}',
+                      // Read "Usually Typically 1–3 months" on a phone; the
+                      // label already carries its own word.
+                      Text('Usually ${m.ageRangeLabel.replaceFirst('Typically ', '')}',
                           style: ppBody(12, color: ppMuted)),
                     ]),
               ),

@@ -63,7 +63,8 @@ class PpDoor {
   /// where `closing` gives it somewhere to go. Tried on Sleep first
   /// (2026-09-12) so the two representations can be compared on a phone —
   /// Feeding keeps the card until that is decided. When both are set, the
-  /// line is drawn and the card is not.
+  /// line is drawn and the card is not. Decided 2026-09-13, on a phone: the
+  /// card, on every door; no door sets this now.
   final String? closingLine;
 
   /// Areas of the section this door deliberately does not show — because a
@@ -174,11 +175,20 @@ class PpDoorTool {
     required this.surfaceId,
     required this.icon,
     this.chip = 'Tool',
+    this.afterPageId,
   });
   final String label;
   final String blurb;
   final String surfaceId;
   final IconData icon;
+
+  /// ⚠️ A TOOL THAT FOLLOWS ITS READ. Tools lead the first rail; this puts
+  /// one after a named page instead, so a rail can go read, then the tool
+  /// for it: "The normal range is much wider than you think", then Where he
+  /// is right now; "When something is genuinely worth checking", then A
+  /// gentle check-in. The user's call on Development (2026-09-13): educate,
+  /// then hand over the tool, per pair. Null keeps the tool at the front.
+  final String? afterPageId;
 
   /// "Tool", "Audio" — the badge the brief marks the landing item with.
   final String chip;

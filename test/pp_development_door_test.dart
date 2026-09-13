@@ -61,6 +61,9 @@ void main() {
       expect(_page('dev_worth_checking').format, 'FLAGGED CALLOUT');
       expect(_page('dev_born_early').bands, isNot(contains('dev_2_3')), reason: 'only up to two years');
       expect(door.tabs[0].tools.map((t) => t.surfaceId), ['pp_milestones', 'pp_dev_checkin']);
+      // Read, then the tool for it: the user's call, 2026-09-13.
+      expect(door.tabs[0].tools[0].afterPageId, 'dev_range_is_wide');
+      expect(door.tabs[0].tools[1].afterPageId, 'dev_worth_checking');
       expect(door.tabs[0].footer, contains('not one he has missed'));
     });
 
@@ -162,6 +165,12 @@ void main() {
       }
       expect(find.text('Where he is right now'), findsOneWidget);
       expect(find.text('Talk to a specialist'), findsOneWidget);
+      // The rail order on screen: read, tool, read, tool, read.
+      double x(String t) => tester.getTopLeft(find.text(t).first).dx;
+      expect(x('The normal range is much wider than you think'), lessThan(x('Where he is right now')));
+      expect(x('Where he is right now'), lessThan(x('When something is genuinely worth checking')));
+      expect(x('When something is genuinely worth checking'), lessThan(x('A gentle check-in')));
+      expect(x('A gentle check-in'), lessThan(x('If your baby was born early')));
       // Land on the leaps the way a deep link does.
       await tester.pumpWidget(MaterialApp(
           home: PpDoorScreen(key: const ValueKey('leaps'), door: door, onSurface: (_, _) {}, initialTabId: 'leaps')));

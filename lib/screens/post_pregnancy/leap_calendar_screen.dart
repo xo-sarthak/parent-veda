@@ -78,7 +78,9 @@ class _LeapCalendarScreenState extends State<LeapCalendarScreen> {
             const SizedBox(height: 6),
             // _pad(Text('Every mental leap of the first two years, mapped to ${child.nameMid}\'s own dates. He is in ${kLeaps[curIdx].label} right now.',
             //     style: ppBody(14, h: 1.55))),
-            _pad(Text('The ten fussy-then-forward phases of the first twenty months, by the age they usually arrive. ${child.nameMid} may be in ${kLeaps[curIdx].label} around now.',
+            // "your baby" mid-sentence, never at the start of one: the name
+            // token is lower-case by design, so the sentence is shaped around it.
+            _pad(Text('The ten fussy-then-forward phases of the first twenty months, by the age they usually arrive. Around now, ${child.nameMid} may be in ${kLeaps[curIdx].label}.',
                 style: ppBody(14, h: 1.55))),
             const SizedBox(height: 10),
             // The caveat, in the header where it is read, not the footer
@@ -144,14 +146,16 @@ class _LeapCalendarScreenState extends State<LeapCalendarScreen> {
           boxShadow: now ? [BoxShadow(color: a.withValues(alpha: 0.35), blurRadius: 22, spreadRadius: -10, offset: const Offset(0, 10))] : null,
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          // The label and the badge on one row truncated "Phase 1" to
+          // "Phas…" on a phone once the badge said ABOUT NOW; the badge is
+          // its own line now.
           Row(children: [
             Flexible(child: Text(l.label, style: ppJakarta(15, color: now ? Colors.white : ppInk), maxLines: 1, overflow: TextOverflow.ellipsis)),
             const Spacer(),
-            if (now)
-              Text('ABOUT NOW', style: ppBody(9.5, color: Colors.white, w: FontWeight.w800).copyWith(letterSpacing: 0.8))
-            else if (past)
-              const Icon(Icons.check_rounded, size: 15, color: ppMuted),
+            if (past) const Icon(Icons.check_rounded, size: 15, color: ppMuted),
           ]),
+          if (now)
+            Text('ABOUT NOW', style: ppBody(9.5, color: Colors.white, w: FontWeight.w800).copyWith(letterSpacing: 0.8)),
           const SizedBox(height: 6),
           Text(l.name, style: ppBody(12.5, color: now ? Colors.white.withValues(alpha: 0.95) : ppSoft, w: FontWeight.w600, h: 1.3), maxLines: 2, overflow: TextOverflow.ellipsis),
           const Spacer(),
@@ -202,7 +206,7 @@ class _LeapCalendarScreenState extends State<LeapCalendarScreen> {
               ]),
               const SizedBox(height: 3),
               // Text('${_fmt(start)} – ${_fmt(end)}  ·  ${past ? 'behind him' : now ? 'happening now' : 'ahead'}',
-              Text('${l.aroundLabel}  ·  ${past ? 'likely behind him' : now ? 'around now, give or take' : 'ahead'}',
+              Text('${l.aroundLabel}  ·  ${past ? 'likely behind him' : now ? 'give or take' : 'ahead'}',
                   style: ppBody(12, color: ppMuted), maxLines: 1, overflow: TextOverflow.ellipsis),
             ]),
           ),

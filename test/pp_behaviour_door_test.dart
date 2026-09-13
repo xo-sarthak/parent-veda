@@ -160,7 +160,7 @@ void main() {
   group('the age rule', () {
     test('the section auto-scopes', () => expect(_beh.autoScope, isTrue));
 
-    testWidgets('an infant parent sees one tab; a four-year-old\'s sees four, without Crying', (tester) async {
+    testWidgets('an infant parent sees one open tab and four locked; a four-year-old\'s sees four, without Crying', (tester) async {
       tester.view.physicalSize = const Size(1200, 7000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.reset);
@@ -168,14 +168,25 @@ void main() {
       await tester.pumpWidget(MaterialApp(home: PpDoorScreen(key: const ValueKey(3), door: door, onSurface: (_, _) {})));
       await tester.pumpAndSettle();
       expect(find.text('Crying, the first year'), findsWidgets);
-      expect(find.text('Tantrums and the ziddi years'), findsNothing);
-      expect(find.text('Scared, shy or clingy'), findsNothing);
       expect(find.text('When the crying is too much'), findsOneWidget);
+      // The toddler tabs are on the selector, locked, with the age they open.
+      expect(find.text('Tantrums and the ziddi years'), findsWidgets);
+      expect(find.text('Scared, shy or clingy'), findsWidgets);
+      expect(find.textContaining('From 1 year'), findsNWidgets(4));
+      expect(find.byIcon(Icons.lock_outline_rounded), findsNWidgets(8), reason: 'the badge and the mark, per locked card');
+      // Landing on a locked tab shows the panel, not its rails.
+      await tester.pumpWidget(MaterialApp(
+          home: PpDoorScreen(key: const ValueKey('locked'), door: door, onSurface: (_, _) {}, initialTabId: 'tantrums')));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('This opens when'), findsOneWidget);
+      expect(find.text('How to handle a ziddi bachcha'), findsNothing);
+      expect(find.text('Talk to a child psychologist'), findsOneWidget, reason: 'the closing still draws');
 
       _ageMonths(48);
       await tester.pumpWidget(MaterialApp(home: PpDoorScreen(key: const ValueKey(48), door: door, onSurface: (_, _) {})));
       await tester.pumpAndSettle();
-      expect(find.text('Crying, the first year'), findsNothing);
+      expect(find.text('Crying, the first year'), findsNothing, reason: 'a tab he has grown past is gone, not locked');
+      expect(find.byIcon(Icons.lock_outline_rounded), findsNothing);
       for (final t in door.tabs.skip(1)) {
         expect(find.text(t.label), findsWidgets, reason: t.id);
       }

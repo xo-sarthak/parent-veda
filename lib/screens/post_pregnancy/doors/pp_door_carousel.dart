@@ -211,9 +211,17 @@ class PpDoorCarousel extends StatefulWidget {
     required this.selected,
     required this.p,
     required this.onPick,
+    this.locked = const [],
   });
 
   final List<PpDoorTab> groups;
+
+  /// ⚠️ A LOCKED TAB IS SHOWN, NOT HIDDEN. Per group: true when the tab
+  /// holds nothing for his age yet. The card is drawn misted with a lock
+  /// on it, the way a game shows a level that is coming, so the section
+  /// never looks bare and she knows what opens when. The user's call,
+  /// 2026-09-13. The screen orders locked cards after the open ones.
+  final List<bool> locked;
 
   /// The second line on each card — "4 things", "Your timeline".
   ///
@@ -531,6 +539,8 @@ class _PpDoorCarouselState extends State<PpDoorCarousel>
                                     key: ValueKey(widget.groups[i].id),
                                     group: widget.groups[i],
                                     inside: _countFor(i),
+                                    locked: i < widget.locked.length &&
+                                        widget.locked[i],
                                     offset: _offsetOf(i),
                                     count: _count,
                                     index: i,
@@ -688,17 +698,20 @@ Color _markMid(double h) =>
     HSLColor.fromAHSL(1, h % 360, 0.30, 0.82).toColor();
 
 class _PpDoorMark extends CustomPainter {
-  const _PpDoorMark({required this.hue, required this.index});
+  const _PpDoorMark({required this.hue, required this.index, this.grey = false});
 
   final double hue;
   final int index;
+
+  /// A locked card's mark: the same drawing in grey.
+  final bool grey;
 
   @override
   void paint(Canvas canvas, Size size) {
     // Everything below is written in the design's 96-unit space and scaled
     // once, so the numbers in the code are the numbers in the design file.
     canvas.scale(size.width / 96);
-    final deep = ppDoorDeep(hue);
+    final deep = grey ? const Color(0xFF8A8592) : ppDoorDeep(hue);
     final d = _kMarkDots[index % _kMarkDots.length];
     const c = Offset(48, 48);
 
@@ -770,7 +783,8 @@ class _PpDoorMark extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_PpDoorMark old) => old.hue != hue || old.index != index;
+  bool shouldRepaint(_PpDoorMark old) =>
+      old.hue != hue || old.index != index || old.grey != grey;
 }
 
 /// One card on the track — a drawing, at a position on a ring.
@@ -789,12 +803,16 @@ class _PpDoorCard extends StatelessWidget {
     required this.index,
     required this.held,
     required this.p,
+    this.locked = false,
   });
 
   final PpDoorTab group;
 
   /// The second line — "4 things", "Your timeline". Counted by the screen.
   final String inside;
+
+  /// Drawn misted with a lock: nothing here for his age yet.
+  final bool locked;
 
   /// Signed distance from the middle of the track, fractional while it moves.
   final double offset;
@@ -902,24 +920,34 @@ class _PpDoorCard extends StatelessWidget {
     // stops walking darker and a touch more saturated per step.
     // `linear-gradient(150deg, …)` measures clockwise from straight up, so the
     // line runs (sin150, −cos150) = (0.5, 0.866) — down and to the right.
+    //
+    // ⚠️ A LOCKED CARD LOSES ITS COLOUR, NOT JUST ITS COUNT. On a phone the
+    // first cut kept the hue, the icon and the name at full weight, and the
+    // lock badge alone had to say "not yet" — it did not. Locked, the field
+    // is grey paper, the mark is grey, the name is metadata-grey, and the
+    // second line says LOCKED. Seen and asked for, 2026-09-13.
+    final sat = locked ? 0.04 : 1.0;
     final field = LinearGradient(
       begin: const Alignment(-0.5, -0.866),
       end: const Alignment(0.5, 0.866),
       colors: [
-        HSLColor.fromAHSL(1, h, 0.32 + 0.03 * a, 0.94 - 0.07 * a).toColor(),
-        HSLColor.fromAHSL(1, h, 0.26 + 0.05 * a, 0.91 - 0.10 * a).toColor(),
+        HSLColor.fromAHSL(1, h, (0.32 + 0.03 * a) * sat, 0.94 - 0.07 * a).toColor(),
+        HSLColor.fromAHSL(1, h, (0.26 + 0.05 * a) * sat, 0.91 - 0.10 * a).toColor(),
       ],
     );
+    final ink = locked ? p.ink3 : deep;
 
     // ⚠️ A SOFT RIM, NOT A HARD RING. Both values are the group's own hue at
     // two strengths, so no new colour is introduced to say which card is
     // forward — the geometry already says it, and the rim's job is only to give
     // the card an edge.
-    final rim = Color.lerp(
-      HSLColor.fromAHSL(0.32, h, 0.24, 0.60 - 0.04 * a).toColor(),
-      HSLColor.fromAHSL(0.55, h, 0.32, 0.62).toColor(),
-      near,
-    )!;
+    final rim = locked
+        ? p.line
+        : Color.lerp(
+            HSLColor.fromAHSL(0.32, h, 0.24, 0.60 - 0.04 * a).toColor(),
+            HSLColor.fromAHSL(0.55, h, 0.32, 0.62).toColor(),
+            near,
+          )!;
 
     Widget card = SizedBox(
       width: kPpDoorCardWidth,
@@ -973,7 +1001,7 @@ class _PpDoorCard extends StatelessWidget {
                   children: [
                     Positioned.fill(
                       child: CustomPaint(
-                        painter: _PpDoorMark(hue: group.hue, index: index),
+                        painter: _PpDoorMark(hue: group.hue, index: index, grey: locked),
                       ),
                     ),
                     // The group's own icon at the centre of its mark — the
@@ -981,12 +1009,29 @@ class _PpDoorCard extends StatelessWidget {
                     // decoration.
                     Transform.translate(
                       offset: const Offset(-2, -3),
-                      child: Icon(group.icon, size: 26, color: deep),
+                      child: Icon(locked ? Icons.lock_outline_rounded : group.icon,
+                          size: 26, color: ink),
                     ),
                   ],
                 ),
               ),
             ),
+            // ---- the lock, over a misted card ---------------------------
+            if (locked)
+              Positioned(
+                top: 12,
+                left: 13,
+                child: Container(
+                  width: 30,
+                  height: 30,
+                  decoration: BoxDecoration(
+                    color: p.surface.withValues(alpha: 0.92),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: p.line),
+                  ),
+                  child: Icon(Icons.lock_outline_rounded, size: 16, color: p.ink3),
+                ),
+              ),
             Positioned(
               left: 13,
               right: 13,
@@ -1003,7 +1048,7 @@ class _PpDoorCard extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                           height: 1.2,
                           letterSpacing: -0.3,
-                          color: p.ink1)),
+                          color: locked ? p.ink3 : p.ink1)),
                   const SizedBox(height: 3),
                   // ⚠️ THE COUNT FADES WITH DISTANCE, THE NAME DOES NOT. 4a
                   // hides a neighbour's whole label, which works there because
@@ -1020,7 +1065,7 @@ class _PpDoorCard extends StatelessWidget {
                         style: pvManrope(
                             fontSize: 11,
                             fontWeight: FontWeight.w700,
-                            color: deep.withValues(alpha: 0.75))),
+                            color: ink.withValues(alpha: locked ? 1 : 0.75))),
                   ),
                 ],
               ),

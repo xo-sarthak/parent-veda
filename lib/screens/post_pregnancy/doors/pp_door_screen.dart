@@ -119,22 +119,74 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
   /// The tabs for his age. See `PpDoorTab.toMonths`: a tab scoped to the
   /// first two years is not on the selector for a three-year-old.
   ///
-  /// ⚠️ AND A TAB WITH NOTHING FOR HIS BAND DROPS TOO. Behaviour's four
-  /// toddler tabs hold no area for a three-month-old, and its Crying tab
-  /// none for a four-year-old; the brief's age rule is "other bands hidden,
-  /// not one tap away", and an empty tab is the emptiest kind of one tap
-  /// away. A tab keeps its place if any of its areas is in his band; a tab
+  /// ⚠️ A TAB HE HAS GROWN PAST DROPS; A TAB HE HAS NOT REACHED IS LOCKED.
+  /// Behaviour's four toddler tabs hold no area for a three-month-old, and
+  /// its Crying tab none for a four-year-old. The brief's age rule is "other
+  /// bands hidden, not one tap away" — and the user's call (2026-09-13) is
+  /// the game's answer to it: what is coming is shown misted with a lock and
+  /// the age it opens, after the open tabs, so the section never looks bare
+  /// and she knows to come back; what is behind him is simply gone. A tab
   /// of tools alone (no areas at all, like Development's leaps) is always
-  /// there, since a tool has no band.
+  /// open, since a tool has no band.
   List<PpDoorTab> get _tabs => [
         for (final t in door.tabs)
-          if ((t.toMonths == null ||
-                  ChildProfileStore.instance.ageInMonths < t.toMonths!) &&
-              (t.areaIds.isEmpty ||
-                  t.areaIds.any((id) => section.areas
-                      .any((a) => a.id == id && a.inBand(_band)))))
-            t,
-      ];
+          if (_lockFor(t) != _Lock.past) t,
+      ]..sort((a, b) {
+          // Open first, then locked by the age they open. A stable sort:
+          // ties keep the door's own order.
+          final la = _unlockMonths(a), lb = _unlockMonths(b);
+          if (la == null && lb == null) return 0;
+          if (la == null) return -1;
+          if (lb == null) return 1;
+          return la.compareTo(lb);
+        });
+
+  /// The month a locked tab opens, or null when it is open now.
+  int? _unlockMonths(PpDoorTab t) {
+    if (t.areaIds.isEmpty) return null;
+    final age = ChildProfileStore.instance.ageInMonths;
+    final starts = <int>[];
+    for (final id in t.areaIds) {
+      for (final a in section.areas.where((a) => a.id == id)) {
+        if (a.inBand(_band)) return null;
+        starts.add(_areaFrom(a));
+      }
+    }
+    if (starts.isEmpty) return null;
+    final from = starts.reduce((x, y) => x < y ? x : y);
+    return from > age ? from : null;
+  }
+
+  _Lock _lockFor(PpDoorTab t) {
+    final age = ChildProfileStore.instance.ageInMonths;
+    if (t.toMonths != null && age >= t.toMonths!) return _Lock.past;
+    if (t.areaIds.isEmpty) return _Lock.open;
+    if (_unlockMonths(t) != null) return _Lock.locked;
+    // Not open, not ahead: every area's band has closed behind him.
+    final open = t.areaIds.any(
+        (id) => section.areas.any((a) => a.id == id && a.inBand(_band)));
+    return open ? _Lock.open : _Lock.past;
+  }
+
+  /// Where an area's earliest band starts, in months. An area with no bands
+  /// is for every age.
+  int _areaFrom(PpArea a) {
+    final set = section.bandSet;
+    if (a.bands.isEmpty || set == null) return 0;
+    var from = 1 << 20;
+    for (final b in set.bands) {
+      if (a.bands.contains(b.id) && b.fromMonths < from) from = b.fromMonths;
+    }
+    return from == 1 << 20 ? 0 : from;
+  }
+
+  /// "From 1 year", "From 6 months": the card's second line while locked.
+  String _lockLabel(int months) => months % 12 == 0
+      ? 'From ${months ~/ 12} ${months == 12 ? 'year' : 'years'}'
+      : 'From $months months';
+
+  /// The card's second line while locked: "Locked · From 1 year".
+  String _lockLine(int months) => 'Locked  ·  ${_lockLabel(months)}';
   PpSection get section => ppSectionFor(door.sectionId)!;
 
   String get _band => section.bandSet?.active.id ?? '';
@@ -153,14 +205,23 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
               ),
       ];
 
-  /// The second line on a tab's card. Counted, never typed.
+  /// The second line on a tab's card. Counted, never typed — or, while the
+  /// tab is locked, the age it opens.
   String _countFor(PpDoorTab tab) {
+    if (_unlockMonths(tab) case final m?) return _lockLine(m);
     final n = tab.tools.length +
         _railsFor(tab).fold(0, (t, r) => t + r.$2.length) +
         (tab.redFlagPageId != null ? 1 : 0);
     if (n == 0) return '';
     return n == 1 ? '1 thing' : '$n things';
   }
+
+  _CardSpec _toolSpec(BuildContext context, PpDoorTool tool) => _CardSpec(
+        title: tool.label,
+        chip: tool.chip,
+        icon: tool.icon,
+        onTap: () => widget.onSurface(context, tool.surfaceId),
+      );
 
   // ---- navigation -----------------------------------------------------------
 
@@ -226,11 +287,22 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
               PpDoorCarousel(
                 groups: tabs,
                 counts: [for (final t in tabs) _countFor(t)],
+                locked: [for (final t in tabs) _unlockMonths(t) != null],
                 selected: _tab,
                 p: p,
                 onPick: (i) => setState(() => _tab = i),
               ),
               const SizedBox(height: 26),
+
+              // ---- a locked tab: the panel, not the rails -----------------
+              if (_unlockMonths(tab) case final m?) ...[
+                ppDoorPad(_LockedPanel(
+                  months: m,
+                  label: _lockLabel(m),
+                  p: p,
+                )),
+                const SizedBox(height: 26),
+              ] else ...[
 
               // ---- a pinned jump to another tab ----------------------------
               if (tab.jumpToTabId case final target?) ...[
@@ -290,19 +362,19 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                 // first rail for the same reason.
                 for (final cards in [
                   [
+                    // A tool leads the first rail unless it names the page
+                    // it follows (`PpDoorTool.afterPageId`); a tool whose
+                    // page is not on this rail leads anyway rather than
+                    // vanishing.
                     if (ri == 0)
                       for (final tool in tab.tools)
-                        _CardSpec(
-                          title: tool.label,
-                          chip: tool.chip,
-                          icon: tool.icon,
-                          onTap: () =>
-                              widget.onSurface(context, tool.surfaceId),
-                        ),
+                        if (tool.afterPageId == null ||
+                            !pages.any((x) => x.id == tool.afterPageId))
+                          _toolSpec(context, tool),
                     for (final page in [
                       ...pages.where((x) => x.pinned),
                       ...pages.where((x) => !x.pinned),
-                    ])
+                    ]) ...[
                       _CardSpec(
                         title: page.title,
                         meta: page.subtitle,
@@ -313,6 +385,11 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                         soon: page.comingSoon,
                         onTap: () => _openPage(context, page),
                       ),
+                      if (ri == 0)
+                        for (final tool in tab.tools)
+                          if (tool.afterPageId == page.id)
+                            _toolSpec(context, tool),
+                    ],
                   ]
                 ]) ...[
                   if (cards.isNotEmpty)
@@ -336,6 +413,8 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                 ],
                 const SizedBox(height: 26),
               ],
+
+              ], // end of the open tab's body
 
               // ---- the tab's footer, in a human voice ----------------------
               if (tab.footer case final line?) ...[
@@ -589,6 +668,70 @@ class _Hero extends StatelessWidget {
 /// What a rail card needs, whichever thing it is for. A page and a tool are
 /// the same card — that is the whole point of the spec: the rail has one
 /// vocabulary, and a tool does not get a second one.
+enum _Lock { open, locked, past }
+
+/// What a locked tab shows instead of its rails: the lock, the age it opens,
+/// and the promise that nothing on it is due before then.
+class _LockedPanel extends StatelessWidget {
+  const _LockedPanel({required this.months, required this.label, required this.p});
+  final int months;
+  final String label;
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) {
+    final name = ChildProfileStore.instance.nameMid;
+    final when = months % 12 == 0
+        ? '${months ~/ 12}'
+        : '$months months';
+    final turns = months % 12 == 0 ? 'turns $when' : 'is $when old';
+    return Container(
+      padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
+      decoration: BoxDecoration(
+        color: p.surface,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: p.line),
+      ),
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Container(
+          width: 40,
+          height: 40,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(color: p.surfaceAlt, shape: BoxShape.circle),
+          child: Icon(Icons.lock_outline_rounded, size: 20, color: p.ink2),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(label.toUpperCase(),
+                style: pvManrope(
+                    fontSize: 10.5,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.1,
+                    color: p.ink3)),
+            const SizedBox(height: 6),
+            Text('This opens when $name $turns.',
+                style: pvFraunces(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    height: 1.2,
+                    letterSpacing: -0.35,
+                    color: p.ink1)),
+            const SizedBox(height: 6),
+            Text('Nothing here is due before then. It will be on this tab '
+                'the day it is, with nothing to catch up on.',
+                style: pvManrope(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w500,
+                    height: 1.5,
+                    color: p.ink2)),
+          ]),
+        ),
+      ]),
+    );
+  }
+}
+
 class _CardSpec {
   const _CardSpec({
     required this.title,

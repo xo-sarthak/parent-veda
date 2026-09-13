@@ -284,9 +284,10 @@ Two additions from Development (2026-09-12): a tab may carry `toMonths`, and
 drops off the selector once her child is that old (the brief's "drops away
 after 2, on purpose"); and a tab with `tools` but no `areaIds` still draws
 one rail, headed with the tab's name (The leaps is one tool, the calendar).
-From Behaviour (2026-09-13): a tab whose areas are all outside his band is not
-on the selector at all, so a door with an infant-only area and toddler-only
-areas shows each parent only her tabs. `PpAnimationKind.breathing` is the
+From Behaviour (2026-09-13): a tab whose areas all start after his age is on
+the selector LOCKED (misted, a lock, "From 1 year"; a panel instead of rails),
+after the open tabs; a tab he has grown past is gone. A tool can follow the
+read it belongs to with `PpDoorTool.afterPageId`. `PpAnimationKind.breathing` is the
 shared breathing circle; a brief that says "the breathing component" means it.
 
 ### The door-rebuild additions (2026-09-11, Sleep first)

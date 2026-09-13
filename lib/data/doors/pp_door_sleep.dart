@@ -103,10 +103,11 @@ final PpDoor kPpSleepDoor = PpDoor(
       ],
     ),
   ],
-  // ⚠️ REPRESENTATION B, ON THIS DOOR ONLY. A sentence, not a card; the
-  // `closing` below still says where the tap goes.
-  closingLine: 'If the nights are wearing you down more than the day can '
-      'fix, a sleep expert can look at her specifically. Book a 1:1.',
+  // ⚠️ REPRESENTATION B WAS TRIED HERE AND NOT CHOSEN. A sentence instead
+  // of a card, compared against the card on the other doors on a phone;
+  // the user picked the card for every door (2026-09-13). Kept for revert.
+  // closingLine: 'If the nights are wearing you down more than the day can '
+  //     'fix, a sleep expert can look at her specifically. Book a 1:1.',
   closing: const PpDoorClosing(
     label: 'Talk to a sleep expert',
     blurb: 'Book a 1:1 if the nights are wearing you down more than the day '

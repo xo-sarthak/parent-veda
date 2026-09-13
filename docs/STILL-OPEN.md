@@ -6466,3 +6466,35 @@ closing.
   one more pair of eyes.
 * **The scripts tool's "for the family" copy** on the infant tab is mine, not
   the brief's; say if it should read like the toddler card.
+
+### 48.5 Decided on a phone, 2026-09-13
+
+* **Six tabs on Health and Development.** Seen on the selector; kept.
+* **The closing is a card, on every door.** Sleep's sentence (representation
+  B) is commented in `pp_door_sleep.dart`; `PpDoor.closingLine` stays for
+  revert, unset everywhere.
+* **Read, then the tool for it.** Development's On track rail goes normal
+  range → tracker → worth checking → check-in → born early, on the user's
+  call ("educate someone before the tool"). `PpDoorTool.afterPageId` in the
+  shell; a tool with no page stays at the front.
+* **The infant-tab scripts blurb** was never on screen: rail cards draw a
+  tool's label and chip only, so the question was moot. Left as data.
+* **Noticed, not touched:** the Ask Veda FAB sits over the last lines of
+  every story screen (Sleep's 3am too). Hiding it on stories is the FAB's
+  route-name check, `global_ask_fab.dart`.
+
+### 48.6 Locked tabs, not hidden ones — 2026-09-13
+
+Seeing Behaviour at day one — one card on the selector — the user's call:
+"do it like a game: show them, but locked, with the open one at the top, so
+they don't lose access, know what's coming, and the section does not look
+bare." So the shell now tells three states apart per tab (`_lockFor` in
+`pp_door_screen.dart`): **open** (an area in his band, or a tools-only tab),
+**locked** (every area's band starts after his age — drawn misted with a lock,
+"From 1 year" as the card's second line, after the open tabs; selecting it
+shows a panel "This opens when he turns 1. Nothing here is due before then"
+and the closing), **past** (`toMonths` reached, or every band closed behind
+him — gone, as the briefs ask). The unlock age is the earliest `fromMonths`
+of the tab's areas' bands. Behaviour at day one: Crying open, four locked.
+Seen on the phone.
+
