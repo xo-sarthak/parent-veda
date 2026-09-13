@@ -376,6 +376,8 @@ class PpIllustrationView extends StatelessWidget {
               _CutItPainter(p: p, badges: block.labels.length),
             PpIllustrationKind.allergicReaction =>
               _AllergyPainter(p: p, badges: block.labels.length),
+            PpIllustrationKind.poopColours =>
+              _PoopColoursPainter(p: p, badges: block.labels.length),
           },
         ),
       );
@@ -908,6 +910,41 @@ class _DehydrationPainter extends _ScenePainter {
 /// Eight rashes as a grid of swatches, each drawn in its own hand: pimples,
 /// pinpoints, dry patches, greasy scales, a nappy zone, blisters, crusted
 /// crops, welts. Numbered to the legend.
+/// A strip of swatches, one per colour a nappy can show in the first weeks,
+/// numbered to the legend. Drawn, not photographed: the colour is the whole
+/// point and a swatch carries it without the squeamishness a photo brings.
+class _PoopColoursPainter extends _ScenePainter {
+  _PoopColoursPainter({required super.p, required super.badges});
+
+  static const _swatches = [
+    Color(0xFF2B2B2B), // meconium, black and tar-like
+    Color(0xFF3F5A2A), // dark green, the changeover
+    Color(0xFFD8A626), // mustard, seedy
+    Color(0xFFB07A4A), // tan, firmer, on formula
+    Color(0xFF6E8B3D), // a little green sometimes
+    Color(0xFFE8A0A8), // the pink stain in a girl's nappy
+  ];
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final n = _swatches.length;
+    final gap = 8.0;
+    final cw = (size.width - gap * (n + 1)) / n;
+    final top = size.height * 0.18;
+    final bottom = size.height * 0.82;
+    for (var i = 0; i < n; i++) {
+      final cell = Rect.fromLTRB(gap + i * (cw + gap), top, gap + i * (cw + gap) + cw, bottom);
+      final rr = RRect.fromRectAndRadius(cell, const Radius.circular(12));
+      canvas.drawRRect(rr, Paint()..color = _swatches[i]);
+      canvas.drawRRect(rr, ink..strokeWidth = 1);
+      badge(canvas, i + 1, Offset(cell.left + 14, cell.top + 14));
+    }
+  }
+
+  @override
+  bool shouldRepaint(_PoopColoursPainter old) => old.badges != badges;
+}
+
 class _RashGridPainter extends _ScenePainter {
   _RashGridPainter({required super.p, required super.badges});
 

@@ -6583,3 +6583,42 @@ story audios and 15 films (EL3–EL4). The tracker tool points at
   from 2, school from 3). That is the content's own banding, seen on the
   phone; if it reads as too much grey, the habits area's `_fromOne` is the
   one worth questioning (a hand-washing habit starts before one).
+
+---
+
+## 51.0 First 40 Days, the eighth parenting door — 2026-09-13
+
+Built to `First_40_Days_Prompt.pdf`. The door is
+`lib/data/doors/pp_door_first40.dart`; the contract is
+`test/pp_first40_door_test.dart`. Walked on a phone at day one.
+
+### 51.1 The calls
+
+* **Five tabs** from ten areas: Din by din · When to rush · Maa ki dekhbhaal
+  · Samjho your newborn · Feeding, sleep and the rest. The mother is third
+  (judgement call 2's lean); no red strip and no closing card, both on the
+  brief; the go-now list is the first card of tab two.
+* **Judgement call 1, the real day spine, is NOT built.** Four fixed
+  day-range pages stand in, auto-scoped by band. Logged FF10 and in
+  PARENTING-DOORS-REVIEW.md: it is real build effort and the user asked for
+  speed first.
+* **One crisis screen.** "When the crying will not stop" opens Behaviour's
+  dark story by `pp_page/`; its step-list is in a comment. One latch film
+  (Feeding's), one malish, swaddle and settling film (Sleep's) — the shared
+  slot ids, with the film's own title, since `pp_section_test` holds one
+  title per slot id. One oil comparison (the malish page links). The
+  short-cycles explanation is "Newborn sleep, honestly"'s.
+* **Reformats:** first bath a film; the nappy page a drawn colour strip
+  (`poopColours`); skin and noises as carousels (each page its one block,
+  doctor line and India note as the last slides); safe sleep as Sleep's
+  drawing; soothing video-first.
+* **Two tools dropped from the door** that the brief's rail names:
+  `pp_baby_ok_check` (the Is My Baby OK? area's first page opens it) and
+  `pp_ask_veda` (the Puchho page is that card). A Tool card beside each
+  would be the same thing twice on one tab. Feeding and growth tools stay.
+* **The sticky-eye slide** on the skin carousel is one line I wrote
+  (REQUIRED_REVIEW); the brief asked to "add one card". Everything else new
+  is a scaffold (FF1–FF5).
+* The long badges the briefs use now shorten on the chip ("Flagged
+  quick-reference" was truncating): Red flag, Flagged, Comparison, Day by
+  day, Audio.

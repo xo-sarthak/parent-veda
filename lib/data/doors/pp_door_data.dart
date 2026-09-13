@@ -38,6 +38,7 @@ import 'pp_door_behaviour.dart';
 import 'pp_door_development.dart';
 import 'pp_door_early_learning.dart';
 import 'pp_door_feeding.dart';
+import 'pp_door_first40.dart';
 import 'pp_door_health.dart';
 import 'pp_door_potty.dart';
 import 'pp_door_sleep.dart';
@@ -46,6 +47,7 @@ export 'pp_door_behaviour.dart';
 export 'pp_door_development.dart';
 export 'pp_door_early_learning.dart';
 export 'pp_door_feeding.dart';
+export 'pp_door_first40.dart';
 export 'pp_door_health.dart';
 export 'pp_door_potty.dart';
 export 'pp_door_sleep.dart';
@@ -220,6 +222,7 @@ final List<PpDoor> kPpDoors = [
   kPpBehaviourDoor,
   kPpPottyDoor,
   kPpEarlyLearningDoor,
+  kPpFirst40Door,
 ];
 
 PpDoor? ppDoorFor(String sectionId) {

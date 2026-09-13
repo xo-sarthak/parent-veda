@@ -689,6 +689,11 @@ enum PpIllustrationKind {
 
   /// A face: the mild signs on one side, the call-now signs on the other.
   allergicReaction,
+
+  /// A colour strip of newborn poop, day one to week six: black, dark green,
+  /// mustard, tan, occasional green, and the pink stain. Parents are matching
+  /// a nappy to a picture.
+  poopColours,
 }
 
 /// `[ILLUSTRATION]` — one labelled picture.

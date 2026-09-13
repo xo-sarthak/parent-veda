@@ -82,6 +82,21 @@ IconData ppDoorFormatIcon(String? format) => switch (format?.toUpperCase()) {
 String ppDoorChip(String? format) {
   final f = (format ?? 'Article').trim();
   if (f.isEmpty) return 'Article';
+  // The long badges the briefs use, at chip length. "Flagged quick-refer…"
+  // was what the chip showed on a phone (First 40 Days, 2026-09-13).
+  switch (f.toUpperCase()) {
+    case 'FLAGGED QUICK-REFERENCE':
+      return 'Red flag';
+    case 'FLAGGED ARTICLE':
+    case 'FLAGGED CALLOUT':
+      return 'Flagged';
+    case 'COMPARISON TABLE':
+      return 'Comparison';
+    case 'DAY-SPINE CARD':
+      return 'Day by day';
+    case 'AUDIO LIBRARY':
+      return 'Audio';
+  }
   return f[0].toUpperCase() + f.substring(1).toLowerCase();
 }
 

@@ -110,6 +110,10 @@ const PpBandSet kPpJaapaBands = PpBandSet([
 final PpSection kPpFirst40Section = PpSection(
   id: 'parenting_first_40', // MUST match the hub's bracketId
   title: 'Jaapa: Your First 40 Days',
+  // ⚠️ THE AGE RULE. "Drop the three buttons at the top. The app knows the
+  // baby's age, so open on where she is now. Only one area, the day-by-day
+  // guide, actually changes by stage."
+  autoScope: true,
   subtitle: 'Newborn care, and looking after the person who just gave birth.',
   intro: 'The first forty days are loud, tender and very short. Here is what is '
       'normal, what to do, and the few things that need a doctor today.',
@@ -383,10 +387,36 @@ final PpSection kPpFirst40Section = PpSection(
                 surfaceId: 'pp_you_maa',
                 blurb: 'Pelvic floor, mood, strength, going back to work, and '
                     'the parts that take months.'),
+            // "His first vaccinations: point to Health's shots tool, not a
+            // new page."
+            PpLink('His first vaccinations, and what is due next',
+                surfaceId: 'pp_vaccines',
+                blurb: 'The schedule, an alarm, and a doctor-ready record.'),
             PpLink('What changes next in him',
                 surfaceId: 'pp_what_changed',
                 blurb: 'The leaps, growth spurts and sudden changes ahead.'),
           ],
+        ),
+        // ⚠️ [NEW], two scaffolds near the day-by-day guide. "The whole
+        // section is mother-and-baby, and the one person who can protect
+        // both has no page written for him." And the ceremonies: "touched in
+        // one 'In an Indian home' box on the 40-day page, not owned
+        // anywhere." Copy supplied, not generated.
+        PpPage(
+          id: 'f40_for_husband',
+          title: 'For your husband, in the first 40 days',
+          subtitle: 'Guard the door, protect her rest, take a night shift',
+          format: 'ARTICLE',
+          comingSoon: true,
+          blocks: [],
+        ),
+        PpPage(
+          id: 'f40_ceremonies',
+          title: 'The ceremonies, and keeping him safe through them',
+          subtitle: 'Chhati, naamkaran, the first outing: crowds, kisses, and when it is safe',
+          format: 'ARTICLE',
+          comingSoon: true,
+          blocks: [],
         ),
       ],
     ),
@@ -568,6 +598,22 @@ final PpSection kPpFirst40Section = PpSection(
           id: 'f40_crying_never_shake',
           title: 'When the crying will not stop',
           subtitle: 'What to do with him, and what to do with yourself.',
+          // ⚠️ [reformat: step-list > interactive] AND ONE SCREEN, NOT TWO.
+          // "Same crisis content as Behaviour's 'When the crying is too
+          // much', make it one screen both point to." Behaviour's is the
+          // dark one-step-at-a-time story (never-shake screen included);
+          // this card opens it directly. The copy that lived here is kept
+          // below for revert; the never-shake and get-help blocks live on
+          // in that story, spoken to her.
+          // format: 'STEP-LIST',
+          format: 'INTERACTIVE',
+          toolSurfaceId: 'pp_page/parenting_behaviour/crying_too_much',
+          blocks: [],
+        ),
+        /* kept for revert: the step-list the shared crisis screen replaced
+        PpPage(
+          id: 'f40_crying_never_shake_copy',
+          title: 'When the crying will not stop',
           format: 'STEP-LIST',
           blocks: [
             PpIntro('There will be an evening when you have tried everything, '
@@ -636,6 +682,7 @@ final PpSection kPpFirst40Section = PpSection(
                     'what actually helps.'),
           ],
         ),
+        */
       ],
     ),
 
@@ -726,8 +773,20 @@ final PpSection kPpFirst40Section = PpSection(
           id: 'f40_first_bath',
           title: 'His first bath, and when to start',
           subtitle: 'Later than you think, and shorter than you think.',
-          format: 'STEP-LIST',
+          // [reformat: add a film] "Bathing a slippery newborn is a scary
+          // physical skill and there is no film here today; keep the
+          // step-list under it."
+          // format: 'STEP-LIST',
+          format: 'VIDEO',
           blocks: [
+            PpVideoSlot(
+              title: 'The first bath, shown',
+              subtitle: 'The hold, the water, the five minutes, and getting '
+                  'him dry and warm again.',
+              minutes: '5 MIN',
+              slotId: 'first40/first_bath',
+              hue: 26,
+            ),
             PpIntro('There is no rush to bathe a newborn. The white coating he '
                 'is born with protects his skin, and waiting a day or two is '
                 'better for his temperature, his blood sugar and his first '
@@ -793,12 +852,27 @@ final PpSection kPpFirst40Section = PpSection(
           id: 'f40_nappy_poop',
           title: 'Nappies, and what his poop should look like',
           subtitle: 'The two counts that tell you he is fine.',
+          // [reformat: chart + illustration] "add a colour strip of what
+          // each looks like. Parents are matching a nappy to a picture."
           format: 'CHART-CARD',
           blocks: [
             PpIntro('Newborn poop changes colour dramatically in the first '
                 'week, and almost all of it is normal. Nappies are also the '
                 'cheapest reassurance you have: enough wet ones means enough '
                 'milk.'),
+            PpIllustration(
+              kind: PpIllustrationKind.poopColours,
+              title: 'The colours, in order',
+              labels: [
+                PpIllustrationLabel('Black and tar-like', 'Meconium, the first two days.'),
+                PpIllustrationLabel('Dark green', 'The changeover, days 3 to 4.'),
+                PpIllustrationLabel('Mustard yellow with seeds', 'The classic breastfed poop.'),
+                PpIllustrationLabel('Tan or brown, firmer', 'Usual on formula.'),
+                PpIllustrationLabel('A little dark green sometimes', 'Common and harmless.'),
+                PpIllustrationLabel('A pink or orange stain', 'Concentrated urine, or a small hormonal bleed in a girl. Mention it.'),
+              ],
+              caption: 'Match the nappy to the strip. Chalky white, red, or black after day three are the ones to show a doctor.',
+            ),
             PpChartCard(
               title: 'What to expect, day by day',
               // REQUIRED_REVIEW: the whole nappy-count and stool-progression
@@ -867,8 +941,19 @@ final PpSection kPpFirst40Section = PpSection(
           id: 'f40_swaddle',
           title: 'Swaddling, and how tight is right',
           subtitle: 'Snug at the arms, loose at the hips.',
-          format: 'STEP-LIST',
+          // [reformat: step-list > video-first] [reference] Sleep's swaddling
+          // film, the same slot id; "do not shoot a second".
+          // format: 'STEP-LIST',
+          format: 'VIDEO',
           blocks: [
+            PpVideoSlot(
+              // The shared film's own title; one slot id, one title.
+              title: 'The hip-safe swaddle, and the day to stop',
+              subtitle: 'Snug at the arms, loose at the hips, and when to stop.',
+              minutes: '3 MIN',
+              slotId: 'sleep/swaddle_demo',
+              hue: 26,
+            ),
             PpIntro('A swaddle works because it stops his own startle reflex '
                 'from waking him. It is one of the most useful tricks of the '
                 'first weeks, and it has two rules that matter.'),
@@ -987,8 +1072,46 @@ final PpSection kPpFirst40Section = PpSection(
           id: 'f40_newborn_skin',
           title: 'His skin looks strange. Is that normal?',
           subtitle: 'Peeling, spots, patches and blotches.',
-          format: 'CARDS',
+          // ⚠️ [reformat: cards > illustrated carousel]. "Skin is a
+          // see-it-to-know-it thing": one slide per finding, the doctor
+          // line and the India note as the last two. The page is its one
+          // block, so the card opens the slides directly. The photographs
+          // are owed (docs/DOOR-CONTENT-OWED.md); the cards are kept below
+          // for revert.
+          // format: 'CARDS',
+          format: 'CAROUSEL',
           blocks: [
+            PpCarousel(
+              hue: 44,
+              coverTitle: 'His skin looks strange. Is that normal?',
+              coverBlurb: 'Eight things newborn skin does in the first weeks, '
+                  'and nearly all of it clears on its own.',
+              cards: [
+                PpCarouselCard('Peeling and flaking',
+                    'Especially hands, feet and ankles, in the first two weeks. Normal. A plain moisturiser if it looks dry, nothing more.'),
+                PpCarouselCard('Tiny white pinhead spots on the nose and cheeks',
+                    'Milia, blocked oil glands. They clear by themselves in a few weeks. Do not squeeze them.'),
+                PpCarouselCard('Blotchy red patches with a small pale centre',
+                    'A common newborn rash of the first week. Comes and goes across the body and needs nothing.'),
+                PpCarouselCard('Small pimples on the face at 3 to 4 weeks',
+                    'Newborn acne, driven by hormones. Wash with plain water and wait. No creams.'),
+                PpCarouselCard('Slate grey or bluish patches on the back and buttocks',
+                    'Common in Indian babies. Harmless birthmarks that fade over years.'),
+                PpCarouselCard('A flat pink patch on the eyelids, forehead or nape',
+                    'A stork mark. It reddens when he cries and usually fades.'),
+                PpCarouselCard('Yellow greasy scales on the scalp',
+                    'Cradle cap. Soften with a little oil an hour before a bath, then wash gently. Never pick it off.'),
+                PpCarouselCard('Prickly red bumps in the neck folds',
+                    'Heat rash. Fewer layers, a cooler room, and keep the folds dry.'),
+                PpCarouselCard('A sticky or watery eye',
+                    'A blocked tear duct is common and usually clears by itself; wipe from the nose outwards with cooled boiled water. Yellow-green discharge, redness or swelling of the lid: show a doctor.'),
+                PpCarouselCard('Skin that needs a doctor',
+                    'Blisters, or spots filled with pus or fluid; a rash with a fever or a baby who is feeding poorly; small dark red or purple spots that do not fade when you press them; yellow, weeping or spreading patches; or a rash all over the body that appeared very quickly.'),
+                PpCarouselCard('In an Indian home',
+                    'Besan and malai are traditional for the skin and are mostly harmless on the body, but keep them away from his eyes and mouth, and stop if the skin reddens. Skip fairness pastes and any lightening product entirely. His colour is not a problem to be treated.'),
+              ],
+            ),
+            /* kept for revert: the cards the carousel replaced
             PpIntro('Newborn skin does a lot of odd things in the first weeks '
                 'and nearly all of it clears on its own. Most of what worries '
                 'parents needs no cream at all.'),
@@ -1033,6 +1156,7 @@ final PpSection kPpFirst40Section = PpSection(
                 'and mouth, and stop if the skin reddens. Skip fairness pastes '
                 'and any lightening product entirely. His colour is not a '
                 'problem to be treated.'),
+            */
           ],
         ),
         PpPage(
@@ -1164,8 +1288,40 @@ final PpSection kPpFirst40Section = PpSection(
           id: 'f40_newborn_noises',
           title: 'Hiccups, sneezes, grunts and other noises',
           subtitle: 'The sounds that keep parents awake for nothing.',
-          format: 'CARDS',
+          // [reformat: cards > carousel] "swipe through the normal noises."
+          // The page is its one block; the cards are kept below for revert.
+          // format: 'CARDS',
+          format: 'CAROUSEL',
           blocks: [
+            PpCarousel(
+              hue: 44,
+              coverTitle: 'Hiccups, sneezes, grunts and other noises',
+              coverBlurb: 'The sounds that make you sit up at 3am, and what '
+                  'each one means. Nearly all of them: nothing.',
+              cards: [
+                PpCarouselCard('Hiccups, several times a day',
+                    'His diaphragm is immature. They do not hurt him. A feed or a cuddle usually settles them, and never jerk him or startle him to stop them.'),
+                PpCarouselCard('Sneezing often',
+                    'Clearing dust and mucus from a tiny nose. Not a cold, unless there is also a blocked nose that stops him feeding.'),
+                PpCarouselCard('Grunting and straining, especially while pooping',
+                    'He is learning to push while lying flat. Normal. Constipated means hard pellets, not effort.'),
+                PpCarouselCard('A rattly or snuffly nose',
+                    'Narrow passages plus normal mucus. Saline drops if it blocks a feed, and nothing else.'),
+                PpCarouselCard('Squeaks, whimpers and cries in sleep',
+                    'Light sleep. Wait a minute before picking him up, he often settles himself.'),
+                PpCarouselCard('Jerky arms and legs, and a startle with a bang',
+                    'A normal newborn reflex. It fades by 3 to 4 months.'),
+                PpCarouselCard('Irregular breathing while asleep',
+                    'Fast, then slow, then a short pause. Normal in a newborn as long as he stays pink and the pauses are brief.'),
+                PpCarouselCard('A small posset of milk after feeds',
+                    'Bringing up a mouthful is normal. Forceful or green vomiting is not.'),
+                PpCarouselCard('Noises that are actually breathing trouble',
+                    'A doctor now if breathing is the problem rather than the noise: more than 60 breaths a minute at rest, grunting with every single breath, nostrils flaring, ribs or the space between them pulling in, a pause longer than 15 to 20 seconds, a blue tinge to the lips or tongue, or a blocked nose that stops him feeding at all.'),
+                PpCarouselCard('In an Indian home',
+                    'Hiccups get treated at home with water, gutti or a thread on the forehead. Water before six months is genuinely unsafe for him, and gripe water and janam ghutti are not needed by any baby. A feed does the same job with none of the risk.'),
+              ],
+            ),
+            /* kept for revert: the cards the carousel replaced
             PpIntro('Newborns are noisy sleepers and noisy feeders. Most of the '
                 'sounds that make you sit up at 3am mean nothing at all.'),
             PpCards([
@@ -1210,6 +1366,7 @@ final PpSection kPpFirst40Section = PpSection(
                 'unsafe for him, and gripe water and janam ghutti are not '
                 'needed by any baby. A feed does the same job with none of the '
                 'risk.'),
+            */
           ],
         ),
         PpPage(
@@ -1222,16 +1379,27 @@ final PpSection kPpFirst40Section = PpSection(
                 'was, and he was rocked to sleep every time you walked around. '
                 'Being awake at night is not a habit he has picked up. It is '
                 'the setting he arrived with.'),
+            // [single-source] The short-cycles / no-routine-yet explanation
+            // is "Newborn sleep, honestly"'s; this page keeps day-and-night
+            // confusion and what helps. The paragraph is kept for revert.
+            PpArticle([
+              'What does exist is a gentle nudge you can give his body clock: '
+              'light and activity in the day, dark and dullness at night. '
+              'Nothing else. Most babies find a longer night stretch '
+              'somewhere between 6 and 12 weeks, and it arrives on its own '
+              'timing rather than yours.',
+            ]),
+            PpLink('Why he wakes so often, and why there is no routine yet',
+                pageId: 'f40_newborn_sleep',
+                blurb: 'The short cycles, explained once.'),
+            /* kept for revert
             PpArticle([
               'Newborns sleep in short cycles, around the clock, and they wake '
               'often because they need to feed often. There is no routine to '
               'build yet and no schedule that will hold. What does exist is a '
               'gentle nudge you can give his body clock.',
-              'The nudge is light and activity in the day, dark and dullness at '
-              'night. Nothing else. Most babies find a longer night stretch '
-              'somewhere between 6 and 12 weeks, and it arrives on its own '
-              'timing rather than yours.',
             ]),
+            */
             PpSteps([
               PpStep('Make mornings bright and ordinary',
                   'Open the curtains. Let the house be noisy. Feed him in the '
@@ -1268,12 +1436,25 @@ final PpSection kPpFirst40Section = PpSection(
           id: 'f40_safe_sleep',
           title: 'Sleeping safely, in your bed or his',
           subtitle: 'How to make the way your family sleeps safer.',
-          format: 'STEP-LIST',
+          // [reformat: step-list > illustration] [reference] Sleep's safe-sleep
+          // picture, the same drawing. "High stakes, a picture carries it."
+          // format: 'STEP-LIST',
+          format: 'ILLUSTRATION',
           blocks: [
             PpIntro('Almost every Indian family sleeps with the baby in the '
                 'room, and most share the bed. Rather than telling you not to, '
                 'here is how to make it as safe as it can be, and the few '
                 'situations where it genuinely is not.'),
+            PpIllustration(
+              kind: PpIllustrationKind.safeBedSetup,
+              title: 'A safe sleep space, in your bed or his',
+              labels: [
+                PpIllustrationLabel('On his back', 'Every sleep, naps included, with anyone.'),
+                PpIllustrationLabel('A firm, flat surface', 'Not a soft mattress, a quilt nest or a folded razai.'),
+                PpIllustrationLabel('Nothing loose around his head', 'No pillow, soft toys, bumpers or dupatta.'),
+                PpIllustrationLabel('His own clear space', 'Beside the mother, not between the parents or against a bolster.'),
+              ],
+            ),
             PpSteps([
               PpStep('On his back, every sleep',
                   'Naps included, at night, with anyone. This one rule reduces '
@@ -1429,6 +1610,18 @@ final PpSection kPpFirst40Section = PpSection(
             ),
           ],
         ),
+        // ⚠️ [NEW], a scaffold. "A premature, low-birth-weight, or
+        // just-out-of-NICU baby: what is different about temperature,
+        // feeding, kangaroo care, and when to worry. Today this exists only
+        // as scattered 'if he was born early' lines with no home."
+        PpPage(
+          id: 'f40_small_or_early',
+          title: 'Bringing home a small or early baby',
+          subtitle: 'Temperature, feeding, kangaroo care, and when to worry',
+          format: 'ARTICLE',
+          comingSoon: true,
+          blocks: [],
+        ),
       ],
     ),
 
@@ -1457,7 +1650,8 @@ final PpSection kPpFirst40Section = PpSection(
                 'almost everybody needs a few days and a pair of experienced '
                 'hands to get it.'),
             PpVideoSlot(
-              title: 'A deep latch, shown properly',
+              // The shared film's own title; one slot id, one title.
+              title: 'A lactation counsellor shows a deep latch',
               subtitle: 'Positioning, the mouth wide, and how to tell it is '
                   'right. Filmed with a real mother and baby.',
               minutes: '7 MIN',
@@ -1466,7 +1660,9 @@ final PpSection kPpFirst40Section = PpSection(
               // latch. This one is a newborn-week explainer with a different
               // title and a different job. Two different videos under one id
               // means one file lands and the other never does.
-              slotId: 'first40/latch_demo',
+              // [reference] Feeding's latch film, one film. Was
+              // 'first40/latch_demo'.
+              slotId: 'feeding/latch_demo',
             ),
             PpSteps([
               PpStep('Get yourself comfortable first',
@@ -1797,11 +1993,14 @@ final PpSection kPpFirst40Section = PpSection(
                 'faster, and it gives whoever does it a daily half hour of pure '
                 'closeness with him.'),
             PpVideoSlot(
-              title: 'Malish, the full sequence',
+              // The shared film's own title; one slot id, one title.
+              title: 'Malish before sleep, demonstrated',
               subtitle: 'Legs, arms, chest, tummy and back, with the pressure '
                   'shown on a real baby.',
               minutes: '10 MIN',
-              slotId: 'first40/malish_demo',
+              // [reference] Sleep's malish film, one film. Was
+              // 'first40/malish_demo'.
+              slotId: 'sleep/malish_demo',
             ),
             PpSteps([
               PpStep('Pick your moment',
@@ -1852,6 +2051,13 @@ final PpSection kPpFirst40Section = PpSection(
                   'enjoying it.',
               hue: 268,
             ),
+            // [single-source] "Malish oil is written twice." The comparison
+            // on Jaapa Essentials is the one home; this page points there.
+            // The cards are kept below for revert.
+            PpLink('Which oil? Coconut, til, mustard, almond',
+                pageId: 'f40_which_oil',
+                blurb: 'The comparison, and the ones to skip.'),
+            /* kept for revert
             PpCards([
               PpCard('Coconut oil',
                   'Light, cooling, well tolerated, easy to find. The safest '
@@ -1871,6 +2077,7 @@ final PpSection kPpFirst40Section = PpSection(
                   'anything perfumed, and all essential oils. His skin absorbs '
                   'far more than yours.'),
             ], heading: 'Which oil', hue: 268),
+            */
             PpCallout(
               'Stop and speak to a doctor if the oil leaves his skin red, '
               'itchy or bumpy, or if he has eczema that flares after malish. '
@@ -1898,8 +2105,20 @@ final PpSection kPpFirst40Section = PpSection(
           id: 'f40_soothing',
           title: 'Soothing your baby',
           subtitle: 'The calming sequence, in the order that works.',
-          format: 'STEP-LIST',
+          // [reformat: step-list > video-first] [reference] Sleep's settling
+          // film, the calming moves shown. Steps stay under it.
+          // format: 'STEP-LIST',
+          format: 'VIDEO',
           blocks: [
+            PpVideoSlot(
+              // The shared film's own title; one slot id, one title.
+              title: 'Gentle settling, demonstrated',
+              subtitle: 'Swaddle, side, shush, sway, and when to stop and hand '
+                  'him over.',
+              minutes: '4 MIN',
+              slotId: 'sleep/settling_demo',
+              hue: 26,
+            ),
             PpIntro('Newborns calm down through their bodies, not through '
                 'reasoning, and there is a rough order that works better than '
                 'random trying. Recreate the womb: tight, sideways, noisy and '
@@ -2730,6 +2949,26 @@ final PpSection kPpFirst40Section = PpSection(
                 surfaceId: 'pp_find_help',
                 blurb: 'Doctors, counsellors and support near you.'),
           ],
+        ),
+        // ⚠️ [NEW], two scaffolds. "Your breasts in the early weeks" is the
+        // single biggest gap in the section: engorgement, cracked nipples, a
+        // blocked duct, mastitis with a same-day flag. And the honest note
+        // that ovulation can return before the first period.
+        PpPage(
+          id: 'f40_breasts',
+          title: 'Your breasts in the early weeks',
+          subtitle: 'Engorgement, cracked nipples, a blocked duct, and the one that needs a doctor today',
+          format: 'FLAGGED ARTICLE',
+          comingSoon: true,
+          blocks: [],
+        ),
+        PpPage(
+          id: 'f40_pregnant_again',
+          title: 'When your body can get pregnant again',
+          subtitle: 'Sooner than the first period, and feeding is not a method',
+          format: 'SHORT ARTICLE',
+          comingSoon: true,
+          blocks: [],
         ),
       ],
     ),

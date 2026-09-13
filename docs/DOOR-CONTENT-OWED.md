@@ -174,6 +174,7 @@ two.
 | Behaviour (parenting) | 15 | 11 | – | 4 | – |
 | Potty (parenting) | 6 | 4 | – | 2 | – |
 | Early Learning (parenting) | 4 | 2 | – | 2 | – |
+| First 40 Days (parenting) | 11 | 5 | – | 4 | 1 (the day spine, FF10) |
 
 Pregnancy, six doors: written pieces owed, in prose — **S1, L3, L4, L5, L6,
 M1**, six reads. Films — **N1, L1, L2, M4 ×3, M6 ×5**, eleven. Audio — **M5
@@ -266,3 +267,24 @@ here.
 | EL2 | `skills_language` — English or the mother tongue, and when to start letters | Article | Coming soon | The words to hold the line when the pressure to start ABCs at two starts. Copy supplied. |
 | EL3 | The 58 story audios | Audio | Built from data | Every story has a "listen" button and no recording. "A story library with no narration is half-built, so recording the story audio is the first job." |
 | EL4 | The 15 films | Film | Built from data | Every `early_learning/*` slot is a placeholder: tummy-time reach, pouring, spooning dal, the strokes before letters, brushing teeth, the Montessori corner, telling a story with no book, the six read-alouds, readiness, what comes before writing. |
+
+### P8. First 40 Days — `lib/data/doors/pp_door_first40.dart`
+
+Built to `First_40_Days_Prompt.pdf`. "The built content is strong and dense,
+so this is mostly adding, not cutting." Five scaffolds, one new film, one
+drawn strip; the photographs for the skin slides.
+`test/pp_first40_door_test.dart` fails if a coming-soon page is not here.
+
+| # | Card | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| FF1 | `f40_breasts` — Your breasts in the early weeks | Flagged article | Coming soon | "The single biggest gap in the section": engorgement, cracked nipples, a blocked duct, mastitis with a same-day flag. |
+| FF2 | `f40_pregnant_again` — When your body can get pregnant again | Short article | Coming soon | Ovulation can return before the first period; feeding is not reliable contraception. |
+| FF3 | `f40_small_or_early` — Bringing home a small or early baby | Article | Coming soon | Temperature, feeding, kangaroo care, when to worry. |
+| FF4 | `f40_for_husband` — For your husband, in the first 40 days | Article | Coming soon | Guard the door, protect her rest and food, a night shift, skin to skin, watch her mood. |
+| FF5 | `f40_ceremonies` — The ceremonies, and keeping him safe through them | Article | Coming soon | Chhati, naamkaran, the first outing: crowds, kissing his face, infection, when it is safe to go out. |
+| FF6 | `f40_first_bath` — His first bath | Film · 5 min | Built from data | Slot `first40/first_bath`: the hold, the water, the five minutes. |
+| FF7 | `f40_newborn_skin` — the illustrated carousel | Photographs | Built from data | Eight slides of text; the brief wants "a photo of each (milia, stork mark, the grey-blue patch, cradle cap, newborn acne)". The sticky-eye slide is one line written here, REQUIRED_REVIEW. |
+| FF8 | `f40_nappy_poop` — the colour strip | Illustration | Built from data | Drawn in code (`poopColours`); artwork can replace via `PpIllustration.asset`. |
+| FF9 | `f40_jaundice` — how far the yellow has spread | Illustration | Not built | "A small picture (face, chest, palms) would help; light touch." Not drawn yet. |
+| FF10 | The day-by-day spine | Build | Not built | Judgement call 1: the real "you are on day 12" screen. Four fixed day-range pages stand in. See PARENTING-DOORS-REVIEW.md. |
+| FF11 | The eleven films the brief marks | Film | Built from data | `first40/*` slots are placeholders; latch, malish, swaddle and settling now share Feeding's and Sleep's slots, so four fewer to shoot. |
