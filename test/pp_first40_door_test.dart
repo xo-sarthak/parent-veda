@@ -100,12 +100,16 @@ void main() {
       expect(all.contains('short cycles'), isFalse, reason: 'the short-cycles explanation is Newborn sleep, honestly\'s');
     });
 
-    test('the five scaffolds, each in the ledger, and the vaccines pointer', () {
+    test('the three scaffolds in the ledger, the two windows into You, and the vaccines pointer', () {
       final ledger = File('docs/DOOR-CONTENT-OWED.md').readAsStringSync();
-      for (final id in ['f40_breasts', 'f40_pregnant_again', 'f40_small_or_early', 'f40_for_husband', 'f40_ceremonies']) {
+      for (final id in ['f40_small_or_early', 'f40_for_husband', 'f40_ceremonies']) {
         expect(_page(id).comingSoon, isTrue, reason: id);
         expect(ledger.contains(id), isTrue, reason: '$id is a coming-soon card nobody has logged as owed');
       }
+      // Breasts and pregnant-again were scaffolds until the You brief made
+      // You, Maa the one home; they open its pages now (pp_you_maa_door_test).
+      expect(_page('f40_breasts').toolSurfaceId, startsWith('pp_page/parenting_maternal/'));
+      expect(_page('f40_pregnant_again').toolSurfaceId, startsWith('pp_page/parenting_maternal/'));
       expect(_listed('maa_ki_dekhbhaal'), contains('f40_breasts'));
       expect(_listed('samjho'), contains('f40_small_or_early'));
       expect(_listed('din_by_din'), containsAll(['f40_for_husband', 'f40_ceremonies']));

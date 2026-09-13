@@ -833,6 +833,11 @@ final List<CommunityPost> kTtcPosts = [
 //  the parenting UI renders monogram/icon avatars, never emojis.
 // ===========================================================================
 final List<Community> kParentingCommunities = [
+  // ⚠️ THE 4TH TRIMESTER CIRCLE. The You, Maa section's room: a moderated
+  // postpartum space for the mother, kept private from the family group.
+  // Its distress-routing and framing are written in that section; this is
+  // only the room those links open. English only, per the standing policy.
+  Community(id: 'mothers_4th_trimester', name: _same('The 4th Trimester Circle'), emoji: '', description: _same('Other mothers at your stage, for the part nobody in the house asks about. Moderated, and not for the family WhatsApp group.'), members: 6200, topics: _topics(['Emotional', 'Health', 'Sleep'])),
   // --- Auto-joined for the scenario child (Aarav · 4-mo boy · Delhi NCR) ---
   Community(id: 'infants_0_1', name: _t('0–1 Year', '0–1 साल'), emoji: '', description: _t('The whole first year - feeding, sleep, milestones and the fourth-trimester fog, together.', 'पूरा पहला साल — दूध-खाना, नींद, milestones और चौथी तिमाही की धुंध, सब साथ में।'), members: 14200, auto: true, topics: _topics(['Sleep', 'Feeding', 'Milestones'])),
   Community(id: 'boy_moms', name: _t('Boy Moms', 'बेटों की माँएँ'), emoji: '', description: _t('Raising boys - the mess, the cuddles and everything in between.', 'बेटों की परवरिश — बिखरा घर, गले लगना, और बीच का सब कुछ।'), members: 9800, auto: true, topics: _topics(['Behaviour'])),

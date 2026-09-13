@@ -6622,3 +6622,63 @@ Built to `First_40_Days_Prompt.pdf`. The door is
 * The long badges the briefs use now shorten on the chip ("Flagged
   quick-reference" was truncating): Red flag, Flagged, Comparison, Day by
   day, Audio.
+
+---
+
+## 52.0 You, Maa, the ninth parenting door — 2026-09-13
+
+Built to `You_Parenting_Maa_rebuild.pdf`. The door is
+`lib/data/doors/pp_door_you_maa.dart`; the contract is
+`test/pp_you_maa_door_test.dart`.
+
+### 52.1 The calls
+
+* **Five tabs** from ten areas: How are you today, Maa? (the triage and the
+  mind area) · Your body (body, pelvic floor) · Moving and eating · The
+  people in your house (and the circle) · Going back. Her bands are her
+  own (`kPpPostpartumBands`); the section auto-scopes on them.
+* **The frightening-thoughts route is pinned** above the rails on the
+  landing tab, in the red-flag treatment with the eyebrow "READ THIS ONE
+  FIRST" (the shell reads the page's `ROUTE` format for it). One tap from
+  `pp_crisis_path`, as the brief insists. No tools, no scored tracker, and
+  a test that no page here reaches the baby's checker.
+* **Judgement call 1, consolidate:** You, Maa is the one home for her
+  recovery. First 40 Days' bleeding, stitches and C-section pages are
+  windows into `body_lochia`, `body_perineum`, `body_csection_early` (their
+  copy in comments); its breasts and pregnant-again scaffolds became windows
+  into `body_breasts` and `people_intimacy`; Feeding's mastitis flag links
+  in. The owed ledger's FF1–FF2 close into YM3.
+* **Judgement call 2, collapse:** the tile opens the door. The hub's two
+  doors stay for the older home.
+
+### 52.2 The wiring
+
+* The eight shop links → `pp_products`; the four circle links → a new
+  Community room `mothers_4th_trimester` (`community_data.dart`, English
+  only) opened by a new router prefix `pp_community/<roomId>`.
+* The two consult rosters the brief calls "declared not-ready" are seeded
+  in `pp_experts_data.dart` already (Maternal mental health,
+  Physiotherapist); the closing opens the first.
+* The dead card: `_backToWork` carries `bands: _cleared`, so it locks
+  "From 2 months" in the first six weeks instead of drawing an empty card.
+  (Two months is the band boundary the data calls "6 weeks".)
+* Two scaffolds: her own sleep (`body_your_sleep`), her thyroid
+  (`body_thyroid`), in Your body.
+
+### 52.3 Open
+
+* The lock label reads "From 2 months" where the band is called "6 weeks
+  to 3 months". A per-band lock label would fix the wording.
+* The recipes are pages here and links to `pp_food`; the brief wants them
+  tagged postpartum inside the shared recipe library (YM6).
+
+### 52.4 Walked on the phone — 2026-09-14
+
+Every tab renders; the pinned route reads "READ THIS ONE FIRST"; Going back
+is locked at day one; First 40 Days' bleeding card opens You's page and
+comes back. Two lines the shell wrote in the baby's voice read wrong here
+("FOR YOUR BABY · THE FIRST 6 WEEKS", "This opens when your baby is 2 months
+old"); `PpDoor.aboutHer` flips them to "FOR YOU" and "when you are 2 months
+in". The cross-section windows are now tabled in PARENTING-DOORS-REVIEW.md
+on the user's ask.
+

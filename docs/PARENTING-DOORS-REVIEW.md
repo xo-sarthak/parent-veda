@@ -81,12 +81,57 @@ follows.
       (their pages open them). Fine, or wanted as cards too?
 - [ ] The sticky-eye slide on the skin carousel is one line I wrote, not
       the brief's copy. Keep, or replace when the copy comes?
-- [ ] The mother's ownership line: First 40 Days keeps the acute recovery,
-      You keeps the longer arc. Confirm before You is built.
+- [x] The mother's ownership line — decided with You: You, Maa is the one
+      home; First 40 Days' acute pages are windows into it.
+
+## You, Maa (§52)
+
+- [ ] The frightening-thoughts route is pinned in the red-flag treatment,
+      eyebrow "READ THIS ONE FIRST". Right weight for a mother in distress,
+      or should it be an ordinary first card?
+- [ ] Going back locks with "From 2 months"; the band is called "6 weeks to
+      3 months". Fix the wording per band, or leave?
+- [ ] YM6: the six healing-kitchen recipes are pages here; the brief wants
+      them tagged postpartum in the shared recipe library too. Do it?
+- [ ] The consolidation reached back into First 40 Days (three pages and two
+      cards are windows now). Walk that door once more and confirm it still
+      reads as her recovery woven in.
+
+## Cross-section windows — where one door opens another's page
+
+Every place a card or link on one door opens a page that lives on another
+(`pp_page/<section>/<page>` in the router). One copy, opened from wherever
+the question arises; back returns to the door she came from. Listed so the
+review can decide, per line, whether the window is right or the door should
+carry its own version (each is a one-line revert: the copy sits in a
+comment under the card, or the link is simply removed).
+
+| From | Card or link | Opens |
+|---|---|---|
+| Feeding | If he chokes (safety) | Health · If he chokes or can't breathe |
+| Feeding | Mastitis red flag → link | You, Maa · Sore, rock hard breasts |
+| Health | Constipation | Feeding · Solids and constipation |
+| Health | Allergies | Feeding · Introducing allergens safely |
+| Potty | Diaper-free time → rash pictures | Health · Which rash is this? |
+| Potty | She is holding it in → depth | Health · Constipation |
+| Potty | Regressions → leaps | Development · Is my baby going through a leap? |
+| Behaviour | Listening and cooperation (Three to six) | Behaviour · He does not listen (canonical) |
+| Early Learning | Sharing / Waiting / Kindness / Truth / Screens habits | Behaviour · the in-the-moment page for each |
+| First 40 Days | When the crying will not stop | Behaviour · When the crying is too much (the dark story) |
+| First 40 Days | Your bleeding · After a normal delivery · After a C-section | You, Maa · the three acute recovery pages |
+| First 40 Days | Your breasts in the early weeks · When you can get pregnant again | You, Maa · Sore, rock hard breasts · Sex, contraception and the two of you |
+
+Plus the shared tools by surface id (not pages): the What Changed checker
+(Health, Development, Behaviour, Potty), the Growth journey (Feeding, Health,
+First 40 Days), the milestone tracker (Development, Early Learning), the
+nuskhe library (Health), the scripts tool (Behaviour), Sleep's films and
+safe-sleep drawing (First 40 Days), Feeding's latch film (First 40 Days).
+
+- [ ] Any of the windows above that should be a door's own copy instead?
 
 ## Every door
 
-- [ ] Copy for every coming-soon card: `DOOR-CONTENT-OWED.md` P1–P8.
+- [ ] Copy for every coming-soon card: `DOOR-CONTENT-OWED.md` P1–P9.
 - [ ] The films and audios in the same ledger; the 58 story recordings first.
 - [ ] The hub configs (`parenting_hubs.dart`) still describe the old two-door
       homes; the V3 tile bypasses them. Retire, or leave for the older home?

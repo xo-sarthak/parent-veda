@@ -55,6 +55,9 @@ import 'nuskhe_screen.dart';
 import 'problem_solver_screen.dart';
 import 'products_discovery_screen.dart';
 import 'pp_experts_data.dart' show kFindHelpNeeds;
+import 'pp_community_detail_screen.dart';
+import 'community_screen.dart';
+import '../../data/community_data.dart' show kParentingCommunities;
 import 'development_all_activities_screen.dart';
 // import 'on_track_checklist_screen.dart'; // merged into the journey, kept for revert
 import 'development_checkin_screen.dart';
@@ -137,6 +140,18 @@ Widget? ppScreenForSurface(String id) {
   // brief single-sources home remedies: "every per-illness remedy card
   // elsewhere references this, filtered." The old per-illness card pages
   // were second copies of the same remedies.
+  // ⚠️ `pp_community/<roomId>` OPENS ONE ROOM. The You, Maa section's
+  // "open your circle" links were `null` surfaces for want of this; the
+  // room is data in `community_data.dart`, the screen is the one every
+  // room uses.
+  const roomPrefix = 'pp_community/';
+  if (id.startsWith(roomPrefix)) {
+    final roomId = id.substring(roomPrefix.length);
+    for (final c in kParentingCommunities) {
+      if (c.id == roomId) return PpCommunityDetailScreen(community: c);
+    }
+    return const CommunityScreen();
+  }
   const nuskhePrefix = 'pp_nuskhe/';
   // ⚠️ `pp_what_changed/<entry>` OPENS THE ONE CHECKER PRE-FILTERED. The
   // Behaviour door's tool lands on the Behaviour and Mood concerns with the

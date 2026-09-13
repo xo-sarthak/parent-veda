@@ -292,8 +292,10 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
               mark: bracketMarkFor(door.sectionId),
               ageLine: section.bandSet == null
                   ? null
-                  : 'FOR ${ChildProfileStore.instance.nameMid.toUpperCase()}'
-                      '  ·  ${section.bandSet!.active.label.toUpperCase()}',
+                  : door.aboutHer
+                      ? 'FOR YOU  ·  ${section.bandSet!.active.label.toUpperCase()}'
+                      : 'FOR ${ChildProfileStore.instance.nameMid.toUpperCase()}'
+                          '  ·  ${section.bandSet!.active.label.toUpperCase()}',
             ),
             PpDoorSheet(p: p, children: [
               const SizedBox(height: 22),
@@ -314,6 +316,7 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                 ppDoorPad(_LockedPanel(
                   months: m,
                   label: _lockLabel(m),
+                  aboutHer: door.aboutHer,
                   p: p,
                 )),
                 const SizedBox(height: 26),
@@ -688,10 +691,13 @@ enum _Lock { open, locked, past }
 /// What a locked tab shows instead of its rails: the lock, the age it opens,
 /// and the promise that nothing on it is due before then.
 class _LockedPanel extends StatelessWidget {
-  const _LockedPanel({required this.months, required this.label, required this.p});
+  const _LockedPanel({required this.months, required this.label, required this.p, this.aboutHer = false});
   final int months;
   final String label;
   final V2Palette p;
+
+  /// The mother's door: "when you are 2 months in", not "when he is".
+  final bool aboutHer;
 
   @override
   Widget build(BuildContext context) {
@@ -700,6 +706,9 @@ class _LockedPanel extends StatelessWidget {
         ? '${months ~/ 12}'
         : '$months months';
     final turns = months % 12 == 0 ? 'turns $when' : 'is $when old';
+    final herWhen = months % 12 == 0
+        ? '${months ~/ 12} ${months == 12 ? 'year' : 'years'}'
+        : '$months months';
     return Container(
       padding: const EdgeInsets.fromLTRB(18, 18, 18, 18),
       decoration: BoxDecoration(
@@ -725,7 +734,9 @@ class _LockedPanel extends StatelessWidget {
                     letterSpacing: 1.1,
                     color: p.ink3)),
             const SizedBox(height: 6),
-            Text('This opens when $name $turns.',
+            Text(aboutHer
+                    ? 'This opens when you are $herWhen in.'
+                    : 'This opens when $name $turns.',
                 style: pvFraunces(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -944,7 +955,12 @@ class _PinnedRedFlag extends StatelessWidget {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('RED FLAG',
+                  // You, Maa pins its frightening-thoughts route here; the
+                  // brief's words for it are "read this one first", not a
+                  // red flag, and a mother in that state should meet those.
+                  Text(page.format?.toUpperCase() == 'ROUTE'
+                          ? 'READ THIS ONE FIRST'
+                          : 'RED FLAG',
                       style: pvManrope(
                           fontSize: 9.5,
                           fontWeight: FontWeight.w800,

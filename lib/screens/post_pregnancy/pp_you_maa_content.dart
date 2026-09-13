@@ -78,8 +78,15 @@ const List<String> _later = [_b2, _b3];
 const String _crisis = 'pp_crisis_path';
 
 /// Not yet routed. Named here so the report and the router agree on the id.
-const String? _circleSurface = null; // pp_circle_4th_trimester, notReady
-const String? _shopSurface = null; // pp_postpartum_products, notReady
+// ⚠️ THE TWO DEAD ENDS, WIRED (the You brief, 2026-09-13). "Around eight
+// in-page links go nowhere ... these are the missing shop. Point them at the
+// shared products surface. Do not build a separate shop here." And the
+// circle: "a moderated postpartum room in the app's Community, not a
+// separate build" — a room of its own, opened by id.
+// const String? _circleSurface = null; // pp_circle_4th_trimester, notReady
+// const String? _shopSurface = null; // pp_postpartum_products, notReady
+const String _circleSurface = 'pp_community/mothers_4th_trimester';
+const String _shopSurface = 'pp_products';
 
 final PpSection kPpYouMaaSection = PpSection(
   id: 'parenting_maternal', // MUST match the hub's bracketId
@@ -89,6 +96,10 @@ final PpSection kPpYouMaaSection = PpSection(
       'you. Your body, your mind, your strength, your food, and getting back to '
       'being a person as well as a mother.',
   bandSet: kPpPostpartumBands,
+  // ⚠️ THE AGE RULE, ON HER TIMELINE. "Drop the four buttons at the top and
+  // open on where she is in her own recovery. Keep these bands defined
+  // separately from the baby's."
+  autoScope: true,
   areas: [
     _howAreYou,
     _yourBody,
@@ -1296,6 +1307,18 @@ final PpArea _yourBody = PpArea(
             'are allowed to book an appointment purely about yourself.'),
       ],
     ),
+    // ⚠️ [NEW], a scaffold. "Postpartum thyroid trouble is common and often
+    // missed, and it mimics depression, fatigue and hair loss. A mother
+    // searching 'thyroid after delivery' will not find it." Copy supplied.
+    PpPage(
+      id: 'body_thyroid',
+      title: 'Your thyroid after birth',
+      subtitle: 'Common, often missed, and it looks like everything else',
+      format: 'SHORT ARTICLE',
+      bands: _cleared,
+      comingSoon: true,
+      blocks: [],
+    ),
     PpPage(
       id: 'body_skin_settling',
       title: 'Your skin, stretch marks and the line on your belly',
@@ -1398,6 +1421,20 @@ final PpArea _yourBody = PpArea(
             surfaceId: null,
             blurb: 'On the "Have you eaten today?" pages.'),
       ],
+    ),
+    // ⚠️ [NEW], a scaffold. "The one real content gap": her own sleep
+    // survival. Splitting the nights, protecting one block of unbroken
+    // sleep, why broken sleep is not the same as short sleep, and the line
+    // where exhaustion tips into something that needs the mind area. The
+    // baby's sleep lives in Sleep; this is about protecting hers.
+    PpPage(
+      id: 'body_your_sleep',
+      title: 'Getting sleep when she will not let you',
+      subtitle: 'Protecting one block of unbroken sleep, and the line to watch',
+      format: 'ARTICLE',
+      bands: _allBands,
+      comingSoon: true,
+      blocks: [],
     ),
   ],
 );
@@ -5571,6 +5608,12 @@ const PpArea _backToWork = PpArea(
   blurb: 'Returning to work, or choosing not to, and the person you were before '
       'all this.',
   hue: 186,
+  // ⚠️ THE DEAD CARD. Every page here is tagged to later stages (rightly: a
+  // mother six days in should not be reading about returning to work), but
+  // the area itself was for every stage, so it drew a card that opened
+  // nothing in the first six weeks. The brief's FIX 3: tag the area out.
+  // On the door that makes it a locked tab, with the age it opens.
+  bands: _cleared,
   pages: [
     PpPage(
       id: 'work_planning',

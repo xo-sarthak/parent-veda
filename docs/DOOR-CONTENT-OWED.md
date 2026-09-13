@@ -174,7 +174,8 @@ two.
 | Behaviour (parenting) | 15 | 11 | – | 4 | – |
 | Potty (parenting) | 6 | 4 | – | 2 | – |
 | Early Learning (parenting) | 4 | 2 | – | 2 | – |
-| First 40 Days (parenting) | 11 | 5 | – | 4 | 1 (the day spine, FF10) |
+| First 40 Days (parenting) | 11 | 3 | – | 4 | 1 (the day spine, FF10); FF1–FF2 closed into You |
+| You, Maa (parenting) | 6 | 2 | – | 3 | – |
 
 Pregnancy, six doors: written pieces owed, in prose — **S1, L3, L4, L5, L6,
 M1**, six reads. Films — **N1, L1, L2, M4 ×3, M6 ×5**, eleven. Audio — **M5
@@ -277,8 +278,8 @@ drawn strip; the photographs for the skin slides.
 
 | # | Card | Kind | Outcome | Owed |
 |---|---|---|---|---|
-| FF1 | `f40_breasts` — Your breasts in the early weeks | Flagged article | Coming soon | "The single biggest gap in the section": engorgement, cracked nipples, a blocked duct, mastitis with a same-day flag. |
-| FF2 | `f40_pregnant_again` — When your body can get pregnant again | Short article | Coming soon | Ovulation can return before the first period; feeding is not reliable contraception. |
+| ~~FF1~~ | `f40_breasts` — Your breasts in the early weeks | Window | Built from data | Opens You, Maa's "Sore, rock hard breasts" (YM3), on the You brief's consolidation. The cracked-nipples and blocked-duct copy is owed there. |
+| ~~FF2~~ | `f40_pregnant_again` — When your body can get pregnant again | Window | Built from data | Opens You, Maa's "Sex, contraception, and the two of you", which already says it. |
 | FF3 | `f40_small_or_early` — Bringing home a small or early baby | Article | Coming soon | Temperature, feeding, kangaroo care, when to worry. |
 | FF4 | `f40_for_husband` — For your husband, in the first 40 days | Article | Coming soon | Guard the door, protect her rest and food, a night shift, skin to skin, watch her mood. |
 | FF5 | `f40_ceremonies` — The ceremonies, and keeping him safe through them | Article | Coming soon | Chhati, naamkaran, the first outing: crowds, kissing his face, infection, when it is safe to go out. |
@@ -288,3 +289,20 @@ drawn strip; the photographs for the skin slides.
 | FF9 | `f40_jaundice` — how far the yellow has spread | Illustration | Not built | "A small picture (face, chest, palms) would help; light touch." Not drawn yet. |
 | FF10 | The day-by-day spine | Build | Not built | Judgement call 1: the real "you are on day 12" screen. Four fixed day-range pages stand in. See PARENTING-DOORS-REVIEW.md. |
 | FF11 | The eleven films the brief marks | Film | Built from data | `first40/*` slots are placeholders; latch, malish, swaddle and settling now share Feeding's and Sleep's slots, so four fewer to shoot. |
+
+### P9. You, Maa — `lib/data/doors/pp_door_you_maa.dart`
+
+Built to `You_Parenting_Maa_rebuild.pdf`. "Close to complete on content. The
+real work is connecting the many links that currently go nowhere." Two
+scaffolds; the owed work is the films and the breast-health copy the
+consolidation now expects here. `test/pp_you_maa_door_test.dart` fails if a
+coming-soon page is not here.
+
+| # | Card | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| YM1 | `body_your_sleep` — Getting sleep when she will not let you | Article | Coming soon | "The one real content gap": splitting the nights, one block of unbroken sleep, broken vs short sleep, the line where exhaustion needs the mind area. |
+| YM2 | `body_thyroid` — Your thyroid after birth | Short article | Coming soon | Common, often missed, mimics depression and hair loss. A card the brief would accept; a page holds the place. |
+| YM3 | `body_breasts` — Sore, rock hard breasts | Copy | Built from data | Judgement call 1: this is now THE breast-health page; First 40 Days' card and Feeding's mastitis flag open it. It covers engorgement and mastitis; cracked nipples and the blocked duct are owed here (First 40 Days' scaffold FF1 is closed into this row). |
+| YM4 | The 11 feeling-films on the shelf | Film · ~55 min | Built from data | "The highest-value video set in the section: a mother needs to hear 'I feel nothing at all' said aloud by someone who has been there. Prioritise filming these." |
+| YM5 | The remaining 20 film slots | Film / animation | Built from data | The five pelvic-floor exercises (and "finding the right muscle" as an animation of the internal muscle, not a filmed body), six movement sessions, six recipes, two work films, one for the frightening thoughts route. |
+| YM6 | The recipes in the shared library | Data | Not done | The six healing-kitchen recipes should also be tagged postpartum in `pp_food`'s recipe library; today they are pages here that link to `pp_food`. |

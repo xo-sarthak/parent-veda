@@ -42,6 +42,7 @@ import 'pp_door_first40.dart';
 import 'pp_door_health.dart';
 import 'pp_door_potty.dart';
 import 'pp_door_sleep.dart';
+import 'pp_door_you_maa.dart';
 
 export 'pp_door_behaviour.dart';
 export 'pp_door_development.dart';
@@ -51,6 +52,7 @@ export 'pp_door_first40.dart';
 export 'pp_door_health.dart';
 export 'pp_door_potty.dart';
 export 'pp_door_sleep.dart';
+export 'pp_door_you_maa.dart';
 
 /// One parenting door: a shell over one section.
 class PpDoor {
@@ -58,6 +60,7 @@ class PpDoor {
     required this.sectionId,
     required this.tabs,
     this.heroImageUrl,
+    this.aboutHer = false,
     this.hiddenAreaIds = const [],
     this.closing,
     this.closingLine,
@@ -89,6 +92,13 @@ class PpDoor {
   /// stock photographs of sleeping babies show precisely the opposite. A
   /// close face and a fist, position out of frame, is what passed.
   final String? heroImageUrl;
+
+  /// ⚠️ THE ONE DOOR THAT IS ABOUT THE MOTHER. Every line the shell writes
+  /// for itself — the hero's "FOR his-name · band", the locked tab's
+  /// "This opens when he turns 1" — is in the baby's voice, and read wrong
+  /// on You, Maa, where the bands are HER time since birth. Seen on a phone,
+  /// 2026-09-14. True flips those lines to her.
+  final bool aboutHer;
 
   /// The `PpSection` this door opens — also the bracket id, which is what the
   /// home tile carries. The hero's eyebrow, title and blurb come from that
@@ -223,6 +233,7 @@ final List<PpDoor> kPpDoors = [
   kPpPottyDoor,
   kPpEarlyLearningDoor,
   kPpFirst40Door,
+  kPpYouMaaDoor,
 ];
 
 PpDoor? ppDoorFor(String sectionId) {

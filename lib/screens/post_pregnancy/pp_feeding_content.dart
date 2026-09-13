@@ -777,6 +777,13 @@ final PpArea _breastfeeding = PpArea(
           surfaceId: 'pp_experts',
           role: 'lactation',
         ),
+        // The You brief consolidates breast health (engorgement, cracked
+        // nipples, blocked duct, mastitis) into "Sore, rock hard breasts"
+        // there; this red flag stays here and links in.
+        PpLink('Sore, rock hard breasts: the whole picture',
+            surfaceId: 'pp_page/parenting_maternal/body_breasts',
+            blurb: 'Engorgement, cracked nipples, a blocked duct and mastitis, '
+                'in her own section.'),
       ],
     ),
     PpPage(

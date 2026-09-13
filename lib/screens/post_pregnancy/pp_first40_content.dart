@@ -2507,6 +2507,12 @@ final PpSection kPpFirst40Section = PpSection(
           title: 'Your bleeding: what is normal',
           subtitle: 'How much, how long, and the amount that is too much.',
           format: 'ARTICLE',
+          // ⚠️ A WINDOW INTO YOU, MAA, NOT A COPY (judgement call 1 of the
+          // You brief, the user's call 2026-09-13): the bleeding is written once, there.
+          // The page opens the canonical one; its own copy is kept below.
+          toolSurfaceId: 'pp_page/parenting_maternal/body_lochia',
+          blocks: [],
+          /* kept for revert
           blocks: [
             PpIntro('Bleeding after birth is heavier and longer than most women '
                 'expect, and it happens after a caesarean too. Knowing the '
@@ -2577,12 +2583,19 @@ final PpSection kPpFirst40Section = PpSection(
                 'amount much harder. In the first week, pads are worth the '
                 'money for that reason alone.'),
           ],
+          */
         ),
         PpPage(
           id: 'f40_after_normal_delivery',
           title: 'After a normal delivery',
           subtitle: 'Stitches, soreness, and the first trip to the toilet.',
           format: 'ARTICLE',
+          // ⚠️ A WINDOW INTO YOU, MAA, NOT A COPY (judgement call 1 of the
+          // You brief, the user's call 2026-09-13): stitches and sitting down, once, there.
+          // The page opens the canonical one; its own copy is kept below.
+          toolSurfaceId: 'pp_page/parenting_maternal/body_perineum',
+          blocks: [],
+          /* kept for revert
           blocks: [
             PpIntro('If you tore or were cut, the stitches will be sore for '
                 'about two weeks and then improve fast. Almost everything that '
@@ -2639,12 +2652,19 @@ final PpSection kPpFirst40Section = PpSection(
                 blurb: 'Leaking, heaviness, core strength and what comes after '
                     'these weeks.'),
           ],
+          */
         ),
         PpPage(
           id: 'f40_after_csection',
           title: 'After a C-section',
           subtitle: 'Your first weeks with a fresh scar.',
           format: 'ARTICLE',
+          // ⚠️ A WINDOW INTO YOU, MAA, NOT A COPY (judgement call 1 of the
+          // You brief, the user's call 2026-09-13): the C-section weeks, once, there.
+          // The page opens the canonical one; its own copy is kept below.
+          toolSurfaceId: 'pp_page/parenting_maternal/body_csection_early',
+          blocks: [],
+          /* kept for revert
           blocks: [
             PpIntro('A caesarean is major abdominal surgery, and you have been '
                 'sent home to look after a newborn while recovering from it. '
@@ -2708,6 +2728,7 @@ final PpSection kPpFirst40Section = PpSection(
                 blurb: 'Scar massage, core work and movement, once you are '
                     'cleared.'),
           ],
+          */
         ),
         PpPage(
           id: 'f40_rest_and_food',
@@ -2954,20 +2975,28 @@ final PpSection kPpFirst40Section = PpSection(
         // single biggest gap in the section: engorgement, cracked nipples, a
         // blocked duct, mastitis with a same-day flag. And the honest note
         // that ovulation can return before the first period.
+        // ⚠️ NOT A SCAFFOLD ANY MORE. The You brief consolidates breast
+        // health into "Sore, rock hard breasts" there; this card is the
+        // window into it. The engorgement, cracked nipples, blocked duct and
+        // mastitis copy that page still owes is logged under You (YM3).
         PpPage(
           id: 'f40_breasts',
           title: 'Your breasts in the early weeks',
           subtitle: 'Engorgement, cracked nipples, a blocked duct, and the one that needs a doctor today',
           format: 'FLAGGED ARTICLE',
-          comingSoon: true,
+          toolSurfaceId: 'pp_page/parenting_maternal/body_breasts',
           blocks: [],
         ),
+        // ⚠️ NOT A SCAFFOLD ANY MORE. "Sex, contraception, and the two of
+        // you" (You, Maa) owns the get-pregnant-again answer and already
+        // says it: you can ovulate before your first period returns. This
+        // card is the window into it.
         PpPage(
           id: 'f40_pregnant_again',
           title: 'When your body can get pregnant again',
           subtitle: 'Sooner than the first period, and feeding is not a method',
           format: 'SHORT ARTICLE',
-          comingSoon: true,
+          toolSurfaceId: 'pp_page/parenting_maternal/people_intimacy',
           blocks: [],
         ),
       ],
