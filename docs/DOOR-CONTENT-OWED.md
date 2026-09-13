@@ -118,8 +118,8 @@ when its pillar is built to final (the pillars brief, pillar by pillar).
 
 | # | Card (brief's title) | Kind | Tab / section | Outcome | Owed |
 |---|---|---|---|---|---|
-| ~~G1~~ | ~~Ragas ×5~~ | Audio ×5 | Listen · "Ragas" | **Built to final** (Shravan, 2026-09-12) | Five Carnatic veena recordings (L. Ramakrishnan ×2, Veena Kinhal ×3), public-domain dedications on archive.org, via `assets/audio/shravan_manifest.json`; streamed then cached. Owed: move the nine files to **Cloudflare R2** (nine URL edits). STILL-OPEN §46. |
-| ~~G2~~ | ~~Nature sounds ×4~~ | Audio ×4 | Listen · "Nature sounds" | **Built to final** (Shravan, 2026-09-12) | Four radio-aporee field recordings incl. Prakrti temple bells, New Delhi. Same manifest, same R2 move owed. |
+| ~~G1~~ | ~~Ragas ×5~~ | Audio ×5 | Listen · "Ragas" | **Built to final** (Shravan, 2026-09-12) | Five Carnatic veena recordings (L. Ramakrishnan ×2, Veena Kinhal ×3), public-domain dedications on archive.org, via `assets/audio/shravan_manifest.json`; streamed then cached. On **Cloudflare R2** since 2026-09-13. STILL-OPEN §46. |
+| ~~G2~~ | ~~Nature sounds ×4~~ | Audio ×4 | Listen · "Nature sounds" | **Built to final** (Shravan, 2026-09-12) | Four radio-aporee field recordings incl. Prakrti temple bells, New Delhi. Same manifest, on R2. |
 | ~~G3~~ | ~~Body Awareness Journey~~ | Guided · 9 min | Listen · "Guided" | **Built to final** (Shravan, 2026-09-12) | A nine-minute script (`kKriyaBodyAwareness`) on the relaxation screen, TTS via `GarbhNarrator`; recording owed as manifest entries under `kriya.body_awareness.<step>`. |
 | ~~G4~~ | ~~Today's passage — the narrator~~ | Read + Record | Talk and read · "Today's pick" | **Built to final** (Samvad, 2026-09-12) | `GarbhNarrator`: manifest recording else calm TTS. Recordings owed as manifest entries under `samvad.<piece id>` — no code. STILL-OPEN §45. |
 | ~~G5~~ | ~~Affirmations and blessings, ~20~~ | Read | Talk and read · "Affirmations and blessings" | **Built to final** (Samvad, 2026-09-12) | Twenty in the library (four new, English-only). |
@@ -177,7 +177,7 @@ Pregnancy, six doors: written pieces owed, in prose — **S1, L3, L4, L5, L6,
 M1**, six reads. Films — **N1, L1, L2, M4 ×3, M6 ×5**, eleven. Audio — **M5
 ×4**. One decision: N2. One confirmation: M3's numbers. Garbh Sanskar: all
 twelve rows closed by the four pillars (2026-09-12); what remains there is
-recordings by manifest entry and nine URLs to R2.
+recordings by manifest entry.
 Parenting's totals are its terminal's to keep.
 
 ### P3. Health — `lib/data/doors/pp_door_health.dart`

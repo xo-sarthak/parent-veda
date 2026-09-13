@@ -84,7 +84,9 @@ void main() {
       expect(lib.tracks.length, tracks.length);
       final p = lib.playableFor('bells')!;
       expect(p.isFile, isFalse);
-      expect(p.source, startsWith('https://archive.org/download/'));
+      // On R2 since 2026-09-13; the item page stays on archive.org.
+      expect(p.source, startsWith('https://pub-'));
+      expect(p.source, contains('.r2.dev/shravan/'));
       expect(lib.isCached('bells'), isFalse);
       expect(lib.trackFor('nope'), isNull);
       expect(lib.playableFor('bodyscan'), isNull); // a script, not a file

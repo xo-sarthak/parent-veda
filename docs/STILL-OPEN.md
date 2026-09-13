@@ -6313,10 +6313,13 @@ what exists; a longer bonding raga is one more archive.org search.
   same list, two headings.
 
 ### 46.4 Still owed
-* **Cloudflare R2.** The user's chosen home. Nine `file` URLs in the
-  manifest, once the files are uploaded; nothing else changes. The
-  recordings should be re-encoded to one bitrate first (they arrive as
-  archive.org's VBR MP3s, 4–13 MB each).
+* ~~**Cloudflare R2.**~~ Done 2026-09-13: the nine tracks re-encoded to
+  128 kbps (ffmpeg, tags carry title / recordist / licence), uploaded to
+  bucket `parentveda-audio` under `shravan/` beside the narration's `hi/`,
+  each object curl-verified and byte-compared before the manifest's nine
+  `file` URLs moved. `sourceUrl` stays on archive.org. Still on the
+  `pub-*.r2.dev` development host — a custom domain is one host edit in
+  the manifest and one constant in `narration_service.dart`, before launch.
 * **A media notification with lock-screen controls.** Playback survives a
   locked screen now, but she cannot pause it from there. That is
   `audio_service` (a foreground service, both platforms' config) and it is
