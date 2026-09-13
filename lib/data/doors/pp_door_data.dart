@@ -34,11 +34,13 @@
 
 import 'package:flutter/material.dart' show IconData;
 
+import 'pp_door_behaviour.dart';
 import 'pp_door_development.dart';
 import 'pp_door_feeding.dart';
 import 'pp_door_health.dart';
 import 'pp_door_sleep.dart';
 
+export 'pp_door_behaviour.dart';
 export 'pp_door_development.dart';
 export 'pp_door_feeding.dart';
 export 'pp_door_health.dart';
@@ -201,6 +203,7 @@ final List<PpDoor> kPpDoors = [
   kPpFeedingDoor,
   kPpHealthDoor,
   kPpDevelopmentDoor,
+  kPpBehaviourDoor,
 ];
 
 PpDoor? ppDoorFor(String sectionId) {

@@ -118,10 +118,21 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
 
   /// The tabs for his age. See `PpDoorTab.toMonths`: a tab scoped to the
   /// first two years is not on the selector for a three-year-old.
+  ///
+  /// ⚠️ AND A TAB WITH NOTHING FOR HIS BAND DROPS TOO. Behaviour's four
+  /// toddler tabs hold no area for a three-month-old, and its Crying tab
+  /// none for a four-year-old; the brief's age rule is "other bands hidden,
+  /// not one tap away", and an empty tab is the emptiest kind of one tap
+  /// away. A tab keeps its place if any of its areas is in his band; a tab
+  /// of tools alone (no areas at all, like Development's leaps) is always
+  /// there, since a tool has no band.
   List<PpDoorTab> get _tabs => [
         for (final t in door.tabs)
-          if (t.toMonths == null ||
-              ChildProfileStore.instance.ageInMonths < t.toMonths!)
+          if ((t.toMonths == null ||
+                  ChildProfileStore.instance.ageInMonths < t.toMonths!) &&
+              (t.areaIds.isEmpty ||
+                  t.areaIds.any((id) => section.areas
+                      .any((a) => a.id == id && a.inBand(_band)))))
             t,
       ];
   PpSection get section => ppSectionFor(door.sectionId)!;

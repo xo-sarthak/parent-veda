@@ -171,6 +171,7 @@ two.
 | Feeding (parenting) | 4 | 2 | – | 2 | 1 (allergen tracker persistence) |
 | Health (parenting) | 6 | 3 | – | 3 | 1 (dosing table sign-off) |
 | Development (parenting) | 4 | 1 | – | 3 | – (DV2 is a data job, logged) |
+| Behaviour (parenting) | 15 | 11 | – | 4 | – |
 
 Pregnancy, six doors: written pieces owed, in prose — **S1, L3, L4, L5, L6,
 M1**, six reads. Films — **N1, L1, L2, M4 ×3, M6 ×5**, eleven. Audio — **M5
@@ -207,3 +208,29 @@ reslot or merge; the owed pieces are one write and one data job.
 | DV2 | The four areas of growing as "a closer look inside the tracker" | Data | Built from data | The brief assumes one milestone list behind the tracker and the area pages. There are two: `MilestoneStore` (18 milestones, six domains) behind the tracker and `DevArea` skills (`pp_development_data.dart`) behind Brain / Physical / Language / Emotional. The join is a hand map (`_kAreaForDomain` in `milestone_journey_screen.dart`). Making them one dataset — so ticking a skill in either place updates both — is a data job: one list, one store, both screens reading it. |
 | DV3 | `dev_tummy_time` — Tummy time without the tears | Film · 4 min | Built from data | Reformatted step-list > video; slot `development/tummy_time` needs the film. The steps stay under it. |
 | DV4 | The "done together" activity films | Film | Built from data | Every activity page's video is a placeholder today. The brief: "the thing to actually shoot, the 'doing it together' activity clips first." Seven explainer films on the reads likewise (`development/*` slots). |
+
+### P5. Behaviour — `lib/data/doors/pp_door_behaviour.dart`
+
+Built to `Behaviour_Parenting.pdf` (31 Aug 2026). "The verdict is mostly add,
+not cut": two new areas fill the section's missing half, and their copy "is
+being written separately in the same house voice and will be dropped in. Do
+not AI-generate placeholder copy." So eleven coming-soon cards hold their
+places. `test/pp_behaviour_door_test.dart` fails if one is not in this table.
+
+| # | Card | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| BH1 | `beh_scared_everything` — Why he is suddenly scared of everything | Article | Coming soon | Copy, house voice. |
+| BH2 | `beh_fear_dark` — Fear of the dark, and the monster under the bed | Article | Coming soon | Copy; cross-link Sleep's bedtime pages. |
+| BH3 | `beh_fear_doctor` — The doctor, the injection, the haircut | Step-list | Coming soon | Copy. |
+| BH4 | `beh_fear_dogs` — Scared of dogs, lifts and loud noises | Short article | Coming soon | Copy. |
+| BH5 | `beh_shy_child` — The shy child, and "say hello, beta" | Article | Coming soon | Copy. |
+| BH6 | `beh_fear_worth_checking` — When fear or clinginess is worth checking | Flagged callout | Coming soon | Copy; calm, routes to a person. |
+| BH7 | `beh_thumb_sucking` — Thumb-sucking, and when to just leave it | Article | Coming soon | Copy. |
+| BH8 | `beh_head_banging` — Head-banging and rocking | Article | Coming soon | Copy. |
+| BH9 | `beh_breath_holding` — Breath-holding spells | Article + flagged callout | Coming soon | Copy: "the reassurance parents need" plus the one doctor line. |
+| BH10 | `beh_nail_biting` — Nail-biting and the other little habits | Short article | Coming soon | Copy. |
+| BH11 | `beh_self_touching` — Touching himself, and what to do about it | Article | Coming soon | The brief's judgement call 3, included on the user's call (2026-09-13). Copy: normal, do not shame, redirect gently, when to actually mention it. |
+| BH12 | `beh_calm_jar` — A calm jar | Film · 3 min | Built from data | Reformatted Activity > Video; slot `behaviour/calm_jar` needs the make-and-use film. Steps stay. |
+| BH13 | `crying_too_much` — When the crying is too much | Interactive | Built from data | Rebuilt as the dark one-step-at-a-time story (Sleep's 3am pattern); the article is in a comment. Worth a clinical read of the eight screens. |
+| BH14 | `beh_balloon_breathing` — Balloon breathing | Animation | Built from data | The shared breathing circle on a 3-in / 5-out pattern (`kPpBalloonBreath`). No asset owed. |
+| BH15 | The fourteen films the brief marks | Film | Built from data | Every `behaviour/*` slot is a placeholder: ziddi, tantrums, five steps, no-year, throwing, anger, screens ×2, calm corner, filling the tank, no-hitting, big feelings, lying, crying curve. |

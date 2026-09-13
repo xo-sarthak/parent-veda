@@ -138,6 +138,20 @@ Widget? ppScreenForSurface(String id) {
   // elsewhere references this, filtered." The old per-illness card pages
   // were second copies of the same remedies.
   const nuskhePrefix = 'pp_nuskhe/';
+  // ⚠️ `pp_what_changed/<entry>` OPENS THE ONE CHECKER PRE-FILTERED. The
+  // Behaviour door's tool lands on the Behaviour and Mood concerns with the
+  // full list one tap away, which is what the home's dead switch arm meant
+  // to do and never could (the section guard returns first). One checker,
+  // an entry context, no copy.
+  const whatChangedPrefix = 'pp_what_changed/';
+  if (id.startsWith(whatChangedPrefix)) {
+    final entry = id.substring(whatChangedPrefix.length);
+    return switch (entry) {
+      'behaviour' => const WhatChangedScreen(
+          initialCategories: ['Behaviour', 'Mood']),
+      _ => const WhatChangedScreen(),
+    };
+  }
   if (id.startsWith(nuskhePrefix)) {
     return RemedyListScreen(category: id.substring(nuskhePrefix.length));
   }

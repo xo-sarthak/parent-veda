@@ -25,9 +25,18 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
+import '../../models/breath_pattern.dart';
 import '../../theme/pv_fonts.dart';
+import '../../widgets/breathing_circle.dart';
 import '../v2/v2_palette.dart';
 import 'pp_content.dart';
+
+/// Balloon breathing: in through the nose for three, out through the mouth
+/// for five. The long out-breath is the part that does the work.
+const BreathPattern kPpBalloonBreath = BreathPattern([
+  BreathStep('Fill the balloon', 3, BreathKind.expand),
+  BreathStep('Let it out slowly', 5, BreathKind.contract),
+]);
 
 // =============================================================================
 //  THE ANIMATION
@@ -82,18 +91,37 @@ class _PpAnimationViewState extends State<PpAnimationView>
                 letterSpacing: -0.35,
                 color: p.ink1)),
         const SizedBox(height: 14),
-        AspectRatio(
-          aspectRatio: 16 / 10,
-          child: AnimatedBuilder(
-            animation: _c,
-            builder: (context, _) => CustomPaint(
-              painter: switch (widget.block.kind) {
-                PpAnimationKind.sleepCycles =>
-                  _SleepCyclesPainter(t: _c.value, p: p),
-              },
+        // ⚠️ THE BREATHING KIND IS NOT A PAINTER. It is the one breathing
+        // circle the app already has, handed the balloon pattern and its own
+        // clock; drawing a fourth circle here is the thing that widget exists
+        // to prevent.
+        if (widget.block.kind == PpAnimationKind.breathing)
+          Center(
+            child: PvBreathTicker(
+              running: true,
+              builder: (context, s) => PvBreathingCircle(
+                pattern: kPpBalloonBreath,
+                elapsed: s,
+                tint: p.action.withValues(alpha: 0.18),
+                ink: p.ink1,
+                size: 220,
+              ),
+            ),
+          )
+        else
+          AspectRatio(
+            aspectRatio: 16 / 10,
+            child: AnimatedBuilder(
+              animation: _c,
+              builder: (context, _) => CustomPaint(
+                painter: switch (widget.block.kind) {
+                  PpAnimationKind.sleepCycles =>
+                    _SleepCyclesPainter(t: _c.value, p: p),
+                  PpAnimationKind.breathing => throw StateError('handled above'),
+                },
+              ),
             ),
           ),
-        ),
         if (widget.block.caption != null) ...[
           const SizedBox(height: 12),
           Text(widget.block.caption!,

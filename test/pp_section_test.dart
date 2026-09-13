@@ -286,8 +286,13 @@ void main() {
         // with. `test/pp_sleep_door_test.dart` asserts the shape.
         final f = p.format?.toUpperCase();
         if (f == 'CAROUSEL' || f == 'INTERACTIVE') continue;
+        // An animation at the top is the same case as a video: Behaviour's
+        // balloon breathing is the breathing circle first, on the brief's
+        // "not a text page", and its caption orients her as the film's
+        // subtitle does. The intro still follows; steps still may not lead.
         final rest = [
-          for (final b in p.orderedBlocks) if (b is! PpVideoSlot) b
+          for (final b in p.orderedBlocks)
+            if (b is! PpVideoSlot && b is! PpAnimation) b
         ];
         expect(rest.first, isA<PpIntro>(),
             reason: '${s.id}/${p.id} does not open with a PpIntro '

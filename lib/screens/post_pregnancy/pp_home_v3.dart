@@ -684,12 +684,19 @@ class _PpHomeV3State extends State<PpHomeV3> {
       // ⚠️ CATEGORIES, NOT THE WORD "behaviour". Tantrums, clinginess and
       // separation upset are filed under "Mood", so a text match surfaced two
       // concerns out of the handful the door's own blurb names.
-      case kPpActBehaviour:
-        Navigator.of(context).push(MaterialPageRoute<void>(
-          settings: const RouteSettings(name: 'pp/what_changed'),
-          builder: (_) => const WhatChangedScreen(
-              initialCategories: ['Behaviour', 'Mood']),
-        ));
+      //
+      // ⚠️ DEAD, AND NOW SAID SO. `sectionForAction` above returns first for
+      // this action, so this arm has never run since Behaviour gained a
+      // section. What it meant to do lives on as the surface
+      // `pp_what_changed/behaviour` (the Behaviour door's tool), on the
+      // brief's judgement call 1 and the user's answer, 2026-09-13. Kept
+      // for revert.
+      // case kPpActBehaviour:
+      //   Navigator.of(context).push(MaterialPageRoute<void>(
+      //     settings: const RouteSettings(name: 'pp/what_changed'),
+      //     builder: (_) => const WhatChangedScreen(
+      //         initialCategories: ['Behaviour', 'Mood']),
+      //   ));
 
       case kPpActPottyReadiness:
         owed('Is my child ready?',

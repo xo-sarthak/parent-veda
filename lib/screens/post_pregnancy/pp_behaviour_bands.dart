@@ -345,6 +345,11 @@ const PpArea kBehDiscipline = PpArea(
         ),
         PpWhenLine('Relevant from about one, and most useful between two and '
             'six.'),
+        // The mechanism, once: why a small child lashes out lives on the
+        // anger page; this page is the parent's hand, not the child's.
+        PpLink('Why a child lashes out, and why a smack teaches the wrong thing',
+            pageId: 'beh_anger',
+            blurb: 'The one explanation the three hitting pages share.'),
         PpLink('What to say instead, situation by situation',
             surfaceId: 'pp_scripts',
             blurb: 'The sentences, for the moments this actually comes up.'),
@@ -550,6 +555,21 @@ const PpArea kBehOlderChild = PpArea(
     PpPage(
       id: 'beh_cooperation',
       title: 'Listening and cooperation',
+      // ⚠️ MERGED. "He does not listen to anything I say" (pp_behaviour_more)
+      // and this page said the same thing; the brief: "Keep ONE listening
+      // page. Reference from both areas, no second copy." That one is the
+      // canonical (it has the why, and the joint-family note); this card
+      // opens it. The badge follows the content it opens. Copy kept below.
+      // format: 'STEP-LIST',
+      format: 'ARTICLE',
+      bands: _bandC,
+      toolSurfaceId: 'pp_page/parenting_behaviour/beh_not_listening',
+      blocks: [],
+    ),
+    /* kept for revert: the second listening page
+    PpPage(
+      id: 'beh_cooperation_copy',
+      title: 'Listening and cooperation',
       format: 'STEP-LIST',
       bands: _bandC,
       blocks: [
@@ -581,6 +601,7 @@ const PpArea kBehOlderChild = PpArea(
         PpWhenLine('Three to six, and useful well beyond.'),
       ],
     ),
+    */
     PpPage(
       id: 'beh_friendships',
       title: 'Early friendships and falling out',
@@ -620,9 +641,21 @@ const PpArea kBehOlderChild = PpArea(
     PpPage(
       id: 'beh_older_lying',
       title: 'Lying, fairness and telling on people',
+      // ⚠️ THE ONE LYING PAGE. "She told me a lie" (pp_behaviour_content.dart,
+      // kept in a comment) said the same thing for the same age; the brief:
+      // "Keep one, delete the copy." Its film, its script and its doctor
+      // line moved here so the merge lost nothing worth keeping.
       format: 'ARTICLE',
       bands: _bandC,
       blocks: [
+        PpVideoSlot(
+          title: 'Why small children lie',
+          subtitle: 'A child psychologist on why it is a milestone rather '
+              'than a character problem, and what to do at the moment it '
+              'happens.',
+          minutes: '5 MIN',
+          slotId: 'behaviour/lying',
+        ),
         PpIntro('Lying at four is not a moral failure. It is a cognitive '
             'achievement he is trying out, and how you respond decides whether '
             'it becomes a habit.'),
@@ -652,6 +685,21 @@ const PpArea kBehOlderChild = PpArea(
           PpCard('Do not punish the confession',
               'It is the fastest way to guarantee the next lie.'),
         ], heading: 'What not to do', hue: 232),
+        PpScript([
+          PpScriptLine(
+            say: 'I know that was hard to say. Thank you for telling me.',
+            notThis: 'Do not lie to me. I always find out.',
+            why: 'The first makes honesty worth it. The second makes it a '
+                'contest he will try harder to win.',
+          ),
+        ], heading: 'Words to use'),
+        PpCallout(
+          'Worth raising with your paediatrician if lying is constant, '
+          'elaborate and unbothered by being found out, or if it comes together '
+          'with taking things and hurting animals or other children.',
+          kind: PpCalloutKind.doctor,
+          title: 'When to ask',
+        ),
         PpWhenLine('Three to six.'),
       ],
     ),

@@ -109,9 +109,20 @@ class _ScriptsLibraryScreenState extends State<ScriptsLibraryScreen> {
             const SizedBox(height: 18),
             _pad(_searchBar()),
 
-            if (!searching) ...[
-              const SizedBox(height: 14),
-              _pad(_bandRow()),
+            // ⚠️ THE AGE CHIPS CAME OFF (Behaviour brief, 2026-09-13): "kill
+            // the age chips, scope to his age." His band leads and is not
+            // chosen; search still ignores it, because a typed word knows
+            // better than his birthday. Kept below for revert.
+            // if (!searching) ...[
+            //   const SizedBox(height: 14),
+            //   _pad(_bandRow()),
+            // ],
+            if (!searching && _band != null) ...[
+              const SizedBox(height: 12),
+              _pad(Text(
+                  'FOR ${ChildProfileStore.instance.nameMid.toUpperCase()}  ·  ${_bandLabels[_band]!.toUpperCase()}',
+                  style: ppBody(10.5, color: ppMuted, w: FontWeight.w800)
+                      .copyWith(letterSpacing: 1.1))),
             ],
 
             const SizedBox(height: 20),
@@ -122,15 +133,16 @@ class _ScriptsLibraryScreenState extends State<ScriptsLibraryScreen> {
             else
               _pad(Column(children: [for (final s in results) _card(s)])),
 
-            if (!searching && _band != null) ...[
-              const SizedBox(height: 8),
-              _pad(GestureDetector(
-                onTap: () => setState(() => _band = null),
-                behavior: HitTestBehavior.opaque,
-                child: Text('Show every age',
-                    style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
-              )),
-            ],
+            // "Show every age" retired with the chips. Kept for revert.
+            // if (!searching && _band != null) ...[
+            //   const SizedBox(height: 8),
+            //   _pad(GestureDetector(
+            //     onTap: () => setState(() => _band = null),
+            //     behavior: HitTestBehavior.opaque,
+            //     child: Text('Show every age',
+            //         style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
+            //   )),
+            // ],
           ],
         ),
       ),
@@ -176,6 +188,7 @@ class _ScriptsLibraryScreenState extends State<ScriptsLibraryScreen> {
         ]),
       );
 
+  // ignore: unused_element
   Widget _bandRow() => SizedBox(
         height: 34,
         child: ListView(

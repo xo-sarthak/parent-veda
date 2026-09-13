@@ -637,6 +637,11 @@ class PpInteractiveItem {
 enum PpAnimationKind {
   /// Two sleep-cycle waves, hers and yours. She surfaces twice as often.
   sleepCycles,
+
+  /// The shared breathing circle (`lib/widgets/breathing_circle.dart`), on
+  /// the balloon pattern: in for three, out for five. Behaviour's balloon
+  /// breathing, single-sourced with Mind and mood and Kriya.
+  breathing,
 }
 
 /// `[ANIMATION]` — a short drawn animation with a caption.

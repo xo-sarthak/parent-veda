@@ -6400,3 +6400,66 @@ The two disagree on every tab, so the user chose: reissued. The door is
 * **The hub's two doors** (`kPpDevelopment` in `parenting_hubs.dart`) are
   bypassed on V3 — the tile opens the door — and untouched for the older
   home.
+
+---
+
+## 48.0 Behaviour, the fifth parenting door — 2026-09-13
+
+Built to `Behaviour_Parenting.pdf` (31 Aug 2026). The door is
+`lib/data/doors/pp_door_behaviour.dart`; the contract is
+`test/pp_behaviour_door_test.dart`. Not yet walked on a phone.
+
+### 48.1 The brief said "no tabs"; the door has five
+
+"Behaviour is a Sleep or Feeding type area, not a Health or Development one.
+One clean library plus a tools rail. Do NOT invent a five-tab structure." The
+standing call (§39, decided on a phone) is that every parenting door wears the
+shell, so the twelve areas needed a grouping the brief did not draw. The
+user's, from three options: **Crying, the first year · Tantrums and the ziddi
+years · He keeps doing this · Scared, shy or clingy · Calm and guidance.**
+Tools ride the tab they belong to (scripts on Tantrums, and on Crying for the
+infant's parent; the checker on He keeps doing this); the psychologist is the
+closing.
+
+### 48.2 What the shell learned
+
+* **A tab with nothing for his band drops.** An infant's parent sees one tab;
+  a four-year-old's sees four, without Crying. `_tabs` in
+  `pp_door_screen.dart`: a tab stays if any of its areas is in his band, or
+  it has no areas at all (a tools tab, like Development's leaps). The brief's
+  age rule was "other bands hidden, not one tap away", and an empty tab is
+  the emptiest kind of one tap away.
+* **The breathing circle is an animation kind.** `PpAnimationKind.breathing`
+  renders `PvBreathingCircle` (`lib/widgets/breathing_circle.dart`) on
+  `kPpBalloonBreath` (in 3, out 5). One circle app-wide, as that widget's
+  header demands; `pp_section_test` now treats a leading animation like a
+  leading video for the intro rule.
+
+### 48.3 The merges, in one list
+
+* `lying` ("She told me a lie") merged into `beh_older_lying`, taking its film,
+  script and doctor line with it. `beh_cooperation` is a reference card into
+  `beh_not_listening` (`pp_page/parenting_behaviour/...`). The area "Lying,
+  back-talk and screens" dissolved: `siblings` reslotted into Three to six,
+  the const kept. The aggression mechanism is `beh_anger`'s; `hitting_biting`
+  and `beh_no_hitting` link to it. `defiance` links to `beh_ziddi` for the
+  will-before-words explanation (both areas kept, on the user's call).
+* Reformats: `crying_too_much` is the dark step-through (eight screens, the
+  never-shake screen among them, the get-help line as its closing);
+  `beh_balloon_breathing` the circle; `beh_calm_jar` a film; the screen-time
+  chart hoists his row.
+* New: `beh_back_talk` from the brief's copy, verbatim. Two new areas as
+  eleven coming-soon cards (BH1–BH11 in the ledger), the self-touching page
+  included on the user's call.
+* The scripts tool lost its age chips (`scripts_library_screen.dart`, kept for
+  revert); the checker opens pre-filtered via `pp_what_changed/behaviour`,
+  and the home's dead `kPpActBehaviour` arm is commented with a pointer.
+
+### 48.4 Open, for the user
+
+* **Six-vs-five stays open for Health and Development**; Behaviour is five.
+* **The crying-too-much screens want a clinical read** (BH13): the copy is
+  the article's, cut into eight, but a safety page in a new medium is worth
+  one more pair of eyes.
+* **The scripts tool's "for the family" copy** on the infant tab is mine, not
+  the brief's; say if it should read like the toddler card.

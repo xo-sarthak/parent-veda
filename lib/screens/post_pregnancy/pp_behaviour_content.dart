@@ -405,9 +405,66 @@ const PpArea _crying = PpArea(
       id: 'crying_too_much',
       title: 'When the crying is too much',
       subtitle: 'For the moment you feel you cannot take another minute.',
-      format: 'ARTICLE + FLAGGED CALLOUT',
+      // ⚠️ [reformat: Article + red flag > Interactive]. "The worst mismatch
+      // and the highest stakes. A parent at the edge at 2am cannot read a
+      // six-item list. One calm instruction on screen at a time, dark and
+      // glanceable, same as Sleep's 3am fix. The never-shake-a-baby block
+      // and get-help-today routing stay, spoken to her." The page is its
+      // one block; the prose it replaced is kept below for revert.
+      // format: 'ARTICLE + FLAGGED CALLOUT',
+      format: 'INTERACTIVE',
       bands: ['infant'],
       blocks: [
+        PpInteractive(
+          kind: PpInteractiveKind.night,
+          title: 'When the crying is too much',
+          blurb: 'One calm step per screen, dark and dim. For right now.',
+          hue: 14,
+          items: [
+            PpInteractiveItem('You are not a bad parent',
+                'Hours of crying push almost every parent to anger, or panic, '
+                    'or nothing at all. Your body has reached its limit and '
+                    'needs a break. The break is the whole plan.'),
+            PpInteractiveItem('Put him down somewhere safe',
+                'On his back in his cot, or on a firm flat surface with '
+                    'nothing near his face. A baby put down safely and '
+                    'crying is completely fine for a few minutes.'),
+            PpInteractiveItem('Walk out of the room',
+                'Close the door if you need to. You are not abandoning him. '
+                    'You are keeping him safe.'),
+            PpInteractiveItem('Do one slow thing for two minutes',
+                'Splash your face, drink a glass of water, stand at a '
+                    'window, breathe out for longer than you breathe in.'),
+            PpInteractiveItem('Call someone before you go back in',
+                'Your partner, your mother, your sister, a friend, a '
+                    'neighbour. Say the true sentence: I am finding this very '
+                    'hard right now.'),
+            PpInteractiveItem('Go back when your hands feel steady',
+                'Then hand him over if there is anyone to hand him to. '
+                    'Twenty-minute shifts through the worst evenings is a '
+                    'normal way to get through them.'),
+            PpInteractiveItem('Never shake him, not even lightly',
+                'A baby head is heavy and the neck is weak. Shaking can tear '
+                    'blood vessels inside the brain in seconds, and the '
+                    'damage is permanent. It happens to loving parents at the '
+                    'end of long nights, which is exactly why the steps '
+                    'before this matter.'),
+            PpInteractiveItem('If it has already happened',
+                'If a baby has been shaken or has taken a hard knock to the '
+                    'head, he needs to be seen straight away even if he '
+                    'seems fine, and whoever takes him should say plainly '
+                    'what happened.'),
+          ],
+          closing: 'Tell your doctor today, not next week, if you are '
+              'frightened of what you might do, if you have thoughts of '
+              'harming yourself or the baby, if you feel nothing at all '
+              'towards him, or if you have already handled him more roughly '
+              'than you meant to. All four are common and treatable, and none '
+              'of them make you a bad mother. If you cannot reach a doctor '
+              'and you are frightened, go to the nearest hospital and say '
+              'exactly that sentence.',
+        ),
+        /* kept for revert: the article the step-through replaced
         PpIntro('If the crying has pushed you to the edge, you are not a bad '
             'parent and you are very far from the only one. This page is for '
             'that exact moment.'),
@@ -489,6 +546,7 @@ const PpArea _crying = PpArea(
             'can actually do, and it is the request that helps.'),
         PpWhenLine('Worth knowing for the whole first year, and especially '
             'between four and sixteen weeks when crying peaks.'),
+        */
       ],
     ),
 
@@ -681,12 +739,26 @@ const PpArea _firstFeelings = PpArea(
         PpIntro('It is shocking the first time, and it is extremely common. A '
             'child who bites at this age is not a child who will grow up '
             'violent.'),
+        // ⚠️ THE MECHANISM, ONCE. "Why a child lashes out physically" was
+        // written three times (here, Anger, Guiding without hitting); the
+        // brief: single-source it. The anger page keeps the explanation;
+        // this page keeps the moment (she bit someone) and points at it.
+        // The paragraph is kept below for revert.
+        PpArticle([
+          'Biting and hitting peak in the second year for a simple reason: '
+              'strong feeling, no words.',
+        ], heading: 'Why they do it'),
+        PpLink('Why a child lashes out, in full',
+            pageId: 'beh_anger',
+            blurb: 'The one explanation the three hitting pages share.'),
+        /* kept for revert
         PpArticle([
           'Biting and hitting peak in the second year for a simple reason: '
               'strong feeling, no words. Frustration, excitement, tiredness and '
               'teething all come out through the body, because the body is what '
               'she has.',
         ], heading: 'Why they do it'),
+        */
         PpSteps([
           PpStep('Attend to the child who was hurt first',
               'It teaches more than any telling-off, and it is the right thing '
@@ -994,6 +1066,12 @@ const PpArea _theNoYear = PpArea(
           PpStep('Hold the line on the few that matter',
               'Safety, kindness, and not much else. Everything is not a hill.'),
         ], heading: 'What to do'),
+        // Kept as its own area beside The ziddi child on the user's call
+        // (2026-09-13); the shared "why the will arrives before the words"
+        // is the ziddi page's, referenced here rather than written twice.
+        PpLink('Why the will arrives before the words',
+            pageId: 'beh_ziddi',
+            blurb: 'The same discovery, seen from the ziddi side.'),
         PpCards([
           PpCard('Do not ask a question you cannot accept no to',
               'Shall we go home now invites the answer you do not want.'),
@@ -1075,6 +1153,7 @@ const PpArea _theNoYear = PpArea(
 //  BAND D (3 to 5 years) — words, rules and other people
 // =============================================================================
 
+// ignore: unused_element
 const PpArea _rulesAndOthers = PpArea(
   id: 'rules_and_others',
   mark: IntentMark.blocksMark,
@@ -1083,6 +1162,11 @@ const PpArea _rulesAndOthers = PpArea(
   hue: 42,
   bands: ['preschool'],
   pages: [
+    /* ⚠️ MERGED INTO `beh_older_lying` (pp_behaviour_bands.dart), KEPT FOR
+       REVERT. "One lying page, not two. 'She told me a lie' and 'Lying,
+       fairness and telling on people' are the same page for the same age.
+       Keep one, delete the copy." The film, the script and the doctor line
+       went with it.
     PpPage(
       id: 'lying',
       title: 'She told me a lie',
@@ -1147,6 +1231,8 @@ const PpArea _rulesAndOthers = PpArea(
         PpWhenLine('First lies from about 3, common through 4 and 5.'),
       ],
     ),
+    */
+
     /* ⚠️ MOVED OUT TO ITS OWN DOOR, KEPT FOR REVERT.
        The prompt gives screen time its own door with four pages; it was one
        page filed under "lying, back-talk and screens". `kBehScreens` in
@@ -1218,58 +1304,288 @@ const PpArea _rulesAndOthers = PpArea(
       ],
     ),
     */
+    // `siblings` moved out to `_siblings` below: it is reslotted into
+    // Three to six.
+  ],
+);
+
+
+// =============================================================================
+//  RESLOT — the sibling page, out of the dissolved area
+// =============================================================================
+
+const PpPage _siblings = PpPage(
+  id: 'siblings',
+  title: 'The fighting between them',
+  subtitle: 'Sibling rivalry, and the one thing that helps most.',
+  format: 'ARTICLE',
+  bands: ['preschool'],
+  blocks: [
+    PpIntro('Some fighting is how siblings learn to negotiate. Constant '
+        'fighting is usually about something else.'),
+    PpArticle([
+      'Underneath most of it is a question about whether there is enough of '
+          'you to go round. The children who fight least are usually the '
+          'ones who each get a small amount of a parent entirely to '
+          'themselves, reliably, on purpose.',
+    ], heading: 'Why they do it'),
+    PpSteps([
+      PpStep('Ten minutes each, alone, most days',
+          'It sounds too simple. It works better than any refereeing.'),
+      PpStep('Stay out of the small ones',
+          'Stepping in every time makes you the prize they are competing '
+          'for.'),
+      PpStep('Step in immediately for anything physical',
+          'Separate first, discuss later.'),
+      PpStep('Do not investigate who started it',
+          'You will never know, and the search itself teaches them to build '
+          'a case.'),
+      PpStep('Never compare them out loud',
+          'Not even favourably. Especially not favourably.'),
+    ], heading: 'What to do'),
+    PpCards([
+      PpCard('Do not make the older one always give way',
+          'You are bigger is not a reason, and it builds real resentment.'),
+      PpCard('Do not label them',
+          'The clever one and the naughty one both live up to it.'),
+    ], heading: 'What not to do', hue: 12),
+    PpCallout(
+      'Worth raising with your paediatrician if one child is genuinely '
+      'frightened of another, if there is real injury, or if the aggression '
+      'is one-way and constant rather than a squabble between equals.',
+      kind: PpCalloutKind.doctor,
+      title: 'When to ask',
+    ),
+    PpWhenLine('Anywhere from the arrival of a second child onwards.'),
+    PpConsult(
+      title: 'Talk to a child psychologist',
+      whoFor: 'For behaviour that has stopped responding to anything you '
+          'try, or that is frightening you. One conversation often changes '
+          'the picture, and nothing here is a diagnosis.',
+      surfaceId: 'pp_experts',
+      role: 'psychologist',
+    ),
+  ],
+);
+
+// =============================================================================
+//  NEW — "Back-talk, and 'I hate you'" (3 to 5), the brief's one written page
+// -----------------------------------------------------------------------------
+//  Copy supplied in full by the brief, dropped in as written.
+// =============================================================================
+
+const PpPage _backTalk = PpPage(
+  id: 'beh_back_talk',
+  title: 'Back-talk, and "I hate you"',
+  subtitle: 'Words sharp enough to sting, and no idea yet what they do.',
+  format: 'ARTICLE',
+  bands: ['preschool'],
+  blocks: [
+    PpIntro('Around four he gets words sharp enough to sting, and no idea yet '
+        'what they do. "I hate you." "You are not my friend." It lands hard. '
+        'It almost never means what it says.'),
+    PpArticle(heading: 'Why he does it', [
+      'A four-year-old feels something huge and grabs the biggest word he '
+          'has. "I hate you" is usually "I am so angry and I do not know '
+          'where to put it." He is finding out what words do, the same way '
+          'he once found out what a thrown spoon does. The sting you feel is '
+          'proof the words work, not proof he means them.',
+    ]),
+    PpSteps([
+      PpStep('Do not flinch out loud',
+          'Your calm tells him the word is not a bomb. A big reaction just '
+          'shows him he has found a button.'),
+      PpStep('Name what is under it',
+          '"You are really angry we are leaving." That is the thing he could '
+          'not say.'),
+      PpStep('Hold the line and the love together',
+          '"You can be angry with me. I am still not letting you hit."'),
+      PpStep('Do not argue the word',
+          '"You do not mean that" starts a fight he wins by saying it louder. '
+          'Let it sit.'),
+      PpStep('Come back to it small, later',
+          '"Earlier you said you hated me. That is okay, you were cross. I '
+          'still love you."'),
+    ], heading: 'What to do'),
+    PpCards([
+      PpCard('Do not punish the feeling',
+          'You can hold what he does; punishing the feeling teaches him to '
+          'hide it, which is worse at fifteen.'),
+      PpCard('Do not say it back', 'Not even as a joke.'),
+      PpCard('Do not make him say sorry for it',
+          'A forced sorry teaches the word, not the meaning.'),
+    ], heading: 'What not to do', hue: 232),
+    PpScript([
+      PpScriptLine(
+        say: 'You are allowed to be this angry with me.',
+        notThis: 'Do not you dare talk to me like that.',
+      ),
+      PpScriptLine(
+        say: 'I still love you, even when you are this cross.',
+        notThis: 'Fine, hate me then.',
+      ),
+    ], heading: 'The words'),
+    PpIndiaNote('In front of family, "I hate you" from a child lands like an '
+        'insult to the whole way you are raising him, and someone will say '
+        '"dekho, kaise baat karta hai." You do not owe the room a correction '
+        'on the spot. Handle it quietly, your way. A calm child a week later '
+        'persuades them more than a scolding today.'),
+    PpCallout(
+      'Worth mentioning to your paediatrician if the rage behind it is '
+      'extreme and daily well past four, if it turns into hurting, or if he '
+      'seems flat and joyless rather than stormy.',
+      kind: PpCalloutKind.doctor,
+      title: 'When to ask',
+    ),
+    PpWhenLine('Three to five, once the words arrive.'),
+  ],
+);
+
+// =============================================================================
+//  MERGE — Three to six absorbs the dissolved area and gains the new page
+// -----------------------------------------------------------------------------
+//  `kBehOlderChild` (pp_behaviour_bands.dart) is const and untouched; this is
+//  the same area with the sibling page reslotted in and the back-talk page
+//  added, assembled here because the pages live in this file.
+// =============================================================================
+
+final PpArea _olderChild = PpArea(
+  id: kBehOlderChild.id,
+  mark: kBehOlderChild.mark,
+  title: kBehOlderChild.title,
+  blurb: kBehOlderChild.blurb,
+  hue: kBehOlderChild.hue,
+  bands: kBehOlderChild.bands,
+  pages: [...kBehOlderChild.pages, _siblings, _backTalk],
+);
+
+// =============================================================================
+//  NEW AREAS — the two missing pillars
+// -----------------------------------------------------------------------------
+//  "The 41 built pages are excellent on one axis and nearly silent on two
+//  others. Almost everything here is about the child who acts out. But a
+//  parent whose child is the opposite, scared, shy, clingy, or stuck on a
+//  habit, opens Behaviour and finds almost nothing." The cards and slots are
+//  built now; the copy is being written separately in the house voice and is
+//  NOT auto-generated. Each is a coming-soon card that holds its place; the
+//  owed ledger (docs/DOOR-CONTENT-OWED.md) lists every one, and the door
+//  test fails if one falls out of it.
+// =============================================================================
+
+const PpArea _scared = PpArea(
+  id: 'scared',
+  mark: IntentMark.moonMark,
+  title: 'When he is scared, shy or clingy',
+  blurb: 'The fearful, shy or clingy child: the dark, the doctor, dogs, '
+      'strangers, and the "say hello, beta" moment.',
+  hue: 232,
+  bands: _toddlerAndUp,
+  pages: [
     PpPage(
-      id: 'siblings',
-      title: 'The fighting between them',
-      subtitle: 'Sibling rivalry, and the one thing that helps most.',
+      id: 'beh_scared_everything',
+      title: 'Why he is suddenly scared of everything',
       format: 'ARTICLE',
-      bands: ['preschool'],
-      blocks: [
-        PpIntro('Some fighting is how siblings learn to negotiate. Constant '
-            'fighting is usually about something else.'),
-        PpArticle([
-          'Underneath most of it is a question about whether there is enough of '
-              'you to go round. The children who fight least are usually the '
-              'ones who each get a small amount of a parent entirely to '
-              'themselves, reliably, on purpose.',
-        ], heading: 'Why they do it'),
-        PpSteps([
-          PpStep('Ten minutes each, alone, most days',
-              'It sounds too simple. It works better than any refereeing.'),
-          PpStep('Stay out of the small ones',
-              'Stepping in every time makes you the prize they are competing '
-              'for.'),
-          PpStep('Step in immediately for anything physical',
-              'Separate first, discuss later.'),
-          PpStep('Do not investigate who started it',
-              'You will never know, and the search itself teaches them to build '
-              'a case.'),
-          PpStep('Never compare them out loud',
-              'Not even favourably. Especially not favourably.'),
-        ], heading: 'What to do'),
-        PpCards([
-          PpCard('Do not make the older one always give way',
-              'You are bigger is not a reason, and it builds real resentment.'),
-          PpCard('Do not label them',
-              'The clever one and the naughty one both live up to it.'),
-        ], heading: 'What not to do', hue: 12),
-        PpCallout(
-          'Worth raising with your paediatrician if one child is genuinely '
-          'frightened of another, if there is real injury, or if the aggression '
-          'is one-way and constant rather than a squabble between equals.',
-          kind: PpCalloutKind.doctor,
-          title: 'When to ask',
-        ),
-        PpWhenLine('Anywhere from the arrival of a second child onwards.'),
-        PpConsult(
-          title: 'Talk to a child psychologist',
-          whoFor: 'For behaviour that has stopped responding to anything you '
-              'try, or that is frightening you. One conversation often changes '
-              'the picture, and nothing here is a diagnosis.',
-          surfaceId: 'pp_experts',
-          role: 'psychologist',
-        ),
-      ],
+      bands: _toddlerAndUp,
+      comingSoon: true,
+      blocks: [],
+    ),
+    PpPage(
+      id: 'beh_fear_dark',
+      title: 'Fear of the dark, and the monster under the bed',
+      subtitle: 'Night fears, and what actually helps at bedtime',
+      format: 'ARTICLE',
+      bands: _toddlerAndUp,
+      comingSoon: true,
+      blocks: [],
+    ),
+    PpPage(
+      id: 'beh_fear_doctor',
+      title: 'The doctor, the injection, the haircut',
+      format: 'STEP-LIST',
+      bands: _toddlerAndUp,
+      comingSoon: true,
+      blocks: [],
+    ),
+    PpPage(
+      id: 'beh_fear_dogs',
+      title: 'Scared of dogs, lifts and loud noises',
+      format: 'SHORT ARTICLE',
+      bands: _toddlerAndUp,
+      comingSoon: true,
+      blocks: [],
+    ),
+    PpPage(
+      id: 'beh_shy_child',
+      title: 'The shy child, and "say hello, beta"',
+      format: 'ARTICLE',
+      bands: _toddlerAndUp,
+      comingSoon: true,
+      blocks: [],
+    ),
+    PpPage(
+      id: 'beh_fear_worth_checking',
+      title: 'When fear or clinginess is worth checking',
+      format: 'FLAGGED CALLOUT',
+      bands: _toddlerAndUp,
+      comingSoon: true,
+      blocks: [],
+    ),
+  ],
+);
+
+const PpArea _habits = PpArea(
+  id: 'habits',
+  mark: IntentMark.bodyMark,
+  title: 'The habits that worry you',
+  blurb: 'Thumb-sucking, head-banging, rocking, breath-holding, and the '
+      'relatives who have noticed.',
+  hue: 42,
+  bands: _toddlerAndUp,
+  pages: [
+    PpPage(
+      id: 'beh_thumb_sucking',
+      title: 'Thumb-sucking, and when to just leave it',
+      format: 'ARTICLE',
+      bands: _toddlerAndUp,
+      comingSoon: true,
+      blocks: [],
+    ),
+    PpPage(
+      id: 'beh_head_banging',
+      title: 'Head-banging and rocking',
+      format: 'ARTICLE',
+      bands: _toddlerAndUp,
+      comingSoon: true,
+      blocks: [],
+    ),
+    PpPage(
+      id: 'beh_breath_holding',
+      title: 'Breath-holding spells',
+      subtitle: 'The reassurance parents need, and the one line for the doctor',
+      format: 'ARTICLE',
+      bands: _toddlerAndUp,
+      comingSoon: true,
+      blocks: [],
+    ),
+    PpPage(
+      id: 'beh_nail_biting',
+      title: 'Nail-biting and the other little habits',
+      format: 'SHORT ARTICLE',
+      bands: _toddlerAndUp,
+      comingSoon: true,
+      blocks: [],
+    ),
+    // The brief's judgement call 3, included on the user's call
+    // (2026-09-13): normal, do not shame, redirect gently, when to mention
+    // it. Copy supplied later, like the rest.
+    PpPage(
+      id: 'beh_self_touching',
+      title: 'Touching himself, and what to do about it',
+      subtitle: 'Normal, and the one thing not to do',
+      format: 'ARTICLE',
+      bands: _toddlerAndUp,
+      comingSoon: true,
+      blocks: [],
     ),
   ],
 );
@@ -1285,11 +1601,15 @@ const PpArea _rulesAndOthers = PpArea(
 //  0-1 parent sees."
 // =============================================================================
 
-const PpSection kPpBehaviourSection = PpSection(
+final PpSection kPpBehaviourSection = PpSection(
   id: 'parenting_behaviour',
   title: 'Behaviour',
   intro: 'Why she does it, what to do in the moment, and the words to use.',
   bandSet: kPpChildBands,
+  // ⚠️ THE AGE RULE. "The four bands come out. The app knows his age, so
+  // the library opens on his band and shows only that band's areas. No band
+  // chooser, no 'show every age'."
+  autoScope: true,
   // ⚠️ ORDER IS THE SPEC'S ORDER, NOT THE FILE'S. Band A first, then the
   // toddler doors in the sequence the prompt lays them out, then Band C. The
   // band chooser narrows what LEADS; this list decides what a parent scrolling
@@ -1300,12 +1620,18 @@ const PpSection kPpBehaviourSection = PpSection(
     kBehZiddi, // B1 — the dominant India door, previously absent
     _firstFeelings, // B2 — tantrums and first hitting
     _theNoYear, // B3 — the specific behaviours
-    _rulesAndOthers, // B3 — lying, siblings
+    // ⚠️ DISSOLVED. "Fold the old 'Lying, back-talk and screens' area into
+    // 'Three to six' (both 3 to 5). Its title promised back-talk and screens
+    // but held only lying plus sibling fighting; screens are their own
+    // area." Lying merged, siblings reslotted, the const kept for revert.
+    // _rulesAndOthers, // B3 — lying, siblings
     kBehSpecific, // B3 — the "he keeps doing this" lookup door
     kBehScreens, // B4 — screens as its own door, per the prompt
     kBehDiscipline, // B5 — previously absent
     kBehCalm, // the regulation activities
-    kBehOlderChild, // Band C — previously absent
+    _olderChild, // Band C — kBehOlderChild plus the reslot and the new page
+    _scared, // [NEW AREA] the missing half of the section
+    _habits, // [NEW AREA] the habits that worry parents
   ],
   // ⚠️ THE SECTION HAD NO TOOLS AT ALL, while this file's header said
   // "nine areas plus three tools". The header was describing the spec rather
@@ -1325,7 +1651,10 @@ const PpSection kPpBehaviourSection = PpSection(
       label: 'Something has changed',
       blurb: 'Started biting, head-banging, suddenly clingy. Work through it '
           'calmly.',
-      surfaceId: 'pp_what_changed',
+      // Pre-filtered to the Behaviour and Mood concerns, the full list one
+      // tap away. The user's call (2026-09-13) on the brief's judgement
+      // call 1: wire the entry context rather than delete the dead arm.
+      surfaceId: 'pp_what_changed/behaviour',
       icon: Icons.swap_horiz_rounded,
     ),
   ],

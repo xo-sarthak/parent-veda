@@ -396,6 +396,9 @@ const PpArea kBehScreens = PpArea(
         PpTable(
           heading: 'Rough guidance by age',
           columns: ['Age', 'Usual advice', 'What matters more'],
+          // [auto-scope]: "keep the Chart, lead with his age row." His row
+          // is hoisted and marked; the others stay as context.
+          rowMonths: [(0, 18), (18, 24), (24, 72)],
           rows: [
             ['Under 18 months', 'None, except video calls',
                 'Video calls with family are genuinely different. They are a '
@@ -599,9 +602,19 @@ const PpArea kBehCalm = PpArea(
     PpPage(
       id: 'beh_balloon_breathing',
       title: 'Balloon breathing',
-      format: 'ACTIVITY',
+      // [reformat: Activity > Animation] "render with the shared
+      // breathing-circle Animation component. Not a text page." The steps
+      // stay under the circle.
+      // format: 'ACTIVITY',
+      format: 'ANIMATION',
       bands: _bandBC,
       blocks: [
+        PpAnimation(
+          kind: PpAnimationKind.breathing,
+          title: 'Breathe with the balloon',
+          caption: 'In through the nose for three, out through the mouth for '
+              'five. Hands on the belly, both of you, and follow the circle.',
+        ),
         PpIntro('One hand on the belly, breathe in until it fills like a '
             'balloon, then let it out slowly. The only technique on this page '
             'that works on the adult too.'),
@@ -659,9 +672,19 @@ const PpArea kBehCalm = PpArea(
     PpPage(
       id: 'beh_calm_jar',
       title: 'A calm jar',
-      format: 'ACTIVITY',
+      // [reformat: Activity > Video] "a short make-and-use film. Showing
+      // beats telling for a physical make." Slot first; the steps stay.
+      // format: 'ACTIVITY',
+      format: 'VIDEO',
       bands: _bandBC,
       blocks: [
+        PpVideoSlot(
+          title: 'Making a calm jar, and using it',
+          subtitle: 'Warm water, glitter glue, a taped lid, and the minute of '
+              'watching it settle.',
+          minutes: '3 MIN',
+          slotId: 'behaviour/calm_jar',
+        ),
         PpIntro('A sealed bottle of water with glitter in it. Shake it, watch '
             'it settle, and breathe while it does. The settling is the point: '
             'it gives a feeling a shape and an ending.'),
