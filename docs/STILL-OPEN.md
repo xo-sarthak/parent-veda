@@ -6690,7 +6690,9 @@ on the user's ask.
 Built to `What_to_buy_parenting.pdf`, which is explicit: "do not wrap it in a
 section, do not add tabs, do not merge the two doors." The user agreed; the
 tile stays the two-door hub (guides / catalogue). The contract is
-`test/pp_what_to_buy_test.dart`. Not walked on a phone yet.
+`test/pp_what_to_buy_test.dart`. Walked on a phone 2026-09-14: the eight
+Coming soon rows on the guides hub; "Compare malish oils" lands on a loaded
+tray with the guidance panel reading the shelf card.
 
 ### 53.1 The three fixes
 
@@ -6726,8 +6728,8 @@ tile stays the two-door hub (guides / catalogue). The contract is
 
 Built to `Traditions_Parenting.pdf`. The door is
 `lib/data/doors/pp_door_traditions.dart`; the contract is
-`test/pp_traditions_door_test.dart`. Not walked on a phone (the phone's
-Wi-Fi dropped); the tests hold every tab and both ages.
+`test/pp_traditions_door_test.dart`. Walked on a phone 2026-09-14: five
+tabs, the placeholders, the drawn customs picture; nothing to fix.
 
 ### 54.1 The calls
 

@@ -24,8 +24,8 @@ follows.
 | Early learning | `Early_Learning_Parenting.pdf` | door, 5 tabs | ca2a206 | yes | `pp_early_learning_door_test` |
 | First 40 days | `First_40_Days_Prompt.pdf` | door, 5 tabs | 430a5c4 | yes | `pp_first40_door_test` |
 | You | `You_Parenting_Maa_rebuild.pdf` | door, 5 tabs | 43c389c | yes | `pp_you_maa_door_test` |
-| What to buy | `What_to_buy_parenting.pdf` | **the shop, on the brief** | 90e0e71 | installed, not walked | `pp_what_to_buy_test` |
-| Traditions | `Traditions_Parenting.pdf` | door, 5 tabs | (pending) | no — Wi-Fi dropped | `pp_traditions_door_test` |
+| What to buy | `What_to_buy_parenting.pdf` | **the shop, on the brief** | 90e0e71 | yes | `pp_what_to_buy_test` |
+| Traditions | `Traditions_Parenting.pdf` | door, 5 tabs | 1f847b9 | yes | `pp_traditions_door_test` |
 
 Across all of them: `test/pp_doors_sanity_test.dart` (2026-09-14) holds that
 every door's areas exist, every surface any page or door points at resolves,
@@ -137,7 +137,6 @@ brief is missing, and every deliberate deviation is a line in this file.
 
 - [ ] TR4 and TR8, the two sensitive pages, are scaffolds: read the copy
       before either ships (the brief's own ask).
-- [ ] Not walked on the phone yet (Wi-Fi dropped). Walk it once.
 - [ ] The Coming up now tab shows one chart for her stage plus two
       placeholders; a parent cannot read ahead to the next stage's chart. The
       brief wants exactly that ("opens the matching page"); say if a
