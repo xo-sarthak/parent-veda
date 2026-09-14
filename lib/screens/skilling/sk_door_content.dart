@@ -116,6 +116,40 @@ class SkProduct {
       };
 }
 
+/// One free tool a band's activities run in — the 8 to 11 task's ACCESS
+/// RAIL, "built once, parent-gated, reused by all 12", extended by the 11 to
+/// 14 task. Added at the fill (2026-09-14) because the structure pass had no
+/// slot for it; the task said STOP and list, and this is the listed shape.
+///
+/// ⚠️ FREE, AND NEVER AN AD TO A CHILD. The rail is drawn behind the
+/// grown-up gate (`sk_access/<door>`), and the tools are the task's own
+/// list: offline and no-account first. ParentVeda hosts no editor and
+/// collects nothing; any account is the parent's choice under the existing
+/// consent.
+class SkAccessTool {
+  const SkAccessTool({
+    required this.name,
+    required this.line,
+    required this.bands,
+    this.url,
+    this.offline = false,
+    this.noAccount = false,
+  });
+  final String name;
+
+  /// The task's own words for it.
+  final String line;
+  final List<String> bands;
+
+  /// Opened through the gate, in the browser. Null for "a supervised look
+  /// at a real AI tool" — the parent's choice, not a link.
+  final String? url;
+  final bool offline;
+  final bool noAccount;
+
+  bool inBand(String band) => bands.contains(band);
+}
+
 /// One skill door's content.
 class SkDoorContent {
   const SkDoorContent({
@@ -129,6 +163,7 @@ class SkDoorContent {
     required this.products,
     required this.parentNote,
     this.crossBandSetId,
+    this.access = const [],
   });
 
   /// The bracket id — `skilling_coding`.
@@ -157,6 +192,14 @@ class SkDoorContent {
 
   /// The set that spans every band and gets its own tab (Coding's AI set).
   final String? crossBandSetId;
+
+  /// The access rail: the free tools her band's activities run in. Empty
+  /// for a band that needs nothing (Coding's Unplugged), in which case the
+  /// door draws no card for it.
+  final List<SkAccessTool> access;
+
+  List<SkAccessTool> accessFor(String band) =>
+      [for (final t in access) if (t.inBand(band)) t];
 
   String bandName(String bandId) => bandNames[bandId] ?? bandId;
 

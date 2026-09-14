@@ -6830,3 +6830,25 @@ and are the next pass; two of them name fields the shell does not have
 (the 8–11 access rail; the 11–14 resume marker) — both are generic to the
 doors and are listed in `SKILLING-DOOR-BUILD.md` §9, not here. Not walked
 on a phone yet.
+
+### 55.5 The three fills — 2026-09-14
+
+All 36 activities mapped verbatim from `tasks/coding/` (Tasks 1–3 of 36)
+into the scaffold's ids; ledger rows S1–S3 closed. Two things the tasks
+said to STOP on, and what was done: the **access rail** is built as a
+shell slot (`SkDoorContent.access`, `SkAccessScreen`, `sk_access/<door>`,
+the Grown-ups card leading Things to do — S9); the **resume marker** is
+flagged, not built (`SKILLING-DOOR-BUILD.md` §9). One field added to
+`SkActivity` at the fill: `withGrownUp` (the AI-literacy projects' mark).
+One allow-listed "score" (the quiz the child builds). Three cross-links to
+unbuilt doors logged in the review file. Not walked on a phone.
+
+### 55.6 Walked on the phone — 2026-09-14
+
+At 8, 5 and 12, through the gate, an activity's three buttons, the sum
+gate, the grown-up screen, settings, and the locked state. Six fixes in
+the fill commit, listed in the review file; the one with teeth is the Ask
+Veda FAB, which was reachable from every child screen and is now hidden on
+`sk_`/`sk/` routes in `global_ask_fab.dart`. Nothing else in the walk
+contradicted the brief.
+

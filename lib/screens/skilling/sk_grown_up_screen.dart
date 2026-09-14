@@ -109,6 +109,10 @@ class _SkGrownUpScreenState extends State<SkGrownUpScreen> {
     final bracket = bracketById(widget.doorId);
     final child = SkChildStore.instance;
     final band = child.band;
+    // Under the floor the shelves show the FIRST rung — what she will meet
+    // at six — not every level at once. Seen on a phone (2026-09-14): a
+    // five-year-old's parent got nine products across three levels.
+    final shelfBand = band?.id ?? kSkBands.first.id;
     if (!_passed || c == null) {
       return Scaffold(
         backgroundColor: p.ground,
@@ -172,7 +176,7 @@ class _SkGrownUpScreenState extends State<SkGrownUpScreen> {
                 'about her future.',
                 style: pvManrope(fontSize: 13.5, height: 1.45, color: p.ink2)),
             const SizedBox(height: 12),
-            for (final course in c.coursesFor(band?.id)) ...[
+            for (final course in c.coursesFor(shelfBand)) ...[
               _ShelfRow(
                 p: p,
                 icon: course.mode == SkCourseMode.live
@@ -188,7 +192,7 @@ class _SkGrownUpScreenState extends State<SkGrownUpScreen> {
               ),
               const SizedBox(height: 10),
             ],
-            if (c.coursesFor(band?.id).isEmpty)
+            if (c.coursesFor(shelfBand).isEmpty)
               _SoonCard(
                   p: p,
                   title: 'No classes at this level yet',
@@ -203,7 +207,7 @@ class _SkGrownUpScreenState extends State<SkGrownUpScreen> {
                 'you; never shown to her as an ad.',
                 style: pvManrope(fontSize: 13.5, height: 1.45, color: p.ink2)),
             const SizedBox(height: 12),
-            for (final prod in c.productsFor(band?.id)) ...[
+            for (final prod in c.productsFor(shelfBand)) ...[
               _ShelfRow(
                 p: p,
                 icon: switch (prod.kind) {
@@ -579,6 +583,9 @@ class _Settings extends StatelessWidget {
         _kv('Grown-up gate', s.hasPin ? 'PIN' : 'A sum in words', p),
         const SizedBox(height: 12),
         Wrap(spacing: 8, runSpacing: 8, children: [
+          // Her age can be corrected here without withdrawing consent — the
+          // walk (2026-09-14) found withdraw-and-redo was the only way.
+          _action(context, 'Change her date of birth', () => _askDob(context)),
           _action(context, s.hasPin ? 'Change PIN' : 'Set a PIN',
               () => _askPin(context)),
           if (s.hasPin)
@@ -586,7 +593,10 @@ class _Settings extends StatelessWidget {
           _action(context, 'Withdraw consent and forget her', () {
             SkPracticeStore.instance.forgetAll();
             s.forget();
-            Navigator.of(context).popUntil((r) => r.isFirst);
+            // Back to the skilling preview, not the app's first route — seen
+            // on a phone (2026-09-14) landing on the pregnancy home.
+            Navigator.of(context).popUntil(
+                (r) => r.settings.name == 'skilling/preview' || r.isFirst);
           }, quiet: true),
         ]),
         const SizedBox(height: 12),
@@ -642,6 +652,19 @@ class _Settings extends StatelessWidget {
         child: Text(label,
             style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w800)),
       );
+
+  Future<void> _askDob(BuildContext context) async {
+    final s = SkChildStore.instance;
+    final now = DateTime.now();
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: s.dob ?? DateTime(now.year - 8, now.month, now.day),
+      firstDate: DateTime(now.year - 18, 1, 1),
+      lastDate: now,
+      helpText: 'When was she born?',
+    );
+    if (picked != null) s.update(dob: picked);
+  }
 
   Future<void> _askPin(BuildContext context) async {
     final ctl = TextEditingController();

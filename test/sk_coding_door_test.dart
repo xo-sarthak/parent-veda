@@ -100,14 +100,70 @@ void main() {
       expect(_c.activities.map((a) => a.id).toSet(), hasLength(36));
     });
 
-    test('the scaffold authors no activity copy', () {
+    // ⚠️ FILLED 2026-09-14 from the three task PDFs. The scaffold test
+    // ("authors no activity copy") is replaced by the fills' acceptance
+    // checklists, which are the same shape in all three tasks.
+    test('every slot is filled: the tasks\' acceptance checklist, all three bands', () {
       for (final a in _c.activities) {
-        expect(a.comingSoon, isTrue, reason: a.id);
-        expect(a.oneLine, isEmpty, reason: a.id);
-        expect(a.steps, isEmpty, reason: a.id);
-        expect(a.whatYouPractised, isEmpty, reason: a.id);
-        expect(a.theThinking, isEmpty, reason: a.id);
+        expect(a.comingSoon, isFalse, reason: a.id);
+        expect(a.title, isNotEmpty, reason: a.id);
+        expect(a.oneLine, isNotEmpty, reason: a.id);
+        expect(a.steps, hasLength(4), reason: '${a.id}: four numbered steps, as every task writes them');
+        expect(a.theThinking, isNotEmpty, reason: a.id);
+        expect(a.whatYouPractised, isNotEmpty, reason: a.id);
+        // The honest end line names the doing, never a grade.
+        expect(a.whatYouPractised.toLowerCase(), isNot(contains('%')), reason: a.id);
+        expect(a.whatYouPractised.toLowerCase(), isNot(contains('genius')), reason: a.id);
       }
+      // 6 to 8: household-only materials with a no-supplies fallback.
+      for (final a in _c.activitiesFor('6-8')) {
+        expect(a.materials, isNotEmpty, reason: a.id);
+        expect(a.tool, isNull, reason: '${a.id}: unplugged needs no tool');
+      }
+      // 8 to 11 and 11 to 14: a free tool per activity.
+      for (final a in [..._c.activitiesFor('8-11'), ..._c.activitiesFor('11-14')]) {
+        expect(a.tool, isNotNull, reason: a.id);
+        expect(a.tool!.toLowerCase(), isNot(contains('paid')), reason: a.id);
+      }
+      // The AI-literacy projects are marked "with a grown-up".
+      expect(_c.activityById('cd_1114_04')!.withGrownUp, isTrue);
+      expect(_c.activityById('cd_1114_06')!.withGrownUp, isTrue);
+      // The task's titles, in the task's order, as a spot check per band.
+      expect(_c.activityById('cd_68_01')!.title, 'Be My Robot');
+      expect(_c.activityById('cd_68_12')!.title, 'A Different Way');
+      expect(_c.activityById('cd_811_01')!.title, 'Make it Move');
+      expect(_c.activityById('cd_811_12')!.title, 'Stuck? Try, Save, Try');
+      expect(_c.activityById('cd_1114_01')!.title, 'Build a Story Game');
+      expect(_c.activityById('cd_1114_12')!.title, 'Share It and Make It Better');
+    });
+
+    test('no outcome promise, no timer, and the one allowed "score" is the quiz the child builds', () {
+      const banned = ['future', 'genius', 'career', 'income', 'guarantee', 'ahead of', 'timer', 'leaderboard'];
+      for (final a in _c.activities) {
+        final copy = [a.title, a.oneLine, a.materials, ...a.steps, a.theThinking, a.whatYouPractised, a.tool ?? '']
+            .join(' ')
+            .toLowerCase();
+        for (final b in banned) {
+          expect(copy.contains(b), isFalse, reason: '${a.id} says "$b"');
+        }
+        final scores = RegExp(r'\b(score|scores|points?)\b').hasMatch(copy);
+        expect(scores, a.id == 'cd_1114_10',
+            reason: '${a.id}: only Make a Quiz Game may say score — the game keeps its players\' points, the app never grades the child');
+      }
+    });
+
+    test('the access rail: free tools per band, none for Unplugged, every link https', () {
+      expect(_c.accessFor('6-8'), isEmpty, reason: 'nothing to set up');
+      expect(_c.accessFor('8-11').map((t) => t.name).toList(),
+          ['ScratchJr', 'Scratch, the offline app', 'code.org', 'Blockly Games']);
+      expect(_c.accessFor('11-14').map((t) => t.name).toList(), [
+        'Scratch, the offline app', 'Python, with turtle for art', 'Machine Learning for Kids',
+        'A supervised look at a real AI tool',
+      ]);
+      for (final t in _c.access) {
+        if (t.url != null) expect(t.url, startsWith('https://'), reason: t.name);
+      }
+      expect(skScreenForSurface('sk_access/skilling_coding'), isNotNull);
     });
 
     test('the model carries every field the task PDFs name', () {
@@ -260,7 +316,9 @@ void main() {
       for (final s in kSkCodingSkills) {
         expect(find.text(s.label), findsOneWidget, reason: s.id);
       }
-      expect(find.text('Coming soon'), findsWidgets);
+      expect(find.text('Coming soon'), findsNothing, reason: 'every activity slot is filled');
+      expect(find.text('Free tools to set up'), findsOneWidget, reason: 'the access rail leads the first rail');
+      expect(find.text('Make it Move'), findsOneWidget);
     });
 
     testWidgets('a five-year-old sees every child tab locked from 6, and the grown-up card open', (tester) async {

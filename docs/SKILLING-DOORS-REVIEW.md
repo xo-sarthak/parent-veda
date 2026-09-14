@@ -21,7 +21,7 @@ buy are stub sheets; the door stays behind `kDebugMode`; the preview ships.
 
 | Tile | Brief | Shape | Tasks (fills) | Commit | Walked on a phone | Contract |
 |---|---|---|---|---|---|---|
-| Coding | `ParentVeda_Coding_structure_v2.pdf` | door, 5 tabs + the shell | 3 of 3 exist, not yet mapped | — | no | `sk_coding_door_test` |
+| Coding | `ParentVeda_Coding_structure_v2.pdf` | door, 5 tabs + the shell | **3 of 3 filled** (36 activities) | 5f963a7 (door), fill commit next | **yes** — 2026-09-14, at 8, 5 and 12 | `sk_coding_door_test` |
 | Communication | `ParentVeda_Communication_structure.pdf` | plan sheet | 2 of 3 exist | — | — | — |
 | Confidence | `ParentVeda_Confidence_structure.pdf` | plan sheet | 3 of 3 exist | — | — | — |
 | Creativity | `ParentVeda_Creativity_structure.pdf` | plan sheet | none yet | — | — | — |
@@ -68,8 +68,17 @@ The suggestions are the last three lines.
       again · I made something" and the end line. The three verbs are the
       brief's; the button labels are mine.
 - [ ] The Today card is chosen by the day of the year (same all day,
-      changes daily, never recorded). With every slot coming soon it is a
-      coming-soon card today. Fine until the fill?
+      changes daily, never recorded). Since the fill it is a real activity
+      every day. **Look:** Today's thing to try → the one card → the three
+      buttons.
+- [ ] **Look:** Things to do at 9 → "Free tools to set up" leads the first
+      rail with a Grown-ups chip and opens the tools list behind the gate.
+      Right place, or should it sit on the grown-up screen instead?
+- [ ] **Look:** an 11–14 project → the chips "With a grown-up" / "More
+      than one sitting" under the one-line. Labels are mine; the marks are
+      the task's.
+- [ ] The resume marker the 11–14 task asks about is flagged, not built
+      (`SKILLING-DOOR-BUILD.md` §9). Want one?
 - [ ] The parent note's built half draws the keepsake's words and, when an
       activity has one, its `theThinking` line. Say if the note should stay
       authored-only.
@@ -80,6 +89,21 @@ The suggestions are the last three lines.
       "UI only, nothing behind the doors" — held by `skilling_doorway_test`.
       True in release; in a debug build Coding opens. Change the subtitle
       now, or on the day the stage un-gates?
+- [x] **Walked on the phone, 2026-09-14** (Samsung S21 FE, Android 16), at
+      8 (Blocks), 5 (the floor) and 12 (Projects). Fixed in the same pass:
+      the Ask Veda FAB no longer floats over any skilling route (it opened
+      an adult surface from a child screen and sat over the consent list,
+      the end line and the locked panel); the activity's tool chip wraps
+      instead of overflowing; settings gained "Change her date of birth";
+      withdraw returns to the preview, not the pregnancy home; the gate
+      drops the keyboard before the date picker; under the floor the
+      shelves show the first rung, not every level. Seen and kept: the
+      hero, the one-card Today tab, the six skill rails, the three
+      buttons and the end line, the sum gate, the grown-up screen, the
+      locked state.
+- [ ] **Look, after the walk:** the door re-scopes live when the date of
+      birth changes in settings — no restart. Fine, or should a band change
+      say so somewhere?
 - [ ] **Suggestion A (regroup):** Things to do (today's card pinned first,
       then the six skill rails) · Lessons · AI, explained · Made and tried ·
       **For the grown-up as a fifth, gated tab**. Five tabs always open, no
@@ -102,4 +126,6 @@ Communication split the Communication brief names.
 
 | From | Into | Page | Status |
 |---|---|---|---|
-| — | — | — | none yet |
+| Coding · `cd_811_12` Stuck? Try, Save, Try | Stillness | the settle-breath ("point to it, do not rebuild it") | owed — Stillness not built; the builder note was dropped from the parent line |
+| Coding · `cd_1114_06` Why AI Gets It Wrong | Thinking | the "is this true" reasoning side | owed — Thinking not built; the parent line names it in prose |
+| Coding · `cd_1114_12` Share It and Make It Better | Making (Creativity) | the private, family-only showcase posture | owed — no sharing feature exists on either door; sharing here is offline, to a family member |

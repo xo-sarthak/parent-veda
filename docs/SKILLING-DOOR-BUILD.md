@@ -121,7 +121,11 @@ From the Coding v2 brief and the user's calls of 2026-09-14:
    itself ships (with its PREVIEW pill, held by `skilling_doorway_test`).
 10. **Placeholders only in a structure pass.** Titles like "Activity 3" and
     "Lesson 2", `comingSoon: true`, empty blocks, every id in the ledger.
-    The task PDFs fill them verbatim in a later pass.
+    The task PDFs fill them verbatim in a later pass — **verbatim includes
+    the tasks' Hinglish-friendly words** ("Silly, na?", "ulta"); the house
+    rule against Latin-script Hinglish is for copy we write. One task-copy
+    exception is allow-listed by id in the sanity test: an activity in which
+    the CHILD builds a game that keeps its players' points may say "score".
 11. **English only.** Kid voice, Hinglish-friendly, Devanagari if Hindi is
     ever asked for; never Latin-script Hinglish.
 
@@ -257,17 +261,25 @@ three shelves; withdraw consent and the return to the gate.
 Points that apply to every skill door. Door-specific ones are in
 `STILL-OPEN.md` by section; content owed is in `DOOR-CONTENT-OWED.md`.
 
-- [ ] **The 8–11 access rail.** The Coding 8–11 task PDF asks for a
-      parent-gated rail naming the free tools (ScratchJr, Scratch offline,
-      code.org / Blockly Games), "built once, reused by all 12". The shell
-      has no slot for it. Proposed: `SkDoorContent.access` — a per-band list
-      of `SkLink(url:)` rendered as a gated rail on the activities tab.
-      Decide at the fill.
-- [ ] **The 11–14 resume marker.** The Coding 11–14 task asks for "a
-      multi-session resume marker". That is per-child state (which step she
-      reached) — child data and a step count. `SkActivity.multiSession` is a
-      content flag only. Proposed: none; a project she returns to reads the
-      steps again. Decide at the fill.
+- [x] **The 8–11 access rail** — built at the Coding fill (2026-09-14):
+      `SkDoorContent.access` (a list of `SkAccessTool`, band-tagged), drawn
+      as a "Free tools to set up" Grown-ups card leading the first rail of
+      the activities tab, opening `sk_access/<door>` (`SkAccessScreen`),
+      which asks the gate on open and lists the tools with links. Any door
+      with tools to set up gets it by filling `access`.
+- [ ] **The 11–14 resume marker.** Flagged at the fill, not built, as the
+      task asks ("if not, flag it, do not build one silently"). It is
+      per-child state — which step she reached — child data and a step
+      count. `SkActivity.multiSession` marks the seven projects that span
+      sittings ("More than one sitting" chip); a project she returns to
+      reads the steps again. Say if a marker is wanted; it would be the
+      keepsake's first non-word field.
+- [ ] **Cross-links the fills name to doors that do not exist yet:** task
+      2's activity 12 → the Stillness door's settle-breath ("point to it,
+      do not rebuild it"); task 3's activity 6 → the Thinking door's "is
+      this true" side; task 3's sharing posture → "the same private-showcase
+      posture as the Making door". Logged in the review file's cross-door
+      table; each becomes a `SkLink` when its door lands.
 - [ ] **Fourteen and over.** Reads the top band. The brief says a fourth
       band "is easy to add later". When?
 - [ ] **The brief's own example line contains a number** ("You practised

@@ -89,6 +89,9 @@ class _SkParentGateScreenState extends State<SkParentGateScreen> {
       _parent.text.trim().isNotEmpty && _dob != null && _consent && !_busy;
 
   Future<void> _pickDob() async {
+    // The keyboard from the name field stayed up under the picker on a
+    // phone (2026-09-14) and ate the next tap. Drop focus first.
+    FocusScope.of(context).unfocus();
     final now = DateTime.now();
     final picked = await showDatePicker(
       context: context,

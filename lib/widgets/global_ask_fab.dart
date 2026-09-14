@@ -124,11 +124,19 @@ class FabRouteObserver extends NavigatorObserver {
     final inParenting = _stack.any((r) => r.settings.name == kParentingRootRoute);
     final inTtc = _stack.any((r) => r.settings.name == kTtcRootRoute);
     final top = _stack.isEmpty ? null : _stack.last;
+    final name = top?.settings.name ?? '';
     final suppressed = top != null &&
         (top is PopupRoute || // modal sheets, dialogs, menus
-            top.settings.name == kPremiereRoute ||
-            top.settings.name == kAskVedaRoute ||
-            top.settings.name == kCallRoute);
+            name == kPremiereRoute ||
+            name == kAskVedaRoute ||
+            name == kCallRoute ||
+            // The skilling stage: every route there is either a CHILD screen,
+            // where an adult surface (and a network call) must not be one tap
+            // away, or a parent screen behind a gate the FAB would bypass.
+            // Seen on a phone, 2026-09-14: the button sat over the consent
+            // list, the keepsake's end line and the locked panel.
+            name.startsWith('sk_') ||
+            name.startsWith('sk/'));
     FabState.instance
         ._update(inParenting: inParenting, inTtc: inTtc, suppressed: suppressed);
   }

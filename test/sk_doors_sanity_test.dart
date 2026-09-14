@@ -193,19 +193,27 @@ void main() {
         .where((l) => !l.trimLeft().startsWith('//'))
         .join('\n');
 
+    /// A sentence that denies a score is the one permitted use of the
+    /// vocabulary, in code and in copy alike.
+    final denial = RegExp(
+        r'\b(no|never|not a|nothing)\b[^.]{0,40}\b(score|scores|ranking|rank|points|streak|streaks|percentage|grade|badges?)\b|ranks no one',
+        caseSensitive: false);
+
     test('no scoring identifier anywhere in the skilling tree', () {
       final banned = RegExp(
           r'\b(score|scores|scoring|streak|streaks|leaderboard|percent|percentage|points|ranking|ranked|grade|graded|xp|badge|badges)\b',
           caseSensitive: false);
-      final denial = RegExp(
-          r'\b(no|never|not a|nothing)\b[^.]{0,40}\b(score|scores|ranking|rank|points|streak|streaks|percentage|grade|badges?)\b|ranks no one',
-          caseSensitive: false);
       final hits = <String>[];
       // The design preview is excluded: its copy is ABOUT the ban ("Nothing
       // measured. Nothing ranked.") and it predates the doors.
+      // The activity data files hold the task PDFs' copy verbatim, and one
+      // task-supplied project (Make a Quiz Game) builds a game that keeps
+      // its PLAYERS' points — allowed by the task in so many words. Those
+      // files are checked by the next test, against the copy and an
+      // allow-list, rather than by this source scan.
       final files = [
         ...dartFiles('lib/screens/skilling').where((f) => !f.path.endsWith('skilling_preview_screen.dart')),
-        ...dartFiles('lib/data/skilling'),
+        ...dartFiles('lib/data/skilling').where((f) => !f.path.endsWith('_activities.dart')),
         ...dartFiles('lib/data/doors').where((f) => f.path.contains('sk_door')),
       ];
       expect(files, isNotEmpty);
@@ -218,6 +226,30 @@ void main() {
         }
       }
       expect(hits, isEmpty, reason: 'scoring vocabulary in code:\n${hits.join('\n')}');
+    });
+
+    /// Activities whose copy may mention a score, because the CHILD builds
+    /// a game that keeps its players' points. Named, so a second one is a
+    /// decision and not a drift.
+    const scoreAllowed = {'cd_1114_10'};
+
+    test('no activity copy scores the child; the allow-list names the games she builds', () {
+      final word = RegExp(r'\b(score|scores|scoring|points?|streak|leaderboard|percent|percentage|rank|ranking|grade|graded|badge|badges)\b',
+          caseSensitive: false);
+      final hits = <String>[];
+      for (final c in kSkDoorContents) {
+        for (final a in c.activities) {
+          if (scoreAllowed.contains(a.id)) continue;
+          // A sentence that DENIES a score ("never a public gallery with
+          // likes or ranking") is the one permitted use, as in the source
+          // scan above; it is removed before the check.
+          final copy = [a.title, a.oneLine, a.materials, ...a.steps, a.theThinking, a.whatYouPractised]
+              .join(' ')
+              .replaceAll(denial, '');
+          if (word.hasMatch(copy)) hits.add('${c.doorId}/${a.id}');
+        }
+      }
+      expect(hits, isEmpty, reason: 'scoring vocabulary in activity copy:\n${hits.join('\n')}');
     });
 
     test('the keepsake store returns words and bools, never a number', () {

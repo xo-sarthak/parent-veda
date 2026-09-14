@@ -95,9 +95,24 @@ class SkActivityScreen extends StatelessWidget {
                       height: 1.5,
                       color: p.ink1)),
             ],
-            if (a.tool != null) ...[
+            if (a.tool != null || a.withGrownUp || a.multiSession) ...[
               const SizedBox(height: 12),
-              _Chip(label: a.tool!, icon: Icons.computer_outlined, p: p),
+              Wrap(spacing: 6, runSpacing: 6, children: [
+                if (a.tool != null)
+                  _Chip(label: a.tool!, icon: Icons.computer_outlined, p: p),
+                // The 11 to 14 task: AI-literacy projects are marked "with a
+                // grown-up"; projects that span sittings say so.
+                if (a.withGrownUp)
+                  _Chip(
+                      label: 'With a grown-up',
+                      icon: Icons.family_restroom_outlined,
+                      p: p),
+                if (a.multiSession)
+                  _Chip(
+                      label: 'More than one sitting',
+                      icon: Icons.event_repeat_outlined,
+                      p: p),
+              ]),
             ],
             const SizedBox(height: 24),
 
@@ -215,26 +230,37 @@ class _Chip extends StatelessWidget {
   final String label;
   final IconData icon;
   final V2Palette p;
+  // ⚠️ A CHIP THAT WRAPS. The tool line the tasks write can be long
+  // ("Scratch, or ScratchJr (parent loads the broken script from setup)"),
+  // and a one-line Row overflowed by 37px on a phone (2026-09-14). The icon
+  // rides inside the text as a span, so the pill wraps as one paragraph
+  // instead of clipping.
   @override
-  Widget build(BuildContext context) => Row(mainAxisSize: MainAxisSize.min, children: [
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-          decoration: BoxDecoration(
-            color: p.surfaceAlt,
-            borderRadius: BorderRadius.circular(999),
-          ),
-          child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Icon(icon, size: 13, color: p.ink2),
-            const SizedBox(width: 5),
-            Text(label,
-                style: pvManrope(
-                    fontSize: 11.5,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.4,
-                    color: p.ink2)),
-          ]),
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(
+          color: p.surfaceAlt,
+          borderRadius: BorderRadius.circular(16),
         ),
-      ]);
+        child: Text.rich(
+          TextSpan(children: [
+            WidgetSpan(
+              alignment: PlaceholderAlignment.middle,
+              child: Padding(
+                padding: const EdgeInsets.only(right: 5),
+                child: Icon(icon, size: 13, color: p.ink2),
+              ),
+            ),
+            TextSpan(text: label),
+          ]),
+          style: pvManrope(
+              fontSize: 11.5,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 0.4,
+              height: 1.4,
+              color: p.ink2),
+        ),
+      );
 }
 
 /// One of the three. Full width, the child tap height, a word and a mark.

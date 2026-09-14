@@ -25,6 +25,7 @@ final SkDoorContent kSkCodingContent = SkDoorContent(
   products: kSkCodingProducts,
   parentNote: kSkCodingParentNote,
   crossBandSetId: 'ai',
+  access: kSkCodingAccess,
 );
 
 /// Every door with content. Adding a door is a line here and a line in

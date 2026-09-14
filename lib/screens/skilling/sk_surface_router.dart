@@ -24,6 +24,7 @@
 //    sk_lessons/<door>                the door on Lessons
 //    sk_cross/<door>                  the door on the cross-band tab
 //    sk_keepsake/<door>               What I've made and tried
+//    sk_access/<door>                 the free tools to set up (gated)
 //    sk_grown_up/<door>               the parent side (gated)
 //    sk_courses/<door>                the parent side, on the course shelf
 //    sk_products/<door>               the parent side, on the product shelf
@@ -37,6 +38,7 @@ import 'package:flutter/material.dart';
 import '../../data/doors/sk_door_data.dart';
 import '../../services/bracket_resolver.dart';
 import 'doors/sk_door_screen.dart';
+import 'sk_access_screen.dart';
 import 'sk_activity_screen.dart';
 import 'sk_child_store.dart';
 import 'sk_content_registry.dart';
@@ -79,6 +81,9 @@ Widget? skScreenForSurface(String id) {
       if (door == null || skDoorContentFor(door) == null) return null;
       return SkKeepsakeScreen(
           doorId: door, doorTitle: bracketById(door)?.title.now ?? '');
+    case 'sk_access':
+      if (door == null || skDoorContentFor(door) == null) return null;
+      return SkAccessScreen(doorId: door);
     case 'sk_grown_up':
       if (door == null || skDoorContentFor(door) == null) return null;
       return SkGrownUpScreen(doorId: door);

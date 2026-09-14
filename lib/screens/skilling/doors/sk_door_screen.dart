@@ -213,6 +213,12 @@ class _SkDoorScreenState extends State<SkDoorScreen> {
           ),
         ];
       case SkTabKind.activities:
+        // ⚠️ THE ACCESS RAIL LEADS, WHEN THE BAND HAS ONE. The 8 to 11
+        // task's "build once, parent-gated": a Grown-ups card first on the
+        // first rail, opening the free-tools screen behind the gate. The
+        // Unplugged band has no tools and gets no card.
+        final access = content.accessFor(band.id);
+        var first = true;
         return [
           for (final s in content.skills)
             if (content.activitiesForSkill(band.id, s.id).isNotEmpty)
@@ -220,6 +226,15 @@ class _SkDoorScreenState extends State<SkDoorScreen> {
                 title: s.label,
                 line: s.kidLine,
                 cards: [
+                  if (access.isNotEmpty && first && !(first = false))
+                    _CardSpec(
+                      title: 'Free tools to set up',
+                      meta: 'FOR THE GROWN-UP',
+                      chip: 'Grown-ups',
+                      icon: Icons.lock_outline_rounded,
+                      onTap: () =>
+                          widget.onSurface(context, 'sk_access/${content.doorId}'),
+                    ),
                   for (final a in content.activitiesForSkill(band.id, s.id))
                     _activityCard(a),
                 ],

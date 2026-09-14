@@ -259,6 +259,7 @@ class SkActivity {
     this.whatYouPractised = '',
     this.tool,
     this.multiSession = false,
+    this.withGrownUp = false,
     this.comingSoon = false,
   });
 
@@ -296,6 +297,12 @@ class SkActivity {
   /// content only; no resume marker is kept about the child. See the
   /// review file for that open call.
   final bool multiSession;
+
+  /// The 11 to 14 task's rule: "AI-literacy projects are marked 'with a
+  /// grown-up'". A chip on the card and the screen. Added at the fill
+  /// (2026-09-14) — the tool string carried the words, but a mark derived
+  /// from prose is a mark that vanishes when the prose is edited.
+  final bool withGrownUp;
 
   /// The scaffold state: a real card at full size, "Coming soon", no tap.
   final bool comingSoon;
