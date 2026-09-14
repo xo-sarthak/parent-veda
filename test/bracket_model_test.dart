@@ -9,6 +9,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/data/brackets/parenting_brackets.dart';
 import 'package:parentveda/data/brackets/pregnancy_brackets.dart';
 import 'package:parentveda/data/brackets/skilling_brackets.dart';
+import 'package:parentveda/data/doors/sk_door_data.dart';
+import 'package:parentveda/screens/skilling/sk_surface_router.dart';
 import 'package:parentveda/data/brackets/ttc_brackets.dart';
 import 'package:parentveda/screens/v2/v3_skill_art.dart';
 import 'package:parentveda/models/bracket.dart';
@@ -306,6 +308,30 @@ void main() {
     // it gets replaced with the per-surface router assertion the other three
     // stages have. Deleting it would remove the only thing standing between a
     // spreadsheet and a promise.
+    //
+    // ⚠️ REPLACED, NOT DELETED — 2026-09-14. Coding is the first skilling
+    // bracket with live cells, so this is now the per-surface router
+    // assertion the other three stages have: every live skilling cell is
+    // `sk_`-prefixed and `sk_surface_router.dart` opens it. A bracket with
+    // no door still may not claim a live layer.
+    test('every live skilling layer resolves through the skilling router', () {
+      for (final b in kSkillingBrackets) {
+        if (skDoorFor(b.id) == null) {
+          expect(b.liveLayers, isEmpty,
+              reason: '${b.id} claims a live layer, but has no door — '
+                  'name the file first, then flip the state');
+          continue;
+        }
+        expect(b.liveLayers, isNotEmpty, reason: '${b.id} has a door and no live cell');
+        for (final id in liveSurfaceIds(b)) {
+          expect(id.startsWith('sk_'), isTrue,
+              reason: '${b.id} points at "$id" — skilling ids are sk_-prefixed');
+          expect(skScreenForSurface(id), isNotNull,
+              reason: '${b.id} points at "$id", which opens nothing');
+        }
+      }
+    });
+    /* kept for revert — the gate as it stood before the first door
     test('no skilling layer claims to be live', () {
       for (final b in kSkillingBrackets) {
         expect(b.liveLayers, isEmpty,
@@ -313,6 +339,7 @@ void main() {
                 'skilling — name the file first, then flip the state');
       }
     });
+    */
 
     test('twelve skilling brackets, eighty-four cells', () {
       expect(kSkillingBrackets.length, 12);
@@ -329,10 +356,10 @@ void main() {
     // Every skilling cell is `notReady` — real, named, not built. NOT
     // `notApplicable`: the workbook refuses nothing in this stage, and marking
     // an unbuilt thing as permanently refused would quietly delete a plan.
-    test('every skilling cell is notReady, never refused', () {
+    test('every skilling cell is live or notReady, never refused', () {
       for (final b in kSkillingBrackets) {
         for (final l in BracketLayer.values) {
-          expect(b.layer(l).state, LayerState.notReady,
+          expect(b.layer(l).state, isIn([LayerState.live, LayerState.notReady]),
               reason: '${b.id} → ${l.name}');
         }
       }

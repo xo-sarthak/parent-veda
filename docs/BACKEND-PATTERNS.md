@@ -1467,6 +1467,48 @@ filter that is right for one audience and wrong for another:
   nothing to settle, so nothing is recorded, deliberately rather than by
   accident.
 
+## 16a. A record that never gets a table — the skilling child
+
+From the first skilling door (2026-09-14, `lib/screens/skilling/sk_child_store.dart`).
+The shortest section in this file, and the one most likely to be undone by
+someone being helpful.
+
+Every store in this app follows one shape: local-first, then a cloud row
+through `SupabaseRepo`, then a merge. The skilling child — a name and a
+date of birth so the door can speak to her and scope to her band — is
+deliberately **not** that shape. It is `shared_preferences` only. No table,
+no RLS policy, no sync, no `child_id` on any row anywhere.
+
+Two reasons, and they are different kinds of reason:
+
+1. **The law the brief cites.** India's rules on children's data need
+   verified parental consent before a child's data is touched and forbid
+   profiling and behavioural tracking of a child. A row in Postgres is a
+   record a query can join; a record on one phone cannot be profiled by us
+   because we never hold it. The cheapest way to be unable to misuse data
+   is not to have it — the same argument §10c makes for a narrow return
+   type, taken to its end.
+2. **The shape of the product.** Nothing on the skilling side needs the
+   child's record on a second device. The keepsake (`sk_practice_store.dart`)
+   holds three verbs per activity and nothing that adds up; the only reader
+   is the phone it was written on.
+
+What this costs, stated so it is a decision and not an oversight: a parent
+who changes phones re-consents and the keepsake starts empty. That is the
+correct behaviour for consented data — withdrawal is a tap
+(`SkChildStore.forget`), and a new phone is a fresh consent — but it is a
+cost, and the day someone asks for "her keepsake on both parents' phones",
+the answer is a table with `my_child_ids`-style RLS (§4) **and** a consent
+record beside it, not a quiet `SupabaseRepo.insert`.
+
+The companion seam is `sk_consent_verifier.dart`: the verification adapter
+(DigiLocker or equivalent) is an interface with a stub that passes and says
+so on screen. The general fact: an interface with one stub costs nothing
+and makes the real adapter a one-file change that touches no screen. What
+it must never become is a boolean — `SkVerification.stub` and `.verified`
+are separate states precisely so a walk-through can never be mistaken for a
+lawful consent.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.

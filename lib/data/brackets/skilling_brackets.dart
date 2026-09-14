@@ -9,6 +9,15 @@
 //  ⚠️ NOT ONE CELL IS LIVE, AND THAT IS THE POINT OF THE FILE
 //  ---------------------------------------------------------------------------
 //
+//  ⚠️ NO LONGER TRUE OF ONE ROW — `skilling_coding` has five live cells since
+//  2026-09-14, each pointing at a named file through `sk_surface_router.dart`
+//  (see the row). Everything below still describes the other eleven, and the
+//  gate it names — "nothing may be promoted without a named file" — is the
+//  gate Coding passed. The two conflicts further down are RESOLVED by the
+//  Coding v2 brief: the stage speaks to the child (behind a parent gate),
+//  and nothing scores a child; the text is kept as the record of why they
+//  were flagged.
+//
 //  Eighty-four cells, zero resolvers. The other three stages had years of
 //  content sitting behind their doors before the doors existed — TTC's grid
 //  mostly WIRED screens that already shipped. Skilling has nothing at all: no
@@ -264,6 +273,48 @@ final List<Bracket> kSkillingBrackets = [
             'promising nothing about anyone\'s future.',
         hi: 'पहले बिना कंप्यूटर, फिर blocks, फिर असली projects — उम्र के हिसाब '
             'से, और किसी के भविष्य का कोई वादा किए बिना।'),
+    // ⚠️ THE FIRST LIVE CELLS IN THE STAGE — 2026-09-14, to
+    // `ParentVeda_Coding_structure_v2.pdf`. Five layers promoted to their
+    // named files; `extras` and `consult` stay `notReady` as the brief
+    // says ("Leave extras and consult as notReady"). The workbook text is
+    // KEPT on the live cells (a longhand spec rather than `.live()`), so
+    // the plan sheet the other eleven tiles show would still render this
+    // row if it ever needed to, and so the reason a cell is live is read
+    // beside the surface it opens. Every surface resolves through
+    // `sk_surface_router.dart`; `test/sk_doors_sanity_test.dart` holds it.
+    layers: {
+      BracketLayer.content: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Unplugged -> block-based -> projects, age-banded',
+        surfaceIds: ['sk_lessons/skilling_coding', 'sk_cross/skilling_coding'],
+      ),
+      BracketLayer.activities: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Project practice',
+        surfaceIds: ['sk_today/skilling_coding', 'sk_activities/skilling_coding'],
+      ),
+      BracketLayer.tools: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Project / rubric tracker (honest, no outcome promises)',
+        surfaceIds: ['sk_keepsake/skilling_coding'],
+      ),
+      BracketLayer.products: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Optional',
+        surfaceIds: ['sk_products/skilling_coding'],
+      ),
+      BracketLayer.course: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Leveled program (paid) - WhiteHat Jr caution',
+        surfaceIds: ['sk_courses/skilling_coding'],
+      ),
+      BracketLayer.consult: const BracketLayerSpec(
+          state: LayerState.notReady, reason: 'Rare'),
+      BracketLayer.extras: const BracketLayerSpec(
+          state: LayerState.notReady,
+          reason: 'Challenges, certificates, progress report'),
+    },
+    /* kept for revert — the row as declared before the door
     layers: _skillLayers(
       content: 'Unplugged -> block-based -> projects, age-banded',
       activities: 'Project practice',
@@ -273,6 +324,7 @@ final List<Bracket> kSkillingBrackets = [
       consult: 'Rare',
       extras: 'Challenges, certificates, progress report',
     ),
+    */
   ),
 
   Bracket(

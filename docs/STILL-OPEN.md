@@ -6769,3 +6769,64 @@ recipe library; the two First 40 Days tools). A new gate,
 every surface resolves, every link lands, every coming-soon card is owed,
 every window page carries no copy. The status table at the top of the
 review file is the one place to see where each tile stands.
+
+---
+
+## 55.0 Coding, the first skilling door, and the skilling shell — 2026-09-14
+
+Appended at the end because this file is shared with the pregnancy and
+parenting terminals. Built to `ParentVeda_Coding_structure_v2.pdf` (11 Sep
+2026) in the skilling terminal. The door is `lib/data/doors/sk_door_coding.dart`
+over `lib/data/skilling/skilling_coding_*.dart`; the shell is
+`lib/screens/skilling/` (see `docs/SKILLING-DOOR-BUILD.md` — the pattern doc,
+the decided rules, and every point GENERIC to skill doors, which this file
+does not repeat); the contract is `test/sk_coding_door_test.dart`; the
+cross-door gate is `test/sk_doors_sanity_test.dart`; content owed is
+`docs/DOOR-CONTENT-OWED.md` S1–S8; the review list is
+`docs/SKILLING-DOORS-REVIEW.md`.
+
+### 55.1 What changed
+
+* **A fourth door engine**, copied from parenting's the way parenting's was
+  copied from pregnancy's, importing neither: `sk_door_data.dart`,
+  `sk_door_screen / carousel / chrome`, a block model + one renderer
+  (`sk_content.dart`), `SkDoorContent` with named slots, a router.
+* **The brief's five child surfaces are the five tabs**, in the brief's
+  order, on the user's call; the four parent surfaces are one screen
+  behind the grown-up gate, reached from the closing card. Consult is held,
+  so no Consult card.
+* **The Coding bracket's five cells are live** — the first in the stage —
+  longhand, workbook text kept, extras and consult `notReady`.
+  `bracket_model_test.dart`'s "no skilling layer is live" became the
+  router assertion its own comment said it would.
+* **The preview**: the Coding tile opens the door in a debug build (plan
+  sheet otherwise and for the other eleven); the banner says so; the two
+  "open questions" cards now state the answers (old wording kept for
+  revert); the compass lights a point by practice.
+* **36 activity slots, 12 lessons, 6 AI cards, 6 courses, 9 products, the
+  parent note** — all placeholders, all coming soon, all in the ledger.
+  Not one word of activity, lesson, course or product copy is authored.
+
+### 55.2 The user's calls, in one place
+
+1a the door is `kDebugMode`, the preview ships · 2a+ own child store,
+pre-filled from the parenting child at 6 or over · 3a under six: child
+tabs locked, grown-up open · 4 the brief literally · 5a+c sum in words, or
+a PIN if set · 6 skilling's own product shelf · 7a enrol is a stub sheet.
+
+### 55.3 Needs a decision (door-specific)
+
+* **The hero photo** (bricks, no face). Swap or keep — review file.
+* **The three button labels** on an activity and the six rail headings
+  ("Putting steps in order"…) are mine, in the brief's words for the child.
+* **Whether the parent note draws the keepsake** or stays authored-only.
+* **The regrouping suggestions** (A, B, C in the review file) — after the
+  walk, not before.
+
+### 55.4 Owed
+
+Rows S1–S8 in `docs/DOOR-CONTENT-OWED.md`. The three Coding task PDFs exist
+and are the next pass; two of them name fields the shell does not have
+(the 8–11 access rail; the 11–14 resume marker) — both are generic to the
+doors and are listed in `SKILLING-DOOR-BUILD.md` §9, not here. Not walked
+on a phone yet.

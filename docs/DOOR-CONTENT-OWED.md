@@ -178,6 +178,7 @@ two.
 | You, Maa (parenting) | 6 | 2 | – | 3 | – |
 | What to buy (parenting) | 10 | 8 | – | 2 | – (call 2: shelves owned as they are) |
 | Traditions (parenting) | 10 | 8 | – | 2 | – (two sensitive pages, tone to sign off) |
+| Coding (skilling) | 8 | 7 (69 slots: 36 activities, 12 lessons, 6 AI cards, 6 courses, 9 products, 1 note) | – | 1 (the consent adapter) | 2 generic (access rail, resume marker — `SKILLING-DOOR-BUILD.md` §9) |
 
 Pregnancy, six doors: written pieces owed, in prose — **S1, L3, L4, L5, L6,
 M1**, six reads. Films — **N1, L1, L2, M4 ×3, M6 ×5**, eleven. Audio — **M5
@@ -348,3 +349,38 @@ one drawn illustration, and seventeen films none of which is shot.
 | TR8 | `mother_kept_apart` — When the mother is kept apart | Article | Coming soon | The most sensitive (call 1): jaapa seclusion and the not-to-be-touched custom. Us-not-shame; tone signed off by the user before it ships. |
 | TR9 | `newborn_customs` — the four visual customs | Illustration | Built from data | Drawn in code (`newbornCustoms`): the kajal dot on the sole, the bare cord, the frog-leg swaddle, the unbound head. Artwork can replace via `PpIllustration.asset`. |
 | TR10 | Seventeen films, 88 minutes | Film | Built from data | In the order worth shooting: kajal-honey-cord (watch with a grandmother), jhula, mundan, annaprashan, karnavedha, tahneek; the ceremony walk-throughs after. |
+
+---
+
+## Skilling
+
+Built in its own terminal, on its own shell (`lib/screens/skilling/doors/`,
+`lib/data/doors/sk_door_*.dart`, content in `lib/data/skilling/`). Every
+skill brief has two halves — a STRUCTURE PDF that says "placeholders only,
+do not author lesson, activity, course or product copy", and per-band TASK
+PDFs ("Task N of 36") that supply the real activities verbatim — so a
+skilling door's rows are of a kind the other stages do not have: **whole
+sets of slots that a named task PDF will fill.** A row here closes when the
+task is mapped in; the ids are the ids the fill takes over, so nothing on
+the rail moves. `test/sk_doors_sanity_test.dart` fails if a coming-soon slot
+on any skill door is not here.
+
+Rows carry an `S` prefix per door: S1… for Coding, then the next door's
+letters after it.
+
+### S. Coding & AI literacy — `lib/data/doors/sk_door_coding.dart`
+
+Built to `ParentVeda_Coding_structure_v2.pdf` (11 Sep 2026), the first
+skill door and the one that lays the shell. Every slot below is a real card
+at full size, "Coming soon", no tap.
+
+| # | Card | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| S1 | The Unplugged activity set, 6 to 8 — `cd_68_01` … `cd_68_12` (`cd_68_01`, `cd_68_02`, `cd_68_03`, `cd_68_04`, `cd_68_05`, `cd_68_06`, `cd_68_07`, `cd_68_08`, `cd_68_09`, `cd_68_10`, `cd_68_11`, `cd_68_12`) | Activity ×12 | Coming soon | **The fill exists:** `tasks/coding/ParentVeda Coding 6-8 activities prompt Coding Age Bracket 1.pdf`, twelve activities, two per thinking skill, mapped verbatim into `SkActivity` in the next pass. Slots are ordered sequencing ×2, pattern ×2, debugging ×2, decomposition ×2, logic ×2, persistence ×2 — the task's own order. |
+| S2 | The Blocks activity set, 8 to 11 — `cd_811_01` … `cd_811_12` (`cd_811_01`, `cd_811_02`, `cd_811_03`, `cd_811_04`, `cd_811_05`, `cd_811_06`, `cd_811_07`, `cd_811_08`, `cd_811_09`, `cd_811_10`, `cd_811_11`, `cd_811_12`) | Activity ×12 | Coming soon | **The fill exists:** `…Coding 8-11 activities prompt Coding Age Bracket 2.pdf`. It also asks for an **access rail** (the free tools — ScratchJr, Scratch offline, code.org / Blockly Games — parent-gated, built once) which the shell does not yet have a slot for; that is the STOP-and-list item for the fill pass. |
+| S3 | The Projects activity set, 11 to 14 — `cd_1114_01` … `cd_1114_12` (`cd_1114_01`, `cd_1114_02`, `cd_1114_03`, `cd_1114_04`, `cd_1114_05`, `cd_1114_06`, `cd_1114_07`, `cd_1114_08`, `cd_1114_09`, `cd_1114_10`, `cd_1114_11`, `cd_1114_12`) | Activity ×12 | Coming soon | **The fill exists:** `…Coding 11-14 activities prompt Coding Age Bracket 3.pdf`. Four are AI-literacy builds. It asks for a **multi-session resume marker**; `SkActivity.multiSession` is a content flag only — a per-child resume marker is child data and is a decision, not a field (see `docs/SKILLING-DOORS-REVIEW.md`). |
+| S4 | The lesson library — Unplugged `cd_unp_l1`–`cd_unp_l4`, Blocks `cd_blk_l1`–`cd_blk_l4`, Projects `cd_prj_l1`–`cd_prj_l4` (`cd_unp_l1`, `cd_unp_l2`, `cd_unp_l3`, `cd_unp_l4`, `cd_blk_l1`, `cd_blk_l2`, `cd_blk_l3`, `cd_blk_l4`, `cd_prj_l1`, `cd_prj_l2`, `cd_prj_l3`, `cd_prj_l4`) and the AI set `cd_ai_68_1`, `cd_ai_68_2`, `cd_ai_811_1`, `cd_ai_811_2`, `cd_ai_1114_1`, `cd_ai_1114_2` | Lesson ×12, Article ×6 | Coming soon | No task PDF yet. The structure brief: "the actual lessons … the AI cards … are job two, the writing and sourcing, done band by band." Four per set and two AI cards per band are the scaffold's shape, not a count the brief gave. |
+| S5 | The course shelf — `cd_course_68_live`, `cd_course_68_rec`, `cd_course_811_live`, `cd_course_811_rec`, `cd_course_1114_live`, `cd_course_1114_rec` | Course ×6 | Coming soon | Real programmes, one live and one recorded per level. Placeholder prices (₹2,999 / $36 live; ₹999 / $12 recorded) are display only; money is server-side. Enrol is a stub sheet until the booking engine is wired (the user's call, question 7). Every entry carries `noOutcomeClaims`. |
+| S6 | The product shelf — `cd_prod_68_kit`, `cd_prod_68_robot`, `cd_prod_68_book`, `cd_prod_811_kit`, `cd_prod_811_robot`, `cd_prod_811_book`, `cd_prod_1114_kit`, `cd_prod_1114_robot`, `cd_prod_1114_book` | Product ×9 | Coming soon | Real, sourced kits, robotics sets and books per band. Skilling's own shelf (question 6); the product engines are to be unified in one later pass, and this list is that pass's input. |
+| S7 | `cd_parent_note` — For the grown-up: why it helps her thinking, and how to help | Parent note | Coming soon | The authored half of the note. The built half — "what she has been doing" — already draws from the keepsake in words. |
+| S8 | Consent verification | Adapter | Built from data | `SkConsentVerifier` is an interface with a stub that passes and says so. The real adapter (DigiLocker or equivalent) waits on legal review. Not a card; listed so it is worked through with the rest. |

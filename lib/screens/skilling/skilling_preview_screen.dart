@@ -20,6 +20,13 @@
 //    · The banner at the top says all of that in one line, on screen, where a
 //      reviewer sees it rather than where a developer reads it.
 //
+//  ⚠️ SINCE 2026-09-14, ONE DOOR IS REAL. The Coding tile opens `SkDoorScreen`
+//  (`lib/screens/skilling/doors/`) through `skOpenDoor`, in a debug build,
+//  after the parent gate; the other eleven keep the plan sheet, and every
+//  tile keeps it in release. The two "open questions" below are answered by
+//  the Coding v2 brief and the cards now say so. The compass lights a point
+//  by practice. Everything else in this header still holds.
+//
 //  ---------------------------------------------------------------------------
 //  ⚠️ WHY THE HERO CANNOT BE THE COMPASS YET
 //  ---------------------------------------------------------------------------
@@ -58,6 +65,8 @@ import '../v2/v2_block_grid.dart';
 import '../v2/v2_palette.dart';
 import '../v2/v3_hero_field.dart';
 import '../v2/v3_skill_art.dart';
+import 'sk_practice_store.dart';
+import 'sk_surface_router.dart';
 
 class SkillingPreviewScreen extends StatelessWidget {
   const SkillingPreviewScreen({super.key, this.lang = AppLanguage.english});
@@ -65,7 +74,17 @@ class SkillingPreviewScreen extends StatelessWidget {
   final AppLanguage lang;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => AnimatedBuilder(
+        // The compass lights a point when a skill has been practised, so the
+        // screen listens to the keepsake. See `_CompassCard`.
+        animation: SkPracticeStore.instance,
+        builder: (context, _) => _body(context),
+      );
+
+  Widget _body(BuildContext context) {
+    // Lazy, idempotent, fire-and-forget: the keepsake notifies once loaded
+    // and the compass redraws with its lit points.
+    SkPracticeStore.instance.load();
     final p = V2PaletteStore.instance.current;
     final brackets = bracketsFor(LifeStage.skilling);
     // The stage's own accent. Indigo rather than a borrowed stage colour: the
@@ -112,7 +131,14 @@ class SkillingPreviewScreen extends StatelessWidget {
                     // bracket slot would have meant one enum with 29 cases and
                     // a switch that no stage reads in full.
                     skillMark: skillMarkFor(b.id),
-                    onTap: () => _showPlan(context, b, p),
+                    // ⚠️ A BRACKET WITH A DOOR OPENS IT; the rest keep the
+                    // plan sheet. `skOpenDoor` is false in a release build
+                    // (the stage stays gated) and false for a bracket with
+                    // no `SkDoor`, and both fall through to the sheet — so
+                    // the tile never opens nothing.
+                    onTap: () {
+                      if (!skOpenDoor(context, b.id)) _showPlan(context, b, p);
+                    },
                   ),
               ],
             )),
@@ -127,6 +153,34 @@ class SkillingPreviewScreen extends StatelessWidget {
             _pad(_CompassCard(p: p, brackets: brackets, lang: lang)),
             const SizedBox(height: 32),
 
+            // ⚠️ THE TWO OPEN QUESTIONS ARE ANSWERED (Coding v2 brief,
+            // 2026-09-14) and the cards now say the answers. The question
+            // wording is kept below for revert.
+            _pad(_Head(
+                eyebrow: 'Decided',
+                title: 'Two things settled first',
+                p: p)),
+            const SizedBox(height: 12),
+            _pad(_QuestionCard(
+              p: p,
+              n: '1',
+              title: 'The learning screens talk to the child.',
+              body: 'The parent registers, verifies and consents; the child '
+                  'steps into a space that speaks to her, reads aloud and '
+                  'asks nothing of her data. Settings, courses and anything '
+                  'to do with money stay with the parent, behind a gate.',
+            )),
+            const SizedBox(height: 12),
+            _pad(_QuestionCard(
+              p: p,
+              n: '2',
+              title: 'Nothing here scores a child.',
+              body: 'No points, streaks, ranking badges, levels, percentages '
+                  'or graded certificates. The keepsake records tried, '
+                  'practised again and made, in words. Challenges become '
+                  'optional fun; the progress report is not built.',
+            )),
+            /* kept for revert — the questions as first asked
             _pad(_Head(
                 eyebrow: 'Open questions',
                 title: 'Two things to decide first',
@@ -153,6 +207,7 @@ class SkillingPreviewScreen extends StatelessWidget {
                   'the word "Practising", never a percentage. Both cannot be '
                   'true, and nothing is built either way yet.',
             )),
+            */
             const SizedBox(height: 32),
           ]),
         ]),
@@ -294,8 +349,8 @@ class _PreviewBanner extends StatelessWidget {
           const SizedBox(width: 9),
           Expanded(
             child: Text(
-                'Design preview. None of these doors opens anything yet — '
-                'tapping one shows what is planned behind it.',
+                'Design preview. Coding opens its door in a debug build; '
+                'the other eleven show what is planned behind them.',
                 style:
                     pvManrope(fontSize: 12.5, height: 1.45, color: p.ink2)),
           ),
@@ -373,6 +428,14 @@ class _CompassCard extends StatelessWidget {
               child: CustomPaint(
                 painter: _CompassPainter(
                   hues: [for (final b in brackets) b.hue],
+                  // ⚠️ LIT BY PRACTICE, NEVER BY ABILITY. The brief's
+                  // "compass as practice": a point lights when that skill
+                  // has been practised at all — a bool from the keepsake,
+                  // not a count, not a level.
+                  lit: [
+                    for (final b in brackets)
+                      SkPracticeStore.instance.hasPractised(b.id)
+                  ],
                   ring: p.line,
                   ink: p.ink3,
                 ),
@@ -387,17 +450,27 @@ class _CompassCard extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
               'Drawn empty on purpose. Filling these arcs by ability would be a '
-              'score, and this app does not score children. What it can honestly '
-              'show later is which skills have been practised — never how well.',
+              'score, and this app does not score children. A point lights when '
+              'that skill has been practised at all — never how well, never how '
+              'much.',
               style: pvManrope(fontSize: 13, height: 1.5, color: p.ink3)),
         ]),
       );
 }
 
 class _CompassPainter extends CustomPainter {
-  _CompassPainter({required this.hues, required this.ring, required this.ink});
+  _CompassPainter(
+      {required this.hues,
+      required this.ring,
+      required this.ink,
+      this.lit = const []});
 
   final List<double> hues;
+
+  /// Per point: practised at all. A lit point is drawn as a ring around
+  /// the dot — the same size dot, so twelve lit points look like twelve
+  /// unlit ones with rings, and nothing reads as bigger than anything.
+  final List<bool> lit;
   final Color ring;
   final Color ink;
 
@@ -422,18 +495,25 @@ class _CompassPainter extends CustomPainter {
       // rather than as scattered dots.
       canvas.drawLine(
           c + Offset(math.cos(ang), math.sin(ang)) * (r * 0.55), at, ringPaint);
-      canvas.drawCircle(
-          at,
-          6,
-          Paint()
-            ..color = HSLColor.fromAHSL(1, hues[i], 0.44, 0.62).toColor());
+      final colour = HSLColor.fromAHSL(1, hues[i], 0.44, 0.62).toColor();
+      canvas.drawCircle(at, 6, Paint()..color = colour);
+      if (i < lit.length && lit[i]) {
+        canvas.drawCircle(
+            at,
+            10,
+            Paint()
+              ..style = PaintingStyle.stroke
+              ..strokeWidth = 1.5
+              ..color = colour);
+      }
     }
     // The centre: one small dot, the child. Not a score, not a total.
     canvas.drawCircle(c, 4, Paint()..color = ink);
   }
 
   @override
-  bool shouldRepaint(_CompassPainter old) => old.hues != hues;
+  bool shouldRepaint(_CompassPainter old) =>
+      old.hues != hues || old.lit.join() != lit.join();
 }
 
 class _QuestionCard extends StatelessWidget {
