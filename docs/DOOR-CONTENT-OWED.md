@@ -177,6 +177,7 @@ two.
 | First 40 Days (parenting) | 11 | 3 | – | 4 | 1 (the day spine, FF10); FF1–FF2 closed into You |
 | You, Maa (parenting) | 6 | 2 | – | 3 | – |
 | What to buy (parenting) | 10 | 8 | – | 2 | – (call 2: shelves owned as they are) |
+| Traditions (parenting) | 10 | 8 | – | 2 | – (two sensitive pages, tone to sign off) |
 
 Pregnancy, six doors: written pieces owed, in prose — **S1, L3, L4, L5, L6,
 M1**, six reads. Films — **N1, L1, L2, M4 ×3, M6 ×5**, eleven. Audio — **M5
@@ -327,3 +328,23 @@ below are the placeholders; `test/pp_what_to_buy_test.dart` holds them.
 | WB8 | `season_born` — Buying for the season she is born in | Guide | Coming soon | Light: a summer baby vs a winter one. |
 | WB9 | Four expert films on the nine guides | Film | Built from data | The card says "still being filmed" honestly; this is sponsored inventory, so a stub is a paid slot over nothing. |
 | WB10 | Three "compare" links with no true shelf | Catalogue | Built from data | Nasal aspirators and cough-and-cold products land on First aid; malish oils on Lotions. Real shelves would make the links honest. |
+
+### P11. Traditions — `lib/data/doors/pp_door_traditions.dart`
+
+Built to `Traditions_Parenting.pdf`. "The build for this one is unusually
+finished, so most of the work below is the editorial." Eight placeholders,
+one drawn illustration, and seventeen films none of which is shot.
+`test/pp_traditions_door_test.dart` fails if a coming-soon page is not here.
+
+| # | Card | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| TR1 | `how_date_chosen` — How the date gets chosen, and what to do when it does not suit the baby | Article | Coming soon | The biggest gap: the panchang, the muhurat, the pandit, the birth-star, and the conversation when the date is wrong for the baby. |
+| TR2 | `how_name_chosen` — How Indian families choose the name | Article | Coming soon | Rashi and nakshatra letters, gotra, numerology, and a name that survives school. Strengthens Find a name. |
+| TR3 | `first_festivals` — The baby's first festivals, done safely | Cards | Coming soon | Its own small area (call 2). First Diwali, Holi, Eid, Christmas, Raksha Bandhan: diyas, cracker noise, colours on skin, fasting while nursing. |
+| TR4 | `skip_it` — If you would rather not do a ceremony at all | Short article | Coming soon | Sensitive (call 1). Yes, it is alright; how to hold that line kindly. The user reads it before it ships. |
+| TR5 | `someone_elses_ceremony` — Going to someone else's baby's ceremony | Cards | Coming soon | A light card: the gift, the shagun, what to wear, your own baby. |
+| TR6 | `twins_adopted_second` — Twins, an adopted baby, or the second child | Cards | Coming soon | "There is no rule and no debt." |
+| TR7 | `interfaith_far_from_home` — Interfaith families, and doing this far from home | Article | Coming soon | Two traditions in one house; no pandit, agiary or gurdwara nearby. |
+| TR8 | `mother_kept_apart` — When the mother is kept apart | Article | Coming soon | The most sensitive (call 1): jaapa seclusion and the not-to-be-touched custom. Us-not-shame; tone signed off by the user before it ships. |
+| TR9 | `newborn_customs` — the four visual customs | Illustration | Built from data | Drawn in code (`newbornCustoms`): the kajal dot on the sole, the bare cord, the frog-leg swaddle, the unbound head. Artwork can replace via `PpIllustration.asset`. |
+| TR10 | Seventeen films, 88 minutes | Film | Built from data | In the order worth shooting: kajal-honey-cord (watch with a grandmother), jhula, mundan, annaprashan, karnavedha, tahneek; the ceremony walk-throughs after. |

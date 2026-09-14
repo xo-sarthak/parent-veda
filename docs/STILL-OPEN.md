@@ -6719,3 +6719,53 @@ tile stays the two-door hub (guides / catalogue). The contract is
 * Eight placeholder guides (`ProductGuide.comingSoon`) hold rows on the hub
   under a Coming soon chip and do not open; the guide contract test skips
   them. WB1–WB8 in the ledger.
+
+---
+
+## 54.0 Traditions, the last parenting door — 2026-09-14
+
+Built to `Traditions_Parenting.pdf`. The door is
+`lib/data/doors/pp_door_traditions.dart`; the contract is
+`test/pp_traditions_door_test.dart`. Not walked on a phone (the phone's
+Wi-Fi dropped); the tests hold every tab and both ages.
+
+### 54.1 The calls
+
+* **Five tabs** from eight areas: Coming up now · Welcoming her home · The
+  first years · In every faith · Small, safe and honest. Only the first
+  changes with her age; nothing locks or drops on this door. No red flag,
+  no closing, both on the brief.
+* **Call 1, the two sensitive pages** (when the mother is kept apart; if you
+  would rather not do a ceremony at all): added as scaffolds, TR4 and TR8,
+  tone to be read by the user before either ships.
+* **Call 2, the first festivals:** its own small area, on the last tab.
+
+### 54.2 Single source and the picture
+
+* The newborn-gathering safety block and the blade rule keep their short
+  in-context lines word for word (the brief: "do not change any doctor
+  callout or safety line") and each of the ten pages that carried them
+  links to the one full block on "On the day: blades, piercing and heat",
+  which itself links to Health's go-now list.
+* "Keeping it small" already pointed at the cost chart; annaprashan's food
+  page already pointed at Feeding and the food surface. Verified, tested.
+* The newborn-customs page gained a drawn four-cell illustration
+  (`newbornCustoms`: kajal on the sole, the bare cord, the frog-leg swaddle,
+  the unbound head); the card text stays.
+* Eight placeholders TR1–TR8; the two the brief puts "at the top" sit on
+  the first tab after her stage's chart, with Find a name after the naming
+  read.
+
+### 54.3 The sanity pass across all eleven — 2026-09-14
+
+On the user's ask, each brief's target structure was re-read against the
+code. Every page, tool, reformat, merge and [NEW] scaffold a brief names is
+present or logged; the deliberate deviations are all lines in
+`docs/PARENTING-DOORS-REVIEW.md` (the shell over the briefs' library model;
+the tools left off two doors where their page already opens them; the
+Development day spine not built; the You recipes not yet tagged in the
+recipe library; the two First 40 Days tools). A new gate,
+`test/pp_doors_sanity_test.dart`, holds the wiring across all doors at once:
+every surface resolves, every link lands, every coming-soon card is owed,
+every window page carries no copy. The status table at the top of the
+review file is the one place to see where each tile stands.

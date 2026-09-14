@@ -114,6 +114,12 @@ final PpSection kPpTraditionsSection = PpSection(
       'What actually happens, what you really need, what it costs, and what you '
       'can happily skip.',
   bandSet: kPpTraditionsBands,
+  // ⚠️ THE AGE RULE, THE ONE FIX. The four chips came off and with them the
+  // "everything here is worth reading at any age" line they triggered. Six
+  // areas are for every age and show in full; "Which ceremony is coming up
+  // now?" is the one band-tagged area and opens the right chart for her
+  // age on its own.
+  autoScope: true,
   areas: [
     _whatsNow,
     _welcome,
@@ -122,6 +128,7 @@ final PpSection kPpTraditionsSection = PpSection(
     _otherFaiths,
     _keepItSmall,
     _notSafe,
+    _firstFestivals, // [NEW AREA], on the user's call (call 2)
   ],
   tools: [
     // ⚠️ BOTH OF THESE ARE LIVE AND REUSED, NOT REBUILT. `pp_names` is the
@@ -308,6 +315,25 @@ final PpArea _whatsNow = PpArea(
             blurb: 'Age-matched play, with the reason each one helps.'),
       ],
     ),
+    // ⚠️ [NEW], two scaffolds at the top, next to "what is coming up". "Half
+    // the section tells a parent to push back on a bad muhurat but never
+    // explains the muhurat." Copy supplied, not generated.
+    PpPage(
+      id: 'how_date_chosen',
+      title: 'How the date gets chosen, and what to do when it does not suit the baby',
+      subtitle: 'The panchang, the muhurat, the pandit, the birth-star',
+      format: 'ARTICLE',
+      comingSoon: true,
+      blocks: [],
+    ),
+    PpPage(
+      id: 'how_name_chosen',
+      title: 'How Indian families choose the name',
+      subtitle: 'Rashi and nakshatra letters, gotra, numerology, and a name that survives school',
+      format: 'ARTICLE',
+      comingSoon: true,
+      blocks: [],
+    ),
   ],
 );
 
@@ -448,6 +474,13 @@ final PpArea _welcome = PpArea(
         PpLink('Namkaran, if the name is being said tonight', pageId: 'namkaran'),
         PpLink('Customs done with love that are not safe',
             pageId: 'newborn_customs'),
+        // [single-source] The short line above stays word for word; the full
+        // newborn-gathering block lives once, on "On the day: blades,
+        // piercing and heat".
+        PpLink('The full newborn-in-a-crowd rule, once',
+            pageId: 'ceremony_day_safety',
+            blurb: 'Small group, washed hands, no kissing her face, and the '
+                'fever that means a doctor today.'),
       ],
     ),
 
@@ -604,6 +637,13 @@ final PpArea _welcome = PpArea(
             blurb: 'Silver spoon sets, outfits, thali sets. Compare before you '
                 'buy.'),
         PpLink('How to keep it small', pageId: 'keeping_it_small'),
+        // [single-source] The short line above stays word for word; the full
+        // newborn-gathering block lives once, on "On the day: blades,
+        // piercing and heat".
+        PpLink('The full newborn-in-a-crowd rule, once',
+            pageId: 'ceremony_day_safety',
+            blurb: 'Small group, washed hands, no kissing her face, and the '
+                'fever that means a doctor today.'),
       ],
     ),
 
@@ -849,6 +889,13 @@ final PpArea _welcome = PpArea(
             blurb: 'The schedule, what each one is for, and reminders.'),
         PpLink('Customs done with love that are not safe',
             pageId: 'newborn_customs'),
+        // [single-source] The short line above stays word for word; the full
+        // newborn-gathering block lives once, on "On the day: blades,
+        // piercing and heat".
+        PpLink('The full newborn-in-a-crowd rule, once',
+            pageId: 'ceremony_day_safety',
+            blurb: 'Small group, washed hands, no kissing her face, and the '
+                'fever that means a doctor today.'),
       ],
     ),
   ],
@@ -1275,6 +1322,12 @@ final PpArea _milestones = PpArea(
         PpLink('At the ceremony itself: blades, piercing and heat',
             pageId: 'ceremony_day_safety'),
         PpLink('If your family keeps kesh instead', pageId: 'sikh_naming'),
+        // [single-source] The fresh-sealed-blade rule lives once, on "On the
+        // day: blades, piercing and heat".
+        PpLink('The blade rule, once',
+            pageId: 'ceremony_day_safety',
+            blurb: 'One fresh sealed blade, opened in front of you, and '
+                'nothing on the shaved head.'),
       ],
     ),
 
@@ -1411,6 +1464,12 @@ final PpArea _milestones = PpArea(
         ),
         PpLink('At the ceremony itself: blades, piercing and heat',
             pageId: 'ceremony_day_safety'),
+        // [single-source] The fresh-sealed-blade rule lives once, on "On the
+        // day: blades, piercing and heat".
+        PpLink('The blade rule, once',
+            pageId: 'ceremony_day_safety',
+            blurb: 'One fresh sealed blade, opened in front of you, and '
+                'nothing on the shaved head.'),
       ],
     ),
 
@@ -1748,6 +1807,13 @@ final PpArea _otherFaiths = PpArea(
             blurb: 'Search by meaning, origin and sound.'),
         PpLink('Tahneek, the first sweet taste', pageId: 'tahneek'),
         PpLink('Make an announcement card', surfaceId: 'pp_memories'),
+        // [single-source] The short line above stays word for word; the full
+        // newborn-gathering block lives once, on "On the day: blades,
+        // piercing and heat".
+        PpLink('The full newborn-in-a-crowd rule, once',
+            pageId: 'ceremony_day_safety',
+            blurb: 'Small group, washed hands, no kissing her face, and the '
+                'fever that means a doctor today.'),
       ],
     ),
     PpPage(
@@ -1828,6 +1894,13 @@ final PpArea _otherFaiths = PpArea(
         PpLink('Aqiqah, and naming', pageId: 'aqiqah'),
         PpLink('Customs done with love that are not safe',
             pageId: 'newborn_customs'),
+        // [single-source] The short line above stays word for word; the full
+        // newborn-gathering block lives once, on "On the day: blades,
+        // piercing and heat".
+        PpLink('The full newborn-in-a-crowd rule, once',
+            pageId: 'ceremony_day_safety',
+            blurb: 'Small group, washed hands, no kissing her face, and the '
+                'fever that means a doctor today.'),
       ],
     ),
     PpPage(
@@ -1924,6 +1997,13 @@ final PpArea _otherFaiths = PpArea(
             surfaceId: 'pp_names'),
         PpLink('Make a christening invite', surfaceId: 'pp_memories'),
         PpLink('How to keep it small', pageId: 'keeping_it_small'),
+        // [single-source] The short line above stays word for word; the full
+        // newborn-gathering block lives once, on "On the day: blades,
+        // piercing and heat".
+        PpLink('The full newborn-in-a-crowd rule, once',
+            pageId: 'ceremony_day_safety',
+            blurb: 'Small group, washed hands, no kissing her face, and the '
+                'fever that means a doctor today.'),
       ],
     ),
     PpPage(
@@ -2027,6 +2107,13 @@ final PpArea _otherFaiths = PpArea(
             blurb: 'Filter by starting letter, which is exactly what this '
                 'ceremony needs.'),
         PpLink('Mundan, for families who do it', pageId: 'mundan'),
+        // [single-source] The short line above stays word for word; the full
+        // newborn-gathering block lives once, on "On the day: blades,
+        // piercing and heat".
+        PpLink('The full newborn-in-a-crowd rule, once',
+            pageId: 'ceremony_day_safety',
+            blurb: 'Small group, washed hands, no kissing her face, and the '
+                'fever that means a doctor today.'),
       ],
     ),
     PpPage(
@@ -2115,7 +2202,24 @@ final PpArea _otherFaiths = PpArea(
             surfaceId: 'pp_names'),
         PpLink('Customs done with love that are not safe',
             pageId: 'newborn_customs'),
+        // [single-source] The short line above stays word for word; the full
+        // newborn-gathering block lives once, on "On the day: blades,
+        // piercing and heat".
+        PpLink('The full newborn-in-a-crowd rule, once',
+            pageId: 'ceremony_day_safety',
+            blurb: 'Small group, washed hands, no kissing her face, and the '
+                'fever that means a doctor today.'),
       ],
+    ),
+    // ⚠️ [NEW], a scaffold. "The five-faith area assumes one tradition per
+    // household and a temple or church nearby."
+    PpPage(
+      id: 'interfaith_far_from_home',
+      title: 'Interfaith families, and doing this far from home',
+      subtitle: 'Two traditions in one house, or no pandit, agiary or gurdwara nearby',
+      format: 'ARTICLE',
+      comingSoon: true,
+      blocks: [],
     ),
   ],
 );
@@ -2410,6 +2514,33 @@ final PpArea _keepItSmall = PpArea(
             pageId: 'newborn_customs'),
       ],
     ),
+    // ⚠️ [NEW], three scaffolds. "If you would rather not do a ceremony at
+    // all" is the honest, sensitive one (call 1, the user's call: add it,
+    // read it before it ships). The other two are light cards.
+    PpPage(
+      id: 'skip_it',
+      title: 'If you would rather not do a ceremony at all',
+      subtitle: 'Yes, that is alright. And how to hold the line kindly',
+      format: 'SHORT ARTICLE',
+      comingSoon: true,
+      blocks: [],
+    ),
+    PpPage(
+      id: 'someone_elses_ceremony',
+      title: 'Going to someone else\'s baby\'s ceremony',
+      subtitle: 'What to gift, the shagun, what to wear, whether to bring your own baby',
+      format: 'CARDS',
+      comingSoon: true,
+      blocks: [],
+    ),
+    PpPage(
+      id: 'twins_adopted_second',
+      title: 'Twins, an adopted baby, or the second child',
+      subtitle: 'No rule, and no debt',
+      format: 'CARDS',
+      comingSoon: true,
+      blocks: [],
+    ),
   ],
 );
 
@@ -2446,6 +2577,19 @@ final PpArea _notSafe = PpArea(
             'a lot of it is genuinely good. A short list is not. These are the '
             'ones worth knowing about, said plainly, with no judgement of '
             'anyone who has been doing them.'),
+        // [reformat] "add a labelled picture to the visual ones, because these
+        // are 'do this, not that' that a photo settles faster than words."
+        // Drawn in code; artwork can replace via `PpIllustration.asset`.
+        PpIllustration(
+          kind: PpIllustrationKind.newbornCustoms,
+          title: 'The four you can see',
+          labels: [
+            PpIllustrationLabel('Kajal', 'Never in the eye. If the family insists on a dot, the sole of the foot or behind the ear, and a fresh stick.'),
+            PpIllustrationLabel('The cord', 'Bare and dry. Nothing on it, folded nappy below it, until it falls off on its own.'),
+            PpIllustrationLabel('The swaddle', 'Arms snug, hips and knees free to bend out, frog-leg. Never straight-legged and tight.'),
+            PpIllustrationLabel('Head shape', 'It rounds itself. No pressing, no binding, no shaping between pillows.'),
+          ],
+        ),
         PpArticle([
           'Every custom below is done out of love, usually by a grandmother '
           'who did the same for her own children and saw them grow up fine. '
@@ -2726,7 +2870,52 @@ final PpArea _notSafe = PpArea(
         PpLink('Mundan, in full', pageId: 'mundan'),
         PpLink('Karnavedha, ear piercing, in full', pageId: 'karnavedha'),
         PpLink('What to say, without a fight', pageId: 'family_pressure'),
+        // The fever line here is Health's go-now list's; one list, cross-linked.
+        PpLink('The signs that mean a doctor now, in full',
+            surfaceId: 'pp_page/parenting_health/health_go_now',
+            blurb: 'The canonical list, kept in Health.'),
       ],
+    ),
+    // ⚠️ [NEW], the sensitive one (call 1, the user's call): the mother
+    // treated as apart or "not to be touched" during the ceremonies meant
+    // to welcome her baby. Written gently, us-not-shame, and read by the
+    // user before it ships. A scaffold until then.
+    PpPage(
+      id: 'mother_kept_apart',
+      title: 'When the mother is kept apart',
+      subtitle: 'Jaapa seclusion, the puja and the kitchen, handled with care',
+      format: 'ARTICLE',
+      comingSoon: true,
+      blocks: [],
+    ),
+  ],
+);
+
+// =============================================================================
+//  [NEW AREA] The baby's first festivals — on the user's call (call 2)
+// -----------------------------------------------------------------------------
+//  "First Diwali, Holi, Eid, Christmas, Raksha Bandhan. Genuinely searched,
+//  genuinely useful, and squarely this section's mix of warmth and safety."
+//  Its own small area rather than a card under the not-safe customs, so
+//  festival safety is not undersold. A scaffold until the copy lands; the
+//  owed ledger lists it (P11) and the door test holds it there.
+// =============================================================================
+
+const PpArea _firstFestivals = PpArea(
+  id: 'first_festivals',
+  mark: IntentMark.moonMark,
+  title: 'Her first festivals, done safely',
+  blurb: 'Diyas and cracker noise, colours on baby skin, fasting while '
+      'nursing. The warmth, and the same-day safety.',
+  hue: 44,
+  pages: [
+    PpPage(
+      id: 'first_festivals',
+      title: 'The baby\'s first festivals, done safely',
+      subtitle: 'First Diwali, Holi, Eid, Christmas, Raksha Bandhan',
+      format: 'CARDS',
+      comingSoon: true,
+      blocks: [],
     ),
   ],
 );

@@ -284,6 +284,10 @@ Two additions from Development (2026-09-12): a tab may carry `toMonths`, and
 drops off the selector once her child is that old (the brief's "drops away
 after 2, on purpose"); and a tab with `tools` but no `areaIds` still draws
 one rail, headed with the tab's name (The leaps is one tool, the calendar).
+`test/pp_doors_sanity_test.dart` is the gate across every door at once: a
+new door's areas, surfaces, page links and coming-soon cards are checked
+there without writing a line, so write the door's own test for the brief's
+map and let this one hold the wiring.
 From Behaviour (2026-09-13): a tab whose areas all start after his age is on
 the selector LOCKED (misted, a lock, "From 1 year"; a panel instead of rails),
 after the open tabs; a tab he has grown past is gone. A tool can follow the

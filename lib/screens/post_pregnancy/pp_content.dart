@@ -694,6 +694,10 @@ enum PpIllustrationKind {
   /// mustard, tan, occasional green, and the pink stain. Parents are matching
   /// a nappy to a picture.
   poopColours,
+
+  /// Four newborn customs as "this, not that": where a kajal dot may go,
+  /// the bare dry cord, the frog-leg swaddle, a head left to round itself.
+  newbornCustoms,
 }
 
 /// `[ILLUSTRATION]` — one labelled picture.

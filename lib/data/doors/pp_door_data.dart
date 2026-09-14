@@ -42,6 +42,7 @@ import 'pp_door_first40.dart';
 import 'pp_door_health.dart';
 import 'pp_door_potty.dart';
 import 'pp_door_sleep.dart';
+import 'pp_door_traditions.dart';
 import 'pp_door_you_maa.dart';
 
 export 'pp_door_behaviour.dart';
@@ -52,6 +53,7 @@ export 'pp_door_first40.dart';
 export 'pp_door_health.dart';
 export 'pp_door_potty.dart';
 export 'pp_door_sleep.dart';
+export 'pp_door_traditions.dart';
 export 'pp_door_you_maa.dart';
 
 /// One parenting door: a shell over one section.
@@ -234,6 +236,7 @@ final List<PpDoor> kPpDoors = [
   kPpEarlyLearningDoor,
   kPpFirst40Door,
   kPpYouMaaDoor,
+  kPpTraditionsDoor,
 ];
 
 PpDoor? ppDoorFor(String sectionId) {

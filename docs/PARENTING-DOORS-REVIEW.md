@@ -11,6 +11,29 @@ tabs stay where a brief asked for six; the closing is a card; locked tabs
 rather than hidden ones; tools lead a rail unless a tool names the read it
 follows.
 
+## Where every tile stands — 2026-09-14, all eleven briefs built
+
+| Tile | Brief | Shape | Commit | Walked on a phone | Contract |
+|---|---|---|---|---|---|
+| Sleep | `ParentVeda_Sleep_rebuild.pdf` | door, 5 tabs | 99193bc | yes | `pp_sleep_door_test` |
+| Feeding | `ParentVeda_Feeding_rebuild.pdf` | door, 5 tabs | 67fde00 | yes | `pp_feeding_door_test` |
+| Health | `ParentVeda_Health_rebuild.pdf` | door, 6 tabs | e362ac1 | yes | `pp_health_door_test` |
+| Development | `Development_Parenting.pdf` (reissued) | door, 6 tabs | a3fc8c3 | yes | `pp_development_door_test` |
+| Behaviour | `Behaviour_Parenting.pdf` | door, 5 tabs | 6c594b7 | yes | `pp_behaviour_door_test` |
+| Potty training | `Potty_Parenting.pdf` | door, 5 tabs | a452b99 | yes | `pp_potty_door_test` |
+| Early learning | `Early_Learning_Parenting.pdf` | door, 5 tabs | ca2a206 | yes | `pp_early_learning_door_test` |
+| First 40 days | `First_40_Days_Prompt.pdf` | door, 5 tabs | 430a5c4 | yes | `pp_first40_door_test` |
+| You | `You_Parenting_Maa_rebuild.pdf` | door, 5 tabs | 43c389c | yes | `pp_you_maa_door_test` |
+| What to buy | `What_to_buy_parenting.pdf` | **the shop, on the brief** | 90e0e71 | installed, not walked | `pp_what_to_buy_test` |
+| Traditions | `Traditions_Parenting.pdf` | door, 5 tabs | (pending) | no — Wi-Fi dropped | `pp_traditions_door_test` |
+
+Across all of them: `test/pp_doors_sanity_test.dart` (2026-09-14) holds that
+every door's areas exist, every surface any page or door points at resolves,
+every in-section link lands, every coming-soon card is in the owed ledger, and
+every "opens elsewhere" page carries no copy. The sanity pass of the same day
+re-read each brief's target structure against the code; nothing named in a
+brief is missing, and every deliberate deviation is a line in this file.
+
 ## Sleep (§39)
 
 - [ ] The 3am story is drawn on the dark ground; the other stories are not.
@@ -110,6 +133,16 @@ follows.
       baby comes", "Nappies") on the guides hub. Fine, or fold under the
       existing three?
 
+## Traditions (§54)
+
+- [ ] TR4 and TR8, the two sensitive pages, are scaffolds: read the copy
+      before either ships (the brief's own ask).
+- [ ] Not walked on the phone yet (Wi-Fi dropped). Walk it once.
+- [ ] The Coming up now tab shows one chart for her stage plus two
+      placeholders; a parent cannot read ahead to the next stage's chart. The
+      brief wants exactly that ("opens the matching page"); say if a
+      "what comes after" link is wanted.
+
 ## Cross-section windows — where one door opens another's page
 
 Every place a card or link on one door opens a page that lives on another
@@ -144,7 +177,7 @@ safe-sleep drawing (First 40 Days), Feeding's latch film (First 40 Days).
 
 ## Every door
 
-- [ ] Copy for every coming-soon card: `DOOR-CONTENT-OWED.md` P1–P10.
+- [ ] Copy for every coming-soon card: `DOOR-CONTENT-OWED.md` P1–P11.
 - [ ] The films and audios in the same ledger; the 58 story recordings first.
 - [ ] The hub configs (`parenting_hubs.dart`) still describe the old two-door
       homes; the V3 tile bypasses them. Retire, or leave for the older home?

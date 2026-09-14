@@ -378,6 +378,8 @@ class PpIllustrationView extends StatelessWidget {
               _AllergyPainter(p: p, badges: block.labels.length),
             PpIllustrationKind.poopColours =>
               _PoopColoursPainter(p: p, badges: block.labels.length),
+            PpIllustrationKind.newbornCustoms =>
+              _NewbornCustomsPainter(p: p, badges: block.labels.length),
           },
         ),
       );
@@ -943,6 +945,59 @@ class _PoopColoursPainter extends _ScenePainter {
 
   @override
   bool shouldRepaint(_PoopColoursPainter old) => old.badges != badges;
+}
+
+/// Four cells, one custom each: a foot with a dot at the sole (kajal, not
+/// the eye), a bare cord stump above a folded nappy line, a swaddled baby
+/// with the legs bent out, a head with no binding. Numbered to the legend.
+class _NewbornCustomsPainter extends _ScenePainter {
+  _NewbornCustomsPainter({required super.p, required super.badges});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final w = size.width;
+    final h = size.height;
+    final cw = w / 2;
+    final ch = h / 2;
+    final dot = Paint()..color = p.ink1.withValues(alpha: 0.8);
+    for (var i = 0; i < 4; i++) {
+      final cell = Rect.fromLTWH((i % 2) * cw + 6, (i ~/ 2) * ch + 6, cw - 12, ch - 12);
+      canvas.drawRRect(RRect.fromRectAndRadius(cell, const Radius.circular(10)), Paint()..color = Colors.white);
+      canvas.drawRRect(RRect.fromRectAndRadius(cell, const Radius.circular(10)), ink);
+      final c = cell.center;
+      final u = cell.width / 12;
+      switch (i) {
+        case 0: // a foot, sole up, with the dot on the sole
+          canvas.drawOval(Rect.fromCenter(center: c, width: u * 4, height: u * 7), soft);
+          canvas.drawOval(Rect.fromCenter(center: c, width: u * 4, height: u * 7), ink);
+          canvas.drawCircle(Offset(c.dx, c.dy + u * 1.5), u * 0.45, dot);
+          tickAt(canvas, Offset(cell.right - 18, cell.bottom - 18), 7);
+        case 1: // the cord stump, bare, above a folded nappy line
+          canvas.drawOval(Rect.fromCenter(center: Offset(c.dx, c.dy - u), width: u * 7, height: u * 5), soft);
+          canvas.drawLine(Offset(c.dx, c.dy - u * 2.2), Offset(c.dx, c.dy - u * 0.4), ink..strokeWidth = 2);
+          canvas.drawCircle(Offset(c.dx, c.dy - u * 0.4), u * 0.5, dot);
+          canvas.drawLine(Offset(cell.left + 12, c.dy + u * 2.2), Offset(cell.right - 12, c.dy + u * 2.2), ink..strokeWidth = 1.5);
+          tickAt(canvas, Offset(cell.right - 18, cell.bottom - 18), 7);
+        case 2: // a swaddled baby, legs bent out
+          baby(canvas, Offset(c.dx, c.dy - u * 2.5), u * 1.3);
+          canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(c.dx, c.dy + u * 0.6), width: u * 4.5, height: u * 4), Radius.circular(u)), soft);
+          canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(c.dx, c.dy + u * 0.6), width: u * 4.5, height: u * 4), Radius.circular(u)), ink);
+          for (final sx in [-1.0, 1.0]) {
+            canvas.drawLine(Offset(c.dx + sx * u * 1.2, c.dy + u * 2.4), Offset(c.dx + sx * u * 3.2, c.dy + u * 3.6), ink..strokeWidth = 2);
+          }
+          tickAt(canvas, Offset(cell.right - 18, cell.bottom - 18), 7);
+        case 3: // a head, round, nothing on it; a crossed-out band beside it
+          canvas.drawCircle(Offset(c.dx - u, c.dy), u * 2.6, soft);
+          canvas.drawCircle(Offset(c.dx - u, c.dy), u * 2.6, ink);
+          canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromCenter(center: Offset(c.dx + u * 3, c.dy), width: u * 1.4, height: u * 5), Radius.circular(u * 0.4)), soft);
+          crossAt(canvas, Offset(c.dx + u * 3, c.dy), u * 1.2);
+      }
+      badge(canvas, i + 1, Offset(cell.left + 14, cell.top + 14));
+    }
+  }
+
+  @override
+  bool shouldRepaint(_NewbornCustomsPainter old) => old.badges != badges;
 }
 
 class _RashGridPainter extends _ScenePainter {
