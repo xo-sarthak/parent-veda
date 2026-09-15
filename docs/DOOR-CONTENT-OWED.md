@@ -179,6 +179,7 @@ two.
 | What to buy (parenting) | 10 | 8 | – | 2 | – (call 2: shelves owned as they are) |
 | Traditions (parenting) | 10 | 8 | – | 2 | – (two sensitive pages, tone to sign off) |
 | Coding (skilling) | 9 | 4 (33 slots: 12 lessons, 6 AI cards, 6 courses, 9 products, 1 note — the 36 activities are filled) | – | 2 (the consent adapter, the access rail) | 1 generic (resume marker — `SKILLING-DOOR-BUILD.md` §9) |
+| Communication (skilling) | 10 | 8 (65 slots: 36 activities, 27 lessons, 12 courses, 12 products, 2 notes) | – | 1 (the voice keepsake) | 1 (cloud copy of recordings, behind a real consent) |
 
 Pregnancy, six doors: written pieces owed, in prose — **S1, L3, L4, L5, L6,
 M1**, six reads. Films — **N1, L1, L2, M4 ×3, M6 ×5**, eleven. Audio — **M5
@@ -385,3 +386,22 @@ at full size, "Coming soon", no tap.
 | S7 | `cd_parent_note` — For the grown-up: why it helps her thinking, and how to help | Parent note | Coming soon | The authored half of the note. The built half — "what she has been doing" — already draws from the keepsake in words. |
 | S9 | The access rail — the free tools per band, `kSkCodingAccess` | Rail (gated) | Built from data | Task 2's "build once, parent-gated, reused by all 12", extended by task 3: ScratchJr, Scratch offline, code.org, Blockly Games (8–11); Scratch, Python turtle, Machine Learning for Kids, a supervised AI tool (11–14). Links open behind the grown-up gate. Owed: nothing — unless a tool's URL moves. |
 | S8 | Consent verification | Adapter | Built from data | `SkConsentVerifier` is an interface with a stub that passes and says so. The real adapter (DigiLocker or equivalent) waits on legal review. Not a card; listed so it is worked through with the rest. |
+
+### SC. Communication & articulation — `lib/data/doors/sk_door_communication.dart`
+
+Built to `ParentVeda_Communication_structure.pdf` (11 Sep 2026), door two,
+on 2026-09-15. Frame only, on the brief's own instruction ("new copy stays
+unwritten until you say go"). Rows carry `SC`.
+
+| # | Card | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| SC1 | Say it out loud, 6 to 8 — `cm_68_01` … `cm_68_12` (`cm_68_01`, `cm_68_02`, `cm_68_03`, `cm_68_04`, `cm_68_05`, `cm_68_06`, `cm_68_07`, `cm_68_08`, `cm_68_09`, `cm_68_10`, `cm_68_11`, `cm_68_12`) | Activity ×12 | Coming soon | **The fill exists:** `tasks/communication/ParentVeda Communication 6-8 activities prompt.pdf`. Two per skill in the door's skill order (clarity, listening, describing, storytelling, the right word, putting your point). |
+| SC2 | Tell it and explain it, 8 to 11 — `cm_811_01` … `cm_811_12` (`cm_811_01`, `cm_811_02`, `cm_811_03`, `cm_811_04`, `cm_811_05`, `cm_811_06`, `cm_811_07`, `cm_811_08`, `cm_811_09`, `cm_811_10`, `cm_811_11`, `cm_811_12`) | Activity ×12 | Coming soon | **The fill exists:** `…Communication 8-11 activities prompt.pdf`. |
+| SC3 | Say what you think, 11 to 14 — `cm_1114_01` … `cm_1114_12` (`cm_1114_01`, `cm_1114_02`, `cm_1114_03`, `cm_1114_04`, `cm_1114_05`, `cm_1114_06`, `cm_1114_07`, `cm_1114_08`, `cm_1114_09`, `cm_1114_10`, `cm_1114_11`, `cm_1114_12`) | Activity ×12 | Coming soon | No task PDF yet for this band. |
+| SC4 | The lesson library — speaking prompts, story frames, describe-it and explain-it; three per band per set (`cm_prm_68_1`, `cm_prm_68_2`, `cm_prm_68_3`, `cm_prm_811_1`, `cm_prm_811_2`, `cm_prm_811_3`, `cm_prm_1114_1`, `cm_prm_1114_2`, `cm_prm_1114_3`, `cm_stf_68_1`, `cm_stf_68_2`, `cm_stf_68_3`, `cm_stf_811_1`, `cm_stf_811_2`, `cm_stf_811_3`, `cm_stf_1114_1`, `cm_stf_1114_2`, `cm_stf_1114_3`, `cm_dex_68_1`, `cm_dex_68_2`, `cm_dex_68_3`, `cm_dex_811_1`, `cm_dex_811_2`, `cm_dex_811_3`, `cm_dex_1114_1`, `cm_dex_1114_2`, `cm_dex_1114_3`) | Lesson ×27 | Coming soon | No task PDF. The brief: "prompt, story and describe-or-explain sets per band, each tied to one of the six skills. Works in her own language and in English, mother tongue first." Three per band per set is the scaffold's count. |
+| SC5 | The course shelf — the brief's three per level plus "Speaking in English, too" (`cm_course_68_expression`, `cm_course_68_storytelling`, `cm_course_68_speaking_up`, `cm_course_68_english`, `cm_course_811_expression`, `cm_course_811_storytelling`, `cm_course_811_speaking_up`, `cm_course_811_english`, `cm_course_1114_expression`, `cm_course_1114_storytelling`, `cm_course_1114_speaking_up`, `cm_course_1114_english`) | Course ×12 | Coming soon | Real programmes. The English slot is the user's call (question 4, a): serves the demand, sells no fluency; every string under the no-outcome scan. Placeholder prices ₹2,999 / $36 live, ₹999 / $12 recorded. |
+| SC6 | The product shelf — a story deck, a picture book, a conversation game, a puppet per band (`cm_prod_68_deck`, `cm_prod_68_book`, `cm_prod_68_game`, `cm_prod_68_puppet`, `cm_prod_811_deck`, `cm_prod_811_book`, `cm_prod_811_game`, `cm_prod_811_puppet`, `cm_prod_1114_deck`, `cm_prod_1114_book`, `cm_prod_1114_game`, `cm_prod_1114_puppet`) | Product ×12 | Coming soon | Real, sourced items. Skilling's own shelf (question 5, a); the shop unification later takes this list. |
+| SC7 | `cm_parent_note` — For the grown-up: why saying what you mean is a real skill | Parent note | Coming soon | The authored half; the keepsake's words already draw. |
+| SC8 | `cm_boundary_note` — If speech itself is the worry | Parent note | Coming soon | The brief's held call: one honest line to a speech professional, never a course, never a "fix her speech" product. The card stands on the grown-up screen; the line is unwritten. |
+| SC9 | "Your voice, saved" — the recorder and the clips | Keepsake | Built from data | On this phone only (`sk_voice_keepsake.dart`). **Owed, for the day the consent adapter is real:** a cloud copy behind a separate consent line — child-scoped bucket, RLS, retention, a delete that deletes. `BACKEND-PATTERNS.md` §16a. |
+| SC10 | Cross-links to Confidence, Reading and Feelings | Windows | Owed | Those doors do not exist; the brief's "cross-link, do not duplicate" becomes `sk_page/<door>/<page>` windows when each lands. Review file, cross-door table. |

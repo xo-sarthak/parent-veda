@@ -164,7 +164,21 @@ class SkDoorContent {
     required this.parentNote,
     this.crossBandSetId,
     this.access = const [],
+    this.boundaryNote,
+    this.voiceKeepsake = false,
   });
+
+  /// One honest line out to a professional, on the parent side — the
+  /// Communication brief's "if speech itself is the worry (stammer, delay)".
+  /// Held as a single line, never a course and never a "fix her speech"
+  /// product; drawn as a card on the grown-up screen. Null for a door
+  /// without one.
+  final SkPage? boundaryNote;
+
+  /// The door records her voice: "Your voice, saved". The activity screen
+  /// shows a record row, and the keepsake screen lists the clips beside the
+  /// practised words. On this phone only — see `sk_voice_keepsake.dart`.
+  final bool voiceKeepsake;
 
   /// The bracket id — `skilling_coding`.
   final String doorId;
@@ -256,7 +270,7 @@ class SkDoorContent {
 
   /// Every page with an id — lessons and the note — for the router and
   /// the wiring tests.
-  List<SkPage> get allPages => [...lessons, parentNote];
+  List<SkPage> get allPages => [...lessons, parentNote, ?boundaryNote];
 
   SkPage? pageById(String id) {
     for (final p in allPages) {

@@ -163,7 +163,7 @@ class _SkDoorScreenState extends State<SkDoorScreen> {
   late int _tab = () {
     final id = widget.initialTabId;
     if (id == null) return 0;
-    final i = door.tabs.indexWhere((t) => t.id == id);
+    final i = _tabs.indexWhere((t) => t.id == id);
     return i < 0 ? 0 : i;
   }();
 
@@ -172,15 +172,40 @@ class _SkDoorScreenState extends State<SkDoorScreen> {
 
   SkBand? get _band => SkChildStore.instance.band;
 
+  /// The tabs for her age: a band-pinned tab she has grown past is gone.
+  ///
+  /// ⚠️ A TAB SHE HAS GROWN PAST DROPS; A TAB SHE HAS NOT REACHED IS LOCKED.
+  /// The parenting door's rule, applied to `SkDoorTab.bandId`: Communication's
+  /// "Say it out loud (6 to 8)" is not on a twelve-year-old's selector, and
+  /// "Say what you think (11 to 14)" is on a six-year-old's, locked, "From
+  /// 11 years". A tab with no band (Coding's shape) is for every age.
+  List<SkDoorTab> get _tabs => [
+        for (final t in door.tabs)
+          if (!_past(t)) t,
+      ];
+
+  bool _past(SkDoorTab t) {
+    final b = t.bandId;
+    final hers = _band;
+    if (b == null || hers == null) return false;
+    return skBandRung(b) < skBandRung(hers.id);
+  }
+
+  /// The band a tab draws: its own, or hers.
+  String _bandFor(SkDoorTab t, SkBand hers) => t.bandId ?? hers.id;
+
   /// The age a tab opens, or null when it is open now.
   ///
-  /// Under the floor every child tab is locked at six. A `pages` tab whose
-  /// pages are all for a later band locks at that band's start. Nothing
-  /// drops: a skill door's five surfaces exist at every age, so a tab she
-  /// has grown past is not a thing here — the content inside it changes.
+  /// Under the floor every child tab is locked at six. A band-pinned tab
+  /// ahead of her band locks at that band's start. A `pages` tab whose
+  /// pages are all for a later band locks at that band's start.
   int? _unlockYears(SkDoorTab t) {
     final band = _band;
     if (band == null) return kSkAgeFloor;
+    if (t.bandId case final b?) {
+      if (skBandRung(b) > skBandRung(band.id)) return skBandById(b)?.fromYears;
+      return null;
+    }
     if (t.kind != SkTabKind.pages) return null;
     var earliest = 1 << 20;
     for (final id in t.pageIds) {
@@ -200,11 +225,12 @@ class _SkDoorScreenState extends State<SkDoorScreen> {
 
   /// The rails a tab shows: a heading, an optional quiet line, and cards.
   List<_Rail> _railsFor(SkDoorTab tab) {
-    final band = _band;
-    if (band == null) return const [];
+    final hers = _band;
+    if (hers == null) return const [];
+    final bandId = _bandFor(tab, hers);
     switch (tab.kind) {
       case SkTabKind.today:
-        final a = content.todayFor(band.id);
+        final a = content.todayFor(bandId);
         return [
           _Rail(
             title: 'One thing to try today',
@@ -217,11 +243,11 @@ class _SkDoorScreenState extends State<SkDoorScreen> {
         // task's "build once, parent-gated": a Grown-ups card first on the
         // first rail, opening the free-tools screen behind the gate. The
         // Unplugged band has no tools and gets no card.
-        final access = content.accessFor(band.id);
+        final access = content.accessFor(bandId);
         var first = true;
         return [
           for (final s in content.skills)
-            if (content.activitiesForSkill(band.id, s.id).isNotEmpty)
+            if (content.activitiesForSkill(bandId, s.id).isNotEmpty)
               _Rail(
                 title: s.label,
                 line: s.kidLine,
@@ -235,19 +261,19 @@ class _SkDoorScreenState extends State<SkDoorScreen> {
                       onTap: () =>
                           widget.onSurface(context, 'sk_access/${content.doorId}'),
                     ),
-                  for (final a in content.activitiesForSkill(band.id, s.id))
+                  for (final a in content.activitiesForSkill(bandId, s.id))
                     _activityCard(a),
                 ],
               ),
         ];
       case SkTabKind.lessons:
         return [
-          for (final set in content.lessonSetsFor(band.id))
+          for (final set in content.lessonSetsFor(bandId))
             _Rail(
               title: set.title,
               line: set.blurb,
               cards: [
-                for (final l in content.lessonsIn(set.id, band.id)) _pageCard(l),
+                for (final l in content.lessonsIn(set.id, bandId)) _pageCard(l),
               ],
             ),
         ];
@@ -260,7 +286,7 @@ class _SkDoorScreenState extends State<SkDoorScreen> {
             title: set.title,
             line: set.blurb,
             cards: [
-              for (final l in content.lessonsIn(set.id, band.id)) _pageCard(l),
+              for (final l in content.lessonsIn(set.id, bandId)) _pageCard(l),
             ],
           ),
         ];
@@ -271,7 +297,7 @@ class _SkDoorScreenState extends State<SkDoorScreen> {
           _Rail(title: tab.label, cards: [
             for (final id in tab.pageIds)
               if (content.pageById(id) case final p?)
-                if (p.inBand(band.id)) _pageCard(p),
+                if (p.inBand(bandId)) _pageCard(p),
           ]),
         ];
     }
@@ -334,7 +360,7 @@ class _SkDoorScreenState extends State<SkDoorScreen> {
 
   Widget _body(BuildContext context, V2Palette p) {
     final bracket = bracketById(door.doorId);
-    final tabs = door.tabs;
+    final tabs = _tabs;
     final hue = bracket?.hue ?? tabs.first.hue;
     final tint = v2BlockTint(hue, p);
     final tab = tabs[_tab.clamp(0, tabs.length - 1)];

@@ -21,8 +21,8 @@ buy are stub sheets; the door stays behind `kDebugMode`; the preview ships.
 
 | Tile | Brief | Shape | Tasks (fills) | Commit | Walked on a phone | Contract |
 |---|---|---|---|---|---|---|
-| Coding | `ParentVeda_Coding_structure_v2.pdf` | door, 5 tabs + the shell | **3 of 3 filled** (36 activities) | 5f963a7 (door), fill commit next | **yes** — 2026-09-14, at 8, 5 and 12 | `sk_coding_door_test` |
-| Communication | `ParentVeda_Communication_structure.pdf` | plan sheet | 2 of 3 exist | — | — | — |
+| Coding | `ParentVeda_Coding_structure_v2.pdf` | door, 5 tabs + the shell | **3 of 3 filled** (36 activities) | 5f963a7 (door), 87dcd62 (fills + walk) | **yes** — 2026-09-14, at 8, 5 and 12 | `sk_coding_door_test` |
+| Communication | `ParentVeda_Communication_structure.pdf` | door, 5 tabs (three band cards) | 2 of 3 exist, not yet mapped | commit next | no | `sk_communication_door_test` |
 | Confidence | `ParentVeda_Confidence_structure.pdf` | plan sheet | 3 of 3 exist | — | — | — |
 | Creativity | `ParentVeda_Creativity_structure.pdf` | plan sheet | none yet | — | — | — |
 | Feelings | `ParentVeda_Feelings_structure.pdf` | plan sheet | none yet | — | — | — |
@@ -117,6 +117,37 @@ The suggestions are the last three lines.
       Robot →") rather than a tab, once the fills land and it is a real
       activity.
 
+## Communication (§56)
+
+Built to the brief literally on your calls of 2026-09-15 (1a 2A 3a 4a 5a).
+Frame only; the two task PDFs (6–8, 8–11) fill it next.
+
+- [ ] **Look:** Skilling → Expression → the selector at 6: `Say it out loud`
+      open, `Tell it and explain it` locked "From 8 years", `Say what you
+      think` locked "From 11 years", then Lessons and Your voice, saved. At
+      12 the first two cards are gone and three remain. The brief's surface
+      table made a picture — say if three cards at 12 reads too thin.
+- [ ] **Look:** an activity → "Say it in your voice · Record it" above the
+      three buttons → the record sheet (big mic, listen back, keep it). The
+      copy on that sheet is mine.
+- [ ] **Look:** Your voice, saved → the clips, then "What you tried". The
+      words list is the same keepsake as Coding's; here it sits under the
+      recordings rather than on its own screen. Right, or two tabs?
+- [ ] **Look:** the hero photo — a boy mid-laugh with an open book
+      (`photo-1472162072942`). Keep, or a child clearly talking?
+- [ ] The English course slot is titled "Speaking in English, too — Say it
+      out loud" (per level). Say if "too" reads wrong.
+- [ ] The boundary note sits on the grown-up screen under the parent note,
+      as a coming-soon card. The brief made no call on placement.
+- [ ] Recordings are on this phone only. A cloud copy waits on a real
+      consent adapter and a separate consent line (ledger SC9). Agree?
+- [ ] The tile still says "Expression" (the bracket's label) while the
+      brief's door is "Communication & articulation" and the bracket's
+      title says the same. Keep the short tile word?
+- [ ] **Suggestion:** with three band cards on the selector, the parent
+      side would fit better as the hero's small lock control than as a
+      closing card below five rails; same as Coding's Suggestion A.
+
 ## Cross-door windows
 
 `sk_page/<door>/<page>` as a `toolSurfaceId` on a page with no blocks —
@@ -129,3 +160,6 @@ Communication split the Communication brief names.
 | Coding · `cd_811_12` Stuck? Try, Save, Try | Stillness | the settle-breath ("point to it, do not rebuild it") | owed — Stillness not built; the builder note was dropped from the parent line |
 | Coding · `cd_1114_06` Why AI Gets It Wrong | Thinking | the "is this true" reasoning side | owed — Thinking not built; the parent line names it in prose |
 | Coding · `cd_1114_12` Share It and Make It Better | Making (Creativity) | the private, family-only showcase posture | owed — no sharing feature exists on either door; sharing here is offline, to a family member |
+| Communication | Confidence | the shared speaking practice — Confidence owns the nerve and the audience, Expression the clarity and the back-and-forth; the recorder is built once (`sk_voice_keepsake.dart`) | owed — Confidence not built; it windows into Communication's prompt sets when it lands |
+| Communication | Reading | "a child reads a story there and retells it here" | owed — Reading not built |
+| Communication | Feelings | "Feelings owns naming the emotion; Expression owns putting it into clear words" | owed — Feelings not built |

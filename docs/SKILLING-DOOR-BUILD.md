@@ -45,6 +45,21 @@ door file cannot invent a sixth surface; `SkTabKind.pages` (a rail of named
 pages) is the one escape hatch, for a brief that names a surface the five do
 not cover. Use it only when a brief does.
 
+**Three shell slots added by Communication (2026-09-15):**
+
+* **A tab pinned to a band** — `SkDoorTab.bandId`. The Communication brief
+  lists its three activity sets as three surfaces, so each is a card. A
+  band ahead of hers is locked ("From 8 years"); a band behind hers drops.
+  A tab with no `bandId` (Coding's shape) draws her band. Use it when a
+  brief lists the bands as surfaces; do not use it to invent a ladder.
+* **The voice keepsake** — `SkDoorContent.voiceKeepsake: true` puts a
+  "Record it" row on every activity and routes `sk_voice/<door>` to
+  `SkVoiceKeepsakeScreen` (her clips, then the words). On this phone only;
+  see the file header for why the pregnancy recorder was not reused as-is.
+* **The boundary note** — `SkDoorContent.boundaryNote`, a parent-facing
+  page drawn as a card on the grown-up screen. For a brief that holds a
+  clinical line ("if speech itself is the worry") rather than a consult.
+
 ### The two voices
 
 Every skilling screen is one of two things, and the file says which:
@@ -299,6 +314,12 @@ Points that apply to every skill door. Door-specific ones are in
 - [ ] **Voice.** The read-aloud uses the device's English voice via
       `BabyVoiceService`. A recorded warm voice (the brief's "a warm voice")
       is a narration-manifest job like Garbh Sanskar's.
+- [ ] **A cloud copy of her recordings** — only when a real consent adapter
+      replaces the stub AND a parent consents to cloud storage as a separate
+      line: a child-scoped bucket, RLS, a retention limit, a delete that
+      removes the object. `BACKEND-PATTERNS.md` §16a; ledger SC9. Until
+      then every clip stays on the phone and a phone change loses them —
+      the correct behaviour for consented data.
 - [ ] **The product-engine unification** (question 6): skilling's shelf is
       its own; the parenting shop is its own. One pass, later, with both
       lists as input.

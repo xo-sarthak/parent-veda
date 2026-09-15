@@ -257,6 +257,9 @@ class _SkParentGateScreenState extends State<SkParentGateScreen> {
                       'her and scope to her age.',
                   'The words "tried", "practised again" and "made" against '
                       'the activities she does. Never a score.',
+                  'Recordings she makes in her own voice, on the doors that '
+                      'keep one. On this phone only; you can delete any of '
+                      'them.',
                   'All of it on this phone only. Nothing about her is sent '
                       'anywhere, and no ad is ever shown to her.',
                 ]) ...[

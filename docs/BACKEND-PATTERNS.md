@@ -1501,6 +1501,22 @@ cost, and the day someone asks for "her keepsake on both parents' phones",
 the answer is a table with `my_child_ids`-style RLS (§4) **and** a consent
 record beside it, not a quiet `SupabaseRepo.insert`.
 
+**The same rule, applied to a heavier kind of data — 2026-09-15.** The
+Communication door records the child's voice. The brief said to reuse the
+pregnancy journal's recorder; that recorder saves on the phone and then
+uploads every clip to Supabase Storage (`JournalStore.saveAudio` →
+`StorageService.upload`). Right for a mother's journal. For a named child's
+voice — as personal as data gets, identifying, biometric-adjacent — it would
+mean processing a child's data in our bucket on the strength of a consent
+that is still a stub. So `sk_voice_keepsake.dart` takes the same `record`
+and `audioplayers` mechanism and leaves the upload out. The cloud copy is
+the same job as the child record's: a child-scoped bucket under RLS, a
+retention limit, a delete that removes the object, **and a separate consent
+line for cloud storage** — after a real adapter exists. The general fact:
+"reuse" that carries a network call is not reuse of the thing the brief
+described; check what a helper does with the bytes before pointing a child
+at it.
+
 The companion seam is `sk_consent_verifier.dart`: the verification adapter
 (DigiLocker or equivalent) is an interface with a stub that passes and says
 so on screen. The general fact: an interface with one stub costs nothing

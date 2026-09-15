@@ -6854,3 +6854,44 @@ Veda FAB, which was reachable from every child screen and is now hidden on
 `sk_`/`sk/` routes in `global_ask_fab.dart`. Nothing else in the walk
 contradicted the brief.
 
+---
+
+## 56.0 Communication, the second skilling door — 2026-09-15
+
+Appended at the end; this file is shared. Built to
+`ParentVeda_Communication_structure.pdf` (11 Sep 2026) on the shell Coding
+laid. The door is `lib/data/doors/sk_door_communication.dart` over
+`lib/data/skilling/skilling_communication_*.dart`; the contract is
+`test/sk_communication_door_test.dart`; owed content is
+`docs/DOOR-CONTENT-OWED.md` SC1–SC10; the review list is
+`docs/SKILLING-DOORS-REVIEW.md`. Generic points are in
+`docs/SKILLING-DOOR-BUILD.md` §9, not here.
+
+### 56.1 The calls — 2026-09-15
+
+1a the recorder is the pregnancy journal's mechanism without its upload
+(`sk_voice_keepsake.dart`; the journal file untouched) · 2A the five cards
+are the brief's surface table — three band sets, Lessons, Your voice, saved
+— with band cards locking ahead and dropping behind · 3a Confidence and
+Expression stay separate; the recorder is built once in the shell · 4a the
+course shelf carries the brief's three plus one "Speaking in English, too"
+per level, mother tongue first, no fluency sold · 5a skilling's own product
+shelf.
+
+### 56.2 What changed
+
+Three shell slots (`SkDoorTab.bandId`, `SkDoorContent.voiceKeepsake`,
+`SkDoorContent.boundaryNote`), a voice store + record sheet + screen, the
+`sk_voice/<door>` surface, one consent line for recordings, the activity
+screen's record row. 36 activity slots, 27 lessons, 12 courses, 12
+products, the parent note and the boundary note — all placeholders, all in
+the ledger. The bracket's five cells live; the workbook's "rubric tracker"
+refused into the voice keepsake, as the brief says. Not walked on a phone.
+
+### 56.3 Needs a decision (door-specific)
+
+* The record sheet's copy ("Keep it", "Not this one", "Listen back") is
+  mine — review file.
+* Whether the words list belongs under the recordings or on its own tab.
+* The hero photo.
+

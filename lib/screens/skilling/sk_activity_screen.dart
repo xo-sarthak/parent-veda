@@ -30,6 +30,7 @@ import '../v2/v2_palette.dart';
 import 'sk_content.dart';
 import 'sk_door_content.dart';
 import 'sk_practice_store.dart';
+import 'sk_voice_keepsake.dart';
 
 class SkActivityScreen extends StatelessWidget {
   const SkActivityScreen({
@@ -136,6 +137,25 @@ class SkActivityScreen extends StatelessWidget {
                 if (i != a.steps.length - 1) const SizedBox(height: 18),
               ],
               const SizedBox(height: 30),
+            ],
+
+            // ---- her voice, on a door that keeps it -------------------------
+            //
+            // "Your voice, saved": the Communication brief's keepsake. A
+            // record row above the three words, so telling the story IS the
+            // doing. On this phone only.
+            if (content.voiceKeepsake) ...[
+              _Heading('Say it in your voice', p),
+              const SizedBox(height: 12),
+              _WordButton(
+                key: const Key('sk-voice-row'),
+                label: 'Record it',
+                icon: Icons.mic_rounded,
+                p: p,
+                onTap: () => skRecordVoice(context,
+                    doorId: content.doorId, itemId: a.id, title: a.title),
+              ),
+              const SizedBox(height: 26),
             ],
 
             // ---- the three words --------------------------------------------

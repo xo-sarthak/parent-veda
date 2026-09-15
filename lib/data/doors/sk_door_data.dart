@@ -33,8 +33,10 @@
 import 'package:flutter/material.dart' show IconData;
 
 import 'sk_door_coding.dart';
+import 'sk_door_communication.dart';
 
 export 'sk_door_coding.dart';
+export 'sk_door_communication.dart';
 
 /// Which of the brief's child surfaces a tab draws.
 enum SkTabKind {
@@ -105,9 +107,20 @@ class SkDoorTab {
     required this.kind,
     this.tools = const [],
     this.pageIds = const [],
+    this.bandId,
     this.note,
     this.footer,
   });
+
+  /// ⚠️ A TAB PINNED TO ONE BAND. The Communication brief lists its three
+  /// activity sets as three SURFACES — "Say it out loud (6 to 8)", "Tell it
+  /// and explain it (8 to 11)", "Say what you think (11 to 14)" — so each
+  /// is a card on the selector. Null (Coding's shape) means the tab draws
+  /// her band. Set, the tab draws that band, and the age rule applies to
+  /// the tab whole: a band ahead of hers is LOCKED ("From 8 years"), a
+  /// band behind hers DROPS — the user's rule 3, made a picture. The
+  /// user's call for Communication, 2026-09-15 (question 2, A).
+  final String? bandId;
 
   final String id;
 
@@ -176,6 +189,7 @@ class SkDoorClosing {
 /// a door is a data file and a line here.
 final List<SkDoor> kSkDoors = [
   kSkCodingDoor,
+  kSkCommunicationDoor,
 ];
 
 SkDoor? skDoorFor(String doorId) {

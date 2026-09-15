@@ -38,6 +38,7 @@ import 'sk_content_registry.dart';
 import 'sk_door_content.dart';
 import 'sk_grown_up_gate.dart';
 import 'sk_practice_store.dart';
+import 'sk_voice_keepsake.dart';
 
 /// Which shelf to scroll to when opened by a deep link.
 enum SkGrownUpSection { note, courses, products, settings }
@@ -166,6 +167,20 @@ class _SkGrownUpScreenState extends State<SkGrownUpScreen> {
                   'in plain words, what each thinking skill is and how to '
                   'back it at home. No ranking, no worry-making.',
             ),
+            // ---- the boundary note, where a door has one ------------------
+            //
+            // One honest line out to a professional — never a course, never
+            // a "fix her speech" product. Coming soon until its copy lands;
+            // the card is the place it will stand.
+            if (c.boundaryNote case final bn?) ...[
+              const SizedBox(height: 10),
+              _SoonCard(
+                p: p,
+                title: bn.title,
+                line: bn.subtitle ?? '',
+                icon: Icons.health_and_safety_outlined,
+              ),
+            ],
             const SizedBox(height: 30),
 
             // ---- the course shelf --------------------------------------------
@@ -592,6 +607,7 @@ class _Settings extends StatelessWidget {
             _action(context, 'Use the sum instead', () => s.setPin(null)),
           _action(context, 'Withdraw consent and forget her', () {
             SkPracticeStore.instance.forgetAll();
+            SkVoiceStore.instance.forgetAll();
             s.forget();
             // Back to the skilling preview, not the app's first route — seen
             // on a phone (2026-09-14) landing on the pregnancy home.

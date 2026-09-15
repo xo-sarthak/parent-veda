@@ -172,6 +172,44 @@ final List<Bracket> kSkillingBrackets = [
             'expression.',
         hi: 'जो कहना है वही कहना — रोज़ के विषय, कहानी कहना, और बोलकर '
             'ख़ुद को व्यक्त करना।'),
+    // ⚠️ LIVE SINCE 2026-09-15, to `ParentVeda_Communication_structure.pdf`.
+    // Same shape as Coding's row below: five layers to named surfaces,
+    // workbook text kept, extras (reshape) and consult (hold) `notReady`.
+    // The "rubric tracker" the workbook asked for is refused by the brief
+    // ("a rubric scores a child") and becomes "Your voice, saved".
+    layers: {
+      BracketLayer.content: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Daily speaking prompts, storytelling, spoken expression',
+        surfaceIds: ['sk_lessons/skilling_communication'],
+      ),
+      BracketLayer.activities: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Practice set',
+        surfaceIds: ['sk_activities/skilling_communication'],
+      ),
+      BracketLayer.tools: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Rubric tracker',
+        surfaceIds: ['sk_voice/skilling_communication'],
+      ),
+      BracketLayer.products: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Optional',
+        surfaceIds: ['sk_products/skilling_communication'],
+      ),
+      BracketLayer.course: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Leveled program (paid)',
+        surfaceIds: ['sk_courses/skilling_communication'],
+      ),
+      BracketLayer.consult: const BracketLayerSpec(
+          state: LayerState.notReady, reason: 'Rare'),
+      BracketLayer.extras: const BracketLayerSpec(
+          state: LayerState.notReady,
+          reason: 'Challenges, certificates, progress report'),
+    },
+    /* kept for revert — the row as declared before the door
     layers: _skillLayers(
       content: 'Daily speaking prompts, storytelling, spoken expression',
       activities: 'Practice set',
@@ -181,6 +219,7 @@ final List<Bracket> kSkillingBrackets = [
       consult: 'Rare',
       extras: 'Challenges, certificates, progress report',
     ),
+    */
   ),
 
   Bracket(

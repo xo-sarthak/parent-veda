@@ -24,6 +24,7 @@
 //    sk_lessons/<door>                the door on Lessons
 //    sk_cross/<door>                  the door on the cross-band tab
 //    sk_keepsake/<door>               What I've made and tried
+//    sk_voice/<door>                  Your voice, saved (clips + the words)
 //    sk_access/<door>                 the free tools to set up (gated)
 //    sk_grown_up/<door>               the parent side (gated)
 //    sk_courses/<door>                the parent side, on the course shelf
@@ -46,6 +47,7 @@ import 'sk_grown_up_screen.dart';
 import 'sk_keepsake_screen.dart';
 import 'sk_parent_gate_screen.dart';
 import 'sk_practice_store.dart';
+import 'sk_voice_keepsake.dart';
 
 /// The screen for a surface id, or null.
 Widget? skScreenForSurface(String id) {
@@ -81,6 +83,9 @@ Widget? skScreenForSurface(String id) {
       if (door == null || skDoorContentFor(door) == null) return null;
       return SkKeepsakeScreen(
           doorId: door, doorTitle: bracketById(door)?.title.now ?? '');
+    case 'sk_voice':
+      if (door == null || skDoorContentFor(door)?.voiceKeepsake != true) return null;
+      return SkVoiceKeepsakeScreen(doorId: door);
     case 'sk_access':
       if (door == null || skDoorContentFor(door) == null) return null;
       return SkAccessScreen(doorId: door);

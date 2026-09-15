@@ -12,6 +12,10 @@ import '../../data/skilling/skilling_coding_activities.dart';
 import '../../data/skilling/skilling_coding_content.dart';
 import '../../data/skilling/skilling_coding_course.dart';
 import '../../data/skilling/skilling_coding_products.dart';
+import '../../data/skilling/skilling_communication_activities.dart';
+import '../../data/skilling/skilling_communication_content.dart';
+import '../../data/skilling/skilling_communication_course.dart';
+import '../../data/skilling/skilling_communication_products.dart';
 import 'sk_door_content.dart';
 
 final SkDoorContent kSkCodingContent = SkDoorContent(
@@ -28,10 +32,25 @@ final SkDoorContent kSkCodingContent = SkDoorContent(
   access: kSkCodingAccess,
 );
 
+final SkDoorContent kSkCommunicationContent = SkDoorContent(
+  doorId: 'skilling_communication',
+  bandNames: kSkCommunicationBandNames,
+  skills: kSkCommunicationSkills,
+  lessonSets: kSkCommunicationLessonSets,
+  lessons: kSkCommunicationLessons,
+  activities: kSkCommunicationActivities,
+  courses: kSkCommunicationCourses,
+  products: kSkCommunicationProducts,
+  parentNote: kSkCommunicationParentNote,
+  boundaryNote: kSkCommunicationBoundaryNote,
+  voiceKeepsake: true,
+);
+
 /// Every door with content. Adding a door is a line here and a line in
 /// `kSkDoors`.
 final List<SkDoorContent> kSkDoorContents = [
   kSkCodingContent,
+  kSkCommunicationContent,
 ];
 
 SkDoorContent? skDoorContentFor(String doorId) {
