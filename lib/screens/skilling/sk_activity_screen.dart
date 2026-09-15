@@ -27,6 +27,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
+import 'sk_child_store.dart';
 import 'sk_content.dart';
 import 'sk_door_content.dart';
 import 'sk_practice_store.dart';
@@ -44,8 +45,11 @@ class SkActivityScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-        animation: Listenable.merge(
-            [V2PaletteStore.instance, SkPracticeStore.instance]),
+        animation: Listenable.merge([
+          V2PaletteStore.instance,
+          SkPracticeStore.instance,
+          SkChildStore.instance,
+        ]),
         builder: (context, _) =>
             _body(context, V2PaletteStore.instance.current),
       );
@@ -139,12 +143,16 @@ class SkActivityScreen extends StatelessWidget {
               const SizedBox(height: 30),
             ],
 
-            // ---- her voice, on a door that keeps it -------------------------
+            // ---- her voice, where the activity offers it --------------------
             //
-            // "Your voice, saved": the Communication brief's keepsake. A
-            // record row above the three words, so telling the story IS the
-            // doing. On this phone only.
-            if (content.voiceKeepsake) ...[
+            // "Your voice, saved": the Communication brief's keepsake. The
+            // tasks make it per-activity (`offersRecording`, the storytelling
+            // ones) and off until a parent turns it on. A record row above
+            // the three words, so telling the story IS the doing. On this
+            // phone only; never analysed, graded or transcribed.
+            if (content.voiceKeepsake &&
+                a.offersRecording &&
+                SkChildStore.instance.voiceAllowed) ...[
               _Heading('Say it in your voice', p),
               const SizedBox(height: 12),
               _WordButton(

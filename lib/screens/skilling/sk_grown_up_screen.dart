@@ -596,7 +596,28 @@ class _Settings extends StatelessWidget {
             p),
         _kv('Verification', _verificationLabel(s.verification), p),
         _kv('Grown-up gate', s.hasPin ? 'PIN' : 'A sum in words', p),
-        const SizedBox(height: 12),
+        _kv('Her voice', s.voiceAllowed ? 'Recording on, this phone only' : 'Recording off', p),
+        const SizedBox(height: 6),
+        // ⚠️ THE PARENT'S SEPARATE YES TO RECORDING. Off by default (the
+        // Communication tasks' rule); on this phone only; never analysed,
+        // graded or transcribed; deleted with consent. Shown on every door,
+        // since the record is the child's, not the door's.
+        SwitchListTile(
+          key: const Key('sk-voice-switch'),
+          contentPadding: EdgeInsets.zero,
+          value: s.voiceAllowed,
+          onChanged: s.setVoiceAllowed,
+          activeThumbColor: p.action,
+          title: Text('Let her record her voice',
+              style: pvManrope(
+                  fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
+          subtitle: Text(
+              'Only on the doors that keep a voice keepsake. Kept on this '
+              'phone, never analysed or sent anywhere. You can delete any '
+              'clip.',
+              style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink2)),
+        ),
+        const SizedBox(height: 6),
         Wrap(spacing: 8, runSpacing: 8, children: [
           // Her age can be corrected here without withdrawing consent — the
           // walk (2026-09-14) found withdraw-and-redo was the only way.

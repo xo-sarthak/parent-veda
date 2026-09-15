@@ -22,7 +22,7 @@ buy are stub sheets; the door stays behind `kDebugMode`; the preview ships.
 | Tile | Brief | Shape | Tasks (fills) | Commit | Walked on a phone | Contract |
 |---|---|---|---|---|---|---|
 | Coding | `ParentVeda_Coding_structure_v2.pdf` | door, 5 tabs + the shell | **3 of 3 filled** (36 activities) | 5f963a7 (door), 87dcd62 (fills + walk) | **yes** — 2026-09-14, at 8, 5 and 12 | `sk_coding_door_test` |
-| Communication | `ParentVeda_Communication_structure.pdf` | door, 5 tabs (three band cards) | 2 of 3 exist, not yet mapped | commit next | no | `sk_communication_door_test` |
+| Communication | `ParentVeda_Communication_structure.pdf` | door, 5 tabs (three band cards) | **2 of 3 filled** (6–8, 8–11); 11–14 not written | a86c5bf (frame), fill commit next | no | `sk_communication_door_test` |
 | Confidence | `ParentVeda_Confidence_structure.pdf` | plan sheet | 3 of 3 exist | — | — | — |
 | Creativity | `ParentVeda_Creativity_structure.pdf` | plan sheet | none yet | — | — | — |
 | Feelings | `ParentVeda_Feelings_structure.pdf` | plan sheet | none yet | — | — | — |
@@ -127,9 +127,14 @@ Frame only; the two task PDFs (6–8, 8–11) fill it next.
       think` locked "From 11 years", then Lessons and Your voice, saved. At
       12 the first two cards are gone and three remain. The brief's surface
       table made a picture — say if three cards at 12 reads too thin.
-- [ ] **Look:** an activity → "Say it in your voice · Record it" above the
-      three buttons → the record sheet (big mic, listen back, keep it). The
-      copy on that sheet is mine.
+- [ ] **Look:** For the grown-up → settings → "Let her record her voice"
+      (off by default, the tasks' rule) → then Tell it and explain it →
+      Retell the Movie → "Say it in your voice · Record it" above the three
+      buttons → the record sheet (big mic, listen back, keep it). Only the
+      four storytelling activities offer it. The sheet's copy is mine.
+- [ ] While recording is off, Your voice, saved shows "Recording is off. A
+      grown-up can turn it on…" instead of a record button. Right, or hide
+      the card until it is on?
 - [ ] **Look:** Your voice, saved → the clips, then "What you tried". The
       words list is the same keepsake as Coding's; here it sits under the
       recordings rather than on its own screen. Right, or two tabs?

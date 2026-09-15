@@ -61,7 +61,23 @@ class SkChildStore extends ChangeNotifier {
   SkVerification _verification = SkVerification.none;
   String? _pinHash;
   String? _pinSalt;
+  bool _voiceAllowed = false;
   bool _loaded = false;
+
+  /// ⚠️ OFF BY DEFAULT. The Communication tasks on recording a child's
+  /// voice: "Optional, off by default, only with parent setup and consent.
+  /// On-device only, minimal retention, parent-deletable." The gate's
+  /// consent covers the record; this switch is the parent's separate yes
+  /// to recording, flipped on the grown-up screen. Until it is on, no
+  /// child screen shows a record row and the keepsake screen invites the
+  /// parent to turn it on.
+  bool get voiceAllowed => _voiceAllowed;
+
+  void setVoiceAllowed(bool on) {
+    _voiceAllowed = on;
+    _save();
+    notifyListeners();
+  }
 
   /// The name the learning screens say. Never a "your baby" fallback: a
   /// skilling child is six or more and has a name or the screens use "you".
@@ -169,6 +185,7 @@ class SkChildStore extends ChangeNotifier {
     _verification = SkVerification.none;
     _pinHash = null;
     _pinSalt = null;
+    _voiceAllowed = false;
     _save();
     notifyListeners();
   }
@@ -210,6 +227,7 @@ class SkChildStore extends ChangeNotifier {
           orElse: () => SkVerification.none);
       _pinHash = j['pinHash'] as String?;
       _pinSalt = j['pinSalt'] as String?;
+      _voiceAllowed = j['voiceAllowed'] == true;
     } catch (_) {
       // A corrupt record reads as no record. The gate asks again.
     }
@@ -232,6 +250,7 @@ class SkChildStore extends ChangeNotifier {
             'verification': _verification.name,
             'pinHash': _pinHash,
             'pinSalt': _pinSalt,
+            'voiceAllowed': _voiceAllowed,
           }));
     } catch (_) {}
   }

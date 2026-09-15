@@ -6895,3 +6895,16 @@ refused into the voice keepsake, as the brief says. Not walked on a phone.
 * Whether the words list belongs under the recordings or on its own tab.
 * The hero photo.
 
+### 56.4 The two fills — 2026-09-15
+
+Tasks 7 and 8 of 36 mapped verbatim into `cm_68_*` and `cm_811_*`; ledger
+rows SC1–SC2 closed; the 11 to 14 band stays coming soon until its task is
+written. The tasks named one field the model lacked — `offersRecording`,
+true on the four storytelling activities — and a rule the structure brief
+did not: recording is "optional, off by default, only with parent setup
+and consent". So `SkChildStore.voiceAllowed` (default false) and a switch
+on the grown-up screen; the record row and the Record button wait on it,
+and the keepsake screen invites the grown-up meanwhile. The vocabulary
+scan learned that "points land" is a point made (`cm_68_11`, allow-listed
+by name). Not walked on a phone.
+

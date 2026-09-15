@@ -23,7 +23,6 @@ import 'package:parentveda/screens/skilling/doors/sk_door_screen.dart';
 import 'package:parentveda/screens/skilling/sk_activity_screen.dart';
 import 'package:parentveda/screens/skilling/sk_bands.dart';
 import 'package:parentveda/screens/skilling/sk_child_store.dart';
-import 'package:parentveda/screens/skilling/sk_content.dart';
 import 'package:parentveda/screens/skilling/sk_content_registry.dart';
 import 'package:parentveda/screens/skilling/sk_door_content.dart';
 import 'package:parentveda/screens/skilling/sk_practice_store.dart';
@@ -86,19 +85,63 @@ void main() {
           ['Clarity', 'Listening', 'Describing', 'Storytelling', 'The right word', 'Putting your point']);
     });
 
-    test('a FULL set per band, two per skill, all placeholders', () {
+    test('a FULL set per band, two per skill; two bands filled, the third owed', () {
       for (final band in kSkBands) {
         final list = _c.activitiesFor(band.id);
         expect(list, hasLength(12), reason: band.id);
         for (final s in kSkCommunicationSkills) {
           expect(list.where((a) => a.skillPurpose == s.id), hasLength(2), reason: '${band.id}/${s.id}');
         }
-        for (final a in list) {
-          expect(a.comingSoon, isTrue, reason: '${a.id}: frame only');
-          expect(a.steps, isEmpty, reason: '${a.id}: no copy authored');
-        }
       }
       expect(_c.activities.map((a) => a.id).toSet(), hasLength(36));
+      // Tasks 7 and 8 of 36, filled 2026-09-15; the 11 to 14 task is not written.
+      for (final a in [..._c.activitiesFor('6-8'), ..._c.activitiesFor('8-11')]) {
+        expect(a.comingSoon, isFalse, reason: a.id);
+        expect(a.oneLine, isNotEmpty, reason: a.id);
+        expect(a.materials, isNotEmpty, reason: '${a.id}: "Nothing", or the household items');
+        expect(a.steps, hasLength(4), reason: a.id);
+        expect(a.theThinking, isNotEmpty, reason: a.id);
+        expect(a.whatYouPractised, isNotEmpty, reason: a.id);
+      }
+      for (final a in _c.activitiesFor('11-14')) {
+        expect(a.comingSoon, isTrue, reason: '${a.id}: no task PDF yet');
+      }
+      // The tasks' spot checks.
+      expect(_c.activityById('cm_68_01')!.title, 'Say It So I Get It');
+      expect(_c.activityById('cm_68_12')!.title, 'I Heard You, and...');
+      expect(_c.activityById('cm_811_01')!.title, 'Explain How It Works');
+      expect(_c.activityById('cm_811_12')!.title, 'Disagree Nicely');
+    });
+
+    test('the tasks\' rules: no nerve or audience, listening carries weight, any language, no outcome', () {
+      const banned = ['future', 'genius', 'guarantee', 'career', 'ahead of', 'correct accent', 'stage voice', 'leaderboard'];
+      for (final a in _c.activities.where((a) => !a.comingSoon)) {
+        final copy = [a.title, a.oneLine, a.materials, ...a.steps, a.whatYouPractised].join(' ').toLowerCase();
+        for (final b in banned) {
+          expect(copy.contains(b), isFalse, reason: '${a.id} says "$b"');
+        }
+        // The child-facing copy never asks for courage or an audience — that
+        // is Confidence. (The parent line may name the contrast.)
+        for (final b in ['be brave', 'audience', 'in front of people', 'louder']) {
+          expect(copy.contains(b), isFalse, reason: '${a.id} says "$b" — that is the Confidence door');
+        }
+      }
+      // The right-word activities explicitly allow any language.
+      final anyLang = _c.activities.where((a) => a.skillPurpose == 'right_word' && !a.comingSoon);
+      expect(anyLang.any((a) => [...a.steps, a.theThinking].join(' ').toLowerCase().contains('any language')), isTrue);
+      expect(anyLang.any((a) => [...a.steps, a.theThinking].join(' ').toLowerCase().contains('every language')), isTrue);
+    });
+
+    test('offersRecording is the tasks\' four, and only those', () {
+      final offered = _c.activities.where((a) => a.offersRecording).map((a) => a.id).toList();
+      expect(offered, ['cm_68_07', 'cm_68_08', 'cm_811_07', 'cm_811_08']);
+      expect(_c.activityById('cm_68_07')!.title, 'Tell Me What Happened');
+      expect(_c.activityById('cm_68_08')!.title, 'Once Upon a Time');
+      expect(_c.activityById('cm_811_07')!.title, 'Retell the Movie');
+      expect(_c.activityById('cm_811_08')!.title, 'Make It Exciting');
+      for (final a in _c.activities.where((a) => a.offersRecording)) {
+        expect(a.skillPurpose, 'storytelling', reason: a.id);
+      }
     });
   });
 
@@ -203,22 +246,49 @@ void main() {
       expect(gate.contains('Recordings she makes'), isTrue);
     });
 
-    testWidgets('an activity on this door carries the record row; Coding\'s does not', (tester) async {
+    testWidgets('the record row: only where offered, only once a parent turns it on, never on Coding', (tester) async {
       tester.view.physicalSize = const Size(1200, 4000);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.reset);
       SkChildStore.instance.debugSetAgeYears(7);
-      const a = SkActivity(
-        id: 'demo', band: '6-8', skillPurpose: 'clarity', title: 'Say it',
-        oneLine: 'One.', steps: ['A.'], whatYouPractised: 'W.',
-      );
-      await tester.pumpWidget(MaterialApp(home: SkActivityScreen(content: _c, activity: a)));
-      await tester.pumpAndSettle();
-      expect(find.byKey(const Key('sk-voice-row')), findsOneWidget);
-      await tester.pumpWidget(MaterialApp(
-          home: SkActivityScreen(key: const ValueKey('cd'), content: skDoorContentFor('skilling_coding')!, activity: a)));
+      final story = _c.activityById('cm_68_08')!; // Once Upon a Time, offersRecording
+      final plain = _c.activityById('cm_68_01')!; // Say It So I Get It
+      // Off by default: no row even where offered.
+      expect(SkChildStore.instance.voiceAllowed, isFalse, reason: 'off by default');
+      await tester.pumpWidget(MaterialApp(home: SkActivityScreen(content: _c, activity: story)));
       await tester.pumpAndSettle();
       expect(find.byKey(const Key('sk-voice-row')), findsNothing);
+      // The parent turns it on.
+      SkChildStore.instance.setVoiceAllowed(true);
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('sk-voice-row')), findsOneWidget);
+      expect(find.text('Say it in your voice'), findsOneWidget);
+      // Not on an activity that does not offer it.
+      await tester.pumpWidget(MaterialApp(home: SkActivityScreen(key: const ValueKey('p'), content: _c, activity: plain)));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('sk-voice-row')), findsNothing);
+      // Never on a door without the keepsake.
+      await tester.pumpWidget(MaterialApp(
+          home: SkActivityScreen(key: const ValueKey('cd'), content: skDoorContentFor('skilling_coding')!, activity: story)));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('sk-voice-row')), findsNothing);
+      SkChildStore.instance.setVoiceAllowed(false);
+    });
+
+    testWidgets('the keepsake screen invites the grown-up while recording is off', (tester) async {
+      tester.view.physicalSize = const Size(1200, 4000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+      SkChildStore.instance.debugSetAgeYears(7);
+      await tester.pumpWidget(const MaterialApp(home: SkVoiceKeepsakeScreen(doorId: 'skilling_communication')));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('sk-voice-off')), findsOneWidget);
+      expect(find.text('Record something'), findsNothing);
+      SkChildStore.instance.setVoiceAllowed(true);
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('sk-voice-off')), findsNothing);
+      expect(find.text('Record something'), findsOneWidget);
+      SkChildStore.instance.setVoiceAllowed(false);
     });
   });
 
@@ -249,7 +319,8 @@ void main() {
       expect(find.textContaining('From 8 years'), findsOneWidget);
       expect(find.textContaining('From 11 years'), findsOneWidget);
       expect(find.text('Clarity'), findsOneWidget, reason: 'her band\'s first rail');
-      expect(find.text('Coming soon'), findsWidgets, reason: 'frame only');
+      expect(find.text('Say It So I Get It'), findsOneWidget, reason: 'filled');
+      expect(find.text('Coming soon'), findsNothing, reason: 'the 6 to 8 band is filled');
       // Landing on the 11 to 14 tab shows the panel, not its rails.
       await tester.pumpWidget(MaterialApp(
           home: SkDoorScreen(key: const ValueKey('l'), door: door, onSurface: (_, _) {}, initialTabId: 'say_what_you_think')));

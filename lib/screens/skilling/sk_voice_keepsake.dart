@@ -566,14 +566,42 @@ class _SkVoiceKeepsakeScreenState extends State<SkVoiceKeepsakeScreen> {
                     height: 1.5,
                     color: p.ink2)),
             const SizedBox(height: 22),
-            _Button(
-              label: 'Record something',
-              icon: Icons.mic_rounded,
-              p: p,
-              onTap: () => skRecordVoice(context, doorId: widget.doorId),
-            ),
+            // ⚠️ OFF UNTIL A PARENT TURNS IT ON. The tasks' rule. The screen
+            // still exists (a feature is never hidden); what it shows is the
+            // invitation, addressed to the grown-up, not a record button.
+            if (!SkChildStore.instance.voiceAllowed)
+              Container(
+                key: const Key('sk-voice-off'),
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: p.surfaceAlt,
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Icon(Icons.lock_outline_rounded, size: 20, color: p.ink2),
+                  const SizedBox(height: 10),
+                  Text('Recording is off.',
+                      style: pvFraunces(
+                          fontSize: 19,
+                          fontWeight: FontWeight.w600,
+                          height: 1.25,
+                          color: p.ink1)),
+                  const SizedBox(height: 6),
+                  Text('A grown-up can turn it on under "For the grown-up". '
+                      'Recordings stay on this phone and can be deleted any '
+                      'time.',
+                      style: pvManrope(fontSize: 14.5, height: 1.5, color: p.ink2)),
+                ]),
+              )
+            else
+              _Button(
+                label: 'Record something',
+                icon: Icons.mic_rounded,
+                p: p,
+                onTap: () => skRecordVoice(context, doorId: widget.doorId),
+              ),
             const SizedBox(height: 24),
-            if (clips.isEmpty)
+            if (clips.isEmpty && SkChildStore.instance.voiceAllowed)
               Container(
                 key: const Key('sk-voice-empty'),
                 padding: const EdgeInsets.all(18),

@@ -228,13 +228,20 @@ void main() {
       expect(hits, isEmpty, reason: 'scoring vocabulary in code:\n${hits.join('\n')}');
     });
 
-    /// Activities whose copy may mention a score, because the CHILD builds
-    /// a game that keeps its players' points. Named, so a second one is a
-    /// decision and not a drift.
-    const scoreAllowed = {'cd_1114_10'};
+    /// Activities whose copy may carry a scoring word, each for a named
+    /// reason, so a new one is a decision and not a drift:
+    ///   cd_1114_10  Make a Quiz Game — the CHILD builds a game that keeps
+    ///               its players' points; the task allows it in so many words.
+    ///   cm_68_11    Say What You Want and Why — "That is how points land":
+    ///               the plural of a point MADE, on the door whose sixth skill
+    ///               is putting your point. Task copy, verbatim.
+    const scoreAllowed = {'cd_1114_10', 'cm_68_11'};
 
+    // ⚠️ `points`, NOT `points?`. "Make your point" is Communication's sixth
+    // skill and is on every one of its cards; a score is plural. Tightened
+    // 2026-09-15 when the fill tripped it.
     test('no activity copy scores the child; the allow-list names the games she builds', () {
-      final word = RegExp(r'\b(score|scores|scoring|points?|streak|leaderboard|percent|percentage|rank|ranking|grade|graded|badge|badges)\b',
+      final word = RegExp(r'\b(score|scores|scoring|points|streak|leaderboard|percent|percentage|rank|ranking|grade|graded|badge|badges)\b',
           caseSensitive: false);
       final hits = <String>[];
       for (final c in kSkDoorContents) {

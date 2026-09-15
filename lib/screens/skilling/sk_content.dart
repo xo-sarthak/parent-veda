@@ -260,6 +260,7 @@ class SkActivity {
     this.tool,
     this.multiSession = false,
     this.withGrownUp = false,
+    this.offersRecording = false,
     this.comingSoon = false,
   });
 
@@ -303,6 +304,13 @@ class SkActivity {
   /// (2026-09-14) — the tool string carried the words, but a mark derived
   /// from prose is a mark that vanishes when the prose is edited.
   final bool withGrownUp;
+
+  /// The Communication tasks' field: "the optional 'save your story' step;
+  /// true for Tell Me What Happened, Once Upon a Time" — the record row
+  /// shows on THIS activity, on a door that keeps her voice, when a parent
+  /// has turned recording on. False everywhere else. Added at the fill
+  /// (2026-09-15); the tasks said STOP and list, and this is the field.
+  final bool offersRecording;
 
   /// The scaffold state: a real card at full size, "Coming soon", no tap.
   final bool comingSoon;

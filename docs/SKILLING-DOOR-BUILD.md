@@ -52,10 +52,15 @@ not cover. Use it only when a brief does.
   band ahead of hers is locked ("From 8 years"); a band behind hers drops.
   A tab with no `bandId` (Coding's shape) draws her band. Use it when a
   brief lists the bands as surfaces; do not use it to invent a ladder.
-* **The voice keepsake** — `SkDoorContent.voiceKeepsake: true` puts a
-  "Record it" row on every activity and routes `sk_voice/<door>` to
-  `SkVoiceKeepsakeScreen` (her clips, then the words). On this phone only;
-  see the file header for why the pregnancy recorder was not reused as-is.
+* **The voice keepsake** — `SkDoorContent.voiceKeepsake: true` routes
+  `sk_voice/<door>` to `SkVoiceKeepsakeScreen` (her clips, then the
+  words) and lets an activity with `offersRecording: true` show a "Record
+  it" row. **Off by default**: the parent's separate yes is
+  `SkChildStore.voiceAllowed`, a switch on the grown-up screen (the
+  Communication tasks' rule — "optional, off by default, only with parent
+  setup and consent; on-device only; never analysed, graded, scored,
+  transcribed or profiled"). On this phone only; see the file header for
+  why the pregnancy recorder was not reused as-is.
 * **The boundary note** — `SkDoorContent.boundaryNote`, a parent-facing
   page drawn as a card on the grown-up screen. For a brief that holds a
   clinical line ("if speech itself is the worry") rather than a consult.
@@ -179,6 +184,13 @@ From the Coding v2 brief and the user's calls of 2026-09-14:
     status table. Generic points come here, §9.
 11. Give the `git add` list and a commit message in a file. Walk the door on
     the phone when given access; small follow-up commits for what it finds.
+
+### Fields the task PDFs have added so far
+
+`withGrownUp` (Coding 11–14), `offersRecording` (Communication 6–8 and
+8–11). Both booleans on `SkActivity`, both marks the task names, both
+false by default. A fill that needs a third STOPs and lists it, as the
+tasks say.
 
 ### When the task PDFs arrive for a door
 
