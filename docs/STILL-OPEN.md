@@ -7127,3 +7127,44 @@ merge needs an identity; both keepsake stores now merge by id. The child
 type sizes moved to one set of constants at a middle setting on the
 user's reaction. The device is released.
 
+---
+
+## 57.0 Confidence, the third skilling door — 2026-09-16
+
+Appended at the end; this file is shared. Built to
+`ParentVeda_Confidence_structure.pdf` (11 Sep 2026), "the one that actually
+sells", on the shell as it stood after Communication. The door is
+`lib/data/doors/sk_door_confidence.dart` over
+`lib/data/skilling/skilling_confidence_*.dart`; the contract is
+`test/sk_confidence_door_test.dart`; owed content is
+`docs/DOOR-CONTENT-OWED.md` SF1–SF11; the review list is
+`docs/SKILLING-DOORS-REVIEW.md`. Generic points: `SKILLING-DOOR-BUILD.md` §9.
+
+### 57.1 The calls — 2026-09-16
+
+1a the paid door as placeholders behind the gate (course shelf + a coach
+row), the booking engine named as the pass after a real coach exists · 2a
+the coach on the grown-up screen under the classes, one closing card ·
+3b six cards, the brief's six child surfaces, the recorder and the
+keepsake as two cards onto one screen's two halves · 4a "notice one thing
+you did" as a prompt after listen-back, stored nowhere.
+
+### 57.2 What changed
+
+Four shell slots (`coach`, `voiceSelfReview`, `voiceTitle`, the `SkBreath`
+block rendering the app's one breathing circle), the `sk_record/<door>`
+surface. 36 activity slots, 18 lesson slots, 6 courses, 9 products, the
+parent note, the boundary note, the coach — placeholders, all in the
+ledger — and one built page, the steady-your-nerves breath. The bracket's
+six cells live: the first live Consult in the stage, the rubric tracker
+refused into Hear yourself back. The recorder's plugin calls are guarded
+and its permission wait bounded, which is what let a widget test hold the
+sheet. Not walked on a phone.
+
+### 57.3 Needs a decision (door-specific)
+
+* Six cards on the selector — seen on a phone, or not.
+* The self-review prompt's words, the coach row's words, the two lines
+  under the breath — all mine.
+* Whether "With a coach" oversells a placeholder course title.
+

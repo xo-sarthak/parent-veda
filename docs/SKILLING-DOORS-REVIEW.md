@@ -22,8 +22,8 @@ buy are stub sheets; the door stays behind `kDebugMode`; the preview ships.
 | Tile | Brief | Shape | Tasks (fills) | Commit | Walked on a phone | Contract |
 |---|---|---|---|---|---|---|
 | Coding | `ParentVeda_Coding_structure_v2.pdf` | door, 5 tabs + the shell | **3 of 3 filled** (36 activities) | 5f963a7 (door), 87dcd62 (fills + walk) | **yes** — 2026-09-14, at 8, 5 and 12 | `sk_coding_door_test` |
-| Communication | `ParentVeda_Communication_structure.pdf` | door, 5 tabs (three band cards) | **2 of 3 filled** (6–8, 8–11); 11–14 not written | a86c5bf (frame), 0fa1193 (fills), walk commit next | **yes** — 2026-09-16, at 12 and 8, recorder end to end | `sk_communication_door_test` |
-| Confidence | `ParentVeda_Confidence_structure.pdf` | plan sheet | 3 of 3 exist | — | — | — |
+| Communication | `ParentVeda_Communication_structure.pdf` | door, 5 tabs (three band cards) | **2 of 3 filled** (6–8, 8–11); 11–14 not written | a86c5bf (frame), 0fa1193 (fills), e67da1b (walk) | **yes** — 2026-09-16, at 12 and 8, recorder end to end | `sk_communication_door_test` |
+| Confidence | `ParentVeda_Confidence_structure.pdf` | door, **6 cards** (three band cards + recorder + keepsake) | 3 of 3 exist, not yet mapped | commit next | no | `sk_confidence_door_test` |
 | Creativity | `ParentVeda_Creativity_structure.pdf` | plan sheet | none yet | — | — | — |
 | Feelings | `ParentVeda_Feelings_structure.pdf` | plan sheet | none yet | — | — | — |
 | Focus | `ParentVeda_Focus_structure.pdf` | plan sheet | none yet | — | — | — |
@@ -172,6 +172,37 @@ Frame only; the two task PDFs (6–8, 8–11) fill it next.
       side would fit better as the hero's small lock control than as a
       closing card below five rails; same as Coding's Suggestion A.
 
+## Confidence (§57)
+
+Built to the brief literally on your calls of 2026-09-16 (1a 2a 3b 4a).
+Frame only; three task PDFs fill it next.
+
+- [ ] **Look:** Skilling → Confidence → the selector: six cards. Use your
+      voice · Stand up and say it · Give a real talk · Lessons · Hear
+      yourself back · Your talks, saved. The brief listed six; the
+      coverflow is drawn for five. Say if six reads crowded (Health and
+      Development carry six on the parenting side and were kept).
+- [ ] **Look:** Hear yourself back → (recording on) the sheet opens
+      straight away → record → Listen back → the prompt "Notice one thing
+      you did. Just for you — nothing is written down." Right tone? The
+      words are mine.
+- [ ] **Look:** Lessons → Stage exercises → Steady your nerves: the app's
+      breathing circle (in 3, out 5) with two lines of mine under it. The
+      one built lesson on the door; say if it should wait for the fill.
+- [ ] **Look:** For the grown-up → under the classes, "A speaking coach,
+      one to one" (₹799 / $10 placeholder) → the stub sheet. The row's
+      words are mine. The booking-engine wiring waits on a real coach.
+- [ ] The course titles ("With a coach, Use your voice" / "At her own
+      pace, Use your voice") — say if "with a coach" oversells for a
+      placeholder.
+- [ ] The hero photo: a classroom, hands up to answer. Keep?
+- [ ] The tile says "Confidence"; the brief's door is "Confidence & public
+      speaking". Fine.
+- [ ] **Suggestion:** on this door the recorder and the keepsake being two
+      cards makes the walk to "record something" one tap shorter than on
+      Communication. If it reads well, Communication could take the same
+      shape (its brief listed one surface; yours to say).
+
 ## Cross-door windows
 
 `sk_page/<door>/<page>` as a `toolSurfaceId` on a page with no blocks —
@@ -187,3 +218,6 @@ Communication split the Communication brief names.
 | Communication | Confidence | the shared speaking practice — Confidence owns the nerve and the audience, Expression the clarity and the back-and-forth; the recorder is built once (`sk_voice_keepsake.dart`) | owed — Confidence not built; it windows into Communication's prompt sets when it lands |
 | Communication | Reading | "a child reads a story there and retells it here" | owed — Reading not built |
 | Communication | Feelings | "Feelings owns naming the emotion; Expression owns putting it into clear words" | owed — Feelings not built |
+| Confidence | Communication | the shared speaking practice — Confidence dares to say it, Communication says it clearly; one recorder (`sk_voice_keepsake.dart`), used by both | built as the shared recorder; the prompt-set window waits on Communication's lesson fill |
+| Confidence · `cf_breath` | Stillness | the quick calming breath — "Confidence references that breath for the moment before you speak, it does not build its own" | built as the app's one circle in an `SkBreath` block; the Stillness page it should link to does not exist yet |
+| Confidence | Feelings | "naming and handling the fear is Feelings" | owed — Feelings not built |

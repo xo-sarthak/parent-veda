@@ -212,6 +212,40 @@ class _SkGrownUpScreenState extends State<SkGrownUpScreen> {
                   p: p,
                   title: 'No classes at this level yet',
                   line: 'They arrive band by band.'),
+            // ---- the coach, where a door un-holds Consult ----------------
+            //
+            // Parent books, so parent side: a row under the classes, not a
+            // Consult closing card (the user's call, 2026-09-16, 2a). Opens
+            // a stub sheet until a real coach exists; the booking engine is
+            // the named next pass.
+            if (c.coach case final coach?) ...[
+              const SizedBox(height: 10),
+              _ShelfRow(
+                key: const Key('sk-coach-row'),
+                p: p,
+                icon: Icons.record_voice_over_outlined,
+                chip: coach.comingSoon ? 'Coming soon' : 'Coach',
+                title: coach.title,
+                line: 'One to one  ·  you book, she attends',
+                blurb: coach.blurb,
+                price: _price(coach.priceInr, coach.priceUsd),
+                dimmed: false,
+                onTap: () => _stubSheet(
+                  context,
+                  eyebrow: 'BOOK  ·  ONE TO ONE',
+                  title: coach.title,
+                  lines: [
+                    coach.blurb,
+                    if (_price(coach.priceInr, coach.priceUsd) case final pr?)
+                      'Placeholder price: $pr. The real price is set when the '
+                          'coach is.',
+                    'Booking opens when a coach is here. Nothing is charged '
+                        'from here.',
+                    'A coach who teaches, and promises nothing about her.',
+                  ],
+                ),
+              ),
+            ],
             const SizedBox(height: 30),
 
             // ---- the product shelf -------------------------------------------
@@ -459,6 +493,7 @@ class _SoonCard extends StatelessWidget {
 
 class _ShelfRow extends StatelessWidget {
   const _ShelfRow({
+    super.key,
     required this.p,
     required this.icon,
     required this.chip,

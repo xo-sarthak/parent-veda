@@ -65,6 +65,22 @@ not cover. Use it only when a brief does.
   page drawn as a card on the grown-up screen. For a brief that holds a
   clinical line ("if speech itself is the worry") rather than a consult.
 
+**Four more, added by Confidence (2026-09-16):**
+
+* **A coach row** — `SkDoorContent.coach` (`SkCoach`), drawn under the
+  classes on the grown-up screen with a stub sheet. For a brief that
+  un-holds Consult. The booking engine (`lib/booking/`) is wired the day a
+  real coach is onboarded, not before.
+* **The self-review prompt** — `SkDoorContent.voiceSelfReview: true` shows
+  "Notice one thing you did" on the record sheet after listen-back. A
+  prompt, never a field; nothing noticed is stored.
+* **`sk_record/<door>`** — the keepsake screen opening straight onto the
+  recorder, for a brief that lists the recorder as its own surface.
+  `SkDoorContent.voiceTitle` names the screen in the door's words.
+* **`SkBreath`** — a block rendering the app's ONE breathing circle
+  (`lib/widgets/breathing_circle.dart`) with `kSkSteadyBreath` (in 3, out
+  5). For "steady your nerves"; never a second circle.
+
 ### The two voices
 
 Every skilling screen is one of two things, and the file says which:
@@ -329,6 +345,12 @@ Points that apply to every skill door. Door-specific ones are in
 - [ ] **Voice.** The read-aloud uses the device's English voice via
       `BabyVoiceService`. A recorded warm voice (the brief's "a warm voice")
       is a narration-manifest job like Garbh Sanskar's.
+- [ ] **The booking engine for a coach.** Confidence's coach is a
+      placeholder row; when a real coach exists, wire the row to
+      `lib/booking/` as a 1:1 consult Offering (capacity 1 — the
+      one-to-one-before-group rule), under the same no-outcome guard, with
+      money server-side. `BookingCatalog` says experts are "a decision, not
+      a derivation" — this is that decision, per door.
 - [ ] **A cloud copy of her recordings** — only when a real consent adapter
       replaces the stub AND a parent consents to cloud storage as a separate
       line: a child-scoped bucket, RLS, a retention limit, a delete that

@@ -148,6 +148,48 @@ final List<Bracket> kSkillingBrackets = [
             'to hear yourself back.',
         hi: 'सामने खड़े होकर बोलना — अभ्यास के लिए विषय, और ख़ुद को सुनकर '
             'सुधारने का तरीक़ा।'),
+    // ⚠️ LIVE SINCE 2026-09-16, to `ParentVeda_Confidence_structure.pdf`.
+    // Six cells live — the first door with a live CONSULT: the brief
+    // un-holds the speaking coach ("the only door naming a real role with
+    // real supply"), built as a placeholder row on the grown-up screen
+    // until a coach is onboarded. The rubric tracker is refused ("it scores
+    // a child") into "Hear yourself back". Extras stay `notReady`.
+    layers: {
+      BracketLayer.content: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Speaking practice with prompts, stage exercises',
+        surfaceIds: ['sk_lessons/skilling_confidence'],
+      ),
+      BracketLayer.activities: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Practice + record & self-review',
+        surfaceIds: ['sk_activities/skilling_confidence'],
+      ),
+      BracketLayer.tools: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Record & self-review tool + rubric tracker',
+        surfaceIds: ['sk_record/skilling_confidence', 'sk_voice/skilling_confidence'],
+      ),
+      BracketLayer.products: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Optional',
+        surfaceIds: ['sk_products/skilling_confidence'],
+      ),
+      BracketLayer.course: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Leveled program (paid)',
+        surfaceIds: ['sk_courses/skilling_confidence'],
+      ),
+      BracketLayer.consult: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Speaking coach',
+        surfaceIds: ['sk_courses/skilling_confidence'],
+      ),
+      BracketLayer.extras: const BracketLayerSpec(
+          state: LayerState.notReady,
+          reason: 'Challenges, certificates, progress report'),
+    },
+    /* kept for revert — the row as declared before the door
     layers: _skillLayers(
       content: 'Speaking practice with prompts, stage exercises',
       activities: 'Practice + record & self-review',
@@ -157,6 +199,7 @@ final List<Bracket> kSkillingBrackets = [
       consult: 'Speaking coach',
       extras: 'Challenges, certificates, progress report',
     ),
+    */
   ),
 
   Bracket(

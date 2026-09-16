@@ -180,6 +180,7 @@ two.
 | Traditions (parenting) | 10 | 8 | – | 2 | – (two sensitive pages, tone to sign off) |
 | Coding (skilling) | 9 | 4 (33 slots: 12 lessons, 6 AI cards, 6 courses, 9 products, 1 note — the 36 activities are filled) | – | 2 (the consent adapter, the access rail) | 1 generic (resume marker — `SKILLING-DOOR-BUILD.md` §9) |
 | Communication (skilling) | 10 | 6 (41 slots: 12 activities for 11–14, 27 lessons, 12 courses, 12 products, 2 notes — the 6–8 and 8–11 activities are filled) | – | 1 (the voice keepsake) | 1 (cloud copy of recordings, behind a real consent) |
+| Confidence (skilling) | 11 | 8 (72 slots: 36 activities, 18 lessons, 6 courses, 9 products, 2 notes, 1 coach) | – | 1 (the breath page) | 1 (the coach onboarded, then the booking wiring) |
 
 Pregnancy, six doors: written pieces owed, in prose — **S1, L3, L4, L5, L6,
 M1**, six reads. Films — **N1, L1, L2, M4 ×3, M6 ×5**, eleven. Audio — **M5
@@ -405,3 +406,22 @@ unwritten until you say go"). Rows carry `SC`.
 | SC8 | `cm_boundary_note` — If speech itself is the worry | Parent note | Coming soon | The brief's held call: one honest line to a speech professional, never a course, never a "fix her speech" product. The card stands on the grown-up screen; the line is unwritten. |
 | SC9 | "Your voice, saved" — the recorder and the clips | Keepsake | Built from data | On this phone only (`sk_voice_keepsake.dart`). **Off by default** (the tasks' rule): a parent turns it on under For the grown-up (`SkChildStore.voiceAllowed`), and the record row shows only on the four `offersRecording` activities. **Owed, for the day the consent adapter is real:** a cloud copy behind a separate consent line — child-scoped bucket, RLS, retention, a delete that deletes. `BACKEND-PATTERNS.md` §16a. |
 | SC10 | Cross-links to Confidence, Reading and Feelings | Windows | Owed | Those doors do not exist; the brief's "cross-link, do not duplicate" becomes `sk_page/<door>/<page>` windows when each lands. Review file, cross-door table. |
+
+### SF. Confidence & public speaking — `lib/data/doors/sk_door_confidence.dart`
+
+Built to `ParentVeda_Confidence_structure.pdf` (11 Sep 2026), door three,
+on 2026-09-16. Frame only. Rows carry `SF`.
+
+| # | Card | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| SF1 | Use your voice, 6 to 8 — (`cf_68_01`, `cf_68_02`, `cf_68_03`, `cf_68_04`, `cf_68_05`, `cf_68_06`, `cf_68_07`, `cf_68_08`, `cf_68_09`, `cf_68_10`, `cf_68_11`, `cf_68_12`) | Activity ×12 | Coming soon | **The fill exists:** `tasks/confidence/… 6-8 … Bracket 1.pdf`. |
+| SF2 | Stand up and say it, 8 to 11 — (`cf_811_01`, `cf_811_02`, `cf_811_03`, `cf_811_04`, `cf_811_05`, `cf_811_06`, `cf_811_07`, `cf_811_08`, `cf_811_09`, `cf_811_10`, `cf_811_11`, `cf_811_12`) | Activity ×12 | Coming soon | **The fill exists:** `… 8-11 … Bracket 2.pdf`. |
+| SF3 | Give a real talk, 11 to 14 — (`cf_1114_01`, `cf_1114_02`, `cf_1114_03`, `cf_1114_04`, `cf_1114_05`, `cf_1114_06`, `cf_1114_07`, `cf_1114_08`, `cf_1114_09`, `cf_1114_10`, `cf_1114_11`, `cf_1114_12`) | Activity ×12 | Coming soon | **The fill exists:** `… 11-14 … Bracket 3.pdf`. |
+| SF4 | The lesson sets — speaking prompts and stage exercises, three per band per set (`cf_prm_68_1`, `cf_prm_68_2`, `cf_prm_68_3`, `cf_prm_811_1`, `cf_prm_811_2`, `cf_prm_811_3`, `cf_prm_1114_1`, `cf_prm_1114_2`, `cf_prm_1114_3`, `cf_stg_68_1`, `cf_stg_68_2`, `cf_stg_68_3`, `cf_stg_811_1`, `cf_stg_811_2`, `cf_stg_811_3`, `cf_stg_1114_1`, `cf_stg_1114_2`, `cf_stg_1114_3`) | Lesson ×18 | Coming soon | No task PDF. "Prompt and stage-exercise sets per band, each tied to one of the six skills. Small low-stakes turns first, a real talk last." The one built page in the set is `cf_breath` (SF9). |
+| SF5 | The course shelf — with a coach (live) and at her own pace (recorded), per level (`cf_course_68_live`, `cf_course_68_rec`, `cf_course_811_live`, `cf_course_811_rec`, `cf_course_1114_live`, `cf_course_1114_rec`) | Course ×6 | Coming soon | Real programmes with a real coach. Placeholders behind the gate (question 1a); the booking engine is the named next pass. Every string under the no-outcome scan: no "confident child", no rank. |
+| SF6 | The product shelf — a toy mic, prompt cards, a little stage timer, per band (`cf_prod_68_mic`, `cf_prod_68_cards`, `cf_prod_68_timer`, `cf_prod_811_mic`, `cf_prod_811_cards`, `cf_prod_811_timer`, `cf_prod_1114_mic`, `cf_prod_1114_cards`, `cf_prod_1114_timer`) | Product ×9 | Coming soon | Real, sourced items. Skilling's own shelf; the timer is a prop she holds, never something the app reads. |
+| SF7 | `cf_parent_note` — For the grown-up: why daring to speak is a real skill, and why a quiet child is not a problem to fix | Parent note | Coming soon | The authored half. |
+| SF8 | `cf_boundary_note` — If it is more than shyness | Parent note | Coming soon | The brief's held boundary: a real fear of speaking or a stammer is not a confidence gap and not a course. One honest line to a professional, unwritten; its card stands on the grown-up screen. |
+| SF9 | `cf_breath` — Steady your nerves | Tool | Built from data | The one built lesson: the app's one breathing circle (`PvBreathingCircle`, in for three, out for five) as an `SkBreath` block. The brief: "Confidence references that breath for the moment before you speak, it does not build its own." Copy on the page is two lines of mine — say if it should wait for the fill. |
+| SF10 | `cf_coach` — A speaking coach, one to one | Consult | Coming soon | The brief's un-held Consult: a placeholder row under the classes (question 2a), stub sheet on tap, ₹799 / $10 placeholder. **Owed:** a real coach onboarded, then the row wired to `lib/booking/` as a 1:1 Offering (capacity 1) — the named next pass. |
+| SF11 | Cross-links to Communication, Stillness and Feelings | Windows | Owed | Communication exists (`sk_page/skilling_communication/…` when its lessons are filled); Stillness and Feelings do not. Review file, cross-door table. |

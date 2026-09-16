@@ -16,6 +16,10 @@ import '../../data/skilling/skilling_communication_activities.dart';
 import '../../data/skilling/skilling_communication_content.dart';
 import '../../data/skilling/skilling_communication_course.dart';
 import '../../data/skilling/skilling_communication_products.dart';
+import '../../data/skilling/skilling_confidence_activities.dart';
+import '../../data/skilling/skilling_confidence_content.dart';
+import '../../data/skilling/skilling_confidence_course.dart';
+import '../../data/skilling/skilling_confidence_products.dart';
 import 'sk_door_content.dart';
 
 final SkDoorContent kSkCodingContent = SkDoorContent(
@@ -46,11 +50,29 @@ final SkDoorContent kSkCommunicationContent = SkDoorContent(
   voiceKeepsake: true,
 );
 
+final SkDoorContent kSkConfidenceContent = SkDoorContent(
+  doorId: 'skilling_confidence',
+  bandNames: kSkConfidenceBandNames,
+  skills: kSkConfidenceSkills,
+  lessonSets: kSkConfidenceLessonSets,
+  lessons: kSkConfidenceLessons,
+  activities: kSkConfidenceActivities,
+  courses: kSkConfidenceCourses,
+  products: kSkConfidenceProducts,
+  parentNote: kSkConfidenceParentNote,
+  boundaryNote: kSkConfidenceBoundaryNote,
+  voiceKeepsake: true,
+  voiceSelfReview: true,
+  voiceTitle: 'Your talks, saved',
+  coach: kSkConfidenceCoach,
+);
+
 /// Every door with content. Adding a door is a line here and a line in
 /// `kSkDoors`.
 final List<SkDoorContent> kSkDoorContents = [
   kSkCodingContent,
   kSkCommunicationContent,
+  kSkConfidenceContent,
 ];
 
 SkDoorContent? skDoorContentFor(String doorId) {

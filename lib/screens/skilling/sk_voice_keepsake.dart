@@ -43,6 +43,7 @@ import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
 import 'sk_child_store.dart';
 import 'sk_content.dart';
+import 'sk_content_registry.dart';
 import 'sk_practice_store.dart';
 
 /// One saved clip.
@@ -193,6 +194,7 @@ Future<bool> skRecordVoice(
   required String doorId,
   String? itemId,
   String? title,
+  bool selfReview = false,
 }) async {
   // ⚠️ ASK FOR THE MICROPHONE BEFORE THE SHEET, NOT INSIDE IT. On a phone
   // (2026-09-15) the first-ever permission dialog rose over the sheet and
@@ -201,13 +203,18 @@ Future<bool> skRecordVoice(
   // share a stack well, so the permission is settled first and the sheet
   // opens onto a phone that can already record. A refusal is not an error:
   // the sheet still opens and says the microphone is off.
-  final rec = AudioRecorder();
+  // ⚠️ EVERY PLUGIN CALL IS GUARDED, INCLUDING CONSTRUCTION. Under
+  // `flutter test` the `record` plugin has no platform and throws at first
+  // touch; a sheet that cannot be built in a test is a sheet no test can
+  // hold. No platform, or a refusal, and the sheet still opens and says so.
+  // Bounded: with no platform the call never completes, and a parent
+  // reading the dialog needs longer than a snappy timeout gives. Ninety
+  // seconds is longer than any permission dialog and shorter than forever.
   try {
-    await rec.hasPermission();
-  } catch (_) {
-  } finally {
+    final rec = AudioRecorder();
+    await rec.hasPermission().timeout(const Duration(seconds: 90));
     await rec.dispose();
-  }
+  } catch (_) {}
   if (!context.mounted) return false;
   final saved = await showModalBottomSheet<bool>(
     context: context,
@@ -215,59 +222,75 @@ Future<bool> skRecordVoice(
     backgroundColor: V2PaletteStore.instance.current.ground,
     shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(26))),
-    builder: (_) => _RecordSheet(doorId: doorId, itemId: itemId, title: title),
+    builder: (_) => _RecordSheet(
+        doorId: doorId, itemId: itemId, title: title, selfReview: selfReview),
   );
   return saved ?? false;
 }
 
 class _RecordSheet extends StatefulWidget {
-  const _RecordSheet({required this.doorId, this.itemId, this.title});
+  const _RecordSheet(
+      {required this.doorId, this.itemId, this.title, this.selfReview = false});
   final String doorId;
   final String? itemId;
   final String? title;
+
+  /// Confidence's "notice one thing you did": a prompt after listen-back,
+  /// stored nowhere.
+  final bool selfReview;
 
   @override
   State<_RecordSheet> createState() => _RecordSheetState();
 }
 
 class _RecordSheetState extends State<_RecordSheet> {
-  final AudioRecorder _rec = AudioRecorder();
+  /// Made on first use, inside a guard — see `skRecordVoice`.
+  AudioRecorder? _recorder;
+  AudioRecorder get _rec => _recorder ??= AudioRecorder();
   final AudioPlayer _player = AudioPlayer();
   bool _recording = false;
   bool _playing = false;
   bool _noMic = false;
+  bool _listened = false;
   String? _path;
 
   @override
   void dispose() {
-    _rec.dispose();
+    try {
+      _recorder?.dispose();
+    } catch (_) {}
     _player.dispose();
     super.dispose();
   }
 
   Future<void> _toggle() async {
-    if (_recording) {
-      final path = await _rec.stop();
-      if (!mounted) return;
-      setState(() {
-        _recording = false;
-        _path = path;
-      });
-      return;
-    }
-    if (!await _rec.hasPermission()) {
+    try {
+      if (_recording) {
+        final path = await _rec.stop();
+        if (!mounted) return;
+        setState(() {
+          _recording = false;
+          _path = path;
+        });
+        return;
+      }
+      if (!await _rec.hasPermission()) {
+        if (mounted) setState(() => _noMic = true);
+        return;
+      }
+      final dir = await SkVoiceStore.folder();
+      final path = '${dir.path}/v_${DateTime.now().microsecondsSinceEpoch}.m4a';
+      await _rec.start(const RecordConfig(), path: path);
+      if (mounted) {
+        setState(() {
+          _recording = true;
+          _noMic = false;
+          _path = null;
+        });
+      }
+    } catch (_) {
+      // No microphone platform: say the mic is off rather than crash.
       if (mounted) setState(() => _noMic = true);
-      return;
-    }
-    final dir = await SkVoiceStore.folder();
-    final path = '${dir.path}/v_${DateTime.now().microsecondsSinceEpoch}.m4a';
-    await _rec.start(const RecordConfig(), path: path);
-    if (mounted) {
-      setState(() {
-        _recording = true;
-        _noMic = false;
-        _path = null;
-      });
     }
   }
 
@@ -281,7 +304,10 @@ class _RecordSheetState extends State<_RecordSheet> {
     }
     await _player.play(DeviceFileSource(p));
     if (!mounted) return;
-    setState(() => _playing = true);
+    setState(() {
+      _playing = true;
+      _listened = true;
+    });
     _player.onPlayerComplete.first.then((_) {
       if (mounted) setState(() => _playing = false);
     });
@@ -410,6 +436,26 @@ class _RecordSheetState extends State<_RecordSheet> {
                   ),
                 ),
               ]),
+              // ⚠️ THE SELF-REVIEW IS A PROMPT, NOT A FIELD. Confidence's
+              // "hear yourself back, notice one thing you did": shown once
+              // she has listened, and nothing she notices is written down.
+              // The app never grades, analyses or transcribes the clip.
+              if (widget.selfReview && _listened) ...[
+                const SizedBox(height: 12),
+                Container(
+                  key: const Key('sk-voice-notice'),
+                  padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+                  decoration: BoxDecoration(
+                    color: p.surfaceAlt,
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Text(
+                      'Notice one thing you did. Just for you — nothing is '
+                      'written down, and nobody marks it.',
+                      style: pvManrope(
+                          fontSize: 14.5, height: 1.5, color: p.ink1)),
+                ),
+              ],
               const SizedBox(height: 10),
               SizedBox(
                 width: double.infinity,
@@ -497,8 +543,13 @@ class _Button extends StatelessWidget {
 // =============================================================================
 
 class SkVoiceKeepsakeScreen extends StatefulWidget {
-  const SkVoiceKeepsakeScreen({super.key, required this.doorId});
+  const SkVoiceKeepsakeScreen(
+      {super.key, required this.doorId, this.openRecorder = false});
   final String doorId;
+
+  /// "Hear yourself back": open with the record sheet already up, when a
+  /// parent has turned recording on.
+  final bool openRecorder;
 
   @override
   State<SkVoiceKeepsakeScreen> createState() => _SkVoiceKeepsakeScreenState();
@@ -513,6 +564,15 @@ class _SkVoiceKeepsakeScreenState extends State<SkVoiceKeepsakeScreen> {
     super.initState();
     SkVoiceStore.instance.load();
     SkPracticeStore.instance.load();
+    if (widget.openRecorder) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted || !SkChildStore.instance.voiceAllowed) return;
+        skRecordVoice(context,
+            doorId: widget.doorId,
+            selfReview:
+                skDoorContentFor(widget.doorId)?.voiceSelfReview ?? false);
+      });
+    }
   }
 
   @override
@@ -570,7 +630,7 @@ class _SkVoiceKeepsakeScreenState extends State<SkVoiceKeepsakeScreen> {
                       letterSpacing: 1.2,
                       color: p.action)),
             const SizedBox(height: 8),
-            Text('Your voice, saved',
+            Text(skDoorContentFor(widget.doorId)?.voiceTitle ?? 'Your voice, saved',
                 style: pvFraunces(
                     fontSize: kSkTitleSize,
                     fontWeight: FontWeight.w600,
@@ -619,7 +679,10 @@ class _SkVoiceKeepsakeScreenState extends State<SkVoiceKeepsakeScreen> {
                 label: 'Record something',
                 icon: Icons.mic_rounded,
                 p: p,
-                onTap: () => skRecordVoice(context, doorId: widget.doorId),
+                onTap: () => skRecordVoice(context,
+                    doorId: widget.doorId,
+                    selfReview:
+                        skDoorContentFor(widget.doorId)?.voiceSelfReview ?? false),
               ),
             const SizedBox(height: 24),
             if (clips.isEmpty && SkChildStore.instance.voiceAllowed)

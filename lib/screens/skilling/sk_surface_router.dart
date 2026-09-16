@@ -25,6 +25,7 @@
 //    sk_cross/<door>                  the door on the cross-band tab
 //    sk_keepsake/<door>               What I've made and tried
 //    sk_voice/<door>                  Your voice, saved (clips + the words)
+//    sk_record/<door>                 the same screen, opening on the recorder
 //    sk_access/<door>                 the free tools to set up (gated)
 //    sk_grown_up/<door>               the parent side (gated)
 //    sk_courses/<door>                the parent side, on the course shelf
@@ -86,6 +87,12 @@ Widget? skScreenForSurface(String id) {
     case 'sk_voice':
       if (door == null || skDoorContentFor(door)?.voiceKeepsake != true) return null;
       return SkVoiceKeepsakeScreen(doorId: door);
+    case 'sk_record':
+      // The brief's "Hear yourself back" as its own card (the user's call,
+      // 2026-09-16, 3b): the keepsake screen, opening straight onto the
+      // recorder. Two cards, one screen's two halves.
+      if (door == null || skDoorContentFor(door)?.voiceKeepsake != true) return null;
+      return SkVoiceKeepsakeScreen(doorId: door, openRecorder: true);
     case 'sk_access':
       if (door == null || skDoorContentFor(door) == null) return null;
       return SkAccessScreen(doorId: door);

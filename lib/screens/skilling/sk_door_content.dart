@@ -150,6 +150,30 @@ class SkAccessTool {
   bool inBand(String band) => bands.contains(band);
 }
 
+/// A one-to-one coach the parent books. Placeholder now: the Confidence
+/// brief un-holds Consult ("the only door naming a real role with real
+/// supply") and the user's call (2026-09-16, question 1a) is a placeholder
+/// row behind the gate until a real coach is onboarded, with the booking
+/// engine (`lib/booking/`) as the named next pass. Same guardrail as a
+/// course: teaches, promises nothing.
+class SkCoach {
+  const SkCoach({
+    required this.id,
+    required this.title,
+    this.blurb = '',
+    this.priceInr,
+    this.priceUsd,
+    this.comingSoon = true,
+  });
+  final String id;
+  final String title;
+  final String blurb;
+  final int? priceInr;
+  final int? priceUsd;
+  final bool comingSoon;
+  bool get noOutcomeClaims => true;
+}
+
 /// One skill door's content.
 class SkDoorContent {
   const SkDoorContent({
@@ -166,7 +190,23 @@ class SkDoorContent {
     this.access = const [],
     this.boundaryNote,
     this.voiceKeepsake = false,
+    this.voiceSelfReview = false,
+    this.voiceTitle = 'Your voice, saved',
+    this.coach,
   });
+
+  /// The keepsake screen's title, in the door's own words — Communication's
+  /// "Your voice, saved", Confidence's "Your talks, saved".
+  final String voiceTitle;
+
+  /// "Hear yourself back … notice one thing you did." After listen-back the
+  /// record sheet shows one prompt and stores nothing — the noticing is
+  /// hers (the user's call, 2026-09-16, question 4a). Confidence only.
+  final bool voiceSelfReview;
+
+  /// The one-to-one coach row on the grown-up screen. Null for a door whose
+  /// Consult is held.
+  final SkCoach? coach;
 
   /// One honest line out to a professional, on the parent side — the
   /// Communication brief's "if speech itself is the worry (stammer, delay)".

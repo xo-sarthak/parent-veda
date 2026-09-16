@@ -49,8 +49,10 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../localization/app_language.dart';
+import '../../models/breath_pattern.dart';
 import '../../services/baby_voice_service.dart';
 import '../../theme/pv_fonts.dart';
+import '../../widgets/breathing_circle.dart';
 import '../../widgets/pv_placeholders.dart';
 import '../v2/v2_palette.dart';
 import 'sk_grown_up_gate.dart';
@@ -149,6 +151,34 @@ class SkLink extends SkBlock {
   /// Honestly not built yet: renders as such, never as a dead tap.
   bool get isDead => pageId == null && surfaceId == null && url == null;
 }
+
+/// The steady-your-nerves breath: the ONE breathing circle the app has
+/// (`lib/widgets/breathing_circle.dart`, stage-neutral), handed a pattern
+/// and its own clock. The Confidence brief: "the quick calming breath
+/// belongs to Stillness, which itself reuses the breathing-circle the app
+/// already has. Confidence references that breath for the moment before
+/// you speak, it does not build its own." Added 2026-09-16 for the
+/// Confidence fills to use; the block is the reference, not a fourth circle.
+class SkBreath extends SkBlock {
+  const SkBreath({
+    this.heading = 'Steady your nerves',
+    this.line,
+    this.pattern = kSkSteadyBreath,
+  });
+  final String heading;
+
+  /// One line under the circle — "Butterflies are normal. Breathe, then go."
+  final String? line;
+  final BreathPattern pattern;
+}
+
+/// In for three, out for five — the long out-breath does the work. The
+/// parenting balloon breath's numbers, restated here rather than imported
+/// from the parenting shell.
+const BreathPattern kSkSteadyBreath = BreathPattern([
+  BreathStep('Breathe in', 3, BreathKind.expand),
+  BreathStep('Let it out slowly', 5, BreathKind.contract),
+]);
 
 /// One paragraph for the parent, on a child's page, behind the gate. The
 /// brief: "the parent note explains, in plain words with no hype, why that
@@ -529,8 +559,37 @@ class SkBlockView extends StatelessWidget {
     if (b is SkVideoSlot) return _video(b, p);
     if (b is SkLink) return _link(context, b, p);
     if (b is SkGrownUpNote) return _grownUp(context, b, p);
+    if (b is SkBreath) return _breath(b, p);
     return const SizedBox.shrink();
   }
+
+  Widget _breath(SkBreath b, V2Palette p) => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _heading(b.heading, p),
+          Center(
+            child: PvBreathTicker(
+              running: true,
+              builder: (context, s) => PvBreathingCircle(
+                pattern: b.pattern,
+                elapsed: s,
+                tint: p.action.withValues(alpha: 0.18),
+                ink: p.ink1,
+                size: 220,
+              ),
+            ),
+          ),
+          if (b.line case final line?) ...[
+            const SizedBox(height: 14),
+            Text(line,
+                style: pvManrope(
+                    fontSize: _body,
+                    fontWeight: FontWeight.w500,
+                    height: 1.55,
+                    color: p.ink2)),
+          ],
+        ],
+      );
 
   // Kid-voice sizes are the brief's answer to "text-heavy is a fail state":
   // body 17 on a child page, 14.5 on a parent one.
