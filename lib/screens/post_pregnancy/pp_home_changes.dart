@@ -118,15 +118,22 @@ class PhaseChange {
   /// phase, then the phase's own "should I be worried?" line. Every phase
   /// has one, and it is the sentence a parent most needs after a list of
   /// things her child "should" be doing.
+  ///
+  /// ⚠️ THE MILESTONE IS QUOTED, NOT CONJUGATED. The texts are written
+  /// third-person singular ("Calms when held"), and the first cut spliced
+  /// them after "most children" — "most children calms when held" was on
+  /// the phone. So the milestone stands as its own sentence and the claim
+  /// about most children follows it, with "this" or "these" doing the
+  /// pointing.
   List<String> paragraphs() => [
         if (milestones.length == 1)
-          'By the end of ${phase.ageLabel}, most children ${_lower(milestones.first.text)}. '
-              'It is one of the things changing in ${_lower(phase.name)}, and it '
-              'arrives on its own timetable.'
+          '${milestones.first.text}. Most children can do this by the end of '
+              '${phase.ageLabel}. It is one of the things changing in '
+              '${_lower(phase.name)}, and it arrives on its own timetable.'
         else
-          'By the end of ${phase.ageLabel}, most children '
-              '${milestones.map((m) => _lower(m.text)).join(', and ')}. '
-              'These are the ${category.toLowerCase()} changes of ${_lower(phase.name)}, '
+          '${milestones.map((m) => m.text).join('. ')}. Most children can do '
+              'these by the end of ${phase.ageLabel}. They are the '
+              '${category.toLowerCase()} changes of ${_lower(phase.name)}, '
               'and they arrive on their own timetable.',
         phase.reassurance,
       ];
@@ -144,11 +151,13 @@ class PhaseChange {
 
   /// An age-suitable activity in this domain, or null.
   DevActivity? activityFor(int ageMonths) {
-    final pool = growActivitiesForAge(ageMonths);
+    final pool = growActivitiesForAge(ageMonths).where((a) => areaIds.contains(a.areaId));
+    // Exact fit first; the widened band only if the domain has nothing at
+    // this exact age. Same rule as the home's activity store.
     for (final a in pool) {
-      if (areaIds.contains(a.areaId)) return a;
+      if (growSuitsAge(a, ageMonths)) return a;
     }
-    return null;
+    return pool.isEmpty ? null : pool.first;
   }
 }
 

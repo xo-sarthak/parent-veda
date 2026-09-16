@@ -2407,25 +2407,35 @@ class _Chip extends StatelessWidget {
   final double? hue;
   final IconData? icon;
 
+  // ⚠️ `widthFactor: 1` IS THE WHOLE FIX. On the phone this chip stretched to
+  // the full width of the change sheet: a ListView hands its children a
+  // TIGHT cross-axis width, and a Container obeys it. `Align` with a width
+  // factor sizes itself to its child instead, whatever the parent offers, so
+  // the chip is the width of its word in a Column, a ListView or a Wrap.
   @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
-        decoration: BoxDecoration(
-          color: hue == null ? p.surfaceAlt : v2BlockTint(hue!, p),
-          borderRadius: BorderRadius.circular(999),
+  Widget build(BuildContext context) => Align(
+        alignment: Alignment.centerLeft,
+        widthFactor: 1,
+        heightFactor: 1,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+          decoration: BoxDecoration(
+            color: hue == null ? p.surfaceAlt : v2BlockTint(hue!, p),
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            if (icon != null) ...[
+              Icon(icon, size: 11, color: hue == null ? p.ink3 : p.ink1),
+              const SizedBox(width: 5),
+            ],
+            Text(label.toUpperCase(),
+                style: pvManrope(
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.1,
+                    color: hue == null ? p.ink3 : p.ink1)),
+          ]),
         ),
-        child: Row(mainAxisSize: MainAxisSize.min, children: [
-          if (icon != null) ...[
-            Icon(icon, size: 11, color: hue == null ? p.ink3 : p.ink1),
-            const SizedBox(width: 5),
-          ],
-          Text(label.toUpperCase(),
-              style: pvManrope(
-                  fontSize: 9.5,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 1.1,
-                  color: hue == null ? p.ink3 : p.ink1)),
-        ]),
       );
 }
 
@@ -2974,33 +2984,45 @@ class _ReadRail extends StatelessWidget {
                                         const SizedBox.shrink()),
                           ),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(14),
-                          child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _Chip(
-                                    label: 'Article · ${r.minutes} min',
-                                    p: p),
-                                const SizedBox(height: 9),
-                                Text(r.title,
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: pvFraunces(
-                                        fontSize: 15,
-                                        fontWeight: FontWeight.w600,
-                                        height: 1.25,
-                                        letterSpacing: -0.3,
-                                        color: p.ink1)),
-                                const SizedBox(height: 5),
-                                Text(r.teaser,
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                    style: pvManrope(
-                                        fontSize: 12.5,
-                                        height: 1.4,
-                                        color: p.ink2)),
-                              ]),
+                        // ⚠️ THE TEASER IS `Expanded`, THE TITLE IS NOT. The
+                        // card is a fixed height inside a horizontal rail, a
+                        // title runs one line or two, and a teaser that always
+                        // asks for two lines overflows by 12px under a two-line
+                        // title (the widget test caught it). So the title takes
+                        // what it needs and the teaser fills whatever is left —
+                        // two lines under a short title, one under a long one,
+                        // never a stripe.
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.all(14),
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _Chip(
+                                      label: 'Article · ${r.minutes} min',
+                                      p: p),
+                                  const SizedBox(height: 9),
+                                  Text(r.title,
+                                      maxLines: 2,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: pvFraunces(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.w600,
+                                          height: 1.25,
+                                          letterSpacing: -0.3,
+                                          color: p.ink1)),
+                                  const SizedBox(height: 5),
+                                  Expanded(
+                                    child: Text(r.teaser,
+                                        maxLines: 2,
+                                        overflow: TextOverflow.ellipsis,
+                                        style: pvManrope(
+                                            fontSize: 12.5,
+                                            height: 1.4,
+                                            color: p.ink2)),
+                                  ),
+                                ]),
+                          ),
                         ),
                       ]),
                 ),
@@ -3033,10 +3055,12 @@ class _JournalInvite extends StatelessWidget {
   Widget _chip(String label, VoidCallback onTap) => InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(999),
+        // ⚠️ NO `alignment:` HERE. A Container with an alignment fills the
+        // width it is offered, and inside a Wrap that is the whole run — on
+        // the phone the four chips stacked one per line, each full width.
+        // Padding alone lets the word set the size.
         child: Container(
-          height: 28,
-          padding: const EdgeInsets.symmetric(horizontal: 11),
-          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
           decoration: BoxDecoration(
             border: Border.all(color: p.line, width: 1.2),
             borderRadius: BorderRadius.circular(999),

@@ -6952,13 +6952,37 @@ Not walked on a phone yet.
    pregnancy `ProfileScreen` needs a `PregnancyController`.
 4. **The "Current" (V1) home also gets the new bar** — same component.
 
-### 57.3 Owed
+### 57.3 Walked on the phone — 2026-09-16
 
-- Walk it on the phone. The two-line "Brain activities" label at 9.5px on a
-  small handset is the thing to look at first.
-- The change-sheet video is the domain's first catalogue video, not one
-  made for the milestone; the phase video is the fallback. Real per-change
-  videos are content, not code.
+SM G990B2, debug parent flavour. Every section renders in the design's
+order; the bar reads Home · Products · Tools · Brain activities · More with
+the two-line label legible and the icons level; Done dims and holds, Change
+swaps in place with its chip; More opens the sheet; a change card opens
+video → text → more. Four things found and fixed in the same pass:
+
+1. The four journal chips stacked one per line, full width — a `Container`
+   with `alignment:` fills whatever a `Wrap` offers. Padding alone now.
+2. The category chip stretched across the change sheet — a ListView hands
+   its children a tight width. `_Chip` sizes itself with `Align(widthFactor:
+   1)` so it is the width of its word wherever it is placed.
+3. "Most children calms when held" — the milestone is third-person singular
+   and was spliced after a plural. It stands as its own sentence now.
+4. A day-one baby was offered "Ball drop (6–9 mo)" while 0–3 mo cards sat
+   unused: the widened pool was ranked without caring which tier a card came
+   from. Exact fit ranks above the widened band, in the store and the sheet.
+
+Also seen, not mine: the Current | V3 pill is a fixed overlay and sits over
+whatever scrolls under it (the video card, the journal title). Pre-existing;
+it is testing chrome that comes out before launch.
+
+### 57.4 Owed
+
+- The change-sheet video and read are the domain's first catalogue items,
+  not the age's: the Self-care card at 0–4 weeks shows "Fever, without the
+  panic" and "Starting solids". The catalogue has no self-care content for a
+  newborn, so the fallback shows. Content, not code — the day per-age
+  videos and reads exist, `PhaseChange.video` / `.read` are the two getters
+  to point at them.
 - `PpHomeActivitiesStore` is local only. If picks must follow her to a new
   phone, `CloudSyncedStore` + a table, as GrowStore does.
 - The Ask Veda FAB position is unchanged; the design shows it above the bar

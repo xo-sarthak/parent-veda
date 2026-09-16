@@ -201,9 +201,18 @@ class PpHomeActivitiesStore extends ChangeNotifier {
     final pool = growActivitiesForAge(ageMonths)
         .where((a) => !exclude.contains(a.id))
         .toList();
+    // ⚠️ EXACT AGE FIRST, THEN THE WIDENED BAND. `growActivitiesForAge`
+    // widens the window until fourteen activities fit, so a newborn's pool
+    // holds 2–6 mo and 6–9 mo cards too. On the phone a day-one baby was
+    // offered "Ball drop (6–9 mo)" while "0–3 mo" cards sat unused: the hash
+    // ordered the pool without caring which tier a card came from. Now a
+    // card that fits the age exactly always ranks above one that only fits
+    // the widened band; the widened band is a fallback, not a peer.
     int cmp(DevActivity a, DevActivity b) {
       final ca = _onCooldown(a.id), cb = _onCooldown(b.id);
       if (ca != cb) return ca ? 1 : -1; // fresh before on-cooldown
+      final ea = growSuitsAge(a, ageMonths), eb = growSuitsAge(b, ageMonths);
+      if (ea != eb) return ea ? -1 : 1; // exact fit before widened band
       return _score(a.id, day).compareTo(_score(b.id, day));
     }
     pool.sort(cmp);
