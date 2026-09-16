@@ -771,24 +771,51 @@ class TtcBottomNav extends StatelessWidget {
   /// Icons only. The labels used to be hardcoded English here, so the one part
   /// of the stage visible on EVERY screen was the one part that never
   /// translated - the whole app in Hinglish with an English nav under it.
+  ///
+  /// ⚠️ LINE ICONS, THE SAME ONES THE OTHER TWO BARS USE — 2026-09-16. This
+  /// bar was the one of three still drawing FILLED glyphs (`home_rounded`,
+  /// `school_rounded`, `widgets_rounded`) while pregnancy's `main_scaffold`
+  /// and parenting's `PpBottomNav` had gone to outlined. Put side by side the
+  /// three stages read as two apps, which is the exact drift `PvNavBar` was
+  /// made to end — and which sharing the CONTAINER does not prevent, because
+  /// the icons are the one thing each stage still supplies. Where a tab means
+  /// the same thing in another stage it now takes that stage's glyph: Tools
+  /// is `handyman_outlined` everywhere, Today is `home_outlined` everywhere.
+  /// The filled set is kept for revert.
   static const List<IconData> _icons = [
-    Icons.home_rounded,
-    Icons.school_rounded,
-    Icons.widgets_rounded,
-    Icons.calendar_today_rounded,
-    Icons.groups_rounded,
+    Icons.home_outlined,
+    Icons.school_outlined,
+    Icons.handyman_outlined,
+    Icons.calendar_today_outlined,
+    Icons.groups_outlined,
   ];
+  // Kept for revert:
+  //   static const List<IconData> _icons = [
+  //     Icons.home_rounded,
+  //     Icons.school_rounded,
+  //     Icons.widgets_rounded,
+  //     Icons.calendar_today_rounded,
+  //     Icons.groups_rounded,
+  //   ];
 
   /// V3's icons. Tabs 0 and 2 are deliberately identical to V1's — Today and
   /// Tools mean the same thing in both, and a woman who flips the version pill
   /// should not have to re-find them.
   static const List<IconData> _iconsV3 = [
-    Icons.home_rounded,
-    Icons.school_rounded,
-    Icons.widgets_rounded,
+    Icons.home_outlined,
+    Icons.school_outlined,
+    Icons.handyman_outlined,
     Icons.chat_bubble_outline_rounded,
     Icons.more_horiz_rounded,
   ];
+  // Kept for revert:
+  //   static const List<IconData> _iconsV3 = [
+  //     Icons.home_rounded,
+  //     Icons.school_rounded,
+  //     Icons.widgets_rounded,
+  //     Icons.chat_bubble_outline_rounded,
+  //     Icons.more_horiz_rounded,
+  //   ];
 
   static List<String> _labels(TtcS t) =>
       [t.tabToday, t.tabPrepare, t.tabTools, t.tabCalendar, t.tabCommunity];

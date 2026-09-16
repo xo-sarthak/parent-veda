@@ -62,6 +62,7 @@ import '../../ttc/ttc_daily_data.dart';
 import '../../ttc/ttc_log_store.dart';
 import '../../ttc/ttc_fertile_window.dart';
 import '../../ttc/ttc_focus_data.dart';
+import '../../ttc/ttc_prepare_data.dart';
 import '../../ttc/ttc_products_data.dart';
 import '../../ttc/ttc_reads_data.dart';
 import '../../ttc/ttc_ritual_store.dart';
@@ -71,6 +72,8 @@ import '../brackets/bracket_screen.dart';
 import '../v2/v2_block_grid.dart';
 import '../v2/v2_palette.dart';
 import '../v2/v3_bracket_art.dart';
+// V3JournalSection is in the commented-out journal block. Kept for revert.
+// ignore: unused_import
 import '../v2/v3_daily.dart';
 import '../v2/v3_daily_art.dart';
 import '../../ttc/ttc_home_hero.dart';
@@ -84,6 +87,7 @@ import 'ttc_daily_insights.dart';
 import 'ttc_insight_screen.dart';
 import 'ttc_journey_map_screen.dart';
 import 'ttc_symptom_mark.dart';
+import 'ttc_shop_v3.dart' show openTtcProductPage;
 import 'ttc_products_screen.dart';
 import 'ttc_profile_screen.dart';
 import 'ttc_ritual_screen.dart';
@@ -274,7 +278,15 @@ class _TtcHomeV3State extends State<TtcHomeV3>
               // every other TTC screen reserves, and V3 shipped without it —
               // the last rows of this page sat under a floating pill and an
               // opaque 56px circle. See docs/STILL-OPEN.md §9.4.
-              padding: const EdgeInsets.only(bottom: ttcBottomInset),
+              // ⚠️ AND THEN THE SHEET TOOK IT OVER — 2026-09-16. Once the
+              // field became the page's own surface, this padding stopped
+              // being clearance and became a WINDOW: on the phone the last
+              // ~130dp under the disclaimer showed the field through it,
+              // exactly the failure parenting's `_Sheet` note describes. The
+              // sheet reserves the clearance inside itself now (see `_Sheet`),
+              // so the scroll view reserves nothing. Kept for revert:
+              //   padding: const EdgeInsets.only(bottom: ttcBottomInset),
+              padding: EdgeInsets.zero,
               children: [
                 // ---- THE CYCLE HEADER ---------------------------------------
                 //
@@ -437,13 +449,51 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   // pregnancy name here would promise a woman who has not
                   // conceived the pregnancy feature — and would make the two
                   // stages look like the same screen twice.
-                  _pad(_SectionIntro(
-                      title: TtcS.current().samskarTitle,
-                      subtitle: TtcS.current().samskarSubtitle,
-                      body: TtcS.current().samskarBody,
-                      p: p)),
-                  const SizedBox(height: 14),
-                  _pad(_RitualCardV3(p: p, hinglish: hinglish, chapter: chapter)),
+                  //
+                  // ⚠️ RESHAPED 2026-09-16 TO THE PARENTING V3 GRAMMAR. The
+                  // user asked for the lower half of this screen to take the
+                  // shapes the parenting and pregnancy V3 homes now have, so
+                  // the three stages read as one app. Three decisions came
+                  // with it, all the user's:
+                  //
+                  //   · "Sanskar", not "Samskar" — see ttc_strings.dart.
+                  //   · The subtitle "Improve your chances" is gone.
+                  //   · NO COUNTER AND NO STREAK. The 0/5 and the "3 days"
+                  //     that `_RitualCardV3` carried are the two things the
+                  //     parenting brief refused ("no counters, no streak, no
+                  //     2 of 3") and the Grow feature refused before it: a
+                  //     number that resets punishes the parent who had a hard
+                  //     fortnight. Completing from the home is unchanged —
+                  //     that is the parity invariant, and it is held by the
+                  //     Done pill rather than by a fraction.
+                  //
+                  // Each part is now a card in the shape of parenting's
+                  // "Activities to do today": a tinted mark, the part's name,
+                  // TODAY'S prompt for it (the actual sentence, not the generic
+                  // "why"), and a Done pill. Done stays on the page, dimmed,
+                  // until tomorrow. The old intro and card are kept below for
+                  // revert:
+                  //   _pad(_SectionIntro(
+                  //       title: TtcS.current().samskarTitle,
+                  //       subtitle: TtcS.current().samskarSubtitle,
+                  //       body: TtcS.current().samskarBody,
+                  //       p: p)),
+                  //   const SizedBox(height: 14),
+                  //   _pad(_RitualCardV3(p: p, hinglish: hinglish, chapter: chapter)),
+                  //
+                  // ⚠️ A PHOTOGRAPH BEHIND IT, LIKE PREGNANCY'S GARBH SANSKAR.
+                  // Asked for by name: "provide image behind sanskar thing, so
+                  // that it looks good like we have in pregnancy v3". Pregnancy
+                  // V3 (`V3GarbhBlock`, the same day's design) gives its
+                  // practice a full-bleed band with the name on it and the
+                  // card lifting onto the band — the page's third full-bleed
+                  // moment after the hero and the film. This is that shape,
+                  // with this stage's own photograph: the one the Mind & body
+                  // door already carries, rather than a new id picked blind.
+                  //
+                  // The band sits OUTSIDE `_pad` because it reaches both edges;
+                  // the cards under it inset themselves.
+                  _SanskarBlock(p: p, hinglish: hinglish, chapter: chapter),
                   const SizedBox(height: 32),
 
                   // ---- TODAY ------------------------------------------------
@@ -509,43 +559,67 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   // a fertility home is one careless subtitle away from being a
                   // claim, which is why the card shows the category and the
                   // price and not a benefit.
+                  //
+                  // Renamed 2026-09-16 to the parenting wording, and the cards
+                  // take parenting's shape (an image well, the name, a chip,
+                  // the price, a chevron) and open THAT product rather than
+                  // the shop's front page. The chip is the category where
+                  // parenting shows a why-line — the rule above stands: never
+                  // a benefit under a supplement on a fertility home.
+                  // Kept for revert:
+                  //   _pad(_Head(
+                  //       eyebrow: hinglish ? 'Saman' : 'Worth having',
+                  //       title: hinglish ? 'Aapke liye' : 'Recommended for you',
+                  //       p: p)),
                   _pad(_Head(
-                      eyebrow: hinglish ? 'Saman' : 'Worth having',
-                      title: hinglish ? 'Aapke liye' : 'Recommended for you',
+                      eyebrow: hinglish ? 'Aapke liye' : 'Recommended',
+                      title: hinglish
+                          ? 'Aapke liye products'
+                          : 'Recommended products for you',
                       p: p)),
                   const SizedBox(height: 14),
                   _ProductRail(p: p, hinglish: hinglish),
                   const SizedBox(height: 32),
 
                   // ---- RECOMMENDED READS -----------------------------------
+                  // Renamed 2026-09-16 to the parenting wording. Kept for
+                  // revert:
+                  //   _pad(_Head(
+                  //       eyebrow: hinglish ? 'Padhne ke liye' : 'To read',
+                  //       title: hinglish ? 'Aapke chapter ke liye' : 'Recommended reads',
+                  //       p: p)),
                   _pad(_Head(
-                      eyebrow: hinglish ? 'Padhne ke liye' : 'To read',
-                      title: hinglish ? 'Aapke chapter ke liye' : 'Recommended reads',
+                      eyebrow: hinglish ? 'Padhne ke liye' : 'Read',
+                      title: hinglish
+                          ? 'Aaj ke liye reads'
+                          : 'Recommended reads for today',
                       p: p)),
                   const SizedBox(height: 12),
-                  _pad(_LinkCard(
-                    title: chapter.title(hinglish),
-                    body: chapter.nextUp(hinglish),
-                    p: p,
-                    hue: _chapterHue(chapter),
-                    mark: V3DailyMark.note,
-                    onTap: () => _openSurface(context, 'ttc_chapter'),
-                  )),
-                  const SizedBox(height: 10),
-
-                  // ⚠️ THE THREE TABS, WHICH THE CARD ABOVE CANNOT REACH.
-                  // `ttc_chapter` opens the reader at its DEFAULT tab, so V3
-                  // could reach "Me" and nothing else. V1 put Me / Us / What's
-                  // next in the hero, exactly where pregnancy puts Baby /
-                  // Mother / What's next.
-                  //
-                  // They are not in this hero because the V3 field is a
-                  // photographic surface carrying a spine chip and one large
-                  // number — three chrome circles on it is the gradient-and-
-                  // shortcut hero V3 exists to replace. Hung off the chapter
-                  // card instead, which is the thing they are shortcuts INTO.
-                  _pad(_ChapterTabs(p: p, chapter: chapter)),
-                  const SizedBox(height: 14),
+                  // ⚠️ THE THREE TABS ARE ON THE CARD NOW, as pills — the
+                  // design's shape. They used to be three boxes under a link
+                  // card; same three destinations. The note that put them
+                  // here rather than in the hero still holds: the V3 field is
+                  // a photographic surface carrying a spine chip and one
+                  // large number, and three chrome circles on it is the
+                  // gradient-and-shortcut hero V3 exists to replace. `ttc_chapter`
+                  // opens the reader at its DEFAULT tab, so without these
+                  // V3 could reach "Me" and nothing else. Kept for revert:
+                  //   _pad(_LinkCard(
+                  //     title: chapter.title(hinglish),
+                  //     body: chapter.nextUp(hinglish),
+                  //     p: p,
+                  //     hue: _chapterHue(chapter),
+                  //     mark: V3DailyMark.note,
+                  //     onTap: () => _openSurface(context, 'ttc_chapter'),
+                  //   )),
+                  //   const SizedBox(height: 10),
+                  //   _pad(_ChapterTabs(p: p, chapter: chapter)),
+                  _pad(_ChapterCard(
+                      p: p,
+                      hinglish: hinglish,
+                      chapter: chapter,
+                      onOpen: () => _openSurface(context, 'ttc_chapter'))),
+                  const SizedBox(height: 12),
 
                   // ⚠️ THE LIBRARY, WHICH THE CHAPTER CARD ALSO CANNOT REACH.
                   // `kTtcReads` is the largest body of content in the stage and
@@ -571,40 +645,65 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   // labels differ, because only the two labels are about a
                   // different stage. Parenting made the same call for the same
                   // reason.
+                  //
+                  // ⚠️ RESHAPED 2026-09-16 to the parenting journal card: a
+                  // square on the left (a pen, not a camera — this stage is
+                  // written more than photographed), a prompt, four entry
+                  // chips, "Open the journal" under it. The four destinations
+                  // are exactly the four the tile card reached. The shared
+                  // `V3JournalSection` is kept below for revert; the day
+                  // pregnancy takes this card too it should become the shared
+                  // one again.
+                  //   _pad(_Head(
+                  //       eyebrow: hinglish ? 'Aaj ke liye' : 'Keep today',
+                  //       title: hinglish ? 'Aapki journal' : 'Your journal',
+                  //       p: p)),
+                  //   const SizedBox(height: 12),
+                  //   _pad(V3JournalSection(
+                  //     p: p,
+                  //     onOpenAll: () => _openSurface(context, 'ttc_journal'),
+                  //     actions: [
+                  //       V3QuickAction(
+                  //           icon: Icons.edit_note_rounded,
+                  //           mark: V3DailyMark.memory,
+                  //           hue: 42,
+                  //           label: hinglish ? 'Kuch\nlikhein' : 'Write\nsomething',
+                  //           onTap: () => _openSurface(context, 'ttc_journal')),
+                  //       V3QuickAction(
+                  //           icon: Icons.favorite_border_rounded,
+                  //           mark: V3DailyMark.capsule,
+                  //           hue: 344,
+                  //           label: hinglish ? 'Aaj kaisa\nlaga' : 'How today\nfelt',
+                  //           onTap: () => _openSurface(context, 'ttc_journal')),
+                  //       V3QuickAction(
+                  //           icon: Icons.checklist_rounded,
+                  //           mark: V3DailyMark.note,
+                  //           hue: 206,
+                  //           label: hinglish ? 'Roz ka\nlog' : 'Log for\ntoday',
+                  //           onTap: () => _openSurface(context, 'ttc_calendar')),
+                  //       V3QuickAction(
+                  //           icon: Icons.people_outline_rounded,
+                  //           mark: V3DailyMark.photo,
+                  //           hue: 268,
+                  //           label: hinglish ? 'Saath\nmein' : 'The two\nof you',
+                  //           onTap: () => _openSurface(context, 'ttc_partner')),
+                  //     ],
+                  //   )),
                   _pad(_Head(
-                      eyebrow: hinglish ? 'Aaj ke liye' : 'Keep today',
-                      title: hinglish ? 'Aapki journal' : 'Your journal',
+                      eyebrow: hinglish ? 'Aapki journal' : 'Your journal',
+                      title: hinglish
+                          ? 'Aaj ka kuch rakh lein'
+                          : 'Keep something from today',
                       p: p)),
-                  const SizedBox(height: 12),
-                  _pad(V3JournalSection(
+                  const SizedBox(height: 14),
+                  _pad(_JournalInvite(
                     p: p,
+                    hinglish: hinglish,
+                    onWrite: () => _openSurface(context, 'ttc_journal'),
+                    onFelt: () => _openSurface(context, 'ttc_journal'),
+                    onLog: () => _openSurface(context, 'ttc_calendar'),
+                    onUs: () => _openSurface(context, 'ttc_partner'),
                     onOpenAll: () => _openSurface(context, 'ttc_journal'),
-                    actions: [
-                      V3QuickAction(
-                          icon: Icons.edit_note_rounded,
-                          mark: V3DailyMark.memory,
-                          hue: 42,
-                          label: hinglish ? 'Kuch\nlikhein' : 'Write\nsomething',
-                          onTap: () => _openSurface(context, 'ttc_journal')),
-                      V3QuickAction(
-                          icon: Icons.favorite_border_rounded,
-                          mark: V3DailyMark.capsule,
-                          hue: 344,
-                          label: hinglish ? 'Aaj kaisa\nlaga' : 'How today\nfelt',
-                          onTap: () => _openSurface(context, 'ttc_journal')),
-                      V3QuickAction(
-                          icon: Icons.checklist_rounded,
-                          mark: V3DailyMark.note,
-                          hue: 206,
-                          label: hinglish ? 'Roz ka\nlog' : 'Log for\ntoday',
-                          onTap: () => _openSurface(context, 'ttc_calendar')),
-                      V3QuickAction(
-                          icon: Icons.people_outline_rounded,
-                          mark: V3DailyMark.photo,
-                          hue: 268,
-                          label: hinglish ? 'Saath\nmein' : 'The two\nof you',
-                          onTap: () => _openSurface(context, 'ttc_partner')),
-                    ],
                   )),
                   const SizedBox(height: 32),
 
@@ -616,23 +715,38 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   // which makes it the stage where closing on a shop would be
                   // most tempting and most wrong. The last thing she reads is
                   // that there is a person, not that there is a price.
+                  //
+                  // ⚠️ FOUR CARDS, NOT ONE LINK — 2026-09-16. The single link
+                  // card named four people in a sentence and opened the whole
+                  // Prepare catalogue; now each of the four is a card that
+                  // opens ITS consultation, and "See everyone" is the door to
+                  // the catalogue. No prices on this home: the rule that this
+                  // section closes the page on a person, not a price, is why
+                  // it is last and why the cards carry a role and not a rate.
+                  // Kept for revert:
+                  //   _pad(_LinkCard(
+                  //     title: hinglish ? 'Fertility experts' : 'Fertility experts',
+                  //     body: hinglish
+                  //         ? 'Gynae, fertility specialist, nutritionist, psychologist — '
+                  //             'video par, aapke waqt par.'
+                  //         : 'A gynaecologist, a fertility specialist, a nutritionist, '
+                  //             'a psychologist — on video, at a time you choose.',
+                  //     p: p,
+                  //     hue: 186,
+                  //     mark: V3DailyMark.capsule,
+                  //     onTap: () => _openSurface(context, 'ttc_prepare'),
+                  //   )),
                   _pad(_Head(
                       eyebrow: hinglish ? 'Log' : 'People',
                       title: hinglish ? 'Expert se baat karein' : 'Talk to experts',
                       p: p)),
+                  const SizedBox(height: 14),
+                  _ExpertRail(p: p, hinglish: hinglish),
                   const SizedBox(height: 12),
-                  _pad(_LinkCard(
-                    title: hinglish ? 'Fertility experts' : 'Fertility experts',
-                    body: hinglish
-                        ? 'Gynae, fertility specialist, nutritionist, psychologist — '
-                            'video par, aapke waqt par.'
-                        : 'A gynaecologist, a fertility specialist, a nutritionist, '
-                            'a psychologist — on video, at a time you choose.',
-                    p: p,
-                    hue: 186,
-                    mark: V3DailyMark.capsule,
-                    onTap: () => _openSurface(context, 'ttc_prepare'),
-                  )),
+                  _pad(_SeeAllRow(
+                      label: hinglish ? 'Sabko dekhein' : 'See everyone',
+                      p: p,
+                      onTap: () => _openSurface(context, 'ttc_prepare'))),
                   const SizedBox(height: 26),
 
                   // ---- THE DOOR OUT ----------------------------------------
@@ -2237,7 +2351,10 @@ class _Sheet extends StatelessWidget {
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           ...children,
-          const SizedBox(height: 150),
+          // Clearance for the floating nav AND the Ask FAB, inside the opaque
+          // sheet. `ttcBottomInset` is what every other TTC screen reserves;
+          // 150 is what the parenting sheet reserves. Whichever is larger.
+          SizedBox(height: ttcBottomInset > 150 ? ttcBottomInset : 150),
         ]),
       );
 }
@@ -2299,6 +2416,9 @@ class _Head extends StatelessWidget {
 /// phrase most people meet for the first time here, and a section whose name
 /// needs a sentence should be given the sentence rather than left to be
 /// guessed at from the tasks.
+// Superseded 2026-09-16: the Sanskar section takes `_Head` + a body line like
+// every other section, now that its subtitle is gone. Kept for revert.
+// ignore: unused_element
 class _SectionIntro extends StatelessWidget {
   const _SectionIntro(
       {required this.title,
@@ -2418,6 +2538,9 @@ class _SectionIntro extends StatelessWidget {
 
 /// A titled card with a drawn mark. The shape every "one thing" section on the
 /// other two stages uses.
+// Superseded 2026-09-16: the chapter card became `_ChapterCard` and the
+// experts link became `_ExpertRail`. Kept for revert.
+// ignore: unused_element
 class _LinkCard extends StatelessWidget {
   const _LinkCard(
       {required this.title,
@@ -3221,6 +3344,21 @@ class _Story extends StatelessWidget {
 */
 
 /// Products worth having, as a rail.
+/// The products rail, in the design's card: an image well, the name, one
+/// line, the price and a chevron. Opens THE product.
+///
+/// ⚠️ THE WELL DRAWS A MARK, NOT A PHOTOGRAPH. `TtcProduct.photos` is empty
+/// across the catalogue today. The parenting rail makes the same call for
+/// the same reason — a wrong photograph is read as THIS product.
+///
+/// ⚠️ THE ONE LINE IS "LOOK FOR", NEVER "WHY". The design's line reads
+/// "Folate — from three months before": a category and a moment. The section
+/// comment above the call site is the rule — on a fertility home, one line
+/// under a supplement is the shortest route to an implied promise about her
+/// odds — and `whyEn` is exactly that line. `lookForEn` ("Plain 400mcg folic
+/// acid. That is all most people need.") is a shopping instruction, makes no
+/// claim about outcome, and is what the catalogue was written to put beside
+/// a price. The category rides in the chip.
 class _ProductRail extends StatelessWidget {
   const _ProductRail({required this.p, required this.hinglish});
 
@@ -3236,76 +3374,81 @@ class _ProductRail extends StatelessWidget {
     ];
 
     return SizedBox(
-      // ⚠️ SAME ARITHMETIC AS THE FOCUS RAIL, SAME FIX. 18 + 158 + 11 + 158 is
-      // 345, and the gap that follows pushes the third card to 356 — four
-      // points visible on a 360pt screen, which reads as a clipping bug rather
-      // than as an invitation to swipe. 142 wide with a 10pt gap leaves 38.
-      height: 150,
+      // Well 104 + a two-line name + a two-line look-for + the price row.
+      // 262 left a dead band under the look-for on the phone.
+      height: 244,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 18),
         itemCount: picks.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 10),
+        separatorBuilder: (_, _) => const SizedBox(width: 12),
         itemBuilder: (context, i) {
           final product = picks[i];
           final tint = v2BlockTint((344 + (i * 24)) % 360, p);
-          return InkWell(
-            onTap: () => openTtcProducts(context),
-            borderRadius: BorderRadius.circular(18),
-            child: Container(
-              width: 142,
-              padding: const EdgeInsets.all(13),
-              decoration: BoxDecoration(
-                color: p.surface,
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: p.line),
+          final ink = HSLColor.fromColor(tint)
+              .withSaturation(0.46)
+              .withLightness(0.42)
+              .toColor();
+          return SizedBox(
+            width: 178,
+            child: InkWell(
+              onTap: () => openTtcProductPage(context, product.id),
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: p.surface,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: p.line),
+                ),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        height: 104,
+                        width: double.infinity,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                            color: tint,
+                            borderRadius: BorderRadius.circular(14)),
+                        child: Icon(Icons.shopping_bag_outlined,
+                            size: 30, color: ink),
+                      ),
+                      const SizedBox(height: 10),
+                      Text(product.name(hinglish),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: pvFraunces(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              height: 1.25,
+                              letterSpacing: -0.3,
+                              color: p.ink1)),
+                      const SizedBox(height: 5),
+                      Expanded(
+                        child: Text(
+                            hinglish ? product.lookForHi : product.lookForEn,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: pvManrope(
+                                fontSize: 12.5, height: 1.4, color: p.ink2)),
+                      ),
+                      const SizedBox(height: 6),
+                      Row(children: [
+                        Expanded(
+                          child: Text(product.priceEn,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: pvManrope(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w800,
+                                  color: p.ink1)),
+                        ),
+                        Icon(Icons.chevron_right_rounded,
+                            size: 18, color: p.ink3),
+                      ]),
+                    ]),
               ),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      width: 34,
-                      height: 34,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                          color: tint, borderRadius: BorderRadius.circular(11)),
-                      child: Icon(Icons.shopping_bag_outlined,
-                          size: 17,
-                          color: HSLColor.fromColor(tint)
-                              .withSaturation(0.46)
-                              .withLightness(0.42)
-                              .toColor()),
-                    ),
-                    const SizedBox(height: 11),
-                    Text(product.name(hinglish),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: pvFraunces(
-                            fontSize: 14.5,
-                            fontWeight: FontWeight.w600,
-                            height: 1.25,
-                            letterSpacing: -0.2,
-                            color: p.ink1)),
-                    const Spacer(),
-                    // ⚠️ CATEGORY AND PRICE, NEVER A BENEFIT. See the section
-                    // comment: a one-line claim under a supplement on a
-                    // fertility home is the shortest route this product has to
-                    // an implied promise about her odds.
-                    Text(product.category.toUpperCase(),
-                        style: pvManrope(
-                            fontSize: 9,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.9,
-                            color: p.ink3)),
-                    const SizedBox(height: 3),
-                    Text(product.priceEn,
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: pvManrope(
-                            fontSize: 11.5,
-                            fontWeight: FontWeight.w700,
-                            color: p.ink2)),
-                  ]),
             ),
           );
         },
@@ -3314,7 +3457,103 @@ class _ProductRail extends StatelessWidget {
   }
 }
 
-/// Reads from the stage library, as a rail.
+// The 142dp rail this replaces, which opened the shop's front page. Kept for
+// revert:
+// class _ProductRail extends StatelessWidget {
+//   const _ProductRail({required this.p, required this.hinglish});
+//
+//   final V2Palette p;
+//   final bool hinglish;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     // Four, taken off the same deterministic rotation the daily pick uses so
+//     // the rail is stable within a day and moves between them.
+//     final picks = [
+//       for (var i = 0; i < 4; i++) ttcPickForToday(ttcProducts, offset: 4 + i),
+//     ];
+//
+//     return SizedBox(
+//       // ⚠️ SAME ARITHMETIC AS THE FOCUS RAIL, SAME FIX. 18 + 158 + 11 + 158 is
+//       // 345, and the gap that follows pushes the third card to 356 — four
+//       // points visible on a 360pt screen, which reads as a clipping bug rather
+//       // than as an invitation to swipe. 142 wide with a 10pt gap leaves 38.
+//       height: 150,
+//       child: ListView.separated(
+//         scrollDirection: Axis.horizontal,
+//         padding: const EdgeInsets.symmetric(horizontal: 18),
+//         itemCount: picks.length,
+//         separatorBuilder: (_, _) => const SizedBox(width: 10),
+//         itemBuilder: (context, i) {
+//           final product = picks[i];
+//           final tint = v2BlockTint((344 + (i * 24)) % 360, p);
+//           return InkWell(
+//             onTap: () => openTtcProducts(context),
+//             borderRadius: BorderRadius.circular(18),
+//             child: Container(
+//               width: 142,
+//               padding: const EdgeInsets.all(13),
+//               decoration: BoxDecoration(
+//                 color: p.surface,
+//                 borderRadius: BorderRadius.circular(18),
+//                 border: Border.all(color: p.line),
+//               ),
+//               child: Column(
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//                   children: [
+//                     Container(
+//                       width: 34,
+//                       height: 34,
+//                       alignment: Alignment.center,
+//                       decoration: BoxDecoration(
+//                           color: tint, borderRadius: BorderRadius.circular(11)),
+//                       child: Icon(Icons.shopping_bag_outlined,
+//                           size: 17,
+//                           color: HSLColor.fromColor(tint)
+//                               .withSaturation(0.46)
+//                               .withLightness(0.42)
+//                               .toColor()),
+//                     ),
+//                     const SizedBox(height: 11),
+//                     Text(product.name(hinglish),
+//                         maxLines: 2,
+//                         overflow: TextOverflow.ellipsis,
+//                         style: pvFraunces(
+//                             fontSize: 14.5,
+//                             fontWeight: FontWeight.w600,
+//                             height: 1.25,
+//                             letterSpacing: -0.2,
+//                             color: p.ink1)),
+//                     const Spacer(),
+//                     // ⚠️ CATEGORY AND PRICE, NEVER A BENEFIT. See the section
+//                     // comment: a one-line claim under a supplement on a
+//                     // fertility home is the shortest route this product has to
+//                     // an implied promise about her odds.
+//                     Text(product.category.toUpperCase(),
+//                         style: pvManrope(
+//                             fontSize: 9,
+//                             fontWeight: FontWeight.w800,
+//                             letterSpacing: 0.9,
+//                             color: p.ink3)),
+//                     const SizedBox(height: 3),
+//                     Text(product.priceEn,
+//                         maxLines: 1,
+//                         overflow: TextOverflow.ellipsis,
+//                         style: pvManrope(
+//                             fontSize: 11.5,
+//                             fontWeight: FontWeight.w700,
+//                             color: p.ink2)),
+//                   ]),
+//             ),
+//           );
+//         },
+//       ),
+//     );
+//   }
+// }
+
+/// Reads from the stage library, as a rail — the design's card: a tinted
+/// well inside the padding, a "READ · N MIN" chip, the title, the standfirst.
 class _ReadRail extends StatelessWidget {
   const _ReadRail({required this.p, required this.hinglish});
 
@@ -3330,70 +3569,72 @@ class _ReadRail extends StatelessWidget {
     ];
 
     return SizedBox(
-      height: 150,
+      height: 236,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 18),
         itemCount: picks.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 11),
+        separatorBuilder: (_, _) => const SizedBox(width: 12),
         itemBuilder: (context, i) {
           final read = picks[i];
           final tint = v2BlockTint(read.hue, p);
-          return InkWell(
-            onTap: () =>
-                openTtcSurface(context, '$kTtcReadPrefix${read.id}'),
-            borderRadius: BorderRadius.circular(18),
-            child: Container(
-              width: 196,
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: p.surface,
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: p.line),
-              ),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                          color: tint,
-                          borderRadius: BorderRadius.circular(999)),
-                      child: Text(
-                          (hinglish ? read.kicker.hi : read.kicker.en)
-                              .toUpperCase(),
-                          style: pvManrope(
-                              fontSize: 8.5,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 0.8,
-                              color: HSLColor.fromColor(tint)
-                                  .withSaturation(0.46)
-                                  .withLightness(0.34)
-                                  .toColor())),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(hinglish ? read.title.hi : read.title.en,
-                        maxLines: 3,
-                        overflow: TextOverflow.ellipsis,
-                        style: pvFraunces(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            height: 1.25,
-                            letterSpacing: -0.25,
-                            color: p.ink1)),
-                    const Spacer(),
-                    Row(children: [
-                      Text(TtcS.current().readOpen,
-                          style: pvManrope(
-                              fontSize: 11.5,
-                              fontWeight: FontWeight.w800,
-                              color: p.action)),
-                      const SizedBox(width: 3),
-                      Icon(Icons.arrow_forward_rounded,
-                          size: 13, color: p.action),
+          final deep = HSLColor.fromColor(tint).withLightness(0.82).toColor();
+          return SizedBox(
+            width: 210,
+            child: InkWell(
+              onTap: () =>
+                  openTtcSurface(context, '$kTtcReadPrefix${read.id}'),
+              borderRadius: BorderRadius.circular(20),
+              child: Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: p.surface,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: p.line),
+                ),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        height: 86,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(14),
+                          gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [tint, deep]),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      _Chip(
+                          label:
+                              '${TtcS.current().readOpen} · ${read.minutes} min',
+                          p: p),
+                      const SizedBox(height: 8),
+                      Text(hinglish ? read.title.hi : read.title.en,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: pvFraunces(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w600,
+                              height: 1.25,
+                              letterSpacing: -0.3,
+                              color: p.ink1)),
+                      const SizedBox(height: 4),
+                      // ⚠️ `Expanded`, so a two-line title and a standfirst
+                      // share the card's fixed height without either
+                      // overflowing — the parenting rail's lesson.
+                      Expanded(
+                        child: Text(
+                            hinglish ? read.teaser.hi : read.teaser.en,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: pvManrope(
+                                fontSize: 12.5, height: 1.4, color: p.ink2)),
+                      ),
                     ]),
-                  ]),
+              ),
             ),
           );
         },
@@ -3409,6 +3650,103 @@ class _ReadRail extends StatelessWidget {
     return now.difference(DateTime(now.year, 1, 1)).inDays;
   }
 }
+
+// The 196dp rail this replaces. Kept for revert:
+// /// Reads from the stage library, as a rail.
+// class _ReadRail extends StatelessWidget {
+//   const _ReadRail({required this.p, required this.hinglish});
+//
+//   final V2Palette p;
+//   final bool hinglish;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     if (kTtcReads.isEmpty) return const SizedBox.shrink();
+//     final picks = [
+//       for (var i = 0; i < 4 && i < kTtcReads.length; i++)
+//         kTtcReads[(_dayOfYear() + i) % kTtcReads.length],
+//     ];
+//
+//     return SizedBox(
+//       height: 150,
+//       child: ListView.separated(
+//         scrollDirection: Axis.horizontal,
+//         padding: const EdgeInsets.symmetric(horizontal: 18),
+//         itemCount: picks.length,
+//         separatorBuilder: (_, _) => const SizedBox(width: 11),
+//         itemBuilder: (context, i) {
+//           final read = picks[i];
+//           final tint = v2BlockTint(read.hue, p);
+//           return InkWell(
+//             onTap: () =>
+//                 openTtcSurface(context, '$kTtcReadPrefix${read.id}'),
+//             borderRadius: BorderRadius.circular(18),
+//             child: Container(
+//               width: 196,
+//               padding: const EdgeInsets.all(14),
+//               decoration: BoxDecoration(
+//                 color: p.surface,
+//                 borderRadius: BorderRadius.circular(18),
+//                 border: Border.all(color: p.line),
+//               ),
+//               child: Column(
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//                   children: [
+//                     Container(
+//                       padding: const EdgeInsets.symmetric(
+//                           horizontal: 8, vertical: 4),
+//                       decoration: BoxDecoration(
+//                           color: tint,
+//                           borderRadius: BorderRadius.circular(999)),
+//                       child: Text(
+//                           (hinglish ? read.kicker.hi : read.kicker.en)
+//                               .toUpperCase(),
+//                           style: pvManrope(
+//                               fontSize: 8.5,
+//                               fontWeight: FontWeight.w800,
+//                               letterSpacing: 0.8,
+//                               color: HSLColor.fromColor(tint)
+//                                   .withSaturation(0.46)
+//                                   .withLightness(0.34)
+//                                   .toColor())),
+//                     ),
+//                     const SizedBox(height: 10),
+//                     Text(hinglish ? read.title.hi : read.title.en,
+//                         maxLines: 3,
+//                         overflow: TextOverflow.ellipsis,
+//                         style: pvFraunces(
+//                             fontSize: 15,
+//                             fontWeight: FontWeight.w600,
+//                             height: 1.25,
+//                             letterSpacing: -0.25,
+//                             color: p.ink1)),
+//                     const Spacer(),
+//                     Row(children: [
+//                       Text(TtcS.current().readOpen,
+//                           style: pvManrope(
+//                               fontSize: 11.5,
+//                               fontWeight: FontWeight.w800,
+//                               color: p.action)),
+//                       const SizedBox(width: 3),
+//                       Icon(Icons.arrow_forward_rounded,
+//                           size: 13, color: p.action),
+//                     ]),
+//                   ]),
+//             ),
+//           );
+//         },
+//       ),
+//     );
+//   }
+//
+//   /// Same day-of-year rotation `ttcPickForToday` uses, so the reads rail turns
+//   /// over on the same schedule as everything else on this page rather than on
+//   /// one of its own.
+//   static int _dayOfYear() {
+//     final now = DateTime.now();
+//     return now.difference(DateTime(now.year, 1, 1)).inDays;
+//   }
+// }
 
 // ⚠️ SUPERSEDED BY `_DailyRail`, KEPT FOR REVERT. Same insight, same
 // destination, same `ttcPickForToday(ttcInsights)` rotation — as a circle in
@@ -3702,6 +4040,8 @@ class _ReadRail extends StatelessWidget {
 // }
 
 /// Me · Us · What's next — the chapter reader's three tabs, as shortcuts.
+// Superseded 2026-09-16 by the pills on `_ChapterCard`. Kept for revert.
+// ignore: unused_element
 class _ChapterTabs extends StatelessWidget {
   const _ChapterTabs({required this.p, required this.chapter});
 
@@ -3746,6 +4086,11 @@ class _ChapterTabs extends StatelessWidget {
 }
 
 /// The door out of the stage. Never a prompt to test.
+///
+/// The design's shape (2026-09-16): a hairline above, the label and a chevron,
+/// the body under it. No border, no tint, no fill — even less of a card than
+/// before, which is the right direction for the one row on this page that
+/// must never read as "why haven't you tested?".
 class _TestDoor extends StatelessWidget {
   const _TestDoor({required this.p});
 
@@ -3756,37 +4101,75 @@ class _TestDoor extends StatelessWidget {
     final t = TtcS.current();
     return InkWell(
       onTap: () => recordPositiveTest(context),
-      borderRadius: BorderRadius.circular(18),
+      borderRadius: BorderRadius.circular(8),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        padding: const EdgeInsets.only(top: 20),
         decoration: BoxDecoration(
-          // No tint block and no fill — see the section comment. The border
-          // alone is what makes it a door rather than an offer.
-          borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: p.line),
+          border: Border(top: BorderSide(color: p.line)),
         ),
-        child: Row(children: [
-          Icon(Icons.auto_awesome_outlined, size: 18, color: p.ink3),
-          const SizedBox(width: 12),
-          Expanded(
-            child:
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(t.transitionRecord,
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Expanded(
+              child: Text(t.transitionRecord,
                   style: pvManrope(
                       fontSize: 13.5,
                       fontWeight: FontWeight.w700,
                       color: p.ink1)),
-              const SizedBox(height: 2),
-              Text(t.transitionRecordBody,
-                  style:
-                      pvManrope(fontSize: 11.5, height: 1.45, color: p.ink3)),
-            ]),
-          ),
+            ),
+            Icon(Icons.chevron_right_rounded, size: 18, color: p.ink3),
+          ]),
+          const SizedBox(height: 4),
+          Text(t.transitionRecordBody,
+              style: pvManrope(fontSize: 13, height: 1.45, color: p.ink2)),
         ]),
       ),
     );
   }
 }
+
+// The bordered card this replaces. Kept for revert:
+// /// The door out of the stage. Never a prompt to test.
+// class _TestDoor extends StatelessWidget {
+//   const _TestDoor({required this.p});
+//
+//   final V2Palette p;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final t = TtcS.current();
+//     return InkWell(
+//       onTap: () => recordPositiveTest(context),
+//       borderRadius: BorderRadius.circular(18),
+//       child: Container(
+//         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+//         decoration: BoxDecoration(
+//           // No tint block and no fill — see the section comment. The border
+//           // alone is what makes it a door rather than an offer.
+//           borderRadius: BorderRadius.circular(18),
+//           border: Border.all(color: p.line),
+//         ),
+//         child: Row(children: [
+//           Icon(Icons.auto_awesome_outlined, size: 18, color: p.ink3),
+//           const SizedBox(width: 12),
+//           Expanded(
+//             child:
+//                 Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+//               Text(t.transitionRecord,
+//                   style: pvManrope(
+//                       fontSize: 13.5,
+//                       fontWeight: FontWeight.w700,
+//                       color: p.ink1)),
+//               const SizedBox(height: 2),
+//               Text(t.transitionRecordBody,
+//                   style:
+//                       pvManrope(fontSize: 11.5, height: 1.45, color: p.ink3)),
+//             ]),
+//           ),
+//         ]),
+//       ),
+//     );
+//   }
+// }
 
 /// The estimates disclaimer, in this palette.
 class _HomeDisclaimer extends StatelessWidget {
@@ -3818,6 +4201,11 @@ class _HomeDisclaimer extends StatelessWidget {
 /// `TtcStore` and `TtcLang` only, so a tick would have changed the store and
 /// repainted nothing. Scoping the listener to this card also means ticking one
 /// item does not rebuild the doors, the reads and the journal.
+// ⚠️ SUPERSEDED 2026-09-16 by `_SanskarCards`. This card carried the 0/5
+// counter and the streak; both were refused by the user on the same grounds
+// the Grow feature refused a streak. Completing from the home — the parity
+// invariant — survives in the Done pill. Kept for revert.
+// ignore: unused_element
 class _RitualCardV3 extends StatelessWidget {
   const _RitualCardV3(
       {required this.p, required this.hinglish, required this.chapter});
@@ -3897,6 +4285,8 @@ class _RitualCardV3 extends StatelessWidget {
   }
 }
 
+// Superseded with `_RitualCardV3`. Kept for revert.
+// ignore: unused_element
 class _RitualRow extends StatelessWidget {
   const _RitualRow({
     required this.p,
@@ -3974,4 +4364,739 @@ class _RitualRow extends StatelessWidget {
       ),
     );
   }
+}
+
+// -----------------------------------------------------------------------------
+//  The 2026-09-16 reshape — the "TTC V3 Home" Claude Design, applied below the
+//  doors. Built first straight from the parenting widgets, then brought to the
+//  design the user had made in the meantime; the two agreed on every section
+//  and differed on the details below, which are now the design's.
+// -----------------------------------------------------------------------------
+
+/// A small uppercase format chip, sized to its word wherever it is placed.
+/// Same widget as parenting's, including the `widthFactor` fix.
+class _Chip extends StatelessWidget {
+  const _Chip({required this.label, required this.p});
+
+  final String label;
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) => Align(
+        alignment: Alignment.centerLeft,
+        widthFactor: 1,
+        heightFactor: 1,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+          decoration: BoxDecoration(
+            color: p.surfaceAlt,
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Text(label.toUpperCase(),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: pvManrope(
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.1,
+                  color: p.ink3)),
+        ),
+      );
+}
+
+/// The Sanskar section as pregnancy V3 draws its practice: a full-bleed
+/// photograph with the name and one line on it, and the first of the five
+/// rows lifting onto the band. No explainer card — the review: "i dont need a
+/// separate card just for so much text, looks bland". What the section is
+/// for is one sentence on the photograph; what it asks is the five rows.
+///
+/// Mirrors `V3GarbhBlock` (v2/v3_garbh.dart) in geometry — 172dp band, a
+/// 22dp overlap, the same dark scrim, the same gold eyebrow — so the two
+/// stages' practices are visibly the same idea. It is not that widget because
+/// that one takes `HomeDay` and pillar rows; the shape is shared, the binding
+/// differs.
+///
+/// ⚠️ THE PHOTOGRAPH IS THE MIND & BODY DOOR'S. Reused rather than a new
+/// Unsplash id picked without seeing it: that door has been walked on a phone
+/// with this picture, so it is known to load and known to be a calm figure
+/// rather than a surprise. `errorBuilder` paints the dark ground if it ever
+/// does not arrive, and the type stays readable on that.
+class _SanskarBlock extends StatelessWidget {
+  const _SanskarBlock(
+      {required this.p, required this.hinglish, required this.chapter});
+
+  final V2Palette p;
+  final bool hinglish;
+  final TtcChapter chapter;
+
+  static const double _band = 196;
+  static const double _overlap = 22;
+  static const String _image =
+      'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=900&h=520&fit=crop';
+
+  @override
+  Widget build(BuildContext context) {
+    final t = TtcS.current();
+    return Stack(clipBehavior: Clip.none, children: [
+      Positioned(
+        top: 0,
+        left: 0,
+        right: 0,
+        height: _band,
+        child: Stack(fit: StackFit.expand, children: [
+          Image.network(_image,
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _) =>
+                  Container(color: const Color(0xFF201C24))),
+          const DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topRight,
+                end: Alignment.bottomLeft,
+                colors: [Color(0x40000000), Color(0xD9000000)],
+              ),
+            ),
+          ),
+          Positioned(
+            left: 18,
+            right: 18,
+            bottom: _overlap + 16,
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text((hinglish ? 'Roz ka abhyaas' : 'Practice').toUpperCase(),
+                      style: pvManrope(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.6,
+                          color: const Color(0xFFF0C078))),
+                  const SizedBox(height: 7),
+                  Text(t.sanskarTitle,
+                      style: pvFraunces(
+                          fontSize: 23,
+                          fontWeight: FontWeight.w600,
+                          height: 1.15,
+                          letterSpacing: -0.55,
+                          color: Colors.white)),
+                  const SizedBox(height: 6),
+                  // The one line. On the photograph, not in a card of its own.
+                  Text(t.sanskarBody,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvManrope(
+                          fontSize: 13,
+                          height: 1.4,
+                          color: Colors.white.withValues(alpha: 0.86))),
+                ]),
+          ),
+          // The explainer, as on pregnancy's band: a section named in
+          // Sanskrit on an English screen needs a door to "what is this".
+          // The ritual screen carries the why of every part.
+          Positioned(
+            right: 16,
+            top: 14,
+            child: InkWell(
+              onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                builder: (_) => TtcRitualScreen(chapter: chapter),
+                settings: const RouteSettings(name: 'ttc/ritual'),
+              )),
+              customBorder: const CircleBorder(),
+              child: Container(
+                width: 26,
+                height: 26,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                      color: Colors.white.withValues(alpha: 0.55)),
+                ),
+                child: Text('i',
+                    style: pvFraunces(
+                        fontSize: 13,
+                        fontStyle: FontStyle.italic,
+                        color: Colors.white)),
+              ),
+            ),
+          ),
+        ]),
+      ),
+      // The rows, the first lifting onto the band.
+      Padding(
+        padding: const EdgeInsets.only(top: _band - _overlap),
+        child: _SanskarCards(p: p, hinglish: hinglish, chapter: chapter),
+      ),
+    ]);
+  }
+}
+
+/// The five parts of the day's Sanskar, one row-card each, plus the footer.
+///
+/// ⚠️ ITS OWN `ListenableBuilder`, for the reason `_RitualCardV3` gave: the
+/// page's top-level builder does not listen to `TtcRitualStore`, so a tick
+/// would change the store and repaint nothing — and scoping the listener here
+/// means ticking one part does not rebuild the doors, the reads and the
+/// journal.
+class _SanskarCards extends StatelessWidget {
+  const _SanskarCards(
+      {required this.p, required this.hinglish, required this.chapter});
+
+  final V2Palette p;
+  final bool hinglish;
+  final TtcChapter chapter;
+
+  static IconData _icon(TtcRitualPart part) => switch (part) {
+        TtcRitualPart.reflection => Icons.menu_book_outlined,
+        TtcRitualPart.breath => Icons.air_rounded,
+        TtcRitualPart.conversation => Icons.people_outline_rounded,
+        TtcRitualPart.gratitude => Icons.favorite_border_rounded,
+        TtcRitualPart.action => Icons.handyman_outlined,
+      };
+
+  // The design's hues, part by part.
+  static double _hue(TtcRitualPart part) => switch (part) {
+        TtcRitualPart.reflection => 42,
+        TtcRitualPart.breath => 104,
+        TtcRitualPart.conversation => 268,
+        TtcRitualPart.gratitude => 344,
+        TtcRitualPart.action => 26,
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    final t = TtcS.current();
+    final items = ttcRituals[chapter] ?? const <TtcRitualItem>[];
+    return ListenableBuilder(
+      listenable: TtcRitualStore.instance,
+      builder: (context, _) {
+        final store = TtcRitualStore.instance;
+        final allDone =
+            items.isNotEmpty && items.every((i) => store.isDone(i.part));
+        return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          for (final item in items) ...[
+            _pad(_SanskarCard(
+              p: p,
+              hinglish: hinglish,
+              item: item,
+              icon: _icon(item.part),
+              hue: _hue(item.part),
+              done: store.isDone(item.part),
+              onToggle: () => store.toggle(item.part),
+              onOpen: () => Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) =>
+                      TtcRitualScreen(chapter: chapter, focus: item.part),
+                  settings: const RouteSettings(name: 'ttc/ritual'),
+                ),
+              ),
+            )),
+            const SizedBox(height: 12),
+          ],
+          // No count, no streak. One line about tomorrow.
+          _pad(Text(allDone ? t.sanskarFooterAllDone : t.sanskarFooter,
+              style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink2))),
+        ]);
+      },
+    );
+  }
+}
+
+/// One part of the Sanskar, in the design's row: a tinted mark, the part's
+/// name and its one line, and the Done pill on the RIGHT. Done stays on the
+/// page, dimmed, until tomorrow.
+///
+/// ⚠️ TWO TAP TARGETS, AND THAT IS THE DESIGN — carried over from the row it
+/// replaces. The pill completes; the row body opens the ritual at that part.
+/// Completing must never require reading first. "Done today" is itself a tap
+/// target that un-does, because the store allows it and V1 allows it; a tick
+/// that cannot be taken back is a worse control than one that can.
+class _SanskarCard extends StatelessWidget {
+  const _SanskarCard({
+    required this.p,
+    required this.hinglish,
+    required this.item,
+    required this.icon,
+    required this.hue,
+    required this.done,
+    required this.onToggle,
+    required this.onOpen,
+  });
+
+  final V2Palette p;
+  final bool hinglish;
+  final TtcRitualItem item;
+  final IconData icon;
+  final double hue;
+  final bool done;
+  final VoidCallback onToggle;
+  final VoidCallback onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final t = TtcS.current();
+    // ⚠️ THE DIM IS ON THE CONTENTS, NOT THE CARD. Dimming the whole card
+    // made its white surface translucent, and the first card sits on the
+    // photograph — on the phone the band showed through "Done today". The
+    // surface stays opaque; only what is on it fades.
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: p.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: p.line),
+        // The first row lifts onto the photograph; the shadow is what makes
+        // that read as depth rather than as a card cut off by a picture.
+        // All five carry it so the column is one thing.
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black.withValues(alpha: 0.06),
+              blurRadius: 14,
+              offset: const Offset(0, 4)),
+        ],
+      ),
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 200),
+        opacity: done ? 0.62 : 1,
+        child: Row(children: [
+          Expanded(
+            child: InkWell(
+              onTap: onOpen,
+              borderRadius: BorderRadius.circular(12),
+              child: Row(children: [
+                Container(
+                  width: 44,
+                  height: 44,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: v2BlockTint(hue, p),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: Icon(icon, size: 21, color: p.ink1),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(item.part.title(hinglish),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: pvFraunces(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                height: 1.25,
+                                letterSpacing: -0.3,
+                                color: p.ink1)),
+                        const SizedBox(height: 3),
+                        Text(item.part.why(hinglish),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: pvManrope(
+                                fontSize: 12.5, height: 1.4, color: p.ink2)),
+                      ]),
+                ),
+              ]),
+            ),
+          ),
+          const SizedBox(width: 10),
+          if (done)
+            InkWell(
+              onTap: onToggle,
+              borderRadius: BorderRadius.circular(999),
+              child: Container(
+                height: 34,
+                padding: const EdgeInsets.fromLTRB(6, 0, 12, 0),
+                decoration: BoxDecoration(
+                  color: p.surfaceAlt,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Container(
+                    width: 22,
+                    height: 22,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                        color: Color(0xFF2E9E6B), shape: BoxShape.circle),
+                    child: const Icon(Icons.check_rounded,
+                        size: 13, color: Colors.white),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(t.sanskarDoneToday,
+                      style: pvManrope(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w800,
+                          color: p.ink2)),
+                ]),
+              ),
+            )
+          else
+            InkWell(
+              onTap: onToggle,
+              borderRadius: BorderRadius.circular(999),
+              child: Container(
+                height: 34,
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                      color: p.action.withValues(alpha: 0.42)),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Icon(Icons.check_rounded, size: 14, color: p.action),
+                  const SizedBox(width: 6),
+                  Text(t.sanskarDone,
+                      style: pvManrope(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.2,
+                          color: p.action)),
+                ]),
+              ),
+            ),
+        ]),
+      ),
+    );
+  }
+}
+
+/// The chapter card with its three tabs ON it, as pills: Me · Us · What's
+/// next, each opening the chapter reader at that tab. Tapping the card body
+/// opens the reader at its default.
+class _ChapterCard extends StatelessWidget {
+  const _ChapterCard(
+      {required this.p,
+      required this.hinglish,
+      required this.chapter,
+      required this.onOpen});
+
+  final V2Palette p;
+  final bool hinglish;
+  final TtcChapter chapter;
+  final VoidCallback onOpen;
+
+  Widget _pill(BuildContext context, String label, TtcChapterTab tab,
+          {bool lead = false}) =>
+      InkWell(
+        onTap: () => openTtcChapter(context, chapter, tab: tab),
+        borderRadius: BorderRadius.circular(999),
+        child: Container(
+          height: 30,
+          padding: const EdgeInsets.symmetric(horizontal: 13),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: lead
+                ? p.action.withValues(alpha: 0.08)
+                : Colors.transparent,
+            border: Border.all(
+                color: lead ? p.action.withValues(alpha: 0.42) : p.line),
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Text(label.toUpperCase(),
+              style: pvManrope(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.1,
+                  color: lead ? p.action : p.ink2)),
+        ),
+      );
+
+  @override
+  Widget build(BuildContext context) {
+    final t = TtcS.current();
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: p.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: p.line),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        InkWell(
+          onTap: onOpen,
+          borderRadius: BorderRadius.circular(12),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Container(
+              width: 44,
+              height: 44,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: v2BlockTint(_chapterHue(chapter), p),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(Icons.menu_book_outlined, size: 22, color: p.ink1),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(chapter.title(hinglish),
+                        style: pvFraunces(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            height: 1.25,
+                            letterSpacing: -0.3,
+                            color: p.ink1)),
+                    const SizedBox(height: 4),
+                    Text(chapter.nextUp(hinglish),
+                        style: pvManrope(
+                            fontSize: 12.5, height: 1.4, color: p.ink2)),
+                  ]),
+            ),
+          ]),
+        ),
+        const SizedBox(height: 14),
+        // "Me" leads because it is the reader's default tab — the one the
+        // card body opens — and the pill says so before she taps.
+        Wrap(spacing: 8, runSpacing: 8, children: [
+          _pill(context, t.shortcutMe, TtcChapterTab.me, lead: true),
+          _pill(context, t.shortcutUs, TtcChapterTab.us),
+          _pill(context, t.shortcutNext, TtcChapterTab.next),
+        ]),
+      ]),
+    );
+  }
+}
+
+/// "Keep something from today": the design's card — a tinted well with a
+/// pen beside the prompt, then four entry chips across the card, and "Open
+/// the journal" under it.
+class _JournalInvite extends StatelessWidget {
+  const _JournalInvite({
+    required this.p,
+    required this.hinglish,
+    required this.onWrite,
+    required this.onFelt,
+    required this.onLog,
+    required this.onUs,
+    required this.onOpenAll,
+  });
+
+  final V2Palette p;
+  final bool hinglish;
+  final VoidCallback onWrite;
+  final VoidCallback onFelt;
+  final VoidCallback onLog;
+  final VoidCallback onUs;
+  final VoidCallback onOpenAll;
+
+  Widget _chip(String label, VoidCallback onTap) => InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(999),
+        // No `alignment:` on the Container — inside a Wrap it would fill the
+        // run. The parenting card learned this on a phone.
+        child: Container(
+          height: 32,
+          padding: const EdgeInsets.symmetric(horizontal: 13),
+          decoration: BoxDecoration(
+            border: Border.all(color: p.line),
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Center(
+            widthFactor: 1,
+            child: Text(label,
+                style: pvManrope(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
+                    color: p.ink1)),
+          ),
+        ),
+      );
+
+  @override
+  Widget build(BuildContext context) =>
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: p.surface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: p.line),
+          ),
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(children: [
+                  InkWell(
+                    onTap: onWrite,
+                    borderRadius: BorderRadius.circular(14),
+                    child: Container(
+                      width: 64,
+                      height: 64,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: v2BlockTint(268, p),
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Icon(Icons.edit_outlined, size: 28, color: p.ink1),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Text(
+                        hinglish
+                            ? 'Aaj kaisa laga, kuch jo dhyaan mein aaya, ya '
+                                'aap dono ke liye ek note.'
+                            : 'How today felt, something you noticed, or a '
+                                'note for the two of you.',
+                        style: pvManrope(
+                            fontSize: 13, height: 1.5, color: p.ink2)),
+                  ),
+                ]),
+                const SizedBox(height: 16),
+                Wrap(spacing: 8, runSpacing: 8, children: [
+                  _chip(hinglish ? 'Likhein' : 'Write', onWrite),
+                  _chip(hinglish ? 'Aaj kaisa laga' : 'How today felt', onFelt),
+                  _chip(hinglish ? 'Aaj ka log' : 'Log for today', onLog),
+                  _chip(hinglish ? 'Aap dono' : 'The two of you', onUs),
+                ]),
+              ]),
+        ),
+        const SizedBox(height: 12),
+        InkWell(
+          onTap: onOpenAll,
+          borderRadius: BorderRadius.circular(8),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Text(hinglish ? 'Journal kholein' : 'Open the journal',
+                style: pvManrope(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w700,
+                    color: p.ink2)),
+            const SizedBox(width: 4),
+            Icon(Icons.chevron_right_rounded, size: 16, color: p.ink3),
+          ]),
+        ),
+      ]);
+}
+
+/// The four people, one card each, each opening ITS consultation.
+///
+/// ⚠️ ROLES, NOT NAMES. `TtcOffering.expertId` points at ids
+/// ('ttc_dr_gynae', …) that no record in the app resolves to a person yet —
+/// the catalogue has thirteen offerings and no expert table. So the card says
+/// what the person is, which is true, rather than who, which would be
+/// invented. The circle is a person mark for the same reason: the design
+/// draws it as the place a photograph goes, and there is no photograph yet.
+///
+/// ⚠️ NO PRICE. This section closes the page on a person, not a rate; the
+/// offering page carries the price, one tap in.
+class _ExpertRail extends StatelessWidget {
+  const _ExpertRail({required this.p, required this.hinglish});
+
+  final V2Palette p;
+  final bool hinglish;
+
+  static const List<(String, String, String, double)> _experts = [
+    ('ttc_consult_gynae', 'Gynaecologist', 'Gynaecologist', 206),
+    ('ttc_consult_fertility', 'Fertility specialist', 'Fertility specialist',
+        268),
+    ('ttc_nutrition_consult', 'Nutritionist', 'Nutritionist', 104),
+    ('ttc_psych_consult', 'Psychologist', 'Psychologist', 344),
+  ];
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+        height: 160,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 18),
+          itemCount: _experts.length,
+          separatorBuilder: (_, _) => const SizedBox(width: 12),
+          itemBuilder: (context, i) {
+            final (id, en, hi, hue) = _experts[i];
+            final offering = ttcOfferingById(id);
+            return SizedBox(
+              width: 152,
+              child: InkWell(
+                onTap: () {
+                  if (offering == null) {
+                    openTtcSurface(context, 'ttc_prepare');
+                    return;
+                  }
+                  Navigator.of(context).push(MaterialPageRoute<void>(
+                    settings: RouteSettings(name: 'ttc/prepare/$id'),
+                    builder: (_) => TtcOfferingScreen(offering: offering),
+                  ));
+                },
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: p.surface,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: p.line),
+                  ),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 52,
+                          height: 52,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: v2BlockTint(hue, p),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(Icons.person_outline_rounded,
+                              size: 26, color: p.ink1),
+                        ),
+                        const SizedBox(height: 10),
+                        Text(hinglish ? hi : en,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: pvFraunces(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w600,
+                                height: 1.25,
+                                letterSpacing: -0.3,
+                                color: p.ink1)),
+                        const SizedBox(height: 4),
+                        Text(
+                            hinglish
+                                ? 'Video par, aapke waqt par'
+                                : 'On video, at a time you choose',
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: pvManrope(
+                                fontSize: 12.5, height: 1.4, color: p.ink2)),
+                      ]),
+                ),
+              ),
+            );
+          },
+        ),
+      );
+}
+
+/// A wide surface card with a label and a chevron — "See everyone".
+class _SeeAllRow extends StatelessWidget {
+  const _SeeAllRow(
+      {required this.label, required this.p, required this.onTap});
+
+  final String label;
+  final V2Palette p;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          decoration: BoxDecoration(
+            color: p.surface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: p.line),
+          ),
+          child: Row(children: [
+            Expanded(
+              child: Text(label,
+                  style: pvManrope(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w700,
+                      color: p.ink1)),
+            ),
+            Icon(Icons.chevron_right_rounded, size: 18, color: p.ink3),
+          ]),
+        ),
+      );
 }

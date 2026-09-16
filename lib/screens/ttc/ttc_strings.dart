@@ -660,34 +660,73 @@ class TtcS {
 
   // ---- the daily practice ---------------------------------------------------
   //
-  // ⚠️ "GARBHADHANA SAMSKARA" AND NOT "GARBH SANSKAR", DELIBERATELY, and the
-  // two must not be collapsed by a later tidy-up. Garbh Sanskar is the
-  // PREGNANCY practice — ParentVeda ships it four pillars deep in the pregnancy
-  // stage — and using its name on a woman who has not conceived promises her a
-  // feature she cannot reach and makes two stages look like one screen twice.
-  // Garbhadhana Samskara is the older, narrower idea this section actually is:
-  // preparing both parents *before* conception.
+  // ⚠️ "SANSKAR", NOT "SAMSKAR" — DECIDED 2026-09-16. The section shipped as
+  // "Daily Preconception Samskar" / "Garbhadhana Samskara" (the Sanskrit
+  // transliteration) and the user called it a misspelling: the app's word is
+  // "Sanskar", the one every parent already reads in "Garbh Sanskar". Both
+  // spellings kept below, the old one commented, so the rename is one line
+  // to revert.
   //
-  // ⚠️ AND THE BODY MAKES NO CAUSAL CLAIM. "A steadier place to begin from" is
-  // as far as it goes. Not "improves your chances of a healthy baby", which is
-  // a claim about outcome that nothing in this app is entitled to make — the
-  // subtitle's "Improve your chances" is a general framing with no number and
-  // no personalisation attached, and it stays on the right side of the line
-  // only while the body under it stays honest about what five minutes can do.
-  String get samskarTitle =>
-      _p('Daily Preconception Samskar', 'Roz ka Preconception Samskar');
-  String get samskarSubtitle =>
+  // ⚠️ STILL "GARBHADHANA SANSKAR" AND NOT "GARBH SANSKAR", and the two must
+  // not be collapsed by a later tidy-up. Garbh Sanskar is the PREGNANCY
+  // practice — ParentVeda ships it four pillars deep in the pregnancy stage —
+  // and using its name on a woman who has not conceived promises her a
+  // feature she cannot reach and makes two stages look like one screen twice.
+  // Garbhadhana Sanskar is the older, narrower idea this section actually is:
+  // preparing both parents *before* conception. The distinction lives in the
+  // first word, so the spelling of the second can follow the house style.
+  //
+  // ⚠️ THE SUBTITLE "IMPROVE YOUR CHANCES" IS GONE — DECIDED 2026-09-16. The
+  // old comment argued it stayed "on the right side of the line" as a general
+  // framing with no number attached. The V3 rebuild asked the question again
+  // and the answer was no: on a fertility home, "improve your chances" over
+  // five daily ticks reads as a claim about outcome whether or not a number
+  // follows, and the clinical rule ("never a personalised probability, and
+  // population statistics only where they reduce pressure rather than set a
+  // target") is not met by a sentence that sets a target. The body makes no
+  // causal claim — "a calmer place to begin from" is as far as it goes — and
+  // that is now the only claim the section makes. Getter kept for revert.
+  String get sanskarTitle =>
+      _p('Daily Preconception Sanskar', 'Roz ka Preconception Sanskar');
+  // Kept for revert:
+  //   String get samskarTitle =>
+  //       _p('Daily Preconception Samskar', 'Roz ka Preconception Samskar');
+  String get sanskarSubtitle =>
       _p('Improve your chances', 'Apne mauke behtar karein');
-  String get samskarBody => _p(
-      'Ayurveda has a name for the months before a child is conceived — '
-          'Garbhadhana Samskara, the preparing of both parents rather than only '
-          'the pregnancy that follows. These few minutes a day are that idea, '
-          'kept small: a steadier body, a quieter head, and a calmer place to '
-          'begin from.',
-      'Bachcha conceive karne se pehle ke mahinon ka Ayurveda mein ek naam hai — '
-          'Garbhadhana Samskara, yaani sirf pregnancy ki nahi, dono parents ki '
-          'taiyari. Roz ke yeh chand minute wahi soch hain, bilkul simple: '
-          'sthir sharir, shaant dimaag, aur shuru karne ke liye ek behtar jagah.');
+  // ⚠️ ONE LINE, NOT A PARAGRAPH — 2026-09-16. On the phone the explainer
+  // card under the photograph carried five lines of Ayurveda before the first
+  // thing she could do; the review: "why are we throwing so much theory and
+  // text heavy practice session... cut it short". The name still gets its
+  // gloss, because "Garbhadhana Sanskar" on an English screen needs one; the
+  // rest is what the five rows show rather than say. The paragraph is kept
+  // for revert.
+  String get sanskarBody => _p(
+      'A few minutes a day for the two of you, in the months before. '
+          'Ayurveda calls it Garbhadhana Sanskar.',
+      'Roz ke chand minute, aap dono ke liye, conceive karne se pehle ke '
+          'mahinon mein. Ayurveda ise Garbhadhana Sanskar kehta hai.');
+  // Kept for revert:
+  //   String get sanskarBody => _p(
+  //       'Ayurveda has a name for the months before a child is conceived — '
+  //           'Garbhadhana Sanskar, the preparing of both parents rather than only '
+  //           'the pregnancy that follows. These few minutes a day are that idea, '
+  //           'kept small: a steadier body, a quieter head, and a calmer place to '
+  //           'begin from.',
+  //       'Bachcha conceive karne se pehle ke mahinon ka Ayurveda mein ek naam hai — '
+  //           'Garbhadhana Sanskar, yaani sirf pregnancy ki nahi, dono parents ki '
+  //           'taiyari. Roz ke yeh chand minute wahi soch hain, bilkul simple: '
+  //           'sthir sharir, shaant dimaag, aur shuru karne ke liye ek behtar jagah.');
+
+  /// The line under the five parts. No count — see `_SanskarCard` in
+  /// ttc_home_v3.dart for why the 0/5 and the streak went.
+  String get sanskarFooter =>
+      _p('Five small things. Tomorrow they are new.',
+          'Paanch chhoti cheezein. Kal nayi hongi.');
+  String get sanskarFooterAllDone =>
+      _p('All five done. Tomorrow they are new.',
+          'Paanchon ho gaye. Kal nayi hongi.');
+  String get sanskarDone => _p('Done', 'Ho gaya');
+  String get sanskarDoneToday => _p('Done today', 'Aaj ho gaya');
 
   String get dailyRitual => _p('Daily ritual', 'Roz ka ritual');
   String get dailyRitualTitle =>

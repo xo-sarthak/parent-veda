@@ -95,10 +95,12 @@ void main() {
     // DEFAULT tab, so a single chapter link reaches "Me" and nothing else —
     // which is what V3 had. Us and What's next were unreachable in this
     // version of the app entirely.
-    final f = find.text(t.shortcutUs, skipOffstage: false);
+    // The pills on the chapter card draw their labels in uppercase (the
+    // 2026-09-16 design); the strings themselves are unchanged.
+    final f = find.text(t.shortcutUs.toUpperCase(), skipOffstage: false);
     await _scrollTo(tester, f);
     for (final label in [t.shortcutMe, t.shortcutUs, t.shortcutNext]) {
-      expect(find.text(label, skipOffstage: false), findsWidgets,
+      expect(find.text(label.toUpperCase(), skipOffstage: false), findsWidgets,
           reason: '"$label" opens a chapter tab and V3 cannot reach it');
     }
   });
@@ -108,37 +110,45 @@ void main() {
     // ⚠️ THE ONE GAP A REACHABILITY CHECK WOULD HAVE PASSED. V3 had a card
     // that opened the ritual screen — same destination, so "can she get
     // there?" answers yes. What it removed was the ability to DO the thing
-    // from Today: the tick, the 0/5, the streak.
+    // from Today.
     //
     // That difference does not show up as a missing link. It shows up as
     // lower ritual completion on V3, which the toggle would then have
     // attributed to the design.
+    //
+    // ⚠️ THE COUNTER IS GONE — DECIDED 2026-09-16. This test used to assert
+    // a "0/5" on the home and watch it become "1/5". The V3 reshape removed
+    // the count and the streak on the user's call (the same call the
+    // parenting brief and the Grow feature made: no counters, no streaks).
+    // What the invariant was ever about is that a part can be marked done
+    // WITHOUT navigating, and that the card repaints when it is — so that
+    // is what is asserted now: five Done pills, then one becomes "Done
+    // today" when the store changes.
     TtcRitualStore.instance.resetForTest();
     await pumpV3(tester);
+    final t = TtcS.current();
 
-    final counter = find.text('0/${TtcRitualStore.instance.total}',
-        skipOffstage: false);
-    await _scrollTo(tester, counter);
-    expect(counter, findsWidgets,
-        reason: 'no progress counter, so nothing on the home says how much of '
-            'the ritual is done');
+    final pills = find.text(t.sanskarDone, skipOffstage: false);
+    await _scrollTo(tester, pills);
+    expect(pills, findsNWidgets(TtcRitualStore.instance.total),
+        reason: 'every part of the ritual should be completable from the home');
+    expect(find.text(t.sanskarDoneToday, skipOffstage: false), findsNothing,
+        reason: 'nothing should be done yet');
 
-    // Tick the first part from the home and expect the count to move WITHOUT
-    // a navigation having happened.
-    final ticks = find.byIcon(Icons.check_rounded, skipOffstage: false);
-    final circles = find.descendant(
-        of: find.byType(GestureDetector, skipOffstage: false),
-        matching: find.byType(Container, skipOffstage: false));
-    expect(circles, findsWidgets);
-    expect(ticks, findsNothing, reason: 'nothing should be done yet');
-
+    // Tick the first part and expect the card to change WITHOUT a
+    // navigation having happened.
     TtcRitualStore.instance.toggle(TtcRitualPart.values.first);
     await tester.pump(const Duration(milliseconds: 300));
 
-    expect(find.text('1/${TtcRitualStore.instance.total}', skipOffstage: false),
-        findsWidgets,
+    expect(find.text(t.sanskarDoneToday, skipOffstage: false), findsOneWidget,
         reason: 'the card does not listen to TtcRitualStore, so a completed '
             'part repaints nothing');
+    expect(find.text(t.sanskarDone, skipOffstage: false),
+        findsNWidgets(TtcRitualStore.instance.total - 1));
+    // And no fraction anywhere: the count was removed on purpose.
+    expect(find.textContaining('/${TtcRitualStore.instance.total}', skipOffstage: false),
+        findsNothing,
+        reason: 'the 0/5 counter was removed by decision on 2026-09-16');
   });
 
   testWidgets('the door out of the stage is on it', (tester) async {

@@ -2428,12 +2428,20 @@ class _Chip extends StatelessWidget {
               Icon(icon, size: 11, color: hue == null ? p.ink3 : p.ink1),
               const SizedBox(width: 5),
             ],
-            Text(label.toUpperCase(),
-                style: pvManrope(
-                    fontSize: 9.5,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.1,
-                    color: hue == null ? p.ink3 : p.ink1)),
+            // Flexible + ellipsis: a chip must shrink before it can overflow.
+            // "SUPPLEMENTS" in a 158dp card was 2.6px over under the test
+            // font's square glyphs, and a chip that can overflow at all will
+            // do it on somebody's large-text setting.
+            Flexible(
+              child: Text(label.toUpperCase(),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.1,
+                      color: hue == null ? p.ink3 : p.ink1)),
+            ),
           ]),
         ),
       );

@@ -7168,3 +7168,123 @@ sheet. Not walked on a phone.
   under the breath — all mine.
 * Whether "With a coach" oversells a placeholder course title.
 
+## 58.0 TTC V3 home, the lower half in the parenting grammar — 2026-09-16
+
+Built directly, no Claude Design round — the widgets it would have drawn
+already existed in `pp_home_v3.dart`, and drawing them again could only
+drift. Everything above and including the seven doors is untouched.
+`lib/screens/ttc/ttc_home_v3.dart`, `ttc_strings.dart`. Walked on the phone
+the same day.
+
+### 58.1 The calls, all the user's
+
+- **"Sanskar", not "Samskar"** — the section shipped with the Sanskrit
+  transliteration and it was a misspelling for this app. Still
+  "Garbhadhana Sanskar", never "Garbh Sanskar" (that is the pregnancy
+  practice); the distinction lives in the first word.
+- **"Improve your chances" is gone.** The old comment defended it as a
+  general framing; asked again, the answer was no — on a fertility home a
+  sentence that sets a target is a target.
+- **No counter, no streak.** The 0/5 and "3 days" the ritual card carried
+  are gone, on the grounds the parenting brief and the Grow feature gave.
+  Completing from the home — the parity invariant — is held by a Done pill
+  per part; `test/ttc_home_v3_parity_test.dart` now asserts five pills and
+  that one becomes "Done today" without navigating, and that no fraction
+  is drawn.
+
+### 58.2 What changed
+
+Sanskar: `_Head` + body line, then five `_SanskarCard`s (tinted mark, the
+part's name, TODAY'S prompt, the why, Done) and a footer line. Products:
+parenting's card shape, opens the product page (`openTtcProductPage`) not
+the shop front; a category chip where parenting has a why-line, because the
+"never a benefit under a supplement" rule stands. Reads: renamed, rail in
+parenting's shape (cover band, "READ · N MIN", title, standfirst). Journal:
+parenting's invite card with a pen square and this stage's four doors.
+People: four role cards (gynaecologist, fertility specialist, nutritionist,
+psychologist), each opening ITS consultation, then "See everyone". Roles
+not names — `TtcOffering.expertId` resolves to no record yet.
+
+### 58.2a Then the design arrived, and the band — 2026-09-16, later
+
+The user ran the Claude Design after all (`TTC V3 Home`, project
+49005443). It agreed with the build on every section and differed on
+details, which are now the design's: the Sanskar parts are ROWS with the
+Done pill on the right, the chapter card carries Me · Us · What's next as
+pills on itself, the reads and products cards keep their wells inside the
+padding, the journal card is a 64dp pen well beside the prompt with the
+chips across the card, the experts wear a person mark, "See everyone" is a
+surface card, the test door is a hairline row.
+
+Two more calls from the walk that followed:
+
+- **A photograph behind the Sanskar, "like pregnancy V3".** `_SanskarBlock`
+  mirrors `V3GarbhBlock`: a 196dp full-bleed band (the Mind & body door's
+  own photo, not a new id picked blind), the dark scrim, the gold eyebrow,
+  the title in white, the (i) to the ritual screen, and the first row
+  lifting 22dp onto the band. The explainer text was first a card lifting
+  onto the band; "i dont need a separate card just for so much text, looks
+  bland" — so the text is one line on the photograph and the first ROW
+  lifts instead. The done-dim moved from the card to its contents, because
+  a translucent card on a photograph let the band through.
+- **"Cut it short."** The five-line Ayurveda paragraph is one sentence
+  plus the name's gloss. Paragraph kept in ttc_strings.dart for revert.
+- **The bottom bar's icons are line icons now**, the same glyphs pregnancy
+  and parenting use for the same tabs. TTC was the one bar of three still
+  drawing filled `home_rounded` / `school_rounded` / `widgets_rounded`;
+  sharing `PvNavBar` never covered the icons, which each stage supplies.
+
+### 58.3 Found on the walk, fixed
+
+- The hero field showed through under the disclaimer: the `ListView` still
+  reserved `ttcBottomInset` OUTSIDE the sheet while the sheet reserved 150
+  inside — the "padding is a window onto the field" bug parenting's sheet
+  note describes. Pre-existing. The sheet reserves `max(ttcBottomInset,
+  150)` now and the scroll view reserves nothing.
+- The product card had a dead band between chip and price at parenting's
+  226dp (no why-line here). 214.
+- Both stages' chips shrink with an ellipsis instead of overflowing —
+  "SUPPLEMENTS" was 2.6px over under the test font.
+
+### 58.4 Owed
+
+- Expert names on the four cards, the day `expertId` resolves to a person.
+- The chapter card and its Me · Us · What's next tabs kept their existing
+  shape; the design prompt had the tabs ON the card. Cosmetic, and the two
+  widgets are reachable and tested as they are.
+
+
+---
+
+## 59.0 Onboarding is decided against the Mobbin audit; three things it leaves open — OPENED 2026-09-16
+
+`docs/ONBOARDING-AUDIT.md` holds the audit, the seven-screen decision and the
+Claude Design brief. Nothing is built yet; the brief goes to Claude Design
+first. What the decision leaves behind:
+
+### 59.1 The phone ask on day 3 — parked until the app is done
+
+The number is collected on screen 7, after the reveal, as a tap (Phone Number
+Hint) and an auto-filled OTP. The user's own instinct, and the audit's, is that
+the ask would land better on day 3 inside the app, at the first moment there is
+something concrete to send on WhatsApp. **Decided: onboarding now; day-3 as an
+A/B later.** Needs an in-app ask surface and a flag for which arm she saw.
+
+### 59.2 Skilling has no home — `SkillingPreviewScreen` stands in
+
+The Stage tile now writes `LifeStage.skilling` and the splash routes it to the
+preview screen. That screen was built as a design preview and says so in its
+class doc; it is now a destination and needs to be read as one — an entry to
+every skilling door, and the parent gate. A real skilling home is owed.
+
+### 59.3 §22.4 — the partner's name — CLOSED by the flow
+
+Hers from Google on the Hello screen; his from his own Google on his own
+device; the invite may carry a nickname that never leaves the phone. No new
+question, no name held that its owner did not give.
+
+### 59.4 The old `AuthFlowScreen` — kept, commented at the splash call site
+
+Email + password, Apple, Facebook, the forgot/otp/reset chain and the "Soft
+solid" design all stay in the file for revert. No user has an email account
+yet, which is why the cut costs nothing now and would cost something later.
