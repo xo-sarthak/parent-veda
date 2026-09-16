@@ -7,6 +7,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../theme/app_theme.dart';
 import 'pv_nav_bar.dart';
 
 class PvTab {
@@ -49,12 +50,19 @@ class PvTabBar extends StatelessWidget {
     return SafeArea(
       top: false,
       child: Padding(
-        padding: const EdgeInsets.only(left: 14, right: 14, bottom: 14),
+        // 16 · 16 · 18, the parenting V3 home's placement of the same bar
+        // (pp_home_v3.dart), so the pill sits at one height and one width in
+        // both stages. Was 14 · 14 · 14. `_kNavBarBottomInset` in
+        // pv_nav_bar.dart mirrors the 18.
+        padding: const EdgeInsets.only(left: 16, right: 16, bottom: 18),
         child: PvNavBar(
           items: [for (final t in tabs) PvNavItem(t.icon, t.label)],
           activeIndex: activeIndex,
           onTap: onChanged,
-          accent: father ? _fAccent : null,
+          // Parenting lights its bar with `ppPurple`, which is
+          // `AppTheme.primary500`; this stage took the bar's default
+          // (`primary600`), one step darker. Same violet now.
+          accent: father ? _fAccent : AppTheme.primary500,
           inactive: father ? _fMuted : null,
         ),
       ),

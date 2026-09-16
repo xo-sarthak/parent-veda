@@ -35,9 +35,35 @@ class PvVideoPlayer extends StatefulWidget {
     this.onNext,
     this.onFullscreenChanged,
     this.repository = const LocalWatchRepository(),
+    this.inline = false,
+    this.autoStart = false,
   });
 
   final WatchVideo video;
+
+  /// ⚠️ INLINE MEANS "PLAYING INSIDE A PAGE THAT STAYS WHERE IT IS".
+  ///
+  /// Added 2026-09-16 for the pregnancy V3 home, whose "This Week Explained"
+  /// film plays in place — the design's call was that leaving the page for
+  /// her week's explanation breaks the reading order. Two controls stop making
+  /// sense once the player is a paragraph in a scroll rather than a screen:
+  ///
+  ///   · the top-bar back arrow, which pops a route — on a tab root it would
+  ///     pop nothing and read as a button that does nothing;
+  ///   · the fullscreen button, which swaps the player for a `SizedBox.expand`
+  ///     that a `ListView` cannot size, and needs a HOST to reparent it (see
+  ///     watch_player_screen.dart). A home screen with a bottom bar and a
+  ///     version pill over it is not that host.
+  ///
+  /// So `inline` hides both. Everything else — play, ±10s, scrubber, speed,
+  /// progress, completion — is unchanged, because those ARE the player.
+  final bool inline;
+
+  /// Start playing as soon as the source is ready, instead of waiting for a
+  /// tap on the cover. For the case where the host has already drawn the
+  /// poster and the play control and the tap has happened: a second cover
+  /// with a second play button would ask her twice.
+  final bool autoStart;
 
   /// Tapped from the completion card. If null, no "Next lesson" button shows.
   final VoidCallback? onNext;
@@ -126,6 +152,7 @@ class PvVideoPlayerState extends State<PvVideoPlayer> {
     });
     PvScreenSecurity.instance.enable();
     _restartHideTimer();
+    if (widget.autoStart) _startPlayback();
   }
 
   // ---- controller listener ------------------------------------------------
@@ -425,7 +452,7 @@ class PvVideoPlayerState extends State<PvVideoPlayer> {
               ),
             ),
             child: Stack(children: [
-              _topBar(),
+              if (!widget.inline) _topBar(),
               if (_isBuffering) const Center(child: _Spinner()) else Center(child: _centerControls()),
               _bottomBar(),
             ]),
@@ -447,7 +474,7 @@ class PvVideoPlayerState extends State<PvVideoPlayer> {
         ),
       ),
       child: Stack(children: [
-        _topBar(),
+        if (!widget.inline) _topBar(),
         Center(
           child: loading
               ? const _Spinner()
@@ -532,8 +559,10 @@ class PvVideoPlayerState extends State<PvVideoPlayer> {
               child: Text('${_rateLabel(_rate)}x', style: ppBody(12.5, color: Colors.white, w: FontWeight.w800)),
             ),
           ),
-          const SizedBox(width: 6),
-          _iconBtn(_fullscreen ? Icons.fullscreen_exit_rounded : Icons.fullscreen_rounded, _toggleFullscreen),
+          if (!widget.inline) ...[
+            const SizedBox(width: 6),
+            _iconBtn(_fullscreen ? Icons.fullscreen_exit_rounded : Icons.fullscreen_rounded, _toggleFullscreen),
+          ],
         ]),
       ]),
     );

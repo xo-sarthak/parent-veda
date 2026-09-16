@@ -44,6 +44,17 @@ const Map<String, String> kDevVideoUrls = {
   'q_noise': _kDevSampleUrl,
   'q_tummy': _kDevSampleUrl,
   'pod_sleep': _kDevSampleUrl,
+  // ---- PREGNANCY (lib/models/pv_video.dart), from 2026-09-16 --------------
+  // The V3 home's "This Week Explained" plays the week's recommended film
+  // inline through the same engine (see v2/v3_week_film.dart). The five
+  // week-ranged recommendations are mapped so the play control on the home
+  // plays something on a dev build; the skill/expert/birth shelf ids are left
+  // unmapped on purpose, so the "film arriving" state is exercised too.
+  'rec_t1': _kDevSampleUrl,
+  'rec_scan1': _kDevSampleUrl,
+  'rec_sound': _kDevSampleUrl,
+  'rec_movement': _kDevSampleUrl,
+  'rec_labour': _kDevSampleUrl,
 };
 
 /// The URL that should actually play for [video], or null if none is available

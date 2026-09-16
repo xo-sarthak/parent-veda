@@ -199,10 +199,18 @@ class GarbhPillarRow {
     required this.done,
     this.image,
     this.onTap,
+    this.onToggleDone,
   });
 
   final String name;
   final String tag;
+
+  /// The done-mark's own tap, when the mark is a control rather than a
+  /// readout. `V3GarbhBlock` (the 2026-09-16 design) makes the circle live:
+  /// she can tick a practice she did away from the app — sang to the baby in
+  /// the car — without opening the pillar to prove it. `V3GarbhSection` never
+  /// reads this; its mark stays a readout.
+  final VoidCallback? onToggleDone;
 
   /// A PHOTOGRAPH OF THE PRACTICE, not a glyph for the category.
   ///
@@ -318,4 +326,225 @@ class _PillarRow extends StatelessWidget {
           ]),
         ),
       );
+}
+
+// =============================================================================
+//  V3GarbhBlock — the 2026-09-16 shape: a full-bleed band, a card over it
+// -----------------------------------------------------------------------------
+//  Built to the "Pregnancy Home V3" Claude Design. `V3GarbhSection` above is
+//  the previous shape (one framed card with a photo header) and is kept for
+//  revert; its call site in home_v3_screen.dart is commented, not removed.
+//
+//  WHAT CHANGED AND WHY IT IS NOT A RESTYLE. The old block was a card among
+//  cards. The design gives Garbh Sanskar the same treatment as the hero and
+//  the week's film: a photograph that reaches both edges of the screen, with
+//  the practice card lifting off it. On a page whose other sections are inset
+//  18dp, the three full-bleed moments — hero, film, Garbh — are the page's
+//  structure; everything else is content between them.
+//
+//  The rows lost their photo tiles and their tags. Four rows of name + what
+//  today holds + a done-mark is what the design draws, and it is enough: the
+//  name is the pillar, the line under it is the reason to tap. The pillar
+//  images are still on `GarbhPillarRow` and still render in the old section.
+//
+//  ⚠️ THE DONE-MARK IS A CONTROL HERE. Tapping the circle marks the practice
+//  done (or undoes it); tapping the row still opens the pillar. Two targets
+//  on one row, so the circle gets a 44px hit area and the row's InkWell stops
+//  short of it.
+// =============================================================================
+
+class V3GarbhBlock extends StatelessWidget {
+  const V3GarbhBlock({
+    super.key,
+    required this.day,
+    required this.p,
+    required this.rows,
+    this.onAbout,
+  });
+
+  final HomeDay day;
+  final V2Palette p;
+  final List<GarbhPillarRow> rows;
+  final VoidCallback? onAbout;
+
+  /// The photograph's height, and how far the card climbs onto it.
+  static const double _band = 172;
+  static const double _overlap = 22;
+
+  @override
+  Widget build(BuildContext context) {
+    // The card is the sizing child: the Stack is as tall as the band minus the
+    // overlap plus the card. The band is painted first, so the card sits on
+    // top of it without a second container to say so.
+    return Stack(clipBehavior: Clip.none, children: [
+      Positioned(
+        top: 0,
+        left: 0,
+        right: 0,
+        height: _band,
+        child: _Band(p: p, onAbout: onAbout),
+      ),
+      Padding(
+        padding: const EdgeInsets.fromLTRB(18, _band - _overlap, 18, 0),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
+          decoration: BoxDecoration(
+            color: p.surface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: p.line),
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.06),
+                  blurRadius: 14,
+                  offset: const Offset(0, 4)),
+            ],
+          ),
+          child: Column(children: [
+            for (final row in rows) ...[
+              _BlockRow(row: row, p: p),
+              if (row != rows.last)
+                Divider(height: 1, thickness: 1, color: p.line),
+            ],
+          ]),
+        ),
+      ),
+    ]);
+  }
+}
+
+class _Band extends StatelessWidget {
+  const _Band({required this.p, this.onAbout});
+  final V2Palette p;
+  final VoidCallback? onAbout;
+
+  @override
+  Widget build(BuildContext context) => Stack(fit: StackFit.expand, children: [
+        Image.network(_kGarbhHeaderImage,
+            fit: BoxFit.cover,
+            errorBuilder: (_, _, _) =>
+                Container(color: const Color(0xFF201C24))),
+        const DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topRight,
+              end: Alignment.bottomLeft,
+              colors: [Color(0x40000000), Color(0xD9000000)],
+            ),
+          ),
+        ),
+        // The type sits above the card's overlap, not behind it.
+        Positioned(
+          left: 18,
+          right: 18,
+          bottom: V3GarbhBlock._overlap + 14,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('GARBH SANSKAR',
+                style: pvManrope(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.6,
+                    color: const Color(0xFFF0C078))),
+            const SizedBox(height: 7),
+            Text('Your practice for today',
+                style: pvFraunces(
+                    fontSize: 23,
+                    fontWeight: FontWeight.w600,
+                    height: 1.15,
+                    letterSpacing: -0.55,
+                    color: Colors.white)),
+          ]),
+        ),
+        // The explainer, kept from the old header: a section named in
+        // Sanskrit on an English screen needs a door to "what is this".
+        Positioned(
+          right: 16,
+          top: 14,
+          child: InkWell(
+            onTap: onAbout,
+            customBorder: const CircleBorder(),
+            child: Container(
+              width: 26,
+              height: 26,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border:
+                    Border.all(color: Colors.white.withValues(alpha: 0.55)),
+              ),
+              child: Text('i',
+                  style: pvFraunces(
+                      fontSize: 13,
+                      fontStyle: FontStyle.italic,
+                      color: Colors.white)),
+            ),
+          ),
+        ),
+      ]);
+}
+
+class _BlockRow extends StatelessWidget {
+  const _BlockRow({required this.row, required this.p});
+  final GarbhPillarRow row;
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) => Row(children: [
+        Expanded(
+          child: InkWell(
+            onTap: row.onTap,
+            borderRadius: BorderRadius.circular(12),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(row.name,
+                        style: pvJakarta(
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w700,
+                            color: p.ink1)),
+                    const SizedBox(height: 2),
+                    Text(row.today,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: pvManrope(
+                            fontSize: 13, height: 1.45, color: p.ink2)),
+                  ]),
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        // 44px target around a 26px mark, per the tap-target minimum. Falls
+        // back to the row's own tap when nobody wired the toggle, so the
+        // circle is never a dead spot on a live row.
+        InkWell(
+          onTap: row.onToggleDone ?? row.onTap,
+          customBorder: const CircleBorder(),
+          child: SizedBox(
+            width: 44,
+            height: 44,
+            child: Center(
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 160),
+                width: 26,
+                height: 26,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: row.done ? row.accent : Colors.transparent,
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                      color: row.done
+                          ? row.accent
+                          : Colors.black.withValues(alpha: 0.16),
+                      width: 1.5),
+                ),
+                child: row.done
+                    ? const Icon(Icons.check_rounded,
+                        size: 15, color: Colors.white)
+                    : null,
+              ),
+            ),
+          ),
+        ),
+      ]);
 }

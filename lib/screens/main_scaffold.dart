@@ -199,11 +199,21 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
                 PvTab(Icons.edit_outlined, 'Journal'),
               ]
             : [
-                PvTab(Icons.home_rounded, s.tabToday),
-                PvTab(Icons.school_rounded, s.tabPrepare),
-                PvTab(Icons.widgets_rounded, s.toolsTab),
-                PvTab(Icons.calendar_today_rounded, s.tabCalendar),
-                PvTab(Icons.groups_rounded, s.tabCommunity),
+                // ⚠️ OUTLINED, LIKE PARENTING'S — 2026-09-16. The bar is one
+                // component (`PvNavBar`) on every screen of every stage, but
+                // this stage handed it filled `_rounded` glyphs while parenting
+                // handed it `_outlined` ones, so the same bar looked heavier
+                // here — thicker icons on an identical pill. Same names, same
+                // positions; only the glyph weight changes. Tools takes the
+                // parenting bar's own icon so the word and the mark agree
+                // across stages. The filled set, kept for revert:
+                //   home_rounded · school_rounded · widgets_rounded ·
+                //   calendar_today_rounded · groups_rounded
+                PvTab(Icons.home_outlined, s.tabToday),
+                PvTab(Icons.school_outlined, s.tabPrepare),
+                PvTab(Icons.handyman_outlined, s.toolsTab),
+                PvTab(Icons.calendar_today_outlined, s.tabCalendar),
+                PvTab(Icons.groups_outlined, s.tabCommunity),
               ];
         return Scaffold(
           backgroundColor: AppTheme.scaffoldBackground,

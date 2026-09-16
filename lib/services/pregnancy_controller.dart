@@ -82,6 +82,10 @@ class PregnancyController extends ChangeNotifier {
   /// Where the saved due date came from. Same seam, same reason.
   static const String kDueDateSourceKey = 'pregnancy_due_date_source';
 
+  /// The day the app was FIRST opened without a due date. The week-20
+  /// placeholder is anchored to it — see [_placeholderDueDate].
+  static const String kPlaceholderAnchorKey = 'pregnancy_placeholder_anchor';
+
   /// Content runs from week 4 to week 40.
   static const int firstContentWeek = 4;
   static const int lastContentWeek = 40;
@@ -337,6 +341,29 @@ class PregnancyController extends ChangeNotifier {
                   .where((s) => s.name == src)
                   .firstOrNull ??
               DueDateSource.unknown;
+        } else {
+          // ⚠️ NO DUE DATE: THE PLACEHOLDER MOVES, FROM 2026-09-16.
+          //
+          // It used to be "16 weeks from today", recomputed on every launch,
+          // so the app sat at week 20 day 140 forever — the same baby
+          // photograph every morning. TTC does not do this: its cycle day is
+          // derived from a SAVED start date and today's date, so it advances
+          // on its own. Same idea here. The first day she opens the app
+          // without a date is remembered, and week 20 day 140 is pinned to
+          // THAT day; every real day after it is one day further along.
+          //
+          // Derived, not asked. The anchor is written once and never shown.
+          // A real due date, once set, replaces all of this — and the
+          // testing reset clears the anchor so the demo starts at week 20
+          // again rather than wherever it had drifted to.
+          final anchor = DateTime.tryParse(
+              prefs.getString(kPlaceholderAnchorKey) ?? '');
+          if (anchor == null) {
+            await prefs.setString(
+                kPlaceholderAnchorKey, _dateOnly(_now).toIso8601String());
+          } else {
+            _dueDate = _placeholderDueDate(_dateOnly(anchor));
+          }
         }
       } catch (_) {/* keep the placeholder */}
       _selectedWeek ??= currentWeek;
@@ -481,6 +508,9 @@ class PregnancyController extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(kDueDateKey);
       await prefs.remove(kDueDateSourceKey);
+      // Back to week 20 TODAY, not to wherever the moving placeholder had
+      // reached. See the anchor note in `load()`.
+      await prefs.remove(kPlaceholderAnchorKey);
     } catch (_) {/* best-effort */}
     // Also clear it in the cloud so the reset isn't undone on the next sync.
     try {
@@ -501,9 +531,17 @@ class PregnancyController extends ChangeNotifier {
   /// Placeholder due date so the demo opens mid-journey (~week 20 - "halfway
   /// there"), giving a healthy mix of unlocked past weeks and locked future
   /// weeks while matching the Home Screen daily-moment prototype.
-  static DateTime _placeholderDueDate(DateTime now) {
+  /// The due date that puts [anchor] at week 20, day 140.
+  ///
+  /// Called with TODAY at construction (so the first frame is week 20) and
+  /// again in `load()` with the persisted first-open day, which is what makes
+  /// the placeholder advance: a due date fixed in the past-relative sense
+  /// means every new day is one day closer to it. It clamps at week 40 like a
+  /// real pregnancy would; an install that has drifted that far is a tester's,
+  /// and `resetForTesting` brings it back.
+  static DateTime _placeholderDueDate(DateTime anchor) {
     const demoCurrentWeek = 20;
     final weeksRemaining = _termWeeks - demoCurrentWeek; // 16 weeks out
-    return _dateOnly(now).add(Duration(days: weeksRemaining * 7));
+    return _dateOnly(anchor).add(Duration(days: weeksRemaining * 7));
   }
 }

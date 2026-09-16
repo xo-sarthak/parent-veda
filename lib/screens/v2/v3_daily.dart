@@ -507,12 +507,15 @@ class V3InviteBlock extends StatelessWidget {
           border: Border.all(color: p.line),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          // Violet, like every other eyebrow on the page (`V3SectionHead`).
+          // It was ink3 and read as the one grey label in a column of violet
+          // ones; the user asked for uniformity, 2026-09-16.
           Text('INVITE A FRIEND',
               style: pvManrope(
                   fontSize: 11.5,
                   fontWeight: FontWeight.w800,
-                  letterSpacing: 1.6,
-                  color: p.ink3)),
+                  letterSpacing: 1.3,
+                  color: p.action.withValues(alpha: 0.85))),
           const SizedBox(height: 8),
           // ⚠️ WAS "Someone you know is doing this too" — a statement about
           // someone else. This asks HER a question she can answer, which is what
@@ -562,30 +565,47 @@ class V3InviteBlock extends StatelessWidget {
             const SizedBox(height: 4),
           ],
           const SizedBox(height: 12),
-          // The one violet thing on the block, because violet means "you can
-          // act on this" and this is the only action on it.
-          InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(999),
-            child: Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
-              decoration: BoxDecoration(
-                color: p.action,
-                borderRadius: BorderRadius.circular(999),
-              ),
-              child: Row(mainAxisSize: MainAxisSize.min, children: [
-                Text('Click here to invite',
-                    style: pvManrope(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w700,
-                        color: Colors.white)),
-                const SizedBox(width: 7),
-                const Icon(Icons.arrow_forward_rounded,
-                    size: 16, color: Colors.white),
-              ]),
-            ),
-          ),
+          // ⚠️ THE SOLID VIOLET BUTTON IS OFF, KEPT FOR REVERT — 2026-09-16.
+          //
+          // The argument for it was "the one violet thing on the block,
+          // because violet means you can act on this". On the phone it read
+          // as the odd one out: every other secondary action on this page —
+          // Manage list, Remind me, Open your journal — is the quiet outlined
+          // pill, and a filled slab at the foot of the scroll looked like an
+          // older screen's button that had wandered in. The user's words:
+          // "looks old ui, very purple". An invite is a secondary ask, and it
+          // wears the secondary button.
+          //
+          // "Click here to invite" was also web copy; there is no click.
+          //
+          // InkWell(
+          //   onTap: onTap,
+          //   borderRadius: BorderRadius.circular(999),
+          //   child: Container(
+          //     padding:
+          //         const EdgeInsets.symmetric(horizontal: 20, vertical: 13),
+          //     decoration: BoxDecoration(
+          //       color: p.action,
+          //       borderRadius: BorderRadius.circular(999),
+          //     ),
+          //     child: Row(mainAxisSize: MainAxisSize.min, children: [
+          //       Text('Click here to invite',
+          //           style: pvManrope(
+          //               fontSize: 14,
+          //               fontWeight: FontWeight.w700,
+          //               color: Colors.white)),
+          //       const SizedBox(width: 7),
+          //       const Icon(Icons.arrow_forward_rounded,
+          //           size: 16, color: Colors.white),
+          //     ]),
+          //   ),
+          // ),
+          _Pill(
+              label: 'Send an invite',
+              icon: Icons.person_add_alt_1_outlined,
+              p: p,
+              fullWidth: true,
+              onTap: onTap),
         ]),
       );
 }

@@ -6988,3 +6988,131 @@ it is testing chrome that comes out before launch.
 - The Ask Veda FAB position is unchanged; the design shows it above the bar
   on the right, which is where `global_ask_fab.dart` already puts it.
 
+
+## 58.0 Pregnancy V3 home, reshaped to the Claude Design — 2026-09-16
+
+The "Pregnancy Home V3" design (project `cbb69aa9-88ab-4250-b1ea-c80f78b9a356`,
+option 1a with 1d for the shelf and 1c for playback) applied to
+`lib/screens/home_v3_screen.dart`. New files: `lib/screens/v2/v3_week_film.dart`
+(the inline film, the shelf row, the PvVideo→WatchVideo adapter and
+`PregnancyFilmRepository`), `lib/screens/v2/v3_film_screen.dart` (where a
+shelf row opens), `V3GarbhBlock` in `v3_garbh.dart`. Not walked on a phone.
+
+### 58.1 The calls
+
+- **The page is three inset columns with two full-bleed things between**:
+  the film and the Garbh band. It was one padded column after the hero.
+- **This Week Explained** is the week's `v2VideoFor(week)` film, directly
+  under the doors, 16:9 edge to edge, **playing in place** — the poster
+  becomes the player where it stood. The old "Recommended Watch" card that
+  showed the same film below the journal is commented out.
+- **The engine is the parenting `PvVideoPlayer`**, which gained two additive
+  flags: `inline` (no back arrow, no fullscreen button — a `ListView` cannot
+  host fullscreen and a tab root cannot pop) and `autoStart` (the home has
+  already drawn the play control, so the player must not ask twice). Its
+  `LocalWatchRepository` is NOT reused: it resolves ids against the parenting
+  catalogue with `orElse: first`, so a pregnancy id would have silently played
+  the first parenting lesson. `PregnancyFilmRepository` resolves from the
+  video it is handed. Progress lands in `WatchStore` keyed by catalogue id.
+- **No play control that plays nothing.** The pregnancy catalogue has no
+  files. Without a URL the poster says "WEEK N FILM · ARRIVING", has no play
+  button, and the tap goes where the old card went (`todays_video`). On a dev
+  build the five recommended ids are mapped to the sample in
+  `pv_video_config.dart` so the control is real there.
+- **Garbh Sanskar** is a 172dp full-bleed band with the practice card
+  overlapping it by 22. Rows are name + today's line + a done-mark; the photo
+  tiles and tags are not drawn (still on the model, still in the old
+  section). **The done-mark is a control**: tap ticks or unticks via
+  `GarbhStore.markDone/undoDone`; the row still opens the pillar.
+- **My journal**: only the title changed, per option 1g. The two quick
+  actions stay.
+- **Watch These Videos This Week**: three rows from `v3ShelfVideosFor` —
+  same-week videos, the film excluded, recommended → expert → skill → birth →
+  newborn, no nearest-week fallback. A row opens `V3FilmScreen`, the
+  pregnancy stage's first video page (fullscreen hosted the WatchPlayerScreen
+  way).
+- **Use these tools** title is now 'Count, track, time'; the tiles still
+  switch on usage history, the title no longer says which rule picked them.
+- **Hero** 392 → 340. The design draws 300; the ask was "a bit".
+
+### 58.2 Assumptions made without asking — say if wrong
+
+1. **Medicine reminder card left as it was.** Content matches the design
+   (label, rows, Manage list / Remind me); the design puts the tick on the
+   left with no capsule well, and the shipped card puts it on the right for a
+   reason recorded in `v3_daily.dart`. Not re-litigated.
+2. **Invite block stays** at the foot. Not in the design; a section is not
+   removed on inference.
+3. **The film stops when scrolled two screens away** — the ListView disposes
+   it, position is saved, the next tap resumes. Not kept alive on purpose.
+4. **The Classic | V3 pill** still overlays the hero; testing chrome.
+
+### 58.3 Walked on the phone — 2026-09-16
+
+SM G990B2, debug parent flavour. The hero reads at 340; This Week Explained
+sits under the doors and plays in place (0:17 dev sample) with no back arrow
+and no fullscreen control; the Garbh band and card overlap as drawn and the
+done-mark ticks and unticks in the pillar's accent; the journal title is the
+new line over the untouched card; the shelf renders as option 1d; products,
+"Count, track, time" and the invite block close the page. Two things found
+and fixed in the same pass:
+
+1. **The film page showed a play button that played nothing.** For an
+   unmapped film the parenting engine's own poster mounted, and that poster
+   draws a play circle whether or not a source exists. `V3FilmPoster` is now
+   shared by the home block and the page; without a file it says "FILM ·
+   ARRIVING" and has no control.
+2. **The film page was empty** — a player, a title, one line. The user saw
+   it: "its not good if user gets to see empty screens." Filled with things
+   that exist and are about the film: a "Try it now" door to the tool the
+   film teaches (`_toolFor`, only where the subject IS the tool — kegel,
+   movement, scans, hospital bag, contractions), three reads found by the
+   film's own title words through `readSearch` and filled from the week's
+   recommendations, and the other films for the week. No chapters or
+   takeaways — those are content for films not yet shot.
+3. **The invite button was a solid violet slab** — "looks old ui, very
+   purple". Every other secondary action on the page is the quiet outlined
+   pill; it is that pill now, reading "Send an invite" ("Click here" is web
+   copy). The old button is commented in `v3_daily.dart`.
+
+### 58.4 Two more from the walk — the bar, and the day that never moved
+
+- **The bar now matches parenting's.** One component (`PvNavBar`) on both
+  stages, but this stage handed it filled `_rounded` glyphs where parenting
+  hands `_outlined` ones — so the same pill looked heavier here. Now
+  `home_outlined · school_outlined · handyman_outlined ·
+  calendar_today_outlined · groups_outlined`, the accent is `primary500`
+  (parenting's `ppPurple`) rather than the bar's default `primary600`, and
+  the inset is parenting's 16 · 16 · 18 (was 14 · 14 · 14;
+  `_kNavBarBottomInset` follows). Names and positions unchanged. The father
+  (Slate) tab set was not touched.
+- **The no-date placeholder advances.** It was "16 weeks from today",
+  recomputed on every launch, so with no due date the app sat at week 20
+  day 140 with the same photograph every morning. TTC's cycle day moves
+  because it is derived from a SAVED start and today's date; the pregnancy
+  placeholder is now anchored the same way — `pregnancy_placeholder_anchor`,
+  written once on the first date-less open, never shown, cleared by
+  `resetForTesting`. Verified on the phone by backdating the anchor three
+  days: Week 21, day 3, the week-21 photograph, its own learning line.
+  Caveat: `_now` is fixed at construction, so a session left open across
+  midnight ticks on the next launch, not at 00:00. Not a new limitation —
+  a real due date behaved the same way.
+  ⚠️ Debug-tooling trap found on the way: editing
+  `FlutterSharedPreferences.xml` under `run-as` after a `force-stop` can be
+  silently undone by Android's `.bak` recovery if the stop landed mid-write.
+  Stop, wait, check for the `.bak`, then edit.
+
+### 58.5 Owed
+
+- **The "arriving" state with `kUseDevVideos` off** was not walked; the
+  five `rec_*` ids are mapped on the dev build, so the home film always
+  played. The shelf's unmapped films exercised the state on the page.
+- **"Try it now · Kegel"** uses the surface's own label from `kAppSurfaces`,
+  which is terse. If a friendlier line is wanted it belongs on the surface,
+  so the Tools tab says the same thing.
+- **Move the video engine out of `post_pregnancy/video/`** to `lib/widgets/`
+  now that two stages import it. Pure move; nothing changes.
+- **Real stills for the film and the shelf** — the tinted grounds are
+  honest placeholders. Content, not code.
+- **A "Saved" tile** in Use these tools (the design's fourth) — `saved` is
+  not in `_ToolsRow._face` today.

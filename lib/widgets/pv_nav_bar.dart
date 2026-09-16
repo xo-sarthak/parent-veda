@@ -222,8 +222,9 @@ class PvNavBar extends StatelessWidget {
 /// item's 2dp and the container's 10dp vertical padding.
 const double _kNavBarHeight = 22 + 3 + 15 + (2 * 2) + (10 * 2);
 
-/// The gap `PvTabBar` leaves under the bar.
-const double _kNavBarBottomInset = 14;
+/// The gap `PvTabBar` leaves under the bar (18 since 2026-09-16, matching
+/// the parenting home's placement).
+const double _kNavBarBottomInset = 18;
 
 /// The distance from the bottom of a full-screen `Stack` at which a floating
 /// control clears the tab bar, on THIS device.

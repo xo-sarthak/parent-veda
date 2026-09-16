@@ -18,6 +18,14 @@
 //  nothing. Both read HomeDay, read_next_data, kVideos and product_data.
 //
 //  ENGLISH ONLY via `.en` — see v2_sections.dart.
+//
+//  RESHAPED 2026-09-16 TO THE "Pregnancy Home V3" CLAUDE DESIGN (option 1a).
+//  The order is now: hero · scans due · Start anywhere · This Week Explained
+//  (the week's film, full-bleed, playing in place) · Garbh Sanskar (a
+//  full-bleed band with the practice card over it) · Medicine reminder · My
+//  journal · Watch These Videos This Week (a three-row shelf) · Recommended
+//  reads · Recommended products · Use these tools. What moved, what was
+//  commented out and what was assumed is recorded in docs/STILL-OPEN.md §58.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -84,8 +92,10 @@ import 'v2/v3_bracket_art.dart';
 import 'v2/v3_daily.dart';
 import 'v2/v3_daily_art.dart';
 import 'v2/v3_daily_tip.dart';
+import 'v2/v3_film_screen.dart';
 import 'v2/v3_garbh.dart';
 import 'v2/v3_sections.dart';
+import 'v2/v3_week_film.dart';
 
 class HomeV3Screen extends StatefulWidget {
   const HomeV3Screen({super.key, required this.pregnancy, required this.home});
@@ -202,6 +212,8 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
     final p = V2PaletteStore.instance.current;
     final reads = v2ReadsFor(week, activeDay);
     final video = v2VideoFor(week);
+    // The three under "Watch These Videos This Week" — never the film above.
+    final shelf = v3ShelfVideosFor(week, excludeId: video?.id);
     final products = v2ProductsFor(week, activeDay);
 
     // ⚠️ `.now` ON BOTH THE TEST AND THE VALUE, AND THE TEST IS THE SUBTLE
@@ -286,8 +298,16 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
                 onAvatar: () => _open(context, 'journal'),
                 onSaved: () => _open(context, 'saved'),
               ),
-            // Everything except the hero is inset. The hero is the only
-            // child allowed to touch the screen edges.
+            // ⚠️ THE PAGE IS THREE INSET COLUMNS WITH TWO FULL-BLEED THINGS
+            // BETWEEN THEM, not one column any more.
+            //
+            // It used to be one Padding(Column) after the hero, and the hero
+            // was the only child allowed to touch the edges. The design adds
+            // two more: the week's film and the Garbh Sanskar band. A list
+            // that pads everything cannot let one child out, so the column is
+            // split where each of them sits and the gutter is re-opened after.
+            // Same 18dp gutter as before — the V3 family's, not the design's
+            // 24 (see STILL-OPEN §57.2).
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 18),
               child: Column(
@@ -325,7 +345,69 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
             const SizedBox(height: 12),
             V2BlockGrid(
                 palette: p, blocks: _brackets(context, p), columns: 4),
-            const SizedBox(height: 28),
+
+            // ---- THIS WEEK EXPLAINED — the heading ---------------------------
+            //
+            // ⚠️ THE WEEK'S FILM MOVED UP HERE FROM BELOW THE JOURNAL, and it
+            // is the design's central call: the film is her week's
+            // explanation, so it follows the doors directly, at the page's
+            // second-largest type, with no eyebrow. "Recommended Watch · Six
+            // minutes, this week" is commented out below, kept for revert.
+            if (video != null) ...[
+              const SizedBox(height: 36),
+              Text('This Week Explained',
+                  style: pvFraunces(
+                      fontSize: 24,
+                      letterSpacing: -0.6,
+                      fontWeight: FontWeight.w600,
+                      height: 1.15,
+                      color: p.ink1)),
+              const SizedBox(height: 14),
+            ],
+                ],
+              ),
+            ),
+
+            // ---- THIS WEEK EXPLAINED — the film, edge to edge ----------------
+            //
+            // Plays IN PLACE. Tapping the poster swaps in the player where
+            // the poster was; nothing navigates. See v3_week_film.dart for
+            // what that costs in a ListView and why it is still the right
+            // shape for this section.
+            if (video != null)
+              V3WeekFilm(
+                  video: video,
+                  week: week,
+                  p: p,
+                  // While there is no file: where the old card went.
+                  onUnavailable: () => _open(context, 'todays_video')),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+            if (video != null) ...[
+              const SizedBox(height: 14),
+              Text(video.title.en,
+                  style: pvFraunces(
+                      fontSize: 17,
+                      letterSpacing: -0.43,
+                      fontWeight: FontWeight.w600,
+                      height: 1.25,
+                      color: p.ink1)),
+              if (video.reason.en.trim().isNotEmpty) ...[
+                const SizedBox(height: 6),
+                Text('Why this matters now: ${video.reason.en}',
+                    style: pvJakarta(fontSize: 13, height: 1.5, color: p.ink2)),
+              ],
+            ],
+            // Room for the Garbh band to arrive as its own moment. When
+            // there is no film the doors sit directly above it.
+            SizedBox(height: video != null ? 40 : 28),
+                ],
+              ),
+            ),
 
             // ⚠️ READS AND WATCH HAVE SWAPPED PLACES.
             //
@@ -335,7 +417,13 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
             // the one more likely to be opened on a tired evening. The reads
             // block moved down rather than being duplicated — see below.
 
-            // ---- GARBH SANSKAR ---------------------------------------------
+            // ---- GARBH SANSKAR — a band, and a card over it -----------------
+            //
+            // The 2026-09-16 shape: `V3GarbhBlock`, full-bleed. The band
+            // reaches both edges and the card insets itself, so this sits
+            // OUTSIDE the padded column like the film above it. The previous
+            // `V3GarbhSection` — one framed card — is kept in v3_garbh.dart
+            // and its call is the commented `return` below.
             //
             // One block, not three cards. See v3_garbh.dart for what was wrong
             // and which principle each fix comes from.
@@ -356,6 +444,7 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
                       icon: Icons.graphic_eq_rounded,
                       accent: const Color(0xFF9A7526),
                       done: store.isDone('shravan'),
+                      onToggleDone: () => _toggleGarbh(store, 'shravan'),
                       onTap: () => Navigator.of(context).push(MaterialPageRoute(
                           builder: (_) => ShravanScreen(
                               controller: pregnancy, daily: true))),
@@ -388,6 +477,7 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
                       icon: Icons.record_voice_over_rounded,
                       accent: const Color(0xFF9C5F51),
                       done: store.isDone('samvad'),
+                      onToggleDone: () => _toggleGarbh(store, 'samvad'),
                       onTap: () => Navigator.of(context).push(MaterialPageRoute(
                           builder: (_) => SamvadScreen(
                               controller: pregnancy, daily: true))),
@@ -413,6 +503,7 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
                       icon: Icons.psychology_alt_outlined,
                       accent: const Color(0xFF7A6E9B),
                       done: store.isDone('buddhi'),
+                      onToggleDone: () => _toggleGarbh(store, 'buddhi'),
                       onTap: () => Navigator.of(context).push(MaterialPageRoute(
                           builder: (_) => GarbhBuddhiScreen(
                                 controller: pregnancy,
@@ -439,12 +530,20 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
                       icon: Icons.spa_rounded,
                       accent: const Color(0xFF8A6D3B),
                       done: store.isDone('kriya'),
+                      onToggleDone: () => _toggleGarbh(store, 'kriya'),
                       onTap: () => Navigator.of(context).push(MaterialPageRoute(
                           builder: (_) =>
                               KriyaScreen(controller: pregnancy, daily: true))),
                     ),
                   ];
-                  return V3GarbhSection(
+                  // The one-card shape, kept for revert:
+                  // return V3GarbhSection(
+                  //   day: day,
+                  //   p: p,
+                  //   rows: rows,
+                  //   onAbout: () => _open(context, 'garbh_daily'),
+                  // );
+                  return V3GarbhBlock(
                     day: day,
                     p: p,
                     rows: rows,
@@ -452,8 +551,15 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
                   );
                 },
               ),
-              const SizedBox(height: 28),
             ],
+
+            // The gutter re-opens here and runs to the foot of the page.
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 18),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+            const SizedBox(height: 40),
 
             // ---- TODAY'S MEDICINES ------------------------------------------
             //
@@ -518,9 +624,12 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
             // speaking are different acts, not different formats. A woman who
             // does not want to type is not looking for a smaller version of the
             // writing screen.
+            // ⚠️ ONLY THE TITLE LINE CHANGED (design option 1g: "the card
+            // under it is untouched"). Was 'Something for your baby, when it
+            // grows up'.
             V3SectionHead(
                 eyebrow: 'My journal',
-                title: 'Something for your baby, when it grows up',
+                title: 'Create a memory for your baby to show when it grows up',
                 p: p),
             const SizedBox(height: 12),
             V3JournalSection(
@@ -592,17 +701,50 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
             //   const SizedBox(height: 28),
             // ],
 
-            // ---- RECOMMENDED WATCH — above the reads -------------------------
-            if (video != null) ...[
+            // ---- RECOMMENDED WATCH — MOVED UP, KEPT FOR REVERT ---------------
+            //
+            // The week's film is now "This Week Explained", directly under
+            // the doors. This card showed the SAME video here; showing it twice
+            // on one page would be the same promotion twice in one session.
+            //
+            // if (video != null) ...[
+            //   V3SectionHead(
+            //       eyebrow: 'Recommended Watch',
+            //       title: 'Six minutes, this week',
+            //       p: p),
+            //   const SizedBox(height: 12),
+            //   V2VideoCard(
+            //       video: video,
+            //       p: p,
+            //       onTap: () => _open(context, 'todays_video')),
+            //   const SizedBox(height: 28),
+            // ],
+
+            // ---- WATCH THESE VIDEOS THIS WEEK — the shelf -------------------
+            //
+            // Three MORE films, as rows with a small thumb (design option 1d).
+            // Not a rail: the products rail sits two sections down and two
+            // rails on one scroll read as one shop. Not two-up: a third card
+            // orphans. A row opens `V3FilmScreen`; the film above plays in
+            // place, these open a page, and that is the difference between
+            // her week's explanation and three more if she wants them.
+            if (shelf.isNotEmpty) ...[
               V3SectionHead(
-                  eyebrow: 'Recommended Watch',
-                  title: 'Six minutes, this week',
+                  eyebrow: 'Recommended videos',
+                  title: 'Watch These Videos This Week',
                   p: p),
-              const SizedBox(height: 12),
-              V2VideoCard(
-                  video: video,
-                  p: p,
-                  onTap: () => _open(context, 'todays_video')),
+              const SizedBox(height: 2),
+              for (final v in shelf) ...[
+                V3VideoRow(
+                    video: v,
+                    p: p,
+                    onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                        settings: RouteSettings(name: 'pregnancy/film/${v.id}'),
+                        builder: (_) => V3FilmScreen(
+                            video: v, week: week, pregnancy: pregnancy)))),
+                if (v != shelf.last)
+                  Divider(height: 1, thickness: 1, color: p.line),
+              ],
               const SizedBox(height: 28),
             ],
 
@@ -1063,6 +1205,12 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
     ));
   }
 
+  /// The Garbh done-mark as a control. Undo is allowed because a tick she
+  /// did not mean is worse than a streak she can fix — and `undoDone` does
+  /// not rewind the streak, so a mis-tap costs nothing but the tick.
+  void _toggleGarbh(GarbhStore store, String pillarId) =>
+      store.isDone(pillarId) ? store.undoDone(pillarId) : store.markDone(pillarId);
+
   void _open(BuildContext context, String surfaceId) {
     final h = homeFor(surfaceId);
     if (h == null) return;
@@ -1358,11 +1506,16 @@ class _ToolsRow extends StatelessWidget {
         if (ids.isEmpty) return const SizedBox.shrink();
 
         return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          // ⚠️ ONE TITLE NOW, the design's. It used to switch between
+          // 'Worth having at week $week' and 'The ones you come back to' on
+          // `store.hasHistory`; the tiles still switch, the title no longer
+          // announces which rule picked them. Kept for revert:
+          //   title: store.hasHistory
+          //       ? 'The ones you come back to'
+          //       : 'Worth having at week $week',
           V3SectionHead(
-              eyebrow: 'Use These Tools',
-              title: store.hasHistory
-                  ? 'The ones you come back to'
-                  : 'Worth having at week $week',
+              eyebrow: 'Use these tools',
+              title: 'Count, track, time',
               p: p),
           const SizedBox(height: 12),
           Row(

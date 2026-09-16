@@ -97,7 +97,12 @@ class V3Hero extends StatelessWidget {
     return InkWell(
       onTap: onTap,
       child: SizedBox(
-          height: 392,
+          // 392 -> 340 on 2026-09-16, with the "Pregnancy Home V3" design. The
+          // design draws the hero at 300 on a 360pt frame; the user asked for
+          // "a bit" less than what shipped, not the design's figure, so this
+          // sits between the two. The learning line still has three lines of
+          // room at the foot, which is the constraint that set 392 originally.
+          height: 340,
           child: Stack(fit: StackFit.expand, children: [
             // ---- HARD CUT. THE DISSOLVE IS REVERTED -----------------------
             //
