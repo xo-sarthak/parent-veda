@@ -180,7 +180,7 @@ class ToolsHubScreen extends StatelessWidget {
             ),
           ),
         ),
-        const Positioned(left: 16, right: 16, bottom: 18, child: PpBottomNav(active: 2)),
+        const Positioned(left: 16, right: 16, bottom: 18, child: PpBottomNav(active: PpTab.tools)),
       ]),
     );
   }

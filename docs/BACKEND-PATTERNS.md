@@ -1525,6 +1525,36 @@ it must never become is a boolean — `SkVerification.stub` and `.verified`
 are separate states precisely so a walk-through can never be mistaken for a
 lawful consent.
 
+## 16b. A position is not an identity — the bottom bar reorder
+
+From the V3 home reshape (2026-09-16, `lib/screens/post_pregnancy/pp_common.dart`).
+Small, and the same shape as three bugs this file already records.
+
+The parenting bar was `My Child · Brain · Tools · Community · Products`, and
+fifteen call sites said `openPpTab(context, 4)` to mean "Products". Then the
+design reordered it to `Home · Products · Tools · Brain activities · More`.
+Nothing about that change fails to compile; every one of the fifteen calls
+still runs; and each now lands a parent somewhere she did not tap for —
+"See all products" opens the More sheet. A **position** (where a tab sits)
+had leaked into fifteen files as an **identity** (which tab it is). It is
+`.en` versus `.now` again: the display value used as the key.
+
+The fix is the general one. Give the thing a name (`enum PpTab`), build the
+bar from names, and keep the old integer entry point as an **adapter that
+preserves the old positions' meaning** — `openPpTab(context, 4)` still means
+Products, exactly as on the day each caller was written. No caller changed,
+so no caller can have been re-routed by accident, and new code has
+`openPpTabTo(context, PpTab.products)` which cannot drift.
+
+The cost, named: two entry points for one action, and an adapter whose
+numbering looks wrong to anyone reading the bar. That is the right trade
+while fifteen callers exist. The day the last one is migrated, the adapter
+goes.
+
+The same rule caught the More sheet: it renders Community plus every Explore
+drawer row, and the drawer rows are declared once (`ppExploreEntries`) and
+rendered twice, because two lists that must agree will not.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.

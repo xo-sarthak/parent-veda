@@ -962,7 +962,7 @@ class _CommunityScreenState extends State<CommunityScreen> {
         Positioned(right: 20, bottom: 168, child: _composeFab()),
         const PpAskVedaFab(bottom: 96),
         const Positioned(
-            left: 16, right: 16, bottom: 18, child: PpBottomNav(active: 3)),
+            left: 16, right: 16, bottom: 18, child: PpBottomNav(active: PpTab.more)),
       ]),
     );
   }

@@ -238,7 +238,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
               );
             },
           ),
-          if (widget.home) const Positioned(left: 16, right: 16, bottom: 18, child: PpBottomNav(active: 0)),
+          if (widget.home) const Positioned(left: 16, right: 16, bottom: 18, child: PpBottomNav(active: PpTab.home)),
         ]),
       ),
     );

@@ -148,7 +148,7 @@ class _PostPregnancyHomeState extends State<PostPregnancyHome> with SingleTicker
             ),
           ),
         ),
-        const Positioned(left: 16, right: 16, bottom: 18, child: PpBottomNav(active: 0)),
+        const Positioned(left: 16, right: 16, bottom: 18, child: PpBottomNav(active: PpTab.home)),
       ]),
     );
   }

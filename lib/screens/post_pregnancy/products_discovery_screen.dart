@@ -260,7 +260,7 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreen> {
           ),
         ),
         const PpAskVedaFab(bottom: 96),
-        const Positioned(left: 16, right: 16, bottom: 18, child: PpBottomNav(active: 4)),
+        const Positioned(left: 16, right: 16, bottom: 18, child: PpBottomNav(active: PpTab.products)),
       ]),
     );
   }

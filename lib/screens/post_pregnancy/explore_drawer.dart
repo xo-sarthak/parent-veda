@@ -82,6 +82,195 @@ import 'recipes_screen.dart';
 // ignore: unused_import
 import 'recommendations_screen.dart';
 
+
+/// One row of the Explore drawer — and, since 2026-09-16, of the More sheet.
+///
+/// ⚠️ ONE LIST, TWO SURFACES. The bottom bar's "More" tab opens a sheet that
+/// holds Community plus "everything else that used to be a tab or lives in the
+/// Explore drawer". The obvious way to build that sheet is to write its rows —
+/// and then every destination exists in two files, and the day someone adds a
+/// row here it silently does not appear there. The hub registry already
+/// learned this ("the hub's tools are read from the section, not declared
+/// twice"). So the drawer's rows are DATA, this function is the only place
+/// they are declared, and both surfaces render it.
+///
+/// A function rather than a const list because two descriptions carry the
+/// child's name, which is read from the store at build time.
+class ExploreEntry {
+  const ExploreEntry(this.icon, this.title, this.desc, this.screen,
+      {this.top = false, this.onTapOverride});
+  final IconData icon;
+  final String title;
+  final String desc;
+  final Widget screen;
+
+  /// Was the drawer's "draw a top border" flag on the first row. The drawer
+  /// still honours it; the sheet draws cards and ignores it.
+  final bool top;
+  final VoidCallback? onTapOverride;
+}
+
+List<ExploreEntry> ppExploreEntries() => [
+    ExploreEntry(Icons.tune_rounded, 'Personalize ParentVeda experience',
+        'Tune what you see, for your family.', const FamilyProfileScreen(),
+        top: true),
+    // GUIDED JOURNEYS REMOVED FROM THE APP. The screen and its
+    // content are untouched on disk; only this door is closed, so
+    // uncommenting brings it straight back. Kept for revert:
+    // _section(context, Icons.route_rounded, 'Guided journeys',
+    //     'One short read at a time, for the hard stretches.', const JourneysScreen()),
+    //
+    // HIS JOURNEY removed from the MENU, not from the app — the
+    // phase map is still reached from the My Child hero. Kept:
+    // _section(context, Icons.timeline_rounded, 'His journey',
+    //     "Every phase from birth to five, on his timeline.", const PhaseMapScreen()),
+    ExploreEntry(Icons.play_circle_outline, 'Watch',
+        'Expert videos, chosen for his stage.', const WatchHomeScreen()),
+    // SKILL DEVELOPMENT MOVED OUT OF EXPLORE and into the bottom
+    // nav as "Brain", replacing the Ask Veda tab — see
+    // PpBottomNav in pp_common.dart. A drawer row as well would
+    // be a second door to a hero tab.
+    //
+    // Two earlier states, both kept for revert:
+    //   the original, opening V1 directly —
+    // _section(context, Icons.emoji_objects_outlined, 'Skill Development',
+    //     'Understand & nurture how he grows.', const DevelopmentHomeScreen()),
+    //   then the three-version wrapper —
+    // _section(context, Icons.emoji_objects_outlined, 'Skill Development',
+    //     'Understand & nurture how he grows.', const GrowHomeScreen()),
+    // Replaced by the full Health ecosystem (the Health Guide lives
+    // inside it now). Old row kept, commented, for easy revert:
+    // _section(context, Icons.monitor_heart_outlined, 'Health Guide',
+    //     "Aarav's health record & guidance.", const HealthGuideScreen()),
+    // Now opens the three-version wrapper (V1 = this exact
+    // screen, unchanged; V2 = the Health Wallet brief as
+    // written; V3 = the recommendation). Old row kept,
+    // commented, for easy revert:
+    // _section(context, Icons.monitor_heart_outlined, 'Health',
+    //     "${ChildProfileStore.instance.name}'s living health story, organised.", const HealthHomeScreen()),
+    ExploreEntry(Icons.monitor_heart_outlined, 'Health',
+        "${ChildProfileStore.instance.name}'s living health story, organised.", const WalletHomeScreen()),
+    // Food is merged into Recipes now (one unified food companion). Kept for revert:
+    // _section(context, Icons.ramen_dining_outlined, 'Food',
+    //     "What to feed Aarav today - a food companion.", const FoodHomeScreen()),
+    // REDESIGNED (Recipes brief): expert banner, search, meal
+    // planner, diet chips, ten browsable sections. The old screen
+    // is untouched on disk. Kept for revert:
+    // _section(context, Icons.restaurant_menu_outlined, 'Recipes',
+    //     'Age-tagged Indian food, meal plans & shopping.', const RecipesScreen()),
+    ExploreEntry(Icons.restaurant_menu_outlined, 'Recipes',
+        'Curated by age — browse by meal, not by filter.', const RecipesExploreScreen()),
+    // REDESIGNED (Recommendations brief): sticky section-nav
+    // chips, Recommended For You, twelve category rails. Kept:
+    // _section(context, Icons.recommend_outlined, 'Recommendations',
+    //     'What to read, watch, play & do.', const RecommendationsScreen()),
+    ExploreEntry(Icons.recommend_outlined, 'Recommendations',
+        'Expert-curated books, toys, activities & more.', const RecoExploreScreen()),
+    // REDESIGNED (Read brief): filters moved to the top, Today's
+    // Read / Continue Reading / Collections removed, topics become
+    // playlists. Kept for revert:
+    // _section(context, Icons.auto_stories_outlined, 'READ',
+    //     'Guided reads, collections and short videos.', const ReadingHomeScreen()),
+    ExploreEntry(Icons.auto_stories_outlined, 'Read',
+        'Vetted reads, by topic and by type.', const ReadExploreScreen()),
+    // REDESIGNED (Courses brief): banner, search, the existing
+    // filters, Chosen For You, three sections, and a detail page
+    // whose sections are expanded by default. Kept for revert:
+    // _section(context, Icons.school_outlined, 'Courses & Masterclasses',
+    //     'Live cohorts, courses & masterclasses.', const LearningHomeScreen()),
+    ExploreEntry(Icons.school_outlined, 'Courses & Masterclasses',
+        'Expert-led, and vetted for your stage.', const CoursesExploreScreen()),
+    ExploreEntry(Icons.self_improvement_outlined, 'Yoga & Classes',
+        'Live & recorded classes for every stage.', const YogaHomeScreen()),
+    ExploreEntry(Icons.event_available_outlined, 'My Bookings',
+        'Your classes & sessions, all in one place.', const MyBookingsScreen()),
+    ExploreEntry(Icons.card_giftcard_outlined, 'Invite a friend',
+        'You both get a free consultation.', const InviteFriendsScreen()),
+    ExploreEntry(Icons.diversity_1_outlined, 'Your Care Circle',
+        'The people supporting you through this.',
+        const CareCircleScreen()),
+    ExploreEntry(Icons.card_giftcard_outlined, 'Memories',
+        'Beautiful cards for the moments that matter.', const MemoriesHomeScreen()),
+    // Masterclasses + Cohort Courses + Courses are now one section (above);
+    // "Guides & Tools" is retired. All kept (commented) for easy revert:
+    // _section(context, Icons.school_outlined, 'Masterclasses',
+    //     'One evening with an expert.', const MasterclassesScreen()),
+    // _section(context, Icons.groups_outlined, 'Cohort Courses',
+    //     'Guided, together - small groups.', const CohortCoursesScreen()),
+    // _section(context, Icons.article_outlined, 'Guides & Tools',
+    //     'Downloads you keep forever.', const GuidesToolsScreen()),
+    // _section(context, Icons.video_library_outlined, 'Courses',
+    //     'Documentary guides, stage by stage.', const CoursesScreen()),
+    ExploreEntry(Icons.handshake_outlined, 'Find help',
+        'Vetted local services near you.', const ProblemSolverScreen()),
+    ExploreEntry(Icons.local_florist_outlined, 'Dadi/Nani Nuskhe',
+        'Home remedies, safely.', const NuskheScreen()),
+    ExploreEntry(Icons.savings_outlined, 'Investments & Savings',
+        'Plan ahead for their future.', const InvestmentsScreen()),
+    ExploreEntry(Icons.auto_awesome_outlined, 'Astrology & Numerology',
+        'Optional cosmic notes.', const AstrologyScreen()),
+    ExploreEntry(Icons.menu_book_outlined, 'My Journal V2',
+        'A keepsake storybook of their life.', const JournalWelcomeScreen()),
+
+    // MOVED OUT OF TOOLS, per the review. Tools is for the things
+    // you use ON your child — trackers and journeys. Launches and
+    // the Brand Studio are things to browse, which is what Explore
+    // is for.
+    //
+    // The Launch Hub keeps its one front door: a destination is
+    // visited on purpose, never pushed at anyone
+    // (docs/BRAND-STUDIO.md §3). Moving the door does not change
+    // that — it is still exactly one.
+    ExploreEntry(Icons.new_releases_outlined, 'Launches',
+        'New, and worth knowing about.',
+        const LaunchHubScreen(stage: BrandStage.parenting)),
+    ExploreEntry(Icons.workspace_premium_outlined, 'Brand Studio',
+        'All 15 brand products, walked end to end.',
+        const BrandShowcaseScreen()),
+    if (kDebugMode)
+      ExploreEntry(Icons.science_outlined, 'Brand Studio (debug)',
+          'Every campaign, and why it is blocked.',
+          const BrandPreviewScreen()),
+    // ⚠️ DEBUG-ONLY, AND IT MUST STAY THAT WAY UNTIL SKILLING HAS
+    // CONTENT. This is the fourth stage's home as a DESIGN
+    // PREVIEW: twelve doors, none of which opens a real screen,
+    // because eighty-four bracket cells are declared and not one
+    // is live. Shipping it to a parent would be twelve promises
+    // the app cannot keep.
+    //
+    // It lives here rather than beside the TTC and Parenting
+    // gateways on the pregnancy home for exactly that reason —
+    // those two are stages, this is a mock-up, and the difference
+    // has to be visible in where it is reachable from.
+    // ⚠️ THE `kDebugMode` HERE IS GONE TOO, and consistency is the
+    // whole reason. The pregnancy home's Skilling door is now shown
+    // in every build; leaving this one debug-only would have meant
+    // the same preview appearing in one place and not the other
+    // depending on how the app was compiled, which is worse than
+    // either answer on its own.
+    //
+    // The label does the work the guard used to: "(preview)" and
+    // "UI only, nothing behind the doors" are the honest version,
+    // and they stay until a skilling bracket has a live resolver.
+    ExploreEntry(Icons.school_outlined, 'Skilling (preview)',
+        'The fourth stage, UI only — nothing behind the doors.',
+        const SkillingPreviewScreen()),
+
+    // DUE DATE and TRACK OVULATION: two separate features now,
+    // not one "Due date & ovulation" tool. They were in Tools and
+    // did nothing but show a snackbar; each now asks the one
+    // question that decides whether it applies, and says plainly
+    // that the stage switch itself is still being built rather
+    // than opening a pregnancy home over a toddler's data.
+    ExploreEntry(Icons.calendar_month_outlined, 'Due date',
+        'Expecting again? Start here.',
+        const NextBabyScreen(intent: NextBabyIntent.dueDate)),
+    ExploreEntry(Icons.egg_outlined, 'Track ovulation',
+        'Trying for another? Your cycle, understood.',
+        const NextBabyScreen(intent: NextBabyIntent.ovulation)),
+
+    ];
+
 class ExploreDrawer extends StatelessWidget {
   const ExploreDrawer({super.key});
 
@@ -121,163 +310,9 @@ class ExploreDrawer extends StatelessWidget {
                   // Renamed from 'My Family Profile'. Kept for revert:
                   // _section(context, Icons.tune_rounded, 'My Family Profile',
                   //     'Personalise ParentVeda for your family.', const FamilyProfileScreen()),
-                  _section(context, Icons.tune_rounded, 'Personalize ParentVeda experience',
-                      'Tune what you see, for your family.', const FamilyProfileScreen(),
-                      top: true),
-                  // GUIDED JOURNEYS REMOVED FROM THE APP. The screen and its
-                  // content are untouched on disk; only this door is closed, so
-                  // uncommenting brings it straight back. Kept for revert:
-                  // _section(context, Icons.route_rounded, 'Guided journeys',
-                  //     'One short read at a time, for the hard stretches.', const JourneysScreen()),
-                  //
-                  // HIS JOURNEY removed from the MENU, not from the app — the
-                  // phase map is still reached from the My Child hero. Kept:
-                  // _section(context, Icons.timeline_rounded, 'His journey',
-                  //     "Every phase from birth to five, on his timeline.", const PhaseMapScreen()),
-                  _section(context, Icons.play_circle_outline, 'Watch',
-                      'Expert videos, chosen for his stage.', const WatchHomeScreen()),
-                  // SKILL DEVELOPMENT MOVED OUT OF EXPLORE and into the bottom
-                  // nav as "Brain", replacing the Ask Veda tab — see
-                  // PpBottomNav in pp_common.dart. A drawer row as well would
-                  // be a second door to a hero tab.
-                  //
-                  // Two earlier states, both kept for revert:
-                  //   the original, opening V1 directly —
-                  // _section(context, Icons.emoji_objects_outlined, 'Skill Development',
-                  //     'Understand & nurture how he grows.', const DevelopmentHomeScreen()),
-                  //   then the three-version wrapper —
-                  // _section(context, Icons.emoji_objects_outlined, 'Skill Development',
-                  //     'Understand & nurture how he grows.', const GrowHomeScreen()),
-                  // Replaced by the full Health ecosystem (the Health Guide lives
-                  // inside it now). Old row kept, commented, for easy revert:
-                  // _section(context, Icons.monitor_heart_outlined, 'Health Guide',
-                  //     "Aarav's health record & guidance.", const HealthGuideScreen()),
-                  // Now opens the three-version wrapper (V1 = this exact
-                  // screen, unchanged; V2 = the Health Wallet brief as
-                  // written; V3 = the recommendation). Old row kept,
-                  // commented, for easy revert:
-                  // _section(context, Icons.monitor_heart_outlined, 'Health',
-                  //     "${ChildProfileStore.instance.name}'s living health story, organised.", const HealthHomeScreen()),
-                  _section(context, Icons.monitor_heart_outlined, 'Health',
-                      "${ChildProfileStore.instance.name}'s living health story, organised.", const WalletHomeScreen()),
-                  // Food is merged into Recipes now (one unified food companion). Kept for revert:
-                  // _section(context, Icons.ramen_dining_outlined, 'Food',
-                  //     "What to feed Aarav today - a food companion.", const FoodHomeScreen()),
-                  // REDESIGNED (Recipes brief): expert banner, search, meal
-                  // planner, diet chips, ten browsable sections. The old screen
-                  // is untouched on disk. Kept for revert:
-                  // _section(context, Icons.restaurant_menu_outlined, 'Recipes',
-                  //     'Age-tagged Indian food, meal plans & shopping.', const RecipesScreen()),
-                  _section(context, Icons.restaurant_menu_outlined, 'Recipes',
-                      'Curated by age — browse by meal, not by filter.', const RecipesExploreScreen()),
-                  // REDESIGNED (Recommendations brief): sticky section-nav
-                  // chips, Recommended For You, twelve category rails. Kept:
-                  // _section(context, Icons.recommend_outlined, 'Recommendations',
-                  //     'What to read, watch, play & do.', const RecommendationsScreen()),
-                  _section(context, Icons.recommend_outlined, 'Recommendations',
-                      'Expert-curated books, toys, activities & more.', const RecoExploreScreen()),
-                  // REDESIGNED (Read brief): filters moved to the top, Today's
-                  // Read / Continue Reading / Collections removed, topics become
-                  // playlists. Kept for revert:
-                  // _section(context, Icons.auto_stories_outlined, 'READ',
-                  //     'Guided reads, collections and short videos.', const ReadingHomeScreen()),
-                  _section(context, Icons.auto_stories_outlined, 'Read',
-                      'Vetted reads, by topic and by type.', const ReadExploreScreen()),
-                  // REDESIGNED (Courses brief): banner, search, the existing
-                  // filters, Chosen For You, three sections, and a detail page
-                  // whose sections are expanded by default. Kept for revert:
-                  // _section(context, Icons.school_outlined, 'Courses & Masterclasses',
-                  //     'Live cohorts, courses & masterclasses.', const LearningHomeScreen()),
-                  _section(context, Icons.school_outlined, 'Courses & Masterclasses',
-                      'Expert-led, and vetted for your stage.', const CoursesExploreScreen()),
-                  _section(context, Icons.self_improvement_outlined, 'Yoga & Classes',
-                      'Live & recorded classes for every stage.', const YogaHomeScreen()),
-                  _section(context, Icons.event_available_outlined, 'My Bookings',
-                      'Your classes & sessions, all in one place.', const MyBookingsScreen()),
-                  _section(context, Icons.card_giftcard_outlined, 'Invite a friend',
-                      'You both get a free consultation.', const InviteFriendsScreen()),
-                  _section(context, Icons.diversity_1_outlined, 'Your Care Circle',
-                      'The people supporting you through this.',
-                      const CareCircleScreen()),
-                  _section(context, Icons.card_giftcard_outlined, 'Memories',
-                      'Beautiful cards for the moments that matter.', const MemoriesHomeScreen()),
-                  // Masterclasses + Cohort Courses + Courses are now one section (above);
-                  // "Guides & Tools" is retired. All kept (commented) for easy revert:
-                  // _section(context, Icons.school_outlined, 'Masterclasses',
-                  //     'One evening with an expert.', const MasterclassesScreen()),
-                  // _section(context, Icons.groups_outlined, 'Cohort Courses',
-                  //     'Guided, together - small groups.', const CohortCoursesScreen()),
-                  // _section(context, Icons.article_outlined, 'Guides & Tools',
-                  //     'Downloads you keep forever.', const GuidesToolsScreen()),
-                  // _section(context, Icons.video_library_outlined, 'Courses',
-                  //     'Documentary guides, stage by stage.', const CoursesScreen()),
-                  _section(context, Icons.handshake_outlined, 'Find help',
-                      'Vetted local services near you.', const ProblemSolverScreen()),
-                  _section(context, Icons.local_florist_outlined, 'Dadi/Nani Nuskhe',
-                      'Home remedies, safely.', const NuskheScreen()),
-                  _section(context, Icons.savings_outlined, 'Investments & Savings',
-                      'Plan ahead for their future.', const InvestmentsScreen()),
-                  _section(context, Icons.auto_awesome_outlined, 'Astrology & Numerology',
-                      'Optional cosmic notes.', const AstrologyScreen()),
-                  _section(context, Icons.menu_book_outlined, 'My Journal V2',
-                      'A keepsake storybook of their life.', const JournalWelcomeScreen()),
-
-                  // MOVED OUT OF TOOLS, per the review. Tools is for the things
-                  // you use ON your child — trackers and journeys. Launches and
-                  // the Brand Studio are things to browse, which is what Explore
-                  // is for.
-                  //
-                  // The Launch Hub keeps its one front door: a destination is
-                  // visited on purpose, never pushed at anyone
-                  // (docs/BRAND-STUDIO.md §3). Moving the door does not change
-                  // that — it is still exactly one.
-                  _section(context, Icons.new_releases_outlined, 'Launches',
-                      'New, and worth knowing about.',
-                      const LaunchHubScreen(stage: BrandStage.parenting)),
-                  _section(context, Icons.workspace_premium_outlined, 'Brand Studio',
-                      'All 15 brand products, walked end to end.',
-                      const BrandShowcaseScreen()),
-                  if (kDebugMode)
-                    _section(context, Icons.science_outlined, 'Brand Studio (debug)',
-                        'Every campaign, and why it is blocked.',
-                        const BrandPreviewScreen()),
-                  // ⚠️ DEBUG-ONLY, AND IT MUST STAY THAT WAY UNTIL SKILLING HAS
-                  // CONTENT. This is the fourth stage's home as a DESIGN
-                  // PREVIEW: twelve doors, none of which opens a real screen,
-                  // because eighty-four bracket cells are declared and not one
-                  // is live. Shipping it to a parent would be twelve promises
-                  // the app cannot keep.
-                  //
-                  // It lives here rather than beside the TTC and Parenting
-                  // gateways on the pregnancy home for exactly that reason —
-                  // those two are stages, this is a mock-up, and the difference
-                  // has to be visible in where it is reachable from.
-                  // ⚠️ THE `kDebugMode` HERE IS GONE TOO, and consistency is the
-                  // whole reason. The pregnancy home's Skilling door is now shown
-                  // in every build; leaving this one debug-only would have meant
-                  // the same preview appearing in one place and not the other
-                  // depending on how the app was compiled, which is worse than
-                  // either answer on its own.
-                  //
-                  // The label does the work the guard used to: "(preview)" and
-                  // "UI only, nothing behind the doors" are the honest version,
-                  // and they stay until a skilling bracket has a live resolver.
-                  _section(context, Icons.school_outlined, 'Skilling (preview)',
-                      'The fourth stage, UI only — nothing behind the doors.',
-                      const SkillingPreviewScreen()),
-
-                  // DUE DATE and TRACK OVULATION: two separate features now,
-                  // not one "Due date & ovulation" tool. They were in Tools and
-                  // did nothing but show a snackbar; each now asks the one
-                  // question that decides whether it applies, and says plainly
-                  // that the stage switch itself is still being built rather
-                  // than opening a pregnancy home over a toddler's data.
-                  _section(context, Icons.calendar_month_outlined, 'Due date',
-                      'Expecting again? Start here.',
-                      const NextBabyScreen(intent: NextBabyIntent.dueDate)),
-                  _section(context, Icons.egg_outlined, 'Track ovulation',
-                      'Trying for another? Your cycle, understood.',
-                      const NextBabyScreen(intent: NextBabyIntent.ovulation)),
+                  for (final e in ppExploreEntries())
+                    _section(context, e.icon, e.title, e.desc, e.screen,
+                        top: e.top, onTapOverride: e.onTapOverride),
                 ],
               ),
             ),

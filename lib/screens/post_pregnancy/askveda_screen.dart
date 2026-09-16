@@ -208,7 +208,8 @@ class _AskVedaScreenState extends State<AskVedaScreen> {
             ]),
           ),
         ),
-        const Positioned(left: 16, right: 16, bottom: 18, child: PpBottomNav(active: 1)),
+        // Ask Veda is reached from the FAB, not the bar, so no tab is lit.
+        const Positioned(left: 16, right: 16, bottom: 18, child: PpBottomNav(active: null)),
       ]),
     );
   }

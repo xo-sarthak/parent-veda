@@ -30,6 +30,7 @@ import 'pp_products_data.dart';
 import 'product_detail_screen.dart';
 import 'products_discovery_screen.dart';
 import 'tools_hub_screen.dart';
+import 'pp_more_sheet.dart';
 
 // ---- palette ----------------------------------------------------------------
 // ⚠️ UNIFIED WITH THE PREGNANCY GROUND, 2026-08-17.
@@ -386,20 +387,53 @@ class _StripePainter extends CustomPainter {
   bool shouldRepaint(covariant _StripePainter old) => old.a != a || old.b != b;
 }
 
-// ---- shared floating bottom nav (My Child · AskVeda · Community · Products) --
-//  The parenting app's 4 hero tabs. Only My Child + Products are built; the
-//  others show a gentle "coming soon". "My Child" pops back to the home route
-//  (named 'pp/my_child' by the doorway) from any depth. Pass onProducts to push
-//  the Products discovery screen from a non-products tab.
-/// Central tab navigation for the parenting app: pop back to the My Child home
+// ---- shared floating bottom nav (Home · Products · Tools · Brain · More) ----
+//  Reordered and renamed 2026-09-16 to the V3 home design:
+//
+//      Home · Products · Tools · Brain activities · More
+//
+//  "Home" is what used to be called "My Child"; Community left the bar and is
+//  the first row of the More sheet along with everything the Explore drawer
+//  held (see pp_more_sheet.dart).
+//
+//  ⚠️ THE TAB IS AN ENUM NOW, NOT A POSITION, AND THE REORDER IS WHY.
+//
+//  Every caller in the app used to say `openPpTab(context, 4)` and mean
+//  "Products". A position is a DISPLAY fact — where the tab happens to sit —
+//  that had leaked into ~15 call sites as an IDENTITY. The day the order
+//  changes, every one of those calls silently opens something else, and
+//  nothing fails: `openPpTab(context, 4)` still compiles, still navigates,
+//  and now lands a parent on the More sheet when she tapped "See all
+//  products". The same trap this repo already names for `.en` vs `.now`.
+//
+//  So the tab has a name (`PpTab`), the bar is built from names, and the old
+//  int entry point survives as an ADAPTER that keeps the OLD positions'
+//  meaning — `openPpTab(context, 4)` still means Products, exactly as it did
+//  the day each caller was written. No caller had to change and none can have
+//  been re-routed by accident. New code uses `openPpTabTo`.
+//
+//  History, kept for the record:
+//    v1  My Child · AskVeda · Community · Products         (4 tabs)
+//    v2  My Child · Brain · Tools · Community · Products   (5 tabs)
+//    v3  Home · Products · Tools · Brain activities · More (this)
+
+/// The parenting bar's five destinations, by name.
+enum PpTab { home, products, tools, brain, more }
+
+/// Central tab navigation for the parenting app: pop back to the home
 /// (route 'pp/my_child') so the stack stays shallow, then push the target tab.
-void openPpTab(BuildContext context, int index) {
+/// `more` is the exception — it is a sheet over wherever she is, not a screen.
+void openPpTabTo(BuildContext context, PpTab tab) {
+  if (tab == PpTab.more) {
+    showPpMoreSheet(context);
+    return;
+  }
   final nav = Navigator.of(context);
   nav.popUntil((r) => r.isFirst || r.settings.name == 'pp/my_child');
-  switch (index) {
-    case 1:
-      // WAS AskVeda. Tab 1 is now Brain Development (the Grow feature), per the
-      // parenting review: Ask Veda comes OUT of the bottom tabs and Skill
+  switch (tab) {
+    case PpTab.brain:
+      // WAS AskVeda. This tab became Brain Development (the Grow feature), per
+      // the parenting review: Ask Veda comes OUT of the bottom tabs and Skill
       // Development comes out of Explore and takes its place, renamed.
       //
       // Ask Veda is not gone — it is still reached from the My Child page
@@ -407,38 +441,89 @@ void openPpTab(BuildContext context, int index) {
       // Kept for revert:
       //   nav.push(MaterialPageRoute<void>(builder: (_) => const AskVedaScreen()));
       nav.push(MaterialPageRoute<void>(builder: (_) => const GrowHomeScreen()));
-      break;
-    case 2:
+    case PpTab.tools:
       nav.push(MaterialPageRoute<void>(builder: (_) => const ToolsHubScreen()));
-      break;
-    case 3:
-      nav.push(MaterialPageRoute<void>(builder: (_) => const CommunityScreen()));
-      break;
-    case 4:
+    case PpTab.products:
       nav.push(MaterialPageRoute<void>(builder: (_) => const ProductsDiscoveryScreen()));
+    case PpTab.home:
+    case PpTab.more:
+      // Home: the popUntil above already returned to it. More: handled above.
       break;
-    // 0 = My Child: the popUntil above already returned to it.
   }
 }
+
+/// ⚠️ LEGACY ADAPTER — the positions here are the v2 bar's, ON PURPOSE.
+///
+/// 0 = home · 1 = Brain · 2 = Tools · 3 = Community · 4 = Products. Every
+/// existing caller was written against that order and this keeps each one
+/// landing where it always did. Community is no longer a tab, so 3 pushes the
+/// Community screen directly — the destination survives the bar losing it.
+///
+/// Do not add new callers; use [openPpTabTo].
+void openPpTab(BuildContext context, int index) {
+  switch (index) {
+    case 0:
+      openPpTabTo(context, PpTab.home);
+    case 1:
+      openPpTabTo(context, PpTab.brain);
+    case 2:
+      openPpTabTo(context, PpTab.tools);
+    case 3:
+      final nav = Navigator.of(context);
+      nav.popUntil((r) => r.isFirst || r.settings.name == 'pp/my_child');
+      nav.push(MaterialPageRoute<void>(builder: (_) => const CommunityScreen()));
+    case 4:
+      openPpTabTo(context, PpTab.products);
+  }
+}
+
+// The v2 body of openPpTab, kept for revert:
+//   final nav = Navigator.of(context);
+//   nav.popUntil((r) => r.isFirst || r.settings.name == 'pp/my_child');
+//   switch (index) {
+//     case 1:
+//       nav.push(MaterialPageRoute<void>(builder: (_) => const GrowHomeScreen()));
+//       break;
+//     case 2:
+//       nav.push(MaterialPageRoute<void>(builder: (_) => const ToolsHubScreen()));
+//       break;
+//     case 3:
+//       nav.push(MaterialPageRoute<void>(builder: (_) => const CommunityScreen()));
+//       break;
+//     case 4:
+//       nav.push(MaterialPageRoute<void>(builder: (_) => const ProductsDiscoveryScreen()));
+//       break;
+//     // 0 = My Child: the popUntil above already returned to it.
+//   }
 
 class PpBottomNav extends StatelessWidget {
   const PpBottomNav({super.key, required this.active});
 
-  /// 0 = My Child · 1 = Brain · 2 = Tools · 3 = Community · 4 = Products
-  final int active;
+  /// Which tab is lit. Pass `null` from a screen that is not a tab (Ask Veda,
+  /// reached from the FAB) so nothing is highlighted rather than the wrong
+  /// thing.
+  final PpTab? active;
 
   // Tab 1 was AskVeda. Kept for revert:
   //   (Icons.auto_awesome_rounded, 'AskVeda'),
   //
-  // 'Brain' rather than 'Brain Development': five tabs share the width evenly,
-  // and a two-word label truncates on a small phone. The screen it opens is
-  // titled in full.
-  static const List<(IconData, String)> _tabs = [
-    (Icons.child_care_rounded, 'My Child'),
-    (Icons.emoji_objects_rounded, 'Brain'),
-    (Icons.widgets_rounded, 'Tools'),
-    (Icons.groups_rounded, 'Community'),
-    (Icons.shopping_bag_rounded, 'Products'),
+  // The v2 set, kept for revert:
+  //   (Icons.child_care_rounded, 'My Child'),
+  //   (Icons.emoji_objects_rounded, 'Brain'),
+  //   (Icons.widgets_rounded, 'Tools'),
+  //   (Icons.groups_rounded, 'Community'),
+  //   (Icons.shopping_bag_rounded, 'Products'),
+  //
+  // 'Brain\nactivities' is the one two-line label in the app. The review asked
+  // for that wording; at 11px it does not fit a fifth of a small phone, and
+  // "Brain acti…" is worse than two small lines. PvNavBar draws an explicit
+  // newline on two lines at 9.5px — see rule 5 in pv_nav_bar.dart.
+  static const List<(PpTab, IconData, String)> _tabs = [
+    (PpTab.home, Icons.home_outlined, 'Home'),
+    (PpTab.products, Icons.shopping_basket_outlined, 'Products'),
+    (PpTab.tools, Icons.handyman_outlined, 'Tools'),
+    (PpTab.brain, Icons.psychology_outlined, 'Brain\nactivities'),
+    (PpTab.more, Icons.more_horiz_rounded, 'More'),
   ];
 
   // ⚠️ NOW A THIN ADAPTER OVER `PvNavBar`.
@@ -454,9 +539,9 @@ class PpBottomNav extends StatelessWidget {
   // was the one rule this bar still broke.
   @override
   Widget build(BuildContext context) => PvNavBar(
-        items: [for (final (i, l) in _tabs) PvNavItem(i, l)],
-        activeIndex: active,
-        onTap: (i) => openPpTab(context, i),
+        items: [for (final (_, i, l) in _tabs) PvNavItem(i, l)],
+        activeIndex: active == null ? -1 : PpTab.values.indexOf(active!),
+        onTap: (i) => openPpTabTo(context, _tabs[i].$1),
         accent: ppPurple,
       );
 }

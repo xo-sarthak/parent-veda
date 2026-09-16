@@ -19,6 +19,30 @@
 //  soft field, one large fact, two short lines. A drawing is the same every
 //  morning; the child's age and what is coming next are not. Full reasoning at
 //  the head of pp_hero_field.dart.
+//
+//  ⚠️ RESHAPED 2026-09-16 TO THE "PARENTVEDA V3 HOME" CLAUDE DESIGN, from the
+//  user's own seven-point brief. What changed, section by section, and why
+//  each piece of the old screen is commented rather than deleted:
+//
+//    1. Where to go        What to buy is the FIRST tile. Order only.
+//    2. This phase explained  VIDEO FIRST, then the text, then a rail of three
+//                          further resources. The separate "Watch" section
+//                          lower down is gone — that video lives here now.
+//    3. How {name} is doing  Only what is ACTUALLY changing at this age — one
+//                          card per domain with a milestone this phase, from
+//                          the AAP list in pp_phases_data. Tap → a sheet:
+//                          video, then text, then more. See pp_home_changes.
+//    4. Today              "Activities to do today with your baby" — three,
+//                          Done stays for the day, Change swaps at once, all
+//                          fresh tomorrow. State in pp_home_activities_store.
+//    5. Read               "Recommended reads for today", age-relevant, a rail.
+//    6. Recommended        "Recommended products for your baby", age-relevant.
+//    7. My journal         "Record a memory for your child today" — a photo
+//                          square, a prompt, four entry chips.
+//
+//  The hero is untouched. "Asked a lot" and "Looking ahead" were not in the
+//  design and were not in the brief either way; they stay below the journal
+//  until told otherwise, because a section is never removed on inference.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -33,6 +57,7 @@ import '../brackets/hub/problem_hub_screen.dart';
 import '../../data/hubs/hub_registry.dart';
 
 import '../../localization/app_language.dart';
+import '../../models/bracket.dart';
 import '../../services/bracket_resolver.dart';
 import '../../services/life_stage_store.dart';
 import '../../services/parenting_surfaces.dart';
@@ -42,7 +67,12 @@ import '../v2/v2_block_grid.dart';
 import '../v2/v2_palette.dart';
 import '../v2/v2_sections.dart' show v2CoverTint, v2PpReadCover;
 import '../v2/v3_bracket_art.dart';
+// V3JournalSection is in the commented-out journal block below. Kept so the
+// revert is one uncomment.
+// ignore: unused_import
 import '../v2/v3_daily.dart';
+// V3DailyMark is only in the commented-out journal block. Kept for revert.
+// ignore: unused_import
 import '../v2/v3_daily_art.dart';
 import '../v2/v3_daily_tip.dart';
 import '../v2/v3_hero_chrome.dart';
@@ -51,7 +81,18 @@ import 'pp_child_profile.dart';
 import 'pp_common.dart';
 import 'pp_daily_tips.dart';
 import 'pp_development_data.dart';
+// The old day-rotated single pick read these directly; the store does now.
+// Kept for revert. `kGrowExtraActivities` is still reachable through
+// pp_grow_data's `kGrowActivities`.
+// ignore: unused_import
 import 'pp_grow_activities.dart';
+import 'pp_home_activities_store.dart';
+import 'pp_home_changes.dart';
+import 'journal_v2/journal_capture_screens.dart';
+import 'reading_reader_screen.dart';
+import 'development_activity_screen.dart';
+import 'watch_player_screen.dart';
+import 'product_detail_screen.dart';
 import 'journal_v2/journal_home_screen.dart';
 import 'phase_map_screen.dart';
 import 'family_profile_screen.dart';
@@ -121,18 +162,26 @@ class _PpHomeV3State extends State<PpHomeV3> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: Listenable.merge(
-          [ChildProfileStore.instance, V2PaletteStore.instance]),
+      animation: Listenable.merge([
+        ChildProfileStore.instance,
+        V2PaletteStore.instance,
+        PpHomeActivitiesStore.instance,
+      ]),
       builder: (context, _) {
         final p = V2PaletteStore.instance.current;
         final child = ChildProfileStore.instance;
         final phase = currentPhase(child);
         _maybeShowTip(child.ageInMonths, p);
 
-        final activity = _todaysActivity();
-        final reads = _reads(3);
+        // The single day-rotated pick, replaced by the three-a-day store.
+        // Kept for revert:
+        //   final activity = _todaysActivity();
+        final activities =
+            PpHomeActivitiesStore.instance.todays(child.ageInMonths);
+        final changes = phaseChangesFor(phase);
+        final reads = _readsForAge(child.ageInMonths, 3);
         final video = _video(phase);
-        final products = _products(6);
+        final products = _productsForAge(child.ageInMonths, 6);
         final faqs = phaseFaqs(phase.number, count: 3);
         final next = nextPhase(child);
 
@@ -194,11 +243,19 @@ class _PpHomeV3State extends State<PpHomeV3> {
                 _pad(_Head(
                     eyebrow: 'Where to go', title: 'Start anywhere', p: p)),
                 const SizedBox(height: 14),
+                // ⚠️ WHAT TO BUY IS FIRST, and only first. The brief: "What to
+                // Buy should become the FIRST box among these 11. It does NOT
+                // become the top heading of the overall Parenting page."
+                //
+                // Reordered HERE rather than in kParentingBrackets: that list
+                // is the registry every hub, door and test reads, and its
+                // order is documentary (the eleven were built in that order).
+                // This is a display decision about one grid.
                 _pad(V2BlockGrid(
                   palette: p,
                   columns: 4,
                   blocks: [
-                    for (final b in bracketsFor(LifeStage.parenting))
+                    for (final b in _tilesOrder(bracketsFor(LifeStage.parenting)))
                       V2Block(
                         label: b.label.of(lang),
                         icon: Icons.circle_outlined,
@@ -240,7 +297,22 @@ class _PpHomeV3State extends State<PpHomeV3> {
                     eyebrow: 'This phase explained',
                     title: 'What ${phase.ageLabel} looks like',
                     p: p)),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
+                // ⚠️ VIDEO FIRST. The brief: "Currently the written description
+                // comes first while the video appears much further down the
+                // page. Change the order so that the video explanation of the
+                // phase comes first, the written description follows
+                // immediately after, and any additional resources follow."
+                //
+                // The video is the same phase-matched one the old "Watch"
+                // section showed (see `_video`). Only its place changed.
+                if (video != null) ...[
+                  _pad(_PhaseVideoCard(
+                      video: video,
+                      p: p,
+                      onTap: () => _openVideo(context, video))),
+                  const SizedBox(height: 16),
+                ],
                 _pad(_PhaseExplained(
                   phase: phase,
                   p: p,
@@ -248,69 +320,212 @@ class _PpHomeV3State extends State<PpHomeV3> {
                   onToggle: () =>
                       setState(() => _phaseExpanded = !_phaseExpanded),
                 )),
+                const SizedBox(height: 16),
+                _ResourceRail(p: p, items: [
+                  _Resource(
+                      label: 'What changes next',
+                      hue: 42,
+                      icon: Icons.timeline_outlined,
+                      onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                              settings:
+                                  const RouteSettings(name: 'pp/phase_map'),
+                              builder: (_) => const PhaseMapScreen()))),
+                  _Resource(
+                      label: 'Something changed?',
+                      hue: 285,
+                      icon: Icons.help_outline_rounded,
+                      onTap: () => _openSurface(context, 'pp_what_changed')),
+                  _Resource(
+                      label: 'When to call the doctor',
+                      hue: 188,
+                      icon: Icons.medical_services_outlined,
+                      onTap: () => _openSurface(context, 'pp_baby_ok_check')),
+                ]),
                 const SizedBox(height: 32),
 
+                // ---- HOW {NAME} IS DOING ------------------------------------
+                //
+                // ⚠️ ONLY WHAT IS CHANGING, NOT EVERY DOMAIN. The brief: "When
+                // opened, it should NOT show every possible developmental
+                // change. Determine what is actually changing at the baby's
+                // current age and surface only those under the existing
+                // categories." The cards come from the phase's own AAP
+                // milestone list — see the head of pp_home_changes.dart for
+                // why that list and not kDevAreas.
+                //
+                // The eight-row `_Snapshot` this replaces is kept below for
+                // revert; its rows were fixed at a four-month-old and did not
+                // move with the child.
                 _pad(_Head(
                     eyebrow: 'How ${child.nameMid} is doing',
                     title: 'Right now',
                     p: p)),
-                const SizedBox(height: 12),
-                _pad(_Snapshot(
-                    p: p,
-                    onTap: () => _openSurface(context, 'pp_development'))),
+                if (changes.isNotEmpty) ...[
+                  const SizedBox(height: 6),
+                  _pad(Text(phaseChangesLine(changes, phase),
+                      style: pvManrope(
+                          fontSize: 13, height: 1.45, color: p.ink3))),
+                ],
+                const SizedBox(height: 14),
+                // Kept for revert:
+                //   _pad(_Snapshot(
+                //       p: p,
+                //       onTap: () => _openSurface(context, 'pp_development'))),
+                if (changes.isEmpty)
+                  // A feature is never hidden: a phase with nothing listed
+                  // still shows the door to Development.
+                  _pad(_EmptyInvite(
+                      p: p,
+                      line: 'Nothing is listed for ${phase.ageLabel} yet. '
+                          'The Development door has the whole picture.',
+                      cta: 'Open Development',
+                      onTap: () => _openSurface(context, 'pp_development')))
+                else
+                  for (final c in changes) ...[
+                    _pad(_ChangeCard(
+                        change: c,
+                        p: p,
+                        onTap: () => _showChangeSheet(context, c, child, p))),
+                    const SizedBox(height: 12),
+                  ],
+                const SizedBox(height: 20),
+
+                // ---- ACTIVITIES TO DO TODAY ---------------------------------
+                //
+                // Was "Today · One thing to try", a single day-rotated card that
+                // opened the activities library. Now three cards with their
+                // own Done and Change, state held by PpHomeActivitiesStore.
+                // The old block is kept for revert:
+                //   if (activity != null) ...[
+                //     _pad(_Head(
+                //         eyebrow: 'Today', title: 'One thing to try', p: p)),
+                //     const SizedBox(height: 12),
+                //     _pad(_ActivityCard(
+                //         activity: activity,
+                //         p: p,
+                //         onTap: () => _openSurface(context, 'pp_activities'))),
+                //     const SizedBox(height: 32),
+                //   ],
+                _pad(_Head(
+                    eyebrow: 'Today',
+                    title: 'Activities to do today with your baby',
+                    p: p)),
+                const SizedBox(height: 14),
+                if (activities.isEmpty)
+                  _pad(_EmptyInvite(
+                      p: p,
+                      line: 'The activity library is still filling in for '
+                          '${phase.ageLabel}.',
+                      cta: 'Browse every activity',
+                      onTap: () => _openSurface(context, 'pp_activities')))
+                else ...[
+                  for (final a in activities) ...[
+                    _pad(_TodayActivityCard(
+                      activity: a,
+                      p: p,
+                      done: PpHomeActivitiesStore.instance.isDone(a.id),
+                      swapped: PpHomeActivitiesStore.instance.wasSwappedIn(a.id),
+                      onDone: () => PpHomeActivitiesStore.instance.markDone(a.id),
+                      onChange: () => PpHomeActivitiesStore.instance
+                          .swap(a.id, child.ageInMonths),
+                      onOpen: () => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                              settings: RouteSettings(
+                                  name: 'pp/activity/${a.id}'),
+                              builder: (_) =>
+                                  DevelopmentActivityScreen(activity: a))),
+                    )),
+                    const SizedBox(height: 12),
+                  ],
+                  // No counter, no streak, no "2 of 3" — the brief and the
+                  // Grow feature both refuse those. One line about tomorrow.
+                  _pad(Text(
+                      PpHomeActivitiesStore.instance.allDone
+                          ? 'All three done. Tomorrow brings three new ones.'
+                          : 'Tomorrow brings three new ones.',
+                      style: pvManrope(
+                          fontSize: 13, height: 1.45, color: p.ink3))),
+                ],
                 const SizedBox(height: 32),
 
-                if (activity != null) ...[
-                  _pad(_Head(
-                      eyebrow: 'Today', title: 'One thing to try', p: p)),
-                  const SizedBox(height: 12),
-                  _pad(_ActivityCard(
-                      activity: activity,
-                      p: p,
-                      onTap: () => _openSurface(context, 'pp_activities'))),
-                  const SizedBox(height: 32),
-                ],
-
+                // ---- READ ---------------------------------------------------
+                //
+                // "Short enough for today" → "Recommended reads for today", and
+                // a rail rather than rows, per the design. The row form is
+                // kept for revert:
+                //   _pad(_Head(
+                //       eyebrow: 'To read',
+                //       title: 'Short enough for today',
+                //       p: p)),
+                //   const SizedBox(height: 6),
+                //   for (final r in reads)
+                //     _pad(_ReadRow(
+                //         article: r,
+                //         p: p,
+                //         onTap: () => _openSurface(context, 'pp_read'))),
                 if (reads.isNotEmpty) ...[
                   _pad(_Head(
-                      eyebrow: 'To read',
-                      title: 'Short enough for today',
+                      eyebrow: 'Read',
+                      title: 'Recommended reads for today',
                       p: p)),
-                  const SizedBox(height: 6),
-                  for (final r in reads)
-                    _pad(_ReadRow(
-                        article: r,
-                        p: p,
-                        onTap: () => _openSurface(context, 'pp_read'))),
-                  const SizedBox(height: 32),
-                ],
-
-                if (video != null) ...[
-                  _pad(_Head(
-                      eyebrow: 'Watch',
-                      title: 'This phase, in a video',
-                      p: p)),
-                  const SizedBox(height: 12),
-                  _pad(_VideoCard(
-                      video: video,
+                  const SizedBox(height: 14),
+                  _ReadRail(
+                      items: reads,
                       p: p,
-                      onTap: () => _openSurface(context, 'pp_watch'))),
+                      onOpen: (r) => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                              settings:
+                                  RouteSettings(name: 'pp/read/${r.id}'),
+                              builder: (_) =>
+                                  ReadingReaderScreen(article: r)))),
                   const SizedBox(height: 32),
                 ],
 
-                // Products LAST and priced, same as pregnancy V3 — free first,
-                // paid last, which is the wedge expressed as layout.
+                // ---- WATCH — MOVED INTO "THIS PHASE EXPLAINED" --------------
+                //
+                // The heading is gone; the video is the first thing in that
+                // section now. Kept for revert:
+                //   if (video != null) ...[
+                //     _pad(_Head(
+                //         eyebrow: 'Watch',
+                //         title: 'This phase, in a video',
+                //         p: p)),
+                //     const SizedBox(height: 12),
+                //     _pad(_VideoCard(
+                //         video: video,
+                //         p: p,
+                //         onTap: () => _openSurface(context, 'pp_watch'))),
+                //     const SizedBox(height: 32),
+                //   ],
+
+                // ---- RECOMMENDED PRODUCTS -----------------------------------
+                //
+                // Products still after every free section, same as pregnancy
+                // V3 — free first, paid last, which is the wedge expressed as
+                // layout. Renamed from "Things that help · What parents ask us
+                // about" to the brief's wording, and filtered to the child's
+                // age. Kept for revert:
+                //   _pad(_Head(
+                //       eyebrow: 'Things that help',
+                //       title: 'What parents ask us about',
+                //       note: 'Prices shown',
+                //       p: p)),
                 if (products.isNotEmpty) ...[
                   _pad(_Head(
-                      eyebrow: 'Things that help',
-                      title: 'What parents ask us about',
-                      note: 'Prices shown',
+                      eyebrow: 'Recommended',
+                      title: 'Recommended products for your baby',
                       p: p)),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   _ProductRail(
                       items: products,
                       p: p,
-                      onOpen: () => _openSurface(context, 'pp_products')),
+                      onOpen: (it) => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                              settings:
+                                  RouteSettings(name: 'pp/product/${it.id}'),
+                              builder: (_) =>
+                                  ProductDetailScreen(product: it)))),
                   const SizedBox(height: 32),
                 ],
 
@@ -321,49 +536,65 @@ class _PpHomeV3State extends State<PpHomeV3> {
                 // PUTS SOMETHING IN rather than taking something out. Pregnancy
                 // V3 learned this the hard way: the journal was demoted to a
                 // chip and quietly stopped happening.
+                // "Keep today" → "Record a memory for your child today", and
+                // the design's own card: a photo square, a prompt line, four
+                // entry chips. The shared V3JournalSection it replaces is kept
+                // for revert — the note about why it was shared still holds,
+                // and the day pregnancy V3 adopts this card it should become
+                // the shared one again.
+                //   _pad(_Head(
+                //       eyebrow: 'My journal', title: 'Keep today', p: p)),
+                //   const SizedBox(height: 12),
+                //   _pad(V3JournalSection(
+                //     p: p,
+                //     actions: [
+                //       V3QuickAction(
+                //           icon: Icons.edit_note_rounded,
+                //           mark: V3DailyMark.memory,
+                //           hue: 42,
+                //           label: 'Write a\nmemory',
+                //           onTap: () => _openJournal(context)),
+                //       V3QuickAction(
+                //           icon: Icons.favorite_border_rounded,
+                //           mark: V3DailyMark.note,
+                //           hue: 344,
+                //           label: 'Note for\nthem',
+                //           onTap: () => _openJournal(context)),
+                //       V3QuickAction(
+                //           icon: Icons.photo_camera_outlined,
+                //           mark: V3DailyMark.photo,
+                //           hue: 206,
+                //           label: 'Add a\nphoto',
+                //           onTap: () => _openJournal(context)),
+                //       V3QuickAction(
+                //           icon: Icons.mic_none_rounded,
+                //           mark: V3DailyMark.voice,
+                //           hue: 268,
+                //           label: 'Record\nvoice',
+                //           onTap: () => _openJournal(context)),
+                //     ],
+                //     onOpenAll: () => _openJournal(context),
+                //   )),
                 _pad(_Head(
-                    eyebrow: 'My journal', title: 'Keep today', p: p)),
-                const SizedBox(height: 12),
-                // ⚠️ THE SAME WIDGET PREGNANCY USES, not a parenting copy.
-                //
-                // It was a copy, and a copy is how two screens drift: the
-                // pregnancy card has drawn marks in four hues and a bordered
-                // pill, this one had flat line icons and a different button.
-                // Nobody decided that — it happened because two people (or the
-                // same person twice) wrote the same card in two places.
-                //
-                // A shared component makes uniformity the default rather than a
-                // thing to remember, which matters most for the sections that
-                // exist in BOTH stages. The verbs differ by one word ("Note for
-                // baby" / "Note for them") and that is all that should.
-                _pad(V3JournalSection(
+                    eyebrow: 'My journal',
+                    title: 'Record a memory for your child today',
+                    p: p)),
+                const SizedBox(height: 14),
+                _pad(_JournalInvite(
                   p: p,
-                  actions: [
-                    V3QuickAction(
-                        icon: Icons.edit_note_rounded,
-                        mark: V3DailyMark.memory,
-                        hue: 42,
-                        label: 'Write a\nmemory',
-                        onTap: () => _openJournal(context)),
-                    V3QuickAction(
-                        icon: Icons.favorite_border_rounded,
-                        mark: V3DailyMark.note,
-                        hue: 344,
-                        label: 'Note for\nthem',
-                        onTap: () => _openJournal(context)),
-                    V3QuickAction(
-                        icon: Icons.photo_camera_outlined,
-                        mark: V3DailyMark.photo,
-                        hue: 206,
-                        label: 'Add a\nphoto',
-                        onTap: () => _openJournal(context)),
-                    V3QuickAction(
-                        icon: Icons.mic_none_rounded,
-                        mark: V3DailyMark.voice,
-                        hue: 268,
-                        label: 'Record\nvoice',
-                        onTap: () => _openJournal(context)),
-                  ],
+                  onPhoto: () => _openCapture(context, 'A photo from today'),
+                  onMilestone: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                          settings:
+                              const RouteSettings(name: 'pp/journal/guided'),
+                          builder: (_) => const GuidedMemoryScreen())),
+                  onThought: () => Navigator.of(context).push(
+                      MaterialPageRoute<void>(
+                          settings:
+                              const RouteSettings(name: 'pp/journal/write'),
+                          builder: (_) => const WriteStoryScreen())),
+                  onMoment: () =>
+                      _openCapture(context, 'A moment from today'),
                   onOpenAll: () => _openJournal(context),
                 )),
                 const SizedBox(height: 32),
@@ -418,7 +649,10 @@ class _PpHomeV3State extends State<PpHomeV3> {
               ],
             ),
             const Positioned(
-                left: 16, right: 16, bottom: 18, child: PpBottomNav(active: 0)),
+                left: 16,
+                right: 16,
+                bottom: 18,
+                child: PpBottomNav(active: PpTab.home)),
           ]),
         );
       },
@@ -436,12 +670,25 @@ class _PpHomeV3State extends State<PpHomeV3> {
   // one, and the age filtering belongs in the destination screens that already
   // do it properly.
 
+  /// The eleven tiles, What to buy first, the rest in registry order.
+  static List<Bracket> _tilesOrder(List<Bracket> all) => [
+        for (final b in all)
+          if (b.id == 'parenting_buying') b,
+        for (final b in all)
+          if (b.id != 'parenting_buying') b,
+      ];
+
+  // The single day-rotated pick. Superseded by PpHomeActivitiesStore, which
+  // owns "three a day, Done stays, Change swaps". Kept for revert.
+  // ignore: unused_element
   DevActivity? _todaysActivity() {
     final all = [...kGrowExtraActivities, ...kDevActivities];
     if (all.isEmpty) return null;
     return all[DateTime.now().day % all.length];
   }
 
+  // Day-rotated, age-blind. Kept for revert.
+  // ignore: unused_element
   List<ReadArticle> _reads(int n) {
     final all = readCatalog;
     if (all.isEmpty) return const [];
@@ -449,6 +696,42 @@ class _PpHomeV3State extends State<PpHomeV3> {
     return [
       for (var i = 0; i < n && i < all.length; i++) all[(start + i) % all.length]
     ];
+  }
+
+  /// Reads that fit the child's age first, the rest to fill — a rail of three
+  /// is the promise, and "relevant to the current age" is the preference.
+  ///
+  /// ⚠️ THE TAGS ARE PROSE AND THE PARSER FAILS OPEN. `ReadArticle.ageTag` is
+  /// '3–6 mo', '1–3 yr', '6+ mo' or 'All stages'. `devAgeRange` reads the
+  /// first two; '6+' is read here; anything else ('All stages', a typo) is
+  /// treated as suiting every age rather than none, because a read that
+  /// silently vanishes from every rail is the worse failure.
+  List<ReadArticle> _readsForAge(int months, int n) {
+    final all = readCatalog;
+    if (all.isEmpty) return const [];
+    bool suits(ReadArticle a) {
+      final r = devAgeRange(a.ageTag);
+      if (r != null) return months >= r.lo && months <= r.hi;
+      final plus = RegExp(r'(\d+)\s*\+').firstMatch(a.ageTag);
+      if (plus != null) {
+        var lo = int.parse(plus.group(1)!);
+        if (a.ageTag.toLowerCase().contains('yr')) lo *= 12;
+        return months >= lo;
+      }
+      return true;
+    }
+
+    // Day-rotated within each tier, so the rail is not the same three every
+    // morning for a child who stays in one band for months.
+    List<ReadArticle> rotate(List<ReadArticle> xs) {
+      if (xs.isEmpty) return xs;
+      final start = DateTime.now().day % xs.length;
+      return [for (var i = 0; i < xs.length; i++) xs[(start + i) % xs.length]];
+    }
+
+    final fit = rotate(all.where(suits).toList());
+    final rest = rotate(all.where((a) => !suits(a)).toList());
+    return [...fit, ...rest].take(n).toList();
   }
 
   /// ⚠️ THE PHASE'S VIDEO, NOT THE DAY'S.
@@ -470,6 +753,8 @@ class _PpHomeV3State extends State<PpHomeV3> {
         : kWatchVideos[DateTime.now().day % kWatchVideos.length];
   }
 
+  // Day-rotated, age-blind. Kept for revert.
+  // ignore: unused_element
   List<PpProduct> _products(int n) {
     if (kPpProducts.isEmpty) return const [];
     final start = DateTime.now().day % kPpProducts.length;
@@ -477,6 +762,23 @@ class _PpHomeV3State extends State<PpHomeV3> {
       for (var i = 0; i < n && i < kPpProducts.length; i++)
         kPpProducts[(start + i) % kPpProducts.length]
     ];
+  }
+
+  /// Products that suit the child's age first (`PpProduct.suitsAge`, which
+  /// every product already declares), the rest to fill the rail. A card for a
+  /// product she does not need yet is allowed — the design's own rail says
+  /// "You do not need this yet" on one — but it comes after the ones she does.
+  List<PpProduct> _productsForAge(int months, int n) {
+    if (kPpProducts.isEmpty) return const [];
+    List<PpProduct> rotate(List<PpProduct> xs) {
+      if (xs.isEmpty) return xs;
+      final start = DateTime.now().day % xs.length;
+      return [for (var i = 0; i < xs.length; i++) xs[(start + i) % xs.length]];
+    }
+
+    final fit = rotate(kPpProducts.where((x) => x.suitsAge(months)).toList());
+    final rest = rotate(kPpProducts.where((x) => !x.suitsAge(months)).toList());
+    return [...fit, ...rest].take(n).toList();
   }
 
   // ---- Navigation -----------------------------------------------------------
@@ -762,6 +1064,165 @@ class _PpHomeV3State extends State<PpHomeV3> {
         builder: (_) => const JournalV2Home(),
       ));
 
+  void _openCapture(BuildContext context, String prompt) =>
+      Navigator.of(context).push(MaterialPageRoute<void>(
+        settings: const RouteSettings(name: 'pp/journal/capture'),
+        builder: (_) => QuickCaptureScreen(prompt: prompt),
+      ));
+
+  void _openVideo(BuildContext context, WatchVideo video) =>
+      Navigator.of(context).push(MaterialPageRoute<void>(
+        settings: RouteSettings(name: 'pp/watch/${video.id}'),
+        builder: (_) => WatchPlayerScreen(video: video),
+      ));
+
+  /// The "How {name} is doing" detail sheet: video first, then the written
+  /// explanation, then "More on this". Same order as the phase section above
+  /// it, by the brief's own rule.
+  void _showChangeSheet(BuildContext context, PhaseChange change,
+      ChildProfileStore child, V2Palette p) {
+    final video = change.video;
+    final read = change.read;
+    final activity = change.activityFor(child.ageInMonths);
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (ctx) => DraggableScrollableSheet(
+        initialChildSize: 0.86,
+        minChildSize: 0.5,
+        maxChildSize: 0.96,
+        expand: false,
+        builder: (ctx, sc) => Container(
+          decoration: BoxDecoration(
+            color: p.ground,
+            borderRadius:
+                const BorderRadius.vertical(top: Radius.circular(28)),
+          ),
+          child: Column(children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 12, 18, 4),
+              child: Row(children: [
+                const SizedBox(width: 38),
+                Expanded(
+                  child: Center(
+                    child: Container(
+                      width: 42,
+                      height: 4,
+                      decoration: BoxDecoration(
+                          color: Colors.black.withValues(alpha: 0.14),
+                          borderRadius: BorderRadius.circular(999)),
+                    ),
+                  ),
+                ),
+                IconButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  icon: Icon(Icons.close_rounded, color: p.ink3),
+                  splashRadius: 20,
+                ),
+              ]),
+            ),
+            Expanded(
+              child: ListView(
+                controller: sc,
+                padding: const EdgeInsets.fromLTRB(24, 6, 24, 28),
+                children: [
+                  _Chip(label: change.category, hue: change.hue, p: p),
+                  const SizedBox(height: 10),
+                  Text(change.title,
+                      style: pvFraunces(
+                          fontSize: 24,
+                          fontWeight: FontWeight.w600,
+                          height: 1.15,
+                          letterSpacing: -0.6,
+                          color: p.ink1)),
+                  const SizedBox(height: 16),
+                  // 1. Video.
+                  if (video != null) ...[
+                    _PhaseVideoCard(
+                        video: video,
+                        p: p,
+                        hue: change.hue,
+                        onTap: () {
+                          Navigator.of(ctx).pop();
+                          _openVideo(context, video);
+                        }),
+                    const SizedBox(height: 18),
+                  ],
+                  // 2. Text.
+                  for (final para in change.paragraphs()) ...[
+                    Text(para,
+                        style: pvManrope(
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w500,
+                            height: 1.65,
+                            color: p.ink1)),
+                    const SizedBox(height: 12),
+                  ],
+                  const SizedBox(height: 12),
+                  // 3. More.
+                  Text('MORE ON THIS',
+                      style: pvManrope(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.5,
+                          color: p.action)),
+                  const SizedBox(height: 10),
+                  if (read != null)
+                    _MoreRow(
+                        p: p,
+                        icon: Icons.menu_book_outlined,
+                        hue: 42,
+                        title: read.title,
+                        sub: 'Article · ${read.minutes} min',
+                        onTap: () {
+                          Navigator.of(ctx).pop();
+                          Navigator.of(context).push(MaterialPageRoute<void>(
+                              settings:
+                                  RouteSettings(name: 'pp/read/${read.id}'),
+                              builder: (_) =>
+                                  ReadingReaderScreen(article: read)));
+                        }),
+                  if (activity != null)
+                    _MoreRow(
+                        p: p,
+                        icon: Icons.back_hand_outlined,
+                        hue: 150,
+                        title: activity.title,
+                        sub: 'Activity · ${activity.minutes} min',
+                        onTap: () {
+                          Navigator.of(ctx).pop();
+                          Navigator.of(context).push(MaterialPageRoute<void>(
+                              settings: RouteSettings(
+                                  name: 'pp/activity/${activity.id}'),
+                              builder: (_) => DevelopmentActivityScreen(
+                                  activity: activity)));
+                        }),
+                  _MoreRow(
+                      p: p,
+                      icon: Icons.eco_outlined,
+                      hue: 268,
+                      title: 'Development',
+                      sub: 'Everything for ${change.phase.ageLabel}',
+                      onTap: () {
+                        Navigator.of(ctx).pop();
+                        _openSurface(context, 'pp_development');
+                      }),
+                  const SizedBox(height: 14),
+                  Text(
+                      'General guidance for this age. Your paediatrician knows '
+                      'your child; nothing here replaces that.',
+                      style: pvManrope(
+                          fontSize: 12, height: 1.5, color: p.ink3)),
+                ],
+              ),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
+
   void _openSurface(BuildContext context, String surfaceId) {
     final screen = ppScreenForSurface(surfaceId);
     if (screen == null) return;
@@ -1001,7 +1462,13 @@ class _Sheet extends StatelessWidget {
 
 class _Head extends StatelessWidget {
   const _Head(
-      {required this.eyebrow, required this.title, required this.p, this.note});
+      {required this.eyebrow,
+      required this.title,
+      required this.p,
+      // `note` carried "Prices shown" on the old products head, now commented
+      // out. Kept for revert.
+      // ignore: unused_element_parameter
+      this.note});
 
   final String eyebrow;
   final String title;
@@ -1041,6 +1508,9 @@ class _Head extends StatelessWidget {
       );
 }
 
+// The single "One thing to try" card. Superseded by _TodayActivityCard
+// (three a day, with Done and Change). Kept for revert.
+// ignore: unused_element
 class _ActivityCard extends StatelessWidget {
   const _ActivityCard(
       {required this.activity, required this.p, required this.onTap});
@@ -1089,6 +1559,8 @@ class _ActivityCard extends StatelessWidget {
       );
 }
 
+// The 74dp-cover row form. Superseded by the _ReadRail cards. Kept for revert.
+// ignore: unused_element
 class _ReadRow extends StatelessWidget {
   const _ReadRow({required this.article, required this.p, required this.onTap});
 
@@ -1163,6 +1635,10 @@ class _ReadRow extends StatelessWidget {
       );
 }
 
+// The "Watch" section's card, with title and why inside it. Superseded by
+// _PhaseVideoCard, which sits at the top of "This phase explained" with its
+// caption under it. Kept for revert.
+// ignore: unused_element
 class _VideoCard extends StatelessWidget {
   const _VideoCard({required this.video, required this.p, required this.onTap});
 
@@ -1273,17 +1749,25 @@ double _productHue(String category) => switch (category) {
       _ => 268,
     };
 
+/// The design's product card: an image well, the name, a one-line why-now,
+/// the price and a chevron. Age-relevant, honest — a card may say "you do not
+/// need this yet" — and it opens THAT product, never the shop's front page.
+///
+/// The image well still draws the category MARK rather than a photograph, for
+/// the reason the commented rail below gives at length: `PpProduct.imageUrl`
+/// is empty across the catalogue, and a wrong photograph is worse than a
+/// colour. `PpProductImage` takes over the day the catalogue has pictures.
 class _ProductRail extends StatelessWidget {
   const _ProductRail(
       {required this.items, required this.p, required this.onOpen});
 
   final List<PpProduct> items;
   final V2Palette p;
-  final VoidCallback onOpen;
+  final ValueChanged<PpProduct> onOpen;
 
   @override
   Widget build(BuildContext context) => SizedBox(
-        height: 172,
+        height: 236,
         child: ListView.separated(
           scrollDirection: Axis.horizontal,
           padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -1291,80 +1775,171 @@ class _ProductRail extends StatelessWidget {
           separatorBuilder: (_, _) => const SizedBox(width: 12),
           itemBuilder: (context, i) {
             final it = items[i];
+            final why = it.bestFor.isNotEmpty ? it.bestFor : it.summary;
             return SizedBox(
-              width: 132,
+              width: 158,
               child: InkWell(
-                onTap: onOpen,
-                borderRadius: BorderRadius.circular(16),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      // ⚠️ A DRAWN CATEGORY MARK, NOT A STOCK PHOTOGRAPH — and
-                      // this is the one place where parenting deliberately does
-                      // NOT copy pregnancy.
-                      //
-                      // Pregnancy shows photographs because `Product.imageUrl`
-                      // exists and carries 24 hand-picked ones. `PpProduct` has
-                      // no image field at all, so matching pregnancy would mean
-                      // inventing a per-CATEGORY photo bank — and of the six
-                      // parenting categories only about half have an honest
-                      // match in the images we already own. "On the move" and
-                      // "Health & safety" would get something calm and
-                      // unrelated, which is the failure product_data.dart names
-                      // outright: a wrong photograph is worse than a colour,
-                      // because a photograph is read as THIS product.
-                      //
-                      // The marks are the better answer rather than the
-                      // fallback: they are ours, they are right by
-                      // construction, they need no network, and they are the
-                      // language the eleven doors above already speak. The well
-                      // was bland because it was EMPTY, not because it lacked a
-                      // photograph.
-                      //
-                      // Real product photography replaces this the day the
-                      // catalogue has it — that is a data gap, and it belongs to
-                      // whoever owns the catalogue.
-                      Container(
-                        height: 108,
-                        width: double.infinity,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: v2BlockTint(_productHue(it.category), p),
-                          borderRadius: BorderRadius.circular(16),
+                onTap: () => onOpen(it),
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: p.surface,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: p.line),
+                  ),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          height: 96,
+                          width: double.infinity,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: v2BlockTint(_productHue(it.category), p),
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                          child: switch (_productMark(it.category)) {
+                            final BracketMark m => SizedBox(
+                                width: 46,
+                                height: 46,
+                                child: V3BracketArt(
+                                    mark: m,
+                                    tint: v2BlockTint(
+                                        _productHue(it.category), p))),
+                            null => const SizedBox.shrink(),
+                          },
                         ),
-                        child: switch (_productMark(it.category)) {
-                          final BracketMark m => SizedBox(
-                              width: 52,
-                              height: 52,
-                              child: V3BracketArt(
-                                  mark: m,
-                                  tint: v2BlockTint(
-                                      _productHue(it.category), p))),
-                          null => const SizedBox.shrink(),
-                        },
-                      ),
-                      const SizedBox(height: 8),
-                      Text(it.name,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: pvJakarta(
-                              fontSize: 12.5,
-                              fontWeight: FontWeight.w600,
-                              height: 1.25,
-                              color: p.ink1)),
-                      const SizedBox(height: 3),
-                      Text('₹${it.price}',
-                          style: pvManrope(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: p.ink2)),
-                    ]),
+                        const SizedBox(height: 10),
+                        Text(it.name,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: pvManrope(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w600,
+                                height: 1.3,
+                                color: p.ink1)),
+                        const SizedBox(height: 4),
+                        Text(why,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: pvManrope(
+                                fontSize: 12.5, height: 1.35, color: p.ink2)),
+                        const Spacer(),
+                        Row(children: [
+                          Expanded(
+                            child: Text('₹${it.price}',
+                                style: pvManrope(
+                                    fontSize: 13.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: p.ink1)),
+                          ),
+                          Icon(Icons.chevron_right_rounded,
+                              size: 18, color: p.ink3),
+                        ]),
+                      ]),
+                ),
               ),
             );
           },
         ),
       );
 }
+
+// The rail this replaces — 132dp cards with no why-line, opening the shop's
+// front page rather than the product. Kept for revert:
+// class _ProductRail extends StatelessWidget {
+//   const _ProductRail(
+//       {required this.items, required this.p, required this.onOpen});
+//
+//   final List<PpProduct> items;
+//   final V2Palette p;
+//   final VoidCallback onOpen;
+//
+//   @override
+//   Widget build(BuildContext context) => SizedBox(
+//         height: 172,
+//         child: ListView.separated(
+//           scrollDirection: Axis.horizontal,
+//           padding: const EdgeInsets.symmetric(horizontal: 18),
+//           itemCount: items.length,
+//           separatorBuilder: (_, _) => const SizedBox(width: 12),
+//           itemBuilder: (context, i) {
+//             final it = items[i];
+//             return SizedBox(
+//               width: 132,
+//               child: InkWell(
+//                 onTap: onOpen,
+//                 borderRadius: BorderRadius.circular(16),
+//                 child: Column(
+//                     crossAxisAlignment: CrossAxisAlignment.start,
+//                     children: [
+//                       // ⚠️ A DRAWN CATEGORY MARK, NOT A STOCK PHOTOGRAPH — and
+//                       // this is the one place where parenting deliberately does
+//                       // NOT copy pregnancy.
+//                       //
+//                       // Pregnancy shows photographs because `Product.imageUrl`
+//                       // exists and carries 24 hand-picked ones. `PpProduct` has
+//                       // no image field at all, so matching pregnancy would mean
+//                       // inventing a per-CATEGORY photo bank — and of the six
+//                       // parenting categories only about half have an honest
+//                       // match in the images we already own. "On the move" and
+//                       // "Health & safety" would get something calm and
+//                       // unrelated, which is the failure product_data.dart names
+//                       // outright: a wrong photograph is worse than a colour,
+//                       // because a photograph is read as THIS product.
+//                       //
+//                       // The marks are the better answer rather than the
+//                       // fallback: they are ours, they are right by
+//                       // construction, they need no network, and they are the
+//                       // language the eleven doors above already speak. The well
+//                       // was bland because it was EMPTY, not because it lacked a
+//                       // photograph.
+//                       //
+//                       // Real product photography replaces this the day the
+//                       // catalogue has it — that is a data gap, and it belongs to
+//                       // whoever owns the catalogue.
+//                       Container(
+//                         height: 108,
+//                         width: double.infinity,
+//                         alignment: Alignment.center,
+//                         decoration: BoxDecoration(
+//                           color: v2BlockTint(_productHue(it.category), p),
+//                           borderRadius: BorderRadius.circular(16),
+//                         ),
+//                         child: switch (_productMark(it.category)) {
+//                           final BracketMark m => SizedBox(
+//                               width: 52,
+//                               height: 52,
+//                               child: V3BracketArt(
+//                                   mark: m,
+//                                   tint: v2BlockTint(
+//                                       _productHue(it.category), p))),
+//                           null => const SizedBox.shrink(),
+//                         },
+//                       ),
+//                       const SizedBox(height: 8),
+//                       Text(it.name,
+//                           maxLines: 2,
+//                           overflow: TextOverflow.ellipsis,
+//                           style: pvJakarta(
+//                               fontSize: 12.5,
+//                               fontWeight: FontWeight.w600,
+//                               height: 1.25,
+//                               color: p.ink1)),
+//                       const SizedBox(height: 3),
+//                       Text('₹${it.price}',
+//                           style: pvManrope(
+//                               fontSize: 12,
+//                               fontWeight: FontWeight.w700,
+//                               color: p.ink2)),
+//                     ]),
+//               ),
+//             );
+//           },
+//         ),
+//       );
+// }
 
 // -----------------------------------------------------------------------------
 //  The spine sections — not brackets, and deliberately so
@@ -1376,6 +1951,11 @@ class _ProductRail extends StatelessWidget {
 /// at — never a bar, a percentage, or a position against other children. The
 /// Development door goes deeper on all four; this exists so she can see them
 /// without leaving home, which is what V1 does and the first cut of V3 dropped.
+// ⚠️ SUPERSEDED 2026-09-16 by _ChangeCard + pp_home_changes.dart. The rows
+// here read `DevArea.word`, which is fixed at roughly a four-month-old and
+// does not move with the child — the exact opposite of "only what is changing
+// at this age". Kept for revert.
+// ignore: unused_element
 class _Snapshot extends StatelessWidget {
   const _Snapshot({required this.p, required this.onTap});
 
@@ -1810,4 +2390,725 @@ class _AheadCard extends StatelessWidget {
       ),
     );
   }
+}
+
+// -----------------------------------------------------------------------------
+//  The 2026-09-16 design's pieces
+// -----------------------------------------------------------------------------
+
+/// A small format chip: "BRAIN", "ARTICLE · 4 MIN", "SWAPPED".
+class _Chip extends StatelessWidget {
+  const _Chip({required this.label, required this.p, this.hue, this.icon});
+
+  final String label;
+  final V2Palette p;
+
+  /// Tinted on the pastel wheel when given; the quiet surfaceAlt otherwise.
+  final double? hue;
+  final IconData? icon;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+        decoration: BoxDecoration(
+          color: hue == null ? p.surfaceAlt : v2BlockTint(hue!, p),
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          if (icon != null) ...[
+            Icon(icon, size: 11, color: hue == null ? p.ink3 : p.ink1),
+            const SizedBox(width: 5),
+          ],
+          Text(label.toUpperCase(),
+              style: pvManrope(
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.1,
+                  color: hue == null ? p.ink3 : p.ink1)),
+        ]),
+      );
+}
+
+/// The 16:9 video card at the top of "This phase explained" and of the
+/// change sheet: a tinted cover, a play button, a duration chip, and the
+/// title as a caption UNDER the card rather than inside it.
+class _PhaseVideoCard extends StatelessWidget {
+  const _PhaseVideoCard(
+      {required this.video, required this.p, required this.onTap, this.hue});
+
+  final WatchVideo video;
+  final V2Palette p;
+  final VoidCallback onTap;
+  final double? hue;
+
+  @override
+  Widget build(BuildContext context) {
+    final tint = v2BlockTint(hue ?? 273, p);
+    final deep = HSLColor.fromColor(tint).withLightness(0.72).toColor();
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          clipBehavior: Clip.antiAlias,
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: p.line),
+          ),
+          child: AspectRatio(
+            aspectRatio: 16 / 9,
+            child: Stack(fit: StackFit.expand, children: [
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: RadialGradient(
+                    center: const Alignment(-0.7, -0.85),
+                    radius: 1.5,
+                    colors: [tint, deep],
+                  ),
+                ),
+              ),
+              Center(
+                child: Container(
+                  width: 54,
+                  height: 54,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.94),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.18),
+                          blurRadius: 14,
+                          offset: const Offset(0, 4)),
+                    ],
+                  ),
+                  child: Icon(Icons.play_arrow_rounded,
+                      size: 30, color: p.action),
+                ),
+              ),
+              Positioned(
+                right: 10,
+                bottom: 10,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+                  decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.58),
+                      borderRadius: BorderRadius.circular(999)),
+                  child: Text('${(video.seconds / 60).ceil()} MIN',
+                      style: pvManrope(
+                          fontSize: 9.5,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.1,
+                          color: Colors.white)),
+                ),
+              ),
+            ]),
+          ),
+        ),
+      ),
+      const SizedBox(height: 10),
+      Text(video.title,
+          maxLines: 2,
+          overflow: TextOverflow.ellipsis,
+          style: pvManrope(fontSize: 13, height: 1.45, color: p.ink3)),
+    ]);
+  }
+}
+
+class _Resource {
+  const _Resource(
+      {required this.label,
+      required this.hue,
+      required this.icon,
+      required this.onTap});
+  final String label;
+  final double hue;
+  final IconData icon;
+  final VoidCallback onTap;
+}
+
+/// The row of further resources under the phase text: compact cards, a
+/// tinted mark, a label and a chevron. Every card opens something real.
+class _ResourceRail extends StatelessWidget {
+  const _ResourceRail({required this.p, required this.items});
+
+  final V2Palette p;
+  final List<_Resource> items;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+        height: 96,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 18),
+          itemCount: items.length,
+          separatorBuilder: (_, _) => const SizedBox(width: 10),
+          itemBuilder: (context, i) {
+            final it = items[i];
+            return SizedBox(
+              width: 170,
+              child: InkWell(
+                onTap: it.onTap,
+                borderRadius: BorderRadius.circular(18),
+                child: Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: p.surface,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(color: p.line),
+                  ),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 32,
+                          height: 32,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: v2BlockTint(it.hue, p),
+                            borderRadius: BorderRadius.circular(11),
+                          ),
+                          child: Icon(it.icon, size: 18, color: p.ink2),
+                        ),
+                        const Spacer(),
+                        Row(children: [
+                          Expanded(
+                            child: Text(it.label,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: pvManrope(
+                                    fontSize: 13.5,
+                                    fontWeight: FontWeight.w600,
+                                    height: 1.3,
+                                    color: p.ink1)),
+                          ),
+                          Icon(Icons.chevron_right_rounded,
+                              size: 18, color: p.ink3),
+                        ]),
+                      ]),
+                ),
+              ),
+            );
+          },
+        ),
+      );
+}
+
+/// One "How {name} is doing" card: category chip, the change, one line, and
+/// "See what changes ›". Tapping opens the video → text → more sheet.
+class _ChangeCard extends StatelessWidget {
+  const _ChangeCard(
+      {required this.change, required this.p, required this.onTap});
+
+  final PhaseChange change;
+  final V2Palette p;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
+          decoration: BoxDecoration(
+            color: p.surface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: p.line),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            _Chip(label: change.category, hue: change.hue, p: p),
+            const SizedBox(height: 10),
+            Text(change.title,
+                style: pvFraunces(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    height: 1.25,
+                    letterSpacing: -0.4,
+                    color: p.ink1)),
+            const SizedBox(height: 6),
+            Text(change.notice,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
+            const SizedBox(height: 12),
+            Row(children: [
+              Text('See what changes',
+                  style: pvManrope(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                      color: p.action)),
+              const SizedBox(width: 4),
+              Icon(Icons.chevron_right_rounded, size: 17, color: p.action),
+            ]),
+          ]),
+        ),
+      );
+}
+
+/// A row in the change sheet's "More on this" list.
+class _MoreRow extends StatelessWidget {
+  const _MoreRow(
+      {required this.p,
+      required this.icon,
+      required this.hue,
+      required this.title,
+      required this.sub,
+      required this.onTap});
+
+  final V2Palette p;
+  final IconData icon;
+  final double hue;
+  final String title;
+  final String sub;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(18),
+          child: Container(
+            padding: const EdgeInsets.all(14),
+            decoration: BoxDecoration(
+              color: p.surface,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: p.line),
+            ),
+            child: Row(children: [
+              Container(
+                width: 36,
+                height: 36,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: v2BlockTint(hue, p),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, size: 19, color: p.ink2),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: pvManrope(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w600,
+                              height: 1.3,
+                              color: p.ink1)),
+                      const SizedBox(height: 3),
+                      Text(sub,
+                          style: pvManrope(
+                              fontSize: 13, height: 1.3, color: p.ink3)),
+                    ]),
+              ),
+              Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
+            ]),
+          ),
+        ),
+      );
+}
+
+/// An empty section's invitation. A feature is never hidden; only the copy
+/// changes.
+class _EmptyInvite extends StatelessWidget {
+  const _EmptyInvite(
+      {required this.p,
+      required this.line,
+      required this.cta,
+      required this.onTap});
+
+  final V2Palette p;
+  final String line;
+  final String cta;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
+          decoration: BoxDecoration(
+            color: p.surface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: p.line),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(line,
+                style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
+            const SizedBox(height: 10),
+            Row(children: [
+              Text(cta,
+                  style: pvManrope(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                      color: p.action)),
+              const SizedBox(width: 4),
+              Icon(Icons.chevron_right_rounded, size: 17, color: p.action),
+            ]),
+          ]),
+        ),
+      );
+}
+
+/// One of today's three activities.
+///
+/// Three states, per the brief: to do (a "Done" pill and a quiet "Change"),
+/// done (dimmed, a filled tick, "Done today", stays until tomorrow), and just
+/// swapped in (a small "Swapped" chip beside the title). No counter anywhere.
+class _TodayActivityCard extends StatelessWidget {
+  const _TodayActivityCard({
+    required this.activity,
+    required this.p,
+    required this.done,
+    required this.swapped,
+    required this.onDone,
+    required this.onChange,
+    required this.onOpen,
+  });
+
+  final DevActivity activity;
+  final V2Palette p;
+  final bool done;
+  final bool swapped;
+  final VoidCallback onDone;
+  final VoidCallback onChange;
+  final VoidCallback onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final area = devAreaById(activity.areaId);
+    final hue = HSLColor.fromColor(area.accent).hue;
+    return AnimatedOpacity(
+      duration: const Duration(milliseconds: 200),
+      opacity: done ? 0.58 : 1,
+      child: Container(
+        padding: const EdgeInsets.all(18),
+        decoration: BoxDecoration(
+          color: p.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: p.line),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          InkWell(
+            onTap: onOpen,
+            borderRadius: BorderRadius.circular(12),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Container(
+                width: 40,
+                height: 40,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: v2BlockTint(hue, p),
+                  borderRadius: BorderRadius.circular(13),
+                ),
+                child: switch (devMarkFor(area.id)) {
+                  final DevMark m =>
+                    V3DevMark(mark: m, accent: area.accent, size: 22),
+                  null => Icon(area.icon, size: 19, color: p.ink2),
+                },
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Wrap(
+                          crossAxisAlignment: WrapCrossAlignment.center,
+                          spacing: 8,
+                          runSpacing: 4,
+                          children: [
+                            Text(activity.title,
+                                style: pvFraunces(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w600,
+                                    height: 1.25,
+                                    letterSpacing: -0.4,
+                                    color: p.ink1)),
+                            if (swapped)
+                              _Chip(
+                                  label: 'Swapped',
+                                  icon: Icons.refresh_rounded,
+                                  p: p),
+                          ]),
+                      const SizedBox(height: 5),
+                      Text(activity.benefit,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: pvManrope(
+                              fontSize: 13.5, height: 1.5, color: p.ink2)),
+                      const SizedBox(height: 8),
+                      Text('${activity.minutes} min  ·  ${activity.ageTag}',
+                          style: pvManrope(fontSize: 13, color: p.ink3)),
+                    ]),
+              ),
+            ]),
+          ),
+          const SizedBox(height: 14),
+          if (done)
+            Container(
+              height: 38,
+              padding: const EdgeInsets.fromLTRB(12, 0, 16, 0),
+              decoration: BoxDecoration(
+                color: p.surfaceAlt,
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Container(
+                  width: 20,
+                  height: 20,
+                  alignment: Alignment.center,
+                  decoration: const BoxDecoration(
+                      color: Color(0xFF2E9E6B), shape: BoxShape.circle),
+                  child: const Icon(Icons.check_rounded,
+                      size: 13, color: Colors.white),
+                ),
+                const SizedBox(width: 8),
+                Text('Done today',
+                    style: pvManrope(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: p.ink2)),
+              ]),
+            )
+          else
+            Row(children: [
+              InkWell(
+                onTap: onDone,
+                borderRadius: BorderRadius.circular(999),
+                child: Container(
+                  height: 38,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: p.line, width: 1.2),
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Icon(Icons.check_rounded, size: 16, color: p.ink1),
+                    const SizedBox(width: 7),
+                    Text('Done',
+                        style: pvManrope(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: p.ink1)),
+                  ]),
+                ),
+              ),
+              const SizedBox(width: 10),
+              InkWell(
+                onTap: onChange,
+                borderRadius: BorderRadius.circular(999),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Icon(Icons.refresh_rounded, size: 16, color: p.ink2),
+                    const SizedBox(width: 7),
+                    Text('Change',
+                        style: pvManrope(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: p.ink2)),
+                  ]),
+                ),
+              ),
+            ]),
+        ]),
+      ),
+    );
+  }
+}
+
+/// The reads rail: a cover band, a format chip, the title, one line.
+class _ReadRail extends StatelessWidget {
+  const _ReadRail({required this.items, required this.p, required this.onOpen});
+
+  final List<ReadArticle> items;
+  final V2Palette p;
+  final ValueChanged<ReadArticle> onOpen;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+        height: 212,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 18),
+          itemCount: items.length,
+          separatorBuilder: (_, _) => const SizedBox(width: 12),
+          itemBuilder: (context, i) {
+            final r = items[i];
+            final url = v2PpReadCover(r.collection);
+            return SizedBox(
+              width: 216,
+              child: InkWell(
+                onTap: () => onOpen(r),
+                borderRadius: BorderRadius.circular(20),
+                child: Container(
+                  clipBehavior: Clip.antiAlias,
+                  decoration: BoxDecoration(
+                    color: p.surface,
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(color: p.line),
+                  ),
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // The tint is the ground and the photograph sits on
+                        // it, so a missing image degrades to a colour band
+                        // rather than to a hole.
+                        SizedBox(
+                          height: 84,
+                          width: double.infinity,
+                          child: ColoredBox(
+                            color: v2CoverTint(r.id, p),
+                            child: url == null
+                                ? null
+                                : Image.network(url,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (_, _, _) =>
+                                        const SizedBox.shrink()),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(14),
+                          child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                _Chip(
+                                    label: 'Article · ${r.minutes} min',
+                                    p: p),
+                                const SizedBox(height: 9),
+                                Text(r.title,
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: pvFraunces(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.w600,
+                                        height: 1.25,
+                                        letterSpacing: -0.3,
+                                        color: p.ink1)),
+                                const SizedBox(height: 5),
+                                Text(r.teaser,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: pvManrope(
+                                        fontSize: 12.5,
+                                        height: 1.4,
+                                        color: p.ink2)),
+                              ]),
+                        ),
+                      ]),
+                ),
+              ),
+            );
+          },
+        ),
+      );
+}
+
+/// "Record a memory for your child today": a photo square on the left, a
+/// prompt and four entry chips on the right, "Open the journal ›" under it.
+class _JournalInvite extends StatelessWidget {
+  const _JournalInvite({
+    required this.p,
+    required this.onPhoto,
+    required this.onMilestone,
+    required this.onThought,
+    required this.onMoment,
+    required this.onOpenAll,
+  });
+
+  final V2Palette p;
+  final VoidCallback onPhoto;
+  final VoidCallback onMilestone;
+  final VoidCallback onThought;
+  final VoidCallback onMoment;
+  final VoidCallback onOpenAll;
+
+  Widget _chip(String label, VoidCallback onTap) => InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(999),
+        child: Container(
+          height: 28,
+          padding: const EdgeInsets.symmetric(horizontal: 11),
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            border: Border.all(color: p.line, width: 1.2),
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Text(label,
+              style: pvManrope(
+                  fontSize: 12, fontWeight: FontWeight.w700, color: p.ink2)),
+        ),
+      );
+
+  @override
+  Widget build(BuildContext context) =>
+      Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: p.surface,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: p.line),
+          ),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            InkWell(
+              onTap: onPhoto,
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                width: 92,
+                height: 92,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: p.surfaceAlt,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(
+                      color: Colors.black.withValues(alpha: 0.14)),
+                ),
+                child: Icon(Icons.photo_camera_outlined,
+                    size: 26, color: p.ink3),
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                        'A first smile, a milestone, a thought, or just how '
+                        'today felt.',
+                        style: pvManrope(
+                            fontSize: 13.5, height: 1.5, color: p.ink2)),
+                    const SizedBox(height: 10),
+                    Wrap(spacing: 6, runSpacing: 6, children: [
+                      _chip('Photo', onPhoto),
+                      _chip('Milestone', onMilestone),
+                      _chip('Thought', onThought),
+                      _chip('Moment', onMoment),
+                    ]),
+                  ]),
+            ),
+          ]),
+        ),
+        const SizedBox(height: 12),
+        InkWell(
+          onTap: onOpenAll,
+          borderRadius: BorderRadius.circular(8),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Text('Open the journal',
+                style: pvManrope(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: p.action)),
+            const SizedBox(width: 4),
+            Icon(Icons.chevron_right_rounded, size: 17, color: p.action),
+          ]),
+        ),
+      ]);
 }

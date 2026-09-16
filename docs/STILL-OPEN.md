@@ -6908,3 +6908,59 @@ and the keepsake screen invites the grown-up meanwhile. The vocabulary
 scan learned that "points land" is a point made (`cm_68_11`, allow-listed
 by name). Not walked on a phone.
 
+## 57.0 Parenting V3 home, reshaped to the Claude Design — 2026-09-16
+
+The user's seven-point brief became a Claude Design prompt, the design
+(`parenting-homescreen`, "ParentVeda V3 Home") came back, and the screen was
+built to it: `lib/screens/post_pregnancy/pp_home_v3.dart`, with the state in
+`pp_home_activities_store.dart`, the derivation in `pp_home_changes.dart`,
+the More sheet in `pp_more_sheet.dart`, and the bar in `pp_common.dart`.
+Not walked on a phone yet.
+
+### 57.1 The calls
+
+- **What to buy is the first tile**, reordered at the grid rather than in
+  `kParentingBrackets` — the registry's order is documentary.
+- **Video first** in This phase explained; the separate Watch section is
+  commented out, its video moved up. Three resource cards under the text:
+  What changes next (phase map), Something changed? (What Changed library),
+  When to call the doctor (Baby OK check).
+- **How {name} is doing shows only what is changing**: one card per domain
+  with an AAP milestone this phase, from `AgePhase.milestones`. Not
+  `kDevAreas`, whose words are fixed at a four-month-old. Tap → sheet: video,
+  text, more.
+- **Three activities a day**, Done stays, Change swaps at once, the sent-away
+  one sits out fourteen days, tomorrow is fresh. `PpHomeActivitiesStore`
+  writes completions THROUGH to `GrowStore` so the Brain tab agrees.
+- **Read / Recommended / My journal** renamed to the brief's words; reads and
+  products age-ranked with the rest filling to three and six.
+- **Bar**: Home · Products · Tools · Brain activities · More, app-wide (the
+  bar is one component on eight screens, so it cannot be V3-only). `PpTab`
+  enum; `openPpTab(int)` kept as an adapter with the OLD positions' meaning
+  so no caller was silently re-routed.
+- **More** is a sheet: Community first, then the design's six, then every
+  remaining Explore drawer row, from ONE list (`ppExploreEntries`).
+
+### 57.2 Assumptions made without asking — say if wrong
+
+1. **"Asked a lot" and "Looking ahead" stay** under My journal. Neither the
+   brief nor the design mentions them; a section is not removed on
+   inference. One line each to comment out.
+2. **Side gutter stays 18dp**, the V3 family's, not the design's 24 — the
+   pregnancy and TTC V3 homes use 18 and the three must read as one app.
+3. **Settings → Family profile.** There is no parenting settings screen; the
+   pregnancy `ProfileScreen` needs a `PregnancyController`.
+4. **The "Current" (V1) home also gets the new bar** — same component.
+
+### 57.3 Owed
+
+- Walk it on the phone. The two-line "Brain activities" label at 9.5px on a
+  small handset is the thing to look at first.
+- The change-sheet video is the domain's first catalogue video, not one
+  made for the milestone; the phase video is the fallback. Real per-change
+  videos are content, not code.
+- `PpHomeActivitiesStore` is local only. If picks must follow her to a new
+  phone, `CloudSyncedStore` + a table, as GrowStore does.
+- The Ask Veda FAB position is unchanged; the design shows it above the bar
+  on the right, which is where `global_ask_fab.dart` already puts it.
+

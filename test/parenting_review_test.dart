@@ -115,9 +115,14 @@ void main() {
   //  Navigation
   // ==========================================================================
   group('bottom nav — Brain replaces Ask Veda', () {
-    test('tab 1 opens Brain Development', () {
+    test('the Brain tab opens Brain Development', () {
       expect(nav.contains('const GrowHomeScreen()'), isTrue);
-      expect(nav.contains("(Icons.emoji_objects_rounded, 'Brain')"), isTrue);
+      // The v2 label was 'Brain'; the 2026-09-16 V3 home design renamed the
+      // tab "Brain activities" (two lines) and moved it to fourth. The v2
+      // tuple is kept commented in pp_common.dart.
+      expect(nav.contains(r"(PpTab.brain, Icons.psychology_outlined, 'Brain\nactivities')"), isTrue);
+      expect(navRaw.contains("//   (Icons.emoji_objects_rounded, 'Brain'),"), isTrue,
+          reason: 'the v2 tab set is kept for revert');
     });
 
     test('Ask Veda is out of the tabs but not out of the app', () {

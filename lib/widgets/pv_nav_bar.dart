@@ -44,6 +44,14 @@
 //
 //  4. Two changes mark the active tab — colour AND weight — never one.
 //  5. Labels never hide, never wrap, and never go below 11px.
+//     ⚠️ ONE EXCEPTION, 2026-09-16: a label the AUTHOR breaks with a newline is
+//     drawn on two lines at 9.5px. The rule was against the LAYOUT deciding
+//     where a word breaks — a five-tab bar that wraps differently at every text
+//     scale never sits still. A break placed by hand is stable, so it keeps
+//     the guarantee the rule exists for. It was needed for the parenting bar's
+//     "Brain activities" (the review asked for that exact wording), which at
+//     11px is ~96dp wide on a ~69dp tab — an ellipsis would have shown "Brain
+//     acti…", which is worse than two small lines.
 //  6. The bar floats on a tinted shadow, so it is distinct from the page
 //     without a hard border.
 // =============================================================================
@@ -116,6 +124,9 @@ class PvNavBar extends StatelessWidget {
     final active = i == activeIndex;
     final it = items[i];
     final ink = active ? on : off;
+    // See rule 5 above: only an explicit newline gets two lines.
+    final twoLine = it.label.contains('\n');
+    final size = twoLine ? 9.5 : 11.0;
 
     // ⚠️ EVERY TAB IS `Expanded`, so the row shares its width evenly and cannot
     // overflow however large the user's text scale is. A five-tab bar that
@@ -126,7 +137,11 @@ class PvNavBar extends StatelessWidget {
         onTap: () => activeIndex == i ? null : onTap(i),
         behavior: HitTestBehavior.opaque,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 2),
+          // A two-line label is drawn 9.5px + 9.5px ≈ the height of one 11px
+          // line plus ~5dp; the top padding gives that back so the ICON of a
+          // two-line tab still sits level with its neighbours. Nothing moves
+          // between tabs, which is rule 1.
+          padding: EdgeInsets.fromLTRB(0, 2, 0, twoLine ? 0 : 2),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -143,18 +158,20 @@ class PvNavBar extends StatelessWidget {
               AnimatedDefaultTextStyle(
                 duration: const Duration(milliseconds: 180),
                 curve: Curves.easeOut,
-                style: labelStyle != null
-                    ? labelStyle!(11,
-                        color: ink,
-                        w: active ? FontWeight.w800 : FontWeight.w600)
-                    : pvManrope(
-                        fontSize: 11,
-                        color: ink,
-                        fontWeight: active ? FontWeight.w800 : FontWeight.w600,
-                      ),
+                style: (labelStyle != null
+                        ? labelStyle!(size,
+                            color: ink,
+                            w: active ? FontWeight.w800 : FontWeight.w600)
+                        : pvManrope(
+                            fontSize: size,
+                            color: ink,
+                            fontWeight:
+                                active ? FontWeight.w800 : FontWeight.w600,
+                          ))
+                    .copyWith(height: twoLine ? 1.15 : null),
                 child: Text(
                   it.label,
-                  maxLines: 1,
+                  maxLines: twoLine ? 2 : 1,
                   overflow: TextOverflow.ellipsis,
                   textAlign: TextAlign.center,
                 ),
