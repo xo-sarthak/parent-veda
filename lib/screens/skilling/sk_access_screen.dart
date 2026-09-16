@@ -79,7 +79,7 @@ class _SkAccessScreenState extends State<SkAccessScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 48),
           children: [
-            skBack(context, p),
+            Row(children: [skBack(context, p)]),
             const SizedBox(height: 18),
             Text((bracketById(widget.doorId)?.title.now ?? widget.doorId).toUpperCase(),
                 style: pvManrope(

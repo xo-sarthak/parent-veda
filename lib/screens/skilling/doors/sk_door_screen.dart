@@ -629,11 +629,15 @@ class _Hero extends StatelessWidget {
                   child: InkWell(
                     onTap: () => Navigator.of(context).maybePop(),
                     child: SizedBox(
-                        // The child tap size, not the parenting 38.
-                        width: kSkTap,
-                        height: kSkTap,
+                        // The parenting hero's 38, NOT the child tap size.
+                        // At 56 it sat over the face in Communication's
+                        // photograph (seen on a phone, 2026-09-15); the
+                        // hero is where a parent taps too, and the child
+                        // sizes belong to the content screens.
+                        width: 38,
+                        height: 38,
                         child: Icon(Icons.arrow_back_rounded,
-                            size: 22, color: p.ink1)),
+                            size: 19, color: p.ink1)),
                   ),
                 ),
               ),

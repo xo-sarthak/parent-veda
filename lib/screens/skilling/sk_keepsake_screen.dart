@@ -49,7 +49,7 @@ class SkKeepsakeScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 48),
           children: [
-            skBack(context, p),
+            Row(children: [skBack(context, p)]),
             const SizedBox(height: 18),
             if (doorTitle.isNotEmpty)
               Text(doorTitle.toUpperCase(),
@@ -61,7 +61,7 @@ class SkKeepsakeScreen extends StatelessWidget {
             const SizedBox(height: 8),
             Text("What I've made and tried",
                 style: pvFraunces(
-                    fontSize: 30,
+                    fontSize: kSkTitleSize,
                     fontWeight: FontWeight.w600,
                     height: 1.18,
                     color: p.ink1)),

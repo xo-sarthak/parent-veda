@@ -87,7 +87,7 @@ class SkActivityScreen extends StatelessWidget {
             const SizedBox(height: 8),
             Text(a.title,
                 style: pvFraunces(
-                    fontSize: 30,
+                    fontSize: kSkTitleSize,
                     fontWeight: FontWeight.w600,
                     height: 1.18,
                     color: p.ink1)),
@@ -95,7 +95,7 @@ class SkActivityScreen extends StatelessWidget {
               const SizedBox(height: 10),
               Text(a.oneLine,
                   style: pvManrope(
-                      fontSize: 19,
+                      fontSize: kSkLeadSize,
                       fontWeight: FontWeight.w500,
                       height: 1.5,
                       color: p.ink1)),
@@ -126,7 +126,7 @@ class SkActivityScreen extends StatelessWidget {
               const SizedBox(height: 8),
               Text(a.materials,
                   style: pvManrope(
-                      fontSize: 17,
+                      fontSize: kSkBodySize,
                       fontWeight: FontWeight.w500,
                       height: 1.55,
                       color: p.ink2)),
@@ -218,7 +218,7 @@ class SkActivityScreen extends StatelessWidget {
                               ? 'You practised ${skill?.label.toLowerCase() ?? 'a real thinking skill'}. Nice work.'
                               : a.whatYouPractised,
                           style: pvFraunces(
-                              fontSize: 20,
+                              fontSize: kSkHeadingSize - 1,
                               fontWeight: FontWeight.w600,
                               height: 1.3,
                               color: p.ink1)),
@@ -247,7 +247,7 @@ class _Heading extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Text(text,
       style: pvFraunces(
-          fontSize: 21,
+          fontSize: kSkHeadingSize,
           fontWeight: FontWeight.w600,
           height: 1.22,
           color: p.ink1));
@@ -324,7 +324,7 @@ class _WordButton extends StatelessWidget {
               const SizedBox(width: 12),
               Text(label,
                   style: pvManrope(
-                      fontSize: 17,
+                      fontSize: kSkButtonSize,
                       fontWeight: FontWeight.w700,
                       color: p.ink1)),
             ]),

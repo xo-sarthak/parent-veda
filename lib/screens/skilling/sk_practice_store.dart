@@ -188,9 +188,17 @@ class SkPracticeStore extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       final raw = prefs.getString(_key);
       if (raw == null) return;
+      // Merge, never append — the same rule the voice store learned on a
+      // phone. An entry's identity is (door, item, kind, moment).
       for (final j in (jsonDecode(raw) as List)) {
         final e = SkPracticeEntry.fromJson(Map<String, dynamic>.from(j));
-        if (e != null) _entries.add(e);
+        if (e == null) continue;
+        final dup = _entries.any((x) =>
+            x.doorId == e.doorId &&
+            x.itemId == e.itemId &&
+            x.kind == e.kind &&
+            x.at == e.at);
+        if (!dup) _entries.add(e);
       }
     } catch (_) {}
     notifyListeners();

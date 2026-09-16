@@ -7116,3 +7116,14 @@ and fixed in the same pass:
   honest placeholders. Content, not code.
 - **A "Saved" tile** in Use these tools (the design's fourth) — `saved` is
   not in `_ToolsRow._face` today.
+
+### 56.5 Walked on the phone — 2026-09-16
+
+At 12 and at 8, and the recorder end to end (the first real microphone
+use in the stage). Four fixes in the walk commit, listed in the review
+file; the one with a general lesson is the store that appended on load —
+a lazy `load()` into a store that may already hold rows is a merge, and a
+merge needs an identity; both keepsake stores now merge by id. The child
+type sizes moved to one set of constants at a middle setting on the
+user's reaction. The device is released.
+

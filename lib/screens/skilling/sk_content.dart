@@ -392,6 +392,20 @@ class SkReadAloud extends StatelessWidget {
 /// The child-screen tap target. The brief says big; this is the number.
 const double kSkTap = 56;
 
+/// The child-screen type sizes, in one place.
+///
+/// ⚠️ THE "MIDDLE" SETTING, 2026-09-16. Built at 30 / 19 / 17 (the brief's
+/// "text-heavy is a fail state" taken literally) and seen on a 6.4" phone
+/// as oversized rather than child-sized ("absurdly big"). The app's normal
+/// sizes are 26 / 14.5 / 13.5. These sit between: a child page still reads
+/// larger than a parent page, and the 56pt targets are untouched. Change
+/// them here and every child screen moves.
+const double kSkTitleSize = 27;
+const double kSkLeadSize = 17;
+const double kSkBodySize = 16;
+const double kSkHeadingSize = 20;
+const double kSkButtonSize = 16;
+
 /// Renders an `SkPage`. The only place skilling page layout is decided.
 class SkContentPage extends StatelessWidget {
   const SkContentPage({
@@ -431,7 +445,7 @@ class SkContentPage extends StatelessWidget {
             const SizedBox(height: 18),
             Text(page.title,
                 style: pvFraunces(
-                    fontSize: kid ? 30 : 26,
+                    fontSize: kid ? kSkTitleSize : 26,
                     fontWeight: FontWeight.w600,
                     height: 1.18,
                     color: p.ink1)),
@@ -439,7 +453,7 @@ class SkContentPage extends StatelessWidget {
               const SizedBox(height: 8),
               Text(page.subtitle!,
                   style: pvManrope(
-                      fontSize: kid ? 16 : 14.5,
+                      fontSize: kid ? kSkLeadSize - 1 : 14.5,
                       fontWeight: FontWeight.w500,
                       height: 1.55,
                       color: p.ink2)),
@@ -466,13 +480,20 @@ class SkContentPage extends StatelessWidget {
       };
 }
 
-/// The back control, V3's hairline circle — at the child tap size.
+/// The back control, V3's hairline circle.
+///
+/// ⚠️ 44, NOT THE 56 TAP SIZE, AND ALWAYS INSIDE A ROW. At 56 in a bare
+/// `ListView` it stretched to the cross axis and drew centred — "such a
+/// big button at top centre" on a phone (2026-09-16). A back control is a
+/// control the child already knows from every screen; it does not need
+/// the activity buttons' size, and it must sit where every other back
+/// sits. Callers wrap it in a `Row` so the list cannot centre it.
 Widget skBack(BuildContext context, V2Palette p) => GestureDetector(
       onTap: () => Navigator.of(context).maybePop(),
       behavior: HitTestBehavior.opaque,
       child: Container(
-        width: kSkTap,
-        height: kSkTap,
+        width: 44,
+        height: 44,
         alignment: Alignment.center,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
@@ -513,8 +534,8 @@ class SkBlockView extends StatelessWidget {
 
   // Kid-voice sizes are the brief's answer to "text-heavy is a fail state":
   // body 17 on a child page, 14.5 on a parent one.
-  double get _body => kidVoice ? 17 : 14.5;
-  double get _lead => kidVoice ? 19 : 16;
+  double get _body => kidVoice ? kSkBodySize : 14.5;
+  double get _lead => kidVoice ? kSkLeadSize : 16;
 
   Widget _intro(SkIntro b, V2Palette p) => Text(b.text,
       style: pvManrope(
@@ -529,7 +550,7 @@ class SkBlockView extends StatelessWidget {
           padding: const EdgeInsets.only(bottom: 12),
           child: Text(t,
               style: pvFraunces(
-                  fontSize: kidVoice ? 21 : 19,
+                  fontSize: kidVoice ? kSkHeadingSize : 19,
                   fontWeight: FontWeight.w600,
                   height: 1.22,
                   color: p.ink1)),
@@ -720,7 +741,7 @@ Widget skStepRow(int i, String title, String? detail, V2Palette p,
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(title,
               style: pvManrope(
-                  fontSize: kidVoice ? 17 : 14.5,
+                  fontSize: kidVoice ? kSkBodySize : 14.5,
                   fontWeight: FontWeight.w700,
                   height: 1.4,
                   color: p.ink1)),
@@ -728,7 +749,7 @@ Widget skStepRow(int i, String title, String? detail, V2Palette p,
             const SizedBox(height: 3),
             Text(detail,
                 style: pvManrope(
-                    fontSize: kidVoice ? 15 : 13.5,
+                    fontSize: kidVoice ? kSkBodySize - 1 : 13.5,
                     fontWeight: FontWeight.w500,
                     height: 1.55,
                     color: p.ink2)),

@@ -22,7 +22,7 @@ buy are stub sheets; the door stays behind `kDebugMode`; the preview ships.
 | Tile | Brief | Shape | Tasks (fills) | Commit | Walked on a phone | Contract |
 |---|---|---|---|---|---|---|
 | Coding | `ParentVeda_Coding_structure_v2.pdf` | door, 5 tabs + the shell | **3 of 3 filled** (36 activities) | 5f963a7 (door), 87dcd62 (fills + walk) | **yes** — 2026-09-14, at 8, 5 and 12 | `sk_coding_door_test` |
-| Communication | `ParentVeda_Communication_structure.pdf` | door, 5 tabs (three band cards) | **2 of 3 filled** (6–8, 8–11); 11–14 not written | a86c5bf (frame), fill commit next | no | `sk_communication_door_test` |
+| Communication | `ParentVeda_Communication_structure.pdf` | door, 5 tabs (three band cards) | **2 of 3 filled** (6–8, 8–11); 11–14 not written | a86c5bf (frame), 0fa1193 (fills), walk commit next | **yes** — 2026-09-16, at 12 and 8, recorder end to end | `sk_communication_door_test` |
 | Confidence | `ParentVeda_Confidence_structure.pdf` | plan sheet | 3 of 3 exist | — | — | — |
 | Creativity | `ParentVeda_Creativity_structure.pdf` | plan sheet | none yet | — | — | — |
 | Feelings | `ParentVeda_Feelings_structure.pdf` | plan sheet | none yet | — | — | — |
@@ -135,6 +135,25 @@ Frame only; the two task PDFs (6–8, 8–11) fill it next.
 - [ ] While recording is off, Your voice, saved shows "Recording is off. A
       grown-up can turn it on…" instead of a record button. Right, or hide
       the card until it is on?
+- [x] **Walked on the phone, 2026-09-16** at 12 (three cards, two dropped)
+      and 8 (Tell it and explain it open, Say what you think locked). The
+      recorder end to end: switch on → Retell the Movie → Record it →
+      mic permission → record → listen back → keep → listed → played →
+      per-clip delete. Fixed in the same pass: one Keep showed as four
+      rows (the store appended on load instead of merging by id — both
+      stores fixed); the first-ever mic permission dialog closed the sheet
+      (permission is now settled before the sheet opens); the hero back
+      button at 56pt sat over the boy's face (38 on the hero, 44 on the
+      content screens, left-aligned where it had centred); the child type
+      sizes were "absurdly big" and are now the middle setting
+      (`kSkTitleSize` 27 / 17 / 16 in `sk_content.dart`, one place).
+- [ ] **Pronoun.** The keepsake reads "what *she* tried" for a child
+      called Kabir. The skilling record has no sex field — the briefs
+      write "her" throughout — and adding one is more data about the
+      child. Options: keep "she" as the house voice; use "they"; or use
+      the name twice. Say which.
+- [ ] The Coding hero photo (bricks) and this one (a laughing boy who
+      reads younger than 6) — both worth a second look together.
 - [ ] **Look:** Your voice, saved → the clips, then "What you tried". The
       words list is the same keepsake as Coding's; here it sits under the
       recordings rather than on its own screen. Right, or two tabs?

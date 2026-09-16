@@ -70,10 +70,13 @@ not cover. Use it only when a brief does.
 Every skilling screen is one of two things, and the file says which:
 
 * **Child-facing** (`SkContentPage` with `kidVoice: true`, `SkActivityScreen`,
-  the door, the keepsake): body 17pt, targets ≥ 56 (`kSkTap`), a speaker at
-  the top that reads the page through `BabyVoiceService` (the app's one TTS
-  seam), no purchase, no external link and no settings without the grown-up
-  gate.
+  the door, the keepsake): the sizes in `sk_content.dart`'s `kSk*Size`
+  constants (title 27 / lead 17 / body 16 — the "middle" setting after the
+  first build's 30 / 19 / 17 read as oversized on a phone), targets ≥ 56
+  (`kSkTap`) on the activity buttons, the back control at 44 and always in
+  a `Row`, a speaker at the top that reads the page through
+  `BabyVoiceService` (the app's one TTS seam), no purchase, no external link
+  and no settings without the grown-up gate.
 * **Parent-facing** (`SkParentGateScreen`, `SkGrownUpScreen`, the parent note
   with `kidVoice: false`): the app's ordinary sizes and voice.
 

@@ -147,6 +147,7 @@ bool skOpenDoor(BuildContext context, String doorId) {
   Future.wait([
     SkChildStore.instance.load(),
     SkPracticeStore.instance.load(),
+    SkVoiceStore.instance.load(),
   ]).then((_) {
     if (!context.mounted) return;
     if (!SkChildStore.instance.consented) {

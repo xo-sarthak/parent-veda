@@ -159,9 +159,15 @@ class SkVoiceStore extends ChangeNotifier {
       final prefs = await SharedPreferences.getInstance();
       final raw = prefs.getString(_key);
       if (raw == null) return;
+      // ⚠️ MERGE BY ID, NEVER APPEND. `add` can run before the first
+      // `load` (the sheet saved a clip before any screen read the store),
+      // and a load that appends then shows the same clip twice — four
+      // rows for one "Keep it", seen on a phone (2026-09-15). The general
+      // fact: a lazy load into a store that may already hold rows is a
+      // merge, and a merge needs an identity.
       for (final j in (jsonDecode(raw) as List)) {
         final c = SkVoiceClip.fromJson(Map<String, dynamic>.from(j));
-        if (c != null) _clips.add(c);
+        if (c != null && !_clips.any((x) => x.id == c.id)) _clips.add(c);
       }
     } catch (_) {}
     notifyListeners();
@@ -188,6 +194,21 @@ Future<bool> skRecordVoice(
   String? itemId,
   String? title,
 }) async {
+  // ⚠️ ASK FOR THE MICROPHONE BEFORE THE SHEET, NOT INSIDE IT. On a phone
+  // (2026-09-15) the first-ever permission dialog rose over the sheet and
+  // the sheet was gone when it closed; the second attempt worked because
+  // the permission then existed. A system dialog and a modal sheet do not
+  // share a stack well, so the permission is settled first and the sheet
+  // opens onto a phone that can already record. A refusal is not an error:
+  // the sheet still opens and says the microphone is off.
+  final rec = AudioRecorder();
+  try {
+    await rec.hasPermission();
+  } catch (_) {
+  } finally {
+    await rec.dispose();
+  }
+  if (!context.mounted) return false;
   final saved = await showModalBottomSheet<bool>(
     context: context,
     isScrollControlled: true,
@@ -539,7 +560,7 @@ class _SkVoiceKeepsakeScreenState extends State<SkVoiceKeepsakeScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 48),
           children: [
-            skBack(context, p),
+            Row(children: [skBack(context, p)]),
             const SizedBox(height: 18),
             if (title.isNotEmpty)
               Text(title.toUpperCase(),
@@ -551,7 +572,7 @@ class _SkVoiceKeepsakeScreenState extends State<SkVoiceKeepsakeScreen> {
             const SizedBox(height: 8),
             Text('Your voice, saved',
                 style: pvFraunces(
-                    fontSize: 30,
+                    fontSize: kSkTitleSize,
                     fontWeight: FontWeight.w600,
                     height: 1.18,
                     color: p.ink1)),
