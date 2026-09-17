@@ -48,7 +48,8 @@ import 'belly_skin/bump_ritual_screen.dart';
 import '../services/father_preview.dart';
 import 'dear_baby_vault_screen.dart';
 import 'journal_screen.dart';
-import 'saved_hub_screen.dart';
+// import 'saved_hub_screen.dart'; // kept for revert — SavedScreen replaced the hub 2026-09-16
+import 'saved_screen.dart';
 import '../theme/pv_fonts.dart';
 import '../services/auth/social_auth.dart';
 import '../services/auth/delete_account.dart';
@@ -253,9 +254,17 @@ class ProfileScreen extends StatelessWidget {
                 icon: Icons.bookmark_rounded,
                 accent: const Color(0xFF3FA56A),
                 accentBg: const Color(0xFFEAF3EF),
+                // One Saved screen for the whole app since 2026-09-16
+                // (docs/FAMILY-MODEL.md §6). Kept for revert:
+                // onTap: () => Navigator.of(context).push(
+                //   MaterialPageRoute(
+                //     builder: (_) => SavedHubScreen(controller: controller),
+                //   ),
+                // ),
                 onTap: () => Navigator.of(context).push(
                   MaterialPageRoute(
-                    builder: (_) => SavedHubScreen(controller: controller),
+                    settings: const RouteSettings(name: 'saved'),
+                    builder: (_) => const SavedScreen(),
                   ),
                 ),
               );

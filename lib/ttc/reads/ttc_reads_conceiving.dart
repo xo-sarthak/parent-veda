@@ -284,7 +284,9 @@ final List<PvRead> kTtcReadsConceiving = [
       ),
     ],
 
-    readNext: ['ttc_read_timing_myths'],
+    // Two, so the Read-next rail shows two cards — the next question after
+    // "how does it work" is "when", and after that "do I need a kit".
+    readNext: ['ttc_read_timing_myths', 'ttc_read_ovulation_kits'],
   ),
 
 

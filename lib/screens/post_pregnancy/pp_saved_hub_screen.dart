@@ -146,7 +146,7 @@ class PpSavedHubScreen extends StatelessWidget {
                         Icons.wb_twilight_rounded,
                         t.$2.title,
                         t.$2.why.isEmpty ? 'A daily tip' : 'With the reason why',
-                        () => _push(context, _SavedTipScreen(tip: t.$2)),
+                        () => _push(context, SavedTipScreen(tip: t.$2)),
                         onUnsave: () =>
                             DailyTipStore.instance.toggleSaved(t.$1),
                       ),
@@ -271,8 +271,10 @@ class PpSavedHubScreen extends StatelessWidget {
 ///
 /// The pop-up is a moment; this is the same content as a page you came looking
 /// for, so it opens expanded rather than hiding the reason behind a tap.
-class _SavedTipScreen extends StatelessWidget {
-  const _SavedTipScreen({required this.tip});
+// Public since 2026-09-16: the unified SavedScreen opens a kept tip here.
+// (This hub itself is no longer pushed from anywhere — kept for revert.)
+class SavedTipScreen extends StatelessWidget {
+  const SavedTipScreen({super.key, required this.tip});
   final DailyTip tip;
 
   @override

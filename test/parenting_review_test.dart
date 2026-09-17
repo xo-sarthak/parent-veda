@@ -916,7 +916,10 @@ void dailyPopupAndSaved() {
   group('saved collections on the parenting side', () {
     test('the bookmark sits in the My Child header, like pregnancy', () {
       expect(child.contains('Icons.bookmark_border_rounded'), isTrue);
-      expect(child.contains('const PpSavedHubScreen()'), isTrue);
+      // Since 2026-09-16 the bookmark opens the ONE Saved screen for the whole
+      // app (docs/FAMILY-MODEL.md §6); the parenting hub is kept for revert.
+      // expect(child.contains('const PpSavedHubScreen()'), isTrue);
+      expect(child.contains('const SavedScreen()'), isTrue);
       // Same icon as the pregnancy home, so the two apps read as one product.
       expect(_code(_read('lib/screens/home_screen_b.dart'))
               .contains('Icons.bookmark_border_rounded'),

@@ -38,7 +38,8 @@ import 'multichild_sheet.dart';
 import 'pp_common.dart';
 import 'pp_expert_link.dart';
 import 'daily_tip_popup.dart';
-import 'pp_saved_hub_screen.dart';
+// import 'pp_saved_hub_screen.dart'; // kept for revert — SavedScreen replaced the hub 2026-09-16
+import '../saved_screen.dart';
 import 'pp_daily_tips.dart';
 import 'pp_development_data.dart';
 import 'pp_leaps_data.dart';
@@ -291,8 +292,10 @@ class _MyChildScreenState extends State<MyChildScreen> {
       // Gaps tightened 8 -> 6 with the fourth icon. Three gaps, so it buys back
       // 6 of the 7 overflowed pixels; the Flexible above covers the rest and
       // any future phone narrower than the ones tested.
-      _headerIcon(Icons.bookmark_border_rounded,
-          () => _push(const PpSavedHubScreen())),
+      // One Saved screen for the whole app since 2026-09-16. Kept for revert:
+      // _headerIcon(Icons.bookmark_border_rounded,
+      //     () => _push(const PpSavedHubScreen())),
+      _headerIcon(Icons.bookmark_border_rounded, () => _push(const SavedScreen())),
       const SizedBox(width: 6),
       _headerIcon(Icons.search_rounded, () => _push(const RecoSearchScreen())),
       const SizedBox(width: 6),

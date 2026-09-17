@@ -56,6 +56,7 @@ import '../services/landing_focus.dart';
 import '../services/life_stage_store.dart';
 import '../services/pregnancy_controller.dart';
 import 'weekly_card_stack_screen.dart';
+import 'saved_screen.dart';
 import '../services/scans_store.dart';
 // openAskVeda dropped from the show list with the Ask door. The FAB still calls
 // it; this screen no longer needs to, because Ask is on every screen already.
@@ -69,13 +70,15 @@ import 'v2/v2_palette.dart';
 import 'v2/v2_sections.dart';
 import '../data/garbh_data.dart';
 import '../services/garbh_store.dart';
-import 'garbh_screen.dart' show ShravanScreen, SamvadScreen, KriyaScreen, gameForPuzzle;
+import 'garbh_screen.dart' show GarbhScreen, ShravanScreen, SamvadScreen, KriyaScreen, gameForPuzzle;
 import 'garbh_buddhi_screen.dart';
 import '../models/journal_entry.dart';
 import '../services/medicine_store.dart';
 import '../services/reminder_store.dart';
 import '../widgets/journal/journal_create.dart';
 import 'journal_screen.dart';
+import 'read_next_screen.dart' show ReadItemScreen;
+import 'watch_learn_screen.dart';
 import 'reminders_screen.dart' show showMedReminderEditor;
 import 'tools/medicine_tracker_screen.dart';
 import 'brackets/bracket_screen.dart';
@@ -278,7 +281,17 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
                   // v3_sections.dart — rendered prose, not an identity.
                   learning: day.babyLearning.now,
                 p: p,
-                onTap: () => _open(context, 'weekly_snapshot'),
+                // ⚠️ WAS `_open(context, 'weekly_snapshot')`, which switched
+                // the home to CLASSIC and stopped. V3 is final (2026-09-16):
+                // the hero opens the week she is looking at, like the spine.
+                // Kept for revert: onTap: () => _open(context, 'weekly_snapshot'),
+                onTap: () {
+                  pregnancy.selectWeek(week);
+                  Navigator.of(context).push(MaterialPageRoute(
+                    settings: const RouteSettings(name: 'weekly_card_stack'),
+                    builder: (_) => WeeklyCardStackScreen(controller: pregnancy),
+                  ));
+                },
                 // ⚠️ A PUSH, NOT A TAB SWITCH. `_open` routes through
                 // `homeFor()` to `AppNav.go(tabIndex)`, which lands on Today —
                 // the classic home. The chip says WEEK 40, so it has to open
@@ -295,8 +308,19 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
                         WeeklyCardStackScreen(controller: pregnancy),
                   ));
                 },
-                onAvatar: () => _open(context, 'journal'),
-                onSaved: () => _open(context, 'saved'),
+                // Was `_open(context, 'journal')` — classic fallback. Kept for
+                // revert. Now the journal itself:
+                onAvatar: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                    settings: const RouteSettings(name: 'journal'),
+                    builder: (_) => JournalScreen(controller: pregnancy))),
+                // ⚠️ WAS `_open(context, 'saved')`, which switched the home to
+                // CLASSIC and stopped — the V3 scaffolding from when classic
+                // was still the destination. V3 is final (2026-09-16): every
+                // tap opens the thing itself. Kept for revert:
+                // onSaved: () => _open(context, 'saved'),
+                onSaved: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                    settings: const RouteSettings(name: 'saved'),
+                    builder: (_) => const SavedScreen())),
               ),
             // ⚠️ THE PAGE IS THREE INSET COLUMNS WITH TWO FULL-BLEED THINGS
             // BETWEEN THEM, not one column any more.
@@ -379,8 +403,12 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
                   video: video,
                   week: week,
                   p: p,
-                  // While there is no file: where the old card went.
-                  onUnavailable: () => _open(context, 'todays_video')),
+                  // While there is no file: Watch & Learn, where every film
+                  // she can watch today lives. Was `_open(context,
+                  // 'todays_video')` — the classic fallback; kept for revert.
+                  onUnavailable: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                      settings: const RouteSettings(name: 'watch'),
+                      builder: (_) => WatchLearnScreen(controller: pregnancy)))),
 
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 18),
@@ -547,7 +575,11 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
                     day: day,
                     p: p,
                     rows: rows,
-                    onAbout: () => _open(context, 'garbh_daily'),
+                    // Was `_open(context, 'garbh_daily')` — classic fallback;
+                    // kept for revert. Now the Garbh Sanskar door itself:
+                    onAbout: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                        settings: const RouteSettings(name: 'garbh'),
+                        builder: (_) => GarbhScreen(controller: pregnancy))),
                   );
                 },
               ),
@@ -763,7 +795,13 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
                 V3ReadRow(
                     item: r,
                     p: p,
-                    onTap: () => _open(context, 'daily_reads')),
+                    // ⚠️ WAS `_open(context, 'daily_reads')`, which switched
+                    // the home to CLASSIC and never opened the article — the
+                    // bug the user hit on "You are halfway, what changes now?".
+                    // Kept for revert. The row opens the piece it names:
+                    onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                        settings: RouteSettings(name: 'read/${r.id}'),
+                        builder: (_) => ReadItemScreen(item: r, controller: pregnancy)))),
               const SizedBox(height: 28),
             ],
 

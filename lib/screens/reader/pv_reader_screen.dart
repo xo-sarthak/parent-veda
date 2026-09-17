@@ -163,6 +163,11 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
   bool _tocOpen = false;
   double _progress = 0;
 
+  /// "▸ References" — collapsed by default (READER-AUDIT §3.2 rule 2). Session
+  /// scoped like the sections: which disclosures were open is not a
+  /// preference.
+  bool _refsOpen = false;
+
   PvRead get a => widget.read;
   AppLanguage get _lang => widget.lang;
   PvReadStore get _store => PvReadStore.instance;
@@ -491,10 +496,20 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                   _pad(_callout(s, a.whenToSeeSomeone)),
                   const SizedBox(height: 24),
 
+                  // ---- REFERENCES, collapsed, then "was this helpful?" ----
+                  //
+                  // References are present and last (Flo, Superpower, GoHenry)
+                  // but folded: the sources are for the reader who wants to
+                  // check, not a block every reader scrolls past. The helpful
+                  // question comes straight after the piece has finished
+                  // making its case and before the app starts suggesting
+                  // things — GoHenry's placement, our design system's pills.
                   if (a.evidence != null) ...[
-                    _pad(_evidence(s)),
-                    const SizedBox(height: 24),
+                    _pad(_references(s)),
+                    const SizedBox(height: 18),
                   ],
+                  _pad(_helpful(s)),
+                  const SizedBox(height: 26),
 
                   if (a.nextSteps.isNotEmpty) ...[
                     _pad(Text(_t('What you can do with this', 'Ab iska kya karein'),
@@ -522,7 +537,11 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                     _pad(Text(_t('Read next', 'Aage padhein'),
                         style: _heading(s))),
                     const SizedBox(height: 12),
-                    for (final id in a.readNext) _pad(_readNext(s, id)),
+                    // A rail, two cards visible, never a wall — the Flo
+                    // teardown's rule for Insights, applied to the foot of a
+                    // read. Kept for revert (the stacked rows):
+                    // for (final id in a.readNext) _pad(_readNext(s, id)),
+                    _readNextRail(s),
                   ],
                 ],
               ),
@@ -602,6 +621,17 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
         .map((w) => w[0].toUpperCase())
         .join();
 
+    // ⚠️ "REVIEWED BY", NOT "BY" — and the verified mark sits on the PERSON.
+    // From the reader audit (docs/READER-AUDIT.md §3.2 rule 1): Flo's medical-
+    // board badge was the single most trust-carrying element in fifteen
+    // readers, and every one of our models already holds a name and a role.
+    // The mark used to sit on the evidence block at the foot, where it said
+    // "this text was checked"; here it says "this person checked it", which
+    // is the claim she actually wants made. The blue is the learned glyph —
+    // see the note that travelled with it from the old evidence block.
+    final verified = s.bg.computeLuminance() < 0.4
+        ? const Color(0xFF52A9F5)
+        : const Color(0xFF1668C1);
     return Row(children: [
       Container(
         width: 30,
@@ -618,11 +648,26 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(name,
-                  style: pvJakarta(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: s.ink)),
+              Text(_t('REVIEWED BY', 'JAANCH KI'),
+                  style: pvManrope(
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.1,
+                      color: s.soft)),
+              const SizedBox(height: 2),
+              Row(children: [
+                Flexible(
+                  child: Text(name,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvManrope(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w700,
+                          color: s.ink)),
+                ),
+                const SizedBox(width: 5),
+                Icon(Icons.verified_rounded, size: 14, color: verified),
+              ]),
               const SizedBox(height: 1),
               Text(
                   '${a.authorRole.of(_lang)} \u00B7 '
@@ -1032,6 +1077,9 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
   /// ⚠️ VISIBLE, NOT A FOOTNOTE. An unsourced claim in a fertility article is
   /// indistinguishable from the content this product exists to replace, so the
   /// sourcing is set at reading size and given its own rule above it.
+  // Kept for revert — replaced by [_references] on 2026-09-16; the badge and
+  // its rationale moved to [_byline].
+  // ignore: unused_element
   Widget _evidence(_Skin s) => Container(
         padding: const EdgeInsets.fromLTRB(15, 14, 15, 15),
         decoration: BoxDecoration(
@@ -1070,6 +1118,158 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
               style: pvManrope(fontSize: 13 * _fs, height: 1.65, color: s.soft)),
         ]),
       );
+
+  /// "▸ References" — the evidence note behind a disclosure. The verified mark
+  /// moved up to the byline (see [_byline]); what is left here is the
+  /// sources, which is exactly what a reader who taps this wants.
+  ///
+  /// Kept for revert: [_evidence], the always-open block with the badge.
+  Widget _references(_Skin s) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: s.rule),
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+        InkWell(
+          onTap: () => setState(() => _refsOpen = !_refsOpen),
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(15, 13, 13, 13),
+            child: Row(children: [
+              Expanded(
+                child: Text(_t('REFERENCES', 'SANDARBH'), style: _meta(s)),
+              ),
+              AnimatedRotation(
+                turns: _refsOpen ? 0.5 : 0,
+                duration: const Duration(milliseconds: 180),
+                child: Icon(Icons.expand_more_rounded, size: 20, color: s.soft),
+              ),
+            ]),
+          ),
+        ),
+        AnimatedCrossFade(
+          duration: const Duration(milliseconds: 180),
+          crossFadeState:
+              _refsOpen ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+          firstChild: const SizedBox(width: double.infinity),
+          secondChild: Padding(
+            padding: const EdgeInsets.fromLTRB(15, 0, 15, 15),
+            child: Text(a.evidence!.of(_lang),
+                style:
+                    pvManrope(fontSize: 13 * _fs, height: 1.65, color: s.soft)),
+          ),
+        ),
+      ]),
+    );
+  }
+
+  /// "Was this helpful?" — two outlined pills (DESIGN-SYSTEM §4.3), no thumbs,
+  /// no counts shown back. Answering replaces the pills with one quiet line so
+  /// the question is asked once per article, not on every open. The answer is
+  /// a per-item signal for the recommendations engine (PvReadStore.helpfulOf).
+  Widget _helpful(_Skin s) {
+    final answer = _store.helpfulOf(a.id);
+    if (answer != null) {
+      return Text(
+        answer
+            ? _t('Thanks — noted as helpful.', 'Shukriya — helpful mark kiya.')
+            : _t('Thanks — we will keep working on this one.',
+                'Shukriya — is par aur kaam karenge.'),
+        style: pvManrope(fontSize: 12.5, height: 1.4, color: s.soft),
+      );
+    }
+    Widget pill(String label, bool value) => InkWell(
+          onTap: () => _store.setHelpful(a.id, value),
+          borderRadius: BorderRadius.circular(999),
+          child: Container(
+            height: 38,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: s.rule, width: 1.2),
+            ),
+            child: Text(label,
+                style: pvManrope(
+                    fontSize: 13, fontWeight: FontWeight.w700, color: s.ink)),
+          ),
+        );
+    return Row(children: [
+      Expanded(
+        child: Text(_t('Was this helpful?', 'Kya ye kaam aaya?'),
+            style: pvManrope(
+                fontSize: 13.5, fontWeight: FontWeight.w700, color: s.ink)),
+      ),
+      pill(_t('Not really', 'Nahi'), false),
+      const SizedBox(width: 8),
+      pill(_t('Yes', 'Haan'), true),
+    ]);
+  }
+
+  /// Read next as a horizontal rail, two cards visible. Each card: the read's
+  /// tinted cover (its hue), the title, and the read time when the resolver
+  /// hands one back. Ids that no longer resolve render nothing — the same
+  /// rule as [_readNext].
+  Widget _readNextRail(_Skin s) {
+    final ids = a.readNext
+        .where((id) => widget.readTitle?.call(id) != null)
+        .toList();
+    if (ids.isEmpty) return const SizedBox.shrink();
+    return SizedBox(
+      height: 150,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 22),
+        itemCount: ids.length,
+        separatorBuilder: (_, _) => const SizedBox(width: 10),
+        itemBuilder: (context, i) {
+          final id = ids[i];
+          final title = widget.readTitle!.call(id)!;
+          final width = (MediaQuery.of(context).size.width - 44 - 10) / 2;
+          return GestureDetector(
+            onTap: () => widget.openRead?.call(context, id),
+            behavior: HitTestBehavior.opaque,
+            child: Container(
+              width: width,
+              padding: const EdgeInsets.fromLTRB(13, 12, 13, 12),
+              decoration: BoxDecoration(
+                color: s.panel,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: s.rule),
+              ),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: s.accent.withValues(alpha: 0.14),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      alignment: Alignment.centerLeft,
+                      padding: const EdgeInsets.only(left: 10),
+                      child: Icon(Icons.article_outlined,
+                          size: 18, color: s.accent),
+                    ),
+                    const SizedBox(height: 10),
+                    Expanded(
+                      child: Text(title.of(_lang),
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
+                          style: pvFraunces(
+                              fontSize: 14.5 * _fs,
+                              height: 1.3,
+                              fontWeight: FontWeight.w600,
+                              color: s.ink)),
+                    ),
+                  ]),
+            ),
+          );
+        },
+      ),
+    );
+  }
 
   // ---- video ---------------------------------------------------------------
 
@@ -1266,6 +1466,8 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
     );
   }
 
+  // Kept for revert — the stacked rows; [_readNextRail] replaced it 2026-09-16.
+  // ignore: unused_element
   Widget _readNext(_Skin s, String id) {
     final title = widget.readTitle?.call(id);
     if (title == null) return const SizedBox.shrink();

@@ -97,7 +97,8 @@ import 'journal_v2/journal_home_screen.dart';
 import 'phase_map_screen.dart';
 import 'family_profile_screen.dart';
 import 'pp_hero_field.dart';
-import 'pp_saved_hub_screen.dart';
+// import 'pp_saved_hub_screen.dart'; // kept for revert — SavedScreen replaced the hub 2026-09-16
+import '../saved_screen.dart';
 import 'pp_phase_faqs.dart';
 import 'pp_phases_data.dart';
 import 'pp_products_data.dart';
@@ -231,9 +232,14 @@ class _PpHomeV3State extends State<PpHomeV3> {
                   onSpine: () => Navigator.of(context).push(MaterialPageRoute(
                       settings: const RouteSettings(name: 'pp/phase_map'),
                       builder: (_) => const PhaseMapScreen())),
+                  // One Saved screen for the whole app since 2026-09-16
+                  // (docs/FAMILY-MODEL.md §6). Kept for revert:
+                  // onSaved: () => Navigator.of(context).push(MaterialPageRoute(
+                  //     settings: const RouteSettings(name: 'pp/saved'),
+                  //     builder: (_) => const PpSavedHubScreen())),
                   onSaved: () => Navigator.of(context).push(MaterialPageRoute(
-                      settings: const RouteSettings(name: 'pp/saved'),
-                      builder: (_) => const PpSavedHubScreen())),
+                      settings: const RouteSettings(name: 'saved'),
+                      builder: (_) => const SavedScreen())),
                   onProfile: () => Navigator.of(context).push(MaterialPageRoute(
                       settings: const RouteSettings(name: 'pp/profile'),
                       builder: (_) => const FamilyProfileScreen())),

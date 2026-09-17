@@ -60,7 +60,8 @@ import 'profile_screen.dart';
 import 'products_screen.dart';
 import 'global_search.dart';
 import 'read_next_screen.dart';
-import 'saved_hub_screen.dart';
+// import 'saved_hub_screen.dart'; // kept for revert — SavedScreen replaced the hub 2026-09-16
+import 'saved_screen.dart';
 import 'reminders_screen.dart';
 import 'tools/medicine_tracker_screen.dart';
 // Old "Scans & Care" screen - merged into TestsScansReportsScreen. Kept
@@ -486,8 +487,13 @@ class HomeScreenB extends StatelessWidget {
         const Spacer(),
         // Saved hub - a bookmark right on Home, beside search.
         GestureDetector(
+          // One Saved screen for the whole app since 2026-09-16
+          // (docs/FAMILY-MODEL.md §6). Kept for revert:
+          // onTap: () => Navigator.of(context).push(MaterialPageRoute(
+          //     builder: (_) => SavedHubScreen(controller: pregnancy))),
           onTap: () => Navigator.of(context).push(MaterialPageRoute(
-              builder: (_) => SavedHubScreen(controller: pregnancy))),
+              settings: const RouteSettings(name: 'saved'),
+              builder: (_) => const SavedScreen())),
           child: Container(
             width: 40,
             height: 40,

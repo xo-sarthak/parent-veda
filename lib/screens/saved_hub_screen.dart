@@ -95,7 +95,7 @@ class SavedHubScreen extends StatelessWidget {
                     subtitle: p.tag,
                     date: _date(s, p.savedAt),
                     onTap: () => _push(
-                        context, _SavedRtbReadScreen(controller: controller, piece: p)),
+                        context, SavedRtbReadScreen(controller: controller, piece: p)),
                   ),
               // Daily reads.
               _header(s.shReads),
@@ -299,8 +299,10 @@ class SavedHubScreen extends StatelessWidget {
 }
 
 // A simple reader for a saved read-to-baby piece.
-class _SavedRtbReadScreen extends StatelessWidget {
-  const _SavedRtbReadScreen({required this.controller, required this.piece});
+// Public since 2026-09-16: the unified SavedScreen opens a saved piece here.
+// (This hub itself is no longer pushed from anywhere — kept for revert.)
+class SavedRtbReadScreen extends StatelessWidget {
+  const SavedRtbReadScreen({super.key, required this.controller, required this.piece});
   final PregnancyController controller;
   final SavedRtbPiece piece;
 

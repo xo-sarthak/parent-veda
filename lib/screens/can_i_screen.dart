@@ -88,6 +88,11 @@ String _catLabel(S s, CanICategory c) {
 
 int _trimesterIndex(int week) => week <= 13 ? 0 : (week <= 27 ? 1 : 2);
 
+/// Public since 2026-09-16 so the unified Saved screen opens the same answer
+/// screen a tap in Can I? does — one destination per kind, never a guess.
+void openCanIAnswer(BuildContext context, CanIEntry entry, PregnancyController c) =>
+    _openAnswer(context, entry, c);
+
 void _openAnswer(BuildContext context, CanIEntry entry, PregnancyController c) {
   Navigator.of(context).push(MaterialPageRoute(
     builder: (_) => CanIAnswerScreen(entry: entry, controller: c),
