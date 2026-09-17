@@ -1,6 +1,11 @@
 // Functional test for the revised Products flow: the Compare Manager caps at
 // three same-category products (and blocks a fourth / a cross-category pick),
 // and the subcategory brand filter actually filters the grid.
+//
+// ⚠️ PINNED TO THE `...Classic` BODIES SINCE 2026-09-17. The public names are
+// facades over the unified store now (lib/screens/products/); these tests
+// keep the kept-for-revert bodies honest. The shipped path is covered in
+// test/pv_store_test.dart.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -21,7 +26,7 @@ void main() {
   }
 
   testWidgets('Compare ticks products and caps at two', (tester) async {
-    await pumpPhone(tester, const ProductsSubcategoryScreen()); // Sleep · Soothers (4 items, same category)
+    await pumpPhone(tester, const ProductsSubcategoryScreenClassic()); // Sleep · Soothers (4 items, same category)
 
     // The product cards sit below the buying-guidance card. Scroll to the unique
     // hint line just above them so the (eager) card column builds into view.
@@ -74,7 +79,7 @@ void main() {
   });
 
   testWidgets('Brand filter narrows the grid', (tester) async {
-    await pumpPhone(tester, const ProductsSubcategoryScreen());
+    await pumpPhone(tester, const ProductsSubcategoryScreenClassic());
 
     // The brand chips sit below the buying-guidance card - scroll to them first.
     await tester.scrollUntilVisible(find.text('Dozy'), 300,
@@ -94,7 +99,7 @@ void main() {
       ..toggle(productById('hush'))
       ..toggle(productById('lull'));
 
-    await pumpPhone(tester, const ProductsCompareScreen());
+    await pumpPhone(tester, const ProductsCompareScreenClassic());
 
     // both selected products render (in the overview + the table header row)
     final hush = find.text('Hush Mini Sound Machine');
@@ -116,7 +121,7 @@ void main() {
   });
 
   testWidgets('Filters button opens a sheet and narrows the home to a concern', (tester) async {
-    await pumpPhone(tester, const ProductsDiscoveryScreen());
+    await pumpPhone(tester, const ProductsDiscoveryScreenClassic());
 
     // browse mode by default
     expect(find.text('Shop by category'), findsOneWidget);

@@ -37,7 +37,10 @@ import 'pp_age_bands.dart';
 import 'pp_chart_browser_screen.dart';
 // import 'pp_feeding_content.dart'; // only the chooser version needs it (kept for revert)
 import 'products_compare_screen.dart';
-import 'pp_products_data.dart' show ppPreloadCompare;
+// import 'pp_products_data.dart' show ppPreloadCompare; // kept for revert
+import '../../data/products/pv_catalog_adapters.dart' show pvSlug;
+import '../../services/pv_catalog_store.dart';
+import '../../services/pv_compare_store.dart';
 import 'pp_sounds_screen.dart';
 import 'pp_wake_windows_screen.dart';
 import 'pp_what_to_feed_screen.dart';
@@ -158,7 +161,12 @@ Widget? ppScreenForSurface(String id) {
   const comparePrefix = 'pp_compare/';
   if (id.startsWith(comparePrefix)) {
     final shelf = id.substring(comparePrefix.length);
-    ppPreloadCompare(shelf);
+    // The unified tray, seeded from the unified shelf. `shelf` arrives as the
+    // sub's display name ('Soothers & white noise'); the unified ids are its
+    // slug. Kept for revert: ppPreloadCompare(shelf).
+    final subId = pvSlug(shelf);
+    PvCompareStore.instance.preload(
+        PvCatalogStore.instance.all.where((p) => p.subId == subId));
     return const ProductsCompareScreen();
   }
   // ⚠️ `pp_nuskhe/<category>` OPENS THE REMEDIES ALREADY FILTERED. The Health

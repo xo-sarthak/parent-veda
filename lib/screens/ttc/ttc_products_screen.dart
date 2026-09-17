@@ -1,4 +1,14 @@
 // =============================================================================
+//  RETIRED 2026-09-17 - FACADE OVER THE UNIFIED STORE (lib/screens/products/)
+// -----------------------------------------------------------------------------
+//  The user's call: "I want to retire the mall. One unified product system."
+//  The public class name(s) below now build the unified screen so every
+//  existing call site lands there without an edit; the old body is kept as
+//  `...Classic` for revert (comment out, never delete). Delete after a
+//  release cycle with no revert. See docs/PRODUCTS-AUDIT.md.
+// =============================================================================
+
+// =============================================================================
 //  TTC - Products
 // -----------------------------------------------------------------------------
 //      "Trust before commerce. Recommendations first. Shopping second."
@@ -18,6 +28,11 @@ import 'package:flutter/material.dart';
 import '../../ttc/ttc_products_data.dart';
 import 'ttc_common.dart';
 import 'ttc_strings.dart';
+import '../../data/products/pv_catalog_adapters.dart' show pvIdForTtc;
+import '../../services/life_stage_store.dart';
+import '../products/pv_product_screen.dart';
+import '../products/pv_store_chrome.dart';
+import '../products/pv_store_screen.dart';
 
 void openTtcProducts(BuildContext context) {
   Navigator.of(context).push(MaterialPageRoute<void>(
@@ -26,8 +41,8 @@ void openTtcProducts(BuildContext context) {
   ));
 }
 
-class TtcProductsScreen extends StatefulWidget {
-  const TtcProductsScreen({super.key, this.focusId});
+class TtcProductsScreenClassic extends StatefulWidget {
+  const TtcProductsScreenClassic({super.key, this.focusId});
 
   /// A product to scroll to, from an Ask Veda pointer (`ttcprod_folic` →
   /// `folic`). The rest of the library stays on screen - a research page that
@@ -35,10 +50,10 @@ class TtcProductsScreen extends StatefulWidget {
   final String? focusId;
 
   @override
-  State<TtcProductsScreen> createState() => _TtcProductsScreenState();
+  State<TtcProductsScreenClassic> createState() => _TtcProductsScreenState();
 }
 
-class _TtcProductsScreenState extends State<TtcProductsScreen> {
+class _TtcProductsScreenState extends State<TtcProductsScreenClassic> {
   final _focusKey = GlobalKey();
 
   @override
@@ -190,4 +205,17 @@ class _ProductCard extends StatelessWidget {
           Text(body, style: ttcBody(12.5, color: color, h: 1.55)),
         ]),
       );
+}
+
+// ---- facade (the retirement) -----------------------------------------------
+
+/// Ask Veda's `ttcprod_<id>` deep links land here with a `focusId`; they now
+/// open the unified product page directly. Without one, the TTC storefront.
+class TtcProductsScreen extends StatelessWidget {
+  const TtcProductsScreen({super.key, this.focusId});
+  final String? focusId;
+  @override
+  Widget build(BuildContext context) => focusId == null
+      ? const PvStoreScreen(chrome: PvStoreChrome.none, initialStage: LifeStage.tryingToConceive)
+      : PvProductScreen(productId: pvIdForTtc(focusId!));
 }

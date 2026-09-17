@@ -1,4 +1,14 @@
 // =============================================================================
+//  RETIRED 2026-09-17 - FACADE OVER THE UNIFIED STORE (lib/screens/products/)
+// -----------------------------------------------------------------------------
+//  The user's call: "I want to retire the mall. One unified product system."
+//  The public class name(s) below now build the unified screen so every
+//  existing call site lands there without an edit; the old body is kept as
+//  `...Classic` for revert (comment out, never delete). Delete after a
+//  release cycle with no revert. See docs/PRODUCTS-AUDIT.md.
+// =============================================================================
+
+// =============================================================================
 //  ProductDetailScreen - Products · detail (parenting · S3·detail v2)
 // -----------------------------------------------------------------------------
 //  Trust-first product page: for a soother, an explain-first "what's inside &
@@ -16,12 +26,13 @@ import '../product_guide/product_guide_data.dart';
 import 'pp_common.dart';
 import 'pp_products_data.dart';
 import 'products_compare_screen.dart';
+import '../products/pv_product_screen.dart';
 
-class ProductDetailScreen extends StatelessWidget {
-  const ProductDetailScreen({super.key, this.product = _fallback});
+class ProductDetailScreenClassic extends StatelessWidget {
+  const ProductDetailScreenClassic({super.key, this.product = fallback});
   final PpProduct product;
 
-  static const PpProduct _fallback = PpProduct(
+  static const PpProduct fallback = PpProduct(
     id: 'dozy',
     name: 'Dozy White-Noise & Sleep Soother',
     brand: 'Dozy',
@@ -850,4 +861,13 @@ class _HowWeReviewState extends State<_HowWeReview> {
           ]),
         ),
       );
+}
+
+// ---- facade (the retirement) -----------------------------------------------
+
+class ProductDetailScreen extends StatelessWidget {
+  const ProductDetailScreen({super.key, this.product = ProductDetailScreenClassic.fallback});
+  final PpProduct product;
+  @override
+  Widget build(BuildContext context) => PvProductScreen(productId: product.id);
 }

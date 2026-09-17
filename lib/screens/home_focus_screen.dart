@@ -439,8 +439,11 @@ class HomeFocusScreen extends StatelessWidget {
     switch (home) {
       case AppHome.today:
         TodayVersionStore.instance.set(TodayVersion.classic);
-      case AppHome.prepare:
+      case AppHome.products:
         AppNav.instance.go(1);
+      case AppHome.prepare:
+        // Prepare left the bar for the Tools hub's first tile (2026-09-17).
+        AppNav.instance.go(2);
       case AppHome.tools:
         AppNav.instance.go(2);
       case AppHome.calendar:

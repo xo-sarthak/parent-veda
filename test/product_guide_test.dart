@@ -3,6 +3,10 @@
 // only for products that have a guide.
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+// ⚠️ PINNED TO THE `...Classic` BODIES SINCE 2026-09-17: the public names are
+// facades over the unified store (lib/screens/products/). These keep the
+// kept-for-revert Guide screens honest; the shipped page is covered in
+// test/pv_store_test.dart.
 
 import 'package:parentveda/screens/product_guide/product_guide_chooser.dart';
 import 'package:parentveda/screens/product_guide/product_guide_data.dart';
@@ -19,7 +23,7 @@ void main() {
 
   testWidgets('Hub lists guides and opens one', (tester) async {
     bigView(tester);
-    await tester.pumpWidget(const MaterialApp(home: ProductGuideHubScreen()));
+    await tester.pumpWidget(const MaterialApp(home: ProductGuideHubScreenClassic()));
     await tester.pumpAndSettle();
 
     expect(find.text('Baby skincare'), findsWidgets);
@@ -38,7 +42,7 @@ void main() {
 
   testWidgets('Community See-all filters ratings by sentiment', (tester) async {
     bigView(tester);
-    await tester.pumpWidget(MaterialApp(home: ProductGuideScreen(guide: pgById('baby_lotion')!)));
+    await tester.pumpWidget(MaterialApp(home: ProductGuideScreenClassic(guide: pgById('baby_lotion')!)));
     await tester.pumpAndSettle();
     final scrollable = find.byType(Scrollable).first;
     await tester.scrollUntilVisible(find.textContaining('See all'), 250, scrollable: scrollable, maxScrolls: 40);
@@ -58,7 +62,7 @@ void main() {
 
   testWidgets('A guide page shows the decision hero and deep-dive', (tester) async {
     bigView(tester);
-    await tester.pumpWidget(MaterialApp(home: ProductGuideScreen(guide: pgById('baby_lotion')!)));
+    await tester.pumpWidget(MaterialApp(home: ProductGuideScreenClassic(guide: pgById('baby_lotion')!)));
     await tester.pumpAndSettle();
 
     expect(find.text('STRONG BUY'), findsOneWidget); // at-a-glance signal band
@@ -72,7 +76,7 @@ void main() {
 
   testWidgets('At-a-glance buy signal shows and accepts the parent vote', (tester) async {
     bigView(tester);
-    await tester.pumpWidget(MaterialApp(home: ProductGuideScreen(guide: pgById('baby_lotion')!)));
+    await tester.pumpWidget(MaterialApp(home: ProductGuideScreenClassic(guide: pgById('baby_lotion')!)));
     await tester.pumpAndSettle();
 
     // The glanceable band + score + consensus + your-take — all above the fold.
@@ -91,7 +95,7 @@ void main() {
 
   testWidgets('Research Corner is ingredient-specific + labels maker studies', (tester) async {
     bigView(tester);
-    await tester.pumpWidget(MaterialApp(home: ProductGuideScreen(guide: pgById('baby_lotion')!)));
+    await tester.pumpWidget(MaterialApp(home: ProductGuideScreenClassic(guide: pgById('baby_lotion')!)));
     await tester.pumpAndSettle();
     final scrollable = find.byType(Scrollable).first;
     // A study about an actual ingredient in the cream.
@@ -116,7 +120,7 @@ void main() {
     // (The What to buy brief, 2026-09-14: matching is by id and the explicit
     // map only; a name keyword no longer counts — it offered the steriliser
     // guide to the anti-colic bottle.)
-    openProductWithGuideCheck(ctx, id: 'lotion', name: 'A gentle baby lotion', onOpenNormal: () => openedNormal = true);
+    openProductWithGuideCheckClassic(ctx, id: 'lotion', name: 'A gentle baby lotion', onOpenNormal: () => openedNormal = true);
     await tester.pumpAndSettle();
     expect(find.text('How would you like to see this?'), findsOneWidget);
     expect(find.text('ParentVeda Product Guide'), findsWidgets);
@@ -126,7 +130,7 @@ void main() {
     // even when its name shares a word with a guide.
     await tester.tapAt(const Offset(20, 20)); // tap scrim to dismiss
     await tester.pumpAndSettle();
-    openProductWithGuideCheck(ctx, id: 'bottle', name: 'Anti-Colic Feeding Bottle', onOpenNormal: () => openedNormal = true);
+    openProductWithGuideCheckClassic(ctx, id: 'bottle', name: 'Anti-Colic Feeding Bottle', onOpenNormal: () => openedNormal = true);
     await tester.pumpAndSettle();
     expect(openedNormal, isTrue);
     expect(find.text('How would you like to see this?'), findsNothing);

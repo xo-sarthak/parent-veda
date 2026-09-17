@@ -30,9 +30,9 @@ import 'package:flutter/material.dart';
 import '../data/can_i_data.dart';
 import '../models/can_i_entry.dart';
 import '../models/community_models.dart';
-import '../models/product_models.dart';
+// import '../models/product_models.dart'; // kept for revert
 import '../models/read_item.dart';
-import '../data/product_data.dart';
+// import '../data/product_data.dart'; // kept for revert
 import '../data/read_next_data.dart';
 import '../data/reads/pregnancy_reads.dart';
 import '../models/pv_video.dart';
@@ -53,7 +53,11 @@ import 'post_pregnancy/pp_watch_data.dart';
 import 'post_pregnancy/reading_reader_screen.dart';
 import 'post_pregnancy/watch_player_screen.dart';
 import 'post_pregnancy/watch_quicklearn_screen.dart';
-import 'products_screen.dart' show ProductDetailScreen;
+// import 'products_screen.dart' show ProductDetailScreen; // kept for revert
+import '../models/pv_product.dart';
+import '../services/pv_catalog_store.dart';
+import 'products/pv_product_screen.dart';
+import 'products/pv_store_chrome.dart' show kPvProductRoutePrefix;
 import 'read_next_screen.dart' show ReadItemScreen;
 import 'saved_hub_screen.dart' show SavedRtbReadScreen;
 import 'ttc/ttc_surface_router.dart' show openTtcSurface, kTtcReadPrefix;
@@ -521,7 +525,7 @@ class SavedItemOpener {
       case SavedKind.video:
         return _pvVideo(id)?.title.en ?? _watchVideo(id)?.title;
       case SavedKind.product:
-        return _product(id)?.name.en;
+        return _pvProduct(id)?.name;
       case SavedKind.question:
         return _canI(id)?.name.en;
       case SavedKind.readToBaby:
@@ -549,7 +553,8 @@ class SavedItemOpener {
         if (_watchVideo(id) != null) return true;
         return _pvVideo(id) != null && c != null;
       case SavedKind.product:
-        return _product(id) != null && c != null;
+        // Any stage's product opens — the unified catalogue, no controller needed.
+        return _pvProduct(id) != null;
       case SavedKind.question:
         return _canI(id) != null && c != null;
       case SavedKind.readToBaby:
@@ -593,8 +598,11 @@ class SavedItemOpener {
           push(WatchLearnScreen(controller: c), name: 'watch');
         }
       case SavedKind.product:
-        if (_product(id) != null && c != null) {
-          push(ProductDetailScreen(product: _product(id)!, controller: c), name: 'product/$id');
+        // Was `ProductDetailScreen(product: _product(id)!, controller: c)` on
+        // the pregnancy catalogue only — a saved parenting or TTC product
+        // showed "no longer available". The unified page opens all three.
+        if (_pvProduct(id) != null) {
+          push(PvProductScreen(productId: id), name: '$kPvProductRoutePrefix$id');
         }
       case SavedKind.question:
         if (_canI(id) != null && c != null) openCanIAnswer(context, _canI(id)!, c);
@@ -650,12 +658,16 @@ class SavedItemOpener {
     return null;
   }
 
+  static PvProduct? _pvProduct(String id) => PvCatalogStore.instance.byId(id);
+
+  /* kept for revert — the pregnancy-only lookup
   static Product? _product(String id) {
     for (final p in kProducts) {
       if (p.id == id) return p;
     }
     return null;
   }
+  */
 
   static CanIEntry? _canI(String id) {
     for (final e in kCanIEntries) {

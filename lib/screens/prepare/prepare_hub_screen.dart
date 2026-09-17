@@ -36,7 +36,11 @@ import 'program_detail_screen.dart';
 import '../../localization/app_language.dart';
 
 class PrepareHubScreen extends StatelessWidget {
-  const PrepareHubScreen({super.key, required this.lang});
+  const PrepareHubScreen({super.key, required this.lang, this.backLabel});
+
+  /// Set when PUSHED (from the Tools hub, since 2026-09-17) so the top bar
+  /// grows a back arrow; null when it was a tab root under the pill.
+  final String? backLabel;
 
   /// The language to render in.
   ///
@@ -66,7 +70,7 @@ class PrepareHubScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.only(top: 12, bottom: 120),
           children: [
-            pad(pvTopBar(context, lang: lang, title: s.uiPrepare)),
+            pad(pvTopBar(context, lang: lang, title: s.uiPrepare, backLabel: backLabel)),
             const SizedBox(height: 22),
 
             // hero

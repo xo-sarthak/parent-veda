@@ -1,4 +1,14 @@
 // =============================================================================
+//  RETIRED 2026-09-17 - FACADE OVER THE UNIFIED STORE (lib/screens/products/)
+// -----------------------------------------------------------------------------
+//  The user's call: "I want to retire the mall. One unified product system."
+//  The public class name(s) below now build the unified screen so every
+//  existing call site lands there without an edit; the old body is kept as
+//  `...Classic` for revert (comment out, never delete). Delete after a
+//  release cycle with no revert. See docs/PRODUCTS-AUDIT.md.
+// =============================================================================
+
+// =============================================================================
 //  Product Guide hub — browse the products worth researching
 // -----------------------------------------------------------------------------
 //  The Tools-tab entry for the Product Guide (both apps use it identically). A
@@ -13,15 +23,18 @@ import 'product_guide_data.dart';
 import 'product_guide_screen.dart';
 import 'product_guide_style.dart';
 import '../../localization/app_language.dart';
+import '../products/pv_store_chrome.dart';
+import '../products/pv_store_screen.dart';
+import '../../services/life_stage_store.dart';
 
-class ProductGuideHubScreen extends StatefulWidget {
-  const ProductGuideHubScreen({super.key});
+class ProductGuideHubScreenClassic extends StatefulWidget {
+  const ProductGuideHubScreenClassic({super.key});
 
   @override
-  State<ProductGuideHubScreen> createState() => _ProductGuideHubScreenState();
+  State<ProductGuideHubScreenClassic> createState() => _ProductGuideHubScreenState();
 }
 
-class _ProductGuideHubScreenState extends State<ProductGuideHubScreen> {
+class _ProductGuideHubScreenState extends State<ProductGuideHubScreenClassic> {
   final _search = TextEditingController();
   String _q = '';
 
@@ -34,7 +47,7 @@ class _ProductGuideHubScreenState extends State<ProductGuideHubScreen> {
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 22), child: c);
 
   void _open(ProductGuide g) =>
-      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => ProductGuideScreen(guide: g)));
+      Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => ProductGuideScreenClassic(guide: g)));
 
   List<ProductGuide> get _matches {
     final t = _q.trim().toLowerCase();
@@ -279,4 +292,15 @@ class _ProductGuideHubScreenState extends State<ProductGuideHubScreen> {
       ),
     );
   }
+}
+
+// ---- facade (the retirement) -----------------------------------------------
+
+/// The Guide hub's experts, ingredients and studies now live ON the product
+/// page; the hub itself is the store's Parenting storefront.
+class ProductGuideHubScreen extends StatelessWidget {
+  const ProductGuideHubScreen({super.key});
+  @override
+  Widget build(BuildContext context) =>
+      const PvStoreScreen(chrome: PvStoreChrome.none, initialStage: LifeStage.parenting);
 }

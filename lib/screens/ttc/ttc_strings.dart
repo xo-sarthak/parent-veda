@@ -108,6 +108,7 @@ class TtcS {
   // ⚠️ V3 ONLY. V1 keeps Today · Prepare · Tools · Calendar · Community, and
   // the reason the two differ is written out at the nav in `ttc_common.dart`.
   String get tabCourses => _p('Courses', 'Courses');
+  String get tabProducts => _p('Products', 'Products');
   String get tabTalkToExpert => _p('Talk to expert', 'Expert se baat');
   String get tabMore => _p('More', 'Aur');
 

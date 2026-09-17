@@ -53,6 +53,7 @@ class UsageSurface {
   static const tools = 'tools';
   static const garbh = 'garbh';
   static const prepare = 'prepare';
+  static const products = 'products';
   static const community = 'community';
   static const askVeda = 'ask_veda';
   static const profile = 'profile';
@@ -73,7 +74,7 @@ class UsageSurface {
   static const sponsorProgramme = 'sponsor_programme';
 
   static const all = <String>{
-    home, weekly, calendar, journal, tools, garbh, prepare, community,
+    home, weekly, calendar, journal, tools, garbh, prepare, products, community,
     askVeda, profile,
     myChild, explore, watch, food, learn, health, development,
     ttcToday, ttcCycle, ttcLearn,

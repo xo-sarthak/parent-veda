@@ -118,7 +118,9 @@ void main() {
       // one `habits` tracker, so four tiles became one. Four fewer tiles, one
       // more, and not a single capability lost — all four are named on the new
       // tile and the findability test above asserts it.
-      expect(TtcToolsScreen.toolCount, 23);
+      // ⚠️ 23 -> 24 ON 2026-09-17. Courses left the V3 bar (slot 2 is the
+      // unified store) and became the first tile of Plan and learn.
+      expect(TtcToolsScreen.toolCount, 24);
     });
 
     testWidgets('all nine Prepare categories render', (tester) async {

@@ -1,4 +1,14 @@
 // =============================================================================
+//  RETIRED 2026-09-17 - FACADE OVER THE UNIFIED STORE (lib/screens/products/)
+// -----------------------------------------------------------------------------
+//  The user's call: "I want to retire the mall. One unified product system."
+//  The public class name(s) below now build the unified screen so every
+//  existing call site lands there without an edit; the old body is kept as
+//  `...Classic` for revert (comment out, never delete). Delete after a
+//  release cycle with no revert. See docs/PRODUCTS-AUDIT.md.
+// =============================================================================
+
+// =============================================================================
 //  ProductsSubcategoryScreen - Products · subcategory (parenting · S3·subcat v2)
 // -----------------------------------------------------------------------------
 //  A subcategory (e.g. Soothers & white noise): what-to-look-for, working brand
@@ -12,17 +22,19 @@ import 'package:flutter/material.dart';
 import 'pp_common.dart';
 import 'pp_product_widgets.dart';
 import 'pp_products_data.dart';
+import '../../data/products/pv_catalog_adapters.dart' show pvSlug;
+import '../products/pv_shelf_screen.dart';
 
-class ProductsSubcategoryScreen extends StatefulWidget {
-  const ProductsSubcategoryScreen({super.key, this.category = 'Sleep', this.sub = 'Soothers & white noise'});
+class ProductsSubcategoryScreenClassic extends StatefulWidget {
+  const ProductsSubcategoryScreenClassic({super.key, this.category = 'Sleep', this.sub = 'Soothers & white noise'});
   final String category;
   final String sub;
 
   @override
-  State<ProductsSubcategoryScreen> createState() => _ProductsSubcategoryScreenState();
+  State<ProductsSubcategoryScreenClassic> createState() => _ProductsSubcategoryScreenState();
 }
 
-class _ProductsSubcategoryScreenState extends State<ProductsSubcategoryScreen> {
+class _ProductsSubcategoryScreenState extends State<ProductsSubcategoryScreenClassic> {
   String _brand = 'All brands';
   String _sort = 'Top rated'; // 'Top rated' | 'Price'
   bool _underK = false;
@@ -232,4 +244,14 @@ class _ProductsSubcategoryScreenState extends State<ProductsSubcategoryScreen> {
         ),
     ]);
   }
+}
+
+// ---- facade (the retirement) -----------------------------------------------
+
+class ProductsSubcategoryScreen extends StatelessWidget {
+  const ProductsSubcategoryScreen({super.key, this.category = 'Sleep', this.sub = 'Soothers & white noise'});
+  final String category;
+  final String sub;
+  @override
+  Widget build(BuildContext context) => PvShelfScreen(categoryId: pvSlug(category), subId: pvSlug(sub));
 }

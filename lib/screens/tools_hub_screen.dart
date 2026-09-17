@@ -38,6 +38,7 @@ import 'care_partner/care_debug_screen.dart';
 import '../brand/brand_models.dart';
 import '../brand/launch_hub_screen.dart';
 import 'product_guide/product_guide_hub_screen.dart';
+import 'prepare/prepare_hub_screen.dart';
 import 'tools/ask_veda_screen.dart';
 import 'tools/baby_movement_screen.dart';
 import 'tools/contraction_tracker_screen.dart';
@@ -82,6 +83,13 @@ class ToolsHubScreen extends StatelessWidget {
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => b()));
 
     final tools = <_Tool>[
+      // ⚠️ PREPARE LEFT THE BAR — 2026-09-17. Slot 2 became the unified store
+      // (docs/PRODUCTS-AUDIT.md); the courses, consults, yoga and birthing
+      // classes hub is the FIRST tile here so it is one tap further, never
+      // hidden. Pushed with a back label because it was a tab root before.
+      _Tool(s.tabPrepare, Icons.school_outlined, AppTheme.primary400,
+          () => open(() => PrepareHubScreen(lang: controller.language, backLabel: s.toolsTab)),
+          priority: PregPriority.birthPrep),
       // ⚠️ THE DOOR, NOT THE LIBRARY — 2026-09-12. Found on the phone: this
       // tile still opened `GarbhScreen`, the "pick a pillar" menu the door
       // replaced, so the area had two front doors and the older one was the
@@ -116,6 +124,9 @@ class ToolsHubScreen extends StatelessWidget {
           () => open(() => ReadyForBirthScreen(controller: controller)), priority: PregPriority.birthPrep),
       _Tool(s.pclTitle, Icons.checklist_rounded, const Color(0xFF3E9A8C),
           () => open(() => ProductChecklistScreen(controller: controller)), priority: PregPriority.birthPrep),
+      // Product Guide is inside the store now (the Guide's experts, ingredients
+      // and studies sit on every product page). Tile kept so the word still
+      // finds it; it opens the Parenting storefront.
       _Tool('Product Guide', Icons.menu_book_outlined, AppTheme.primary400,
           () => open(() => const ProductGuideHubScreen())),
       // The Launch Hub's only front door. A destination is visited on purpose —

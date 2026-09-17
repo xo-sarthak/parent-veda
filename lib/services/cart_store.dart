@@ -30,6 +30,7 @@ class CartItem {
     this.qty = 1,
     this.size = '',
     this.color = '',
+    this.image = '',
   });
 
   final String lineId;
@@ -40,6 +41,10 @@ class CartItem {
   int qty;
   String size; // optional variant
   String color; // optional variant
+
+  /// Photo URL for the cart row. Added 2026-09-17 with the unified store —
+  /// optional, JSON key 'i', so every cart persisted before it still loads.
+  String image;
 
   double get lineTotal => unitPrice * qty;
 
@@ -52,6 +57,7 @@ class CartItem {
         'q': qty,
         's': size,
         'c': color,
+        if (image.isNotEmpty) 'i': image,
       };
 
   factory CartItem.fromJson(Map<String, dynamic> j) => CartItem(
@@ -63,6 +69,7 @@ class CartItem {
         qty: (j['q'] as num?)?.toInt() ?? 1,
         size: j['s'] as String? ?? '',
         color: j['c'] as String? ?? '',
+        image: j['i'] as String? ?? '',
       );
 }
 
@@ -119,6 +126,7 @@ class CartStore extends ChangeNotifier with CloudSyncedStore {
     String size = '',
     String color = '',
     int qty = 1,
+    String image = '',
   }) {
     final list = _carts.putIfAbsent(cartId, () => []);
     // Same product + same variant → just bump the quantity.
@@ -139,6 +147,7 @@ class CartStore extends ChangeNotifier with CloudSyncedStore {
       qty: qty,
       size: size,
       color: color,
+      image: image,
     ));
     _persistNotify();
   }

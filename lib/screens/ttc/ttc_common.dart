@@ -28,6 +28,7 @@ import 'ttc_calendar_screen.dart';
 import 'ttc_community_screen.dart';
 import 'ttc_more_screen.dart';
 import 'ttc_prepare_screen.dart';
+import 'ttc_shop_v3.dart' show TtcShopScreen;
 import 'ttc_profile_screen.dart';
 import 'ttc_strings.dart';
 import 'ttc_home_version.dart';
@@ -623,9 +624,11 @@ void openTtcTabV3(BuildContext context, int index) {
     // they went — the same mistake already fixed once for the consult button in
     // `ttc_home_v3.dart`'s `kTtcActConsult`.
     case 1:
+      // The unified store with this stage's bar. Kept for revert:
+      //   const TtcPrepareScreen(onlyCategory: 'courses') at 'ttc/courses'
       nav.push(MaterialPageRoute<void>(
-          builder: (_) => const TtcPrepareScreen(onlyCategory: 'courses'),
-          settings: const RouteSettings(name: 'ttc/courses')));
+          builder: (_) => const TtcShopScreen(),
+          settings: const RouteSettings(name: 'ttc/products')));
       break;
     case 2:
       nav.push(MaterialPageRoute<void>(
@@ -679,8 +682,11 @@ int ttcV3ActiveFor(String? route, int v1Active) {
   switch (route) {
     case ttcHomeRoute:
       return 0;
-    case 'ttc/courses':
+    case 'ttc/products':
       return 1;
+    case 'ttc/courses':
+      // Courses lives under Tools now (its first tile).
+      return 2;
     case 'ttc/tools':
       return 2;
     case 'ttc/consults':
@@ -817,9 +823,12 @@ class TtcBottomNav extends StatelessWidget {
   /// V3's icons. Tabs 0 and 2 are deliberately identical to V1's — Today and
   /// Tools mean the same thing in both, and a woman who flips the version pill
   /// should not have to re-find them.
+  // ⚠️ SLOT 2 IS THE STORE — 2026-09-17 (docs/PRODUCTS-AUDIT.md). Same word,
+  // icon and position on all three stages. Courses moved to the first tile
+  // of the Tools hub. Kept for revert: Icons.school_outlined / t.tabCourses.
   static const List<IconData> _iconsV3 = [
     Icons.home_outlined,
-    Icons.school_outlined,
+    Icons.shopping_basket_outlined,
     Icons.handyman_outlined,
     Icons.chat_bubble_outline_rounded,
     Icons.more_horiz_rounded,
@@ -837,7 +846,7 @@ class TtcBottomNav extends StatelessWidget {
       [t.tabToday, t.tabPrepare, t.tabTools, t.tabCalendar, t.tabCommunity];
 
   static List<String> _labelsV3(TtcS t) =>
-      [t.tabToday, t.tabCourses, t.tabTools, t.tabTalkToExpert, t.tabMore];
+      [t.tabToday, t.tabProducts, t.tabTools, t.tabTalkToExpert, t.tabMore];
 
   // ⚠️ NOW A THIN ADAPTER OVER `PvNavBar`. This bar was the furthest behind of
   // the three: it both re-flowed the row on every tap AND kept a saturated

@@ -334,14 +334,16 @@ void main() {
       expect(find.text(ttcCanIById('chai')!.question(false)), findsOneWidget);
     });
 
-    testWidgets('a product pointer highlights without reordering',
-        (tester) async {
+    testWidgets('a product pointer opens that product', (tester) async {
+      // ⚠️ CHANGED 2026-09-17. The pointer used to land on the flat research
+      // list with the item highlighted. `TtcProductsScreen(focusId:)` is a
+      // facade now: an Ask Veda `ttcprod_folic` opens the unified product
+      // page for `ttc_folic` directly — the way every shop's deep link lands
+      // on the product, not on a list with a glow. The other products are one
+      // tap away on the shelf, never gone.
       await pumpTall(tester, const TtcProductsScreen(focusId: 'folic'));
       expect(tester.takeException(), isNull);
-      // Every other product is still there.
-      for (final p in ttcProducts.take(4)) {
-        expect(find.text(p.name(false)), findsWidgets, reason: p.id);
-      }
+      expect(find.text(ttcProducts.first.name(false)), findsWidgets);
     });
 
     testWidgets('an unknown id degrades to the plain library', (tester) async {

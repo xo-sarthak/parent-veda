@@ -1,4 +1,14 @@
 // =============================================================================
+//  RETIRED 2026-09-17 - FACADE OVER THE UNIFIED STORE (lib/screens/products/)
+// -----------------------------------------------------------------------------
+//  The user's call: "I want to retire the mall. One unified product system."
+//  The public class name(s) below now build the unified screen so every
+//  existing call site lands there without an edit; the old body is kept as
+//  `...Classic` for revert (comment out, never delete). Delete after a
+//  release cycle with no revert. See docs/PRODUCTS-AUDIT.md.
+// =============================================================================
+
+// =============================================================================
 //  ParentVeda Products ❤️ (Tools card) - a trust-first decision engine
 // -----------------------------------------------------------------------------
 //  Recommended (stage-aware) / Browse all / Saved. Each category leads with a
@@ -21,6 +31,11 @@ import 'cart_screen.dart';
 import 'product_guide/product_guide_chooser.dart';
 import 'product_guide/product_guide_data.dart';
 import 'tools/product_checklist_screen.dart';
+import 'products/pv_product_screen.dart';
+import 'products/pv_shelf_screen.dart';
+import 'products/pv_store_chrome.dart';
+import 'products/pv_store_screen.dart';
+import '../services/life_stage_store.dart';
 
 const Color _score = Color(0xFFE6A817); // warm gold for the score
 const Color _accent = AppTheme.primary500;
@@ -49,8 +64,8 @@ void _push(BuildContext c, Widget w) =>
 //  Home - 3 tabs
 // ===========================================================================
 
-class ProductsScreen extends StatelessWidget {
-  const ProductsScreen({super.key, required this.controller});
+class ProductsScreenClassic extends StatelessWidget {
+  const ProductsScreenClassic({super.key, required this.controller});
   final PregnancyController controller;
 
   @override
@@ -665,8 +680,8 @@ class _WeekTimeline extends StatelessWidget {
 //  Category page (guidance → picks → browse all)
 // ===========================================================================
 
-class ProductCategoryScreen extends StatelessWidget {
-  const ProductCategoryScreen({super.key, required this.category, required this.controller});
+class ProductCategoryScreenClassic extends StatelessWidget {
+  const ProductCategoryScreenClassic({super.key, required this.category, required this.controller});
   final ProductCategory category;
   final PregnancyController controller;
   @override
@@ -717,8 +732,8 @@ class ProductCategoryScreen extends StatelessWidget {
 //  Product detail
 // ===========================================================================
 
-class ProductDetailScreen extends StatelessWidget {
-  const ProductDetailScreen({super.key, required this.product, required this.controller});
+class ProductDetailScreenClassic extends StatelessWidget {
+  const ProductDetailScreenClassic({super.key, required this.product, required this.controller});
   final Product product;
   final PregnancyController controller;
   @override
@@ -1190,4 +1205,31 @@ class _ProductSearchDelegate extends SearchDelegate<void> {
         ),
     ]);
   }
+}
+
+// ---- facades (the retirement) ----------------------------------------------
+
+/// The pregnancy shop -> the unified store on the Pregnancy storefront.
+class ProductsScreen extends StatelessWidget {
+  const ProductsScreen({super.key, required this.controller});
+  final PregnancyController controller;
+  @override
+  Widget build(BuildContext context) =>
+      const PvStoreScreen(chrome: PvStoreChrome.none, initialStage: LifeStage.pregnancy);
+}
+
+class ProductCategoryScreen extends StatelessWidget {
+  const ProductCategoryScreen({super.key, required this.category, required this.controller});
+  final ProductCategory category;
+  final PregnancyController controller;
+  @override
+  Widget build(BuildContext context) => PvShelfScreen(categoryId: category.id);
+}
+
+class ProductDetailScreen extends StatelessWidget {
+  const ProductDetailScreen({super.key, required this.product, required this.controller});
+  final Product product;
+  final PregnancyController controller;
+  @override
+  Widget build(BuildContext context) => PvProductScreen(productId: product.id);
 }

@@ -23,6 +23,7 @@ CLAUDE.md invariants) → brief → build → this ledger.
 | 4 | Family model — stage transitions, second child, partner | 2026-09-16 | `FAMILY-MODEL.md` §2–4 | Written down; `pregnancies` table owed |
 | 5 | Onboarding questions, OTP length, invite-applied state | 2026-09-17 | this file §5 | Yes, inside the onboarding build |
 | 6 | Base UI — page ground, buttons, chips, cards, sheets, type | 2026-09-17 | `DESIGN-SYSTEM.md` §4.0 · `BASE-UI-DECISIONS.md` | Ground, type (Newsreader + Manrope), button theme, transitions, callouts, sheets; §2 answered; sweep owed |
+| 7 | Products — one store for three stages | 2026-09-17 | `PRODUCTS-AUDIT.md` | Yes, same day (`lib/screens/products/`, nine screens; old screens are facades) |
 
 ---
 
@@ -168,6 +169,34 @@ one that changed the app is §2.3: Fraunces out, Newsreader in, through the
 **Owed.** `BASE-UI-DECISIONS.md` §3 (the sweep); STILL-OPEN §63.3's two
 remaining walks.
 
+## 7. Products — one store for three stages
+
+**Asked.** Fourteen flow queries across ~20 apps: storefronts (Amazon Haul,
+Target, H&M, Blinkit Kids, Walmart nursery, SHEIN, Tabby), the department
+switch (H&M's `WOMEN +`, Zara's menu, H&M search with counts), listings (Etsy,
+Zara, Sephora), product pages (Amazon's 20 screens, Sephora, CRED Store),
+gallery/zoom (H&M, SSENSE), reviews (Best Buy, Target, Etsy, Amazon), experts
+(Lovi, Liven, Klarna, Swiggy), compare (Best Buy, Walmart, lululemon),
+variant sheets (Yami, UNIQLO, Etsy), cart → checkout → placed (foodpanda,
+7-Eleven, adidas, CRED's address sheet), orders (Apple Store, Starlink).
+
+**Found.** The storefront is a menu of ways in (search · department · category
+glyphs · for-you · editorial · shelves). The department switch is one word at
+the top, and search is cross-department with counts. The listing card is a
+contract users already read. The product page is a funnel in one scroll with a
+sticky commit bar. Reviews lead with a number and pros/cons chips; experts are
+named with credentials. Checkout is one spine everywhere.
+
+**Adopted.** All of it as-is, in our type and on the base-UI rule; one store
+with three storefronts and the stage switch in the second slot; Products in
+slot 2 of every bar; our two blocks — *ParentVeda recommends* (a signed
+reason, on some products) and *What experts say* — and the honest empties.
+
+**Declined.** Distribution bars we cannot back, AI review summaries, sponsored
+storefront rows, a score /100, per-stage product screens, the Guide chooser.
+
+**Owed.** STILL-OPEN §65.
+
 ---
 
 ## What the library does not carry
@@ -176,6 +205,11 @@ Searching these by name returns junk (Mindvalley, an HR app): **Ovia, Glow,
 Huckleberry, BabyCenter, What to Expect.** Search parenting patterns by
 description instead. In: Flo, Clue, Headspace, Oura, Apple Health, Swiggy,
 Zomato, CRED, and the general-purpose apps above.
+
+Shopping (2026-09-17): **Myntra, Nykaa, Flipkart, FirstCry are NOT in** — the
+queries fall through to Shopee, Instagram shops and CRED. In: Amazon, Zara,
+H&M, Sephora, Etsy, Target, Walmart, Blinkit, CRED Store, Tabby, SHEIN,
+adidas, UNIQLO, Best Buy, lululemon.
 
 ## Queries that worked
 
@@ -195,6 +229,5 @@ Zomato, CRED, and the general-purpose apps above.
 
 - The three "today" homes as one app (the habit question proper) — after the
   V3 homes settle.
-- Product / commerce screens across stages (§61.2).
 - The day-2 return: what the first notification says, what visibly changes.
 - The story-card format for the home's daily rail (§60.3).

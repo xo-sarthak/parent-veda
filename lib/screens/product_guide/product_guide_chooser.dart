@@ -1,4 +1,14 @@
 // =============================================================================
+//  RETIRED 2026-09-17 - FACADE OVER THE UNIFIED STORE (lib/screens/products/)
+// -----------------------------------------------------------------------------
+//  The user's call: "I want to retire the mall. One unified product system."
+//  The public class name(s) below now build the unified screen so every
+//  existing call site lands there without an edit; the old body is kept as
+//  `...Classic` for revert (comment out, never delete). Delete after a
+//  release cycle with no revert. See docs/PRODUCTS-AUDIT.md.
+// =============================================================================
+
+// =============================================================================
 //  Product Guide — the "which view?" chooser + detail-page banner
 // -----------------------------------------------------------------------------
 //  When a parent taps a product that HAS a Product Guide, we don't guess where
@@ -18,7 +28,7 @@ import '../../localization/app_language.dart';
 
 /// Open a tapped product. If a Product Guide exists for it (by [id] or [name]),
 /// ask the parent which view they'd like; otherwise just [onOpenNormal].
-void openProductWithGuideCheck(
+void openProductWithGuideCheckClassic(
   BuildContext context, {
   String? id,
   String? name,
@@ -65,7 +75,7 @@ void showProductViewChooser(
             featured: true,
             onTap: () {
               Navigator.of(ctx).pop();
-              Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => ProductGuideScreen(guide: guide)));
+              Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => ProductGuideScreenClassic(guide: guide)));
             },
           ),
           const SizedBox(height: 12),
@@ -141,7 +151,7 @@ Widget productGuideBanner(BuildContext context, ProductGuide guide, {EdgeInsets 
     Padding(
       padding: padding,
       child: GestureDetector(
-        onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => ProductGuideScreen(guide: guide))),
+        onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => ProductGuideScreenClassic(guide: guide))),
         behavior: HitTestBehavior.opaque,
         child: Container(
           padding: const EdgeInsets.all(14),
@@ -169,3 +179,17 @@ Widget productGuideBanner(BuildContext context, ProductGuide guide, {EdgeInsets 
         ),
       ),
     );
+
+// ---- facade (the retirement) -----------------------------------------------
+
+/// The "Guide or quick page?" sheet is retired: there is one product page
+/// now and the Guide's layers are on it. Every caller's `onOpenNormal` is a
+/// `ProductDetailScreen` push, and that class is itself a facade over the
+/// unified page - so opening "normally" IS opening the guide.
+void openProductWithGuideCheck(
+  BuildContext context, {
+  String? id,
+  String? name,
+  required VoidCallback onOpenNormal,
+}) =>
+    onOpenNormal();

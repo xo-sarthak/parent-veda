@@ -33,7 +33,11 @@ enum PaymentOutcome { paid, free, cancelled, failed, notConfigured }
 class PaymentResult {
   const PaymentResult(this.outcome, [this.message]);
   final PaymentOutcome outcome;
+
+  /// On [PaymentOutcome.paid], the Razorpay payment id; otherwise a reason.
   final String? message;
+
+  String get paymentId => outcome == PaymentOutcome.paid ? (message ?? '') : '';
 
   /// True when the purchase should be granted — a real paid payment, or a free
   /// offering. [notConfigured] is handled separately (preview mint).
@@ -45,23 +49,50 @@ class PaymentService {
   PaymentService._();
   static final PaymentService instance = PaymentService._();
 
-  /// Run checkout for [offering]. Awaits the full order → pay → verify flow.
-  Future<PaymentResult> checkout(Offering offering, {String? email}) async {
-    // Free ("Free on ParentVeda+", ₹0) — nothing to charge.
-    if (offering.priceMinor <= 0) {
+  /// Run checkout for a booking [offering]. Awaits order → pay → verify.
+  Future<PaymentResult> checkout(Offering offering, {String? email}) =>
+      pay(
+        amountMinor: offering.priceMinor,
+        title: offering.title,
+        reference: offering.id,
+        email: email,
+      );
+
+  /// The general three-step flow, shared by bookings and the product store.
+  ///
+  /// [reference] is what the server writes into the Razorpay order's notes
+  /// (an offering id, or a product order id). [lines] is the product-store
+  /// case: the edge function re-prices them from the `products` table so
+  /// the amount charged is the server's, not the phone's — "money is decided
+  /// server-side, always". When it cannot price a line it falls back to
+  /// [amountMinor] and marks the order `priced_by: client`, which is
+  /// auditable rather than silent.
+  Future<PaymentResult> pay({
+    required int amountMinor,
+    required String title,
+    required String reference,
+    String? email,
+    String? contact,
+    List<Map<String, Object>> lines = const [],
+  }) async {
+    // Free — nothing to charge.
+    if (amountMinor <= 0) {
       return const PaymentResult(PaymentOutcome.free);
     }
 
     // 1) Create the order server-side. Null means the payment backend is not
-    //    reachable — fall back to preview rather than block the booking.
+    //    reachable — fall back to preview rather than block the purchase.
     final order = await SupabaseRepo.invokeEdge('razorpay-create-order', {
-      'amountMinor': offering.priceMinor,
-      'offeringId': offering.id,
+      'amountMinor': amountMinor,
+      'offeringId': reference,
+      if (lines.isNotEmpty) 'lines': lines,
     });
     final orderId = order?['orderId'] as String?;
     if (orderId == null) {
       return const PaymentResult(PaymentOutcome.notConfigured);
     }
+    // The server's amount wins when it re-priced the lines.
+    final chargeMinor = (order?['amount'] as num?)?.toInt() ?? amountMinor;
 
     // 2) Open checkout and await the native callback.
     final completer = Completer<PaymentResult>();
@@ -76,7 +107,7 @@ class PaymentService {
       });
       if (!completer.isCompleted) {
         completer.complete(v?['valid'] == true
-            ? const PaymentResult(PaymentOutcome.paid)
+            ? PaymentResult(PaymentOutcome.paid, r.paymentId)
             : const PaymentResult(
                 PaymentOutcome.failed, 'Payment could not be verified.'));
       }
@@ -104,12 +135,16 @@ class PaymentService {
       rzp.open({
         'key': PaymentConfig.razorpayKeyId,
         'order_id': orderId,
-        'amount': offering.priceMinor,
+        'amount': chargeMinor,
         'currency': 'INR',
         'name': 'ParentVeda',
-        'description': offering.title,
-        'theme': {'color': '#6A30B6'},
-        if (email != null) 'prefill': {'email': email},
+        'description': title,
+        'theme': {'color': '#201C24'},
+        if (email != null || contact != null)
+          'prefill': {
+            'email': ?email,
+            'contact': ?contact,
+          },
       });
     } catch (e) {
       if (!completer.isCompleted) {

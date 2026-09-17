@@ -136,7 +136,16 @@ class FabRouteObserver extends NavigatorObserver {
             // Seen on a phone, 2026-09-14: the button sat over the consent
             // list, the keepsake's end line and the locked panel.
             name.startsWith('sk_') ||
-            name.startsWith('sk/'));
+            name.startsWith('sk/') ||
+            // The store's transactional screens: a commit bar owns the bottom
+            // (bag, checkout, the placed screen) or the photo owns the whole
+            // screen (zoom). Seen on the phone 2026-09-17: the pill sat on
+            // top of "View order". The storefront, shelf and product page
+            // keep it — a question mid-decision is exactly its job there.
+            name == 'store/cart' ||
+            name == 'store/checkout' ||
+            name == 'store/placed' ||
+            name == 'store/gallery');
     FabState.instance
         ._update(inParenting: inParenting, inTtc: inTtc, suppressed: suppressed);
   }

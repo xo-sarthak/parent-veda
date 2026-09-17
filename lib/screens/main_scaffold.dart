@@ -37,7 +37,9 @@ import 'father/father_reads_screen.dart';
 // ignore: unused_import
 import 'home_screen_b.dart';
 import 'today_home_screen.dart';
-import 'prepare/prepare_hub_screen.dart';
+// import 'prepare/prepare_hub_screen.dart'; // kept for revert (slot 2 → store)
+import 'products/pv_store_chrome.dart';
+import 'products/pv_store_screen.dart';
 import 'tools_hub_screen.dart';
 import 'weekly_card_stack_screen.dart';
 import '../services/usage_events.dart';
@@ -51,7 +53,7 @@ import '../booking/prescription_watch.dart';
 /// language, and the numbers would look like a drop in usage.
 const _pregnancySurfaces = <String>[
   UsageSurface.home,
-  UsageSurface.prepare,
+  UsageSurface.products,
   UsageSurface.tools,
   UsageSurface.calendar,
   UsageSurface.community,
@@ -190,7 +192,14 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
                 // HomeScreenB(pregnancy: widget.pregnancy, home: widget.home),
                 TodayHomeScreen(
                     pregnancy: widget.pregnancy, home: widget.home),
-                PrepareHubScreen(lang: widget.pregnancy.language),
+                // ⚠️ SLOT 2 IS THE STORE — 2026-09-17, the user's call after
+                // the Mobbin marketplace audit: "Products" in the same slot
+                // with the same word and icon on all three stages, so
+                // everyone learns one ParentVeda. Prepare (courses, consults,
+                // yoga, birthing classes) is the first tile of the Tools hub
+                // now. Kept for revert:
+                //   PrepareHubScreen(lang: widget.pregnancy.language),
+                const PvStoreScreen(chrome: PvStoreChrome.embedded),
                 ToolsHubScreen(controller: widget.pregnancy),
                 CalendarScreen(controller: widget.pregnancy),
                 CommunityScreen(controller: widget.pregnancy),
@@ -215,7 +224,8 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
                 //   home_rounded · school_rounded · widgets_rounded ·
                 //   calendar_today_rounded · groups_rounded
                 PvTab(Icons.home_outlined, s.tabToday),
-                PvTab(Icons.school_outlined, s.tabPrepare),
+                // Was: PvTab(Icons.school_outlined, s.tabPrepare) — kept for revert.
+                const PvTab(Icons.shopping_basket_outlined, 'Products'),
                 PvTab(Icons.handyman_outlined, s.toolsTab),
                 PvTab(Icons.calendar_today_outlined, s.tabCalendar),
                 PvTab(Icons.groups_outlined, s.tabCommunity),

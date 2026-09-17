@@ -39,6 +39,11 @@
 /// Where a surface lives. Five tabs, plus the Profile stack behind the avatar.
 enum AppHome {
   today,
+
+  /// Slot 2 on every stage's bar since 2026-09-17 — the unified store. Prepare
+  /// (courses, consults) moved into Tools as its first tile; `prepare` stays
+  /// as a value because its surfaces still answer its question.
+  products,
   prepare,
   tools,
   community,
@@ -55,7 +60,8 @@ extension AppHomeCopy on AppHome {
   /// answer it, the surface is in the wrong place.
   String get question => switch (this) {
         AppHome.today => 'What matters right now?',
-        AppHome.prepare => 'What can I learn or buy?',
+        AppHome.products => 'What should I buy — and what should I not?',
+        AppHome.prepare => 'What can I learn or book?',
         AppHome.tools => 'What can I track or check?',
         AppHome.community => 'Am I normal, and who can I ask?',
         AppHome.calendar => 'What is coming up?',
@@ -64,6 +70,7 @@ extension AppHomeCopy on AppHome {
 
   String get label => switch (this) {
         AppHome.today => 'Today',
+        AppHome.products => 'Products',
         AppHome.prepare => 'Prepare',
         AppHome.tools => 'Tools',
         AppHome.community => 'Community',
@@ -106,7 +113,7 @@ const List<AppSurface> kAppSurfaces = [
   AppSurface('cohorts', AppHome.prepare, 'Cohorts'),
   AppSurface('yoga', AppHome.prepare, 'Yoga'),
   AppSurface('birthing_classes', AppHome.prepare, 'Birthing classes'),
-  AppSurface('shop', AppHome.prepare, 'Shop'),
+  AppSurface('shop', AppHome.products, 'Products'),
   AppSurface('nutrition', AppHome.prepare, 'Nutrition'),
 
   // ---- Tools: track or check -------------------------------------------------

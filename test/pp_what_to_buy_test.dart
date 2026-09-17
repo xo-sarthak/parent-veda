@@ -13,6 +13,7 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:parentveda/services/pv_compare_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/data/doors/pp_door_data.dart';
@@ -55,13 +56,17 @@ void main() {
     });
 
     test('the route seeds the tray with that shelf, and the bare route keeps the empty state', () {
-      PpCompareStore.instance.clear();
+      // ⚠️ THE UNIFIED TRAY SINCE 2026-09-17. The route seeds `PvCompareStore`
+      // (one tray for all three stages) from the unified shelf; the screen
+      // returned is the facade over `PvCompareScreen`. Kept for revert:
+      //   PpCompareStore.instance.selected / .count
+      PvCompareStore.instance.clear();
       expect(ppScreenForSurface('pp_compare/Sleepwear & sacks'), isA<ProductsCompareScreen>());
-      expect(PpCompareStore.instance.selected.map((p) => p.sub).toSet(), {'Sleepwear & sacks'});
-      expect(PpCompareStore.instance.count, 2, reason: 'that shelf holds two; the tray takes two');
+      expect(PvCompareStore.instance.items.map((p) => p.subId).toSet(), {'sleepwear_and_sacks'});
+      expect(PvCompareStore.instance.items.length, 2, reason: 'that shelf holds two; the tray takes two');
       expect(ppScreenForSurface('pp_compare/Rash creams'), isA<ProductsCompareScreen>());
-      expect(PpCompareStore.instance.count, 1, reason: 'a one-product shelf: the "one" state, not empty');
-      PpCompareStore.instance.clear();
+      expect(PvCompareStore.instance.items.length, 1, reason: 'a one-product shelf: the "one" state, not empty');
+      PvCompareStore.instance.clear();
       expect(ppScreenForSurface('pp_compare'), isA<ProductsCompareScreen>());
       expect(PpCompareStore.instance.count, 0);
     });

@@ -1657,6 +1657,54 @@ Saved screen now has one opener map, `SavedItemOpener`, which is the single
 answer to "what does tapping a saved thing do" — the same shape as
 `pvDoorEntryScreen`: null for an unknown id, never a near match.
 
+## 16e. The price is the server's; the status is the payment's — `orders`
+
+From the unified store (2026-09-17, `docs/PRODUCTS-AUDIT.md`), built as
+`0083_products_unified_and_orders.sql`, `lib/services/pv_order_store.dart`,
+`lib/booking/payment_service.dart` (`pay()`), and a change to
+`supabase/functions/razorpay-create-order/index.ts`. Three general facts.
+
+**1. Never charge a number the phone sent.** The booking flow already sent
+`amountMinor` from the client, and for a fixed-price consult that was
+tolerable because the server could have looked it up and did not. A cart is
+different: quantities, variants and a "delivery fee above ₹999" rule are
+exactly the things a modified client would edit. So the store sends the
+**lines** — `{productId, variantId?, qty}` — and the function prices them
+from `products` with the service-role key. The amount Razorpay opens with is
+the one the server computed, and `PaymentService.pay()` reads it back from
+the create-order response rather than trusting its own figure.
+
+The trade-off is what happens when the server *cannot* price a line (the
+unified catalogue is seed-only until 0083 is loaded). Refusing would make the
+shop unable to take money because a table is behind. Silently charging the
+client's number would be the bug we are avoiding, wearing a disguise. The
+function does the third thing: it charges the client's figure **and writes
+`priced_by: client` into the Razorpay order's notes**, so every such order is
+findable in the dashboard. A fallback you can audit is a fallback; one you
+cannot is a hole.
+
+**2. An order's status is a claim about money, so only the money may set it.**
+`PvOrderStore.place()` takes the status from its caller and the caller is the
+checkout screen *after* `PaymentService` returned — `paid` only when the
+Razorpay signature verified server-side, `preview` when the payment stack was
+unreachable. The app never promotes an order on its own judgement, and the
+preview copy says "no money moved and nothing ships" in the first sentence.
+The hardening not yet written: a trigger refusing `status = 'paid'` without a
+`payment_id`, and the verify function writing the row itself so the client is
+not even the messenger.
+
+**3. A ledger is rows; a preference is a blob.** Addresses and the order list
+sync as one `user_state` blob (`CloudSyncedStore`, the CartStore shape) so a
+new phone gets them back — cloud-wins-on-startup is fine for "which address is
+default". But an order is something support, fulfilment and an accountant
+must query, filter and sum, and a JSON blob keyed by user is none of those. So
+each order is *also* a row in `orders`, upserted on the app-minted id (a retry
+is idempotent, never a second order), owned by the person, with the address
+and the items **snapshotted** into the row — editing her address next month
+must not rewrite what was shipped last month. RLS: select/insert/update on
+`user_id = auth.uid()`, and no delete policy at all. A ledger keeps its rows;
+cancel is a status.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
@@ -1701,3 +1749,7 @@ answer to "what does tapping a saved thing do" — the same shape as
 20. `docs/FAMILY-MODEL.md` → `0081_saved_items.sql` → `lib/services/saved_store.dart`
     — who owns what across stages; tags vs owners; rows vs blobs, and the
     three columns a two-device merge needs (§16d).
+21. `0083_products_unified_and_orders.sql` → `supabase/functions/razorpay-create-order/`
+    → `lib/services/pv_order_store.dart` — the server prices the cart and marks
+    the one case it could not; the payment sets the status; orders are rows
+    with snapshots, not a blob (§16e).

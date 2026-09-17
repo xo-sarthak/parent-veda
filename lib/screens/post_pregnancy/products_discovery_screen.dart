@@ -1,4 +1,14 @@
 // =============================================================================
+//  RETIRED 2026-09-17 - FACADE OVER THE UNIFIED STORE (lib/screens/products/)
+// -----------------------------------------------------------------------------
+//  The user's call: "I want to retire the mall. One unified product system."
+//  The public class name(s) below now build the unified screen so every
+//  existing call site lands there without an edit; the old body is kept as
+//  `...Classic` for revert (comment out, never delete). Delete after a
+//  release cycle with no revert. See docs/PRODUCTS-AUDIT.md.
+// =============================================================================
+
+// =============================================================================
 //  ProductsDiscoveryScreen - Products · home / categories (parenting · S3 v2)
 // -----------------------------------------------------------------------------
 //  "Research first. Buy when you're sure." A search/ask bar, a marketplace-style
@@ -19,20 +29,22 @@ import 'pp_section_extras.dart';
 import 'products_category_screen.dart';
 import 'products_compare_screen.dart';
 import 'products_subcategory_screen.dart';
+import '../products/pv_store_chrome.dart';
+import '../products/pv_store_screen.dart';
 
 // Price / rating filter options (label, threshold).
 const List<(String, int)> _priceBands = [('Under ₹500', 500), ('Under ₹1,000', 1000), ('Under ₹2,000', 2000)];
 const List<(String, double)> _ratingBands = [('4.5★ & up', 4.5), ('4.0★ & up', 4.0)];
 const List<String> _sorts = ['Top rated', 'Most reviewed', 'Price: low to high', 'Price: high to low'];
 
-class ProductsDiscoveryScreen extends StatefulWidget {
-  const ProductsDiscoveryScreen({super.key});
+class ProductsDiscoveryScreenClassic extends StatefulWidget {
+  const ProductsDiscoveryScreenClassic({super.key});
 
   @override
-  State<ProductsDiscoveryScreen> createState() => _ProductsDiscoveryScreenState();
+  State<ProductsDiscoveryScreenClassic> createState() => _ProductsDiscoveryScreenState();
 }
 
-class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreen> {
+class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreenClassic> {
   // applied filters
   final Set<String> _concerns = {};
   String? _stage;
@@ -604,4 +616,13 @@ class _ProductsDiscoveryScreenState extends State<ProductsDiscoveryScreen> {
           ]),
         ),
       );
+}
+
+// ---- facade (the retirement) -----------------------------------------------
+
+/// The parenting Products tab -> the unified store with the parenting bar.
+class ProductsDiscoveryScreen extends StatelessWidget {
+  const ProductsDiscoveryScreen({super.key});
+  @override
+  Widget build(BuildContext context) => const PvStoreScreen(chrome: PvStoreChrome.parenting);
 }

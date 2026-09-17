@@ -47,6 +47,15 @@ class SupabaseRepo {
   /// True when someone is logged in (so cloud calls are possible).
   static bool get isLoggedIn => userId != null;
 
+  /// The signed-in email, for a checkout prefill. Same guard as [userId].
+  static String? get userEmail {
+    try {
+      return _client.auth.currentUser?.email;
+    } catch (_) {
+      return null;
+    }
+  }
+
   /// Load ALL of the current user's rows from [table].
   /// Ordered by [orderBy] (defaults to created_at, newest first).
   /// Returns an empty list if logged out.

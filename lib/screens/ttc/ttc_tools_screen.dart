@@ -27,6 +27,7 @@ import 'ttc_cycle_screens.dart';
 import 'ttc_journal_screen.dart';
 import 'ttc_journey_map_screen.dart';
 import 'ttc_nutrition_screen.dart';
+import 'ttc_prepare_screen.dart';
 import 'ttc_products_screen.dart';
 import 'ttc_records_screen.dart';
 import 'ttc_strings.dart';
@@ -358,6 +359,20 @@ final List<TtcToolGroup> ttcToolGroups = [
     titleEn: 'Plan and learn',
     titleHi: 'Plan aur seekhein',
     tools: [
+      // ⚠️ COURSES LEFT THE BAR — 2026-09-17. Slot 2 of the V3 bar became the
+      // unified store (docs/PRODUCTS-AUDIT.md); the courses hub is the first
+      // tile of this group so it is one tap further, never hidden. 23 → 24.
+      TtcTool(
+        id: 'courses',
+        icon: Icons.school_outlined,
+        nameEn: 'Courses',
+        nameHi: 'Courses',
+        descEn: 'Guided, by people who know',
+        descHi: 'Guided, jaankaar logon se',
+        open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
+            builder: (_) => const TtcPrepareScreen(onlyCategory: 'courses'),
+            settings: const RouteSettings(name: 'ttc/courses'))),
+      ),
       /*
       TtcTool(
         id: 'exercise',

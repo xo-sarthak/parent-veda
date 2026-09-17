@@ -15,6 +15,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// ⚠️ PINNED TO THE `...Classic` BODIES SINCE 2026-09-17. The public names are
+// facades over the unified store (lib/screens/products/); these keep the
+// kept-for-revert TTC shop honest. The shipped path is covered in
+// test/pv_store_test.dart.
 import 'package:parentveda/screens/ttc/ttc_shop_v3.dart';
 import 'package:parentveda/screens/ttc/ttc_surface_router.dart';
 import 'package:parentveda/ttc/ttc_products_data.dart';
@@ -159,7 +163,7 @@ void main() {
 
     testWidgets('the buy sheet does not claim a commission we do not take',
         (tester) async {
-      await _pump(tester, const TtcProductPage(productId: 'folic'));
+      await _pump(tester, const TtcProductPageClassic(productId: 'folic'));
       // The in-page Buy pill sits below the score card, so it is off-screen at
       // test height. Scroll to it rather than tapping blind.
       // `scrollUntilVisible` cannot be used: the page has two scrollables (the
@@ -188,7 +192,7 @@ void main() {
   // ===========================================================================
   group('the band is visible before anything is tapped', () {
     testWidgets('the shelf prints it on the card', (tester) async {
-      await _pump(tester, const TtcShelfScreen(category: 'supplements'));
+      await _pump(tester, const TtcShelfScreenClassic(category: 'supplements'));
       expect(find.text(TtcRecoBand.strong.label.toUpperCase()), findsWidgets);
       expect(find.text(TtcRecoBand.skip.label.toUpperCase()), findsWidgets,
           reason: '"generally not needed" is not readable on the shelf, so it '
@@ -196,7 +200,7 @@ void main() {
     });
 
     testWidgets('and the default shelf hides nothing', (tester) async {
-      await _pump(tester, const TtcShelfScreen(category: 'supplements'));
+      await _pump(tester, const TtcShelfScreenClassic(category: 'supplements'));
       // A shelf that opens already filtered has quietly become a shop again.
       // The chip row became a Filters button and a sheet — the design's own
       // arrangement — so the assertion moves to the thing that matters: no
@@ -208,7 +212,7 @@ void main() {
     });
 
     testWidgets('price is on the card, not one tap deeper', (tester) async {
-      await _pump(tester, const TtcShelfScreen(category: 'supplements'));
+      await _pump(tester, const TtcShelfScreenClassic(category: 'supplements'));
       for (final p in ttcProductsIn('supplements')) {
         // The card shows the single figure; `priceEn` keeps the honest range
         // for the research copy and the details rows.
@@ -238,15 +242,15 @@ void main() {
     });
 
     testWidgets('categories → shelf → product all build', (tester) async {
-      await _pump(tester, const TtcShopScreen());
-      await _pump(tester, const TtcShelfScreen(category: 'kits'));
-      await _pump(tester, const TtcProductPage(productId: 'lh_strips'));
+      await _pump(tester, const TtcShopScreenClassic());
+      await _pump(tester, const TtcShelfScreenClassic(category: 'kits'));
+      await _pump(tester, const TtcProductPageClassic(productId: 'lh_strips'));
       expect(tester.takeException(), isNull);
     });
 
     testWidgets('an unknown id opens a plain "gone", never another product',
         (tester) async {
-      await _pump(tester, const TtcProductPage(productId: 'nonsense'));
+      await _pump(tester, const TtcProductPageClassic(productId: 'nonsense'));
       expect(find.text('That one is gone.'), findsOneWidget);
     });
   });
@@ -255,7 +259,7 @@ void main() {
   group('the honest look never has an empty column', () {
     testWidgets('both blocks render for a product with both lists',
         (tester) async {
-      await _pump(tester, const TtcProductPage(productId: 'folic'));
+      await _pump(tester, const TtcProductPageClassic(productId: 'folic'));
       expect(find.text('AN HONEST LOOK'), findsOneWidget);
       expect(find.text("WHAT'S GOOD"), findsOneWidget);
       // ⚠️ `findsWidgets`, NOT `findsOneWidget`, AND THE REASON IS A REAL
@@ -274,7 +278,7 @@ void main() {
 
     testWidgets('and "before you buy" comes before the honest look',
         (tester) async {
-      await _pump(tester, const TtcProductPage(productId: 'fertility_blend'));
+      await _pump(tester, const TtcProductPageClassic(productId: 'fertility_blend'));
       // Section eyebrows render uppercase — `ttcShopEyebrow`, the design
       // system's signature, Manrope 11/800 in the action violet.
       final before = tester.getTopLeft(find.text('BEFORE YOU BUY')).dy;
@@ -297,6 +301,10 @@ void main() {
   //  these are written against the mechanism rather than the appearance.
   // ===========================================================================
   group('drawn correctly, not just written correctly', () {
+    // ⚠️ THE CLASSIC TRAY + CLASSIC SCREEN, since 2026-09-17: `TtcCompareScreen`
+    // is a facade over the unified `PvCompareScreen`, which reads the unified
+    // `PvCompareStore`. These pin the kept-for-revert body; the shipped tray
+    // is covered in test/pv_store_test.dart.
     setUp(TtcCompareTray.instance.clear);
 
     testWidgets('the compare bar sits under a Material, so its text is not '
@@ -314,7 +322,7 @@ void main() {
       TtcCompareTray.instance.toggle(ttcProducts[1].id);
 
       await _pump(tester,
-          TtcShelfScreen(category: ttcProducts.first.category));
+          TtcShelfScreenClassic(category: ttcProducts.first.category));
 
       final label = find.text('Compare');
       expect(label, findsWidgets);
@@ -336,7 +344,7 @@ void main() {
       // an override of a theme, and any field that must look unstyled has to
       // turn off every slot the theme fills.
       await _pump(tester,
-          TtcShelfScreen(category: ttcProducts.first.category));
+          TtcShelfScreenClassic(category: ttcProducts.first.category));
 
       final fields = tester.widgetList<TextField>(find.byType(TextField));
       expect(fields, isNotEmpty, reason: 'the shelf carries a search field');
@@ -352,7 +360,7 @@ void main() {
       // The failure: the shop entry's compare row was `picked.length < 2 ? null
       // : ...`. A row that looks tappable and is not reads as broken, and was
       // reported as exactly that.
-      await _pump(tester, const TtcCompareScreen());
+      await _pump(tester, const TtcCompareScreenClassic());
       expect(find.text('Nothing picked yet.'), findsOneWidget);
 
       TtcCompareTray.instance.toggle(ttcProducts.first.id);
@@ -376,7 +384,7 @@ void main() {
       for (final p in pair) {
         TtcCompareTray.instance.toggle(p.id);
       }
-      await _pump(tester, const TtcCompareScreen());
+      await _pump(tester, const TtcCompareScreenClassic());
 
       final keys = <String>{for (final p in pair) for (final s in p.specs) s.$1};
       for (final k in keys) {
@@ -392,7 +400,7 @@ void main() {
       for (final p in _twoOnOneShelf()) {
         TtcCompareTray.instance.toggle(p.id);
       }
-      await _pump(tester, const TtcCompareScreen());
+      await _pump(tester, const TtcCompareScreenClassic());
 
       final framing = tester.getTopLeft(find.textContaining(
           'the evidence row matters more'));

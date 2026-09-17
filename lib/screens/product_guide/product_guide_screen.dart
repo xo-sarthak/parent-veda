@@ -1,4 +1,14 @@
 // =============================================================================
+//  RETIRED 2026-09-17 - FACADE OVER THE UNIFIED STORE (lib/screens/products/)
+// -----------------------------------------------------------------------------
+//  The user's call: "I want to retire the mall. One unified product system."
+//  The public class name(s) below now build the unified screen so every
+//  existing call site lands there without an edit; the old body is kept as
+//  `...Classic` for revert (comment out, never delete). Delete after a
+//  release cycle with no revert. See docs/PRODUCTS-AUDIT.md.
+// =============================================================================
+
+// =============================================================================
 //  ParentVeda Product Guide — the product page, redesigned for trust
 // -----------------------------------------------------------------------------
 //  Not an Amazon spec sheet. Above the fold answers ONE question in ~10 seconds
@@ -29,10 +39,12 @@ import 'product_guide_data.dart';
 import 'product_guide_style.dart';
 import 'product_guide_votes.dart';
 import '../../localization/app_language.dart';
+import '../../data/products/pv_catalog_adapters.dart' show pvProductIdForGuide;
+import '../products/pv_product_screen.dart';
 
 
-class ProductGuideScreen extends StatelessWidget {
-  const ProductGuideScreen({super.key, required this.guide});
+class ProductGuideScreenClassic extends StatelessWidget {
+  const ProductGuideScreenClassic({super.key, required this.guide});
   final ProductGuide guide;
 
   void _push(BuildContext c, Widget s) => Navigator.of(c).push(MaterialPageRoute<void>(builder: (_) => s));
@@ -829,7 +841,7 @@ class ProductGuideScreen extends StatelessWidget {
       _pad(Column(children: [
         for (final r in items)
           GestureDetector(
-            onTap: () => _push(context, ProductGuideScreen(guide: r)),
+            onTap: () => _push(context, ProductGuideScreenClassic(guide: r)),
             behavior: HitTestBehavior.opaque,
             child: Container(
               margin: const EdgeInsets.only(bottom: 10),
@@ -994,4 +1006,14 @@ class _CommunityAllScreenState extends State<_CommunityAllScreen> {
       ),
     );
   }
+}
+
+// ---- facade (the retirement) -----------------------------------------------
+
+/// A Guide opens the unified product page of the product it belongs to.
+class ProductGuideScreen extends StatelessWidget {
+  const ProductGuideScreen({super.key, required this.guide});
+  final ProductGuide guide;
+  @override
+  Widget build(BuildContext context) => PvProductScreen(productId: pvProductIdForGuide(guide.id));
 }

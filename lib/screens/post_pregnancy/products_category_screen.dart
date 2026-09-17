@@ -1,4 +1,14 @@
 // =============================================================================
+//  RETIRED 2026-09-17 - FACADE OVER THE UNIFIED STORE (lib/screens/products/)
+// -----------------------------------------------------------------------------
+//  The user's call: "I want to retire the mall. One unified product system."
+//  The public class name(s) below now build the unified screen so every
+//  existing call site lands there without an edit; the old body is kept as
+//  `...Classic` for revert (comment out, never delete). Delete after a
+//  release cycle with no revert. See docs/PRODUCTS-AUDIT.md.
+// =============================================================================
+
+// =============================================================================
 //  ProductsCategoryScreen - Products · category (parenting · S3·category v2)
 // -----------------------------------------------------------------------------
 //  A curated category (e.g. Sleep): intro + an ⓘ stage-relevance reveal,
@@ -16,16 +26,18 @@ import 'pp_common.dart';
 import 'pp_product_widgets.dart';
 import 'pp_products_data.dart';
 import 'products_subcategory_screen.dart';
+import '../../data/products/pv_catalog_adapters.dart' show pvSlug;
+import '../products/pv_shelf_screen.dart';
 
-class ProductsCategoryScreen extends StatefulWidget {
-  const ProductsCategoryScreen({super.key, this.category = 'Sleep'});
+class ProductsCategoryScreenClassic extends StatefulWidget {
+  const ProductsCategoryScreenClassic({super.key, this.category = 'Sleep'});
   final String category;
 
   @override
-  State<ProductsCategoryScreen> createState() => _ProductsCategoryScreenState();
+  State<ProductsCategoryScreenClassic> createState() => _ProductsCategoryScreenState();
 }
 
-class _ProductsCategoryScreenState extends State<ProductsCategoryScreen> {
+class _ProductsCategoryScreenState extends State<ProductsCategoryScreenClassic> {
   bool _noteOpen = false;
   String _activeSub = 'All';
 
@@ -196,4 +208,13 @@ class _ProductsCategoryScreenState extends State<ProductsCategoryScreen> {
 
   void _openSub(String sub) => Navigator.of(context)
       .push(MaterialPageRoute<void>(builder: (_) => ProductsSubcategoryScreen(category: _cat.name, sub: sub)));
+}
+
+// ---- facade (the retirement) -----------------------------------------------
+
+class ProductsCategoryScreen extends StatelessWidget {
+  const ProductsCategoryScreen({super.key, this.category = 'Sleep'});
+  final String category;
+  @override
+  Widget build(BuildContext context) => PvShelfScreen(categoryId: pvSlug(category));
 }

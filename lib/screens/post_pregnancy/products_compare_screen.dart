@@ -1,4 +1,14 @@
 // =============================================================================
+//  RETIRED 2026-09-17 - FACADE OVER THE UNIFIED STORE (lib/screens/products/)
+// -----------------------------------------------------------------------------
+//  The user's call: "I want to retire the mall. One unified product system."
+//  The public class name(s) below now build the unified screen so every
+//  existing call site lands there without an edit; the old body is kept as
+//  `...Classic` for revert (comment out, never delete). Delete after a
+//  release cycle with no revert. See docs/PRODUCTS-AUDIT.md.
+// =============================================================================
+
+// =============================================================================
 //  ProductsCompareScreen - Products · compare (parenting · S3·compare v2 premium)
 // -----------------------------------------------------------------------------
 //  Compare as a first-class TOOL, and now a pure PRESENTATION layer over the
@@ -24,9 +34,10 @@ import '../../brand/presented_by.dart';
 import 'pp_common.dart';
 import 'pp_product_widgets.dart';
 import 'pp_products_data.dart';
+import '../products/pv_compare_screen.dart';
 
-class ProductsCompareScreen extends StatelessWidget {
-  const ProductsCompareScreen({super.key});
+class ProductsCompareScreenClassic extends StatelessWidget {
+  const ProductsCompareScreenClassic({super.key});
 
   static const Color _green = Color(0xFF1F8A5B);
   static const Color _amberBg = Color(0xFFFFF6EE);
@@ -814,4 +825,12 @@ class ProductsCompareScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+// ---- facade (the retirement) -----------------------------------------------
+
+class ProductsCompareScreen extends StatelessWidget {
+  const ProductsCompareScreen({super.key});
+  @override
+  Widget build(BuildContext context) => const PvCompareScreen();
 }

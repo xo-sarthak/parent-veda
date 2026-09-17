@@ -1,4 +1,14 @@
 // =============================================================================
+//  RETIRED 2026-09-17 - FACADE OVER THE UNIFIED STORE (lib/screens/products/)
+// -----------------------------------------------------------------------------
+//  The user's call: "I want to retire the mall. One unified product system."
+//  The public class name(s) below now build the unified screen so every
+//  existing call site lands there without an edit; the old body is kept as
+//  `...Classic` for revert (comment out, never delete). Delete after a
+//  release cycle with no revert. See docs/PRODUCTS-AUDIT.md.
+// =============================================================================
+
+// =============================================================================
 //  The TTC product flow — categories → shelf → product
 // -----------------------------------------------------------------------------
 //  Built 2026-09-03 from the "ParentVeda Product Flow" design project. Three
@@ -70,6 +80,12 @@ import 'ttc_common.dart';
 import 'ttc_records_v2.dart' show TtcRecordsAction;
 import 'ttc_strings.dart';
 import 'ttc_tool_chrome.dart';
+import '../../data/products/pv_catalog_adapters.dart' show pvIdForTtc;
+import '../products/pv_compare_screen.dart';
+import '../products/pv_product_screen.dart';
+import '../products/pv_shelf_screen.dart';
+import '../products/pv_store_chrome.dart';
+import '../products/pv_store_screen.dart';
 
 /// ⚠️ 320, WHICH IS THE DESIGN'S OWN HERO HUE — put back 2026-09-03.
 ///
@@ -297,14 +313,14 @@ void openTtcShop(BuildContext context) =>
       builder: (_) => const TtcShopScreen(),
     ));
 
-class TtcShopScreen extends StatefulWidget {
-  const TtcShopScreen({super.key});
+class TtcShopScreenClassic extends StatefulWidget {
+  const TtcShopScreenClassic({super.key});
 
   @override
-  State<TtcShopScreen> createState() => _TtcShopScreenState();
+  State<TtcShopScreenClassic> createState() => _TtcShopScreenState();
 }
 
-class _TtcShopScreenState extends State<TtcShopScreen> {
+class _TtcShopScreenState extends State<TtcShopScreenClassic> {
   final _q = TextEditingController();
   String _query = '';
 
@@ -644,15 +660,15 @@ class _ProductRowCompact extends StatelessWidget {
 //  SCREEN 2 — the shelf
 // =============================================================================
 
-class TtcShelfScreen extends StatefulWidget {
-  const TtcShelfScreen({super.key, required this.category});
+class TtcShelfScreenClassic extends StatefulWidget {
+  const TtcShelfScreenClassic({super.key, required this.category});
   final String category;
 
   @override
-  State<TtcShelfScreen> createState() => _TtcShelfScreenState();
+  State<TtcShelfScreenClassic> createState() => _TtcShelfScreenState();
 }
 
-class _TtcShelfScreenState extends State<TtcShelfScreen> {
+class _TtcShelfScreenState extends State<TtcShelfScreenClassic> {
   /// ⚠️ THE SHARED TRAY, NOT A LIST ON THIS SCREEN. It used to be screen
   /// state, which meant opening a product and coming back lost the tick — and
   /// that is the actual journey: tick one, read it, go back, tick another.
@@ -1286,8 +1302,8 @@ Future<void> showTtcCompare(BuildContext context, List<TtcProduct> pair) {
 /// the tray — add, remove or clear from anywhere and this rebuilds. That is the
 /// reason it can be opened from four places (a shelf bar, a product pill, the
 /// For-him rail, the shop entry) without any of them passing state.
-class TtcCompareScreen extends StatelessWidget {
-  const TtcCompareScreen({super.key});
+class TtcCompareScreenClassic extends StatelessWidget {
+  const TtcCompareScreenClassic({super.key});
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
@@ -1982,22 +1998,23 @@ TtcProduct? ttcProductById(String id) =>
 
 void openTtcProductPage(BuildContext context, String id) {
   if (ttcProductById(id) == null) return;
+  // The unified page, on the unified id (`ttc_` prefix - see the adapter).
   Navigator.of(context).push(MaterialPageRoute<void>(
-    settings: RouteSettings(name: 'ttc/shop/product/$id'),
-    builder: (_) => TtcProductPage(productId: id),
+    settings: RouteSettings(name: '$kPvProductRoutePrefix${pvIdForTtc(id)}'),
+    builder: (_) => PvProductScreen(productId: pvIdForTtc(id)),
   ));
 }
 
-class TtcProductPage extends StatefulWidget {
-  const TtcProductPage({super.key, required this.productId});
+class TtcProductPageClassic extends StatefulWidget {
+  const TtcProductPageClassic({super.key, required this.productId});
 
   final String productId;
 
   @override
-  State<TtcProductPage> createState() => _TtcProductPageState();
+  State<TtcProductPageClassic> createState() => _TtcProductPageState();
 }
 
-class _TtcProductPageState extends State<TtcProductPage> {
+class _TtcProductPageState extends State<TtcProductPageClassic> {
   final _scroll = ScrollController();
   bool _sticky = false;
   String? _vote;
@@ -4419,4 +4436,33 @@ class _CompareFab extends StatelessWidget {
       ),
     );
   }
+}
+
+// ---- facades (the retirement) ----------------------------------------------
+
+/// TTC -> the unified store with the TTC bar on the Products slot.
+class TtcShopScreen extends StatelessWidget {
+  const TtcShopScreen({super.key});
+  @override
+  Widget build(BuildContext context) => const PvStoreScreen(chrome: PvStoreChrome.ttc);
+}
+
+class TtcShelfScreen extends StatelessWidget {
+  const TtcShelfScreen({super.key, required this.category});
+  final String category;
+  @override
+  Widget build(BuildContext context) => PvShelfScreen(categoryId: 'ttc_$category');
+}
+
+class TtcCompareScreen extends StatelessWidget {
+  const TtcCompareScreen({super.key});
+  @override
+  Widget build(BuildContext context) => const PvCompareScreen();
+}
+
+class TtcProductPage extends StatelessWidget {
+  const TtcProductPage({super.key, required this.productId});
+  final String productId;
+  @override
+  Widget build(BuildContext context) => PvProductScreen(productId: pvIdForTtc(productId));
 }
