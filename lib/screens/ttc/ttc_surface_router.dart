@@ -93,6 +93,7 @@ Widget? ttcScreenForSurface(String id) {
           : AppLanguage.english,
       resolveVideo: ttcVideoBySlot,
       readTitle: ttcReadTitle,
+      resolveRead: ttcReadById,
       openRead: (context, readId) =>
           _push(context, kTtcReadPrefix + readId),
       openSurface: _push,

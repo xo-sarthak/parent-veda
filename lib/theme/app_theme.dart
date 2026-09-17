@@ -401,7 +401,16 @@ final ColorScheme _lightScheme = ColorScheme(
       colorScheme: scheme,
       scaffoldBackgroundColor: scaffold,
       textTheme: text,
-      splashFactory: InkSparkle.splashFactory,
+      // ---- Ink: a quiet grey ripple, shaped by the control — 2026-09-17 ---
+      // InkSparkle is Material 3's shader "sparkle": violet, and drawn on the
+      // Material's ink layer, so it ignores any Container clip above it —
+      // which is why the reader's rounded References row lit up as a sharp
+      // violet rectangle ("these things just make the app look bad"). The
+      // classic ripple respects an InkWell's borderRadius / customBorder, is
+      // cheaper (no shader), and in ink-grey at 6% it reads as pressure, not
+      // as the brand colour. Kept for revert:
+      // splashFactory: InkSparkle.splashFactory,
+      splashFactory: InkRipple.splashFactory,
       // ---- Motion: one push everywhere — 2026-09-17 (BASE-UI, §4.0) -------
       // Android's default is a zoom-fade; the apps that feel settled (Airbnb,
       // Notion, Linear) push horizontally with swipe-back, and the same
@@ -412,9 +421,10 @@ final ColorScheme _lightScheme = ColorScheme(
         TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
       }),
       visualDensity: VisualDensity.standard,
-      // Soft lavender splash, never harsh
-      splashColor: scheme.primary.withValues(alpha: 0.08),
-      highlightColor: scheme.primary.withValues(alpha: 0.04),
+      // Ink-grey, never the brand colour (DESIGN-SYSTEM §4.0). Kept for
+      // revert: scheme.primary at 0.08 / 0.04.
+      splashColor: scheme.onSurface.withValues(alpha: 0.06),
+      highlightColor: scheme.onSurface.withValues(alpha: 0.03),
 
       // ---- App bar: quiet, flat, surface-colored --------------------------
       appBarTheme: AppBarTheme(

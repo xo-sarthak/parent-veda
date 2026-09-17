@@ -86,6 +86,7 @@ class TtcHeroArt extends StatelessWidget {
     required this.tint,
     this.imageUrl,
     this.fit = BoxFit.cover,
+    this.animate = true,
   });
 
   final TtcArt? art;
@@ -93,13 +94,21 @@ class TtcHeroArt extends StatelessWidget {
   final String? imageUrl;
   final BoxFit fit;
 
+  /// ⚠️ FALSE ON RAIL TILES — 2026-09-17. Every tile with art ran its own
+  /// six-second loop, so a door with eight art tiles repainted eight painters
+  /// at 60 fps for as long as it was open, and kept doing so through the pop
+  /// transition — the user: "jittery… when I'm exiting a door". The loop is
+  /// for the one hero above an article, where it is looked at; on a rail it
+  /// was cost without an audience.
+  final bool animate;
+
   @override
   Widget build(BuildContext context) {
     final drawn = art == null
         ? const SizedBox.shrink()
         : Padding(
             padding: const EdgeInsets.all(12),
-            child: TtcIllustration(art: art!, tint: tint),
+            child: TtcIllustration(art: art!, tint: tint, animate: animate),
           );
 
     final url = imageUrl;

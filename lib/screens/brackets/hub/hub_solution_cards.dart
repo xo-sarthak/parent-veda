@@ -58,7 +58,9 @@ enum SolutionType { read, watch, tool, activity, product, course, consult }
 extension SolutionMeta on SolutionType {
   /// The small-caps chip. `null` metadata means the chip is just the type.
   String chip(AppLanguage lang) => switch (this) {
-        SolutionType.read => lang.isEnglish ? 'READ' : 'पढ़ें',
+        // 'ARTICLE' since 2026-09-17 (STILL-OPEN §60.2: one chip word for
+        // written pieces, everywhere). Kept for revert: 'READ'.
+        SolutionType.read => lang.isEnglish ? 'ARTICLE' : 'पढ़ें',
         SolutionType.watch => lang.isEnglish ? 'WATCH' : 'देखें',
         SolutionType.tool => lang.isEnglish ? 'TOOL' : 'TOOL',
         SolutionType.activity => lang.isEnglish ? 'DO' : 'करें',

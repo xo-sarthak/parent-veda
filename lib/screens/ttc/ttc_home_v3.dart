@@ -59,6 +59,7 @@ import '../../theme/pv_fonts.dart';
 
 import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_daily_data.dart';
+import '../../ttc/ttc_insight_read.dart';
 import '../../ttc/ttc_log_store.dart';
 import '../../ttc/ttc_fertile_window.dart';
 import '../../ttc/ttc_focus_data.dart';
@@ -84,7 +85,7 @@ import 'ttc_focus_screen.dart';
 import 'ttc_common.dart';
 import 'ttc_cycle_report_screen.dart';
 import 'ttc_daily_insights.dart';
-import 'ttc_insight_screen.dart';
+// import 'ttc_insight_screen.dart'; // kept for revert — the insight opens in the reader now
 import 'ttc_journey_map_screen.dart';
 import 'ttc_symptom_mark.dart';
 import 'ttc_shop_v3.dart' show openTtcProductPage;
@@ -2829,10 +2830,13 @@ void _openInsight(
         builder: (_) => TtcSymptomLogScreen(day: selected),
       ));
     case TtcInsightGo.insight:
-      Navigator.of(context).push(MaterialPageRoute<void>(
-        settings: const RouteSettings(name: 'ttc/insight'),
-        builder: (_) => TtcInsightScreen(insight: insight),
-      ));
+      // The article format, 2026-09-17 — see ttc_insight_read.dart. Kept for
+      // revert:
+      // Navigator.of(context).push(MaterialPageRoute<void>(
+      //   settings: const RouteSettings(name: 'ttc/insight'),
+      //   builder: (_) => TtcInsightScreen(insight: insight),
+      // ));
+      openTtcInsight(context, insight);
     case TtcInsightGo.myth:
       showTtcRowSheet(
         context,
@@ -3175,10 +3179,12 @@ class _DailyRail extends StatelessWidget {
             hue: 206,
             mark: V3DailyMark.note,
             p: p,
-            onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
-              builder: (_) => TtcInsightScreen(insight: insight),
-              settings: const RouteSettings(name: 'ttc/insight'),
-            )),
+            // The article format (ttc_insight_read.dart). Kept for revert:
+            // onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+            //   builder: (_) => TtcInsightScreen(insight: insight),
+            //   settings: const RouteSettings(name: 'ttc/insight'),
+            // )),
+            onTap: () => openTtcInsight(context, insight),
           ),
           _Story(
             caption: t.todaysMyth,

@@ -62,6 +62,14 @@ final List<PvRead> kTtcReadsConceiving = [
   PvRead(
     id: 'ttc_read_how_conception_works',
     hue: 344,
+    // ⚠️ A CALENDAR, NOT A LANDSCAPE. The first URL here was a mountain,
+    // picked for looking calm rather than for meaning anything — the exact
+    // failure of stock imagery, where a picture is chosen for mood and ends
+    // up decorating a subject it has nothing to do with. This piece is about
+    // WHICH DAYS, so the picture is days. (Moved here from the door tile,
+    // 2026-09-17, so the piece carries its picture wherever it opens.)
+    imageUrl:
+        'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&h=600&fit=crop',
     kicker: _en('Fertile window'),
     title: _en('How conception actually works'),
     teaser: _en('The mechanism, in plain words — what a cycle is doing, what '

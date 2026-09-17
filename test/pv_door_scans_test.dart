@@ -549,11 +549,19 @@ void main() {
       }
     });
 
-    test('no two formats share a label', () {
-      final labels = PvDoorFormat.values.map((f) => f.label).toList();
+    test('no two formats share a label, except the two written ones', () {
+      // STILL-OPEN §60.2 (applied 2026-09-17): `read` and `article` both say
+      // "Article" — the look-up / read-through difference lives inside the
+      // piece, not on the chip, which is where every reader in the Mobbin
+      // set puts it. Every other pair still promises something different.
+      final labels = PvDoorFormat.values
+          .where((f) => f != PvDoorFormat.read)
+          .map((f) => f.label)
+          .toList();
       expect(labels.toSet().length, labels.length,
           reason: 'Two chips reading the same word promise the same thing and '
               'do different things.');
+      expect(PvDoorFormat.read.label, PvDoorFormat.article.label);
     });
   });
 }

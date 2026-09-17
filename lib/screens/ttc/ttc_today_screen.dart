@@ -26,6 +26,7 @@ import 'package:flutter/material.dart';
 import '../../ttc/cycle_store.dart';
 import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_daily_data.dart';
+import '../../ttc/ttc_insight_read.dart';
 import '../../ttc/ttc_journal_store.dart';
 import '../../ttc/ttc_products_data.dart';
 import '../../ttc/ttc_ritual_store.dart';
@@ -34,7 +35,7 @@ import 'ttc_chapter_screen.dart';
 import 'ttc_today_parts.dart';
 import 'ttc_common.dart';
 import 'ttc_cycle_screens.dart';
-import 'ttc_insight_screen.dart';
+// import 'ttc_insight_screen.dart'; // kept for revert — the insight opens in the reader now
 import 'ttc_journey_map_screen.dart';
 import 'ttc_journal_screen.dart';
 import 'ttc_partner_screen.dart';
@@ -688,10 +689,12 @@ class _InsightCard extends StatelessWidget {
     final hi = t.hinglish;
     final insight = ttcPickForToday(ttcInsights);
     return TtcCard(
-      onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
-        builder: (_) => TtcInsightScreen(insight: insight),
-        settings: const RouteSettings(name: 'ttc/insight'),
-      )),
+      // The article format (ttc_insight_read.dart). Kept for revert:
+      // onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+      //   builder: (_) => TtcInsightScreen(insight: insight),
+      //   settings: const RouteSettings(name: 'ttc/insight'),
+      // )),
+      onTap: () => openTtcInsight(context, insight),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           ttcEyebrow(t.todaysInsight),

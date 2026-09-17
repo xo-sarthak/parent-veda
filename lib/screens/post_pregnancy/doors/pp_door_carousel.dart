@@ -1089,10 +1089,20 @@ class _PpDoorCard extends StatelessWidget {
     // soften into nothing; the default clamp would smear its edge pixels
     // outward into a hard, slightly wider rectangle.
     if (a > 0.01) {
-      card = ImageFiltered(
-        imageFilter: ImageFilter.blur(
-            sigmaX: blur, sigmaY: blur, tileMode: TileMode.decal),
-        child: card,
+      // ⚠️ A REPAINT BOUNDARY ROUND THE BLUR — 2026-09-17. A blur is
+      // re-rasterised on every frame the layer above it moves, and the deck
+      // sits inside a page that scrolls and slides out on pop; four blurred
+      // cards re-rendering at 60 fps through a route transition is the
+      // "jittery when exiting a door" the user saw. The boundary lets the
+      // engine keep the blurred raster between frames while the deck is at
+      // rest, so a scroll or a pop composites a cached image rather than
+      // recomputing the filter.
+      card = RepaintBoundary(
+        child: ImageFiltered(
+          imageFilter: ImageFilter.blur(
+              sigmaX: blur, sigmaY: blur, tileMode: TileMode.decal),
+          child: card,
+        ),
       );
     }
 

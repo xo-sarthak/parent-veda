@@ -2256,10 +2256,20 @@ class _CarouselCard extends StatelessWidget {
     // blurred card's edges soften into nothing; the default clamp would smear
     // its edge pixels outward into a hard, slightly wider rectangle.
     if (a > 0.01) {
-      card = ImageFiltered(
-        imageFilter: ImageFilter.blur(
-            sigmaX: blur, sigmaY: blur, tileMode: TileMode.decal),
-        child: card,
+      // ⚠️ A REPAINT BOUNDARY ROUND THE BLUR — 2026-09-17. A blur is
+      // re-rasterised on every frame the layer above it moves, and the deck
+      // sits inside a page that scrolls and slides out on pop; four blurred
+      // cards re-rendering at 60 fps through a route transition is the
+      // "jittery when exiting a door" the user saw. The boundary lets the
+      // engine keep the blurred raster between frames while the deck is at
+      // rest, so a scroll or a pop composites a cached image rather than
+      // recomputing the filter.
+      card = RepaintBoundary(
+        child: ImageFiltered(
+          imageFilter: ImageFilter.blur(
+              sigmaX: blur, sigmaY: blur, tileMode: TileMode.decal),
+          child: card,
+        ),
       );
     }
 
@@ -2556,7 +2566,10 @@ TtcArt? artForTile(TtcTile tile) => switch (tile) {
 
 /// The photograph a tile carries, if any.
 String? photoForTile(TtcTile tile) => switch (tile) {
-      TtcArticleTile(:final imageUrl) => imageUrl,
+      // The tile's own picture, else the read's — the read owns it now
+      // (`PvRead.imageUrl`), and the tile only ever overrides.
+      TtcArticleTile(:final imageUrl, :final readId) =>
+        imageUrl ?? (readId == null ? null : ttcReadById(readId)?.imageUrl),
       _ => null,
     };
 
@@ -3036,6 +3049,8 @@ class _TileCard extends StatelessWidget {
                 art: artForTile(tile),
                 tint: tint,
                 imageUrl: photoForTile(tile),
+                // Still on a rail — see `TtcHeroArt.animate`.
+                animate: false,
               ),
             )
           else
@@ -3341,11 +3356,15 @@ void openTtcArticle(
         openAtHeading: atHeading,
       resolveVideo: ttcVideoBySlot,
       readTitle: ttcReadTitle,
+      resolveRead: ttcReadById,
       openRead: (context, id) => openTtcSurface(context, '$kTtcReadPrefix$id'),
       openSurface: openTtcSurface,
-      hero: (art == null && (imageUrl == null || imageUrl.isEmpty))
+      // The read's own picture wins over the tile's drawn art; the drawn art
+      // is the fallback while the picture loads or when there is none.
+      hero: (art == null && (imageUrl ?? read.imageUrl) == null)
           ? null
-          : TtcHeroArt(art: art, tint: tint, imageUrl: imageUrl),
+          : TtcHeroArt(
+              art: art, tint: tint, imageUrl: imageUrl ?? read.imageUrl),
     ),
   ));
 }

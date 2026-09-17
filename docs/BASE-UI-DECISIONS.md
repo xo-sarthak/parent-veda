@@ -28,6 +28,8 @@ Read with `DESIGN-SYSTEM.md` §4.0 (the rule) and `MOBBIN-DISCOVERY.md` §6
 | **One push transition app-wide** (Cupertino slide with swipe-back on both platforms) and **press feedback** (a 2% settle, 120 ms) on every base component | `app_theme.dart`, `onboarding_chrome.dart` `ObPress` | "focus a lot upon motions — stuff that silently appeals" |
 | **The tool sheets cover the viewport and own the nav clearance** — the hero field's lower arc no longer bleeds through as a lilac bloom under short tools or under a tool's last card | `ttc_tool_chrome.dart`, `ttc_window_screen.dart`, `ttc_infographic_screen.dart`, `problem_hub_screen.dart` | seen on the phone walking the user's path; DESIGN-SYSTEM §4.1 already said the sheet owns the clearance |
 | **TTC meta text and hairlines are grey, not lavender** (`ttcMuted`, `ttcBorder`); **the stage menu's icons are ink** | `ttc_common.dart`, `stage_gateway.dart` | §4.0 — the accent is for eyebrows and links, not small print |
+| **The ripple is grey and shaped by the control** — `InkRipple`, `onSurface` at 6% / 3%; the M3 sparkle ignored clips and drew a violet rectangle on rounded rows | `app_theme.dart`, `pv_reader_screen.dart` `_references` | the user, on the References row: "these things just make the app look bad" |
+| **Rail art no longer loops; blurred deck cards and the hero field are their own layers** | `ttc_illustrations.dart`, three carousels, `v3_hero_field.dart` | "jittery when exiting a door" — STILL-OPEN §63.4 |
 
 Everything above is commented for revert where it replaced something.
 

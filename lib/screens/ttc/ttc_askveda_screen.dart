@@ -22,12 +22,13 @@ import '../../services/remote/ask_veda_service.dart';
 import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_chapter_data.dart';
 import '../../ttc/ttc_daily_data.dart';
+import '../../ttc/ttc_insight_read.dart';
 import '../../ttc/ttc_prepare_data.dart';
 import '../../ttc/ttc_store.dart';
 import '../../widgets/global_ask_fab.dart' show kAskVedaRoute;
 import 'ttc_can_i_screen.dart';
 import 'ttc_common.dart';
-import 'ttc_insight_screen.dart';
+// import 'ttc_insight_screen.dart'; // kept for revert — the insight opens in the reader now
 import 'ttc_prepare_screen.dart';
 import 'ttc_products_screen.dart';
 import 'ttc_strings.dart';
@@ -580,7 +581,9 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
       final key = id.substring('ttcinsight_'.length);
       final match = ttcInsights.where((i) => i.id == key);
       if (match.isEmpty) return false;
-      push(TtcInsightScreen(insight: match.first), 'ttc/insight');
+      // The article format (ttc_insight_read.dart). Kept for revert:
+      // push(TtcInsightScreen(insight: match.first), 'ttc/insight');
+      openTtcInsight(context, match.first);
       return true;
     }
     if (id.startsWith('ttcoffer_')) {

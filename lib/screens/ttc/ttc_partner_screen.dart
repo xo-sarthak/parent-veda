@@ -23,6 +23,7 @@ import 'package:flutter/material.dart';
 
 import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_daily_data.dart';
+import '../../ttc/ttc_insight_read.dart';
 import '../../ttc/ttc_journal_store.dart';
 import '../../ttc/ttc_log_store.dart';
 import '../../ttc/ttc_mind_today.dart';
@@ -32,7 +33,7 @@ import '../../ttc/ttc_store.dart';
 import 'ttc_askveda_screen.dart';
 import 'ttc_chapter_screen.dart';
 import 'ttc_common.dart';
-import 'ttc_insight_screen.dart';
+// import 'ttc_insight_screen.dart'; // kept for revert — the insight opens in the reader now
 import 'ttc_journal_screen.dart';
 import 'ttc_journey_map_screen.dart';
 import 'ttc_strings.dart';
@@ -616,10 +617,12 @@ class _LearnCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final hi = t.hinglish;
     return _SlateCard(
-      onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
-        builder: (_) => TtcInsightScreen(insight: insight),
-        settings: const RouteSettings(name: 'ttc/insight'),
-      )),
+      // The article format (ttc_insight_read.dart). Kept for revert:
+      // onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+      //   builder: (_) => TtcInsightScreen(insight: insight),
+      //   settings: const RouteSettings(name: 'ttc/insight'),
+      // )),
+      onTap: () => openTtcInsight(context, insight),
       // Parity with her `_InsightCard`, which carries a read time, the opening
       // paragraph and the takeaway in a panel. His had a title and a takeaway,
       // so the same piece of writing looked like a caption on his side and an

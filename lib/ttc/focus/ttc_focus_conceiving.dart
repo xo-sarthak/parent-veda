@@ -144,13 +144,9 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
           title: 'Which days can she get pregnant?',
           blurb: 'About six days each cycle. Here is why.',
           art: TtcArt.fertileWindow,
-          imageUrl:
-              // ⚠️ A CALENDAR, NOT A LANDSCAPE. The first URL here was a mountain,
-              // picked for looking calm rather than for meaning anything — the
-              // exact failure of stock imagery, where a picture is chosen for
-              // mood and ends up decorating a subject it has nothing to do
-              // with. This piece is about WHICH DAYS, so the picture is days.
-              'https://images.unsplash.com/photo-1506784983877-45594efa4cbe?w=800&h=600&fit=crop',
+          // The picture lives on the read now (`PvRead.imageUrl`, 2026-09-17)
+          // and the rail reads it from there — see `photoForTile`. The URL
+          // and its rationale moved with it.
           readId: 'ttc_read_how_conception_works',
         ),
         TtcCarouselTile(

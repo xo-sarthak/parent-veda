@@ -85,6 +85,7 @@ class PvReaderScreen extends StatefulWidget {
     this.readTitle,
     this.hero,
     this.openAtHeading,
+    this.resolveRead,
   });
 
   final PvRead read;
@@ -140,6 +141,13 @@ class PvReaderScreen extends StatefulWidget {
   /// renamed or not yet written — and the honest response is to drop the link
   /// rather than print an empty card under a "Read next" heading.
   final LocalizedText? Function(String readId)? readTitle;
+
+  /// The whole read behind a Read next id, when the stage can hand it over —
+  /// its teaser and picture make the card the same tile as the tools above it
+  /// (the user, 2026-09-17: "the read next… can be the way it's above for the
+  /// tools"). Falls back to [readTitle] when absent, so nothing that only
+  /// passes titles breaks.
+  final PvRead? Function(String readId)? resolveRead;
 
   @override
   State<PvReaderScreen> createState() => _PvReaderScreenState();
@@ -364,29 +372,33 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                   // ⚠️ EDGE TO EDGE, not inset with a radius. An inset picture
                   // reads as a card ABOUT the article; a full-bleed one reads
                   // as the top of it.
-                  if (widget.hero case final hero?) ...[
-                    SizedBox(
-                      height: 132,
-                      width: double.infinity,
-                      // Half-speed parallax, clamped so an overscroll bounce
-                      // cannot drag the image out of its frame. Scoped to this
-                      // subtree, so a 2,000-word article is not relaying out on
-                      // every frame of a scroll.
-                      child: ClipRect(
-                        child: AnimatedBuilder(
-                          animation: _sc,
-                          builder: (context, child) {
-                            final off = _sc.hasClients ? _sc.offset : 0.0;
-                            return Transform.translate(
-                                offset: Offset(0, (off * 0.4).clamp(0.0, 132.0)),
-                                child: child);
-                          },
-                          child: hero,
-                        ),
+                  // ⚠️ ALWAYS, SINCE 2026-09-17 — "I need an image on top."
+                  // The caller's `hero` when it passes one (TTC's drawn art
+                  // that a photo upgrades), else the read's own picture, else
+                  // the tinted band with the article mark — the same frame in
+                  // every case, so every article has the same head whether or
+                  // not its picture has been chosen yet (`_defaultHero`).
+                  SizedBox(
+                    height: 132,
+                    width: double.infinity,
+                    // Half-speed parallax, clamped so an overscroll bounce
+                    // cannot drag the image out of its frame. Scoped to this
+                    // subtree, so a 2,000-word article is not relaying out on
+                    // every frame of a scroll.
+                    child: ClipRect(
+                      child: AnimatedBuilder(
+                        animation: _sc,
+                        builder: (context, child) {
+                          final off = _sc.hasClients ? _sc.offset : 0.0;
+                          return Transform.translate(
+                              offset: Offset(0, (off * 0.4).clamp(0.0, 132.0)),
+                              child: child);
+                        },
+                        child: widget.hero ?? _defaultHero(s),
                       ),
                     ),
-                    const SizedBox(height: 14),
-                  ],
+                  ),
+                  const SizedBox(height: 14),
 
                   // ---- THE MASTHEAD ----------------------------------------
                   //
@@ -423,9 +435,11 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                   // ⚠️ 24, NOT 32, WHERE THERE IS A PICTURE ABOVE IT. A
                   // 32pt title under a 132pt photo pushes the byline off the
                   // fold and undoes the reason the photo was shortened.
+                  // One geometry — every article has a picture frame now, so
+                  // the 32/17.5 no-picture sizes retired with it (2026-09-17).
                   _pad(Text(a.title.of(_lang),
                       style: pvFraunces(
-                          fontSize: (widget.hero == null ? 32 : 24) * _fs,
+                          fontSize: 24 * _fs,
                           height: 1.12,
                           fontWeight: FontWeight.w600,
                           letterSpacing: -0.4,
@@ -438,14 +452,14 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                   // re-read. Roman, one step down in colour, does the same job.
                   _pad(Text(a.teaser.of(_lang),
                       style: pvFraunces(
-                          fontSize: (widget.hero == null ? 17.5 : 14.5) * _fs,
+                          fontSize: 14.5 * _fs,
                           height: 1.5,
                           color: s.soft))),
-                  SizedBox(height: widget.hero == null ? 22 : 14),
+                  const SizedBox(height: 14),
                   _pad(_byline(s)),
                   const SizedBox(height: 14),
                   _pad(Divider(color: s.rule, height: 1)),
-                  SizedBox(height: widget.hero == null ? 26 : 16),
+                  const SizedBox(height: 16),
 
                   // ---- THE LEDE --------------------------------------------
                   //
@@ -560,6 +574,35 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
 
   // ---- top bar -------------------------------------------------------------
 
+  /// The picture frame when the caller passes no `hero`: the read's own
+  /// photograph, or — until one is chosen — the article's type-tinted band
+  /// with the mark cropped by the edge, the same device as the tiles at the
+  /// foot. A photo that fails to load falls back to the band, so the frame
+  /// never renders empty.
+  Widget _defaultHero(_Skin s) {
+    final p = V2PaletteStore.instance.current;
+    final band = ColoredBox(
+      color: v2BlockTint(SolutionType.read.hue, p),
+      child: Stack(children: [
+        Positioned(
+          right: -18,
+          bottom: -22,
+          child: Icon(SolutionType.read.icon,
+              size: 132, color: Colors.white.withValues(alpha: 0.42)),
+        ),
+      ]),
+    );
+    final url = a.imageUrl;
+    if (url == null || url.isEmpty) return band;
+    return Image.network(
+      url,
+      fit: BoxFit.cover,
+      errorBuilder: (_, _, _) => band,
+      loadingBuilder: (context, child, progress) =>
+          progress == null ? child : band,
+    );
+  }
+
   Widget _topBar(_Skin s) => Padding(
         padding: const EdgeInsets.fromLTRB(8, 4, 8, 4),
         child: Row(children: [
@@ -648,7 +691,7 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(_t('REVIEWED BY', 'JAANCH KI'),
+              Text(a.reviewed ? _t('REVIEWED BY', 'JAANCH KI') : _t('BY', 'LEKHAK'),
                   style: pvManrope(
                       fontSize: 9.5,
                       fontWeight: FontWeight.w800,
@@ -665,8 +708,10 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                           fontWeight: FontWeight.w700,
                           color: s.ink)),
                 ),
-                const SizedBox(width: 5),
-                Icon(Icons.verified_rounded, size: 14, color: verified),
+                if (a.reviewed) ...[
+                  const SizedBox(width: 5),
+                  Icon(Icons.verified_rounded, size: 14, color: verified),
+                ],
               ]),
               const SizedBox(height: 1),
               Text(
@@ -1144,12 +1189,18 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
   ///
   /// Kept for revert: [_evidence], the always-open block with the badge.
   Widget _references(_Skin s) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: s.rule),
-      ),
+    // ⚠️ A MATERIAL WITH A CLIP, NOT A CONTAINER WITH ONE. Ink is painted on
+    // the nearest Material ancestor, so a Container's clip never touched the
+    // ripple and the rounded row lit up as a sharp rectangle (seen on the
+    // phone, 2026-09-17). A Material that clips to its own rounded shape clips
+    // its ink as well.
+    return Material(
+      color: Colors.transparent,
       clipBehavior: Clip.antiAlias,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+        side: BorderSide(color: s.rule),
+      ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         InkWell(
           onTap: () => setState(() => _refsOpen = !_refsOpen),
@@ -1231,58 +1282,43 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
   /// hands one back. Ids that no longer resolve render nothing — the same
   /// rule as [_readNext].
   Widget _readNextRail(_Skin s) {
-    final ids = a.readNext
-        .where((id) => widget.readTitle?.call(id) != null)
-        .toList();
-    if (ids.isEmpty) return const SizedBox.shrink();
+    // Title from either seam; teaser and picture only when the stage hands
+    // the whole read over.
+    (LocalizedText, LocalizedText?, String?)? resolve(String id) {
+      final r = widget.resolveRead?.call(id);
+      if (r != null) return (r.title, r.teaser, r.imageUrl);
+      final t = widget.readTitle?.call(id);
+      return t == null ? null : (t, null, null);
+    }
+
+    final items = [
+      for (final id in a.readNext)
+        if (resolve(id) case final r?) (id, r),
+    ];
+    if (items.isEmpty) return const SizedBox.shrink();
+
+    // ⚠️ THE SAME TILE AS "WHAT YOU CAN DO WITH THIS" — 2026-09-17. The rail
+    // had its own quieter card (panel, hairline, a small icon well), and the
+    // user asked for the tool tiles' treatment instead: one tile family at the
+    // foot of an article, not two. The 2026-09-16 card is in git for revert.
     return SizedBox(
-      height: 150,
+      height: 172,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 22),
-        itemCount: ids.length,
+        itemCount: items.length,
         separatorBuilder: (_, _) => const SizedBox(width: 10),
         itemBuilder: (context, i) {
-          final id = ids[i];
-          final title = widget.readTitle!.call(id)!;
+          final (id, (title, teaser, image)) = items[i];
           final width = (MediaQuery.of(context).size.width - 44 - 10) / 2;
-          return GestureDetector(
-            onTap: () => widget.openRead?.call(context, id),
-            behavior: HitTestBehavior.opaque,
-            child: Container(
-              width: width,
-              padding: const EdgeInsets.fromLTRB(13, 12, 13, 12),
-              decoration: BoxDecoration(
-                color: s.panel,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: s.rule),
-              ),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: s.accent.withValues(alpha: 0.14),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      alignment: Alignment.centerLeft,
-                      padding: const EdgeInsets.only(left: 10),
-                      child: Icon(Icons.article_outlined,
-                          size: 18, color: s.accent),
-                    ),
-                    const SizedBox(height: 10),
-                    Expanded(
-                      child: Text(title.of(_lang),
-                          maxLines: 3,
-                          overflow: TextOverflow.ellipsis,
-                          style: pvFraunces(
-                              fontSize: 14.5 * _fs,
-                              height: 1.3,
-                              fontWeight: FontWeight.w600,
-                              color: s.ink)),
-                    ),
-                  ]),
+          return SizedBox(
+            width: width,
+            child: _tile(
+              type: SolutionType.read,
+              title: title.of(_lang),
+              value: teaser?.of(_lang),
+              imageUrl: image,
+              onTap: () => widget.openRead?.call(context, id),
             ),
           );
         },
@@ -1399,14 +1435,10 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
       PvNextKind.consult => SolutionType.consult,
     };
 
-    final p = V2PaletteStore.instance.current;
-    final tint = v2BlockTint(type.hue % 360, p);
-    final deep = HSLColor.fromColor(tint)
-        .withSaturation(0.46)
-        .withLightness(0.34)
-        .toColor();
-
-    return InkWell(
+    return _tile(
+      type: type,
+      title: n.title.of(_lang),
+      value: n.value.of(_lang),
       onTap: () {
         if (n.action != null) {
           widget.openAction?.call(context, n.action!);
@@ -1414,6 +1446,29 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
           widget.openSurface?.call(context, n.surfaceId!);
         }
       },
+    );
+  }
+
+  /// The one tile at the foot of an article — a next step, a read next. The
+  /// type's well tint, its chip, the mark cropped by the edge as the picture,
+  /// or a photograph filling the block where the piece has one.
+  Widget _tile({
+    required SolutionType type,
+    required String title,
+    String? value,
+    String? imageUrl,
+    required VoidCallback onTap,
+  }) {
+    final p = V2PaletteStore.instance.current;
+    final tint = v2BlockTint(type.hue % 360, p);
+    final deep = HSLColor.fromColor(tint)
+        .withSaturation(0.46)
+        .withLightness(0.34)
+        .toColor();
+    final photo = imageUrl != null && imageUrl.isNotEmpty;
+
+    return InkWell(
+      onTap: onTap,
       borderRadius: BorderRadius.circular(18),
       child: Container(
         height: 172,
@@ -1426,13 +1481,37 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
           // ⚠️ THE MARK IS THE PICTURE, cropped by the block's own edge rather
           // than sitting in a well of its own. Same device as the focus rail:
           // it fills the space an illustration will eventually take, at an
-          // alpha low enough that the title never has to fight it.
-          Positioned(
-            right: -22,
-            bottom: -14,
-            child: Icon(type.icon,
-                size: 108, color: Colors.white.withValues(alpha: 0.42)),
-          ),
+          // alpha low enough that the title never has to fight it. Where the
+          // piece HAS a picture, the picture fills the block and a scrim
+          // rises under the type — the door rail's own treatment.
+          if (photo)
+            Positioned.fill(
+              child: Image.network(imageUrl, fit: BoxFit.cover,
+                  errorBuilder: (_, _, _) => const SizedBox.shrink()),
+            )
+          else
+            Positioned(
+              right: -22,
+              bottom: -14,
+              child: Icon(type.icon,
+                  size: 108, color: Colors.white.withValues(alpha: 0.42)),
+            ),
+          if (photo)
+            Positioned.fill(
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.white.withValues(alpha: 0.0),
+                      Colors.white.withValues(alpha: 0.86),
+                    ],
+                    stops: const [0.30, 0.72],
+                  ),
+                ),
+              ),
+            ),
           Padding(
             padding: const EdgeInsets.all(13),
             child: Column(
@@ -1461,7 +1540,7 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                     ]),
                   ),
                   const Spacer(),
-                  Text(n.title.of(_lang),
+                  Text(title,
                       maxLines: 3,
                       overflow: TextOverflow.ellipsis,
                       style: pvFraunces(
@@ -1470,14 +1549,16 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                           height: 1.22,
                           letterSpacing: -0.3,
                           color: p.ink1)),
-                  const SizedBox(height: 5),
-                  Text(n.value.of(_lang),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: pvManrope(
-                          fontSize: 10.5,
-                          height: 1.32,
-                          color: p.ink2.withValues(alpha: 0.9))),
+                  if (value case final v?) ...[
+                    const SizedBox(height: 5),
+                    Text(v,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: pvManrope(
+                            fontSize: 10.5,
+                            height: 1.32,
+                            color: p.ink2.withValues(alpha: 0.9))),
+                  ],
                 ]),
           ),
         ]),

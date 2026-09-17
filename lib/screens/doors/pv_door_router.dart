@@ -409,6 +409,7 @@ void openPvDoorRead(
       lang: c.language,
       openAtHeading: atHeading,
       readTitle: pregnancyReadTitle,
+      resolveRead: pregnancyReadById,
       openRead: (ctx, id) => openPvDoorRead(ctx, id, c),
       openSurface: (ctx, id) => openPvDoorSurface(ctx, id, c),
     ),

@@ -192,9 +192,15 @@ class V3HeroField extends StatelessWidget {
   final int variant;
 
   @override
-  Widget build(BuildContext context) => CustomPaint(
-        painter: _FieldPainter(accent, ground, variant, chroma),
-        size: Size.infinite,
+  // ⚠️ ITS OWN LAYER. The field is a few thousand draw calls that never
+  // change; behind a page that scrolls and slides it must not be re-rasterised
+  // on every frame of either. A RepaintBoundary lets the engine cache it once
+  // and composite the cached raster (2026-09-17, the door-exit jitter).
+  Widget build(BuildContext context) => RepaintBoundary(
+        child: CustomPaint(
+          painter: _FieldPainter(accent, ground, variant, chroma),
+          size: Size.infinite,
+        ),
       );
 }
 

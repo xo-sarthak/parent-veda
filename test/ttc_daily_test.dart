@@ -12,6 +12,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/screens/ttc/ttc_chapter_screen.dart';
+import 'package:parentveda/screens/reader/pv_reader_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_insight_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_journal_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_ritual_screen.dart';
@@ -476,7 +477,12 @@ void main() {
       final insight = ttcPickForToday(ttcInsights);
       await tester.tap(find.text(insight.title(false)).first);
       await tester.pumpAndSettle();
-      expect(find.byType(TtcInsightScreen), findsOneWidget);
+      // The article format since 2026-09-17 (ttc_insight_read.dart): the
+      // insight opens in the shared reader, as its own PvRead, with the title
+      // on the masthead. `TtcInsightScreen` is kept for revert and opened by
+      // nothing.
+      expect(find.byType(PvReaderScreen), findsOneWidget);
+      expect(find.byType(TtcInsightScreen), findsNothing);
     });
   });
 

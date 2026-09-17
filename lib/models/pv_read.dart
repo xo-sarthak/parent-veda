@@ -253,7 +253,29 @@ class PvRead {
     this.relatedVideoSlots = const [],
     this.readNext = const [],
     this.nextSteps = const [],
+    this.imageUrl,
+    this.reviewed = true,
   });
+
+  /// Whether a named clinician stands behind the piece — true for every
+  /// hand-written read (their `authorRole` names the reviewer and the month).
+  /// False for pieces the adapters build from editorial seeds (a daily
+  /// insight), where the byline is the desk and the verified mark would be a
+  /// claim nobody made. The reader keys the eyebrow and the mark on it.
+  final bool reviewed;
+
+  /// The picture above the masthead, and on this read's card wherever it is
+  /// offered (a Read next tile, a door rail).
+  ///
+  /// ⚠️ ON THE READ, NOT ON THE TILE — 2026-09-17. The first picture-led
+  /// article kept its URL on the door tile that opened it, so the same piece
+  /// opened from a journey step or another article's Read next had no
+  /// picture. The user's rule now: every article has an image on top. The
+  /// reader draws this when the caller passes no `hero`; a null renders the
+  /// tinted band with the article mark in the same 132-pt frame, so the page
+  /// keeps its shape whether or not the picture has been chosen yet — and
+  /// `docs/DOOR-CONTENT-OWED.md` lists the ones that have not.
+  final String? imageUrl;
 
   final String id;
 

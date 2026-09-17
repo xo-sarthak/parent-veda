@@ -130,7 +130,13 @@ extension PvDoorFormatCopy on PvDoorFormat {
         PvDoorFormat.tool => 'Tool',
         PvDoorFormat.article => 'Article',
         PvDoorFormat.guide => 'Guide',
-        PvDoorFormat.read => 'Read',
+        // ⚠️ 'Article', NOT 'Read' — STILL-OPEN §60.2, applied 2026-09-17. The
+        // enum value stays (it is persisted in door data); only the word on
+        // the chip changes. Nobody in the Mobbin set distinguishes look-up
+        // from read-through at the chip; the distinction above lives INSIDE
+        // the piece (glossary or FAQ first, contents visible). Kept for
+        // revert: 'Read'.
+        PvDoorFormat.read => 'Article',
         PvDoorFormat.mythFact => 'Myth vs fact',
         PvDoorFormat.checklist => 'Checklist',
         PvDoorFormat.talk => 'Talk',

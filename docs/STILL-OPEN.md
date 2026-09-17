@@ -7306,6 +7306,48 @@ Two more calls from the walk that followed:
   shape; the design prompt had the tabs ON the card. Cosmetic, and the two
   widgets are reachable and tested as they are.
 
+---
+
+## 101.0 Thinking, the fourth skilling door — 2026-09-17
+
+Built to `ParentVeda_Thinking_structure.pdf` ("the stage's default shape,
+so the work here is editorial, not structural") on the shell as it stood
+after Confidence. The door is `lib/data/doors/sk_door_thinking.dart` over
+`lib/data/skilling/skilling_thinking_*.dart`; the contract is
+`test/sk_thinking_door_test.dart`; owed content is
+`docs/DOOR-CONTENT-OWED.md` ST1–ST11; the review list is
+`docs/SKILLING-DOORS-REVIEW.md`. Generic points: `SKILLING-DOOR-BUILD.md` §9.
+
+### 101.1 The calls — 2026-09-17
+
+1a the careful framing: sharp checking of claims, forwards and arguments;
+"question the idea, respect the person" kept apart; never framed as
+arguing with parents or teachers · 2a spotting-fake as a headline strand
+of this door, its own lesson set, built once with Coding (this door the
+reasoning, Coding the mechanism) · 3a the extras reshape as a "Just for
+fun" lesson set (a riddle, a friendly debate per band), with the
+workbook's certificate becoming the keepsake's name on this door.
+
+### 101.2 What changed
+
+One shell slot, `SkDoorContent.keepsakeTitle` (the shared keepsake under
+the door's name, "You kept thinking" — one store, one screen). Six moves
+from the brief's table, 36 activity slots, four lesson sets (33 slots),
+four courses, nine products, the parent note under the brief's own title
+— placeholders, all in the ledger. The bracket's six cells live; the
+rubric tracker refused into the keepsake; the progress report dropped;
+Consult held. Nothing AI-literacy authored here: Coding's AI pages are
+coming soon, so the strand leaves the cross-link slot the brief's prompt
+asks for and lists it. Not walked on a phone.
+
+### 101.3 Needs a decision (door-specific)
+
+* The strand's child-facing name, "Is this true?", versus the brief's
+  "spotting fake".
+* Whether the linking page between Thinking's strand and Coding's AI set
+  is authored on this door or on Coding's when both fills exist — one
+  page, one owner.
+* The hero photo.
 
 ---
 
@@ -7361,12 +7403,37 @@ commented at their call sites. Books (`ReadItem.type == book`) do NOT
 converge — they route to the Book Companion; a book is a product, not an
 article.
 
-### 60.2 The chip — one word, "Article"
+### 60.2 The chip — one word, "Article" — APPLIED 2026-09-17
 
 `PvDoorFormat.read` keeps its enum value (persisted in door data) and takes
-the label `'Article'`. The look-up/read-through distinction lives inside the
-piece (glossary or FAQ section first, TOC visible), which is where every app
-in the set puts it. Closes the 2026-09-11 question.
+the label `'Article'`; `SolutionType.read`'s chip says ARTICLE too. The
+look-up/read-through distinction lives inside the piece (glossary or FAQ
+section first, TOC visible), which is where every app in the set puts it.
+Closes the 2026-09-11 question.
+
+### 60.6 The format is confirmed; the reader gained its picture frame and one tile family — 2026-09-17
+
+The user, on the phone: *"I like this format… this article format has to be
+applied for all the articles in each and every door."* Two changes he asked
+for on the article first, both done: **Read next** is the same tile as *What
+you can do with this* (type well, chip, teaser, the read's photo when it has
+one — `resolveRead` seam on the reader); and **every article has a picture
+frame on top** — `PvRead.imageUrl`, drawn by the reader when the caller
+passes no `hero`, and a type-tinted band with the mark while no picture has
+been chosen (he allowed "blank with just a space"). The first adapter landed
+with it: the TTC **daily insight** opens in the reader
+(`lib/ttc/ttc_insight_read.dart`; `TtcInsightScreen` commented at five call
+sites, kept). Short pieces carry a shared, non-urgent when-to-ask line and a
+byline with no verified mark (`PvRead.reviewed = false`).
+
+**Owed — the rollout, in this order:** parenting door pages (`PpPage` and
+its blocks → the reader shell; tables, charts and scripts render through
+`PpBlockView` inside it), the pregnancy detail screens the doors open
+(`ConditionDetailScreen`, `ScanDetailScreen`, `ReportArticleScreen`,
+`NutrientDetailScreen`, `MmArticleScreen`, `BsArticleScreen`), then the
+three older models (`ReadItem`, `ReadArticle`, `Article`, §60.1). Pictures
+per article are a content job — the frame is there, the URLs are owed in
+`DOOR-CONTENT-OWED.md`.
 
 ### 60.3 The card format — owed to the home, not the reader
 
@@ -7422,12 +7489,13 @@ is the shape: a row per pregnancy (start, dating method, due date, outcome,
 column. Also where a loss is recorded, so the app can stop pushing pregnancy
 content afterwards (personalisation reads `outcome`). Not built.
 
-### 61.2 One product catalogue across stages
+### 61.2 One product catalogue across stages — BUILT 2026-09-17
 
 The user's own words: three product sections, one per stage, "makes no
 sense". Same shape as saved_items — one table, stage as a tag, the current
-stage as the default filter, switchable. Recorded here because the decision
-is taken; the build is not started.
+stage as the default filter, switchable. Built the same day from the Mobbin
+marketplace audit (`docs/PRODUCTS-AUDIT.md`): `lib/screens/products/`,
+`PvCatalogStore`, migration 0083. What it still owes is §65.
 
 ### 61.3 Sharing a bookmark with the partner
 
@@ -7539,6 +7607,23 @@ ink now; Ovulation kits had no Read next, so its foot was blank space.
 Still owed: the parenting V3 home and the onboarding on the phone (needs a
 sign-out), and the sweep.
 
+### 63.4 Motion — what "jittery on exiting a door" turned out to be — 2026-09-17
+
+Three things, all on every door, none of them the transition itself (the
+user likes the same push between two articles): every TTC rail tile with
+drawn art ran its own six-second loop at 60 fps (`TtcIllustration`), the
+deck's four blurred cards were re-rasterised on every frame the page moved
+(`ImageFiltered` with no layer of its own), and the hero field's few
+thousand draw calls sat in the page's own layer. Fixed: rail art no longer
+animates (`TtcHeroArt.animate = false` on rails), each blurred card and the
+field are behind a `RepaintBoundary`. The fourth thing was the build: a
+debug APK is JIT-compiled and stutters on first passes through any code —
+motion is judged on the **release** build, which is what is on the phone
+now. If it still jitters there, the next step is a `--profile` run with the
+timeline, not more guessing. Also in this pass: the ripple is the classic
+grey one, shaped by the control (`InkSparkle` ignored clips and drew a
+violet rectangle on the rounded References row).
+
 ## 64.0 The TTC home names a window the tool refuses — SEEN 2026-09-17
 
 On the same account, at the same minute, the V3 home's hero said *"Your
@@ -7554,3 +7639,177 @@ on its own terms and together they contradict her on one screen pair —
 home if the tool has just deferred. Not a base-UI matter; it needs one
 decision about which surface yields when the pathway is a guess and no
 clinic dates exist. Recorded, not fixed.
+
+## 65.0 The unified store is built; what it still owes — OPENED 2026-09-17
+
+`docs/PRODUCTS-AUDIT.md` is the audit and the architecture. Nine screens in
+`lib/screens/products/`, one model, one catalogue folded from the three old
+ones by adapters, one compare tray, an order/address store, `PaymentService.pay()`
+shared with bookings, migration 0083, and the create-order function pricing
+cart lines server-side. Products is slot 2 on all three bars; Prepare and
+Courses are the first tile of their Tools hubs. Every old product screen is a
+facade; every old body is `…Classic`, kept for revert. 4,109 tests green.
+
+### 65.1 Deploy 0083 and load the catalogue into `products`
+
+`supabase db push` is the user's. Until the unified rows are in the table the
+create-order function cannot price a line and charges the phone's figure with
+`priced_by: client` on the Razorpay order — visible in the dashboard, not
+silent, but not the server's number either. The adapters
+(`buildPvCatalog()`) are the import script; a one-off that writes them as
+rows is not written yet. `PvCatalogStore.applyRows` is the seam on the app
+side; nothing calls it yet.
+
+### 65.2 A device walk of all three storefronts — WALKED 2026-09-17 (pregnancy shell)
+
+Walked on the Galaxy S21 FE the same evening, in versus format against the
+Mobbin references (`scratchpad/shots/v*.png` during the session; the
+references are in `PRODUCTS-AUDIT.md` §2). Storefront → stage switch → shelf
+→ product → zoom → bag → checkout → address → Razorpay (a real test payment,
+`pay_TdAI2mS3GamCis`, verified server-side) → placed → orders. Twelve
+defects found on the phone and fixed:
+
+1. `UsageSurface` allow-list did not know `products` — the tab tap asserted.
+2. Rails had ~40 dp of slack under the cards (fixed-height ListView) → a
+   content-sized Row in a horizontal scroll view.
+3. The same product in two rails → recommends rail deduped against for-you.
+4. Size chips rendered full-width → a Container's `alignment` in a Wrap.
+5. The sort chip overflowed beside a counted Filters chip → Flexible + cap.
+6. "For you · 0 weeks" on a phone with no saved child → no clock.
+7. TTC's own PARENTVEDA PICK badge above the mark → badge dropped.
+8. Pros/cons chips repeated the lists above, truncated → dropped.
+9. Floating top buttons over the page's text once scrolled → white bar.
+10. "Compare with similar" and "You might also like" showed the same item →
+    related is cross-category.
+11. The "Added to your bag" snack outlived navigation and sat on the bag's
+    commit; every ink snack sat on the ink bar and "looked like one" (the
+    user) → white, hairlined, lifted above both the bar and the Ask pill.
+12. The Ask pill sat on "View order" → hidden on bag/checkout/placed/zoom.
+13. Razorpay did not prefill the phone → `+91` prefix.
+
+Plus what the user asked for on the walk: the hero band (`pv_hero_band.dart`)
+and the motion pass (`PRODUCTS-MOTION-AND-ASSETS.md`).
+
+**Not walked:** the parenting and TTC shells' own bars on the store (the
+phone was signed in as pregnancy; the bar is drawn by `PvStoreNav` from
+`chrome`, pinned by test, but unseen). Do those two first next time.
+
+### 65.3 Seed content that must be replaced before launch
+
+- Reviewer names on "ParentVeda recommends" (Dr. Meera Iyer, Dr. Anaya Rao,
+  Dr. Vikram Sethi) are the Guide data's seed experts, not real reviewers.
+- Photographs are free-licence Unsplash shots of the object type, captioned
+  "Representative photo". Real product shots replace them per product in
+  `pv_product_extras.dart` (a source-file photo always sits first).
+- The pregnancy "best overall" recommendations were written in this build;
+  the parenting ones are the Guides' verdicts; TTC's are the source file's.
+- `expertsPct` / `parentsPct` on the parenting side are the Guide's own
+  derived figures, carried because the Guide already showed them. The unified
+  model never derives one; those inherited numbers should become measured or
+  null when real review data exists.
+
+### 65.4 Order status cannot move past what the app knows
+
+`paid` is set after the signature verifies; nothing ever sets shipped /
+delivered. That is a webhook (Razorpay → `orders.status`, then the
+fulfilment side) and a WhatsApp template; the placed screen promises "a
+WhatsApp update when it leaves", which is a promise the outbox can keep once
+the template exists. The 7-day returns line is copy, not a flow.
+
+### 65.5 An Ask Veda row on the product page
+
+Every stage's Ask Veda is a different screen; the product page has no row
+because wiring the wrong one is worse than none. One `askVedaFor(stage)`
+opener in the surface routers, then a row under "What experts say".
+
+### 65.6 Brand Studio on the shelf
+
+Sponsored placement obeys the rank floor (`lib/brand/rank_floor.dart`) on the
+old shelves; the unified shelf sorts on band and review count and reads no
+campaign. Wire `rankFloor` into `PvShelfScreen`'s sort before any campaign
+targets a product.
+
+### 65.7 Retire the classic bodies after a release cycle
+
+`ProductsScreenClassic`, `ProductsDiscoveryScreenClassic`, both
+`ProductDetailScreenClassic`s, `ProductsCompareScreenClassic`,
+`Products(Sub)CategoryScreenClassic`, `ProductGuideHubScreenClassic`,
+`ProductGuideScreenClassic`, `openProductWithGuideCheckClassic`,
+`TtcShopScreenClassic` and its shelf/product/compare, `TtcProductsScreenClassic`,
+`PpCompareStore`, `TtcCompareTray`, and their pinned tests. Same clock as §61.4.
+
+### 65.8 Two small facades that changed behaviour, on purpose
+
+- Ask Veda's `ttcprod_<id>` deep link opens the product page directly, not
+  the flat list with a highlight (test updated, `ttc_open_points_test`).
+- The Guide's "which view?" chooser is gone; a product with a Guide opens the
+  one page that now carries the Guide's layers.
+
+### 65.9 What the product engine is still missing — the honest list, 2026-09-17
+
+The user asked for it in one place. Ordered by what a shopper would hit
+first, not by effort.
+
+**Commerce that is a screen but not yet a system**
+- Order status after `paid`: no webhook, no packed/shipped/delivered, no
+  WhatsApp template. The placed screen promises a WhatsApp update it cannot
+  send yet (§65.4).
+- Returns and cancellation: copy only ("7 days"). No cancel button on an
+  order, no return flow, no refund path through Razorpay.
+- Stock: nothing knows a quantity. "Only 2 left" (Amazon Haul) and
+  sold-out states do not exist; a variant cannot be unavailable.
+- Delivery estimate and pincode check: "3–6 days" is a constant. CRED's
+  "delivery in 3–6 days · Home, 453331" needs a serviceability lookup.
+- Coupons / promo codes: the checkout has no field. (Expert codes are
+  decided as attribution OR coupon — STILL-OPEN §13.0 — and neither reaches
+  the store yet.)
+- Multiple addresses are stored but there is no address book screen outside
+  checkout; no edit, only add and pick.
+- Guest checkout: `PvOrderStore` syncs only when logged in; a logged-out
+  order is local to the phone forever.
+- Server-priced orders depend on 0083 being loaded (§65.1); until then the
+  Razorpay order is stamped `priced_by: client`.
+
+**Trust layer**
+- Reviews are seed. No write path: a parent cannot rate or review, and the
+  "asked two weeks after delivery" line in the reviews empty state is a
+  promise without a job behind it.
+- "Helpful" on a review, review photos, verified-purchase marks — none.
+- Expert films: the cards open nothing (`videoId` is a stub on the Guide
+  side too).
+- The reviewer names on "ParentVeda recommends" are seed experts.
+- Q&A ("Ask a question", Sephora; "Ask Rufus", Amazon) — the natural home is
+  an Ask Veda row on the product page (§65.5), not built.
+
+**Discovery**
+- Search is substring-only over name/brand/category/best-for; no typo
+  tolerance, no synonyms ("pacifier" ≠ "soother"), no recent searches, no
+  suggestions as you type.
+- Filters have no age/week filter on the parenting/pregnancy shelves and no
+  "concern" entry (rashes, colic) — the old parenting discovery had both.
+- Brand pages ("From the brand", Amazon; Instagram shops) — a brand is a
+  string, not a destination.
+- Recently viewed ("Pick up where you left off", Etsy) — not kept.
+- Saved products have a home (Saved · Products) but no price-drop or
+  back-in-stock signal.
+
+**Catalogue**
+- 59 products. Real shelves need hundreds; the adapters are the import
+  script and the table is ready (0083), the rows are not.
+- Photos are representative stock (§65.3); category marks are Material
+  glyphs (`PRODUCTS-MOTION-AND-ASSETS.md` §2.2).
+- Hindi: the store is English-only by policy (CLAUDE.md); the pregnancy
+  catalogue's Devanagari names are not surfaced.
+
+**Monetisation**
+- Brand Studio's rank floor is not wired into the shelf sort (§65.6); no
+  sponsored slot on the storefront; no affiliate tracking parameter on the
+  retailer URLs (the Amazon links are plain searches).
+- Bundles / "frequently bought together" — none.
+
+**Engineering**
+- No analytics on the funnel beyond the tab tap (`UsageEvents`): card taps,
+  add-to-bag, checkout start, payment outcome are unrecorded.
+- Image caching is Flutter's in-memory cache only; no disk cache package —
+  a cold open refetches every photo.
+- The Classic bodies and their pinned tests are still compiled (§65.7).
