@@ -180,7 +180,7 @@ two.
 | Traditions (parenting) | 10 | 8 | – | 2 | – (two sensitive pages, tone to sign off) |
 | Coding (skilling) | 9 | 4 (33 slots: 12 lessons, 6 AI cards, 6 courses, 9 products, 1 note — the 36 activities are filled) | – | 2 (the consent adapter, the access rail) | 1 generic (resume marker — `SKILLING-DOOR-BUILD.md` §9) |
 | Communication (skilling) | 10 | 6 (41 slots: 12 activities for 11–14, 27 lessons, 12 courses, 12 products, 2 notes — the 6–8 and 8–11 activities are filled) | – | 1 (the voice keepsake) | 1 (cloud copy of recordings, behind a real consent) |
-| Confidence (skilling) | 11 | 8 (72 slots: 36 activities, 18 lessons, 6 courses, 9 products, 2 notes, 1 coach) | – | 1 (the breath page) | 1 (the coach onboarded, then the booking wiring) |
+| Confidence (skilling) | 11 | 5 (36 slots: 18 lessons, 6 courses, 9 products, 2 notes, 1 coach — the 36 activities are filled) | – | 1 (the breath page) | 1 (the coach onboarded, then the booking wiring) |
 
 Pregnancy, six doors: written pieces owed, in prose — **S1, L3, L4, L5, L6,
 M1**, six reads. Films — **N1, L1, L2, M4 ×3, M6 ×5**, eleven. Audio — **M5
@@ -410,13 +410,14 @@ unwritten until you say go"). Rows carry `SC`.
 ### SF. Confidence & public speaking — `lib/data/doors/sk_door_confidence.dart`
 
 Built to `ParentVeda_Confidence_structure.pdf` (11 Sep 2026), door three,
-on 2026-09-16. Frame only. Rows carry `SF`.
+on 2026-09-16; the three activity bands filled from Tasks 4, 5 and 6 of 36
+on 2026-09-17. Rows carry `SF`.
 
 | # | Card | Kind | Outcome | Owed |
 |---|---|---|---|---|
-| SF1 | Use your voice, 6 to 8 — (`cf_68_01`, `cf_68_02`, `cf_68_03`, `cf_68_04`, `cf_68_05`, `cf_68_06`, `cf_68_07`, `cf_68_08`, `cf_68_09`, `cf_68_10`, `cf_68_11`, `cf_68_12`) | Activity ×12 | Coming soon | **The fill exists:** `tasks/confidence/… 6-8 … Bracket 1.pdf`. |
-| SF2 | Stand up and say it, 8 to 11 — (`cf_811_01`, `cf_811_02`, `cf_811_03`, `cf_811_04`, `cf_811_05`, `cf_811_06`, `cf_811_07`, `cf_811_08`, `cf_811_09`, `cf_811_10`, `cf_811_11`, `cf_811_12`) | Activity ×12 | Coming soon | **The fill exists:** `… 8-11 … Bracket 2.pdf`. |
-| SF3 | Give a real talk, 11 to 14 — (`cf_1114_01`, `cf_1114_02`, `cf_1114_03`, `cf_1114_04`, `cf_1114_05`, `cf_1114_06`, `cf_1114_07`, `cf_1114_08`, `cf_1114_09`, `cf_1114_10`, `cf_1114_11`, `cf_1114_12`) | Activity ×12 | Coming soon | **The fill exists:** `… 11-14 … Bracket 3.pdf`. |
+| SF1 | ~~Use your voice, 6 to 8 — (`cf_68_01`, `cf_68_02`, `cf_68_03`, `cf_68_04`, `cf_68_05`, `cf_68_06`, `cf_68_07`, `cf_68_08`, `cf_68_09`, `cf_68_10`, `cf_68_11`, `cf_68_12`)~~ | Activity ×12 | **Filled** | Closed 2026-09-17, the fill commit: all twelve mapped verbatim from Task 4 of 36. `offersRecording` on Loud and Proud Name, Show and Tell at Home, Your Own Way; Butterflies Breath opens `cf_breath`. |
+| SF2 | ~~Stand up and say it, 8 to 11 — (`cf_811_01`, `cf_811_02`, `cf_811_03`, `cf_811_04`, `cf_811_05`, `cf_811_06`, `cf_811_07`, `cf_811_08`, `cf_811_09`, `cf_811_10`, `cf_811_11`, `cf_811_12`)~~ | Activity ×12 | **Filled** | Closed 2026-09-17, the fill commit: all twelve mapped verbatim from Task 5 of 36. `offersRecording` on Answer in Class, Two-Minute Talk, Read it Out Loud; Your Calm-Down Routine opens `cf_breath`. |
+| SF3 | ~~Give a real talk, 11 to 14 — (`cf_1114_01`, `cf_1114_02`, `cf_1114_03`, `cf_1114_04`, `cf_1114_05`, `cf_1114_06`, `cf_1114_07`, `cf_1114_08`, `cf_1114_09`, `cf_1114_10`, `cf_1114_11`, `cf_1114_12`)~~ | Activity ×12 | **Filled** | Closed 2026-09-17, the fill commit: all twelve mapped verbatim from Task 6 of 36. `offersRecording` on Give the Real Talk; The Big-Day Routine opens `cf_breath`. Two things the task names that do not exist, listed not built: the Thinking door's "question ideas, not elders" line (Speak Up to a Grown-Up cross-links to it) and "the door's help line" (After a Rough One) — the door's nearest thing is the parent-facing boundary note, SF8. |
 | SF4 | The lesson sets — speaking prompts and stage exercises, three per band per set (`cf_prm_68_1`, `cf_prm_68_2`, `cf_prm_68_3`, `cf_prm_811_1`, `cf_prm_811_2`, `cf_prm_811_3`, `cf_prm_1114_1`, `cf_prm_1114_2`, `cf_prm_1114_3`, `cf_stg_68_1`, `cf_stg_68_2`, `cf_stg_68_3`, `cf_stg_811_1`, `cf_stg_811_2`, `cf_stg_811_3`, `cf_stg_1114_1`, `cf_stg_1114_2`, `cf_stg_1114_3`) | Lesson ×18 | Coming soon | No task PDF. "Prompt and stage-exercise sets per band, each tied to one of the six skills. Small low-stakes turns first, a real talk last." The one built page in the set is `cf_breath` (SF9). |
 | SF5 | The course shelf — with a coach (live) and at her own pace (recorded), per level (`cf_course_68_live`, `cf_course_68_rec`, `cf_course_811_live`, `cf_course_811_rec`, `cf_course_1114_live`, `cf_course_1114_rec`) | Course ×6 | Coming soon | Real programmes with a real coach. Placeholders behind the gate (question 1a); the booking engine is the named next pass. Every string under the no-outcome scan: no "confident child", no rank. |
 | SF6 | The product shelf — a toy mic, prompt cards, a little stage timer, per band (`cf_prod_68_mic`, `cf_prod_68_cards`, `cf_prod_68_timer`, `cf_prod_811_mic`, `cf_prod_811_cards`, `cf_prod_811_timer`, `cf_prod_1114_mic`, `cf_prod_1114_cards`, `cf_prod_1114_timer`) | Product ×9 | Coming soon | Real, sourced items. Skilling's own shelf; the timer is a prop she holds, never something the app reads. |

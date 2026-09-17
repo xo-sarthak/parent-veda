@@ -291,6 +291,7 @@ class SkActivity {
     this.multiSession = false,
     this.withGrownUp = false,
     this.offersRecording = false,
+    this.breathPageId,
     this.comingSoon = false,
   });
 
@@ -341,6 +342,15 @@ class SkActivity {
   /// has turned recording on. False everywhere else. Added at the fill
   /// (2026-09-15); the tasks said STOP and list, and this is the field.
   final bool offersRecording;
+
+  /// The Confidence tasks' "(Uses the app's breathing circle.)" — three
+  /// steadying-nerves activities, one per band, open the circle mid-step.
+  /// The id of the door's breath page (`cf_breath`); the activity screen
+  /// draws one row that opens it. Added at the fill (2026-09-17): the tasks
+  /// said STOP and list a missing field, and this is the field. A page id,
+  /// not a bool, so the circle stays the one page and never a second
+  /// rendering.
+  final String? breathPageId;
 
   /// The scaffold state: a real card at full size, "Coming soon", no tap.
   final bool comingSoon;

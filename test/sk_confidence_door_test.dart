@@ -7,7 +7,9 @@
 //  card or a real booking before a coach exists; a course string promising
 //  a confident child; the breath page growing a second circle; the
 //  self-review growing a field; the six skills drifting from the brief's
-//  table; a coming-soon slot nobody owes.
+//  table; a coming-soon slot nobody owes. Then the three task PDFs' fills
+//  (2026-09-17): every slot filled, the seven that offer a recording, the
+//  three that open the breathing circle, no score, no promise.
 // =============================================================================
 
 import 'dart:io';
@@ -20,6 +22,7 @@ import 'package:parentveda/data/doors/sk_door_data.dart';
 import 'package:parentveda/data/skilling/skilling_confidence_activities.dart';
 import 'package:parentveda/models/bracket.dart';
 import 'package:parentveda/screens/skilling/doors/sk_door_screen.dart';
+import 'package:parentveda/screens/skilling/sk_activity_screen.dart';
 import 'package:parentveda/screens/skilling/sk_bands.dart';
 import 'package:parentveda/screens/skilling/sk_child_store.dart';
 import 'package:parentveda/screens/skilling/sk_content.dart';
@@ -90,19 +93,116 @@ void main() {
       expect(_c.skillById('steadying_nerves')!.kidLine, contains('going anyway'));
     });
 
-    test('a FULL set per band, two per skill, all placeholders, no copy', () {
+    test('a FULL set per band, two per skill, thirty-six ids', () {
       for (final band in kSkBands) {
         final list = _c.activitiesFor(band.id);
         expect(list, hasLength(12), reason: band.id);
         for (final s in kSkConfidenceSkills) {
           expect(list.where((a) => a.skillPurpose == s.id), hasLength(2), reason: '${band.id}/${s.id}');
         }
-        for (final a in list) {
-          expect(a.comingSoon, isTrue, reason: a.id);
-          expect(a.steps, isEmpty, reason: a.id);
-        }
       }
       expect(_c.activities.map((a) => a.id).toSet(), hasLength(36));
+    });
+
+    // Tasks 4, 5 and 6 of 36, filled 2026-09-17. The frame's rule ("all
+    // placeholders, no copy") is replaced by the tasks' acceptance
+    // checklists, the same shape in all three.
+    test('every slot is filled: the tasks\' acceptance checklist, all three bands', () {
+      for (final a in _c.activities) {
+        expect(a.comingSoon, isFalse, reason: a.id);
+        expect(a.title, isNotEmpty, reason: a.id);
+        expect(a.oneLine, isNotEmpty, reason: a.id);
+        expect(a.materials, isNotEmpty, reason: '${a.id}: "Nothing", or the household things');
+        expect(a.steps, hasLength(4), reason: '${a.id}: four numbered steps, as every task writes them');
+        expect(a.theThinking, isNotEmpty, reason: a.id);
+        expect(a.whatYouPractised, isNotEmpty, reason: a.id);
+        expect(a.tool, isNull, reason: '${a.id}: nothing to install on this door');
+        expect(a.withGrownUp, isFalse, reason: a.id);
+      }
+      // The tasks' titles, first and last per band, as a spot check.
+      expect(_c.activityById('cf_68_01')!.title, 'Loud and Proud Name');
+      expect(_c.activityById('cf_68_12')!.title, 'Silly Voices');
+      expect(_c.activityById('cf_811_01')!.title, 'Answer in Class');
+      expect(_c.activityById('cf_811_12')!.title, 'Don\'t Shrink');
+      expect(_c.activityById('cf_1114_01')!.title, 'Speak Up to a Grown-Up');
+      expect(_c.activityById('cf_1114_12')!.title, 'Own the Room as You');
+      // The quiet child, protected by name in every band.
+      for (final id in ['cf_68_04', 'cf_68_11', 'cf_811_11', 'cf_811_12', 'cf_1114_11', 'cf_1114_12']) {
+        expect(_c.activityById(id)!.skillPurpose, anyOf('being_yourself', 'being_heard'), reason: id);
+      }
+      expect(_c.activityById('cf_68_04')!.title, 'The Puppet Speaks');
+    });
+
+    test('offersRecording is the tasks\' seven, and only those', () {
+      final offered = _c.activities.where((a) => a.offersRecording).map((a) => a.id).toList();
+      expect(offered, [
+        'cf_68_01', 'cf_68_05', 'cf_68_11', // Loud and Proud Name, Show and Tell at Home, Your Own Way
+        'cf_811_01', 'cf_811_05', 'cf_811_06', // Answer in Class, Two-Minute Talk, Read it Out Loud
+        'cf_1114_05', // Give the Real Talk
+      ]);
+      expect(_c.voiceKeepsake, isTrue, reason: 'the row can only show on a door that keeps her voice');
+      expect(_c.voiceSelfReview, isTrue, reason: 'her own "notice one thing" is the only review');
+    });
+
+    test('the breathing circle: three activities open the one page, and it is the one circle', () {
+      final breathers = _c.activities.where((a) => a.breathPageId != null).map((a) => a.id).toList();
+      expect(breathers, ['cf_68_07', 'cf_811_07', 'cf_1114_07'],
+          reason: 'Butterflies Breath, Your Calm-Down Routine, The Big-Day Routine');
+      for (final a in _c.activities.where((a) => a.breathPageId != null)) {
+        expect(a.breathPageId, 'cf_breath', reason: a.id);
+        expect(_c.pageById(a.breathPageId!), isNotNull, reason: '${a.id}: the page it opens exists');
+        expect(a.skillPurpose, 'steadying_nerves', reason: a.id);
+        expect(skRouterKnows('sk_page/skilling_confidence/${a.breathPageId}'), isTrue, reason: a.id);
+      }
+      // No activity on any other door opens a breath — the field is Confidence's.
+      for (final c in kSkDoorContents.where((c) => c.doorId != 'skilling_confidence')) {
+        expect(c.activities.where((a) => a.breathPageId != null), isEmpty, reason: c.doorId);
+      }
+    });
+
+    test('the tasks\' hard rules: no score, no promise, no timer, no upsell, delivery not craft', () {
+      const banned = [
+        'future', 'genius', 'career', 'guarantee', 'ahead of', 'timer', 'leaderboard', 'star performer',
+        'future leader', 'ceo', 'ace every', 'course', 'coach', 'buy', 'cure', 'fix this',
+      ];
+      for (final a in _c.activities) {
+        final copy = [a.title, a.oneLine, a.materials, ...a.steps, a.theThinking, a.whatYouPractised]
+            .join(' ')
+            .toLowerCase();
+        for (final b in banned) {
+          expect(copy.contains(b), isFalse, reason: '${a.id} says "$b"');
+        }
+        expect(RegExp(r'\b(score|scores|scoring|marks|rating|rated|grade|graded|pass or fail)\b').hasMatch(copy), isFalse,
+            reason: '${a.id}: nothing grades the child');
+        // The honest end line names the doing.
+        expect(a.whatYouPractised.startsWith('You '), isTrue, reason: a.id);
+      }
+      // Not "say it clearly": that door is Communication's. The three
+      // steadying-nerves reframes say nerves stay.
+      expect(_c.activityById('cf_68_07')!.steps.last, contains('The nerves may still be there'));
+      expect(_c.activityById('cf_1114_08')!.oneLine, 'You cannot delete nerves. You can use them.');
+    });
+
+    testWidgets('the breath row opens the one circle from the activity, and only where a step says so', (tester) async {
+      tester.view.physicalSize = const Size(1200, 4000);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+      SkChildStore.instance.debugSetAgeYears(7);
+      final plain = _c.activityById('cf_68_01')!; // Loud and Proud Name
+      await tester.pumpWidget(MaterialApp(home: SkActivityScreen(content: _c, activity: plain)));
+      await tester.pumpAndSettle();
+      expect(find.byKey(const Key('sk-breath-row')), findsNothing);
+      final breath = _c.activityById('cf_68_07')!; // Butterflies Breath
+      await tester.pumpWidget(MaterialApp(home: SkActivityScreen(key: const ValueKey('b'), content: _c, activity: breath)));
+      await tester.pumpAndSettle();
+      expect(find.text('Butterflies Breath'), findsOneWidget);
+      expect(find.byKey(const Key('sk-breath-row')), findsOneWidget);
+      await tester.tap(find.byKey(const Key('sk-breath-row')));
+      // The circle animates forever; pump, do not settle.
+      await tester.pump();
+      await tester.pump(const Duration(milliseconds: 600));
+      expect(find.text('Steady your nerves'), findsOneWidget, reason: 'the cf_breath page, pushed');
+      expect(find.text('Breathe with the circle'), findsOneWidget);
     });
   });
 

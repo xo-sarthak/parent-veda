@@ -235,7 +235,13 @@ void main() {
     ///   cm_68_11    Say What You Want and Why — "That is how points land":
     ///               the plural of a point MADE, on the door whose sixth skill
     ///               is putting your point. Task copy, verbatim.
-    const scoreAllowed = {'cd_1114_10', 'cm_68_11'};
+    ///   cf_811_05   Two-Minute Talk — "Three points keeps it doable": the
+    ///               three things she plans to say. Task copy, verbatim.
+    ///   cf_1114_05  Give the Real Talk — "an opening line, three points, a
+    ///               closing line". The same three. Task copy, verbatim.
+    ///   cf_1114_10  After a Rough One — "the door's help line points to a
+    ///               trusted adult": the verb. Task copy, verbatim.
+    const scoreAllowed = {'cd_1114_10', 'cm_68_11', 'cf_811_05', 'cf_1114_05', 'cf_1114_10'};
 
     // ⚠️ `points`, NOT `points?`. "Make your point" is Communication's sixth
     // skill and is on every one of its cards; a score is plural. Tightened

@@ -31,6 +31,7 @@ import 'sk_child_store.dart';
 import 'sk_content.dart';
 import 'sk_door_content.dart';
 import 'sk_practice_store.dart';
+import 'sk_surface_router.dart';
 import 'sk_voice_keepsake.dart';
 
 class SkActivityScreen extends StatelessWidget {
@@ -141,6 +142,27 @@ class SkActivityScreen extends StatelessWidget {
                 if (i != a.steps.length - 1) const SizedBox(height: 18),
               ],
               const SizedBox(height: 30),
+            ],
+
+            // ---- the breath, where a step says "open the circle" ------------
+            //
+            // The Confidence tasks: "Open the breathing circle and take three
+            // slow balloon breaths with it." One row that opens the door's
+            // breath page (`sk_page/<door>/cf_breath`), which is the app's one
+            // circle in an `SkBreath` block. The page is pushed, not drawn
+            // here, so the circle has one home.
+            if (a.breathPageId case final breath?) ...[
+              _Heading('The breathing circle', p),
+              const SizedBox(height: 12),
+              _WordButton(
+                key: const Key('sk-breath-row'),
+                label: 'Open the breathing circle',
+                icon: Icons.air_rounded,
+                p: p,
+                onTap: () => skOpenSurface(
+                    context, 'sk_page/${content.doorId}/$breath'),
+              ),
+              const SizedBox(height: 26),
             ],
 
             // ---- her voice, where the activity offers it --------------------

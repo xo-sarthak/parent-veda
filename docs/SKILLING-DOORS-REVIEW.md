@@ -23,7 +23,7 @@ buy are stub sheets; the door stays behind `kDebugMode`; the preview ships.
 |---|---|---|---|---|---|---|
 | Coding | `ParentVeda_Coding_structure_v2.pdf` | door, 5 tabs + the shell | **3 of 3 filled** (36 activities) | 5f963a7 (door), 87dcd62 (fills + walk) | **yes** — 2026-09-14, at 8, 5 and 12 | `sk_coding_door_test` |
 | Communication | `ParentVeda_Communication_structure.pdf` | door, 5 tabs (three band cards) | **2 of 3 filled** (6–8, 8–11); 11–14 not written | a86c5bf (frame), 0fa1193 (fills), e67da1b (walk) | **yes** — 2026-09-16, at 12 and 8, recorder end to end | `sk_communication_door_test` |
-| Confidence | `ParentVeda_Confidence_structure.pdf` | door, **6 cards** (three band cards + recorder + keepsake) | 3 of 3 exist, not yet mapped | 5eb85a4, walk commit next | **yes** — 2026-09-17, at 8 | `sk_confidence_door_test` |
+| Confidence | `ParentVeda_Confidence_structure.pdf` | door, **6 cards** (three band cards + recorder + keepsake) | **3 of 3 filled** (36 activities) | 5eb85a4 (frame), 153b3a4 (walk), fills commit next | **yes** — 2026-09-17, at 8, frame and fills | `sk_confidence_door_test` |
 | Creativity | `ParentVeda_Creativity_structure.pdf` | plan sheet | none yet | — | — | — |
 | Feelings | `ParentVeda_Feelings_structure.pdf` | plan sheet | none yet | — | — | — |
 | Focus | `ParentVeda_Focus_structure.pdf` | plan sheet | none yet | — | — | — |
@@ -175,7 +175,9 @@ Frame only; the two task PDFs (6–8, 8–11) fill it next.
 ## Confidence (§100)
 
 Built to the brief literally on your calls of 2026-09-16 (1a 2a 3b 4a).
-Frame only; three task PDFs fill it next.
+The three activity bands filled verbatim from Tasks 4, 5 and 6 of 36 on
+2026-09-17 — every field diffed against the PDF text by script, 36 of 36
+match. The fill's own list follows the frame's.
 
 - [ ] **Look:** Skilling → Confidence → the selector: six cards. Use your
       voice · Stand up and say it · Give a real talk · Lessons · Hear
@@ -213,6 +215,57 @@ Frame only; three task PDFs fill it next.
       Communication. If it reads well, Communication could take the same
       shape (its brief listed one surface; yours to say).
 
+**The fills (2026-09-17)**
+
+- [ ] **Look:** Use your voice → Butterflies Breath → under the steps,
+      "The breathing circle · Open the breathing circle" → the Steady your
+      nerves page (the one circle). The same row on Your Calm-Down Routine
+      (8–11) and The Big-Day Routine (11–14). The tasks said "(Uses the
+      app's breathing circle.)"; this row is the wiring. The field is
+      `breathPageId` — the one field the fill added; the tasks said STOP
+      and list a missing field, and this is it.
+- [ ] **Look:** (recording on) Loud and Proud Name, Show and Tell at Home,
+      Your Own Way, Answer in Class, Two-Minute Talk, Read it Out Loud, Give
+      the Real Talk → "Say it in your voice · Record it". Seven of
+      thirty-six, the tasks' seven, and no others.
+- [ ] **The recorder the tasks name is not the one used.** All three tasks
+      say "reuse the app's EXISTING voice recorder (the pregnancy Garbh
+      Sanskar / family-voice recorder)". Skilling has its own
+      (`sk_voice_keepsake.dart`), built for Communication on your call of
+      2026-09-15 (option a: own copy, same `record`/`audioplayers`
+      mechanism, no upload). That is what the seven rows open. Nothing new
+      was built; the task's assumption was overtaken by an earlier
+      decision. Say if you want it otherwise.
+- [ ] **Two things the tasks name that do not exist**, listed not built:
+      * "the Thinking door's 'question ideas, not elders' line" — Speak Up
+        to a Grown-Up's parent line cross-links to it. Thinking is not
+        built; the window is in the cross-door table.
+      * "the door's help line points to a trusted adult or professional" —
+        After a Rough One's parent line. The door has the parent-facing
+        boundary note card (SF8, unwritten) on the grown-up screen; there
+        is no child-facing help line on any skilling door. Yours to say
+        whether one should exist (a generic point, `SKILLING-DOOR-BUILD.md`
+        §9).
+- [ ] **Two lines to eyeball against the no-promise rule**, kept verbatim
+      because the copy is the task's: Ask the Real Question step 4, "That
+      is leadership, quietly." (present tense, about the act — not "future
+      leader"); On the Call step 4, "That is a skill you will use your
+      whole life." Both read as honest to me; say if either should go back
+      to the task author.
+- [ ] Hinglish kept verbatim where the tasks wrote it: "kachcha papad,
+      pakka papad", "dadaji". The English-only rule is for copy we write;
+      this is theirs.
+- [ ] The scan allow-list grew by three ids for the word "points" —
+      "three points" (the talk's) and "points to" (the verb). Reasons are
+      written beside each in `sk_doors_sanity_test.dart`.
+- [x] **Walked on the phone after the fill, 2026-09-17** at 8: the new
+      hero, the filled Stand up and say it rails, Your Calm-Down Routine →
+      the breath row → the one circle, Answer in Class → the record row →
+      "I tried it" → the task's end line → TRIED on the card, Say What You
+      Think with no record row and no breath row. One fix on the way in:
+      the preview's note still said "Coding opens its door"; it now counts
+      from `kSkDoors` ("Three of the twelve…").
+
 ## Cross-door windows
 
 `sk_page/<door>/<page>` as a `toolSurfaceId` on a page with no blocks —
@@ -231,3 +284,4 @@ Communication split the Communication brief names.
 | Confidence | Communication | the shared speaking practice — Confidence dares to say it, Communication says it clearly; one recorder (`sk_voice_keepsake.dart`), used by both | built as the shared recorder; the prompt-set window waits on Communication's lesson fill |
 | Confidence · `cf_breath` | Stillness | the quick calming breath — "Confidence references that breath for the moment before you speak, it does not build its own" | built as the app's one circle in an `SkBreath` block; the Stillness page it should link to does not exist yet |
 | Confidence | Feelings | "naming and handling the fear is Feelings" | owed — Feelings not built |
+| Confidence · `cf_1114_01` | Thinking | Speak Up to a Grown-Up "cross-links to the Thinking door's 'question ideas, not elders' line; keep the tone consistent across both" | owed — Thinking not built; when it is, the line's page id goes here |

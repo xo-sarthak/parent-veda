@@ -65,6 +65,7 @@ import '../v2/v2_block_grid.dart';
 import '../v2/v2_palette.dart';
 import '../v2/v3_hero_field.dart';
 import '../v2/v3_skill_art.dart';
+import '../../data/doors/sk_door_data.dart';
 import 'sk_practice_store.dart';
 import 'sk_surface_router.dart';
 
@@ -348,9 +349,13 @@ class _PreviewBanner extends StatelessWidget {
           Icon(Icons.info_outline_rounded, size: 17, color: p.ink2),
           const SizedBox(width: 9),
           Expanded(
+            // Counted from `kSkDoors`, not written: the line said "Coding"
+            // for two doors too long (seen on the phone, 2026-09-17).
             child: Text(
-                'Design preview. Coding opens its door in a debug build; '
-                'the other eleven show what is planned behind them.',
+                'Design preview. ${_cap(_words[kSkDoors.length])} of the twelve '
+                'open their doors in a debug build; the other '
+                '${_words[12 - kSkDoors.length]} show what is planned '
+                'behind them.',
                 style:
                     pvManrope(fontSize: 12.5, height: 1.45, color: p.ink2)),
           ),
@@ -662,3 +667,11 @@ class _PlanSheet extends StatelessWidget {
     );
   }
 }
+
+/// One to twelve, in words — the preview counts its open doors in prose.
+const List<String> _words = [
+  'none', 'one', 'two', 'three', 'four', 'five', 'six',
+  'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve',
+];
+
+String _cap(String w) => w[0].toUpperCase() + w.substring(1);

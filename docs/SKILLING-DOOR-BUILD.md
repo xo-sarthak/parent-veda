@@ -212,8 +212,13 @@ From the Coding v2 brief and the user's calls of 2026-09-14:
 ### Fields the task PDFs have added so far
 
 `withGrownUp` (Coding 11–14), `offersRecording` (Communication 6–8 and
-8–11). Both booleans on `SkActivity`, both marks the task names, both
-false by default. A fill that needs a third STOPs and lists it, as the
+8–11, Confidence all three), `breathPageId` (Confidence, one per band).
+The first two are booleans, marks the task names, false by default. The
+third is a page id, null by default: the activity screen draws one row,
+"Open the breathing circle", that pushes `sk_page/<door>/<id>` — the
+door's breath page, which is the app's one circle. A page id rather than
+a bool so the circle keeps one home and the activity never grows a second
+rendering of it. A fill that needs a fourth STOPs and lists it, as the
 tasks say.
 
 ### When the task PDFs arrive for a door
@@ -330,7 +335,16 @@ Points that apply to every skill door. Door-specific ones are in
       do not rebuild it"); task 3's activity 6 → the Thinking door's "is
       this true" side; task 3's sharing posture → "the same private-showcase
       posture as the Making door". Logged in the review file's cross-door
-      table; each becomes a `SkLink` when its door lands.
+      table; each becomes a `SkLink` when its door lands. Confidence's
+      task 6 adds the Thinking door's "question ideas, not elders" line.
+- [ ] **A child-facing help line.** Confidence's task 6 (After a Rough One)
+      says "if a child's distress runs deeper than a rough talk, the door's
+      help line points to a trusted adult or professional". No skilling
+      door has one on the child side; each has a parent-facing boundary
+      note behind the gate. Whether a child screen should carry one calm
+      line ("if this feels bigger than a talk, tell a grown-up you trust")
+      is a stage-wide call, not a Confidence one: it touches every door's
+      child pages and the never-diagnose rule. Listed, not built.
 - [ ] **Fourteen and over.** Reads the top band. The brief says a fourth
       band "is easy to add later". When?
 - [ ] **The brief's own example line contains a number** ("You practised
