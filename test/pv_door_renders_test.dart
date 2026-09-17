@@ -69,7 +69,8 @@ void main() {
     // ⚠️ THE TIMELINE ITSELF, NOT A CARD THAT OPENS IT. "WHERE YOU ARE" is the
     // timeline body's own eyebrow and appears nowhere else in the app, so
     // finding it proves the tool is rendered in place rather than linked to.
-    expect(find.text('WHERE YOU ARE'), findsOneWidget);
+    // Since the 2026-09-18 redraw the timeline opens on its "Up next" card.
+    expect(find.textContaining('UP NEXT'), findsOneWidget);
 
     // And the footer line the brief says to keep unchanged.
     expect(find.textContaining('the usual run, not a rule'), findsWidgets);

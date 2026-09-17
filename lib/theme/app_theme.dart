@@ -416,8 +416,17 @@ final ColorScheme _lightScheme = ColorScheme(
       // Notion, Linear) push horizontally with swipe-back, and the same
       // transition on every route is half of what "consistent" means. The
       // Cupertino builder gives both platforms that one motion.
+      // ⚠️ ANDROID: FADE-FORWARDS, NOT CUPERTINO — 2026-09-18. The Cupertino
+      // push DIMS the page underneath while the new one slides over it (the
+      // "overlay" the user saw opening and closing every door), and its
+      // edge-swipe-back competes with the doors' own horizontal rails, so
+      // "a single swipe back turns into two". Fade-forwards is Android's own
+      // current transition: the same horizontal family (a short slide with a
+      // fade), no dimming layer, and back stays with the system gesture — one
+      // swipe. iOS keeps Cupertino, which is native there. Kept for revert:
+      // TargetPlatform.android: CupertinoPageTransitionsBuilder(),
       pageTransitionsTheme: const PageTransitionsTheme(builders: {
-        TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.android: FadeForwardsPageTransitionsBuilder(),
         TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
       }),
       visualDensity: VisualDensity.standard,

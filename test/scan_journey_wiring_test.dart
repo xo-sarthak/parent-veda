@@ -77,7 +77,9 @@ void main() {
       // this replaced ("her week falls inside this scan's window") could mark
       // two rows at once — growth_scan spans 28–36 and doppler 30–40, so for
       // eight weeks the timeline had two answers to a question that has one.
-      expect(find.text('NEXT UP'), findsOneWidget);
+      // Since the 2026-09-18 redraw the one next scan is the one "Up next"
+      // card, not a pill on a row.
+      expect(find.textContaining('UP NEXT'), findsOneWidget);
     });
 
     testWidgets('at week 30, where two windows overlap, still exactly one',
@@ -85,21 +87,26 @@ void main() {
       final c = _at(30);
       addTearDown(c.dispose);
       await _pump(t, ScanTimelineScreen(pregnancy: c));
-      expect(find.text('NEXT UP'), findsOneWidget);
+      expect(find.textContaining('UP NEXT'), findsOneWidget);
     });
 
-    testWidgets('the three states are legible without reading the dots',
+    testWidgets('the states explain themselves — no legend, no status pills',
         (t) async {
       final c = _at(20);
       addTearDown(c.dispose);
       await _pump(t, ScanTimelineScreen(pregnancy: c));
 
-      // The legend is what turns a filled dot from "different" into "done".
-      // Without it the visual states are a puzzle rather than an answer, which
-      // is the whole thing the review asked to fix.
-      expect(find.text('Done'), findsOneWidget);
-      expect(find.text('Next'), findsOneWidget);
-      expect(find.text('Later'), findsOneWidget);
+      // ⚠️ REVERSED 2026-09-18. The legend ("Done · Next · Later") and the
+      // NEXT UP / DONE pills were the thing the user called "this whole
+      // corporate thing, two colours". A dated list with a tick and a bold
+      // row needs neither (Fable, Tiimo), and the next scan has the card.
+      expect(find.text('Later'), findsNothing);
+      expect(find.text('NEXT UP'), findsNothing);
+      expect(find.text('Mark as done'), findsNothing);
+      // Every scan in the run is on the page, by name.
+      for (final (id, _, _) in kScanRun) {
+        expect(find.text(_scan(id).name.en), findsWidgets, reason: id);
+      }
     });
 
     testWidgets('a scan whose window has gone by says "not marked", never '

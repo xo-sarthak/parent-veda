@@ -47,6 +47,7 @@ import '../../services/pregnancy_controller.dart';
 import '../../services/scans_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
+import '../tools/scans_appointments_screen.dart';
 import 'scan_detail_screen.dart';
 
 /// English for now, Hindi owed. `grep -c '_en('` is the size of what is left.
@@ -170,38 +171,56 @@ class ScanTimelineBody extends StatelessWidget {
         // it — which is why it is not inside `_placeOf`.
         final nextId = _nextId(week, store);
 
+        // ⚠️ REDRAWN 2026-09-18 — the user, on the phone: "I hate this
+        // screen… this whole corporate thing, two colours, Done Next Later."
+        // What the timeline had: a tinted "where you are" card, a three-dot
+        // legend, and nine bordered rows each carrying a station dot, a
+        // "Mark as done" link and a violet NEXT UP / DONE pill. What the apps
+        // that do this well do (Mobbin: Zocdoc "Up next", Superpower "your
+        // appointment is in 4 days", Fable's dated milestone list): ONE card
+        // for the next thing, and the rest as a quiet dated list — a date
+        // block on the left, the name, a tick when done. No legend, because
+        // a tick and a bold row explain themselves; no pills, because the
+        // card already says which one is next; no colour states (DESIGN-
+        // SYSTEM §4.0). The previous widgets stay below, kept for revert.
+        final next = nextId == null ? null : _byId(nextId);
+        final (nextFrom, nextTo) = _windowOf(nextId);
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _WhereYouAre(pregnancy: pregnancy, p: p, lang: lang),
-            const SizedBox(height: 14),
-            _Legend(p: p, lang: lang),
-            const SizedBox(height: 18),
-            Container(
-              clipBehavior: Clip.antiAlias,
-              decoration: BoxDecoration(
-                color: p.surface,
-                borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: p.line),
+            if (next != null)
+              _UpNext(
+                scan: next,
+                from: nextFrom,
+                to: nextTo,
+                week: week,
+                booked: _bookedFor(next.id, store),
+                p: p,
+                lang: lang,
+                pregnancy: pregnancy,
               ),
-              child: Column(children: [
-                for (final (id, from, to) in kScanRun) ...[
-                  _TimelineRow(
-                    scan: _byId(id),
-                    from: from,
-                    to: to,
-                    where: _placeOf(id, from, to, week, store, nextId),
-                    booked: _bookedFor(id, store),
-                    p: p,
-                    lang: lang,
-                    pregnancy: pregnancy,
-                  ),
-                  if (id != kScanRun.last.$1)
-                    Divider(
-                        height: 1, thickness: 1, color: p.line, indent: 58),
-                ],
-              ]),
-            ),
+            const SizedBox(height: 26),
+            Text(_en('THE USUAL RUN').of(lang),
+                style: pvManrope(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.3,
+                    color: p.ink3)),
+            const SizedBox(height: 6),
+            for (final (id, from, to) in kScanRun)
+              if (_byId(id) case final scan?)
+                _RunRow(
+                  scan: scan,
+                  from: from,
+                  to: to,
+                  where: _placeOf(id, from, to, week, store, nextId),
+                  booked: _bookedFor(id, store),
+                  week: week,
+                  p: p,
+                  lang: lang,
+                  pregnancy: pregnancy,
+                  last: id == kScanRun.last.$1,
+                ),
             if (showFooter) ...[
               const SizedBox(height: 18),
               // ⚠️ THE FOOTER LINE IS UNCHANGED, AND THE BRIEF SAYS SO IN SO
@@ -252,6 +271,13 @@ class ScanTimelineBody extends StatelessWidget {
   /// The fallback matters too: if every remaining scan's window has passed,
   /// the earliest unfinished one is still the honest answer to "what next",
   /// so it is returned rather than leaving the list with nothing marked.
+  (int, int) _windowOf(String? id) {
+    for (final (sid, from, to) in kScanRun) {
+      if (sid == id) return (from, to);
+    }
+    return (0, 0);
+  }
+
   String? _nextId(int week, ScansStore store) {
     String? fallback;
     for (final (id, _, to) in kScanRun) {
@@ -288,6 +314,261 @@ TestScanInfo? _byId(String id) {
 //  The header — her week and her due date, attributed
 // -----------------------------------------------------------------------------
 
+
+// =============================================================================
+//  The 2026-09-18 timeline: one card for what is next, and the run as a list
+// =============================================================================
+
+/// The next scan, as the one card on the page.
+///
+/// Eyebrow says which week she is in and that this is what is next; the
+/// name in the display face; the window and — where she has one — the
+/// booked date; one white pill to add or open the date. The whole card opens
+/// the scan's own page. Nothing on it is coloured except the eyebrow.
+class _UpNext extends StatelessWidget {
+  const _UpNext({
+    required this.scan,
+    required this.from,
+    required this.to,
+    required this.week,
+    required this.booked,
+    required this.p,
+    required this.lang,
+    required this.pregnancy,
+  });
+
+  final TestScanInfo scan;
+  final int from;
+  final int to;
+  final int week;
+  final Appointment? booked;
+  final V2Palette p;
+  final AppLanguage lang;
+  final PregnancyController pregnancy;
+
+  String _when() {
+    if (week < from) {
+      final n = from - week;
+      return n == 1 ? 'in about a week' : 'in about $n weeks';
+    }
+    if (week <= to) return 'usually around now';
+    return 'the usual window has passed';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final b = booked;
+    return InkWell(
+      onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+        settings: const RouteSettings(name: 'scans/detail'),
+        builder: (_) => ScanDetailScreen(scan: scan, pregnancy: pregnancy),
+      )),
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(18, 16, 18, 16),
+        decoration: BoxDecoration(
+          color: p.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: p.line, width: 1.2),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(_en('UP NEXT  ·  WEEK $week').of(lang),
+              style: pvManrope(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.3,
+                  color: p.action)),
+          const SizedBox(height: 8),
+          Text(scan.name.of(lang),
+              style: pvFraunces(
+                  fontSize: 24,
+                  fontWeight: FontWeight.w600,
+                  height: 1.15,
+                  letterSpacing: -0.3,
+                  color: p.ink1)),
+          const SizedBox(height: 6),
+          Text('${_en('Weeks $from to $to').of(lang)}  ·  ${_en(_when()).of(lang)}',
+              style: pvManrope(fontSize: 13, height: 1.45, color: p.ink2)),
+          const SizedBox(height: 14),
+          Row(children: [
+            Icon(b == null ? Icons.event_outlined : Icons.event_available_outlined,
+                size: 18, color: p.ink2),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                  b == null
+                      ? _en('No date added yet').of(lang)
+                      : _dateLine(b),
+                  style: pvManrope(
+                      fontSize: 13.5, fontWeight: FontWeight.w600, color: p.ink1)),
+            ),
+          ]),
+          const SizedBox(height: 14),
+          SizedBox(
+            width: double.infinity,
+            child: OutlinedButton(
+              onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                settings: const RouteSettings(name: 'appointments'),
+                builder: (_) => ScansAppointmentsScreen(controller: pregnancy),
+              )),
+              child: Text(b == null
+                  ? _en('Add the date').of(lang)
+                  : _en('See the appointment').of(lang)),
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+
+  static String _dateLine(Appointment a) {
+    final d = DateTime.tryParse(a.dateIso);
+    return [
+      if (d != null) '${d.day} ${_kMonths[d.month - 1]}',
+      if (a.time.isNotEmpty) a.time,
+      if (a.location.isNotEmpty) a.location,
+    ].join('  ·  ');
+  }
+}
+
+/// One scan in the run. A week block on the left, the name and one line of
+/// meta, a tick circle on the right that toggles done. The row opens the
+/// scan; the circle is the only control.
+///
+/// The three states are set in weight and ink alone: done is grey with a
+/// filled tick, next is bold ink, the rest are plain. Fable's milestone list
+/// and Tiimo's day both do exactly this and nobody needs a legend for it.
+class _RunRow extends StatelessWidget {
+  const _RunRow({
+    required this.scan,
+    required this.from,
+    required this.to,
+    required this.where,
+    required this.booked,
+    required this.week,
+    required this.p,
+    required this.lang,
+    required this.pregnancy,
+    required this.last,
+  });
+
+  final TestScanInfo scan;
+  final int from;
+  final int to;
+  final _Where where;
+  final Appointment? booked;
+  final int week;
+  final V2Palette p;
+  final AppLanguage lang;
+  final PregnancyController pregnancy;
+  final bool last;
+
+  @override
+  Widget build(BuildContext context) {
+    final isDone = where == _Where.done;
+    final isNext = where == _Where.next;
+    final canToggle = isDone || from <= week;
+    final b = booked;
+
+    final meta = isDone
+        ? _en('Done').of(lang)
+        : b != null
+            ? _UpNext._dateLine(b)
+            : where == _Where.passed
+                ? _en('Not marked as done').of(lang)
+                : (scan.altName ?? scan.when).of(lang);
+
+    return InkWell(
+      onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+        settings: const RouteSettings(name: 'scans/detail'),
+        builder: (_) => ScanDetailScreen(scan: scan, pregnancy: pregnancy),
+      )),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          border: last ? null : Border(bottom: BorderSide(color: p.line)),
+        ),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+          // The week block — the date column every dated list has.
+          SizedBox(
+            width: 52,
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(_en('WEEK').of(lang),
+                  style: pvManrope(
+                      fontSize: 9,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.0,
+                      color: p.ink3)),
+              Text('$from–$to',
+                  style: pvManrope(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                      height: 1.2,
+                      color: isDone ? p.ink3 : p.ink1)),
+            ]),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(scan.name.of(lang),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(
+                      fontSize: 15,
+                      fontWeight: isNext ? FontWeight.w700 : FontWeight.w600,
+                      height: 1.3,
+                      color: isDone ? p.ink3 : p.ink1)),
+              const SizedBox(height: 2),
+              Text(meta,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(fontSize: 12, height: 1.4, color: p.ink3)),
+            ]),
+          ),
+          const SizedBox(width: 12),
+          // The tick. Filled ink when done; a ring otherwise, heavier on
+          // the next one. Tappable only once the window has opened — a
+          // scan that is months away cannot be "done" yet.
+          GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: canToggle
+                ? () => isDone
+                    ? ScansStore.instance.unmarkCompleted(scan.id)
+                    : ScansStore.instance.markCompleted(
+                        scanId: scan.id,
+                        journalTitle: scan.name.of(lang),
+                        week: week)
+                : null,
+            child: Padding(
+              padding: const EdgeInsets.all(6),
+              child: Container(
+                width: 24,
+                height: 24,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isDone ? p.ink1 : Colors.transparent,
+                  border: Border.all(
+                      color: isDone
+                          ? p.ink1
+                          : isNext
+                              ? p.ink1
+                              : p.line,
+                      width: isNext && !isDone ? 1.8 : 1.4),
+                ),
+                child: isDone
+                    ? Icon(Icons.check_rounded, size: 15, color: p.surface)
+                    : null,
+              ),
+            ),
+          ),
+        ]),
+      ),
+    );
+  }
+}
+
+// Kept for revert — the 2026-09-18 redraw replaced it. See ScanTimelineBody.
+// ignore: unused_element
 class _WhereYouAre extends StatelessWidget {
   const _WhereYouAre(
       {required this.pregnancy, required this.p, required this.lang});
@@ -362,6 +643,8 @@ const List<String> _kMonths = [
 //  One station on the rail
 // -----------------------------------------------------------------------------
 
+// Kept for revert — the 2026-09-18 redraw replaced it. See ScanTimelineBody.
+// ignore: unused_element
 class _TimelineRow extends StatelessWidget {
   const _TimelineRow({
     required this.scan,
@@ -560,6 +843,8 @@ class _TimelineRow extends StatelessWidget {
 /// *arrow* — it says "here", stays legible if you look away, and settles into
 /// the page rather than fighting it. That is the whole difference between
 /// pointing at the next scan and worrying her about it.
+// Kept for revert — the 2026-09-18 redraw replaced it. See ScanTimelineBody.
+// ignore: unused_element
 class _Station extends StatefulWidget {
   const _Station({required this.where, required this.p});
 
@@ -711,6 +996,8 @@ class _StationState extends State<_Station>
 /// done is a guess until something says so. Three words each, once, at the top
 /// removes the guess for the whole page — and it costs one line of height
 /// against nine rows of ambiguity.
+// Kept for revert — the 2026-09-18 redraw replaced it. See ScanTimelineBody.
+// ignore: unused_element
 class _Legend extends StatelessWidget {
   const _Legend({required this.p, required this.lang});
 
@@ -740,6 +1027,8 @@ class _Legend extends StatelessWidget {
 }
 
 /// A static miniature of a station dot, for the legend only.
+// Kept for revert — the 2026-09-18 redraw replaced it. See ScanTimelineBody.
+// ignore: unused_element
 class _Dot extends StatelessWidget {
   const _Dot(
       {this.filled = false, this.tick = false, this.haloed = false, required this.p});

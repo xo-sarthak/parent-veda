@@ -7489,7 +7489,32 @@ library's mid-piece film, related films and mark-as-read. Walked on the
 phone: a condition, a parenting chart page, the daily insight, the
 conception article. `test/reader_unification_test.dart` is the guard.
 
-**Still owed from it:** pictures per article (`DOOR-CONTENT-OWED.md`);
+**2026-09-18 — the chip names the thing, so the thing comes first.** A
+parenting page chipped Chart opened on a title, byline and serif lede with
+the chart below the fold — "it just looks like text." `pp_page_read.dart`
+now hoists the blocks a format names (chart, table, cards, illustration,
+animation, audio, steps, script) to the head of the body and lifts no lede;
+the reader draws no empty lede rule. Guarded in
+`reader_unification_test.dart`. Walked: Sleep → "Her sleep right now".
+
+**2026-09-18 — the pregnancy side, done to the bar.** (1) *Declutter:* the
+"Mark as read" / "Mark as done" buttons are gone from every article —
+completion is derived from reading to the end (`PvReaderScreen.onReadToEnd`,
+still ticks the home's daily-reads box); a parenting consult block is a foot
+tile, never a purple button mid-piece; an empty lede draws no rule. (2) *The
+twenty thin weekly reads are written out* — `pregnancy_reads_weekly_a..d.dart`,
+each at the library's bar (four sections, three headings, FAQ, 600+ words,
+named sources, urgent when-to-see-someone); `ReadItemScreen` opens the full
+piece by id; `pregnancy_reads_shape_test` holds them. (3) *Pictures:*
+`lib/data/reads/read_images.dart` — one free-licence photograph per pregnancy
+read (32 of 34), chosen for subject through the Openverse API (rawpixel CC0,
+Flickr CC BY), credit printed under the frame; the home's read rail shows the
+same picture as the page. (4) Doors back in registry order — Sleep first.
+
+**Still owed from it:** pictures for `preg_scan_read_calm`,
+`preg_week_read_res_music` (no honest match found; they draw the band), for
+the TTC and parenting reads, and for the parenting door pages (~400 —
+a content pass with a picker, not a script);
 `MmArticleScreen`'s paid footer for the "more than mood" group (the
 counselling booking sheet) is not yet a tile — it opens through `onTalk`
 where a screen passes one; the classic Warm Nest home's three readers
@@ -7685,6 +7710,37 @@ now. If it still jitters there, the next step is a `--profile` run with the
 timeline, not more guessing. Also in this pass: the ripple is the classic
 grey one, shaped by the control (`InkSparkle` ignored clips and drew a
 violet rectangle on the rounded References row).
+
+### 63.5 The push transition — fade-forwards on Android, 2026-09-18
+
+The Cupertino push dimmed the page underneath (the "overlay" the user saw
+on every door, opening and closing) and its edge-swipe fought the doors'
+horizontal rails ("a single swipe back turns into two"). Android now uses
+its own fade-forwards transition — same horizontal family, no dim, back
+with the system gesture. iOS keeps Cupertino. `app_theme.dart`.
+
+### 63.6 The scans timeline, redrawn — 2026-09-18
+
+"I hate this screen… this whole corporate thing, two colours, Done Next
+Later." Mobbin (Zocdoc, Superpower, Fable): one card for what is next, the
+rest a dated list. `ScanTimelineBody`: an *Up next* card (name, window,
+booked date or "No date added yet", one white pill), then *The usual run*
+— week block, name, one meta line, a tick circle that toggles done. Legend,
+station dots, "Mark as done" links and NEXT UP / DONE pills retired (kept
+in the file for revert). Walked on the phone.
+
+### 63.7 One format per tag — DESIGN-SYSTEM §4.0b, 2026-09-18
+
+CARDS pages open as the story deck (15 of 32; the rest carry a film, a
+consult offer or a chart the deck cannot hold, or are empty, and open in the
+reader with their cards listed); the chart card is the same white data card
+as the table; Activity / Ceremony / Recipe open on their steps; Red-flag
+pages open on their flags; Guide and Myth-vs-fact chips say Article; the
+checklist's share bar is the theme's ink pill. **Owed:** the door deck's
+footprint (the user: "I like this swipe animation but it takes too much
+space"); the TTC and parenting tag surfaces walked on the phone; the empty
+CARDS pages (Potty pull-ups, taking longer; Traditions ×3; Health accidents)
+are still empty.
 
 ## 64.0 The TTC home names a window the tool refuses — SEEN 2026-09-17
 

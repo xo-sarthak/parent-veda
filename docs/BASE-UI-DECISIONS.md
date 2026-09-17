@@ -30,6 +30,8 @@ Read with `DESIGN-SYSTEM.md` §4.0 (the rule) and `MOBBIN-DISCOVERY.md` §6
 | **TTC meta text and hairlines are grey, not lavender** (`ttcMuted`, `ttcBorder`); **the stage menu's icons are ink** | `ttc_common.dart`, `stage_gateway.dart` | §4.0 — the accent is for eyebrows and links, not small print |
 | **The ripple is grey and shaped by the control** — `InkRipple`, `onSurface` at 6% / 3%; the M3 sparkle ignored clips and drew a violet rectangle on rounded rows | `app_theme.dart`, `pv_reader_screen.dart` `_references` | the user, on the References row: "these things just make the app look bad" |
 | **Rail art no longer loops; blurred deck cards and the hero field are their own layers** | `ttc_illustrations.dart`, three carousels, `v3_hero_field.dart` | "jittery when exiting a door" — STILL-OPEN §63.4 |
+| **Android pushes with fade-forwards, not Cupertino** — no dimming layer under the new page; back is the system gesture | `app_theme.dart` | "opens with an overlay… closes with an overlay… a single swipe back turns into two" — STILL-OPEN §63.5 |
+| **The scans timeline is one card and a dated list** — no legend, no status pills, no colour states | `scan_timeline_screen.dart` | "I hate this screen" — STILL-OPEN §63.6 |
 | **Coming-soon film thumbnails stay inside their well** — the gradient's end stop was the deep tone (L 0.52), a violet slab on white; now it travels a third of the way | `pv_placeholders.dart` | seen on the condition page in the reader, 2026-09-17 |
 
 Everything above is commented for revert where it replaced something.
