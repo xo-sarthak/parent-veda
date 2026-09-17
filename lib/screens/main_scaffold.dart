@@ -18,8 +18,8 @@ import '../services/father_content_controller.dart';
 import '../services/father_preview.dart';
 import '../services/home_content_controller.dart';
 import '../services/pregnancy_controller.dart';
-import '../brand/brand_models.dart';
-import '../brand/premiere_screen.dart';
+// import '../brand/brand_models.dart'; // kept for revert — Premiere off at app open (2026-09-17)
+// import '../brand/premiere_screen.dart'; // kept for revert
 import '../theme/app_theme.dart';
 // Retired: the old sponsored-brand promo carousel, replaced by ParentVeda
 // Premiere (lib/brand/). Kept for revert — see docs/BRAND-STUDIO.md §12.
@@ -103,14 +103,19 @@ class _MainScaffoldState extends State<MainScaffold> with WidgetsBindingObserver
     // the first frame, so a valid Navigator/context exists). Almost always
     // resolves to null — Premiere runs 3-6 times a year and only once per
     // campaign — and null is the normal, correct answer.
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!mounted) return;
-      showPremiereIfAny(
-        context,
-        stage: BrandStage.pregnancy,
-        pregnancyWeek: widget.pregnancy.currentWeek,
-      );
-    });
+    // ⚠️ THE PREMIERE IS OFF AT APP OPEN SINCE 2026-09-17 — the user's call
+    // while the base UI is being settled: "it's opening again and again, I
+    // don't like it." The demo campaign (Cetaphil / Calm Balm) fired on every
+    // launch with the always-show review flag. The Brand Showcase screen can
+    // still open it on demand. Kept for revert:
+    // WidgetsBinding.instance.addPostFrameCallback((_) {
+    //   if (!mounted) return;
+    //   showPremiereIfAny(
+    //     context,
+    //     stage: BrandStage.pregnancy,
+    //     pregnancyWeek: widget.pregnancy.currentWeek,
+    //   );
+    // });
   }
 
   @override

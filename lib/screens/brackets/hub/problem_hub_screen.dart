@@ -345,8 +345,8 @@ class _Sheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
-        constraints:
-            BoxConstraints(minHeight: MediaQuery.sizeOf(context).height * 0.72),
+        // Full height, not 0.72 — see the note in ttc_tool_chrome.dart's sheet.
+        constraints: BoxConstraints(minHeight: MediaQuery.sizeOf(context).height),
         decoration: BoxDecoration(
           color: p.ground,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),

@@ -126,11 +126,13 @@ class _TtcHomeBody extends StatelessWidget {
           //
           // Both are reachable. Only the placement differs, and it differs
           // because the two versions are being looked at for different reasons.
-          if (TtcHomeVersionStore.instance.version == TtcHomeVersion.v1)
-            Positioned(
-                right: 14,
-                top: MediaQuery.of(context).viewPadding.top + 56,
-                child: const _Pill()),
+          // Moved to Profile → Developer on 2026-09-17 (BASE-UI-DECISIONS
+          // §2.2): a final home carries no switch. Kept for revert:
+          // if (TtcHomeVersionStore.instance.version == TtcHomeVersion.v1)
+          //   Positioned(
+          //       right: 14,
+          //       top: MediaQuery.of(context).viewPadding.top + 56,
+          //       child: const _Pill()),
         ]),
       );
 }
@@ -146,6 +148,8 @@ class _TtcHomeBody extends StatelessWidget {
 ///
 /// The rule: **a widget that displays store state subscribes to that store
 /// itself.** Ancestor rebuilds are an optimisation, not a guarantee.
+// Kept for revert — mounted from Profile → Developer instead since 2026-09-17.
+// ignore: unused_element
 class _Pill extends StatelessWidget {
   const _Pill();
 

@@ -885,10 +885,18 @@ void dailyPopupAndSaved() {
     test('it fires after the brand takeover, awaited', () {
       // showPremiereIfAny returns a Future that completes when its route pops.
       // Without the await both sheets land in the same frame, stacked.
-      final at = child.indexOf('await showPremiereIfAny(');
-      final then = child.indexOf('await maybeShowDailyTip(');
-      expect(at, greaterThan(-1), reason: 'the brand ad must be awaited');
+      //
+      // Since 2026-09-17 the Premiere is OFF at app open (STILL-OPEN §63 —
+      // "it's opening again and again"): the call is kept as a comment in
+      // the same spot, so the ORDER is still pinned here — if it comes back,
+      // it comes back awaited and before the tip.
+      final raw = _read('lib/screens/post_pregnancy/my_child_screen.dart');
+      final at = raw.indexOf('// await showPremiereIfAny(');
+      final then = raw.indexOf('await maybeShowDailyTip(');
+      expect(at, greaterThan(-1), reason: 'the brand ad stays in place, commented');
       expect(then, greaterThan(at), reason: 'the tip must come second');
+      expect(child.contains('\n        await showPremiereIfAny('), isFalse,
+          reason: 'the Premiere must not fire at app open');
     });
 
     test('every open while testing, behind a named flag', () {

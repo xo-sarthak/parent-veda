@@ -9,7 +9,9 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
+import '../../theme/pv_fonts.dart';
+// import 'package:google_fonts/google_fonts.dart'; // fonts go through theme/pv_fonts.dart since 2026-09-17
 
 import 'pp_common.dart';
 import 'pp_reading_data.dart';
@@ -78,8 +80,8 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
 
   double get _fs => _store.fontScale;
 
-  TextStyle _bodyStyle(_RTheme t) => GoogleFonts.fraunces(fontSize: 17.5 * _fs, height: 1.75, color: t.ink, letterSpacing: 0.1);
-  TextStyle _headingStyle(_RTheme t) => GoogleFonts.fraunces(fontSize: 21 * _fs, height: 1.25, fontWeight: FontWeight.w600, color: t.ink);
+  TextStyle _bodyStyle(_RTheme t) => pvFraunces(fontSize: 17.5 * _fs, height: 1.75, color: t.ink, letterSpacing: 0.1);
+  TextStyle _headingStyle(_RTheme t) => pvFraunces(fontSize: 21 * _fs, height: 1.25, fontWeight: FontWeight.w600, color: t.ink);
 
   String _initial() {
     final n = a.author.replaceAll('Dr. ', '').trim();
@@ -109,11 +111,11 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
             controller: _sc,
             padding: const EdgeInsets.only(top: 8, bottom: 48),
             children: [
-              _pad(Text(readCollectionById(a.collection).title.toUpperCase(), style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: t.accent))),
+              _pad(Text(readCollectionById(a.collection).title.toUpperCase(), style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: t.accent))),
               const SizedBox(height: 12),
-              _pad(Text(a.title, style: GoogleFonts.fraunces(fontSize: 30 * _fs, height: 1.15, fontWeight: FontWeight.w600, color: t.ink))),
+              _pad(Text(a.title, style: pvFraunces(fontSize: 30 * _fs, height: 1.15, fontWeight: FontWeight.w600, color: t.ink))),
               const SizedBox(height: 12),
-              _pad(Text(a.teaser, style: GoogleFonts.fraunces(fontSize: 17 * _fs, height: 1.5, fontStyle: FontStyle.italic, color: t.soft))),
+              _pad(Text(a.teaser, style: pvFraunces(fontSize: 17 * _fs, height: 1.5, fontStyle: FontStyle.italic, color: t.soft))),
               const SizedBox(height: 16),
               _pad(_byline(t)),
               const SizedBox(height: 18),
@@ -171,12 +173,12 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
               TextSpan(text: a.author, style: TextStyle(color: t.ink, fontWeight: FontWeight.w700)),
               TextSpan(text: '  ·  ${a.authorRole}', style: TextStyle(color: t.soft)),
             ]),
-            style: GoogleFonts.manrope(fontSize: 12.5),
+            style: pvManrope(fontSize: 12.5),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
         ),
-        Text('${a.minutes} min', style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.w600, color: t.soft)),
+        Text('${a.minutes} min', style: pvManrope(fontSize: 12, fontWeight: FontWeight.w600, color: t.soft)),
       ]);
 
   // ---- a section ----------------------------------------------------------
@@ -240,14 +242,14 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           const Icon(Icons.play_arrow_rounded, size: 12, color: Colors.white),
           const SizedBox(width: 3),
-          Text(label, style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.w700, color: Colors.white)),
+          Text(label, style: pvManrope(fontSize: 10.5, fontWeight: FontWeight.w700, color: Colors.white)),
         ]),
       );
 
   Widget _watchPill(_RTheme t) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
         decoration: BoxDecoration(color: t.bg.withValues(alpha: 0.92), borderRadius: BorderRadius.circular(999)),
-        child: Text('WATCH', style: GoogleFonts.manrope(fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: 0.9, color: t.accent)),
+        child: Text('WATCH', style: pvManrope(fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: 0.9, color: t.accent)),
       );
 
   // ---- embedded mid-article video (single, striped placeholder + play) ----
@@ -267,11 +269,11 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 14, 16, 16),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('WATCH · ${v.durationLabel}', style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: t.soft)),
+                Text('WATCH · ${v.durationLabel}', style: pvManrope(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.8, color: t.soft)),
                 const SizedBox(height: 6),
-                Text(v.title, style: GoogleFonts.fraunces(fontSize: 18 * _fs, height: 1.25, fontWeight: FontWeight.w600, color: t.ink)),
+                Text(v.title, style: pvFraunces(fontSize: 18 * _fs, height: 1.25, fontWeight: FontWeight.w600, color: t.ink)),
                 const SizedBox(height: 6),
-                Text(v.why, style: GoogleFonts.manrope(fontSize: 13, height: 1.55, color: t.soft), maxLines: 3, overflow: TextOverflow.ellipsis),
+                Text(v.why, style: pvManrope(fontSize: 13, height: 1.55, color: t.soft), maxLines: 3, overflow: TextOverflow.ellipsis),
               ]),
             ),
           ]),
@@ -289,9 +291,9 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
     final vids = _relatedVideoList();
     if (vids.isEmpty) return const SizedBox.shrink();
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('Related videos', style: GoogleFonts.fraunces(fontSize: 20 * _fs, fontWeight: FontWeight.w600, color: t.ink)),
+      Text('Related videos', style: pvFraunces(fontSize: 20 * _fs, fontWeight: FontWeight.w600, color: t.ink)),
       const SizedBox(height: 4),
-      Text('Short lessons on this, for when you have a minute.', style: GoogleFonts.manrope(fontSize: 12.5, color: t.soft)),
+      Text('Short lessons on this, for when you have a minute.', style: pvManrope(fontSize: 12.5, color: t.soft)),
       const SizedBox(height: 16),
       SizedBox(
         height: 166,
@@ -318,7 +320,7 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
               Positioned(right: 8, bottom: 8, child: _durationBadge(v.durationLabel)),
             ]),
             const SizedBox(height: 8),
-            Text(v.title, style: GoogleFonts.manrope(fontSize: 13, height: 1.3, fontWeight: FontWeight.w600, color: t.ink), maxLines: 2, overflow: TextOverflow.ellipsis),
+            Text(v.title, style: pvManrope(fontSize: 13, height: 1.3, fontWeight: FontWeight.w600, color: t.ink), maxLines: 2, overflow: TextOverflow.ellipsis),
           ]),
         ),
       );
@@ -337,12 +339,12 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
           Row(children: [
             Icon(Icons.lightbulb_outline_rounded, size: 17, color: t.accent),
             const SizedBox(width: 9),
-            Expanded(child: Text('ParentVeda tip · ${tip.title}', style: GoogleFonts.manrope(fontSize: 13.5, fontWeight: FontWeight.w800, color: t.ink))),
+            Expanded(child: Text('ParentVeda tip · ${tip.title}', style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w800, color: t.ink))),
             Icon(open ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded, size: 20, color: t.soft),
           ]),
           if (open) ...[
             const SizedBox(height: 10),
-            Text(tip.body, style: GoogleFonts.manrope(fontSize: 14, height: 1.6, color: t.ink)),
+            Text(tip.body, style: pvManrope(fontSize: 14, height: 1.6, color: t.ink)),
           ],
         ]),
       ),
@@ -358,18 +360,18 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
             padding: const EdgeInsets.all(15),
             color: ppCoral.withValues(alpha: 0.08),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('MYTH', style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: ppCoral)),
+              Text('MYTH', style: pvManrope(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: ppCoral)),
               const SizedBox(width: 12),
-              Expanded(child: Text(mf.myth, style: GoogleFonts.manrope(fontSize: 14, height: 1.55, color: t.ink, fontStyle: FontStyle.italic))),
+              Expanded(child: Text(mf.myth, style: pvManrope(fontSize: 14, height: 1.55, color: t.ink, fontStyle: FontStyle.italic))),
             ]),
           ),
           Container(
             padding: const EdgeInsets.all(15),
             color: t.accent.withValues(alpha: 0.07),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text('FACT', style: GoogleFonts.manrope(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: t.accent)),
+              Text('FACT', style: pvManrope(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: t.accent)),
               const SizedBox(width: 15),
-              Expanded(child: Text(mf.fact, style: GoogleFonts.manrope(fontSize: 14, height: 1.6, color: t.ink, fontWeight: FontWeight.w600))),
+              Expanded(child: Text(mf.fact, style: pvManrope(fontSize: 14, height: 1.6, color: t.ink, fontWeight: FontWeight.w600))),
             ]),
           ),
         ]),
@@ -381,7 +383,7 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Icon(Icons.verified_outlined, size: 16, color: t.soft),
           const SizedBox(width: 10),
-          Expanded(child: Text('The evidence: ${a.evidence}', style: GoogleFonts.manrope(fontSize: 12.5, height: 1.5, color: t.soft))),
+          Expanded(child: Text('The evidence: ${a.evidence}', style: pvManrope(fontSize: 12.5, height: 1.5, color: t.soft))),
         ]),
       );
 
@@ -397,7 +399,7 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
         child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
           Icon(done ? Icons.check_circle_rounded : Icons.check_rounded, size: 18, color: done ? t.accent : Colors.white),
           const SizedBox(width: 8),
-          Text(done ? 'Read - nicely done' : 'Mark as read', style: GoogleFonts.manrope(fontSize: 13.5, fontWeight: FontWeight.w700, color: done ? t.accent : Colors.white)),
+          Text(done ? 'Read - nicely done' : 'Mark as read', style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, color: done ? t.accent : Colors.white)),
         ]),
       ),
     );
@@ -407,9 +409,9 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
   Widget _readNext(_RTheme t) {
     final next = readNextArticles(a);
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text('Read next', style: GoogleFonts.fraunces(fontSize: 20 * _fs, fontWeight: FontWeight.w600, color: t.ink)),
+      Text('Read next', style: pvFraunces(fontSize: 20 * _fs, fontWeight: FontWeight.w600, color: t.ink)),
       const SizedBox(height: 4),
-      Text('Keep reading - more on this, one after another.', style: GoogleFonts.manrope(fontSize: 12.5, color: t.soft)),
+      Text('Keep reading - more on this, one after another.', style: pvManrope(fontSize: 12.5, color: t.soft)),
       const SizedBox(height: 16),
       for (final na in next)
         GestureDetector(
@@ -424,9 +426,9 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
               const SizedBox(width: 13),
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('${readKindLabel(na.kind).toUpperCase()} · ${na.minutes} MIN', style: GoogleFonts.manrope(fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: t.soft)),
+                  Text('${readKindLabel(na.kind).toUpperCase()} · ${na.minutes} MIN', style: pvManrope(fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: 0.6, color: t.soft)),
                   const SizedBox(height: 3),
-                  Text(na.title, style: GoogleFonts.manrope(fontSize: 13.5, fontWeight: FontWeight.w600, color: t.ink), maxLines: 1, overflow: TextOverflow.ellipsis),
+                  Text(na.title, style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w600, color: t.ink), maxLines: 1, overflow: TextOverflow.ellipsis),
                 ]),
               ),
               Icon(Icons.chevron_right_rounded, size: 20, color: t.soft),
@@ -453,7 +455,7 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
           child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
             Center(child: Container(width: 38, height: 4, decoration: BoxDecoration(color: t.rule, borderRadius: BorderRadius.circular(999)))),
             const SizedBox(height: 16),
-            Text('In this read', style: GoogleFonts.fraunces(fontSize: 20, fontWeight: FontWeight.w600, color: t.ink)),
+            Text('In this read', style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, color: t.ink)),
             const SizedBox(height: 12),
             for (final e in entries)
               GestureDetector(
@@ -466,7 +468,7 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
                 behavior: HitTestBehavior.opaque,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(vertical: 11),
-                  child: Text(e.$2, style: GoogleFonts.manrope(fontSize: 15, fontWeight: FontWeight.w600, color: t.ink)),
+                  child: Text(e.$2, style: pvManrope(fontSize: 15, fontWeight: FontWeight.w600, color: t.ink)),
                 ),
               ),
           ]),
@@ -489,11 +491,11 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
             child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
               Center(child: Container(width: 38, height: 4, decoration: BoxDecoration(color: t.rule, borderRadius: BorderRadius.circular(999)))),
               const SizedBox(height: 16),
-              Text('Reading', style: GoogleFonts.fraunces(fontSize: 20, fontWeight: FontWeight.w600, color: t.ink)),
+              Text('Reading', style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, color: t.ink)),
               const SizedBox(height: 18),
               // font size
               Row(children: [
-                Text('A', style: GoogleFonts.fraunces(fontSize: 15, color: t.soft)),
+                Text('A', style: pvFraunces(fontSize: 15, color: t.soft)),
                 const SizedBox(width: 10),
                 Expanded(
                   child: SliderTheme(
@@ -512,7 +514,7 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
                   ),
                 ),
                 const SizedBox(width: 10),
-                Text('A', style: GoogleFonts.fraunces(fontSize: 26, color: t.soft)),
+                Text('A', style: pvFraunces(fontSize: 26, color: t.soft)),
               ]),
               const SizedBox(height: 16),
               // mode
@@ -548,7 +550,7 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
             borderRadius: BorderRadius.circular(12),
             border: Border.all(color: on ? _t.accent : t.rule),
           ),
-          child: Text(label, style: GoogleFonts.manrope(fontSize: 13, fontWeight: FontWeight.w700, color: on ? _t.accent : t.soft)),
+          child: Text(label, style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: on ? _t.accent : t.soft)),
         ),
       ),
     );

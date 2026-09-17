@@ -7189,6 +7189,23 @@ Communication's and is now a per-door slot (`voiceBlurb`,
 and the coach row all behaved. Not rebuilt on the phone after the fixes —
 the other terminal held the build — so the swap is seen at the next walk.
 
+### 100.5 The three bands filled — 2026-09-17
+
+Tasks 4, 5 and 6 of 36, verbatim, thirty-six activities; every field
+diffed against the PDF text by script. One field added, `breathPageId`,
+because three activities say "open the breathing circle" and the model
+had no way to say which page — a page id, not a bool, so the circle keeps
+one home. Seven `offersRecording`, the tasks' seven. Two named things do
+not exist and were listed, not built: the Thinking door's "question ideas,
+not elders" line, and "the door's help line" for a child whose distress
+runs deeper than a rough talk (the door has only the parent-facing
+boundary note; whether any skilling door should carry a child-facing help
+line is a generic call). The tasks name the pregnancy recorder as the one
+to reuse; skilling's own, built on the 2026-09-15 call, is what the rows
+open. Walked after the fill the same day: the breath row, the record
+row, the end line, all as built; the preview's "Coding opens its door"
+note now counts its doors instead of naming one.
+
 ## 58.0 TTC V3 home, the lower half in the parenting grammar — 2026-09-16
 
 Built directly, no Claude Design round — the widgets it would have drawn
@@ -7467,3 +7484,58 @@ The Claude Design has the seven screens; the question screens exist only in
 code. If the design is to stay the reference, the question artboards should be
 added there (DesignSync can push them) — not done, since the user is reviewing
 the built screens directly.
+
+---
+
+## 63.0 The base UI is being settled — white ground, ink buttons, one type family — OPENED 2026-09-17
+
+The user's brief: settle colour, type, buttons and components once, from what
+the long-standing and current apps do (Mobbin), so V3 keeps its restraint and
+nothing new regresses. Done so far, all reversible and recorded in
+`docs/BASE-UI-DECISIONS.md` §1: white page ground everywhere; Plus Jakarta
+Sans retired into Manrope through the `pvJakarta` seam (DESIGN-SYSTEM §2.2's
+own decision, finally executed); the theme's FilledButton / ElevatedButton
+became the ink pill and OutlinedButton the white pill; the onboarding chrome
+follows the rule; the Premiere is off at app open.
+
+### 63.1 Seven calls for the user — BASE-UI-DECISIONS §2 — ANSWERED 2026-09-17
+
+FAB stays violet · pills moved to Profile → Developer · Fraunces replaced by
+Newsreader · accent unchanged · ramp, radii, dark mode as recommended. The
+sweep (§63.2) is unblocked.
+
+### 63.2 The sweep — hand-rolled violet buttons, call-site renames, Garbh constants
+
+24 hand-rolled `AppTheme.primary` fills and 43 `0xFF6A30B6` uses to sort into
+"accent, correct" and "button, migrate to the theme". Classic screens last.
+
+### 63.3 Walked on white — the user's own path, 2026-09-17
+
+Pregnancy V3 home → stage menu → TTC V3 home → Fertile window door → the
+conception article (its "Worth raising with a doctor" callout, its two tool
+cards) → "See this cycle's window" → the clinic-dates screen → Ovulation
+kits. What the walk found and fixed, on top of the §1 list: the tool sheets
+were 0.72 of a screen and carried the nav clearance OUTSIDE the sheet, so
+the hero field's lower arc bled through as a lilac bloom under every short
+tool and under every tool's last card (`ttc_tool_chrome`, `ttc_window`,
+`ttc_infographic`, `problem_hub`); TTC meta text and hairlines were lavender
+(`ttcMuted`, `ttcBorder`) — grey now; the stage menu's icons were violet —
+ink now; Ovulation kits had no Read next, so its foot was blank space.
+Still owed: the parenting V3 home and the onboarding on the phone (needs a
+sign-out), and the sweep.
+
+## 64.0 The TTC home names a window the tool refuses — SEEN 2026-09-17
+
+On the same account, at the same minute, the V3 home's hero said *"Your
+fertile days are today and 2 more days · 13 Sep to 19 Sep"* and the Fertile
+window tool said *"Your clinic is watching this cycle… so we do not name a
+date."* Both are deliberate: the hero calls `ttcFertileWindowNow(
+ignoreOwnership: true)` because the pathway's clinic guess is a GUESS and
+her real clinic dates are checked first (`ttc_home_hero.dart`, the long note
+above that call); the tool honours `behaviour.showsFertilityWindow` because
+a clinic-run cycle is the wrong model for a six-day picture. Each is right
+on its own terms and together they contradict her on one screen pair —
+"prediction language only where we predict" (CLAUDE.md) cannot hold on the
+home if the tool has just deferred. Not a base-UI matter; it needs one
+decision about which surface yields when the pathway is a guess and no
+clinic dates exist. Recorded, not fixed.

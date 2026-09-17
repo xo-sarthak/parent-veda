@@ -102,6 +102,19 @@ The palette is `_baseline` in `v2_palette.dart`. **Settled 2026-08-15. Not open.
 
 ### ⚠️ (0) BRAND COLOUR IS NOT INTERFACE COLOUR — SETTLED 2026-08-16, SHIPPED
 
+> **The ground is WHITE since 2026-09-17.** The user put the Claude Design
+> (white pages, the tint inside pastel wells) beside the app (this section's
+> `#F5F3F6` ground) and read the app as stale: *"that purple tint in the
+> background… stop doing that, it has to be fixed across the app."* So
+> `V2PaletteStore` now defaults to `GroundOption.paperWhite` (`#FFFFFF`,
+> hairline `0x1F`, surfaceAlt `#F4F2F6`), and every constant that copied the
+> old ground (`ppBg`, `ttcBg`, `kGameGround`, the Garbh and journal `_cream`
+> / `_ground`) is white too. The August reasoning below is kept as history:
+> its concern — a white card has no edge on white — is answered by the
+> stronger hairline the White spec already pairs with it, and by moving the
+> tint into the wells, which is where the design puts colour. Rule 1.1
+> ("the background belongs to the page") still holds; the page is just white.
+
 Full reasoning in `UX-PRINCIPLES.md` §5.0. Short version: Zepto is a purple
 company with an almost colourless app. That is the correct answer, not a
 compromise — a painted page kills the accent's signalling power, contaminates
@@ -234,7 +247,12 @@ template.**
 But we currently ship **three**. `pvJakarta` and `pvManrope` are both sans —
 that is the redundant one.
 
-> **Fraunces** — display: headings, the one fact, card titles, questions.
+> **Newsreader** — display: headings, the one fact, card titles, questions.
+> (Was Fraunces until 2026-09-17; it had become the default serif of
+> AI-generated pages and read as such. Newsreader keeps the optical-size axis
+> and the editorial warmth — BASE-UI-DECISIONS §2.3. The helper is still
+> called `pvFraunces` because 500 call sites use the name; it renders
+> Newsreader.)
 > **Manrope** — everything else: body, labels, eyebrows, metadata, buttons.
 > **~~Plus Jakarta Sans~~ — retire.** Replace with Manrope at the same size.
 
@@ -434,6 +452,39 @@ Title          Fraunces 22 / w600 / −0.5 / p.ink1
 
 The eyebrow is `action`. **This is load-bearing** — it shipped grey on two
 screens and drained the colour out of everything below it.
+
+## 4.0 The base-UI rule — SETTLED 2026-09-17, from the Mobbin component audit
+
+**Ink for actions. Brand as a small accent. Colour only inside wells.**
+
+The user put the onboarding build beside the Claude Design and beside the V3
+homes and said it plainly: *"a good app design does not throw the colour
+palette at the user — you don't see everything blue and yellow inside
+Flipkart."* The V3 homes already obey this; the classic screens and the first
+onboarding build did not. A Mobbin pass over the apps that have stayed premium
+for years (Airbnb, Notion, Linear, Etsy, Queue, Waking Up) confirmed the
+grammar, and it is now the contract every new screen is built against:
+
+| Element | Rule | Seen at |
+|---|---|---|
+| **Page** | white (`#FFFFFF`); hairline `0x1F` because a white card needs an edge | Airbnb, Notion, Linear, Liven, Wysa |
+| **Commit button** (one per screen at most) | near-black pill, `ink1` fill, white label, height 52 | Queue "Notify me", Etsy "Show results", Airbnb "Confirm" |
+| **Secondary / Google** | white pill, hairline, `ink1` label; the Google mark sits on white, never on a fill | Sesame, Wispr Flow, Whatnot "Done" |
+| **Chip** | hairline pill; selected = `ink1` fill with white label | Etsy filters, Strava tags |
+| **Choice tile / card** | white, hairline, radius 16; selected = `ink1` border and mark | Airbnb co-host cards |
+| **List row** | white, hairline separators, `ink2` icons, chevron | Airbnb settings, Notion, Linear |
+| **Sheet** | `ground`, top radius 24, close top-right, actions pinned | Etsy, Airwallex, Noom |
+| **Where `action` (violet) may appear** | eyebrows · links · a switch's on-state · the progress hairline · the verified mark. Nowhere else. | Notion's one blue toggle |
+| **Where category colour lives** | the tinted icon well (`v2BlockTint(hue)`), and the hero band | the V3 door tiles; Liven's cards |
+
+Rule 4.3 below still holds for in-content buttons (outlined, never filled
+violet). What this section adds is the *commit* button's shape, and the
+sentence that decides everything else: **if you are reaching for the brand
+colour to make something feel like a button, you have the wrong element.**
+
+The first consumer is `lib/screens/auth/onboarding/onboarding_chrome.dart`
+(`ObPrimary`, `ObSecondary`, `ObPill`, `ObTile`, `ObGridCard`). Screens that
+still fill with violet are classic, kept for reference, and not the pattern.
 
 ## 4.3 Button — **there is one**
 

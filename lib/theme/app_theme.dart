@@ -21,6 +21,7 @@
 //  Requires: google_fonts (pubspec.yaml -> google_fonts: ^6.2.1 or later)
 // =============================================================================
 
+import 'package:flutter/cupertino.dart' show CupertinoPageTransitionsBuilder;
 import 'package:flutter/material.dart';
 import '../screens/v2/v2_palette.dart';
 
@@ -401,6 +402,15 @@ final ColorScheme _lightScheme = ColorScheme(
       scaffoldBackgroundColor: scaffold,
       textTheme: text,
       splashFactory: InkSparkle.splashFactory,
+      // ---- Motion: one push everywhere — 2026-09-17 (BASE-UI, §4.0) -------
+      // Android's default is a zoom-fade; the apps that feel settled (Airbnb,
+      // Notion, Linear) push horizontally with swipe-back, and the same
+      // transition on every route is half of what "consistent" means. The
+      // Cupertino builder gives both platforms that one motion.
+      pageTransitionsTheme: const PageTransitionsTheme(builders: {
+        TargetPlatform.android: CupertinoPageTransitionsBuilder(),
+        TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+      }),
       visualDensity: VisualDensity.standard,
       // Soft lavender splash, never harsh
       splashColor: scheme.primary.withValues(alpha: 0.08),
@@ -429,47 +439,53 @@ final ColorScheme _lightScheme = ColorScheme(
         ),
       ),
 
-      // ---- Primary action: filled purple ----------------------------------
+      // ---- Primary action: the INK PILL — DESIGN-SYSTEM §4.0, 2026-09-17 ----
+      //
+      // Was `scheme.primary` (violet) with a 16px radius. The base-UI rule from
+      // the Mobbin component audit — ink for actions, brand as a small accent
+      // — makes the one commit button on a screen a near-black pill (Airbnb,
+      // Etsy, Queue). This is the seam behind 228 FilledButtons and every
+      // ElevatedButton, so the change is uniform: the same button everywhere,
+      // which is what the user asked for ("the payment button cannot be of
+      // ten different types"). Kept for revert: backgroundColor:
+      // scheme.primary, foregroundColor: scheme.onPrimary, radius _rButton.
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
-          backgroundColor: scheme.primary,
-          foregroundColor: scheme.onPrimary,
+          backgroundColor: scheme.onSurface,
+          foregroundColor: scheme.surface,
+          disabledBackgroundColor: scheme.surfaceContainerHighest,
+          disabledForegroundColor: scheme.onSurfaceVariant,
           elevation: 0,
           minimumSize: const Size(64, 52),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           textStyle: text.labelLarge,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(_rButton),
-          ),
+          shape: const StadiumBorder(),
         ),
       ),
 
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          backgroundColor: scheme.primary,
-          foregroundColor: scheme.onPrimary,
+          backgroundColor: scheme.onSurface,
+          foregroundColor: scheme.surface,
           elevation: 0,
           shadowColor: Colors.transparent,
           minimumSize: const Size(64, 52),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           textStyle: text.labelLarge,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(_rButton),
-          ),
+          shape: const StadiumBorder(),
         ),
       ),
 
       // ---- Secondary action: soft outlined --------------------------------
+      // Secondary: white pill, hairline, INK label (not violet) — §4.0.
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
-          foregroundColor: scheme.primary,
+          foregroundColor: scheme.onSurface,
           minimumSize: const Size(64, 52),
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
           side: BorderSide(color: scheme.outline, width: 1.2),
           textStyle: text.labelLarge,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(_rButton),
-          ),
+          shape: const StadiumBorder(), // was RoundedRectangleBorder(_rButton)
         ),
       ),
 

@@ -158,7 +158,7 @@ class _ProductCard extends StatelessWidget {
           color: ttcBrown,
           label: t.productsWatchOut,
           body: product.watchOut(hi),
-          tint: const Color(0xFFFDF6EC),
+          tint: ttcCautionCard,
         ),
         const SizedBox(height: 12),
         Text(product.priceEn,

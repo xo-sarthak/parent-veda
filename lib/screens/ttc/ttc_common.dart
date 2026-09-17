@@ -37,7 +37,7 @@ import '../../theme/pv_fonts.dart';
 // ---- palette (same hexes as pregnancy & parenting) --------------------------
 // ⚠️ Unified with the pregnancy ground — see pp_common.dart for the
 // full reasoning and why this is static rather than a getter.
-const Color ttcBg = Color(0xFFF5F3F6); // was 0xFFFBF9FE
+const Color ttcBg = Color(0xFFFFFFFF); // white since 2026-09-17 (V2Palette's note); was 0xFFF5F3F6 // was 0xFFFBF9FE
 const Color ttcInk = Color(0xFF2F2C30);
 const Color ttcSoft = Color(0xFF69636C);
 const Color ttcPurple = Color(0xFF6A30B6);
@@ -55,10 +55,26 @@ const Color ttcPurpleDeep = Color(0xFF4A1C86);
 const Color ttcCoral = Color(0xFFFF5A79);
 // Matched to `surfaceAlt`. Was the old lilac #F3EEF7.
 const Color ttcPanel = Color(0xFFEDEAF0);
-const Color ttcMuted = Color(0xFFA99CBB);
-const Color ttcBorder = Color(0xFFE7DFEE);
+// ⚠️ META TEXT IS GREY, NOT LAVENDER — 2026-09-17 (DESIGN-SYSTEM §4.0). The
+// disclaimer, captions and hairlines were tinted violet (0xFFA99CBB on
+// 0xFFE7DFEE), which on the white ground read as the palette leaking into the
+// small print. Neutral now, one step lighter than ttcSoft; the accent stays on
+// eyebrows and links only. Kept for revert:
+// const Color ttcMuted = Color(0xFFA99CBB);
+// const Color ttcBorder = Color(0xFFE7DFEE);
+const Color ttcMuted = Color(0xFF8B8591);
+const Color ttcBorder = ttcLine;
 const Color ttcLine = Color(0xFFE4E2E5);
-const Color ttcBrown = Color(0xFF7A4600);
+// ⚠️ THE "CLINIC / CAUTION" STATE HAS NO COLOUR — 2026-09-17 (BASE-UI §4.0).
+// `ttcBrown` (0xFF7A4600, mustard on a cream 0xFFFDF6EC card) was used ~100
+// times across twelve TTC screens to say "a clinic owns this cycle" or "worth
+// caution". On the phone it read as random ("where did this colour even come
+// from?"). The state is now told in FORM — the card sits in the panel well
+// with an ink icon and ink text — and every use follows from this one line.
+// Kept for revert: const Color ttcBrown = Color(0xFF7A4600);
+const Color ttcBrown = ttcInk;
+/// The card fill that used to be cream (0xFFFDF6EC) — the panel well now.
+const Color ttcCautionCard = ttcPanel;
 const Color ttcCoralTint = Color(0xFFFFF0F3);
 const Color ttcTitleInk = Color(0xFF2D144C);
 
@@ -438,7 +454,7 @@ class TtcClinicLedCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TtcCard(
-      color: const Color(0xFFFDF6EC),
+      color: ttcCautionCard,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           const Icon(Icons.local_hospital_outlined, size: 18, color: ttcBrown),

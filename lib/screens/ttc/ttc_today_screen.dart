@@ -1032,7 +1032,7 @@ class _JournalCard extends StatelessWidget {
 //           width: double.infinity,
 //           padding: const EdgeInsets.all(12),
 //           decoration: BoxDecoration(
-//             color: const Color(0xFFFDF6EC),
+//             color: ttcCautionCard,
 //             borderRadius: BorderRadius.circular(14),
 //           ),
 //           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -1224,7 +1224,7 @@ class _TodayList extends StatelessWidget {
                 width: double.infinity,
                 padding: const EdgeInsets.all(15),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFDF6EC),
+                  color: ttcCautionCard,
                   borderRadius: BorderRadius.circular(ttcCardRadius),
                 ),
                 child: Text(n.indian(hi),

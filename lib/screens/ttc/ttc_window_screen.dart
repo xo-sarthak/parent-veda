@@ -185,7 +185,8 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
               ),
             ),
             ListView(
-              padding: const EdgeInsets.only(bottom: ttcBottomInset),
+              // Zero — the sheet owns the clearance (ttc_tool_chrome.dart).
+              padding: EdgeInsets.zero,
               children: [
                 _hero(t, p, today),
                 _sheet(t, p, today),
@@ -253,8 +254,8 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
     final window = ttcWindowAhead(_cyclesAhead);
 
     return Container(
-      constraints:
-          BoxConstraints(minHeight: MediaQuery.sizeOf(context).height * 0.72),
+      // Full height, not 0.72 — see the note in ttc_tool_chrome.dart's sheet.
+      constraints: BoxConstraints(minHeight: MediaQuery.sizeOf(context).height),
       decoration: BoxDecoration(
         color: p.ground,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
@@ -270,7 +271,7 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
           ),
         ],
       ),
-      padding: const EdgeInsets.fromLTRB(18, 28, 18, 28),
+      padding: const EdgeInsets.fromLTRB(18, 28, 18, 28 + ttcBottomInset),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         // ⚠️ A CLINIC-RUN CYCLE REPLACES THE SCREEN, IT DOES NOT CAVEAT IT. The
         // six-day model is not merely unhelpful on a monitored cycle, it is the

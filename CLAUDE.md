@@ -286,3 +286,5 @@ source for exactly this reason.
 | `docs/DIRECTUS-SETUP.md` | The panel runbook — collections, roles, the publish webhooks, and the two cross-repo handoffs |
 | `docs/PERSONALIZATION.md` | The personalisation engine's three layers |
 | `docs/DOOR-CONTENT-OWED.md` | Every page, film or track a door brief referenced that did not exist — the "STOP and list it" ledger, worked through at the end |
+| `docs/MOBBIN-DISCOVERY.md` | What the Mobbin research produced, audit by audit — found, adopted, declined, owed — plus the queries that work and the apps the library lacks. Read before starting a new audit |
+| `docs/FAMILY-MODEL.md` | Who owns what across stages: the person owns identity and bookmarks, the child owns child records, stage is a tag. Read before adding a table with `user_id`, `child_id` or `stage` |

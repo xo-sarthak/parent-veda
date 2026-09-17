@@ -49,6 +49,7 @@ import '../services/father_preview.dart';
 import 'dear_baby_vault_screen.dart';
 import 'journal_screen.dart';
 // import 'saved_hub_screen.dart'; // kept for revert — SavedScreen replaced the hub 2026-09-16
+import 'developer_switches.dart';
 import 'saved_screen.dart';
 import '../theme/pv_fonts.dart';
 import '../services/auth/social_auth.dart';
@@ -458,6 +459,9 @@ class ProfileScreen extends StatelessWidget {
                   RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
             ),
           ),
+          const SizedBox(height: 10),
+          // --- Developer: the home-version switches, off the homes --------
+          const DeveloperSwitches(),
           const SizedBox(height: 10),
           // --- Sign out (replays the auth flow) ---------------------------
           OutlinedButton.icon(

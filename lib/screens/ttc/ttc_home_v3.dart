@@ -2863,7 +2863,7 @@ void _openInsight(
             width: double.infinity,
             padding: const EdgeInsets.all(15),
             decoration: BoxDecoration(
-              color: const Color(0xFFFDF6EC),
+              color: ttcCautionCard,
               borderRadius: BorderRadius.circular(ttcCardRadius),
             ),
             child: Text(n.indian(hi),
@@ -3219,7 +3219,7 @@ class _DailyRail extends StatelessWidget {
                   width: double.infinity,
                   padding: const EdgeInsets.all(15),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFFDF6EC),
+                    color: ttcCautionCard,
                     borderRadius: BorderRadius.circular(ttcCardRadius),
                   ),
                   child: Text(n.indian(hi),
@@ -3907,7 +3907,7 @@ class _ReadRail extends StatelessWidget {
 //                 width: double.infinity,
 //                 padding: const EdgeInsets.all(15),
 //                 decoration: BoxDecoration(
-//                   color: const Color(0xFFFDF6EC),
+//                   color: ttcCautionCard,
 //                   borderRadius: BorderRadius.circular(ttcCardRadius),
 //                 ),
 //                 child: Text(n.indian(hi),

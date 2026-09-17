@@ -238,9 +238,31 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     return ObPage(
       p: p,
       body: [
-        const SizedBox(height: 36),
-        Image.asset('assets/brand/pv-mark.png', width: 56, height: 56),
-        const SizedBox(height: 26),
+        // The design's hero band: a soft tinted field the mark sits on. The
+        // tint is a well hue at the page's own lightness — colour in a well,
+        // not on the page.
+        Container(
+          height: 150,
+          margin: const EdgeInsets.only(top: 4),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(22),
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [v2BlockTint(300, p), v2BlockTint(344, p).withValues(alpha: 0.55)],
+            ),
+          ),
+          alignment: Alignment.bottomLeft,
+          padding: const EdgeInsets.all(16),
+          child: Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(color: p.surface, borderRadius: BorderRadius.circular(12)),
+            padding: const EdgeInsets.all(8),
+            child: Image.asset('assets/brand/pv-mark.png'),
+          ),
+        ),
+        const SizedBox(height: 22),
         Text('ParentVeda',
             style: pvManrope(
                 fontSize: 12,
@@ -267,7 +289,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(children: [
-              Icon(Icons.check_circle_rounded, size: 18, color: p.action),
+              Icon(Icons.check_circle_rounded, size: 18, color: p.ink1),
               const SizedBox(width: 10),
               Expanded(
                 child: Text('Invited by a friend · code ${referral.redeemedCode} applied',
@@ -277,7 +299,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
           ),
       ],
       bottom: Column(mainAxisSize: MainAxisSize.min, children: [
-        ObPrimary(
+        ObSecondary(
           p: p,
           label: _busy ? 'Signing in…' : 'Continue with Google',
           leading: SizedBox(
@@ -453,21 +475,30 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               eyebrow: 'Who is using this',
               title: 'Which of you is this?',
               subtitle: 'Whoever is not here gets their own app, paired to yours.'),
-          ObTile(
-              p: p,
-              title: 'Mother',
-              subtitle: 'Trying, expecting or raising',
-              icon: Icons.person_outline_rounded,
-              selected: false,
-              onTap: () => _go(ObStep.stage)),
-          const SizedBox(height: 10),
-          ObTile(
-              p: p,
-              title: 'Partner',
-              subtitle: 'Join with her code',
-              icon: Icons.people_outline_rounded,
-              selected: false,
-              onTap: _partner),
+          // Two cards side by side with tinted wells — the design's shape.
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Expanded(
+              child: ObGridCard(
+                  p: p,
+                  title: 'Mother',
+                  subtitle: 'Trying, expecting or raising',
+                  icon: Icons.favorite_border_rounded,
+                  hue: 344,
+                  selected: false,
+                  onTap: () => _go(ObStep.stage)),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: ObGridCard(
+                  p: p,
+                  title: 'Partner',
+                  subtitle: 'Join with her code',
+                  icon: Icons.people_outline_rounded,
+                  hue: 205,
+                  selected: false,
+                  onTap: _partner),
+            ),
+          ]),
           const SizedBox(height: 18),
           Text('We only ever hold a name its owner gave us.',
               style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink3)),
@@ -489,11 +520,16 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
   // ---- 04 stage -----------------------------------------------------------------
 
   Widget _stagePage(V2Palette p) {
-    Widget tile(String id, String title, String sub, IconData icon) => ObTile(
+    // A 2x2 of cards with tinted wells — the design's shape. Hues are the
+    // stages' own (pink for trying, violet for pregnancy, blue for parenting,
+    // green for skilling), from the V3 door palette.
+    Widget card(String id, String title, String sub, IconData icon, double hue) =>
+        ObGridCard(
           p: p,
           title: title,
           subtitle: sub,
           icon: icon,
+          hue: hue,
           selected: _stage == id,
           onTap: () {
             setState(() => _stage = id);
@@ -514,13 +550,17 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             eyebrow: 'Where you are',
             title: 'Where are you right now?',
             subtitle: 'This sets your home. You can change it whenever life does.'),
-        tile('trying', 'Trying to conceive', 'Cycle and timing', Icons.favorite_border_rounded),
-        const SizedBox(height: 10),
-        tile('pregnancy', 'Pregnant', 'Week by week', Icons.pregnant_woman_rounded),
-        const SizedBox(height: 10),
-        tile('parenting', 'Parent — 0 to 5', 'Sleep and leaps', Icons.child_care_rounded),
-        const SizedBox(height: 10),
-        tile('skilling', 'Skilling — 6 and up', 'Skills and habits', Icons.school_outlined),
+        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Expanded(child: card('trying', 'Trying to conceive', 'Cycle and timing', Icons.favorite_border_rounded, 344)),
+          const SizedBox(width: 12),
+          Expanded(child: card('pregnancy', 'Pregnant', 'Week by week', Icons.pregnant_woman_rounded, 275)),
+        ]),
+        const SizedBox(height: 12),
+        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Expanded(child: card('parenting', 'Parent — 0 to 5', 'Sleep and leaps', Icons.child_care_rounded, 205)),
+          const SizedBox(width: 12),
+          Expanded(child: card('skilling', 'Skilling — 6 and up', 'Skills and habits', Icons.school_outlined, 150)),
+        ]),
         const SizedBox(height: 18),
         Text('Expecting twins or more? You can say so later.',
             style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink3)),
@@ -648,7 +688,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
         const SizedBox(height: 10),
         ObField(
           p: p,
-          label: 'Optional',
+          label: 'Boy or girl — optional',
           child: Wrap(spacing: 8, children: [
             ObPill(p: p, label: 'Boy', selected: _childIsBoy == true, onTap: () => setState(() => _childIsBoy = true)),
             ObPill(p: p, label: 'Girl', selected: _childIsBoy == false, onTap: () => setState(() => _childIsBoy = false)),
@@ -909,7 +949,9 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
               : null,
         ),
         const SizedBox(height: 18),
-        Text('The permission comes after the value, and nothing is pre-ticked.',
+        // ⚠️ This line used to read "The permission comes after the value, and
+        // nothing is pre-ticked" — a design annotation that leaked into copy.
+        Text('You can change both any time from Profile.',
             style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink3)),
       ],
       bottom: Column(mainAxisSize: MainAxisSize.min, children: [
@@ -1200,7 +1242,7 @@ class _OtpSheetState extends State<_OtpSheet> {
                       color: p.surface,
                       borderRadius: BorderRadius.circular(12),
                       border: Border.all(
-                          color: i == digits.length ? p.ink2.withValues(alpha: 0.5) : p.line,
+                          color: i == digits.length ? p.ink1 : p.line,
                           width: 1.4),
                     ),
                     child: Text(i < digits.length ? digits[i] : '',

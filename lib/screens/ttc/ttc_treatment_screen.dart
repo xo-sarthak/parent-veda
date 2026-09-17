@@ -423,7 +423,7 @@ class TtcTreatmentEntryCard extends StatelessWidget {
     final next = store.cycle.next;
 
     return TtcCard(
-      color: const Color(0xFFFDF6EC),
+      color: ttcCautionCard,
       onTap: () => openTtcTreatment(context),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [

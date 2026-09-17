@@ -93,10 +93,12 @@ class PpHomeScreen extends StatelessWidget {
           // its offset depends on one inset we can read exactly, and the eye
           // is already there because the header is. `+56` puts it clear of the
           // header's own icon row rather than on top of it.
-          Positioned(
-              right: 14,
-              top: MediaQuery.of(context).viewPadding.top + 56,
-              child: const _Pill()),
+          // Moved to Profile → Developer on 2026-09-17 (BASE-UI-DECISIONS
+          // §2.2): a final home carries no switch. Kept for revert:
+          // Positioned(
+          //     right: 14,
+          //     top: MediaQuery.of(context).viewPadding.top + 56,
+          //     child: const _Pill()),
         ]);
       },
     );
@@ -125,6 +127,8 @@ class PpHomeScreen extends StatelessWidget {
 /// The rule that covers all four: **a widget that displays store state should
 /// subscribe to that store itself, rather than relying on an ancestor.**
 /// Ancestor rebuilds are an optimisation, not a guarantee.
+// Kept for revert — mounted from Profile → Developer instead since 2026-09-17.
+// ignore: unused_element
 class _Pill extends StatelessWidget {
   const _Pill();
 

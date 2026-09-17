@@ -222,7 +222,7 @@ class _CanICardState extends State<_CanICard> {
             width: double.infinity,
             padding: const EdgeInsets.all(13),
             decoration: BoxDecoration(
-              color: const Color(0xFFFDF6EC),
+              color: ttcCautionCard,
               borderRadius: BorderRadius.circular(14),
             ),
             child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -259,7 +259,7 @@ class _CanICardState extends State<_CanICard> {
       case TtcVerdict.moderate:
         return const Color(0xFFF6ECFA);
       case TtcVerdict.askDoctor:
-        return const Color(0xFFFDF6EC);
+        return ttcCautionCard;
       case TtcVerdict.avoid:
         return ttcCoralTint;
     }

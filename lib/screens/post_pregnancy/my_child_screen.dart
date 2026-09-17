@@ -14,8 +14,10 @@
 
 import 'package:flutter/material.dart';
 
+import '../../theme/pv_fonts.dart';
+
 import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
-import 'package:google_fonts/google_fonts.dart';
+// import 'package:google_fonts/google_fonts.dart'; // fonts go through theme/pv_fonts.dart since 2026-09-17
 
 import 'development_area_screen.dart';
 import 'dev_stage_detail_screen.dart';
@@ -49,7 +51,7 @@ import '../../brand/brand_models.dart';
 import '../../brand/brand_notifications.dart';
 import '../../brand/launch_spotlight.dart';
 import '../referral/invite_nudge_card.dart';
-import '../../brand/premiere_screen.dart';
+// import '../../brand/premiere_screen.dart'; // kept for revert — Premiere off at app open (2026-09-17)
 import 'pp_phases_data.dart';
 import 'pp_reading_data.dart';
 import 'pp_watch_data.dart';
@@ -108,7 +110,9 @@ class _MyChildScreenState extends State<MyChildScreen> {
         // with the tip underneath.
         //
         // The sequence the review described: brand ad, then today's thing.
-        await showPremiereIfAny(context, stage: BrandStage.parenting);
+        // Premiere off at app open since 2026-09-17 (see main_scaffold.dart);
+        // the daily tip still runs. Kept for revert:
+        // await showPremiereIfAny(context, stage: BrandStage.parenting);
         if (!mounted) return;
         // No-ops if it has already shown today — unless kDailyPopupAlwaysShow
         // is on, which it is while this is being reviewed.
@@ -267,7 +271,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
       // renders in full, and it can never again be the thing that breaks the
       // header when an icon is added. Kept for revert:
       // Text('ParentVeda',
-      //     style: GoogleFonts.plusJakartaSans(fontSize: 19, fontWeight: FontWeight.w800, color: ppPurple, letterSpacing: -0.5)),
+      //     style: pvJakarta(fontSize: 19, fontWeight: FontWeight.w800, color: ppPurple, letterSpacing: -0.5)),
       // Expanded, and NO Spacer after it — that pairing is what actually
       // truncated the wordmark to "Parent…".
       //
@@ -282,7 +286,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
         child: Text('ParentVeda',
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.plusJakartaSans(fontSize: 19, fontWeight: FontWeight.w800, color: ppPurple, letterSpacing: -0.5)),
+            style: pvJakarta(fontSize: 19, fontWeight: FontWeight.w800, color: ppPurple, letterSpacing: -0.5)),
       ),
       // SAVED / COLLECTIONS, beside search — the same placement and the same
       // icon the pregnancy home has had (home_screen_b). The parenting side
@@ -1370,7 +1374,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
         child: Text('How ${_child.nameMid} is today'.toUpperCase(),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: GoogleFonts.manrope(
+            style: pvManrope(
                 fontSize: 11.5,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.0,
@@ -1418,7 +1422,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
             child: Text("TODAY'S PARENTING TIP",
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: GoogleFonts.manrope(
+                style: pvManrope(
                     fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: ppPurple)),
           ),
         ]),
@@ -1439,7 +1443,7 @@ class _MyChildScreenState extends State<MyChildScreen> {
             decoration: BoxDecoration(color: ppPurple, borderRadius: BorderRadius.circular(16)),
             child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
               Text('Read more',
-                  style: GoogleFonts.manrope(
+                  style: pvManrope(
                       fontSize: 14, fontWeight: FontWeight.w700, letterSpacing: 0.2, color: Colors.white)),
               const SizedBox(width: 7),
               const Icon(Icons.arrow_forward_rounded, size: 17, color: Colors.white),

@@ -217,7 +217,7 @@ class _TestCardState extends State<_TestCard> {
             width: double.infinity,
             padding: const EdgeInsets.all(13),
             decoration: BoxDecoration(
-              color: const Color(0xFFFDF6EC),
+              color: ttcCautionCard,
               borderRadius: BorderRadius.circular(14),
             ),
             child: Column(

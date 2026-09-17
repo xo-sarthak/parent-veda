@@ -134,7 +134,7 @@ class GarbhBrowseScreen extends StatelessWidget {
     // V3 baseline values - see the note at the top of garbh_screen.dart for
     // why this section carries the values rather than a live palette
     // reference.
-    const ground = Color(0xFFF5F3F6); // V3 ground
+    const ground = Color(0xFFFFFFFF); // V3 ground — white since 2026-09-17; was 0xFFF5F3F6
     const ink = Color(0xFF201C24); // V3 ink1
     const muted = Color(0xFF6F6878); // V3 ink3
 

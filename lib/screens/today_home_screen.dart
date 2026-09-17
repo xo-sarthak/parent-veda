@@ -196,7 +196,9 @@ class _TodayHomeScreenState extends State<TodayHomeScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                _TodayVersionPill(),
+                // Moved to Profile → Developer on 2026-09-17 (BASE-UI-
+                // DECISIONS §2.2): a final home carries no switch. Kept:
+                // _TodayVersionPill(),
               ],
             ),
           ),
@@ -206,6 +208,8 @@ class _TodayHomeScreenState extends State<TodayHomeScreen> {
   }
 }
 
+// Kept for revert — mounted from Profile → Developer instead since 2026-09-17.
+// ignore: unused_element
 class _TodayVersionPill extends StatelessWidget {
   const _TodayVersionPill();
 

@@ -33,6 +33,7 @@ import 'package:flutter/material.dart';
 
 import '../screens/post_pregnancy/pp_home_version.dart';
 import '../screens/ttc/ttc_common.dart';
+import '../theme/pv_fonts.dart';
 
 /// One of the three places a family can be.
 ///
@@ -132,13 +133,16 @@ Future<void> showStageDoorMenu(BuildContext context, GlobalKey anchor) async {
           value: d,
           height: 46,
           child: Row(children: [
-            Icon(d.icon, size: 19, color: const Color(0xFF6A30B6)),
+            // Ink, not violet — DESIGN-SYSTEM §4.0: a menu row draws its icon
+            // in ink like every settings row (Airbnb, Notion). 2026-09-17.
+            // Kept for revert: color: const Color(0xFF6A30B6)
+            Icon(d.icon, size: 19, color: const Color(0xFF2F2C30)),
             const SizedBox(width: 12),
             Text(d.label,
-                style: const TextStyle(
+                style: pvManrope(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
-                    color: Color(0xFF2F2C30))),
+                    color: const Color(0xFF2F2C30))),
           ]),
         ),
     ],

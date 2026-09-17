@@ -914,31 +914,32 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
   /// one. Urgent gets a heavier top rule in its own colour; the others get the
   /// page's own hairline. One signal, no container.
   Widget _callout(_Skin s, PvCallout c) {
-    final (Color tone, IconData icon) = switch (c.tone) {
-      PvCalloutTone.note => (s.accent, Icons.info_outline_rounded),
-      PvCalloutTone.reassure =>
-        (const Color(0xFF3F9E7C), Icons.favorite_border_rounded),
-      // ⚠️ Amber, never red. A red box on a fertility page reads as an alarm
-      // about her, and this box is about a symptom.
-      PvCalloutTone.urgent =>
-        (const Color(0xFFC98A25), Icons.phone_in_talk_outlined),
+    // ⚠️ NO COLOUR ON A CLINICAL CALLOUT — 2026-09-17, the base-UI rule
+    // (DESIGN-SYSTEM §4.0) applied to the one place the reader still spent
+    // it. The amber rule and tinted icon read as "gimmicky and random" on the
+    // phone, and the user was right: colour was doing a container's job.
+    // The safety distinction the old note insisted on — urgent must be told
+    // apart from a note at a glance — is kept, and kept in FORM: the urgent
+    // callout is the one callout that sits in a well (panel, radius 16, ink
+    // icon); note and reassure sit inline between hairlines. One signal,
+    // no colour. Kept for revert: amber 0xFFC98A25 / green 0xFF3F9E7C tones.
+    final icon = switch (c.tone) {
+      PvCalloutTone.note => Icons.info_outline_rounded,
+      PvCalloutTone.reassure => Icons.favorite_border_rounded,
+      PvCalloutTone.urgent => Icons.phone_in_talk_outlined,
     };
     final urgent = c.tone == PvCalloutTone.urgent;
 
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Container(
-          height: urgent ? 1.6 : 1,
-          color: urgent ? tone.withValues(alpha: 0.45) : s.rule),
-      const SizedBox(height: 13),
+    final body = Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Padding(
           padding: const EdgeInsets.only(top: 2),
-          child: Icon(icon, size: 15, color: tone),
+          child: Icon(icon, size: 16, color: s.ink),
         ),
         const SizedBox(width: 9),
         Expanded(
           child: Text(c.title.of(_lang),
-              style: pvJakarta(
+              style: pvManrope(
                   fontSize: 14.5 * _fs,
                   height: 1.35,
                   fontWeight: FontWeight.w700,
@@ -948,6 +949,24 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
       const SizedBox(height: 7),
       Text(c.body.of(_lang),
           style: pvManrope(fontSize: 14 * _fs, height: 1.62, color: s.soft)),
+    ]);
+
+    if (urgent) {
+      return Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(16, 15, 16, 16),
+        decoration: BoxDecoration(
+          color: s.panel,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: s.rule),
+        ),
+        child: body,
+      );
+    }
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Container(height: 1, color: s.rule),
+      const SizedBox(height: 13),
+      body,
       const SizedBox(height: 14),
       Container(height: 1, color: s.rule),
     ]);

@@ -70,7 +70,7 @@ const int kJournalMaxPhotos = 3;
 //  Values rather than a live palette reference, for the same reason the Garbh
 //  section carries them - see the note at the top of `garbh_screen.dart`.
 // =============================================================================
-const _ground = Color(0xFFF5F3F6); // V3 ground
+const _ground = Color(0xFFFFFFFF); // V3 ground — white since 2026-09-17; was 0xFFF5F3F6
 const _surface = Color(0xFFFFFFFF); // V3 surface
 const _surfaceAlt = Color(0xFFEDEAF0); // V3 surfaceAlt
 const _line = Color(0x14000000); // V3 line

@@ -32,7 +32,7 @@ const Color kGameAccentDeep = Color(0xFF5E5378);
 const Color kGameInk = Color(0xFF201C24); // V3 ink1
 const Color kGameMuted = Color(0xFF6F6878); // V3 ink3
 const Color kGameLine = Color(0x14000000); // V3 line
-const Color kGameGround = Color(0xFFF5F3F6); // V3 ground
+const Color kGameGround = Color(0xFFFFFFFF); // V3 ground — white since 2026-09-17; was 0xFFF5F3F6
 const Color kGameSurface = Color(0xFFFFFFFF);
 const Color kGameSoftRed = Color(0xFFC07A6A);
 

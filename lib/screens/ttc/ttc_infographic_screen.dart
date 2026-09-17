@@ -58,7 +58,8 @@ class TtcInfographicScreen extends StatelessWidget {
           ),
         ),
         ListView(
-          padding: const EdgeInsets.only(bottom: ttcBottomInset),
+          // Zero — the sheet owns the clearance (ttc_tool_chrome.dart).
+          padding: EdgeInsets.zero,
           children: [
             SafeArea(
               bottom: false,
@@ -98,7 +99,10 @@ class TtcInfographicScreen extends StatelessWidget {
                       offset: const Offset(0, -6)),
                 ],
               ),
-              padding: const EdgeInsets.fromLTRB(18, 24, 18, 28),
+              constraints: BoxConstraints(
+                  minHeight: MediaQuery.sizeOf(context).height),
+              padding:
+                  const EdgeInsets.fromLTRB(18, 24, 18, 28 + ttcBottomInset),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [

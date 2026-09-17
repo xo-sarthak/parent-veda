@@ -703,5 +703,10 @@ final List<PvRead> kTtcReadsConceiving = [
     evidence: _en('NICE fertility guideline CG156; ASRM/SREI committee opinion '
         'on optimising natural fertility (2022); NHS guidance on ovulation '
         'predictor kits.'),
+
+    // Walked on the phone 2026-09-17: this was the one read in the door whose
+    // foot ended in blank space, because it had no Read next. The question
+    // after "do kits help" is "how does it actually work", then "when".
+    readNext: ['ttc_read_how_conception_works', 'ttc_read_timing_myths'],
   ),
 ];

@@ -106,7 +106,9 @@ TextStyle pvDisplayStyle({
           height: _hiHeight(height),
           color: color,
         )
-      : GoogleFonts.fraunces(
+      // Newsreader since 2026-09-17 — see pvFraunces below. Kept for revert:
+      // GoogleFonts.fraunces(
+      : GoogleFonts.newsreader(
           fontSize: size,
           fontWeight: weight,
           letterSpacing: letterSpacing,
@@ -206,7 +208,12 @@ TextStyle pvFraunces({
             decoration: decoration,
             shadows: shadows,
           )
-        : GoogleFonts.fraunces(
+        // ⚠️ NEWSREADER, NOT FRAUNCES — 2026-09-17 (BASE-UI-DECISIONS §2.3).
+        // Fraunces had become the default serif of AI-generated pages and read
+        // as such; Newsreader (Production Type) is an editorial screen serif
+        // with the same optical-size axis, so the one seam carries all 500
+        // call sites. Kept for revert: GoogleFonts.fraunces(
+        : GoogleFonts.newsreader(
             fontSize: fontSize,
             fontWeight: fontWeight,
             fontStyle: fontStyle,
@@ -240,7 +247,19 @@ TextStyle pvJakarta({
             decoration: decoration,
             shadows: shadows,
           )
-        : GoogleFonts.plusJakartaSans(
+        // ⚠️ PLUS JAKARTA SANS IS RETIRED — 2026-09-17. DESIGN-SYSTEM §2.2(a)
+        // decided "two families, not three: Fraunces + Manrope; replace Plus
+        // Jakarta Sans with Manrope at the same size", and 433 call sites
+        // across 79 files never moved. This is the seam that moves them all:
+        // `pvJakarta` now renders Manrope, same size, same weight, so the
+        // one-type-system decision is true everywhere in one line. Callers
+        // can migrate to `pvManrope` at leisure; nothing needs to. Kept for
+        // revert:
+        // : GoogleFonts.plusJakartaSans(
+        //     fontSize: fontSize, fontWeight: fontWeight, fontStyle: fontStyle,
+        //     letterSpacing: letterSpacing, height: height, color: color,
+        //     decoration: decoration, shadows: shadows);
+        : GoogleFonts.manrope(
             fontSize: fontSize,
             fontWeight: fontWeight,
             fontStyle: fontStyle,

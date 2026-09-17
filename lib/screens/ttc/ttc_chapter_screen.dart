@@ -306,7 +306,7 @@ class _MedicalCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final hi = t.hinglish;
     return TtcCard(
-      color: const Color(0xFFFDF6EC),
+      color: ttcCautionCard,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           const Icon(Icons.medical_services_outlined, size: 17, color: ttcBrown),

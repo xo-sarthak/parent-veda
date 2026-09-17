@@ -69,7 +69,7 @@ import '../data/samvad_mantras_data.dart';
 //  `V2NutritionHues` - V3 neutrals plus a local accent set - which is the
 //  established pattern for a section with its own colour language.
 // =============================================================================
-const _cream = Color(0xFFF5F3F6); // V3 ground
+const _cream = Color(0xFFFFFFFF); // V3 ground — white since 2026-09-17; was 0xFFF5F3F6
 const _surface = Color(0xFFFFFFFF); // V3 surface (already matched)
 const _ink = Color(0xFF201C24); // V3 ink1
 const _muted = Color(0xFF6F6878); // V3 ink3

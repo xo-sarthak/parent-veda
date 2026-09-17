@@ -177,7 +177,13 @@ class TtcToolScaffold extends StatelessWidget {
         ),
         ListView(
           controller: scrollController,
-          padding: const EdgeInsets.only(bottom: ttcBottomInset),
+          // ⚠️ ZERO, NOT `ttcBottomInset`. The inset was here, OUTSIDE the
+          // sheet, so the last screen-height of scroll was transparent and the
+          // hero field's lower arc showed through it as a lilac bloom under
+          // every tool's last card (walked 2026-09-17). DESIGN-SYSTEM §4.1: the
+          // sheet owns the bottom clearance. Kept for revert:
+          // padding: const EdgeInsets.only(bottom: ttcBottomInset),
+          padding: EdgeInsets.zero,
           children: [
             SafeArea(
               bottom: false,
@@ -237,8 +243,14 @@ class _Sheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Container(
+        // ⚠️ A FULL SCREEN, NOT 0.72 OF ONE. The hero field behind this sheet
+        // paints the whole page, and its lower arc sits at ~74% of the height;
+        // a sheet shorter than the viewport lets that arc bleed through as a
+        // lilac bloom under the content (seen on the Fertile window tool with
+        // a clinic-led cycle, 2026-09-17). The door chromes already use the
+        // full height; this matches them. Was `height * 0.72`.
         constraints: BoxConstraints(
-            minHeight: MediaQuery.sizeOf(context).height * 0.72),
+            minHeight: MediaQuery.sizeOf(context).height),
         decoration: BoxDecoration(
           color: p.ground,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
@@ -250,6 +262,8 @@ class _Sheet extends StatelessWidget {
             ),
           ],
         ),
+        // The nav clearance lives inside the sheet — see the ListView above.
+        padding: const EdgeInsets.only(bottom: ttcBottomInset),
         child: Column(
             crossAxisAlignment: CrossAxisAlignment.start, children: children),
       );

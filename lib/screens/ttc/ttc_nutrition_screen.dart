@@ -164,7 +164,7 @@ class _DayCard extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
-            color: const Color(0xFFFDF6EC),
+            color: ttcCautionCard,
             borderRadius: BorderRadius.circular(14),
           ),
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [

@@ -340,7 +340,15 @@ class V2PaletteStore extends ChangeNotifier {
   V2Palette _current = _baseline;
 
   /// Which ground is on screen. Defaults to what ships.
-  GroundOption _ground = GroundOption.current;
+  // ⚠️ WHITE IS THE DEFAULT SINCE 2026-09-17 — the user's call, made on a
+  // side-by-side of the Claude Design (white pages, pastel wells) and the app
+  // (this tinted ground): "that purple tint in the background makes it look
+  // stale. Stop doing that — it has to be fixed across the app." The August
+  // measurement above stands as history; the answer to "a white card has no
+  // edge on white" is the stronger hairline the White spec already carries
+  // (0x1F, not 0x14), and the tint moves INTO the wells, where the design put
+  // it. Kept for revert: GroundOption.current.
+  GroundOption _ground = GroundOption.paperWhite;
   GroundOption get ground => _ground;
 
   /// ⚠️ EVERY SCREEN READS THIS, so switching the ground repaints the whole app

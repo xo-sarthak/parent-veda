@@ -112,12 +112,10 @@ class TtcPcosCheckResultScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: p.surfaceAlt,
           borderRadius: BorderRadius.circular(18),
-          border: Border(
-              left: BorderSide(
-                  color: urgent
-                      ? const Color(0xFFC98A25)
-                      : const Color(0xFF3F9E7C),
-                  width: 3)),
+          // The coloured left rule (amber / green) is gone — BASE-UI §4.0:
+          // urgency is told by the well and the words, never by a tint. Kept
+          // for revert: amber 0xFFC98A25 / green 0xFF3F9E7C, width 3.
+          border: Border.all(color: p.line),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Icon(urgent ? Icons.phone_in_talk_outlined : Icons.spa_outlined,

@@ -10,8 +10,10 @@
 
 
 import 'package:flutter/material.dart';
+
+import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_nav_bar.dart';
-import 'package:google_fonts/google_fonts.dart';
+// import 'package:google_fonts/google_fonts.dart'; // fonts go through theme/pv_fonts.dart since 2026-09-17
 
 import '../../theme/app_theme.dart';
 
@@ -53,7 +55,7 @@ import 'pp_more_sheet.dart';
 // The consequence, stated so it is not a surprise: the ground picker drives V3
 // and the AppTheme surfaces, not these two. When the picker is deleted, every
 // ground in the app is one const value again.
-const Color ppBg = Color(0xFFF5F3F6); // was 0xFFFBF9FE
+const Color ppBg = Color(0xFFFFFFFF); // white since 2026-09-17 (V2Palette's note); was 0xFFF5F3F6 // was 0xFFFBF9FE
 const Color ppInk = Color(0xFF2F2C30);
 const Color ppSoft = Color(0xFF69636C);
 const Color ppPurple = Color(0xFF6A30B6);
@@ -86,15 +88,15 @@ const Color ppAccentRose = AppTheme.accentRose;
 // ---- text -------------------------------------------------------------------
 TextStyle ppFraunces(double size,
         {FontWeight w = FontWeight.w400, Color color = ppInk, double h = 1.12}) =>
-    GoogleFonts.fraunces(
+    pvFraunces(
         fontSize: size, fontWeight: w, height: h, letterSpacing: -0.4, color: color);
 
 TextStyle ppJakarta(double size, {FontWeight w = FontWeight.w700, Color color = ppTitleInk}) =>
-    GoogleFonts.plusJakartaSans(fontSize: size, fontWeight: w, color: color);
+    pvJakarta(fontSize: size, fontWeight: w, color: color);
 
 TextStyle ppBody(double size,
         {Color color = ppSoft, double h = 1.6, FontWeight w = FontWeight.w400}) =>
-    GoogleFonts.manrope(fontSize: size, height: h, color: color, fontWeight: w);
+    pvManrope(fontSize: size, height: h, color: color, fontWeight: w);
 
 // ---- small parts ------------------------------------------------------------
 /// The small uppercase label above a section title.
@@ -112,7 +114,7 @@ TextStyle ppBody(double size,
 /// decision rather than an accident.
 Widget ppEyebrow(String t, {Color color = ppPurple, double spacing = 1.4}) => Text(
       t.toUpperCase(),
-      style: GoogleFonts.manrope(
+      style: pvManrope(
           fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: spacing, color: color),
     );
 
@@ -124,11 +126,11 @@ Widget ppLangToggle() => Text.rich(
         TextSpan(text: ' · ', style: TextStyle(color: Color(0xFFC7BBD6))),
         TextSpan(text: 'हिं', style: TextStyle(color: ppMuted, fontWeight: FontWeight.w600)),
       ]),
-      style: GoogleFonts.manrope(fontSize: 12),
+      style: pvManrope(fontSize: 12),
     );
 
 Widget ppSeeAll([String label = 'See all →']) => Text(label,
-    style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.w700, color: ppPurple));
+    style: pvManrope(fontSize: 12, fontWeight: FontWeight.w700, color: ppPurple));
 
 // A location chip (pin · label · caret) used across the Problem Solver / local-services
 // screens. Visual only - the city is fixed to the mock's Delhi NCR for now.
@@ -138,7 +140,7 @@ Widget ppLocationPill(String city) => Container(
       child: Row(mainAxisSize: MainAxisSize.min, children: [
         const Icon(Icons.place_outlined, size: 13, color: ppPurple),
         const SizedBox(width: 5),
-        Text(city, style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.w700, color: ppInk)),
+        Text(city, style: pvManrope(fontSize: 12, fontWeight: FontWeight.w700, color: ppInk)),
         const SizedBox(width: 3),
         const Icon(Icons.keyboard_arrow_down_rounded, size: 16, color: ppMuted),
       ]),
@@ -853,7 +855,7 @@ Widget ppSectionEyebrow(String text, {Color color = ppPurple}) => Padding(
       padding: const EdgeInsets.only(left: 4, bottom: 2),
       child: Text(
         text.toUpperCase(),
-        style: GoogleFonts.manrope(
+        style: pvManrope(
           fontSize: 11.5,
           fontWeight: FontWeight.w800,
           letterSpacing: 1.0,
@@ -890,7 +892,7 @@ Widget ppSectionCard({
           Expanded(
             child: Text(
               eyebrow.toUpperCase(),
-              style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: accent),
+              style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: accent),
             ),
           ),
           ?trailing,
@@ -945,7 +947,7 @@ Widget ppCarousel({
                 onTap: onSeeAll,
                 behavior: HitTestBehavior.opaque,
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  Text(seeAll, style: GoogleFonts.manrope(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.white)),
+                  Text(seeAll, style: pvManrope(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.white)),
                   const Icon(Icons.chevron_right_rounded, size: 17, color: Colors.white),
                 ]),
               ),
@@ -972,7 +974,7 @@ Widget ppLead(String eyebrow, String title, {IconData? icon, Color accent = ppCo
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(eyebrow.toUpperCase(),
-            style: GoogleFonts.manrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.0, color: ppPurple)),
+            style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.0, color: ppPurple)),
         const SizedBox(height: 5),
         Row(children: [
           if (icon != null) ...[Icon(icon, size: 19, color: accent), const SizedBox(width: 8)],

@@ -41,7 +41,7 @@ import '../theme/pv_fonts.dart';
 
 const _ink = Color(0xFF201C24); // V3 ink1
 const _muted = Color(0xFF6F6878); // V3 ink3
-const _cream = Color(0xFFF5F3F6); // V3 ground
+const _cream = Color(0xFFFFFFFF); // V3 ground — white since 2026-09-17; was 0xFFF5F3F6
 const _accent = Color(0xFF8A6D3B); // Kriya's warm gold - a practice, not a task
 
 class GarbhRitualScreen extends StatelessWidget {

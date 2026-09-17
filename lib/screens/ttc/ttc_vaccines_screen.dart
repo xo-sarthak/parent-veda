@@ -555,7 +555,8 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
                               p,
                               t('LIVE · ${v.waitDays}-DAY WAIT',
                                   'LIVE · ${v.waitDays} DIN'),
-                              const Color(0xFFC98A25)),
+                              // ink, not amber — BASE-UI §4.0 (was 0xFFC98A25)
+                              p.ink1),
                         ],
                       ]),
                       const SizedBox(height: 5),

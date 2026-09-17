@@ -48,7 +48,7 @@ import 'v2/v2_palette.dart';
 
 const _ink = Color(0xFF201C24); // V3 ink1
 const _muted = Color(0xFF6F6878); // V3 ink3
-const _ground = Color(0xFFF5F3F6); // V3 ground
+const _ground = Color(0xFFFFFFFF); // V3 ground — white since 2026-09-17; was 0xFFF5F3F6
 const _accent = Color(0xFFB98A7E); // Samvad's warm rose - this is her voice
 
 class GarbhJournalScreen extends StatelessWidget {
