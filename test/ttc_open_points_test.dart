@@ -211,7 +211,12 @@ void main() {
     });
 
     test('a paired father still gets his own shell first', () {
-      expect(splash.contains("role != 'father' &&"), isTrue,
+      // Since 2026-09-17 the splash has ONE router, `_homeFor`, and the
+      // father branch is its first line — before any stage is consulted.
+      final i = splash.indexOf('Route<void> _homeFor(');
+      expect(i, greaterThan(0));
+      final body = splash.substring(i, splash.indexOf('}', i));
+      expect(body.indexOf("role == 'father'"), lessThan(body.indexOf('tryingToConceive')),
           reason: 'a father declaring "trying" would lose his Slate shell');
     });
 

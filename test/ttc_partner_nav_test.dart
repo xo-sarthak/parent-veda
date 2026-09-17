@@ -23,6 +23,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/screens/ttc/ttc_common.dart';
+import 'package:parentveda/screens/ttc/ttc_home_version.dart';
 import 'package:parentveda/screens/ttc/ttc_partner_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/screens/ttc/ttc_today_screen.dart';
@@ -40,6 +41,10 @@ void main() {
     LifeStageStore.instance.resetForTest();
     TtcLang.instance.hinglish = false;
     TtcPartnerMode.instance.on = false;
+    // ⚠️ THESE TESTS PIN THE CLASSIC BAR'S CONTRACT. V3 is the default since
+    // 2026-09-17 (STILL-OPEN §62) and its bar has different destinations; the
+    // classic bar is kept for reference and this file keeps holding it.
+    TtcHomeVersionStore.instance.set(TtcHomeVersion.v1);
   });
 
   tearDown(() => TtcPartnerMode.instance.on = false);

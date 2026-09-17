@@ -53,7 +53,11 @@ class TodayVersionStore extends ChangeNotifier {
   TodayVersionStore._();
   static final TodayVersionStore instance = TodayVersionStore._();
 
-  TodayVersion _v = TodayVersion.classic;
+  // ⚠️ V3 IS THE DEFAULT SINCE 2026-09-17 — the user's decision of 2026-09-16:
+  // "the version 3 screens are final, the classic screens are kept for
+  // reference". The pill stays so a reviewer can still look at classic; the
+  // app boots into V3. Kept for revert: the old default was TodayVersion.classic.
+  TodayVersion _v = TodayVersion.v3;
   TodayVersion get version => _v;
 
   void set(TodayVersion v) {

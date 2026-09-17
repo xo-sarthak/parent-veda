@@ -23,6 +23,9 @@ import '../services/remote/sync_registry.dart';
 import '../services/remote/supabase_repo.dart';
 import '../theme/app_theme.dart';
 import 'auth/auth_flow_screen.dart';
+import 'auth/onboarding/onboarding_flow.dart';
+import 'post_pregnancy/pp_home_version.dart' show PpHomeScreen;
+import 'skilling/skilling_preview_screen.dart';
 // father_daily_screen import parked - the paired father now lands on the unified
 // MainScaffold (father mode), not the standalone Father Daily screen.
 // import 'father/father_daily_screen.dart';
@@ -108,23 +111,17 @@ class _SplashScreenState extends State<SplashScreen>
     } catch (_) {/* default to showing auth */}
     if (!mounted) return;
     if (authed) {
-      // A couple who declared "trying" boots straight into their own stage
-      // rather than through a pregnancy home that is not about them.
-      //
-      // The father branch wins first: a paired partner has his own shell, and
-      // his TTC experience is reached inside it.
-      if (role != 'father' && stage == LifeStage.tryingToConceive.id) {
-        nav.pushReplacement(_ttcRoute());
-        return;
-      }
-      nav.pushReplacement(role == 'father' ? _fatherRoute() : _mainRoute());
+      nav.pushReplacement(_homeFor(role, stage));
       return;
     }
+    // ⚠️ THE FIRST RUN IS `OnboardingFlow` SINCE 2026-09-17 (docs/ONBOARDING-
+    // AUDIT.md, the Claude Design "ParentVeda Onboarding"). The old
+    // AuthFlowScreen is kept for revert and is still pushed BY the new flow
+    // for its two branches — partner pairing and the doctor entry.
     nav.pushReplacement(MaterialPageRoute(
-      builder: (_) => AuthFlowScreen(
-        // "I'm a doctor" → mark auth done and enter doctor mode. The MaterialApp
-        // builder swaps the whole app to the doctor dashboard, so no navigation
-        // is needed here.
+      settings: const RouteSettings(name: 'onboarding'),
+      builder: (_) => OnboardingFlow(
+        pregnancy: widget.pregnancy,
         onDoctor: (expertId) async {
           try {
             final prefs = await SharedPreferences.getInstance();
@@ -132,25 +129,84 @@ class _SplashScreenState extends State<SplashScreen>
           } catch (_) {/* best-effort */}
           DoctorSession.instance.enter(expertId);
         },
-        onDone: (due, isFather) async {
-        try {
-          final prefs = await SharedPreferences.getInstance();
-          await prefs.setBool(kAuthCompletedKey, true);
-          await prefs.setString(kUserRoleKey, isFather ? 'father' : 'mother');
-        } catch (_) {/* best-effort */}
-        // Wire the auth Profile due date into the app's real due date.
-        // PINNED TO WEEK 20 (testing): disabled so login can't move the week.
-        // Re-enable with the load() restore block in pregnancy_controller.dart.
-        // if (!isFather && due != null) await widget.pregnancy.setDueDate(due);
-        // Load the real profile name(s) so the app shows them (not placeholders).
-        await widget.pregnancy.loadProfileFromCloud();
-        // Re-pull every store's cloud data now that we're logged in, so a fresh
-        // login shows the user's data without needing an app restart.
-        SyncRegistry.resyncAll();
-        nav.pushReplacement(isFather ? _fatherRoute() : _mainRoute());
-      }),
+        onDone: (stageId, isFather) async {
+          // The flow wrote the flags, the stage and the profile itself; what
+          // is left is what the old handler did after: pull her profile and
+          // every store's cloud data, then land her in HER stage's home.
+          await widget.pregnancy.loadProfileFromCloud();
+          SyncRegistry.resyncAll();
+          nav.pushReplacement(_homeFor(isFather ? 'father' : 'mother', stageId));
+        },
+      ),
     ));
+    return;
+    // Kept for revert — the pre-2026-09-17 first run:
+    // nav.pushReplacement(MaterialPageRoute(
+    //   builder: (_) => AuthFlowScreen(
+    //     // "I'm a doctor" → mark auth done and enter doctor mode. The MaterialApp
+    //     // builder swaps the whole app to the doctor dashboard, so no navigation
+    //     // is needed here.
+    //     onDoctor: (expertId) async {
+    //       try {
+    //         final prefs = await SharedPreferences.getInstance();
+    //         await prefs.setBool(kAuthCompletedKey, true);
+    //       } catch (_) {/* best-effort */}
+    //       DoctorSession.instance.enter(expertId);
+    //     },
+    //     onDone: (due, isFather) async {
+    //     try {
+    //       final prefs = await SharedPreferences.getInstance();
+    //       await prefs.setBool(kAuthCompletedKey, true);
+    //       await prefs.setString(kUserRoleKey, isFather ? 'father' : 'mother');
+    //     } catch (_) {/* best-effort */}
+    //     // Wire the auth Profile due date into the app's real due date.
+    //     // PINNED TO WEEK 20 (testing): disabled so login can't move the week.
+    //     // Re-enable with the load() restore block in pregnancy_controller.dart.
+    //     // if (!isFather && due != null) await widget.pregnancy.setDueDate(due);
+    //     // Load the real profile name(s) so the app shows them (not placeholders).
+    //     await widget.pregnancy.loadProfileFromCloud();
+    //     // Re-pull every store's cloud data now that we're logged in, so a fresh
+    //     // login shows the user's data without needing an app restart.
+    //     SyncRegistry.resyncAll();
+    //     nav.pushReplacement(isFather ? _fatherRoute() : _mainRoute());
+    //   }),
+    // ));
   }
+
+  /// The one answer to "where does this person land". V3 is final
+  /// (2026-09-16): every stage has its own home and nobody is routed through
+  /// another stage's shell to reach theirs.
+  ///
+  /// The father branch wins first: a paired partner has his own shell, and his
+  /// stage experience is reached inside it.
+  Route<void> _homeFor(String role, String? stage) {
+    if (role == 'father') return _fatherRoute();
+    if (stage == LifeStage.tryingToConceive.id) return _ttcRoute();
+    if (stage == LifeStage.parenting.id) return _parentingRoute();
+    if (stage == LifeStage.skilling.id) return _skillingRoute();
+    return _mainRoute();
+  }
+
+  // A parenting family lands on the parenting home, not on the pregnancy shell
+  // with a doorway to it. Same route name the in-app door uses, so openPpTab's
+  // popUntil still finds it.
+  Route<void> _parentingRoute() => PageRouteBuilder(
+        settings: const RouteSettings(name: 'pp/my_child'),
+        transitionDuration: const Duration(milliseconds: 450),
+        pageBuilder: (_, _, _) => PpHomeScreen(lang: widget.pregnancy.language),
+        transitionsBuilder: (_, anim, _, child) =>
+            FadeTransition(opacity: anim, child: child),
+      );
+
+  // Skilling's home is the preview screen until a real one exists
+  // (STILL-OPEN §59.2) — a decision the user took on 2026-09-16.
+  Route<void> _skillingRoute() => PageRouteBuilder(
+        settings: const RouteSettings(name: 'skilling'),
+        transitionDuration: const Duration(milliseconds: 450),
+        pageBuilder: (_, _, _) => SkillingPreviewScreen(lang: widget.pregnancy.language),
+        transitionsBuilder: (_, anim, _, child) =>
+            FadeTransition(opacity: anim, child: child),
+      );
 
   Route<void> _mainRoute() => PageRouteBuilder(
         transitionDuration: const Duration(milliseconds: 450),

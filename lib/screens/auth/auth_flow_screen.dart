@@ -89,7 +89,18 @@ const String kAuthCompletedKey = 'auth_completed';
 const String kUserRoleKey = 'user_role';
 
 class AuthFlowScreen extends StatefulWidget {
-  const AuthFlowScreen({super.key, required this.onDone, this.onDoctor});
+  const AuthFlowScreen({
+    super.key,
+    required this.onDone,
+    this.onDoctor,
+    this.initialScreen = 'welcome',
+  });
+
+  /// Since 2026-09-17 the first run is `OnboardingFlow`; this screen is kept
+  /// for the two branches it still owns — the partner pairing (`'pairCode'`)
+  /// and the doctor entry (`'welcome'`, where "I'm a doctor" lives) — and
+  /// for revert. The new flow pushes it already positioned on that branch.
+  final String initialScreen;
 
   /// Fired when auth completes, with the due date the mother optionally picked
   /// on the Profile step (null if skipped / father), and [isFather] = true when
@@ -105,7 +116,7 @@ class AuthFlowScreen extends StatefulWidget {
 }
 
 class _AuthFlowScreenState extends State<AuthFlowScreen> {
-  String _screen = 'welcome';
+  late String _screen = widget.initialScreen;
   String _stage = ''; // pregnant | new | trying
   DateTime? _pickedDue; // chosen on the Profile step → fed into the app
   bool _busy = false; // true while a Supabase auth request is in flight

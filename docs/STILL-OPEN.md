@@ -3,7 +3,7 @@
 Everything parked, undecided, or half-built — in one place, so nothing gets
 quietly dropped between sessions.
 
-**Last updated:** 2026-08-21
+**Last updated:** 2026-09-17
 
 ## How to use this file
 
@@ -21,6 +21,12 @@ quietly dropped between sessions.
 **Blocking the sponsor programme:** §11.6 — the activation code has no sender
 **Blocking real money:** §2.1, §2.2, §5.1
 **Everything else** can wait without harm.
+
+> **Numbering (2026-09-17):** sections below 100 belong to the pregnancy /
+> parenting / TTC / home streams and continue the sequence; **100–199 belong
+> to skilling** (Confidence is §100). Two terminals appending to one counter
+> collided on §42, §58 and twice on §57/§62 in a day; a reserved block per
+> stream is the fix. The committed §42 and §58 duplicates stay as they are.
 
 ---
 
@@ -5428,7 +5434,7 @@ These need a decision rather than a patch.
   store and wiring are done now (see §38.5) and the screen is a plain working
   version to be re-skinned when the design lands.
 
-### 38.5 ⏰ REMINDER — one format for articles and reads, when all eight pregnancy doors are done
+### 38.5 ⏰ REMINDER — one format for articles and reads — DISCUSSED 2026-09-16, see §60
 
 **The user wants a discussion before any more of this is decided, once
 Garbh Sanskar and Mind and mood are built.** Raise it then, unprompted.
@@ -7129,7 +7135,12 @@ user's reaction. The device is released.
 
 ---
 
-## 57.0 Confidence, the third skilling door — 2026-09-16
+## 100.0 Confidence, the third skilling door — 2026-09-16
+
+(Numbered 57, then 62, when written — the parenting terminal took both the
+same day, once while this was being renumbered. Two writers cannot share a
+sequence, so from here the SKILLING sections take 100 and up; the other
+terminals' numbering runs below. Nothing else in this file refers to it.)
 
 Appended at the end; this file is shared. Built to
 `ParentVeda_Confidence_structure.pdf` (11 Sep 2026), "the one that actually
@@ -7140,7 +7151,7 @@ sells", on the shell as it stood after Communication. The door is
 `docs/DOOR-CONTENT-OWED.md` SF1–SF11; the review list is
 `docs/SKILLING-DOORS-REVIEW.md`. Generic points: `SKILLING-DOOR-BUILD.md` §9.
 
-### 57.1 The calls — 2026-09-16
+### 100.1 The calls — 2026-09-16
 
 1a the paid door as placeholders behind the gate (course shelf + a coach
 row), the booking engine named as the pass after a real coach exists · 2a
@@ -7149,7 +7160,7 @@ the coach on the grown-up screen under the classes, one closing card ·
 keepsake as two cards onto one screen's two halves · 4a "notice one thing
 you did" as a prompt after listen-back, stored nowhere.
 
-### 57.2 What changed
+### 100.2 What changed
 
 Four shell slots (`coach`, `voiceSelfReview`, `voiceTitle`, the `SkBreath`
 block rendering the app's one breathing circle), the `sk_record/<door>`
@@ -7161,12 +7172,22 @@ refused into Hear yourself back. The recorder's plugin calls are guarded
 and its permission wait bounded, which is what let a widget test hold the
 sheet. Not walked on a phone.
 
-### 57.3 Needs a decision (door-specific)
+### 100.3 Needs a decision (door-specific)
 
 * Six cards on the selector — seen on a phone, or not.
 * The self-review prompt's words, the coach row's words, the two lines
   under the breath — all mine.
 * Whether "With a coach" oversells a placeholder course title.
+
+### 100.4 Walked on the phone — 2026-09-17
+
+At 8, the whole door. Two fixes, both content: the hero photograph (a
+chalkboard in it read a cancer lesson — a hero is read at full size and
+every word in it is the door's) and the voice screen's copy, which was
+Communication's and is now a per-door slot (`voiceBlurb`,
+`voiceEmptyLine`). The recorder, the self-review prompt, the breath page
+and the coach row all behaved. Not rebuilt on the phone after the fixes —
+the other terminal held the build — so the swap is seen at the next walk.
 
 ## 58.0 TTC V3 home, the lower half in the parenting grammar — 2026-09-16
 
@@ -7288,3 +7309,161 @@ question, no name held that its owner did not give.
 Email + password, Apple, Facebook, the forgot/otp/reset chain and the "Soft
 solid" design all stay in the file for revert. No user has an email account
 yet, which is why the cut costs nothing now and would cost something later.
+
+---
+
+## 60.0 Reading converges on one reader; the card format is found and parked — OPENED 2026-09-16
+
+The §38.5 discussion happened, against Mobbin (`docs/READER-AUDIT.md`). The
+user's benchmark is the TTC reader — *"How conception actually works"* in the
+Fertile window door, `PvReaderScreen` — and the decision keeps it and adds
+five things (Reviewed-by row, collapsed References, "Was this helpful?" pills,
+related rows, Read next as a two-card rail). Nothing is built yet; the brief
+in §6 of that doc goes to Claude Design first.
+
+### 60.1 Four models become one — adapters, not rewrites
+
+`ReadItem`, `ReadArticle` and `Article` converge on `PvRead` through
+`fromX()` adapters so no seed data is rewritten. The three old readers stay,
+commented at their call sites. Books (`ReadItem.type == book`) do NOT
+converge — they route to the Book Companion; a book is a product, not an
+article.
+
+### 60.2 The chip — one word, "Article"
+
+`PvDoorFormat.read` keeps its enum value (persisted in door data) and takes
+the label `'Article'`. The look-up/read-through distinction lives inside the
+piece (glossary or FAQ section first, TOC visible), which is where every app
+in the set puts it. Closes the 2026-09-11 question.
+
+### 60.3 The card format — owed to the home, not the reader
+
+Flo's Daily insights, Blinkist Shorts, Deepstash: one idea per card,
+segmented progress, the last card is a verb. Spec in READER-AUDIT §2.3. It
+belongs to the V3 homes' daily rail. Not built; raise when the homes settle.
+
+### 60.5 The five additions are BUILT on `PvReaderScreen` — 2026-09-16
+
+Shown first on the user's benchmark, *How conception actually works* (TTC V3 →
+Fertile window door → the read; `lib/ttc/reads/ttc_reads_conceiving.dart`,
+id `ttc_read_how_conception_works`). Because the screen is shared, every
+`PvRead` in TTC and pregnancy carries them; the user reviews the one article
+and the format is then confirmed for everything V3 opens.
+
+1. *Reviewed by* row with the verified mark on the person (moved up from the
+   evidence block, with the rationale that travelled with it).
+2. *References* as a collapsed disclosure, last in the body.
+3. *Was this helpful?* — two outlined pills; the answer lives in
+   `PvReadStore.helpfulOf` locally (`pv_read_helpful`). **Owed:** a server
+   column the recommendations engine reads; not until something consumes it.
+4. Related rows — already there as the *What you can do with this* tile grid
+   (`nextSteps`); kept as tiles, the V3 signature, rather than churned to rows.
+5. *Read next* as a two-card rail; the benchmark article gained a second id
+   so the rail shows two.
+The old evidence block and stacked rows are kept in the file for revert.
+Adapters for the other three models and the chip word: not started — waiting
+on the user's look.
+
+### 60.4 Father reads converge last
+
+Father mode has its own chrome; the reader must render inside the Slate look
+before `father_reads_screen.dart` goes behind a comment.
+
+---
+
+## 61.0 The family model is written down; two things it makes owed — OPENED 2026-09-16
+
+`docs/FAMILY-MODEL.md` states the rule the schema already followed and nobody
+had said: the person is the root of identity and of bookmarks; the child is
+the root of what is logged about the child; stage is a tag, never an owner.
+`saved_items` (0081) is the first table built against it — one bookmark
+table for the whole app, ten old saved-sets behind facades, one Saved screen
+reached from every home. Built and tested; **not deployed** — `supabase db
+push` is the user's.
+
+### 61.1 A `pregnancies` table — the second baby's real requirement
+
+Today a pregnancy is `profiles.due_date` + `life_stage`, one at a time. The
+second pregnancy overwrites the first. Apple Health's "log a past pregnancy"
+is the shape: a row per pregnancy (start, dating method, due date, outcome,
+`child_id` once born). `DueDateSource` already exists to fill the method
+column. Also where a loss is recorded, so the app can stop pushing pregnancy
+content afterwards (personalisation reads `outcome`). Not built.
+
+### 61.2 One product catalogue across stages
+
+The user's own words: three product sections, one per stage, "makes no
+sense". Same shape as saved_items — one table, stage as a tag, the current
+stage as the default filter, switchable. Recorded here because the decision
+is taken; the build is not started.
+
+### 61.3 Sharing a bookmark with the partner
+
+Deliberately personal for now (FAMILY-MODEL §5). If wanted: a `shared`
+boolean and a partner read policy — one migration, no store change.
+
+### 61.4 The two old hubs and ten old saved-sets — commented, kept for revert
+
+`saved_hub_screen.dart`, `pp_saved_hub_screen.dart`, and the old bodies of
+VideoStore / ProductStore / CanIStore / ReadNextStore / PvReadStore /
+CommunityStore / ReadToBabySavedStore / WatchStore / ReadingStore /
+DailyTipStore. Delete after a release cycle with no revert.
+
+### 61.5 Five V3 taps that fell back to classic — CLOSED
+
+`home_v3_screen.dart`: the week hero, the avatar, the film-unavailable
+fallback, the Garbh "about", and the reads rows all called `_open(context,
+'<today surface>')`, which set `TodayVersion.classic` and stopped — the "tap
+the article, land on the classic home" defect. Each now opens the thing it
+names; `test/saved_screen_wiring_test.dart` refuses any live `_open` to a
+Today/Profile surface. The remaining `_open` uses (`shop`, `tests_scans`)
+are real tab switches and stay.
+
+---
+
+## 62.0 The first run is built; V3 is the default; what is still owed — OPENED 2026-09-17
+
+`lib/screens/auth/onboarding/` — `OnboardingFlow` is what the splash pushes.
+Built from the Claude Design "ParentVeda Onboarding" plus a question block:
+two or three give-back questions per stage (`onboarding_questions.dart`),
+after the date and before the reveal, each writing to `FamilyProfileStore`.
+The old `AuthFlowScreen` is kept, commented at the splash, and still pushed by
+the new flow for its two branches (partner pairing, doctor). Migration 0082
+lets `profiles.life_stage` accept `skilling` and brings the pairing code to
+six characters so both code sheets are one length (Swiggy/Zomato use six).
+
+**V3 is the default** on all three homes (`TodayVersionStore`,
+`PpHomeVersionStore`, `TtcHomeVersionStore`) — closes §17.3. The splash now
+routes every stage to its own home: parenting to `PpHomeScreen`, skilling to
+`SkillingPreviewScreen`, instead of everyone through the pregnancy shell.
+
+### 62.1 Not walked on a phone yet
+
+Google sign-in, the Phone Number Hint sheet, the SMS auto-fill and the OTP
+functions need a real device and deployed functions (0080, mock mode is
+enough). Tests cover every screen after sign-in.
+
+### 62.2 "Was this helpful?" has no server column
+
+`PvReadStore.helpfulOf` is local. When the recommendations engine reads it
+server-side, add a column and a push; not before.
+
+### 62.3 Twins, and the second child at onboarding
+
+The Stage screen says "Expecting twins or more? You can say so later" and
+there is no later yet. The Date screen adds one child; a second is added from
+inside Parenting. Both are `pregnancies` / multi-child work (§61.1).
+
+### 62.4 Reveal art
+
+The reveal draws a tinted panel with the week/month label where the design
+has the week-14 baby illustration. `assets/baby/` has per-week JPGs for
+pregnancy; wiring the right one by week, and finding month art for parenting,
+is a small follow-up.
+
+### 62.5 The design project could carry the questions
+
+The Claude Design has the seven screens; the question screens exist only in
+code. If the design is to stay the reference, the question artboards should be
+added there (DesignSync can push them) — not done, since the user is reviewing
+the built screens directly.

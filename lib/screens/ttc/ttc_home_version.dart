@@ -37,7 +37,11 @@ class TtcHomeVersionStore extends ChangeNotifier {
   TtcHomeVersionStore._();
   static final TtcHomeVersionStore instance = TtcHomeVersionStore._();
 
-  TtcHomeVersion _v = TtcHomeVersion.v1;
+  // ⚠️ V3 IS THE DEFAULT SINCE 2026-09-17 — the user's decision of 2026-09-16:
+  // "the version 3 screens are final, the classic screens are kept for
+  // reference". The pill stays so a reviewer can still look at classic; the
+  // app boots into V3. Kept for revert: the old default was TtcHomeVersion.v1.
+  TtcHomeVersion _v = TtcHomeVersion.v3;
   TtcHomeVersion get version => _v;
 
   void set(TtcHomeVersion v) {
