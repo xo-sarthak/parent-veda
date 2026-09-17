@@ -7133,6 +7133,21 @@ merge needs an identity; both keepsake stores now merge by id. The child
 type sizes moved to one set of constants at a middle setting on the
 user's reaction. The device is released.
 
+### 56.6 The third band, written here — 2026-09-17
+
+No Task 9 PDF existed; the user asked for it to be written. Claude Code
+wrote it, and on the user's call it sits with the other task PDFs
+(`tasks/communication/`, `.pdf` and the editable `.md`), first page
+saying who wrote it and when, in the other tasks' shape and under their
+rules; the twelve activities are generated from it verbatim into the
+Dart — the first activity copy authored by Claude Code rather than
+received. The ledger row (SC3) says the copy is owed a review by the task
+author. Three calls
+worth their look are in the review file: two writing-shaped activities,
+a friend counting fillers out loud (the app counts nothing), and
+observed-versus-assumed as describing rather than thinking. The
+Communication door's thirty-six are now all real. Not walked after.
+
 ---
 
 ## 100.0 Confidence, the third skilling door — 2026-09-16

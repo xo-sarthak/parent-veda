@@ -229,6 +229,19 @@ task names a field the model does not have, STOP and list it (the Coding
 8–11 task's **access rail** and the 11–14 task's **resume marker** are the
 two known ones; see §9). Never a new screen, never a second activity model.
 
+**When no task PDF exists and the user asks for the copy anyway** (first
+time: Communication 11–14, 2026-09-17): write the task in the PDFs' exact
+shape (the same sections, the same rules, the field list, the twelve, the
+acceptance checklist), with a note on the first page saying **who wrote
+it** (Claude Code, at the user's instruction, on the date) — and put it
+**with the other task PDFs** in `Downloads/door-pdf/skilling-doors/tasks/
+<door>/`, the `.md` beside a rendered `.pdf` (the user's call, 2026-09-17:
+the tasks live together, and the author is named). Generate the Dart from
+the `.md`, never by hand (`gen_cm_1114.py` in the session scratchpad is
+the shape), and diff it back by script. Mark the ledger row and the review
+list "written by Claude Code, owed a task-author review". The document is
+the source; the Dart changes when it changes.
+
 ---
 
 ## 4. The shell, file by file

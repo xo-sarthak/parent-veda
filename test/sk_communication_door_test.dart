@@ -85,7 +85,7 @@ void main() {
           ['Clarity', 'Listening', 'Describing', 'Storytelling', 'The right word', 'Putting your point']);
     });
 
-    test('a FULL set per band, two per skill; two bands filled, the third owed', () {
+    test('a FULL set per band, two per skill; all three bands filled', () {
       for (final band in kSkBands) {
         final list = _c.activitiesFor(band.id);
         expect(list, hasLength(12), reason: band.id);
@@ -94,23 +94,40 @@ void main() {
         }
       }
       expect(_c.activities.map((a) => a.id).toSet(), hasLength(36));
-      // Tasks 7 and 8 of 36, filled 2026-09-15; the 11 to 14 task is not written.
-      for (final a in [..._c.activitiesFor('6-8'), ..._c.activitiesFor('8-11')]) {
+      // Tasks 7 and 8 of 36, filled 2026-09-15; Task 9, written by Claude
+      // Code at the user's instruction (it sits with the other task PDFs)
+      // and filled 2026-09-17.
+      for (final a in _c.activities) {
         expect(a.comingSoon, isFalse, reason: a.id);
         expect(a.oneLine, isNotEmpty, reason: a.id);
         expect(a.materials, isNotEmpty, reason: '${a.id}: "Nothing", or the household items');
         expect(a.steps, hasLength(4), reason: a.id);
         expect(a.theThinking, isNotEmpty, reason: a.id);
         expect(a.whatYouPractised, isNotEmpty, reason: a.id);
-      }
-      for (final a in _c.activitiesFor('11-14')) {
-        expect(a.comingSoon, isTrue, reason: '${a.id}: no task PDF yet');
+        expect(a.whatYouPractised.startsWith('You '), isTrue, reason: a.id);
+        expect(a.tool, isNull, reason: a.id);
+        expect(a.breathPageId, isNull, reason: '${a.id}: the breath is Confidence\'s');
       }
       // The tasks' spot checks.
       expect(_c.activityById('cm_68_01')!.title, 'Say It So I Get It');
       expect(_c.activityById('cm_68_12')!.title, 'I Heard You, and...');
       expect(_c.activityById('cm_811_01')!.title, 'Explain How It Works');
       expect(_c.activityById('cm_811_12')!.title, 'Disagree Nicely');
+      expect(_c.activityById('cm_1114_01')!.title, 'Explain the Hard Thing');
+      expect(_c.activityById('cm_1114_12')!.title, 'Hold a Real Back-and-Forth');
+    });
+
+    test('the 11 to 14 copy holds the band\'s brief line and the door\'s boundaries', () {
+      // The task sits outside the repo with the other PDFs, so it cannot be
+      // read here; the Dart was generated from it and diffed by script at
+      // the fill. These are the lines that carry the band's shape.
+      // The band's brief line, honoured by the capstone.
+      expect(_c.activityById('cm_1114_12')!.oneLine, contains('change your mind out loud'));
+      // Craft, not logic: the two point activities hand reasoning to Thinking.
+      expect(_c.activityById('cm_1114_11')!.theThinking, contains('Thinking door'));
+      expect(_c.activityById('cm_1114_12')!.theThinking, contains('Thinking door'));
+      // Listening carries weight: the fourth waits for "yes, that is it".
+      expect(_c.activityById('cm_1114_04')!.steps[2], contains('yes, that is it'));
     });
 
     test('the tasks\' rules: no nerve or audience, listening carries weight, any language, no outcome', () {
@@ -132,13 +149,15 @@ void main() {
       expect(anyLang.any((a) => [...a.steps, a.theThinking].join(' ').toLowerCase().contains('every language')), isTrue);
     });
 
-    test('offersRecording is the tasks\' four, and only those', () {
+    test('offersRecording is the tasks\' six, and only those', () {
       final offered = _c.activities.where((a) => a.offersRecording).map((a) => a.id).toList();
-      expect(offered, ['cm_68_07', 'cm_68_08', 'cm_811_07', 'cm_811_08']);
+      expect(offered, ['cm_68_07', 'cm_68_08', 'cm_811_07', 'cm_811_08', 'cm_1114_07', 'cm_1114_08']);
       expect(_c.activityById('cm_68_07')!.title, 'Tell Me What Happened');
       expect(_c.activityById('cm_68_08')!.title, 'Once Upon a Time');
       expect(_c.activityById('cm_811_07')!.title, 'Retell the Movie');
       expect(_c.activityById('cm_811_08')!.title, 'Make It Exciting');
+      expect(_c.activityById('cm_1114_07')!.title, 'Tell It So It Lands');
+      expect(_c.activityById('cm_1114_08')!.title, 'Short Version, Long Version');
       for (final a in _c.activities.where((a) => a.offersRecording)) {
         expect(a.skillPurpose, 'storytelling', reason: a.id);
       }

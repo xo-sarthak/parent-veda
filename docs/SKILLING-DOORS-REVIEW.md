@@ -22,8 +22,8 @@ buy are stub sheets; the door stays behind `kDebugMode`; the preview ships.
 | Tile | Brief | Shape | Tasks (fills) | Commit | Walked on a phone | Contract |
 |---|---|---|---|---|---|---|
 | Coding | `ParentVeda_Coding_structure_v2.pdf` | door, 5 tabs + the shell | **3 of 3 filled** (36 activities) | 5f963a7 (door), 87dcd62 (fills + walk) | **yes** — 2026-09-14, at 8, 5 and 12 | `sk_coding_door_test` |
-| Communication | `ParentVeda_Communication_structure.pdf` | door, 5 tabs (three band cards) | **2 of 3 filled** (6–8, 8–11); 11–14 not written | a86c5bf (frame), 0fa1193 (fills), e67da1b (walk) | **yes** — 2026-09-16, at 12 and 8, recorder end to end | `sk_communication_door_test` |
-| Confidence | `ParentVeda_Confidence_structure.pdf` | door, **6 cards** (three band cards + recorder + keepsake) | **3 of 3 filled** (36 activities) | 5eb85a4 (frame), 153b3a4 (walk), fills commit next | **yes** — 2026-09-17, at 8, frame and fills | `sk_confidence_door_test` |
+| Communication | `ParentVeda_Communication_structure.pdf` | door, 5 tabs (three band cards) | **3 of 3 filled** (6–8, 8–11 from the author's PDFs; **11–14 written by Claude Code**, with the other PDFs) | a86c5bf (frame), 0fa1193 (fills), e67da1b (walk), 11–14 fill commit next | **yes** — 2026-09-16, at 12 and 8, recorder end to end (11–14 fill not yet) | `sk_communication_door_test` |
+| Confidence | `ParentVeda_Confidence_structure.pdf` | door, **6 cards** (three band cards + recorder + keepsake) | **3 of 3 filled** (36 activities) | 5eb85a4 (frame), 153b3a4 (walk), 6a78176 (fills + walk) | **yes** — 2026-09-17, at 8, frame and fills | `sk_confidence_door_test` |
 | Creativity | `ParentVeda_Creativity_structure.pdf` | plan sheet | none yet | — | — | — |
 | Feelings | `ParentVeda_Feelings_structure.pdf` | plan sheet | none yet | — | — | — |
 | Focus | `ParentVeda_Focus_structure.pdf` | plan sheet | none yet | — | — | — |
@@ -171,6 +171,40 @@ Frame only; the two task PDFs (6–8, 8–11) fill it next.
 - [ ] **Suggestion:** with three band cards on the selector, the parent
       side would fit better as the hero's small lock control than as a
       closing card below five rails; same as Coding's Suggestion A.
+
+**The 11 to 14 fill (2026-09-17) — the copy is mine, read it**
+
+- [ ] **This is the first activity copy written by Claude Code rather
+      than received from the task author.** You asked for it ("write 11-14
+      tasks then"). On your call it sits with the other task PDFs —
+      `tasks/communication/ParentVeda Communication 11-14 activities prompt.pdf`, the editable `.md` beside it, the
+      first page saying who wrote it and when — in Tasks 7 and 8's exact
+      shape, so the task author can review and edit it like the rest. The
+      Dart is generated from the `.md` (scratchpad `gen_cm_1114.py`) and
+      was diffed against it by script, 12 of 12.
+- [ ] **Read the twelve as twelve:** Explain the Hard Thing · Say It Once
+      for the Group · Listen Past the First Answer · Say It Back Before You
+      Answer · Describe It So They Could Draw It · Say What Happened,
+      Exactly · Tell It So It Lands · Short Version, Long Version · Drop
+      the Fillers · Write It to a Teacher · Point, Reason, Example · Hold a
+      Real Back-and-Forth. Each steps up from its 8–11 twin, the way Tasks
+      5 and 6 did for Confidence.
+- [ ] Three calls I made that a task author might make differently:
+      * **Two activities involve writing** (Write It to a Teacher; Say It
+        Once for the Group is spoken but planned). The door is
+        communication, not only speech, and a message to a teacher is the
+        realest 11–14 register task there is — but the other bands are
+        all spoken.
+      * **Drop the Fillers** has a friend counting fillers out loud. That
+        is play and the app counts nothing; the scan is happy. Say if a
+        count of any kind is off-brief.
+      * **Say What Happened, Exactly** teaches observed-versus-assumed
+        (fair reporting). It is describing with a job; say if it drifts
+        toward the Thinking door.
+- [ ] `offersRecording` on the two storytelling ones, as in the other
+      bands — six in thirty-six on this door now.
+- [ ] Not walked after the fill; the band's rails are the same rails at a
+      different age (12).
 
 ## Confidence (§100)
 

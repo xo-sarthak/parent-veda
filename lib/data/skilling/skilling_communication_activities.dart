@@ -1,5 +1,5 @@
 // =============================================================================
-//  Communication & articulation — the activity set: two bands filled, one owed
+//  Communication & articulation — the activity set, all three bands filled
 // -----------------------------------------------------------------------------
 //  Scaffolded to `ParentVeda_Communication_structure.pdf` ("a full set per
 //  band, not a token few … each built on one real skill, tagged, ending on
@@ -8,7 +8,10 @@
 //
 //    Task 7 of 36  ·  6 to 8   ·  Say it out loud          ·  twelve, filled
 //    Task 8 of 36  ·  8 to 11  ·  Tell it and explain it   ·  twelve, filled
-//    (none yet)    ·  11 to 14 ·  Say what you think       ·  twelve slots
+//    Task 9 of 36  ·  11 to 14 ·  Say what you think       ·  twelve, filled
+//                     (written by Claude Code on 2026-09-17 at the user's
+//                     instruction, not by the task author; sits with the
+//                     other task PDFs, `.md` beside `.pdf`)
 //
 //  ⚠️ THE COPY IS THE TASK PDFS', WORD FOR WORD. Kid voice, Hinglish-friendly
 //  ("nani's", "gully cricket", "jalebis"), mother tongue first: every line
@@ -20,11 +23,13 @@
 //  door … Listening is HALF of this door." Two of the six skills receive.
 //
 //  ⚠️ `offersRecording` IS THE TASKS' FIELD. "The optional 'save your story'
-//  step; true for Tell Me What Happened, Once Upon a Time" (6 to 8) and
-//  "Retell the Movie, Make It Exciting" (8 to 11). Four activities in
-//  twenty-four. The row shows only on those, only on a door that keeps her
-//  voice, and only once a parent has turned recording on — off by default,
-//  on this phone only, never analysed, graded or transcribed.
+//  step; true for Tell Me What Happened, Once Upon a Time" (6 to 8),
+//  "Retell the Movie, Make It Exciting" (8 to 11) and "Tell It So It Lands,
+//  Short Version, Long Version" (11 to 14). Six activities in thirty-six,
+//  the two storytelling ones per band. The row shows only on those, only
+//  on a door that keeps her voice, and only once a parent has turned
+//  recording on — off by default, on this phone only, never analysed,
+//  graded or transcribed.
 //
 //  Ids are the scaffold's — `cm_68_01` … `cm_1114_12`, two per skill in
 //  the door's skill order — so nothing on the rail moved when the copy
@@ -616,9 +621,348 @@ const List<SkActivity> _tellAndExplain = [
 ];
 
 // =============================================================================
-//  Say what you think, 11 to 14 — twelve slots, no task PDF yet
+//  Task 9 of 36 — Say what you think, 11 to 14
+// -----------------------------------------------------------------------------
+//  ⚠️ THIS TASK WAS WRITTEN BY CLAUDE CODE, NOT THE TASK AUTHOR. The user
+//  asked for it on 2026-09-17 ("write 11-14 tasks then"). It sits with the
+//  other task PDFs — `tasks/communication/ParentVeda Communication 11-14
+//  activities prompt.pdf`, the editable `.md` beside it — in their
+//  shape and under their rules, and the copy below is generated from the
+//  `.md` verbatim. Edit the document, regenerate; never this.
 // =============================================================================
 
+const List<SkActivity> _sayWhatYouThink = [
+  SkActivity(
+    id: 'cm_1114_01',
+    band: '11-14',
+    skillPurpose: 'clarity',
+    title: 'Explain the Hard Thing',
+    oneLine: 'Take something genuinely complicated and explain it to someone '
+        'who does not know it.',
+    materials: 'Nothing. One person who does not already know the thing.',
+    steps: [
+      'Pick something you actually understand that is not simple: how a UPI '
+          'payment goes through, the offside rule, why the sky is blue, a '
+          'chapter from school.',
+      'Start with the one-line version. If they only hear one sentence, what '
+          'must it be?',
+      'Add detail only when they ask, or when their face says "wait, what?"',
+      'Ask them to tell it back to you. Where they wobble is where your '
+          'explanation needs work, not where they were slow.',
+    ],
+    theThinking: 'The step up from "explain how it works": a complex thing, to '
+        'a listener who starts from zero, led by the one-line version and then '
+        'only the detail that is needed. The habit of blaming the explanation '
+        'and not the listener is the whole skill.',
+    whatYouPractised: 'You explained something hard to someone who did not '
+        'know it, and fixed the parts that did not land. Clarity on a hard '
+        'thing is a real skill.',
+  ),
+  SkActivity(
+    id: 'cm_1114_02',
+    band: '11-14',
+    skillPurpose: 'clarity',
+    title: 'Say It Once for the Group',
+    oneLine: 'Give a group one instruction so clear that nobody has to ask '
+        '"matlab?"',
+    materials: 'Nothing. A group: a project team, cousins, the family before '
+        'an outing.',
+    steps: [
+      'When you need a group to do something (meet at the gate at four, bring '
+          'one thing each, split the work), plan the message before you say '
+          'it.',
+      'Say it in order: what, who, when, where. One time, at a normal pace.',
+      'Watch. Did anyone ask "wait, which gate?" That is a missing piece, not '
+          'a slow listener.',
+      'Next time, put that piece in from the start. A group that does not need '
+          'to ask has been told clearly.',
+    ],
+    theThinking: 'Clarity to a group is harder than clarity to one person, '
+        'because there is no single face to read and no second try. Planning '
+        'the message and listening for the questions that come back, then '
+        'closing those gaps, is how clear people get clear.',
+    whatYouPractised: 'You told a group something once, clearly, and noticed '
+        'what they still had to ask. Saying it right the first time is a real '
+        'skill.',
+  ),
+  SkActivity(
+    id: 'cm_1114_03',
+    band: '11-14',
+    skillPurpose: 'listening',
+    title: 'Listen Past the First Answer',
+    oneLine: 'Ask a grandparent or elder about their life, and keep going past '
+        'the first answer.',
+    materials: 'Nothing. Someone older, with a little time.',
+    steps: [
+      'Ask something real: "What was school like for you?" "How did you and '
+          'dadaji meet?" "What was the first job you did?"',
+      'Listen to the whole answer. Do not plan your next question while they '
+          'are talking.',
+      'Ask a follow-up that comes FROM what they just said: "You walked how '
+          'far? What happened when it rained?"',
+      'Then one more. The real story is usually under the third question, not '
+          'the first.',
+    ],
+    theThinking: 'Listening at this age grows from asking a good question to '
+        'sustaining attention: following up on what was actually said, three '
+        'questions deep. An elder\'s story is the kindest place to practise '
+        'it, and the child usually comes away with something she did not know '
+        'about her own family.',
+    whatYouPractised: 'You listened past the first answer and found the real '
+        'story underneath. Following what someone actually said is deep '
+        'listening.',
+  ),
+  SkActivity(
+    id: 'cm_1114_04',
+    band: '11-14',
+    skillPurpose: 'listening',
+    title: 'Say It Back Before You Answer',
+    oneLine: 'In a real disagreement, say their side back until they say "yes, '
+        'that is it", and only then reply.',
+    materials: 'Nothing. A real disagreement, with a sibling, a friend, a '
+        'parent.',
+    steps: [
+      'Next time you disagree with someone, hold your reply.',
+      'Say their view back in your own words, fairly, not as a joke: "So you '
+          'think I should not go because it ends late and you would be '
+          'worried?"',
+      'Wait for "yes, that is it." If they say "no, not quite", listen again '
+          'and try again.',
+      'Only now give your side. You will notice it is a different '
+          'conversation.',
+    ],
+    theThinking: 'The step up from "really hear the other side": the child '
+        'does not move on until the other person confirms she has understood '
+        'them. This is the single most useful listening habit there is, and '
+        'almost no adult does it. The point is understanding, not agreeing; '
+        'she can still disagree, and the disagreement will be cleaner.',
+    whatYouPractised: 'You said someone\'s side back until they agreed you had '
+        'it, before you answered. Understanding first is the hardest, best '
+        'listening.',
+  ),
+  SkActivity(
+    id: 'cm_1114_05',
+    band: '11-14',
+    skillPurpose: 'describing',
+    title: 'Describe It So They Could Draw It',
+    oneLine: 'Describe something the listener cannot see, well enough that '
+        'they could draw it.',
+    materials: 'Nothing. A picture on a phone, or a view from a window, and '
+        'one person who cannot see it. Paper if they want to draw.',
+    steps: [
+      'Pick a photo, a poster, or the view from your window. Your listener '
+          'faces the other way, or is on a call.',
+      'Describe it in an order: the big shape first, then left to right, then '
+          'the details. Sizes, colours, what is next to what.',
+      'Let them draw it, or say back what they see in their head.',
+      'Compare. What did you leave out? What did you say that did not help? '
+          'That gap is the whole lesson.',
+    ],
+    theThinking: 'Describing with a hard test: could someone rebuild the '
+        'picture from your words alone? The step up from giving directions is '
+        'that there is no landmark to lean on, only order and precision. The '
+        'comparison at the end teaches more than any amount of "describe it '
+        'nicely".',
+    whatYouPractised: 'You described something so someone could almost draw '
+        'it, and saw exactly what your words missed. Precise describing is a '
+        'real skill.',
+  ),
+  SkActivity(
+    id: 'cm_1114_06',
+    band: '11-14',
+    skillPurpose: 'describing',
+    title: 'Say What Happened, Exactly',
+    oneLine: 'Describe something that happened, in order, only what you saw, '
+        'not what you guessed.',
+    materials: 'Nothing. Something that actually happened: at school, in the '
+        'colony, at home.',
+    steps: [
+      'Pick a real event with more than one person in it: a fight in the '
+          'corridor, a broken thing, a mix-up over whose turn it was.',
+      'Tell it in order, from the start. First this, then this.',
+      'Keep to what you actually saw and heard. "He looked angry" is a guess. '
+          '"He shouted and left" is what happened.',
+      'If you did not see a part, say so: "I do not know what happened before '
+          'I came in." That line makes you the person people trust to tell it.',
+    ],
+    theThinking: 'Describing with a job to do, fairly: separating what was '
+        'observed from what was assumed, and saying plainly what she does not '
+        'know. It is the description a teacher or a parent actually needs, and '
+        'it is a skill many adults never build. Keep it on the telling, not on '
+        'who was right.',
+    whatYouPractised: 'You told what happened in order, with only what you '
+        'saw, and said what you did not know. Fair, exact describing is a real '
+        'skill.',
+  ),
+  SkActivity(
+    id: 'cm_1114_07',
+    band: '11-14',
+    skillPurpose: 'storytelling',
+    title: 'Tell It So It Lands',
+    oneLine: 'Tell a true story from your life so it lands: a hook, the '
+        'middle, and a last line.',
+    materials: 'Nothing. Something that happened to you and a few people to '
+        'tell it to, at dinner or on a call.',
+    offersRecording: true,
+    steps: [
+      'Pick something that happened to you this week or this year. Funny, '
+          'strange, small is fine.',
+      'Start with a line that makes them want the rest: "So the bus did not '
+          'come."',
+      'Tell the middle in order, only the parts that matter to the story.',
+      'End on a line, not a fade. "And that is why I am never trusting that '
+          'timetable again." Then stop.',
+    ],
+    theThinking: 'Retelling a film becomes telling her own story with a shape: '
+        'an opening that pulls, a middle that keeps only what matters, and an '
+        'ending line she chooses instead of trailing off. The story that lands '
+        'at dinner is the one she will tell for years, and this is where it '
+        'gets its shape.',
+    whatYouPractised: 'You told a true story with a hook, a middle and a last '
+        'line, and it landed. Telling your own story well is real '
+        'storytelling.',
+  ),
+  SkActivity(
+    id: 'cm_1114_08',
+    band: '11-14',
+    skillPurpose: 'storytelling',
+    title: 'Short Version, Long Version',
+    oneLine: 'Tell the same story in two lines, then in full. Know what you '
+        'cut and why.',
+    materials: 'Nothing. A story you have already told, and someone to tell it '
+        'to twice.',
+    offersRecording: true,
+    steps: [
+      'Take a story you know well: something from a trip, a match, a school '
+          'day.',
+      'Tell the two-line version, the one for a corridor or a lift: what '
+          'happened, and why it mattered.',
+      'Now tell the full version, the one for dinner, with the details that '
+          'make it good.',
+      'Notice what you cut for the short one. That is you deciding what the '
+          'story is really about.',
+    ],
+    theThinking: '"Make it exciting" becomes control over length: the same '
+        'story at two sizes, on purpose, for two situations. Knowing what to '
+        'cut is the mark of someone who understands her own story, and it is '
+        'the same skill she will use for a summary, an answer in class, a '
+        'message.',
+    whatYouPractised: 'You told one story short and then in full, and knew '
+        'what you cut. Fitting a story to the moment is real storytelling.',
+  ),
+  SkActivity(
+    id: 'cm_1114_09',
+    band: '11-14',
+    skillPurpose: 'right_word',
+    title: 'Drop the Fillers',
+    oneLine: 'Say a thing without "like", "basically", "matlab", "you know", '
+        'and hear what is left.',
+    materials: 'Nothing. A friend or a sibling to catch you.',
+    steps: [
+      'Explain something for a minute or two while a friend counts your '
+          'fillers: like, basically, matlab, you know, actually, umm.',
+      'Say the same thing again. Every time a filler comes, pause instead. A '
+          'pause is allowed.',
+      'Notice: the pause is usually where you did not yet have the word. Find '
+          'the word.',
+      'Fillers live in every language. You do not have to lose them all, just '
+          'know when you are leaning on them.',
+    ],
+    theThinking: 'The right word at this age often means noticing the '
+        'non-words that stand in for it. A filler is a placeholder for a word '
+        'she has not found yet; swapping it for a pause, and then for the '
+        'word, is precision she can hear immediately. A friend counting is '
+        'play, not a score, and nothing is written down.',
+    whatYouPractised: 'You said a thing without leaning on fillers, and found '
+        'the words that were hiding behind them. Choosing the word over the '
+        'filler is a real skill.',
+  ),
+  SkActivity(
+    id: 'cm_1114_10',
+    band: '11-14',
+    skillPurpose: 'right_word',
+    title: 'Write It to a Teacher',
+    oneLine: 'Write a short message to a teacher or coach that is clear, '
+        'polite, and easy to say yes to.',
+    materials: 'Nothing, or a phone with a grown-up\'s okay. Any language the '
+        'teacher reads.',
+    steps: [
+      'Pick a real ask: a doubt about homework, a day off from practice, an '
+          'extension, a form you need signed.',
+      'Shape it: a greeting, the ask in one clear line, the reason in one '
+          'line, a thank you. Four parts, that is all.',
+      'Read it as the teacher. Is anything missing that they would have to '
+          'ask? Is anything in it that sounds like a friend chat?',
+      'Send it, or show it to a grown-up first. A clear, polite ask is one '
+          'most people want to say yes to.',
+    ],
+    theThinking: 'Friend-versus-teacher becomes the real thing: a written '
+        'request to an adult in charge, in the right register, with the ask '
+        'and the reason visible in one read. Register lives in every language, '
+        'and the four-part shape travels to every message she will ever need '
+        'to write to someone in charge.',
+    whatYouPractised: 'You wrote a clear, polite message to a teacher with the '
+        'ask and the reason in it. Choosing the right words for the right '
+        'person is a real skill.',
+  ),
+  SkActivity(
+    id: 'cm_1114_11',
+    band: '11-14',
+    skillPurpose: 'putting_your_point',
+    title: 'Point, Reason, Example',
+    oneLine: 'Make your point in three moves: the point, the reason, one '
+        'example.',
+    materials: 'Nothing. A class discussion, a family decision, a debate with '
+        'a friend.',
+    steps: [
+      'Take something you think: "We should keep the school library open at '
+          'lunch."',
+      'Say the point in one line. Then the reason: "because a lot of us have '
+          'nowhere quiet to sit."',
+      'Then one example that makes it real: "Last week four of us were doing '
+          'homework on the stairs."',
+      'Stop there. Point, reason, example. Three moves, and your point stands '
+          'up on its own.',
+    ],
+    theThinking: 'Two reasons become a shape: point, reason, example. It is '
+        'the craft of putting a view across so it can be followed and '
+        'remembered, not the logic of whether the reason is a good one (that '
+        'is the Thinking door). A child who has the shape can use it in class, '
+        'at home, and in writing, without having to be the loudest.',
+    whatYouPractised: 'You made a point with a reason and an example, in three '
+        'clear moves. Putting your point so it stands up is a real skill.',
+  ),
+  SkActivity(
+    id: 'cm_1114_12',
+    band: '11-14',
+    skillPurpose: 'putting_your_point',
+    title: 'Hold a Real Back-and-Forth',
+    oneLine: 'Have a proper exchange: say your view, hear theirs, answer what '
+        'they actually said, and be able to change your mind out loud.',
+    materials: 'Nothing. Someone who sees it differently, and a few minutes.',
+    steps: [
+      'Pick something you two see differently: which film, whether the rule is '
+          'fair, what to do on Sunday.',
+      'Say your view with a reason. Then listen to theirs, all of it.',
+      'Answer what THEY said, not what you had ready. "You said it is unfair '
+          'to the younger ones. I had not thought of that, but..."',
+      'If they change your mind a little, say so out loud: "Okay, that shifts '
+          'it for me." That is not losing. That is the whole point of talking.',
+    ],
+    theThinking: 'The band\'s capstone and the brief\'s own words, "holding a '
+        'real back-and-forth": a view with a reason, listening in full, '
+        'responding to what was actually said, and saying out loud when her '
+        'mind has moved. Disagreeing nicely grows into a conversation that '
+        'goes somewhere. Keep it on the craft of the exchange; the quality of '
+        'the arguments is the Thinking door\'s.',
+    whatYouPractised: 'You held a real back-and-forth: your view, their view, '
+        'an answer to what they actually said, and an honest "that shifts it" '
+        'when it did. That is communication at its best.',
+  ),
+];
+
+/* kept for revert — the scaffold that held the twelve slots from 2026-09-15
+   to 2026-09-17. The ids it minted are the ids above.
 const List<String> _skillOrder = [
   'clarity', 'clarity',
   'listening', 'listening',
@@ -638,6 +982,7 @@ final List<SkActivity> _sayWhatYouThink = [
       comingSoon: true,
     ),
 ];
+*/
 
 final List<SkActivity> kSkCommunicationActivities = [
   ..._sayItOutLoud,
