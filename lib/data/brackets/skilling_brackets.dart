@@ -279,6 +279,51 @@ final List<Bracket> kSkillingBrackets = [
             'enjoy being wrong.',
         hi: 'पहेलियाँ, तर्क, "क्यों" की कड़ियाँ, और इतनी हल्की बहस कि ग़लत '
             'होना भी अच्छा लगे।'),
+    // ⚠️ LIVE SINCE 2026-09-17, to `ParentVeda_Thinking_structure.pdf`.
+    // Six cells live. The rubric tracker is refused ("it scores a child,
+    // and scoring a child's thinking is the surest way to stop her enjoying
+    // being wrong") into the shared no-score keepsake; extras are reshaped
+    // — challenges become optional fun (a lesson set), the certificate
+    // becomes the "you kept thinking" keepsake, the progress report is
+    // dropped. Consult stays held: "a reasoning or debate coach, rarely".
+    layers: {
+      BracketLayer.content: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: "Puzzles, reasoning & 'why' chains, light debate",
+        surfaceIds: ['sk_lessons/skilling_critical_thinking'],
+      ),
+      BracketLayer.activities: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Practice set',
+        surfaceIds: ['sk_activities/skilling_critical_thinking'],
+      ),
+      BracketLayer.tools: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Rubric tracker',
+        surfaceIds: ['sk_keepsake/skilling_critical_thinking'],
+      ),
+      BracketLayer.products: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Optional',
+        surfaceIds: ['sk_products/skilling_critical_thinking'],
+      ),
+      BracketLayer.course: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Leveled program (paid)',
+        surfaceIds: ['sk_courses/skilling_critical_thinking'],
+      ),
+      BracketLayer.consult:
+          const BracketLayerSpec(state: LayerState.notReady, reason: 'Rare'),
+      BracketLayer.extras: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Challenges, certificates, progress report',
+        surfaceIds: [
+          'sk_lessons/skilling_critical_thinking',
+          'sk_keepsake/skilling_critical_thinking',
+        ],
+      ),
+    },
+    /* kept for revert — the row as declared before the door
     layers: _skillLayers(
       content: "Puzzles, reasoning & 'why' chains, light debate",
       activities: 'Practice set',
@@ -288,6 +333,7 @@ final List<Bracket> kSkillingBrackets = [
       consult: 'Rare',
       extras: 'Challenges, certificates, progress report',
     ),
+    */
   ),
 
   // The stage's highest-volume bracket by a distance — good habits ~14,800 and

@@ -197,7 +197,15 @@ class SkDoorContent {
     this.voiceEmptyLine = 'Tell a story, describe something, or say what you '
         'think. Tap Record something and it lands here.',
     this.coach,
+    this.keepsakeTitle = "What I've made and tried",
   });
+
+  /// The practice keepsake's title, in the door's own words. Coding's "What
+  /// I've made and tried" by default; Thinking's brief reshapes the
+  /// workbook's certificate into a "you kept thinking" keepsake, which is
+  /// this same screen under that name — one keepsake, one store, a
+  /// per-door title (added 2026-09-17).
+  final String keepsakeTitle;
 
   /// The keepsake screen's title, in the door's own words — Communication's
   /// "Your voice, saved", Confidence's "Your talks, saved".

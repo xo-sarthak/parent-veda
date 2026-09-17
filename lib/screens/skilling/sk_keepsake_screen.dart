@@ -21,6 +21,7 @@ import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
 import 'sk_child_store.dart';
 import 'sk_content.dart';
+import 'sk_content_registry.dart';
 import 'sk_practice_store.dart';
 
 class SkKeepsakeScreen extends StatelessWidget {
@@ -59,7 +60,7 @@ class SkKeepsakeScreen extends StatelessWidget {
                       letterSpacing: 1.2,
                       color: p.action)),
             const SizedBox(height: 8),
-            Text("What I've made and tried",
+            Text(skDoorContentFor(doorId)?.keepsakeTitle ?? "What I've made and tried",
                 style: pvFraunces(
                     fontSize: kSkTitleSize,
                     fontWeight: FontWeight.w600,

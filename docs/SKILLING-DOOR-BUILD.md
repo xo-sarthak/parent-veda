@@ -86,6 +86,15 @@ not cover. Use it only when a brief does.
   (`lib/widgets/breathing_circle.dart`) with `kSkSteadyBreath` (in 3, out
   5). For "steady your nerves"; never a second circle.
 
+**One more, added by Thinking (2026-09-17):**
+
+* **The keepsake's title** — `SkDoorContent.keepsakeTitle`, default "What
+  I've made and tried". For a brief that reshapes an extra (a certificate)
+  into the keepsake under its own name: Thinking's "You kept thinking".
+  One keepsake, one store, one screen; only the title is the door's. A
+  brief that wants a *second* keepsake is refused by the shell, not
+  accommodated by it.
+
 ### The two voices
 
 Every skilling screen is one of two things, and the file says which:
@@ -205,7 +214,11 @@ From the Coding v2 brief and the user's calls of 2026-09-14:
 9. `flutter analyze` clean of new issues; the full suite green.
 10. Append a numbered section to `docs/STILL-OPEN.md` (door-specific only),
     a checklist to `docs/SKILLING-DOORS-REVIEW.md`, and the row in its
-    status table. Generic points come here, §9.
+    status table. Generic points come here, §9. **The brief's OUTPUT
+    section asks for a hand-back** — files changed, every layer left
+    notReady, reused vs newly created, anything named but not found — and
+    it goes at the top of the door's review-file section as a "Hand-back"
+    block, in that order (the user's ask, 2026-09-17), not only in chat.
 11. Give the `git add` list and a commit message in a file. Walk the door on
     the phone when given access; small follow-up commits for what it finds.
 

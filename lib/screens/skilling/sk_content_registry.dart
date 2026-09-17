@@ -20,6 +20,10 @@ import '../../data/skilling/skilling_confidence_activities.dart';
 import '../../data/skilling/skilling_confidence_content.dart';
 import '../../data/skilling/skilling_confidence_course.dart';
 import '../../data/skilling/skilling_confidence_products.dart';
+import '../../data/skilling/skilling_thinking_activities.dart';
+import '../../data/skilling/skilling_thinking_content.dart';
+import '../../data/skilling/skilling_thinking_course.dart';
+import '../../data/skilling/skilling_thinking_products.dart';
 import 'sk_door_content.dart';
 
 final SkDoorContent kSkCodingContent = SkDoorContent(
@@ -71,12 +75,28 @@ final SkDoorContent kSkConfidenceContent = SkDoorContent(
   coach: kSkConfidenceCoach,
 );
 
+final SkDoorContent kSkThinkingContent = SkDoorContent(
+  doorId: 'skilling_critical_thinking',
+  bandNames: kSkThinkingBandNames,
+  skills: kSkThinkingSkills,
+  lessonSets: kSkThinkingLessonSets,
+  lessons: kSkThinkingLessons,
+  activities: kSkThinkingActivities,
+  courses: kSkThinkingCourses,
+  products: kSkThinkingProducts,
+  parentNote: kSkThinkingParentNote,
+  // The brief's extras reshape: the certificate becomes a "you kept
+  // thinking" keepsake — the shared one, under this name.
+  keepsakeTitle: 'You kept thinking',
+);
+
 /// Every door with content. Adding a door is a line here and a line in
 /// `kSkDoors`.
 final List<SkDoorContent> kSkDoorContents = [
   kSkCodingContent,
   kSkCommunicationContent,
   kSkConfidenceContent,
+  kSkThinkingContent,
 ];
 
 SkDoorContent? skDoorContentFor(String doorId) {

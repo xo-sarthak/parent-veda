@@ -22,7 +22,7 @@ buy are stub sheets; the door stays behind `kDebugMode`; the preview ships.
 | Tile | Brief | Shape | Tasks (fills) | Commit | Walked on a phone | Contract |
 |---|---|---|---|---|---|---|
 | Coding | `ParentVeda_Coding_structure_v2.pdf` | door, 5 tabs + the shell | **3 of 3 filled** (36 activities) | 5f963a7 (door), 87dcd62 (fills + walk) | **yes** — 2026-09-14, at 8, 5 and 12 | `sk_coding_door_test` |
-| Communication | `ParentVeda_Communication_structure.pdf` | door, 5 tabs (three band cards) | **3 of 3 filled** (6–8, 8–11 from the author's PDFs; **11–14 written by Claude Code**, with the other PDFs) | a86c5bf (frame), 0fa1193 (fills), e67da1b (walk), 11–14 fill commit next | **yes** — 2026-09-16, at 12 and 8, recorder end to end (11–14 fill not yet) | `sk_communication_door_test` |
+| Communication | `ParentVeda_Communication_structure.pdf` | door, 5 tabs (three band cards) | **3 of 3 filled** (6–8, 8–11 from the author's PDFs; **11–14 written by Claude Code**, with the other PDFs) | a86c5bf (frame), 0fa1193 (fills), e67da1b (walk), e34b39f (11–14) | **yes** — 2026-09-16, at 12 and 8, recorder end to end (11–14 fill not yet) | `sk_communication_door_test` |
 | Confidence | `ParentVeda_Confidence_structure.pdf` | door, **6 cards** (three band cards + recorder + keepsake) | **3 of 3 filled** (36 activities) | 5eb85a4 (frame), 153b3a4 (walk), 6a78176 (fills + walk) | **yes** — 2026-09-17, at 8, frame and fills | `sk_confidence_door_test` |
 | Creativity | `ParentVeda_Creativity_structure.pdf` | plan sheet | none yet | — | — | — |
 | Feelings | `ParentVeda_Feelings_structure.pdf` | plan sheet | none yet | — | — | — |
@@ -31,7 +31,7 @@ buy are stub sheets; the door stays behind `kDebugMode`; the preview ships.
 | Memory | `ParentVeda_Memory_structure.pdf` | plan sheet | none yet | — | — | — |
 | Reading | `ParentVeda_Reading_structure.pdf` | plan sheet | none yet | — | — | — |
 | Stillness | `ParentVeda_Stillness_structure.pdf` | plan sheet | none yet | — | — | — |
-| Thinking | `ParentVeda_Thinking_structure.pdf` | plan sheet | none yet | — | — | — |
+| Thinking | `ParentVeda_Thinking_structure.pdf` | door, 5 tabs (three band cards + Lessons + the keepsake as "You kept thinking") | none yet (no task PDFs) | commit next | no | `sk_thinking_door_test` |
 | Values | `ParentVeda_Values_structure.pdf` | plan sheet | none yet | — | — | — |
 
 Across all of them: `test/sk_doors_sanity_test.dart` holds that every
@@ -42,6 +42,27 @@ router, no scoring vocabulary is in the skilling tree, the keepsake has no
 numeric member, and no shelf string promises a future.
 
 ## Coding (§55)
+
+**Hand-back, as the brief's OUTPUT asks (2026-09-14; fills 2026-09-15):**
+
+- *Files changed:* the whole skilling shell (`lib/screens/skilling/*`,
+  `lib/screens/skilling/doors/*`), `lib/data/doors/sk_door_data.dart` +
+  `sk_door_coding.dart`, `lib/data/skilling/skilling_coding_*.dart`,
+  `lib/data/brackets/skilling_brackets.dart` (Coding row live),
+  `lib/widgets/global_ask_fab.dart` (hidden on `sk_` routes),
+  `test/sk_coding_door_test.dart`, `test/sk_doors_sanity_test.dart`.
+- *Layers left notReady as content:* lessons (12 + AI 6), courses (6),
+  products (9), parent note — placeholders, ledger S1–S9. The 36
+  activities were placeholders at the frame and are now filled from the
+  three task PDFs.
+- *Reused vs new:* new — the shell itself (this was the first door):
+  gate, child record, learning surface, band scope, no-score keepsake,
+  course and product shelves, router. Reused — `bracket_resolver`, the
+  bracket model, `v3_skill_art`, the preview tile. The product shelf is
+  skilling's own, not `pp_products` (your question 6).
+- *Named but not found:* nothing named was missing; the consent-
+  verification provider is an interface + stub flagged for legal review,
+  as asked.
 
 Built to the brief literally, on the user's call ("follow the brief
 completely, I want to see how the brief does; then give your suggestions").
@@ -118,6 +139,29 @@ The suggestions are the last three lines.
       activity.
 
 ## Communication (§56)
+
+**Hand-back, as the brief's OUTPUT asks (2026-09-15; fills 2026-09-15 and
+2026-09-17):**
+
+- *Files changed:* `lib/data/doors/sk_door_communication.dart`,
+  `lib/data/skilling/skilling_communication_*.dart`,
+  `lib/screens/skilling/sk_voice_keepsake.dart` (new),
+  `sk_door_content.dart` (`boundaryNote`, `voiceKeepsake`, `voiceTitle`,
+  `voiceBlurb`, `voiceEmptyLine`), `sk_door_screen.dart` (band-pinned
+  tabs), `skilling_brackets.dart` (row live),
+  `test/sk_communication_door_test.dart`.
+- *Layers left notReady as content:* lessons (27), courses (12),
+  products (12), parent note, boundary note — placeholders, ledger
+  SC4–SC8. The 36 activities are filled (two bands from the author's
+  PDFs; 11–14 written by Claude Code, filed with the PDFs, owed a review).
+- *Reused vs new:* new — the voice keepsake (skilling's own recorder, the
+  `record`/`audioplayers` mechanism, on-device, no upload: your call 1a);
+  band-pinned tabs; the boundary note slot. Reused — the whole Coding
+  shell, the shared no-score keepsake.
+- *Named but not found:* the brief names the pregnancy Garbh Sanskar
+  recorder as the one to reuse; skilling got its own copy on your call
+  (no cloud bucket for a child's voice). Reading, Feelings, Confidence
+  cross-links — logged in the cross-door table.
 
 Built to the brief literally on your calls of 2026-09-15 (1a 2A 3a 4a 5a).
 Frame only; the two task PDFs (6–8, 8–11) fill it next.
@@ -207,6 +251,29 @@ Frame only; the two task PDFs (6–8, 8–11) fill it next.
       different age (12).
 
 ## Confidence (§100)
+
+**Hand-back, as the brief's OUTPUT asks (2026-09-16; fills 2026-09-17):**
+
+- *Files changed:* `lib/data/doors/sk_door_confidence.dart`,
+  `lib/data/skilling/skilling_confidence_*.dart`, `sk_door_content.dart`
+  (`coach`, `voiceSelfReview`), `sk_content.dart` (`SkBreath` block,
+  `breathPageId`), `sk_activity_screen.dart` (the breath row),
+  `sk_grown_up_screen.dart` (the coach row), `sk_surface_router.dart`
+  (`sk_record/<door>`), `skilling_brackets.dart` (row live, the first
+  live Consult), `test/sk_confidence_door_test.dart`.
+- *Layers left notReady as content:* lessons (18), courses (6), products
+  (9), parent note, boundary note, the coach — placeholders, ledger
+  SF4–SF8, SF10. The 36 activities are filled from the three task PDFs.
+- *Reused vs new:* new — the coach row (placeholder; booking engine is
+  the named next pass), the self-review prompt, `sk_record`, the
+  `SkBreath` block and `breathPageId`. Reused — the app's ONE breathing
+  circle (`lib/widgets/breathing_circle.dart`), the voice keepsake built
+  for Communication, the shared no-score keepsake.
+- *Named but not found:* the tasks' "pregnancy recorder" (skilling's own
+  is used, per the earlier call); the Thinking door's "question ideas,
+  not elders" line (Thinking built since; its parent note); "the door's
+  help line" for a child (no skilling door has one — generic point, build
+  doc §9); Stillness and Feelings cross-links — logged.
 
 Built to the brief literally on your calls of 2026-09-16 (1a 2a 3b 4a).
 The three activity bands filled verbatim from Tasks 4, 5 and 6 of 36 on
@@ -300,6 +367,82 @@ match. The fill's own list follows the frame's.
       the preview's note still said "Coding opens its door"; it now counts
       from `kSkDoors` ("Three of the twelve…").
 
+## Thinking (§101)
+
+**Hand-back, as the brief's OUTPUT asks (2026-09-17):**
+
+- *Files changed:* `lib/data/doors/sk_door_thinking.dart` (new),
+  `lib/data/skilling/skilling_thinking_{activities,content,course,
+  products}.dart` (new), `lib/data/doors/sk_door_data.dart` (listed),
+  `lib/screens/skilling/sk_content_registry.dart` (registered),
+  `sk_door_content.dart` (`keepsakeTitle`), `sk_keepsake_screen.dart`
+  (uses it), `lib/data/brackets/skilling_brackets.dart` (row live: six
+  cells, Consult held), `test/sk_thinking_door_test.dart` (new).
+- *Every layer left notReady as content:* activities (36), lessons (33:
+  puzzles, why-chains, Is this true?, Just for fun), courses (4),
+  products (9), parent note — placeholders, ledger ST1–ST8. No puzzle,
+  activity, class or product copy written.
+- *Reused vs new:* reused — the gate, the learning surface, the band
+  scope, the shared no-score keepsake (as "You kept thinking"), the
+  shelves, the router. New — one shell slot, `keepsakeTitle`, so the one
+  keepsake can wear a door's name; nothing else.
+- *The fake-spotting cross-link to Coding:* Coding's AI-literacy pages
+  (`cd_ai_*`) exist as slots but are coming soon, so — as the prompt says
+  for that case — this door leaves a cross-link slot (the "Is this true?"
+  set's blurb names the Coding door), lists it (ST4, ST10, the cross-door
+  table), and re-authors nothing; a test scans the file for AI-mechanism
+  vocabulary.
+- *Named but not found / not used:* `pp_products` — not used on purpose,
+  skilling's own shelf holds (your Coding call, question 6). The no-score
+  keepsake and AI literacy were both found. Maths does not exist; the
+  puzzles set's blurb draws the line ("a number puzzle lives in Maths").
+
+Built to the brief literally on your calls of 2026-09-17 (1a careful
+framing · 2a spotting-fake as a headline strand · 3a a "Just for fun"
+set). Frame only; no task PDFs exist for this door yet.
+
+- [ ] **Look:** Skilling → Thinking → the selector: five cards. Ask lots
+      of whys · Work out how it works · Think for yourself · Lessons · You
+      kept thinking. The tab footers are the brief's band lines, word for
+      word.
+- [ ] **Look:** Lessons → four rails: Puzzles · Why-chains · Is this
+      true? · Just for fun. The third is the spotting-fake strand, a
+      headline set on your call (2a); its blurb names the Coding door as
+      where "how the machine makes things up" lives. Say if the set's name
+      should be the brief's "spotting fake" rather than the child's "Is
+      this true?".
+- [ ] **Look:** You kept thinking → the shared keepsake (same store, same
+      screen) titled in this door's words. This is the brief's extras
+      reshape: the certificate becomes a "you kept thinking" keepsake; the
+      progress report is dropped; the rubric tracker is refused into it.
+      One slot was added for it (`SkDoorContent.keepsakeTitle`).
+- [ ] **Look:** For the grown-up → the parent note card carries the
+      brief's own title, "How to raise a questioner without raising an
+      arguer", coming soon. Under it the four classes (₹2499 / $30
+      placeholders): reasoning per level, light debate for 11–14 only,
+      because the brief puts debate in Think for yourself.
+- [ ] **The careful framing (1a) is held in the frame's own words**: every
+      footer and blurb says what she checks — a claim, a forward, an
+      argument — and never who she argues with. A test scans the door's
+      copy for "argue with", "defy", "question your parents/teacher/elders".
+      The fills, when they come, are held to the same line.
+- [ ] **The one defence, built once**: Thinking owns the reasoning ("is
+      this true, who says so, how would I know"); Coding's AI literacy
+      owns the mechanism. Coding's AI pages are themselves coming soon, so
+      this door leaves the cross-link slot the brief's prompt asks for and
+      lists it (ledger ST4, ST10). The page that links across is authored
+      when both halves exist. Nothing AI-literacy was re-authored here (a
+      test scans for it).
+- [ ] The product shelf is skilling's own, as on every door, not
+      `pp_products` (the brief's prompt names `pp_products`; your standing
+      call from Coding question 6 holds until the engines unify).
+- [ ] Consult held: "a reasoning or debate coach, rarely". No row.
+- [ ] The hero photo — a child at a desk, head down, working something out
+      on paper (`photo-1529390079861`). Keep?
+- [ ] The tile says "Thinking"; the brief's door is "Critical thinking &
+      first principles". Fine.
+- [ ] Not walked on a phone yet.
+
 ## Cross-door windows
 
 `sk_page/<door>/<page>` as a `toolSurfaceId` on a page with no blocks —
@@ -310,7 +453,7 @@ Communication split the Communication brief names.
 | From | Into | Page | Status |
 |---|---|---|---|
 | Coding · `cd_811_12` Stuck? Try, Save, Try | Stillness | the settle-breath ("point to it, do not rebuild it") | owed — Stillness not built; the builder note was dropped from the parent line |
-| Coding · `cd_1114_06` Why AI Gets It Wrong | Thinking | the "is this true" reasoning side | owed — Thinking not built; the parent line names it in prose |
+| Coding · `cd_1114_06` Why AI Gets It Wrong | Thinking | the "is this true" reasoning side | Thinking built 2026-09-17; its "Is this true?" set is the other half. The linking page waits on Coding's AI pages (coming soon) and Thinking's strand fill — the one defence, authored once when both exist |
 | Coding · `cd_1114_12` Share It and Make It Better | Making (Creativity) | the private, family-only showcase posture | owed — no sharing feature exists on either door; sharing here is offline, to a family member |
 | Communication | Confidence | the shared speaking practice — Confidence owns the nerve and the audience, Expression the clarity and the back-and-forth; the recorder is built once (`sk_voice_keepsake.dart`) | owed — Confidence not built; it windows into Communication's prompt sets when it lands |
 | Communication | Reading | "a child reads a story there and retells it here" | owed — Reading not built |
@@ -318,4 +461,8 @@ Communication split the Communication brief names.
 | Confidence | Communication | the shared speaking practice — Confidence dares to say it, Communication says it clearly; one recorder (`sk_voice_keepsake.dart`), used by both | built as the shared recorder; the prompt-set window waits on Communication's lesson fill |
 | Confidence · `cf_breath` | Stillness | the quick calming breath — "Confidence references that breath for the moment before you speak, it does not build its own" | built as the app's one circle in an `SkBreath` block; the Stillness page it should link to does not exist yet |
 | Confidence | Feelings | "naming and handling the fear is Feelings" | owed — Feelings not built |
-| Confidence · `cf_1114_01` | Thinking | Speak Up to a Grown-Up "cross-links to the Thinking door's 'question ideas, not elders' line; keep the tone consistent across both" | owed — Thinking not built; when it is, the line's page id goes here |
+| Confidence · `cf_1114_01` | Thinking | Speak Up to a Grown-Up "cross-links to the Thinking door's 'question ideas, not elders' line; keep the tone consistent across both" | Thinking built 2026-09-17 on the careful framing (1a); the line lives in its parent note `th_parent_note` (coming soon) — the page id goes here when that note is written |
+| Thinking · `is_it_true` set | Coding · `ai` set | "Thinking owns the reasoning (is this true, who says so, how would I know); Coding's AI literacy owns the mechanism (how AI generates content, why it errs and is biased); the two cross-link into one defence built once" | the cross-link slot: the set's blurb names the Coding door; both halves coming soon; the linking page is authored once when they exist |
+| Thinking · `puzzles` set | Maths | "A logic puzzle is Thinking, a number puzzle is Maths" | owed — Maths not built; the set's blurb says which is which |
+| Thinking · `th_course_1114_debate` and `fun` set | Communication | "Communication owns saying your point clearly and persuasively, Thinking owns the reasoning behind it and steelmanning the other side" | Communication built; its Hold a Real Back-and-Forth (`cm_1114_12`) hands the reasoning to this door in its parent line; the window is a page when the debate fill exists |
+| Thinking · breaking it down | Coding | "Both break a problem down, Coding as computational thinking to build something, Thinking as first principles to understand something" | owed — the move's fill names Coding's Break It Down activities when written |

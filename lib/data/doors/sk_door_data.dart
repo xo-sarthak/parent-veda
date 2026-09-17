@@ -35,10 +35,12 @@ import 'package:flutter/material.dart' show IconData;
 import 'sk_door_coding.dart';
 import 'sk_door_communication.dart';
 import 'sk_door_confidence.dart';
+import 'sk_door_thinking.dart';
 
 export 'sk_door_coding.dart';
 export 'sk_door_communication.dart';
 export 'sk_door_confidence.dart';
+export 'sk_door_thinking.dart';
 
 /// Which of the brief's child surfaces a tab draws.
 enum SkTabKind {
@@ -193,6 +195,7 @@ final List<SkDoor> kSkDoors = [
   kSkCodingDoor,
   kSkCommunicationDoor,
   kSkConfidenceDoor,
+  kSkThinkingDoor,
 ];
 
 SkDoor? skDoorFor(String doorId) {
