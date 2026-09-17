@@ -129,7 +129,11 @@ extension PvDoorFormatCopy on PvDoorFormat {
   String get label => switch (this) {
         PvDoorFormat.tool => 'Tool',
         PvDoorFormat.article => 'Article',
-        PvDoorFormat.guide => 'Guide',
+        // 'Article' too — a Guide tile opens the reader at a heading, which
+        // is an article by another name. One word for written pieces
+        // (STILL-OPEN §60.2; the user, 2026-09-18: one format per tag).
+        // Kept for revert: 'Guide'.
+        PvDoorFormat.guide => 'Article',
         // ⚠️ 'Article', NOT 'Read' — STILL-OPEN §60.2, applied 2026-09-17. The
         // enum value stays (it is persisted in door data); only the word on
         // the chip changes. Nobody in the Mobbin set distinguishes look-up
@@ -137,7 +141,9 @@ extension PvDoorFormatCopy on PvDoorFormat {
         // the piece (glossary or FAQ first, contents visible). Kept for
         // revert: 'Read'.
         PvDoorFormat.read => 'Article',
-        PvDoorFormat.mythFact => 'Myth vs fact',
+        // 'Article' — the myth-vs-fact block lives INSIDE the piece it opens.
+        // Kept for revert: 'Myth vs fact'.
+        PvDoorFormat.mythFact => 'Article',
         PvDoorFormat.checklist => 'Checklist',
         PvDoorFormat.talk => 'Talk',
         PvDoorFormat.recipe => 'Recipe',

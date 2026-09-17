@@ -95,6 +95,39 @@ Widget ppPageScreen(
 
   final format = page.format?.toUpperCase();
   final months = ChildProfileStore.instance.ageInMonths;
+
+  // ⚠️ CARDS IS A STORY — see `ppCardsAsSlides`. One format per tag.
+  if (format == 'CARDS') {
+    final slides = ppCardsAsSlides(page);
+    if (slides != null) {
+      PpIntro? intro;
+      for (final b in page.blocks) {
+        if (b is PpIntro) {
+          intro = b;
+          break;
+        }
+      }
+      double hue = 268;
+      for (final b in page.blocks) {
+        if (b is PpCards) {
+          hue = b.hue;
+          break;
+        }
+      }
+      return (
+        PpStoryScreen(
+          title: page.title,
+          cards: slides,
+          hue: hue,
+          coverTitle: page.title,
+          coverBlurb: page.subtitle ?? intro?.text,
+          onPage: openById,
+        ),
+        'story',
+      );
+    }
+  }
+
   for (final b in page.blocks) {
     if (b is PpCarousel && format == 'CAROUSEL') {
       final cards = b.cardsFor(months);

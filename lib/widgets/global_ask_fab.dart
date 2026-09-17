@@ -145,7 +145,15 @@ class FabRouteObserver extends NavigatorObserver {
             name == 'store/cart' ||
             name == 'store/checkout' ||
             name == 'store/placed' ||
-            name == 'store/gallery');
+            name == 'store/gallery' ||
+            // A story deck is immersive — one idea per slide, the slide's
+            // last line at the foot. The button sat over that line on the
+            // temperament deck (2026-09-18). Parenting pushes stories as
+            // 'pp/<section>/story/<page>' (and interactives as '…/interactive/…');
+            // TTC as 'ttc/story'.
+            name == 'ttc/story' ||
+            name.contains('/story/') ||
+            name.contains('/interactive/'));
     FabState.instance
         ._update(inParenting: inParenting, inTtc: inTtc, suppressed: suppressed);
   }

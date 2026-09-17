@@ -283,31 +283,15 @@ class _ShareBar extends StatelessWidget {
             ),
           ],
         ),
-        child: GestureDetector(
-          onTap: onTap,
-          behavior: HitTestBehavior.opaque,
-          child: Container(
-            height: 50,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: p.action,
-              borderRadius: BorderRadius.circular(999),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.ios_share_rounded, size: 17, color: p.onAction),
-                const SizedBox(width: 9),
-                Text(
-                    count == 1
-                        ? 'Share 1 question'
-                        : 'Share $count questions',
-                    style: pvManrope(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        color: p.onAction)),
-              ],
-            ),
+        // The theme's ink pill (DESIGN-SYSTEM §4.0), 2026-09-18 — was a
+        // violet-filled pill drawn by hand. Kept for revert in git.
+        child: SizedBox(
+          width: double.infinity,
+          height: 50,
+          child: FilledButton.icon(
+            onPressed: onTap,
+            icon: const Icon(Icons.ios_share_rounded, size: 17),
+            label: Text(count == 1 ? 'Share 1 question' : 'Share $count questions'),
           ),
         ),
       );

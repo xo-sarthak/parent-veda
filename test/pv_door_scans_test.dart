@@ -554,14 +554,21 @@ void main() {
       // "Article" — the look-up / read-through difference lives inside the
       // piece, not on the chip, which is where every reader in the Mobbin
       // set puts it. Every other pair still promises something different.
+      const written = {
+        PvDoorFormat.read,
+        PvDoorFormat.guide,
+        PvDoorFormat.mythFact,
+      };
       final labels = PvDoorFormat.values
-          .where((f) => f != PvDoorFormat.read)
+          .where((f) => !written.contains(f))
           .map((f) => f.label)
           .toList();
       expect(labels.toSet().length, labels.length,
           reason: 'Two chips reading the same word promise the same thing and '
               'do different things.');
-      expect(PvDoorFormat.read.label, PvDoorFormat.article.label);
+      for (final f in written) {
+        expect(f.label, PvDoorFormat.article.label, reason: '$f');
+      }
     });
   });
 }

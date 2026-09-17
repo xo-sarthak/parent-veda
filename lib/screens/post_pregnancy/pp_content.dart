@@ -622,6 +622,67 @@ List<PpCarouselCard> ppInteractiveAsSlides(PpInteractive b) => [
           PpCarouselCard(c),
     ];
 
+/// ⚠️ A CARDS PAGE IS A STORY — 2026-09-18. The user asked for one format
+/// per tag: "for tags like interactive, carousel we have the Instagram story
+/// type… we don't have it for cards." A CARDS page is a set of titled ideas
+/// ("three rough styles", five cards each), which is exactly the object the
+/// reader audit named the story card — one idea per card, swipe, the last
+/// card is a verb (Blinkist Shorts, Deepstash, Flo's daily insights). So
+/// CARDS opens the same `PpStoryScreen` as CAROUSEL and INTERACTIVE:
+///
+///   · the cover is the page title and its subtitle or intro;
+///   · every `PpCard` is a slide; a callout is a slide under its own title;
+///     the doctor line is a slide called "When to see a doctor";
+///   · a page link becomes the linked closing slide ("Swipe up for …");
+///   · an India note rides as a slide too.
+///
+/// Returns null when the page carries a block the deck cannot hold — a
+/// table, a chart, an illustration, a film — and the page then opens in the
+/// reader with its cards listed, rather than losing anything.
+List<PpCarouselCard>? ppCardsAsSlides(PpPage page) {
+  final slides = <PpCarouselCard>[];
+  PpCarouselCard? closing;
+  for (final b in page.blocks) {
+    switch (b) {
+      case PpIntro():
+        break; // the cover has it
+      case PpCards(:final cards):
+        for (final c in cards) {
+          slides.add(PpCarouselCard(c.title, c.line));
+        }
+      case PpCallout(:final title, :final text, :final kind):
+        slides.add(PpCarouselCard(
+            title ??
+                switch (kind) {
+                  PpCalloutKind.key => 'Worth remembering',
+                  PpCalloutKind.doctor => 'Worth raising with a doctor',
+                  PpCalloutKind.myth => 'A common belief, checked',
+                  PpCalloutKind.safety => 'For safety',
+                },
+            text));
+      case PpWhenLine(:final text):
+        slides.add(PpCarouselCard('When to see a doctor', text));
+      case PpIndiaNote(:final text):
+        slides.add(PpCarouselCard('In India', text));
+      case PpCarousel():
+        // A carousel on a CARDS page is already slides.
+        slides.addAll(b.cards);
+      case PpArticle(:final heading, :final paragraphs):
+        slides.add(PpCarouselCard(heading ?? page.title, paragraphs.join('\n\n')));
+      case PpLink(:final label, :final blurb, :final pageId):
+        if (pageId != null && closing == null) {
+          closing = PpCarouselCard.linked(label, blurb ?? 'Swipe up for the page',
+              pageId: pageId);
+        }
+      default:
+        return null; // a table, a chart, a film — the deck cannot hold it
+    }
+  }
+  if (slides.isEmpty) return null;
+  if (closing != null) slides.add(closing);
+  return slides;
+}
+
 class PpInteractiveItem {
   const PpInteractiveItem(this.title, [this.detail, this.group]);
   final String title;
@@ -1207,11 +1268,19 @@ class PpBlockView extends StatelessWidget {
     // says "you are here" on the row that holds her age. See
     // `PpChartCard.rowMonths`.
     final hers = b.herRow(ChildProfileStore.instance.ageInMonths);
+    // ⚠️ A WHITE DATA CARD, LIKE THE TABLE — 2026-09-18. The chart card was a
+    // filled tint with a white pane for her row; the table was white with a
+    // tinted row. Two treatments for one kind of thing (a few labelled
+    // figures), and the filled one read as a slab on the white page. One
+    // family now, the one the health apps share (Mobbin: Alan, Withings,
+    // Peloton): white, hairline, tabular figures, and colour only on the row
+    // that is hers (DESIGN-SYSTEM §4.0). Kept for revert: color: tint.
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 16, 16, 16),
       decoration: BoxDecoration(
-        color: tint,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: p.line),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(b.title, style: pvFraunces(fontSize: 18, fontWeight: FontWeight.w600, height: 1.22, color: p.ink1)),
@@ -1230,7 +1299,7 @@ class PpBlockView extends StatelessWidget {
                 : EdgeInsets.zero,
             decoration: i == hers
                 ? BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.75),
+                    color: tint,
                     borderRadius: BorderRadius.circular(12),
                   )
                 : null,
