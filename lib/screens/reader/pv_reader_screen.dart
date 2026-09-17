@@ -48,6 +48,7 @@ import 'package:flutter/material.dart';
 
 import '../../widgets/global_ask_fab.dart';
 
+import '../../data/reads/read_images.dart';
 import '../../localization/app_language.dart';
 import '../../models/pv_read.dart';
 import '../../models/pv_video_slot.dart';
@@ -87,6 +88,7 @@ class PvReaderScreen extends StatefulWidget {
     this.openAtHeading,
     this.resolveRead,
     this.customBlock,
+    this.onReadToEnd,
   });
 
   final PvRead read;
@@ -156,6 +158,16 @@ class PvReaderScreen extends StatefulWidget {
   /// draws nothing for it, which the parenting adapter's test guards.
   final Widget Function(BuildContext context, Object block)? customBlock;
 
+  /// Fired once, the first time she scrolls past nine-tenths of the piece.
+  ///
+  /// ⚠️ DERIVED, NEVER ASKED — 2026-09-18. Two of the retired readers ended
+  /// with a filled "Mark as read" / "Mark as done" button; the user on the
+  /// phone: "makes no sense to be there… doesn't change anything… again a
+  /// clutter." The one thing those buttons did that mattered — ticking the
+  /// home's daily-reads box — now happens because she read it, which is the
+  /// only honest signal anyway. The stage that keeps the record passes this.
+  final VoidCallback? onReadToEnd;
+
   @override
   State<PvReaderScreen> createState() => _PvReaderScreenState();
 }
@@ -177,6 +189,7 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
 
   bool _tocOpen = false;
   double _progress = 0;
+  bool _reachedEnd = false;
 
   /// "▸ References" — collapsed by default (READER-AUDIT §3.2 rule 2). Session
   /// scoped like the sections: which disclosures were open is not a
@@ -248,6 +261,10 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
     // the epsilon this is a setState on every scroll frame.
     if ((p - _progress).abs() > 0.004) setState(() => _progress = p);
     _store.setProgress(a.id, p);
+    if (!_reachedEnd && p >= 0.9) {
+      _reachedEnd = true;
+      widget.onReadToEnd?.call();
+    }
   }
 
   // ---- the reading surface -------------------------------------------------
@@ -405,7 +422,22 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 14),
+                  // The photograph's credit — a CC BY picture is only free
+                  // with its author named, and every publication prints one.
+                  // Tiny, grey, under the frame; absent when there is no
+                  // photograph or the picture carries no licence to honour.
+                  if (_photoCredit case final credit?) ...[
+                    const SizedBox(height: 6),
+                    _pad(Text('Photo · $credit',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: pvManrope(
+                            fontSize: 9.5,
+                            letterSpacing: 0.2,
+                            color: s.soft.withValues(alpha: 0.8)))),
+                    const SizedBox(height: 8),
+                  ] else
+                    const SizedBox(height: 14),
 
                   // ---- THE MASTHEAD ----------------------------------------
                   //
@@ -476,8 +508,12 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                   // bottom, and the reassurance is read by nobody, because
                   // frightened people do not scroll. "How worried should I be"
                   // is the question she arrived with. Answer it, then explain.
-                  _pad(_lede(s)),
-                  const SizedBox(height: 28),
+                  // A piece with no scale-setter — a chart page that opens on
+                  // its chart — draws no empty rule (2026-09-18).
+                  if (a.scaleSetter.of(_lang).trim().isNotEmpty) ...[
+                    _pad(_lede(s)),
+                    const SizedBox(height: 28),
+                  ],
 
                   if (a.heroVideoSlot != null) ...[
                     _pad(_video(s, a.heroVideoSlot!)),
@@ -586,6 +622,14 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
   /// with the mark cropped by the edge, the same device as the tiles at the
   /// foot. A photo that fails to load falls back to the band, so the frame
   /// never renders empty.
+  /// The credit to print under the frame, or null when the frame holds the
+  /// caller's own hero, no photograph, or a picture without a licence line.
+  String? get _photoCredit {
+    if (widget.hero != null) return null;
+    if (readImageFor(a.id, own: a.imageUrl) == null) return null;
+    return kReadImageCredits[a.id];
+  }
+
   Widget _defaultHero(_Skin s) {
     final p = V2PaletteStore.instance.current;
     final band = ColoredBox(
@@ -599,7 +643,8 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
         ),
       ]),
     );
-    final url = a.imageUrl;
+    // The read's own picture, else the table's (read_images.dart).
+    final url = readImageFor(a.id, own: a.imageUrl);
     if (url == null || url.isEmpty) return band;
     return Image.network(
       url,
@@ -1300,7 +1345,7 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
     // the whole read over.
     (LocalizedText, LocalizedText?, String?)? resolve(String id) {
       final r = widget.resolveRead?.call(id);
-      if (r != null) return (r.title, r.teaser, r.imageUrl);
+      if (r != null) return (r.title, r.teaser, readImageFor(r.id, own: r.imageUrl));
       final t = widget.readTitle?.call(id);
       return t == null ? null : (t, null, null);
     }

@@ -676,13 +676,19 @@ class _PpHomeV3State extends State<PpHomeV3> {
   // one, and the age filtering belongs in the destination screens that already
   // do it properly.
 
-  /// The eleven tiles, What to buy first, the rest in registry order.
-  static List<Bracket> _tilesOrder(List<Bracket> all) => [
-        for (final b in all)
-          if (b.id == 'parenting_buying') b,
-        for (final b in all)
-          if (b.id != 'parenting_buying') b,
-      ];
+  /// The eleven tiles, in registry order — Sleep first.
+  ///
+  /// ⚠️ WHAT TO BUY IS NO LONGER HOISTED — 2026-09-18, the user: "the door
+  /// positioning should be like the way it was." The 2026-09-16 brief put it
+  /// first; on the phone it read as the shop leading a parenting home, and
+  /// the products door is being built elsewhere anyway. Kept for revert:
+  // static List<Bracket> _tilesOrder(List<Bracket> all) => [
+  //       for (final b in all)
+  //         if (b.id == 'parenting_buying') b,
+  //       for (final b in all)
+  //         if (b.id != 'parenting_buying') b,
+  //     ];
+  static List<Bracket> _tilesOrder(List<Bracket> all) => all;
 
   // The single day-rotated pick. Superseded by PpHomeActivitiesStore, which
   // owns "three a day, Done stays, Change swaps". Kept for revert.

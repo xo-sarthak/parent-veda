@@ -161,6 +161,59 @@ void main() {
         _checkRead(pvReadFromArticle(a));
       }
     });
+    test('a page chipped as a thing opens on the thing', () {
+      // The chip names the thing, so the thing comes first (2026-09-18):
+      // a CHART page's first section is its chart, a TABLE page's its table,
+      // and no serif lede is lifted above it.
+      final kinds = <String, bool Function(Object)>{
+        'CHART': (b) => b is PpChartCard,
+        'TABLE': (b) => b is PpTable,
+        'COMPARISON TABLE': (b) => b is PpTable,
+        'CARDS': (b) => b is PpCards,
+      };
+      var seen = 0;
+      for (final section in kPpSections) {
+        for (final page in section.allPages) {
+          final kind = kinds[page.format?.toUpperCase()];
+          if (kind == null) continue;
+          if (!page.blocks.any(kind)) continue; // declared, but no such block
+          final r = ppPageAsRead(section, page);
+          seen++;
+          expect(r.sections.first.custom, isNotNull,
+              reason: '${section.id}/${page.id}: opens on prose, not its ${page.format}');
+          expect(kind(r.sections.first.custom!), isTrue,
+              reason: '${section.id}/${page.id}: opens on the wrong block');
+          expect(r.scaleSetter.en, isEmpty,
+              reason: '${section.id}/${page.id}: a lede above the thing');
+        }
+      }
+      expect(seen, greaterThan(10));
+    });
+
+    test('a CARDS page is a story deck, one slide per card', () {
+      // One format per tag (2026-09-18): CARDS joins CAROUSEL and INTERACTIVE
+      // on the story screen. A page the deck cannot hold (a table, a film)
+      // returns null and opens in the reader instead — never silently short.
+      var decks = 0;
+      for (final section in kPpSections) {
+        for (final page in section.allPages) {
+          if (page.format?.toUpperCase() != 'CARDS') continue;
+          final cards = page.blocks.whereType<PpCards>().fold<int>(0, (a, b) => a + b.cards.length);
+          final slides = ppCardsAsSlides(page);
+          if (slides == null) continue;
+          decks++;
+          expect(slides.length, greaterThanOrEqualTo(cards),
+              reason: '${section.id}/${page.id}: a card went missing');
+          for (final sl in slides) {
+            expect(sl.title.trim(), isNotEmpty);
+          }
+        }
+      }
+      // 15 today; the rest carry a film, a consult offer or a chart the deck
+      // cannot hold, or are still empty pages, and open in the reader.
+      expect(decks, greaterThanOrEqualTo(14));
+    });
+
     test('parenting door pages — every page of every section, no block lost', () {
       for (final section in kPpSections) {
         for (final page in section.allPages) {

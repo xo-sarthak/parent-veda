@@ -464,7 +464,7 @@ is the shape he confirmed on *How conception actually works*:
 |---|---|
 | Picture frame | 132 pt, full bleed; the read's `imageUrl`, else the type-tinted band with the article mark. Always present, so every article has the same head. |
 | Masthead | Title 24 Newsreader · teaser 14.5 · byline (REVIEWED BY + verified mark when a clinician stands behind it; BY the editorial desk, no mark, when not) · hairline |
-| Lede | The scale-setter, on a violet left rule — "how worried should I be" answered first |
+| Lede | The scale-setter, on a violet left rule — "how worried should I be" answered first. **Absent on a thing-first page**: a piece chipped Chart / Table / Cards / Illustration / Audio / Steps opens on that block right under the byline, and its intro follows as a paragraph — the chip names the thing, so the thing comes first (2026-09-18, the user on "Her sleep right now": "a chart should be looking like a chart"). |
 | Contents | Only past two headings; collapsed |
 | Body | Sections: heading, paragraphs, bullets, tip, myth/fact, callout, video slot, or a **custom block** the owning stage renders (a parenting table, a chart card, a script, the condition page's film and add-to-journey pill) |
 | When to see someone | Required on the model. Urgent = the one well; note/reassure = inline between hairlines. Short pieces share `kPvShortPieceCallout`. |
@@ -480,6 +480,35 @@ all of it. Mobbin (Alan, Withings, Lovi, Clue): tables inside articles are
 hairline rows, steps are quiet numbered circles, the picture sits above a
 category eyebrow and an author row — which is what the parenting blocks
 already were, so they render inside the reader unchanged.
+
+## 4.0b The tag table — one format per chip — SETTLED 2026-09-18
+
+The user: *"we should be fixing one format… for tags like interactive,
+carousel we have the Instagram story type, but we don't have it for cards,
+table."* Every chip a tile can wear now names exactly one format, and the
+format is the same object wherever the chip appears. From Mobbin: the story
+card (Blinkist Shorts, Deepstash, Flo Daily insights — one idea per card, the
+last card a verb), the data card (Alan, Withings, Peloton — white, hairline
+rows, tabular figures, colour only on the row that is yours), the up-next
+card and dated list (Zocdoc, Superpower, Fable), the step-led page
+(Headspace exercises, Lovevery play, every recipe app).
+
+| Chip | Format | Where it lives |
+|---|---|---|
+| **Article** (also the old Read, Guide, Myth vs fact) | The reader: picture frame, masthead, byline, lede, body, when-to-ask, foot tiles | `PvReaderScreen` via `PvRead` and the adapters |
+| **Story · Carousel · Interactive · Cards** | The story deck: cover, one idea per slide, chevrons, the last slide a verb | `PpStoryScreen`; `ppCardsAsSlides` for CARDS |
+| **Chart · Table · Comparison table** | The data card, opening the page (thing-first): white, hairline rows, tabular figures, her row in the well | `PpChartCard` / `PpTable` via `PpBlockView`, hoisted by `pp_page_read.dart` |
+| **Activity · Ceremony · Recipe · Steps** | Step-led: the numbered steps open the page, prose follows | hoisted `PpSteps` |
+| **Red flag · Flagged callout** | The flags open the page as urgent wells; the foot keeps the shared note | hoisted `PpCallout` / `PpWhenLine` |
+| **Illustration · Animation · Audio** | The thing opens the page | hoisted block |
+| **Tool** | The tool's own screen — a tool is a tool | the surface router |
+| **Checklist** | One screen: tick rows, ink ticks, the theme's ink pill to share | `PvChecklistScreen` |
+| **Talk** | The consult / community surface | the surface router |
+| **Video** | Coming-soon tiles until films exist; then the film page | `PvVideoPlaceholder` |
+
+A page whose format the deck cannot hold (a CARDS page carrying a film or a
+consult offer) opens in the reader with its cards listed — never silently
+short. `test/reader_unification_test.dart` holds the table.
 
 ## 4.0 The base-UI rule — SETTLED 2026-09-17, from the Mobbin component audit
 

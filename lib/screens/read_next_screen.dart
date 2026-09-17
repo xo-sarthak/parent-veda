@@ -22,6 +22,8 @@ import 'book_companion_screen.dart';
 import 'read_reader_screen.dart';
 import '../theme/pv_fonts.dart';
 import '../data/reads/read_adapters.dart';
+import 'doors/pv_door_router.dart';
+import '../data/reads/pregnancy_reads.dart';
 import 'reader/pv_reader_screen.dart';
 
 const Color _accent = AppTheme.primary500;
@@ -530,9 +532,6 @@ class _SaveHeart extends StatelessWidget {
 //  Reader
 // ===========================================================================
 
-/// The weekly read's own block inside the article — see `PvReadSection.custom`.
-enum _ReadItemBlock { done }
-
 class ReadItemScreen extends StatelessWidget {
   const ReadItemScreen({super.key, required this.item, required this.controller});
   final ReadItem item;
@@ -546,46 +545,30 @@ class ReadItemScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (item.type == ReadType.book) return buildClassic(context);
-    final s = S(controller.language);
+    // ⚠️ NO "MARK AS DONE" BUTTON — 2026-09-18. The user, on the phone: "this
+    // absurd mark as completed button… why do it like that." Done is DERIVED:
+    // reading to the end ticks the home's daily-reads box (same
+    // ReadDoneStore) and sets the status, exactly what the button did. The
+    // two-button foot is in git (d92651f) for revert.
+    ReadDoneStore.instance.ensureLoaded();
+    // ⚠️ THE WRITTEN-OUT PIECE WHEN THERE IS ONE — 2026-09-18. The weekly
+    // reads were forty to a hundred words; each now has a full read in
+    // `pregnancy_reads_weekly_*.dart`, and this is where it takes over from
+    // the seed. The seed still feeds the rail, Saved and search.
+    final full = pregnancyWeeklyReadFor(item.id);
     return PvReaderScreen(
-      read: pvReadFromReadItem(item, foot: _ReadItemBlock.done),
+      read: full ?? pvReadFromReadItem(item),
       lang: controller.language,
-      // The done control, as before: marking complete ticks the Home
-      // daily-reads box too (same ReadDoneStore) and clears any "reading"
-      // status — no second tap, no contradictory state. Theme buttons now,
-      // so it is the same ink pill as every commit in the app.
-      customBlock: (context, block) => AnimatedBuilder(
-        animation: Listenable.merge([ReadNextStore.instance, ReadDoneStore.instance]),
-        builder: (context, _) {
-          ReadDoneStore.instance.ensureLoaded();
-          final status = ReadNextStore.instance.statusOf(item.id);
-          final done = ReadDoneStore.instance.isDone(item.id);
-          return Row(children: [
-            if (!done) ...[
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: () => ReadNextStore.instance.setStatus(item.id, 'reading'),
-                  child: Text(status == 'reading' ? s.rnReadingBadge : s.rnMarkReading),
-                ),
-              ),
-              const SizedBox(width: 12),
-            ],
-            Expanded(
-              child: FilledButton(
-                onPressed: () {
-                  ReadDoneStore.instance.toggle(item.id);
-                  if (ReadDoneStore.instance.isDone(item.id)) {
-                    ReadNextStore.instance.setStatus(item.id, 'completed');
-                  } else {
-                    ReadNextStore.instance.clearStatus(item.id);
-                  }
-                },
-                child: Text(done ? s.rnCompletedBadge : s.rnMarkDone),
-              ),
-            ),
-          ]);
-        },
-      ),
+      readTitle: pregnancyReadTitle,
+      resolveRead: pregnancyReadById,
+      openRead: (ctx, id) => openPvDoorRead(ctx, id, controller),
+      openSurface: (ctx, id) => openPvDoorSurface(ctx, id, controller),
+      onReadToEnd: () {
+        if (!ReadDoneStore.instance.isDone(item.id)) {
+          ReadDoneStore.instance.toggle(item.id);
+        }
+        ReadNextStore.instance.setStatus(item.id, 'completed');
+      },
     );
   }
 

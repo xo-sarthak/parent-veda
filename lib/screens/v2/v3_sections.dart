@@ -28,6 +28,8 @@
 
 import 'package:flutter/material.dart';
 
+import '../../data/reads/pregnancy_reads_weekly_a.dart' show kPregWeekReadPrefix;
+import '../../data/reads/read_images.dart';
 import '../../models/product_models.dart';
 import '../../models/read_item.dart';
 import '../../theme/pv_fonts.dart';
@@ -335,7 +337,11 @@ class V3ReadRow extends StatelessWidget {
               // a category has no photo the tint alone shows, which is an
               // honest blank rather than a wrong picture.
               child: Builder(builder: (_) {
-                final url = v2ReadCover(item.category.en);
+                // The article's own picture first (read_images.dart, the
+                // same one its frame shows), else the category's. A rail
+                // card and the page it opens should share a photograph.
+                final url = kReadImageUrls['$kPregWeekReadPrefix${item.id}'] ??
+                    v2ReadCover(item.category.en);
                 if (url == null) return const SizedBox.shrink();
                 return Image.network(url,
                     fit: BoxFit.cover,

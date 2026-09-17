@@ -56,11 +56,19 @@ import 'pregnancy_reads_conditions.dart';
 import 'pregnancy_reads_labour.dart';
 import 'pregnancy_reads_nutrition.dart';
 import 'pregnancy_reads_scans.dart';
+import 'pregnancy_reads_weekly_a.dart';
+import 'pregnancy_reads_weekly_b.dart';
+import 'pregnancy_reads_weekly_c.dart';
+import 'pregnancy_reads_weekly_d.dart';
 
 export 'pregnancy_reads_conditions.dart';
 export 'pregnancy_reads_labour.dart';
 export 'pregnancy_reads_nutrition.dart';
 export 'pregnancy_reads_scans.dart';
+export 'pregnancy_reads_weekly_a.dart';
+export 'pregnancy_reads_weekly_b.dart';
+export 'pregnancy_reads_weekly_c.dart';
+export 'pregnancy_reads_weekly_d.dart';
 
 /// Every pregnancy read, in door order.
 ///
@@ -72,7 +80,17 @@ final List<PvRead> kPregnancyReads = [
   ...kPregnancyReadsConditions,
   ...kPregnancyReadsNutrition,
   ...kPregnancyReadsLabour,
+  // The weekly reads, written out 2026-09-18 — see pregnancy_reads_weekly_a.
+  ...kPregnancyReadsWeeklyA,
+  ...kPregnancyReadsWeeklyB,
+  ...kPregnancyReadsWeeklyC,
+  ...kPregnancyReadsWeeklyD,
 ];
+
+/// The full read behind a weekly `ReadItem`, or null when the item has not
+/// been written out yet (the adapter then draws what the seed carries).
+PvRead? pregnancyWeeklyReadFor(String readItemId) =>
+    pregnancyReadById('$kPregWeekReadPrefix$readItemId');
 
 /// Lookup by id. Null is a real answer — the door router opens nothing rather
 /// than guessing at a near match, and the wiring test makes sure no shipped

@@ -28,7 +28,7 @@ class _RTheme {
 
 /// The library reader's own blocks inside the article — the film mid-piece,
 /// the related films, the mark-as-read control. See `PvReadSection.custom`.
-enum _LibraryBlock { video, related, complete }
+enum _LibraryBlock { video, related }
 
 class ReadingReaderScreen extends StatefulWidget {
   const ReadingReaderScreen({super.key, required this.article});
@@ -113,9 +113,11 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
         a,
         video: a.relatedVideoId == null ? null : _LibraryBlock.video,
         related: _LibraryBlock.related,
-        complete: _LibraryBlock.complete,
+        // No "Mark as read" button (2026-09-18, the user: "makes no sense to
+        // be there") — completion is derived from reading to the end.
       ),
       lang: AppLanguage.english,
+      onReadToEnd: () => _store.setProgress(a.id, 1.0),
       resolveRead: readArticleReadById,
       openRead: (context, id) {
         for (final na in kReadArticles) {
@@ -129,7 +131,6 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
       customBlock: (context, block) => switch (block as _LibraryBlock) {
         _LibraryBlock.video => _embeddedVideo(t, watchVideoById(a.relatedVideoId!)),
         _LibraryBlock.related => _relatedVideos(t),
-        _LibraryBlock.complete => _completeButton(t),
       },
     );
   }

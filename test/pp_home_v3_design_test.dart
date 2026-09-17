@@ -210,7 +210,11 @@ void main() {
       }
     }
 
-    testWidgets('What to buy is the first tile', (tester) async {
+    testWidgets('the tiles are in registry order — Sleep first, not What to buy',
+        (tester) async {
+      // ⚠️ REVERSED 2026-09-18. The 2026-09-16 brief hoisted What to buy to
+      // the first tile; the user on the phone: "the door positioning should
+      // be like the way it was." Registry order, Sleep first.
       await tester.pumpWidget(const MaterialApp(home: PpHomeV3()));
       await tester.pump(const Duration(milliseconds: 400));
       expect(tester.takeException(), isNull);
@@ -218,15 +222,16 @@ void main() {
       final labels = bracketsFor(LifeStage.parenting)
           .map((b) => b.label.en)
           .toList();
-      final buy = labels.firstWhere((l) => l.toLowerCase().contains('buy'));
-      final buyPos = tester.getTopLeft(find.text(buy).first);
+      final first = labels.first;
+      expect(first.toLowerCase(), contains('sleep'));
+      final firstPos = tester.getTopLeft(find.text(first).first);
       for (final l in labels) {
-        if (l == buy) continue;
+        if (l == first) continue;
         final pos = tester.getTopLeft(find.text(l).first);
         expect(
-            pos.dy > buyPos.dy || (pos.dy == buyPos.dy && pos.dx > buyPos.dx),
+            pos.dy > firstPos.dy || (pos.dy == firstPos.dy && pos.dx > firstPos.dx),
             isTrue,
-            reason: '"$l" is drawn before "$buy"');
+            reason: '"$l" is drawn before "$first"');
       }
     });
 

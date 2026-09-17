@@ -64,6 +64,40 @@ const String kPpPageLinkAction = 'pp_page:';
 
 LocalizedText _same(String s) => LocalizedText(en: s, hi: s);
 
+/// ⚠️ THE CHIP NAMES THE THING, SO THE THING COMES FIRST — 2026-09-18. The
+/// user opened a page chipped "Chart" and met a title, a byline and a serif
+/// lede before the chart: *"a chart should be looking like a chart… it just
+/// looks like text."* For a page whose format is a THING rather than a piece
+/// of writing, the blocks of that kind are hoisted to the head of the body
+/// and no lede is lifted out of the prose — the thing is the lede. The
+/// prose that introduced it follows as ordinary paragraphs. Formats not
+/// listed here are writing, and open as writing.
+bool Function(PpBlock)? _leadKind(String? format) => switch (format?.toUpperCase()) {
+      'CHART' => (b) => b is PpChartCard,
+      'TABLE' || 'COMPARISON TABLE' => (b) => b is PpTable,
+      'CARDS' => (b) => b is PpCards,
+      'ILLUSTRATION' => (b) => b is PpIllustration,
+      'ANIMATION' => (b) => b is PpAnimation,
+      'AUDIO' || 'AUDIO LIBRARY' => (b) => b is PpAudioSlot,
+      // Step-led things: an activity, a ceremony, a recipe open on the
+      // steps (Mobbin: Headspace exercises, Lovevery play, every recipe app).
+      'STEPS' || 'STEP-LIST' || 'ACTIVITY' || 'CEREMONY' || 'RECIPE' =>
+        (b) => b is PpSteps,
+      'SCRIPT' => (b) => b is PpScript,
+      // A red-flag page opens on the flags. Its callouts and doctor lines
+      // lead; the foot keeps the shared note so nothing is said twice.
+      'RED FLAG' || 'FLAGGED CALLOUT' =>
+        (b) => b is PpCallout || b is PpWhenLine,
+      _ => null,
+    };
+
+/// Whether the page's format is one whose doctor lines LEAD (a red-flag
+/// page) rather than close the piece.
+bool _flagsLead(String? format) => switch (format?.toUpperCase()) {
+      'RED FLAG' || 'FLAGGED CALLOUT' => true,
+      _ => false,
+    };
+
 PvCallout _callout(PpCallout c) {
   final tone = switch (c.kind) {
     PpCalloutKind.doctor => PvCalloutTone.urgent,
@@ -96,16 +130,29 @@ PvRead ppPageAsRead(PpSection section, PpPage page) {
   }
   if (intro != null) blocks.remove(intro);
 
+  // ---- thing-first pages ---------------------------------------------------
+  final lead = _leadKind(page.format);
+  final leads = lead == null ? const <PpBlock>[] : blocks.where(lead).toList();
+  final thingFirst = leads.isNotEmpty;
+  if (thingFirst) {
+    blocks.removeWhere(lead!);
+    blocks.insertAll(0, leads);
+  }
+
   final String teaser;
   String lede;
   if (page.subtitle case final sub?) {
     teaser = sub;
-    lede = intro?.text ?? '';
+    lede = thingFirst ? '' : (intro?.text ?? '');
+    // The intro still reads — after the thing, as the first paragraph.
+    if (thingFirst && intro != null) {
+      blocks.insert(leads.length, PpArticle([intro.text]));
+    }
   } else {
     teaser = intro?.text ?? '';
     lede = '';
   }
-  if (lede.isEmpty) {
+  if (lede.isEmpty && !thingFirst) {
     // Lift the first paragraph of the first article block into the lede, so
     // the page opens the way every other article does — on its scale-setter.
     for (var i = 0; i < blocks.length; i++) {
@@ -139,7 +186,15 @@ PvRead ppPageAsRead(PpSection section, PpPage page) {
       case PpCallout():
         sections.add(PvReadSection(callout: _callout(b)));
       case PpWhenLine(:final text):
-        if (when == null) {
+        if (_flagsLead(page.format)) {
+          // On a red-flag page the doctor line is the content, up top.
+          sections.add(PvReadSection(
+            callout: PvCallout(
+                tone: PvCalloutTone.urgent,
+                title: _same('When to see a doctor'),
+                body: _same(text)),
+          ));
+        } else if (when == null) {
           when = PvCallout(
             tone: PvCalloutTone.urgent,
             title: _same('When to see a doctor'),
@@ -153,6 +208,18 @@ PvRead ppPageAsRead(PpSection section, PpPage page) {
                 body: _same(text)),
           ));
         }
+      // ⚠️ A CONSULT IS A FOOT TILE, NOT A PURPLE BUTTON MID-PIECE — 2026-09-18.
+      // The user, in "What is a sleep regression?": "randomly here I can see
+      // talk to someone with a purple button." The offer belongs where every
+      // other next thing lives: the tiles at the foot, in the consult type's
+      // own well.
+      case PpConsult(:final title, :final whoFor, :final surfaceId):
+        next.add(PvReadNextStep(
+          kind: PvNextKind.consult,
+          title: _same(title),
+          value: _same(whoFor),
+          surfaceId: surfaceId,
+        ));
       case PpLink(:final label, :final blurb, :final surfaceId, :final pageId):
         if (surfaceId != null) {
           next.add(PvReadNextStep(
