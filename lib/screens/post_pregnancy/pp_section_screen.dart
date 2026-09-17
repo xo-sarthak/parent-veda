@@ -41,6 +41,7 @@ import '../v2/v2_palette.dart';
 import 'pp_age_bands.dart';
 import 'pp_child_profile.dart';
 import 'pp_content.dart';
+import 'pp_page_read.dart';
 import 'pp_story_screen.dart';
 
 /// ⚠️ THE ONE WAY A PAGE OPENS, FROM ANY SCREEN.
@@ -134,8 +135,15 @@ Widget ppPageScreen(
       );
     }
   }
+  // ⚠️ THE ARTICLE FORMAT, 2026-09-17 — every parenting page reads in the
+  // one reader (pp_page_read.dart). `PpContentPage` is kept for revert and
+  // opened by nothing; test/reader_unification_test.dart holds that.
+  // return (
+  //   PpContentPage(page: page, onSurface: onSurface, onPage: openById),
+  //   'page',
+  // );
   return (
-    PpContentPage(page: page, onSurface: onSurface, onPage: openById),
+    ppPageReader(section, page, onSurface: onSurface, onPage: openById),
     'page',
   );
 }

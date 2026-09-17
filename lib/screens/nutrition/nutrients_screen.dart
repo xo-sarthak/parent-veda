@@ -14,6 +14,8 @@ import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_placeholders.dart';
 import '../v2/v2_palette.dart';
 import 'nutrition_stage_screen.dart';
+import '../../data/reads/read_adapters.dart';
+import '../reader/pv_reader_screen.dart';
 
 class NutrientsScreen extends StatelessWidget {
   const NutrientsScreen({super.key});
@@ -130,8 +132,19 @@ class NutrientDetailScreen extends StatelessWidget {
   const NutrientDetailScreen({super.key, required this.guide});
   final NutrientGuide guide;
 
+  // ⚠️ THE ARTICLE FORMAT, 2026-09-17 — this screen now hands its model to
+  // the one reader through `read_adapters.dart` (STILL-OPEN §60.1, §60.6),
+  // so every caller — door, home, Saved, search — gets the one format and
+  // nothing that constructs this screen has to change. The previous body is
+  // `buildClassic` below, kept for revert and opened by nothing;
+  // test/reader_unification_test.dart holds that.
   @override
   Widget build(BuildContext context) {
+    return PvReaderScreen(read: pvReadFromNutrient(guide), lang: PvType.lang);
+  }
+
+  /// The previous body, kept for revert. See `build`.
+  Widget buildClassic(BuildContext context) {
     return AnimatedBuilder(
       animation: V2PaletteStore.instance,
       builder: (context, _) {

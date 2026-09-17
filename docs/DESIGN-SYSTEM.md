@@ -453,6 +453,34 @@ Title          Fraunces 22 / w600 / −0.5 / p.ink1
 The eyebrow is `action`. **This is load-bearing** — it shipped grey on two
 screens and drained the colour out of everything below it.
 
+## 4.0a One reader — SETTLED 2026-09-17
+
+Every piece of writing in the app is one object, `PvRead`, on one screen,
+`PvReaderScreen`. The user: *"I don't need issues in confusion for 5 different
+formats… new additions in future get under the same template."* The screen
+is the shape he confirmed on *How conception actually works*:
+
+| Part | What it is |
+|---|---|
+| Picture frame | 132 pt, full bleed; the read's `imageUrl`, else the type-tinted band with the article mark. Always present, so every article has the same head. |
+| Masthead | Title 24 Newsreader · teaser 14.5 · byline (REVIEWED BY + verified mark when a clinician stands behind it; BY the editorial desk, no mark, when not) · hairline |
+| Lede | The scale-setter, on a violet left rule — "how worried should I be" answered first |
+| Contents | Only past two headings; collapsed |
+| Body | Sections: heading, paragraphs, bullets, tip, myth/fact, callout, video slot, or a **custom block** the owning stage renders (a parenting table, a chart card, a script, the condition page's film and add-to-journey pill) |
+| When to see someone | Required on the model. Urgent = the one well; note/reassure = inline between hairlines. Short pieces share `kPvShortPieceCallout`. |
+| Foot | References (collapsed) · Was this helpful? · *What you can do with this* and *Read next* on the **same tile** (type well, chip, mark or photo) |
+
+Nine older readers and the parenting page renderer were retired into adapters
+(`lib/data/reads/read_adapters.dart`, `pp_page_read.dart`,
+`ttc_insight_read.dart`); each old screen's `build` now delegates and keeps
+its previous body as `buildClassic`, reachable from nowhere. Books stay on
+the Book Companion (a product, not an article); the weekly card stack is
+out of scope by the user's call. `test/reader_unification_test.dart` holds
+all of it. Mobbin (Alan, Withings, Lovi, Clue): tables inside articles are
+hairline rows, steps are quiet numbered circles, the picture sits above a
+category eyebrow and an author row — which is what the parenting blocks
+already were, so they render inside the reader unchanged.
+
 ## 4.0 The base-UI rule — SETTLED 2026-09-17, from the Mobbin component audit
 
 **Ink for actions. Brand as a small accent. Colour only inside wells.**

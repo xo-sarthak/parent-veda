@@ -21,6 +21,8 @@ import '../theme/app_theme.dart';
 import 'book_companion_screen.dart';
 import 'read_reader_screen.dart';
 import '../theme/pv_fonts.dart';
+import '../data/reads/read_adapters.dart';
+import 'reader/pv_reader_screen.dart';
 
 const Color _accent = AppTheme.primary500;
 const Color _gold = Color(0xFFE6A817);
@@ -528,12 +530,67 @@ class _SaveHeart extends StatelessWidget {
 //  Reader
 // ===========================================================================
 
+/// The weekly read's own block inside the article — see `PvReadSection.custom`.
+enum _ReadItemBlock { done }
+
 class ReadItemScreen extends StatelessWidget {
   const ReadItemScreen({super.key, required this.item, required this.controller});
   final ReadItem item;
   final PregnancyController controller;
+  // ⚠️ THE ARTICLE FORMAT, 2026-09-17 — this screen now hands its model to
+  // the one reader through `read_adapters.dart` (STILL-OPEN §60.1, §60.6),
+  // so every caller — door, home, Saved, search — gets the one format and
+  // nothing that constructs this screen has to change. The previous body is
+  // `buildClassic` below, kept for revert and opened by nothing;
+  // test/reader_unification_test.dart holds that.
   @override
   Widget build(BuildContext context) {
+    if (item.type == ReadType.book) return buildClassic(context);
+    final s = S(controller.language);
+    return PvReaderScreen(
+      read: pvReadFromReadItem(item, foot: _ReadItemBlock.done),
+      lang: controller.language,
+      // The done control, as before: marking complete ticks the Home
+      // daily-reads box too (same ReadDoneStore) and clears any "reading"
+      // status — no second tap, no contradictory state. Theme buttons now,
+      // so it is the same ink pill as every commit in the app.
+      customBlock: (context, block) => AnimatedBuilder(
+        animation: Listenable.merge([ReadNextStore.instance, ReadDoneStore.instance]),
+        builder: (context, _) {
+          ReadDoneStore.instance.ensureLoaded();
+          final status = ReadNextStore.instance.statusOf(item.id);
+          final done = ReadDoneStore.instance.isDone(item.id);
+          return Row(children: [
+            if (!done) ...[
+              Expanded(
+                child: OutlinedButton(
+                  onPressed: () => ReadNextStore.instance.setStatus(item.id, 'reading'),
+                  child: Text(status == 'reading' ? s.rnReadingBadge : s.rnMarkReading),
+                ),
+              ),
+              const SizedBox(width: 12),
+            ],
+            Expanded(
+              child: FilledButton(
+                onPressed: () {
+                  ReadDoneStore.instance.toggle(item.id);
+                  if (ReadDoneStore.instance.isDone(item.id)) {
+                    ReadNextStore.instance.setStatus(item.id, 'completed');
+                  } else {
+                    ReadNextStore.instance.clearStatus(item.id);
+                  }
+                },
+                child: Text(done ? s.rnCompletedBadge : s.rnMarkDone),
+              ),
+            ),
+          ]);
+        },
+      ),
+    );
+  }
+
+  /// The previous body, kept for revert. See `build`.
+  Widget buildClassic(BuildContext context) {
     final s = S(controller.language);
     final text = Theme.of(context).textTheme;
     final isBook = item.type == ReadType.book;

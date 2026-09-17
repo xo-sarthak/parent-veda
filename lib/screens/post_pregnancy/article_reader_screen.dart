@@ -16,6 +16,9 @@ import 'pp_experts_data.dart';
 import 'pp_products_data.dart';
 import 'product_detail_screen.dart';
 import 'provider_profile_screen.dart';
+import '../../data/reads/read_adapters.dart';
+import '../../localization/app_language.dart';
+import '../reader/pv_reader_screen.dart';
 
 class ArticleReaderScreen extends StatelessWidget {
   const ArticleReaderScreen({super.key, this.article});
@@ -38,8 +41,20 @@ class ArticleReaderScreen extends StatelessWidget {
   void _openAuthor(BuildContext context, Expert e) =>
       Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => ProviderProfileScreen(expert: e)));
 
+  // ⚠️ THE ARTICLE FORMAT, 2026-09-17 — this screen now hands its model to
+  // the one reader through `read_adapters.dart` (STILL-OPEN §60.1, §60.6),
+  // so every caller — door, home, Saved, search — gets the one format and
+  // nothing that constructs this screen has to change. The previous body is
+  // `buildClassic` below, kept for revert and opened by nothing;
+  // test/reader_unification_test.dart holds that.
   @override
   Widget build(BuildContext context) {
+    final a = article ?? kArticles.firstWhere((e) => e.id == 'sleepcycles');
+    return PvReaderScreen(read: pvReadFromArticle(a), lang: AppLanguage.english);
+  }
+
+  /// The previous body, kept for revert. See `build`.
+  Widget buildClassic(BuildContext context) {
     final a = article ?? kArticles.firstWhere((e) => e.id == 'sleepcycles');
     final related = kArticles.where((x) => x.category == a.category && x.id != a.id).take(2).toList();
     final expert = expertByName(a.author); // null when we have no seed profile

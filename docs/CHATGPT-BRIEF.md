@@ -89,6 +89,11 @@ These are the ones most likely to make a proposal land or fail.
   success rate, nothing derived from her profile. Population statistics are fine
   where they reduce pressure rather than set a target — *"most couples conceive
   within a year"* is allowed; *"your odds this cycle are 18%"* is not.
+- **One article format.** Every piece of writing — an article, a look-up
+  entry, a daily insight, a door page — opens in one reader as one model
+  (`PvRead`). A brief that proposes its own reading screen, card style or
+  "detail page" for written content is proposing a sixth format; describe the
+  content and its sections instead.
 - **A feature is never hidden.** Empty sections render an invitation; only the
   empty copy changes.
 - **Derive, never ask.** Ask only for what is genuinely unknowable, and say what

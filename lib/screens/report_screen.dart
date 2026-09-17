@@ -22,6 +22,9 @@ import 'brackets/hub/hub_solution_cards.dart' show SolutionMeta, SolutionType;
 import 'doors/pv_door_chrome.dart' show PvDoorRow;
 import 'tools/ask_veda_screen.dart';
 import 'v2/v2_palette.dart';
+import '../data/reads/read_adapters.dart';
+import '../models/pv_read.dart';
+import 'reader/pv_reader_screen.dart';
 
 const Color _calm = Color(0xFF18A39B); // teal - calm, non-alarming accent
 const Color _reassure = Color(0xFF3FA56A); // soft green - "things to remember"
@@ -485,8 +488,34 @@ class ReportArticleScreen extends StatelessWidget {
     ));
   }
 
+  // ⚠️ THE ARTICLE FORMAT, 2026-09-17 — this screen now hands its model to
+  // the one reader through `read_adapters.dart` (STILL-OPEN §60.1, §60.6),
+  // so every caller — door, home, Saved, search — gets the one format and
+  // nothing that constructs this screen has to change. The previous body is
+  // `buildClassic` below, kept for revert and opened by nothing;
+  // test/reader_unification_test.dart holds that.
   @override
   Widget build(BuildContext context) {
+    final s = S(controller.language);
+    return PvReaderScreen(
+      read: pvReadFromFinding(finding, steps: [
+        // "Still worried? Ask Veda" — pre-filled with this finding, as before.
+        PvReadNextStep(
+          kind: PvNextKind.read,
+          title: LocalizedText(en: s.rAskTitle, hi: s.rAskTitle),
+          value: LocalizedText(en: s.rAskBody, hi: s.rAskBody),
+          action: 'finding_askveda',
+        ),
+      ]),
+      lang: controller.language,
+      openAction: (context, action) {
+        if (action == 'finding_askveda') _askVeda(context, s);
+      },
+    );
+  }
+
+  /// The previous body, kept for revert. See `build`.
+  Widget buildClassic(BuildContext context) {
     final lang = controller.language;
     final s = S(lang);
     final text = Theme.of(context).textTheme;

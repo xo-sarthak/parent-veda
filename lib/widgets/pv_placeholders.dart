@@ -183,7 +183,17 @@ class PvVideoPlaceholder extends StatelessWidget {
                             : LinearGradient(
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
-                                colors: [tint, deep],
+                                // ⚠️ THE WELL'S OWN TINT, NOT A SLAB — 2026-09-17
+                                // (DESIGN-SYSTEM §4.0). The end stop was `deep`
+                                // (L 0.52), which made every coming-soon film a
+                                // saturated violet block on a white page. Now it
+                                // travels only to the tint's shadow; the play
+                                // mark keeps `deep` for contrast. Kept for
+                                // revert: colors: [tint, deep],
+                                colors: [
+                                  tint,
+                                  Color.lerp(tint, deep, 0.35)!,
+                                ],
                               ),
                       ),
                     ),
@@ -455,7 +465,8 @@ class PvAudioPlaceholder extends StatelessWidget {
                 gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [tint, deep.withValues(alpha: 0.6)],
+                  // Softened with the thumbnail above (2026-09-17). Was deep at 0.6.
+                  colors: [tint, Color.lerp(tint, deep, 0.35)!],
                 ),
                 borderRadius: BorderRadius.circular(12),
               ),
@@ -573,7 +584,8 @@ class PvReadPlaceholder extends StatelessWidget {
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    colors: [tint, deep.withValues(alpha: 0.55)],
+                    // Softened with the thumbnail above (2026-09-17). Was deep at 0.55.
+                    colors: [tint, Color.lerp(tint, deep, 0.35)!],
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),

@@ -50,21 +50,8 @@ import '../screens/ttc/ttc_strings.dart';
 /// The id a daily insight carries as a read: `ttc_insight_<insight.id>`.
 const String kTtcInsightReadPrefix = 'ttc_insight_';
 
-/// The one when-to-ask line every short piece carries. See the head of the
-/// file for why it is shared and why it is not urgent.
-const PvCallout kPvShortPieceCallout = PvCallout(
-  tone: PvCalloutTone.note,
-  title: LocalizedText(
-      en: 'A general note, not advice about you',
-      hi: 'Aam baat, aapke baare mein salah nahi'),
-  body: LocalizedText(
-      en: 'Nothing here is written with your history in front of it. If '
-          'anything worries you, or a clinic is already looking after your '
-          'cycle, ask them — they know your case and this page does not.',
-      hi: 'Yahan kuch bhi aapki history dekh kar nahi likha gaya. Agar kuch '
-          'pareshan kare, ya koi clinic pehle se aapka cycle dekh raha hai, '
-          'unse poochhein — wo aapka case jaante hain, ye page nahi.'),
-);
+// The shared when-to-ask line for short pieces is `kPvShortPieceCallout`
+// on the model (pv_read.dart) — the parenting page adapter uses it too.
 
 /// One hue per topic, so the picture frame and the foot tiles read as the
 /// insight's subject before a word is read. Hues from `V2BlockHues` where a

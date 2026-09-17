@@ -92,6 +92,7 @@ import 'package:parentveda/screens/post_pregnancy/reading_collection_screen.dart
 import 'package:parentveda/screens/post_pregnancy/reading_home_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/reading_library_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/reading_reader_screen.dart';
+import 'package:parentveda/screens/reader/pv_reader_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/post_pregnancy_home.dart';
 import 'package:parentveda/screens/post_pregnancy/problem_solver_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/product_detail_screen.dart';
@@ -670,11 +671,15 @@ void main() {
     await tester.pumpWidget(MaterialApp(home: ReadingReaderScreen(article: readArticleById('fever'))));
     await tester.pumpAndSettle();
 
-    await tester.scrollUntilVisible(find.textContaining('ParentVeda tip'), 250,
-        scrollable: find.byType(Scrollable).first, maxScrolls: 40);
-    expect(find.textContaining('ParentVeda tip'), findsOneWidget);
-    await tester.tap(find.textContaining('ParentVeda tip'));
-    await tester.pumpAndSettle();
+    // The article format since 2026-09-17: the library piece opens in the
+    // one reader (read_adapters.dart), where a tip is set "IN PRACTICE" and
+    // is open by design — no tap to expand. The piece's own tip text must
+    // still be on the page.
+    expect(find.byType(PvReaderScreen), findsOneWidget);
+    final tip = readArticleById('fever').sections.firstWhere((s) => s.tip != null).tip!;
+    await tester.scrollUntilVisible(find.text(tip.title), 250,
+        scrollable: find.byType(Scrollable).first, maxScrolls: 60);
+    expect(find.text(tip.title), findsOneWidget);
     expect(tester.takeException(), isNull);
   });
 

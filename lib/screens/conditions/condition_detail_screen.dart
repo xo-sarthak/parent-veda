@@ -29,6 +29,8 @@ import '../brackets/hub/problem_hub_screen.dart' show HubPill;
 import '../prepare/consultations_screen.dart';
 import '../tools/medicine_tracker_screen.dart';
 import '../v2/v2_palette.dart';
+import '../../data/reads/read_adapters.dart';
+import '../reader/pv_reader_screen.dart';
 
 /// The specialist a condition page's consult offer promises, as a `Specialist.id`.
 ///
@@ -44,6 +46,10 @@ import '../v2/v2_palette.dart';
 /// from the same entry rather than written twice.
 const String kConditionConsultRole = 'sp_ob';
 
+/// The condition page's own blocks inside the article — opaque to the reader,
+/// rendered here. See `PvReadSection.custom`.
+enum _ConditionBlock { watch, journey, medicine, readMore }
+
 class ConditionDetailScreen extends StatelessWidget {
   const ConditionDetailScreen(
       {super.key, required this.entry, required this.pregnancy});
@@ -51,8 +57,77 @@ class ConditionDetailScreen extends StatelessWidget {
   final ConditionEntry entry;
   final PregnancyController pregnancy;
 
+  // ⚠️ THE ARTICLE FORMAT, 2026-09-17 — this screen now hands its model to
+  // the one reader through `read_adapters.dart` (STILL-OPEN §60.1, §60.6),
+  // so every caller — door, home, Saved, search — gets the one format and
+  // nothing that constructs this screen has to change. The previous body is
+  // `buildClassic` below, kept for revert and opened by nothing;
+  // test/reader_unification_test.dart holds that.
   @override
   Widget build(BuildContext context) {
+    final lang = pregnancy.language;
+    return AnimatedBuilder(
+      animation: ConditionsStore.instance,
+      builder: (context, _) {
+        final store = ConditionsStore.instance;
+        final read = pvReadFromCondition(
+          entry,
+          // Only where the film was earned — `showWatch` still governs.
+          watch: entry.showWatch ? _ConditionBlock.watch : null,
+          // Personalise behind the diagnosed door only. A curious reader must
+          // not be handed a button that writes "she has this" into the profile
+          // Ask Veda reads.
+          journey: store.isDiagnosed ? _ConditionBlock.journey : null,
+          foot: [
+            if (entry.showMedicine) _ConditionBlock.medicine,
+            if (entry.showReadMore) _ConditionBlock.readMore,
+          ],
+          offerConsult: !entry.highAnxiety,
+        );
+        return PvReaderScreen(
+          read: read,
+          lang: lang,
+          customBlock: (context, block) {
+            final p = V2PaletteStore.instance.current;
+            return switch (block as _ConditionBlock) {
+              _ConditionBlock.watch => _WatchSection(entry: entry, p: p, lang: lang),
+              _ConditionBlock.journey => HubPill(
+                  label: store.isAddedToJourney(entry.id)
+                      ? const LocalizedText(
+                              en: 'Added to your journey', hi: 'Added to your journey')
+                          .of(lang)
+                      : const LocalizedText(
+                              en: 'Add to my journey', hi: 'Add to my journey')
+                          .of(lang),
+                  icon: store.isAddedToJourney(entry.id)
+                      ? Icons.check_circle_outline_rounded
+                      : Icons.add_circle_outline_rounded,
+                  p: p,
+                  onTap: () => store.toggleAddedToJourney(entry.id),
+                ),
+              _ConditionBlock.medicine => _MedicineAsk(
+                  entry: entry, pregnancy: pregnancy, p: p, lang: lang, store: store),
+              _ConditionBlock.readMore => _ReadMoreSection(entry: entry, p: p, lang: lang),
+            };
+          },
+          openAction: (context, action) {
+            if (action == 'condition_consult') {
+              // ⚠️ THE FILTER IS THE WHOLE POINT OF THE TAP. Naming a
+              // gynaecologist and then opening a list of five specialists is
+              // the wiring gate this app has already shipped once.
+              Navigator.of(context).push(MaterialPageRoute<void>(
+                  settings: const RouteSettings(name: 'consults'),
+                  builder: (_) => ConsultationsScreen(
+                      lang: lang, onlyRole: kConditionConsultRole)));
+            }
+          },
+        );
+      },
+    );
+  }
+
+  /// The previous body, kept for revert. See `build`.
+  Widget buildClassic(BuildContext context) {
     final lang = pregnancy.language;
 
     return AnimatedBuilder(

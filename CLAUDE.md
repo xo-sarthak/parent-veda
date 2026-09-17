@@ -134,6 +134,15 @@ it belongs in the answer rather than the screen, it belongs there.
 - **Derive, never ask.** Only ask for what is genuinely unknowable, and say what
   the answer unlocks.
 - **Comment out, never delete** superseded UI, with a "kept for revert" note.
+- **One reader.** Every piece of writing opens in `PvReaderScreen` as a
+  `PvRead` — articles, look-ups, daily insights, door pages, all three
+  stages. New written content is authored as a `PvRead`; older seed models
+  reach the reader through the adapters in `lib/data/reads/read_adapters.dart`
+  (and `pp_page_read.dart`, `ttc_insight_read.dart`), never through a screen
+  of their own. A block the reader does not model rides as
+  `PvReadSection.custom` and the owning stage renders it.
+  `test/reader_unification_test.dart` fails the build if a retired renderer
+  is opened again. Decided 2026-09-17 (STILL-OPEN §60.6).
 - **Write new copy in English.** Hindi is not a default any more — see
   "New work is English" below before reaching for `_t(...)`.
 - **No decorative emoji** in chrome. Line icons.

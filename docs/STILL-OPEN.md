@@ -7351,6 +7351,52 @@ asks for and lists it. Not walked on a phone.
 
 ---
 
+## 102.0 Stillness, the fifth skilling door — 2026-09-17
+
+Built to `ParentVeda_Stillness_structure.pdf` ("the door with the most
+already built behind it, and a streak it should refuse for its own
+reason") on the shell as it stood after Thinking. The door is
+`lib/data/doors/sk_door_stillness.dart` over
+`lib/data/skilling/skilling_stillness_*.dart`; the contract is
+`test/sk_stillness_door_test.dart`; owed content is
+`docs/DOOR-CONTENT-OWED.md` SL1–SL12; the review list is
+`docs/SKILLING-DOORS-REVIEW.md`. Generic points: `SKILLING-DOOR-BUILD.md` §9.
+
+### 102.1 The calls — 2026-09-17
+
+1a **the streak refused, on the record with its reason**: "a streak turns
+a non-striving practice into a target, and a broken streak makes a child
+feel she has failed at calming down" — the most defensible streak in the
+stage, refused because it defeats the practice, not only because of the
+rule · 2a engines reused (the breathing circle, the app's one audio
+player, the garbh theme), sessions kid-authored where the pregnancy
+content does not transfer, adapted where it does (yoga → gentle moving,
+the Kriya body-scan → resting), each card marked which · 3a the
+invitation to return is one line on the keepsake, no number in it, never
+a notification · 4a the settle breath built as the one page, the source
+Focus, Feelings and Memory will reference.
+
+### 102.2 What changed
+
+One shell slot, `SkDoorContent.keepsakeInvite`. Six practices from the
+brief's table, 36 practice slots, three session sets (24 slots) marked
+Kid-native or Adapted, three recorded series, nine products, the parent
+note under the brief's own title, one built page (`sl_settle`, the one
+circle, the brief's words). The bracket's six cells live; the streak
+tracker refused into the keepsake; extras dropped outright and what is
+left, the unmeasured record, is the keepsake; Consult held. The engines
+named by the brief were all found; none rebuilt; the audio player is
+wired the day a session exists. Not walked on a phone.
+
+### 102.3 Needs a decision (door-specific)
+
+* Whether Confidence's `cf_breath` becomes a window onto `sl_settle` (one
+  page, one owner) or keeps its own words on the same circle.
+* The keepsake's third word, "I made something", on a breathing practice.
+* The hero photo: play in a misty grove, not a child sitting still.
+
+---
+
 ## 59.0 Onboarding is decided against the Mobbin audit; three things it leaves open — OPENED 2026-09-16
 
 `docs/ONBOARDING-AUDIT.md` holds the audit, the seven-screen decision and the
@@ -7426,14 +7472,30 @@ with it: the TTC **daily insight** opens in the reader
 sites, kept). Short pieces carry a shared, non-urgent when-to-ask line and a
 byline with no verified mark (`PvRead.reviewed = false`).
 
-**Owed — the rollout, in this order:** parenting door pages (`PpPage` and
-its blocks → the reader shell; tables, charts and scripts render through
-`PpBlockView` inside it), the pregnancy detail screens the doors open
-(`ConditionDetailScreen`, `ScanDetailScreen`, `ReportArticleScreen`,
-`NutrientDetailScreen`, `MmArticleScreen`, `BsArticleScreen`), then the
-three older models (`ReadItem`, `ReadArticle`, `Article`, §60.1). Pictures
-per article are a content job — the frame is there, the URLs are owed in
-`DOOR-CONTENT-OWED.md`.
+**The rollout — DONE 2026-09-17, same day.** Parenting door pages (every
+page of every section; blocks the reader does not model ride as
+`PvReadSection.custom` and `PpBlockView` draws them inside the frame); the
+six pregnancy detail screens the doors open (conditions, scans, report
+findings, nutrients, mind and mood, belly and skin); the three older models
+(`ReadItem` except books, `ReadArticle`, `Article`). Each old screen's
+`build` hands its model to the reader through `read_adapters.dart` and keeps
+its previous body as `buildClassic`; every caller — door, home, Saved,
+search — gets the one format untouched. Features the old screens carried
+travelled with them: the condition film, add-to-journey behind the
+diagnosed door, the gynaecologist offer with its role filter; the scan's
+appointment / line-by-line / decoder / consult / Ask Veda tiles; the
+finding's Ask Veda; the weekly read's mark-done (ticks the home's box); the
+library's mid-piece film, related films and mark-as-read. Walked on the
+phone: a condition, a parenting chart page, the daily insight, the
+conception article. `test/reader_unification_test.dart` is the guard.
+
+**Still owed from it:** pictures per article (`DOOR-CONTENT-OWED.md`);
+`MmArticleScreen`'s paid footer for the "more than mood" group (the
+counselling booking sheet) is not yet a tile — it opens through `onTalk`
+where a screen passes one; the classic Warm Nest home's three readers
+(`GrowReaderScreen`, `FatherLearnReaderScreen`, `StoryReaderScreen`) are
+classic-only and untouched; the video placeholder gradients were softened
+(`pv_placeholders.dart`) so a coming-soon film is a well, not a violet slab.
 
 ### 60.3 The card format — owed to the home, not the reader
 

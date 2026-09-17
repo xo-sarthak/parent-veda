@@ -17,11 +17,18 @@ import 'pp_common.dart';
 import 'pp_reading_data.dart';
 import 'pp_watch_data.dart';
 import 'reading_common.dart';
+import '../../data/reads/read_adapters.dart';
+import '../../localization/app_language.dart';
+import '../reader/pv_reader_screen.dart';
 
 class _RTheme {
   const _RTheme(this.bg, this.ink, this.soft, this.panel, this.rule, this.accent);
   final Color bg, ink, soft, panel, rule, accent;
 }
+
+/// The library reader's own blocks inside the article — the film mid-piece,
+/// the related films, the mark-as-read control. See `PvReadSection.custom`.
+enum _LibraryBlock { video, related, complete }
 
 class ReadingReaderScreen extends StatefulWidget {
   const ReadingReaderScreen({super.key, required this.article});
@@ -91,8 +98,44 @@ class _ReadingReaderScreenState extends State<ReadingReaderScreen> {
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
   void _soon(String m) => ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(m), behavior: SnackBarBehavior.floating));
 
+  // ⚠️ THE ARTICLE FORMAT, 2026-09-17 — this screen now hands its model to
+  // the one reader through `read_adapters.dart` (STILL-OPEN §60.1, §60.6),
+  // so every caller — door, home, Saved, search — gets the one format and
+  // nothing that constructs this screen has to change. The previous body is
+  // `buildClassic` below, kept for revert and opened by nothing;
+  // test/reader_unification_test.dart holds that.
   @override
   Widget build(BuildContext context) {
+    final a = widget.article;
+    final t = _t;
+    return PvReaderScreen(
+      read: pvReadFromReadArticle(
+        a,
+        video: a.relatedVideoId == null ? null : _LibraryBlock.video,
+        related: _LibraryBlock.related,
+        complete: _LibraryBlock.complete,
+      ),
+      lang: AppLanguage.english,
+      resolveRead: readArticleReadById,
+      openRead: (context, id) {
+        for (final na in kReadArticles) {
+          if ('$kReadArticlePrefix${na.id}' == id) {
+            Navigator.of(context).push(MaterialPageRoute<void>(
+                builder: (_) => ReadingReaderScreen(article: na)));
+            return;
+          }
+        }
+      },
+      customBlock: (context, block) => switch (block as _LibraryBlock) {
+        _LibraryBlock.video => _embeddedVideo(t, watchVideoById(a.relatedVideoId!)),
+        _LibraryBlock.related => _relatedVideos(t),
+        _LibraryBlock.complete => _completeButton(t),
+      },
+    );
+  }
+
+  /// The previous body, kept for revert. See `build`.
+  Widget buildClassic(BuildContext context) {
     final t = _t;
     return Scaffold(
       backgroundColor: t.bg,

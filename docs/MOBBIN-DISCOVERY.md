@@ -18,7 +18,7 @@ CLAUDE.md invariants) → brief → build → this ledger.
 | # | Audit | Date | Doc | Built? |
 |---|---|---|---|---|
 | 1 | Onboarding | 2026-09-16 | `ONBOARDING-AUDIT.md` | Yes, 2026-09-17 (`lib/screens/auth/onboarding/`) |
-| 2 | Reading | 2026-09-16 | `READER-AUDIT.md` | Five additions on `PvReaderScreen`; adapters pending the user's look |
+| 2 | Reading | 2026-09-16 · 17 | `READER-AUDIT.md` · `DESIGN-SYSTEM.md` §4.0a | Five additions, then the whole app on one reader through adapters (guarded) |
 | 3 | Saved / bookmarks | 2026-09-16 | `FAMILY-MODEL.md` §5–6 | Yes (`saved_items`, `SavedScreen`) |
 | 4 | Family model — stage transitions, second child, partner | 2026-09-16 | `FAMILY-MODEL.md` §2–4 | Written down; `pregnancies` table owed |
 | 5 | Onboarding questions, OTP length, invite-applied state | 2026-09-17 | this file §5 | Yes, inside the onboarding build |
@@ -75,9 +75,16 @@ applied). Four models converge on `PvRead` through adapters (decided).
 **Declined.** Engagement counts, follow buttons, a bottom tab bar inside the
 reader, font-family choice, share in the top bar.
 
-**Owed.** STILL-OPEN §60.1 (adapters), §60.2 (chip word), §60.3 (the card
-format, owed to the home rail not the reader), §60.4 (father reads), §62.2
-(a server column for "helpful").
+**Applied 2026-09-17.** §60.1 (adapters — every reading model in the app
+converges on `PvRead`; the guard test keeps it so), §60.2 ("Article"), the
+picture frame on every article, Read next on the tool tile. A second pass
+asked how readers set tables, steps and scripts *inside* a piece (Alan,
+Withings Health Mate, Lovi, Clue, Keeta): hairline rows, quiet numbered
+circles, no filled cells — the parenting blocks already did this, so they
+render inside the reader unchanged.
+
+**Owed.** §60.3 (the card format, owed to the home rail not the reader),
+§60.4 (father reads), §62.2 (a server column for "helpful").
 
 ## 3. Saved / bookmarks
 

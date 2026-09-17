@@ -29,6 +29,8 @@ import '../../theme/pv_fonts.dart';
 import '../brackets/hub/hub_solution_cards.dart';
 import '../v2/v2_palette.dart';
 import '../../widgets/pv_placeholders.dart';
+import '../../data/reads/read_adapters.dart';
+import '../reader/pv_reader_screen.dart';
 
 const _lang = AppLanguage.english;
 
@@ -36,8 +38,19 @@ class BsArticleScreen extends StatelessWidget {
   const BsArticleScreen({super.key, required this.page});
   final BsPage page;
 
+  // ⚠️ THE ARTICLE FORMAT, 2026-09-17 — this screen now hands its model to
+  // the one reader through `read_adapters.dart` (STILL-OPEN §60.1, §60.6),
+  // so every caller — door, home, Saved, search — gets the one format and
+  // nothing that constructs this screen has to change. The previous body is
+  // `buildClassic` below, kept for revert and opened by nothing;
+  // test/reader_unification_test.dart holds that.
   @override
   Widget build(BuildContext context) {
+    return PvReaderScreen(read: pvReadFromBs(page), lang: PvType.lang);
+  }
+
+  /// The previous body, kept for revert. See `build`.
+  Widget buildClassic(BuildContext context) {
     final p = V2PaletteStore.instance.current;
     final areaHue = kBsAreaInfo[page.area]!.hue;
 

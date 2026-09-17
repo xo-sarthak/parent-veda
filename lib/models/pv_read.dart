@@ -116,6 +116,29 @@ class PvCallout {
   final LocalizedText body;
 }
 
+/// The one when-to-ask line a SHORT piece carries when nobody wrote one for
+/// it — a daily insight, a parenting page with no doctor line of its own.
+///
+/// ⚠️ `whenToSeeSomeone` stays REQUIRED on the model (CLAUDE.md: anything
+/// clinical ends by routing calmly to a doctor), and this is how an adapter
+/// meets that without inventing clinical text: one honest, quiet sentence —
+/// general, not about you; your clinic knows your case. `note` tone, so it
+/// renders inline between hairlines, not as the urgent well. Hand-written
+/// reads must not use it; `assertShape` still demands the urgent tone there.
+const PvCallout kPvShortPieceCallout = PvCallout(
+  tone: PvCalloutTone.note,
+  title: LocalizedText(
+      en: 'A general note, not advice about you',
+      hi: 'Aam baat, aapke baare mein salah nahi'),
+  body: LocalizedText(
+      en: 'Nothing here is written with your history in front of it. If '
+          'anything worries you, or a clinic is already looking after you, '
+          'ask them — they know your case and this page does not.',
+      hi: 'Yahan kuch bhi aapki history dekh kar nahi likha gaya. Agar kuch '
+          'pareshan kare, ya koi clinic pehle se aapko dekh raha hai, unse '
+          'poochhein — wo aapka case jaante hain, ye page nahi.'),
+);
+
 /// A question and its answer, at the foot of the read.
 @immutable
 class PvReadFaq {
@@ -146,7 +169,21 @@ class PvReadSection {
     this.videoSlot,
     this.collapsible = false,
     this.summary,
+    this.custom,
   });
+
+  /// A block the reader does not model, owned and rendered by the stage that
+  /// wrote it — a parenting table, a chart card, a script, a consult offer.
+  ///
+  /// ⚠️ OPAQUE HERE, ON PURPOSE. The model stays widget-free and stage-free:
+  /// it carries the block as an `Object`, and `PvReaderScreen.customBlock`
+  /// is the seam through which the stage turns it back into its own widget
+  /// (`PpBlockView` for parenting). This is what lets a parenting page with
+  /// a wake-windows table read in the one article format without the table
+  /// being rewritten as prose or the reader learning what a table is. A
+  /// section carrying a custom block usually carries nothing else; the
+  /// reader renders it after any heading and paragraphs it does have.
+  final Object? custom;
 
   /// Null for the opening section, which runs straight on from the teaser.
   final LocalizedText? heading;

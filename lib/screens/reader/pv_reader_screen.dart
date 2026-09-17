@@ -86,6 +86,7 @@ class PvReaderScreen extends StatefulWidget {
     this.hero,
     this.openAtHeading,
     this.resolveRead,
+    this.customBlock,
   });
 
   final PvRead read;
@@ -148,6 +149,12 @@ class PvReaderScreen extends StatefulWidget {
   /// tools"). Falls back to [readTitle] when absent, so nothing that only
   /// passes titles breaks.
   final PvRead? Function(String readId)? resolveRead;
+
+  /// Renders a section's `custom` block — see `PvReadSection.custom`. The
+  /// stage that wrote the block hands the widget back; the reader only
+  /// decides where it goes. A section with a custom block and no renderer
+  /// draws nothing for it, which the parenting adapter's test guards.
+  final Widget Function(BuildContext context, Object block)? customBlock;
 
   @override
   State<PvReaderScreen> createState() => _PvReaderScreenState();
@@ -923,6 +930,13 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
       kids.add(Padding(
           padding: const EdgeInsets.only(bottom: 22),
           child: _pad(_video(s, sec.videoSlot!))));
+    }
+    if (sec.custom case final block?) {
+      if (widget.customBlock case final render?) {
+        kids.add(Padding(
+            padding: const EdgeInsets.only(bottom: 24),
+            child: _pad(render(context, block))));
+      }
     }
 
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: kids);

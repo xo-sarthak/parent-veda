@@ -80,6 +80,9 @@ import '../tools/scans_appointments_screen.dart';
 import '../tools/tests_scans_reports_screen.dart';
 import '../v2/v2_palette.dart';
 import 'hub/hub_solution_cards.dart';
+import '../../data/reads/read_adapters.dart';
+import '../../models/pv_read.dart';
+import '../reader/pv_reader_screen.dart';
 
 /// The specialist this screen's consult card promises, as a `Specialist.id`.
 ///
@@ -104,8 +107,98 @@ class ScanDetailScreen extends StatelessWidget {
   final TestScanInfo scan;
   final PregnancyController pregnancy;
 
+  // ⚠️ THE ARTICLE FORMAT, 2026-09-17 — this screen now hands its model to
+  // the one reader through `read_adapters.dart` (STILL-OPEN §60.1, §60.6),
+  // so every caller — door, home, Saved, search — gets the one format and
+  // nothing that constructs this screen has to change. The previous body is
+  // `buildClassic` below, kept for revert and opened by nothing;
+  // test/reader_unification_test.dart holds that.
   @override
   Widget build(BuildContext context) {
+    final lang = pregnancy.language;
+    return AnimatedBuilder(
+      animation: ScansStore.instance,
+      builder: (context, _) {
+        final appt = _appointment();
+        final read = pvReadFromScan(
+          scan,
+          redFlags: kScanRedFlags[scan.id] ?? const <LocalizedText>[],
+          steps: [
+            // Her booked appointment for THIS scan, when there is one — a
+            // card about a thing that does not exist does not render.
+            if (appt != null)
+              PvReadNextStep(
+                kind: PvNextKind.tool,
+                title: LocalizedText(en: appt.title, hi: appt.title),
+                value: LocalizedText(en: _apptLine(appt), hi: _apptLine(appt)),
+                action: 'scan_appointments',
+              ),
+            const PvReadNextStep(
+              kind: PvNextKind.tool,
+              title: LocalizedText(en: 'Your report, line by line', hi: 'आपकी report, हर line'),
+              value: LocalizedText(
+                  en: 'Every parameter, what the usual range is, and what it means.',
+                  hi: 'हर parameter, आम range क्या है, और उसका मतलब।'),
+              action: 'scan_reference',
+            ),
+            const PvReadNextStep(
+              kind: PvNextKind.read,
+              title: LocalizedText(
+                  en: 'A word on the report you do not recognise?',
+                  hi: 'Report का कोई शब्द समझ नहीं आया?'),
+              value: LocalizedText(
+                  en: 'Look it up, see what it may mean, and what to ask.',
+                  hi: 'देखिए उसका मतलब क्या हो सकता है, और क्या पूछें।'),
+              action: 'scan_decoder',
+            ),
+            const PvReadNextStep(
+              kind: PvNextKind.consult,
+              title: LocalizedText(
+                  en: 'Have a gynaecologist go through it with you',
+                  hi: 'किसी gynaecologist से समझिए'),
+              value: LocalizedText(
+                  en: 'They tell you what the scan does and does not say.',
+                  hi: 'वे बताएँगे यह scan क्या कहता है और क्या नहीं।'),
+              action: 'scan_consult',
+            ),
+            PvReadNextStep(
+              kind: PvNextKind.read,
+              title: LocalizedText(
+                  en: 'Still worried? Ask Veda about ${scan.name.en}',
+                  hi: 'अब भी चिंता? Veda से ${scan.name.hi} के बारे में पूछिए'),
+              value: const LocalizedText(
+                  en: 'Ask anything about this scan, in your own words.',
+                  hi: 'इस scan के बारे में अपने शब्दों में कुछ भी पूछिए।'),
+              action: 'scan_askveda',
+            ),
+          ],
+        );
+        return PvReaderScreen(
+          read: read,
+          lang: lang,
+          openAction: (context, action) => switch (action) {
+            'scan_appointments' => _push(
+                context, ScansAppointmentsScreen(controller: pregnancy), 'appointments'),
+            'scan_reference' => _push(context,
+                TestScanDetailScreen(info: scan, controller: pregnancy), 'scans/reference'),
+            'scan_decoder' => _push(context,
+                ReportScreen(controller: pregnancy, initialReport: scan.id), 'scans/decoder'),
+            // ⚠️ THE FILTER IS THE WHOLE POINT OF THE TAP — see kScanConsultRole.
+            'scan_consult' => _push(context,
+                ConsultationsScreen(lang: lang, onlyRole: kScanConsultRole), 'consults'),
+            // The FAB's own route name, so the sparkle suppresses itself over
+            // the screen it opens.
+            'scan_askveda' => _push(context,
+                AskVedaScreen(controller: pregnancy, initialQuery: scan.name.en), kAskVedaRoute),
+            _ => null,
+          },
+        );
+      },
+    );
+  }
+
+  /// The previous body, kept for revert. See `build`.
+  Widget buildClassic(BuildContext context) {
     final lang = pregnancy.language;
 
     return AnimatedBuilder(
