@@ -15,16 +15,31 @@
 //  and the per-user preferences are a device setting — a mother who reads in
 //  dark mode on her phone has said nothing about her husband's tablet.
 //
-//  ⚠️ CLOUD SYNC IS DELIBERATELY NOT WIRED YET. `ReadingStore` (parenting) uses
-//  the `CloudSyncedStore` mixin and that is the right end state, but TTC takes
-//  no new tables while its UI is being finalised — see `docs/STILL-OPEN.md`
-//  §9.7, the same call TTC attachments made. Local-first already behaves
-//  correctly here: progress shows instantly and a cloud failure is never a
-//  crash, because there is no cloud call to fail.
+//  ⚠️ BOOKMARKS MOVED TO SavedStore ON 2026-09-16 (docs/FAMILY-MODEL.md §5).
+//  The saved set is now rows of kind `article` in `saved_items`, owned by the
+//  person and synced row by row — which closes the §9.7 hold below for saves.
+//  `isSaved` / `saved` / `toggleSave` keep their signatures and delegate. The
+//  old 'pv_read_saved' prefs key is read once by SavedStore.importLegacy.
+//
+//  PROGRESS AND PREFERENCES STAY HERE AND STAY LOCAL. Progress is per-device
+//  by nature (which paragraph this phone is at), and mode / font scale are
+//  device settings — a mother who reads in dark mode on her phone has said
+//  nothing about her husband's tablet. The original note, kept:
+//
+//  CLOUD SYNC IS DELIBERATELY NOT WIRED for progress. `ReadingStore`
+//  (parenting) uses the `CloudSyncedStore` mixin and that is the right end
+//  state, but TTC takes no new tables while its UI is being finalised — see
+//  `docs/STILL-OPEN.md` §9.7, the same call TTC attachments made. Local-first
+//  already behaves correctly here: progress shows instantly and a cloud
+//  failure is never a crash, because there is no cloud call to fail.
 // =============================================================================
 
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../data/reads/pregnancy_reads.dart';
+import '../ttc/ttc_reads_data.dart';
+import 'saved_store.dart';
 
 /// Light, sepia, dark. Persisted by NAME, not by index.
 ///
@@ -34,16 +49,23 @@ import 'package:shared_preferences/shared_preferences.dart';
 enum PvReadMode { light, sepia, dark }
 
 class PvReadStore extends ChangeNotifier {
-  PvReadStore._();
+  PvReadStore._() {
+    SavedStore.instance.addListener(notifyListeners);
+  }
   static final PvReadStore instance = PvReadStore._();
 
   static const _kProgress = 'pv_read_progress';
-  static const _kSaved = 'pv_read_saved';
+  // static const _kSaved = 'pv_read_saved'; // kept for revert — read by SavedStore.importLegacy
   static const _kMode = 'pv_read_mode';
   static const _kFont = 'pv_read_font';
+  // "Was this helpful?" — id → 'yes' | 'no'. Local, like progress; the
+  // recommendations engine reads it as a per-item signal. A cloud column is
+  // not owed until something server-side consumes it (STILL-OPEN §62.2).
+  static const _kHelpful = 'pv_read_helpful';
 
   final Map<String, double> _progress = {};
-  final Set<String> _saved = {};
+  final Map<String, String> _helpful = {};
+  // final Set<String> _saved = {}; // kept for revert — now SavedStore rows
   PvReadMode _mode = PvReadMode.light;
   double _fontScale = 1.0;
 
@@ -51,10 +73,25 @@ class PvReadStore extends ChangeNotifier {
 
   PvReadMode get mode => _mode;
   double get fontScale => _fontScale;
-  Set<String> get saved => Set.unmodifiable(_saved);
+  Set<String> get saved => SavedStore.instance.idsOf(SavedKind.article).toSet();
 
   double progressOf(String id) => _progress[id] ?? 0;
-  bool isSaved(String id) => _saved.contains(id);
+
+  /// true = helpful, false = not really, null = not answered.
+  bool? helpfulOf(String id) => switch (_helpful[id]) {
+        'yes' => true,
+        'no' => false,
+        _ => null,
+      };
+
+  Future<void> setHelpful(String id, bool helpful) async {
+    _helpful[id] = helpful ? 'yes' : 'no';
+    notifyListeners();
+    final p = await SharedPreferences.getInstance();
+    await p.setStringList(
+        _kHelpful, [for (final e in _helpful.entries) '${e.key}:${e.value}']);
+  }
+  bool isSaved(String id) => SavedStore.instance.isSaved(SavedKind.article, id);
 
   /// True once she is far enough in that "continue reading" is honest.
   bool isStarted(String id) {
@@ -80,7 +117,12 @@ class PvReadStore extends ChangeNotifier {
       final v = double.tryParse(row.substring(i + 1));
       if (v != null) _progress[row.substring(0, i)] = v;
     }
-    _saved.addAll(p.getStringList(_kSaved) ?? const <String>[]);
+    // _saved.addAll(p.getStringList(_kSaved) ?? const <String>[]); // kept for revert
+    for (final row in p.getStringList(_kHelpful) ?? const <String>[]) {
+      final i = row.lastIndexOf(':');
+      if (i > 0) _helpful[row.substring(0, i)] = row.substring(i + 1);
+    }
+    await SavedStore.instance.load();
 
     final modeName = p.getString(_kMode);
     _mode = PvReadMode.values.firstWhere((m) => m.name == modeName,
@@ -115,12 +157,18 @@ class PvReadStore extends ChangeNotifier {
     // something that is true within a few percent.
   }
 
-  Future<void> toggleSave(String id) async {
-    _saved.contains(id) ? _saved.remove(id) : _saved.add(id);
-    notifyListeners();
-    final p = await SharedPreferences.getInstance();
-    await p.setStringList(_kSaved, _saved.toList());
+  Future<void> toggleSave(String id) {
+    final r = ttcReadById(id) ?? pregnancyReadById(id);
+    return SavedStore.instance.toggle(SavedKind.article, id,
+        title: r?.title.en ?? '', subtitle: r?.kicker.en);
   }
+  // Kept for revert:
+  // Future<void> toggleSave(String id) async {
+  //   _saved.contains(id) ? _saved.remove(id) : _saved.add(id);
+  //   notifyListeners();
+  //   final p = await SharedPreferences.getInstance();
+  //   await p.setStringList(_kSaved, _saved.toList());
+  // }
 
   Future<void> setMode(PvReadMode m) async {
     if (m == _mode) return;

@@ -144,6 +144,17 @@ String dailyTipId([DateTime? on]) {
   return 'tip_${doy % kDailyTips.length}';
 }
 
+/// The tip behind a saved id ('tip_N'), or null for an id this build does
+/// not have. Used for the Saved screen's title snapshot; a null renders as
+/// "No longer available", never as a wrong tip.
+DailyTip? dailyTipById(String id) {
+  final n = int.tryParse(id.replaceFirst('tip_', ''));
+  if (n == null || n < 0 || n >= kDailyTips.length) return null;
+  return kDailyTips[n];
+}
+
+String dailyTipTitle(String id) => dailyTipById(id)?.title ?? '';
+
 /// The plain-text form used by the share sheet.
 ///
 /// Includes the source line: a tip forwarded to a WhatsApp group with no

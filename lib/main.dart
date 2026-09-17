@@ -57,6 +57,7 @@ import 'services/bought_store.dart';
 import 'services/bump_store.dart';
 import 'services/calendar_store.dart';
 import 'services/can_i_store.dart';
+import 'services/saved_store.dart';
 import 'services/cart_store.dart';
 import 'services/community_store.dart';
 import 'services/expert_follow_store.dart';
@@ -159,6 +160,7 @@ class _ParentVedaAppState extends State<ParentVedaApp>
     WidgetsBinding.instance.addObserver(this);
     UsageEvents.instance.startSession();
     _controller = PregnancyController();
+    PregnancyController.current = _controller; // see the field's doc
     // Kick off the async content load; the screen shows a loader until ready.
     _controller.load();
     _home = HomeContentController();
@@ -199,6 +201,10 @@ class _ParentVedaAppState extends State<ParentVedaApp>
     // show a number generated from a hash of the offering id rather than the
     // one the booking ledger holds — see ServerSlotStore.
     ServerSlotStore.instance.refresh();
+    // Every bookmark in the app, one store (docs/FAMILY-MODEL.md §5). Loaded
+    // first so the per-kind facades below find their rows ready; each of
+    // them also calls load(), which is idempotent.
+    SavedStore.instance.load();
     // Load Can I? saved-questions persistence.
     CanIStore.instance.init();
     // Load Garbh Sanskar Journey persistence (favorites, reflective tally).

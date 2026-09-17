@@ -1555,6 +1555,108 @@ The same rule caught the More sheet: it renders Community plus every Explore
 drawer row, and the drawer rows are declared once (`ppExploreEntries`) and
 rendered twice, because two lists that must agree will not.
 
+## 16c. A verified attribute is not an identity — the phone number
+
+From the onboarding decision (2026-09-16, `docs/ONBOARDING-AUDIT.md`), built
+as `0080_phone_otp.sql` + `supabase/functions/phone-otp-send` /
+`phone-otp-verify` + `lib/services/auth/phone_otp.dart`.
+
+The ask was simple: Google is the only sign-in, and we also need her phone
+number, verified, for WhatsApp. Supabase has phone auth built in — one
+call to send a code, one to verify, done. **Using it would have been the
+mistake.** Phone auth makes the number a *login*. She would then be two
+identities — a Google user and a phone user — and the moment those two
+sessions touch different `profiles` rows, her journal is in two places and
+she thinks it vanished. `AUTH-SETUP.md` already warns about this shape for
+Google-plus-Facebook; a second identity of any kind reopens it.
+
+So the number is an **attribute**: something a session that already exists
+can prove and attach, and that can never open a session on its own. That
+one sentence decided every layer:
+
+| Layer | Consequence |
+|---|---|
+| Identity | from the JWT, never the body (§14d again); `auth.admin` and `signInWithOtp` do not appear in either function, and the test asserts it |
+| The code | ours — generated in the function, hashed `sha256(user_id ':' code)`, stored in `phone_otps`; MSG91 only carries it (`otp=` on its SendOTP call) |
+| The rules | in SQL, in one transaction — `phone_otp_issue()` counts and inserts under the same statement, so two racing sends cannot both pass "three per ten minutes" (§16a: enforce where the thing being protected lives) |
+| The write | `phone_otp_consume()` stamps `profiles.phone` + `phone_verified_at` in the transaction that consumes the code. The Edge function writes nothing; two writers for one fact can disagree, one cannot |
+| The answer | a word — `verified` / `wrong` / `expired` / `too_many` / `none` — not a bool, because each is a different button (§15b) |
+| Visibility | `phone_otps` has RLS on and **no policies**, no grant to `authenticated`: nobody but `service_role` can read a hash |
+
+**Say what a control does.** A six-digit code has a million values, so the
+hash is not what stops a guesser — offline, with the table and the user id,
+all million take seconds. What stops a guesser is the five-minute expiry
+and the five-attempt cap. The hash stops the *cheap* failure: a backup, a log
+line, a screen-share of the dashboard showing a live code. Write down which
+job each control does, or the next reader will trust the wrong one.
+
+**The contract that lives outside the repo.** Android auto-fills the code only
+if the SMS ends with the app's 11-character hash, and that line is on the
+MSG91 template (DLT-registered, so a change costs days). Leave it off and the
+code arrives, the boxes stay empty, and nothing logs on either side — the Ask
+Veda request-body failure in a new costume. It is documented in the sender's
+header, and the test checks the documentation is there, because the code
+that depends on it cannot check the template itself.
+
+**What it costs.** Two Edge Functions and four SQL functions where Supabase
+phone auth would have been two client calls. ≈ ₹0.15–0.25 / $0.002–0.003
+per SMS. And the number is only ever as trustworthy as the last verification
+— `phone_verified_at` is a timestamp, not a boolean, so the WhatsApp engine
+can decide how stale is too stale.
+
+## 16d. Tags are not owners; rows are not blobs — `saved_items`
+
+From the family-model decision (2026-09-16, `docs/FAMILY-MODEL.md`), built as
+`0081_saved_items.sql` + `lib/services/saved_store.dart` +
+`lib/screens/saved_screen.dart`. Two general facts, each learned the hard way.
+
+**1. Ownership is a question you answer once, or ten times.** Ten stores
+each kept a "saved" set, because nobody had written down who owns a
+bookmark. The answer — the *person*, with stage and child as *tags* — is
+what makes "she saved it in trying, she is pregnant now, is it still there?"
+not a feature but a non-event: a row with `stage = 'trying'` in a list that
+shows everything. A `child_id` that is `on delete set null` is the same idea:
+deleting a child must not delete what she read about him. When a new table
+wants a `stage` or `child_id` column, ask whether it is an owner (access
+flows through it: `my_child_ids()`) or a tag (a filter). Getting that wrong
+is a migration later; getting it undecided is ten stores.
+
+**2. Blobs clobber; rows merge.** `CloudSyncedStore` syncs one JSON blob per
+store — the right tool for a preference, where "cloud wins on startup" is
+harmless. For a *set the user edits from two devices* it is wrong in a way
+no test on one device can show: she unsaves on the tablet, the phone was
+offline with the old set, the phone comes back and pushes — the unsave is
+undone. Rows keyed by a natural key `(user, kind, item)` merge item by item.
+Three things make that merge correct, and each is a column:
+
+| Column | Without it |
+|---|---|
+| `updated_at` | no way to say which device's row is newer |
+| `removed_at` (tombstone) | an unsave is an absence, and an absence cannot win a merge — the stale device resurrects it |
+| `title` snapshot | a row whose content was edited or withdrawn renders blank, or matches the wrong thing |
+
+`SavedStore.merge()` is the whole algorithm in twelve lines and
+`test/saved_store_test.dart` walks each branch: stale save vs newer unsave,
+newer unsave vs older save, re-save after tombstone. The natural key also
+means **no uuid** — the identity is the same on every device deterministically,
+which is the app-generates-the-id rule with nothing to generate.
+
+**The migration nobody sees.** The old stores' saves lived in two places — a
+prefs key on the device and a blob in `user_state`. A tester updating in
+place has the prefs key; the same tester on a fresh phone has only the blob.
+`importLegacy` (prefs, once per install) and `importLegacyCloud` (blobs, once
+per account) each read every old shape verbatim, skip the parenting demo
+seeds that every account was born with, and leave the old keys in place for
+a rollback. A data migration that only handles the case you tested is how
+saves vanish for exactly the users who would notice.
+
+**What it cost.** A facade on each of ten stores (their old bodies commented,
+kept for revert), one static `PregnancyController.current` so a surface
+outside any stage shell can open a pregnancy screen, and 24 tests. And the
+Saved screen now has one opener map, `SavedItemOpener`, which is the single
+answer to "what does tapping a saved thing do" — the same shape as
+`pvDoorEntryScreen`: null for an unknown id, never a near match.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
@@ -1593,3 +1695,9 @@ rendered twice, because two lists that must agree will not.
     authorised against — a host has no booking at their own class.
 18. `lib/booking/server_slots.dart` — server truth meeting a synchronous `build`,
     and why the fallback is zero rather than a plausible guess (§16b).
+19. `0080_phone_otp.sql` + `supabase/functions/phone-otp-send/` — a verified
+    attribute that must never become an identity, rules in one transaction,
+    and the template line that lives outside the repo (§16c).
+20. `docs/FAMILY-MODEL.md` → `0081_saved_items.sql` → `lib/services/saved_store.dart`
+    — who owns what across stages; tags vs owners; rows vs blobs, and the
+    three columns a two-device merge needs (§16d).

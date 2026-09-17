@@ -139,6 +139,14 @@ dependencies:
   # dependency and a second place for the App ID to drift.
   google_sign_in: ^7.2.0
 
+  # Phone number in two taps, zero keystrokes (lib/services/auth/phone_otp.dart).
+  # Phone Number Hint shows the SIM's number in a Play Services sheet; SMS
+  # Retriever hands the OTP SMS to the app so the six boxes fill themselves.
+  # Android only, which is the decided platform (docs/ONBOARDING-AUDIT.md §5.5).
+  # The retriever only works if the SMS ends with the app's 11-char hash -
+  # that line is set on the MSG91 template, not here. See phone-otp-send.
+  smart_auth: ^3.2.0
+
   # AskVeda RAG chatbot backend — the app's Ask Veda screen POSTs a question to
   # the AskVeda service (/ask) and shows the grounded answer. Plain REST over http.
   http: ^1.2.2

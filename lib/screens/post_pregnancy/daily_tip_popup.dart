@@ -48,6 +48,7 @@ import '../../services/remote/cloud_synced_store.dart';
 import 'pp_common.dart';
 import 'pp_expert_link.dart';
 import 'pp_daily_tips.dart';
+import '../../services/saved_store.dart';
 import 'pp_watch_data.dart';
 import 'watch_player_screen.dart';
 import 'watch_quicklearn_screen.dart';
@@ -95,14 +96,19 @@ WatchVideo dailyPopupVideo([DateTime? on]) {
 // =============================================================================
 
 class DailyTipStore extends ChangeNotifier with CloudSyncedStore {
-  DailyTipStore._();
+  DailyTipStore._() {
+    // Kept tips live in SavedStore since 2026-09-16 (docs/FAMILY-MODEL.md §5)
+    // as rows of kind `tip`; this store keeps only "shown today".
+    SavedStore.instance.addListener(notifyListeners);
+  }
   static final DailyTipStore instance = DailyTipStore._();
 
   /// yyyy-MM-dd of the last day the pop-up was shown.
   String _lastShown = '';
 
-  /// Tip ids the parent chose to keep.
-  final Set<String> _saved = {};
+  /// Tip ids the parent chose to keep - now SavedStore rows of kind `tip`.
+  // final Set<String> _saved = {}; // kept for revert
+  Set<String> get _saved => SavedStore.instance.idsOf(SavedKind.tip).toSet();
 
   static const _prefsKey = 'pp_daily_tip_v1';
 
@@ -138,14 +144,13 @@ class DailyTipStore extends ChangeNotifier with CloudSyncedStore {
   }
 
   @override
-  Object cloudData() => {'lastShown': _lastShown, 'saved': _saved.toList()};
+  Object cloudData() => {'lastShown': _lastShown}; // 'saved' moved to saved_items
 
   @override
   void applyCloudData(Object data) {
     if (data is! Map) return;
     _lastShown = (data['lastShown'] ?? '').toString();
-    final s = data['saved'];
-    if (s is List) _saved..clear()..addAll(s.map((e) => e.toString()));
+    // saved: kept for revert - SavedStore owns kept tips now.
     notifyListeners();
   }
 
@@ -181,12 +186,16 @@ class DailyTipStore extends ChangeNotifier with CloudSyncedStore {
     notifyListeners();
   }
 
-  bool isSaved(String id) => _saved.contains(id);
+  bool isSaved(String id) => SavedStore.instance.isSaved(SavedKind.tip, id);
 
   void toggleSaved(String id) {
-    if (!_saved.add(id)) _saved.remove(id);
-    notifyListeners();
+    SavedStore.instance.toggle(SavedKind.tip, id, title: dailyTipTitle(id));
   }
+  // Kept for revert:
+  // void toggleSaved(String id) {
+  //   if (!_saved.add(id)) _saved.remove(id);
+  //   notifyListeners();
+  // }
 
   List<String> get saved => List.unmodifiable(_saved);
 

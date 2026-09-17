@@ -18,6 +18,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/read_store.dart';
 import '../../services/remote/cloud_synced_store.dart';
+import '../../services/saved_store.dart';
 import '../../care_partner/care_journey.dart';
 
 /// An expandable "ParentVeda tip" shown inline in the reader.
@@ -686,10 +687,17 @@ List<ReadArticle> readNextArticles(ReadArticle article, {int limit = 4}) {
 enum ReadMode { light, sepia, dark }
 
 class ReadingStore extends ChangeNotifier with CloudSyncedStore {
-  ReadingStore._();
+  ReadingStore._() {
+    // Saved articles live in SavedStore since 2026-09-16 (docs/FAMILY-MODEL.md
+    // §5) as rows of kind `article`; this store keeps progress, font, mode.
+    SavedStore.instance.addListener(notifyListeners);
+  }
   static final ReadingStore instance = ReadingStore._();
 
-  final Set<String> _saved = {'leap4', 'matrescence'};
+  // final Set<String> _saved = {'leap4', 'matrescence'}; // kept for revert - demo seeds are gone with it
+  // `article` is shared with the pregnancy and TTC reads, so every read below
+  // filters to ids THIS catalogue knows — readArticleById's orElse would
+  // otherwise turn a foreign id into a phantom first article.
   final Map<String, double> _progress = {'sleepcycles': 0.35, 'solids': 0.65};
   double _fontScale = 1.0;
   ReadMode _mode = ReadMode.light;
@@ -702,7 +710,7 @@ class ReadingStore extends ChangeNotifier with CloudSyncedStore {
 
   @override
   Object cloudData() => {
-        'saved': _saved.toList(),
+        // 'saved': _saved.toList(), // moved to saved_items; an old blob's copy is lifted once by SavedStore
         'progress': _progress,
         'fontScale': _fontScale,
         'mode': _mode.name,
@@ -711,8 +719,7 @@ class ReadingStore extends ChangeNotifier with CloudSyncedStore {
   @override
   void applyCloudData(Object data) {
     if (data is! Map) return;
-    final s = data['saved'];
-    if (s is List) _saved..clear()..addAll(s.map((e) => e.toString()));
+    // saved: kept for revert - SavedStore owns bookmarks now.
     final p = data['progress'];
     if (p is Map) {
       _progress
@@ -755,13 +762,23 @@ class ReadingStore extends ChangeNotifier with CloudSyncedStore {
   }
 
 
-  bool isSaved(String id) => _saved.contains(id);
+  bool isSaved(String id) => SavedStore.instance.isSaved(SavedKind.article, id);
   void toggleSave(String id) {
-    _saved.contains(id) ? _saved.remove(id) : _saved.add(id);
-    notifyListeners();
+    final a = readCatalog.where((x) => x.id == id).firstOrNull;
+    SavedStore.instance.toggle(SavedKind.article, id,
+        title: a?.title ?? '', subtitle: a == null ? null : '${a.minutes} min');
   }
+  // Kept for revert:
+  // void toggleSave(String id) {
+  //   _saved.contains(id) ? _saved.remove(id) : _saved.add(id);
+  //   notifyListeners();
+  // }
 
-  List<ReadArticle> get saved => _saved.map(readArticleById).toList();
+  /// Newest saved first.
+  List<ReadArticle> get saved => [
+        for (final id in SavedStore.instance.idsOf(SavedKind.article))
+          if (readCatalog.any((a) => a.id == id)) readArticleById(id)
+      ];
 
   double progressOf(String id) => _progress[id] ?? 0;
   void setProgress(String id, double p) {

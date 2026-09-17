@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../services/remote/cloud_synced_store.dart';
+import '../../services/saved_store.dart';
 import 'pp_experts_data.dart';
 
 /// One learning item. `quick` splits Deep vs Quick (Shorts) modes; `isPodcast`
@@ -590,7 +591,12 @@ List<WatchCollection> expertCollections() {
 //  A ChangeNotifier singleton, matching the app's other stores.
 // =============================================================================
 class WatchStore extends ChangeNotifier with CloudSyncedStore {
-  WatchStore._();
+  WatchStore._() {
+    // Saved videos live in SavedStore since 2026-09-16 (docs/FAMILY-MODEL.md
+    // §5) as rows of kind `video`; this store keeps following, progress,
+    // recents, completed and collections. Screens listen here, so forward.
+    SavedStore.instance.addListener(notifyListeners);
+  }
   static final WatchStore instance = WatchStore._();
 
   // ---- persistence (user_state KV; own-only, a personal preference) --------
@@ -617,7 +623,7 @@ class WatchStore extends ChangeNotifier with CloudSyncedStore {
 
   @override
   Object cloudData() => {
-        'saved': _saved.toList(),
+        // 'saved': _saved.toList(), // moved to saved_items; an old blob's copy is lifted once by SavedStore
         'following': _following.toList(),
         'progress': _progress,
         'recent': _recent,
@@ -636,7 +642,7 @@ class WatchStore extends ChangeNotifier with CloudSyncedStore {
       if (v is List) into..clear()..addAll(v.map((e) => e.toString()));
     }
 
-    strs('saved', _saved);
+    // strs('saved', _saved); // kept for revert - SavedStore owns bookmarks now
     strs('following', _following);
     strs('completed', _completed);
     final p = data['progress'];
@@ -691,7 +697,10 @@ class WatchStore extends ChangeNotifier with CloudSyncedStore {
     persistLocalCache();
   }
 
-  final Set<String> _saved = {'tummytime', 'q_iron'};
+  // final Set<String> _saved = {'tummytime', 'q_iron'}; // kept for revert - demo seeds are gone with it
+  // The `video` kind is shared with the pregnancy videos, so every read below
+  // filters to ids THIS catalogue knows — watchVideoById's orElse would
+  // otherwise turn a pregnancy id into a phantom first video.
   final Set<String> _following = {'ananya'};
   // 0..1 progress; a value in (0,1) = "continue watching".
   final Map<String, double> _progress = {
@@ -701,13 +710,24 @@ class WatchStore extends ChangeNotifier with CloudSyncedStore {
   };
   final List<String> _recent = ['leap4brain', 'sleep4mo', 'q_play'];
 
-  bool isSaved(String id) => _saved.contains(id);
+  bool isSaved(String id) => SavedStore.instance.isSaved(SavedKind.video, id);
   void toggleSave(String id) {
-    _saved.contains(id) ? _saved.remove(id) : _saved.add(id);
-    notifyListeners();
+    final v = kWatchAll.where((x) => x.id == id).firstOrNull;
+    SavedStore.instance.toggle(SavedKind.video, id,
+        title: v?.title ?? '',
+        subtitle: v == null ? null : '${(v.seconds / 60).ceil()} min');
   }
+  // Kept for revert:
+  // void toggleSave(String id) {
+  //   _saved.contains(id) ? _saved.remove(id) : _saved.add(id);
+  //   notifyListeners();
+  // }
 
-  List<WatchVideo> get saved => _saved.map(watchVideoById).toList();
+  /// Newest saved first.
+  List<WatchVideo> get saved => [
+        for (final id in SavedStore.instance.idsOf(SavedKind.video))
+          if (kWatchAll.any((v) => v.id == id)) watchVideoById(id)
+      ];
 
   bool isFollowing(String expertId) => _following.contains(expertId);
   void toggleFollow(String expertId) {

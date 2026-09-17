@@ -11,6 +11,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'remote/cloud_synced_store.dart';
+import 'saved_store.dart';
 
 class SavedRtbPiece {
   const SavedRtbPiece({
@@ -62,8 +63,17 @@ class SavedRtbPiece {
   }
 }
 
+// ⚠️ MEMBERSHIP MOVED TO SavedStore ON 2026-09-16 (docs/FAMILY-MODEL.md §5).
+// Whether a piece IS saved is a `saved_items` row of kind `read_to_baby`,
+// owned by the person. What stays here is the BODY CACHE: a read-to-baby piece
+// is a few paragraphs she reads aloud, and the row carries only title and tag,
+// so the text is kept locally (and in this store's blob) so the Saved screen
+// can open it. A fresh device with the row but no cached body shows the title
+// and tag and opens Samvad — never a blank row.
 class ReadToBabySavedStore extends ChangeNotifier with CloudSyncedStore {
-  ReadToBabySavedStore._();
+  ReadToBabySavedStore._() {
+    SavedStore.instance.addListener(notifyListeners);
+  }
   static final ReadToBabySavedStore instance = ReadToBabySavedStore._();
 
   static const _key = 'rtb_saved';
@@ -83,6 +93,7 @@ class ReadToBabySavedStore extends ChangeNotifier with CloudSyncedStore {
     } catch (_) {/* start empty */}
     _loaded = true;
     notifyListeners();
+    await SavedStore.instance.load();
     await syncStateFromCloud();
   }
 
@@ -99,24 +110,48 @@ class ReadToBabySavedStore extends ChangeNotifier with CloudSyncedStore {
   @override
   Future<void> persistLocalCache() => _persist();
 
-  bool isSaved(String key) => _items.any((p) => p.key == key);
-  bool get isEmpty => _items.isEmpty;
+  bool isSaved(String key) => SavedStore.instance.isSaved(SavedKind.readToBaby, key);
+  bool get isEmpty => SavedStore.instance.count(SavedKind.readToBaby) == 0;
+  // Kept for revert:
+  // bool isSaved(String key) => _items.any((p) => p.key == key);
+  // bool get isEmpty => _items.isEmpty;
 
-  /// Newest-saved first.
+  /// The cached body for a saved key, when this device has it.
+  SavedRtbPiece? cached(String key) {
+    for (final p in _items) {
+      if (p.key == key) return p;
+    }
+    return null;
+  }
+
+  /// Newest-saved first — driven by SavedStore's rows, bodies from the cache.
   List<SavedRtbPiece> recent() {
-    final l = [..._items];
-    l.sort((a, b) => b.savedAt.compareTo(a.savedAt));
-    return l;
+    return [
+      for (final r in SavedStore.instance.items(kind: SavedKind.readToBaby))
+        cached(r.itemId) ??
+            SavedRtbPiece(
+              key: r.itemId,
+              title: r.title.isEmpty ? r.itemId : r.title,
+              body: '',
+              tag: r.subtitle ?? '',
+              savedAt: r.savedAt.millisecondsSinceEpoch,
+            ),
+    ];
   }
 
   /// [key] identifies the piece and must not change with language; [title] is
   /// what she sees in the Saved hub and may. They are the same string until a
   /// caller has a translated title to hand, which is why [title] is optional.
   void toggleSave(String key, String body, String tag, {String? title}) {
+    final wasSaved = isSaved(key);
+    SavedStore.instance.toggle(SavedKind.readToBaby, key,
+        title: title ?? key, subtitle: tag);
+    // The body cache follows membership: keep the text while saved, drop it
+    // on unsave. The cache is never consulted for "is it saved".
     final idx = _items.indexWhere((p) => p.key == key);
-    if (idx >= 0) {
-      _items.removeAt(idx);
-    } else {
+    if (wasSaved) {
+      if (idx >= 0) _items.removeAt(idx);
+    } else if (idx < 0) {
       _items.add(SavedRtbPiece(
         key: key,
         title: title ?? key,

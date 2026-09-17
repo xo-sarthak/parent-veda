@@ -15,6 +15,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../data/community_data.dart';
 import '../models/community_models.dart';
 import 'remote/cloud_synced_store.dart';
+import 'saved_store.dart';
 
 /// The identity used while testing "Doctor mode" (until real doctor logins
 /// exist). When the test doctor verifies a post, it counts as one expert.
@@ -22,13 +23,17 @@ const String kTestDoctorName = 'Dr. (You)';
 const String kTestDoctorCred = 'OB-GYN';
 
 class CommunityStore extends ChangeNotifier with CloudSyncedStore {
-  CommunityStore._();
+  CommunityStore._() {
+    // Bookmarks live in SavedStore since 2026-09-16 (docs/FAMILY-MODEL.md §5);
+    // screens listen to this store, so forward its changes.
+    SavedStore.instance.addListener(notifyListeners);
+  }
   static final CommunityStore instance = CommunityStore._();
 
   static const _joinedKey = 'comm_joined';
   static const _mutedKey = 'comm_muted';
   static const _likedKey = 'comm_liked';
-  static const _savedKey = 'comm_saved';
+  // static const _savedKey = 'comm_saved'; // kept for revert — read once by SavedStore.importLegacy
   static const _upvotedKey = 'comm_upvoted';
   static const _votesKey = 'comm_votes';
   static const _postsKey = 'comm_posts';
@@ -42,7 +47,8 @@ class CommunityStore extends ChangeNotifier with CloudSyncedStore {
   final Set<String> _joined = {};
   final Set<String> _muted = {};
   final Set<String> _liked = {};
-  final Set<String> _saved = {};
+  // final Set<String> _saved = {}; // kept for revert — now SavedStore rows of kind `post`
+  Set<String> get _saved => SavedStore.instance.idsOf(SavedKind.post).toSet();
   final Set<String> _upvoted = {};
   final Map<String, String> _votes = {};
   final List<CommunityPost> _created = [];
@@ -64,9 +70,7 @@ class CommunityStore extends ChangeNotifier with CloudSyncedStore {
     _liked
       ..clear()
       ..addAll(p.getStringList(_likedKey) ?? const []);
-    _saved
-      ..clear()
-      ..addAll(p.getStringList(_savedKey) ?? const []);
+    // _saved..clear()..addAll(p.getStringList(_savedKey) ?? const []); // kept for revert
     _upvoted
       ..clear()
       ..addAll(p.getStringList(_upvotedKey) ?? const []);
@@ -108,7 +112,7 @@ class CommunityStore extends ChangeNotifier with CloudSyncedStore {
         'joined': _joined.toList(),
         'muted': _muted.toList(),
         'liked': _liked.toList(),
-        'saved': _saved.toList(),
+        // 'saved': _saved.toList(), // moved to saved_items; an old blob's copy is lifted once by SavedStore
         'upvoted': _upvoted.toList(),
         'votes': _votes,
         'posts': _created.map((p) => p.toJson()).toList(),
@@ -126,7 +130,7 @@ class CommunityStore extends ChangeNotifier with CloudSyncedStore {
     fillSet(_joined, m['joined']);
     fillSet(_muted, m['muted']);
     fillSet(_liked, m['liked']);
-    fillSet(_saved, m['saved']);
+    // fillSet(_saved, m['saved']); // kept for revert — SavedStore owns bookmarks now
     fillSet(_upvoted, m['upvoted']);
     _votes
       ..clear()
@@ -153,7 +157,7 @@ class CommunityStore extends ChangeNotifier with CloudSyncedStore {
     await p.setStringList(_joinedKey, _joined.toList());
     await p.setStringList(_mutedKey, _muted.toList());
     await p.setStringList(_likedKey, _liked.toList());
-    await p.setStringList(_savedKey, _saved.toList());
+    // await p.setStringList(_savedKey, _saved.toList()); // kept for revert
     await p.setStringList(_upvotedKey, _upvoted.toList());
     await p.setString(_votesKey, jsonEncode(_votes));
     await p.setString(
@@ -173,6 +177,10 @@ class CommunityStore extends ChangeNotifier with CloudSyncedStore {
   bool isUpvoted(String id) => _upvoted.contains(id);
   String? votedOption(String id) => _votes[id];
   List<CommunityPost> get createdPosts => List.unmodifiable(_created);
+
+  /// Every post this store can show, seed and hers — for the Saved screen's
+  /// resolver, which must find a post by id without knowing which room.
+  List<CommunityPost> get allPosts => List.unmodifiable(_allPosts);
 
   // --- "My Activity" / "My Bookmarks" views ---
   List<CommunityPost> get savedPosts =>
@@ -266,10 +274,24 @@ class CommunityStore extends ChangeNotifier with CloudSyncedStore {
   }
 
   void toggleSave(String id) {
-    if (!_saved.remove(id)) _saved.add(id);
-    _prefs?.setStringList(_savedKey, _saved.toList());
-    notifyListeners();
+    CommunityPost? post;
+    for (final x in _allPosts) {
+      if (x.id == id) {
+        post = x;
+        break;
+      }
+    }
+    final text = post?.text ?? '';
+    SavedStore.instance.toggle(SavedKind.post, id,
+        title: text.length > 80 ? '${text.substring(0, 80)}…' : text,
+        subtitle: post?.author);
   }
+  // Kept for revert:
+  // void toggleSave(String id) {
+  //   if (!_saved.remove(id)) _saved.add(id);
+  //   _prefs?.setStringList(_savedKey, _saved.toList());
+  //   notifyListeners();
+  // }
 
   void toggleUpvote(String id) {
     if (!_upvoted.remove(id)) _upvoted.add(id);

@@ -209,3 +209,9 @@ docs/APP-FLOW-MAP.pdf
 # this folder. The audits and inventories beside them in docs/ are app
 # planning and stay tracked.
 docs/design-prompts/
+
+# Mobbin reference screenshots - downloaded because the MCP image URLs expire
+# in 30 days. The permanent links live in the docs/*-AUDIT.md index tables.
+research/mobbin/**/*.webp
+research/mobbin/**/*.jpg
+research/mobbin/**/*.png

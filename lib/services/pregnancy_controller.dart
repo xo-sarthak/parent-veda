@@ -60,6 +60,17 @@ extension DueDateSourceOwnership on DueDateSource {
 }
 
 class PregnancyController extends ChangeNotifier {
+  /// The app's ONE live controller, registered by `main.dart` the moment it is
+  /// created. Screens inside a stage shell keep receiving it threaded through
+  /// constructors — that stays the rule, and `bs_itching_screen.dart` records
+  /// why constructing a second one is a silent bug. This static exists for the
+  /// few surfaces that live OUTSIDE any stage shell and still have to open a
+  /// pregnancy screen: the unified Saved screen opened from the parenting home
+  /// must be able to open a pregnancy article she saved a year ago
+  /// (docs/FAMILY-MODEL.md §5). Null only in tests and previews, which is why
+  /// every reader of it degrades to "cannot open" rather than throwing.
+  static PregnancyController? current;
+
   PregnancyController({DateTime? dueDate, DateTime? now})
       : _now = now ?? DateTime.now(),
         _dueDate = dueDate ?? _placeholderDueDate(now ?? DateTime.now());
