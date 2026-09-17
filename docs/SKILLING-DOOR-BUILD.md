@@ -14,6 +14,11 @@ calls that apply to every door rather than to one. The user's instruction
 section; points generic to the doors of skilling live here, in §9. Content
 owed goes to `DOOR-CONTENT-OWED.md`, under its Skilling heading.
 
+**`STILL-OPEN.md` numbering: skilling sections take §100 and up** (Coding
+§55 and Communication §56 predate this; Confidence is §100). Two terminals
+appending to one sequence collided twice on 2026-09-16/17; a reserved block
+is how two writers share one file.
+
 ---
 
 ## 0. What a skill door is, and how it differs from the other two

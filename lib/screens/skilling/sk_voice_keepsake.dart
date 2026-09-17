@@ -613,6 +613,10 @@ class _SkVoiceKeepsakeScreenState extends State<SkVoiceKeepsakeScreen> {
     final lines = SkPracticeStore.instance.entriesFor(widget.doorId);
     final name = SkChildStore.instance.name;
     final title = bracketById(widget.doorId)?.title.now ?? '';
+    final content = skDoorContentFor(widget.doorId);
+    final blurb = (content?.voiceBlurb ?? '')
+        .replaceAll('{name}', name.isEmpty ? 'you' : name)
+        .replaceAll('{she}', name.isEmpty ? 'you' : 'she');
     return Scaffold(
       backgroundColor: p.ground,
       body: SafeArea(
@@ -630,17 +634,14 @@ class _SkVoiceKeepsakeScreenState extends State<SkVoiceKeepsakeScreen> {
                       letterSpacing: 1.2,
                       color: p.action)),
             const SizedBox(height: 8),
-            Text(skDoorContentFor(widget.doorId)?.voiceTitle ?? 'Your voice, saved',
+            Text(content?.voiceTitle ?? 'Your voice, saved',
                 style: pvFraunces(
                     fontSize: kSkTitleSize,
                     fontWeight: FontWeight.w600,
                     height: 1.18,
                     color: p.ink1)),
             const SizedBox(height: 10),
-            Text(
-                'The stories and things ${name.isEmpty ? 'you' : name} said out '
-                'loud, and what ${name.isEmpty ? 'you' : 'she'} tried. It all '
-                'stays on this phone.',
+            Text(blurb,
                 style: pvManrope(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
@@ -704,8 +705,7 @@ class _SkVoiceKeepsakeScreenState extends State<SkVoiceKeepsakeScreen> {
                           height: 1.25,
                           color: p.ink1)),
                   const SizedBox(height: 6),
-                  Text('Tell a story, describe something, or say what you '
-                      'think. Tap Record something and it lands here.',
+                  Text(content?.voiceEmptyLine ?? '',
                       style: pvManrope(fontSize: 15, height: 1.5, color: p.ink2)),
                 ]),
               )

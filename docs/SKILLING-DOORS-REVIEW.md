@@ -23,7 +23,7 @@ buy are stub sheets; the door stays behind `kDebugMode`; the preview ships.
 |---|---|---|---|---|---|---|
 | Coding | `ParentVeda_Coding_structure_v2.pdf` | door, 5 tabs + the shell | **3 of 3 filled** (36 activities) | 5f963a7 (door), 87dcd62 (fills + walk) | **yes** — 2026-09-14, at 8, 5 and 12 | `sk_coding_door_test` |
 | Communication | `ParentVeda_Communication_structure.pdf` | door, 5 tabs (three band cards) | **2 of 3 filled** (6–8, 8–11); 11–14 not written | a86c5bf (frame), 0fa1193 (fills), e67da1b (walk) | **yes** — 2026-09-16, at 12 and 8, recorder end to end | `sk_communication_door_test` |
-| Confidence | `ParentVeda_Confidence_structure.pdf` | door, **6 cards** (three band cards + recorder + keepsake) | 3 of 3 exist, not yet mapped | commit next | no | `sk_confidence_door_test` |
+| Confidence | `ParentVeda_Confidence_structure.pdf` | door, **6 cards** (three band cards + recorder + keepsake) | 3 of 3 exist, not yet mapped | 5eb85a4, walk commit next | **yes** — 2026-09-17, at 8 | `sk_confidence_door_test` |
 | Creativity | `ParentVeda_Creativity_structure.pdf` | plan sheet | none yet | — | — | — |
 | Feelings | `ParentVeda_Feelings_structure.pdf` | plan sheet | none yet | — | — | — |
 | Focus | `ParentVeda_Focus_structure.pdf` | plan sheet | none yet | — | — | — |
@@ -172,7 +172,7 @@ Frame only; the two task PDFs (6–8, 8–11) fill it next.
       side would fit better as the hero's small lock control than as a
       closing card below five rails; same as Coding's Suggestion A.
 
-## Confidence (§57)
+## Confidence (§100)
 
 Built to the brief literally on your calls of 2026-09-16 (1a 2a 3b 4a).
 Frame only; three task PDFs fill it next.
@@ -195,7 +195,17 @@ Frame only; three task PDFs fill it next.
 - [ ] The course titles ("With a coach, Use your voice" / "At her own
       pace, Use your voice") — say if "with a coach" oversells for a
       placeholder.
-- [ ] The hero photo: a classroom, hands up to answer. Keep?
+- [x] The hero photo — **swapped on the walk** (2026-09-17): the first
+      pick's chalkboard read "if someone in your family has cancer", legible
+      only at hero size. Now a classroom on the floor, hands up, one child
+      standing at the front (`photo-1588075592446`). Keep?
+- [x] **Walked on the phone, 2026-09-17** at 8: five of the six cards (Use
+      your voice dropped), Hear yourself back opening straight onto the
+      sheet, record → listen back → the "notice one thing" prompt → keep →
+      one row, the breathing circle page, the boundary note, the classes
+      and the coach row. Two fixes: the hero photo, and the voice screen's
+      subtitle and empty line, which were Communication's words and are now
+      a per-door slot ("The turns Kabir stood up and took…").
 - [ ] The tile says "Confidence"; the brief's door is "Confidence & public
       speaking". Fine.
 - [ ] **Suggestion:** on this door the recorder and the keepsake being two

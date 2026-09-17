@@ -29,11 +29,14 @@ import 'sk_door_data.dart';
 
 final SkDoor kSkConfidenceDoor = SkDoor(
   doorId: 'skilling_confidence',
-  // Unsplash, free. A classroom, children's hands up to answer — the first
-  // of the brief's "rooms an Indian child actually faces" (answering in
-  // class), facing the front, no stage. Swap if a better free one turns up.
+  // Unsplash, free. A classroom on the floor, hands up to answer, one child
+  // standing at the front — the first of the brief's "rooms an Indian child
+  // actually faces" (answering in class), no stage. The first pick
+  // (`photo-1577896851231`) had a chalkboard reading "if someone in your
+  // family has cancer", seen only on the phone (2026-09-17): a hero
+  // photograph is read at full size, and every word in it is the door's.
   heroImageUrl:
-      'https://images.unsplash.com/photo-1577896851231-70ef18881754?w=900&h=700&fit=crop',
+      'https://images.unsplash.com/photo-1588075592446-265fd1e6e76f?w=900&h=700&fit=crop',
   tabs: const [
     SkDoorTab(
       id: 'use_your_voice',

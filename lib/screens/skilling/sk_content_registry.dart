@@ -64,6 +64,10 @@ final SkDoorContent kSkConfidenceContent = SkDoorContent(
   voiceKeepsake: true,
   voiceSelfReview: true,
   voiceTitle: 'Your talks, saved',
+  voiceBlurb: 'The turns {name} stood up and took, and what {she} tried. It '
+      'all stays on this phone; nobody marks it.',
+  voiceEmptyLine: 'Say one line to the room, or give a whole talk. Tap Record '
+      'something and it lands here, just for you.',
   coach: kSkConfidenceCoach,
 );
 

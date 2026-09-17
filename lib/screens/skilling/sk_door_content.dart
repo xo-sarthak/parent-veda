@@ -192,12 +192,24 @@ class SkDoorContent {
     this.voiceKeepsake = false,
     this.voiceSelfReview = false,
     this.voiceTitle = 'Your voice, saved',
+    this.voiceBlurb = 'The stories and things {name} said out loud, and what '
+        '{she} tried. It all stays on this phone.',
+    this.voiceEmptyLine = 'Tell a story, describe something, or say what you '
+        'think. Tap Record something and it lands here.',
     this.coach,
   });
 
   /// The keepsake screen's title, in the door's own words — Communication's
   /// "Your voice, saved", Confidence's "Your talks, saved".
   final String voiceTitle;
+
+  /// The line under it. `{name}` is her name or "you"; `{she}` is "she" or
+  /// "you". Communication's words by default; a door with a different
+  /// keepsake says its own (seen on a phone, 2026-09-17).
+  final String voiceBlurb;
+
+  /// The empty state's invitation, in the door's words.
+  final String voiceEmptyLine;
 
   /// "Hear yourself back … notice one thing you did." After listen-back the
   /// record sheet shows one prompt and stores nothing — the noticing is
