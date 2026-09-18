@@ -60,6 +60,7 @@
 //  is the closest thing the grid has to an alarm without being a red.
 // =============================================================================
 
+import '../../screens/brackets/hub/hub_intent_art.dart' show IntentMark;
 import 'package:flutter/material.dart' show Icons;
 
 import 'pv_door_data.dart';
@@ -129,6 +130,7 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
     PvDoorGroup(
       id: kCondTabFind,
       label: 'Find a condition',
+      mark: IntentMark.scanFan,
       icon: Icons.search_rounded,
       hue: 186,
       inlineSurfaceId: kCondSurfaceFind,
@@ -139,6 +141,7 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
     PvDoorGroup(
       id: kCondTabWhen,
       label: 'When it comes up',
+      mark: IntentMark.calendarDay,
       icon: Icons.calendar_month_outlined,
       hue: 26,
       note: 'Nobody gets all of these, and most pregnancies get none of them. '
@@ -155,6 +158,7 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
     PvDoorGroup(
       id: kCondTabHelp,
       label: 'Get help now',
+      mark: IntentMark.nextStep,
       icon: Icons.emergency_outlined,
       hue: 344,
       pinnedRedFlag: kSameDayFlag,
@@ -163,6 +167,7 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
     PvDoorGroup(
       id: kCondTabLiving,
       label: 'Living with it',
+      mark: IntentMark.moodArc,
       icon: Icons.wb_sunny_outlined,
       hue: 42,
     ),
@@ -178,6 +183,7 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
     PvDoorGroup(
       id: kCondTabTalk,
       label: 'Talk',
+      mark: IntentMark.askDoctor,
       icon: Icons.chat_bubble_outline_rounded,
       hue: 160,
       pinnedRedFlag: kPregnancyUrgentFlag,

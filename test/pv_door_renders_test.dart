@@ -23,12 +23,66 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/data/doors/pv_door_data.dart';
 import 'package:parentveda/screens/doors/pv_door_carousel.dart';
+import 'package:parentveda/screens/doors/pv_door_chips.dart';
 import 'package:parentveda/screens/doors/pv_door_screen.dart';
+import 'package:parentveda/screens/doors/pv_door_rail.dart';
+import 'package:parentveda/screens/doors/pv_door_tiles.dart';
 import 'package:parentveda/services/bracket_resolver.dart';
 import 'package:parentveda/services/pregnancy_controller.dart';
 
 /// The narrowest screen this app is designed against.
 const Size _phone = Size(360, 780);
+
+/// Reach tab [i] on a door — through its dot on the deck, or its chip.
+Finder _tab(String bracketId, int i) => kPvDoorChipDoors.contains(bracketId)
+    ? find.byKey(pvDoorChipKey(i))
+    : find.byKey(pvDoorDotKey(i));
+
+/// Reach tab [i]. On a chip door: scroll the chip into view and tap it. On
+/// the deck (no dots since 2026-09-18): step the ring through its side
+/// zones, one tap at a time — the way a thumb does it.
+Future<void> _goTab(WidgetTester tester, String bracketId, int i) async {
+  if (kPvDoorRailDoors.contains(bracketId)) {
+    final f = find.byKey(pvDoorRailCardKey(i));
+    await tester.ensureVisible(f);
+    await tester.pump();
+    await tester.tap(f);
+    await tester.pump();
+    return;
+  }
+  if (kPvDoorTileDoors.contains(bracketId)) {
+    final f = find.byKey(pvDoorTileKey(i));
+    await tester.ensureVisible(f);
+    await tester.pump();
+    await tester.tap(f);
+    await tester.pump();
+    return;
+  }
+  if (kPvDoorChipDoors.contains(bracketId)) {
+    final f = _tab(bracketId, i);
+    await tester.ensureVisible(f);
+    await tester.pump();
+    await tester.tap(f);
+    await tester.pump();
+    return;
+  }
+  final door = pvDoorPageFor(bracketId)!;
+  var at = _selectedOf(tester);
+  final n = door.groups.length;
+  // Shortest way round the ring.
+  var forward = (i - at) % n;
+  var back = (at - i) % n;
+  final dir = forward <= back ? 1 : -1;
+  var steps = forward <= back ? forward : back;
+  while (steps-- > 0) {
+    await tester.tap(find.byKey(pvDoorZoneKey(dir)));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
+  }
+}
+
+int _selectedOf(WidgetTester tester) =>
+    tester.widget<PvDoorCarousel>(find.byType(PvDoorCarousel)).selected;
 
 Future<void> _pump(WidgetTester tester,
     [String bracketId = 'pregnancy_scans_tests']) async {
@@ -78,17 +132,16 @@ void main() {
 
   testWidgets('the selector is the carousel, with a dot per tab',
       (tester) async {
-    await _pump(tester);
+    // Complications is on the tile row (2026-09-18); the deck is judged on a
+    // door that still has it.
+    await _pump(tester, 'pregnancy_nutrition');
 
     // ⚠️ THE WIDGET, NOT THE DATA. A test can prove the door declares five
     // groups and prove nothing at all about which control draws them.
     expect(find.byKey(kPvDoorCarouselKey), findsOneWidget);
 
-    final door = pvDoorPageFor('pregnancy_scans_tests')!;
-    for (var i = 0; i < door.groups.length; i++) {
-      expect(find.byKey(pvDoorDotKey(i)), findsOneWidget,
-          reason: 'dot $i is missing, so tab $i is two swipes from anywhere.');
-    }
+    // No dots since 2026-09-18 — the neighbours peek, which is the indicator.
+    expect(find.byKey(pvDoorDotKey(0)), findsNothing);
 
     // Both side targets exist. Without them the track is a picture — the cards
     // are under an IgnorePointer and cannot be tapped.
@@ -103,8 +156,7 @@ void main() {
 
     for (var i = 1; i < door.groups.length; i++) {
       // The dot is the one-tap route to any tab, including the back pair.
-      await tester.tap(find.byKey(pvDoorDotKey(i)));
-      await tester.pump();
+      await _goTab(tester, 'pregnancy_scans_tests', i);
       await tester.pump(const Duration(milliseconds: 500)); // the settle
 
       final g = door.groups[i];
@@ -122,7 +174,7 @@ void main() {
     final door = pvDoorPageFor('pregnancy_scans_tests')!;
     final talk = door.groups.indexWhere((g) => g.id == kScansTabTalk);
 
-    await tester.tap(find.byKey(pvDoorDotKey(talk)));
+    await _goTab(tester, 'pregnancy_scans_tests', talk);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
 
@@ -142,7 +194,7 @@ void main() {
     final door = pvDoorPageFor('pregnancy_scans_tests')!;
     final scan = door.groups.indexWhere((g) => g.id == kScansTabScan);
 
-    await tester.tap(find.byKey(pvDoorDotKey(scan)));
+    await _goTab(tester, 'pregnancy_scans_tests', scan);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 500));
 
@@ -174,7 +226,7 @@ void main() {
     // test that never asks will pass over a broken layout.
     for (var i = 0; i < door.groups.length; i++) {
       if (i > 0) {
-        await tester.tap(find.byKey(pvDoorDotKey(i)));
+        await _goTab(tester, 'pregnancy_scans_tests', i);
         await tester.pump();
         await tester.pump(const Duration(milliseconds: 500));
       }
@@ -200,9 +252,36 @@ void _everyDoor() {
     testWidgets('$name opens on its first tab and draws it', (tester) async {
       await _pump(tester, name);
       expect(find.text(door.heroTitle), findsOneWidget);
-      expect(find.byKey(kPvDoorCarouselKey), findsOneWidget);
-      for (var i = 0; i < door.groups.length; i++) {
-        expect(find.byKey(pvDoorDotKey(i)), findsOneWidget);
+      // The selector is the deck, or — on the doors in `kPvDoorChipDoors`
+      // (the §2.8 comparison, 2026-09-18) — the chip row. Either way every
+      // tab has one tappable handle.
+      final rail = kPvDoorRailDoors.contains(name);
+      final tiles = kPvDoorTileDoors.contains(name);
+      final chips = kPvDoorChipDoors.contains(name);
+      expect(
+          find.byKey(rail
+              ? kPvDoorRailKey
+              : tiles
+                  ? kPvDoorTilesKey
+                  : chips
+                      ? kPvDoorChipsKey
+                      : kPvDoorCarouselKey),
+          findsOneWidget);
+      if (rail) {
+        for (var i = 0; i < door.groups.length; i++) {
+          expect(find.byKey(pvDoorRailCardKey(i)), findsOneWidget);
+        }
+      } else if (tiles) {
+        for (var i = 0; i < door.groups.length; i++) {
+          expect(find.byKey(pvDoorTileKey(i)), findsOneWidget);
+        }
+      } else if (chips) {
+        for (var i = 0; i < door.groups.length; i++) {
+          expect(find.byKey(pvDoorChipKey(i)), findsOneWidget);
+        }
+      } else {
+        expect(find.byKey(pvDoorZoneKey(-1)), findsOneWidget);
+        expect(find.byKey(pvDoorZoneKey(1)), findsOneWidget);
       }
     });
 
@@ -210,8 +289,7 @@ void _everyDoor() {
       await _pump(tester, name);
       for (var i = 0; i < door.groups.length; i++) {
         if (i > 0) {
-          await tester.tap(find.byKey(pvDoorDotKey(i)));
-          await tester.pump();
+          await _goTab(tester, name, i);
           await tester.pump(const Duration(milliseconds: 500));
         }
         final g = door.groups[i];
@@ -232,8 +310,7 @@ void _everyDoor() {
       await _pump(tester, name);
       for (var i = 0; i < door.groups.length; i++) {
         if (i > 0) {
-          await tester.tap(find.byKey(pvDoorDotKey(i)));
-          await tester.pump();
+          await _goTab(tester, name, i);
           await tester.pump(const Duration(milliseconds: 500));
         }
         final g = door.groups[i];
@@ -253,8 +330,7 @@ void _everyDoor() {
       await _pump(tester, name);
       for (var i = 0; i < door.groups.length; i++) {
         if (i > 0) {
-          await tester.tap(find.byKey(pvDoorDotKey(i)));
-          await tester.pump();
+          await _goTab(tester, name, i);
           await tester.pump(const Duration(milliseconds: 500));
         }
         expect(tester.takeException(), isNull,
@@ -268,8 +344,7 @@ void _everyDoor() {
         final flag = door.groups[i].pinnedRedFlag;
         if (flag == null) continue;
         if (i > 0) {
-          await tester.tap(find.byKey(pvDoorDotKey(i)));
-          await tester.pump();
+          await _goTab(tester, name, i);
           await tester.pump(const Duration(milliseconds: 500));
         }
         expect(find.text(flag.title), findsOneWidget);

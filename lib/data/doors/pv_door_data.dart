@@ -67,6 +67,8 @@
 
 import 'package:flutter/material.dart' show IconData;
 
+import '../../screens/brackets/hub/hub_intent_art.dart' show IntentMark;
+
 import '../same_day_signs_data.dart';
 import '../scan_extras.dart' show kScanUrgentSigns;
 import 'pv_door_belly_skin.dart';
@@ -682,9 +684,14 @@ class PvDoorRedFlag {
     required this.lines,
     required this.surfaceId,
     this.footer,
+    this.seeAll = true,
   });
 
   final String title;
+
+  /// Whether the card links out to [surfaceId]. False when the card already
+  /// carries everything that page would say (2026-09-18).
+  final bool seeAll;
 
   /// The signs themselves, referenced from their one home.
   final List<PvDoorFlagLine> lines;
@@ -751,6 +758,7 @@ class PvDoorGroup {
     required this.label,
     required this.icon,
     required this.hue,
+    this.mark,
     this.inlineSurfaceId,
     this.inlineLabel,
     this.layout = PvDoorLayout.rails,
@@ -766,6 +774,11 @@ class PvDoorGroup {
   final String label;
 
   /// The mark at the centre of the card's drawing.
+  /// The group's DRAWN mark for the tile selector — the rails' own hand
+  /// (`HubIntentArt`), set per group so no icon-to-mark guessing happens.
+  /// Null falls back to [icon] in ink. Added 2026-09-18 with `PvDoorTiles`.
+  final IntentMark? mark;
+
   final IconData icon;
 
   /// The tab's own hue — its field, its rim, its lit dot.
@@ -975,6 +988,14 @@ final PvDoorRedFlag kPregnancyUrgentFlag = PvDoorRedFlag(
   title: 'Call your doctor if',
   lines: kScanUrgentSignsEn,
   surfaceId: 'scans/urgent',
+  // The urgent screen's one sentence that the card did not carry, carried.
+  // With it here, "See all of these" opened a page that repeated the seven
+  // lines above it (the door walk, 2026-09-18) — so the card no longer
+  // links out. `ScanUrgentScreen` stays for revert.
+  footer: 'Call, do not message — your obstetrician, the labour ward, or the '
+      'nearest hospital with a maternity unit. If you cannot reach anyone '
+      'and the pain or bleeding is bad, go in.',
+  seeAll: false,
 );
 
 /// `kScanUrgentSigns` in English, which is the only language this door writes.

@@ -57,6 +57,8 @@ import '../services/life_stage_store.dart';
 import '../services/pregnancy_controller.dart';
 import 'weekly_card_stack_screen.dart';
 import 'saved_screen.dart';
+// import 'search/pv_search_screen.dart'; // the home bar, kept for revert
+// import '../widgets/pv_search_bar.dart';
 import '../services/scans_store.dart';
 // openAskVeda dropped from the show list with the Ask door. The FAB still calls
 // it; this screen no longer needs to, because Ask is on every screen already.
@@ -367,6 +369,16 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
                 title: 'Start anywhere',
                 p: p),
             const SizedBox(height: 12),
+            // ---- SEARCH — NOT HERE. 2026-09-18: a bar sat between this
+            // heading and the grid for an hour; the user: "not below Start
+            // anywhere, that wasn't my intent." Search lives in each door's
+            // hero (`PvDoorScreen._Hero`), scoped to the door with
+            // "Everywhere" one tap away. Kept for revert:
+            //   PvSearchBar(
+            //       hint: 'Search scans, symptoms, foods, anything',
+            //       p: p,
+            //       onTap: () => openPvSearch(context, pregnancy)),
+            //   const SizedBox(height: 14),
             V2BlockGrid(
                 palette: p, blocks: _brackets(context, p), columns: 4),
 

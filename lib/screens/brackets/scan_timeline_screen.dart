@@ -48,7 +48,7 @@ import '../../services/scans_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
 import '../v2/v2_palette.dart';
-import '../tools/scans_appointments_screen.dart';
+// import '../tools/scans_appointments_screen.dart'; // the roadmap, kept for revert
 import 'scan_detail_screen.dart';
 
 /// English for now, Hindi owed. `grep -c '_en('` is the size of what is left.
@@ -416,13 +416,16 @@ class _UpNext extends StatelessWidget {
           Row(children: [
             Expanded(
               child: OutlinedButton(
-                onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(
-                  settings: const RouteSettings(name: 'appointments'),
-                  builder: (_) => ScansAppointmentsScreen(controller: pregnancy),
-                )),
+                // A sheet for THIS scan's date — not the old "Scans &
+                // appointments" roadmap, which listed every scan again on
+                // a page of its own (the door walk, 2026-09-18: "remove
+                // them"). Kept for revert:
+                //   Navigator.push(ScansAppointmentsScreen(controller: pregnancy))
+                onPressed: () => showScanDateSheet(context,
+                    scan: scan, lang: lang, existing: b),
                 child: Text(b == null
                     ? _en('Add the date').of(lang)
-                    : _en('See the appointment').of(lang)),
+                    : _en('Edit the date').of(lang)),
               ),
             ),
             const SizedBox(width: 10),
@@ -1135,9 +1138,13 @@ Future<void> showScanNoteSheet(BuildContext context,
                 .of(lang),
             hintStyle: pvManrope(fontSize: 14, height: 1.5, color: p.ink3),
             filled: true,
-            fillColor: p.surfaceAlt,
+            fillColor: p.surface, // was p.surfaceAlt — lavender (2026-09-18)
             border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: p.line)),
+            enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: p.line)),
             focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
                 borderSide: BorderSide(color: p.ink1, width: 1.4)),
@@ -1172,4 +1179,286 @@ Future<void> showScanNoteSheet(BuildContext context,
       ]),
     ),
   );
+}
+
+// -----------------------------------------------------------------------------
+//  The date sheet — one scan, one appointment, saved where the calendar reads
+// -----------------------------------------------------------------------------
+
+/// Add or change the booked date for [scan]. Writes a real `Appointment`
+/// (`ScansStore.addAppointment`, type scan, titled with the scan's name) so
+/// the Up-next card, the run's row, the scan's own read and the Calendar's
+/// appointment lane all see it — the same row the old roadmap screen wrote.
+/// Changing replaces the row; removing deletes it.
+///
+/// ⚠️ INLINE, NOT A DIALOG — 2026-09-18, from Mobbin. Every app that sets
+/// a date today draws the month grid INSIDE the sheet (Rodeo, Todoist,
+/// Alta, Freenow) with the chosen day as a filled disc and today ringed;
+/// the time is a row of slots to tap (Instacart, Agoda, Future Pro), not a
+/// clock face. Two taps and Save, nothing modal over modal. The Material
+/// `CalendarDatePicker` is that grid without the dialog around it, and it
+/// takes the app's `datePickerTheme` (ink on white). The first cut used
+/// `showDatePicker` / `showTimePicker`; the user: "I don't need this purple
+/// tint in the calendar view" — the dialog's own surface was lavender.
+Future<void> showScanDateSheet(BuildContext context,
+    {required TestScanInfo scan,
+    required AppLanguage lang,
+    Appointment? existing}) async {
+  final p = V2PaletteStore.instance.current;
+  var date = existing?.date ?? DateTime.now();
+  var time = existing?.time ?? '';
+  final place = TextEditingController(text: existing?.location ?? '');
+
+  // The pickers are ink app-wide now (`datePickerTheme`, `timePickerTheme`
+  // in app_theme.dart); this override only pins the accent for anything
+  // those themes do not name.
+  // The grid reads `colorScheme.primary` for a few strokes the picker
+  // theme does not name; pin it to ink.
+  ThemeData inkGrid(BuildContext ctx) {
+    final t = Theme.of(ctx);
+    return t.copyWith(
+      colorScheme: t.colorScheme.copyWith(
+          primary: p.ink1,
+          onPrimary: Colors.white,
+          surface: p.surface,
+          surfaceContainerHigh: p.surface,
+          surfaceTint: Colors.transparent),
+    );
+  }
+
+  await showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: p.surface,
+    shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+    builder: (ctx) => StatefulBuilder(
+      builder: (ctx, setSheet) => SingleChildScrollView(
+        padding: EdgeInsets.fromLTRB(
+            20, 18, 20, 20 + MediaQuery.viewInsetsOf(ctx).bottom),
+        child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(_en('THE DATE FOR').of(lang),
+                  style: pvManrope(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.3,
+                      color: p.ink3)),
+              const SizedBox(height: 4),
+              Text(scan.name.of(lang),
+                  style: pvFraunces(
+                      fontSize: 22,
+                      fontWeight: FontWeight.w600,
+                      height: 1.2,
+                      color: p.ink1)),
+              const SizedBox(height: 6),
+              // ---- the month, inline -------------------------------------
+              Theme(
+                data: inkGrid(ctx),
+                child: CalendarDatePicker(
+                  initialDate: date,
+                  firstDate: DateTime(date.year - 1),
+                  lastDate: DateTime(date.year + 1),
+                  onDateChanged: (d) => setSheet(() => date = d),
+                ),
+              ),
+              // ---- the time, as slots --------------------------------------
+              Text(_en('TIME').of(lang),
+                  style: pvManrope(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.3,
+                      color: p.ink3)),
+              const SizedBox(height: 8),
+              _TimeSlots(
+                  value: time,
+                  p: p,
+                  lang: lang,
+                  onPick: (t) => setSheet(() => time = t)),
+              const SizedBox(height: 14),
+              TextField(
+                controller: place,
+                textCapitalization: TextCapitalization.words,
+                style: pvManrope(fontSize: 15, color: p.ink1),
+                decoration: InputDecoration(
+                  hintText: _en('Where — the clinic or hospital (optional)')
+                      .of(lang),
+                  hintStyle: pvManrope(fontSize: 14, color: p.ink3),
+                  prefixIcon:
+                      Icon(Icons.place_outlined, size: 20, color: p.ink2),
+                  isDense: true,
+                  contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 14, vertical: 14),
+                  filled: true,
+                  fillColor: p.surface,
+                  enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: p.line)),
+                  focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                      borderSide: BorderSide(color: p.ink1, width: 1.4)),
+                ),
+              ),
+              const SizedBox(height: 14),
+              Row(children: [
+                if (existing != null) ...[
+                  TextButton(
+                    onPressed: () async {
+                      pvCommitFeedback();
+                      await ScansStore.instance.deleteAppointment(existing.id);
+                      if (ctx.mounted) Navigator.of(ctx).pop();
+                    },
+                    child: Text(_en('Remove').of(lang)),
+                  ),
+                  const Spacer(),
+                ],
+                Expanded(
+                  flex: existing != null ? 0 : 1,
+                  child: FilledButton(
+                    onPressed: () async {
+                      pvCommitFeedback();
+                      final store = ScansStore.instance;
+                      if (existing != null) {
+                        await store.deleteAppointment(existing.id);
+                      }
+                      await store.addAppointment(Appointment(
+                        id: existing?.id ??
+                            'ap_${DateTime.now().microsecondsSinceEpoch}',
+                        title: scan.name.en,
+                        dateIso: date.toIso8601String(),
+                        time: time,
+                        location: place.text.trim(),
+                        type: ApptType.scan,
+                      ));
+                      if (ctx.mounted) Navigator.of(ctx).pop();
+                    },
+                    child: Text(_en('Save').of(lang)),
+                  ),
+                ),
+              ]),
+            ]),
+      ),
+    ),
+  );
+}
+
+/// One tappable line on the date sheet: an icon, the value, a chevron.
+/// The first cut's date and time rows (each opened a Material dialog).
+/// Kept for revert.
+// ignore: unused_element
+class _SheetRow extends StatelessWidget {
+  const _SheetRow(
+      {required this.icon,
+      required this.label,
+      required this.p,
+      required this.onTap,
+      this.muted = false});
+
+  final IconData icon;
+  final String label;
+  final V2Palette p;
+  final VoidCallback onTap;
+  final bool muted;
+
+  @override
+  Widget build(BuildContext context) => PvPress(
+        child: Material(
+          color: p.surface,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: p.line)),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: onTap,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+              child: Row(children: [
+                Icon(icon, size: 20, color: p.ink2),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(label,
+                      style: pvManrope(
+                          fontSize: 15,
+                          fontWeight: muted ? FontWeight.w500 : FontWeight.w600,
+                          color: muted ? p.ink3 : p.ink1)),
+                ),
+                Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
+              ]),
+            ),
+          ),
+        ),
+      );
+}
+
+/// The time as a row of half-hour slots to tap — "No time" first, then
+/// 8:00 to 19:30. One tap; the chosen slot goes ink. Slots rather than a
+/// clock face (Instacart, Agoda, Future Pro): a scan is booked to the
+/// half hour, and a wheel asks for precision nobody has.
+class _TimeSlots extends StatelessWidget {
+  const _TimeSlots(
+      {required this.value,
+      required this.p,
+      required this.lang,
+      required this.onPick});
+
+  final String value;
+  final V2Palette p;
+  final AppLanguage lang;
+  final ValueChanged<String> onPick;
+
+  static final List<String> slots = [
+    for (var h = 8; h < 20; h++)
+      for (final m in const ['00', '30'])
+        '${h > 12 ? h - 12 : h}:$m ${h < 12 ? 'am' : 'pm'}',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    Widget chip(String label, bool on, VoidCallback onTap) => PvPress(
+          child: Material(
+            color: on ? p.ink1 : p.surface,
+            shape: StadiumBorder(
+                side: BorderSide(color: on ? p.ink1 : p.line)),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: on
+                  ? null
+                  : () {
+                      pvCommitFeedback();
+                      onTap();
+                    },
+              // A fixed height with the label centred — Manrope's ascent
+              // sat the text high in a padded pill (the user: "not in the
+              // centre").
+              child: Container(
+                height: 36,
+                alignment: Alignment.center,
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                child: Text(label,
+                    style: pvManrope(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                        height: 1.0,
+                        color: on ? Colors.white : p.ink1)),
+              ),
+            ),
+          ),
+        );
+    return SizedBox(
+      height: 36,
+      child: ListView(
+        scrollDirection: Axis.horizontal,
+        clipBehavior: Clip.none,
+        children: [
+          chip(_en('No time').of(lang), value.isEmpty, () => onPick('')),
+          for (final s in slots) ...[
+            const SizedBox(width: 8),
+            chip(s, value == s, () => onPick(s)),
+          ],
+        ],
+      ),
+    );
+  }
 }

@@ -125,6 +125,7 @@ import 'package:flutter/services.dart';
 
 import '../../data/doors/pv_door_data.dart';
 import '../../theme/pv_fonts.dart';
+import '../brackets/hub/hub_intent_art.dart';
 import '../v2/v2_palette.dart';
 
 /// ⚠️ THESE KEYS EXIST SO THE WIRING CAN BE ASSERTED, AND THAT IS THE ONLY
@@ -157,13 +158,44 @@ Key pvDoorZoneKey(int step) => ValueKey('pv-door-zone-$step');
 // the mark 74 → 62, and the gaps either side 22/26 → 14/18. About 54pt back,
 // which is the first rail's title and chips on the first screen. The 4a
 // numbers are kept beside each for revert.
-const double kPvDoorCardWidth = 156; // was 172
-const double kPvDoorCardHeight = 112; // was 132
+// ⚠️ THE LOW DECK — 2026-09-18, the user's last try at keeping the swipe:
+// "find a way… these card swipes… space efficient." The fan, the blur, the
+// swipe and the ring are untouched; the CARD changed shape. It was a tile
+// (mark above a two-line title, 156×112 after the first tightening) and is
+// now a wide low landscape card — the mark at the left, the label beside it
+// (Plenty of Fish's boost cards, Lloyds' speed reads: the low cards in the
+// Mobbin set are all icon-left, label-right). The track drops from 124 to
+// 76; the whole selector from ~170pt to ~98. Kept for revert: 156×112 / 124.
+const double kPvDoorCardWidth = 176; // was 196 for a day; 20pt more of each neighbour shows
+const double kPvDoorCardHeight = 64;
 
 /// The track's height — 4a's 146 — and where in it the cards sit. The cards are
 /// laid out 4pt down and step down a further 8 per place round the ring, so the
 /// back pair sit lowest; the shadow under the front card takes the rest.
-const double kPvDoorTrackHeight = 124; // was 146
+const double kPvDoorTrackHeight = 76;
+
+/// The drawn mark for a group, by the icon its door data names — so the
+/// deck gets the rails' own hand without a field on every group. Null falls
+/// back to the icon in ink.
+IntentMark? pvDoorMarkFor(IconData icon) {
+  if (icon == Icons.timeline_rounded) return IntentMark.timelineRail;
+  if (icon == Icons.menu_book_outlined || icon == Icons.auto_stories_outlined) return IntentMark.reportPage;
+  if (icon == Icons.description_outlined || icon == Icons.folder_open_rounded) return IntentMark.reportPage;
+  if (icon == Icons.chat_bubble_outline_rounded || icon == Icons.people_outline_rounded ||
+      icon == Icons.record_voice_over_outlined) return IntentMark.askDoctor;
+  if (icon == Icons.search_rounded) return IntentMark.scanFan;
+  if (icon == Icons.calendar_month_outlined || icon == Icons.event_note_outlined ||
+      icon == Icons.timer_outlined) return IntentMark.calendarDay;
+  if (icon == Icons.restaurant_menu_outlined || icon == Icons.eco_outlined) return IntentMark.plate;
+  if (icon == Icons.self_improvement_rounded || icon == Icons.spa_outlined) return IntentMark.moodArc;
+  if (icon == Icons.wb_sunny_outlined) return IntentMark.moonMark;
+  if (icon == Icons.favorite_border_rounded || icon == Icons.face_retouching_natural_outlined) return IntentMark.bodyMark;
+  if (icon == Icons.work_outline_rounded) return IntentMark.bagMark;
+  if (icon == Icons.emergency_outlined || icon == Icons.verified_outlined) return IntentMark.nextStep;
+  if (icon == Icons.headphones_outlined || icon == Icons.school_outlined ||
+      icon == Icons.photo_camera_outlined) return IntentMark.cuppedHands;
+  return null;
+} // was 124, was 146
 const double _cardTop = 4;
 
 /// 4a's edge fade: 45% at the edge, 82% a tenth of the way in, solid across the
@@ -241,10 +273,11 @@ class PvDoorCarousel extends StatefulWidget {
 
   /// The track, 4a's 12pt under it, and the dot row with its tap padding. One
   /// number, so the sheet's spacing does not have to know the parts.
-  static const double height =
-      kPvDoorTrackHeight + _dotGap + _PvDoorDots.height;
+  // No dots since 2026-09-18 — the track is the whole selector.
+  static const double height = kPvDoorTrackHeight;
 
-  static const double _dotGap = 12 - _PvDoorDots.tapPad;
+  // ignore: unused_field
+  static const double _dotGap = 4 - _PvDoorDots.tapPad; // kept with _PvDoorDots
 
   @override
   State<PvDoorCarousel> createState() => _PvDoorCarouselState();
@@ -601,14 +634,11 @@ class _PvDoorCarouselState extends State<PvDoorCarousel>
                 ],
               ),
             ),
-            const SizedBox(height: PvDoorCarousel._dotGap),
-            _PvDoorDots(
-              groups: widget.groups,
-              position: _position,
-              selected: widget.selected,
-              p: p,
-              onPick: _land,
-            ),
+            // ⚠️ NO DOTS — 2026-09-18. A deck whose neighbours peek needs no
+            // page indicator (Matter, Play, Tinder); dots belong where nothing
+            // peeks (App Store) or where the dots ARE the choices (Klarna).
+            // `_PvDoorDots` stays in the file for revert. Tests reach a tab
+            // the way a thumb does: the side zones, one step at a time.
           ],
         ),
       ),
@@ -700,6 +730,9 @@ Color _markLight(double h) =>
 Color _markMid(double h) =>
     HSLColor.fromAHSL(1, h % 360, 0.30, 0.82).toColor();
 
+// Kept for revert — the orbiting-ring mark the tinted card carried until
+// 2026-09-18. The clean card draws the line icon in a well instead.
+// ignore: unused_element
 class _PvDoorMark extends CustomPainter {
   const _PvDoorMark({required this.hue, required this.index});
 
@@ -832,7 +865,10 @@ class _PvDoorCard extends StatelessWidget {
     final o = offset;
     final a = o.abs();
     final s = o.sign;
+    // `h` and `deep` fed the tinted card; kept for revert with `_PvDoorMark`.
+    // ignore: unused_local_variable
     final h = group.hue % 360;
+    // ignore: unused_local_variable
     final deep = pvDoorDeep(group.hue);
 
     // ⚠️ EVERY ONE OF THESE IS CONTINUOUS IN `o`. At a == 0 they are 4a's
@@ -857,7 +893,9 @@ class _PvDoorCard extends StatelessWidget {
     // gesture. 4a has no press state; the turn is the feedback. [held] still
     // arrives, so the plumbing stays for a tweened version if one is wanted:
     //   final scale = (1 - 0.2 * a) * (held ? 0.95 : 1);
-    final scale = 1 - 0.2 * a;
+    // Front 1.0, neighbours 0.88, the back pair 0.80 — the ring reads as one
+    // chosen and four waiting (Klarna, Lloyds). Was: final scale = 1 - 0.2 * a;
+    final scale = 1 - 0.12 * a.clamp(0.0, 1.0) - 0.08 * (a - 1).clamp(0.0, 1.0);
 
     // ⚠️ NOTHING IS HIDDEN — THAT IS THE WHOLE OF 4a — EXCEPT AT THE SEAM. The
     // design's opacities are 1, .92, .72 and every card on a five-ring is
@@ -895,7 +933,7 @@ class _PvDoorCard extends StatelessWidget {
     // See the header for why the perspective entry is negative.
     final m = Matrix4.identity()
       ..setEntry(3, 2, -1 / 1000)
-      ..translateByDouble(s * ladder(96, 74), 8 * a, -60 * a, 1)
+      ..translateByDouble(s * ladder(96, 74), 5 * a, -60 * a, 1)
       ..rotateY(-s * ladder(24, 8) * math.pi / 180)
       ..rotateX(3 * one * math.pi / 180)
       ..scaleByDouble(scale, scale, 1, 1);
@@ -909,30 +947,34 @@ class _PvDoorCard extends StatelessWidget {
     // tint deepening in `field` below. On a mid-range phone the layers, not the
     // maths, are what turn a glide into a stutter, and a stutter reads as
     // jitter.
-    final blur = 1.1 * a;
+    final blur = 0.55 * a; // was 1.1 — soft, not mush
 
     // 4a's "tint that deepens as it recedes": a 150° two-stop field with both
     // stops walking darker and a touch more saturated per step.
     // `linear-gradient(150deg, …)` measures clockwise from straight up, so the
     // line runs (sin150, −cos150) = (0.5, 0.866) — down and to the right.
+    // ⚠️ A WHITE CARD, ONE HAIRLINE, ONE ICON IN A QUIET WELL — 2026-09-18.
+    // The user on the low deck: "remove these funky colors… it looks gimmicky
+    // and not ready… ready for production." Mobbin's production cards of this
+    // shape (ANZ Plus, CVS Health, Air NZ, Beli) agree to the letter: white,
+    // a single hairline, a line icon in a small neutral square, bold title,
+    // grey one-liner. So the hue-keyed gradient, the hue-keyed rim, the
+    // hue-tinted shadow and the orbiting-ring illustration are retired (the
+    // painter stays in the file; the deck's fan, blur and swipe are untouched).
+    // Cards further round the ring dim towards the ground so the fan still
+    // reads as depth; the front card carries a neutral shadow.
     final field = LinearGradient(
-      begin: const Alignment(-0.5, -0.866),
-      end: const Alignment(0.5, 0.866),
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      // Rear cards stay near-white (they were dimmed to 55–75% and, with the
+      // blur, read as noise). The neighbour's label must stay legible — the
+      // swipe depends on seeing what you are swiping TO.
       colors: [
-        HSLColor.fromAHSL(1, h, 0.32 + 0.03 * a, 0.94 - 0.07 * a).toColor(),
-        HSLColor.fromAHSL(1, h, 0.26 + 0.05 * a, 0.91 - 0.10 * a).toColor(),
+        Color.lerp(p.surface, p.surfaceAlt, 0.18 * a)!,
+        Color.lerp(p.surface, p.surfaceAlt, 0.30 * a)!,
       ],
     );
-
-    // ⚠️ A SOFT RIM, NOT A HARD RING. Both values are the group's own hue at
-    // two strengths, so no new colour is introduced to say which card is
-    // forward — the geometry already says it, and the rim's job is only to give
-    // the card an edge.
-    final rim = Color.lerp(
-      HSLColor.fromAHSL(0.32, h, 0.24, 0.60 - 0.04 * a).toColor(),
-      HSLColor.fromAHSL(0.55, h, 0.32, 0.62).toColor(),
-      near,
-    )!;
+    final rim = Color.lerp(p.line, p.ink2.withValues(alpha: 0.45), near)!;
 
     Widget card = SizedBox(
       width: kPvDoorCardWidth,
@@ -940,7 +982,7 @@ class _PvDoorCard extends StatelessWidget {
       child: DecoratedBox(
         decoration: BoxDecoration(
           gradient: field,
-          borderRadius: BorderRadius.circular(18),
+          borderRadius: BorderRadius.circular(16),
           border: Border.all(color: rim, width: 1),
           boxShadow: near > 0
               ? [
@@ -948,11 +990,10 @@ class _PvDoorCard extends StatelessWidget {
                   // grey shadow reads as a sticker on the page rather than a
                   // part of it.
                   BoxShadow(
-                    color:
-                        HSLColor.fromAHSL(0.38 * near, h, 0.34, 0.42).toColor(),
-                    blurRadius: 26,
-                    spreadRadius: -12,
-                    offset: const Offset(0, 10),
+                    color: Colors.black.withValues(alpha: 0.16 * near),
+                    blurRadius: 28,
+                    spreadRadius: -10,
+                    offset: const Offset(0, 12),
                   ),
                 ]
               : null,
@@ -967,78 +1008,65 @@ class _PvDoorCard extends StatelessWidget {
         // stacked on top of one, so the name lies over its lower edge and
         // neither has to give way. It is also what lets the mark bleed off the
         // edge.
-        child: Stack(
-          clipBehavior: Clip.none,
-          children: [
-            // 4a's mark: 74pt, top-right, with the ring round the disc running
-            // just past the corner. And it drifts — `translateX(−s·a·7px)`, a
-            // few points against the turn, so the drawing slides across its
-            // card as the card comes round.
-            Positioned(
-              top: 10,
-              right: 10,
-              width: 62, // was 74
-              height: 62,
-              child: Transform.translate(
-                offset: Offset(-o * 7, 0),
-                child: Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Positioned.fill(
-                      child: CustomPaint(
-                        painter: _PvDoorMark(hue: group.hue, index: index),
-                      ),
-                    ),
-                    // The group's own icon at the centre of its mark — the
-                    // thing that keeps the drawing a TAB rather than
-                    // decoration.
-                    Transform.translate(
-                      offset: const Offset(-2, -3),
-                      child: Icon(group.icon, size: 26, color: deep),
-                    ),
-                  ],
-                ),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(10, 0, 14, 0),
+          child: Row(children: [
+            // The mark, 44pt, at the left — the disc's ring still runs past
+            // the card's top and bottom edge by a hair, which is what keeps
+            // it from reading as an icon in a box.
+            // The icon's well: the ground tint, 40pt, radius 12 — the one
+            // place the group's hue may show, and quietly (DESIGN-SYSTEM
+            // §4.0: colour inside wells). The icon itself is ink.
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: Color.lerp(
+                    v2BlockTint(group.hue % 360, p), p.surface, 0.35 + 0.4 * a),
+                borderRadius: BorderRadius.circular(12),
               ),
+              // A drawn mark, not a stock glyph — the same hand as the door
+              // rails (`HubIntentArt`), chosen from the group's icon so no
+              // door data changes. Where no mark fits, the line icon in ink.
+              child: switch (pvDoorMarkFor(group.icon)) {
+                final mark? => Padding(
+                    padding: const EdgeInsets.all(6),
+                    child: HubIntentArt(
+                        mark: mark, tint: v2BlockTint(group.hue % 360, p))),
+                null => Icon(group.icon, size: 20, color: p.ink1),
+              },
             ),
-            Positioned(
-              left: 13,
-              right: 13,
-              bottom: 13,
+            const SizedBox(width: 12),
+            Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Text(group.label,
-                      maxLines: 2,
+                      maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: pvFraunces(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          height: 1.2,
-                          letterSpacing: -0.3,
+                      style: pvManrope(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          height: 1.15,
+                          letterSpacing: -0.2,
                           color: p.ink1)),
-                  const SizedBox(height: 3),
-                  // ⚠️ THE COUNT FADES WITH DISTANCE, THE NAME DOES NOT. 4a
-                  // hides a neighbour's whole label, which works there because
-                  // its art carries the identity on its own. Ours has to keep
-                  // the name — a nameless neighbour is a coloured rectangle,
-                  // and she would have to swipe to find out what she was
-                  // swiping to. The count is the part that is only useful once
-                  // you have chosen, so it is the part that goes.
+                  const SizedBox(height: 2),
                   Opacity(
                     opacity: near,
                     child: Text(inside,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: pvManrope(
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                            color: deep.withValues(alpha: 0.75))),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: p.ink3)),
                   ),
                 ],
               ),
             ),
-          ],
+          ]),
         ),
       ),
     );
@@ -1110,6 +1138,8 @@ class _PvDoorCard extends StatelessWidget {
 /// the same fractional number the cards do, so halfway through a drag the pill
 /// is halfway between two dots. A dot row that waits for the gesture to finish
 /// and then jumps is the tell that a carousel is a slideshow.
+// Kept for revert — the dot row under the deck, retired 2026-09-18.
+// ignore: unused_element
 class _PvDoorDots extends StatelessWidget {
   const _PvDoorDots({
     required this.groups,
@@ -1132,6 +1162,7 @@ class _PvDoorDots extends StatelessWidget {
   /// Transparent target above and below the painted dot.
   static const double tapPad = 7;
 
+  // ignore: unused_field
   static const double height = dot + 2 * tapPad;
 
   @override

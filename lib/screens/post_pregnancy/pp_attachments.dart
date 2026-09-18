@@ -21,6 +21,8 @@
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import '../../widgets/pv_feedback.dart';
+import '../../theme/pv_fonts.dart';
 import 'package:image_picker/image_picker.dart';
 
 import '../../services/remote/storage_service.dart';
@@ -51,7 +53,12 @@ Future<List<Attachment>> showAttachmentPicker(BuildContext context, {bool allowP
         child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
           Center(child: Container(width: 38, height: 4, decoration: BoxDecoration(color: ppLine, borderRadius: BorderRadius.circular(999)))),
           const SizedBox(height: 14),
-          Text('Add an attachment', style: ppJakarta(17)),
+          // The display face and ink (2026-09-19) — the sheet's heading was
+          // Jakarta in the old title ink, and its icons violet; the user
+          // saw it from the scan locker and it did not match.
+          Text('Add a report', style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, color: ppInk)),
+          const SizedBox(height: 4),
+          Text('A photo of the paper, or the PDF', style: ppBody(12.5, color: ppMuted)),
           const SizedBox(height: 14),
           _row(ctx, Icons.photo_camera_outlined, 'Take a photo', () => _camera(ctx)),
           _row(ctx, Icons.photo_library_outlined, 'Choose photos', () => _gallery(ctx)),
@@ -63,21 +70,25 @@ Future<List<Attachment>> showAttachmentPicker(BuildContext context, {bool allowP
   return res ?? const [];
 }
 
-Widget _row(BuildContext ctx, IconData icon, String label, VoidCallback onTap) => GestureDetector(
-      onTap: onTap,
+Widget _row(BuildContext ctx, IconData icon, String label, VoidCallback onTap) => PvPress(
+        child: GestureDetector(
+      onTap: () {
+        pvCommitFeedback();
+        onTap();
+      },
       behavior: HitTestBehavior.opaque,
       child: Container(
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
         decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(14), border: Border.all(color: ppHair)),
         child: Row(children: [
-          Icon(icon, size: 20, color: ppPurple),
+          Icon(icon, size: 20, color: ppInk), // was ppPurple
           const SizedBox(width: 14),
           Expanded(child: Text(label, style: ppBody(14, color: ppInk, w: FontWeight.w600))),
           const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
         ]),
       ),
-    );
+    ));
 
 Future<void> _camera(BuildContext ctx) async {
   try {

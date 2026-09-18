@@ -7,10 +7,22 @@ import 'package:flutter/material.dart';
 
 import '../../data/prepare_data.dart';
 import 'consultation_detail_screen.dart';
+import '../../widgets/pv_feedback.dart';
+import '../../theme/pv_fonts.dart';
+import '../doors/pv_door_chrome.dart' show PvDoorToolScaffold;
 import 'prepare_common.dart';
 import '../../localization/app_language.dart';
 
-class ConsultationsScreen extends StatelessWidget {
+// ⚠️ THE SCREEN'S STRUCTURE — 2026-09-18, the door walk, from Mobbin. The
+// user: "very cluttered… not structured well." Zocdoc, Preply and Alan
+// share one shape for a list of people you book: a SPECIALTY ROW of pills
+// at the top (the filter the door passes in is just the pill that starts
+// selected), then one provider per block — avatar, the name bold, what
+// they are and their credential, one line of proof (rating · reviews),
+// the price, and their next availability as its own slim pill — hairlines
+// between blocks, the whole block opens the detail where Book lives. The
+// old row (`_specialistFull`) carried nine things and its own button.
+class ConsultationsScreen extends StatefulWidget {
   const ConsultationsScreen({super.key, required this.lang, this.onlyRole});
 
   final AppLanguage lang;
@@ -33,14 +45,51 @@ class ConsultationsScreen extends StatelessWidget {
   /// of the app holds.
   final String? onlyRole;
 
+  @override
+  State<ConsultationsScreen> createState() => _ConsultationsScreenState();
+}
+
+class _ConsultationsScreenState extends State<ConsultationsScreen> {
+  AppLanguage get lang => widget.lang;
+
+  /// The selected pill: a specialist id, or null for everyone. Starts on the
+  /// role the door promised, when it exists.
+  late String? _role = kSpecialists.any((x) => x.id == widget.onlyRole)
+      ? widget.onlyRole
+      : null;
+
   /// The specialists to show. Falls back to everyone when the requested role
   /// does not exist, rather than rendering an empty screen — a filter that
   /// matches nothing must never look like "we have no experts".
   List<Specialist> get _shown {
-    if (onlyRole == null) return kSpecialists;
-    final hit = kSpecialists.where((x) => x.id == onlyRole).toList();
+    if (_role == null) return kSpecialists;
+    final hit = kSpecialists.where((x) => x.id == _role).toList();
     return hit.isEmpty ? kSpecialists : hit;
   }
+
+  Widget _pill(String label, bool on, VoidCallback onTap) => PvPress(
+        child: Material(
+          color: on ? kInk : kCanvas,
+          shape: StadiumBorder(side: BorderSide(color: on ? kInk : kBorder)),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: on
+                ? null
+                : () {
+                    pvCommitFeedback();
+                    onTap();
+                  },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              child: Text(label,
+                  style: pvManrope(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                      color: on ? Colors.white : kInk)),
+            ),
+          ),
+        ),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -48,52 +97,39 @@ class ConsultationsScreen extends StatelessWidget {
     void open(Specialist sp) => Navigator.of(context).push(
         MaterialPageRoute(builder: (_) => ConsultationDetailScreen(specialist: sp, lang: lang)));
 
-    return Scaffold(
-      backgroundColor: kCanvas,
-      body: SafeArea(
-        bottom: false,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
-          children: [
-            pvTopBar(context, lang: lang, backLabel: s.uiPrepare),
-            const SizedBox(height: 22),
-            pvEyebrow(s.prepEyebrowPrivate),
-            const SizedBox(height: 10),
-            Text(s.uiConsultations, style: pvHeroStyle()),
-            const SizedBox(height: 12),
-            Text(s.uiPrivateSessionRightExpert, style: pvSubStyle()),
-            pvBanner(spans: [
-              pvText(s.uiSomethingMindAfterWeek),
-            ]),
-            const SizedBox(height: 22),
+    // The door tool header (2026-09-19) — the same hero every leaf of a
+    // door wears. Kept for revert: the Scaffold + bare back arrow + eyebrow
+    // + pvHeroStyle title that stood here.
+    return PvDoorToolScaffold(
+      hue: 160,
+      eyebrow: s.prepEyebrowPrivate,
+      title: s.uiConsultations,
+      intro: s.uiPrivateSessionRightExpert,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            // ---- who: the specialty pills ---------------------------------
+            // The filter is a row she can see and change. "All" is the way
+            // back out; the door's promised expert is just the pill that
+            // starts selected. Kept for revert: the "See all experts" pill.
+            SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              clipBehavior: Clip.none,
+              child: Row(children: [
+                _pill('All', _role == null, () => setState(() => _role = null)),
+                for (final x in kSpecialists) ...[
+                  const SizedBox(width: 8),
+                  _pill(x.role.now, _role == x.id,
+                      () => setState(() => _role = x.id)),
+                ],
+              ]),
+            ),
+            const SizedBox(height: 18),
 
-            // Filtered when we promised a specific expert, everyone otherwise.
             for (int i = 0; i < _shown.length; i++)
               _specialist(s, _shown[i], () => open(_shown[i]),
                   bottom: i == _shown.length - 1),
-
-            // ⚠️ THE WAY BACK OUT, and it is not optional. A filtered list that
-            // cannot be widened is a list that has hidden things from her.
-            if (onlyRole != null && _shown.length != kSpecialists.length) ...[
-              const SizedBox(height: 6),
-              InkWell(
-                onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => ConsultationsScreen(lang: lang))),
-                borderRadius: BorderRadius.circular(999),
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(999),
-                    border: Border.all(color: kPurple.withValues(alpha: 0.35)),
-                  ),
-                  child: Text('See all experts',
-                      style: pvBody(kPurple, 13.5)
-                          .copyWith(fontWeight: FontWeight.w700)),
-                ),
-              ),
-            ],
 
             const SizedBox(height: 22),
             Container(
@@ -107,13 +143,115 @@ class ConsultationsScreen extends StatelessWidget {
               ]),
             ),
             pvFooterNote(s.prepFooterConsultations),
-          ],
+          ]),
+        ),
+      ],
+    );
+  }
+
+  // ⚠️ THREE LINES, NOT SEVEN — 2026-09-18, the door walk. The row carried
+  // the role, the price, the name, the credential, a blurb, the rating,
+  // the languages, the next slot AND a Book button; the user: "very
+  // cluttered… not structured well." Zocdoc, Fresha and Alan (Mobbin) give
+  // a specialist three lines: who, what, and one line of proof. So: an
+  // initials disc; the NAME bold; role · credential; ★ rating · from ₹ ·
+  // the next slot when there is one. The whole row opens the detail, where
+  // Book lives — one tap here, not two targets. The seven-line row is
+  // `_specialistFull` below, kept for revert.
+  Widget _specialist(S str, Specialist s, VoidCallback onTap, {bool bottom = false}) {
+    final initials = s.name.now
+        .replaceAll('Dr. ', '')
+        .split(' ')
+        .where((w) => w.isNotEmpty)
+        .take(2)
+        .map((w) => w[0])
+        .join();
+    final reviews = s.reviews.length;
+    final proof = reviews == 0
+        ? s.rating
+        : '${s.rating}  ·  $reviews ${reviews == 1 ? 'review' : 'reviews'}';
+    return PvPress(
+      child: InkWell(
+        onTap: () {
+          pvCommitFeedback();
+          onTap();
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 16),
+          decoration: BoxDecoration(
+            border: Border(
+              top: const BorderSide(color: kHair),
+              bottom: bottom ? const BorderSide(color: kHair) : BorderSide.none,
+            ),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Container(
+                width: 52,
+                height: 52,
+                alignment: Alignment.center,
+                decoration:
+                    const BoxDecoration(color: kPanel, shape: BoxShape.circle),
+                child: Text(initials,
+                    style: pvManrope(
+                        fontSize: 16, fontWeight: FontWeight.w800, color: kInk)),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(s.name.now, style: pvTitleStyle(16.5)),
+                      const SizedBox(height: 2),
+                      Text('${s.role.now}  ·  ${s.cred.now.split(' · ').first}',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: pvBody(kSoft, 13)),
+                      const SizedBox(height: 6),
+                      Text(proof,
+                          style: pvBody(kInk, 12.5)
+                              .copyWith(fontWeight: FontWeight.w600)),
+                      const SizedBox(height: 2),
+                      Text('${s.fromPrice.now}  ·  30 min',
+                          style: pvBody(kMuted, 12.5)),
+                    ]),
+              ),
+              const SizedBox(width: 8),
+              const Padding(
+                padding: EdgeInsets.only(top: 14),
+                child:
+                    Icon(Icons.chevron_right_rounded, size: 20, color: kMuted),
+              ),
+            ]),
+            // Next availability as its own slim pill, full width — Zocdoc's
+            // "Next available" bar, in a hairline rather than yellow.
+            if (s.next != null) ...[
+              const SizedBox(height: 12),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(vertical: 9),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: kBorder),
+                ),
+                child: Text(s.next!.now,
+                    style: pvManrope(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w700,
+                        color: kInk)),
+              ),
+            ],
+          ]),
         ),
       ),
     );
   }
 
-  Widget _specialist(S str, Specialist s, VoidCallback onTap, {bool bottom = false}) {
+  /// The seven-line row with its own Book button, 2026-08 → 2026-09-18.
+  /// Kept for revert.
+  // ignore: unused_element
+  Widget _specialistFull(S str, Specialist s, VoidCallback onTap, {bool bottom = false}) {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,

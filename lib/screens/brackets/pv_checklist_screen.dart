@@ -145,7 +145,7 @@ class _PvChecklistScreenState extends State<PvChecklistScreen> {
                         letterSpacing: -0.4,
                         color: p.ink1))),
                 const SizedBox(height: 11),
-                for (final q in g.items) ...[
+                for (final q in g.items)
                   pvDoorPad(_ItemRow(
                     item: q,
                     hue: widget.hue,
@@ -153,8 +153,6 @@ class _PvChecklistScreenState extends State<PvChecklistScreen> {
                     p: p,
                     onTap: () => store.toggle(list.id, q.id),
                   )),
-                  const SizedBox(height: 8),
-                ],
                 const SizedBox(height: 20),
               ],
 
@@ -210,7 +208,7 @@ class _ItemRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final tint = v2BlockTint(hue % 360, p);
+    // `hue` no longer paints anything here; kept on the widget for revert.
     return Semantics(
       checked: ticked,
       button: true,
@@ -222,16 +220,16 @@ class _ItemRow extends StatelessWidget {
           onTap();
         },
         behavior: HitTestBehavior.opaque,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 160),
-          padding: const EdgeInsets.fromLTRB(14, 13, 14, 13),
+        // ⚠️ A ROW, NOT A CARD — 2026-09-18, the door walk. Each question was
+        // a bordered card that filled with the group's tint when ticked; a
+        // tinted fill behind text is the one thing the user asked to have
+        // gone everywhere. Withings and Reminders (Mobbin): rows between
+        // hairlines, an ink box that fills on tick, the words go bold. Kept
+        // for revert: BoxDecoration(color: ticked ? tint : surface, radius 16).
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(2, 13, 2, 13),
           decoration: BoxDecoration(
-            // ⚠️ A TICKED ROW GOES TINTED, NOT GREYED OUT. Greying says "done
-            // with, ignore" — the opposite of what a ticked question means
-            // here. It is the one she is definitely asking.
-            color: ticked ? tint : p.surface,
-            borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: ticked ? Colors.transparent : p.line),
+            border: Border(bottom: BorderSide(color: p.line)),
           ),
           child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             AnimatedContainer(

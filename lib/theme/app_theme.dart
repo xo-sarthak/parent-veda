@@ -508,9 +508,11 @@ final ColorScheme _lightScheme = ColorScheme(
         ),
       ),
 
+      // Ink text buttons (2026-09-18): "Cancel / OK / Delete / Clear" were
+      // violet on every dialog and sheet. Kept for revert: scheme.primary.
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
-          foregroundColor: scheme.primary,
+          foregroundColor: scheme.onSurface,
           textStyle: text.labelLarge,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           shape: RoundedRectangleBorder(
@@ -520,9 +522,17 @@ final ColorScheme _lightScheme = ColorScheme(
       ),
 
       // ---- Inputs: filled, soft, rounded, calm hints ----------------------
+      // ⚠️ NO VIOLET IN A FIELD, AT REST OR ON TAP — 2026-09-18. The fill
+      // was `surfaceContainer` (the lavender ground), the caret `primary`,
+      // and the selection theme was Material's default, which is also
+      // `primary`: tap a search bar and three purples lit at once. The user:
+      // "search bars across the app look gross to me due to that purple
+      // thing… when tapped the grossness doubles." Now: white, a hairline,
+      // ink ring, ink caret, a grey selection (below). Kept for revert:
+      //   fillColor: scheme.surfaceContainer,   enabledBorder: none
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: scheme.surfaceContainer,
+        fillColor: scheme.surface,
         contentPadding:
             const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
         hintStyle: text.bodyMedium?.copyWith(color: scheme.onSurfaceVariant),
@@ -534,11 +544,10 @@ final ColorScheme _lightScheme = ColorScheme(
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(_rInput),
-          borderSide: BorderSide.none,
+          borderSide: BorderSide(color: scheme.outlineVariant),
         ),
         // Ink ring on focus, not violet (DESIGN-SYSTEM §4.0, 2026-09-18 —
-        // seen on the scan note sheet). The caret stays `primary`: a thin
-        // accent is the rule's own list. Kept for revert: scheme.primary.
+        // seen on the scan note sheet). Kept for revert: scheme.primary.
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(_rInput),
           borderSide: BorderSide(color: scheme.onSurface, width: 1.4),
@@ -547,6 +556,15 @@ final ColorScheme _lightScheme = ColorScheme(
           borderRadius: BorderRadius.circular(_rInput),
           borderSide: BorderSide(color: scheme.error, width: 1.4),
         ),
+      ),
+
+      // ---- Text selection: ink, not violet ---------------------------------
+      // Material's default caret, handles and highlight are all `primary`.
+      // Kept for revert: remove this block.
+      textSelectionTheme: TextSelectionThemeData(
+        cursorColor: scheme.onSurface,
+        selectionHandleColor: scheme.onSurface,
+        selectionColor: scheme.onSurface.withValues(alpha: 0.14),
       ),
 
       // ---- Chips: pill-shaped, soft ---------------------------------------
@@ -604,10 +622,11 @@ final ColorScheme _lightScheme = ColorScheme(
         trackHeight: 4,
         overlayColor: scheme.primary.withValues(alpha: 0.12),
       ),
+      // Spinners in ink (2026-09-19). Kept for revert: scheme.primary.
       progressIndicatorTheme: ProgressIndicatorThemeData(
-        color: scheme.primary,
-        linearTrackColor: scheme.surfaceContainerHigh,
-        circularTrackColor: scheme.surfaceContainerHigh,
+        color: scheme.onSurface,
+        linearTrackColor: scheme.surfaceContainerLow,
+        circularTrackColor: scheme.surfaceContainerLow,
         linearMinHeight: 6,
       ),
 
@@ -641,6 +660,57 @@ final ColorScheme _lightScheme = ColorScheme(
         ),
         titleTextStyle: text.headlineSmall,
         contentTextStyle: text.bodyMedium,
+      ),
+      // The Material pickers, in ink on white (2026-09-18). Without these
+      // the date picker sat on `surfaceContainerHigh` (lavender) with the
+      // chosen day in `primary` (violet) — seen on the scan date sheet.
+      datePickerTheme: DatePickerThemeData(
+        backgroundColor: scheme.surface,
+        surfaceTintColor: Colors.transparent,
+        headerBackgroundColor: scheme.surface,
+        headerForegroundColor: scheme.onSurface,
+        dayForegroundColor: WidgetStateProperty.resolveWith((states) =>
+            states.contains(WidgetState.selected)
+                ? scheme.surface
+                : scheme.onSurface),
+        dayBackgroundColor: WidgetStateProperty.resolveWith((states) =>
+            states.contains(WidgetState.selected)
+                ? scheme.onSurface
+                : Colors.transparent),
+        todayForegroundColor: WidgetStateProperty.resolveWith((states) =>
+            states.contains(WidgetState.selected)
+                ? scheme.surface
+                : scheme.onSurface),
+        todayBackgroundColor: WidgetStateProperty.resolveWith((states) =>
+            states.contains(WidgetState.selected)
+                ? scheme.onSurface
+                : Colors.transparent),
+        todayBorder: BorderSide(color: scheme.onSurface),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(_rCard)),
+      ),
+      timePickerTheme: TimePickerThemeData(
+        backgroundColor: scheme.surface,
+        dialHandColor: scheme.onSurface,
+        dialBackgroundColor: scheme.surfaceContainerLow,
+        hourMinuteColor: WidgetStateColor.resolveWith((states) =>
+            states.contains(WidgetState.selected)
+                ? scheme.onSurface
+                : scheme.surfaceContainerLow),
+        hourMinuteTextColor: WidgetStateColor.resolveWith((states) =>
+            states.contains(WidgetState.selected)
+                ? scheme.surface
+                : scheme.onSurface),
+        dayPeriodColor: WidgetStateColor.resolveWith((states) =>
+            states.contains(WidgetState.selected)
+                ? scheme.onSurface
+                : Colors.transparent),
+        dayPeriodTextColor: WidgetStateColor.resolveWith((states) =>
+            states.contains(WidgetState.selected)
+                ? scheme.surface
+                : scheme.onSurface),
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(_rCard)),
       ),
       bottomSheetTheme: BottomSheetThemeData(
         backgroundColor: scheme.surface,

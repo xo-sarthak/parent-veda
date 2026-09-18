@@ -40,6 +40,7 @@ import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/scan_reports_store.dart';
 import '../../theme/pv_fonts.dart';
+import '../doors/pv_door_chrome.dart' show PvDoorToolScaffold;
 import '../v2/v2_palette.dart';
 
 LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
@@ -107,20 +108,16 @@ class _ScanReportEditScreenState extends State<ScanReportEditScreen> {
     final lang = S.current;
     final scan = _scanId == null ? null : _scanById(_scanId!);
 
-    return Scaffold(
-      backgroundColor: p.ground,
-      appBar: AppBar(
-        backgroundColor: p.ground,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        foregroundColor: p.ink1,
-        title: Text(_en('Edit report').of(lang),
-            style: pvManrope(
-                fontSize: 16, fontWeight: FontWeight.w700, color: p.ink1)),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(18, 8, 18, 40),
-        children: [
+    // The door tool header (2026-09-19) — was an AppBar in Manrope.
+    return PvDoorToolScaffold(
+      hue: 206,
+      eyebrow: 'My reports',
+      title: _en('Edit report').of(lang),
+      intro: _en('The name, the scan it came from, the date, a note.').of(lang),
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           // ---- 1 · The name, typed --------------------------------------
           //
           // ⚠️ THE TEXT FIELD IS FIRST, AND THE LIST IS UNDER IT.
@@ -154,7 +151,7 @@ class _ScanReportEditScreenState extends State<ScanReportEditScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: p.action, width: 1.6),
+                borderSide: BorderSide(color: p.ink1, width: 1.4), // was p.action
               ),
             ),
           ),
@@ -306,7 +303,7 @@ class _ScanReportEditScreenState extends State<ScanReportEditScreen> {
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: BorderSide(color: p.action, width: 1.6),
+                borderSide: BorderSide(color: p.ink1, width: 1.4), // was p.action
               ),
             ),
           ),
@@ -314,27 +311,12 @@ class _ScanReportEditScreenState extends State<ScanReportEditScreen> {
 
           FilledButton(
             onPressed: _dirty ? _save : null,
-            style: FilledButton.styleFrom(
-              backgroundColor: p.action,
-              foregroundColor: p.onAction,
-              disabledBackgroundColor: p.line,
-              disabledForegroundColor: p.ink3,
-              minimumSize: const Size.fromHeight(50),
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16)),
-            ),
-            child: Text(_en('Save').of(lang),
-                style: pvManrope(fontSize: 15, fontWeight: FontWeight.w700)),
+            style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(50)),
+            child: Text(_en('Save').of(lang)),
           ),
-          const SizedBox(height: 10),
-          Text(
-              _en('Only the details change. Your files stay exactly as they '
-                      'are.')
-                  .of(lang),
-              textAlign: TextAlign.center,
-              style: pvManrope(fontSize: 12, height: 1.5, color: p.ink3)),
-        ],
-      ),
+          ]),
+        ),
+      ],
     );
   }
 
@@ -414,9 +396,9 @@ class _Chip extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
           decoration: BoxDecoration(
-            color: selected ? p.action : p.surface,
+            color: selected ? p.ink1 : p.surface, // was p.action
             borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: selected ? p.action : p.line),
+            border: Border.all(color: selected ? p.ink1 : p.line),
           ),
           child: Text(label,
               style: pvManrope(

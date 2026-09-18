@@ -16,6 +16,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/pv_fonts.dart';
+import '../../widgets/pv_feedback.dart';
 import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
 import '../v2/v2_palette.dart';
 import '../v2/v3_hero_field.dart';
@@ -446,8 +447,82 @@ class PvDoorRow extends StatelessWidget {
   /// A coming-soon row: the same row a shade back, and not tappable.
   final bool dimmed;
 
+  // ⚠️ THE COMPACT ROW — 2026-09-18, the door walk. This was a bordered
+  // card per row: a tinted glyph tile, the title in the display face, a
+  // blurb, an outlined "Article" capsule, a chevron — ~140pt each, and the
+  // user called the list "outdated". The list form every reference app
+  // uses for a library (GoodRx, Flo, Apple Health, CVS — Mobbin) is a
+  // ROW: a neutral well with the icon, a bold title, one grey line, a
+  // chevron, a hairline between rows. It is also the search screen's own
+  // result row, so a list and a search result are the same object. The
+  // card body is `buildCard` below, kept for revert.
   @override
   Widget build(BuildContext context) {
+    final well = Color.alphaBlend(p.ink1.withValues(alpha: 0.06), p.surface);
+    return PvPress(
+      enabled: !dimmed,
+      child: InkWell(
+        onTap: dimmed ? null : onTap,
+        child: Opacity(
+          opacity: dimmed ? 0.62 : 1,
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            decoration: BoxDecoration(
+                border: Border(bottom: BorderSide(color: p.line))),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Container(
+                width: 40,
+                height: 40,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: well,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(icon, size: 20, color: p.ink2),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title,
+                        style: pvManrope(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            height: 1.25,
+                            color: p.ink1)),
+                    const SizedBox(height: 2),
+                    Text(blurb,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: pvManrope(
+                            fontSize: 12.5, height: 1.4, color: p.ink2)),
+                    const SizedBox(height: 3),
+                    Text(chip,
+                        style: pvManrope(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w600,
+                            color: p.ink3)),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              if (!dimmed)
+                Padding(
+                  padding: const EdgeInsets.only(top: 9),
+                  child: Icon(Icons.chevron_right_rounded,
+                      size: 20, color: p.ink3),
+                ),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// The bordered card form, 2026-09-10 → 2026-09-18. Kept for revert.
+  // ignore: unused_element
+  Widget buildCard(BuildContext context) {
     final tint = v2BlockTint(hue, p);
     final deep = HSLColor.fromColor(tint)
         .withSaturation(0.46)

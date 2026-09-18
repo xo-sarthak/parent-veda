@@ -24,6 +24,7 @@ CLAUDE.md invariants) → brief → build → this ledger.
 | 5 | Onboarding questions, OTP length, invite-applied state | 2026-09-17 | this file §5 | Yes, inside the onboarding build |
 | 6 | Base UI — page ground, buttons, chips, cards, sheets, type | 2026-09-17 | `DESIGN-SYSTEM.md` §4.0 · `BASE-UI-DECISIONS.md` | Ground, type (Newsreader + Manrope), button theme, transitions, callouts, sheets; §2 answered; sweep owed |
 | 7 | Products — one store for three stages | 2026-09-17 | `PRODUCTS-AUDIT.md` | Yes, same day (`lib/screens/products/`, nine screens; old screens are facades) |
+| 8 | ParentVeda+ (doctor app) — provider home, earnings ledger, payouts, availability, front door | 2026-09-18 | `DOCTOR-APP-AUDIT.md` | Yes, same day (`0084`, `doctor_chrome.dart`, five `*_tab.dart`); not walked — STILL-OPEN §5.4 |
 
 ---
 
@@ -206,12 +207,70 @@ storefront rows, a score /100, per-stage product screens, the Guide chooser.
 
 ---
 
+## 8. ParentVeda+ — the doctor app
+
+**Asked.** Nine queries, provider-side only: the host home (Airbnb host
+Today, Future Pro), earnings overviews (Turo Business, Cash App, Fiverr,
+Revolut Business, Shopify, TikTok monetisation), the per-item receipt (Turo
+host receipt, alias), payouts and statements (Turo transaction history,
+DoorDash Dasher, Upwork, Airtasker, Gusto, StubHub), working hours
+(OpenPhone, Swarm, Linktree, Beside, Tripadvisor), the working day (Jobber,
+Apple Store), the class host view (Posh, Luma), the front door (Slack).
+
+**Found.** A provider home leads with ONE blocker card, then the next
+thing as a card with its two actions. Money is one big number, a legend of
+sources with an amount each, and a printed-receipt grammar for any line
+(price → fee with a sentence → you earned). "We owe you ₹X · next payout
+<date>" is the plainest copy in the set. Hours are seven rows, one per day,
+with a master switch. A host manages a class from one page with seats sold
+of capacity. Sign-in is email → code, password as the fallback.
+
+**Adopted.** All of it, in our type and on the base-UI rule, with type and
+targets tightened for a 40+ audience (`doctor_chrome.dart`); the by-source
+legend became rows so every source renders even when empty.
+
+**Declined.** Charts as the primary view, dark money screens, gamified
+rewards, provider ratings/performance tabs (we do not rank doctors),
+attendee names on a class.
+
+**Owed.** STILL-OPEN §5.4. Full write-up `DOCTOR-APP-AUDIT.md`.
+
+---
+
+## 9. The door walk — Scans & tests (2026-09-18/19)
+
+The user's standing instruction for this pass: *"keep using the Mobbin MCP…
+I don't want you to just pick one and keep building on it."* So every
+pattern touched on a door gets its own query, and what it produced is
+logged here so the next door starts from it rather than from the chat.
+
+| Pattern | Query (screens, iOS) | Found | Adopted |
+|---|---|---|---|
+| Search entry on a page | "search bar pinned at the bottom…", "Flo category page with a search bar below the heading" | Bottom bar = iOS 26 search-SCREEN pattern (Apple Games, Podcasts, Linear, Wabi); the entry is at the top everywhere (Flo topic page: title · line · field · card rail) | A bar under every door's blurb; a search screen with the field on top — DESIGN-SYSTEM §4.0e |
+| Search screen | "health app search screen with the field focused, recent searches and suggestions" | Flo, Bloom, CVS, Apple Health, Yazio, GoodRx: field top, keyboard up, recents + suggestions, grey/white field | `PvSearchScreen` |
+| Warning list | "when to see a doctor section, plain text list, no coloured box" | **Flo**: bold lead sentence, coral-dot list, on white. Clue: a grey box (what the user hates) | The red-flag form: rule · display heading · coral dots · grey foot. Pinned flag, reader callout, urgent screen |
+| Library list | (from the search pass) GoodRx, Apple Health, CVS | Rows: icon well, bold title, one grey line, chevron, hairline | `PvDoorRow` compact row |
+| Date + time | "choose an appointment date and time in a bottom sheet…" | **Rodeo, Todoist, Alta, Freenow**: month grid INLINE in the sheet, chosen day a filled disc. **Instacart, Agoda, Future Pro**: time as tappable slots. Nobody opens a dialog over a sheet | `showScanDateSheet`: `CalendarDatePicker` inline + `_TimeSlots` |
+| Checklist | "checklist of questions to ask your doctor with tick boxes and share" | Withings, Reminders: hairline rows, ink box, no fill on tick | `PvChecklistScreen` rows |
+| Specialists to book | "telehealth app listing specialists… photo, specialty, rating, fee" | **Zocdoc** (avatar · name · specialty · ★ · reviews · next-available bar), **Preply** (price + reviews + one line), **Alan** (specialty tabs on top) | `ConsultationsScreen`: specialty pills, three-line block, next slot as a slim pill, no inline Book |
+| Documents empty state | "medical records screen empty state inviting to add a document" | Docusign / Grab / Cleo: full-width hairline "Add" box; Fi / Zocdoc: illustration + pill | Looked at, NOT applied — the locker's single add tile was the user's own 2026-09-12 call |
+
+**Declined this pass:** Clue's boxed "When to get medical advice" (the
+box); Zocdoc's yellow availability bar (colour as container); Material's
+`showDatePicker` dialog (lavender surface, violet day — and a dialog over a
+sheet).
+
 ## What the library does not carry
 
 Searching these by name returns junk (Mindvalley, an HR app): **Ovia, Glow,
 Huckleberry, BabyCenter, What to Expect.** Search parenting patterns by
 description instead. In: Flo, Clue, Headspace, Oura, Apple Health, Swiggy,
 Zomato, CRED, and the general-purpose apps above.
+
+Provider apps (2026-09-18): **Uber Driver, Practo, Doctolib, Fresha, Booksy,
+Square Appointments, Calendly are NOT in.** In: Airbnb host, Turo host,
+DoorDash Dasher, Fiverr, Upwork, Airtasker, Jobber, Future Pro, Posh, Luma,
+OpenPhone, Swarm, Linktree.
 
 Shopping (2026-09-17): **Myntra, Nykaa, Flipkart, FirstCry are NOT in** — the
 queries fall through to Shopee, Instagram shops and CRED. In: Amazon, Zara,

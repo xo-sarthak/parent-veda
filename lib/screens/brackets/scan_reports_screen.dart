@@ -47,6 +47,7 @@ import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/scan_reports_store.dart';
 import '../../theme/pv_fonts.dart';
+import '../../widgets/pv_feedback.dart';
 import '../../widgets/storage_image.dart';
 import '../post_pregnancy/pp_attachments.dart';
 import '../v2/v2_palette.dart';
@@ -183,24 +184,18 @@ class _ScanReportsScreenState extends State<ScanReportsBody> {
                   const SizedBox(height: 10),
                 ],
               ],
-              const SizedBox(height: 22),
-              // ⚠️ THE DOOR'S RAIL CARD, NOT A ROW. This body renders inline
-              // on the Scans door's fourth tab, and the user's rule on the
-              // phone (2026-09-12) is one card language everywhere — a row
-              // here read as "the old design tile" beside the rails under it.
-              // A rail of one card is the door's own shape for a single
-              // action; `PvDoorSingleRail` keeps its height and gutter.
-              PvDoorSingleRail(
-                child: PvDoorRailCard(
-                  p: p,
-                  hue: SolutionType.tool.hue,
-                  icon: Icons.tune_rounded,
-                  chip: 'Tool',
-                  title: _en('Add a report').of(lang),
-                  meta: _en('Photo or PDF').of(lang),
-                  onTap: () => _add(context),
-                ),
-              ),
+              const SizedBox(height: 16),
+              // ⚠️ AN ADD, NOT A TOOL — 2026-09-19, the user's review. The
+              // rail card read as a tool that opens something; it only
+              // adds. Every documents screen on Mobbin (Docusign, Grab,
+              // Cleo, Fi) draws the add as one full-width hairline box with
+              // a plus. It sits under the list so the newest report is the
+              // first thing she sees; when the locker is empty it is the
+              // only thing. The 2026-09-12 rail card is kept for revert:
+              //   PvDoorSingleRail(child: PvDoorRailCard(hue: tool, icon: tune,
+              //     chip: 'Tool', title: 'Add a report', meta: 'Photo or PDF',
+              //     onTap: () => _add(context)))
+              _AddRow(p: p, lang: lang, onTap: () => _add(context)),
               const SizedBox(height: 20),
               // ⚠️ OFF, KEPT FOR REVERT. It read "Clinics usually keep the
               // original. Keep your own copy, the next doctor will ask."
@@ -257,6 +252,15 @@ class _ScanReportsScreenState extends State<ScanReportsBody> {
               ReportFile(path: a.path, name: a.name, isPdf: a.isPdf))
           .toList(),
     ));
+    // The add answers (Fi's "Uploads completed", DESIGN-SYSTEM §4.0c): a
+    // hum and one floating line naming what landed.
+    pvCommitFeedback();
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Added · ${named.title}'),
+        duration: const Duration(seconds: 2),
+      ));
+    }
   }
 
   /// Ask her to type a name for something the library does not know.
@@ -528,16 +532,12 @@ class _ReportRow extends StatelessWidget {
                   ],
                 ),
               ),
-              // ⚠️ DELETE STAYS ON THE ROW. It is the one control that already
-              // shipped here, and taking it away to "tidy up" would trade a
-              // working one-tap action for a longer path to the same place.
-              // The viewer offers it too, past the document — see there for
-              // why that copy is the safer of the two.
-              IconButton(
-                onPressed: onDelete,
-                icon: Icon(Icons.delete_outline, size: 19, color: p.ink3),
-                tooltip: 'Remove',
-              ),
+              // The trash left the row (2026-09-19, the user's review of the
+              // locker; Fi and Superpower keep delete off the list). Remove
+              // lives in the viewer, past the document, where the warning
+              // "this might be your only copy" can be checked. Kept for
+              // revert:
+              //   IconButton(onPressed: onDelete, icon: Icon(Icons.delete_outline))
               Padding(
                 padding: const EdgeInsets.only(top: 10, right: 6),
                 child: Icon(Icons.chevron_right_rounded,
@@ -615,4 +615,62 @@ class _Empty extends StatelessWidget {
               style: pvManrope(fontSize: 14, height: 1.55, color: p.ink2)),
         ],
       );
+}
+
+/// The add action as a full-width hairline box: a plus in a neutral well,
+/// "Add a report", "A photo of the paper, or the PDF".
+class _AddRow extends StatelessWidget {
+  const _AddRow({required this.p, required this.lang, required this.onTap});
+
+  final V2Palette p;
+  final AppLanguage lang;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final well = Color.alphaBlend(p.ink1.withValues(alpha: 0.06), p.surface);
+    return PvPress(
+      child: Material(
+        color: p.surface,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: BorderSide(color: p.line)),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () {
+            pvCommitFeedback();
+            onTap();
+          },
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
+            child: Row(children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                    color: well, borderRadius: BorderRadius.circular(12)),
+                child: Icon(Icons.add_rounded, size: 22, color: p.ink1),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(_en('Add a report').of(lang),
+                          style: pvManrope(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: p.ink1)),
+                      const SizedBox(height: 2),
+                      Text(_en('A photo of the paper, or the PDF').of(lang),
+                          style: pvManrope(fontSize: 12.5, color: p.ink2)),
+                    ]),
+              ),
+              Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
 }

@@ -446,6 +446,80 @@ Fix it when programmes next get touched, or leave it: the field note is enough
 for a column edited once a quarter, and it is not enough for one edited every
 time a clinician signs up. That difference is the whole reason `0074` exists.
 
+## 5.4 ParentVeda+ rework — BUILT and WALKED 2026-09-18 (signed-in half; sign-in screen not yet)
+
+Mobbin audit #8, `docs/DOCTOR-APP-AUDIT.md`. The five tabs (Home ·
+Appointments · Availability · Earnings · Profile), the email-code front door,
+the ledger (`0084`) and the Earnings admin panel are built and green
+(`test/doctor_app_shell_test.dart`, `test/doctor_tabs_render_test.dart`).
+Walked on the Samsung the same evening as Dr Aparna (a session already on
+the phone): Home, Appointments, Availability (+ a day sheet), Earnings (+ a
+source screen), Profile. Six things found and fixed on the spot — the hours
+line compacted to "10am–1pm, 5–8pm", a "How a consultation works" group
+under Appointments' empty state (no card over blank space), the trailing
+column of a row capped rather than flexed (a switch mid-row, "Obstetricia /
+n"), `DcKeyValue` for label/value rows, the payout-account read made loud
+(`selectAllOrNull`) so a missing table no longer nags "add your bank
+account", and an unknown rate reads "—" instead of "You keep 0%". **The
+sign-in screens are not walked** — that needs a sign-out and a way back in
+(the Magic Link template, or the test doctor's password). What is open, in
+the order it bites:
+
+**5.4a The rates are placeholders.** `expert_share_rules` seeds consult
+80/85, class/cohort/course 70, own-coupon course 45, video 50 — the user's
+call while the Commercial Terms workbook is missing, every row noted
+`PLACEHOLDER`. When the workbook arrives: new rows with a later
+`effective_from`, never edits. Until then the percentages a doctor sees are
+*a* number, not *the* number — do not demo the Earnings tab to a real
+clinician with these.
+
+**5.4b The Magic Link email template.** Sign-in by code sends through
+Supabase's **Magic Link** template, which must carry `{{ .Token }}` and not
+`{{ .ConfirmationURL }}` — the same trap AUTH-SETUP §3b fixed for Reset
+Password. The user does this in the dashboard; until then the code email
+arrives empty and nothing on the app side can tell. Also confirm Email OTP
+length is 6.
+
+**5.4c `0084` is written, not run.** The user applies it in the SQL editor.
+Until it runs, the ledger readers 404, the store keeps an empty cache, and
+every Earnings number is ₹0 with its empty-state copy — correct, and not the
+feature.
+
+**5.4d Bookings still have no real money.** Buy mints an entitlement and
+charges nothing, so every ledger row is `accrued → payable` on a gross the
+catalogue price supplied (now recorded on the booking as `price_paise`).
+When booking payment lands, the capture should flip `accrued` to `payable`
+in the same transaction — a function the payment side can call;
+`write_expert_earning` is the seam. The other terminal owns
+`payment_service.dart` / `razorpay-*`; hand this over rather than editing
+theirs.
+
+**5.4e Payouts are manual.** `record_expert_payout()` after the NEFT, with
+the UTR. Razorpay Route later = a webhook writer, not a migration. The 7th
+of the following month is the policy (`next_payout_date()`), chosen by the
+build, not yet confirmed by the user.
+
+**5.4f A no-show still pays.** The trigger marks `missed` as `payable`
+(consult_policy: the doctor is paid). A doctor who *themselves* no-shows is
+not detected anywhere (§5.3) and would be paid too. Needs the doctor-side
+session record before it can be reversed automatically.
+
+**5.4g Programme money is capacity-based.** The trigger calls a slot with
+capacity 1 a consultation and everything else a programme, then looks the
+kind up in `programmes`. A compiled-catalogue masterclass with no
+`programmes` row lands as `masterclass` at the booking's recorded price —
+fine — but a 1:1 offering with capacity > 1 would be misfiled. None exists.
+
+**5.4h Not built, deliberately:** the annual statement (PDF with PAN), a
+chart under the by-source legend, attendee names on a class, editing the
+public profile in-app (§5.1: editorial), self-serve rate negotiation.
+
+**5.4i Kept for revert, unreachable:** `doctor_home_screen.dart`,
+`doctor_appointments_screen.dart`, `doctor_schedule_screen.dart`,
+`doctor_impact_tab.dart`, `doctor_earnings_screen.dart`,
+`doctor_profile_screen.dart`, `doctor_earnings.dart`. Delete after the walk
+if nothing is missed.
+
 ## 5.2 One-to-many programmes — BUILT 2026-08-23, with two things parked
 
 Masterclasses and cohorts. Six defects were itemised here after the
@@ -2124,16 +2198,21 @@ Rejected: **refuse** (then why is the field editable?) and **move** (contradicts
    allows `consultation | masterclass | cohort | subscription | product |
    course | referral | other`, with nothing for **ad revenue**, **affiliate**
    or **brand sponsorship**.
-4. ⚠️ `rate_bps` is capped at **5000 (50%)**. The workbook's consultation split
-   gives the expert **80%**, rising to **85%** above 20 sessions a month. Both
-   are rejected by that CHECK. The cap is right for a *referral* commission and
-   wrong for a *delivery* share — more evidence they are two tables, not one.
-5. The 80% currently lives in `kDoctorSharePct` in `lib/doctor/doctor_earnings.dart`
-   — a client-side Dart constant, one global knob, no per-expert override and no
-   volume tier.
+4. ~~⚠️ `rate_bps` is capped at **5000 (50%)**…~~ **ANSWERED 2026-09-18 by
+   `0084`:** the delivery share is its own table, `expert_share_rules`,
+   `share_bps` to 10000, per-expert override and a `min_monthly` tier — the
+   two-tables conclusion, built. `care_commission_rules` keeps its cap for
+   referrals.
+5. ~~The 80% currently lives in `kDoctorSharePct`…~~ **ANSWERED 2026-09-18:**
+   `kDoctorSharePct` is referenced only by the retired
+   `doctor_earnings_screen.dart` (`test/doctor_app_shell_test.dart` holds
+   that). Rates are rows; the ledger freezes the one that applied into every
+   earning. ⚠️ The seeded rates are **placeholders** until the workbook is
+   found — see §5.4.
 
-None of this blocks the code-entry screen, which can ship against attribution
-alone. It blocks paying anyone correctly.
+Items 1–3 still stand. None of this blocks the code-entry screen, which can
+ship against attribution alone. Items 1–3 block paying a *coupon* share
+correctly; the *delivery* share is now paid correctly.
 
 ---
 
@@ -7457,6 +7536,51 @@ is unthinkable, and it is a score"), named as the one exception in
 
 ---
 
+## 104.0 Making (Creativity & expression), the seventh skilling door — 2026-09-18
+
+Built to `ParentVeda_Creativity_structure.pdf` ("the one door whose plan
+already refuses scoring") on the shell as it stood after Feelings. The
+door is `lib/data/doors/sk_door_making.dart` over
+`lib/data/skilling/skilling_making_*.dart`, with one new shell file,
+`sk_portfolio.dart`; the contract is `test/sk_making_door_test.dart`; owed
+content is `docs/DOOR-CONTENT-OWED.md` MK1–MK10; the review list is
+`docs/SKILLING-DOORS-REVIEW.md`. Generic points: `SKILLING-DOOR-BUILD.md` §9.
+
+### 104.1 The calls — 2026-09-18
+
+1a the showcase **private by default**: no cross-user gallery, no likes,
+no ratings, no featured wall · 2a **the least commercial door, kept so**:
+a light class shelf (an art and a music class per level), Consult held —
+the opposite of Confidence, on purpose, "the door that proves the app
+means what it says" · 3a the showcase as **a show mode on this phone**,
+because the journal's "invite someone to see" is a link whose other half
+does not exist in this repo · 4a **photo capture built now**, on-device,
+the voice posture: behind the parent's switch, off by default, copied
+into documents, parent-deletable, never analysed or judged.
+
+### 104.2 What changed
+
+Two shell slots (`photosAllowed` on the child record, `portfolio` on the
+door content) and one shell file. The portfolio screen composes the
+three keepsakes — photos (new), recordings (the voice keepsake), words
+(the shared keepsake) — and carries the show mode. Six moves from the
+brief's table, 36 activity slots, three prompt sets (27 slots: art,
+music, making — all three, because "creativity for kids quietly means
+colouring"), six small classes, twelve products whose every blurb names
+the free path, the parent note under the brief's own title. The
+bracket: six cells live, the portfolio tracker surviving as a portfolio,
+the showcase kept and held private, Consult held. Not walked on a phone.
+
+### 104.3 Needs a decision (door-specific)
+
+* The who-for names in the show mode (`kSkShowingTo`) — mine; the
+  invite's six exactly, or these.
+* Whether the 6 to 8 fill should window into parenting Early Learning's
+  art and messy play, or only name it.
+* The hero photo.
+
+---
+
 ## 59.0 Onboarding is decided against the Mobbin audit; three things it leaves open — OPENED 2026-09-16
 
 `docs/ONBOARDING-AUDIT.md` holds the audit, the seven-screen decision and the
@@ -7789,6 +7913,48 @@ booked date or "No date added yet", one white pill), then *The usual run*
 station dots, "Mark as done" links and NEXT UP / DONE pills retired (kept
 in the file for revert). Walked on the phone.
 
+### 63.13 Read photos from rawpixel carry a watermark — BLOCKER — SEEN 2026-09-19
+
+22 of the 32 URLs in `read_images.dart` are `images.rawpixel.com/image_1300/…`
+previews, and rawpixel tiles its logo across a preview (seen on "Take it to
+your appointment" — fetched and looked at). They cannot ship. Replace each
+through Openverse with `source=flickr,wikimedia` (CC BY / CC0 files served
+clean), keep the credit line, re-run `pregnancy_reads_shape_test`. The 10
+Flickr `_b.jpg` files are fine.
+
+### 63.12 The door walk — Scans & tests done; the recipe — 2026-09-19
+
+`docs/PREGNANCY-DOORS-REVIEW.md` holds the table for each door. Scans &
+tests: search bar; timeline's date sheet (inline calendar + slots; a real
+`Appointment`); "What is next" tool retired; scan reads carry their own
+parameters + interpretation; line-by-line tool retired; decoder tab
+without its own search, ink pills, compact rows; the pinned flag and every
+callout un-boxed (§4.0 addendum); Talk merged to one section; checklist
+rows; the Prepare kit inked; consults restructured (Zocdoc/Preply/Alan);
+pickers and text buttons ink app-wide. Owed on this door: the booking flow
+under the consult detail (shared with the doctors terminal); the locker
+walked with a real report. Next door: Complications.
+
+### 63.11 The Ask Veda FAB — restyle owed — 2026-09-18
+
+The user: "very purple and outdated… like a sore thumb on the Products
+page and the new pages. Not a lot of changes, a little tweak so it matches
+the new app." Queued behind the door selector. BASE-UI-DECISIONS §2.1 was
+(a) keep the violet; the user has now answered (b). Direction when it is
+built: the pill family (§4.0) — ink or white, the mark in line, a shadow
+not a fill — checked against Mobbin's floating assistants before touching
+`global_ask_fab.dart`.
+
+### 63.10 Search — built on pregnancy doors; owed elsewhere — 2026-09-18
+
+`PvSearchBar` in every pregnancy door's hero; `PvSearchScreen` over
+`kPvDoorPages`; `PvSearchStore` for recents. DESIGN-SYSTEM §4.0e. Owed:
+the same bar on parenting doors (`pp_door_screen`, index over
+`PpDoorPage`s) and TTC (`ttc_focus_screen`, index over the TTC pages) —
+each stage's index is its own door data; the screen and store are shared.
+Also owed: the weekly reads (`pregnancyWeeklyReadFor`) are not in the
+index, being home content rather than door tiles.
+
 ### 63.9 A note on each scan — 2026-09-18
 
 The Up-next card carries two pills: *Add the date* (the appointments
@@ -7816,9 +7982,11 @@ consult offer or a chart the deck cannot hold, or are empty, and open in the
 reader with their cards listed); the chart card is the same white data card
 as the table; Activity / Ceremony / Recipe open on their steps; Red-flag
 pages open on their flags; Guide and Myth-vs-fact chips say Article; the
-checklist's share bar is the theme's ink pill. **Done 2026-09-18:** the door deck is
-tightened on all three stages (BASE-UI-DECISIONS §2.8 holds the chips
-alternative for the user's call); **owed:** the TTC and parenting tag surfaces walked on the phone; the empty
+checklist's share bar is the theme's ink pill. **2026-09-18, evening:** four selectors exist behind flags in
+`pv_door_screen.dart` — rail (Flo, on Scans & tests), tiles (on
+Complications), low deck (everywhere else), chips (none). BASE-UI-DECISIONS
+§2.8 has the record; the user picks rail vs tiles, then it rolls to every
+door of all three stages and the other three retire. **Owed:** the TTC and parenting tag surfaces walked on the phone; the empty
 CARDS pages (Potty pull-ups, taking longer; Traditions ×3; Health accidents)
 are still empty.
 
@@ -8011,3 +8179,47 @@ first, not by effort.
 - Image caching is Flutter's in-memory cache only; no disk cache package —
   a cold open refetches every photo.
 - The Classic bodies and their pinned tests are still compiled (§65.7).
+
+## 66.0 The question miner is built and run; four things it could not reach — OPENED 2026-09-18
+
+`tools/question_miner/` collects question text (never answers) from public
+sources, tags each question with a stage and a door-aligned topic, clusters
+by meaning per stage and ranks by demand. Output: `research/questions/`
+(workbook `parentveda_questions.xlsx`, CSVs, generated README). Read the
+tool's README for sources and method.
+
+**Reddit OAuth credentials were not in hand.** The brief said they were
+provided; nothing was on disk or in the environment. The run used the
+public RSS feeds instead, which Reddit now limits to ONE request per clock
+minute per IP (measured from `x-ratelimit-*` headers), so Reddit is the
+shallowest source in the pool: one page of new, hot and top-of-year per
+sub. When the credentials exist, put them in `tools/question_miner/.env`
+(`REDDIT_CLIENT_ID`, `REDDIT_CLIENT_SECRET`, `REDDIT_USER_AGENT`) and run
+`python tools/question_miner/run.py run --sources reddit` — PRAW pulls up
+to 1,000 titles per listing at 100 req/min, the whole Reddit pass takes
+about five minutes, the other sources carry forward, and the pool is
+re-clustered. This is the one open point that changes the ranking.
+
+**Google "People also ask" is not reachable by HTTP.** The SERP HTML comes
+back 200 without the PAA block (rendered client-side). Substitute in the
+run: the autocomplete expansion (`<why/how/is it safe…> stem`, `stem a…z`,
+then one level deeper), which is the same demand signal one step earlier.
+If PAA is still wanted, it is a browser-driven job (Claude in Chrome over
+~100 queries), not a fetcher.
+
+**Semrush is off the table until the user says otherwise** (decided
+2026-09-18: "we will decide its use in future"). Recorded only so nobody
+re-proposes it as a collector: it would give question keywords with India
+search volumes, and the account currently has no API units anyway.
+
+**Hinglish clusters run small.** Parentune and BabyChakra questions are
+largely romanised Hindi; the English embedding model does not read it, so
+`qm/normalize.py` maps ~150 common Hinglish words to English before
+embedding. That lands "mera baby khana nahi khata" beside "baby not eating"
+but misses longer sentences, which cluster among themselves. Options: a
+multilingual embedder (none reachable offline yet — HuggingFace is
+connection-reset from this network; `fetch_model.py` uses a mirror), or
+widening the word map as the unclear bucket shows what is missed.
+
+Also dead on 2026-09-18, for the record: Momspresso (TLS handshake fails),
+Quora (Cloudflare challenge), Bing PAA (client-rendered).

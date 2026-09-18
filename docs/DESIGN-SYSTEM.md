@@ -453,6 +453,26 @@ Title          Fraunces 22 / w600 / −0.5 / p.ink1
 The eyebrow is `action`. **This is load-bearing** — it shipped grey on two
 screens and drained the colour out of everything below it.
 
+### 4.0 · addendum — no text on a tinted box — SETTLED 2026-09-18
+
+The door walk added one line to the rule above, and it has teeth: **a
+paragraph, a list or a warning never sits on a tinted rounded rectangle.**
+Not the pink well for red flags, not the lavender panel for a callout, not
+a grey box for a note, not a tinted row for a ticked item. The user, on
+the pinned "Call your doctor if": *"a big blob thrown at the screen… ruins
+the whole UI."* What replaces it, by kind:
+
+| Kind | Form |
+|---|---|
+| Warning / red flags | an ink rule (1.5), the heading in the display face, the lines as a list with one **coral dot** each, the "where to call" sentence in grey, a hairline under. The dot is the only colour and it is the signal. (Flo's own form.) |
+| Note / aside | an icon and a grey line, on the page (`_TabNote`); or the reader's aside between two hairlines |
+| Tip | a left hairline, eyebrow, title, body (unchanged) |
+| Ticked / selected row | bold text and an ink box; the row does not fill |
+| Card | white, one hairline, radius 16 — a card is a container for an OBJECT (a scan, a person, a parameter table), never for a sentence |
+
+Tinted fills survive in exactly two places: the group's mark well (the
+"colour in wells" rule) and a tile's field on a rail.
+
 ## 4.0a One reader — SETTLED 2026-09-17
 
 Every piece of writing in the app is one object, `PvRead`, on one screen,
@@ -480,6 +500,35 @@ all of it. Mobbin (Alan, Withings, Lovi, Clue): tables inside articles are
 hairline rows, steps are quiet numbered circles, the picture sits above a
 category eyebrow and an author row — which is what the parenting blocks
 already were, so they render inside the reader unchanged.
+
+## 4.0d The door deck — SETTLED 2026-09-18
+
+The selector under every door hero: a fanned, blurred, swipeable ring of
+**low landscape cards** (196×64, track 76, ~98pt with dots). Each card is
+white, one hairline, a line icon in a 40pt well that carries a whisper of the
+group's hue, a Manrope w700 label, a grey count line; the front card has a
+neutral shadow, rear cards dim towards the ground. No tinted fills, no
+coloured rims, no illustration. The three stage decks (`pv_door_carousel`,
+`pp_door_carousel`, `ttc_focus_screen`'s `_GroupCarousel`) share this
+geometry and this card. A chip row (`PvDoorChips`) exists behind
+`kPvDoorChipDoors` for any door that turns out to need a flat selector.
+
+## 4.0e Search — a bar in every door, one screen behind it — SETTLED 2026-09-18
+
+Every door carries `PvSearchBar` under its hero blurb (Flo's spot): white,
+the page hairline, grey lens, ink hint, stadium, 48pt. It is a button drawn
+as a field — the tap opens `PvSearchScreen`, whose own field takes focus.
+No keyboard on a page that is not a form. The search screen: field top,
+back at left, keyboard up; *Recent* and *Start with* before typing;
+result rows (format icon in a neutral well, title, blurb, "Door · Tab")
+that open through `openPvDoorTile`; scope chips *In <door> / Everywhere*;
+*Ask Veda about "…"* as the last row, always. The index is the doors'
+tiles (`pvSearchIndex`), word-prefix matched. Nothing on the home; nothing
+at the bottom. No violet in any field anywhere: `inputDecorationTheme` is
+white + hairline + ink ring, `textSelectionTheme` is ink caret, ink
+handles, grey selection. The floating Ask button is suppressed on the
+`search` route. Held by `test/pv_search_test.dart`. Parenting and TTC
+doors are owed the same bar (STILL-OPEN §63.10).
 
 ## 4.0c Feedback — every commit tap answers — SETTLED 2026-09-18
 

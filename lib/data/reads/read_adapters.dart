@@ -292,12 +292,23 @@ PvRead pvReadFromCondition(
 
 const String kScanReadPrefix = 'scan_';
 
+/// The parameters of one scan's report, as a block the reader hands back to
+/// the scans stage to draw (`PvReaderScreen.customBlock`). Data only — the
+/// widget is `ScanParametersView` in `scan_detail_screen.dart`.
+class PvScanParametersBlock {
+  const PvScanParametersBlock(this.parameters);
+  final List<ReportParameter> parameters;
+}
+
 /// A scan, as a read — the classic page's four questions as sections, its
 /// "call your gynaecologist if" list as the urgent line, and the screen's
 /// own foot (her booked appointment, the line-by-line report, the decoder,
 /// the consult, Ask Veda) as next-step tiles the screen supplies and opens.
-/// The report's parameters are NOT repeated here: "Your report, line by
-/// line" is the tile that opens them (`TestScanDetailScreen`), as before.
+/// The report's parameters ARE here since 2026-09-18 — "What the report
+/// will say" as a data card (`PvScanParametersBlock`, drawn by the scans
+/// stage through `customBlock`) and "How to read the result" from the
+/// scan's own interpretation. The separate "Your report, line by line"
+/// tool that used to hold them is retired from the door: one home per fact.
 PvRead pvReadFromScan(
   TestScanInfo s, {
   List<LocalizedText> redFlags = const [],
@@ -326,6 +337,18 @@ PvRead pvReadFromScan(
         PvReadSection(
             heading: const LocalizedText(en: 'How should I prepare?', hi: 'तैयारी कैसे करूँ?'),
             paragraphs: [s.preparation]),
+        if (s.parameters.isNotEmpty)
+          PvReadSection(
+              heading: const LocalizedText(
+                  en: 'What the report will say', hi: 'Report mein kya likha hoga'),
+              paragraphs: [if (s.understandingReport.en.isNotEmpty) s.understandingReport],
+              custom: PvScanParametersBlock(s.parameters)),
+        if (s.interpretation.en.isNotEmpty)
+          PvReadSection(
+              heading: const LocalizedText(
+                  en: 'How to read the result', hi: 'Nateeja kaise padhein'),
+              paragraphs: [s.interpretation],
+              bullets: s.interpretPointers),
       ],
       whenToSeeSomeone: redFlags.isEmpty
           ? const PvCallout(

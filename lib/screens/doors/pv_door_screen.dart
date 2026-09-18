@@ -58,8 +58,31 @@ import '../v2/v2_palette.dart';
 import '../v2/v3_bracket_art.dart';
 import '../v2/v3_hero_field.dart';
 import 'pv_door_carousel.dart';
+import 'pv_door_chips.dart';
 import 'pv_door_chrome.dart';
+import 'pv_door_rail.dart';
+import 'pv_door_tiles.dart';
 import 'pv_door_router.dart';
+import '../search/pv_search_screen.dart';
+import '../../widgets/pv_search_bar.dart';
+
+/// Doors that use the chip row instead of the deck — the §2.8 comparison.
+/// Scans & tests first, by the user's ask; empty this set to put every door
+/// back on the deck, or fill it to move them all.
+/// Empty since the low deck (2026-09-18): the user chose to keep the swipe
+/// and shrink the card instead. The chip row stays built; add a bracket id
+/// here to put a door on chips.
+const Set<String> kPvDoorChipDoors = {};
+
+/// Doors on the TILE row — icon tiles with a label beneath, every tab
+/// visible, one tap (DoorDash, Skip, Glovo, Grab; the app's own home grid).
+/// Complications first, for the user to judge; then every door.
+const Set<String> kPvDoorTileDoors = {'pregnancy_complications'};
+
+/// Doors on the straddling card RAIL — Flo's pattern, the user's reference
+/// (2026-09-18): tall white cards across the seam between hero and sheet.
+/// Scans & tests first.
+const Set<String> kPvDoorRailDoors = {'pregnancy_scans_tests'};
 
 // -----------------------------------------------------------------------------
 //  Rail geometry
@@ -85,7 +108,9 @@ import 'pv_door_router.dart';
 /// as the distance the sheet is lifted — so it is one number, not two that have
 /// to be kept equal by hand. Get them out of step and either the tinted field
 /// reappears in the sheet's rounded corners or the page grows a gap.
-const double kPvDoorHeroOverlap = 38;
+const Key kPvDoorSearchKey = ValueKey('pv-door-search');
+
+const double kPvDoorHeroOverlap = 38; // the rail lifts by PvDoorRail.overlap (70); see _Hero's `bottom`
 
 class PvDoorScreen extends StatefulWidget {
   const PvDoorScreen({
@@ -234,19 +259,84 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                   tint: tint,
                   eyebrow: bracket.label.of(lang),
                   bracket: bracket,
+                  pregnancy: widget.pregnancy,
                 ),
                 PvDoorSheet(p: p, children: [
                   // ⚠️ THE ANCHOR A LAUNCHER CARD SCROLLS TO. See `_openTile`.
-                  SizedBox(key: _selectorAnchor, height: 14), // was 22 (deck tightened 2026-09-18)
+                  SizedBox(
+                      key: _selectorAnchor,
+                      // The rail rides up over the hero by its overlap, so
+                      // the sheet's own top gap is spent lifting it.
+                      height: kPvDoorRailDoors.contains(page.bracketId) ? 0 : 14),
+
+                  // ---- the rail, across the seam ----------------------------
+                  //
+                  // ⚠️ IT STRADDLES: a negative top offset lifts the rail so
+                  // its upper part sits over the photograph and its lower part
+                  // on the sheet (Flo). The sheet is not clipped, so the cards
+                  // paint over the hero; `kPvDoorHeroOverlap` already makes
+                  // the photo run under the sheet's rounded top, so there is
+                  // picture behind the lifted cards, not the tinted field.
+                  if (kPvDoorRailDoors.contains(page.bracketId)) ...[
+                    // A slot `overlap` shorter than the rail, with the rail
+                    // painted upward out of it (clip none on the sheet), is
+                    // what puts the cards' top half over the photograph.
+                    SizedBox(
+                      height: PvDoorRail.cardHeight - PvDoorRail.overlap,
+                      child: OverflowBox(
+                        alignment: Alignment.bottomCenter,
+                        minHeight: PvDoorRail.cardHeight,
+                        maxHeight: PvDoorRail.cardHeight,
+                        child: PvDoorRail(
+                        groups: groups,
+                        counts: [for (final g in groups) _countFor(g)],
+                        selected: _group,
+                        p: p,
+                        onPick: (i) => setState(() => _group = i),
+                      ),
+                      ),
+                    ),
+                    // The translate paints the rail higher but its layout
+                    // slot stays where it was, so the content below already
+                    // sits `overlap` further from the painted cards than the
+                    // slot suggests; the sheet's top gap was zeroed above to
+                    // pay some of that back. A small gap only, here.
+                    const SizedBox(height: 4),
+                  ] else
 
                   // ---- the selector, first thing under the hero ----------
-                  PvDoorCarousel(
-                    groups: groups,
-                    counts: [for (final g in groups) _countFor(g)],
-                    selected: _group,
-                    p: p,
-                    onPick: (i) => setState(() => _group = i),
-                  ),
+                  //
+                  // ⚠️ TWO SELECTORS, ONE DOOR AT A TIME — 2026-09-18. The deck
+                  // (`PvDoorCarousel`) is the app's signature; the chip row
+                  // (`PvDoorChips`) is what every app in the Mobbin set uses
+                  // for a selector above content. The user asked to see (b)
+                  // on Scans & tests and compare (BASE-UI-DECISIONS §2.8);
+                  // `kPvDoorChipDoors` names the doors on chips. Same contract
+                  // both ways, so the door itself does not know which it has.
+                  if (kPvDoorTileDoors.contains(page.bracketId))
+                    PvDoorTiles(
+                      groups: groups,
+                      counts: [for (final g in groups) _countFor(g)],
+                      selected: _group,
+                      p: p,
+                      onPick: (i) => setState(() => _group = i),
+                    )
+                  else if (kPvDoorChipDoors.contains(page.bracketId))
+                    PvDoorChips(
+                      groups: groups,
+                      counts: [for (final g in groups) _countFor(g)],
+                      selected: _group,
+                      p: p,
+                      onPick: (i) => setState(() => _group = i),
+                    )
+                  else
+                    PvDoorCarousel(
+                      groups: groups,
+                      counts: [for (final g in groups) _countFor(g)],
+                      selected: _group,
+                      p: p,
+                      onPick: (i) => setState(() => _group = i),
+                    ),
                   const SizedBox(height: 18), // was 26
 
                   // ---- a pinned red flag, above everything ---------------
@@ -427,9 +517,11 @@ class _Hero extends StatelessWidget {
     required this.tint,
     required this.eyebrow,
     required this.bracket,
+    required this.pregnancy,
   });
 
   final PvDoorPage page;
+  final PregnancyController pregnancy;
   final V2Palette p;
   final Color tint;
 
@@ -437,6 +529,14 @@ class _Hero extends StatelessWidget {
   final String eyebrow;
 
   final Bracket bracket;
+
+  /// How far the picture runs on under the sheet. On a rail door the cards
+  /// float up over the seam, so the picture must reach up behind them or a
+  /// band of the tinted field shows between photo and sheet (seen on the
+  /// phone, 2026-09-18).
+  double get _bleed => kPvDoorRailDoors.contains(page.bracketId)
+      ? kPvDoorHeroOverlap + PvDoorRail.overlap
+      : kPvDoorHeroOverlap;
 
   @override
   Widget build(BuildContext context) {
@@ -475,7 +575,7 @@ class _Hero extends StatelessWidget {
           top: 0,
           left: 0,
           right: 0,
-          bottom: -kPvDoorHeroOverlap,
+          bottom: -_bleed,
           child: Image.network(
             photo,
             fit: BoxFit.cover,
@@ -500,7 +600,7 @@ class _Hero extends StatelessWidget {
           top: 0,
           left: 0,
           right: 0,
-          bottom: -kPvDoorHeroOverlap,
+          bottom: -_bleed,
           child: DecoratedBox(
             decoration: BoxDecoration(
               gradient: LinearGradient(
@@ -537,14 +637,16 @@ class _Hero extends StatelessWidget {
       SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 8, 22, 20),
+          // On a rail door the cards float up over the seam by their
+          // overlap, so the blurb needs that much more room below it.
+          padding: EdgeInsets.fromLTRB(20, 8, 22,
+              20 + (kPvDoorRailDoors.contains(page.bracketId) ? PvDoorRail.overlap - 12 : 0)),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Align(
-                alignment: Alignment.centerLeft,
-                child: Material(
+              Row(children: [
+                Material(
                   color: Colors.white.withValues(alpha: 0.55),
                   shape: const CircleBorder(),
                   clipBehavior: Clip.antiAlias,
@@ -557,7 +659,14 @@ class _Hero extends StatelessWidget {
                             size: 19, color: p.ink1)),
                   ),
                 ),
-              ),
+                // A search CIRCLE sat here for an hour (2026-09-18) — the
+                // user: "I meant a search bar inside each door." The bar is
+                // under the blurb now. Kept for revert:
+                //   const Spacer(),
+                //   Material(color: white 55%, shape: CircleBorder,
+                //     child: InkWell(onTap: openPvSearch(door: page),
+                //       child: Icon(Icons.search_rounded)))
+              ]),
               // ⚠️ THE PHOTOGRAPH IS GIVEN ROOM HERE, AND NOWHERE ELSE. The
               // hero is a Stack whose size comes from this column, so the only
               // way to make the picture bigger is to make the column taller —
@@ -599,7 +708,19 @@ class _Hero extends StatelessWidget {
                             ? p.ink2
                             : Colors.white.withValues(alpha: 0.92))),
               ),
-              const SizedBox(height: 6),
+              const SizedBox(height: 16),
+              // ---- SEARCH, IN THE DOOR ----------------------------------------
+              // Flo's topic page, exactly: title, one line, a white search
+              // field, then the card rail (BASE-UI-DECISIONS §2.9). A door is
+              // thirty to fifty things across five tabs; "NT scan" typed
+              // beats two swipes and a scroll. Scoped to this door, with
+              // "Everywhere" one tap away on the screen it opens.
+              PvSearchBar(
+                  key: kPvDoorSearchKey,
+                  hint: 'Search $eyebrow',
+                  p: p,
+                  onTap: () => openPvSearch(context, pregnancy, door: page)),
+              const SizedBox(height: 4),
             ],
           ),
         ),
@@ -747,9 +868,88 @@ class _PinnedRedFlag extends StatelessWidget {
   /// Opens the condition page behind one line, where that line has one.
   final void Function(String conditionId) onLine;
 
+  // ⚠️ NO BOX — 2026-09-18, the door walk. This was a pink well (radius 20,
+  // `kPvUrgentTint`) and the user's words for it were "a big blob thrown at
+  // the screen… ruins the whole UI". Flo's own "seek immediate medical help
+  // if" is the reference (Mobbin): a bold lead sentence, the signs as a
+  // plain list with one coral dot each, on the page itself. So: a rule, the
+  // heading in the display face, the lines with a dot, the foot in grey.
+  // The dot is the only colour, and it is the one signal that says "call".
+  // The old well stays below for revert.
   @override
   Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
+        onTap: flag.seeAll ? onTap : null,
+        behavior: HitTestBehavior.opaque,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(height: 1.5, color: p.ink1),
+            const SizedBox(height: 14),
+            Text(flag.title,
+                style: pvFraunces(
+                    fontSize: 21,
+                    fontWeight: FontWeight.w600,
+                    height: 1.2,
+                    letterSpacing: -0.3,
+                    color: p.ink1)),
+            const SizedBox(height: 10),
+            for (final line in flag.lines)
+              GestureDetector(
+                onTap: line.conditionId == null
+                    ? null
+                    : () => onLine(line.conditionId!),
+                behavior: HitTestBehavior.opaque,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 5),
+                  child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8, right: 11),
+                          child: Container(
+                            width: 6,
+                            height: 6,
+                            decoration: const BoxDecoration(
+                                color: kPvUrgentInk, shape: BoxShape.circle),
+                          ),
+                        ),
+                        Expanded(
+                          child: Text(line.text,
+                              style: pvManrope(
+                                  fontSize: 14, height: 1.5, color: p.ink1)),
+                        ),
+                        if (line.conditionId != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 2, left: 6),
+                            child: Icon(Icons.chevron_right_rounded,
+                                size: 16, color: p.ink3),
+                          ),
+                      ]),
+                ),
+              ),
+            if (flag.footer case final footer?) ...[
+              const SizedBox(height: 8),
+              Text(footer,
+                  style: pvManrope(fontSize: 12.5, height: 1.55, color: p.ink2)),
+            ],
+            if (flag.seeAll) ...[
+              const SizedBox(height: 10),
+              Text('See all of these',
+                  style: pvManrope(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w800,
+                      color: p.ink1)),
+            ],
+            const SizedBox(height: 14),
+            Container(height: 1, color: p.line),
+          ],
+        ),
+      );
+
+  // Kept for revert — the pink well, 2026-09-10 → 2026-09-18.
+  // ignore: unused_element
+  Widget buildWell(BuildContext context) => GestureDetector(
+        onTap: flag.seeAll ? onTap : null,
         behavior: HitTestBehavior.opaque,
         child: Container(
           width: double.infinity,
@@ -775,65 +975,29 @@ class _PinnedRedFlag extends StatelessWidget {
                 ),
               ]),
               const SizedBox(height: 12),
-              // ⚠️ A LINE WITH ITS OWN PAGE IS ITS OWN TARGET, and it has to
-              // stop the tap reaching the box behind it — otherwise a tap on
-              // "the baby moving less than usual" would open the general
-              // screen rather than the page that line was assembled from.
-              // `GestureDetector` on the row does that by consuming the
-              // gesture; the box's own handler only ever sees the gaps.
               for (final line in flag.lines) ...[
-                GestureDetector(
-                  onTap: line.conditionId == null
-                      ? null
-                      : () => onLine(line.conditionId!),
-                  behavior: HitTestBehavior.opaque,
-                  child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 7, right: 9),
-                          child: Container(
-                            width: 4,
-                            height: 4,
-                            decoration: const BoxDecoration(
-                                color: kPvUrgentInk, shape: BoxShape.circle),
-                          ),
-                        ),
-                        Expanded(
-                          child: Text(line.text,
-                              style: pvManrope(
-                                  fontSize: 13, height: 1.55, color: p.ink1)),
-                        ),
-                        // The mark that says this line goes somewhere. Only on
-                        // the lines that do.
-                        if (line.conditionId != null)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 2, left: 6),
-                            child: Icon(Icons.chevron_right_rounded,
-                                size: 16,
-                                color: kPvUrgentInk.withValues(alpha: 0.7)),
-                          ),
-                      ]),
-                ),
+                Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Padding(
+                    padding: const EdgeInsets.only(top: 7, right: 9),
+                    child: Container(
+                      width: 4,
+                      height: 4,
+                      decoration: const BoxDecoration(
+                          color: kPvUrgentInk, shape: BoxShape.circle),
+                    ),
+                  ),
+                  Expanded(
+                    child: Text(line.text,
+                        style: pvManrope(
+                            fontSize: 13, height: 1.55, color: p.ink1)),
+                  ),
+                ]),
                 const SizedBox(height: 9),
               ],
-              // ⚠️ THE BRIEF'S OWN SENTENCE, WHERE A FLAG CARRIES ONE. It sits
-              // above the "see all" link because it qualifies the LIST, not the
-              // link — "this tells you when to call and never replaces calling
-              // a doctor or going in".
-              if (flag.footer case final footer?) ...[
-                const SizedBox(height: 4),
+              if (flag.footer case final footer?)
                 Text(footer,
                     style: pvManrope(
                         fontSize: 12, height: 1.55, color: p.ink2)),
-                const SizedBox(height: 10),
-              ] else
-                const SizedBox(height: 4),
-              Text('See all of these',
-                  style: pvManrope(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w800,
-                      color: kPvUrgentInk)),
             ],
           ),
         ),
@@ -848,18 +1012,19 @@ class _TabNote extends StatelessWidget {
   final V2Palette p;
 
   @override
-  Widget build(BuildContext context) => Container(
-        padding: const EdgeInsets.all(13),
-        decoration: BoxDecoration(
-          color: p.ink1.withValues(alpha: 0.04),
-          borderRadius: BorderRadius.circular(14),
-        ),
+  // No box (2026-09-18): the note sits on the page, an icon and a line of
+  // grey. Was a 4% ink well, radius 14 — kept for revert.
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 2),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Icon(Icons.info_outline_rounded, size: 15, color: p.ink3),
+          Padding(
+            padding: const EdgeInsets.only(top: 2),
+            child: Icon(Icons.info_outline_rounded, size: 15, color: p.ink3),
+          ),
           const SizedBox(width: 9),
           Expanded(
             child: Text(note,
-                style: pvManrope(fontSize: 12, height: 1.5, color: p.ink2)),
+                style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink2)),
           ),
         ]),
       );

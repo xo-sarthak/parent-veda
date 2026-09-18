@@ -466,4 +466,6 @@ class PvReadNextStep {
   final String? action;
 }
 
-enum PvNextKind { read, watch, tool, activity, product, course, consult }
+// `ask` — 2026-09-19: a step that opens Ask Veda wore the ARTICLE chip,
+// which the user called misleading. It wears its own name now.
+enum PvNextKind { read, watch, tool, activity, product, course, consult, ask }

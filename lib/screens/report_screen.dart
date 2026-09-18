@@ -17,9 +17,10 @@ import '../localization/app_language.dart';
 import '../models/report_finding.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
+import '../widgets/pv_feedback.dart';
 import '../widgets/pv_placeholders.dart';
 import 'brackets/hub/hub_solution_cards.dart' show SolutionMeta, SolutionType;
-import 'doors/pv_door_chrome.dart' show PvDoorRow;
+import 'doors/pv_door_chrome.dart' show PvDoorRow, PvDoorToolScaffold, pvDoorPad;
 import 'tools/ask_veda_screen.dart';
 import 'v2/v2_palette.dart';
 import '../data/reads/read_adapters.dart';
@@ -124,6 +125,9 @@ class ReportScreen extends StatefulWidget {
 }
 
 class _ReportScreenState extends State<ReportScreen> {
+  /// Whether the folded "More topics" list is open (unfiltered only).
+  bool _moreOpen = false;
+
   PregnancyController get controller => widget.controller;
 
   /// ⚠️ A SET, BECAUSE THE REQUIREMENT SAYS "MULTIPLE FILTERS".
@@ -210,7 +214,13 @@ class _ReportScreenState extends State<ReportScreen> {
                     ?.copyWith(color: AppTheme.neutral600, height: 1.4)),
             const SizedBox(height: 18),
           ],
-          _SearchBar(hint: s.rSearchHint, onTap: () => _search(context, lang)),
+          // ⚠️ NOT WHEN EMBEDDED — 2026-09-18. The door carries its own
+          // search bar under the hero, and it indexes these findings
+          // (`pvSearchIndex`); two bars a screen apart was "a conflicting
+          // search bar situation" (the user). The standalone screen keeps
+          // this one.
+          if (!embedded)
+            _SearchBar(hint: s.rSearchHint, onTap: () => _search(context, lang)),
 
           // ---- THE REPORT FILTER --------------------------------------------
           const SizedBox(height: 18),
@@ -259,9 +269,11 @@ class _ReportScreenState extends State<ReportScreen> {
             const SizedBox(height: 26),
             Container(
               padding: const EdgeInsets.fromLTRB(16, 18, 16, 18),
+              // White + hairline, not the lavender well (2026-09-18).
               decoration: BoxDecoration(
-                color: AppTheme.surfaceContainer,
+                color: AppTheme.surface,
                 borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: AppTheme.outlineVariant),
               ),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text(
@@ -275,7 +287,7 @@ class _ReportScreenState extends State<ReportScreen> {
                   child: Text(
                       lang.isEnglish ? 'Show everything' : 'सब कुछ दिखाएँ',
                       style: text.labelLarge?.copyWith(
-                          color: AppTheme.primary600,
+                          color: AppTheme.neutral900, // was primary600
                           fontWeight: FontWeight.w800)),
                 ),
               ]),
@@ -287,16 +299,49 @@ class _ReportScreenState extends State<ReportScreen> {
             Text(s.rPopularTitle,
                 style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
           if (popular.isNotEmpty) const SizedBox(height: 12),
-          for (final f in popular) ...[
+          for (final f in popular)
             _TopicRow(
               finding: f,
               lang: lang,
               onTap: () => _openArticle(context, f, controller),
             ),
-            const SizedBox(height: 10),
-          ],
           if (all.isNotEmpty) const SizedBox(height: 18),
-          if (all.isNotEmpty)
+          // ⚠️ "MORE TOPICS" FOLDS — 2026-09-19. Twenty-one rows under six
+          // popular ones is a scroll that grows every time a finding is
+          // added, and the section under it (the door's own tiles) sinks
+          // with it (the user's review). Closed by default while
+          // unfiltered: the heading carries the count and a chevron, one
+          // tap opens it. With a report chip on, the whole point is the
+          // list, so it is open.
+          if (all.isNotEmpty && _picked.isEmpty)
+            PvPress(
+              child: InkWell(
+                onTap: () {
+                  pvCommitFeedback();
+                  setState(() => _moreOpen = !_moreOpen);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 6),
+                  child: Row(children: [
+                    Expanded(
+                      child: Text(
+                          lang.isEnglish
+                              ? 'More topics  ·  ${all.length}'
+                              : 'और विषय  ·  ${all.length}',
+                          style: text.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.w800)),
+                    ),
+                    AnimatedRotation(
+                      turns: _moreOpen ? 0.5 : 0,
+                      duration: const Duration(milliseconds: 180),
+                      child: Icon(Icons.expand_more_rounded,
+                          color: AppTheme.neutral600),
+                    ),
+                  ]),
+                ),
+              ),
+            )
+          else if (all.isNotEmpty)
             Text(
                 // The heading has to stop saying "All topics" once a filter is
                 // on, or the screen contradicts itself in its own heading.
@@ -314,14 +359,21 @@ class _ReportScreenState extends State<ReportScreen> {
                         : 'इन रिपोर्टों के विषय'),
                 style: text.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
           if (all.isNotEmpty) const SizedBox(height: 12),
-          for (final f in all) ...[
-            _TopicRow(
-              finding: f,
-              lang: lang,
-              onTap: () => _openArticle(context, f, controller),
-            ),
-            const SizedBox(height: 10),
-          ],
+          // The fold opens like a drawer, not a jump.
+          AnimatedSize(
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeOutCubic,
+            alignment: Alignment.topCenter,
+            child: Column(children: [
+              if (_picked.isNotEmpty || _moreOpen)
+                for (final f in all)
+                  _TopicRow(
+                    finding: f,
+                    lang: lang,
+                    onTap: () => _openArticle(context, f, controller),
+                  ),
+            ]),
+          ),
     ];
 
     // ⚠️ EMBEDDED RETURNS A COLUMN, NOT A LIST. A scrolling widget inside
@@ -332,13 +384,18 @@ class _ReportScreenState extends State<ReportScreen> {
           crossAxisAlignment: CrossAxisAlignment.start, children: body);
     }
 
-    return Scaffold(
-      backgroundColor: AppTheme.scaffoldBackground,
-      appBar: AppBar(title: Text(s.rTitle)),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(18, 8, 18, 28),
-        children: body,
-      ),
+    // The door tool header (2026-09-19): every leaf of a door wears the
+    // same hero — back circle at the gutter, eyebrow, the title in the
+    // display face, one line — the one the checklist has and the user
+    // asked to see everywhere. Was an AppBar titled in a different face.
+    return PvDoorToolScaffold(
+      hue: 206,
+      eyebrow: 'Scans & tests',
+      title: s.rTitle,
+      intro: s.rSubtitle,
+      children: [
+        for (final w in body.skip(2)) pvDoorPad(w),
+      ],
     );
   }
 
@@ -359,16 +416,22 @@ class _FilterChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final text = Theme.of(context).textTheme;
-    return GestureDetector(
-      onTap: onTap,
+    return PvPress(
+        child: GestureDetector(
+      onTap: () {
+        pvCommitFeedback();
+        onTap();
+      },
       behavior: HitTestBehavior.opaque,
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
+        // Ink, not violet (2026-09-18, DESIGN-SYSTEM §4.0: selection is
+        // ink). Kept for revert: AppTheme.primary600 fill and border.
         decoration: BoxDecoration(
-          color: selected ? AppTheme.primary600 : AppTheme.surface,
+          color: selected ? AppTheme.neutral900 : AppTheme.surface,
           borderRadius: BorderRadius.circular(999),
           border: Border.all(
-              color: selected ? AppTheme.primary600 : AppTheme.outlineVariant,
+              color: selected ? AppTheme.neutral900 : AppTheme.outlineVariant,
               width: 1.2),
         ),
         child: Text(label,
@@ -380,7 +443,7 @@ class _FilterChip extends StatelessWidget {
               fontWeight: selected ? FontWeight.w800 : FontWeight.w600,
             )),
       ),
-    );
+    ));
   }
 }
 

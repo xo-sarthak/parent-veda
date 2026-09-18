@@ -118,6 +118,91 @@ starts on the first screen) and keep the deck for the hero only.
 the tightened deck should be judged on the phone before the signature is
 given up.
 
+**Resolved 2026-09-18 — (c), the low deck.** The user saw (b) on Scans &
+tests ("minimalistic and clean") and still wanted the swipe: "find a way…
+these card swipes… space efficient… this is the last try." The card changed
+shape rather than the selector: a wide low landscape card (196×64, mark at
+the left, label beside — the low cards in the Mobbin set, Plenty of Fish and
+Lloyds, are all icon-left) on the same fan, blur, ring and swipe; track
+124 → 76; the selector ~170pt → ~98. On every door of every stage.
+`PvDoorChips` stays built behind `kPvDoorChipDoors` (empty).
+
+**Later the same day — four selectors, and the user's own reference.** He
+found Flo's doors and asked for that: a flat rail of tall white cards that
+STRADDLES THE SEAM between hero photo and sheet, big drawn mark, full label
+(never truncated), chevron, plain swipe. Built as `PvDoorRail` and put on
+Scans & tests (`kPvDoorRailDoors`); the hero's photo bleeds further under
+the sheet on rail doors so the cards sit on picture, not field. He also
+liked the TILE ROW (`PvDoorTiles`, DoorDash/Skip/Glovo — icon tiles with a
+label beneath, all visible, one tap) which is on Complications
+(`kPvDoorTileDoors`); its wells now sit on one line (fixed label box, fixed
+border width). The low deck (`PvDoorCarousel`, now white cards, drawn
+marks, no dots) is on every other door. Every group can carry an
+`IntentMark` (`PvDoorGroup.mark`) — set explicitly per door, never mapped
+from an icon. **Open:** which of rail / tiles becomes the one selector for
+all doors of all three stages; the user judges Scans & tests (rail) against
+Complications (tiles).
+
+**The rail card, trimmed (2026-09-18, 21:30) — "this looks way better."**
+Three asks, all kept reversible in `pv_door_rail.dart`: the tinted square
+around the mark is gone — the drawn mark sits BARE on the white at 48pt,
+the way Flo's cards carry their icon (`bareMark = true`; the well is under
+the `else`); the card is 136 tall, not 164 — the gap between mark and
+heading was air, not composition; the selected ring is 1.2pt, not 1.8.
+The hero bleed and the sheet slot derive from `cardHeight`, so nothing
+else moved. Decided on the phone, release build.
+
+**And the card itself, same day:** "remove these funky colors… it looks
+gimmicky and not ready." Mobbin's production cards of this shape (ANZ Plus,
+CVS Health, Air NZ, Beli) are unanimous — white, one hairline, a line icon in
+a small neutral square, bold title, grey one-liner. The deck card is that
+now: white with the page hairline, the icon in a 40pt well carrying a whisper
+of the group's tint (the one place colour may show), Manrope label, grey
+count line, neutral shadow on the front card, rear cards dimmed towards the
+ground. The hue-keyed gradient, rim, shadow and the orbiting-ring
+illustration are retired (`_PvDoorMark` kept in the file).
+
+### 2.9 Where search lives — DECIDED 2026-09-18
+
+The user asked for a search bar and asked where, having noticed "it is in
+trend to have it at the bottom". Mobbin, three passes:
+
+- **The bottom bar is a search-SCREEN pattern, not an entry.** iOS 26 drops
+  the field onto the keyboard once you are already searching — Apple Games,
+  Apple Podcasts, Linear, Wabi, Grok, Rodeo. None of them put a field at the
+  bottom of a page that is about something else.
+- **The entry is at the top, everywhere.** Flo: a field under the heading
+  of a topic page ("How to get pregnant": title, one line, white field,
+  card rail) and in the app bar of its browse tab. Superpower under its
+  heading. CVS, Bloom, Yazio, Apple Health, GoodRx: the field is the first
+  thing on the search screen, keyboard up, recents and suggestions below.
+- **The field itself is white or grey, never brand-coloured** — every one
+  of them.
+
+Tried, in order, on the phone: (1) a bar between "Start anywhere" and the
+grid on the home plus a glass search circle top-right of each door — the
+user: "not below Start anywhere, that wasn't my intent… I like your button
+idea but that isn't very intuitive"; (2) **the bar under the blurb in every
+door's hero, Flo's spot — CHOSEN.** The home bar and the circle are
+commented out, kept for revert.
+
+What it opens is `PvSearchScreen`: field at the top, keyboard up; before
+she types, *Recent* (`PvSearchStore`, six, local) and *Start with* (the
+door's tabs — derived, never a typed "popular" list); as she types, rows
+that open through the door's own router; a chip pair *In Scans & tests /
+Everywhere*; and under any list, or alone under none, *Ask Veda about "…"*
+— the miss is never a dead end. The index is `kPvDoorPages` read once;
+matching is word-prefix ("nt" finds NT scan, not appointment).
+
+**No violet in any field, at rest or on tap** — the user's rule, applied
+app-wide in `app_theme.dart`: white fill, hairline, ink ring, ink caret,
+grey selection. It was lavender fill + violet caret + violet handles: "when
+tapped the grossness doubles."
+
+**§2.1 is answered by this too.** The user, 2026-09-18: the FAB "seems very
+purple and outdated… like a sore thumb on the Products page." (b) it is,
+after the door selector is finalised. Recorded in STILL-OPEN §63.11.
+
 ## 3. The follow-up sweep, once §2 is answered — work, not decisions
 
 - **Hand-rolled violet buttons** — 24 `backgroundColor: AppTheme.primary…`

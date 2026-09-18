@@ -67,6 +67,7 @@
 //  the one tab that is about a person rather than a document.
 // =============================================================================
 
+import '../../screens/brackets/hub/hub_intent_art.dart' show IntentMark;
 import 'package:flutter/material.dart' show Icons;
 
 import 'pv_door_data.dart';
@@ -152,6 +153,7 @@ final PvDoorPage kScansDoor = PvDoorPage(
     PvDoorGroup(
       id: kScansTabMine,
       label: 'My scans',
+      mark: IntentMark.timelineRail,
       icon: Icons.timeline_rounded,
       hue: 206,
       inlineSurfaceId: kScansSurfaceTimeline,
@@ -162,6 +164,7 @@ final PvDoorPage kScansDoor = PvDoorPage(
     PvDoorGroup(
       id: kScansTabScan,
       label: 'Understand a scan',
+      mark: IntentMark.scanFan,
       icon: Icons.menu_book_outlined,
       hue: 26,
     ),
@@ -176,6 +179,7 @@ final PvDoorPage kScansDoor = PvDoorPage(
     PvDoorGroup(
       id: kScansTabResult,
       label: 'Understand a result',
+      mark: IntentMark.reportPage,
       icon: Icons.description_outlined,
       hue: 344,
       inlineSurfaceId: kScansSurfaceDecoder,
@@ -184,6 +188,7 @@ final PvDoorPage kScansDoor = PvDoorPage(
     PvDoorGroup(
       id: kScansTabReports,
       label: 'My reports',
+      mark: IntentMark.chartLog,
       icon: Icons.folder_open_rounded,
       hue: 42,
       inlineSurfaceId: kScansSurfaceReports,
@@ -213,6 +218,7 @@ final PvDoorPage kScansDoor = PvDoorPage(
     PvDoorGroup(
       id: kScansTabTalk,
       label: 'Talk',
+      mark: IntentMark.askDoctor,
       icon: Icons.chat_bubble_outline_rounded,
       hue: 160,
       pinnedRedFlag: kPregnancyUrgentFlag,
@@ -223,17 +229,26 @@ final PvDoorPage kScansDoor = PvDoorPage(
     // =========================================================================
     //  SUB-TAB 1 · My scans
     // =========================================================================
-    PvDoorSection(
-      group: kScansTabMine,
-      heading: 'What is next',
-      tiles: [
-        PvDoorToolTile(
-          title: 'What is next, and when',
-          blurb: 'Opens the page for the scan you have coming up.',
-          surfaceId: kScansSurfaceNext,
-        ),
-      ],
-    ),
+    // ⚠️ RETIRED 2026-09-18 — the door walk. The timeline above this section
+    // already says what is next and when: the Up-next card names the scan,
+    // its window, her date; the run below it ticks what is done. The tool
+    // this opened (`ScanNextScreen`: "the one you have done", "what follows",
+    // the appointments screen) said the same things a screen deeper, in a
+    // smaller font, under a tinted callout. The user: "I don't want to stay
+    // on it… what did I even go through so many clicks to read." One place
+    // for one fact. `ScanNextScreen` and `kScansSurfaceNext` stay for revert.
+    //
+    // PvDoorSection(
+    //   group: kScansTabMine,
+    //   heading: 'What is next',
+    //   tiles: [
+    //     PvDoorToolTile(
+    //       title: 'What is next, and when',
+    //       blurb: 'Opens the page for the scan you have coming up.',
+    //       surfaceId: kScansSurfaceNext,
+    //     ),
+    //   ],
+    // ),
 
     // =========================================================================
     //  SUB-TAB 2 · Understand a scan — before you go
@@ -379,11 +394,15 @@ final PvDoorPage kScansDoor = PvDoorPage(
         //
         // The brief marks this "[Read] reuse", and the thing being reused is
         // the shipped `_ReportSearchDelegate`: type a word, get the topic.
-        PvDoorReadTile(
-          title: 'A word on the report you do not know',
-          blurb: 'Look it up, see what it may mean, and what to ask.',
-          surfaceId: kScansSurfaceDecoder,
-        ),
+        // ⚠️ RETIRED 2026-09-19 — the user's review: this card opened the
+        // decoder as its own screen — the same Popular / More topics list
+        // the tab above it already IS. "Repetitive and useless." The read
+        // beside it stays. Kept for revert:
+        // PvDoorReadTile(
+        //   title: 'A word on the report you do not know',
+        //   blurb: 'Look it up, see what it may mean, and what to ask.',
+        //   surfaceId: kScansSurfaceDecoder,
+        // ),
         PvDoorGuideTile(
           title: 'Reading a report without panicking',
           blurb: 'One reading is one moment, not a verdict.',
@@ -409,12 +428,19 @@ final PvDoorPage kScansDoor = PvDoorPage(
       group: kScansTabReports,
       heading: 'Make sense of what is in there',
       tiles: [
-        PvDoorToolTile(
-          title: 'Your report, line by line',
-          blurb: 'Every reading, the usual range, and what it means when '
-              'yours sits outside it.',
-          surfaceId: kScansSurfaceParameters,
-        ),
+        // ⚠️ RETIRED 2026-09-18 — the door walk. Every scan's own read now
+        // carries "What the report will say" (its parameters, usual range,
+        // low/high) and "How to read the result" — `pvReadFromScan`. The
+        // old tool (`TestsScansReportsScreen`) listed the same parameters
+        // on a separate violet page, one library deep. One home per fact.
+        // The tile, the surface id and the screen stay for revert.
+        //
+        // PvDoorToolTile(
+        //   title: 'Your report, line by line',
+        //   blurb: 'Every reading, the usual range, and what it means when '
+        //       'yours sits outside it.',
+        //   surfaceId: kScansSurfaceParameters,
+        // ),
         PvDoorGuideTile(
           title: 'What to keep, and why',
           blurb: 'The six pieces of paper that matter later.',
@@ -431,18 +457,9 @@ final PvDoorPage kScansDoor = PvDoorPage(
     // =========================================================================
     //  SUB-TAB 5 · Talk
     // =========================================================================
-    PvDoorSection(
-      group: kScansTabTalk,
-      heading: 'Talk to someone',
-      tiles: [
-        PvDoorTalkTile(
-          title: 'Have a doctor go through it with you',
-          blurb: 'Book a 1:1 with a gynaecologist and ask about your report.',
-          surfaceId: kScansSurfaceConsult,
-        ),
-      ],
-    ),
-
+    // One section, two cards (2026-09-18): two headings over one card each
+    // read as two shelves with nothing on them. "Before your appointment"
+    // is what both cards are for.
     PvDoorSection(
       group: kScansTabTalk,
       heading: 'Before your appointment',
@@ -451,6 +468,11 @@ final PvDoorPage kScansDoor = PvDoorPage(
           title: 'What to ask at your next scan',
           blurb: 'Tick what matters to you, and take the list in with you.',
           surfaceId: kScansSurfaceQuestions,
+        ),
+        PvDoorTalkTile(
+          title: 'Have a doctor go through it with you',
+          blurb: 'Book a 1:1 with a gynaecologist and ask about your report.',
+          surfaceId: kScansSurfaceConsult,
         ),
       ],
     ),

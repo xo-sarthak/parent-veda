@@ -19,6 +19,8 @@
 // =============================================================================
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:parentveda/data/tests_scans_reports_data.dart';
+import 'package:parentveda/data/reads/read_adapters.dart';
 import 'package:parentveda/data/doors/pv_door_data.dart';
 import 'package:parentveda/data/reads/pregnancy_reads.dart';
 import 'package:parentveda/data/report_findings_data.dart';
@@ -435,15 +437,24 @@ void main() {
       }
     });
 
-    test('the report tool appears once, not twice', () {
-      // ⚠️ SINGLE SOURCE. The brief says it in two places: "Your report, line
-      // by line" is one tool shown in My reports and linked from scan pages,
-      // never duplicated. Two tiles naming it would be the copy it forbids.
+    test('the report parameters live in each scan read, not in a tool tile', () {
+      // ⚠️ SINGLE SOURCE, MOVED. The brief's "Your report, line by line" was
+      // one tool tile in My reports. Since 2026-09-18 (the door walk) every
+      // scan's read carries its own parameters ("What the report will say",
+      // `pvReadFromScan`), so the tile is retired: zero tiles name it, and
+      // the parameters appear exactly once — inside the read. Two homes for
+      // the same table is the copy the brief forbids.
       final tiles = door.allTiles
           .where((t) => t.title == 'Your report, line by line')
           .toList();
-      expect(tiles.length, 1);
-      expect(tiles.single, isA<PvDoorToolTile>());
+      expect(tiles, isEmpty);
+      final anomaly = kTestsScans.firstWhere((s) => s.id == 'anomaly_scan');
+      final read = pvReadFromScan(anomaly);
+      expect(
+          read.sections.any((sec) =>
+              sec.heading?.en == 'What the report will say' &&
+              sec.custom is PvScanParametersBlock),
+          isTrue);
     });
 
     test('every scan card carries the week range the brief annotates', () {

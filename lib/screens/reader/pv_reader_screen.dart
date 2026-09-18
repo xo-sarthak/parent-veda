@@ -947,7 +947,9 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
             width: 5,
             height: 5,
             decoration:
-                BoxDecoration(color: s.accent, shape: BoxShape.circle),
+                // Ink, not the accent (2026-09-18) — a violet dot beside a
+                // coral one read as two systems. Kept for revert: s.accent.
+                BoxDecoration(color: s.ink, shape: BoxShape.circle),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -1056,17 +1058,56 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
           style: pvManrope(fontSize: 14 * _fs, height: 1.62, color: s.soft)),
     ]);
 
+    // ⚠️ NO PANEL — 2026-09-18, the door walk. The urgent callout sat in a
+    // tinted well (radius 16) and the user's words were "a big blob thrown
+    // at the screen". Flo's "seek immediate medical help if" is the form
+    // now: an ink rule, the heading in the display face, the body's bullet
+    // lines as a list with one coral dot each, the rest in grey. The dot is
+    // the only colour and it is the one signal that says "call". Kept for
+    // revert: Container(color: s.panel, radius 16, border: s.rule).
     if (urgent) {
-      return Container(
-        width: double.infinity,
-        padding: const EdgeInsets.fromLTRB(16, 15, 16, 16),
-        decoration: BoxDecoration(
-          color: s.panel,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: s.rule),
-        ),
-        child: body,
-      );
+      final lines = c.body.of(_lang).split('\n');
+      return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Container(height: 1.5, color: s.ink),
+        const SizedBox(height: 14),
+        Text(c.title.of(_lang),
+            style: pvFraunces(
+                fontSize: 20 * _fs,
+                fontWeight: FontWeight.w600,
+                height: 1.2,
+                letterSpacing: -0.3,
+                color: s.ink)),
+        const SizedBox(height: 8),
+        for (final line in lines)
+          if (line.trim().isEmpty)
+            const SizedBox(height: 6)
+          else if (line.trimLeft().startsWith('• '))
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Padding(
+                  padding: EdgeInsets.only(top: 8 * _fs, right: 11),
+                  child: Container(
+                    width: 6,
+                    height: 6,
+                    decoration: const BoxDecoration(
+                        color: Color(0xFFFF5A79), shape: BoxShape.circle),
+                  ),
+                ),
+                Expanded(
+                  child: Text(line.trimLeft().substring(2),
+                      style: pvManrope(
+                          fontSize: 14 * _fs, height: 1.5, color: s.ink)),
+                ),
+              ]),
+            )
+          else
+            Text(line,
+                style: pvManrope(
+                    fontSize: 14 * _fs, height: 1.62, color: s.soft)),
+        const SizedBox(height: 14),
+        Container(height: 1, color: s.rule),
+      ]);
     }
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       Container(height: 1, color: s.rule),
@@ -1496,10 +1537,14 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
       PvNextKind.product => SolutionType.product,
       PvNextKind.course => SolutionType.course,
       PvNextKind.consult => SolutionType.consult,
+      PvNextKind.ask => SolutionType.consult,
     };
 
     return _tile(
       type: type,
+      // An Ask Veda step says so on its chip (2026-09-19).
+      chip: n.kind == PvNextKind.ask ? 'ASK VEDA' : null,
+      icon: n.kind == PvNextKind.ask ? Icons.auto_awesome_outlined : null,
       title: n.title.of(_lang),
       value: n.value.of(_lang),
       onTap: () {
@@ -1520,6 +1565,8 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
     required String title,
     String? value,
     String? imageUrl,
+    String? chip,
+    IconData? icon,
     required VoidCallback onTap,
   }) {
     final p = V2PaletteStore.instance.current;
@@ -1557,7 +1604,7 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
             Positioned(
               right: -22,
               bottom: -14,
-              child: Icon(type.icon,
+              child: Icon(icon ?? type.icon,
                   size: 108, color: Colors.white.withValues(alpha: 0.42)),
             ),
           if (photo)
@@ -1589,10 +1636,10 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      Icon(type.icon, size: 10, color: deep),
+                      Icon(icon ?? type.icon, size: 10, color: deep),
                       const SizedBox(width: 4),
                       Flexible(
-                        child: Text(type.chip(_lang),
+                        child: Text(chip ?? type.chip(_lang),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: pvManrope(

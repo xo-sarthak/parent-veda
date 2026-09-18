@@ -47,6 +47,7 @@ import '../../services/remote/storage_service.dart';
 import '../../services/scan_reports_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/storage_image.dart';
+import '../doors/pv_door_chrome.dart' show PvDoorToolScaffold;
 import '../v2/v2_palette.dart';
 import 'scan_report_edit_screen.dart';
 
@@ -86,64 +87,41 @@ class ScanReportViewerScreen extends StatelessWidget {
           final d = DateTime.tryParse(r.dateIso);
           final scan = r.scanId == null ? null : _scanById(r.scanId!);
 
-          return Scaffold(
-            backgroundColor: p.ground,
-            appBar: AppBar(
-              backgroundColor: p.ground,
-              surfaceTintColor: Colors.transparent,
-              elevation: 0,
-              foregroundColor: p.ink1,
-              title: Text(r.title,
-                  overflow: TextOverflow.ellipsis,
-                  style: pvManrope(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w700,
-                      color: p.ink1)),
-              actions: [
-                IconButton(
-                  tooltip: 'Edit',
-                  icon: Icon(Icons.edit_outlined, size: 20, color: p.ink2),
-                  onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute<void>(
-                      settings:
-                          const RouteSettings(name: 'scans/reports/edit'),
-                      builder: (_) => ScanReportEditScreen(
-                          reportId: r.id, pregnancy: pregnancy),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            body: ListView(
-              padding: const EdgeInsets.fromLTRB(18, 4, 18, 40),
-              children: [
+          // The door tool header (2026-09-19): the same hero every leaf of a
+          // door wears; the report's date, count and scan as the intro
+          // line; edit and remove as two pills under the files. Was an
+          // AppBar titled in Manrope with a pencil top-right — "not from
+          // the same app" (the user).
+          return PvDoorToolScaffold(
+            hue: 206,
+            eyebrow: 'My reports',
+            title: r.title,
+            intro: [
+              if (d != null) _fmt(d),
+              '${r.files.length} ${r.files.length == 1 ? 'file' : 'files'}',
+              if (scan != null && scan.name.of(lang) != r.title) scan.name.of(lang),
+            ].join('  ·  '),
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 18),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+
                 // ---- What this is, and when -------------------------------
-                Text(
-                    [
-                      if (d != null) _fmt(d),
-                      '${r.files.length} '
-                          '${r.files.length == 1 ? 'file' : 'files'}',
-                    ].join('  ·  '),
-                    style: pvManrope(fontSize: 12.5, color: p.ink3)),
-                if (scan != null) ...[
-                  const SizedBox(height: 12),
-                  _ScanChip(label: scan.name.of(lang), p: p),
-                ],
+                // Her note, on the page — not in a well (2026-09-19).
                 if (r.note.isNotEmpty) ...[
-                  const SizedBox(height: 16),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.fromLTRB(15, 13, 15, 14),
-                    decoration: BoxDecoration(
-                      color: p.surfaceAlt,
-                      borderRadius: BorderRadius.circular(16),
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 2),
+                      child: Icon(Icons.sticky_note_2_outlined, size: 16, color: p.ink3),
                     ),
-                    child: Text(r.note,
-                        style: pvManrope(
-                            fontSize: 13.5, height: 1.55, color: p.ink2)),
-                  ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(r.note,
+                          style: pvManrope(fontSize: 13.5, height: 1.55, color: p.ink2)),
+                    ),
+                  ]),
+                  const SizedBox(height: 18),
                 ],
-                const SizedBox(height: 20),
 
                 // ---- The files themselves ----------------------------------
                 //
@@ -153,17 +131,8 @@ class ScanReportViewerScreen extends StatelessWidget {
                 // So each file renders its own preview at a usable size and
                 // tapping only ever means "bigger".
                 if (r.files.isEmpty)
-                  Container(
-                    padding: const EdgeInsets.all(18),
-                    decoration: BoxDecoration(
-                      color: p.surfaceAlt,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: Text(
-                        _en('This report has no files attached.').of(lang),
-                        style: pvManrope(
-                            fontSize: 13.5, height: 1.5, color: p.ink2)),
-                  )
+                  Text(_en('This report has no files attached.').of(lang),
+                      style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2))
                 else
                   for (int i = 0; i < r.files.length; i++) ...[
                     _FileCard(
@@ -183,25 +152,33 @@ class ScanReportViewerScreen extends StatelessWidget {
                     const SizedBox(height: 12),
                   ],
 
-                const SizedBox(height: 14),
-                // ⚠️ DELETE LIVES DOWN HERE, PAST THE DOCUMENT. On the list it
-                // sat beside a row, which meant a report could be destroyed
-                // without ever being looked at. Here she has necessarily
-                // scrolled past the thing itself first — and the confirm
-                // dialog's warning ("this might be your only copy") is a claim
-                // she can now check rather than take on trust.
-                TextButton.icon(
-                  onPressed: () => _confirmDelete(context, r, p, lang),
-                  icon: const Icon(Icons.delete_outline,
-                      size: 18, color: Color(0xFFB3261E)),
-                  label: Text(_en('Remove this report').of(lang),
-                      style: pvManrope(
-                          fontSize: 13.5,
-                          fontWeight: FontWeight.w700,
-                          color: const Color(0xFFB3261E))),
-                ),
-              ],
-            ),
+                  const SizedBox(height: 6),
+                  Row(children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                            settings: const RouteSettings(name: 'scans/reports/edit'),
+                            builder: (_) => ScanReportEditScreen(
+                                reportId: r.id, pregnancy: pregnancy),
+                          ),
+                        ),
+                        icon: const Icon(Icons.edit_outlined, size: 17),
+                        label: Text(_en('Edit details').of(lang)),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () => _confirmDelete(context, r, p, lang),
+                        icon: const Icon(Icons.delete_outline, size: 17),
+                        label: Text(_en('Remove').of(lang)),
+                      ),
+                    ),
+                  ]),
+                ]),
+              ),
+            ],
           );
         },
       );
@@ -261,6 +238,8 @@ TestScanInfo? _scanById(String id) {
 }
 
 /// The scan this report belongs to, when she has said.
+// Kept for revert — the violet scan chip, retired 2026-09-19.
+// ignore: unused_element
 class _ScanChip extends StatelessWidget {
   const _ScanChip({required this.label, required this.p});
 
@@ -319,8 +298,10 @@ class _FileCard extends StatelessWidget {
             const SizedBox(height: 7),
           ],
           Material(
-            color: p.surfaceAlt,
-            borderRadius: BorderRadius.circular(18),
+            color: p.surface, // was p.surfaceAlt (2026-09-19)
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18),
+                side: BorderSide(color: p.line)),
             clipBehavior: Clip.antiAlias,
             child: InkWell(
               onTap: onOpen,
@@ -485,13 +466,25 @@ class _PdfScreenState extends State<_PdfScreen> {
                       fontSize: 14, height: 1.55, color: p.ink2)),
             );
           }
+          // The page on the ground, no violet action bar (2026-09-19):
+          // `printing`'s defaults were a grey field and a primary-coloured
+          // print/share bar. Share lives in the top bar instead.
           return PdfPreview(
             build: (format) => b,
             canChangePageFormat: false,
             canChangeOrientation: false,
             canDebug: false,
-            allowPrinting: true,
-            allowSharing: true,
+            useActions: false,
+            scrollViewDecoration: BoxDecoration(color: p.ground),
+            pdfPreviewPageDecoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.10),
+                    blurRadius: 14,
+                    offset: const Offset(0, 4)),
+              ],
+            ),
             pdfFileName: widget.file.name,
           );
         },

@@ -83,6 +83,7 @@ import 'hub/hub_solution_cards.dart';
 import '../../data/reads/read_adapters.dart';
 import '../../models/pv_read.dart';
 import '../reader/pv_reader_screen.dart';
+import 'scan_timeline_screen.dart' show showScanDateSheet;
 
 /// The specialist this screen's consult card promises, as a `Specialist.id`.
 ///
@@ -133,16 +134,13 @@ class ScanDetailScreen extends StatelessWidget {
                 value: LocalizedText(en: _apptLine(appt), hi: _apptLine(appt)),
                 action: 'scan_appointments',
               ),
+            // "Your report, line by line" — retired 2026-09-18: the read
+            // above now carries this scan's parameters itself. Kept for
+            // revert:
+            //   PvReadNextStep(kind: tool, title: 'Your report, line by line',
+            //     action: 'scan_reference')
             const PvReadNextStep(
               kind: PvNextKind.tool,
-              title: LocalizedText(en: 'Your report, line by line', hi: 'आपकी report, हर line'),
-              value: LocalizedText(
-                  en: 'Every parameter, what the usual range is, and what it means.',
-                  hi: 'हर parameter, आम range क्या है, और उसका मतलब।'),
-              action: 'scan_reference',
-            ),
-            const PvReadNextStep(
-              kind: PvNextKind.read,
               title: LocalizedText(
                   en: 'A word on the report you do not recognise?',
                   hi: 'Report का कोई शब्द समझ नहीं आया?'),
@@ -162,7 +160,7 @@ class ScanDetailScreen extends StatelessWidget {
               action: 'scan_consult',
             ),
             PvReadNextStep(
-              kind: PvNextKind.read,
+              kind: PvNextKind.ask,
               title: LocalizedText(
                   en: 'Still worried? Ask Veda about ${scan.name.en}',
                   hi: 'अब भी चिंता? Veda से ${scan.name.hi} के बारे में पूछिए'),
@@ -176,9 +174,15 @@ class ScanDetailScreen extends StatelessWidget {
         return PvReaderScreen(
           read: read,
           lang: lang,
+          customBlock: (context, block) => block is PvScanParametersBlock
+              ? ScanParametersView(parameters: block.parameters, lang: lang)
+              : const SizedBox.shrink(),
           openAction: (context, action) => switch (action) {
-            'scan_appointments' => _push(
-                context, ScansAppointmentsScreen(controller: pregnancy), 'appointments'),
+            // Her date, edited in place (the sheet the timeline uses) — not
+            // the old roadmap screen. Kept for revert:
+            //   _push(context, ScansAppointmentsScreen(controller: pregnancy), 'appointments')
+            'scan_appointments' =>
+              showScanDateSheet(context, scan: scan, lang: lang, existing: appt),
             'scan_reference' => _push(context,
                 TestScanDetailScreen(info: scan, controller: pregnancy), 'scans/reference'),
             'scan_decoder' => _push(context,
@@ -788,6 +792,113 @@ class _Fact extends StatelessWidget {
           const SizedBox(height: 5),
           Text(value,
               style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)),
+        ]),
+      );
+}
+
+// =============================================================================
+//  ScanParametersView — "What the report will say", as one data card
+// -----------------------------------------------------------------------------
+//  The tag table's data card (DESIGN-SYSTEM §4.0b): white, one hairline,
+//  a row per parameter with a rule between rows. Name in bold, the usual
+//  range as the number line, what it measures in grey, and — where the
+//  data has them — what a low or high value can point at, each one line.
+//  Nothing coloured, nothing filled. Drawn inside the scan's read; replaces
+//  the separate `TestScanDetailScreen` page for this scan.
+// =============================================================================
+
+class ScanParametersView extends StatelessWidget {
+  const ScanParametersView(
+      {super.key, required this.parameters, required this.lang});
+
+  final List<ReportParameter> parameters;
+  final AppLanguage lang;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    return Container(
+      decoration: BoxDecoration(
+        color: p.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: p.line),
+      ),
+      child: Column(children: [
+        for (var i = 0; i < parameters.length; i++) ...[
+          if (i > 0) Divider(height: 1, thickness: 1, color: p.line),
+          _row(parameters[i], p),
+        ],
+      ]),
+    );
+  }
+
+  Widget _row(ReportParameter r, V2Palette p) {
+    final range = r.typicalRange?.of(lang);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        // A short range ("11–14 g/dL") sits on the right of the name; a
+        // range written as a sentence (AFI's) takes its own line, or it
+        // squeezes the name to a letter a line (seen on the phone).
+        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Expanded(
+            child: Text(r.name.of(lang),
+                style: pvManrope(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w700,
+                    height: 1.3,
+                    color: p.ink1)),
+          ),
+          if (range != null && range.isNotEmpty && range.length <= 22) ...[
+            const SizedBox(width: 12),
+            Text(range,
+                textAlign: TextAlign.right,
+                style: pvManrope(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    height: 1.3,
+                    color: p.ink1)),
+          ],
+        ]),
+        if (range != null && range.length > 22) ...[
+          const SizedBox(height: 3),
+          Text(range,
+              style: pvManrope(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  height: 1.4,
+                  color: p.ink1)),
+        ],
+        const SizedBox(height: 4),
+        Text(r.measures.of(lang),
+            style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
+        if (r.ifLow != null || r.ifHigh != null || r.note != null) ...[
+          const SizedBox(height: 8),
+          if (r.ifLow case final low?) _pointer('Low', low.of(lang), p),
+          if (r.ifHigh case final high?) _pointer('High', high.of(lang), p),
+          if (r.note case final note?) _pointer('Note', note.of(lang), p),
+        ],
+      ]),
+    );
+  }
+
+  Widget _pointer(String key, String text, V2Palette p) => Padding(
+        padding: const EdgeInsets.only(top: 3),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          SizedBox(
+            width: 40,
+            child: Text(key.toUpperCase(),
+                style: pvManrope(
+                    fontSize: 10,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1,
+                    height: 1.9,
+                    color: p.ink3)),
+          ),
+          Expanded(
+            child: Text(text,
+                style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink2)),
+          ),
         ]),
       );
 }

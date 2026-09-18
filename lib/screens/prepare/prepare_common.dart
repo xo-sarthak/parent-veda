@@ -22,19 +22,27 @@ import '../../theme/pv_fonts.dart';
 import '../../localization/app_language.dart';
 
 // ---- palette (mirrors the design's hexes; AppTheme holds the same base) -----
-const Color kCanvas = Color(0xFFFBF9FE);
+// ⚠️ INKED — 2026-09-18, the door walk (DESIGN-SYSTEM §4.0). The kit was
+// violet on lavender: violet icons, violet outline buttons, a lavender
+// panel behind every banner, lavender hairlines, a lavender canvas. The
+// user on the consult list: "purple… like a sore thumb." Every constant
+// keeps its NAME so the fourteen Prepare screens compile unchanged; the
+// VALUES are the base palette — white ground, ink, neutral greys. `kPurple`
+// is ink now; the accent survives only as the coral that marks urgency.
+// Old values kept beside each for revert.
+const Color kCanvas = Color(0xFFFFFFFF); // was 0xFFFBF9FE
 const Color kInk = Color(0xFF2F2C30);
 const Color kSoft = Color(0xFF69636C);
-const Color kPurple = Color(0xFF6A30B6);
+const Color kPurple = Color(0xFF2F2C30); // was 0xFF6A30B6 — ink now
 const Color kCoral = Color(0xFFFF5A79);
-const Color kPanel = Color(0xFFF3EEF7);
-const Color kMuted = Color(0xFFA99CBB);
-const Color kBorder = Color(0xFFE7DFEE);
-const Color kHair = Color(0xFFEFEAF2);
+const Color kPanel = Color(0xFFF5F4F6); // was 0xFFF3EEF7
+const Color kMuted = Color(0xFF8E8A92); // was 0xFFA99CBB
+const Color kBorder = Color(0xFFE4E2E5); // was 0xFFE7DFEE
+const Color kHair = Color(0xFFEEEDEF); // was 0xFFEFEAF2
 const Color kCoralTint = Color(0xFFFFF0F3);
-const Color kLockBg = Color(0xFFF0EBF5);
-const Color kStripeA = Color(0xFFEFE7F5);
-const Color kStripeB = Color(0xFFF6F0FA);
+const Color kLockBg = Color(0xFFF5F4F6); // was 0xFFF0EBF5
+const Color kStripeA = Color(0xFFF1F0F2); // was 0xFFEFE7F5
+const Color kStripeB = Color(0xFFF8F7F9); // was 0xFFF6F0FA
 
 // ---- text styles ------------------------------------------------------------
 TextStyle pvHeroStyle() => pvFraunces(
@@ -136,10 +144,14 @@ Widget pvPill(String text, {Color bg = kPanel, Color fg = kPurple}) => Container
     );
 
 // Rounded lavender info/context banner.
+// No box (2026-09-18): the banner is a line set between two hairlines.
+// Kept for revert: BoxDecoration(color: kPanel, radius 16).
 Widget pvBanner({IconData? icon, required List<InlineSpan> spans}) => Container(
       margin: const EdgeInsets.only(top: 20),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(color: kPanel, borderRadius: BorderRadius.circular(16)),
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      decoration: const BoxDecoration(
+          border: Border(
+              top: BorderSide(color: kHair), bottom: BorderSide(color: kHair))),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
         if (icon != null) ...[
           Icon(icon, size: 18, color: kPurple),
@@ -179,10 +191,11 @@ Widget pvPrimaryButton(String label, VoidCallback onTap,
 // Outlined purple button (small).
 Widget pvOutlineButton(String label, VoidCallback onTap) => Material(
       color: Colors.transparent,
-      shape: RoundedRectangleBorder(
-          side: const BorderSide(color: kPurple), borderRadius: BorderRadius.circular(14)),
+      // The base pill (DESIGN-SYSTEM §4.0): stadium, ink hairline, ink label.
+      // Was radius 14 in violet.
+      shape: const StadiumBorder(side: BorderSide(color: kBorder, width: 1.2)),
       child: InkWell(
-        borderRadius: BorderRadius.circular(14),
+        customBorder: const StadiumBorder(),
         onTap: onTap,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 9),
