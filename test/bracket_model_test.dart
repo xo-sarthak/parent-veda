@@ -356,9 +356,20 @@ void main() {
     // Every skilling cell is `notReady` — real, named, not built. NOT
     // `notApplicable`: the workbook refuses nothing in this stage, and marking
     // an unbuilt thing as permanently refused would quietly delete a plan.
-    test('every skilling cell is live or notReady, never refused', () {
+    //
+    // ⚠️ ONE EXCEPTION, NAMED, WITH ITS REASON (2026-09-18): the Feelings
+    // brief refuses its extras cell outright — "An emotional progress report
+    // on a child is unthinkable, and it is a score." That is not an unbuilt
+    // plan; it is a refusal, and `notReady` would misrecord it as something
+    // still coming. The cell's reason string carries the brief's words.
+    test('every skilling cell is live or notReady, never refused — bar the one the brief refuses', () {
       for (final b in kSkillingBrackets) {
         for (final l in BracketLayer.values) {
+          if (b.id == 'skilling_emotional' && l == BracketLayer.extras) {
+            expect(b.layer(l).state, LayerState.notApplicable);
+            expect(b.layer(l).reason, contains('dropped outright'));
+            continue;
+          }
           expect(b.layer(l).state, isIn([LayerState.live, LayerState.notReady]),
               reason: '${b.id} → ${l.name}');
         }

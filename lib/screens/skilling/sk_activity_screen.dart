@@ -31,6 +31,7 @@ import 'sk_child_store.dart';
 import 'sk_content.dart';
 import 'sk_door_content.dart';
 import 'sk_practice_store.dart';
+import 'sk_safety.dart';
 import 'sk_surface_router.dart';
 import 'sk_voice_keepsake.dart';
 
@@ -63,6 +64,7 @@ class SkActivityScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: p.ground,
+      bottomNavigationBar: skSafetyBarFor(content.doorId),
       body: SafeArea(
         bottom: false,
         child: ListView(

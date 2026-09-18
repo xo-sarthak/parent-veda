@@ -38,6 +38,7 @@ import 'sk_content_registry.dart';
 import 'sk_door_content.dart';
 import 'sk_grown_up_gate.dart';
 import 'sk_practice_store.dart';
+import 'sk_journal.dart';
 import 'sk_voice_keepsake.dart';
 
 /// Which shelf to scroll to when opened by a deep link.
@@ -281,7 +282,7 @@ class _SkGrownUpScreenState extends State<SkGrownUpScreen> {
             // ---- set up and consent ------------------------------------------
             _Head('Set up and consent', p, key: _keys[SkGrownUpSection.settings]),
             const SizedBox(height: 12),
-            _Settings(p: p),
+            _Settings(p: p, journal: c.journal),
           ],
         ),
       ),
@@ -598,8 +599,13 @@ class _ShelfRow extends StatelessWidget {
 
 /// The child's record, the PIN, the verifier's word, and withdrawal.
 class _Settings extends StatelessWidget {
-  const _Settings({required this.p});
+  const _Settings({required this.p, this.journal = false});
   final V2Palette p;
+
+  /// The door keeps her private journal (Feelings). The parent's powers
+  /// over it are exactly two — know it exists, delete it — and neither is
+  /// reading it. The user's call (2026-09-18, 1a), flagged for legal review.
+  final bool journal;
 
   @override
   Widget build(BuildContext context) {
@@ -632,6 +638,8 @@ class _Settings extends StatelessWidget {
         _kv('Verification', _verificationLabel(s.verification), p),
         _kv('Grown-up gate', s.hasPin ? 'PIN' : 'A sum in words', p),
         _kv('Her voice', s.voiceAllowed ? 'Recording on, this phone only' : 'Recording off', p),
+        if (journal)
+          _kv('Her journal', 'Hers. On this phone, locked; you can delete it, not read it', p),
         const SizedBox(height: 6),
         // ⚠️ THE PARENT'S SEPARATE YES TO RECORDING. Off by default (the
         // Communication tasks' rule); on this phone only; never analysed,
@@ -661,9 +669,15 @@ class _Settings extends StatelessWidget {
               () => _askPin(context)),
           if (s.hasPin)
             _action(context, 'Use the sum instead', () => s.setPin(null)),
+          if (journal)
+            // ⚠️ DELETE, NEVER READ. The one parental power over the
+            // journal besides consent. Files, index and key all go.
+            _action(context, 'Delete her journal', () => SkJournalStore.instance.forgetAll(),
+                quiet: true),
           _action(context, 'Withdraw consent and forget her', () {
             SkPracticeStore.instance.forgetAll();
             SkVoiceStore.instance.forgetAll();
+            SkJournalStore.instance.forgetAll();
             s.forget();
             // Back to the skilling preview, not the app's first route — seen
             // on a phone (2026-09-14) landing on the pregnancy home.

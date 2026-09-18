@@ -514,6 +514,49 @@ final List<Bracket> kSkillingBrackets = [
             'harder ones down.',
         hi: 'असली हालात जिन पर सोचा जाए, और मुश्किल वाली बातें लिखने के लिए '
             'सवाल।'),
+    // ⚠️ LIVE SINCE 2026-09-18, to `ParentVeda_Feelings_structure.pdf` —
+    // the mental-health door. Five cells live, and the content marked
+    // "care": nothing authored until a child psychologist has reviewed it.
+    // The rubric tracker is REFUSED "and here it matters most: you cannot
+    // rate a child's emotional intelligence" — into the plain keepsake, no
+    // mood score, no chart, never any AI reading of a child's feelings.
+    // Extras (the progress report) are DROPPED OUTRIGHT — "an emotional
+    // progress report on a child is unthinkable, and it is a score" — the
+    // sharpest notApplicable in the stage. Consult held: the free off-ramp
+    // comes first; help is not an upsell.
+    layers: {
+      BracketLayer.content: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Scenario practice, journaling prompts',
+        surfaceIds: ['sk_lessons/skilling_emotional'],
+      ),
+      BracketLayer.activities: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Scenario / journal practice',
+        surfaceIds: ['sk_activities/skilling_emotional', 'sk_journal/skilling_emotional'],
+      ),
+      BracketLayer.tools: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Rubric tracker',
+        surfaceIds: ['sk_keepsake/skilling_emotional'],
+      ),
+      BracketLayer.products: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Optional',
+        surfaceIds: ['sk_products/skilling_emotional'],
+      ),
+      BracketLayer.course: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Optional',
+        surfaceIds: ['sk_courses/skilling_emotional'],
+      ),
+      BracketLayer.consult:
+          const BracketLayerSpec(state: LayerState.notReady, reason: 'Rare'),
+      BracketLayer.extras: const BracketLayerSpec(
+          state: LayerState.notApplicable,
+          reason: 'Progress report — dropped outright; it is a score'),
+    },
+    /* kept for revert — the row as declared before the door
     layers: _skillLayers(
       content: 'Scenario practice, journaling prompts',
       activities: 'Scenario / journal practice',
@@ -523,6 +566,7 @@ final List<Bracket> kSkillingBrackets = [
       consult: 'Rare',
       extras: 'Progress report',
     ),
+    */
   ),
 
   Bracket(

@@ -45,6 +45,7 @@ import 'sk_child_store.dart';
 import 'sk_content.dart';
 import 'sk_content_registry.dart';
 import 'sk_practice_store.dart';
+import 'sk_safety.dart';
 
 /// One saved clip.
 class SkVoiceClip {
@@ -619,6 +620,7 @@ class _SkVoiceKeepsakeScreenState extends State<SkVoiceKeepsakeScreen> {
         .replaceAll('{she}', name.isEmpty ? 'you' : 'she');
     return Scaffold(
       backgroundColor: p.ground,
+      bottomNavigationBar: skSafetyBarFor(widget.doorId),
       body: SafeArea(
         bottom: false,
         child: ListView(

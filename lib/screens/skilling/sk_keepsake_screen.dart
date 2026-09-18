@@ -24,6 +24,7 @@ import 'sk_content.dart';
 import 'sk_content_registry.dart';
 import 'sk_door_content.dart';
 import 'sk_practice_store.dart';
+import 'sk_safety.dart';
 
 class SkKeepsakeScreen extends StatelessWidget {
   const SkKeepsakeScreen({super.key, required this.doorId, this.doorTitle = ''});
@@ -48,6 +49,7 @@ class SkKeepsakeScreen extends StatelessWidget {
     final name = SkChildStore.instance.name;
     return Scaffold(
       backgroundColor: p.ground,
+      bottomNavigationBar: skSafetyBarFor(doorId),
       body: SafeArea(
         bottom: false,
         child: ListView(

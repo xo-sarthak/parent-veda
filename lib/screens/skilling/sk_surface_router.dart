@@ -45,6 +45,7 @@ import 'sk_activity_screen.dart';
 import 'sk_child_store.dart';
 import 'sk_content_registry.dart';
 import 'sk_grown_up_screen.dart';
+import 'sk_journal.dart';
 import 'sk_keepsake_screen.dart';
 import 'sk_parent_gate_screen.dart';
 import 'sk_practice_store.dart';
@@ -87,6 +88,11 @@ Widget? skScreenForSurface(String id) {
     case 'sk_voice':
       if (door == null || skDoorContentFor(door)?.voiceKeepsake != true) return null;
       return SkVoiceKeepsakeScreen(doorId: door);
+    case 'sk_journal':
+      // The Feelings brief's "her private journal" — only on a door that
+      // keeps one. Child-private, on this phone, encrypted (§103).
+      if (door == null || skDoorContentFor(door)?.journal != true) return null;
+      return SkJournalScreen(doorId: door);
     case 'sk_record':
       // The brief's "Hear yourself back" as its own card (the user's call,
       // 2026-09-16, 3b): the keepsake screen, opening straight onto the
@@ -155,6 +161,7 @@ bool skOpenDoor(BuildContext context, String doorId) {
     SkChildStore.instance.load(),
     SkPracticeStore.instance.load(),
     SkVoiceStore.instance.load(),
+    SkJournalStore.instance.load(),
   ]).then((_) {
     if (!context.mounted) return;
     if (!SkChildStore.instance.consented) {

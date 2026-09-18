@@ -25,12 +25,12 @@ buy are stub sheets; the door stays behind `kDebugMode`; the preview ships.
 | Communication | `ParentVeda_Communication_structure.pdf` | door, 5 tabs (three band cards) | **3 of 3 filled** (6–8, 8–11 from the author's PDFs; **11–14 written by Claude Code**, with the other PDFs) | a86c5bf (frame), 0fa1193 (fills), e67da1b (walk), e34b39f (11–14) | **yes** — 2026-09-16, at 12 and 8, recorder end to end (11–14 fill not yet) | `sk_communication_door_test` |
 | Confidence | `ParentVeda_Confidence_structure.pdf` | door, **6 cards** (three band cards + recorder + keepsake) | **3 of 3 filled** (36 activities) | 5eb85a4 (frame), 153b3a4 (walk), 6a78176 (fills + walk) | **yes** — 2026-09-17, at 8, frame and fills | `sk_confidence_door_test` |
 | Creativity | `ParentVeda_Creativity_structure.pdf` | plan sheet | none yet | — | — | — |
-| Feelings | `ParentVeda_Feelings_structure.pdf` | plan sheet | none yet | — | — | — |
+| Feelings | `ParentVeda_Feelings_structure.pdf` | door, **6 cards** (three band cards + Scenarios and prompts + Your journal + You practised) and the off-ramp bar on every screen | none yet — **content marked "care": clinical review before any fill** | commit next | no | `sk_feelings_door_test` |
 | Focus | `ParentVeda_Focus_structure.pdf` | plan sheet | none yet | — | — | — |
 | Maths | `ParentVeda_Maths_structure.pdf` | plan sheet | none yet | — | — | — |
 | Memory | `ParentVeda_Memory_structure.pdf` | plan sheet | none yet | — | — | — |
 | Reading | `ParentVeda_Reading_structure.pdf` | plan sheet | none yet | — | — | — |
-| Stillness | `ParentVeda_Stillness_structure.pdf` | door, 5 tabs (three band cards + Sessions + the keepsake as "Quiet moments taken") | none yet (no task PDFs) | commit next | no | `sk_stillness_door_test` |
+| Stillness | `ParentVeda_Stillness_structure.pdf` | door, 5 tabs (three band cards + Sessions + the keepsake as "Quiet moments taken") | none yet (no task PDFs) | 266d1ab | no | `sk_stillness_door_test` |
 | Thinking | `ParentVeda_Thinking_structure.pdf` | door, 5 tabs (three band cards + Lessons + the keepsake as "You kept thinking") | none yet (no task PDFs) | db71b51 | no | `sk_thinking_door_test` |
 | Values | `ParentVeda_Values_structure.pdf` | plan sheet | none yet | — | — | — |
 
@@ -522,6 +522,113 @@ keepsake · 4a the settle breath built). Frame only; no task PDFs exist.
 - [ ] Not walked on a phone (the device is the other terminal's until you
       say).
 
+## Feelings (§103)
+
+**Hand-back, as the brief's OUTPUT asks (2026-09-18):**
+
+- *Files changed:* `lib/data/doors/sk_door_feelings.dart` (new),
+  `lib/data/skilling/skilling_feelings_{activities,content,course,
+  products}.dart` (new), `lib/screens/skilling/sk_safety.dart` (new — the
+  off-ramp bar and sheet), `lib/screens/skilling/sk_journal.dart` (new —
+  key store seam, AES-GCM cipher, store, screen),
+  `lib/screens/skilling/sk_crisis_pathway.dart` (new — the stub),
+  `sk_door_content.dart` (`journal`, `safety`, `SkSafety`, `SkHelpline`),
+  `sk_surface_router.dart` (`sk_journal/<door>`; the journal store loads
+  at door entry), the safety bar added to the door screen, the activity
+  screen, the content page (child pages only), the keepsake and the voice
+  keepsake, `sk_grown_up_screen.dart` (her journal: delete, never read;
+  withdrawing consent forgets it), `lib/data/doors/sk_door_data.dart`,
+  `sk_content_registry.dart`, `skilling_brackets.dart` (row live; extras
+  `notApplicable` with the brief's reason), `pubspec.yaml` +
+  `pubspec.lock` (`pointycastle` made a direct dependency; no version
+  change), `test/sk_feelings_door_test.dart` (new),
+  `test/sk_doors_sanity_test.dart` (the gated-link rule with its one
+  exception), `test/bracket_model_test.dart` (the one refused skilling
+  cell, named).
+- *Every layer left notReady, and the two that need review before a line
+  is written:* activities (36), scenarios (9) and journal prompts (9) —
+  every card's chip says "Needs review", **content needs a child
+  psychologist**; courses (3), products (9), parent note (also clinical).
+  **The journal needs legal review** for its child-private default
+  against DPDP's parental-consent rules, and its key custody moved to the
+  platform keystore, before it ships. Nothing authored.
+- *Reused vs newly created — the off-ramp and the journal called out:*
+  **reused** — the gate, surface, scope, shared no-score keepsake (as "You
+  practised"), the shelves, the router; **Stillness's calm practice**
+  through a window page (`fe_calm` → `sk_page/skilling_stillness/
+  sl_settle`), no breathing rebuilt; the voice keepsake's on-device
+  machinery as the journal's shape. **New** — the **safety off-ramp**
+  (`SkTalkToSomeoneBar`: a calm bar on every child screen of the door, a
+  sheet with the trusted-adult line and tap-to-call; ungated on purpose,
+  the one ungated link off a child screen, on the record; records
+  nothing); the **private-journal scaffold** (`SkJournalStore`: on-device,
+  AES-256-GCM per entry with a fresh nonce, an index that holds ids and
+  dates and no text, one reader — her own page — no search, count,
+  sentiment, export or sync; child-private; the parent deletes, never
+  reads); the **crisis-pathway stub** (does nothing, reads nothing, not
+  wired to the journal, and STOPS: what the experts decide is listed in
+  the file); two shell slots (`journal`, `safety`).
+- *Named but not found / not used:* `pp_products` — not used on purpose,
+  skilling's own shelf holds. No existing journal mechanism was
+  child-private and on-device (the pregnancy and father journals sync to
+  Supabase), so the minimal scaffold the prompt allows was built and is
+  listed (FE10). The no-score keepsake and Stillness's calm practice were
+  found. Nothing else to stop on.
+
+Built to the brief literally on your calls of 2026-09-18 (1a child-private
+journal · 2a real helplines, flagged verify · 3a AES via `pointycastle` ·
+4a the off-ramp bar on every child screen). Frame only; **nothing on this
+door is authored until a child psychologist has reviewed it.**
+
+- [ ] **Look:** Skilling → Feelings → the selector: six cards. Name what
+      you feel · Handle the big feelings · Find your way through ·
+      Scenarios and prompts · Your journal · You practised. The footers are
+      the brief's band lines, word for word. And at the foot of the
+      screen, on this door only, a calm bar: "Talk to someone · Always
+      okay".
+- [ ] **Look:** the bar → the sheet: "If something feels too big, tell a
+      grown-up you trust…", then Childline · 1098 and Tele-MANAS · 14416
+      with tap-to-call, then "Nothing you say here is written down". The
+      words are mine; the numbers are real as of writing and **flagged
+      VERIFY** — a lawyer and a clinician confirm both and the wording
+      before ship, and a release build hides anything still flagged.
+- [ ] **The ungated exception, on the record.** The helpline tap is the
+      one link off a child screen that does not ask a grown-up first,
+      because the child who needs it may be the child who cannot ask. A
+      test holds that it is the only one, and that it is a phone call and
+      never a web link. Say if you want it otherwise.
+- [ ] **Look:** Your journal → "Yours. It stays on this phone, locked, and
+      nobody reads it but you." → Write a page → Keep it → a dated row →
+      open → "Tear this page out". The parent's side (For the grown-up →
+      settings): "Her journal · Hers. On this phone, locked; you can delete
+      it, not read it" and a "Delete her journal" action. **Legal review
+      owed** on the child-private default (DPDP parental consent).
+- [ ] **Key custody is the flagged gap.** The pages are AES-256-GCM
+      encrypted, but the key sits in `shared_preferences` beside them —
+      a lock with the key under the mat. The seam (`SkJournalKeyStore`)
+      is built; the platform keystore implementation (`flutter_secure_
+      storage` or equal) is owed before ship. A dependency call for you.
+- [ ] **The crisis pathway is stopped**, as the brief asks. No scanning of
+      her journal, ever, by anything; the stub does nothing and nothing
+      calls it. What a child psychologist and a lawyer must decide is
+      listed in `sk_crisis_pathway.dart`. Do not ask me to build it.
+- [ ] **Look:** Scenarios and prompts → three rails: Scenarios to think
+      through · Journal prompts (every card "Needs review") · When a
+      feeling is big → the one card opens Stillness's Settle page — the
+      first cross-door window in the stage, no copy of the breath here.
+- [ ] **Look:** For the grown-up → the parent note card carries the
+      brief's own title, "How to help a child with big feelings, and when
+      to seek help" (coming soon, clinical); three recorded series (₹699 /
+      $8 placeholders) whose blurbs say "not treatment"; no coach (held —
+      "help is not an upsell here").
+- [ ] The keepsake's three words on a feelings activity ("I made
+      something") — the same question as Stillness raised. Yours.
+- [ ] The hero photo — two girls in a field at golden hour, the older
+      one's arm round the younger (`photo-1476234251651`). Keep?
+- [ ] The tile says "Feelings"; the brief's door is "Emotional
+      intelligence & resilience". Fine.
+- [ ] Not walked on a phone (the device is the other terminal's).
+
 ## Cross-door windows
 
 `sk_page/<door>/<page>` as a `toolSurfaceId` on a page with no blocks —
@@ -536,12 +643,16 @@ Communication split the Communication brief names.
 | Coding · `cd_1114_12` Share It and Make It Better | Making (Creativity) | the private, family-only showcase posture | owed — no sharing feature exists on either door; sharing here is offline, to a family member |
 | Communication | Confidence | the shared speaking practice — Confidence owns the nerve and the audience, Expression the clarity and the back-and-forth; the recorder is built once (`sk_voice_keepsake.dart`) | owed — Confidence not built; it windows into Communication's prompt sets when it lands |
 | Communication | Reading | "a child reads a story there and retells it here" | owed — Reading not built |
-| Communication | Feelings | "Feelings owns naming the emotion; Expression owns putting it into clear words" | owed — Feelings not built |
+| Communication | Feelings | "Feelings owns naming the emotion; Expression owns putting it into clear words" | Feelings built 2026-09-18; the window is a page when the Feelings fill exists |
 | Confidence | Communication | the shared speaking practice — Confidence dares to say it, Communication says it clearly; one recorder (`sk_voice_keepsake.dart`), used by both | built as the shared recorder; the prompt-set window waits on Communication's lesson fill |
 | Confidence · `cf_breath` | Stillness | the quick calming breath — "Confidence references that breath for the moment before you speak, it does not build its own" | Stillness built 2026-09-17: `sl_settle` is the same circle, same numbers (a test holds the pattern identical). Whether `cf_breath` becomes a window onto `sl_settle` or keeps its own words is on the Stillness review list |
 | Stillness · `sl_settle` and the calming / resting sessions | Focus, Feelings, Memory | "Stillness is the source, others borrow from it. Focus borrows a settle-breath to apply to a task, Feelings borrows a calming practice to handle an emotion, Memory borrows study-calm" | the source exists; the borrowers do not. Each references `sk_page/skilling_stillness/…` when built, never its own breath |
-| Stillness | Feelings | "Feelings owns naming and understanding an emotion; Stillness owns settling the body. Cross-link tightly, keep each in its own home" | owed — Feelings not built; the parent note's subtitle already sends real distress to "the emotional doors and a professional" |
-| Confidence | Feelings | "naming and handling the fear is Feelings" | owed — Feelings not built |
+| Stillness | Feelings | "Feelings owns naming and understanding an emotion; Stillness owns settling the body. Cross-link tightly, keep each in its own home" | **built 2026-09-18** — Feelings' `fe_calm` is a window onto `sk_page/skilling_stillness/sl_settle`, the first cross-door window in the stage; nothing rebuilt |
+| Feelings | Communication | "Feelings owns naming and understanding the feeling; Communication owns putting it into clear words. Name it here, say it there" | Communication built; its right-word activities already keep off feelings; the page-level window waits on the Feelings fill (clinical review first) |
+| Feelings | Values | "Values owns moral character (what is right); Feelings owns emotional intelligence (what you feel). Empathy and kindness sit on the border" | owed — Values not built; Reading others is the skill on this side |
+| Feelings | parenting Behaviour | "Parenting Behaviour is parent-facing and younger; this door is kid-facing and school-age. Cross-link, do not duplicate, and single-source any scenario content that genuinely matches" | owed — a fill-time call, scenario by scenario, once the clinician has reviewed them |
+| Memory, Focus | Feelings | "Feelings is where the anxiety threads come home. Exam stress from Memory, focus worry from Focus. Those doors point here for handling the feeling; this door owns it" | owed — neither built; each points at Handling the big ones and the off-ramp when it is |
+| Confidence | Feelings | "naming and handling the fear is Feelings" | Feelings built 2026-09-18; Handling the big ones is the skill; the page waits on the fill |
 | Confidence · `cf_1114_01` | Thinking | Speak Up to a Grown-Up "cross-links to the Thinking door's 'question ideas, not elders' line; keep the tone consistent across both" | Thinking built 2026-09-17 on the careful framing (1a); the line lives in its parent note `th_parent_note` (coming soon) — the page id goes here when that note is written |
 | Thinking · `is_it_true` set | Coding · `ai` set | "Thinking owns the reasoning (is this true, who says so, how would I know); Coding's AI literacy owns the mechanism (how AI generates content, why it errs and is biased); the two cross-link into one defence built once" | the cross-link slot: the set's blurb names the Coding door; both halves coming soon; the linking page is authored once when they exist |
 | Thinking · `puzzles` set | Maths | "A logic puzzle is Thinking, a number puzzle is Maths" | owed — Maths not built; the set's blurb says which is which |

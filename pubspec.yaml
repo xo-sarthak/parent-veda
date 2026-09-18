@@ -83,6 +83,10 @@ dependencies:
   # Saving the week-40 celebration image to a file before sharing/downloading,
   # and storing captured photo memories in the app documents directory.
   path_provider: ^2.1.3
+  # The skilling Feelings journal: AES-GCM at rest for a child's own pages.
+  # Already in the lock via Supabase; made direct so the import is honest.
+  # (2026-09-18; key custody still owed to the platform keystore, STILL-OPEN §103.)
+  pointycastle: ^4.0.0
 
   # Gentle baby-voice text-to-speech for card dialogue.
   flutter_tts: ^4.0.2

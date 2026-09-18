@@ -107,6 +107,32 @@ not cover. Use it only when a brief does.
   A brief that wants a streak, a chain or a days-in-a-row is refused by
   the stage's rule, and on Stillness for its own reason too.
 
+**Two more, added by Feelings (2026-09-18) — the door that carries the
+most weight:**
+
+* **A private journal** — `SkDoorContent.journal: true` and
+  `sk_journal/<door>` (`sk_journal.dart`). On this phone, AES-256-GCM per
+  entry (`pointycastle`, the AES the app already ships), an index with ids
+  and dates and no text, one reader (her own page), no search, count,
+  sentiment, export or sync; child-private by default — the parent deletes
+  it, never reads it. The key-custody seam (`SkJournalKeyStore`) ships
+  with the platform keystore, not `shared_preferences`. The crisis pathway
+  is a stub that STOPS (`sk_crisis_pathway.dart`); no door may wire the
+  journal to anything that reads it.
+* **A safety off-ramp** — `SkDoorContent.safety: SkSafety(...)`, drawn by
+  the shell as `SkTalkToSomeoneBar` at the foot of every child screen of
+  the door (the door, activities, child pages, keepsakes, the journal).
+  A trusted-adult line and real helplines with tap-to-call, ungated — the
+  one ungated link off a child screen, on the record, and the sanity test
+  holds it is the only one and is a phone call. Helplines carry
+  `verify: true` until legal and clinical review; a release build shows
+  nothing still flagged.
+
+**A door marked "care" (Feelings): the recipe changes in two places.**
+Every content slot's chip says "Needs review" (`format`), so a fill cannot
+land quietly; and a task PDF for the door goes to a child psychologist
+before it comes here at all. The ledger rows say "clinical review first".
+
 ### The two voices
 
 Every skilling screen is one of two things, and the file says which:
@@ -377,12 +403,23 @@ Points that apply to every skill door. Door-specific ones are in
       task 6 adds the Thinking door's "question ideas, not elders" line.
 - [ ] **A child-facing help line.** Confidence's task 6 (After a Rough One)
       says "if a child's distress runs deeper than a rough talk, the door's
-      help line points to a trusted adult or professional". No skilling
-      door has one on the child side; each has a parent-facing boundary
-      note behind the gate. Whether a child screen should carry one calm
-      line ("if this feels bigger than a talk, tell a grown-up you trust")
-      is a stage-wide call, not a Confidence one: it touches every door's
-      child pages and the never-diagnose rule. Listed, not built.
+      help line points to a trusted adult or professional". **Feelings now
+      has one** (`SkSafety`, the bar on every child screen of that door,
+      2026-09-18). Whether Confidence — or every door — should carry the
+      same bar is the stage-wide call that remains: the shell can do it
+      with one line per door content. Yours to say.
+- [ ] **Key custody for the journal.** `SkJournalKeyStore` has one
+      implementation, the key in `shared_preferences` beside the data. The
+      platform keystore (Android Keystore / iOS Keychain, via
+      `flutter_secure_storage` or equal — a dependency call) is owed before
+      the Feelings door ships. STILL-OPEN §103.
+- [ ] **The journal's child-private default** needs legal review against
+      DPDP's parental-consent rules before ship (the brief's own flag; the
+      user's call 1a). The parent owns consent and deletion and does not
+      read entries. STILL-OPEN §103.
+- [ ] **The helplines** (Childline 1098, Tele-MANAS 14416) carry
+      `verify: true` until a lawyer and a clinician confirm the numbers and
+      the wording. STILL-OPEN §103.
 - [ ] **Fourteen and over.** Reads the top band. The brief says a fourth
       band "is easy to add later". When?
 - [ ] **The brief's own example line contains a number** ("You practised

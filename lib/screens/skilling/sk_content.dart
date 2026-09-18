@@ -56,6 +56,7 @@ import '../../widgets/breathing_circle.dart';
 import '../../widgets/pv_placeholders.dart';
 import '../v2/v2_palette.dart';
 import 'sk_grown_up_gate.dart';
+import 'sk_safety.dart';
 
 // =============================================================================
 //  THE BLOCKS
@@ -472,6 +473,9 @@ class SkContentPage extends StatelessWidget {
     final kid = page.kidVoice;
     return Scaffold(
       backgroundColor: p.ground,
+      // A child page on a door with an off-ramp carries it; a parent page
+      // (kidVoice false) does not — the parent's route to help is the note.
+      bottomNavigationBar: kid ? skSafetyBarFor(doorId) : null,
       body: SafeArea(
         bottom: false,
         child: ListView(

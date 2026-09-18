@@ -56,6 +56,7 @@ import '../sk_content.dart';
 import '../sk_content_registry.dart';
 import '../sk_door_content.dart';
 import '../sk_practice_store.dart';
+import '../sk_safety.dart';
 import 'sk_door_carousel.dart';
 import 'sk_door_chrome.dart';
 
@@ -372,6 +373,9 @@ class _SkDoorScreenState extends State<SkDoorScreen> {
 
     return Scaffold(
       backgroundColor: p.ground,
+      // The Feelings brief's off-ramp, on every screen of a door that has
+      // one; null — nothing — on every other door.
+      bottomNavigationBar: skSafetyBarFor(door.doorId),
       body: Stack(children: [
         Positioned.fill(
           child: V3HeroField(

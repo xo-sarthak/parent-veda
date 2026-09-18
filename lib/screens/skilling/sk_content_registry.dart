@@ -20,6 +20,10 @@ import '../../data/skilling/skilling_confidence_activities.dart';
 import '../../data/skilling/skilling_confidence_content.dart';
 import '../../data/skilling/skilling_confidence_course.dart';
 import '../../data/skilling/skilling_confidence_products.dart';
+import '../../data/skilling/skilling_feelings_activities.dart';
+import '../../data/skilling/skilling_feelings_content.dart';
+import '../../data/skilling/skilling_feelings_course.dart';
+import '../../data/skilling/skilling_feelings_products.dart';
 import '../../data/skilling/skilling_stillness_activities.dart';
 import '../../data/skilling/skilling_stillness_content.dart';
 import '../../data/skilling/skilling_stillness_course.dart';
@@ -111,6 +115,22 @@ final SkDoorContent kSkStillnessContent = SkDoorContent(
       'to keep and no day to miss.',
 );
 
+final SkDoorContent kSkFeelingsContent = SkDoorContent(
+  doorId: 'skilling_emotional',
+  bandNames: kSkFeelingsBandNames,
+  skills: kSkFeelingsSkills,
+  lessonSets: kSkFeelingsLessonSets,
+  lessons: kSkFeelingsLessons,
+  activities: kSkFeelingsActivities,
+  courses: kSkFeelingsCourses,
+  products: kSkFeelingsProducts,
+  parentNote: kSkFeelingsParentNote,
+  keepsakeTitle: 'You practised',
+  // Her private journal (1a) and the off-ramp on every screen (4a).
+  journal: true,
+  safety: kSkFeelingsSafety,
+);
+
 /// Every door with content. Adding a door is a line here and a line in
 /// `kSkDoors`.
 final List<SkDoorContent> kSkDoorContents = [
@@ -119,6 +139,7 @@ final List<SkDoorContent> kSkDoorContents = [
   kSkConfidenceContent,
   kSkThinkingContent,
   kSkStillnessContent,
+  kSkFeelingsContent,
 ];
 
 SkDoorContent? skDoorContentFor(String doorId) {

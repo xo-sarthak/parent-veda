@@ -199,6 +199,8 @@ class SkDoorContent {
     this.coach,
     this.keepsakeTitle = "What I've made and tried",
     this.keepsakeInvite,
+    this.journal = false,
+    this.safety,
   });
 
   /// The practice keepsake's title, in the door's own words. Coding's "What
@@ -214,6 +216,21 @@ class SkDoorContent {
   /// the screen only, never a notification; null on every other door.
   /// The scan in `sk_doors_sanity_test.dart` holds the no-number rule.
   final String? keepsakeInvite;
+
+  /// The door keeps a private journal for the child (`sk_journal/<door>`,
+  /// `SkJournalStore`): on this phone, encrypted at rest, never uploaded,
+  /// never analysed, never read by any AI, and child-private by default —
+  /// the parent owns consent and deletion and does not read entries. The
+  /// Feelings brief's "her private journal: the harder feelings, written
+  /// down" (the user's call, 2026-09-18, 1a; flagged for legal review
+  /// against DPDP's parental-consent rules). False on every other door.
+  final bool journal;
+
+  /// The safety off-ramp — "Talk to someone: a trusted adult and a real
+  /// child helpline, always one tap away" — drawn as a bar at the foot of
+  /// every child screen of the door that carries one (`SkTalkToSomeoneBar`).
+  /// Null on every other door.
+  final SkSafety? safety;
 
   /// The keepsake screen's title, in the door's own words — Communication's
   /// "Your voice, saved", Confidence's "Your talks, saved".
@@ -353,4 +370,39 @@ class SkDoorContent {
     }
     return null;
   }
+}
+
+/// The Feelings brief's off-ramp: "a first-class, always-present 'talk to
+/// someone' that points to a trusted adult + a real child helpline; not
+/// buried, present on every screen of this door." Help is not an upsell.
+///
+/// ⚠️ THE ONE UNGATED WAY OUT OF A CHILD SCREEN, ON THE RECORD. Every other
+/// link, purchase or setting on a child screen sits behind the grown-up
+/// check. A helpline cannot: the child who needs it may be the child who
+/// cannot ask a parent first. The user's call (2026-09-18, 4a).
+class SkSafety {
+  const SkSafety({required this.trustedAdultLine, required this.helplines});
+
+  /// "Tell a grown-up you trust …" — in the child's words.
+  final String trustedAdultLine;
+  final List<SkHelpline> helplines;
+}
+
+/// One real helpline. `verify` is true until a lawyer and a clinician have
+/// confirmed the number and its wording; the review list and the ledger
+/// carry the flag, and the sheet shows nothing marked verify in a release
+/// build — the stage is behind `kDebugMode` anyway.
+class SkHelpline {
+  const SkHelpline({
+    required this.name,
+    required this.number,
+    required this.note,
+    this.verify = true,
+  });
+  final String name;
+
+  /// Dialable as written — digits only, so `tel:` takes it as is.
+  final String number;
+  final String note;
+  final bool verify;
 }

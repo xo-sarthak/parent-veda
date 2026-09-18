@@ -265,6 +265,28 @@ void main() {
       expect(hits, isEmpty, reason: 'scoring vocabulary in activity copy:\n${hits.join('\n')}');
     });
 
+    // ⚠️ THE ONE UNGATED LINK OFF A CHILD SCREEN. Every `launchUrl` in the
+    // skilling tree sits behind `skAskGrownUp` in the same file — except the
+    // Feelings off-ramp (`sk_safety.dart`), whose `tel:` to a child helpline
+    // must not wait for a parent (the user's call, 2026-09-18, 4a). A second
+    // file doing this is a decision, not a drift.
+    test('every launchUrl on a child screen is gated, bar the helpline', () {
+      final ungated = <String>[];
+      for (final f in Directory('lib/screens/skilling').listSync(recursive: true).whereType<File>()) {
+        if (!f.path.endsWith('.dart')) continue;
+        final src = f.readAsStringSync();
+        if (!src.contains('launchUrl(')) continue;
+        final name = f.path.replaceAll('\\', '/').split('/').last;
+        if (name == 'sk_safety.dart') {
+          expect(src.contains("scheme: 'tel'"), isTrue, reason: 'the exception is a phone call, nothing else');
+          expect(src.contains('https://'), isFalse, reason: 'no web link rides the exception');
+          continue;
+        }
+        if (!src.contains('skAskGrownUp')) ungated.add(name);
+      }
+      expect(ungated, isEmpty, reason: 'launchUrl without the grown-up check: ${ungated.join(', ')}');
+    });
+
     test('the keepsake store returns words and bools, never a number', () {
       final src = code(File('lib/screens/skilling/sk_practice_store.dart'));
       final numeric = RegExp(r'^\s*(int|double|num)\s+(get\s+)?[a-z]\w*', multiLine: true);
