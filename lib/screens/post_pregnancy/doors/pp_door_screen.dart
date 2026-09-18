@@ -298,7 +298,7 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                           '  ·  ${section.bandSet!.active.label.toUpperCase()}',
             ),
             PpDoorSheet(p: p, children: [
-              const SizedBox(height: 22),
+              const SizedBox(height: 14), // was 22 (deck tightened 2026-09-18)
 
               // ---- the selector, first thing under the hero ----------------
               PpDoorCarousel(
@@ -309,7 +309,7 @@ class _PpDoorScreenState extends State<PpDoorScreen> {
                 p: p,
                 onPick: (i) => setState(() => _tab = i),
               ),
-              const SizedBox(height: 26),
+              const SizedBox(height: 18), // was 26
 
               // ---- a locked tab: the panel, not the rails -----------------
               if (_unlockMonths(tab) case final m?) ...[

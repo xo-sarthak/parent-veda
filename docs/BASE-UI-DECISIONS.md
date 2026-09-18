@@ -98,6 +98,24 @@ buttons). *Recommendation: keep.*
 pass touched it, and nothing audited was checked in dark. *Recommendation:
 out of scope until light is settled; then one pass.*
 
+### 2.8 The door deck — tightened, or replaced by chips? — OPEN 2026-09-18
+
+You said: *"I like this swipe animation… but it takes too much space."* Done
+without asking: the deck is tightened (card 172×132 → 156×112, track 146 →
+124, mark 74 → 62, the gaps either side 22/26 → 14/18 — about 54pt back, on
+all three stages). The call: Mobbin's set splits cleanly. When a carousel IS
+the task (Klarna "pick your card", Lloyds "choose an account", Tubi's age
+rating) it takes the whole screen. When it is a **selector above content**
+(Gymshark Workouts / Plans / Creators, DAZN Teams / Standings, Waking Up
+Practice / Theory / Life) every one of them uses a **compact row of chips**
+and gives the height to the content. Our door is the second case.
+**(a)** keep the tightened deck — it is the app's own signature and you like
+the motion; **(b)** replace it with a chip row (one line, ~44pt, the content
+starts on the first screen) and keep the deck for the hero only.
+*Recommendation: (a) for now, and (b) if the next walk still feels tall* —
+the tightened deck should be judged on the phone before the signature is
+given up.
+
 ## 3. The follow-up sweep, once §2 is answered — work, not decisions
 
 - **Hand-rolled violet buttons** — 24 `backgroundColor: AppTheme.primary…`

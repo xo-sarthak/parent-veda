@@ -237,7 +237,7 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                 ),
                 PvDoorSheet(p: p, children: [
                   // ⚠️ THE ANCHOR A LAUNCHER CARD SCROLLS TO. See `_openTile`.
-                  SizedBox(key: _selectorAnchor, height: 22),
+                  SizedBox(key: _selectorAnchor, height: 14), // was 22 (deck tightened 2026-09-18)
 
                   // ---- the selector, first thing under the hero ----------
                   PvDoorCarousel(
@@ -247,7 +247,7 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                     p: p,
                     onPick: (i) => setState(() => _group = i),
                   ),
-                  const SizedBox(height: 26),
+                  const SizedBox(height: 18), // was 26
 
                   // ---- a pinned red flag, above everything ---------------
                   //

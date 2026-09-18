@@ -7736,9 +7736,9 @@ consult offer or a chart the deck cannot hold, or are empty, and open in the
 reader with their cards listed); the chart card is the same white data card
 as the table; Activity / Ceremony / Recipe open on their steps; Red-flag
 pages open on their flags; Guide and Myth-vs-fact chips say Article; the
-checklist's share bar is the theme's ink pill. **Owed:** the door deck's
-footprint (the user: "I like this swipe animation but it takes too much
-space"); the TTC and parenting tag surfaces walked on the phone; the empty
+checklist's share bar is the theme's ink pill. **Done 2026-09-18:** the door deck is
+tightened on all three stages (BASE-UI-DECISIONS §2.8 holds the chips
+alternative for the user's call); **owed:** the TTC and parenting tag surfaces walked on the phone; the empty
 CARDS pages (Potty pull-ups, taking longer; Traditions ×3; Health accidents)
 are still empty.
 

@@ -196,7 +196,7 @@ class _TtcFocusScreenState extends State<TtcFocusScreen> {
                       // on any device, for any group.
                       minHeightFactor: 1,
                       children: [
-                    const SizedBox(height: 22),
+                    const SizedBox(height: 14), // was 22 (deck tightened 2026-09-18)
 
                     // ---- the selector, first thing under the hero --------
                     //
@@ -231,7 +231,7 @@ class _TtcFocusScreenState extends State<TtcFocusScreen> {
                             p: p,
                             onPick: (i) => setState(() => _group = i),
                           ),
-                    const SizedBox(height: 26),
+                    const SizedBox(height: 18), // was 26
 
                     // ⚠️ THE GROUP'S NAME IS NOT REPEATED HERE, AND IT WAS.
                     // Tapping the card marked "Understand" and then reading the
@@ -1357,13 +1357,20 @@ Key ttcCarouselZoneKey(int step) => ValueKey('ttc-carousel-zone-$step');
 /// the track and are cut by its mask, which fades to 45% there so the cut
 /// reads as mist rather than as an edge. Pinching the numbers until all five
 /// fit would flatten the ladder into a row.
-const double kTtcCarouselCardWidth = 172;
-const double kTtcCarouselCardHeight = 132;
+// ⚠️ TIGHTENED 2026-09-18 — the user on the door: "I like this swipe
+// animation… but it takes too much space." Under a hero that already takes
+// two-fifths of the screen, the deck cost ~220pt before the first rail. The
+// deck stays; its geometry shrinks: card 172×132 → 156×112, track 146 → 124,
+// the mark 74 → 62, and the gaps either side 22/26 → 14/18. About 54pt back,
+// which is the first rail's title and chips on the first screen. The 4a
+// numbers are kept beside each for revert.
+const double kTtcCarouselCardWidth = 156; // was 172
+const double kTtcCarouselCardHeight = 112; // was 132
 
 /// The track's height — 4a's 146 — and where in it the cards sit. The cards are
 /// laid out 4pt down and step down a further 8 per place round the ring, so
 /// the back pair sit lowest; the shadow under the front card takes the rest.
-const double kTtcCarouselTrackHeight = 146;
+const double kTtcCarouselTrackHeight = 124; // was 146
 const double _cardTop = 4;
 
 /// 4a's edge fade: 45% at the edge, 82% a tenth of the way in, solid across
@@ -2175,8 +2182,8 @@ class _CarouselCard extends StatelessWidget {
             Positioned(
               top: 10,
               right: 10,
-              width: 74,
-              height: 74,
+              width: 62, // was 74
+              height: 62,
               child: Transform.translate(
                 offset: Offset(-o * 7, 0),
                 child: Stack(
