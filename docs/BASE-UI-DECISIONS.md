@@ -43,7 +43,7 @@ Newsreader, done · 2.4 explained, nothing to change · 2.5–2.7 as recommended
 
 ## 2. Your calls — read, answer, and the follow-up runs
 
-### 2.1 The Ask Veda FAB — violet fill, on every screen
+### 2.1 The Ask Veda FAB — violet fill, on every screen — ANSWERED 2026-09-19: (a), a better violet
 
 Today it is the one filled-violet circle left on the V3 home. Two readings:
 **(a) keep it** — it is the app's signature action, one per screen, and a
@@ -51,6 +51,16 @@ brand-coloured floating button is what Airbnb (rausch), Notion (blue) and
 Duolingo do with their single "the app's own thing" control; **(b) ink it**
 — the same rule as every other button. *Recommendation: (a).* A signature
 needs one home, and this is the one place the brand colour is doing a job.
+
+**Answered (a), 2026-09-19 — a better violet.** The user, on the Products
+page: "very purple and outdated… like a sore thumb." Built in ink first
+(Mobbin's floating assistants — ChatGPT, Opera, Tiimo, Lovi — are white or
+ink discs); he looked and chose violet back: "the app logo is purple… keep
+it purple, but a good purple." So: a two-tone violet disc (7B47CC →
+5526A0), a violet shadow at 30%, white sparkle, the shared press, and
+lifted from 92 to 108 so it clears the nav pill. The ink disc is kept in
+the file for revert. A drawn mark for the sparkle is owed (STILL-OPEN
+§63.11).
 
 ### 2.2 The Classic / V3 pill on the homes
 

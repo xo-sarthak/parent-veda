@@ -7913,7 +7913,7 @@ booked date or "No date added yet", one white pill), then *The usual run*
 station dots, "Mark as done" links and NEXT UP / DONE pills retired (kept
 in the file for revert). Walked on the phone.
 
-### 63.13 Read photos from rawpixel carry a watermark — BLOCKER — SEEN 2026-09-19
+### 63.13 Read photos from rawpixel carry a watermark — FIXED 2026-09-19 (22 swapped to StockSnap CC0 via Openverse; rule: never `images.rawpixel.com/image_*` previews)
 
 22 of the 32 URLs in `read_images.dart` are `images.rawpixel.com/image_1300/…`
 previews, and rawpixel tiles its logo across a preview (seen on "Take it to
@@ -7921,6 +7921,16 @@ your appointment" — fetched and looked at). They cannot ship. Replace each
 through Openverse with `source=flickr,wikimedia` (CC BY / CC0 files served
 clean), keep the credit line, re-run `pregnancy_reads_shape_test`. The 10
 Flickr `_b.jpg` files are fine.
+
+### 63.14 The door walk — Complications done — 2026-09-19
+
+See `docs/PREGNANCY-DOORS-REVIEW.md` §2. New door-wide rule: written
+sections are lists (DESIGN-SYSTEM §4.0 addendum 2) — this changed every
+door's all-article sections at once; walk each as its door comes up. The
+condition gate is off; "Add to my journey" confirms on tap. Owed: the
+phone walk (device dozed), the 15 condition reads for thinness. Also seen:
+the daily tip returns on every foreground, not once a day — check
+`_maybeShowTip` in home_v3_screen.dart. Next door: Is it safe?
 
 ### 63.12 The door walk — Scans & tests done; the recipe — 2026-09-19
 

@@ -13,6 +13,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'pv_feedback.dart';
 
 import '../screens/post_pregnancy/askveda_screen.dart' as pp;
 import '../screens/tools/ask_veda_screen.dart' as preg;
@@ -63,10 +64,14 @@ const String kCallRoute = 'call';
 //  thirty files, is wrong the first time anyone nudges this.
 
 /// How far the FAB sits above the bottom of the screen, normally.
-const double kAskFabBottomOffset = 92;
+///
+/// 108 since 2026-09-19 (was 92): the nav pill is 64pt on an 18pt inset,
+/// so its top is at 82 — at 92 the disc's shadow and the pill's shadow met
+/// and the user saw an overlap. 108 leaves a clear 26pt of ground.
+const double kAskFabBottomOffset = 108;
 
 /// Raised on the pregnancy Today tab, which has its own floating dev pill.
-const double kAskFabRaisedOffset = 150;
+const double kAskFabRaisedOffset = 166; // was 150; moved with the offset above
 
 /// The circle's diameter.
 const double kAskFabSize = 56;
@@ -257,26 +262,41 @@ class GlobalAskFab extends StatelessWidget {
     );
   }
 
-  // The original parenting Ask-Veda FAB: a plain circle with the sparkle icon,
-  // nothing else. Same on both apps now.
-  Widget _pill() => Material(
-        color: Colors.transparent,
-        shape: const CircleBorder(),
-        child: InkWell(
-          onTap: _open,
-          customBorder: const CircleBorder(),
-          child: Container(
-            width: kAskFabSize,
-            height: kAskFabSize,
-            alignment: Alignment.center,
-            decoration: const BoxDecoration(
-              color: Color(0xFF6A30B6),
-              shape: BoxShape.circle,
-              boxShadow: [
-                BoxShadow(color: Color(0x4D6A30B6), blurRadius: 16, spreadRadius: -2, offset: Offset(0, 6)),
-              ],
+  // ⚠️ A GOOD VIOLET — 2026-09-19 (BASE-UI-DECISIONS §2.1: (a) after all).
+  // The user first called the flat brand fill "a sore thumb", saw it in
+  // ink, and chose violet back: the logo is violet and the button is the
+  // one place the brand colour does a job. So: not the flat 0xFF6A30B6 but
+  // a two-tone disc (lighter top-left, deeper bottom-right — the depth
+  // Opera's and monday's sparkles carry), a violet shadow at 30%, the
+  // sparkle in white, and the shared press. Kept for revert: the ink disc
+  // (Color(0xFF2F2C30), neutral shadow) and the flat violet before it.
+  Widget _pill() => PvPress(
+        child: Material(
+          color: Colors.transparent,
+          shape: const CircleBorder(),
+          child: InkWell(
+            onTap: () {
+              pvCommitFeedback();
+              _open();
+            },
+            customBorder: const CircleBorder(),
+            child: Container(
+              width: kAskFabSize,
+              height: kAskFabSize,
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFF7B47CC), Color(0xFF5526A0)],
+                ),
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(color: Color(0x4D5526A0), blurRadius: 18, spreadRadius: -2, offset: Offset(0, 8)),
+                ],
+              ),
+              child: const Icon(Icons.auto_awesome_rounded, size: 24, color: Colors.white),
             ),
-            child: const Icon(Icons.auto_awesome_rounded, size: 24, color: Colors.white),
           ),
         ),
       );
