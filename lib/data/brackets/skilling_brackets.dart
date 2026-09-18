@@ -538,6 +538,49 @@ final List<Bracket> kSkillingBrackets = [
             'span rather than an adult\'s.',
         hi: 'साथ-साथ बैठना और आसान योग — बड़ों नहीं, बच्चों के ध्यान के '
             'हिसाब से।'),
+    // ⚠️ LIVE SINCE 2026-09-17, to `ParentVeda_Stillness_structure.pdf`.
+    // Six cells live. The streak tracker is REFUSED, and on the record with
+    // its reason (the user's call, 1a): "a streak is the opposite of the
+    // practice … becomes a gentle 'want to sit again?' invitation and a
+    // shelf of quiet moments taken. Never a chain to keep or break." Extras
+    // (streaks, progress report) are dropped outright — "the sharpest
+    // refusal in the stage" — and what is left, the unmeasured record, is
+    // the keepsake. Consult held: "real distress is not a meditation gap".
+    layers: {
+      BracketLayer.content: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Guided kid meditations & yoga',
+        surfaceIds: ['sk_lessons/skilling_stillness'],
+      ),
+      BracketLayer.activities: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Guided practice',
+        surfaceIds: ['sk_activities/skilling_stillness'],
+      ),
+      BracketLayer.tools: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Streak tracker',
+        surfaceIds: ['sk_keepsake/skilling_stillness'],
+      ),
+      BracketLayer.products: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Optional',
+        surfaceIds: ['sk_products/skilling_stillness'],
+      ),
+      BracketLayer.course: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Optional',
+        surfaceIds: ['sk_courses/skilling_stillness'],
+      ),
+      BracketLayer.consult:
+          const BracketLayerSpec(state: LayerState.notReady, reason: 'Rare'),
+      BracketLayer.extras: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Streaks, progress report',
+        surfaceIds: ['sk_keepsake/skilling_stillness'],
+      ),
+    },
+    /* kept for revert — the row as declared before the door
     layers: _skillLayers(
       content: 'Guided kid meditations & yoga',
       activities: 'Guided practice',
@@ -547,6 +590,7 @@ final List<Bracket> kSkillingBrackets = [
       consult: 'Rare',
       extras: 'Streaks, progress report',
     ),
+    */
   ),
 
   Bracket(

@@ -198,6 +198,7 @@ class SkDoorContent {
         'think. Tap Record something and it lands here.',
     this.coach,
     this.keepsakeTitle = "What I've made and tried",
+    this.keepsakeInvite,
   });
 
   /// The practice keepsake's title, in the door's own words. Coding's "What
@@ -206,6 +207,13 @@ class SkDoorContent {
   /// this same screen under that name — one keepsake, one store, a
   /// per-door title (added 2026-09-17).
   final String keepsakeTitle;
+
+  /// One gentle line under the keepsake's subtitle, in the door's words —
+  /// Stillness's "want to sit again?" (its brief's reshape of the streak,
+  /// the user's call 2026-09-17, 3a). A sentence with no number in it, on
+  /// the screen only, never a notification; null on every other door.
+  /// The scan in `sk_doors_sanity_test.dart` holds the no-number rule.
+  final String? keepsakeInvite;
 
   /// The keepsake screen's title, in the door's own words — Communication's
   /// "Your voice, saved", Confidence's "Your talks, saved".

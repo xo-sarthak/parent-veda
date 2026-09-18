@@ -182,6 +182,7 @@ two.
 | Communication (skilling) | 10 | 5 (29 slots: 27 lessons, 12 courses, 12 products, 2 notes — the 36 activities are filled; the 11–14 twelve are repo-written copy owed a task-author review) | – | 1 (the voice keepsake) | 1 (cloud copy of recordings, behind a real consent) |
 | Confidence (skilling) | 11 | 5 (36 slots: 18 lessons, 6 courses, 9 products, 2 notes, 1 coach — the 36 activities are filled) | – | 1 (the breath page) | 1 (the coach onboarded, then the booking wiring) |
 | Thinking (skilling) | 11 | 8 (82 slots: 36 activities, 33 lessons, 4 courses, 9 products, 1 note) | – | 1 (the keepsake, renamed) | 1 (the one spotting-fake defence, authored with Coding) |
+| Stillness (skilling) | 12 | 8 (73 slots: 36 practices, 24 sessions, 3 courses, 9 products, 1 note) | – | 2 (the settle breath, the keepsake with its invitation) | 1 (the borrowers — Focus, Feelings, Memory — pointing here, not rebuilding) |
 
 Pregnancy, six doors: written pieces owed, in prose — **S1, L3, L4, L5, L6,
 M1**, six reads. Films — **N1, L1, L2, M4 ×3, M6 ×5**, eleven. Audio — **M5
@@ -448,3 +449,26 @@ Rows carry `ST`.
 | ST9 | "You kept thinking" — the keepsake | Keepsake | Built from data | The shared no-score keepsake under this door's name (`SkDoorContent.keepsakeTitle`), which is what the extras reshape says: "The certificate becomes a 'you kept thinking' keepsake." The progress report is dropped. The rubric tracker is refused into it. Nothing owed. |
 | ST10 | Cross-links to Coding, Maths and Communication | Windows | Owed | Coding (AI literacy — the other half of the one defence; and breaking-down as computational thinking) exists with its AI pages coming soon; Maths does not exist; Communication exists (light debate: it says the point, this door reasons it). Review file, cross-door table. |
 | ST11 | A reasoning or debate coach | Consult | Held | "Rarely. Held." No row on the door. |
+
+### SL. Meditation, yoga & mindfulness — `lib/data/doors/sk_door_stillness.dart`
+
+Built to `ParentVeda_Stillness_structure.pdf`, door five, on 2026-09-17, on
+the user's calls 1a (the streak refused, on the record), 2a (engines
+reused, sessions kid-authored), 3a (the invitation as one line on the
+keepsake, never a notification), 4a (the settle breath built as the
+source). Frame only. Rows carry `SL`.
+
+| # | Card | Kind | Outcome | Owed |
+|---|---|---|---|---|
+| SL1 | Breathe and wiggle, 6 to 8 — (`sl_68_01`, `sl_68_02`, `sl_68_03`, `sl_68_04`, `sl_68_05`, `sl_68_06`, `sl_68_07`, `sl_68_08`, `sl_68_09`, `sl_68_10`, `sl_68_11`, `sl_68_12`) | Practice ×12 | Coming soon | No task PDF yet. "Tiny playful breath games and animal poses, a minute or two. Movement first, then a moment of quiet." Two per practice in the door's order. Every session ends on a soft line, never a score. |
+| SL2 | Sit and settle, 8 to 11 — (`sl_811_01`, `sl_811_02`, `sl_811_03`, `sl_811_04`, `sl_811_05`, `sl_811_06`, `sl_811_07`, `sl_811_08`, `sl_811_09`, `sl_811_10`, `sl_811_11`, `sl_811_12`) | Practice ×12 | Coming soon | No task PDF yet. "Short guided sits, noticing, simple yoga, and a real way to calm down when wound up." |
+| SL3 | Find your calm, 11 to 14 — (`sl_1114_01`, `sl_1114_02`, `sl_1114_03`, `sl_1114_04`, `sl_1114_05`, `sl_1114_06`, `sl_1114_07`, `sl_1114_08`, `sl_1114_09`, `sl_1114_10`, `sl_1114_11`, `sl_1114_12`) | Practice ×12 | Coming soon | No task PDF yet. "Longer practices, yoga, and using stillness for stress, sleep and the harder days of the pre-teen years." |
+| SL4 | Guided sits, three per band — KID-NATIVE (`sl_sit_68_1`, `sl_sit_68_2`, `sl_sit_68_3`, `sl_sit_811_1`, `sl_sit_811_2`, `sl_sit_811_3`, `sl_sit_1114_1`, `sl_sit_1114_2`, `sl_sit_1114_3`) | Session ×9 | Coming soon | Written for a child (2a): "adult and pregnancy meditation adapted lazily fails a child, who needs short, playful, movement-first practices, not a ten-minute sit." Run on the app's one audio player when they exist. |
+| SL5 | Gentle moving, three per band, and Resting, two per band — ADAPT (`sl_mov_68_1`, `sl_mov_68_2`, `sl_mov_68_3`, `sl_mov_811_1`, `sl_mov_811_2`, `sl_mov_811_3`, `sl_mov_1114_1`, `sl_mov_1114_2`, `sl_mov_1114_3`, `sl_rst_68_1`, `sl_rst_68_2`, `sl_rst_811_1`, `sl_rst_811_2`, `sl_rst_1114_1`, `sl_rst_1114_2`) | Session ×15 | Coming soon | Adapted (2a) from what the app already has: Garbh Sanskar's yoga as animal poses and short stretches; the Kriya body-scan (`lib/data/kriya_relaxation_data.dart`) re-timed and re-voiced for a child. The card says "Adapted". |
+| SL6 | The course shelf — a longer guided series per level (`sl_course_68_series`, `sl_course_811_series`, `sl_course_1114_series`) | Course ×3 | Coming soon | Real recordings. Placeholders behind the gate at ₹699 / $8; recorded only, "small, reuse-first"; every string under the no-outcome scan — nothing says "calmer child", "cures", "anxiety", "focus" or "sleep better". |
+| SL7 | The product shelf — a cushion, a kids' mat, calm cards, per band (`sl_prod_68_cushion`, `sl_prod_68_mat`, `sl_prod_68_cards`, `sl_prod_811_cushion`, `sl_prod_811_mat`, `sl_prod_811_cards`, `sl_prod_1114_cushion`, `sl_prod_1114_mat`, `sl_prod_1114_cards`) | Product ×9 | Coming soon | Real, sourced items. Skilling's own shelf; optional, never a gate. |
+| SL8 | `sl_parent_note` — How stillness helps, without over-selling it | Parent note | Coming soon | The brief's own title. The authored half: a practice, not a treatment; why there is no streak, on purpose; where real distress goes instead (the emotional doors and a professional). |
+| SL9 | `sl_settle` — Settle | Practice | Built from data | The one built page (4a): the app's one breathing circle in an `SkBreath` block with the brief's own line under it. **The source** Focus, Feelings and Memory reference; Confidence's `cf_breath` already borrows it. Nothing owed. |
+| SL10 | "Quiet moments taken" — the keepsake and the invitation | Keepsake | Built from data | The shared no-score keepsake under this door's name, with one gentle line ("Want to sit again? … no chain to keep and no day to miss") — the brief's reshape of the streak, and the user's decision on the record (1a). Two shell slots for it (`keepsakeTitle` from Thinking, `keepsakeInvite` new). Nothing owed. |
+| SL11 | Cross-links to Focus, Feelings and Memory (borrowers) and Confidence (already borrowing) | Windows | Owed | Focus, Feelings, Memory do not exist; when they do, they reference `sk_page/skilling_stillness/sl_settle` and the calming/resting sessions, never their own. Confidence's `cf_breath` is the same circle today; whether it becomes a window onto `sl_settle` is a review-list call. |
+| SL12 | A kids' yoga or meditation teacher | Consult | Held | "Rarely. Held. Real distress is not a meditation gap." No row. |

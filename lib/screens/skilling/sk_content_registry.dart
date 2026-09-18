@@ -20,6 +20,10 @@ import '../../data/skilling/skilling_confidence_activities.dart';
 import '../../data/skilling/skilling_confidence_content.dart';
 import '../../data/skilling/skilling_confidence_course.dart';
 import '../../data/skilling/skilling_confidence_products.dart';
+import '../../data/skilling/skilling_stillness_activities.dart';
+import '../../data/skilling/skilling_stillness_content.dart';
+import '../../data/skilling/skilling_stillness_course.dart';
+import '../../data/skilling/skilling_stillness_products.dart';
 import '../../data/skilling/skilling_thinking_activities.dart';
 import '../../data/skilling/skilling_thinking_content.dart';
 import '../../data/skilling/skilling_thinking_course.dart';
@@ -90,6 +94,23 @@ final SkDoorContent kSkThinkingContent = SkDoorContent(
   keepsakeTitle: 'You kept thinking',
 );
 
+final SkDoorContent kSkStillnessContent = SkDoorContent(
+  doorId: 'skilling_stillness',
+  bandNames: kSkStillnessBandNames,
+  skills: kSkStillnessSkills,
+  lessonSets: kSkStillnessLessonSets,
+  lessons: kSkStillnessLessons,
+  activities: kSkStillnessActivities,
+  courses: kSkStillnessCourses,
+  products: kSkStillnessProducts,
+  parentNote: kSkStillnessParentNote,
+  // The brief's reshape of the streak: "a gentle 'want to sit again?'
+  // invitation and a shelf of quiet moments taken. Never a chain."
+  keepsakeTitle: 'Quiet moments taken',
+  keepsakeInvite: 'Want to sit again? Whenever you like. There is no chain '
+      'to keep and no day to miss.',
+);
+
 /// Every door with content. Adding a door is a line here and a line in
 /// `kSkDoors`.
 final List<SkDoorContent> kSkDoorContents = [
@@ -97,6 +118,7 @@ final List<SkDoorContent> kSkDoorContents = [
   kSkCommunicationContent,
   kSkConfidenceContent,
   kSkThinkingContent,
+  kSkStillnessContent,
 ];
 
 SkDoorContent? skDoorContentFor(String doorId) {

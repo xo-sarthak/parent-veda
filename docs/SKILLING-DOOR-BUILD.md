@@ -95,6 +95,18 @@ not cover. Use it only when a brief does.
   brief that wants a *second* keepsake is refused by the shell, not
   accommodated by it.
 
+**One more, added by Stillness (2026-09-17):**
+
+* **The keepsake's invitation** — `SkDoorContent.keepsakeInvite`, null by
+  default. One gentle sentence under the keepsake's subtitle, in the
+  door's words, the same on an empty shelf and a full one. For a brief
+  that reshapes a streak into "a gentle 'want to sit again?' invitation"
+  (Stillness, the user's call 1a/3a). The rules are the slot's shape: a
+  string (so no count can live in it), on the screen only (no
+  notification path exists), and the door's test holds "no digit in it".
+  A brief that wants a streak, a chain or a days-in-a-row is refused by
+  the stage's rule, and on Stillness for its own reason too.
+
 ### The two voices
 
 Every skilling screen is one of two things, and the file says which:

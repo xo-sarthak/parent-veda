@@ -22,12 +22,15 @@ import '../v2/v2_palette.dart';
 import 'sk_child_store.dart';
 import 'sk_content.dart';
 import 'sk_content_registry.dart';
+import 'sk_door_content.dart';
 import 'sk_practice_store.dart';
 
 class SkKeepsakeScreen extends StatelessWidget {
   const SkKeepsakeScreen({super.key, required this.doorId, this.doorTitle = ''});
   final String doorId;
   final String doorTitle;
+
+  SkDoorContent? get _content => skDoorContentFor(doorId);
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
@@ -60,7 +63,7 @@ class SkKeepsakeScreen extends StatelessWidget {
                       letterSpacing: 1.2,
                       color: p.action)),
             const SizedBox(height: 8),
-            Text(skDoorContentFor(doorId)?.keepsakeTitle ?? "What I've made and tried",
+            Text(_content?.keepsakeTitle ?? "What I've made and tried",
                 style: pvFraunces(
                     fontSize: kSkTitleSize,
                     fontWeight: FontWeight.w600,
@@ -76,6 +79,19 @@ class SkKeepsakeScreen extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                     height: 1.5,
                     color: p.ink2)),
+            // The one gentle line a door may add — Stillness's "want to sit
+            // again?". No count, no chain; the same words on an empty shelf
+            // and a full one.
+            if (_content?.keepsakeInvite case final invite?) ...[
+              const SizedBox(height: 10),
+              Text(invite,
+                  key: const Key('sk-keepsake-invite'),
+                  style: pvManrope(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                      height: 1.5,
+                      color: p.action)),
+            ],
             const SizedBox(height: 26),
             if (lines.isEmpty)
               Container(

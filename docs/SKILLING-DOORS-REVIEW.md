@@ -30,8 +30,8 @@ buy are stub sheets; the door stays behind `kDebugMode`; the preview ships.
 | Maths | `ParentVeda_Maths_structure.pdf` | plan sheet | none yet | — | — | — |
 | Memory | `ParentVeda_Memory_structure.pdf` | plan sheet | none yet | — | — | — |
 | Reading | `ParentVeda_Reading_structure.pdf` | plan sheet | none yet | — | — | — |
-| Stillness | `ParentVeda_Stillness_structure.pdf` | plan sheet | none yet | — | — | — |
-| Thinking | `ParentVeda_Thinking_structure.pdf` | door, 5 tabs (three band cards + Lessons + the keepsake as "You kept thinking") | none yet (no task PDFs) | commit next | no | `sk_thinking_door_test` |
+| Stillness | `ParentVeda_Stillness_structure.pdf` | door, 5 tabs (three band cards + Sessions + the keepsake as "Quiet moments taken") | none yet (no task PDFs) | commit next | no | `sk_stillness_door_test` |
+| Thinking | `ParentVeda_Thinking_structure.pdf` | door, 5 tabs (three band cards + Lessons + the keepsake as "You kept thinking") | none yet (no task PDFs) | db71b51 | no | `sk_thinking_door_test` |
 | Values | `ParentVeda_Values_structure.pdf` | plan sheet | none yet | — | — | — |
 
 Across all of them: `test/sk_doors_sanity_test.dart` holds that every
@@ -443,6 +443,85 @@ set). Frame only; no task PDFs exist for this door yet.
       first principles". Fine.
 - [ ] Not walked on a phone yet.
 
+## Stillness (§102)
+
+**Hand-back, as the brief's OUTPUT asks (2026-09-17):**
+
+- *Files changed:* `lib/data/doors/sk_door_stillness.dart` (new),
+  `lib/data/skilling/skilling_stillness_{activities,content,course,
+  products}.dart` (new), `lib/data/doors/sk_door_data.dart` (listed),
+  `lib/screens/skilling/sk_content_registry.dart` (registered),
+  `sk_door_content.dart` (`keepsakeInvite`), `sk_keepsake_screen.dart`
+  (draws it), `lib/data/brackets/skilling_brackets.dart` (row live: six
+  cells, Consult held), `test/sk_stillness_door_test.dart` (new).
+- *Every layer left notReady as content:* practices (36), sessions (24:
+  guided sits, gentle moving, resting), courses (3), products (9), parent
+  note — placeholders, ledger SL1–SL8. No meditation script, session,
+  activity or product copy written.
+- *Reused vs adapted vs new — the engines called out:* **reused** — the
+  breathing circle (`lib/widgets/breathing_circle.dart`, through the
+  `SkBreath` block), the app's one audio player (`RagaAudioStore`,
+  verified; wired the day a session exists), the `garbh` theme key, the
+  shared no-score keepsake, the gate, the surface, the scope, the shelves.
+  **Adapted** (marked on the cards, 2a) — the yoga in Garbh Sanskar → the
+  gentle-moving sessions; the Kriya body-scan
+  (`lib/data/kriya_relaxation_data.dart`) → the resting sessions. **New** —
+  one shell slot, `keepsakeInvite` (one gentle line on the keepsake, no
+  number, never a notification: the streak's replacement, 1a/3a); the
+  guided sits are kid-native slots; `sl_settle`, the one built page (4a),
+  is the circle with the brief's own words, the source the other doors
+  borrow. No second engine of any kind (a test scans for it).
+- *Named but not found / not used:* `pp_products` — not used on purpose,
+  skilling's own shelf holds (your Coding call). The breathing circle,
+  audio player, garbh theme and no-score keepsake were all found. Nothing
+  to stop on.
+
+Built to the brief literally on your calls of 2026-09-17 (1a refuse the
+streak · 2a engines reused, sessions kid-authored · 3a one line on the
+keepsake · 4a the settle breath built). Frame only; no task PDFs exist.
+
+- [ ] **Look:** Skilling → Stillness → the selector: five cards. Breathe
+      and wiggle · Sit and settle · Find your calm · Sessions · Quiet
+      moments taken. The footers are the brief's band lines, word for word.
+- [ ] **Look:** Sessions → three rails: Guided sits (the first card is
+      Settle, the built one; the rest "Kid-native") · Gentle moving
+      ("Adapted") · Resting ("Adapted"). The chip on each card is the call
+      2a mark, so a later fill knows which is which. Say if the chip words
+      should be plainer.
+- [ ] **Look:** Sessions → Settle: the app's one circle, in 3 / out 5, and
+      one line under it ("Nothing to get right"). This is the SOURCE page
+      Focus, Feelings and Memory will reference; Confidence's Steady your
+      nerves is the same circle with its own words. Two questions: should
+      Confidence's page become a window onto this one (one page, one owner)
+      or stay as its own words on the same circle? And is "Settle" the
+      right title, or the brief's "Settling"?
+- [ ] **Look:** Quiet moments taken → the shared keepsake under this name,
+      with one purple line: "Want to sit again? Whenever you like. There is
+      no chain to keep and no day to miss." The same words on an empty
+      shelf and a full one; no number anywhere. This is the streak's
+      replacement, your decision on the record (1a). Say if the line is
+      too long or the wrong tone.
+- [ ] **The three words on a practice.** The keepsake's buttons are the
+      shell's — "I tried it · I did it again · I made something". On a
+      breathing practice the third reads oddly. Options: leave (the words
+      are the stage's one vocabulary); or let a door hide "I made
+      something" (a shell slot). Yours.
+- [ ] **Look:** For the grown-up → the parent note card, "How stillness
+      helps, without over-selling it", coming soon; the three recorded
+      series (₹699 / $8 placeholders); no coach (held).
+- [ ] The hero photo — four children mid-leap in a misty grove
+      (`photo-1502086223501`). It is "breathe and wiggle" more than
+      "stillness"; the calm ones I could find were all adults. Say if you
+      want a quieter frame and I will look again.
+- [ ] Secular and inclusive: the frame's copy says "animal poses",
+      "stretch", "a quiet minute" — no mantra, no deity, no ritual. The
+      fills are held to the same line (a copy rule for later, per the
+      brief).
+- [ ] The tile says "Stillness"; the brief's door is "Meditation, yoga &
+      mindfulness". Fine.
+- [ ] Not walked on a phone (the device is the other terminal's until you
+      say).
+
 ## Cross-door windows
 
 `sk_page/<door>/<page>` as a `toolSurfaceId` on a page with no blocks —
@@ -452,14 +531,16 @@ Communication split the Communication brief names.
 
 | From | Into | Page | Status |
 |---|---|---|---|
-| Coding · `cd_811_12` Stuck? Try, Save, Try | Stillness | the settle-breath ("point to it, do not rebuild it") | owed — Stillness not built; the builder note was dropped from the parent line |
+| Coding · `cd_811_12` Stuck? Try, Save, Try | Stillness | the settle-breath ("point to it, do not rebuild it") | Stillness built 2026-09-17: the page is `sk_page/skilling_stillness/sl_settle`; the activity's link to it is a fill-time call |
 | Coding · `cd_1114_06` Why AI Gets It Wrong | Thinking | the "is this true" reasoning side | Thinking built 2026-09-17; its "Is this true?" set is the other half. The linking page waits on Coding's AI pages (coming soon) and Thinking's strand fill — the one defence, authored once when both exist |
 | Coding · `cd_1114_12` Share It and Make It Better | Making (Creativity) | the private, family-only showcase posture | owed — no sharing feature exists on either door; sharing here is offline, to a family member |
 | Communication | Confidence | the shared speaking practice — Confidence owns the nerve and the audience, Expression the clarity and the back-and-forth; the recorder is built once (`sk_voice_keepsake.dart`) | owed — Confidence not built; it windows into Communication's prompt sets when it lands |
 | Communication | Reading | "a child reads a story there and retells it here" | owed — Reading not built |
 | Communication | Feelings | "Feelings owns naming the emotion; Expression owns putting it into clear words" | owed — Feelings not built |
 | Confidence | Communication | the shared speaking practice — Confidence dares to say it, Communication says it clearly; one recorder (`sk_voice_keepsake.dart`), used by both | built as the shared recorder; the prompt-set window waits on Communication's lesson fill |
-| Confidence · `cf_breath` | Stillness | the quick calming breath — "Confidence references that breath for the moment before you speak, it does not build its own" | built as the app's one circle in an `SkBreath` block; the Stillness page it should link to does not exist yet |
+| Confidence · `cf_breath` | Stillness | the quick calming breath — "Confidence references that breath for the moment before you speak, it does not build its own" | Stillness built 2026-09-17: `sl_settle` is the same circle, same numbers (a test holds the pattern identical). Whether `cf_breath` becomes a window onto `sl_settle` or keeps its own words is on the Stillness review list |
+| Stillness · `sl_settle` and the calming / resting sessions | Focus, Feelings, Memory | "Stillness is the source, others borrow from it. Focus borrows a settle-breath to apply to a task, Feelings borrows a calming practice to handle an emotion, Memory borrows study-calm" | the source exists; the borrowers do not. Each references `sk_page/skilling_stillness/…` when built, never its own breath |
+| Stillness | Feelings | "Feelings owns naming and understanding an emotion; Stillness owns settling the body. Cross-link tightly, keep each in its own home" | owed — Feelings not built; the parent note's subtitle already sends real distress to "the emotional doors and a professional" |
 | Confidence | Feelings | "naming and handling the fear is Feelings" | owed — Feelings not built |
 | Confidence · `cf_1114_01` | Thinking | Speak Up to a Grown-Up "cross-links to the Thinking door's 'question ideas, not elders' line; keep the tone consistent across both" | Thinking built 2026-09-17 on the careful framing (1a); the line lives in its parent note `th_parent_note` (coming soon) — the page id goes here when that note is written |
 | Thinking · `is_it_true` set | Coding · `ai` set | "Thinking owns the reasoning (is this true, who says so, how would I know); Coding's AI literacy owns the mechanism (how AI generates content, why it errs and is biased); the two cross-link into one defence built once" | the cross-link slot: the set's blurb names the Coding door; both halves coming soon; the linking page is authored once when they exist |
