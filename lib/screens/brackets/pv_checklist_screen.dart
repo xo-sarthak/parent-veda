@@ -39,6 +39,7 @@ import '../../services/pregnancy_controller.dart';
 import '../../services/pv_checklist_store.dart';
 import '../../services/pv_checklist_subjects.dart';
 import '../../theme/pv_fonts.dart';
+import '../../widgets/pv_feedback.dart';
 import '../doors/pv_door_chrome.dart';
 import '../v2/v2_palette.dart';
 
@@ -214,8 +215,12 @@ class _ItemRow extends StatelessWidget {
       checked: ticked,
       button: true,
       label: item.text,
-      child: GestureDetector(
-        onTap: onTap,
+      child: PvPress(
+          child: GestureDetector(
+        onTap: () {
+          pvCommitFeedback();
+          onTap();
+        },
         behavior: HitTestBehavior.opaque,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 160),
@@ -255,7 +260,7 @@ class _ItemRow extends StatelessWidget {
             ),
           ]),
         ),
-      ),
+      )),
     );
   }
 }

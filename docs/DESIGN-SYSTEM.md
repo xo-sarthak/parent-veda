@@ -481,6 +481,20 @@ hairline rows, steps are quiet numbered circles, the picture sits above a
 category eyebrow and an author row — which is what the parenting blocks
 already were, so they render inside the reader unchanged.
 
+## 4.0c Feedback — every commit tap answers — SETTLED 2026-09-18
+
+The user: *"consider the taps and the effects that make the user feel like
+they did something."* One component, `lib/widgets/pv_feedback.dart`:
+**`PvPress`** (a 2% settle on pointer-down, 120 ms — Airbnb, Notion, Linear:
+a press scales, never dims) on tiles, rows and cards; **`PvTick`** for any
+list that marks a thing done (bounce 1 → 1.18 → 1 in 220 ms, the mark
+cross-fades, a light haptic — Things, Apple Reminders, Todoist);
+**`pvCommitFeedback()`** — the haptic alone — for a commit that already has
+a visual answer (a pill that becomes a "thanks"). Wired so far: the scans
+timeline's ticks and Up-next card, the reader's foot tiles and helpful
+pills, the checklist rows, all of onboarding (`ObPress` is now an alias).
+New surfaces use these rather than a bare `InkWell`.
+
 ## 4.0b The tag table — one format per chip — SETTLED 2026-09-18
 
 The user: *"we should be fixing one format… for tags like interactive,

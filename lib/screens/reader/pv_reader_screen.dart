@@ -55,6 +55,7 @@ import '../../models/pv_video_slot.dart';
 import '../../services/pv_read_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_placeholders.dart';
+import '../../widgets/pv_feedback.dart';
 import '../brackets/hub/hub_solution_cards.dart';
 import '../v2/v2_palette.dart';
 
@@ -1309,7 +1310,10 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
       );
     }
     Widget pill(String label, bool value) => InkWell(
-          onTap: () => _store.setHelpful(a.id, value),
+          onTap: () {
+            pvCommitFeedback();
+            _store.setHelpful(a.id, value);
+          },
           borderRadius: BorderRadius.circular(999),
           child: Container(
             height: 38,
@@ -1526,7 +1530,8 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
         .toColor();
     final photo = imageUrl != null && imageUrl.isNotEmpty;
 
-    return InkWell(
+    return PvPress(
+        child: InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(18),
       child: Container(
@@ -1622,7 +1627,7 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
           ),
         ]),
       ),
-    );
+    ));
   }
 
   // Kept for revert — the stacked rows; [_readNextRail] replaced it 2026-09-16.

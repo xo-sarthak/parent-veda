@@ -46,6 +46,7 @@ import '../../models/scan_appointment.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../services/scans_store.dart';
 import '../../theme/pv_fonts.dart';
+import '../../widgets/pv_feedback.dart';
 import '../v2/v2_palette.dart';
 import '../tools/scans_appointments_screen.dart';
 import 'scan_detail_screen.dart';
@@ -358,7 +359,9 @@ class _UpNext extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final b = booked;
-    return InkWell(
+    final note = ScansStore.instance.noteFor(scan.id);
+    return PvPress(
+        child: InkWell(
       onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
         settings: const RouteSettings(name: 'scans/detail'),
         builder: (_) => ScanDetailScreen(scan: scan, pregnancy: pregnancy),
@@ -404,21 +407,50 @@ class _UpNext extends StatelessWidget {
             ),
           ]),
           const SizedBox(height: 14),
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton(
-              onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(
-                settings: const RouteSettings(name: 'appointments'),
-                builder: (_) => ScansAppointmentsScreen(controller: pregnancy),
-              )),
-              child: Text(b == null
-                  ? _en('Add the date').of(lang)
-                  : _en('See the appointment').of(lang)),
+          // Two things she can do for THIS scan, side by side: the date, and
+          // a note — what the doctor said, the report number, a question to
+          // carry in. The user (2026-09-18): "have a button that does
+          // something useful for that particular scan… it should be a
+          // working feature." The note is hers, saved in ScansStore, shown
+          // here and on the scan's row in the run.
+          Row(children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                  settings: const RouteSettings(name: 'appointments'),
+                  builder: (_) => ScansAppointmentsScreen(controller: pregnancy),
+                )),
+                child: Text(b == null
+                    ? _en('Add the date').of(lang)
+                    : _en('See the appointment').of(lang)),
+              ),
             ),
-          ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () => showScanNoteSheet(context, scan: scan, lang: lang),
+                child: Text(note == null
+                    ? _en('Add a note').of(lang)
+                    : _en('Edit the note').of(lang)),
+              ),
+            ),
+          ]),
+          if (note != null) ...[
+            const SizedBox(height: 14),
+            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Icon(Icons.sticky_note_2_outlined, size: 16, color: p.ink3),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(note,
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                    style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
+              ),
+            ]),
+          ],
         ]),
       ),
-    );
+    ));
   }
 
   static String _dateLine(Appointment a) {
@@ -470,13 +502,16 @@ class _RunRow extends StatelessWidget {
     final canToggle = isDone || from <= week;
     final b = booked;
 
-    final meta = isDone
-        ? _en('Done').of(lang)
-        : b != null
-            ? _UpNext._dateLine(b)
-            : where == _Where.passed
-                ? _en('Not marked as done').of(lang)
-                : (scan.altName ?? scan.when).of(lang);
+    final note = ScansStore.instance.noteFor(scan.id);
+    final meta = note != null
+        ? note
+        : isDone
+            ? _en('Done').of(lang)
+            : b != null
+                ? _UpNext._dateLine(b)
+                : where == _Where.passed
+                    ? _en('Not marked as done').of(lang)
+                    : (scan.altName ?? scan.when).of(lang);
 
     return InkWell(
       onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
@@ -526,11 +561,14 @@ class _RunRow extends StatelessWidget {
             ]),
           ),
           const SizedBox(width: 12),
-          // The tick. Filled ink when done; a ring otherwise, heavier on
-          // the next one. Tappable only once the window has opened — a
-          // scan that is months away cannot be "done" yet.
-          GestureDetector(
-            behavior: HitTestBehavior.opaque,
+          // The tick — bounces and hums when toggled (PvTick). Tappable only
+          // once the window has opened; a scan months away cannot be "done".
+          PvTick(
+            done: isDone,
+            emphasis: isNext,
+            ink: p.ink1,
+            line: p.line,
+            surface: p.surface,
             onTap: canToggle
                 ? () => isDone
                     ? ScansStore.instance.unmarkCompleted(scan.id)
@@ -539,27 +577,6 @@ class _RunRow extends StatelessWidget {
                         journalTitle: scan.name.of(lang),
                         week: week)
                 : null,
-            child: Padding(
-              padding: const EdgeInsets.all(6),
-              child: Container(
-                width: 24,
-                height: 24,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: isDone ? p.ink1 : Colors.transparent,
-                  border: Border.all(
-                      color: isDone
-                          ? p.ink1
-                          : isNext
-                              ? p.ink1
-                              : p.line,
-                      width: isNext && !isDone ? 1.8 : 1.4),
-                ),
-                child: isDone
-                    ? Icon(Icons.check_rounded, size: 15, color: p.surface)
-                    : null,
-              ),
-            ),
           ),
         ]),
       ),
@@ -1071,4 +1088,88 @@ class _Dot extends StatelessWidget {
       ]),
     );
   }
+}
+
+/// The note sheet — one field, save, and delete when there is one.
+///
+/// A bottom sheet rather than a page: she is on the timeline, the note is a
+/// sentence or two, and the sheet keeps the scan in view behind it (the
+/// pattern every notes-on-a-thing app uses — Zocdoc's visit notes, Apple
+/// Health's add-a-note). 24-pt top radius, actions pinned, ink pill to save
+/// (DESIGN-SYSTEM §4.0). Saving hums; the card and the row re-read the store.
+Future<void> showScanNoteSheet(BuildContext context,
+    {required TestScanInfo scan, required AppLanguage lang}) async {
+  final p = V2PaletteStore.instance.current;
+  final existing = ScansStore.instance.noteFor(scan.id) ?? '';
+  final ctl = TextEditingController(text: existing);
+  await showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: p.surface,
+    shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+    builder: (ctx) => Padding(
+      padding: EdgeInsets.fromLTRB(
+          20, 18, 20, 20 + MediaQuery.viewInsetsOf(ctx).bottom),
+      child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(_en('A NOTE ON').of(lang),
+            style: pvManrope(
+                fontSize: 10,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.3,
+                color: p.ink3)),
+        const SizedBox(height: 4),
+        Text(scan.name.of(lang),
+            style: pvFraunces(
+                fontSize: 22, fontWeight: FontWeight.w600, height: 1.2, color: p.ink1)),
+        const SizedBox(height: 14),
+        TextField(
+          controller: ctl,
+          autofocus: true,
+          minLines: 3,
+          maxLines: 6,
+          textCapitalization: TextCapitalization.sentences,
+          style: pvManrope(fontSize: 15, height: 1.5, color: p.ink1),
+          decoration: InputDecoration(
+            hintText: _en('What the doctor said, the report number, a question to ask…')
+                .of(lang),
+            hintStyle: pvManrope(fontSize: 14, height: 1.5, color: p.ink3),
+            filled: true,
+            fillColor: p.surfaceAlt,
+            border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
+            focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(16),
+                borderSide: BorderSide(color: p.ink1, width: 1.4)),
+            contentPadding: const EdgeInsets.all(14),
+          ),
+        ),
+        const SizedBox(height: 14),
+        Row(children: [
+          if (existing.isNotEmpty) ...[
+            TextButton(
+              onPressed: () async {
+                pvCommitFeedback();
+                await ScansStore.instance.setNote(scan.id, '');
+                if (ctx.mounted) Navigator.of(ctx).pop();
+              },
+              child: Text(_en('Delete').of(lang)),
+            ),
+            const Spacer(),
+          ],
+          Expanded(
+            flex: existing.isNotEmpty ? 0 : 1,
+            child: FilledButton(
+              onPressed: () async {
+                pvCommitFeedback();
+                await ScansStore.instance.setNote(scan.id, ctl.text);
+                if (ctx.mounted) Navigator.of(ctx).pop();
+              },
+              child: Text(_en('Save').of(lang)),
+            ),
+          ),
+        ]),
+      ]),
+    ),
+  );
 }

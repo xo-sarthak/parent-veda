@@ -24,37 +24,17 @@
 import 'package:flutter/material.dart';
 
 import '../../../theme/pv_fonts.dart';
+import '../../../widgets/pv_feedback.dart';
 import '../../v2/v2_palette.dart';
 
 /// Press feedback for every base component: a 2% settle while the finger is
 /// down, back on release. Airbnb's and Linear's buttons do exactly this and
 /// nothing more — it is the difference between "tapped" and "pressed", and it
 /// costs 120 ms. Ripples stay (InkWell inside); the scale wraps them.
-class ObPress extends StatefulWidget {
-  const ObPress({super.key, required this.child, this.enabled = true});
-  final Widget child;
-  final bool enabled;
-
-  @override
-  State<ObPress> createState() => _ObPressState();
-}
-
-class _ObPressState extends State<ObPress> {
-  bool _down = false;
-
-  @override
-  Widget build(BuildContext context) => Listener(
-    onPointerDown: widget.enabled ? (_) => setState(() => _down = true) : null,
-    onPointerUp: (_) => setState(() => _down = false),
-    onPointerCancel: (_) => setState(() => _down = false),
-    child: AnimatedScale(
-      scale: _down ? 0.98 : 1,
-      duration: const Duration(milliseconds: 120),
-      curve: Curves.easeOut,
-      child: widget.child,
-    ),
-  );
-}
+/// The press feedback — now the app-wide `PvPress` (lib/widgets/pv_feedback.dart),
+/// promoted 2026-09-18 so every tile presses the same way. Kept as a name so
+/// the onboarding screens read as before.
+typedef ObPress = PvPress;
 
 /// Page frame: ground, safe area, an optional back arrow and a scrolling body
 /// with the primary action pinned beneath it.

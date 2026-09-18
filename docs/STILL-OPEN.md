@@ -7397,6 +7397,66 @@ wired the day a session exists. Not walked on a phone.
 
 ---
 
+## 103.0 Feelings, the sixth skilling door — 2026-09-18
+
+Built to `ParentVeda_Feelings_structure.pdf` ("the mental-health door,
+and the one that carries the most weight of all twelve") on the shell as
+it stood after Stillness. The door is `lib/data/doors/sk_door_feelings.
+dart` over `lib/data/skilling/skilling_feelings_*.dart`, with three new
+shell files — `sk_safety.dart`, `sk_journal.dart`, `sk_crisis_pathway.
+dart`; the contract is `test/sk_feelings_door_test.dart`; owed content is
+`docs/DOOR-CONTENT-OWED.md` FE1–FE14; the review list is
+`docs/SKILLING-DOORS-REVIEW.md`. Generic points: `SKILLING-DOOR-BUILD.md` §9.
+
+### 103.1 The calls — 2026-09-18
+
+1a **the journal child-private by default** — the parent owns the
+account, consent and deletion and does not read entries; help is one tap
+away inside the journal; **flagged for legal review** against DPDP's
+parental-consent rules, the brief's own "one of the two heaviest calls in
+the whole build" · 2a the off-ramp shows **real numbers, flagged verify**
+(Childline 1098, Tele-MANAS 14416) with tap-to-call; a release build
+hides anything still flagged · 3a **AES-256-GCM at rest** via
+`pointycastle`, made a direct dependency (it was already in the lock via
+Supabase; no version changed) · 4a the off-ramp as **a bar at the foot of
+every child screen** of the door, ungated on purpose — the one ungated
+link off a child screen in the stage, on the record.
+
+### 103.2 What changed
+
+Two shell slots (`journal`, `safety`) and three shell files. The off-ramp
+bar and sheet (records nothing, anywhere). The private journal: an index
+with ids and dates and no text; each page sealed in its own file with a
+fresh nonce; one reader, her own page; the parent can delete it and
+cannot read it; withdrawing consent forgets it with the key. The crisis
+pathway as a stub that does nothing and STOPS. Six SEL skills from the
+brief's table, 36 activity slots, two lesson sets marked "Needs review"
+on every card, one window onto Stillness's settle breath (the stage's
+first cross-door window), three recorded series, nine products, the
+parent note under the brief's own title. The bracket: five cells live,
+Consult held, and extras `notApplicable` — the stage's first refused
+cell, with the brief's reason ("an emotional progress report on a child
+is unthinkable, and it is a score"), named as the one exception in
+`bracket_model_test`. Not walked on a phone.
+
+### 103.3 Needs a decision, and three reviews before anything ships
+
+* **Legal:** the child-private journal against DPDP parental consent.
+* **Clinical:** every scenario, prompt and the parent note — nothing is
+  authored until a child psychologist has reviewed a task; and the
+  helpline wording.
+* **Legal and clinical:** the helpline numbers themselves (verify).
+* **Key custody:** the journal's key must move from `shared_preferences`
+  to the platform keystore — a dependency call (`flutter_secure_storage`
+  or equal).
+* **The crisis pathway** is designed by a child psychologist and a lawyer,
+  not here. What they decide is listed in `sk_crisis_pathway.dart`.
+* Whether the off-ramp bar should also sit on Confidence (its task 6
+  names "the door's help line") or on every door.
+* The keepsake's third word on a feelings activity; the hero photo.
+
+---
+
 ## 59.0 Onboarding is decided against the Mobbin audit; three things it leaves open — OPENED 2026-09-16
 
 `docs/ONBOARDING-AUDIT.md` holds the audit, the seven-screen decision and the
@@ -7728,6 +7788,26 @@ booked date or "No date added yet", one white pill), then *The usual run*
 — week block, name, one meta line, a tick circle that toggles done. Legend,
 station dots, "Mark as done" links and NEXT UP / DONE pills retired (kept
 in the file for revert). Walked on the phone.
+
+### 63.9 A note on each scan — 2026-09-18
+
+The Up-next card carries two pills: *Add the date* (the appointments
+screen) and *Add a note* — a bottom sheet, one field, Save / Delete. The
+note is hers: `ScansStore.noteFor / setNote`, `shared_preferences` key
+`scans_notes`, shown on the card and as the scan's row meta in the run.
+Held by `test/scan_note_test.dart`. **Owed:** the cloud column
+(`completed_scans` has no notes; a `scan_notes` table keyed by user +
+scan id, LWW like the rest — BACKEND-PATTERNS §sync), and the partner
+seeing her note. The user's launch rule, recorded here for the next
+feature: *"whatever that button does should be working… not static."*
+
+### 63.8 Tap feedback as a component — DESIGN-SYSTEM §4.0c, 2026-09-18
+
+`PvPress` / `PvTick` / `pvCommitFeedback` in `lib/widgets/pv_feedback.dart`;
+wired on the scans timeline, the reader's foot, the checklist and
+onboarding. **Owed:** the door rail cards and the home door grid (a press
+settle), the story deck's chevrons, the TTC insight rail — as each is
+walked.
 
 ### 63.7 One format per tag — DESIGN-SYSTEM §4.0b, 2026-09-18
 

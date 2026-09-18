@@ -24,6 +24,33 @@ class ScansStore extends ChangeNotifier {
 
   static const _completedKey = 'scans_completed';
   static const _apptKey = 'scans_appointments';
+  static const _notesKey = 'scans_notes';
+
+  /// Her own note on a scan, by scan id — what the doctor said, the report
+  /// number, a question to carry in. Added 2026-09-18 for the timeline's
+  /// "Add a note"; local-first like everything here (STILL-OPEN §63.9 owes
+  /// the cloud column).
+  final Map<String, String> _notes = {};
+
+  String? noteFor(String scanId) {
+    final n = _notes[scanId];
+    return n == null || n.trim().isEmpty ? null : n;
+  }
+
+  Future<void> setNote(String scanId, String text) async {
+    final t = text.trim();
+    if (t.isEmpty) {
+      if (_notes.remove(scanId) == null) return;
+    } else {
+      if (_notes[scanId] == t) return;
+      _notes[scanId] = t;
+    }
+    notifyListeners();
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_notesKey, jsonEncode(_notes));
+    } catch (_) {}
+  }
 
   final List<CompletedScan> _completed = [];
   final List<Appointment> _appts = [];
@@ -52,6 +79,10 @@ class ScansStore extends ChangeNotifier {
         for (final e in (jsonDecode(a) as List)) {
           _appts.add(Appointment.fromJson(Map<String, dynamic>.from(e)));
         }
+      }
+      final n = prefs.getString(_notesKey);
+      if (n != null) {
+        (jsonDecode(n) as Map).forEach((k, v) => _notes['$k'] = '$v');
       }
     } catch (_) {/* start empty */}
     _loaded = true;

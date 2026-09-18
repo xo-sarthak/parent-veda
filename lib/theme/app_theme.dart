@@ -536,9 +536,12 @@ final ColorScheme _lightScheme = ColorScheme(
           borderRadius: BorderRadius.circular(_rInput),
           borderSide: BorderSide.none,
         ),
+        // Ink ring on focus, not violet (DESIGN-SYSTEM §4.0, 2026-09-18 —
+        // seen on the scan note sheet). The caret stays `primary`: a thin
+        // accent is the rule's own list. Kept for revert: scheme.primary.
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(_rInput),
-          borderSide: BorderSide(color: scheme.primary, width: 1.6),
+          borderSide: BorderSide(color: scheme.onSurface, width: 1.4),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(_rInput),
