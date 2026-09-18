@@ -1,0 +1,6 @@
+requests
+praw
+scikit-learn
+fastembed
+openpyxl
+numpy

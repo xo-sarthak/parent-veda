@@ -7935,7 +7935,7 @@ pickers and text buttons ink app-wide. Owed on this door: the booking flow
 under the consult detail (shared with the doctors terminal); the locker
 walked with a real report. Next door: Complications.
 
-### 63.11 The Ask Veda FAB — restyle owed — 2026-09-18
+### 63.11 The Ask Veda FAB — DONE 2026-09-19 (two-tone violet, lifted above the nav pill; BASE-UI §2.1). Owed: a drawn Veda mark in place of the stock sparkle — the user: "maybe change the logo for Ask Veda"
 
 The user: "very purple and outdated… like a sore thumb on the Products
 page and the new pages. Not a lot of changes, a little tweak so it matches

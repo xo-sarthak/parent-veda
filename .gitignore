@@ -215,3 +215,11 @@ docs/design-prompts/
 research/mobbin/**/*.webp
 research/mobbin/**/*.jpg
 research/mobbin/**/*.png
+
+# Question miner (tools/question_miner/). The embedding model is 66 MB of
+# ONNX pulled by fetch_model.py; the SQLite store is rebuilt by every run.
+# What IS tracked is the recipe (the tool) and the rendered pool under
+# research/questions/ - the CSVs and the workbook are the deliverable.
+tools/question_miner/.models/
+research/questions/questions.sqlite*
+research/questions/*.log
