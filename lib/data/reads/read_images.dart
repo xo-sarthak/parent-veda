@@ -23,9 +23,415 @@
 // ⚠️ NO RAWPIXEL — 2026-09-19. Twenty-two entries were
 // `images.rawpixel.com/image_1300/…` previews, and rawpixel tiles its logo
 // across a preview (seen on the phone, STILL-OPEN §63.13). Replaced through
-// Openverse with `source=stocksnap` (CC0, served clean at 960px); the ten
-// Flickr `_b.jpg` files were fine and stay.
+// Openverse with `source=stocksnap` (CC0, served clean at 960px). The ten
+// Flickr files went the same way on 2026-09-19: Flickr's CDN resets the
+// connection from Indian networks (checked: all ten failed, all 86 others
+// served), so one host — StockSnap — for the whole table.
 const Map<String, String> kReadImageUrls = {
+  // Is it safe? — 2026-09-19. One photo per Can I entry (`cani_<id>`) and
+  // one per shelf (`cani_shelf_<category>`), picked by hand from contact
+  // sheets of Wikimedia Commons and StockSnap candidates. Placeholders on
+  // their way to cut-outs on R2 (STILL-OPEN §68.4); a missing id falls
+  // back to the category icon in the tile.
+  'cani_papaya':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/03_Preparing_papaya_fruit_-_papaya_peeled_and_cut_in_half.jpg/960px-03_Preparing_papaya_fruit_-_papaya_peeled_and_cut_in_half.jpg',
+  'cani_pineapple':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0f/Fruit_drink.jpg/960px-Fruit_drink.jpg',
+  'cani_mango':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/Mangos_-_single_and_halved.jpg/960px-Mangos_-_single_and_halved.jpg',
+  'cani_banana':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Bunch_of_bananas_on_sale.jpg/960px-Bunch_of_bananas_on_sale.jpg',
+  'cani_curd':
+      'https://upload.wikimedia.org/wikipedia/commons/f/fc/Bread_Dahi_Vada_Naivaidya.jpg',
+  'cani_chocolate':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Green_and_Black%27s_dark_chocolate_bar_2.jpg/960px-Green_and_Black%27s_dark_chocolate_bar_2.jpg',
+  'cani_street_food':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Golgappa_Pani_Puri_India.jpg/960px-Golgappa_Pani_Puri_India.jpg',
+  'cani_honey':
+      'https://cdn.stocksnap.io/img-thumbs/960w/97LJAKWL36.jpg',
+  'cani_ginger':
+      'https://upload.wikimedia.org/wikipedia/commons/c/c1/Ginger_Plant_vs.jpg',
+  'cani_coffee':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/A_small_cup_of_coffee.JPG/960px-A_small_cup_of_coffee.JPG',
+  'cani_tea':
+      'https://cdn.stocksnap.io/img-thumbs/960w/0ZS74TCOME.jpg',
+  'cani_green_tea':
+      'https://cdn.stocksnap.io/img-thumbs/960w/04E3HNGAKH.jpg',
+  'cani_coconut_water':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/Tender_coconut_water_02.jpg/960px-Tender_coconut_water_02.jpg',
+  'cani_buttermilk':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Plain_Lassi_in_a_glass.jpg/960px-Plain_Lassi_in_a_glass.jpg',
+  'cani_alcohol':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f9/Bottle_and_glass_of_Barefoot_white_zinfandel_wine%2C_2012.jpg/960px-Bottle_and_glass_of_Barefoot_white_zinfandel_wine%2C_2012.jpg',
+  'cani_soft_drinks':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Glass_cola.jpg/960px-Glass_cola.jpg',
+  'cani_water':
+      'https://cdn.stocksnap.io/img-thumbs/960w/SVHF6MUWVZ.jpg',
+  'cani_paracetamol':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Tylenol_paracetamol_sustained_release_tablets%2C_Chinese_version_%2820221212120513%29.jpg/960px-Tylenol_paracetamol_sustained_release_tablets%2C_Chinese_version_%2820221212120513%29.jpg',
+  'cani_ibuprofen':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/200mg_ibuprofen_tablets.jpg/960px-200mg_ibuprofen_tablets.jpg',
+  'cani_combiflam':
+      'https://cdn.stocksnap.io/img-thumbs/960w/TPI078T0IS.jpg',
+  'cani_antibiotics':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/18/Co-fluampicil_capsules_and_container.jpg/960px-Co-fluampicil_capsules_and_container.jpg',
+  'cani_folic_acid':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Prenatal_vitamin_tablets.jpg/960px-Prenatal_vitamin_tablets.jpg',
+  'cani_calcium':
+      'https://upload.wikimedia.org/wikipedia/commons/8/89/Calcium-Tablets-2007.jpg',
+  'cani_vitamin_d':
+      'https://upload.wikimedia.org/wikipedia/commons/7/75/%D0%A0%D1%8B%D0%B1%D0%B8%D0%B9_%D0%B6%D0%B8%D1%80_%D0%B2_%D0%BA%D0%B0%D0%BF%D1%81%D1%83%D0%BB%D0%B0%D1%85.jpg',
+  'cani_flight_travel':
+      'https://cdn.stocksnap.io/img-thumbs/960w/J9FFZI8YC0.jpg',
+  'cani_long_travel':
+      'https://cdn.stocksnap.io/img-thumbs/960w/ZR6M4FRGPN.jpg',
+  'cani_yoga':
+      'https://cdn.stocksnap.io/img-thumbs/960w/W23EUNXBCG.jpg',
+  'cani_swimming':
+      'https://cdn.stocksnap.io/img-thumbs/960w/EQOZK44067.jpg',
+  'cani_walking':
+      'https://cdn.stocksnap.io/img-thumbs/960w/RIUG2ATBWT.jpg',
+  'cani_hair_color':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Hair_dyes_for_hair_colouring_in_a_shelf_of_a_hair_salon_in_Germany.jpg/960px-Hair_dyes_for_hair_colouring_in_a_shelf_of_a_hair_salon_in_Germany.jpg',
+  'cani_waxing':
+      'https://cdn.stocksnap.io/img-thumbs/960w/CUGFVFAI24.jpg',
+  'cani_nail_polish':
+      'https://cdn.stocksnap.io/img-thumbs/960w/S6RLOBPAOZ.jpg',
+  'cani_sex':
+      'https://cdn.stocksnap.io/img-thumbs/960w/TMPW2UJPBR.jpg',
+  'cani_sleeping_back':
+      'https://cdn.stocksnap.io/img-thumbs/960w/46BMYP2BDJ.jpg',
+  'cani_mosquito_repellent':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Mosquito_coil.JPG/960px-Mosquito_coil.JPG',
+  'cani_dental':
+      'https://cdn.stocksnap.io/img-thumbs/960w/N79O15BH30.jpg',
+  'cani_xray':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/An_XRay_machine_in_Orthopeadic_clinic.jpg/960px-An_XRay_machine_in_Orthopeadic_clinic.jpg',
+  'cani_sauna':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Sauna_of_the_spa_at_Amantaka_luxury_Resort_%26_Hotel_in_Luang_Prabang_Laos.jpg/960px-Sauna_of_the_spa_at_Amantaka_luxury_Resort_%26_Hotel_in_Luang_Prabang_Laos.jpg',
+  'cani_fasting':
+      'https://cdn.stocksnap.io/img-thumbs/960w/AMW6XPP8AT.jpg',
+  'cani_apple':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Red_Apple.jpg/960px-Red_Apple.jpg',
+  'cani_orange':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2c/Blood_orange_slice.jpg/960px-Blood_orange_slice.jpg',
+  'cani_grapes':
+      'https://cdn.stocksnap.io/img-thumbs/960w/3DC9F8D017.jpg',
+  'cani_watermelon':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Watermelon_slice%2C_May_2024.jpg/960px-Watermelon_slice%2C_May_2024.jpg',
+  'cani_muskmelon':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Cucumis_melo_var._reticulatus_%28photo_by_Scott_Bauer%29.jpg/960px-Cucumis_melo_var._reticulatus_%28photo_by_Scott_Bauer%29.jpg',
+  'cani_guava':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Goiaba_vermelha.jpg/960px-Goiaba_vermelha.jpg',
+  'cani_pomegranate':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Pomegranate_arils.jpg/960px-Pomegranate_arils.jpg',
+  'cani_chikoo':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f1/Chikoo%2C_Sapodilla%2C_Noseberry%2C_Mudapples_%28Manilkara_zapota%29_%E0%B4%B8%E0%B4%AA%E0%B5%8D%E0%B4%AA%E0%B5%8B%E0%B4%9F%E0%B5%8D%E0%B4%9F._%2839254772404%29.jpg/960px-Chikoo%2C_Sapodilla%2C_Noseberry%2C_Mudapples_%28Manilkara_zapota%29_%E0%B4%B8%E0%B4%AA%E0%B5%8D%E0%B4%AA%E0%B5%8B%E0%B4%9F%E0%B5%8D%E0%B4%9F._%2839254772404%29.jpg',
+  'cani_litchi':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Lychee_fruits_and_seed.jpg/960px-Lychee_fruits_and_seed.jpg',
+  'cani_jackfruit':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Jackfruit_Flesh.jpg/960px-Jackfruit_Flesh.jpg',
+  'cani_dates':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Dates_10-8-09-101309_copy.jpg/960px-Dates_10-8-09-101309_copy.jpg',
+  'cani_figs':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Fig_%28Ficus_carica%29_fruit_halved.jpg/960px-Fig_%28Ficus_carica%29_fruit_halved.jpg',
+  'cani_berries':
+      'https://cdn.stocksnap.io/img-thumbs/960w/4WN4U4DM5L.jpg',
+  'cani_kiwi':
+      'https://cdn.stocksnap.io/img-thumbs/960w/QLO68U090J.jpg',
+  'cani_pear':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Four_pears.jpg/960px-Four_pears.jpg',
+  'cani_dry_fruits':
+      'https://cdn.stocksnap.io/img-thumbs/960w/4EXMQZWRDQ.jpg',
+  'cani_almonds':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Liat_Portal_for_Foodie_Disorder_-_Raw_almonds_in_a_bowl.jpg/960px-Liat_Portal_for_Foodie_Disorder_-_Raw_almonds_in_a_bowl.jpg',
+  'cani_walnuts':
+      'https://cdn.stocksnap.io/img-thumbs/960w/KQK5TLH6E1.jpg',
+  'cani_cashews':
+      'https://cdn.stocksnap.io/img-thumbs/960w/HWP9X99UM3.jpg',
+  'cani_peanuts':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Roasted_Peanuts_with_shell.jpg/960px-Roasted_Peanuts_with_shell.jpg',
+  'cani_sabudana':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Sabudana_Khichdi_with_Sweet_curd.JPG/960px-Sabudana_Khichdi_with_Sweet_curd.JPG',
+  'cani_spinach':
+      'https://upload.wikimedia.org/wikipedia/commons/f/fc/A_pot_of_cut_spinach_leaves_with_carrots_and_onions.jpg',
+  'cani_drumstick':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Moringa_oleifera_drumstick_pods.JPG/960px-Moringa_oleifera_drumstick_pods.JPG',
+  'cani_brinjal':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Solanum_melongena_24_08_2012_%281%29.JPG/960px-Solanum_melongena_24_08_2012_%281%29.JPG',
+  'cani_potato':
+      'https://cdn.stocksnap.io/img-thumbs/960w/RYSFFCA1QV.jpg',
+  'cani_tomato':
+      'https://cdn.stocksnap.io/img-thumbs/960w/GB9LU1L8RG.jpg',
+  'cani_carrot':
+      'https://cdn.stocksnap.io/img-thumbs/960w/VXT0GH53QR.jpg',
+  'cani_beetroot':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/Beetroots_in_a_basket.jpg/960px-Beetroots_in_a_basket.jpg',
+  'cani_sprouts':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Mung_beans_%28Vigna_radiata%29.jpg/960px-Mung_beans_%28Vigna_radiata%29.jpg',
+  'cani_raw_salad':
+      'https://cdn.stocksnap.io/img-thumbs/960w/Z0133GNPXT.jpg',
+  'cani_mushroom':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/2016-01_Agaricus_bisporus_07.jpg/960px-2016-01_Agaricus_bisporus_07.jpg',
+  'cani_egg':
+      'https://cdn.stocksnap.io/img-thumbs/960w/M9KEI36GNT.jpg',
+  'cani_chicken':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Chicken_Curry_9.jpg/960px-Chicken_Curry_9.jpg',
+  'cani_mutton':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/51/Mutton_Curry_%2844786%29.jpg/960px-Mutton_Curry_%2844786%29.jpg',
+  'cani_fish':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Meen_curry_2.JPG/960px-Meen_curry_2.JPG',
+  'cani_prawns':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ca/Peeling_cooked_baltic_prawns_Dragstrup_Vig_2009-08-04.jpg/960px-Peeling_cooked_baltic_prawns_Dragstrup_Vig_2009-08-04.jpg',
+  'cani_high_mercury_fish':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Xiphias_gladius_stuffed.jpg/960px-Xiphias_gladius_stuffed.jpg',
+  'cani_dal':
+      'https://cdn.stocksnap.io/img-thumbs/960w/WOZ7PQGMMI.jpg',
+  'cani_soya':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Rotini_with_vegetable_tikka_masala%2C_textured_vegetable_protein%2C_peanuts%2C_and_black_pepper_-_Massachusetts.jpg/960px-Rotini_with_vegetable_tikka_masala%2C_textured_vegetable_protein%2C_peanuts%2C_and_black_pepper_-_Massachusetts.jpg',
+  'cani_rajma_chana':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Rajma_Chawal_Thali.jpg/960px-Rajma_Chawal_Thali.jpg',
+  'cani_cheese':
+      'https://cdn.stocksnap.io/img-thumbs/960w/ABFRSZL8XB.jpg',
+  'cani_ghee':
+      'https://cdn.stocksnap.io/img-thumbs/960w/NS5Q6MVMZQ.jpg',
+  'cani_mawa_sweets':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Kaju-katlii.jpg/960px-Kaju-katlii.jpg',
+  'cani_oats':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Rolled_oats_in_bowl_2.jpg/960px-Rolled_oats_in_bowl_2.jpg',
+  'cani_poha':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Indian_breakfast-_Poha.jpg/960px-Indian_breakfast-_Poha.jpg',
+  'cani_instant_noodles':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Lobster_instant_noodle.jpg/960px-Lobster_instant_noodle.jpg',
+  'cani_fried_snacks':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/2013_Sechsel%C3%A4uten_-_%27Samosa%27_und_%27Pakora%27_-_Limmatquai_2013-04-14_17-35-59_%28P7700%29.JPG/960px-2013_Sechsel%C3%A4uten_-_%27Samosa%27_und_%27Pakora%27_-_Limmatquai_2013-04-14_17-35-59_%28P7700%29.JPG',
+  'cani_pickle':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/Mango_Pickle_Home_Made_Style.JPG/960px-Mango_Pickle_Home_Made_Style.JPG',
+  'cani_turmeric_milk':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Golden_Milk.jpg/960px-Golden_Milk.jpg',
+  'cani_jaggery':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Making_Jaggery_%28Gur%29_in_Punjab.jpg/960px-Making_Jaggery_%28Gur%29_in_Punjab.jpg',
+  'cani_spices':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Indian_Spices_%2849696133942%29.jpg/960px-Indian_Spices_%2849696133942%29.jpg',
+  'cani_sugar':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/W%C3%BCrfelzucker_--_2018_--_3564.jpg/960px-W%C3%BCrfelzucker_--_2018_--_3564.jpg',
+  'cani_sushi':
+      'https://cdn.stocksnap.io/img-thumbs/960w/BBD3AU9NSR.jpg',
+  'cani_raw_meat':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Steak_Tartare_in_Dresden.jpg/960px-Steak_Tartare_in_Dresden.jpg',
+  'cani_deli_meat':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Cold_cuts.jpg/960px-Cold_cuts.jpg',
+  'cani_leftovers':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Open_refrigerator_with_food_at_night.jpg/960px-Open_refrigerator_with_food_at_night.jpg',
+  'cani_spicy_food':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f8/VitorJubini_MercadoDaVilaRubim_Vitoria_ES_%2839182859020%29_%28square_crop%29.jpg/960px-VitorJubini_MercadoDaVilaRubim_Vitoria_ES_%2839182859020%29_%28square_crop%29.jpg',
+  'cani_milkshake':
+      'https://cdn.stocksnap.io/img-thumbs/960w/BNCZWVYVMQ.jpg',
+  'cani_fresh_juice':
+      'https://cdn.stocksnap.io/img-thumbs/960w/VWZSB0VCZ8.jpg',
+  'cani_lemon_water':
+      'https://cdn.stocksnap.io/img-thumbs/960w/SE6LA5BXBG.jpg',
+  'cani_sugarcane_juice':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/Sugarcane_Juice.png/960px-Sugarcane_Juice.png',
+  'cani_lassi':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Lassi_1.jpg/960px-Lassi_1.jpg',
+  'cani_energy_drinks':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Energy_Drink_Battery_Cans.jpg/960px-Energy_Drink_Battery_Cans.jpg',
+  'cani_herbal_tea':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/Herbal_Tea_01.jpg/960px-Herbal_Tea_01.jpg',
+  'cani_smoothie':
+      'https://cdn.stocksnap.io/img-thumbs/960w/HWFUPZEHMO.jpg',
+  'cani_kombucha':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Wild_Kombucha_logo.jpg/500px-Wild_Kombucha_logo.jpg',
+  'cani_diet_soda':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Can_of_Diet_Sierra_Mist_lemon-lime_soda%2C_2011.jpg/960px-Can_of_Diet_Sierra_Mist_lemon-lime_soda%2C_2011.jpg',
+  'cani_aam_panna':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/49/Aam_Panna_-_Summer_Cooler.JPG/960px-Aam_Panna_-_Summer_Cooler.JPG',
+  'cani_badam_milk':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Bapatla_Badam_Milk.jpg/960px-Bapatla_Badam_Milk.jpg',
+  'cani_decaf_coffee':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/33/Coffee_cup_and_coffee_bean.jpg/960px-Coffee_cup_and_coffee_bean.jpg',
+  'cani_jaljeera':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Two_Indian_Drinks.jpg/960px-Two_Indian_Drinks.jpg',
+  'cani_ors':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Ors_sachet.jpg/960px-Ors_sachet.jpg',
+  'cani_aspirin':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Regular_strength_enteric_coated_aspirin_tablets.jpg/960px-Regular_strength_enteric_coated_aspirin_tablets.jpg',
+  'cani_cetirizine':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Cetirizine_tablets_under_the_brand_name_%C2%AB%D0%97%D0%BE%D0%B4%D0%B0%D0%BA%C2%BB.jpg/960px-Cetirizine_tablets_under_the_brand_name_%C2%AB%D0%97%D0%BE%D0%B4%D0%B0%D0%BA%C2%BB.jpg',
+  'cani_antacids':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/Antacid-L478.jpg/960px-Antacid-L478.jpg',
+  'cani_pantoprazole':
+      'https://upload.wikimedia.org/wikipedia/commons/6/63/Pantoprazole_20mg.jpg',
+  'cani_multivitamin':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/New_Reference_Material_Can_Improve_testing_of_Multivitamin_Tablets_%285880985736%29.jpg/960px-New_Reference_Material_Can_Improve_testing_of_Multivitamin_Tablets_%285880985736%29.jpg',
+  'cani_omega3':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b0/Omega_3_gelcap.jpg/960px-Omega_3_gelcap.jpg',
+  'cani_b12':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Mecobalamin_tablets.jpg/960px-Mecobalamin_tablets.jpg',
+  'cani_ondansetron':
+      'https://upload.wikimedia.org/wikipedia/commons/5/5c/000817lg_Zofran_8_MG_Oral_Tablet.jpg',
+  'cani_doxylamine':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Prenatal_vitamin_tablets.jpg/960px-Prenatal_vitamin_tablets.jpg',
+  'cani_cough_syrup':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Vintage_Turkish_pediatric_cough_syrup_bottle.png/960px-Vintage_Turkish_pediatric_cough_syrup_bottle.png',
+  'cani_lozenges':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b8/Hustenbonbon.JPG/960px-Hustenbonbon.JPG',
+  'cani_vicks_balm':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Vicks_VapoRub_%2851013600352%29_%28cropped%29.jpg/960px-Vicks_VapoRub_%2851013600352%29_%28cropped%29.jpg',
+  'cani_isabgol':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Culinary_psyllium%2C_Russian_market_03.jpg/960px-Culinary_psyllium%2C_Russian_market_03.jpg',
+  'cani_probiotics':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Probiotic_with_FOS.jpg/960px-Probiotic_with_FOS.jpg',
+  'cani_ashwagandha':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Ashwagandha_Powder_and_Root_on_Spoons_-_50191697031.jpg/960px-Ashwagandha_Powder_and_Root_on_Spoons_-_50191697031.jpg',
+  'cani_homeopathy':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/19/Homeopathy_globules.jpg/960px-Homeopathy_globules.jpg',
+  'cani_diclofenac':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Diclofenac_Natrium_50mg_Aurobindo.jpg/960px-Diclofenac_Natrium_50mg_Aurobindo.jpg',
+  'cani_antifungal_cream':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/72/Canesten.jpg/960px-Canesten.jpg',
+  'cani_deworming':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Anterone_%28cyproterone_acetate%29_tablets_in_Australia%2C_with_three_blister_packs.jpg/960px-Anterone_%28cyproterone_acetate%29_tablets_in_Australia%2C_with_three_blister_packs.jpg',
+  'cani_thyroid_medicine':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Levothyroxine_25mcg_Tablets.jpg/960px-Levothyroxine_25mcg_Tablets.jpg',
+  'cani_bp_medicine':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/41/2020_Sfigmomanometr_elektroniczny.jpg/960px-2020_Sfigmomanometr_elektroniczny.jpg',
+  'cani_insulin':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b4/Insulin_pen_%28labeled%29.jpg/960px-Insulin_pen_%28labeled%29.jpg',
+  'cani_vaccines':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Comirnaty_Omicron_XBB.1.5_vial_and_influenza_vaccine_2023.jpg/960px-Comirnaty_Omicron_XBB.1.5_vial_and_influenza_vaccine_2023.jpg',
+  'cani_driving':
+      'https://cdn.stocksnap.io/img-thumbs/960w/G8GSBPQZUB.jpg',
+  'cani_cycling':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Cycling_Amsterdam_03.jpg/960px-Cycling_Amsterdam_03.jpg',
+  'cani_running':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Jogging_Woman_in_Grass.jpg/960px-Jogging_Woman_in_Grass.jpg',
+  'cani_dancing':
+      'https://cdn.stocksnap.io/img-thumbs/960w/N9WJOUYWZ3.jpg',
+  'cani_household_chores':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Our_Father%27s_House_Soup_Kitchen_dishwashing-vertical.jpg/960px-Our_Father%27s_House_Soup_Kitchen_dishwashing-vertical.jpg',
+  'cani_climbing_stairs':
+      'https://cdn.stocksnap.io/img-thumbs/960w/O1SC8XTWTL.jpg',
+  'cani_standing_long':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/56/All_devotees_standing_in_a_queue_for_darshan.jpg/960px-All_devotees_standing_in_a_queue_for_darshan.jpg',
+  'cani_amusement_rides':
+      'https://cdn.stocksnap.io/img-thumbs/960w/VBAMVNWQRS.jpg',
+  'cani_trekking':
+      'https://cdn.stocksnap.io/img-thumbs/960w/5LXBN8H2CQ.jpg',
+  'cani_gym':
+      'https://cdn.stocksnap.io/img-thumbs/960w/00RNNUWGLM.jpg',
+  'cani_keratin':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/365-2011-049-_Ava%27s_Haircut.jpg/960px-365-2011-049-_Ava%27s_Haircut.jpg',
+  'cani_facial':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/Facial_mask.jpg/960px-Facial_mask.jpg',
+  'cani_chemical_peel':
+      'https://cdn.stocksnap.io/img-thumbs/960w/HIZNJOUVSY.jpg',
+  'cani_botox_fillers':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7f/Dr_Braun_Performs_a_Botox_Injection_%284035273577%29.jpg/960px-Dr_Braun_Performs_a_Botox_Injection_%284035273577%29.jpg',
+  'cani_laser_hair':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/38/Laser-hair-removal-face-ama-regenerative-medicine.jpg/960px-Laser-hair-removal-face-ama-regenerative-medicine.jpg',
+  'cani_pedicure':
+      'https://cdn.stocksnap.io/img-thumbs/960w/XX356Q6EI4.jpg',
+  'cani_makeup':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/67/Makeup_weapons_Brushes_.jpg/960px-Makeup_weapons_Brushes_.jpg',
+  'cani_sunscreen':
+      'https://cdn.stocksnap.io/img-thumbs/960w/5O2GOIJXYE.jpg',
+  'cani_retinol':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8c/Person_applies_cream_for_skin_from_a_jar_closeup.jpg/960px-Person_applies_cream_for_skin_from_a_jar_closeup.jpg',
+  'cani_perfume':
+      'https://cdn.stocksnap.io/img-thumbs/960w/KFMR70XLYS.jpg',
+  'cani_hair_oil':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Baroy_Lanao_Hair_conditioner_serum_Jasminum_essential_virgin_coconut_oil1.jpg/960px-Baroy_Lanao_Hair_conditioner_serum_Jasminum_essential_virgin_coconut_oil1.jpg',
+  'cani_tattoo':
+      'https://cdn.stocksnap.io/img-thumbs/960w/UIJTQRCQWL.jpg',
+  'cani_gel_nails':
+      'https://cdn.stocksnap.io/img-thumbs/960w/XX356Q6EI4.jpg',
+  'cani_smoking':
+      'https://cdn.stocksnap.io/img-thumbs/960w/XK7QYY8NQV.jpg',
+  'cani_secondhand_smoke':
+      'https://cdn.stocksnap.io/img-thumbs/960w/2E7DE661A5.jpg',
+  'cani_vaping':
+      'https://cdn.stocksnap.io/img-thumbs/960w/JLDXQBNPWC.jpg',
+  'cani_hot_water_bath':
+      'https://cdn.stocksnap.io/img-thumbs/960w/CUGFVFAI24.jpg',
+  'cani_ac_use':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Air_conditioner_2.jpg/960px-Air_conditioner_2.jpg',
+  'cani_incense':
+      'https://upload.wikimedia.org/wikipedia/commons/9/9c/Incense_sticks_in_bangalore.jpg',
+  'cani_cleaning_chemicals':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/HK_Sheung_Wan_%E6%97%A5%E6%9C%AC%E5%9F%8E_Japan_Home_Centre_%E8%97%8D%E5%A8%81%E5%AF%B6_Sara_Lee_SWIPE_blue_concentrate_cleaning_products_%E8%97%8D%E8%87%B3%E5%B0%8A_Campbell_April-2012.JPG/960px-HK_Sheung_Wan_%E6%97%A5%E6%9C%AC%E5%9F%8E_Japan_Home_Centre_%E8%97%8D%E5%A8%81%E5%AF%B6_Sara_Lee_SWIPE_blue_concentrate_cleaning_products_%E8%97%8D%E8%87%B3%E5%B0%8A_Campbell_April-2012.JPG',
+  'cani_paint_fumes':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Paint_roller_4.jpg/960px-Paint_roller_4.jpg',
+  'cani_pesticides':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Spraying_pesticide_04.jpg/960px-Spraying_pesticide_04.jpg',
+  'cani_pet_cats':
+      'https://cdn.stocksnap.io/img-thumbs/960w/OU5O7ZUVH7.jpg',
+  'cani_pet_dogs':
+      'https://cdn.stocksnap.io/img-thumbs/960w/2Q8CXYKKAZ.jpg',
+  'cani_gardening':
+      'https://cdn.stocksnap.io/img-thumbs/960w/WV6Q25F8ZJ.jpg',
+  'cani_public_transport':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Delhi_Metro_train_red_line_at_Shaheed_Sthal_metro_station.jpg/960px-Delhi_Metro_train_red_line_at_Shaheed_Sthal_metro_station.jpg',
+  'cani_crowded_places':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Hopelessly_crowded%21_%287937793806%29.jpg/960px-Hopelessly_crowded%21_%287937793806%29.jpg',
+  'cani_high_heels':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cd/Black_high-heeled_shoes_for_flight_attendants_at_CAMC_%2820240518150910%29.jpg/960px-Black_high-heeled_shoes_for_flight_attendants_at_CAMC_%2820240518150910%29.jpg',
+  'cani_tight_clothes':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/66/Polygonum_shastense_jeans_2-vein_leaf.jpg/960px-Polygonum_shastense_jeans_2-vein_leaf.jpg',
+  'cani_massage':
+      'https://cdn.stocksnap.io/img-thumbs/960w/VH22RVC5UT.jpg',
+  'cani_spa':
+      'https://cdn.stocksnap.io/img-thumbs/960w/811926DC8B.jpg',
+  'cani_meditation':
+      'https://cdn.stocksnap.io/img-thumbs/960w/D0B13477F5.jpg',
+  'cani_mobile_phone':
+      'https://cdn.stocksnap.io/img-thumbs/960w/DLITZEAVJJ.jpg',
+  'cani_stress':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Stressed_and_depressed_woman_covers_her_face_with_hands.jpg/960px-Stressed_and_depressed_woman_covers_her_face_with_hands.jpg',
+  'cani_paneer':
+      'https://upload.wikimedia.org/wikipedia/commons/a/a5/Malai_Paneer_Tikka%2C_PK_007.jpg',
+  'cani_milk':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Milk_bottle_and_two_doughnuts.jpg/960px-Milk_bottle_and_two_doughnuts.jpg',
+  'cani_saffron':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Saffron_salonik.jpg/960px-Saffron_salonik.jpg',
+  'cani_makhana':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/03/Roasted_and_spiced_Foxnuts_%28Phool_Makhana%29.jpg/960px-Roasted_and_spiced_Foxnuts_%28Phool_Makhana%29.jpg',
+  'cani_salt':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Seasalt.jpg/960px-Seasalt.jpg',
+  'cani_maida':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/All-Purpose_Flour_%284107895947%29.jpg/960px-All-Purpose_Flour_%284107895947%29.jpg',
+  'cani_custard_apple':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Sitaphal_Chinawal.jpg/960px-Sitaphal_Chinawal.jpg',
+  'cani_sleeping_pills':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Lorafen_%28lorazepamum%29_tablets%2C_1_mg.jpg/960px-Lorafen_%28lorazepamum%29_tablets%2C_1_mg.jpg',
+  'cani_ayurvedic_medicine':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Ayurvedic_herbs_02.jpg/960px-Ayurvedic_herbs_02.jpg',
+  'cani_packaged_juice':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/20240814Satona_Kartonger.jpg/960px-20240814Satona_Kartonger.jpg',
+  'cani_shelf_eat':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Golgappa_Pani_Puri_India.jpg/960px-Golgappa_Pani_Puri_India.jpg',
+  'cani_shelf_drink':
+      'https://cdn.stocksnap.io/img-thumbs/960w/0ZS74TCOME.jpg',
+  'cani_shelf_take':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/New_Reference_Material_Can_Improve_testing_of_Multivitamin_Tablets_%285880985736%29.jpg/960px-New_Reference_Material_Can_Improve_testing_of_Multivitamin_Tablets_%285880985736%29.jpg',
+  'cani_shelf_doActivity':
+      'https://cdn.stocksnap.io/img-thumbs/960w/RIUG2ATBWT.jpg',
+  // The seven "See more" conditions, missed on the first pass (audit 2026-09-19).
+  'condition_icp_cholestasis':
+      'https://cdn.stocksnap.io/img-thumbs/960w/8E0DHVSNK8.jpg',
+  'condition_hellp':
+      'https://cdn.stocksnap.io/img-thumbs/960w/YG98MVAAAF.jpg',
+  'condition_vasa_previa':
+      'https://cdn.stocksnap.io/img-thumbs/960w/URMURJLZOO.jpg',
+  'condition_rh_negative':
+      'https://cdn.stocksnap.io/img-thumbs/960w/9M1HWW2JFV.jpg',
+  'condition_pre_existing':
+      'https://cdn.stocksnap.io/img-thumbs/960w/WTWX4BZ4FD.jpg',
+  'condition_covid_pregnancy':
+      'https://cdn.stocksnap.io/img-thumbs/960w/6ENSM2NM1P.jpg',
+  'condition_dengue_pregnancy':
+      'https://pd.w.org/2023/05/826647086692c87d2.91927625-2048x1367.jpg',
   // The 27 report findings and 20 conditions (`finding_<id>`,
   // `condition_<id>`) — 2026-09-19, so the decoder's and Complications'
   // rows carry a picture. Placeholders from the same CC0 pool, chosen for
@@ -153,37 +559,37 @@ const Map<String, String> kReadImageUrls = {
   'preg_week_read_first_scan':
       'https://cdn.stocksnap.io/img-thumbs/960w/MU4EHC71DU.jpg',
   'preg_week_read_first_trimester':
-      'https://live.staticflickr.com/168/455643284_16fb61b0b2_b.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/W6KDUGJ4LR.jpg',
   'preg_week_read_nutrition_t2':
-      'https://live.staticflickr.com/7274/7654718986_d184cc7fd1_b.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/G8QICMKLUV.jpg',
   'preg_week_read_partner_support':
       'https://cdn.stocksnap.io/img-thumbs/960w/0MLHM34HE1.jpg',
   'preg_week_read_halfway':
       'https://cdn.stocksnap.io/img-thumbs/960w/4UF03CU9M7.jpg',
   'preg_week_read_anomaly_scan':
-      'https://live.staticflickr.com/7003/6721335809_fbaa640952_b.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/MU4EHC71DU.jpg',
   'preg_week_read_baby_sound':
       'https://cdn.stocksnap.io/img-thumbs/960w/HJ8M7LUVLT.jpg',
   'preg_week_read_talking_baby':
       'https://cdn.stocksnap.io/img-thumbs/960w/0RYWABOQID.jpg',
   'preg_week_read_back_pain':
-      'https://live.staticflickr.com/5506/25354114919_295acda6b0_b.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/0B4LRPC8QF.jpg',
   'preg_week_read_third_tri_prep':
       'https://cdn.stocksnap.io/img-thumbs/960w/SITUKGWGWJ.jpg',
   'preg_week_read_movement_awareness':
       'https://cdn.stocksnap.io/img-thumbs/960w/ZZLEPU3SIR.jpg',
   'preg_week_read_hospital_bag':
-      'https://live.staticflickr.com/2164/2284764037_df5b9bf8cf_b.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/SITUKGWGWJ.jpg',
   'preg_week_read_labour_prep':
-      'https://live.staticflickr.com/2028/32027398583_b6bb331ab2_b.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/4GGMTEBZY9.jpg',
   'preg_week_read_first_24h':
-      'https://live.staticflickr.com/2731/4434436315_da2cd858cc_b.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/ILUIZBPPTT.jpg',
   'preg_week_read_exp_priya':
       'https://cdn.stocksnap.io/img-thumbs/960w/0B4LRPC8QF.jpg',
   'preg_week_read_exp_meera':
       'https://cdn.stocksnap.io/img-thumbs/960w/6ENSM2NM1P.jpg',
   'preg_week_read_res_voices':
-      'https://live.staticflickr.com/158/423505105_d77db0ba17_b.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/0RYWABOQID.jpg',
   'preg_week_read_res_stress':
       'https://cdn.stocksnap.io/img-thumbs/960w/MWJBXJDRPO.jpg',
   'preg_scan_read_sex_law':
@@ -203,11 +609,11 @@ const Map<String, String> kReadImageUrls = {
   'preg_cond_read_less_movement':
       'https://cdn.stocksnap.io/img-thumbs/960w/8E0DHVSNK8.jpg',
   'preg_cond_read_sugar_india':
-      'https://live.staticflickr.com/5095/5478130842_48de60e3bb_b.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/KRX6BEOKGM.jpg',
   'preg_cond_read_thyroid_tablet':
       'https://cdn.stocksnap.io/img-thumbs/960w/LKM1T38B6S.jpg',
   'preg_cond_read_iron':
-      'https://live.staticflickr.com/4043/4264803251_44d8827693_b.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/8OY1EZZVXX.jpg',
   'preg_diet_read_add_now':
       'https://cdn.stocksnap.io/img-thumbs/960w/KRX6BEOKGM.jpg',
   'preg_labour_read_pain_relief':
@@ -216,6 +622,205 @@ const Map<String, String> kReadImageUrls = {
 
 /// Read id → licence · source · creator, for the credit line.
 const Map<String, String> kReadImageCredits = {
+  'cani_papaya': 'CC BY 3.0 · Wikimedia Commons · Marek Ślusarczyk (Tupungato) Photo portf',
+  'cani_pineapple': 'Public domain · Wikimedia Commons · Unknown photographer',
+  'cani_mango': 'CC BY-SA 4.0 · Wikimedia Commons · Ivar Leidus',
+  'cani_banana': 'CC0 · Wikimedia Commons · Wilfredor',
+  'cani_curd': 'CC BY-SA 4.0 · Wikimedia Commons · Shruthi Gaurav Alva',
+  'cani_chocolate': 'CC0 · Wikimedia Commons · Mx. Granger',
+  'cani_street_food': 'CC BY 2.0 · Wikimedia Commons · Yusuke Kawasaki',
+  'cani_honey': 'CC0 · StockSnap · Krzysztof%20Puszczy%u0144ski',
+  'cani_ginger': 'CC BY-SA 3.0 · Wikimedia Commons · Venkatx5',
+  'cani_coffee': 'CC BY-SA 2.0 · Wikimedia Commons · Julius Schorzman',
+  'cani_tea': 'CC0 · StockSnap · Andrew E Weber',
+  'cani_green_tea': 'CC0 · StockSnap · Jorge Garcia',
+  'cani_coconut_water': 'CC BY-SA 4.0 · Wikimedia Commons · Vis M',
+  'cani_buttermilk': 'CC BY-SA 4.0 · Wikimedia Commons · Kyu3a',
+  'cani_alcohol': 'CC0 · Wikimedia Commons · DimiTalen',
+  'cani_soft_drinks': 'Public domain · Wikimedia Commons · pic_p_ter',
+  'cani_water': 'CC0 · StockSnap · Krzysztof%20Puszczy%u0144ski',
+  'cani_paracetamol': 'CC BY-SA 4.0 · Wikimedia Commons · N509FZ',
+  'cani_ibuprofen': 'CC BY-SA 3.0 · Wikimedia Commons · Ragesoss',
+  'cani_combiflam': 'CC0 · StockSnap · Martin Vorel',
+  'cani_antibiotics': 'CC BY-SA 4.0 · Wikimedia Commons · Whispyhistory',
+  'cani_folic_acid': 'CC BY-SA 3.0 · Wikimedia Commons · Ragesoss',
+  'cani_calcium': 'CC BY 3.0 · Wikimedia Commons · Kham Tran - www.khamtran.com',
+  'cani_vitamin_d': 'CC BY-SA 4.0 · Wikimedia Commons · Schekinov Alexey Victorovich',
+  'cani_flight_travel': 'CC0 · StockSnap · The Pic Pac',
+  'cani_long_travel': 'CC0 · StockSnap · Mike Wilson',
+  'cani_yoga': 'CC0 · StockSnap · Burst',
+  'cani_swimming': 'CC0 · StockSnap · Ian Prince',
+  'cani_walking': 'CC0 · StockSnap · Matt Moloney',
+  'cani_hair_color': 'CC BY-SA 4.0 · Wikimedia Commons · File:Shelve with various hair colours (h',
+  'cani_waxing': 'CC0 · StockSnap · Authentic Stock',
+  'cani_nail_polish': 'CC0 · StockSnap · Sarah Pflug',
+  'cani_sex': 'CC0 · StockSnap · Living Together',
+  'cani_sleeping_back': 'CC0 · StockSnap · Alexandre Vanier',
+  'cani_mosquito_repellent': 'CC BY-SA 3.0 · Wikimedia Commons · مانفی',
+  'cani_dental': 'CC0 · StockSnap · Daniel Frank',
+  'cani_xray': 'CC BY-SA 4.0 · Wikimedia Commons · రవిచంద్ర',
+  'cani_sauna': 'CC BY-SA 4.0 · Wikimedia Commons · Basile Morin',
+  'cani_fasting': 'CC0 · StockSnap · The World is a Stage',
+  'cani_apple': 'CC BY 2.0 · Wikimedia Commons · Abhijit Tembhekar from Mumbai, India',
+  'cani_orange': 'CC BY-SA 4.0 · Wikimedia Commons · Rhododendrites',
+  'cani_grapes': 'CC0 · StockSnap · Skitter Photo',
+  'cani_watermelon': 'CC BY-SA 4.0 · Wikimedia Commons · Ralff Nestor Nacor',
+  'cani_muskmelon': 'Public domain · Wikimedia Commons · USDA photo by Scott Bauer. Image Number ',
+  'cani_guava': 'CC BY-SA 4.0 · Wikimedia Commons · Rodrigo.Argenton',
+  'cani_pomegranate': 'CC BY-SA 4.0 · Wikimedia Commons · Ivar Leidus',
+  'cani_chikoo': 'CC BY 2.0 · Wikimedia Commons · Rison Thumboor from Thrissur, India',
+  'cani_litchi': 'CC BY-SA 4.0 · Wikimedia Commons · Ivar Leidus',
+  'cani_jackfruit': 'CC BY-SA 3.0 · Wikimedia Commons · Mullookkaaran',
+  'cani_dates': 'Public domain · Wikimedia Commons · Loorie Cooper',
+  'cani_figs': 'CC BY-SA 4.0 · Wikimedia Commons · Ivar Leidus',
+  'cani_berries': 'CC0 · StockSnap · Lukas',
+  'cani_kiwi': 'CC0 · StockSnap · Piotr Lohunko',
+  'cani_pear': 'CC BY-SA 4.0 · Wikimedia Commons · Rhododendrites',
+  'cani_dry_fruits': 'CC0 · StockSnap · Jonas Svidras',
+  'cani_almonds': 'CC BY-SA 4.0 · Wikimedia Commons · HaJunkiyada',
+  'cani_walnuts': 'CC0 · StockSnap · Krzysztof%20Puszczy%u0144ski',
+  'cani_cashews': 'CC0 · StockSnap · Rachael Gorjestani',
+  'cani_peanuts': 'CC BY-SA 4.0 · Wikimedia Commons · Sanjay Acharya',
+  'cani_sabudana': 'CC BY-SA 4.0 · Wikimedia Commons · Dheerajk88',
+  'cani_spinach': 'CC BY-SA 4.0 · Wikimedia Commons · Olgatladi2020',
+  'cani_drumstick': 'CC BY-SA 4.0 · Wikimedia Commons · Erector',
+  'cani_brinjal': 'CC BY-SA 3.0 · Wikimedia Commons · Joydeep',
+  'cani_potato': 'CC0 · StockSnap · Maciej Szlachta',
+  'cani_tomato': 'CC0 · StockSnap · Krzysztof%20Puszczy%u0144ski',
+  'cani_carrot': 'CC0 · StockSnap · Suzy Hazelwood',
+  'cani_beetroot': 'CC BY-SA 4.0 · Wikimedia Commons · W.carter',
+  'cani_sprouts': 'CC BY-SA 4.0 · Wikimedia Commons · Ivar Leidus',
+  'cani_raw_salad': 'CC0 · StockSnap · Jeffrey Betts',
+  'cani_mushroom': 'CC BY-SA 4.0 · Wikimedia Commons · 0x010C',
+  'cani_egg': 'CC0 · StockSnap · Patryk Dziejma',
+  'cani_chicken': 'CC BY-SA 4.0 · Wikimedia Commons · Gaurav Dhwaj Khadka',
+  'cani_mutton': 'CC BY-SA 3.0 · Wikimedia Commons · Gaurav Dhwaj Khadka',
+  'cani_fish': 'CC BY-SA 2.5 · Wikimedia Commons · Kalakki at Malayalam Wikipedia',
+  'cani_prawns': 'CC BY-SA 3.0 · Wikimedia Commons · Kim Hansen',
+  'cani_high_mercury_fish': 'CC BY-SA 3.0 · Wikimedia Commons · Citron',
+  'cani_dal': 'CC0 · StockSnap · Foodie Girl',
+  'cani_soya': 'CC0 · Wikimedia Commons · Daderot',
+  'cani_rajma_chana': 'CC BY-SA 4.0 · Wikimedia Commons · Medhi jyoti',
+  'cani_cheese': 'CC0 · StockSnap · Jakub Rostkowski',
+  'cani_ghee': 'CC0 · StockSnap · Brooke Cagle',
+  'cani_mawa_sweets': 'CC BY-SA 4.0 · Wikimedia Commons · Priyam1307',
+  'cani_oats': 'CC BY-SA 4.0 · Wikimedia Commons · Bodhi Peace',
+  'cani_poha': 'CC BY-SA 4.0 · Wikimedia Commons · Medhi jyoti',
+  'cani_instant_noodles': 'CC BY 2.0 · Wikimedia Commons · Ruocaled',
+  'cani_fried_snacks': 'CC BY-SA 3.0 · Wikimedia Commons · Roland zh',
+  'cani_pickle': 'CC0 · Wikimedia Commons · Miansari66',
+  'cani_turmeric_milk': 'CC BY-SA 4.0 · Wikimedia Commons · మురళీకృష్ణ ముసునూరి',
+  'cani_jaggery': 'CC BY-SA 4.0 · Wikimedia Commons · Amarvirbilkhu',
+  'cani_spices': 'CC BY 2.0 · Wikimedia Commons · Ajay Suresh from New York, NY, USA',
+  'cani_sugar': 'CC BY-SA 4.0 · Wikimedia Commons · Dietmar Rabich',
+  'cani_sushi': 'CC0 · StockSnap · Chevanon',
+  'cani_raw_meat': 'CC BY-SA 4.0 · Wikimedia Commons · Dr. Bernd Gross',
+  'cani_deli_meat': 'CC BY-SA 4.0 · Wikimedia Commons · مانفی',
+  'cani_leftovers': 'CC BY-SA 4.0 · Wikimedia Commons · W.carter',
+  'cani_spicy_food': 'Public domain · Wikimedia Commons · MTur Destinos',
+  'cani_milkshake': 'CC0 · StockSnap · Burst',
+  'cani_fresh_juice': 'CC0 · StockSnap · WDnet Studio',
+  'cani_lemon_water': 'CC0 · StockSnap · Healthy Living',
+  'cani_sugarcane_juice': 'CC BY-SA 4.0 · Wikimedia Commons · Gannu03',
+  'cani_lassi': 'CC BY-SA 4.0 · Wikimedia Commons · Gaurav Dhwaj Khadka',
+  'cani_energy_drinks': 'CC BY-SA 3.0 · Wikimedia Commons · Klooni',
+  'cani_herbal_tea': 'CC0 · Wikimedia Commons · PagesAndPathsPH',
+  'cani_smoothie': 'CC0 · StockSnap · Patryk Dziejma',
+  'cani_kombucha': 'CC BY-SA 4.0 · Wikimedia Commons · Jmb195',
+  'cani_diet_soda': 'CC0 · Wikimedia Commons · DimiTalen',
+  'cani_aam_panna': 'CC BY-SA 4.0 · Wikimedia Commons · Zeel Patel',
+  'cani_badam_milk': 'CC BY-SA 4.0 · Wikimedia Commons · Saiphani02',
+  'cani_decaf_coffee': 'CC0 · Wikimedia Commons · mcfoodie',
+  'cani_jaljeera': 'CC BY-SA 2.0 · Wikimedia Commons · Nick Gray',
+  'cani_ors': 'CC BY-SA 4.0 · Wikimedia Commons · Shubjt',
+  'cani_aspirin': 'CC BY-SA 4.0 · Wikimedia Commons · Ragesoss',
+  'cani_cetirizine': 'CC0 · Wikimedia Commons · Issuial',
+  'cani_antacids': 'CC BY 2.5 · Wikimedia Commons · Midnightcomm',
+  'cani_pantoprazole': 'Public domain · Wikimedia Commons · NLM',
+  'cani_multivitamin': 'Public domain · Wikimedia Commons · National Institute of Standards and Tech',
+  'cani_omega3': 'CC0 · Wikimedia Commons · DigiGal DZiner',
+  'cani_b12': 'CC0 · Wikimedia Commons · Vack Xu',
+  'cani_ondansetron': 'Public domain · Wikimedia Commons · NLM',
+  'cani_doxylamine': 'CC BY-SA 3.0 · Wikimedia Commons · Ragesoss',
+  'cani_cough_syrup': 'CC0 · Wikimedia Commons · Necatorina',
+  'cani_lozenges': 'CC BY-SA 3.0 · Wikimedia Commons · Thogru',
+  'cani_vicks_balm': 'CC BY 2.0 · Wikimedia Commons · ajay_suresh',
+  'cani_isabgol': 'CC0 · Wikimedia Commons · Retired electrician',
+  'cani_probiotics': 'CC BY 4.0 · Wikimedia Commons · Corn cheese',
+  'cani_ashwagandha': 'CC BY 2.0 · Wikimedia Commons · formulatehealth',
+  'cani_homeopathy': 'CC BY-SA 4.0 · Wikimedia Commons · Dr. Moumita Sahana',
+  'cani_diclofenac': 'CC BY 4.0 · Wikimedia Commons · Bluberryman',
+  'cani_antifungal_cream': 'Public domain · Wikimedia Commons · Editor182',
+  'cani_deworming': 'CC BY-SA 4.0 · Wikimedia Commons · BlankEclair',
+  'cani_thyroid_medicine': 'Public domain · Wikimedia Commons · User:Ash',
+  'cani_bp_medicine': 'CC BY-SA 4.0 · Wikimedia Commons · Jacek Halicki',
+  'cani_insulin': 'CC BY 4.0 · Wikimedia Commons · User:Wesalius, labeled by User:Berchanhi',
+  'cani_vaccines': 'CC BY-SA 4.0 · Wikimedia Commons · Whispyhistory',
+  'cani_driving': 'CC0 · StockSnap · Burst',
+  'cani_cycling': 'CC BY-SA 4.0 · Wikimedia Commons · Alfredo Borba',
+  'cani_running': 'CC BY 2.0 · Wikimedia Commons · Mike Baird from Morro Bay, USAMike Baird',
+  'cani_dancing': 'CC0 · StockSnap · Hudson Hintze',
+  'cani_household_chores': 'Public domain · Wikimedia Commons · NancyHeise  talk',
+  'cani_climbing_stairs': 'CC0 · StockSnap · Huney Co',
+  'cani_standing_long': 'CC BY-SA 4.0 · Wikimedia Commons · Yash26M12',
+  'cani_amusement_rides': 'CC0 · StockSnap · Sergei Gussev',
+  'cani_trekking': 'CC0 · StockSnap · Joshua Earle',
+  'cani_gym': 'CC0 · StockSnap · Khusen Rustamov',
+  'cani_keratin': 'CC BY-SA 2.0 · Wikimedia Commons · jason gessner',
+  'cani_facial': 'CC BY 2.0 · Wikimedia Commons · Sérgio (Savaman) Savarese',
+  'cani_chemical_peel': 'CC0 · StockSnap · Authentic Stock',
+  'cani_botox_fillers': 'CC BY-SA 2.0 · Wikimedia Commons · Dr. Braun from Vancouver, Canada',
+  'cani_laser_hair': 'CC BY-SA 4.0 · Wikimedia Commons · Amaregenmed (Alice Pien, MD)',
+  'cani_pedicure': 'CC0 · StockSnap · Freestocks.org',
+  'cani_makeup': 'CC BY-SA 4.0 · Wikimedia Commons · Makeupweapons',
+  'cani_sunscreen': 'CC0 · StockSnap · Kristin Hardwick',
+  'cani_retinol': 'CC BY 2.0 · Wikimedia Commons · Shixart1985',
+  'cani_perfume': 'CC0 · StockSnap · Jess Watters',
+  'cani_hair_oil': 'CC BY-SA 4.0 · Wikimedia Commons',
+  'cani_tattoo': 'CC0 · StockSnap · Tim Gouw',
+  'cani_gel_nails': 'CC0 · StockSnap · Freestocks.org',
+  'cani_smoking': 'CC0 · StockSnap · Emma Leigh Parker',
+  'cani_secondhand_smoke': 'CC0 · StockSnap · Carli Jean',
+  'cani_vaping': 'CC0 · StockSnap · Isabella Mendes',
+  'cani_hot_water_bath': 'CC0 · StockSnap · Authentic Stock',
+  'cani_ac_use': 'CC BY-SA 4.0 · Wikimedia Commons · Solijon Solayev',
+  'cani_incense': 'CC BY 2.0 · Wikimedia Commons · Meanest Indian',
+  'cani_cleaning_chemicals': 'CC BY-SA 3.0 · Wikimedia Commons · Slipperzoo',
+  'cani_paint_fumes': 'CC BY 2.0 · Wikimedia Commons · Michael Cory',
+  'cani_pesticides': 'CC BY-SA 4.0 · Wikimedia Commons · Azorbli',
+  'cani_pet_cats': 'CC0 · StockSnap · Snapwire',
+  'cani_pet_dogs': 'CC0 · StockSnap · Alex%20Bl%u0103jan',
+  'cani_gardening': 'CC0 · StockSnap · Neslihan Gunaydin',
+  'cani_public_transport': 'CC BY-SA 4.0 · Wikimedia Commons · Ravi Dwivedi',
+  'cani_crowded_places': 'CC BY 2.0 · Wikimedia Commons · shankar s. from Poona (pune), India, Ind',
+  'cani_high_heels': 'CC BY-SA 4.0 · Wikimedia Commons · N509FZ',
+  'cani_tight_clothes': 'CC BY 3.0 · Wikimedia Commons · Dcrjsr',
+  'cani_massage': 'CC0 · StockSnap · Authentic Stock',
+  'cani_spa': 'CC0 · StockSnap · Leeroy',
+  'cani_meditation': 'CC0 · StockSnap · Dingzeyu Li',
+  'cani_mobile_phone': 'CC0 · StockSnap · JESHOOTS.com',
+  'cani_stress': 'CC BY 2.0 · Wikimedia Commons · Shixart1985',
+  'cani_paneer': 'CC BY-SA 4.0 · Wikimedia Commons · PallaviKhale',
+  'cani_milk': 'CC0 · Wikimedia Commons · www.Pixel.la Free Stock Photos',
+  'cani_saffron': 'CC BY-SA 4.0 · Wikimedia Commons · Salonik Saffron',
+  'cani_makhana': 'CC BY-SA 4.0 · Wikimedia Commons · Talupu',
+  'cani_salt': 'CC BY-SA 4.0 · Wikimedia Commons · Relativity',
+  'cani_maida': 'CC BY-SA 2.0 · Wikimedia Commons · Veganbaking.net from USA',
+  'cani_custard_apple': 'CC BY-SA 3.0 · Wikimedia Commons · ABHIJEET',
+  'cani_sleeping_pills': 'CC BY 3.0 · Wikimedia Commons · Żółwiciel',
+  'cani_ayurvedic_medicine': 'CC BY-SA 4.0 · Wikimedia Commons · Vis M',
+  'cani_packaged_juice': 'CC BY-SA 4.0 · Wikimedia Commons · Kolbkorr',
+  'cani_shelf_eat': 'CC BY 2.0 · Wikimedia Commons · Yusuke Kawasaki',
+  'cani_shelf_drink': 'CC0 · StockSnap · Andrew E Weber',
+  'cani_shelf_take': 'Public domain · Wikimedia Commons · National Institute of Standards and Tech',
+  'cani_shelf_doActivity': 'CC0 · StockSnap · Matt Moloney',
+  'condition_icp_cholestasis': 'CC0 · stocksnap · Freestocks.org',
+  'condition_hellp': 'CC0 · stocksnap · Direct Media',
+  'condition_vasa_previa': 'CC0 · stocksnap · Candace McDaniel',
+  'condition_rh_negative': 'CC0 · stocksnap · Negative Space',
+  'condition_pre_existing': 'CC0 · stocksnap · Direct Media',
+  'condition_covid_pregnancy': 'CC0 · stocksnap · Brodie Vissers',
+  'condition_dengue_pregnancy': 'CC0 · wordpress · sreejagroups',
   'finding_low_lying_placenta': 'CC0 · stocksnap · Skitter Photo',
   'finding_breech': 'CC0 · stocksnap · Candace McDaniel',
   'finding_nuchal_cord': 'CC0 · stocksnap · Matt Bango',
@@ -275,22 +880,22 @@ const Map<String, String> kReadImageCredits = {
   'preg_scan_read_calm': 'CC0 · stocksnap · Marcos Moraes',
   'preg_week_read_managing_nausea': 'CC0 · stocksnap · Josh Willink',
   'preg_week_read_first_scan': 'CC0 · stocksnap · Candace McDaniel',
-  'preg_week_read_first_trimester': 'CC BY-SA · flickr · viralbus',
-  'preg_week_read_nutrition_t2': 'CC BY · flickr · shankar s.',
+  'preg_week_read_first_trimester': 'CC0 · stocksnap · Djordje Popovic',
+  'preg_week_read_nutrition_t2': 'CC0 · stocksnap · Dana Tentis',
   'preg_week_read_partner_support': 'CC0 · stocksnap · William Stitt',
   'preg_week_read_halfway': 'CC0 · stocksnap · Freestocks.org',
-  'preg_week_read_anomaly_scan': 'CC BY · flickr · mwcarruthers',
+  'preg_week_read_anomaly_scan': 'CC0 · stocksnap · Candace McDaniel',
   'preg_week_read_baby_sound': 'CC0 · stocksnap · Freestocks.org',
   'preg_week_read_talking_baby': 'CC0 · stocksnap · Suhyeon Choi',
-  'preg_week_read_back_pain': 'CC BY · flickr · gm.esthermax',
+  'preg_week_read_back_pain': 'CC0 · stocksnap · Mel Elías',
   'preg_week_read_third_tri_prep': 'CC0 · stocksnap · Matt Bango',
   'preg_week_read_movement_awareness': 'CC0 · stocksnap · Candace McDaniel',
-  'preg_week_read_hospital_bag': 'CC BY · flickr · Joe Shlabotnik',
-  'preg_week_read_labour_prep': 'CC BY · flickr · SimpleSkye',
-  'preg_week_read_first_24h': 'CC BY-SA · flickr · Krisztina.Konczos',
+  'preg_week_read_hospital_bag': 'CC0 · stocksnap · Matt Bango',
+  'preg_week_read_labour_prep': 'CC0 · stocksnap · Freestocks.org',
+  'preg_week_read_first_24h': 'CC0 · stocksnap · Candace McDaniel',
   'preg_week_read_exp_priya': 'CC0 · stocksnap · Mel Elías',
   'preg_week_read_exp_meera': 'CC0 · stocksnap · Brodie Vissers',
-  'preg_week_read_res_voices': 'CC BY-SA · flickr · Hammer51012',
+  'preg_week_read_res_voices': 'CC0 · stocksnap · Suhyeon Choi',
   'preg_week_read_res_stress': 'CC0 · stocksnap · Marcos Moraes',
   'preg_scan_read_sex_law': 'CC0 · stocksnap · Skitter Photo',
   'preg_scan_read_costs': 'CC0 · stocksnap · Oles kanebckuu',
@@ -300,9 +905,9 @@ const Map<String, String> kReadImageCredits = {
   'preg_cond_read_bp_dangerous': 'CC0 · stocksnap · Direct Media',
   'preg_cond_read_bleeding': 'CC0 · stocksnap · Direct Media',
   'preg_cond_read_less_movement': 'CC0 · stocksnap · Freestocks.org',
-  'preg_cond_read_sugar_india': 'CC BY-SA · flickr · mitpatterson2010',
+  'preg_cond_read_sugar_india': 'CC0 · stocksnap · Burst',
   'preg_cond_read_thyroid_tablet': 'CC0 · stocksnap · Michal Jarmoluk',
-  'preg_cond_read_iron': 'CC BY · flickr · jencu',
+  'preg_cond_read_iron': 'CC0 · stocksnap · Tim Sullivan',
   'preg_diet_read_add_now': 'CC0 · stocksnap · Burst',
   'preg_labour_read_pain_relief': 'CC0 · stocksnap · Freestocks.org',
 };

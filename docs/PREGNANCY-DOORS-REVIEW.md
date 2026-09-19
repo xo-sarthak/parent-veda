@@ -143,9 +143,65 @@ checklist, consults.
 | Living with it · "Keep track of it" | "Add a condition to my journey" (opened the Find list as a screen) · "Keep your reports for this" (opened the Scans locker) | **retired** — both are a tap away in their own homes |
 | Talk | the seven-line pregnancy flag again (one tab after Get help now's five); two sections of one card | no second flag; one section, two cards |
 
-**Mobbin, this door:** the article-list pass above.
+**Round two (2026-09-19 evening) — symmetry with Scans & tests.** The
+user: "use that understanding to elevate Complications… structural
+symmetry, especially the swipeable tabs." Done: the **rail** selector
+(Complications was the last door on the tile row); **week windows** on
+every "When it comes up" tile (Scans' cards carry "Weeks 11–13" — this
+tab is the library read by TIME, which is the one thing Find a condition
+does not answer, so it keeps its second listing only because it now says
+when); the Find tab's "See more" pill is the **fold** the decoder has
+("More conditions · 19", chevron, unfolds); rows carry photos. Checked and
+left: the medicine question card, the watch placeholder, the frame line
+(a callout between rules). Mobbin: Withings, Visible, CVS — one list, one
+grouping, search on top; never the same items regrouped twice.
 
-**Still owed:** the phone walk of the built state (the device dozed);
+**Still owed:** the phone walk (the device was away for both rounds);
 the 15 condition reads not read one by one for thinness.
 
-## 3. Is it safe? — next
+## 3. Is it safe? — BUILT 2026-09-19, walk owed
+
+Not a door page: the home tile opens the `can_i` surface, and the surface
+is now `CanIDoorBody`. Researched first (seven Mobbin passes, §11 of
+MOBBIN-DISCOVERY), then the user's brief: "make it fun, interactive with
+images … instead of just being a static section that just displays text
+for a single click."
+
+**What it is now, top to bottom**
+
+1. Hero: eyebrow, *Can I have it, do it, take it?*, one line, **the field**
+   (live results as she types; Enter opens the first hit or asks Veda).
+2. **Asked most** — twelve cut-outs, three across, verdict pill on the corner.
+3. **Asked recently** — her last twenty as chips (dot + name); empty = one
+   line of invitation.
+4. **For your weeks** — the entries with a note for her trimester; with no
+   due date, an invitation to set one.
+5. **Browse the shelves** — four photo tiles (Eat / Drink / Take / Do) with
+   counts → `CanIGroupScreen`: sub-group chips, cut-out grids per shelf.
+6. **Saved** — three rows + "All saved · N".
+7. Disclaimer.
+8. Pinned at the foot: **Scan a packet** (barcode, live) + a round
+   **photo** button (wired; waits on the key). `kCanIScanAtFoot` flips them
+   back beside the field for the device comparison.
+
+**The answer** is the reader (`pvReadFromCanI`): photo hero → the verdict
+word with the note for *her week* → Why → **Instead, try** (a rail of safe
+swaps) → the other trimesters, folded → In an Indian kitchen → **My doctor
+said** (two pills; her doctor's line prints above ours) → Also asked →
+Share / Ask Veda.
+
+**The camera.** Barcode → ML Kit on-device → Open Food Facts → `canIMatch`
+→ the answer. Photo → optional "What is it?" word → `can-i-identify` (a
+name, never a verdict) → `canIMatch` → the answer. Every miss is logged.
+
+**To walk on the phone (owed)**
+
+- The field: type "pa", "papita", "nt"; Enter on a hit; Enter on nothing.
+- The scan pill's look against the sheet; flip `kCanIScanAtFoot` and compare.
+- Scan a real packet (Maggi, Amul, a Crocin strip); scan a regional one.
+- Photo path shows "switching on soon" cleanly, and a typed word still lands.
+- A tile → the reader: photo hero, verdict, her-week line (needs a due date),
+  the swap rail, My doctor said (tap, re-open, it persists), share text.
+- Group screen chips; the grid's 3-across at the phone's width.
+- Recents fill and cap; Saved rows open the same reader.
+- Foot clearance under the pinned bar on every state, keyboard up and down.

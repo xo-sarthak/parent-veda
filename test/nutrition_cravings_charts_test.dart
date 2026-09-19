@@ -21,6 +21,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:parentveda/data/prepare_data.dart';
 import 'package:parentveda/data/cravings_data.dart';
 import 'package:parentveda/data/diet_chart_facets.dart';
 import 'package:parentveda/services/diet_chart_pdf.dart';
@@ -448,8 +449,13 @@ void main() {
 
       expect(find.byType(ConsultationsScreen), findsOneWidget);
       // Same rule as the scans card: the words and the filter are one fact.
-      expect(find.text('Prenatal Nutritionist'), findsOneWidget);
-      expect(find.text('Obstetrician'), findsNothing);
+      // Since 2026-09-19 the filter is a pill row (every role is a pill, the
+      // selected one's card is the only card), so the claim is on the
+      // cards: the nutritionist's name is listed, the obstetrician's is not.
+      final nutri = kSpecialists.firstWhere((x) => x.role.en == 'Prenatal Nutritionist');
+      final ob = kSpecialists.firstWhere((x) => x.role.en == 'Obstetrician');
+      expect(find.text(nutri.name.en), findsOneWidget);
+      expect(find.text(ob.name.en), findsNothing);
     });
   });
 }

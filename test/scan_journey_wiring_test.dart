@@ -184,7 +184,9 @@ void main() {
       // heading promising everything over a list missing six entries is the
       // same untruth as the duplication, pointing the other way. See the note
       // in `report_screen.dart`.
-      expect(find.text('More topics'), findsOneWidget);
+      // Folded since 2026-09-19 (the user: no See-more pill — a fold that
+      // says its count). The heading carries the count now.
+      expect(find.textContaining('More topics'), findsOneWidget);
 
       // And the thing this test actually cares about: nothing was filtered
       // out, so the library is at full size minus the six shown above it.
@@ -226,14 +228,20 @@ void main() {
               lang: AppLanguage.english, onlyRole: kScanConsultRole));
 
       final ob = kSpecialists.firstWhere((s) => s.id == kScanConsultRole);
+      // The filter is a pill row since 2026-09-19: the door's expert starts
+      // selected, so her pill is there and her card is the only card (a
+      // card prints "Role · credential", so the exact role text is the
+      // pill and the card is the name). Every other specialist appears as
+      // a pill only, never as a card.
       expect(find.text(ob.role.en), findsOneWidget);
-
-      // Everyone else is off this view...
+      expect(find.text(ob.name.en), findsOneWidget);
       for (final s in kSpecialists.where((x) => x.id != kScanConsultRole)) {
-        expect(find.text(s.role.en), findsNothing, reason: s.id);
+        expect(find.text(s.role.en), findsOneWidget, reason: '${s.id} pill');
+        expect(find.text(s.name.en), findsNothing, reason: '${s.id} card');
       }
-      // ...and reachable, which is what stops a filter from being a wall.
-      expect(find.text('See all experts'), findsOneWidget);
+      // ...and "All" is the way back out, which is what stops a filter from
+      // being a wall. (Kept for revert in the screen: "See all experts".)
+      expect(find.text('All'), findsOneWidget);
     });
   });
 

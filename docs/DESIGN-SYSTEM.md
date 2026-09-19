@@ -485,6 +485,20 @@ code (`pvDoorTileIsWritten`, `_ArticleList`) and in
 is a rail". Mobbin: Equinox, Alan, Gentler Streak, Liven, Tonal list
 same-kind articles; Clue and Atoms rail mixed or featured content.
 
+### 4.0 · addendum 4 — a verdict is a dot and a word — SETTLED 2026-09-19
+
+From the Is it safe? door. A verdict (safe / in moderation / depends /
+avoid / ask your doctor) is a **7pt dot and one word**, ink, on white.
+Never a painted tile, never a tinted box behind the name, never a number.
+On a photo tile it is a white hairline pill on the corner with a 6pt dot.
+On the answer page the dot may grow to 12pt beside the Fraunces word —
+that is the one place the verdict is the headline. The five colours
+(`canIVerdictColor`) are the dot's only; the word never takes them.
+
+Cut-out tiles (`CanICutoutTile`): square photo, hairline, name under in
+Manrope 12.5/700, two lines max. Three across on a phone. No photo → the
+category's line icon in the neutral well, never a blank square.
+
 ### 4.0 · addendum 3 — the leaf formats, so nobody re-decides them — SETTLED 2026-09-19
 
 Every screen a door tile opens is one of these. New tiles pick one; they

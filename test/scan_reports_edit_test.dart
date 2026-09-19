@@ -114,7 +114,15 @@ void main() {
       await ScanReportsStore.instance
           .add(_report(title: 'Anomaly scan', scanId: 'anomaly_scan'));
 
+      // Option A (2026-09-19, decided with the user): the tab is an ENTRY —
+      // "+ Add a report" and "Your reports · N" — and the rows live one tap
+      // in, on ScanReportsAllScreen. The door is still a door; it is one
+      // screen further along.
       await _pump(t, ScanReportsScreen(pregnancy: pregnancy));
+      expect(find.textContaining('Your reports'), findsOneWidget);
+      await t.tap(find.textContaining('Your reports'));
+      await t.pumpAndSettle();
+      expect(find.byType(ScanReportsAllScreen), findsOneWidget);
       expect(find.text('Anomaly scan'), findsOneWidget);
 
       await t.tap(find.text('Anomaly scan'));
@@ -127,12 +135,14 @@ void main() {
       expect(find.byType(ScanReportViewerScreen), findsOneWidget);
     });
 
-    testWidgets('delete is still one tap from the list', (t) async {
+    testWidgets('delete is one tap from the report', (t) async {
       await ScanReportsStore.instance.add(_report(title: 'Growth scan'));
-      await _pump(t, ScanReportsScreen(pregnancy: pregnancy));
+      // The bin left the list with option A (a list of doors carries no
+      // bins); Remove is a labelled button on the report itself.
+      await _pump(
+          t, ScanReportViewerScreen(reportId: 'rep_1', pregnancy: pregnancy));
 
-      // Adding a way in must not cost the way that already worked.
-      expect(find.byTooltip('Remove'), findsOneWidget);
+      expect(find.text('Remove'), findsOneWidget);
     });
   });
 
@@ -153,7 +163,9 @@ void main() {
 
       expect(find.text('Dating scan'), findsWidgets);
       expect(find.text('Dr Rao: recheck in four weeks'), findsOneWidget);
-      expect(find.textContaining('4 Mar 2026'), findsOneWidget);
+      // The date sits in the masthead AND the Added detail since the report
+      // page was rebuilt (2026-09-19); at least once is the claim.
+      expect(find.textContaining('4 Mar 2026'), findsWidgets);
     });
 
     testWidgets('a report with no files says so rather than showing blank',
@@ -174,7 +186,9 @@ void main() {
           t,
           ScanReportViewerScreen(reportId: 'rep_1', pregnancy: pregnancy));
 
-      await t.tap(find.byTooltip('Edit'));
+      // A labelled button since the report page rebuild (2026-09-19), not
+      // an icon with a tooltip.
+      await t.tap(find.text('Edit details'));
       await t.pumpAndSettle();
       expect(find.byType(ScanReportEditScreen), findsOneWidget);
     });

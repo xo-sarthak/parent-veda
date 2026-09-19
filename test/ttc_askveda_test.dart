@@ -105,7 +105,10 @@ void main() {
       final observer = FabRouteObserver();
       observer.didPush(routed(kTtcRootRoute), null);
       FabState.instance.markAppLive();
-      expect(FabState.instance.visible, isTrue);
+      // The FAB is off for now (kAskFabEnabled, 2026-09-19, §63.17); the
+      // suppression still has to fire underneath so the day it returns
+      // it hides where it always did.
+      expect(FabState.instance.visible, FabState.kAskFabEnabled);
       observer.didPush(routed(kAskVedaRoute), null);
       expect(FabState.instance.visible, isFalse);
     });

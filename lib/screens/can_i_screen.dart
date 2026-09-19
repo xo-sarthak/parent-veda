@@ -18,6 +18,8 @@ import '../models/can_i_entry.dart';
 import '../services/can_i_store.dart';
 import '../services/pregnancy_controller.dart';
 import '../theme/app_theme.dart';
+import 'can_i/can_i_answer.dart' as door;
+import 'can_i/can_i_door.dart';
 import 'tools/ask_veda_screen.dart';
 
 // ---------------------------------------------------------------------------
@@ -90,9 +92,13 @@ int _trimesterIndex(int week) => week <= 13 ? 0 : (week <= 27 ? 1 : 2);
 
 /// Public since 2026-09-16 so the unified Saved screen opens the same answer
 /// screen a tap in Can I? does — one destination per kind, never a guess.
+/// Since 2026-09-19 that destination is the reader (can_i/can_i_answer.dart);
+/// this name stays so the Saved screen's import does not move.
 void openCanIAnswer(BuildContext context, CanIEntry entry, PregnancyController c) =>
-    _openAnswer(context, entry, c);
+    door.openCanIAnswer(context, entry, c);
 
+// The pre-2026-09-19 answer screen. Kept for revert.
+// ignore: unused_element
 void _openAnswer(BuildContext context, CanIEntry entry, PregnancyController c) {
   Navigator.of(context).push(MaterialPageRoute(
     builder: (_) => CanIAnswerScreen(entry: entry, controller: c),
@@ -116,8 +122,17 @@ class CanIScreen extends StatelessWidget {
     if (picked != null && context.mounted) _openAnswer(context, picked, controller);
   }
 
+  // ⚠️ THE DOOR — 2026-09-19. The body is `CanIDoorBody`
+  // (lib/screens/can_i/can_i_door.dart): the field with scan and snap
+  // beside it, the cut-out grid, her recents, her trimester's shelf, the
+  // four shelves, Saved. The old kit body below is `buildClassic`, kept
+  // for revert; `_search`, `_CategoryScreen`, `CanIAnswerScreen` and
+  // `_SavedScreen` stay for the same reason and are unreached.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) => CanIDoorBody(controller: controller);
+
+  // ignore: unused_element
+  Widget buildClassic(BuildContext context) {
     return AnimatedBuilder(
       animation: controller,
       builder: (context, _) {

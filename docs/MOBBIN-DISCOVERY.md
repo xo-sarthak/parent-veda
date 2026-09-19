@@ -289,6 +289,33 @@ line each, so the next profile question starts here:
 list of equals); Zomato's gold/points band; per-thing sharing toggles in
 v1 (the user's call — one switch until the server owns the rule).
 
+## 11. Is it safe? — a lookup that is not a list (2026-09-19)
+
+Seven passes, two of them after the user asked for *features*, not a
+layout ("instead of just being a static section that just displays text
+for a single click"). What each one settled:
+
+| Question | Who answered it | Taken |
+|---|---|---|
+| What is the first thing on the page? | **GoodRx**, **Noom Food Lookup** — the field; you came to ask a thing | The field in the hero, live results as she types |
+| Where does the camera live? | **Yuka**, **Noom**, **Lifesum**, **Bevel** — scan beside search, never a separate mode; **PhonePe / GPay / Paytm** — scan at the bottom centre, under the thumb | Both built behind `kCanIScanAtFoot`; bottom-centre pill by default, the user judges on the device |
+| How does a verdict read at a glance? | **Yuka** — an 8pt dot and one word per row, no painted tile | `CanIVerdictDot` + word; a corner pill on photo tiles |
+| How does food look appealing? | **Uber Eats / Safeway**, **Shipt / Target**, **Thrive Market** — cut-out photos on white, name under, tight grid | `CanICutoutTile`, 3 across |
+| Big photo or cut-out? | **Uber Eats Browse**, **Panera** — photography for the *category*, cut-outs for the *item* | Photo shelves (Eat / Drink / Take / Do), cut-out items |
+| What does a "no" end in? | **Amazon Fresh** "Replace with:" rail, **Uber Eats** swap sheet, **Instacart** "If out of stock…" | *Instead, try* — a rail of safe swaps on every non-safe answer |
+| How does the answer page open? | **Vivino**, **Yami**, **HelloFresh** — the photo edge to edge, the judgement in the first line under it | The reader with a photo hero; verdict block first |
+| What makes it come back? | **Yuka History** tab, **Noom** recents | *Asked recently* chips; Saved surfaced on the door |
+| A barcode's unknown-product state? | **Yuka** "Unknown product · Fill in the information", **Lifesum** "Barcode not found" | "Not in our list yet" sheet → Ask Veda / Scan another; the miss logged |
+
+**Not in the library:** any pregnancy food-safety app (Ovia, BabyCenter
+are absent, as noted in §"What the library does not carry"); the pattern
+was assembled from grocery, nutrition and payments apps instead.
+
+**Declined:** Yuka's numeric score (a number invites comparison and a
+personalised probability, which the clinical rule forbids); Bumble's
+safety hub (tiles of static reading — the thing this door replaces);
+Bevel's radial action menu (nine actions where we have two).
+
 ## What the library does not carry
 
 Searching these by name returns junk (Mindvalley, an HR app): **Ovia, Glow,

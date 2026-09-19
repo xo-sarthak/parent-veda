@@ -7943,6 +7943,16 @@ through Openverse with `source=flickr,wikimedia` (CC BY / CC0 files served
 clean), keep the credit line, re-run `pregnancy_reads_shape_test`. The 10
 Flickr `_b.jpg` files are fine.
 
+### 63.18 Read photos: one host, verified; bundling as assets owed — 2026-09-19
+
+`read_images.dart` is 96 entries, all `cdn.stocksnap.io`, every one
+fetched and checked as a real JPEG (the ten Flickr files are gone: Flickr's
+CDN resets connections from Indian networks — all ten failed, all others
+served). The user still saw icons on Scans & tests on the phone — either an
+older build or StockSnap blocked on that network. **Decided (the user, 2026-09-19):** the photos go to Cloudflare R2, the
+same bucket the Garbh audio uses — upload the 96 files, point the table at
+`r2.dev` URLs, keep the credit. Not bundled. Owed with the R2 custom domain.
+
 ### 63.17 The Ask Veda FAB is OFF — 2026-09-19
 
 `FabState.kAskFabEnabled = false` (global_ask_fab.dart). The user: "hide
@@ -8370,3 +8380,69 @@ in-app switch was the pre-flavour road.
 reached from the preview home's avatar and from the grown-up page, both
 behind `kDebugMode` like the rest of the stage. When the stage ships, its
 You needs nothing new — the content row already exists — only the door.
+
+## 68.0 Is it safe? is rebuilt as a door; what it still owes — OPENED 2026-09-19
+
+`lib/screens/can_i/` (door, group, answer, identify, widgets),
+`lib/data/can_i_groups.dart`, `lib/data/reads/can_i_read.dart`,
+`lib/services/can_i_activity_store.dart`, `0086_can_i_misses.sql`,
+`supabase/functions/can-i-identify/`. Seven Mobbin passes in
+MOBBIN-DISCOVERY §11; the walk in PREGNANCY-DOORS-REVIEW §3. Built, not
+walked — the phone was out for this pass.
+
+### 68.1 The vision key — a pricing decision, then a secret
+The photo path is wired end to end and returns `not_configured` until
+`CAN_I_VISION_PROVIDER` and the matching key are set. The user's call,
+after a pricing discussion. Brackets at ~1,200 tokens a photo, 10,000
+lookups a month: Groq Llama 4 Scout ≈ $2 / ₹170; Gemini 2.5 Flash ≈ $2 /
+₹170; Claude Haiku 4.5 ≈ $15 / ₹1,250. Accuracy on Indian foods is the
+real difference; test 30 photos on each before picking. Then:
+`supabase functions deploy can-i-identify` and two `secrets set` lines
+(the function's header has them).
+
+### 68.2 Migration 0086 is written, not run
+`can_i_misses` + the desk's view. Run it; the misses log is inert until
+then (the client's upsert fails silently, as designed).
+
+### 68.3 Scan placement — decided on the device
+`kCanIScanAtFoot` (can_i_door.dart): TRUE = pinned pill at the bottom
+centre (payments-app placement, the user's suggestion), FALSE = two
+rounds beside the field (Yuka). Both built; the user judges on the phone.
+"It should not be like it was looking way better in the hero section."
+
+### 68.4 Photos — placeholders from two free pools, R2 later
+193 item photos + 4 shelf photos in `read_images.dart` (`cani_<id>`,
+`cani_shelf_<category>`), picked by hand from Wikimedia Commons and
+StockSnap (via Openverse) contact sheets. Roughly a fifth are stand-ins
+(a related dish, a generic tablet) and a few have none and fall back to
+the icon well. The end state is cut-outs on white on Cloudflare R2
+(§63.18); the map is the only thing that changes.
+
+### 68.5 Trimester notes — 82 / 65 / 78, written 2026-09-19
+Before this pass 4 / 3 / 4 entries had a trimester note; "for you, week
+N" had nothing to say. Written for every entry where the trimester
+genuinely changes the answer (`cani_trimester.py` in the session
+scratchpad seeded them; the notes live in `can_i_data.dart`). **Owed: a
+clinical read of the new notes.** They are general, hedged and defer to
+the doctor, but they have not had a clinician's eyes.
+
+### 68.6 Can I entries are not in the Everywhere search
+`pvSearchIndex()` is keyed by `PvDoorPage`, and Is it safe? is a surface,
+not a door page. The door's own field covers it; "papaya" typed on the
+Scans door does not find it. Small seam: a `PvSearchHit` without a page.
+
+### 68.7 "What changed this week" on the home
+The notes now make it derivable: entries whose note for her new
+trimester exists. A home card on the trimester crossing ("3 answers
+changed for you") is the natural use; out of this door's scope.
+
+### 68.8 The old screen
+`CanIScreen.buildClassic`, `_CategoryScreen`, `CanIAnswerScreen`,
+`_SavedScreen`, `_CanISearchDelegate` and `kCanIPopular` stay in
+`can_i_screen.dart` for revert. Retire after the walk.
+
+### 68.9 Open Food Facts coverage
+Regional Indian brands are often absent; the "not in the food database"
+sheet handles it and logs the barcode. If misses show one brand
+repeatedly, OFF accepts contributions — or a small own table of
+barcode → entry for the fifty most-scanned packets.

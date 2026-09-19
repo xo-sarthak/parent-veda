@@ -72,7 +72,11 @@ void main() {
     addTearDown(c.dispose);
 
     FabState.instance.markAppLive();
-    expect(FabState.instance.visible, isTrue);
+    // The FAB is switched off for now (kAskFabEnabled, 2026-09-19,
+    // STILL-OPEN §63.17): `visible` is false whatever the app does. The
+    // layout claim still holds either way — asserted on the constant so
+    // the test says which world it is in rather than failing silently.
+    expect(FabState.instance.visible, FabState.kAskFabEnabled);
 
     await t.pumpWidget(_appShell(c, content));
     await t.pump();
