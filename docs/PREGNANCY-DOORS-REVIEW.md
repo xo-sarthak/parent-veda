@@ -82,4 +82,24 @@ Superpower (the add as a hairline box; upload from the top).
   release or two.
 - The rail-vs-tiles choice for the other doors (this door has the rail).
 
-## 2. Complications — next
+## 2. Complications — WALKED AND FIXED 2026-09-19 (phone check owed: it dozed mid-walk)
+
+Tree: home tile → door (tiles: Find a condition · When it comes up · Get
+help now · Living with it · Talk) → 15 condition reads, 6 guides, the
+checklist, consults.
+
+| Where | Was | Now |
+|---|---|---|
+| Find a condition | a gate question ("has your doctor mentioned a condition, or do you just want to learn?"), then a lavender "Just exploring · change" pill, then a second search bar, then the list | the list. The gate is off (derive, never ask); the door's bar indexes every condition |
+| Condition read · "Add to my journey" | shown only behind the "diagnosed" answer | on every page — and **adding asks first** (a sheet: "only if your doctor has said you have it… Ask Veda will answer with it in mind"). One tap cannot add; removing is one tap. The guard test moved from the door to the tap |
+| When it comes up · three rails of "Article" cards | | **a list** — this is the new door-wide rule: a section whose tiles are all written draws as rows with the read's photo (or the format well); a mixed section keeps the rail. `_ArticleList`, `pvDoorTileIsWritten`. Mobbin: Equinox, Alan, Gentler Streak, Liven, Tonal list same-kind articles; Clue, Atoms rail mixed content |
+| Get help now | five signs + "See all of these" → a screen with the same five | `seeAll: false` — every line already opens its condition |
+| Living with it · "Keep track of it" | "Add a condition to my journey" (opened the Find list as a screen) · "Keep your reports for this" (opened the Scans locker) | **retired** — both are a tap away in their own homes |
+| Talk | the seven-line pregnancy flag again (one tab after Get help now's five); two sections of one card | no second flag; one section, two cards |
+
+**Mobbin, this door:** the article-list pass above.
+
+**Still owed:** the phone walk of the built state (the device dozed);
+the 15 condition reads not read one by one for thinness.
+
+## 3. Is it safe? — next

@@ -208,18 +208,26 @@ void main() {
   // ===========================================================================
 
   group('a curious visit saves nothing', () {
-    testWidgets('no "add to my journey" behind the browsing door', (t) async {
+    testWidgets('"add to my journey" shows to a curious reader but asks first',
+        (t) async {
       ConditionsStore.instance.setDoor(ConditionDoorAnswer.curious);
       await _pump(
           t,
           ConditionDetailScreen(entry: _byId('gdm'), pregnancy: pregnancy));
 
-      // ⚠️ THIS MATTERS MORE NOW THAN IT DID. Before the bridge, showing the
-      // button to a curious reader would have written to a dead set. It now
-      // writes into the profile Ask Veda reads — so the door is the thing
+      // ⚠️ THE GATE IS OFF (2026-09-19, derive never ask) AND THE GUARD
+      // MOVED. The write goes into the profile Ask Veda reads, so the thing
       // standing between "I looked up a scary word" and "the app believes I
-      // have this".
-      expect(find.text('Add to my journey'), findsNothing);
+      // have this" is now a consent sheet on the tap, not a question at the
+      // door. One tap must not add.
+      expect(find.text('Add to my journey'), findsOneWidget);
+      await t.tap(find.text('Add to my journey'));
+      await t.pumpAndSettle();
+      expect(ConditionsStore.instance.isAddedToJourney('gdm'), isFalse);
+      expect(find.text('Not now'), findsOneWidget);
+      await t.tap(find.text('Add it'));
+      await t.pumpAndSettle();
+      expect(ConditionsStore.instance.isAddedToJourney('gdm'), isTrue);
     });
 
     testWidgets('the diagnosed door shows it', (t) async {

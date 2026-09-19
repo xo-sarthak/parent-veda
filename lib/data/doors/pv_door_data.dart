@@ -159,6 +159,26 @@ extension PvDoorFormatCopy on PvDoorFormat {
 //  The tiles
 // -----------------------------------------------------------------------------
 
+/// Whether a tile opens a piece of WRITING — an article, guide, read or
+/// myth-fact — as opposed to a tool, a film, a checklist, a person. A section
+/// whose tiles are all written draws as a LIST (2026-09-19); anything mixed
+/// stays a rail. See `_ArticleList` in pv_door_screen.dart.
+bool pvDoorTileIsWritten(PvDoorTile t) => switch (t.format) {
+      PvDoorFormat.article ||
+      PvDoorFormat.guide ||
+      PvDoorFormat.read ||
+      PvDoorFormat.mythFact =>
+        true,
+      _ => false,
+    };
+
+/// The read id a written tile opens, for its photo (`readImageFor`), or null
+/// where the tile's library has no read-image entry.
+String? pvDoorTileReadImageId(PvDoorTile t) => switch (t) {
+      PvDoorGuideTile(:final readId) => readId,
+      _ => null,
+    };
+
 sealed class PvDoorTile {
   const PvDoorTile({
     required this.title,
@@ -1033,4 +1053,7 @@ final PvDoorRedFlag kSameDayFlag = PvDoorRedFlag(
   ],
   surfaceId: 'conditions/same_day',
   footer: kSameDayFooter,
+  // Each line already opens its condition; the "See all" screen was the
+  // same five lines with the condition named (2026-09-19). Kept by route.
+  seeAll: false,
 );

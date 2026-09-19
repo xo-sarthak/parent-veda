@@ -23,6 +23,7 @@ import '../../data/conditions_data.dart';
 import '../../localization/app_language.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/pv_fonts.dart';
+import '../../widgets/pv_feedback.dart';
 import '../../widgets/pv_placeholders.dart';
 import '../brackets/hub/hub_solution_cards.dart';
 import '../brackets/hub/problem_hub_screen.dart' show HubPill;
@@ -77,7 +78,9 @@ class ConditionDetailScreen extends StatelessWidget {
           // Personalise behind the diagnosed door only. A curious reader must
           // not be handed a button that writes "she has this" into the profile
           // Ask Veda reads.
-          journey: store.isDiagnosed ? _ConditionBlock.journey : null,
+          // On every page since 2026-09-19 (the gate is off; derive, never
+          // ask). Was: store.isDiagnosed ? journey : null.
+          journey: _ConditionBlock.journey,
           foot: [
             if (entry.showMedicine) _ConditionBlock.medicine,
             if (entry.showReadMore) _ConditionBlock.readMore,
@@ -103,7 +106,15 @@ class ConditionDetailScreen extends StatelessWidget {
                       ? Icons.check_circle_outline_rounded
                       : Icons.add_circle_outline_rounded,
                   p: p,
-                  onTap: () => store.toggleAddedToJourney(entry.id),
+                  // ⚠️ ADDING CONFIRMS; REMOVING DOES NOT. The gate that used
+                  // to hide this pill from a curious reader is off (2026-09-19,
+                  // derive never ask) — but the write goes into the profile
+                  // Ask Veda reads, so "I looked up a scary word" must not
+                  // become "the app believes I have this" on one tap. The
+                  // sheet says what it does; a second tap is the consent.
+                  onTap: () => store.isAddedToJourney(entry.id)
+                      ? store.toggleAddedToJourney(entry.id)
+                      : _confirmAdd(context, entry, store, p, lang),
                 ),
               _ConditionBlock.medicine => _MedicineAsk(
                   entry: entry, pregnancy: pregnancy, p: p, lang: lang, store: store),
@@ -124,6 +135,55 @@ class ConditionDetailScreen extends StatelessWidget {
         );
       },
     );
+  }
+
+  /// The consent sheet for "Add to my journey". Plain words on what it
+  /// changes, an ink pill to add, a text button to not.
+  Future<void> _confirmAdd(BuildContext context, ConditionEntry entry,
+      ConditionsStore store, V2Palette p, AppLanguage lang) async {
+    final yes = await showModalBottomSheet<bool>(
+      context: context,
+      backgroundColor: p.surface,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.fromLTRB(
+            20, 18, 20, 20 + MediaQuery.paddingOf(ctx).bottom),
+        child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Add ${entry.name.of(lang)} to your journey?',
+                  style: pvFraunces(
+                      fontSize: 21,
+                      fontWeight: FontWeight.w600,
+                      height: 1.2,
+                      color: p.ink1)),
+              const SizedBox(height: 10),
+              Text(
+                  'Only if your doctor has said you have it. It goes on your '
+                  'own list here, and Ask Veda will answer with it in mind. '
+                  'You can take it off any time.',
+                  style: pvManrope(fontSize: 14, height: 1.55, color: p.ink2)),
+              const SizedBox(height: 18),
+              Row(children: [
+                TextButton(
+                  onPressed: () => Navigator.pop(ctx, false),
+                  child: const Text('Not now'),
+                ),
+                const Spacer(),
+                FilledButton(
+                  onPressed: () => Navigator.pop(ctx, true),
+                  child: const Text('Add it'),
+                ),
+              ]),
+            ]),
+      ),
+    );
+    if (yes == true) {
+      pvCommitFeedback();
+      store.toggleAddedToJourney(entry.id);
+    }
   }
 
   /// The previous body, kept for revert. See `build`.

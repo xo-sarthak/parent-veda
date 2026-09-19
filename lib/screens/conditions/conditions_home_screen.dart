@@ -59,7 +59,8 @@ class ConditionsHomeScreen extends StatefulWidget {
 class _ConditionsHomeScreenState extends State<ConditionsHomeScreen> {
   final _search = TextEditingController();
   bool _seeMore = false;
-  bool _showGate = false;
+  // ignore: unused_field
+  bool _showGate = false; // the gate is off since 2026-09-19; kept for revert
 
   @override
   void initState() {
@@ -299,10 +300,15 @@ class _Browse extends StatelessWidget {
             searching ? kAllConditions.where((c) => c.matches(query)).toList() : const <ConditionEntry>[];
 
         final children = <Widget>[
-            _DoorChip(store: store, p: p, lang: lang, onTap: onChangeDoor),
-            const SizedBox(height: 16),
-            _SearchField(controller: search, p: p, lang: lang),
-            const SizedBox(height: 22),
+            // The door chip and the search field stay on the standalone
+            // screen; embedded, the door's bar and the page's pill do their
+            // jobs (2026-09-19).
+            if (!embedded) ...[
+              _DoorChip(store: store, p: p, lang: lang, onTap: onChangeDoor),
+              const SizedBox(height: 16),
+              _SearchField(controller: search, p: p, lang: lang),
+              const SizedBox(height: 22),
+            ],
             if (searching) ...[
               _SearchResults(results: results, p: p, lang: lang, onOpen: onOpen),
             ] else ...[
@@ -477,13 +483,15 @@ class _ConditionsHomeBodyState extends State<ConditionsHomeBody> {
         final p = V2PaletteStore.instance.current;
         final store = ConditionsStore.instance;
 
-        if (!store.answered || _showGate) {
-          return _DoorGate(
-              p: p,
-              lang: lang,
-              embedded: true,
-              onAnswered: () => setState(() => _showGate = false));
-        }
+        // ⚠️ NO GATE — 2026-09-19, the door walk. The tab opened on a
+        // question ("has your doctor mentioned a condition, or do you just
+        // want to learn?") whose only effect was whether a condition page
+        // showed "Add to my journey", and left a lavender "Just exploring ·
+        // change" pill at the top of the list forever. CLAUDE.md: derive,
+        // never ask. The pill shows on every condition page now; nothing is
+        // saved unless she taps it. `_DoorGate` and `_showGate` stay for
+        // revert. The inner search bar is gone too: the door's own bar
+        // indexes every condition.
         return _Browse(
           p: p,
           lang: lang,

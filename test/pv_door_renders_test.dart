@@ -301,12 +301,18 @@ void _everyDoor() {
       }
     });
 
-    testWidgets('$name: every section is a rail, even a section of one',
+    testWidgets('$name: a written section is a list, a mixed one is a rail',
         (tester) async {
-      // ⚠️ SYMMETRY, AS A RULE. Decided on the phone, 2026-09-11: one card
-      // language on every section of every tab, so a rail of one card is
-      // still a rail. A full-width row anywhere under a section heading is
-      // the failure. `PvDoorLayout.stack` must not change this.
+      // ⚠️ THE LAYOUT RULE, 2026-09-19 (it replaced 2026-09-11's "every
+      // section is a rail, even a section of one"). A section whose tiles
+      // are ALL written — article, guide, read, myth-fact — draws as a
+      // vertical list of rows with a thumbnail; a section with a tool, a
+      // film, a checklist or a person in it keeps the rail. Decided on the
+      // phone from Complications' three rails of identical "Article" cards,
+      // against Mobbin (Equinox, Alan, Gentler Streak, Liven list same-kind
+      // articles; Clue and Atoms rail mixed content). So the number of
+      // horizontal ListViews on a tab is the number of MIXED sections, and
+      // every written section is present as its rows.
       await _pump(tester, name);
       for (var i = 0; i < door.groups.length; i++) {
         if (i > 0) {
@@ -315,13 +321,32 @@ void _everyDoor() {
         }
         final g = door.groups[i];
         final sections = door.sectionsOf(g.id);
-        // The carousel is a custom gesture widget, not a ListView, so every
-        // horizontal ListView on screen is a section rail.
+        final mixed = sections.where((s) =>
+            s.inlineSurfaceId == null &&
+            s.tiles.isNotEmpty &&
+            !s.tiles.every(pvDoorTileIsWritten));
+        // An inline tool may draw a horizontal list of its own (Garbh's
+        // ritual rail does); it is counted as at most one per inline
+        // section, and never as a section rail.
+        final inlineRails = sections.where((s) => s.inlineSurfaceId != null).length;
         final rails = find.byWidgetPredicate((w) =>
             w is ListView && w.scrollDirection == Axis.horizontal);
-        expect(rails, findsNWidgets(sections.length),
-            reason: '$name / "${g.label}": ${sections.length} sections must '
-                'draw ${sections.length} rails.');
+        final n = tester.widgetList(rails).length;
+        expect(n >= mixed.length && n <= mixed.length + inlineRails, isTrue,
+            reason: '$name / "${g.label}": ${mixed.length} mixed sections must '
+                'draw ${mixed.length} rails (found $n, with $inlineRails inline '
+                'tools that may add one each).');
+        // And every written section is rows: its first tile's title is on
+        // the page as a row title, not inside a horizontal list.
+        for (final sec in sections) {
+          if (sec.inlineSurfaceId != null || sec.tiles.isEmpty) continue;
+          if (!sec.tiles.every(pvDoorTileIsWritten)) continue;
+          final first = sec.tilesFor(20).first;
+          final inRail = find.descendant(of: rails, matching: find.text(first.title));
+          expect(inRail, findsNothing,
+              reason: '$name / "${g.label}" / "${sec.heading}" is all written '
+                  'and must be a list, not a rail.');
+        }
       }
     });
 

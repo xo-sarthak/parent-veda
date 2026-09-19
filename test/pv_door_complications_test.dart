@@ -86,20 +86,19 @@ void main() {
       ]);
     });
 
-    test('two flags, and they are different lists', () {
-      // ⚠️ ONE DOOR, TWO PINNED FLAGS, ON PURPOSE. Get-help-now carries the
-      // assembled condition list; Talk carries the stage's standing pregnancy
-      // list, which is the same object the Scans door pins. Collapsing them
-      // would either put condition-specific lines on a general warning or drop
-      // the general ones from a safety tab.
+    test('one flag, on Get help now, and it links nowhere it repeats', () {
+      // ⚠️ ONE DOOR, ONE PINNED FLAG — 2026-09-19, the door walk. Talk used to
+      // carry the stage's standing pregnancy list as well (the same object
+      // Scans pins), one tab after Get help now's assembled list; on the
+      // phone that read as the same warning twice. Get help now is this
+      // door's warning. Its "See all" is off: every line already opens its
+      // condition, and the screen was the same five lines again.
       final help = door.groups.firstWhere((g) => g.id == kCondTabHelp);
       final talk = door.groups.firstWhere((g) => g.id == kCondTabTalk);
       expect(help.pinnedRedFlag, isNotNull);
-      expect(talk.pinnedRedFlag, isNotNull);
+      expect(talk.pinnedRedFlag, isNull);
       expect(help.pinnedRedFlag!.title, 'Signs to get help the same day');
-      expect(talk.pinnedRedFlag!.title, 'Call your doctor if');
-      expect(help.pinnedRedFlag!.lines.length,
-          isNot(equals(talk.pinnedRedFlag!.lines.length)));
+      expect(help.pinnedRedFlag!.seeAll, isFalse);
     });
 
     test('no other tab pins a flag', () {
@@ -110,11 +109,15 @@ void main() {
       }
     });
 
-    test('the report locker is linked, not rebuilt', () {
-      // The brief: "links to My reports in Scans (single source)."
-      final tile = door.allTiles
-          .firstWhere((t) => t.title == 'Keep your reports for this');
-      expect((tile as PvDoorToolTile).surfaceId, 'scans/reports');
+    test('the report locker is neither linked nor rebuilt here', () {
+      // The brief: "links to My reports in Scans (single source)." Since
+      // 2026-09-19 the link tile is retired too: the locker is one tap away
+      // in its own door, and a tool tile that only opens another tab was
+      // the pattern the door walk removed everywhere. No tile names it.
+      expect(door.allTiles.where((t) => t.title == 'Keep your reports for this'),
+          isEmpty);
+      expect(door.allTiles.where((t) => t.title == 'Add a condition to my journey'),
+          isEmpty);
     });
   });
 

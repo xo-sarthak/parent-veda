@@ -473,6 +473,18 @@ the whole UI."* What replaces it, by kind:
 Tinted fills survive in exactly two places: the group's mark well (the
 "colour in wells" rule) and a tile's field on a rail.
 
+### 4.0 · addendum 2 — a written section is a list, a mixed one is a rail — SETTLED 2026-09-19
+
+Under a door heading, a section whose tiles are **all written** (article,
+guide, read, myth-fact) draws as a vertical list: a 56pt thumbnail (the
+read's photo, else the format's icon in a neutral well), the title bold,
+the blurb in one grey line, a chevron, a hairline. A section with a tool,
+a film, a checklist or a person in it keeps the card rail. The rule is in
+code (`pvDoorTileIsWritten`, `_ArticleList`) and in
+`test/pv_door_renders_test.dart`; it replaced 2026-09-11's "every section
+is a rail". Mobbin: Equinox, Alan, Gentler Streak, Liven, Tonal list
+same-kind articles; Clue and Atoms rail mixed or featured content.
+
 ## 4.0a One reader — SETTLED 2026-09-17
 
 Every piece of writing in the app is one object, `PvRead`, on one screen,

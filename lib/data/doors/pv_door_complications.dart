@@ -186,7 +186,9 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
       mark: IntentMark.askDoctor,
       icon: Icons.chat_bubble_outline_rounded,
       hue: 160,
-      pinnedRedFlag: kPregnancyUrgentFlag,
+      // No second flag (2026-09-19): "Get help now" is this door's warning,
+      // one tab over; the scans list repeated here read as the same thing
+      // twice. Kept for revert: pinnedRedFlag: kPregnancyUrgentFlag,
     ),
   ],
 
@@ -352,42 +354,37 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
       ],
     ),
 
-    PvDoorSection(
-      group: kCondTabLiving,
-      heading: 'Keep track of it',
-      tiles: [
-        PvDoorToolTile(
-          title: 'Add a condition to my journey',
-          blurb: 'Put it on your own list, so it is the first thing here next '
-              'time.',
-          surfaceId: kCondSurfaceJourney,
-        ),
-        // ⚠️ ONE LOCKER, TWO DOORS. The brief's own instruction: link to My
-        // reports in Scans, single source. A second locker here would be two
-        // places a report could be and one place she would look.
-        PvDoorToolTile(
-          title: 'Keep your reports for this',
-          blurb: 'Your report locker, in Scans & tests. A photo is enough.',
-          surfaceId: kCondSurfaceReports,
-        ),
-      ],
-    ),
+    // ⚠️ RETIRED 2026-09-19 — the door walk. "Add a condition to my journey"
+    // opened the Find tab as a screen (the same list, one deeper); "Keep
+    // your reports for this" opened the Scans locker. Both are a tap away
+    // in their own homes, and "Add to my journey" is on every condition
+    // page now. One home per fact. Kept for revert:
+    // PvDoorSection(
+    //   group: kCondTabLiving,
+    //   heading: 'Keep track of it',
+    //   tiles: [
+    //     PvDoorToolTile(
+    //       title: 'Add a condition to my journey',
+    //       blurb: 'Put it on your own list, so it is the first thing here next '
+    //           'time.',
+    //       surfaceId: kCondSurfaceJourney,
+    //     ),
+    //     // ⚠️ ONE LOCKER, TWO DOORS. The brief's own instruction: link to My
+    //     // reports in Scans, single source. A second locker here would be two
+    //     // places a report could be and one place she would look.
+    //     PvDoorToolTile(
+    //       title: 'Keep your reports for this',
+    //       blurb: 'Your report locker, in Scans & tests. A photo is enough.',
+    //       surfaceId: kCondSurfaceReports,
+    //     ),
+    //   ],
+    // ),
+    // 
+    // // =========================================================================
+    // //  SUB-TAB 5 · Talk
 
     // =========================================================================
-    //  SUB-TAB 5 · Talk
-    // =========================================================================
-    PvDoorSection(
-      group: kCondTabTalk,
-      heading: 'Talk to someone',
-      tiles: [
-        PvDoorTalkTile(
-          title: 'Have a doctor explain your condition',
-          blurb: 'Book a 1:1 with a gynaecologist and go through it together.',
-          surfaceId: kCondSurfaceConsult,
-        ),
-      ],
-    ),
-
+    // One section, two cards (2026-09-19) — as on Scans & tests.
     PvDoorSection(
       group: kCondTabTalk,
       heading: 'Before your appointment',
@@ -396,6 +393,11 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
           title: 'What to ask about your condition',
           blurb: 'Tick what matters to you, and take the list in with you.',
           surfaceId: kCondSurfaceQuestions,
+        ),
+        PvDoorTalkTile(
+          title: 'Have a doctor explain your condition',
+          blurb: 'Book a 1:1 with a gynaecologist and go through it together.',
+          surfaceId: kCondSurfaceConsult,
         ),
       ],
     ),

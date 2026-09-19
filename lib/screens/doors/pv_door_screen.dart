@@ -54,6 +54,8 @@ import '../../data/conditions_data.dart' show ConditionsStore;
 import '../../services/scan_reports_store.dart';
 import '../../services/scans_store.dart';
 import '../../theme/pv_fonts.dart';
+import '../../widgets/pv_feedback.dart';
+import '../../data/reads/read_images.dart';
 import '../v2/v2_palette.dart';
 import '../v2/v3_bracket_art.dart';
 import '../v2/v3_hero_field.dart';
@@ -444,6 +446,24 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                       if (section.inlineSurfaceId case final surface?)
                         pvDoorInlineToolFor(surface, widget.pregnancy) ??
                             const SizedBox(height: kPvRailCardHeight)
+                      // ⚠️ ALL WRITTEN → A LIST, NOT A RAIL — 2026-09-19, the
+                      // door walk. Three rails of identical grey "Article"
+                      // cards on Complications' "When it comes up" read as a
+                      // wall of pages. Every app that lists same-kind
+                      // articles under a heading (Mobbin: Equinox, Alan,
+                      // Gentler Streak, Liven, Tonal) uses a vertical list
+                      // with a thumbnail; rails are for MIXED or featured
+                      // content (Clue, Atoms). So a section of only written
+                      // tiles is rows — photo or format well, bold title,
+                      // one line, chevron — and anything mixed keeps the
+                      // rail. One layout rule, no per-door flag.
+                      else if (tiles.isNotEmpty &&
+                          tiles.every(pvDoorTileIsWritten))
+                        pvDoorPad(_ArticleList(
+                          tiles: tiles,
+                          p: p,
+                          onOpen: _openTile,
+                        ))
                       else
                       SizedBox(
                         height: kPvRailCardHeight,
@@ -1027,5 +1047,104 @@ class _TabNote extends StatelessWidget {
                 style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink2)),
           ),
         ]),
+      );
+}
+
+// =============================================================================
+//  _ArticleList — a section of written tiles, as rows
+// -----------------------------------------------------------------------------
+//  The list form for a section that is all articles (see the rail branch in
+//  the door body for why). A row: a 56pt thumbnail — the read's photograph
+//  where it has one (`readImageFor`), else the format's icon in a neutral
+//  well — the title bold, the blurb in one grey line, a chevron, a hairline
+//  under. Presses and hums. The same object as a search result and the
+//  decoder's topic row (`PvDoorRow`), with the photo added.
+// =============================================================================
+
+class _ArticleList extends StatelessWidget {
+  const _ArticleList({required this.tiles, required this.p, required this.onOpen});
+
+  final List<PvDoorTile> tiles;
+  final V2Palette p;
+  final void Function(PvDoorTile) onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    final well = Color.alphaBlend(p.ink1.withValues(alpha: 0.06), p.surface);
+    return Column(children: [
+      for (final t in tiles)
+        PvPress(
+          enabled: !t.comingSoon,
+          child: InkWell(
+            onTap: t.comingSoon ? null : () => onOpen(t),
+            child: Opacity(
+              opacity: t.comingSoon ? 0.62 : 1,
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                    border: Border(bottom: BorderSide(color: p.line))),
+                child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: SizedBox(
+                      width: 56,
+                      height: 56,
+                      child: switch (pvDoorTileReadImageId(t)) {
+                        final id? when readImageFor(id) != null => Image.network(
+                            readImageFor(id)!,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) => _well(well, t),
+                            loadingBuilder: (context, child, progress) =>
+                                progress == null ? child : _well(well, t),
+                          ),
+                        _ => _well(well, t),
+                      },
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(t.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: pvManrope(
+                                fontSize: 15,
+                                fontWeight: FontWeight.w700,
+                                height: 1.25,
+                                color: p.ink1)),
+                        const SizedBox(height: 3),
+                        Text(t.comingSoon ? 'Coming soon' : t.blurb,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: pvManrope(
+                                fontSize: 12.5, height: 1.4, color: p.ink2)),
+                        if (t.meta case final m?) ...[
+                          const SizedBox(height: 3),
+                          Text(m,
+                              style: pvManrope(
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: p.ink3)),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  if (!t.comingSoon)
+                    Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
+                ]),
+              ),
+            ),
+          ),
+        ),
+    ]);
+  }
+
+  Widget _well(Color well, PvDoorTile t) => Container(
+        color: well,
+        alignment: Alignment.center,
+        child: Icon(pvDoorFormatIcon(t.format), size: 22, color: p.ink2),
       );
 }
