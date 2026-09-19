@@ -53,6 +53,43 @@ String canICategoryLabel(CanICategory c) => switch (c) {
       CanICategory.doActivity => 'Do',
     };
 
+/// A photo that tries again. The free hosts throttle by IP — Wikimedia
+/// answered 429 to a phone sharing an IP with a script, 2026-09-19 — and a
+/// tile that gives up on the first refusal is blank for the whole visit.
+/// One retry at 2 s, one at 5 s, then the fallback. The end state is our
+/// own host (R2, STILL-OPEN §68.4), where none of this is needed.
+class CanIPhoto extends StatefulWidget {
+  const CanIPhoto({super.key, required this.url, required this.fallback, this.fit = BoxFit.cover});
+  final String url;
+  final Widget fallback;
+  final BoxFit fit;
+
+  @override
+  State<CanIPhoto> createState() => _CanIPhotoState();
+}
+
+class _CanIPhotoState extends State<CanIPhoto> {
+  int _attempt = 0;
+  static const _delays = [Duration(seconds: 2), Duration(seconds: 5)];
+
+  @override
+  Widget build(BuildContext context) => Image.network(
+        widget.url,
+        key: ValueKey('${widget.url}#$_attempt'),
+        fit: widget.fit,
+        gaplessPlayback: true,
+        errorBuilder: (_, _, _) {
+          if (_attempt < _delays.length) {
+            final next = _attempt + 1;
+            Future.delayed(_delays[_attempt], () {
+              if (mounted && _attempt == next - 1) setState(() => _attempt = next);
+            });
+          }
+          return widget.fallback;
+        },
+      );
+}
+
 /// The dot and the word, inline.
 class CanIVerdictLine extends StatelessWidget {
   const CanIVerdictLine({super.key, required this.verdict, required this.p, this.size = 12.5});
@@ -134,10 +171,7 @@ class CanICutoutTile extends StatelessWidget {
               ),
               clipBehavior: Clip.antiAlias,
               child: Stack(fit: StackFit.expand, children: [
-                if (url != null)
-                  Image.network(url, fit: BoxFit.cover, errorBuilder: (_, _, _) => _well(p))
-                else
-                  _well(p),
+                if (url != null) CanIPhoto(url: url, fallback: _well(p)) else _well(p),
                 Positioned(left: 6, bottom: 6, child: CanIVerdictPill(verdict: entry.verdict, p: p)),
               ]),
             ),
@@ -189,8 +223,7 @@ class CanIRow extends StatelessWidget {
             ),
             clipBehavior: Clip.antiAlias,
             child: url != null
-                ? Image.network(url, fit: BoxFit.cover,
-                    errorBuilder: (_, _, _) => Icon(canICategoryIcon(entry.category), size: 20, color: p.ink3))
+                ? CanIPhoto(url: url, fallback: Icon(canICategoryIcon(entry.category), size: 20, color: p.ink3))
                 : Icon(canICategoryIcon(entry.category), size: 20, color: p.ink3),
           ),
           const SizedBox(width: 12),

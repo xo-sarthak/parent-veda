@@ -199,9 +199,24 @@ class _CanIDoorBodyState extends State<CanIDoorBody> {
                           }
                         },
                         style: pvManrope(fontSize: 14.5, color: p.ink1),
+                        // ⚠️ EVERY BORDER OFF, AND NO FILL. The app-wide
+                        // inputDecorationTheme draws a white box with a
+                        // hairline and an ink focus ring; inside this pill
+                        // that showed as a second box (the phone,
+                        // 2026-09-19: "search bar needs fixing"). `border:
+                        // none` alone leaves enabled/focused borders and the
+                        // fill from the theme.
                         decoration: InputDecoration(
                           isCollapsed: true,
+                          isDense: true,
+                          filled: false,
                           border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          disabledBorder: InputBorder.none,
+                          errorBorder: InputBorder.none,
+                          focusedErrorBorder: InputBorder.none,
+                          contentPadding: EdgeInsets.zero,
                           hintText: 'Papaya, Crocin, hair colour…',
                           hintStyle: pvManrope(fontSize: 14.5, color: p.ink3),
                         ),
@@ -220,11 +235,7 @@ class _CanIDoorBodyState extends State<CanIDoorBody> {
               // Beside the field, Yuka's placement — see kCanIScanAtFoot.
               if (!kCanIScanAtFoot) ...[
                 const SizedBox(width: 8),
-                _round(p, Icons.qr_code_scanner_rounded, 'Scan a barcode',
-                    () => openCanIScan(context, widget.controller)),
-                const SizedBox(width: 8),
-                _round(p, Icons.photo_camera_outlined, 'Take a photo',
-                    () => canISnap(context, widget.controller)),
+                _round(p, Icons.photo_camera_outlined, 'Open the camera', _chooseCamera),
               ],
             ]),
           ]),
@@ -250,12 +261,17 @@ class _CanIDoorBodyState extends State<CanIDoorBody> {
         ),
       );
 
+  /// One button, then her choice — the user, 2026-09-19: "a single button
+  /// at the bottom that indicates you can open the camera; then whether
+  /// they want a barcode scanner or a camera, that's upon them … the very
+  /// first intuitive thought would be to click a photo." Photo is listed
+  /// first for that reason.
   Widget _scanBar(V2Palette p) => SafeArea(
         top: false,
         child: Padding(
           padding: const EdgeInsets.fromLTRB(20, 0, 20, 14),
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            PvPress(
+          child: Center(
+            child: PvPress(
               child: Material(
                 color: p.ink1,
                 shape: const StadiumBorder(),
@@ -266,41 +282,82 @@ class _CanIDoorBodyState extends State<CanIDoorBody> {
                   onTap: () {
                     pvCommitFeedback();
                     _focus.unfocus();
-                    openCanIScan(context, widget.controller);
+                    _chooseCamera();
                   },
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(18, 13, 22, 13),
+                    padding: const EdgeInsets.fromLTRB(20, 13, 24, 13),
                     child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      Icon(Icons.qr_code_scanner_rounded, size: 20, color: p.ground),
+                      Icon(Icons.photo_camera_outlined, size: 20, color: p.ground),
                       const SizedBox(width: 10),
-                      Text('Scan a packet',
+                      Text('Open the camera',
                           style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w800, color: p.ground)),
                     ]),
                   ),
                 ),
               ),
             ),
-            const SizedBox(width: 10),
-            PvPress(
-              child: Material(
-                color: p.surface,
-                shape: CircleBorder(side: BorderSide(color: p.line)),
-                clipBehavior: Clip.antiAlias,
-                elevation: 6,
-                shadowColor: Colors.black.withValues(alpha: 0.25),
-                child: InkWell(
-                  onTap: () {
-                    pvCommitFeedback();
-                    _focus.unfocus();
-                    canISnap(context, widget.controller);
-                  },
-                  child: Tooltip(
-                    message: 'Take a photo',
-                    child: SizedBox(width: 48, height: 48, child: Icon(Icons.photo_camera_outlined, size: 21, color: p.ink1)),
-                  ),
-                ),
-              ),
+          ),
+        ),
+      );
+
+  Future<void> _chooseCamera() async {
+    final p = V2PaletteStore.instance.current;
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: p.surface,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.fromLTRB(20, 18, 20, 12 + MediaQuery.paddingOf(ctx).bottom),
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('THE CAMERA',
+              style: pvManrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.3, color: p.ink3)),
+          const SizedBox(height: 4),
+          Text('Show us the thing',
+              style: pvFraunces(fontSize: 22, fontWeight: FontWeight.w600, height: 1.2, color: p.ink1)),
+          const SizedBox(height: 14),
+          _choice(ctx, p, Icons.photo_camera_outlined, 'Take a photo',
+              'A fruit, a plate, a packet, a cream — anything.', 'photo'),
+          _choice(ctx, p, Icons.qr_code_scanner_rounded, 'Scan a barcode',
+              'Packaged food and medicines; exact when the packet is known.', 'barcode',
+              last: true),
+        ]),
+      ),
+    );
+    if (!mounted || choice == null) return;
+    if (choice == 'photo') {
+      await canISnap(context, widget.controller);
+    } else {
+      await openCanIScan(context, widget.controller);
+    }
+  }
+
+  Widget _choice(BuildContext ctx, V2Palette p, IconData icon, String title, String sub, String value,
+          {bool last = false}) =>
+      InkWell(
+        onTap: () {
+          pvCommitFeedback();
+          Navigator.pop(ctx, value);
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 14),
+          decoration: BoxDecoration(border: last ? null : Border(bottom: BorderSide(color: p.line))),
+          child: Row(children: [
+            Container(
+              width: 44,
+              height: 44,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: p.line)),
+              child: Icon(icon, size: 21, color: p.ink1),
             ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(title, style: pvManrope(fontSize: 15, fontWeight: FontWeight.w700, color: p.ink1)),
+                const SizedBox(height: 2),
+                Text(sub, style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink2)),
+              ]),
+            ),
+            Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
           ]),
         ),
       );
@@ -361,52 +418,63 @@ class _CanIDoorBodyState extends State<CanIDoorBody> {
     final recents = [for (final id in CanIActivityStore.instance.recents) ?canIById(id)];
     final forHer = week == null ? const <CanIEntry>[] : canIForTrimester(week);
     final saved = [for (final id in CanIStore.instance.savedIds) ?canIById(id)];
+    final yours = recents.isNotEmpty || saved.isNotEmpty;
     return [
-      // Asked most — twelve cut-outs, three across.
+      // ---- YOURS, FIRST ------------------------------------------------
+      // Saved and recents used to be two sections, one at the very foot,
+      // each with its own empty paragraph (the phone, 2026-09-19: "Saved
+      // heading is coming at the way bottom"). One row under the field:
+      // "Saved · N" leads, her recents follow; empty, one quiet line.
+      pvDoorPad(canIHeading(p, 'Yours')),
+      const SizedBox(height: 12),
+      if (!yours)
+        pvDoorPad(Text('What you look up, and what you save with the heart, stays here.',
+            style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)))
+      else
+        SizedBox(
+          height: 40,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: kPvDoorGutter),
+            children: [
+              if (saved.isNotEmpty) ...[
+                CanIChip(
+                    label: 'Saved  ·  ${saved.length}',
+                    p: p,
+                    selected: true,
+                    leading: Icon(Icons.favorite_rounded, size: 14, color: p.ground),
+                    onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                        settings: const RouteSettings(name: 'saved'),
+                        builder: (_) => const SavedScreen()))),
+                const SizedBox(width: 8),
+              ],
+              for (var i = 0; i < recents.length; i++) ...[
+                if (i > 0) const SizedBox(width: 8),
+                CanIChip(
+                  label: recents[i].name.now,
+                  p: p,
+                  leading: CanIVerdictDot(verdict: recents[i].verdict, p: p, size: 8),
+                  onTap: () => _open(recents[i]),
+                ),
+              ],
+            ],
+          ),
+        ),
+      const SizedBox(height: 26),
+
+      // ---- ASKED MOST ----------------------------------------------------
       pvDoorPad(canIHeading(p, 'Asked most', sub: 'The dozen every pregnancy asks in its first month.')),
       const SizedBox(height: 14),
       pvDoorPad(_grid([for (final id in kCanIAskedMost) ?canIById(id)], p)),
       const SizedBox(height: 26),
 
-      // Asked recently — hers. Empty = an invitation, never hidden.
-      pvDoorPad(canIHeading(p, 'Asked recently')),
-      const SizedBox(height: 12),
-      if (recents.isEmpty)
-        pvDoorPad(Text('What you look up stays here, so the second time is one tap.',
-            style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)))
-      else
-        SizedBox(
-          height: 40,
-          child: ListView.separated(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: kPvDoorGutter),
-            itemCount: recents.length,
-            separatorBuilder: (_, _) => const SizedBox(width: 8),
-            itemBuilder: (_, i) => CanIChip(
-              label: recents[i].name.now,
-              p: p,
-              leading: CanIVerdictDot(verdict: recents[i].verdict, p: p, size: 8),
-              onTap: () => _open(recents[i]),
-            ),
-          ),
-        ),
-      const SizedBox(height: 26),
-
-      // For your weeks — what has a line for her trimester in particular.
-      pvDoorPad(canIHeading(p, week == null ? 'For your trimester' : 'For your weeks · ${_trimesterWord(week)}',
-          sub: week == null
-              ? 'Set your due date and this shelf fills with what changes for your trimester.'
-              : 'Answers that shift with the trimester you are in.')),
-      const SizedBox(height: 14),
-      if (forHer.isNotEmpty) _rail(forHer.take(12).toList(), p),
-      if (forHer.isNotEmpty) const SizedBox(height: 26),
-
-      // The four shelves.
+      // ---- THE SHELVES ---------------------------------------------------
       pvDoorPad(canIHeading(p, 'Browse the shelves')),
       const SizedBox(height: 14),
       pvDoorPad(GridView.count(
         crossAxisCount: 2,
         shrinkWrap: true,
+        padding: EdgeInsets.zero,
         physics: const NeverScrollableScrollPhysics(),
         mainAxisSpacing: 10,
         crossAxisSpacing: 10,
@@ -415,28 +483,13 @@ class _CanIDoorBodyState extends State<CanIDoorBody> {
       )),
       const SizedBox(height: 26),
 
-      // Saved.
-      pvDoorPad(canIHeading(p, 'Saved')),
-      const SizedBox(height: 12),
-      pvDoorPad(saved.isEmpty
-          ? Text('The heart on any answer keeps it here.',
-              style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2))
-          : Column(children: [
-              for (var i = 0; i < saved.length && i < 3; i++)
-                CanIRow(entry: saved[i], p: p, last: i == saved.length - 1 || i == 2, onTap: () => _open(saved[i])),
-              if (saved.length > 3) ...[
-                const SizedBox(height: 8),
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: CanIChip(
-                      label: 'All saved · ${saved.length}',
-                      p: p,
-                      onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
-                          settings: const RouteSettings(name: 'saved'),
-                          builder: (_) => const SavedScreen()))),
-                ),
-              ],
-            ])),
+      // ---- FOR HER WEEKS -------------------------------------------------
+      pvDoorPad(canIHeading(p, week == null ? 'For your trimester' : 'For your weeks · ${_trimesterWord(week)}',
+          sub: week == null
+              ? 'Set your due date and this shelf fills with what changes for your trimester.'
+              : 'Answers that shift with the trimester you are in.')),
+      const SizedBox(height: 14),
+      if (forHer.isNotEmpty) _rail(forHer.take(12).toList(), p),
       const SizedBox(height: 26),
       pvDoorPad(PvDoorDisclaimer(
           p: p,
@@ -451,8 +504,12 @@ class _CanIDoorBodyState extends State<CanIDoorBody> {
         _ => 'third trimester',
       };
 
+  // ⚠️ padding: zero on every grid — a GridView inside a column inherits
+  // the MediaQuery's top padding (the status bar) as its own, which read as
+  // a blank band under the heading on the phone.
   Widget _grid(List<CanIEntry> items, V2Palette p) => GridView.builder(
         shrinkWrap: true,
+        padding: EdgeInsets.zero,
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 3, mainAxisSpacing: 14, crossAxisSpacing: 10, childAspectRatio: 0.74),
@@ -496,10 +553,9 @@ class _CanIDoorBodyState extends State<CanIDoorBody> {
           ),
           clipBehavior: Clip.antiAlias,
           child: Stack(fit: StackFit.expand, children: [
-            if (url != null) Image.network(url, fit: BoxFit.cover, errorBuilder: (_, _, _) => const SizedBox.shrink()),
-            if (url == null)
-              Positioned(
-                  right: -16, bottom: -12, child: Icon(canICategoryIcon(cat), size: 96, color: p.line)),
+            Positioned(
+                right: -16, bottom: -12, child: Icon(canICategoryIcon(cat), size: 96, color: p.line)),
+            if (url != null) CanIPhoto(url: url, fallback: const SizedBox.shrink()),
             Positioned.fill(
               child: DecoratedBox(
                 decoration: BoxDecoration(
@@ -603,6 +659,7 @@ class _CanIGroupScreenState extends State<CanIGroupScreen> {
               const SizedBox(height: 12),
               pvDoorPad(GridView.builder(
                 shrinkWrap: true,
+                padding: EdgeInsets.zero,
                 physics: const NeverScrollableScrollPhysics(),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                     crossAxisCount: 3, mainAxisSpacing: 14, crossAxisSpacing: 10, childAspectRatio: 0.74),

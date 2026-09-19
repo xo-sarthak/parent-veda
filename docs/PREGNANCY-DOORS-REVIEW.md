@@ -194,7 +194,26 @@ Share / Ask Veda.
 → the answer. Photo → optional "What is it?" word → `can-i-identify` (a
 name, never a verdict) → `canIMatch` → the answer. Every miss is logged.
 
-**To walk on the phone (owed)**
+**Walked 2026-09-19 night, three rounds on the device.** The user's
+findings and what changed:
+- *"search bar needs fixing"* — the theme's input box drew inside the pill
+  → every border off, no fill.
+- *"spacing issue below Asked most"* — a GridView inheriting the status-bar
+  padding → `padding: zero` on every grid.
+- *"all images not coming through"* — Wikimedia throttling the shared IP →
+  `CanIPhoto` retries at 2 s and 5 s; R2 made urgent (§63.18).
+- *"Saved heading at the way bottom"* → **Yours** (Saved · N + recents)
+  directly under the field; the shelves moved up; *For your weeks* last.
+- *"purplish-bluish … maybe a green"* → bracket hue 136.
+- *"this is not an article"* → `CanIVerdictScreen` (addendum 5); the
+  floating bar became a pinned SliverAppBar; her trimester line no longer
+  repeats in the list.
+- *"a single button … let the user decide"* → one **Open the camera** pill,
+  a photo-first chooser sheet.
+- *"pick better images"* → the depicts pass (§68.11).
+- *"you don't have to do anything in Hindi"* → the copied kicker removed.
+
+**Still to walk**
 
 - The field: type "pa", "papita", "nt"; Enter on a hit; Enter on nothing.
 - The scan pill's look against the sheet; flip `kCanIScanAtFoot` and compare.

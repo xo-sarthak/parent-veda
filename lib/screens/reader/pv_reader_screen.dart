@@ -374,7 +374,11 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
             Expanded(
               child: ListView(
                 controller: _sc,
-                padding: const EdgeInsets.only(top: 10, bottom: kAskFabReserve + 24),
+                // The FAB's reserve only while the FAB exists (kAskFabEnabled,
+                // 2026-09-19) — with it off this was a blank band under Read
+                // next on every read.
+                padding: const EdgeInsets.only(
+                    top: 10, bottom: (FabState.kAskFabEnabled ? kAskFabReserve : 0) + 24),
                 children: [
                   // ---- THE PICTURE, WHERE THERE IS ONE ---------------------
                   //

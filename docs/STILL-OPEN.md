@@ -8446,3 +8446,22 @@ Regional Indian brands are often absent; the "not in the food database"
 sheet handles it and logs the barcode. If misses show one brand
 repeatedly, OFF accepts contributions — or a small own table of
 barcode → entry for the fifty most-scanned packets.
+
+### 68.10 The answer is a verdict page, not a read — DECIDED on the phone 2026-09-19
+`CanIVerdictScreen` behind `kCanIAnswerAsVerdict` (can_i_answer.dart);
+the reader path (`CanIAnswerReader` + `pvReadFromCanI`) stays for revert
+and for reader-shaped seams. DESIGN-SYSTEM §4.0 addendum 5 has the rule.
+Also from the walk: the bracket hue is 136 (green) not 232; one camera
+button with a photo-first chooser instead of two buttons; *Yours* (Saved
++ recents) under the field instead of Saved at the foot; the reader's foot
+reserve now follows `kAskFabEnabled`. The user's standing note for this
+door: *"either it serves the purpose or not. It needs to look good."*
+
+### 68.11 Photos, second pass — Wikidata "depicts"
+The first pass (Commons text search, first hit) put a cocktail on
+Pineapple and a couple-with-dog on Sex. Second pass: item → Wikidata Q →
+Commons `haswbstatement:P180=Q` sorted by incoming links (the pictures
+Wikipedia itself uses), reviewed on sheets. Entries with no tagged photo
+keep the first-pass pick or the icon well. Still placeholders until R2
+(§63.18), which the Wikimedia 429 made urgent: a free host throttles by
+IP, and Indian carriers put thousands of users behind one.

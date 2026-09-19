@@ -485,6 +485,26 @@ code (`pvDoorTileIsWritten`, `_ArticleList`) and in
 is a rail". Mobbin: Equinox, Alan, Gentler Streak, Liven, Tonal list
 same-kind articles; Clue and Atoms rail mixed or featured content.
 
+### 4.0 · addendum 5 — a lookup is not a read — SETTLED 2026-09-19 (the phone)
+
+The Is it safe? answer opened in the one reader for a few hours and the
+user called it on the device: *"this is not an article … there is no need
+to even tag it as an article when it's not."* A lookup is a **verdict with
+reasons**, and it gets a verdict's page (`CanIVerdictScreen`):
+
+photo (pinned bar once scrolled, the name in it) → name · the question →
+**the verdict** (14pt dot + Fraunces word) with the short answer → *For you
+· week N* → Why → *Instead, try* (cut-outs) → the other trimesters as
+T1/T2/T3 rows → *In an Indian kitchen* → *My doctor said* → **Send · Ask
+Veda as two buttons** → *Also asked* as cut-outs → the disclaimer line.
+
+No byline, no reading time, no contents, no references, no "was this
+helpful", no ARTICLE chip anywhere. This is the one exception to §4.0b's
+"every piece of writing opens in the reader", and it is an exception
+because the thing is not writing. The rule for the next case: **if the
+page's first line is a judgement, it is a verdict page; if it is a
+sentence, it is a read.**
+
 ### 4.0 · addendum 4 — a verdict is a dot and a word — SETTLED 2026-09-19
 
 From the Is it safe? door. A verdict (safe / in moderation / depends /

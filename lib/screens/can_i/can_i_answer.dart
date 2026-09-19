@@ -24,15 +24,24 @@ import '../../widgets/pv_feedback.dart';
 import '../tools/ask_veda_screen.dart';
 import '../reader/pv_reader_screen.dart';
 import '../v2/v2_palette.dart';
+import 'can_i_verdict_screen.dart';
 import 'can_i_widgets.dart';
 
 const String kCanIAnswerRoute = 'can_i/answer';
+
+/// Which screen an answer opens. TRUE (2026-09-19, the phone walk) = the
+/// verdict page (`CanIVerdictScreen`) — the user: "this is not an article".
+/// FALSE = the reader with the three custom blocks (`CanIAnswerReader`),
+/// kept for revert and for the reader-shaped seams (Saved, search).
+const bool kCanIAnswerAsVerdict = true;
 
 void openCanIAnswer(BuildContext context, CanIEntry entry, PregnancyController c) {
   CanIActivityStore.instance.touch(entry.id);
   Navigator.of(context).push(MaterialPageRoute<void>(
     settings: const RouteSettings(name: kCanIAnswerRoute),
-    builder: (_) => CanIAnswerReader(entry: entry, controller: c),
+    builder: (_) => kCanIAnswerAsVerdict
+        ? CanIVerdictScreen(entry: entry, controller: c)
+        : CanIAnswerReader(entry: entry, controller: c),
   ));
 }
 
@@ -103,7 +112,10 @@ Future<void> shareCanIAnswer(CanIEntry e, {int? week}) =>
     Share.share(canIShareText(e, week: week));
 
 // -----------------------------------------------------------------------------
-//  The blocks
+//  The blocks — NO HORIZONTAL PADDING OF THEIR OWN: the reader wraps every
+//  custom block in its page gutter already, and a second gutter here put
+//  these three a step deeper than the reader's headings (the phone,
+//  2026-09-19).
 // -----------------------------------------------------------------------------
 
 /// The verdict word, then the line for her trimester. The one place the
@@ -118,7 +130,7 @@ class _VerdictView extends StatelessWidget {
     final e = block.entry;
     final note = block.noteForHer;
     return Padding(
-      padding: const EdgeInsets.fromLTRB(18, 4, 18, 8),
+      padding: const EdgeInsets.fromLTRB(0, 4, 0, 8),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           CanIVerdictDot(verdict: e.verdict, p: p, size: 12),
@@ -154,7 +166,7 @@ class _InsteadView extends StatelessWidget {
       padding: const EdgeInsets.fromLTRB(0, 6, 0, 10),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 18),
+          padding: EdgeInsets.zero,
           child: canIHeading(p, 'Instead, try',
               sub: block.entry.verdict == CanIVerdict.avoid
                   ? 'What you can reach for in its place.'
@@ -165,7 +177,7 @@ class _InsteadView extends StatelessWidget {
           height: 156,
           child: ListView.separated(
             scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: 18),
+            padding: EdgeInsets.zero,
             itemCount: block.swaps.length,
             separatorBuilder: (_, _) => const SizedBox(width: 10),
             itemBuilder: (context, i) => SizedBox(
@@ -197,7 +209,7 @@ class _DoctorView extends StatelessWidget {
       builder: (context, _) {
         final said = CanIActivityStore.instance.doctorSaid(e.id);
         return Padding(
-          padding: const EdgeInsets.fromLTRB(18, 6, 18, 10),
+          padding: const EdgeInsets.fromLTRB(0, 6, 0, 10),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             canIHeading(p, 'My doctor said',
                 sub: 'Your doctor knows your pregnancy; this page does not. '

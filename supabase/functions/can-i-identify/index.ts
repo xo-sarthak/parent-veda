@@ -23,7 +23,9 @@
 //  hands her the field. It never pretends.
 //
 //  DEPLOY:
-//    supabase functions deploy can-i-identify
+//    supabase functions deploy can-i-identify --no-verify-jwt
+//    (like the other functions: the door works logged-out, and a photo from
+//    a logged-out user must not meet a 401)
 //  SECRETS (pick one provider; set its key):
 //    supabase secrets set CAN_I_VISION_PROVIDER=groq
 //    supabase secrets set GROQ_API_KEY=...
@@ -50,7 +52,7 @@ const GOOGLE_KEY = Deno.env.get("GOOGLE_AI_API_KEY") ?? "";
 // Models: the cheapest vision-capable tier of each, as of 2026-09.
 const GROQ_MODEL = Deno.env.get("CAN_I_VISION_MODEL") ?? "meta-llama/llama-4-scout-17b-16e-instruct";
 const ANTHROPIC_MODEL = Deno.env.get("CAN_I_VISION_MODEL") ?? "claude-haiku-4-5-20251001";
-const GOOGLE_MODEL = Deno.env.get("CAN_I_VISION_MODEL") ?? "gemini-2.5-flash";
+const GOOGLE_MODEL = Deno.env.get("CAN_I_VISION_MODEL") ?? "gemini-3.6-flash"; // 2.5-flash retired for new projects, 2026-09
 
 const PROMPT =
   "This photo was taken by a pregnant woman in India who wants to know if the thing in it " +
@@ -129,13 +131,25 @@ async function askGoogle(b64: string, mime: string, prompt: string): Promise<str
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         contents: [{ parts: [{ text: prompt }, { inline_data: { mime_type: mime, data: b64 } }] }],
-        generationConfig: { maxOutputTokens: 20, temperature: 0 },
+        // Gemini 3.x THINKS before it answers, and the thinking is billed
+        // against maxOutputTokens: with 20 it spent the budget before the
+        // name and answered "par" / nothing (seen 2026-09-19). No thinking
+        // for a two-word answer, and room to spare.
+        generationConfig: {
+          maxOutputTokens: 256,
+          temperature: 0,
+          thinkingConfig: { thinkingBudget: 0 },
+        },
       }),
     },
   );
   if (!r.ok) throw new Error(`google ${r.status} ${await r.text()}`);
   const j = await r.json();
-  return j.candidates?.[0]?.content?.parts?.[0]?.text ?? "unknown";
+  const parts = j.candidates?.[0]?.content?.parts ?? [];
+  // The text part, skipping any thought part the model still returns.
+  const text = parts.find((p: { text?: string; thought?: boolean }) => p.text && !p.thought)?.text;
+  if (!text) console.log(`[can-i-identify] google empty: ${JSON.stringify(j).slice(0, 300)}`);
+  return text ?? "unknown";
 }
 
 serve(async (req) => {

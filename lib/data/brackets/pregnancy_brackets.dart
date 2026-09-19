@@ -123,7 +123,11 @@ final List<Bracket> kPregnancyBrackets = [
     id: 'pregnancy_is_it_safe',
     stage: LifeStage.pregnancy,
     theme: 'safety',
-    hue: 232,
+    // 136: a grass green — the user's call on the phone, 2026-09-19 ("instead
+    // of the purplish-bluish, maybe a green, some vibrancy"). Between
+    // Nutrition's lime (104) and Fitness's mint (160), distinct from both.
+    // Was 232 (blue-violet).
+    hue: 136,
     label: _t(en: 'Is it safe?', hi: 'सुरक्षित है?'),
     title: _t(
         en: 'Is it safe in pregnancy?', hi: 'क्या यह गर्भावस्था में सुरक्षित है?'),

@@ -50,7 +50,7 @@ class PvCanIDoctorBlock {
   final CanIEntry entry;
 }
 
-const LocalizedText _kicker = LocalizedText(en: 'Is it safe?', hi: 'सुरक्षित है?');
+const LocalizedText _kicker = LocalizedText(en: 'Is it safe?', hi: 'Is it safe?'); // English only (the user, 2026-09-19)
 const LocalizedText _desk = LocalizedText(en: 'ParentVeda editorial', hi: 'ParentVeda editorial');
 
 /// The question the category asks, for the teaser under the name.
@@ -88,9 +88,7 @@ PvRead pvReadFromCanI(CanIEntry e, {int? week}) {
     for (final t in [1, 2, 3])
       if (week == null || canITrimester(week) != t)
         if (switch (t) { 1 => e.t1, 2 => e.t2, _ => e.t3 } case final n?)
-          LocalizedText(
-              en: '${switch (t) { 1 => 'First', 2 => 'Second', _ => 'Third' }} trimester: ${n.en}',
-              hi: '${switch (t) { 1 => 'First', 2 => 'Second', _ => 'Third' }} trimester: ${n.hi}'),
+          _same('${switch (t) { 1 => 'First', 2 => 'Second', _ => 'Third' }} trimester: ${n.en}'),
   ];
   return PvRead(
     id: '$kCanIReadPrefix${e.id}',
@@ -126,7 +124,7 @@ PvRead pvReadFromCanI(CanIEntry e, {int? week}) {
               'page to your doctor and let them decide for you.'
           : 'If your doctor has told you something different for your '
               'pregnancy, they are right and this page is not. Record what '
-              'they said below so this answer remembers it.'),
+              'they said under My doctor said, and this answer remembers it.'),
     ),
     faqs: const [],
     readNext: [
@@ -142,9 +140,7 @@ PvRead pvReadFromCanI(CanIEntry e, {int? week}) {
       ),
       PvReadNextStep(
         kind: PvNextKind.ask,
-        title: LocalizedText(
-            en: 'Something specific? Ask Veda about ${e.name.en}',
-            hi: 'Something specific? Ask Veda about ${e.name.hi}'),
+        title: _same('Something specific? Ask Veda about ${e.name.en}'),
         value: _same('Your brand, your dose, your week — in your own words.'),
         action: 'cani_askveda',
       ),

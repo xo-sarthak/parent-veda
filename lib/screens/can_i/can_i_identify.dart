@@ -32,6 +32,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 
 import '../../data/can_i_data.dart';
+import '../../data/reads/can_i_read.dart' show canIVerdictWord;
 import '../../models/can_i_entry.dart';
 import '../../services/can_i_activity_store.dart';
 import '../../services/pregnancy_controller.dart';
@@ -42,6 +43,8 @@ import '../../widgets/pv_feedback.dart';
 import '../tools/ask_veda_screen.dart';
 import '../v2/v2_palette.dart';
 import 'can_i_answer.dart';
+import 'can_i_motion.dart';
+import 'can_i_verdict_screen.dart';
 import 'can_i_widgets.dart';
 
 // -----------------------------------------------------------------------------
@@ -172,6 +175,7 @@ class _CanIScanScreenState extends State<CanIScanScreen> {
     detectionSpeed: DetectionSpeed.noDuplicates,
   );
   bool _busy = false;
+  String? _code;
 
   @override
   void dispose() {
@@ -183,20 +187,37 @@ class _CanIScanScreenState extends State<CanIScanScreen> {
     if (_busy) return;
     final code = cap.barcodes.map((b) => b.rawValue).whereType<String>().firstOrNull;
     if (code == null || code.isEmpty) return;
-    setState(() => _busy = true);
-    pvCommitFeedback();
+    // LOCKED: the ring closes and goes green, the heavy haptic lands — the
+    // phone saw it, before the network has said a word.
+    setState(() {
+      _busy = true;
+      _code = code;
+    });
+    canILockHaptic();
     await _cam.stop();
     final product = await canIProductForBarcode(code);
     if (!mounted) return;
     final entry = product == null ? null : canIMatch(product);
-    final again = await showCanIIdentifyResult(context, widget.controller,
+    final choice = await showCanIIdentifyResult(context, widget.controller,
         entry: entry, product: product, source: 'barcode', query: code);
     if (!mounted) return;
-    if (again) {
-      setState(() => _busy = false);
-      await _cam.start();
-    } else {
-      Navigator.of(context).maybePop();
+    switch (choice) {
+      case CanIIdentifyChoice.again:
+        setState(() {
+          _busy = false;
+          _code = null;
+        });
+        await _cam.start();
+      case CanIIdentifyChoice.open:
+        // One move: this screen becomes the answer. A pop followed by a
+        // push raced the sheet's own pop and removed the wrong route.
+        CanIActivityStore.instance.touch(entry!.id);
+        Navigator.of(context).pushReplacement(MaterialPageRoute<void>(
+          settings: const RouteSettings(name: kCanIAnswerRoute),
+          builder: (_) => CanIVerdictScreen(entry: entry, controller: widget.controller),
+        ));
+      case CanIIdentifyChoice.close:
+        Navigator.of(context).maybePop();
     }
   }
 
@@ -207,12 +228,16 @@ class _CanIScanScreenState extends State<CanIScanScreen> {
       backgroundColor: Colors.black,
       body: Stack(fit: StackFit.expand, children: [
         MobileScanner(controller: _cam, onDetect: _onDetect),
-        // The finder — four corners, nothing else over the picture.
+        // The finder — four corners and a sweep while looking; a green
+        // ring the instant it locks (can_i_motion.dart).
         Center(
           child: SizedBox(
             width: 260,
             height: 170,
-            child: CustomPaint(painter: _CornersPainter()),
+            child: Stack(fit: StackFit.expand, children: [
+              CanISweep(running: !_busy),
+              CanIFinder(locked: _busy),
+            ]),
           ),
         ),
         SafeArea(
@@ -247,13 +272,24 @@ class _CanIScanScreenState extends State<CanIScanScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(28, 0, 28, 24),
               child: Column(children: [
-                Text(_busy ? 'Looking it up…' : 'Point at the barcode on the packet',
-                    textAlign: TextAlign.center,
-                    style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.white)),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 220),
+                  child: Text(_busy ? 'Got it — reading the packet…' : 'Point at the barcode on the packet',
+                      key: ValueKey(_busy),
+                      textAlign: TextAlign.center,
+                      style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.white)),
+                ),
                 const SizedBox(height: 6),
-                Text('Packaged food and medicines. For a fruit or a dish, type its name instead.',
+                Text(
+                    _busy && _code != null
+                        ? _code!
+                        : 'Packaged food and medicines. For a fruit or a dish, type its name instead.',
                     textAlign: TextAlign.center,
-                    style: pvManrope(fontSize: 13, height: 1.45, color: Colors.white.withValues(alpha: 0.8))),
+                    style: pvManrope(
+                        fontSize: 13,
+                        height: 1.45,
+                        letterSpacing: _busy ? 1.2 : 0,
+                        color: Colors.white.withValues(alpha: 0.8))),
                 const SizedBox(height: 16),
                 if (_busy)
                   SizedBox(
@@ -267,6 +303,8 @@ class _CanIScanScreenState extends State<CanIScanScreen> {
   }
 }
 
+// Superseded by CanIFinder (can_i_motion.dart), 2026-09-20. Kept for revert.
+// ignore: unused_element
 class _CornersPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
@@ -310,11 +348,13 @@ Future<void> canISnap(BuildContext context, PregnancyController c) async {
   if (!context.mounted) return;
   final hint = await _askHint(context, bytes);
   if (hint == null || !context.mounted) return; // she backed out
+  // LOOKING: her photo with a sweep across it — the app is reading it, not
+  // stuck (Opera's scan line). Replaces a bare spinner over the page.
   showDialog<void>(
     context: context,
     barrierDismissible: false,
-    builder: (_) => const Center(
-        child: SizedBox(width: 28, height: 28, child: CircularProgressIndicator(strokeWidth: 2))),
+    barrierColor: Colors.black.withValues(alpha: 0.55),
+    builder: (_) => _IdentifyingOverlay(bytes: bytes, hint: hint),
   );
   final res = await SupabaseRepo.invokeEdgeResult('can-i-identify', {
     'image': base64Encode(bytes),
@@ -329,12 +369,53 @@ Future<void> canISnap(BuildContext context, PregnancyController c) async {
   // The model drew a blank, or is not on yet, but she told us: her word is
   // the query, and the sheet is the ordinary found / not-found one.
   if (entry == null && hint.isNotEmpty) entry = canIMatch(hint);
-  await showCanIIdentifyResult(context, c,
+  final choice = await showCanIIdentifyResult(context, c,
       entry: entry,
       product: name ?? (hint.isNotEmpty ? hint : null),
       source: 'photo',
       query: hint.isNotEmpty ? hint : 'photo',
       notConfigured: notConfigured && entry == null);
+  if (choice == CanIIdentifyChoice.open && entry != null && context.mounted) {
+    openCanIAnswer(context, entry, c);
+  }
+}
+
+class _IdentifyingOverlay extends StatelessWidget {
+  const _IdentifyingOverlay({required this.bytes, required this.hint});
+  final Uint8List bytes;
+  final String hint;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    return Center(
+      child: Material(
+        color: Colors.transparent,
+        child: Column(mainAxisSize: MainAxisSize.min, children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(22),
+            child: SizedBox(
+              width: 200,
+              height: 200,
+              child: Stack(fit: StackFit.expand, children: [
+                Image.memory(bytes, fit: BoxFit.cover),
+                const CanISweep(color: Colors.white),
+                Positioned.fill(child: CanIFinder(locked: false)),
+              ]),
+            ),
+          ),
+          const SizedBox(height: 18),
+          Text('Looking closely…',
+              style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.white)),
+          const SizedBox(height: 4),
+          Text(hint.isEmpty ? 'A second or two.' : 'You said "$hint" — checking.',
+              style: pvManrope(fontSize: 13, color: Colors.white.withValues(alpha: 0.8))),
+          const SizedBox(height: 14),
+          SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: p.ground)),
+        ]),
+      ),
+    );
+  }
 }
 
 /// The picture back, one optional field, Identify. Null = she backed out.
@@ -394,8 +475,20 @@ Future<String?> _askHint(BuildContext context, Uint8List bytes) {
 //  The result sheet — one for both paths
 // -----------------------------------------------------------------------------
 
-/// Returns true when she wants to scan again.
-Future<bool> showCanIIdentifyResult(
+/// What she chose on the sheet. `open` carries the entry; the CALLER opens
+/// it — the sheet never pushes a route itself. That was the barcode bug
+/// (2026-09-20): the sheet pushed the answer, then the scan screen popped
+/// "itself" and removed the answer instead, leaving a stopped camera.
+enum CanIIdentifyChoice { again, open, close }
+
+/// Returns what she chose.
+///
+/// FOUND is a PREVIEW OF THE ANSWER (Deliveroo's and Uber Eats' item sheet,
+/// Mobbin 2026-09-20): the photo full-width at the top with the tick
+/// landing on it, the name, the verdict and its one line, then "See the
+/// answer". What the camera read is a caption, not the headline — she
+/// scanned to learn about the thing, not to be told the barcode worked.
+Future<CanIIdentifyChoice> showCanIIdentifyResult(
   BuildContext context,
   PregnancyController c, {
   required CanIEntry? entry,
@@ -407,99 +500,185 @@ Future<bool> showCanIIdentifyResult(
   final p = V2PaletteStore.instance.current;
   if (entry == null) {
     CanIActivityStore.instance.logMiss(query, source: source, product: product);
+  } else {
+    // FOUND: the answer is here — two soft taps, then the tick draws.
+    canIFoundHaptic();
   }
-  final again = await showModalBottomSheet<bool>(
+  final choice = await showModalBottomSheet<CanIIdentifyChoice>(
     context: context,
     backgroundColor: p.surface,
+    clipBehavior: Clip.antiAlias,
     shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
-    builder: (ctx) => Padding(
-      padding: EdgeInsets.fromLTRB(20, 18, 20, 20 + MediaQuery.paddingOf(ctx).bottom),
-      child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text(
-            entry != null
-                ? 'FOUND'
-                : notConfigured
-                    ? 'PHOTO LOOKUP'
-                    : 'NOT IN OUR LIST YET',
-            style: pvManrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.3, color: p.ink3)),
-        const SizedBox(height: 6),
-        if (entry != null) ...[
-          if (product != null) ...[
-            Text(product,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                style: pvManrope(fontSize: 13, height: 1.4, color: p.ink2)),
-            const SizedBox(height: 10),
-          ],
-          CanIRow(
-              entry: entry,
-              p: p,
-              last: true,
-              onTap: () {
-                Navigator.pop(ctx, false);
-                openCanIAnswer(context, entry, c);
-              }),
-          const SizedBox(height: 12),
-          FilledButton(
-            onPressed: () {
-              pvCommitFeedback();
-              Navigator.pop(ctx, false);
-              openCanIAnswer(context, entry, c);
-            },
-            style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
-            child: Text('Open ${entry.name.now}'),
+    builder: (ctx) => entry != null
+        ? _FoundSheet(entry: entry, product: product, source: source, p: p, controller: c)
+        : Padding(
+            padding: EdgeInsets.fromLTRB(20, 18, 20, 20 + MediaQuery.paddingOf(ctx).bottom),
+            child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(notConfigured ? 'PHOTO LOOKUP' : 'NOT IN OUR LIST YET',
+                  style: pvManrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.3, color: p.ink3)),
+              const SizedBox(height: 6),
+              if (notConfigured) ...[
+                Text('Switching on soon',
+                    style: pvFraunces(fontSize: 22, fontWeight: FontWeight.w600, height: 1.2, color: p.ink1)),
+                const SizedBox(height: 8),
+                Text('Photo lookup is not live in this build yet. Type what it is and the answer is the same.',
+                    style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)),
+                const SizedBox(height: 16),
+                FilledButton(
+                  onPressed: () => Navigator.pop(ctx, CanIIdentifyChoice.close),
+                  style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+                  child: const Text('Type it instead'),
+                ),
+              ] else ...[
+                Text(product ?? 'We could not read that',
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: pvFraunces(fontSize: 22, fontWeight: FontWeight.w600, height: 1.2, color: p.ink1)),
+                const SizedBox(height: 8),
+                Text(
+                    product == null
+                        ? 'The barcode is not in the food database — common for regional brands. '
+                            'Type the name and we will look it up that way.'
+                        : 'We have noted it, so the answer can be written. Until then, ask Veda '
+                            'or type the plain name — "noodles", not the brand.',
+                    style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)),
+                const SizedBox(height: 16),
+                FilledButton(
+                  onPressed: () {
+                    pvCommitFeedback();
+                    Navigator.pop(ctx, CanIIdentifyChoice.close);
+                    Navigator.of(context).push(MaterialPageRoute<void>(
+                      settings: const RouteSettings(name: kAskVedaRoute),
+                      builder: (_) => AskVedaScreen(
+                          controller: c, initialQuery: 'Is ${product ?? 'this'} safe in pregnancy?'),
+                    ));
+                  },
+                  style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+                  child: const Text('Ask Veda'),
+                ),
+                if (source == 'barcode') ...[
+                  const SizedBox(height: 8),
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx, CanIIdentifyChoice.again),
+                    style: TextButton.styleFrom(minimumSize: const Size.fromHeight(44)),
+                    child: const Text('Scan another'),
+                  ),
+                ],
+              ],
+            ]),
           ),
-        ] else if (notConfigured) ...[
-          Text('Switching on soon',
-              style: pvFraunces(fontSize: 22, fontWeight: FontWeight.w600, height: 1.2, color: p.ink1)),
-          const SizedBox(height: 8),
-          Text('Photo lookup is not live in this build yet. Type what it is and the answer is the same.',
-              style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)),
-          const SizedBox(height: 16),
-          FilledButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
-            child: const Text('Type it instead'),
-          ),
-        ] else ...[
-          Text(product ?? 'We could not read that',
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-              style: pvFraunces(fontSize: 22, fontWeight: FontWeight.w600, height: 1.2, color: p.ink1)),
-          const SizedBox(height: 8),
-          Text(
-              product == null
-                  ? 'The barcode is not in the food database — common for regional brands. '
-                      'Type the name and we will look it up that way.'
-                  : 'We have noted it, so the answer can be written. Until then, ask Veda '
-                      'or type the plain name — "noodles", not the brand.',
-              style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)),
-          const SizedBox(height: 16),
-          FilledButton(
-            onPressed: () {
-              pvCommitFeedback();
-              Navigator.pop(ctx, false);
-              Navigator.of(context).push(MaterialPageRoute<void>(
-                settings: const RouteSettings(name: kAskVedaRoute),
-                builder: (_) => AskVedaScreen(
-                    controller: c,
-                    initialQuery: 'Is ${product ?? 'this'} safe in pregnancy?'),
-              ));
-            },
-            style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
-            child: const Text('Ask Veda'),
-          ),
-          if (source == 'barcode') ...[
-            const SizedBox(height: 8),
-            TextButton(
-              onPressed: () => Navigator.pop(ctx, true),
-              style: TextButton.styleFrom(minimumSize: const Size.fromHeight(44)),
-              child: const Text('Scan another'),
-            ),
-          ],
-        ],
-      ]),
-    ),
   );
-  return again ?? false;
+  return choice ?? CanIIdentifyChoice.close;
 }
+
+/// The found preview: photo, tick, name, verdict, one line, the button.
+class _FoundSheet extends StatelessWidget {
+  const _FoundSheet({
+    required this.entry,
+    required this.product,
+    required this.source,
+    required this.p,
+    required this.controller,
+  });
+  final CanIEntry entry;
+  final String? product;
+  final String source;
+  final V2Palette p;
+  final PregnancyController controller;
+
+  @override
+  Widget build(BuildContext ctx) {
+    final e = entry;
+    final url = canIImageFor(e.id);
+    final read = product == null
+        ? null
+        : (source == 'barcode' ? 'Barcode read as' : 'Photo read as');
+    return Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+      // ---- the photo, the tick landing on it ------------------------------
+      SizedBox(
+        height: 210,
+        child: Stack(fit: StackFit.expand, children: [
+          if (url != null)
+            CanIPhoto(url: url, fallback: ColoredBox(color: p.surfaceAlt))
+          else
+            ColoredBox(
+                color: p.surfaceAlt,
+                child: Center(child: Icon(canICategoryIcon(e.category), size: 48, color: p.ink3))),
+          // a white scrim rising under the name band
+          Positioned.fill(
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [Colors.transparent, p.surface],
+                  stops: const [0.55, 1.0],
+                ),
+              ),
+            ),
+          ),
+          Positioned(
+            right: 20,
+            top: 18,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(color: p.surface, shape: BoxShape.circle),
+              child: const CanITick(size: 40),
+            ),
+          ),
+        ]),
+      ),
+      Padding(
+        padding: EdgeInsets.fromLTRB(20, 0, 20, 20 + MediaQuery.paddingOf(ctx).bottom),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          CanIArrive(
+            delay: const Duration(milliseconds: 180),
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(e.name.now,
+                  style: pvFraunces(
+                      fontSize: 26, fontWeight: FontWeight.w600, height: 1.1, letterSpacing: -0.5, color: p.ink1)),
+              const SizedBox(height: 8),
+              Row(children: [
+                CanIVerdictDot(verdict: e.verdict, p: p, size: 10),
+                const SizedBox(width: 8),
+                Text(canIVerdictWord(e.verdict),
+                    style: pvManrope(fontSize: 15, fontWeight: FontWeight.w800, color: p.ink1)),
+              ]),
+              const SizedBox(height: 8),
+              Text(e.short.now,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2)),
+              if (read != null && product != null) ...[
+                const SizedBox(height: 10),
+                Text('$read "$product"',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: pvManrope(fontSize: 11.5, color: p.ink3)),
+              ],
+            ]),
+          ),
+          const SizedBox(height: 18),
+          FilledButton(
+            onPressed: () {
+              pvCommitFeedback();
+              Navigator.pop(ctx, CanIIdentifyChoice.open);
+            },
+            style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+            child: const Text('See the answer'),
+          ),
+          const SizedBox(height: 4),
+          Center(
+            child: TextButton(
+              onPressed: () =>
+                  Navigator.pop(ctx, source == 'barcode' ? CanIIdentifyChoice.again : CanIIdentifyChoice.close),
+              child: Text(source == 'barcode' ? 'Not this one — scan again' : 'Not this one',
+                  style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: p.ink2)),
+            ),
+          ),
+        ]),
+      ),
+    ]);
+  }
+}
+

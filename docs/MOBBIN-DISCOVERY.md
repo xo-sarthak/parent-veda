@@ -307,6 +307,8 @@ for a single click"). What each one settled:
 | What makes it come back? | **Yuka History** tab, **Noom** recents | *Asked recently* chips; Saved surfaced on the door |
 | A barcode's unknown-product state? | **Yuka** "Unknown product · Fill in the information", **Lifesum** "Barcode not found" | "Not in our list yet" sheet → Ask Veda / Scan another; the miss logged |
 
+| The answer page, once "not an article" | **Yuka** product page (thumbnail, name, score line, dotted list, recommendations), **State Farm** driving verdict (hero, verdict headline, one reason, ticked tips), **Vivino** (photo, the judgement in the first line) | `CanIVerdictScreen`: photo → name → verdict + short answer → For you → Why → swaps → T1/T2/T3 rows → doctor → two buttons → cut-outs |
+
 **Not in the library:** any pregnancy food-safety app (Ovia, BabyCenter
 are absent, as noted in §"What the library does not carry"); the pattern
 was assembled from grocery, nutrition and payments apps instead.

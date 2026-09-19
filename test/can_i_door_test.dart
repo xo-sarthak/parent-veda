@@ -142,9 +142,16 @@ void main() {
 
     test('the door reaches scan, snap, the shelves and the answer', () {
       expect(door, contains('openCanIScan(context, widget.controller)'));
+      expect(door, contains('_chooseCamera'));
       expect(door, contains('canISnap(context, widget.controller)'));
       expect(door, contains('CanIGroupScreen(category: cat'));
       expect(door, contains('openCanIAnswer(context, e, widget.controller)'));
+    });
+
+    test('an answer opens the verdict page, not the reader', () {
+      final answer = File('lib/screens/can_i/can_i_answer.dart').readAsStringSync();
+      expect(answer, contains('const bool kCanIAnswerAsVerdict = true;'));
+      expect(answer, contains('CanIVerdictScreen(entry: entry, controller: c)'));
     });
 
     test('the saved screen still opens the same answer', () {
