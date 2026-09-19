@@ -128,6 +128,18 @@ most weight:**
   `verify: true` until legal and clinical review; a release build shows
   nothing still flagged.
 
+**One more, added by Making (2026-09-18):**
+
+* **A portfolio** — `SkDoorContent.portfolio: true` and `sk_portfolio/
+  <door>` (`sk_portfolio.dart`). A gallery that keeps what she made and
+  cannot return a score: photos (new; `image_picker`, copied into
+  documents, behind `SkChildStore.photosAllowed`, off by default), her
+  recordings (the voice keepsake, reused) and her words (the shared
+  keepsake, reused), with a private show mode for family in the room. No
+  likes, no ranking, no featured wall, no cross-user gallery, and no
+  judgement of the work by anything. A door that wants a public gallery
+  is refused by the stage, not accommodated by the slot.
+
 **A door marked "care" (Feelings): the recipe changes in two places.**
 Every content slot's chip says "Needs review" (`format`), so a fill cannot
 land quietly; and a task PDF for the door goes to a child psychologist

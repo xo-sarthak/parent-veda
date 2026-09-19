@@ -62,6 +62,7 @@ class SkChildStore extends ChangeNotifier {
   String? _pinHash;
   String? _pinSalt;
   bool _voiceAllowed = false;
+  bool _photosAllowed = false;
   bool _loaded = false;
 
   /// ⚠️ OFF BY DEFAULT. The Communication tasks on recording a child's
@@ -75,6 +76,20 @@ class SkChildStore extends ChangeNotifier {
 
   void setVoiceAllowed(bool on) {
     _voiceAllowed = on;
+    _save();
+    notifyListeners();
+  }
+
+  /// ⚠️ OFF BY DEFAULT, THE SAME POSTURE AS VOICE. The Making brief on
+  /// saved work: "a photo of a child's art can show her face or name;
+  /// treat saved work like the voice keepsake … gated behind explicit
+  /// parent consent … on-device where possible, minimal retention, parent
+  /// can delete. NEVER analyse, grade, judge or profile the saved work."
+  /// The parent's separate yes to keeping photos (2026-09-18).
+  bool get photosAllowed => _photosAllowed;
+
+  void setPhotosAllowed(bool on) {
+    _photosAllowed = on;
     _save();
     notifyListeners();
   }
@@ -186,6 +201,7 @@ class SkChildStore extends ChangeNotifier {
     _pinHash = null;
     _pinSalt = null;
     _voiceAllowed = false;
+    _photosAllowed = false;
     _save();
     notifyListeners();
   }
@@ -228,6 +244,7 @@ class SkChildStore extends ChangeNotifier {
       _pinHash = j['pinHash'] as String?;
       _pinSalt = j['pinSalt'] as String?;
       _voiceAllowed = j['voiceAllowed'] == true;
+      _photosAllowed = j['photosAllowed'] == true;
     } catch (_) {
       // A corrupt record reads as no record. The gate asks again.
     }
@@ -251,6 +268,7 @@ class SkChildStore extends ChangeNotifier {
             'pinHash': _pinHash,
             'pinSalt': _pinSalt,
             'voiceAllowed': _voiceAllowed,
+            'photosAllowed': _photosAllowed,
           }));
     } catch (_) {}
   }

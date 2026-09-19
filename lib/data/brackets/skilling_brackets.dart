@@ -490,6 +490,48 @@ final List<Bracket> kSkillingBrackets = [
             'keep what comes out.',
         hi: 'कला, संगीत और बनाना — शुरू करने के लिए विषय, और जो बने उसे '
             'सँभालने की जगह।'),
+    // ⚠️ LIVE SINCE 2026-09-18, to `ParentVeda_Creativity_structure.pdf` —
+    // "the one door whose plan already refuses scoring". Six cells live.
+    // The portfolio tracker survives as a PORTFOLIO, not a tracker: a
+    // gallery that keeps what she made and cannot return a score. The
+    // showcase is kept and held PRIVATE — a show mode on this phone, no
+    // cross-user gallery, no likes, no featured wall (the user's call, 1a).
+    // Consult held: "an art or music teacher, rarely".
+    layers: {
+      BracketLayer.content: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Art, music, and making prompts',
+        surfaceIds: ['sk_lessons/skilling_creativity'],
+      ),
+      BracketLayer.activities: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Making practice',
+        surfaceIds: ['sk_activities/skilling_creativity'],
+      ),
+      BracketLayer.tools: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Portfolio tracker',
+        surfaceIds: ['sk_portfolio/skilling_creativity'],
+      ),
+      BracketLayer.products: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Optional',
+        surfaceIds: ['sk_products/skilling_creativity'],
+      ),
+      BracketLayer.course: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Optional',
+        surfaceIds: ['sk_courses/skilling_creativity'],
+      ),
+      BracketLayer.consult:
+          const BracketLayerSpec(state: LayerState.notReady, reason: 'Rare'),
+      BracketLayer.extras: const BracketLayerSpec(
+        state: LayerState.live,
+        reason: 'Portfolio showcase',
+        surfaceIds: ['sk_portfolio/skilling_creativity'],
+      ),
+    },
+    /* kept for revert — the row as declared before the door
     layers: _skillLayers(
       content: 'Art, music, and making prompts',
       activities: 'Making practice',
@@ -499,6 +541,7 @@ final List<Bracket> kSkillingBrackets = [
       consult: 'Rare',
       extras: 'Portfolio showcase',
     ),
+    */
   ),
 
   Bracket(

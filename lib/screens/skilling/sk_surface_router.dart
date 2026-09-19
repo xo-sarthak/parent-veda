@@ -48,6 +48,7 @@ import 'sk_grown_up_screen.dart';
 import 'sk_journal.dart';
 import 'sk_keepsake_screen.dart';
 import 'sk_parent_gate_screen.dart';
+import 'sk_portfolio.dart';
 import 'sk_practice_store.dart';
 import 'sk_voice_keepsake.dart';
 
@@ -88,6 +89,10 @@ Widget? skScreenForSurface(String id) {
     case 'sk_voice':
       if (door == null || skDoorContentFor(door)?.voiceKeepsake != true) return null;
       return SkVoiceKeepsakeScreen(doorId: door);
+    case 'sk_portfolio':
+      // The Making brief's gallery — only on a door that keeps one.
+      if (door == null || skDoorContentFor(door)?.portfolio != true) return null;
+      return SkPortfolioScreen(doorId: door, onSurface: skOpenSurface);
     case 'sk_journal':
       // The Feelings brief's "her private journal" — only on a door that
       // keeps one. Child-private, on this phone, encrypted (§103).
@@ -162,6 +167,7 @@ bool skOpenDoor(BuildContext context, String doorId) {
     SkPracticeStore.instance.load(),
     SkVoiceStore.instance.load(),
     SkJournalStore.instance.load(),
+    SkPortfolioStore.instance.load(),
   ]).then((_) {
     if (!context.mounted) return;
     if (!SkChildStore.instance.consented) {

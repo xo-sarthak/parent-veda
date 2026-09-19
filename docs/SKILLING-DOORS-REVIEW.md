@@ -24,8 +24,8 @@ buy are stub sheets; the door stays behind `kDebugMode`; the preview ships.
 | Coding | `ParentVeda_Coding_structure_v2.pdf` | door, 5 tabs + the shell | **3 of 3 filled** (36 activities) | 5f963a7 (door), 87dcd62 (fills + walk) | **yes** — 2026-09-14, at 8, 5 and 12 | `sk_coding_door_test` |
 | Communication | `ParentVeda_Communication_structure.pdf` | door, 5 tabs (three band cards) | **3 of 3 filled** (6–8, 8–11 from the author's PDFs; **11–14 written by Claude Code**, with the other PDFs) | a86c5bf (frame), 0fa1193 (fills), e67da1b (walk), e34b39f (11–14) | **yes** — 2026-09-16, at 12 and 8, recorder end to end (11–14 fill not yet) | `sk_communication_door_test` |
 | Confidence | `ParentVeda_Confidence_structure.pdf` | door, **6 cards** (three band cards + recorder + keepsake) | **3 of 3 filled** (36 activities) | 5eb85a4 (frame), 153b3a4 (walk), 6a78176 (fills + walk) | **yes** — 2026-09-17, at 8, frame and fills | `sk_confidence_door_test` |
-| Creativity | `ParentVeda_Creativity_structure.pdf` | plan sheet | none yet | — | — | — |
-| Feelings | `ParentVeda_Feelings_structure.pdf` | door, **6 cards** (three band cards + Scenarios and prompts + Your journal + You practised) and the off-ramp bar on every screen | none yet — **content marked "care": clinical review before any fill** | commit next | no | `sk_feelings_door_test` |
+| Creativity (Making) | `ParentVeda_Creativity_structure.pdf` | door, 5 tabs (three band cards + Prompts + Your portfolio, the showcase inside it) | none yet (no task PDFs) | commit next | no | `sk_making_door_test` |
+| Feelings | `ParentVeda_Feelings_structure.pdf` | door, **6 cards** (three band cards + Scenarios and prompts + Your journal + You practised) and the off-ramp bar on every screen | none yet — **content marked "care": clinical review before any fill** | 8c09f97 | no | `sk_feelings_door_test` |
 | Focus | `ParentVeda_Focus_structure.pdf` | plan sheet | none yet | — | — | — |
 | Maths | `ParentVeda_Maths_structure.pdf` | plan sheet | none yet | — | — | — |
 | Memory | `ParentVeda_Memory_structure.pdf` | plan sheet | none yet | — | — | — |
@@ -629,6 +629,84 @@ door is authored until a child psychologist has reviewed it.**
       intelligence & resilience". Fine.
 - [ ] Not walked on a phone (the device is the other terminal's).
 
+## Making — Creativity & expression (§104)
+
+**Hand-back, as the brief's OUTPUT asks (2026-09-18):**
+
+- *Files changed:* `lib/data/doors/sk_door_making.dart` (new),
+  `lib/data/skilling/skilling_making_{activities,content,course,
+  products}.dart` (new), `lib/screens/skilling/sk_portfolio.dart` (new —
+  the store, the add-a-photo sheet, the screen, the show mode),
+  `sk_child_store.dart` (`photosAllowed`, off by default),
+  `sk_door_content.dart` (`portfolio`), `sk_surface_router.dart`
+  (`sk_portfolio/<door>`; the store loads at door entry),
+  `sk_grown_up_screen.dart` (the photos switch, "Delete her photos",
+  withdrawing consent forgets them), `lib/data/doors/sk_door_data.dart`,
+  `sk_content_registry.dart`, `skilling_brackets.dart` (row live: six
+  cells, Consult held), `test/sk_making_door_test.dart` (new).
+- *Every layer left notReady as content:* activities (36), prompts (27:
+  art, music, making), courses (6), products (12), parent note —
+  placeholders, ledger MK1–MK4, MK6–MK8. No prompt, activity, class or
+  product copy written.
+- *Reused vs newly created — photo capture called out:* **reused** — the
+  gate, surface, scope, the shared no-score keepsake (as "What I made",
+  reached from inside the portfolio), the voice keepsake for the music
+  she makes (`sk_voice/<door>`, reached from inside the portfolio), the
+  shelves, the router; `image_picker`, already a dependency. **New** — the
+  **photo capture**, the brief's one new capability: camera or gallery,
+  the picked file copied out of the cache into documents (the
+  `memory_photos` lesson), an index of ids, dates and captions, behind the
+  parent's photos switch (off by default), parent-deletable, never
+  analysed, and no "how good is this drawing" of any kind; the
+  **portfolio screen** composing the three; the **show mode** — the
+  showcase, private: a full-screen pager to hand to family in the room,
+  nothing leaves the phone, no likes, no ranking, no featured wall (1a,
+  3a); two shell slots (`photosAllowed`, `portfolio`).
+- *Named but not found / not used:* `pp_products` — not used on purpose,
+  skilling's own shelf holds. The brief's "existing keepsake/journal (from
+  the pregnancy journal)" — the pregnancy journal syncs to Supabase and
+  is the pregnancy stage's; skilling's own keepsakes are what the
+  portfolio reuses (the standing call). The journal's "invite someone to
+  see" pattern — found, and it is a link whose other half (the web page,
+  the upload) is not in this repo; a dead link for a child's art would be
+  worse than none, so the show mode replaces it (3a). Nothing else to
+  stop on.
+
+Built to the brief literally on your calls of 2026-09-18 (1a the showcase
+private · 2a the least commercial door, kept so · 3a a show mode on this
+phone · 4a photo capture, on-device, the voice posture). Frame only; no
+task PDFs exist.
+
+- [ ] **Look:** Skilling → Making → the selector: five cards. Just make
+      it · Make it yours · Make something real · Prompts · Your portfolio.
+      The footers are the brief's band lines, word for word.
+- [ ] **Look:** Prompts → three rails: Art · Music · Making — the brief's
+      "honour all three" — their blurbs naming rangoli, the kitchen shelf,
+      a dupatta fort.
+- [ ] **Look:** Your portfolio → (photos off) the note asking a grown-up
+      to turn them on; the "Your recordings" and "What you tried and made"
+      rows open the two reused keepsakes. (Photos on, from For the
+      grown-up) → "Keep a photo of something you made" → camera or the
+      phone → a caption in her words → a tile in the grid → tap it → "Take
+      it out". Then **Show it** → a black screen, "Made by Kabir", a row of
+      who-for chips (Papa · Mumma · Dadi …) → "For Dadi, made by Kabir",
+      swipe through. Nothing else on that screen, on purpose.
+- [ ] **The who-for names** are restated in skilling (`kSkShowingTo`)
+      rather than imported from the pregnancy invite screen; the list is
+      mine — say if it should be the invite's six exactly.
+- [ ] **Look:** For the grown-up → "Let her keep photos of what she made"
+      (off by default) with its line about faces and names; "Delete her
+      photos"; the parent note card, "Why this is a real skill, in plain
+      words"; six small classes (₹999 / $12 placeholders, an art and a
+      music per level); no coach (held).
+- [ ] The keepsake vocabulary on this door — "I made something" finally
+      reads right here. The same three words everywhere; yours.
+- [ ] The hero photo — a child's hands painting stones, markers
+      everywhere, no face (`photo-1596464716127`). Keep?
+- [ ] The tile says "Making"; the brief's door is "Creativity &
+      expression" and the bracket id is `skilling_creativity`. Fine.
+- [ ] Not walked on a phone yet.
+
 ## Cross-door windows
 
 `sk_page/<door>/<page>` as a `toolSurfaceId` on a page with no blocks —
@@ -640,7 +718,9 @@ Communication split the Communication brief names.
 |---|---|---|---|
 | Coding · `cd_811_12` Stuck? Try, Save, Try | Stillness | the settle-breath ("point to it, do not rebuild it") | Stillness built 2026-09-17: the page is `sk_page/skilling_stillness/sl_settle`; the activity's link to it is a fill-time call |
 | Coding · `cd_1114_06` Why AI Gets It Wrong | Thinking | the "is this true" reasoning side | Thinking built 2026-09-17; its "Is this true?" set is the other half. The linking page waits on Coding's AI pages (coming soon) and Thinking's strand fill — the one defence, authored once when both exist |
-| Coding · `cd_1114_12` Share It and Make It Better | Making (Creativity) | the private, family-only showcase posture | owed — no sharing feature exists on either door; sharing here is offline, to a family member |
+| Coding · `cd_1114_12` Share It and Make It Better | Making (Creativity) | the private, family-only showcase posture | **Making built 2026-09-18**: its Show it is exactly that posture — a show mode on this phone, no link, no upload. Coding's activity stays offline-to-family as written |
+| Making | parenting Early Learning | "the parenting stage already has art, messy play and making for younger children. This door is school-age. Cross-link at the 6 to 8 edge, do not duplicate" | owed — a fill-time call for the 6 to 8 band; the parent side exists |
+| Making · showing it | Confidence, Communication | "'Showing it' is not public speaking. Sharing a made thing here is a different act from standing up to speak (Confidence) or saying it clearly (Communication)" | both built; the window is a line in the showing-it fills, not a page |
 | Communication | Confidence | the shared speaking practice — Confidence owns the nerve and the audience, Expression the clarity and the back-and-forth; the recorder is built once (`sk_voice_keepsake.dart`) | owed — Confidence not built; it windows into Communication's prompt sets when it lands |
 | Communication | Reading | "a child reads a story there and retells it here" | owed — Reading not built |
 | Communication | Feelings | "Feelings owns naming the emotion; Expression owns putting it into clear words" | Feelings built 2026-09-18; the window is a page when the Feelings fill exists |

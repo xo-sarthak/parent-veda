@@ -39,6 +39,7 @@ import 'sk_door_content.dart';
 import 'sk_grown_up_gate.dart';
 import 'sk_practice_store.dart';
 import 'sk_journal.dart';
+import 'sk_portfolio.dart';
 import 'sk_voice_keepsake.dart';
 
 /// Which shelf to scroll to when opened by a deep link.
@@ -282,7 +283,7 @@ class _SkGrownUpScreenState extends State<SkGrownUpScreen> {
             // ---- set up and consent ------------------------------------------
             _Head('Set up and consent', p, key: _keys[SkGrownUpSection.settings]),
             const SizedBox(height: 12),
-            _Settings(p: p, journal: c.journal),
+            _Settings(p: p, journal: c.journal, portfolio: c.portfolio),
           ],
         ),
       ),
@@ -599,8 +600,12 @@ class _ShelfRow extends StatelessWidget {
 
 /// The child's record, the PIN, the verifier's word, and withdrawal.
 class _Settings extends StatelessWidget {
-  const _Settings({required this.p, this.journal = false});
+  const _Settings({required this.p, this.journal = false, this.portfolio = false});
   final V2Palette p;
+
+  /// The door keeps a portfolio (Making): the photos switch and delete
+  /// action show here. Recordings already have theirs.
+  final bool portfolio;
 
   /// The door keeps her private journal (Feelings). The parent's powers
   /// over it are exactly two — know it exists, delete it — and neither is
@@ -640,6 +645,8 @@ class _Settings extends StatelessWidget {
         _kv('Her voice', s.voiceAllowed ? 'Recording on, this phone only' : 'Recording off', p),
         if (journal)
           _kv('Her journal', 'Hers. On this phone, locked; you can delete it, not read it', p),
+        if (portfolio)
+          _kv('Her photos', s.photosAllowed ? 'Keeping photos on, this phone only' : 'Keeping photos off', p),
         const SizedBox(height: 6),
         // ⚠️ THE PARENT'S SEPARATE YES TO RECORDING. Off by default (the
         // Communication tasks' rule); on this phone only; never analysed,
@@ -660,6 +667,24 @@ class _Settings extends StatelessWidget {
               'clip.',
               style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink2)),
         ),
+        if (portfolio)
+          // ⚠️ THE PARENT'S SEPARATE YES TO PHOTOS — the Making brief: "treat
+          // saved work like the voice keepsake". Off by default; on this
+          // phone; never analysed, graded or judged; deleted with consent.
+          SwitchListTile(
+            key: const Key('sk-photos-switch'),
+            contentPadding: EdgeInsets.zero,
+            value: s.photosAllowed,
+            onChanged: s.setPhotosAllowed,
+            activeThumbColor: p.action,
+            title: Text('Let her keep photos of what she made',
+                style: pvManrope(fontSize: 14, fontWeight: FontWeight.w700, color: p.ink1)),
+            subtitle: Text(
+                'A picture of a drawing or a made thing can show her face or '
+                'her name, so it is kept like her voice: on this phone, never '
+                'sent anywhere, never judged. You can delete any photo.',
+                style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink2)),
+          ),
         const SizedBox(height: 6),
         Wrap(spacing: 8, runSpacing: 8, children: [
           // Her age can be corrected here without withdrawing consent — the
@@ -674,10 +699,13 @@ class _Settings extends StatelessWidget {
             // journal besides consent. Files, index and key all go.
             _action(context, 'Delete her journal', () => SkJournalStore.instance.forgetAll(),
                 quiet: true),
+          if (portfolio)
+            _action(context, 'Delete her photos', () => SkPortfolioStore.instance.forgetAll(), quiet: true),
           _action(context, 'Withdraw consent and forget her', () {
             SkPracticeStore.instance.forgetAll();
             SkVoiceStore.instance.forgetAll();
             SkJournalStore.instance.forgetAll();
+            SkPortfolioStore.instance.forgetAll();
             s.forget();
             // Back to the skilling preview, not the app's first route — seen
             // on a phone (2026-09-14) landing on the pregnancy home.

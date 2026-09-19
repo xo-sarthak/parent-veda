@@ -24,6 +24,10 @@ import '../../data/skilling/skilling_feelings_activities.dart';
 import '../../data/skilling/skilling_feelings_content.dart';
 import '../../data/skilling/skilling_feelings_course.dart';
 import '../../data/skilling/skilling_feelings_products.dart';
+import '../../data/skilling/skilling_making_activities.dart';
+import '../../data/skilling/skilling_making_content.dart';
+import '../../data/skilling/skilling_making_course.dart';
+import '../../data/skilling/skilling_making_products.dart';
 import '../../data/skilling/skilling_stillness_activities.dart';
 import '../../data/skilling/skilling_stillness_content.dart';
 import '../../data/skilling/skilling_stillness_course.dart';
@@ -131,6 +135,29 @@ final SkDoorContent kSkFeelingsContent = SkDoorContent(
   safety: kSkFeelingsSafety,
 );
 
+final SkDoorContent kSkMakingContent = SkDoorContent(
+  doorId: 'skilling_creativity',
+  bandNames: kSkMakingBandNames,
+  skills: kSkMakingSkills,
+  lessonSets: kSkMakingLessonSets,
+  lessons: kSkMakingLessons,
+  activities: kSkMakingActivities,
+  courses: kSkMakingCourses,
+  products: kSkMakingProducts,
+  parentNote: kSkMakingParentNote,
+  keepsakeTitle: 'What I made',
+  // The recorder for the music she makes (reused), and the portfolio that
+  // keeps photos of what she made (new) — the brief's "reuses the keepsake
+  // and recorder; photo capture is new; no score".
+  voiceKeepsake: true,
+  voiceTitle: 'Your recordings',
+  voiceBlurb: 'The tunes and beats {name} made, and what {she} tried. It '
+      'all stays on this phone; nobody marks it.',
+  voiceEmptyLine: 'Clap a beat, hum a tune, play the thing you made. Tap '
+      'Record something and it lands here.',
+  portfolio: true,
+);
+
 /// Every door with content. Adding a door is a line here and a line in
 /// `kSkDoors`.
 final List<SkDoorContent> kSkDoorContents = [
@@ -140,6 +167,7 @@ final List<SkDoorContent> kSkDoorContents = [
   kSkThinkingContent,
   kSkStillnessContent,
   kSkFeelingsContent,
+  kSkMakingContent,
 ];
 
 SkDoorContent? skDoorContentFor(String doorId) {

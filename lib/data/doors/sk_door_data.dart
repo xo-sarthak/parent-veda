@@ -36,6 +36,7 @@ import 'sk_door_coding.dart';
 import 'sk_door_communication.dart';
 import 'sk_door_confidence.dart';
 import 'sk_door_feelings.dart';
+import 'sk_door_making.dart';
 import 'sk_door_stillness.dart';
 import 'sk_door_thinking.dart';
 
@@ -43,6 +44,7 @@ export 'sk_door_coding.dart';
 export 'sk_door_communication.dart';
 export 'sk_door_confidence.dart';
 export 'sk_door_feelings.dart';
+export 'sk_door_making.dart';
 export 'sk_door_stillness.dart';
 export 'sk_door_thinking.dart';
 
@@ -202,6 +204,7 @@ final List<SkDoor> kSkDoors = [
   kSkThinkingDoor,
   kSkStillnessDoor,
   kSkFeelingsDoor,
+  kSkMakingDoor,
 ];
 
 SkDoor? skDoorFor(String doorId) {

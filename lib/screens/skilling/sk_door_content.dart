@@ -201,6 +201,7 @@ class SkDoorContent {
     this.keepsakeInvite,
     this.journal = false,
     this.safety,
+    this.portfolio = false,
   });
 
   /// The practice keepsake's title, in the door's own words. Coding's "What
@@ -231,6 +232,14 @@ class SkDoorContent {
   /// every child screen of the door that carries one (`SkTalkToSomeoneBar`).
   /// Null on every other door.
   final SkSafety? safety;
+
+  /// The door keeps a portfolio (`sk_portfolio/<door>`, `sk_portfolio.dart`):
+  /// photos of what she made (new, on this phone, behind the parent's
+  /// photos switch), her recordings (the voice keepsake, reused) and her
+  /// words (the shared keepsake, reused), with a private show mode. The
+  /// Making brief's "a gallery that keeps what she made … it cannot return
+  /// a score" (the user's calls, 2026-09-18). False on every other door.
+  final bool portfolio;
 
   /// The keepsake screen's title, in the door's own words — Communication's
   /// "Your voice, saved", Confidence's "Your talks, saved".
