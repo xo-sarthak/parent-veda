@@ -66,6 +66,10 @@ import '../v2/v2_palette.dart';
 import '../v2/v3_hero_field.dart';
 import '../v2/v3_skill_art.dart';
 import '../../data/doors/sk_door_data.dart';
+import '../profile/pv_you_screen.dart';
+import '../saved_screen.dart';
+import '../v2/v3_hero_chrome.dart';
+import 'sk_child_store.dart';
 import 'sk_practice_store.dart';
 import 'sk_surface_router.dart';
 
@@ -256,6 +260,29 @@ class _Hero extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Saved and the avatar, as on the other three homes. The
+                // avatar is the one door to You (2026-09-19): the parent's
+                // profile, with her keepsakes and consent reachable from it.
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: AnimatedBuilder(
+                    animation: SkChildStore.instance,
+                    builder: (context, _) => V3HeroChrome(
+                      tone: V3HeroTone.onField,
+                      p: p,
+                      initial: SkChildStore.instance.name.isEmpty
+                          ? ''
+                          : SkChildStore.instance.name[0],
+                      onSaved: () =>
+                          Navigator.of(context).push(MaterialPageRoute<void>(
+                              settings: const RouteSettings(name: 'saved'),
+                              builder: (_) => const SavedScreen())),
+                      onProfile: () =>
+                          openPvYou(context, stage: LifeStage.skilling),
+                    ),
+                  ),
+                ),
+                const Spacer(),
                 // ink2 on the tinted field, as everywhere else — a grey
                 // calibrated for a neutral ground loses contrast on a
                 // chromatic one faster than it loses lightness.

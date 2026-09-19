@@ -1,6 +1,14 @@
 // =============================================================================
 //  ProfileScreen  -  the "Profile" tab
 // -----------------------------------------------------------------------------
+//  ⚠️ FACADE since 2026-09-19. `ProfileScreen` now opens the unified You
+//  screen (`lib/screens/profile/pv_you_screen.dart`) for the pregnancy stage,
+//  so every existing push of `ProfileScreen(controller: …)` lands on the one
+//  profile without touching its call sites. The pregnancy-only body below is
+//  kept, byte for byte, as `ProfileScreenClassic` — for revert.
+//  docs/PROFILE-AUDIT.md §5 lists where each of its rows went.
+//
+//  Original header:
 //  A light profile header, the Dear Baby memory-vault entry point, and a
 //  language toggle. Dear Baby lives here (rather than its own tab) so the Tools
 //  tab can be a permanent destination.
@@ -49,6 +57,8 @@ import '../services/father_preview.dart';
 import 'dear_baby_vault_screen.dart';
 import 'journal_screen.dart';
 // import 'saved_hub_screen.dart'; // kept for revert — SavedScreen replaced the hub 2026-09-16
+import 'profile/pv_you_screen.dart';
+import '../services/life_stage_store.dart';
 import 'developer_switches.dart';
 import 'saved_screen.dart';
 import '../theme/pv_fonts.dart';
@@ -57,6 +67,19 @@ import '../services/auth/delete_account.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen(
+      {super.key, required this.controller, this.father = false});
+
+  final PregnancyController controller;
+  final bool father;
+
+  @override
+  Widget build(BuildContext context) =>
+      PvYouScreen(stage: LifeStage.pregnancy, father: father);
+}
+
+/// The pre-2026-09-19 pregnancy profile. Kept for revert; nothing pushes it.
+class ProfileScreenClassic extends StatelessWidget {
+  const ProfileScreenClassic(
       {super.key, required this.controller, this.father = false});
 
   final PregnancyController controller;

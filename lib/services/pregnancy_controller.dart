@@ -202,6 +202,15 @@ class PregnancyController extends ChangeNotifier {
 
   /// The mother's name - the logged-in user's own name in mother mode, or the
   /// paired mother's name in father mode. Falls back to a placeholder.
+  /// The signed-in person's own name from `profiles`, or null before a
+  /// profile load. The You screen reads this for the identity card; it does
+  /// not fall back to 'Priya' the way [motherName] does, because a profile
+  /// must show the placeholder honestly rather than a name she never gave.
+  String? get myName => _myName;
+
+  /// The paired partner's name, or null when not paired.
+  String? get partnerName => _partnerName;
+
   String get motherName =>
       (_myRole == 'mother' ? _myName : _partnerName) ?? 'Priya';
 

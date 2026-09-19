@@ -30,6 +30,8 @@ import 'package:flutter/material.dart';
 import '../../services/bracket_resolver.dart';
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
+import '../../services/life_stage_store.dart';
+import '../profile/pv_you_screen.dart';
 import 'sk_bands.dart';
 import 'sk_child_store.dart';
 import 'sk_consent_verifier.dart';
@@ -690,6 +692,10 @@ class _Settings extends StatelessWidget {
           // Her age can be corrected here without withdrawing consent — the
           // walk (2026-09-14) found withdraw-and-redo was the only way.
           _action(context, 'Change her date of birth', () => _askDob(context)),
+          // The parent's own profile — account, family, the other stages'
+          // things. Her keepsakes route back here from it, behind the gate.
+          _action(context, 'Your profile',
+              () => openPvYou(context, stage: LifeStage.skilling)),
           _action(context, s.hasPin ? 'Change PIN' : 'Set a PIN',
               () => _askPin(context)),
           if (s.hasPin)

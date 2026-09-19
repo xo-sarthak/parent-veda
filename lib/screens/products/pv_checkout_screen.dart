@@ -245,7 +245,7 @@ class _PvCheckoutScreenState extends State<PvCheckoutScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
-      builder: (_) => const _AddressForm(),
+      builder: (_) => const PvAddressForm(),
     );
     if (a != null && mounted) {
       PvOrderStore.instance.saveAddress(a);
@@ -596,14 +596,16 @@ class _PvCheckoutScreenState extends State<PvCheckoutScreen> {
 
 /// The add-address form. Every field required except the second line; the
 /// PIN is six digits, the phone ten. Saved as the default.
-class _AddressForm extends StatefulWidget {
-  const _AddressForm();
+/// Public since 2026-09-19: the You screen's address book reuses it, so an
+/// address added there and one added here are the same thing.
+class PvAddressForm extends StatefulWidget {
+  const PvAddressForm({super.key});
 
   @override
-  State<_AddressForm> createState() => _AddressFormState();
+  State<PvAddressForm> createState() => _AddressFormState();
 }
 
-class _AddressFormState extends State<_AddressForm> {
+class _AddressFormState extends State<PvAddressForm> {
   final _name = TextEditingController();
   final _phone = TextEditingController();
   final _l1 = TextEditingController();

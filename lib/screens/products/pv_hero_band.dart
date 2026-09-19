@@ -130,9 +130,29 @@ class PvHeroBand extends StatefulWidget {
 }
 
 class _PvHeroBandState extends State<PvHeroBand> {
-  final PageController _pages = PageController(viewportFraction: 0.9);
+  // ⚠️ THE BAND LOOPS — the user's call (2026-09-19): the last card swipes
+  // on to the first and the first swipes back to the last, with no dead
+  // edge either way. A `PageView` cannot wrap by itself, so the trick every
+  // marketplace carousel uses: give it a huge virtual page count, map each
+  // virtual index onto a real slide with `% n`, and start in the middle so
+  // both directions have thousands of pages of runway. Nothing is
+  // duplicated in memory — the builder is lazy and only the visible card
+  // and its neighbours exist.
+  static const int _virtual = 100000;
+
+  late final int _origin = widget.slides.isEmpty
+      ? 0
+      : (_virtual ~/ 2) - ((_virtual ~/ 2) % widget.slides.length);
+  late final PageController _pages = PageController(
+    viewportFraction: 0.9,
+    initialPage: _origin,
+  );
   Timer? _auto;
-  int _page = 0;
+
+  /// The virtual page; `_page` is the real slide it shows.
+  late int _virtualPage = _origin;
+  int get _page =>
+      widget.slides.isEmpty ? 0 : _virtualPage % widget.slides.length;
   bool _touched = false;
 
   @override
@@ -148,9 +168,9 @@ class _PvHeroBandState extends State<PvHeroBand> {
     if (widget.slides.length < 2) return;
     _auto = Timer.periodic(const Duration(seconds: 5), (_) {
       if (!mounted || _touched || !_pages.hasClients) return;
-      final next = (_page + 1) % widget.slides.length;
+      // Always forward: a wrap is just the next virtual page.
       _pages.animateToPage(
-        next,
+        _virtualPage + 1,
         duration: const Duration(milliseconds: 420),
         curve: Curves.easeOutCubic,
       );
@@ -176,14 +196,17 @@ class _PvHeroBandState extends State<PvHeroBand> {
             onPointerDown: (_) => _touched = true,
             child: PageView.builder(
               controller: _pages,
-              itemCount: widget.slides.length,
-              onPageChanged: (i) => setState(() => _page = i),
+              // One slide needs no loop and no runway.
+              itemCount: widget.slides.length < 2 ? 1 : _virtual,
+              onPageChanged: (i) => setState(() => _virtualPage = i),
+              // Every card has a neighbour on both sides now, so the gutter
+              // is symmetric — the "first card, no left gap" special case
+              // is gone with the edge it was for.
               itemBuilder: (context, i) => Padding(
-                padding: EdgeInsets.only(
-                  left: i == 0 ? 0 : 5,
-                  right: i == widget.slides.length - 1 ? 0 : 5,
+                padding: const EdgeInsets.symmetric(horizontal: 5),
+                child: _HeroCard(
+                  slide: widget.slides[i % widget.slides.length],
                 ),
-                child: _HeroCard(slide: widget.slides[i]),
               ),
             ),
           ),

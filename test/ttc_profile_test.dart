@@ -21,6 +21,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:parentveda/screens/profile/pv_you_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_calendar_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_community_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_prepare_screen.dart';
@@ -78,15 +79,22 @@ void main() {
       await pumpTall(tester, const TtcTodayScreen());
       await tester.tap(find.byIcon(Icons.person_outline_rounded).first);
       await tester.pumpAndSettle();
-      expect(find.byType(TtcProfileScreen), findsOneWidget);
+      // Since 2026-09-19 the door lands on the unified You screen directly.
+      expect(find.byType(PvYouScreen), findsOneWidget);
     });
   });
 
   // ===========================================================================
+  // ⚠️ Since 2026-09-19 `TtcProfileScreen` is a FACADE over the unified You
+  // screen (test/pv_you_test.dart holds its contract). The groups below pump
+  // `TtcProfileScreenClassic` — the body kept for revert — so a revert lands
+  // on a tested screen rather than a stale one. The door group above still
+  // pumps the facade: the door is what must reach a profile, whichever body.
+  // ===========================================================================
   group('the language control', () {
     testWidgets('offers both languages and switches between them',
         (tester) async {
-      await pumpTall(tester, const TtcProfileScreen());
+      await pumpTall(tester, const TtcProfileScreenClassic());
       expect(find.text('Hinglish'), findsOneWidget);
       expect(find.text('English'), findsOneWidget);
 
@@ -99,7 +107,7 @@ void main() {
 
     testWidgets('and the screen itself re-renders in the new language',
         (tester) async {
-      await pumpTall(tester, const TtcProfileScreen());
+      await pumpTall(tester, const TtcProfileScreenClassic());
       await tester.tap(find.text('Hinglish'));
       await tester.pumpAndSettle();
       // "Language" in English, "Bhasha" in Hinglish.
@@ -121,7 +129,7 @@ void main() {
   // ===========================================================================
   group('what else the screen carries', () {
     testWidgets('a sign-out', (tester) async {
-      await pumpTall(tester, const TtcProfileScreen());
+      await pumpTall(tester, const TtcProfileScreenClassic());
       expect(find.text('Sign out'), findsOneWidget);
     });
 
@@ -130,21 +138,21 @@ void main() {
       // real way forward is recording a positive test. The label is what stops
       // this being mistaken for a product decision - the same convention the
       // pregnancy Profile uses twice.
-      await pumpTall(tester, const TtcProfileScreen());
+      await pumpTall(tester, const TtcProfileScreenClassic());
       expect(find.textContaining('testing'), findsWidgets);
       expect(find.text('Go to pregnancy'), findsOneWidget);
     });
 
     testWidgets('partner pairing says what is true rather than offering a dead button',
         (tester) async {
-      await pumpTall(tester, const TtcProfileScreen());
+      await pumpTall(tester, const TtcProfileScreenClassic());
       expect(find.text('Your partner'), findsOneWidget);
       expect(find.textContaining('being built'), findsOneWidget);
     });
 
     testWidgets('it builds in Hinglish too', (tester) async {
       TtcLang.instance.hinglish = true;
-      await pumpTall(tester, const TtcProfileScreen());
+      await pumpTall(tester, const TtcProfileScreenClassic());
       expect(tester.takeException(), isNull);
       TtcLang.instance.hinglish = false;
     });
@@ -154,7 +162,7 @@ void main() {
   group('the stage switch', () {
     testWidgets('sets the life stage to pregnancy', (tester) async {
       expect(LifeStageStore.instance.stage, isNot(LifeStage.pregnancy));
-      await pumpTall(tester, const TtcProfileScreen());
+      await pumpTall(tester, const TtcProfileScreenClassic());
       await tester.tap(find.text('Go to pregnancy'));
       await tester.pumpAndSettle();
       expect(LifeStageStore.instance.stage, LifeStage.pregnancy,
@@ -174,7 +182,7 @@ void main() {
         // Mimic the splash: TTC as the FIRST route, nothing beneath it.
         onGenerateRoute: (_) => MaterialPageRoute<void>(
           settings: const RouteSettings(name: ttcHomeRoute),
-          builder: (_) => const TtcProfileScreen(),
+          builder: (_) => const TtcProfileScreenClassic(),
         ),
       ));
       await tester.pumpAndSettle();

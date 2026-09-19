@@ -56,6 +56,7 @@ import '../services/landing_focus.dart';
 import '../services/life_stage_store.dart';
 import '../services/pregnancy_controller.dart';
 import 'weekly_card_stack_screen.dart';
+import 'profile/pv_you_screen.dart';
 import 'saved_screen.dart';
 // import 'search/pv_search_screen.dart'; // the home bar, kept for revert
 // import '../widgets/pv_search_bar.dart';
@@ -310,11 +311,14 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
                         WeeklyCardStackScreen(controller: pregnancy),
                   ));
                 },
-                // Was `_open(context, 'journal')` — classic fallback. Kept for
-                // revert. Now the journal itself:
-                onAvatar: () => Navigator.of(context).push(MaterialPageRoute<void>(
-                    settings: const RouteSettings(name: 'journal'),
-                    builder: (_) => JournalScreen(controller: pregnancy))),
+                // Was `_open(context, 'journal')` — classic fallback, then the
+                // journal itself. Both kept for revert. Since 2026-09-19 the
+                // avatar is the one door to You on every stage; the journal
+                // sits under Your things there.
+                // onAvatar: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                //     settings: const RouteSettings(name: 'journal'),
+                //     builder: (_) => JournalScreen(controller: pregnancy))),
+                onAvatar: () => openPvYou(context, stage: LifeStage.pregnancy),
                 // ⚠️ WAS `_open(context, 'saved')`, which switched the home to
                 // CLASSIC and stopped — the V3 scaffolding from when classic
                 // was still the destination. V3 is final (2026-09-16): every

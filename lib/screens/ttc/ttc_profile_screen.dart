@@ -37,20 +37,32 @@ import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_store.dart';
 import '../auth/auth_flow_screen.dart' show kAuthCompletedKey;
 import '../../services/auth/social_auth.dart';
+import '../profile/pv_you_screen.dart';
 import 'ttc_common.dart';
 import 'ttc_home_version.dart';
 import 'ttc_journey_map_screen.dart';
 import 'ttc_strings.dart';
 
-void openTtcProfile(BuildContext context) {
-  Navigator.of(context).push(MaterialPageRoute<void>(
-    builder: (_) => const TtcProfileScreen(),
-    settings: const RouteSettings(name: 'ttc/profile'),
-  ));
-}
+// ⚠️ FACADE since 2026-09-19. Both the opener and the screen land on the
+// unified You screen (`lib/screens/profile/pv_you_screen.dart`) for the
+// trying stage. The body below is kept, byte for byte, as
+// `TtcProfileScreenClassic` for revert; nothing pushes it. Its language,
+// sign-out and testing switches all have a home on You (Preferences, Account
+// and the debug-only Developer section).
+void openTtcProfile(BuildContext context) =>
+    openPvYou(context, stage: LifeStage.tryingToConceive);
 
 class TtcProfileScreen extends StatelessWidget {
   const TtcProfileScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) =>
+      const PvYouScreen(stage: LifeStage.tryingToConceive);
+}
+
+/// The pre-2026-09-19 TTC profile. Kept for revert; nothing pushes it.
+class TtcProfileScreenClassic extends StatelessWidget {
+  const TtcProfileScreenClassic({super.key});
 
   @override
   Widget build(BuildContext context) {

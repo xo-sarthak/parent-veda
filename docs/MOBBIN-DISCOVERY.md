@@ -25,6 +25,7 @@ CLAUDE.md invariants) → brief → build → this ledger.
 | 6 | Base UI — page ground, buttons, chips, cards, sheets, type | 2026-09-17 | `DESIGN-SYSTEM.md` §4.0 · `BASE-UI-DECISIONS.md` | Ground, type (Newsreader + Manrope), button theme, transitions, callouts, sheets; §2 answered; sweep owed |
 | 7 | Products — one store for three stages | 2026-09-17 | `PRODUCTS-AUDIT.md` | Yes, same day (`lib/screens/products/`, nine screens; old screens are facades) |
 | 8 | ParentVeda+ (doctor app) — provider home, earnings ledger, payouts, availability, front door | 2026-09-18 | `DOCTOR-APP-AUDIT.md` | Yes, same day (`0084`, `doctor_chrome.dart`, five `*_tab.dart`); not walked — STILL-OPEN §5.4 |
+| 10 | Profile — one *You* screen for four stages | 2026-09-19 | `PROFILE-AUDIT.md` | Yes, same day (`lib/screens/profile/`, nine files; `ProfileScreen` and `TtcProfileScreen` are facades); not walked — STILL-OPEN §67 |
 
 ---
 
@@ -235,6 +236,14 @@ attendee names on a class.
 
 **Owed.** STILL-OPEN §5.4. Full write-up `DOCTOR-APP-AUDIT.md`.
 
+**8b — the Home hero (2026-09-19).** Two more queries on provider homes
+with imagery: Calm / Air NZ (photo band, first card overlapping), Zopa,
+Jobber (the work's context behind the greeting), Airbnb host / Bloom (a
+place, no faces), pliability / Fiverr (the person's own photo large).
+Adopted as `DcHero` with three CC0 photographs by hour and the doctor's own
+`photo_url`. Declined dark full-bleed homes and promotional heroes.
+`DOCTOR-APP-AUDIT.md` §7.
+
 ---
 
 ## 9. The door walk — Scans & tests (2026-09-18/19)
@@ -259,6 +268,26 @@ logged here so the next door starts from it rather than from the chat.
 box); Zocdoc's yellow availability bar (colour as container); Material's
 `showDatePicker` dialog (lavender surface, violet day — and a dialog over a
 sheet).
+
+## 10. Profile — one You screen (2026-09-19)
+
+The full audit is `PROFILE-AUDIT.md`. What the library settled, in one
+line each, so the next profile question starts here:
+
+| Question | Who answered it | Taken |
+|---|---|---|
+| Where does the stage live? | **Flo** — the goal (period / conceive / pregnancy) is a row on the profile, changed with intent | *Your journey*: four chapters, one forward action, no free switch |
+| Profile vs settings? | **Oura** — profile is who you are, settings is how the app behaves, two pages | One page, two halves: A–E about her, F–H about the app |
+| How are rows grouped? | **Clue** *More* — grouped rows, eyebrow headers, hairlines, no cards inside cards | `PvYouSection` + `PvYouRow` |
+| Adult and children? | **Fitbit Family**, **Garmin child account** — the adult at the root, children beneath as chips | *Family*: partner card, then child chips → `PvChildScreen` |
+| The partner's view? | **Flo Partner** — "what he can see" stated as a list | `PvPartnerScreen`: what they see / never, one switch |
+| Switching who you are? | **Airbnb** "Switch to hosting", **Netflix** profiles — a floating pill, not a tab | *View as* pill, only when a partner is paired |
+| Data rights? | **Apple Health** privacy sentence, **Urban Company** privacy centre, **Zalando** request/delete | `PvDataPrivacyScreen`: what we store · download (coming) · delete |
+| A report for the doctor? | **Flo** "Report for a doctor" | `PvDoctorNotesScreen`: read-only, her own entries, disclaimer |
+
+**Declined:** Netflix-style full-screen profile picker (a family is not a
+list of equals); Zomato's gold/points band; per-thing sharing toggles in
+v1 (the user's call — one switch until the server owns the rule).
 
 ## What the library does not carry
 

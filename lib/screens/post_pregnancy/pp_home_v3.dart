@@ -95,9 +95,10 @@ import 'watch_player_screen.dart';
 import 'product_detail_screen.dart';
 import 'journal_v2/journal_home_screen.dart';
 import 'phase_map_screen.dart';
-import 'family_profile_screen.dart';
+// import 'family_profile_screen.dart'; // kept for revert — the avatar opens You since 2026-09-19
 import 'pp_hero_field.dart';
 // import 'pp_saved_hub_screen.dart'; // kept for revert — SavedScreen replaced the hub 2026-09-16
+import '../profile/pv_you_screen.dart';
 import '../saved_screen.dart';
 import 'pp_phase_faqs.dart';
 import 'pp_phases_data.dart';
@@ -240,9 +241,13 @@ class _PpHomeV3State extends State<PpHomeV3> {
                   onSaved: () => Navigator.of(context).push(MaterialPageRoute(
                       settings: const RouteSettings(name: 'saved'),
                       builder: (_) => const SavedScreen())),
-                  onProfile: () => Navigator.of(context).push(MaterialPageRoute(
-                      settings: const RouteSettings(name: 'pp/profile'),
-                      builder: (_) => const FamilyProfileScreen())),
+                  // Was the family profile editor; kept for revert. Since
+                  // 2026-09-19 the avatar opens You, and the editor is one
+                  // row inside it (Preferences · Personalise).
+                  // onProfile: () => Navigator.of(context).push(MaterialPageRoute(
+                  //     settings: const RouteSettings(name: 'pp/profile'),
+                  //     builder: (_) => const FamilyProfileScreen())),
+                  onProfile: () => openPvYou(context, stage: LifeStage.parenting),
                 ),
                 _Sheet(p: p, children: [
                 const SizedBox(height: 26),

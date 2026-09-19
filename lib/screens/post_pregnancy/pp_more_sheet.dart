@@ -38,7 +38,9 @@ import '../v2/v2_palette.dart';
 import 'community_screen.dart';
 import 'courses_explore_screen.dart';
 import 'explore_drawer.dart';
-import 'family_profile_screen.dart';
+// import 'family_profile_screen.dart'; // kept for revert — the Settings row became You on 2026-09-19
+import '../../services/life_stage_store.dart';
+import '../profile/pv_you_screen.dart';
 import 'pp_child_profile.dart';
 import 'problem_solver_screen.dart';
 import 'recipes_explore_screen.dart';
@@ -67,8 +69,14 @@ List<ExploreEntry> _named() => [
       ExploreEntry(Icons.place_outlined, 'Find help',
           'Lactation, paediatrics and night help near you.',
           const ProblemSolverScreen()),
-      ExploreEntry(Icons.settings_outlined, 'Settings',
-          'Your family, reminders and language.', const FamilyProfileScreen()),
+      // Was `Settings → FamilyProfileScreen` (kept for revert). Since
+      // 2026-09-19 the row is You — the one profile — and the family editor
+      // is a row inside it.
+      // ExploreEntry(Icons.settings_outlined, 'Settings',
+      //     'Your family, reminders and language.', const FamilyProfileScreen()),
+      ExploreEntry(Icons.person_outline_rounded, 'You',
+          'Your profile, family, reminders and language.',
+          const PvYouScreen(stage: LifeStage.parenting)),
     ];
 
 /// Drawer titles that the named rows above already stand for. A drawer row
@@ -79,7 +87,10 @@ const Set<String> _coveredDrawerTitles = {
   'Recipes',
   'Memories',
   'Find help',
-  'Personalize ParentVeda experience', // → Settings
+  // 'Personalize ParentVeda experience', // → Settings — kept for revert.
+  // Since 2026-09-19 the named row is You, and the family editor stays
+  // reachable from here as its own row under "Everything else" too: You
+  // holds it one tap deeper, and a feature is never hidden.
 };
 
 /// The sheet's full content, in order: the named seven, then the rest of the
