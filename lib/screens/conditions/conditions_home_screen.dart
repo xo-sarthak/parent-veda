@@ -33,6 +33,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../../widgets/pv_feedback.dart';
 import '../../data/reads/read_images.dart';
 
 import '../../data/conditions_data.dart';
@@ -380,40 +381,66 @@ class _Browse extends StatelessWidget {
                 ],
               ),
               const SizedBox(height: 22),
-              HubPill(
-                label: seeMore
-                    ? const LocalizedText(en: 'See less', hi: 'See less')
-                        .of(lang)
-                    : const LocalizedText(en: 'See more', hi: 'See more')
-                        .of(lang),
-                icon: seeMore
-                    ? Icons.expand_less_rounded
-                    : Icons.expand_more_rounded,
-                p: p,
-                fullWidth: true,
-                onTap: onToggleSeeMore,
+              // ⚠️ "MORE CONDITIONS · N" FOLDS — 2026-09-19, the same fold the
+              // decoder's "More topics" has: the heading carries the count
+              // and a chevron, the list unfolds under it. Was a "See more /
+              // See less" pill (HubPill) — kept for revert.
+              PvPress(
+                child: InkWell(
+                  onTap: () {
+                    pvCommitFeedback();
+                    onToggleSeeMore();
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 6),
+                    child: Row(children: [
+                      Expanded(
+                        child: Text(
+                            'More conditions  ·  ${kSeeMoreGroups.values.fold<int>(0, (n, l) => n + l.length)}',
+                            style: pvFraunces(
+                                fontSize: 20,
+                                fontWeight: FontWeight.w600,
+                                height: 1.2,
+                                letterSpacing: -0.4,
+                                color: p.ink1)),
+                      ),
+                      AnimatedRotation(
+                        turns: seeMore ? 0.5 : 0,
+                        duration: const Duration(milliseconds: 180),
+                        child: Icon(Icons.expand_more_rounded, color: p.ink2),
+                      ),
+                    ]),
+                  ),
+                ),
               ),
-              if (seeMore) ...[
-                const SizedBox(height: 22),
-                for (final entry in kSeeMoreGroups.entries) ...[
-                  SolutionGroup(
-                    title: entry.key.title,
-                    p: p,
-                    lang: lang,
-                    cards: [
-                      for (final c in entry.value)
-                        _conditionRow(
-                        c: c,
+              AnimatedSize(
+                duration: const Duration(milliseconds: 220),
+                curve: Curves.easeOutCubic,
+                alignment: Alignment.topCenter,
+                child: Column(children: [
+                  if (seeMore) ...[
+                    const SizedBox(height: 14),
+                    for (final entry in kSeeMoreGroups.entries) ...[
+                      SolutionGroup(
+                        title: entry.key.title,
                         p: p,
                         lang: lang,
-                        onTap: () => onOpen(c),
+                        cards: [
+                          for (final c in entry.value)
+                            _conditionRow(
+                            c: c,
+                            p: p,
+                            lang: lang,
+                            onTap: () => onOpen(c),
+                          ),
+                        ],
                       ),
+                      if (entry.key != kSeeMoreGroups.keys.last)
+                        const SizedBox(height: 22),
                     ],
-                  ),
-                  if (entry.key != kSeeMoreGroups.keys.last)
-                    const SizedBox(height: 22),
-                ],
-              ],
+                  ],
+                ]),
+              ),
             ],
           ];
 

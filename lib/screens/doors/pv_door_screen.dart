@@ -80,12 +80,14 @@ const Set<String> kPvDoorChipDoors = {};
 /// Doors on the TILE row — icon tiles with a label beneath, every tab
 /// visible, one tap (DoorDash, Skip, Glovo, Grab; the app's own home grid).
 /// Complications first, for the user to judge; then every door.
-const Set<String> kPvDoorTileDoors = {'pregnancy_complications'};
+// Complications moved to the rail 2026-09-19 (the user: "structural
+// symmetry" with Scans & tests). Kept for revert: {'pregnancy_complications'}.
+const Set<String> kPvDoorTileDoors = {};
 
 /// Doors on the straddling card RAIL — Flo's pattern, the user's reference
 /// (2026-09-18): tall white cards across the seam between hero and sheet.
 /// Scans & tests first.
-const Set<String> kPvDoorRailDoors = {'pregnancy_scans_tests'};
+const Set<String> kPvDoorRailDoors = {'pregnancy_scans_tests', 'pregnancy_complications'};
 
 // -----------------------------------------------------------------------------
 //  Rail geometry

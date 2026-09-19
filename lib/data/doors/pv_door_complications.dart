@@ -207,6 +207,12 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
     //  ⚠️ LINKS, NOT COPIES. Every tile here opens a page that already exists;
     //  the brief says "group by linking" and the DO NOT list repeats it.
     // =========================================================================
+    // ⚠️ THE WEEK WINDOW ON EVERY TILE — 2026-09-19, for symmetry with Scans
+    // & tests, whose cards carry "Weeks 11–13". This tab is the one place
+    // the library is read by TIME ("what could come up at week 24?"), which
+    // Find a condition (by commonness) does not answer — so it earns the
+    // second listing only if it says when. The windows are the usual ones
+    // the reads state; a doctor's own timing wins.
     PvDoorSection(
       group: kCondTabWhen,
       heading: 'Early months',
@@ -216,24 +222,28 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
           blurb: 'Rare, urgent, and treatable when it is caught early.',
           library: PvDoorLibrary.condition,
           entryId: 'ectopic',
+          meta: 'Weeks 5–10',
         ),
         PvDoorEntryTile(
           title: 'Severe vomiting (hyperemesis)',
           blurb: 'Far past ordinary morning sickness, and treatable.',
           library: PvDoorLibrary.condition,
           entryId: 'hyperemesis',
+          meta: 'Weeks 6–16',
         ),
         PvDoorEntryTile(
           title: 'Thyroid gland off (thyroid in pregnancy)',
           blurb: 'Common here, and fixed with a daily tablet.',
           library: PvDoorLibrary.condition,
           entryId: 'thyroid',
+          meta: 'First booking bloods',
         ),
         PvDoorEntryTile(
           title: 'Low blood, low iron (anemia)',
           blurb: 'The commonest finding in an Indian pregnancy.',
           library: PvDoorLibrary.condition,
           entryId: 'anemia',
+          meta: 'Any time · checked at 8, 28',
         ),
       ],
     ),
@@ -247,6 +257,7 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
           blurb: 'Usually no symptoms at all, which is why everyone is tested.',
           library: PvDoorLibrary.condition,
           entryId: 'gdm',
+          meta: 'Weeks 24–28 (OGTT)',
         ),
         // ⚠️ THE FINDINGS LIBRARY, AND IT IS THE RULE WORKING. There is no
         // low-lying placenta in `kAllConditions` — the nearest entry is
@@ -258,12 +269,14 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
           blurb: 'Common at the mid-pregnancy scan, and it usually moves up.',
           library: PvDoorLibrary.finding,
           entryId: 'low_lying_placenta',
+          meta: 'Weeks 18–22 (anomaly scan)',
         ),
         PvDoorEntryTile(
           title: 'PCOS in pregnancy',
           blurb: 'Something you had before, watched a little more closely now.',
           library: PvDoorLibrary.condition,
           entryId: 'pcos',
+          meta: 'Watched from the start',
         ),
       ],
     ),
@@ -277,18 +290,21 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
           blurb: 'Mostly managed with closer check-ups, sometimes a tablet.',
           library: PvDoorLibrary.condition,
           entryId: 'high_bp',
+          meta: 'After week 20',
         ),
         PvDoorEntryTile(
           title: 'Baby lying feet-down (breech)',
           blurb: 'Common until late on, and there is time for it to turn.',
           library: PvDoorLibrary.condition,
           entryId: 'breech',
+          meta: 'Weeks 32–36',
         ),
         PvDoorEntryTile(
           title: 'Less water around the baby (low fluid)',
           blurb: 'Found on a scan, and watched with more scans.',
           library: PvDoorLibrary.condition,
           entryId: 'low_amniotic_fluid',
+          meta: 'Weeks 28–40',
         ),
         // ⚠️ FINDINGS AGAIN, and the brief names this card by hand. Cord around
         // the neck exists only as something a report says — no condition page
@@ -299,6 +315,7 @@ final PvDoorPage kComplicationsDoor = PvDoorPage(
           blurb: 'Very common, and usually not a problem at all.',
           library: PvDoorLibrary.finding,
           entryId: 'nuchal_cord',
+          meta: 'Later scans',
         ),
       ],
     ),

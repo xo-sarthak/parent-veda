@@ -344,10 +344,16 @@ void main() {
       // Collapsed: the grouped shelves are not on the page.
       expect(find.text(ConditionGroup.placentaBleeding.title.en), findsNothing);
 
-      await t.tap(find.text('See more'));
+      // The fold (2026-09-19): "More conditions · N" is the heading, a tap
+      // unfolds the shelves. Was a "See more" pill.
+      final fold = find.textContaining('More conditions');
+      await t.scrollUntilVisible(fold, 300, scrollable: find.byType(Scrollable).first);
+      await t.tap(fold);
       await t.pumpAndSettle();
 
       for (final g in kSeeMoreGroups.keys) {
+        await t.scrollUntilVisible(find.text(g.title.en), 300,
+            scrollable: find.byType(Scrollable).first);
         expect(find.text(g.title.en), findsOneWidget, reason: g.name);
       }
     });
