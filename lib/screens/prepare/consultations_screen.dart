@@ -10,6 +10,8 @@ import 'consultation_detail_screen.dart';
 import '../../widgets/pv_feedback.dart';
 import '../../theme/pv_fonts.dart';
 import '../doors/pv_door_chrome.dart' show PvDoorToolScaffold;
+import '../post_pregnancy/pp_experts_data.dart' show expertByName;
+import '../post_pregnancy/pp_expert_link.dart' show openExpertProfile;
 import 'prepare_common.dart';
 import '../../localization/app_language.dart';
 
@@ -94,8 +96,21 @@ class _ConsultationsScreenState extends State<ConsultationsScreen> {
   @override
   Widget build(BuildContext context) {
     final s = S(lang);
-    void open(Specialist sp) => Navigator.of(context).push(
-        MaterialPageRoute(builder: (_) => ConsultationDetailScreen(specialist: sp, lang: lang)));
+    // ⚠️ THE PROFILE, NOT THE DETAIL — 2026-09-19. A person opens to the one
+    // doctor page (`ProviderProfileScreen`), where the 1:1 sits among what
+    // she offers and the Book pill is the funnel. `ConsultationDetailScreen`
+    // — the slot picker between the list and the profile — stays reachable
+    // only when a specialist has no `Expert` behind it (data not yet
+    // linked), and is kept for revert.
+    void open(Specialist sp) {
+      final e = expertByName(sp.name.en);
+      if (e != null) {
+        openExpertProfile(context, e);
+        return;
+      }
+      Navigator.of(context).push(
+          MaterialPageRoute(builder: (_) => ConsultationDetailScreen(specialist: sp, lang: lang)));
+    }
 
     // The door tool header (2026-09-19) — the same hero every leaf of a
     // door wears. Kept for revert: the Scaffold + bare back arrow + eyebrow
@@ -223,9 +238,11 @@ class _ConsultationsScreenState extends State<ConsultationsScreen> {
                     Icon(Icons.chevron_right_rounded, size: 20, color: kMuted),
               ),
             ]),
-            // Next availability as its own slim pill, full width — Zocdoc's
-            // "Next available" bar, in a hairline rather than yellow.
-            if (s.next != null) ...[
+            // The "Next: today 6pm" pill is off the list (2026-09-19, the
+            // user: "unnecessary UI… it should be in a better way"). Her
+            // next slots live on the profile, where she books. Kept for
+            // revert by the `false &&`.
+            if (false && s.next != null) ...[
               const SizedBox(height: 12),
               Container(
                 width: double.infinity,

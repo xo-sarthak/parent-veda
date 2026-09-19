@@ -176,6 +176,15 @@ bool pvDoorTileIsWritten(PvDoorTile t) => switch (t.format) {
 /// where the tile's library has no read-image entry.
 String? pvDoorTileReadImageId(PvDoorTile t) => switch (t) {
       PvDoorGuideTile(:final readId) => readId,
+      PvDoorMythTile(:final readId) => readId, // "Do I need every scan" had none (2026-09-19)
+      // A scan's read is `scan_<id>` (read_adapters.dart, kScanReadPrefix);
+      // a finding's is `finding_<id>`; a condition's `condition_<id>`.
+      PvDoorEntryTile(:final library, :final entryId) => switch (library) {
+          PvDoorLibrary.scan => 'scan_$entryId',
+          PvDoorLibrary.finding => 'finding_$entryId',
+          PvDoorLibrary.condition => 'condition_$entryId',
+          _ => null,
+        },
       _ => null,
     };
 
@@ -600,6 +609,8 @@ class PvDoorSection {
     required this.tiles,
     required this.group,
     this.lead,
+    this.folded = false,
+    this.strip = false,
   }) : inlineSurfaceId = null;
 
   /// A section whose rail is drawn by a widget, not by tiles.
@@ -624,10 +635,28 @@ class PvDoorSection {
     required String this.inlineSurfaceId,
     required this.group,
   })  : tiles = const [],
+        folded = false,
+        strip = false,
         lead = null;
 
   final String heading;
   final List<PvDoorTile> tiles;
+
+  /// Closed by default, opened by a tap on its heading — for a section of
+  /// background reading under a list of specific things ("Before any scan"
+  /// under the nine scans, 2026-09-19). GoodRx's shape: the specific list,
+  /// then "Related · 9 articles" with a count. It never moves above the
+  /// list — that is where she came for — and it never hides: the heading
+  /// carries the count and a chevron. Inline sections ignore it.
+  final bool folded;
+
+  /// A folded section that is ALSO offered as a slim strip above the tab's
+  /// first list until she dismisses it once ("New to scans? Four things to
+  /// read first ›" with an ✕). Bluesky's and Shopify's "Getting started"
+  /// strip (Mobbin, 2026-09-19): background reading is a tap away on the
+  /// first visits, and never in the way after. The dismissal is remembered
+  /// per section heading in `PvDoorStripStore`.
+  final bool strip;
 
   /// Null on every tile-backed section; set only by [PvDoorSection.inline].
   final String? inlineSurfaceId;

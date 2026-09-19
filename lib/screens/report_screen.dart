@@ -24,6 +24,7 @@ import 'doors/pv_door_chrome.dart' show PvDoorRow, PvDoorToolScaffold, pvDoorPad
 import 'tools/ask_veda_screen.dart';
 import 'v2/v2_palette.dart';
 import '../data/reads/read_adapters.dart';
+import '../data/reads/read_images.dart';
 import '../models/pv_read.dart';
 import 'reader/pv_reader_screen.dart';
 
@@ -529,6 +530,7 @@ class _TopicRow extends StatelessWidget {
         chip: 'Article',
         title: finding.name.of(lang),
         blurb: _plainLine(finding, lang),
+        imageUrl: readImageFor('finding_${finding.id}'),
         onTap: onTap,
       );
 }

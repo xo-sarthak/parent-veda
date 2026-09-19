@@ -11,12 +11,12 @@
 import 'package:flutter/material.dart';
 
 import '../../../theme/pv_fonts.dart';
-import '../../../widgets/global_ask_fab.dart' show kAskFabReserve;
+import '../../../widgets/global_ask_fab.dart' show FabState, kAskFabBottomOffset, kAskFabSize;
 import '../../v2/v2_palette.dart';
 
 /// How much clearance the foot of a door's scroll leaves — the FAB's own
 /// number, not a guess.
-const double kPpDoorBottomInset = kAskFabReserve;
+const double kPpDoorBottomInset = FabState.kAskFabEnabled ? kAskFabBottomOffset + kAskFabSize : 24; // see kPvDoorBottomInset (2026-09-19)
 
 /// The urgent tint. Coral, never scarlet — see the pregnancy chrome for why.
 const Color kPpUrgentTint = Color(0xFFFFF0F3);
@@ -39,10 +39,11 @@ class PpDoorSheet extends StatelessWidget {
   final V2Palette p;
   final List<Widget> children;
 
+  // No full-viewport minimum (2026-09-19) — see PvDoorSheet: the ground is
+  // white, so the minimum only added a screen of blank scroll under a
+  // short tab. Kept for revert: minHeight: MediaQuery.sizeOf(context).height.
   @override
   Widget build(BuildContext context) => Container(
-        constraints:
-            BoxConstraints(minHeight: MediaQuery.sizeOf(context).height),
         decoration: BoxDecoration(
           color: p.ground,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),

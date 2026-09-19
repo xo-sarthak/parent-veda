@@ -39,6 +39,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:printing/printing.dart';
+import '../../widgets/pv_feedback.dart';
+import 'package:share_plus/share_plus.dart';
 
 import '../../data/tests_scans_reports_data.dart';
 import '../../localization/app_language.dart';
@@ -96,62 +98,102 @@ class ScanReportViewerScreen extends StatelessWidget {
             hue: 206,
             eyebrow: 'My reports',
             title: r.title,
-            intro: [
-              if (d != null) _fmt(d),
-              '${r.files.length} ${r.files.length == 1 ? 'file' : 'files'}',
-              if (scan != null && scan.name.of(lang) != r.title) scan.name.of(lang),
-            ].join('  ·  '),
+            intro: '${r.files.length} ${r.files.length == 1 ? 'file' : 'files'}'
+                '${d == null ? '' : '  ·  ${_fmt(d)}'}',
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 18),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
 
                 // ---- What this is, and when -------------------------------
-                // Her note, on the page — not in a well (2026-09-19).
-                if (r.note.isNotEmpty) ...[
-                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Padding(
-                      padding: const EdgeInsets.only(top: 2),
-                      child: Icon(Icons.sticky_note_2_outlined, size: 16, color: p.ink3),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(r.note,
-                          style: pvManrope(fontSize: 13.5, height: 1.55, color: p.ink2)),
-                    ),
-                  ]),
-                  const SizedBox(height: 18),
-                ],
+                // ---- details -------------------------------------------
+                // Report date, when it was added, the scan it is linked
+                // to — the three things a paper carries and the page did
+                // not (the user's review, 2026-09-19).
+                _Detail(p: p, label: 'Report date', value: d == null ? '—' : _fmt(d)),
+                _Detail(p: p, label: 'Added', value: _addedLine(r.dateIso)),
+                if (scan != null)
+                  _Detail(p: p, label: 'Scan', value: scan.name.of(lang)),
+                const SizedBox(height: 18),
 
-                // ---- The files themselves ----------------------------------
-                //
-                // ⚠️ THE PAGE OPENS ON THE DOCUMENT, NOT ON A LIST OF LINKS.
-                // A single-file report — which is most of them — should be
-                // readable the moment the screen appears, with no second tap.
-                // So each file renders its own preview at a usable size and
-                // tapping only ever means "bigger".
+                // ---- the note, never empty ------------------------------
+                // Visible's "Note · Edit note" block (Mobbin): a heading,
+                // the words, and the way to change them — and when there
+                // are none, the invitation instead of a gap.
+                Text('NOTE',
+                    style: pvManrope(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.2,
+                        color: p.ink3)),
+                const SizedBox(height: 6),
+                PvPress(
+                  child: InkWell(
+                    onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                      settings: const RouteSettings(name: 'scans/reports/edit'),
+                      builder: (_) => ScanReportEditScreen(reportId: r.id, pregnancy: pregnancy),
+                    )),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 6),
+                      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Expanded(
+                          child: Text(
+                              r.note.isEmpty
+                                  ? 'What the doctor said, what to ask next time…'
+                                  : r.note,
+                              style: pvManrope(
+                                  fontSize: 14.5,
+                                  height: 1.5,
+                                  color: r.note.isEmpty ? p.ink3 : p.ink1)),
+                        ),
+                        const SizedBox(width: 10),
+                        Icon(Icons.edit_outlined, size: 18, color: p.ink3),
+                      ]),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Text('FILES  ·  ${r.files.length}',
+                    style: pvManrope(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.2,
+                        color: p.ink3)),
+                const SizedBox(height: 8),
                 if (r.files.isEmpty)
                   Text(_en('This report has no files attached.').of(lang),
                       style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2))
                 else
-                  for (int i = 0; i < r.files.length; i++) ...[
-                    _FileCard(
-                      file: r.files[i],
-                      index: i,
-                      total: r.files.length,
-                      p: p,
-                      onOpen: () => Navigator.of(context).push(
-                        MaterialPageRoute<void>(
-                          settings: const RouteSettings(
-                              name: 'scans/reports/file'),
-                          builder: (_) => _FullFileScreen(
-                              file: r.files[i], title: r.title),
+                  // ⚠️ A GRID, NOT A STACK OF CARDS — 2026-09-19, the user's
+                  // review: three photos made three 260pt cards and a scroll.
+                  // Every records screen on Mobbin (Careem, Booking, Craft,
+                  // Dropbox) shows attached files as a grid of squares, tap
+                  // to open full. Three across; a PDF square carries its
+                  // icon and name. `_FileCard` stays below for revert.
+                  GridView.count(
+                    crossAxisCount: 3,
+                    mainAxisSpacing: 8,
+                    crossAxisSpacing: 8,
+                    padding: EdgeInsets.zero, // the grid's own top inset made a gap
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    children: [
+                      for (int i = 0; i < r.files.length; i++)
+                        _FileSquare(
+                          file: r.files[i],
+                          p: p,
+                          onOpen: () => Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              settings: const RouteSettings(
+                                  name: 'scans/reports/file'),
+                              builder: (_) => _FullFileScreen(
+                                  file: r.files[i], title: r.title),
+                            ),
+                          ),
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                  ],
-
+                    ],
+                  ),
+                const SizedBox(height: 18),
                   const SizedBox(height: 6),
                   Row(children: [
                     Expanded(
@@ -176,6 +218,7 @@ class ScanReportViewerScreen extends StatelessWidget {
                       ),
                     ),
                   ]),
+                  const SizedBox(height: 24), // the FAB is off (2026-09-19); was 88
                 ]),
               ),
             ],
@@ -268,6 +311,8 @@ class _ScanChip extends StatelessWidget {
 //  One file, previewed in place
 // -----------------------------------------------------------------------------
 
+// Kept for revert — one tall card per file, retired 2026-09-19.
+// ignore: unused_element
 class _FileCard extends StatelessWidget {
   const _FileCard({
     required this.file,
@@ -386,6 +431,16 @@ class _FullFileScreen extends StatelessWidget {
                 fontSize: 15,
                 fontWeight: FontWeight.w600,
                 color: Colors.white)),
+        // Share / save, from the top bar (2026-09-19). The file is hers;
+        // the system sheet offers Files, Drive, WhatsApp — download is
+        // "Save to Files" there.
+        actions: [
+          IconButton(
+            tooltip: 'Share',
+            icon: const Icon(Icons.ios_share_rounded, color: Colors.white),
+            onPressed: () => shareReportFile(file),
+          ),
+        ],
       ),
       extendBodyBehindAppBar: true,
       body: Center(
@@ -444,6 +499,15 @@ class _PdfScreenState extends State<_PdfScreen> {
             overflow: TextOverflow.ellipsis,
             style: pvManrope(
                 fontSize: 15, fontWeight: FontWeight.w700, color: p.ink1)),
+        // Share / save from the top bar — the `printing` action bar that
+        // carried these went with its violet (2026-09-19).
+        actions: [
+          IconButton(
+            tooltip: 'Share',
+            icon: Icon(Icons.ios_share_rounded, color: p.ink1),
+            onPressed: () => shareReportFile(widget.file),
+          ),
+        ],
       ),
       body: FutureBuilder<Uint8List?>(
         future: _bytes,
@@ -491,4 +555,93 @@ class _PdfScreenState extends State<_PdfScreen> {
       ),
     );
   }
+}
+
+/// One file as a square in the grid: the photo, or the PDF icon and name.
+class _FileSquare extends StatelessWidget {
+  const _FileSquare({required this.file, required this.p, required this.onOpen});
+
+  final ReportFile file;
+  final V2Palette p;
+  final VoidCallback onOpen;
+
+  @override
+  Widget build(BuildContext context) => PvPress(
+        child: Material(
+          color: p.surface,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(14),
+              side: BorderSide(color: p.line)),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: onOpen,
+            child: file.isPdf
+                ? Padding(
+                    padding: const EdgeInsets.all(10),
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.picture_as_pdf_outlined,
+                              size: 28, color: p.ink2),
+                          const SizedBox(height: 6),
+                          Text(file.name,
+                              maxLines: 2,
+                              textAlign: TextAlign.center,
+                              overflow: TextOverflow.ellipsis,
+                              style: pvManrope(
+                                  fontSize: 10.5,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.3,
+                                  color: p.ink2)),
+                        ]),
+                  )
+                : StorageImage(file.path, fit: BoxFit.cover),
+          ),
+        ),
+      );
+}
+
+/// Hand the file to the system share sheet — WhatsApp, Drive, "Save to
+/// Files". `StorageService.resolve` gives a local File for a storage ref or
+/// a legacy local path alike, so a file uploaded on another phone shares
+/// from this one too.
+Future<void> shareReportFile(ReportFile file) async {
+  final f = await StorageService.resolve(file.path);
+  if (f == null) return;
+  await Share.shareXFiles([XFile(f.path, name: file.name)]);
+}
+
+/// One line of the details block: a grey label, the value.
+class _Detail extends StatelessWidget {
+  const _Detail({required this.p, required this.label, required this.value});
+  final V2Palette p;
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          SizedBox(
+            width: 104,
+            child: Text(label,
+                style: pvManrope(fontSize: 13, color: p.ink3)),
+          ),
+          Expanded(
+            child: Text(value,
+                style: pvManrope(
+                    fontSize: 13.5, fontWeight: FontWeight.w600, color: p.ink1)),
+          ),
+        ]),
+      );
+}
+
+String _addedLine(String iso) {
+  final a = DateTime.tryParse(iso);
+  if (a == null) return '—';
+  const m = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  final h12 = a.hour % 12 == 0 ? 12 : a.hour % 12;
+  final mm = a.minute.toString().padLeft(2, '0');
+  final ap = a.hour < 12 ? 'am' : 'pm';
+  return '${a.day} ${m[a.month - 1]} ${a.year} · $h12:$mm $ap';
 }

@@ -16,9 +16,13 @@ import '../../booking/booking_catalog.dart';
 import '../../data/prepare_data.dart';
 import '../../localization/app_language.dart';
 import '../prepare/program_detail_screen.dart';
+import '../prepare/prepare_common.dart' show showPrepareBooking;
 import 'booking_sheet.dart';
 import 'learning_detail_screen.dart';
 import 'pp_channels_data.dart';
+import '../../theme/pv_fonts.dart';
+import '../../widgets/pv_feedback.dart';
+import '../v2/v2_palette.dart';
 import 'pp_common.dart';
 import 'pp_experts_data.dart';
 import 'pp_learning_data.dart';
@@ -44,8 +48,27 @@ class ProviderProfileScreen extends StatelessWidget {
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 
+  // ⚠️ THE ONE DOCTOR PAGE — 2026-09-19. The user's brief: "a doctor's
+  // LinkedIn — photo, name, field, experience, rating, where they practise,
+  // why you can trust them, what they host, whether they offer 1:1s, parent
+  // reviews — and a funnel to book." This screen already held all of that
+  // for parenting (built 2026-08) and the pregnancy consult list opened a
+  // separate detail between the list and it. Now every surface that names a
+  // person lands here, in the base UI (DESIGN-SYSTEM §4.0), on the shape
+  // Zocdoc, Airbnb's host page, Preply and Udemy's instructor share (Mobbin):
+  // avatar · name · role · location · ★ rating · N reviews · a stat row ·
+  // About · Why · what she offers · qualifications (unfolds) · reviews as
+  // rows · a sticky Book pill. The old body is `buildClassic` below, kept
+  // for revert; `ConsultationDetailScreen` is retired from the consult list.
   @override
   Widget build(BuildContext context) {
+    final e = expert ?? expertById('neha');
+    return _ProfileBody(e: e, screen: this);
+  }
+
+  /// The parenting-kit body, 2026-08 → 2026-09-19. Kept for revert.
+  // ignore: unused_element
+  Widget buildClassic(BuildContext context) {
     final e = expert ?? expertById('neha');
     final programs = programsByInstructor(e.id);
     // ⚠️ THE OTHER TWO THINGS SHE MIGHT TEACH, AND WHY THEY ARE JOINED
@@ -627,5 +650,530 @@ class ProviderProfileScreen extends StatelessWidget {
             const Icon(Icons.chevron_right_rounded, size: 20, color: ppMuted),
           ]),
         ),
+      );
+}
+
+// =============================================================================
+//  The base-UI body
+// =============================================================================
+
+class _ProfileBody extends StatefulWidget {
+  const _ProfileBody({required this.e, required this.screen});
+  final Expert e;
+  final ProviderProfileScreen screen;
+
+  @override
+  State<_ProfileBody> createState() => _ProfileBodyState();
+}
+
+class _ProfileBodyState extends State<_ProfileBody> {
+  bool _qualsOpen = false;
+
+  Expert get e => widget.e;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    final programs = programsByInstructor(e.id);
+    final yogaClasses = classesByInstructor(e.name);
+    final prepPrograms = prepProgramsByInstructor(e.name);
+    final labels = e.tagsNow;
+    String label(int i) => i < labels.length ? labels[i] : e.tags[i];
+    final langs = <String>[];
+    final focus = <String>[];
+    for (var i = 0; i < e.tags.length; i++) {
+      (ProviderProfileScreen._languages.contains(e.tags[i]) ? langs : focus).add(label(i));
+    }
+    // ⚠️ THE SPECIALIST TWIN. Pregnancy's 1:1 supply — price, half-hour
+    // slots, two named reviews — lives on `Specialist` (prepare_data.dart),
+    // matched by name; the parenting doctors carry `timings` on `Expert`
+    // instead. The profile reads both, so a person is bookable and reviewed
+    // whichever side wrote them. Merging the two models is owed
+    // (STILL-OPEN §63.16); until then this seam is the one place they meet.
+    final sp = kSpecialists.where((x) => x.name.en == e.name).firstOrNull;
+    final bookable = e.timings.trim().isNotEmpty || sp != null;
+    final reviews = e.reviews.isNotEmpty
+        ? e.reviews
+        : [for (final r in sp?.reviews ?? const <Review>[]) (r.who.now, r.when.now, r.quote.now)];
+    final first = _first(e);
+    final initials = e.name
+        .replaceAll('Dr. ', '')
+        .split(' ')
+        .where((w) => w.isNotEmpty)
+        .take(2)
+        .map((w) => w[0])
+        .join();
+    final well = Color.alphaBlend(p.ink1.withValues(alpha: 0.06), p.surface);
+    final offers = <Widget>[];
+    if (bookable) {
+      offers.add(_offerRow(
+        p,
+        icon: Icons.videocam_outlined,
+        title: '1:1 consultation  ·  30 min video',
+        sub: sp != null
+            ? '${sp.consultPrice}  ·  today ${sp.slots.join(', ')}'
+            : '${e.fee.$1} ${e.fee.$2}${e.timings.trim().isEmpty ? '' : '  ·  ${e.timings}'}',
+        onTap: () => _book(context, sp),
+      ));
+    }
+    for (final pr in prepPrograms) {
+      offers.add(_offerRow(
+        p,
+        icon: Icons.school_outlined,
+        title: pr.title.now,
+        sub: '${pr.kind.name[0].toUpperCase()}${pr.kind.name.substring(1)}  ·  ${pr.price}',
+        onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+          settings: RouteSettings(name: 'prepare/program/${pr.id}'),
+          builder: (_) => ProgramDetailScreen(program: pr, lang: S.current),
+        )),
+      ));
+    }
+    for (final pr in programs) {
+      offers.add(_offerRow(
+        p,
+        icon: Icons.school_outlined,
+        title: pr.title,
+        sub: '${pr.kind.label}  ·  ${pr.durationLabel}  ·  ${pr.price}',
+        onTap: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(builder: (_) => LearningDetailScreen(program: pr))),
+      ));
+    }
+    for (final c in yogaClasses) {
+      offers.add(_offerRow(
+        p,
+        icon: Icons.self_improvement_rounded,
+        title: c.title,
+        sub: 'Class  ·  Yoga & fitness',
+        onTap: () => Navigator.of(context).push(
+            MaterialPageRoute<void>(builder: (_) => YogaClassScreen(cls: c))),
+      ));
+    }
+
+    return Scaffold(
+      backgroundColor: p.surface,
+      body: Stack(children: [
+        ListView(
+          padding: EdgeInsets.only(bottom: bookable ? 120 : 40),
+          children: [
+            SafeArea(
+              bottom: false,
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(12, 4, 18, 0),
+                child: Row(children: [
+                  IconButton(
+                    onPressed: () => Navigator.of(context).maybePop(),
+                    icon: Icon(Icons.arrow_back_rounded, color: p.ink1),
+                    tooltip: 'Back',
+                  ),
+                ]),
+              ),
+            ),
+            // ---- who ---------------------------------------------------------
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 8, 18, 0),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Container(
+                  width: 96,
+                  height: 96,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(color: well, shape: BoxShape.circle),
+                  clipBehavior: Clip.antiAlias,
+                  // A photograph when the person has one; initials until then.
+                  // Real doctors bring their own — a stock face on a named
+                  // doctor would be a lie.
+                  child: Text(initials,
+                      style: pvManrope(
+                          fontSize: 30, fontWeight: FontWeight.w800, color: p.ink1)),
+                ),
+                const SizedBox(height: 16),
+                Text(e.name,
+                    style: pvFraunces(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w600,
+                        height: 1.1,
+                        letterSpacing: -0.6,
+                        color: p.ink1)),
+                const SizedBox(height: 6),
+                Text(e.credentialNow,
+                    style: pvManrope(fontSize: 14.5, height: 1.4, color: p.ink2)),
+                if (e.locationNow.trim().isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Row(children: [
+                    Icon(Icons.place_outlined, size: 15, color: p.ink3),
+                    const SizedBox(width: 5),
+                    Flexible(
+                      child: Text(e.locationNow,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: pvManrope(fontSize: 13, color: p.ink3)),
+                    ),
+                  ]),
+                ],
+                if (e.topPick) ...[
+                  const SizedBox(height: 10),
+                  Row(children: [
+                    Icon(Icons.verified_outlined, size: 16, color: p.ink1),
+                    const SizedBox(width: 6),
+                    Flexible(
+                      child: Text(e.topPickLabel,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: pvManrope(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w700,
+                              color: p.ink1)),
+                    ),
+                  ]),
+                ],
+                const SizedBox(height: 20),
+                // ---- the stat row (Airbnb's host page) --------------------
+                Row(children: [
+                  _stat(p, '★ ${e.rating}', e.reviewsCount.isNotEmpty ? e.reviewsCount : 'rating'),
+                  _rule(p),
+                  _stat(p, e.mid.$1, e.mid.$2),
+                  if (e.experience.trim().isNotEmpty) ...[
+                    _rule(p),
+                    _stat(p, e.experience.split(' ').first, 'years'),
+                  ],
+                ]),
+                const SizedBox(height: 8),
+                Divider(height: 1, color: p.line),
+              ]),
+            ),
+
+            // ---- about --------------------------------------------------------
+            if (e.blurbNow.trim().isNotEmpty)
+              _section(p, 'About $first', Text(e.blurbNow,
+                  style: pvManrope(fontSize: 15, height: 1.6, color: p.ink1))),
+            if (e.whyNow.trim().isNotEmpty)
+              _section(
+                  p,
+                  e.whyHeadingNow.trim().isEmpty ? 'Why ParentVeda picks $first' : e.whyHeadingNow,
+                  Text(e.whyNow,
+                      style: pvManrope(fontSize: 15, height: 1.6, color: p.ink1))),
+            if (focus.isNotEmpty || langs.isNotEmpty)
+              _section(
+                  p,
+                  'Helps with',
+                  Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Wrap(spacing: 8, runSpacing: 8, children: [
+                      for (final t in focus) _chip(p, t),
+                    ]),
+                    if (langs.isNotEmpty) ...[
+                      const SizedBox(height: 10),
+                      Text('Speaks ${langs.join(', ')}',
+                          style: pvManrope(fontSize: 13, color: p.ink2)),
+                    ],
+                  ])),
+
+            // ---- what she offers ---------------------------------------------
+            if (offers.isNotEmpty)
+              _section(p, 'Sessions with $first', Column(children: offers)),
+
+            // ---- qualifications, unfolding --------------------------------
+            if (_hasCreds(e))
+              _section(
+                p,
+                null,
+                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  PvPress(
+                    child: InkWell(
+                      onTap: () {
+                        pvCommitFeedback();
+                        setState(() => _qualsOpen = !_qualsOpen);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(children: [
+                          Expanded(
+                            child: Text('Qualifications & experience',
+                                style: pvFraunces(
+                                    fontSize: 21,
+                                    fontWeight: FontWeight.w600,
+                                    height: 1.2,
+                                    letterSpacing: -0.45,
+                                    color: p.ink1)),
+                          ),
+                          AnimatedRotation(
+                            turns: _qualsOpen ? 0.5 : 0,
+                            duration: const Duration(milliseconds: 180),
+                            child: Icon(Icons.expand_more_rounded, color: p.ink2),
+                          ),
+                        ]),
+                      ),
+                    ),
+                  ),
+                  AnimatedSize(
+                    duration: const Duration(milliseconds: 220),
+                    curve: Curves.easeOutCubic,
+                    alignment: Alignment.topCenter,
+                    child: _qualsOpen
+                        ? Padding(
+                            padding: const EdgeInsets.only(top: 10),
+                            child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  for (final q in e.qualificationsNow) _line(p, q),
+                                  if (e.experience.trim().isNotEmpty) _line(p, e.experience),
+                                  if (e.practisesAt.trim().isNotEmpty) _line(p, 'Practises at ${e.practisesAt}'),
+                                  if (e.registration.trim().isNotEmpty) _line(p, e.registration),
+                                  for (final m in e.memberships) _line(p, m),
+                                ]),
+                          )
+                        : const SizedBox(width: double.infinity),
+                  ),
+                ]),
+              ),
+
+            // ---- reviews -------------------------------------------------
+            if (reviews.isNotEmpty)
+              _section(
+                  p,
+                  'From parents',
+                  Column(children: [
+                    for (var i = 0; i < reviews.length; i++)
+                      _reviewRow(p, reviews[i].$1, reviews[i].$2, reviews[i].$3,
+                          last: i == reviews.length - 1),
+                  ])),
+
+            Padding(
+              padding: const EdgeInsets.fromLTRB(18, 22, 18, 0),
+              child: Text(e.disclaimer,
+                  style: pvManrope(fontSize: 12, height: 1.55, color: p.ink3)),
+            ),
+          ],
+        ),
+
+        // ---- the funnel: one pill, always in reach -----------------------
+        if (bookable)
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: Container(
+              padding: EdgeInsets.fromLTRB(18, 14, 18, 16 + MediaQuery.paddingOf(context).bottom),
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [p.surface.withValues(alpha: 0), p.surface],
+                  stops: const [0, 0.35],
+                ),
+              ),
+              child: FilledButton(
+                onPressed: () => _book(context, sp),
+                style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+                child: Text('Book a 1:1  ·  ${sp?.consultPrice ?? e.fee.$1}'),
+              ),
+            ),
+          ),
+      ]),
+    );
+  }
+
+  void _book(BuildContext context, Specialist? sp) {
+    pvCommitFeedback();
+    // A pregnancy specialist books through the Prepare sheet with a slot;
+    // the slot picker is the sheet's own (see _pickSlot). Parenting doctors
+    // go through the booking engine as before.
+    if (sp != null) {
+      _pickSlot(context, sp);
+      return;
+    }
+    final o = BookingCatalog.instance.offeringForCatalog(e.id);
+    if (o != null) {
+      showBookingSheet(context, o);
+    } else {
+      showProviderBookingSheet(context, e);
+    }
+  }
+
+  /// Which slot — a sheet of ink pills, then the Prepare confirm sheet.
+  Future<void> _pickSlot(BuildContext context, Specialist sp) async {
+    final p = V2PaletteStore.instance.current;
+    final slot = await showModalBottomSheet<String>(
+      context: context,
+      backgroundColor: p.surface,
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) => Padding(
+        padding: EdgeInsets.fromLTRB(20, 18, 20, 20 + MediaQuery.paddingOf(ctx).bottom),
+        child: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text('WHEN', style: pvManrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.3, color: p.ink3)),
+          const SizedBox(height: 4),
+          Text('Today, with ${_first(e)}',
+              style: pvFraunces(fontSize: 22, fontWeight: FontWeight.w600, height: 1.2, color: p.ink1)),
+          const SizedBox(height: 6),
+          Text('${sp.consultPrice}  ·  30 min video call', style: pvManrope(fontSize: 13.5, color: p.ink2)),
+          const SizedBox(height: 16),
+          Wrap(spacing: 8, runSpacing: 8, children: [
+            for (final t in sp.slots)
+              PvPress(
+                child: Material(
+                  color: p.surface,
+                  shape: StadiumBorder(side: BorderSide(color: p.line)),
+                  clipBehavior: Clip.antiAlias,
+                  child: InkWell(
+                    onTap: () {
+                      pvCommitFeedback();
+                      Navigator.pop(ctx, t);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      child: Text(t, style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, color: p.ink1)),
+                    ),
+                  ),
+                ),
+              ),
+          ]),
+        ]),
+      ),
+    );
+    if (slot == null || !context.mounted) return;
+    await showPrepareBooking(
+      context,
+      lang: S.current,
+      id: sp.id,
+      title: '${sp.role.now} · ${sp.name.now}',
+      priceLabel: '${sp.consultPrice} · 30-min video call',
+      whenLabel: 'Today · $slot',
+      heading: 'Confirm your consult',
+      cta: 'Confirm booking',
+    );
+  }
+
+  static bool _hasCreds(Expert e) =>
+      e.qualifications.isNotEmpty ||
+      e.experience.trim().isNotEmpty ||
+      e.practisesAt.trim().isNotEmpty ||
+      e.registration.trim().isNotEmpty ||
+      e.memberships.isNotEmpty;
+
+  static String _first(Expert e) {
+    final parts = e.name.replaceAll('Dr. ', '').split(' ');
+    return parts.isEmpty ? e.name : parts.first;
+  }
+
+  Widget _section(V2Palette p, String? heading, Widget body) => Padding(
+        padding: const EdgeInsets.fromLTRB(18, 26, 18, 0),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          if (heading != null) ...[
+            Text(heading,
+                style: pvFraunces(
+                    fontSize: 21,
+                    fontWeight: FontWeight.w600,
+                    height: 1.2,
+                    letterSpacing: -0.45,
+                    color: p.ink1)),
+            const SizedBox(height: 10),
+          ],
+          body,
+        ]),
+      );
+
+  Widget _stat(V2Palette p, String value, String label) => Expanded(
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(value,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: pvManrope(fontSize: 17, fontWeight: FontWeight.w800, color: p.ink1)),
+          const SizedBox(height: 2),
+          Text(label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: pvManrope(fontSize: 12, color: p.ink3)),
+        ]),
+      );
+
+  Widget _rule(V2Palette p) => Container(
+      width: 1, height: 30, margin: const EdgeInsets.symmetric(horizontal: 14), color: p.line);
+
+  Widget _chip(V2Palette p, String t) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+        decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(999), border: Border.all(color: p.line)),
+        child: Text(t,
+            style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w600, color: p.ink1)),
+      );
+
+  Widget _line(V2Palette p, String t) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 5),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 8, right: 10),
+            child: Container(
+                width: 5, height: 5, decoration: BoxDecoration(color: p.ink1, shape: BoxShape.circle)),
+          ),
+          Expanded(child: Text(t, style: pvManrope(fontSize: 14, height: 1.5, color: p.ink1))),
+        ]),
+      );
+
+  Widget _offerRow(V2Palette p,
+          {required IconData icon,
+          required String title,
+          required String sub,
+          required VoidCallback onTap}) =>
+      PvPress(
+        child: InkWell(
+          onTap: () {
+            pvCommitFeedback();
+            onTap();
+          },
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            decoration: BoxDecoration(border: Border(bottom: BorderSide(color: p.line))),
+            child: Row(children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                    color: Color.alphaBlend(p.ink1.withValues(alpha: 0.06), p.surface),
+                    borderRadius: BorderRadius.circular(12)),
+                child: Icon(icon, size: 20, color: p.ink2),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(title,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvManrope(fontSize: 15, fontWeight: FontWeight.w700, height: 1.25, color: p.ink1)),
+                  const SizedBox(height: 2),
+                  Text(sub,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvManrope(fontSize: 12.5, color: p.ink2)),
+                ]),
+              ),
+              const SizedBox(width: 8),
+              Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
+            ]),
+          ),
+        ),
+      );
+
+  Widget _reviewRow(V2Palette p, String name, String who, String quote, {required bool last}) =>
+      Container(
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+            border: last ? null : Border(bottom: BorderSide(color: p.line))),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            Expanded(
+              child: Text('$name  ·  $who',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: p.ink1)),
+            ),
+            // Five drawn stars in ink — the glyph string rendered faint and
+            // tiny (the user: "the stars are not nearly visible").
+            Row(mainAxisSize: MainAxisSize.min, children: [
+              for (var i = 0; i < 5; i++)
+                Icon(Icons.star_rounded, size: 15, color: p.ink1),
+            ]),
+          ]),
+          const SizedBox(height: 6),
+          Text(quote, style: pvManrope(fontSize: 14, height: 1.55, color: p.ink2)),
+        ]),
       );
 }

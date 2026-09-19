@@ -812,7 +812,10 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
       ),
       child: Column(children: [
         GestureDetector(
-          onTap: () => setState(() => _tocOpen = !_tocOpen),
+          onTap: () {
+            pvCommitFeedback();
+            setState(() => _tocOpen = !_tocOpen);
+          },
           behavior: HitTestBehavior.opaque,
           child: Padding(
             padding: const EdgeInsets.fromLTRB(15, 13, 12, 13),
@@ -823,31 +826,39 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                     '${a.toc.length} ${_t('SECTIONS', 'HISSE')}',
                     style: _meta(s)),
               ),
-              Icon(
-                  _tocOpen
-                      ? Icons.expand_less_rounded
-                      : Icons.expand_more_rounded,
-                  size: 20,
-                  color: s.soft),
+              AnimatedRotation(
+                turns: _tocOpen ? 0.5 : 0,
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOutCubic,
+                child: Icon(Icons.expand_more_rounded, size: 20, color: s.soft),
+              ),
             ]),
           ),
         ),
-        if (_tocOpen)
-          for (var i = 0; i < a.sections.length; i++)
-            if (a.sections[i].heading != null)
-              GestureDetector(
-                onTap: () => _jumpTo(i),
-                behavior: HitTestBehavior.opaque,
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.fromLTRB(15, 11, 15, 11),
-                  decoration:
-                      BoxDecoration(border: Border(top: BorderSide(color: s.rule))),
-                  child: Text(a.sections[i].heading!.of(_lang),
-                      style: pvManrope(
-                          fontSize: 14, height: 1.4, color: s.ink)),
-                ),
-              ),
+        // Unfolds (2026-09-19) rather than appearing.
+        AnimatedSize(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+          alignment: Alignment.topCenter,
+          child: Column(children: [
+            if (_tocOpen)
+              for (var i = 0; i < a.sections.length; i++)
+                if (a.sections[i].heading != null)
+                  GestureDetector(
+                    onTap: () => _jumpTo(i),
+                    behavior: HitTestBehavior.opaque,
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.fromLTRB(15, 11, 15, 11),
+                      decoration:
+                          BoxDecoration(border: Border(top: BorderSide(color: s.rule))),
+                      child: Text(a.sections[i].heading!.of(_lang),
+                          style: pvManrope(
+                              fontSize: 14, height: 1.4, color: s.ink)),
+                    ),
+                  ),
+          ]),
+        ),
       ]),
     );
   }
@@ -1204,8 +1215,10 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
       decoration:
           BoxDecoration(border: Border(bottom: BorderSide(color: s.rule))),
       child: GestureDetector(
-        onTap: () => setState(
-            () => open ? _openFaqs.remove(index) : _openFaqs.add(index)),
+        onTap: () {
+          pvCommitFeedback();
+          setState(() => open ? _openFaqs.remove(index) : _openFaqs.add(index));
+        },
         behavior: HitTestBehavior.opaque,
         child: Padding(
           padding: const EdgeInsets.symmetric(vertical: 15),
@@ -1223,16 +1236,30 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
               const SizedBox(width: 10),
               Padding(
                 padding: const EdgeInsets.only(top: 2),
-                child: Icon(open ? Icons.remove_rounded : Icons.add_rounded,
-                    size: 19, color: s.soft),
+                child: AnimatedRotation(
+                  turns: open ? 0.125 : 0, // + turns into ×… read as "close"
+                  duration: const Duration(milliseconds: 200),
+                  curve: Curves.easeOutCubic,
+                  child: Icon(Icons.add_rounded, size: 19, color: s.soft),
+                ),
               ),
             ]),
-            if (open) ...[
-              const SizedBox(height: 10),
-              Text(f.answer.of(_lang),
-                  style: pvManrope(
-                      fontSize: 14.5 * _fs, height: 1.72, color: s.soft)),
-            ],
+            // The answer unfolds (2026-09-19) — the user: "a tab should feel
+            // like a tab, not a static hard situation". Height animates;
+            // the glyph turns from + to − rather than swapping.
+            AnimatedSize(
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutCubic,
+              alignment: Alignment.topCenter,
+              child: open
+                  ? Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: Text(f.answer.of(_lang),
+                          style: pvManrope(
+                              fontSize: 14.5 * _fs, height: 1.72, color: s.soft)),
+                    )
+                  : const SizedBox(width: double.infinity),
+            ),
           ]),
         ),
       ),
@@ -1304,7 +1331,10 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
         InkWell(
-          onTap: () => setState(() => _refsOpen = !_refsOpen),
+          onTap: () {
+            pvCommitFeedback();
+            setState(() => _refsOpen = !_refsOpen);
+          },
           child: Padding(
             padding: const EdgeInsets.fromLTRB(15, 13, 13, 13),
             child: Row(children: [
@@ -1319,17 +1349,19 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
             ]),
           ),
         ),
-        AnimatedCrossFade(
-          duration: const Duration(milliseconds: 180),
-          crossFadeState:
-              _refsOpen ? CrossFadeState.showSecond : CrossFadeState.showFirst,
-          firstChild: const SizedBox(width: double.infinity),
-          secondChild: Padding(
-            padding: const EdgeInsets.fromLTRB(15, 0, 15, 15),
-            child: Text(a.evidence!.of(_lang),
-                style:
-                    pvManrope(fontSize: 13 * _fs, height: 1.65, color: s.soft)),
-          ),
+        // Unfolds (2026-09-19): a cross-fade at a fixed size jumped.
+        AnimatedSize(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+          alignment: Alignment.topCenter,
+          child: _refsOpen
+              ? Padding(
+                  padding: const EdgeInsets.fromLTRB(15, 0, 15, 15),
+                  child: Text(a.evidence!.of(_lang),
+                      style: pvManrope(
+                          fontSize: 13 * _fs, height: 1.65, color: s.soft)),
+                )
+              : const SizedBox(width: double.infinity),
         ),
       ]),
     );

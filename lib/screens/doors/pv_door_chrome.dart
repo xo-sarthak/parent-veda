@@ -17,7 +17,7 @@ import 'package:flutter/material.dart';
 
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
-import '../../widgets/global_ask_fab.dart' show kAskFabReserve;
+import '../../widgets/global_ask_fab.dart' show FabState, kAskFabBottomOffset, kAskFabSize;
 import '../v2/v2_palette.dart';
 import '../v2/v3_hero_field.dart';
 
@@ -26,7 +26,21 @@ import '../v2/v3_hero_field.dart';
 /// ⚠️ THE FAB'S OWN NUMBER, NOT A GUESS. `kAskFabReserve` is what the Ask Veda
 /// button reserves for itself, and a hardcoded literal here would be a second
 /// opinion about the same gap — wrong the day the button moves.
-const double kPvDoorBottomInset = kAskFabReserve;
+/// ⚠️ THE NORMAL RESERVE, NOT THE RAISED ONE (2026-09-19). Doors never sit
+/// on the pregnancy Today tab, so the 234pt raised reserve was 58pt of
+/// nothing under every door's disclaimer — on every tab.
+///
+/// ⚠️ AND IT CLEARS THE BUTTON, NOT THE BUTTON PLUS A MARGIN. The last thing
+/// on every door is the disclaimer, which is not tappable, so the sheet
+/// only has to keep its last line above the button's top edge — 108 + 56
+/// = 164 from the bottom, and the disclaimer's own 8pt of leading covers
+/// the breathing room. The reserve's extra 12 is for a tappable row.
+/// Measured on the phone: the old 234 left 148pt of nothing.
+///
+/// ⚠️ WITH THE FAB OFF (FabState.kAskFabEnabled, 2026-09-19) there is
+/// nothing to clear: 24pt of ground under the disclaimer. When the button
+/// returns, this goes back to `kAskFabBottomOffset + kAskFabSize`.
+const double kPvDoorBottomInset = FabState.kAskFabEnabled ? kAskFabBottomOffset + kAskFabSize : 24;
 
 /// The urgent tint. Coral, never scarlet.
 ///
@@ -71,10 +85,17 @@ class PvDoorSheet extends StatelessWidget {
   final List<Widget> children;
   final double minHeightFactor;
 
+  // ⚠️ NO FULL-VIEWPORT MINIMUM ANY MORE — 2026-09-19. The minimum existed
+  // so the TINTED FIELD under the sheet would never show when a short tab
+  // ended early. The ground is white since the base UI (§4.0): the sheet
+  // and what is under it are the same colour, so the minimum bought
+  // nothing and cost a screen of blank scroll under every short tab (the
+  // user: "so much white space… increasing the scroll for no reason").
+  // What remains is the hero: the sheet must reach past it, which
+  // `kPvDoorHeroOverlap` already guarantees by construction. Kept for
+  // revert: minHeight: MediaQuery.sizeOf(context).height * minHeightFactor.
   @override
   Widget build(BuildContext context) => Container(
-        constraints: BoxConstraints(
-            minHeight: MediaQuery.sizeOf(context).height * minHeightFactor),
         decoration: BoxDecoration(
           color: p.ground,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
@@ -427,7 +448,13 @@ class PvDoorRow extends StatelessWidget {
     required this.blurb,
     this.onTap,
     this.dimmed = false,
+    this.imageUrl,
   });
+
+  /// The piece's photograph, drawn as the thumbnail where there is one;
+  /// the icon well otherwise (2026-09-19 — the decoder's and Complications'
+  /// rows had the pictures in `read_images.dart` and did not use them).
+  final String? imageUrl;
 
   final V2Palette p;
 
@@ -469,16 +496,22 @@ class PvDoorRow extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 12),
             decoration: BoxDecoration(
                 border: Border(bottom: BorderSide(color: p.line))),
-            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Container(
-                width: 40,
-                height: 40,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  color: well,
-                  borderRadius: BorderRadius.circular(12),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: SizedBox(
+                  width: 56,
+                  height: 56,
+                  child: imageUrl != null && imageUrl!.isNotEmpty
+                      ? Image.network(
+                          imageUrl!,
+                          fit: BoxFit.cover,
+                          errorBuilder: (_, _, _) => _iconWell(well),
+                          loadingBuilder: (context, child, progress) =>
+                              progress == null ? child : _iconWell(well),
+                        )
+                      : _iconWell(well),
                 ),
-                child: Icon(icon, size: 20, color: p.ink2),
               ),
               const SizedBox(width: 14),
               Expanded(
@@ -519,6 +552,12 @@ class PvDoorRow extends StatelessWidget {
       ),
     );
   }
+
+  Widget _iconWell(Color well) => Container(
+        color: well,
+        alignment: Alignment.center,
+        child: Icon(icon, size: 22, color: p.ink2),
+      );
 
   /// The bordered card form, 2026-09-10 → 2026-09-18. Kept for revert.
   // ignore: unused_element

@@ -49,6 +49,7 @@ import '../../../services/pregnancy_controller.dart';
 import '../../../services/remote/supabase_repo.dart';
 import '../../../services/whatsapp_prefs.dart';
 import '../../../theme/pv_fonts.dart';
+import '../../../widgets/pv_date_sheet.dart';
 import '../../post_pregnancy/pp_child_profile.dart';
 import '../../referral/enter_code_sheet.dart';
 import '../../skilling/sk_child_store.dart';
@@ -268,7 +269,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
                 fontSize: 12,
                 fontWeight: FontWeight.w800,
                 letterSpacing: 1.4,
-                color: p.action.withValues(alpha: 0.85))),
+                color: p.ink3)), // eyebrow in ink, not violet (2026-09-19)
         const SizedBox(height: 10),
         Text('For the whole journey — trying, expecting, raising.',
             style: pvFraunces(
@@ -711,11 +712,15 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
     required DateTime last,
     required void Function(DateTime) onPicked,
   }) async {
-    final d = await showDatePicker(
-      context: context,
-      initialDate: initial.isBefore(first) ? first : (initial.isAfter(last) ? last : initial),
-      firstDate: first,
-      lastDate: last,
+    // The app's date sheet (2026-09-19) — the Material dialog this replaced
+    // sat lavender over the page with a violet day (the user's screenshot).
+    // Kept for revert: showDatePicker(context, initialDate, firstDate, lastDate).
+    final d = await showPvDateSheet(
+      context,
+      title: 'Which day?',
+      initial: initial,
+      first: first,
+      last: last,
     );
     if (d != null) onPicked(d);
   }
@@ -1011,7 +1016,7 @@ class _OnboardingFlowState extends State<OnboardingFlow> {
             Switch.adaptive(
               value: on,
               onChanged: onChanged,
-              activeTrackColor: p.action,
+              activeTrackColor: p.ink1, // was p.action (2026-09-19)
             ),
           ]),
           ?child,

@@ -81,6 +81,12 @@ const double kAskFabSize = 56;
 /// that is occasionally generous beats two that are occasionally wrong.
 const double kAskFabReserve = kAskFabRaisedOffset + kAskFabSize + 12;
 
+/// The reserve on an ordinary screen — the FAB at its normal offset. The
+/// door sheets used `kAskFabReserve` (the RAISED reserve, 234pt) for their
+/// foot and the user saw "so much white space… increasing the scroll for no
+/// reason" (2026-09-19). 108 + 56 + 12 = 176.
+const double kAskFabReserveNormal = kAskFabBottomOffset + kAskFabSize + 12;
+
 /// Shared, tiny reactive state the observer writes and the FAB reads.
 class FabState extends ChangeNotifier {
   FabState._();
@@ -91,7 +97,15 @@ class FabState extends ChangeNotifier {
   bool _inTtc = false;
   bool _suppressed = false; // over a sheet / dialog / premiere / ask screen
 
-  bool get visible => _appLive && !_suppressed;
+  /// ⚠️ OFF FOR NOW — 2026-09-19. The user: "hide the Ask Veda FAB for now,
+  /// we have a separate discussion on it anyway." Every door page keeps an
+  /// "Ask Veda about …" row and the search screen its last row, so the
+  /// question is one tap away without a floating button. Flip to `true`
+  /// to bring it back; the placement, the mark and where it belongs are
+  /// STILL-OPEN §63.11.
+  static const bool kAskFabEnabled = false;
+
+  bool get visible => kAskFabEnabled && _appLive && !_suppressed;
   bool get inParenting => _inParenting;
   bool get inTtc => _inTtc;
 

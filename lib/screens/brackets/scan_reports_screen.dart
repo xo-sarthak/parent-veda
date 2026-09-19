@@ -51,7 +51,7 @@ import '../../widgets/pv_feedback.dart';
 import '../../widgets/storage_image.dart';
 import '../post_pregnancy/pp_attachments.dart';
 import '../v2/v2_palette.dart';
-import '../doors/pv_door_chrome.dart' show PvDoorRailCard, PvDoorSingleRail;
+import '../doors/pv_door_chrome.dart' show PvDoorRailCard, PvDoorSingleRail, PvDoorToolScaffold, PvDoorDisclaimer;
 import 'hub/hub_solution_cards.dart' show SolutionMeta, SolutionType;
 import 'scan_report_viewer_screen.dart';
 
@@ -153,50 +153,36 @@ class _ScanReportsScreenState extends State<ScanReportsBody> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-              if (reports.isEmpty)
-                _Empty(p: p, lang: lang)
-              else ...[
-                Text(
-                    _en('Newest first. Everything stays on your phone.')
-                        .of(lang),
-                    style:
-                        pvManrope(fontSize: 12.5, height: 1.5, color: p.ink3)),
-                const SizedBox(height: 16),
-                for (final r in reports) ...[
-                  _ReportRow(
-                    report: r,
-                    p: p,
-                    lang: lang,
-                    // ⚠️ THE ROW OPENS THE REPORT. It used to open nothing —
-                    // the only control on it was a bin, so the door built to
-                    // answer "where did I put that report?" could name the
-                    // report and would not show it.
-                    onOpen: () => Navigator.of(context).push(
-                      MaterialPageRoute<void>(
-                        settings:
-                            const RouteSettings(name: 'scans/reports/view'),
-                        builder: (_) => ScanReportViewerScreen(
-                            reportId: r.id, pregnancy: widget.pregnancy),
-                      ),
-                    ),
-                    onDelete: () => _confirmDelete(context, r, p, lang),
-                  ),
-                  const SizedBox(height: 10),
-                ],
-              ],
-              const SizedBox(height: 16),
-              // ⚠️ AN ADD, NOT A TOOL — 2026-09-19, the user's review. The
-              // rail card read as a tool that opens something; it only
-              // adds. Every documents screen on Mobbin (Docusign, Grab,
-              // Cleo, Fi) draws the add as one full-width hairline box with
-              // a plus. It sits under the list so the newest report is the
-              // first thing she sees; when the locker is empty it is the
-              // only thing. The 2026-09-12 rail card is kept for revert:
-              //   PvDoorSingleRail(child: PvDoorRailCard(hue: tool, icon: tune,
-              //     chip: 'Tool', title: 'Add a report', meta: 'Photo or PDF',
-              //     onTap: () => _add(context)))
+              // ⚠️ THE ADD IS FIRST, NOT LAST — 2026-09-19, the user's
+              // review: with reports stacking up, the add row sank under
+              // them and she scrolled to the bottom to add. Fi and
+              // Superpower put the add above the list (an "Upload" pill,
+              // an "+ Add" pill by the heading). The row sits above the
+              // list, the empty state below it says why.
               _AddRow(p: p, lang: lang, onTap: () => _add(context)),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
+              // ⚠️ THE LOCKER IS AN ENTRY — option A, the user's call
+              // 2026-09-19. Every records app on Mobbin (Superpower, Fi,
+              // Apple Health, Claude's "1 file" pill) gives the list its own
+              // screen; none puts records on a page about something else.
+              // So the tab holds two rows — add, and "Your reports · N" with
+              // the last-added line under it — and the two articles beneath
+              // stay in view whether she has none or forty. The list, the
+              // search, the scan pills and the month groups are one tap in
+              // (`ScanReportsAllScreen`). The newest-five list is kept for
+              // revert in `_grouped`.
+              _YourReportsRow(
+                reports: reports,
+                p: p,
+                lang: lang,
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute<void>(
+                    settings: const RouteSettings(name: 'scans/reports/all'),
+                    builder: (_) => ScanReportsAllScreen(pregnancy: widget.pregnancy),
+                  ),
+                ),
+              ),
+              // The door adds its own 26 before the next heading; nothing here.
               // ⚠️ OFF, KEPT FOR REVERT. It read "Clinics usually keep the
               // original. Keep your own copy, the next doctor will ask."
               // Removed per review: the screen's own empty state already says
@@ -214,7 +200,51 @@ class _ScanReportsScreenState extends State<ScanReportsBody> {
     );
   }
 
-  Future<void> _add(BuildContext context) async {
+  void _openReport(BuildContext context, ScanReport r) =>
+      Navigator.of(context).push(MaterialPageRoute<void>(
+        settings: const RouteSettings(name: 'scans/reports/view'),
+        builder: (_) =>
+            ScanReportViewerScreen(reportId: r.id, pregnancy: widget.pregnancy),
+      ));
+
+  /// Rows under month headings ("September 2026"), newest first. Kept for
+  /// revert of the newest-five tab (option C).
+  // ignore: unused_element
+  List<Widget> _grouped(List<ScanReport> rs, V2Palette p, AppLanguage lang,
+      {required void Function(ScanReport) onOpen}) {
+    final out = <Widget>[];
+    String? month;
+    for (final r in rs) {
+      final d = DateTime.tryParse(r.reportDateIso) ?? DateTime.now();
+      final m = '${_kMonthsLong[d.month - 1]} ${d.year}';
+      if (m != month) {
+        month = m;
+        out.add(Padding(
+          padding: EdgeInsets.only(top: out.isEmpty ? 4 : 18, bottom: 4),
+          child: Text(m.toUpperCase(),
+              style: pvManrope(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.2,
+                  color: p.ink3)),
+        ));
+      }
+      out.add(_ReportRow(
+        report: r,
+        p: p,
+        lang: lang,
+        onOpen: () => onOpen(r),
+        onDelete: () {},
+      ));
+    }
+    return out;
+  }
+
+  Future<void> _add(BuildContext context) => addReport(context, widget.pregnancy);
+
+  /// The add flow, shared with `ScanReportsAllScreen`: picker → "Which one
+  /// is this?" → upload → store → a toast.
+  static Future<void> addReport(BuildContext context, PregnancyController pregnancy) async {
     // ⚠️ The picker is the app's existing one. Camera, gallery, PDF — all three
     // already work, and all three matter here: a lab may email a PDF, a clinic
     // may hand over paper.
@@ -271,7 +301,7 @@ class _ScanReportsScreenState extends State<ScanReportsBody> {
   /// what accumulates in a pregnancy folder. Skipping the sheet used to store
   /// the literal title "Report" — so a mother with four unnamed documents saw
   /// four rows called "Report" and had to open each one to tell them apart.
-  Future<String?> _askName(BuildContext context) async {
+  static Future<String?> _askName(BuildContext context) async {
     final p = V2PaletteStore.instance.current;
     final controller = TextEditingController();
     final name = await showDialog<String>(
@@ -313,7 +343,15 @@ class _ScanReportsScreenState extends State<ScanReportsBody> {
 
   /// Optional, and skippable. ⚠️ Naming the scan is a convenience, never a
   /// gate — a report we cannot classify is still a report she needs to keep.
-  Future<_ReportNaming> _askWhichScan(BuildContext context) async {
+  /// "Report · 19 Sep" — the name a skipped sheet gives, so two unnamed
+  /// reports are not both "Report" (the user, 2026-09-19).
+  static String _dayName() {
+    final d = DateTime.now();
+    const m = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return 'Report · ${d.day} ${m[d.month - 1]}';
+  }
+
+  static Future<_ReportNaming> _askWhichScan(BuildContext context) async {
     final p = V2PaletteStore.instance.current;
     final lang = S.current;
 
@@ -360,7 +398,7 @@ class _ScanReportsScreenState extends State<ScanReportsBody> {
       ),
     );
 
-    if (!context.mounted) return const _ReportNaming('Report', null);
+    if (!context.mounted) return _ReportNaming(_dayName(), null);
 
     if (picked is TestScanInfo) {
       // ⚠️ `.en`, NOT `.of(lang)`. The title is stored, and a stored value is
@@ -372,16 +410,16 @@ class _ScanReportsScreenState extends State<ScanReportsBody> {
     if (picked == _kTypeName) {
       final typed = await _askName(context);
       // She opened the box and closed it again. That is "skip", not an error.
-      return _ReportNaming(typed ?? 'Report', null);
+      return _ReportNaming(typed ?? _dayName(), null);
     }
-    return const _ReportNaming('Report', null);
+    return _ReportNaming(_dayName(), null);
   }
 
   /// Sentinel for the "Type a name" row. A private const object rather than a
   /// magic string, so nothing can collide with a real value coming back.
   static const Object _kTypeName = Object();
 
-  Widget _pickRow(
+  static Widget _pickRow(
           BuildContext ctx, String label, VoidCallback onTap, V2Palette p) =>
       InkWell(
         onTap: onTap,
@@ -464,10 +502,12 @@ class _ReportRow extends StatelessWidget {
       child: InkWell(
         onTap: onOpen,
         child: Container(
-          padding: const EdgeInsets.fromLTRB(16, 14, 6, 14),
+          // The compact row (2026-09-19): a hairline under, no card — the
+          // same object as the article rows beneath it. Was a bordered
+          // card, radius 18.
+          padding: const EdgeInsets.fromLTRB(0, 12, 0, 12),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: p.line),
+            border: Border(bottom: BorderSide(color: p.line)),
           ),
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -487,11 +527,12 @@ class _ReportRow extends StatelessWidget {
                     Text(report.title,
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
-                        style: pvFraunces(
-                            fontSize: 15.5,
-                            fontWeight: FontWeight.w600,
+                        style: pvManrope(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            height: 1.25,
                             color: p.ink1)),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 3),
                     Text(
                         '${d == null ? '' : _fmt(d)}'
                         '${d == null ? '' : ' · '}'
@@ -576,7 +617,7 @@ class _Thumb extends StatelessWidget {
       height: 46,
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
-        color: p.surfaceAlt,
+        color: Color.alphaBlend(p.ink1.withValues(alpha: 0.06), p.surface), // was surfaceAlt
         borderRadius: BorderRadius.circular(12),
       ),
       child: showImage
@@ -665,6 +706,289 @@ class _AddRow extends StatelessWidget {
                       Text(_en('A photo of the paper, or the PDF').of(lang),
                           style: pvManrope(fontSize: 12.5, color: p.ink2)),
                     ]),
+              ),
+              Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+const List<String> _kMonthsLong = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+/// "All reports · 12 ›" — the row that opened the full locker under the
+/// newest five. Kept for revert.
+// ignore: unused_element
+class _AllRow extends StatelessWidget {
+  const _AllRow(
+      {required this.count, required this.p, required this.lang, required this.onTap});
+
+  final int count;
+  final V2Palette p;
+  final AppLanguage lang;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => PvPress(
+        child: InkWell(
+          onTap: () {
+            pvCommitFeedback();
+            onTap();
+          },
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 12),
+            child: Row(children: [
+              Expanded(
+                child: Text('All reports  ·  $count',
+                    style: pvManrope(
+                        fontSize: 15, fontWeight: FontWeight.w700, color: p.ink1)),
+              ),
+              Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
+            ]),
+          ),
+        ),
+      );
+}
+
+// =============================================================================
+//  ScanReportsAllScreen — every report, searchable, filtered by scan
+// -----------------------------------------------------------------------------
+//  Superpower's Health Records (Mobbin): a search field, a filter, rows
+//  under date headings. Here: the tool header, a field, scan pills, then
+//  the rows grouped by month. The add lives here too.
+// =============================================================================
+
+class ScanReportsAllScreen extends StatefulWidget {
+  const ScanReportsAllScreen({super.key, required this.pregnancy});
+  final PregnancyController pregnancy;
+
+  @override
+  State<ScanReportsAllScreen> createState() => _ScanReportsAllScreenState();
+}
+
+class _ScanReportsAllScreenState extends State<ScanReportsAllScreen> {
+  final _q = TextEditingController();
+  String? _scan;
+
+  @override
+  void initState() {
+    super.initState();
+    _q.addListener(() => setState(() {}));
+  }
+
+  @override
+  void dispose() {
+    _q.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+        animation:
+            Listenable.merge([ScanReportsStore.instance, V2PaletteStore.instance]),
+        builder: (context, _) {
+          final p = V2PaletteStore.instance.current;
+          final lang = S.current;
+          final all = ScanReportsStore.instance.reports;
+          final q = _q.text.trim().toLowerCase();
+          final shown = [
+            for (final r in all)
+              if ((_scan == null || r.scanId == _scan) &&
+                  (q.isEmpty ||
+                      r.title.toLowerCase().contains(q) ||
+                      r.note.toLowerCase().contains(q)))
+                r
+          ];
+          final scans = {for (final r in all) if (r.scanId != null) r.scanId!};
+
+          Widget pill(String label, bool on, VoidCallback onTap) => PvPress(
+                child: Material(
+                  color: on ? p.ink1 : p.surface,
+                  shape: StadiumBorder(side: BorderSide(color: on ? p.ink1 : p.line)),
+                  clipBehavior: Clip.antiAlias,
+                  child: InkWell(
+                    onTap: on ? null : () {
+                      pvCommitFeedback();
+                      onTap();
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      child: Text(label,
+                          style: pvManrope(
+                              fontSize: 12.5,
+                              fontWeight: FontWeight.w700,
+                              color: on ? Colors.white : p.ink1)),
+                    ),
+                  ),
+                ),
+              );
+
+          return PvDoorToolScaffold(
+            hue: 206,
+            eyebrow: 'Scans & tests',
+            title: 'All reports',
+            intro: '${all.length} ${all.length == 1 ? 'report' : 'reports'}. '
+                'Everything stays on your phone, and in your account when you are signed in.',
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 18),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  TextField(
+                    controller: _q,
+                    style: pvManrope(fontSize: 15, fontWeight: FontWeight.w500, color: p.ink1),
+                    decoration: InputDecoration(
+                      hintText: 'Search a report or a note',
+                      hintStyle: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w500, color: p.ink3),
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                      prefixIcon: Icon(Icons.search_rounded, size: 21, color: p.ink3),
+                      filled: true,
+                      fillColor: p.surface,
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          borderSide: BorderSide(color: p.line)),
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(24),
+                          borderSide: BorderSide(color: p.ink1, width: 1.2)),
+                    ),
+                  ),
+                  if (scans.length > 1) ...[
+                    const SizedBox(height: 12),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      clipBehavior: Clip.none,
+                      child: Row(children: [
+                        pill('All', _scan == null, () => setState(() => _scan = null)),
+                        for (final id in scans)
+                          if (_scanById(id) case final sc?) ...[
+                            const SizedBox(width: 8),
+                            pill(sc.name.of(lang), _scan == id, () => setState(() => _scan = id)),
+                          ],
+                      ]),
+                    ),
+                  ],
+                  const SizedBox(height: 14),
+                  _AddRow(p: p, lang: lang, onTap: () => _addHere(context)),
+                  const SizedBox(height: 14),
+                  if (shown.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 18),
+                      child: Text(all.isEmpty ? 'Nothing here yet. A photo is enough.' : 'Nothing matches.',
+                          style: pvManrope(fontSize: 14, color: p.ink2)),
+                    )
+                  else
+                    for (final w in _groupedStatic(shown, p, lang,
+                        onOpen: (r) => Navigator.of(context).push(MaterialPageRoute<void>(
+                              settings: const RouteSettings(name: 'scans/reports/view'),
+                              builder: (_) => ScanReportViewerScreen(
+                                  reportId: r.id, pregnancy: widget.pregnancy),
+                            ))))
+                      w,
+                  const SizedBox(height: 22),
+                  PvDoorDisclaimer(p: p),
+                  const SizedBox(height: 24), // the FAB is off (2026-09-19); was 88
+                ]),
+              ),
+            ],
+          );
+        },
+      );
+
+  /// The same add as the tab's — picker, "Which one is this?", store.
+  Future<void> _addHere(BuildContext context) =>
+      _ScanReportsScreenState.addReport(context, widget.pregnancy);
+
+  static List<Widget> _groupedStatic(
+      List<ScanReport> rs, V2Palette p, AppLanguage lang,
+      {required void Function(ScanReport) onOpen}) {
+    final out = <Widget>[];
+    String? month;
+    for (final r in rs) {
+      final d = DateTime.tryParse(r.reportDateIso) ?? DateTime.now();
+      final m = '${_kMonthsLong[d.month - 1]} ${d.year}';
+      if (m != month) {
+        month = m;
+        out.add(Padding(
+          padding: EdgeInsets.only(top: out.isEmpty ? 4 : 18, bottom: 4),
+          child: Text(m.toUpperCase(),
+              style: pvManrope(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.2,
+                  color: p.ink3)),
+        ));
+      }
+      out.add(_ReportRow(report: r, p: p, lang: lang, onOpen: () => onOpen(r), onDelete: () {}));
+    }
+    return out;
+  }
+}
+
+TestScanInfo? _scanById(String id) {
+  for (final s in kTestsScans) {
+    if (s.id == id) return s;
+  }
+  return null;
+}
+
+/// "Your reports · N ›" with the last-added line — the entry to the locker.
+/// With none: "Nothing here yet · a photo is enough", still tappable (the
+/// screen inside has the add too), so the row is never a dead end.
+class _YourReportsRow extends StatelessWidget {
+  const _YourReportsRow(
+      {required this.reports, required this.p, required this.lang, required this.onTap});
+
+  final List<ScanReport> reports;
+  final V2Palette p;
+  final AppLanguage lang;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final well = Color.alphaBlend(p.ink1.withValues(alpha: 0.06), p.surface);
+    final n = reports.length;
+    final latest = reports.isEmpty ? null : reports.first;
+    final d = latest == null ? null : DateTime.tryParse(latest.reportDateIso);
+    const m = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    final sub = latest == null
+        ? _en('Nothing here yet. A photo is enough.').of(lang)
+        : 'Last added  ·  ${latest.title}${d == null ? '' : '  ·  ${d.day} ${m[d.month - 1]}'}';
+    return PvPress(
+      child: Material(
+        color: p.surface,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16), side: BorderSide(color: p.line)),
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          onTap: () {
+            pvCommitFeedback();
+            onTap();
+          },
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 14, 14, 14),
+            child: Row(children: [
+              Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(color: well, borderRadius: BorderRadius.circular(12)),
+                child: Icon(Icons.folder_open_rounded, size: 21, color: p.ink1),
+              ),
+              const SizedBox(width: 14),
+              Expanded(
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Text(n == 0 ? 'Your reports' : 'Your reports  ·  $n',
+                      style: pvManrope(fontSize: 15, fontWeight: FontWeight.w700, color: p.ink1)),
+                  const SizedBox(height: 2),
+                  Text(sub,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvManrope(fontSize: 12.5, color: p.ink2)),
+                ]),
               ),
               Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
             ]),

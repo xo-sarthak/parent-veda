@@ -41,6 +41,8 @@ import '../../services/pregnancy_controller.dart';
 import '../../services/scan_reports_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../doors/pv_door_chrome.dart' show PvDoorToolScaffold;
+import '../post_pregnancy/pp_attachments.dart';
+import '../../widgets/pv_feedback.dart';
 import '../v2/v2_palette.dart';
 
 LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
@@ -309,6 +311,24 @@ class _ScanReportEditScreenState extends State<ScanReportEditScreen> {
           ),
           const SizedBox(height: 28),
 
+          // ---- more files ----------------------------------------------
+          // The one edit the screen could not do (the user's review,
+          // 2026-09-19): the second page of a report, photographed later.
+          Text('Files  ·  ${_report?.files.length ?? 0}',
+              style: pvFraunces(
+                  fontSize: 19,
+                  fontWeight: FontWeight.w600,
+                  height: 1.2,
+                  letterSpacing: -0.4,
+                  color: p.ink1)),
+          const SizedBox(height: 10),
+          OutlinedButton.icon(
+            onPressed: _addFiles,
+            icon: const Icon(Icons.add_rounded, size: 18),
+            label: const Text('Add more files'),
+          ),
+          const SizedBox(height: 28),
+
           FilledButton(
             onPressed: _dirty ? _save : null,
             style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(50)),
@@ -318,6 +338,22 @@ class _ScanReportEditScreenState extends State<ScanReportEditScreen> {
         ),
       ],
     );
+  }
+
+  /// Photograph or attach more pages; they are stored the way the add
+  /// stores them and appended, saved at once (no Save needed for a file).
+  Future<void> _addFiles() async {
+    final r = _report;
+    if (r == null) return;
+    final picked = await showAttachmentPicker(context);
+    if (picked.isEmpty || !mounted) return;
+    final stored = await uploadAttachments(picked, 'report');
+    await ScanReportsStore.instance.update(r.copyWith(files: [
+      ...r.files,
+      for (final a in stored) ReportFile(path: a.path, name: a.name, isPdf: a.isPdf),
+    ]));
+    pvCommitFeedback();
+    if (mounted) setState(() {});
   }
 
   Future<void> _save() async {

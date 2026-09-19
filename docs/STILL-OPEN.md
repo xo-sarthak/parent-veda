@@ -465,13 +465,24 @@ sign-in screens are not walked** — that needs a sign-out and a way back in
 (the Magic Link template, or the test doctor's password). What is open, in
 the order it bites:
 
-**5.4a The rates are placeholders.** `expert_share_rules` seeds consult
-80/85, class/cohort/course 70, own-coupon course 45, video 50 — the user's
-call while the Commercial Terms workbook is missing, every row noted
-`PLACEHOLDER`. When the workbook arrives: new rows with a later
-`effective_from`, never edits. Until then the percentages a doctor sees are
-*a* number, not *the* number — do not demo the Earnings tab to a real
-clinician with these.
+**5.4a ~~The rates are placeholders.~~ REAL since `0085` (2026-09-19).** The
+user sent the Commercial Terms table; `0085_expert_share_rates.sql` retires
+the placeholders and seeds it: consultations a flat **80%** (no 85% tier —
+§13.0's memory was wrong), live courses **55%**, recorded courses **30%
+through ours / 55% through the doctor's own code**, videos, articles and
+affiliate **20%**, sponsorship as the named face **35%**, product
+endorsement **10%** (10–15% per deal, override per expert). It adds a
+`channel` (platform | own_code) to the rules and the ledger. **The user runs
+`0085`** the way they ran `0084`.
+
+Still not modelled, by design, each a manual row with a note until it is:
+a live course with several experts ("55% pool, split by time devoted" —
+`programme_experts` holds no time weights); the additional 10% for a
+multi-expert sale through the doctor's own code (rides on §13.0 items 1–3);
+sponsorship on the brand's own channels (a licensing fee, share 100%, fee
+as gross); a co-developed product's "20% of margin" (margin is not a
+column). `own_code` is never *written* yet — the trigger passes `platform`
+for every booking until coupon attribution exists.
 
 **5.4b The Magic Link email template.** Sign-in by code sends through
 Supabase's **Magic Link** template, which must carry `{{ .Token }}` and not
@@ -513,6 +524,16 @@ fine — but a 1:1 offering with capacity > 1 would be misfiled. None exists.
 **5.4h Not built, deliberately:** the annual statement (PDF with PAN), a
 chart under the by-source legend, attendee names on a class, editing the
 public profile in-app (§5.1: editorial), self-serve rate negotiation.
+
+**5.4j The Home hero (2026-09-19, audit #8b).** Three CC0 photographs by
+hour of day (`assets/doctor/`, credits in `doctor_hero_images.dart`), the
+date, the greeting, one information line, the doctor's own photograph
+(`expert_profiles.photo_url`, via `DoctorSession.profile`), the first card
+overlapping the band, and a "How parents see you" card. **Not walked** —
+the device was the other terminal's. Owed from it: the credits are listed
+in code but not yet shown under Profile → About; a doctor with no
+`photo_url` sees her initial, which is honest but is the thing the panel
+should fill first.
 
 **5.4i Kept for revert, unreachable:** `doctor_home_screen.dart`,
 `doctor_appointments_screen.dart`, `doctor_schedule_screen.dart`,
@@ -7922,6 +7943,58 @@ through Openverse with `source=flickr,wikimedia` (CC BY / CC0 files served
 clean), keep the credit line, re-run `pregnancy_reads_shape_test`. The 10
 Flickr `_b.jpg` files are fine.
 
+### 63.17 The Ask Veda FAB is OFF — 2026-09-19
+
+`FabState.kAskFabEnabled = false` (global_ask_fab.dart). The user: "hide
+it for now, we have a separate discussion on it." Every door page keeps
+its "Ask Veda about …" row and the search screen its last row. The door
+sheets' foot inset reads the flag (24pt off, 164 on). Decide with §63.11:
+placement, a drawn mark, whether it lives only on reads.
+
+### 63.16 One doctor page, keyed by the doctor — BUILT 2026-09-19; the data seam owed
+
+**Built.** `ProviderProfileScreen` is the one doctor page (base UI; Mobbin:
+Zocdoc, Airbnb host, Preply, Udemy instructor): avatar · name · role ·
+location · top pick · ★ / N reviews / years · About · Why · Helps with ·
+**Sessions with her** (1:1 + every masterclass, course, cohort and class
+she hosts, as rows) · Qualifications (unfolds) · From parents · a sticky
+"Book a 1:1 · ₹" pill. The pregnancy consult list opens it directly;
+`ConsultationDetailScreen` (the slot picker in between) is retired to a
+fallback. The 1:1 row opens a slot sheet (ink pills) → the Prepare confirm
+sheet. The "Next: today 6pm" pill is off the list.
+
+**The user's brief for the data:** "plug and play — we give you a document
+or spreadsheet that says this doctor does these things, and it shows up
+wherever she is." Where that stands:
+
+| Fact | Keyed by the doctor today? | Where |
+|---|---|---|
+| Who she is (name, role, location, rating, blurb, why, tags, qualifications) | YES — `expert_profiles` row, merged over Dart by `ExpertStore` (0072) | cloud |
+| Whether she takes 1:1s | YES — `expert_profiles.takes_consults` | cloud |
+| Her masterclasses / cohorts / courses | YES — `programmes` + `programme_experts(expert_id)` (0054) | cloud |
+| Her real slots | YES — `DoctorScheduleStore`, from ParentVeda+ | cloud |
+| Pregnancy 1:1 price, the 4 demo slots, 2 reviews | **NO** — on `Specialist` (prepare_data.dart), matched to the Expert BY NAME in the profile | Dart |
+| Pregnancy Prepare courses' host | **NO** — `instructorName: String`, matched by name | Dart |
+| Reviews | **NO** — a tuple list on `Expert`, empty for pregnancy people | Dart |
+
+**Owed (the spreadsheet job):** one `expert_id` column on `Specialist` and
+on `PrepProgram` (then the name matches go); a `reviews` table keyed by
+`expert_id` (the same shape Products uses, named reviews); a per-doctor
+consult price on `expert_profiles`. With those three, the sheet is one row
+per doctor + one row per offering, and every surface that names her reads
+the same rows. The profile's `Specialist` seam is the only place the two
+models meet — remove it when the ids land.
+
+### 63.15 Scans & tests — second review round done — 2026-09-19
+
+PREGNANCY-DOORS-REVIEW §1, second table. Owed from it: photos for the 27
+findings and 15 conditions (`finding_<id>`, `condition_<id>` in
+read_images.dart — rows fall back to the icon well until then); the
+"Report" default title when she skips "Which one is this?" (a photo
+should get a name from the day, e.g. "Report · 19 Sep"); onboarding's
+"Week 1" placeholder card. The leaf-format table is DESIGN-SYSTEM §4.0
+addendum 3.
+
 ### 63.14 The door walk — Complications done — 2026-09-19
 
 See `docs/PREGNANCY-DOORS-REVIEW.md` §2. New door-wide rule: written
@@ -8233,3 +8306,67 @@ widening the word map as the unclear bucket shows what is missed.
 
 Also dead on 2026-09-18, for the record: Momspresso (TLS handshake fails),
 Quora (Cloudflare challenge), Bing PAA (client-rendered).
+
+## 67.0 You — one profile for four stages is built; what it still owes — OPENED 2026-09-19
+
+`lib/screens/profile/` (docs/PROFILE-AUDIT.md). Eight sections in one
+order on every stage; the avatar on all four homes opens it;
+`ProfileScreen` and `TtcProfileScreen` are facades. Built on the user's
+five decisions: *You*; avatar entry; *Notes for your doctor* in; *Download
+my data* present as "Coming"; one partner switch. Not walked on a device
+(the phone was out of bounds for this pass).
+
+### 67.1 Download my data needs an edge function
+
+The row is on `PvDataPrivacyScreen` and says *Coming*. Her rows are spread
+across a dozen tables with RLS on each, and only a function running as
+the service role can gather them into one file for one user. Shape when
+built: `export-my-data` edge function, answers only for the token's own
+user (the `delete-account` pattern), writes a JSON (later a zip) to a
+private storage bucket, returns a signed URL that expires in an hour. The
+row then opens that URL. Until then the copy says so, because a row that
+pretends to work is worse than one that says when.
+
+### 67.2 Partner sharing is one local switch; the server does not know
+
+`kPvPartnerShareKey` (`pv_partner_share_week`) is a `shared_preferences`
+bool read by nothing on the server. The partner sees what the existing
+RLS lets a paired partner see, which is unchanged by the switch. That is
+honest on screen (the partner page says what is shared and what never
+is) but the switch itself is inert until it becomes a column on
+`profiles` (`share_week_with_partner boolean default true`) that the
+partner-read policies check. Per-thing switches (calendar / journal /
+records) were declined for v1 — the user's call — and belong in the same
+migration when they come.
+
+### 67.3 Privacy notice, Help, About
+
+Three rows that end in a snack today: the privacy notice (no published
+document yet), Help (no support channel — the snack names an email), and
+About (a sheet with the honest four sentences). Each is a row so the
+place exists; each needs its content.
+
+### 67.4 The device walk
+
+Every stage's You, the child page, the partner page, the doctor notes,
+the language sheet (TTC flips `TtcLang`, the others `controller.setLanguage`),
+the sign-out round trip, the delete flow with the typed keyword, and the
+*View as* pill with a paired partner. Same versus format as the store
+walk: ours beside the Mobbin reference. Also the products hero band's
+loop, which landed in the same commit and has not been seen on a phone.
+
+### 67.5 The classic bodies
+
+`ProfileScreenClassic` and `TtcProfileScreenClassic` are kept for revert
+and pushed by nothing (`test/pv_you_test.dart` holds that). Retire them
+after a release cycle, with §65.7's store bodies. The classic pregnancy
+profile's *Enter doctor mode · testing* was NOT carried to You: the
+doctor app is its own flavour now (BACKEND-PATTERNS §12) and the
+in-app switch was the pre-flavour road.
+
+### 67.6 Skilling's You is the parent's, in a debug build
+
+`LifeStage.skilling` is still not a persisted stage; You for skilling is
+reached from the preview home's avatar and from the grown-up page, both
+behind `kDebugMode` like the rest of the stage. When the stage ships, its
+You needs nothing new — the content row already exists — only the door.

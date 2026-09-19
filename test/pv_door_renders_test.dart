@@ -27,6 +27,7 @@ import 'package:parentveda/screens/doors/pv_door_chips.dart';
 import 'package:parentveda/screens/doors/pv_door_screen.dart';
 import 'package:parentveda/screens/doors/pv_door_rail.dart';
 import 'package:parentveda/screens/doors/pv_door_tiles.dart';
+import 'package:parentveda/screens/reader/pv_reader_screen.dart';
 import 'package:parentveda/services/bracket_resolver.dart';
 import 'package:parentveda/services/pregnancy_controller.dart';
 
@@ -161,7 +162,11 @@ void main() {
 
       final g = door.groups[i];
       for (final s in door.sectionsOf(g.id)) {
-        expect(find.text(s.heading), findsOneWidget,
+        expect(
+            s.folded
+                ? find.text('${s.heading}  ·  ${s.tiles.length}')
+                : find.text(s.heading),
+            findsOneWidget,
             reason: 'tab "${g.label}" is open and its section '
                 '"${s.heading}" is not on screen.');
       }
@@ -199,7 +204,20 @@ void main() {
     await tester.pump(const Duration(milliseconds: 500));
 
     // The section it lives in is on screen.
-    expect(find.text('Before any scan'), findsOneWidget);
+    // "Before any scan" folds (2026-09-19): its heading carries the count
+    // and a tap opens it. The coming-soon card is inside.
+    // The page's ListView is lazy: drag until the heading is built.
+    Future<void> dragTo(Finder f) async {
+      for (var i = 0; i < 12 && f.evaluate().isEmpty; i++) {
+        await tester.drag(find.byType(Scrollable).first, const Offset(0, -300));
+        await tester.pump();
+      }
+      expect(f, findsWidgets);
+    }
+    // "Before any scan" is a plain section at the end (the fold and strip
+    // were tried and taken off, 2026-09-19); the card is a list row in it.
+    await dragTo(find.text('Before any scan'));
+    await dragTo(find.text('What the scan person can and cannot tell you'));
 
     // ⚠️ IT HOLDS ITS PLACE AT FULL SIZE. The rule at the head of
     // `pv_placeholders.dart`: a placeholder occupies the real geometry, so
@@ -210,11 +228,17 @@ void main() {
     );
     expect(card, findsWidgets);
 
-    // Tapping it must not push anything.
+    // Tapping it must not push anything. The hero title is scrolled out of
+    // the lazy list by now, so the check is that the door is still the top
+    // route: its card is still hit-testable and no reader appeared.
     await tester.tap(card.first, warnIfMissed: false);
     await tester.pump();
-    expect(find.text('Your scans, in one place.'), findsOneWidget,
-        reason: 'a coming-soon card navigated away.');
+    await tester.pump(const Duration(milliseconds: 400));
+    // The row is still on the page and no reader was pushed. (A coming-soon
+    // row has no onTap, so it is not itself hit-testable — that is the
+    // point, not a failure.)
+    expect(card, findsWidgets, reason: 'a coming-soon card navigated away.');
+    expect(find.byType(PvReaderScreen), findsNothing);
   });
 
   testWidgets('nothing overflows at 360dp on any tab', (tester) async {
@@ -294,7 +318,13 @@ void _everyDoor() {
         }
         final g = door.groups[i];
         for (final s in door.sectionsOf(g.id)) {
-          expect(find.text(s.heading), findsOneWidget,
+          // A folded section's heading carries its count ("Before any scan
+          // · 4"); the plain heading is the rest.
+          expect(
+              s.folded
+                  ? find.text('${s.heading}  ·  ${s.tiles.length}')
+                  : find.text(s.heading),
+              findsOneWidget,
               reason: '$name / "${g.label}": section "${s.heading}" is not on '
                   'screen while that tab is open.');
         }

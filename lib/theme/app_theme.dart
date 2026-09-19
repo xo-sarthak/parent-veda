@@ -472,7 +472,10 @@ final ColorScheme _lightScheme = ColorScheme(
         style: FilledButton.styleFrom(
           backgroundColor: scheme.onSurface,
           foregroundColor: scheme.surface,
-          disabledBackgroundColor: scheme.surfaceContainerHighest,
+          // A disabled pill is grey, not lavender (2026-09-19 — the edit
+          // screen's Save sat in `surfaceContainerHighest`, 0xFFE6DEED).
+          // Kept for revert: scheme.surfaceContainerHighest.
+          disabledBackgroundColor: const Color(0xFFE4E2E5),
           disabledForegroundColor: scheme.onSurfaceVariant,
           elevation: 0,
           minimumSize: const Size(64, 52),

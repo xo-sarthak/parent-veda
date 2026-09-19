@@ -118,7 +118,7 @@ class ObHead extends StatelessWidget {
             fontSize: 11.5,
             fontWeight: FontWeight.w800,
             letterSpacing: 1.3,
-            color: p.action.withValues(alpha: 0.85),
+            color: p.ink3, // was p.action at 85% (2026-09-19)
           ),
         ),
         const SizedBox(height: 10),
@@ -515,13 +515,17 @@ class ObGiveBack extends StatelessWidget {
     alignment: Alignment.topCenter,
     child: text.isEmpty
         ? const SizedBox(width: double.infinity)
+        // No box (2026-09-19, DESIGN-SYSTEM §4.0 addendum): the give-back
+        // sits between two hairlines, eyebrow in grey. Was a lavender well
+        // with a violet eyebrow — kept for revert.
         : Container(
             width: double.infinity,
             margin: const EdgeInsets.only(top: 16),
-            padding: const EdgeInsets.fromLTRB(16, 14, 16, 15),
+            padding: const EdgeInsets.symmetric(vertical: 14),
             decoration: BoxDecoration(
-              color: p.surfaceAlt,
-              borderRadius: BorderRadius.circular(16),
+              border: Border(
+                  top: BorderSide(color: p.line),
+                  bottom: BorderSide(color: p.line)),
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -532,7 +536,7 @@ class ObGiveBack extends StatelessWidget {
                     fontSize: 10.5,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 1.2,
-                    color: p.action.withValues(alpha: 0.85),
+                    color: p.ink3,
                   ),
                 ),
                 const SizedBox(height: 7),

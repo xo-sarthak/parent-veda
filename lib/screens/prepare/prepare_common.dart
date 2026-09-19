@@ -13,6 +13,8 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../v2/v2_palette.dart';
+import '../../widgets/pv_feedback.dart';
 
 import '../../booking/booking_catalog.dart';
 import '../../services/prepare_store.dart';
@@ -517,8 +519,113 @@ class _BookingSheet extends StatefulWidget {
 class _BookingSheetState extends State<_BookingSheet> {
   bool _done = false;
 
+  // ⚠️ THE BASE UI — 2026-09-19, the doctor-page walk. This sheet is the
+  // tail of every Prepare booking (a 1:1, a masterclass, a course, a
+  // cohort), and it was the old kit: a lavender panel with the summary
+  // inside it, a violet button, a violet tick. The confirm sheets that
+  // ship today (Mobbin: Urban Company, Angi, Opendoor, Transit) are a
+  // heading, the booking as LINES — what · when · price — and one pill;
+  // success is a ring tick, "You're all set", the same lines, Done. The
+  // old body is `buildClassic` below, kept for revert.
   @override
   Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    return Container(
+      decoration: BoxDecoration(
+        color: p.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(20, 18, 20, 20),
+          child: AnimatedSize(
+            duration: const Duration(milliseconds: 220),
+            curve: Curves.easeOutCubic,
+            alignment: Alignment.topCenter,
+            child: _done ? _successInk(p) : _confirmInk(p),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _line(V2Palette p, IconData icon, String text) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Padding(
+            padding: const EdgeInsets.only(top: 1),
+            child: Icon(icon, size: 18, color: p.ink2),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(text,
+                style: pvManrope(fontSize: 14.5, height: 1.45, color: p.ink1)),
+          ),
+        ]),
+      );
+
+  Widget _confirmInk(V2Palette p) {
+    return Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text('CONFIRM',
+          style: pvManrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.3, color: p.ink3)),
+      const SizedBox(height: 4),
+      Text(widget.heading,
+          style: pvFraunces(fontSize: 22, fontWeight: FontWeight.w600, height: 1.2, color: p.ink1)),
+      const SizedBox(height: 14),
+      _line(p, Icons.person_outline_rounded, widget.title),
+      if (widget.whenLabel != null) _line(p, Icons.event_outlined, widget.whenLabel!),
+      _line(p, Icons.payments_outlined, widget.priceLabel),
+      const SizedBox(height: 10),
+      Text(S(widget.lang).uiWeLlHoldSpot,
+          style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink3)),
+      const SizedBox(height: 16),
+      FilledButton(
+        onPressed: () {
+          pvCommitFeedback();
+          PrepareStore.instance.book(widget.id);
+          setState(() => _done = true);
+        },
+        style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+        child: Text(widget.cta),
+      ),
+    ]);
+  }
+
+  Widget _successInk(V2Palette p) {
+    return Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Container(
+        width: 56,
+        height: 56,
+        alignment: Alignment.center,
+        decoration: BoxDecoration(shape: BoxShape.circle, border: Border.all(color: p.ink1, width: 1.6)),
+        child: Icon(Icons.check_rounded, size: 28, color: p.ink1),
+      ),
+      const SizedBox(height: 14),
+      Text(S(widget.lang).uiReAllSet,
+          style: pvFraunces(fontSize: 22, fontWeight: FontWeight.w600, height: 1.2, color: p.ink1)),
+      const SizedBox(height: 14),
+      _line(p, Icons.person_outline_rounded, widget.title),
+      if (widget.whenLabel != null) _line(p, Icons.event_outlined, widget.whenLabel!),
+      _line(p, Icons.payments_outlined, widget.priceLabel),
+      const SizedBox(height: 10),
+      Text(S(widget.lang).prepSavedToList(widget.title),
+          style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink3)),
+      const SizedBox(height: 16),
+      FilledButton(
+        onPressed: () {
+          Navigator.of(context).maybePop();
+          widget.onConfirmed?.call();
+        },
+        style: FilledButton.styleFrom(minimumSize: const Size.fromHeight(52)),
+        child: Text(S(widget.lang).uiDone),
+      ),
+    ]);
+  }
+
+  /// The old-kit body, 2026-08 → 2026-09-19. Kept for revert.
+  // ignore: unused_element
+  Widget buildClassic(BuildContext context) {
     return Container(
       decoration: const BoxDecoration(
         color: kCanvas,

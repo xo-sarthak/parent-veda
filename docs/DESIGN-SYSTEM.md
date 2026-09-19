@@ -485,6 +485,22 @@ code (`pvDoorTileIsWritten`, `_ArticleList`) and in
 is a rail". Mobbin: Equinox, Alan, Gentler Streak, Liven, Tonal list
 same-kind articles; Clue and Atoms rail mixed or featured content.
 
+### 4.0 · addendum 3 — the leaf formats, so nobody re-decides them — SETTLED 2026-09-19
+
+Every screen a door tile opens is one of these. New tiles pick one; they
+do not invent a fourth.
+
+| The tile is… | The screen is… | Where it is drawn |
+|---|---|---|
+| a read (article, guide, myth-fact, condition, scan, finding) | the reader: photo, kicker, title, lede, byline, contents pill, sections, callouts as rules, FAQ that unfolds, "What can you do with this" tiles, Read next | `PvReaderScreen` |
+| a tool, a checklist, a person, a locker, a list of people | the tool header — back circle at the gutter, eyebrow, display title, one line — then the sheet | `PvDoorToolScaffold` |
+| a date to set | the date sheet: month grid inline, a Save pill (the timeline adds time slots) | `showPvDateSheet` |
+| a short thing to type (a note, a name) | a bottom sheet: eyebrow, display title, one field, Save | `showScanNoteSheet` is the model |
+| a choice among a few | ink pills in a row, "All" first | the decoder's chips, the consult specialties |
+| files someone added | a 3-across grid of squares; tap opens full with Share in the top bar | `_FileSquare` |
+| many items of one kind | rows under headings; the newest few, then "All · N ›" to a searchable screen | the locker |
+| background reading under a specific list | a slim "start here" strip with ✕ until dismissed; folded with a count at the end | `PvDoorSection.strip` / `.folded` |
+
 ## 4.0a One reader — SETTLED 2026-09-17
 
 Every piece of writing in the app is one object, `PvRead`, on one screen,

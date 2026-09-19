@@ -27,6 +27,13 @@ it, and they are in DESIGN-SYSTEM §4.0 now):
    is a row of slots. No dialog on a sheet.
 5. **The Prepare kit is ink.** `prepare_common.dart` keeps its names and
    loses its violet; fourteen screens follow.
+6. **Spacing and separation, every screen.** The user (2026-09-19): "keep
+   looking for random spacing issues… segregation and separation of
+   sections and headings." On every walk: eyebrow → 6–8pt → content;
+   between sections 18–26pt, never less than the gap inside one; a heading
+   sits closer to what it heads than to what came before; a grid or list
+   has no stray inset of its own (`padding: EdgeInsets.zero` on a nested
+   GridView); the last thing on a page clears the floating Ask button.
 
 ---
 
@@ -63,6 +70,45 @@ each tile's screen.
 | The locker's add looks like a tool; purple icons on the attach sheet; fonts differ sheet to sheet; the viewer's purple pill, pencil screen, PDF chrome | "+ Add a report" hairline row under the list; attach sheet in the display face with ink icons and presses; viewer and edit screen on the tool header, ink chips, plain note, file card white, PDF on the ground with no action bar; a toast when a report lands; trash off the row (delete lives in the viewer) |
 | "Prepare" + EN·हिं at the top of consults | gone — the tool header's back circle |
 | Search should be scoped to the door | it is — "In Scans & tests" is the default, Everywhere the toggle |
+
+**The second review round (2026-09-19 afternoon):**
+
+| He said | Done |
+|---|---|
+| The list is monotonous — the same icon on every scan; use pictures | every written row carries the read's photo (`pvDoorTileReadImageId` reaches `scan_<id>`, `finding_<id>`, `condition_<id>`); nine scan photos added; a scan read opens with its photo too. Findings and conditions still fall back to the format well until they get photos (owed) |
+| "Before any scan" is at the bottom; relevant but not always | Bluesky/Shopify's "Getting started" strip: a slim "Before any scan · 3 to read first ›" row ABOVE the trimester lists with an ✕; dismissed once (`PvDoorStripStore`), it lives folded at the end (`PvDoorSection.strip`, `.folded`) |
+| FAQ should open smoothly, "a tab should feel like a tab" | `AnimatedSize` on the answer, the + turns 45°, the tap hums |
+| The locker will clutter; the articles under it sink; a report page wastes space; no time on files; the note looks empty; no way to add more files; the sheet line looks purple; the disabled Save is purple; no share/download | add row FIRST; rows under month headings; the newest five, then "All reports · N ›" → `ScanReportsAllScreen` (search, scan pills); the report page = details block (report date · added with time · scan) + a NOTE block that is never empty + a 3-across files grid (one file = one square) + Edit / Remove pills; Edit details gains "Add more files"; Share in both viewers' top bars (files are already in Supabase Storage when signed in — `resolve()` fetches them on another phone); the sheet line in `ppSoft`; disabled pills grey |
+| Onboarding's due-date picker is the old Material dialog | `showPvDateSheet` (`lib/widgets/pv_date_sheet.dart`) — the inline month grid, shared with the scan timeline; onboarding eyebrows in ink, "Good to know" un-boxed, the reminders switch in ink |
+
+**Round three (2026-09-19 evening):** "Before any scan" back to a plain
+section at the end (the user: "it was better before"; `folded`/`strip`
+stay on the model); the myth tile reaches its photo; photos on all 27
+findings and 20 conditions (tone placeholders from the CC0 pool — a photo
+per finding is a content job); contents, references and FAQ all unfold
+with motion and hum; the locker's time in 12-hour; the "Next: today 6pm"
+pill off the consult list; **the one doctor page** (STILL-OPEN §63.16).
+**My reports — option A, chosen:** the tab is an entry — "+ Add a report"
+and "Your reports · N" with the last-added line — and the list, search,
+scan pills, month groups and add all live in `ScanReportsAllScreen`. The
+two articles stay in view at any count. (B added the newest one on the
+tab; C was the capped list. Mobbin: Superpower, Fi, Apple Health, Claude's
+"1 file" pill — none puts records on a page about something else.) An
+unnamed report is "Report · 19 Sep". The decoder's and Complications'
+rows carry their photos (`PvDoorRow.imageUrl`). Reviews' stars are drawn
+icons in ink. The Prepare confirm/success sheet is the base UI (shared by
+every Prepare booking, so the course and masterclass tails pick it up).
+
+**Round four — the foot.** The user: "so much white space at the bottom
+of every scroll." Two causes, both in the door sheet: a full-viewport
+minimum height (written for the old tinted field; the ground is white
+now, so it bought nothing) and a 234pt foot inset (the FAB's RAISED
+reserve, for the Today tab's dev pill). With the Ask Veda FAB off for
+now (`FabState.kAskFabEnabled`, the user's call pending the FAB
+discussion) the foot is 24pt on both door families. The one violet left
+on the door — the Up-next eyebrow — is ink.
+
+**Mobbin, this round:** Bluesky / Shopify (getting-started strip) · Fi / Apple Health (records under date headings, flat) · Superpower (the full records screen: search + filter) · Visible (a Note block with Edit inline) · Careem / Booking / Craft / Dropbox (files as a grid of squares) · GoodRx (specific list, then "Related · N").
 
 **Mobbin, this door:** Flo "seek immediate medical help if" (the warning
 form) · GoodRx / Apple Health / CVS (list rows) · Rodeo / Todoist / Alta /

@@ -26,6 +26,128 @@
 // Openverse with `source=stocksnap` (CC0, served clean at 960px); the ten
 // Flickr `_b.jpg` files were fine and stay.
 const Map<String, String> kReadImageUrls = {
+  // The 27 report findings and 20 conditions (`finding_<id>`,
+  // `condition_<id>`) — 2026-09-19, so the decoder's and Complications'
+  // rows carry a picture. Placeholders from the same CC0 pool, chosen for
+  // tone (a woman, a clinic, a newborn), not for the finding; a photo per
+  // finding is a content job for the medical desk.
+  'finding_low_lying_placenta':
+      'https://cdn.stocksnap.io/img-thumbs/960w/40B226DC63.jpg',
+  'finding_breech':
+      'https://cdn.stocksnap.io/img-thumbs/960w/URMURJLZOO.jpg',
+  'finding_nuchal_cord':
+      'https://cdn.stocksnap.io/img-thumbs/960w/CSJVVRW2WA.jpg',
+  'finding_gestational_diabetes':
+      'https://cdn.stocksnap.io/img-thumbs/960w/GXKGNGWFHJ.jpg',
+  'finding_low_fluid':
+      'https://cdn.stocksnap.io/img-thumbs/960w/YTSDRKIDZP.jpg',
+  'finding_preeclampsia':
+      'https://cdn.stocksnap.io/img-thumbs/960w/R0HDABKHWA.jpg',
+  'finding_high_fluid':
+      'https://cdn.stocksnap.io/img-thumbs/960w/ZZLEPU3SIR.jpg',
+  'finding_short_cervix':
+      'https://cdn.stocksnap.io/img-thumbs/960w/9E4A810C8L.jpg',
+  'finding_placental_calcification':
+      'https://cdn.stocksnap.io/img-thumbs/960w/8E0DHVSNK8.jpg',
+  'finding_twin_pregnancy':
+      'https://cdn.stocksnap.io/img-thumbs/960w/4GGMTEBZY9.jpg',
+  'finding_anemia':
+      'https://cdn.stocksnap.io/img-thumbs/960w/0RYWABOQID.jpg',
+  'finding_reduced_movements':
+      'https://cdn.stocksnap.io/img-thumbs/960w/0MLHM34HE1.jpg',
+  'finding_braxton_hicks':
+      'https://cdn.stocksnap.io/img-thumbs/960w/6ENSM2NM1P.jpg',
+  'finding_high_bp':
+      'https://cdn.stocksnap.io/img-thumbs/960w/B6BMB1BLFT.jpg',
+  'finding_placenta_resolved':
+      'https://cdn.stocksnap.io/img-thumbs/960w/HJ8M7LUVLT.jpg',
+  'finding_small_baby':
+      'https://cdn.stocksnap.io/img-thumbs/960w/0B4LRPC8QF.jpg',
+  'finding_large_baby':
+      'https://cdn.stocksnap.io/img-thumbs/960w/MWJBXJDRPO.jpg',
+  'finding_subchorionic_hematoma':
+      'https://cdn.stocksnap.io/img-thumbs/960w/4UF03CU9M7.jpg',
+  'finding_vanishing_twin':
+      'https://cdn.stocksnap.io/img-thumbs/960w/IFKNZQ3CZE.jpg',
+  'finding_marginal_cord':
+      'https://cdn.stocksnap.io/img-thumbs/960w/KN1OCKC4Y2.jpg',
+  'finding_single_umbilical_artery':
+      'https://cdn.stocksnap.io/img-thumbs/960w/5YUFL6LC0E.jpg',
+  'finding_ventriculomegaly':
+      'https://cdn.stocksnap.io/img-thumbs/960w/XTPQ1UMFH1.jpg',
+  'finding_eif':
+      'https://cdn.stocksnap.io/img-thumbs/960w/EDI8LWKSBB.jpg',
+  'finding_soft_markers':
+      'https://cdn.stocksnap.io/img-thumbs/960w/WTWX4BZ4FD.jpg',
+  'finding_fibroids':
+      'https://cdn.stocksnap.io/img-thumbs/960w/6C4YTOELUE.jpg',
+  'finding_group_b_strep':
+      'https://cdn.stocksnap.io/img-thumbs/960w/P9LLUXMARB.jpg',
+  'finding_rh_negative':
+      'https://cdn.stocksnap.io/img-thumbs/960w/9M1HWW2JFV.jpg',
+  'condition_gdm':
+      'https://cdn.stocksnap.io/img-thumbs/960w/ZZLEPU3SIR.jpg',
+  'condition_thyroid':
+      'https://cdn.stocksnap.io/img-thumbs/960w/8E0DHVSNK8.jpg',
+  'condition_anemia':
+      'https://cdn.stocksnap.io/img-thumbs/960w/0RYWABOQID.jpg',
+  'condition_pcos':
+      'https://cdn.stocksnap.io/img-thumbs/960w/6ENSM2NM1P.jpg',
+  'condition_hyperemesis':
+      'https://cdn.stocksnap.io/img-thumbs/960w/HJ8M7LUVLT.jpg',
+  'condition_placenta_previa':
+      'https://cdn.stocksnap.io/img-thumbs/960w/MWJBXJDRPO.jpg',
+  'condition_high_bp':
+      'https://cdn.stocksnap.io/img-thumbs/960w/IFKNZQ3CZE.jpg',
+  'condition_ectopic':
+      'https://cdn.stocksnap.io/img-thumbs/960w/5YUFL6LC0E.jpg',
+  'condition_miscarriage':
+      'https://cdn.stocksnap.io/img-thumbs/960w/EDI8LWKSBB.jpg',
+  'condition_preeclampsia':
+      'https://cdn.stocksnap.io/img-thumbs/960w/6C4YTOELUE.jpg',
+  'condition_placental_abruption':
+      'https://cdn.stocksnap.io/img-thumbs/960w/9M1HWW2JFV.jpg',
+  'condition_iugr':
+      'https://cdn.stocksnap.io/img-thumbs/960w/0DCSAGJ9CM.jpg',
+  'condition_low_amniotic_fluid':
+      'https://cdn.stocksnap.io/img-thumbs/960w/VKCF2FYI3D.jpg',
+  'condition_polyhydramnios':
+      'https://pd.w.org/2023/05/826647086692c87d2.91927625-2048x1367.jpg',
+  'condition_breech':
+      'https://cdn.stocksnap.io/img-thumbs/960w/4UF03CU9M7.jpg',
+  'condition_cervical_incompetence':
+      'https://cdn.stocksnap.io/img-thumbs/960w/0B4LRPC8QF.jpg',
+  'condition_uti':
+      'https://cdn.stocksnap.io/img-thumbs/960w/B6BMB1BLFT.jpg',
+  'condition_piles':
+      'https://cdn.stocksnap.io/img-thumbs/960w/0MLHM34HE1.jpg',
+  'condition_varicose_veins':
+      'https://cdn.stocksnap.io/img-thumbs/960w/4GGMTEBZY9.jpg',
+  'condition_fibroids':
+      'https://cdn.stocksnap.io/img-thumbs/960w/9E4A810C8L.jpg',
+  // The nine scan reads (`scan_<id>`, pvReadFromScan) and the calm read —
+  // added 2026-09-19 so no written row and no scan page opens without a
+  // picture (the user: "use images, don't skip on them").
+  'scan_blood_tests':
+      'https://cdn.stocksnap.io/img-thumbs/960w/9M1HWW2JFV.jpg',
+  'scan_dating_scan':
+      'https://cdn.stocksnap.io/img-thumbs/960w/MU4EHC71DU.jpg',
+  'scan_nt_scan':
+      'https://cdn.stocksnap.io/img-thumbs/960w/ZZLEPU3SIR.jpg',
+  'scan_nipt':
+      'https://cdn.stocksnap.io/img-thumbs/960w/RAW1RLRTM7.jpg',
+  'scan_anomaly_scan':
+      'https://cdn.stocksnap.io/img-thumbs/960w/40B226DC63.jpg',
+  'scan_ogtt':
+      'https://cdn.stocksnap.io/img-thumbs/960w/XRSJ1LVRGM.jpg',
+  'scan_growth_scan':
+      'https://cdn.stocksnap.io/img-thumbs/960w/4UF03CU9M7.jpg',
+  'scan_doppler':
+      'https://cdn.stocksnap.io/img-thumbs/960w/HJ8M7LUVLT.jpg',
+  'scan_gbs':
+      'https://pd.w.org/2023/05/826647086692c87d2.91927625-2048x1367.jpg',
+  'preg_scan_read_calm':
+      'https://cdn.stocksnap.io/img-thumbs/960w/MWJBXJDRPO.jpg',
   'preg_week_read_managing_nausea':
       'https://cdn.stocksnap.io/img-thumbs/960w/B6BMB1BLFT.jpg',
   'preg_week_read_first_scan':
@@ -94,6 +216,63 @@ const Map<String, String> kReadImageUrls = {
 
 /// Read id → licence · source · creator, for the credit line.
 const Map<String, String> kReadImageCredits = {
+  'finding_low_lying_placenta': 'CC0 · stocksnap · Skitter Photo',
+  'finding_breech': 'CC0 · stocksnap · Candace McDaniel',
+  'finding_nuchal_cord': 'CC0 · stocksnap · Matt Bango',
+  'finding_gestational_diabetes': 'CC0 · stocksnap · Matt Bango',
+  'finding_low_fluid': 'CC0 · stocksnap · Candace McDaniel',
+  'finding_preeclampsia': 'CC0 · stocksnap · Candace McDaniel',
+  'finding_high_fluid': 'CC0 · stocksnap · Candace McDaniel',
+  'finding_short_cervix': 'CC0 · stocksnap · Candace McDaniel',
+  'finding_placental_calcification': 'CC0 · stocksnap · Freestocks.org',
+  'finding_twin_pregnancy': 'CC0 · stocksnap · Freestocks.org',
+  'finding_anemia': 'CC0 · stocksnap · Suhyeon Choi',
+  'finding_reduced_movements': 'CC0 · stocksnap · William Stitt',
+  'finding_braxton_hicks': 'CC0 · stocksnap · Brodie Vissers',
+  'finding_high_bp': 'CC0 · stocksnap · Josh Willink',
+  'finding_placenta_resolved': 'CC0 · stocksnap · Freestocks.org',
+  'finding_small_baby': 'CC0 · stocksnap · Mel Elías',
+  'finding_large_baby': 'CC0 · stocksnap · Marcos Moraes',
+  'finding_subchorionic_hematoma': 'CC0 · stocksnap · Freestocks.org',
+  'finding_vanishing_twin': 'CC0 · stocksnap · Arteida MjESHTRI',
+  'finding_marginal_cord': 'CC0 · stocksnap · Direct Media',
+  'finding_single_umbilical_artery': 'CC0 · stocksnap · Oles kanebckuu',
+  'finding_ventriculomegaly': 'CC0 · stocksnap · Direct Media',
+  'finding_eif': 'CC0 · stocksnap · Direct Media',
+  'finding_soft_markers': 'CC0 · stocksnap · Direct Media',
+  'finding_fibroids': 'CC0 · stocksnap · Mali Maeder',
+  'finding_group_b_strep': 'CC0 · stocksnap · Direct Media',
+  'finding_rh_negative': 'CC0 · stocksnap · Negative Space',
+  'condition_gdm': 'CC0 · stocksnap · Candace McDaniel',
+  'condition_thyroid': 'CC0 · stocksnap · Freestocks.org',
+  'condition_anemia': 'CC0 · stocksnap · Suhyeon Choi',
+  'condition_pcos': 'CC0 · stocksnap · Brodie Vissers',
+  'condition_hyperemesis': 'CC0 · stocksnap · Freestocks.org',
+  'condition_placenta_previa': 'CC0 · stocksnap · Marcos Moraes',
+  'condition_high_bp': 'CC0 · stocksnap · Arteida MjESHTRI',
+  'condition_ectopic': 'CC0 · stocksnap · Oles kanebckuu',
+  'condition_miscarriage': 'CC0 · stocksnap · Direct Media',
+  'condition_preeclampsia': 'CC0 · stocksnap · Mali Maeder',
+  'condition_placental_abruption': 'CC0 · stocksnap · Negative Space',
+  'condition_iugr': 'CC0 · stocksnap · Direct Media',
+  'condition_low_amniotic_fluid': 'CC0 · stocksnap · Direct Media',
+  'condition_polyhydramnios': 'CC0 · wordpress · sreejagroups',
+  'condition_breech': 'CC0 · stocksnap · Freestocks.org',
+  'condition_cervical_incompetence': 'CC0 · stocksnap · Mel Elías',
+  'condition_uti': 'CC0 · stocksnap · Josh Willink',
+  'condition_piles': 'CC0 · stocksnap · William Stitt',
+  'condition_varicose_veins': 'CC0 · stocksnap · Freestocks.org',
+  'condition_fibroids': 'CC0 · stocksnap · Candace McDaniel',
+  'scan_blood_tests': 'CC0 · stocksnap · Negative Space',
+  'scan_dating_scan': 'CC0 · stocksnap · Candace McDaniel',
+  'scan_nt_scan': 'CC0 · stocksnap · Candace McDaniel',
+  'scan_nipt': 'CC0 · stocksnap · Negative Space',
+  'scan_anomaly_scan': 'CC0 · stocksnap · Skitter Photo',
+  'scan_ogtt': 'CC0 · stocksnap · Djordje Popovic',
+  'scan_growth_scan': 'CC0 · stocksnap · Freestocks.org',
+  'scan_doppler': 'CC0 · stocksnap · Freestocks.org',
+  'scan_gbs': 'CC0 · wordpress · sreejagroups',
+  'preg_scan_read_calm': 'CC0 · stocksnap · Marcos Moraes',
   'preg_week_read_managing_nausea': 'CC0 · stocksnap · Josh Willink',
   'preg_week_read_first_scan': 'CC0 · stocksnap · Candace McDaniel',
   'preg_week_read_first_trimester': 'CC BY-SA · flickr · viralbus',

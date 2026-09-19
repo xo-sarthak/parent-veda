@@ -58,7 +58,7 @@ Future<List<Attachment>> showAttachmentPicker(BuildContext context, {bool allowP
           // saw it from the scan locker and it did not match.
           Text('Add a report', style: pvFraunces(fontSize: 20, fontWeight: FontWeight.w600, color: ppInk)),
           const SizedBox(height: 4),
-          Text('A photo of the paper, or the PDF', style: ppBody(12.5, color: ppMuted)),
+          Text('A photo of the paper, or the PDF', style: ppBody(12.5, color: ppSoft)), // ppMuted is a lavender grey (2026-09-19)
           const SizedBox(height: 14),
           _row(ctx, Icons.photo_camera_outlined, 'Take a photo', () => _camera(ctx)),
           _row(ctx, Icons.photo_library_outlined, 'Choose photos', () => _gallery(ctx)),

@@ -52,6 +52,7 @@ import '../../models/bracket.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../data/conditions_data.dart' show ConditionsStore;
 import '../../services/scan_reports_store.dart';
+import '../../services/pv_door_strip_store.dart';
 import '../../services/scans_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
@@ -190,6 +191,12 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
 
   final GlobalKey _selectorAnchor = GlobalKey();
 
+  /// Headings of folded sections she has opened this visit.
+  final Set<String> _open = {};
+
+  /// The folded headings, keyed so a strip can scroll to its section.
+  final Map<String, GlobalKey> _stripTargets = {};
+
   /// The second line on a tab's card. Counted, never typed.
   ///
   /// ⚠️ A HAND-WRITTEN COUNT GOES STALE SILENTLY — nothing fails, the number is
@@ -211,6 +218,12 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    PvDoorStripStore.instance.init();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       // ⚠️ THE STORES THE INLINE TOOLS READ, LISTENED TO HERE. The timeline and
@@ -229,6 +242,7 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
         // The list grows by one line per door that renders a stateful tool
         // inline, and forgetting a line looks like a frozen tab.
         ConditionsStore.instance,
+        PvDoorStripStore.instance,
       ]),
       builder: (context, _) {
         final p = V2PaletteStore.instance.current;
@@ -399,10 +413,74 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                   //
                   // (The one-element inner `for` is Dart's only way to bind a
                   // local inside a collection literal; it runs once.)
+                  // ---- the "start here" strip --------------------------
+                  // A folded section marked `strip` is offered up here,
+                  // slim, until dismissed once. See PvDoorSection.strip.
+                  for (final strip in page
+                      .sectionsOf(group.id)
+                      .where((s) => s.strip && !PvDoorStripStore.instance.dismissed(s.heading)))
+                    pvDoorPad(Padding(
+                      padding: const EdgeInsets.only(bottom: 18),
+                      child: _StartHereStrip(
+                        section: strip,
+                        p: p,
+                        onOpen: () {
+                          pvCommitFeedback();
+                          setState(() => _open.add(strip.heading));
+                          // Scroll to the section it stands for.
+                          final ctx = _stripTargets[strip.heading]?.currentContext;
+                          if (ctx != null) {
+                            Scrollable.ensureVisible(ctx,
+                                alignment: 0.1,
+                                duration: const Duration(milliseconds: 360),
+                                curve: Curves.easeOutCubic);
+                          }
+                        },
+                        onDismiss: () {
+                          pvCommitFeedback();
+                          PvDoorStripStore.instance.dismiss(strip.heading);
+                        },
+                      ),
+                    )),
+
                   for (final section in page.sectionsOf(group.id))
                     for (final tiles in [
                       section.tilesFor(widget.pregnancy.currentWeek)
                     ]) ...[
+                    if (section.folded)
+                      pvDoorPad(PvPress(
+                        key: _stripTargets.putIfAbsent(section.heading, () => GlobalKey()),
+                        child: InkWell(
+                          onTap: () {
+                            pvCommitFeedback();
+                            setState(() => _open.contains(section.heading)
+                                ? _open.remove(section.heading)
+                                : _open.add(section.heading));
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: Row(children: [
+                              Expanded(
+                                child: Text(
+                                    '${section.heading}  ·  ${tiles.length}',
+                                    style: pvFraunces(
+                                        fontSize: 21,
+                                        fontWeight: FontWeight.w600,
+                                        height: 1.2,
+                                        letterSpacing: -0.45,
+                                        color: p.ink1)),
+                              ),
+                              AnimatedRotation(
+                                turns: _open.contains(section.heading) ? 0.5 : 0,
+                                duration: const Duration(milliseconds: 180),
+                                child: Icon(Icons.expand_more_rounded,
+                                    color: p.ink2),
+                              ),
+                            ]),
+                          ),
+                        ),
+                      ))
+                    else
                     pvDoorPad(Text(section.heading,
                         style: pvFraunces(
                             fontSize: 21,
@@ -459,11 +537,18 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                       // rail. One layout rule, no per-door flag.
                       else if (tiles.isNotEmpty &&
                           tiles.every(pvDoorTileIsWritten))
-                        pvDoorPad(_ArticleList(
-                          tiles: tiles,
-                          p: p,
-                          onOpen: _openTile,
-                        ))
+                        AnimatedSize(
+                          duration: const Duration(milliseconds: 220),
+                          curve: Curves.easeOutCubic,
+                          alignment: Alignment.topCenter,
+                          child: section.folded && !_open.contains(section.heading)
+                              ? const SizedBox(width: double.infinity)
+                              : pvDoorPad(_ArticleList(
+                                  tiles: tiles,
+                                  p: p,
+                                  onOpen: _openTile,
+                                )),
+                        )
                       else
                       SizedBox(
                         height: kPvRailCardHeight,
@@ -1147,4 +1232,59 @@ class _ArticleList extends StatelessWidget {
         alignment: Alignment.center,
         child: Icon(pvDoorFormatIcon(t.format), size: 22, color: p.ink2),
       );
+}
+
+// =============================================================================
+//  _StartHereStrip — "New here? Four things to read first ›" with an ✕
+// =============================================================================
+
+class _StartHereStrip extends StatelessWidget {
+  const _StartHereStrip(
+      {required this.section, required this.p, required this.onOpen, required this.onDismiss});
+
+  final PvDoorSection section;
+  final V2Palette p;
+  final VoidCallback onOpen;
+  final VoidCallback onDismiss;
+
+  @override
+  Widget build(BuildContext context) {
+    final n = section.tiles.where((t) => !t.comingSoon).length;
+    return Material(
+      color: p.surface,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(14),
+          side: BorderSide(color: p.line)),
+      clipBehavior: Clip.antiAlias,
+      child: Row(children: [
+        Expanded(
+          child: InkWell(
+            onTap: onOpen,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(14, 12, 6, 12),
+              child: Row(children: [
+                Icon(Icons.auto_stories_outlined, size: 18, color: p.ink2),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text('${section.heading}  ·  $n to read first',
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvManrope(
+                          fontSize: 13.5,
+                          fontWeight: FontWeight.w700,
+                          color: p.ink1)),
+                ),
+                Icon(Icons.chevron_right_rounded, size: 18, color: p.ink3),
+              ]),
+            ),
+          ),
+        ),
+        IconButton(
+          onPressed: onDismiss,
+          tooltip: 'Dismiss',
+          icon: Icon(Icons.close_rounded, size: 18, color: p.ink3),
+        ),
+      ]),
+    );
+  }
 }

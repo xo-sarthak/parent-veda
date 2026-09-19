@@ -380,7 +380,7 @@ class _UpNext extends StatelessWidget {
                   fontSize: 10,
                   fontWeight: FontWeight.w800,
                   letterSpacing: 1.3,
-                  color: p.action)),
+                  color: p.ink2)), // was p.action — the last violet on the door (2026-09-19)
           const SizedBox(height: 8),
           Text(scan.name.of(lang),
               style: pvFraunces(

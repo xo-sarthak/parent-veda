@@ -349,6 +349,10 @@ final PvDoorPage kScansDoor = PvDoorPage(
       ],
     ),
 
+    // A plain section at the end, by the user's call (2026-09-19, after
+    // seeing it folded and as a strip: "keep it the way it was before —
+    // it's fine below Last three months"). `folded` and `strip` stay on
+    // the model for a door that needs them.
     PvDoorSection(
       group: kScansTabScan,
       heading: 'Before any scan',

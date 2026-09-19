@@ -33,6 +33,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../../data/reads/read_images.dart';
 
 import '../../data/conditions_data.dart';
 import '../../localization/app_language.dart';
@@ -257,6 +258,7 @@ Widget _conditionRow({
       // words. The reassurance is two lines answering a question she has not
       // asked yet, and it is still there on the page itself.
       blurb: c.plainLine.of(lang),
+      imageUrl: readImageFor('condition_${c.id}'),
       onTap: onTap,
     );
 
