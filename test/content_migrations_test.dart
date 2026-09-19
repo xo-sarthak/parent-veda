@@ -94,6 +94,31 @@ void main() {
     'sponsor_analytics_config': 'the k-anonymity threshold for HR analytics '
         '(0060) — select+update only, and it exists as a row precisely so a '
         'privacy decision can be tightened without a release',
+    // ---- the doctor ledger (0084) ------------------------------------------
+    // Every table here is about the EXPERT'S money, not a family's. The one
+    // that carries a parent is expert_earnings, and only as a booking id the
+    // ledger points at; the name is joined at read time, never copied in.
+    'expert_share_rules': 'the deal (0084) — full CRUD, because a negotiated '
+        'rate is an editorial act and history is protected by effective_from, '
+        'not by forbidding writes',
+    'expert_earnings': 'the ledger (0084) — select+insert+update, NO delete: '
+        'the append-only rule is the whole point. Insert is for manual rows '
+        '(a fixed fee for a video) through add_manual_expert_earning(), which '
+        'refuses a row without a note the doctor can read; update is the '
+        'status walk accrued → payable → paid',
+    'expert_payouts': 'the settlement (0084) — select+insert+update. An admin '
+        'records a transfer through record_expert_payout(), which derives the '
+        'amount from the payable rows rather than trusting a typed number',
+    'expert_videos': 'a film made with a doctor (0084) — a link and a share; '
+        'full CRUD, it is catalogue',
+    'expert_payout_accounts': 'where the money goes (0084) — select+update '
+        'only, so finance can read an account to pay it and flip status to '
+        'verified/rejected, never invent or delete one. Bank details are '
+        'personal data and are granted anyway for the same reason as '
+        'brand_sample_claims: a transfer cannot be made without them',
+    'expert_invites': 'which email may sign in as which expert (0084) — full '
+        'CRUD; the same class of editorial act as partner_accounts, and it '
+        'replaces the SQL step in main_doctor.dart',
   };
 
   /// True when the store reads a VIEW rather than a base table. Views play by

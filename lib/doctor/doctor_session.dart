@@ -112,6 +112,21 @@ class DoctorSession extends ChangeNotifier {
   /// A timeout resolves to "no identity", the same answer as a refusal, so the
   /// doctor sees the sign-in screen and can act. Six seconds because this blocks
   /// a person looking at a spinner, not a background sync.
+  /// Link this account to the expert an admin invited it as (0084:
+  /// expert_invites → claim_expert_invite). Idempotent and silent: called on
+  /// every sign-in, it finds nothing for an already-linked account and that
+  /// is fine. It runs BEFORE resolveFromServer so a first sign-in lands on
+  /// the dashboard rather than on "not an expert, ask us to link it".
+  Future<void> claimInvite() async {
+    if (!SupabaseRepo.isLoggedIn) return;
+    try {
+      await SupabaseRepo.callFunction('claim_expert_invite')
+          .timeout(_resolveDeadline);
+    } catch (e) {
+      debugPrint('[doctor] claim_expert_invite failed: $e');
+    }
+  }
+
   Future<bool> resolveFromServer() async {
     if (!SupabaseRepo.isLoggedIn) return false;
 

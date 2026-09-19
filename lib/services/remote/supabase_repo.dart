@@ -414,6 +414,10 @@ class SupabaseRepo {
     required String stage,
     required String title,
     String? joinUrl,
+    // What the parent paid, recorded ON the booking (0084). The doctor's
+    // ledger reads this and never the catalogue, so a later price change
+    // cannot rewrite what a session was worth when it was booked.
+    int? priceMinor,
   }) async {
     if (userId == null) return false;
     try {
@@ -428,6 +432,7 @@ class SupabaseRepo {
         'p_stage': stage,
         'p_title': title,
         'p_join_url': joinUrl,
+        'p_price_paise': priceMinor,
       });
       return true;
     } catch (_) {
@@ -463,6 +468,21 @@ class SupabaseRepo {
     }
   }
 
+  /// [selectAll] that tells "the server said none" from "the server did not
+  /// answer": null on any failure. For reads whose EMPTY result drives a
+  /// nag the user cannot dismiss (0084's payout account), the difference is
+  /// the whole point.
+  static Future<List<Map<String, dynamic>>?> selectAllOrNull(String table) async {
+    if (userId == null) return null;
+    try {
+      final rows = await _client.from(table).select();
+      return List<Map<String, dynamic>>.from(rows);
+    } catch (e) {
+      debugPrint('[repo] select $table failed: $e');
+      return null;
+    }
+  }
+
   /// Upsert a raw row (no user_id injected) into a table with its own key.
   /// RLS still gates the write. Best-effort.
   static Future<void> upsertRow(
@@ -474,6 +494,25 @@ class SupabaseRepo {
     try {
       await _client.from(table).upsert(data, onConflict: onConflict);
     } catch (_) {/* best-effort */}
+  }
+
+  /// The loud twin of [upsertRow]: true only when the server accepted it.
+  /// For the writes where "best-effort" is the wrong contract — a doctor's
+  /// bank account (0084) must never LOOK saved when RLS refused it, because
+  /// the failure would surface as a payout to nowhere months later.
+  static Future<bool> upsertRowConfirmed(
+    String table,
+    Map<String, dynamic> data, {
+    String? onConflict,
+  }) async {
+    if (userId == null) return false;
+    try {
+      await _client.from(table).upsert(data, onConflict: onConflict);
+      return true;
+    } catch (e) {
+      debugPrint('[repo] upsert $table refused: $e');
+      return false;
+    }
   }
 
   /// Update rows matching every column in [filters]. The mirror of

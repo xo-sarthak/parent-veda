@@ -398,6 +398,7 @@ class BookingStore extends ChangeNotifier with CloudSyncedStore {
       stage: ent.stage.name,
       title: ent.title,
       joinUrl: slot.joinUrl,
+      priceMinor: BookingCatalog.instance.offeringById(slot.offeringId)?.priceMinor,
     );
     if (!granted) return null; // server refused the seat
 

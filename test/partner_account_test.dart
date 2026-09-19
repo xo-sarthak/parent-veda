@@ -18,8 +18,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/care_partner/care_partner_models.dart';
 import 'package:parentveda/care_partner/partner_dashboard_store.dart';
 import 'package:parentveda/doctor/doctor_session.dart';
-import 'package:parentveda/screens/doctor/doctor_home_screen.dart';
-import 'package:parentveda/screens/doctor/doctor_profile_screen.dart';
+// 2026-09-18: the live screens are the *_tab.dart files; the old ones are
+// kept for revert and no longer reachable, so the invariant is held on the
+// screens a partner actually sees.
+import 'package:parentveda/screens/doctor/doctor_home_tab.dart';
+import 'package:parentveda/screens/doctor/doctor_profile_tab.dart';
 import 'package:parentveda/screens/doctor/doctor_referral_kit_screen.dart';
 
 /// A hospital: a real partner with NO expert record. The case that was broken.
@@ -39,6 +42,8 @@ const _doctor = CarePartner(
   status: PartnerStatus.active,
   expertId: 'exp_meera',
 );
+
+void _noTab(DoctorTab _) {}
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -89,8 +94,8 @@ void main() {
       DoctorSession.instance.enterAsPartner(_org.id);
       PartnerDashboardStore.instance.debugSeed(partner: _org);
 
-      await t.pumpWidget(const MaterialApp(
-          home: Scaffold(body: DoctorHomeScreen())));
+      await t.pumpWidget(MaterialApp(
+          home: Scaffold(body: DoctorHomeTab(goTo: _noTab))));
       await t.pump();
 
       expect(find.text('Nova IVF Fertility'), findsWidgets);
@@ -107,7 +112,7 @@ void main() {
       PartnerDashboardStore.instance.debugSeed(partner: _org);
 
       await t.pumpWidget(const MaterialApp(
-          home: Scaffold(body: DoctorProfileScreen())));
+          home: Scaffold(body: DoctorProfileTab())));
       await t.pump();
 
       expect(find.text('Nova IVF Fertility'), findsWidgets);
@@ -124,8 +129,8 @@ void main() {
       DoctorSession.instance.enter('exp_meera');
       PartnerDashboardStore.instance.debugSeed(partner: _doctor);
 
-      await t.pumpWidget(const MaterialApp(
-          home: Scaffold(body: DoctorHomeScreen())));
+      await t.pumpWidget(MaterialApp(
+          home: Scaffold(body: DoctorHomeTab(goTo: _noTab))));
       await t.pump();
       // Resolved from kExperts, so the exact name depends on the catalogue —
       // what matters is that a doctor route still produces a doctor.

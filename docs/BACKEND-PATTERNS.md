@@ -1705,6 +1705,70 @@ must not rewrite what was shipped last month. RLS: select/insert/update on
 `user_id = auth.uid()`, and no delete policy at all. A ledger keeps its rows;
 cancel is a status.
 
+## 16f. A statement is a record, not a report — the doctor's ledger
+
+From the ParentVeda+ rework (2026-09-18, `docs/DOCTOR-APP-AUDIT.md`), built as
+`0084_expert_earnings.sql` and `lib/doctor/doctor_ledger.dart`. The doctor's
+Earnings screen used to be a *report*: every consult booking × the catalogue
+price × a Dart constant `0.80`, recomputed on every open. It looked like
+money and was not — a price change rewrote last month, a negotiated 85% had
+nowhere to live, and a masterclass did not exist as money at all. Four
+general facts came out of replacing it.
+
+**1. Freeze the inputs at the moment of the event.** A statement answers
+"what happened", and the only way to answer that later is to have written it
+down *then*. So `expert_earnings` stores the gross, the rate that applied
+(`share_bps`) and both shares, per row, and never reads a rule again. The
+rule table (`expert_share_rules`) can change freely — a new row with a later
+`effective_from` — because nothing that has already happened depends on it.
+The general form: **if a number is shown to someone as a fact about the
+past, store the inputs, not just the output, and store them when the past
+was the present.** A derived column you can recompute is fine for a cache
+and wrong for a ledger.
+
+**2. Three lifetimes, three tables.** The deal changes when a doctor
+negotiates; the ledger must not change once written; a payout groups many
+ledger rows into one transfer that lands or fails as a unit. Each has a
+different writer and a different reason to exist, so each is a table.
+Folding the rate into the ledger (one table) would have meant a rate change
+is a row edit; folding payouts into the ledger (a `paid_at` column) would
+have lost the transfer reference, the bank last-4 and the ability to net a
+post-payout cancellation against the *next* transfer. The test for "is this
+one table or two" is whether the two things are ever *true at different
+times* — here they always are.
+
+**3. Amounts never change; status walks, reversals are rows.** The ledger's
+one mutable column is `status` (`accrued → payable → paid`), and even that is
+a lifecycle, not an edit. A cancellation writes a **new negative row** with
+`reversal_of` pointing at the original — and if the original was already
+paid, that new row is `payable`, so the money comes back off the next payout
+instead of being clawed from a bank account. The audit trail is the table
+itself. Compare `orders` (§16e): cancel is a status there because an order
+is one thing; a reversal is a row here because money that has moved cannot
+be un-moved, only offset.
+
+**4. Design the record for the eventual process; run the process by hand
+until the automation earns its cost.** Payouts are manual — an admin makes
+the NEFT and calls `record_expert_payout()` with the UTR — because no
+inbound money exists yet, the rates are placeholders, per-doctor KYC is its
+own product, and ten doctors is a spreadsheet. But `expert_payouts.method`
+already admits `razorpay_route` and `reference` already holds a transfer id,
+so switching on Route later adds a **writer** (a webhook inserting the same
+row), not a migration and not a screen change. The doctor's app never learns
+the difference. Note also what "manual" does *not* mean here: the amount is
+never typed. `record_expert_payout()` derives it from the payable rows, so
+an admin who transferred a different sum has made an error the system
+cannot express — the CLAUDE.md rule "money is decided server-side" holds
+under a manual process as much as an automatic one.
+
+Two smaller things worth carrying. The trigger on `booking_bookings` means
+the ledger **cannot be forgotten** by a future writer of bookings — the
+alternative, "remember to call accrue() after book_slot()", is the shape of
+bug this repo has hit with `timing_ownership`. And the counterparty (the
+parent's name) is **joined at read time** from the booking, never copied into
+the ledger: a name change does not strand the statement, and no family data
+is duplicated into a table the CMS role can read.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
@@ -1753,3 +1817,7 @@ cancel is a status.
     → `lib/services/pv_order_store.dart` — the server prices the cart and marks
     the one case it could not; the payment sets the status; orders are rows
     with snapshots, not a blob (§16e).
+22. `0084_expert_earnings.sql` → `lib/doctor/doctor_ledger.dart` — a statement
+    is a record, not a report: inputs frozen per row, three lifetimes in
+    three tables, reversals as rows, manual payouts over a Route-shaped
+    record (§16f).

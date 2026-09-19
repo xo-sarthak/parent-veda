@@ -1,7 +1,10 @@
 // =============================================================================
 //  DoctorAuthScreen — the way into ParentVeda+.
 // -----------------------------------------------------------------------------
-//  Email and password. Nothing else.
+//  Email, then a six-digit code from the email. Nothing to invent, nothing to
+//  remember. (Slack's "logging in" flow, Mobbin audit #8; the user's call,
+//  2026-09-18.) Password stays as the quiet fallback for an account that has
+//  one — it is a link under the button, not the default.
 //
 //  WHAT IS DELIBERATELY ABSENT, because the parent auth flow has all of it and
 //  none of it belongs here: no role picker, no due date, no stage selector, no
@@ -13,44 +16,32 @@
 //  of who you are. Here the account IS the identity. Sign in, and the server
 //  answers who you are from expert_accounts (see DoctorSession.resolveFromServer).
 //
+//  HOW A DOCTOR GETS IN WITHOUT ANYONE TYPING SQL. An admin writes their email
+//  against their expert id in expert_invites (0084). The code proves they own
+//  that email; claim_expert_invite() then links expert_accounts; resolve finds
+//  it. The user described this as "we feed the email in the back end, they
+//  just log in" — that is exactly what it is, with the proof of ownership
+//  being the code rather than nothing.
+//
 //  So this screen cannot make you a doctor. It can only let a doctor in. If the
 //  account has no expert record, it says so plainly rather than offering a list
 //  to pick from — the honest failure, and the one that keeps the door shut.
+//
+//  ⚠️ DASHBOARD DEPENDENCY: the code arrives through Supabase's **Magic Link**
+//  email template, which must contain {{ .Token }} — the same trap
+//  docs/AUTH-SETUP.md §3b describes for Reset Password. Without it the email
+//  arrives with no code and nothing on this side can tell.
+//
+//  Kept for revert: the previous build was email + password only, with the
+//  fields in ppPanel and a violet-filled button; the password path below is
+//  that build, restyled.
 // =============================================================================
 
 import 'package:flutter/material.dart';
-
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../doctor/doctor_session.dart';
-import '../post_pregnancy/pp_common.dart';
-import '../../theme/pv_fonts.dart';
-
-// ---- palette -----------------------------------------------------------------
-// This screen used to carry its own deep-slate/teal scheme, on the argument
-// that a clinician should never wonder which app they are in. Sound argument,
-// but it was true of this screen ALONE: every doctor screen behind it already
-// used the ParentVeda tokens, so the app changed colour at sign-in — which
-// reads as a half-finished build rather than as a second product.
-//
-// So the aliases below now point at the shared palette instead. The names stay
-// (`_accent`, `_muted`) because they describe the ROLE the colour plays here,
-// and one line per role is a cheaper place to change a decision than forty
-// call sites.
-//
-// Kept for revert — the original slate scheme:
-//   const _bg = Color(0xFF101418);
-//   const _panel = Color(0xFF181D23);
-//   const _line = Color(0xFF262C34);
-//   const _ink = Color(0xFFF2F5F8);
-//   const _muted = Color(0xFF8A94A0);
-//   const _accent = Color(0xFF3FA9A0);
-const _bg = ppBg;
-const _panel = ppPanel;
-const _line = ppBorder;
-const _ink = ppTitleInk;
-const _muted = ppSoft;
-const _accent = ppPurple;
+import 'doctor_chrome.dart';
 
 class DoctorAuthScreen extends StatefulWidget {
   const DoctorAuthScreen({super.key, required this.onSignedIn});
@@ -62,64 +53,91 @@ class DoctorAuthScreen extends StatefulWidget {
   State<DoctorAuthScreen> createState() => _DoctorAuthScreenState();
 }
 
+enum _Step { email, code, password }
+
 class _DoctorAuthScreenState extends State<DoctorAuthScreen> {
   final _email = TextEditingController();
+  final _code = TextEditingController();
   final _password = TextEditingController();
+  _Step _step = _Step.email;
   bool _busy = false;
   String? _error;
+
+  /// Must agree with Authentication → Email → "Email OTP Length" in the
+  /// dashboard (6; the project defaulted to 8 once — AUTH-SETUP §3b).
+  static const _codeLength = 6;
 
   @override
   void dispose() {
     _email.dispose();
+    _code.dispose();
     _password.dispose();
     super.dispose();
   }
 
-  Future<void> _submit() async {
-    final email = _email.text.trim();
-    final password = _password.text;
-    if (email.isEmpty || password.isEmpty) {
-      setState(() => _error = 'Enter your email and password.');
+  String get _emailText => _email.text.trim().toLowerCase();
+
+  bool get _emailLooksRight =>
+      RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(_emailText);
+
+  Future<void> _sendCode() async {
+    if (!_emailLooksRight) {
+      setState(() => _error = 'Enter the email ParentVeda has for you.');
       return;
     }
     setState(() {
       _busy = true;
       _error = null;
     });
-
     try {
-      await Supabase.instance.client.auth
-          .signInWithPassword(email: email, password: password);
+      // shouldCreateUser stays true: a doctor who has never signed into the
+      // parent app has no auth user yet, and the invite is claimed AFTER the
+      // code proves the email. A stranger who types an unknown email gets a
+      // code, gets in, claims nothing, resolves nothing, and is signed out
+      // with the message below — the door stays shut, and nobody can use
+      // this form to test whether a clinician has an account.
+      await Supabase.instance.client.auth.signInWithOtp(email: _emailText);
       if (!mounted) return;
-
-      // TWO STEPS, and the second is the one that matters. Signing in proves
-      // the account; it does not make anyone a doctor. The server decides that,
-      // and an account with no expert record must be told so rather than shown
-      // an empty dashboard it cannot explain.
-      final ok = await DoctorSession.instance.resolveFromServer();
-      if (!mounted) return;
-
-      if (!ok) {
-        await Supabase.instance.client.auth.signOut();
-        if (!mounted) return;
-        setState(() {
-          _busy = false;
-          _error = 'This account is not registered as a ParentVeda expert. '
-              'Ask us to link it, then sign in again.';
-        });
-        return;
-      }
-
-      widget.onSignedIn();
+      setState(() {
+        _busy = false;
+        _step = _Step.code;
+      });
     } on AuthException catch (e) {
-      // Supabase says the same thing for a wrong password and an address that
-      // has never registered. Passed through unchanged on purpose: telling
-      // them apart would turn this form into a way to test whether a given
-      // clinician has an account.
+      if (mounted) setState(() { _busy = false; _error = e.message; });
+    } catch (_) {
       if (mounted) {
         setState(() {
           _busy = false;
-          _error = e.message;
+          _error = 'Could not reach ParentVeda. Check your connection.';
+        });
+      }
+    }
+  }
+
+  Future<void> _verifyCode() async {
+    final code = _code.text.trim();
+    if (code.length != _codeLength) {
+      setState(() => _error = 'Enter the $_codeLength-digit code from the email.');
+      return;
+    }
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      await Supabase.instance.client.auth.verifyOTP(
+        type: OtpType.email,
+        email: _emailText,
+        token: code,
+      );
+      await _afterSignIn();
+    } on AuthException catch (e) {
+      if (mounted) {
+        setState(() {
+          _busy = false;
+          _error = e.message.toLowerCase().contains('expired')
+              ? 'That code has expired. Send a new one.'
+              : 'That code is not right. Check the email and try again.';
         });
       }
     } catch (_) {
@@ -132,151 +150,219 @@ class _DoctorAuthScreenState extends State<DoctorAuthScreen> {
     }
   }
 
+  Future<void> _signInWithPassword() async {
+    final password = _password.text;
+    if (!_emailLooksRight || password.isEmpty) {
+      setState(() => _error = 'Enter your email and password.');
+      return;
+    }
+    setState(() {
+      _busy = true;
+      _error = null;
+    });
+    try {
+      await Supabase.instance.client.auth
+          .signInWithPassword(email: _emailText, password: password);
+      await _afterSignIn();
+    } on AuthException catch (e) {
+      // Supabase says the same thing for a wrong password and an address that
+      // has never registered. Passed through unchanged on purpose.
+      if (mounted) setState(() { _busy = false; _error = e.message; });
+    } catch (_) {
+      if (mounted) {
+        setState(() {
+          _busy = false;
+          _error = 'Could not reach ParentVeda. Check your connection.';
+        });
+      }
+    }
+  }
+
+  /// TWO STEPS after the credential, and the second is the one that matters.
+  /// Signing in proves the account; it does not make anyone a doctor. The
+  /// server decides that, and an account with no expert record must be told
+  /// so rather than shown an empty dashboard it cannot explain.
+  Future<void> _afterSignIn() async {
+    if (!mounted) return;
+    await DoctorSession.instance.claimInvite();
+    final ok = await DoctorSession.instance.resolveFromServer();
+    if (!mounted) return;
+    if (!ok) {
+      await Supabase.instance.client.auth.signOut();
+      if (!mounted) return;
+      setState(() {
+        _busy = false;
+        _step = _Step.email;
+        _code.clear();
+        _error = 'This email is not registered with ParentVeda+. '
+            'If you consult with us, write to partners@parentveda.com and we will add it.';
+      });
+      return;
+    }
+    widget.onSignedIn();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final p = dcP;
     return Scaffold(
-      backgroundColor: _bg,
+      backgroundColor: p.ground,
       body: SafeArea(
-        child: Center(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(24, 32, 24, 32),
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 400),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Center(
-                    child: Container(
-                      width: 62,
-                      height: 62,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: _accent.withValues(alpha: 0.14),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: const Icon(Icons.medical_services_outlined,
-                          size: 30, color: _accent),
+        child: Column(children: [
+          SizedBox(
+            height: 48,
+            child: Row(children: [
+              if (_step != _Step.email)
+                IconButton(
+                  onPressed: _busy
+                      ? null
+                      : () => setState(() {
+                            _step = _Step.email;
+                            _error = null;
+                          }),
+                  icon: Icon(Icons.arrow_back_rounded, color: p.ink1),
+                  tooltip: 'Back',
+                ),
+            ]),
+          ),
+          Expanded(
+            child: ListView(
+              padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+              children: [
+                Row(children: [
+                  Container(
+                    width: 44,
+                    height: 44,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: p.surfaceAlt,
+                      borderRadius: BorderRadius.circular(14),
                     ),
+                    child: Icon(Icons.medical_services_outlined, size: 22, color: p.ink1),
                   ),
-                  const SizedBox(height: 22),
-                  Text(
-                    'ParentVeda+',
-                    textAlign: TextAlign.center,
-                    style: pvJakarta(
-                        fontSize: 30,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.7,
-                        color: _ink),
-                  ),
-                  const SizedBox(height: 7),
-                  Text(
-                    'For doctors, counsellors and partner clinics.',
-                    textAlign: TextAlign.center,
-                    style: pvJakarta(
-                        fontSize: 14, height: 1.5, color: _muted),
-                  ),
-                  const SizedBox(height: 30),
-                  _field(_email, 'Email', 'you@clinic.com',
-                      keyboard: TextInputType.emailAddress),
-                  const SizedBox(height: 14),
-                  _field(_password, 'Password', '', obscure: true),
-                  if (_error != null) ...[
-                    const SizedBox(height: 14),
-                    Container(
-                      padding: const EdgeInsets.all(13),
-                      // Matches the alert panel the Impact screen already
-                      // uses (ppCoralTint on a 40% coral hairline), so a
-                      // warning looks the same in both apps.
-                      decoration: BoxDecoration(
-                        color: ppCoralTint,
-                        borderRadius: BorderRadius.circular(12),
-                        border:
-                            Border.all(color: ppCoral.withValues(alpha: 0.4)),
-                      ),
-                      child: Text(_error!,
-                          style: pvJakarta(
-                              fontSize: 13, height: 1.45, color: ppTitleInk)),
-                    ),
-                  ],
-                  const SizedBox(height: 22),
-                  GestureDetector(
-                    onTap: _busy ? null : _submit,
-                    behavior: HitTestBehavior.opaque,
-                    child: Container(
-                      height: 52,
-                      alignment: Alignment.center,
-                      decoration: BoxDecoration(
-                        color: _busy ? _line : _accent,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: _busy
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                  strokeWidth: 2, color: _muted))
-                          // White on purple. The old near-black ink worked on
-                          // a bright teal; on ppPurple it fails contrast.
-                          : Text('Sign in',
-                              style: pvJakarta(
-                                  fontSize: 15.5,
-                                  fontWeight: FontWeight.w800,
-                                  color: Colors.white)),
-                    ),
-                  ),
-                  const SizedBox(height: 26),
-                  Text(
-                    'Accounts are created by ParentVeda. If you consult with us '
-                    'and cannot sign in, contact your ParentVeda partner manager.',
-                    textAlign: TextAlign.center,
-                    style: pvJakarta(
-                        fontSize: 12, height: 1.55, color: _muted),
-                  ),
+                  const SizedBox(width: 12),
+                  Text('ParentVeda+', style: dcStrong(17)),
+                ]),
+                const SizedBox(height: 28),
+                ...switch (_step) {
+                  _Step.email => _emailStep(p),
+                  _Step.code => _codeStep(p),
+                  _Step.password => _passwordStep(p),
+                },
+                if (_error != null) ...[
+                  const SizedBox(height: 16),
+                  DcNotice(_error!, problem: true),
                 ],
-              ),
+              ],
             ),
           ),
-        ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
+            child: Column(mainAxisSize: MainAxisSize.min, children: [
+              ObPrimary(
+                p: p,
+                label: _busy
+                    ? 'One moment…'
+                    : switch (_step) {
+                        _Step.email => 'Send me a code',
+                        _Step.code => 'Sign in',
+                        _Step.password => 'Sign in',
+                      },
+                onTap: _busy
+                    ? null
+                    : switch (_step) {
+                        _Step.email => _sendCode,
+                        _Step.code => _verifyCode,
+                        _Step.password => _signInWithPassword,
+                      },
+              ),
+              const SizedBox(height: 10),
+              if (_step == _Step.email)
+                TextButton(
+                  onPressed: _busy ? null : () => setState(() { _step = _Step.password; _error = null; }),
+                  child: Text('Use a password instead', style: dcStrong(14, color: p.action)),
+                )
+              else if (_step == _Step.code)
+                TextButton(
+                  onPressed: _busy ? null : _sendCode,
+                  child: Text('Send a new code', style: dcStrong(14, color: p.action)),
+                )
+              else
+                TextButton(
+                  onPressed: _busy ? null : () => setState(() { _step = _Step.email; _error = null; }),
+                  child: Text('Sign in with a code instead', style: dcStrong(14, color: p.action)),
+                ),
+            ]),
+          ),
+        ]),
       ),
     );
   }
 
-  Widget _field(TextEditingController c, String label, String hint,
-      {bool obscure = false, TextInputType? keyboard}) {
-    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(label.toUpperCase(),
-          style: pvJakarta(
-              fontSize: 11,
-              fontWeight: FontWeight.w800,
-              letterSpacing: 0.7,
-              color: _muted)),
-      const SizedBox(height: 7),
-      TextField(
-        controller: c,
-        obscureText: obscure,
-        keyboardType: keyboard,
-        autocorrect: false,
-        enableSuggestions: false,
-        style: pvJakarta(fontSize: 15, color: _ink),
-        onSubmitted: (_) => _submit(),
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: pvJakarta(
-              fontSize: 15, color: _muted.withValues(alpha: 0.55)),
-          filled: true,
-          fillColor: _panel,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(13),
-            borderSide: const BorderSide(color: _line),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(13),
-            borderSide: const BorderSide(color: _accent, width: 1.6),
-          ),
+  List<Widget> _emailStep(dynamic p) => [
+        Text('Sign in', style: dcTitle(32)),
+        const SizedBox(height: 8),
+        Text(
+          'For doctors, counsellors and partner clinics. Enter the email ParentVeda has for you and we will send a code.',
+          style: dcMeta(15),
         ),
-      ),
-    ]);
-  }
+        const SizedBox(height: 24),
+        DcInput(
+          label: 'Email',
+          controller: _email,
+          hint: 'you@clinic.com',
+          keyboard: TextInputType.emailAddress,
+          autofocus: true,
+          onSubmitted: (_) => _sendCode(),
+        ),
+        const SizedBox(height: 20),
+        Text(
+          'Accounts are created by ParentVeda. If you consult with us and cannot sign in, write to partners@parentveda.com.',
+          style: dcMeta(13, color: p.ink3),
+        ),
+      ];
+
+  List<Widget> _codeStep(dynamic p) => [
+        Text('Check your email', style: dcTitle(32)),
+        const SizedBox(height: 8),
+        Text.rich(TextSpan(children: [
+          TextSpan(text: 'We sent a $_codeLength-digit code to ', style: dcMeta(15)),
+          TextSpan(text: _emailText, style: dcStrong(15)),
+          TextSpan(text: '. It expires in an hour.', style: dcMeta(15)),
+        ])),
+        const SizedBox(height: 24),
+        DcInput(
+          label: 'Code',
+          controller: _code,
+          hint: '••••••',
+          keyboard: TextInputType.number,
+          autofocus: true,
+          onSubmitted: (_) => _verifyCode(),
+        ),
+        const SizedBox(height: 20),
+        Text(
+          'Nothing there? Check spam, or send a new code below.',
+          style: dcMeta(13, color: p.ink3),
+        ),
+      ];
+
+  List<Widget> _passwordStep(dynamic p) => [
+        Text('Sign in with a password', style: dcTitle(32)),
+        const SizedBox(height: 8),
+        Text('For accounts that were set up with one.', style: dcMeta(15)),
+        const SizedBox(height: 24),
+        DcInput(
+          label: 'Email',
+          controller: _email,
+          hint: 'you@clinic.com',
+          keyboard: TextInputType.emailAddress,
+        ),
+        const SizedBox(height: 14),
+        DcInput(
+          label: 'Password',
+          controller: _password,
+          obscure: true,
+          onSubmitted: (_) => _signInWithPassword(),
+        ),
+      ];
 }

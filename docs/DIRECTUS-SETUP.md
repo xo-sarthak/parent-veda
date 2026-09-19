@@ -433,16 +433,56 @@ must never invent hours for them.
         → refuses unless the paperwork is complete and unexpired
 4. Expert Profiles → Create          expert_id, partner_id, name, credential,
    (only if they consult)            fee_paise, takes_consults, status published
-5. SQL: link their login
+5. Expert Invites → Create           email, expert_id          (0084)
+   The doctor signs into ParentVeda+ with that email; the code proves they
+   own it; claim_expert_invite() links expert_accounts. No SQL.
+   (The old step, kept for an account that must be linked by hand:
         insert into public.expert_accounts (user_id, expert_id)
         values ((select id from auth.users where email='...'), 'meera')
-        on conflict (user_id) do update set expert_id = excluded.expert_id;
+        on conflict (user_id) do update set expert_id = excluded.expert_id;)
 6. They set their own hours in ParentVeda+.
 ```
 
-Steps 1, 2 and 4 become forms. **3 and 5 stay SQL on purpose** — both are
-audited acts (approving someone, and granting a login the power to see
-patients), and both should remain deliberate rather than a checkbox.
+Steps 1, 2, 4 and 5 become forms. **3 stays SQL on purpose** — approving
+someone is an audited act and should remain deliberate rather than a
+checkbox. Step 5 stopped being SQL on 2026-09-18: an invite is the same class
+of editorial act as `partner_accounts`, and the proof of ownership is the
+email code, not the person typing the insert.
+
+### The doctor's money — `0084`, the ledger
+
+Register: `expert_share_rules`, `expert_earnings`, `expert_payouts`,
+`expert_videos`, `expert_payout_accounts`, `expert_invites`. The grants are
+already in the migration; this is the panel's side.
+
+| Collection | What the panel does with it | Do NOT |
+|---|---|---|
+| `expert_share_rules` | The deal. `expert_id` empty = the platform default; set = that doctor's negotiated rate. `min_monthly` is the volume tier. To change a rate, **add a row with a later `effective_from`** | edit `share_bps` on a row that has earned against it — history reads the rate that applied then |
+| `expert_earnings` | Read. Filter by `expert_id`, `status`. The only writes are through functions (below) | insert or edit amounts by hand; delete anything |
+| `expert_payouts` | Read; created by `record_expert_payout()` | type an amount — the function derives it |
+| `expert_videos` | A film made with a doctor: `url`, `title`, `share_bps` | — |
+| `expert_payout_accounts` | Finance reads the account to pay it; sets `status` to `verified` or `rejected` (with `reason`) | edit the account details — the doctor owns those; a client edit resets status to pending |
+| `expert_invites` | `email` + `expert_id`. That is onboarding a login | — |
+
+The three admin actions, SQL until §5d turns them into Flows:
+
+```sql
+-- a video's revenue for a month (read from the channel's own reporting)
+select public.accrue_video_earning('vid_…', date '2026-09-01', 40000000, 'Sep 2026 ad revenue');
+
+-- a manual row: a fixed fee, a bonus, anything not a booking. The note is
+-- MANDATORY and the doctor reads it on their receipt.
+select public.add_manual_expert_earning('meera', 'other', 'Panel review, Sep',
+  now(), 500000, 10000, 'Fixed fee for reviewing the sleep articles');
+
+-- after the NEFT is made: gathers every payable row up to the date, creates
+-- the payout with their SUM, marks them paid. Raises if nothing is payable.
+select public.record_expert_payout('meera', date '2026-09-30', 'UTR…', 'manual_neft', '1234');
+```
+
+⚠️ **The seeded rates are placeholders** (every row's `note` says so). The
+Commercial Terms workbook replaces them when the user finds it — as new rows
+with a later `effective_from`, not edits.
 
 ### Creating a masterclass, end to end
 

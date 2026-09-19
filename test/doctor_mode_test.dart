@@ -46,8 +46,10 @@ void main() {
   testWidgets('the doctor dashboard renders for the logged-in expert',
       (tester) async {
     await pump(tester);
-    expect(find.textContaining('Dr. Neha'), findsWidgets);
-    expect(find.text('UPCOMING CALLS'), findsOneWidget);
+    // The 2026-09-18 Home greets by first name and puts the credential
+    // beneath; the old 'UPCOMING CALLS' eyebrow became 'Today' / 'Next up'.
+    expect(find.textContaining('Dr Neha'), findsWidgets);
+    expect(find.textContaining('This week'.toUpperCase()), findsOneWidget);
   });
 
   // An unknown expert id used to return allDoctors().first — a REAL other
