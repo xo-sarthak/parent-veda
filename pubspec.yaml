@@ -243,6 +243,9 @@ flutter:
     - assets/blocks/
     - assets/brand/
     - assets/brand/partners/
+    # ParentVeda+ Home hero: three CC0 photographs (morning / afternoon /
+    # evening), credits in lib/doctor/doctor_hero_images.dart.
+    - assets/doctor/
 
   # To add assets to your application, add an assets section, like this:
   # assets:

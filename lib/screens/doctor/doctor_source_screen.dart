@@ -68,8 +68,12 @@ class _DoctorSourceScreenState extends State<DoctorSourceScreen> {
             // and "you keep 0%" is a claim, not an absence. Walked 2026-09-18.
             Text(
               l.rateFor(src) > 0
-                  ? 'You keep ${dcPercent(l.rateFor(src))} of ${src.gross.toLowerCase()}. '
-                      'The rest covers the platform, payments, support and the app.'
+                  ? (src.hasOwnCodeRate && l.ownCodeRateFor(src) > 0
+                      ? 'You keep ${dcPercent(l.rateFor(src))} of a sale ParentVeda brings and '
+                          '${dcPercent(l.ownCodeRateFor(src))} of one your own code brings. '
+                          'The rest covers the platform, payments, support and the app.'
+                      : 'You keep ${dcPercent(l.rateFor(src))} of ${src.gross.toLowerCase()}. '
+                          'The rest covers the platform, payments, support and the app.')
                   : 'Your share of ${src.gross.toLowerCase()} is shown here once it is set. '
                       'Every line below carries the rate that applied to it.',
               style: dcMeta(13.5, color: p.ink2),
@@ -114,6 +118,7 @@ class _DoctorSourceScreenState extends State<DoctorSourceScreen> {
                     title: r.headline,
                     subtitle: '${dcDayDate(r.occurredAt)}'
                         '${r.source == EarningSource.consultation ? ' · ${dcTime(r.occurredAt)}' : ''}'
+                        '${r.channel == EarningChannel.ownCode ? ' · your code' : ''}'
                         ' · ${r.status.label}',
                     trailingText: dcRupees(r.expertPaise),
                     trailingSub: r.status == EarningStatus.reversed ? 'not counted' : null,
@@ -147,7 +152,8 @@ Future<void> showReceipt(BuildContext context, EarningRow r) {
       DcCard(
         padding: const EdgeInsets.fromLTRB(16, 6, 16, 8),
         child: Column(children: [
-          DcReceiptLine(r.source.gross, dcRupees(r.grossPaise)),
+          DcReceiptLine(r.source.gross, dcRupees(r.grossPaise),
+              note: r.channel == EarningChannel.ownCode ? 'Brought by your own code.' : null),
           Divider(height: 1, color: p.line),
           DcReceiptLine(
             'ParentVeda fee ($feePct)',

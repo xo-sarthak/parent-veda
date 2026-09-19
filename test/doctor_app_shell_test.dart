@@ -173,10 +173,36 @@ void main() {
       }
     });
 
-    test('the sources agree on both sides', () {
-      const sources = ['consultation', 'masterclass', 'cohort', 'course', 'video', 'referral', 'other'];
-      expect(sql, contains("check (source in ('${sources.join("','")}'))"));
+    test('the sources agree on both sides (0085 widened them)', () {
+      const sources = ['consultation', 'masterclass', 'cohort', 'course', 'video', 'article', 'affiliate', 'sponsorship', 'product', 'referral', 'other'];
+      final sql85 = _read('supabase/migrations/0085_expert_share_rates.sql');
+      // 0085 writes the list across two lines; compare without whitespace.
+      final flat = sql85.replaceAll(RegExp(r'\s+'), '');
+      expect(flat, contains("check(sourcein('${sources.join("','")}'))"));
       expect(EarningSource.values.map((e) => e.name).toList(), sources);
+    });
+
+    test('0085 carries the workbook, and the workbook corrected 13.0', () {
+      final sql85 = _read('supabase/migrations/0085_expert_share_rates.sql');
+      // Consultations: a flat 80%, and no 85% tier anywhere in the real rows.
+      expect(sql85, contains("('consultation', 'platform', 0, 8000,"));
+      expect(sql85, isNot(contains('8500')));
+      // Recorded courses: 30% through ours, 55% through the doctor's code.
+      expect(sql85, contains("('course',       'platform', 0, 3000,"));
+      expect(sql85, contains("('course',       'own_code', 0, 5500,"));
+      // Live courses 55%, content 20%, sponsorship 35%, products 10%.
+      expect(sql85, contains("('masterclass',  'platform', 0, 5500,"));
+      expect(sql85, contains("('video',        'platform', 0, 2000,"));
+      expect(sql85, contains("('sponsorship',  'platform', 0, 3500,"));
+      expect(sql85, contains("('product',      'platform', 0, 1000,"));
+      // No placeholder survives with an open end.
+      expect(sql85, contains("where note like 'PLACEHOLDER%'"));
+      // The arity trap: every changed signature is dropped first.
+      for (final fn in const ['resolve_share_bps', 'write_expert_earning', 'my_earnings', 'my_share_rates', 'add_manual_expert_earning']) {
+        expect(sql85, contains('drop function if exists public.$fn('), reason: '$fn re-created without dropping the old arity');
+      }
+      // The client reads the channel the SQL now returns.
+      expect(_read('lib/doctor/doctor_ledger.dart'), contains("j['channel']"));
     });
   });
 

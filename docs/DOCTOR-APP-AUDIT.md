@@ -330,6 +330,45 @@ row flips to built.
 | Shell | `doctor_scaffold.dart` | Five tabs on `PvNavBar`. |
 | Tests | `test/doctor_app_shell_test.dart` · `test/doctor_tabs_render_test.dart` | Reachability, the RPC/column contract against the SQL, no-money-on-the-phone, formatting, every tab at 360dp logged out. `content_migrations_test` allow-list carries the six tables with reasons. |
 | Docs | BACKEND-PATTERNS §16f · DIRECTUS-SETUP §4c · STILL-OPEN §5.4, §13.0 | |
+| The real rates (2026-09-19) | `supabase/migrations/0085_expert_share_rates.sql` | The Commercial Terms table replaces the placeholders; `channel` added; sources widened to articles, affiliate, sponsorship, products. **Written, not run.** |
+| The hero (2026-09-19) | `doctor_chrome.dart` (`DcHero`) · `doctor_hero_images.dart` · `assets/doctor/` · `doctor_session.dart` (`profile`) · `doctor_home_tab.dart` | §7 below. Not walked. |
+| Demo seed | `supabase/seed/doctor_demo.sql` | A sample doctor's month through the real writers. |
 
-**Owed** — STILL-OPEN §5.4a–i. The two that gate a demo: run `0084`, and
+**Owed** — STILL-OPEN §5.4a–j. The two that gate a demo: run `0084`, and
 put `{{ .Token }}` in the Magic Link template.
+
+---
+
+## 7. Audit #8b — the Home hero (2026-09-19)
+
+**The ask.** "Look around the initial home screens for doctors' apps … using
+images and everything to make it seem more real, rather than a bland screen."
+
+**Asked.** Two screen queries, nineteen results: provider/professional homes
+with a hero (Jobber, Fiverr, Remote, Deel, Instagram professional, Alan,
+Bloom, pliability) and photo-band homes (Calm, Air NZ, Zopa, TIDE, Airbnb
+host, Delta, Chick-fil-A, Locals, Hulu, IMDb, Luma).
+
+| Reference | The move |
+|---|---|
+| [Calm](https://mobbin.com/screens/6c340b3f-2d75-4bb9-aeba-0583bed57f5d) · [Air NZ](https://mobbin.com/screens/dca9e16d-2652-40e1-9bd3-e822ff85260d) | A photo band at the top carries the greeting; the first card overlaps its bottom edge. |
+| [Zopa](https://mobbin.com/screens/ba5fe1a7-45ab-4b8b-befe-0732d1b687ee) | A photo of a person doing the thing, with the number card overlapping. |
+| [Jobber](https://mobbin.com/screens/3872fb82-2e8f-41fe-b587-e1063401f155) | The context of the work (a map) behind the greeting. |
+| [Airbnb host](https://mobbin.com/flows/44b957df-0c8c-4a6d-bcd1-1ab5b5c33f36) · [Bloom](https://mobbin.com/screens/b10a526a-1b46-47f9-b118-c9163727604e) | A soft photograph of a place behind the next-steps cards; no faces. |
+| [pliability](https://mobbin.com/screens/eaebf242-70e3-4b84-a353-bada351e8ace) · [Fiverr](https://mobbin.com/screens/51435e24-2522-477a-94d0-7f784f91e3a4) | The person's own photo, large, beside their name. |
+
+**Declined.** Full-bleed dark photo homes (TIDE, Locals, Hulu), promotional
+heroes (Delta, Chick-fil-A), stat grids full of dashes (Fiverr's "—").
+
+**Adopted.** `DcHero`: a photograph of a place for the hour (three CC0
+StockSnap photos — a window, a desk, a lamp; no stethoscope, no laptop, no
+face), an ink scrim (never violet), the date, the greeting, ONE information
+line ("2 consultations today · next at 5:00 pm" — the parent hero's rule
+that the information is the hero), her own photograph top-right with her
+initial as the fallback, and the first card overlapping the band by 28pt.
+Plus "How parents see you": her public card as the parent directory
+renders it, the About text a tap away, read-only. Three photos not one, by
+the parent hero's own argument: the same band every morning is wallpaper by
+the second week.
+
+**Owed.** STILL-OPEN §5.4j.

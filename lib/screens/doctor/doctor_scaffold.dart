@@ -121,7 +121,11 @@ class _DoctorScaffoldState extends State<DoctorScaffold>
     };
     return Scaffold(
       backgroundColor: dcP.ground,
-      body: SafeArea(bottom: false, child: body),
+      // Home carries a full-bleed photo band that runs under the status bar
+      // (DcHero pads itself by the real inset); every other tab starts below
+      // it. SafeArea would strip the inset from MediaQuery and leave a white
+      // strip above the photograph.
+      body: SafeArea(bottom: false, top: _tab != DoctorTab.home, child: body),
       bottomNavigationBar: PvNavBar(
         items: _items,
         activeIndex: _tab.index,

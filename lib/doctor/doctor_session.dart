@@ -13,9 +13,62 @@
 //  expert-accounts mapping), and the testing entry is removed.
 // =============================================================================
 
+import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/remote/supabase_repo.dart';
+
+/// What a PARENT sees of this doctor — the `expert_profiles` row (0072),
+/// which is public-read. Held on the session so the Home can show her own
+/// photograph and the "how parents see you" card without the parent-side
+/// catalogue (`Expert` has no photo field; adding one is the parent
+/// terminal's file). Null until the server has answered once; cached after.
+class DoctorPublicProfile {
+  const DoctorPublicProfile({
+    required this.expertId,
+    required this.name,
+    required this.credential,
+    required this.category,
+    required this.location,
+    required this.blurb,
+    required this.photoUrl,
+    required this.feeInr,
+    required this.rating,
+    required this.takesConsults,
+  });
+  final String expertId;
+  final String name;
+  final String credential;
+  final String category;
+  final String location;
+  final String blurb;
+  final String? photoUrl;
+  final int feeInr;
+  final double rating;
+  final bool takesConsults;
+
+  factory DoctorPublicProfile.fromRow(Map r) => DoctorPublicProfile(
+        expertId: (r['expert_id'] ?? '').toString(),
+        name: (r['name'] ?? '').toString(),
+        credential: (r['credential'] ?? '').toString(),
+        category: (r['category'] ?? '').toString(),
+        location: (r['location'] ?? '').toString(),
+        blurb: (r['blurb'] ?? '').toString(),
+        photoUrl: (r['photo_url'] as String?)?.trim().isEmpty ?? true ? null : (r['photo_url'] as String).trim(),
+        feeInr: (r['fee_inr'] as num?)?.toInt() ?? 0,
+        rating: (r['rating'] as num?)?.toDouble() ?? 0,
+        takesConsults: r['takes_consults'] != false,
+      );
+
+  Map<String, dynamic> toRow() => {
+        'expert_id': expertId, 'name': name, 'credential': credential,
+        'category': category, 'location': location, 'blurb': blurb,
+        'photo_url': photoUrl, 'fee_inr': feeInr, 'rating': rating,
+        'takes_consults': takesConsults,
+      };
+}
 
 class DoctorSession extends ChangeNotifier {
   DoctorSession._();
@@ -39,6 +92,40 @@ class DoctorSession extends ChangeNotifier {
   bool _active = false;
   String? _expertId;
   String? _partnerId;
+
+  DoctorPublicProfile? _profile;
+  /// The doctor's own public card, or null until known. See [loadProfile].
+  DoctorPublicProfile? get profile => _profile;
+
+  /// Fetches this expert's `expert_profiles` row — public-read, so a plain
+  /// select — and caches it. Called after a resolve and by the Home's pull.
+  /// A failure keeps the cache; a cache miss keeps null, and the hero shows
+  /// the initial instead of a photograph. Never a crash.
+  Future<void> loadProfile() async {
+    final id = _expertId;
+    if (id == null || id.isEmpty) return;
+    if (_profile == null || _profile!.expertId != id) {
+      try {
+        final sp = await SharedPreferences.getInstance();
+        final raw = sp.getString('doctor_profile_$id');
+        if (raw != null) {
+          _profile = DoctorPublicProfile.fromRow(jsonDecode(raw) as Map);
+          notifyListeners();
+        }
+      } catch (_) {}
+    }
+    if (!SupabaseRepo.isLoggedIn) return;
+    final rows = await SupabaseRepo.selectAllOrNull('expert_profiles');
+    if (rows == null) return;
+    final mine = rows.where((r) => r['expert_id'] == id).toList();
+    if (mine.isEmpty) return;
+    _profile = DoctorPublicProfile.fromRow(mine.first);
+    try {
+      final sp = await SharedPreferences.getInstance();
+      await sp.setString('doctor_profile_$id', jsonEncode(_profile!.toRow()));
+    } catch (_) {}
+    notifyListeners();
+  }
 
   /// True while the app should show the doctor experience.
   bool get active => _active;
@@ -142,6 +229,8 @@ class DoctorSession extends ChangeNotifier {
         _expertId = expertId;
         _partnerId = null;
         notifyListeners();
+        // Not awaited: the card is a nicety, the dashboard is the point.
+        loadProfile();
         return true;
       }
     } catch (e) {
@@ -177,6 +266,7 @@ class DoctorSession extends ChangeNotifier {
     _active = false;
     _expertId = null;
     _partnerId = null;
+    _profile = null;
     notifyListeners();
   }
 

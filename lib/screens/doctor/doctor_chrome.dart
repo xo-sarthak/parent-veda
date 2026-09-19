@@ -120,6 +120,11 @@ String dcMonth(DateTime d) => '${_mo[d.month - 1]} ${d.year}';
 
 /// A tab body inside DoctorScaffold: title, optional trailing, scrolling
 /// children. Pull-to-refresh when [onRefresh] is given.
+///
+/// With a [hero], the title row is replaced by the full-bleed photo band and
+/// the FIRST child overlaps the band's bottom edge by [DcHero.overlap] —
+/// Calm's and Air NZ's composition (audit #8b). The overlap is what makes
+/// the page read as one thing rather than a picture with a list under it.
 class DcTab extends StatelessWidget {
   const DcTab({
     super.key,
@@ -128,37 +133,181 @@ class DcTab extends StatelessWidget {
     this.trailing,
     this.onRefresh,
     this.subtitle,
+    this.hero,
   });
   final String title;
   final String? subtitle;
   final Widget? trailing;
   final List<Widget> children;
   final Future<void> Function()? onRefresh;
+  final DcHero? hero;
 
   @override
   Widget build(BuildContext context) {
     final list = ListView(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(20, 14, 20, 40),
+      padding: hero == null
+          ? const EdgeInsets.fromLTRB(20, 14, 20, 40)
+          : const EdgeInsets.only(bottom: 40),
       children: [
-        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(title, style: dcTitle(30)),
-              if (subtitle != null) ...[
-                const SizedBox(height: 4),
-                Text(subtitle!, style: dcMeta(14)),
-              ],
-            ]),
+        if (hero != null) ...[
+          hero!,
+          if (children.isNotEmpty)
+            Transform.translate(
+              offset: const Offset(0, -DcHero.overlap),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: children.first,
+              ),
+            ),
+          Transform.translate(
+            offset: const Offset(0, -DcHero.overlap),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: children.skip(1).toList()),
+            ),
           ),
-          ?trailing,
-        ]),
-        const SizedBox(height: 18),
-        ...children,
+        ] else ...[
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Expanded(
+              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                Text(title, style: dcTitle(30)),
+                if (subtitle != null) ...[
+                  const SizedBox(height: 4),
+                  Text(subtitle!, style: dcMeta(14)),
+                ],
+              ]),
+            ),
+            ?trailing,
+          ]),
+          const SizedBox(height: 18),
+          ...children,
+        ],
       ],
     );
     if (onRefresh == null) return list;
     return RefreshIndicator(onRefresh: onRefresh!, color: dcP.ink1, child: list);
+  }
+}
+
+/// The Home's photo band. A photograph of a place (never a face), an ink
+/// scrim so the words read, the date, the greeting, ONE line of information
+/// — "the information is the hero", the parent app's rule — and the
+/// doctor's own photograph top-right, with her initial when there is none.
+///
+/// The scrim is ink at 0 → 0.58, never the brand colour: a violet wash over
+/// a photograph is the palette thrown at the user, which is the thing the
+/// base-UI rule exists to stop.
+class DcHero extends StatelessWidget {
+  const DcHero({
+    super.key,
+    required this.asset,
+    required this.greeting,
+    required this.dateLine,
+    this.infoLine,
+    this.photoUrl,
+    this.initial,
+    this.onAvatar,
+  });
+  final String asset;
+  final String greeting;
+  final String dateLine;
+  final String? infoLine;
+  final String? photoUrl;
+  final String? initial;
+  final VoidCallback? onAvatar;
+
+  /// The band's height and how far the first card rides up into it.
+  static const double height = 296;
+  static const double overlap = 28;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = dcP;
+    final top = MediaQuery.of(context).padding.top;
+    return SizedBox(
+      height: height + top,
+      child: Stack(fit: StackFit.expand, children: [
+        Image.asset(asset, fit: BoxFit.cover, alignment: Alignment.center,
+            errorBuilder: (_, _, _) => Container(color: p.surfaceAlt)),
+        // Two scrims: a soft one over the whole picture so the photograph
+        // sits back, and a heavier one from the middle down so the words
+        // and the overlapping card have something to stand on.
+        DecoratedBox(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Colors.black.withValues(alpha: 0.18),
+                Colors.black.withValues(alpha: 0.10),
+                Colors.black.withValues(alpha: 0.58),
+              ],
+              stops: const [0, 0.45, 1],
+            ),
+          ),
+        ),
+        Positioned(
+          left: 20,
+          right: 20,
+          top: top + 14,
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Expanded(child: Text(dateLine, style: dcStrong(13.5, color: Colors.white.withValues(alpha: 0.9)))),
+            _Avatar(photoUrl: photoUrl, initial: initial, onTap: onAvatar),
+          ]),
+        ),
+        Positioned(
+          left: 20,
+          right: 20,
+          bottom: overlap + 22,
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(greeting,
+                style: dcTitle(32, color: Colors.white).copyWith(shadows: const [Shadow(color: Color(0x66000000), blurRadius: 12)]),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis),
+            if (infoLine != null && infoLine!.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(infoLine!,
+                  style: dcBody(15, color: Colors.white.withValues(alpha: 0.92), w: FontWeight.w600),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis),
+            ],
+          ]),
+        ),
+      ]),
+    );
+  }
+}
+
+class _Avatar extends StatelessWidget {
+  const _Avatar({this.photoUrl, this.initial, this.onTap});
+  final String? photoUrl;
+  final String? initial;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = dcP;
+    final ring = Container(
+      width: 52,
+      height: 52,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: p.surface,
+        border: Border.all(color: Colors.white, width: 2),
+        boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 10, offset: Offset(0, 3))],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: photoUrl == null
+          ? Center(child: Text((initial ?? '?').toUpperCase(), style: dcNum(22)))
+          : Image.network(
+              photoUrl!,
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => Center(child: Text((initial ?? '?').toUpperCase(), style: dcNum(22))),
+            ),
+    );
+    if (onTap == null) return ring;
+    return InkWell(onTap: onTap, customBorder: const CircleBorder(), child: ring);
   }
 }
 

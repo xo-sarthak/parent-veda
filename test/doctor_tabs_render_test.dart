@@ -93,7 +93,7 @@ void main() {
     await goTo(tester, 'Earnings');
     expect(find.text('WE OWE YOU'), findsOneWidget);
     expect(find.text('₹0'), findsWidgets);
-    for (final s in const ['Consultations', 'Masterclasses', 'Cohorts', 'Courses', 'Videos', 'Referrals']) {
+    for (final s in const ['Consultations', 'Masterclasses', 'Cohorts', 'Recorded courses', 'Videos', 'Articles', 'Affiliate income', 'Brand sponsorship', 'Products', 'Referrals']) {
       await see(tester, find.text(s));
     }
     await see(tester, find.textContaining('No videos yet'));

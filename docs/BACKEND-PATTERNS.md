@@ -1761,6 +1761,19 @@ an admin who transferred a different sum has made an error the system
 cannot express — the CLAUDE.md rule "money is decided server-side" holds
 under a manual process as much as an automatic one.
 
+**A footnote from the day after.** The real rate table arrived (`0085`) and
+corrected two placeholders the wrong way round — recorded courses pay the
+doctor 30%, not 70%; consultations are a flat 80% with no tier. Because the
+rate was a *row* and not a constant, and because nothing had earned against
+the placeholders yet, the fix was: delete the placeholder rows, insert the
+real ones, done. Had a single booking been written, the fix would instead
+have been: close the old rows with `effective_to`, insert the new — and
+every statement already issued would still add up. That is the whole
+argument for storing the rate on the ledger row, made concrete within
+twenty-four hours. `0085` also added a dimension the table lacked, `channel`
+(platform | own_code): a new column with a default, so every existing row
+and every existing caller kept working, and the callers that care pass it.
+
 Two smaller things worth carrying. The trigger on `booking_bookings` means
 the ledger **cannot be forgotten** by a future writer of bookings — the
 alternative, "remember to call accrue() after book_slot()", is the shape of

@@ -134,12 +134,19 @@ class _DoctorEarningsTabState extends State<DoctorEarningsTab> {
             // ---- by source ------------------------------------------------
             const DcSectionHead('By source', title: 'Where it came from'),
             DcRowGroup(children: [
+              // The workbook's order (0085): consultations · live courses ·
+              // recorded courses · content · products. Every row renders,
+              // earned or not — the empty ones are the advertisement.
               for (final src in const [
                 EarningSource.consultation,
                 EarningSource.masterclass,
                 EarningSource.cohort,
                 EarningSource.course,
                 EarningSource.video,
+                EarningSource.article,
+                EarningSource.affiliate,
+                EarningSource.sponsorship,
+                EarningSource.product,
               ])
                 _sourceRow(context, l, src),
               // Referrals: the families count, aggregate only, and the
@@ -207,10 +214,17 @@ class _DoctorEarningsTabState extends State<DoctorEarningsTab> {
   Widget _sourceRow(BuildContext context, DoctorLedger l, EarningSource src) {
     final t = l.summary.forSource(src);
     final rate = l.rateFor(src);
+    final own = l.ownCodeRateFor(src);
     final has = t != null && t.items > 0;
+    // "30% through ParentVeda, 55% through your own code" where both exist.
+    final rateLine = rate <= 0
+        ? null
+        : (src.hasOwnCodeRate && own > 0
+            ? '${dcPercent(rate)} through ParentVeda, ${dcPercent(own)} through your own code'
+            : '${dcPercent(rate)} of ${src.gross.toLowerCase()}');
     final sub = has
-        ? '${t.items} ${t.items == 1 ? 'item' : 'items'} · ${dcPercent(rate)} of ${src.gross.toLowerCase()}'
-        : (rate > 0 ? '${src.emptyLine} You keep ${dcPercent(rate)}.' : src.emptyLine);
+        ? '${t.items} ${t.items == 1 ? 'item' : 'items'} · ${rateLine ?? src.gross.toLowerCase()}'
+        : (rateLine != null ? '${src.emptyLine} You keep $rateLine.' : src.emptyLine);
     return DcRow(
       title: src.label,
       subtitle: sub,

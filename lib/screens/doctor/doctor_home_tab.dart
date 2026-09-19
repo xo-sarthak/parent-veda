@@ -18,6 +18,13 @@
 //  ledger's, the hours are the schedule store's. The old dashboard
 //  (doctor_home_screen.dart) is kept for revert; the stage toggle it carried
 //  for testing now lives under Profile → Developer.
+//
+//  THE HERO (2026-09-19, audit #8b): a photograph of a place for the hour,
+//  the date, the greeting, one line of information, her own photograph, and
+//  the first card overlapping the band — see DcHero and doctor_hero_images.
+//  Plus one new block, "How parents see you": her public card as the parent
+//  side renders it, because the image every provider app has and wastes as a
+//  24px avatar is the provider's own.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -27,6 +34,7 @@ import '../../booking/prescription.dart';
 import '../../care_partner/care_partner_models.dart';
 import '../../care_partner/partner_dashboard_store.dart';
 import '../../doctor/doctor_directory.dart';
+import '../../doctor/doctor_hero_images.dart';
 import '../../doctor/doctor_ledger.dart';
 import '../../doctor/doctor_roster.dart';
 import '../../doctor/doctor_schedule.dart';
@@ -80,6 +88,8 @@ class DoctorHomeTab extends StatelessWidget {
         final thisWeek = upcoming.where((b) => b.startsUtc.toLocal().isBefore(weekEnd)).length;
         final owedRx = past.where((b) => !PrescriptionStore.instance.hasFor(b.id)).length;
         final liveClass = hosts.where((h) => h.openable && h.scheduled).toList();
+        final profile = session.profile;
+        final slotsThisWeek = schedule == null ? 0 : DoctorScheduleStore.instance.preview(e!.id, days: 7).length;
 
         final attention = <Widget>[
           if (ledger.accountKnown && ledger.account == null)
@@ -131,11 +141,31 @@ class DoctorHomeTab extends StatelessWidget {
         // in full on the line beneath — "Good morning, Nova" would read as a
         // person, and a partner with no consulting identity must never be
         // shown as one (partner_account_test holds this).
+        final hero = doctorHeroFor(now);
         return DcTab(
           title: e != null ? _greeting(name) : _greeting(null),
           subtitle: e != null ? (sub.isEmpty ? null : sub) : name,
+          hero: DcHero(
+            asset: hero.asset,
+            dateLine: _dateLine(now),
+            greeting: e != null ? _greeting(name) : _greeting(null),
+            // An organisation: its full name is the information line, as its
+            // own text, never folded into a person's greeting.
+            infoLine: e == null ? name : _infoLine(
+              today: today.length,
+              next: next,
+              upcoming: upcoming.length,
+              slotsThisWeek: slotsThisWeek,
+              paused: schedule?.paused ?? false,
+              hasHours: schedule?.hasAnyHours ?? false,
+              consults: true,
+            ),
+            photoUrl: e == null ? null : profile?.photoUrl,
+            initial: e == null ? null : _initial(name),
+            onAvatar: e == null ? null : () => goTo(DoctorTab.profile),
+          ),
           onRefresh: () async {
-            await Future.wait([roster.refresh(), ledger.refresh()]);
+            await Future.wait([roster.refresh(), ledger.refresh(), session.loadProfile()]);
           },
           children: [
             if (attention.isNotEmpty) ...[
@@ -215,6 +245,23 @@ class DoctorHomeTab extends StatelessWidget {
                   onTap: () => goTo(DoctorTab.availability),
                 ),
               ]),
+              const SizedBox(height: 22),
+            ],
+
+            // ---- how parents see you ----------------------------------------
+            if (e != null) ...[
+              const DcSectionHead('How parents see you'),
+              _PublicCard(
+                name: profile?.name ?? name,
+                credential: profile?.credential ?? sub,
+                category: profile?.category ?? e.category,
+                location: profile?.location ?? '',
+                photoUrl: profile?.photoUrl,
+                feeInr: profile?.feeInr ?? 0,
+                rating: profile?.rating ?? 0,
+                blurb: profile?.blurb ?? e.blurb,
+                initial: _initial(name),
+              ),
             ],
           ],
         );
@@ -256,6 +303,44 @@ class DoctorHomeTab extends StatelessWidget {
         return ad.compareTo(bd);
       });
     return sorted.first;
+  }
+
+  static String _initial(String name) {
+    final n = name.replaceAll(RegExp(r'^(Dr|Prof)\.?\s*'), '').trim();
+    return n.isEmpty ? '?' : n.characters.first.toUpperCase();
+  }
+
+  static String _dateLine(DateTime now) {
+    const wd = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const mo = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    return '${wd[now.weekday - 1]} ${now.day} ${mo[now.month - 1]}';
+  }
+
+  /// The one line under the greeting. The parent hero's rule: the
+  /// information IS the hero, so the line says the thing that matters most
+  /// right now and nothing else.
+  static String? _infoLine({
+    required int today,
+    required Booking? next,
+    required int upcoming,
+    required int slotsThisWeek,
+    required bool paused,
+    required bool hasHours,
+    required bool consults,
+  }) {
+    if (!consults) return null;
+    if (today > 0 && next != null) {
+      final n = today == 1 ? '1 consultation today' : '$today consultations today';
+      return '$n · next at ${dcTime(next.startsUtc)}';
+    }
+    if (next != null) {
+      return 'Nothing today · next ${dcDayDate(next.startsUtc)} at ${dcTime(next.startsUtc)}';
+    }
+    if (paused) return 'Bookings are paused';
+    if (!hasHours) return 'Set your hours and parents can book you';
+    return slotsThisWeek > 0
+        ? 'A free day · $slotsThisWeek slots open this week'
+        : 'A free day';
   }
 
   static String _greeting(String? name) {
@@ -373,4 +458,101 @@ class _NextCard extends StatelessWidget {
       ]),
     );
   }
+}
+
+/// Her public card, as a parent's directory renders it — photo, name,
+/// credential, category, fee, rating — and the About text one tap away.
+/// Read-only here: a public profile is an editorial act (STILL-OPEN §5.1),
+/// so the card says who to write to rather than offering an Edit.
+class _PublicCard extends StatelessWidget {
+  const _PublicCard({
+    required this.name,
+    required this.credential,
+    required this.category,
+    required this.location,
+    required this.photoUrl,
+    required this.feeInr,
+    required this.rating,
+    required this.blurb,
+    required this.initial,
+  });
+  final String name;
+  final String credential;
+  final String category;
+  final String location;
+  final String? photoUrl;
+  final int feeInr;
+  final double rating;
+  final String blurb;
+  final String initial;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = dcP;
+    final meta = [
+      if (category.isNotEmpty) category,
+      if (location.isNotEmpty) location,
+    ].join(' · ');
+    return DcCard(
+      onTap: () => _open(context),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(color: p.surfaceAlt, borderRadius: BorderRadius.circular(16)),
+            clipBehavior: Clip.antiAlias,
+            child: photoUrl == null
+                ? Center(child: Text(initial, style: dcNum(26)))
+                : Image.network(photoUrl!, fit: BoxFit.cover,
+                    errorBuilder: (_, _, _) => Center(child: Text(initial, style: dcNum(26)))),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(name, style: dcStrong(16.5), maxLines: 1, overflow: TextOverflow.ellipsis),
+              if (credential.isNotEmpty) Text(credential, style: dcMeta(13.5), maxLines: 2, overflow: TextOverflow.ellipsis),
+              if (meta.isNotEmpty) ...[
+                const SizedBox(height: 2),
+                Text(meta, style: dcMeta(13, color: p.ink3), maxLines: 1, overflow: TextOverflow.ellipsis),
+              ],
+            ]),
+          ),
+          Icon(Icons.chevron_right_rounded, size: 24, color: p.ink3),
+        ]),
+        const SizedBox(height: 14),
+        Row(children: [
+          if (feeInr > 0) ...[
+            _pill(p, Icons.currency_rupee_rounded, '${dcRupees(feeInr * 100)} a consultation'),
+            const SizedBox(width: 8),
+          ],
+          if (rating > 0) _pill(p, Icons.star_rounded, rating.toStringAsFixed(1)),
+          if (feeInr <= 0 && rating <= 0) _pill(p, Icons.visibility_outlined, 'Listed to parents'),
+        ]),
+      ]),
+    );
+  }
+
+  Widget _pill(dynamic p, IconData icon, String label) => Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+        decoration: BoxDecoration(color: p.surfaceAlt, borderRadius: BorderRadius.circular(999)),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          Icon(icon, size: 15, color: p.ink2),
+          const SizedBox(width: 5),
+          Text(label, style: dcStrong(12.5)),
+        ]),
+      );
+
+  void _open(BuildContext context) => dcSheet<void>(
+        context,
+        title: 'How parents see you',
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(name, style: dcTitle(24)),
+          if (credential.isNotEmpty) ...[const SizedBox(height: 4), Text(credential, style: dcMeta(14.5))],
+          if (blurb.isNotEmpty) ...[const SizedBox(height: 14), Text(blurb, style: dcBody(15, h: 1.55))],
+          const SizedBox(height: 16),
+          const DcNotice('This is your public profile. Changes are made by ParentVeda — write to partners@parentveda.com with what to update.'),
+          const SizedBox(height: 8),
+        ]),
+      );
 }

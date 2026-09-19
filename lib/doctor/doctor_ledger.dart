@@ -25,16 +25,32 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/remote/supabase_repo.dart';
 
-/// The ways a doctor makes money here. The order is the screen's order.
-enum EarningSource { consultation, masterclass, cohort, course, video, referral, other }
+/// The ways a doctor makes money here — the Commercial Terms workbook's
+/// rows (0085), in the workbook's order: consultations, live courses,
+/// recorded courses, content, products, then referrals. The order is the
+/// screen's order.
+enum EarningSource { consultation, masterclass, cohort, course, video, article, affiliate, sponsorship, product, referral, other }
+
+/// Which channel brought a sale. A recorded course pays 30% through ours
+/// and 55% through the doctor's own code (0085).
+enum EarningChannel { platform, ownCode }
+
+extension EarningChannelX on EarningChannel {
+  String get wire => this == EarningChannel.ownCode ? 'own_code' : 'platform';
+  static EarningChannel parse(String? s) => s == 'own_code' ? EarningChannel.ownCode : EarningChannel.platform;
+}
 
 extension EarningSourceX on EarningSource {
   String get label => switch (this) {
         EarningSource.consultation => 'Consultations',
         EarningSource.masterclass => 'Masterclasses',
         EarningSource.cohort => 'Cohorts',
-        EarningSource.course => 'Courses',
+        EarningSource.course => 'Recorded courses',
         EarningSource.video => 'Videos',
+        EarningSource.article => 'Articles',
+        EarningSource.affiliate => 'Affiliate income',
+        EarningSource.sponsorship => 'Brand sponsorship',
+        EarningSource.product => 'Products',
         EarningSource.referral => 'Referrals',
         EarningSource.other => 'Other',
       };
@@ -43,8 +59,12 @@ extension EarningSourceX on EarningSource {
         EarningSource.consultation => 'Consultation',
         EarningSource.masterclass => 'Masterclass',
         EarningSource.cohort => 'Cohort',
-        EarningSource.course => 'Course',
+        EarningSource.course => 'Recorded course',
         EarningSource.video => 'Video',
+        EarningSource.article => 'Article',
+        EarningSource.affiliate => 'Affiliate',
+        EarningSource.sponsorship => 'Sponsorship',
+        EarningSource.product => 'Product',
         EarningSource.referral => 'Referral',
         EarningSource.other => 'Other',
       };
@@ -55,7 +75,11 @@ extension EarningSourceX on EarningSource {
         EarningSource.masterclass => 'Seats sold',
         EarningSource.cohort => 'Seats sold',
         EarningSource.course => 'Course sales',
-        EarningSource.video => 'Video revenue',
+        EarningSource.video => 'Ad revenue',
+        EarningSource.article => 'Ad revenue',
+        EarningSource.affiliate => 'Affiliate income',
+        EarningSource.sponsorship => 'Sponsorship value',
+        EarningSource.product => 'Product sales',
         EarningSource.referral => 'Referral value',
         EarningSource.other => 'Amount',
       };
@@ -67,9 +91,16 @@ extension EarningSourceX on EarningSource {
         EarningSource.cohort => 'Nothing yet. A cohort you lead shows here, seat by seat.',
         EarningSource.course => 'Nothing yet. Sales of a recorded course show here.',
         EarningSource.video => 'No videos yet. Each film made with you appears here with its share.',
+        EarningSource.article => 'Nothing yet. Ad revenue on articles validated under your name.',
+        EarningSource.affiliate => 'Nothing yet. Affiliate income earned on your content.',
+        EarningSource.sponsorship => 'Nothing yet. Brand work where you are the named face.',
+        EarningSource.product => 'Nothing yet. Products you endorse or co-develop.',
         EarningSource.referral => 'Nothing yet. Families you refer earn here once a rate is agreed.',
         EarningSource.other => 'Nothing else yet.',
       };
+
+  /// Sources with a second rate through the doctor's own code (0085).
+  bool get hasOwnCodeRate => this == EarningSource.course;
 
   static EarningSource parse(String? s) =>
       EarningSource.values.firstWhere((e) => e.name == s, orElse: () => EarningSource.other);
@@ -197,9 +228,11 @@ class EarningRow {
     required this.payoutId,
     required this.reversalOf,
     required this.note,
+    this.channel = EarningChannel.platform,
   });
   final String id;
   final EarningSource source;
+  final EarningChannel channel;
   final String refKind;
   final String? refId;
   final String title;
@@ -237,6 +270,7 @@ class EarningRow {
         payoutId: j['payout_id'] as String?,
         reversalOf: j['reversal_of'] as String?,
         note: j['note'] as String?,
+        channel: EarningChannelX.parse(j['channel'] as String?),
       );
 
   Map<String, dynamic> toJson() => {
@@ -246,7 +280,7 @@ class EarningRow {
         'gross_paise': grossPaise, 'share_bps': shareBps,
         'expert_paise': expertPaise, 'platform_paise': platformPaise,
         'status': status.name, 'payout_id': payoutId, 'reversal_of': reversalOf,
-        'note': note,
+        'note': note, 'channel': channel.wire,
       };
 }
 
@@ -382,7 +416,10 @@ class DoctorLedger extends ChangeNotifier {
   final Map<String, List<EarningRow>> _payoutItems = {};
   List<ExpertVideo> _videos = const [];
   List<ExpertVideo> get videos => _videos;
+  /// Today's rates by source, for the platform channel; [_ownCodeRates] for
+  /// the doctor's own code (0085). Both from my_share_rates().
   Map<EarningSource, int> _rates = const {};
+  Map<EarningSource, int> _ownCodeRates = const {};
   Map<EarningSource, int> get rates => _rates;
   PayoutAccount? _account;
   PayoutAccount? get account => _account;
@@ -423,6 +460,11 @@ class DoctorLedger extends ChangeNotifier {
       if (r != null) {
         final m = jsonDecode(r) as Map;
         _rates = {for (final e in m.entries) EarningSourceX.parse(e.key as String): (e.value as num).toInt()};
+      }
+      final oc = sp.getString(_key('rates_own_code'));
+      if (oc != null) {
+        final m = jsonDecode(oc) as Map;
+        _ownCodeRates = {for (final e in m.entries) EarningSourceX.parse(e.key as String): (e.value as num).toInt()};
       }
       final a = sp.getString(_key('account'));
       if (a != null) _account = PayoutAccount.fromJson(jsonDecode(a) as Map);
@@ -541,12 +583,23 @@ class DoctorLedger extends ChangeNotifier {
     try {
       final res = await SupabaseRepo.callFunction('my_share_rates');
       final m = <EarningSource, int>{};
+      final oc = <EarningSource, int>{};
       for (final r in res.whereType<Map>()) {
-        m[EarningSourceX.parse(r['source'] as String?)] = (r['share_bps'] as num?)?.toInt() ?? 0;
+        final src = EarningSourceX.parse(r['source'] as String?);
+        final bps = (r['share_bps'] as num?)?.toInt() ?? 0;
+        // 0084's my_share_rates had no channel column; treat its rows as
+        // platform so the app works against either migration level.
+        if (EarningChannelX.parse(r['channel'] as String?) == EarningChannel.ownCode) {
+          oc[src] = bps;
+        } else {
+          m[src] = bps;
+        }
       }
       if (m.isNotEmpty) {
         _rates = m;
+        _ownCodeRates = oc;
         await _put('rates', {for (final e in m.entries) e.key.name: e.value});
+        await _put('rates_own_code', {for (final e in oc.entries) e.key.name: e.value});
       }
     } catch (e) {
       debugPrint('[ledger] rates failed: $e');
@@ -556,6 +609,9 @@ class DoctorLedger extends ChangeNotifier {
   /// Today's rate for a source: the period's frozen rate if it earned, else
   /// the rule in force. So an empty row can still say "80% of what parents pay".
   int rateFor(EarningSource s) => _summary.forSource(s)?.shareBps ?? _rates[s] ?? 0;
+
+  /// The rate through the doctor's own code, where one exists (0085).
+  int ownCodeRateFor(EarningSource s) => _ownCodeRates[s] ?? 0;
 
   Future<void> refreshAccount() async {
     if (!SupabaseRepo.isLoggedIn || _expertId == null) return;
@@ -623,6 +679,7 @@ class DoctorLedger extends ChangeNotifier {
     _payoutItems.clear();
     _videos = const [];
     _rates = const {};
+    _ownCodeRates = const {};
     _account = null;
     _accountKnown = false;
     notifyListeners();

@@ -480,9 +480,19 @@ select public.add_manual_expert_earning('meera', 'other', 'Panel review, Sep',
 select public.record_expert_payout('meera', date '2026-09-30', 'UTR…', 'manual_neft', '1234');
 ```
 
-⚠️ **The seeded rates are placeholders** (every row's `note` says so). The
-Commercial Terms workbook replaces them when the user finds it — as new rows
-with a later `effective_from`, not edits.
+The rates are the Commercial Terms table since `0085` (consultations 80%,
+live courses 55%, recorded 30% / 55% through the doctor's own code, content
+20%, sponsorship 35%, products 10%). A negotiated rate for one doctor is a
+row with their `expert_id`; a rate change for everyone is a row with a later
+`effective_from`. Never an edit. The `channel` column is `platform` unless
+the sale came through the doctor's own code.
+
+**Loading a sample doctor:** `supabase/seed/doctor_demo.sql` — set the
+expert id, the doctor's login email and a parent's email at the top, run
+it; every row goes through the real writers (the booking trigger,
+`accrue_video_earning`, `add_manual_expert_earning`,
+`record_expert_payout`), so the Earnings tab shows the production path with
+data in it. The cleanup block at the bottom removes exactly what it added.
 
 ### Creating a masterclass, end to end
 
