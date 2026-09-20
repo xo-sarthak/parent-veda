@@ -18,9 +18,26 @@ import 'pp_experts_data.dart';
 import 'pp_yoga_data.dart';
 import 'yoga_common.dart';
 import 'yoga_instructor_screen.dart';
+import '../learn/pv_offering_screen.dart';
+import '../learn/pv_learn_catalog.dart';
 
+// ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
+// name and constructor so every push of it lands on the unified learn
+// screens; the body below is kept, byte for byte, as `YogaClassScreenClassic` for
+// revert. Nothing pushes the Classic (test/pv_learn_test.dart holds that).
 class YogaClassScreen extends StatelessWidget {
   const YogaClassScreen({super.key, required this.cls});
+  final YogaClass cls;
+  @override
+  Widget build(BuildContext context) {
+    final v = PvLearnCatalog.instance.byId(cls.id);
+    return v == null ? YogaClassScreenClassic(cls: cls) : PvOfferingScreen(view: v);
+  }
+}
+
+/// The pre-2026-09-20 body. Kept for revert; nothing pushes it.
+class YogaClassScreenClassic extends StatelessWidget {
+  const YogaClassScreenClassic({super.key, required this.cls});
   final YogaClass cls;
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);

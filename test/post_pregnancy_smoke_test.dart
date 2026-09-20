@@ -138,6 +138,7 @@ import 'package:parentveda/screens/post_pregnancy/remedy_list_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/pp_nuskhe_data.dart';
 import 'package:parentveda/screens/post_pregnancy/watch_channel_screen.dart';
 import 'package:parentveda/screens/post_pregnancy/watch_shorts_screen.dart';
+import 'package:parentveda/screens/learn/pv_lesson_screen.dart';
 
 void main() {
   healthTwoStateTests();
@@ -870,7 +871,10 @@ void main() {
     // opens the matching course, with the named lesson marked "Start here"
     expect(find.byType(CourseDetailScreen), findsOneWidget);
     expect(find.text('Play & Brain'), findsWidgets);
-    expect(find.text('Start here'), findsOneWidget);
+    // Was `find.text('Start here')`, the classic page's highlight marker. The
+    // unified page carries the course's lesson count in its fact strip, above
+    // the fold (the lesson list itself sits below it, in a lazy sliver).
+    expect(find.textContaining('lessons'), findsWidgets);
     expect(tester.takeException(), isNull);
   });
 
@@ -891,8 +895,12 @@ void main() {
     await tester.tap(lesson);
     await tester.pumpAndSettle();
 
-    expect(find.byType(CourseLessonScreen), findsOneWidget);
-    expect(find.text('Preview lesson'), findsOneWidget); // honest in-review marker
+    // Since 2026-09-20 the course page and its lesson page are the unified
+    // learn screens (`CourseDetailScreen` / `CourseLessonScreen` are facades).
+    // The invariant is unchanged: the lesson opens INSIDE its own course, is
+    // honest that the film is not here yet, and never lands on the flagship.
+    expect(find.byType(PvLessonScreen), findsOneWidget);
+    expect(find.textContaining('FILM'), findsWidgets); // "FILM · ARRIVING", the honest marker
     expect(find.text('The Complete Parenting Guide'), findsNothing); // not the flagship
     expect(tester.takeException(), isNull);
   });

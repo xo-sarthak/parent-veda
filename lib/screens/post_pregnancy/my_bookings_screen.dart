@@ -38,15 +38,27 @@ import '../auth/auth_flow_screen.dart';
 import 'pp_common.dart';
 import 'pp_experts_data.dart';
 import 'prescription_view_screen.dart';
+import '../learn/pv_my_learning_screen.dart';
 
-class MyBookingsScreen extends StatefulWidget {
+// ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
+// name and constructor so every push of it lands on the unified learn
+// screens; the body below is kept, byte for byte, as `MyBookingsScreenClassic` for
+// revert. Nothing pushes the Classic (test/pv_learn_test.dart holds that).
+class MyBookingsScreen extends StatelessWidget {
   const MyBookingsScreen({super.key});
-
   @override
-  State<MyBookingsScreen> createState() => _MyBookingsScreenState();
+  Widget build(BuildContext context) => const PvMyLearningScreen();
 }
 
-class _MyBookingsScreenState extends State<MyBookingsScreen> {
+/// The pre-2026-09-20 body. Kept for revert; nothing pushes it.
+class MyBookingsScreenClassic extends StatefulWidget {
+  const MyBookingsScreenClassic({super.key});
+
+  @override
+  State<MyBookingsScreenClassic> createState() => _MyBookingsScreenState();
+}
+
+class _MyBookingsScreenState extends State<MyBookingsScreenClassic> {
   @override
   void initState() {
     super.initState();

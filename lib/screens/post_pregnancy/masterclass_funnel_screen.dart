@@ -12,15 +12,32 @@ import 'package:flutter/material.dart';
 import 'pp_common.dart';
 import 'pp_experts_data.dart';
 import 'provider_profile_screen.dart';
+import '../learn/pv_offering_screen.dart';
+import '../learn/pv_learn_catalog.dart';
 
-class MasterclassFunnelScreen extends StatefulWidget {
-  const MasterclassFunnelScreen({super.key});
+// ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
+// name and constructor so every push of it lands on the unified learn
+// screens; the body below is kept, byte for byte, as `MasterclassFunnelScreenClassic` for
+// revert. Nothing pushes the Classic (test/pv_learn_test.dart holds that).
+class MasterclassFunnelScreen extends StatelessWidget {
+  const MasterclassFunnelScreen({super.key, });
 
   @override
-  State<MasterclassFunnelScreen> createState() => _MasterclassFunnelScreenState();
+  Widget build(BuildContext context) {
+    final v = PvLearnCatalog.instance.byId('mc_sleepreg');
+    return v == null ? const MasterclassFunnelScreenClassic() : PvOfferingScreen(view: v);
+  }
 }
 
-class _MasterclassFunnelScreenState extends State<MasterclassFunnelScreen> {
+/// The pre-2026-09-20 body. Kept for revert; nothing pushes it.
+class MasterclassFunnelScreenClassic extends StatefulWidget {
+  const MasterclassFunnelScreenClassic({super.key});
+
+  @override
+  State<MasterclassFunnelScreenClassic> createState() => _MasterclassFunnelScreenState();
+}
+
+class _MasterclassFunnelScreenState extends State<MasterclassFunnelScreenClassic> {
   int _openFaq = 0;
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);

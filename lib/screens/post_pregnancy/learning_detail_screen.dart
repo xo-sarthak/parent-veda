@@ -19,16 +19,33 @@ import 'pp_common.dart';
 import 'pp_courses_data.dart';
 import 'pp_learning_data.dart';
 import 'provider_profile_screen.dart';
+import '../learn/pv_offering_screen.dart';
+import '../learn/pv_learn_catalog.dart';
 
-class LearningDetailScreen extends StatefulWidget {
+// ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
+// name and constructor so every push of it lands on the unified learn
+// screens; the body below is kept, byte for byte, as `LearningDetailScreenClassic` for
+// revert. Nothing pushes the Classic (test/pv_learn_test.dart holds that).
+class LearningDetailScreen extends StatelessWidget {
   const LearningDetailScreen({super.key, required this.program});
+  final LearningProgram program;
+  @override
+  Widget build(BuildContext context) {
+    final v = PvLearnCatalog.instance.byId(program.id);
+    return v == null ? LearningDetailScreenClassic(program: program) : PvOfferingScreen(view: v);
+  }
+}
+
+/// The pre-2026-09-20 body. Kept for revert; nothing pushes it.
+class LearningDetailScreenClassic extends StatefulWidget {
+  const LearningDetailScreenClassic({super.key, required this.program});
   final LearningProgram program;
 
   @override
-  State<LearningDetailScreen> createState() => _LearningDetailScreenState();
+  State<LearningDetailScreenClassic> createState() => _LearningDetailScreenState();
 }
 
-class _LearningDetailScreenState extends State<LearningDetailScreen> {
+class _LearningDetailScreenState extends State<LearningDetailScreenClassic> {
   LearningProgram get p => widget.program;
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);

@@ -449,13 +449,18 @@ void main() {
 
       expect(find.byType(ConsultationsScreen), findsOneWidget);
       // Same rule as the scans card: the words and the filter are one fact.
-      // Since 2026-09-19 the filter is a pill row (every role is a pill, the
-      // selected one's card is the only card), so the claim is on the
-      // cards: the nutritionist's name is listed, the obstetrician's is not.
+      // Since 2026-09-20 the facade lands on the nutritionist's own consult
+      // page (the unified learn page): her name is on it, the obstetrician's
+      // consult is not a card on it.
       final nutri = kSpecialists.firstWhere((x) => x.role.en == 'Prenatal Nutritionist');
       final ob = kSpecialists.firstWhere((x) => x.role.en == 'Obstetrician');
-      expect(find.text(nutri.name.en), findsOneWidget);
-      expect(find.text(ob.name.en), findsNothing);
+      expect(find.text('Consult with ${nutri.name.en}'), findsWidgets);
+      // The obstetrician is on the page only as the "Other experts" rail,
+      // below the head that names it — never as the page itself.
+      final rail = t.getTopLeft(find.text('Other experts')).dy;
+      for (final e in find.text('Consult with ${ob.name.en}').evaluate()) {
+        expect(t.getTopLeft(find.byWidget(e.widget)).dy > rail, isTrue);
+      }
     });
   });
 }

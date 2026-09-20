@@ -26,6 +26,7 @@ CLAUDE.md invariants) → brief → build → this ledger.
 | 7 | Products — one store for three stages | 2026-09-17 | `PRODUCTS-AUDIT.md` | Yes, same day (`lib/screens/products/`, nine screens; old screens are facades) |
 | 8 | ParentVeda+ (doctor app) — provider home, earnings ledger, payouts, availability, front door | 2026-09-18 | `DOCTOR-APP-AUDIT.md` | Yes, same day (`0084`, `doctor_chrome.dart`, five `*_tab.dart`); not walked — STILL-OPEN §5.4 |
 | 10 | Profile — one *You* screen for four stages | 2026-09-19 | `PROFILE-AUDIT.md` | Yes, same day (`lib/screens/profile/`, nine files; `ProfileScreen` and `TtcProfileScreen` are facades); not walked — STILL-OPEN §67 |
+| 11 | Learning — one funnel for courses, masterclasses, cohorts, 1:1 consults and class packs | 2026-09-20 | `LEARNING-AUDIT.md` | Yes, same day (`lib/screens/learn/`, ten files; twenty-five facades); not walked — STILL-OPEN §69 |
 
 ---
 
@@ -317,6 +318,25 @@ was assembled from grocery, nutrition and payments apps instead.
 personalised probability, which the clinical rule forbids); Bumble's
 safety hub (tiles of static reading — the thing this door replaces);
 Bevel's radial action menu (nine actions where we have two).
+
+## 11. Learning — one page for five kinds (2026-09-20)
+
+The audit is `LEARNING-AUDIT.md`. The one finding, and who settled each
+part of it:
+
+| Question | Who answered it | Taken |
+|---|---|---|
+| Is a course page and a cohort page one design? | **Udemy, MasterClass, Peloton, Airbnb, Alan** — the same ten sections with a different fact strip | `PvOfferingScreen`: one order; the kind fills B, C, E, J |
+| What is the structure block? | Udemy's curriculum · MasterClass's lessons · pliability's week cards · Alan's "how it works" | `pvStructureTitle` + lessons / week cards / steps |
+| Where do dates live? | **Airbnb** cards on the page with seats left; **Alan, Preply** a slot sheet from one button | Slots in a sheet; group = date cards, 1:1 = week strip + times by part of day |
+| Pay before or after picking? | **Alan**: time, then money | `pvLearnCommit`: slot → review → pay → reserve |
+| What does "booked" look like? | **Peloton** scheduled class, **Zocdoc** upcoming visit | `PvSessionScreen`: big time, countdown → Join, prepare, partner line, reschedule / cancel with the rule |
+| The learning home? | **Skillshare** Continue watching, **Udemy** My learning, **Noom** pinned current course | *Yours first* strip, then the kind filter, then rails |
+| The player? | **MasterClass** lesson page, **Udemy** lectures list | `PvLessonScreen`: film · title · Up next · the list with ticks |
+
+**Declined:** the "sales page" vocabulary (guarantee bands, testimonial
+carousels), seat urgency in colour, progress rings and badges, a chat
+button to the expert, a separate detail screen for the slot picker.
 
 ## What the library does not carry
 

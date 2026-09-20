@@ -27,6 +27,7 @@ import 'package:parentveda/ttc/ttc_garbh_course_store.dart';
 import 'package:parentveda/ttc/ttc_mind_today.dart';
 import 'package:parentveda/ttc/ttc_practice_data.dart';
 import 'package:parentveda/ttc/ttc_prepare_data.dart';
+import 'package:parentveda/screens/learn/pv_offering_screen.dart';
 
 /// Every word the course shows, in one bag.
 String _allCopy() {
@@ -341,11 +342,17 @@ void main() {
           MaterialApp(home: TtcOfferingScreen(offering: offering)));
       await tester.pump(const Duration(milliseconds: 400));
 
-      expect(find.byType(TtcGarbhCourseScreen), findsOneWidget);
+      // Since 2026-09-20 the offering screen is a facade over the unified
+      // learn page, and the free course is that page with no engine offering
+      // behind it: it can only play. The redirect is now a data fact (the
+      // course's view is built from the taught sessions) rather than a branch.
+      expect(find.byType(PvOfferingScreen), findsOneWidget);
+      expect(find.text('Start the course'), findsOneWidget);
       // And no price anywhere on it. `priceLabel` for a free offering is the
       // word "Free", which would pass a bare "no ₹" check while a Buy button
       // sat underneath it.
       expect(find.text('Buy'), findsNothing);
+      expect(find.textContaining('₹'), findsNothing);
     });
   });
 

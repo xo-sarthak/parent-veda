@@ -11,9 +11,27 @@ import 'prepare_common.dart';
 import 'prepare_video_screen.dart';
 import '../../theme/pv_fonts.dart';
 import '../../localization/app_language.dart';
+import '../learn/pv_offering_screen.dart';
+import '../learn/pv_learn_catalog.dart';
 
+// ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
+// name and constructor so every push of it lands on the unified learn
+// screens; the body below is kept, byte for byte, as `MasterclassDetailScreenClassic` for
+// revert. Nothing pushes the Classic (test/pv_learn_test.dart holds that).
 class MasterclassDetailScreen extends StatelessWidget {
   const MasterclassDetailScreen({super.key, required this.m, required this.lang});
+  final Masterclass m;
+  final AppLanguage lang;
+  @override
+  Widget build(BuildContext context) {
+    final v = PvLearnCatalog.instance.byId('prog_${m.id}');
+    return v == null ? MasterclassDetailScreenClassic(m: m, lang: lang) : PvOfferingScreen(view: v);
+  }
+}
+
+/// The pre-2026-09-20 body. Kept for revert; nothing pushes it.
+class MasterclassDetailScreenClassic extends StatelessWidget {
+  const MasterclassDetailScreenClassic({super.key, required this.m, required this.lang});
 
   final Masterclass m;
   final AppLanguage lang;

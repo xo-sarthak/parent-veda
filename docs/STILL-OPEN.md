@@ -8465,3 +8465,65 @@ Wikipedia itself uses), reviewed on sheets. Entries with no tagged photo
 keep the first-pass pick or the icon well. Still placeholders until R2
 (§63.18), which the Wikimedia 429 made urgent: a free host throttles by
 IP, and Indian carriers put thousands of users behind one.
+
+## 69.0 Learn — one funnel for five kinds is built; what it still owes — OPENED 2026-09-20
+
+`lib/screens/learn/` (docs/LEARNING-AUDIT.md). One Learn home, one
+Offering page with ten sections in one order, one slot sheet, one review
+sheet, one Booked page, one player, one My learning; twenty-five retired
+screens are facades over them and the doctor page's rows and Book pill go
+through the same flow. Built on the user's five decisions, all as
+recommended. Not walked on a device.
+
+### 69.1 The device walk
+
+Every stage's Learn home; one offering of each kind; a full booking of a
+consult (slot → review → Razorpay test → Booked → the LiveKit green room)
+and of a masterclass (date card → review → Booked → the group room); a
+class pack (review → slots → Booked, credits counting down); the free
+garbh course (a lesson opens its practice screen, the tick comes back);
+the doctor page's rows; the covers (topic placeholders — a wrong subject
+is a data edit in `pv_learn_images.dart`). Versus format, ours beside the
+Mobbin reference.
+
+### 69.2 Reviews on offerings — one review system
+
+Decision 3: the store's `reviews` table when it can take an `offering_id`
+beside `product_id` (one column, nullable, a check that exactly one is
+set). Until then the page reads the source models' seed reviews. The
+"honest count" rule from the store applies: no number that is not a row.
+
+### 69.3 Lesson progress is local only
+
+`PvLearnProgressStore` is `shared_preferences`. It belongs with bookmarks
+in the family model (hers, across her phones) — a `user_state` key through
+`CloudSyncedStore` is the cheap correct shape (BACKEND-PATTERNS §16g's
+argument: one reader, replaced whole).
+
+### 69.4 The films
+
+No lesson has a video; the player says "Film · arriving" over the cover and
+shows the lesson notes. `PvLearnLesson.videoUrl` is the seam. When the
+watch library carries course films, the adapter fills it and the poster
+becomes `PvVideoPlayer` — nothing else moves.
+
+### 69.5 Calendar export
+
+The Booked page's *Calendar* action sets the one-hour reminder and says
+export is coming. An `.ics` share or `add_2_calendar` is the whole job.
+
+### 69.6 Retire the classics
+
+Twenty-five `…Classic` bodies, pushed by nothing. Retire with §65.7 and
+§67.5 after a release cycle. `MindMood`'s talk offerings still run
+`showBookingSheetClassic`; giving them a `PvOfferingView` adapter retires
+that too.
+
+### 69.7 The store's category tiles — owed LAST
+
+Not learning, but the user's ordering: after this is walked, the products
+front page's category tiles (pregnancy pillow, stretch marks, maternity
+wear…) get real images in place of line icons — "make this page look real,
+not static". Free photos of the object type, one per category per stage,
+with the `PvCoverBlock` fallback; check Mobbin's category-tile grammar
+(Myntra, Blinkit, Zepto) first.

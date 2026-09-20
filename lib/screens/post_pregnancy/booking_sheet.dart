@@ -28,8 +28,23 @@ import '../../booking/server_slots.dart';
 import '../../doctor/doctor_schedule_store.dart';
 import 'my_bookings_screen.dart';
 import 'pp_common.dart';
+import '../learn/pv_learn_catalog.dart';
+import '../learn/pv_learn_flow.dart';
 
+// ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md §4.4–4.5). An offering
+// the learn catalogue knows runs the unified flow — slot sheet, review
+// sheet, Booked page — through `pvLearnCommit`. One it does not know (the
+// Mind and Mood talk offerings, for now) keeps the sheet below, byte for
+// byte, as `showBookingSheetClassic`.
 Future<void> showBookingSheet(BuildContext context, Offering offering) {
+  final v = PvLearnCatalog.instance.byOfferingId(offering.id);
+  if (v == null) return showBookingSheetClassic(context, offering);
+  return pvLearnCommit(context, v);
+}
+
+/// The pre-2026-09-20 sheet. Kept for revert and for offerings outside
+/// the learn catalogue.
+Future<void> showBookingSheetClassic(BuildContext context, Offering offering) {
   return showModalBottomSheet<void>(
     context: context,
     backgroundColor: ppBg,

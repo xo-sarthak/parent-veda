@@ -14,6 +14,11 @@ import '../post_pregnancy/pp_experts_data.dart' show expertByName;
 import '../post_pregnancy/pp_expert_link.dart' show openExpertProfile;
 import 'prepare_common.dart';
 import '../../localization/app_language.dart';
+import '../learn/pv_learn_screen.dart';
+import '../../services/life_stage_store.dart';
+import '../../data/learn/pv_learn_view.dart';
+import '../learn/pv_learn_catalog.dart';
+import '../learn/pv_offering_screen.dart';
 
 // ⚠️ THE SCREEN'S STRUCTURE — 2026-09-18, the door walk, from Mobbin. The
 // user: "very cluttered… not structured well." Zocdoc, Preply and Alan
@@ -24,8 +29,32 @@ import '../../localization/app_language.dart';
 // the price, and their next availability as its own slim pill — hairlines
 // between blocks, the whole block opens the detail where Book lives. The
 // old row (`_specialistFull`) carried nine things and its own button.
-class ConsultationsScreen extends StatefulWidget {
+// ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
+// name and constructor so every push of it lands on the unified learn
+// screens; the body below is kept, byte for byte, as `ConsultationsScreenClassic` for
+// revert. Nothing pushes the Classic (test/pv_learn_test.dart holds that).
+class ConsultationsScreen extends StatelessWidget {
   const ConsultationsScreen({super.key, required this.lang, this.onlyRole});
+  final AppLanguage lang;
+
+  /// A specialist id from a door ("talk with your doctor"). The door names
+  /// one person, so it lands on that person's consult page — the other
+  /// experts are its "Other experts" rail, which is the way back out. No id,
+  /// or one the catalogue does not know: the consult list.
+  final String? onlyRole;
+
+  @override
+  Widget build(BuildContext context) {
+    final v = onlyRole == null ? null : PvLearnCatalog.instance.byId(onlyRole!);
+    return v == null
+        ? const PvLearnScreen(stage: LifeStage.pregnancy, kind: PvLearnKind.consult)
+        : PvOfferingScreen(view: v);
+  }
+}
+
+/// The pre-2026-09-20 body. Kept for revert; nothing pushes it.
+class ConsultationsScreenClassic extends StatefulWidget {
+  const ConsultationsScreenClassic({super.key, required this.lang, this.onlyRole});
 
   final AppLanguage lang;
 
@@ -48,10 +77,10 @@ class ConsultationsScreen extends StatefulWidget {
   final String? onlyRole;
 
   @override
-  State<ConsultationsScreen> createState() => _ConsultationsScreenState();
+  State<ConsultationsScreenClassic> createState() => _ConsultationsScreenState();
 }
 
-class _ConsultationsScreenState extends State<ConsultationsScreen> {
+class _ConsultationsScreenState extends State<ConsultationsScreenClassic> {
   AppLanguage get lang => widget.lang;
 
   /// The selected pill: a specialist id, or null for everyone. Starts on the

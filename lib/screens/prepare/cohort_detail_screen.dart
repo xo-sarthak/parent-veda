@@ -9,14 +9,32 @@ import '../../data/prepare_data.dart';
 import '../../experts/expert_link.dart';
 import 'prepare_common.dart';
 import '../../localization/app_language.dart';
+import '../learn/pv_offering_screen.dart';
+import '../learn/pv_learn_catalog.dart';
 
 /// Stripped off a cohort's start label. English-only by design: the
 /// Hindi start labels are written without the prefix, so there is
 /// nothing to remove there.
 final RegExp _kStartsPrefix = RegExp(r'^starts ');
 
+// ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
+// name and constructor so every push of it lands on the unified learn
+// screens; the body below is kept, byte for byte, as `CohortDetailScreenClassic` for
+// revert. Nothing pushes the Classic (test/pv_learn_test.dart holds that).
 class CohortDetailScreen extends StatelessWidget {
   const CohortDetailScreen({super.key, required this.cohort, required this.lang});
+  final Cohort cohort;
+  final AppLanguage lang;
+  @override
+  Widget build(BuildContext context) {
+    final v = PvLearnCatalog.instance.byId('prog_${cohort.id}');
+    return v == null ? CohortDetailScreenClassic(cohort: cohort, lang: lang) : PvOfferingScreen(view: v);
+  }
+}
+
+/// The pre-2026-09-20 body. Kept for revert; nothing pushes it.
+class CohortDetailScreenClassic extends StatelessWidget {
+  const CohortDetailScreenClassic({super.key, required this.cohort, required this.lang});
 
   final Cohort cohort;
   final AppLanguage lang;

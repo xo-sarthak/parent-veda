@@ -34,6 +34,7 @@ import 'package:parentveda/screens/report_screen.dart';
 import 'package:parentveda/screens/tools/tests_scans_reports_screen.dart';
 import 'package:parentveda/services/pregnancy_controller.dart';
 import 'package:parentveda/services/scans_store.dart';
+import 'package:parentveda/screens/learn/pv_offering_screen.dart';
 
 /// A controller sitting at roughly [week], via the due date rather than a
 /// setter — `currentWeek` is derived, and driving it any other way would be
@@ -228,20 +229,23 @@ void main() {
               lang: AppLanguage.english, onlyRole: kScanConsultRole));
 
       final ob = kSpecialists.firstWhere((s) => s.id == kScanConsultRole);
-      // The filter is a pill row since 2026-09-19: the door's expert starts
-      // selected, so her pill is there and her card is the only card (a
-      // card prints "Role · credential", so the exact role text is the
-      // pill and the card is the name). Every other specialist appears as
-      // a pill only, never as a card.
-      expect(find.text(ob.role.en), findsOneWidget);
-      expect(find.text(ob.name.en), findsOneWidget);
+      // Since 2026-09-20 the door lands on HER consult page (the unified
+      // learn page; `ConsultationsScreen` is a facade): the card names her
+      // and her role, no other specialist is a card, and "Other experts" is
+      // the way back out — which is what stops a door from being a wall.
+      // The pill-row version (2026-09-19) is kept in the Classic body.
+      expect(find.byType(PvOfferingScreen), findsOneWidget);
+      expect(find.text('Consult with ${ob.name.en}'), findsWidgets);
+      expect(find.text(ob.role.en), findsWidgets);
+      // The others are on the page only as the "Other experts" rail, below
+      // the head that names it — never above her.
+      final rail = t.getTopLeft(find.text('Other experts')).dy;
       for (final s in kSpecialists.where((x) => x.id != kScanConsultRole)) {
-        expect(find.text(s.role.en), findsOneWidget, reason: '${s.id} pill');
-        expect(find.text(s.name.en), findsNothing, reason: '${s.id} card');
+        for (final e in find.text('Consult with ${s.name.en}').evaluate()) {
+          expect(t.getTopLeft(find.byWidget(e.widget)).dy > rail, isTrue,
+              reason: '${s.id} is a card above the way out');
+        }
       }
-      // ...and "All" is the way back out, which is what stops a filter from
-      // being a wall. (Kept for revert in the screen: "See all experts".)
-      expect(find.text('All'), findsOneWidget);
     });
   });
 

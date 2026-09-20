@@ -18,9 +18,23 @@ import 'masterclass_funnel_screen.dart';
 import 'pp_common.dart';
 import 'pp_experts_data.dart';
 import 'provider_profile_screen.dart';
+import '../learn/pv_learn_screen.dart';
+import '../../services/life_stage_store.dart';
+import '../../data/learn/pv_learn_view.dart';
 
+// ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
+// name and constructor so every push of it lands on the unified learn
+// screens; the body below is kept, byte for byte, as `MasterclassesScreenClassic` for
+// revert. Nothing pushes the Classic (test/pv_learn_test.dart holds that).
 class MasterclassesScreen extends StatelessWidget {
   const MasterclassesScreen({super.key});
+  @override
+  Widget build(BuildContext context) => const PvLearnScreen(stage: LifeStage.parenting, kind: PvLearnKind.masterclass);
+}
+
+/// The pre-2026-09-20 body. Kept for revert; nothing pushes it.
+class MasterclassesScreenClassic extends StatelessWidget {
+  const MasterclassesScreenClassic({super.key});
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 

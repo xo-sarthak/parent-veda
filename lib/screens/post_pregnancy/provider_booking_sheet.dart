@@ -10,9 +10,25 @@ import 'package:flutter/material.dart';
 
 import 'pp_common.dart';
 import 'pp_experts_data.dart';
+import '../learn/pv_learn_catalog.dart';
+import '../learn/pv_learn_flow.dart';
 
 /// Opens the mock booking sheet for [e]. Local only - no backend.
+// ⚠️ FACADE since 2026-09-20. A doctor with a consult offering books through
+// the unified flow (`pvLearnCommit`: slots, then review and pay, then the
+// Booked page). One without keeps the mock sheet below as
+// `showProviderBookingSheetClassic`, for revert.
 void showProviderBookingSheet(BuildContext context, Expert e) {
+  final v = PvLearnCatalog.instance.byId(e.id);
+  if (v == null) {
+    showProviderBookingSheetClassic(context, e);
+    return;
+  }
+  pvLearnCommit(context, v);
+}
+
+/// The pre-2026-09-20 mock sheet. Kept for revert.
+void showProviderBookingSheetClassic(BuildContext context, Expert e) {
   showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,

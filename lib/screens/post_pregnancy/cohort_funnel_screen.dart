@@ -14,15 +14,32 @@ import 'package:flutter/material.dart';
 import 'pp_common.dart';
 import 'pp_experts_data.dart';
 import 'provider_profile_screen.dart';
+import '../learn/pv_offering_screen.dart';
+import '../learn/pv_learn_catalog.dart';
 
-class CohortFunnelScreen extends StatefulWidget {
-  const CohortFunnelScreen({super.key});
+// ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
+// name and constructor so every push of it lands on the unified learn
+// screens; the body below is kept, byte for byte, as `CohortFunnelScreenClassic` for
+// revert. Nothing pushes the Classic (test/pv_learn_test.dart holds that).
+class CohortFunnelScreen extends StatelessWidget {
+  const CohortFunnelScreen({super.key, });
 
   @override
-  State<CohortFunnelScreen> createState() => _CohortFunnelScreenState();
+  Widget build(BuildContext context) {
+    final v = PvLearnCatalog.instance.byId('co_sleep');
+    return v == null ? const CohortFunnelScreenClassic() : PvOfferingScreen(view: v);
+  }
 }
 
-class _CohortFunnelScreenState extends State<CohortFunnelScreen> {
+/// The pre-2026-09-20 body. Kept for revert; nothing pushes it.
+class CohortFunnelScreenClassic extends StatefulWidget {
+  const CohortFunnelScreenClassic({super.key});
+
+  @override
+  State<CohortFunnelScreenClassic> createState() => _CohortFunnelScreenState();
+}
+
+class _CohortFunnelScreenState extends State<CohortFunnelScreenClassic> {
   int _openFaq = 0;
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);

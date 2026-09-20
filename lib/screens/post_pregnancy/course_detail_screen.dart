@@ -15,9 +15,37 @@ import 'pp_common.dart';
 import 'pp_experts_data.dart';
 import 'pp_expert_link.dart';
 import 'pp_courses_data.dart';
+import '../learn/pv_offering_screen.dart';
+import '../learn/pv_learn_catalog.dart';
+import '../../data/learn/pv_learn_view.dart';
+import 'pp_learning_data.dart';
 
+// ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
+// name and constructor so every push of it lands on the unified learn
+// screens; the body below is kept, byte for byte, as `CourseDetailScreenClassic` for
+// revert. Nothing pushes the Classic (test/pv_learn_test.dart holds that).
 class CourseDetailScreen extends StatelessWidget {
   const CourseDetailScreen({super.key, required this.course, this.highlight});
+  final Course course;
+  final String? highlight;
+  @override
+  Widget build(BuildContext context) {
+    final v = pvViewForCourse(course.id);
+    return v == null ? CourseDetailScreenClassic(course: course, highlight: highlight) : PvOfferingScreen(view: v);
+  }
+}
+
+/// The programme whose curriculum is this course — `LearningProgram.courseId`.
+PvOfferingView? pvViewForCourse(String courseId) {
+  for (final p in mergedLearningPrograms()) {
+    if (p.courseId == courseId) return PvLearnCatalog.instance.byId(p.id);
+  }
+  return null;
+}
+
+/// The pre-2026-09-20 body. Kept for revert; nothing pushes it.
+class CourseDetailScreenClassic extends StatelessWidget {
+  const CourseDetailScreenClassic({super.key, required this.course, this.highlight});
   final Course course;
   final String? highlight; // the Go-Deeper text, to mark a "start here" lesson
 

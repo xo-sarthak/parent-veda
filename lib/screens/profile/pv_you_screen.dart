@@ -61,7 +61,7 @@ import '../pregnancy_profile_screen.dart';
 import '../referral/invite_friends_screen.dart';
 import '../reminders_screen.dart';
 import '../skilling/sk_child_store.dart';
-import '../ttc/ttc_strings.dart' show TtcLang;
+import '../ttc/ttc_strings.dart' show TtcLang, TtcPartnerMode, TtcS;
 import 'pv_account_actions.dart';
 import 'pv_child_screen.dart';
 import 'pv_data_privacy_screen.dart';
@@ -930,6 +930,44 @@ class _PvYouScreenState extends State<PvYouScreen> {
                     ),
                 ],
               ),
+              // The TTC "view as her / him" switch — the classic TTC
+              // profile's `_ModeSegment`, a testing affordance for crossing
+              // between the two halves of that stage. Debug only, here,
+              // because Profile is the one surface both shells share.
+              if (_stage == LifeStage.tryingToConceive) ...[
+                const SizedBox(height: 14),
+                Text(
+                  'View as · testing',
+                  style: pvManrope(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                    color: p.ink1,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                ListenableBuilder(
+                  listenable: TtcPartnerMode.instance,
+                  builder: (context, _) {
+                    final t = TtcS.current();
+                    final him = TtcPartnerMode.instance.on;
+                    return Wrap(
+                      spacing: 8,
+                      children: [
+                        PvChip(
+                          label: t.partnerHer,
+                          selected: !him,
+                          onTap: () => TtcPartnerMode.instance.on = false,
+                        ),
+                        PvChip(
+                          label: t.partnerHim,
+                          selected: him,
+                          onTap: () => TtcPartnerMode.instance.on = true,
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ],
             ],
           ),
         ),

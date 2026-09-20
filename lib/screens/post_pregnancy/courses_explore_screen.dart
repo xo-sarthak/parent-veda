@@ -38,6 +38,9 @@ import 'pp_expert_link.dart';
 import 'pp_experts_data.dart';
 import 'pp_explore_kit.dart';
 import 'pp_learning_data.dart';
+import '../learn/pv_learn_screen.dart';
+import '../../services/life_stage_store.dart';
+import '../../data/learn/pv_learn_view.dart';
 
 // =============================================================================
 //  The three sections
@@ -67,14 +70,25 @@ String courseKindLabel(LearningKind k) => switch (k) {
       LearningKind.masterclass => 'Masterclass',
     };
 
-class CoursesExploreScreen extends StatefulWidget {
+// ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
+// name and constructor so every push of it lands on the unified learn
+// screens; the body below is kept, byte for byte, as `CoursesExploreScreenClassic` for
+// revert. Nothing pushes the Classic (test/pv_learn_test.dart holds that).
+class CoursesExploreScreen extends StatelessWidget {
   const CoursesExploreScreen({super.key});
-
   @override
-  State<CoursesExploreScreen> createState() => _CoursesExploreScreenState();
+  Widget build(BuildContext context) => const PvLearnScreen(stage: LifeStage.parenting);
 }
 
-class _CoursesExploreScreenState extends State<CoursesExploreScreen> {
+/// The pre-2026-09-20 body. Kept for revert; nothing pushes it.
+class CoursesExploreScreenClassic extends StatefulWidget {
+  const CoursesExploreScreenClassic({super.key});
+
+  @override
+  State<CoursesExploreScreenClassic> createState() => _CoursesExploreScreenState();
+}
+
+class _CoursesExploreScreenState extends State<CoursesExploreScreenClassic> {
   final _search = TextEditingController();
   String _q = '';
   String _type = 'All';
@@ -420,8 +434,29 @@ class CourseResultRow extends StatelessWidget {
 //  "View all" — one kind
 // =============================================================================
 
-class CourseListingScreen extends StatefulWidget {
-  const CourseListingScreen({
+// ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
+// name and constructor so every push of it lands on the unified learn
+// screens; the body below is kept, byte for byte, as `CourseListingScreenClassic` for
+// revert. Nothing pushes the Classic (test/pv_learn_test.dart holds that).
+class CourseListingScreen extends StatelessWidget {
+  const CourseListingScreen({super.key, required this.section, required this.topic});
+  final CourseSection section;
+  final String? topic;
+  @override
+  Widget build(BuildContext context) => PvLearnScreen(
+        stage: LifeStage.parenting,
+        kind: switch (section.kind) {
+          LearningKind.liveCohort => PvLearnKind.cohort,
+          LearningKind.recordedCourse => PvLearnKind.course,
+          LearningKind.masterclass => PvLearnKind.masterclass,
+        },
+        topic: topic,
+      );
+}
+
+/// The pre-2026-09-20 body. Kept for revert; nothing pushes it.
+class CourseListingScreenClassic extends StatefulWidget {
+  const CourseListingScreenClassic({
     super.key,
     required this.section,
     required this.topic,
@@ -431,10 +466,10 @@ class CourseListingScreen extends StatefulWidget {
   final String topic;
 
   @override
-  State<CourseListingScreen> createState() => _CourseListingScreenState();
+  State<CourseListingScreenClassic> createState() => _CourseListingScreenState();
 }
 
-class _CourseListingScreenState extends State<CourseListingScreen> {
+class _CourseListingScreenState extends State<CourseListingScreenClassic> {
   final _search = TextEditingController();
   String _q = '';
   late String _topic = widget.topic;

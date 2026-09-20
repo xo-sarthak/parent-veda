@@ -31,7 +31,11 @@ void main() {
     tester.view.physicalSize = const Size(1170, 2600);
     tester.view.devicePixelRatio = 3.0;
     addTearDown(tester.view.reset);
-    await tester.pumpWidget(const MaterialApp(home: MyBookingsScreen()));
+    // ⚠️ Since 2026-09-20 `MyBookingsScreen` is a FACADE over the unified
+    // `PvMyLearningScreen` (test/pv_learn_test.dart holds its contract). This
+    // file pumps the body kept for revert, so a revert lands on a tested
+    // screen rather than a stale one.
+    await tester.pumpWidget(const MaterialApp(home: MyBookingsScreenClassic()));
     // Explicit pumps rather than pumpAndSettle: the screen kicks off async
     // reminder-scheduling in a post-frame callback, and pumpAndSettle can race
     // with that background work under the parallel test runner. Two pumps are

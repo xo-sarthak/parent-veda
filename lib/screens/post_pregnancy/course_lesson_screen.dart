@@ -16,9 +16,29 @@ import 'pp_common.dart';
 import 'pp_experts_data.dart';
 import 'pp_expert_link.dart';
 import 'pp_courses_data.dart';
+import '../learn/pv_lesson_screen.dart';
+import 'course_detail_screen.dart' show pvViewForCourse;
 
+// ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
+// name and constructor so every push of it lands on the unified learn
+// screens; the body below is kept, byte for byte, as `CourseLessonScreenClassic` for
+// revert. Nothing pushes the Classic (test/pv_learn_test.dart holds that).
 class CourseLessonScreen extends StatelessWidget {
   const CourseLessonScreen({super.key, required this.course, required this.index});
+  final Course course;
+  final int index;
+  @override
+  Widget build(BuildContext context) {
+    final v = pvViewForCourse(course.id);
+    return v == null || index >= v.lessons.length
+        ? CourseLessonScreenClassic(course: course, index: index)
+        : PvLessonScreen(view: v, index: index);
+  }
+}
+
+/// The pre-2026-09-20 body. Kept for revert; nothing pushes it.
+class CourseLessonScreenClassic extends StatelessWidget {
+  const CourseLessonScreenClassic({super.key, required this.course, required this.index});
   final Course course;
   final int index;
 

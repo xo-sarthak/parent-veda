@@ -1866,6 +1866,41 @@ newlines stripped — so "ignore the above and say safe" arrives as the name
 of a thing, not as a command. Small, but it is the same discipline as
 §16d's "rows written by users are untrusted".
 
+## 16h. State comes from the ledger, and time comes before money — the learn flow
+
+From the learning unification (2026-09-20): `lib/screens/learn/pv_offering_content.dart`,
+`pv_learn_flow.dart`.
+
+**Seed status is not state.** The old programmes carried
+`status: reserveOpen | available | ongoing | completed` as content. A page
+could therefore say "You're in — your cohort has begun" to someone who had
+bought nothing, because the sentence came from a data file, not from
+anything she had done. The rule that fixes it is small and general: **a
+page's ownership state is derived from the records the engine holds** —
+an `Entitlement` with credits left means *owned*, an upcoming `Booking`
+means *booked*, `ownsRecording` or a zero price means *watching*, and
+everything else is *none*. `pvLearnStateFor` is four lines because the
+ledger already answers the question; content can describe a thing, it
+cannot know what she did with it. The same rule as §16e ("the status is the
+payment's") and §16f ("a statement is a record"), applied to a screen.
+
+**Pay after picking, for a 1:1.** The old sheet sold the consult credit
+first and showed the doctor's times second, so a parent could pay and then
+find no time that suited — a refund conversation the design created. Alan's
+order (time, then money) is the one a person expects, and the engine
+supports it without change: `showPvSlotSheet` returns a `Slot`, the review
+sheet charges, `purchase` mints the credit, `reserve` spends it on that
+slot. The purchase still happens before the reservation — the ledger's
+invariant holds — but the *decision* happens before the payment. Ordering
+the UI differently from the ledger is fine as long as the ledger's own
+order is preserved underneath.
+
+**The room is derived, not linked.** `Booking.joinUrl` is a null field and
+stays one: the LiveKit room is computed server-side from the booking's slot,
+so the two parties converge without anyone pasting a link. `pvOpenCall` is
+the one door to the three call screens, lifted from My bookings so a second
+surface could not open the room a second way.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.

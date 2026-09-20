@@ -38,6 +38,8 @@ import 'ttc_mind_today_screen.dart';
 import 'ttc_practice_player.dart';
 import 'ttc_surface_router.dart';
 import 'ttc_tool_chrome.dart';
+import '../learn/pv_offering_screen.dart';
+import '../learn/pv_learn_catalog.dart';
 
 /// Sage. The hue of "The practice" tab, which is where this course is reached
 /// from — see `ttc_focus_mind_body.dart`. The course is the deep end of that
@@ -48,8 +50,23 @@ const double kTtcCourseHue = 104;
 //  The course
 // =============================================================================
 
+// ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
+// name and constructor so every push of it lands on the unified learn
+// screens; the body below is kept, byte for byte, as `TtcGarbhCourseScreenClassic` for
+// revert. Nothing pushes the Classic (test/pv_learn_test.dart holds that).
 class TtcGarbhCourseScreen extends StatelessWidget {
-  const TtcGarbhCourseScreen({super.key});
+  const TtcGarbhCourseScreen({super.key, });
+
+  @override
+  Widget build(BuildContext context) {
+    final v = PvLearnCatalog.instance.byId(kPvTtcGarbhCourseId);
+    return v == null ? const TtcGarbhCourseScreenClassic() : PvOfferingScreen(view: v);
+  }
+}
+
+/// The pre-2026-09-20 body. Kept for revert; nothing pushes it.
+class TtcGarbhCourseScreenClassic extends StatelessWidget {
+  const TtcGarbhCourseScreenClassic({super.key});
 
   @override
   Widget build(BuildContext context) {

@@ -9,9 +9,24 @@ import '../../data/prepare_data.dart';
 import 'cohort_detail_screen.dart';
 import 'prepare_common.dart';
 import '../../localization/app_language.dart';
+import '../learn/pv_learn_screen.dart';
+import '../../services/life_stage_store.dart';
+import '../../data/learn/pv_learn_view.dart';
 
+// ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
+// name and constructor so every push of it lands on the unified learn
+// screens; the body below is kept, byte for byte, as `CohortsScreenClassic` for
+// revert. Nothing pushes the Classic (test/pv_learn_test.dart holds that).
 class CohortsScreen extends StatelessWidget {
   const CohortsScreen({super.key, required this.lang});
+  final AppLanguage lang;
+  @override
+  Widget build(BuildContext context) => const PvLearnScreen(stage: LifeStage.pregnancy, kind: PvLearnKind.cohort);
+}
+
+/// The pre-2026-09-20 body. Kept for revert; nothing pushes it.
+class CohortsScreenClassic extends StatelessWidget {
+  const CohortsScreenClassic({super.key, required this.lang});
 
   final AppLanguage lang;
 

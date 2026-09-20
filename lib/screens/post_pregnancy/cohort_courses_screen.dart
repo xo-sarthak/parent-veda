@@ -17,9 +17,23 @@ import 'pp_child_profile.dart';
 
 import 'cohort_funnel_screen.dart';
 import 'pp_common.dart';
+import '../learn/pv_learn_screen.dart';
+import '../../services/life_stage_store.dart';
+import '../../data/learn/pv_learn_view.dart';
 
+// ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
+// name and constructor so every push of it lands on the unified learn
+// screens; the body below is kept, byte for byte, as `CohortCoursesScreenClassic` for
+// revert. Nothing pushes the Classic (test/pv_learn_test.dart holds that).
 class CohortCoursesScreen extends StatelessWidget {
   const CohortCoursesScreen({super.key});
+  @override
+  Widget build(BuildContext context) => const PvLearnScreen(stage: LifeStage.parenting, kind: PvLearnKind.cohort);
+}
+
+/// The pre-2026-09-20 body. Kept for revert; nothing pushes it.
+class CohortCoursesScreenClassic extends StatelessWidget {
+  const CohortCoursesScreenClassic({super.key});
 
   Widget _pad(Widget c) => Padding(padding: const EdgeInsets.symmetric(horizontal: 24), child: c);
 

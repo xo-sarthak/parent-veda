@@ -24,9 +24,39 @@ import '../../ttc/ttc_store.dart';
 import 'ttc_common.dart';
 import 'ttc_garbh_course_screen.dart';
 import 'ttc_strings.dart';
+import '../learn/pv_learn_screen.dart';
+import '../../services/life_stage_store.dart';
+import '../../data/learn/pv_learn_view.dart';
+import '../learn/pv_offering_screen.dart';
+import '../learn/pv_learn_catalog.dart';
 
+// ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
+// name and constructor so every push of it lands on the unified learn
+// screens; the body below is kept, byte for byte, as `TtcPrepareScreenClassic` for
+// revert. Nothing pushes the Classic (test/pv_learn_test.dart holds that).
 class TtcPrepareScreen extends StatelessWidget {
   const TtcPrepareScreen({super.key, this.onlyCategory});
+  final String? onlyCategory;
+
+  /// The nine Prepare categories, still the stage's vocabulary for the
+  /// topic chips; kept on the facade so callers and tests keep one name.
+  static List<(String, String, String)> get categories => ttcPrepareCategories;
+
+  @override
+  Widget build(BuildContext context) => PvLearnScreen(
+        stage: LifeStage.tryingToConceive,
+        kind: switch (onlyCategory) {
+          'consults' => PvLearnKind.consult,
+          'courses' => PvLearnKind.course,
+          _ => null,
+        },
+        topic: onlyCategory == 'consults' || onlyCategory == 'courses' ? null : onlyCategory,
+      );
+}
+
+/// The pre-2026-09-20 body. Kept for revert; nothing pushes it.
+class TtcPrepareScreenClassic extends StatelessWidget {
+  const TtcPrepareScreenClassic({super.key, this.onlyCategory});
 
   /// Show one category instead of all nine.
   ///
@@ -157,8 +187,23 @@ class _OfferingCard extends StatelessWidget {
 //  One offering, and its real slots
 // =============================================================================
 
+// ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
+// name and constructor so every push of it lands on the unified learn
+// screens; the body below is kept, byte for byte, as `TtcOfferingScreenClassic` for
+// revert. Nothing pushes the Classic (test/pv_learn_test.dart holds that).
 class TtcOfferingScreen extends StatelessWidget {
   const TtcOfferingScreen({super.key, required this.offering});
+  final TtcOffering offering;
+  @override
+  Widget build(BuildContext context) {
+    final v = PvLearnCatalog.instance.byId(offering.id);
+    return v == null ? TtcOfferingScreenClassic(offering: offering) : PvOfferingScreen(view: v);
+  }
+}
+
+/// The pre-2026-09-20 body. Kept for revert; nothing pushes it.
+class TtcOfferingScreenClassic extends StatelessWidget {
+  const TtcOfferingScreenClassic({super.key, required this.offering});
 
   final TtcOffering offering;
 

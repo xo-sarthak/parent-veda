@@ -16,9 +16,24 @@ import '../../data/prepare_data.dart';
 import 'prepare_common.dart';
 import 'program_detail_screen.dart';
 import '../../localization/app_language.dart';
+import '../learn/pv_learn_screen.dart';
+import '../../services/life_stage_store.dart';
 
-class CoursesCohortsScreen extends StatefulWidget {
+// ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
+// name and constructor so every push of it lands on the unified learn
+// screens; the body below is kept, byte for byte, as `CoursesCohortsScreenClassic` for
+// revert. Nothing pushes the Classic (test/pv_learn_test.dart holds that).
+class CoursesCohortsScreen extends StatelessWidget {
   const CoursesCohortsScreen({super.key, required this.lang, this.topic});
+  final AppLanguage lang;
+  final String? topic;
+  @override
+  Widget build(BuildContext context) => PvLearnScreen(stage: LifeStage.pregnancy, topic: topic);
+}
+
+/// The pre-2026-09-20 body. Kept for revert; nothing pushes it.
+class CoursesCohortsScreenClassic extends StatefulWidget {
+  const CoursesCohortsScreenClassic({super.key, required this.lang, this.topic});
 
   final AppLanguage lang;
 
@@ -26,10 +41,10 @@ class CoursesCohortsScreen extends StatefulWidget {
   final String? topic;
 
   @override
-  State<CoursesCohortsScreen> createState() => _CoursesCohortsScreenState();
+  State<CoursesCohortsScreenClassic> createState() => _CoursesCohortsScreenState();
 }
 
-class _CoursesCohortsScreenState extends State<CoursesCohortsScreen> {
+class _CoursesCohortsScreenState extends State<CoursesCohortsScreenClassic> {
   final TextEditingController _search = TextEditingController();
   String _query = '';
   String? _topic;

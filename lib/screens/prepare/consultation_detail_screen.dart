@@ -10,9 +10,28 @@ import '../../data/prepare_data.dart';
 import '../../experts/expert_link.dart';
 import 'prepare_common.dart';
 import '../../localization/app_language.dart';
+import '../learn/pv_offering_screen.dart';
+import '../learn/pv_learn_catalog.dart';
 
-class ConsultationDetailScreen extends StatefulWidget {
-  const ConsultationDetailScreen(
+// ⚠️ FACADE since 2026-09-20 (docs/LEARNING-AUDIT.md). The class keeps its
+// name and constructor so every push of it lands on the unified learn
+// screens; the body below is kept, byte for byte, as `ConsultationDetailScreenClassic` for
+// revert. Nothing pushes the Classic (test/pv_learn_test.dart holds that).
+class ConsultationDetailScreen extends StatelessWidget {
+  const ConsultationDetailScreen({super.key, required this.specialist, required this.lang, this.onBooked});
+  final Specialist specialist;
+  final AppLanguage lang;
+  final VoidCallback? onBooked;
+  @override
+  Widget build(BuildContext context) {
+    final v = PvLearnCatalog.instance.byId(specialist.id);
+    return v == null ? ConsultationDetailScreenClassic(specialist: specialist, lang: lang, onBooked: onBooked) : PvOfferingScreen(view: v);
+  }
+}
+
+/// The pre-2026-09-20 body. Kept for revert; nothing pushes it.
+class ConsultationDetailScreenClassic extends StatefulWidget {
+  const ConsultationDetailScreenClassic(
       {super.key, required this.specialist, required this.lang, this.onBooked});
 
   final Specialist specialist;
@@ -24,10 +43,10 @@ class ConsultationDetailScreen extends StatefulWidget {
   final VoidCallback? onBooked;
 
   @override
-  State<ConsultationDetailScreen> createState() => _ConsultationDetailScreenState();
+  State<ConsultationDetailScreenClassic> createState() => _ConsultationDetailScreenState();
 }
 
-class _ConsultationDetailScreenState extends State<ConsultationDetailScreen> {
+class _ConsultationDetailScreenState extends State<ConsultationDetailScreenClassic> {
   int _slot = 0;
 
   @override

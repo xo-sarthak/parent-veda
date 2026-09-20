@@ -30,6 +30,10 @@ import 'pp_yoga_data.dart';
 import 'provider_booking_sheet.dart';
 import 'watch_channel_screen.dart';
 import 'yoga_class_screen.dart';
+import '../../data/learn/pv_learn_view.dart';
+import '../learn/pv_learn_catalog.dart';
+import '../learn/pv_learn_flow.dart';
+import '../learn/pv_offering_screen.dart';
 
 class ProviderProfileScreen extends StatelessWidget {
   const ProviderProfileScreen({super.key, this.expert});
@@ -674,9 +678,10 @@ class _ProfileBodyState extends State<_ProfileBody> {
   @override
   Widget build(BuildContext context) {
     final p = V2PaletteStore.instance.current;
-    final programs = programsByInstructor(e.id);
-    final yogaClasses = classesByInstructor(e.name);
-    final prepPrograms = prepProgramsByInstructor(e.name);
+    // Kept for revert — the three per-source lists the old offer loops read:
+    //   final programs = programsByInstructor(e.id);
+    //   final yogaClasses = classesByInstructor(e.name);
+    //   final prepPrograms = prepProgramsByInstructor(e.name);
     final labels = e.tagsNow;
     String label(int i) => i < labels.length ? labels[i] : e.tags[i];
     final langs = <String>[];
@@ -704,48 +709,75 @@ class _ProfileBodyState extends State<_ProfileBody> {
         .map((w) => w[0])
         .join();
     final well = Color.alphaBlend(p.ink1.withValues(alpha: 0.06), p.surface);
+    // ⚠️ WHAT SHE OFFERS, FROM THE ONE CATALOGUE — 2026-09-20. The four loops
+    // below (consult · Prepare programme · parenting programme · yoga class)
+    // each opened a different page for the same kind of thing, which is how
+    // "when you click on them, old pages are opening" happened. Now every
+    // row is a `PvOfferingView` from `PvLearnCatalog.forExpert`, and every
+    // row opens `PvOfferingScreen`. The consult is one of those rows. The
+    // old loops are kept for revert:
+    // final offers = <Widget>[];
+    // if (bookable) {
+    //   offers.add(_offerRow(
+    //     p,
+    //     icon: Icons.videocam_outlined,
+    //     title: '1:1 consultation  ·  30 min video',
+    //     sub: sp != null
+    //         ? '${sp.consultPrice}  ·  today ${sp.slots.join(', ')}'
+    //         : '${e.fee.$1} ${e.fee.$2}${e.timings.trim().isEmpty ? '' : '  ·  ${e.timings}'}',
+    //     onTap: () => _book(context, sp),
+    //   ));
+    // }
+    // for (final pr in prepPrograms) {
+    //   offers.add(_offerRow(
+    //     p,
+    //     icon: Icons.school_outlined,
+    //     title: pr.title.now,
+    //     sub: '${pr.kind.name[0].toUpperCase()}${pr.kind.name.substring(1)}  ·  ${pr.price}',
+    //     onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
+    //       settings: RouteSettings(name: 'prepare/program/${pr.id}'),
+    //       builder: (_) => ProgramDetailScreen(program: pr, lang: S.current),
+    //     )),
+    //   ));
+    // }
+    // for (final pr in programs) {
+    //   offers.add(_offerRow(
+    //     p,
+    //     icon: Icons.school_outlined,
+    //     title: pr.title,
+    //     sub: '${pr.kind.label}  ·  ${pr.durationLabel}  ·  ${pr.price}',
+    //     onTap: () => Navigator.of(context).push(
+    //         MaterialPageRoute<void>(builder: (_) => LearningDetailScreen(program: pr))),
+    //   ));
+    // }
+    // for (final c in yogaClasses) {
+    //   offers.add(_offerRow(
+    //     p,
+    //     icon: Icons.self_improvement_rounded,
+    //     title: c.title,
+    //     sub: 'Class  ·  Yoga & fitness',
+    //     onTap: () => Navigator.of(context).push(
+    //         MaterialPageRoute<void>(builder: (_) => YogaClassScreen(cls: c))),
+    //   ));
+    // }
     final offers = <Widget>[];
-    if (bookable) {
+    final offered = <PvOfferingView>[
+      ...PvLearnCatalog.instance.forExpert(e.id),
+      if (sp != null) ?PvLearnCatalog.instance.byId(sp.id),
+    ];
+    final seen = <String>{};
+    for (final v in offered) {
+      if (!seen.add(v.id)) continue;
       offers.add(_offerRow(
         p,
-        icon: Icons.videocam_outlined,
-        title: '1:1 consultation  ·  30 min video',
-        sub: sp != null
-            ? '${sp.consultPrice}  ·  today ${sp.slots.join(', ')}'
-            : '${e.fee.$1} ${e.fee.$2}${e.timings.trim().isEmpty ? '' : '  ·  ${e.timings}'}',
-        onTap: () => _book(context, sp),
-      ));
-    }
-    for (final pr in prepPrograms) {
-      offers.add(_offerRow(
-        p,
-        icon: Icons.school_outlined,
-        title: pr.title.now,
-        sub: '${pr.kind.name[0].toUpperCase()}${pr.kind.name.substring(1)}  ·  ${pr.price}',
-        onTap: () => Navigator.of(context).push(MaterialPageRoute<void>(
-          settings: RouteSettings(name: 'prepare/program/${pr.id}'),
-          builder: (_) => ProgramDetailScreen(program: pr, lang: S.current),
-        )),
-      ));
-    }
-    for (final pr in programs) {
-      offers.add(_offerRow(
-        p,
-        icon: Icons.school_outlined,
-        title: pr.title,
-        sub: '${pr.kind.label}  ·  ${pr.durationLabel}  ·  ${pr.price}',
-        onTap: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(builder: (_) => LearningDetailScreen(program: pr))),
-      ));
-    }
-    for (final c in yogaClasses) {
-      offers.add(_offerRow(
-        p,
-        icon: Icons.self_improvement_rounded,
-        title: c.title,
-        sub: 'Class  ·  Yoga & fitness',
-        onTap: () => Navigator.of(context).push(
-            MaterialPageRoute<void>(builder: (_) => YogaClassScreen(cls: c))),
+        icon: switch (v.kind) {
+          PvLearnKind.consult => Icons.videocam_outlined,
+          PvLearnKind.classPack => Icons.self_improvement_rounded,
+          _ => Icons.school_outlined,
+        },
+        title: v.title,
+        sub: '${v.kind.label}  ·  ${v.facts.isNotEmpty ? v.facts.first.value : v.durationLabel}  ·  ${v.priceLabel}',
+        onTap: () => pvOpenOffering(context, v),
       ));
     }
 
@@ -973,22 +1005,26 @@ class _ProfileBodyState extends State<_ProfileBody> {
 
   void _book(BuildContext context, Specialist? sp) {
     pvCommitFeedback();
-    // A pregnancy specialist books through the Prepare sheet with a slot;
-    // the slot picker is the sheet's own (see _pickSlot). Parenting doctors
-    // go through the booking engine as before.
-    if (sp != null) {
-      _pickSlot(context, sp);
+    // ⚠️ ONE FLOW — 2026-09-20. The pill runs `pvLearnCommit` on the consult
+    // offering: the slot sheet (their real calendar), then review and pay,
+    // then the Booked page. The pregnancy specialist used to go through its
+    // own `_pickSlot` (a sheet of ink pills, a mock confirm) and the
+    // parenting doctor through `showBookingSheet` — two funnels for one
+    // half hour. Kept for revert:
+    //   if (sp != null) { _pickSlot(context, sp); return; }
+    //   final o = BookingCatalog.instance.offeringForCatalog(e.id);
+    //   if (o != null) showBookingSheet(context, o); else showProviderBookingSheet(context, e);
+    final v = PvLearnCatalog.instance.byId(sp?.id ?? e.id) ?? PvLearnCatalog.instance.byId(e.id);
+    if (v != null) {
+      pvLearnCommit(context, v);
       return;
     }
-    final o = BookingCatalog.instance.offeringForCatalog(e.id);
-    if (o != null) {
-      showBookingSheet(context, o);
-    } else {
-      showProviderBookingSheet(context, e);
-    }
+    showProviderBookingSheet(context, e);
   }
 
   /// Which slot — a sheet of ink pills, then the Prepare confirm sheet.
+  /// Kept for revert; the unified slot sheet replaced it on 2026-09-20.
+  // ignore: unused_element
   Future<void> _pickSlot(BuildContext context, Specialist sp) async {
     final p = V2PaletteStore.instance.current;
     final slot = await showModalBottomSheet<String>(
