@@ -1927,6 +1927,94 @@ every save — a per-user blob that only grows is a per-user blob that one
 day fails to save, silently, because it crossed a row size nobody set on
 purpose.
 
+## 16i. A URL you do not own is a dependency you did not declare — the photos
+
+`lib/data/reads/read_images.dart` + `tools/read_images/`, 2026-09-20.
+Every photograph in the app was a hotlink to a free host — Wikimedia
+Commons, StockSnap — and for a week the phone showed icon wells where
+the photos should be. The diagnosis went wrong before it went right, and
+the wrong turn is the lesson.
+
+**What it looked like:** photos missing on the device, in batches. The
+first explanation was Wikimedia's rate limit — it does answer 429 above
+roughly one request a second per IP, my scripts had been hammering it,
+and a door opens thirty photos at once. Plausible, partly true, and it
+hid the real fault for days.
+
+**What it was:** `cdn.stocksnap.io` sits behind a Cloudflare rule that
+answers **403 to anything that is not a browser tab** — a Dart user
+agent, a Chrome user agent, a referer, nothing gets through, and it is
+not throttling, it is policy. The two hosts failed differently: one
+*sometimes*, one *always*. 196 of the 357 photos had never drawn on a
+phone, and a 429 story covered for a 403 one because both look the same
+in a widget — an `errorBuilder` fallback.
+
+The general fact: **a third party's URL in your table is a runtime
+dependency on their access policy**, and they can change it without a
+version bump, a deprecation or a log line on your side. The same
+sentence is true of a CDN, a free API tier and a `hi-IN` voice. You own
+it the day you copy it somewhere you control.
+
+**The fix has three layers, and the order matters:**
+
+1. **Mirror what you reference.** `tools/read_images/fetch_read_images.py`
+   walks the Dart table (no Dart needed — a regex over the source) and
+   writes every id to one folder as `<id>.jpg`, 1200px, with a manifest
+   and a credits file. It is re-runnable and resumes: an id whose file
+   exists *from the same source URL* is skipped, a re-picked id is
+   fetched again. It fetches StockSnap through **Openverse's proxy**
+   (`/v1/images/<id>/thumb/?full_size=true` — the 960w original, 1000 a
+   day per IP, Cloudflare-cached) because the CDN refuses scripts too;
+   `openverse_ids.json` beside it carries the id map.
+2. **One switch in the app.** `readImageFor` is the only way a photo URL
+   leaves the table (a rail that read `kReadImageUrls[...]` directly was
+   the one bypass, closed). Once the folder is on R2, `kReadImageBase`
+   becomes the bucket's public URL and every lookup returns
+   `<base><id>.jpg`; the table's URLs become provenance for the credits
+   and nothing else.
+3. **A stopgap that dies on its own.** Until the base is set, StockSnap
+   ids route through the same Openverse proxy on the phone
+   (`kOpenverseIds`, generated from the sidecar). It is not a launch
+   answer — a carrier NAT puts thousands of phones behind one IP and the
+   proxy's budget is 1000 a day per IP — and it is written so the R2
+   branch runs first and makes it unreachable.
+
+**Why a folder and a constant, not a table in Supabase:** the images are
+content the build ships references to; nothing about them is per-user,
+and a query for a URL we already know is a round trip for nothing. A
+folder with the ids as file names *is* the index.
+
+## 16j. An estimate is a fact about the food, not a verdict about her — `food_values.dart`
+
+2026-09-20. The Nutrition door gained a number under every meal, and the
+design question was not "how do we compute it" but "what is it allowed to
+mean". Three decisions, each one a rule you can reuse:
+
+1. **Estimate from a table you own, and say so on every surface.** The
+   values come from a ~150-food table at IFCT scale, not from a nutrition
+   API — an API is a runtime dependency on someone else's access policy
+   (§16i), and these numbers change once a decade. The caveat line
+   (`kNutritionEstimateNote`) is on every surface that shows a grid,
+   verbatim, held by a test. An estimate that does not say it is one is a
+   lie by omission.
+2. **Two estimators, one table.** Prose ("Dal with two rotis") is matched
+   longest-phrase-first with count words; a recipe is summed from its
+   ingredients by weight. Same table, so a chart day and a recipe can never
+   disagree about what a roti is. Unknown ingredients contribute nothing,
+   so a recipe can only read low — the right side to err on.
+3. **The reference is a population fact, shown once, never as a bar.** A
+   day in pregnancy asks for roughly 27 mg iron; that sentence sits by the
+   ticks in the word "roughly". Her plate is never drawn against it as a
+   percentage, because a bar against a target is exactly the pressure the
+   clinical rule (never a personalised probability; statistics only where
+   they reduce pressure) exists to forbid. `test/food_values_test.dart`
+   greps the four surfaces for `kPregnancyDayReference` and
+   `LinearProgressIndicator` so the bar cannot come back quietly.
+
+The general fact: **when a number is derived, decide what it may be
+compared to before you decide how to draw it.** The comparison is the
+claim; the tile is just type.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
@@ -1985,3 +2073,5 @@ purpose.
     versus a process on a server; the model names, the app judges (§16g).
 24. `lib/services/nutrition_day_store.dart` — a day is a local date string,
     never a DateTime; a per-user blob that prunes itself (§16h).
+
+

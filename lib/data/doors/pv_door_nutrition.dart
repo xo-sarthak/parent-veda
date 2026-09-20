@@ -75,6 +75,8 @@
 import 'package:flutter/material.dart' show Icons;
 
 import '../nutrition_data.dart';
+import '../reads/read_images.dart' show readImageFor;
+import '../../screens/brackets/hub/hub_intent_art.dart' show IntentMark;
 import 'pv_door_data.dart';
 
 /// Surfaces this door opens. Constants because each becomes a route NAME.
@@ -85,8 +87,15 @@ const String kDietSurfaceFasting = 'nutrition/fasting';
 const String kDietSurfaceBigger = 'nutrition/nutrients';
 const String kDietSurfaceExperts = 'nutrition/experts';
 const String kDietSurfaceQuestions = 'nutrition/questions';
+// 2026-09-20, the consistency pass: the day as the first tab's tool, the
+// recipes as an inline rail. See nutrition_today_body.dart.
+const String kDietSurfaceToday = 'nutrition/today';
+const String kDietSurfaceRecipeRail = 'nutrition/recipe_rail';
+const String kDietSurfaceList = 'nutrition/list';
 
-const String kDietTabEat = 'eat';
+const String kDietTabEat = 'eat'; // retired 2026-09-20 (a second Is it safe?); kept for revert
+const String kDietTabToday = 'today';
+const String kDietTabRecipes = 'recipes';
 const String kDietTabNow = 'now';
 const String kDietTabNutrients = 'nutrients';
 const String kDietTabCharts = 'charts';
@@ -139,11 +148,14 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
   // line under it says "for an Indian kitchen"; a bowl of salad over those
   // words is the picture arguing with the sentence.
   //
-  // A South Indian veg thali on a banana leaf, viewed and chosen rather than
-  // picked from a caption — see `pv_door_scans.dart` for why that distinction
-  // is the whole rule about photographs here.
-  heroImageUrl:
-      'https://images.unsplash.com/photo-1742281257687-092746ad6021?w=900&h=700&fit=crop',
+  // Two hands cupping cherry tomatoes over a wooden table (StockSnap, CC0),
+  // picked by eye on 2026-09-20 from a contact sheet of market, produce,
+  // kitchen and bowl candidates: hands and food, no plate, no country in
+  // the frame, dark enough under the door's scrim for white type. It lives
+  // in the read-image table so the R2 mirror carries it with the rest.
+  // The thali it replaces, kept for revert:
+  //   'https://images.unsplash.com/photo-1742281257687-092746ad6021?w=900&h=700&fit=crop'
+  heroImageUrl: readImageFor('nutrition_hero'),
 
   // ⚠️ NO CLOSING LINE, AND REMOVING IT IS THE FIX RATHER THAN THE OMISSION.
   //
@@ -174,34 +186,65 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
     // -------------------------------------------------------------------------
     //  1. Can I eat this? — the checker and cravings, inline
     // -------------------------------------------------------------------------
+    // ⚠️ THE FIRST TAB IS TODAY — 2026-09-20, the consistency pass. It used
+    // to be "Can I eat this?", a 64-food safety checker: a second, weaker Is
+    // it safe? next door to the real one. One home per fact — that group is
+    // retired (kept below, commented, for revert) and a tile on Today points
+    // at the Is it safe? door. In its place, the day: her plate, the five
+    // ticks, the glasses, the cravings — the tool that makes this door
+    // something she opens every day rather than reads once.
     PvDoorGroup(
-      id: kDietTabEat,
-      label: 'Can I eat this?',
-      icon: Icons.search_rounded,
+      id: kDietTabToday,
+      label: 'Today',
+      icon: Icons.restaurant_outlined,
+      mark: IntentMark.plate, // the drawn marks Scans and Complications wear (the user, 2026-09-20)
       hue: 104,
-      inlineSurfaceId: kDietSurfaceCanIEat,
-      inlineLabel: 'Search any food',
-      layout: PvDoorLayout.stack,
+      inlineSurfaceId: kDietSurfaceToday,
+      inlineLabel: 'Your plate',
     ),
+    // Kept for revert:
+    // PvDoorGroup(
+    //   id: kDietTabEat,
+    //   label: 'Can I eat this?',
+    //   icon: Icons.search_rounded,
+    //   hue: 104,
+    //   inlineSurfaceId: kDietSurfaceCanIEat,
+    //   inlineLabel: 'Search any food',
+    //   layout: PvDoorLayout.stack,
+    // ),
 
     PvDoorGroup(
       id: kDietTabNow,
       label: 'What to eat now',
       icon: Icons.restaurant_menu_outlined,
+      mark: IntentMark.nextStep,
       hue: 26,
     ),
 
+    // THE RECIPES TAB IS A TOOL, NOT A RAIL. The user asked (2026-09-20)
+    // whether a rail was the right way to show recipes; the recipe apps say
+    // no (a filterable photo grid, led by one card). `RecipesGridBody`.
     PvDoorGroup(
-      id: kDietTabNutrients,
-      label: 'Nutrients & recipes',
-      icon: Icons.eco_outlined,
+      id: kDietTabRecipes,
+      label: 'Recipes',
+      icon: Icons.soup_kitchen_outlined,
+      mark: IntentMark.cuppedHands,
       hue: 160,
+      inlineSurfaceId: kDietSurfaceRecipeRail,
+      inlineLabel: '${kRecipes.length} to cook',
     ),
+
+    // "What your body needs" is a section of What to eat now since
+    // 2026-09-20, so the door keeps five tabs like every other. Kept for
+    // revert:
+    // PvDoorGroup(id: kDietTabNutrients, label: 'What your body needs',
+    //     icon: Icons.eco_outlined, hue: 186),
 
     PvDoorGroup(
       id: kDietTabCharts,
       label: 'Charts & fasting',
       icon: Icons.event_note_outlined,
+      mark: IntentMark.calendarDay,
       hue: 42,
     ),
 
@@ -223,9 +266,10 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
       id: kDietTabTalk,
       label: 'Talk',
       icon: Icons.chat_bubble_outline_rounded,
+      mark: IntentMark.askDoctor,
       hue: 344,
-      inlineSurfaceId: kDietSurfaceExperts,
-      inlineLabel: 'Dieticians',
+      inlineSurfaceId: kDietSurfaceExperts, // NutritionTalkBody since 2026-09-20
+      inlineLabel: 'The dietician',
       note: 'This is general guidance, not your doctor\'s advice. Anything '
           'specific to your health goes to your doctor or our dietician.',
     ),
@@ -233,12 +277,24 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
 
   sections: [
     // =========================================================================
-    //  SUB-TAB 1 · Can I eat this?
-    // -------------------------------------------------------------------------
-    //  No cards. The brief lists five things for this tab — the search, the
-    //  most-searched chips, the category chips, the food list, and cravings
-    //  folded in — and all five ARE the inline screen.
+    //  SUB-TAB 1 · Today — the tool draws above; one section under it
     // =========================================================================
+    PvDoorSection(
+      group: kDietTabToday,
+      heading: 'Also on this door',
+      tiles: [
+        PvDoorToolTile(
+          title: 'Is this food safe?',
+          blurb: 'Papaya, paneer, street food, a packet — the Is it safe? door, one tap away.',
+          surfaceId: 'can_i',
+        ),
+        PvDoorToolTile(
+          title: 'Your shopping list',
+          blurb: 'Ingredients from the recipes you picked, ticked off at the shop.',
+          surfaceId: kDietSurfaceList,
+        ),
+      ],
+    ),
 
     // =========================================================================
     //  SUB-TAB 2 · What to eat now
@@ -315,7 +371,7 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
     //  SUB-TAB 3 · Nutrients and recipes
     // =========================================================================
     PvDoorSection(
-      group: kDietTabNutrients,
+      group: kDietTabNow, // was its own tab; five tabs like every door (2026-09-20)
       heading: 'What your body needs',
       tiles: [
         ..._tilesFor(PvDoorLibrary.nutrient, [
@@ -326,16 +382,12 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
               blurb: _firstSentence(n.whatItDoes.en),
             ),
         ]),
-        // ⚠️ "The bigger questions" IS A SECTION OF THE NUTRIENTS SCREEN, NOT A
-        // PAGE — five whole-diet cards rendered under that heading. So one card
-        // opens that screen, which is where they live. The brief marks it
-        // [Guide] reuse and this is the reuse.
-        PvDoorToolTile(
-          title: 'The bigger questions',
-          blurb: 'Prenatal vitamins, iron and calcium timing, veg protein and '
-              'B12, and whether your thali is enough.',
-          surfaceId: kDietSurfaceBigger,
-        ),
+        // "The bigger questions" was a tool tile at the end of this rail that
+        // opened `NutrientsScreen` — the same twelve nutrients again, with the
+        // five whole-diet cards under them. The user (2026-09-20): repetitive.
+        // The five are reads now, in the next section; the tile is kept for
+        // revert:
+        //   PvDoorToolTile(title: 'The bigger questions', blurb: ..., surfaceId: kDietSurfaceBigger),
         // ⚠️ COMING SOON, AND THE PLACEHOLDER ALREADY SHIPS on the nutrients
         // screen. The brief marks it [Video, COMING SOON] reuse; the card holds
         // its place at full size and does not tap.
@@ -347,24 +399,20 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
       ],
     ),
 
+    // Recipes: the whole tab is `RecipesGridBody` (the group's inline
+    // tool). The rail + tile list it had for an hour is kept for revert:
+    //   PvDoorSection.inline(group: kDietTabRecipes, heading: 'Recipes for you',
+    //       inlineSurfaceId: kDietSurfaceRecipeRail),
+    //   PvDoorSection(group: kDietTabRecipes, heading: 'Every recipe', tiles:
+    //       [PvDoorToolTile(... surfaceId: kDietSurfaceRecipes), ..._tilesFor(recipe)]),
+
     PvDoorSection(
-      group: kDietTabNutrients,
-      heading: 'Recipes to actually cook',
-      tiles: [
-        PvDoorToolTile(
-          title: 'Recipe library',
-          blurb: 'Filter by what you need, or by where you are from.',
-          surfaceId: kDietSurfaceRecipes,
-        ),
-        ..._tilesFor(PvDoorLibrary.recipe, [
-          for (final r in kRecipes)
-            (
-              id: r.id,
-              title: r.name.en,
-              blurb: _firstSentence(r.whyNow.en),
-            ),
-        ]),
-      ],
+      group: kDietTabNow,
+      heading: 'The bigger questions',
+      tiles: _tilesFor(PvDoorLibrary.dietQuestion, [
+        for (final q in kNutritionPracticalCards)
+          (id: q.id, title: q.title.en, blurb: _firstSentence(q.body.en)),
+      ]),
     ),
 
     // =========================================================================
@@ -414,24 +462,12 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
     PvDoorSection(
       group: kDietTabCharts,
       heading: 'Fasting, done safely',
-      tiles: [
-        // ⚠️ THE CARD IS NOT NAMED AFTER ITS SECTION, AND A RENDER TEST CAUGHT
-        // IT. Both read "Fasting, done safely" at first, which is the
-        // repeat-the-heading failure one level down from the tab: the card's
-        // title said nothing the heading had not just said, and the words she
-        // needed — which fasts are covered — were only in the blurb.
-        PvDoorEntryTile(
-          title: 'Fasting in pregnancy',
-          blurb: 'Navratri, Ramzan, Karva Chauth, Ekadashi and Jain fasts — '
-              'and whether to fast at all.',
-          library: PvDoorLibrary.fasting,
-          // ⚠️ A REAL ID SO THE WIRING TEST STILL BITES. It validates against
-          // the library even though every fasting id opens the same screen; a
-          // typo here should still fail rather than pass because the
-          // destination happens not to depend on it.
-          entryId: 'should_i_fast',
-        ),
-      ],
+      // Eight pages since 2026-09-20 (reads in the one reader — see
+      // nutrition_reads.dart); the one-card form above is history.
+      tiles: _tilesFor(PvDoorLibrary.fasting, [
+        for (final t in [...kFastingGeneral, ...kFastingByOccasion])
+          (id: t.id, title: t.title.en, blurb: _firstSentence(t.body.en)),
+      ]),
     ),
 
     // =========================================================================

@@ -40,6 +40,16 @@
 import 'package:flutter/material.dart';
 
 import '../../data/doors/pv_door_data.dart';
+import '../../data/reads/nutrition_reads.dart';
+import '../can_i_screen.dart' show CanIScreen;
+import '../../models/pv_read.dart';
+import '../nutrition/door/nutrition_today_body.dart';
+import '../nutrition/door/nutrition_talk_body.dart';
+import '../nutrition/door/nutrition_door.dart' show NutritionDoorScreen;
+import '../nutrition/door/recipe_cook_screen.dart';
+import '../nutrition/door/diet_chart_plan_screen.dart';
+import '../nutrition/door/recipes_screen.dart';
+import '../nutrition/door/shopping_list_screen.dart';
 import '../../data/reads/pregnancy_reads.dart';
 import '../../data/tests_scans_reports_data.dart';
 import '../../services/pregnancy_controller.dart';
@@ -58,7 +68,6 @@ import '../nutrition/diet_charts_screen.dart';
 import '../nutrition/can_i_eat_body.dart';
 import '../nutrition/fasting_screen.dart';
 import '../nutrition/nutrients_screen.dart';
-import '../nutrition/nutrition_recipes_screen.dart';
 // ⚠️ PREFIXED, BECAUSE `ConditionDetailScreen` EXISTS TWICE IN THIS APP. One is
 // the Complications page ("my doctor said I have X"); the other is the DIET
 // page for the same condition ("what to eat for it"). Two real screens with one
@@ -195,7 +204,14 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
       // chrome. `FoodCheckScreen` is still the standalone checker; this is the
       // folded pair the brief asks for.
       kDietSurfaceCanIEat => _CanIEatScreen(pregnancy: c),
-      kDietSurfaceRecipes => const NutritionRecipesScreen(),
+      kDietSurfaceRecipes => RecipesScreen(pregnancy: c), // base UI, 2026-09-20
+      kDietSurfaceList => const ShoppingListScreen(),
+      // Pushed forms of the two inline surfaces: the day as its own screen
+      // (the standalone door from earlier that night), the rail as the grid.
+      kDietSurfaceToday => NutritionDoorScreen(pregnancy: c),
+      kDietSurfaceRecipeRail => RecipesScreen(pregnancy: c),
+      // A door tile that points at the Is it safe? door.
+      'can_i' => CanIScreen(controller: c),
       kDietSurfaceCharts => DietChartsScreen(pregnancy: c),
       kDietSurfaceFasting => const FastingScreen(),
       kDietSurfaceBigger => const NutrientsScreen(),
@@ -262,6 +278,34 @@ void openPvDoorConditionPage(
   ));
 }
 
+/// A nutrition read in the one reader: the nutrition resolver for read-next,
+/// and the one action a diet-for-a-condition page carries (its condition).
+Widget _nutritionReader(PvRead read, PregnancyController c) => PvReaderScreen(
+      read: read,
+      lang: c.language,
+      resolveRead: nutritionReadById,
+      openRead: (context, id) {
+        final r = nutritionReadById(id);
+        if (r == null) return;
+        Navigator.of(context).push(MaterialPageRoute<void>(
+          settings: RouteSettings(name: 'read/$id'),
+          builder: (_) => _nutritionReader(r, c),
+        ));
+      },
+      openAction: (context, action) {
+        if (action.startsWith('condition:')) {
+          final cid = action.substring('condition:'.length);
+          final e = kAllConditions.where((x) => x.id == cid).firstOrNull;
+          if (e != null) {
+            Navigator.of(context).push(MaterialPageRoute<void>(
+              settings: const RouteSettings(name: 'conditions/detail'),
+              builder: (_) => ConditionDetailScreen(entry: e, pregnancy: c),
+            ));
+          }
+        }
+      },
+    );
+
 /// The tool a group renders IN PLACE, or null when it is not an inline tool.
 ///
 /// ⚠️ INLINE MEANS A BODY, NOT A SCREEN. Every widget returned here is a
@@ -283,9 +327,18 @@ Widget? pvDoorInlineToolFor(String id, PregnancyController c) => switch (id) {
       // ⚠️ THE FOOD CHECKER AND CRAVINGS, FOLDED. The brief's own call — same
       // "can I have this" question, two kinds of object. See `CanIEatBody`.
       kDietSurfaceCanIEat => CanIEatBody(pregnancy: c),
-      // ⚠️ THE FOUR PAID TIERS, RENDERED RATHER THAN RE-CARDED. Keeping the
-      // tiers exactly as they are is easiest to guarantee by not retyping them.
-      kDietSurfaceExperts => const diet.ExpertOptionsBlock(),
+      // ⚠️ THE DAY IS THE FIRST TAB — 2026-09-20. The plate, the ticks, the
+      // glasses and the cravings as one inline body, the way My scans is the
+      // timeline. See nutrition_today_body.dart.
+      kDietSurfaceToday => NutritionTodayBody(pregnancy: c),
+      // The dieticians, in the base UI: the nutritionist's own card and the
+      // four things she can do, booked through the same sheet as every
+      // consult. The old violet block (`ExpertOptionsBlock`) stays for revert.
+      kDietSurfaceExperts => NutritionTalkBody(pregnancy: c),
+      // The Recipes tab's tool: the library as a lead card + need chips +
+      // a photo grid (recipes_screen.dart). `NutritionRecipeRail` was the
+      // rail form, kept for revert.
+      kDietSurfaceRecipeRail => RecipesGridBody(pregnancy: c),
       // ⚠️ THE KEEPSAKE IS THE TAB. `BumpJourneyScreen` is a Scaffold, so the
       // inline form is its body — see `BumpJourneyBody`.
       kBsSurfaceRitual => BumpRitualBody(controller: c),
@@ -438,37 +491,33 @@ Widget? pvDoorEntryScreen(
           return ReportArticleScreen(finding: f, controller: c);
         }
       }
+    // ⚠️ THE NUTRITION LIBRARY OPENS IN THE ONE READER — 2026-09-20, the
+    // consistency pass. `NutrientDetailScreen`, `StageDetailScreen`,
+    // `ConditionDetailScreen` and `RecipeDetailScreen` were the old kit
+    // (violet buttons, tinted boxes); they stay in their files for revert
+    // and nothing reaches them. See lib/data/reads/nutrition_reads.dart.
     case PvDoorLibrary.nutrient:
       for (final n in kNutrientGuides) {
-        if (n.id == id) return NutrientDetailScreen(guide: n);
+        if (n.id == id) return _nutritionReader(pvReadFromNutrient(n), c);
       }
     case PvDoorLibrary.dietStage:
       for (final g in kTrimesterGuides) {
-        if (g.id == id) return diet.StageDetailScreen(guide: g);
+        if (g.id == id) return _nutritionReader(pvReadFromStage(g), c);
       }
     case PvDoorLibrary.dietCondition:
       for (final g in kConditionGuides) {
-        if (g.id == id) {
-          return diet.ConditionDetailScreen(guide: g, pregnancy: c);
-        }
+        if (g.id == id) return _nutritionReader(pvReadFromDietCondition(g), c);
       }
     case PvDoorLibrary.recipe:
       for (final r in kRecipes) {
-        if (r.id == id) return RecipeDetailScreen(recipe: r);
+        if (r.id == id) return RecipeCookScreen(recipe: r, pregnancy: c);
       }
     case PvDoorLibrary.dietChart:
       for (final ch in kDietCharts) {
-        if (ch.id == id) return DietChartScreen(chart: ch);
+        if (ch.id == id) return DietChartPlanScreen(pregnancy: c, chart: ch);
       }
-    // ⚠️ THE ONLY LIBRARY WITH NO PER-ENTRY PAGE, AND THE BRIEF SAID TO SAY SO
-    // RATHER THAN BUILD ONE. `kFastingByOccasion` and `kFastingGeneral` are
-    // eight title-and-paragraph rows rendered INLINE on `FastingScreen`; they
-    // are not tappable and no detail screen exists.
-    //
-    // So the id is validated (a typo still fails the wiring test) and every
-    // fasting tile opens the screen that shows all eight. Eight cards each
-    // opening the same screen would be eight promises with one destination, so
-    // the door carries ONE card — see `pv_door_nutrition.dart`.
+    // Fasting: eight pages at last (STILL-OPEN §35.6 → §69). Each topic is a
+    // read; the general three ride as read-next on every occasion.
     case PvDoorLibrary.bellySkin:
       for (final page in kBsPages) {
         if (page.id == id) return BsArticleScreen(page: page);
@@ -503,7 +552,11 @@ Widget? pvDoorEntryScreen(
       );
     case PvDoorLibrary.fasting:
       for (final t in [...kFastingByOccasion, ...kFastingGeneral]) {
-        if (t.id == id) return const FastingScreen();
+        if (t.id == id) return _nutritionReader(pvReadFromFasting(t), c);
+      }
+    case PvDoorLibrary.dietQuestion:
+      for (final q in kNutritionPracticalCards) {
+        if (q.id == id) return _nutritionReader(pvReadFromDietQuestion(q), c);
       }
   }
   return null;
@@ -526,6 +579,7 @@ String pvDoorEntryRoute(PvDoorLibrary library, String id) =>
       PvDoorLibrary.recipe => 'nutrition/recipe/$id',
       PvDoorLibrary.dietChart => 'nutrition/chart/$id',
       PvDoorLibrary.fasting => 'nutrition/fasting/$id',
+      PvDoorLibrary.dietQuestion => 'nutrition/question/$id',
       PvDoorLibrary.bellySkin => 'belly_skin/$id',
       PvDoorLibrary.mindRead => 'mind/read/$id',
     };
@@ -543,6 +597,7 @@ bool pvDoorEntryResolves(PvDoorLibrary library, String id) => switch (library) {
       PvDoorLibrary.dietChart => kDietCharts.any((e) => e.id == id),
       PvDoorLibrary.fasting =>
         [...kFastingByOccasion, ...kFastingGeneral].any((e) => e.id == id),
+      PvDoorLibrary.dietQuestion => kNutritionPracticalCards.any((e) => e.id == id),
       PvDoorLibrary.bellySkin => kBsPages.any((e) => e.id == id),
       PvDoorLibrary.mindRead =>
         id == kMmPartnerArticle.id || mmArticleById(id) != null,
@@ -563,6 +618,10 @@ bool pvDoorSurfaceResolves(String id) => switch (id) {
       kCondSurfaceJourney ||
       kCondSurfaceQuestions ||
       kDietSurfaceCanIEat ||
+      kDietSurfaceToday ||
+      kDietSurfaceRecipeRail ||
+      kDietSurfaceList ||
+      'can_i' ||
       kDietSurfaceRecipes ||
       kDietSurfaceCharts ||
       kDietSurfaceFasting ||

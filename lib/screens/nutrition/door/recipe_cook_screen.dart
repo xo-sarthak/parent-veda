@@ -16,6 +16,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../../../data/nutrition/food_values.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../../data/nutrition/nutrition_photos.dart';
@@ -123,6 +124,8 @@ class _RecipeCookScreenState extends State<RecipeCookScreen> {
                   const SizedBox(height: 8),
                   Text(r.whyNow.en, style: pvManrope(fontSize: 15, height: 1.5, color: p.ink1)),
                   const SizedBox(height: 12),
+                  // The writer's highlights ("Whole dal, no refined flour") stay
+                  // as pills; the numbers are the grid under them.
                   Wrap(spacing: 8, runSpacing: 8, children: [
                     for (final g in r.nutritionGlance)
                       Container(
@@ -132,6 +135,8 @@ class _RecipeCookScreenState extends State<RecipeCookScreen> {
                         child: Text(g, style: pvManrope(fontSize: 12, fontWeight: FontWeight.w700, color: p.ink2)),
                       ),
                   ]),
+                  const SizedBox(height: 18),
+                  NutritionValuesGrid(p: p, values: estimateRecipe(r)),
                 ]),
               ),
               const SizedBox(height: 22),

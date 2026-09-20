@@ -41,7 +41,7 @@ const Map<String, String> kReadImageUrls = {
   'nut_fish_curry':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Bengali_bata_fish_curry.jpg/960px-Bengali_bata_fish_curry.jpg',
   'nut_shukto':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Shukto%2C_a_Bengali_dish.jpg/960px-Shukto%2C_a_Bengali_dish.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/KKMQPWQK6H.jpg',
   'nut_ragi_porridge':
       'https://upload.wikimedia.org/wikipedia/commons/6/6f/Raagi_koozh.jpg',
   'nut_sambar':
@@ -77,51 +77,51 @@ const Map<String, String> kReadImageUrls = {
   'nut_oats':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Oatmeal_porridge_1-minute_with_additional_ingredients.jpg/960px-Oatmeal_porridge_1-minute_with_additional_ingredients.jpg',
   'nut_boiled_eggs':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Boiled_Egg_-_Crossection.jpg/960px-Boiled_Egg_-_Crossection.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/7ICUECNY4R.jpg',
   'nut_omelette':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/FoodOmelete.jpg/960px-FoodOmelete.jpg',
   'nut_paneer':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Homemade_Paneer_Bhurji_cooked_in_pan_India.jpg/960px-Homemade_Paneer_Bhurji_cooked_in_pan_India.jpg',
   'nut_dal':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Dal_tadka_and_naan.jpg/960px-Dal_tadka_and_naan.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/WOZ7PQGMMI.jpg',
   'nut_sprouts':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Sprouted_Moong_Salad.JPG/960px-Sprouted_Moong_Salad.JPG',
   'nut_chana':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Chana_Masala_in_Paul%C3%ADnia%2C_2023-10-16.jpg/960px-Chana_Masala_in_Paul%C3%ADnia%2C_2023-10-16.jpg',
   'nut_curd':
-      'https://upload.wikimedia.org/wikipedia/commons/f/fc/Bread_Dahi_Vada_Naivaidya.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/QL0I5DPNGX.jpg',
   'nut_lassi':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Lassi_1.jpg/960px-Lassi_1.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/BNCZWVYVMQ.jpg',
   'nut_fruit_bowl':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/20241117_Fruit_Platter_anagoria.jpg/960px-20241117_Fruit_Platter_anagoria.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/4MUZH41WMD.jpg',
   'nut_banana':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Cavendish_banana_from_Maracaibo.jpg/960px-Cavendish_banana_from_Maracaibo.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/63ZQSDZUPT.jpg',
   'nut_apple':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Red_Apple.jpg/960px-Red_Apple.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/OQGVJXG77S.jpg',
   'nut_nuts':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Bowl_of_Cashews_and_Almonds_%2848140118636%29.jpg/960px-Bowl_of_Cashews_and_Almonds_%2848140118636%29.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/4EXMQZWRDQ.jpg',
   'nut_dates':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Date_Fruit.jpg/960px-Date_Fruit.jpg',
   'nut_soup':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Autumn_Soup_%28Unsplash%29.jpg/960px-Autumn_Soup_%28Unsplash%29.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/WOZ7PQGMMI.jpg',
   'nut_salad':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Vegitarian_green_salad_from_india.jpg/960px-Vegitarian_green_salad_from_india.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/PLOA1CWIRK.jpg',
   'nut_coconut_water':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Klappermelk_kelapa_muda.jpg/960px-Klappermelk_kelapa_muda.jpg',
   'nut_chicken_curry':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Pan_Chicken_Curry.jpg/960px-Pan_Chicken_Curry.jpg',
   'nut_makhana':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Roasted_Makhana_%28Foxnut%29.jpg/960px-Roasted_Makhana_%28Foxnut%29.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/885S4Q0UVA.jpg',
   'nut_khakhra':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Khakhra.JPG/960px-Khakhra.JPG',
+      'https://cdn.stocksnap.io/img-thumbs/960w/HJQJJ8RWHJ.jpg',
   'nut_sandwich':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Vegetable_Sandwich_2.jpg/960px-Vegetable_Sandwich_2.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/K5T076FWTJ.jpg',
   'nut_smoothie':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Acai_Smoothie_Bowls_%28Unsplash%29.jpg/960px-Acai_Smoothie_Bowls_%28Unsplash%29.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/8X2LVKANB9.jpg',
   'nut_juice':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Health_monitoring_with_fresh_juice_and_a_stethoscope_during_a_wellness_assessment.jpg/960px-Health_monitoring_with_fresh_juice_and_a_stethoscope_during_a_wellness_assessment.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/UR1JSQIAUN.jpg',
   'nut_chai':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Masala_Chai.JPG/960px-Masala_Chai.JPG',
+      'https://cdn.stocksnap.io/img-thumbs/960w/0ZS74TCOME.jpg',
   'nut_r_pcos_moong_chilla':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Chilla_besan.JPG/960px-Chilla_besan.JPG',
   'nut_r_bengali_macher_jhol':
@@ -178,7 +178,7 @@ const Map<String, String> kReadImageUrls = {
   'cani_street_food':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Golgappa_Pani_Puri_India.jpg/960px-Golgappa_Pani_Puri_India.jpg',
   'cani_honey':
-      'https://cdn.stocksnap.io/img-thumbs/960w/97LJAKWL36.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/TPZVAKR2HA.jpg',
   'cani_ginger':
       'https://upload.wikimedia.org/wikipedia/commons/c/c1/Ginger_Plant_vs.jpg',
   'cani_coffee':
@@ -194,7 +194,7 @@ const Map<String, String> kReadImageUrls = {
   'cani_alcohol':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Schwappender_Wein.jpg/960px-Schwappender_Wein.jpg',
   'cani_soft_drinks':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Glass_cola.jpg/960px-Glass_cola.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/H57MU5YDCI.jpg',
   'cani_water':
       'https://cdn.stocksnap.io/img-thumbs/960w/SVHF6MUWVZ.jpg',
   'cani_paracetamol':
@@ -270,25 +270,25 @@ const Map<String, String> kReadImageUrls = {
   'cani_kiwi':
       'https://cdn.stocksnap.io/img-thumbs/960w/QLO68U090J.jpg',
   'cani_pear':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Four_pears.jpg/960px-Four_pears.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/QIXV1AILYQ.jpg',
   'cani_dry_fruits':
       'https://cdn.stocksnap.io/img-thumbs/960w/4EXMQZWRDQ.jpg',
   'cani_almonds':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/b/bd/Liat_Portal_for_Foodie_Disorder_-_Raw_almonds_in_a_bowl.jpg/960px-Liat_Portal_for_Foodie_Disorder_-_Raw_almonds_in_a_bowl.jpg',
   'cani_walnuts':
-      'https://cdn.stocksnap.io/img-thumbs/960w/KQK5TLH6E1.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/DCAJ3SUL76.jpg',
   'cani_cashews':
-      'https://cdn.stocksnap.io/img-thumbs/960w/HWP9X99UM3.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/B5YN5OPOU5.jpg',
   'cani_peanuts':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/36/Roasted_Peanuts_with_shell.jpg/960px-Roasted_Peanuts_with_shell.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/CI7RAD5RGJ.jpg',
   'cani_sabudana':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Sabudana_Khichdi_with_Sweet_curd.JPG/960px-Sabudana_Khichdi_with_Sweet_curd.JPG',
   'cani_spinach':
       'https://upload.wikimedia.org/wikipedia/commons/f/fc/A_pot_of_cut_spinach_leaves_with_carrots_and_onions.jpg',
   'cani_drumstick':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Moringa_oleifera_drumstick_pods.JPG/960px-Moringa_oleifera_drumstick_pods.JPG',
+      'https://cdn.stocksnap.io/img-thumbs/960w/TMTU3V2Z30.jpg',
   'cani_brinjal':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Solanum_melongena_24_08_2012_%281%29.JPG/960px-Solanum_melongena_24_08_2012_%281%29.JPG',
+      'https://cdn.stocksnap.io/img-thumbs/960w/CPA2WXSFA2.jpg',
   'cani_potato':
       'https://cdn.stocksnap.io/img-thumbs/960w/RYSFFCA1QV.jpg',
   'cani_tomato':
@@ -300,19 +300,19 @@ const Map<String, String> kReadImageUrls = {
   'cani_sprouts':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Mung_beans_%28Vigna_radiata%29.jpg/960px-Mung_beans_%28Vigna_radiata%29.jpg',
   'cani_raw_salad':
-      'https://cdn.stocksnap.io/img-thumbs/960w/Z0133GNPXT.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/PLOA1CWIRK.jpg',
   'cani_mushroom':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/2016-01_Agaricus_bisporus_07.jpg/960px-2016-01_Agaricus_bisporus_07.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/J6O7SG69BZ.jpg',
   'cani_egg':
-      'https://cdn.stocksnap.io/img-thumbs/960w/M9KEI36GNT.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/Z05D72KD5S.jpg',
   'cani_chicken':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Chicken_Curry_9.jpg/960px-Chicken_Curry_9.jpg',
   'cani_mutton':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Odia_Mutton_Curry_%28Mansha_Tarkari%29.jpg/960px-Odia_Mutton_Curry_%28Mansha_Tarkari%29.jpg',
   'cani_fish':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Meen_curry_2.JPG/960px-Meen_curry_2.JPG',
+      'https://cdn.stocksnap.io/img-thumbs/960w/FWJC3SUNGR.jpg',
   'cani_prawns':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Cafe_La_Haye_-_2019_August_-_Sarah_Stierch_03.jpg/960px-Cafe_La_Haye_-_2019_August_-_Sarah_Stierch_03.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/30DIV2QY3M.jpg',
   'cani_high_mercury_fish':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Xiphias_gladius_stuffed.jpg/960px-Xiphias_gladius_stuffed.jpg',
   'cani_dal':
@@ -322,69 +322,69 @@ const Map<String, String> kReadImageUrls = {
   'cani_rajma_chana':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Rajma_Chawal_by_Rama_Bhave.jpg/960px-Rajma_Chawal_by_Rama_Bhave.jpg',
   'cani_cheese':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Le_Chat_Apt_Salade_de_tomate%2C_ch%C3%A8vre_et_basilic.jpg/960px-Le_Chat_Apt_Salade_de_tomate%2C_ch%C3%A8vre_et_basilic.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/IDWG2ABOTY.jpg',
   'cani_ghee':
       'https://cdn.stocksnap.io/img-thumbs/960w/NS5Q6MVMZQ.jpg',
   'cani_mawa_sweets':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Kaju_katli_dessert_-_side_view.jpg/960px-Kaju_katli_dessert_-_side_view.jpg',
   'cani_oats':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Rolled_oats_in_bowl_2.jpg/960px-Rolled_oats_in_bowl_2.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/F7TE35CV6D.jpg',
   'cani_poha':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Indian_breakfast-_Poha.jpg/960px-Indian_breakfast-_Poha.jpg',
   'cani_instant_noodles':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a8/Lobster_instant_noodle.jpg/960px-Lobster_instant_noodle.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/MOCF3JR8J4.jpg',
   'cani_fried_snacks':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/2013_Sechsel%C3%A4uten_-_%27Samosa%27_und_%27Pakora%27_-_Limmatquai_2013-04-14_17-35-59_%28P7700%29.JPG/960px-2013_Sechsel%C3%A4uten_-_%27Samosa%27_und_%27Pakora%27_-_Limmatquai_2013-04-14_17-35-59_%28P7700%29.JPG',
+      'https://cdn.stocksnap.io/img-thumbs/960w/MU88DSXA3X.jpg',
   'cani_pickle':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Iskus_Ko_Achar.jpg/960px-Iskus_Ko_Achar.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/29BCBF9B37.jpg',
   'cani_turmeric_milk':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Golden_Milk.jpg/960px-Golden_Milk.jpg',
   'cani_jaggery':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Jaggery_cubes.jpg/960px-Jaggery_cubes.jpg',
   'cani_spices':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Indian_Spices_%2849696133942%29.jpg/960px-Indian_Spices_%2849696133942%29.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/6ASMNGB3YI.jpg',
   'cani_sugar':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/5/57/W%C3%BCrfelzucker_--_2018_--_3564.jpg/960px-W%C3%BCrfelzucker_--_2018_--_3564.jpg',
   'cani_sushi':
-      'https://cdn.stocksnap.io/img-thumbs/960w/BBD3AU9NSR.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/R6DB535ZZA.jpg',
   'cani_raw_meat':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fd/Steak_Tartare_in_Dresden.jpg/960px-Steak_Tartare_in_Dresden.jpg',
   'cani_deli_meat':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6e/Cold_cuts.jpg/960px-Cold_cuts.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/7VWFM9893J.jpg',
   'cani_leftovers':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Open_refrigerator_with_food_at_night.jpg/960px-Open_refrigerator_with_food_at_night.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/AE3F359626.jpg',
   'cani_spicy_food':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/%D0%A2%D0%B0%D0%B2%D1%87%D0%B5_%D0%93%D1%80%D0%B0%D0%B2%D1%87%D0%B5.jpg/960px-%D0%A2%D0%B0%D0%B2%D1%87%D0%B5_%D0%93%D1%80%D0%B0%D0%B2%D1%87%D0%B5.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/7OHAJSJDVW.jpg',
   'cani_milkshake':
       'https://cdn.stocksnap.io/img-thumbs/960w/BNCZWVYVMQ.jpg',
   'cani_fresh_juice':
-      'https://cdn.stocksnap.io/img-thumbs/960w/VWZSB0VCZ8.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/UR1JSQIAUN.jpg',
   'cani_lemon_water':
-      'https://cdn.stocksnap.io/img-thumbs/960w/SE6LA5BXBG.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/O1HJS7EOAJ.jpg',
   'cani_sugarcane_juice':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Sugarcane_Juice_in_Ogan_Ilir.jpg/960px-Sugarcane_Juice_in_Ogan_Ilir.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/UR1JSQIAUN.jpg',
   'cani_lassi':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Lassi_1.jpg/960px-Lassi_1.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/BNCZWVYVMQ.jpg',
   'cani_energy_drinks':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Energy_Drink_Battery_Cans.jpg/960px-Energy_Drink_Battery_Cans.jpg',
   'cani_herbal_tea':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Infusi%C3%B3_de_Tim%C3%B3.jpg/960px-Infusi%C3%B3_de_Tim%C3%B3.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/UASWOBMBJ0.jpg',
   'cani_smoothie':
-      'https://cdn.stocksnap.io/img-thumbs/960w/HWFUPZEHMO.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/4L8M6ANLZL.jpg',
   'cani_kombucha':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Wild_Kombucha_logo.jpg/500px-Wild_Kombucha_logo.jpg',
   'cani_diet_soda':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Can_of_Diet_Sierra_Mist_lemon-lime_soda%2C_2011.jpg/960px-Can_of_Diet_Sierra_Mist_lemon-lime_soda%2C_2011.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/XA721L883R.jpg',
   'cani_aam_panna':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/%C4%80m_pann%C4%81_at_Kitchen_of_Awadh%2C_DLF_Phase_4%2C_Gurgaon_%282025-09-28%29.jpg/960px-%C4%80m_pann%C4%81_at_Kitchen_of_Awadh%2C_DLF_Phase_4%2C_Gurgaon_%282025-09-28%29.jpg',
   'cani_badam_milk':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Bapatla_Badam_Milk.jpg/960px-Bapatla_Badam_Milk.jpg',
   'cani_decaf_coffee':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Decaf_latte_-_Trading_Post_Coffee_Roasters_2025-03-09.jpg/960px-Decaf_latte_-_Trading_Post_Coffee_Roasters_2025-03-09.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/WZKGHBRQIB.jpg',
   'cani_jaljeera':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Two_Indian_Drinks.jpg/960px-Two_Indian_Drinks.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/9Y7B28HZD1.jpg',
   'cani_ors':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Ors_sachet.jpg/960px-Ors_sachet.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/EBUJNKRBLV.jpg',
   'cani_aspirin':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Regular_strength_enteric_coated_aspirin_tablets.jpg/960px-Regular_strength_enteric_coated_aspirin_tablets.jpg',
   'cani_cetirizine':
@@ -522,25 +522,25 @@ const Map<String, String> kReadImageUrls = {
   'cani_paneer':
       'https://upload.wikimedia.org/wikipedia/commons/a/a5/Malai_Paneer_Tikka%2C_PK_007.jpg',
   'cani_milk':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Milk_bottle_and_two_doughnuts.jpg/960px-Milk_bottle_and_two_doughnuts.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/P2QSUXKCN5.jpg',
   'cani_saffron':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Saffron_threads_in_a_glass_jar_%28_Viora_Saffron_packaging%29.jpg/960px-Saffron_threads_in_a_glass_jar_%28_Viora_Saffron_packaging%29.jpg',
   'cani_makhana':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Foxnut_Makhana_-_Nawada_District_-_Bihar_-_1.jpg/960px-Foxnut_Makhana_-_Nawada_District_-_Bihar_-_1.jpg',
   'cani_salt':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Seasalt.jpg/960px-Seasalt.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/6HO3GQMD6J.jpg',
   'cani_maida':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/6/64/All-Purpose_Flour_%284107895947%29.jpg/960px-All-Purpose_Flour_%284107895947%29.jpg',
   'cani_custard_apple':
       'https://upload.wikimedia.org/wikipedia/commons/3/3d/Atemola_%28cross_of_Annona_cherimola_and_Annona_squamosa%29.jpg',
   'cani_sleeping_pills':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Lorafen_%28lorazepamum%29_tablets%2C_1_mg.jpg/960px-Lorafen_%28lorazepamum%29_tablets%2C_1_mg.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/TPI078T0IS.jpg',
   'cani_ayurvedic_medicine':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/Ayurvedic_herbs_02.jpg/960px-Ayurvedic_herbs_02.jpg',
   'cani_packaged_juice':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/20240814Satona_Kartonger.jpg/960px-20240814Satona_Kartonger.jpg',
   'cani_vitamin_c':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Fruit_plate_with_fresh_fruits.jpg/960px-Fruit_plate_with_fresh_fruits.jpg',
+      'https://cdn.stocksnap.io/img-thumbs/960w/SVKP65LN31.jpg',
   'cani_shelf_eat':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Golgappa_Pani_Puri_India.jpg/960px-Golgappa_Pani_Puri_India.jpg',
   'cani_shelf_drink':
@@ -750,6 +750,38 @@ const Map<String, String> kReadImageUrls = {
       'https://cdn.stocksnap.io/img-thumbs/960w/KRX6BEOKGM.jpg',
   'preg_labour_read_pain_relief':
       'https://cdn.stocksnap.io/img-thumbs/960w/4GGMTEBZY9.jpg',
+  'nut_milk':
+      'https://cdn.stocksnap.io/img-thumbs/960w/P2QSUXKCN5.jpg',
+  'cani_chyawanprash':
+      'https://cdn.stocksnap.io/img-thumbs/960w/RV2WZOWKSO.jpg',
+  'cani_laxative':
+      'https://cdn.stocksnap.io/img-thumbs/960w/1ZOMOXPNDS.jpg',
+  'nutrition_hero':
+      'https://cdn.stocksnap.io/img-thumbs/960w/7UZYSYUAX7.jpg',
+  'cani_hero':
+      'https://cdn.stocksnap.io/img-thumbs/960w/VBQSBXBAO8.jpg',
+  'nut_orange':
+      'https://cdn.stocksnap.io/img-thumbs/960w/SVKP65LN31.jpg',
+  'nut_r_vegetable_poha':
+      'https://live.staticflickr.com/116/305698269_7ab5752616_b.jpg',
+  'nut_r_vegetable_upma':
+      'https://live.staticflickr.com/65535/49712703693_7326f27281_b.jpg',
+  'nut_r_peanut_jaggery_chikki':
+      'https://live.staticflickr.com/4016/4289423176_c6ca559bfc_b.jpg',
+  'nut_r_jaggery_kheer':
+      'https://live.staticflickr.com/181/481045627_71fc48f652_b.jpg',
+  'nut_r_ginger_lemon_tea':
+      'https://live.staticflickr.com/4023/4242146993_23dd82fc6c.jpg',
+  'nut_r_badam_milk':
+      'https://live.staticflickr.com/128/349994358_8b9d099c55_b.jpg',
+  'nut_r_moong_dal_soup':
+      'https://live.staticflickr.com/3444/3210281474_f3950cb1c0_b.jpg',
+  'nut_r_tomato_carrot_soup':
+      'https://live.staticflickr.com/7051/6973566295_153eaef49e_b.jpg',
+  'nut_r_egg_curry':
+      'https://live.staticflickr.com/6134/5931058622_23be744086_b.jpg',
+  'nut_r_dal_palak':
+      'https://live.staticflickr.com/2466/3751603633_33224e092a_b.jpg',
 };
 
 /// Read id → licence · source · creator, for the credit line.
@@ -758,7 +790,7 @@ const Map<String, String> kReadImageCredits = {
   'nut_curd_rice': 'CC BY-SA 4.0 · Wikimedia Commons · Sudharshan Shanmugasundaram',
   'nut_palak_paneer': 'CC0 · Wikimedia Commons · Daderot',
   'nut_fish_curry': 'CC BY-SA 4.0 · Wikimedia Commons · Billjones94',
-  'nut_shukto': 'CC BY-SA 4.0 · Wikimedia Commons · Billjones94',
+  'nut_shukto': 'CC0 · StockSnap · Foodie Girl',
   'nut_ragi_porridge': 'CC BY-SA 4.0 · Wikimedia Commons · Narmadhaa',
   'nut_sambar': 'CC BY-SA 4.0 · Wikimedia Commons · Sutapa Pal',
   'nut_rajma': 'CC BY-SA 4.0 · Wikimedia Commons · Shreya151994',
@@ -776,29 +808,29 @@ const Map<String, String> kReadImageCredits = {
   'nut_paratha': 'CC BY-SA 4.0 · Wikimedia Commons · Shahzaib Damn Cruze',
   'nut_roti_sabzi': 'CC BY-SA 2.0 · Wikimedia Commons · Devika',
   'nut_oats': 'CC BY-SA 4.0 · Wikimedia Commons · UserTwoSix',
-  'nut_boiled_eggs': 'CC BY-SA 2.0 · Wikimedia Commons · Ramesh NG',
+  'nut_boiled_eggs': 'CC0 · StockSnap · Foodie Girl',
   'nut_omelette': 'Public domain · Wikimedia Commons · Renee Comet (photographer)',
   'nut_paneer': 'CC BY-SA 4.0 · Wikimedia Commons · Status 401',
-  'nut_dal': 'CC BY-SA 4.0 · Wikimedia Commons · Wind Hashira',
+  'nut_dal': 'CC0 · StockSnap · Foodie Girl',
   'nut_sprouts': 'CC BY-SA 4.0 · Wikimedia Commons · Abhijit Patil',
   'nut_chana': 'CC BY-SA 4.0 · Wikimedia Commons · Parzeus',
-  'nut_curd': 'CC BY-SA 4.0 · Wikimedia Commons · Shruthi Gaurav Alva',
-  'nut_lassi': 'CC BY-SA 4.0 · Wikimedia Commons · Gaurav Dhwaj Khadka',
-  'nut_fruit_bowl': 'CC BY-SA 4.0 · Wikimedia Commons · Anagoria',
-  'nut_banana': 'CC BY-SA 3.0 · Wikimedia Commons · Wilfredor',
-  'nut_apple': 'CC BY 2.0 · Wikimedia Commons · Abhijit Tembhekar from Mumbai, India',
-  'nut_nuts': 'CC BY 2.0 · Wikimedia Commons · NIAID',
+  'nut_curd': 'CC0 · StockSnap · Jamie Hamel-Smith',
+  'nut_lassi': 'CC0 · StockSnap · Burst',
+  'nut_fruit_bowl': 'CC0 · StockSnap · Suzy Hazelwood',
+  'nut_banana': 'CC0 · StockSnap · Piotr Lohunko',
+  'nut_apple': 'CC0 · StockSnap · Mali Maeder',
+  'nut_nuts': 'CC0 · StockSnap · Jonas Svidras',
   'nut_dates': 'CC BY-SA 4.0 · Wikimedia Commons · Lebron jay',
-  'nut_soup': 'CC0 · Wikimedia Commons · Cala cala_maffia',
-  'nut_salad': 'CC BY-SA 4.0 · Wikimedia Commons · Vinayakpatil1981',
+  'nut_soup': 'CC0 · StockSnap · Foodie Girl',
+  'nut_salad': 'CC0 · StockSnap · FOCA Stock',
   'nut_coconut_water': 'CC BY-SA 2.0 · Wikimedia Commons · mararie',
   'nut_chicken_curry': 'CC BY-SA 4.0 · Wikimedia Commons · Asinha631',
-  'nut_makhana': 'CC BY-SA 4.0 · Wikimedia Commons · Salil Kumar Mukherjee',
-  'nut_khakhra': 'CC BY-SA 4.0 · Wikimedia Commons · Jay87.mehta',
-  'nut_sandwich': 'CC BY-SA 4.0 · Wikimedia Commons · Ganesh Mohan T',
-  'nut_smoothie': 'CC0 · Wikimedia Commons · Brenda Godinez cravethebenefits',
-  'nut_juice': 'CC BY 2.0 · Wikimedia Commons · Shixart1985',
-  'nut_chai': 'Public domain · Wikimedia Commons · Miansari66',
+  'nut_makhana': 'CC0 · StockSnap · Alex Munsell',
+  'nut_khakhra': 'CC0 · StockSnap · Anita Peeples',
+  'nut_sandwich': 'CC0 · StockSnap · Jay Mantri',
+  'nut_smoothie': 'CC0 · StockSnap · Tohm Brigitte',
+  'nut_juice': 'CC0 · StockSnap · JESHOOTS.com',
+  'nut_chai': 'CC0 · StockSnap · Andrew E Weber',
   'nut_r_pcos_moong_chilla': 'CC BY-SA 4.0 · Wikimedia Commons · Kamalsahansi',
   'nut_r_bengali_macher_jhol': 'CC BY-SA 4.0 · Wikimedia Commons · Rajeeb Dutta',
   'nut_r_bengali_shukto': 'CC BY-SA 4.0 · Wikimedia Commons · Billjones94',
@@ -824,7 +856,7 @@ const Map<String, String> kReadImageCredits = {
   'cani_curd': 'CC BY-SA 4.0 · Wikimedia Commons · Shruthi Gaurav Alva',
   'cani_chocolate': 'CC0 · Wikimedia Commons · Mx. Granger',
   'cani_street_food': 'CC BY 2.0 · Wikimedia Commons · Yusuke Kawasaki',
-  'cani_honey': 'CC0 · StockSnap · Krzysztof%20Puszczy%u0144ski',
+  'cani_honey': 'CC0 · StockSnap · Roberta Sorge',
   'cani_ginger': 'CC BY-SA 3.0 · Wikimedia Commons · Venkatx5',
   'cani_coffee': 'CC BY-SA 2.0 · Wikimedia Commons · Julius Schorzman',
   'cani_tea': 'CC BY-SA 4.0 · Wikimedia Commons · Gaurav Dhwaj Khadka',
@@ -832,8 +864,8 @@ const Map<String, String> kReadImageCredits = {
   'cani_coconut_water': 'CC BY-SA 4.0 · Wikimedia Commons · Vis M',
   'cani_buttermilk': 'CC BY-SA 4.0 · Wikimedia Commons · Kyu3a',
   'cani_alcohol': 'CC BY 3.0 de · Wikimedia Commons · Stefan Krause, Germany',
-  'cani_soft_drinks': 'Public domain · Wikimedia Commons · pic_p_ter',
-  'cani_water': 'CC0 · StockSnap · Krzysztof%20Puszczy%u0144ski',
+  'cani_soft_drinks': 'CC0 · StockSnap · Agnieszka Bladzik',
+  'cani_water': 'CC0 · StockSnap · Krzysztof Puszczyński',
   'cani_paracetamol': 'CC BY-SA 4.0 · Wikimedia Commons · N509FZ',
   'cani_ibuprofen': 'CC BY-SA 3.0 · Wikimedia Commons · Ragesoss',
   'cani_combiflam': 'CC0 · StockSnap · Martin Vorel',
@@ -870,64 +902,64 @@ const Map<String, String> kReadImageCredits = {
   'cani_figs': 'CC BY-SA 4.0 · Wikimedia Commons · Ivar Leidus',
   'cani_berries': 'CC0 · StockSnap · Lukas',
   'cani_kiwi': 'CC0 · StockSnap · Piotr Lohunko',
-  'cani_pear': 'CC BY-SA 4.0 · Wikimedia Commons · Rhododendrites',
+  'cani_pear': 'CC0 · StockSnap · Foodie Girl',
   'cani_dry_fruits': 'CC0 · StockSnap · Jonas Svidras',
   'cani_almonds': 'CC BY-SA 4.0 · Wikimedia Commons · HaJunkiyada',
-  'cani_walnuts': 'CC0 · StockSnap · Krzysztof%20Puszczy%u0144ski',
-  'cani_cashews': 'CC0 · StockSnap · Rachael Gorjestani',
-  'cani_peanuts': 'CC BY-SA 4.0 · Wikimedia Commons · Sanjay Acharya',
+  'cani_walnuts': 'CC0 · StockSnap · Nordwood Themes',
+  'cani_cashews': 'CC0 · StockSnap · Jakub Kapusnak',
+  'cani_peanuts': 'CC0 · StockSnap · Krzysztof Puszczyński',
   'cani_sabudana': 'CC BY-SA 4.0 · Wikimedia Commons · Dheerajk88',
   'cani_spinach': 'CC BY-SA 4.0 · Wikimedia Commons · Olgatladi2020',
-  'cani_drumstick': 'CC BY-SA 4.0 · Wikimedia Commons · Erector',
-  'cani_brinjal': 'CC BY-SA 3.0 · Wikimedia Commons · Joydeep',
+  'cani_drumstick': 'CC0 · StockSnap · fireskystudios.com',
+  'cani_brinjal': 'CC0 · StockSnap · Peter Hershey',
   'cani_potato': 'CC0 · StockSnap · Maciej Szlachta',
-  'cani_tomato': 'CC0 · StockSnap · Krzysztof%20Puszczy%u0144ski',
+  'cani_tomato': 'CC0 · StockSnap · Krzysztof Puszczyński',
   'cani_carrot': 'CC0 · StockSnap · Suzy Hazelwood',
   'cani_beetroot': 'CC BY-SA 4.0 · Wikimedia Commons · W.carter',
   'cani_sprouts': 'CC BY-SA 4.0 · Wikimedia Commons · Ivar Leidus',
-  'cani_raw_salad': 'CC0 · StockSnap · Jeffrey Betts',
-  'cani_mushroom': 'CC BY-SA 4.0 · Wikimedia Commons · 0x010C',
-  'cani_egg': 'CC0 · StockSnap · Patryk Dziejma',
+  'cani_raw_salad': 'CC0 · StockSnap · FOCA Stock',
+  'cani_mushroom': 'CC0 · StockSnap · Marcin Czaja',
+  'cani_egg': 'CC0 · StockSnap · Peter Belch',
   'cani_chicken': 'CC BY-SA 4.0 · Wikimedia Commons · Gaurav Dhwaj Khadka',
   'cani_mutton': 'CC BY-SA 4.0 · Wikimedia Commons · Satwik Cuttack',
-  'cani_fish': 'CC BY-SA 2.5 · Wikimedia Commons · Kalakki at Malayalam Wikipedia',
-  'cani_prawns': 'CC BY 4.0 · Wikimedia Commons · Missvain',
+  'cani_fish': 'CC0 · StockSnap · Malidate Van',
+  'cani_prawns': 'CC0 · StockSnap · Tim Sullivan',
   'cani_high_mercury_fish': 'CC BY-SA 3.0 · Wikimedia Commons · Citron',
   'cani_dal': 'CC0 · StockSnap · Foodie Girl',
   'cani_soya': 'CC0 · Wikimedia Commons · Daderot',
   'cani_rajma_chana': 'CC BY-SA 4.0 · Wikimedia Commons · Shreya151994',
-  'cani_cheese': 'CC BY-SA 4.0 · Wikimedia Commons · Marianne Casamance',
+  'cani_cheese': 'CC0 · StockSnap · Foodie Girl',
   'cani_ghee': 'CC0 · StockSnap · Brooke Cagle',
   'cani_mawa_sweets': 'CC BY-SA 3.0 · Wikimedia Commons · Unknomics',
-  'cani_oats': 'CC BY-SA 4.0 · Wikimedia Commons · Bodhi Peace',
+  'cani_oats': 'CC0 · StockSnap · Andrew Pons',
   'cani_poha': 'CC BY-SA 4.0 · Wikimedia Commons · Medhi jyoti',
-  'cani_instant_noodles': 'CC BY 2.0 · Wikimedia Commons · Ruocaled',
-  'cani_fried_snacks': 'CC BY-SA 3.0 · Wikimedia Commons · Roland zh',
-  'cani_pickle': 'CC BY-SA 4.0 · Wikimedia Commons · Gaurav Dhwaj Khadka',
+  'cani_instant_noodles': 'CC0 · StockSnap · Krzysztof Puszczyński',
+  'cani_fried_snacks': 'CC0 · StockSnap · Mike Moloney',
+  'cani_pickle': 'CC0 · StockSnap · JESHOOTS.com',
   'cani_turmeric_milk': 'CC BY-SA 4.0 · Wikimedia Commons · మురళీకృష్ణ ముసునూరి',
   'cani_jaggery': 'CC BY-SA 4.0 · Wikimedia Commons · Mangosapiens',
-  'cani_spices': 'CC BY 2.0 · Wikimedia Commons · Ajay Suresh from New York, NY, USA',
+  'cani_spices': 'CC0 · StockSnap · Patrycja Tomaszczyk',
   'cani_sugar': 'CC BY-SA 4.0 · Wikimedia Commons · Dietmar Rabich',
-  'cani_sushi': 'CC0 · StockSnap · Chevanon',
+  'cani_sushi': 'CC0 · StockSnap · Krzysztof Puszczyński',
   'cani_raw_meat': 'CC BY-SA 4.0 · Wikimedia Commons · Dr. Bernd Gross',
-  'cani_deli_meat': 'CC BY-SA 4.0 · Wikimedia Commons · مانفی',
-  'cani_leftovers': 'CC BY-SA 4.0 · Wikimedia Commons · W.carter',
-  'cani_spicy_food': 'CC BY-SA 4.0 · Wikimedia Commons · Cuklev',
+  'cani_deli_meat': 'CC0 · StockSnap · Jessica Ruscello',
+  'cani_leftovers': 'CC0 · StockSnap · Jeffrey Betts',
+  'cani_spicy_food': 'CC0 · StockSnap · ela haney',
   'cani_milkshake': 'CC0 · StockSnap · Burst',
-  'cani_fresh_juice': 'CC0 · StockSnap · WDnet Studio',
+  'cani_fresh_juice': 'CC0 · StockSnap · JESHOOTS.com',
   'cani_lemon_water': 'CC0 · StockSnap · Healthy Living',
-  'cani_sugarcane_juice': 'CC BY-SA 4.0 · Wikimedia Commons · Firzafp',
-  'cani_lassi': 'CC BY-SA 4.0 · Wikimedia Commons · Gaurav Dhwaj Khadka',
+  'cani_sugarcane_juice': 'CC0 · StockSnap · JESHOOTS.com',
+  'cani_lassi': 'CC0 · StockSnap · Burst',
   'cani_energy_drinks': 'CC BY-SA 3.0 · Wikimedia Commons · Klooni',
-  'cani_herbal_tea': 'CC BY-SA 4.0 · Wikimedia Commons · Francesc Fort',
-  'cani_smoothie': 'CC0 · StockSnap · Patryk Dziejma',
+  'cani_herbal_tea': 'CC0 · StockSnap · Marina Pershina',
+  'cani_smoothie': 'CC0 · StockSnap · WDnet Studio',
   'cani_kombucha': 'CC BY-SA 4.0 · Wikimedia Commons · Jmb195',
-  'cani_diet_soda': 'CC0 · Wikimedia Commons · DimiTalen',
+  'cani_diet_soda': 'CC0 · StockSnap · Skitter Photo',
   'cani_aam_panna': 'CC BY-SA 4.0 · Wikimedia Commons · Contrapunctus-1',
   'cani_badam_milk': 'CC BY-SA 4.0 · Wikimedia Commons · Saiphani02',
-  'cani_decaf_coffee': 'CC0 · Wikimedia Commons · Andy Li',
-  'cani_jaljeera': 'CC BY-SA 2.0 · Wikimedia Commons · Nick Gray',
-  'cani_ors': 'CC BY-SA 4.0 · Wikimedia Commons · Shubjt',
+  'cani_decaf_coffee': 'CC0 · StockSnap · Negative Space',
+  'cani_jaljeera': 'CC0 · StockSnap · Toa Heftiba',
+  'cani_ors': 'CC0 · StockSnap · Steve Johnson',
   'cani_aspirin': 'CC BY-SA 4.0 · Wikimedia Commons · Ragesoss',
   'cani_cetirizine': 'CC0 · Wikimedia Commons · Issuial',
   'cani_antacids': 'CC BY 2.5 · Wikimedia Commons · Midnightcomm',
@@ -984,7 +1016,7 @@ const Map<String, String> kReadImageCredits = {
   'cani_paint_fumes': 'CC BY 2.0 · Wikimedia Commons · Michael Cory',
   'cani_pesticides': 'CC BY-SA 4.0 · Wikimedia Commons · Azorbli',
   'cani_pet_cats': 'CC0 · StockSnap · Snapwire',
-  'cani_pet_dogs': 'CC0 · StockSnap · Alex%20Bl%u0103jan',
+  'cani_pet_dogs': 'CC0 · StockSnap · Alex Blăjan',
   'cani_gardening': 'CC0 · StockSnap · Neslihan Gunaydin',
   'cani_public_transport': 'CC BY-SA 4.0 · Wikimedia Commons · Ravi Dwivedi',
   'cani_crowded_places': 'CC BY 2.0 · Wikimedia Commons · shankar s. from Poona (pune), India, Ind',
@@ -996,16 +1028,16 @@ const Map<String, String> kReadImageCredits = {
   'cani_mobile_phone': 'CC0 · StockSnap · JESHOOTS.com',
   'cani_stress': 'CC BY 2.0 · Wikimedia Commons · Shixart1985',
   'cani_paneer': 'CC BY-SA 4.0 · Wikimedia Commons · PallaviKhale',
-  'cani_milk': 'CC0 · Wikimedia Commons · www.Pixel.la Free Stock Photos',
+  'cani_milk': 'CC0 · StockSnap · Krzysztof Puszczyński',
   'cani_saffron': 'CC0 · Wikimedia Commons · ulleo',
   'cani_makhana': 'CC BY-SA 4.0 · Wikimedia Commons · FacetsOfNonStickPans',
-  'cani_salt': 'CC BY-SA 4.0 · Wikimedia Commons · Relativity',
+  'cani_salt': 'CC0 · StockSnap · Birch Landing Home',
   'cani_maida': 'CC BY-SA 2.0 · Wikimedia Commons · Veganbaking.net from USA',
   'cani_custard_apple': 'CC BY-SA 3.0 · Wikimedia Commons',
-  'cani_sleeping_pills': 'CC BY 3.0 · Wikimedia Commons · Żółwiciel',
+  'cani_sleeping_pills': 'CC0 · StockSnap · Martin Vorel',
   'cani_ayurvedic_medicine': 'CC BY-SA 4.0 · Wikimedia Commons · Vis M',
   'cani_packaged_juice': 'CC BY-SA 4.0 · Wikimedia Commons · Kolbkorr',
-  'cani_vitamin_c': 'CC BY-SA 4.0 · Wikimedia Commons · Marc-Lautenbacher',
+  'cani_vitamin_c': 'CC0 · StockSnap · Daria Nepriakhina',
   'cani_shelf_eat': 'CC BY 2.0 · Wikimedia Commons · Yusuke Kawasaki',
   'cani_shelf_drink': 'CC0 · StockSnap · Andrew E Weber',
   'cani_shelf_take': 'Public domain · Wikimedia Commons · National Institute of Standards and Tech',
@@ -1106,8 +1138,270 @@ const Map<String, String> kReadImageCredits = {
   'preg_cond_read_iron': 'CC0 · stocksnap · Tim Sullivan',
   'preg_diet_read_add_now': 'CC0 · stocksnap · Burst',
   'preg_labour_read_pain_relief': 'CC0 · stocksnap · Freestocks.org',
+  'nut_milk': 'CC0 · StockSnap · Krzysztof Puszczyński',
+  'cani_chyawanprash': 'CC0 · StockSnap · Markus Spiske',
+  'cani_laxative': 'CC0 · StockSnap · Freestocks.org',
+  'nutrition_hero': 'CC0 · StockSnap · Nordwood Themes',
+  'cani_hero': 'CC0 · StockSnap · Agnieszka Walędziak',
+  'nut_orange': 'CC0 · StockSnap · Daria Nepriakhina',
+  'nut_r_vegetable_poha': 'CC BY · Flickr · rovingI',
+  'nut_r_vegetable_upma': 'CC BY · Flickr · spurekar',
+  'nut_r_peanut_jaggery_chikki': 'CC BY · Flickr · Vegan Feast Catering',
+  'nut_r_jaggery_kheer': 'CC BY · Flickr · RBerteig',
+  'nut_r_ginger_lemon_tea': 'CC BY · Flickr · noahbloom',
+  'nut_r_badam_milk': 'CC BY · Flickr · jules:stonesoup',
+  'nut_r_moong_dal_soup': 'CC BY · Flickr · bobjudge',
+  'nut_r_tomato_carrot_soup': 'CC BY · Flickr · emmadiscovery',
+  'nut_r_egg_curry': 'CC BY-SA · Flickr · Rameshng',
+  'nut_r_dal_palak': 'CC BY-SA · Flickr · avlxyz',
 };
 
-/// The picture for a read: its own, else the table's, else none.
-String? readImageFor(String readId, {String? own}) =>
-    (own != null && own.isNotEmpty) ? own : kReadImageUrls[readId];
+/// ⚠️ OUR OWN HOST, ONCE IT EXISTS — 2026-09-20. Every URL in the table
+/// above points at a free host (Wikimedia Commons, StockSnap), and the free
+/// hosts throttle by IP: a phone behind a carrier's shared address saw all
+/// but one photo refused in one session. The fix is to serve them
+/// ourselves. `tools/read_images/fetch_read_images.py` downloads every id
+/// in the table into one folder (`<id>.jpg`); the folder goes up to a
+/// Cloudflare R2 bucket as-is; and this constant becomes that bucket's
+/// public URL (with a trailing slash). From then on `readImageFor` builds
+/// `<base><id>.jpg` and the table's URLs are only the credits' provenance
+/// and a fallback for an id the bucket lacks.
+///
+/// Empty = not set up yet: the table's URLs are used directly, as before.
+const String kReadImageBase = '';
+
+/// The picture for a read: its own, else ours (R2), else the table's, else
+/// none. An id that is in the table is assumed to be in the bucket once
+/// the base is set — the fetch script mirrors the whole table.
+String? readImageFor(String readId, {String? own}) {
+  if (own != null && own.isNotEmpty) return own;
+  final url = kReadImageUrls[readId];
+  if (url == null) return null;
+  if (kReadImageBase.isNotEmpty) return '$kReadImageBase$readId.jpg';
+  final ov = kOpenverseIds[readId];
+  if (ov != null && (url.contains('stocksnap.io') || url.contains('staticflickr.com'))) return openverseImageUrl(ov);
+  return url;
+}
+
+/// ⚠️ STOPGAP UNTIL R2 — 2026-09-20. `cdn.stocksnap.io` sits behind a
+/// Cloudflare rule that answers 403 to anything that is not a browser tab:
+/// the phone got 403 for every StockSnap URL in the table, with a Dart user
+/// agent and with Chrome's, so 196 of the 357 photos had never drawn on the
+/// device. (It was read as Wikimedia throttling for a week; it was not.)
+/// Openverse indexes StockSnap and proxies each image by its own id, and
+/// that proxy answers the phone. `tools/read_images/openverse_ids.json`
+/// holds the same map for the mirror script; this constant is generated
+/// from it and dies with the StockSnap URLs the day `kReadImageBase` is
+/// set — the R2 branch above runs first.
+String openverseImageUrl(String id) => 'https://api.openverse.org/v1/images/$id/thumb/?full_size=true';
+
+const Map<String, String> kOpenverseIds = {
+  'cani_amusement_rides': '46049d46-f815-4a18-949b-c171c13fae33',
+  'cani_berries': 'd5093f91-7788-4414-814c-956c360dec0f',
+  'cani_brinjal': '57b8347d-4d83-4fd3-ba6d-236b989c2b53',
+  'cani_carrot': 'c43f202b-ab6c-439b-8b0b-f22b9f1c66ef',
+  'cani_cashews': '8a90bf17-a7ee-4c9b-8a58-8466b5d0f7c9',
+  'cani_cheese': '910473e2-3e36-4eb2-8837-5578952dca7d',
+  'cani_chemical_peel': 'ff075f38-71f8-4dc0-b930-5e383c2bc8a7',
+  'cani_chyawanprash': '0d02bce8-f553-42ba-941a-67cffad43c20',
+  'cani_climbing_stairs': '88db6723-0d25-40c0-8a26-e70463ec0b65',
+  'cani_combiflam': '1c472723-e3b3-4612-8c79-79c2805cae6d',
+  'cani_dal': '50f4cd72-f300-4259-b0e9-51ad7d7971dc',
+  'cani_dancing': 'f5e60e84-a3a5-431a-a797-3ab1485b9952',
+  'cani_decaf_coffee': '18bfb8f5-81b4-4fb1-b312-d1593ae61424',
+  'cani_deli_meat': '1299b96f-49ca-49a0-b2e6-1e1efcdef5ee',
+  'cani_diet_soda': '2108e20d-ba2d-4f9d-b812-0f6551b486a2',
+  'cani_driving': '0e66fa6f-bd61-4790-b72c-0b7408c4bfd5',
+  'cani_drumstick': '76134dba-39fd-461b-b8c2-402fb486be42',
+  'cani_dry_fruits': '2dd6863e-c162-4c83-88ad-df933278a7dc',
+  'cani_egg': '4f77f9e4-1b31-402a-978d-2900d17bb446',
+  'cani_fasting': 'ad60eeb8-7f1b-4e03-8045-22e79c7611a1',
+  'cani_fish': 'd6e74b4a-395c-4799-a141-90c1b586643a',
+  'cani_flight_travel': 'e54a8258-1cef-48bc-8667-e57d2ee28e26',
+  'cani_fresh_juice': 'a34f4595-28ed-4f4f-b740-a99f5687b69b',
+  'cani_fried_snacks': 'fb4d9dfc-8630-4fbe-8b38-4c7d582427f9',
+  'cani_gardening': 'a17b99f4-5429-4a30-92e5-1e81107d7e1f',
+  'cani_gel_nails': 'a71bfd77-9f7e-45bb-a4dd-875d2fbc35e5',
+  'cani_ghee': '089f2f2b-4a68-4de3-bc9f-e0f879432348',
+  'cani_grapes': '79d03177-e94f-44a3-938c-691af8e3a512',
+  'cani_green_tea': '0368d3b1-fd76-42ec-b49d-5cb96381d362',
+  'cani_gym': 'a9541001-99a6-4fd4-ac30-78a90dfdfe94',
+  'cani_herbal_tea': '87b3b06d-8c26-4ae5-a277-071aba1177f3',
+  'cani_hero': '7b37f6ce-7d0f-4ab9-9e95-5519e117adda',
+  'cani_honey': '60a2315e-ed23-4964-95ed-25f44ff38de9',
+  'cani_hot_water_bath': '82be117b-6b7c-47df-b9ea-a151d97fe08d',
+  'cani_instant_noodles': '27359dfa-a384-478a-bd7f-63a278291bda',
+  'cani_jaljeera': 'afeb23f6-2cf4-45e0-bbfa-fd51548cca2a',
+  'cani_kiwi': '2c738119-0120-4671-b2d9-55b38d206a8c',
+  'cani_lassi': '81d320bd-d504-43ca-9ea8-a6101bd3b9da',
+  'cani_laxative': 'ca66e2e7-3ad9-4112-b70a-092e3594f1cf',
+  'cani_leftovers': 'ad5a5edc-3763-47bc-8f92-d325c56a564c',
+  'cani_lemon_water': '3cca783c-d3a4-45a6-8cf9-026c8dfe473e',
+  'cani_long_travel': 'a6942b3d-6090-4fae-9c6a-cba9fc75b9f0',
+  'cani_massage': 'edff9d5d-cbc5-49d5-a5ae-f55cb8b55671',
+  'cani_milk': '35e968c1-06c3-439d-819c-6eb28c339317',
+  'cani_milkshake': '81d320bd-d504-43ca-9ea8-a6101bd3b9da',
+  'cani_mobile_phone': '11cd1d83-581a-46ba-b047-3f04abd3dc74',
+  'cani_mushroom': '96c26d06-1a17-4d77-bca7-5dff163f0b1b',
+  'cani_nail_polish': 'b6238c19-3c99-4051-a48e-88237fa195ff',
+  'cani_oats': '3d1c8a78-4558-468a-ae05-5923000743f5',
+  'cani_ors': 'eeddfed2-237f-4f06-8828-c8dd928fe339',
+  'cani_peanuts': 'bc5be522-5f0f-41a0-82b5-ed0cf428f7c9',
+  'cani_pear': '777a46aa-fc78-4299-bb39-f217e6f278bf',
+  'cani_pedicure': 'a71bfd77-9f7e-45bb-a4dd-875d2fbc35e5',
+  'cani_perfume': '3355869e-3376-4c0b-8a24-de58701024e0',
+  'cani_pet_cats': '81f5ecc8-98f9-4819-87cd-dce74e8564ff',
+  'cani_pet_dogs': '82fbd49f-595e-44e1-a18b-49c2b57050aa',
+  'cani_pickle': '556264d1-6969-4224-abfe-cf78eeb99e4c',
+  'cani_potato': '51b6f763-82e8-4cf4-97a2-db8f260392ed',
+  'cani_prawns': 'ce238aa0-538f-48ad-818c-d40b0023e186',
+  'cani_raw_salad': 'a516f54b-9d2f-442a-9308-471fe2a62d55',
+  'cani_salt': '68f9ddd2-a573-43b9-b5b9-67e1059c2d90',
+  'cani_secondhand_smoke': '796a59c5-63bd-4903-8d9b-675e22c9c377',
+  'cani_sex': '8f82d802-8224-4f7b-b3fd-5cfe59805227',
+  'cani_shelf_doActivity': '15ba125e-f2a9-4abb-bf10-a44aedacb215',
+  'cani_sleeping_back': '635a480d-2365-4ef4-b0f9-665abf04dac3',
+  'cani_sleeping_pills': '1c472723-e3b3-4612-8c79-79c2805cae6d',
+  'cani_smoking': 'e6c37601-a2e5-4d00-9ff3-cf97a1763b35',
+  'cani_smoothie': 'bcf85173-49f4-430a-95cb-f274e64679a6',
+  'cani_soft_drinks': '3a6ff63b-db66-4ac0-839d-a9573bce60b1',
+  'cani_spices': 'e055a32b-1685-43ed-8f23-4784363f62b4',
+  'cani_spicy_food': 'c8a2e427-59b5-465e-b099-50c9c1ec7222',
+  'cani_sugarcane_juice': 'a34f4595-28ed-4f4f-b740-a99f5687b69b',
+  'cani_sunscreen': '49a87548-7cb0-41f0-864e-b9651e923590',
+  'cani_sushi': '32b3de63-06fb-42b5-ab80-bf2862332f27',
+  'cani_swimming': 'aaf2363f-5838-44c6-8bc5-780605f91d52',
+  'cani_tattoo': '3143ff33-a2b8-4fb3-ab27-a5e948e911c1',
+  'cani_tomato': '6c3af578-f403-4214-9b44-5b9b2ed36aea',
+  'cani_trekking': '39431e7d-eb28-4579-af86-c7be7cff55ba',
+  'cani_vaping': 'ee6b1a71-c3fc-47e5-8f82-a3253f705cf3',
+  'cani_vitamin_c': '9d9a78eb-5337-48b9-9d69-b91f17bed226',
+  'cani_walking': '15ba125e-f2a9-4abb-bf10-a44aedacb215',
+  'cani_walnuts': '694540c2-46ac-458f-b261-c4c616e9e001',
+  'cani_water': 'ed36b19e-675d-490b-9a19-8d72a6643f9e',
+  'cani_waxing': '82be117b-6b7c-47df-b9ea-a151d97fe08d',
+  'cani_yoga': '126d6729-71c2-4ad8-823f-cd77f9fb3a09',
+  'condition_anemia': 'e84ea250-d502-45e2-910d-d8b28de7bc28',
+  'condition_breech': 'a4614b33-8f42-452b-9714-840376f5c92f',
+  'condition_cervical_incompetence': '99ae4ccb-24c6-4582-86fb-a70e800108db',
+  'condition_covid_pregnancy': '03ab9ba4-47a6-477a-9b67-b806a06be1dd',
+  'condition_ectopic': '373a2ccd-73e0-4e8c-bd07-b0d611b7ac6e',
+  'condition_fibroids': '8a38e220-3c17-4c22-8f78-272eec927ed4',
+  'condition_gdm': '0431bd03-8fce-44f8-ac2a-230088a318da',
+  'condition_hellp': '679f9d68-20b0-42b2-8326-4d6b93f82bda',
+  'condition_high_bp': '124e8a79-a8c9-4fee-b01a-3c8e681e8014',
+  'condition_hyperemesis': '4084d766-5e2e-4d7d-a21c-e6fb07637968',
+  'condition_icp_cholestasis': '062c169c-e5c0-4647-85f9-b894092e7fea',
+  'condition_iugr': '8c822fc9-1b37-46a2-9184-141b36317829',
+  'condition_low_amniotic_fluid': '27c8d660-7526-4bf6-ad44-3cd1ef3bdcac',
+  'condition_miscarriage': 'a4724431-6805-4b40-a80d-d878491dfedc',
+  'condition_pcos': '03ab9ba4-47a6-477a-9b67-b806a06be1dd',
+  'condition_piles': '8f82d802-8224-4f7b-b3fd-5cfe59805227',
+  'condition_placenta_previa': '4767df3d-924b-49b0-a300-ddcd04b1bc2b',
+  'condition_placental_abruption': 'e7d58d39-6f6e-454a-a195-e82dfa5a6f79',
+  'condition_pre_existing': '5dc948d9-4dfd-4576-9203-a88c86dd4999',
+  'condition_preeclampsia': 'dab1d2b0-961a-4b5b-9d6e-c7cb27fb3c22',
+  'condition_rh_negative': 'e7d58d39-6f6e-454a-a195-e82dfa5a6f79',
+  'condition_thyroid': '062c169c-e5c0-4647-85f9-b894092e7fea',
+  'condition_uti': '44054c98-cfba-4040-ae87-db2081fcb3f1',
+  'condition_varicose_veins': '4ce285bb-2b9b-4697-a915-40fc80d7affb',
+  'condition_vasa_previa': 'c956881c-f7a6-478a-a516-9cb2aa9b6aae',
+  'finding_anemia': 'e84ea250-d502-45e2-910d-d8b28de7bc28',
+  'finding_braxton_hicks': '03ab9ba4-47a6-477a-9b67-b806a06be1dd',
+  'finding_breech': 'c956881c-f7a6-478a-a516-9cb2aa9b6aae',
+  'finding_eif': 'a4724431-6805-4b40-a80d-d878491dfedc',
+  'finding_fibroids': 'dab1d2b0-961a-4b5b-9d6e-c7cb27fb3c22',
+  'finding_gestational_diabetes': '6753390e-9c55-48db-90e6-89ae0a51d37c',
+  'finding_group_b_strep': '5f205b17-28fc-4810-8501-1a90c22e7a25',
+  'finding_high_bp': '44054c98-cfba-4040-ae87-db2081fcb3f1',
+  'finding_high_fluid': '0431bd03-8fce-44f8-ac2a-230088a318da',
+  'finding_large_baby': '4767df3d-924b-49b0-a300-ddcd04b1bc2b',
+  'finding_low_fluid': 'a19cca0a-9578-48e0-a129-b86744dc2965',
+  'finding_low_lying_placenta': 'e0636dfa-fb16-4fbe-9e56-2e1537eefcea',
+  'finding_marginal_cord': '5f0e95e2-2b69-46b1-a85f-69c9cb75fb47',
+  'finding_nuchal_cord': '3a63007a-cf37-4b25-8289-8bf37b7eb9c8',
+  'finding_placenta_resolved': '4084d766-5e2e-4d7d-a21c-e6fb07637968',
+  'finding_placental_calcification': '062c169c-e5c0-4647-85f9-b894092e7fea',
+  'finding_preeclampsia': 'a6fb8f84-aeb3-45b2-9805-e891ddd1fb9f',
+  'finding_reduced_movements': '8f82d802-8224-4f7b-b3fd-5cfe59805227',
+  'finding_rh_negative': 'e7d58d39-6f6e-454a-a195-e82dfa5a6f79',
+  'finding_short_cervix': '8a38e220-3c17-4c22-8f78-272eec927ed4',
+  'finding_single_umbilical_artery': '373a2ccd-73e0-4e8c-bd07-b0d611b7ac6e',
+  'finding_small_baby': '99ae4ccb-24c6-4582-86fb-a70e800108db',
+  'finding_soft_markers': '5dc948d9-4dfd-4576-9203-a88c86dd4999',
+  'finding_subchorionic_hematoma': 'a4614b33-8f42-452b-9714-840376f5c92f',
+  'finding_twin_pregnancy': '4ce285bb-2b9b-4697-a915-40fc80d7affb',
+  'finding_vanishing_twin': '124e8a79-a8c9-4fee-b01a-3c8e681e8014',
+  'finding_ventriculomegaly': 'd37fbb94-5a81-4b4e-9608-3721ae040a68',
+  'nut_apple': '0bdcc5c5-244b-4099-8580-e4ecc8801a3d',
+  'nut_banana': '78d976ea-2eee-43bf-9159-dfc377e202bb',
+  'nut_boiled_eggs': 'c5c30020-e879-4fb5-a61b-8c9663662598',
+  'nut_chai': 'a6757fb0-8f93-483e-8d9e-69178a2befbf',
+  'nut_dal': '50f4cd72-f300-4259-b0e9-51ad7d7971dc',
+  'nut_fruit_bowl': '48d77962-04c1-4cb3-9ca7-1e50ba8fbd5c',
+  'nut_juice': 'a34f4595-28ed-4f4f-b740-a99f5687b69b',
+  'nut_khakhra': '32c4069d-3b5f-4525-84d6-b85caf2ba838',
+  'nut_lassi': '81d320bd-d504-43ca-9ea8-a6101bd3b9da',
+  'nut_makhana': '1eeef039-e25b-43b9-8465-e6c91926629c',
+  'nut_milk': '35e968c1-06c3-439d-819c-6eb28c339317',
+  'nut_nuts': '2dd6863e-c162-4c83-88ad-df933278a7dc',
+  'nut_salad': 'a516f54b-9d2f-442a-9308-471fe2a62d55',
+  'nut_sandwich': '36011e8e-c7f6-4d85-aed2-a77d952c59f4',
+  'nut_shukto': 'a01ecc5c-176b-4d1f-a445-655ff2184e3a',
+  'nut_smoothie': '7fdd4d38-6b50-4bca-934a-bc33f52ac3c9',
+  'nut_soup': '50f4cd72-f300-4259-b0e9-51ad7d7971dc',
+  'nutrition_hero': '100c77dd-4fdb-4f87-bfe8-61c1185a71c9',
+  'preg_cond_read_bleeding': '41411a68-de90-4e05-a9e2-4aa4dacc4d2b',
+  'preg_cond_read_bp_dangerous': '5dc948d9-4dfd-4576-9203-a88c86dd4999',
+  'preg_cond_read_iron': 'fcd27b05-eef9-4a13-bc55-38a4d36cd8f8',
+  'preg_cond_read_less_movement': '062c169c-e5c0-4647-85f9-b894092e7fea',
+  'preg_cond_read_sugar_india': 'e900b133-5f79-46e0-99d9-a21a2a6ebf59',
+  'preg_cond_read_thyroid_tablet': '43ad449f-d284-4387-8aa7-fd4ae0f36bed',
+  'preg_diet_read_add_now': 'e900b133-5f79-46e0-99d9-a21a2a6ebf59',
+  'preg_labour_read_pain_relief': '4ce285bb-2b9b-4697-a915-40fc80d7affb',
+  'preg_scan_read_calm': '4767df3d-924b-49b0-a300-ddcd04b1bc2b',
+  'preg_scan_read_costs': '373a2ccd-73e0-4e8c-bd07-b0d611b7ac6e',
+  'preg_scan_read_every_scan': 'c956881c-f7a6-478a-a516-9cb2aa9b6aae',
+  'preg_scan_read_keep': '212437f5-df50-456b-99ed-4b1a448f1c8a',
+  'preg_scan_read_sex_law': 'e0636dfa-fb16-4fbe-9e56-2e1537eefcea',
+  'preg_scan_read_take_along': 'a4724431-6805-4b40-a80d-d878491dfedc',
+  'preg_week_read_anomaly_scan': '967fef0f-50f9-4409-8373-f8a0b8849027',
+  'preg_week_read_baby_sound': '4084d766-5e2e-4d7d-a21c-e6fb07637968',
+  'preg_week_read_back_pain': '99ae4ccb-24c6-4582-86fb-a70e800108db',
+  'preg_week_read_exp_meera': '03ab9ba4-47a6-477a-9b67-b806a06be1dd',
+  'preg_week_read_exp_priya': '99ae4ccb-24c6-4582-86fb-a70e800108db',
+  'preg_week_read_first_24h': '1f6e6288-bb1e-4530-8955-626fdf8d60db',
+  'preg_week_read_first_scan': '967fef0f-50f9-4409-8373-f8a0b8849027',
+  'preg_week_read_first_trimester': 'f2e7bacc-e460-4672-bf15-fbed7a7156fa',
+  'preg_week_read_halfway': 'a4614b33-8f42-452b-9714-840376f5c92f',
+  'preg_week_read_hospital_bag': 'c13553e4-6a18-43eb-afd3-9dc57dc66aa1',
+  'preg_week_read_labour_prep': '4ce285bb-2b9b-4697-a915-40fc80d7affb',
+  'preg_week_read_managing_nausea': '44054c98-cfba-4040-ae87-db2081fcb3f1',
+  'preg_week_read_movement_awareness': '0431bd03-8fce-44f8-ac2a-230088a318da',
+  'preg_week_read_nutrition_t2': '73c66a67-4ee0-4bc2-8c81-428a5691192b',
+  'preg_week_read_partner_support': '8f82d802-8224-4f7b-b3fd-5cfe59805227',
+  'preg_week_read_res_stress': '4767df3d-924b-49b0-a300-ddcd04b1bc2b',
+  'preg_week_read_res_voices': 'e84ea250-d502-45e2-910d-d8b28de7bc28',
+  'preg_week_read_talking_baby': 'e84ea250-d502-45e2-910d-d8b28de7bc28',
+  'preg_week_read_third_tri_prep': 'c13553e4-6a18-43eb-afd3-9dc57dc66aa1',
+  'scan_anomaly_scan': 'e0636dfa-fb16-4fbe-9e56-2e1537eefcea',
+  'scan_blood_tests': 'e7d58d39-6f6e-454a-a195-e82dfa5a6f79',
+  'scan_dating_scan': '967fef0f-50f9-4409-8373-f8a0b8849027',
+  'scan_doppler': '4084d766-5e2e-4d7d-a21c-e6fb07637968',
+  'scan_growth_scan': 'a4614b33-8f42-452b-9714-840376f5c92f',
+  'scan_nipt': '029d8b5c-0500-49f2-86ba-0052ceddbe5a',
+  'scan_nt_scan': '0431bd03-8fce-44f8-ac2a-230088a318da',
+  'scan_ogtt': '7e215a27-2711-4f99-85dd-dd65177792b9',
+  'nut_curd': 'ac661033-2077-40d2-aabc-b3d84a43e923',
+  'nut_orange': '9d9a78eb-5337-48b9-9d69-b91f17bed226',
+  'nut_r_vegetable_poha': 'f6cd04a9-bc36-4f5d-8627-297fa40b5dec',
+  'nut_r_vegetable_upma': '8b89caf2-88d2-462e-96da-b126d276eac5',
+  'nut_r_peanut_jaggery_chikki': '8a751b3c-0bf1-49bb-8713-385285cecf90',
+  'nut_r_jaggery_kheer': '63e8c09c-90f7-46fa-a029-aa3b5801b0d5',
+  'nut_r_ginger_lemon_tea': '189e1f65-29ea-4148-b437-3a26991ce18e',
+  'nut_r_badam_milk': '666b8268-e4dd-4276-a35b-7377b2a7b763',
+  'nut_r_moong_dal_soup': '9d6a71fe-2687-477e-a06d-b5c6cee3f163',
+  'nut_r_tomato_carrot_soup': '93b20b43-7f23-4f3c-aeba-819e85b47a66',
+  'nut_r_egg_curry': 'f47eecc9-df62-48fe-ab4b-0a4cdcbe323c',
+  'nut_r_dal_palak': 'b59dd853-0f80-4f15-a532-f4c2c4e396f1',
+};

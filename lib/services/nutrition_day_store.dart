@@ -107,7 +107,13 @@ class NutritionDayStore extends ChangeNotifier with CloudSyncedStore {
   ChartRegion? _region;
   bool _reminder = false;
 
+  /// A chart she chose on its own page ("Make this my chart"). Null: Today
+  /// picks the chart that fits her (`plateChartFor`). Persisted in the same
+  /// blob as her region — one preference next to another.
+  String? _pinnedChartId;
+
   ChartRegion? get region => _region;
+  String? get pinnedChartId => _pinnedChartId;
   bool get reminder => _reminder;
   List<CravingLog> get cravings => List.unmodifiable(_cravings);
   List<ShoppingItem> get shopping => List.unmodifiable(_shopping);
@@ -248,6 +254,11 @@ class NutritionDayStore extends ChangeNotifier with CloudSyncedStore {
     _save();
   }
 
+  void setPinnedChart(String? chartId) {
+    _pinnedChartId = chartId;
+    _save();
+  }
+
   // ---- persistence ------------------------------------------------------------
 
   void _save() {
@@ -273,6 +284,7 @@ class NutritionDayStore extends ChangeNotifier with CloudSyncedStore {
         'shopping': [for (final s in _shopping) {'r': s.recipeId, 'n': s.name, 'd': s.done}],
         'region': _region?.name,
         'reminder': _reminder,
+        'chart': _pinnedChartId,
       };
 
   @override
@@ -307,6 +319,8 @@ class NutritionDayStore extends ChangeNotifier with CloudSyncedStore {
     final r = data['region'];
     _region = r is String ? ChartRegion.values.where((x) => x.name == r).firstOrNull : null;
     _reminder = data['reminder'] == true;
+    final ch = data['chart'];
+    _pinnedChartId = ch is String && ch.isNotEmpty ? ch : null;
   }
 
   @override
@@ -322,5 +336,6 @@ class NutritionDayStore extends ChangeNotifier with CloudSyncedStore {
     _shopping.clear();
     _region = null;
     _reminder = false;
+    _pinnedChartId = null;
   }
 }

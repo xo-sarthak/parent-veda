@@ -21,6 +21,7 @@
 // =============================================================================
 
 import '../localization/app_language.dart';
+import 'nutrition_recipes_more.dart';
 
 LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
 
@@ -1593,6 +1594,39 @@ class RecipeIngredient {
   final String unit;
 }
 
+/// When in the day a recipe is eaten. A recipe can suit more than one.
+///
+/// 2026-09-20: the user asked, on the phone, whether she could ask for a
+/// breakfast, a sweet, a soup — "are we offering that?" We were not: the
+/// sixteen recipes carried need / stage / condition tags only. Every recipe
+/// app in the library (Lifesum, Yazio, Blinkit, Woolworths, Withings, Kitchen
+/// Stories) leads its library with MEAL-TYPE tiles, so the model gains a
+/// `meals` and a `kind`, the grid gains the tiles, and the library gains the
+/// recipes that make each tile more than a pair.
+enum RecipeMeal { breakfast, lunch, dinner, snack }
+
+/// What a recipe is — the tile she taps when she is not thinking in meals.
+enum RecipeKind { main, light, soup, sweet, drink }
+
+extension RecipeMealMeta on RecipeMeal {
+  String get label => switch (this) {
+        RecipeMeal.breakfast => 'Breakfast',
+        RecipeMeal.lunch => 'Lunch',
+        RecipeMeal.dinner => 'Dinner',
+        RecipeMeal.snack => 'Snacks',
+      };
+}
+
+extension RecipeKindMeta on RecipeKind {
+  String get label => switch (this) {
+        RecipeKind.main => 'Mains',
+        RecipeKind.light => 'Light',
+        RecipeKind.soup => 'Soups',
+        RecipeKind.sweet => 'Sweets',
+        RecipeKind.drink => 'Drinks',
+      };
+}
+
 class Recipe {
   const Recipe({
     required this.id,
@@ -1605,7 +1639,15 @@ class Recipe {
     required this.steps,
     required this.nutritionGlance,
     required this.videoTitle,
+    this.meals = const [RecipeMeal.lunch, RecipeMeal.dinner],
+    this.kind = RecipeKind.main,
   });
+
+  /// When it is eaten; the grid's meal tiles filter on this.
+  final List<RecipeMeal> meals;
+
+  /// What it is; the grid's kind tiles filter on this.
+  final RecipeKind kind;
 
   final String id;
   final LocalizedText name;
@@ -1657,6 +1699,8 @@ final List<Recipe> kRecipes = [
   //  dish, which is a fact about the food and not an instruction about her.
   Recipe(
     id: 'pcos_moong_chilla',
+    meals: const [RecipeMeal.breakfast, RecipeMeal.snack],
+    kind: RecipeKind.light,
     name: _en('Moong dal chilla with curd'),
     whyNow: _en('A savoury pancake built on protein and fibre rather than '
         'refined flour, which is the change that steadies energy through the '
@@ -1693,6 +1737,8 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'bengali_macher_jhol',
+    meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
+    kind: RecipeKind.main,
     name: _en('Bengali macher jhol'),
     whyNow: _en('A light fish curry that gives you protein and omega-3 '
         'without a heavy hand of oil or spice.'),
@@ -1720,6 +1766,8 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'bengali_shukto',
+    meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
+    kind: RecipeKind.main,
     name: _en('Bengali shukto'),
     whyNow: _en('A mixed-vegetable dish that is gentle on digestion and a '
         'good source of everyday fibre.'),
@@ -1745,6 +1793,8 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'tamil_ragi_kanji',
+    meals: const [RecipeMeal.breakfast],
+    kind: RecipeKind.light,
     name: _en('Tamil ragi kanji'),
     whyNow: _en('A finger-millet porridge that is easy on a queasy stomach '
         'and quietly strong on iron and calcium.'),
@@ -1768,6 +1818,8 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'tamil_sambar',
+    meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
+    kind: RecipeKind.main,
     name: _en('Tamil sambar'),
     whyNow: _en('A lentil and vegetable stew that pairs protein with fibre '
         'in one easy, everyday pot.'),
@@ -1793,6 +1845,8 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'punjabi_palak_paneer',
+    meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
+    kind: RecipeKind.main,
     name: _en('Punjabi palak paneer'),
     whyNow: _en('Iron from the spinach and calcium from the paneer in one '
         'familiar, comforting curry.'),
@@ -1819,6 +1873,8 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'punjabi_rajma',
+    meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
+    kind: RecipeKind.main,
     name: _en('Punjabi rajma'),
     whyNow: _en('A kidney-bean curry that is a solid, filling source of both '
         'protein and iron.'),
@@ -1844,6 +1900,8 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'gujarati_dhokla',
+    meals: const [RecipeMeal.breakfast, RecipeMeal.snack],
+    kind: RecipeKind.light,
     name: _en('Gujarati dhokla'),
     whyNow: _en('A steamed, fermented snack that is light, protein-bearing '
         'and easy on the stomach.'),
@@ -1869,6 +1927,8 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'gujarati_khichdi',
+    meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
+    kind: RecipeKind.main,
     name: _en('Gujarati moong dal khichdi'),
     whyNow: _en('A gentle, easy-to-digest one-pot meal, especially useful on '
         'a nauseous or low-appetite day.'),
@@ -1894,6 +1954,8 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'south_indian_ragi_dosa',
+    meals: const [RecipeMeal.breakfast, RecipeMeal.dinner],
+    kind: RecipeKind.main,
     name: _en('South Indian ragi dosa'),
     whyNow: _en('A breakfast dosa that trades some rice for ragi, adding '
         'iron and calcium to a familiar plate.'),
@@ -1919,6 +1981,8 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'south_indian_curd_rice',
+    meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
+    kind: RecipeKind.main,
     name: _en('South Indian curd rice'),
     whyNow: _en('A cooling, probiotic dish that settles the stomach and '
         'often eases late-pregnancy heartburn.'),
@@ -1944,6 +2008,8 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'maharashtrian_varan_bhaat',
+    meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
+    kind: RecipeKind.main,
     name: _en('Maharashtrian varan bhaat'),
     whyNow: _en('A simple dal and rice combination that is gentle, filling '
         'and easy to make on a tired evening.'),
@@ -1968,6 +2034,8 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'maharashtrian_thalipeeth',
+    meals: const [RecipeMeal.breakfast, RecipeMeal.dinner],
+    kind: RecipeKind.main,
     name: _en('Maharashtrian thalipeeth'),
     whyNow: _en('A multigrain flatbread that brings iron and fibre together '
         'in one hearty breakfast.'),
@@ -1993,6 +2061,8 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'jain_kadhi_khichdi',
+    meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
+    kind: RecipeKind.main,
     name: _en('Jain kadhi khichdi'),
     whyNow: _en('A calcium-rich, gut-friendly meal made without onion or '
         'garlic, gentle enough for an off day.'),
@@ -2018,6 +2088,8 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'besan_chilla',
+    meals: const [RecipeMeal.breakfast, RecipeMeal.snack],
+    kind: RecipeKind.light,
     name: _en('Besan chilla'),
     whyNow: _en('A quick, protein-forward savoury pancake that works for any '
         'meal of the day.'),
@@ -2043,6 +2115,8 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'vegetable_daliya',
+    meals: const [RecipeMeal.breakfast, RecipeMeal.dinner],
+    kind: RecipeKind.light,
     name: _en('Vegetable daliya'),
     whyNow: _en('A broken-wheat porridge, light but filling, and a steady '
         'source of fibre for the later months.'),
@@ -2065,6 +2139,10 @@ final List<Recipe> kRecipes = [
     nutritionGlance: const ['Fibre 6g', 'Calories 180'],
     videoTitle: 'Cook along: Vegetable daliya',
   ),
+  // The 2026-09-20 additions — breakfasts, snacks, sweets, drinks, soups and
+  // the non-vegetarian mains that make the meal tiles real. See
+  // nutrition_recipes_more.dart.
+  ...kMoreRecipes,
 ];
 
 /// A clearly-named stub. The integrator wires this to whatever share/print

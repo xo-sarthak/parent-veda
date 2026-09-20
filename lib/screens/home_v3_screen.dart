@@ -990,9 +990,10 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
     // has a door because somebody decided the hub was the wrong shape for it,
     // and falling through to the hub would silently keep the shape that was
     // replaced.
-    // ⚠️ NUTRITION OPENS AS A DAY, NOT A CATALOGUE — 2026-09-20. The
-    // five-tab door over `kNutritionDoor` stays behind `kNutritionDoorAsDay`
-    // for revert; see lib/screens/nutrition/door/nutrition_door.dart.
+    // Nutrition opened as its own day screen for a few hours on 2026-09-20;
+    // the user asked for one door language, so the day is now the first
+    // tab's tool on the ordinary door below. `kNutritionDoorAsDay` is false
+    // and the standalone screen stays for revert.
     if (bracketId == kNutritionBracketId && kNutritionDoorAsDay) {
       Navigator.of(context).push(MaterialPageRoute<void>(
         settings: const RouteSettings(name: kNutritionDoorRoute),

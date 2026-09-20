@@ -41,32 +41,45 @@ void main() {
   setUp(() => door = pvDoorPageFor('pregnancy_nutrition')!);
 
   group('the door matches the brief', () {
-    test('five sub-tabs, Can I eat this first', () {
+    // ⚠️ RE-PINNED 2026-09-20. The brief's first tab was "Can I eat this?",
+    // a 64-food safety checker — a second Is it safe?. One home per fact:
+    // that tab is retired and the first tab is TODAY, the plate as a tool.
+    // Nutrients fold into What to eat now so the door keeps five tabs like
+    // every other. See STILL-OPEN §69 / §70.
+    test('five sub-tabs, Today first', () {
       expect(door.groups.length, 5);
-      expect(door.groups.first.id, kDietTabEat);
+      expect(door.groups.first.id, kDietTabToday);
       expect(door.groups.map((g) => g.label), [
-        'Can I eat this?',
+        'Today',
         'What to eat now',
-        'Nutrients & recipes',
+        'Recipes',
         'Charts & fasting',
         'Talk',
       ]);
     });
 
-    test('sub-tab 1 is a search screen, not a rail, and carries no cards', () {
-      // The brief says so by name, and its DO NOT list repeats it. All five
-      // things it lists for this tab — search, most-searched, category chips,
-      // the food list, cravings folded in — ARE the inline screen.
+    test('sub-tab 1 is the day as a tool, with a pointer to Is it safe? under it', () {
       final g = door.groups.first;
-      expect(g.layout, PvDoorLayout.stack);
-      expect(g.inlineSurfaceId, kDietSurfaceCanIEat);
-      expect(door.sectionsOf(kDietTabEat), isEmpty);
+      expect(g.inlineSurfaceId, kDietSurfaceToday);
+      final tiles = door.sectionsOf(kDietTabToday).expand((s) => s.tiles).toList();
+      expect(tiles.whereType<PvDoorToolTile>().map((t) => t.surfaceId), contains('can_i'));
+      // The retired checker is on no tab.
+      expect(door.groups.map((g) => g.inlineSurfaceId), isNot(contains(kDietSurfaceCanIEat)));
+    });
+
+    test('the recipes tab IS the grid, not a rail over a tile list', () {
+      // 2026-09-20: the user asked whether a rail was the right way to show
+      // recipes. It was not (Crouton, Kitchen Stories: a filterable photo
+      // grid led by one card). The tab is the tool; it draws no sections.
+      final g = door.groups.firstWhere((g) => g.id == kDietTabRecipes);
+      expect(g.inlineSurfaceId, kDietSurfaceRecipeRail);
+      expect(door.sectionsOf(kDietTabRecipes), isEmpty);
     });
 
     test('sub-tabs 2, 3, 4 and 5 are card rails', () {
       for (final id in [
         kDietTabNow,
-        kDietTabNutrients,
+        kDietTabRecipes,
         kDietTabCharts,
         kDietTabTalk
       ]) {
@@ -167,8 +180,13 @@ void main() {
     });
 
     test('every recipe', () {
+      // The recipes are the grid's, not the door's tiles (see the Recipes
+      // tab test): the grid draws every one that suits her diet, and with
+      // no diet set that is all of them. The library entries still resolve
+      // by id through the router — pinned in nutrition_door_test.dart.
       final ids = _from(door, PvDoorLibrary.recipe).map((t) => t.entryId);
-      expect(ids.toSet(), kRecipes.map((r) => r.id).toSet());
+      expect(ids, isEmpty, reason: 'recipes moved to RecipesGridBody on 2026-09-20');
+      expect(kRecipes.map((r) => r.id).toSet().length, kRecipes.length);
     });
 
     test('every diet chart', () {
@@ -186,8 +204,13 @@ void main() {
           if (t is PvDoorToolTile) t.surfaceId,
       ];
       expect(surfaces, contains(kDietSurfaceCharts));
-      expect(surfaces, contains(kDietSurfaceRecipes));
-      expect(surfaces, contains(kDietSurfaceBigger));
+      // kDietSurfaceRecipes (the pushed library) no longer has a card: the
+      // Recipes tab is that library, inline, since 2026-09-20.
+      expect(surfaces, isNot(contains(kDietSurfaceRecipes)));
+      // kDietSurfaceBigger (NutrientsScreen) has no card either: it listed
+      // the twelve nutrients again; the five bigger questions are reads.
+      expect(surfaces, isNot(contains(kDietSurfaceBigger)));
+      expect(_from(door, PvDoorLibrary.dietQuestion).length, kNutritionPracticalCards.length);
     });
 
     test('the supplements film is a coming-soon video, not a guide', () {
@@ -201,21 +224,14 @@ void main() {
       expect(videos.single.format, PvDoorFormat.video);
     });
 
-    test('fasting is one card, and it is honest about why', () {
-      // ⚠️ THE BRIEF LISTS EIGHT AND NONE OF THEM IS A PAGE.
-      // `kFastingByOccasion` and `kFastingGeneral` are title-and-paragraph rows
-      // rendered inline on `FastingScreen`, not tappable, with no detail
-      // screen. Eight cards each opening the same screen would be eight
-      // promises with one destination; building eight pages is what the brief
-      // forbids. So: one card, listed in STILL-OPEN §35.
+    test('fasting is eight pages, each a read', () {
+      // Owed since STILL-OPEN §35.6; paid 2026-09-20 — every topic is a
+      // PvRead in the one reader (nutrition_reads.dart), so each card has
+      // its own destination.
       final fasting = _from(door, PvDoorLibrary.fasting);
-      expect(fasting.length, 1);
-      expect(fasting.single.title, isNot('Fasting, done safely'),
-          reason: 'the card must not repeat its own section heading.');
-      // The blurb is where the eight actually get named.
-      final blurb = fasting.single.blurb.toLowerCase();
-      for (final word in ['navratri', 'ramzan', 'karva chauth', 'ekadashi']) {
-        expect(blurb, contains(word));
+      expect(fasting.length, 8);
+      for (final t in fasting) {
+        expect(t.title, isNot('Fasting, done safely'));
       }
     });
   });

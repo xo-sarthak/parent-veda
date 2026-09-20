@@ -325,6 +325,9 @@ enum PvDoorLibrary {
   /// `kFastingByOccasion` + `kFastingGeneral` — fasting, safely.
   fasting,
 
+  /// `kNutritionPracticalCards` — the five whole-diet questions, each a read.
+  dietQuestion,
+
   /// `kBsPages` — one skin or belly read.
   bellySkin,
 
@@ -353,6 +356,7 @@ extension PvDoorLibraryCopy on PvDoorLibrary {
         PvDoorLibrary.dietStage => PvDoorFormat.guide,
         PvDoorLibrary.dietCondition => PvDoorFormat.guide,
         PvDoorLibrary.fasting => PvDoorFormat.guide,
+        PvDoorLibrary.dietQuestion => PvDoorFormat.guide,
         // ⚠️ "Read", NOT "Guide". The Belly & skin brief marks every one of its
         // nineteen pages [Read], and it is the right word: these explain what
         // is happening to her skin rather than handing her something to do.

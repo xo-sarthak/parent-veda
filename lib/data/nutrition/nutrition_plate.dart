@@ -77,14 +77,13 @@ class NutritionPlate {
   final int dayIndex;
   final List<PlateMeal> meals;
 
-  /// The chart's swaps plus the same slot on its other days — what "Swap"
-  /// offers for one meal. The chart's own swap lines come first; they were
-  /// written for exactly this.
+  /// What "Swap" offers for one meal: the SAME SLOT on the chart's other
+  /// days — real meals, in the chart's words. The chart's own `swaps` lines
+  /// are advice ("Iron: palak, methi, jaggery…"), not dishes; offering them
+  /// here put a sentence of guidance on the plate as breakfast (the phone,
+  /// 2026-09-20). They are `swapIdeas` now, shown as text.
   List<String> swapsFor(PlateMeal m) {
     final out = <String>[];
-    for (final s in content.swaps) {
-      out.add(s.en);
-    }
     for (var d = 0; d < content.days.length; d++) {
       if (d == dayIndex) continue;
       final day = content.days[d];
@@ -95,6 +94,9 @@ class NutritionPlate {
     }
     return out;
   }
+
+  /// The chart's own swap advice — sentences, for reading.
+  List<String> get swapIdeas => [for (final s in content.swaps) s.en];
 }
 
 ChartStage plateStageFor(int week) =>

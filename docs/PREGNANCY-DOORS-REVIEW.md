@@ -215,7 +215,7 @@ findings and what changed:
 
 **Still to walk**
 
-## 4. Nutrition — BUILT 2026-09-20 as a day, walk owed
+## 4. Nutrition — BUILT as a day, then FOLDED INTO THE DOOR on the phone 2026-09-20 (STILL-OPEN §70)
 
 Research first (MOBBIN-DISCOVERY §12), the user's go on all three tiers,
 with one brief: *"make sure Is it safe? and Nutrition don't look like a
@@ -230,7 +230,26 @@ experience, interface and psychology, and the user base who is pregnant."*
 → *The library* (charts · fasting · nutrients · Is it safe?) → dieticians
 → disclaimer.
 
-**To walk on the phone**
+**As it stands after the fold (2026-09-20 evening, walked):** the door
+hero (hands cupping tomatoes) → the rail of five (Today · What to eat now ·
+Recipes · Charts & fasting · Talk, drawn marks) → Today = the plate, ticks,
+water, cravings inline, then *Also on this door* (Is it safe? · Your list)
+→ Recipes = Cook today lead card, need chips, two-across grid → Charts &
+fasting = tool cards + eight fasting reads → Talk = the dietician's card.
+Walked in this order on the phone: the hero, the marks, the plate (dinner
+wore lunch's photo — fixed; curd wore an offering — re-picked), the grid
+(second row blank on Wikimedia's 429 — retries lengthened), Charts,
+Is it safe?'s hero (now the door hero, a market). The photo host story is
+STILL-OPEN §70.3 — **R2 upload is on the user and blocks launch**.
+
+**The deep dive (2026-09-20 evening, walked; STILL-OPEN §70.4):** chart as
+a plan with a day strip and photo rows; "Your plate" once, no Today /
+Tomorrow chips; the bigger questions as reads; seven recipe tiles over 40
+recipes; a number under every meal and six tiles for the day; Talk lists
+the panel; no white mist. Owed: seven-day charts, 3D category
+illustrations, 14 recipe photos.
+
+**To walk on the phone (the day, as first built; still true inside the tab)**
 - The plate: Today vs Tomorrow differ; Swap changes the row in place
   (AnimatedSwitcher) and marks it; "Not today" dims and strikes; "Put it
   back" restores; "The chart" opens the right chart.

@@ -340,7 +340,7 @@ class V3ReadRow extends StatelessWidget {
                 // The article's own picture first (read_images.dart, the
                 // same one its frame shows), else the category's. A rail
                 // card and the page it opens should share a photograph.
-                final url = kReadImageUrls['$kPregWeekReadPrefix${item.id}'] ??
+                final url = readImageFor('$kPregWeekReadPrefix${item.id}') ??
                     v2ReadCover(item.category.en);
                 if (url == null) return const SizedBox.shrink();
                 return Image.network(url,

@@ -165,8 +165,12 @@ void main() {
       final home = _read('lib/screens/home_v3_screen.dart');
       expect(home, isNot(contains(RegExp(r'^\s+PvSearchBar\(', multiLine: true))));
       final door = _read('lib/screens/doors/pv_door_screen.dart');
-      expect(door, contains('PvSearchBar('));
-      expect(door, contains('openPvSearch(context, pregnancy, door: page)'));
+      // LIVE since 2026-09-20 (pv_live_search.dart): the field is the door's
+      // own, results draw in the sheet, and the pushed screen is the way on
+      // ("Search everywhere"). The bar that pushed is a comment now.
+      expect(door, contains('PvLiveSearchField('));
+      expect(door, contains('openPvSearch(context, widget.pregnancy, query: q)'));
+      expect(door, isNot(contains(RegExp(r'^\s+PvSearchBar\(', multiLine: true))));
     });
   });
 }

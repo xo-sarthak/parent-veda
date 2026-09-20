@@ -79,11 +79,17 @@ class PvDoorSheet extends StatelessWidget {
     required this.p,
     required this.children,
     this.minHeightFactor = 1,
+    this.minHeight = 0,
   });
 
   final V2Palette p;
   final List<Widget> children;
   final double minHeightFactor;
+
+  /// A floor in pixels, used while a door's live search field is active
+  /// (`pvLiveSearchSheetMin`): the field can only ride to the top of the
+  /// screen if the sheet under it is tall enough to scroll.
+  final double minHeight;
 
   // ⚠️ NO FULL-VIEWPORT MINIMUM ANY MORE — 2026-09-19. The minimum existed
   // so the TINTED FIELD under the sheet would never show when a short tab
@@ -96,6 +102,7 @@ class PvDoorSheet extends StatelessWidget {
   // revert: minHeight: MediaQuery.sizeOf(context).height * minHeightFactor.
   @override
   Widget build(BuildContext context) => Container(
+        constraints: BoxConstraints(minHeight: minHeight),
         decoration: BoxDecoration(
           color: p.ground,
           borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
@@ -298,11 +305,17 @@ class PvDoorRailCard extends StatelessWidget {
     this.index = 0,
     this.dimmed = false,
     this.onTap,
+    this.imageUrl,
   });
 
   final V2Palette p;
   final double hue;
   final IconData icon;
+
+  /// A photograph filling the card, with a white scrim rising under the
+  /// type — the reader's next-step tile treatment, on a rail (2026-09-20,
+  /// for the recipe rail). Null = the mark in the tint, as everywhere.
+  final String? imageUrl;
 
   /// The badge, top-left — "Tool", "Article", "Coming soon".
   final String chip;
@@ -326,6 +339,7 @@ class PvDoorRailCard extends StatelessWidget {
         .withSaturation(0.46)
         .withLightness(0.34)
         .toColor();
+    final onPhoto = imageUrl != null && imageUrl!.isNotEmpty;
 
     return InkWell(
       onTap: dimmed ? null : onTap,
@@ -340,13 +354,33 @@ class PvDoorRailCard extends StatelessWidget {
           ),
           clipBehavior: Clip.antiAlias,
           child: Stack(children: [
-            // The mark, quiet and large, where an illustration would sit.
-            Positioned(
-              right: -22,
-              bottom: 22,
-              child: Icon(icon,
-                  size: 96, color: Colors.white.withValues(alpha: 0.34)),
-            ),
+            // The mark, quiet and large, where an illustration would sit —
+            // or the photograph, where the piece has one.
+            if (imageUrl case final url? when url.isNotEmpty) ...[
+              Positioned.fill(
+                child: Image.network(url, fit: BoxFit.cover, errorBuilder: (_, _, _) => const SizedBox.shrink()),
+              ),
+              // A DARK scrim, never a white one: the white mist washed the
+              // photo out and the type sat on fog (the phone, 2026-09-20).
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [Colors.black.withValues(alpha: 0.0), Colors.black.withValues(alpha: 0.66)],
+                      stops: const [0.35, 1.0],
+                    ),
+                  ),
+                ),
+              ),
+            ] else
+              Positioned(
+                right: -22,
+                bottom: 22,
+                child: Icon(icon,
+                    size: 96, color: Colors.white.withValues(alpha: 0.34)),
+              ),
             Padding(
               padding: const EdgeInsets.all(13),
               child: Column(
@@ -383,7 +417,7 @@ class PvDoorRailCard extends StatelessWidget {
                             fontSize: 9,
                             fontWeight: FontWeight.w800,
                             letterSpacing: 0.8,
-                            color: deep.withValues(alpha: 0.85))),
+                            color: onPhoto ? Colors.white.withValues(alpha: 0.85) : deep.withValues(alpha: 0.85))),
                     const SizedBox(height: 4),
                   ],
                   Text(title,
@@ -394,7 +428,7 @@ class PvDoorRailCard extends StatelessWidget {
                           fontWeight: FontWeight.w600,
                           height: 1.22,
                           letterSpacing: -0.3,
-                          color: p.ink1)),
+                          color: onPhoto ? Colors.white : p.ink1)),
                 ],
               ),
             ),

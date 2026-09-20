@@ -604,19 +604,10 @@ class _FoundSheet extends StatelessWidget {
             ColoredBox(
                 color: p.surfaceAlt,
                 child: Center(child: Icon(canICategoryIcon(e.category), size: 48, color: p.ink3))),
-          // a white scrim rising under the name band
-          Positioned.fill(
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [Colors.transparent, p.surface],
-                  stops: const [0.55, 1.0],
-                ),
-              ),
-            ),
-          ),
+          // A white scrim rose under the name band here; the user
+          // (2026-09-20): no white mist, no fading — the photo, then the
+          // words. Kept for revert:
+          //   Positioned.fill(child: DecoratedBox(gradient: transparent → p.surface, stops 0.55→1))
           Positioned(
             right: 20,
             top: 18,

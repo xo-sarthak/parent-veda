@@ -67,7 +67,11 @@ import 'pv_door_rail.dart';
 import 'pv_door_tiles.dart';
 import 'pv_door_router.dart';
 import '../search/pv_search_screen.dart';
-import '../../widgets/pv_search_bar.dart';
+import '../tools/ask_veda_screen.dart';
+import '../../services/pv_search_store.dart';
+import '../../widgets/global_ask_fab.dart' show kAskVedaRoute;
+import 'pv_live_search.dart';
+// import '../../widgets/pv_search_bar.dart'; // the bar that pushed a screen — kept for revert (2026-09-20)
 
 /// Doors that use the chip row instead of the deck — the §2.8 comparison.
 /// Scans & tests first, by the user's ask; empty this set to put every door
@@ -87,7 +91,7 @@ const Set<String> kPvDoorTileDoors = {};
 /// Doors on the straddling card RAIL — Flo's pattern, the user's reference
 /// (2026-09-18): tall white cards across the seam between hero and sheet.
 /// Scans & tests first.
-const Set<String> kPvDoorRailDoors = {'pregnancy_scans_tests', 'pregnancy_complications'};
+const Set<String> kPvDoorRailDoors = {'pregnancy_scans_tests', 'pregnancy_complications', 'pregnancy_nutrition'};
 
 // -----------------------------------------------------------------------------
 //  Rail geometry
@@ -150,6 +154,28 @@ class PvDoorScreen extends StatefulWidget {
 }
 
 class _PvDoorScreenState extends State<PvDoorScreen> {
+  // ⚠️ THE SEARCH BAR IS LIVE, AND ITS FLOW IS SHARED. `PvLiveSearch`
+  // (pv_live_search.dart) owns the three states — idle, focused-and-empty,
+  // typing — the scroll of the field to the top, the fading hero words and
+  // Back-twice. Built on Is it safe? and lifted out at the user's ask
+  // (2026-09-20) so every door searches the same way. This screen supplies
+  // what is its own: the index (`pvSearchIndexOf(page)`), the row
+  // (`PvSearchHitRow`), her recents (`PvSearchStore`) and the two ways on.
+  final PvLiveSearch _search = PvLiveSearch();
+
+  @override
+  void initState() {
+    super.initState();
+    PvDoorStripStore.instance.init();
+    PvSearchStore.instance.init();
+  }
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
   late int _group = () {
     final id = widget.initialGroup;
     if (id == null) return 0;
@@ -220,12 +246,6 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
   }
 
   @override
-  void initState() {
-    super.initState();
-    PvDoorStripStore.instance.init();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       // ⚠️ THE STORES THE INLINE TOOLS READ, LISTENED TO HERE. The timeline and
@@ -245,6 +265,8 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
         // inline, and forgetting a line looks like a frozen tab.
         ConditionsStore.instance,
         PvDoorStripStore.instance,
+        _search,
+        PvSearchStore.instance,
       ]),
       builder: (context, _) {
         final p = V2PaletteStore.instance.current;
@@ -254,7 +276,9 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
         final groups = page.groups;
         final group = groups[_group.clamp(0, groups.length - 1)];
 
-        return Scaffold(
+        return PvLiveSearchScope(
+          search: _search,
+          child: Scaffold(
           backgroundColor: p.ground,
           body: Stack(children: [
             // The field is the page's surface and does not scroll — the same
@@ -278,8 +302,17 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                   eyebrow: bracket.label.of(lang),
                   bracket: bracket,
                   pregnancy: widget.pregnancy,
+                  search: _search,
                 ),
-                PvDoorSheet(p: p, children: [
+                PvDoorSheet(p: p, minHeight: pvLiveSearchSheetMin(context, _search), children: [
+                  // ---- the field's three states ---------------------------
+                  // Typing: rows replace the page. Focused and empty with
+                  // recents: the recents replace the page. Otherwise the page.
+                  if (_search.searching)
+                    ..._liveResults(p)
+                  else if (_search.recalling && PvSearchStore.instance.recent.isNotEmpty)
+                    ..._liveRecall(p)
+                  else ...[
                   // ⚠️ THE ANCHOR A LAUNCHER CARD SCROLLS TO. See `_openTile`.
                   SizedBox(
                       key: _selectorAnchor,
@@ -603,13 +636,102 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                   ],
 
                   pvDoorPad(PvDoorDisclaimer(p: p)),
+                  ],
                 ]),
               ],
             ),
           ]),
+          ),
         );
       },
     );
+  }
+
+  // ---- the live field's two states ----------------------------------------
+
+  /// Rows for what she has typed, over this door's index; under them the
+  /// two ways on — everywhere, and Ask Veda.
+  List<Widget> _liveResults(V2Palette p) {
+    final q = _search.query;
+    final hits = pvSearch(q, pvSearchIndexOf(page));
+    final label = bracket.label.of(widget.pregnancy.language);
+    return [
+      const SizedBox(height: 22),
+      pvDoorPad(Text(hits.isEmpty ? 'Nothing in $label by that name' : 'In $label',
+          style: pvFraunces(fontSize: 22, fontWeight: FontWeight.w600, height: 1.15, color: p.ink1))),
+      const SizedBox(height: 6),
+      for (var i = 0; i < hits.length && i < 30; i++)
+        PvSearchHitRow(
+            key: pvSearchHitKey(i),
+            p: p,
+            hit: hits[i],
+            onTap: () {
+              _search.focus.unfocus();
+              openPvSearchHit(context, hits[i], widget.pregnancy, query: q);
+            }),
+      const SizedBox(height: 14),
+      pvDoorPad(PvLiveSearchWayOn(
+        p: p,
+        icon: Icons.travel_explore_outlined,
+        title: 'Search everywhere for "$q"',
+        line: 'Every door of this stage, not just $label.',
+        onTap: () {
+          pvCommitFeedback();
+          _search.focus.unfocus();
+          openPvSearch(context, widget.pregnancy, query: q);
+        },
+      )),
+      const SizedBox(height: 10),
+      pvDoorPad(PvLiveSearchWayOn(
+        p: p,
+        icon: Icons.auto_awesome_outlined,
+        title: 'Ask Veda about "$q"',
+        line: 'In your own words, with your week in mind.',
+        onTap: () {
+          pvCommitFeedback();
+          PvSearchStore.instance.remember(q);
+          _search.focus.unfocus();
+          Navigator.of(context).push(MaterialPageRoute<void>(
+            settings: const RouteSettings(name: kAskVedaRoute),
+            builder: (_) => AskVedaScreen(controller: widget.pregnancy, initialQuery: q),
+          ));
+        },
+      )),
+      const SizedBox(height: 8),
+    ];
+  }
+
+  /// Her recent searches, as rows that put the words back in the field.
+  List<Widget> _liveRecall(V2Palette p) {
+    final recent = PvSearchStore.instance.recent;
+    return [
+      const SizedBox(height: 22),
+      pvLiveSearchRecallHeading(p, 'Recent', onClear: PvSearchStore.instance.clear),
+      const SizedBox(height: 6),
+      for (final r in recent)
+        PvPress(
+          child: InkWell(
+            onTap: () {
+              pvCommitFeedback();
+              _search.run(r);
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+              child: Row(children: [
+                Icon(Icons.history_rounded, size: 20, color: p.ink2),
+                const SizedBox(width: 14),
+                Expanded(
+                    child: Text(r,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: pvManrope(fontSize: 15, fontWeight: FontWeight.w600, color: p.ink1))),
+                Icon(Icons.north_west_rounded, size: 16, color: p.ink3),
+              ]),
+            ),
+          ),
+        ),
+      const SizedBox(height: 8),
+    ];
   }
 }
 
@@ -625,9 +747,11 @@ class _Hero extends StatelessWidget {
     required this.eyebrow,
     required this.bracket,
     required this.pregnancy,
+    required this.search,
   });
 
   final PvDoorPage page;
+  final PvLiveSearch search;
   final PregnancyController pregnancy;
   final V2Palette p;
   final Color tint;
@@ -785,48 +909,70 @@ class _Hero extends StatelessWidget {
                   height: photo == null
                       ? 20
                       : MediaQuery.sizeOf(context).height * 0.10),
-              Text(eyebrow.toUpperCase(),
-                  style: pvManrope(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.4,
-                      color: photo == null
-                          ? p.ink2
-                          : Colors.white.withValues(alpha: 0.82))),
-              const SizedBox(height: 8),
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 300),
-                child: Text(page.heroTitle,
-                    style: pvFraunces(
-                        fontSize: photo == null ? 27 : 30,
-                        fontWeight: FontWeight.w600,
-                        height: 1.15,
-                        letterSpacing: -0.6,
-                        color: photo == null ? p.ink1 : Colors.white)),
-              ),
-              const SizedBox(height: 12),
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 330),
-                child: Text(page.heroBlurb,
-                    style: pvManrope(
-                        fontSize: 13.5,
-                        height: 1.55,
-                        color: photo == null
-                            ? p.ink2
-                            : Colors.white.withValues(alpha: 0.92))),
+              // The words fade while the field has focus (pv_live_search).
+              PvLiveSearchWords(
+                search: search,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(eyebrow.toUpperCase(),
+                        style: pvManrope(
+                            fontSize: 11,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: 1.4,
+                            color: photo == null
+                                ? p.ink2
+                                : Colors.white.withValues(alpha: 0.82))),
+                    const SizedBox(height: 8),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 300),
+                      child: Text(page.heroTitle,
+                          style: pvFraunces(
+                              fontSize: photo == null ? 27 : 30,
+                              fontWeight: FontWeight.w600,
+                              height: 1.15,
+                              letterSpacing: -0.6,
+                              color: photo == null ? p.ink1 : Colors.white)),
+                    ),
+                    const SizedBox(height: 12),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 330),
+                      child: Text(page.heroBlurb,
+                          style: pvManrope(
+                              fontSize: 13.5,
+                              height: 1.55,
+                              color: photo == null
+                                  ? p.ink2
+                                  : Colors.white.withValues(alpha: 0.92))),
+                    ),
+                  ],
+                ),
               ),
               const SizedBox(height: 16),
               // ---- SEARCH, IN THE DOOR ----------------------------------------
               // Flo's topic page, exactly: title, one line, a white search
               // field, then the card rail (BASE-UI-DECISIONS §2.9). A door is
               // thirty to fifty things across five tabs; "NT scan" typed
-              // beats two swipes and a scroll. Scoped to this door, with
-              // "Everywhere" one tap away on the screen it opens.
-              PvSearchBar(
+              // beats two swipes and a scroll. LIVE since 2026-09-20: results
+              // draw in the sheet as she types (pv_live_search.dart), with
+              // "Search everywhere" the way on. The bar that pushed a screen,
+              // kept for revert:
+              //   PvSearchBar(key: kPvDoorSearchKey, hint: 'Search $eyebrow', p: p,
+              //       onTap: () => openPvSearch(context, pregnancy, door: page)),
+              PvLiveSearchField(
                   key: kPvDoorSearchKey,
-                  hint: 'Search $eyebrow',
+                  search: search,
                   p: p,
-                  onTap: () => openPvSearch(context, pregnancy, door: page)),
+                  hint: 'Search $eyebrow',
+                  onSubmitted: (q) {
+                    final hits = pvSearch(q.trim(), pvSearchIndexOf(page));
+                    if (hits.isNotEmpty) {
+                      openPvSearchHit(context, hits.first, pregnancy, query: q);
+                    } else if (q.trim().isNotEmpty) {
+                      openPvSearch(context, pregnancy, query: q.trim());
+                    }
+                  }),
               const SizedBox(height: 4),
             ],
           ),

@@ -172,4 +172,27 @@ void main() {
       }
     });
   });
+
+  group('the door leads with Asked most; history is a typing shortcut', () {
+    // 2026-09-20, the user on the phone: the Yours row under the field read
+    // as "my history displayed at the very top … static". Mobbin: no lookup
+    // screen shows history idle — recents appear on focus (Yazio, Keeta,
+    // Swiggy), the idle page leads with Popular (Woolworths, Instacart).
+    final src = File('lib/screens/can_i/can_i_door.dart').readAsStringSync();
+    test('Yours is not a live heading', () {
+      expect(RegExp(r"^\s*pvDoorPad\(canIHeading\(p, 'Yours'", multiLine: true).hasMatch(src), isFalse);
+    });
+    test('recents and saved draw only while the field is focused and empty', () {
+      expect(src, contains('final recalling = _search.recalling;'));
+      expect(src, contains('..._recall(p)'));
+      expect(src, contains("pvLiveSearchRecallHeading(p, 'Recent'"));
+    });
+    test('the idle page leads with Asked most and keeps one Saved row at the foot', () {
+      final welcome = src.substring(src.indexOf('List<Widget> _welcome('));
+      final askedMost = welcome.indexOf("canIHeading(p, 'Asked most'");
+      final savedRow = welcome.indexOf('_savedRow(p, saved.length)');
+      expect(askedMost, greaterThan(0));
+      expect(savedRow, greaterThan(askedMost));
+    });
+  });
 }

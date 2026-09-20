@@ -24,10 +24,21 @@ const List<(String, String)> kNutritionDishKeys = [
   ('dhokla', 'dhokla'), ('khichdi', 'khichdi'), ('varan', 'dal_rice'), ('thalipeeth', 'thalipeeth'),
   ('kadhi', 'kadhi'), ('chilla', 'chilla'), ('daliya', 'daliya'), ('dalia', 'daliya'),
   ('poha', 'poha'), ('upma', 'upma'), ('idli', 'idli'), ('dosa', 'dosa'), ('paratha', 'paratha'),
-  ('roti', 'roti_sabzi'), ('chapati', 'roti_sabzi'), ('phulka', 'roti_sabzi'),
-  ('oats', 'oats'), ('porridge', 'oats'), ('egg', 'boiled_eggs'), ('omelette', 'omelette'),
+  ('oats', 'oats'), ('porridge', 'oats'), ('omelette', 'omelette'), ('egg', 'boiled_eggs'),
+  // The protein names the plate: "chicken curry with rice" is a chicken
+  // photo, not the rice's (the chart screen, 2026-09-20).
+  ('chicken', 'chicken_curry'), ('mutton', 'chicken_curry'), ('macher', 'fish_curry'), ('fish', 'fish_curry'),
+  ('prawn', 'fish_curry'), ('pomfret', 'fish_curry'),
   ('paneer', 'paneer'), ('dal', 'dal'), ('sprouts', 'sprouts'), ('chana', 'chana'),
-  ('chole', 'chana'), ('sabzi', 'roti_sabzi'), ('rice', 'dal_rice'), ('curd', 'curd'),
+  ('chole', 'chana'), ('makhana', 'makhana'), ('soup', 'soup'), ('laddoo', 'dates'), ('kheer', 'milk'),
+  ('halwa', 'dates'), ('chikki', 'nuts'), ('orange', 'orange'), ('sweet lime', 'orange'), ('mosambi', 'orange'),
+  ('coconut water', 'coconut_water'), ('haldi doodh', 'milk'), ('badam', 'milk'),
+  // ⚠️ THE BREAD AND THE RICE COME AFTER THE DISH. "Paneer bhurji with roti"
+  // is a paneer photo, not the thali the roti key points at; on the phone
+  // (2026-09-20) dinner wore lunch's picture because 'roti' sat above
+  // 'paneer'. The accompaniments are the fallback, never the match.
+  ('roti', 'roti_sabzi'), ('chapati', 'roti_sabzi'), ('phulka', 'roti_sabzi'),
+  ('sabzi', 'roti_sabzi'), ('rice', 'dal_rice'), ('curd', 'curd'),
   ('dahi', 'curd'), ('lassi', 'lassi'), ('buttermilk', 'buttermilk'), ('chaas', 'buttermilk'),
   ('milk', 'milk'), ('fruit', 'fruit_bowl'), ('banana', 'banana'), ('apple', 'apple'),
   ('nuts', 'nuts'), ('almond', 'nuts'), ('dates', 'dates'), ('soup', 'soup'),

@@ -18,6 +18,8 @@
 //  The search result and the recents list.
 // =============================================================================
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
 import '../../data/reads/can_i_read.dart';
@@ -70,7 +72,27 @@ class CanIPhoto extends StatefulWidget {
 
 class _CanIPhotoState extends State<CanIPhoto> {
   int _attempt = 0;
-  static const _delays = [Duration(seconds: 2), Duration(seconds: 5)];
+  // A retry is a Timer, not a Future.delayed, so a card scrolled away (or
+  // a page popped) cancels it rather than firing into a dead widget.
+  Timer? _retry;
+
+  @override
+  void dispose() {
+    _retry?.cancel();
+    super.dispose();
+  }
+  // Four tries over about a minute, not two over seven seconds. A door
+  // opens thirty photos at once and the free hosts answer the burst with
+  // 429 for longer than five seconds; on the phone (2026-09-20) the grid's
+  // second row had given up for good while curl on the same phone fetched
+  // every one of them. Jitter spreads the retries so they are not a second
+  // burst. R2 (`kReadImageBase`) is the fix; this is the meantime.
+  static const _delays = [
+    Duration(seconds: 2),
+    Duration(seconds: 6),
+    Duration(seconds: 15),
+    Duration(seconds: 40),
+  ];
 
   @override
   Widget build(BuildContext context) => Image.network(
@@ -81,7 +103,9 @@ class _CanIPhotoState extends State<CanIPhoto> {
         errorBuilder: (_, _, _) {
           if (_attempt < _delays.length) {
             final next = _attempt + 1;
-            Future.delayed(_delays[_attempt], () {
+            final jitter = Duration(milliseconds: widget.url.hashCode.abs() % 1500);
+            _retry?.cancel();
+            _retry = Timer(_delays[_attempt] + jitter, () {
               if (mounted && _attempt == next - 1) setState(() => _attempt = next);
             });
           }

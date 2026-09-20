@@ -8519,16 +8519,74 @@ Twenty-five `…Classic` bodies, pushed by nothing. Retire with §65.7 and
 `showBookingSheetClassic`; giving them a `PvOfferingView` adapter retires
 that too.
 
-### 69.7 The store's category tiles — DONE 2026-09-20, not walked
+### 69.7 The store's category tiles — DONE 2026-09-20, walked once, redone
 
-The products front page's category tiles carry a photo of the object
-(`lib/data/products/pv_category_images.dart`, one Unsplash id per category
-on every stage; Blinkit's tile grammar from Mobbin — the object on a soft
-tint, the label beneath). The icon-on-tint tile is the fallback for a
-category the map does not know and for a failed load, so a Directus
-category still gets a tile. `test/pv_store_test.dart` fails when a bundled
-category has no photo. Chosen by subject word, not seen — the nineteen
-photos are on the device walk's list with the learn covers.
+First cut mapped Unsplash ids from memory; the user's walk found a cat in
+a blanket under Books and a sofa under Stretch mark care. **An id
+remembered is not a photo seen.** Redone the way the nutrition dishes
+were: each object searched on Wikimedia Commons, candidates laid on a
+contact sheet, looked at, chosen (`lib/data/products/pv_category_images.dart`,
+nineteen, 500-px thumbs — Wikimedia refuses 640). `PvRetryImage` tries
+again at 2 s and 5 s because Commons answers 429 to a strip of nineteen
+asking at once. Two are the weakest and worth a glance on the next walk:
+*Stretch mark care* (a small-brand cocoa-butter jar) and *Skincare* (two
+branded baby washes). The learn covers (§69.1) still carry the first
+cut's Unsplash ids and need the same treatment.
+
+### 69.8 The store walk of 2026-09-20 — done, and one thing to decide
+
+Fixed from the user's walk, all against Mobbin:
+
+- **One search pill.** The home's pill and the search screen's were two
+  look-alike containers at different x and y, so tapping made a second
+  shape appear under the first. `PvSearchPill` is one widget, one
+  geometry, Hero-linked; the back arrow lives inside it (UNIQLO, SKIMS).
+- **A search panel with something in it.** Recent (with a clear — eBay,
+  StubHub), Try (suggested searches — On, Gymshark), Shop by category
+  with the photo tiles (Gojek). As she types: matching categories as
+  rows first (SKIMS), then the stage chips and the grid. `PvSearchHistory`,
+  local, eight entries.
+- **A wishlist.** The heart saved to You → Saved → Products, three taps
+  away and unsigned. Now a heart with a count in the store header opens
+  `PvWishlistScreen` (Myntra), hers first then the other chapters.
+- **No notice on the heart.** The snack rose to a third of the screen
+  ("a very abrupt position"); the heart now fills with a small pop and
+  the header count says where it went. `pvSnack` is unchanged for the
+  compare messages, which sit above a real bar.
+- **The 20-second guide** is a white card with a hairline, the eyebrow,
+  the line, and LOOK FOR / SKIP with ink marks — no tinted well, no green
+  ticks or red crosses. The old card is `_guidanceClassic`.
+- **The shelf grid** is rows sized to content (`PvProductGridSliver`),
+  one gap between rows; the fixed-ratio grid left a different slack under
+  every card ("the spacing is not defined").
+
+**To decide — the "ParentVeda recommends" box on the product page.** The
+user does not like the filled violet well "popping up in the centre" and
+asked what other apps do. Mobbin (2026-09-20): Liven marks an expert
+review with the expert's avatar, name and credential and a small
+EXPERT REVIEWED pill; Faire and Commons use a round seal with a
+one-line explanation; Amazon's Choice and Udemy's Bestseller are small
+ink tags on the card, not bands on the page. Three options:
+
+1. **A signature, not a box (recommended).** White card, hairline, the
+   violet eyebrow PARENTVEDA RECOMMENDS, the reason in plain ink, and
+   the reviewer as a person — initials disc, name, credential, the
+   verified mark — Liven's shape. It converts because a named clinician
+   vouches, and it follows the base UI (white, ink, violet only on the
+   eyebrow). The "before you buy" line stays as a quiet second paragraph.
+2. **A seal.** A round ParentVeda mark at the top of the section with the
+   reason beside it (Faire, Commons). Distinctive, but a seal is a claim
+   of authority in a shape, and the store's honesty rules put the reason
+   and the name above the shape.
+3. **Tag only.** Keep the PARENTVEDA PICK tag on the image and drop the
+   band to a plain paragraph. Least visible; the user asked for something
+   that "pops into the eyes", so no.
+
+**Picked: option 1, built 2026-09-20.** `_recommend` on `pv_product_screen.dart`
+is the signature card; the tinted well is `_recommendClassic`, kept for
+revert. The two cautionary bands keep the same card with their word as
+the eyebrow and the tone dot in place of the mark — a caution is not a
+signature.
 
 ## 69.0 Nutrition is a day — BUILT 2026-09-20, walk owed
 
@@ -8577,3 +8635,143 @@ vs "Snack") — harmonise across the nineteen contents.
 ### 69.6 Not walked
 The phone dropped off USB as the first build finished. Walk list in
 PREGNANCY-DOORS-REVIEW §4.
+
+## 70.0 Nutrition, back inside the door language — 2026-09-20, on the phone
+
+The day screen (§69) stood outside the door shell and the user called it on
+the device: *"make it consistent, like Scans & tests and Complications …
+I want to maintain consistency throughout the application."* So:
+
+- The Nutrition tile opens the ordinary `PvDoorScreen` over `kNutritionDoor`
+  again (`kNutritionDoorAsDay = false`; the standalone screen stays for
+  revert). Nutrition joins `kPvDoorRailDoors`.
+- **Today is the first tab's inline tool** (`NutritionTodayBody`: plate,
+  ticks, glasses, cravings, eating-your-way) — the way My scans is the
+  timeline. Under it, two tiles: *Is this food safe?* (→ the Is it safe?
+  door) and *Your shopping list*.
+- "Can I eat this?" is retired from the door (a second Is it safe?);
+  nutrients fold into *What to eat now* so the door keeps five tabs.
+- **Recipes** is a tab: an inline rail of `PvDoorRailCard`s **with photos**
+  (the card gained an optional `imageUrl`, reader next-step treatment), then
+  every recipe as tiles; a recipe opens `RecipeCookScreen`.
+- **Every nutrition leaf is a read in the one reader** (`nutrition_reads.dart`:
+  nutrient, stage, condition-diet, and the eight fasting pages — §35.6 paid).
+  The old `NutrientDetailScreen`, `StageDetailScreen`,
+  `ConditionDetailScreen`, `RecipeDetailScreen`, `FastingScreen` are
+  unreached, kept for revert.
+- **Talk** is `NutritionTalkBody`: the nutritionist's card → her profile and
+  the real booking sheet; the violet `ExpertOptionsBlock` with its
+  snackbar-only "Request this" is retired.
+- The chart browser and craving page lose their violet (ink + hairline).
+
+### 70.1 Owed
+Photos for the stage / condition / nutrient / fasting reads (`dietstage_`,
+`dietcond_`, `nutrient_`, `fasting_` ids) — the rows show icon wells until
+then; `pvDoorTileReadImageId` needs those libraries. The same host
+question as everywhere (§63.18): R2 first.
+
+### 70.2 The second pass on the phone — 2026-09-20 evening
+- **Rail-card marks** are the drawn `IntentMark`s Scans and Complications
+  use (plate, nextStep, cuppedHands, calendarDay, askDoctor), not Material
+  icons.
+- **Recipes is a grid, not a rail.** The user asked "is a rail the right
+  way to show recipes — yes or no". No: Crouton, Kitchen Stories,
+  Woolworths and CREME show a library as a filterable photo grid led by
+  one card. The tab is `RecipesGridBody` (Cook today lead → need chips →
+  two across); `NutritionRecipeRail` is kept for revert; `kDietSurfaceRecipes`
+  (the pushed library) has no tile any more because the tab IS it.
+- **Photo cards** drop the white mist for a dark bottom gradient with
+  white type (`PvDoorRailCard.imageUrl`).
+- **A new hero** — two hands cupping cherry tomatoes (StockSnap, CC0),
+  picked by eye from a contact sheet, in the read-image table as
+  `nutrition_hero` so the mirror carries it. Is it safe? wears `cani_hero`
+  (a market's crates) with the same door-hero geometry.
+- **Seen and fixed:** dinner wore lunch's thali because 'roti' matched
+  before 'paneer' (dish keys reordered, pinned in a test); the curd photo
+  was a naivaidya offering (re-picked); the grid's second row gave up on
+  Wikimedia's 429 after two retries (`CanIPhoto` now tries four times over
+  a minute, jittered).
+- **Charts & fasting** and the fasting list are the door's ordinary tool
+  cards and read rows; photos for those reads stay owed (§70.1).
+
+### 70.4 The deep dive — 2026-09-20 evening (MOBBIN-DISCOVERY §14)
+Click by click at the user's ask ("recursive tree"). Built and walked:
+- **Chart = plan** (`diet_chart_plan_screen.dart`): day strip → the plate's
+  photo rows → "Make this my chart" (`NutritionDayStore.pinnedChartId`;
+  Today follows) → Swaps / Go easy on at 16pt → doctor's note rule-left →
+  six-tile day total. The boxed `DietChartScreen` is unreached, kept.
+- **Today once**: "Your plate" + date; the Today / Tomorrow chips retired
+  (kept commented); "From the … chart · See the week" under the plate.
+- **Bigger questions** = five reads (`dietq_`, `PvDoorLibrary.dietQuestion`);
+  `NutritionsScreen` unreached.
+- **Recipes**: `RecipeMeal` + `RecipeKind` on the model; seven bucket tiles
+  (`kRecipeBuckets`) over the need chips; **24 new recipes**
+  (`nutrition_recipes_more.dart`) — 40 total.
+- **A number under every meal** (`food_values.dart`, `test/food_values_test.dart`):
+  glance on every row and card, `NutritionValuesGrid` on sheet / recipe /
+  chart day / whole plate, the caveat on each, the reference once by the
+  ticks in "roughly". No bars, no Σ.
+- **Talk** lists every nutritionist from `mergedExperts()` (real first).
+- No white mist: the meal sheet's and the Is it safe? found-sheet's fades
+  removed (kept commented).
+
+**Owed from the dive**
+- **Charts: three days → seven.** The user asked why three; the plan screen
+  and the plate take any number. Recommended two passes (Full month,
+  Vegetarian, Non-veg, First trimester, GDM first). His call on order.
+- **Category illustrations** (Blinkit-style 3D, one style) — Higgsfield,
+  seven images, on his go; the tiles take a URL.
+- **Photos for 14 of the 24 new recipes** — the dish-word fallback holds;
+  Openverse's general index was thin for them (10 picked).
+- The values are estimates from a hand table; a dietician's review of
+  `kFoodValues` before launch would be right.
+
+### 70.3 The photos — mirrored; R2 is the launch blocker (see BACKEND-PATTERNS §16i)
+`cdn.stocksnap.io` answers 403 to the phone (any user agent), so **196 of
+357 photos had never drawn on a device** — read for a week as Wikimedia
+throttling. Done today: every StockSnap id routes through Openverse's
+proxy on the phone (a stopgap, 1000/day per IP, dies when
+`kReadImageBase` is set); 62 food ids re-picked from StockSnap by eye plus
+the two heroes; every credit's URL-encoded artist name decoded; **all 357
+ids mirrored** to `C:\Users\sarth\Downloads\parentveda-images\` with
+`manifest.json` + `CREDITS.txt` (`tools/read_images/fetch_read_images.py`,
+resumable, `openverse_ids.json` sidecar). **Owed, and it blocks launch:**
+the user uploads the folder to an R2 bucket (flat, ids as names), then
+`kReadImageBase` = the bucket's public URL. Also owed: the door heroes
+that are still Unsplash hotlinks (Scans, Complications and the parenting
+doors) into the same table, so one switch covers all of them.
+
+## 71.0 The search bar's flow — one template, every door — 2026-09-20
+
+Built on Is it safe? after the user rejected "Yours" at the top of the page,
+then lifted out at his ask. `lib/screens/doors/pv_live_search.dart`:
+`PvLiveSearch` (three states, scroll-to-top on focus, `run`, `release`),
+`PvLiveSearchScope` (Back twice), `PvLiveSearchWords` (the fade),
+`PvLiveSearchField`, `pvLiveSearchRecallHeading`, `PvLiveSearchWayOn`,
+`pvLiveSearchSheetMin`. Research: MOBBIN-DISCOVERY §13. Held by
+`test/pv_live_search_test.dart` (the states; both consumers use the
+template and grew no field of their own).
+
+- **Is it safe?** runs on it: Yours gone from the top (kept for revert in
+  `_welcome`), Asked most first, one *Saved answers* row at the foot,
+  recents + saved in `_recall` under focus.
+- **Every shell door** runs on it: the hero bar is live; results come from
+  `pvSearchIndexOf(page)` (the door's tiles + its libraries) as
+  `PvSearchHitRow`s; focus shows `PvSearchStore.recent`; under results
+  "Search everywhere for …" (→ `PvSearchScreen` with `query`) and "Ask Veda
+  about …". `PvSearchBar` + `openPvSearch(door:)` is a comment now.
+- The Nutrition recipes joined the index as library hits
+  (`_nutritionLibraries`) — they stopped being tiles when the Recipes tab
+  became the grid, and "ragi" found nothing on the phone.
+- Walked: Nutrition ("ragi" → two recipes, field at the top, Back twice →
+  idle), Complications (Recent on focus), Is it safe? (recall + fade).
+
+### 71.1 Owed
+- The home's search (no bar there by decision, 2026-09-18) stays the pushed
+  screen. If the home ever gets a bar, it takes this template.
+- Is it safe?'s field and the shell's are the same widget now; the camera
+  round beside the field (`!kCanIScanAtFoot`) is the one per-door
+  `trailing` — nobody else uses it yet.
+- A door with Saved of its own (only Is it safe? today) draws Saved in
+  recall itself; if a second door grows saved items, lift that into the
+  template too.

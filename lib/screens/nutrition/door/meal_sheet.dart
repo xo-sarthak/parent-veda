@@ -10,6 +10,7 @@
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import '../../../data/nutrition/food_values.dart';
 
 import '../../../data/nutrition/nutrition_photos.dart';
 import '../../../data/nutrition/nutrition_plate.dart';
@@ -63,23 +64,17 @@ class _MealSheet extends StatelessWidget {
               controller: sc,
               padding: EdgeInsets.fromLTRB(0, 0, 0, 20 + MediaQuery.paddingOf(ctx).bottom),
               children: [
-                SizedBox(
-                  height: 190,
-                  child: Stack(fit: StackFit.expand, children: [
-                    NutritionPhoto(url: url, p: p, iconSize: 44),
-                    Positioned.fill(
-                      child: DecoratedBox(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                              begin: Alignment.topCenter,
-                              end: Alignment.bottomCenter,
-                              colors: [Colors.transparent, p.surface],
-                              stops: const [0.55, 1]),
-                        ),
-                      ),
-                    ),
-                  ]),
-                ),
+                // The photo band only when there is a photo; a grey band with
+                // a scrim read as a broken image on the phone.
+                // The photo, then the words. It had a fade into the sheet at
+                // its foot; the user (2026-09-20): "no white mist, no fading —
+                // the image, then the section below." Kept for revert:
+                //   Positioned.fill(child: DecoratedBox(gradient: transparent → p.surface, stops 0.55→1))
+                if (url != null) ...[
+                  SizedBox(height: 190, child: NutritionPhoto(url: url, p: p, iconSize: 44)),
+                  const SizedBox(height: 18),
+                ] else
+                  const SizedBox(height: 22),
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -98,6 +93,10 @@ class _MealSheet extends StatelessWidget {
                         child: Text('Swapped · back to ${meal.items}',
                             style: pvManrope(fontSize: 12.5, color: p.ink3, decoration: TextDecoration.underline)),
                       ),
+                    ],
+                    if (estimateMeal(current) case final v?) ...[
+                      const SizedBox(height: 16),
+                      NutritionValuesGrid(p: p, values: v, title: 'This meal, estimated'),
                     ],
                     const SizedBox(height: 18),
                     Text('Swap it for',
@@ -129,6 +128,24 @@ class _MealSheet extends StatelessWidget {
                           ]),
                         ),
                       ),
+                    if (plate.swapIdeas.isNotEmpty) ...[
+                      const SizedBox(height: 18),
+                      Text('Swap ideas from the chart',
+                          style: pvFraunces(fontSize: 18, fontWeight: FontWeight.w600, color: p.ink1)),
+                      const SizedBox(height: 8),
+                      for (final idea in plate.swapIdeas)
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8),
+                          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                            Padding(
+                              padding: const EdgeInsets.only(top: 7),
+                              child: Container(width: 5, height: 5, decoration: BoxDecoration(shape: BoxShape.circle, color: p.ink3)),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(child: Text(idea, style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2))),
+                          ]),
+                        ),
+                    ],
                     const SizedBox(height: 18),
                     OutlinedButton.icon(
                       onPressed: () {

@@ -32,6 +32,7 @@ import '../../services/diet_chart_pdf.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/pv_fonts.dart';
 import '../v2/v2_palette.dart';
+import 'door/diet_chart_plan_screen.dart';
 
 class DietChartsScreen extends StatefulWidget {
   const DietChartsScreen({super.key, required this.pregnancy});
@@ -191,7 +192,7 @@ class _DietChartsScreenState extends State<DietChartsScreen> {
                           style: pvManrope(
                               fontSize: 12.5,
                               fontWeight: FontWeight.w700,
-                              color: p.action)),
+                              color: p.ink1)),
                     ),
                   ),
                 const SizedBox(height: 8),
@@ -237,7 +238,7 @@ class _DietChartsScreenState extends State<DietChartsScreen> {
                                 style: pvManrope(
                                     fontSize: 13,
                                     fontWeight: FontWeight.w800,
-                                    color: p.action)),
+                                    color: p.ink1)),
                           ),
                         ]),
                   )
@@ -251,7 +252,7 @@ class _DietChartsScreenState extends State<DietChartsScreen> {
                           MaterialPageRoute<void>(
                               settings: RouteSettings(
                                   name: 'nutrition/chart/${chart.id}'),
-                              builder: (_) => DietChartScreen(chart: chart))),
+                              builder: (_) => DietChartPlanScreen(pregnancy: widget.pregnancy, chart: chart))),
                     ),
                     const SizedBox(height: 10),
                   ],
@@ -286,13 +287,16 @@ class _YouAreHere extends StatelessWidget {
   Widget build(BuildContext context) => Container(
         width: double.infinity,
         padding: const EdgeInsets.fromLTRB(15, 13, 15, 14),
+        // Ink and a hairline since 2026-09-20 (was a violet tint under
+        // text — the one thing the base UI forbids).
         decoration: BoxDecoration(
-          color: p.action.withValues(alpha: 0.09),
+          color: p.surface,
           borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: p.line),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            Icon(Icons.my_location_rounded, size: 16, color: p.action),
+            Icon(Icons.my_location_rounded, size: 16, color: p.ink1),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
@@ -316,7 +320,7 @@ class _YouAreHere extends StatelessWidget {
                 style: pvManrope(
                     fontSize: 12.5,
                     fontWeight: FontWeight.w800,
-                    color: p.action)),
+                    color: p.ink1)),
           ),
         ]),
       );
@@ -354,17 +358,17 @@ class _AxisRow extends StatelessWidget {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 13, vertical: 8),
                     decoration: BoxDecoration(
-                      color: selected ? p.action : p.surface,
+                      color: selected ? p.ink1 : p.surface,
                       borderRadius: BorderRadius.circular(999),
                       border:
-                          Border.all(color: selected ? p.action : p.line),
+                          Border.all(color: selected ? p.ink1 : p.line),
                     ),
                     child: Text(text,
                         style: pvManrope(
                             fontSize: 12.5,
                             fontWeight:
                                 selected ? FontWeight.w800 : FontWeight.w600,
-                            color: selected ? p.onAction : p.ink2)),
+                            color: selected ? p.ground : p.ink2)),
                   ),
                 ),
                 const SizedBox(width: 8),

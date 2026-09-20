@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../data/nutrition/nutrition_photos.dart';
+import '../../../data/nutrition/food_values.dart';
 import '../../../theme/pv_fonts.dart';
 import '../../../widgets/pv_feedback.dart';
 import '../../can_i/can_i_widgets.dart' show CanIPhoto;
@@ -70,6 +71,8 @@ class PlateRow extends StatelessWidget {
     required this.onTap,
     required this.onSwap,
     this.last = false,
+    this.showSwap = true,
+    this.photoUrl,
   });
   final V2Palette p;
   final String slot;
@@ -80,9 +83,14 @@ class PlateRow extends StatelessWidget {
   final VoidCallback onSwap;
   final bool last;
 
+  /// Off on a chart's day (diet_chart_plan_screen.dart): a plan is read,
+  /// a plate is acted on. Same row either way.
+  final bool showSwap;
+  final String? photoUrl;
+
   @override
   Widget build(BuildContext context) {
-    final url = nutritionPhotoFor(items);
+    final url = photoUrl ?? nutritionPhotoFor(items);
     return InkWell(
       onTap: () {
         pvCommitFeedback();
@@ -103,8 +111,12 @@ class PlateRow extends StatelessWidget {
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Row(children: [
-                  Text(slot.toUpperCase(),
-                      style: pvManrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: p.ink3)),
+                  Flexible(
+                    child: Text(slot.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: pvManrope(fontSize: 10, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: p.ink3)),
+                  ),
                   if (swapped) ...[
                     const SizedBox(width: 8),
                     Icon(Icons.swap_horiz_rounded, size: 13, color: p.ink3),
@@ -128,8 +140,12 @@ class PlateRow extends StatelessWidget {
                           color: p.ink1,
                           decoration: skipped ? TextDecoration.lineThrough : null)),
                 ),
+                // The numbers under every meal — the food apps' card line.
+                const SizedBox(height: 3),
+                NutritionGlanceLine(p: p, values: estimateMeal(items), maxLines: 2),
               ]),
             ),
+            if (showSwap) ...[
             const SizedBox(width: 10),
             PvPress(
               child: Material(
@@ -148,6 +164,7 @@ class PlateRow extends StatelessWidget {
                 ),
               ),
             ),
+            ],
           ]),
         ),
       ),
@@ -365,8 +382,9 @@ class NutritionChip extends StatelessWidget {
 
 /// A recipe card for a rail: photo, name, one line, minutes-free.
 class RecipeCard extends StatelessWidget {
-  const RecipeCard({super.key, required this.p, required this.name, required this.line, required this.url, required this.onTap, this.width = 168});
+  const RecipeCard({super.key, required this.p, required this.name, required this.line, required this.url, required this.onTap, this.width = 168, this.values});
   final V2Palette p;
+  final NutritionValues? values;
   final String name;
   final String line;
   final String? url;
@@ -381,22 +399,99 @@ class RecipeCard extends StatelessWidget {
             onTap();
           },
           borderRadius: BorderRadius.circular(16),
+          // In a grid cell the height is the cell's and the photo takes what
+          // the two lines leave; in a rail the photo is 120 and the card is
+          // as tall as its words. One card, both homes.
           child: SizedBox(
             width: width,
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              ClipRRect(
+            child: LayoutBuilder(builder: (context, box) {
+              final photo = ClipRRect(
                 borderRadius: BorderRadius.circular(16),
-                child: SizedBox(height: 120, width: width, child: NutritionPhoto(url: url, p: p, icon: Icons.soup_kitchen_outlined)),
-              ),
-              const SizedBox(height: 8),
-              Text(name,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, height: 1.25, color: p.ink1)),
-              const SizedBox(height: 2),
-              Text(line, maxLines: 2, overflow: TextOverflow.ellipsis, style: pvManrope(fontSize: 12, height: 1.35, color: p.ink2)),
-            ]),
+                child: SizedBox(
+                    height: box.hasBoundedHeight ? null : 120,
+                    width: width,
+                    child: NutritionPhoto(url: url, p: p, icon: Icons.soup_kitchen_outlined)),
+              );
+              return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                if (box.hasBoundedHeight) Expanded(child: photo) else photo,
+                const SizedBox(height: 8),
+                Text(name,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, height: 1.25, color: p.ink1)),
+                const SizedBox(height: 2),
+                Text(line, maxLines: 2, overflow: TextOverflow.ellipsis, style: pvManrope(fontSize: 12, height: 1.35, color: p.ink2)),
+                if (values != null) ...[
+                  const SizedBox(height: 4),
+                  NutritionGlanceLine(p: p, values: values, size: 11),
+                ],
+              ]);
+            }),
           ),
         ),
       );
+}
+
+/// The six numbers as a tile grid — "Per serving, estimated" — with the
+/// caveat under. The meal sheet, the recipe page and the chart plan all
+/// draw this one; Cherrypick's per-serving block, in the base UI.
+class NutritionValuesGrid extends StatelessWidget {
+  const NutritionValuesGrid({super.key, required this.p, required this.values, this.title = 'Per serving, estimated'});
+  final V2Palette p;
+  final NutritionValues values;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) {
+    final tiles = nutritionTiles(values);
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(title, style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: p.ink3)),
+      const SizedBox(height: 10),
+      GridView.builder(
+        shrinkWrap: true,
+        padding: EdgeInsets.zero,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3, mainAxisSpacing: 8, crossAxisSpacing: 8, childAspectRatio: 1.55),
+        itemCount: tiles.length,
+        itemBuilder: (_, i) => Container(
+          padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+          decoration: BoxDecoration(
+              color: p.surface, borderRadius: BorderRadius.circular(14), border: Border.all(color: p.line)),
+          // Scales down rather than overflowing on a narrow phone (or the
+          // test's square glyphs).
+          child: FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+              Text(tiles[i].$2, style: pvFraunces(fontSize: 17, fontWeight: FontWeight.w600, color: p.ink1)),
+              const SizedBox(height: 2),
+              Text(tiles[i].$1, style: pvManrope(fontSize: 11.5, color: p.ink2)),
+            ]),
+          ),
+        ),
+      ),
+      const SizedBox(height: 8),
+      Text(kNutritionEstimateNote, style: pvManrope(fontSize: 11.5, height: 1.45, color: p.ink3)),
+    ]);
+  }
+}
+
+/// The glance line under a dish: "≈ 320 kcal · 12 g protein · 3 mg iron".
+class NutritionGlanceLine extends StatelessWidget {
+  const NutritionGlanceLine({super.key, required this.p, required this.values, this.size = 11.5, this.maxLines = 1});
+  final V2Palette p;
+  final NutritionValues? values;
+  final double size;
+  final int maxLines;
+
+  @override
+  Widget build(BuildContext context) {
+    final v = values;
+    if (v == null || v.isEmpty) return const SizedBox.shrink();
+    return Text(nutritionGlance(v),
+        maxLines: maxLines,
+        overflow: TextOverflow.ellipsis,
+        style: pvManrope(fontSize: size, fontWeight: FontWeight.w600, height: 1.4, color: p.ink3));
+  }
 }

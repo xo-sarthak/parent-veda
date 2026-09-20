@@ -133,9 +133,9 @@ void main() {
 
   testWidgets('the selector is the carousel, with a dot per tab',
       (tester) async {
-    // Complications is on the tile row (2026-09-18); the deck is judged on a
-    // door that still has it.
-    await _pump(tester, 'pregnancy_nutrition');
+    // Complications is on the tile row (2026-09-18) and Nutrition joined the
+    // rail doors (2026-09-20); the deck is judged on a door that still has it.
+    await _pump(tester, 'pregnancy_belly_skin');
 
     // ⚠️ THE WIDGET, NOT THE DATA. A test can prove the door declares five
     // groups and prove nothing at all about which control draws them.
@@ -362,7 +362,11 @@ void _everyDoor() {
         final rails = find.byWidgetPredicate((w) =>
             w is ListView && w.scrollDirection == Axis.horizontal);
         final n = tester.widgetList(rails).length;
-        expect(n >= mixed.length && n <= mixed.length + inlineRails, isTrue,
+        // A tab whose whole body is a tool (`group.inlineSurfaceId`, e.g.
+        // Nutrition's Today: the plate, the cravings chips) draws what the
+        // tool needs; only the floor holds there.
+        final toolTab = g.inlineSurfaceId != null;
+        expect(n >= mixed.length && (toolTab || n <= mixed.length + inlineRails), isTrue,
             reason: '$name / "${g.label}": ${mixed.length} mixed sections must '
                 'draw ${mixed.length} rails (found $n, with $inlineRails inline '
                 'tools that may add one each).');

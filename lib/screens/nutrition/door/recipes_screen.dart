@@ -10,9 +10,12 @@
 import 'package:flutter/material.dart';
 
 import '../../../data/nutrition/nutrition_photos.dart';
+import '../../../data/nutrition/food_values.dart';
 import '../../../data/nutrition/nutrition_plate.dart';
 import '../../../data/nutrition_data.dart';
 import '../../../services/family_profile.dart';
+import '../../../services/nutrition_day_store.dart';
+import '../../../widgets/pv_feedback.dart';
 import '../../../services/pregnancy_controller.dart';
 import '../../../theme/pv_fonts.dart';
 import '../../doors/pv_door_chrome.dart';
@@ -20,21 +23,13 @@ import '../../v2/v2_palette.dart';
 import 'nutrition_widgets.dart';
 import 'recipe_cook_screen.dart';
 
-class RecipesScreen extends StatefulWidget {
+class RecipesScreen extends StatelessWidget {
   const RecipesScreen({super.key, required this.pregnancy});
   final PregnancyController pregnancy;
 
   @override
-  State<RecipesScreen> createState() => _RecipesScreenState();
-}
-
-class _RecipesScreenState extends State<RecipesScreen> {
-  String? _tag;
-
-  @override
   Widget build(BuildContext context) {
     final diet = FamilyProfileStore.instance.diet;
-    final mine = [for (final r in kRecipes) if (recipeSuits(r, diet) && (_tag == null || r.tags.contains(_tag))) r];
     return PvDoorToolScaffold(
       hue: 104,
       eyebrow: 'Nutrition · Recipes',
@@ -42,10 +37,162 @@ class _RecipesScreenState extends State<RecipesScreen> {
       intro: diet == null
           ? 'Everyday Indian dishes, each with a reason it helps now. Tap one to cook it.'
           : '${diet.label.en} dishes from an everyday Indian kitchen, each with a reason it helps now.',
-      children: [
-        Builder(builder: (context) {
+      children: [RecipesGridBody(pregnancy: pregnancy)],
+    );
+  }
+}
+
+/// The library as a grid — the Recipes tab's inline tool AND the pushed
+/// screen's body. 2026-09-20, after the user asked whether a rail was the
+/// right way to show recipes: it is not. Crouton, Kitchen Stories,
+/// Woolworths and CREME all show a recipe library as a PHOTO GRID you can
+/// filter, led by one "cook today" card; a rail hides all but two. So:
+/// the lead (hers first, the unticked needs leading), the need chips, then
+/// two across.
+class RecipesGridBody extends StatefulWidget {
+  const RecipesGridBody({super.key, required this.pregnancy});
+  final PregnancyController pregnancy;
+
+  @override
+  State<RecipesGridBody> createState() => _RecipesGridBodyState();
+}
+
+/// A meal-type or kind tile on the grid: what she taps when she wants "a
+/// breakfast" or "a soup" rather than "iron". Seven of them, the library's
+/// order (Lifesum, Yazio, Blinkit, Woolworths): the four meals, then the
+/// three kinds that are not a meal.
+const List<Object> kRecipeBuckets = [
+  RecipeMeal.breakfast,
+  RecipeMeal.lunch,
+  RecipeMeal.dinner,
+  RecipeMeal.snack,
+  RecipeKind.sweet,
+  RecipeKind.drink,
+  RecipeKind.soup,
+];
+
+String recipeBucketLabel(Object b) => b is RecipeMeal ? b.label : (b as RecipeKind).label;
+
+bool recipeInBucket(Recipe r, Object b) => b is RecipeMeal ? r.meals.contains(b) : r.kind == b;
+
+class _RecipesGridBodyState extends State<RecipesGridBody> {
+  String? _tag;
+
+  /// The tile she picked: a [RecipeMeal] or a [RecipeKind]. Both filters
+  /// stack — "breakfast" AND "iron" is a real question.
+  Object? _bucket;
+
+  @override
+  Widget build(BuildContext context) => AnimatedBuilder(
+        animation: Listenable.merge([V2PaletteStore.instance, FamilyProfileStore.instance, NutritionDayStore.instance]),
+        builder: (context, _) {
           final p = V2PaletteStore.instance.current;
+          final diet = FamilyProfileStore.instance.diet;
+          final store = NutritionDayStore.instance;
+          final today = DateTime.now();
+          final unticked = kPlateNeeds.where((n) => !store.ticked(today, n.id)).map((n) => n.recipeTag).toSet();
+          final all = [for (final r in kRecipes) if (recipeSuits(r, diet)) r]
+            ..sort((a, b) {
+              final ah = a.tags.any(unticked.contains) ? 0 : 1;
+              final bh = b.tags.any(unticked.contains) ? 0 : 1;
+              return ah.compareTo(bh);
+            });
+          final lead = all.isEmpty ? null : all.first;
+          final mine = [
+            for (final r in all)
+              if ((_tag == null || r.tags.contains(_tag)) && (_bucket == null || recipeInBucket(r, _bucket!))) r
+          ];
+          final filtering = _tag != null || _bucket != null;
           return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            // ---- cook today ---------------------------------------------
+            if (lead != null && !filtering) ...[
+              pvDoorPad(nutritionHeading(p, 'Cook today',
+                  sub: unticked.isEmpty ? 'Something for the evening.' : 'Picked for what you have not had yet today.')),
+              const SizedBox(height: 12),
+              pvDoorPad(PvPress(
+                child: InkWell(
+                  onTap: () {
+                    pvCommitFeedback();
+                    openRecipe(context, lead, widget.pregnancy);
+                  },
+                  borderRadius: BorderRadius.circular(18),
+                  child: Container(
+                    height: 200,
+                    decoration: BoxDecoration(
+                        color: p.surfaceAlt, borderRadius: BorderRadius.circular(18), border: Border.all(color: p.line)),
+                    clipBehavior: Clip.antiAlias,
+                    child: Stack(fit: StackFit.expand, children: [
+                      NutritionPhoto(
+                          url: nutritionRecipePhoto(lead.id, lead.name.en), p: p, icon: Icons.soup_kitchen_outlined, iconSize: 48),
+                      Positioned.fill(
+                        child: DecoratedBox(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                              colors: [Colors.transparent, Colors.black.withValues(alpha: 0.62)],
+                              stops: const [0.4, 1],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        left: 16,
+                        right: 16,
+                        bottom: 14,
+                        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                          Text(lead.name.en,
+                              style: pvFraunces(fontSize: 22, fontWeight: FontWeight.w600, height: 1.15, color: Colors.white)),
+                          const SizedBox(height: 4),
+                          Text(lead.whyNow.en,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: pvManrope(fontSize: 12.5, height: 1.4, color: Colors.white.withValues(alpha: 0.9))),
+                          const SizedBox(height: 4),
+                          Text(nutritionGlance(estimateRecipe(lead)),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: pvManrope(
+                                  fontSize: 11.5, fontWeight: FontWeight.w700, color: Colors.white.withValues(alpha: 0.85))),
+                        ]),
+                      ),
+                    ]),
+                  ),
+                ),
+              )),
+              const SizedBox(height: 26),
+            ],
+            // ---- what she wants: a meal, or a kind ----------------------
+            pvDoorPad(nutritionHeading(p, 'What are you after?',
+                sub: diet == null ? 'A meal, a sweet, a soup — then by what you need.' : '${diet.label.en} only, by meal or by what you need.')),
+            const SizedBox(height: 14),
+            SizedBox(
+              height: 118,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                padding: const EdgeInsets.symmetric(horizontal: kPvDoorGutter),
+                itemCount: kRecipeBuckets.length,
+                separatorBuilder: (_, _) => const SizedBox(width: 10),
+                itemBuilder: (_, i) {
+                  final b = kRecipeBuckets[i];
+                  final first = all.where((r) => recipeInBucket(r, b)).firstOrNull;
+                  return _BucketTile(
+                    p: p,
+                    label: recipeBucketLabel(b),
+                    count: all.where((r) => recipeInBucket(r, b)).length,
+                    url: first == null ? null : nutritionRecipePhoto(first.id, first.name.en),
+                    selected: _bucket == b,
+                    onTap: () => setState(() => _bucket = _bucket == b ? null : b),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 18),
+            // ---- the grid ----------------------------------------------
+            pvDoorPad(nutritionHeading(p,
+                _bucket == null ? 'Every recipe' : recipeBucketLabel(_bucket!),
+                sub: _bucket == null ? 'By what you need.' : '${mine.length} to cook. Narrow by what you need.')),
+            const SizedBox(height: 12),
             SizedBox(
               height: 40,
               child: ListView(
@@ -64,9 +211,12 @@ class _RecipesScreenState extends State<RecipesScreen> {
                 ],
               ),
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: 18),
             if (mine.isEmpty)
-              pvDoorPad(Text('Nothing tagged for that yet — the plate\'s swaps still cover it.',
+              pvDoorPad(Text(
+                  _bucket != null && _tag != null
+                      ? 'Nothing that is both yet. Try one without the other.'
+                      : 'Nothing tagged for that yet. The plate has swaps that cover it.',
                   style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2)))
             else
               pvDoorPad(GridView.builder(
@@ -82,14 +232,69 @@ class _RecipesScreenState extends State<RecipesScreen> {
                   name: mine[i].name.en,
                   line: mine[i].whyNow.en,
                   url: nutritionRecipePhoto(mine[i].id, mine[i].name.en),
+                  values: estimateRecipe(mine[i]),
                   onTap: () => openRecipe(context, mine[i], widget.pregnancy),
                 ),
               )),
-            const SizedBox(height: 24),
-            pvDoorPad(PvDoorDisclaimer(p: p, text: 'Recipes are everyday food, not treatment. If you have a condition plan, it comes first.')),
+            const SizedBox(height: 8),
           ]);
-        }),
-      ],
-    );
-  }
+        },
+      );
+}
+
+/// A meal or kind: a square photo with an ink ring when chosen, the label
+/// and a count under. The photo is the bucket's first recipe's — no second
+/// set of pictures to pick.
+class _BucketTile extends StatelessWidget {
+  const _BucketTile({
+    required this.p,
+    required this.label,
+    required this.count,
+    required this.url,
+    required this.selected,
+    required this.onTap,
+  });
+  final V2Palette p;
+  final String label;
+  final int count;
+  final String? url;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => PvPress(
+        child: InkWell(
+          onTap: () {
+            pvCommitFeedback();
+            onTap();
+          },
+          borderRadius: BorderRadius.circular(16),
+          child: SizedBox(
+            width: 84,
+            child: Column(children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 160),
+                width: 78,
+                height: 78,
+                padding: const EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: selected ? p.ink1 : Colors.transparent, width: 2),
+                ),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(13),
+                  child: NutritionPhoto(url: url, p: p, icon: Icons.soup_kitchen_outlined),
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(
+                      fontSize: 12.5, fontWeight: selected ? FontWeight.w800 : FontWeight.w600, color: p.ink1)),
+              Text('$count', style: pvManrope(fontSize: 11, color: p.ink3)),
+            ]),
+          ),
+        ),
+      );
 }

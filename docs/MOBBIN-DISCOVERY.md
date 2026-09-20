@@ -400,3 +400,108 @@ adidas, UNIQLO, Best Buy, lululemon.
   V3 homes settle.
 - The day-2 return: what the first notification says, what visibly changes.
 - The story-card format for the home's daily rail (§60.3).
+
+## 13. The search bar's flow — one template for every door (2026-09-20)
+
+**Trigger.** On the phone the user looked at Is it safe?'s "Yours" row — Saved
+· N and her last look-ups as chips under the field — and said it read as
+"my history displayed at the very top … static … I don't see any use of it",
+that Asked most deserved the top, and to "figure out a way, use the Mobbin
+MCP". Then: "create this flow as a template so it can be reused for every
+door wherever the search bar is."
+
+**Query.** `search_screens` "food scanner search screen recent searches
+popular products" (ios). Twenty screens: Thrive Market, Yazio, Fitbit,
+Woolworths, Noom, MyFitnessPal, Ultrahuman, MacroFactor, Cal AI, Garmin,
+Alma, Lifesum, Swiggy, Keeta, Grubhub, Gojek, Kitchen Stories, Vivino,
+Instacart, Under Armour.
+
+**Found.**
+- Nobody shows history on the idle screen. Recent searches appear only once
+  the field has FOCUS and is still empty (Yazio, Keeta, Swiggy, Kitchen
+  Stories, Ultrahuman), or behind a Recent / Favourites tab (Fitbit, Garmin,
+  Lifesum).
+- The idle screen leads with Popular / categories (Woolworths, Grubhub,
+  Gojek, Instacart).
+- The one idle nod to "yours" is Woolworths' Buy Again: a single row with a
+  meaning line and a chevron, not a section of chips.
+- On focus the field rides to the top so the keyboard sits under the recents
+  (Swiggy, Keeta); a miss always ends in a way on.
+
+**Adopted** (`lib/screens/doors/pv_live_search.dart`, on Is it safe? and
+every shell door):
+- Three states — idle (the page), focused-and-empty (Recent + Saved as rows,
+  Clear), typing (rows; last row a way on: "Search everywhere" / "Ask Veda
+  about …").
+- On focus: the field scrolls to 4% from the top (`Scrollable.ensureVisible`
+  after the frame), the hero's words fade (200ms), the sheet grows a floor
+  of screen + keyboard so a short result list still gives the field room to
+  rise.
+- Back twice — the user's call: the first drops the keyboard and leaves the
+  rows readable ("some people would want to see what's happening below"), the
+  second releases the field (PopScope), never leaves the door.
+- Is it safe?: Yours retired from the top; Asked most first; one "Saved
+  answers" row at the foot (Buy Again).
+- The doors: the bar that pushed `PvSearchScreen` is live now; the pushed
+  screen remains as "Search everywhere" with the words carried over.
+
+**Declined.** A Recent / Saved tab pair (Fitbit) — a third control on a door
+that already has a rail.
+
+## 14. Nutrition, the deep dive — plans, recipe tiles, a number under every meal (2026-09-20)
+
+**Trigger.** The user walked the door click by click: the chart was "text
+thrown at me" in grey boxes at 13pt; "The chart" sat as a stray button in
+the Today / Tomorrow chip row; the nutrients rail ended in a tool that
+listed the same nutrients again; "can I ask for a breakfast, a sweet, a
+soup?" — no; and then: "it's a nutrition door with zero nutritional values
+… people care about nutritional value so much."
+
+**Queries.** `search_screens` (ios): "meal plan day breakfast lunch dinner
+recipes plan week"; "recipes browse filter by meal type breakfast dinner
+dessert snack category"; "dish calories protein macros per meal healthy
+mode food delivery nutrition info". Zomato's Healthy Mode is not in the
+library; the delivery and meal-kit apps stood in.
+
+**Found.**
+- A plan is a DAY STRIP + that day's MEALS WITH PHOTOS (Centr, Crouton,
+  Wabi, Cherrypick) — never a week of text.
+- A recipe library leads with MEAL-TYPE TILES — Breakfast · Lunch · Dinner ·
+  Snacks · Sweets · Drinks (Lifesum, Yazio, Blinkit, Woolworths, Withings),
+  with a filter sheet by category behind (Kitchen Stories). Blinkit's tiles
+  are 3D illustrations in one style; Yazio's are 2D.
+- Nutrition on a dish: TWO OR THREE NUMBERS ON THE CARD (HelloFresh "35 min
+  · 1020 Cal · 46 g", Chipotle "210 cal", Chick-fil-A "650 cal · 31 g
+  protein"), a PER-SERVING BLOCK on the page (Cherrypick's grid, Bevel's
+  tiles, Ultrahuman's rings), and an honest caveat ("industry-average data;
+  your portions vary").
+
+**Adopted.**
+- `DietChartPlanScreen`: day strip, the plate's own photo rows, "Make this
+  my chart" (pins it — Today follows), Swaps / Go easy on in the reader's
+  16pt, the doctor's note as a rule-left block, a six-tile day total.
+- Today: one "Your plate" heading with the date; no Today / Tomorrow chips
+  (three Todays down one screen, and "why not the day after?"); the chart
+  as a quiet line under the plate; the whole plate as the six tiles.
+- Recipes: `meals` + `kind` on every recipe, seven bucket tiles with counts
+  (first recipe's photo — no second set of pictures), 24 recipes written to
+  make the tiles real (40 total).
+- `food_values.dart`: a ~150-food table (IFCT-scale, per 100 g with typical
+  servings); `estimateMeal` for prose, `estimateRecipe` from ingredients;
+  the glance line under every plate row, chart row and recipe card
+  (energy · protein · the one strength); `NutritionValuesGrid` on the meal
+  sheet, the recipe page, the chart day and the whole plate; the caveat on
+  each; the day's reference once, by the ticks, in "roughly", no bars.
+- The five bigger questions as reads; the one-nutritionist Talk tab reads
+  the merged expert catalogue.
+
+**Declined.** Percentage-of-need bars (Yazio, Ultrahuman) — a bar against a
+target is the pressure this door exists to reduce, and the clinical rule
+forbids it. A Σ sign for the day total — "not everyone is mathematically
+sound"; the six tiles instead. The photo-to-surface fade under a hero photo
+("no white mist, no fading").
+
+**Owed.** 3D category illustrations in one style (Blinkit) — generated
+(Higgsfield) on the user's go; charts extended from three days to seven
+(the user's question; his call on order); photos for 14 of the 24 new
+recipes (Openverse's general index is thin; the dish-word fallback holds).

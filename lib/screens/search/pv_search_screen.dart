@@ -40,7 +40,9 @@ import '../../theme/pv_fonts.dart';
 import '../../widgets/global_ask_fab.dart' show kAskVedaRoute;
 import '../../widgets/pv_feedback.dart';
 import '../doors/pv_door_router.dart';
+import '../../data/nutrition_data.dart' show kRecipes;
 import '../../data/report_findings_data.dart';
+import '../nutrition/door/recipe_cook_screen.dart' show openRecipe;
 import '../../data/tests_scans_reports_data.dart';
 import '../brackets/scan_detail_screen.dart';
 import '../doors/pv_door_screen.dart';
@@ -56,10 +58,37 @@ const Key kPvSearchAskKey = ValueKey('pv-search-ask');
 /// Push the search screen. From a door pass its page; from the home pass
 /// nothing and the whole stage is searched.
 void openPvSearch(BuildContext context, PregnancyController pregnancy,
-    {PvDoorPage? door}) {
+    {PvDoorPage? door, String? query}) {
   Navigator.of(context).push(MaterialPageRoute<void>(
     settings: const RouteSettings(name: kPvSearchRoute),
-    builder: (_) => PvSearchScreen(pregnancy: pregnancy, door: door),
+    builder: (_) => PvSearchScreen(pregnancy: pregnancy, door: door, query: query),
+  ));
+}
+
+/// The index scoped to one door: its tiles and its inline libraries, not
+/// the door itself. What a door's own live field searches (pv_live_search).
+List<PvSearchHit> pvSearchIndexOf(PvDoorPage door) => [
+      for (final h in pvSearchIndex())
+        if (h.page == door && (h.tile != null || h.open != null)) h
+    ];
+
+/// Open a hit the way the search screen does — the door's router for a
+/// tile, the hit's own opener for a library entry, the door for a door —
+/// and remember the words that found it.
+void openPvSearchHit(BuildContext context, PvSearchHit h, PregnancyController pregnancy, {String? query}) {
+  pvCommitFeedback();
+  if (query != null && query.trim().isNotEmpty) PvSearchStore.instance.remember(query);
+  if (h.tile case final t?) {
+    openPvDoorTile(context, t, pregnancy);
+    return;
+  }
+  if (h.open case final open?) {
+    open(context, pregnancy);
+    return;
+  }
+  Navigator.of(context).push(MaterialPageRoute<void>(
+    settings: const RouteSettings(name: 'bracket/scans'),
+    builder: (_) => PvDoorScreen(page: h.page, bracket: h.bracket, pregnancy: pregnancy),
   ));
 }
 
@@ -126,6 +155,7 @@ List<PvSearchHit> pvSearchIndex() => _stageIndex ??= [
         if (bracketById(page.bracketId) case final b?) ...[
           ..._indexOf(page, b),
           if (page.bracketId == 'pregnancy_scans_tests') ..._scansLibraries(page, b),
+          if (page.bracketId == 'pregnancy_nutrition') ..._nutritionLibraries(page, b),
         ],
     ];
 
@@ -159,6 +189,26 @@ List<PvSearchHit> _scansLibraries(PvDoorPage page, Bracket b) {
             builder: (_) => ScanDetailScreen(scan: scan, pregnancy: c),
           )),
         ),
+  ];
+}
+
+/// The recipes stopped being tiles on 2026-09-20 (the Recipes tab is the
+/// grid, `RecipesGridBody`), and the door's live field found "ragi" nowhere
+/// on the phone. The library is reached here instead: a recipe opens its
+/// cook screen, the same one the grid opens.
+List<PvSearchHit> _nutritionLibraries(PvDoorPage page, Bracket b) {
+  final door = b.label.now;
+  return [
+    for (final r in kRecipes)
+      PvSearchHit._(
+        title: r.name.en,
+        blurb: r.whyNow.en,
+        meta: '$door · Recipes',
+        icon: Icons.soup_kitchen_outlined,
+        page: page,
+        bracket: b,
+        open: (context, c) => openRecipe(context, r, c),
+      ),
   ];
 }
 
@@ -223,12 +273,16 @@ List<PvSearchHit> pvSearch(String query, List<PvSearchHit> index) {
 // -----------------------------------------------------------------------------
 
 class PvSearchScreen extends StatefulWidget {
-  const PvSearchScreen({super.key, required this.pregnancy, this.door});
+  const PvSearchScreen({super.key, required this.pregnancy, this.door, this.query});
 
   final PregnancyController pregnancy;
 
   /// The door this was opened from, if any — searched first.
   final PvDoorPage? door;
+
+  /// Words already typed — a door's live field handing over to
+  /// "Search everywhere".
+  final String? query;
 
   @override
   State<PvSearchScreen> createState() => _PvSearchScreenState();
@@ -244,6 +298,10 @@ class _PvSearchScreenState extends State<PvSearchScreen> {
     super.initState();
     PvSearchStore.instance.init();
     _ctl.addListener(() => setState(() {}));
+    if (widget.query case final q? when q.trim().isNotEmpty) {
+      _ctl.text = q;
+      _ctl.selection = TextSelection.collapsed(offset: q.length);
+    }
   }
 
   @override
@@ -271,23 +329,7 @@ class _PvSearchScreenState extends State<PvSearchScreen> {
     _focus.requestFocus();
   }
 
-  void _open(PvSearchHit h) {
-    pvCommitFeedback();
-    PvSearchStore.instance.remember(_ctl.text);
-    if (h.tile case final t?) {
-      openPvDoorTile(context, t, widget.pregnancy);
-      return;
-    }
-    if (h.open case final open?) {
-      open(context, widget.pregnancy);
-      return;
-    }
-    Navigator.of(context).push(MaterialPageRoute<void>(
-      settings: const RouteSettings(name: 'bracket/scans'),
-      builder: (_) => PvDoorScreen(
-          page: h.page, bracket: h.bracket, pregnancy: widget.pregnancy),
-    ));
-  }
+  void _open(PvSearchHit h) => openPvSearchHit(context, h, widget.pregnancy, query: _ctl.text);
 
   void _ask() {
     pvCommitFeedback();
@@ -519,62 +561,8 @@ class _PvSearchScreenState extends State<PvSearchScreen> {
 
   // ---- a result -----------------------------------------------------------
 
-  Widget _row(V2Palette p, PvSearchHit h, int i) {
-    final well = Color.alphaBlend(p.ink1.withValues(alpha: 0.06), p.surface);
-    return PvPress(
-      key: pvSearchHitKey(i),
-      child: InkWell(
-        onTap: () => _open(h),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                  color: well, borderRadius: BorderRadius.circular(12)),
-              child: Icon(h.icon, size: 20, color: p.ink2),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(h.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: pvManrope(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          height: 1.25,
-                          color: p.ink1)),
-                  const SizedBox(height: 2),
-                  Text(h.blurb,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: pvManrope(
-                          fontSize: 12.5, height: 1.35, color: p.ink2)),
-                  const SizedBox(height: 3),
-                  Text(h.meta,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: pvManrope(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
-                          color: p.ink3)),
-                ],
-              ),
-            ),
-            const SizedBox(width: 8),
-            Padding(
-              padding: const EdgeInsets.only(top: 9),
-              child: Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
-            ),
-          ]),
-        ),
-      ),
-    );
-  }
+  Widget _row(V2Palette p, PvSearchHit h, int i) =>
+      PvSearchHitRow(key: pvSearchHitKey(i), p: p, hit: h, onTap: () => _open(h));
 
   // ---- nothing here, and the way on ----------------------------------------
 
@@ -638,4 +626,71 @@ class _PvSearchScreenState extends State<PvSearchScreen> {
           ),
         ),
       );
+}
+
+/// One result: the icon in a well, the title, the blurb, where it lands.
+/// The search screen's row and the door's live field draw the same one.
+class PvSearchHitRow extends StatelessWidget {
+  const PvSearchHitRow({super.key, required this.p, required this.hit, required this.onTap});
+  final V2Palette p;
+  final PvSearchHit hit;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final h = hit;
+    final well = Color.alphaBlend(p.ink1.withValues(alpha: 0.06), p.surface);
+    return PvPress(
+      child: InkWell(
+        onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                  color: well, borderRadius: BorderRadius.circular(12)),
+              child: Icon(h.icon, size: 20, color: p.ink2),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(h.title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvManrope(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          height: 1.25,
+                          color: p.ink1)),
+                  const SizedBox(height: 2),
+                  Text(h.blurb,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvManrope(
+                          fontSize: 12.5, height: 1.35, color: p.ink2)),
+                  const SizedBox(height: 3),
+                  Text(h.meta,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvManrope(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                          color: p.ink3)),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Padding(
+              padding: const EdgeInsets.only(top: 9),
+              child: Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
 }

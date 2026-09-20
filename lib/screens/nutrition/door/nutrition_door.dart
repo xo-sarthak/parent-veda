@@ -42,7 +42,9 @@ import '../../../services/nutrition_day_store.dart';
 import '../../../services/pregnancy_controller.dart';
 import '../../../theme/pv_fonts.dart';
 import '../../../widgets/pv_feedback.dart';
+import '../../../data/doors/pv_door_nutrition.dart' show kNutritionDoor;
 import '../../can_i_screen.dart' show CanIScreen;
+import '../../doors/pv_door_screen.dart' show PvDoorScreen;
 import '../../doors/pv_door_chrome.dart';
 import '../../v2/v2_palette.dart';
 import '../../v2/v3_hero_field.dart';
@@ -64,7 +66,7 @@ const String kNutritionDoorRoute = 'bracket/scans'; // the FAB reads it; unchang
 
 /// Which door the Nutrition tile opens. TRUE = this (the day). FALSE = the
 /// five-tab `PvDoorScreen` over `kNutritionDoor`, kept for revert.
-const bool kNutritionDoorAsDay = true;
+const bool kNutritionDoorAsDay = false; // the day is the door's first tab now (2026-09-20)
 
 /// The craving chips: a kind → the craving page it opens.
 const List<(String, String, String)> kCravingChips = [
@@ -158,8 +160,8 @@ class _NutritionDoorScreenState extends State<NutritionDoorScreen> {
                   const SizedBox(height: 28),
                   ..._librarySection(p),
                   const SizedBox(height: 28),
-                  pvDoorPad(nutritionHeading(p, 'Talk to a dietician', sub: 'Everything above is free. This is the paid layer.')),
-                  const SizedBox(height: 12),
+                  // The block brings its own heading ("Want a real person
+                  // on this?"); a second one above it read twice on the phone.
                   const ExpertOptionsBlock(),
                   const SizedBox(height: 24),
                   pvDoorPad(PvDoorDisclaimer(
@@ -506,7 +508,18 @@ class _NutritionDoorScreenState extends State<NutritionDoorScreen> {
         row(Icons.science_outlined, 'What your body needs', '${kNutrientGuides.length} nutrients, in everyday foods',
             () => const NutrientsScreen(), 'nutrition/nutrients'),
         row(Icons.help_outline_rounded, 'Is this food safe?', 'Papaya, paneer, street food — the Is it safe? door',
-            () => CanIScreen(controller: widget.pregnancy), 'can_i',
+            () => CanIScreen(controller: widget.pregnancy), 'can_i'),
+        // THE DOOR AS IT WAS — the user's ask on the phone, 2026-09-20: "a
+        // version toggle, just in case, for us to see what was before". The
+        // five-tab PvDoorScreen over kNutritionDoor, one tap away for the
+        // comparison; Back returns here. Retire once the day door is judged.
+        row(Icons.history_rounded, 'The door as it was', 'The five-tab version, kept for comparison',
+            () {
+              final b = bracketById(kNutritionBracketId);
+              return b == null
+                  ? CanIScreen(controller: widget.pregnancy)
+                  : PvDoorScreen(page: kNutritionDoor, bracket: b, pregnancy: widget.pregnancy);
+            }, 'bracket/scans',
             last: true),
       ])),
     ];

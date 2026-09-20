@@ -23,6 +23,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:parentveda/data/diet_chart_content.dart';
 import 'package:parentveda/data/diet_chart_facets.dart';
+import 'package:parentveda/data/nutrition/nutrition_photos.dart';
 import 'package:parentveda/data/nutrition/nutrition_plate.dart';
 import 'package:parentveda/data/nutrition_data.dart';
 import 'package:parentveda/services/family_profile.dart';
@@ -77,6 +78,19 @@ void main() {
         expect(s.contains(m.items), isFalse);
         expect(s.toSet().length, s.length);
       }
+    });
+  });
+
+  group('a dish photo for a meal sentence', () {
+    test('the dish beats the bread or rice it comes with', () {
+      // Seen on the phone 2026-09-20: dinner wore lunch's thali because
+      // 'roti' was matched before 'paneer'.
+      expect(nutritionDishIdFor('Paneer bhurji with roti'), 'nut_paneer');
+      expect(nutritionDishIdFor('Dal, methi sabzi, two rotis, salad'), 'nut_dal');
+      expect(nutritionDishIdFor('Curd rice with pickle'), 'nut_curd_rice');
+      expect(nutritionDishIdFor('Two rotis with lauki sabzi'), 'nut_roti_sabzi');
+      expect(nutritionDishIdFor('Curd with flaxseed'), 'nut_curd');
+      expect(nutritionDishIdFor('A cup of warm water'), isNull);
     });
   });
 
@@ -147,12 +161,25 @@ void main() {
     final home = File('lib/screens/home_v3_screen.dart').readAsStringSync();
     final door = File('lib/screens/nutrition/door/nutrition_door.dart').readAsStringSync();
 
-    test('the home opens the day door', () {
-      expect(home, contains('NutritionDoorScreen(pregnancy: pregnancy)'));
-      expect(door, contains('const bool kNutritionDoorAsDay = true;'));
+    test('the day is the first tab, not a screen of its own', () {
+      // 2026-09-20: the standalone day screen stands down for one door
+      // language; the router renders NutritionTodayBody on the first tab.
+      expect(door, contains('const bool kNutritionDoorAsDay = false;'));
+      final router = File('lib/screens/doors/pv_door_router.dart').readAsStringSync();
+      expect(router, contains('kDietSurfaceToday => NutritionTodayBody(pregnancy: c)'));
+      expect(router, contains('kDietSurfaceRecipeRail => RecipesGridBody(pregnancy: c)'));
+      expect(router, contains('kDietSurfaceExperts => NutritionTalkBody(pregnancy: c)'));
+      expect(home, contains('kNutritionBracketId && kNutritionDoorAsDay'));
     });
 
-    test('the door reaches every leaf', () {
+    test('the today body reaches every leaf', () {
+      final body = File('lib/screens/nutrition/door/nutrition_today_body.dart').readAsStringSync();
+      for (final s in ['showMealSheet(', 'NeedScreen(need: n', 'showPreferenceSheet(context', 'CravingDetailScreen(item', 'DietChartPlanScreen(chart']) {
+        expect(body, contains(s), reason: s);
+      }
+    });
+
+    test('the standalone door still reaches every leaf (kept for revert)', () {
       for (final s in [
         'showMealSheet(',
         'NeedScreen(need: n',

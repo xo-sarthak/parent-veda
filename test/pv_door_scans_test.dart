@@ -299,8 +299,17 @@ void main() {
       // nothing while it loads, so the cost is paid in a blank hero.
       for (final door in kPvDoorPages) {
         final url = door.heroImageUrl!;
-        expect(url, contains('w=900'), reason: '${door.bracketId} is uncropped.');
-        expect(url, contains('fit=crop'), reason: '${door.bracketId} is uncropped.');
+        // A read-table image (StockSnap's 960w rendition, mirrored to R2 at a
+        // 1200px long edge) is already phone-sized; only Unsplash needs asking.
+        if (url.contains('images.unsplash.com')) {
+          expect(url, contains('w=900'), reason: '${door.bracketId} is uncropped.');
+          expect(url, contains('fit=crop'), reason: '${door.bracketId} is uncropped.');
+        } else {
+          // (the Openverse proxy serves StockSnap's 960w rendition — see
+          // `openverseImageUrl` in read_images.dart)
+          expect(url, anyOf(contains('/960w/'), contains('/960px-'), contains('/thumb/?full_size=true')),
+              reason: '${door.bracketId} is uncropped.');
+        }
       }
     });
   });

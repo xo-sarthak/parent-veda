@@ -133,13 +133,13 @@ class CravingDetailScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: p.surface,
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: p.action.withValues(alpha: 0.4)),
+                      border: Border.all(color: p.line),
                     ),
                     child: Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Icon(Icons.chat_bubble_outline_rounded,
-                              size: 17, color: p.action),
+                              size: 17, color: p.ink1),
                           const SizedBox(width: 11),
                           Expanded(
                             child: Text(
@@ -279,14 +279,14 @@ class _RecipeCard extends StatelessWidget {
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
-            Icon(Icons.soup_kitchen_outlined, size: 18, color: p.action),
+            Icon(Icons.soup_kitchen_outlined, size: 18, color: p.ink1),
             const SizedBox(width: 9),
             Text('MAKE IT AT HOME',
                 style: pvManrope(
                     fontSize: 10,
                     fontWeight: FontWeight.w800,
                     letterSpacing: 1.1,
-                    color: p.action)),
+                    color: p.ink1)),
           ]),
           const SizedBox(height: 11),
           Text(recipe.name.now,
@@ -343,7 +343,7 @@ class _RecipeCard extends StatelessWidget {
                           style: pvManrope(
                               fontSize: 13,
                               fontWeight: FontWeight.w800,
-                              color: p.action)),
+                              color: p.ink1)),
                     ),
                     Expanded(
                       child: Text(recipe.steps[i].now,
