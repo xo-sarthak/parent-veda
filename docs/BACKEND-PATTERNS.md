@@ -1901,6 +1901,32 @@ so the two parties converge without anyone pasting a link. `pvOpenCall` is
 the one door to the three call screens, lifted from My bookings so a second
 surface could not open the room a second way.
 
+## 16h. A day is a key, not a timestamp — `nutrition_day`
+
+`lib/services/nutrition_day_store.dart`, 2026-09-20. Small, but the
+trap is common enough to write down. The store keeps what she did on
+each day: glasses, ticks, swaps. The obvious key is a `DateTime`. It is
+the wrong one, twice over:
+
+1. **JSON has no DateTime.** It round-trips as a string, and the string
+   most libraries write is UTC. A tick at 08:10 IST on the 20th is
+   02:40 UTC on the 20th — fine — but a tick at 03:00 IST on the 21st is
+   21:30 UTC on the *20th*. Her breakfast files itself under yesterday
+   on the way back from the cloud.
+2. **Equality.** Two `DateTime`s for the same day differ by the
+   milliseconds she tapped at; a map keyed on them has one entry per tap.
+
+So the key is the *local calendar date as a string*, `"2026-09-20"`,
+made once (`plateDateKey`) and used for both the blob and the lookups.
+It cannot drift, it sorts, and it is what she means by "today". The same
+rule applies to anything filed by day: appointments are instants
+(timestamps), days are labels (strings).
+
+**And the blob prunes itself.** Sixty days, and empty days are dropped on
+every save — a per-user blob that only grows is a per-user blob that one
+day fails to save, silently, because it crossed a row size nobody set on
+purpose.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.
@@ -1957,3 +1983,5 @@ surface could not open the room a second way.
     `supabase/functions/can-i-identify/` — blob or table decided by who
     reads it; a write-only log as instrumentation; a secret on a function
     versus a process on a server; the model names, the app judges (§16g).
+24. `lib/services/nutrition_day_store.dart` — a day is a local date string,
+    never a DateTime; a per-user blob that prunes itself (§16h).

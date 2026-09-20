@@ -485,6 +485,19 @@ code (`pvDoorTileIsWritten`, `_ArticleList`) and in
 is a rail". Mobbin: Equinox, Alan, Gentler Streak, Liven, Tonal list
 same-kind articles; Clue and Atoms rail mixed or featured content.
 
+### 4.0 · addendum 6 — a door that is a day — SETTLED 2026-09-20
+
+Nutrition opens on *today* and its sections are things she does, not
+things she reads. Its language, distinct from Is it safe?'s by design:
+**photo rows** for the plate (72pt photo, slot eyebrow, dishes in Manrope
+14.5/700, a Swap pill); **rings** for the needs (50→54pt on tick, ink
+fill, six-stroke burst, no colour); **tumblers** for water (a pale-blue
+fill is the one non-ink colour on the door, because water is water);
+**ink chips** for cravings and preferences. No red, no scores, no
+streaks. The rule for the next door: if the section is something she
+*does today*, it is a control with state; if it is something she *reads*,
+it is a row into the reader.
+
 ### 4.0 · addendum 5 — a lookup is not a read — SETTLED 2026-09-19 (the phone)
 
 The Is it safe? answer opened in the one reader for a few hours and the

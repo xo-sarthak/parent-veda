@@ -338,6 +338,31 @@ part of it:
 carousels), seat urgency in colour, progress rings and badges, a chat
 button to the expert, a separate detail screen for the slot picker.
 
+## 12. Nutrition — a door that is a day (2026-09-20)
+
+Seven passes before a line of code, on the user's instruction to research
+"UI, UX, flow, user psychology and effects" first. What each settled:
+
+| Question | Who answered it | Taken |
+|---|---|---|
+| What is a meal plan, really? | **Crouton**, **Recime**, **Cherrypick** — a *day*: breakfast · lunch · dinner as rows, each swappable, "what you'll need" one tap away. Nobody reads a chart | *Your plate*: today's meals from the chart that fits her, photo rows, Swap, "not today"; Tomorrow a chip away |
+| What brings people back daily? | **MyFitnessPal**, **MacroFactor** rings; **Alma**'s nutrient page ("contributing foods") | *Did you get…*: five ticks (iron, calcium, protein, folate, fibre), no numbers; long-press → the foods that count. Alma inverted: we show what would count, we never measure |
+| Water? | **Noom**, **Yazio**, **Lifesum** — a row of glasses, tap to fill | Eight tumblers, tap to fill up to, tap the last to empty |
+| A recipe? | **Woolworths** (servings stepper, Shop ingredients), **Crouton** (scale, method), **CREME** (photo, Cook button) | Servings stepper scaling every quantity, *Add to my list*, numbered method, **Cook** |
+| Cook mode? | **Recime** (Step N of M, segmented bar, one instruction, Next/Finish, ingredients button), **HelloFresh** ("Enjoy your meal" over the photo) | `CookModeScreen`: exactly that, screen kept awake |
+| The tick's feel? | **Noom** ("Did it today!" → soft squiggles → "Done for today"), **Atoms** (a deliberate press), **Finch** (confetti — declined, too much) | Ring fills, six ink strokes fly out, medium haptic; the line under the ticks celebrates, never counts a miss |
+| Diet preference? | **Kitchen Stories**, **Blue Apron** — set once, every list respects it | Onboarding's answer steers plate, swaps, recipes; region added; one row to change |
+
+**User-psychology rules for this door** (the reader may be nauseous, tired,
+not hungry): no red anywhere; no streaks, fire icons or "days missed";
+"not today" is one tap and as easy as a swap; the only numbers are
+glasses; every line under a section is a celebration or an invitation.
+
+**Declined:** calorie/macro targets (a personal target she can fail —
+against the clinical and calm rules); Finch's pet and confetti; weekly
+calendar grids of empty days (Crouton's Meal Plan when empty — a wall of
+"No recipes").
+
 ## What the library does not carry
 
 Searching these by name returns junk (Mindvalley, an HR app): **Ovia, Glow,

@@ -28,6 +28,136 @@
 // connection from Indian networks (checked: all ten failed, all 86 others
 // served), so one host — StockSnap — for the whole table.
 const Map<String, String> kReadImageUrls = {
+  // Nutrition — 2026-09-20. A photo per dish word (`nut_<dish>`, matched
+  // from a chart meal's sentence by nutrition_photos.dart) and per recipe
+  // (`nut_r_<id>`), picked by eye from Wikidata-tagged and Commons text
+  // candidates. Placeholders until R2 (STILL-OPEN §69.3).
+  'nut_ragi_dosa':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Ragi_Dosa_Mumbai.jpg/960px-Ragi_Dosa_Mumbai.jpg',
+  'nut_curd_rice':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Curd_Rice.jpg/960px-Curd_Rice.jpg',
+  'nut_palak_paneer':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Palak_paneer_on_rotini%2C_with_curry_powder_and_peanuts_-_Massachusetts.jpg/960px-Palak_paneer_on_rotini%2C_with_curry_powder_and_peanuts_-_Massachusetts.jpg',
+  'nut_fish_curry':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Bengali_bata_fish_curry.jpg/960px-Bengali_bata_fish_curry.jpg',
+  'nut_shukto':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Shukto%2C_a_Bengali_dish.jpg/960px-Shukto%2C_a_Bengali_dish.jpg',
+  'nut_ragi_porridge':
+      'https://upload.wikimedia.org/wikipedia/commons/6/6f/Raagi_koozh.jpg',
+  'nut_sambar':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Idli_Sambar-Noida-UP-SP004.jpg/960px-Idli_Sambar-Noida-UP-SP004.jpg',
+  'nut_rajma':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Rajma_Chawal_by_Rama_Bhave.jpg/960px-Rajma_Chawal_by_Rama_Bhave.jpg',
+  'nut_dhokla':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Khaman_Dhokla_Gujrati.jpg/960px-Khaman_Dhokla_Gujrati.jpg',
+  'nut_khichdi':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Spicy_Khichdi.JPG/960px-Spicy_Khichdi.JPG',
+  'nut_dal_rice':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Fish_Curry_Rice_Thali_%2823370163493%29.jpg/960px-Fish_Curry_Rice_Thali_%2823370163493%29.jpg',
+  'nut_thalipeeth':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Thalipeeth_-_Maharashtra.jpg/960px-Thalipeeth_-_Maharashtra.jpg',
+  'nut_kadhi':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Gujarati_Thali_with_Rotlo%2C_Kadhi%2C_Olo%2C_Gol.jpg/960px-Gujarati_Thali_with_Rotlo%2C_Kadhi%2C_Olo%2C_Gol.jpg',
+  'nut_chilla':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Chilla_besan.JPG/960px-Chilla_besan.JPG',
+  'nut_daliya':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Daliya_khichdi.jpg/960px-Daliya_khichdi.jpg',
+  'nut_poha':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5d/Kanda_Poha-Diu-DSC003.jpg/960px-Kanda_Poha-Diu-DSC003.jpg',
+  'nut_upma':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Upma_South_India.JPG/960px-Upma_South_India.JPG',
+  'nut_idli':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Idli_Sambar-Noida-UP-SP004.jpg/960px-Idli_Sambar-Noida-UP-SP004.jpg',
+  'nut_dosa':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Masala_dosa_01.jpg/960px-Masala_dosa_01.jpg',
+  'nut_paratha':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7e/Paratha_is_a_dough_fried_flatbread_of_India_and_Pakistan.jpg/960px-Paratha_is_a_dough_fried_flatbread_of_India_and_Pakistan.jpg',
+  'nut_roti_sabzi':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/A_thali_with_daal_roti_bhindi_ki_sabzi_and_mango_pickle.jpg/960px-A_thali_with_daal_roti_bhindi_ki_sabzi_and_mango_pickle.jpg',
+  'nut_oats':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d8/Oatmeal_porridge_1-minute_with_additional_ingredients.jpg/960px-Oatmeal_porridge_1-minute_with_additional_ingredients.jpg',
+  'nut_boiled_eggs':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a4/Boiled_Egg_-_Crossection.jpg/960px-Boiled_Egg_-_Crossection.jpg',
+  'nut_omelette':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/FoodOmelete.jpg/960px-FoodOmelete.jpg',
+  'nut_paneer':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Homemade_Paneer_Bhurji_cooked_in_pan_India.jpg/960px-Homemade_Paneer_Bhurji_cooked_in_pan_India.jpg',
+  'nut_dal':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/73/Dal_tadka_and_naan.jpg/960px-Dal_tadka_and_naan.jpg',
+  'nut_sprouts':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Sprouted_Moong_Salad.JPG/960px-Sprouted_Moong_Salad.JPG',
+  'nut_chana':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a3/Chana_Masala_in_Paul%C3%ADnia%2C_2023-10-16.jpg/960px-Chana_Masala_in_Paul%C3%ADnia%2C_2023-10-16.jpg',
+  'nut_curd':
+      'https://upload.wikimedia.org/wikipedia/commons/f/fc/Bread_Dahi_Vada_Naivaidya.jpg',
+  'nut_lassi':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Lassi_1.jpg/960px-Lassi_1.jpg',
+  'nut_fruit_bowl':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/20241117_Fruit_Platter_anagoria.jpg/960px-20241117_Fruit_Platter_anagoria.jpg',
+  'nut_banana':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/31/Cavendish_banana_from_Maracaibo.jpg/960px-Cavendish_banana_from_Maracaibo.jpg',
+  'nut_apple':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/15/Red_Apple.jpg/960px-Red_Apple.jpg',
+  'nut_nuts':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Bowl_of_Cashews_and_Almonds_%2848140118636%29.jpg/960px-Bowl_of_Cashews_and_Almonds_%2848140118636%29.jpg',
+  'nut_dates':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Date_Fruit.jpg/960px-Date_Fruit.jpg',
+  'nut_soup':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cb/Autumn_Soup_%28Unsplash%29.jpg/960px-Autumn_Soup_%28Unsplash%29.jpg',
+  'nut_salad':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/71/Vegitarian_green_salad_from_india.jpg/960px-Vegitarian_green_salad_from_india.jpg',
+  'nut_coconut_water':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Klappermelk_kelapa_muda.jpg/960px-Klappermelk_kelapa_muda.jpg',
+  'nut_chicken_curry':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Pan_Chicken_Curry.jpg/960px-Pan_Chicken_Curry.jpg',
+  'nut_makhana':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Roasted_Makhana_%28Foxnut%29.jpg/960px-Roasted_Makhana_%28Foxnut%29.jpg',
+  'nut_khakhra':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3e/Khakhra.JPG/960px-Khakhra.JPG',
+  'nut_sandwich':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cc/Vegetable_Sandwich_2.jpg/960px-Vegetable_Sandwich_2.jpg',
+  'nut_smoothie':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Acai_Smoothie_Bowls_%28Unsplash%29.jpg/960px-Acai_Smoothie_Bowls_%28Unsplash%29.jpg',
+  'nut_juice':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/Health_monitoring_with_fresh_juice_and_a_stethoscope_during_a_wellness_assessment.jpg/960px-Health_monitoring_with_fresh_juice_and_a_stethoscope_during_a_wellness_assessment.jpg',
+  'nut_chai':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/04/Masala_Chai.JPG/960px-Masala_Chai.JPG',
+  'nut_r_pcos_moong_chilla':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Chilla_besan.JPG/960px-Chilla_besan.JPG',
+  'nut_r_bengali_macher_jhol':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Bata_macher_jhol-MB03.jpg/960px-Bata_macher_jhol-MB03.jpg',
+  'nut_r_bengali_shukto':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Shukto%2C_a_Bengali_dish.jpg/960px-Shukto%2C_a_Bengali_dish.jpg',
+  'nut_r_punjabi_palak_paneer':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b7/Palakpaneer_Rayagada_Odisha_0009.jpg/960px-Palakpaneer_Rayagada_Odisha_0009.jpg',
+  'nut_r_gujarati_dhokla':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Dhokla_6.jpg/960px-Dhokla_6.jpg',
+  'nut_r_gujarati_khichdi':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Masala_Khichadi.jpg/960px-Masala_Khichadi.jpg',
+  'nut_r_south_indian_ragi_dosa':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Ragi_Dosa_Mumbai.jpg/960px-Ragi_Dosa_Mumbai.jpg',
+  'nut_r_south_indian_curd_rice':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Curd_Rice.jpg/960px-Curd_Rice.jpg',
+  'nut_r_maharashtrian_varan_bhaat':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Varan_Bhat.jpg/960px-Varan_Bhat.jpg',
+  'nut_r_maharashtrian_thalipeeth':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Thalipeeth_-_Maharashtra.jpg/960px-Thalipeeth_-_Maharashtra.jpg',
+  'nut_r_jain_kadhi_khichdi':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Kadhi_and_Khichdi_of_Bardoli%2C_gujarat.jpg/960px-Kadhi_and_Khichdi_of_Bardoli%2C_gujarat.jpg',
+  'nut_r_besan_chilla':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Chilla_besan.JPG/960px-Chilla_besan.JPG',
+  'nut_r_vegetable_daliya':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/db/Daliya_khichdi.jpg/960px-Daliya_khichdi.jpg',
+  'nut_r_tamil_sambar':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/02/Idli_Sambar-Noida-UP-SP004.jpg/960px-Idli_Sambar-Noida-UP-SP004.jpg',
+  'nut_r_punjabi_rajma':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Rajma_Chawal_by_Rama_Bhave.jpg/960px-Rajma_Chawal_by_Rama_Bhave.jpg',
+  'nut_r_tamil_ragi_kanji':
+      'https://upload.wikimedia.org/wikipedia/commons/6/6f/Raagi_koozh.jpg',
+  'nut_ragi_kanji':
+      'https://upload.wikimedia.org/wikipedia/commons/6/6f/Raagi_koozh.jpg',
+  'nut_buttermilk':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Lassi_1.jpg/960px-Lassi_1.jpg',
   // Is it safe? — 2026-09-19. One photo per Can I entry (`cani_<id>`) and
   // one per shelf (`cani_shelf_<category>`), picked by hand from contact
   // sheets of Wikimedia Commons and StockSnap candidates. Placeholders on
@@ -54,7 +184,7 @@ const Map<String, String> kReadImageUrls = {
   'cani_coffee':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/A_small_cup_of_coffee.JPG/960px-A_small_cup_of_coffee.JPG',
   'cani_tea':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/2/25/Mix_Masala_Tea.jpg/960px-Mix_Masala_Tea.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Mix_Masala_Tea.jpg/960px-Mix_Masala_Tea.jpg',
   'cani_green_tea':
       'https://cdn.stocksnap.io/img-thumbs/960w/04E3HNGAKH.jpg',
   'cani_coconut_water':
@@ -62,7 +192,7 @@ const Map<String, String> kReadImageUrls = {
   'cani_buttermilk':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Plain_Lassi_in_a_glass.jpg/960px-Plain_Lassi_in_a_glass.jpg',
   'cani_alcohol':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/4e/Schwappender_Wein.jpg/960px-Schwappender_Wein.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4e/Schwappender_Wein.jpg/960px-Schwappender_Wein.jpg',
   'cani_soft_drinks':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/1/10/Glass_cola.jpg/960px-Glass_cola.jpg',
   'cani_water':
@@ -92,7 +222,7 @@ const Map<String, String> kReadImageUrls = {
   'cani_walking':
       'https://cdn.stocksnap.io/img-thumbs/960w/RIUG2ATBWT.jpg',
   'cani_hair_color':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/dc/Dyeing_hair_purple.png/960px-Dyeing_hair_purple.png',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/dc/Dyeing_hair_purple.png/960px-Dyeing_hair_purple.png',
   'cani_waxing':
       'https://cdn.stocksnap.io/img-thumbs/960w/CUGFVFAI24.jpg',
   'cani_nail_polish':
@@ -102,11 +232,11 @@ const Map<String, String> kReadImageUrls = {
   'cani_sleeping_back':
       'https://cdn.stocksnap.io/img-thumbs/960w/46BMYP2BDJ.jpg',
   'cani_mosquito_repellent':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/05/Portable_Mosquito_Coil_Holder_-_Lion_Chemical.jpg/960px-Portable_Mosquito_Coil_Holder_-_Lion_Chemical.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Portable_Mosquito_Coil_Holder_-_Lion_Chemical.jpg/960px-Portable_Mosquito_Coil_Holder_-_Lion_Chemical.jpg',
   'cani_dental':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/76/Dentist-gd569d444b_1920.jpg/960px-Dentist-gd569d444b_1920.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/76/Dentist-gd569d444b_1920.jpg/960px-Dentist-gd569d444b_1920.jpg',
   'cani_xray':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1c/Tube_%C3%A0_Rayon_X_dans_un_h%C3%B4pital_au_B%C3%A9nin_05.jpg/960px-Tube_%C3%A0_Rayon_X_dans_un_h%C3%B4pital_au_B%C3%A9nin_05.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Tube_%C3%A0_Rayon_X_dans_un_h%C3%B4pital_au_B%C3%A9nin_05.jpg/960px-Tube_%C3%A0_Rayon_X_dans_un_h%C3%B4pital_au_B%C3%A9nin_05.jpg',
   'cani_sauna':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Sauna_of_the_spa_at_Amantaka_luxury_Resort_%26_Hotel_in_Luang_Prabang_Laos.jpg/960px-Sauna_of_the_spa_at_Amantaka_luxury_Resort_%26_Hotel_in_Luang_Prabang_Laos.jpg',
   'cani_fasting':
@@ -120,13 +250,13 @@ const Map<String, String> kReadImageUrls = {
   'cani_watermelon':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/6/60/Watermelon_slice%2C_May_2024.jpg/960px-Watermelon_slice%2C_May_2024.jpg',
   'cani_muskmelon':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/09/Muskmelon_in_summer.jpg/960px-Muskmelon_in_summer.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Muskmelon_in_summer.jpg/960px-Muskmelon_in_summer.jpg',
   'cani_guava':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/8/84/Goiaba_vermelha.jpg/960px-Goiaba_vermelha.jpg',
   'cani_pomegranate':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/8/85/Pomegranate_arils.jpg/960px-Pomegranate_arils.jpg',
   'cani_chikoo':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/b/b2/Chiku_fruit.jpg/960px-Chiku_fruit.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Chiku_fruit.jpg/960px-Chiku_fruit.jpg',
   'cani_litchi':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/Lychee_fruits_and_seed.jpg/960px-Lychee_fruits_and_seed.jpg',
   'cani_jackfruit':
@@ -178,11 +308,11 @@ const Map<String, String> kReadImageUrls = {
   'cani_chicken':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/Chicken_Curry_9.jpg/960px-Chicken_Curry_9.jpg',
   'cani_mutton':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fe/Odia_Mutton_Curry_%28Mansha_Tarkari%29.jpg/960px-Odia_Mutton_Curry_%28Mansha_Tarkari%29.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Odia_Mutton_Curry_%28Mansha_Tarkari%29.jpg/960px-Odia_Mutton_Curry_%28Mansha_Tarkari%29.jpg',
   'cani_fish':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Meen_curry_2.JPG/960px-Meen_curry_2.JPG',
   'cani_prawns':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/8/82/Cafe_La_Haye_-_2019_August_-_Sarah_Stierch_03.jpg/960px-Cafe_La_Haye_-_2019_August_-_Sarah_Stierch_03.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/82/Cafe_La_Haye_-_2019_August_-_Sarah_Stierch_03.jpg/960px-Cafe_La_Haye_-_2019_August_-_Sarah_Stierch_03.jpg',
   'cani_high_mercury_fish':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6c/Xiphias_gladius_stuffed.jpg/960px-Xiphias_gladius_stuffed.jpg',
   'cani_dal':
@@ -190,13 +320,13 @@ const Map<String, String> kReadImageUrls = {
   'cani_soya':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d0/Rotini_with_vegetable_tikka_masala%2C_textured_vegetable_protein%2C_peanuts%2C_and_black_pepper_-_Massachusetts.jpg/960px-Rotini_with_vegetable_tikka_masala%2C_textured_vegetable_protein%2C_peanuts%2C_and_black_pepper_-_Massachusetts.jpg',
   'cani_rajma_chana':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/12/Rajma_Chawal_by_Rama_Bhave.jpg/960px-Rajma_Chawal_by_Rama_Bhave.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Rajma_Chawal_by_Rama_Bhave.jpg/960px-Rajma_Chawal_by_Rama_Bhave.jpg',
   'cani_cheese':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/de/Le_Chat_Apt_Salade_de_tomate%2C_ch%C3%A8vre_et_basilic.jpg/960px-Le_Chat_Apt_Salade_de_tomate%2C_ch%C3%A8vre_et_basilic.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Le_Chat_Apt_Salade_de_tomate%2C_ch%C3%A8vre_et_basilic.jpg/960px-Le_Chat_Apt_Salade_de_tomate%2C_ch%C3%A8vre_et_basilic.jpg',
   'cani_ghee':
       'https://cdn.stocksnap.io/img-thumbs/960w/NS5Q6MVMZQ.jpg',
   'cani_mawa_sweets':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ec/Kaju_katli_dessert_-_side_view.jpg/960px-Kaju_katli_dessert_-_side_view.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ec/Kaju_katli_dessert_-_side_view.jpg/960px-Kaju_katli_dessert_-_side_view.jpg',
   'cani_oats':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c8/Rolled_oats_in_bowl_2.jpg/960px-Rolled_oats_in_bowl_2.jpg',
   'cani_poha':
@@ -206,11 +336,11 @@ const Map<String, String> kReadImageUrls = {
   'cani_fried_snacks':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/b/ba/2013_Sechsel%C3%A4uten_-_%27Samosa%27_und_%27Pakora%27_-_Limmatquai_2013-04-14_17-35-59_%28P7700%29.JPG/960px-2013_Sechsel%C3%A4uten_-_%27Samosa%27_und_%27Pakora%27_-_Limmatquai_2013-04-14_17-35-59_%28P7700%29.JPG',
   'cani_pickle':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/6/69/Iskus_Ko_Achar.jpg/960px-Iskus_Ko_Achar.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/69/Iskus_Ko_Achar.jpg/960px-Iskus_Ko_Achar.jpg',
   'cani_turmeric_milk':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/Golden_Milk.jpg/960px-Golden_Milk.jpg',
   'cani_jaggery':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/78/Jaggery_cubes.jpg/960px-Jaggery_cubes.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Jaggery_cubes.jpg/960px-Jaggery_cubes.jpg',
   'cani_spices':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Indian_Spices_%2849696133942%29.jpg/960px-Indian_Spices_%2849696133942%29.jpg',
   'cani_sugar':
@@ -224,7 +354,7 @@ const Map<String, String> kReadImageUrls = {
   'cani_leftovers':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7b/Open_refrigerator_with_food_at_night.jpg/960px-Open_refrigerator_with_food_at_night.jpg',
   'cani_spicy_food':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9a/%D0%A2%D0%B0%D0%B2%D1%87%D0%B5_%D0%93%D1%80%D0%B0%D0%B2%D1%87%D0%B5.jpg/960px-%D0%A2%D0%B0%D0%B2%D1%87%D0%B5_%D0%93%D1%80%D0%B0%D0%B2%D1%87%D0%B5.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9a/%D0%A2%D0%B0%D0%B2%D1%87%D0%B5_%D0%93%D1%80%D0%B0%D0%B2%D1%87%D0%B5.jpg/960px-%D0%A2%D0%B0%D0%B2%D1%87%D0%B5_%D0%93%D1%80%D0%B0%D0%B2%D1%87%D0%B5.jpg',
   'cani_milkshake':
       'https://cdn.stocksnap.io/img-thumbs/960w/BNCZWVYVMQ.jpg',
   'cani_fresh_juice':
@@ -232,13 +362,13 @@ const Map<String, String> kReadImageUrls = {
   'cani_lemon_water':
       'https://cdn.stocksnap.io/img-thumbs/960w/SE6LA5BXBG.jpg',
   'cani_sugarcane_juice':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/4/44/Sugarcane_Juice_in_Ogan_Ilir.jpg/960px-Sugarcane_Juice_in_Ogan_Ilir.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Sugarcane_Juice_in_Ogan_Ilir.jpg/960px-Sugarcane_Juice_in_Ogan_Ilir.jpg',
   'cani_lassi':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/5/59/Lassi_1.jpg/960px-Lassi_1.jpg',
   'cani_energy_drinks':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/Energy_Drink_Battery_Cans.jpg/960px-Energy_Drink_Battery_Cans.jpg',
   'cani_herbal_tea':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/b/be/Infusi%C3%B3_de_Tim%C3%B3.jpg/960px-Infusi%C3%B3_de_Tim%C3%B3.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/be/Infusi%C3%B3_de_Tim%C3%B3.jpg/960px-Infusi%C3%B3_de_Tim%C3%B3.jpg',
   'cani_smoothie':
       'https://cdn.stocksnap.io/img-thumbs/960w/HWFUPZEHMO.jpg',
   'cani_kombucha':
@@ -246,11 +376,11 @@ const Map<String, String> kReadImageUrls = {
   'cani_diet_soda':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9f/Can_of_Diet_Sierra_Mist_lemon-lime_soda%2C_2011.jpg/960px-Can_of_Diet_Sierra_Mist_lemon-lime_soda%2C_2011.jpg',
   'cani_aam_panna':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/3/35/%C4%80m_pann%C4%81_at_Kitchen_of_Awadh%2C_DLF_Phase_4%2C_Gurgaon_%282025-09-28%29.jpg/960px-%C4%80m_pann%C4%81_at_Kitchen_of_Awadh%2C_DLF_Phase_4%2C_Gurgaon_%282025-09-28%29.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/%C4%80m_pann%C4%81_at_Kitchen_of_Awadh%2C_DLF_Phase_4%2C_Gurgaon_%282025-09-28%29.jpg/960px-%C4%80m_pann%C4%81_at_Kitchen_of_Awadh%2C_DLF_Phase_4%2C_Gurgaon_%282025-09-28%29.jpg',
   'cani_badam_milk':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Bapatla_Badam_Milk.jpg/960px-Bapatla_Badam_Milk.jpg',
   'cani_decaf_coffee':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/c/cf/Decaf_latte_-_Trading_Post_Coffee_Roasters_2025-03-09.jpg/960px-Decaf_latte_-_Trading_Post_Coffee_Roasters_2025-03-09.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Decaf_latte_-_Trading_Post_Coffee_Roasters_2025-03-09.jpg/960px-Decaf_latte_-_Trading_Post_Coffee_Roasters_2025-03-09.jpg',
   'cani_jaljeera':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/Two_Indian_Drinks.jpg/960px-Two_Indian_Drinks.jpg',
   'cani_ors':
@@ -266,7 +396,7 @@ const Map<String, String> kReadImageUrls = {
   'cani_multivitamin':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/New_Reference_Material_Can_Improve_testing_of_Multivitamin_Tablets_%285880985736%29.jpg/960px-New_Reference_Material_Can_Improve_testing_of_Multivitamin_Tablets_%285880985736%29.jpg',
   'cani_omega3':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/9/94/Cod_Liver_Oil_Capsules.jpg/960px-Cod_Liver_Oil_Capsules.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/94/Cod_Liver_Oil_Capsules.jpg/960px-Cod_Liver_Oil_Capsules.jpg',
   'cani_b12':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/Mecobalamin_tablets.jpg/960px-Mecobalamin_tablets.jpg',
   'cani_ondansetron':
@@ -276,11 +406,11 @@ const Map<String, String> kReadImageUrls = {
   'cani_cough_syrup':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b2/Vintage_Turkish_pediatric_cough_syrup_bottle.png/960px-Vintage_Turkish_pediatric_cough_syrup_bottle.png',
   'cani_lozenges':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/13/Hustenbonbons_01.jpg/960px-Hustenbonbons_01.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/13/Hustenbonbons_01.jpg/960px-Hustenbonbons_01.jpg',
   'cani_vicks_balm':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Vicks_VapoRub_%2851013600352%29_%28cropped%29.jpg/960px-Vicks_VapoRub_%2851013600352%29_%28cropped%29.jpg',
   'cani_isabgol':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/16/Culinary_psyllium%2C_Russian_market_13.jpg/960px-Culinary_psyllium%2C_Russian_market_13.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/16/Culinary_psyllium%2C_Russian_market_13.jpg/960px-Culinary_psyllium%2C_Russian_market_13.jpg',
   'cani_probiotics':
       'https://upload.wikimedia.org/wikipedia/commons/0/04/Biogaia_Lactobacillus_Reuteri_Product.jpg',
   'cani_ashwagandha':
@@ -358,9 +488,9 @@ const Map<String, String> kReadImageUrls = {
   'cani_ac_use':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e2/Air_conditioner_2.jpg/960px-Air_conditioner_2.jpg',
   'cani_incense':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e8/Incense_stick.JPG/960px-Incense_stick.JPG',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Incense_stick.JPG/960px-Incense_stick.JPG',
   'cani_cleaning_chemicals':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/7/74/2022-07-08_Albert_%C5%A0estka_interi%C3%A9r_drogerie.jpg/960px-2022-07-08_Albert_%C5%A0estka_interi%C3%A9r_drogerie.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/2022-07-08_Albert_%C5%A0estka_interi%C3%A9r_drogerie.jpg/960px-2022-07-08_Albert_%C5%A0estka_interi%C3%A9r_drogerie.jpg',
   'cani_paint_fumes':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/Paint_roller_4.jpg/960px-Paint_roller_4.jpg',
   'cani_pesticides':
@@ -382,9 +512,9 @@ const Map<String, String> kReadImageUrls = {
   'cani_massage':
       'https://cdn.stocksnap.io/img-thumbs/960w/VH22RVC5UT.jpg',
   'cani_spa':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/e/ef/%D0%A1%D0%9F%D0%90_%D0%BF%D1%80%D0%BE%D1%86%D0%B5%D0%B4%D1%83%D1%80%D1%8B_%D0%B2_%D0%9A%D1%80%D0%B0%D1%81%D0%BD%D0%BE%D0%B9_%D0%9F%D0%BE%D0%BB%D1%8F%D0%BD%D0%B5.jpg/960px-%D0%A1%D0%9F%D0%90_%D0%BF%D1%80%D0%BE%D1%86%D0%B5%D0%B4%D1%83%D1%80%D1%8B_%D0%B2_%D0%9A%D1%80%D0%B0%D1%81%D0%BD%D0%BE%D0%B9_%D0%9F%D0%BE%D0%BB%D1%8F%D0%BD%D0%B5.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ef/%D0%A1%D0%9F%D0%90_%D0%BF%D1%80%D0%BE%D1%86%D0%B5%D0%B4%D1%83%D1%80%D1%8B_%D0%B2_%D0%9A%D1%80%D0%B0%D1%81%D0%BD%D0%BE%D0%B9_%D0%9F%D0%BE%D0%BB%D1%8F%D0%BD%D0%B5.jpg/960px-%D0%A1%D0%9F%D0%90_%D0%BF%D1%80%D0%BE%D1%86%D0%B5%D0%B4%D1%83%D1%80%D1%8B_%D0%B2_%D0%9A%D1%80%D0%B0%D1%81%D0%BD%D0%BE%D0%B9_%D0%9F%D0%BE%D0%BB%D1%8F%D0%BD%D0%B5.jpg',
   'cani_meditation':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d2/Sinemorec_-_Butamiata_beach_%28by_Pudelek%29.JPG/960px-Sinemorec_-_Butamiata_beach_%28by_Pudelek%29.JPG',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d2/Sinemorec_-_Butamiata_beach_%28by_Pudelek%29.JPG/960px-Sinemorec_-_Butamiata_beach_%28by_Pudelek%29.JPG',
   'cani_mobile_phone':
       'https://cdn.stocksnap.io/img-thumbs/960w/DLITZEAVJJ.jpg',
   'cani_stress':
@@ -394,9 +524,9 @@ const Map<String, String> kReadImageUrls = {
   'cani_milk':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Milk_bottle_and_two_doughnuts.jpg/960px-Milk_bottle_and_two_doughnuts.jpg',
   'cani_saffron':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/1/1c/Saffron_threads_in_a_glass_jar_%28_Viora_Saffron_packaging%29.jpg/960px-Saffron_threads_in_a_glass_jar_%28_Viora_Saffron_packaging%29.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Saffron_threads_in_a_glass_jar_%28_Viora_Saffron_packaging%29.jpg/960px-Saffron_threads_in_a_glass_jar_%28_Viora_Saffron_packaging%29.jpg',
   'cani_makhana':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/0/0e/Foxnut_Makhana_-_Nawada_District_-_Bihar_-_1.jpg/960px-Foxnut_Makhana_-_Nawada_District_-_Bihar_-_1.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0e/Foxnut_Makhana_-_Nawada_District_-_Bihar_-_1.jpg/960px-Foxnut_Makhana_-_Nawada_District_-_Bihar_-_1.jpg',
   'cani_salt':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Seasalt.jpg/960px-Seasalt.jpg',
   'cani_maida':
@@ -410,11 +540,11 @@ const Map<String, String> kReadImageUrls = {
   'cani_packaged_juice':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/20240814Satona_Kartonger.jpg/960px-20240814Satona_Kartonger.jpg',
   'cani_vitamin_c':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/5/54/Fruit_plate_with_fresh_fruits.jpg/960px-Fruit_plate_with_fresh_fruits.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/5/54/Fruit_plate_with_fresh_fruits.jpg/960px-Fruit_plate_with_fresh_fruits.jpg',
   'cani_shelf_eat':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Golgappa_Pani_Puri_India.jpg/960px-Golgappa_Pani_Puri_India.jpg',
   'cani_shelf_drink':
-      'https://thumb.wikimedia.org/wikipedia/commons/thumb/2/25/Mix_Masala_Tea.jpg/960px-Mix_Masala_Tea.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/25/Mix_Masala_Tea.jpg/960px-Mix_Masala_Tea.jpg',
   'cani_shelf_take':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/2/23/New_Reference_Material_Can_Improve_testing_of_Multivitamin_Tablets_%285880985736%29.jpg/960px-New_Reference_Material_Can_Improve_testing_of_Multivitamin_Tablets_%285880985736%29.jpg',
   'cani_shelf_doActivity':
@@ -624,6 +754,69 @@ const Map<String, String> kReadImageUrls = {
 
 /// Read id → licence · source · creator, for the credit line.
 const Map<String, String> kReadImageCredits = {
+  'nut_ragi_dosa': 'CC BY-SA 4.0 · Wikimedia Commons · Pradeep717',
+  'nut_curd_rice': 'CC BY-SA 4.0 · Wikimedia Commons · Sudharshan Shanmugasundaram',
+  'nut_palak_paneer': 'CC0 · Wikimedia Commons · Daderot',
+  'nut_fish_curry': 'CC BY-SA 4.0 · Wikimedia Commons · Billjones94',
+  'nut_shukto': 'CC BY-SA 4.0 · Wikimedia Commons · Billjones94',
+  'nut_ragi_porridge': 'CC BY-SA 4.0 · Wikimedia Commons · Narmadhaa',
+  'nut_sambar': 'CC BY-SA 4.0 · Wikimedia Commons · Sutapa Pal',
+  'nut_rajma': 'CC BY-SA 4.0 · Wikimedia Commons · Shreya151994',
+  'nut_dhokla': 'CC BY-SA 4.0 · Wikimedia Commons · Mrudit161187',
+  'nut_khichdi': 'CC BY-SA 4.0 · Wikimedia Commons · Seena.ge',
+  'nut_dal_rice': 'CC BY-SA 2.0 · Wikimedia Commons · goanfishcurryrice3',
+  'nut_thalipeeth': 'CC BY-SA 4.0 · Wikimedia Commons · Avinashvh1n1',
+  'nut_kadhi': 'CC0 · Wikimedia Commons · Brihaspati',
+  'nut_chilla': 'CC BY-SA 4.0 · Wikimedia Commons · Kamalsahansi',
+  'nut_daliya': 'CC0 · Wikimedia Commons · QueerEcofeminist',
+  'nut_poha': 'CC BY-SA 4.0 · Wikimedia Commons · Mahi Gajwani',
+  'nut_upma': 'CC BY-SA 4.0 · Wikimedia Commons · Intodustin',
+  'nut_idli': 'CC BY-SA 4.0 · Wikimedia Commons · Sutapa Pal',
+  'nut_dosa': 'CC BY-SA 4.0 · Wikimedia Commons · Marajozkee',
+  'nut_paratha': 'CC BY-SA 4.0 · Wikimedia Commons · Shahzaib Damn Cruze',
+  'nut_roti_sabzi': 'CC BY-SA 2.0 · Wikimedia Commons · Devika',
+  'nut_oats': 'CC BY-SA 4.0 · Wikimedia Commons · UserTwoSix',
+  'nut_boiled_eggs': 'CC BY-SA 2.0 · Wikimedia Commons · Ramesh NG',
+  'nut_omelette': 'Public domain · Wikimedia Commons · Renee Comet (photographer)',
+  'nut_paneer': 'CC BY-SA 4.0 · Wikimedia Commons · Status 401',
+  'nut_dal': 'CC BY-SA 4.0 · Wikimedia Commons · Wind Hashira',
+  'nut_sprouts': 'CC BY-SA 4.0 · Wikimedia Commons · Abhijit Patil',
+  'nut_chana': 'CC BY-SA 4.0 · Wikimedia Commons · Parzeus',
+  'nut_curd': 'CC BY-SA 4.0 · Wikimedia Commons · Shruthi Gaurav Alva',
+  'nut_lassi': 'CC BY-SA 4.0 · Wikimedia Commons · Gaurav Dhwaj Khadka',
+  'nut_fruit_bowl': 'CC BY-SA 4.0 · Wikimedia Commons · Anagoria',
+  'nut_banana': 'CC BY-SA 3.0 · Wikimedia Commons · Wilfredor',
+  'nut_apple': 'CC BY 2.0 · Wikimedia Commons · Abhijit Tembhekar from Mumbai, India',
+  'nut_nuts': 'CC BY 2.0 · Wikimedia Commons · NIAID',
+  'nut_dates': 'CC BY-SA 4.0 · Wikimedia Commons · Lebron jay',
+  'nut_soup': 'CC0 · Wikimedia Commons · Cala cala_maffia',
+  'nut_salad': 'CC BY-SA 4.0 · Wikimedia Commons · Vinayakpatil1981',
+  'nut_coconut_water': 'CC BY-SA 2.0 · Wikimedia Commons · mararie',
+  'nut_chicken_curry': 'CC BY-SA 4.0 · Wikimedia Commons · Asinha631',
+  'nut_makhana': 'CC BY-SA 4.0 · Wikimedia Commons · Salil Kumar Mukherjee',
+  'nut_khakhra': 'CC BY-SA 4.0 · Wikimedia Commons · Jay87.mehta',
+  'nut_sandwich': 'CC BY-SA 4.0 · Wikimedia Commons · Ganesh Mohan T',
+  'nut_smoothie': 'CC0 · Wikimedia Commons · Brenda Godinez cravethebenefits',
+  'nut_juice': 'CC BY 2.0 · Wikimedia Commons · Shixart1985',
+  'nut_chai': 'Public domain · Wikimedia Commons · Miansari66',
+  'nut_r_pcos_moong_chilla': 'CC BY-SA 4.0 · Wikimedia Commons · Kamalsahansi',
+  'nut_r_bengali_macher_jhol': 'CC BY-SA 4.0 · Wikimedia Commons · Rajeeb Dutta',
+  'nut_r_bengali_shukto': 'CC BY-SA 4.0 · Wikimedia Commons · Billjones94',
+  'nut_r_punjabi_palak_paneer': 'CC BY-SA 4.0 · Wikimedia Commons · Lopanayak',
+  'nut_r_gujarati_dhokla': 'CC BY-SA 4.0 · Wikimedia Commons · Yakshitha',
+  'nut_r_gujarati_khichdi': 'CC BY-SA 4.0 · Wikimedia Commons · Dkgohil',
+  'nut_r_south_indian_ragi_dosa': 'CC BY-SA 4.0 · Wikimedia Commons · Pradeep717',
+  'nut_r_south_indian_curd_rice': 'CC BY-SA 4.0 · Wikimedia Commons · Sudharshan Shanmugasundaram',
+  'nut_r_maharashtrian_varan_bhaat': 'CC BY-SA 4.0 · Wikimedia Commons · Kashmira3091',
+  'nut_r_maharashtrian_thalipeeth': 'CC BY-SA 4.0 · Wikimedia Commons · Avinashvh1n1',
+  'nut_r_jain_kadhi_khichdi': 'CC BY-SA 4.0 · Wikimedia Commons · Satyams2000',
+  'nut_r_besan_chilla': 'CC BY-SA 4.0 · Wikimedia Commons · Kamalsahansi',
+  'nut_r_vegetable_daliya': 'CC0 · Wikimedia Commons · QueerEcofeminist',
+  'nut_r_tamil_sambar': 'CC BY-SA 4.0 · Wikimedia Commons · Sutapa Pal',
+  'nut_r_punjabi_rajma': 'CC BY-SA 4.0 · Wikimedia Commons · Shreya151994',
+  'nut_r_tamil_ragi_kanji': 'CC BY-SA 4.0 · Wikimedia Commons · Narmadhaa',
+  'nut_ragi_kanji': 'CC BY-SA 4.0 · Wikimedia Commons · Narmadhaa',
+  'nut_buttermilk': 'CC BY-SA 4.0 · Wikimedia Commons · Gaurav Dhwaj Khadka',
   'cani_papaya': 'CC BY 3.0 · Wikimedia Commons · Marek Ślusarczyk (Tupungato) Photo portf',
   'cani_pineapple': 'CC BY-SA 3.0 · Wikimedia Commons · MANOJTV at English Wikipedia',
   'cani_mango': 'CC BY-SA 4.0 · Wikimedia Commons · Ivar Leidus',

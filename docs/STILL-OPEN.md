@@ -8519,11 +8519,61 @@ Twenty-five `…Classic` bodies, pushed by nothing. Retire with §65.7 and
 `showBookingSheetClassic`; giving them a `PvOfferingView` adapter retires
 that too.
 
-### 69.7 The store's category tiles — owed LAST
+### 69.7 The store's category tiles — DONE 2026-09-20, not walked
 
-Not learning, but the user's ordering: after this is walked, the products
-front page's category tiles (pregnancy pillow, stretch marks, maternity
-wear…) get real images in place of line icons — "make this page look real,
-not static". Free photos of the object type, one per category per stage,
-with the `PvCoverBlock` fallback; check Mobbin's category-tile grammar
-(Myntra, Blinkit, Zepto) first.
+The products front page's category tiles carry a photo of the object
+(`lib/data/products/pv_category_images.dart`, one Unsplash id per category
+on every stage; Blinkit's tile grammar from Mobbin — the object on a soft
+tint, the label beneath). The icon-on-tint tile is the fallback for a
+category the map does not know and for a failed load, so a Directus
+category still gets a tile. `test/pv_store_test.dart` fails when a bundled
+category has no photo. Chosen by subject word, not seen — the nineteen
+photos are on the device walk's list with the learn covers.
+
+## 69.0 Nutrition is a day — BUILT 2026-09-20, walk owed
+
+`lib/screens/nutrition/door/` (door, meal sheet, need screen, recipe +
+cook mode, recipes grid, shopping list, preference sheet),
+`lib/data/nutrition/nutrition_plate.dart` (the plate, the needs, chart
+scoring), `lib/data/nutrition/nutrition_photos.dart` (dish sentence →
+photo), `lib/services/nutrition_day_store.dart` (per-day blob).
+The home tile opens `NutritionDoorScreen` behind `kNutritionDoorAsDay`;
+the five-tab `PvDoorScreen` over `kNutritionDoor` stays for revert.
+Research in MOBBIN-DISCOVERY §12. Tests: test/nutrition_door_test.dart.
+
+### 69.1 Built, in one line each
+Today's plate from the best-fit chart (trimester × diet × region ×
+condition), deterministic per date; Swap (the chart's swaps + the other
+days' same slot) and "not today"; five needs as ticks with a burst, foods
+and recipes behind each; eight glasses; craving chips that log and open
+the craving page, with a seven-day pattern line; recipes hers-first with
+the unticked needs leading; a recipe page with a servings stepper, Add to
+my list, numbered method and Cook mode (screen awake); the shopping list
+with Send; diet + region in one sheet; the library (charts, fasting,
+nutrients, Is it safe?) as rows; the dieticians unchanged.
+
+### 69.2 "Can I eat this?" retired from this door
+Nutrition's old first tab was a 64-food safety checker — a second Is it
+safe?. One home per fact: the row "Is this food safe?" opens the Is it
+safe? door. **Owed:** merge the 64 `kFoodEntries` into the 193 Can I
+entries where they add a food we lack, then retire `food_verdict_screen`
+and `can_i_eat_body`.
+
+### 69.3 Photos
+~48 dish keys + 17 recipes through the reviewed pipeline (Wikidata
+depicts, then Commons text), by eye, Wikimedia/StockSnap hosts, R2 later.
+A sentence with no known dish shows the slot icon.
+
+### 69.4 The reminder (Tier 2)
+`NutritionDayStore.reminder` exists; the one gentle daily nudge is NOT
+wired to NotificationService yet — one line of opt-in on the door and a
+`scheduleOneOff` at 8 pm "Did you get your iron today?" is the whole job.
+
+### 69.5 Owed content
+Eight fasting pages (§35.6, still); a clinical read of `kPlateNeeds`
+lines; the plate slots' names come from each chart and vary ("Evening"
+vs "Snack") — harmonise across the nineteen contents.
+
+### 69.6 Not walked
+The phone dropped off USB as the first build finished. Walk list in
+PREGNANCY-DOORS-REVIEW §4.

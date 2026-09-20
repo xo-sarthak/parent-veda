@@ -215,6 +215,38 @@ findings and what changed:
 
 **Still to walk**
 
+## 4. Nutrition — BUILT 2026-09-20 as a day, walk owed
+
+Research first (MOBBIN-DISCOVERY §12), the user's go on all three tiers,
+with one brief: *"make sure Is it safe? and Nutrition don't look like a
+replica — Nutrition, as the word says, should satisfy its purpose; user
+experience, interface and psychology, and the user base who is pregnant."*
+
+**What it is, top to bottom:** hero (week · the chart · Today / Tomorrow)
+→ *Your plate* (photo rows, Swap, not today; *The chart* opens the source)
+→ *Did you get…* (five rings, burst on tick, long-press → what counts)
+→ *Water* (eight tumblers) → *Craving something?* (chips → craving page)
+→ *Recipes for you* (rail, hers first) → *Your list* → *Eating your way*
+→ *The library* (charts · fasting · nutrients · Is it safe?) → dieticians
+→ disclaimer.
+
+**To walk on the phone**
+- The plate: Today vs Tomorrow differ; Swap changes the row in place
+  (AnimatedSwitcher) and marks it; "Not today" dims and strikes; "Put it
+  back" restores; "The chart" opens the right chart.
+- Ticks: the burst and the haptic; the line under changes 0 → n → 5; long
+  press opens the need page; the button there mirrors the tick.
+- Glasses: fill up to the tap, the last one empties; the line under.
+- Cravings: a chip logs and opens; two taps on the same kind within a
+  week → the pattern line on return.
+- Recipes: the rail; a recipe: stepper scales quantities, Add to my list
+  toggles, Cook: one step per screen, back/next, ingredients sheet,
+  Enjoy; the screen stays awake.
+- Your list: grouped, tick, Clear bought, Send.
+- Eating your way: change diet → recipes and plate change; region →
+  a regional chart when one exists.
+- Foot: dieticians block, disclaimer, no blank band.
+
 - The field: type "pa", "papita", "nt"; Enter on a hit; Enter on nothing.
 - The scan pill's look against the sheet; flip `kCanIScanAtFoot` and compare.
 - Scan a real packet (Maggi, Amul, a Crocin strip); scan a regional one.

@@ -87,6 +87,7 @@ import 'tools/medicine_tracker_screen.dart';
 import 'brackets/bracket_screen.dart';
 import '../data/doors/pv_door_data.dart';
 import 'doors/pv_door_screen.dart';
+import 'nutrition/door/nutrition_door.dart';
 // ⚠️ COMMENTED WITH THE PUSH IT SERVED, KEPT FOR REVERT. `ScansHubScreen` and
 // both of its configs still ship and still have their tests; see the note at
 // `_openBracket`. Restoring the old landing is uncommenting this line and the
@@ -989,6 +990,17 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
     // has a door because somebody decided the hub was the wrong shape for it,
     // and falling through to the hub would silently keep the shape that was
     // replaced.
+    // ⚠️ NUTRITION OPENS AS A DAY, NOT A CATALOGUE — 2026-09-20. The
+    // five-tab door over `kNutritionDoor` stays behind `kNutritionDoorAsDay`
+    // for revert; see lib/screens/nutrition/door/nutrition_door.dart.
+    if (bracketId == kNutritionBracketId && kNutritionDoorAsDay) {
+      Navigator.of(context).push(MaterialPageRoute<void>(
+        settings: const RouteSettings(name: kNutritionDoorRoute),
+        builder: (_) => NutritionDoorScreen(pregnancy: pregnancy),
+      ));
+      return;
+    }
+
     if (pvDoorPageFor(bracketId) case final door?) {
       Navigator.of(context).push(MaterialPageRoute<void>(
         // ⚠️ THE ROUTE NAME IS UNCHANGED FROM THE HUB'S. `global_ask_fab.dart`
