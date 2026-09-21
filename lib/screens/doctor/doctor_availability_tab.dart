@@ -24,23 +24,28 @@ import 'package:flutter/material.dart';
 
 import '../../doctor/doctor_schedule.dart';
 import '../../doctor/doctor_schedule_store.dart';
+import '../../doctor/doctor_hero_images.dart';
 import '../../doctor/doctor_session.dart';
+import 'doctor_art.dart';
 import 'doctor_chrome.dart';
+import 'doctor_task_feed.dart';
 
 const _dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 class DoctorAvailabilityTab extends StatelessWidget {
-  const DoctorAvailabilityTab({super.key});
+  const DoctorAvailabilityTab({super.key, required this.goTo});
+  final void Function(DoctorTab) goTo;
 
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: Listenable.merge([DoctorSession.instance, DoctorScheduleStore.instance]),
+      listenable: doctorFeedListenable(),
       builder: (context, _) {
+        final feed = DoctorFeed.now();
         final id = DoctorSession.instance.expertId;
         if (id == null || id.isEmpty) {
           return const DcTab(title: 'Availability', children: [
-            DcEmpty('No consulting identity', 'An organisation account has no hours of its own; each clinician sets theirs.', icon: Icons.schedule_outlined),
+            DcEmpty('No consulting identity', 'An organisation account has no hours of its own; each clinician sets theirs.', mark: DoctorMark.hours),
           ]);
         }
         final store = DoctorScheduleStore.instance;
@@ -50,11 +55,20 @@ class DoctorAvailabilityTab extends StatelessWidget {
 
         return DcTab(
           title: 'Availability',
-          subtitle: s.paused ? 'Paused — parents see no slots' : 'Parents book inside these hours',
+          hero: DcHero(
+            asset: kDoctorHeroImages['availability']!.asset,
+            eyebrow: 'Availability',
+            greeting: s.paused ? 'Paused for now' : 'When you are free',
+            infoLine: s.paused
+                ? 'Parents see no slots until you resume. Existing bookings stand.'
+                : 'Parents book inside these hours. Change a day, add time off, pause any time.',
+            badge: feed.unread,
+            onBell: () => feed.openUpdates(context, goTo),
+          ),
           children: [
             DcRowGroup(children: [
               DcSwitchRow(
-                icon: s.paused ? Icons.pause_circle_outline_rounded : Icons.play_circle_outline_rounded,
+                mark: DoctorMark.hours,
                 title: 'Taking bookings',
                 subtitle: s.paused ? 'Off. Existing bookings stand.' : 'On',
                 value: !s.paused,
@@ -82,7 +96,7 @@ class DoctorAvailabilityTab extends StatelessWidget {
             const SizedBox(height: 10),
             DcRowGroup(children: [
               DcRow(
-                icon: Icons.copy_all_outlined,
+                mark: DoctorMark.calendar,
                 title: 'Same hours on every working day',
                 subtitle: 'Copies ${_firstWorkingDayName(s)}\'s hours to the others.',
                 onTap: !s.hasAnyHours ? null : () => _copyHours(context, id),
@@ -94,7 +108,7 @@ class DoctorAvailabilityTab extends StatelessWidget {
             const DcSectionHead('Rules'),
             DcRowGroup(children: [
               DcRow(
-                icon: Icons.tune_rounded,
+                mark: DoctorMark.prescribe,
                 title: 'Consultation rules',
                 subtitle: '${s.rules.slotMinutes} min each · ${s.rules.bufferAfterMin} min gap · up to ${s.rules.maxPerDay} a day · ${_notice(s.rules.minNoticeMinutes)} notice',
                 onTap: () => Navigator.of(context).push(MaterialPageRoute(
@@ -109,7 +123,7 @@ class DoctorAvailabilityTab extends StatelessWidget {
               DcEmpty(
                 'No time off booked',
                 'Holidays, leave, or a day you simply cannot take. Your week runs as set.',
-                icon: Icons.beach_access_outlined,
+                mark: DoctorMark.calendar,
                 action: 'Add time off',
                 onAction: () => _addTimeOff(context, id),
               )
@@ -117,7 +131,7 @@ class DoctorAvailabilityTab extends StatelessWidget {
               DcRowGroup(children: [
                 for (var i = 0; i < s.timeOff.length; i++)
                   DcRow(
-                    icon: Icons.beach_access_outlined,
+                    mark: DoctorMark.calendar,
                     title: _timeOffLine(s.timeOff[i]),
                     subtitle: s.timeOff[i].reason.isEmpty ? null : s.timeOff[i].reason,
                     chevron: false,
@@ -289,7 +303,7 @@ class _DaySheetState extends State<_DaySheet> {
         DcRowGroup(children: [
           for (var i = 0; i < day.sessions.length; i++)
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 10, 8, 10),
+              padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
               child: Row(children: [
                 _timeChip(hhmm(day.sessions[i].start), () => _pick(i, true)),
                 Padding(padding: const EdgeInsets.symmetric(horizontal: 10), child: Text('to', style: dcMeta(14))),

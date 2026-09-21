@@ -68,6 +68,26 @@ class DoctorPublicProfile {
         'photo_url': photoUrl, 'fee_inr': feeInr, 'rating': rating,
         'takes_consults': takesConsults,
       };
+
+  DoctorPublicProfile withPhoto(String? url) => DoctorPublicProfile.fromRow({...toRow(), 'photo_url': url});
+}
+
+/// One card from ParentVeda on the Home (0088: expert_notices).
+class DoctorNotice {
+  const DoctorNotice({required this.id, required this.title, required this.body, this.url, this.startsAt});
+  final String id;
+  final String title;
+  final String body;
+  final String? url;
+  /// When it went live — the updates feed files it under that day.
+  final DateTime? startsAt;
+  factory DoctorNotice.fromRow(Map r) => DoctorNotice(
+        id: (r['id'] ?? '').toString(),
+        title: (r['title'] ?? '').toString(),
+        body: (r['body'] ?? '').toString(),
+        url: (r['url'] as String?)?.trim().isEmpty ?? true ? null : (r['url'] as String).trim(),
+        startsAt: DateTime.tryParse((r['starts_at'] ?? '').toString()),
+      );
 }
 
 class DoctorSession extends ChangeNotifier {
@@ -97,6 +117,92 @@ class DoctorSession extends ChangeNotifier {
   /// The doctor's own public card, or null until known. See [loadProfile].
   DoctorPublicProfile? get profile => _profile;
 
+  DoctorNotice? _notice;
+  /// The one card from ParentVeda (0088), newest in window, or null.
+  DoctorNotice? get notice => _notice;
+
+  bool _qrKitOpened = false;
+  /// Has she opened the referral kit at least once on this phone? The
+  /// nearest honest proxy for "printed the poster" — the app cannot see a
+  /// printer. Setup-carousel state only.
+  bool get qrKitOpened => _qrKitOpened;
+
+  Future<void> markQrKitOpened() async {
+    if (_qrKitOpened) return;
+    _qrKitOpened = true;
+    notifyListeners();
+    try {
+      final sp = await SharedPreferences.getInstance();
+      await sp.setBool('doctor_qr_kit_opened', true);
+    } catch (_) {}
+  }
+
+  Future<void> loadNotice() async {
+    try {
+      final sp = await SharedPreferences.getInstance();
+      _qrKitOpened = sp.getBool('doctor_qr_kit_opened') ?? false;
+    } catch (_) {}
+    if (!SupabaseRepo.isLoggedIn) return;
+    // RLS already narrows to "in window, for me"; newest wins.
+    final rows = await SupabaseRepo.selectAllOrNull('expert_notices');
+    if (rows == null) return;
+    final sorted = rows.toList()
+      ..sort((a, b) => (b['starts_at'] ?? '').toString().compareTo((a['starts_at'] ?? '').toString()));
+    _notice = sorted.isEmpty ? null : DoctorNotice.fromRow(sorted.first);
+    notifyListeners();
+  }
+
+  /// The doctor's own photograph — the ONE column of her public profile the
+  /// app may write (0090). Bytes go to the public `expert-photos` bucket at
+  /// <uid>/<expert>.jpg (upsert), the URL gets a `?v=` so a changed picture
+  /// is a changed URL, and `set_my_expert_photo` writes the column through
+  /// the identity gate. Local-first the other way round from usual: the
+  /// server is asked FIRST here, because a photo the parent cannot see is
+  /// not a photo, and the local mirror follows only on a confirmed write.
+  /// Returns null on success, else a sentence for the screen.
+  Future<String?> setPhoto(Uint8List jpegBytes) async {
+    final id = _expertId;
+    final uid = SupabaseRepo.userId;
+    if (id == null || id.isEmpty || uid == null) return 'Sign in to add a photo.';
+    final url = await SupabaseRepo.uploadPublicFile('expert-photos', '$uid/$id.jpg', jpegBytes);
+    if (url == null) return 'Could not upload the photo. Check your connection and try again.';
+    final stamped = '$url?v=${DateTime.now().millisecondsSinceEpoch ~/ 1000}';
+    try {
+      await SupabaseRepo.callFunction('set_my_expert_photo', {'p_expert_id': id, 'p_url': stamped});
+    } catch (e) {
+      debugPrint('[doctor] set_my_expert_photo refused: $e');
+      return 'The photo uploaded but could not be put on your profile. Try again in a moment.';
+    }
+    _profile = (_profile ?? DoctorPublicProfile.fromRow({'expert_id': id})).withPhoto(stamped);
+    try {
+      final sp = await SharedPreferences.getInstance();
+      await sp.setString('doctor_profile_$id', jsonEncode(_profile!.toRow()));
+    } catch (_) {}
+    notifyListeners();
+    return null;
+  }
+
+  /// Takes the photo off the profile. The file stays in the bucket until the
+  /// next upload replaces it — a delete that fails would otherwise leave the
+  /// profile pointing at nothing.
+  Future<String?> clearPhoto() async {
+    final id = _expertId;
+    if (id == null || id.isEmpty) return 'Sign in first.';
+    try {
+      await SupabaseRepo.callFunction('set_my_expert_photo', {'p_expert_id': id, 'p_url': null});
+    } catch (e) {
+      debugPrint('[doctor] set_my_expert_photo(null) refused: $e');
+      return 'Could not remove the photo. Try again in a moment.';
+    }
+    if (_profile != null) _profile = _profile!.withPhoto(null);
+    try {
+      final sp = await SharedPreferences.getInstance();
+      if (_profile != null) await sp.setString('doctor_profile_$id', jsonEncode(_profile!.toRow()));
+    } catch (_) {}
+    notifyListeners();
+    return null;
+  }
+
   /// Fetches this expert's `expert_profiles` row — public-read, so a plain
   /// select — and caches it. Called after a resolve and by the Home's pull.
   /// A failure keeps the cache; a cache miss keeps null, and the hero shows
@@ -125,6 +231,7 @@ class DoctorSession extends ChangeNotifier {
       await sp.setString('doctor_profile_$id', jsonEncode(_profile!.toRow()));
     } catch (_) {}
     notifyListeners();
+    loadNotice();
   }
 
   /// True while the app should show the doctor experience.
@@ -267,6 +374,7 @@ class DoctorSession extends ChangeNotifier {
     _expertId = null;
     _partnerId = null;
     _profile = null;
+    _notice = null;
     notifyListeners();
   }
 

@@ -24,6 +24,7 @@ import '../../doctor/doctor_reminders.dart';
 import '../../doctor/doctor_roster.dart';
 import '../../doctor/doctor_schedule_store.dart';
 import '../../doctor/doctor_session.dart';
+import '../../doctor/doctor_updates.dart';
 import '../../widgets/pv_nav_bar.dart';
 import 'doctor_appointments_tab.dart';
 import 'doctor_availability_tab.dart';
@@ -31,6 +32,7 @@ import 'doctor_chrome.dart';
 import 'doctor_earnings_tab.dart';
 import 'doctor_home_tab.dart';
 import 'doctor_profile_tab.dart';
+import 'doctor_task_feed.dart';
 // Retired 2026-09-18, kept for revert:
 // import 'doctor_home_screen.dart';
 // import 'doctor_appointments_screen.dart';
@@ -68,6 +70,7 @@ class _DoctorScaffoldState extends State<DoctorScaffold>
     _poll = Timer.periodic(_pollEvery, (_) => _refresh());
     DoctorScheduleStore.instance.init();
     DoctorLedger.instance.bind(DoctorSession.instance.expertId);
+    DoctorUpdatesRead.instance.load();
   }
 
   @override
@@ -91,6 +94,9 @@ class _DoctorScaffoldState extends State<DoctorScaffold>
       DoctorRoster.instance.refresh(),
       PrescriptionStore.instance.refresh(),
       DoctorLedger.instance.refreshSummary(),
+      // The itemised month feeds the bell ("you earned 1,920"), so it loads
+      // with the summary rather than waiting for the Earnings tab.
+      DoctorLedger.instance.loadRows(null),
     ]);
     if (!mounted) return;
     // A missed consultation is the worst outcome in the product. Re-arming on
@@ -98,7 +104,9 @@ class _DoctorScaffoldState extends State<DoctorScaffold>
     // so repeats overwrite rather than stack.
     final id = DoctorSession.instance.expertId;
     if (id != null) {
-      DoctorReminders.instance.syncAll(DoctorRoster.instance.upcomingConsults(id));
+      DoctorReminders.instance.syncAll(
+        DoctorRoster.instance.upcomingConsults(id),
+      );
     }
   }
 
@@ -114,22 +122,64 @@ class _DoctorScaffoldState extends State<DoctorScaffold>
   Widget build(BuildContext context) {
     final body = switch (_tab) {
       DoctorTab.home => DoctorHomeTab(goTo: (t) => setState(() => _tab = t)),
-      DoctorTab.appointments => const DoctorAppointmentsTab(),
-      DoctorTab.availability => const DoctorAvailabilityTab(),
-      DoctorTab.earnings => const DoctorEarningsTab(),
-      DoctorTab.profile => const DoctorProfileTab(),
+      DoctorTab.appointments => DoctorAppointmentsTab(
+        goTo: (t) => setState(() => _tab = t),
+      ),
+      DoctorTab.availability => DoctorAvailabilityTab(
+        goTo: (t) => setState(() => _tab = t),
+      ),
+      DoctorTab.earnings => DoctorEarningsTab(
+        goTo: (t) => setState(() => _tab = t),
+      ),
+      DoctorTab.profile => DoctorProfileTab(
+        goTo: (t) => setState(() => _tab = t),
+      ),
     };
-    return Scaffold(
-      backgroundColor: dcP.ground,
-      // Home carries a full-bleed photo band that runs under the status bar
-      // (DcHero pads itself by the real inset); every other tab starts below
-      // it. SafeArea would strip the inset from MediaQuery and leave a white
-      // strip above the photograph.
-      body: SafeArea(bottom: false, top: _tab != DoctorTab.home, child: body),
-      bottomNavigationBar: PvNavBar(
-        items: _items,
-        activeIndex: _tab.index,
-        onTap: (i) => setState(() => _tab = DoctorTab.values[i]),
+    // ⚠️ BACK ON A TAB GOES HOME, NOT OUT. A task's verb ("Write" on the
+    // prescriptions card) SWITCHES a tab rather than pushing a route, so
+    // there is nothing on the Navigator for Back to pop and Android closed
+    // the app — from Home to Appointments to gone, on one tap of Back (the
+    // user, 2026-09-21). The convention every tabbed app follows (YouTube,
+    // Instagram, Gmail): Back on a non-Home tab returns to Home; only Back
+    // on Home leaves. canPop is recomputed on every tab change, which is
+    // why it is derived here and not stored.
+    return PopScope(
+      canPop: _tab == DoctorTab.home,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop && _tab != DoctorTab.home)
+          setState(() => _tab = DoctorTab.home);
+      },
+      child: Scaffold(
+        backgroundColor: dcP.ground,
+        // Home carries a full-bleed photo band that runs under the status bar
+        // (DcHero pads itself by the real inset); every other tab starts below
+        // it. SafeArea would strip the inset from MediaQuery and leave a white
+        // strip above the photograph.
+        // Every tab is a door now: the photograph runs under the status bar
+        // on all five, and DcHero pads itself by the real inset.
+        // The bar FLOATS, as it does on the parenting home (post_pregnancy_home
+        // 2026-09-16): a pill 16 in from each edge, 18 above the system inset,
+        // with the page scrolling under it. Docked in `bottomNavigationBar` it
+        // ran edge to edge and read as a different component from the parent
+        // app's, though it is the same PvNavBar. Every tab body pads its list
+        // by `DcTab.barClearance` so the last row clears the pill.
+        body: Stack(
+          children: [
+            Positioned.fill(
+              child: SafeArea(bottom: false, top: false, child: body),
+            ),
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: MediaQuery.of(context).viewPadding.bottom + 18,
+              child: PvNavBar(
+                items: _items,
+                activeIndex: _tab.index,
+                onTap: (i) => setState(() => _tab = DoctorTab.values[i]),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

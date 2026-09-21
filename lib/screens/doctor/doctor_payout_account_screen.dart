@@ -46,11 +46,19 @@ class _DoctorPayoutAccountScreenState extends State<DoctorPayoutAccountScreen> {
     _ifsc = TextEditingController(text: a?.ifsc ?? '');
     _pan = TextEditingController(text: a?.pan ?? '');
     _upi = TextEditingController(text: a?.upiId ?? '');
+    for (final c in [_name, _number, _confirm, _ifsc, _pan, _upi]) {
+      c.addListener(_clearError);
+    }
+  }
+
+  void _clearError() {
+    if (_error != null && mounted) setState(() => _error = null);
   }
 
   @override
   void dispose() {
     for (final c in [_name, _number, _confirm, _ifsc, _pan, _upi]) {
+      c.removeListener(_clearError);
       c.dispose();
     }
     super.dispose();
@@ -136,7 +144,7 @@ class _DoctorPayoutAccountScreenState extends State<DoctorPayoutAccountScreen> {
         const SizedBox(height: 14),
         DcInput(label: 'UPI id (optional)', controller: _upi, hint: 'name@bank', keyboard: TextInputType.emailAddress),
         if (_error != null) ...[
-          const SizedBox(height: 16),
+          const SizedBox(height: 14),
           DcNotice(_error!, problem: true),
         ],
         const SizedBox(height: 16),

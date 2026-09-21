@@ -16,7 +16,7 @@ import 'package:flutter/material.dart';
 
 import '../../doctor/doctor_roster.dart';
 import '../../doctor/doctor_session.dart';
-import '../v2/v2_palette.dart' show v2BlockTint;
+import 'doctor_art.dart';
 import 'doctor_chrome.dart';
 import 'doctor_class_launch.dart';
 
@@ -39,7 +39,7 @@ class DoctorClassesScreen extends StatelessWidget {
               const DcEmpty(
                 'No classes yet',
                 'When ParentVeda assigns you a masterclass or a cohort, it appears here with its seats and a Start button that opens 30 minutes before.',
-                icon: Icons.school_outlined,
+                mark: DoctorMark.classes,
               )
             else
               for (final o in sessions) ...[
@@ -74,13 +74,7 @@ class ClassCard extends StatelessWidget {
     return DcCard(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Container(
-            width: 40,
-            height: 40,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(color: v2BlockTintFor(h.isCohort), borderRadius: BorderRadius.circular(12)),
-            child: Icon(h.isCohort ? Icons.groups_outlined : Icons.school_outlined, size: 21, color: p.ink1),
-          ),
+          DoctorArtTile(mark: DoctorMark.classes, p: p, size: 44, radius: 13),
           const SizedBox(width: 14),
           Expanded(
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -115,4 +109,3 @@ class ClassCard extends StatelessWidget {
   }
 }
 
-Color v2BlockTintFor(bool cohort) => v2BlockTint(cohort ? 104 : 268, dcP);

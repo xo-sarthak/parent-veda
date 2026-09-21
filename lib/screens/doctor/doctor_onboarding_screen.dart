@@ -21,7 +21,8 @@ import 'package:flutter/material.dart';
 
 import '../../doctor/doctor_onboarding_store.dart';
 import '../../doctor/doctor_session.dart';
-import '../post_pregnancy/pp_common.dart';
+import 'doctor_art.dart';
+import 'doctor_chrome.dart';
 
 class DoctorOnboardingScreen extends StatefulWidget {
   const DoctorOnboardingScreen({super.key});
@@ -63,61 +64,58 @@ class _DoctorOnboardingScreenState extends State<DoctorOnboardingScreen> {
     _next();
   }
 
+  // The form keeps what she types for the length of the visit, so stepping
+  // back does not blank a field. Nothing is sent yet — see the file head.
+  final Map<String, TextEditingController> _fields = {};
+  final Set<String> _picked = {};
+  TextEditingController _c(String label) => _fields.putIfAbsent(label, TextEditingController.new);
+
+  @override
+  void dispose() {
+    for (final c in _fields.values) {
+      c.dispose();
+    }
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
+    final p = dcP;
+    // 2026-09-21: onto the doctor chrome — violet bars, violet button,
+    // tinted notes all gone; the same five steps.
     return AnimatedBuilder(
       animation: _store,
-      builder: (context, _) => Scaffold(
-        backgroundColor: ppBg,
-        appBar: AppBar(
-          backgroundColor: ppBg,
-          surfaceTintColor: Colors.transparent,
-          elevation: 0,
-          title: Text('Set up your practice', style: ppJakarta(16)),
-        ),
-        body: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 4, 20, 40),
-          children: [
-            _progress(),
-            const SizedBox(height: 20),
-            Text(_steps[_step].$1, style: ppFraunces(25, h: 1.1)),
-            const SizedBox(height: 5),
-            Text(_steps[_step].$2, style: ppBody(13, h: 1.5)),
-            const SizedBox(height: 20),
-            switch (_step) {
-              0 => _basics(),
-              1 => _qualifications(),
-              2 => _registration(),
-              3 => _documents(),
-              _ => _payouts(),
-            },
-            const SizedBox(height: 24),
-            _cta(),
-            const SizedBox(height: 10),
-            Center(
-              child: GestureDetector(
-                onTap: _skip,
-                behavior: HitTestBehavior.opaque,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  child: Text('Skip for now',
-                      style: ppJakarta(13, color: ppSoft)),
-                ),
-              ),
-            ),
-          ],
-        ),
+      builder: (context, _) => DcScreen(
+        title: _steps[_step].$1,
+        subtitle: 'Step ${_step + 1} of ${_steps.length} · ${_steps[_step].$2}',
+        bottom: Column(mainAxisSize: MainAxisSize.min, children: [
+          ObPrimary(p: p, label: _step == _steps.length - 1 ? 'Finish' : 'Continue', onTap: _next),
+          const SizedBox(height: 4),
+          TextButton(onPressed: _skip, child: Text('Skip for now', style: dcStrong(14, color: p.ink2))),
+        ]),
+        children: [
+          _progress(p),
+          const SizedBox(height: 22),
+          switch (_step) {
+            0 => _basics(),
+            1 => _qualifications(),
+            2 => _registration(),
+            3 => _documents(),
+            _ => _payouts(),
+          },
+        ],
       ),
     );
   }
 
-  Widget _progress() => Row(children: [
+  /// Five short ink bars; done and current in ink, the rest hairline.
+  Widget _progress(dynamic p) => Row(children: [
         for (var i = 0; i < _steps.length; i++) ...[
           Expanded(
             child: Container(
               height: 4,
               decoration: BoxDecoration(
-                color: i <= _step ? ppPurple : ppHair,
+                color: i <= _step ? p.ink1 : p.line,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -125,19 +123,6 @@ class _DoctorOnboardingScreenState extends State<DoctorOnboardingScreen> {
           if (i < _steps.length - 1) const SizedBox(width: 5),
         ],
       ]);
-
-  Widget _cta() => GestureDetector(
-        onTap: _next,
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          height: 52,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-              color: ppPurple, borderRadius: BorderRadius.circular(15)),
-          child: Text(_step == _steps.length - 1 ? 'Finish' : 'Continue',
-              style: ppJakarta(14.5, color: Colors.white)),
-        ),
-      );
 
   // ---- steps ----------------------------------------------------------------
   //
@@ -154,7 +139,7 @@ class _DoctorOnboardingScreenState extends State<DoctorOnboardingScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _field('Full name', 'Dr. …'),
-        _field('Years of experience', 'e.g. 9'),
+        _field('Years of experience', 'e.g. 9', keyboard: TextInputType.number),
         _chips('Title', const ['Dr.', 'Mr.', 'Mrs.', 'Ms.']),
         _chips('Languages you consult in',
             const ['English', 'हिन्दी', 'বাংলা', 'தமிழ்', 'मराठी'],
@@ -166,7 +151,7 @@ class _DoctorOnboardingScreenState extends State<DoctorOnboardingScreen> {
       children: [
         _field('Qualification', 'MBBS, MD …'),
         _field('College / University', 'e.g. AIIMS, New Delhi'),
-        _field('Year of completion', 'e.g. 2016'),
+        _field('Year of completion', 'e.g. 2016', keyboard: TextInputType.number),
         _chips('Speciality', const [
           'Obstetrician',
           'Gynaecologist',
@@ -183,8 +168,8 @@ class _DoctorOnboardingScreenState extends State<DoctorOnboardingScreen> {
       children: [
         _field('Registration number', 'e.g. 2254785558'),
         _field('Medical council', 'e.g. Delhi Medical Council'),
-        _field('Registration year', 'e.g. 2017'),
-        _note(
+        _field('Registration year', 'e.g. 2017', keyboard: TextInputType.number),
+        const DcNotice(
           'This is what lets a parent check you on a public register. It is '
           'the single most important thing on this screen.',
         ),
@@ -193,10 +178,13 @@ class _DoctorOnboardingScreenState extends State<DoctorOnboardingScreen> {
   Widget _documents() => Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _upload('Proof of qualification', 'Degree certificate'),
-        _upload('Registration proof', 'Council registration certificate'),
-        _upload('Identity proof', 'Aadhaar, PAN, passport or driving licence'),
-        _note(
+        DcRowGroup(children: [
+          _upload('Proof of qualification', 'Degree certificate'),
+          _upload('Registration proof', 'Council registration certificate'),
+          _upload('Identity proof', 'Aadhaar, PAN, passport or driving licence'),
+        ]),
+        const SizedBox(height: 14),
+        const DcNotice(
           'Uploading is a submission, not an approval. A person at ParentVeda '
           'reviews these before your profile goes live to parents.',
         ),
@@ -206,10 +194,10 @@ class _DoctorOnboardingScreenState extends State<DoctorOnboardingScreen> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         _field('Account holder name', 'As printed on the passbook'),
-        _field('Account number', 'The number on your passbook or cheque'),
-        _field('IFSC', 'e.g. HDFC0001234'),
-        _field('PAN', 'For TDS and invoices'),
-        _note(
+        _field('Account number', 'The number on your passbook or cheque', keyboard: TextInputType.number),
+        _field('IFSC', 'e.g. HDFC0001234', capitals: true),
+        _field('PAN', 'For TDS and invoices', capitals: true),
+        const DcNotice(
           'Earnings collect in your ParentVeda balance whether or not this is '
           'filled in. You just cannot withdraw until it is.',
         ),
@@ -217,93 +205,52 @@ class _DoctorOnboardingScreenState extends State<DoctorOnboardingScreen> {
 
   // ---- pieces ---------------------------------------------------------------
 
-  Widget _field(String label, String hint) => Padding(
-        padding: const EdgeInsets.only(bottom: 14),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(label.toUpperCase(),
-              style: ppJakarta(10.5, color: ppSoft)),
-          const SizedBox(height: 7),
-          TextField(
-            style: ppBody(13.5, color: ppInk),
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle: ppBody(13, color: ppMuted),
-              filled: true,
-              fillColor: Colors.white,
-              isDense: true,
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: ppBorder),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: const BorderSide(color: ppPurple),
-              ),
-            ),
-          ),
-        ]),
-      );
-
-  Widget _chips(String label, List<String> options, {bool multi = false}) =>
-      Padding(
+  Widget _field(String label, String hint, {TextInputType? keyboard, bool capitals = false}) => Padding(
         padding: const EdgeInsets.only(bottom: 16),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(label.toUpperCase(), style: ppJakarta(10.5, color: ppSoft)),
-          const SizedBox(height: 9),
-          Wrap(spacing: 8, runSpacing: 8, children: [
-            for (final o in options)
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 13, vertical: 9),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(color: ppBorder),
-                ),
-                child: Text(o, style: ppBody(12.5, color: ppInk)),
-              ),
-          ]),
+        child: DcInput(label: label, controller: _c(label), hint: hint, keyboard: keyboard, capitals: capitals),
+      );
+
+  /// Ink pills: chosen ones fill with ink, the rest sit on a hairline.
+  Widget _chips(String label, List<String> options, {bool multi = false}) {
+    final p = dcP;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 18),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(label.toUpperCase(), style: dcEyebrow()),
+        const SizedBox(height: 9),
+        Wrap(spacing: 8, runSpacing: 8, children: [
+          for (final o in options) _chip(p, '$label|$o', o, multi: multi, group: label),
         ]),
-      );
+      ]),
+    );
+  }
 
-  Widget _upload(String title, String hint) => Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: Container(
-          padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: ppBorder),
-          ),
-          child: Row(children: [
-            const Icon(Icons.upload_file_outlined, size: 20, color: ppPurple),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(title, style: ppJakarta(13.5)),
-                    const SizedBox(height: 2),
-                    Text(hint, style: ppBody(11.5)),
-                  ]),
-            ),
-            Text('Upload', style: ppJakarta(12, color: ppPurple)),
-          ]),
-        ),
-      );
-
-  Widget _note(String s) => Container(
-        padding: const EdgeInsets.fromLTRB(13, 12, 13, 12),
+  Widget _chip(dynamic p, String key, String text, {required bool multi, required String group}) {
+    final on = _picked.contains(key);
+    return InkWell(
+      borderRadius: BorderRadius.circular(999),
+      onTap: () => setState(() {
+        if (!multi) _picked.removeWhere((k) => k.startsWith('$group|'));
+        on ? _picked.remove(key) : _picked.add(key);
+      }),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 9),
         decoration: BoxDecoration(
-          color: ppPanel,
-          borderRadius: BorderRadius.circular(12),
+          color: on ? p.ink1 : p.surface,
+          borderRadius: BorderRadius.circular(999),
+          border: Border.all(color: on ? p.ink1 : p.line, width: 1.2),
         ),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          const Icon(Icons.info_outline_rounded, size: 15, color: ppPurple),
-          const SizedBox(width: 9),
-          Expanded(child: Text(s, style: ppBody(11.5, h: 1.5))),
-        ]),
+        child: Text(text, style: dcStrong(13.5, color: on ? p.surface : p.ink1)),
+      ),
+    );
+  }
+
+  Widget _upload(String title, String hint) => DcRow(
+        mark: DoctorMark.upload,
+        title: title,
+        subtitle: hint,
+        trailing: Text('Upload', style: dcStrong(14, color: dcP.action)),
+        chevron: false,
+        onTap: () => dcToast(context, 'Uploads open once your account is verified. Email the document to partners@parentveda.com for now.'),
       );
 }

@@ -1774,6 +1774,33 @@ twenty-four hours. `0085` also added a dimension the table lacked, `channel`
 (platform | own_code): a new column with a default, so every existing row
 and every existing caller kept working, and the callers that care pass it.
 
+**A second footnote, two days later — the arithmetic.** The demo seed's
+first video (₹12,400 at 20%) raised `integer out of range` inside
+`write_expert_earning()`. The line was `round(gross_paise * share_bps /
+10000.0)`, and Postgres evaluates `int × int` *as int* before it ever sees
+the `/ 10000.0`: 1,240,000 × 2,000 = 2.48 billion, past int32's 2.147
+billion. Consultations never hit it (80,000 × 8,000 = 640 million). The
+general fact: **minor units times basis points is the product of two
+four-figure scalings, and that is the overflow to expect wherever money
+meets a percentage.** Do the arithmetic in `numeric` and narrow to the
+column type once, at the end (`0087`). It is the same lesson as the
+`fee_paise` → `fee_inr` rename in `0074` from the other side: the unit you
+store is a decision with consequences several functions away.
+
+**A third footnote, the same evening — the window.** The seed's backdated
+consultations froze **0%**: `resolve_share_bps()` picks the rule in force
+*on the event's date*, and `0085` had inserted the founding rates with
+`effective_from = current_date`, so anything dated before the migration
+ran found no rule. Both halves are correct — the lookup by event date is
+the whole point, and the ledger refusing to invent a rate is the whole
+point — and together they produced an honest zero. The general fact: **a
+rate table's founding rows must be in force from before the first event
+they could be asked about**; only a *change* starts on the day it is
+added (`0089`). Note what the fix is not: the zeros already frozen are not
+rewritten, because the ledger does not edit amounts — the demo is
+re-seeded, and anything real would be a reversal and a re-accrual, by
+hand, on purpose.
+
 Two smaller things worth carrying. The trigger on `booking_bookings` means
 the ledger **cannot be forgotten** by a future writer of bookings — the
 alternative, "remember to call accrue() after book_slot()", is the shape of
@@ -2014,6 +2041,36 @@ mean". Three decisions, each one a rule you can reuse:
 The general fact: **when a number is derived, decide what it may be
 compared to before you decide how to draw it.** The comparison is the
 claim; the tile is just type.
+
+## 16k. A policy opens a row; a function opens a column — the doctor's photo
+
+`expert_profiles` has no client write policy, on purpose (0072): a row there
+sets a price and puts a name in front of a pregnant woman, so it is the
+panel's. Then the doctor needed to put her own face on it (0090), and the
+tempting fix — an `update` policy `using (expert_id in my_expert_ids())` —
+would have handed her the fee, the credential and the blurb along with the
+photo. RLS is row-shaped. It cannot say "this column and not those".
+
+So the photo gets no policy. It gets **one `security definer` function that
+updates one column**, `set_my_expert_photo(expert_id, url)`, which checks
+the identity gate itself (`my_expert_ids()`, the same gate every consulting
+read uses), refuses any URL outside our own bucket, and touches nothing
+else. The caller still has no update right on the table. That is the general
+shape whenever a user owns one field of a record somebody else owns the rest
+of — a display name on a moderated listing, a "mark as read" on a shared
+notice — and it is worth reaching for before a column-level grant, because a
+function can also *validate* (the URL check) and a grant cannot.
+
+The bucket is the other half. `media` (0013) is private and foldered per
+user, right for a journal and wrong for a face that parents must see before
+they sign in. `expert-photos` is public-read with the same own-folder write
+rule: `<uid>/<expert_id>.jpg`, upserted, so a new photo replaces the old at
+the same path. The cost of upsert is a CDN that may keep serving the old
+bytes; the app appends `?v=<epoch>` to the stored URL, so a changed picture
+is a changed URL and no cache has to be asked to forget. And the write order
+is the reverse of local-first: the server is asked first and the local mirror
+follows a confirmed write, because a photo the parent cannot see is not a
+photo.
 
 ## 17. Reading list, in order
 

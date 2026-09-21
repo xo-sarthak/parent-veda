@@ -20,11 +20,14 @@
 //  implementation of the same pill would be the drift this file exists to stop.
 // =============================================================================
 
+import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
 import '../v2/v2_palette.dart';
+import 'doctor_art.dart';
 
 export '../auth/onboarding/onboarding_chrome.dart' show ObPrimary, ObSecondary;
 
@@ -118,14 +121,24 @@ String dcMonth(DateTime d) => '${_mo[d.month - 1]} ${d.year}';
 
 // ---- page frames ---------------------------------------------------------
 
-/// A tab body inside DoctorScaffold: title, optional trailing, scrolling
-/// children. Pull-to-refresh when [onRefresh] is given.
+/// A tab body inside DoctorScaffold. Two shapes:
 ///
-/// With a [hero], the title row is replaced by the full-bleed photo band and
-/// the FIRST child overlaps the band's bottom edge by [DcHero.overlap] —
-/// Calm's and Air NZ's composition (audit #8b). The overlap is what makes
-/// the page read as one thing rather than a picture with a list under it.
-class DcTab extends StatelessWidget {
+///   * with a [hero] — A DOOR. The photograph runs under the status bar, the
+///     eyebrow, heading and one line sit on it, and the content is a rounded
+///     SHEET that rides up over the picture (`DcHero.overlap`) — the
+///     pregnancy doors' composition, which the user asked for on every tab
+///     (2026-09-21). The picture parallaxes at half the scroll speed and the
+///     words fade as the sheet climbs; a ground strip covers the status-bar
+///     inset once the band is gone, and the clock flips light → dark.
+///   * without — a plain page: title, subtitle, children, on the 16pt gutter.
+///
+/// Pull-to-refresh when [onRefresh] is given.
+class DcTab extends StatefulWidget {
+  /// The floating tab bar's footprint: its height (74) plus the 18 it floats
+  /// above the inset. The inset itself is the scaffold's; a tab body that
+  /// ends this far short of the bottom lets its last row clear the pill.
+  static const double barClearance = 74 + 18;
+
   const DcTab({
     super.key,
     required this.title,
@@ -143,142 +156,376 @@ class DcTab extends StatelessWidget {
   final DcHero? hero;
 
   @override
+  State<DcTab> createState() => _DcTabState();
+}
+
+class _DcTabState extends State<DcTab> {
+  final ScrollController _scroll = ScrollController();
+  /// Raw scroll offset, for the parallax and the fade.
+  final ValueNotifier<double> _offset = ValueNotifier(0);
+  /// 0..1: how far the status-bar strip has faded in.
+  final ValueNotifier<double> _cover = ValueNotifier(0);
+
+  @override
+  void initState() {
+    super.initState();
+    _scroll.addListener(_onScroll);
+    WidgetsBinding.instance.addPostFrameCallback((_) => _applyOverlay());
+  }
+
+  void _onScroll() {
+    final o = _scroll.offset;
+    if (o != _offset.value) _offset.value = o;
+    final start = (widget.hero?.height ?? DcHero.doorHeight) - 48;
+    final v = ((o - start) / 40).clamp(0.0, 1.0);
+    if (v != _cover.value) {
+      final flipped = (v >= 0.5) != (_cover.value >= 0.5);
+      _cover.value = v;
+      if (flipped) _applyOverlay();
+    }
+  }
+
+  /// AnnotatedRegion alone did not flip the clock on the phone (Samsung,
+  /// 2026-09-21); setting the style directly does. Light on the photograph,
+  /// dark once the ground strip has covered the inset.
+  void _applyOverlay() {
+    if (widget.hero == null) return;
+    SystemChrome.setSystemUIOverlayStyle(_cover.value < 0.5
+        ? SystemUiOverlayStyle.light.copyWith(statusBarColor: Colors.transparent)
+        : SystemUiOverlayStyle.dark.copyWith(statusBarColor: Colors.transparent));
+  }
+
+  @override
+  void dispose() {
+    _scroll.removeListener(_onScroll);
+    _scroll.dispose();
+    _offset.dispose();
+    _cover.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final list = ListView(
+    final hero = widget.hero;
+    final children = widget.children;
+    final p = dcP;
+    Widget list = ListView(
+      controller: hero == null ? null : _scroll,
       physics: const AlwaysScrollableScrollPhysics(),
       padding: hero == null
-          ? const EdgeInsets.fromLTRB(20, 14, 20, 40)
-          : const EdgeInsets.only(bottom: 40),
+          ? const EdgeInsets.fromLTRB(16, 14, 16, 40)
+          : EdgeInsets.zero,
       children: [
         if (hero != null) ...[
-          hero!,
-          if (children.isNotEmpty)
-            Transform.translate(
-              offset: const Offset(0, -DcHero.overlap),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: children.first,
-              ),
-            ),
+          hero.withScroll(_offset),
+          // THE SHEET. Laid out straight after the band and pulled up over it
+          // by the overlap: rounded top corners over picture, never over
+          // ground (the doors learnt this — pv_door_screen.dart's hero note).
           Transform.translate(
             offset: const Offset(0, -DcHero.overlap),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: children.skip(1).toList()),
+            child: Container(
+              decoration: BoxDecoration(
+                color: p.ground,
+                borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
+              ),
+              padding: const EdgeInsets.fromLTRB(16, 22, 16, 40 + DcTab.barClearance),
+              child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: children),
             ),
           ),
         ] else ...[
           Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Expanded(
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text(title, style: dcTitle(30)),
-                if (subtitle != null) ...[
+                Text(widget.title, style: dcTitle(30)),
+                if (widget.subtitle != null) ...[
                   const SizedBox(height: 4),
-                  Text(subtitle!, style: dcMeta(14)),
+                  Text(widget.subtitle!, style: dcMeta(14)),
                 ],
               ]),
             ),
-            ?trailing,
+            ?widget.trailing,
           ]),
           const SizedBox(height: 18),
           ...children,
         ],
       ],
     );
-    if (onRefresh == null) return list;
-    return RefreshIndicator(onRefresh: onRefresh!, color: dcP.ink1, child: list);
+    if (widget.onRefresh != null) {
+      list = RefreshIndicator(onRefresh: widget.onRefresh!, color: p.ink1, child: list);
+    }
+    if (hero == null) return list;
+
+    final top = MediaQuery.of(context).padding.top;
+    return ValueListenableBuilder<double>(
+      valueListenable: _cover,
+      builder: (context, cover, _) => AnnotatedRegion<SystemUiOverlayStyle>(
+        value: cover < 0.5 ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark,
+        child: Stack(children: [
+          list,
+          Positioned(
+            left: 0,
+            right: 0,
+            top: 0,
+            height: top,
+            child: IgnorePointer(
+              child: Opacity(opacity: cover, child: ColoredBox(color: p.ground)),
+            ),
+          ),
+        ]),
+      ),
+    );
   }
 }
 
-/// The Home's photo band. A photograph of a place (never a face), an ink
-/// scrim so the words read, the date, the greeting, ONE line of information
-/// — "the information is the hero", the parent app's rule — and the
-/// doctor's own photograph top-right, with her initial when there is none.
+/// The door hero. A photograph of a place (never a face), an ink scrim so
+/// the words read, an eyebrow, a heading in Newsreader, ONE line under it
+/// — the pregnancy doors' grammar (pv_door_screen.dart `_Hero`) — and, top
+/// right, the bell and (on Home) her own photograph, both 44pt.
 ///
-/// The scrim is ink at 0 → 0.58, never the brand colour: a violet wash over
-/// a photograph is the palette thrown at the user, which is the thing the
-/// base-UI rule exists to stop.
+/// The scrim is ink at 0.52 → 0.30 → 0.34, the doors' numbers: heavier at
+/// the top for the status bar and the date, lighter through the middle so
+/// the picture is a picture, and it never fades to the page colour — that
+/// washes the type into a haze.
 class DcHero extends StatelessWidget {
   const DcHero({
     super.key,
     required this.asset,
     required this.greeting,
-    required this.dateLine,
+    this.eyebrow,
+    this.dateLine,
     this.infoLine,
     this.photoUrl,
     this.initial,
     this.onAvatar,
+    this.badge = 0,
+    this.onBell,
+    this.facts = const [],
+    this.height = doorHeight,
+    this.scroll,
   });
   final String asset;
+  /// The band's height without the status inset. The doors' 332 by default;
+  /// Profile passes a banner — LinkedIn's cover is about a quarter of the
+  /// screen, and at the door's height the photograph read as the page
+  /// (the user, 2026-09-21: "covering 40% of the screen doesn't make sense").
+  final double height;
+  /// Up to three figures on the photograph under the blurb — "0 today ·
+  /// 3 this week · 12 slots open". Fiverr's and Airbnb's host heroes: the
+  /// same facts the page repeats below, but read in one glance. Empty on the
+  /// tabs whose heading already says everything.
+  final List<DcFact> facts;
+  /// Small caps above the heading: the tab's name on a tab, nothing on Home.
+  final String? eyebrow;
+  /// The heading: the greeting on Home, the tab's phrase elsewhere.
   final String greeting;
-  final String dateLine;
+  final String? dateLine;
   final String? infoLine;
   final String? photoUrl;
   final String? initial;
   final VoidCallback? onAvatar;
+  final int badge;
+  final VoidCallback? onBell;
+  /// The list's scroll offset, for the parallax and the fade. Set by DcTab.
+  final ValueListenable<double>? scroll;
 
-  /// The band's height and how far the first card rides up into it.
-  static const double height = 296;
+  DcHero withScroll(ValueListenable<double> s) => DcHero(
+        key: key,
+        asset: asset,
+        greeting: greeting,
+        eyebrow: eyebrow,
+        dateLine: dateLine,
+        infoLine: infoLine,
+        photoUrl: photoUrl,
+        initial: initial,
+        onAvatar: onAvatar,
+        badge: badge,
+        onBell: onBell,
+        facts: facts,
+        height: height,
+        scroll: s,
+      );
+
+  /// The doors' band height (plus the status inset) and how far the sheet
+  /// rides up into it. 300 was the doors' height; the facts row needs the
+  /// extra. A tab may pass its own [height].
+  static const double doorHeight = 332;
+  static const double bannerHeight = 168;
   static const double overlap = 28;
 
   @override
   Widget build(BuildContext context) {
     final p = dcP;
     final top = MediaQuery.of(context).padding.top;
+    final total = height + top;
     return SizedBox(
-      height: height + top,
-      child: Stack(fit: StackFit.expand, children: [
-        Image.asset(asset, fit: BoxFit.cover, alignment: Alignment.center,
-            errorBuilder: (_, _, _) => Container(color: p.surfaceAlt)),
-        // Two scrims: a soft one over the whole picture so the photograph
-        // sits back, and a heavier one from the middle down so the words
-        // and the overlapping card have something to stand on.
-        DecoratedBox(
+      height: total,
+      child: ValueListenableBuilder<double>(
+        valueListenable: scroll ?? const AlwaysStoppedAnimation(0.0),
+        builder: (context, o, _) {
+          // Parallax: the picture climbs at half the sheet's speed, so it
+          // reads as behind the page rather than part of it. The words fade
+          // over the first 160pt so the sheet is never over live type.
+          final shift = (o * 0.5).clamp(0.0, total);
+          final fade = (1 - o / 180).clamp(0.0, 1.0);
+          return Stack(fit: StackFit.expand, clipBehavior: Clip.hardEdge, children: [
+            Transform.translate(
+              offset: Offset(0, shift),
+              child: Image.asset(asset, fit: BoxFit.cover, alignment: Alignment.center,
+                  errorBuilder: (_, _, _) => Container(color: p.surfaceAlt)),
+            ),
+            DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withValues(alpha: 0.52),
+                    Colors.black.withValues(alpha: 0.30),
+                    Colors.black.withValues(alpha: 0.42),
+                  ],
+                  stops: const [0, 0.55, 1],
+                ),
+              ),
+            ),
+            Positioned(
+              left: 16,
+              right: 16,
+              top: top + 12,
+              child: Opacity(
+                opacity: fade,
+                child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
+                  Expanded(
+                    child: Text(dateLine ?? '', style: dcStrong(13.5, color: Colors.white.withValues(alpha: 0.9))),
+                  ),
+                  if (onBell != null) ...[
+                    _Bell(count: badge, onTap: onBell!),
+                    const SizedBox(width: 10),
+                  ],
+                  if (onAvatar != null || photoUrl != null || initial != null)
+                    _Avatar(photoUrl: photoUrl, initial: initial, onTap: onAvatar),
+                ]),
+              ),
+            ),
+            Positioned(
+              left: 16,
+              right: 16,
+              bottom: overlap + 24,
+              child: Opacity(
+                opacity: fade,
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  if (eyebrow != null && eyebrow!.isNotEmpty) ...[
+                    Text(eyebrow!.toUpperCase(), style: dcEyebrow(color: Colors.white.withValues(alpha: 0.82))),
+                    const SizedBox(height: 8),
+                  ],
+                  // Profile passes an empty heading: its name sits under
+                  // the photo circle in the sheet (LinkedIn's arrangement).
+                  if (greeting.isNotEmpty)
+                  ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 320),
+                    child: Text(greeting,
+                        style: dcTitle(30, color: Colors.white).copyWith(shadows: const [Shadow(color: Color(0x55000000), blurRadius: 12)]),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis),
+                  ),
+                  if (infoLine != null && infoLine!.isNotEmpty) ...[
+                    const SizedBox(height: 10),
+                    ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 330),
+                      child: Text(infoLine!,
+                          style: dcBody(14.5, color: Colors.white.withValues(alpha: 0.92), w: FontWeight.w600, h: 1.5),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis),
+                    ),
+                  ],
+                  if (facts.isNotEmpty) ...[
+                    const SizedBox(height: 16),
+                    Row(children: [
+                      for (var i = 0; i < facts.length; i++) ...[
+                        if (i > 0)
+                          Container(
+                            width: 1,
+                            height: 30,
+                            margin: const EdgeInsets.symmetric(horizontal: 16),
+                            color: Colors.white.withValues(alpha: 0.35),
+                          ),
+                        // Flexible, so a wide text scale shortens a label
+                        // rather than pushing the row off the photograph.
+                        Flexible(
+                          child: Column(crossAxisAlignment: CrossAxisAlignment.start, mainAxisSize: MainAxisSize.min, children: [
+                            Text(facts[i].value, style: dcTitle(22, color: Colors.white).copyWith(height: 1.0), maxLines: 1, overflow: TextOverflow.ellipsis),
+                            const SizedBox(height: 3),
+                            Text(facts[i].label, style: dcMeta(12, color: Colors.white.withValues(alpha: 0.82)), maxLines: 1, overflow: TextOverflow.ellipsis),
+                          ]),
+                        ),
+                      ],
+                    ]),
+                  ],
+                ]),
+              ),
+            ),
+          ]);
+        },
+      ),
+    );
+  }
+}
+
+/// One figure on the hero: the value in Fraunces, the label under it.
+class DcFact {
+  const DcFact(this.value, this.label);
+  final String value;
+  final String label;
+}
+
+/// The bell on the photograph: a white disc, an ink bell, the count as a
+/// small ink pill. Never red — a count is information; the one red in this
+/// app is for a field with a problem. 44pt, the same as the avatar.
+class _Bell extends StatelessWidget {
+  const _Bell({required this.count, required this.onTap});
+  final int count;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = dcP;
+    return InkWell(
+      onTap: onTap,
+      customBorder: const CircleBorder(),
+      child: Stack(clipBehavior: Clip.none, children: [
+        Container(
+          width: 44,
+          height: 44,
+          alignment: Alignment.center,
           decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-              colors: [
-                Colors.black.withValues(alpha: 0.18),
-                Colors.black.withValues(alpha: 0.10),
-                Colors.black.withValues(alpha: 0.58),
-              ],
-              stops: const [0, 0.45, 1],
+            shape: BoxShape.circle,
+            color: p.surface,
+            boxShadow: const [BoxShadow(color: Color(0x33000000), blurRadius: 10, offset: Offset(0, 3))],
+          ),
+          child: Icon(count > 0 ? Icons.notifications_rounded : Icons.notifications_none_rounded, size: 22, color: p.ink1),
+        ),
+        if (count > 0)
+          Positioned(
+            right: -2,
+            top: -2,
+            child: Container(
+              constraints: const BoxConstraints(minWidth: 20),
+              height: 20,
+              padding: const EdgeInsets.symmetric(horizontal: 6),
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: p.ink1,
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: p.surface, width: 2),
+              ),
+              child: Text('$count', style: dcStrong(11, color: p.surface)),
             ),
           ),
-        ),
-        Positioned(
-          left: 20,
-          right: 20,
-          top: top + 14,
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Expanded(child: Text(dateLine, style: dcStrong(13.5, color: Colors.white.withValues(alpha: 0.9)))),
-            _Avatar(photoUrl: photoUrl, initial: initial, onTap: onAvatar),
-          ]),
-        ),
-        Positioned(
-          left: 20,
-          right: 20,
-          bottom: overlap + 22,
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(greeting,
-                style: dcTitle(32, color: Colors.white).copyWith(shadows: const [Shadow(color: Color(0x66000000), blurRadius: 12)]),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis),
-            if (infoLine != null && infoLine!.isNotEmpty) ...[
-              const SizedBox(height: 8),
-              Text(infoLine!,
-                  style: dcBody(15, color: Colors.white.withValues(alpha: 0.92), w: FontWeight.w600),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis),
-            ],
-          ]),
-        ),
       ]),
     );
   }
 }
 
+/// Her photograph, 44pt like the bell; her initial when there is none.
 class _Avatar extends StatelessWidget {
   const _Avatar({this.photoUrl, this.initial, this.onTap});
   final String? photoUrl;
@@ -289,8 +536,8 @@ class _Avatar extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = dcP;
     final ring = Container(
-      width: 52,
-      height: 52,
+      width: 44,
+      height: 44,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: p.surface,
@@ -299,11 +546,11 @@ class _Avatar extends StatelessWidget {
       ),
       clipBehavior: Clip.antiAlias,
       child: photoUrl == null
-          ? Center(child: Text((initial ?? '?').toUpperCase(), style: dcNum(22)))
+          ? Center(child: Text((initial ?? '?').toUpperCase(), style: dcNum(19)))
           : Image.network(
               photoUrl!,
               fit: BoxFit.cover,
-              errorBuilder: (_, _, _) => Center(child: Text((initial ?? '?').toUpperCase(), style: dcNum(22))),
+              errorBuilder: (_, _, _) => Center(child: Text((initial ?? '?').toUpperCase(), style: dcNum(19))),
             ),
     );
     if (onTap == null) return ring;
@@ -335,7 +582,7 @@ class DcScreen extends StatelessWidget {
     final p = dcP;
     Widget list = ListView(
       physics: const AlwaysScrollableScrollPhysics(),
-      padding: const EdgeInsets.fromLTRB(20, 4, 20, 32),
+      padding: const EdgeInsets.fromLTRB(16, 4, 16, 32 + DcTab.barClearance),
       children: [
         Text(title, style: dcTitle(28)),
         if (subtitle != null) ...[
@@ -368,7 +615,7 @@ class DcScreen extends StatelessWidget {
           Expanded(child: list),
           if (bottom != null)
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
               child: bottom,
             ),
         ]),
@@ -393,8 +640,12 @@ class DcSectionHead extends StatelessWidget {
       padding: const EdgeInsets.only(top: 6, bottom: 10),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          Text(eyebrow.toUpperCase(), style: dcEyebrow(color: p.action.withValues(alpha: 0.85))),
-          const Spacer(),
+          Expanded(
+            child: Text(eyebrow.toUpperCase(),
+                style: dcEyebrow(color: p.action.withValues(alpha: 0.85)),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis),
+          ),
           if (note != null)
             InkWell(
               onTap: onNote,
@@ -417,7 +668,7 @@ class DcSectionHead extends StatelessWidget {
 
 /// A white card with a hairline. Elevation in this system is a line.
 class DcCard extends StatelessWidget {
-  const DcCard({super.key, required this.child, this.padding = const EdgeInsets.all(16), this.onTap, this.tint});
+  const DcCard({super.key, required this.child, this.padding = const EdgeInsets.all(14), this.onTap, this.tint});
   final Widget child;
   final EdgeInsets padding;
   final VoidCallback? onTap;
@@ -462,11 +713,26 @@ class DcRow extends StatelessWidget {
     this.onTap,
     this.chevron = true,
     this.titleColor,
+    this.leading,
+    this.mark,
+    this.markMuted = false,
+    this.markRing = false,
   });
   final String title;
   final String? subtitle;
   final IconData? icon;
   final double? hue;
+  /// A custom leading block (a photograph thumbnail) in place of the icon well.
+  final Widget? leading;
+  /// A drawn mark (doctor_art.dart) in place of the icon well — the same
+  /// hand as the doors, and what replaced "icons everywhere".
+  final DoctorMark? mark;
+  /// The mark on the neutral surface, greyed — a row that cannot be acted on
+  /// yet (a no-show before ten minutes have passed).
+  final bool markMuted;
+  /// The mark on a white disc in a hairline ring instead of the tinted
+  /// well — for a row that explains rather than acts (doctor_art.dart).
+  final bool markRing;
   final Widget? trailing;
   final String? trailingText;
   final String? trailingSub;
@@ -478,9 +744,15 @@ class DcRow extends StatelessWidget {
   Widget build(BuildContext context) {
     final p = dcP;
     final row = Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+      padding: const EdgeInsets.symmetric(vertical: 13),
       child: Row(children: [
-        if (icon != null) ...[
+        if (leading != null) ...[
+          leading!,
+          const SizedBox(width: 14),
+        ] else if (mark != null) ...[
+          if (markRing) DoctorArtRing(mark: mark!, p: p, size: 44) else DoctorArtTile(mark: mark!, p: p, size: 44, radius: 13, muted: markMuted),
+          const SizedBox(width: 14),
+        ] else if (icon != null) ...[
           Container(
             width: 40,
             height: 40,
@@ -549,7 +821,7 @@ class DcKeyValue extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+        padding: const EdgeInsets.symmetric(vertical: 13),
         child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
           SizedBox(width: 110, child: Text(label, style: dcMeta(14.5))),
           const SizedBox(width: 12),
@@ -570,20 +842,20 @@ class DcRowGroup extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = dcP;
-    return Container(
-      decoration: BoxDecoration(
-        color: p.surface,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: p.line),
-      ),
-      clipBehavior: Clip.antiAlias,
-      child: Column(children: [
-        for (var i = 0; i < children.length; i++) ...[
-          if (i > 0) Divider(height: 1, thickness: 1, color: p.line, indent: 16, endIndent: 16),
-          children[i],
-        ],
-      ]),
-    );
+    // NO BOX. This was a bordered, rounded container with its own inset,
+    // inside the page gutter — so every line started ~37pt from the edge and
+    // the content sat in a channel ("a left and a right gutter that squishes
+    // everything in between" — the user, 2026-09-21). Airbnb's settings,
+    // Notion's and Linear's lists are rows on the ground with a hairline
+    // between them: the text sits on the page gutter and nothing else.
+    return Column(children: [
+      Divider(height: 1, thickness: 1, color: p.line),
+      for (var i = 0; i < children.length; i++) ...[
+        if (i > 0) Divider(height: 1, thickness: 1, color: p.line),
+        children[i],
+      ],
+      Divider(height: 1, thickness: 1, color: p.line),
+    ]);
   }
 }
 
@@ -610,20 +882,28 @@ class DcStat extends StatelessWidget {
       );
 }
 
-/// Two or three stats side by side in one card.
+/// Two or three stats side by side between two hairlines. It WAS a card;
+/// stacked under the other cards on Earnings the borders read as a wall
+/// down each side of the screen (the user, 2026-09-21). Same rule as the
+/// lists: rows and hairlines, never a box.
 class DcStatRow extends StatelessWidget {
   const DcStatRow(this.stats, {super.key});
   final List<DcStat> stats;
 
   @override
-  Widget build(BuildContext context) => DcCard(
-        child: Row(children: [
-          for (var i = 0; i < stats.length; i++) ...[
-            if (i > 0) Container(width: 1, height: 44, color: dcP.line, margin: const EdgeInsets.symmetric(horizontal: 14)),
-            Expanded(child: stats[i]),
-          ],
-        ]),
-      );
+  Widget build(BuildContext context) {
+    final p = dcP;
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      decoration: BoxDecoration(border: Border(top: BorderSide(color: p.line), bottom: BorderSide(color: p.line))),
+      child: Row(children: [
+        for (var i = 0; i < stats.length; i++) ...[
+          if (i > 0) Container(width: 1, height: 44, color: p.line, margin: const EdgeInsets.symmetric(horizontal: 14)),
+          Expanded(child: stats[i]),
+        ],
+      ]),
+    );
+  }
 }
 
 /// The blocker / attention card — Airbnb's "Account info is needed — Required
@@ -638,6 +918,7 @@ class DcAttention extends StatelessWidget {
     required this.onTap,
     this.icon = Icons.info_outline_rounded,
     this.urgent = false,
+    this.mark,
   });
   final String title;
   final String body;
@@ -645,21 +926,29 @@ class DcAttention extends StatelessWidget {
   final VoidCallback onTap;
   final IconData icon;
   final bool urgent;
+  final DoctorMark? mark;
 
   @override
   Widget build(BuildContext context) {
     final p = dcP;
     final well = v2BlockTint(urgent ? 344 : 42, p);
-    return DcCard(
+    // A row between hairlines, not a card — see DcStatRow.
+    return InkWell(
       onTap: onTap,
+      child: Container(
+      padding: const EdgeInsets.symmetric(vertical: 14),
+      decoration: BoxDecoration(border: Border(top: BorderSide(color: p.line), bottom: BorderSide(color: p.line))),
       child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Container(
-          width: 40,
-          height: 40,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(color: well, borderRadius: BorderRadius.circular(12)),
-          child: Icon(icon, size: 21, color: p.ink1),
-        ),
+        if (mark != null)
+          DoctorArtTile(mark: mark!, p: p, size: 44, radius: 13)
+        else
+          Container(
+            width: 40,
+            height: 40,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(color: well, borderRadius: BorderRadius.circular(12)),
+            child: Icon(icon, size: 21, color: p.ink1),
+          ),
         const SizedBox(width: 14),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -672,6 +961,7 @@ class DcAttention extends StatelessWidget {
         ),
         Icon(Icons.chevron_right_rounded, size: 24, color: p.ink3),
       ]),
+      ),
     );
   }
 }
@@ -781,10 +1071,13 @@ class DcStatusPill extends StatelessWidget {
 
 /// The empty state — the feature's advertisement, never a blank.
 class DcEmpty extends StatelessWidget {
-  const DcEmpty(this.title, this.body, {super.key, this.icon = Icons.inbox_outlined, this.action, this.onAction});
+  const DcEmpty(this.title, this.body, {super.key, this.icon = Icons.inbox_outlined, this.action, this.onAction, this.mark});
   final String title;
   final String body;
   final IconData icon;
+  /// A drawn mark in place of the line icon — the empty state is the
+  /// feature's advertisement, and an advertisement is drawn, not iconed.
+  final DoctorMark? mark;
   final String? action;
   final VoidCallback? onAction;
 
@@ -794,7 +1087,7 @@ class DcEmpty extends StatelessWidget {
     return DcCard(
       padding: const EdgeInsets.fromLTRB(18, 22, 18, 20),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Icon(icon, size: 26, color: p.ink3),
+        if (mark != null) DoctorArtTile(mark: mark!, p: p, size: 48, radius: 15) else Icon(icon, size: 26, color: p.ink3),
         const SizedBox(height: 12),
         Text(title, style: dcStrong(16)),
         const SizedBox(height: 4),
@@ -818,10 +1111,11 @@ class DcEmpty extends StatelessWidget {
 /// A switch row: label + optional sub on the left, the switch on the right.
 /// The switch's on-state is one of the five places violet may appear.
 class DcSwitchRow extends StatelessWidget {
-  const DcSwitchRow({super.key, required this.title, required this.value, required this.onChanged, this.subtitle, this.icon});
+  const DcSwitchRow({super.key, required this.title, required this.value, required this.onChanged, this.subtitle, this.icon, this.mark});
   final String title;
   final String? subtitle;
   final IconData? icon;
+  final DoctorMark? mark;
   final bool value;
   final ValueChanged<bool> onChanged;
 
@@ -830,12 +1124,18 @@ class DcSwitchRow extends StatelessWidget {
         title: title,
         subtitle: subtitle,
         icon: icon,
+        mark: mark,
         chevron: false,
         onTap: () => onChanged(!value),
+        // Ink, not violet. The base-UI rule allowed the switch's on-state as
+        // one of the five places for the brand colour; the user rejected it
+        // on the doctor app ("the toggles are purple — makes no sense",
+        // 2026-09-21). Ink for actions, and a switch is an action.
         trailing: Switch.adaptive(
           value: value,
           onChanged: onChanged,
-          activeTrackColor: dcP.action,
+          activeTrackColor: dcP.ink1,
+          activeThumbColor: dcP.surface,
         ),
       );
 }
@@ -852,6 +1152,7 @@ class DcInput extends StatelessWidget {
     this.onSubmitted,
     this.autofocus = false,
     this.capitals = false,
+    this.errorText,
   });
   final String label;
   final TextEditingController controller;
@@ -862,11 +1163,18 @@ class DcInput extends StatelessWidget {
   final bool capitals;
   final ValueChanged<String>? onSubmitted;
 
+  /// A problem with THIS field: the border turns red and the words sit
+  /// under it in red. Subway, CHOPT and Target do exactly this (Mobbin,
+  /// 2026-09-21); the tinted block the auth screen had is the callout
+  /// language the user rejected on sight. Nothing but the text and the line.
+  final String? errorText;
+
   @override
   Widget build(BuildContext context) {
     final p = dcP;
+    final bad = errorText != null && errorText!.isNotEmpty;
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Text(label.toUpperCase(), style: dcEyebrow()),
+      Text(label.toUpperCase(), style: dcEyebrow(color: bad ? dcError : null)),
       const SizedBox(height: 7),
       TextField(
         controller: controller,
@@ -886,20 +1194,32 @@ class DcInput extends StatelessWidget {
           contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide(color: p.line, width: 1.2),
+            borderSide: BorderSide(color: bad ? dcError : p.line, width: bad ? 1.4 : 1.2),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide(color: p.ink1, width: 1.4),
+            borderSide: BorderSide(color: bad ? dcError : p.ink1, width: 1.4),
           ),
         ),
       ),
+      if (bad) ...[
+        const SizedBox(height: 7),
+        Text(errorText!, style: dcBody(13.5, color: dcError, w: FontWeight.w600)),
+      ],
     ]);
   }
 }
 
-/// A notice well — the calm callout. Sand for information, rose for a
-/// problem. Never a fill of the action colour.
+/// The one red. Text and hairlines only — never a fill.
+const Color dcError = Color(0xFFD92D20);
+
+/// A note: an icon and a line of quiet text, no background. This USED to be
+/// a tinted rounded block (sand for information, rose for a problem) and
+/// the user rejected the shape itself — "a background of colour in a
+/// rectangle with soft edges" — on the sign-in screen, 2026-09-21. The
+/// message is the words; a coloured box behind them is a second message
+/// ("look, a callout") that says nothing. Problems are red text; notes are
+/// grey text with an info mark.
 class DcNotice extends StatelessWidget {
   const DcNotice(this.text, {super.key, this.problem = false});
   final String text;
@@ -908,14 +1228,15 @@ class DcNotice extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = dcP;
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: v2BlockTint(problem ? 344 : 42, p),
-        borderRadius: BorderRadius.circular(12),
+    final c = problem ? dcError : p.ink2;
+    return Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Padding(
+        padding: const EdgeInsets.only(top: 2),
+        child: Icon(problem ? Icons.error_outline_rounded : Icons.info_outline_rounded, size: 17, color: c),
       ),
-      child: Text(text, style: dcBody(14, h: 1.45)),
-    );
+      const SizedBox(width: 8),
+      Expanded(child: Text(text, style: dcBody(14, h: 1.45, color: c, w: problem ? FontWeight.w600 : FontWeight.w500))),
+    ]);
   }
 }
 

@@ -50,6 +50,36 @@ const kDoctorHeroImages = <String, DoctorHeroImage>{
     creator: 'Aaron Burden',
     source: 'StockSnap (CC0)',
   ),
+  // The tabs' own pictures (2026-09-21): a tab is a door, and a door opens
+  // on its picture. Fixed per tab, not by hour — a tab is a place.
+  'appointments': DoctorHeroImage(
+    asset: 'assets/doctor/hero_appointments.jpg',
+    title: 'A consulting room',
+    creator: 'Breather',
+    source: 'StockSnap (CC0)',
+  ),
+  'earnings': DoctorHeroImage(
+    asset: 'assets/doctor/hero_earnings.jpg',
+    title: 'A notebook of plans',
+    creator: 'Jeffrey Betts',
+    source: 'StockSnap (CC0)',
+  ),
+  // 2026-09-21 evening: Availability and Profile borrowed Home's morning and
+  // evening plates, so after five Home and Profile were the same picture.
+  // Their own now. StockSnap's CDN answers 403 to a script; these came
+  // through Openverse's own proxy at 960px (`/thumb/?full_size=true`).
+  'availability': DoctorHeroImage(
+    asset: 'assets/doctor/hero_availability.jpg',
+    title: 'Flowers on a shelf',
+    creator: 'Burst',
+    source: 'StockSnap (CC0)',
+  ),
+  'profile': DoctorHeroImage(
+    asset: 'assets/doctor/hero_profile.jpg',
+    title: 'A chair and a shelf',
+    creator: 'Breather',
+    source: 'StockSnap (CC0)',
+  ),
 };
 
 /// Which photograph the hour gets: morning until noon, afternoon until five,

@@ -525,15 +525,91 @@ fine — but a 1:1 offering with capacity > 1 would be misfiled. None exists.
 chart under the by-source legend, attendee names on a class, editing the
 public profile in-app (§5.1: editorial), self-serve rate negotiation.
 
-**5.4j The Home hero (2026-09-19, audit #8b).** Three CC0 photographs by
-hour of day (`assets/doctor/`, credits in `doctor_hero_images.dart`), the
-date, the greeting, one information line, the doctor's own photograph
-(`expert_profiles.photo_url`, via `DoctorSession.profile`), the first card
-overlapping the band, and a "How parents see you" card. **Not walked** —
-the device was the other terminal's. Owed from it: the credits are listed
-in code but not yet shown under Profile → About; a doctor with no
-`photo_url` sees her initial, which is honest but is the thing the panel
-should fill first.
+**5.4j The Home hero (2026-09-19, audit #8b) — WALKED 2026-09-21.** Three
+CC0 photographs by hour of day (`assets/doctor/`, credits in
+`doctor_hero_images.dart`), the date, the greeting, one information line,
+the doctor's own photograph (`expert_profiles.photo_url`, via
+`DoctorSession.profile`), the first card overlapping the band, and a "How
+parents see you" card. Three fixes from the walk: the first child under the
+band is always a card (the eyebrow sat half on the photo); an empty source
+row says the rate once, not the invitation and the rate; a ground strip
+fades in over the status-bar inset as the band scrolls off, with the clock
+flipping light → dark. The **sign-in screens were walked the same day**:
+the code route sends (Supabase accepts; `doctor@test.com` is not a real
+inbox, so no code can arrive for it), the password route signs in and
+resolves. Owed: the photo credits are listed in code but not yet shown
+under Profile → About; a doctor with no `photo_url` sees her initial, which
+is honest but is the thing the panel should fill first; the seed has not
+been run yet (`0085` has — the rows read 80 / 55 / 30 / 20 / 35 / 10).
+
+**5.4k Home v2 (2026-09-21, audit #8c) — BUILT and WALKED with the seeded
+month.** The user's two calls: the home read as plain (a stack of empty
+cards), and leading with "add your bank account" was unfair. Mobbin's
+seller/host homes answered both. Fixed spine: hero → next up (or the week
+strip) → quick actions → this week (+ slots open, + the bookings switch)
+→ set up your practice (rail, gone at 4/4) → needs you (≤3 rows, see all)
+→ for you (three doctor reads, `lib/data/reads/doctor_reads.dart`) → from
+ParentVeda (`0088 expert_notices`) → classes → public card. The variable
+pile is `doctor_tasks.dart`, shown as the bell count, the rows and
+`DoctorInboxScreen`. Owed: the seed's masterclass does not appear under
+Classes (classes come from the compiled catalogue, not `booking_slots` —
+the §5.1c gap); the read covers are Openverse-proxied StockSnap, to be
+mirrored to R2 with the others; `0088` and `0089` must be RUN; the demo
+must be re-seeded after `0089` (its backdated rows froze 0%).
+
+**5.4l Every tab is a door (2026-09-21, audit #8d) — BUILT and WALKED.**
+All five tabs open on a photograph with an eyebrow, a Fraunces heading and
+a blurb, a bell with the pending count and the avatar; the sheet rides over
+the photo with parallax and the clock flips light/dark at the cover point.
+`DoctorMark` (`doctor_art.dart`) replaces the Material icons in every
+well; switches are ink. Owed: photo credits under Profile → About; the
+parallax is judged by eye, not by test. (Availability and Profile got
+plates of their own the same evening — `hero_availability.jpg`,
+`hero_profile.jpg` — after Home and Profile showed the same picture after
+five.)
+
+**5.4m The walk's three corrections (2026-09-21, audit §9.1) — BUILT and
+WALKED.** Date as the hero's eyebrow, a sentence with a relative day, and
+three figures on the photograph; the bar floats like parenting's; the bell
+holds derived UPDATES (`doctor_updates.dart`, read-state local) and the
+chores are one swipe rail on Home. Owed: a server-side read-state if the
+doctor ever uses two phones (today it is per device); the seeded earnings
+all say "just now" because the seed stamps `occurred_at = now()` — spread
+them over the month when the seed is next touched; `DoctorInboxScreen` is
+unreachable, delete after a week if nothing is missed.
+
+**5.4n Three more from the walk (2026-09-21, later).** Back on any
+non-Home tab returns to Home (`PopScope` in `doctor_scaffold.dart`) — a
+task's verb switches a tab, so Back had nothing to pop and closed the app;
+"Write" on the prescriptions card lands on Appointments → Past
+(`DoctorAppointmentsTab.openOn`), where the owed ones are; the referral kit
+moved onto the doctor chrome (it was the last screen in the parenting
+palette — violet code, violet icons, a tinted foot panel) with WhatsApp's
+own glyph on its row. Owed: the kit's card shows the care-partner demo
+identity ("Dr Meera Rao · Rainbow Hospital") rather than the signed-in
+doctor — `PartnerDashboardStore` resolves the partner from its own seed,
+not from `expert_profiles`; join them when the partner approval flow lands
+(§13.0).
+
+**5.4o The sweep (2026-09-21, later) — DONE.** No Material icon in a well
+and no parenting palette on any reachable doctor screen (audit §9.2);
+prescription, poster, practice-setup and the kit are on the chrome; a
+ring placement for rows that explain. Owed: the practice-setup form still
+sends nothing (it never did — `DoctorOnboardingStore` records skips only);
+the upload rows say so and point at partners@parentveda.com. (Moot the same
+evening — see §5.4p: the form is unreachable.)
+
+**5.4p Earnings walls, the form that asked twice, the photo (2026-09-21,
+later still) — BUILT; photo NOT walked to the server.** Stat row and
+attention card unboxed (audit §9.3). Practice-setup row commented out —
+KYC happens before the account. The photo: `doctor_photo_sheet.dart`,
+`DoctorSession.setPhoto/clearPhoto`, `SupabaseRepo.uploadPublicFile`,
+migration `0090_expert_photo.sql`. **The user must (1) create the PUBLIC
+bucket `expert-photos` in the dashboard, (2) run 0090,** then pick a photo
+on the phone and check it lands on the profile and in the parent app's
+directory. Owed: nothing crops the picture — the avatar shows a centre
+square of whatever was chosen; a square crop step is the next thing if
+doctors send landscape shots.
 
 **5.4i Kept for revert, unreachable:** `doctor_home_screen.dart`,
 `doctor_appointments_screen.dart`, `doctor_schedule_screen.dart`,
@@ -8734,10 +8810,25 @@ Click by click at the user's ask ("recursive tree"). Built and walked:
   Guide, which would turn the rail into a list).
 - "What she can do for you" → "What they can do for you".
 
+### 70.6 Seven days, the week at a glance, pictorial nutrients — 2026-09-21
+- **Every English chart has seven days** (`diet_chart_days_more.dart`, spliced
+  into `kChartContent`; the Hindi chart keeps three). Every new line is in
+  the food-values table (the test holds it). The plate rotates through
+  seven now.
+- **The week at a glance** (`_WeekGrid` on `DietChartPlanScreen`): days
+  across, meals down, the dish's first words in each cell, the chosen day
+  underlined, tap a column → that day. Scrolls under the gutter.
+- **Pictorial nutrients:** `NutritionTopThree` — the three needs a dish is
+  strongest in as the ticks' own marks with amounts, on the recipe page and
+  the meal sheet; the text pills are gone (`nutritionGlance` strings kept
+  in data for revert). `Recipe.fact` — one "Did you know" per recipe (41),
+  a rule-left line under the marks.
+- **Asked, awaiting his call:** the Day 1·2·3 chip strip on the plan screen
+  duplicates the grid's tappable header — comment it out? The recipe grid
+  cards could carry the three marks tiny instead of the kcal line.
+
 **Owed from the dive**
-- **Charts: three days → seven.** The user asked why three; the plan screen
-  and the plate take any number. Recommended two passes (Full month,
-  Vegetarian, Non-veg, First trimester, GDM first). His call on order.
+- ~~Charts: three days → seven.~~ Done on the 21st (all but the Hindi chart).
 - **Category illustrations** (Blinkit-style 3D, one style) — Higgsfield,
   seven images, on his go; the tiles take a URL.
 - **Photos for 14 of the 24 new recipes** — the dish-word fallback holds;

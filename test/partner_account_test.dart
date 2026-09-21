@@ -23,6 +23,7 @@ import 'package:parentveda/doctor/doctor_session.dart';
 // screens a partner actually sees.
 import 'package:parentveda/screens/doctor/doctor_home_tab.dart';
 import 'package:parentveda/screens/doctor/doctor_profile_tab.dart';
+import 'package:parentveda/screens/doctor/doctor_task_feed.dart';
 import 'package:parentveda/screens/doctor/doctor_referral_kit_screen.dart';
 
 /// A hospital: a real partner with NO expert record. The case that was broken.
@@ -111,8 +112,8 @@ void main() {
       DoctorSession.instance.enterAsPartner(_org.id);
       PartnerDashboardStore.instance.debugSeed(partner: _org);
 
-      await t.pumpWidget(const MaterialApp(
-          home: Scaffold(body: DoctorProfileTab())));
+      await t.pumpWidget(MaterialApp(
+          home: Scaffold(body: DoctorProfileTab(goTo: _noTab))));
       await t.pump();
 
       expect(find.text('Nova IVF Fertility'), findsWidgets);

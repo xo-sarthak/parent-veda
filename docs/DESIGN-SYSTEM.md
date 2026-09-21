@@ -369,7 +369,7 @@ clean, stylistically unified image beat photo overlays*, because mixed photos
 have inconsistent light and mood and "don't feel like they belong to the same
 product". Drawn marks are unified by construction.
 
-## 3.1 The six families
+## 3.1 The seven families
 
 | Family | Size | Where |
 |---|---|---|
@@ -379,6 +379,29 @@ product". Drawn marks are unified by construction.
 | `DevMark` | 34dp | development areas (6) |
 | `IntentMark` | 64dp | hub intent doors (4) |
 | `V3DailyMark` | 28dp | journal quick actions (5) |
+| `DoctorMark` | 44dp | ParentVeda+ (the doctor app): quick actions, rows, rails, empties (18) |
+
+`DoctorMark` (`lib/screens/doctor/doctor_art.dart`, 2026-09-21) is the
+seventh family and the first outside the parent app. (The doctor hero also
+carries up to three figures on the photograph — `DcFact` — value in
+Fraunces 22 over a 12pt label, hairline dividers; the facts the page
+repeats below, read in one glance. Home only; a tab whose heading already
+says everything passes none.) It follows the same
+rules — one filled shape at 92%, white knockouts, one path, no halo — and
+ships in a tinted tile (`DoctorArtTile`, radius 13 at 44, 15 at 48, 16 at
+56) because a doctor's rows are about money and patients and want a stop
+the eye can land on. Material icons remain only where an icon is a verb
+(back, chevron, join, share) — see §3.4.
+
+Two placements in the doctor app, chosen by what the row does (2026-09-21,
+"a bit of differentiation"): the **tinted well** (`DoctorArtTile`) on
+anything that opens, sends or saves; the **hollow ring on white**
+(`DoctorArtRing`, the parent app's need-tick placement) on a row that
+explains — "how a consultation works", "you are all caught up". Same mark,
+same seed colour, so the two read as one hand. The third placement the
+parent app has, bare on a photograph, is not used here. Sweep done the same
+day: no Material icon remains in a well anywhere reachable in the doctor
+app; `DoctorTask` lost its `IconData`.
 
 ⚠️ **A family is authored for its size. It is not a scale factor.** At 34dp a
 brain with folds is a smudge; at 110dp the same shape is bare. Redraw, never
@@ -917,6 +940,50 @@ fix, offer a way out.
 Label above in `eyebrow` style. **Sliders and wheels for one-time setup; text
 fields and steppers for anything repeated or precise.**
 
+
+### Lists are not boxed — SETTLED 2026-09-21, on the doctor Earnings tab
+
+**A group of rows is rows on the page with a hairline between them, and a
+hairline above and below. Never a bordered, rounded container with its own
+inset inside the page gutter.** The user, on the Earnings tab: "a left and
+a right gutter that margins out … and squishes everything into between."
+The double inset (gutter + box border + box padding) put every line ~37pt
+from the edge and made the content read as a channel. Airbnb's settings,
+Notion's and Linear's lists never box; the row's text sits on the page
+gutter and the hairline does the separating.
+
+Cards still exist for *objects* — a consultation, the stat trio, a set-up
+step — and they sit on the same 16pt gutter with a 14pt inset. Rails run
+edge to edge (see the door rule). Consumer: `DcRowGroup` / `DcRow` in
+`doctor_chrome.dart`; the parent-side `pp_common` row groups are owed the
+same pass.
+
+### Errors and notes — SETTLED 2026-09-21, on the doctor sign-in
+
+**A problem with a field is red text under that field and the field's own
+border in red. Nothing else.** No tinted block, no rounded box, no modal.
+The user rejected the tinted callout on sight ("a background of colour in a
+rectangle with soft edges — I hate this design language"). Mobbin agrees on
+the clean end of the range: Subway, CHOPT and Target show the words beside
+the field and colour the line; Kraken, TradingView and HBO Max box them;
+LARQ and Bloom interrupt with a modal. We do the first.
+
+Rules that fall out of it:
+
+* The error names the field it belongs to by sitting under it. A page-level
+  message that belongs to no field is one line of red text with an
+  error mark, not a box.
+* The error clears the instant the field is edited. A red line that stays
+  while she is already typing the fix is the app arguing with her.
+* Notes (information, not problems) are grey text with an info mark. Same
+  rule: the words are the message; a coloured box behind them is a second
+  message that says nothing.
+* The one red is `dcError` / `AppTheme.danger` and it is spent on text and
+  hairlines only — never a fill.
+
+First consumers: `DcInput.errorText` and `DcNotice` in
+`lib/screens/doctor/doctor_chrome.dart`. The parent-side `onboarding_chrome`
+still carries a boxed notice; it is the next thing to bring in line.
 ## 4.14 Chips
 
 Radius 999, `surface`, `line` border, Manrope 13/w600 `ink1`. Selected: hue well

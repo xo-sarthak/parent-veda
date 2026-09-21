@@ -41,6 +41,7 @@ import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../doctor/doctor_session.dart';
+import 'doctor_art.dart';
 import 'doctor_chrome.dart';
 
 class DoctorAuthScreen extends StatefulWidget {
@@ -68,10 +69,26 @@ class _DoctorAuthScreenState extends State<DoctorAuthScreen> {
   static const _codeLength = 6;
 
   @override
+  void initState() {
+    super.initState();
+    // The error belongs to the moment it was made. The instant she edits the
+    // field it is gone — a red line that stays while she is already typing
+    // the fix is the app arguing with her (walked 2026-09-21).
+    for (final c in [_email, _code, _password]) {
+      c.addListener(_clearError);
+    }
+  }
+
+  void _clearError() {
+    if (_error != null && mounted) setState(() => _error = null);
+  }
+
+  @override
   void dispose() {
-    _email.dispose();
-    _code.dispose();
-    _password.dispose();
+    for (final c in [_email, _code, _password]) {
+      c.removeListener(_clearError);
+      c.dispose();
+    }
     super.dispose();
   }
 
@@ -166,8 +183,16 @@ class _DoctorAuthScreenState extends State<DoctorAuthScreen> {
       await _afterSignIn();
     } on AuthException catch (e) {
       // Supabase says the same thing for a wrong password and an address that
-      // has never registered. Passed through unchanged on purpose.
-      if (mounted) setState(() { _busy = false; _error = e.message; });
+      // has never registered — kept that way on purpose (no account probing),
+      // but said in our words rather than its.
+      if (mounted) {
+        setState(() {
+          _busy = false;
+          _error = e.message.toLowerCase().contains('invalid')
+              ? 'That email and password do not match.'
+              : e.message;
+        });
+      }
     } catch (_) {
       if (mounted) {
         setState(() {
@@ -227,19 +252,10 @@ class _DoctorAuthScreenState extends State<DoctorAuthScreen> {
           ),
           Expanded(
             child: ListView(
-              padding: const EdgeInsets.fromLTRB(24, 8, 24, 24),
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
               children: [
                 Row(children: [
-                  Container(
-                    width: 44,
-                    height: 44,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      color: p.surfaceAlt,
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(Icons.medical_services_outlined, size: 22, color: p.ink1),
-                  ),
+                  DoctorArtTile(mark: DoctorMark.plus, p: p, size: 44, radius: 14),
                   const SizedBox(width: 12),
                   Text('ParentVeda+', style: dcStrong(17)),
                 ]),
@@ -249,15 +265,11 @@ class _DoctorAuthScreenState extends State<DoctorAuthScreen> {
                   _Step.code => _codeStep(p),
                   _Step.password => _passwordStep(p),
                 },
-                if (_error != null) ...[
-                  const SizedBox(height: 16),
-                  DcNotice(_error!, problem: true),
-                ],
               ],
             ),
           ),
           Padding(
-            padding: const EdgeInsets.fromLTRB(24, 8, 24, 20),
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
             child: Column(mainAxisSize: MainAxisSize.min, children: [
               ObPrimary(
                 p: p,
@@ -314,6 +326,7 @@ class _DoctorAuthScreenState extends State<DoctorAuthScreen> {
           keyboard: TextInputType.emailAddress,
           autofocus: true,
           onSubmitted: (_) => _sendCode(),
+          errorText: _error,
         ),
         const SizedBox(height: 20),
         Text(
@@ -338,6 +351,7 @@ class _DoctorAuthScreenState extends State<DoctorAuthScreen> {
           keyboard: TextInputType.number,
           autofocus: true,
           onSubmitted: (_) => _verifyCode(),
+          errorText: _error,
         ),
         const SizedBox(height: 20),
         Text(
@@ -363,6 +377,7 @@ class _DoctorAuthScreenState extends State<DoctorAuthScreen> {
           controller: _password,
           obscure: true,
           onSubmitted: (_) => _signInWithPassword(),
+          errorText: _error,
         ),
       ];
 }

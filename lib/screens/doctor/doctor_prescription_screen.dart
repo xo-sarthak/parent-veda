@@ -10,7 +10,7 @@ import 'package:flutter/material.dart';
 
 import '../../booking/prescription.dart';
 import '../../doctor/doctor_session.dart';
-import '../post_pregnancy/pp_common.dart';
+import 'doctor_chrome.dart';
 
 class DoctorPrescriptionScreen extends StatefulWidget {
   const DoctorPrescriptionScreen({
@@ -23,7 +23,10 @@ class DoctorPrescriptionScreen extends StatefulWidget {
   final String bookingId;
   final String title;
 
-  /// Where "back" actually goes.
+  /// Where "back" actually goes. Since the chrome's back is a plain arrow
+  /// (2026-09-21) the label is no longer drawn; kept so callers need not
+  /// change, and so the history below still reads.
+  ///
   ///
   /// It was hardcoded to 'Dashboard', which is right from the home screen and
   /// wrong from Appointments - the only other door into this screen, and the
@@ -138,106 +141,64 @@ class _DoctorPrescriptionScreenState extends State<DoctorPrescriptionScreen> {
     }
   }
 
-  void _snack(String m) => ScaffoldMessenger.of(context)
-    ..clearSnackBars()
-    ..showSnackBar(SnackBar(content: Text(m)));
+  void _snack(String m) => dcToast(context, m);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: ppBg,
-      body: SafeArea(
-        bottom: false,
-        child: Column(children: [
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 24),
-              children: [
-                ppBack(context, widget.backLabel),
-                const SizedBox(height: 16),
-                ppEyebrow('Prescription', color: ppPurple),
-                const SizedBox(height: 8),
-                Text(_amending ? 'Update the prescription' : 'Write a prescription',
-                    style: ppFraunces(26, h: 1.1)),
-                const SizedBox(height: 6),
-                Text('For ${widget.title}.',
-                    style: ppBody(13, color: ppSoft)),
-                const SizedBox(height: 22),
-                Text('MEDICINES',
-                    style: ppBody(11, color: ppMuted, w: FontWeight.w800)
-                        .copyWith(letterSpacing: 1.0)),
-                const SizedBox(height: 10),
-                for (var i = 0; i < _rows.length; i++) _medRow(i),
-                const SizedBox(height: 4),
-                GestureDetector(
-                  onTap: () => setState(() => _rows.add(_Row())),
-                  behavior: HitTestBehavior.opaque,
-                  child: Row(children: [
-                    const Icon(Icons.add_circle_outline_rounded,
-                        size: 18, color: ppPurple),
-                    const SizedBox(width: 7),
-                    Text('Add another medicine',
-                        style: ppBody(13, color: ppPurple, w: FontWeight.w700)),
-                  ]),
-                ),
-                const SizedBox(height: 24),
-                Text('ADVICE / NOTES',
-                    style: ppBody(11, color: ppMuted, w: FontWeight.w800)
-                        .copyWith(letterSpacing: 1.0)),
-                const SizedBox(height: 10),
-                _field(_advice, 'Rest, fluids, when to follow up…', lines: 4),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(top: BorderSide(color: ppHair)),
-            ),
-            child: GestureDetector(
-              onTap: _saving ? null : _save,
-              behavior: HitTestBehavior.opaque,
-              child: Opacity(
-                opacity: _saving ? 0.7 : 1,
-                child: Container(
-                  height: 52,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                      color: ppPurple, borderRadius: BorderRadius.circular(16)),
-                  child: Text(_saving
-                      ? (_amending ? 'Updating…' : 'Sending…')
-                      : (_amending ? 'Update prescription' : 'Send prescription'),
-                      style: ppBody(15, color: Colors.white, w: FontWeight.w700)),
-                ),
-              ),
-            ),
-          ),
-        ]),
+    final p = dcP;
+    // 2026-09-21: onto the doctor chrome. This was the doctor's most-used
+    // screen after Appointments and the last one still in the parenting
+    // palette — violet eyebrow, violet button, tinted fields.
+    return DcScreen(
+      title: _amending ? 'Update the prescription' : 'Write a prescription',
+      subtitle: 'For ${widget.title}.',
+      bottom: ObPrimary(
+        p: p,
+        label: _saving
+            ? (_amending ? 'Updating…' : 'Sending…')
+            : (_amending ? 'Update prescription' : 'Send prescription'),
+        onTap: _saving ? null : _save,
       ),
+      children: [
+        const DcSectionHead('Medicines'),
+        for (var i = 0; i < _rows.length; i++) ...[_medRow(i), const SizedBox(height: 10)],
+        InkWell(
+          onTap: () => setState(() => _rows.add(_Row())),
+          borderRadius: BorderRadius.circular(10),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Row(children: [
+              Icon(Icons.add_rounded, size: 20, color: p.action),
+              const SizedBox(width: 6),
+              Text('Add another medicine', style: dcStrong(14, color: p.action)),
+            ]),
+          ),
+        ),
+        const SizedBox(height: 22),
+        const DcSectionHead('Advice and notes'),
+        _field(_advice, 'Rest, fluids, when to follow up…', lines: 4),
+        const SizedBox(height: 12),
+        const DcNotice('The parent sees this the moment you save. Anything clinical is yours; ParentVeda never changes a word.'),
+      ],
     );
   }
 
   Widget _medRow(int i) {
     final r = _rows[i];
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+    final p = dcP;
+    return DcCard(
       padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: ppHair),
-      ),
       child: Column(children: [
         Row(children: [
           Expanded(child: _field(r.med, 'Medicine name')),
           if (_rows.length > 1) ...[
-            const SizedBox(width: 8),
-            GestureDetector(
-              onTap: () => setState(() {
+            const SizedBox(width: 6),
+            IconButton(
+              onPressed: () => setState(() {
                 _rows.removeAt(i).dispose();
               }),
-              child: const Icon(Icons.close_rounded, size: 20, color: ppMuted),
+              icon: Icon(Icons.close_rounded, size: 20, color: p.ink3),
+              tooltip: 'Remove',
             ),
           ],
         ]),
@@ -251,23 +212,29 @@ class _DoctorPrescriptionScreenState extends State<DoctorPrescriptionScreen> {
     );
   }
 
-  Widget _field(TextEditingController c, String hint, {int lines = 1}) =>
-      TextField(
-        controller: c,
-        maxLines: lines,
-        style: ppBody(13.5, color: ppInk),
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: ppBody(13, color: ppMuted),
-          isDense: true,
-          filled: true,
-          fillColor: ppPanel,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 12, vertical: 11),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(10),
-            borderSide: BorderSide.none,
-          ),
+  /// The chrome's field (DcInput) without the label: three sit on one row.
+  Widget _field(TextEditingController c, String hint, {int lines = 1}) {
+    final p = dcP;
+    return TextField(
+      controller: c,
+      maxLines: lines,
+      style: dcBody(15),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: dcBody(15, color: p.ink3),
+        isDense: true,
+        filled: true,
+        fillColor: p.surface,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: p.line, width: 1.2),
         ),
-      );
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: p.ink1, width: 1.4),
+        ),
+      ),
+    );
+  }
 }

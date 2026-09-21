@@ -23,6 +23,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../doctor/doctor_ledger.dart';
+import 'doctor_art.dart';
 import 'doctor_chrome.dart';
 
 class DoctorSourceScreen extends StatefulWidget {
@@ -87,13 +88,13 @@ class _DoctorSourceScreenState extends State<DoctorSourceScreen> {
                   'No videos yet',
                   'When ParentVeda films with you, each video is listed here with its link and your share. '
                   'Revenue is added month by month as the channel reports it.',
-                  icon: Icons.videocam_outlined,
+                  mark: DoctorMark.video,
                 )
               else
                 DcRowGroup(children: [
                   for (final v in l.videos)
                     DcRow(
-                      icon: Icons.play_circle_outline_rounded,
+                      mark: DoctorMark.video,
                       title: v.title.isEmpty ? v.url : v.title,
                       subtitle: 'Your share ${dcPercent(v.shareBps)} · added ${dcDate(v.addedAt, year: true)}',
                       trailing: Icon(Icons.open_in_new_rounded, size: 20, color: p.ink3),
@@ -109,7 +110,7 @@ class _DoctorSourceScreenState extends State<DoctorSourceScreen> {
               DcEmpty(
                 'Nothing in ${l.period.label.toLowerCase()}',
                 src.emptyLine,
-                icon: Icons.receipt_outlined,
+                mark: DoctorMark.earnings,
               )
             else
               DcRowGroup(children: [

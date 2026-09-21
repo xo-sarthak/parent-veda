@@ -27,13 +27,24 @@ import '../../doctor/consult_policy.dart';
 import '../../doctor/doctor_reminders.dart';
 import '../../doctor/doctor_roster.dart';
 import '../../doctor/doctor_session.dart';
+import '../../doctor/doctor_hero_images.dart';
+import 'doctor_art.dart';
 import 'doctor_chrome.dart';
 import 'doctor_class_launch.dart';
+import 'doctor_task_feed.dart';
 import 'doctor_classes_screen.dart';
 import 'doctor_prescription_screen.dart';
 
 class DoctorAppointmentsTab extends StatefulWidget {
-  const DoctorAppointmentsTab({super.key});
+  const DoctorAppointmentsTab({super.key, required this.goTo});
+  final void Function(DoctorTab) goTo;
+
+  /// Which segment the next build opens on — 0 today, 1 upcoming, 2 past.
+  /// Set by a task's verb before `goTo(appointments)`: "Write" on the
+  /// prescriptions card must land on Past, where the owed ones are, not on
+  /// an empty Today (the walk, 2026-09-21). Consumed once, then cleared, so
+  /// a later tap on the tab itself opens on Today as usual.
+  static int? openOn;
 
   @override
   State<DoctorAppointmentsTab> createState() => _DoctorAppointmentsTabState();
@@ -45,6 +56,11 @@ class _DoctorAppointmentsTabState extends State<DoctorAppointmentsTab> {
   @override
   void initState() {
     super.initState();
+    final asked = DoctorAppointmentsTab.openOn;
+    if (asked != null) {
+      _tab = asked.clamp(0, 2);
+      DoctorAppointmentsTab.openOn = null;
+    }
     DoctorRoster.instance.refresh();
     PrescriptionStore.instance.refresh();
   }
@@ -64,12 +80,13 @@ class _DoctorAppointmentsTabState extends State<DoctorAppointmentsTab> {
     final expertId = DoctorSession.instance.expertId;
     if (expertId == null) {
       return const DcTab(title: 'Appointments', children: [
-        DcEmpty('No consulting identity', 'An organisation account sees no roster of its own.', icon: Icons.event_note_outlined),
+        DcEmpty('No consulting identity', 'An organisation account sees no roster of its own.', mark: DoctorMark.calendar),
       ]);
     }
     return ListenableBuilder(
-      listenable: Listenable.merge([DoctorRoster.instance, PrescriptionStore.instance]),
+      listenable: doctorFeedListenable(),
       builder: (context, _) {
+        final feed = DoctorFeed.now();
         final roster = DoctorRoster.instance;
         final upcoming = roster.upcomingConsults(expertId);
         final past = roster.pastConsults(expertId);
@@ -84,7 +101,14 @@ class _DoctorAppointmentsTabState extends State<DoctorAppointmentsTab> {
 
         return DcTab(
           title: 'Appointments',
-          subtitle: _summary(today.length, later.length, past.length, unwritten),
+          hero: DcHero(
+            asset: kDoctorHeroImages['appointments']!.asset,
+            eyebrow: 'Appointments',
+            greeting: today.isEmpty ? 'Who is next' : (today.length == 1 ? 'One today' : '${today.length} today'),
+            infoLine: _summary(today.length, later.length, past.length, unwritten),
+            badge: feed.unread,
+            onBell: () => feed.openUpdates(context, widget.goTo),
+          ),
           onRefresh: _pull,
           children: [
             DcSegments(
@@ -107,11 +131,12 @@ class _DoctorAppointmentsTabState extends State<DoctorAppointmentsTab> {
                 (_tab == 2 && past.isEmpty)) ...[
               const SizedBox(height: 10),
               const DcSectionHead('How a consultation works'),
+              // Rings, not wells: these rows explain, they do not act.
               const DcRowGroup(children: [
-                DcRow(icon: Icons.schedule_outlined, title: 'Parents book inside your hours', subtitle: 'Set on the Availability tab. Each slot is one consultation.', chevron: false),
-                DcRow(icon: Icons.notifications_outlined, title: 'You get a reminder an hour before', subtitle: 'And the parent gets one too.', chevron: false),
-                DcRow(icon: Icons.videocam_outlined, title: 'Join opens ten minutes before', subtitle: 'From here or from Home. Cancel or mark a no-show from the ⋯ on the card.', chevron: false),
-                DcRow(icon: Icons.edit_note_rounded, title: 'Write the prescription after', subtitle: 'It lands in the parent\'s app the moment you save.', chevron: false),
+                DcRow(mark: DoctorMark.hours, markRing: true, title: 'Parents book inside your hours', subtitle: 'Set on the Availability tab. Each slot is one consultation.', chevron: false),
+                DcRow(mark: DoctorMark.calendar, markRing: true, title: 'You get a reminder an hour before', subtitle: 'And the parent gets one too.', chevron: false),
+                DcRow(mark: DoctorMark.video, markRing: true, title: 'Join opens ten minutes before', subtitle: 'From here or from Home. Cancel or mark a no-show from the ⋯ on the card.', chevron: false),
+                DcRow(mark: DoctorMark.prescribe, markRing: true, title: 'Write the prescription after', subtitle: 'It lands in the parent\'s app the moment you save.', chevron: false),
               ]),
             ],
           ],
@@ -129,7 +154,7 @@ class _DoctorAppointmentsTabState extends State<DoctorAppointmentsTab> {
 
   List<Widget> _day(BuildContext context, List<Booking> calls, List<HostSession> classes, {required String emptyTitle, required String emptyBody}) {
     if (calls.isEmpty && classes.isEmpty) {
-      return [DcEmpty(emptyTitle, emptyBody, icon: Icons.event_available_outlined)];
+      return [DcEmpty(emptyTitle, emptyBody, mark: DoctorMark.calendar)];
     }
     final items = <(DateTime, Widget)>[
       for (final b in calls) (b.startsUtc, _ConsultCard(booking: b, past: false, onMore: () => _openActions(b))),
@@ -140,7 +165,7 @@ class _DoctorAppointmentsTabState extends State<DoctorAppointmentsTab> {
 
   List<Widget> _grouped(BuildContext context, List<Booking> calls, List<HostSession> classes) {
     if (calls.isEmpty && classes.isEmpty) {
-      return const [DcEmpty('Nothing coming up', 'When a parent books a slot with you, it appears here.', icon: Icons.event_note_outlined)];
+      return const [DcEmpty('Nothing coming up', 'When a parent books a slot with you, it appears here.', mark: DoctorMark.calendar)];
     }
     final items = <(DateTime, Widget)>[
       for (final b in calls) (b.startsUtc, _ConsultCard(booking: b, past: false, onMore: () => _openActions(b))),
@@ -161,7 +186,7 @@ class _DoctorAppointmentsTabState extends State<DoctorAppointmentsTab> {
 
   List<Widget> _past(BuildContext context, List<Booking> past) {
     if (past.isEmpty) {
-      return const [DcEmpty('No past consultations', 'Finished consultations, and the ones still needing a prescription, live here.', icon: Icons.history_rounded)];
+      return const [DcEmpty('No past consultations', 'Finished consultations, and the ones still needing a prescription, live here.', mark: DoctorMark.prescribe)];
     }
     final owed = past.where((b) => !PrescriptionStore.instance.hasFor(b.id) && b.status != BookingStatus.cancelled).toList();
     final rest = past.where((b) => !owed.contains(b)).toList();
@@ -188,8 +213,7 @@ class _DoctorAppointmentsTabState extends State<DoctorAppointmentsTab> {
       child: DcRowGroup(children: [
         if (canCancel)
           DcRow(
-            icon: Icons.event_busy_outlined,
-            hue: 344,
+            mark: DoctorMark.cancelled,
             title: 'Cancel this consultation',
             subtitle: 'The parent gets their full credit back straight away. Use this if you cannot make it.',
             chevron: false,
@@ -199,8 +223,8 @@ class _DoctorAppointmentsTabState extends State<DoctorAppointmentsTab> {
             },
           ),
         DcRow(
-          icon: Icons.person_off_outlined,
-          hue: canNoShow ? 42 : null,
+          mark: DoctorMark.noShow,
+          markMuted: !canNoShow,
           title: 'Mark as no-show',
           subtitle: canNoShow
               ? 'The parent did not join. You are still paid for the slot you held.'
@@ -216,7 +240,7 @@ class _DoctorAppointmentsTabState extends State<DoctorAppointmentsTab> {
         ),
         if (!canCancel)
           DcRow(
-            icon: hasRx ? Icons.description_outlined : Icons.edit_note_rounded,
+            mark: hasRx ? DoctorMark.done : DoctorMark.prescribe,
             title: hasRx ? 'View the prescription' : 'Write the prescription',
             subtitle: hasRx ? 'What you sent the parent after this consultation.' : 'Finished, but nothing sent to the parent yet.',
             onTap: () {

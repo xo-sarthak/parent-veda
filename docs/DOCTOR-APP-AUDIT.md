@@ -2,8 +2,8 @@
 
 *Written 2026-09-18. Mobbin audit #8. All seven questions answered the same
 day. **BUILT the same evening, and WALKED** on the phone (all five tabs;
-six fixes from the walk, listed in STILL-OPEN §5.4). The sign-in screens are
-the one thing not yet seen on a device. §6 at the end = what landed.*
+six fixes from the walk, listed in STILL-OPEN §5.4). The hero (§7) and the
+sign-in screens were walked on 2026-09-21; `0085` is in. §6 = what landed.*
 
 **The ask.** The doctor app exists (`lib/main_doctor.dart`, `--flavor doctor`)
 and works, but it looks like the classic parent app — violet everywhere, a
@@ -333,6 +333,8 @@ row flips to built.
 | The real rates (2026-09-19) | `supabase/migrations/0085_expert_share_rates.sql` | The Commercial Terms table replaces the placeholders; `channel` added; sources widened to articles, affiliate, sponsorship, products. **Written, not run.** |
 | The hero (2026-09-19) | `doctor_chrome.dart` (`DcHero`) · `doctor_hero_images.dart` · `assets/doctor/` · `doctor_session.dart` (`profile`) · `doctor_home_tab.dart` | §7 below. Not walked. |
 | Demo seed | `supabase/seed/doctor_demo.sql` | A sample doctor's month through the real writers. |
+| Home v2 (2026-09-21) | `doctor_home_tab.dart` · `doctor_tasks.dart` · `doctor_inbox_screen.dart` · `lib/data/reads/doctor_reads.dart` · `0088_expert_notices.sql` | Audit #8c (§8). Walked with the seeded month. |
+| Two ledger corrections (2026-09-21) | `0087_expert_earning_math.sql` · `0089_share_rates_effective_from.sql` | The split in numeric (int32 overflow on a video earning); founding rates in force from 1 Jan (backdated rows froze 0%). BACKEND-PATTERNS §16f footnotes. |
 
 **Owed** — STILL-OPEN §5.4a–j. The two that gate a demo: run `0084`, and
 put `{{ .Token }}` in the Magic Link template.
@@ -372,3 +374,159 @@ the parent hero's own argument: the same band every morning is wallpaper by
 the second week.
 
 **Owed.** STILL-OPEN §5.4j.
+
+---
+
+## 8. Audit #8c — the Home that is not a stack of empty cards (2026-09-21)
+
+**The ask.** "The home screen looks very plain and bland" and "is it fair
+to show 'add your bank account' at the very top?"
+
+**Asked.** Three screen queries. Clinician/provider homes as such — none in
+the library (Practo Pro, Doctolib Pro, Zocdoc's provider app are absent;
+Hers/Hims, Withings, Alan, Noom, Liven, Ten Percent Happier are patient-
+side but show how a health home feels full). Seller/host homes — Whatnot
+Seller Hub, eBay Selling, Twitch creator, Shopee, Fiverr, Revolut
+Business, Squarespace, Posh, Airbnb Insights, Vestiaire, Vinted, Deel.
+"Needs you" handling — Monzo, Deel, Jobber, Craft, Asana, Greenlight,
+Whatnot, QUITTR, Numo.
+
+**Found.** The homes that feel full with zero data never show an empty
+card: a row of quick actions under the greeting (Revolut, Shopee,
+Squarespace, Liven); a getting-started rail of illustrated cards with
+"step 3 of 4" that disappears when done (eBay, Whatnot, Twitch); a week
+strip (Ten Percent Happier, Noom); numbers as tiles framed with what is
+possible (Fiverr, Posh); resources with photo thumbnails (Airbnb,
+Withings); one announcement from the platform (Shopee, Whatnot). And
+nobody leads with the nag: a bell with a count (Deel, Jobber, Craft), a
+one-line "You have 4 notifications · See all" (Monzo), at most three rows
+with "View all" (Asana, Greenlight), "you're all caught up" when empty
+(Whatnot).
+
+**Adopted.** All of it — see STILL-OPEN §5.4k for the spine. The variable
+pile is computed once (`doctor_tasks.dart`) so the bell, the rows and the
+Inbox cannot disagree.
+
+**Declined.** Goal rings and "trusted seller" progress (Vestiaire,
+Twitch's follower goals) — gamifying a clinician; account-health scores
+(Whatnot, Turo) — we do not rank doctors; a red badge — the one red is for
+a field with a problem, a count is information and wears ink.
+
+## 9. Audit #8d — every tab is a door (2026-09-21)
+
+**The ask.** "For each and every tab in the bottom pill — Appointments,
+Availability, Earnings, Profile — take the hero from the doors inside the
+pregnancy side: the image, the heading, the sub-heading, and a really good
+scroll, some sort of parallax." And: the avatar was larger than the bell,
+the toggles were purple, the icons everywhere were bland next to the parent
+app's drawn marks, and Availability sat cramped at the very top.
+
+**Asked.** Tab-level heroes with a photograph in finance and provider
+apps (Revolut Business, Monzo, Deel, Jobber, Airbnb host, Fiverr); parallax
+headers that hand over to a sheet (Airbnb listing, Headspace, Calm, Ten
+Percent Happier); notification bells on secondary tabs (Deel, Jobber,
+Craft, Asana).
+
+**Found.** The apps that give every tab a photo header do three things
+the same way: the sheet with a top radius rides up over the photo, the
+photo moves at half speed and fades, and the status bar flips from light
+to dark as the sheet covers it. The bell sits on every tab in the apps
+where money and work do not wait for Home (Deel, Jobber). Nobody puts a
+toggle in a brand colour; a switch is ink on and grey off.
+
+**Adopted.** `DcTab`/`DcHero` in `doctor_chrome.dart`: photo 300dp, eyebrow
++ Fraunces 30 heading + blurb, the bell (44) and avatar (44) discs, the
+sheet overlapping 28dp with radius 24, parallax at 0.5, fade over 160dp,
+`SystemChrome.setSystemUIOverlayStyle` flipped at the cover point (an
+`AnnotatedRegion` alone did not win on the Samsung). Each tab has its own
+photograph (`doctor_hero_images.dart`: three by time of day on Home, one
+each for Appointments and Earnings; Availability and Profile reuse the
+morning and evening plates for now). The bell is fed from one place,
+`doctor_task_feed.dart`, so five tabs cannot disagree. Switches are ink.
+`DoctorMark` replaces every icon in a well (DESIGN-SYSTEM §3.1).
+
+**Declined.** A collapsing app bar with a title that shrinks into the
+toolbar (Material large top app bar) — the door grammar is a sheet over a
+photograph, not a bar; a coloured hero per tab — one ground, photographs
+carry the colour.
+
+**Owed.** Photo credits under Profile → About; the door test in
+`test/doctor_tabs_render_test.dart` holds the heroes at 360dp but not the
+parallax, which is judged by eye.
+
+### 9.1 The same evening — three corrections from the walk
+
+**The date was lonely, the sentence was not one.** "Monday 21 September"
+alone in the top corner, and "Nothing today · next Tue 22 Sep at 10:30 pm"
+under the greeting, had to be read twice. The date is now the hero's
+eyebrow over the greeting (where a door's eyebrow sits), the line is a
+sentence with a relative day ("Nothing on your calendar today. Your next
+consultation is tomorrow at 10:30 pm."), and a row of three figures sits
+on the photograph — today · this week · slots open — Fiverr's and Airbnb's
+host heroes. `DcFact`, `DcHero.facts`; the band grew to 332.
+
+**The bar is the parenting bar.** Same `PvNavBar`; the difference was that
+parenting floats it (`Positioned(left: 16, right: 16, bottom: 18)`) and the
+doctor scaffold docked it full width. It floats now, and every tab body
+pads its list by `DcTab.barClearance`.
+
+**A bell is a notification panel, not a chore list.** The bell held the
+task list (bank account, prescriptions). Now it holds UPDATES — a parent
+booked, a consultation inside 24 hours, a class within a fortnight, money
+in, money reversed, a payout sent or scheduled, a notice from ParentVeda —
+all DERIVED from rows the app already holds (`lib/doctor/doctor_updates.dart`,
+pure, tested in `test/doctor_updates_test.dart`), so a seeded month fills
+it with no fakes and an empty account says "nothing yet". Read state is
+local (`DoctorUpdatesRead`, shared_preferences, deterministic ids); opening
+the panel marks everything read, so the badge means "since you last
+looked" (Deel, Monzo). The chores moved to ONE swipe rail on Home under
+"Needs you" — work first (prescriptions owed, a class opening), then the
+set-up steps, finished ones ticked at the end; the old set-up rail and the
+three-row list merged into it. `DoctorInboxScreen` kept for revert,
+unreachable.
+
+### 9.2 The sanity sweep (2026-09-21, later)
+
+Every reachable doctor screen audited for two things: a Material icon in a
+well, and the parenting palette. Found and fixed — the referral kit, the
+poster screen, the prescription screen and the practice-setup form were
+still `ppPurple`/`ppJakarta`; the consultation sheet (cancel, no-show,
+prescription), the sign-out row and the sign-in header still had icons in
+wells. Six marks added (`cancelled`, `noShow`, `leave`, `plus`, `download`,
+`upload`), a ring placement for explanatory rows, and Back-goes-Home in the
+scaffold. Left as they are, on purpose: icons that are verbs (back, close,
+chevron, add/remove, more, the camera on Join), the inline 16pt glyphs in a
+text line (the date on the next card, the rupee and star pills), and
+`care_qr_poster.dart`, which is the printed poster's own artwork and carries
+the brand violet because it is a ParentVeda card on a clinic wall.
+
+### 9.3 Three more from the user (2026-09-21, later still)
+
+**A wall down the Earnings gutters.** Three boxed blocks stacked at the top
+— the owed card, the bank-account card, the stat card — put a hairline down
+each side of the screen. `DcStatRow` and `DcAttention` are rows between
+hairlines now, and the owed number stands on the page; the same rule as the
+lists. Home's stat row changed with it.
+
+**The practice-setup form asked twice.** A doctor is onboarded *after* KYC —
+qualifications, registration and documents are collected before the account
+exists — so a form asking for them again in the app was wrong in kind, not
+in style. Its row on Profile is commented out (kept for revert), the screen
+is unreachable.
+
+**"Add your photo" had no way to add one.** It said "email us". Now the
+photo is a circle straddling the seam between the banner and the sheet,
+at the left, name and credential under it — LinkedIn's arrangement, chosen
+on the phone over the centred Places/Grab one (Mobbin: Lyft, Patreon,
+Runna, Remote Global HR for the badge-on-the-rim; LinkedIn, X, Places, Grab
+for the straddle). With it, Profile's band became a BANNER
+(`DcHero.bannerHeight`, 168) rather than the door's 332: at the door's
+height the photograph was the page and neither alignment sat well on it.
+The other four tabs keep the door. Tapping the circle (or "Add your
+photo") opens a sheet — camera or gallery, a square preview, one button —
+and `DoctorSession.setPhoto` puts it
+in the public `expert-photos` bucket and on the profile through
+`set_my_expert_photo` (0090; BACKEND-PATTERNS §16k for why a function and
+not a policy). The set-up task's verb is "Add photo" and opens the same
+sheet. NOT walked end to end: 0090 is unrun and the bucket does not exist
+yet; the sheet and the picker were walked, the upload was not.

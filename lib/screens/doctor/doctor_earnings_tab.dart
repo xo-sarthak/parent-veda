@@ -29,16 +29,20 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:share_plus/share_plus.dart';
 
+import '../../doctor/doctor_hero_images.dart';
 import '../../doctor/doctor_ledger.dart';
 import '../../doctor/doctor_session.dart';
+import 'doctor_art.dart';
 import 'doctor_chrome.dart';
+import 'doctor_task_feed.dart';
 import 'doctor_impact_screen.dart';
 import 'doctor_payout_account_screen.dart';
 import 'doctor_payouts_screen.dart';
 import 'doctor_source_screen.dart';
 
 class DoctorEarningsTab extends StatefulWidget {
-  const DoctorEarningsTab({super.key});
+  const DoctorEarningsTab({super.key, required this.goTo});
+  final void Function(DoctorTab) goTo;
 
   @override
   State<DoctorEarningsTab> createState() => _DoctorEarningsTabState();
@@ -54,18 +58,31 @@ class _DoctorEarningsTabState extends State<DoctorEarningsTab> {
   @override
   Widget build(BuildContext context) {
     return ListenableBuilder(
-      listenable: DoctorLedger.instance,
+      listenable: doctorFeedListenable(),
       builder: (context, _) {
+        final feed = DoctorFeed.now();
         final l = DoctorLedger.instance;
         final s = l.summary;
         final p = dcP;
         return DcTab(
           title: 'Earnings',
+          hero: DcHero(
+            asset: kDoctorHeroImages['earnings']!.asset,
+            eyebrow: 'Earnings',
+            greeting: s.owedPaise > 0 ? 'We owe you ${dcRupees(s.owedPaise)}' : 'What you have earned',
+            infoLine: s.nextPayout == null
+                ? 'Every rupee from every source, the rate that applied, and when it is paid.'
+                : 'Next payout ${dcDate(s.nextPayout!, year: true)} by bank transfer. Every line carries the rate that applied.',
+            badge: feed.unread,
+            onBell: () => feed.openUpdates(context, widget.goTo),
+          ),
           onRefresh: l.refresh,
           children: [
             // ---- we owe you ----------------------------------------------
-            DcCard(
-              padding: const EdgeInsets.fromLTRB(18, 18, 18, 16),
+            // The number stands on the page, no box: three boxed blocks in
+            // a row read as walls down the gutters (2026-09-21).
+            Padding(
+              padding: const EdgeInsets.fromLTRB(0, 4, 0, 18),
               child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 Text('WE OWE YOU', style: dcEyebrow()),
                 const SizedBox(height: 8),
@@ -84,12 +101,11 @@ class _DoctorEarningsTabState extends State<DoctorEarningsTab> {
                 ],
               ]),
             ),
-            const SizedBox(height: 12),
 
             // ---- the blocker, if any --------------------------------------
             if (l.accountKnown && l.account == null)
               DcAttention(
-                icon: Icons.account_balance_outlined,
+                mark: DoctorMark.bank,
                 title: 'Add your bank account',
                 body: 'Required to get paid. Takes a minute; we verify it before the first transfer.',
                 action: 'Add account',
@@ -97,7 +113,7 @@ class _DoctorEarningsTabState extends State<DoctorEarningsTab> {
               )
             else if (l.account != null && l.account!.status == 'rejected')
               DcAttention(
-                icon: Icons.account_balance_outlined,
+                mark: DoctorMark.bank,
                 urgent: true,
                 title: 'We could not verify your bank account',
                 body: l.account!.reason ?? 'Please check the details and submit again.',
@@ -107,7 +123,7 @@ class _DoctorEarningsTabState extends State<DoctorEarningsTab> {
             else if (l.account != null)
               DcRowGroup(children: [
                 DcRow(
-                  icon: Icons.account_balance_outlined,
+                  mark: DoctorMark.bank,
                   title: 'Payout account ${l.account!.masked}',
                   subtitle: l.account!.verified
                       ? 'Verified · ${l.account!.ifsc}'
@@ -173,13 +189,13 @@ class _DoctorEarningsTabState extends State<DoctorEarningsTab> {
               const DcEmpty(
                 'No payouts yet',
                 'Each bank transfer appears here with its reference number and the sessions it covered.',
-                icon: Icons.receipt_long_outlined,
+                mark: DoctorMark.earnings,
               )
             else
               DcRowGroup(children: [
                 for (final po in l.payouts.take(3))
                   DcRow(
-                    icon: Icons.receipt_long_outlined,
+                    mark: DoctorMark.earnings,
                     title: dcRupees(po.amountPaise),
                     subtitle: '${po.statusLabel}${po.paidAt != null ? ' · ${dcDate(po.paidAt!, year: true)}' : ''} · ${po.methodLabel}',
                     onTap: () => Navigator.of(context).push(MaterialPageRoute(
@@ -193,7 +209,7 @@ class _DoctorEarningsTabState extends State<DoctorEarningsTab> {
             const DcSectionHead('Statement'),
             DcRowGroup(children: [
               DcRow(
-                icon: Icons.ios_share_rounded,
+                mark: DoctorMark.prescribe,
                 title: 'Share ${l.period.label.toLowerCase()} as a statement',
                 subtitle: 'A CSV your accountant can open. Every line, with the rate that applied.',
                 onTap: () => _shareStatement(context, l),
@@ -222,9 +238,12 @@ class _DoctorEarningsTabState extends State<DoctorEarningsTab> {
         : (src.hasOwnCodeRate && own > 0
             ? '${dcPercent(rate)} through ParentVeda, ${dcPercent(own)} through your own code'
             : '${dcPercent(rate)} of ${src.gross.toLowerCase()}');
+    // An empty row says the RATE once a rate exists — "You keep 80% of
+    // parent paid" — and the invitation only until then. Both together ran
+    // to three lines and were cut (walked 2026-09-21).
     final sub = has
         ? '${t.items} ${t.items == 1 ? 'item' : 'items'} · ${rateLine ?? src.gross.toLowerCase()}'
-        : (rateLine != null ? '${src.emptyLine} You keep $rateLine.' : src.emptyLine);
+        : (rateLine != null ? 'Nothing yet. You keep $rateLine.' : src.emptyLine);
     return DcRow(
       title: src.label,
       subtitle: sub,

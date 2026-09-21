@@ -515,6 +515,32 @@ class SupabaseRepo {
     }
   }
 
+  /// Put bytes in a PUBLIC bucket and return the URL anyone can read. The
+  /// caller chooses [path] under its own folder (RLS: the first segment must
+  /// be the user id — 0013 for media, 0090 for expert-photos). Upsert, so a
+  /// new file at the same path replaces the old; the `?v=` the caller appends
+  /// is what makes a cache notice. Null when the server refused, and it says
+  /// why in the log — a doctor's photo is one the user watches land.
+  static Future<String?> uploadPublicFile(
+    String bucket,
+    String path,
+    Uint8List bytes, {
+    String contentType = 'image/jpeg',
+  }) async {
+    if (userId == null) return null;
+    try {
+      await _client.storage.from(bucket).uploadBinary(
+            path,
+            bytes,
+            fileOptions: FileOptions(contentType: contentType, upsert: true),
+          );
+      return _client.storage.from(bucket).getPublicUrl(path);
+    } catch (e) {
+      debugPrint('[repo] upload $bucket/$path refused: $e');
+      return null;
+    }
+  }
+
   /// Update rows matching every column in [filters]. The mirror of
   /// [deleteMatch], for a table whose natural key is not `id` — a sample claim
   /// is identified by (campaign_id, user_id), not by a serial nobody holds.

@@ -119,6 +119,9 @@ void main() {
     'expert_invites': 'which email may sign in as which expert (0084) — full '
         'CRUD; the same class of editorial act as partner_accounts, and it '
         'replaces the SQL step in main_doctor.dart',
+    'expert_notices': 'the one card from ParentVeda on the doctor Home (0088) '
+        '— full CRUD, it is editorial content: a title, a line, a window, an '
+        'audience. Carries no family data',
   };
 
   /// True when the store reads a VIEW rather than a base table. Views play by

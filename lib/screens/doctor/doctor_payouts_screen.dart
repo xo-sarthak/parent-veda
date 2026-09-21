@@ -15,6 +15,7 @@
 import 'package:flutter/material.dart';
 
 import '../../doctor/doctor_ledger.dart';
+import 'doctor_art.dart';
 import 'doctor_chrome.dart';
 import 'doctor_source_screen.dart' show showReceipt;
 
@@ -41,7 +42,7 @@ class DoctorPayoutsScreen extends StatelessWidget {
               const DcEmpty(
                 'No payouts yet',
                 'Payable earnings are transferred on the 7th of each month. Each transfer appears here with its reference number.',
-                icon: Icons.receipt_long_outlined,
+                mark: DoctorMark.earnings,
               )
             else
               for (final e in byMonth.entries) ...[
@@ -49,7 +50,7 @@ class DoctorPayoutsScreen extends StatelessWidget {
                 DcRowGroup(children: [
                   for (final po in e.value)
                     DcRow(
-                      icon: Icons.receipt_long_outlined,
+                      mark: DoctorMark.earnings,
                       title: dcRupees(po.amountPaise),
                       subtitle: '${po.statusLabel}${po.paidAt != null ? ' · ${dcDate(po.paidAt!)}' : ''} · ${po.methodLabel}'
                           '${po.bankLast4 != null ? ' · •••• ${po.bankLast4}' : ''}',
@@ -129,7 +130,7 @@ class _DoctorPayoutScreenState extends State<DoctorPayoutScreen> {
 
             DcSectionHead('Every line', note: items.isEmpty ? null : '${items.length}'),
             if (items.isEmpty)
-              const DcEmpty('Loading the lines…', 'Each session this payout covered is listed here.', icon: Icons.receipt_outlined)
+              const DcEmpty('Loading the lines…', 'Each session this payout covered is listed here.', mark: DoctorMark.earnings)
             else
               DcRowGroup(children: [
                 for (final r in items)

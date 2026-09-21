@@ -32,8 +32,9 @@ import '../../care_partner/care_partner_engine.dart';
 import '../../care_partner/care_partner_models.dart';
 import '../../care_partner/care_poster_pdf.dart';
 import '../../memories/memory_export.dart';
-import '../post_pregnancy/pp_common.dart';
 import 'care_qr_poster.dart';
+import 'doctor_art.dart';
+import 'doctor_chrome.dart';
 
 class CarePosterScreen extends StatefulWidget {
   const CarePosterScreen({
@@ -63,116 +64,71 @@ class _CarePosterScreenState extends State<CarePosterScreen> {
   @override
   Widget build(BuildContext context) {
     final size = _format.size;
-    return Scaffold(
-      backgroundColor: ppBg,
-      appBar: AppBar(
-        backgroundColor: ppBg,
-        surfaceTintColor: Colors.transparent,
-        elevation: 0,
-        title: Text('Your poster', style: ppJakarta(16)),
-      ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 4, 20, 36),
-        children: [
-          _formatToggle(),
-          const SizedBox(height: 18),
-          // Captured at its LOGICAL size and scaled for display, so the export
-          // is identical to the preview.
-          Center(
-            child: SizedBox(
-              width: size.width,
-              height: size.height,
-              child: FittedBox(
-                child: RepaintBoundary(
-                  key: _boundary,
-                  child: CareQrPoster(
-                    partner: widget.partner,
-                    link: _link,
-                    token: widget.token,
-                    format: _format,
-                  ),
+    // 2026-09-21: onto the doctor chrome — this was one of the last screens
+    // still in the parenting palette (violet buttons, a tinted foot panel).
+    // The three ways out are rows with drawn marks, like the kit's.
+    return DcScreen(
+      title: 'Your poster',
+      subtitle: 'For a wall, a desk, or a message.',
+      children: [
+        DcSegments(
+          expand: true,
+          labels: [for (final f in CarePosterFormat.values) f.label],
+          index: CarePosterFormat.values.indexOf(_format),
+          onChanged: (i) => setState(() => _format = CarePosterFormat.values[i]),
+        ),
+        const SizedBox(height: 18),
+        // Captured at its LOGICAL size and scaled for display, so the export
+        // is identical to the preview.
+        Center(
+          child: SizedBox(
+            width: size.width,
+            height: size.height,
+            child: FittedBox(
+              child: RepaintBoundary(
+                key: _boundary,
+                child: CareQrPoster(
+                  partner: widget.partner,
+                  link: _link,
+                  token: widget.token,
+                  format: _format,
                 ),
               ),
             ),
           ),
-          const SizedBox(height: 22),
+        ),
+        const SizedBox(height: 22),
+        DcRowGroup(children: [
           // The PDF is first because it is the one that goes on a wall. Its QR
           // is drawn as vector paths, so it stays exact at A4 — a 1080px PNG
           // upscaled to that size gives soft-edged modules that a camera in a
           // dim waiting room, at an angle, behind glass, often will not read.
-          _button(Icons.picture_as_pdf_rounded, 'Download for printing',
-              _downloadPdf,
-              filled: true),
-          const SizedBox(height: 10),
-          _button(Icons.download_rounded, 'Save image to photos', _save),
-          const SizedBox(height: 10),
-          _button(Icons.ios_share_rounded, 'Share image', _share),
-          const SizedBox(height: 20),
-          Container(
-            padding: const EdgeInsets.fromLTRB(14, 13, 14, 13),
-            decoration: BoxDecoration(
-                color: ppPanel, borderRadius: BorderRadius.circular(13)),
-            child: Text(
-              'The PDF has an A4 poster and a sheet of two smaller ones to cut '
-              'in half — a wall, a reception desk, a consulting room. The image '
-              'is for sending. Either way the code is printed on it, for anyone '
-              'whose camera will not scan.',
-              style: ppBody(11.5, h: 1.5),
-            ),
+          DcRow(
+            mark: DoctorMark.download,
+            title: 'Download for printing',
+            subtitle: 'A PDF: an A4 poster and a sheet of two smaller ones to cut in half.',
+            onTap: _busy ? null : _downloadPdf,
           ),
-        ],
-      ),
+          DcRow(
+            mark: DoctorMark.photo,
+            title: 'Save image to photos',
+            subtitle: 'The poster as a picture, for sending.',
+            onTap: _busy ? null : _save,
+          ),
+          DcRow(
+            mark: DoctorMark.referral,
+            title: 'Share image',
+            subtitle: 'Opens your share sheet.',
+            onTap: _busy ? null : _share,
+          ),
+        ]),
+        const SizedBox(height: 16),
+        const DcNotice(
+          'Either way the code is printed on it, for anyone whose camera will not scan.',
+        ),
+      ],
     );
   }
-
-  Widget _formatToggle() => Container(
-        padding: const EdgeInsets.all(3),
-        decoration: BoxDecoration(
-            color: ppPanel, borderRadius: BorderRadius.circular(11)),
-        child: Row(children: [
-          for (final f in CarePosterFormat.values)
-            Expanded(
-              child: GestureDetector(
-                onTap: () => setState(() => _format = f),
-                behavior: HitTestBehavior.opaque,
-                child: Container(
-                  height: 34,
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(
-                    color: _format == f ? Colors.white : Colors.transparent,
-                    borderRadius: BorderRadius.circular(9),
-                  ),
-                  child: Text(f.label,
-                      style: ppJakarta(12.5,
-                          color: _format == f ? ppPurple : ppSoft)),
-                ),
-              ),
-            ),
-        ]),
-      );
-
-  Widget _button(IconData icon, String label, Future<void> Function() onTap,
-          {bool filled = false}) =>
-      GestureDetector(
-        onTap: _busy ? null : onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          height: 50,
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: filled ? ppPurple : Colors.white,
-            borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: filled ? ppPurple : ppBorder),
-          ),
-          child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Icon(icon, size: 18, color: filled ? Colors.white : ppPurple),
-            const SizedBox(width: 9),
-            Text(label,
-                style:
-                    ppJakarta(13.5, color: filled ? Colors.white : ppPurple)),
-          ]),
-        ),
-      );
 
   Future<Uint8List?> _capture() =>
       // ×3: a 360-wide layout becomes 1080 wide.
@@ -185,11 +141,7 @@ class _CarePosterScreenState extends State<CarePosterScreen> {
     if (bytes != null) ok = await MemoryExport.saveToGallery(bytes);
     if (!mounted) return;
     setState(() => _busy = false);
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(ok
-          ? 'Saved to your photos'
-          : 'Could not save — check photo permissions'),
-    ));
+    dcToast(context, ok ? 'Saved to your photos' : 'Could not save — check photo permissions');
   }
 
   /// Print, save as PDF, or hand to another app — the OS sheet offers all
@@ -204,10 +156,7 @@ class _CarePosterScreenState extends State<CarePosterScreen> {
       );
       await CarePosterPdf.present(partner: widget.partner, bytes: bytes);
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Could not build the PDF: $e')));
-      }
+      if (mounted) dcToast(context, 'Could not build the PDF: $e');
     }
     if (!mounted) return;
     setState(() => _busy = false);
