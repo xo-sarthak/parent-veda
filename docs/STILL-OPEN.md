@@ -8715,6 +8715,25 @@ Click by click at the user's ask ("recursive tree"). Built and walked:
 - No white mist: the meal sheet's and the Is it safe? found-sheet's fades
   removed (kept commented).
 
+### 70.5 The second walk — gutters, the chart browser, View all (same evening)
+- **The wall.** The door wrapped every inline tool in `pvDoorPad` and the
+  three Nutrition bodies padded themselves too — text 36pt in, every rail
+  clipped at the gutter. `kPvDoorSelfPaddedTools` (pv_door_screen.dart)
+  lists tools that lay out their own gutter; the door leaves them alone.
+  `test/pv_door_renders_test.dart` "every rail runs edge to edge" now
+  fails any rail on any door whose box does not start at x=0. Checked: no
+  other door had it.
+- **"View all ›"** on a section heading: `PvDoorSection.moreSurfaceId` +
+  `railMax`. The charts rail shows eight; View all opens the browser.
+- **`DietChartBrowseScreen`** replaces the filter form (`DietChartsScreen`,
+  unreached, kept): two edge-to-edge chip rails (diet · stage; condition ·
+  region), full-width cards with a distinct dish photo each, the focus
+  line, "3 days · Vegetarian · Second trimester", "Your chart" marked.
+  MOBBIN §14 (Tempo, Blue Apron, HelloFresh, Blinkit).
+- **`PvDoorFormat.plan`** — a chart's chip says Plan, not Tool (and not
+  Guide, which would turn the rail into a list).
+- "What she can do for you" → "What they can do for you".
+
 **Owed from the dive**
 - **Charts: three days → seven.** The user asked why three; the plan screen
   and the plate take any number. Recommended two passes (Full month,

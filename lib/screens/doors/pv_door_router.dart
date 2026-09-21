@@ -47,6 +47,7 @@ import '../nutrition/door/nutrition_today_body.dart';
 import '../nutrition/door/nutrition_talk_body.dart';
 import '../nutrition/door/nutrition_door.dart' show NutritionDoorScreen;
 import '../nutrition/door/recipe_cook_screen.dart';
+import '../nutrition/door/diet_chart_browse_screen.dart';
 import '../nutrition/door/diet_chart_plan_screen.dart';
 import '../nutrition/door/recipes_screen.dart';
 import '../nutrition/door/shopping_list_screen.dart';
@@ -64,7 +65,7 @@ import '../belly_skin/bs_itching_screen.dart';
 import '../belly_skin/ingredient_checker_screen.dart';
 import '../belly_skin/bump_ritual_screen.dart';
 import '../conditions/condition_detail_screen.dart';
-import '../nutrition/diet_charts_screen.dart';
+// import '../nutrition/diet_charts_screen.dart'; // the filter form, kept for revert (2026-09-20)
 import '../nutrition/can_i_eat_body.dart';
 import '../nutrition/fasting_screen.dart';
 import '../nutrition/nutrients_screen.dart';
@@ -212,7 +213,9 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
       kDietSurfaceRecipeRail => RecipesScreen(pregnancy: c),
       // A door tile that points at the Is it safe? door.
       'can_i' => CanIScreen(controller: c),
-      kDietSurfaceCharts => DietChartsScreen(pregnancy: c),
+      // The browser (diet_chart_browse_screen.dart). `DietChartsScreen`, the
+      // filter form, is kept for revert.
+      kDietSurfaceCharts => DietChartBrowseScreen(pregnancy: c),
       kDietSurfaceFasting => const FastingScreen(),
       kDietSurfaceBigger => const NutrientsScreen(),
       kDietSurfaceExperts => const _DieticiansScreen(),

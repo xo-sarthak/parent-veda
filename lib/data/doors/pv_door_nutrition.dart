@@ -418,22 +418,18 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
     // =========================================================================
     //  SUB-TAB 4 · Charts and fasting
     // =========================================================================
+    // ⚠️ EIGHT ON THE RAIL, "VIEW ALL" FOR THE REST. Nineteen chart cards
+    // in a row was "a big scroll" (the user, 2026-09-20), and the "Browse
+    // every chart" tool card that led it opened a filter form. The heading's
+    // View all opens `DietChartBrowseScreen` — chips over full-width cards —
+    // and the tool card is retired, kept for revert:
+    //   PvDoorToolTile(title: 'Browse every chart', blurb: ..., surfaceId: kDietSurfaceCharts),
     PvDoorSection(
       group: kDietTabCharts,
       heading: 'Ready-made diet charts',
+      moreSurfaceId: kDietSurfaceCharts,
+      railMax: 8,
       tiles: [
-        // ⚠️ NOT "DIET CHARTS", WHICH IS THE HEADING IT SITS UNDER. Seen on a
-        // phone: the browse-everything card and its own section printed the
-        // same two words a centimetre apart, so the card looked like a label
-        // for the rail rather than a thing to tap. Same fault the fasting card
-        // had. A card's title has to earn its line against the heading above
-        // it — if it repeats it, it is invisible.
-        PvDoorToolTile(
-          title: 'Browse every chart',
-          blurb: 'Filter by stage, diet, condition, region — and Hindi. Free '
-              'to view or download.',
-          surfaceId: kDietSurfaceCharts,
-        ),
         ..._tilesFor(PvDoorLibrary.dietChart, [
           for (final c in kDietCharts)
             (

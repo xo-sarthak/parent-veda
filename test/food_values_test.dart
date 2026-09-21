@@ -12,6 +12,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/data/diet_chart_content.dart';
 import 'package:parentveda/data/nutrition/food_values.dart';
 import 'package:parentveda/data/nutrition_data.dart';
+import 'package:parentveda/data/reads/read_images.dart';
 
 void main() {
   group('every chart meal has a number', () {
@@ -89,6 +90,24 @@ void main() {
     test('the estimate note is on every surface that shows the grid', () {
       final w = File('lib/screens/nutrition/door/nutrition_widgets.dart').readAsStringSync();
       expect(w, contains('kNutritionEstimateNote'));
+    });
+  });
+
+  group('the photos come from our own host', () {
+    // 2026-09-21: the R2 bucket is live. The base URL is set, every id in the
+    // table resolves through it, and the free-host stopgaps are unreachable.
+    test('kReadImageBase is set and ends with a slash', () {
+      expect(kReadImageBase, startsWith('https://'));
+      expect(kReadImageBase, endsWith('/'));
+    });
+    test('every read image resolves to the bucket, by its id', () {
+      for (final id in kReadImageUrls.keys) {
+        expect(readImageFor(id), '$kReadImageBase$id.jpg', reason: id);
+      }
+    });
+    test('an unknown id is still null, and an own url still wins', () {
+      expect(readImageFor('no_such_image'), isNull);
+      expect(readImageFor('nut_dal', own: 'https://x/y.jpg'), 'https://x/y.jpg');
     });
   });
 }

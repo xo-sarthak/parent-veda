@@ -93,6 +93,10 @@ const Set<String> kPvDoorTileDoors = {};
 /// Scans & tests first.
 const Set<String> kPvDoorRailDoors = {'pregnancy_scans_tests', 'pregnancy_complications', 'pregnancy_nutrition'};
 
+/// Inline tools that lay out their own gutter (their rails run edge to
+/// edge); the door does not wrap these in `pvDoorPad`.
+const Set<String> kPvDoorSelfPaddedTools = {'nutrition/today', 'nutrition/recipe_rail', 'nutrition/experts'};
+
 // -----------------------------------------------------------------------------
 //  Rail geometry
 // -----------------------------------------------------------------------------
@@ -434,7 +438,14 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                   if (group.inlineSurfaceId case final surface?) ...[
                     if (pvDoorInlineToolFor(surface, widget.pregnancy)
                         case final tool?) ...[
-                      pvDoorPad(tool),
+                      // ⚠️ A TOOL THAT PADS ITSELF IS NOT PADDED HERE. The
+                      // Nutrition bodies lay out their own gutters and their
+                      // rails scroll under them; wrapped in this pad as well,
+                      // their text sat 36pt in and every rail was clipped at
+                      // the gutter — "a wall on the left and right" (the user,
+                      // 2026-09-20). Scans' timeline does not pad itself and
+                      // keeps the wrap.
+                      if (kPvDoorSelfPaddedTools.contains(surface)) tool else pvDoorPad(tool),
                       const SizedBox(height: 28),
                     ],
                   ],
@@ -480,7 +491,11 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
 
                   for (final section in page.sectionsOf(group.id))
                     for (final tiles in [
-                      section.tilesFor(widget.pregnancy.currentWeek)
+                      // A capped rail (PvDoorSection.railMax): the rest is
+                      // one "View all" away on `moreSurfaceId`.
+                      section.railMax == null
+                          ? section.tilesFor(widget.pregnancy.currentWeek)
+                          : section.tilesFor(widget.pregnancy.currentWeek).take(section.railMax!).toList()
                     ]) ...[
                     if (section.folded)
                       pvDoorPad(PvPress(
@@ -516,13 +531,36 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                         ),
                       ))
                     else
-                    pvDoorPad(Text(section.heading,
-                        style: pvFraunces(
-                            fontSize: 21,
-                            fontWeight: FontWeight.w600,
-                            height: 1.2,
-                            letterSpacing: -0.45,
-                            color: p.ink1))),
+                    pvDoorPad(Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+                      Expanded(
+                        child: Text(section.heading,
+                            style: pvFraunces(
+                                fontSize: 21,
+                                fontWeight: FontWeight.w600,
+                                height: 1.2,
+                                letterSpacing: -0.45,
+                                color: p.ink1)),
+                      ),
+                      // "View all ›" — a long rail's way to the whole list.
+                      if (section.moreSurfaceId case final more?)
+                        PvPress(
+                          child: InkWell(
+                            onTap: () {
+                              pvCommitFeedback();
+                              openPvDoorSurface(context, more, widget.pregnancy);
+                            },
+                            borderRadius: BorderRadius.circular(10),
+                            child: Padding(
+                              padding: const EdgeInsets.fromLTRB(8, 6, 2, 6),
+                              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                                Text('View all',
+                                    style: pvManrope(fontSize: 13, fontWeight: FontWeight.w700, color: p.ink1)),
+                                Icon(Icons.chevron_right_rounded, size: 18, color: p.ink1),
+                              ]),
+                            ),
+                          ),
+                        ),
+                    ])),
                     const SizedBox(height: 13),
                     // ⚠️ EVERY SECTION IS A RAIL. ONE TILE, TWO TILES, A TOOL
                     // TAB — A RAIL. Decided by the user on the phone,
@@ -1016,6 +1054,7 @@ IconData pvDoorFormatIcon(PvDoorFormat format) => switch (format) {
       PvDoorFormat.audio => Icons.headphones_outlined,
       // A puzzle piece: played, not used.
       PvDoorFormat.game => Icons.extension_outlined,
+      PvDoorFormat.plan => Icons.calendar_view_week_outlined,
     };
 
 /// One card on a rail.

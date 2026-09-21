@@ -505,3 +505,15 @@ sound"; the six tiles instead. The photo-to-surface fade under a hero photo
 (Higgsfield) on the user's go; charts extended from three days to seven
 (the user's question; his call on order); photos for 14 of the 24 new
 recipes (Openverse's general index is thin; the dish-word fallback holds).
+
+### 14a. The chart browser (same evening)
+Query: "browse meal plans list filter chips plan cards diet programs" (ios).
+**Found:** Tempo's Training plans (search · one chip row · full-width cards
+with image, title, one line, three facts), Blue Apron / HelloFresh (a
+Filters chip row over vertical cards), Blinkit (facet tags on each card).
+Nobody browses with a form. **Adopted:** `DietChartBrowseScreen` — two
+edge-to-edge chip rails, full-width cards, each with a distinct dish photo
+from the chart's own days, facts line, "Your chart" mark. The door's rail
+caps at eight with "View all ›" (`PvDoorSection.moreSurfaceId`).
+**Declined:** a filter sheet (Kitchen Stories) — nineteen charts do not
+need one; the chips are the filter.

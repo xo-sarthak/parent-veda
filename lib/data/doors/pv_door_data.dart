@@ -116,6 +116,11 @@ enum PvDoorFormat {
   // brief, and "Tool" over Sudoku would be the chip lying about what the tap
   // gives her — a tool is used and put down; a game is played.
   game,
+  // ⚠️ ADDED FOR NUTRITION'S CHARTS (2026-09-20). A diet chart is a plan she
+  // comes back to: "Tool" over it read wrong (the user), and "Guide" made the
+  // rail a list, because a guide is written and a written section is rows.
+  // A plan is neither used-and-put-down nor read once; it is followed.
+  plan,
 }
 
 extension PvDoorFormatCopy on PvDoorFormat {
@@ -152,6 +157,7 @@ extension PvDoorFormatCopy on PvDoorFormat {
         PvDoorFormat.video => 'Video',
         PvDoorFormat.audio => 'Audio',
         PvDoorFormat.game => 'Game',
+        PvDoorFormat.plan => 'Plan',
       };
 }
 
@@ -366,7 +372,9 @@ extension PvDoorLibraryCopy on PvDoorLibrary {
         PvDoorLibrary.recipe => PvDoorFormat.recipe,
         // A chart is a three-day plan you open, filter and download. That is a
         // tool, not a read.
-        PvDoorLibrary.dietChart => PvDoorFormat.tool,
+        // A chart is a plan she comes back to — a guide, not a tool; the
+        // "Tool" tag on every chart card read wrong (the user, 2026-09-20).
+        PvDoorLibrary.dietChart => PvDoorFormat.plan,
       };
 }
 
@@ -615,7 +623,18 @@ class PvDoorSection {
     this.lead,
     this.folded = false,
     this.strip = false,
+    this.moreSurfaceId,
+    this.railMax,
   }) : inlineSurfaceId = null;
+
+  /// "View all ›" on the heading, opening this surface — for a rail that
+  /// would otherwise be nineteen cards long (Nutrition's charts, 2026-09-20:
+  /// "it's a big scroll"). Null: no link.
+  final String? moreSurfaceId;
+
+  /// How many tiles the rail draws when [moreSurfaceId] is set; the rest
+  /// live on that screen. Null: all of them.
+  final int? railMax;
 
   /// A section whose rail is drawn by a widget, not by tiles.
   ///
@@ -638,6 +657,8 @@ class PvDoorSection {
     required this.heading,
     required String this.inlineSurfaceId,
     required this.group,
+    this.moreSurfaceId,
+    this.railMax,
   })  : tiles = const [],
         folded = false,
         strip = false,

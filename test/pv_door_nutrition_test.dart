@@ -203,7 +203,13 @@ void main() {
         for (final t in door.allTiles)
           if (t is PvDoorToolTile) t.surfaceId,
       ];
-      expect(surfaces, contains(kDietSurfaceCharts));
+      // kDietSurfaceCharts has no tool card any more either: the charts
+      // rail is capped at eight and its heading's "View all" opens the
+      // browser (PvDoorSection.moreSurfaceId, 2026-09-20).
+      final charts = door.sectionsOf(kDietTabCharts).first;
+      expect(charts.moreSurfaceId, kDietSurfaceCharts);
+      expect(charts.railMax, 8);
+      expect(surfaces, isNot(contains(kDietSurfaceCharts)));
       // kDietSurfaceRecipes (the pushed library) no longer has a card: the
       // Recipes tab is that library, inline, since 2026-09-20.
       expect(surfaces, isNot(contains(kDietSurfaceRecipes)));

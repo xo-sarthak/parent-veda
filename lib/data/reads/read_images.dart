@@ -1168,7 +1168,11 @@ const Map<String, String> kReadImageCredits = {
 /// and a fallback for an id the bucket lacks.
 ///
 /// Empty = not set up yet: the table's URLs are used directly, as before.
-const String kReadImageBase = '';
+// 2026-09-21: the R2 bucket `parentveda-images` on its r2.dev development
+// URL — 368 files, uploaded by tools/read_images/upload_to_r2.py. A custom
+// domain (img.parentveda.com) replaces this string later; nothing else
+// changes. Empty = the table's URLs, as before.
+const String kReadImageBase = 'https://pub-bfbc0773e60e4c5c851b535f08b384bc.r2.dev/';
 
 /// The picture for a read: its own, else ours (R2), else the table's, else
 /// none. An id that is in the table is assumed to be in the bucket once

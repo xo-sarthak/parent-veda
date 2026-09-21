@@ -222,7 +222,7 @@ with one brief: *"make sure Is it safe? and Nutrition don't look like a
 replica — Nutrition, as the word says, should satisfy its purpose; user
 experience, interface and psychology, and the user base who is pregnant."*
 
-**What it is, top to bottom:** hero (week · the chart · Today / Tomorrow)
+**What it is, top to bottom (as first built; the chips are gone since 70.4):** hero (week · the chart · Today / Tomorrow)
 → *Your plate* (photo rows, Swap, not today; *The chart* opens the source)
 → *Did you get…* (five rings, burst on tick, long-press → what counts)
 → *Water* (eight tumblers) → *Craving something?* (chips → craving page)
@@ -250,7 +250,7 @@ the panel; no white mist. Owed: seven-day charts, 3D category
 illustrations, 14 recipe photos.
 
 **To walk on the phone (the day, as first built; still true inside the tab)**
-- The plate: Today vs Tomorrow differ; Swap changes the row in place
+- The plate (Today only since 2026-09-20 evening): Swap changes the row in place
   (AnimatedSwitcher) and marks it; "Not today" dims and strikes; "Put it
   back" restores; "The chart" opens the right chart.
 - Ticks: the burst and the haptic; the line under changes 0 → n → 5; long

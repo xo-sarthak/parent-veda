@@ -19,6 +19,7 @@
 // =============================================================================
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:parentveda/data/reads/read_images.dart';
 import 'package:parentveda/data/tests_scans_reports_data.dart';
 import 'package:parentveda/data/reads/read_adapters.dart';
 import 'package:parentveda/data/doors/pv_door_data.dart';
@@ -305,9 +306,13 @@ void main() {
           expect(url, contains('w=900'), reason: '${door.bracketId} is uncropped.');
           expect(url, contains('fit=crop'), reason: '${door.bracketId} is uncropped.');
         } else {
-          // (the Openverse proxy serves StockSnap's 960w rendition — see
-          // `openverseImageUrl` in read_images.dart)
-          expect(url, anyOf(contains('/960w/'), contains('/960px-'), contains('/thumb/?full_size=true')),
+          // Our own bucket serves the mirror's 1200px long edge (the fetch
+          // script resizes on the way in), so a bucket URL is phone-sized by
+          // construction; the free-host renditions were the old answer.
+          expect(
+              url,
+              anyOf(startsWith(kReadImageBase), contains('/960w/'), contains('/960px-'),
+                  contains('/thumb/?full_size=true')),
               reason: '${door.bracketId} is uncropped.');
         }
       }

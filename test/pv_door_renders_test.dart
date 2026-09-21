@@ -397,6 +397,33 @@ void _everyDoor() {
       }
     });
 
+    testWidgets('$name: every rail runs edge to edge on every tab', (tester) async {
+      // ⚠️ THE GUTTER MISTAKE, MADE ONCE AND NOT AGAIN. The door wrapped its
+      // inline tools in the 18pt gutter and the Nutrition bodies padded
+      // themselves too: text sat 36pt in and every horizontal rail was
+      // clipped at the gutter — "a wall on the left and right" (the user,
+      // 2026-09-20). A rail scrolls UNDER the gutter: its box starts at the
+      // screen's left edge and its own padding makes the first card sit in.
+      await _pump(tester, name);
+      for (var i = 0; i < door.groups.length; i++) {
+        if (i > 0) {
+          await _goTab(tester, name, i);
+          await tester.pump(const Duration(milliseconds: 500));
+        }
+        final rails = find.byWidgetPredicate((w) => w is ListView && w.scrollDirection == Axis.horizontal);
+        for (final e in rails.evaluate()) {
+          final box = e.renderObject as RenderBox?;
+          if (box == null || !box.hasSize) continue;
+          final left = box.localToGlobal(Offset.zero).dx;
+          final width = box.size.width;
+          expect(left, closeTo(0, 0.5),
+              reason: '$name / "${door.groups[i].label}": a rail starts ${left}pt in — it is inside a gutter.');
+          expect(width, closeTo(tester.view.physicalSize.width / tester.view.devicePixelRatio, 0.5),
+              reason: '$name / "${door.groups[i].label}": a rail is narrower than the screen.');
+        }
+      }
+    });
+
     testWidgets('$name: every pinned flag renders every line', (tester) async {
       await _pump(tester, name);
       for (var i = 0; i < door.groups.length; i++) {

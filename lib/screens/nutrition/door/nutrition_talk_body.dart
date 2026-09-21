@@ -189,7 +189,7 @@ class NutritionTalkBody extends StatelessWidget {
               ])),
             ],
             const SizedBox(height: 22),
-            pvDoorPad(nutritionHeading(p, 'What she can do for you')),
+            pvDoorPad(nutritionHeading(p, 'What they can do for you')),
             const SizedBox(height: 4),
             pvDoorPad(Column(children: [
               for (var i = 0; i < _kWhatSheDoes.length; i++)
