@@ -228,7 +228,7 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
       id: kDietTabRecipes,
       label: 'Recipes',
       icon: Icons.soup_kitchen_outlined,
-      mark: IntentMark.cuppedHands,
+      mark: IntentMark.cookMark, // was cuppedHands — care, not cooking
       hue: 160,
       inlineSurfaceId: kDietSurfaceRecipeRail,
       inlineLabel: '${kRecipes.length} to cook',

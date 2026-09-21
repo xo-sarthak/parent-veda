@@ -603,7 +603,7 @@ class _FoundSheet extends StatelessWidget {
           else
             ColoredBox(
                 color: p.surfaceAlt,
-                child: Center(child: Icon(canICategoryIcon(e.category), size: 48, color: p.ink3))),
+                child: Center(child: canICategoryGlyph(p, e.category, size: 64))),
           // A white scrim rose under the name band here; the user
           // (2026-09-20): no white mist, no fading — the photo, then the
           // words. Kept for revert:

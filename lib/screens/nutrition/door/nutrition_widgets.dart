@@ -21,6 +21,7 @@ import '../../../data/nutrition/nutrition_photos.dart';
 import '../../../data/nutrition/food_values.dart';
 import '../../../theme/pv_fonts.dart';
 import '../../../widgets/pv_feedback.dart';
+import '../../brackets/hub/hub_intent_art.dart';
 import '../../can_i/can_i_widgets.dart' show CanIPhoto;
 import '../../v2/v2_palette.dart';
 
@@ -35,7 +36,15 @@ class NutritionPhoto extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final well = ColoredBox(color: p.surfaceAlt, child: Center(child: Icon(icon, size: iconSize, color: p.ink3)));
+    // No photo: the drawn plate in the door's tint, not a fork-and-knife on
+    // grey (2026-09-21). `icon` is kept on the signature for revert.
+    final well = ColoredBox(
+        color: nutritionMarkTint(p),
+        child: Center(
+            child: SizedBox(
+                width: iconSize * 1.5,
+                height: iconSize * 1.5,
+                child: HubIntentArt(mark: IntentMark.plate, tint: nutritionMarkTint(p)))));
     return url == null ? well : CanIPhoto(url: url!, fallback: well);
   }
 }
@@ -175,11 +184,14 @@ class PlateRow extends StatelessWidget {
 /// A need: a ring that fills on tap, a soft burst, the label under it.
 /// Nothing turns red; an unticked ring is just a ring.
 class NeedTile extends StatefulWidget {
-  const NeedTile({super.key, required this.p, required this.label, required this.icon, required this.ticked, required this.onTick, required this.onOpen});
+  const NeedTile({super.key, required this.p, required this.label, required this.icon, required this.ticked, required this.onTick, required this.onOpen, this.needId});
   final V2Palette p;
   final String label;
   final IconData icon;
   final bool ticked;
+
+  /// The need's id — when set, the drawn mark is used instead of [icon].
+  final String? needId;
   final VoidCallback onTick;
   final VoidCallback onOpen;
 
@@ -239,8 +251,14 @@ class _NeedTileState extends State<NeedTile> with SingleTickerProviderStateMixin
               ),
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 200),
-                child: Icon(widget.ticked ? Icons.check_rounded : widget.icon,
-                    key: ValueKey(widget.ticked), size: 22, color: widget.ticked ? p.ground : p.ink1),
+                child: widget.ticked
+                    ? Icon(Icons.check_rounded, key: const ValueKey(true), size: 22, color: p.ground)
+                    : widget.needId != null
+                        ? Padding(
+                            key: const ValueKey(false),
+                            padding: const EdgeInsets.all(9),
+                            child: nutritionNeedGlyph(p, widget.needId!, size: 26))
+                        : Icon(widget.icon, key: const ValueKey(false), size: 22, color: p.ink1),
               ),
             ),
           ]),
@@ -422,8 +440,10 @@ class RecipeCard extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(line, maxLines: 2, overflow: TextOverflow.ellipsis, style: pvManrope(fontSize: 12, height: 1.35, color: p.ink2)),
                 if (values != null) ...[
-                  const SizedBox(height: 4),
-                  NutritionGlanceLine(p: p, values: values, size: 11),
+                  const SizedBox(height: 6),
+                  // The three marks, small, instead of a kcal line (the
+                  // user's call, 2026-09-21).
+                  NutritionTopThree(p: p, values: values!, compact: true),
                 ],
               ]);
             }),
@@ -495,3 +515,105 @@ class NutritionGlanceLine extends StatelessWidget {
         style: pvManrope(fontSize: size, fontWeight: FontWeight.w600, height: 1.4, color: p.ink3));
   }
 }
+
+/// The five needs' marks — drawn (`IntentMark`), the same hand as the door's
+/// rail cards, worn by the ticks, "Strong in", the need pages and the chips.
+/// The Material line icons they replaced (spa, local_drink, egg_alt, eco,
+/// grass) are kept in `nutritionNeedIcon` for revert.
+IntentMark nutritionNeedMark(String id) => switch (id) {
+      'iron' => IntentMark.ironMark,
+      'calcium' => IntentMark.calciumMark,
+      'protein' => IntentMark.proteinMark,
+      'folic_acid' => IntentMark.folateMark,
+      _ => IntentMark.fibreMark,
+    };
+
+/// The door's tint for a need mark on a white ground: the Nutrition hue,
+/// the same seed the rail cards use.
+Color nutritionMarkTint(V2Palette p) => v2BlockTint(104, p);
+
+/// A need's mark at [size], in the door's tint.
+Widget nutritionNeedGlyph(V2Palette p, String id, {double size = 24}) =>
+    SizedBox(width: size, height: size, child: HubIntentArt(mark: nutritionNeedMark(id), tint: nutritionMarkTint(p)));
+
+/// Kept for revert (2026-09-21): the line icons the needs wore before.
+IconData nutritionNeedIcon(String id) => switch (id) {
+      'iron' => Icons.spa_outlined,
+      'calcium' => Icons.local_drink_outlined,
+      'protein' => Icons.egg_alt_outlined,
+      'folic_acid' => Icons.eco_outlined,
+      _ => Icons.grass_outlined,
+    };
+
+/// What a dish is strongest in, as three marks with the amount under each
+/// — the pictorial line the user asked for (2026-09-21: "not just pills";
+/// "chia seeds: fibre, omega-3, calcium"). Hollow ring, ink mark, the tick's
+/// own geometry at 48pt.
+class NutritionTopThree extends StatelessWidget {
+  const NutritionTopThree({super.key, required this.p, required this.values, this.title = 'Strong in', this.compact = false});
+  final V2Palette p;
+  final NutritionValues values;
+  final String title;
+
+  /// On a grid card: three small wells and the amounts, no title.
+  final bool compact;
+
+  @override
+  Widget build(BuildContext context) {
+    if (values.isEmpty) return const SizedBox.shrink();
+    final top = nutritionTopThree(values);
+    if (compact) {
+      // Scales down on a narrow card rather than overflowing.
+      return FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.centerLeft,
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          for (var i = 0; i < top.length; i++) ...[
+            if (i > 0) const SizedBox(width: 10),
+            nutritionNeedWell(p, top[i].$1, size: 22, radius: 7),
+            const SizedBox(width: 4),
+            Text(top[i].$3, style: pvManrope(fontSize: 11, fontWeight: FontWeight.w700, color: p.ink2)),
+          ],
+        ]),
+      );
+    }
+    // The tinted well — the door's rail cards and the doctor app's rows put
+    // a concept mark in one; the tick keeps its ring because it flips to a
+    // check.
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(title, style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: p.ink3)),
+      const SizedBox(height: 12),
+      Row(children: [
+        for (var i = 0; i < top.length; i++) ...[
+          if (i > 0) const SizedBox(width: 22),
+          Column(children: [
+            nutritionNeedWell(p, top[i].$1, size: 48, radius: 15),
+            const SizedBox(height: 8),
+            Text(top[i].$3, style: pvFraunces(fontSize: 15, fontWeight: FontWeight.w600, color: p.ink1)),
+            const SizedBox(height: 1),
+            Text(top[i].$2, style: pvManrope(fontSize: 11.5, color: p.ink2)),
+          ]),
+        ],
+      ]),
+    ]);
+  }
+}
+
+/// Any mark in the door's tinted well — for rows that are not a need.
+Widget nutritionMarkWell(V2Palette p, IntentMark mark, {double size = 40, double radius = 12}) => Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(color: nutritionMarkTint(p), borderRadius: BorderRadius.circular(radius)),
+      padding: EdgeInsets.all(size * 0.2),
+      child: HubIntentArt(mark: mark, tint: nutritionMarkTint(p)),
+    );
+
+/// A need's mark in a tinted well — `DoctorArtTile`'s geometry: the tint as
+/// the ground, the mark at 60% of the tile.
+Widget nutritionNeedWell(V2Palette p, String id, {double size = 48, double radius = 15}) => Container(
+      width: size,
+      height: size,
+      decoration: BoxDecoration(color: nutritionMarkTint(p), borderRadius: BorderRadius.circular(radius)),
+      padding: EdgeInsets.all(size * 0.2),
+      child: HubIntentArt(mark: nutritionNeedMark(id), tint: nutritionMarkTint(p)),
+    );

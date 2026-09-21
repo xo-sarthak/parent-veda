@@ -8810,6 +8810,10 @@ Click by click at the user's ask ("recursive tree"). Built and walked:
   Guide, which would turn the rail into a list).
 - "What she can do for you" → "What they can do for you".
 
+### 70.7 What the user still wants to change on Nutrition
+"A few changes on the Nutrition side" — to be given after the pregnancy
+home (2026-09-21). Not yet specified.
+
 ### 70.6 Seven days, the week at a glance, pictorial nutrients — 2026-09-21
 - **Every English chart has seven days** (`diet_chart_days_more.dart`, spliced
   into `kChartContent`; the Hindi chart keeps three). Every new line is in

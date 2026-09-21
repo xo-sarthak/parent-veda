@@ -27,6 +27,7 @@ import '../../data/reads/read_images.dart';
 import '../../models/can_i_entry.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
+import '../brackets/hub/hub_intent_art.dart';
 import '../v2/v2_palette.dart';
 
 /// The photo for an entry, from the one read-image table (`cani_<id>`).
@@ -40,6 +41,20 @@ Color canIVerdictColor(CanIVerdict v, V2Palette p) => switch (v) {
       CanIVerdict.avoid => const Color(0xFFE0475F),
       CanIVerdict.askDoctor => p.ink1,
     };
+
+/// The category as a drawn mark (2026-09-21): eat = the plate, drink = the
+/// glass, take = the capsule, do = the steps. `canICategoryIcon` stays for
+/// revert.
+IntentMark canICategoryMark(CanICategory c) => switch (c) {
+      CanICategory.eat => IntentMark.plate,
+      CanICategory.drink => IntentMark.calciumMark,
+      CanICategory.take => IntentMark.pillMark,
+      CanICategory.doActivity => IntentMark.stepsMark,
+    };
+
+/// The category mark at [size], in Is it safe?'s green.
+Widget canICategoryGlyph(V2Palette p, CanICategory c, {double size = 28}) =>
+    SizedBox(width: size, height: size, child: HubIntentArt(mark: canICategoryMark(c), tint: v2BlockTint(136, p)));
 
 IconData canICategoryIcon(CanICategory c) => switch (c) {
       CanICategory.eat => Icons.restaurant_outlined,
@@ -211,7 +226,7 @@ class CanICutoutTile extends StatelessWidget {
   }
 
   Widget _well(V2Palette p) => Center(
-        child: Icon(canICategoryIcon(entry.category), size: 30, color: p.ink3),
+        child: Center(child: canICategoryGlyph(p, entry.category, size: 40)),
       );
 }
 
@@ -247,8 +262,8 @@ class CanIRow extends StatelessWidget {
             ),
             clipBehavior: Clip.antiAlias,
             child: url != null
-                ? CanIPhoto(url: url, fallback: Icon(canICategoryIcon(entry.category), size: 20, color: p.ink3))
-                : Icon(canICategoryIcon(entry.category), size: 20, color: p.ink3),
+                ? CanIPhoto(url: url, fallback: Center(child: canICategoryGlyph(p, entry.category, size: 26)))
+                : Center(child: canICategoryGlyph(p, entry.category, size: 26)),
           ),
           const SizedBox(width: 12),
           Expanded(

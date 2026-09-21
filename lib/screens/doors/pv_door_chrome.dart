@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
 import '../../widgets/global_ask_fab.dart' show FabState, kAskFabBottomOffset, kAskFabSize;
+import '../brackets/hub/hub_intent_art.dart';
 import '../v2/v2_palette.dart';
 import '../v2/v3_hero_field.dart';
 
@@ -306,11 +307,16 @@ class PvDoorRailCard extends StatelessWidget {
     this.dimmed = false,
     this.onTap,
     this.imageUrl,
+    this.mark,
   });
 
   final V2Palette p;
   final double hue;
   final IconData icon;
+
+  /// The drawn mark (2026-09-21): the ghost at the card's corner and the
+  /// chip's glyph. Null: the Material [icon], for revert.
+  final IntentMark? mark;
 
   /// A photograph filling the card, with a white scrim rising under the
   /// type — the reader's next-step tile treatment, on a rail (2026-09-20,
@@ -374,7 +380,18 @@ class PvDoorRailCard extends StatelessWidget {
                   ),
                 ),
               ),
-            ] else
+            ] else if (mark case final m?)
+              // The format, drawn, as the card's ghost — where the Material
+              // icon sat at 96 in white. Deeper than the tint, faint.
+              Positioned(
+                right: -18,
+                bottom: 14,
+                child: Opacity(
+                  opacity: 0.55,
+                  child: SizedBox(width: 108, height: 108, child: HubIntentArt(mark: m, tint: tint)),
+                ),
+              )
+            else
               Positioned(
                 right: -22,
                 bottom: 22,
@@ -394,7 +411,12 @@ class PvDoorRailCard extends StatelessWidget {
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Row(mainAxisSize: MainAxisSize.min, children: [
-                      Icon(icon, size: 10, color: deep),
+                      // The chip is a label: its glyph is the drawn mark
+                      // when there is one, tiny.
+                      if (mark case final m?)
+                        SizedBox(width: 11, height: 11, child: HubIntentArt(mark: m, tint: tint))
+                      else
+                        Icon(icon, size: 10, color: deep),
                       const SizedBox(width: 4),
                       Flexible(
                         child: Text(chip,

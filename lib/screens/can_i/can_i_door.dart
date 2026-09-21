@@ -786,7 +786,10 @@ class _CanIDoorBodyState extends State<CanIDoorBody> {
           child: Stack(
             fit: StackFit.expand,
             children: [
-              Positioned(right: -16, bottom: -12, child: Icon(canICategoryIcon(cat), size: 96, color: p.line)),
+              Positioned(
+                  right: -14,
+                  bottom: -10,
+                  child: Opacity(opacity: 0.35, child: canICategoryGlyph(p, cat, size: 110))),
               if (url != null) CanIPhoto(url: url, fallback: const SizedBox.shrink()),
               Positioned.fill(
                 child: DecoratedBox(

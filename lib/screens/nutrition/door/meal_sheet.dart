@@ -96,6 +96,8 @@ class _MealSheet extends StatelessWidget {
                     ],
                     if (estimateMeal(current) case final v?) ...[
                       const SizedBox(height: 16),
+                      NutritionTopThree(p: p, values: v),
+                      const SizedBox(height: 18),
                       NutritionValuesGrid(p: p, values: v, title: 'This meal, estimated'),
                     ],
                     const SizedBox(height: 18),

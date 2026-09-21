@@ -185,6 +185,22 @@ final Map<String, FoodValue> kFoodValues = {
   'panjiri': FoodValue(_v(480, 9, 3.0, 80, 4, 30), serving: 40),
   'gond ka laddu': FoodValue(_v(450, 7, 3.0, 70, 3, 25), serving: 40),
   'gond laddu': FoodValue(_v(450, 7, 3.0, 70, 3, 25), serving: 40),
+  'pongal': FoodValue(_v(150, 5, 1.0, 20, 2, 25), serving: 200),
+  'pesarattu': FoodValue(_v(180, 9, 2.0, 30, 3.5, 100), serving: 120, pieceGrams: 60),
+  'poriyal': FoodValue(_v(80, 2.5, 1.0, 45, 3, 35), serving: 100),
+  'keerai': FoodValue(_v(40, 3, 2.5, 100, 2.5, 140), serving: 100),
+  'thoran': FoodValue(_v(90, 2.5, 1.0, 45, 3, 35), serving: 100),
+  'bisi bele bath': FoodValue(_v(140, 5, 1.5, 25, 3, 40), serving: 250),
+  'ragi mudde': FoodValue(_v(110, 2.5, 1.5, 120, 3, 8), serving: 150),
+  'sattu': FoodValue(_v(400, 20, 6.0, 60, 12, 200), serving: 40),
+  'sattu paratha': FoodValue(_v(300, 11, 3.5, 40, 6, 60), serving: 90, pieceGrams: 90),
+  'khandvi': FoodValue(_v(150, 7, 1.2, 40, 2, 70), serving: 80),
+  'shrikhand': FoodValue(_v(220, 5, 0.2, 130, 0, 8), serving: 80),
+  'mishti doi': FoodValue(_v(150, 4, 0.2, 130, 0, 7), serving: 100),
+  'chorchori': FoodValue(_v(90, 2.5, 1.2, 45, 3.5, 40), serving: 120),
+  'aloo posto': FoodValue(_v(150, 4, 1.5, 40, 2.5, 20), serving: 120),
+  'bajra roti': FoodValue(_v(300, 9, 5.0, 30, 6, 40), serving: 60, pieceGrams: 60),
+  'jowar roti': FoodValue(_v(290, 8, 3.0, 25, 7, 20), serving: 60, pieceGrams: 60),
   'kadala curry': FoodValue(_v(140, 7, 2.6, 45, 5, 95), serving: 150),
   'khichuri': FoodValue(_v(120, 4.5, 1.0, 20, 2, 25), serving: 250),
   'adai': FoodValue(_v(190, 9, 2.2, 30, 3.5, 90), serving: 120, pieceGrams: 60),
@@ -349,6 +365,9 @@ final Map<String, FoodValue> kFoodValues = {
   'chirer polao': FoodValue(_v(150, 3, 1.5, 15, 1.5, 10), serving: 150),
   'luchi': FoodValue(_v(330, 6, 1.5, 15, 1.5, 15), serving: 60, pieceGrams: 30),
   'biscuits': FoodValue(_v(480, 6, 1.5, 20, 1, 10), serving: 30),
+  'biscuit': FoodValue(_v(480, 6, 1.5, 20, 1, 10), serving: 15, pieceGrams: 8),
+  'crackers': FoodValue(_v(430, 8, 1.5, 30, 2, 15), serving: 20, pieceGrams: 5),
+  'cornflakes': FoodValue(_v(370, 7, 8.0, 10, 3, 100), serving: 30),
   'samosa': FoodValue(_v(260, 5, 1.5, 20, 2, 15), serving: 100),
   'pakora': FoodValue(_v(280, 7, 2.0, 30, 3, 60), serving: 80),
 
@@ -506,6 +525,20 @@ String nutritionGlance(NutritionValues v) {
   ]..sort((a, b) => b.$1.compareTo(a.$1));
   if (ranked.first.$1 > 0.03) parts.add(ranked.first.$2);
   return parts.join('  ·  ');
+}
+
+/// The three a dish is strongest in, ranked by share of a day's reference —
+/// energy excluded (every dish has some). (need id, label, value with unit.)
+/// The need id matches `kPlateNeeds` so the tick's own mark can draw it.
+List<(String, String, String)> nutritionTopThree(NutritionValues v) {
+  final ranked = [
+    (v.protein / kPregnancyDayReference.protein, 'protein', 'Protein', '${_n(v.protein)} g'),
+    (v.iron / kPregnancyDayReference.iron, 'iron', 'Iron', '${_n(v.iron)} mg'),
+    (v.calcium / kPregnancyDayReference.calcium, 'calcium', 'Calcium', '${_n(v.calcium)} mg'),
+    (v.fibre / kPregnancyDayReference.fibre, 'fibre', 'Fibre', '${_n(v.fibre)} g'),
+    (v.folate / kPregnancyDayReference.folate, 'folic_acid', 'Folate', '${_n(v.folate)} µg'),
+  ]..sort((a, b) => b.$1.compareTo(a.$1));
+  return [for (final r in ranked.take(3)) (r.$2, r.$3, r.$4)];
 }
 
 /// The six, for a tile grid: (label, value with unit).

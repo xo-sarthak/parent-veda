@@ -29,15 +29,18 @@ import '../../post_pregnancy/pp_expert_link.dart' show openExpertProfile;
 import '../../post_pregnancy/pp_experts_data.dart' show expertByName;
 import '../../prepare/consultations_screen.dart';
 import '../../v2/v2_palette.dart';
+import '../../brackets/hub/hub_intent_art.dart';
 import 'nutrition_widgets.dart';
 
 const String kNutritionConsultRole = 'sp_nutrition';
 
-const List<(IconData, String, String)> _kWhatSheDoes = [
-  (Icons.description_outlined, 'A personal diet plan', 'Built around your own reports and routine, not a generic chart.'),
-  (Icons.videocam_outlined, 'Weekly check-ins', 'Steady calls as your needs change through pregnancy.'),
-  (Icons.monitor_heart_outlined, 'Day-to-day management', 'Hands-on help if a condition needs close watching.'),
-  (Icons.help_outline_rounded, 'One session, your questions', 'A single consult to get specific answers.'),
+// Drawn marks since 2026-09-21 (were description / videocam / monitor_heart
+// / help_outline line icons).
+const List<(IntentMark, String, String)> _kWhatSheDoes = [
+  (IntentMark.pageMark, 'A personal diet plan', 'Built around your own reports and routine, not a generic chart.'),
+  (IntentMark.calendarDay, 'Weekly check-ins', 'Steady calls as your needs change through pregnancy.'),
+  (IntentMark.chartLog, 'Day-to-day management', 'Hands-on help if a condition needs close watching.'),
+  (IntentMark.questionMark, 'One session, your questions', 'A single consult to get specific answers.'),
 ];
 
 class NutritionTalkBody extends StatelessWidget {
@@ -200,7 +203,7 @@ class NutritionTalkBody extends StatelessWidget {
                     decoration: BoxDecoration(
                         border: i == _kWhatSheDoes.length - 1 ? null : Border(bottom: BorderSide(color: p.line))),
                     child: Row(children: [
-                      Icon(_kWhatSheDoes[i].$1, size: 20, color: p.ink1),
+                      nutritionMarkWell(p, _kWhatSheDoes[i].$1),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

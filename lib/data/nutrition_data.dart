@@ -1641,7 +1641,12 @@ class Recipe {
     required this.videoTitle,
     this.meals = const [RecipeMeal.lunch, RecipeMeal.dinner],
     this.kind = RecipeKind.main,
+    this.fact,
   });
+
+  /// One "did you know" about the dish — a fact about the food, never about
+  /// her (2026-09-21). Null: the page shows no line.
+  final String? fact;
 
   /// When it is eaten; the grid's meal tiles filter on this.
   final List<RecipeMeal> meals;
@@ -1699,6 +1704,7 @@ final List<Recipe> kRecipes = [
   //  dish, which is a fact about the food and not an instruction about her.
   Recipe(
     id: 'pcos_moong_chilla',
+    fact: "Moong is the dal that keeps its protein through soaking and grinding — a chilla has more of it than the same weight of roti.",
     meals: const [RecipeMeal.breakfast, RecipeMeal.snack],
     kind: RecipeKind.light,
     name: _en('Moong dal chilla with curd'),
@@ -1737,6 +1743,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'bengali_macher_jhol',
+    fact: "River fish like rohu and katla are low in mercury, which is why a Bengali kitchen can have fish four days a week in pregnancy.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
     name: _en('Bengali macher jhol'),
@@ -1766,6 +1773,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'bengali_shukto',
+    fact: "Bitter gourd and drumstick in shukto are two of the highest-fibre vegetables an Indian kitchen cooks.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
     name: _en('Bengali shukto'),
@@ -1793,6 +1801,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'tamil_ragi_kanji',
+    fact: "Ragi has about ten times the calcium of rice — a bowl of kanji is a glass of milk in grain form.",
     meals: const [RecipeMeal.breakfast],
     kind: RecipeKind.light,
     name: _en('Tamil ragi kanji'),
@@ -1818,6 +1827,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'tamil_sambar',
+    fact: "Sambar's dal and its tamarind are a pair: the sour helps the iron from the dal go in.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
     name: _en('Tamil sambar'),
@@ -1845,6 +1855,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'punjabi_palak_paneer',
+    fact: "Spinach is folate; paneer is calcium and protein. Together they cover three of the five ticks in one dish.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
     name: _en('Punjabi palak paneer'),
@@ -1873,6 +1884,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'punjabi_rajma',
+    fact: "A cup of cooked rajma has more fibre than a bowl of oats and nearly as much protein as an egg.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
     name: _en('Punjabi rajma'),
@@ -1900,6 +1912,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'gujarati_dhokla',
+    fact: "Fermented and steamed: dhokla's batter makes its own B vitamins overnight, and steaming keeps them.",
     meals: const [RecipeMeal.breakfast, RecipeMeal.snack],
     kind: RecipeKind.light,
     name: _en('Gujarati dhokla'),
@@ -1927,6 +1940,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'gujarati_khichdi',
+    fact: "Rice and moong together make a complete protein — the reason khichdi has fed sick days for a thousand years.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
     name: _en('Gujarati moong dal khichdi'),
@@ -1954,6 +1968,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'south_indian_ragi_dosa',
+    fact: "Swapping half the rice for ragi in a dosa adds calcium and iron without changing how it cooks.",
     meals: const [RecipeMeal.breakfast, RecipeMeal.dinner],
     kind: RecipeKind.main,
     name: _en('South Indian ragi dosa'),
@@ -1981,6 +1996,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'south_indian_curd_rice',
+    fact: "Curd rice is probiotic and cooling — the meal for a hot afternoon or a stomach that wants nothing spicy.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
     name: _en('South Indian curd rice'),
@@ -2008,6 +2024,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'maharashtrian_varan_bhaat',
+    fact: "Varan is toor dal at its plainest, and toor has the most protein of the everyday dals.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
     name: _en('Maharashtrian varan bhaat'),
@@ -2034,6 +2051,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'maharashtrian_thalipeeth',
+    fact: "Thalipeeth mixes four flours; bajra brings the iron and jowar the fibre.",
     meals: const [RecipeMeal.breakfast, RecipeMeal.dinner],
     kind: RecipeKind.main,
     name: _en('Maharashtrian thalipeeth'),
@@ -2061,6 +2079,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'jain_kadhi_khichdi',
+    fact: "Kadhi's curd is calcium and the besan is protein — a no-onion, no-garlic dish that still adds up.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
     name: _en('Jain kadhi khichdi'),
@@ -2088,6 +2107,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'besan_chilla',
+    fact: "Besan has three times the protein of wheat flour and a fifth of the glycaemic load — a chilla steadies the morning.",
     meals: const [RecipeMeal.breakfast, RecipeMeal.snack],
     kind: RecipeKind.light,
     name: _en('Besan chilla'),
@@ -2115,6 +2135,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'vegetable_daliya',
+    fact: "Daliya is whole wheat cracked, not milled — the bran stays, and so does the fibre.",
     meals: const [RecipeMeal.breakfast, RecipeMeal.dinner],
     kind: RecipeKind.light,
     name: _en('Vegetable daliya'),

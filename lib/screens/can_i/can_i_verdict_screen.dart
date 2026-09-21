@@ -303,7 +303,7 @@ class CanIVerdictScreen extends StatelessWidget {
 
   Widget _well(V2Palette p) => ColoredBox(
         color: p.surfaceAlt,
-        child: Center(child: Icon(canICategoryIcon(entry.category), size: 56, color: p.ink3)),
+        child: Center(child: canICategoryGlyph(p, entry.category, size: 72)),
       );
 
   Widget _round(V2Palette p, IconData icon, VoidCallback onTap, {Color? tint}) => Material(

@@ -57,6 +57,7 @@
 // =============================================================================
 
 import '../localization/app_language.dart';
+import 'diet_chart_days_more.dart';
 
 LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
 LocalizedText _t(String en, String hi) => LocalizedText(en: en, hi: hi);
@@ -170,7 +171,9 @@ bool hasHindiContent(String chartId) {
 //  section is for.
 // =============================================================================
 
-final Map<String, ChartContent> kChartContent = {
+/// The charts as written — three days each. `kChartContent` is this with
+/// days four to seven spliced in where they exist (diet_chart_days_more.dart).
+final Map<String, ChartContent> _kChartContentAsWritten = {
   // ---------------------------------------------------------------------------
   'full_month_indian': ChartContent(
     focus: _en('A general, all-round chart for an ordinary Indian kitchen, '
@@ -1212,3 +1215,19 @@ final Map<String, ChartContent> kChartContent = {
     ],
   ),
 };
+
+/// Every chart, with the extra days spliced in. Nothing else about a chart
+/// changes — focus, swaps, limits and the doctor's note are the writer's.
+final Map<String, ChartContent> kChartContent = {
+  for (final e in _kChartContentAsWritten.entries)
+    e.key: kChartDaysMore.containsKey(e.key)
+        ? ChartContent(
+            focus: e.value.focus,
+            days: [...e.value.days, ...kChartDaysMore[e.key]!],
+            swaps: e.value.swaps,
+            limits: e.value.limits,
+            doctorNote: e.value.doctorNote,
+          )
+        : e.value,
+};
+

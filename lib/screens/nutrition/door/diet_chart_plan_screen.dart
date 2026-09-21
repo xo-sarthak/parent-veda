@@ -87,25 +87,34 @@ class _DietChartPlanScreenState extends State<DietChartPlanScreen> {
           children: content == null
               ? [pvDoorPad(Text('This chart is still being written.', style: _body(p)))]
               : [
-                  // ---- the day strip ------------------------------------
-                  SizedBox(
-                    height: 40,
-                    child: ListView(
-                      scrollDirection: Axis.horizontal,
-                      padding: const EdgeInsets.symmetric(horizontal: kPvDoorGutter),
-                      children: [
-                        for (var i = 0; i < content.days.length; i++) ...[
-                          if (i > 0) const SizedBox(width: 8),
-                          NutritionChip(
-                              label: content.days[i].label.en,
-                              p: p,
-                              selected: _day == i,
-                              onTap: () => setState(() => _day = i)),
-                        ],
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 6),
+                  // ---- the week at a glance --------------------------------
+                  // What "a diet chart" means to her before she has read a
+                  // word: the table on the fridge — days across, meals down
+                  // (the user, 2026-09-21). One glance says the whole week;
+                  // a tap on a day column opens that day's rows under it.
+                  _WeekGrid(p: p, content: content, day: _day, onDay: (i) => setState(() => _day = i)),
+                  const SizedBox(height: 22),
+                  // The Day 1·2·3 chip strip sat here; the week grid's header does
+                  // the same job (the user's call, 2026-09-21). Kept for revert:
+                  // // ---- the day strip ------------------------------------
+                  // SizedBox(
+                  //   height: 40,
+                  //   child: ListView(
+                  //     scrollDirection: Axis.horizontal,
+                  //     padding: const EdgeInsets.symmetric(horizontal: kPvDoorGutter),
+                  //     children: [
+                  //       for (var i = 0; i < content.days.length; i++) ...[
+                  //         if (i > 0) const SizedBox(width: 8),
+                  //         NutritionChip(
+                  //             label: content.days[i].label.en,
+                  //             p: p,
+                  //             selected: _day == i,
+                  //             onTap: () => setState(() => _day = i)),
+                  //       ],
+                  //     ],
+                  //   ),
+                  // ),
+                  // const SizedBox(height: 6),
                   // ---- that day, as the plate draws a day -----------------
                   pvDoorPad(Column(children: [
                     for (var i = 0; i < content.days[_day].meals.length; i++)
@@ -238,4 +247,106 @@ class _DietChartPlanScreenState extends State<DietChartPlanScreen> {
             ]),
           ),
       ]);
+}
+
+/// The week as a table: a column per day, a row per meal slot, the dish's
+/// first words in each cell. Scrolls sideways under the gutter; the chosen
+/// day's column is ink. Days run to seven where the chart has them.
+class _WeekGrid extends StatelessWidget {
+  const _WeekGrid({required this.p, required this.content, required this.day, required this.onDay});
+  final V2Palette p;
+  final ChartContent content;
+  final int day;
+  final ValueChanged<int> onDay;
+
+  static const double _col = 104;
+  static const double _slotCol = 78;
+
+  @override
+  Widget build(BuildContext context) {
+    // The slots, in the order the first day names them; a day that lacks a
+    // slot shows a dash rather than shifting the row.
+    final slots = <String>[];
+    for (final d in content.days) {
+      for (final m in d.meals) {
+        if (!slots.contains(m.meal.en)) slots.add(m.meal.en);
+      }
+    }
+    String cell(ChartDay d, String slot) {
+      for (final m in d.meals) {
+        if (m.meal.en == slot) {
+          final t = m.items.en.split(RegExp('[—–,(]')).first.trim();
+          return t;
+        }
+      }
+      return '—';
+    }
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: kPvDoorGutter),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        // header: the day names, tappable
+        Row(children: [
+          const SizedBox(width: _slotCol),
+          for (var i = 0; i < content.days.length; i++)
+            SizedBox(
+              width: _col,
+              child: InkWell(
+                onTap: () {
+                  pvCommitFeedback();
+                  onDay(i);
+                },
+                borderRadius: BorderRadius.circular(10),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(content.days[i].label.en,
+                      textAlign: TextAlign.center,
+                      style: pvManrope(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w800,
+                          color: i == day ? p.ink1 : p.ink3,
+                          decoration: i == day ? TextDecoration.underline : null)),
+                ),
+              ),
+            ),
+        ]),
+        for (var r = 0; r < slots.length; r++)
+          Container(
+            decoration: BoxDecoration(border: Border(top: BorderSide(color: p.line))),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              SizedBox(
+                width: _slotCol,
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(0, 10, 8, 10),
+                  child: Text(slots[r].toUpperCase(),
+                      style: pvManrope(fontSize: 9.5, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: p.ink3)),
+                ),
+              ),
+              for (var i = 0; i < content.days.length; i++)
+                SizedBox(
+                  width: _col,
+                  child: InkWell(
+                    onTap: () {
+                      pvCommitFeedback();
+                      onDay(i);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(6, 10, 6, 10),
+                      child: Text(cell(content.days[i], slots[r]),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: pvManrope(
+                              fontSize: 12,
+                              height: 1.3,
+                              fontWeight: i == day ? FontWeight.w700 : FontWeight.w500,
+                              color: i == day ? p.ink1 : p.ink2)),
+                    ),
+                  ),
+                ),
+            ]),
+          ),
+      ]),
+    );
+  }
 }

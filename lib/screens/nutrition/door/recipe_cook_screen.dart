@@ -123,19 +123,25 @@ class _RecipeCookScreenState extends State<RecipeCookScreen> {
                       style: pvFraunces(fontSize: 28, fontWeight: FontWeight.w600, height: 1.1, letterSpacing: -0.6, color: p.ink1)),
                   const SizedBox(height: 8),
                   Text(r.whyNow.en, style: pvManrope(fontSize: 15, height: 1.5, color: p.ink1)),
-                  const SizedBox(height: 12),
-                  // The writer's highlights ("Whole dal, no refined flour") stay
-                  // as pills; the numbers are the grid under them.
-                  Wrap(spacing: 8, runSpacing: 8, children: [
-                    for (final g in r.nutritionGlance)
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        decoration: BoxDecoration(
-                            color: p.surface, borderRadius: BorderRadius.circular(999), border: Border.all(color: p.line)),
-                        child: Text(g, style: pvManrope(fontSize: 12, fontWeight: FontWeight.w700, color: p.ink2)),
-                      ),
-                  ]),
                   const SizedBox(height: 18),
+                  // What it is strong in, as marks (the user, 2026-09-21: not
+                  // pills). The writer's glance strings that were pills here
+                  // are kept in the data for revert; `fact` is the line now.
+                  NutritionTopThree(p: p, values: estimateRecipe(r)),
+                  if (r.fact case final fact?) ...[
+                    const SizedBox(height: 16),
+                    Container(
+                      padding: const EdgeInsets.only(left: 14),
+                      decoration: BoxDecoration(border: Border(left: BorderSide(color: p.ink1, width: 2))),
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text('Did you know',
+                            style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: p.ink3)),
+                        const SizedBox(height: 4),
+                        Text(fact, style: pvManrope(fontSize: 14.5, height: 1.5, color: p.ink1)),
+                      ]),
+                    ),
+                  ],
+                  const SizedBox(height: 20),
                   NutritionValuesGrid(p: p, values: estimateRecipe(r)),
                 ]),
               ),

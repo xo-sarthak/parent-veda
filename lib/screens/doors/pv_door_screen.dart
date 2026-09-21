@@ -60,6 +60,7 @@ import '../../data/reads/read_images.dart';
 import '../v2/v2_palette.dart';
 import '../v2/v3_bracket_art.dart';
 import '../v2/v3_hero_field.dart';
+import '../brackets/hub/hub_intent_art.dart';
 import 'pv_door_carousel.dart';
 import 'pv_door_chips.dart';
 import 'pv_door_chrome.dart';
@@ -619,6 +620,7 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                               : pvDoorPad(_ArticleList(
                                   tiles: tiles,
                                   p: p,
+                                  hue: hue,
                                   onOpen: _openTile,
                                 )),
                         )
@@ -1025,6 +1027,25 @@ class _Hero extends StatelessWidget {
 // -----------------------------------------------------------------------------
 
 /// The format's mark. Small on a chip, large and quiet behind a card.
+/// The format's DRAWN mark — what the row wells and the rail cards' ghost
+/// wear since 2026-09-21 (the user: one hand, "bye bye to the generic
+/// icons"). `pvDoorFormatIcon` below stays for the chip's tiny glyph and for
+/// revert.
+IntentMark pvDoorFormatMark(PvDoorFormat format) => switch (format) {
+      PvDoorFormat.tool => IntentMark.toolMark,
+      PvDoorFormat.article => IntentMark.pageMark,
+      PvDoorFormat.guide => IntentMark.bookMark,
+      PvDoorFormat.read => IntentMark.pageMark,
+      PvDoorFormat.mythFact => IntentMark.questionMark,
+      PvDoorFormat.checklist => IntentMark.checkMark,
+      PvDoorFormat.talk => IntentMark.askDoctor,
+      PvDoorFormat.recipe => IntentMark.cookMark,
+      PvDoorFormat.video => IntentMark.playMark,
+      PvDoorFormat.audio => IntentMark.audioMark,
+      PvDoorFormat.game => IntentMark.blocksMark,
+      PvDoorFormat.plan => IntentMark.calendarDay,
+    };
+
 IconData pvDoorFormatIcon(PvDoorFormat format) => switch (format) {
       PvDoorFormat.tool => Icons.tune_rounded,
       PvDoorFormat.article => Icons.article_outlined,
@@ -1085,6 +1106,7 @@ class _RailCard extends StatelessWidget {
         hue: hue,
         index: index,
         icon: pvDoorFormatIcon(tile.format),
+        mark: pvDoorFormatMark(tile.format),
         chip: tile.comingSoon ? 'Coming soon' : tile.format.label,
         title: tile.title,
         meta: tile.meta,
@@ -1334,11 +1356,14 @@ class _TabNote extends StatelessWidget {
 // =============================================================================
 
 class _ArticleList extends StatelessWidget {
-  const _ArticleList({required this.tiles, required this.p, required this.onOpen});
+  const _ArticleList({required this.tiles, required this.p, required this.onOpen, this.hue});
 
   final List<PvDoorTile> tiles;
   final V2Palette p;
   final void Function(PvDoorTile) onOpen;
+
+  /// The door's hue: the well and the mark take its tint.
+  final double? hue;
 
   @override
   Widget build(BuildContext context) {
@@ -1414,10 +1439,14 @@ class _ArticleList extends StatelessWidget {
     ]);
   }
 
+  // The format as a drawn mark in a tinted well (DoctorArtTile's geometry);
+  // was a Material icon on grey. Kept for revert:
+  //   Icon(pvDoorFormatIcon(t.format), size: 22, color: p.ink2)
   Widget _well(Color well, PvDoorTile t) => Container(
-        color: well,
+        color: hue == null ? well : v2BlockTint(hue!, p),
         alignment: Alignment.center,
-        child: Icon(pvDoorFormatIcon(t.format), size: 22, color: p.ink2),
+        padding: const EdgeInsets.all(11),
+        child: HubIntentArt(mark: pvDoorFormatMark(t.format), tint: v2BlockTint(hue ?? 104, p)),
       );
 }
 

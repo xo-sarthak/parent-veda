@@ -28,6 +28,7 @@ import '../../../services/nutrition_day_store.dart';
 import '../../../services/pregnancy_controller.dart';
 import '../../../theme/pv_fonts.dart';
 import '../../../widgets/pv_feedback.dart';
+import '../../brackets/hub/hub_intent_art.dart';
 import '../../doors/pv_door_chrome.dart';
 import '../../v2/v2_palette.dart';
 import '../craving_detail_screen.dart';
@@ -228,7 +229,8 @@ class _NutritionTodayBodyState extends State<NutritionTodayBody> {
                   NeedTile(
                     p: p,
                     label: n.label,
-                    icon: _needIcon(n.id),
+                    icon: nutritionNeedIcon(n.id),
+                    needId: n.id,
                     ticked: store.ticked(_date, n.id),
                     onTick: () => store.toggleTick(_date, n.id),
                     onOpen: () => Navigator.of(context).push(MaterialPageRoute<void>(
@@ -267,13 +269,13 @@ class _NutritionTodayBodyState extends State<NutritionTodayBody> {
               NutritionChip(
                 label: FamilyProfileStore.instance.diet?.label.en ?? 'Diet: not set',
                 p: p,
-                leading: Icon(Icons.restaurant_outlined, size: 14, color: p.ink1),
+                leading: SizedBox(width: 16, height: 16, child: HubIntentArt(mark: IntentMark.plate, tint: nutritionMarkTint(p))),
                 onTap: () => showPreferenceSheet(context),
               ),
               NutritionChip(
                 label: store.region == null ? 'Region: any' : plateRegionLabel(store.region!),
                 p: p,
-                leading: Icon(Icons.place_outlined, size: 14, color: p.ink1),
+                leading: SizedBox(width: 16, height: 16, child: HubIntentArt(mark: IntentMark.compassMark, tint: nutritionMarkTint(p))),
                 onTap: () => showPreferenceSheet(context, region: true),
               ),
             ])),
@@ -289,13 +291,8 @@ class _NutritionTodayBodyState extends State<NutritionTodayBody> {
     return '$ticked of ${kPlateNeeds.length} today — every one helps.';
   }
 
-  IconData _needIcon(String id) => switch (id) {
-        'iron' => Icons.spa_outlined,
-        'calcium' => Icons.local_drink_outlined,
-        'protein' => Icons.egg_alt_outlined,
-        'folic_acid' => Icons.eco_outlined,
-        _ => Icons.grass_outlined,
-      };
+  // `nutritionNeedIcon` (nutrition_widgets.dart) — shared with the dish
+  // marks since 2026-09-21.
 
   List<Widget> _cravings(V2Palette p, NutritionDayStore store) {
     final pattern = store.cravingPattern();

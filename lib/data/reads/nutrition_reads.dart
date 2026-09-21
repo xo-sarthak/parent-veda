@@ -130,13 +130,16 @@ PvRead pvReadFromFasting(FastingTopic t) {
     kicker: _kicker,
     title: t.title,
     teaser: _same('Fasting, done safely'),
-    scaleSetter: t.body,
+    // The first sentence sets the scale; the rest is the short version. The
+    // whole body in both read as the same paragraph twice (the phone,
+    // 2026-09-21).
+    scaleSetter: _firstSentence(t.body),
     author: _desk,
     authorRole: _kicker,
     reviewed: false,
     hue: 42,
     sections: [
-      PvReadSection(heading: _same('The short version'), paragraphs: [t.body]),
+      if (_rest(t.body) case final rest?) PvReadSection(heading: _same('The short version'), paragraphs: [rest]),
       PvReadSection(
           heading: _same('Whatever the fast, the same three rules'),
           bullets: [
@@ -204,3 +207,24 @@ PvRead pvReadFromDietQuestion(NutritionPracticalCard c) => PvRead(
       faqs: const [],
       readNext: const [],
     );
+
+/// The first sentence of a body, as its own text.
+LocalizedText _firstSentence(LocalizedText t) {
+  String cut(String x) {
+    final m = RegExp(r'^(.+?[.!?])(\s|$)').firstMatch(x.trim());
+    return m == null ? x.trim() : m.group(1)!;
+  }
+  return LocalizedText(en: cut(t.en), hi: cut(t.hi));
+}
+
+/// Everything after the first sentence, or null when there is nothing.
+LocalizedText? _rest(LocalizedText t) {
+  String rest(String x) {
+    final m = RegExp(r'^(.+?[.!?])(\s|$)').firstMatch(x.trim());
+    return m == null ? '' : x.trim().substring(m.end).trim();
+  }
+  final en = rest(t.en);
+  if (en.isEmpty) return null;
+  final hi = rest(t.hi);
+  return LocalizedText(en: en, hi: hi.isEmpty ? en : hi);
+}

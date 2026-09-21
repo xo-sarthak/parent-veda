@@ -133,6 +133,63 @@ enum IntentMark {
 
   /// A compass rose. The skill picker — many directions, one child.
   compassMark,
+
+  // ---------------------------------------------------------------------------
+  //  NUTRITION'S FIVE NEEDS — 2026-09-21
+  // ---------------------------------------------------------------------------
+  //  The Did-you-get ticks, "Strong in" on a dish and the need pages wore
+  //  Material line icons while the rail cards above them wore these drawn
+  //  marks — two hands on one door (the user: "so two varieties?"). The rule
+  //  now: a mark that stands for a CONCEPT is drawn; chrome (chevrons, search,
+  //  close) stays Material. Iron, calcium, protein, folate and fibre are
+  //  concepts.
+
+  /// A spinach leaf with its midrib — the iron of an Indian kitchen.
+  ironMark,
+
+  /// A glass of milk, side on, the milk line below the rim.
+  calciumMark,
+
+  /// An egg in a cup — protein as the everyday object, not a molecule.
+  proteinMark,
+
+  /// A sprig of three small leaves — the greens folate comes from.
+  folateMark,
+
+  /// A wheat ear — whole grain, the bran on.
+  fibreMark,
+
+  // ---------------------------------------------------------------------------
+  //  THE FORMATS — 2026-09-21
+  // ---------------------------------------------------------------------------
+  //  Every read row and tool tile on every door wore a Material icon in a
+  //  grey well (a book on all eight fasting rows) — "generic, ugly" (the
+  //  user). A format is a concept, so it is drawn: these five plus the marks
+  //  the other formats already had (reportPage, checkMark, blocksMark, plate,
+  //  calendarDay, askDoctor, questionMark). See `pvDoorFormatMark`.
+
+  /// An open book — a guide, something she comes back to.
+  bookMark,
+
+  /// A slider with its knob — a tool, something she sets.
+  toolMark,
+
+  /// A play triangle in a rounded frame — a film.
+  playMark,
+
+  /// Headphones — a track.
+  audioMark,
+
+  /// A page with a fold and two lines — an article or a read.
+  pageMark,
+
+  /// A capsule, two halves — a medicine (Is it safe? · Take).
+  pillMark,
+
+  /// A kadhai with two handles and steam rising — cooked food, a recipe.
+  /// (The Recipes tab wore cupped hands, which says care, not cooking — the
+  /// user, 2026-09-21.)
+  cookMark,
 }
 
 class HubIntentArt extends StatelessWidget {
@@ -369,6 +426,200 @@ class _IntentPainter extends CustomPainter {
         canvas.drawCircle(const Offset(80, 30), 4.5, white);
 
       // ---- WHAT SHOULD I EAT -----------------------------------------------
+      // ---- NUTRITION'S FIVE NEEDS -------------------------------------------
+      case IntentMark.ironMark:
+        // A leaf: two arcs meeting at the tip, the midrib cut through.
+        canvas.drawPath(
+            Path()
+              ..moveTo(50, 12)
+              ..quadraticBezierTo(90, 30, 58, 84)
+              ..quadraticBezierTo(46, 90, 42, 84)
+              ..quadraticBezierTo(10, 30, 50, 12)
+              ..close(),
+            obj);
+        canvas.drawLine(const Offset(50, 22), const Offset(50, 82), cut(5));
+        canvas.drawLine(const Offset(50, 46), const Offset(66, 34), cut(4));
+        canvas.drawLine(const Offset(50, 62), const Offset(34, 50), cut(4));
+      case IntentMark.calciumMark:
+        // A glass, slightly tapered, and the milk inside it.
+        canvas.drawPath(
+            Path()
+              ..moveTo(28, 14)
+              ..lineTo(72, 14)
+              ..lineTo(66, 86)
+              ..lineTo(34, 86)
+              ..close(),
+            soft);
+        canvas.drawPath(
+            Path()
+              ..moveTo(31, 40)
+              ..lineTo(69, 40)
+              ..lineTo(66, 86)
+              ..lineTo(34, 86)
+              ..close(),
+            obj);
+        canvas.drawLine(const Offset(28, 14), const Offset(72, 14), cutSeed(5));
+      case IntentMark.proteinMark:
+        // An egg standing in a cup.
+        canvas.drawPath(
+            Path()
+              ..moveTo(24, 62)
+              ..lineTo(76, 62)
+              ..quadraticBezierTo(74, 90, 50, 90)
+              ..quadraticBezierTo(26, 90, 24, 62)
+              ..close(),
+            soft);
+        canvas.drawOval(const Rect.fromLTRB(32, 12, 68, 66), obj);
+        canvas.drawLine(const Offset(24, 62), const Offset(76, 62), cutSeed(4));
+      case IntentMark.folateMark:
+        // A stem with three leaves — the greens, not a tablet.
+        canvas.drawLine(const Offset(50, 88), const Offset(50, 30), cutSeed(6));
+        canvas.drawPath(
+            Path()
+              ..moveTo(50, 30)
+              ..quadraticBezierTo(70, 6, 76, 26)
+              ..quadraticBezierTo(70, 44, 50, 30)
+              ..close(),
+            obj);
+        canvas.drawPath(
+            Path()
+              ..moveTo(50, 50)
+              ..quadraticBezierTo(24, 30, 22, 50)
+              ..quadraticBezierTo(28, 68, 50, 50)
+              ..close(),
+            obj);
+        canvas.drawPath(
+            Path()
+              ..moveTo(50, 66)
+              ..quadraticBezierTo(76, 52, 78, 70)
+              ..quadraticBezierTo(70, 86, 50, 66)
+              ..close(),
+            obj);
+      case IntentMark.fibreMark:
+        // A wheat ear: a stem and grains climbing it in pairs.
+        canvas.drawLine(const Offset(50, 90), const Offset(50, 22), cutSeed(6));
+        for (var i = 0; i < 4; i++) {
+          final y = 74.0 - i * 15;
+          canvas.drawOval(Rect.fromCenter(center: Offset(38, y), width: 20, height: 12), obj);
+          canvas.drawOval(Rect.fromCenter(center: Offset(62, y), width: 20, height: 12), obj);
+        }
+        canvas.drawOval(const Rect.fromLTRB(42, 10, 58, 26), obj);
+
+      // ---- THE FORMATS --------------------------------------------------------
+      case IntentMark.bookMark:
+        // Two leaves meeting at the spine, the text lines knocked out.
+        canvas.drawPath(
+            Path()
+              ..moveTo(50, 26)
+              ..quadraticBezierTo(30, 16, 12, 24)
+              ..lineTo(12, 80)
+              ..quadraticBezierTo(30, 72, 50, 82)
+              ..close(),
+            obj);
+        canvas.drawPath(
+            Path()
+              ..moveTo(50, 26)
+              ..quadraticBezierTo(70, 16, 88, 24)
+              ..lineTo(88, 80)
+              ..quadraticBezierTo(70, 72, 50, 82)
+              ..close(),
+            obj);
+        canvas.drawLine(const Offset(50, 26), const Offset(50, 82), cut(3));
+        canvas.drawLine(const Offset(22, 38), const Offset(40, 42), cut(3));
+        canvas.drawLine(const Offset(22, 52), const Offset(40, 56), cut(3));
+        canvas.drawLine(const Offset(60, 42), const Offset(78, 38), cut(3));
+        canvas.drawLine(const Offset(60, 56), const Offset(78, 52), cut(3));
+      case IntentMark.toolMark:
+        // Two slider tracks, a knob on each at different points.
+        canvas.drawRRect(
+            RRect.fromRectAndRadius(const Rect.fromLTRB(14, 30, 86, 40), const Radius.circular(5)), soft);
+        canvas.drawRRect(
+            RRect.fromRectAndRadius(const Rect.fromLTRB(14, 60, 86, 70), const Radius.circular(5)), soft);
+        canvas.drawCircle(const Offset(62, 35), 11, obj);
+        canvas.drawCircle(const Offset(36, 65), 11, obj);
+      case IntentMark.playMark:
+        canvas.drawRRect(
+            RRect.fromRectAndRadius(const Rect.fromLTRB(12, 18, 88, 82), const Radius.circular(18)), obj);
+        canvas.drawPath(
+            Path()
+              ..moveTo(41, 34)
+              ..lineTo(68, 50)
+              ..lineTo(41, 66)
+              ..close(),
+            white);
+      case IntentMark.audioMark:
+        // The band over the head, a cup on each side.
+        canvas.drawPath(
+            Path()
+              ..moveTo(20, 60)
+              ..lineTo(20, 50)
+              ..quadraticBezierTo(20, 18, 50, 18)
+              ..quadraticBezierTo(80, 18, 80, 50)
+              ..lineTo(80, 60),
+            cutSeed(7));
+        canvas.drawRRect(
+            RRect.fromRectAndRadius(const Rect.fromLTRB(12, 52, 32, 82), const Radius.circular(8)), obj);
+        canvas.drawRRect(
+            RRect.fromRectAndRadius(const Rect.fromLTRB(68, 52, 88, 82), const Radius.circular(8)), obj);
+      case IntentMark.pageMark:
+        // A sheet with the corner folded, two lines of text.
+        canvas.drawPath(
+            Path()
+              ..moveTo(24, 12)
+              ..lineTo(62, 12)
+              ..lineTo(78, 28)
+              ..lineTo(78, 88)
+              ..lineTo(24, 88)
+              ..close(),
+            obj);
+        canvas.drawPath(
+            Path()
+              ..moveTo(62, 12)
+              ..lineTo(62, 28)
+              ..lineTo(78, 28)
+              ..close(),
+            soft);
+        canvas.drawLine(const Offset(36, 50), const Offset(66, 50), cut(4));
+        canvas.drawLine(const Offset(36, 64), const Offset(60, 64), cut(4));
+
+      case IntentMark.cookMark:
+        // The bowl of the kadhai, its rim, the two handles, three wisps.
+        canvas.drawPath(
+            Path()
+              ..moveTo(18, 48)
+              ..lineTo(82, 48)
+              ..quadraticBezierTo(80, 88, 50, 88)
+              ..quadraticBezierTo(20, 88, 18, 48)
+              ..close(),
+            obj);
+        canvas.drawRRect(
+            RRect.fromRectAndRadius(const Rect.fromLTRB(12, 44, 88, 52), const Radius.circular(4)), obj);
+        canvas.drawLine(const Offset(6, 46), const Offset(14, 40), cutSeed(5));
+        canvas.drawLine(const Offset(94, 46), const Offset(86, 40), cutSeed(5));
+        for (final x in [36.0, 50.0, 64.0]) {
+          canvas.drawPath(
+              Path()
+                ..moveTo(x, 34)
+                ..quadraticBezierTo(x - 6, 26, x, 18)
+                ..quadraticBezierTo(x + 6, 10, x, 4),
+              soft
+                ..style = PaintingStyle.stroke
+                ..strokeWidth = 5
+                ..strokeCap = StrokeCap.round);
+        }
+        soft.style = PaintingStyle.fill;
+      case IntentMark.pillMark:
+        // A capsule on a slant, one half solid, one half soft, the seam cut.
+        canvas.save();
+        canvas.translate(50, 50);
+        canvas.rotate(-0.6);
+        canvas.drawRRect(
+            RRect.fromRectAndRadius(const Rect.fromLTRB(-34, -13, 0, 13), const Radius.circular(13)), obj);
+        canvas.drawRRect(
+            RRect.fromRectAndRadius(const Rect.fromLTRB(0, -13, 34, 13), const Radius.circular(13)), soft);
+        canvas.drawLine(const Offset(0, -13), const Offset(0, 13), cut(3));
+        canvas.restore();
+
       case IntentMark.plate:
         // ⚠️ SEEN FROM THE SIDE, NOT ABOVE. A circle with two blobs and a bar
         // inside it is a FACE — and this app already has a face mark two doors
