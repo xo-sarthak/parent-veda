@@ -218,6 +218,78 @@ enum IntentMark {
 
   /// A laddoo: a disc with the boondi as dots.
   sweetMark,
+
+  // ---------------------------------------------------------------------------
+  //  THE BODY AREAS — 2026-09-22, the Symptoms door
+  // ---------------------------------------------------------------------------
+  //  Six areas group the symptom library by where she feels it. Four are new;
+  //  the back (`bodyMark`) and sleep (`moonMark`) were already drawn.
+
+  /// A tummy: a soft rounded belly in profile with a wave inside — digestion.
+  tummyMark,
+
+  /// A head in profile with a zigzag at the temple — headaches, dizziness.
+  headMark,
+
+  /// A patch of skin: a rounded square with three tiny itch strokes.
+  skinMark,
+
+  /// A tiny foot, sole up — a kick.
+  kickMark,
+
+  // ---------------------------------------------------------------------------
+  //  THE SYMPTOMS THEMSELVES — 2026-09-22, the user: "for headache, bloating,
+  //  mood swings … if it's possible". Each common symptom wears its own mark;
+  //  the rarer ones wear their area's. `symptomMark()` in symptoms_widgets.
+  // ---------------------------------------------------------------------------
+
+  /// A flame — heartburn.
+  flameMark,
+
+  /// A tight coil — constipation.
+  coilMark,
+
+  /// A battery, one bar left — fatigue.
+  batteryMark,
+
+  /// A balloon on a string — bloating.
+  balloonMark,
+
+  /// A spoon — taste.
+  spoonMark,
+
+  /// A plate with a bar across it — food aversions.
+  noPlateMark,
+
+  /// A spine: a stack of discs with a bolt beside it — back pain.
+  spineMark,
+
+  /// A lightning bolt — a cramp.
+  boltMark,
+
+  /// A droplet — urine, leaking.
+  dropMark,
+
+  /// A spiral — dizziness.
+  spiralMark,
+
+  /// Three wind lines — breathlessness.
+  windMark,
+
+  /// A moon with a z — trouble sleeping.
+  sleepMark,
+
+  /// A nose in profile with two scent lines — smell.
+  noseMark,
+
+  /// A thermometer — feeling hot.
+  thermoMark,
+
+  /// A tooth — gums.
+  toothMark,
+
+  /// A foot from the side, puffed — swelling.
+  swellMark,
 }
 
 class HubIntentArt extends StatelessWidget {
@@ -742,6 +814,260 @@ class _IntentPainter extends CustomPainter {
           canvas.drawCircle(Offset(d.$1, d.$2), 4, white);
         }
         canvas.drawOval(const Rect.fromLTRB(40, 10, 60, 24), soft);
+
+      case IntentMark.tummyMark:
+        // The belly in profile — a leaning oval — with a wave through it.
+        canvas.save();
+        canvas.translate(50, 54);
+        canvas.rotate(-0.25);
+        canvas.drawOval(const Rect.fromLTRB(-34, -30, 34, 30), obj);
+        canvas.restore();
+        canvas.drawPath(
+            Path()
+              ..moveTo(26, 56)
+              ..quadraticBezierTo(36, 44, 46, 56)
+              ..quadraticBezierTo(56, 68, 66, 56)
+              ..quadraticBezierTo(72, 50, 76, 54),
+            cut(5));
+
+      case IntentMark.headMark:
+        // A head in profile: the crown, the brow, the nose, the chin — and a
+        // zigzag at the temple.
+        canvas.drawPath(
+            Path()
+              ..moveTo(30, 90)
+              ..lineTo(30, 62)
+              ..quadraticBezierTo(14, 40, 30, 20)
+              ..quadraticBezierTo(46, 4, 66, 14)
+              ..quadraticBezierTo(84, 24, 78, 44)
+              ..lineTo(84, 52)
+              ..lineTo(78, 56)
+              ..lineTo(78, 66)
+              ..quadraticBezierTo(74, 76, 62, 74)
+              ..lineTo(62, 90)
+              ..close(),
+            obj);
+        canvas.drawPath(
+            Path()
+              ..moveTo(40, 30)
+              ..lineTo(50, 40)
+              ..lineTo(42, 48)
+              ..lineTo(52, 58),
+            cut(4));
+
+      case IntentMark.skinMark:
+        // A patch of skin, and three short itch strokes across its corner.
+        canvas.drawRRect(RRect.fromRectAndRadius(const Rect.fromLTRB(16, 22, 84, 84), const Radius.circular(18)), obj);
+        for (final d in [0.0, 14.0, 28.0]) {
+          canvas.drawLine(Offset(34 + d, 58), Offset(46 + d, 44), cut(4));
+        }
+        canvas.drawCircle(const Offset(68, 70), 4, white);
+
+      case IntentMark.kickMark:
+        // A foot, sole up: the sole, the heel, five toes.
+        canvas.drawOval(const Rect.fromLTRB(30, 34, 70, 92), obj);
+        canvas.drawOval(const Rect.fromLTRB(26, 12, 42, 30), obj);
+        canvas.drawOval(const Rect.fromLTRB(42, 6, 55, 22), obj);
+        canvas.drawOval(const Rect.fromLTRB(55, 8, 66, 22), obj);
+        canvas.drawOval(const Rect.fromLTRB(66, 14, 76, 27), obj);
+        canvas.drawOval(const Rect.fromLTRB(74, 24, 84, 36), obj);
+        canvas.drawArc(const Rect.fromLTRB(38, 50, 62, 82), 0.3, 2.5, false, cut(4));
+
+      case IntentMark.flameMark:
+        canvas.drawPath(
+            Path()
+              ..moveTo(50, 8)
+              ..quadraticBezierTo(78, 40, 72, 62)
+              ..quadraticBezierTo(68, 88, 50, 92)
+              ..quadraticBezierTo(32, 88, 28, 62)
+              ..quadraticBezierTo(24, 44, 38, 30)
+              ..quadraticBezierTo(40, 44, 50, 40)
+              ..quadraticBezierTo(46, 24, 50, 8)
+              ..close(),
+            obj);
+        canvas.drawPath(
+            Path()
+              ..moveTo(50, 56)
+              ..quadraticBezierTo(62, 66, 56, 80)
+              ..quadraticBezierTo(50, 88, 44, 80)
+              ..quadraticBezierTo(40, 68, 50, 56)
+              ..close(),
+            white);
+
+      case IntentMark.coilMark:
+        canvas.drawPath(
+            Path()
+              ..moveTo(16, 62)
+              ..cubicTo(16, 30, 44, 30, 44, 56)
+              ..cubicTo(44, 78, 68, 78, 68, 52)
+              ..cubicTo(68, 28, 86, 34, 86, 50),
+            cutSeed(9));
+        canvas.drawCircle(const Offset(86, 50), 6, obj);
+
+      case IntentMark.batteryMark:
+        canvas.drawRRect(RRect.fromRectAndRadius(const Rect.fromLTRB(12, 30, 80, 70), const Radius.circular(9)), obj);
+        canvas.drawRRect(RRect.fromRectAndRadius(const Rect.fromLTRB(80, 41, 90, 59), const Radius.circular(3)), obj);
+        canvas.drawRRect(RRect.fromRectAndRadius(const Rect.fromLTRB(20, 38, 72, 62), const Radius.circular(5)), white);
+        canvas.drawRRect(RRect.fromRectAndRadius(const Rect.fromLTRB(20, 38, 34, 62), const Radius.circular(4)), obj);
+
+      case IntentMark.balloonMark:
+        canvas.drawOval(const Rect.fromLTRB(24, 6, 76, 66), obj);
+        canvas.drawPath(
+            Path()
+              ..moveTo(50, 66)
+              ..lineTo(44, 74)
+              ..lineTo(56, 74)
+              ..close(),
+            obj);
+        canvas.drawPath(
+            Path()
+              ..moveTo(50, 74)
+              ..quadraticBezierTo(40, 84, 52, 94),
+            cutSeed(4));
+        canvas.drawOval(const Rect.fromLTRB(36, 16, 48, 34), white);
+
+      case IntentMark.spoonMark:
+        canvas.save();
+        canvas.translate(50, 50);
+        canvas.rotate(-0.7);
+        canvas.drawOval(const Rect.fromLTRB(-16, -46, 16, -4), obj);
+        canvas.drawRRect(RRect.fromRectAndRadius(const Rect.fromLTRB(-5, -8, 5, 46), const Radius.circular(5)), obj);
+        canvas.drawOval(const Rect.fromLTRB(-8, -38, 4, -18), white);
+        canvas.restore();
+
+      case IntentMark.noPlateMark:
+        canvas.drawOval(const Rect.fromLTRB(10, 30, 90, 70), obj);
+        canvas.drawOval(const Rect.fromLTRB(26, 38, 74, 62), white);
+        canvas.drawLine(const Offset(22, 78), const Offset(78, 22), cutSeed(8));
+        canvas.drawLine(const Offset(24, 76), const Offset(76, 24), cut(3));
+
+      case IntentMark.spineMark:
+        for (var i = 0; i < 5; i++) {
+          canvas.drawRRect(
+              RRect.fromRectAndRadius(Rect.fromLTRB(34, 10.0 + i * 16, 62, 22.0 + i * 16), const Radius.circular(5)), obj);
+        }
+        canvas.drawPath(
+            Path()
+              ..moveTo(76, 34)
+              ..lineTo(68, 50)
+              ..lineTo(78, 50)
+              ..lineTo(70, 66),
+            cutSeed(5));
+
+      case IntentMark.boltMark:
+        canvas.drawPath(
+            Path()
+              ..moveTo(58, 6)
+              ..lineTo(28, 54)
+              ..lineTo(50, 54)
+              ..lineTo(42, 94)
+              ..lineTo(74, 42)
+              ..lineTo(52, 42)
+              ..close(),
+            obj);
+
+      case IntentMark.dropMark:
+        canvas.drawPath(
+            Path()
+              ..moveTo(50, 8)
+              ..quadraticBezierTo(84, 52, 76, 68)
+              ..quadraticBezierTo(70, 92, 50, 92)
+              ..quadraticBezierTo(30, 92, 24, 68)
+              ..quadraticBezierTo(16, 52, 50, 8)
+              ..close(),
+            obj);
+        canvas.drawCircle(const Offset(40, 70), 5, white);
+
+      case IntentMark.spiralMark:
+        canvas.drawPath(
+            Path()
+              ..moveTo(50, 50)
+              ..cubicTo(62, 50, 62, 66, 50, 66)
+              ..cubicTo(30, 66, 30, 36, 50, 36)
+              ..cubicTo(78, 36, 78, 76, 50, 76)
+              ..cubicTo(14, 76, 14, 24, 50, 24)
+              ..cubicTo(86, 24, 90, 60, 80, 78),
+            cutSeed(7));
+
+      case IntentMark.windMark:
+        for (final row in [(18.0, 30.0, 70.0), (18.0, 50.0, 84.0), (18.0, 70.0, 60.0)]) {
+          canvas.drawPath(
+              Path()
+                ..moveTo(row.$1, row.$2)
+                ..lineTo(row.$3, row.$2)
+                ..quadraticBezierTo(row.$3 + 12, row.$2, row.$3 + 12, row.$2 - 8),
+              cutSeed(7));
+        }
+
+      case IntentMark.sleepMark:
+        canvas.drawPath(
+            Path()
+              ..addOval(Rect.fromCircle(center: const Offset(42, 54), radius: 30))
+              ..addOval(Rect.fromCircle(center: const Offset(58, 44), radius: 26))
+              ..fillType = PathFillType.evenOdd,
+            obj);
+        canvas.drawPath(
+            Path()
+              ..moveTo(64, 14)
+              ..lineTo(84, 14)
+              ..lineTo(64, 34)
+              ..lineTo(84, 34),
+            cutSeed(5));
+
+      case IntentMark.noseMark:
+        canvas.drawPath(
+            Path()
+              ..moveTo(44, 12)
+              ..lineTo(44, 52)
+              ..quadraticBezierTo(28, 60, 34, 72)
+              ..quadraticBezierTo(44, 82, 58, 72)
+              ..quadraticBezierTo(62, 60, 50, 56),
+            cutSeed(8));
+        for (final y in [30.0, 44.0]) {
+          canvas.drawPath(
+              Path()
+                ..moveTo(62, y)
+                ..quadraticBezierTo(72, y - 8, 84, y),
+              cutSeed(5));
+        }
+
+      case IntentMark.thermoMark:
+        canvas.drawRRect(RRect.fromRectAndRadius(const Rect.fromLTRB(40, 8, 60, 66), const Radius.circular(10)), obj);
+        canvas.drawCircle(const Offset(50, 76), 16, obj);
+        canvas.drawRRect(RRect.fromRectAndRadius(const Rect.fromLTRB(46, 30, 54, 66), const Radius.circular(4)), white);
+        canvas.drawCircle(const Offset(50, 76), 8, white);
+
+      case IntentMark.toothMark:
+        canvas.drawPath(
+            Path()
+              ..moveTo(28, 30)
+              ..quadraticBezierTo(28, 8, 44, 12)
+              ..quadraticBezierTo(50, 16, 56, 12)
+              ..quadraticBezierTo(72, 8, 72, 30)
+              ..quadraticBezierTo(74, 56, 66, 84)
+              ..quadraticBezierTo(60, 96, 56, 70)
+              ..quadraticBezierTo(50, 56, 44, 70)
+              ..quadraticBezierTo(40, 96, 34, 84)
+              ..quadraticBezierTo(26, 56, 28, 30)
+              ..close(),
+            obj);
+
+      case IntentMark.swellMark:
+        // A foot from the side, the ankle puffed: the sole, the heel, the
+        // rounded top, and a ring of three short strokes above the ankle.
+        canvas.drawPath(
+            Path()
+              ..moveTo(10, 78)
+              ..lineTo(90, 78)
+              ..quadraticBezierTo(90, 62, 70, 60)
+              ..lineTo(56, 56)
+              ..quadraticBezierTo(48, 30, 30, 30)
+              ..quadraticBezierTo(12, 30, 12, 56)
+              ..close(),
+            obj);
+        for (final x in [20.0, 30.0, 40.0]) {
+          canvas.drawLine(Offset(x, 22), Offset(x + 4, 12), cutSeed(4));
+        }
 
       case IntentMark.plate:
         // ⚠️ SEEN FROM THE SIDE, NOT ABOVE. A circle with two blobs and a bar

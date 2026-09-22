@@ -107,6 +107,95 @@ class SymptomStore extends ChangeNotifier {
     return n;
   }
 
+  // ---------------------------------------------------------------------------
+  //  The day-level verbs the Symptoms door's check-in uses — 2026-09-22
+  // ---------------------------------------------------------------------------
+  //  The store always keyed a log by its `dateKey`; the old companion only
+  //  ever wrote today's. The check-in reads and writes ANY day the strip
+  //  selects, so the verbs take a date. A day carries at most one log per
+  //  symptom (tapping again changes the severity; tapping off removes it) —
+  //  the grid is a set of (day, symptom) cells, not a diary of taps.
+
+  /// The logs on [date], one per symptom.
+  List<SymptomLog> logsOn(DateTime date) {
+    final k = dateKey(date);
+    return [for (final l in _logs) if (l.dateKey == k) l];
+  }
+
+  bool isLogged(DateTime date, String symptomId) =>
+      logsOn(date).any((l) => l.symptomId == symptomId);
+
+  /// 'mild' · 'moderate' · 'strong', or null when not logged that day.
+  String? severityOn(DateTime date, String symptomId) =>
+      logsOn(date).where((l) => l.symptomId == symptomId).firstOrNull?.severity;
+
+  /// Log [symptomId] on [date] at [severity], replacing that day's entry
+  /// for the same symptom. `notes` is kept if one was already written.
+  Future<void> setOn(DateTime date, String symptomId, String severity) async {
+    final existing = logsOn(date).where((l) => l.symptomId == symptomId).firstOrNull;
+    if (existing != null) {
+      if (existing.severity == severity) return;
+      final updated = SymptomLog(
+        id: existing.id,
+        symptomId: existing.symptomId,
+        dateKey: existing.dateKey,
+        severity: severity,
+        notes: existing.notes,
+        createdAtIso: existing.createdAtIso,
+      );
+      _logs[_logs.indexOf(existing)] = updated;
+      notifyListeners();
+      await _persist();
+      if (SupabaseRepo.isLoggedIn) {
+        try {
+          await SupabaseRepo.update('symptom_logs', updated.id, {'severity': severity});
+        } catch (_) {/* offline - the next init merges */}
+      }
+      return;
+    }
+    await log(symptomId: symptomId, severity: severity, addToJournal: false, week: 0, journalTitle: '', on: date);
+  }
+
+  /// Remove [symptomId] from [date].
+  Future<void> unlogOn(DateTime date, String symptomId) async {
+    final existing = logsOn(date).where((l) => l.symptomId == symptomId).toList();
+    if (existing.isEmpty) return;
+    _logs.removeWhere(existing.contains);
+    notifyListeners();
+    await _persist();
+    if (SupabaseRepo.isLoggedIn) {
+      for (final l in existing) {
+        try {
+          await SupabaseRepo.delete('symptom_logs', l.id);
+        } catch (_) {/* offline */}
+      }
+    }
+  }
+
+  /// The seven days ending on [end] (inclusive), oldest first.
+  static List<DateTime> weekEnding(DateTime end) {
+    final e = DateTime(end.year, end.month, end.day);
+    return [for (var i = 6; i >= 0; i--) e.subtract(Duration(days: i))];
+  }
+
+  /// Every symptom logged in the week ending [end], with its count of days —
+  /// most days first. The "Your week" grid's rows and the pattern line.
+  List<({String symptomId, int days})> weekCounts(DateTime end) {
+    final days = weekEnding(end);
+    final counts = <String, int>{};
+    for (final d in days) {
+      for (final l in logsOn(d)) {
+        counts[l.symptomId] = (counts[l.symptomId] ?? 0) + 1;
+      }
+    }
+    final out = [for (final e in counts.entries) (symptomId: e.key, days: e.value)];
+    out.sort((a, b) => b.days.compareTo(a.days));
+    return out;
+  }
+
+  /// Days in the week ending [end] with anything logged.
+  int daysLoggedInWeek(DateTime end) => weekEnding(end).where((d) => logsOn(d).isNotEmpty).length;
+
   Future<void> log({
     required String symptomId,
     required String severity,
@@ -114,13 +203,14 @@ class SymptomStore extends ChangeNotifier {
     required bool addToJournal,
     required int week,
     required String journalTitle,
+    DateTime? on,
   }) async {
     final now = DateTime.now();
     final id = 'sl_${now.microsecondsSinceEpoch}';
     final entry = SymptomLog(
       id: id,
       symptomId: symptomId,
-      dateKey: dateKey(now),
+      dateKey: dateKey(on ?? now),
       severity: severity,
       notes: notes,
       createdAtIso: now.toIso8601String(),

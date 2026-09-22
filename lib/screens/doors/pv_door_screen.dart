@@ -92,11 +92,11 @@ const Set<String> kPvDoorTileDoors = {};
 /// Doors on the straddling card RAIL — Flo's pattern, the user's reference
 /// (2026-09-18): tall white cards across the seam between hero and sheet.
 /// Scans & tests first.
-const Set<String> kPvDoorRailDoors = {'pregnancy_scans_tests', 'pregnancy_complications', 'pregnancy_nutrition'};
+const Set<String> kPvDoorRailDoors = {'pregnancy_scans_tests', 'pregnancy_complications', 'pregnancy_nutrition', 'pregnancy_symptoms'};
 
 /// Inline tools that lay out their own gutter (their rails run edge to
 /// edge); the door does not wrap these in `pvDoorPad`.
-const Set<String> kPvDoorSelfPaddedTools = {'nutrition/today', 'nutrition/recipe_rail', 'nutrition/experts'};
+const Set<String> kPvDoorSelfPaddedTools = {'nutrition/today', 'nutrition/recipe_rail', 'nutrition/experts', 'symptoms/today', 'symptoms/week', 'symptoms/normal'};
 
 // -----------------------------------------------------------------------------
 //  Rail geometry

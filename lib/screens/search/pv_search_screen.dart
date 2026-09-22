@@ -43,6 +43,9 @@ import '../doors/pv_door_router.dart';
 import '../../data/nutrition_data.dart' show kRecipes;
 import '../../data/report_findings_data.dart';
 import '../nutrition/door/recipe_cook_screen.dart' show openRecipe;
+import '../../data/reads/symptom_reads.dart' show pvReadFromNormal;
+import '../../data/symptoms/symptom_normal.dart' show kNormalQuestions;
+import '../symptoms/door/symptoms_today_body.dart' show symptomReader;
 import '../../data/tests_scans_reports_data.dart';
 import '../brackets/scan_detail_screen.dart';
 import '../doors/pv_door_screen.dart';
@@ -125,7 +128,7 @@ class PvSearchHit {
   /// Null for a door hit, and for a library hit (see [open]).
   final PvDoorTile? tile;
 
-  String get _haystack => '$title $blurb $meta'.toLowerCase();
+  String get _haystack => '$title $blurb $meta ${tile?.keywords.join(' ') ?? ''}'.toLowerCase();
 
   /// The words of the haystack, for prefix matching.
   late final List<String> _words = _haystack.split(_kSplit);
@@ -156,6 +159,7 @@ List<PvSearchHit> pvSearchIndex() => _stageIndex ??= [
           ..._indexOf(page, b),
           if (page.bracketId == 'pregnancy_scans_tests') ..._scansLibraries(page, b),
           if (page.bracketId == 'pregnancy_nutrition') ..._nutritionLibraries(page, b),
+          if (page.bracketId == 'pregnancy_symptoms') ..._symptomLibraries(page, b),
         ],
     ];
 
@@ -208,6 +212,28 @@ List<PvSearchHit> _nutritionLibraries(PvDoorPage page, Bracket b) {
         page: page,
         bracket: b,
         open: (context, c) => openRecipe(context, r, c),
+      ),
+  ];
+}
+
+/// The ten "is this normal?" questions are the tab's own tool (rows with a
+/// Call round), not tiles, so they join the index here — by the words she
+/// would type: "bleeding", "fever", "leaking".
+List<PvSearchHit> _symptomLibraries(PvDoorPage page, Bracket b) {
+  final door = b.label.now;
+  return [
+    for (final q in kNormalQuestions)
+      PvSearchHit._(
+        title: q.question,
+        blurb: '${q.verdict.word}. ${q.short}',
+        meta: '$door · Is this normal?',
+        icon: Icons.help_outline_rounded,
+        page: page,
+        bracket: b,
+        open: (context, c) => Navigator.of(context).push(MaterialPageRoute<void>(
+          settings: RouteSettings(name: 'symptoms/normal/${q.id}'),
+          builder: (_) => symptomReader(pvReadFromNormal(q), c),
+        )),
       ),
   ];
 }

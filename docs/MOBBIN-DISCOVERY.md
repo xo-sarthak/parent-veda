@@ -603,3 +603,27 @@ space. Nobody in the library runs a full-bleed photograph as the home
 hero. **Adopted:** the disc on the field (`V3PregHero`); the photograph
 inside it today, the repo's own 2D set (soft pink figure on pink, drawn to
 be circle-clipped) when the user brings it back.
+
+## 18. Symptoms — check-in grids, "is this normal?", the report (2026-09-22)
+
+Queries: "pregnancy symptom log", "symptom tracker daily check in",
+"is this normal pregnancy", "share health report doctor" (ios). **Flo**:
+"How are you feeling today?" as a grid of round tinted discs with a drawn
+mark and a one-word label, a tap selects, a second tap opens intensity;
+a Symptoms report (date range → PDF preview → Share). **Clue**: a row per
+symptom, a column per day, a dot whose size is the strength — the cycle
+view every doctor can read at a glance. **Ovia / BabyCenter** (not in the
+library; from the review datasets): "Is this normal?" as a list of
+questions in the woman's own words, answered with a verdict first.
+**Huckleberry**: a day strip over the log so a missed day can be filled in.
+**What converges:** the log is discs, not checkboxes; the week is a grid,
+not a chart; a report is a preview then Share; the urgent list is a fixed
+five, never personalised. **Adopted:** the disc grid with the marks drawn
+in the door's hand and a severity sheet on the second tap; a day strip over
+the check-in (Huckleberry) so yesterday can be logged; Clue's dot grid as
+Your week with a counted "pattern" line (counts, never a trend); Send my
+week as plain text (Share / Copy) — a WhatsApp message reaches an Indian
+doctor, a PDF sits in Downloads; the ten questions as rows wearing a
+verdict pill, a Call round on the "now" rows. **Declined:** intensity
+sliders (three words are what she can answer at 11 pm); a PDF report;
+any "getting worse" arrow.

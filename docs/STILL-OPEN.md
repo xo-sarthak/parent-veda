@@ -9063,3 +9063,58 @@ is opened by nothing (revert).
   could weigh the week's nutrition theme (`WeekContent.nutrition`) instead.
 - The user's own read of the sets — several late-week sweets are boxes and
   tins ("a 2 kg bag of sugar", "a Diwali hamper"); he may prune.
+
+## 73.0 The Symptoms door — 2026-09-22, built and walked
+
+Research: MOBBIN-DISCOVERY §18. `lib/data/doors/pv_door_symptoms.dart`,
+`lib/data/symptoms/`, `lib/screens/symptoms/door/`,
+`test/symptoms_door_test.dart` (14). Walked on the phone the same day.
+
+**The door** (`pregnancy_symptoms`, card rail like Nutrition): Today ·
+Is this normal? · By symptom · Your week · Talk.
+- **Today** is the check-in, an inline tool: a day strip (`PvDayStrip`,
+  edge to edge, a dot under a day she logged) so yesterday can be logged;
+  COMMON IN WEEK n — eight discs picked by `symptomsCommonAt(week)` (peak
+  weeks first, then the trimester, then the rest; stable); "Something else
+  · n more" folds the rest by area; tap = mild, tap again = the severity
+  sheet (mild / moderate / strong / not today after all); "What helps"
+  draws one line per logged symptom and opens its read; an evening
+  reminder switch (`symptoms_evening`, 20:30, off by default).
+- **Is this normal?** is a tool, not a list of reads: ten questions in her
+  words (`kNormalQuestions`), a verdict pill (usually fine / call today /
+  call now) and, on every "now" row, a **Call** round that opens the
+  dialler. Each row opens its read. The questions reach the door's search
+  through `_symptomLibraries`.
+- **By symptom** — 33 (`kSymptomLibrary` = the companion's 12 + 21 new),
+  six areas with their own tint and mark; every tile carries `keywords`
+  ("chakkar", "peshab") so the search finds it by the word she types —
+  `PvDoorTile.keywords` is new and in the haystack.
+- **Your week** — Clue's grid (a row per symptom, a dot per day sized by
+  strength), THE PATTERN as counts only, Send my week (the note as it will
+  read → Share / Copy).
+- **Talk** — the pinned five-line "call now" flag, then the consult tile.
+- The store learned days: `setOn`, `unlogOn`, `severityOn`, `weekCounts`,
+  `daysLoggedInWeek`; every write is the usual local-first fire-and-forget.
+- 26 drawn marks added to `IntentMark` for the door and its symptoms.
+
+**Clinical rules held:** nothing is computed about her (the week counts
+days; no trend, no score); the urgent five are fixed and never
+personalised; every read ends on the disclaimer; the Call round dials an
+empty dialler because the app must never guess her hospital's number.
+
+### 73.1 Owed
+- **The door's own hero photograph** — it borrows the back-pain read's.
+- **A care-circle phone number** for the Call round (today it opens the
+  dialler empty). Lives with the family model (§61), not this door.
+- **The symptom reads have no photo** — the reader shows the grey
+  placeholder. One photo per area (six) would do; per symptom is 33.
+- **The marks' hand** — the tiles are filled `IntentMark`s; TTC's check-in
+  draws its symptoms as line glyphs and faces (`ttc_symptom_mark.dart`,
+  `ttc_mood_face.dart`). The user asked whether the pregnancy check-in
+  should wear the same hand. Twelve of the 33 exist there already; 21
+  would be drawn. Decision pending.
+- **The date strip on the check-in** — kept so yesterday can be logged
+  (Huckleberry); the user asked why it is there. One line to remove if he
+  would rather Today logs today only.
+- Water / nutrition week view (§70.8) — still a decision, not a build.
+

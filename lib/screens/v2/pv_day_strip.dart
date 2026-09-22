@@ -40,6 +40,7 @@ class PvDayStrip extends StatefulWidget {
     this.daysBack = 180,
     this.daysForward = 6,
     this.markFor,
+    this.gutter = 0,
   });
 
   final V2Palette p;
@@ -76,6 +77,11 @@ class PvDayStrip extends StatefulWidget {
 
   /// What sits under a date, in an 18pt slot. Null: nothing.
   final Widget? Function(DateTime date, bool selected)? markFor;
+
+  /// Side padding INSIDE the strip, so the list itself runs edge to edge
+  /// (the door rule: a rail is never inside the gutter) while the first
+  /// cell starts at the gutter. Zero on a home that pads around it.
+  final double gutter;
 
   static const double slot = 46.0;
   static const double disc = 34.0;
@@ -130,7 +136,7 @@ class _PvDayStripState extends State<PvDayStrip> {
     _centred = true;
     final index = widget.selected.difference(_first).inDays;
     final target =
-        (index * PvDayStrip.slot) - (viewport / 2) + (PvDayStrip.slot / 2);
+        (index * PvDayStrip.slot) + widget.gutter - (viewport / 2) + (PvDayStrip.slot / 2);
     _sc.jumpTo(target.clamp(0.0, _sc.position.maxScrollExtent));
   }
 
@@ -180,7 +186,8 @@ class _PvDayStripState extends State<PvDayStrip> {
                 curve: Curves.easeOutCubic,
                 builder: (context, v, child) => Transform.translate(
                   offset: Offset(
-                      v * PvDayStrip.slot -
+                      v * PvDayStrip.slot +
+                          widget.gutter -
                           (_sc.hasClients ? _sc.offset : 0) +
                           (PvDayStrip.slot - PvDayStrip.disc) / 2,
                       0),
@@ -199,7 +206,7 @@ class _PvDayStripState extends State<PvDayStrip> {
             controller: _sc,
             scrollDirection: Axis.horizontal,
             itemCount: count,
-            padding: EdgeInsets.zero,
+            padding: EdgeInsets.symmetric(horizontal: widget.gutter),
             itemBuilder: (context, i) {
               final date =
                   DateTime(_first.year, _first.month, _first.day + i);

@@ -41,6 +41,13 @@ import 'package:flutter/material.dart';
 
 import '../../data/doors/pv_door_data.dart';
 import '../../data/reads/nutrition_reads.dart';
+import '../../data/reads/symptom_reads.dart';
+import '../../data/symptoms/symptom_library.dart' show symptomById;
+import '../../data/symptoms/symptom_normal.dart' show normalQuestionById;
+import '../../data/doors/pv_door_symptoms.dart';
+import '../symptoms/door/symptoms_today_body.dart' show SymptomsTodayBody, symptomReader;
+import '../symptoms/door/symptoms_week_body.dart' show SymptomsWeekBody;
+import '../symptoms/door/symptoms_screens.dart';
 import '../can_i_screen.dart' show CanIScreen;
 import '../../models/pv_read.dart';
 import '../nutrition/door/nutrition_today_body.dart';
@@ -216,6 +223,10 @@ Widget? pvDoorScreenFor(String id, PregnancyController c) => switch (id) {
       // The browser (diet_chart_browse_screen.dart). `DietChartsScreen`, the
       // filter form, is kept for revert.
       kDietSurfaceCharts => DietChartBrowseScreen(pregnancy: c),
+      // The Symptoms door's pushed pages (2026-09-22).
+      kSymSurfaceWeek => SymptomsWeekScreen(pregnancy: c),
+      kSymSurfaceSend => SymptomsSendScreen(pregnancy: c),
+      kSymSurfaceUrgent => SymptomsNormalScreen(pregnancy: c),
       kDietSurfaceFasting => const FastingScreen(),
       kDietSurfaceBigger => const NutrientsScreen(),
       kDietSurfaceExperts => const _DieticiansScreen(),
@@ -342,6 +353,11 @@ Widget? pvDoorInlineToolFor(String id, PregnancyController c) => switch (id) {
       // a photo grid (recipes_screen.dart). `NutritionRecipeRail` was the
       // rail form, kept for revert.
       kDietSurfaceRecipeRail => RecipesGridBody(pregnancy: c),
+      // The Symptoms door: the check-in is the first tab, the week the
+      // fourth (2026-09-22).
+      kSymSurfaceToday => SymptomsTodayBody(pregnancy: c),
+      kSymSurfaceWeek => SymptomsWeekBody(pregnancy: c, onSend: null), // the section's Send tile does it
+      kSymSurfaceNormal => SymptomsNormalBody(pregnancy: c),
       // ⚠️ THE KEEPSAKE IS THE TAB. `BumpJourneyScreen` is a Scaffold, so the
       // inline form is its body — see `BumpJourneyBody`.
       kBsSurfaceRitual => BumpRitualBody(controller: c),
@@ -561,6 +577,14 @@ Widget? pvDoorEntryScreen(
       for (final q in kNutritionPracticalCards) {
         if (q.id == id) return _nutritionReader(pvReadFromDietQuestion(q), c);
       }
+    // The Symptoms door (2026-09-22): both kinds open in the one reader with
+    // the door's own read-next resolved.
+    case PvDoorLibrary.symptom:
+      final s = symptomById(id);
+      if (s != null) return symptomReader(pvReadFromSymptom(s), c);
+    case PvDoorLibrary.symptomNormal:
+      final q = normalQuestionById(id);
+      if (q != null) return symptomReader(pvReadFromNormal(q), c);
   }
   return null;
 }
@@ -585,6 +609,8 @@ String pvDoorEntryRoute(PvDoorLibrary library, String id) =>
       PvDoorLibrary.dietQuestion => 'nutrition/question/$id',
       PvDoorLibrary.bellySkin => 'belly_skin/$id',
       PvDoorLibrary.mindRead => 'mind/read/$id',
+      PvDoorLibrary.symptom => 'symptoms/read/$id',
+      PvDoorLibrary.symptomNormal => 'symptoms/normal/$id',
     };
 
 /// Whether a library id resolves at all. Used by the wiring test, which cannot
@@ -604,6 +630,8 @@ bool pvDoorEntryResolves(PvDoorLibrary library, String id) => switch (library) {
       PvDoorLibrary.bellySkin => kBsPages.any((e) => e.id == id),
       PvDoorLibrary.mindRead =>
         id == kMmPartnerArticle.id || mmArticleById(id) != null,
+      PvDoorLibrary.symptom => symptomById(id) != null,
+      PvDoorLibrary.symptomNormal => normalQuestionById(id) != null,
     };
 
 /// Whether a surface id opens anything at all. Used by the wiring test.
@@ -631,6 +659,11 @@ bool pvDoorSurfaceResolves(String id) => switch (id) {
       kDietSurfaceBigger ||
       kDietSurfaceExperts ||
       kDietSurfaceQuestions ||
+      kSymSurfaceToday ||
+      kSymSurfaceWeek ||
+      kSymSurfaceNormal ||
+      kSymSurfaceSend ||
+      kSymSurfaceUrgent ||
       kBsSurfaceChecker ||
       kBsSurfaceItching ||
       kBsSurfaceRitual ||

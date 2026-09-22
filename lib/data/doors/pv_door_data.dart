@@ -74,6 +74,7 @@ import '../scan_extras.dart' show kScanUrgentSigns;
 import 'pv_door_belly_skin.dart';
 import 'pv_door_complications.dart';
 import 'pv_door_garbh.dart';
+import 'pv_door_symptoms.dart';
 import 'pv_door_labour.dart';
 import 'pv_door_mind.dart';
 import 'pv_door_nutrition.dart';
@@ -200,6 +201,7 @@ sealed class PvDoorTile {
     required this.blurb,
     this.meta,
     this.comingSoon = false,
+    this.keywords = const [],
   });
 
   /// Short and plain. The one line she reads.
@@ -219,6 +221,11 @@ sealed class PvDoorTile {
   /// does the explaining: "Checks the baby's early growth and development", not
   /// "nuchal translucency measurement".
   final String blurb;
+
+  /// Words the door's search should find this tile by that are not in its
+  /// title or blurb — "chakkar" for dizziness, "matli" for nausea (the
+  /// Symptoms door, 2026-09-22). Never rendered.
+  final List<String> keywords;
 
   /// A short fact set above the title on a card. "Weeks 6–10".
   ///
@@ -339,6 +346,13 @@ enum PvDoorLibrary {
 
   /// `kMmArticles` — one Mind & mood read, on `MmArticleScreen`.
   mindRead,
+
+  /// A symptom of the library — lib/data/symptoms/symptom_library.dart
+  /// (the Symptoms door, 2026-09-22).
+  symptom,
+
+  /// One of the ten "is this normal?" questions — symptom_normal.dart.
+  symptomNormal,
 }
 
 extension PvDoorLibraryCopy on PvDoorLibrary {
@@ -369,6 +383,8 @@ extension PvDoorLibraryCopy on PvDoorLibrary {
         PvDoorLibrary.bellySkin => PvDoorFormat.read,
         // The Mind & mood brief marks every one [Read].
         PvDoorLibrary.mindRead => PvDoorFormat.read,
+        PvDoorLibrary.symptom => PvDoorFormat.read,
+        PvDoorLibrary.symptomNormal => PvDoorFormat.read,
         PvDoorLibrary.recipe => PvDoorFormat.recipe,
         // A chart is a three-day plan you open, filter and download. That is a
         // tool, not a read.
@@ -391,6 +407,7 @@ final class PvDoorEntryTile extends PvDoorTile {
     required this.entryId,
     super.meta,
     super.comingSoon,
+    super.keywords,
   });
 
   final PvDoorLibrary library;
@@ -1034,6 +1051,7 @@ final List<PvDoorPage> kPvDoorPages = [
   kLabourDoor,
   kMindDoor,
   kGarbhDoor,
+  kSymptomsDoor, // 2026-09-22
 ];
 
 /// The door for a bracket, or null when that bracket still opens a hub.
