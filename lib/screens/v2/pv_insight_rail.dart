@@ -72,6 +72,7 @@ class PvInsightTile extends StatelessWidget {
     required this.p,
     required this.onTap,
     this.caption,
+    this.artWidget,
   });
 
   static const double width = 100;
@@ -88,6 +89,12 @@ class PvInsightTile extends StatelessWidget {
 
   final double hue;
   final PvInsightArt art;
+
+  /// A drawn mark to wear INSTEAD of [art] — the Symptoms door's own glyph on
+  /// a "you logged" card (2026-09-22). It sits top-right, where the painted
+  /// art cannot: the painted set is anchored bottom-right and a long value
+  /// ("Constipation") ran straight through it.
+  final Widget? artWidget;
   final V2Palette p;
   final VoidCallback onTap;
 
@@ -116,17 +123,23 @@ class PvInsightTile extends StatelessWidget {
           ),
           clipBehavior: Clip.antiAlias,
           child: Stack(children: [
-            Positioned.fill(
-              child: CustomPaint(
-                  painter: PvInsightMark(
-                      art: art, ink: deep.withValues(alpha: 0.5))),
-            ),
+            if (artWidget == null)
+              Positioned.fill(
+                child: CustomPaint(
+                    painter: PvInsightMark(
+                        art: art, ink: deep.withValues(alpha: 0.5))),
+              )
+            else
+              Positioned(top: 8, right: 8, child: SizedBox(width: 22, height: 22, child: artWidget)),
             Padding(
               padding: const EdgeInsets.fromLTRB(10, 9, 10, 9),
               child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(eyebrow.toUpperCase(),
+                    Padding(
+                      // Room for the drawn mark in the corner.
+                      padding: EdgeInsets.only(right: artWidget == null ? 0 : 24),
+                      child: Text(eyebrow.toUpperCase(),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: pvManrope(
@@ -135,6 +148,7 @@ class PvInsightTile extends StatelessWidget {
                             letterSpacing: 0.6,
                             height: 1.25,
                             color: deep)),
+                    ),
                     const Spacer(),
                     Text(value,
                         maxLines: caption == null ? 4 : 3,

@@ -35,7 +35,7 @@
 
 import '../data/can_i_data.dart';
 import '../data/nutrition/nutrition_plate.dart';
-import '../data/symptom_data.dart';
+import '../data/symptoms/symptom_library.dart';
 import '../models/can_i_entry.dart';
 import '../models/home_day.dart';
 import '../models/read_item.dart';
@@ -145,7 +145,10 @@ List<PregInsight> pregInsightsFor({
   };
   if (logged.isNotEmpty) {
     for (final id in logged.take(2)) {
-      final s = kSymptoms.where((x) => x.id == id).firstOrNull;
+      // ⚠️ `symptomById`, NOT `kSymptoms`. The door logs from the 33-strong
+      // library; the old seed list is 12 of them, so a card for anything she
+      // logged from the other 21 silently did not appear (2026-09-22).
+      final s = symptomById(id);
       if (s == null) continue;
       cards.add(PregInsight(
         id: 'symptom_$id',

@@ -58,6 +58,8 @@ import '../models/week_content.dart' show WeekContent;
 import '../services/pregnancy_controller.dart';
 import 'weekly_card_stack_screen.dart';
 import 'preg_daily_insights.dart';
+import 'symptoms/door/symptoms_widgets.dart' show symptomLineMark;
+import '../data/symptoms/symptom_library.dart' show symptomById;
 import 'v2/preg_size_sheet.dart';
 import '../data/preg_size_sets.dart';
 import '../services/preg_size_set_store.dart';
@@ -569,6 +571,13 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                     caption: c.caption,
                     hue: c.hue,
                     art: c.art,
+                    // A logged symptom wears its own drawn mark — two cards
+                    // both showing the generic one read as a duplicate.
+                    artWidget: switch (c.symptomId) {
+                      final id? when symptomById(id) != null =>
+                        symptomLineMark(symptomById(id)!, size: 22, ink: p.ink2),
+                      _ => null,
+                    },
                     p: p,
                     onTap: () => _openInsight(context, c, week, weekContent),
                   ),

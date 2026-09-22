@@ -14,6 +14,8 @@ import '../../../models/symptom.dart';
 import '../../../theme/pv_fonts.dart';
 import '../../../widgets/pv_feedback.dart';
 import '../../brackets/hub/hub_intent_art.dart';
+import '../../ttc/ttc_mood_face.dart';
+import '../../ttc/ttc_symptom_mark.dart';
 import '../../v2/v2_palette.dart';
 
 /// The three strengths, in the store's words.
@@ -47,8 +49,91 @@ Widget symptomsHeading(V2Palette p, String text, {String? sub, Widget? trailing}
 /// The area's tint on a white ground.
 Color symptomAreaTint(V2Palette p, SymptomArea a) => v2BlockTint(a.hue, p);
 
-/// The symptom's own mark, where one is drawn; its area's otherwise
-/// (2026-09-22, the user: "for headache, bloating, mood swings …").
+// =============================================================================
+//  The marks — drawn in TTC's hand
+// -----------------------------------------------------------------------------
+//  ⚠️ THE CHECK-IN DRAWS LINE GLYPHS AND FACES, NOT THE FILLED `IntentMark`s.
+//  The user, walking the door (2026-09-22): *"in trying to conceive we have
+//  those face designs that have been drawn — can we do something for this as
+//  well?"* The same woman makes the same gesture a stage earlier on the TTC
+//  logger, where every symptom is a line glyph in one hand and every feeling a
+//  features-only face (`ttc_mood_face.dart` says why: emoji belong to the OS,
+//  filled marks read as stickers). Two hands for one gesture read as two apps.
+//
+//  So: `symptomGlyphFor` maps the door's ids onto `TtcGlyph` — twelve reuse a
+//  shape TTC already had, twenty-three were drawn for this door — and
+//  `symptomMoodFor` gives mood swings the swings face. `symptomLineMark` is
+//  the one place they are painted; `test/symptoms_door_test.dart` fails if
+//  any symptom would fall through to the filled mark, because a mixed set
+//  reads as unfinished (TTC's rule, `ttc_symptom_marks_test.dart`).
+//
+//  `symptomMark` (the filled set) stays: the door's cards and the area
+//  headings still wear it, and it is the revert.
+// =============================================================================
+
+/// The face for a symptom that is a feeling — only mood swings here. A face
+/// is a claim about an expression, so nothing else gets one.
+TtcMood? symptomMoodFor(String id) => switch (id) { 'moodSwings' => TtcMood.swings, _ => null };
+
+/// The line glyph for a symptom id, or null (the test says: never).
+TtcGlyph? symptomGlyphFor(String id) => switch (id) {
+      // ---- reused from TTC's set ------------------------------------------------
+      'nausea' => TtcGlyph.queasy,
+      'headache' => TtcGlyph.headAche,
+      'fatigue' => TtcGlyph.battery,
+      'bloating' => TtcGlyph.expand,
+      'backPain' => TtcGlyph.spine,
+      'roundLigament' => TtcGlyph.bellyAche,
+      'troubleSleeping' => TtcGlyph.moonEye,
+      'hairSkin' => TtcGlyph.spots,
+      'pelvicGirdle' => TtcGlyph.pelvis,
+      'legCramps' => TtcGlyph.bolt,
+      // ---- drawn for this door -------------------------------------------------
+      'heartburn' => TtcGlyph.flame,
+      'constipation' => TtcGlyph.knot,
+      'metallicTaste' => TtcGlyph.spoon,
+      'foodAversions' => TtcGlyph.bowlSlash,
+      'dizziness' => TtcGlyph.spiral,
+      'breathlessness' => TtcGlyph.breath,
+      'blockedNose' => TtcGlyph.breathSlash,
+      'nosebleeds' => TtcGlyph.drip,
+      'carpalTunnel' => TtcGlyph.tingle,
+      'varicoseVeins' => TtcGlyph.veins,
+      'ribPain' => TtcGlyph.sideAche,
+      'restlessLegs' => TtcGlyph.jitter,
+      'vividDreams' => TtcGlyph.cloudStar,
+      'itching' => TtcGlyph.scratch,
+      'bleedingGums' => TtcGlyph.tooth,
+      'hotFlushes' => TtcGlyph.heat,
+      'smellSensitivity' => TtcGlyph.scent,
+      'frequentUrination' => TtcGlyph.dropRepeat,
+      'swelling' => TtcGlyph.puff,
+      'babyHiccups' => TtcGlyph.bounce,
+      'pelvicPressure' => TtcGlyph.basinDown,
+      'braxtonHicks' => TtcGlyph.tighten,
+      _ => null,
+    };
+
+/// The area's deep ink — the tint pulled down until a line reads on it.
+Color symptomAreaInk(V2Palette p, SymptomArea a) =>
+    HSLColor.fromColor(symptomAreaTint(p, a)).withSaturation(0.45).withLightness(0.42).toColor();
+
+/// A symptom's mark in the door's hand: a face, a line glyph, or — only while
+/// a symptom is being added — the filled mark, which the test never lets ship.
+Widget symptomLineMark(Symptom s, {required double size, required Color ink}) {
+  final mood = symptomMoodFor(s.id);
+  if (mood != null) return TtcMoodFace(mood: mood, size: size, ink: ink);
+  final g = symptomGlyphFor(s.id);
+  if (g == null) {
+    return SizedBox(width: size, height: size, child: HubIntentArt(mark: symptomMark(s), tint: ink));
+  }
+  return TtcGlyphMark(glyph: g, size: size, ink: ink);
+}
+
+/// The symptom's own filled mark, where one is drawn; its area's otherwise
+/// (2026-09-22, the user: "for headache, bloating, mood swings …"). The
+/// check-in no longer draws these — see the note above; kept for the cards
+/// and for revert.
 IntentMark symptomMark(Symptom s) => switch (s.id) {
       'nausea' => IntentMark.tummyMark,
       'heartburn' => IntentMark.flameMark,
@@ -92,7 +177,9 @@ Widget symptomAreaMark(V2Palette p, SymptomArea a) => HubIntentArt(mark: a.mark,
 /// A symptom's mark in its area's tint.
 Widget symptomGlyph(V2Palette p, Symptom s, {double size = 28}) {
   final a = symptomArea(s);
-  return SizedBox(width: size, height: size, child: HubIntentArt(mark: symptomMark(s), tint: symptomAreaTint(p, a)));
+  // Kept for revert — the filled mark:
+  // return SizedBox(width: size, height: size, child: HubIntentArt(mark: symptomMark(s), tint: symptomAreaTint(p, a)));
+  return symptomLineMark(s, size: size, ink: symptomAreaInk(p, a));
 }
 
 /// One tile of the check-in: a 64pt disc with the mark, the name under it,
@@ -101,8 +188,9 @@ Widget symptomGlyph(V2Palette p, Symptom s, {double size = 28}) {
 ///
 /// ⚠️ THE TILE IS A BUTTON WITH TWO MEANINGS AND SAYS WHICH. Not logged →
 /// tap logs it as mild (one tap, no sheet — the whole point of a check-in is
-/// that it costs nothing). Logged → tap opens the strength sheet, where she
-/// can also take it off. Long-press always opens the symptom's page.
+/// that it costs nothing). Logged → tap takes it off again (the user,
+/// 2026-09-22: "tapping again should un-select it"). Hold → [onOpen], which
+/// the check-in points at the strength sheet.
 class SymptomTile extends StatelessWidget {
   const SymptomTile({
     super.key,
@@ -162,7 +250,9 @@ class SymptomTile extends StatelessWidget {
                   color: tint,
                   border: Border.all(color: logged ? p.ink1 : Colors.transparent, width: 2),
                 ),
-                child: HubIntentArt(mark: symptomMark(symptom), tint: tint),
+                // Kept for revert — the filled mark:
+                // child: HubIntentArt(mark: symptomMark(symptom), tint: tint),
+                child: symptomLineMark(symptom, size: 34, ink: symptomAreaInk(p, a)),
               ),
               const SizedBox(height: 7),
               Text(symptom.name.en,
@@ -236,10 +326,12 @@ Future<String?> showSeveritySheet(BuildContext context, Symptom symptom, String 
             const SizedBox(height: 8),
           ],
           const SizedBox(height: 6),
-          TextButton(
-            onPressed: () => Navigator.of(ctx).pop(''),
-            child: Text('Not today after all', style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, color: p.ink2)),
-          ),
+          // Only a logged symptom has a "not today" to offer.
+          if (current.isNotEmpty)
+            TextButton(
+              onPressed: () => Navigator.of(ctx).pop(''),
+              child: Text('Not today after all', style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, color: p.ink2)),
+            ),
         ]),
       ),
     ),

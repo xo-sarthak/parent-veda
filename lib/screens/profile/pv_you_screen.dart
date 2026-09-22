@@ -72,6 +72,16 @@ import 'pv_you_chrome.dart';
 import 'pv_you_content.dart';
 import 'pv_you_sheets.dart';
 
+/// Our own walk builds are `--release` (the only honest way to judge motion)
+/// and release strips `kDebugMode`, which took the Developer section — and
+/// the stage switch inside it — off the phone (the user, 2026-09-22: "from
+/// profile u removed the toggle"). So the section also shows when a build is
+/// made with `--dart-define=PV_DEV=true`. A store build never passes it.
+const bool kPvDevBuild = bool.fromEnvironment('PV_DEV');
+
+/// Whether the team's affordances are on this build.
+const bool kPvShowDeveloper = kDebugMode || kPvDevBuild;
+
 const String kPvYouRoute = 'you';
 
 /// Opens You for the current stage. Every avatar on every home calls this.
@@ -317,7 +327,7 @@ class _PvYouScreenState extends State<PvYouScreen> {
                   SliverToBoxAdapter(child: _support(p, stage)),
                   // H — account
                   SliverToBoxAdapter(child: _account(p, stage)),
-                  if (kDebugMode) SliverToBoxAdapter(child: _developer(p)),
+                  if (kPvShowDeveloper) SliverToBoxAdapter(child: _developer(p)),
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),

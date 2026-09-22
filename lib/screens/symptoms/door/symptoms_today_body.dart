@@ -38,7 +38,7 @@ import '../../../widgets/pv_feedback.dart';
 import '../../doors/pv_door_chrome.dart';
 import '../../doors/pv_door_router.dart' show pvDoorEntryRoute;
 import '../../reader/pv_reader_screen.dart';
-import '../../brackets/hub/hub_intent_art.dart' show HubIntentArt;
+// import '../../brackets/hub/hub_intent_art.dart' show HubIntentArt; // kept for revert — the filled marks
 import '../../v2/pv_day_strip.dart';
 import '../../v2/v2_palette.dart';
 import 'symptoms_widgets.dart';
@@ -122,21 +122,41 @@ class _SymptomsTodayBodyState extends State<SymptomsTodayBody> with WidgetsBindi
     return '${_days[d.weekday - 1]} ${d.day} ${_months[d.month - 1]}';
   }
 
+  /// Tap toggles: on as mild, off again. The user, on the phone
+  /// (2026-09-22): "tapping again should un-select it" — the second tap
+  /// opening the strength sheet made clearing a mistake cost a sheet and a
+  /// read; a check-in has to be as cheap to undo as to make.
   Future<void> _tap(Symptom s) async {
     final store = SymptomStore.instance;
     final current = store.severityOn(_selected, s.id);
     if (current == null) {
       await store.setOn(_selected, s.id, 'mild');
-      return;
+    } else {
+      await store.unlogOn(_selected, s.id);
     }
+  }
+
+  /// Hold says how strong. The sheet logs an unlogged symptom at the picked
+  /// strength; "Not today after all" clears a logged one.
+  Future<void> _hold(Symptom s) async {
+    final store = SymptomStore.instance;
+    final current = store.severityOn(_selected, s.id) ?? '';
     final picked = await showSeveritySheet(context, s, current);
     if (picked == null) return;
     if (picked.isEmpty) {
-      await store.unlogOn(_selected, s.id);
+      if (current.isNotEmpty) await store.unlogOn(_selected, s.id);
     } else {
       await store.setOn(_selected, s.id, picked);
     }
   }
+
+  // Kept for revert — the second tap opened the strength sheet:
+  // Future<void> _tap(Symptom s) async {
+  //   final current = store.severityOn(_selected, s.id);
+  //   if (current == null) { await store.setOn(_selected, s.id, 'mild'); return; }
+  //   final picked = await showSeveritySheet(context, s, current);
+  //   ...
+  // }
 
   void _toggleReminder(bool on) {
     pvCommitFeedback();
@@ -178,7 +198,7 @@ class _SymptomsTodayBodyState extends State<SymptomsTodayBody> with WidgetsBindi
           return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             // ---- the day -------------------------------------------------------
             pvDoorPad(symptomsHeading(p, 'How are you?',
-                sub: '${_dayWord(_selected)}. Tap what you feel; tap again to say how strong.')),
+                sub: '${_dayWord(_selected)}. Tap what you feel, tap again to clear. Hold one to say how strong.')),
             const SizedBox(height: 10),
             // Edge to edge, with the gutter inside it (the door rule).
             PvDayStrip(
@@ -214,7 +234,8 @@ class _SymptomsTodayBodyState extends State<SymptomsTodayBody> with WidgetsBindi
               symptoms: common,
               severityOf: (s) => store.severityOn(_selected, s.id),
               onTap: _tap,
-              onOpen: (s) => openSymptomRead(context, s, c),
+              // Hold = strength. The read is one tap away on its What-helps row.
+              onOpen: _hold,
               enabled: !future,
             )),
 
@@ -246,7 +267,7 @@ class _SymptomsTodayBodyState extends State<SymptomsTodayBody> with WidgetsBindi
                     symptoms: [for (final s in rest) if (symptomArea(s) == area) s],
                     severityOf: (s) => store.severityOn(_selected, s.id),
                     onTap: _tap,
-                    onOpen: (s) => openSymptomRead(context, s, c),
+                    onOpen: _hold,
                     enabled: !future,
                   )),
                 ],
@@ -369,7 +390,9 @@ class _HelpRow extends StatelessWidget {
               padding: const EdgeInsets.all(9),
               decoration: BoxDecoration(
                   color: symptomAreaTint(p, symptomArea(symptom)), borderRadius: BorderRadius.circular(13)),
-              child: HubIntentArt(mark: symptomMark(symptom), tint: symptomAreaTint(p, symptomArea(symptom))),
+              // Kept for revert — the filled mark:
+              // child: HubIntentArt(mark: symptomMark(symptom), tint: symptomAreaTint(p, symptomArea(symptom))),
+              child: symptomLineMark(symptom, size: 24, ink: symptomAreaInk(p, symptomArea(symptom))),
             ),
             const SizedBox(width: 12),
             Expanded(

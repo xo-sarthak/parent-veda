@@ -8,8 +8,8 @@
 //    · the ten questions: four "now", their flag, every one a read whose
 //      opening is the verdict
 //    · the store's day verbs: log, strengthen, remove, count the week
-//    · the check-in: one tap logs mild, the next tap opens the strength
-//      sheet, "What helps" appears for what she logged, a day ahead does
+//    · the check-in: one tap logs mild, the next tap clears it, a hold opens
+//      the strength sheet, "What helps" appears for what she logged, a day ahead does
 //      not log
 //    · the week grid and the note she sends
 //    · the door is registered, five tabs, the flag on Talk only, every tile
@@ -29,6 +29,7 @@ import 'package:parentveda/screens/search/pv_search_screen.dart';
 import 'package:parentveda/screens/symptoms/door/symptoms_today_body.dart';
 import 'package:parentveda/screens/symptoms/door/symptoms_week_body.dart';
 import 'package:parentveda/screens/symptoms/door/symptoms_widgets.dart';
+import 'package:parentveda/screens/ttc/ttc_symptom_mark.dart';
 import 'package:parentveda/services/pregnancy_controller.dart';
 import 'package:parentveda/services/symptom_store.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -167,23 +168,39 @@ void main() {
       expect(tester.takeException(), isNull);
     }
 
-    testWidgets('one tap logs mild; the next opens the strength sheet; help appears', (tester) async {
+    testWidgets('tap logs mild, tap again clears; hold opens the strength sheet; help appears', (tester) async {
       await pump(tester, SymptomsTodayBody(pregnancy: c));
       expect(find.text('COMMON IN WEEK 20'), findsOneWidget);
       expect(find.textContaining('Tap a symptom above'), findsOneWidget);
       final first = symptomsCommonAt(20).first;
+      final today = _dayOnly(DateTime.now());
       await tester.tap(find.byKey(ValueKey('sym_tile_${first.id}')));
       await tester.pump(const Duration(milliseconds: 300));
-      expect(SymptomStore.instance.severityOn(_dayOnly(DateTime.now()), first.id), 'mild');
+      expect(SymptomStore.instance.severityOn(today, first.id), 'mild');
       expect(find.text('${first.name.en} · mild'), findsOneWidget, reason: 'what helps, for what she logged');
 
+      // The user (2026-09-22): "tapping again should un-select it".
       await tester.tap(find.byKey(ValueKey('sym_tile_${first.id}')));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(SymptomStore.instance.severityOn(today, first.id), isNull);
+      expect(find.text('How strong is it today?'), findsNothing, reason: 'a second tap is a clear, not a sheet');
+
+      // Hold says how strong — and logs an unlogged one at that strength.
+      await tester.longPress(find.byKey(ValueKey('sym_tile_${first.id}')));
       await tester.pumpAndSettle(const Duration(milliseconds: 100));
       expect(find.text('How strong is it today?'), findsOneWidget);
+      expect(find.text('Not today after all'), findsNothing, reason: 'nothing to clear yet');
       await tester.tap(find.text('Strong'));
       await tester.pumpAndSettle(const Duration(milliseconds: 100));
-      expect(SymptomStore.instance.severityOn(_dayOnly(DateTime.now()), first.id), 'strong');
+      expect(SymptomStore.instance.severityOn(today, first.id), 'strong');
       expect(find.text('${first.name.en} · strong'), findsOneWidget);
+
+      // Held again, the sheet offers the way off.
+      await tester.longPress(find.byKey(ValueKey('sym_tile_${first.id}')));
+      await tester.pumpAndSettle(const Duration(milliseconds: 100));
+      await tester.tap(find.text('Not today after all'));
+      await tester.pumpAndSettle(const Duration(milliseconds: 100));
+      expect(SymptomStore.instance.severityOn(today, first.id), isNull);
     });
 
     testWidgets('a day ahead does not log', (tester) async {
@@ -247,6 +264,40 @@ void main() {
       // And the old companion's twelve are all in the library.
       for (final s in kSymptoms.where((s) => !s.urgent)) {
         expect(onDoor, contains(s.id));
+      }
+    });
+
+    test('every symptom is drawn in the hand, never the filled fallback', () {
+      // TTC's rule, applied here: a mixed set reads as unfinished. The filled
+      // mark is the safety net while a symptom is being added, not a tier.
+      final bare = [
+        for (final s in kSymptomLibrary)
+          if (symptomMoodFor(s.id) == null && symptomGlyphFor(s.id) == null) s.id,
+      ];
+      expect(bare, isEmpty, reason: 'these would draw the filled mark beside line glyphs: $bare');
+      // Only the feeling wears a face.
+      expect([for (final s in kSymptomLibrary) if (symptomMoodFor(s.id) != null) s.id], ['moodSwings']);
+      // No two symptoms share a glyph — two the same are indistinguishable on a disc.
+      final byGlyph = <TtcGlyph, List<String>>{};
+      for (final s in kSymptomLibrary) {
+        final g = symptomGlyphFor(s.id);
+        if (g != null) byGlyph.putIfAbsent(g, () => []).add(s.id);
+      }
+      final shared = byGlyph.entries.where((e) => e.value.length > 1).map((e) => e.value).toList();
+      expect(shared, isEmpty, reason: 'two symptoms draw the same mark: $shared');
+    });
+
+    testWidgets('every mark paints at the disc and the grid sizes', (tester) async {
+      for (final size in [18.0, 34.0]) {
+        await tester.pumpWidget(MaterialApp(
+          home: Scaffold(
+            body: Wrap(children: [
+              for (final s in kSymptomLibrary) symptomLineMark(s, size: size, ink: Colors.black),
+            ]),
+          ),
+        ));
+        await tester.pump();
+        expect(tester.takeException(), isNull, reason: 'a mark threw at $size');
       }
     });
 

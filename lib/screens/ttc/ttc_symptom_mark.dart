@@ -38,6 +38,20 @@
 //      shows a person, it starts describing what that person looks like.
 //
 //  Legibility target is 15pt, because that is the size on the chips.
+//
+//  ---------------------------------------------------------------------------
+//  ⚠️ THE PREGNANCY SYMPTOMS DOOR DRAWS FROM THIS SET TOO (2026-09-22)
+//  ---------------------------------------------------------------------------
+//
+//  The user's ask: *"in trying to conceive we have those face designs that
+//  have been drawn — can we do something for this as well?"* The check-in on
+//  the pregnancy Symptoms door had its discs drawn as filled `IntentMark`s, a
+//  second visual language for the same gesture the same woman made a stage
+//  earlier. So the door now draws in this hand: `TtcGlyphMark` paints any
+//  glyph by name, the twelve pregnancy symptoms that already had a shape here
+//  reuse it, and the twenty-three that did not are the `// ---- pregnancy`
+//  group below. The mapping from a pregnancy symptom id lives with the door
+//  (`symptoms_widgets.dart`), not here — the ids are the door's identities.
 // =============================================================================
 
 import 'dart:math' as math;
@@ -91,6 +105,30 @@ enum TtcGlyph {
   glass,
   thermometer,
   ripples,
+  // pregnancy — the Symptoms door's twenty-three (2026-09-22)
+  flame,
+  knot,
+  spoon,
+  bowlSlash,
+  spiral,
+  breath,
+  breathSlash,
+  drip,
+  tingle,
+  veins,
+  sideAche,
+  bolt,
+  jitter,
+  cloudStar,
+  scratch,
+  tooth,
+  heat,
+  scent,
+  dropRepeat,
+  puff,
+  bounce,
+  basinDown,
+  tighten,
 }
 
 /// The glyph for a symptom id, or null if it is a mood (which draws a face) or
@@ -170,6 +208,23 @@ class TtcSymptomMark extends StatelessWidget {
       child: CustomPaint(painter: _GlyphPainter(glyph: glyph, ink: ink)),
     );
   }
+}
+
+/// One glyph by name, for a caller that keys its own ids — the pregnancy
+/// Symptoms door. `TtcSymptomMark` stays the TTC entry point.
+class TtcGlyphMark extends StatelessWidget {
+  const TtcGlyphMark({super.key, required this.glyph, required this.size, required this.ink});
+
+  final TtcGlyph glyph;
+  final double size;
+  final Color ink;
+
+  @override
+  Widget build(BuildContext context) => SizedBox(
+        width: size,
+        height: size,
+        child: CustomPaint(painter: _GlyphPainter(glyph: glyph, ink: ink)),
+      );
 }
 
 class _GlyphPainter extends CustomPainter {
@@ -592,6 +647,298 @@ class _GlyphPainter extends CustomPainter {
         canvas.drawCircle(Offset(cx, cy), s * 0.07, fill);
         for (final r in [0.19, 0.31]) {
           canvas.drawCircle(Offset(cx, cy), s * r, thin);
+        }
+
+      // ---- pregnancy: the Symptoms door's own (2026-09-22) -------------------
+      // Same two rules as above — objects and places, never anatomy, never a
+      // body. Legibility target is the door's 34pt disc and its 18pt grid row.
+
+      // Heartburn: one flame, an inner tongue.
+      case TtcGlyph.flame:
+        canvas.drawPath(
+            Path()
+              ..moveTo(cx, cy - s * 0.36)
+              ..quadraticBezierTo(cx + s * 0.34, cy - s * 0.02, cx + s * 0.16, cy + s * 0.22)
+              ..quadraticBezierTo(cx + s * 0.04, cy + s * 0.36, cx - s * 0.1, cy + s * 0.3)
+              ..quadraticBezierTo(cx - s * 0.36, cy + s * 0.1, cx - s * 0.12, cy - s * 0.14)
+              ..quadraticBezierTo(cx - s * 0.02, cy - s * 0.2, cx, cy - s * 0.36),
+            line);
+        canvas.drawPath(
+            Path()
+              ..moveTo(cx + s * 0.02, cy + s * 0.02)
+              ..quadraticBezierTo(cx + s * 0.12, cy + s * 0.16, cx, cy + s * 0.24)
+              ..quadraticBezierTo(cx - s * 0.1, cy + s * 0.16, cx + s * 0.02, cy + s * 0.02),
+            thin);
+
+      // Constipation: a line that will not run straight — one overhand knot.
+      case TtcGlyph.knot:
+        canvas.drawPath(
+            Path()
+              ..moveTo(cx - s * 0.36, cy + s * 0.06)
+              ..cubicTo(cx - s * 0.14, cy + s * 0.06, cx - s * 0.1, cy - s * 0.3, cx + s * 0.06, cy - s * 0.26)
+              ..cubicTo(cx + s * 0.26, cy - s * 0.2, cx + s * 0.1, cy + s * 0.22, cx - s * 0.06, cy + s * 0.18)
+              ..cubicTo(cx - s * 0.2, cy + s * 0.14, cx - s * 0.06, cy - s * 0.1, cx + s * 0.12, cy - s * 0.06)
+              ..cubicTo(cx + s * 0.24, cy - s * 0.04, cx + s * 0.28, cy - s * 0.02, cx + s * 0.36, cy - s * 0.02),
+            line);
+
+
+      // A metallic taste: a spoon, bowl up, and the glint beside it that is
+      // not food.
+      case TtcGlyph.spoon:
+        canvas.drawOval(
+            Rect.fromCenter(center: Offset(cx - s * 0.04, cy - s * 0.16), width: s * 0.26, height: s * 0.34),
+            line);
+        canvas.drawLine(Offset(cx - s * 0.04, cy + s * 0.01), Offset(cx - s * 0.04, cy + s * 0.36), line);
+        canvas.drawLine(Offset(cx + s * 0.24, cy - s * 0.36), Offset(cx + s * 0.24, cy - s * 0.2), thin);
+        canvas.drawLine(Offset(cx + s * 0.16, cy - s * 0.28), Offset(cx + s * 0.32, cy - s * 0.28), thin);
+
+      case TtcGlyph.bowlSlash:
+        canvas.drawArc(
+            Rect.fromCircle(center: Offset(cx, cy), radius: s * 0.28), 0.1, math.pi - 0.2, false, line);
+        canvas.drawLine(Offset(cx - s * 0.3, cy), Offset(cx + s * 0.3, cy), line);
+        slash();
+
+      // Dizziness: the room going round.
+      case TtcGlyph.spiral:
+        final path = Path();
+        var first = true;
+        for (var t = 0.0; t <= math.pi * 4.6; t += 0.15) {
+          final r = s * 0.02 + t * s * 0.024;
+          final o = Offset(cx + math.cos(t) * r, cy + math.sin(t) * r);
+          if (first) {
+            path.moveTo(o.dx, o.dy);
+            first = false;
+          } else {
+            path.lineTo(o.dx, o.dy);
+          }
+        }
+        canvas.drawPath(path, line);
+
+      // Breathlessness: three breaths, each shorter than the last.
+      case TtcGlyph.breath:
+        for (final (dy, len) in [(-0.2, 0.62), (0.0, 0.46), (0.2, 0.3)]) {
+          final y = cy + s * dy;
+          final x0 = cx - s * 0.32;
+          canvas.drawPath(
+              Path()
+                ..moveTo(x0, y)
+                ..quadraticBezierTo(x0 + s * len * 0.35, y - s * 0.07, x0 + s * len * 0.6, y)
+                ..quadraticBezierTo(x0 + s * len * 0.8, y + s * 0.06, x0 + s * len, y - s * 0.02),
+              dy == -0.2 ? line : thin);
+        }
+
+      // A blocked nose: the breath, and the bar across it.
+      case TtcGlyph.breathSlash:
+        for (final dy in [-0.16, 0.0, 0.16]) {
+          final y = cy + s * dy;
+          canvas.drawPath(
+              Path()
+                ..moveTo(cx - s * 0.28, y)
+                ..quadraticBezierTo(cx - s * 0.1, y - s * 0.07, cx + s * 0.02, y)
+                ..quadraticBezierTo(cx + s * 0.14, y + s * 0.06, cx + s * 0.28, y - s * 0.02),
+              thin);
+        }
+        slash();
+
+      // Nosebleeds: one drop, and the two lines it ran down.
+      case TtcGlyph.drip:
+        canvas.drawLine(Offset(cx - s * 0.06, cy - s * 0.34), Offset(cx - s * 0.06, cy - s * 0.1), thin);
+        canvas.drawLine(Offset(cx + s * 0.06, cy - s * 0.34), Offset(cx + s * 0.06, cy - s * 0.16), thin);
+        canvas.drawPath(drop(Offset(cx, cy + s * 0.12), s * 0.2), fill);
+
+      // Carpal tunnel: pins and needles — a ring of them round one point.
+      case TtcGlyph.tingle:
+        canvas.drawCircle(Offset(cx, cy), s * 0.07, fill);
+        for (var i = 0; i < 6; i++) {
+          final a = i * math.pi / 3 + math.pi / 6;
+          canvas.drawCircle(Offset(cx + math.cos(a) * s * 0.24, cy + math.sin(a) * s * 0.24),
+              math.max(0.9, s * 0.04), fill);
+          canvas.drawLine(
+            Offset(cx + math.cos(a) * s * 0.12, cy + math.sin(a) * s * 0.12),
+            Offset(cx + math.cos(a) * s * 0.17, cy + math.sin(a) * s * 0.17),
+            thin,
+          );
+        }
+
+      // Varicose veins: two lines that wander instead of run.
+      case TtcGlyph.veins:
+        for (final dx in [-0.12, 0.12]) {
+          final x = cx + s * dx;
+          canvas.drawPath(
+              Path()
+                ..moveTo(x, cy - s * 0.34)
+                ..cubicTo(x + s * 0.12, cy - s * 0.18, x - s * 0.12, cy - s * 0.02, x, cy + s * 0.1)
+                ..quadraticBezierTo(x + s * 0.1, cy + s * 0.22, x - s * 0.02, cy + s * 0.34),
+              dx < 0 ? line : thin);
+        }
+
+      // Rib pain: the ache at the side, radiating off a curve. No ribs drawn.
+      case TtcGlyph.sideAche:
+        canvas.drawPath(
+            Path()
+              ..moveTo(cx - s * 0.06, cy - s * 0.32)
+              ..quadraticBezierTo(cx - s * 0.3, cy, cx - s * 0.06, cy + s * 0.32),
+            line);
+        for (final a in [-0.5, 0.0, 0.5]) {
+          canvas.drawLine(
+            Offset(cx + s * 0.06, cy + a * s * 0.2),
+            Offset(cx + s * 0.28, cy + a * s * 0.34),
+            thin,
+          );
+        }
+
+      // Leg cramps: the jolt.
+      case TtcGlyph.bolt:
+        canvas.drawPath(
+            Path()
+              ..moveTo(cx + s * 0.1, cy - s * 0.36)
+              ..lineTo(cx - s * 0.14, cy + s * 0.02)
+              ..lineTo(cx + s * 0.04, cy + s * 0.02)
+              ..lineTo(cx - s * 0.1, cy + s * 0.36),
+            line);
+
+      // Restless legs: a short line that cannot keep still — motion ticks
+      // either side of it.
+      case TtcGlyph.jitter:
+        canvas.drawLine(Offset(cx, cy - s * 0.26), Offset(cx, cy + s * 0.26), line);
+        for (final side in [-1, 1]) {
+          for (final dy in [-0.14, 0.0, 0.14]) {
+            canvas.drawLine(
+              Offset(cx + side * s * 0.14, cy + s * dy - s * 0.04),
+              Offset(cx + side * s * 0.24, cy + s * dy + s * 0.04),
+              thin,
+            );
+          }
+        }
+
+
+      // Vivid dreams: a cloud, a star in it.
+      case TtcGlyph.cloudStar:
+        // Three bumps and a floor, unioned so the stroke is one silhouette.
+        var cloud = Path()..addOval(Rect.fromCircle(center: Offset(cx - s * 0.14, cy + s * 0.04), radius: s * 0.16));
+        for (final piece in [
+          Path()..addOval(Rect.fromCircle(center: Offset(cx + s * 0.02, cy - s * 0.1), radius: s * 0.2)),
+          Path()..addOval(Rect.fromCircle(center: Offset(cx + s * 0.18, cy + s * 0.06), radius: s * 0.15)),
+          Path()..addRect(Rect.fromLTRB(cx - s * 0.14, cy + s * 0.04, cx + s * 0.18, cy + s * 0.21)),
+        ]) {
+          cloud = Path.combine(PathOperation.union, cloud, piece);
+        }
+        canvas.drawPath(cloud, line);
+        // A five-point star, filled — a plus in a cloud reads as a pharmacy.
+        final star = Path();
+        for (var i = 0; i < 10; i++) {
+          final a = -math.pi / 2 + i * math.pi / 5;
+          final r = i.isEven ? s * 0.1 : s * 0.042;
+          final o = Offset(cx + s * 0.02 + math.cos(a) * r, cy - s * 0.05 + math.sin(a) * r);
+          if (i == 0) {
+            star.moveTo(o.dx, o.dy);
+          } else {
+            star.lineTo(o.dx, o.dy);
+          }
+        }
+        star.close();
+        canvas.drawPath(star, fill);
+
+      case TtcGlyph.scratch:
+        for (final dx in [-0.16, 0.0, 0.16]) {
+          canvas.drawLine(Offset(cx + s * dx - s * 0.08, cy - s * 0.2), Offset(cx + s * dx + s * 0.08, cy + s * 0.08),
+              dx == 0 ? line : thin);
+        }
+        canvas.drawCircle(Offset(cx - s * 0.2, cy + s * 0.24), math.max(0.9, s * 0.035), fill);
+        canvas.drawCircle(Offset(cx + s * 0.06, cy + s * 0.26), math.max(0.9, s * 0.035), fill);
+        canvas.drawCircle(Offset(cx + s * 0.26, cy + s * 0.2), math.max(0.9, s * 0.035), fill);
+
+      // Bleeding gums: a tooth, a drop at its root.
+      case TtcGlyph.tooth:
+        canvas.drawPath(
+            Path()
+              ..moveTo(cx - s * 0.22, cy - s * 0.12)
+              ..quadraticBezierTo(cx - s * 0.22, cy - s * 0.36, cx - s * 0.04, cy - s * 0.3)
+              ..quadraticBezierTo(cx, cy - s * 0.28, cx + s * 0.04, cy - s * 0.3)
+              ..quadraticBezierTo(cx + s * 0.22, cy - s * 0.36, cx + s * 0.22, cy - s * 0.12)
+              ..quadraticBezierTo(cx + s * 0.22, cy + s * 0.06, cx + s * 0.12, cy + s * 0.24)
+              ..quadraticBezierTo(cx + s * 0.06, cy + s * 0.3, cx + s * 0.02, cy + s * 0.12)
+              ..quadraticBezierTo(cx, cy + s * 0.06, cx - s * 0.02, cy + s * 0.12)
+              ..quadraticBezierTo(cx - s * 0.06, cy + s * 0.3, cx - s * 0.12, cy + s * 0.24)
+              ..quadraticBezierTo(cx - s * 0.22, cy + s * 0.06, cx - s * 0.22, cy - s * 0.12),
+            line);
+        canvas.drawPath(drop(Offset(cx + s * 0.26, cy + s * 0.26), s * 0.08), fill);
+
+      // Hot flushes: heat rising.
+      case TtcGlyph.heat:
+        for (final dx in [-0.18, 0.0, 0.18]) {
+          final x = cx + s * dx;
+          canvas.drawPath(
+              Path()
+                ..moveTo(x, cy + s * 0.3)
+                ..cubicTo(x - s * 0.12, cy + s * 0.14, x + s * 0.12, cy - s * 0.02, x, cy - s * 0.14)
+                ..quadraticBezierTo(x - s * 0.08, cy - s * 0.22, x, cy - s * 0.32),
+              dx == 0 ? line : thin);
+        }
+
+      // Smell sensitivity: a scent, rising from its source.
+      case TtcGlyph.scent:
+        canvas.drawCircle(Offset(cx, cy + s * 0.24), s * 0.08, line);
+        for (final dx in [-0.1, 0.1]) {
+          final x = cx + s * dx;
+          canvas.drawPath(
+              Path()
+                ..moveTo(x, cy + s * 0.1)
+                ..cubicTo(x - s * 0.1, cy - s * 0.02, x + s * 0.1, cy - s * 0.16, x, cy - s * 0.32),
+              thin);
+        }
+
+
+      // Needing to pee often: the drop, again and again.
+      case TtcGlyph.dropRepeat:
+        canvas.drawPath(drop(Offset(cx - s * 0.24, cy + s * 0.02), s * 0.14), line);
+        canvas.drawPath(drop(Offset(cx, cy + s * 0.02), s * 0.14), line);
+        canvas.drawPath(drop(Offset(cx + s * 0.24, cy + s * 0.02), s * 0.14), fill);
+
+      case TtcGlyph.puff:
+        canvas.drawCircle(Offset(cx, cy), s * 0.18, line);
+        for (final side in [-1, 1]) {
+          final x0 = cx + side * s * 0.26;
+          final x1 = cx + side * s * 0.38;
+          canvas.drawLine(Offset(x0, cy), Offset(x1, cy), thin);
+          canvas.drawLine(Offset(x1, cy), Offset(x1 - side * s * 0.06, cy - s * 0.06), thin);
+          canvas.drawLine(Offset(x1, cy), Offset(x1 - side * s * 0.06, cy + s * 0.06), thin);
+        }
+
+      // Baby hiccups: a line that hops, twice, on a rhythm.
+      case TtcGlyph.bounce:
+        canvas.drawPath(
+            Path()
+              ..moveTo(cx - s * 0.36, cy + s * 0.1)
+              ..lineTo(cx - s * 0.22, cy + s * 0.1)
+              ..quadraticBezierTo(cx - s * 0.14, cy - s * 0.24, cx - s * 0.06, cy + s * 0.1)
+              ..lineTo(cx + s * 0.06, cy + s * 0.1)
+              ..quadraticBezierTo(cx + s * 0.14, cy - s * 0.24, cx + s * 0.22, cy + s * 0.1)
+              ..lineTo(cx + s * 0.36, cy + s * 0.1),
+            line);
+
+      case TtcGlyph.basinDown:
+        canvas.drawPath(
+            Path()
+              ..moveTo(cx - s * 0.28, cy - s * 0.02)
+              ..lineTo(cx + s * 0.28, cy - s * 0.02)
+              ..quadraticBezierTo(cx + s * 0.14, cy + s * 0.34, cx, cy + s * 0.34)
+              ..quadraticBezierTo(cx - s * 0.14, cy + s * 0.34, cx - s * 0.28, cy - s * 0.02),
+            line);
+        canvas.drawLine(Offset(cx, cy - s * 0.36), Offset(cx, cy - s * 0.12), line);
+        canvas.drawLine(Offset(cx - s * 0.08, cy - s * 0.2), Offset(cx, cy - s * 0.12), thin);
+        canvas.drawLine(Offset(cx + s * 0.08, cy - s * 0.2), Offset(cx, cy - s * 0.12), thin);
+
+      // Braxton Hicks: the belly curve, and the squeeze from both sides.
+      case TtcGlyph.tighten:
+        canvas.drawPath(
+            Path()
+              ..moveTo(cx - s * 0.2, cy - s * 0.1)
+              ..quadraticBezierTo(cx, cy + s * 0.34, cx + s * 0.2, cy - s * 0.1),
+            line);
+        for (final side in [-1, 1]) {
+          canvas.drawLine(Offset(cx + side * s * 0.36, cy - s * 0.02), Offset(cx + side * s * 0.26, cy + s * 0.06), thin);
+          canvas.drawLine(Offset(cx + side * s * 0.36, cy + s * 0.14), Offset(cx + side * s * 0.26, cy + s * 0.06), thin);
         }
     }
   }

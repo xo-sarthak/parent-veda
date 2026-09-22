@@ -9108,13 +9108,57 @@ empty dialler because the app must never guess her hospital's number.
   dialler empty). Lives with the family model (§61), not this door.
 - **The symptom reads have no photo** — the reader shows the grey
   placeholder. One photo per area (six) would do; per symptom is 33.
-- **The marks' hand** — the tiles are filled `IntentMark`s; TTC's check-in
-  draws its symptoms as line glyphs and faces (`ttc_symptom_mark.dart`,
-  `ttc_mood_face.dart`). The user asked whether the pregnancy check-in
-  should wear the same hand. Twelve of the 33 exist there already; 21
-  would be drawn. Decision pending.
+- ~~**The marks' hand**~~ — DONE 2026-09-22 (§73.2).
 - **The date strip on the check-in** — kept so yesterday can be logged
   (Huckleberry); the user asked why it is there. One line to remove if he
   would rather Today logs today only.
 - Water / nutrition week view (§70.8) — still a decision, not a build.
+
+### 73.2 The check-in draws in TTC's hand — 2026-09-22
+
+The user, walking the door: *"in trying to conceive we have those face
+designs that have been drawn — can we do something for this as well?"*
+Decided yes, on the reasoning in `ttc_mood_face.dart`: the same woman
+makes the same gesture a stage earlier, and two hands for one gesture read
+as two apps.
+
+- `TtcGlyph` grew a `// ---- pregnancy` group of **23** line glyphs (flame,
+  knot, spoon, bowlSlash, spiral, breath, breathSlash, drip, tingle, veins,
+  sideAche, bolt, jitter, cloudStar, scratch, tooth, heat, scent,
+  dropRepeat, puff, bounce, basinDown, tighten), drawn under TTC's two
+  rules — objects and places, never anatomy, never a body. `TtcGlyphMark`
+  paints one by name. **9 reuse** a TTC shape (queasy, headAche, battery,
+  expand, spine, bellyAche, moonEye, spots, pelvis); mood swings wears the
+  swings **face**, the only face. 9 + 23 + 1 = the 33.
+- The door keys its own ids (`symptomGlyphFor`, `symptomMoodFor`,
+  `symptomLineMark` in `symptoms_widgets.dart`); the filled `symptomMark`
+  set stays for the door's cards and as the revert (the old lines are
+  comments at each call site).
+- `test/symptoms_door_test.dart` holds TTC's rule: no symptom may fall to
+  the filled mark, no two share a glyph, only the feeling has a face, and
+  every mark paints at 18 and 34.
+- Checked by eye on a rendered contact sheet (no phone — the other
+  terminal had it); four were redrawn on sight: swelling read as an eye,
+  vivid dreams as a crown, hiccups as a dome, the spoon as a key.
+- **Walked on the phone** the same day, with the marks reading at 34pt and
+  18pt. Three things came out of that walk:
+  * **Tap toggles.** The user: *"tapping again should un-select it."* The
+    second tap opened the strength sheet, so clearing a mis-tap cost a sheet
+    and a read — a check-in has to be as cheap to undo as to make. Now tap =
+    on/off, **hold** = how strong (and the sheet's "Not today after all"
+    only shows for something already logged).
+  * **The home's "You logged" cards** both wore the generic symptom art,
+    which also ran under a long value ("Constipation"). `PvInsightTile` took
+    an optional `artWidget`, drawn **top-right** (the painted set is anchored
+    bottom-right, which is where the value is); the pregnancy rail passes the
+    symptom's own drawn mark.
+  * **A real bug behind it:** that card looked the symptom up in `kSymptoms`
+    — the old 12-strong seed list — while the door logs from the 33-strong
+    library, so anything she logged from the other 21 produced **no card at
+    all**, silently. Now `symptomById`. The general shape: two lists for one
+    concept, one of them a subset, and the lookup on the small one fails by
+    omission, never by error.
+- **Owed:** the area *headings* and door cards still
+  wear the filled marks — that is the intended split (cards are the door's
+  chrome; the check-in is hers), not a leftover.
 
