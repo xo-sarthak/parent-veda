@@ -39,6 +39,7 @@ const String kSymSurfaceWeek = 'symptoms/week';
 const String kSymSurfaceSend = 'symptoms/send';
 const String kSymSurfaceUrgent = 'symptoms/urgent';
 const String kSymSurfaceNormal = 'symptoms/normal';
+const String kSymSurfaceCalling = 'symptoms/calling';
 
 const String kSymTabToday = 'today';
 const String kSymTabNormal = 'normal';
@@ -56,10 +57,13 @@ final PvDoorRedFlag kSymptomsUrgentFlag = PvDoorRedFlag(
     PvDoorFlagLine('The baby is moving less than usual'),
     PvDoorFlagLine('You are leaking fluid, or had a gush'),
     PvDoorFlagLine('Regular or painful tightenings before 37 weeks'),
-    PvDoorFlagLine('A severe headache with vision changes, or sudden swelling of the face and hands'),
+    PvDoorFlagLine(
+      'A severe headache with vision changes, or sudden swelling of the face and hands',
+    ),
   ],
   surfaceId: kSymSurfaceUrgent,
-  footer: 'Your obstetrician, the labour ward, or the nearest hospital with a '
+  footer:
+      'Your obstetrician, the labour ward, or the nearest hospital with a '
       'maternity unit. Call, do not message. If you cannot reach anyone and it '
       'is bad, go in.',
   seeAll: false,
@@ -73,7 +77,8 @@ String _first(String s) {
 final PvDoorPage kSymptomsDoor = PvDoorPage(
   bracketId: kSymptomsBracketId,
   heroTitle: 'How are you feeling today?',
-  heroBlurb: 'Tap what you feel, see what helps, and know exactly when to '
+  heroBlurb:
+      'Tap what you feel, see what helps, and know exactly when to '
       'call — for every ache of pregnancy.',
   // Owed: a photograph of its own. The back-pain read's (a woman in a
   // doorway, a hand on her belly, warm light) carries the door until then.
@@ -123,37 +128,44 @@ final PvDoorPage kSymptomsDoor = PvDoorPage(
       mark: IntentMark.askDoctor,
       hue: 268,
       pinnedRedFlag: kSymptomsUrgentFlag,
-      note: 'General guidance for an ordinary pregnancy, never a diagnosis. '
+      note:
+          'General guidance for an ordinary pregnancy, never a diagnosis. '
           'Your own doctor\'s word wins over anything here.',
     ),
   ],
   sections: [
-    // ---- Today --------------------------------------------------------------
-    // Not "Your week" and "Is this normal?" here — those are this door's own
-    // tabs, one swipe away on the rail; a tile that pushes a copy of a tab
-    // is a door inside a door (the phone, 2026-09-22). The one thing Today
-    // offers that is not a tab: the note for her doctor.
-    PvDoorSection(
-      group: kSymTabToday,
-      heading: 'Take it to your doctor',
-      tiles: [
-        PvDoorToolTile(
-          title: 'Send my week',
-          blurb: 'A short note of the last seven days — what, how often, how strong — ready to share.',
-          surfaceId: kSymSurfaceSend,
-        ),
-      ],
-    ),
+    // ---- Today ----------------------------------------------------------------
+    // ⚠️ NO SECTION. The check-in IS the tab, and everything that was under it
+    // is somewhere else already: "Your week" and "Is this normal?" are tabs one
+    // swipe away, and "Send my week" belongs with the week it sends. Three
+    // copies of Send (Today, Your week, Talk) is what the door actually shipped
+    // on 2026-09-22 — the user, walking it: *"that's also repeating"*.
+    //
+    // The general shape, worth keeping: a tile that opens a surface another tab
+    // already owns is not navigation, it is a second copy of that tab. One job
+    // per tab, and each surface has exactly one home.
 
-    // ---- Is this normal? — the tool draws the ten; under it, the five ----------
+    // ---- Is this normal? -------------------------------------------------------
+    // ⚠️ THE TOOL DRAWS THE TEN. Under it stood "The five to call about", which
+    // opened `SymptomsNormalScreen` — the SAME TEN ROWS the tab was already
+    // showing. The user, walking it (2026-09-22): *"you have listed a lot of
+    // things under 'is this normal?', then under 'if it is one of these, call —
+    // do not read' you have listed the same ones"*. He is right, and on this
+    // tab of all tabs it is worse than untidy: a safety list that appears twice
+    // teaches her to skim it.
+    //
+    // So the tab now says each thing once: the five live on Talk as the pinned
+    // flag (one home), the ten are the answers, and the section under them is
+    // the thing neither covers — what to actually SAY when she rings.
     PvDoorSection(
       group: kSymTabNormal,
-      heading: 'If it is one of these, call — do not read',
+      heading: 'When you do call',
       tiles: [
         PvDoorToolTile(
-          title: 'The five to call about, at any hour',
-          blurb: 'Bleeding, less movement, leaking fluid, early tightenings, a headache with vision changes.',
-          surfaceId: kSymSurfaceUrgent,
+          title: 'What to say when you call',
+          blurb:
+              'The six things they will ask, in order, so you are not composing them at 2 am.',
+          surfaceId: kSymSurfaceCalling,
         ),
       ],
     ),
@@ -183,7 +195,8 @@ final PvDoorPage kSymptomsDoor = PvDoorPage(
       tiles: [
         PvDoorToolTile(
           title: 'Send my week',
-          blurb: 'A short note of the seven days — what, how often, how strong — to share before a visit.',
+          blurb:
+              'A short note of the seven days — what, how often, how strong — to share before a visit.',
           surfaceId: kSymSurfaceSend,
         ),
       ],
@@ -196,14 +209,17 @@ final PvDoorPage kSymptomsDoor = PvDoorPage(
       tiles: [
         PvDoorTalkTile(
           title: 'Have a doctor go through it with you',
-          blurb: 'Book a 1:1 with a gynaecologist and bring your week.',
-          surfaceId: kScansSurfaceConsult, // 'consults' — the one consult sheet every door books through
+          blurb:
+              'Book a 1:1 with a gynaecologist. Send your week from the Your week tab and bring it with you.',
+          surfaceId:
+              kScansSurfaceConsult, // 'consults' — the one consult sheet every door books through
         ),
-        PvDoorToolTile(
-          title: 'Send my week first',
-          blurb: 'The note of the seven days, ready to paste into a message.',
-          surfaceId: kSymSurfaceSend,
-        ),
+        // Kept for revert — Send lives on Your week now, once:
+        // PvDoorToolTile(
+        //   title: 'Send my week first',
+        //   blurb: 'The note of the seven days, ready to paste into a message.',
+        //   surfaceId: kSymSurfaceSend,
+        // ),
       ],
     ),
   ],

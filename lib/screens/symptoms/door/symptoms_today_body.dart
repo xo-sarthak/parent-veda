@@ -29,6 +29,7 @@ import '../../../data/doors/pv_door_data.dart' show PvDoorLibrary;
 import '../../../data/reads/symptom_reads.dart';
 import '../../../data/symptoms/symptom_library.dart';
 import '../../../models/reminder.dart';
+import '../../../models/pv_read.dart' show PvRead;
 import '../../../models/symptom.dart';
 import '../../../services/pregnancy_controller.dart';
 import '../../../services/reminder_store.dart';
@@ -48,26 +49,73 @@ const String kSymptomReminderId = 'symptoms_evening';
 
 /// Open a symptom's page in the one reader.
 void openSymptomRead(BuildContext context, Symptom s, PregnancyController c) {
-  Navigator.of(context).push(MaterialPageRoute<void>(
-    settings: RouteSettings(name: pvDoorEntryRoute(PvDoorLibrary.symptom, s.id)),
-    builder: (_) => symptomReader(pvReadFromSymptom(s), c),
-  ));
+  Navigator.of(context).push(
+    MaterialPageRoute<void>(
+      settings: RouteSettings(
+        name: pvDoorEntryRoute(PvDoorLibrary.symptom, s.id),
+      ),
+      builder: (_) => symptomReader(pvReadFromSymptom(s), c),
+    ),
+  );
 }
 
 /// The reader with this door's read-next resolved.
+/// The head of a symptom read: its own mark, large, on its area's colour.
+///
+/// ⚠️ THIS IS THE ANSWER TO "WE NEED IMAGES", NOT A PLACEHOLDER FOR ONE.
+/// Symptom photography is stock-fake or clinical (the door's plan), so the
+/// reads carry no picture — but the reader's default band is the read hue and
+/// a big white book, which made all thirty-three open identically (the user,
+/// 2026-09-22: *"we need images for this tab"*). A drawn mark on the area's
+/// colour is both individual and honest: six colour families, thirty-three
+/// marks, the same hand as the check-in and the rows, and nothing pretending
+/// to be a photograph of her body.
+Widget? symptomReadHero(String id) {
+  final s = symptomById(
+    id.startsWith(kSymptomReadPrefix)
+        ? id.substring(kSymptomReadPrefix.length)
+        : id,
+  );
+  if (s == null) return null;
+  final p = V2PaletteStore.instance.current;
+  final area = symptomArea(s);
+  final tint = symptomAreaTint(p, area);
+  return ColoredBox(
+    color: tint,
+    child: Stack(
+      children: [
+        // ⚠️ THE MARK ONCE, LARGE AND CROPPED. A big watermark with a small
+        // copy of itself in the other corner is the same thing said twice in
+        // one band — the note this whole pass is about.
+        Positioned(
+          right: -16,
+          bottom: -18,
+          child: Opacity(
+            opacity: 0.45,
+            child: symptomLineMark(s, size: 158, ink: symptomAreaInk(p, area)),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 Widget symptomReader(dynamic read, PregnancyController c) => PvReaderScreen(
-      read: read,
-      lang: c.language,
-      resolveRead: symptomReadById,
-      openRead: (context, id) {
-        final r = symptomReadById(id);
-        if (r == null) return;
-        Navigator.of(context).push(MaterialPageRoute<void>(
-          settings: RouteSettings(name: 'symptoms/read/$id'),
-          builder: (_) => symptomReader(r, c),
-        ));
-      },
+  read: read,
+  lang: c.language,
+  hero: read is PvRead ? symptomReadHero(read.id) : null,
+  resolveRead: symptomReadById,
+  openRead: (context, id) {
+    final r = symptomReadById(id);
+    if (r == null) return;
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        settings: RouteSettings(name: 'symptoms/read/$id'),
+        builder: (_) => symptomReader(r, c),
+      ),
     );
+  },
+);
 
 class SymptomsTodayBody extends StatefulWidget {
   const SymptomsTodayBody({super.key, required this.pregnancy});
@@ -77,7 +125,8 @@ class SymptomsTodayBody extends StatefulWidget {
   State<SymptomsTodayBody> createState() => _SymptomsTodayBodyState();
 }
 
-class _SymptomsTodayBodyState extends State<SymptomsTodayBody> with WidgetsBindingObserver {
+class _SymptomsTodayBodyState extends State<SymptomsTodayBody>
+    with WidgetsBindingObserver {
   static DateTime _dayOnly(DateTime d) => DateTime(d.year, d.month, d.day);
   DateTime _today = _dayOnly(DateTime.now());
   late DateTime _selected = _today;
@@ -112,8 +161,29 @@ class _SymptomsTodayBodyState extends State<SymptomsTodayBody> with WidgetsBindi
     });
   }
 
-  static const _days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-  static const _months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  static const _days = [
+    'Monday',
+    'Tuesday',
+    'Wednesday',
+    'Thursday',
+    'Friday',
+    'Saturday',
+    'Sunday',
+  ];
+  static const _months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ];
   String _dayWord(DateTime d) {
     final diff = d.difference(_today).inDays;
     if (diff == 0) return 'Today';
@@ -162,14 +232,16 @@ class _SymptomsTodayBodyState extends State<SymptomsTodayBody> with WidgetsBindi
     pvCommitFeedback();
     final store = ReminderStore.instance;
     if (on) {
-      store.upsert(const Reminder(
-        id: kSymptomReminderId,
-        title: 'How was today?',
-        body: 'Two taps on the Symptoms door and your week keeps itself.',
-        hour: 20,
-        minute: 30,
-        category: 'symptoms',
-      ));
+      store.upsert(
+        const Reminder(
+          id: kSymptomReminderId,
+          title: 'How was today?',
+          body: 'Two taps on the Symptoms door and your week keeps itself.',
+          hour: 20,
+          minute: 30,
+          category: 'symptoms',
+        ),
+      );
     } else {
       store.remove(kSymptomReminderId);
     }
@@ -177,59 +249,86 @@ class _SymptomsTodayBodyState extends State<SymptomsTodayBody> with WidgetsBindi
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-        animation: Listenable.merge([V2PaletteStore.instance, SymptomStore.instance, ReminderStore.instance, widget.pregnancy]),
-        builder: (context, _) {
-          if (_dayOnly(DateTime.now()) != _today) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (mounted) _rollOver();
-            });
-          }
-          final p = V2PaletteStore.instance.current;
-          final store = SymptomStore.instance;
-          final c = widget.pregnancy;
-          final week = c.currentWeek;
-          final future = _selected.isAfter(_today);
-          final ordered = symptomsCommonAt(week);
-          final common = ordered.take(8).toList();
-          final rest = ordered.skip(8).toList();
-          final loggedToday = store.logsOn(_selected);
-          final reminderOn = ReminderStore.instance.byId(kSymptomReminderId)?.enabled ?? false;
+    animation: Listenable.merge([
+      V2PaletteStore.instance,
+      SymptomStore.instance,
+      ReminderStore.instance,
+      widget.pregnancy,
+    ]),
+    builder: (context, _) {
+      if (_dayOnly(DateTime.now()) != _today) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) _rollOver();
+        });
+      }
+      final p = V2PaletteStore.instance.current;
+      final store = SymptomStore.instance;
+      final c = widget.pregnancy;
+      final week = c.currentWeek;
+      final future = _selected.isAfter(_today);
+      final ordered = symptomsCommonAt(week);
+      final common = ordered.take(8).toList();
+      final rest = ordered.skip(8).toList();
+      final loggedToday = store.logsOn(_selected);
+      final reminderOn =
+          ReminderStore.instance.byId(kSymptomReminderId)?.enabled ?? false;
 
-          return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            // ---- the day -------------------------------------------------------
-            pvDoorPad(symptomsHeading(p, 'How are you?',
-                sub: '${_dayWord(_selected)}. Tap what you feel, tap again to clear. Hold one to say how strong.')),
-            const SizedBox(height: 10),
-            // Edge to edge, with the gutter inside it (the door rule).
-            PvDayStrip(
-              p: p,
-              gutter: kPvDoorGutter,
-              selected: _selected,
-              today: _today,
-              onSelect: (d) => setState(() => _selected = d),
-              accent: p.ink1,
-              keyPrefix: 'sym_day_',
-              daysBack: (c.currentDay - 1).clamp(0, 180),
-              daysForward: 6,
-              markFor: (date, sel) {
-                final n = store.logsOn(date).length;
-                if (n == 0) return null;
-                return Center(
-                  child: Container(
-                    width: 5,
-                    height: 5,
-                    decoration: BoxDecoration(color: sel ? p.ink1 : p.ink3, shape: BoxShape.circle),
-                  ),
-                );
-              },
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // ---- the day -------------------------------------------------------
+          pvDoorPad(
+            symptomsHeading(
+              p,
+              'How are you?',
+              sub:
+                  '${_dayWord(_selected)}. Tap what you feel, tap again to clear. Hold one to say how strong.',
             ),
-            const SizedBox(height: 6),
+          ),
+          const SizedBox(height: 10),
+          // Edge to edge, with the gutter inside it (the door rule).
+          PvDayStrip(
+            p: p,
+            gutter: kPvDoorGutter,
+            selected: _selected,
+            today: _today,
+            onSelect: (d) => setState(() => _selected = d),
+            accent: p.ink1,
+            keyPrefix: 'sym_day_',
+            daysBack: (c.currentDay - 1).clamp(0, 180),
+            daysForward: 6,
+            markFor: (date, sel) {
+              final n = store.logsOn(date).length;
+              if (n == 0) return null;
+              return Center(
+                child: Container(
+                  width: 5,
+                  height: 5,
+                  decoration: BoxDecoration(
+                    color: sel ? p.ink1 : p.ink3,
+                    shape: BoxShape.circle,
+                  ),
+                ),
+              );
+            },
+          ),
+          const SizedBox(height: 6),
 
-            // ---- common this week ---------------------------------------------
-            pvDoorPad(Text(future ? 'THAT DAY HAS NOT COME YET' : 'COMMON IN WEEK $week',
-                style: pvManrope(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 1.3, color: p.ink3))),
-            const SizedBox(height: 12),
-            pvDoorPad(_Grid(
+          // ---- common this week ---------------------------------------------
+          pvDoorPad(
+            Text(
+              future ? 'THAT DAY HAS NOT COME YET' : 'COMMON IN WEEK $week',
+              style: pvManrope(
+                fontSize: 10.5,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.3,
+                color: p.ink3,
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+          pvDoorPad(
+            _Grid(
               p: p,
               symptoms: common,
               severityOf: (s) => store.severityOn(_selected, s.id),
@@ -237,91 +336,167 @@ class _SymptomsTodayBodyState extends State<SymptomsTodayBody> with WidgetsBindi
               // Hold = strength. The read is one tap away on its What-helps row.
               onOpen: _hold,
               enabled: !future,
-            )),
+            ),
+          ),
 
-            // ---- more ----------------------------------------------------------
-            const SizedBox(height: 10),
-            pvDoorPad(Align(
+          // ---- more ----------------------------------------------------------
+          const SizedBox(height: 10),
+          pvDoorPad(
+            Align(
               alignment: Alignment.centerLeft,
               child: TextButton.icon(
                 onPressed: () => setState(() => _more = !_more),
-                icon: Icon(_more ? Icons.expand_less_rounded : Icons.expand_more_rounded, size: 18, color: p.ink1),
-                label: Text(_more ? 'Fewer' : 'Something else · ${rest.length} more',
-                    style: pvManrope(fontSize: 13, fontWeight: FontWeight.w800, color: p.ink1)),
-                style: TextButton.styleFrom(padding: const EdgeInsets.symmetric(horizontal: 4)),
+                icon: Icon(
+                  _more ? Icons.expand_less_rounded : Icons.expand_more_rounded,
+                  size: 18,
+                  color: p.ink1,
+                ),
+                label: Text(
+                  _more ? 'Fewer' : 'Something else · ${rest.length} more',
+                  style: pvManrope(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    color: p.ink1,
+                  ),
+                ),
+                style: TextButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(horizontal: 4),
+                ),
               ),
-            )),
-            if (_more) ...[
-              for (final area in SymptomArea.values)
-                if (rest.any((s) => symptomArea(s) == area)) ...[
-                  const SizedBox(height: 8),
-                  pvDoorPad(Row(children: [
-                    SizedBox(width: 18, height: 18, child: symptomAreaMark(p, area)),
-                    const SizedBox(width: 8),
-                    Text(area.label.toUpperCase(),
-                        style: pvManrope(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 1.3, color: p.ink3)),
-                  ])),
-                  const SizedBox(height: 10),
-                  pvDoorPad(_Grid(
+            ),
+          ),
+          if (_more) ...[
+            for (final area in SymptomArea.values)
+              if (rest.any((s) => symptomArea(s) == area)) ...[
+                const SizedBox(height: 8),
+                pvDoorPad(
+                  Row(
+                    children: [
+                      SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: symptomAreaMark(p, area),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        area.label.toUpperCase(),
+                        style: pvManrope(
+                          fontSize: 10.5,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.3,
+                          color: p.ink3,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 10),
+                pvDoorPad(
+                  _Grid(
                     p: p,
-                    symptoms: [for (final s in rest) if (symptomArea(s) == area) s],
+                    symptoms: [
+                      for (final s in rest)
+                        if (symptomArea(s) == area) s,
+                    ],
                     severityOf: (s) => store.severityOn(_selected, s.id),
                     onTap: _tap,
                     onOpen: _hold,
                     enabled: !future,
-                  )),
-                ],
-            ],
-            const SizedBox(height: 22),
+                  ),
+                ),
+              ],
+          ],
+          const SizedBox(height: 22),
 
-            // ---- what helps, for what she logged --------------------------------
-            //
-            // ⚠️ THE PAYOFF IS RIGHT UNDER THE TAP. A logged symptom earns one
-            // line of help and the way to its page — the check-in gives back
-            // the moment it is used, which is the difference between a log
-            // and a chore. Nothing logged: one honest line, not an empty box.
-            pvDoorPad(symptomsHeading(p, 'What helps',
-                sub: loggedToday.isEmpty
-                    ? (future ? 'Come back on the day.' : 'Tap a symptom above and its help appears here.')
-                    : 'For what you logged ${_dayWord(_selected).toLowerCase()}.')),
-            const SizedBox(height: 10),
-            for (final l in loggedToday)
-              if (symptomById(l.symptomId) case final s?)
-                pvDoorPad(_HelpRow(
+          // ---- what helps, for what she logged --------------------------------
+          //
+          // ⚠️ THE PAYOFF IS RIGHT UNDER THE TAP. A logged symptom earns one
+          // line of help and the way to its page — the check-in gives back
+          // the moment it is used, which is the difference between a log
+          // and a chore. Nothing logged: one honest line, not an empty box.
+          pvDoorPad(
+            symptomsHeading(
+              p,
+              'What helps',
+              sub: loggedToday.isEmpty
+                  ? (future
+                        ? 'Come back on the day.'
+                        : 'Tap a symptom above and its help appears here.')
+                  : 'For what you logged ${_dayWord(_selected).toLowerCase()}.',
+            ),
+          ),
+          const SizedBox(height: 10),
+          for (final l in loggedToday)
+            if (symptomById(l.symptomId) case final s?)
+              pvDoorPad(
+                _HelpRow(
                   p: p,
                   symptom: s,
                   severity: l.severity,
                   onTap: () => openSymptomRead(context, s, c),
-                )),
-            if (loggedToday.isNotEmpty) ...[
-              const SizedBox(height: 4),
-              pvDoorPad(Text(
-                  'General guidance, never a diagnosis. Anything that worries you is a call to your doctor — the Talk tab has the five to call about at any hour.',
-                  style: pvManrope(fontSize: 11.5, height: 1.45, color: p.ink3))),
-            ],
-            const SizedBox(height: 22),
+                ),
+              ),
+          if (loggedToday.isNotEmpty) ...[
+            const SizedBox(height: 4),
+            pvDoorPad(
+              Text(
+                'General guidance, never a diagnosis. Anything that worries you is a call to your doctor — the Talk tab has the five to call about at any hour.',
+                style: pvManrope(fontSize: 11.5, height: 1.45, color: p.ink3),
+              ),
+            ),
+          ],
+          const SizedBox(height: 22),
 
-            // ---- the evening reminder -------------------------------------------
-            pvDoorPad(Container(
+          // ---- the evening reminder -------------------------------------------
+          pvDoorPad(
+            Container(
               padding: const EdgeInsets.fromLTRB(14, 12, 10, 12),
               decoration: BoxDecoration(
-                  color: p.surface, borderRadius: BorderRadius.circular(16), border: Border.all(color: p.line)),
-              child: Row(children: [
-                Expanded(
-                  child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    Text('Ask me each evening', style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w800, color: p.ink1)),
-                    const SizedBox(height: 2),
-                    Text('"How was today?" at 8:30 pm. Off unless you want it.',
-                        style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink2)),
-                  ]),
-                ),
-                Switch.adaptive(value: reminderOn, onChanged: _toggleReminder, activeThumbColor: p.ground, activeTrackColor: p.ink1),
-              ]),
-            )),
-            const SizedBox(height: 8),
-          ]);
-        },
+                color: p.surface,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: p.line),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Ask me each evening',
+                          style: pvManrope(
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w800,
+                            color: p.ink1,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '"How was today?" at 8:30 pm. Off unless you want it.',
+                          style: pvManrope(
+                            fontSize: 12.5,
+                            height: 1.4,
+                            color: p.ink2,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Switch.adaptive(
+                    value: reminderOn,
+                    onChanged: _toggleReminder,
+                    activeThumbColor: p.ground,
+                    activeTrackColor: p.ink1,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
+        ],
       );
+    },
+  );
 }
 
 /// The tiles, four to a row, wrapping.
@@ -342,33 +517,40 @@ class _Grid extends StatelessWidget {
   final bool enabled;
 
   @override
-  Widget build(BuildContext context) => LayoutBuilder(builder: (context, box) {
-        // Four across on a 324pt gutter: 4 × 78 = 312, three gaps of 4.
-        final w = ((box.maxWidth - 12) / 4).clamp(64.0, 96.0);
-        return Wrap(
-          spacing: 4,
-          runSpacing: 14,
-          children: [
-            for (final s in symptoms)
-              SymptomTile(
-                key: ValueKey('sym_tile_${s.id}'),
-                p: p,
-                symptom: s,
-                severity: severityOf(s),
-                onTap: () => onTap(s),
-                onOpen: () => onOpen(s),
-                enabled: enabled,
-                width: w,
-              ),
-          ],
-        );
-      });
+  Widget build(BuildContext context) => LayoutBuilder(
+    builder: (context, box) {
+      // Four across on a 324pt gutter: 4 × 78 = 312, three gaps of 4.
+      final w = ((box.maxWidth - 12) / 4).clamp(64.0, 96.0);
+      return Wrap(
+        spacing: 4,
+        runSpacing: 14,
+        children: [
+          for (final s in symptoms)
+            SymptomTile(
+              key: ValueKey('sym_tile_${s.id}'),
+              p: p,
+              symptom: s,
+              severity: severityOf(s),
+              onTap: () => onTap(s),
+              onOpen: () => onOpen(s),
+              enabled: enabled,
+              width: w,
+            ),
+        ],
+      );
+    },
+  );
 }
 
 /// One logged symptom's help: the mark, the name and strength, the first
 /// tip, the chevron to the page.
 class _HelpRow extends StatelessWidget {
-  const _HelpRow({required this.p, required this.symptom, required this.severity, required this.onTap});
+  const _HelpRow({
+    required this.p,
+    required this.symptom,
+    required this.severity,
+    required this.onTap,
+  });
   final V2Palette p;
   final Symptom symptom;
   final String severity;
@@ -376,42 +558,62 @@ class _HelpRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => InkWell(
-        onTap: () {
-          pvCommitFeedback();
-          onTap();
-        },
-        borderRadius: BorderRadius.circular(14),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10),
-          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Container(
-              width: 42,
-              height: 42,
-              padding: const EdgeInsets.all(9),
-              decoration: BoxDecoration(
-                  color: symptomAreaTint(p, symptomArea(symptom)), borderRadius: BorderRadius.circular(13)),
-              // Kept for revert — the filled mark:
-              // child: HubIntentArt(mark: symptomMark(symptom), tint: symptomAreaTint(p, symptomArea(symptom))),
-              child: symptomLineMark(symptom, size: 24, ink: symptomAreaInk(p, symptomArea(symptom))),
+    onTap: () {
+      pvCommitFeedback();
+      onTap();
+    },
+    borderRadius: BorderRadius.circular(14),
+    child: Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 42,
+            height: 42,
+            padding: const EdgeInsets.all(9),
+            decoration: BoxDecoration(
+              color: symptomAreaTint(p, symptomArea(symptom)),
+              borderRadius: BorderRadius.circular(13),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Text('${symptom.name.en} · ${severityLabel(severity).toLowerCase()}',
-                    style: pvManrope(fontSize: 14, fontWeight: FontWeight.w800, color: p.ink1)),
+            // Kept for revert — the filled mark:
+            // child: HubIntentArt(mark: symptomMark(symptom), tint: symptomAreaTint(p, symptomArea(symptom))),
+            child: symptomLineMark(
+              symptom,
+              size: 24,
+              ink: symptomAreaInk(p, symptomArea(symptom)),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '${symptom.name.en} · ${severityLabel(severity).toLowerCase()}',
+                  style: pvManrope(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                    color: p.ink1,
+                  ),
+                ),
                 const SizedBox(height: 3),
-                Text(symptom.tips.isEmpty ? symptom.why.en : symptom.tips.first.en,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: pvManrope(fontSize: 13, height: 1.45, color: p.ink2)),
-              ]),
+                Text(
+                  symptom.tips.isEmpty ? symptom.why.en : symptom.tips.first.en,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(fontSize: 13, height: 1.45, color: p.ink2),
+                ),
+              ],
             ),
-            const SizedBox(width: 6),
-            Padding(
-              padding: const EdgeInsets.only(top: 10),
-              child: Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
-            ),
-          ]),
-        ),
-      );
+          ),
+          const SizedBox(width: 6),
+          Padding(
+            padding: const EdgeInsets.only(top: 10),
+            child: Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
+          ),
+        ],
+      ),
+    ),
+  );
 }

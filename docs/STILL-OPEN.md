@@ -9356,8 +9356,10 @@ spoil — it is deliberately not a `PvDoorPage`. So Fitness is the gap.
 verdicts for walking, swimming, cycling, running, dancing, gym, trekking and
 lifting, each with per-trimester notes; the Kegel tool.
 
-**Proposed:** five tabs — Today (one practice for her month, the month
-DERIVED and not `_kCurrentMonth = 7`), Practise (chips over rows), Is it safe
+**Proposed:** five tabs — Today (one practice for her month, derived;
+the `_kCurrentMonth = 7` screen turned out to be dead code — its only call
+site is commented out — so the live surface the door replaces is
+`YogaHomeScreen` with `kPregnancyYogaCategories`), Practise (chips over rows), Is it safe
 to…? (the eight verdicts rendered in place, reading `can_i_data`, never
 restated), Pelvic floor (the Kegel tool + reads), Talk (the stop-and-call flag
 for movement + consult).
