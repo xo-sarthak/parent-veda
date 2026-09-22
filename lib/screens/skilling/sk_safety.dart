@@ -22,10 +22,20 @@
 //  ⚠️ NOTHING IS WRITTEN DOWN. Opening the sheet records nothing, anywhere.
 //  A child asking for help must never leave a trace she did not choose.
 //
-//  ⚠️ THE NUMBERS ARE FLAGGED VERIFY. Childline 1098 and Tele-MANAS 14416
-//  are real Indian helplines as of writing; a lawyer and a clinician confirm
-//  the numbers and the wording before anything ships (the user's call, 2a).
-//  The stage is behind `kDebugMode`; nothing reaches a child yet.
+//  ⚠️ THE NUMBERS ARE STILL FLAGGED VERIFY, AND THEY NOW SHOW ANYWAY. Childline
+//  1098 and Tele-MANAS 14416 are India's real national lines as of writing.
+//  When the stage sat behind `kDebugMode` this sheet hid anything still
+//  flagged in a release build — "a wrong number is worse than none". The
+//  stage ships from 2026-09-22, and that rule inverted the door's purpose:
+//  it left a child who tapped "Talk to someone" with no number at all. A
+//  dead end on the off-ramp is worse than a number that may want
+//  re-checking, so `verify` is now a LEDGER flag (FE11, STILL-OPEN §103),
+//  not a display filter. The user's call, 2026-09-22.
+//
+//  ⚠️ WHAT IS STILL OWED, AND IS NOT OPTIONAL BEFORE A PUBLIC LAUNCH: a
+//  lawyer and a clinician confirm both numbers and this sheet's wording.
+//  A helpline that has moved is the one defect here that could cost a child
+//  the call she needed.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -94,15 +104,12 @@ class SkTalkToSomeoneBar extends StatelessWidget {
 }
 
 /// The sheet: the trusted-adult line first, then each helpline with a
-/// tap-to-call. In a release build a helpline still marked `verify` is not
-/// shown at all — a wrong number is worse than none.
+/// tap-to-call. Every helpline shows, in every build (2026-09-22).
 Future<void> skShowTalkToSomeone(BuildContext context, SkSafety safety) {
   final p = V2PaletteStore.instance.current;
-  const release = bool.fromEnvironment('dart.vm.product');
-  final lines = [
-    for (final h in safety.helplines)
-      if (!release || !h.verify) h,
-  ];
+  // Every line, in every build. See the header: `verify` records what is
+  // owed; it no longer decides what a child can see.
+  final lines = safety.helplines;
   return showModalBottomSheet<void>(
     context: context,
     backgroundColor: p.surface,

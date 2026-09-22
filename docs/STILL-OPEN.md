@@ -7678,6 +7678,66 @@ the showcase kept and held private, Consult held. Not walked on a phone.
 
 ---
 
+## 105.0 The skilling stage comes out from behind kDebugMode — 2026-09-22
+
+The user's call, in his words: "can u make sure skilling isnt debug only so
+that it's visible to ppl i share the apk with … the whole side of the app I
+mean when I say skilling."
+
+### 105.1 What was actually gating it
+
+One line: `if (!kDebugMode) return false;` at the top of `skOpenDoor`
+(`lib/screens/skilling/sk_surface_router.dart`). Every way INTO the stage
+already shipped — onboarding's "Skilling — 6 and up", the splash route,
+the pregnancy home's door shelf, the parenting Explore drawer — and
+`test/skilling_doorway_test.dart` has guarded that since the stage was
+built. What did not ship was the last hop: a tile fell through to its plan
+sheet instead of opening the door. So the preview screen was visible to
+everyone and the seven built doors were visible to nobody but a debug
+build.
+
+That gate was the original call (2026-09-14, question 1: "the preview
+ships, the door does not") and every one of the twelve door briefs repeats
+"do not move the stage out from behind kDebugMode". **That instruction is
+now overridden, deliberately, by the person whose product it is.** It is
+recorded here rather than quietly dropped, because a brief-level rule
+being reversed is exactly the kind of thing the next agent will otherwise
+re-impose.
+
+### 105.2 The one thing that had to change with it
+
+The Feelings door's safety off-ramp hid any helpline still flagged
+`verify` when the build was release — "a wrong number is worse than none",
+written when only a developer could reach the door. The moment the stage
+ships, that rule inverts the door's purpose: a child taps "Talk to
+someone" and gets a sheet with no number on it. A dead end on the off-ramp
+is the worse failure, so `SkHelpline.verify` is now a LEDGER flag (FE11)
+and not a display filter; every line shows in every build, and a test
+holds that no build mode decides what a child can see.
+
+**Still owed, and not optional before a public launch:** a lawyer and a
+clinician confirm Childline 1098, Tele-MANAS 14416 and the sheet's
+wording. A helpline that has moved is the one defect in this stage that
+could cost a child the call she needed.
+
+### 105.3 What a stranger with the APK now sees, all of it owed somewhere
+
+* Seven doors of twelve open; five keep their plan sheet.
+* Of the seven, three (Coding, Communication, Confidence) have real
+  activity copy; the rest are "Coming soon" cards by design, and the
+  Feelings content is deliberately unwritten pending clinical review.
+* Four of the seven (Thinking, Stillness, Feelings, Making) have never
+  been walked on a device.
+* The Feelings journal's AES key sits beside the data
+  (`SkJournalKeyStore`, ledger FE10) — acceptable for a preview build,
+  not for a launch.
+* The journal's child-private default still wants legal review against
+  DPDP (§103.3).
+
+None of these are new; what is new is who can see them.
+
+---
+
 ## 59.0 Onboarding is decided against the Mobbin audit; three things it leaves open — OPENED 2026-09-16
 
 `docs/ONBOARDING-AUDIT.md` holds the audit, the seven-screen decision and the

@@ -281,11 +281,17 @@ void main() {
       expect(b.layer(BracketLayer.consult).state, LayerState.notReady);
     });
 
-    test('the door stays behind kDebugMode; the preview tile falls back to the plan sheet', () {
+    // ⚠️ THE GATE IS GONE, ON THE USER'S CALL (2026-09-22, STILL-OPEN §105):
+    // the whole skilling side ships so a shared APK can be walked. What the
+    // test holds now is the half that still matters — a tile whose bracket
+    // has no door must never open nothing.
+    test('the door opens in any build, and a tile without one falls back to the plan sheet', () {
       final router = File('lib/screens/skilling/sk_surface_router.dart').readAsStringSync();
       final body = router.substring(router.indexOf('bool skOpenDoor('));
-      expect(body.contains('if (!kDebugMode) return false;'), isTrue,
-          reason: 'the stage stays gated until the briefs say otherwise');
+      expect(body.contains('kDebugMode'), isFalse,
+          reason: 'the stage ships; the gate was removed deliberately');
+      expect(body.contains('if (door == null) return false;'), isTrue,
+          reason: 'a bracket with no SkDoor still returns false');
       final preview = File('lib/screens/skilling/skilling_preview_screen.dart').readAsStringSync();
       expect(preview.contains('if (!skOpenDoor(context, b.id)) _showPlan(context, b, p);'), isTrue,
           reason: 'a tile that cannot open its door shows the plan, never nothing');

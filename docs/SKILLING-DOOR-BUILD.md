@@ -14,6 +14,23 @@ calls that apply to every door rather than to one. The user's instruction
 section; points generic to the doors of skilling live here, in §9. Content
 owed goes to `DOOR-CONTENT-OWED.md`, under its Skilling heading.
 
+**⚠️ THE STAGE SHIPS SINCE 2026-09-22.** `skOpenDoor` no longer checks
+`kDebugMode`: a release APK opens every built door, because the user wants
+the whole skilling side walkable by the people he shares a build with.
+Every door brief says "do not move the stage out from behind kDebugMode";
+that instruction is overridden, deliberately, on the record (STILL-OPEN
+§105). Two consequences a new door must respect:
+
+* **Nothing is "only a developer will see it" any more.** A placeholder, a
+  half-written line, a hero that reads wrong — a stranger sees it. The
+  "Coming soon" card is the honest face of an unwritten slot, so use it;
+  never leave a live-looking surface with nothing behind it.
+* **A safety surface must work in a release build.** The Feelings off-ramp
+  used to hide its helplines in release; with the stage shipping that left
+  the sheet empty, so `SkHelpline.verify` became a ledger flag rather than
+  a display filter. A test holds that no build mode decides whether a
+  child can see a helpline.
+
 **`STILL-OPEN.md` numbering: skilling sections take §100 and up** (Coding
 §55 and Communication §56 predate this; Confidence is §100). Two terminals
 appending to one sequence collided twice on 2026-09-16/17; a reserved block

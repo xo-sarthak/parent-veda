@@ -24,7 +24,7 @@ buy are stub sheets; the door stays behind `kDebugMode`; the preview ships.
 | Coding | `ParentVeda_Coding_structure_v2.pdf` | door, 5 tabs + the shell | **3 of 3 filled** (36 activities) | 5f963a7 (door), 87dcd62 (fills + walk) | **yes** — 2026-09-14, at 8, 5 and 12 | `sk_coding_door_test` |
 | Communication | `ParentVeda_Communication_structure.pdf` | door, 5 tabs (three band cards) | **3 of 3 filled** (6–8, 8–11 from the author's PDFs; **11–14 written by Claude Code**, with the other PDFs) | a86c5bf (frame), 0fa1193 (fills), e67da1b (walk), e34b39f (11–14) | **yes** — 2026-09-16, at 12 and 8, recorder end to end (11–14 fill not yet) | `sk_communication_door_test` |
 | Confidence | `ParentVeda_Confidence_structure.pdf` | door, **6 cards** (three band cards + recorder + keepsake) | **3 of 3 filled** (36 activities) | 5eb85a4 (frame), 153b3a4 (walk), 6a78176 (fills + walk) | **yes** — 2026-09-17, at 8, frame and fills | `sk_confidence_door_test` |
-| Creativity (Making) | `ParentVeda_Creativity_structure.pdf` | door, 5 tabs (three band cards + Prompts + Your portfolio, the showcase inside it) | none yet (no task PDFs) | commit next | no | `sk_making_door_test` |
+| Creativity (Making) | `ParentVeda_Creativity_structure.pdf` | door, 5 tabs (three band cards + Prompts + Your portfolio, the showcase inside it) | none yet (no task PDFs) | 8834d6a | no | `sk_making_door_test` |
 | Feelings | `ParentVeda_Feelings_structure.pdf` | door, **6 cards** (three band cards + Scenarios and prompts + Your journal + You practised) and the off-ramp bar on every screen | none yet — **content marked "care": clinical review before any fill** | 8c09f97 | no | `sk_feelings_door_test` |
 | Focus | `ParentVeda_Focus_structure.pdf` | plan sheet | none yet | — | — | — |
 | Maths | `ParentVeda_Maths_structure.pdf` | plan sheet | none yet | — | — | — |
@@ -706,6 +706,38 @@ task PDFs exist.
 - [ ] The tile says "Making"; the brief's door is "Creativity &
       expression" and the bracket id is `skilling_creativity`. Fine.
 - [ ] Not walked on a phone yet.
+
+## The stage ships (§105) — 2026-09-22
+
+`skOpenDoor` lost its `kDebugMode` gate on your call: a release APK opens
+every built door, so anyone you hand the build to can walk the whole
+skilling side. The ways IN were already release-visible (onboarding's
+"Skilling — 6 and up", the pregnancy home's door shelf, the parenting
+Explore drawer) and `test/skilling_doorway_test.dart` guards them; the
+doors themselves were the last gate.
+
+- [x] The Feelings off-ramp shows its helplines in every build now.
+      Hiding anything flagged `verify` was right while only a developer
+      could reach the door; once it ships, it left a child who tapped
+      "Talk to someone" with no number at all. `verify` is a ledger flag
+      (FE11), not a display filter. **Still owed, and not optional before a
+      public launch: a lawyer and a clinician confirm both numbers and the
+      sheet's wording.**
+- [ ] **What a stranger now sees, and you may want to say out loud when you
+      share the APK:** seven doors of twelve open, five keep their plan
+      sheet; of the seven, only Coding, Communication and Confidence have
+      real activity copy — the rest are "Coming soon" cards by design;
+      Thinking, Stillness, Feelings and Making have never been walked on a
+      device.
+- [ ] **The journal's key custody (FE10)** is now on strangers' phones: the
+      AES key sits in `shared_preferences` beside the data. Fine for a
+      preview build, not for a launch — the platform keystore is owed.
+- [ ] The preview screen's banner no longer says "in a debug build"; it
+      counts the open doors from `kSkDoors` and says most are still
+      filling up. Read it once and tell me if it oversells.
+- [ ] The Explore drawer still labels the entry "Skilling (preview)".
+      Honest while five doors are plan sheets; say if it should drop the
+      word now that the stage opens.
 
 ## Cross-door windows
 

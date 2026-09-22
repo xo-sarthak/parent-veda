@@ -20,12 +20,14 @@
 //    · The banner at the top says all of that in one line, on screen, where a
 //      reviewer sees it rather than where a developer reads it.
 //
-//  ⚠️ SINCE 2026-09-14, ONE DOOR IS REAL. The Coding tile opens `SkDoorScreen`
-//  (`lib/screens/skilling/doors/`) through `skOpenDoor`, in a debug build,
-//  after the parent gate; the other eleven keep the plan sheet, and every
-//  tile keeps it in release. The two "open questions" below are answered by
-//  the Coding v2 brief and the cards now say so. The compass lights a point
-//  by practice. Everything else in this header still holds.
+//  ⚠️ SINCE 2026-09-14 THE BUILT DOORS ARE REAL, AND SINCE 2026-09-22 THEY ARE
+//  REAL IN A RELEASE BUILD TOO (the user's call: the whole skilling side
+//  ships so a shared APK can be walked). A tile whose bracket has a `SkDoor`
+//  opens `SkDoorScreen` (`lib/screens/skilling/doors/`) through
+//  `skOpenDoor`, after the parent gate; the rest keep the plan sheet. The
+//  two "open questions" below are answered by the Coding v2 brief and the
+//  cards now say so. The compass lights a point by practice. Everything
+//  else in this header still holds.
 //
 //  ---------------------------------------------------------------------------
 //  ⚠️ WHY THE HERO CANNOT BE THE COMPASS YET
@@ -137,10 +139,9 @@ class SkillingPreviewScreen extends StatelessWidget {
                     // a switch that no stage reads in full.
                     skillMark: skillMarkFor(b.id),
                     // ⚠️ A BRACKET WITH A DOOR OPENS IT; the rest keep the
-                    // plan sheet. `skOpenDoor` is false in a release build
-                    // (the stage stays gated) and false for a bracket with
-                    // no `SkDoor`, and both fall through to the sheet — so
-                    // the tile never opens nothing.
+                    // plan sheet. `skOpenDoor` is false for a bracket with
+                    // no `SkDoor`, and falls through to the sheet — so the
+                    // tile never opens nothing.
                     onTap: () {
                       if (!skOpenDoor(context, b.id)) _showPlan(context, b, p);
                     },
@@ -379,8 +380,8 @@ class _PreviewBanner extends StatelessWidget {
             // Counted from `kSkDoors`, not written: the line said "Coding"
             // for two doors too long (seen on the phone, 2026-09-17).
             child: Text(
-                'Design preview. ${_cap(_words[kSkDoors.length])} of the twelve '
-                'open their doors in a debug build; the other '
+                '${_cap(_words[kSkDoors.length])} of the twelve are open to '
+                'walk through, most of them still filling up. The other '
                 '${_words[12 - kSkDoors.length]} show what is planned '
                 'behind them.',
                 style:

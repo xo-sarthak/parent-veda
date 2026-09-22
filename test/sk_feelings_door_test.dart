@@ -161,9 +161,16 @@ void main() {
       expect(s.trustedAdultLine, contains('grown-up you trust'));
       expect(s.helplines.map((h) => h.number).toList(), ['1098', '14416']);
       for (final h in s.helplines) {
-        expect(h.verify, isTrue, reason: '${h.name}: a lawyer and a clinician confirm it before ship');
+        expect(h.verify, isTrue, reason: '${h.name}: a lawyer and a clinician confirm it before a public launch');
         expect(RegExp(r'^\d+$').hasMatch(h.number), isTrue, reason: 'dialable as written');
       }
+      // ⚠️ `verify` is a LEDGER flag, not a display filter (2026-09-22): the
+      // sheet shows every line in every build, because a child who taps
+      // "Talk to someone" must never meet an empty sheet.
+      final safetySrc = File('lib/screens/skilling/sk_safety.dart').readAsStringSync();
+      expect(safetySrc.contains("bool.fromEnvironment('dart.vm.product')"), isFalse,
+          reason: 'no build mode decides whether a helpline is shown');
+      expect(safetySrc.contains('final lines = safety.helplines;'), isTrue);
       // Only this door carries an off-ramp today.
       for (final c in kSkDoorContents.where((c) => c.doorId != 'skilling_emotional')) {
         expect(c.safety, isNull, reason: c.doorId);

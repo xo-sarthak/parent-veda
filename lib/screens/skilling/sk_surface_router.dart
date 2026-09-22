@@ -34,7 +34,6 @@
 //    sk_activity/<door>/<activity>    one activity, by id
 // =============================================================================
 
-import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 
 import '../../data/doors/sk_door_data.dart';
@@ -145,12 +144,25 @@ void skOpenSurface(BuildContext context, String id) {
 }
 
 /// ⚠️ THE ONE WAY A SKILL DOOR OPENS FROM ITS TILE. The parent gate first
-/// if consent has not been given; then the door. Behind `kDebugMode` — the
-/// stage stays gated until the briefs say otherwise (the user's call,
-/// 2026-09-14, question 1: the preview ships, the door does not), so in a
-/// release build this returns false and the tile shows its plan sheet.
+/// if consent has not been given; then the door.
+///
+/// ⚠️ NO LONGER BEHIND `kDebugMode` — THE USER'S CALL, 2026-09-22: the whole
+/// skilling side ships, so people handed a release APK can walk it. The
+/// original call (2026-09-14, question 1) was "the preview ships, the door
+/// does not", and every door brief repeated "do not move the stage out from
+/// behind kDebugMode"; that is now overridden deliberately and on the
+/// record (STILL-OPEN §105).
+///
+/// What this exposes, all of it already true in a debug build and now true
+/// for a stranger's phone: seven doors of twelve, most of their content
+/// still "Coming soon"; four of the seven never walked on a device; the
+/// Feelings journal's key sitting beside the data (`SkJournalKeyStore`,
+/// ledger FE10); and the helpline numbers still flagged for verification
+/// (FE11). Each is listed where it is owed.
+///
+/// A bracket with no `SkDoor` still returns false, and its tile still shows
+/// the plan sheet — so a tile never opens nothing.
 bool skOpenDoor(BuildContext context, String doorId) {
-  if (!kDebugMode) return false;
   final door = skDoorFor(doorId);
   if (door == null) return false;
   MaterialPageRoute<void> route() => MaterialPageRoute<void>(

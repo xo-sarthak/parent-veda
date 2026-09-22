@@ -399,8 +399,12 @@ class SkSafety {
 
 /// One real helpline. `verify` is true until a lawyer and a clinician have
 /// confirmed the number and its wording; the review list and the ledger
-/// carry the flag, and the sheet shows nothing marked verify in a release
-/// build — the stage is behind `kDebugMode` anyway.
+/// (FE11) carry the flag.
+///
+/// ⚠️ IT IS A LEDGER FLAG, NOT A DISPLAY FILTER (2026-09-22). The sheet used
+/// to hide a flagged line in a release build; once the stage shipped that
+/// left the off-ramp empty for the child it exists for, which is the worse
+/// failure. Every line shows; the verification stays owed.
 class SkHelpline {
   const SkHelpline({
     required this.name,
