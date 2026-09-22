@@ -650,7 +650,197 @@ class _PvProductScreenState extends State<PvProductScreen> {
 
   // ---- ours: ParentVeda recommends ------------------------------------------------------
 
+  // ⚠️ A SIGNATURE, NOT A BOX — 2026-09-20, the user's call after the walk
+  // ("I don't like this purple thing popping up in the centre"). Mobbin:
+  // Liven marks an expert review with the expert's avatar, name and
+  // credential and a small EXPERT REVIEWED pill; Amazon's Choice and
+  // Udemy's Bestseller are tags, not bands. So: a white card with a
+  // hairline, the violet eyebrow (the one place the brand colour is
+  // allowed), the reason in plain ink, "before you buy" as a quiet second
+  // paragraph, and the reviewer AS A PERSON — initials disc, name,
+  // credential, the verified mark. It converts because a named clinician
+  // vouches, and it follows the base UI. The old tinted well is
+  // `_recommendClassic`.
+  //
+  // The two cautionary bands ("Generally not needed", "Skip") keep the
+  // same card; their word replaces the eyebrow and the tone dot stands
+  // where the verified mark would — a caution is not a signature.
   Widget _recommend(V2Palette p, PvProduct product) {
+    final r = product.reco!;
+    final recommends = r.band.recommends;
+    final tone = pvToneColor(r.band.tone);
+    final who = r.reviewerName.isEmpty
+        ? 'The ParentVeda editorial team'
+        : r.reviewerName;
+    final initials = who
+        .replaceAll('Dr. ', '')
+        .replaceAll('Dr ', '')
+        .split(' ')
+        .where((w) => w.isNotEmpty)
+        .take(2)
+        .map((w) => w[0])
+        .join()
+        .toUpperCase();
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
+      child: Container(
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: kPvLine),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // The eyebrow: the verdict, in the brand's one allowed place.
+            Row(
+              children: [
+                if (recommends)
+                  Icon(Icons.verified_rounded, size: 15, color: p.action)
+                else
+                  Container(
+                    width: 9,
+                    height: 9,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: tone,
+                    ),
+                  ),
+                const SizedBox(width: 7),
+                Expanded(
+                  child: Text(
+                    (recommends ? 'ParentVeda recommends' : r.band.label)
+                        .toUpperCase(),
+                    style: pvManrope(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.1,
+                      color: recommends ? p.action : p.ink2,
+                    ),
+                  ),
+                ),
+                if (recommends)
+                  Text(
+                    r.band.label,
+                    style: pvManrope(fontSize: 11.5, color: p.ink3),
+                  ),
+              ],
+            ),
+            const SizedBox(height: 10),
+            // The reason, in plain ink — the sentence that does the work.
+            Text(
+              r.reason,
+              style: pvFraunces(
+                fontSize: 17,
+                fontWeight: FontWeight.w500,
+                height: 1.35,
+                color: p.ink1,
+              ),
+            ),
+            if (r.beforeYouBuy.isNotEmpty) ...[
+              const SizedBox(height: 8),
+              Text(
+                r.beforeYouBuy,
+                style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2),
+              ),
+            ],
+            const SizedBox(height: 14),
+            Divider(height: 1, thickness: 1, color: kPvLine),
+            const SizedBox(height: 12),
+            // The signature: a person, not a label.
+            Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: p.surfaceAlt,
+                  ),
+                  child: Text(
+                    initials,
+                    style: pvManrope(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w800,
+                      color: p.ink1,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Flexible(
+                            child: Text(
+                              who,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: pvManrope(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w800,
+                                color: p.ink1,
+                              ),
+                            ),
+                          ),
+                          if (recommends && r.reviewerName.isNotEmpty) ...[
+                            const SizedBox(width: 5),
+                            Icon(
+                              Icons.verified_rounded,
+                              size: 14,
+                              color: p.action,
+                            ),
+                          ],
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Text(
+                        r.reviewerRole.isEmpty
+                            ? (recommends
+                                  ? 'Reviewed this pick'
+                                  : 'Reviewed this call')
+                            : r.reviewerRole,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: pvManrope(fontSize: 12, color: p.ink2),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 9,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: p.surfaceAlt,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(
+                    'REVIEWED',
+                    style: pvManrope(
+                      fontSize: 9.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 0.8,
+                      color: p.ink1,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // The pre-2026-09-20 band: a tinted well. Kept for revert; nothing calls it.
+  // ignore: unused_element
+  Widget _recommendClassic(V2Palette p, PvProduct product) {
     final r = product.reco!;
     final tone = pvToneColor(r.band.tone);
     final tint = r.band.recommends

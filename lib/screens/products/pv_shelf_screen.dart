@@ -141,26 +141,13 @@ class _PvShelfScreenState extends State<PvShelfScreen> {
               if (items.isEmpty)
                 SliverToBoxAdapter(child: _empty(p))
               else
-                SliverPadding(
-                  padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
-                  sliver: SliverGrid(
-                    gridDelegate:
-                        const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 18,
-                          crossAxisSpacing: 12,
-                          childAspectRatio: 0.52,
-                        ),
-                    delegate: SliverChildBuilderDelegate(
-                      (_, i) => PvProductCard(
-                        product: items[i],
-                        compare: true,
-                        heroScope: 'grid',
-                      ),
-                      childCount: items.length,
-                    ),
-                  ),
-                ),
+                // Rows sized to their content, one gap between them — the
+                // fixed-ratio grid left a different slack under every card
+                // (the user, 2026-09-20: "the spacing is not defined").
+                // Kept for revert:
+                //   SliverGrid(gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                //     crossAxisCount: 2, mainAxisSpacing: 18, crossAxisSpacing: 12, childAspectRatio: 0.52), …)
+                PvProductGridSliver(products: items, compare: true, heroScope: 'grid'),
               const SliverToBoxAdapter(child: SizedBox(height: 120)),
             ],
           ),
@@ -250,7 +237,106 @@ class _PvShelfScreenState extends State<PvShelfScreen> {
     ),
   );
 
-  Widget _guidance(V2Palette p, PvGuidance g) => Padding(
+  // ⚠️ RESTYLED 2026-09-20, the user's walk: the tinted well read as "the
+  // purple tint background situation" and the green ticks / red crosses as
+  // "very outdated … poor on a really good screen". The base UI's rule —
+  // white ground, hairlines, ink, brand violet only on the eyebrow — now
+  // holds here too: a white card, the eyebrow, the one line, and when open
+  // two quiet lists headed LOOK FOR and SKIP with ink marks. The tinted
+  // well and the coloured marks are kept for revert in `_guidanceClassic`.
+  Widget _guidance(V2Palette p, PvGuidance g) {
+    final hasMore = g.lookFor.isNotEmpty || g.avoid.isNotEmpty;
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
+      child: InkWell(
+        onTap: hasMore ? () => setState(() => _guideOpen = !_guideOpen) : null,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          padding: const EdgeInsets.fromLTRB(14, 12, 14, 12),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: kPvLine),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Text(
+                    '20-SECOND GUIDE',
+                    style: pvManrope(
+                      fontSize: 10.5,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: 1.1,
+                      color: p.action,
+                    ),
+                  ),
+                  const Spacer(),
+                  if (hasMore)
+                    AnimatedRotation(
+                      turns: _guideOpen ? 0.5 : 0,
+                      duration: const Duration(milliseconds: 180),
+                      child: Icon(Icons.expand_more_rounded, size: 20, color: p.ink3),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Text(
+                g.line,
+                style: pvManrope(
+                  fontSize: 14,
+                  height: 1.45,
+                  fontWeight: FontWeight.w600,
+                  color: p.ink1,
+                ),
+              ),
+              AnimatedSize(
+                duration: const Duration(milliseconds: 200),
+                curve: Curves.easeOutCubic,
+                alignment: Alignment.topCenter,
+                child: !_guideOpen
+                    ? const SizedBox(width: double.infinity)
+                    : Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          if (g.lookFor.isNotEmpty) ...[
+                            const SizedBox(height: 12),
+                            _guideHead(p, 'Look for'),
+                            for (final l in g.lookFor) _mark(p, Icons.check_rounded, p.ink1, l),
+                          ],
+                          if (g.avoid.isNotEmpty) ...[
+                            const SizedBox(height: 12),
+                            _guideHead(p, 'Skip'),
+                            for (final a in g.avoid) _mark(p, Icons.remove_rounded, p.ink3, a),
+                          ],
+                        ],
+                      ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _guideHead(V2Palette p, String t) => Padding(
+    padding: const EdgeInsets.only(bottom: 2),
+    child: Text(
+      t.toUpperCase(),
+      style: pvManrope(
+        fontSize: 10,
+        fontWeight: FontWeight.w800,
+        letterSpacing: 1,
+        color: p.ink3,
+      ),
+    ),
+  );
+
+  // The pre-2026-09-20 card: the tinted well, the bulb, coloured marks.
+  // Kept for revert; nothing calls it.
+  // ignore: unused_element
+  Widget _guidanceClassic(V2Palette p, PvGuidance g) => Padding(
     padding: const EdgeInsets.fromLTRB(20, 8, 20, 4),
     child: InkWell(
       onTap: () => setState(() => _guideOpen = !_guideOpen),
@@ -261,48 +347,23 @@ class _PvShelfScreenState extends State<PvShelfScreen> {
           children: [
             Row(
               children: [
-                Icon(
-                  Icons.lightbulb_outline_rounded,
-                  size: 16,
-                  color: p.action,
-                ),
+                Icon(Icons.lightbulb_outline_rounded, size: 16, color: p.action),
                 const SizedBox(width: 7),
                 Text(
                   '20-SECOND GUIDE',
-                  style: pvManrope(
-                    fontSize: 10.5,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 1.1,
-                    color: p.action,
-                  ),
+                  style: pvManrope(fontSize: 10.5, fontWeight: FontWeight.w800, letterSpacing: 1.1, color: p.action),
                 ),
                 const Spacer(),
                 if (g.lookFor.isNotEmpty || g.avoid.isNotEmpty)
-                  Icon(
-                    _guideOpen
-                        ? Icons.expand_less_rounded
-                        : Icons.expand_more_rounded,
-                    size: 20,
-                    color: p.ink3,
-                  ),
+                  Icon(_guideOpen ? Icons.expand_less_rounded : Icons.expand_more_rounded, size: 20, color: p.ink3),
               ],
             ),
             const SizedBox(height: 6),
-            Text(
-              g.line,
-              style: pvManrope(
-                fontSize: 14,
-                height: 1.45,
-                fontWeight: FontWeight.w600,
-                color: p.ink1,
-              ),
-            ),
+            Text(g.line, style: pvManrope(fontSize: 14, height: 1.45, fontWeight: FontWeight.w600, color: p.ink1)),
             if (_guideOpen) ...[
               const SizedBox(height: 10),
-              for (final l in g.lookFor)
-                _mark(p, Icons.check_rounded, pvToneColor(0), l),
-              for (final a in g.avoid)
-                _mark(p, Icons.close_rounded, pvToneColor(2), a),
+              for (final l in g.lookFor) _mark(p, Icons.check_rounded, pvToneColor(0), l),
+              for (final a in g.avoid) _mark(p, Icons.close_rounded, pvToneColor(2), a),
             ],
           ],
         ),

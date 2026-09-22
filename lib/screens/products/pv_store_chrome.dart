@@ -28,8 +28,11 @@
 //  checkout) draw no bar — the sticky commit bar takes that space.
 // =============================================================================
 
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 
+import '../../data/products/pv_category_images.dart';
 import '../../models/pv_product.dart';
 import '../../services/life_stage_store.dart';
 import '../../services/pv_catalog_store.dart';
@@ -453,12 +456,13 @@ class PvHeart extends StatelessWidget {
               subtitle: product.brand,
               stage: product.stage.id,
             );
-            pvSnack(
-              context,
-              saved
-                  ? 'Removed from Saved'
-                  : 'Saved — find it under Saved · Products',
-            );
+            // ⚠️ NO NOTICE — 2026-09-20, the user's walk: the snack rose to
+            // a third of the way up the screen ("a very abrupt position")
+            // and told her where the item went in words. Myntra and Blinkit
+            // say it with the heart itself and a count on the wishlist icon
+            // in the header, which is where it now lives (`PvWishlistScreen`).
+            // Kept for revert:
+            //   pvSnack(context, saved ? 'Removed from Saved' : 'Saved — find it under Saved · Products');
           },
           borderRadius: BorderRadius.circular(999),
           child: Container(
@@ -471,10 +475,15 @@ class PvHeart extends StatelessWidget {
               shape: BoxShape.circle,
               border: onWhite ? Border.all(color: kPvLine) : null,
             ),
-            child: Icon(
-              saved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
-              size: size * 0.55,
-              color: saved ? const Color(0xFFC6295A) : p.ink1,
+            child: AnimatedScale(
+              scale: saved ? 1.0 : 0.92,
+              duration: const Duration(milliseconds: 220),
+              curve: Curves.easeOutBack,
+              child: Icon(
+                saved ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                size: size * 0.55,
+                color: saved ? const Color(0xFFC6295A) : p.ink1,
+              ),
             ),
           ),
         );
@@ -839,6 +848,7 @@ class PvProductCard extends StatelessWidget {
     this.compare = false,
     this.width,
     this.heroScope = 'card',
+    this.onOpen,
   });
   final PvProduct product;
   final bool compare;
@@ -846,6 +856,9 @@ class PvProductCard extends StatelessWidget {
 
   /// Which rail or grid this card is in; keeps Hero tags unique per route.
   final String heroScope;
+
+  /// Called before the page opens — search records the query here.
+  final void Function(PvProduct)? onOpen;
 
   String get heroTag => 'pv_img_${heroScope}_${product.id}';
 
@@ -857,7 +870,10 @@ class PvProductCard extends StatelessWidget {
     // the page are one object, which is the whole feel of Zara's open.
     final card = ObPress(
       child: InkWell(
-        onTap: () => pvOpenProduct(context, product, heroTag: heroTag),
+        onTap: () {
+          onOpen?.call(product);
+          pvOpenProduct(context, product, heroTag: heroTag);
+        },
         borderRadius: BorderRadius.circular(18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1126,6 +1142,70 @@ class PvStageSwitch extends StatelessWidget {
 
 /// Category tile: the tinted well with a drawn glyph, name under. The only
 /// place the category's colour lives (DESIGN-SYSTEM §4.5).
+/// A photo that tries again. The free hosts throttle by IP — Wikimedia
+/// answers 429 to a phone sharing an IP with thousands (Indian carriers
+/// NAT) and to a strip of nineteen tiles asking at once — and a tile that
+/// gives up on the first refusal is an icon for the whole visit. One retry
+/// at 2 s, one at 5 s, then the fallback. The same shape as `CanIPhoto`
+/// (Is it safe?); the end state is our own host (R2, STILL-OPEN §63.18),
+/// where none of this is needed.
+class PvRetryImage extends StatefulWidget {
+  const PvRetryImage({
+    super.key,
+    required this.url,
+    required this.fallback,
+    this.tint,
+    this.fit = BoxFit.cover,
+  });
+  final String url;
+  final Widget fallback;
+  final Color? tint;
+  final BoxFit fit;
+
+  @override
+  State<PvRetryImage> createState() => _PvRetryImageState();
+}
+
+class _PvRetryImageState extends State<PvRetryImage> {
+  int _attempt = 0;
+  Timer? _retry;
+  static const _delays = [Duration(seconds: 2), Duration(seconds: 5)];
+
+  @override
+  void dispose() {
+    // A retry due after the tile is gone is a timer nobody wants.
+    _retry?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Image.network(
+        widget.url,
+        key: ValueKey('${widget.url}#$_attempt'),
+        fit: widget.fit,
+        gaplessPlayback: true,
+        frameBuilder: (c, child, frame, wasSync) {
+          if (wasSync) return child;
+          return AnimatedSwitcher(
+            duration: const Duration(milliseconds: 240),
+            child: frame == null
+                ? Container(key: const ValueKey('tint'), color: widget.tint)
+                : SizedBox.expand(key: const ValueKey('img'), child: child),
+          );
+        },
+        errorBuilder: (_, _, _) {
+          if (_attempt < _delays.length && _retry == null) {
+            final next = _attempt + 1;
+            _retry = Timer(_delays[_attempt], () {
+              _retry = null;
+              if (mounted && _attempt == next - 1) setState(() => _attempt = next);
+            });
+          }
+          return widget.fallback;
+        },
+      );
+}
+
 class PvCategoryTile extends StatelessWidget {
   const PvCategoryTile({
     super.key,
@@ -1162,23 +1242,41 @@ class PvCategoryTile extends StatelessWidget {
     final p = pvStorePalette;
     final tint = v2BlockTint(category.hue, p);
     final ink = HSLColor.fromAHSL(1, category.hue, 0.32, 0.36).toColor();
+    // ⚠️ A PHOTO OF THE OBJECT, NOT A GLYPH — 2026-09-20, the user's call
+    // ("make this page look real, not static"), Blinkit's tile grammar: the
+    // object on a soft tint, the label beneath. The icon-on-tint tile that
+    // stood here is now the fallback — for a category the photo map does not
+    // know, and for a photo that fails to load — so the strip is never
+    // broken and a new Directus category still gets a tile.
+    final iconTile = Container(
+      width: 72,
+      height: 72,
+      decoration: BoxDecoration(
+        color: tint,
+        borderRadius: BorderRadius.circular(18),
+      ),
+      child: Icon(iconFor(category.id), size: 28, color: ink),
+    );
+    final url = pvCategoryImageFor(category.id);
+    final tile = url == null
+        ? iconTile
+        : SizedBox(
+            width: 72,
+            height: 72,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(18),
+              child: PvRetryImage(url: url, tint: tint, fallback: iconTile),
+            ),
+          );
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(14),
       child: Column(
         children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              color: tint,
-              borderRadius: BorderRadius.circular(18),
-            ),
-            child: Icon(iconFor(category.id), size: 28, color: ink),
-          ),
+          tile,
           const SizedBox(height: 7),
           SizedBox(
-            width: 76,
+            width: 80,
             child: Text(
               category.name,
               textAlign: TextAlign.center,
@@ -1197,6 +1295,122 @@ class PvCategoryTile extends StatelessWidget {
     );
   }
 }
+
+/// The store's search pill — ONE widget for the home and the search screen,
+/// one geometry (46 tall, 14 side padding, hairline), so the Hero between
+/// them is a slide and never a second shape appearing under the first.
+class PvSearchPill extends StatelessWidget {
+  const PvSearchPill({super.key, required this.child, this.hero = false, this.onTap});
+  final Widget child;
+  final bool hero;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget pill = Container(
+      height: 46,
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: kPvLine),
+      ),
+      child: child,
+    );
+    if (onTap != null) {
+      pill = InkWell(onTap: onTap, borderRadius: BorderRadius.circular(999), child: pill);
+    }
+    if (!hero) return pill;
+    return Hero(
+      tag: kPvSearchHeroTag,
+      // The words inside differ between the two ends; the flight shows the
+      // shell only, so text never stretches.
+      flightShuttleBuilder: (_, _, _, _, _) => Material(
+        type: MaterialType.transparency,
+        child: Container(
+          height: 46,
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: kPvLine),
+          ),
+        ),
+      ),
+      child: Material(type: MaterialType.transparency, child: pill),
+    );
+  }
+}
+
+const String kPvSearchHeroTag = 'store-search-pill';
+
+/// The hint, per stage — three things she might type, in her stage's words.
+String pvSearchHintFor(LifeStage stage) => switch (stage.shopStage) {
+      LifeStage.pregnancy => 'Search pillows, creams, bras…',
+      LifeStage.parenting => 'Search bottles, soothers, strollers…',
+      _ => 'Search folic acid, strips, tests…',
+    };
+
+/// Two cards to a row, rows sized to their content.
+///
+/// ⚠️ NOT A `SliverGrid`. A grid gives every cell one aspect ratio, and a
+/// card whose name runs to one line leaves ~40 px of nothing under its
+/// price — so the gap between rows read as "not defined" against the
+/// 12-px gap between columns (the user, 2026-09-20, on the breast-pump
+/// shelf). Here each row is two cards stretched to the taller of the two,
+/// and the space between rows is one number: [rowGap]. What you see is
+/// the gap, and only the gap.
+class PvProductGridSliver extends StatelessWidget {
+  const PvProductGridSliver({
+    super.key,
+    required this.products,
+    this.heroScope = 'grid',
+    this.compare = false,
+    this.onOpen,
+    this.rowGap = 22,
+    this.padding = const EdgeInsets.fromLTRB(20, 4, 20, 0),
+  });
+  final List<PvProduct> products;
+  final String heroScope;
+  final bool compare;
+  final void Function(PvProduct)? onOpen;
+  final double rowGap;
+  final EdgeInsets padding;
+
+  @override
+  Widget build(BuildContext context) {
+    final rows = (products.length + 1) ~/ 2;
+    return SliverPadding(
+      padding: padding,
+      sliver: SliverList(
+        delegate: SliverChildBuilderDelegate(
+          (context, r) {
+            final a = products[r * 2];
+            final b = r * 2 + 1 < products.length ? products[r * 2 + 1] : null;
+            return Padding(
+              padding: EdgeInsets.only(bottom: r == rows - 1 ? 0 : rowGap),
+              child: IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(child: PvProductCard(product: a, compare: compare, heroScope: heroScope, onOpen: onOpen)),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: b == null
+                          ? const SizedBox.shrink()
+                          : PvProductCard(product: b, compare: compare, heroScope: heroScope, onOpen: onOpen),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+          childCount: rows,
+        ),
+      ),
+    );
+  }
+}
+
 
 /// The well-tinted "why" panel — used for guidance, the reco reason, the
 /// "before you buy" sentence. surfaceAlt, no border (a quiet fact card).

@@ -30,6 +30,8 @@ import 'pv_cart_screen.dart';
 import 'pv_hero_band.dart';
 import 'pv_orders_screen.dart';
 import 'pv_search_screen.dart';
+import 'pv_wishlist_screen.dart';
+import '../../services/saved_store.dart';
 import 'pv_shelf_screen.dart';
 import '../v2/v2_palette.dart';
 import 'pv_store_chrome.dart';
@@ -68,6 +70,13 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
       ),
     );
   }
+
+  void _openWishlist() => Navigator.of(context).push(
+    MaterialPageRoute<void>(
+      builder: (_) => PvWishlistScreen(stage: _stage),
+      settings: const RouteSettings(name: 'store/wishlist'),
+    ),
+  );
 
   void _openSearch() => Navigator.of(context).push(
     MaterialPageRoute<void>(
@@ -216,42 +225,44 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
       ),
       child: Row(
         children: [
+          // ⚠️ THE SAME PILL AS THE SEARCH SCREEN'S, Hero-linked — 2026-09-20.
+          // It was a look-alike Container here and a TextField in another
+          // Container there, at a different x and y, so tapping it made a
+          // second shape appear under the first. One widget, one geometry,
+          // and the pill she tapped slides up as the keyboard rises.
           Expanded(
-            child: InkWell(
+            child: PvSearchPill(
+              hero: true,
               onTap: _openSearch,
-              borderRadius: BorderRadius.circular(999),
-              child: Container(
-                height: 46,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(color: kPvLine),
-                ),
-                child: Row(
-                  children: [
-                    Icon(Icons.search_rounded, size: 20, color: p.ink2),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: Text(
-                        switch (_stage) {
-                          LifeStage.pregnancy =>
-                            'Search pillows, creams, bras…',
-                          LifeStage.parenting =>
-                            'Search bottles, soothers, strollers…',
-                          _ => 'Search folic acid, strips, tests…',
-                        },
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: pvManrope(fontSize: 14, color: p.ink3),
-                      ),
+              child: Row(
+                children: [
+                  Icon(Icons.search_rounded, size: 20, color: p.ink2),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      pvSearchHintFor(_stage),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvManrope(fontSize: 14, color: p.ink3),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
           const SizedBox(width: 10),
+          // The wishlist: where the heart puts things (Myntra's header heart
+          // with a count). It replaces the notice the heart used to show.
+          ListenableBuilder(
+            listenable: SavedStore.instance,
+            builder: (context, _) => PvRoundIcon(
+              icon: Icons.favorite_border_rounded,
+              onTap: _openWishlist,
+              badge: SavedStore.instance.items(kind: SavedKind.product).length,
+              size: 46,
+            ),
+          ),
+          const SizedBox(width: 8),
           if (hasOrders) ...[
             PvRoundIcon(
               icon: Icons.receipt_long_outlined,
@@ -284,12 +295,13 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
   Widget _categories(V2Palette p, List<PvCategory> cats) => Padding(
     padding: const EdgeInsets.only(top: 10),
     child: SizedBox(
-      height: 100,
+      // 72-px photo tiles (were 64-px icon wells) plus a two-line label.
+      height: 112,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         itemCount: cats.length,
-        separatorBuilder: (context, _) => const SizedBox(width: 6),
+        separatorBuilder: (context, _) => const SizedBox(width: 8),
         itemBuilder: (_, i) =>
             PvCategoryTile(category: cats[i], onTap: () => _openShelf(cats[i])),
       ),
