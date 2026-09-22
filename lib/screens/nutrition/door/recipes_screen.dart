@@ -15,6 +15,7 @@ import '../../../data/nutrition/nutrition_plate.dart';
 import '../../../data/nutrition_data.dart';
 import '../../../services/family_profile.dart';
 import '../../../services/nutrition_day_store.dart';
+import '../../../services/saved_store.dart';
 import '../../../widgets/pv_feedback.dart';
 import '../../../services/pregnancy_controller.dart';
 import '../../../theme/pv_fonts.dart';
@@ -86,7 +87,7 @@ class _RecipesGridBodyState extends State<RecipesGridBody> {
 
   @override
   Widget build(BuildContext context) => AnimatedBuilder(
-        animation: Listenable.merge([V2PaletteStore.instance, FamilyProfileStore.instance, NutritionDayStore.instance]),
+        animation: Listenable.merge([V2PaletteStore.instance, FamilyProfileStore.instance, SavedStore.instance, NutritionDayStore.instance]),
         builder: (context, _) {
           final p = V2PaletteStore.instance.current;
           final diet = FamilyProfileStore.instance.diet;
@@ -164,6 +165,43 @@ class _RecipesGridBodyState extends State<RecipesGridBody> {
               )),
               const SizedBox(height: 26),
             ],
+            // ---- the ones she kept --------------------------------------
+            // Blinkit's "Bookmarked Recipes · see all" (2026-09-22). It is
+            // the top section there because a saved recipe is the one she
+            // has already decided about. It renders only when she has one:
+            // an empty rail of hearts would be an instruction, not an
+            // invitation, and the tab already opens with "Cook today".
+            if (!filtering) ...[
+              Builder(builder: (context) {
+                final saved = [for (final r in all) if (SavedStore.instance.isSaved(SavedKind.recipe, r.id)) r];
+                if (saved.isEmpty) return const SizedBox.shrink();
+                return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  pvDoorPad(nutritionHeading(p, 'The ones you kept',
+                      sub: '${saved.length} saved. They stay here and in Saved.')),
+                  const SizedBox(height: 12),
+                  SizedBox(
+                    height: 210,
+                    child: ListView.separated(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: kPvDoorGutter),
+                      itemCount: saved.length,
+                      separatorBuilder: (_, _) => const SizedBox(width: 12),
+                      itemBuilder: (_, i) => RecipeCard(
+                        p: p,
+                        recipeId: saved[i].id,
+                        minutes: saved[i].minutes,
+                  name: saved[i].name.en,
+                        line: saved[i].whyNow.en,
+                        url: nutritionRecipePhoto(saved[i].id, saved[i].name.en),
+                        values: estimateRecipe(saved[i]),
+                        onTap: () => openRecipe(context, saved[i], widget.pregnancy),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 26),
+                ]);
+              }),
+            ],
             // ---- what she wants: a meal, or a kind ----------------------
             pvDoorPad(nutritionHeading(p, 'What are you after?',
                 sub: 'A meal, a sweet, a soup — then by what you need.')),
@@ -174,31 +212,47 @@ class _RecipesGridBodyState extends State<RecipesGridBody> {
             // change it (the user, 2026-09-22).
             pvDoorPad(NutritionPreferenceRow(p: p, store: store)),
             const SizedBox(height: 14),
-            SizedBox(
-              height: 118,
-              child: ListView.separated(
-                scrollDirection: Axis.horizontal,
-                padding: const EdgeInsets.symmetric(horizontal: kPvDoorGutter),
-                itemCount: kRecipeBuckets.length,
-                separatorBuilder: (_, _) => const SizedBox(width: 10),
-                itemBuilder: (_, i) {
-                  final b = kRecipeBuckets[i];
-                  // A drawn mark in its own hue, not the first recipe's photo
-                  // — two tiles wore one photo and read as one thing (the
-                  // user, 2026-09-22). `url` stays on the tile for revert.
-                  return _BucketTile(
-                    p: p,
-                    label: recipeBucketLabel(b),
-                    count: all.where((r) => recipeInBucket(r, b)).length,
-                    url: null,
-                    mark: recipeBucketMark(b),
-                    hue: recipeBucketHue(b),
-                    selected: _bucket == b,
-                    onTap: () => setState(() => _bucket = _bucket == b ? null : b),
-                  );
-                },
-              ),
-            ),
+            // ⚠️ A GRID, NOT A RAIL (2026-09-22, the user with Blinkit's
+            // Recipes open: "our recipe section resonates very much with
+            // theirs — can we not do it the way they have").
+            //
+            // Blinkit shows its six meal times as a 3x2 grid, all of them at
+            // once, and that is the argument: a bucket rail hid four of nine
+            // behind a swipe, so "what am I after?" was answered with a
+            // question. The same reasoning is already written above this
+            // file's recipe grid — a rail hides all but two — and the buckets
+            // were the one place it had not been applied.
+            //
+            // The old rail is kept below, commented, for revert.
+            pvDoorPad(GridView.builder(
+              shrinkWrap: true,
+              padding: EdgeInsets.zero,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 3, mainAxisSpacing: 14, crossAxisSpacing: 12, childAspectRatio: 0.64),
+              itemCount: kRecipeBuckets.length,
+              itemBuilder: (_, i) {
+                final b = kRecipeBuckets[i];
+                // A drawn mark in its own hue, not the first recipe's photo
+                // — two tiles wore one photo and read as one thing (the
+                // user, 2026-09-22). `url` stays on the tile for revert.
+                return _BucketTile(
+                  p: p,
+                  label: recipeBucketLabel(b),
+                  count: all.where((r) => recipeInBucket(r, b)).length,
+                  url: null,
+                  mark: recipeBucketMark(b),
+                  hue: recipeBucketHue(b),
+                  selected: _bucket == b,
+                  onTap: () => setState(() => _bucket = _bucket == b ? null : b),
+                );
+              },
+            )),
+            // Kept for revert — the buckets as a horizontal rail:
+            // SizedBox(height: 118, child: ListView.separated(
+            //   scrollDirection: Axis.horizontal,
+            //   padding: const EdgeInsets.symmetric(horizontal: kPvDoorGutter),
+            //   itemCount: kRecipeBuckets.length, ...))
             const SizedBox(height: 18),
             // ---- the grid ----------------------------------------------
             pvDoorPad(nutritionHeading(p,
@@ -244,6 +298,8 @@ class _RecipesGridBodyState extends State<RecipesGridBody> {
                 itemBuilder: (_, i) => RecipeCard(
                   p: p,
                   width: double.infinity,
+                  recipeId: mine[i].id,
+                  minutes: mine[i].minutes,
                   name: mine[i].name.en,
                   line: mine[i].whyNow.en,
                   url: nutritionRecipePhoto(mine[i].id, mine[i].name.en),
@@ -291,13 +347,13 @@ class _BucketTile extends StatelessWidget {
             onTap();
           },
           borderRadius: BorderRadius.circular(16),
-          child: SizedBox(
-            width: 84,
-            child: Column(children: [
-              AnimatedContainer(
+          child: Column(mainAxisSize: MainAxisSize.min, children: [
+              // In a grid the well takes the cell's width; the 78 square was
+              // the rail's geometry.
+              AspectRatio(
+                aspectRatio: 1,
+                child: AnimatedContainer(
                 duration: const Duration(milliseconds: 160),
-                width: 78,
-                height: 78,
                 padding: const EdgeInsets.all(3),
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(18),
@@ -314,6 +370,7 @@ class _BucketTile extends StatelessWidget {
                         ),
                 ),
               ),
+              ),
               const SizedBox(height: 6),
               Text(label,
                   maxLines: 1,
@@ -322,7 +379,6 @@ class _BucketTile extends StatelessWidget {
                       fontSize: 12.5, fontWeight: selected ? FontWeight.w800 : FontWeight.w600, color: p.ink1)),
               Text('$count', style: pvManrope(fontSize: 11, color: p.ink3)),
             ]),
-          ),
         ),
       );
 }

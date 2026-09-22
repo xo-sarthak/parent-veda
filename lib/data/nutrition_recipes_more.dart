@@ -32,6 +32,7 @@ final List<Recipe> kMoreRecipes = [
   // ===========================================================================
   Recipe(
     id: 'vegetable_poha',
+    minutes: 15,
     fact: "The lemon on poha is not decoration: vitamin C turns the peanuts' iron into iron you absorb.",
     meals: const [RecipeMeal.breakfast, RecipeMeal.snack],
     kind: RecipeKind.light,
@@ -62,6 +63,7 @@ final List<Recipe> kMoreRecipes = [
   ),
   Recipe(
     id: 'vegetable_upma',
+    minutes: 20,
     fact: "A handful of vegetables in upma doubles its fibre for no extra cooking time.",
     meals: const [RecipeMeal.breakfast, RecipeMeal.dinner],
     kind: RecipeKind.light,
@@ -92,6 +94,7 @@ final List<Recipe> kMoreRecipes = [
   ),
   Recipe(
     id: 'oats_porridge_dates',
+    minutes: 12,
     fact: "Two dates sweeten a bowl and add about a milligram of iron — sugar would add none.",
     meals: const [RecipeMeal.breakfast],
     kind: RecipeKind.light,
@@ -119,6 +122,7 @@ final List<Recipe> kMoreRecipes = [
   ),
   Recipe(
     id: 'egg_bhurji_roti',
+    minutes: 20,
     fact: "An egg is one of the few foods with choline, which the baby's brain uses this month.",
     meals: const [RecipeMeal.breakfast, RecipeMeal.dinner],
     kind: RecipeKind.main,
@@ -148,6 +152,7 @@ final List<Recipe> kMoreRecipes = [
   ),
   Recipe(
     id: 'paneer_paratha',
+    minutes: 30,
     fact: "Fifty grams of paneer is a quarter of a day's calcium — more than a glass of milk.",
     meals: const [RecipeMeal.breakfast, RecipeMeal.lunch],
     kind: RecipeKind.main,
@@ -177,6 +182,7 @@ final List<Recipe> kMoreRecipes = [
   ),
   Recipe(
     id: 'idli_with_sambar',
+    minutes: 35,
     fact: "Idli batter ferments overnight and the microbes make folate as they go.",
     meals: const [RecipeMeal.breakfast, RecipeMeal.dinner],
     kind: RecipeKind.main,
@@ -210,6 +216,7 @@ final List<Recipe> kMoreRecipes = [
   // ===========================================================================
   Recipe(
     id: 'roasted_makhana',
+    minutes: 10,
     fact: "Makhana is a water-lily seed: high in calcium and magnesium, low in fat, and it keeps for weeks.",
     meals: const [RecipeMeal.snack],
     kind: RecipeKind.light,
@@ -235,6 +242,7 @@ final List<Recipe> kMoreRecipes = [
   ),
   Recipe(
     id: 'sprouts_chaat',
+    minutes: 15,
     fact: "Sprouting a moong bean roughly doubles its folate and vitamin C.",
     meals: const [RecipeMeal.snack, RecipeMeal.breakfast],
     kind: RecipeKind.light,
@@ -262,6 +270,7 @@ final List<Recipe> kMoreRecipes = [
   ),
   Recipe(
     id: 'fruit_chaat',
+    minutes: 10,
     fact: "The vitamin C in a bowl of cut fruit helps the iron from the rest of the day's food go in.",
     meals: const [RecipeMeal.snack],
     kind: RecipeKind.light,
@@ -287,6 +296,7 @@ final List<Recipe> kMoreRecipes = [
   ),
   Recipe(
     id: 'peanut_jaggery_chikki',
+    minutes: 25,
     fact: "Jaggery keeps the iron that refined sugar loses — a square of chikki has about a milligram.",
     meals: const [RecipeMeal.snack],
     kind: RecipeKind.sweet,
@@ -315,6 +325,7 @@ final List<Recipe> kMoreRecipes = [
   // ===========================================================================
   Recipe(
     id: 'dates_nuts_laddoo',
+    minutes: 20,
     fact: "Dates are the sweetener here: no sugar at all, and iron and fibre in every laddoo.",
     meals: const [RecipeMeal.snack],
     kind: RecipeKind.sweet,
@@ -341,6 +352,7 @@ final List<Recipe> kMoreRecipes = [
   ),
   Recipe(
     id: 'jaggery_kheer',
+    minutes: 40,
     fact: "Milk is the calcium in kheer; jaggery instead of sugar adds a little iron and a deeper taste.",
     meals: const [RecipeMeal.dinner, RecipeMeal.snack],
     kind: RecipeKind.sweet,
@@ -367,6 +379,7 @@ final List<Recipe> kMoreRecipes = [
   ),
   Recipe(
     id: 'ragi_halwa',
+    minutes: 25,
     fact: "Ragi has more calcium than any other grain — a halwa of it is a sweet that does some work.",
     meals: const [RecipeMeal.snack],
     kind: RecipeKind.sweet,
@@ -398,6 +411,7 @@ final List<Recipe> kMoreRecipes = [
   // ===========================================================================
   Recipe(
     id: 'ginger_lemon_tea',
+    minutes: 10,
     fact: "A gram of ginger a day is the amount studies used for morning sickness — about three thin slices.",
     meals: const [RecipeMeal.breakfast, RecipeMeal.snack],
     kind: RecipeKind.drink,
@@ -423,6 +437,7 @@ final List<Recipe> kMoreRecipes = [
   ),
   Recipe(
     id: 'haldi_doodh',
+    minutes: 10,
     fact: "The pinch of turmeric in haldi doodh is the everyday amount; the milk is the calcium.",
     meals: const [RecipeMeal.dinner],
     kind: RecipeKind.drink,
@@ -447,6 +462,7 @@ final List<Recipe> kMoreRecipes = [
   ),
   Recipe(
     id: 'salted_buttermilk',
+    minutes: 10,
     fact: "Chaas is curd thinned with water: half the calories of lassi, the same probiotics.",
     meals: const [RecipeMeal.lunch, RecipeMeal.snack],
     kind: RecipeKind.drink,
@@ -471,6 +487,7 @@ final List<Recipe> kMoreRecipes = [
   ),
   Recipe(
     id: 'badam_milk',
+    minutes: 15,
     fact: "Eight almonds and a cup of milk together give about a third of a day's calcium.",
     meals: const [RecipeMeal.breakfast, RecipeMeal.snack],
     kind: RecipeKind.drink,
@@ -496,6 +513,7 @@ final List<Recipe> kMoreRecipes = [
   ),
   Recipe(
     id: 'coconut_water_cooler',
+    minutes: 10,
     fact: "Coconut water has more potassium than a banana and almost no sugar.",
     meals: const [RecipeMeal.snack],
     kind: RecipeKind.drink,
@@ -524,6 +542,7 @@ final List<Recipe> kMoreRecipes = [
   // ===========================================================================
   Recipe(
     id: 'moong_dal_soup',
+    minutes: 25,
     fact: "Moong is the easiest dal to digest — the one dieticians reach for on a queasy day.",
     meals: const [RecipeMeal.dinner, RecipeMeal.lunch],
     kind: RecipeKind.soup,
@@ -551,6 +570,7 @@ final List<Recipe> kMoreRecipes = [
   ),
   Recipe(
     id: 'tomato_carrot_soup',
+    minutes: 30,
     fact: "Cooking tomatoes raises their lycopene; the carrot adds vitamin A.",
     meals: const [RecipeMeal.dinner, RecipeMeal.snack],
     kind: RecipeKind.soup,
@@ -578,6 +598,7 @@ final List<Recipe> kMoreRecipes = [
   ),
   Recipe(
     id: 'chicken_clear_soup',
+    minutes: 35,
     fact: "A clear broth is protein and salt in a form an unwell evening can take.",
     meals: const [RecipeMeal.dinner],
     kind: RecipeKind.soup,
@@ -609,6 +630,7 @@ final List<Recipe> kMoreRecipes = [
   // ===========================================================================
   Recipe(
     id: 'home_chicken_curry',
+    minutes: 45,
     fact: "Chicken's iron is the haem kind — the body absorbs two to three times more of it than from dal.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
@@ -638,6 +660,7 @@ final List<Recipe> kMoreRecipes = [
   ),
   Recipe(
     id: 'egg_curry',
+    minutes: 30,
     fact: "Hard-boiling is exactly right in pregnancy: the yolk set, the protein complete.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
@@ -665,6 +688,7 @@ final List<Recipe> kMoreRecipes = [
   ),
   Recipe(
     id: 'pan_fried_pomfret',
+    minutes: 25,
     fact: "Pomfret is one of the low-mercury sea fish, so it is the omega-3 without the worry.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
@@ -692,6 +716,7 @@ final List<Recipe> kMoreRecipes = [
   ),
   Recipe(
     id: 'dal_palak',
+    minutes: 30,
     fact: "The tomato in dal palak is not just taste — its vitamin C helps the spinach's iron go in.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,

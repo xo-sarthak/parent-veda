@@ -70,7 +70,9 @@ class NeedScreen extends StatelessWidget {
                     separatorBuilder: (_, _) => const SizedBox(width: 12),
                     itemBuilder: (_, i) => RecipeCard(
                       p: p,
-                      name: recipes[i].name.en,
+                      recipeId: recipes[i].id,
+                  minutes: recipes[i].minutes,
+                  name: recipes[i].name.en,
                       line: recipes[i].whyNow.en,
                       url: nutritionRecipePhoto(recipes[i].id, recipes[i].name.en),
                       onTap: () => openRecipe(context, recipes[i], pregnancy),

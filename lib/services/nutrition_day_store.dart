@@ -227,6 +227,24 @@ class NutritionDayStore extends ChangeNotifier with CloudSyncedStore {
 
   bool onList(String recipeId) => _shopping.any((s) => s.recipeId == recipeId);
 
+  /// Is this one ingredient on the list?
+  bool itemOnList(String recipeId, String name) =>
+      _shopping.any((s) => s.recipeId == recipeId && s.name == name);
+
+  /// One ingredient on or off. She has the onions already; the list should
+  /// not make her delete them afterwards (2026-09-22 — Blinkit puts an ADD on
+  /// every ingredient, and per-item is the half of that worth copying: the
+  /// half that is a shopping list, not a shop).
+  void toggleItem(String recipeId, String name) {
+    final i = _shopping.indexWhere((s) => s.recipeId == recipeId && s.name == name);
+    if (i == -1) {
+      _shopping.add(ShoppingItem(recipeId: recipeId, name: name));
+    } else {
+      _shopping.removeAt(i);
+    }
+    _save();
+  }
+
   void toggleBought(ShoppingItem item) {
     item.done = !item.done;
     _save();

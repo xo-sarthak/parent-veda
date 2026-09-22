@@ -627,3 +627,137 @@ doctor, a PDF sits in Downloads; the ten questions as rows wearing a
 verdict pill, a Call round on the "now" rows. **Declined:** intensity
 sliders (three words are what she can answer at 11 pm); a PDF report;
 any "getting worse" arrow.
+
+## 19. Movement in pregnancy — the day, the library, the player (2026-09-22)
+
+Five passes for the **Fitness & yoga** door (the brief is
+`docs/FITNESS-DOOR-BRIEF.md`, which holds the screen-by-screen detail and the
+links). Queries: "prenatal or pregnancy workout home with a weekly plan and
+short sessions", "yoga class library with duration, level and focus filters",
+"exercise detail with steps, warnings or modifications", "guided yoga session
+player with pose timer and next pose", "pelvic floor / kegel guided breathing
+with contract and relax timer" (ios).
+
+**What converges.** *Open*: a week strip with today underlined and ONE named
+practice under it (Daily Movement → SLOW FLOW → 20 min) — a day, not a
+library. *Equinox+ / Withings / Fitbit*: the library is filter chips over rows
+and the row carries the minutes; dropdowns (Fitbit) hide their own state.
+*Tempo*: filters as a sheet, time as clock discs, level as pips. *Open* again:
+safety as a NAMED bordered block on the session page ("Breathwork Safety",
+which itself says not to hold the breath in pregnancy); *pliability* ends its
+cues with "back off if you feel any pinching"; *Finch* puts "listen to your
+body and stop if you ever need to" under the Start button. *MyFitnessPal /
+Centr / Peloton*: a player needs no video — the current move as a large title,
+a countdown, a progress bar, the rest as rows, plus Centr's GET READY count and
+UP NEXT strip. *Calm Sleep / TIDE / stoic*: breath work is a ring with one word
+in it.
+
+**Adopted:** the day-first card with the month's other sessions under it; chips
+over rows for the library; the named safety block per session; Finch's line
+under Start; the list-plus-timer player with GET READY and UP NEXT; the breath
+ring for pelvic floor.
+
+**Declined:** *levels* (a pregnant woman is not "advanced" — trimester and how
+she feels are the axes); *streaks and n/6 counters* (a missed day in pregnancy
+is usually a correct decision, and the TTC home already ruled counters out);
+calories; equipment filters; a teacher's face on every card (we have no
+teachers, and invented bylines are the fake-avatar problem).
+
+## 20. Blinkit's Recipes — what a grocery app got right (2026-09-22)
+
+The user sent the flow himself
+([Explore all recipes](https://mobbin.com/flows/83fef0df-6b0f-4ee9-bdc1-4b269c6c82e0)):
+*"our recipe section resonates very much with theirs... can we not do it the
+way they have done it"*. Read alongside their
+[Recipe detail](https://mobbin.com/flows/2cc74b69-06b3-4e7f-8044-0f45af8e80df).
+
+**Their structure:** a photographic masthead (flat-lay ingredients, "Recipes"
+in a heavy wordmark, back and search as rounds ON the photo) → **six meal-time
+tiles as a 3x2 grid**, illustrated plates on peach, label under → *Bookmarked
+Recipes · see all →* as a rail → *Today's Recommendations* (big cards) → *Cook
+in minutes* (small 3-up) → **All Recipes** behind filter chips (Quick Recipes ·
+Veg · Diet Type ▾ · Ingredients ▾), two-column photo cards. Every card: a
+bookmark top-right ON the photo, category chips bottom-left ON the photo, the
+title under, and the **time** (⏱ 30 mins). Their recipe page: ingredients as
+ADD-to-cart product cards, numbered steps, nutrition as four plain tiles, and
+"*This AI-generated recipe may contain inaccuracies."
+
+**Adopted** (into the Nutrition door's Recipes tab):
+- **The category tiles as a grid, not a rail.** Nine buckets were a horizontal
+  rail that hid four behind a swipe — so "what are you after?" was answered
+  with a question. Now 3-across, all nine on screen. The argument was already
+  written above the recipe grid in the same file ("a rail hides all but two");
+  the buckets were the one place it had not been applied.
+- **The bookmark on the card.** Every Blinkit card carries one. Ours carried
+  none — and `SavedKind.recipe` had existed since the saved-items build with
+  `SavedScreen` rendering a Recipes section that **nothing could fill**. A
+  wiring gap found by copying a competitor's affordance.
+- **"Bookmarked Recipes" as the section above the browse.** Ours is "The ones
+  you kept", and it renders only when she has some — an empty rail of hearts
+  is an instruction, not an invitation.
+
+**Declined, and why:**
+- **Ingredients as ADD-to-cart cards.** That is Blinkit's business, not our
+  promise. A pregnancy recipe page selling garlic is a different product.
+- **Cuisine chips (Chinese / Thai / Main Course).** Our chips answer "what
+  does this give me" — iron, calcium, protein — because that is the pregnancy
+  question. Region exists in our data and stays secondary.
+- **Chips ON the photo.** Tempting, and it is why their cards look dense and
+  good. But the user ruled four hours earlier that a recipe card's marks are
+  **bare, in their own colours, no tinted background** — over a photograph they
+  would need white pills, which is that decision reversed. Left where he put
+  them; offered as a separate change.
+- **A photographic masthead.** Their Recipes is a standalone screen; ours is a
+  tab inside a door whose hero is already a photograph. Two photo heroes on one
+  scroll is the door-inside-a-door problem.
+- **"AI-generated, may contain inaccuracies."** Our recipes are written.
+
+**Owed:** the **time on the card** (⏱ 30 mins) is the one Blinkit signal we
+cannot copy yet — `Recipe` has no minutes, and inventing forty numbers would be
+inventing data. Forty times, written once, would also unlock "Cook in minutes".
+
+### 20a. The second pass — the user revises three of the declines (2026-09-22)
+
+He read the declined list and overturned two, confirmed one, and named the
+real problem behind a third:
+
+- **The time on the card: do it.** *"Telling the users how much time this
+  recipe will take, especially to someone who's pregnant, that's a good
+  thing."* `Recipe.minutes` is now **required**, which immediately caught a
+  second recipe file (`nutrition_recipes_more.dart`) that a nullable field
+  would have left silently timeless. 41 recipes, 41 times, active kitchen
+  time only — soaking and fermenting stay in the steps, because "480 mins"
+  on a dal she cooks in forty is a lie told by a data model.
+- **Chips on the photo: do it if it looks better.** *"If it makes it look
+  good, then I'm fine with it... the way we were doing it was looking bad,
+  so there might be some sort of issues, right?"* — and the issue he named
+  was not the marks but the PICTURES. So the marks moved onto the photo as
+  white discs (Blinkit's chip position), the time took their old place under
+  the title, and the photographs got audited.
+- **Ingredients as ADD cards: half of it.** We already have the shopping list
+  he remembered (`ShoppingListScreen`, recipe-grouped, shareable). What was
+  missing was per-item control — it was all-or-nothing, and *"we don't decide
+  the brand, we just say that you might need ketchup"* is exactly the line
+  between their ADD and ours. Every ingredient now has an Add / On-list
+  toggle; the button below adds everything.
+- **Cuisine chips: he agreed with the decline.** *"Categorization can be a
+  bit better the way they have done"* — which the bucket grid already is.
+
+**The photo audit** (his rule: pick by eye, from a genuine place). Four of
+the sixteen recipe dishes were not the dish:
+| id | was | now |
+|---|---|---|
+| `nut_palak_paneer` | "Palak paneer **on rotini**, with curry powder and peanuts — Massachusetts" — pasta | palak paneer in spinach gravy |
+| `nut_dal_rice` | a **fish curry** thali — on varan bhaat, the vegetarian Maharashtrian dal-rice | varan bhaat on a banana leaf |
+| `nut_kadhi` | a whole Gujarati thali, kadhi one small bowl in it | a bowl of kadhi |
+| `nut_shukto` | a generic StockSnap plate that was not shukto | shukto in its pan |
+
+The fish one is worth keeping as the example: for a vegetarian or Jain
+mother that is not a styling slip, it is the app getting her food wrong.
+Credits moved with the pictures. **And the table alone would have changed
+nothing** — `kReadImageBase` points at R2, so `readImageFor` serves the R2
+copy; the four had to be re-fetched and re-uploaded (`fetch_read_images.py`
+re-fetches on a changed source, `upload_to_r2.py` skips unchanged keys), then
+read back from the live bucket to confirm. Commons is honest but plain for
+regional home food: these are now CORRECT, not styled.
+

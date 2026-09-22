@@ -36,12 +36,15 @@ const Map<String, String> kReadImageUrls = {
       'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Ragi_Dosa_Mumbai.jpg/960px-Ragi_Dosa_Mumbai.jpg',
   'nut_curd_rice':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/5/58/Curd_Rice.jpg/960px-Curd_Rice.jpg',
+  // Was "Palak paneer ON ROTINI, with curry powder and peanuts —
+  // Massachusetts": pasta. Picked by eye 2026-09-22.
   'nut_palak_paneer':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/f/ff/Palak_paneer_on_rotini%2C_with_curry_powder_and_peanuts_-_Massachusetts.jpg/960px-Palak_paneer_on_rotini%2C_with_curry_powder_and_peanuts_-_Massachusetts.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8d/Palak_Paneer_%28Cottage_cheese_in_spinach_gravy%29.jpg/960px-Palak_Paneer_%28Cottage_cheese_in_spinach_gravy%29.jpg',
   'nut_fish_curry':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Bengali_bata_fish_curry.jpg/960px-Bengali_bata_fish_curry.jpg',
+  // Was a generic StockSnap plate that was not shukto at all.
   'nut_shukto':
-      'https://cdn.stocksnap.io/img-thumbs/960w/KKMQPWQK6H.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/24/Shukto%2C_a_Bengali_dish.jpg/960px-Shukto%2C_a_Bengali_dish.jpg',
   'nut_ragi_porridge':
       'https://upload.wikimedia.org/wikipedia/commons/6/6f/Raagi_koozh.jpg',
   'nut_sambar':
@@ -52,12 +55,17 @@ const Map<String, String> kReadImageUrls = {
       'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Khaman_Dhokla_Gujrati.jpg/960px-Khaman_Dhokla_Gujrati.jpg',
   'nut_khichdi':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Spicy_Khichdi.JPG/960px-Spicy_Khichdi.JPG',
+  // ⚠️ WAS A FISH CURRY THALI — on varan bhaat, which is the vegetarian
+  // Maharashtrian dal-and-rice. A meat photograph on a vegetarian dish is
+  // not a styling slip; for a Jain or vegetarian mother it is the app
+  // getting her food wrong. Picked by eye 2026-09-22.
   'nut_dal_rice':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c5/Fish_Curry_Rice_Thali_%2823370163493%29.jpg/960px-Fish_Curry_Rice_Thali_%2823370163493%29.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Varan_Bhat.jpg/960px-Varan_Bhat.jpg',
   'nut_thalipeeth':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Thalipeeth_-_Maharashtra.jpg/960px-Thalipeeth_-_Maharashtra.jpg',
+  // Was a whole Gujarati thali, in which the kadhi is one small bowl.
   'nut_kadhi':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b9/Gujarati_Thali_with_Rotlo%2C_Kadhi%2C_Olo%2C_Gol.jpg/960px-Gujarati_Thali_with_Rotlo%2C_Kadhi%2C_Olo%2C_Gol.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d5/Gujaratikadhi.jpg/960px-Gujaratikadhi.jpg',
   'nut_chilla':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Chilla_besan.JPG/960px-Chilla_besan.JPG',
   'nut_daliya':
@@ -788,17 +796,17 @@ const Map<String, String> kReadImageUrls = {
 const Map<String, String> kReadImageCredits = {
   'nut_ragi_dosa': 'CC BY-SA 4.0 · Wikimedia Commons · Pradeep717',
   'nut_curd_rice': 'CC BY-SA 4.0 · Wikimedia Commons · Sudharshan Shanmugasundaram',
-  'nut_palak_paneer': 'CC0 · Wikimedia Commons · Daderot',
+  'nut_palak_paneer': 'CC BY-SA 4.0 · Wikimedia Commons · DreamyFlutura11',
   'nut_fish_curry': 'CC BY-SA 4.0 · Wikimedia Commons · Billjones94',
-  'nut_shukto': 'CC0 · StockSnap · Foodie Girl',
+  'nut_shukto': 'CC BY-SA 4.0 · Wikimedia Commons · Billjones94',
   'nut_ragi_porridge': 'CC BY-SA 4.0 · Wikimedia Commons · Narmadhaa',
   'nut_sambar': 'CC BY-SA 4.0 · Wikimedia Commons · Sutapa Pal',
   'nut_rajma': 'CC BY-SA 4.0 · Wikimedia Commons · Shreya151994',
   'nut_dhokla': 'CC BY-SA 4.0 · Wikimedia Commons · Mrudit161187',
   'nut_khichdi': 'CC BY-SA 4.0 · Wikimedia Commons · Seena.ge',
-  'nut_dal_rice': 'CC BY-SA 2.0 · Wikimedia Commons · goanfishcurryrice3',
+  'nut_dal_rice': 'CC BY-SA 4.0 · Wikimedia Commons · Kashmira3091',
   'nut_thalipeeth': 'CC BY-SA 4.0 · Wikimedia Commons · Avinashvh1n1',
-  'nut_kadhi': 'CC0 · Wikimedia Commons · Brihaspati',
+  'nut_kadhi': 'Public domain · Wikimedia Commons · Mowglee',
   'nut_chilla': 'CC BY-SA 4.0 · Wikimedia Commons · Kamalsahansi',
   'nut_daliya': 'CC0 · Wikimedia Commons · QueerEcofeminist',
   'nut_poha': 'CC BY-SA 4.0 · Wikimedia Commons · Mahi Gajwani',

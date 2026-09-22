@@ -1631,6 +1631,7 @@ class Recipe {
   const Recipe({
     required this.id,
     required this.name,
+    required this.minutes,
     required this.whyNow,
     required this.region,
     required this.tags,
@@ -1656,6 +1657,18 @@ class Recipe {
 
   final String id;
   final LocalizedText name;
+
+  /// Kitchen time, in minutes, from taking things out to serving — the
+  /// number Blinkit puts on every card and the user asked for (2026-09-22:
+  /// *"telling the users how much time this recipe will take, especially to
+  /// someone who's pregnant, that's a good thing"*).
+  ///
+  /// ⚠️ ACTIVE TIME ONLY. Soaking, fermenting and setting are NOT counted —
+  /// they are hours, they happen the night before, and adding them would put
+  /// "480 mins" on a dal she actually cooks in forty. Where a dish needs one,
+  /// its steps say so. An estimate for an ordinary home kitchen, never a
+  /// promise; it is required so that a recipe cannot ship without one.
+  final int minutes;
 
   /// One line: why this helps you now.
   final LocalizedText whyNow;
@@ -1704,6 +1717,7 @@ final List<Recipe> kRecipes = [
   //  dish, which is a fact about the food and not an instruction about her.
   Recipe(
     id: 'pcos_moong_chilla',
+    minutes: 20,
     fact: "Moong is the dal that keeps its protein through soaking and grinding — a chilla has more of it than the same weight of roti.",
     meals: const [RecipeMeal.breakfast, RecipeMeal.snack],
     kind: RecipeKind.light,
@@ -1743,6 +1757,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'bengali_macher_jhol',
+    minutes: 35,
     fact: "River fish like rohu and katla are low in mercury, which is why a Bengali kitchen can have fish four days a week in pregnancy.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
@@ -1773,6 +1788,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'bengali_shukto',
+    minutes: 40,
     fact: "Bitter gourd and drumstick in shukto are two of the highest-fibre vegetables an Indian kitchen cooks.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
@@ -1801,6 +1817,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'tamil_ragi_kanji',
+    minutes: 15,
     fact: "Ragi has about ten times the calcium of rice — a bowl of kanji is a glass of milk in grain form.",
     meals: const [RecipeMeal.breakfast],
     kind: RecipeKind.light,
@@ -1827,6 +1844,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'tamil_sambar',
+    minutes: 40,
     fact: "Sambar's dal and its tamarind are a pair: the sour helps the iron from the dal go in.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
@@ -1855,6 +1873,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'punjabi_palak_paneer',
+    minutes: 35,
     fact: "Spinach is folate; paneer is calcium and protein. Together they cover three of the five ticks in one dish.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
@@ -1884,6 +1903,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'punjabi_rajma',
+    minutes: 45,
     fact: "A cup of cooked rajma has more fibre than a bowl of oats and nearly as much protein as an egg.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
@@ -1912,6 +1932,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'gujarati_dhokla',
+    minutes: 30,
     fact: "Fermented and steamed: dhokla's batter makes its own B vitamins overnight, and steaming keeps them.",
     meals: const [RecipeMeal.breakfast, RecipeMeal.snack],
     kind: RecipeKind.light,
@@ -1940,6 +1961,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'gujarati_khichdi',
+    minutes: 25,
     fact: "Rice and moong together make a complete protein — the reason khichdi has fed sick days for a thousand years.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
@@ -1968,6 +1990,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'south_indian_ragi_dosa',
+    minutes: 20,
     fact: "Swapping half the rice for ragi in a dosa adds calcium and iron without changing how it cooks.",
     meals: const [RecipeMeal.breakfast, RecipeMeal.dinner],
     kind: RecipeKind.main,
@@ -1996,6 +2019,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'south_indian_curd_rice',
+    minutes: 15,
     fact: "Curd rice is probiotic and cooling — the meal for a hot afternoon or a stomach that wants nothing spicy.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
@@ -2024,6 +2048,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'maharashtrian_varan_bhaat',
+    minutes: 30,
     fact: "Varan is toor dal at its plainest, and toor has the most protein of the everyday dals.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
@@ -2051,6 +2076,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'maharashtrian_thalipeeth',
+    minutes: 25,
     fact: "Thalipeeth mixes four flours; bajra brings the iron and jowar the fibre.",
     meals: const [RecipeMeal.breakfast, RecipeMeal.dinner],
     kind: RecipeKind.main,
@@ -2079,6 +2105,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'jain_kadhi_khichdi',
+    minutes: 35,
     fact: "Kadhi's curd is calcium and the besan is protein — a no-onion, no-garlic dish that still adds up.",
     meals: const [RecipeMeal.lunch, RecipeMeal.dinner],
     kind: RecipeKind.main,
@@ -2107,6 +2134,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'besan_chilla',
+    minutes: 15,
     fact: "Besan has three times the protein of wheat flour and a fifth of the glycaemic load — a chilla steadies the morning.",
     meals: const [RecipeMeal.breakfast, RecipeMeal.snack],
     kind: RecipeKind.light,
@@ -2135,6 +2163,7 @@ final List<Recipe> kRecipes = [
   ),
   Recipe(
     id: 'vegetable_daliya',
+    minutes: 25,
     fact: "Daliya is whole wheat cracked, not milled — the bran stays, and so does the fibre.",
     meals: const [RecipeMeal.breakfast, RecipeMeal.dinner],
     kind: RecipeKind.light,

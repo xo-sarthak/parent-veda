@@ -176,5 +176,19 @@ void main() {
       expect(recipeForMeal('Vegetable upma, a banana'), isNotNull);
       expect(recipeForMeal('Plain water'), isNull);
     });
+
+    test('every recipe says how long it takes, and says something believable', () {
+      // ⚠️ THE FIELD IS REQUIRED, so this cannot catch a missing one — the
+      // compiler does. What it catches is the lazy default: a set of
+      // recipes that all say 30, or one that says 5 or 300, which is how a
+      // number invented to satisfy a field looks. Active kitchen time only;
+      // soaking and fermenting are in the steps (see `Recipe.minutes`).
+      for (final r in kRecipes) {
+        expect(r.minutes, greaterThanOrEqualTo(10), reason: '${r.id} claims ${r.minutes} min');
+        expect(r.minutes, lessThanOrEqualTo(90), reason: '${r.id} claims ${r.minutes} min');
+      }
+      expect(kRecipes.map((r) => r.minutes).toSet().length, greaterThan(3),
+          reason: 'one number repeated across the library is a placeholder, not a time');
+    });
   });
 }

@@ -24,6 +24,7 @@ import '../../../theme/pv_fonts.dart';
 import '../../../widgets/pv_feedback.dart';
 import '../../brackets/hub/hub_intent_art.dart';
 import '../../can_i/can_i_widgets.dart' show CanIPhoto;
+import '../../../services/saved_store.dart';
 import '../../v2/v2_palette.dart';
 
 /// The door's one photo well: a dish photo, or the slot icon in a neutral
@@ -465,8 +466,74 @@ class NutritionChip extends StatelessWidget {
 }
 
 /// A recipe card for a rail: photo, name, one line, minutes-free.
+/// The heart on a recipe photo. White disc, ink outline, filled when saved —
+/// the store's own toggle, so the Saved screen and this card stay one truth.
+class _SaveHeart extends StatelessWidget {
+  const _SaveHeart({required this.p, required this.recipeId, required this.title});
+  final V2Palette p;
+  final String recipeId;
+  final String title;
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: SavedStore.instance,
+        builder: (context, _) {
+          final on = SavedStore.instance.isSaved(SavedKind.recipe, recipeId);
+          return Material(
+            color: p.ground.withValues(alpha: 0.92),
+            shape: const CircleBorder(),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: () {
+                pvCommitFeedback();
+                SavedStore.instance.toggle(SavedKind.recipe, recipeId, title: title, stage: 'pregnancy');
+              },
+              child: SizedBox(
+                width: 30,
+                height: 30,
+                child: Icon(on ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+                    size: 16, color: on ? const Color(0xFFC2185B) : p.ink2),
+              ),
+            ),
+          );
+        },
+      );
+}
+
+/// The three marks as white pills, bottom-left on a recipe photo — Blinkit's
+/// chip position, in our hand.
+///
+/// ⚠️ THE DISC IS FOR READABILITY, NOT DECORATION. On white the marks are
+/// bare and coloured (the user's call, 2026-09-22 morning); on a photograph
+/// a bare mark disappears into whatever is behind it, so each one sits on a
+/// near-opaque white disc. Amounts are dropped here — three numbers over a
+/// photo is a label, not a glance; they are still on the recipe page.
+class _MarkPills extends StatelessWidget {
+  const _MarkPills({required this.p, required this.values});
+  final V2Palette p;
+  final NutritionValues values;
+
+  @override
+  Widget build(BuildContext context) {
+    final top = nutritionTopThree(values);
+    if (top.isEmpty) return const SizedBox.shrink();
+    return Row(mainAxisSize: MainAxisSize.min, children: [
+      for (var i = 0; i < top.length; i++) ...[
+        if (i > 0) const SizedBox(width: 5),
+        Container(
+          width: 26,
+          height: 26,
+          padding: const EdgeInsets.all(5),
+          decoration: BoxDecoration(color: p.ground.withValues(alpha: 0.92), shape: BoxShape.circle),
+          child: nutritionNeedGlyph(p, top[i].$1, size: 16),
+        ),
+      ],
+    ]);
+  }
+}
+
 class RecipeCard extends StatelessWidget {
-  const RecipeCard({super.key, required this.p, required this.name, required this.line, required this.url, required this.onTap, this.width = 168, this.values});
+  const RecipeCard({super.key, required this.p, required this.name, required this.line, required this.url, required this.onTap, this.width = 168, this.values, this.recipeId, this.minutes});
   final V2Palette p;
   final NutritionValues? values;
   final String name;
@@ -474,6 +541,21 @@ class RecipeCard extends StatelessWidget {
   final String? url;
   final VoidCallback onTap;
   final double width;
+
+  /// When given, the card carries a save heart on its photo and `SavedKind
+  /// .recipe` becomes reachable.
+  ///
+  /// ⚠️ THIS CLOSED A WIRING GAP, NOT A DESIGN ONE. `SavedKind.recipe` has
+  /// existed since the saved-items build and `SavedScreen` renders a Recipes
+  /// section — but nothing in the app could put a recipe in it, so the
+  /// section could only ever be empty. Blinkit's card (the user, 2026-09-22)
+  /// carries a bookmark on every photo, which is where the affordance
+  /// belongs: on the thing, not on a page one level in.
+  final String? recipeId;
+
+  /// Kitchen minutes. Drawn under the title with a clock, Blinkit's own
+  /// position for it (the user, 2026-09-22).
+  final int? minutes;
 
   @override
   Widget build(BuildContext context) => PvPress(
@@ -492,9 +574,24 @@ class RecipeCard extends StatelessWidget {
               final photo = ClipRRect(
                 borderRadius: BorderRadius.circular(16),
                 child: SizedBox(
-                    height: box.hasBoundedHeight ? null : 120,
-                    width: width,
-                    child: NutritionPhoto(url: url, p: p, icon: Icons.soup_kitchen_outlined)),
+                  height: box.hasBoundedHeight ? null : 120,
+                  width: width,
+                  child: Stack(fit: StackFit.expand, children: [
+                    NutritionPhoto(url: url, p: p, icon: Icons.soup_kitchen_outlined),
+                    if (recipeId != null)
+                      Positioned(top: 6, right: 6, child: _SaveHeart(p: p, recipeId: recipeId!, title: name)),
+                    // ⚠️ THE MARKS RIDE ON THE PHOTO NOW (2026-09-22, second
+                    // pass on Blinkit). They were bare marks under the line —
+                    // the user's own call that morning — and he revised it on
+                    // seeing Blinkit's cards: *"if it makes it look good then
+                    // I'm fine with it... the way we were doing it was looking
+                    // bad"*. The pill is not decoration: a bare mark on a
+                    // photograph is unreadable, so each one gets a white disc,
+                    // which is also exactly what Blinkit does with its chips.
+                    if (values != null && !values!.isEmpty)
+                      Positioned(left: 6, bottom: 6, child: _MarkPills(p: p, values: values!)),
+                  ]),
+                ),
               );
               return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 if (box.hasBoundedHeight) Expanded(child: photo) else photo,
@@ -506,14 +603,23 @@ class RecipeCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w700, height: 1.25, color: p.ink1)),
+                if (minutes != null) ...[
+                  const SizedBox(height: 3),
+                  Row(children: [
+                    Icon(Icons.schedule_rounded, size: 12.5, color: p.ink3),
+                    const SizedBox(width: 4),
+                    Text('$minutes mins',
+                        style: pvManrope(fontSize: 11.5, fontWeight: FontWeight.w700, color: p.ink2)),
+                  ]),
+                ],
                 const SizedBox(height: 2),
                 Text(line, maxLines: 2, overflow: TextOverflow.ellipsis, style: pvManrope(fontSize: 12, height: 1.35, color: p.ink2)),
-                if (values != null) ...[
-                  const SizedBox(height: 6),
-                  // The three marks, small, instead of a kcal line (the
-                  // user's call, 2026-09-21).
-                  NutritionTopThree(p: p, values: values!, compact: true),
-                ],
+                // Kept for revert — the marks under the line, before they
+                // moved onto the photo (2026-09-22):
+                // if (values != null) ...[
+                //   const SizedBox(height: 6),
+                //   NutritionTopThree(p: p, values: values!, compact: true),
+                // ],
               ]);
             }),
           ),

@@ -170,6 +170,15 @@ class _RecipeCookScreenState extends State<RecipeCookScreen> {
                           ),
                         ),
                         Expanded(child: Text(r.ingredients[i].name.en, style: pvManrope(fontSize: 14.5, color: p.ink1))),
+                        // ⚠️ AN ADD PER INGREDIENT, NOT A CART (2026-09-22).
+                        // Blinkit's recipe page puts an ADD on every
+                        // ingredient — but theirs adds a PRODUCT: a brand, a
+                        // pack size, a price. Ours adds the WORD. The user
+                        // drew that line himself: *"we don't decide the
+                        // brand, we just say that you might need ketchup"*.
+                        // All-or-nothing was the flaw worth fixing: she has
+                        // the onions already.
+                        _AddOne(p: p, recipeId: r.id, name: r.ingredients[i].name.en),
                       ]),
                     ),
                   const SizedBox(height: 14),
@@ -183,7 +192,7 @@ class _RecipeCookScreenState extends State<RecipeCookScreen> {
                       }
                     },
                     icon: Icon(onList ? Icons.check_rounded : Icons.add_shopping_cart_outlined, size: 18),
-                    label: Text(onList ? 'On your list' : 'Add to my list'),
+                    label: Text(onList ? 'On your list' : 'Add everything to my list'),
                     style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48)),
                   ),
                 ]),
@@ -485,4 +494,49 @@ class _FactsLine extends StatelessWidget {
     return Text(parts.join('  ·  '),
         style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink2));
   }
+}
+
+/// One ingredient's add. A plus that becomes a tick — Blinkit's ADD, minus
+/// the brand, the pack size and the price.
+class _AddOne extends StatelessWidget {
+  const _AddOne({required this.p, required this.recipeId, required this.name});
+  final V2Palette p;
+  final String recipeId;
+  final String name;
+
+  @override
+  Widget build(BuildContext context) => ListenableBuilder(
+        listenable: NutritionDayStore.instance,
+        builder: (context, _) {
+          final on = NutritionDayStore.instance.itemOnList(recipeId, name);
+          return Semantics(
+            button: true,
+            label: on ? '$name is on your list' : 'Add $name to your list',
+            child: InkWell(
+              onTap: () {
+                pvCommitFeedback();
+                NutritionDayStore.instance.toggleItem(recipeId, name);
+              },
+              borderRadius: BorderRadius.circular(999),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 160),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: on ? p.ink1 : Colors.transparent,
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: on ? p.ink1 : p.line),
+                ),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  Icon(on ? Icons.check_rounded : Icons.add_rounded,
+                      size: 13, color: on ? p.ground : p.ink2),
+                  const SizedBox(width: 3),
+                  Text(on ? 'On list' : 'Add',
+                      style: pvManrope(
+                          fontSize: 11, fontWeight: FontWeight.w800, color: on ? p.ground : p.ink2)),
+                ]),
+              ),
+            ),
+          );
+        },
+      );
 }

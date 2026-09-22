@@ -392,7 +392,9 @@ class _NutritionDoorScreenState extends State<NutritionDoorScreen> {
           separatorBuilder: (_, _) => const SizedBox(width: 12),
           itemBuilder: (_, i) => RecipeCard(
             p: p,
-            name: mine[i].name.en,
+            recipeId: mine[i].id,
+                  minutes: mine[i].minutes,
+                  name: mine[i].name.en,
             line: mine[i].whyNow.en,
             url: nutritionRecipePhoto(mine[i].id, mine[i].name.en),
             onTap: () => openRecipe(context, mine[i], widget.pregnancy),

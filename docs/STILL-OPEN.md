@@ -9373,3 +9373,36 @@ for movement + consult).
 **Owed content if it goes ahead:** step lists for 27 sessions, an `avoid`
 line per session, pose art, three pelvic-floor reads.
 
+## 75.0 The Recipes tab takes Blinkit's shape — 2026-09-22
+
+Research and the full adopted/declined list: MOBBIN-DISCOVERY §20. Built, not
+walked.
+
+- Bucket tiles: horizontal rail → **3-across grid**, all nine visible.
+- `RecipeCard` takes an optional `recipeId` and then carries a **save heart**
+  on its photo, wired to `SavedStore` — which closed a real wiring gap:
+  `SavedKind.recipe` and the Saved screen's Recipes section existed with no
+  way to put anything in them.
+- A **"The ones you kept"** rail above the buckets, rendered only when she has
+  saved something.
+
+### 75.1 Done in the second pass (same day, after the user read the declines)
+- **`Recipe.minutes`, required**, on all 41 recipes across both recipe files
+  (the required field is what found the second file). Drawn on the card with
+  a clock, under the title.
+- **The marks moved onto the photo** as white discs, Blinkit's chip position.
+- **Per-ingredient Add** on the recipe page, feeding the shopping list that
+  already existed; the whole-recipe button remains.
+- **Four dish photographs re-picked by eye** and re-mirrored to R2 — see
+  MOBBIN §20a for the table and for why the URL table alone was not enough.
+
+### 75.2 Still owed
+- **"Cook in minutes"** as its own section, and a *Quick* chip — now possible
+  since every recipe has a time.
+- **Photo quality, not correctness.** The four are right; Commons has little
+  styled photography of regional Indian home food. A shoot or a licensed set
+  is the only way past that ceiling.
+- `nut_sambar` still leads with idli, and the `kOpenverseIds` entry for
+  `nut_shukto` is now stale (harmless — the proxy only fires for
+  stocksnap/flickr URLs).
+- A walk on the phone.
