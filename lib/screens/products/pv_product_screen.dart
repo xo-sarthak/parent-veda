@@ -37,6 +37,7 @@ import 'pv_cart_screen.dart';
 import 'pv_checkout_screen.dart';
 import 'pv_compare_screen.dart';
 import 'pv_gallery_screen.dart';
+import 'pv_review_block.dart';
 import 'pv_reviews_screen.dart';
 import 'pv_store_chrome.dart';
 
@@ -1373,93 +1374,127 @@ class _PvProductScreenState extends State<PvProductScreen> {
 
   Widget _ratings(V2Palette p, PvProduct product) {
     final has = product.rating > 0 || product.reviews.isNotEmpty;
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          PvSectionHead(
-            title: 'Ratings from parents',
-            action: product.reviews.length > 2 ? 'See all' : null,
-            onAction: () => _openReviews(product),
-          ),
-          const SizedBox(height: 12),
-          if (!has)
-            PvWell(
-              child: Text(
-                'No parent ratings yet. When parents on ParentVeda rate this, the number, the reasons and their words land here — never a figure we made up.',
-                style: pvManrope(fontSize: 13.5, height: 1.5, color: p.ink2),
+    // ⚠️ THE PADDING MOVED INSIDE. This section used to wrap everything in
+    // one 20pt gutter, which was right while it held only text and boxes and
+    // wrong the moment it grew a rail: a horizontal list inside a gutter
+    // stops 20pt short of the screen on both sides and reads as walled in.
+    // Everything but the rail is padded by hand; the rail pads itself.
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              PvSectionHead(
+                title: 'Ratings from parents',
+                action: product.reviews.length > 2 ? 'See all' : null,
+                onAction: () => _openReviews(product),
               ),
-            )
-          else ...[
-            Row(
-              crossAxisAlignment: CrossAxisAlignment.end,
-              children: [
-                if (product.rating > 0)
-                  Text(
-                    product.rating.toStringAsFixed(1),
-                    style: pvFraunces(
-                      fontSize: 44,
-                      fontWeight: FontWeight.w500,
-                      height: 1,
-                      color: p.ink1,
+              const SizedBox(height: 12),
+              if (!has)
+                PvWell(
+                  child: Text(
+                    'No parent ratings yet. When parents on ParentVeda rate this, the number, the reasons and their words land here — never a figure we made up.',
+                    style: pvManrope(
+                      fontSize: 13.5,
+                      height: 1.5,
+                      color: p.ink2,
                     ),
                   ),
-                const SizedBox(width: 10),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                )
+              else ...[
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     if (product.rating > 0)
-                      Row(
-                        children: [
-                          for (var i = 1; i <= 5; i++)
-                            Icon(
-                              i <= product.rating.round()
-                                  ? Icons.star_rounded
-                                  : Icons.star_outline_rounded,
-                              size: 18,
-                              color: kPvStar,
-                            ),
-                        ],
-                      ),
-                    Text(
-                      product.reviewCount > 0
-                          ? '${product.reviewCount} ratings'
-                          : '${product.reviews.length} reviews',
-                      style: pvManrope(fontSize: 12.5, color: p.ink3),
-                    ),
-                  ],
-                ),
-                const Spacer(),
-                if (product.parentsPct != null)
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
                       Text(
-                        '${product.parentsPct}%',
+                        product.rating.toStringAsFixed(1),
                         style: pvFraunces(
-                          fontSize: 24,
+                          fontSize: 44,
                           fontWeight: FontWeight.w500,
                           height: 1,
                           color: p.ink1,
                         ),
                       ),
-                      Text(
-                        'would buy again',
-                        style: pvManrope(fontSize: 11.5, color: p.ink3),
+                    const SizedBox(width: 10),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (product.rating > 0)
+                          Row(
+                            children: [
+                              for (var i = 1; i <= 5; i++)
+                                Icon(
+                                  i <= product.rating.round()
+                                      ? Icons.star_rounded
+                                      : Icons.star_outline_rounded,
+                                  size: 18,
+                                  color: kPvStar,
+                                ),
+                            ],
+                          ),
+                        Text(
+                          product.reviewCount > 0
+                              ? '${product.reviewCount} ratings'
+                              : '${product.reviews.length} reviews',
+                          style: pvManrope(fontSize: 12.5, color: p.ink3),
+                        ),
+                      ],
+                    ),
+                    const Spacer(),
+                    if (product.parentsPct != null)
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            '${product.parentsPct}%',
+                            style: pvFraunces(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w500,
+                              height: 1,
+                              color: p.ink1,
+                            ),
+                          ),
+                          Text(
+                            'would buy again',
+                            style: pvManrope(fontSize: 11.5, color: p.ink3),
+                          ),
+                        ],
                       ),
-                    ],
+                  ],
+                ),
+                // Best Buy's pros/cons chips are aggregated review TAGS with counts;
+                // ours would only repeat the two lists above, truncated. Dropped
+                // on the phone walk. Kept for revert: _prosCon(...).
+              ],
+            ],
+          ),
+        ),
+        // The words, on the rail every other review section in the app now
+        // uses. Kept for revert, the stack this replaced:
+        //   for (final r in product.reviews.take(2)) PvReviewCard(review: r),
+        if (has && product.reviews.isNotEmpty)
+          Padding(
+            padding: const EdgeInsets.only(top: 14),
+            child: PvReviewRail(
+              hue: 268,
+              voices: [
+                for (final r in product.reviews.take(6))
+                  PvReviewVoice(
+                    name: r.author,
+                    context: r.context,
+                    quote: r.text,
+                    stars: r.stars,
+                    note: r.watchOut,
+                    endorsed: r.wouldBuyAgain,
+                    endorsedLabel: 'Would buy again',
                   ),
               ],
             ),
-            // Best Buy's pros/cons chips are aggregated review TAGS with counts;
-            // ours would only repeat the two lists above, truncated. Dropped
-            // on the phone walk. Kept for revert: _prosCon(...).
-            const SizedBox(height: 14),
-            for (final r in product.reviews.take(2)) PvReviewCard(review: r),
-          ],
-        ],
-      ),
+          ),
+      ],
     );
   }
 

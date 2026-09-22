@@ -140,7 +140,11 @@ class PvLearnCatalog {
       PvLearnReview(name: r.$1, who: r.$2, quote: r.$3),
   ];
 
-  static String _lessonsFact(int n) => n == 1 ? '1 lesson' : '$n lessons';
+  /// ⚠️ THE NUMBER ONLY. The strip prints a value over its label, so
+  /// "4 lessons" over "lessons" said it twice — the walk, 2026-09-22. The
+  /// full phrase is still what a one-line card needs, so both exist.
+  static String _lessonsFact(int n) => '$n';
+  static String _lessonsLine(int n) => n == 1 ? '1 lesson' : '$n lessons';
 
   static String _minutesFact(int m) =>
       m >= 60 ? '${(m / 60).toStringAsFixed(m % 60 == 0 ? 0 : 1)} h' : '$m min';
@@ -225,7 +229,7 @@ class PvLearnCatalog {
         name: p.instructorId,
       ),
       hue: _hueOf(p.accent),
-      cover: pvLearnCoverFor(p.topics, kind),
+      cover: pvLearnCoverFor(p.id, p.topics, kind),
       offering: engine,
       priceMinor: engine?.priceMinor ?? _minorOf(p.price),
       priceNote: p.priceNote.isEmpty ? null : p.priceNote,
@@ -237,7 +241,11 @@ class PvLearnCatalog {
       rhythm: p.sessionTimes,
       startLabel: p.startLabel,
       seatsLeft: p.seatsLeft,
-      durationLabel: p.durationLabel,
+      durationLabel: p.durationLabel.isNotEmpty
+          ? p.durationLabel
+          : (kind == PvLearnKind.course && lessons.isNotEmpty
+                ? _lessonsLine(lessons.length)
+                : ''),
       rating: p.rating > 0 ? p.rating : null,
       reviewsLabel: p.reviewsLabel,
       reviews: expert == null ? const [] : _expertReviews(expert),
@@ -287,7 +295,9 @@ class PvLearnCatalog {
         ),
         if (total > 0) PvLearnFact(_minutesFact(total), 'in all'),
         const PvLearnFact('Recorded', 'watch anytime'),
-        const PvLearnFact('Pregnancy', 'for'),
+        // Kept for revert: PvLearnFact('Pregnancy', 'for'). A pregnancy
+        // course on the pregnancy stage telling her it is for pregnancy
+        // spends a quarter of the strip on nothing.
       ],
       PvLearnKind.masterclass => [
         PvLearnFact(
@@ -299,7 +309,7 @@ class PvLearnCatalog {
           PvLearnFact('${p.seatsLeft}', 'seats left')
         else
           const PvLearnFact('Recording', 'included'),
-        const PvLearnFact('English · हिंदी', 'language'),
+        const PvLearnFact('English', 'language'),
       ],
       _ => [
         PvLearnFact(p.durationLabel.now, 'long'),
@@ -324,7 +334,7 @@ class PvLearnCatalog {
         bio: p.instructorBio.now,
       ),
       hue: _hueOf(p.accent),
-      cover: pvLearnCoverFor([for (final t in p.topics) t.en], kind),
+      cover: pvLearnCoverFor(p.id, [for (final t in p.topics) t.en], kind),
       offering: engine,
       priceMinor: engine?.priceMinor ?? _minorOf(p.price),
       priceNote: p.priceNote.now.isEmpty ? null : p.priceNote.now,
@@ -338,7 +348,11 @@ class PvLearnCatalog {
       rhythm: [for (final t in p.sessionTimes) t.now],
       startLabel: p.startLabel?.now,
       seatsLeft: p.seatsLeft,
-      durationLabel: p.durationLabel.now,
+      durationLabel: p.durationLabel.now.isNotEmpty
+          ? p.durationLabel.now
+          : (kind == PvLearnKind.course && lessons.isNotEmpty
+                ? _lessonsLine(lessons.length)
+                : ''),
       rating: p.rating > 0 ? p.rating : null,
       reviewsLabel: p.reviewsLabel.now,
       reviews: [
@@ -399,7 +413,7 @@ class PvLearnCatalog {
         bio: y.instructorBio,
       ),
       hue: 150 + (y.seed % 5) * 20,
-      cover: pvLearnCoverFor([y.category, 'yoga'], kind),
+      cover: pvLearnCoverFor(y.id, [y.category, 'yoga'], kind),
       offering: engine,
       priceMinor: engine?.priceMinor ?? _minorOf(y.price),
       priceNote: y.price.contains('free on') ? 'free on ParentVeda+' : null,
@@ -451,7 +465,7 @@ class PvLearnCatalog {
         expert: e,
       ),
       hue: 268,
-      cover: pvLearnCoverFor(e.tags, PvLearnKind.consult),
+      cover: pvLearnCoverFor(e.id, e.tags, PvLearnKind.consult),
       offering: engine,
       priceMinor: engine.priceMinor,
       topics: e.tags,
@@ -500,14 +514,14 @@ class PvLearnCatalog {
         bio: s.about.now,
       ),
       hue: 268,
-      cover: pvLearnCoverFor([s.role.en, 'doctor'], PvLearnKind.consult),
+      cover: pvLearnCoverFor(s.id, [s.role.en, 'doctor'], PvLearnKind.consult),
       offering: engine,
       priceMinor: engine?.priceMinor ?? _minorOf(s.consultPrice),
       topics: [s.role.now],
       facts: [
         const PvLearnFact('30 min', 'video session'),
         PvLearnFact(s.cred.now, 'qualified'),
-        const PvLearnFact('English · हिंदी', 'speaks'),
+        const PvLearnFact('English', 'speaks'),
         PvLearnFact(s.rating.replaceAll('★', '').trim(), 'rated'),
       ],
       takeaways: [for (final h in s.helps) h.now],
@@ -538,7 +552,7 @@ class PvLearnCatalog {
       PvLearnKind.consult => [
         const PvLearnFact('45 min', 'video session'),
         PvLearnFact(o.forCouple ? 'Both of you' : 'Just you', 'who joins'),
-        const PvLearnFact('English · हिंदी', 'speaks'),
+        const PvLearnFact('English', 'speaks'),
         const PvLearnFact('Notes', 'saved after'),
       ],
       PvLearnKind.cohort => [
@@ -551,7 +565,7 @@ class PvLearnCatalog {
         const PvLearnFact('90 min', 'live'),
         PvLearnFact(o.forCouple ? 'Both of you' : 'One seat', 'who joins'),
         const PvLearnFact('Recording', 'included'),
-        const PvLearnFact('English · हिंदी', 'language'),
+        const PvLearnFact('English', 'language'),
       ],
     };
     return PvOfferingView(
@@ -567,7 +581,7 @@ class PvLearnCatalog {
         role: 'ParentVeda expert',
       ),
       hue: 344,
-      cover: pvLearnCoverFor([o.category, 'trying'], kind),
+      cover: pvLearnCoverFor(o.id, [o.category, 'trying'], kind),
       offering: engine,
       priceMinor: engine?.priceMinor ?? o.priceMinor,
       topics: [o.category],
@@ -612,7 +626,10 @@ class PvLearnCatalog {
       role: 'The practice, in eight sittings',
     ),
     hue: 120,
-    cover: pvLearnCoverFor(const ['calm', 'mind'], PvLearnKind.course),
+    cover: pvLearnCoverFor(kPvTtcGarbhCourseId, const [
+      'calm',
+      'mind',
+    ], PvLearnKind.course),
     // The engine's ₹0 row, so a history row can find this page; isFree keeps
     // the page from selling anything.
     offering: _engine(kTtcOfferingGarbhCourse),
@@ -663,6 +680,9 @@ class PvLearnCatalog {
     _ => 'A ParentVeda expert',
   };
 
+  // Kept for the day a language is a promise we can keep — see
+  // `_languagesOf`.
+  // ignore: unused_field
   static const _langs = {
     'Hindi',
     'English',
@@ -676,10 +696,16 @@ class PvLearnCatalog {
     'Malayalam',
   };
 
-  static String _languagesOf(List<String> tags) {
-    final l = tags.where(_langs.contains).toList();
-    return l.isEmpty ? 'English' : l.take(2).join(' · ');
-  }
+  /// ⚠️ ENGLISH ONLY, FOR NOW — the user, 2026-09-22. The roster carries
+  /// languages per expert and the pregnancy specialists were written as
+  /// "English · हिंदी", but nothing yet promises a consult will actually be
+  /// held in Hindi — no clinician has confirmed it and no booking asks.
+  /// A language on a doctor's row is a promise about the half hour she
+  /// pays for, so until it is one we say only what we can keep. The real
+  /// list is one line away when the roster earns it:
+  ///   final l = tags.where(_langs.contains).toList();
+  ///   return l.isEmpty ? 'English' : l.take(2).join(' · ');
+  static String _languagesOf(List<String> tags) => 'English';
 
   static int _minorOf(String price) {
     final digits = price.replaceAll(RegExp(r'[^0-9]'), '');

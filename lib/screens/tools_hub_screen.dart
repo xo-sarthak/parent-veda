@@ -57,6 +57,8 @@ import 'tools/tests_scans_reports_screen.dart';
 import 'tools/symptom_companion_screen.dart';
 import 'tools/weight_tracker_screen.dart';
 import '../theme/pv_fonts.dart';
+import 'learn/pv_learn_screen.dart';
+import '../services/life_stage_store.dart';
 
 class ToolsHubScreen extends StatelessWidget {
   const ToolsHubScreen({super.key, required this.controller});
@@ -83,105 +85,247 @@ class ToolsHubScreen extends StatelessWidget {
         Navigator.of(context).push(MaterialPageRoute(builder: (_) => b()));
 
     final tools = <_Tool>[
+      // ⚠️ LEARN HAD NO DOOR WITH ITS NAME ON IT — 2026-09-22, the user:
+      // "I can't see a Learn tab". The one catalogue of courses,
+      // masterclasses, cohorts and consults was three taps down and called
+      // something else: Tools → Prepare → Courses & Cohorts. A screen
+      // nobody can name is a screen nobody finds. Prepare keeps its tile
+      // (it still holds yoga, birthing classes and the nutrition funnel);
+      // the overlap between the two is STILL-OPEN §69.9.
+      // ⚠️ IT CARRIES A PRIORITY OR IT SINKS. The grid is reordered by
+      // `orderByPregPriority` — tiles serving a priority she chose come
+      // first — so a tile with none lands behind every tile that has one,
+      // which is where Learn went on the walk (2026-09-22): added first in
+      // this list and rendered fourth. Birth prep is the honest tag: the
+      // catalogue's live things are birth classes, cohorts and consults.
+      _Tool(
+        'Learn',
+        Icons.play_lesson_outlined,
+        AppTheme.primary500,
+        () => open(() => const PvLearnScreen(stage: LifeStage.pregnancy)),
+        priority: PregPriority.birthPrep,
+      ),
       // ⚠️ PREPARE LEFT THE BAR — 2026-09-17. Slot 2 became the unified store
       // (docs/PRODUCTS-AUDIT.md); the courses, consults, yoga and birthing
       // classes hub is the FIRST tile here so it is one tap further, never
       // hidden. Pushed with a back label because it was a tab root before.
-      _Tool(s.tabPrepare, Icons.school_outlined, AppTheme.primary400,
-          () => open(() => PrepareHubScreen(lang: controller.language, backLabel: s.toolsTab)),
-          priority: PregPriority.birthPrep),
+      _Tool(
+        s.tabPrepare,
+        Icons.school_outlined,
+        AppTheme.primary400,
+        () => open(
+          () => PrepareHubScreen(
+            lang: controller.language,
+            backLabel: s.toolsTab,
+          ),
+        ),
+        priority: PregPriority.birthPrep,
+      ),
       // ⚠️ THE DOOR, NOT THE LIBRARY — 2026-09-12. Found on the phone: this
       // tile still opened `GarbhScreen`, the "pick a pillar" menu the door
       // replaced, so the area had two front doors and the older one was the
       // one the Tools tab showed. Same screen as the home tile now; the
       // library stays in the file for revert.
-      _Tool(s.garbhToolTitle, Icons.spa_rounded, const Color(0xFFBE9C4E),
-          () => open(() =>
-              screenForSurface('garbh_daily', controller, controller.language) ??
-              GarbhScreen(controller: controller)),
-          priority: PregPriority.anxiety),
-      _Tool(s.sprToolTitle, Icons.auto_stories_rounded, const Color(0xFF9A7BB5),
-          () => open(() => SpiritualReadingScreen(controller: controller)), priority: PregPriority.anxiety),
-      _Tool(s.babyMovementTracker, Icons.favorite_rounded,
-          AppTheme.secondary500,
-          () => open(() => BabyMovementScreen(controller: controller)), priority: PregPriority.babyDevelopment),
-      _Tool(s.bumpTitle, Icons.pregnant_woman_rounded,
-          const Color(0xFFCB6F94),
-          () => open(() => BumpRitualScreen(controller: controller))),
-      _Tool(s.jrTitle, Icons.menu_book_rounded, const Color(0xFF8A6BBF),
-          () => open(() => JournalScreen(controller: controller))),
-      _Tool(s.rnTitle, Icons.local_library_rounded, AppTheme.secondary500,
-          () => open(() => ReadNextScreen(controller: controller))),
-      _Tool(s.toolWeightTitle, Icons.monitor_weight_rounded,
-          AppTheme.tertiary500,
-          () => open(() => WeightTrackerScreen(controller: controller)), priority: PregPriority.nutrition),
-      _Tool(s.toolKegelTitle, Icons.self_improvement_rounded,
-          AppTheme.secondary400,
-          () => open(() => KegelCareScreen(controller: controller)), priority: PregPriority.fitness),
-      _Tool(s.toolContractionTitle, Icons.timer_rounded, AppTheme.primary400,
-          () => open(() => ContractionTrackerScreen(controller: controller)), priority: PregPriority.birthPrep),
-      _Tool(s.hbName, Icons.luggage_rounded, AppTheme.tertiary400,
-          () => open(() => ReadyForBirthScreen(controller: controller)), priority: PregPriority.birthPrep),
-      _Tool(s.pclTitle, Icons.checklist_rounded, const Color(0xFF3E9A8C),
-          () => open(() => ProductChecklistScreen(controller: controller)), priority: PregPriority.birthPrep),
+      _Tool(
+        s.garbhToolTitle,
+        Icons.spa_rounded,
+        const Color(0xFFBE9C4E),
+        () => open(
+          () =>
+              screenForSurface(
+                'garbh_daily',
+                controller,
+                controller.language,
+              ) ??
+              GarbhScreen(controller: controller),
+        ),
+        priority: PregPriority.anxiety,
+      ),
+      _Tool(
+        s.sprToolTitle,
+        Icons.auto_stories_rounded,
+        const Color(0xFF9A7BB5),
+        () => open(() => SpiritualReadingScreen(controller: controller)),
+        priority: PregPriority.anxiety,
+      ),
+      _Tool(
+        s.babyMovementTracker,
+        Icons.favorite_rounded,
+        AppTheme.secondary500,
+        () => open(() => BabyMovementScreen(controller: controller)),
+        priority: PregPriority.babyDevelopment,
+      ),
+      _Tool(
+        s.bumpTitle,
+        Icons.pregnant_woman_rounded,
+        const Color(0xFFCB6F94),
+        () => open(() => BumpRitualScreen(controller: controller)),
+      ),
+      _Tool(
+        s.jrTitle,
+        Icons.menu_book_rounded,
+        const Color(0xFF8A6BBF),
+        () => open(() => JournalScreen(controller: controller)),
+      ),
+      _Tool(
+        s.rnTitle,
+        Icons.local_library_rounded,
+        AppTheme.secondary500,
+        () => open(() => ReadNextScreen(controller: controller)),
+      ),
+      _Tool(
+        s.toolWeightTitle,
+        Icons.monitor_weight_rounded,
+        AppTheme.tertiary500,
+        () => open(() => WeightTrackerScreen(controller: controller)),
+        priority: PregPriority.nutrition,
+      ),
+      _Tool(
+        s.toolKegelTitle,
+        Icons.self_improvement_rounded,
+        AppTheme.secondary400,
+        () => open(() => KegelCareScreen(controller: controller)),
+        priority: PregPriority.fitness,
+      ),
+      _Tool(
+        s.toolContractionTitle,
+        Icons.timer_rounded,
+        AppTheme.primary400,
+        () => open(() => ContractionTrackerScreen(controller: controller)),
+        priority: PregPriority.birthPrep,
+      ),
+      _Tool(
+        s.hbName,
+        Icons.luggage_rounded,
+        AppTheme.tertiary400,
+        () => open(() => ReadyForBirthScreen(controller: controller)),
+        priority: PregPriority.birthPrep,
+      ),
+      _Tool(
+        s.pclTitle,
+        Icons.checklist_rounded,
+        const Color(0xFF3E9A8C),
+        () => open(() => ProductChecklistScreen(controller: controller)),
+        priority: PregPriority.birthPrep,
+      ),
       // Product Guide is inside the store now (the Guide's experts, ingredients
       // and studies sit on every product page). Tile kept so the word still
       // finds it; it opens the Parenting storefront.
-      _Tool('Product Guide', Icons.menu_book_outlined, AppTheme.primary400,
-          () => open(() => const ProductGuideHubScreen())),
+      _Tool(
+        'Product Guide',
+        Icons.menu_book_outlined,
+        AppTheme.primary400,
+        () => open(() => const ProductGuideHubScreen()),
+      ),
       // The Launch Hub's only front door. A destination is visited on purpose —
       // it is never pushed at anyone. See docs/BRAND-STUDIO.md §3.
-      _Tool('Launches', Icons.auto_awesome_outlined, const Color(0xFF7A4600),
-          () => open(() => LaunchHubScreen(
-                stage: BrandStage.pregnancy,
-                pregnancyWeek: controller.currentWeek,
-              ))),
+      _Tool(
+        'Launches',
+        Icons.auto_awesome_outlined,
+        const Color(0xFF7A4600),
+        () => open(
+          () => LaunchHubScreen(
+            stage: BrandStage.pregnancy,
+            pregnancyWeek: controller.currentWeek,
+          ),
+        ),
+      ),
       // The guided tour of all 15 brand products. NOT debug-gated on purpose:
       // a monetization architecture nobody can see may as well not exist.
-      _Tool('Brand Studio', Icons.workspace_premium_outlined, const Color(0xFF6A30B6),
-          () => open(() => BrandShowcaseScreen(pregnancyWeek: controller.currentWeek))),
+      _Tool(
+        'Brand Studio',
+        Icons.workspace_premium_outlined,
+        const Color(0xFF6A30B6),
+        () => open(
+          () => BrandShowcaseScreen(pregnancyWeek: controller.currentWeek),
+        ),
+      ),
       // Debug-only workbench. The Brand Studio's job is to show almost nothing,
       // so this is the only way to see whether it is working at all.
       if (kDebugMode)
-        _Tool('Brand Studio (debug)', Icons.science_outlined, const Color(0xFFD92D20),
-            () => open(() => BrandPreviewScreen(pregnancyWeek: controller.currentWeek))),
+        _Tool(
+          'Brand Studio (debug)',
+          Icons.science_outlined,
+          const Color(0xFFD92D20),
+          () => open(
+            () => BrandPreviewScreen(pregnancyWeek: controller.currentWeek),
+          ),
+        ),
       // Same reason as above. The Care Partner module is deliberately quiet in
       // the product, and the scan-to-attribution chain cannot be walked for
       // real until there is a Play listing — so this is the only way to see
       // whether any of it works.
       if (kDebugMode)
-        _Tool('Care Partner (debug)', Icons.qr_code_2_rounded, const Color(0xFFD92D20),
-            () => open(() => const CareDebugScreen())),
-      _Tool(s.medTitle, Icons.medication_rounded, const Color(0xFF4F7A52),
-          () => open(() => MedicineTrackerScreen(controller: controller)), priority: PregPriority.symptoms),
-      _Tool(s.rmdTitle, Icons.notifications_active_rounded,
-          const Color(0xFFE0921C),
-          () => open(() => RemindersScreen(controller: controller))),
+        _Tool(
+          'Care Partner (debug)',
+          Icons.qr_code_2_rounded,
+          const Color(0xFFD92D20),
+          () => open(() => const CareDebugScreen()),
+        ),
+      _Tool(
+        s.medTitle,
+        Icons.medication_rounded,
+        const Color(0xFF4F7A52),
+        () => open(() => MedicineTrackerScreen(controller: controller)),
+        priority: PregPriority.symptoms,
+      ),
+      _Tool(
+        s.rmdTitle,
+        Icons.notifications_active_rounded,
+        const Color(0xFFE0921C),
+        () => open(() => RemindersScreen(controller: controller)),
+      ),
       // Merged "Tests, Scans & Reports" (Section 16) replaces both the old
       // "Understanding Your Report" and "Scans & Care" tiles.
-      _Tool(s.tsrTitle, Icons.fact_check_rounded, AppTheme.primary500,
-          () => open(() => TestsScansReportsScreen(controller: controller)), priority: PregPriority.symptoms),
+      _Tool(
+        s.tsrTitle,
+        Icons.fact_check_rounded,
+        AppTheme.primary500,
+        () => open(() => TestsScansReportsScreen(controller: controller)),
+        priority: PregPriority.symptoms,
+      ),
       // _Tool(s.rTitle, Icons.description_rounded, AppTheme.primary500,
       //     () => open(() => ReportScreen(controller: controller))),
-      _Tool(s.toolCanI, Icons.help_outline_rounded, AppTheme.secondary600,
-          () => open(() => CanIScreen(controller: controller))),
-      _Tool(s.symToolTitle, Icons.healing_rounded, const Color(0xFF4A7BC8),
-          () => open(() => SymptomCompanionScreen(controller: controller)), priority: PregPriority.symptoms),
+      _Tool(
+        s.toolCanI,
+        Icons.help_outline_rounded,
+        AppTheme.secondary600,
+        () => open(() => CanIScreen(controller: controller)),
+      ),
+      _Tool(
+        s.symToolTitle,
+        Icons.healing_rounded,
+        const Color(0xFF4A7BC8),
+        () => open(() => SymptomCompanionScreen(controller: controller)),
+        priority: PregPriority.symptoms,
+      ),
       // Merged into "Tests, Scans & Reports" above. Kept commented for revert.
       // _Tool(s.scnToolTitle, Icons.event_note_rounded, const Color(0xFF2E9C8E),
       //     () => open(() => ScansAppointmentsScreen(controller: controller))),
-      _Tool(s.ddcToolTitle, Icons.calendar_month_rounded, AppTheme.primary500,
-          () => open(() => DueDateCalculatorScreen(controller: controller)),
-          staleDueDate: controller.dueDateMayBeStale),
-      _Tool(s.vedaToolTitle, Icons.auto_awesome_rounded, AppTheme.primary600,
-          () => open(() => AskVedaScreen(controller: controller))),
+      _Tool(
+        s.ddcToolTitle,
+        Icons.calendar_month_rounded,
+        AppTheme.primary500,
+        () => open(() => DueDateCalculatorScreen(controller: controller)),
+        staleDueDate: controller.dueDateMayBeStale,
+      ),
+      _Tool(
+        s.vedaToolTitle,
+        Icons.auto_awesome_rounded,
+        AppTheme.primary600,
+        () => open(() => AskVedaScreen(controller: controller)),
+      ),
       // Father's "Stories, Fables & Mythology" removed (the feature was retired
       // from the father product). Kept commented for revert.
       // _Tool('Stories, Fables & Mythology', Icons.history_edu_rounded,
       //     const Color(0xFFE0915B), () => open(() => const FatherStoriesScreen())),
       // Father's simple journal (memory / note / photo / voice) - separate store.
-      _Tool("Father's Journal", Icons.menu_book_rounded, const Color(0xFF2E5266),
-          () => open(() => FatherJournalScreen(controller: controller))),
+      _Tool(
+        "Father's Journal",
+        Icons.menu_book_rounded,
+        const Color(0xFF2E5266),
+        () => open(() => FatherJournalScreen(controller: controller)),
+      ),
     ];
 
     return Container(
@@ -199,15 +343,19 @@ class ToolsHubScreen extends StatelessWidget {
           // in none.
           padding: const EdgeInsets.fromLTRB(18, 14, 18, kAskFabReserve),
           children: [
-            Text(s.toolsTitle,
-                style: pvJakarta(
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
-                    color: AppTheme.primary900)),
+            Text(
+              s.toolsTitle,
+              style: pvJakarta(
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                color: AppTheme.primary900,
+              ),
+            ),
             const SizedBox(height: 4),
-            Text(s.toolsIntro,
-                style: pvManrope(
-                    fontSize: 13, color: AppTheme.neutral600)),
+            Text(
+              s.toolsIntro,
+              style: pvManrope(fontSize: 13, color: AppTheme.neutral600),
+            ),
             const SizedBox(height: 18),
             _journeyHero(context, s),
             // Progressive profiling, asked exactly where the answer pays off:
@@ -215,24 +363,29 @@ class ToolsHubScreen extends StatelessWidget {
             // benefit is visible in the same breath as the question.
             pregPrioritiesStrip(controller.language, 'tools_hub'),
             const SizedBox(height: 16),
-            LayoutBuilder(builder: (context, c) {
-              const gap = 12.0;
-              final w = (c.maxWidth - gap) / 2;
-              return Wrap(
-                spacing: gap,
-                runSpacing: gap,
-                children: [
-                  // LEVEL 3 personalization. A stable sort that returns EVERY
-                  // tile: tools serving a priority she chose come first, the
-                  // rest keep their original order behind them. Nothing is
-                  // hidden, renamed, or moved to another screen - she still
-                  // learns one Tools tab with the same 22 things in it.
-                  for (final t in FamilyProfileStore.instance
-                      .orderByPregPriority(tools, (t) => t.priority))
-                    SizedBox(width: w, child: _tile(s, t)),
-                ],
-              );
-            }),
+            LayoutBuilder(
+              builder: (context, c) {
+                const gap = 12.0;
+                final w = (c.maxWidth - gap) / 2;
+                return Wrap(
+                  spacing: gap,
+                  runSpacing: gap,
+                  children: [
+                    // LEVEL 3 personalization. A stable sort that returns EVERY
+                    // tile: tools serving a priority she chose come first, the
+                    // rest keep their original order behind them. Nothing is
+                    // hidden, renamed, or moved to another screen - she still
+                    // learns one Tools tab with the same 22 things in it.
+                    for (final t
+                        in FamilyProfileStore.instance.orderByPregPriority(
+                          tools,
+                          (t) => t.priority,
+                        ))
+                      SizedBox(width: w, child: _tile(s, t)),
+                  ],
+                );
+              },
+            ),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(15),
@@ -240,18 +393,26 @@ class ToolsHubScreen extends StatelessWidget {
                 color: AppTheme.surfaceContainerHigh,
                 borderRadius: BorderRadius.circular(18),
               ),
-              child: Row(children: [
-                const Icon(Icons.verified_user_rounded,
-                    size: 20, color: AppTheme.primary500),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(s.toolsSupportNote,
+              child: Row(
+                children: [
+                  const Icon(
+                    Icons.verified_user_rounded,
+                    size: 20,
+                    color: AppTheme.primary500,
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      s.toolsSupportNote,
                       style: pvManrope(
-                          fontSize: 12,
-                          height: 1.4,
-                          color: AppTheme.primary700)),
-                ),
-              ]),
+                        fontSize: 12,
+                        height: 1.4,
+                        color: AppTheme.primary700,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
@@ -260,130 +421,156 @@ class ToolsHubScreen extends StatelessWidget {
   }
 
   Widget _journeyHero(BuildContext context, S s) => GestureDetector(
-        onTap: () => Navigator.of(context).push(MaterialPageRoute(
-            builder: (_) => JourneyMapScreen(controller: controller))),
-        child: Container(
-          padding: const EdgeInsets.all(20),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [AppTheme.primary500, AppTheme.primary700],
-            ),
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: const [
-              BoxShadow(
-                  color: Color(0x292D144C),
-                  blurRadius: 22,
-                  offset: Offset(0, 8)),
-            ],
-          ),
-          child: Row(children: [
-            Container(
-              width: 54,
-              height: 54,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.18),
-                  borderRadius: BorderRadius.circular(18)),
-              child: const Icon(Icons.map_rounded, color: Colors.white, size: 28),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(s.toolJourneyTitle,
-                      style: pvJakarta(
-                          fontSize: 17,
-                          fontWeight: FontWeight.w800,
-                          color: Colors.white)),
-                  const SizedBox(height: 3),
-                  Text(s.toolJourneySubtitle,
-                      style: pvManrope(
-                          fontSize: 12.5,
-                          color: Colors.white.withValues(alpha: 0.9))),
-                ],
-              ),
-            ),
-            const Icon(Icons.arrow_forward_rounded, color: Colors.white),
-          ]),
+    onTap: () => Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => JourneyMapScreen(controller: controller),
+      ),
+    ),
+    child: Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppTheme.primary500, AppTheme.primary700],
         ),
-      );
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x292D144C),
+            blurRadius: 22,
+            offset: Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 54,
+            height: 54,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.18),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: const Icon(Icons.map_rounded, color: Colors.white, size: 28),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  s.toolJourneyTitle,
+                  style: pvJakarta(
+                    fontSize: 17,
+                    fontWeight: FontWeight.w800,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  s.toolJourneySubtitle,
+                  style: pvManrope(
+                    fontSize: 12.5,
+                    color: Colors.white.withValues(alpha: 0.9),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Icon(Icons.arrow_forward_rounded, color: Colors.white),
+        ],
+      ),
+    ),
+  );
 
   Widget _tile(S s, _Tool t) => GestureDetector(
-        onTap: t.onTap,
-        child: Container(
-          padding: const EdgeInsets.all(16),
-          decoration: BoxDecoration(
-            color: AppTheme.surface,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: _soft,
+    onTap: t.onTap,
+    child: Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppTheme.surface,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: _soft,
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 46,
+            height: 46,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: t.color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(t.icon, color: t.color, size: 24),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Container(
-                width: 46,
-                height: 46,
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                    color: t.color.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(14)),
-                child: Icon(t.icon, color: t.color, size: 24),
+          const SizedBox(height: 12),
+          Text(
+            t.title,
+            style: pvJakarta(
+              fontSize: 14,
+              fontWeight: FontWeight.w700,
+              color: AppTheme.primary900,
+            ),
+          ),
+          // A quiet line, only when there is something true to say.
+          //
+          // This is the surfacing half of §9.1b. `DueDateSource` has
+          // recorded who owns her date since 2026-07-27 and nothing ever
+          // read it, so a woman who counted from her last period in week six
+          // and had a dating scan in week twelve kept the weaker number for
+          // the rest of her pregnancy — every week card, every appointment,
+          // every countdown derived from it.
+          //
+          // It goes HERE rather than on the home, deliberately. Nothing is
+          // wrong today: the app holds one date and derives everything from
+          // it consistently, so this is a correction OPPORTUNITY, not an
+          // error. A banner on the home for something that is not yet wrong
+          // is precisely the noise a calm product cannot afford — and this
+          // is the tile she opens when she wants to change the date, which
+          // is the moment the sentence is useful.
+          if (t.staleDueDate) ...[
+            const SizedBox(height: 6),
+            Text(
+              s.ddcMayBeStale,
+              style: pvManrope(
+                fontSize: 10.5,
+                height: 1.4,
+                fontWeight: FontWeight.w600,
+                color: AppTheme.primary700,
               ),
-              const SizedBox(height: 12),
-              Text(t.title,
-                  style: pvJakarta(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                      color: AppTheme.primary900)),
-              // A quiet line, only when there is something true to say.
-              //
-              // This is the surfacing half of §9.1b. `DueDateSource` has
-              // recorded who owns her date since 2026-07-27 and nothing ever
-              // read it, so a woman who counted from her last period in week six
-              // and had a dating scan in week twelve kept the weaker number for
-              // the rest of her pregnancy — every week card, every appointment,
-              // every countdown derived from it.
-              //
-              // It goes HERE rather than on the home, deliberately. Nothing is
-              // wrong today: the app holds one date and derives everything from
-              // it consistently, so this is a correction OPPORTUNITY, not an
-              // error. A banner on the home for something that is not yet wrong
-              // is precisely the noise a calm product cannot afford — and this
-              // is the tile she opens when she wants to change the date, which
-              // is the moment the sentence is useful.
-              if (t.staleDueDate) ...[
-                const SizedBox(height: 6),
-                Text(s.ddcMayBeStale,
-                    style: pvManrope(
-                        fontSize: 10.5,
-                        height: 1.4,
-                        fontWeight: FontWeight.w600,
-                        color: AppTheme.primary700)),
-              ],
-              // "Open →" REMOVED from every tile.
-              //
-              // The whole card is the tap target, so the label told her nothing
-              // she could not already see — and repeated ~24 times down a
-              // two-column grid it became the loudest repeating element on the
-              // screen, in a different accent colour each time. A card that
-              // needs to say "Open" is a card that does not look tappable; the
-              // fix for that is the card, not a caption. See
-              // docs/DESIGN-LAYER.md §6a.
-              //
-              // s.openLabel is left in the string table: tools_screen.dart
-              // still uses it, and it is a legitimate label elsewhere.
-            ],
-          ),
-        ),
-      );
+            ),
+          ],
+          // "Open →" REMOVED from every tile.
+          //
+          // The whole card is the tap target, so the label told her nothing
+          // she could not already see — and repeated ~24 times down a
+          // two-column grid it became the loudest repeating element on the
+          // screen, in a different accent colour each time. A card that
+          // needs to say "Open" is a card that does not look tappable; the
+          // fix for that is the card, not a caption. See
+          // docs/DESIGN-LAYER.md §6a.
+          //
+          // s.openLabel is left in the string table: tools_screen.dart
+          // still uses it, and it is a legitimate label elsewhere.
+        ],
+      ),
+    ),
+  );
 }
 
 class _Tool {
-  const _Tool(this.title, this.icon, this.color, this.onTap,
-      {this.priority, this.staleDueDate = false});
+  const _Tool(
+    this.title,
+    this.icon,
+    this.color,
+    this.onTap, {
+    this.priority,
+    this.staleDueDate = false,
+  });
   final String title;
   final IconData icon;
   final Color color;

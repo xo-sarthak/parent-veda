@@ -26,6 +26,7 @@ import '../../booking/booking_models.dart';
 import '../../booking/booking_store.dart';
 import '../../data/learn/pv_learn_view.dart';
 import '../../experts/expert.dart';
+import '../../models/pv_product.dart' show PvStageCopy;
 import '../../services/life_stage_store.dart';
 import '../../services/pv_learn_progress_store.dart';
 import '../../theme/pv_fonts.dart';
@@ -33,6 +34,7 @@ import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_store.dart';
 import '../post_pregnancy/pp_expert_link.dart' show openExpertProfile;
 import '../profile/pv_you_screen.dart' show openPvYou;
+import 'pv_learn_art.dart';
 import 'pv_learn_catalog.dart';
 import 'pv_learn_chrome.dart';
 import 'pv_lesson_screen.dart';
@@ -56,8 +58,26 @@ void openPvLearn(
   );
 }
 
+/// The word a person would filter a clinician by — "Obstetrician",
+/// "Paediatrician" — taken from the credential's first part. Public so a
+/// door can ask for the role of the specialist it names rather than
+/// hard-coding the word and watching it drift out of the roster.
+String pvLearnRoleOf(PvOfferingView v) {
+  final r = v.expert.role.split('·').first.trim();
+  if (r.isEmpty) return 'Other';
+  return r[0].toUpperCase() + r.substring(1);
+}
+
 class PvLearnScreen extends StatefulWidget {
-  const PvLearnScreen({super.key, this.stage, this.kind, this.topic});
+  const PvLearnScreen({
+    super.key,
+    this.stage,
+    this.kind,
+    this.topic,
+    this.role,
+    this.title,
+    this.lead,
+  });
 
   /// Null = her current stage.
   final LifeStage? stage;
@@ -66,6 +86,17 @@ class PvLearnScreen extends StatefulWidget {
   final PvLearnKind? kind;
   final String? topic;
 
+  /// A consult list opened from a door names the kind of clinician it
+  /// promised — "a gynaecologist" — so that role starts selected and the
+  /// others stay one tap away. A door that says a word must keep it.
+  final String? role;
+
+  /// What the door called this, and why she is here. Without them the
+  /// screen says "Learn" to someone who tapped "have a doctor go through
+  /// it with you", which is not what she asked for.
+  final String? title;
+  final String? lead;
+
   @override
   State<PvLearnScreen> createState() => _PvLearnScreenState();
 }
@@ -73,6 +104,7 @@ class PvLearnScreen extends StatefulWidget {
 class _PvLearnScreenState extends State<PvLearnScreen> {
   late PvLearnKind? _kind = widget.kind;
   late String? _topic = widget.topic;
+  late String? _role = widget.role;
 
   LifeStage get _stage =>
       widget.stage ?? LifeStageStore.instance.stage ?? LifeStage.pregnancy;
@@ -101,7 +133,6 @@ class _PvLearnScreenState extends State<PvLearnScreen> {
           for (final k in PvLearnKind.values)
             if (all.any((v) => v.kind == k)) k,
         ];
-        final topics = _topics(all);
         var shown = all;
         if (_kind != null) shown = shown.where((v) => v.kind == _kind).toList();
         if (_topic != null) {
@@ -113,14 +144,34 @@ class _PvLearnScreenState extends State<PvLearnScreen> {
               )
               .toList();
         }
+        if (_role != null) {
+          shown = shown
+              .where(
+                (v) => pvLearnRoleOf(v).toLowerCase() == _role!.toLowerCase(),
+              )
+              .toList();
+        }
         final listMode = _kind != null || _topic != null;
+        // ⚠️ ONE FILTER ROW, NOT FOUR — 2026-09-22, the user's walk: "all the
+        // filters listed so carelessly with no format whatsoever". The screen
+        // drew the kind chips AND a `Wrap` of every topic, which on pregnancy
+        // ran to four lines, held "breathing" and "Breathing" as two chips,
+        // and pushed the first doctor below the fold. Mobbin, same day: Alan's
+        // Medical team, Zocdoc, CVS Find care and Future Pro all show ONE row
+        // — or one Filters button — then a count, then rows worth choosing
+        // from. So: one scrollable row of the dimension that matters here.
+        // On the home that is the kind; inside a kind it is what divides that
+        // kind — the clinician's role for consults, the topic otherwise.
+        final subFilters = listMode
+            ? _subFilters(shown, all)
+            : const <String>[];
         return Scaffold(
           backgroundColor: p.ground,
           body: CustomScrollView(
             slivers: [
               SliverToBoxAdapter(
                 child: PvLearnTopBar(
-                  title: 'Learn',
+                  title: widget.title ?? 'Learn',
                   eyebrow: _stageWord(_stage),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
@@ -145,59 +196,73 @@ class _PvLearnScreenState extends State<PvLearnScreen> {
                   ),
                 ),
               ),
+              // ---- what she came for -----------------------------------------------------------
+              if (widget.lead != null)
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 2, 20, 0),
+                    child: Text(
+                      widget.lead!,
+                      style: pvManrope(
+                        fontSize: 14.5,
+                        height: 1.5,
+                        color: p.ink2,
+                      ),
+                    ),
+                  ),
+                ),
               // ---- 1 · hers first ---------------------------------------------------------------
               if (!listMode) SliverToBoxAdapter(child: _yours(p, all)),
-              // ---- 2 · kind filter --------------------------------------------------------------
+              // ---- 2 · the one filter row -------------------------------------------------------
               SliverToBoxAdapter(
                 child: Padding(
-                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        PvChip(
-                          label: 'All',
-                          selected: _kind == null,
-                          onTap: () => setState(() => _kind = null),
-                        ),
-                        for (final k in kindsHere) ...[
-                          const SizedBox(width: 8),
-                          PvChip(
-                            label: k.plural,
-                            selected: _kind == k,
-                            onTap: () =>
-                                setState(() => _kind = _kind == k ? null : k),
-                          ),
-                        ],
-                      ],
+                  padding: const EdgeInsets.fromLTRB(0, 16, 0, 0),
+                  child: SizedBox(
+                    height: 38,
+                    child: ListView(
+                      scrollDirection: Axis.horizontal,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      children: listMode
+                          ? [
+                              PvChip(
+                                label:
+                                    'All ${(_kind?.plural ?? 'of these').toLowerCase()}',
+                                selected: _role == null && _topic == null,
+                                onTap: () => setState(() {
+                                  _role = null;
+                                  _topic = null;
+                                }),
+                              ),
+                              for (final f in subFilters) ...[
+                                const SizedBox(width: 8),
+                                PvChip(
+                                  label: f,
+                                  selected: _isSub(f),
+                                  onTap: () => setState(() => _toggleSub(f)),
+                                ),
+                              ],
+                            ]
+                          : [
+                              PvChip(
+                                label: 'All',
+                                selected: _kind == null,
+                                onTap: () => setState(() => _kind = null),
+                              ),
+                              for (final k in kindsHere) ...[
+                                const SizedBox(width: 8),
+                                PvChip(
+                                  label: k.plural,
+                                  selected: _kind == k,
+                                  onTap: () => setState(
+                                    () => _kind = _kind == k ? null : k,
+                                  ),
+                                ),
+                              ],
+                            ],
                     ),
                   ),
                 ),
               ),
-              // ---- 3 · topics -------------------------------------------------------------------
-              if (topics.isNotEmpty)
-                SliverToBoxAdapter(
-                  child: Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 10, 20, 0),
-                    child: Wrap(
-                      spacing: 8,
-                      runSpacing: 8,
-                      children: [
-                        for (final t in topics)
-                          PvChip(
-                            label: t,
-                            selected: _topic?.toLowerCase() == t.toLowerCase(),
-                            onTap: () => setState(
-                              () => _topic =
-                                  _topic?.toLowerCase() == t.toLowerCase()
-                                  ? null
-                                  : t,
-                            ),
-                          ),
-                      ],
-                    ),
-                  ),
-                ),
               // ---- the body: rails, or one list ----------------------------------------------------
               if (listMode) ..._list(p, shown) else ..._rails(p, all),
               const SliverToBoxAdapter(child: SizedBox(height: 40)),
@@ -227,9 +292,25 @@ class _PvLearnScreenState extends State<PvLearnScreen> {
         break;
       }
     }
+    // ⚠️ TWO LEAKS IN ONE CARD, found on the walk (2026-09-22): the
+    // pregnancy home offered "Preconception garbh sanskar · 8 classes left
+    // · Book".
+    //
+    //  · WRONG STAGE. `entitlements()` with no stage returns the whole
+    //    history — that is right for My learning, which is deliberately one
+    //    list across the journey, and wrong here, where the strip is about
+    //    what she can do on the stage she is standing in.
+    //  · WRONG KIND. The free course's engine row grants one credit per
+    //    session, so buying it at ₹0 minted eight "classes" to book — but a
+    //    recorded course has no slot to spend them on. A credit is only a
+    //    credit when there is a time to spend it at.
     final credits = store
-        .entitlements()
+        .entitlements(stage: _serviceStage(_stage))
         .where((e) => e.canBook && e.creditsTotal > 1)
+        .where((e) {
+          final v = PvLearnCatalog.instance.byOfferingId(e.offeringId);
+          return v != null && v.isLive && !v.isFree;
+        })
         .toList();
     final cards = <Widget>[
       if (next != null)
@@ -290,7 +371,7 @@ class _PvLearnScreenState extends State<PvLearnScreen> {
           ),
           child: Row(
             children: [
-              Icon(Icons.school_outlined, size: 20, color: p.ink1),
+              PvLearnRing(mark: PvLearnMark.learn, p: p),
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
@@ -573,52 +654,235 @@ class _PvLearnScreenState extends State<PvLearnScreen> {
     );
   }
 
-  List<Widget> _list(dynamic p, List<PvOfferingView> shown) => [
-    SliverToBoxAdapter(
-      child: PvLearnHead(
-        _kind?.plural ?? _topic ?? 'Everything',
-        lead: shown.isEmpty
-            ? 'Nothing here yet for this stage. It is coming; the other kinds are below.'
-            : '${shown.length} on this stage',
+  List<Widget> _list(dynamic p, List<PvOfferingView> shown) {
+    final consults = _kind == PvLearnKind.consult;
+    final others = !consults || _role == null
+        ? const <PvOfferingView>[]
+        : PvLearnCatalog.instance
+              .all(stage: _stage, kind: PvLearnKind.consult)
+              .where((v) => !shown.contains(v))
+              .toList();
+    return [
+      SliverToBoxAdapter(
+        child: PvLearnHead(
+          widget.title != null && consults
+              ? 'Who can help'
+              : (_kind?.plural ?? _topic ?? 'Everything'),
+          // Zocdoc's "265 In-network providers": say what she is looking at
+          // before she looks at it.
+          lead: shown.isEmpty
+              ? 'Nothing here yet for this stage. Tap ${(_kind?.plural ?? 'All').toLowerCase()} above to widen it.'
+              : consults
+              ? '${shown.length} ${shown.length == 1 ? 'person' : 'people'} · 30-minute video, in the app'
+              : '${shown.length} on this stage',
+        ),
       ),
-    ),
-    SliverToBoxAdapter(
-      child: Column(
-        children: [
-          for (final v in shown)
-            PvLearnRow(
-              view: v,
-              tag: v.kind.label,
-              live: v.isLive && v.kind != PvLearnKind.consult,
-              title: v.title,
-              sub:
-                  '${v.expert.name} · ${v.facts.isNotEmpty ? v.facts.first.value : v.durationLabel} · ${v.priceLabel}',
-              onTap: () => _open(v),
+      SliverToBoxAdapter(
+        child: Column(
+          children: [
+            for (final v in shown)
+              if (consults)
+                // A person: her initials, her name, what she is, her fee.
+                // Never "Consult with X" over "X · 30 min" — the walk found
+                // the name said twice on every row.
+                PvLearnRow(
+                  initials: pvLearnInitials(v.expert.name),
+                  title: v.expert.name,
+                  sub: _roleLine(v),
+                  foot: _footLine(v),
+                  price: v.priceLabel,
+                  onTap: () => _open(v),
+                )
+              else
+                PvLearnRow(
+                  view: v,
+                  // The kind tag is noise on a list that is all one kind.
+                  tag: _kind == null ? v.kind.label : null,
+                  live: v.isLive && v.kind != PvLearnKind.consult,
+                  title: v.title,
+                  sub:
+                      '${v.expert.name} · ${v.facts.isNotEmpty ? v.facts.first.value : v.durationLabel}',
+                  price: v.priceLabel,
+                  onTap: () => _open(v),
+                ),
+          ],
+        ),
+      ),
+      // ⚠️ NEVER ONE ROW OVER AN EMPTY PAGE. A door that names a role can
+      // leave two names on a screen built for twenty (the walk: one
+      // obstetrician above 1,400 px of white). The rest of the stage's
+      // clinicians follow under their own head — Zocdoc's "similar
+      // providers" — so the filter narrows without emptying, and she can
+      // see who else there is without undoing her own choice.
+      if (consults && _role != null && others.isNotEmpty) ...[
+        SliverToBoxAdapter(
+          child: PvLearnHead(
+            'Others who can help',
+            lead:
+                'Not ${_article(_role!)} ${_role!.toLowerCase()}, but on your stage.',
+          ),
+        ),
+        SliverToBoxAdapter(
+          child: Column(
+            children: [
+              for (final v in others)
+                PvLearnRow(
+                  initials: pvLearnInitials(v.expert.name),
+                  title: v.expert.name,
+                  sub: _roleLine(v),
+                  foot: _footLine(v),
+                  price: v.priceLabel,
+                  onTap: () => _open(v),
+                ),
+            ],
+          ),
+        ),
+      ],
+      // ⚠️ THE LINE A CONSULT LIST OWES HER. Alan pins "Is it an emergency?
+      // Call 15" under its consultation list; ours says the same in our own
+      // words, and never sells against it.
+      if (consults)
+        SliverToBoxAdapter(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                PvLearnRing(mark: PvLearnMark.note, p: p, size: 34),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'This is a conversation, not an emergency service. If '
+                    'something feels wrong now, call your own doctor or go in.',
+                    style: pvManrope(
+                      fontSize: 12.5,
+                      height: 1.5,
+                      color: p.ink3,
+                    ),
+                  ),
+                ),
+              ],
             ),
-        ],
-      ),
-    ),
-  ];
+          ),
+        ),
+    ];
+  }
 
-  // ---- small ----------------------------------------------------------------------------
+  static String _article(String w) =>
+      'aeiou'.contains(w.trim().isEmpty ? 'x' : w.trim()[0].toLowerCase())
+      ? 'an'
+      : 'a';
 
-  static List<String> _topics(List<PvOfferingView> all) {
-    final count = <String, int>{};
-    for (final v in all) {
-      for (final t in v.topics) {
-        final k = t.trim();
-        if (k.isEmpty || k.length > 22) continue;
-        count[k] = (count[k] ?? 0) + 1;
+  /// ⚠️ THE FACT THAT DECIDES IT — Zocdoc's "Next available: Mon, Jun 8",
+  /// the one element on their row a person actually reads. Ours is the
+  /// engine's own next free slot, so it is true rather than decorative; in
+  /// ink rather than Zocdoc's yellow bar (colour as container was declined
+  /// on the scans pass). No slot published yet, no line — never a guess.
+  static String? _nextLine(PvOfferingView v) {
+    final o = v.offering;
+    if (o == null) return null;
+    final slots = BookingCatalog.instance.slotsFor(o.id);
+    if (slots.isEmpty) return null;
+    return 'Next ${pvLearnDay(slots.first.startsUtc).toLowerCase()}, ${pvLearnTime(slots.first.startsUtc)}';
+  }
+
+  /// ⚠️ WHAT FITS, NOT WHAT FILLS — the user, 2026-09-22: shrink the type
+  /// only when the words cannot be shortened first. The row carried role ·
+  /// years · languages and ran off the edge as "…· All tri…", which tells
+  /// her less than the two facts that fit. So: the role, then the years
+  /// behind it. Rating and the next free time have their own line below.
+  static String _roleLine(PvOfferingView v) {
+    final role = v.expert.role.trim();
+    if (role.isEmpty) return v.subtitle;
+    // The credential after the role is on the person's own page; on a row
+    // of eight people the role and the experience are what separate them.
+    final head = role.split('·').first.trim();
+    final years = v.facts
+        .where((f) => f.label == 'experience' || f.label == 'qualified')
+        .map((f) => f.value)
+        .where((x) => x.length <= 18);
+    return [head, ...years.take(1)].join(' · ');
+  }
+
+  /// Rating and the next free time, in one quiet line. Either may be
+  /// missing; both missing means no line at all.
+  static String? _footLine(PvOfferingView v) {
+    final bits = <String>[
+      if (v.rating != null) '★ ${v.rating!.toStringAsFixed(1)}',
+      ?_nextLine(v),
+    ];
+    return bits.isEmpty ? null : bits.join('  ·  ');
+  }
+
+  bool _isSub(String f) => _kind == PvLearnKind.consult
+      ? _role?.toLowerCase() == f.toLowerCase()
+      : _topic?.toLowerCase() == f.toLowerCase();
+
+  void _toggleSub(String f) {
+    if (_kind == PvLearnKind.consult) {
+      _role = _isSub(f) ? null : f;
+    } else {
+      _topic = _isSub(f) ? null : f;
+    }
+  }
+
+  /// What divides the kind she is looking at: a clinician's role for
+  /// consults, the topic otherwise. Deduped case-insensitively — the walk
+  /// found "breathing" and "Breathing" as two chips — Title Case, and
+  /// ordered by how many things carry it.
+  List<String> _subFilters(
+    List<PvOfferingView> shown,
+    List<PvOfferingView> all,
+  ) {
+    final pool = _kind == null
+        ? all
+        : all.where((v) => v.kind == _kind).toList();
+    final count = <String, String>{};
+    final n = <String, int>{};
+    void add(String raw) {
+      final t = raw.trim();
+      if (t.isEmpty || t.length > 22) return;
+      final key = t.toLowerCase();
+      count[key] ??= t[0].toUpperCase() + t.substring(1);
+      n[key] = (n[key] ?? 0) + 1;
+    }
+
+    for (final v in pool) {
+      if (_kind == PvLearnKind.consult) {
+        add(pvLearnRoleOf(v));
+      } else {
+        for (final t in v.topics) {
+          add(t);
+        }
       }
     }
-    final keys = count.keys.toList()
-      ..sort((a, b) => count[b]!.compareTo(count[a]!));
-    return keys.take(8).toList();
+    // One chip for one thing is not a filter, it is a label.
+    final keys = n.keys.where((k) => n[k]! > 0).toList()
+      ..sort((a, b) => n[b]!.compareTo(n[a]!));
+    if (keys.length < 2) return const [];
+    var out = [for (final k in keys.take(8)) count[k]!];
+    // ⚠️ THE SELECTED ONE COMES FIRST. A door that arrives with a role
+    // already chosen put it third on the walk (2026-09-22), off the edge of
+    // a 390-px phone: the list was filtered and the filter was invisible.
+    final sel = _kind == PvLearnKind.consult ? _role : _topic;
+    if (sel != null) {
+      final i = out.indexWhere((x) => x.toLowerCase() == sel.toLowerCase());
+      if (i > 0) out = [out[i], ...out..removeAt(i)];
+    }
+    return out;
   }
+
+  // ---- small ----------------------------------------------------------------------------
 
   /// The eyebrow says where she is. On trying, that is her chapter — the
   /// stage's own rule ("PREPARE alone said nothing she did not already
   /// know", test/ttc_polish_test.dart); elsewhere the stage word.
+  static ServiceStage _serviceStage(LifeStage s) => switch (s.shopStage) {
+    LifeStage.tryingToConceive => ServiceStage.tryingToConceive,
+    LifeStage.parenting => ServiceStage.parenting,
+    _ => ServiceStage.pregnancy,
+  };
+
   static String _stageWord(LifeStage s) => switch (s) {
     LifeStage.tryingToConceive => TtcStore.instance.today.chapter.title(false),
     LifeStage.pregnancy => 'Pregnancy',

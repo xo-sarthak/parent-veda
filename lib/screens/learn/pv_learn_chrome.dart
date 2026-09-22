@@ -19,10 +19,14 @@
 
 import 'package:flutter/material.dart';
 
+import '../../booking/booking_catalog.dart';
+import '../../data/learn/pv_learn_images.dart';
 import '../../data/learn/pv_learn_view.dart';
+import '../brackets/hub/hub_intent_art.dart';
+import 'pv_learn_art.dart';
 import '../../theme/pv_fonts.dart';
 import '../products/pv_store_chrome.dart'
-    show kPvLine, kPvStar, pvStorePalette, PvCoverBlock, PvRoundIcon, PvCommit;
+    show kPvLine, kPvStar, pvStorePalette, PvRoundIcon, PvCommit;
 import '../v2/v2_palette.dart';
 
 export '../products/pv_store_chrome.dart'
@@ -42,7 +46,17 @@ export '../products/pv_store_chrome.dart'
 const String kPvLearnRoute = 'learn';
 const String kPvOfferingRoutePrefix = 'learn/offering/';
 
-/// A cover photo with the honest block behind it.
+/// The cover. A drawn mark on its own field — or a photograph, the day we
+/// own one.
+///
+/// ⚠️ DRAWN, NOT PHOTOGRAPHED — 2026-09-22. `pvLearnCoverFor` now returns
+/// null for everything, so in practice every cover on this screen is the
+/// mark. `pv_learn_images.dart` carries the whole argument: the stock photos
+/// repeated four to a scroll and were about the wrong subject, and Commons —
+/// which dresses the store and the recipes properly — has no editorial
+/// photography of prenatal classes to replace them with. The photo branch is
+/// kept live rather than deleted because it costs one null check and it is
+/// the entire integration when a real shoot lands.
 class PvLearnCover extends StatelessWidget {
   const PvLearnCover({
     super.key,
@@ -56,9 +70,9 @@ class PvLearnCover extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final well = PvCoverBlock(hue: view.hue, name: view.title, radius: radius);
+    final drawn = PvLearnDrawnCover(view: view, radius: radius);
     final url = view.cover;
-    if (url == null) return well;
+    if (url == null) return drawn;
     final tint = HSLColor.fromAHSL(1, view.hue, 0.18, 0.95).toColor();
     return ClipRRect(
       borderRadius: BorderRadius.circular(radius),
@@ -75,7 +89,84 @@ class PvLearnCover extends StatelessWidget {
                 : SizedBox.expand(key: const ValueKey('img'), child: child),
           );
         },
-        errorBuilder: (_, e, s) => well,
+        errorBuilder: (_, e, s) => drawn,
+      ),
+    );
+  }
+}
+
+/// The field a learn mark sits on.
+///
+/// Composition, and the reason for each part: a flat pastel reads as a
+/// missing image, so the ground is a soft diagonal in the programme's own
+/// hue — light at the top-left, a step darker at the bottom-right, the same
+/// two tones `PvCoverBlock` uses. A single centred glyph on that reads as an
+/// icon rather than a cover, so the mark is drawn TWICE: once very large and
+/// very faint, bled off the right edge, and once at reading size a little
+/// above centre. The faint one is what turns a glyph into a picture — it
+/// gives the card depth and an edge to run off, which is the whole trick a
+/// photograph was doing.
+///
+/// ⚠️ NO HALO, per DESIGN-SYSTEM §3.1 — the mark sits straight on the field,
+/// never on a white disc. The field is already light enough to carry it.
+class PvLearnDrawnCover extends StatelessWidget {
+  const PvLearnDrawnCover({super.key, required this.view, this.radius = 16});
+  final PvOfferingView view;
+  final double radius;
+
+  @override
+  Widget build(BuildContext context) {
+    final mark = pvLearnMarkFor(view.topics, view.kind);
+    final a = HSLColor.fromAHSL(1, view.hue, 0.34, 0.945).toColor();
+    final b = HSLColor.fromAHSL(1, view.hue, 0.30, 0.875).toColor();
+    final tint = HSLColor.fromAHSL(1, view.hue, 0.30, 0.90).toColor();
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(radius),
+      child: LayoutBuilder(
+        builder: (context, c) {
+          final side = c.maxWidth.isFinite && c.maxHeight.isFinite
+              ? (c.maxWidth < c.maxHeight ? c.maxWidth : c.maxHeight)
+              : 160.0;
+          return Container(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [a, b],
+              ),
+            ),
+            child: Stack(
+              clipBehavior: Clip.none,
+              children: [
+                // The ghost: big, faint, running off the right edge.
+                Positioned(
+                  // Further off the edge and fainter than the first cut: at
+                  // 0.16 and only a third out, the ghost read as a SECOND
+                  // object on the card rather than as texture behind the
+                  // first — on the 4:3 hero its rounded corner looked like a
+                  // stray panel of interface.
+                  right: -side * 0.46,
+                  bottom: -side * 0.34,
+                  width: side * 1.35,
+                  height: side * 1.35,
+                  child: Opacity(
+                    opacity: 0.10,
+                    child: HubIntentArt(mark: mark, tint: tint),
+                  ),
+                ),
+                // The mark, read at a glance.
+                Align(
+                  alignment: const Alignment(-0.06, -0.14),
+                  child: SizedBox(
+                    width: side * 0.40,
+                    height: side * 0.40,
+                    child: HubIntentArt(mark: mark, tint: tint),
+                  ),
+                ),
+              ],
+            ),
+          );
+        },
       ),
     );
   }
@@ -150,9 +241,25 @@ class PvLearnCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final p = pvStorePalette;
-    final fact = view.facts.isEmpty
+    // The card's one line.
+    //
+    // `pvLearnFacts` rather than `view.facts`, so a live card never
+    // advertises a date that has been and gone — and for anything live that
+    // date IS the line, because when it happens is the whole question.
+    //
+    // ⚠️ FOR EVERYTHING ELSE THE VALUE ALONE IS NOT A SENTENCE. The strip
+    // prints a value over its label and reads fine as two rows ("4" over
+    // "lessons"); a card has one line, so it needs the phrase. Hence the
+    // duration label first for anything recorded — "4 lessons", "3 weeks ·
+    // live" — and the fact only as the floor.
+    final facts = pvLearnFacts(view);
+    final fact = view.isLive && facts.isNotEmpty
+        ? facts.first.value
+        : view.durationLabel.isNotEmpty
         ? view.durationLabel
-        : view.facts.first.value;
+        : facts.isEmpty
+        ? ''
+        : facts.first.value;
     return SizedBox(
       width: width,
       child: InkWell(
@@ -280,6 +387,9 @@ class PvLearnRow extends StatelessWidget {
     this.trailing,
     this.tag,
     this.live = false,
+    this.initials,
+    this.price,
+    this.foot,
   });
   final String title;
   final String sub;
@@ -291,6 +401,21 @@ class PvLearnRow extends StatelessWidget {
   final String? tag;
   final bool live;
 
+  /// ⚠️ A PERSON WEARS INITIALS, NOT A STOCK PHOTO — 2026-09-22, the walk.
+  /// The consult list drew each doctor's row with a topic placeholder, so
+  /// the same yoga silhouette sat beside three different names and a
+  /// breathing coach wore a photo of baby toys. A picture that is not of
+  /// the person is worse than no picture: it reads as her, and it repeats.
+  /// Set this and the row draws a tinted disc with her initials instead.
+  final String? initials;
+
+  /// Right-aligned, before the chevron. The fee, on a row you choose from.
+  final String? price;
+
+  /// A third, quieter line — the rating and the next free time. Zocdoc's
+  /// "next available" is the one thing a person reads on a provider row.
+  final String? foot;
+
   @override
   Widget build(BuildContext context) {
     final p = pvStorePalette;
@@ -300,7 +425,25 @@ class PvLearnRow extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         child: Row(
           children: [
-            if (leadTop != null)
+            if (initials != null)
+              Container(
+                width: 46,
+                height: 46,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: p.surfaceAlt,
+                ),
+                child: Text(
+                  initials!,
+                  style: pvManrope(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: p.ink1,
+                  ),
+                ),
+              )
+            else if (leadTop != null)
               SizedBox(
                 width: 58,
                 child: Column(
@@ -360,10 +503,34 @@ class PvLearnRow extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: pvManrope(fontSize: 12.5, color: p.ink2),
                   ),
+                  if (foot != null) ...[
+                    const SizedBox(height: 3),
+                    Text(
+                      foot!,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvManrope(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                        color: p.ink1,
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),
             const SizedBox(width: 10),
+            if (price != null) ...[
+              Text(
+                price!,
+                style: pvManrope(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w800,
+                  color: p.ink1,
+                ),
+              ),
+              const SizedBox(width: 6),
+            ],
             trailing ??
                 Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
           ],
@@ -402,23 +569,40 @@ class PvFactStrip extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      shown[i].value,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: pvManrope(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w800,
-                        height: 1.2,
-                        color: p.ink1,
+                    // ⚠️ SHRINK BEFORE YOU BREAK — the user, 2026-09-22:
+                    // "reduce font size to fit text fully … only once you
+                    // can't optimise the text any other way". Four cells on
+                    // a 390-px phone give each value ~85 px, and "Recording"
+                    // wrapped as "Recordin / g". The values are short by
+                    // construction now; this is the floor — one line,
+                    // scaled down to fit, never broken mid-word.
+                    FittedBox(
+                      fit: BoxFit.scaleDown,
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        shown[i].value,
+                        maxLines: 1,
+                        style: pvManrope(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          height: 1.2,
+                          color: p.ink1,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 3),
                     Text(
                       shown[i].label,
-                      maxLines: 1,
+                      // Two lines. A label like "watch anytime" is a phrase,
+                      // and clipping it to "watch anyti…" loses the only
+                      // word that carried the meaning.
+                      maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: pvManrope(fontSize: 11, color: p.ink3),
+                      style: pvManrope(
+                        fontSize: 11,
+                        height: 1.25,
+                        color: p.ink3,
+                      ),
                     ),
                   ],
                 ),
@@ -443,7 +627,7 @@ class PvTrustRow extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(trust.icon, size: 20, color: p.ink1),
+          PvLearnRing(mark: trust.mark, p: p),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
@@ -747,6 +931,10 @@ class PvExpertCard extends StatelessWidget {
 }
 
 /// A parent's review, the store's card.
+/// ⚠️ KEPT FOR REVERT — nothing builds this as of 2026-09-22. The offering
+/// page's proof section is `PvReviewBlock` now (the rail of quote cards);
+/// this is the bordered box it replaced, and it stays because reverting the
+/// section is then one line rather than a rewrite.
 class PvLearnReviewCard extends StatelessWidget {
   const PvLearnReviewCard(this.review, {super.key});
   final PvLearnReview review;
@@ -1039,6 +1227,49 @@ class PvLearnTopBar extends StatelessWidget {
       ),
     );
   }
+}
+
+/// The four facts under a title — and, for anything live, the first two
+/// taken from the ENGINE rather than from the seed.
+///
+/// ⚠️ A DATE THAT HAS ALREADY HAPPENED IS NOT A FACT. Every live programme
+/// carries a `startLabel` written by hand when it was seeded. On 22
+/// September the Birth Confidence Masterclass card read "LIVE · Sun 13 Jul ·
+/// 8:00 pm" — ten weeks stale, and long enough that the cell truncated it
+/// mid-word as well. `BookingCatalog` knows when the next run actually is,
+/// and `ServerSlotStore` refreshes it, so the answer is to derive rather
+/// than store: the day, then the time, then whatever else the seed said.
+///
+/// ⚠️ DERIVED AT RENDER, NOT AT BUILD. This deliberately does not live in
+/// the adapter that builds `PvOfferingView`, even though that is where facts
+/// come from, because the catalogue is cached for the session while slots
+/// arrive from the server afterwards. A fact computed once at startup goes
+/// stale in exactly the way this function exists to prevent.
+/// A person's initials for a disc. One definition, because the consult rows,
+/// the expert chips, the review sheet and an offering's "with —" line must
+/// all shorten the same name the same way.
+String pvLearnInitials(String name) {
+  final parts = name
+      .replaceAll('Dr. ', '')
+      .replaceAll('Dr ', '')
+      .split(' ')
+      .where((w) => w.isNotEmpty)
+      .toList();
+  if (parts.isEmpty) return '?';
+  return parts.take(2).map((w) => w[0].toUpperCase()).join();
+}
+
+List<PvLearnFact> pvLearnFacts(PvOfferingView v) {
+  final o = v.offering;
+  if (o == null || !v.isLive || v.kind == PvLearnKind.consult) return v.facts;
+  final slots = BookingCatalog.instance.slotsFor(o.id);
+  if (slots.isEmpty) return v.facts;
+  final start = slots.first.startsUtc;
+  return [
+    PvLearnFact(pvLearnDay(start), 'next'),
+    PvLearnFact(pvLearnTime(start), 'starts'),
+    ...v.facts.where((f) => f.label != 'when' && f.label != 'starts').take(2),
+  ];
 }
 
 /// Dates in the app's one voice. UTC in, local out.

@@ -9162,3 +9162,154 @@ as two apps.
   wear the filled marks — that is the intended split (cards are the door's
   chrome; the check-in is hers), not a leftover.
 
+### 73.3 The door says each thing once — 2026-09-22, the user's second walk
+
+Four notes off the phone, all of them the same shape: **a surface with two
+homes**.
+
+- **"Is this normal?" said the ten twice.** The tab's tool drew the ten
+  questions; under it, "The five to call about" opened
+  `SymptomsNormalScreen` — the same ten rows. The user: *"you have listed a
+  lot of things under 'is this normal?', then under 'if it is one of these,
+  call — do not read' you have listed the same ones... we need to be a
+  little bit cautious about this section as it's sensitive."* Right on both
+  counts: on a safety tab, a list that appears twice teaches her to skim it.
+  Now the five have ONE home (the pinned flag on Talk), the ten are the
+  answers, and the section under them is what neither covers — **"What to
+  say when you call"** (`symptoms/calling`): the six things the person
+  answering the phone asks, in order. Stationery, not triage — the same six
+  whatever she is calling about, which is why it is safe to print.
+- **"Send my week" had three homes** (Today, Your week, Talk). Now one, on
+  Your week. Today's section is gone entirely: the check-in IS that tab.
+- **By symptom was thirty-three identical brown documents.** Every row wore
+  its format's mark (`pageMark`), because that is the engine's rule. A tile
+  may now carry its own mark — `pvDoorTileArt` in the ROUTER, so the door
+  engine still knows nothing about symptoms — and each row wears the
+  symptom's own drawn mark.
+- **The reads opened on a generic band.** The reader's default head is the
+  read hue plus a large white book, so all thirty-three opened the same.
+  `symptomReadHero` gives each one its mark, large, on its area's colour.
+  ⚠️ This is the ANSWER to "we need images", not a placeholder for one:
+  symptom photography is stock-fake or clinical, and a drawn mark is both
+  individual and honest.
+- **Your week lost its wall.** "The pattern" sat in a lavender rounded
+  rectangle — *"the whole purple background thing with a rectangle soft
+  edges is happening"*. It is now a caption under a hairline rule. The grid
+  itself: the DATE under each weekday letter (a week she can point at),
+  today as an ink disc (the day strip's own language), each day's dot on a
+  hairline track so a sparse week still reads as seven days, and a key for
+  the three dot sizes (a `Wrap`, not a `Row` — three words overflow 360dp).
+
+**Not done, and it needs the device:** none of this has been walked. The
+build was blocked at the time by another terminal's in-flight edit to
+`lib/screens/learn/pv_learn_screen.dart` (whole-program compile), so the
+visual check is owed.
+
+### 69.9 Prepare and Learn are two doors to one room
+
+`PrepareHubScreen` (Tools → Prepare) holds four tiles and three of them
+are now Learn's: *Courses & Cohorts* is a facade over `PvLearnScreen`,
+*Birthing Classes* is the offering `course_birthprep`, and the paid half
+of *Yoga* is the class packs. The fourth, *Nutrition*, has had its own
+door on the home since the nutrition pass. So Tools now shows **Learn**
+and **Prepare** side by side and they overlap almost entirely.
+
+Retiring Prepare's tile is one line — except that `YogaHomeScreen` (the
+recorded yoga library, not just the paid classes) is reachable in
+pregnancy ONLY from that hub, and the *Yoga & fitness* door opens the
+bracket rather than the library. So the order is: give the library a door
+of its own, then retire Prepare's tile and keep the hub for revert. Not
+done while the doors are another terminal's working tree.
+
+### 69.10 The learn covers are drawn, and what would make them photographs
+
+The Unsplash-by-topic map (§69.7's leftover) is gone. On the phone it put
+ONE photograph — a woman on a sofa with two toddlers and a tablet — on
+*The Complete Pregnancy Guide*, *Birth Confidence Masterclass*, *Birth
+Prep Essentials* and *Birth-Ready Bootcamp*, one under the other in a
+single scroll, and a second, of students at laptops, on both cohorts.
+Wrong subject AND structurally repeating: keying a picture to a topic
+WORD means every programme sharing a topic shares the picture, and the
+catalogue is built out of a handful of topics on purpose.
+
+Every cover is now an `IntentMark` on a field in the programme's hue
+(`pv_learn_images.dart`, `PvLearnDrawnCover`) — the same drawn family the
+doors and the hubs use, reused by meaning, which is that family's own
+rule.
+
+**The seam for real photographs is live and empty**: `kPvLearnCovers`,
+keyed by programme id, checked before anything else, and `PvLearnCover`
+falls back to the drawn cover if the URL 404s. Filling it needs a library
+to pick from, and on 2026-09-22 there was not one:
+
+| Source | Why not |
+|---|---|
+| Wikimedia Commons | Licence fine, pictures wrong. These subjects return ethnographic archive photographs, a 1907 oil painting and an Egyptian ostracon. It is an encyclopaedia's library — which is exactly why it dresses the store's OBJECTS and the recipe dishes so well. |
+| Openverse | Amateur Flickr snapshots (a poster on a wall, a screen grab with a "click to read more" banner). Filtered to licences allowing COMMERCIAL use it returns sixteen results for "prenatal yoga", nine of them one red-carpet launch. |
+| Unsplash | Right licence, right pictures, search needs an API key — and choosing ids without SEEING them is the mistake being undone here. |
+
+So: **a free Unsplash access key, or our own photographs, fills the map in
+an afternoon** and every card and hero picks them up with no other change.
+
+### 69.11 The review section — rebuilt, and what the reviews table owes it
+
+One block now, shared: `PvReviewBlock` / `PvReviewRail`
+(`lib/screens/products/pv_review_block.dart`), on the offering page and on
+the product page. Researched on Mobbin at the user's ask. What was taken,
+and what was deliberately not:
+
+| Seen | Ours |
+|---|---|
+| Preply · Coursera · Meetup — a rail of quote cards | **Taken.** A testimonial should read as a voice, so the quote leads in Newsreader under a quote mark, not as a bordered box in a stack. |
+| Nobody — who the reviewer was at the time | **Ours.** Every review already carries `who` / `context` ("28 weeks", "delivered Apr 2025"). Promoted out of the grey byline onto its own line. A woman reading a birth course's reviews is asking whether the writer was anything like her. |
+| Zocdoc — named sub-ratings (bedside manner 4.9, wait time 4.5) | **Owed.** Needs a per-dimension aggregate we do not hold. |
+| Urban Company — word-bands, Excellent (138) / Good (24) | **Owed.** Needs per-star counts. |
+| Etsy · Temu — counted topic chips you can filter by | **Owed.** Needs tags on every review ever left. |
+| Ulta — PROS / CONS as counted word lists | **Owed.** Same. |
+
+The four owed all need the **reviews table**. `pv_reviews_screen.dart`
+already refused distribution bars for this reason and wrote down why —
+"bars drawn from the handful of reviews we show would look like a
+measurement of the whole" — and that holds. When the table lands, the
+bands and the chips are the first thing to build on it, in that order.
+
+Also from the same walk: the offering page's FAQ splashed a rectangular
+ripple over a rounded card and opened with no animation; it now has a
+shaped ink-grey splash, `AnimatedSize` and one rotating chevron. And the
+commit bar's left column stopped being a price slot once the price is
+paid — it reads progress ("4 lessons / none watched yet", "2 of 4 /
+lessons watched") instead of "Yours / yours to keep", which said one fact
+three times counting the hero's tag.
+
+## 74.0 Fitness & yoga — the next door, brief written 2026-09-22
+
+Material only, nothing built. `docs/FITNESS-DOOR-BRIEF.md`; research in
+MOBBIN-DISCOVERY §19.
+
+**Why this one:** ten pregnancy brackets, eight doors. The two without are
+*Is it safe?* and *Fitness & yoga*, and Is it safe? already has a
+purpose-built search-first screen (`can_i_door.dart`, §10) that tabs would
+spoil — it is deliberately not a `PvDoorPage`. So Fitness is the gap.
+
+**What exists and must not be rebuilt:** 27 month-tagged `YogaSession`s
+(bilingual, shipped Devanagari — never strip); `can_i_data`'s activity
+verdicts for walking, swimming, cycling, running, dancing, gym, trekking and
+lifting, each with per-trimester notes; the Kegel tool.
+
+**Proposed:** five tabs — Today (one practice for her month, the month
+DERIVED and not `_kCurrentMonth = 7`), Practise (chips over rows), Is it safe
+to…? (the eight verdicts rendered in place, reading `can_i_data`, never
+restated), Pelvic floor (the Kegel tool + reads), Talk (the stop-and-call flag
+for movement + consult).
+
+**Three questions for the user before any build:**
+1. Video, or a no-video list-plus-timer player? (Recommendation: no video —
+   the current screen already plays into a placeholder, and shooting 27
+   prenatal sessions is a production project.)
+2. Pose art: drawn marks in the TTC/Symptoms hand, or photographs?
+3. Should "how are you today?" be asked here, or DERIVED from the Symptoms
+   check-in ("derive, never ask")?
+
+**Owed content if it goes ahead:** step lists for 27 sessions, an `avoid`
+line per session, pose art, three pelvic-floor reads.
+

@@ -18,7 +18,6 @@ import '../learn/pv_learn_screen.dart';
 import '../../services/life_stage_store.dart';
 import '../../data/learn/pv_learn_view.dart';
 import '../learn/pv_learn_catalog.dart';
-import '../learn/pv_offering_screen.dart';
 
 // ⚠️ THE SCREEN'S STRUCTURE — 2026-09-18, the door walk, from Mobbin. The
 // user: "very cluttered… not structured well." Zocdoc, Preply and Alan
@@ -34,7 +33,13 @@ import '../learn/pv_offering_screen.dart';
 // screens; the body below is kept, byte for byte, as `ConsultationsScreenClassic` for
 // revert. Nothing pushes the Classic (test/pv_learn_test.dart holds that).
 class ConsultationsScreen extends StatelessWidget {
-  const ConsultationsScreen({super.key, required this.lang, this.onlyRole});
+  const ConsultationsScreen({
+    super.key,
+    required this.lang,
+    this.onlyRole,
+    this.title,
+    this.lead,
+  });
   final AppLanguage lang;
 
   /// A specialist id from a door ("talk with your doctor"). The door names
@@ -43,18 +48,35 @@ class ConsultationsScreen extends StatelessWidget {
   /// or one the catalogue does not know: the consult list.
   final String? onlyRole;
 
+  /// What the screen is called and why she is here, when a door sent her.
+  final String? title;
+  final String? lead;
+
   @override
   Widget build(BuildContext context) {
+    // ⚠️ A LIST, NOT ONE PERSON — corrected 2026-09-22 on the walk. For a
+    // day this opened the named specialist's own page, which read as the
+    // app choosing her doctor for her. Zocdoc, Alan and CVS all answer
+    // "find me a gynaecologist" with the gynaecologists and a way to widen
+    // it; the door's word becomes the selected filter, not a decision.
     final v = onlyRole == null ? null : PvLearnCatalog.instance.byId(onlyRole!);
-    return v == null
-        ? const PvLearnScreen(stage: LifeStage.pregnancy, kind: PvLearnKind.consult)
-        : PvOfferingScreen(view: v);
+    return PvLearnScreen(
+      stage: LifeStage.pregnancy,
+      kind: PvLearnKind.consult,
+      role: v == null ? null : pvLearnRoleOf(v),
+      title: title,
+      lead: lead,
+    );
   }
 }
 
 /// The pre-2026-09-20 body. Kept for revert; nothing pushes it.
 class ConsultationsScreenClassic extends StatefulWidget {
-  const ConsultationsScreenClassic({super.key, required this.lang, this.onlyRole});
+  const ConsultationsScreenClassic({
+    super.key,
+    required this.lang,
+    this.onlyRole,
+  });
 
   final AppLanguage lang;
 
@@ -77,7 +99,8 @@ class ConsultationsScreenClassic extends StatefulWidget {
   final String? onlyRole;
 
   @override
-  State<ConsultationsScreenClassic> createState() => _ConsultationsScreenState();
+  State<ConsultationsScreenClassic> createState() =>
+      _ConsultationsScreenState();
 }
 
 class _ConsultationsScreenState extends State<ConsultationsScreenClassic> {
@@ -99,28 +122,31 @@ class _ConsultationsScreenState extends State<ConsultationsScreenClassic> {
   }
 
   Widget _pill(String label, bool on, VoidCallback onTap) => PvPress(
-        child: Material(
-          color: on ? kInk : kCanvas,
-          shape: StadiumBorder(side: BorderSide(color: on ? kInk : kBorder)),
-          clipBehavior: Clip.antiAlias,
-          child: InkWell(
-            onTap: on
-                ? null
-                : () {
-                    pvCommitFeedback();
-                    onTap();
-                  },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-              child: Text(label,
-                  style: pvManrope(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w700,
-                      color: on ? Colors.white : kInk)),
+    child: Material(
+      color: on ? kInk : kCanvas,
+      shape: StadiumBorder(side: BorderSide(color: on ? kInk : kBorder)),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: on
+            ? null
+            : () {
+                pvCommitFeedback();
+                onTap();
+              },
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+          child: Text(
+            label,
+            style: pvManrope(
+              fontSize: 12.5,
+              fontWeight: FontWeight.w700,
+              color: on ? Colors.white : kInk,
             ),
           ),
         ),
-      );
+      ),
+    ),
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -138,7 +164,10 @@ class _ConsultationsScreenState extends State<ConsultationsScreenClassic> {
         return;
       }
       Navigator.of(context).push(
-          MaterialPageRoute(builder: (_) => ConsultationDetailScreen(specialist: sp, lang: lang)));
+        MaterialPageRoute(
+          builder: (_) => ConsultationDetailScreen(specialist: sp, lang: lang),
+        ),
+      );
     }
 
     // The door tool header (2026-09-19) — the same hero every leaf of a
@@ -152,42 +181,66 @@ class _ConsultationsScreenState extends State<ConsultationsScreenClassic> {
       children: [
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            // ---- who: the specialty pills ---------------------------------
-            // The filter is a row she can see and change. "All" is the way
-            // back out; the door's promised expert is just the pill that
-            // starts selected. Kept for revert: the "See all experts" pill.
-            SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              clipBehavior: Clip.none,
-              child: Row(children: [
-                _pill('All', _role == null, () => setState(() => _role = null)),
-                for (final x in kSpecialists) ...[
-                  const SizedBox(width: 8),
-                  _pill(x.role.now, _role == x.id,
-                      () => setState(() => _role = x.id)),
-                ],
-              ]),
-            ),
-            const SizedBox(height: 18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ---- who: the specialty pills ---------------------------------
+              // The filter is a row she can see and change. "All" is the way
+              // back out; the door's promised expert is just the pill that
+              // starts selected. Kept for revert: the "See all experts" pill.
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                clipBehavior: Clip.none,
+                child: Row(
+                  children: [
+                    _pill(
+                      'All',
+                      _role == null,
+                      () => setState(() => _role = null),
+                    ),
+                    for (final x in kSpecialists) ...[
+                      const SizedBox(width: 8),
+                      _pill(
+                        x.role.now,
+                        _role == x.id,
+                        () => setState(() => _role = x.id),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(height: 18),
 
-            for (int i = 0; i < _shown.length; i++)
-              _specialist(s, _shown[i], () => open(_shown[i]),
-                  bottom: i == _shown.length - 1),
+              for (int i = 0; i < _shown.length; i++)
+                _specialist(
+                  s,
+                  _shown[i],
+                  () => open(_shown[i]),
+                  bottom: i == _shown.length - 1,
+                ),
 
-            const SizedBox(height: 22),
-            Container(
-              padding: const EdgeInsets.all(18),
-              decoration: BoxDecoration(color: kPanel, borderRadius: BorderRadius.circular(18)),
-              child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                pvEyebrow(s.prepHowItWorks, color: kPurple),
-                const SizedBox(height: 8),
-                Text(s.uiPickExpertPickSlot,
-                    style: pvBody(kInk, 14).copyWith(height: 1.6)),
-              ]),
-            ),
-            pvFooterNote(s.prepFooterConsultations),
-          ]),
+              const SizedBox(height: 22),
+              Container(
+                padding: const EdgeInsets.all(18),
+                decoration: BoxDecoration(
+                  color: kPanel,
+                  borderRadius: BorderRadius.circular(18),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    pvEyebrow(s.prepHowItWorks, color: kPurple),
+                    const SizedBox(height: 8),
+                    Text(
+                      s.uiPickExpertPickSlot,
+                      style: pvBody(kInk, 14).copyWith(height: 1.6),
+                    ),
+                  ],
+                ),
+              ),
+              pvFooterNote(s.prepFooterConsultations),
+            ],
+          ),
         ),
       ],
     );
@@ -202,7 +255,12 @@ class _ConsultationsScreenState extends State<ConsultationsScreenClassic> {
   // the next slot when there is one. The whole row opens the detail, where
   // Book lives — one tap here, not two targets. The seven-line row is
   // `_specialistFull` below, kept for revert.
-  Widget _specialist(S str, Specialist s, VoidCallback onTap, {bool bottom = false}) {
+  Widget _specialist(
+    S str,
+    Specialist s,
+    VoidCallback onTap, {
+    bool bottom = false,
+  }) {
     final initials = s.name.now
         .replaceAll('Dr. ', '')
         .split(' ')
@@ -228,67 +286,95 @@ class _ConsultationsScreenState extends State<ConsultationsScreenClassic> {
               bottom: bottom ? const BorderSide(color: kHair) : BorderSide.none,
             ),
           ),
-          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Container(
-                width: 52,
-                height: 52,
-                alignment: Alignment.center,
-                decoration:
-                    const BoxDecoration(color: kPanel, shape: BoxShape.circle),
-                child: Text(initials,
-                    style: pvManrope(
-                        fontSize: 16, fontWeight: FontWeight.w800, color: kInk)),
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(s.name.now, style: pvTitleStyle(16.5)),
-                      const SizedBox(height: 2),
-                      Text('${s.role.now}  ·  ${s.cred.now.split(' · ').first}',
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Container(
+                    width: 52,
+                    height: 52,
+                    alignment: Alignment.center,
+                    decoration: const BoxDecoration(
+                      color: kPanel,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(
+                      initials,
+                      style: pvManrope(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w800,
+                        color: kInk,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(s.name.now, style: pvTitleStyle(16.5)),
+                        const SizedBox(height: 2),
+                        Text(
+                          '${s.role.now}  ·  ${s.cred.now.split(' · ').first}',
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: pvBody(kSoft, 13)),
-                      const SizedBox(height: 6),
-                      Text(proof,
-                          style: pvBody(kInk, 12.5)
-                              .copyWith(fontWeight: FontWeight.w600)),
-                      const SizedBox(height: 2),
-                      Text('${s.fromPrice.now}  ·  30 min',
-                          style: pvBody(kMuted, 12.5)),
-                    ]),
+                          style: pvBody(kSoft, 13),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          proof,
+                          style: pvBody(
+                            kInk,
+                            12.5,
+                          ).copyWith(fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '${s.fromPrice.now}  ·  30 min',
+                          style: pvBody(kMuted, 12.5),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  const Padding(
+                    padding: EdgeInsets.only(top: 14),
+                    child: Icon(
+                      Icons.chevron_right_rounded,
+                      size: 20,
+                      color: kMuted,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(width: 8),
-              const Padding(
-                padding: EdgeInsets.only(top: 14),
-                child:
-                    Icon(Icons.chevron_right_rounded, size: 20, color: kMuted),
-              ),
-            ]),
-            // The "Next: today 6pm" pill is off the list (2026-09-19, the
-            // user: "unnecessary UI… it should be in a better way"). Her
-            // next slots live on the profile, where she books. Kept for
-            // revert by the `false &&`.
-            if (false && s.next != null) ...[
-              const SizedBox(height: 12),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 9),
-                alignment: Alignment.center,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(999),
-                  border: Border.all(color: kBorder),
-                ),
-                child: Text(s.next!.now,
+              // The "Next: today 6pm" pill is off the list (2026-09-19, the
+              // user: "unnecessary UI… it should be in a better way"). Her
+              // next slots live on the profile, where she books. Kept for
+              // revert by the `false &&`.
+              if (false && s.next != null) ...[
+                const SizedBox(height: 12),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.symmetric(vertical: 9),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(999),
+                    border: Border.all(color: kBorder),
+                  ),
+                  child: Text(
+                    s.next!.now,
                     style: pvManrope(
-                        fontSize: 12.5,
-                        fontWeight: FontWeight.w700,
-                        color: kInk)),
-              ),
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                      color: kInk,
+                    ),
+                  ),
+                ),
+              ],
             ],
-          ]),
+          ),
         ),
       ),
     );
@@ -297,7 +383,12 @@ class _ConsultationsScreenState extends State<ConsultationsScreenClassic> {
   /// The seven-line row with its own Book button, 2026-08 → 2026-09-18.
   /// Kept for revert.
   // ignore: unused_element
-  Widget _specialistFull(S str, Specialist s, VoidCallback onTap, {bool bottom = false}) {
+  Widget _specialistFull(
+    S str,
+    Specialist s,
+    VoidCallback onTap, {
+    bool bottom = false,
+  }) {
     return GestureDetector(
       onTap: onTap,
       behavior: HitTestBehavior.opaque,
@@ -309,60 +400,94 @@ class _ConsultationsScreenState extends State<ConsultationsScreenClassic> {
             bottom: bottom ? const BorderSide(color: kHair) : BorderSide.none,
           ),
         ),
-        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Container(
-            width: 48,
-            height: 48,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(color: kPanel, borderRadius: BorderRadius.circular(16)),
-            child: Icon(s.icon, size: 24, color: kPurple),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Row(children: [
-                Expanded(child: Text(s.role.now, style: pvTitleStyle(16))),
-                const SizedBox(width: 8),
-                Padding(
-                  padding: const EdgeInsets.only(top: 2),
-                  child: Text(s.fromPrice.now, style: pvBody(kSoft, 13)),
-                ),
-              ]),
-              const SizedBox(height: 3),
-              Text.rich(
-                TextSpan(children: [
-                  TextSpan(
-                      text: s.name.now,
-                      style: const TextStyle(color: kInk, fontWeight: FontWeight.w700, fontSize: 13)),
-                  TextSpan(
-                      text: '  ·  ${s.cred.now.split(' · ').first}',
-                      style: const TextStyle(color: kMuted, fontSize: 13)),
-                ]),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 48,
+              height: 48,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: kPanel,
+                borderRadius: BorderRadius.circular(16),
               ),
-              const SizedBox(height: 2),
-              Text(s.desc.now, style: pvBody(kSoft, 13)),
-              const SizedBox(height: 8),
-              Row(children: [
-                Text(s.rating, style: pvBody(kCoral, 12).copyWith(fontWeight: FontWeight.w700)),
-                const SizedBox(width: 10),
-                Text(str.uiHindiEnglish, style: pvBody(kMuted, 12)),
-                if (s.next != null) ...[
-                  const SizedBox(width: 10),
-                  Flexible(
-                    child: Text(s.next!.now,
-                        style: pvBody(kPurple, 12).copyWith(fontWeight: FontWeight.w600),
-                        overflow: TextOverflow.ellipsis),
+              child: Icon(s.icon, size: 24, color: kPurple),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(s.role.now, style: pvTitleStyle(16)),
+                      ),
+                      const SizedBox(width: 8),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 2),
+                        child: Text(s.fromPrice.now, style: pvBody(kSoft, 13)),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 3),
+                  Text.rich(
+                    TextSpan(
+                      children: [
+                        TextSpan(
+                          text: s.name.now,
+                          style: const TextStyle(
+                            color: kInk,
+                            fontWeight: FontWeight.w700,
+                            fontSize: 13,
+                          ),
+                        ),
+                        TextSpan(
+                          text: '  ·  ${s.cred.now.split(' · ').first}',
+                          style: const TextStyle(color: kMuted, fontSize: 13),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(s.desc.now, style: pvBody(kSoft, 13)),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Text(
+                        s.rating,
+                        style: pvBody(
+                          kCoral,
+                          12,
+                        ).copyWith(fontWeight: FontWeight.w700),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(str.uiHindiEnglish, style: pvBody(kMuted, 12)),
+                      if (s.next != null) ...[
+                        const SizedBox(width: 10),
+                        Flexible(
+                          child: Text(
+                            s.next!.now,
+                            style: pvBody(
+                              kPurple,
+                              12,
+                            ).copyWith(fontWeight: FontWeight.w600),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ],
-              ]),
-            ]),
-          ),
-          const SizedBox(width: 10),
-          Padding(
-            padding: const EdgeInsets.only(top: 8),
-            child: pvOutlineButton(str.prepBook, onTap),
-          ),
-        ]),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Padding(
+              padding: const EdgeInsets.only(top: 8),
+              child: pvOutlineButton(str.prepBook, onTap),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -1,70 +1,180 @@
 // =============================================================================
-//  Learn covers — free photos by topic, with the honest cover as the floor
+//  Learn covers — drawn in the app's own hand, by subject
 // -----------------------------------------------------------------------------
-//  The three learning catalogues carry no images at all (accent colours and
-//  striped placeholders). A course page with no picture reads as a wireframe
-//  next to a photographed store, so — the user's call, as for products — a
-//  free Unsplash photo of the SUBJECT stands in, chosen by the programme's
-//  topic words, never by its title. Every id below resolved on 2026-09-20;
-//  a 404 falls through `Image.network`'s error builder to `PvCoverBlock`.
+//  ⚠️ THE PHOTOS ARE GONE. THIS IS WHY — 2026-09-22, the device walk.
 //
-//  ⚠️ PLACEHOLDERS BY TOPIC, NOT PORTRAITS. No photo here claims to be the
-//  expert; the expert card carries no photo until the roster does. To be
-//  checked on the device walk — a wrong subject is a data edit here.
+//  This file used to map a topic word to a free Unsplash photo. On the phone
+//  the result was indefensible: ONE photograph of a woman on a sofa with two
+//  toddlers and a tablet appeared on "The Complete Pregnancy Guide", "Birth
+//  Confidence Masterclass", "Birth Prep Essentials" AND "Birth-Ready
+//  Bootcamp", one under the other in the same scroll; a second, of three
+//  students at laptops in a co-working space, carried both remaining cohorts.
+//  Two failures at once:
+//
+//   1. WRONG SUBJECT. The ids were written from memory rather than looked at
+//      — the same mistake the store tiles were rebuilt for. Toddlers with a
+//      tablet is not birth preparation.
+//   2. REPETITION IS STRUCTURAL, not a bad draw. Keying a photo to a topic
+//      WORD means every programme sharing a topic shares a picture, and the
+//      catalogue is built out of a handful of topics on purpose.
+//
+//  The obvious fix — pick better photos by eye from Wikimedia Commons, as the
+//  store tiles and the recipe reads do — does not work here, and it is worth
+//  writing down why: Commons is an encyclopaedia's picture library. It is
+//  excellent at OBJECTS (a bowl of ragi, a strip of iron tablets) and poor at
+//  PEOPLE DOING THINGS. Searched for the subjects this screen needs it
+//  returns ethnographic archive photographs, a 1907 oil painting, clinical
+//  record shots and an Egyptian ostracon. None of that can sit on a card
+//  asking a woman for ₹6,999.
+//
+//  So the cover stops being a photograph and becomes a MARK — the same
+//  `IntentMark` family the doors, the hubs and the rails already draw in
+//  (`hub_intent_art.dart`, sixty-odd marks). That family's own rule is that
+//  marks are reused ACROSS surfaces by meaning, so a shared mark is correct
+//  where a shared photograph was not; and each programme keeps its own hue
+//  underneath, so two cards wearing one mark still read apart.
+//
+//  ⚠️ `cover` STAYS ON THE MODEL. When a real shoot exists — our own
+//  photographs of our own classes — a URL per programme fills it and the
+//  photo path in `PvLearnCover` lights up untouched. What is dead is
+//  INVENTING a stock photo from a keyword.
+//
+//  Kept for revert, the map that shipped 2026-09-20:
+//    String _u(String id) =>
+//        'https://images.unsplash.com/photo-$id?w=900&q=80&auto=format&fit=crop';
+//    'sleep': _u('1503454537195-1dcabb73ffb9'),
+//    'newborn': _u('1555252333-9f8e92e65df9'),
+//    'feeding': _u('1519689680058-324335c77eba'),
+//    'development': _u('1516627145497-ae6968895b74'),
+//    'birth': _u('1476703993599-0035a21b17a9'),
+//    'pregnancy': _u('1489710437720-ebb67ec84dd2'),
+//    'prenatal': _u('1544367567-0f2fcb009e0b'),
+//    'yoga': _u('1506126613408-eca07ce68773'),
+//    'breathing': _u('1515488042361-ee00e0ddd4e4'),
+//    'nutrition': _u('1544027993-37dbfe43562a'),
+//    'doctor': _u('1576091160399-112ba8d25d1d'),
+//    'trying': _u('1524250502761-1ac6f2e30d43'),
+//    …and a per-kind default. The full list is in git at 3ca19db.
 // =============================================================================
 
+import '../../screens/brackets/hub/hub_intent_art.dart';
 import 'pv_learn_view.dart';
 
-String _u(String id) =>
-    'https://images.unsplash.com/photo-$id?w=900&q=80&auto=format&fit=crop';
-
-/// Topic word → photo. First match in the programme's topic list wins;
+/// Topic word → drawn mark. First match in the programme's topic list wins;
 /// the kind's default is the floor.
-final Map<String, String> _byTopic = {
-  'sleep': _u('1503454537195-1dcabb73ffb9'),
-  'newborn': _u('1555252333-9f8e92e65df9'),
-  'feeding': _u('1519689680058-324335c77eba'),
-  'breastfeeding': _u('1519689680058-324335c77eba'),
-  'development': _u('1516627145497-ae6968895b74'),
-  'play': _u('1516627145497-ae6968895b74'),
-  'behaviour': _u('1527613426441-4da17471b66d'),
-  'birth': _u('1476703993599-0035a21b17a9'),
-  'labour': _u('1476703993599-0035a21b17a9'),
-  'pregnancy': _u('1489710437720-ebb67ec84dd2'),
-  'prenatal': _u('1544367567-0f2fcb009e0b'),
-  'yoga': _u('1506126613408-eca07ce68773'),
-  'postnatal': _u('1571019613454-1cb2f99b2d8b'),
-  'breathing': _u('1515488042361-ee00e0ddd4e4'),
-  'calm': _u('1515488042361-ee00e0ddd4e4'),
-  'mind': _u('1518611012118-696072aa579a'),
-  'mental': _u('1518611012118-696072aa579a'),
-  'nutrition': _u('1544027993-37dbfe43562a'),
-  'food': _u('1544027993-37dbfe43562a'),
-  'doctor': _u('1576091160399-112ba8d25d1d'),
-  'obstetrician': _u('1559839734-2b71ea197ec2'),
-  'gynaecologist': _u('1559839734-2b71ea197ec2'),
-  'paediatrician': _u('1584515933487-779824d29309'),
-  'consults': _u('1576091160399-112ba8d25d1d'),
-  'trying': _u('1524250502761-1ac6f2e30d43'),
-  'ivf': _u('1579154204601-01588f351e67'),
-  'assessments': _u('1434030216411-0b793f4b4173'),
-  'courses': _u('1541781774459-bb2af2f05b55'),
+///
+/// ⚠️ SUBSTRING, DELIBERATELY. The topics are display strings — "Birth &
+/// Labour", "First Trimester" — so the key is the word inside them. The old
+/// photo map used the same lookup and matched nothing at all for "First
+/// Trimester", which is how four cards ended up on one per-kind default
+/// without anyone noticing: a fallback that reads fine in code and shows as
+/// four identical pictures on the phone.
+const Map<String, IntentMark> _byTopic = {
+  // ---- pregnancy ----------------------------------------------------------
+  'birth': IntentMark.bagMark, // a packed bag: ready, not frightened
+  'labour': IntentMark.bagMark,
+  'trimester': IntentMark.calendarDay, // the weeks, marked
+  'breathing': IntentMark.lotusMark, // stillness, practised
+  'calm': IntentMark.lotusMark,
+  'yoga': IntentMark.lotusMark,
+  'fitness': IntentMark.improveMark, // a line rising, with a leaf on it
+  'exercise': IntentMark.improveMark,
+  'physio': IntentMark.bodyMark,
+  'scan': IntentMark.scanFan,
+  'test': IntentMark.scanFan,
+  'pregnancy': IntentMark.bookMark, // a guide she comes back to
+  // ---- the baby -----------------------------------------------------------
+  'newborn': IntentMark.cuppedHands, // support offered, not instructions
+  'postnatal': IntentMark.cuppedHands,
+  'fourth': IntentMark.cuppedHands,
+  'breastfeeding': IntentMark.feedMark,
+  'lactation': IntentMark.feedMark,
+  'feeding': IntentMark.feedMark,
+  'weaning': IntentMark.bowlMark,
+  'solids': IntentMark.bowlMark,
+  'sleep': IntentMark.sleepMark,
+  'development': IntentMark.stepsMark,
+  'milestone': IntentMark.stepsMark,
+  'play': IntentMark.blocksMark,
+  'behaviour': IntentMark.moodArc,
+
+  // ---- her ----------------------------------------------------------------
+  'nutrition': IntentMark.plate,
+  'food': IntentMark.plate,
+  'diet': IntentMark.plate,
+  'mind': IntentMark.moodArc,
+  'mental': IntentMark.moodArc,
+  'emotion': IntentMark.moodArc,
+  'counsel': IntentMark.moodArc,
+
+  // ---- who ----------------------------------------------------------------
+  'obstetric': IntentMark.askDoctor,
+  'gynae': IntentMark.askDoctor,
+  'gynec': IntentMark.askDoctor,
+  'paediatric': IntentMark.askDoctor,
+  'pediatric': IntentMark.askDoctor,
+  'doctor': IntentMark.askDoctor,
+
+  // ---- trying to conceive -------------------------------------------------
+  'trying': IntentMark.cycleRing,
+  'fertility': IntentMark.cycleRing,
+  'cycle': IntentMark.cycleRing,
+  'ivf': IntentMark.cycleRing,
+  'conceive': IntentMark.cycleRing,
 };
 
-final Map<PvLearnKind, String> _byKind = {
-  PvLearnKind.course: _u('1588072432836-e10032774350'),
-  PvLearnKind.masterclass: _u('1587614382346-4ec70e388b28'),
-  PvLearnKind.cohort: _u('1522202176988-66273c2fd55f'),
-  PvLearnKind.consult: _u('1576091160399-112ba8d25d1d'),
-  PvLearnKind.classPack: _u('1544367567-0f2fcb009e0b'),
+/// The floor. A kind always has a face, so a programme added tomorrow with a
+/// topic nobody mapped still draws something true about what it IS.
+const Map<PvLearnKind, IntentMark> _byKind = {
+  PvLearnKind.course: IntentMark.bookMark,
+  PvLearnKind.masterclass: IntentMark.playMark,
+  PvLearnKind.cohort: IntentMark.calendarDay,
+  PvLearnKind.consult: IntentMark.askDoctor,
+  PvLearnKind.classPack: IntentMark.lotusMark,
 };
 
-String? pvLearnCoverFor(List<String> topics, PvLearnKind kind) {
+IntentMark pvLearnMarkFor(List<String> topics, PvLearnKind kind) {
   for (final t in topics) {
     final k = t.toLowerCase().trim();
     for (final e in _byTopic.entries) {
       if (k.contains(e.key)) return e.value;
     }
   }
-  return _byKind[kind];
+  return _byKind[kind] ?? IntentMark.bookMark;
 }
+
+/// A real photograph for one programme, by its catalogue id.
+///
+/// ⚠️ EMPTY TODAY, AND THIS IS THE SEAM, NOT A REFUSAL. Photographs are
+/// welcome here — the user's call, 2026-09-22 ("we can obviously have images
+/// as well"), and `PvLearnCover` renders one the moment this map holds it,
+/// falling back to the drawn cover if the URL 404s. What is dead is
+/// SYNTHESISING one from a keyword, which is what put a toddler with a
+/// tablet on four birth courses.
+///
+/// Why it is empty rather than filled with something free: picking by eye
+/// needs a library to pick FROM, and from this machine there is not one.
+/// Checked on 2026-09-22:
+///   · Wikimedia Commons — licence fine, pictures wrong. The subjects here
+///     return ethnographic archive photographs, a 1907 oil painting and an
+///     Egyptian ostracon. It is an encyclopaedia's library, which is why it
+///     dresses the store's OBJECTS and the recipes so well and cannot dress
+///     a class.
+///   · Openverse — amateur Flickr snapshots (a poster on a wall, a screen
+///     grab with a "click to read more" banner), and worse, filtered to
+///     licences that allow COMMERCIAL use it returns sixteen results for
+///     "prenatal yoga", nine of them the same red-carpet launch event. A
+///     `by-nc` photo is not usable in a paid app at any quality.
+///   · Unsplash — the right licence and the right pictures, but its search
+///     API needs a key, and choosing ids without SEEING them is the exact
+///     mistake being undone here.
+///
+/// So: a free Unsplash access key (or our own photographs) fills this map in
+/// an afternoon, and every card and hero picks the photo up with no other
+/// change. Until then the drawn cover is the cover — a real one, not a gap.
+///   'course_pregnancy_guide': 'https://…',
+const Map<String, String> kPvLearnCovers = {};
+
+/// The photograph for a programme, or null for the drawn cover.
+String? pvLearnCoverFor(String id, List<String> topics, PvLearnKind kind) =>
+    kPvLearnCovers[id];

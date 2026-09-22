@@ -23,7 +23,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/data/prepare_data.dart';
 import 'package:parentveda/data/cravings_data.dart';
-import 'package:parentveda/data/reads/nutrition_reads.dart' show pvReadFromCraving;
+import 'package:parentveda/data/reads/nutrition_reads.dart'
+    show pvReadFromCraving;
 import 'package:parentveda/data/diet_chart_facets.dart';
 import 'package:parentveda/services/diet_chart_pdf.dart';
 import 'package:parentveda/data/diet_chart_content.dart';
@@ -40,7 +41,9 @@ import 'package:parentveda/services/pregnancy_controller.dart';
 PregnancyController _at(int week) {
   final now = DateTime(2026, 1, 1);
   return PregnancyController(
-      now: now, dueDate: now.add(Duration(days: (40 - week) * 7)));
+    now: now,
+    dueDate: now.add(Duration(days: (40 - week) * 7)),
+  );
 }
 
 Future<void> _pump(WidgetTester t, Widget w) async {
@@ -135,26 +138,31 @@ void main() {
       expect(s.whenToAvoid!.en.toLowerCase(), contains('comfort limit'));
     });
 
-    testWidgets('the same food shows different answers at 8 and 30 weeks',
-        (t) async {
+    testWidgets('the same food shows different answers at 8 and 30 weeks', (
+      t,
+    ) async {
       final early = _at(8);
       addTearDown(early.dispose);
       // The page is a read since 2026-09-22 (`pvReadFromCraving`): the
       // verdict is the teaser AND the opening callout's title, so it shows
       // more than once and the week rides in the same line.
-      await _pump(t,
-          CravingDetailScreen(item: _c('papaya'), pregnancy: early));
+      await _pump(t, CravingDetailScreen(item: _c('papaya'), pregnancy: early));
       expect(find.textContaining('Not now'), findsWidgets);
       expect(find.textContaining('week 8'), findsWidgets);
-      expect(pvReadFromCraving(_c('papaya'), 8).teaser.en, 'At week 8 — Not now');
+      expect(
+        pvReadFromCraving(_c('papaya'), 8).teaser.en,
+        'At week 8 — Not now',
+      );
 
       final late = _at(30);
       addTearDown(late.dispose);
-      await _pump(
-          t, CravingDetailScreen(item: _c('papaya'), pregnancy: late));
+      await _pump(t, CravingDetailScreen(item: _c('papaya'), pregnancy: late));
       expect(find.textContaining('In small amounts'), findsWidgets);
       expect(find.textContaining('week 30'), findsWidgets);
-      expect(pvReadFromCraving(_c('papaya'), 30).teaser.en, 'At week 30 — In small amounts');
+      expect(
+        pvReadFromCraving(_c('papaya'), 30).teaser.en,
+        'At week 30 — In small amounts',
+      );
     });
 
     test('every item carries a note for all three trimesters', () {
@@ -187,8 +195,9 @@ void main() {
       expect(find.text('If you would rather not risk it'), findsOneWidget);
     });
 
-    testWidgets('a home recipe is shown in place, not behind a link',
-        (t) async {
+    testWidgets('a home recipe is shown in place, not behind a link', (
+      t,
+    ) async {
       final c = _at(20);
       addTearDown(c.dispose);
       await _pump(t, CravingDetailScreen(item: _c('golgappa'), pregnancy: c));
@@ -199,10 +208,17 @@ void main() {
       // loses most of the people it is for if it costs another screen.
       final read = pvReadFromCraving(_c('golgappa'), 20);
       final headings = read.sections.map((s) => s.heading?.en ?? '').toList();
-      expect(headings.any((h) => h.startsWith('Make it at home: Home pani puri, safely')), isTrue,
-          reason: headings.join(' | '));
+      expect(
+        headings.any(
+          (h) => h.startsWith('Make it at home: Home pani puri, safely'),
+        ),
+        isTrue,
+        reason: headings.join(' | '),
+      );
       expect(headings, contains('Method'));
-      final recipeSection = read.sections.firstWhere((s) => (s.heading?.en ?? '').startsWith('Make it at home'));
+      final recipeSection = read.sections.firstWhere(
+        (s) => (s.heading?.en ?? '').startsWith('Make it at home'),
+      );
       expect(recipeSection.bullets, isNotEmpty, reason: 'the ingredients');
       final method = read.sections.firstWhere((s) => s.heading?.en == 'Method');
       expect(method.paragraphs.first.en, startsWith('1. '));
@@ -234,9 +250,13 @@ void main() {
       final c = _at(20);
       addTearDown(c.dispose);
       await _pump(
-          t, CravingDetailScreen(item: _c('ice_chewing'), pregnancy: c));
+        t,
+        CravingDetailScreen(item: _c('ice_chewing'), pregnancy: c),
+      );
 
-      final doctor = t.getTopLeft(find.textContaining('telling your doctor')).dy;
+      final doctor = t
+          .getTopLeft(find.textContaining('telling your doctor'))
+          .dy;
       final why = t.getTopLeft(find.text('Why you are craving it')).dy;
       // Burying it under three sections of craving explanation would be the
       // app being calm at her expense.
@@ -255,8 +275,11 @@ void main() {
       // every filter — so a chart added without an entry would quietly appear
       // under every combination and look like a bug in the filters.
       for (final c in kDietCharts) {
-        expect(kChartFacets.containsKey(c.id), isTrue,
-            reason: '${c.id} has no facets — it would match every filter');
+        expect(
+          kChartFacets.containsKey(c.id),
+          isTrue,
+          reason: '${c.id} has no facets — it would match every filter',
+        );
       }
     });
 
@@ -265,17 +288,22 @@ void main() {
       // most real combinations, and does it without any error to notice.
       const gujarati = ChartFacets(region: ChartRegion.gujarati);
       expect(
-          gujarati.satisfies(const ChartFilter(stage: ChartStage.trimester3)),
-          isTrue,
-          reason: 'a regional chart works at any stage');
-      expect(gujarati.satisfies(const ChartFilter(diet: ChartDiet.vegetarian)),
-          isTrue);
+        gujarati.satisfies(const ChartFilter(stage: ChartStage.trimester3)),
+        isTrue,
+        reason: 'a regional chart works at any stage',
+      );
+      expect(
+        gujarati.satisfies(const ChartFilter(diet: ChartDiet.vegetarian)),
+        isTrue,
+      );
     });
 
     test('a different value on the same axis does exclude', () {
       const t1 = ChartFacets(stage: ChartStage.trimester1);
-      expect(t1.satisfies(const ChartFilter(stage: ChartStage.trimester3)),
-          isFalse);
+      expect(
+        t1.satisfies(const ChartFilter(stage: ChartStage.trimester3)),
+        isFalse,
+      );
     });
 
     test('Hindi is a property of a chart, never a kind of chart', () {
@@ -307,21 +335,24 @@ void main() {
       // must be a property that coexists with the other axes, not a sixth
       // shelf that a chart has to choose instead of a trimester.
       const both = ChartFacets(stage: ChartStage.trimester3, inHindi: true);
-      expect(both.satisfies(const ChartFilter(stage: ChartStage.trimester3)),
-          isTrue);
+      expect(
+        both.satisfies(const ChartFilter(stage: ChartStage.trimester3)),
+        isTrue,
+      );
       expect(both.satisfies(const ChartFilter(inHindi: true)), isTrue);
       expect(
-          both.satisfies(
-              const ChartFilter(stage: ChartStage.trimester3, inHindi: true)),
-          isTrue,
-          reason: 'a chart must be able to be a trimester chart AND in Hindi');
+        both.satisfies(
+          const ChartFilter(stage: ChartStage.trimester3, inHindi: true),
+        ),
+        isTrue,
+        reason: 'a chart must be able to be a trimester chart AND in Hindi',
+      );
 
       // And the real library agrees about the shape, whatever its coverage:
       // the Hindi chart is found by the Hindi filter, and it is found by a
       // filter that asks for nothing in particular.
       expect(facetsFor('hindi_chart').inHindi, isTrue);
-      expect(
-          facetsFor('hindi_chart').satisfies(const ChartFilter()), isTrue);
+      expect(facetsFor('hindi_chart').satisfies(const ChartFilter()), isTrue);
     });
 
     test('Jain moved from Region to Diet, where it belongs', () {
@@ -341,7 +372,9 @@ void main() {
       // A chip you can turn on and not off is how someone gets stuck in a
       // filtered state and decides the app is broken.
       const f = ChartFilter(
-          stage: ChartStage.trimester2, diet: ChartDiet.vegetarian);
+        stage: ChartStage.trimester2,
+        diet: ChartDiet.vegetarian,
+      );
       final cleared = f.withStage(ChartStage.trimester2);
       expect(cleared.stage, isNull);
       expect(cleared.diet, ChartDiet.vegetarian, reason: 'other axes survive');
@@ -452,8 +485,9 @@ void main() {
       expect(free, lessThan(paid));
     });
 
-    testWidgets('it opens the nutritionist, not the full expert list',
-        (t) async {
+    testWidgets('it opens the nutritionist, not the full expert list', (
+      t,
+    ) async {
       final c = _at(20);
       addTearDown(c.dispose);
       await _pump(t, NutritionHomeScreen(pregnancy: c));
@@ -466,15 +500,15 @@ void main() {
       // Since 2026-09-20 the facade lands on the nutritionist's own consult
       // page (the unified learn page): her name is on it, the obstetrician's
       // consult is not a card on it.
-      final nutri = kSpecialists.firstWhere((x) => x.role.en == 'Prenatal Nutritionist');
-      final ob = kSpecialists.firstWhere((x) => x.role.en == 'Obstetrician');
-      expect(find.text('Consult with ${nutri.name.en}'), findsWidgets);
-      // The obstetrician is on the page only as the "Other experts" rail,
-      // below the head that names it — never as the page itself.
-      final rail = t.getTopLeft(find.text('Other experts')).dy;
-      for (final e in find.text('Consult with ${ob.name.en}').evaluate()) {
-        expect(t.getTopLeft(find.byWidget(e.widget)).dy > rail, isTrue);
-      }
+      final nutri = kSpecialists.firstWhere(
+        (x) => x.role.en == 'Prenatal Nutritionist',
+      );
+      // Since 2026-09-22 the facade lands on the consult LIST with the
+      // nutritionist's role already selected: she is listed, and the
+      // obstetrician sits behind the "All consults" chip rather than in
+      // front of her.
+      expect(find.text(nutri.name.en), findsWidgets);
+      expect(find.textContaining('All consults'), findsOneWidget);
     });
   });
 }
@@ -503,9 +537,13 @@ void _dietCharts() {
     test('no chart is a title with nothing behind it', () {
       for (final c in kDietCharts) {
         final content = kChartContent[c.id];
-        expect(content, isNotNull,
-            reason: '${c.id} has no content, so its page renders a heading '
-                'and an apology');
+        expect(
+          content,
+          isNotNull,
+          reason:
+              '${c.id} has no content, so its page renders a heading '
+              'and an apology',
+        );
         expect(content!.days, isNotEmpty, reason: c.id);
         expect(content.swaps, isNotEmpty, reason: c.id);
         expect(content.limits, isNotEmpty, reason: c.id);
@@ -547,8 +585,9 @@ void _dietCharts() {
 
     test('exactly the translated charts answer a Hindi filter', () {
       const f = ChartFilter(inHindi: true);
-      final hits =
-          kDietCharts.where((c) => facetsFor(c.id).satisfies(f)).toList();
+      final hits = kDietCharts
+          .where((c) => facetsFor(c.id).satisfies(f))
+          .toList();
       // One today. This assertion is deliberately about identity rather than
       // count: when the other fourteen are translated they join this list on
       // their own, and the test that would then need editing is the wrong test.
@@ -581,9 +620,13 @@ void _dietCharts() {
         final hits = kDietCharts
             .where((c) => facetsFor(c.id).satisfies(filter(v)))
             .where((c) => facetsFor(c.id).specificity(filter(v)) > 0);
-        expect(hits, isNotEmpty,
-            reason: '$v is selectable and no chart is actually about it - '
-                'she would get every untagged chart instead of an answer');
+        expect(
+          hits,
+          isNotEmpty,
+          reason:
+              '$v is selectable and no chart is actually about it - '
+              'she would get every untagged chart instead of an answer',
+        );
       }
     }
 
@@ -607,8 +650,10 @@ void _dietCharts() {
       // filename in the Hindi build - handled badly by printers and some file
       // managers, and the same chart would arrive under two names depending on
       // a setting. `.en` is identity; this is that rule reaching a filename.
-      expect(DietChartPdf.slugForFilename('gestational_diabetes_chart'),
-          'gestational-diabetes-chart');
+      expect(
+        DietChartPdf.slugForFilename('gestational_diabetes_chart'),
+        'gestational-diabetes-chart',
+      );
       expect(DietChartPdf.slugForFilename('t1_chart'), 't1-chart');
     });
 
@@ -623,8 +668,7 @@ void _dietCharts() {
         'anaemia_chart',
       };
       for (final e in kChartContent.entries) {
-        expect(e.value.doctorNote != null, owed.contains(e.key),
-            reason: e.key);
+        expect(e.value.doctorNote != null, owed.contains(e.key), reason: e.key);
       }
     });
   });

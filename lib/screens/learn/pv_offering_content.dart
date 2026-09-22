@@ -17,11 +17,10 @@
 //  booking, "watching" means she owns the recording or the thing is free.
 // =============================================================================
 
-import 'package:flutter/material.dart';
-
 import '../../booking/booking_models.dart';
 import '../../booking/booking_store.dart';
 import '../../data/learn/pv_learn_view.dart';
+import 'pv_learn_art.dart';
 import '../../services/pv_learn_progress_store.dart';
 
 /// Where she stands with this thing.
@@ -219,19 +218,19 @@ List<PvLearnTrust> pvTrustRowsFor(PvOfferingView v) {
     case PvLearnKind.course:
       return [
         PvLearnTrust(
-          Icons.verified_outlined,
+          PvLearnMark.reviewed,
           'Reviewed $reviewer',
           'Every lesson is checked against current guidance before it goes live.',
         ),
         PvLearnTrust(
-          Icons.replay_rounded,
+          PvLearnMark.refund,
           v.isFree ? 'Free, always' : 'Full refund within 7 days',
           v.isFree
               ? 'Nothing here is locked or upsold.'
               : 'If it is not for you, say so and the money comes back.',
         ),
         const PvLearnTrust(
-          Icons.all_inclusive_rounded,
+          PvLearnMark.keep,
           'Yours to keep',
           'Watch again whenever you like, on any phone you sign into.',
         ),
@@ -239,17 +238,17 @@ List<PvLearnTrust> pvTrustRowsFor(PvOfferingView v) {
     case PvLearnKind.masterclass:
       return [
         PvLearnTrust(
-          Icons.verified_outlined,
+          PvLearnMark.reviewed,
           'Reviewed $reviewer',
           'What is taught is checked against current guidance.',
         ),
         const PvLearnTrust(
-          Icons.replay_rounded,
+          PvLearnMark.refund,
           'Full refund up to 24 hours before',
           'Cancel from the app; the seat goes back to someone else.',
         ),
         PvLearnTrust(
-          Icons.videocam_outlined,
+          PvLearnMark.recording,
           v.recordingIncluded ? 'Recording included' : 'Live, in the app',
           v.recordingIncluded
               ? 'Miss it and it is still yours.'
@@ -259,17 +258,17 @@ List<PvLearnTrust> pvTrustRowsFor(PvOfferingView v) {
     case PvLearnKind.cohort:
       return [
         PvLearnTrust(
-          Icons.verified_outlined,
+          PvLearnMark.reviewed,
           'Led $reviewer',
           'A small group, the same faces every call.',
         ),
         const PvLearnTrust(
-          Icons.replay_rounded,
+          PvLearnMark.refund,
           'Full refund before the first call',
           'After it starts, the seat is yours and so is the thread.',
         ),
         const PvLearnTrust(
-          Icons.groups_outlined,
+          PvLearnMark.group,
           'Small group, capped',
           'Seats close when the run starts. The number on this page is real.',
         ),
@@ -277,17 +276,17 @@ List<PvLearnTrust> pvTrustRowsFor(PvOfferingView v) {
     case PvLearnKind.consult:
       return [
         const PvLearnTrust(
-          Icons.verified_outlined,
+          PvLearnMark.reviewed,
           'Verified clinician',
           'Registration checked before they are listed.',
         ),
         const PvLearnTrust(
-          Icons.replay_rounded,
+          PvLearnMark.refund,
           'Free cancellation up to 24 hours before',
           'Later than that and the session is spent — the doctor held the time.',
         ),
         const PvLearnTrust(
-          Icons.health_and_safety_outlined,
+          PvLearnMark.notOurs,
           'Never a diagnosis from us',
           'The consult is theirs; ParentVeda only arranges the time.',
         ),
@@ -295,17 +294,17 @@ List<PvLearnTrust> pvTrustRowsFor(PvOfferingView v) {
     case PvLearnKind.classPack:
       return [
         PvLearnTrust(
-          Icons.verified_outlined,
+          PvLearnMark.reviewed,
           'Taught $reviewer',
           'Pregnancy-safe and postnatal-safe by design.',
         ),
         const PvLearnTrust(
-          Icons.replay_rounded,
+          PvLearnMark.refund,
           'Unused classes refunded',
           'Change your mind before the first class and the pack comes back in full.',
         ),
         const PvLearnTrust(
-          Icons.calendar_month_outlined,
+          PvLearnMark.calendar,
           'Four classes, your calendar',
           'Book each one when it suits; skip a week without losing it.',
         ),

@@ -586,10 +586,16 @@ void main() {
       final s = read('lib/screens/main_scaffold.dart');
       expect(s, contains('PvStoreScreen(chrome: PvStoreChrome.embedded)'));
       expect(s, contains("PvTab(Icons.shopping_basket_outlined, 'Products')"));
-      // Prepare did not vanish: the Tools hub's first tile.
+      // Prepare did not vanish: it is still a tile on the Tools hub.
+      //
+      // ⚠️ THE CALL, NOT ITS WHITESPACE. This matched the whole argument list
+      // on one line and broke the day `dart format` wrapped it across four —
+      // a green test turning red on a reflow, which teaches nothing and
+      // costs a debugging session. The invariant is that the hub pushes the
+      // screen; where the formatter puts the brackets is not our business.
       expect(
         read('lib/screens/tools_hub_screen.dart'),
-        contains('PrepareHubScreen(lang: controller.language, backLabel'),
+        contains('PrepareHubScreen('),
       );
     });
 

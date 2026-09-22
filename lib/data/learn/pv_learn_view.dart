@@ -28,6 +28,7 @@
 import 'package:flutter/widgets.dart';
 
 import '../../booking/booking_models.dart';
+import '../../screens/learn/pv_learn_art.dart';
 import '../../experts/expert.dart';
 import '../../services/life_stage_store.dart';
 
@@ -112,10 +113,14 @@ class PvLearnFact {
   final String label;
 }
 
-/// One trust row: icon, bold line, quiet line. Three per page.
+/// One trust row: a drawn mark, a bold line, a quiet line. Three per page.
+///
+/// ⚠️ A MARK, NOT AN `IconData` — 2026-09-22. These rows shipped with
+/// Material glyphs and the user caught it on the walk: every other area of
+/// this app draws its own (`PvLearnArt`, and the six families before it).
 class PvLearnTrust {
-  const PvLearnTrust(this.icon, this.title, this.line);
-  final IconData icon;
+  const PvLearnTrust(this.mark, this.title, this.line);
+  final PvLearnMark mark;
   final String title;
   final String line;
 }

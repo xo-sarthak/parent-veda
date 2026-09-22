@@ -42,6 +42,7 @@ import '../../doctor/doctor_schedule_store.dart';
 import '../../services/pv_learn_progress_store.dart';
 import '../../services/remote/supabase_repo.dart';
 import '../../theme/pv_fonts.dart';
+import 'pv_learn_art.dart';
 import 'pv_learn_chrome.dart';
 import 'pv_lesson_screen.dart';
 import 'pv_offering_content.dart';
@@ -350,6 +351,18 @@ class _SlotSheetState extends State<_SlotSheet> {
                     ],
                   ),
                 ],
+              // ⚠️ THE LINE EVERY GOOD PICKER CARRIES. Future Pro: "None of
+              // these times work for me"; Fresha: "Can't find a suitable
+              // time? Join waitlist". A picker with no answer for "none of
+              // these" leaves her closing the app to say so.
+              Padding(
+                padding: const EdgeInsets.only(top: 20),
+                child: Text(
+                  'None of these? Times open a week at a time — look again '
+                  'tomorrow, or pick someone else from the list.',
+                  style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink3),
+                ),
+              ),
             ],
           ),
         ),
@@ -477,32 +490,37 @@ class _ReviewSheetState extends State<_ReviewSheet> {
     final v = widget.view;
     final s = widget.slot;
     final rule = pvTrustRowsFor(v)[1];
-    final rows = <(IconData, String, String)>[
+    // ⚠️ THE LAST SCREEN BEFORE MONEY IS NOT THE PLACE FOR BORROWED GLYPHS.
+    // These four rows wore `person_outline`, `event`, `play_circle` and
+    // `replay` — the only Material set left on the paid path. A mark per row,
+    // and the person wears her initials, as she does on the list she was
+    // picked from and on her own page.
+    final rows = <(PvLearnMark?, String, String)>[
       (
-        Icons.person_outline_rounded,
+        null, // initials
         v.expert.name,
         v.kind == PvLearnKind.consult ? v.expert.role : v.title,
       ),
       if (s != null)
         (
-          Icons.event_outlined,
+          PvLearnMark.calendar,
           pvLearnDay(s.startsUtc),
           '${pvLearnTime(s.startsUtc)} – ${pvLearnTime(s.endsUtc)}',
         )
       else
         (
-          Icons.play_circle_outline_rounded,
+          PvLearnMark.recording,
           v.kind == PvLearnKind.classPack
               ? 'Four classes'
-              : v.facts.isNotEmpty
-              ? v.facts.first.value
+              : pvLearnFacts(v).isNotEmpty
+              ? pvLearnFacts(v).first.value
               : 'Recorded',
           v.kind == PvLearnKind.classPack
               ? 'Book each one after this'
               : 'Yours to keep',
         ),
-      (Icons.payments_outlined, v.isFree ? 'Free' : v.priceLabel, v.priceUnit),
-      (Icons.replay_rounded, rule.title, rule.line),
+      (PvLearnMark.money, v.isFree ? 'Free' : v.priceLabel, v.priceUnit),
+      (PvLearnMark.refund, rule.title, rule.line),
     ];
     return SafeArea(
       top: false,
@@ -532,13 +550,32 @@ class _ReviewSheetState extends State<_ReviewSheet> {
               ),
             ),
             const SizedBox(height: 12),
-            for (final (icon, a, b) in rows)
+            for (final (mark, a, b) in rows)
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(icon, size: 20, color: p.ink1),
+                    if (mark == null)
+                      Container(
+                        width: 36,
+                        height: 36,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: p.surfaceAlt,
+                        ),
+                        child: Text(
+                          pvLearnInitials(v.expert.name),
+                          style: pvManrope(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w800,
+                            color: p.ink1,
+                          ),
+                        ),
+                      )
+                    else
+                      PvLearnRing(mark: mark, p: p, size: 36),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -576,7 +613,7 @@ class _ReviewSheetState extends State<_ReviewSheet> {
               ),
               child: Row(
                 children: [
-                  Icon(Icons.info_outline_rounded, size: 18, color: p.ink2),
+                  PvLearnRing(mark: PvLearnMark.note, p: p, size: 34),
                   const SizedBox(width: 10),
                   Expanded(
                     child: Text(

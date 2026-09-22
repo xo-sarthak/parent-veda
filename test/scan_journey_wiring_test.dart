@@ -34,7 +34,7 @@ import 'package:parentveda/screens/report_screen.dart';
 import 'package:parentveda/screens/tools/tests_scans_reports_screen.dart';
 import 'package:parentveda/services/pregnancy_controller.dart';
 import 'package:parentveda/services/scans_store.dart';
-import 'package:parentveda/screens/learn/pv_offering_screen.dart';
+import 'package:parentveda/screens/learn/pv_learn_screen.dart';
 
 /// A controller sitting at roughly [week], via the due date rather than a
 /// setter — `currentWeek` is derived, and driving it any other way would be
@@ -83,16 +83,18 @@ void main() {
       expect(find.textContaining('UP NEXT'), findsOneWidget);
     });
 
-    testWidgets('at week 30, where two windows overlap, still exactly one',
-        (t) async {
+    testWidgets('at week 30, where two windows overlap, still exactly one', (
+      t,
+    ) async {
       final c = _at(30);
       addTearDown(c.dispose);
       await _pump(t, ScanTimelineScreen(pregnancy: c));
       expect(find.textContaining('UP NEXT'), findsOneWidget);
     });
 
-    testWidgets('the states explain themselves — no legend, no status pills',
-        (t) async {
+    testWidgets('the states explain themselves — no legend, no status pills', (
+      t,
+    ) async {
       final c = _at(20);
       addTearDown(c.dispose);
       await _pump(t, ScanTimelineScreen(pregnancy: c));
@@ -125,10 +127,11 @@ void main() {
       // our own record into an accusation aimed at her. It would also be
       // wrong for every mother who had the scan and never opened this screen.
       expect(
-          find.byWidgetPredicate((w) =>
-              w is Text &&
-              (w.data ?? '').toLowerCase().contains('missed')),
-          findsNothing);
+        find.byWidgetPredicate(
+          (w) => w is Text && (w.data ?? '').toLowerCase().contains('missed'),
+        ),
+        findsNothing,
+      );
     });
   });
 
@@ -140,8 +143,7 @@ void main() {
     testWidgets('the scan she came from is the selected chip', (t) async {
       final c = _at(12);
       addTearDown(c.dispose);
-      await _pump(
-          t, ReportScreen(controller: c, initialReport: 'dating_scan'));
+      await _pump(t, ReportScreen(controller: c, initialReport: 'dating_scan'));
 
       // The heading swaps once a filter is on. Its presence is how we know the
       // filter was applied and not merely accepted and dropped.
@@ -152,8 +154,7 @@ void main() {
     testWidgets('every other report is still one tap away', (t) async {
       final c = _at(12);
       addTearDown(c.dispose);
-      await _pump(
-          t, ReportScreen(controller: c, initialReport: 'dating_scan'));
+      await _pump(t, ReportScreen(controller: c, initialReport: 'dating_scan'));
 
       // ⚠️ A FILTER, NOT A MODE. Pre-selecting saves her a tap; it must never
       // cost her a choice. "All" and the other eight reports stay on screen,
@@ -164,8 +165,9 @@ void main() {
       expect(find.text('NIPT'), findsOneWidget);
     });
 
-    testWidgets('an id this screen cannot filter by shows everything',
-        (t) async {
+    testWidgets('an id this screen cannot filter by shows everything', (
+      t,
+    ) async {
       final c = _at(12);
       addTearDown(c.dispose);
       // `gdm` is a CONDITION, not a report — a real id, and not one of the
@@ -202,10 +204,14 @@ void main() {
       const knownUnfilterable = <String>{};
       for (final (id, _, _) in kScanRun) {
         if (knownUnfilterable.contains(id)) continue;
-        expect(canFilterReport(id), isTrue,
-            reason: '$id is on the timeline but the decoder cannot filter by '
-                'it — add a filter, or add it to knownUnfilterable with a '
-                'reason.');
+        expect(
+          canFilterReport(id),
+          isTrue,
+          reason:
+              '$id is on the timeline but the decoder cannot filter by '
+              'it — add a filter, or add it to knownUnfilterable with a '
+              'reason.',
+        );
       }
     });
   });
@@ -221,32 +227,41 @@ void main() {
       expect(kSpecialists.any((s) => s.id == kScanConsultRole), isTrue);
     });
 
-    testWidgets('only the gynaecologist is listed, and there is a way back out',
-        (t) async {
-      await _pump(
+    testWidgets(
+      'only the gynaecologist is listed, and there is a way back out',
+      (t) async {
+        await _pump(
           t,
           const ConsultationsScreen(
-              lang: AppLanguage.english, onlyRole: kScanConsultRole));
+            lang: AppLanguage.english,
+            onlyRole: kScanConsultRole,
+          ),
+        );
 
-      final ob = kSpecialists.firstWhere((s) => s.id == kScanConsultRole);
-      // Since 2026-09-20 the door lands on HER consult page (the unified
-      // learn page; `ConsultationsScreen` is a facade): the card names her
-      // and her role, no other specialist is a card, and "Other experts" is
-      // the way back out — which is what stops a door from being a wall.
-      // The pill-row version (2026-09-19) is kept in the Classic body.
-      expect(find.byType(PvOfferingScreen), findsOneWidget);
-      expect(find.text('Consult with ${ob.name.en}'), findsWidgets);
-      expect(find.text(ob.role.en), findsWidgets);
-      // The others are on the page only as the "Other experts" rail, below
-      // the head that names it — never above her.
-      final rail = t.getTopLeft(find.text('Other experts')).dy;
-      for (final s in kSpecialists.where((x) => x.id != kScanConsultRole)) {
-        for (final e in find.text('Consult with ${s.name.en}').evaluate()) {
-          expect(t.getTopLeft(find.byWidget(e.widget)).dy > rail, isTrue,
-              reason: '${s.id} is a card above the way out');
-        }
-      }
-    });
+        final ob = kSpecialists.firstWhere((s) => s.id == kScanConsultRole);
+        // Since 2026-09-22 the door lands on the CONSULT LIST with the role it
+        // named already selected, and "All consults" as the way out — Zocdoc's
+        // and Alan's answer to "find me a gynaecologist". (For a day it opened
+        // that one doctor's page, which read as the app choosing for her; the
+        // pill-row version of 2026-09-19 is in the Classic body.)
+        expect(find.byType(PvLearnScreen), findsOneWidget);
+        expect(
+          find.text(ob.name.en),
+          findsWidgets,
+          reason: "the door's own doctor is listed",
+        );
+        expect(
+          find.text(ob.role.en),
+          findsWidgets,
+          reason: 'and what she is, on the row',
+        );
+        expect(
+          find.textContaining('All consults'),
+          findsOneWidget,
+          reason: 'the way back out',
+        );
+      },
+    );
   });
 
   // ===========================================================================
@@ -258,11 +273,13 @@ void main() {
       final c = _at(20);
       addTearDown(c.dispose);
       await _pump(
-          t,
-          TestScanDetailScreen(
-              info: _scan('anomaly_scan'),
-              controller: c,
-              openParameters: true));
+        t,
+        TestScanDetailScreen(
+          info: _scan('anomaly_scan'),
+          controller: c,
+          openParameters: true,
+        ),
+      );
 
       // ⚠️ NOT RENDERED, NOT MERELY COLLAPSED — and the difference is the
       // whole point of the second review pass. Collapsed still makes her
@@ -285,12 +302,14 @@ void main() {
       addTearDown(c.dispose);
       final scan = _scan('anomaly_scan');
       await _pump(
-          t,
-          TestScanDetailScreen(
-              info: scan, controller: c, openParameters: true));
+        t,
+        TestScanDetailScreen(info: scan, controller: c, openParameters: true),
+      );
 
-      expect(find.text(S(AppLanguage.english).uiUnderstandingReportParameters),
-          findsOneWidget);
+      expect(
+        find.text(S(AppLanguage.english).uiUnderstandingReportParameters),
+        findsOneWidget,
+      );
       // Open, not just present: a parameter's name is only in the tree once
       // the section has expanded.
       if (scan.parameters.isNotEmpty) {
@@ -302,9 +321,9 @@ void main() {
       final c = _at(20);
       addTearDown(c.dispose);
       await _pump(
-          t,
-          TestScanDetailScreen(
-              info: _scan('anomaly_scan'), controller: c));
+        t,
+        TestScanDetailScreen(info: _scan('anomaly_scan'), controller: c),
+      );
 
       // ⚠️ THE OTHER HALF OF THE DECISION. Someone arriving before a scan
       // wants exactly those five sections. Removing them for her too would
@@ -322,13 +341,16 @@ void main() {
   // ===========================================================================
 
   group('the red-flag heading names a person, not a deadline', () {
-    testWidgets('it says who to call, and the old deadline framing is gone',
-        (t) async {
+    testWidgets('it says who to call, and the old deadline framing is gone', (
+      t,
+    ) async {
       final c = _at(9);
       addTearDown(c.dispose);
       ScansStore.instance; // touch the singleton the screen listens to
       await _pump(
-          t, ScanDetailScreen(scan: _scan('dating_scan'), pregnancy: c));
+        t,
+        ScanDetailScreen(scan: _scan('dating_scan'), pregnancy: c),
+      );
 
       expect(find.text('Call your gynaecologist if'), findsOneWidget);
 
@@ -342,15 +364,19 @@ void main() {
       final c = _at(9);
       addTearDown(c.dispose);
       await _pump(
-          t, ScanDetailScreen(scan: _scan('dating_scan'), pregnancy: c));
+        t,
+        ScanDetailScreen(scan: _scan('dating_scan'), pregnancy: c),
+      );
 
       // ⚠️ SOFTENING THE FRAME IS RIGHT; SOFTENING A RED FLAG IS NOT. This is
       // the line the next person to "make it calmer" must not cross, so it is
       // pinned rather than left to judgement.
       expect(
-          find.byWidgetPredicate((w) =>
-              w is Text && (w.data ?? '').contains('Bleeding, or pain low')),
-          findsOneWidget);
+        find.byWidgetPredicate(
+          (w) => w is Text && (w.data ?? '').contains('Bleeding, or pain low'),
+        ),
+        findsOneWidget,
+      );
     });
   });
 }

@@ -31,6 +31,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:parentveda/booking/booking_catalog.dart';
 import 'package:parentveda/booking/booking_store.dart';
 import 'package:parentveda/data/learn/pv_learn_view.dart';
+import 'package:parentveda/data/learn/pv_learn_images.dart';
+import 'package:parentveda/screens/products/pv_review_block.dart';
 import 'package:parentveda/screens/learn/pv_learn_catalog.dart';
 import 'package:parentveda/screens/learn/pv_learn_screen.dart';
 import 'package:parentveda/screens/learn/pv_my_learning_screen.dart';
@@ -128,7 +130,12 @@ void main() {
         final v = oneOf(k);
         await pumpTall(tester, PvOfferingScreen(view: v));
         expect(tester.takeException(), isNull);
-        expect(find.text(v.title), findsWidgets);
+        // A consult page is titled with the person, not "Consult with X"
+        // over a photograph of X (2026-09-22).
+        expect(
+          find.text(k == PvLearnKind.consult ? v.expert.name : v.title),
+          findsWidgets,
+        );
         final hs = heads(tester);
         expect(hs, isNotEmpty, reason: '${k.name} rendered no section heads');
         for (var i = 1; i < hs.length; i++) {
@@ -378,6 +385,98 @@ void main() {
           );
         }
       }
+    });
+  });
+
+  // ===========================================================================
+  //  5 · THE WALK OF 2026-09-22 — the four things the phone caught
+  // ===========================================================================
+  group('the walk of 2026-09-22', () {
+    test('no learn cover is a stock photo invented from a keyword', () {
+      // ⚠️ THE ONE THAT ACTUALLY SHIPPED WRONG. `pvLearnCoverFor` keyed a
+      // free Unsplash photo off a TOPIC WORD, so four programmes sharing
+      // "Birth & Labour" shared one picture — of two toddlers with a tablet
+      // — stacked in one scroll. A photograph is welcome (`kPvLearnCovers`
+      // is the seam and it is checked first); SYNTHESISING one is not, and
+      // the difference is not visible in a screenshot of the code.
+      for (final v in PvLearnCatalog.instance.all()) {
+        if (v.cover == null) continue;
+        expect(
+          kPvLearnCovers.containsValue(v.cover),
+          isTrue,
+          reason:
+              '${v.id} has a cover that is not in kPvLearnCovers — a photo '
+              'must be chosen for that programme, never derived from a word',
+        );
+      }
+    });
+
+    test('every view has a drawn cover, and topics pick it', () {
+      // The floor: a kind always answers, so a programme added tomorrow
+      // still has a face rather than a blank pastel.
+      for (final v in PvLearnCatalog.instance.all()) {
+        expect(pvLearnMarkFor(v.topics, v.kind), isNotNull);
+      }
+      // And the topic beats the kind, which is the whole point of the map.
+      expect(
+        pvLearnMarkFor(const ['Birth & Labour'], PvLearnKind.course),
+        isNot(pvLearnMarkFor(const [], PvLearnKind.course)),
+      );
+      expect(
+        pvLearnMarkFor(const ['Breastfeeding'], PvLearnKind.masterclass),
+        isNot(
+          pvLearnMarkFor(const ['Birth & Labour'], PvLearnKind.masterclass),
+        ),
+      );
+    });
+
+    testWidgets('an owned thing shows progress, never a price unit', (t) async {
+      // "Yours / yours to keep" under a hero already tagged "Yours" — one
+      // fact three times, in the slot that should say how far in she is.
+      SharedPreferences.setMockInitialValues({});
+      await PvLearnProgressStore.instance.init();
+      final v = PvLearnCatalog.instance
+          .all(stage: LifeStage.pregnancy, kind: PvLearnKind.course)
+          .firstWhere((x) => x.lessons.isNotEmpty);
+      await t.pumpWidget(MaterialApp(home: PvOfferingScreen(view: v)));
+      await t.pump(const Duration(milliseconds: 400));
+      expect(find.text('yours to keep'), findsNothing);
+      // The exact string, not `textContaining` — this course's own subtitle
+      // ends "...taught properly, once." and the old assertion caught it.
+      expect(find.text('once'), findsNothing);
+      expect(find.text('Yours'), findsNothing);
+    });
+
+    testWidgets('a lone review is one card, not a rail with a hole', (t) async {
+      // The rail equalises card heights with a Spacer; with one card there
+      // is nothing to equalise and the gap reads as a loading state.
+      const one = [
+        PvReviewVoice(
+          name: 'Sneha K.',
+          context: '28 weeks',
+          quote: 'The one place that told me what to actually do.',
+        ),
+      ];
+      await t.pumpWidget(
+        const MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: PvReviewBlock(
+                title: 'What mothers said',
+                rating: 4.9,
+                countLabel: '240 mothers',
+                voices: one,
+              ),
+            ),
+          ),
+        ),
+      );
+      await t.pump();
+      expect(find.text('Sneha K.'), findsOneWidget);
+      // Her context is on its own line, not folded into the byline.
+      expect(find.text('28 weeks'), findsOneWidget);
+      // A five-star card draws no stars; the headline carries the average.
+      expect(find.byIcon(Icons.star_rounded), findsNWidgets(5));
     });
   });
 }
