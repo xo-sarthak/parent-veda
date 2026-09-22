@@ -54,8 +54,23 @@ import '../services/app_structure.dart';
 import '../services/home_content_controller.dart';
 import '../services/landing_focus.dart';
 import '../services/life_stage_store.dart';
+import '../models/week_content.dart' show WeekContent;
 import '../services/pregnancy_controller.dart';
 import 'weekly_card_stack_screen.dart';
+import 'preg_daily_insights.dart';
+import 'v2/preg_size_sheet.dart';
+import '../data/preg_size_sets.dart';
+import '../services/preg_size_set_store.dart';
+// import 'v2/pv_day_strip.dart'; // the strip is inside V3PregHero now
+import 'v2/v3_preg_hero.dart';
+import 'preg_week_screen.dart';
+// import 'v2/v3_hero_field.dart'; // kept for revert — PregField since 2026-09-22
+import 'v2/pv_insight_rail.dart';
+import '../services/symptom_store.dart';
+import '../services/nutrition_day_store.dart';
+import 'tools/symptom_companion_screen.dart' show SymptomCompanionScreen, openSymptomDetail;
+import 'can_i/can_i_answer.dart' show openCanIAnswer;
+import '../data/symptom_data.dart' show kSymptoms;
 import 'profile/pv_you_screen.dart';
 import 'saved_screen.dart';
 // import 'search/pv_search_screen.dart'; // the home bar, kept for revert
@@ -63,7 +78,7 @@ import 'saved_screen.dart';
 import '../services/scans_store.dart';
 // openAskVeda dropped from the show list with the Ask door. The FAB still calls
 // it; this screen no longer needs to, because Ask is on every screen already.
-import '../widgets/global_ask_fab.dart' show kAskFabReserve;
+// import '../widgets/global_ask_fab.dart' show kAskFabReserve; // the sheet owns the clearance (2026-09-22)
 import '../referral/referral_store.dart';
 import 'referral/invite_friends_screen.dart';
 import 'today_home_screen.dart';
@@ -114,9 +129,63 @@ class HomeV3Screen extends StatefulWidget {
   State<HomeV3Screen> createState() => _HomeV3ScreenState();
 }
 
-class _HomeV3ScreenState extends State<HomeV3Screen> {
+class _HomeV3ScreenState extends State<HomeV3Screen>
+    with WidgetsBindingObserver {
   PregnancyController get pregnancy => widget.pregnancy;
   HomeContentController get home => widget.home;
+
+  // ---- The day the page is about --------------------------------------------
+  //
+  // ⚠️ THE TTC HOME'S RULES, TAKEN WHOLE (2026-09-21, the pregnancy home took
+  // the TTC fold). One idea of today, held here and threaded down, so the
+  // strip, the heading and the cards cannot disagree about which day it is;
+  // refreshed on resume and on any rebuild after midnight; and the selection
+  // is only dragged forward if she was standing on the old today — advancing
+  // a default is correct, advancing a decision is not.
+  static DateTime _dayOnly(DateTime d) => DateTime(d.year, d.month, d.day);
+  DateTime _today = _dayOnly(DateTime.now());
+  late DateTime _selected = _today;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) _rollOver();
+  }
+
+  void _rollOver() {
+    final now = _dayOnly(DateTime.now());
+    if (now == _today) return;
+    setState(() {
+      final wasOnToday = _selected == _today;
+      _today = now;
+      if (wasOnToday) _selected = now;
+    });
+  }
+
+  /// "Today", "Yesterday", or the date — the insights heading names the day
+  /// the cards were computed for. A heading that says Today above cards
+  /// computed for last Tuesday is a screen lying about its own contents.
+  static const _months = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December',
+  ];
+  String _dayTitle(DateTime day) {
+    final diff = day.difference(_today).inDays;
+    if (diff == 0) return 'Today';
+    if (diff == -1) return 'Yesterday';
+    return '${day.day} ${_months[day.month - 1]}';
+  }
 
   // ---- The daily tip, fired once when this screen first has content ---------
   //
@@ -138,6 +207,7 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
   /// app at 2am is usually awake because something is wrong, uncomfortable or
   /// frightening. "Good evening" at that hour reads as an app that is not paying
   /// attention.
+  // ignore: unused_element
   String _greeting(String name) {
     final h = DateTime.now().hour;
     final part = h < 5
@@ -158,19 +228,25 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
   /// 280 days without 280 strings. It names the week, the day within the week,
   /// and the one milestone fact that is true of that stretch — a trimester
   /// boundary, viability, full term.
+  ///
+  /// ⚠️ THE WEEK AND DAY LEFT THIS LINE ON 2026-09-21: the hero's title says
+  /// "Week 14 · Day 3" now, and a subtitle repeating it two lines above was
+  /// the "Today three times" the Nutrition walk rejected. The milestone alone
+  /// stays. Kept for revert:
+  ///   final dayInWeek = ((activeDay - 1) % 7) + 1;
+  ///   final base = 'Week $week, day $dayInWeek';
+  ///   ... return '$base. Any day now.'; etc.
+  // ignore: unused_element
   String _dayLine(int week, int activeDay) {
-    final dayInWeek = ((activeDay - 1) % 7) + 1;
-    final base = 'Week $week, day $dayInWeek';
-
     // Only the handful of markers a mother actually counts toward.
-    if (week >= 40) return '$base. Any day now.';
-    if (week >= 37) return '$base. Full term from here.';
-    if (week >= 28) return '$base. Third trimester.';
-    if (week == 24) return '$base. A milestone week.';
-    if (week >= 20 && week <= 22) return '$base. The anomaly scan window.';
-    if (week >= 14) return '$base. Second trimester.';
-    if (week >= 13) return '$base. The first trimester is behind you.';
-    return '$base. Early days.';
+    if (week >= 40) return 'Any day now.';
+    if (week >= 37) return 'Full term from here.';
+    if (week >= 28) return 'Third trimester.';
+    if (week == 24) return 'A milestone week.';
+    if (week >= 20 && week <= 22) return 'The anomaly scan window.';
+    if (week >= 14) return 'Second trimester.';
+    if (week >= 13) return 'The first trimester is behind you.';
+    return 'Early days.';
   }
 
   void _maybeShowTip(String line, int week, int day, V2Palette p) {
@@ -203,6 +279,13 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
         // body had already swapped (see today_home_screen.dart). A store read
         // by a child is a store the parent has to listen to.
         V2BlockArtMode.instance,
+        // The insights rail reads these three: a symptom logged, a scan
+        // booked, a need ticked — each must rebuild the rail.
+        SymptomStore.instance,
+        ScansStore.instance,
+        NutritionDayStore.instance,
+        // The hero line and the size card name the set she chose.
+        PregSizeSetStore.instance,
       ]),
       builder: (context, _) => _build(context),
     );
@@ -213,9 +296,23 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    final activeDay = home.previewDay ?? pregnancy.currentDay;
+    // ⚠️ A SECOND MIDNIGHT CHECK, and not a redundant one: the lifecycle
+    // observer covers a resume; this covers a rebuild for any other reason
+    // after midnight without the app having been backgrounded.
+    if (_dayOnly(DateTime.now()) != _today) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) _rollOver();
+      });
+    }
+
+    // ⚠️ THE SELECTED DAY, NOT TODAY. The strip picks a date; the date maps
+    // to a pregnancy day; everything authored by day follows it — the hero,
+    // the insights, the reads. `previewDay` (the debug preview) still wins.
+    final activeDay =
+        home.previewDay ?? pregnancy.dayForDate(_selected);
     final week = (((activeDay - 1) ~/ 7) + 1).clamp(4, 40);
     final day = home.dayFor(activeDay, week);
+    final weekContent = pregnancy.weekData(week);
     final p = V2PaletteStore.instance.current;
     final reads = v2ReadsFor(week, activeDay);
     final video = v2VideoFor(week);
@@ -238,15 +335,27 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
     // The tip no longer has a section on this page — it arrives as a card in
     // the middle of the screen on open. See v2/v3_daily_tip.dart for why a
     // greeting is not the interstitial §16.3 bans.
-    _maybeShowTip(insight, week, activeDay, p);
+    // The day within the week, as the hero says it — the tip said WEEK 4 ·
+    // DAY 14 over a hero saying Week 4 · Day 7 (the phone, 2026-09-22).
+    _maybeShowTip(insight, week, ((activeDay - 1) % 7) + 1, p);
 
+    // The field's hue: the trimester's — the arrival green of the first, the
+    // warm second, the deep third. One colour decision, shared with the sheet.
+    // ⚠️ THE ART'S OWN HUE, EVERY TRIMESTER. A green field under the pink
+    // figure was "two different things put together" (the user,
+    // 2026-09-22). The field is the peach the illustrator painted, so the
+    // figure's halo and the page are one surface. The trimester still picks
+    // the field's composition. Kept for revert:
+    //   final fieldHue = switch (trimester) { 1 => 104.0, 2 => 24.0, _ => 268.0 };
+    final trimester = activeDay <= 91 ? 1 : (activeDay <= 189 ? 2 : 3);
+    // const fieldHue = kPregFieldHue;
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      // The clock, battery and signal now sit ON the photograph, so they have
-      // to be light. Without this they render dark-on-dark and disappear.
+      // The clock, battery and signal sit on the light field now (they sat
+      // on the photograph until 2026-09-22), so they are dark again.
       value: const SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
-        statusBarIconBrightness: Brightness.light,
-        statusBarBrightness: Brightness.dark,
+        statusBarIconBrightness: Brightness.dark,
+        statusBarBrightness: Brightness.light,
       ),
       child: Container(
         color: p.ground,
@@ -258,77 +367,213 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
         child: SafeArea(
           top: false,
           bottom: false,
+        child: Stack(children: [
+          // The field is the PAGE's surface — it does not scroll; the sheet
+          // slides over it (TTC's shape, 2026-09-22).
+          // `PregField`, the art's own colours (2026-09-22, second pass:
+          // `V3HeroField` at a warm hue came out khaki). Kept for revert:
+          //   V3HeroField(accent: v2BlockTint(fieldHue, p), ground: p.ground,
+          //       variant: trimester, chroma: v3FieldChroma(fieldHue)),
+          Positioned.fill(child: PregField(ground: p.ground, variant: trimester)),
         // NO HORIZONTAL PADDING ON THE LIST. The hero has to reach both
         // edges, and a list that pads everything cannot let one child out.
         // Every other section wraps itself in _pad() instead.
-        child: ListView(
-          padding: const EdgeInsets.only(bottom: kAskFabReserve),
+        // The sheet owns the bottom clearance now; the list pads nothing.
+        // Kept for revert: padding: const EdgeInsets.only(bottom: kAskFabReserve),
+        ListView(
+          padding: EdgeInsets.zero,
           children: [
             // ---- HEADER AND HERO AS ONE BLOCK -------------------------------
+            // ---- THE FOLD, IN THE TTC HOME'S STRUCTURE — 2026-09-22 ----------
+            //
+            // [avatar · date · saved] → the day strip → the baby in a disc →
+            // "Week n · Day d" → the size line → "This week" — on the field,
+            // with the rest of the page on a white sheet over it. See
+            // v3_preg_hero.dart for the user's words. The full-bleed
+            // photograph (`V3Hero`) is commented out below, kept for revert.
             if (day != null)
-              V3Hero(
-                // ⚠️ THE GREETING NOW KNOWS THE TIME, AND THE SUBTITLE KNOWS
-                // THE DAY.
-                //
-                // It said "Today, mum" at every hour and "Symptoms, medicines
-                // and how you are doing" in every one of the 280 days. Both were
-                // true always, which is another way of saying neither was about
-                // now. The screen already held the hour and the day and was
-                // using neither.
-                //
-                // See `_greeting()` and `_dayLine()` below.
-                name: _greeting(name),
-                subtitle: _dayLine(week, activeDay),
+              V3PregHero(
+                p: p,
                 week: week,
                 day: activeDay,
-                // ⚠️ DISPLAY, so `.now`. This lands in a `Text(learning)` in
-                  // v3_sections.dart — rendered prose, not an identity.
-                  learning: day.babyLearning.now,
-                p: p,
-                // ⚠️ WAS `_open(context, 'weekly_snapshot')`, which switched
-                // the home to CLASSIC and stopped. V3 is final (2026-09-16):
-                // the hero opens the week she is looking at, like the spine.
-                // Kept for revert: onTap: () => _open(context, 'weekly_snapshot'),
-                onTap: () {
-                  pregnancy.selectWeek(week);
-                  Navigator.of(context).push(MaterialPageRoute(
-                    settings: const RouteSettings(name: 'weekly_card_stack'),
-                    builder: (_) => WeeklyCardStackScreen(controller: pregnancy),
-                  ));
+                selected: _selected,
+                today: _today,
+                // Back to day one of the pregnancy, six months at most; six
+                // ahead, dimmed, so today sits in the centre as on TTC.
+                daysBack: (pregnancy.currentDay - 1).clamp(0, 180),
+                onSelectDay: (d) => setState(() => _selected = d),
+                // A dot under a day she logged a symptom on.
+                markFor: (date, _) {
+                  final key = SymptomStore.dateKey(date);
+                  final any = SymptomStore.instance.logs.any((l) => l.dateKey == key);
+                  if (!any) return null;
+                  return Center(
+                    child: Container(
+                      width: 5,
+                      height: 5,
+                      decoration: BoxDecoration(color: p.ink2, shape: BoxShape.circle),
+                    ),
+                  );
                 },
-                // ⚠️ A PUSH, NOT A TAB SWITCH. `_open` routes through
-                // `homeFor()` to `AppNav.go(tabIndex)`, which lands on Today —
-                // the classic home. The chip says WEEK 40, so it has to open
-                // week 40.
-                //
-                // `selectWeek` before the push, because the stack reads the
-                // controller's selection rather than taking a week argument;
-                // pushing without it opens the stack wherever it was left.
-                onSpine: () {
-                  pregnancy.selectWeek(week);
-                  Navigator.of(context).push(MaterialPageRoute(
-                    settings: const RouteSettings(name: 'weekly_card_stack'),
-                    builder: (_) =>
-                        WeeklyCardStackScreen(controller: pregnancy),
-                  ));
-                },
-                // Was `_open(context, 'journal')` — classic fallback, then the
-                // journal itself. Both kept for revert. Since 2026-09-19 the
-                // avatar is the one door to You on every stage; the journal
-                // sits under Your things there.
-                // onAvatar: () => Navigator.of(context).push(MaterialPageRoute<void>(
-                //     settings: const RouteSettings(name: 'journal'),
-                //     builder: (_) => JournalScreen(controller: pregnancy))),
+                initial: name.isEmpty ? '' : name.trim().characters.last,
+                // The figure and Details open the week page (Flo's Details).
+                // The size line and the "This week" pill left the hero on
+                // 2026-09-22 — the insight card says the size, the page says
+                // the rest. Kept for revert:
+                //   sizeLine: _sizeLine(week, weekContent),
+                //   onSize / onThisWeek: () => _openWeekSheet(context, week, weekContent, p),
+                onDetails: () => openPregWeek(context, pregnancy, week),
                 onAvatar: () => openPvYou(context, stage: LifeStage.pregnancy),
-                // ⚠️ WAS `_open(context, 'saved')`, which switched the home to
-                // CLASSIC and stopped — the V3 scaffolding from when classic
-                // was still the destination. V3 is final (2026-09-16): every
-                // tap opens the thing itself. Kept for revert:
-                // onSaved: () => _open(context, 'saved'),
                 onSaved: () => Navigator.of(context).push(MaterialPageRoute<void>(
                     settings: const RouteSettings(name: 'saved'),
                     builder: (_) => const SavedScreen())),
               ),
+            // ---- THE SHEET: everything under the fold ------------------------
+            V3PregSheet(p: p, children: [
+            // ---- KEPT FOR REVERT: the full-bleed photograph hero ---------------
+
+            // if (day != null)
+            //   V3Hero(
+            //     // ⚠️ THE GREETING NOW KNOWS THE TIME, AND THE SUBTITLE KNOWS
+            //     // THE DAY.
+            //     //
+            //     // It said "Today, mum" at every hour and "Symptoms, medicines
+            //     // and how you are doing" in every one of the 280 days. Both were
+            //     // true always, which is another way of saying neither was about
+            //     // now. The screen already held the hour and the day and was
+            //     // using neither.
+            //     //
+            //     // See `_greeting()` and `_dayLine()` below.
+            //     name: _greeting(name),
+            //     subtitle: _dayLine(week, activeDay),
+            //     week: week,
+            //     day: activeDay,
+            //     // ⚠️ DISPLAY, so `.now`. This lands in a `Text(learning)` in
+            //       // v3_sections.dart — rendered prose, not an identity.
+            //       learning: day.babyLearning.now,
+            //     p: p,
+            //     height: 372,
+            //     // ---- the day strip, on the photograph -----------------------
+            //     //
+            //     // The window runs back to day one of the pregnancy and no
+            //     // further (a date before it is not a day of this pregnancy),
+            //     // six months at most, and SIX DAYS AHEAD, dimmed, exactly as
+            //     // TTC — the user (2026-09-21): "the date today is in the
+            //     // centre", and a strip that ends at today puts today at the
+            //     // edge. A day ahead is selectable; the insights hide the log
+            //     // and the plate on it, and the week it shows is at most six
+            //     // days early.
+            //     strip: PvDayStrip(
+            //       p: p,
+            //       selected: _selected,
+            //       today: _today,
+            //       accent: Colors.white,
+            //       onPhoto: true,
+            //       keyPrefix: 'preg_day_',
+            //       daysBack: (pregnancy.currentDay - 1).clamp(0, 180),
+            //       daysForward: 6,
+            //       // A dot under a day she logged a symptom on — "when have I
+            //       // been logging?" at a glance; the detail is the card.
+            //       markFor: (date, _) {
+            //         final key = SymptomStore.dateKey(date);
+            //         final any = SymptomStore.instance.logs
+            //             .any((l) => l.dateKey == key);
+            //         if (!any) return null;
+            //         return Center(
+            //           child: Container(
+            //             width: 5,
+            //             height: 5,
+            //             decoration: BoxDecoration(
+            //                 color: Colors.white.withValues(alpha: 0.85),
+            //                 shape: BoxShape.circle),
+            //           ),
+            //         );
+            //       },
+            //       onSelect: (d) => setState(() => _selected = d),
+            //     ),
+            //     sizeLine: _sizeLine(week, weekContent),
+            //     // ⚠️ THE HERO NO LONGER OPENS THE WEEK STACK — 2026-09-21,
+            //     // the user: "a pill that says week four, day 13, which leads
+            //     // to the weekly card stack that we don't need at all. Even
+            //     // clicking on the image does that … cut the wire. Don't
+            //     // delete the section, just don't wire it like that."
+            //     //
+            //     // So the photograph, the size line and the "This week" pill
+            //     // all open the week SHEET — the baby this week, its size,
+            //     // what it is doing — and the stack keeps its own doors
+            //     // elsewhere. `_openWeek` stays below for revert.
+            //     onSize: weekContent == null ? null : () => _openWeekSheet(context, week, weekContent, p),
+            //     onThisWeek: weekContent == null ? null : () => _openWeekSheet(context, week, weekContent, p),
+            //     onTap: weekContent == null ? null : () => _openWeekSheet(context, week, weekContent, p),
+            //     // Kept for revert — the stack wiring the user cut:
+            //     // onTap: () {
+            //     //   pregnancy.selectWeek(week);
+            //     //   Navigator.of(context).push(MaterialPageRoute(
+            //     //     settings: const RouteSettings(name: 'weekly_card_stack'),
+            //     //     builder: (_) => WeeklyCardStackScreen(controller: pregnancy),
+            //     //   ));
+            //     // },
+            //     // onSpine: () {  // (the chip; `_openWeek` does the same)
+            //     //   pregnancy.selectWeek(week);
+            //     //   Navigator.of(context).push(MaterialPageRoute(
+            //     //     settings: const RouteSettings(name: 'weekly_card_stack'),
+            //     //     builder: (_) => WeeklyCardStackScreen(controller: pregnancy),
+            //     //   ));
+            //     // },
+            //     // Was `_open(context, 'journal')` — classic fallback, then the
+            //     // journal itself. Both kept for revert. Since 2026-09-19 the
+            //     // avatar is the one door to You on every stage; the journal
+            //     // sits under Your things there.
+            //     // onAvatar: () => Navigator.of(context).push(MaterialPageRoute<void>(
+            //     //     settings: const RouteSettings(name: 'journal'),
+            //     //     builder: (_) => JournalScreen(controller: pregnancy))),
+            //     onAvatar: () => openPvYou(context, stage: LifeStage.pregnancy),
+            //     // ⚠️ WAS `_open(context, 'saved')`, which switched the home to
+            //     // CLASSIC and stopped — the V3 scaffolding from when classic
+            //     // was still the destination. V3 is final (2026-09-16): every
+            //     // tap opens the thing itself. Kept for revert:
+            //     // onSaved: () => _open(context, 'saved'),
+            //     onSaved: () => Navigator.of(context).push(MaterialPageRoute<void>(
+            //         settings: const RouteSettings(name: 'saved'),
+            //         builder: (_) => const SavedScreen())),
+            //   ),
+            // ---- MY DAILY INSIGHTS · <day> ----------------------------------
+            //
+            // The TTC rail, under the hero (2026-09-21). The heading names
+            // the day the cards were computed for; the rail pads itself and
+            // runs edge to edge, so it sits OUTSIDE the padded column — the
+            // double-gutter "wall" Nutrition shipped is the thing to avoid.
+            // See preg_daily_insights.dart for which cards a day earns.
+            if (day != null) ...[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(18, 22, 18, 12),
+                child: V3SectionHead(
+                    eyebrow: 'My daily insights',
+                    title: _dayTitle(_selected),
+                    p: p),
+              ),
+              PvInsightRail(tiles: [
+                for (final c in pregInsightsFor(
+                  date: _selected,
+                  today: _today,
+                  day: activeDay,
+                  week: week,
+                  homeDay: day,
+                  weekContent: weekContent,
+                  reads: reads,
+                ))
+                  PvInsightTile(
+                    key: ValueKey('preg_insight_${c.id}'),
+                    eyebrow: c.eyebrow,
+                    value: c.value,
+                    caption: c.caption,
+                    hue: c.hue,
+                    art: c.art,
+                    p: p,
+                    onTap: () => _openInsight(context, c, week, weekContent),
+                  ),
+              ]),
+            ],
             // ⚠️ THE PAGE IS THREE INSET COLUMNS WITH TWO FULL-BLEED THINGS
             // BETWEEN THEM, not one column any more.
             //
@@ -344,12 +589,16 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-            const SizedBox(height: 24),
+            const SizedBox(height: 26),
 
-            // ---- The only time-sensitive row, still hiding when empty -------
-            V2ComingUp(p: p, onTap: () => _open(context, 'tests_scans')),
-            if (ScansStore.instance.appointments.isNotEmpty)
-              const SizedBox(height: 12),
+            // ---- The only time-sensitive row — FOLDED INTO THE RAIL ---------
+            // 2026-09-21: a scan in the next fortnight is the "Coming up"
+            // card on My daily insights (preg_daily_insights.dart). A row of
+            // its own between the hero and the doors was the interruption
+            // the kick-count card was removed for. Kept for revert:
+            // V2ComingUp(p: p, onTap: () => _open(context, 'tests_scans')),
+            // if (ScansStore.instance.appointments.isNotEmpty)
+            //   const SizedBox(height: 12),
 
             // MOVEMENT / KICK COUNT REMOVED — placement rejected.
             //
@@ -912,8 +1161,10 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
                 ],
               ),
             ),
+            ]),
             ],
           ),
+        ]),
         ),
       ),
     );
@@ -1277,6 +1528,82 @@ class _HomeV3ScreenState extends State<HomeV3Screen> {
   /// not rewind the streak, so a mis-tap costs nothing but the tick.
   void _toggleGarbh(GarbhStore store, String pillarId) =>
       store.isDone(pillarId) ? store.undoDone(pillarId) : store.markDone(pillarId);
+
+  /// "About the size of a guava · 8.7 cm · 43 g" — in the set she chose,
+  /// from the week's snapshot. Null when the week has no size (the sheet and
+  /// the line both hide).
+  // ignore: unused_element
+  String? _sizeLine(int week, WeekContent? w) {
+    if (w == null) return null;
+    final item =
+        pregSizeOrFallback(week, PregSizeSetStore.instance.set, w.snapshot.fruit.en);
+    if (item == null) return null;
+    final parts = [
+      item.line,
+      w.snapshot.length.en.trim(),
+      w.snapshot.weight.en.trim(),
+    ].where((s) => s.isNotEmpty);
+    return parts.join(' · ');
+  }
+
+  /// The week's sheet — superseded by `PregWeekScreen` on 2026-09-22; kept
+  /// for revert.
+  // ignore: unused_element
+  void _openWeekSheet(BuildContext context, int week, WeekContent content, V2Palette p) =>
+      showPregSizeSheet(context, week: week, content: content, p: p);
+
+  /// The week stack, on [week]. `selectWeek` before the push, because the
+  /// stack reads the controller's selection rather than taking an argument.
+  /// ⚠️ UNWIRED from the hero and the insights on 2026-09-21 (the user);
+  /// kept for revert.
+  // ignore: unused_element
+  void _openWeek(BuildContext context, int week) {
+    pregnancy.selectWeek(week);
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      settings: const RouteSettings(name: 'weekly_card_stack'),
+      builder: (_) => WeeklyCardStackScreen(controller: pregnancy),
+    ));
+  }
+
+  /// Every destination an insight card can have, in one place.
+  ///
+  /// ⚠️ AN EXHAUSTIVE SWITCH ON PURPOSE. `PregInsightGo` is a plain enum and
+  /// Dart warns on a missing case — the cheapest version of the wiring gate:
+  /// a card kind that goes nowhere is a compile-time complaint, not a tile
+  /// that does nothing on a device three weeks from now.
+  void _openInsight(
+      BuildContext context, PregInsight c, int week, WeekContent? content) {
+    switch (c.go) {
+      case PregInsightGo.log:
+        Navigator.of(context).push(MaterialPageRoute<void>(
+          settings: const RouteSettings(name: 'symptoms'),
+          builder: (_) => SymptomCompanionScreen(controller: pregnancy),
+        ));
+      case PregInsightGo.symptom:
+        final s = kSymptoms.where((x) => x.id == c.symptomId).firstOrNull;
+        if (s == null) return; // the card is only built for a known id
+        openSymptomDetail(context, s, pregnancy);
+      case PregInsightGo.scan:
+        _openBracket(context, 'pregnancy_scans_tests');
+      case PregInsightGo.week:
+        // The week page, Flo's Details (2026-09-22). Not the stack (the user
+        // cut that wire, 2026-09-21); the size sheet before that. Kept for
+        // revert: _openWeek(context, week); _openWeekSheet(…).
+        openPregWeek(context, pregnancy, week);
+      case PregInsightGo.size:
+        openPregWeek(context, pregnancy, week);
+      case PregInsightGo.eat:
+        _openBracket(context, kNutritionBracketId);
+      case PregInsightGo.safe:
+        if (c.entry case final e?) openCanIAnswer(context, e, pregnancy);
+      case PregInsightGo.read:
+        if (c.read case final r?) {
+          Navigator.of(context).push(MaterialPageRoute<void>(
+              settings: RouteSettings(name: 'read/${r.id}'),
+              builder: (_) => ReadItemScreen(item: r, controller: pregnancy)));
+        }
+    }
+  }
 
   void _open(BuildContext context, String surfaceId) {
     final h = homeFor(surfaceId);

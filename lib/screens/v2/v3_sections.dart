@@ -43,8 +43,17 @@ import 'v2_sections.dart' show v2CoverTint, v2ReadCover;
 
 /// Header and hero as one full-bleed block.
 ///
-/// Her name, the line under it and the avatar sit ON the photograph; the week
-/// and the day's sentence sit at its foot. Nothing above it, no card around it.
+/// Her name, the line under it and the avatar sit ON the photograph; under
+/// them the day strip; at the foot the week and the day, the size line and a
+/// "This week" pill. Nothing above it, no card around it.
+///
+/// ⚠️ RESHAPED 2026-09-21 TO THE TTC FOLD (docs/PREG-HOME-HERO-PLAN.md). The
+/// hero used to carry a WEEK n · DAY d chip and the day's "learning" line at
+/// 26pt; the chip is now the title and the learning line is the first card of
+/// the insights rail under the hero, so the photograph says the week and the
+/// size and nothing else — Flo's disc says "14 weeks" and "Details", and that
+/// is the whole of it. The old foot is commented out below, kept for revert;
+/// [learning] stays on the signature for the same reason.
 class V3Hero extends StatelessWidget {
   const V3Hero({
     super.key,
@@ -52,8 +61,13 @@ class V3Hero extends StatelessWidget {
     required this.subtitle,
     required this.week,
     required this.day,
-    required this.learning,
+    this.learning = '',
     required this.p,
+    this.strip,
+    this.sizeLine,
+    this.onSize,
+    this.onThisWeek,
+    this.height = 340,
     this.onTap,
     this.onSpine,
     this.onAvatar,
@@ -63,9 +77,29 @@ class V3Hero extends StatelessWidget {
   final String name;
   final String subtitle;
   final int week;
+
+  /// The day of pregnancy (1–280) OR the day within the week (1–7); the title
+  /// shows the day within the week either way.
   final int day;
   final String learning;
   final V2Palette p;
+
+  /// The day strip, rendered under the chrome row on the photograph
+  /// (`PvDayStrip(onPhoto: true)`). Null: no strip (the pre-2026-09-21 shape).
+  final Widget? strip;
+
+  /// "About the size of a peach · 8.7 cm · 43 g". Null hides the line.
+  final String? sizeLine;
+
+  /// The size line's tap — the size sheet.
+  final VoidCallback? onSize;
+
+  /// The pill at the foot — the week stack. Null hides the pill.
+  final VoidCallback? onThisWeek;
+
+  /// 340 without the strip; the home passes 372 with it — the strip is 84
+  /// and the foot lost the 3-line learning block, so the net is small.
+  final double height;
   /// The whole photograph. Historically the ONLY way through to the week, and
   /// it goes to the Today tab.
   final VoidCallback? onTap;
@@ -96,16 +130,22 @@ class V3Hero extends StatelessWidget {
     // no boundary here at all: the image runs to the edges of the screen and
     // the status bar sits over it. The caller cancels the list's horizontal
     // padding so this can bleed.
+    // ⚠️ A MINIMUM HEIGHT, NOT A FIXED ONE (2026-09-21). It was
+    // `SizedBox(height: 340)` over `StackFit.expand`: 392 -> 340 on
+    // 2026-09-16 with the "Pregnancy Home V3" design (the design draws the
+    // hero at 300; the user asked for "a bit" less than what shipped). With
+    // the day strip on the photograph the foot's content varies more — a
+    // long size line wraps, a large text scale grows everything — and a fixed
+    // box turned that into an overflow stripe across the pill. Now the
+    // photograph covers whatever the words need and is never shorter than
+    // [height]: the Stack passes the Column's size through, the image and
+    // the scrims fill it, and `spaceBetween` keeps the foot at the foot when
+    // there is room to spare.
     return InkWell(
       onTap: onTap,
-      child: SizedBox(
-          // 392 -> 340 on 2026-09-16, with the "Pregnancy Home V3" design. The
-          // design draws the hero at 300 on a 360pt frame; the user asked for
-          // "a bit" less than what shipped, not the design's figure, so this
-          // sits between the two. The learning line still has three lines of
-          // room at the foot, which is the constraint that set 392 originally.
-          height: 340,
-          child: Stack(fit: StackFit.expand, children: [
+      child: ConstrainedBox(
+          constraints: BoxConstraints(minHeight: height),
+          child: Stack(fit: StackFit.passthrough, children: [
             // ---- HARD CUT. THE DISSOLVE IS REVERTED -----------------------
             //
             // Three attempts, all removed, and the record is worth keeping so
@@ -132,9 +172,11 @@ class V3Hero extends StatelessWidget {
             // section begins, and the eye reads it as two things rather than as
             // a smear between them. Reverted at the user's call after looking
             // at all three, which is the right way to settle it.
-            Image.asset('assets/baby/week_$ww.jpg',
-                fit: BoxFit.cover,
-                errorBuilder: (_, _, _) => Container(color: p.surfaceAlt)),
+            Positioned.fill(
+              child: Image.asset('assets/baby/week_$ww.jpg',
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, _, _) => Container(color: p.surfaceAlt)),
+            ),
             // Two scrims, not one. The type sits at BOTH ends of this block, so
             // a single bottom gradient left her name unreadable against a light
             // frame. Dark at top and bottom, clear through the middle where the
@@ -162,13 +204,38 @@ class V3Hero extends StatelessWidget {
               // dissolve; with the dissolve gone the type has the foot of the
               // image back, which is where it was designed to sit.
               padding: EdgeInsets.fromLTRB(
-                  18, MediaQuery.of(context).padding.top + 14, 18, 22),
+                  18, MediaQuery.of(context).padding.top + (strip == null ? 14 : 8), 18, 22),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                  // ⚠️ THE STRIP IS THE FIRST THING ON THE PHOTOGRAPH
+                  // (2026-09-21, the user, looking at the TTC home: "the
+                  // dates should be the top most … we don't need that
+                  // Goodnight lying over it"). So with a strip the greeting
+                  // comes off the hero — the name lives on the avatar and in
+                  // You — and the row under the strip carries the milestone
+                  // line and the chrome. Without a strip the old header
+                  // (greeting over subtitle) still renders, for revert.
+                  if (strip case final s?) ...[
+                    s,
+                    const SizedBox(height: 10),
+                  ],
+                  Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
                     Expanded(
-                      child: Column(
+                      child: strip != null
+                          ? Text(subtitle,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: pvJakarta(
+                                  fontSize: 14,
+                                  height: 1.4,
+                                  color: Colors.white.withValues(alpha: 0.8)))
+                          : Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(name,
@@ -203,36 +270,100 @@ class V3Hero extends StatelessWidget {
                       onProfile: onAvatar,
                     ),
                   ]),
-                  const Spacer(),
-                  // ⚠️ THE EYEBROW IS NOW THE DOOR TO THE WEEKLY STACK, and on
-                  // THIS stage that is a fix rather than a feature.
-                  //
-                  // The route already existed: the whole photograph was one
-                  // enormous hit target wired straight through to the weekly
-                  // snapshot, with no affordance of any kind. Perfectly wired,
-                  // perfectly invisible — the "correct but unreachable" failure
-                  // in its purest form, and it survived every review because
-                  // nothing was missing, only unfindable.
-                  //
-                  // ⚠️ The photograph stays tappable. Removing that would take
-                  // the gesture away from anyone who already found it, and a
-                  // bigger target is never the problem — the missing signpost
-                  // was.
-                  V3SpineChip(
-                      label: 'WEEK $week · DAY $day',
-                      tone: V3HeroTone.onPhoto,
-                      p: p,
-                      onTap: onSpine ?? onTap),
-                  const SizedBox(height: 8),
-                  Text(learning,
-                      maxLines: 3,
-                      overflow: TextOverflow.ellipsis,
-                      style: pvFraunces(
-                          fontSize: 26,
-                    letterSpacing: -0.65,
-                          fontWeight: FontWeight.w600,
-                          height: 1.18,
-                          color: Colors.white)),
+                  ]),
+                  // The gap between the strip and the foot when the block is
+                  // at its minimum; `spaceBetween` opens it further when the
+                  // block has room. Was a `Spacer`, which cannot live in a
+                  // column whose height is not bounded.
+                  const SizedBox(height: 22),
+                  Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                  if (strip == null) ...[
+                    // ---- THE OLD FOOT — kept for revert (2026-09-21) --------
+                    // ⚠️ THE EYEBROW IS THE DOOR TO THE WEEKLY STACK, and on
+                    // THIS stage that is a fix rather than a feature. The
+                    // route already existed: the whole photograph was one
+                    // enormous hit target wired straight through to the
+                    // weekly snapshot, with no affordance — the "correct but
+                    // unreachable" failure in its purest form. The photograph
+                    // stays tappable; a bigger target is never the problem.
+                    V3SpineChip(
+                        label: 'WEEK $week · DAY $day',
+                        tone: V3HeroTone.onPhoto,
+                        p: p,
+                        onTap: onSpine ?? onTap),
+                    const SizedBox(height: 8),
+                    Text(learning,
+                        maxLines: 3,
+                        overflow: TextOverflow.ellipsis,
+                        style: pvFraunces(
+                            fontSize: 26,
+                            letterSpacing: -0.65,
+                            fontWeight: FontWeight.w600,
+                            height: 1.18,
+                            color: Colors.white)),
+                  ] else ...[
+                    // ---- THE NEW FOOT: the week, the size, the door ---------
+                    //
+                    // "Week 14 · Day 3" is the title now — the one fact she
+                    // opened the app for, at the size the learning line had.
+                    // Under it the size line, tappable (the size sheet), and
+                    // the pill that opens the week — Flo's "Details", in our
+                    // ink-on-white.
+                    Text('Week $week · Day ${((day - 1) % 7) + 1}',
+                        style: pvFraunces(
+                            fontSize: 30,
+                            letterSpacing: -0.75,
+                            fontWeight: FontWeight.w600,
+                            height: 1.1,
+                            color: Colors.white)),
+                    if (sizeLine case final line?) ...[
+                      const SizedBox(height: 6),
+                      GestureDetector(
+                        onTap: onSize,
+                        behavior: HitTestBehavior.opaque,
+                        child: Text(line,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: pvJakarta(
+                                fontSize: 14.5,
+                                height: 1.35,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white.withValues(alpha: 0.9))),
+                      ),
+                    ],
+                    if (onThisWeek != null) ...[
+                      const SizedBox(height: 14),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Material(
+                          color: Colors.white,
+                          shape: const StadiumBorder(),
+                          child: InkWell(
+                            onTap: onThisWeek,
+                            customBorder: const StadiumBorder(),
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.fromLTRB(16, 9, 12, 9),
+                              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                                Text('This week',
+                                    style: pvManrope(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w800,
+                                        color: p.ink1)),
+                                const SizedBox(width: 2),
+                                Icon(Icons.chevron_right_rounded,
+                                    size: 18, color: p.ink1),
+                              ]),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
+                  ]),
                 ],
               ),
             ),

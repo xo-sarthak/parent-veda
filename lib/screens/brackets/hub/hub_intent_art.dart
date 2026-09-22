@@ -190,6 +190,34 @@ enum IntentMark {
   /// (The Recipes tab wore cupped hands, which says care, not cooking — the
   /// user, 2026-09-21.)
   cookMark,
+
+  // ---------------------------------------------------------------------------
+  //  THE MEALS — 2026-09-22
+  // ---------------------------------------------------------------------------
+  //  The Recipes tab's "What are you after?" tiles wore photos, and two tiles
+  //  wore the same photo (breakfast and snacks; lunch and dinner) because a
+  //  tile borrowed its first recipe's picture. The user: "use the mark … with
+  //  the tinted background … and please don't use it of the same colour."
+  //  So each meal and each kind has a mark of its own and a hue of its own.
+  //  Today's rail card takes the sun; What to eat now takes the cutlery.
+
+  /// A sun over a horizon line, five rays — the day; breakfast.
+  sunMark,
+
+  /// A fork and a spoon, crossed — what to eat.
+  forkMark,
+
+  /// A chai cup with its handle and two wisps — the morning.
+  chaiMark,
+
+  /// A samosa: a triangle with a crimped edge — a snack.
+  snackMark,
+
+  /// A soup bowl with a spoon resting in it.
+  bowlMark,
+
+  /// A laddoo: a disc with the boondi as dots.
+  sweetMark,
 }
 
 class HubIntentArt extends StatelessWidget {
@@ -619,6 +647,101 @@ class _IntentPainter extends CustomPainter {
             RRect.fromRectAndRadius(const Rect.fromLTRB(0, -13, 34, 13), const Radius.circular(13)), soft);
         canvas.drawLine(const Offset(0, -13), const Offset(0, 13), cut(3));
         canvas.restore();
+
+      case IntentMark.sunMark:
+        // The disc, the horizon under it, five rays.
+        canvas.drawArc(Rect.fromCircle(center: const Offset(50, 62), radius: 22), math.pi, math.pi, true, obj);
+        canvas.drawLine(const Offset(12, 66), const Offset(88, 66), cutSeed(5));
+        for (final a in [-1.0, -0.5, 0.0, 0.5, 1.0]) {
+          final ang = -math.pi / 2 + a * 0.62;
+          canvas.drawLine(
+              Offset(50 + 30 * math.cos(ang), 62 + 30 * math.sin(ang)),
+              Offset(50 + 40 * math.cos(ang), 62 + 40 * math.sin(ang)),
+              cutSeed(5));
+        }
+        canvas.drawLine(const Offset(24, 80), const Offset(76, 80), soft
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 5
+          ..strokeCap = StrokeCap.round);
+
+      case IntentMark.forkMark:
+        // A fork on the left, a spoon on the right, crossing low.
+        canvas.save();
+        canvas.translate(50, 50);
+        canvas.rotate(-0.35);
+        canvas.drawRRect(RRect.fromRectAndRadius(const Rect.fromLTRB(-4, -14, 4, 44), const Radius.circular(4)), obj);
+        for (final x in [-9.0, -3.0, 3.0, 9.0]) {
+          canvas.drawRRect(RRect.fromRectAndRadius(Rect.fromLTRB(x - 2.2, -44, x + 2.2, -12), const Radius.circular(2.2)), obj);
+        }
+        canvas.drawRRect(RRect.fromRectAndRadius(const Rect.fromLTRB(-12, -20, 12, -10), const Radius.circular(3)), obj);
+        canvas.restore();
+        canvas.save();
+        canvas.translate(50, 50);
+        canvas.rotate(0.35);
+        canvas.drawRRect(RRect.fromRectAndRadius(const Rect.fromLTRB(-4, -14, 4, 44), const Radius.circular(4)), soft);
+        canvas.drawOval(const Rect.fromLTRB(-13, -46, 13, -10), soft);
+        canvas.restore();
+
+      case IntentMark.chaiMark:
+        // The cup, its handle, the saucer, two wisps.
+        canvas.drawPath(
+            Path()
+              ..moveTo(22, 40)
+              ..lineTo(70, 40)
+              ..quadraticBezierTo(70, 76, 46, 76)
+              ..quadraticBezierTo(22, 76, 22, 40)
+              ..close(),
+            obj);
+        canvas.drawArc(const Rect.fromLTRB(64, 44, 88, 68), -math.pi / 2, math.pi, false, cutSeed(6));
+        canvas.drawLine(const Offset(14, 86), const Offset(80, 86), cutSeed(5));
+        for (final x in [38.0, 54.0]) {
+          canvas.drawPath(
+              Path()
+                ..moveTo(x, 30)
+                ..quadraticBezierTo(x - 6, 22, x, 14)
+                ..quadraticBezierTo(x + 6, 6, x, 0),
+              soft
+                ..style = PaintingStyle.stroke
+                ..strokeWidth = 5
+                ..strokeCap = StrokeCap.round);
+        }
+
+      case IntentMark.snackMark:
+        // A samosa: the triangle, a crimped seam along its top edge.
+        canvas.drawPath(
+            Path()
+              ..moveTo(50, 12)
+              ..lineTo(90, 84)
+              ..quadraticBezierTo(50, 96, 10, 84)
+              ..close(),
+            obj);
+        for (var i = 0; i < 5; i++) {
+          final t = 0.18 + i * 0.16;
+          canvas.drawCircle(Offset(50 + 40 * t, 12 + 72 * t), 3.2, white);
+        }
+        canvas.drawLine(const Offset(30, 60), const Offset(48, 78), cut(4));
+
+      case IntentMark.bowlMark:
+        // A bowl in profile, the spoon leaning out of it.
+        canvas.drawPath(
+            Path()
+              ..moveTo(12, 44)
+              ..lineTo(88, 44)
+              ..quadraticBezierTo(86, 86, 50, 86)
+              ..quadraticBezierTo(14, 86, 12, 44)
+              ..close(),
+            obj);
+        canvas.drawLine(const Offset(30, 90), const Offset(70, 90), cutSeed(5));
+        canvas.drawLine(const Offset(58, 40), const Offset(84, 8), cutSeed(6));
+        canvas.drawOval(const Rect.fromLTRB(78, 0, 96, 16), soft);
+
+      case IntentMark.sweetMark:
+        // A laddoo: the ball, the boondi as dots, a leaf of silver on top.
+        canvas.drawCircle(const Offset(50, 56), 34, obj);
+        for (final d in [(36.0, 44.0), (58.0, 40.0), (44.0, 62.0), (64.0, 60.0), (52.0, 78.0), (30.0, 66.0)]) {
+          canvas.drawCircle(Offset(d.$1, d.$2), 4, white);
+        }
+        canvas.drawOval(const Rect.fromLTRB(40, 10, 60, 24), soft);
 
       case IntentMark.plate:
         // ⚠️ SEEN FROM THE SIDE, NOT ABOVE. A circle with two blobs and a bar

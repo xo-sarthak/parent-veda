@@ -1,8 +1,10 @@
 # The pregnancy home, above the fold — research and plan (2026-09-21)
 
-**Status: PLAN, not built.** The user asked for research first ("do your
-research well, formulate a plan that is very much executable, then start").
-Nothing in `lib/` has changed for this yet.
+**Status: Tiers 1 and 2 BUILT on 2026-09-21 (steps A–C), not yet walked;
+D (pictures) and E (the week strip on the stack) owed — see STILL-OPEN §72
+and MOBBIN-DISCOVERY §15.** All five decisions below were taken as
+recommended (the user, 2026-09-21), with one change: no Higgsfield renders
+(no credits) — pictures come by eye, or a free alternative.
 
 **The ask, in his words.** The TTC home's first screen — date strip, the
 day's hero line, *My daily insights* as a rail of cards, then *Start

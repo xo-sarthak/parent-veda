@@ -346,6 +346,15 @@ class _SymptomCompanionScreenState extends State<SymptomCompanionScreen> {
 // =============================================================================
 //  Symptom detail
 // =============================================================================
+
+/// Open one symptom's page — what helps, when to call. The home's "You
+/// logged" insight card lands here (2026-09-21); the companion's own rows
+/// push the same screen anonymously above.
+void openSymptomDetail(BuildContext context, Symptom symptom, PregnancyController c) =>
+    Navigator.of(context).push(MaterialPageRoute<void>(
+        settings: const RouteSettings(name: 'symptoms/detail'),
+        builder: (_) => _SymptomDetail(symptom: symptom, controller: c)));
+
 class _SymptomDetail extends StatelessWidget {
   const _SymptomDetail({required this.symptom, required this.controller});
   final Symptom symptom;

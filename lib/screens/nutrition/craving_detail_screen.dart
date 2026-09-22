@@ -28,6 +28,8 @@
 import 'package:flutter/material.dart';
 
 import '../../data/cravings_data.dart';
+import '../../data/reads/nutrition_reads.dart' show pvReadFromCraving;
+import '../reader/pv_reader_screen.dart';
 import '../../data/nutrition_data.dart';
 import '../../services/pregnancy_controller.dart';
 import '../../theme/pv_fonts.dart';
@@ -41,8 +43,19 @@ class CravingDetailScreen extends StatelessWidget {
   final CravingItem item;
   final PregnancyController pregnancy;
 
+  // ⚠️ THE ONE READER, 2026-09-22. The user walked this page: "very poor
+  // UI/UX … not good at all." Its four questions are now a `PvRead`
+  // (`pvReadFromCraving`, lib/data/reads/nutrition_reads.dart) and open in
+  // `PvReaderScreen` like every other piece of writing — the verdict at her
+  // week as the opening callout, the recipe as ingredients + method, the
+  // doctor line at the foot. The previous body is `buildClassic` below,
+  // kept for revert and opened by nothing.
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) =>
+      PvReaderScreen(read: pvReadFromCraving(item, pregnancy.currentWeek), lang: PvType.lang);
+
+  /// The previous body, kept for revert. See `build`.
+  Widget buildClassic(BuildContext context) {
     return AnimatedBuilder(
       animation: V2PaletteStore.instance,
       builder: (context, _) {

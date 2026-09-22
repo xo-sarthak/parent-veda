@@ -23,6 +23,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/data/prepare_data.dart';
 import 'package:parentveda/data/cravings_data.dart';
+import 'package:parentveda/data/reads/nutrition_reads.dart' show pvReadFromCraving;
 import 'package:parentveda/data/diet_chart_facets.dart';
 import 'package:parentveda/services/diet_chart_pdf.dart';
 import 'package:parentveda/data/diet_chart_content.dart';
@@ -138,17 +139,22 @@ void main() {
         (t) async {
       final early = _at(8);
       addTearDown(early.dispose);
+      // The page is a read since 2026-09-22 (`pvReadFromCraving`): the
+      // verdict is the teaser AND the opening callout's title, so it shows
+      // more than once and the week rides in the same line.
       await _pump(t,
           CravingDetailScreen(item: _c('papaya'), pregnancy: early));
-      expect(find.text('Not now'), findsOneWidget);
-      expect(find.textContaining('At week 8'), findsOneWidget);
+      expect(find.textContaining('Not now'), findsWidgets);
+      expect(find.textContaining('week 8'), findsWidgets);
+      expect(pvReadFromCraving(_c('papaya'), 8).teaser.en, 'At week 8 — Not now');
 
       final late = _at(30);
       addTearDown(late.dispose);
       await _pump(
           t, CravingDetailScreen(item: _c('papaya'), pregnancy: late));
-      expect(find.text('In small amounts'), findsOneWidget);
-      expect(find.textContaining('At week 30'), findsOneWidget);
+      expect(find.textContaining('In small amounts'), findsWidgets);
+      expect(find.textContaining('week 30'), findsWidgets);
+      expect(pvReadFromCraving(_c('papaya'), 30).teaser.en, 'At week 30 — In small amounts');
     });
 
     test('every item carries a note for all three trimesters', () {
@@ -187,12 +193,20 @@ void main() {
       addTearDown(c.dispose);
       await _pump(t, CravingDetailScreen(item: _c('golgappa'), pregnancy: c));
 
-      expect(find.text('MAKE IT AT HOME'), findsOneWidget);
-      expect(find.text('Home pani puri, safely'), findsOneWidget);
-      // Ingredients AND steps, in place — a four-line substitution loses most
-      // of the people it is for if it costs another screen.
-      expect(find.text('YOU NEED'), findsOneWidget);
-      expect(find.text('HOW'), findsOneWidget);
+      // In the read: the recipe is two sections of the same page — the
+      // ingredients under "Make it at home: <name> · n min", the steps under
+      // "Method". Ingredients AND steps, in place — a four-line substitution
+      // loses most of the people it is for if it costs another screen.
+      final read = pvReadFromCraving(_c('golgappa'), 20);
+      final headings = read.sections.map((s) => s.heading?.en ?? '').toList();
+      expect(headings.any((h) => h.startsWith('Make it at home: Home pani puri, safely')), isTrue,
+          reason: headings.join(' | '));
+      expect(headings, contains('Method'));
+      final recipeSection = read.sections.firstWhere((s) => (s.heading?.en ?? '').startsWith('Make it at home'));
+      expect(recipeSection.bullets, isNotEmpty, reason: 'the ingredients');
+      final method = read.sections.firstWhere((s) => s.heading?.en == 'Method');
+      expect(method.paragraphs.first.en, startsWith('1. '));
+      expect(find.textContaining('Make it at home'), findsWidgets);
     });
 
     test('the recipe exists exactly where the risk is in the making', () {

@@ -517,3 +517,89 @@ from the chart's own days, facts line, "Your chart" mark. The door's rail
 caps at eight with "View all ›" (`PvDoorSection.moreSurfaceId`).
 **Declined:** a filter sheet (Kitchen Stories) — nineteen charts do not
 need one; the chips are the filter.
+
+## 15. The pregnancy home's fold — the second round (2026-09-21)
+
+Queries: "pregnancy app home week day strip daily insights cards baby this
+week" and "your baby is the size of a fruit comparison length weight toggle"
+(ios), on top of §PREG-HOME-HERO-PLAN's first round.
+
+**Found, again, and it settled the plan.** Flo's pregnancy home is the
+shape: month + calendar → a day strip (today ringed, dots on logged days)
+→ one big disc with the week's baby and "2 weeks ⓘ" → a **Details** pill →
+steps → **My daily insights** as a rail whose first card is a white
+**Log your symptoms +** and the rest are illustrated reads. Flo's Details
+is a full-bleed 3D baby with a week chip strip at its foot and a sheet
+(what happens at 42 weeks · reviewed by · the baby beside a watermelon ·
+length · weight). Clue's home has ‹ › with the week's date range and a
+**Back to today** pill. Oura's card counts down ("Meet your baby in about
+47 days"). The size-toggle query found nothing new — Flo's sheet is the
+only in-library reference; Pregnancy+ and What to Expect (not in the
+library) are the toggle's home.
+
+**Adopted.** The day strip on the hero; the week and the size as the only
+words on the photograph; a "This week ›" pill where Flo has Details; the
+log card first on the rail, giving way to what she logged; the size sheet
+with the object beside the baby and length · weight tiles; a persisted set
+toggle (fruit & veg · kitchen · sweets) instead of Flo's single fruit.
+
+**Declined.** Flo's disc (our photograph is the hero and the reason she
+opens the app); forward days on the strip (her future weeks are the
+reveal, and a dead cell is worse than none — TTC keeps its six); ‹ › on the
+home (Clue's home IS the week screen; ours has doors under it); a steps
+count (no source).
+
+**Owed.** Comparison pictures (§72.1); the week chip strip on the week
+stack (Tier 3).
+
+## 16. Nutrition, the second walk — logs, recipe pages, swaps (2026-09-22)
+
+Queries (ios): "water intake tracker glasses daily log nutrition tracking
+pregnancy app"; "food diary daily calories protein progress ring meals
+logged history week Lifesum Yazio MyFitnessPal"; "recipe detail page
+ingredients steps nutrition per serving calories protein header photo";
+"meal plan swap meal alternative replace dish button daily plan".
+
+**Do they keep a log of water and nutrition? Yes, all of them.** Lifesum:
+‹ TODAY, 17 JUL › over the ring, meals logged, water as eight glasses with
+the litres. Yazio: the day's meals with a per-meal ring, Water Tracker
+(glasses, 0.00 l of 2.00 l), a Dietary Intake history with daily / weekly /
+monthly bars. MyFitnessPal: a week strip (S M T W T F S) with a tick on
+every day she logged, Diary with Log per meal, Nutrients as Total · Goal ·
+Left. Flo: a Today logging screen with ‹ › and a Water card (−/+, 16 / 72
+fl oz, reminders). **What converges:** the day is navigable; the week is
+visible as ticks or bars; water is glasses per day. Our store already keys
+by date; the day strip and a week view are the missing surfaces. Not built
+— the user asked to know, not to build ("not saying that we should be
+taking a log").
+
+**Recipe pages.** MyFitnessPal (photo · title · Serves · chips · Nutrition
+Per Serving as ONE ring + three numbers · Ingredients · Log to diary),
+Lifesum (photo · title · servings + meal · kcal + minutes · three rings ·
+Ingredients · Track), Yazio (photo · title · Cal / minutes / Easy · prose ·
+tags · Add to list / Add to diary), Noom (photo · title · minutes · calories
+· servings · Save · Log · Ingredients), HelloFresh (Total · Calories ·
+Protein · Difficulty on one line · Ingredients), Recime / Hers (steps, then
+Nutrition at the very foot). **Adopted:** one facts line and the three marks
+under the title, ingredients next, the six tiles and the fact at the foot;
+"Strong in" retired as a heading. **Declined:** rings against a goal (our
+reference is a number, never a bar).
+
+**Swaps.** Centr's meal plan: a day strip, meal cards with a ⇄ on each; the
+swap is a picker and the card changes in place. Chopt: "Swapping <item>" →
+grid → SWAP. Instacart / Target / Walmart: "Replace with" as a sheet of
+alternatives with Select on each. Lifesum: "Adjust my meal". **Adopted:**
+the row's Swap opens its own sheet of alternatives (photo, glance, ±kcal),
+one tap swaps, the row washes; the row itself opens the meal.
+
+## 17. How the apps draw the baby (2026-09-22)
+
+Query: "pregnancy baby illustration week home" (ios). **Flo**: a 3D
+rendered fetus inside a large tinted disc on the home ("2 weeks", Details
+pill), full-bleed 3D on the Details page, a line illustration on
+onboarding. **Clue**: a flat 2D illustration inside a disc on a coloured
+field, one line under it. **Stardust**: a small 2D sprite floating in
+space. Nobody in the library runs a full-bleed photograph as the home
+hero. **Adopted:** the disc on the field (`V3PregHero`); the photograph
+inside it today, the repo's own 2D set (soft pink figure on pink, drawn to
+be circle-clipped) when the user brings it back.

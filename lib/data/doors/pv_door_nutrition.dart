@@ -197,7 +197,9 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
       id: kDietTabToday,
       label: 'Today',
       icon: Icons.restaurant_outlined,
-      mark: IntentMark.plate, // the drawn marks Scans and Complications wear (the user, 2026-09-20)
+      // The sun (2026-09-22; was the plate — the user asked for another
+      // mark on Today and on What to eat now).
+      mark: IntentMark.sunMark,
       hue: 104,
       inlineSurfaceId: kDietSurfaceToday,
       inlineLabel: 'Your plate',
@@ -217,7 +219,7 @@ final PvDoorPage kNutritionDoor = PvDoorPage(
       id: kDietTabNow,
       label: 'What to eat now',
       icon: Icons.restaurant_menu_outlined,
-      mark: IntentMark.nextStep,
+      mark: IntentMark.forkMark, // was nextStep (2026-09-22)
       hue: 26,
     ),
 

@@ -123,26 +123,22 @@ class _RecipeCookScreenState extends State<RecipeCookScreen> {
                       style: pvFraunces(fontSize: 28, fontWeight: FontWeight.w600, height: 1.1, letterSpacing: -0.6, color: p.ink1)),
                   const SizedBox(height: 8),
                   Text(r.whyNow.en, style: pvManrope(fontSize: 15, height: 1.5, color: p.ink1)),
-                  const SizedBox(height: 18),
-                  // What it is strong in, as marks (the user, 2026-09-21: not
-                  // pills). The writer's glance strings that were pills here
-                  // are kept in the data for revert; `fact` is the line now.
-                  NutritionTopThree(p: p, values: estimateRecipe(r)),
-                  if (r.fact case final fact?) ...[
-                    const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.only(left: 14),
-                      decoration: BoxDecoration(border: Border(left: BorderSide(color: p.ink1, width: 2))),
-                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                        Text('Did you know',
-                            style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: p.ink3)),
-                        const SizedBox(height: 4),
-                        Text(fact, style: pvManrope(fontSize: 14.5, height: 1.5, color: p.ink1)),
-                      ]),
-                    ),
-                  ],
-                  const SizedBox(height: 20),
-                  NutritionValuesGrid(p: p, values: estimateRecipe(r)),
+                  const SizedBox(height: 14),
+                  // ⚠️ THE NUMBERS ONCE, SMALL, HERE — and the recipe next.
+                  // The page opened with "Strong in", then "Did you know",
+                  // then six tiles, and the ingredients were a screen down:
+                  // "I clicked for recipe. Recipe is like way below" (the
+                  // user, 2026-09-22). Every recipe page in the library
+                  // (MyFitnessPal, Lifesum, Yazio, HelloFresh, Noom) puts ONE
+                  // line of numbers under the title and the ingredients
+                  // right after; the full facts, if any, sit at the foot.
+                  // So: the facts line, the three marks in their own hues
+                  // with amounts, then ingredients and method; the six-tile
+                  // grid and the did-you-know at the foot for whoever wants
+                  // them. "Strong in" as a heading is gone; the marks stay.
+                  _FactsLine(p: p, recipe: r),
+                  const SizedBox(height: 10),
+                  NutritionTopThree(p: p, values: estimateRecipe(r), compact: true),
                 ]),
               ),
               const SizedBox(height: 22),
@@ -215,6 +211,27 @@ class _RecipeCookScreenState extends State<RecipeCookScreen> {
                         Expanded(child: Text(r.steps[i].en, style: pvManrope(fontSize: 14.5, height: 1.55, color: p.ink1))),
                       ]),
                     ),
+                ]),
+              ),
+              // ---- the numbers in full, and the fact, at the foot ----------
+              _rule(p),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
+                child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                  NutritionValuesGrid(p: p, values: estimateRecipe(r)),
+                  if (r.fact case final fact?) ...[
+                    const SizedBox(height: 18),
+                    Container(
+                      padding: const EdgeInsets.only(left: 14),
+                      decoration: BoxDecoration(border: Border(left: BorderSide(color: p.ink1, width: 2))),
+                      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                        Text('Did you know',
+                            style: pvManrope(fontSize: 11, fontWeight: FontWeight.w800, letterSpacing: 1.2, color: p.ink3)),
+                        const SizedBox(height: 4),
+                        Text(fact, style: pvManrope(fontSize: 14.5, height: 1.5, color: p.ink1)),
+                      ]),
+                    ),
+                  ],
                 ]),
               ),
               const SizedBox(height: 100),
@@ -446,5 +463,26 @@ class _CookModeScreenState extends State<CookModeScreen> {
         ]),
       ),
     );
+  }
+}
+
+
+/// "25 min · serves 4 · ≈ 320 kcal" — the one line under the title.
+class _FactsLine extends StatelessWidget {
+  const _FactsLine({required this.p, required this.recipe});
+  final V2Palette p;
+  final Recipe recipe;
+
+  @override
+  Widget build(BuildContext context) {
+    final v = estimateRecipe(recipe);
+    final mins = recipe.steps.length * 6;
+    final parts = [
+      'about $mins min',
+      'serves ${recipe.defaultServings}',
+      if (v.kcal > 0) '≈ ${v.kcal.round()} kcal a serving',
+    ];
+    return Text(parts.join('  ·  '),
+        style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink2));
   }
 }

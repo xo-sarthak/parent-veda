@@ -709,9 +709,15 @@ class _Ghost extends StatelessWidget {
             border: Border.all(color: color.withValues(alpha: 0.45)),
           ),
           child: Row(mainAxisSize: MainAxisSize.min, children: [
-            Text(label,
-                style: pvManrope(
-                    fontSize: 13, fontWeight: FontWeight.w700, color: color)),
+            // Flexible so a long label ellipsises inside the pill rather
+            // than pushing the arrow off the row (2026-09-21).
+            Flexible(
+              child: Text(label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(
+                      fontSize: 13, fontWeight: FontWeight.w700, color: color)),
+            ),
             const SizedBox(width: 6),
             Icon(Icons.arrow_forward_rounded, size: 15, color: color),
           ]),

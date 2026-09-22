@@ -19,7 +19,9 @@ import '../../../widgets/pv_feedback.dart';
 import '../../../services/pregnancy_controller.dart';
 import '../../../theme/pv_fonts.dart';
 import '../../doors/pv_door_chrome.dart';
+import '../../brackets/hub/hub_intent_art.dart';
 import '../../v2/v2_palette.dart';
+import 'nutrition_today_body.dart' show NutritionPreferenceRow;
 import 'nutrition_widgets.dart';
 import 'recipe_cook_screen.dart';
 
@@ -164,7 +166,13 @@ class _RecipesGridBodyState extends State<RecipesGridBody> {
             ],
             // ---- what she wants: a meal, or a kind ----------------------
             pvDoorPad(nutritionHeading(p, 'What are you after?',
-                sub: diet == null ? 'A meal, a sweet, a soup — then by what you need.' : '${diet.label.en} only, by meal or by what you need.')),
+                sub: 'A meal, a sweet, a soup — then by what you need.')),
+            const SizedBox(height: 10),
+            // The same two chips as under the plate's heading on Today: her
+            // diet and region steer this grid too, and "Non-vegetarian only"
+            // in a subtitle told her what was filtering and not how to
+            // change it (the user, 2026-09-22).
+            pvDoorPad(NutritionPreferenceRow(p: p, store: store)),
             const SizedBox(height: 14),
             SizedBox(
               height: 118,
@@ -175,12 +183,16 @@ class _RecipesGridBodyState extends State<RecipesGridBody> {
                 separatorBuilder: (_, _) => const SizedBox(width: 10),
                 itemBuilder: (_, i) {
                   final b = kRecipeBuckets[i];
-                  final first = all.where((r) => recipeInBucket(r, b)).firstOrNull;
+                  // A drawn mark in its own hue, not the first recipe's photo
+                  // — two tiles wore one photo and read as one thing (the
+                  // user, 2026-09-22). `url` stays on the tile for revert.
                   return _BucketTile(
                     p: p,
                     label: recipeBucketLabel(b),
                     count: all.where((r) => recipeInBucket(r, b)).length,
-                    url: first == null ? null : nutritionRecipePhoto(first.id, first.name.en),
+                    url: null,
+                    mark: recipeBucketMark(b),
+                    hue: recipeBucketHue(b),
                     selected: _bucket == b,
                     onTap: () => setState(() => _bucket = _bucket == b ? null : b),
                   );
@@ -192,6 +204,9 @@ class _RecipesGridBodyState extends State<RecipesGridBody> {
             pvDoorPad(nutritionHeading(p,
                 _bucket == null ? 'Every recipe' : recipeBucketLabel(_bucket!),
                 sub: _bucket == null ? 'By what you need.' : '${mine.length} to cook. Narrow by what you need.')),
+            const SizedBox(height: 10),
+            // The key to the marks on the cards below — "what is what".
+            pvDoorPad(NutritionMarkLegend(p: p)),
             const SizedBox(height: 12),
             SizedBox(
               height: 40,
@@ -253,6 +268,8 @@ class _BucketTile extends StatelessWidget {
     required this.url,
     required this.selected,
     required this.onTap,
+    this.mark,
+    this.hue,
   });
   final V2Palette p;
   final String label;
@@ -260,6 +277,11 @@ class _BucketTile extends StatelessWidget {
   final String? url;
   final bool selected;
   final VoidCallback onTap;
+
+  /// The drawn mark in a tinted well, in the bucket's own hue (2026-09-22).
+  /// Null: the photo, kept for revert.
+  final IntentMark? mark;
+  final double? hue;
 
   @override
   Widget build(BuildContext context) => PvPress(
@@ -283,7 +305,13 @@ class _BucketTile extends StatelessWidget {
                 ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(13),
-                  child: NutritionPhoto(url: url, p: p, icon: Icons.soup_kitchen_outlined),
+                  child: mark == null
+                      ? NutritionPhoto(url: url, p: p, icon: Icons.soup_kitchen_outlined)
+                      : Container(
+                          color: v2BlockTint(hue ?? 104, p),
+                          padding: const EdgeInsets.all(14),
+                          child: HubIntentArt(mark: mark!, tint: v2BlockTint(hue ?? 104, p)),
+                        ),
                 ),
               ),
               const SizedBox(height: 6),
@@ -298,3 +326,33 @@ class _BucketTile extends StatelessWidget {
         ),
       );
 }
+
+/// Each meal and kind, drawn, in its own hue — a chai cup for breakfast, a
+/// plate for lunch, the moon for dinner, a samosa for snacks; the kadhai for
+/// mains, a leaf for light, a bowl for soups, a laddoo for sweets, a glass
+/// for drinks. Nine tiles, nine marks, nine hues around the wheel.
+IntentMark recipeBucketMark(Object b) => switch (b) {
+      RecipeMeal.breakfast => IntentMark.chaiMark,
+      RecipeMeal.lunch => IntentMark.plate,
+      RecipeMeal.dinner => IntentMark.moonMark,
+      RecipeMeal.snack => IntentMark.snackMark,
+      RecipeKind.main => IntentMark.cookMark,
+      RecipeKind.light => IntentMark.folateMark,
+      RecipeKind.soup => IntentMark.bowlMark,
+      RecipeKind.sweet => IntentMark.sweetMark,
+      RecipeKind.drink => IntentMark.calciumMark,
+      _ => IntentMark.plate,
+    };
+
+double recipeBucketHue(Object b) => switch (b) {
+      RecipeMeal.breakfast => 42,
+      RecipeMeal.lunch => 104,
+      RecipeMeal.dinner => 268,
+      RecipeMeal.snack => 26,
+      RecipeKind.main => 344,
+      RecipeKind.light => 160,
+      RecipeKind.soup => 206,
+      RecipeKind.sweet => 320,
+      RecipeKind.drink => 186,
+      _ => 104,
+    };

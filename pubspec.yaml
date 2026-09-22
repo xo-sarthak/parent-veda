@@ -236,6 +236,10 @@ flutter:
     # offline by re-adding the line, but they are no longer shipped.
     - assets/narration/manifest_hi.json
     - assets/baby/
+    # The 2D baby set (weeks 4-40), the figure with its pink halo dissolving
+    # into a transparent edge so it sits on any field — the home's disc and
+    # the week page (2026-09-22). Source masters: lib/data/baby-images/.
+    - assets/baby2d/
     # Hero block art for the V2 Focus experiment. Transparent PNGs, composited
     # onto whichever palette ground is being tested — which is why they survive
     # the palette decision. Trimmed, squared and downsized from the generated

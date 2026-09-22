@@ -203,7 +203,18 @@ class NutritionTalkBody extends StatelessWidget {
                     decoration: BoxDecoration(
                         border: i == _kWhatSheDoes.length - 1 ? null : Border(bottom: BorderSide(color: p.line))),
                     child: Row(children: [
-                      nutritionMarkWell(p, _kWhatSheDoes[i].$1),
+                      // Four rows, four hues — not the door's green four
+                      // times (the user, 2026-09-22: "you don't have to
+                      // throw green at everyone").
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                            color: v2BlockTint(const [206.0, 26.0, 344.0, 268.0][i % 4], p),
+                            borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.all(8),
+                        child: HubIntentArt(mark: _kWhatSheDoes[i].$1, tint: v2BlockTint(const [206.0, 26.0, 344.0, 268.0][i % 4], p)),
+                      ),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [

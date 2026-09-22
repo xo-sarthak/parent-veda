@@ -36,6 +36,8 @@ import '../../doors/pv_door_chrome.dart';
 import '../../v2/v2_palette.dart';
 import '../../../localization/app_language.dart' show S;
 import '../../../services/diet_chart_pdf.dart';
+import 'meal_sheet.dart';
+import '../../../data/nutrition/nutrition_plate.dart';
 import 'nutrition_widgets.dart';
 
 class DietChartPlanScreen extends StatefulWidget {
@@ -126,7 +128,23 @@ class _DietChartPlanScreenState extends State<DietChartPlanScreen> {
                         skipped: false,
                         showSwap: false,
                         photoUrl: nutritionPhotoFor(content.days[_day].meals[i].items.en),
-                        onTap: () {},
+                        // A dish on a chart's day opens the same sheet a dish
+                        // on the plate does — the numbers, what is on it, a
+                        // recipe where there is one (the user, 2026-09-22:
+                        // "I cannot click on them"). Read-only: the sheet's
+                        // swap and not-today act on today's plate, so here
+                        // they are hidden by passing no date to act on.
+                        onTap: () => showMealSheet(context,
+                            plate: NutritionPlate(chart: widget.chart, content: content, dayIndex: _day, meals: const []),
+                            meal: PlateMeal(
+                                slot: content.days[_day].meals[i].meal.en,
+                                items: content.days[_day].meals[i].items.en,
+                                chartId: widget.chart.id,
+                                dayIndex: _day,
+                                slotIndex: i),
+                            date: DateTime.now(),
+                            pregnancy: widget.pregnancy,
+                            readOnly: true),
                         onSwap: () {},
                         last: i == content.days[_day].meals.length - 1,
                       ),

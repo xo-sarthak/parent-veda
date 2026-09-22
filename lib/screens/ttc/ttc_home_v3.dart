@@ -79,6 +79,8 @@ import '../v2/v3_daily.dart';
 import '../v2/v3_daily_art.dart';
 import '../../ttc/ttc_home_hero.dart';
 import '../../ttc/ttc_treatment_store.dart';
+import '../v2/pv_day_strip.dart';
+import '../v2/pv_insight_rail.dart';
 import '../v2/v3_hero_field.dart';
 import 'ttc_chapter_screen.dart';
 import 'ttc_focus_screen.dart';
@@ -1316,7 +1318,7 @@ class _CycleHeader extends StatelessWidget {
 /// tint arriving, which is the single most useful forward-looking thing this
 /// strip does. Further out and it becomes a planner for days that have not
 /// happened, on a screen whose subject is how she feels.
-class _WeekStrip extends StatefulWidget {
+class _WeekStrip extends StatelessWidget {
   const _WeekStrip(
       {required this.p,
       required this.selected,
@@ -1332,334 +1334,383 @@ class _WeekStrip extends StatefulWidget {
   final ValueChanged<DateTime> onSelect;
 
   @override
-  State<_WeekStrip> createState() => _WeekStripState();
-}
-
-class _WeekStripState extends State<_WeekStrip> {
-  static const _dayLetters = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
-
-  /// ~26 weeks back. Long enough that nobody hits the end while browsing, short
-  /// enough that the list is 187 cheap items rather than an infinite builder
-  /// whose scroll offset has to be computed from an epoch.
-  static const _daysBack = 180;
-  static const _daysForward = 6;
-  static const _slot = 46.0;
-
-  final _sc = ScrollController();
-  bool _centred = false;
-
-  /// ⚠️ NOT `late final` ANY MORE. It was, and it was set from
-  /// `DateTime.now()` in `initState` — so the 187-day window was anchored to
-  /// whichever day the screen was first opened on and stayed there. After
-  /// midnight the strip's last cell was five days ahead instead of six, and
-  /// its idea of "today" was a day behind the numbers it was drawing.
-  late DateTime _first = widget.today.subtract(const Duration(days: _daysBack));
-
-  @override
-  void didUpdateWidget(_WeekStrip old) {
-    super.didUpdateWidget(old);
-    if (old.today != widget.today) {
-      // Re-anchor, and let it re-centre once: on the morning after, landing on
-      // today is what she wants, and it is also the only moment where moving
-      // the scroll position under her is not rude.
-      setState(() {
-        _first = widget.today.subtract(const Duration(days: _daysBack));
-        _centred = false;
-      });
-    }
-  }
-
-  @override
-  void dispose() {
-    _sc.dispose();
-    super.dispose();
-  }
-
-  /// Put the selected day on screen after the first layout.
-  ///
-  /// ⚠️ ONCE, NOT ON EVERY BUILD. `_centred` is the guard, and it is load
-  /// bearing: re-centring on every build would yank the strip back under her
-  /// thumb the instant she scrolled, because a scroll rebuilds nothing but a
-  /// tap rebuilds everything. It is also why this cannot be
-  /// `initialScrollOffset` - the viewport width is not known until layout, and
-  /// centring needs it.
-  void _centre(double viewport) {
-    if (_centred || !_sc.hasClients) return;
-    _centred = true;
-    final index = widget.selected.difference(_first).inDays;
-    final target = (index * _slot) - (viewport / 2) + (_slot / 2);
-    _sc.jumpTo(target.clamp(0.0, _sc.position.maxScrollExtent));
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    // ⚠️ THE LIVE CLOCK, NOT `widget.today`, FOR THE TODAY MARKER.
-    //
-    // The parent keeps a `_today` and refreshes it on resume, which is right
-    // for deciding what the page is ABOUT. But the previous version of this
-    // line read that cached value, so if it ever failed to refresh, the marker
-    // for today was wrong too — and a strip that is confidently wrong about
-    // which day it is, is worse than one that is merely stale.
-    //
-    // The window anchor still comes from the parent (`_first`), so the list
-    // does not reshuffle under a scroll. Only the "which of these is today"
-    // question is answered from the clock, every build, unconditionally.
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-    const count = _daysBack + _daysForward + 1;
-
-    return LayoutBuilder(builder: (context, box) {
-      WidgetsBinding.instance
-          .addPostFrameCallback((_) => _centre(box.maxWidth));
-
-      final selIndex =
-          widget.selected.difference(_first).inDays.toDouble();
-
-      return SizedBox(
-        height: 84,
-        child: Stack(children: [
-          // ⚠️ THE CORAL DISC IS ONE WIDGET THAT MOVES, NOT A PROPERTY OF A
-          // CELL — 2026-09-05. Asked for directly: *"I don't need that purple
-          // outline… instead take that pink background. Have a good motion. It
-          // seems sliding through to that particular date."*
-          //
-          // Drawn per-cell it can only ever appear and disappear: the old cell
-          // repaints without it and the new one repaints with it, which is a
-          // cut, not a move. Lifting it out of the list and translating it is
-          // what makes the same pixels read as one object travelling to the day
-          // you tapped.
-          //
-          // ⚠️ IT SITS *UNDER* THE LIST, WHICH IS WHY THE NUMBER STILL SHOWS.
-          // The cells paint no background of their own, so the disc shows
-          // through and each date's own digits draw on top of it. Painted over
-          // the list it would cover the number it is meant to highlight.
-          //
-          // ⚠️ AND IT TRACKS TWO THINGS AT ONCE. The `AnimatedBuilder` on the
-          // scroll controller keeps it glued to its date while the strip is
-          // dragged (instantly, no easing — a marker that lags behind a scroll
-          // looks broken); the `TweenAnimationBuilder` eases only the change of
-          // SELECTION. One of those must be immediate and the other must not,
-          // which is why they are two separate animations and not one.
-          Positioned(
-            left: 0,
-            top: 20,
-            child: AnimatedBuilder(
-              animation: _sc,
-              builder: (context, _) => TweenAnimationBuilder<double>(
-                tween: Tween<double>(end: selIndex),
-                duration: const Duration(milliseconds: 260),
-                curve: Curves.easeOutCubic,
-                builder: (context, v, child) => Transform.translate(
-                  offset: Offset(
-                      v * _slot -
-                          (_sc.hasClients ? _sc.offset : 0) +
-                          (_slot - 34) / 2,
-                      0),
-                  child: child,
-                ),
-                child: Container(
-                  width: 34,
-                  height: 34,
-                  decoration: const BoxDecoration(
-                      color: ttcCoral, shape: BoxShape.circle),
-                ),
-              ),
-            ),
-          ),
-          ListView.builder(
-          controller: _sc,
-          scrollDirection: Axis.horizontal,
-          itemCount: count,
-          padding: EdgeInsets.zero,
-          itemBuilder: (context, i) {
-            final date = DateTime(_first.year, _first.month, _first.day + i);
-            return _WeekDay(
-              // ⚠️ A KEY PER DATE, SO A TEST CAN TAP ONE. Finding a day by its
-              // number does not work here: the list spans six months, so `29`
-              // is ambiguous the moment two months' worth is built, and the
-              // cards below can print a bare number too — a cycle day of 8 and
-              // the 8th of the month are the same string on one screen.
-              key: ValueKey('ttc_day_${date.year}-${date.month}-${date.day}'),
-              date: date,
-              isToday: date == today,
-              isSelected: date == widget.selected,
-              isFuture: date.isAfter(today),
-              letter: _dayLetters[(date.weekday - 1) % 7],
-              p: widget.p,
-              width: _slot,
-              onTap: () => widget.onSelect(date),
-            );
-          },
-        ),
-        ]),
+  Widget build(BuildContext context) => PvDayStrip(
+        p: p,
+        selected: selected,
+        today: today,
+        onSelect: onSelect,
+        accent: ttcCoral,
+        keyPrefix: 'ttc_day_',
+        // ---- WHAT SHE LOGGED ------------------------------------------------
+        //
+        // ⚠️ THE ASYMMETRY IS THE FEATURE, and it was asked for twice: *"if
+        // I'm not on a date but a symptom was logged on that particular date,
+        // it shows a heart below that date. The moment I'm on that date it
+        // shows the symptom icons."* Thirty days of symptom icons at 15pt is
+        // noise nobody can parse; thirty hearts is a scannable answer to
+        // "when have I been logging?" — and the detail arrives on the one day
+        // you asked about.
+        markFor: (date, selected) {
+          final marks = ttcDayMarkers(date);
+          if (marks.shown.isEmpty) return null;
+          return selected
+              ? _MarkRow(marks: marks, p: p)
+              : Icon(Icons.favorite_rounded,
+                  size: 10, color: ttcCoral.withValues(alpha: 0.75));
+        },
       );
-    });
-  }
 }
 
-class _WeekDay extends StatelessWidget {
-  const _WeekDay({
-    super.key,
-    required this.date,
-    required this.isToday,
-    required this.isSelected,
-    required this.isFuture,
-    required this.letter,
-    required this.p,
-    required this.width,
-    required this.onTap,
-  });
-
-  final DateTime date;
-  final bool isToday;
-  final bool isSelected;
-  final bool isFuture;
-  final String letter;
-  final V2Palette p;
-  final double width;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    // =========================================================================
-    //  ⚠️ THE STRIP DRAWS ONE THING: WHICH DAY IS TODAY.
-    // -------------------------------------------------------------------------
-    //  Everything the cycle knows — period starts, fertile days, an expected
-    //  period — is COMMENTED OUT BELOW, kept for revert, and it comes back when
-    //  the distinction is designed properly against the reference. Asked for
-    //  directly: *"in future I will be letting you mark the distinction like
-    //  the competitor app does. But you don't have to do it right now."*
-    //
-    //  ⚠️ AND THE REASON IT HAD TO COME OFF NOW IS WORTH KEEPING. Three rounds
-    //  were lost to "the pink circle is stuck on the 30th", and every round the
-    //  answer was the same: there was more than one pink circle. First a filled
-    //  coral disc for a logged period start sitting beside the today marker;
-    //  then, after that became a ring, a coral RING on the 30th sitting beside
-    //  today's disc. Each time the extra mark was correct, data-driven, and
-    //  completely indistinguishable from "the today marker has not moved".
-    //
-    //  **A second marker in the same colour as the primary one is not extra
-    //  information, it is a bug the reader can see and you cannot.** The strip
-    //  is a date picker first. It shows the date.
-    // =========================================================================
-
-    // final TtcDayFacts facts = ttcFactsFor(date);
-    //
-    // final isFertile =
-    //     facts.fertility != null && facts.fertility != FertilityLevel.low;
-    //
-    // if (facts.isPeriodStart) {
-    //   ring = ttcCoral;
-    // } else if (isFertile) {
-    //   fill = ttcFertilityTint(facts.fertility!);
-    // } else if (facts.isExpectedPeriod) {
-    //   ring = ttcCoral.withValues(alpha: 0.55);
-    // }
-
-    // ⚠️ NO `fill` AND NO `selectedRing` — 2026-09-05. THE CELL DRAWS NO
-    // BACKGROUND AT ALL ANY MORE.
-    //
-    // It used to paint coral on today and a purple ring on the selection. The
-    // ring is gone because it was asked to go — *"I don't need that purple
-    // outline… instead take that pink background"* — and the coral is gone from
-    // here because it now lives in `_WeekStrip` as one disc that slides. See
-    // the note there for why a per-cell fill can only cut and never move.
-    //
-    // ⚠️ WHAT THIS COSTS, AND HOW IT IS PAID. The old arrangement had one
-    // permanent, unmissable mark on today. With the disc following the
-    // selection, today has no fill whenever you are looking at another day —
-    // and *"keep the today marked as where it is so that I know what day is
-    // today"* is the requirement. It is paid twice: the word TODAY sits above
-    // it in coral instead of a weekday letter, and its digits stay coral while
-    // every other unselected day is ink. Two marks, neither of them a disc, so
-    // neither can be confused with the cursor.
-    final onDisc = isSelected;
-
-    final marks = ttcDayMarkers(date);
-
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: SizedBox(
-        width: width,
-        child: Column(children: [
-          // ⚠️ THE WORD, NOT JUST THE COLOUR. A weekday letter is the same
-          // glyph on every seventh cell, so "T" over today carries no
-          // information at all. Replacing it removes the last way to misread
-          // which cell is the current one — and it costs nothing, because the
-          // letter it replaces was the least useful mark on the strip.
-          // ⚠️ A FIXED 14 SO THE DISC KNOWS WHERE THE CIRCLE STARTS. The
-          // sliding marker is positioned from outside this cell, so its `top`
-          // is arithmetic over this row's height plus the gap below it. Left to
-          // the font, that height changes with the text scale and the disc
-          // drifts off the number on exactly the devices whose owners cannot
-          // read it anyway.
-          SizedBox(
-            height: 14,
-            child: Text(isToday ? 'TODAY' : letter,
-              maxLines: 1,
-              overflow: TextOverflow.visible,
-              style: pvManrope(
-                  fontSize: isToday ? 8 : 10.5,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: isToday ? 0.4 : 0.6,
-                  // A future day is dimmer, so the strip has a visible "now"
-                  // edge without a divider drawn between two dates.
-                  color: isToday
-                      ? ttcCoral
-                      : isFuture
-                          ? p.ink3.withValues(alpha: 0.5)
-                          : p.ink3)),
-          ),
-          const SizedBox(height: 6),
-          SizedBox(
-            width: 34,
-            height: 34,
-            child: Center(
-              child: Text('${date.day}',
-                  style: pvManrope(
-                      fontSize: 13.5,
-                      fontWeight: isSelected || isToday
-                          ? FontWeight.w900
-                          : FontWeight.w700,
-                      // White on the disc; coral on today when the disc is
-                      // elsewhere; dimmer ahead of today; ordinary ink behind.
-                      color: onDisc
-                          ? Colors.white
-                          : isToday
-                              ? ttcCoral
-                              : isFuture
-                                  ? p.ink3
-                                  : p.ink1)),
-            ),
-          ),
-          const SizedBox(height: 4),
-
-          // ---- WHAT SHE LOGGED --------------------------------------------
-          //
-          // ⚠️ THE ASYMMETRY IS THE FEATURE, and it was asked for twice:
-          // *"if I'm not on a date but a symptom was logged on that particular
-          // date, it shows a heart below that date. The moment I'm on that date
-          // it shows the symptom icons."*
-          //
-          // Which is a genuinely good interaction rather than a decorative one.
-          // Thirty days of symptom icons at 15pt is noise nobody can parse;
-          // thirty hearts is a scannable answer to "when have I been logging?"
-          // - and the detail arrives on the one day you asked about.
-          SizedBox(
-            height: 18,
-            child: marks.shown.isEmpty
-                ? null
-                : isSelected
-                    ? _MarkRow(marks: marks, p: p)
-                    : Icon(Icons.favorite_rounded,
-                        size: 10, color: ttcCoral.withValues(alpha: 0.75)),
-          ),
-        ]),
-      ),
-    );
-  }
-}
+// =============================================================================
+//  KEPT FOR REVERT — the strip as it was before it became `PvDayStrip`
+//  (lib/screens/v2/pv_day_strip.dart, 2026-09-21). The mechanism moved
+//  verbatim; only the marks slot and the two tones are new. If the shared
+//  widget ever has to be unwound, this is what TTC goes back to.
+// =============================================================================
+// class _WeekStrip extends StatefulWidget {
+//   const _WeekStrip(
+//       {required this.p,
+//       required this.selected,
+//       required this.today,
+//       required this.onSelect});
+//
+//   final V2Palette p;
+//   final DateTime selected;
+//
+//   /// The screen's single idea of today. See `_TtcHomeV3State._today`.
+//   final DateTime today;
+//
+//   final ValueChanged<DateTime> onSelect;
+//
+//   @override
+//   State<_WeekStrip> createState() => _WeekStripState();
+// }
+//
+// class _WeekStripState extends State<_WeekStrip> {
+//   static const _dayLetters = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+//
+//   /// ~26 weeks back. Long enough that nobody hits the end while browsing, short
+//   /// enough that the list is 187 cheap items rather than an infinite builder
+//   /// whose scroll offset has to be computed from an epoch.
+//   static const _daysBack = 180;
+//   static const _daysForward = 6;
+//   static const _slot = 46.0;
+//
+//   final _sc = ScrollController();
+//   bool _centred = false;
+//
+//   /// ⚠️ NOT `late final` ANY MORE. It was, and it was set from
+//   /// `DateTime.now()` in `initState` — so the 187-day window was anchored to
+//   /// whichever day the screen was first opened on and stayed there. After
+//   /// midnight the strip's last cell was five days ahead instead of six, and
+//   /// its idea of "today" was a day behind the numbers it was drawing.
+//   late DateTime _first = widget.today.subtract(const Duration(days: _daysBack));
+//
+//   @override
+//   void didUpdateWidget(_WeekStrip old) {
+//     super.didUpdateWidget(old);
+//     if (old.today != widget.today) {
+//       // Re-anchor, and let it re-centre once: on the morning after, landing on
+//       // today is what she wants, and it is also the only moment where moving
+//       // the scroll position under her is not rude.
+//       setState(() {
+//         _first = widget.today.subtract(const Duration(days: _daysBack));
+//         _centred = false;
+//       });
+//     }
+//   }
+//
+//   @override
+//   void dispose() {
+//     _sc.dispose();
+//     super.dispose();
+//   }
+//
+//   /// Put the selected day on screen after the first layout.
+//   ///
+//   /// ⚠️ ONCE, NOT ON EVERY BUILD. `_centred` is the guard, and it is load
+//   /// bearing: re-centring on every build would yank the strip back under her
+//   /// thumb the instant she scrolled, because a scroll rebuilds nothing but a
+//   /// tap rebuilds everything. It is also why this cannot be
+//   /// `initialScrollOffset` - the viewport width is not known until layout, and
+//   /// centring needs it.
+//   void _centre(double viewport) {
+//     if (_centred || !_sc.hasClients) return;
+//     _centred = true;
+//     final index = widget.selected.difference(_first).inDays;
+//     final target = (index * _slot) - (viewport / 2) + (_slot / 2);
+//     _sc.jumpTo(target.clamp(0.0, _sc.position.maxScrollExtent));
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     // ⚠️ THE LIVE CLOCK, NOT `widget.today`, FOR THE TODAY MARKER.
+//     //
+//     // The parent keeps a `_today` and refreshes it on resume, which is right
+//     // for deciding what the page is ABOUT. But the previous version of this
+//     // line read that cached value, so if it ever failed to refresh, the marker
+//     // for today was wrong too — and a strip that is confidently wrong about
+//     // which day it is, is worse than one that is merely stale.
+//     //
+//     // The window anchor still comes from the parent (`_first`), so the list
+//     // does not reshuffle under a scroll. Only the "which of these is today"
+//     // question is answered from the clock, every build, unconditionally.
+//     final now = DateTime.now();
+//     final today = DateTime(now.year, now.month, now.day);
+//     const count = _daysBack + _daysForward + 1;
+//
+//     return LayoutBuilder(builder: (context, box) {
+//       WidgetsBinding.instance
+//           .addPostFrameCallback((_) => _centre(box.maxWidth));
+//
+//       final selIndex =
+//           widget.selected.difference(_first).inDays.toDouble();
+//
+//       return SizedBox(
+//         height: 84,
+//         child: Stack(children: [
+//           // ⚠️ THE CORAL DISC IS ONE WIDGET THAT MOVES, NOT A PROPERTY OF A
+//           // CELL — 2026-09-05. Asked for directly: *"I don't need that purple
+//           // outline… instead take that pink background. Have a good motion. It
+//           // seems sliding through to that particular date."*
+//           //
+//           // Drawn per-cell it can only ever appear and disappear: the old cell
+//           // repaints without it and the new one repaints with it, which is a
+//           // cut, not a move. Lifting it out of the list and translating it is
+//           // what makes the same pixels read as one object travelling to the day
+//           // you tapped.
+//           //
+//           // ⚠️ IT SITS *UNDER* THE LIST, WHICH IS WHY THE NUMBER STILL SHOWS.
+//           // The cells paint no background of their own, so the disc shows
+//           // through and each date's own digits draw on top of it. Painted over
+//           // the list it would cover the number it is meant to highlight.
+//           //
+//           // ⚠️ AND IT TRACKS TWO THINGS AT ONCE. The `AnimatedBuilder` on the
+//           // scroll controller keeps it glued to its date while the strip is
+//           // dragged (instantly, no easing — a marker that lags behind a scroll
+//           // looks broken); the `TweenAnimationBuilder` eases only the change of
+//           // SELECTION. One of those must be immediate and the other must not,
+//           // which is why they are two separate animations and not one.
+//           Positioned(
+//             left: 0,
+//             top: 20,
+//             child: AnimatedBuilder(
+//               animation: _sc,
+//               builder: (context, _) => TweenAnimationBuilder<double>(
+//                 tween: Tween<double>(end: selIndex),
+//                 duration: const Duration(milliseconds: 260),
+//                 curve: Curves.easeOutCubic,
+//                 builder: (context, v, child) => Transform.translate(
+//                   offset: Offset(
+//                       v * _slot -
+//                           (_sc.hasClients ? _sc.offset : 0) +
+//                           (_slot - 34) / 2,
+//                       0),
+//                   child: child,
+//                 ),
+//                 child: Container(
+//                   width: 34,
+//                   height: 34,
+//                   decoration: const BoxDecoration(
+//                       color: ttcCoral, shape: BoxShape.circle),
+//                 ),
+//               ),
+//             ),
+//           ),
+//           ListView.builder(
+//           controller: _sc,
+//           scrollDirection: Axis.horizontal,
+//           itemCount: count,
+//           padding: EdgeInsets.zero,
+//           itemBuilder: (context, i) {
+//             final date = DateTime(_first.year, _first.month, _first.day + i);
+//             return _WeekDay(
+//               // ⚠️ A KEY PER DATE, SO A TEST CAN TAP ONE. Finding a day by its
+//               // number does not work here: the list spans six months, so `29`
+//               // is ambiguous the moment two months' worth is built, and the
+//               // cards below can print a bare number too — a cycle day of 8 and
+//               // the 8th of the month are the same string on one screen.
+//               key: ValueKey('ttc_day_${date.year}-${date.month}-${date.day}'),
+//               date: date,
+//               isToday: date == today,
+//               isSelected: date == widget.selected,
+//               isFuture: date.isAfter(today),
+//               letter: _dayLetters[(date.weekday - 1) % 7],
+//               p: widget.p,
+//               width: _slot,
+//               onTap: () => widget.onSelect(date),
+//             );
+//           },
+//         ),
+//         ]),
+//       );
+//     });
+//   }
+// }
+//
+// class _WeekDay extends StatelessWidget {
+//   const _WeekDay({
+//     super.key,
+//     required this.date,
+//     required this.isToday,
+//     required this.isSelected,
+//     required this.isFuture,
+//     required this.letter,
+//     required this.p,
+//     required this.width,
+//     required this.onTap,
+//   });
+//
+//   final DateTime date;
+//   final bool isToday;
+//   final bool isSelected;
+//   final bool isFuture;
+//   final String letter;
+//   final V2Palette p;
+//   final double width;
+//   final VoidCallback onTap;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     // =========================================================================
+//     //  ⚠️ THE STRIP DRAWS ONE THING: WHICH DAY IS TODAY.
+//     // -------------------------------------------------------------------------
+//     //  Everything the cycle knows — period starts, fertile days, an expected
+//     //  period — is COMMENTED OUT BELOW, kept for revert, and it comes back when
+//     //  the distinction is designed properly against the reference. Asked for
+//     //  directly: *"in future I will be letting you mark the distinction like
+//     //  the competitor app does. But you don't have to do it right now."*
+//     //
+//     //  ⚠️ AND THE REASON IT HAD TO COME OFF NOW IS WORTH KEEPING. Three rounds
+//     //  were lost to "the pink circle is stuck on the 30th", and every round the
+//     //  answer was the same: there was more than one pink circle. First a filled
+//     //  coral disc for a logged period start sitting beside the today marker;
+//     //  then, after that became a ring, a coral RING on the 30th sitting beside
+//     //  today's disc. Each time the extra mark was correct, data-driven, and
+//     //  completely indistinguishable from "the today marker has not moved".
+//     //
+//     //  **A second marker in the same colour as the primary one is not extra
+//     //  information, it is a bug the reader can see and you cannot.** The strip
+//     //  is a date picker first. It shows the date.
+//     // =========================================================================
+//
+//     // final TtcDayFacts facts = ttcFactsFor(date);
+//     //
+//     // final isFertile =
+//     //     facts.fertility != null && facts.fertility != FertilityLevel.low;
+//     //
+//     // if (facts.isPeriodStart) {
+//     //   ring = ttcCoral;
+//     // } else if (isFertile) {
+//     //   fill = ttcFertilityTint(facts.fertility!);
+//     // } else if (facts.isExpectedPeriod) {
+//     //   ring = ttcCoral.withValues(alpha: 0.55);
+//     // }
+//
+//     // ⚠️ NO `fill` AND NO `selectedRing` — 2026-09-05. THE CELL DRAWS NO
+//     // BACKGROUND AT ALL ANY MORE.
+//     //
+//     // It used to paint coral on today and a purple ring on the selection. The
+//     // ring is gone because it was asked to go — *"I don't need that purple
+//     // outline… instead take that pink background"* — and the coral is gone from
+//     // here because it now lives in `_WeekStrip` as one disc that slides. See
+//     // the note there for why a per-cell fill can only cut and never move.
+//     //
+//     // ⚠️ WHAT THIS COSTS, AND HOW IT IS PAID. The old arrangement had one
+//     // permanent, unmissable mark on today. With the disc following the
+//     // selection, today has no fill whenever you are looking at another day —
+//     // and *"keep the today marked as where it is so that I know what day is
+//     // today"* is the requirement. It is paid twice: the word TODAY sits above
+//     // it in coral instead of a weekday letter, and its digits stay coral while
+//     // every other unselected day is ink. Two marks, neither of them a disc, so
+//     // neither can be confused with the cursor.
+//     final onDisc = isSelected;
+//
+//     final marks = ttcDayMarkers(date);
+//
+//     return InkWell(
+//       onTap: onTap,
+//       borderRadius: BorderRadius.circular(16),
+//       child: SizedBox(
+//         width: width,
+//         child: Column(children: [
+//           // ⚠️ THE WORD, NOT JUST THE COLOUR. A weekday letter is the same
+//           // glyph on every seventh cell, so "T" over today carries no
+//           // information at all. Replacing it removes the last way to misread
+//           // which cell is the current one — and it costs nothing, because the
+//           // letter it replaces was the least useful mark on the strip.
+//           // ⚠️ A FIXED 14 SO THE DISC KNOWS WHERE THE CIRCLE STARTS. The
+//           // sliding marker is positioned from outside this cell, so its `top`
+//           // is arithmetic over this row's height plus the gap below it. Left to
+//           // the font, that height changes with the text scale and the disc
+//           // drifts off the number on exactly the devices whose owners cannot
+//           // read it anyway.
+//           SizedBox(
+//             height: 14,
+//             child: Text(isToday ? 'TODAY' : letter,
+//               maxLines: 1,
+//               overflow: TextOverflow.visible,
+//               style: pvManrope(
+//                   fontSize: isToday ? 8 : 10.5,
+//                   fontWeight: FontWeight.w800,
+//                   letterSpacing: isToday ? 0.4 : 0.6,
+//                   // A future day is dimmer, so the strip has a visible "now"
+//                   // edge without a divider drawn between two dates.
+//                   color: isToday
+//                       ? ttcCoral
+//                       : isFuture
+//                           ? p.ink3.withValues(alpha: 0.5)
+//                           : p.ink3)),
+//           ),
+//           const SizedBox(height: 6),
+//           SizedBox(
+//             width: 34,
+//             height: 34,
+//             child: Center(
+//               child: Text('${date.day}',
+//                   style: pvManrope(
+//                       fontSize: 13.5,
+//                       fontWeight: isSelected || isToday
+//                           ? FontWeight.w900
+//                           : FontWeight.w700,
+//                       // White on the disc; coral on today when the disc is
+//                       // elsewhere; dimmer ahead of today; ordinary ink behind.
+//                       color: onDisc
+//                           ? Colors.white
+//                           : isToday
+//                               ? ttcCoral
+//                               : isFuture
+//                                   ? p.ink3
+//                                   : p.ink1)),
+//             ),
+//           ),
+//           const SizedBox(height: 4),
+//
+//           // ---- WHAT SHE LOGGED --------------------------------------------
+//           //
+//           // ⚠️ THE ASYMMETRY IS THE FEATURE, and it was asked for twice:
+//           // *"if I'm not on a date but a symptom was logged on that particular
+//           // date, it shows a heart below that date. The moment I'm on that date
+//           // it shows the symptom icons."*
+//           //
+//           // Which is a genuinely good interaction rather than a decorative one.
+//           // Thirty days of symptom icons at 15pt is noise nobody can parse;
+//           // thirty hearts is a scannable answer to "when have I been logging?"
+//           // - and the detail arrives on the one day you asked about.
+//           SizedBox(
+//             height: 18,
+//             child: marks.shown.isEmpty
+//                 ? null
+//                 : isSelected
+//                     ? _MarkRow(marks: marks, p: p)
+//                     : Icon(Icons.favorite_rounded,
+//                         size: 10, color: ttcCoral.withValues(alpha: 0.75)),
+//           ),
+//         ]),
+//       ),
+//     );
+//   }
+// }
 
 /// The logged symptoms under the selected date: two of them, then a count.
 class _MarkRow extends StatelessWidget {
@@ -2915,226 +2966,251 @@ class _InsightTile extends StatelessWidget {
   const _InsightTile(
       {required this.card, required this.p, required this.onTap});
 
-  static const double width = 100;
-  static const double height = 112;
-
   final TtcInsightCard card;
   final V2Palette p;
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) {
-    // ⚠️ `% 360` IS NOT DEFENSIVE PADDING. `v2BlockTint` asserts hue <= 360,
-    // and a symptom hue arriving from the data file has already tripped it once
-    // in this stage. A hue is an angle; wrapping it is the correct arithmetic.
-    final tint = v2BlockTint(card.hue % 360, p);
-    final deep = HSLColor.fromColor(tint)
-        .withSaturation(0.45)
-        .withLightness(0.34)
-        .toColor();
-
-    return Semantics(
-      button: true,
-      label: '${card.eyebrow}: ${card.value}',
-      child: InkWell(
+  Widget build(BuildContext context) => PvInsightTile(
+        eyebrow: card.eyebrow,
+        value: card.value,
+        caption: card.caption,
+        hue: card.hue,
+        art: card.art,
+        p: p,
         onTap: onTap,
-        borderRadius: BorderRadius.circular(18),
-        child: Container(
-          width: width,
-          height: height,
-          decoration: BoxDecoration(
-            color: tint,
-            borderRadius: BorderRadius.circular(18),
-          ),
-          clipBehavior: Clip.antiAlias,
-          child: Stack(children: [
-            // The mark fills the block and is cropped by its edge, the same
-            // device the focus rail uses. With the white body gone it has the
-            // whole card to sit in, so it can be quieter and still register.
-            Positioned.fill(
-              child: CustomPaint(
-                  painter: _InsightMark(
-                      art: card.art, ink: deep.withValues(alpha: 0.5))),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(10, 9, 10, 9),
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(card.eyebrow.toUpperCase(),
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
-                        style: pvManrope(
-                            fontSize: 7.5,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 0.6,
-                            height: 1.25,
-                            color: deep)),
-                    const Spacer(),
-                    Text(card.value,
-                        maxLines: card.caption == null ? 4 : 3,
-                        overflow: TextOverflow.ellipsis,
-                        style: pvJakarta(
-                            fontSize: _valueSize(card.value),
-                            fontWeight: FontWeight.w800,
-                            height: 1.2,
-                            color: p.ink1)),
-                    if (card.caption != null) ...[
-                      const SizedBox(height: 3),
-                      Text(card.caption!,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: pvManrope(
-                              fontSize: 8.5,
-                              height: 1.25,
-                              color: p.ink2.withValues(alpha: 0.85))),
-                    ],
-                  ]),
-            ),
-          ]),
-        ),
-      ),
-    );
-  }
-
-  /// ⚠️ THE SIZE FOLLOWS THE LENGTH, and this is the one piece of type on the
-  /// card that could not be a constant. The same slot holds "8" and "Cut back
-  /// on chai to two cups" - a size that suits the sentence makes the number
-  /// look like a label, and a size that suits the number turns the sentence
-  /// into four ellipsised lines. Three steps, chosen at the lengths where the
-  /// text stops fitting rather than at round numbers.
-  ///
-  /// ⚠️ ALL THREE CAME DOWN WITH THE CARD, TWICE. 30/19/14.5 at 158pt became
-  /// 26/16/12.5 at 118, and is 22/14/11 at 100 — a type scale that does not
-  /// shrink with its container is how a resize turns into an overflow, or (with
-  /// `maxLines` set, as here) into silent ellipses that nobody files a bug for.
-  static double _valueSize(String v) {
-    if (v.length <= 3) return 22;
-    if (v.length <= 12) return 14;
-    return 11;
-  }
+      );
 }
 
-/// The drawn mark in a card's head.
-///
-/// ⚠️ DRAWN, NOT AN ICON FONT AND NOT AN ASSET. Same reason the rest of this
-/// stage paints its own art: an icon at this size reads as a button affordance,
-/// and these are not buttons in the head - they are the card's texture. Each
-/// mark is a few strokes tuned to sit behind the eyebrow without competing
-/// with it, which no shipped icon set does.
-class _InsightMark extends CustomPainter {
-  const _InsightMark({required this.art, required this.ink});
-
-  final TtcInsightArt art;
-  final Color ink;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final stroke = Paint()
-      ..color = ink.withValues(alpha: 0.5)
-      ..strokeWidth = 2
-      ..strokeCap = StrokeCap.round
-      ..style = PaintingStyle.stroke;
-    final fill = Paint()..color = ink.withValues(alpha: 0.32);
-
-    // Anchored bottom-right, so the eyebrow at top-left never collides with it
-    // regardless of how many lines the eyebrow takes.
-    final cx = size.width - 22;
-    final cy = size.height - 20;
-
-    // ⚠️ SCALED ABOUT ITS OWN CENTRE, NOT REDRAWN AT NEW NUMBERS. The geometry
-    // below was tuned inside a 158 x 168 card; the card is now 100 x 112, so
-    // every radius and bar length is proportionally half again too big and the
-    // mark starts crowding the value text. Rewriting thirty constants would
-    // have to be redone the next time the card moves — a single transform about
-    // the anchor keeps the drawing and its position independent.
-    canvas.save();
-    canvas.translate(cx, cy);
-    canvas.scale(0.72);
-    canvas.translate(-cx, -cy);
-
-    switch (art) {
-      case TtcInsightArt.level:
-        // Three ascending bars: the shape of a band getting stronger.
-        for (var i = 0; i < 3; i++) {
-          final h = 9.0 + i * 8;
-          canvas.drawRRect(
-              RRect.fromRectAndRadius(
-                  Rect.fromLTWH(cx - 12 + i * 11, cy + 6 - h, 7, h),
-                  const Radius.circular(3)),
-              fill);
-        }
-      case TtcInsightArt.number:
-      case TtcInsightArt.ring:
-        // An open ring - a cycle, with the gap saying it is not finished.
-        canvas.drawArc(Rect.fromCircle(center: Offset(cx, cy), radius: 15),
-            -1.9, 4.9, false, stroke);
-        canvas.drawCircle(Offset(cx + 13, cy - 8), 3.2, fill);
-      case TtcInsightArt.symptom:
-        // A pulse: quiet, one peak, quiet.
-        final path = Path()..moveTo(cx - 20, cy);
-        path.lineTo(cx - 8, cy);
-        path.lineTo(cx - 3, cy - 13);
-        path.lineTo(cx + 3, cy + 8);
-        path.lineTo(cx + 8, cy);
-        path.lineTo(cx + 20, cy);
-        canvas.drawPath(path, stroke);
-      case TtcInsightArt.droplet:
-        final path = Path()
-          ..moveTo(cx, cy - 17)
-          ..quadraticBezierTo(cx + 14, cy - 1, cx, cy + 13)
-          ..quadraticBezierTo(cx - 14, cy - 1, cx, cy - 17)
-          ..close();
-        canvas.drawPath(path, fill);
-      case TtcInsightArt.note:
-        // Lines of text, shortening - a page of something to read.
-        for (var i = 0; i < 4; i++) {
-          canvas.drawLine(Offset(cx - 18, cy - 12 + i * 8),
-              Offset(cx + 18 - i * 7, cy - 12 + i * 8), stroke);
-        }
-      case TtcInsightArt.balance:
-        // Two pans on a beam: the myth on one side, the fact on the other.
-        canvas.drawLine(Offset(cx - 19, cy - 8), Offset(cx + 19, cy - 8),
-            stroke);
-        canvas.drawLine(Offset(cx, cy - 8), Offset(cx, cy + 12), stroke);
-        canvas.drawCircle(Offset(cx - 14, cy + 2), 5, fill);
-        canvas.drawCircle(Offset(cx + 14, cy + 2), 5, fill);
-      case TtcInsightArt.log:
-        canvas.drawCircle(Offset(cx, cy), 15, stroke);
-        canvas.drawLine(Offset(cx - 7, cy), Offset(cx + 7, cy), stroke);
-        canvas.drawLine(Offset(cx, cy - 7), Offset(cx, cy + 7), stroke);
-      case TtcInsightArt.meal:
-        // A bowl.
-        canvas.drawArc(Rect.fromCircle(center: Offset(cx, cy - 2), radius: 16),
-            0.15, 2.85, false, stroke);
-        canvas.drawLine(Offset(cx - 18, cy - 2), Offset(cx + 18, cy - 2),
-            stroke);
-        canvas.drawCircle(Offset(cx, cy - 12), 3.5, fill);
-      case TtcInsightArt.move:
-        // A stride.
-        canvas.drawCircle(Offset(cx + 2, cy - 16), 4.5, fill);
-        canvas.drawLine(Offset(cx + 2, cy - 11), Offset(cx - 2, cy + 1),
-            stroke);
-        canvas.drawLine(Offset(cx - 2, cy + 1), Offset(cx - 11, cy + 11),
-            stroke);
-        canvas.drawLine(Offset(cx - 2, cy + 1), Offset(cx + 9, cy + 11),
-            stroke);
-      case TtcInsightArt.product:
-        canvas.drawRRect(
-            RRect.fromRectAndRadius(
-                Rect.fromLTWH(cx - 15, cy - 12, 30, 26),
-                const Radius.circular(5)),
-            fill);
-        canvas.drawLine(Offset(cx - 15, cy - 4), Offset(cx + 15, cy - 4),
-            stroke);
-    }
-    canvas.restore();
-  }
-
-  @override
-  bool shouldRepaint(_InsightMark old) =>
-      old.art != art || old.ink != ink;
-}
+// =============================================================================
+//  KEPT FOR REVERT — the tile and its painter as they were before they became
+//  `PvInsightTile` / `PvInsightMark` (lib/screens/v2/pv_insight_rail.dart,
+//  2026-09-21). Moved verbatim, sizes and all.
+// =============================================================================
+// class _InsightTile extends StatelessWidget {
+//   const _InsightTile(
+//       {required this.card, required this.p, required this.onTap});
+//
+//   static const double width = 100;
+//   static const double height = 112;
+//
+//   final TtcInsightCard card;
+//   final V2Palette p;
+//   final VoidCallback onTap;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     // ⚠️ `% 360` IS NOT DEFENSIVE PADDING. `v2BlockTint` asserts hue <= 360,
+//     // and a symptom hue arriving from the data file has already tripped it once
+//     // in this stage. A hue is an angle; wrapping it is the correct arithmetic.
+//     final tint = v2BlockTint(card.hue % 360, p);
+//     final deep = HSLColor.fromColor(tint)
+//         .withSaturation(0.45)
+//         .withLightness(0.34)
+//         .toColor();
+//
+//     return Semantics(
+//       button: true,
+//       label: '${card.eyebrow}: ${card.value}',
+//       child: InkWell(
+//         onTap: onTap,
+//         borderRadius: BorderRadius.circular(18),
+//         child: Container(
+//           width: width,
+//           height: height,
+//           decoration: BoxDecoration(
+//             color: tint,
+//             borderRadius: BorderRadius.circular(18),
+//           ),
+//           clipBehavior: Clip.antiAlias,
+//           child: Stack(children: [
+//             // The mark fills the block and is cropped by its edge, the same
+//             // device the focus rail uses. With the white body gone it has the
+//             // whole card to sit in, so it can be quieter and still register.
+//             Positioned.fill(
+//               child: CustomPaint(
+//                   painter: _InsightMark(
+//                       art: card.art, ink: deep.withValues(alpha: 0.5))),
+//             ),
+//             Padding(
+//               padding: const EdgeInsets.fromLTRB(10, 9, 10, 9),
+//               child: Column(
+//                   crossAxisAlignment: CrossAxisAlignment.start,
+//                   children: [
+//                     Text(card.eyebrow.toUpperCase(),
+//                         maxLines: 2,
+//                         overflow: TextOverflow.ellipsis,
+//                         style: pvManrope(
+//                             fontSize: 7.5,
+//                             fontWeight: FontWeight.w800,
+//                             letterSpacing: 0.6,
+//                             height: 1.25,
+//                             color: deep)),
+//                     const Spacer(),
+//                     Text(card.value,
+//                         maxLines: card.caption == null ? 4 : 3,
+//                         overflow: TextOverflow.ellipsis,
+//                         style: pvJakarta(
+//                             fontSize: _valueSize(card.value),
+//                             fontWeight: FontWeight.w800,
+//                             height: 1.2,
+//                             color: p.ink1)),
+//                     if (card.caption != null) ...[
+//                       const SizedBox(height: 3),
+//                       Text(card.caption!,
+//                           maxLines: 2,
+//                           overflow: TextOverflow.ellipsis,
+//                           style: pvManrope(
+//                               fontSize: 8.5,
+//                               height: 1.25,
+//                               color: p.ink2.withValues(alpha: 0.85))),
+//                     ],
+//                   ]),
+//             ),
+//           ]),
+//         ),
+//       ),
+//     );
+//   }
+//
+//   /// ⚠️ THE SIZE FOLLOWS THE LENGTH, and this is the one piece of type on the
+//   /// card that could not be a constant. The same slot holds "8" and "Cut back
+//   /// on chai to two cups" - a size that suits the sentence makes the number
+//   /// look like a label, and a size that suits the number turns the sentence
+//   /// into four ellipsised lines. Three steps, chosen at the lengths where the
+//   /// text stops fitting rather than at round numbers.
+//   ///
+//   /// ⚠️ ALL THREE CAME DOWN WITH THE CARD, TWICE. 30/19/14.5 at 158pt became
+//   /// 26/16/12.5 at 118, and is 22/14/11 at 100 — a type scale that does not
+//   /// shrink with its container is how a resize turns into an overflow, or (with
+//   /// `maxLines` set, as here) into silent ellipses that nobody files a bug for.
+//   static double _valueSize(String v) {
+//     if (v.length <= 3) return 22;
+//     if (v.length <= 12) return 14;
+//     return 11;
+//   }
+// }
+//
+// /// The drawn mark in a card's head.
+// ///
+// /// ⚠️ DRAWN, NOT AN ICON FONT AND NOT AN ASSET. Same reason the rest of this
+// /// stage paints its own art: an icon at this size reads as a button affordance,
+// /// and these are not buttons in the head - they are the card's texture. Each
+// /// mark is a few strokes tuned to sit behind the eyebrow without competing
+// /// with it, which no shipped icon set does.
+// class _InsightMark extends CustomPainter {
+//   const _InsightMark({required this.art, required this.ink});
+//
+//   final TtcInsightArt art;
+//   final Color ink;
+//
+//   @override
+//   void paint(Canvas canvas, Size size) {
+//     final stroke = Paint()
+//       ..color = ink.withValues(alpha: 0.5)
+//       ..strokeWidth = 2
+//       ..strokeCap = StrokeCap.round
+//       ..style = PaintingStyle.stroke;
+//     final fill = Paint()..color = ink.withValues(alpha: 0.32);
+//
+//     // Anchored bottom-right, so the eyebrow at top-left never collides with it
+//     // regardless of how many lines the eyebrow takes.
+//     final cx = size.width - 22;
+//     final cy = size.height - 20;
+//
+//     // ⚠️ SCALED ABOUT ITS OWN CENTRE, NOT REDRAWN AT NEW NUMBERS. The geometry
+//     // below was tuned inside a 158 x 168 card; the card is now 100 x 112, so
+//     // every radius and bar length is proportionally half again too big and the
+//     // mark starts crowding the value text. Rewriting thirty constants would
+//     // have to be redone the next time the card moves — a single transform about
+//     // the anchor keeps the drawing and its position independent.
+//     canvas.save();
+//     canvas.translate(cx, cy);
+//     canvas.scale(0.72);
+//     canvas.translate(-cx, -cy);
+//
+//     switch (art) {
+//       case TtcInsightArt.level:
+//         // Three ascending bars: the shape of a band getting stronger.
+//         for (var i = 0; i < 3; i++) {
+//           final h = 9.0 + i * 8;
+//           canvas.drawRRect(
+//               RRect.fromRectAndRadius(
+//                   Rect.fromLTWH(cx - 12 + i * 11, cy + 6 - h, 7, h),
+//                   const Radius.circular(3)),
+//               fill);
+//         }
+//       case TtcInsightArt.number:
+//       case TtcInsightArt.ring:
+//         // An open ring - a cycle, with the gap saying it is not finished.
+//         canvas.drawArc(Rect.fromCircle(center: Offset(cx, cy), radius: 15),
+//             -1.9, 4.9, false, stroke);
+//         canvas.drawCircle(Offset(cx + 13, cy - 8), 3.2, fill);
+//       case TtcInsightArt.symptom:
+//         // A pulse: quiet, one peak, quiet.
+//         final path = Path()..moveTo(cx - 20, cy);
+//         path.lineTo(cx - 8, cy);
+//         path.lineTo(cx - 3, cy - 13);
+//         path.lineTo(cx + 3, cy + 8);
+//         path.lineTo(cx + 8, cy);
+//         path.lineTo(cx + 20, cy);
+//         canvas.drawPath(path, stroke);
+//       case TtcInsightArt.droplet:
+//         final path = Path()
+//           ..moveTo(cx, cy - 17)
+//           ..quadraticBezierTo(cx + 14, cy - 1, cx, cy + 13)
+//           ..quadraticBezierTo(cx - 14, cy - 1, cx, cy - 17)
+//           ..close();
+//         canvas.drawPath(path, fill);
+//       case TtcInsightArt.note:
+//         // Lines of text, shortening - a page of something to read.
+//         for (var i = 0; i < 4; i++) {
+//           canvas.drawLine(Offset(cx - 18, cy - 12 + i * 8),
+//               Offset(cx + 18 - i * 7, cy - 12 + i * 8), stroke);
+//         }
+//       case TtcInsightArt.balance:
+//         // Two pans on a beam: the myth on one side, the fact on the other.
+//         canvas.drawLine(Offset(cx - 19, cy - 8), Offset(cx + 19, cy - 8),
+//             stroke);
+//         canvas.drawLine(Offset(cx, cy - 8), Offset(cx, cy + 12), stroke);
+//         canvas.drawCircle(Offset(cx - 14, cy + 2), 5, fill);
+//         canvas.drawCircle(Offset(cx + 14, cy + 2), 5, fill);
+//       case TtcInsightArt.log:
+//         canvas.drawCircle(Offset(cx, cy), 15, stroke);
+//         canvas.drawLine(Offset(cx - 7, cy), Offset(cx + 7, cy), stroke);
+//         canvas.drawLine(Offset(cx, cy - 7), Offset(cx, cy + 7), stroke);
+//       case TtcInsightArt.meal:
+//         // A bowl.
+//         canvas.drawArc(Rect.fromCircle(center: Offset(cx, cy - 2), radius: 16),
+//             0.15, 2.85, false, stroke);
+//         canvas.drawLine(Offset(cx - 18, cy - 2), Offset(cx + 18, cy - 2),
+//             stroke);
+//         canvas.drawCircle(Offset(cx, cy - 12), 3.5, fill);
+//       case TtcInsightArt.move:
+//         // A stride.
+//         canvas.drawCircle(Offset(cx + 2, cy - 16), 4.5, fill);
+//         canvas.drawLine(Offset(cx + 2, cy - 11), Offset(cx - 2, cy + 1),
+//             stroke);
+//         canvas.drawLine(Offset(cx - 2, cy + 1), Offset(cx - 11, cy + 11),
+//             stroke);
+//         canvas.drawLine(Offset(cx - 2, cy + 1), Offset(cx + 9, cy + 11),
+//             stroke);
+//       case TtcInsightArt.product:
+//         canvas.drawRRect(
+//             RRect.fromRectAndRadius(
+//                 Rect.fromLTWH(cx - 15, cy - 12, 30, 26),
+//                 const Radius.circular(5)),
+//             fill);
+//         canvas.drawLine(Offset(cx - 15, cy - 4), Offset(cx + 15, cy - 4),
+//             stroke);
+//     }
+//     canvas.restore();
+//   }
+//
+//   @override
+//   bool shouldRepaint(_InsightMark old) =>
+//       old.art != art || old.ink != ink;
+// }
 
 // =============================================================================
 //  KEPT FOR REVERT - the circle rail this replaced

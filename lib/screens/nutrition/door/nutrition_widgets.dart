@@ -18,6 +18,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../data/nutrition/nutrition_photos.dart';
+import '../../../data/nutrition/nutrition_plate.dart' show kPlateNeeds;
 import '../../../data/nutrition/food_values.dart';
 import '../../../theme/pv_fonts.dart';
 import '../../../widgets/pv_feedback.dart';
@@ -69,7 +70,7 @@ Widget nutritionHeading(V2Palette p, String text, {String? sub, Widget? trailing
     );
 
 /// One slot on the plate: photo, the slot's name, the dishes, Swap.
-class PlateRow extends StatelessWidget {
+class PlateRow extends StatefulWidget {
   const PlateRow({
     super.key,
     required this.p,
@@ -98,8 +99,41 @@ class PlateRow extends StatelessWidget {
   final String? photoUrl;
 
   @override
+  State<PlateRow> createState() => _PlateRowState();
+}
+
+class _PlateRowState extends State<PlateRow> with SingleTickerProviderStateMixin {
+  /// A wash of the door's tint that rises and fades when the dish CHANGES —
+  /// the "some effect going around" the user asked for on a swap
+  /// (2026-09-22). Only on a change: a row that flashed on first paint
+  /// would flash five times on every open.
+  late final AnimationController _flash =
+      AnimationController(vsync: this, duration: const Duration(milliseconds: 900));
+
+  @override
+  void didUpdateWidget(PlateRow old) {
+    super.didUpdateWidget(old);
+    if (old.items != widget.items) _flash.forward(from: 0);
+  }
+
+  @override
+  void dispose() {
+    _flash.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final url = photoUrl ?? nutritionPhotoFor(items);
+    final p = widget.p;
+    final items = widget.items;
+    final slot = widget.slot;
+    final swapped = widget.swapped;
+    final skipped = widget.skipped;
+    final last = widget.last;
+    final showSwap = widget.showSwap;
+    final onTap = widget.onTap;
+    final onSwap = widget.onSwap;
+    final url = widget.photoUrl ?? nutritionPhotoFor(items);
     return InkWell(
       onTap: () {
         pvCommitFeedback();
@@ -108,7 +142,20 @@ class PlateRow extends StatelessWidget {
       child: AnimatedOpacity(
         duration: const Duration(milliseconds: 220),
         opacity: skipped ? 0.5 : 1,
-        child: Container(
+        child: AnimatedBuilder(
+          animation: _flash,
+          builder: (context, child) {
+            // Up fast, down slow: 0 → 1 over the first fifth, then out.
+            final t = _flash.value;
+            final a = t < 0.2 ? t / 0.2 : 1 - (t - 0.2) / 0.8;
+            return Container(
+              decoration: BoxDecoration(
+                  color: nutritionMarkTint(p).withValues(alpha: 0.55 * a.clamp(0, 1)),
+                  borderRadius: BorderRadius.circular(14)),
+              child: child,
+            );
+          },
+          child: Container(
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(border: last ? null : Border(bottom: BorderSide(color: p.line))),
           child: Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
@@ -138,7 +185,7 @@ class PlateRow extends StatelessWidget {
                 const SizedBox(height: 4),
                 AnimatedSwitcher(
                   duration: const Duration(milliseconds: 260),
-                  child: Text(items,
+                  child: Text(plateName(items),
                       key: ValueKey(items),
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
@@ -176,6 +223,7 @@ class PlateRow extends StatelessWidget {
             ],
           ]),
         ),
+        ),
       ),
     );
   }
@@ -184,7 +232,7 @@ class PlateRow extends StatelessWidget {
 /// A need: a ring that fills on tap, a soft burst, the label under it.
 /// Nothing turns red; an unticked ring is just a ring.
 class NeedTile extends StatefulWidget {
-  const NeedTile({super.key, required this.p, required this.label, required this.icon, required this.ticked, required this.onTick, required this.onOpen, this.needId});
+  const NeedTile({super.key, required this.p, required this.label, required this.icon, required this.ticked, required this.onTick, required this.onOpen, this.needId, this.amount});
   final V2Palette p;
   final String label;
   final IconData icon;
@@ -192,6 +240,12 @@ class NeedTile extends StatefulWidget {
 
   /// The need's id — when set, the drawn mark is used instead of [icon].
   final String? needId;
+
+  /// The day's reference for this need — "27 mg" — as a small line under
+  /// the name (2026-09-22). It replaces the paragraph that spelt all five
+  /// out in prose above the row; the reference is still one quiet number,
+  /// never a bar.
+  final String? amount;
   final VoidCallback onTick;
   final VoidCallback onOpen;
 
@@ -247,7 +301,15 @@ class _NeedTileState extends State<NeedTile> with SingleTickerProviderStateMixin
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: widget.ticked ? p.ink1 : p.surface,
-                border: Border.all(color: widget.ticked ? p.ink1 : p.line, width: 1.4),
+                // Unticked: the ring in the need's own hue, so the five read
+                // as five things before she has tapped any.
+                border: Border.all(
+                    color: widget.ticked
+                        ? p.ink1
+                        : widget.needId == null
+                            ? p.line
+                            : nutritionNeedTint(p, widget.needId!),
+                    width: widget.ticked ? 1.4 : 2),
               ),
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 200),
@@ -266,6 +328,10 @@ class _NeedTileState extends State<NeedTile> with SingleTickerProviderStateMixin
         const SizedBox(height: 6),
         Text(widget.label,
             style: pvManrope(fontSize: 11.5, fontWeight: FontWeight.w700, color: widget.ticked ? p.ink1 : p.ink2)),
+        if (widget.amount case final a?) ...[
+          const SizedBox(height: 1),
+          Text(a, style: pvManrope(fontSize: 10.5, color: p.ink3)),
+        ],
       ]),
     );
   }
@@ -433,10 +499,13 @@ class RecipeCard extends StatelessWidget {
               return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                 if (box.hasBoundedHeight) Expanded(child: photo) else photo,
                 const SizedBox(height: 8),
+                // 14.5, the plate row's size — a recipe name on the grid and a
+                // dish name on a chart's day were two sizes for one kind of
+                // thing (the user, 2026-09-22).
                 Text(name,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, height: 1.25, color: p.ink1)),
+                    style: pvManrope(fontSize: 14.5, fontWeight: FontWeight.w700, height: 1.25, color: p.ink1)),
                 const SizedBox(height: 2),
                 Text(line, maxLines: 2, overflow: TextOverflow.ellipsis, style: pvManrope(fontSize: 12, height: 1.35, color: p.ink2)),
                 if (values != null) ...[
@@ -528,13 +597,53 @@ IntentMark nutritionNeedMark(String id) => switch (id) {
       _ => IntentMark.fibreMark,
     };
 
-/// The door's tint for a need mark on a white ground: the Nutrition hue,
-/// the same seed the rail cards use.
+/// The door's tint for a mark on a white ground: the Nutrition hue, the
+/// same seed the rail cards use. For anything that is NOT a need — the
+/// needs wear their own hue (`nutritionNeedTint`).
 Color nutritionMarkTint(V2Palette p) => v2BlockTint(104, p);
 
-/// A need's mark at [size], in the door's tint.
+/// One hue per need — 2026-09-22, the user: "every mark you have used is
+/// very green … different nutrients, at least use a different colour."
+/// Iron the rust of a spinach stem, calcium the blue of milk's cool,
+/// protein the ochre of an egg yolk, folate the green it always was, fibre
+/// the wheat gold. The same five hues everywhere a need appears — the ticks,
+/// the cards, the legend, the need pages — so a colour becomes a name.
+double nutritionNeedHue(String id) => switch (id) {
+      'iron' => 344,
+      'calcium' => 206,
+      'protein' => 26,
+      'folic_acid' => 104,
+      _ => 42,
+    };
+
+/// The need's tint on a white ground.
+Color nutritionNeedTint(V2Palette p, String id) => v2BlockTint(nutritionNeedHue(id), p);
+
+/// A need's mark at [size], in its own hue.
 Widget nutritionNeedGlyph(V2Palette p, String id, {double size = 24}) =>
-    SizedBox(width: size, height: size, child: HubIntentArt(mark: nutritionNeedMark(id), tint: nutritionMarkTint(p)));
+    SizedBox(width: size, height: size, child: HubIntentArt(mark: nutritionNeedMark(id), tint: nutritionNeedTint(p, id)));
+
+/// The key to the marks — "what is what". One row, the five marks with
+/// their names, for the top of any list that wears them bare (the recipe
+/// grid). The user, 2026-09-22: "how is a person able to know what is what?"
+class NutritionMarkLegend extends StatelessWidget {
+  const NutritionMarkLegend({super.key, required this.p});
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) => FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: Alignment.centerLeft,
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          for (var i = 0; i < kPlateNeeds.length; i++) ...[
+            if (i > 0) const SizedBox(width: 12),
+            nutritionNeedGlyph(p, kPlateNeeds[i].id, size: 16),
+            const SizedBox(width: 4),
+            Text(kPlateNeeds[i].label, style: pvManrope(fontSize: 11, fontWeight: FontWeight.w700, color: p.ink2)),
+          ],
+        ]),
+      );
+}
 
 /// Kept for revert (2026-09-21): the line icons the needs wore before.
 IconData nutritionNeedIcon(String id) => switch (id) {
@@ -563,14 +672,17 @@ class NutritionTopThree extends StatelessWidget {
     if (values.isEmpty) return const SizedBox.shrink();
     final top = nutritionTopThree(values);
     if (compact) {
-      // Scales down on a narrow card rather than overflowing.
+      // Bare marks in their own hues, no wells (the user, 2026-09-22: on a
+      // recipe card "do not use tinted background, just use plain mark, and
+      // make it different colours"). Scales down on a narrow card rather
+      // than overflowing.
       return FittedBox(
         fit: BoxFit.scaleDown,
         alignment: Alignment.centerLeft,
         child: Row(mainAxisSize: MainAxisSize.min, children: [
           for (var i = 0; i < top.length; i++) ...[
             if (i > 0) const SizedBox(width: 10),
-            nutritionNeedWell(p, top[i].$1, size: 22, radius: 7),
+            nutritionNeedGlyph(p, top[i].$1, size: 18),
             const SizedBox(width: 4),
             Text(top[i].$3, style: pvManrope(fontSize: 11, fontWeight: FontWeight.w700, color: p.ink2)),
           ],
@@ -608,12 +720,12 @@ Widget nutritionMarkWell(V2Palette p, IntentMark mark, {double size = 40, double
       child: HubIntentArt(mark: mark, tint: nutritionMarkTint(p)),
     );
 
-/// A need's mark in a tinted well — `DoctorArtTile`'s geometry: the tint as
-/// the ground, the mark at 60% of the tile.
+/// A need's mark in ITS OWN tinted well — `DoctorArtTile`'s geometry: the
+/// tint as the ground, the mark at 60% of the tile.
 Widget nutritionNeedWell(V2Palette p, String id, {double size = 48, double radius = 15}) => Container(
       width: size,
       height: size,
-      decoration: BoxDecoration(color: nutritionMarkTint(p), borderRadius: BorderRadius.circular(radius)),
+      decoration: BoxDecoration(color: nutritionNeedTint(p, id), borderRadius: BorderRadius.circular(radius)),
       padding: EdgeInsets.all(size * 0.2),
-      child: HubIntentArt(mark: nutritionNeedMark(id), tint: nutritionMarkTint(p)),
+      child: HubIntentArt(mark: nutritionNeedMark(id), tint: nutritionNeedTint(p, id)),
     );

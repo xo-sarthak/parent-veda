@@ -297,6 +297,16 @@ class PregnancyController extends ChangeNotifier {
   DateTime dateForDay(int day) =>
       _dateOnly(_dueDate).subtract(Duration(days: termDays - day));
 
+  /// The inverse: the pregnancy day (1–280) a calendar [date] falls on. The
+  /// home's day strip selects a date; everything under it is authored by day.
+  /// Clamped, so a date before day one or after the due date still lands on
+  /// content rather than on nothing.
+  int dayForDate(DateTime date) {
+    final raw =
+        termDays - _dateOnly(_dueDate).difference(_dateOnly(date)).inDays;
+    return raw.clamp(1, termDays);
+  }
+
   /// Days remaining until the due date (never negative).
   int get daysToDueDate {
     final d = _dueDate.difference(_dateOnly(_now)).inDays;

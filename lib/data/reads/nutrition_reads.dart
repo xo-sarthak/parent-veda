@@ -20,6 +20,8 @@
 
 import '../../localization/app_language.dart';
 import '../../models/pv_read.dart';
+import '../cravings_data.dart';
+import '../nutrition/nutrition_photos.dart' show nutritionPhotoFor;
 import '../nutrition_data.dart';
 
 const String kNutrientReadPrefix = 'nutrient_';
@@ -27,6 +29,7 @@ const String kStageReadPrefix = 'dietstage_';
 const String kDietConditionReadPrefix = 'dietcond_';
 const String kFastingReadPrefix = 'fasting_';
 const String kDietQuestionReadPrefix = 'dietq_';
+const String kCravingReadPrefix = 'craving_';
 
 const LocalizedText _desk = LocalizedText(en: 'ParentVeda editorial', hi: 'ParentVeda editorial');
 const LocalizedText _kicker = LocalizedText(en: 'Nutrition', hi: 'Nutrition');
@@ -42,8 +45,21 @@ const PvCallout _doctorFirst = PvCallout(
           'anything here disagrees with what they said, they are right.'),
 );
 
+/// The first food in a list the dish table has a photo for — so a read
+/// about iron wears a plate of dal rather than a grey well (the user,
+/// 2026-09-22: "in the section What to eat now images are not coming").
+/// The read's own picture, when one is picked by eye later, wins.
+String? _photoFromFoods(Iterable<LocalizedText> foods) {
+  for (final f in foods) {
+    final url = nutritionPhotoFor(f.en);
+    if (url != null) return url;
+  }
+  return null;
+}
+
 PvRead pvReadFromNutrient(NutrientGuide g) => PvRead(
       id: '$kNutrientReadPrefix${g.id}',
+      imageUrl: _photoFromFoods(g.foods),
       kicker: _kicker,
       title: g.name,
       teaser: _same('What your body needs'),
@@ -66,6 +82,7 @@ PvRead pvReadFromNutrient(NutrientGuide g) => PvRead(
 
 PvRead pvReadFromStage(TrimesterGuide g) => PvRead(
       id: '$kStageReadPrefix${g.id}',
+      imageUrl: _photoFromFoods([...g.leanOn, for (final m in g.sampleDay) m.items]),
       kicker: _kicker,
       title: g.label,
       teaser: _same('Food for your stage'),
@@ -91,6 +108,7 @@ PvRead pvReadFromStage(TrimesterGuide g) => PvRead(
 
 PvRead pvReadFromDietCondition(ConditionGuide g) => PvRead(
       id: '$kDietConditionReadPrefix${g.id}',
+      imageUrl: _photoFromFoods(g.guidance),
       kicker: _kicker,
       title: g.label,
       teaser: _same('Eating for a condition'),
@@ -127,6 +145,8 @@ PvRead pvReadFromFasting(FastingTopic t) {
   final all = [...kFastingByOccasion, ...kFastingGeneral];
   return PvRead(
     id: '$kFastingReadPrefix${t.id}',
+    // The fasting plate's own dishes until a picture is picked by eye.
+    imageUrl: nutritionPhotoFor('sabudana khichdi') ?? nutritionPhotoFor('fruit'),
     kicker: _kicker,
     title: t.title,
     teaser: _same('Fasting, done safely'),
@@ -227,4 +247,103 @@ LocalizedText? _rest(LocalizedText t) {
   if (en.isEmpty) return null;
   final hi = rest(t.hi);
   return LocalizedText(en: en, hi: hi.isEmpty ? en : hi);
+}
+
+// -----------------------------------------------------------------------------
+//  A craving, as a read — 2026-09-22
+// -----------------------------------------------------------------------------
+//  `CravingDetailScreen` drew its own page: an emoji, a coloured verdict box,
+//  hand-set headings. The user walked it: "very poor UI/UX … not good at
+//  all." It is writing, so it opens in the one reader (CLAUDE.md, ONE
+//  READER): the verdict at her week is the opening callout, the four
+//  questions are the sections in the order she asks them, the recipe rides
+//  as ingredients + method, and the doctor line closes it as on every read.
+//  The photo is the dish's own where the dish table has one.
+
+/// The verdict as the reader's callout tone: a plain yes reassures, a
+/// "small amounts" is a note, a "not now" is urgent.
+PvCalloutTone _toneFor(NutritionVerdict v) => switch (v) {
+      NutritionVerdict.safe => PvCalloutTone.reassure,
+      NutritionVerdict.limit => PvCalloutTone.note,
+      NutritionVerdict.avoid => PvCalloutTone.urgent,
+    };
+
+String _verdictWord(NutritionVerdict v) => switch (v) {
+      NutritionVerdict.safe => 'Yes',
+      NutritionVerdict.limit => 'In small amounts',
+      NutritionVerdict.avoid => 'Not now',
+    };
+
+String _ordinal(int t) => switch (t) { 1 => 'first', 2 => 'second', _ => 'third' };
+
+/// One craving, answered at [week].
+PvRead pvReadFromCraving(CravingItem item, int week) {
+  final tri = week < 14 ? 1 : (week < 28 ? 2 : 3);
+  final verdict = item.verdictAt(tri);
+  final note = item.stageNoteAt(tri);
+  final showAlternatives = verdict != NutritionVerdict.safe && item.alternatives.isNotEmpty;
+  final recipe = item.recipe;
+  return PvRead(
+    id: '$kCravingReadPrefix${item.id}',
+    kicker: _same('Craving something?'),
+    title: item.name,
+    teaser: _same('At week $week — ${_verdictWord(verdict)}'),
+    // The answer is the first thing on the page; the stage note is the
+    // sentence that makes it hers rather than a leaflet.
+    scaleSetter: note ?? item.why,
+    author: _desk,
+    authorRole: _kicker,
+    reviewed: false,
+    hue: 26,
+    imageUrl: nutritionPhotoFor(item.name.en),
+    sections: [
+      PvReadSection(
+        callout: PvCallout(
+          tone: _toneFor(verdict),
+          title: _same('${_verdictWord(verdict)} — at week $week, your ${_ordinal(tri)} trimester'),
+          body: note ?? item.why,
+        ),
+      ),
+      if (item.talkToDoctor)
+        const PvReadSection(
+          callout: PvCallout(
+            tone: PvCalloutTone.urgent,
+            title: LocalizedText(en: 'Worth telling your doctor', hi: 'Worth telling your doctor'),
+            body: LocalizedText(
+                en: 'At your next visit. This one is often about iron, and iron is easy to check and easy to fix.',
+                hi: 'At your next visit. This one is often about iron, and iron is easy to check and easy to fix.'),
+          ),
+        ),
+      PvReadSection(heading: _same('Why you are craving it'), paragraphs: [item.why]),
+      if (item.modification case final m?) PvReadSection(heading: _same('How to have it safely'), paragraphs: [m]),
+      if (item.whenToAvoid case final w?) PvReadSection(heading: _same('When to skip it'), paragraphs: [w]),
+      if (showAlternatives) PvReadSection(heading: _same('If you would rather not risk it'), bullets: item.alternatives),
+      if (recipe != null) ...[
+        PvReadSection(
+          heading: _same('Make it at home: ${recipe.name.en} · ${recipe.minutes} min'),
+          bullets: recipe.ingredients,
+        ),
+        PvReadSection(
+          heading: _same('Method'),
+          paragraphs: [
+            for (var i = 0; i < recipe.steps.length; i++)
+              LocalizedText(en: '${i + 1}. ${recipe.steps[i].en}', hi: '${i + 1}. ${recipe.steps[i].hi}'),
+            ?recipe.note,
+          ],
+        ),
+      ],
+    ],
+    whenToSeeSomeone: const PvCallout(
+      tone: PvCalloutTone.note,
+      title: LocalizedText(en: 'Your doctor\'s word wins', hi: 'Your doctor\'s word wins'),
+      body: LocalizedText(
+          en: 'General guidance for an ordinary pregnancy. If your own doctor has told you something different about this food, theirs is the answer.',
+          hi: 'General guidance for an ordinary pregnancy. If your own doctor has told you something different about this food, theirs is the answer.'),
+    ),
+    faqs: const [],
+    readNext: [
+      for (final o in kCravingItems)
+        if (o.id != item.id) '$kCravingReadPrefix${o.id}',
+    ].take(4).toList(),
+  );
 }

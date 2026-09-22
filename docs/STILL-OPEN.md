@@ -8810,6 +8810,64 @@ Click by click at the user's ask ("recursive tree"). Built and walked:
   Guide, which would turn the rail into a list).
 - "What she can do for you" → "What they can do for you".
 
+### 70.8 The user's second walk — 2026-09-22 (MOBBIN-DISCOVERY §16)
+
+His list, and what was done (`test/nutrition_second_pass_test.dart`):
+
+1. **Today / What to eat now marks** → the sun (`sunMark`) and the cutlery
+   (`forkMark`); six marks added (`sunMark forkMark chaiMark snackMark
+   bowlMark sweetMark`).
+2. **"From the Non-vegetarian chart"** → a card row: calendar mark in a well,
+   THIS PLATE FOLLOWS / YOUR CHART eyebrow, the chart's name in Fraunces,
+   "See the week".
+3. + 6. **Cravings** → every craving page is a `PvRead` (`pvReadFromCraving`,
+   nutrition_reads.dart) in the one reader: the verdict at her week as the
+   opening callout (reassure / note / urgent by verdict), why · how to have
+   it safely · when to skip · alternatives (only when not a plain yes) ·
+   Make it at home (ingredients + numbered method) · the doctor line; the
+   dish photo where the table has one. `CravingDetailScreen.build` is the
+   facade, `buildClassic` kept. **Eating your way** is not a section any
+   more: `NutritionPreferenceRow` (diet · region · "Tap to change") sits
+   under the plate's heading on Today and under "What are you after?" on
+   Recipes (his "how do I change it?"). The old section is a comment.
+4. **Did you get…** → the reference paragraph is gone; each tick carries its
+   number ("27 mg") under the name; the row is five `Expanded` cells across
+   the gutter (it was a `FittedBox` → Row that shrank to content and huddled
+   left); the unticked ring wears the need's own hue.
+5. **Research** (§16 below): every nutrition app KEEPS the day — ‹ Today ›
+   with a date, a week strip with ticks on logged days (MyFitnessPal), water
+   as glasses per day with the day's litres (Yazio, Lifesum, Flo), a weekly
+   bar of intake (Lifesum, Yazio's history). Our `NutritionDayStore` already
+   keys ticks, water and swaps by date — the data IS a log; what is missing
+   is the way back (yesterday) and the week view. **Not built; his call.**
+7. **Swap** → two sheets. The row → `showMealSheet`: photo, slot + dish, a
+   "Cook it" row where the library has the recipe (`recipeForMeal`), the
+   six tiles ONCE, "On the plate" (each dish's share, from `matchMeal`),
+   Swap + Not today. "Strong in" is gone from the sheet. Swap →
+   `showSwapSheet`: "Instead of <dish>", the alternatives with photo, glance
+   line and ±kcal, one tap swaps and the row washes with the tint
+   (`PlateRow` is stateful; `didUpdateWidget` runs the flash). "Put it back"
+   when swapped; the chart's ideas at the foot. The plate's total already
+   followed swaps.
+8. **What to eat now images** → nutrient / stage / condition / fasting reads
+   take a dish photo from their own food lists (`_photoFromFoods`) until a
+   picture is picked by eye. (§70.3 still owes the real set.)
+9. **Recipes**: bucket tiles wear drawn marks in nine hues
+   (`recipeBucketMark/Hue`; the photo path kept for revert); recipe cards'
+   marks are bare, in the need's hue (no wells); `NutritionMarkLegend` above
+   the grid; the recipe page is facts line → three marks with amounts →
+   Ingredients → Method → six tiles + Did you know at the foot (the library:
+   MFP, Lifesum, Yazio, HelloFresh, Noom all put one line of numbers under
+   the title and the ingredients next); chart-day dishes open the meal
+   sheet read-only; recipe-card names are 14.5 like the plate rows; Talk's
+   four rows wear four hues. **Nutrient hues**: iron 344 · calcium 206 ·
+   protein 26 · folate 104 · fibre 42 (`nutritionNeedHue`), everywhere.
+
+**Open from his list:** "No items in it … the UI when no items are there" —
+which screen? (the shopping list, the Recipes grid under a bucket + need,
+or the cravings pattern line); the fasting rows' real photos; the water /
+nutrition log decision (5).
+
 ### 70.7 What the user still wants to change on Nutrition
 "A few changes on the Nutrition side" — to be given after the pregnancy
 home (2026-09-21). Not yet specified.
@@ -8889,3 +8947,119 @@ template and grew no field of their own).
 - A door with Saved of its own (only Is it safe? today) draws Saved in
   recall itself; if a second door grows saved items, lift that into the
   template too.
+
+## 72.0 The pregnancy home takes the TTC fold — 2026-09-21
+
+docs/PREG-HOME-HERO-PLAN.md, Tiers 1 and 2, BUILT (not yet walked — the
+phone was on Nutrition with the user). Research: MOBBIN-DISCOVERY §15.
+
+**Shared, lifted from TTC** (`lib/screens/v2/`): `PvDayStrip` (the sliding
+disc, the today marker from the live clock, one-time centring, `markFor`
+slot, `onPhoto` tone, `daysForward`) and `PvInsightRail` / `PvInsightTile`
+/ `PvInsightMark` (`PvInsightArt` + baby · size · scan · question). TTC's
+`_WeekStrip` and `_InsightTile` are wrappers over them; the originals are
+commented out in ttc_home_v3.dart, kept for revert; `TtcInsightArt` is a
+typedef. TTC's tests pass unchanged (`ttc_day_` keys kept).
+
+**The pregnancy fold** (`home_v3_screen.dart`, `v2/v3_sections.dart`):
+- The day strip ON the photograph, under the chrome row: white digits, a
+  white disc with an ink digit; runs back to day one of the pregnancy (max
+  six months) and **not forward** — her future weeks are the reveal, and a
+  cell that cannot be selected is not drawn. A dot under a day she logged a
+  symptom on.
+- The hero's title is **"Week 14 · Day 3"**; the subtitle is the milestone
+  alone ("Second trimester.") — the week no longer said twice. Under the
+  title the size line, tappable (the size sheet); a white **"This week ›"**
+  pill (Flo's Details) opens the week stack. The learning line left the
+  photograph for the first insight card. The block sizes itself to its words
+  with a 372 minimum (`ConstrainedBox` over `StackFit.passthrough`) instead
+  of a fixed 340 — a long line wraps instead of striping.
+- **My daily insights · Today/Yesterday/<date>** (`preg_daily_insights.dart`):
+  *Log how today feels* (today only; gives way to *You logged nausea → what
+  helps* → the symptom's own page) · *Coming up: a scan in ≤14 days* (the
+  old "Coming up" row folded in; `V2ComingUp` on the home is a comment) ·
+  *This week: learning to …* (→ the week stack) · *About the size of a
+  guava* (→ the size sheet) · *Eat today: Iron* (first need not ticked →
+  Nutrition) · *Is it safe? …* (one a day → the verdict) · *Read* (the
+  week's first read). Every `PregInsightGo` resolved in one exhaustive
+  switch. The whole page follows the selected date
+  (`PregnancyController.dayForDate`); `previewDay` still wins.
+- **The size sheet** (`v2/preg_size_sheet.dart`): WEEK n · the line · the
+  toggle (Fruit & veg · Kitchen · Sweets, ink chips, persisted by
+  `PregSizeSetStore`) · the baby's photo (the object's picture slot beside
+  it, empty until §72.1) · LENGTH · WEIGHT tiles · What your baby is doing ·
+  Did you know · the averages line ("your scan is the measure") · This week.
+- **Three Indian sets, weeks 4–40** (`lib/data/preg_size_sets.dart`, 111
+  entries): fruit & veg and kitchen compare by length; sweets by length to
+  week 13 and **by weight from 14** ("About as heavy as a boondi laddoo") —
+  no sweet is 40 cm long, but a 1 kg box of laddoos is a thing everyone has
+  carried. The Western list stays as the per-entry fallback. weekContent.json
+  week 5 had week 15's size pasted in ("Apple, 9.0 to 10.5 cm, 70 g") —
+  fixed to a sesame seed / about 2 mm.
+- `test/preg_home_fold_test.dart` (16): strip keyed per date, no future
+  cell, the title once, the sheet + toggle, the heading follows the strip,
+  the rail edge to edge, which cards a day earns, every week has all three
+  comparisons with no repeats, dayForDate ↔ dateForDay.
+
+### 72.0a Restructured to the TTC fold — 2026-09-22 (the user's walk)
+
+"Trying to Conceive looks 1000 times better … right now the pregnancy
+looks like randomly placed stuff." The full-bleed photograph hero
+(`V3Hero`) is a comment now; `lib/screens/v2/v3_preg_hero.dart` is the fold:
+`V3HeroField` behind (hue by trimester: 104 · 24 · 268) → [avatar · date of
+the selected day · saved] → `PvDayStrip` (ink disc, six days ahead) → **the
+baby in a 216dp disc** (Flo, Clue and Stardust all draw the baby in a disc
+on a tinted field — MOBBIN §17) → "Week n · Day d" → the size line → an
+ink "This week ›" pill → `V3PregSheet`, the white sheet the rest of the
+page rides on (TTC's `_Sheet`, with the nav clearance inside it). No
+greeting, no milestone line. The status bar is dark again.
+
+The week sheet says more: milestone (heading) + week headline, what the
+baby is doing, did-you-know, **For you this week** (physical changes,
+emotional state, self-care tip from `WeekContent.mom`). The fruit · kitchen
+· sweets toggle is **off** (`kPregSizeToggle`) until each entry has a
+picture — "the images don't change"; the sets and the store stay.
+
+**The baby art.** The earlier 2D set is in the repo: `lib/data/baby-images/
+Week NN.jpeg` (37 files, 296×295, a soft-pink figure on pink, drawn to be
+circle-clipped — see the old `assets/baby/README.md` in 0906564). It is
+exactly the Flo/Clue disc treatment; the disc takes it as a 2× upscale when
+the user says so. Structure first (done), images second (his order).
+
+### 72.0b Flo's fold, exactly — 2026-09-22, second pass on the phone
+
+"A profile photo put in between … two different things put together, not
+one whole thing … do it exactly like Flo." So: the field is the art's own
+peach (`kPregFieldHue` = 20) in every trimester; the figure is the 2D set,
+`assets/baby2d/week_NN.png` (37, 560px, built by scratchpad/baby2d.py from
+lib/data/baby-images with a radial alpha fade so the painted halo dissolves
+into the field — no clip, no ring); "Week n / Day d" sit inside the glow at
+the top and a white **Details** pill at its foot; no size line, no "This
+week" pill (the insight card says the size). **Details** = `lib/screens/
+preg_week_screen.dart` (`openPregWeek`, route `pregnancy/week`): the figure
+big on the field, a back round, a chip strip of weeks across its foot
+(locked weeks dimmed, `isLocked` — `unlockAllWeeks` ships true), then the
+sheet: What happens in week n · the desk line (no named reviewer, so none
+printed) · Length · Weight · About the size of · milestone + headline · what
+the baby is doing · did you know · For you this week · the averages line.
+The "This week" and "About the size of" cards open it. `showPregSizeSheet`
+is opened by nothing (revert).
+
+### 72.1 Owed
+- The 2D set is in (§72.0b); the photographs in assets/baby/ are unused by
+  the home now (the week stack still reads them).
+- **Comparison pictures** (plan §8): cut-outs on white, one per entry (111),
+  picked by eye, mirrored to R2 — fruit and kitchen as photos; sweets as
+  renders when there are credits (none today). `PregSizeSheet.objectImageUrl`
+  is the slot; a test should pin word ↔ image.
+- **Tier 3** — the week chip strip + photo swipe on the week stack (not the
+  home).
+- **Parenting takes the skeleton** — day strip → the child's hero → insights
+  → doors; the widgets are shared now, so it is data + one hero.
+- Insight cards we do not have the content for: *Myth or fact* (three
+  pregnancy reads carry a mythFact opening; not a rotation) and *Move* (no
+  pregnancy movement set). Both wait on content, not code.
+- The 'Eat today' card names the first need not ticked in plate order; it
+  could weigh the week's nutrition theme (`WeekContent.nutrition`) instead.
+- The user's own read of the sets — several late-week sweets are boxes and
+  tins ("a 2 kg bag of sugar", "a Diwali hamper"); he may prune.

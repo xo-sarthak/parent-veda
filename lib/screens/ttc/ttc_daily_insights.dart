@@ -57,22 +57,28 @@ import '../../ttc/ttc_log_store.dart';
 import '../../ttc/ttc_store.dart';
 import '../../ttc/ttc_symptom_data.dart';
 import 'ttc_calendar_screen.dart' show TtcDayFacts, ttcFactsFor;
+import '../v2/pv_insight_rail.dart' show PvInsightArt;
 import 'ttc_mood_face.dart';
 
-/// What the card draws in its coloured header.
-enum TtcInsightArt {
-  level,
-  number,
-  symptom,
-  droplet,
-  note,
-  balance,
-  ring,
-  log,
-  meal,
-  move,
-  product,
-}
+/// What the card draws — the shared set since 2026-09-21 (`PvInsightArt`,
+/// lib/screens/v2/pv_insight_rail.dart). The TTC name stays so the cards
+/// and their tests read as they did. Kept for revert below.
+typedef TtcInsightArt = PvInsightArt;
+
+// /// What the card draws in its coloured header.
+// enum TtcInsightArt {
+//   level,
+//   number,
+//   symptom,
+//   droplet,
+//   note,
+//   balance,
+//   ring,
+//   log,
+//   meal,
+//   move,
+//   product,
+// }
 
 /// Where tapping it goes. Resolved by the screen, so this file stays pure.
 enum TtcInsightGo {

@@ -226,16 +226,16 @@
    },
    "size": {
     "fruit": {
-     "en": "Apple",
-     "hi": "सेब"
+     "en": "a sesame seed",
+     "hi": "एक तिल"
     },
     "length": {
-     "en": "9.0 to 10.5 cm",
-     "hi": "9.0 से 10.5 cm"
+     "en": "about 2 mm",
+     "hi": "लगभग 2 मिमी"
     },
     "weight": {
-     "en": "About 70 g",
-     "hi": "लगभग 70 g"
+     "en": "less than 1 g",
+     "hi": "1 ग्राम से कम"
     }
    },
    "reveal": {

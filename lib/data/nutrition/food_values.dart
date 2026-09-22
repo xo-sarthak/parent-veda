@@ -410,6 +410,20 @@ class MealMatch {
   final NutritionValues values;
 }
 
+/// The dish before the dash — "Fish curry with rice" from "Fish curry with
+/// rice — well cooked, and a low-mercury fish like rohu". The chart writes
+/// the advice into the line; a row, a swap option and a sheet title show
+/// the dish and carry the advice as its own small line (`plateNote`).
+String plateName(String items) => items.split(RegExp('[—–]')).first.trim();
+
+/// The advice after the dash, or null.
+String? plateNote(String items) {
+  final parts = items.split(RegExp('[—–]'));
+  if (parts.length < 2) return null;
+  final note = parts.sublist(1).join(' ').trim();
+  return note.isEmpty ? null : note[0].toUpperCase() + note.substring(1);
+}
+
 /// Estimate a meal named in prose. Null when nothing in it is a food we know.
 ///
 /// "Two boiled eggs, toast, milk" → boiled eggs ×1 (the key already means
@@ -423,7 +437,12 @@ List<MealMatch> matchMeal(String sentence) {
   // A dash starts advice, not food ("Fish curry with rice — well cooked,
   // and a low-mercury fish like rohu…"): the plate stops at the dash.
   final plate = sentence.split(RegExp('[—–]')).first;
-  final firstOf = plate.split(RegExp(r'\bor\b')).first;
+  // ⚠️ DROP THE ALTERNATIVE, NOT THE REST OF THE PLATE (2026-09-22). This
+  // cut the sentence at "or", so "Chicken or egg curry with roti, palak
+  // sabzi" became "Chicken" — 165 kcal for a dinner, on the phone. Now the
+  // "or …" phrase goes up to the next comma, "with" or "and", and the plate
+  // after it stays: "Chicken curry with roti, palak sabzi".
+  final firstOf = plate.replaceAll(RegExp(r'\s+\bor\b\s+.*?(?=,|;| with | and |$)'), '');
   var s = ' ${firstOf.toLowerCase().replaceAll(RegExp(r'[^a-z0-9\s\-]'), ' ')} ';
   s = s.replaceAll(RegExp(r'\s+'), ' ');
   final out = <MealMatch>[];
@@ -557,6 +576,16 @@ const String kNutritionEstimateNote =
     'your doctor or dietician sets any numbers that matter for you.';
 
 /// The one quiet reference line by the ticks.
+/// The day's reference for one need, as a short amount — "27 mg". For the
+/// tick tiles (2026-09-22); the prose line stays for revert.
+String pregnancyReferenceFor(String needId) => switch (needId) {
+      'iron' => '${_n(kPregnancyDayReference.iron)} mg',
+      'calcium' => '${_n(kPregnancyDayReference.calcium)} mg',
+      'protein' => '${_n(kPregnancyDayReference.protein)} g',
+      'folic_acid' => '${_n(kPregnancyDayReference.folate)} µg',
+      _ => '${_n(kPregnancyDayReference.fibre)} g',
+    };
+
 String pregnancyReferenceLine() =>
     'A day in pregnancy asks for roughly ${_n(kPregnancyDayReference.protein)} g protein, '
     '${_n(kPregnancyDayReference.iron)} mg iron, ${_n(kPregnancyDayReference.calcium)} mg calcium and '
