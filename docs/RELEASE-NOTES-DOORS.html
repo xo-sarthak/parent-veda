@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ParentVeda — Door release notes for product review</title>
+<style>
+/* =============================================================================
+   RELEASE-NOTES-DOORS.css — inline, so the HTML is one file to hand over.
+   A4 print is the only target; the PDF is made with
+     chrome --headless=new --no-pdf-header-footer --print-to-pdf
+   Colour conventions match tools/door_map.css so the documents read as a set:
+     purple = ParentVeda / routable by name      coral = a finding
+   ========================================================================== */
+@page { size: A4 portrait; margin: 14mm 12mm 15mm; }
+
+:root{
+  --ink:#201c24; --body:#332e3c; --mute:#6f6878; --faint:#9a93a6;
+  --line:#e2dde8; --hair:#efebf3; --paper:#faf8fb;
+  --pv:#6a30b6; --pv-soft:#f4effb;
+  --bad:#b3123c; --bad-soft:#fdf0f3;
+  --warn:#8a6410; --warn-soft:#fdf7e9;
+  --ok:#1c6b52; --ok-soft:#eef7f3;
+  --blue:#1f4f8f; --blue-soft:#eef3fa;
+}
+
+*{ box-sizing:border-box; }
+html{ -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+body{
+  margin:0; color:var(--body);
+  font:10.5pt/1.5 "Segoe UI","Helvetica Neue",Arial,sans-serif;
+}
+
+/* ---- masthead ------------------------------------------------------------ */
+.mast{ border-bottom:2.5pt solid var(--ink); padding-bottom:9pt; margin-bottom:16pt; }
+.mast .kicker{ font-size:7.5pt; letter-spacing:.16em; text-transform:uppercase; color:var(--pv); font-weight:700; }
+.mast h1{ font:600 22pt/1.12 Georgia,"Times New Roman",serif; color:var(--ink); margin:5pt 0 6pt; letter-spacing:-.4pt; }
+.mast .sub{ font-size:9.5pt; color:var(--mute); max-width:165mm; }
+
+/* ---- scope panel --------------------------------------------------------- */
+.scope{ background:var(--paper); border:.7pt solid var(--line); border-radius:4pt;
+        padding:9pt 11pt; margin:0 0 16pt; font-size:9pt; }
+.scope b{ color:var(--ink); }
+.scope ul{ margin:5pt 0 0; padding-left:14pt; }
+.scope li{ margin:2.5pt 0; }
+
+/* ---- sections ------------------------------------------------------------ */
+h2{ font:600 14pt/1.2 Georgia,serif; color:var(--ink); margin:20pt 0 3pt;
+    padding-bottom:3.5pt; border-bottom:1pt solid var(--ink); letter-spacing:-.2pt;
+    page-break-after:avoid; }
+h2 .n{ color:var(--pv); }
+h2 + .lede{ font-size:9pt; color:var(--mute); margin:5pt 0 10pt; }
+h3{ font:700 8pt/1.3 "Segoe UI",sans-serif; letter-spacing:.11em; text-transform:uppercase;
+    color:var(--pv); margin:14pt 0 6pt; page-break-after:avoid; }
+
+/* ---- the numbered point -------------------------------------------------- */
+.pt{ display:flex; gap:8pt; padding:5.5pt 0; border-bottom:.6pt solid var(--hair);
+     page-break-inside:avoid; }
+.pt .num{ flex:0 0 15mm; font:700 9pt/1.5 "Segoe UI",sans-serif; color:var(--pv); }
+.pt .txt{ flex:1 1 auto; }
+.pt .txt .h{ color:var(--ink); font-weight:600; }
+.pt .txt .d{ margin-top:1.5pt; }
+.pt code, code{ font:9pt/1.4 "Consolas","Courier New",monospace; color:var(--ink);
+                background:var(--paper); padding:0 1.5pt; border-radius:2pt; }
+
+/* ---- status chips -------------------------------------------------------- */
+.s{ display:inline-block; font:700 6.8pt/1 "Segoe UI",sans-serif; letter-spacing:.09em;
+    text-transform:uppercase; padding:2.6pt 4.5pt; border-radius:2.5pt; vertical-align:1.4pt;
+    margin-right:4pt; white-space:nowrap; }
+.s-built{ background:var(--ok-soft); color:var(--ok); }
+.s-changed{ background:var(--warn-soft); color:var(--warn); }
+.s-part{ background:var(--warn-soft); color:var(--warn); }
+.s-no{ background:var(--bad-soft); color:var(--bad); }
+.s-unwired{ background:var(--bad-soft); color:var(--bad); }
+.s-blocked{ background:var(--bad-soft); color:var(--bad); }
+.s-decided{ background:var(--blue-soft); color:var(--blue); }
+.s-info{ background:var(--pv-soft); color:var(--pv); }
+
+/* ---- tables -------------------------------------------------------------- */
+table{ width:100%; border-collapse:collapse; margin:8pt 0 12pt; font-size:8.6pt;
+       page-break-inside:avoid; }
+th{ text-align:left; font:700 7pt/1.3 "Segoe UI",sans-serif; letter-spacing:.08em;
+    text-transform:uppercase; color:var(--mute); border-bottom:1pt solid var(--ink);
+    padding:0 6pt 4pt 0; }
+td{ padding:4.5pt 6pt 4.5pt 0; border-bottom:.6pt solid var(--hair);
+    vertical-align:top; }
+td.t{ color:var(--ink); font-weight:600; white-space:nowrap; }
+td.c{ text-align:center; }
+.y{ color:var(--ok); font-weight:700; }
+.n2{ color:var(--bad); font-weight:700; }
+.q{ color:var(--warn); font-weight:700; }
+
+/* ---- misc ---------------------------------------------------------------- */
+.foot{ margin-top:20pt; padding-top:8pt; border-top:1pt solid var(--ink);
+       font-size:8.5pt; color:var(--mute); }
+.quote{ font-style:italic; color:var(--mute); }
+.where{ font-size:8.3pt; color:var(--faint); }
+.where code{ background:none; color:var(--mute); font-size:8.3pt; }
+.brk{ page-break-before:always; }
+</style>
+</head>
+<body>
+
+<div class="mast">
+  <div class="kicker">ParentVeda · release notes for product review</div>
+  <h1>The doors, against the briefs they were built from</h1>
+  <div class="sub">Trying to Conceive · Pregnancy · Parenting · Skilling. What each brief asked for, what
+  is built, what is not — and where the same content <em>outside</em> a door was left behind when the
+  door was brought up to its brief. 22 September 2026.</div>
+</div>
+
+<div class="scope">
+  <b>What was checked, and against what.</b>
+  <ul>
+    <li><b>Briefs:</b> the 41 PDFs in <code>Downloads\door-pdf</code> — TTC 9, Pregnancy 8, Parenting 12,
+        Skilling 12 — plus the two home change-lists and the bottom-nav list supplied separately.</li>
+    <li><b>Surfaces:</b> each stage's <b>door</b> and each stage's <b>V3 home</b>. The Classic / V1 homes are
+        kept for revert and are deliberately out of scope. Search, the Tools hub and the Explore sheet were
+        checked wherever they hold a second copy of something a brief touched.</li>
+    <li><b>Every point is numbered 1–124.</b> Feedback can be given as a point number.</li>
+    <li><b>Status words:</b>
+        <span class="s s-built">Built</span> to the brief ·
+        <span class="s s-changed">Changed</span> deliberately, reason on the record ·
+        <span class="s s-part">Partial</span> ·
+        <span class="s s-no">Not built</span> ·
+        <span class="s s-unwired">Unwired</span> the door is right, something else is not ·
+        <span class="s s-blocked">Blocked</span> can't be reviewed yet ·
+        <span class="s s-decided">Decided</span> already settled, please don't re-open.</li>
+    <li><b>Section 1 is the only part that needs a decision before the rest is worth reading.</b>
+        Sections 2–5 are per-stage compliance; section 6 is the two home lists point by point;
+        section 7 is the content still owed, counted.</li>
+  </ul>
+</div>
+
+<!-- ======================================================================= -->
+<h2><span class="n">1.</span> Read this first — what needs attention, not what already agrees</h2>
+<div class="lede">Twenty points. The first seven are the class of problem worth the most attention: the door
+matches its brief and the <em>same thing somewhere else in the app</em> does not, so a reviewer sees two
+versions of one feature depending on where they tapped.</div>
+
+<h3>1a · The door is right, the rest of the app is not</h3>
+
+<div class="pt"><div class="num">1</div><div class="txt">
+  <span class="s s-unwired">Unwired</span><span class="h">Garbh Sanskar on the pregnancy home opens the old library, not the door.</span>
+  <div class="d">The door was built to <code>ParentVeda_Garbh_Sanskar_rebuild.pdf</code>: five sub-tabs,
+  Today as a launcher, the honesty note, the STOP&nbsp;IF block pinned. The V3 home's full-bleed Garbh band —
+  the most prominent Garbh surface in the app — sends "About" to the <em>pre-brief</em> four-tile Tools
+  library instead, which has none of that structure and still names the pillar
+  <span class="quote">"Samvad &amp; Vichara"</span>, a pillar the rebuild removed. The bracket tile, the Tools
+  hub, the hub need and the journey step all reach the door correctly; only the home band does not.</div>
+  <div class="where"><code>home_v3_screen.dart:857</code> pushes <code>GarbhScreen</code> (the library) under the route name
+  <code>garbh</code>; the surface <code>garbh_daily</code> would have reached the door.</div>
+</div></div>
+
+<div class="pt"><div class="num">2</div><div class="txt">
+  <span class="s s-unwired">Unwired</span><span class="h">Two different screens are called "My Journal" in the pregnancy stage.</span>
+  <div class="d">The home's <em>My journal</em> opens <code>JournalScreen</code> (<code>JournalStore</code>);
+  the Garbh door's fifth tab opens <code>GarbhJournalScreen</code> (<code>GarbhJournalStore</code>) — a
+  different screen, a different store, the same name. The Garbh brief's rule is
+  <span class="quote">"everything read or recorded here lands in My Journal (single source)"</span>. A mother has
+  two places a memory might be and no way to guess which.</div>
+</div></div>
+
+<div class="pt"><div class="num">3</div><div class="txt">
+  <span class="s s-unwired">Unwired</span><span class="h">"Log a symptom" from the pregnancy home opens the old 12-symptom companion, not the new Symptoms door.</span>
+  <div class="d">The Symptoms door (built 2026-09-22) is a check-in over <b>33</b> symptoms in six areas, with a
+  day strip, severity and a week log. The home's daily-insight card for logging still pushes
+  <code>SymptomCompanionScreen</code> — the old tool, twelve symptoms. Two check-ins, one stage.</div>
+  <div class="where"><code>home_v3_screen.dart:1589</code>, <code>PregInsightGo.log</code>.</div>
+</div></div>
+
+<div class="pt"><div class="num">4</div><div class="txt">
+  <span class="s s-unwired">Unwired</span><span class="h">A symptom's page opens in the shared reader inside the door and in a bespoke screen from the home.</span>
+  <div class="d">The door's note says the symptom detail <span class="quote">"is a read now"</span> — true inside the
+  door. Tapping a symptom card on the home calls <code>openSymptomDetail</code>, which pushes a hand-built
+  <code>_SymptomDetail</code> instead of <code>PvReaderScreen</code>. One symptom, two layouts. This is the one
+  rule the codebase has a test for elsewhere ("one reader"), and this path is outside it.</div>
+</div></div>
+
+<div class="pt"><div class="num">5</div><div class="txt">
+  <span class="s s-unwired">Unwired</span><span class="h">"Tests, Scans &amp; Reports" was retired from the Scans door and is still a tile in the Tools hub.</span>
+  <div class="d">The Scans brief's whole point was one home per fact: the report parameters now live inside each
+  scan read, and the separate parameter library was retired from the door. <code>TestsScansReportsScreen</code> is
+  still reachable as a Tools tile, so the thing the door removed is one tap away from the Tools tab.</div>
+</div></div>
+
+<div class="pt"><div class="num">6</div><div class="txt">
+  <span class="s s-unwired">Unwired</span><span class="h">Three separate milestone datasets describe the same child, in three places.</span>
+  <div class="d">The parenting home's <em>How your baby is doing</em> derives from <code>AgePhase.milestones</code>
+  (the AAP/CDC list). The Development door's tracker reads <code>MilestoneStore</code> (18 milestones, six
+  domains). The four "areas of growing" pages read <code>DevArea</code> skills. The tracker and the areas are
+  joined by a hand-written map. Ticking something in one place does not update the other two.</div>
+  <div class="where">Logged as DV2 in <code>DOOR-CONTENT-OWED.md</code>; it is a data job, not a screen job.</div>
+</div></div>
+
+<div class="pt"><div class="num">7</div><div class="txt">
+  <span class="s s-info">Note</span><span class="h">Four screens the Scans door retired are still routable, on purpose.</span>
+  <div class="d"><code>ScanUrgentScreen</code>, <code>ScanNextScreen</code>, <code>ScansAppointmentsScreen</code>,
+  <code>TestsScansReportsScreen</code> are alive by route so the change can be reverted. Nothing on the door
+  points at them (except point 5). They should be deleted after a release or two — worth a decision date.</div>
+</div></div>
+
+<h3>1b · Cannot be reviewed in a release build</h3>
+
+<div class="pt"><div class="num">8</div><div class="txt">
+  <span class="s s-blocked">Blocked</span><span class="h">None of the seven built Skilling doors opens in a release build.</span>
+  <div class="d"><code>skOpenDoor</code> returns <code>false</code> when <code>!kDebugMode</code>, so every one of
+  the twelve skilling tiles shows a <em>plan sheet</em> in a release build. This was the decision of 2026-09-14
+  ("the preview ships, the door does not") — but it means a PM on a release build cannot see Coding,
+  Communication, Confidence, Thinking, Stillness, Feelings or Making at all.</div>
+  <div class="where"><code>sk_surface_router.dart:153</code>.</div>
+</div></div>
+
+<div class="pt"><div class="num">9</div><div class="txt">
+  <span class="s s-no">Not built</span><span class="h">Skilling has no home screen. The stage's home <em>is</em> the design preview.</span>
+  <div class="d">Signing in as a skilling family lands on <code>SkillingPreviewScreen</code>, which says so on
+  screen: <span class="quote">"The fourth stage, UI only — nothing behind the doors."</span> There is no V3 home for
+  skilling, so points 6a/6b of section 6 have no skilling equivalent.</div>
+</div></div>
+
+<div class="pt"><div class="num">10</div><div class="txt">
+  <span class="s s-blocked">Blocked</span><span class="h">Twelve video ids can play, and all twelve play the same sample file.</span>
+  <div class="d">This matters because the home change-lists made video the <em>primary</em> explanation on both
+  homes. <code>kDevVideoUrls</code> maps 7 parenting ids and 5 pregnancy ids to one 720p MP4 in Supabase Storage.
+  Everything else — the three-film shelf, every door's film slot — renders an honest poster and a "film arriving"
+  state. So "This Week Explained" and "This phase explained" are correct layouts over one placeholder clip.</div>
+</div></div>
+
+<div class="pt"><div class="num">11</div><div class="txt">
+  <span class="s s-blocked">Blocked</span><span class="h"><code>kUseDevVideos = true</code> must be switched off before release.</span>
+  <div class="d">Its own comment: <span class="quote">"Turn OFF once the backend supplies real
+  <code>WatchVideo.videoUrl</code> values so nothing dev-only ships."</span> Today a store build would stream a dev
+  sample from a public bucket.</div>
+</div></div>
+
+<div class="pt"><div class="num">12</div><div class="txt">
+  <span class="s s-blocked">Blocked</span><span class="h">Photographs are still fetched from Wikimedia and drop out under throttling. The R2 upload is named the launch blocker.</span>
+  <div class="d">A reviewer will see missing images on Nutrition, Is it safe? and several door rails, at random.
+  Retries were lengthened as a stopgap. The fix is a one-off upload of the mirrored folder to an R2 bucket —
+  it is on the user, not in code.</div>
+  <div class="where"><code>STILL-OPEN.md</code> §70.3, §63.18.</div>
+</div></div>
+
+<div class="pt"><div class="num">13</div><div class="txt">
+  <span class="s s-info">Note</span><span class="h">A review build needs <code>--dart-define=PV_DEV=true</code>.</span>
+  <div class="d">Without it the You screen's Developer section — which holds the stage switch — is tree-shaken
+  out, and a reviewer cannot move between TTC, Pregnancy, Parenting and Skilling in one build.</div>
+</div></div>
+
+<h3>1c · A brief is contradicted somewhere outside its own door</h3>
+
+<div class="pt"><div class="num">14</div><div class="txt">
+  <span class="s s-changed">Changed</span><span class="h">A seven-day streak milestone is live in TTC, and two briefs forbid a streak.</span>
+  <div class="d">The eight-sessions brief: <span class="quote">"There is no streak and nothing to maintain… No streak,
+  no completion badge, no certificate."</span> The Mind &amp; body brief: <span class="quote">"No streak and no
+  streak-break message anywhere."</span> Both were honoured on their doors — and
+  <code>ttc_milestones.dart</code> still awards <em>"Kept the daily ritual for a week"</em> at
+  <code>streak() &gt;= 7</code>, on the Journey map, one tap from the V3 home. The home's own streak card was
+  correctly retired; this one was missed.</div>
+</div></div>
+
+<div class="pt"><div class="num">15</div><div class="txt">
+  <span class="s s-changed">Changed</span><span class="h">Nutrition's first and third tabs are no longer the brief's.</span>
+  <div class="d">The brief's five: <em>Can I eat this? · What to eat now · Nutrients &amp; recipes · Charts &amp;
+  fasting · Talk</em>. Shipping: <em>Today · What to eat now · Recipes · Charts &amp; fasting · Talk</em>. Tab 1
+  became the day (the plate, the ticks, water, cravings) and "Nutrients &amp; recipes" became "Recipes"; the two
+  brief labels are commented out in place. The change came from the user's own device walk of 2026-09-20, after
+  the brief. Flagged because it is the one pregnancy door whose tab list no longer matches its PDF.</div>
+</div></div>
+
+<div class="pt"><div class="num">16</div><div class="txt">
+  <span class="s s-changed">Changed</span><span class="h">TTC still writes Hindi in Latin script; the rest of the app moved to Devanagari.</span>
+  <div class="d">Roman-script Hindi was dropped app-wide on 2026-08-03 and fully removed from Pregnancy on
+  2026-08-12. About <b>30 files</b> in the TTC tree still carry it — including the milestone in point 14
+  (<em>"Ek hafte daily ritual nibhaya"</em>). It also breaks voice: the app asks the OS for the
+  <code>hi-IN</code> voice, which cannot read Roman script.</div>
+</div></div>
+
+<div class="pt"><div class="num">17</div><div class="txt">
+  <span class="s s-info">Note</span><span class="h">Heading case is inconsistent between the two homes.</span>
+  <div class="d">Pregnancy ships <em>"Watch These Videos This Week"</em> in title case (as the list was written);
+  parenting ships <em>"Recommended reads for today"</em>, <em>"Activities to do today with your baby"</em> in
+  sentence case. Both follow their list's wording; only the capitalisation differs. One rule, either way, would
+  be a five-string change.</div>
+</div></div>
+
+<h3>1d · Already decided — please don't re-file these</h3>
+
+<div class="pt"><div class="num">18</div><div class="txt">
+  <span class="s s-decided">Decided</span><span class="h">"What to Buy first among the eleven" was built, then reverted on instruction.</span>
+  <div class="d">Built 2026-09-16, reverted 2026-09-18 on the user's words
+  <span class="quote">"the door positioning should be like the way it was"</span> — on a phone it read as the shop
+  leading a parenting home. The hoist is kept commented one line away. Tiles are in registry order,
+  Sleep first.</div>
+</div></div>
+
+<div class="pt"><div class="num">19</div><div class="txt">
+  <span class="s s-decided">Decided</span><span class="h">Neither V3 home has a search bar. Search lives in each door's hero.</span>
+  <div class="d">A bar sat under "Start anywhere" for an hour on 2026-09-18 and was removed on the user's words
+  <span class="quote">"not below Start anywhere, that wasn't my intent."</span> Each door's hero carries a field
+  scoped to that door, with "Everywhere" one tap away; it indexes the door tiles and opens through the same
+  router the door uses, so a search hit and a door tap cannot land on different screens.</div>
+</div></div>
+
+<div class="pt"><div class="num">20</div><div class="txt">
+  <span class="s s-decided">Decided</span><span class="h">Old landings, hubs and classic homes are still on disk by policy.</span>
+  <div class="d">"Comment out, never delete" is a standing repo rule. Classic pregnancy/parenting/TTC homes, the
+  Scans hub, the nutrition day screen, the mind-mood landing and the parenting hub configs all still ship and are
+  unreachable from the V3 path. They are not dead code left by accident; they are one uncomment from being the
+  product again. Points 1–5 are the cases where an old screen is <em>still reachable</em> — those are the
+  defects.</div>
+</div></div>
+
+<!-- ======================================================================= -->
+<h2 class="brk"><span class="n">2.</span> Trying to Conceive — 7 tiles, 7 doors, all built</h2>
+<div class="lede">Nine PDFs: six door briefs, three content briefs for Mind &amp; body and the preconception
+course. Conceiving predates the brief set. Every bracket opens a door; none opens a hub.</div>
+
+<table>
+<tr><th>Tile</th><th>Brief</th><th>Shape built</th><th>Films</th><th>State</th></tr>
+<tr><td class="t">Conceiving</td><td>— (pre-dates)</td><td>5 selector groups</td><td class="c">2</td><td>Built</td></tr>
+<tr><td class="t">PCOS</td><td>pcos_rebuild</td><td>5 groups + "Where do I stand" tool</td><td class="c">3</td><td>Built</td></tr>
+<tr><td class="t">IVF &amp; IUI</td><td>ivf_rebuild</td><td>5 groups + readiness check</td><td class="c">2</td><td>Built</td></tr>
+<tr><td class="t">Getting ready</td><td>getting_ready_rebuild</td><td>5 groups</td><td class="c">0</td><td>Built</td></tr>
+<tr><td class="t">His side</td><td>his_side_rebuild</td><td>5 groups + semen-report reader</td><td class="c">2</td><td>Built</td></tr>
+<tr><td class="t">After a loss</td><td>After_a_loss_rebuild</td><td>4 groups, no tool, two pinned flags</td><td class="c">1</td><td>Built</td></tr>
+<tr><td class="t">Mind &amp; body</td><td>Mindbody_rebuild_final <span class="where">+ new_guides + twelve_practice_cards</span></td><td>5 groups, no tool/tracker/streak</td><td class="c">3</td><td>Built</td></tr>
+</table>
+
+<div class="pt"><div class="num">21</div><div class="txt">
+  <span class="s s-changed">Changed</span><span class="h">Every TTC brief asked for a tab bar. None got one; all seven got a selector rail instead.</span>
+  <div class="d">The reason is on the record and is worth agreeing with or overruling once, for the stage:
+  a tab bar <span class="quote">"lights one word, hides four, and tells you nothing about what is behind them — you
+  choose blind"</span>, on a subject where most people arriving do not know which tab their question belongs to.
+  The rail is five picture cards under the hero: she reads all five, then picks. The brief's tab names survive as
+  the group names, which is the work they were doing.</div>
+</div></div>
+
+<div class="pt"><div class="num">22</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">No intermediate menus. A tile opens content.</span>
+  <div class="d">The Conceiving door's old three-card chooser was removed. No door in the stage opens a hub.</div>
+</div></div>
+
+<div class="pt"><div class="num">23</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">PCOS: the brief's own "Keep track of it" list, in the brief's order, after a correction.</span>
+  <div class="d">The tab had drifted to four tools, two of them invented, and was missing three items that are not
+  tools. Corrected on the user's words <span class="quote">"those 3 points haven't been followed… just follow what's
+  in the pdf."</span> Now two tools, one way back to her read, one clinical card, one room of people.</div>
+</div></div>
+
+<div class="pt"><div class="num">24</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">PCOS: no score, no match percentage, no "you likely have PCOS".</span>
+  <div class="d">The 20-question checker outputs three plain blocks. The brief's own heading
+  "Your realistic odds with PCOS" was renamed — a possessive plus a probability word is the banned construction,
+  and a test scans the source for it.</div>
+</div></div>
+
+<div class="pt"><div class="num">25</div><div class="txt">
+  <span class="s s-no">Not built</span><span class="h">PCOS: five films the brief marks. One of them the brief says to "reuse existing", and no such film exists.</span>
+  <div class="d">All five render the honest 16:9 placeholder, so nothing shifts when a file lands. The
+  "reuse existing" one — <em>Food, insulin and PCOS</em> — describes what the brief's author expected to find.</div>
+</div></div>
+
+<div class="pt"><div class="num">26</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">IVF: no success rates anywhere, and no commerce beyond the consult.</span>
+  <div class="d">"How to read a clinic's success rate" is about reading someone else's published number
+  critically. Products are marked not-applicable on this bracket ("Not a fit (clinical)"), so there is no product
+  tile and no course upsell.</div>
+</div></div>
+
+<div class="pt"><div class="num">27</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">His side: the three doctor-authored originals are reused untouched; three reads the brief names were written rather than substituted.</span>
+  <div class="d">The first build put the nearest existing article behind three tiles — a tile promising
+  "What three months looks like" opened the heat-and-habits essay. Rebuilt 2026-09-06 under a rule that now
+  applies everywhere: <b>reuse only what <em>is</em> the thing.</b></div>
+</div></div>
+
+<div class="pt"><div class="num">28</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">His side owns male-factor content; three other doors reference it by id.</span>
+  <div class="d">Getting ready's "His part", Conceiving's his-side card and IVF's tests card all name reads defined
+  in His side. Nothing is copied, so one edit lands in four doors. His records and IVF's records are one tool
+  shown twice.</div>
+</div></div>
+
+<div class="pt"><div class="num">29</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">After a loss: "Your body" is the default tab, not "Understand", and there is no tool.</span>
+  <div class="d">Both are the brief's calls and both are right: days after a loss the first need is physical
+  reassurance and the hospital flag. Turning miscarriage recovery into a number to log is the one place a tool
+  does harm. <b>Do not add a tracker, calculator or self-check to this area.</b></div>
+</div></div>
+
+<div class="pt"><div class="num">30</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">After a loss: "promote" was implemented as an anchor, not a new page.</span>
+  <div class="d">Six promoted cards open the existing doctor-authored article <em>scrolled to the named
+  section</em>. Without that, all six opened one article at the top and a woman who tapped "Rh status and
+  retained tissue" was left hunting. A test asserts every anchor still resolves.</div>
+</div></div>
+
+<div class="pt"><div class="num">31</div><div class="txt">
+  <span class="s s-no">Not built</span><span class="h">After a loss: one card the brief names, and one optional video, are absent — both for stated reasons.</span>
+  <div class="d">"What recurrent-loss investigation looks like" is the third <em>paragraph</em> of the section above
+  it, not a section — a second card would anchor to the same place, which is the fake promotion the anchor exists
+  to prevent. Splitting the article means editing a doctor-reviewed piece, which the brief forbids. The optional
+  "On trying again" video has no catalogue slot, and inventing one would put a card on the page that no file can
+  ever be mapped to.</div>
+</div></div>
+
+<div class="pt"><div class="num">32</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Mind &amp; body: the brief's four verbs — reuse, promote, reference, new — each landed as a distinct mechanism.</span>
+  <div class="d"><em>reuse</em> = the tile names the existing id; <em>promote</em> = an anchor, one new card and no
+  new prose; <em>reference</em> = another door's read id, so that door still owns it; <em>new</em> = the only
+  genuinely new things (four guides, twelve practices, two myth cards).</div>
+</div></div>
+
+<div class="pt"><div class="num">33</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">The four new Mind &amp; body guides, and the twelve practice cards with players.</span>
+  <div class="d"><code>ttc_read_sleep_trying</code>, <code>ttc_read_bedtime</code>,
+  <code>ttc_read_family_asking</code>, <code>ttc_read_bringing_him_in</code>; twelve
+  <code>TtcPractice</code> entries with real players. Both companion briefs are fully discharged.</div>
+</div></div>
+
+<div class="pt"><div class="num">34</div><div class="txt">
+  <span class="s s-changed">Changed</span><span class="h">Mind &amp; body: two myth cards are written out rather than promoted, because the component needs both halves as text.</span>
+  <div class="d">The brief says promote. A myth tile needs a myth string and a fact string, so there is no way to
+  point one at a section. Both restate material the locked articles already carry. Same compromise as the two
+  After-a-loss myth cards.</div>
+</div></div>
+
+<div class="pt"><div class="num">35</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">The free eight-session preconception course exists, as data, store and screen.</span>
+  <div class="d">All eight sessions from <code>garbh_sanskar_eight_sessions.pdf</code> in the brief's order —
+  breath, stillness, sound, body and day, food, the two of you, putting it together — free, no badge, sessions
+  redoable. Session 8's picks feed the daily practice.</div>
+</div></div>
+
+<div class="pt"><div class="num">36</div><div class="txt">
+  <span class="s s-changed">Changed</span><span class="h">Before that, the course tile opened the catalogue the course was listed in — reachable, tappable, wrong.</span>
+  <div class="d">Worth keeping in the notes as the clearest example of the blind spot every wiring test has:
+  each test asked whether the tile opened <em>something</em>. It did. No test asked whether the thing it opened
+  was the thing the tile promised. The fix asserts the specific destination by type.</div>
+</div></div>
+
+<div class="pt"><div class="num">37</div><div class="txt">
+  <span class="s s-no">Not built</span><span class="h">Thirteen film slots across the seven TTC doors have no file.</span>
+  <div class="d">Every entry in the TTC video catalogue has a null URL — the honest state. Each renders real 16:9
+  geometry, a real title and "coming soon", and does not tap.</div>
+</div></div>
+
+<div class="pt"><div class="num">38</div><div class="txt">
+  <span class="s s-no">Not built</span><span class="h">Hero photographs: His side is still a placeholder, owed with four others.</span>
+</div></div>
+
+<!-- ======================================================================= -->
+<h2 class="brk"><span class="n">3.</span> Pregnancy — 10 tiles, 8 doors</h2>
+<div class="lede">Seven of the eight PDFs are door briefs; the eighth builds the four Garbh pillars behind the
+seventh. Two of the ten tiles have no PDF brief, and one has a brief with nothing built.</div>
+
+<table>
+<tr><th>Tile</th><th>Brief</th><th>Tabs</th><th>Shape follows the brief?</th><th>Owed</th></tr>
+<tr><td class="t">Scans &amp; tests</td><td>Scans_and_tests_rebuild</td><td class="c">5</td><td class="y">yes</td><td>1 read</td></tr>
+<tr><td class="t">Complications</td><td>Complications_rebuild_clean</td><td class="c">5</td><td class="y">yes</td><td>nothing</td></tr>
+<tr><td class="t">Nutrition &amp; diet</td><td>Nutrition_rebuild</td><td class="c">5</td><td class="q">tabs 1 and 3 changed after the walk (pt 15)</td><td>1 film, 1 decision</td></tr>
+<tr><td class="t">Belly &amp; skin</td><td>Belly_and_skin_rebuild</td><td class="c">4</td><td class="y">yes — the brief argues for four</td><td>nothing</td></tr>
+<tr><td class="t">Labour prep</td><td>Labour_prep_rebuild</td><td class="c">5</td><td class="y">yes — timer is the default</td><td>4 reads, 2 films</td></tr>
+<tr><td class="t">Mind &amp; mood</td><td>Mind_and_mood_final</td><td class="c">5</td><td class="y">yes</td><td>1 read, 8 films, 4 audio</td></tr>
+<tr><td class="t">Garbh Sanskar</td><td>Garbh_Sanskar_rebuild <span class="where">+ pillars_build</span></td><td class="c">5</td><td class="y">yes — see pt 1 for the home</td><td>recordings only</td></tr>
+<tr><td class="t">Symptoms</td><td>— <span class="where">(plan, not a PDF)</span></td><td class="c">5</td><td class="y">n/a</td><td>see pt 3, 4</td></tr>
+<tr><td class="t">Is it safe?</td><td>— <span class="where">(Mobbin + verbal brief)</span></td><td class="c">—</td><td class="y">deliberately not a door</td><td>photos</td></tr>
+<tr><td class="t">Fitness &amp; yoga</td><td>FITNESS-DOOR-BRIEF.md <span class="where">(written 2026-09-22)</span></td><td class="c">—</td><td class="n2">nothing built</td><td>the whole door</td></tr>
+</table>
+
+<div class="pt"><div class="num">39</div><div class="txt">
+  <span class="s s-no">Not built</span><span class="h">Fitness &amp; yoga is the one pregnancy tile with a brief and no build.</span>
+  <div class="d">The brief was written on 2026-09-22 (five Mobbin passes, the reuse inventory, the plan) and
+  nothing has been coded. The tile still opens the old one-need hub.</div>
+</div></div>
+
+<div class="pt"><div class="num">40</div><div class="txt">
+  <span class="s s-no">Not built</span><span class="h">Inside it, the yoga screen shows every mother the <em>seventh</em> month.</span>
+  <div class="d"><code>_kCurrentMonth = 7</code> is hardcoded with a <code>TODO</code> to derive it from the saved
+  due date, and it plays into a placeholder video screen. A woman at 12 weeks opens a screen headed with month 7.
+  This is a live defect independent of the door.</div>
+</div></div>
+
+<div class="pt"><div class="num">41</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Is it safe? is deliberately <em>not</em> a five-tab door, and that is the right call.</span>
+  <div class="d">The whole surface is one field and a lookup; tabs would bury the field. It was rebuilt
+  2026-09-19 as a search-first screen — asked most, asked recently, for your weeks, four shelves, saved, barcode
+  and photo scanning — and walked three times on the device. Its Tools tile and its bracket tile both open the
+  same body, which is how points 1–5 should look.</div>
+</div></div>
+
+<div class="pt"><div class="num">42</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Scans: the three-card landing is gone and nothing below it was rebuilt.</span>
+  <div class="d">The brief's constraint, stated four times: this is a reorganisation of a front door, not a
+  rewrite of a stage. The timeline, the nine scan pages, the locker, the decoder and its 27 findings are the same
+  screens, reached one tap earlier.</div>
+</div></div>
+
+<div class="pt"><div class="num">43</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Scans: no Ask Veda card on the door, and the context is passed one level in — where the brief asks for it.</span>
+  <div class="d">An earlier note claimed the route name carried the context. It does not: the route name only
+  picks <em>which stage's</em> Ask Veda opens. The scan half was missing and was added on the scan detail screen.
+  This settled the rule for every later door: no Ask Veda tile anywhere.</div>
+</div></div>
+
+<div class="pt"><div class="num">44</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Scans, after the user's three review rounds: the sheet-based date, one tool header on every leaf, the report locker as an entry, files as a grid, Share in both viewers.</span>
+  <div class="d">Sixteen separate findings from the device walk were applied, including the one that became a
+  door-wide rule — <b>no text on a tinted box</b> — and the "Before any scan" strip that was tried as a
+  dismissible getting-started row and put back as a plain section on the user's word
+  <span class="quote">"it was better before."</span></div>
+</div></div>
+
+<div class="pt"><div class="num">45</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Complications: the language rule is honoured exactly — plain line first, medical word second and only in brackets.</span>
+  <div class="d">Every card reads "Pregnancy sugar goes high (gestational diabetes)" and never the reverse; the
+  page it opens is still titled "Gestational diabetes", which is the word on her prescription. A test holds every
+  one of them. This is the one place in the app a card title may carry a medical word at all.</div>
+</div></div>
+
+<div class="pt"><div class="num">46</div><div class="txt">
+  <span class="s s-changed">Changed</span><span class="h">Complications: "never keep a second copy of a condition" was applied as <em>one page per question</em>, not one page per word.</span>
+  <div class="d">Two cards the brief names by hand — "Cord looped around the neck", "Placenta sitting low" —
+  exist only as report <em>findings</em>. "My doctor said I have X" and "my report says X" are two questions; the
+  door links across for those two rather than copying the entries, which is the one thing the rule forbids
+  outright.</div>
+</div></div>
+
+<div class="pt"><div class="num">47</div><div class="txt">
+  <span class="s s-changed">Changed</span><span class="h">Complications: the gate question was removed — "derive, never ask".</span>
+  <div class="d">"Has your doctor mentioned a condition, or do you just want to learn?" is gone; the list is the
+  tab. "Add to my journey" now shows on every page and <em>asks before adding</em> ("only if your doctor has said
+  you have it"). One tap cannot add; removing is one tap.</div>
+</div></div>
+
+<div class="pt"><div class="num">48</div><div class="txt">
+  <span class="s s-part">Partial</span><span class="h">Complications: not yet walked on a phone, and the 15 condition reads have not been read one by one for thinness.</span>
+</div></div>
+
+<div class="pt"><div class="num">49</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Nutrition: roughly seventy cards, and almost no new copy — as the brief demanded.</span>
+  <div class="d">The brief's first box is the whole brief: <span class="quote">"nothing here is a new page."</span>
+  Every list was verified in code first. Two items are genuinely new: one read and one checklist.</div>
+</div></div>
+
+<div class="pt"><div class="num">50</div><div class="txt">
+  <span class="s s-changed">Changed</span><span class="h">Nutrition: three things the brief did not know, found by walking the code.</span>
+  <div class="d">(i) An <em>eleventh</em> condition guide exists — "Overweight in pregnancy" — which the brief's
+  list of ten omits; it is on the rail, because a door showing ten of eleven makes the eleventh unreachable.
+  (ii) The fourth paid tier is called "Book a consultation", not "Book one session"; the brief says don't change
+  labels, so it keeps its own. (iii) See point 51.</div>
+</div></div>
+
+<div class="pt"><div class="num">51</div><div class="txt">
+  <span class="s s-no">Not built</span><span class="h">Nutrition: the eight fasting pages the brief lists are not pages. The door carries one card. <b>This needs a decision.</b></span>
+  <div class="d">All eight are title-and-paragraph rows rendered inline, not tappable, with no detail screen. Each
+  already has a title and a body and would make a small page easily — but the brief forbade building new pages,
+  so it is a decision, not a writing job.</div>
+</div></div>
+
+<div class="pt"><div class="num">52</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Nutrition: the "link to Complications instead of restating" rule was satisfied one level in, not at the card.</span>
+  <div class="d">Read literally, the card would open Complications and throw away the eating advice — the one
+  thing somebody taps a nutrition door for. Every diet guide was already pure diet; what was missing was the
+  link, which used to read "lives in Complications, coming soon" and was not tappable. Now the card opens the
+  diet page and the page's footer opens the condition.</div>
+</div></div>
+
+<div class="pt"><div class="num">53</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Belly &amp; skin: four tabs, because the brief argues against a fifth.</span>
+  <div class="d">Its words: there is no paid consult and only one real medical flag, <span class="quote">"better kept
+  prominent inside the Itching read than pulled into a thin Talk tab."</span> The first brief to argue against the
+  house shape rather than for it. It cost a fix in the carousel, which had never had a card resting at the seam.</div>
+</div></div>
+
+<div class="pt"><div class="num">54</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Belly &amp; skin: the rails read the content set rather than listing the named cards.</span>
+  <div class="d">The brief says <span class="quote">"the cards named are the visible ones, not the full
+  inventory."</span> A hand-typed list would have shipped exactly the named cards and silently dropped anything
+  added later — on a door that <em>replaced</em> the only route those pages had. Add a twentieth page tomorrow and
+  it appears with no edit.</div>
+</div></div>
+
+<div class="pt"><div class="num">55</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Belly &amp; skin: the only content change in the whole area is two titles, plain phrase first.</span>
+  <div class="d">"The dark line (linea nigra)" and "The pregnancy mask (melasma)" — the rule Complications states
+  in full and this brief calls locked.</div>
+</div></div>
+
+<div class="pt"><div class="num">56</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Labour prep: the default tab is the contraction timer.</span>
+  <div class="d">The brief: <span class="quote">"near the due date people open a tool, not a read."</span> It became a
+  rule for every door — <b>the default tab is whichever one somebody opens the app for</b>, never the most
+  important content.</div>
+</div></div>
+
+<div class="pt"><div class="num">57</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Labour prep: the birth plan exists, after being listed as a conflict and decided.</span>
+  <div class="d">The brief marks it "reuse (pulled out of the old accordion)". There was no accordion and no
+  content — a previous review had <em>removed</em> the step because it promised a page and delivered a grey card.
+  Recorded as a conflict rather than guessed; the user's call on 2026-09-11 was
+  <span class="quote">"the PDF says it, so we need it."</span> The tool now exists, and as a Tool rather than a guide,
+  because what she needs is somewhere to write it down.</div>
+</div></div>
+
+<div class="pt"><div class="num">58</div><div class="txt">
+  <span class="s s-no">Not built</span><span class="h">Labour prep: six cards hold their place with nothing behind them, and the brief marks five of them itself.</span>
+  <div class="d">Two films (the timer explainer, labour start to finish) and four reads (C-section, the first
+  hour, what labour is like and your options, what your partner should do). They render at full size and do not
+  tap. The alternative was a rail of three where the brief describes six.</div>
+</div></div>
+
+<div class="pt"><div class="num">59</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Mind &amp; mood: the duplication bug the brief names is fixed.</span>
+  <div class="d"><span class="quote">"'Check how I am feeling' and 'Help me feel better' open the SAME screen. That is
+  a bug."</span> True — both pushed the old four-tab landing. They now open the door on its Track and Feel tabs.</div>
+</div></div>
+
+<div class="pt"><div class="num">60</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Mind &amp; mood: nothing was dropped — all 26 reads are on the door, including the fifteen the brief's map does not name.</span>
+  <div class="d">The rails are read from the library by group. Where the unnamed fifteen sit is the one editorial
+  decision the file makes, and it is written down.</div>
+</div></div>
+
+<div class="pt"><div class="num">61</div><div class="txt">
+  <span class="s s-part">Partial</span><span class="h">Mind &amp; mood: three [new] cards had no copy in the brief. One is coming-soon, one is omitted, one was built from data.</span>
+  <div class="d">"Tell your doctor" — no prose, so a coming-soon card and the sentence is owed by whoever writes
+  the briefs. "Your partner can feel this too" — no copy and marked optional, so omitted; the existing partner
+  piece is linked from where the brief points at it. "Helpline numbers" — not prose but constants, so built as a
+  screen. <b>Those numbers are still marked "required to confirm" in the data file.</b></div>
+</div></div>
+
+<div class="pt"><div class="num">62</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Garbh Sanskar: five sub-tabs, Today as a launcher that does not repeat the libraries, and the one new honesty note.</span>
+  <div class="d">The four pillar cards switch tab rather than push, and each destination opens on "Today's pick" —
+  which is what "opens Listen at today's pick" means without a second copy of Listen. The note went to area level
+  because the brief's own correctness box says it should. The STOP&nbsp;IF block is the pinned flag, opening
+  "Stop and call your doctor today if…". No streak, no score, no completion state at all.</div>
+</div></div>
+
+<div class="pt"><div class="num">63</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Garbh Sanskar: the two briefs disagreed about the premise and the code settled it — then the pillars were built to final.</span>
+  <div class="d">The door brief said <span class="quote">"this area is already fully built"</span>; the pillars brief said
+  the four pillars are placeholders. The second was right: ten raga cards played one bundled drone, Sudoku was a
+  4×4 with three fixed boards, "Guided Relaxation" was a breathing pattern named relax. All twelve rows closed on
+  2026-09-12 — nine real public-domain recordings on R2, a 9×9 Sudoku with a unique-solution generator, a
+  nonogram, a 13-step relaxation script, twenty affirmations, sixteen stories, eleven mantras. What remains is
+  voice recordings, by manifest entry.</div>
+</div></div>
+
+<div class="pt"><div class="num">64</div><div class="txt">
+  <span class="s s-changed">Changed</span><span class="h">Garbh Sanskar: Vichara is gone, and the door does not name it. One row on the home still did — see point 1.</span>
+  <div class="d">Vichara's shelves duplicated Samvad and Shravan, so as a pillar it was two copies wearing a
+  third name. Its genuinely unique half became Buddhi, which is the pillar that is <em>not</em> for the baby.</div>
+</div></div>
+
+<!-- ======================================================================= -->
+<h2 class="brk"><span class="n">4.</span> Parenting — 11 tiles, 10 doors and one shop</h2>
+<div class="lede">Twelve PDFs for eleven tiles: Development has two, and the reissue replaces the original.
+All eleven were built by 2026-09-14 and all eleven were walked on a phone. A cross-door sanity test holds that
+every area exists, every surface resolves, every in-section link lands and every coming-soon card is in the
+owed ledger.</div>
+
+<table>
+<tr><th>Tile</th><th>Brief</th><th>Shape</th><th>Walked</th><th>Brief asked for a different shape?</th></tr>
+<tr><td class="t">Sleep</td><td>Sleep_rebuild</td><td>door, 5 tabs</td><td class="c y">yes</td><td>landing + library</td></tr>
+<tr><td class="t">Feeding</td><td>Feeding_rebuild</td><td>door, 5 tabs</td><td class="c y">yes</td><td>—</td></tr>
+<tr><td class="t">Health</td><td>Health_rebuild</td><td>door, <b>6 tabs</b></td><td class="c y">yes</td><td>six, on the brief's own call</td></tr>
+<tr><td class="t">Development</td><td>Development_Parenting <span class="where">(reissue)</span></td><td>door, <b>6 tabs</b></td><td class="c y">yes</td><td>—</td></tr>
+<tr><td class="t">Behaviour</td><td>Behaviour_Parenting</td><td>door, 5 tabs</td><td class="c y">yes</td><td class="q">"do NOT invent a five-tab structure"</td></tr>
+<tr><td class="t">Potty training</td><td>Potty_Parenting</td><td>door, 5 tabs</td><td class="c y">yes</td><td class="q">one library</td></tr>
+<tr><td class="t">Early learning</td><td>Early_Learning_Parenting</td><td>door, 5 tabs</td><td class="c y">yes</td><td>four tabs; split on the user's call</td></tr>
+<tr><td class="t">First 40 days</td><td>First_40_Days_Prompt</td><td>door, 5 tabs</td><td class="c y">yes</td><td class="q">"do not force it into five tabs"</td></tr>
+<tr><td class="t">You, Maa</td><td>You_Parenting_Maa_rebuild</td><td>door, 5 tabs</td><td class="c y">yes</td><td>—</td></tr>
+<tr><td class="t">What to buy</td><td>What_to_buy_parenting</td><td><b>the shop</b>, on the brief</td><td class="c y">yes</td><td>"do not rebuild, no tabs"</td></tr>
+<tr><td class="t">Traditions</td><td>Traditions_Parenting</td><td>door, 5 tabs</td><td class="c y">yes</td><td>—</td></tr>
+</table>
+
+<div class="pt"><div class="num">65</div><div class="txt">
+  <span class="s s-changed">Changed</span><span class="h">Three briefs said not to force the content into five tabs. It was, on the user's standing call that every parenting door wears the shell.</span>
+  <div class="d">Behaviour (<span class="quote">"one library plus a tools rail, do NOT invent a five-tab
+  structure"</span>), First 40 Days (<span class="quote">"keep the ten areas plus the tools row"</span>) and Potty
+  (<span class="quote">"collapse the two-door hub into one library"</span>). The grouping in each case is the user's,
+  dated 2026-09-13, and is written into the file. Worth confirming once for the stage rather than per door.</div>
+</div></div>
+
+<div class="pt"><div class="num">66</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">A parenting door holds no content. It is only the shell.</span>
+  <div class="d">Unlike a pregnancy door, where the tiles <em>are</em> the content, a parenting tab names area ids
+  and the screen reads the pages — for this child's age band — at render time. A door that copied page titles into
+  tiles would be a second list of the same things, drifting the first time either was edited. This is why nothing
+  in a parenting door file can be out of date with its section.</div>
+</div></div>
+
+<div class="pt"><div class="num">67</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Tabs drop away and lock with the child's age, from the content's own bands.</span>
+  <div class="d">A parent of a three-month-old sees one Behaviour tab; a parent of a four-year-old does not see
+  Crying. Development's "When will my baby…" drops away after two years and The leaps after twenty months, on the
+  brief's own scoping. Early Learning locks three of five for a baby — if that reads as too much grey, the tag to
+  question is named in the review file.</div>
+</div></div>
+
+<div class="pt"><div class="num">68</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Four doors have no red-flag strip, each for a stated reason, and it is not an omission.</span>
+  <div class="d">Health and Complications earned one because they hold same-day medical emergencies. Behaviour,
+  Development, Early Learning and Traditions do not — <span class="quote">"a red-flag strip where there are none
+  trains people to ignore the real ones."</span> Their genuine flags live on the pages that earn them. First 40
+  Days' go-now list is the first card of its tab rather than a pinned strip,
+  <span class="quote">"so people do not learn to scroll past it."</span></div>
+</div></div>
+
+<div class="pt"><div class="num">69</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Potty has no tools, no quiz and no star charts — all three on purpose, all three the brief's.</span>
+  <div class="d"><span class="quote">"A quiz that says 'not ready' is the verdict the section deliberately
+  avoids"</span>; <span class="quote">"a chart of wins turns a wet afternoon into a visible failure on the
+  wall."</span></div>
+</div></div>
+
+<div class="pt"><div class="num">70</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">You, Maa is the one home for the mother's recovery; First 40 Days and Feeding are windows into it.</span>
+  <div class="d">The brief's judgement call. Three acute recovery pages, the breasts card and Feeding's mastitis
+  flag all open the same pages. One copy, three doors. The frightening-thoughts route is pinned above the triage
+  with "read this one first" — <span class="quote">"do not move it down."</span></div>
+</div></div>
+
+<div class="pt"><div class="num">71</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">The mother's own age bands are separate from the baby's.</span>
+  <div class="d">You, Maa measures her time since birth, not the child's age. Kept separate on purpose.</div>
+</div></div>
+
+<div class="pt"><div class="num">72</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Twelve cross-door windows, each listed, each a one-line revert.</span>
+  <div class="d">Feeding's choking card opens Health's page; Health's constipation and allergy cards open
+  Feeding's; Potty's rash link opens Health's; Early Learning's five habits open Behaviour's in-the-moment pages;
+  First 40 Days' crying card opens Behaviour's dark story. Plus seven shared tools by surface id. The full table
+  is in <code>PARENTING-DOORS-REVIEW.md</code> for a line-by-line yes/no.</div>
+</div></div>
+
+<div class="pt"><div class="num">73</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Merged areas show as deliberate absences, and the tests can tell a merge from a forgetting.</span>
+  <div class="d">"What to feed at this age" is a tool now, not a rail; Health's "Not sure what is wrong" <em>is</em>
+  the What Changed flow; two trackers over one dataset became one. Each merged area is named in
+  <code>hiddenAreaIds</code> so a door test distinguishes it from a dropped one.</div>
+</div></div>
+
+<div class="pt"><div class="num">74</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">What to buy stayed a shop, on the brief's plain words: do not rebuild, do not restructure, no tabs.</span>
+  <div class="d">The work was three link fixes, one single-source, a soft age default and eight placeholder
+  guides.</div>
+</div></div>
+
+<div class="pt"><div class="num">75</div><div class="txt">
+  <span class="s s-part">Partial</span><span class="h">What to buy: three of the seven "compare" links have no true shelf.</span>
+  <div class="d">Nasal aspirators and cough-and-cold products land on First aid; malish oils on Lotions. Either
+  add those shelves or reword the links. <b>Decision needed.</b></div>
+</div></div>
+
+<div class="pt"><div class="num">76</div><div class="txt">
+  <span class="s s-part">Partial</span><span class="h">What to buy: four expert-film cards are sponsored inventory over films not yet shot.</span>
+  <div class="d">The card says "still being filmed" honestly, but a stub is a paid slot over nothing. Worth
+  knowing before a slot is sold.</div>
+</div></div>
+
+<div class="pt"><div class="num">77</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Traditions: only the first tab changes with age, and no tab ever locks.</span>
+  <div class="d">Four ceremony charts, one per stage, and the door opens the right one. Everything else is for
+  every age. The brief also asked for no "book an expert" offer — <span class="quote">"for this subject there is
+  genuinely nobody to book"</span> — and there is none.</div>
+</div></div>
+
+<div class="pt"><div class="num">78</div><div class="txt">
+  <span class="s s-no">Not built</span><span class="h">Traditions: the two sensitive pages are scaffolds, and the brief asks for the copy to be read before either ships.</span>
+  <div class="d">"If you would rather not do a ceremony at all" and "When the mother is kept apart" (jaapa
+  seclusion, the not-to-be-touched custom). Tone to be signed off by the user, not auto-written.</div>
+</div></div>
+
+<div class="pt"><div class="num">79</div><div class="txt">
+  <span class="s s-part">Partial</span><span class="h">Health: the paracetamol/ibuprofen mg-by-weight table is commented out pending sign-off.</span>
+  <div class="d">Restoring it needs paediatric and legal sign-off plus a weight calculator the medical board owns.
+  Today the page carries the read-the-bottle framing. <b>Decision needed.</b></div>
+</div></div>
+
+<div class="pt"><div class="num">80</div><div class="txt">
+  <span class="s s-part">Partial</span><span class="h">Health: six tabs were kept after being seen on a phone; the merge, if five is the answer, is already named.</span>
+  <div class="d">Growing well into Keeping him well.</div>
+</div></div>
+
+<div class="pt"><div class="num">81</div><div class="txt">
+  <span class="s s-part">Partial</span><span class="h">Feeding: the allergen walk-through forgets on close.</span>
+  <div class="d">The brief asks for a tracker ("tick egg, peanut…"). Built as a walk-through; a tracker that
+  remembers needs a store, a child-scoped table and local-first merge. The screen is already its front.
+  <b>Decision needed.</b></div>
+</div></div>
+
+<div class="pt"><div class="num">82</div><div class="txt">
+  <span class="s s-part">Partial</span><span class="h">First 40 Days: the real day-by-day spine is not built; four fixed day-range pages stand in.</span>
+  <div class="d">The brief's own lean is to build the light version — "you are on day 12", today's card lit. Real
+  effort; parked for speed. This is the biggest single unbuilt thing in the parenting stage.</div>
+</div></div>
+
+<div class="pt"><div class="num">83</div><div class="txt">
+  <span class="s s-no">Not built</span><span class="h">Behaviour: eleven pages are scaffolds, by instruction.</span>
+  <div class="d">The brief's verdict is <span class="quote">"mostly add, not cut"</span>: two new areas fill the
+  section's missing half — the scared/shy/clingy half and the little habits — and the copy
+  <span class="quote">"is being written separately in the same house voice. Do not AI-generate placeholder
+  copy."</span> Eleven coming-soon cards hold their places and a test fails if one is not in the owed ledger.</div>
+</div></div>
+
+<div class="pt"><div class="num">84</div><div class="txt">
+  <span class="s s-part">Partial</span><span class="h">Behaviour: the crying-too-much story is eight screens of safety copy in a new medium and wants a clinical read.</span>
+</div></div>
+
+<div class="pt"><div class="num">85</div><div class="txt">
+  <span class="s s-no">Not built</span><span class="h">Early Learning: 58 stories have a "listen" button and no recording.</span>
+  <div class="d">The brief's own words: <span class="quote">"a story library with no narration is half-built, so
+  recording the story audio is the first job."</span> The rhymes collection is a scaffold for the same reason.</div>
+</div></div>
+
+<div class="pt"><div class="num">86</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Early Learning: the activity picker is <em>not</em> a tool on the door, because the first tab's rail is the same set.</span>
+  <div class="d">The brief: <span class="quote">"the activities in Tab 1 and the 'Something to do today' picker are the
+  same set. Keep one."</span></div>
+</div></div>
+
+<div class="pt"><div class="num">87</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Development: the reissue's one structural call was honoured — the reassurance pages come first, the four areas of growing sit inside the tracker.</span>
+  <div class="d"><span class="quote">"A parent's real question is 'is he okay, and what do I do', not 'show me his
+  profile'."</span> And the activities now sit beside the reassurance pages, which is the fix the brief asks
+  for.</div>
+</div></div>
+
+<div class="pt"><div class="num">88</div><div class="txt">
+  <span class="s s-part">Partial</span><span class="h">The old parenting hub configs still describe the two-door homes the V3 tiles bypass.</span>
+  <div class="d">Harmless today because the tile checks for a door first. Retire, or leave for the classic home —
+  <b>one decision.</b></div>
+</div></div>
+
+<!-- ======================================================================= -->
+<h2 class="brk"><span class="n">5.</span> Skilling — 12 tiles, 7 doors, 5 plan sheets</h2>
+<div class="lede">Twelve briefs, one per skill. Seven doors built between 2026-09-14 and 2026-09-18; five tiles
+still open a plan sheet. Read points 8 and 9 first: in a release build a reviewer sees none of this.</div>
+
+<table>
+<tr><th>Tile</th><th>Shape</th><th>Activities filled</th><th>Walked on a phone</th></tr>
+<tr><td class="t">Coding</td><td>door, 5 tabs + the shell</td><td class="c y">36 of 36</td><td class="c y">yes — at 8, 5 and 12</td></tr>
+<tr><td class="t">Communication</td><td>door, 5 tabs (three band cards)</td><td class="c y">36 of 36</td><td class="c y">yes — at 12 and 8</td></tr>
+<tr><td class="t">Confidence</td><td>door, <b>6 cards</b></td><td class="c y">36 of 36</td><td class="c y">yes — at 8</td></tr>
+<tr><td class="t">Thinking</td><td>door, 5 tabs</td><td class="c n2">none</td><td class="c n2">no</td></tr>
+<tr><td class="t">Stillness</td><td>door, 5 tabs</td><td class="c n2">none</td><td class="c n2">no</td></tr>
+<tr><td class="t">Feelings</td><td>door, <b>6 cards</b> + off-ramp bar</td><td class="c n2">none — clinical review first</td><td class="c n2">no</td></tr>
+<tr><td class="t">Making (Creativity)</td><td>door, 5 tabs</td><td class="c n2">none</td><td class="c n2">no</td></tr>
+<tr><td class="t">Focus · Maths · Memory · Reading · Values</td><td class="n2">plan sheet only</td><td class="c n2">—</td><td class="c">—</td></tr>
+</table>
+
+<div class="pt"><div class="num">89</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">The five tabs are the brief's five child surfaces, in the brief's order, on the user's instruction to follow the brief literally first.</span>
+  <div class="d"><span class="quote">"Follow the brief completely, I want to see how the brief does; then give your
+  suggestions."</span> Every skill brief lists the same five — <em>Today's thing to try · Things to do · Lessons ·
+  AI, explained · What I've made and tried</em> — and a door file cannot invent a sixth surface without a brief
+  naming one. The regroupings the build would have proposed are written up separately, not applied.</div>
+</div></div>
+
+<div class="pt"><div class="num">90</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Confidence and Feelings have six cards, because their briefs list six child surfaces.</span>
+  <div class="d">Confidence adds the recorder and the keepsake as separate cards; Feelings adds her journal. Both
+  on the user's explicit call to stay PDF-literal.</div>
+</div></div>
+
+<div class="pt"><div class="num">91</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">The four parent surfaces are not tabs. They sit behind a grown-up gate, on one screen, reached from the closing card under every tab.</span>
+  <div class="d">Set-up and consent, the course shelf, the product shelf, the parent note. The gate is a sum in
+  words or a parent-set PIN.</div>
+</div></div>
+
+<div class="pt"><div class="num">92</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Band scoping: 6–8, 8–11, 11–14, with a floor at 6.</span>
+  <div class="d">A six-year-old sees the first band card open and the next two locked "From 8 years"; a
+  twelve-year-old sees three cards and the ones she has grown past are gone. Under the floor every child tab is
+  locked and the grown-up side stays open. The door re-scopes live when the date of birth changes — no restart.</div>
+</div></div>
+
+<div class="pt"><div class="num">93</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Consult is held on six of the seven doors, exactly as each brief holds it.</span>
+  <div class="d">Coding, Communication, Thinking, Stillness, Feelings and Making all hold it —
+  <span class="quote">"speech delay and stammering are not a skill gap and not a course"</span>,
+  <span class="quote">"real distress is not a meditation gap."</span> Confidence un-holds it, and the coach sits as a
+  row under the classes on the parent screen, because the parent books.</div>
+</div></div>
+
+<div class="pt"><div class="num">94</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">No scoring anywhere in the stage, and a test scans the tree for the vocabulary.</span>
+  <div class="d">Stillness refuses a streak with its reason on the record: <span class="quote">"a streak turns a
+  non-striving practice into a target, and a broken streak makes a child feel she has failed at calming
+  down."</span> Making refuses likes, ranking, a featured wall and any cross-user gallery. The keepsake has no
+  numeric member at all.</div>
+</div></div>
+
+<div class="pt"><div class="num">95</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Feelings: the safety off-ramp is a bar on every screen of the door, not a card.</span>
+  <div class="d">The brief: <span class="quote">"not buried, present on every screen of this door."</span> No line in the
+  door claims to treat, diagnose or fix.</div>
+</div></div>
+
+<div class="pt"><div class="num">96</div><div class="txt">
+  <span class="s s-no">Not built</span><span class="h">Feelings: the crisis pathway is a stub that stops, on purpose, and needs the experts.</span>
+  <div class="d">Also owed: a legal review of the child-private journal, key custody, and verification of the
+  helpline numbers. <b>Three decisions, none of them code.</b></div>
+</div></div>
+
+<div class="pt"><div class="num">97</div><div class="txt">
+  <span class="s s-no">Not built</span><span class="h">The consent verifier is an interface and a passing stub, flagged for legal review — as the brief asks.</span>
+  <div class="d">The settings screen says so on screen: "Not verified yet (stub, pending legal review)". Whether a
+  walk-through should instead <em>refuse</em> to open the door is a decision.</div>
+</div></div>
+
+<div class="pt"><div class="num">98</div><div class="txt">
+  <span class="s s-part">Partial</span><span class="h">Communication's 11–14 band activities were written in-repo, not by the task author.</span>
+  <div class="d">6–8 and 8–11 came from the author's task PDFs; the third band had none, so twelve were written
+  to match and are owed an author review. Flagged so it is not mistaken for authored content.</div>
+</div></div>
+
+<div class="pt"><div class="num">99</div><div class="txt">
+  <span class="s s-no">Not built</span><span class="h">Four of the seven doors have no activity content at all.</span>
+  <div class="d">Thinking, Stillness, Feelings and Making are frames with placeholder slots — 36 activities each —
+  because no task PDFs exist for them. Feelings' are additionally marked "care": clinical review before any
+  fill.</div>
+</div></div>
+
+<div class="pt"><div class="num">100</div><div class="txt">
+  <span class="s s-no">Not built</span><span class="h">Five briefs have no door: Focus, Maths, Memory, Reading, Values.</span>
+  <div class="d">Their tiles open the plan sheet, which shows the plan rather than an empty room —
+  <span class="quote">"twelve doors onto twelve empty rooms is worse than no doors."</span></div>
+</div></div>
+
+<div class="pt"><div class="num">101</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Stillness is the calm source; Focus, Feelings and Memory reference its page rather than rebuilding breath.</span>
+  <div class="d">Recorded now so the three unbuilt doors inherit it rather than growing their own.</div>
+</div></div>
+
+<div class="pt"><div class="num">102</div><div class="txt">
+  <span class="s s-no">Not built</span><span class="h">Across the seven doors: 336 lesson, course, product and note slots are placeholders, and no shelf string promises a future.</span>
+  <div class="d">A test holds that last part — enrol and buy are stub sheets and say so.</div>
+</div></div>
+
+<!-- ======================================================================= -->
+<h2 class="brk"><span class="n">6.</span> The two home lists, and the bottom nav, point by point</h2>
+<div class="lede">The change-lists supplied for the pregnancy and parenting homes, and the bottom-nav list,
+each checked against the shipping V3 screen. Both lists are essentially done; the exceptions are numbered.</div>
+
+<h3>6a · Pregnancy home — eight points</h3>
+
+<table>
+<tr><th>#</th><th>Asked for</th><th>Shipping</th><th></th></tr>
+<tr><td class="t">1</td><td>"What are you looking for?" first, then This Week Explained</td><td>eyebrow "What are you looking for?" over "Start anywhere", then the film</td><td class="c y">done</td></tr>
+<tr><td class="t">2</td><td>Recommended Watch → "This Week Explained"; drop "Six minutes this week"; the week's film plays below the heading</td><td>One heading, no eyebrow, at the page's second-largest type; the film is full-bleed and <b>plays in place</b>. The old heading is commented out, kept for revert</td><td class="c y">done</td></tr>
+<tr><td class="t">3</td><td>Garbh Sanskar unchanged, immediately after</td><td>the full-bleed band, directly after the film</td><td class="c y">done</td></tr>
+<tr><td class="t">4</td><td>Medicine Reminder unchanged, after Garbh</td><td>as asked</td><td class="c y">done</td></tr>
+<tr><td class="t">5</td><td>My Journal: "Create a memory for your baby to show when it grows up"</td><td>that exact line; the card under it untouched</td><td class="c y">done</td></tr>
+<tr><td class="t">6</td><td>New Recommended Videos section above Reads, headed "Watch These Videos This Week", ~3 week-relevant films</td><td>three rows with a small thumb, week-matched, the week's own film excluded</td><td class="c q">done, see 103</td></tr>
+<tr><td class="t">7</td><td>Recommended Reads unchanged, after Videos</td><td>after Videos; subtitle changed from "Short enough for today" to "Research-backed articles"</td><td class="c y">done</td></tr>
+<tr><td class="t">8</td><td>The whole order</td><td>Start anywhere → This Week Explained → Garbh → Medicine → My Journal → Videos → Reads → Products → Tools</td><td class="c y">done</td></tr>
+</table>
+
+<div class="pt"><div class="num">103</div><div class="txt">
+  <span class="s s-part">Partial</span><span class="h">The videos shelf can show fewer than three, by design, and none of them plays.</span>
+  <div class="d">Every candidate must actually cover the week — there is no nearest-week fallback, because
+  <span class="quote">"a shelf of three that are all a trimester away is worse than a shelf of two."</span> Separately,
+  the shelf ids are deliberately left out of the dev video map, so all three show the "film arriving" poster
+  (point 10).</div>
+</div></div>
+
+<div class="pt"><div class="num">104</div><div class="txt">
+  <span class="s s-info">Note</span><span class="h">Two things were removed from the home that the list did not ask about, both on earlier review instructions.</span>
+  <div class="d">The kick-count / movement row (placement rejected: the first thing after the photograph was a
+  clinical instruction) and "Note for baby" / "Add a photo" from My Journal (an earlier review asked for two doors,
+  not four). Both kept commented. The father's app still creates the note type from his own screens.</div>
+</div></div>
+
+<h3>6b · Parenting home — seven points</h3>
+
+<table>
+<tr><th>#</th><th>Asked for</th><th>Shipping</th><th></th></tr>
+<tr><td class="t">1</td><td>What to Buy first among the 11, not the page's top heading</td><td>built 2026-09-16, <b>reverted 2026-09-18</b> on the user's own instruction; hoist kept commented</td><td class="c q">see 18</td></tr>
+<tr><td class="t">2</td><td>This Phase Explained: video first, then the written description, then resources</td><td>exactly that order; the video is the same phase-matched film the old "Watch" section showed, only moved</td><td class="c y">done</td></tr>
+<tr><td class="t">3</td><td>How Your Baby Is Doing: only what is actually changing now; each change opens video → text → detail</td><td>one card per domain that has a milestone this phase, derived from the phase's AAP/CDC list; a domain with nothing changing does not appear; the sheet is video → text → more</td><td class="c y">done</td></tr>
+<tr><td class="t">4</td><td>Rename to "Activities to do today with your baby"; ≥3 a day; Done stays visible till tomorrow; Change swaps immediately and the rejected one does not come straight back; history kept</td><td>all of it, in a store with a date on it; the picks are deterministic on the date so reopening does not reshuffle</td><td class="c y">done</td></tr>
+<tr><td class="t">5</td><td>Read: drop "Short enough for today", use "Recommended Reads for Today", age-relevant</td><td>"Recommended reads for today" (sentence case — point 17)</td><td class="c y">done</td></tr>
+<tr><td class="t">6</td><td>Things That Help → "Recommended Products for Your Baby", age-relevant</td><td>"Recommended products for your baby", age-filtered</td><td class="c y">done</td></tr>
+<tr><td class="t">7</td><td>My Journal: drop "Keep Today", use "Record a Memory for Your Child Today"</td><td>"Record a memory for your child today"</td><td class="c y">done</td></tr>
+</table>
+
+<div class="pt"><div class="num">105</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">The three-a-day activities write through to the Brain tab's own store, so the two surfaces cannot disagree.</span>
+  <div class="d">One event, two readers, one writer each. The home store only remembers that the tick happened on
+  one of today's three cards, which is a home-screen fact.</div>
+</div></div>
+
+<div class="pt"><div class="num">106</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">No counter, no streak, no "2 of 3" under the activities — one line about tomorrow.</span>
+</div></div>
+
+<div class="pt"><div class="num">107</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">"How your baby is doing" has an empty state that is still an invitation, never a hidden section.</span>
+  <div class="d">A phase with nothing listed shows the line and the door to Development. Standing rule: a feature
+  is never hidden; only the empty copy changes.</div>
+</div></div>
+
+<h3>6c · Bottom navigation</h3>
+
+<div class="pt"><div class="num">108</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">Home · Products · Tools · Brain activities · More, in that order, with Community inside More.</span>
+  <div class="d">"My Child" is labelled <b>Home</b>; "Brain" is <b>Brain activities</b>, the one two-line label in
+  the app (at 11px it does not fit a fifth of a small phone, and "Brain acti…" is worse than two small lines).
+  The bar is now one shared component across stages rather than three divergent ones, and it lost the filled
+  purple disc behind the active icon — the one rule it still broke.</div>
+</div></div>
+
+<div class="pt"><div class="num">109</div><div class="txt">
+  <span class="s s-info">Note</span><span class="h">The pregnancy bar is a different set: Today · Products · Tools · Calendar · Community.</span>
+  <div class="d">Same component, different tabs. Worth deciding whether the two stages should converge, or whether
+  the difference is deliberate.</div>
+</div></div>
+
+<div class="pt"><div class="num">110</div><div class="txt">
+  <span class="s s-built">Built</span><span class="h">V3 is the default home on every stage, and the version pill is gone from the home.</span>
+  <div class="d">The user's decision of 2026-09-16: <span class="quote">"the version 3 screens are final, the classic
+  screens are kept for reference."</span> The switch moved to You → Developer, so a final home carries no switch —
+  which is also why a review build needs the PV_DEV define (point 13).</div>
+</div></div>
+
+<!-- ======================================================================= -->
+<h2 class="brk"><span class="n">7.</span> Content still owed, counted</h2>
+<div class="lede">Every door brief carries the same rule — <span class="quote">"if a referenced page is missing, STOP and
+list it rather than creating one."</span> Those lists are one ledger,
+<code>docs/DOOR-CONTENT-OWED.md</code>, and a test per door fails if a coming-soon card is not in it. A card that
+is owed holds its place at full size and does not tap; nothing on a rail moves the day the piece lands.</div>
+
+<table>
+<tr><th>Stage</th><th>Rows</th><th>Coming soon</th><th>Built from data</th><th>Omitted</th><th>Needs a decision</th></tr>
+<tr><td class="t">Pregnancy · 7 doors</td><td class="c">27</td><td class="c">12</td><td class="c">1</td><td class="c">1</td><td class="c">1 · fasting pages</td></tr>
+<tr><td class="t">Parenting · 10 doors + shop</td><td class="c">76</td><td class="c">43</td><td class="c">25</td><td class="c">0</td><td class="c">3</td></tr>
+<tr><td class="t">Skilling · 7 doors</td><td class="c">77</td><td class="c">46</td><td class="c">11</td><td class="c">0</td><td class="c">7 <span class="where">(+1 stopped)</span></td></tr>
+<tr><td class="t">TTC · 7 doors</td><td class="c">—</td><td class="c">13 films</td><td class="c">—</td><td class="c">2</td><td class="c">0</td></tr>
+</table>
+
+<div class="pt"><div class="num">111</div><div class="txt">
+  <span class="s s-no">Not built</span><span class="h">Pregnancy: six reads, eleven films, four audio tracks, one decision, one confirmation.</span>
+  <div class="d">Reads — the scan-person read, C-section, the first hour, what labour is like, what the partner
+  does, "tell your doctor". Films — the supplements video, two labour films, three guided-breathing watch-alongs,
+  five meditations. Audio — four calming tracks, which the brief says to reference Garbh Sanskar's assets, so a
+  wiring job. Decision — the fasting pages (point 51). Confirmation — the helpline numbers (point 61).</div>
+</div></div>
+
+<div class="pt"><div class="num">112</div><div class="txt">
+  <span class="s s-no">Not built</span><span class="h">Garbh Sanskar: all twelve content rows are closed. What remains is voice recordings, by manifest entry — no code.</span>
+  <div class="d">The relaxation script (13 entries), the body-awareness journey and the Samvad narrator pieces.
+  Nine real audio recordings are already live on R2.</div>
+</div></div>
+
+<div class="pt"><div class="num">113</div><div class="txt">
+  <span class="s s-no">Not built</span><span class="h">Parenting: the film list is the single biggest content debt in the app — roughly 85 slots across seven doors, plus 58 story narrations.</span>
+  <div class="d">In the order the briefs themselves prioritise: the eleven feeling-films on You&nbsp;Maa
+  (<span class="quote">"a mother needs to hear 'I feel nothing at all' said aloud by someone who has been
+  there"</span>), the "doing it together" activity clips, the Indian-toilet film
+  (<span class="quote">"the clearest missing video in the section"</span>), the choking response, seventeen ceremony
+  films.</div>
+</div></div>
+
+<div class="pt"><div class="num">114</div><div class="txt">
+  <span class="s s-no">Not built</span><span class="h">Parenting: 28 pages of copy are scaffolds, all of them because a brief said the copy would be supplied.</span>
+  <div class="d">Eleven in Behaviour, eight in Traditions, eight buying guides, four in Potty, two in You Maa, two
+  in Early Learning, two in Health, one in Development, three in First 40 Days.
+  <span class="quote">"Do not AI-generate placeholder copy"</span> is the instruction, and it was followed.</div>
+</div></div>
+
+<div class="pt"><div class="num">115</div><div class="txt">
+  <span class="s s-part">Partial</span><span class="h">Several "illustrations" are drawn in code rather than commissioned, and can be swapped for artwork without touching a page.</span>
+  <div class="d">Food textures and cut-it-this-way, the nappy colour strip, the rash grid, the four newborn
+  customs, thermometer routes, dehydration signs. Two want photographs rather than drawings: the rash grid
+  ("this is HFMD") and the newborn-skin carousel.</div>
+</div></div>
+
+<div class="pt"><div class="num">116</div><div class="txt">
+  <span class="s s-part">Partial</span><span class="h">Photographs: findings, conditions and several door rails carry tone placeholders from a public-domain pool.</span>
+  <div class="d">27 findings and 20 conditions. A real photo per finding is a content job. See also point 12 —
+  the hosting has to move to R2 first.</div>
+</div></div>
+
+<!-- ======================================================================= -->
+<h2><span class="n">8.</span> What a reviewer should know before opening the app</h2>
+
+<div class="pt"><div class="num">117</div><div class="txt">
+  <span class="s s-info">Note</span><span class="h">Build with <code>--flavor parent --dart-define=PV_DEV=true</code>, in release, to see all four stages.</span>
+</div></div>
+
+<div class="pt"><div class="num">118</div><div class="txt">
+  <span class="s s-info">Note</span><span class="h">Skilling will show plan sheets, not doors (points 8–9). A debug build is the only way to walk a skill door.</span>
+</div></div>
+
+<div class="pt"><div class="num">119</div><div class="txt">
+  <span class="s s-info">Note</span><span class="h">Images may be missing at random until the R2 upload happens (point 12). It is not a layout bug.</span>
+</div></div>
+
+<div class="pt"><div class="num">120</div><div class="txt">
+  <span class="s s-info">Note</span><span class="h">A poster with no play control is the honest "film arriving" state, not a broken player (points 10, 37, 113).</span>
+</div></div>
+
+<div class="pt"><div class="num">121</div><div class="txt">
+  <span class="s s-info">Note</span><span class="h">Nothing in any stage gives a personalised probability, a score, a match percentage or a diagnosis, and tests scan the source for the vocabulary.</span>
+  <div class="d">Where a clinician owns a decision the app explains it, reminds about it or helps her prepare for
+  it — it never recreates it. A clinic-owned due date is never second-guessed.</div>
+</div></div>
+
+<div class="pt"><div class="num">122</div><div class="txt">
+  <span class="s s-info">Note</span><span class="h">Everything written opens in one reader, with one exception found in this pass — point 4.</span>
+</div></div>
+
+<div class="pt"><div class="num">123</div><div class="txt">
+  <span class="s s-info">Note</span><span class="h">Hindi: a large amount of Pregnancy ships in Devanagari and stays. New copy since 2026-08-27 is English only, by decision — English in the Hindi build is the expected state, not a bug. TTC is the exception (point 16).</span>
+</div></div>
+
+<div class="pt"><div class="num">124</div><div class="txt">
+  <span class="s s-info">Note</span><span class="h">The last full green suite was 4,409 tests at commit <code>09bc1f9</code>. Eight files and one new brief were uncommitted when these notes were written.</span>
+  <div class="d">Per-door contract tests exist for all 25 built doors, plus three cross-door sanity tests that hold
+  reachability: every area exists, every surface resolves, every in-section link lands, every coming-soon card is
+  in the owed ledger.</div>
+</div></div>
+
+<div class="foot">
+  <b>Where the detail lives.</b>
+  <code>docs/DOOR-CONTENT-OWED.md</code> — every owed row, by door ·
+  <code>docs/PARENTING-DOORS-REVIEW.md</code>, <code>docs/PREGNANCY-DOORS-REVIEW.md</code>,
+  <code>docs/SKILLING-DOORS-REVIEW.md</code> — the per-door questions awaiting a decision ·
+  <code>docs/STILL-OPEN.md</code> §21–§74 and §100–§104 — the reasoning behind every call above, by door ·
+  <code>docs/TTC-DOOR-BUILD.md</code>, <code>docs/PREGNANCY-DOOR-BUILD.md</code>,
+  <code>docs/SKILLING-DOOR-BUILD.md</code> — the playbooks each stage's doors were built to ·
+  <code>docs/FITNESS-DOOR-BRIEF.md</code> — the one written, unbuilt door.
+</div>
+
+</body>
+</html>
