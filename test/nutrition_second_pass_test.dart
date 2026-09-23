@@ -177,6 +177,30 @@ void main() {
       expect(recipeForMeal('Plain water'), isNull);
     });
 
+    test('a quantity reads the way a kitchen measures it', () {
+      // The phone, 2026-09-23: "0.8 tsp mustard seeds" on the sambar.
+      expect(kitchenQty(0.8, 'tsp'), '¾ tsp');
+      expect(kitchenQty(0.25, 'tsp'), '¼ tsp');
+      expect(kitchenQty(1.5, 'tbsp'), '1½ tbsp');
+      expect(kitchenQty(2, 'cup'), '2 cup');
+      expect(kitchenQty(0.05, 'tsp'), 'a pinch');
+      expect(kitchenQty(1.3, 'pcs'), '1½ pcs');
+      expect(kitchenQty(0.2, 'pcs'), '½ pcs');
+      expect(kitchenQty(37, 'g'), '35 g');
+      expect(kitchenQty(333, 'g'), '330 g');
+      expect(kitchenQty(612, 'g'), '600 g');
+      // And no ingredient in the library, at any servings the stepper
+      // allows, ever prints a decimal point.
+      for (final r in kRecipes) {
+        for (final i in r.ingredients) {
+          for (var n = 1; n <= 6; n++) {
+            final q = kitchenQty(i.qtyPerServing * n, i.unit);
+            expect(q.contains('.'), isFalse, reason: '${r.id} · ${i.name.en} × $n → $q');
+          }
+        }
+      }
+    });
+
     test('every recipe says how long it takes, and says something believable', () {
       // ⚠️ THE FIELD IS REQUIRED, so this cannot catch a missing one — the
       // compiler does. What it catches is the lazy default: a set of

@@ -44,6 +44,7 @@ import '../../data/reads/nutrition_reads.dart';
 import '../../data/reads/symptom_reads.dart';
 import '../../data/symptoms/symptom_library.dart' show symptomById;
 import '../symptoms/door/symptoms_widgets.dart' show symptomLineMark;
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
 import '../../data/symptoms/symptom_normal.dart' show normalQuestionById;
 import '../../data/doors/pv_door_symptoms.dart';
 import '../symptoms/door/symptoms_today_body.dart'
@@ -147,6 +148,18 @@ import '../tools/tests_scans_reports_screen.dart';
 /// user, walking it 2026-09-22: *"we need images for this tab"*). Each row now
 /// wears the symptom's own mark — the same hand as the check-in, so the two
 /// tabs are visibly the same thirty-three things.
+/// A tile's own MARK for the big deck card — the card twin of
+/// `pvDoorTileArt`, which draws the row well. Null means the format's mark.
+///
+/// ⚠️ SAME RULE AS ITS TWIN: the door engine asks, the router answers. The
+/// case that made it (the phone, 2026-09-23): "What to say when you call"
+/// is a tool, so it wore the tool format's sliders — on the one card on the
+/// safety tab that is about picking up the phone.
+IntentMark? pvDoorTileMark(PvDoorTile tile) {
+  if (tile is PvDoorToolTile && tile.surfaceId == kSymSurfaceCalling) return IntentMark.phoneMark;
+  return null;
+}
+
 Widget? pvDoorTileArt(PvDoorTile tile, Color ink) {
   if (tile is PvDoorEntryTile && tile.library == PvDoorLibrary.symptom) {
     final s = symptomById(tile.entryId);

@@ -50,11 +50,15 @@ class RecipeCookScreen extends StatefulWidget {
 class _RecipeCookScreenState extends State<RecipeCookScreen> {
   late int _servings = widget.recipe.defaultServings;
 
-  String _qty(RecipeIngredient i) {
-    final q = i.qtyPerServing * _servings;
-    final s = q == q.roundToDouble() ? q.toInt().toString() : q.toStringAsFixed(1).replaceAll(RegExp(r'\.0$'), '');
-    return '$s ${i.unit}'.trim();
-  }
+  String _qty(RecipeIngredient i) => kitchenQty(i.qtyPerServing * _servings, i.unit);
+
+  // Kept for revert — the decimal version, which printed "0.8 tsp mustard
+  // seeds" once the servings stepper multiplied a quarter-teaspoon by three:
+  // String _qty(RecipeIngredient i) {
+  //   final q = i.qtyPerServing * _servings;
+  //   final s = q == q.roundToDouble() ? q.toInt().toString() : q.toStringAsFixed(1).replaceAll(RegExp(r'\.0$'), '');
+  //   return '$s ${i.unit}'.trim();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -539,4 +543,43 @@ class _AddOne extends StatelessWidget {
           );
         },
       );
+}
+
+/// A quantity the way a kitchen writes it (the phone, 2026-09-23: "0.8 tsp
+/// mustard seeds" on the sambar).
+///
+/// ⚠️ ROUNDING HERE IS NOT A LOSS OF PRECISION, IT IS THE PRECISION. A spoon
+/// measure has quarters and nothing finer, so 0.8 tsp is not more accurate
+/// than 3/4 tsp — it is a number nobody can measure. Each unit rounds to the
+/// finest step a real kitchen has:
+///   tsp, tbsp, cup  -> nearest quarter, drawn as a fraction (1/4 1/2 3/4)
+///   pcs             -> nearest half ("1 1/2 pcs"), never below a half
+///   g               -> 5 g under 100, 10 g under 500, 25 g above
+/// Anything that rounds to nothing shows as "a pinch" (spoons) or the
+/// smallest step, never "0 tsp".
+String kitchenQty(double q, String unit) {
+  String frac(double v, double step) {
+    final r = (v / step).round() * step;
+    final whole = r.floor();
+    final rest = r - whole;
+    final f = switch ((rest * 4).round()) { 1 => '¼', 2 => '½', 3 => '¾', _ => '' };
+    if (whole == 0) return f.isEmpty ? '' : f;
+    return f.isEmpty ? '$whole' : '$whole$f';
+  }
+
+  switch (unit) {
+    case 'tsp' || 'tbsp' || 'cup':
+      final v = frac(q, 0.25);
+      return v.isEmpty ? 'a pinch' : '$v $unit';
+    case 'pcs':
+      final v = frac(q < 0.5 ? 0.5 : q, 0.5);
+      return '$v $unit';
+    case 'g':
+      final step = q < 100 ? 5.0 : q < 500 ? 10.0 : 25.0;
+      final r = ((q / step).round() * step).clamp(step, double.infinity);
+      return '${r.toInt()} g';
+    default:
+      final s = q == q.roundToDouble() ? q.toInt().toString() : q.toStringAsFixed(1);
+      return '$s $unit'.trim();
+  }
 }

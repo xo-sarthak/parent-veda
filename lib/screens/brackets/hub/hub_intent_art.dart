@@ -270,6 +270,10 @@ enum IntentMark {
   /// A droplet — urine, leaking.
   dropMark,
 
+  /// A handset — "what to say when you call" (2026-09-23). The door had no
+  /// phone, so a card about phoning wore the tool format's sliders.
+  phoneMark,
+
   /// A spiral — dizziness.
   spiralMark,
 
@@ -977,6 +981,31 @@ class _IntentPainter extends CustomPainter {
               ..close(),
             obj);
         canvas.drawCircle(const Offset(40, 70), 5, white);
+
+      case IntentMark.phoneMark:
+        // An old-telephone handset on its side: earpiece top-left, mouthpiece
+        // bottom-right, the curved grip between — the shape every phone
+        // icon still borrows, readable at 16pt.
+        canvas.drawPath(
+            Path()
+              ..moveTo(22, 14)
+              ..quadraticBezierTo(34, 10, 40, 22)
+              ..lineTo(44, 34)
+              ..quadraticBezierTo(46, 42, 38, 46)
+              ..lineTo(34, 48)
+              ..quadraticBezierTo(40, 62, 54, 68)
+              ..lineTo(56, 64)
+              ..quadraticBezierTo(60, 56, 68, 58)
+              ..lineTo(80, 62)
+              ..quadraticBezierTo(90, 66, 86, 78)
+              ..lineTo(82, 86)
+              ..quadraticBezierTo(76, 94, 60, 90)
+              ..quadraticBezierTo(24, 78, 12, 40)
+              ..quadraticBezierTo(8, 22, 22, 14)
+              ..close(),
+            obj);
+        canvas.drawCircle(const Offset(70, 26), 5, obj);
+        canvas.drawCircle(const Offset(82, 16), 4, obj);
 
       case IntentMark.spiralMark:
         canvas.drawPath(

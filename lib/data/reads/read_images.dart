@@ -28,6 +28,77 @@
 // connection from Indian networks (checked: all ten failed, all 86 others
 // served), so one host — StockSnap — for the whole table.
 const Map<String, String> kReadImageUrls = {
+  // ---- Symptoms: THE THING THAT HELPS, never her body (2026-09-23) ------
+  // The user, walking By symptom: "we should be using real images of
+  // course". Photographs of pregnant bodies are stock-fake or clinical, and
+  // Commons does objects well and people badly, so every read shows what
+  // helps: ginger tea for nausea, a glass of milk for heartburn, a
+  // hot-water bottle for the back. Picked by eye from contact sheets, the
+  // square crop checked (it is what a row shows). Two keep their drawn mark
+  // because nothing was good enough: nosebleeds and round ligament.
+  'symptom_nausea':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3d/Lemon_and_ginger_tea_%2CTanzania.jpg/960px-Lemon_and_ginger_tea_%2CTanzania.jpg',
+  'symptom_heartburn':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a5/Glass_of_Milk_%2833657535532%29.jpg/960px-Glass_of_Milk_%2833657535532%29.jpg',
+  'symptom_constipation':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/de/Starr-170114-6478-Smallanthus_sonchifolius-fruit_bowl_with_watermelon_white_pineapple_papaya_Ice_Cream_and_Apple_banana_Cara_Cara_and_Washington_Navel_Orange-Hawea_Pl_Olinda-Maui_%2832425883706%29.jpg/960px-thumbnail.jpg',
+  'symptom_fatigue':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ad/Pillows_on_a_hotel_bed.jpg/960px-Pillows_on_a_hotel_bed.jpg',
+  'symptom_backPain':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/Knitted_hot_water_bottle_cover.jpg/960px-Knitted_hot_water_bottle_cover.jpg',
+  'symptom_headache':
+      'https://upload.wikimedia.org/wikipedia/commons/c/c4/Glass_of_Water_-_Flickr_-_Greg_Riegler_Photography.jpg',
+  'symptom_troubleSleeping':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8b/Night_light_ball.jpg/960px-Night_light_ball.jpg',
+  'symptom_moodSwings':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/cf/Tea_with_a_view_of_Nilgiris%2C_Jomsom%2C_Nepal_%289412928589%29.jpg/960px-Tea_with_a_view_of_Nilgiris%2C_Jomsom%2C_Nepal_%289412928589%29.jpg',
+  'symptom_swelling':
+      'https://upload.wikimedia.org/wikipedia/commons/1/15/Puff_Redondo_Baixo_2.jpg',
+  'symptom_legCramps':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Banana_bunch_in_a_banana_farm_at_Chinawal.jpg/960px-Banana_bunch_in_a_banana_farm_at_Chinawal.jpg',
+  'symptom_babyHiccups':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/77/Norse-Borgen_Solid_Pink_Baby_Booties_%28Girl%27s%29_%284264764477%29.jpg/960px-Norse-Borgen_Solid_Pink_Baby_Booties_%28Girl%27s%29_%284264764477%29.jpg',
+  'symptom_braxtonHicks':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c9/Ref._913_HEUER_S.A.V.I.C_stopwatch.jpg/960px-Ref._913_HEUER_S.A.V.I.C_stopwatch.jpg',
+  'symptom_bloating':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Moroccan_Mint_Tea_-_1.jpg/960px-Moroccan_Mint_Tea_-_1.jpg',
+  'symptom_metallicTaste':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/3/3f/Zitrone_--_2025_--_7294.jpg/960px-Zitrone_--_2025_--_7294.jpg',
+  'symptom_foodAversions':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c6/Plain_Curd_Rice.jpg/960px-Plain_Curd_Rice.jpg',
+  'symptom_dizziness':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/47/Liat_Portal_for_Foodie_Disorder_-_Tu_B%E2%80%99Shevat_Fruit_Plate.jpg/960px-Liat_Portal_for_Foodie_Disorder_-_Tu_B%E2%80%99Shevat_Fruit_Plate.jpg',
+  'symptom_breathlessness':
+      'https://upload.wikimedia.org/wikipedia/commons/0/04/Cottage_window_with_curtains_and_flowers_-_geograph.org.uk_-_1157347.jpg',
+  'symptom_blockedNose':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Ultrasonic_humidifier.jpg/960px-Ultrasonic_humidifier.jpg',
+  'symptom_pelvicGirdle':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/Pregnancy_pillow.jpg/960px-Pregnancy_pillow.jpg',
+  'symptom_carpalTunnel':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b1/Wrist_brace.jpg/960px-Wrist_brace.jpg',
+  'symptom_varicoseVeins':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/Mediven550_dk8518.jpg/960px-Mediven550_dk8518.jpg',
+  'symptom_ribPain':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4a/Kitten_among_sofa_cushions_%282010%29.jpg/960px-Kitten_among_sofa_cushions_%282010%29.jpg',
+  'symptom_restlessLegs':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Kid_friendly_green_smoothie_in_a_personalized_glass_with_spinach%2C_Greek_yogurt%2C_frozen_blueberries%2C_blackberries_and_strawberries_and_berries%2C_banana_in_a_glass_bowl_on_a_wood_table_%2816225943125%29.jpg/960px-thumbnail.jpg',
+  'symptom_vividDreams':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Moleskine_Evernote_Smart_Notebook_and_pen_%288401944314%29.jpg/960px-Moleskine_Evernote_Smart_Notebook_and_pen_%288401944314%29.jpg',
+  'symptom_itching':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/da/Coconut_oil_bottle_in_the_background_of_coconuts_from_Kaleeswari_Farm.jpg/960px-Coconut_oil_bottle_in_the_background_of_coconuts_from_Kaleeswari_Farm.jpg',
+  'symptom_bleedingGums':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Toothbrush_20050716_004.jpg/960px-Toothbrush_20050716_004.jpg',
+  'symptom_hairSkin':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f6/Cut_Aloe_Vera_Leaf.jpg/960px-Cut_Aloe_Vera_Leaf.jpg',
+  'symptom_hotFlushes':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d4/Hand_fan_1_%28_mahuci%29.jpg/960px-Hand_fan_1_%28_mahuci%29.jpg',
+  'symptom_smellSensitivity':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fc/Mint_leaves_raster.jpg/960px-Mint_leaves_raster.jpg',
+  'symptom_frequentUrination':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/4/45/Metal_Water_Bottles.jpeg/960px-Metal_Water_Bottles.jpeg',
+  'symptom_pelvicPressure':
+      'https://upload.wikimedia.org/wikipedia/commons/2/29/Exercise_ball.jpg',
+
   // Nutrition — 2026-09-20. A photo per dish word (`nut_<dish>`, matched
   // from a chart meal's sentence by nutrition_photos.dart) and per recipe
   // (`nut_r_<id>`), picked by eye from Wikidata-tagged and Commons text
@@ -53,8 +124,13 @@ const Map<String, String> kReadImageUrls = {
       'https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Rajma_Chawal_by_Rama_Bhave.jpg/960px-Rajma_Chawal_by_Rama_Bhave.jpg',
   'nut_dhokla':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/c/ce/Khaman_Dhokla_Gujrati.jpg/960px-Khaman_Dhokla_Gujrati.jpg',
+  // ⚠️ WAS "Spicy Khichdi" WITH A BOWL OF RAW ONION BESIDE IT — and this
+  // photo is the one the Jain kadhi khichdi ("made without onion or garlic")
+  // resolves to. Seen on the phone 2026-09-23. The replacement is plain
+  // khichdi on a steel thali; the prettier candidate had potato in it, which
+  // Jain cooking also avoids, so it would have been the same mistake again.
   'nut_khichdi':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/7/79/Spicy_Khichdi.JPG/960px-Spicy_Khichdi.JPG',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/MoongDal_Khichdi.jpg/960px-MoongDal_Khichdi.jpg',
   // ⚠️ WAS A FISH CURRY THALI — on varan bhaat, which is the vegetarian
   // Maharashtrian dal-and-rice. A meat photograph on a vegetarian dish is
   // not a styling slip; for a Jain or vegetarian mother it is the app
@@ -150,8 +226,13 @@ const Map<String, String> kReadImageUrls = {
       'https://upload.wikimedia.org/wikipedia/commons/thumb/d/df/Varan_Bhat.jpg/960px-Varan_Bhat.jpg',
   'nut_r_maharashtrian_thalipeeth':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c1/Thalipeeth_-_Maharashtra.jpg/960px-Thalipeeth_-_Maharashtra.jpg',
+  // ⚠️ WAS "Kadhi and Khichdi of Bardoli" — with a bowl of raw onion beside
+  // a dish sold as "made without onion or garlic". Seen on the phone
+  // 2026-09-23. This is the recipe's OWN photo, which wins over the shared
+  // `nut_khichdi` (`nutritionRecipePhoto` checks `nut_r_<id>` first) — so
+  // fixing the shared one alone changed nothing on this card.
   'nut_r_jain_kadhi_khichdi':
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/Kadhi_and_Khichdi_of_Bardoli%2C_gujarat.jpg/960px-Kadhi_and_Khichdi_of_Bardoli%2C_gujarat.jpg',
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9c/MoongDal_Khichdi.jpg/960px-MoongDal_Khichdi.jpg',
   'nut_r_besan_chilla':
       'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Chilla_besan.JPG/960px-Chilla_besan.JPG',
   'nut_r_vegetable_daliya':
@@ -794,6 +875,38 @@ const Map<String, String> kReadImageUrls = {
 
 /// Read id → licence · source · creator, for the credit line.
 const Map<String, String> kReadImageCredits = {
+  // Symptoms (2026-09-23)
+  'symptom_nausea': 'CC BY-SA 4.0 · Wikimedia Commons · Erasmus Kamugisha',
+  'symptom_heartburn': 'CC BY 2.0 · Wikimedia Commons · NIAID',
+  'symptom_constipation': 'CC BY 3.0 us · Wikimedia Commons · Forest and Kim Starr',
+  'symptom_fatigue': 'CC BY-SA 4.0 · Wikimedia Commons · Amin',
+  'symptom_backPain': 'CC BY 2.0 · Wikimedia Commons · Kara Babcock',
+  'symptom_headache': 'CC BY 2.0 · Wikimedia Commons · Greg Riegler from Pensacola, FL, USA',
+  'symptom_troubleSleeping': 'CC0 · Wikimedia Commons · J.Doniyorovich',
+  'symptom_moodSwings': 'CC BY 2.0 · Wikimedia Commons · Sharada Prasad CS from Bangalore, India',
+  'symptom_swelling': 'CC BY 3.0 · Wikimedia Commons · Rodrigomariadafe',
+  'symptom_legCramps': 'CC BY-SA 3.0 · Wikimedia Commons · abhiriksh',
+  'symptom_babyHiccups': 'CC BY 2.0 · Wikimedia Commons · marie smith',
+  'symptom_braxtonHicks': 'CC BY-SA 4.0 · Wikimedia Commons · Ikonicstopwatch',
+  'symptom_bloating': 'CC BY-SA 4.0 · Wikimedia Commons · Sarkar Sayantan',
+  'symptom_metallicTaste': 'CC BY-SA 4.0 · Wikimedia Commons · Dietmar Rabich',
+  'symptom_foodAversions': 'CC BY-SA 4.0 · Wikimedia Commons · 5boi38',
+  'symptom_dizziness': 'CC BY-SA 4.0 · Wikimedia Commons · HaJunkiyada',
+  'symptom_breathlessness': 'CC BY-SA 2.0 · Wikimedia Commons · Joseph Mischyshyn',
+  'symptom_blockedNose': 'Public domain · Wikimedia Commons · MaxSem',
+  'symptom_pelvicGirdle': 'CC BY-SA 4.0 · Wikimedia Commons · Panek',
+  'symptom_carpalTunnel': 'CC BY 3.0 · Wikimedia Commons · zyang',
+  'symptom_varicoseVeins': 'CC BY-SA 3.0 · Wikimedia Commons · DrKssn',
+  'symptom_ribPain': 'CC BY 2.0 · Wikimedia Commons · Feliciano Guimarães from Guimarães,',
+  'symptom_restlessLegs': 'CC BY 2.0 · Wikimedia Commons · Personal Creations',
+  'symptom_vividDreams': 'CC BY-SA 2.0 · Wikimedia Commons · Guy Sie from Utrecht, Netherlands',
+  'symptom_itching': 'CC BY-SA 4.0 · Wikimedia Commons · deadrat',
+  'symptom_bleedingGums': 'Public domain · Wikimedia Commons · Jonas Bergsten',
+  'symptom_hairSkin': 'CC BY 2.0 · Wikimedia Commons · Rae Allen',
+  'symptom_hotFlushes': 'CC BY-SA 4.0 · Wikimedia Commons · Bashir Shatima Mustapha',
+  'symptom_smellSensitivity': 'CC0 · Wikimedia Commons · Aviavlad',
+  'symptom_frequentUrination': 'CC0 · Wikimedia Commons · Amraepowell',
+  'symptom_pelvicPressure': 'CC BY 2.0 · Wikimedia Commons · Spiralz from England',
   'nut_ragi_dosa': 'CC BY-SA 4.0 · Wikimedia Commons · Pradeep717',
   'nut_curd_rice': 'CC BY-SA 4.0 · Wikimedia Commons · Sudharshan Shanmugasundaram',
   'nut_palak_paneer': 'CC BY-SA 4.0 · Wikimedia Commons · DreamyFlutura11',
@@ -803,7 +916,7 @@ const Map<String, String> kReadImageCredits = {
   'nut_sambar': 'CC BY-SA 4.0 · Wikimedia Commons · Sutapa Pal',
   'nut_rajma': 'CC BY-SA 4.0 · Wikimedia Commons · Shreya151994',
   'nut_dhokla': 'CC BY-SA 4.0 · Wikimedia Commons · Mrudit161187',
-  'nut_khichdi': 'CC BY-SA 4.0 · Wikimedia Commons · Seena.ge',
+  'nut_khichdi': 'CC BY-SA 4.0 · Wikimedia Commons · Mrudit161187',
   'nut_dal_rice': 'CC BY-SA 4.0 · Wikimedia Commons · Kashmira3091',
   'nut_thalipeeth': 'CC BY-SA 4.0 · Wikimedia Commons · Avinashvh1n1',
   'nut_kadhi': 'Public domain · Wikimedia Commons · Mowglee',
@@ -849,7 +962,7 @@ const Map<String, String> kReadImageCredits = {
   'nut_r_south_indian_curd_rice': 'CC BY-SA 4.0 · Wikimedia Commons · Sudharshan Shanmugasundaram',
   'nut_r_maharashtrian_varan_bhaat': 'CC BY-SA 4.0 · Wikimedia Commons · Kashmira3091',
   'nut_r_maharashtrian_thalipeeth': 'CC BY-SA 4.0 · Wikimedia Commons · Avinashvh1n1',
-  'nut_r_jain_kadhi_khichdi': 'CC BY-SA 4.0 · Wikimedia Commons · Satyams2000',
+  'nut_r_jain_kadhi_khichdi': 'CC BY-SA 4.0 · Wikimedia Commons · Mrudit161187',
   'nut_r_besan_chilla': 'CC BY-SA 4.0 · Wikimedia Commons · Kamalsahansi',
   'nut_r_vegetable_daliya': 'CC0 · Wikimedia Commons · QueerEcofeminist',
   'nut_r_tamil_sambar': 'CC BY-SA 4.0 · Wikimedia Commons · Sutapa Pal',

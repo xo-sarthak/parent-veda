@@ -26,6 +26,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../data/doors/pv_door_data.dart' show PvDoorLibrary;
+import '../../../data/reads/read_images.dart' show readImageFor;
 import '../../../data/reads/symptom_reads.dart';
 import '../../../data/symptoms/symptom_library.dart';
 import '../../../models/reminder.dart';
@@ -71,6 +72,11 @@ void openSymptomRead(BuildContext context, Symptom s, PregnancyController c) {
 /// marks, the same hand as the check-in and the rows, and nothing pretending
 /// to be a photograph of her body.
 Widget? symptomReadHero(String id) {
+  // A photograph wins (2026-09-23, the user: "real images of course"): null
+  // hands the reader its own head, which draws `readImageFor` and prints the
+  // credit. The mark below is now the fallback for the two with no photo.
+  final readId = id.startsWith(kSymptomReadPrefix) ? id : '$kSymptomReadPrefix$id';
+  if (readImageFor(readId) != null) return null;
   final s = symptomById(
     id.startsWith(kSymptomReadPrefix)
         ? id.substring(kSymptomReadPrefix.length)

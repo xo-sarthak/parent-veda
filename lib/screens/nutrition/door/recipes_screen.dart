@@ -229,7 +229,11 @@ class _RecipesGridBodyState extends State<RecipesGridBody> {
               padding: EdgeInsets.zero,
               physics: const NeverScrollableScrollPhysics(),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3, mainAxisSpacing: 14, crossAxisSpacing: 12, childAspectRatio: 0.64),
+                  // FOUR, not three (the phone, 2026-09-23): seven buckets
+                  // in threes left Soups alone on a third row, and the 0.64
+                  // cell — sized for the test font — left a band of white
+                  // under every row. Four across is 4 + 3, one row fewer.
+                  crossAxisCount: 4, mainAxisSpacing: 12, crossAxisSpacing: 10, childAspectRatio: 0.66),
               itemCount: kRecipeBuckets.length,
               itemBuilder: (_, i) {
                 final b = kRecipeBuckets[i];
@@ -349,8 +353,10 @@ class _BucketTile extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
               // In a grid the well takes the cell's width; the 78 square was
-              // the rail's geometry.
-              AspectRatio(
+              // the rail's geometry. FLEXIBLE, so a larger system font takes
+              // its room from the picture and never from the label.
+              Flexible(
+                child: AspectRatio(
                 aspectRatio: 1,
                 child: AnimatedContainer(
                 duration: const Duration(milliseconds: 160),
@@ -369,6 +375,7 @@ class _BucketTile extends StatelessWidget {
                           child: HubIntentArt(mark: mark!, tint: v2BlockTint(hue ?? 104, p)),
                         ),
                 ),
+              ),
               ),
               ),
               const SizedBox(height: 6),

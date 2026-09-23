@@ -20,6 +20,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/data/doors/pv_door_data.dart';
 import 'package:parentveda/data/doors/pv_door_symptoms.dart';
+import 'package:parentveda/data/reads/read_images.dart';
 import 'package:parentveda/data/reads/symptom_reads.dart';
 import 'package:parentveda/data/symptom_data.dart';
 import 'package:parentveda/data/symptoms/symptom_library.dart';
@@ -299,6 +300,33 @@ void main() {
         await tester.pump();
         expect(tester.takeException(), isNull, reason: 'a mark threw at $size');
       }
+    });
+
+    test('a symptom read shows what helps, credited, or falls back to its mark', () {
+      // The user, walking By symptom (2026-09-23): "real images of course".
+      final missing = <String>[];
+      for (final s in kSymptomLibrary) {
+        final id = '$kSymptomReadPrefix${s.id}';
+        if (readImageFor(id) == null) {
+          missing.add(s.id);
+          // No photo is allowed, but then the mark must carry the header.
+          expect(symptomReadHero(s.id), isNotNull, reason: '${s.id} has neither a photo nor a mark');
+        } else {
+          // A photo is CC-licensed, so it must travel with its credit.
+          expect(kReadImageCredits[id], isNotNull, reason: '$id has a photo and no credit');
+          // And the reader draws it: the mark steps aside.
+          expect(symptomReadHero(s.id), isNull, reason: '$id has a photo but the mark still covers it');
+        }
+      }
+      // Two had nothing fit to use on Commons; a longer list means a photo
+      // went missing, a shorter one means someone found better — update this.
+      expect(missing..sort(), ['nosebleeds', 'roundLigament']);
+      // The row asks for the same picture the reader draws.
+      final tile = kSymptomsDoor.sections
+          .expand((x) => x.tiles)
+          .whereType<PvDoorEntryTile>()
+          .firstWhere((t) => t.library == PvDoorLibrary.symptom && t.entryId == 'nausea');
+      expect(pvDoorTileReadImageId(tile), 'symptom_nausea');
     });
 
     test('the door search finds a symptom by the word she types, and a question by its verb', () {

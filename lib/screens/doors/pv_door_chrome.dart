@@ -209,9 +209,17 @@ class PvDoorToolScaffold extends StatelessWidget {
                     variant: variant,
                     chroma: v3FieldChroma(hue)),
               ),
-              ListView(
-                padding: EdgeInsets.zero,
-                children: [
+              // ⚠️ A CUSTOMSCROLLVIEW SO THE SPACE UNDER A SHORT SHEET IS WHITE
+              // (the phone, 2026-09-23: "What to say when you call" ended and
+              // the pink field showed below it). The sheet's full-screen
+              // minimum was removed on 2026-09-19 because on a DOOR the ground
+              // under the sheet is white anyway — but a TOOL paints a tinted
+              // field under everything, so here the gap showed. The filler
+              // below takes only the space the content does not, so a long
+              // tool scrolls exactly as before and a short one adds no
+              // scroll — the thing the user asked for when the minimum went.
+              CustomScrollView(slivers: [
+                SliverList(delegate: SliverChildListDelegate([
                   SafeArea(
                     bottom: false,
                     child: Padding(
@@ -269,8 +277,10 @@ class PvDoorToolScaffold extends StatelessWidget {
                     const SizedBox(height: 22),
                     ...children,
                   ]),
-                ],
-              ),
+                ])),
+                SliverFillRemaining(hasScrollBody: false, child: ColoredBox(color: p.ground)),
+              ]),
+              // Kept for revert — a ListView of the same two children.
               if (action case final a?)
                 Positioned(left: 0, right: 0, bottom: 0, child: a),
             ]),

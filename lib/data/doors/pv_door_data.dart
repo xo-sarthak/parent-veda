@@ -190,6 +190,10 @@ String? pvDoorTileReadImageId(PvDoorTile t) => switch (t) {
           PvDoorLibrary.scan => 'scan_$entryId',
           PvDoorLibrary.finding => 'finding_$entryId',
           PvDoorLibrary.condition => 'condition_$entryId',
+          // A symptom's read is `symptom_<id>` (symptom_reads.dart). Its
+          // photo is the thing that helps; with none, the row falls back to
+          // the drawn mark through `pvDoorTileArt` (2026-09-23).
+          PvDoorLibrary.symptom => 'symptom_$entryId',
           _ => null,
         },
       _ => null,

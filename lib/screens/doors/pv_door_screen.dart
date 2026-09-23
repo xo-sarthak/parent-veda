@@ -1296,7 +1296,7 @@ class _RailCard extends StatelessWidget {
     hue: hue,
     index: index,
     icon: pvDoorFormatIcon(tile.format),
-    mark: pvDoorFormatMark(tile.format),
+    mark: pvDoorTileMark(tile) ?? pvDoorFormatMark(tile.format),
     chip: tile.comingSoon ? 'Coming soon' : tile.format.label,
     title: tile.title,
     meta: tile.meta,

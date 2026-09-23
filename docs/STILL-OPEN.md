@@ -9408,3 +9408,60 @@ walked.
   `nut_shukto` is now stale (harmless — the proxy only fires for
   stocksnap/flickr URLs).
 - A walk on the phone.
+
+### 73.4 The phone walk, 2026-09-23 — photos for every symptom, and four fixes
+
+Walked on the user's S21 FE. The Symptoms cleanup (0565ed5) and the Recipes
+rework (e9d8ac8) both hold on the phone. What the walk found, all fixed:
+
+- **By symptom gets real photographs.** The user: *"we should be using real
+  images of course."* Every read shows **the thing that helps, never her
+  body** — ginger tea for nausea, a glass of milk for heartburn, a knitted
+  hot-water bottle for the back, a moon lamp for sleep, a stopwatch for
+  timing tightenings, a C-shaped pillow for the pelvis. Photographs of
+  pregnant bodies are stock-fake or clinical, and Commons does objects well
+  and people badly. 31 picked by eye from contact sheets, at the SQUARE crop
+  a row actually shows (three first picks failed there and were swapped),
+  approved by the user, licences checked (CC BY / BY-SA / CC0 / public
+  domain — nothing NC or ND), credited, mirrored to R2 and read back live.
+  **Nosebleeds and round ligament keep their drawn mark** — nothing on
+  Commons was fit (toilet rolls; people carrying mats), and the fallback is
+  the design, not a gap.
+  - The wiring was one line: rows already show a photo whenever
+    `pvDoorTileReadImageId` names one, so `PvDoorLibrary.symptom` now answers
+    `symptom_<id>`. The header gives way to the reader's own photo head,
+    which prints the credit.
+- **The Jain kadhi khichdi showed a bowl of raw onion** beside a dish "made
+  without onion or garlic" — the shared `nut_khichdi` photo. Replaced with
+  plain khichdi on a steel thali. The prettier candidate had potato in it,
+  which Jain cooking also avoids: the same mistake in a new form.
+  ⚠️ **Fixing the shared photo changed nothing on the card, first time
+  round.** `nutritionRecipePhoto` checks the recipe's OWN `nut_r_<id>` before
+  the shared `nut_<dish>`, and the Jain recipe had its own ("Kadhi and
+  Khichdi of Bardoli", the onion one). Caught only because the phone was
+  looked at after the fix. Both now point at the approved photo. The same
+  precedence explains yesterday's four dish fixes: they corrected charts and
+  plates, while the recipe cards already had right photos of their own. The
+  general trap: when a lookup has a more specific key that wins, a fix to the
+  general key is invisible wherever the specific one exists — check what the
+  screen RESOLVES, not what you edited.
+- **"0.8 tsp mustard seeds."** The servings stepper leaked decimals.
+  `kitchenQty` rounds each unit to the finest step a kitchen has — spoons
+  and cups to quarters (¾ tsp), pieces to halves, grams to 5/10/25 — and a
+  test runs every ingredient through 1–6 servings for a stray decimal point.
+- **Seven buckets in threes** left Soups alone on a row, with a band of white
+  under every row. Four across, and the square gives way before the labels.
+- **"What to say when you call" wore the tool format's sliders.** A drawn
+  phone (`IntentMark.phoneMark`), through `pvDoorTileMark` — the card twin
+  of the row hook, so the door engine still knows nothing about symptoms.
+- **Short tool screens showed the tinted field under the sheet.** The
+  sheet's full-screen minimum was removed on 2026-09-19 because a DOOR's
+  ground is white; a TOOL paints a tinted field under everything, so there
+  the gap showed. `PvDoorToolScaffold` fills only the space its content
+  leaves with the ground — no extra scroll on a short screen, none lost on
+  a long one. Fixes every tool screen, not one.
+
+**On the user's phone, cleaned up:** the symptoms logged during the walk
+were removed from his real log. The evening reminder was found ON and left
+alone — nobody knows who switched it on.
+
