@@ -1245,6 +1245,23 @@ class PvLearnTopBar extends StatelessWidget {
 /// come from, because the catalogue is cached for the session while slots
 /// arrive from the server afterwards. A fact computed once at startup goes
 /// stale in exactly the way this function exists to prevent.
+/// How far through a course she is, in words.
+///
+/// ⚠️ "4 OF 4 LESSONS LEFT" IS NOT PROGRESS, IT IS ARITHMETIC — the walk,
+/// 2026-09-22. The strip built its line as `left of total lessons left`
+/// unconditionally, so a course she has never opened announced that four of
+/// its four lessons remain: technically true, and it reads as though she had
+/// started and got nowhere. A fraction only means something once there is
+/// something on both sides of it, so nothing watched says the size, and
+/// everything watched says it is done.
+String pvLearnLeftLine(int done, int total) {
+  if (total <= 0) return '';
+  final left = total - done;
+  if (done <= 0) return total == 1 ? '1 lesson' : '$total lessons';
+  if (left <= 0) return 'All $total done';
+  return '$done of $total watched';
+}
+
 /// A person's initials for a disc. One definition, because the consult rows,
 /// the expert chips, the review sheet and an offering's "with —" line must
 /// all shorten the same name the same way.

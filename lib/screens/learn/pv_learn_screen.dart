@@ -329,8 +329,10 @@ class _PvLearnScreenState extends State<PvLearnScreen> {
           p,
           eyebrow: 'Continue',
           title: cont.title,
-          line:
-              '${cont.lessons.length - progress.doneCount(cont.id)} of ${cont.lessons.length} lessons left',
+          line: pvLearnLeftLine(
+            progress.doneCount(cont.id),
+            cont.lessons.length,
+          ),
           verb: 'Continue',
           view: cont,
           onTap: () {

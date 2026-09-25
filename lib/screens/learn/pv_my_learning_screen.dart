@@ -119,9 +119,7 @@ class _PvMyLearningScreenState extends State<PvMyLearningScreen> {
                             return PvLearnRow(
                               view: v,
                               title: v.title,
-                              sub: left <= 0
-                                  ? 'All ${v.lessons.length} lessons done'
-                                  : '$left of ${v.lessons.length} lessons left',
+                              sub: pvLearnLeftLine(done, v.lessons.length),
                               onTap: () {
                                 final last = progress.lastLesson(v.id);
                                 final i = last == null
