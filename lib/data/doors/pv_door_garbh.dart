@@ -86,6 +86,8 @@
 
 import 'package:flutter/material.dart' show Icons;
 
+import '../../screens/brackets/hub/hub_intent_art.dart' show IntentMark;
+
 import '../../models/garbh_content.dart' show GarbhKind;
 import '../garbh_data.dart';
 import '../garbh_rebuild_data.dart';
@@ -106,6 +108,10 @@ const String kGarbhSurfaceReadToday = 'garbh/read/today';
 const String kGarbhSurfaceRelax = 'garbh/relax';
 const String kGarbhSurfaceKriya = 'garbh/kriya';
 const String kGarbhSurfaceJournal = 'garbh/journal';
+
+/// Today's practice, drawn inline — the same component the pregnancy home
+/// renders (garbh_today_practice.dart), so the two cannot drift.
+const String kGarbhSurfaceToday = 'garbh/today';
 const String kGarbhSurfaceCredits = 'garbh/listen/credits';
 
 /// `garbh/listen/<audio id>` — one track on its player.
@@ -184,7 +190,18 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
       id: kGarbhTabToday,
       label: 'Today',
       icon: Icons.wb_sunny_outlined,
+      // ⚠️ THE SAME SHAPE AS EVERY FINISHED DOOR (2026-09-23). The user: "make
+      // it consistent… the way we have our other doors like scans and tests."
+      // Scans, Symptoms, Nutrition and Complications all open on a tab whose
+      // CONTENT is the tool (the timeline, the check-in, the plate, the
+      // finder), and every tab wears a drawn mark. Today's practice was a
+      // section under a heading; it is now the tab's tool, exactly as the
+      // Symptoms check-in is.
+      mark: IntentMark.sunMark,
       hue: 42,
+      inlineSurfaceId: kGarbhSurfaceToday,
+      inlineLabel: 'Four practices',
+      layout: PvDoorLayout.stack,
       noteFor: (week) => garbhWeekReason(week).en,
     ),
 
@@ -195,6 +212,7 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
       id: kGarbhTabListen,
       label: 'Listen',
       icon: Icons.headphones_outlined,
+      mark: IntentMark.audioMark,
       hue: 42,
       // Spoken TO her — "your calm", not "her calm". Read back on the phone.
       note: 'Shravan, listening. Your calm, and a moment you share — nothing '
@@ -208,6 +226,7 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
       id: kGarbhTabRead,
       label: 'Talk and read',
       icon: Icons.record_voice_over_outlined,
+      mark: IntentMark.pageMark,
       hue: 14,
       note: 'Samvad, talking to your baby. Everything you read or record here '
           'lands in My Journal.',
@@ -222,6 +241,7 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
       id: kGarbhTabForYou,
       label: 'For you',
       icon: Icons.self_improvement_rounded,
+      mark: IntentMark.lotusMark,
       hue: 262,
       note: 'This one is for you, and it will not make your baby cleverer.',
       pinnedRedFlag: PvDoorRedFlag(
@@ -247,6 +267,7 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
       id: kGarbhTabJournal,
       label: 'My Journal',
       icon: Icons.auto_stories_outlined,
+      mark: IntentMark.bookMark,
       hue: 330,
       inlineSurfaceId: kGarbhSurfaceJournal,
       inlineLabel: 'Everything your baby has heard',
@@ -261,6 +282,15 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
     // =========================================================================
     //  TODAY
     // =========================================================================
+    // ⚠️ THE SAME PRACTICE THE HOME SHOWS (2026-09-23). These four cards were
+    // the door's own drawing of today: the right destinations and text that
+    // never changed ("One raga chosen for today, and why"), while the home drew
+    // today's actual picks and sent every tap to the old screens. One
+    // component now draws today in both places — `GarbhTodayPractice` — and
+    // the cards below are kept, commented, for revert.
+    // (It was drawn here first, as an inline SECTION under "Today's practice";
+    // it moved up to the tab itself the same day — see the Today group.)
+    /* Kept for revert — the door's own four launcher cards:
     PvDoorSection(
       group: kGarbhTabToday,
       heading: "Today's practice",
@@ -292,6 +322,7 @@ final PvDoorPage kGarbhDoor = PvDoorPage(
         ),
       ],
     ),
+    */
 
     // ⚠️ DRAWN BY `GarbhRitualRail`, which reads the store. The picker card,
     // then whatever she picked. See `PvDoorSection.inline`.

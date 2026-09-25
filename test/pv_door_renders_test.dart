@@ -354,7 +354,7 @@ void _everyDoor() {
         final mixed = sections.where((s) =>
             s.inlineSurfaceId == null &&
             s.tiles.isNotEmpty &&
-            !s.tiles.every(pvDoorTileIsWritten));
+            !pvDoorSectionIsRows(s.tiles));
         // An inline tool may draw a horizontal list of its own (Garbh's
         // ritual rail does); it is counted as at most one per inline
         // section, and never as a section rail.
@@ -374,12 +374,12 @@ void _everyDoor() {
         // the page as a row title, not inside a horizontal list.
         for (final sec in sections) {
           if (sec.inlineSurfaceId != null || sec.tiles.isEmpty) continue;
-          if (!sec.tiles.every(pvDoorTileIsWritten)) continue;
+          if (!pvDoorSectionIsRows(sec.tiles)) continue; // written, or all tracks
           final first = sec.tilesFor(20).first;
           final inRail = find.descendant(of: rails, matching: find.text(first.title));
           expect(inRail, findsNothing,
               reason: '$name / "${g.label}" / "${sec.heading}" is all written '
-                  'and must be a list, not a rail.');
+                  'is rows (written or all tracks) and must be a list, not a rail.');
         }
       }
     });

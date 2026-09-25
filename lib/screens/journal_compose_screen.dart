@@ -84,11 +84,12 @@ Future<void> openJournalCompose(
   PregnancyController p, {
   JournalEntry? edit,
   Future<void> Function(JournalEntry entry)? onAdd,
+  String? prompt,
 }) =>
     Navigator.of(context).push(MaterialPageRoute<void>(
       settings: const RouteSettings(name: 'journal/compose'),
-      builder: (_) =>
-          JournalComposeScreen(pregnancy: p, edit: edit, onAdd: onAdd),
+      builder: (_) => JournalComposeScreen(
+          pregnancy: p, edit: edit, onAdd: onAdd, prompt: prompt),
     ));
 
 class JournalComposeScreen extends StatefulWidget {
@@ -97,10 +98,16 @@ class JournalComposeScreen extends StatefulWidget {
     required this.pregnancy,
     this.edit,
     this.onAdd,
+    this.prompt,
   });
 
   final PregnancyController pregnancy;
   final JournalEntry? edit;
+
+  /// The question she chose to answer (My Journal's "this week's question"),
+  /// placed as the entry's name so the answer keeps what it answers. Ignored
+  /// on an edit.
+  final String? prompt;
 
   /// The father's journal passes its own store hook, exactly as the old sheet
   /// allowed. One composer, two journals.
@@ -123,7 +130,7 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
   bool _locating = false;
 
   late final TextEditingController _heading =
-      TextEditingController(text: widget.edit?.title ?? '');
+      TextEditingController(text: widget.edit?.title ?? widget.prompt ?? '');
   late final TextEditingController _body =
       TextEditingController(text: widget.edit?.description ?? '');
 
@@ -321,6 +328,10 @@ class _JournalComposeScreenState extends State<JournalComposeScreen> {
             controller: _heading,
             onChanged: (_) => setState(() {}),
             textCapitalization: TextCapitalization.sentences,
+            // Wraps: this week's question arrives here as the name, and one
+            // line cut it off mid-sentence (the phone, 2026-09-23).
+            minLines: 1,
+            maxLines: 3,
             style: pvJakarta(
                 fontSize: 19,
                 fontWeight: FontWeight.w700,

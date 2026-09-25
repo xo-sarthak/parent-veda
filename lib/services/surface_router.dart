@@ -53,6 +53,7 @@ import '../screens/tools/symptom_companion_screen.dart';
 import '../screens/tools/tests_scans_reports_screen.dart';
 import '../screens/tools/weight_tracker_screen.dart';
 import 'pregnancy_controller.dart';
+import '../data/doors/pv_door_symptoms.dart' show kSymptomsBracketId;
 
 /// The screen behind a surface id, or null if this surface has no single screen.
 ///
@@ -80,7 +81,9 @@ Widget? _screenFor(String id, PregnancyController c, AppLanguage lang) =>
       'due_date' => DueDateCalculatorScreen(controller: c),
       'reports' => ReportScreen(controller: c),
       'can_i' => CanIScreen(controller: c),
-      'symptoms' => SymptomCompanionScreen(controller: c),
+      // The door (2026-09-23); the companion is kept for revert.
+      // 'symptoms' => SymptomCompanionScreen(controller: c),
+      'symptoms' => pvDoorScreenForBracket(kSymptomsBracketId, c) ?? SymptomCompanionScreen(controller: c),
       'movement' => BabyMovementScreen(controller: c),
       'weight' => WeightTrackerScreen(controller: c),
       'kegel' => KegelCareScreen(controller: c),

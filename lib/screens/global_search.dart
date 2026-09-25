@@ -44,6 +44,10 @@ import 'tools/spiritual_reading_screen.dart';
 import 'tools/tests_scans_reports_screen.dart';
 import 'tools/symptom_companion_screen.dart';
 import '../theme/pv_fonts.dart';
+import 'doors/pv_door_screen.dart' show pvDoorScreenForBracket;
+import '../data/doors/pv_door_symptoms.dart' show kSymptomsBracketId;
+import '../data/symptoms/symptom_library.dart' show symptomById;
+import 'symptoms/door/symptoms_today_body.dart' show openSymptomRead;
 
 void showGlobalSearch(BuildContext context, PregnancyController controller) {
   showSearch<void>(context: context, delegate: _GlobalSearchDelegate(controller));
@@ -107,7 +111,8 @@ class _GlobalSearchDelegate extends SearchDelegate<void> {
         _Dest(s.toolCanI, const ['can i', 'safe', 'eat', 'food', 'drink'],
             Icons.help_outline_rounded, (c) => CanIScreen(controller: c)),
         _Dest(s.symToolTitle, const ['symptom', 'nausea', 'pain', 'relief'],
-            Icons.healing_rounded, (c) => SymptomCompanionScreen(controller: c)),
+            // The Symptoms door (2026-09-23); the companion kept for revert.
+            Icons.healing_rounded, (c) => pvDoorScreenForBracket(kSymptomsBracketId, c) ?? SymptomCompanionScreen(controller: c)),
         _Dest(s.vedaToolTitle, const ['veda', 'ask', 'assistant', 'help'],
             Icons.auto_awesome_rounded, (c) => AskVedaScreen(controller: c)),
         _Dest(s.babyMovementTracker, const ['kick', 'movement', 'counter'],
@@ -209,8 +214,12 @@ class _GlobalSearchDelegate extends SearchDelegate<void> {
             ListTile(
               leading: _leadIcon(Icons.healing_rounded),
               title: Text(x.name.of(lang)),
-              onTap: () =>
-                  _go(context, SymptomCompanionScreen(controller: controller)),
+              // A named symptom opens ITS page in the one reader, not the
+              // companion's front door (2026-09-23).
+              onTap: () => switch (symptomById(x.id)) {
+                final sym? => openSymptomRead(context, sym, controller),
+                null => _go(context, SymptomCompanionScreen(controller: controller)),
+              },
             ),
         ],
       ],

@@ -677,7 +677,8 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
               _store.isSaved(a.id)
                   ? Icons.bookmark_rounded
                   : Icons.bookmark_border_rounded,
-              () => _store.toggleSave(a.id)),
+              // The title travels with the bookmark — see `toggleSave`.
+              () => _store.toggleSave(a.id, title: a.title.en, subtitle: a.kicker.en)),
           // NO SHARE BUTTON. See the head of this file — it goes in when it
           // shares, not before.
         ]),

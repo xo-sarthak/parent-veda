@@ -9,12 +9,22 @@
 //
 //  Self-initialising: loads lazily on first construction so it needs no wiring
 //  in main.dart. Best-effort persistence (failures keep in-memory state).
+//
+//  ⚠️ SYNCED SINCE 2026-09-23 (the persistence audit). It was phone-only with
+//  no stated reason — unlike the birth plan and the scan checklist, which are
+//  local on purpose and say why. The user's rule: "we should be able to
+//  maintain her activity… if she saves something, likes something". A choice
+//  she made about her own reading is hers on the next phone too. One blob in
+//  `user_state` through `CloudSyncedStore`: cloud wins on first sync, local
+//  seeds the cloud when the cloud is empty, a logged-out phone is unchanged.
 // =============================================================================
 
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SpiritualPrefsStore extends ChangeNotifier {
+import 'remote/cloud_synced_store.dart';
+
+class SpiritualPrefsStore extends ChangeNotifier with CloudSyncedStore {
   SpiritualPrefsStore._() {
     _load();
   }
@@ -40,7 +50,33 @@ class SpiritualPrefsStore extends ChangeNotifier {
     } catch (_) {/* keep defaults */}
     _loaded = true;
     notifyListeners();
+    await syncStateFromCloud();
   }
+
+  // ---- cloud (CloudSyncedStore) ----------------------------------------------
+  @override
+  String get cloudKey => 'spiritual_prefs';
+
+  @override
+  Object cloudData() => {
+        'interested': _interested.toList(),
+        'not_interested': _notInterested.toList(),
+      };
+
+  @override
+  void applyCloudData(Object data) {
+    if (data is! Map) return;
+    List<String> list(Object? v) => v is List ? v.whereType<String>().toList() : const [];
+    _interested
+      ..clear()
+      ..addAll(list(data['interested']));
+    _notInterested
+      ..clear()
+      ..addAll(list(data['not_interested']));
+  }
+
+  @override
+  Future<void> persistLocalCache() => _persist();
 
   bool isInterested(String key) => _interested.contains(key);
   bool isNotInterested(String key) => _notInterested.contains(key);

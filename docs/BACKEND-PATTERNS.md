@@ -2072,6 +2072,59 @@ is the reverse of local-first: the server is asked first and the local mirror
 follows a confirmed write, because a photo the parent cannot see is not a
 photo.
 
+## 16l. A sync is a merge, and a delete has to be remembered — the journal
+
+The journal's sync (`JournalStore`, and the father's copy of it) did the
+simplest thing: fetch the cloud's rows, upload any local id the cloud lacked,
+then **replace** the local list with the result. It looks right and it loses
+records four ways, and each one is a general fact about syncing two copies of
+anything:
+
+1. **A column the client writes and the table lacks is a silent loss.** The
+   entry model had `place`; the row mapping did not send it; the table had no
+   column. Because the sync *replaced* the local list, the place was then
+   erased from the phone it was typed on. Fix: one row mapping for both
+   journals (`journalEntryRow`), a migration (0091), and a contract test that
+   parses the migrations and fails if any key the app writes is not a column.
+2. **"Cloud wins" needs to be "newer wins", and that needs a clock.** An edit
+   made offline failed to upload, and the next sync overwrote it with the
+   older cloud copy. Every entry carries `updated_at`, moved on each edit, so
+   the merge compares clocks and pushes the local copy when it is the newer.
+   (Last-write-wins is the simplest conflict rule. It loses the *losing*
+   edit, which is fine for a journal where the same entry is rarely edited on
+   two phones at once, and wrong for a shared document — that needs
+   field-level merges or CRDTs.)
+3. **A delete leaves no trace, so it has to leave one on purpose.** Delete a
+   memory offline, and the row is still in the cloud; the next sync sees
+   "in the cloud, not here" and brings it back. A **tombstone** — the id,
+   persisted until the cloud confirms the delete — is what tells the sync
+   "not missing: removed". The same idea is why databases that replicate
+   (Cassandra, CouchDB) keep tombstones rather than simply dropping rows.
+4. **"Here and not there" means two different things.** An entry on this
+   phone and not in the cloud is either *new* (never uploaded) or *deleted on
+   another phone* (uploaded once, since removed). Treat it as new and every
+   deletion gets resurrected by whichever phone still has it; treat it as
+   deleted and offline work is lost. The phone keeps the set of ids it has
+   **seen** in the cloud: seen-then-gone is a deletion elsewhere, never-seen
+   is new. One persisted set of strings buys the distinction.
+
+The merge itself is a **pure function** (`mergeJournal` in
+`lib/services/journal_sync.dart`): local rows, cloud rows, tombstones and
+seen ids in; what to keep, push and delete out. No Supabase in it, so every
+case is a unit test (`test/journal_sync_test.dart`) instead of a two-phone
+experiment. That split — decide in a pure function, perform the writes in the
+store — is worth copying for any sync: the deciding is where the bugs are,
+and it is the part a test can reach.
+
+And the migration order, from the client's side. `place` is a new column; if
+the app ships before 0091 runs, PostgREST refuses the **whole row** ("could
+not find the 'place' column"), and since cloud writes are fire-and-forget
+that would silently stop *every* journal write. So `journalUpsert` retries a
+write refused for that column once without it and stops sending it for the
+session. Expand-then-contract says to add the column before any client
+depends on it; a client that tolerates being ahead of the schema makes the
+deploy order a preference rather than a precondition.
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.

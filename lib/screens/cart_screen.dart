@@ -119,6 +119,9 @@ Future<void> showAddToCartFlow(
   ScaffoldMessenger.of(context)
     ..clearSnackBars()
     ..showSnackBar(SnackBar(
+          // Flutter 3.44 keeps a snackbar with an action on screen until it is
+          // dismissed (`persist` defaults to true when there is an action).
+          persist: false,
       content: Text(s.cartAddedToCart),
       action: SnackBarAction(
         label: s.cartViewCart,

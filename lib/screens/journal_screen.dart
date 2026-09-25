@@ -23,6 +23,8 @@ import '../widgets/storage_image.dart';
 import '../theme/pv_fonts.dart';
 import 'journal_compose_screen.dart';
 
+export 'journal/pv_journal_screen.dart' show JournalScreen;
+
 /// Two ways to read the journal: a tidy grouped LIST, or a flip-through BOOKLET.
 enum _JournalView { list, booklet }
 
@@ -33,15 +35,28 @@ enum _GroupBy { month, week }
 /// `father == false` covers the mother's own entries (manual + auto).
 typedef _AE = ({JournalEntry e, bool father});
 
-class JournalScreen extends StatefulWidget {
-  const JournalScreen({super.key, required this.controller});
+/// ⚠️ THE PREVIOUS JOURNAL, KEPT (2026-09-23). `JournalScreen` is now the
+/// redrawn journal in `journal/pv_journal_screen.dart` — exported from this
+/// file under the same name, so every screen that opened the journal opens
+/// the new one without an edit. This one stays for revert, and because its
+/// flip-through book and the "you + Dad" book are still the book views: the
+/// new screen's menu opens them here, via [startInBook] / [startCombined].
+class JournalScreenClassic extends StatefulWidget {
+  const JournalScreenClassic({
+    super.key,
+    required this.controller,
+    this.startInBook = false,
+    this.startCombined = false,
+  });
   final PregnancyController controller;
+  final bool startInBook;
+  final bool startCombined;
 
   @override
-  State<JournalScreen> createState() => _JournalScreenState();
+  State<JournalScreenClassic> createState() => _JournalScreenState();
 }
 
-class _JournalScreenState extends State<JournalScreen> {
+class _JournalScreenState extends State<JournalScreenClassic> {
   JournalFilter _filter = JournalFilter.all;
   bool _searching = false;
   String _query = '';
@@ -50,7 +65,8 @@ class _JournalScreenState extends State<JournalScreen> {
   String? _playingPath;
 
   // View state: tidy grouped list (default) vs the flip-through booklet.
-  _JournalView _view = _JournalView.list;
+  late _JournalView _view =
+      widget.startInBook ? _JournalView.booklet : _JournalView.list;
   _GroupBy _groupBy = _GroupBy.month;
   final Set<String> _expanded = {};
   bool _groupsTouched = false; // false → default (only most-recent group open)
@@ -58,7 +74,7 @@ class _JournalScreenState extends State<JournalScreen> {
 
   // Combined (you + Dad) booklet - a separate mode, reached via its own app-bar
   // icon. Father entries surface ONLY here; her List/Booklet stay her own.
-  bool _combined = false;
+  late bool _combined = widget.startCombined;
   final PageController _combinedBookCtrl = PageController();
 
   PregnancyController get p => widget.controller;

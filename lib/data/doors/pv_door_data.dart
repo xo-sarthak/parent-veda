@@ -179,6 +179,17 @@ bool pvDoorTileIsWritten(PvDoorTile t) => switch (t.format) {
       _ => false,
     };
 
+/// Whether a section of these tiles draws as ROWS. Writing does (2026-09-19);
+/// so does a section of only tracks (2026-09-23) — every audio library in the
+/// Mobbin set lists its tracks as rows with a thumbnail and the minutes
+/// (Oura's Sleep, Calm's Sleep Stories), the shape Scans already uses for its
+/// reads. The user: "make it consistent… like the way we have our other
+/// doors like scans and tests." Mixed sections stay a rail.
+bool pvDoorSectionIsRows(List<PvDoorTile> tiles) =>
+    tiles.isNotEmpty &&
+    (tiles.every(pvDoorTileIsWritten) ||
+        tiles.every((t) => t.format == PvDoorFormat.audio));
+
 /// The read id a written tile opens, for its photo (`readImageFor`), or null
 /// where the tile's library has no read-image entry.
 String? pvDoorTileReadImageId(PvDoorTile t) => switch (t) {

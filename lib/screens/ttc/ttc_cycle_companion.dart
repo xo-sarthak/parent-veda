@@ -1150,6 +1150,9 @@ void _removeWithUndo(BuildContext context, DateTime start) {
   final messenger = ScaffoldMessenger.of(context);
   messenger.clearSnackBars();
   messenger.showSnackBar(SnackBar(
+          // Flutter 3.44 keeps a snackbar with an action on screen until it is
+          // dismissed (`persist` defaults to true when there is an action).
+          persist: false,
     content: Text('${ttcShortDate(start)} removed',
         style: pvManrope(fontSize: 13, color: Colors.white)),
     backgroundColor: ttcTitleInk,

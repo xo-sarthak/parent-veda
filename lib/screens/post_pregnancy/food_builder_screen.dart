@@ -275,6 +275,9 @@ class _FoodBuilderScreenState extends State<FoodBuilderScreen> {
             onTap: () {
               FoodStore.instance.addLines(s.missing);
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          // Flutter 3.44 keeps a snackbar with an action on screen until it is
+          // dismissed (`persist` defaults to true when there is an action).
+          persist: false,
                 content: const Text('Missing ingredients added to your shopping list'),
                 behavior: SnackBarBehavior.floating,
                 action: SnackBarAction(label: 'View', onPressed: () => _push(const FoodShoppingScreen())),

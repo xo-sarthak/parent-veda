@@ -59,6 +59,8 @@ import 'tools/weight_tracker_screen.dart';
 import '../theme/pv_fonts.dart';
 import 'learn/pv_learn_screen.dart';
 import '../services/life_stage_store.dart';
+import 'doors/pv_door_screen.dart' show pvDoorScreenForBracket;
+import '../data/doors/pv_door_symptoms.dart' show kSymptomsBracketId;
 
 class ToolsHubScreen extends StatelessWidget {
   const ToolsHubScreen({super.key, required this.controller});
@@ -296,7 +298,11 @@ class ToolsHubScreen extends StatelessWidget {
         s.symToolTitle,
         Icons.healing_rounded,
         const Color(0xFF4A7BC8),
-        () => open(() => SymptomCompanionScreen(controller: controller)),
+        // The Symptoms door (2026-09-23); kept for revert:
+        // () => open(() => SymptomCompanionScreen(controller: controller)),
+        () => open(() =>
+            pvDoorScreenForBracket(kSymptomsBracketId, controller) ??
+            SymptomCompanionScreen(controller: controller)),
         priority: PregPriority.symptoms,
       ),
       // Merged into "Tests, Scans & Reports" above. Kept commented for revert.

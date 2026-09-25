@@ -1399,6 +1399,9 @@ void _addPlannedToCart(BuildContext context, PregnancyController controller) {
   ScaffoldMessenger.of(context)
     ..clearSnackBars()
     ..showSnackBar(SnackBar(
+          // Flutter 3.44 keeps a snackbar with an action on screen until it is
+          // dismissed (`persist` defaults to true when there is an action).
+          persist: false,
       content: Text(added == 0 ? s.cartAllInCart : s.cartAddedN(added)),
       action: added == 0
           ? null

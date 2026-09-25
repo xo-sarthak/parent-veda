@@ -107,35 +107,101 @@ void pvSnack(
   String text, {
   String? action,
   VoidCallback? onAction,
+  // How far above the screen's foot to float. Defaults to the Store's sticky
+  // bar clearance; a screen with a shorter bar passes its own, or the
+  // confirmation floats over its content (the recipe page, 2026-09-23: it
+  // sat on top of an ingredient row).
+  double? lift,
+  // A leading mark for a notice that CONFIRMS something ("on your list").
+  // Opt-in, never the default: this helper also carries errors ("Payment did
+  // not go through"), and a tick on those would say the opposite of the words.
+  IconData? icon,
 }) {
   final p = pvStorePalette;
   final inset = MediaQuery.of(context).padding.bottom;
-  ScaffoldMessenger.of(context)
+  final messenger = ScaffoldMessenger.of(context);
+  // ⚠️ REDESIGNED 2026-09-23 — the user: "these pop ups… look very bland and
+  // poor, and it is just staying on the screen." Two fixes in one:
+  //  · STAYING: Flutter 3.44 made a SnackBar with an `action` persist until
+  //    dismissed (`persist ?? action != null`). This one builds its own
+  //    action inside `content` and passes no `action`, so it always times
+  //    out; `persist: false` says so explicitly as well.
+  //  · BLAND: still WHITE (the user's rule above — an ink notice over an ink
+  //    bar reads as one object), but lifted by a soft shadow instead of a
+  //    hairline, an optional tick in a tinted disc, bolder words, and the
+  //    action as a small INK PILL with an arrow — the base UI's pill — rather
+  //    than faint coloured text. Mobbin 2026-09-23: Notion Mail, Quicken,
+  //    Drive (the action on the right, bold, short), Character AI and
+  //    Linktree (the tick that says done before the words do).
+  messenger
     ..clearSnackBars()
     ..showSnackBar(
       SnackBar(
-        content: Text(
-          text,
-          style: pvManrope(fontSize: 13.5, height: 1.35, color: p.ink1),
-        ),
+        persist: false,
         behavior: SnackBarBehavior.floating,
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
-          side: BorderSide(color: p.ink1.withValues(alpha: 0.18)),
-        ),
-        margin: EdgeInsets.fromLTRB(16, 0, 16, kPvStickyBarClearance + inset),
-        duration: Duration(seconds: action == null ? 2 : 3),
-        action: action == null
-            ? null
-            : SnackBarAction(
-                label: action,
-                textColor: p.action,
-                onPressed: onAction ?? () {},
+        padding: EdgeInsets.zero,
+        margin: EdgeInsets.fromLTRB(16, 0, 16, (lift ?? kPvStickyBarClearance) + inset),
+        duration: Duration(milliseconds: action == null ? 2200 : 3600),
+        content: Container(
+          padding: EdgeInsets.fromLTRB(icon == null ? 16 : 12, 10, action == null ? 16 : 8, 10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18),
+            boxShadow: [
+              BoxShadow(color: p.ink1.withValues(alpha: 0.10), blurRadius: 24, offset: const Offset(0, 8)),
+              BoxShadow(color: p.ink1.withValues(alpha: 0.06), blurRadius: 3, offset: const Offset(0, 1)),
+            ],
+          ),
+          child: Row(children: [
+            if (icon != null) ...[
+              Container(
+                width: 30,
+                height: 30,
+                decoration: BoxDecoration(color: const Color(0xFFE3F2E6), shape: BoxShape.circle),
+                child: Icon(icon, size: 17, color: const Color(0xFF2E7D4F)),
               ),
+              const SizedBox(width: 10),
+            ],
+            Expanded(
+              child: Text(text,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w700, height: 1.3, color: p.ink1)),
+            ),
+            if (action != null) ...[
+              const SizedBox(width: 10),
+              Material(
+                color: p.ink1,
+                shape: const StadiumBorder(),
+                child: InkWell(
+                  customBorder: const StadiumBorder(),
+                  onTap: () {
+                    messenger.hideCurrentSnackBar();
+                    (onAction ?? () {})();
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(14, 8, 10, 8),
+                    child: Row(mainAxisSize: MainAxisSize.min, children: [
+                      Text(action,
+                          style: pvManrope(fontSize: 12.5, fontWeight: FontWeight.w800, color: Colors.white)),
+                      const SizedBox(width: 3),
+                      const Icon(Icons.arrow_forward_rounded, size: 15, color: Colors.white),
+                    ]),
+                  ),
+                ),
+              ),
+            ],
+          ]),
+        ),
       ),
     );
+  // Kept for revert — the white card with a hairline and a text action:
+  //   SnackBar(content: Text(text, style: pvManrope(fontSize: 13.5, ...)),
+  //     backgroundColor: Colors.white, shape: RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.circular(14), side: BorderSide(color: p.ink1 18%)),
+  //     action: SnackBarAction(label: action, textColor: p.action, ...))
 }
 
 /// Where a notice floats from: above the sticky commit bar (52 pill + 12 +

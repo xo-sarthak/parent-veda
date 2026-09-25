@@ -56,7 +56,7 @@ import '../../services/pv_door_strip_store.dart';
 import '../../services/scans_store.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
-import '../../data/reads/read_images.dart';
+// import '../../data/reads/read_images.dart'; // kept for revert — rows asked the table directly; `pvDoorTilePhoto` asks now
 import '../v2/v2_palette.dart';
 import '../v2/v3_bracket_art.dart';
 import '../v2/v3_hero_field.dart';
@@ -72,6 +72,7 @@ import '../tools/ask_veda_screen.dart';
 import '../../services/pv_search_store.dart';
 import '../../widgets/global_ask_fab.dart' show kAskVedaRoute;
 import 'pv_live_search.dart';
+import '../../services/bracket_resolver.dart' show bracketById;
 // import '../../widgets/pv_search_bar.dart'; // the bar that pushed a screen — kept for revert (2026-09-20)
 
 /// Doors that use the chip row instead of the deck — the §2.8 comparison.
@@ -97,6 +98,9 @@ const Set<String> kPvDoorRailDoors = {
   'pregnancy_complications',
   'pregnancy_nutrition',
   'pregnancy_symptoms',
+  // 2026-09-23 — the user: "make it consistent as the structural situation
+  // as well, like the way we have our other doors like scans and tests."
+  'pregnancy_garbh',
 };
 
 /// Inline tools that lay out their own gutter (their rails run edge to
@@ -138,6 +142,43 @@ const Key kPvDoorSearchKey = ValueKey('pv-door-search');
 
 const double kPvDoorHeroOverlap =
     38; // the rail lifts by PvDoorRail.overlap (70); see _Hero's `bottom`
+
+/// The door for a bracket as a screen, or null when the bracket has no door.
+///
+/// ⚠️ FOR CALLERS OUTSIDE THE HOME (2026-09-23). The home opens doors through
+/// `_openBracket`; everything else — a surface id, the Tools hub, global
+/// search — used to construct the screen it knew about, and for Symptoms that
+/// was the retired 12-symptom companion. The Symptoms door was reachable from
+/// its home tile and from nowhere else: correct code, unwired, the failure
+/// this repo keeps having (CLAUDE.md, wiring gate). One opener, so the next
+/// door does not have to be found at five call sites.
+Widget? pvDoorScreenForBracket(String bracketId, PregnancyController c, {String? initialGroup}) {
+  final page = pvDoorPageFor(bracketId);
+  final bracket = bracketById(bracketId);
+  if (page == null || bracket == null) return null;
+  return PvDoorScreen(page: page, bracket: bracket, pregnancy: c, initialGroup: initialGroup);
+}
+
+/// A door's tab switch, offered to whatever renders inside it.
+///
+/// ⚠️ SO A COMPONENT DOES NOT NEED TO KNOW WHERE IT LIVES (2026-09-23). Garbh
+/// Sanskar's Today's practice renders on the pregnancy home AND on the door's
+/// Today tab. A pillar tap inside the door should switch tabs (a push would
+/// stack a second copy of the door); the same tap on the home should open the
+/// door at that tab. The component asks `PvDoorTabSwitch.maybeOf(context)`:
+/// present, it is inside a door; absent, it is not.
+class PvDoorTabSwitch extends InheritedWidget {
+  const PvDoorTabSwitch({super.key, required this.goTo, required super.child});
+
+  /// Switch this door to the group [id]. A no-op for an id the door lacks.
+  final void Function(String id) goTo;
+
+  static PvDoorTabSwitch? maybeOf(BuildContext context) =>
+      context.dependOnInheritedWidgetOfExactType<PvDoorTabSwitch>();
+
+  @override
+  bool updateShouldNotify(PvDoorTabSwitch oldWidget) => false;
+}
 
 class PvDoorScreen extends StatefulWidget {
   const PvDoorScreen({
@@ -219,7 +260,13 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
       openPvDoorTile(context, tile, widget.pregnancy);
       return;
     }
-    final i = page.groups.indexWhere((g) => g.id == target);
+    _goToGroup(target);
+  }
+
+  /// Switch to the group [id] and bring the selector into view. Shared by the
+  /// launcher tiles and by `PvDoorTabSwitch`, so both switch the same way.
+  void _goToGroup(String id) {
+    final i = page.groups.indexWhere((g) => g.id == id);
     if (i < 0) return; // held by the door's own test, never seen by a user
     setState(() => _group = i);
     // ⚠️ AND BRING THE SELECTOR INTO VIEW. Found on the phone, 2026-09-12:
@@ -297,6 +344,8 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
 
         return PvLiveSearchScope(
           search: _search,
+          child: PvDoorTabSwitch(
+          goTo: _goToGroup,
           child: Scaffold(
             backgroundColor: p.ground,
             body: Stack(
@@ -728,8 +777,9 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                               // tiles is rows — photo or format well, bold title,
                               // one line, chevron — and anything mixed keeps the
                               // rail. One layout rule, no per-door flag.
-                              else if (tiles.isNotEmpty &&
-                                  tiles.every(pvDoorTileIsWritten))
+                              // Written, or all tracks — see `pvDoorSectionIsRows`.
+                              // Was `tiles.every(pvDoorTileIsWritten)`.
+                              else if (pvDoorSectionIsRows(tiles))
                                 AnimatedSize(
                                   duration: const Duration(milliseconds: 220),
                                   curve: Curves.easeOutCubic,
@@ -812,6 +862,7 @@ class _PvDoorScreenState extends State<PvDoorScreen> {
                 ),
               ],
             ),
+          ),
           ),
         );
       },
@@ -1297,6 +1348,9 @@ class _RailCard extends StatelessWidget {
     index: index,
     icon: pvDoorFormatIcon(tile.format),
     mark: pvDoorTileMark(tile) ?? pvDoorFormatMark(tile.format),
+    // A coming-soon card keeps its mark: a photo would promise what is not
+    // there yet.
+    imageUrl: tile.comingSoon ? null : pvDoorTilePhoto(tile),
     chip: tile.comingSoon ? 'Coming soon' : tile.format.label,
     title: tile.title,
     meta: tile.meta,
@@ -1625,10 +1679,14 @@ class _ArticleList extends StatelessWidget {
                         child: SizedBox(
                           width: 56,
                           height: 56,
-                          child: switch (pvDoorTileReadImageId(t)) {
-                            final id? when readImageFor(id) != null =>
+                          // The tile's photo from wherever its library keeps
+                          // it — see `pvDoorTilePhoto`. Was
+                          // `readImageFor(pvDoorTileReadImageId(t))`, which
+                          // knew only the table.
+                          child: switch (pvDoorTilePhoto(t)) {
+                            final url? =>
                               Image.network(
-                                readImageFor(id)!,
+                                url,
                                 fit: BoxFit.cover,
                                 errorBuilder: (_, _, _) => _well(well, t),
                                 loadingBuilder: (context, child, progress) =>
@@ -1680,10 +1738,13 @@ class _ArticleList extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(width: 8),
+                      // A track says it plays (Oura's rows); a read, that it opens.
                       if (!t.comingSoon)
                         Icon(
-                          Icons.chevron_right_rounded,
-                          size: 20,
+                          t.format == PvDoorFormat.audio
+                              ? Icons.play_circle_outline_rounded
+                              : Icons.chevron_right_rounded,
+                          size: t.format == PvDoorFormat.audio ? 24 : 20,
                           color: p.ink3,
                         ),
                     ],

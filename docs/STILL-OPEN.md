@@ -9465,3 +9465,113 @@ rework (e9d8ac8) both hold on the phone. What the walk found, all fixed:
 were removed from his real log. The evening reminder was found ON and left
 alone — nobody knows who switched it on.
 
+
+---
+
+## 76.0 Garbh Sanskar — one "today", and the same shape as Scans — 2026-09-23, built and walked
+
+The user: *"The home section is for like what you can do today. The door is
+basically like this is the whole library for you."* And, mid-build: *"make it
+consistent as the structural situation as well, like the way we have our
+other doors like scans and tests."*
+
+**Done:**
+
+- **One drawing of today's practice.** `GarbhTodayPractice`
+  (`lib/screens/garbh/garbh_today_practice.dart`) renders on the pregnancy
+  home AND as the door's Today tab. Before: the home drew today's real picks
+  and opened the OLD standalone pillar screens; the door drew four generic
+  cards whose text never changed. Two copies drift; one cannot.
+  `test/garbh_symmetry_test.dart` holds both call sites.
+- **A pillar tap opens the door at its tab** — from the home a push, inside
+  the door a tab switch (`PvDoorTabSwitch`, an InheritedWidget the door
+  offers, so the component never needs to know where it lives).
+- **"About" on the home opens the door.** It opened the old `GarbhScreen`
+  library — with the streak card the brief forbids — under a comment saying
+  it opened the door.
+- **Pillar photographs mirrored and credited** (`garbh_pillar_*`): Shravan
+  and Samvad kept from Unsplash (were hotlinked, no licence line); Buddhi and
+  Kriya replaced by eye — puzzle pieces (CC0) and a lit diya (CC BY-SA 4.0).
+- **Today's ticks travel with her account** (`GarbhStore.cloudData` now
+  carries `done` + `doneDate`). Still no streak anywhere on the component.
+- **Structure = the finished doors.** On the card rail across the hero
+  (`kPvDoorRailDoors`), a drawn mark on every tab (sun, headphones, page,
+  lotus, book), Today is the TAB'S TOOL like Symptoms' check-in and
+  Nutrition's plate, and a section of only tracks now draws as ROWS with
+  the minutes and a play mark — Oura's Sleep list on Mobbin, and the row
+  Scans already uses for reads (`pvDoorSectionIsRows`). Test: every tab on
+  Scans, Symptoms, Nutrition, Complications and Garbh wears a mark.
+
+**Owed:**
+
+- **§76.1 Pictures for 27 tiles.** Every Garbh tile now has a picture key —
+  its surface id with `/` as `_` (`garbh_listen_rain`,
+  `garbh_play_sudoku`…; `pvDoorGarbhPhotoKey`). Absent a picture, the tile
+  draws its format mark, as before. ChatGPT prompts handed to the user
+  2026-09-23; when the PNGs land: resize, mirror to R2, add to
+  `kReadImageUrls`/credits.
+- **§76.2 No Talk tab — decided, not forgotten.** The four clinical doors
+  end on Talk (flag, then people). Garbh has no expert to book — none in the
+  booking data — and the brief puts the STOP IF flag on For you, beside the
+  breath practices it is about. A Talk tab with only a generic doctor card
+  would be a tab for symmetry's sake. Revisit if a Garbh teacher joins.
+- **§76.3 "Today's pick" on Listen and Talk and read is still generic** —
+  "Today's raga", "Today's passage to read aloud" — while Today names
+  "Baby Bonding Raga". Correct destinations, wrong words; wants the pick's
+  own title (a dynamic tile, or an inline section).
+- **§76.4 `GarbhJournalStore` is phone-only** (entries, rituals, japa,
+  recordings). Text parts can sync through `CloudSyncedStore`; the voice
+  recordings need a private storage bucket — the user's call.
+
+---
+
+## 77.0 My Journal — redrawn to be opened, and synced to every phone — 2026-09-23
+
+The user: *"I was never the fan of the designs that we have for the journal"*,
+then, on the first clean redraw: *"not something she would be like, let's
+open it… it should be beautiful."* And: *"the whole record is maintained not
+locally but wherever she logs in, on whichever device."*
+
+**Built** (`lib/screens/journal/pv_journal_screen.dart`; the old screen is
+`JournalScreenClassic`, still the book views; `JournalScreen` is exported
+under the old name, so every caller opens the new one):
+
+- **A cover** — her newest photo (a memory's or a bump photo), else a painting
+  per trimester, with "Dear little one," over it; parallax as it scrolls.
+- **Forty weeks** — 40 dots filling on open: ink where she kept something,
+  a ring on this week, "26 weeks until you meet". Not a streak: no gaps
+  counted, no total but the weeks until the birth.
+- **This week's question** — `lib/data/journal_prompts.dart`, 30 questions a
+  grown child would want answered, banded by week; Write it opens the compose
+  screen with the question as the entry's name; Say it records; another
+  question turns in.
+- **Weeks as pages** — a week with a photo is a photo card (stoic.'s
+  Journey); rows otherwise (5 Minute Journal's date block, a serif, the big
+  photo); a photo flies into the entry page (Hero); weeks rise in turn.
+- **An entry opens to be read** — photo pager, date, title, words, voice
+  notes, place; Edit and Delete on the page (was tap = edit, long-press =
+  delete, no way to just read).
+- **One way to write a memory** — the home's "Add a memory" opened a
+  text-only sheet; it now opens the journal's compose screen.
+- **Paper ground** (`kJournalPaper`, #FAF7F2) — the one page that is not
+  white, on purpose; one constant to revert.
+
+**Sync fixed, both journals** (`lib/services/journal_sync.dart`, BACKEND-
+PATTERNS §16l): place now reaches the cloud (migration **0091 — the user must
+run it**; the app tolerates it not being run yet); newer-wins merge instead of
+cloud-wins; tombstones so an offline delete is not resurrected; a seen-ids set
+so a delete on one phone is not undone by another. The father's store also
+now removes his uploaded photos when an entry is deleted.
+
+**Owed:**
+
+- **§77.1 Paintings** for the cover (`journal_cover_t1..3`, only when she has
+  no photo) and the question card (`journal_question_t1..3`) — ChatGPT
+  prompts handed over 2026-09-23. The drawn sky stands in until then.
+- **§77.2 The book views** ("Read it as a book", "With your partner's
+  entries") are still the old screen's purple booklet. Next pass.
+- **§77.3 The compose screen** is base UI but plain; it could take the
+  journal's paper and serif.
+- **§77.4 First sync after upgrading** has no seen-ids yet, so an entry
+  deleted on another phone BEFORE this build can come back once. Cannot be
+  told apart from a new one without that history.

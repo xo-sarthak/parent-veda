@@ -74,6 +74,11 @@ class GarbhStore extends ChangeNotifier with CloudSyncedStore {
         'favs': _favs.toList(),
         'streak': _streak,
         'streakDate': _streakDate,
+        // Today's ticks (2026-09-23, the persistence audit): a practice ticked
+        // on one phone shows ticked on the other the same day. Only favourites
+        // and the streak travelled before.
+        'done': _doneToday.toList(),
+        'doneDate': _doneDate,
       };
   @override
   void applyCloudData(Object data) {
@@ -83,6 +88,13 @@ class GarbhStore extends ChangeNotifier with CloudSyncedStore {
       ..addAll(((m['favs'] as List?) ?? const []).map((e) => e.toString()));
     _streak = (m['streak'] as num?)?.toInt() ?? _streak;
     _streakDate = (m['streakDate'] ?? _streakDate).toString();
+    final dd = m['doneDate']?.toString();
+    if (dd != null && dd.isNotEmpty) {
+      _doneDate = dd;
+      _doneToday
+        ..clear()
+        ..addAll(((m['done'] as List?) ?? const []).map((e) => e.toString()));
+    }
   }
 
   @override

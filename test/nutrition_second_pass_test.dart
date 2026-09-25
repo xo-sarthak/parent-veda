@@ -136,6 +136,39 @@ void main() {
       expect(find.byType(NutritionPreferenceRow), findsOneWidget);
     });
 
+    testWidgets('the list button tells the truth: none, some, all', (tester) async {
+      // The phone, 2026-09-23: adding the rice alone flipped the button to
+      // "On your list", and tapping it then removed the whole recipe.
+      final r = kRecipes.first;
+      final store = NutritionDayStore.instance;
+      store.removeRecipeFromList(r.id);
+      tester.view.physicalSize = const Size(400, 3000);
+      tester.view.devicePixelRatio = 1;
+      addTearDown(tester.view.reset);
+      await tester.pumpWidget(MaterialApp(home: RecipeCookScreen(recipe: r, pregnancy: c)));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.text('Add everything to my list'), findsOneWidget);
+
+      // Some: one ingredient added by hand.
+      store.toggleItem(r.id, r.ingredients.first.name.en);
+      await tester.pump(const Duration(milliseconds: 300));
+      final rest = r.ingredients.length - 1;
+      expect(find.text('Add the other $rest to my list'), findsOneWidget);
+      expect(find.text('All on your list'), findsNothing, reason: 'part of a recipe is not all of it');
+
+      // Tapping "the other n" ADDS — it never takes away what she chose.
+      await tester.tap(find.text('Add the other $rest to my list'));
+      await tester.pump(const Duration(milliseconds: 300));
+      expect(find.text('All on your list'), findsOneWidget);
+      for (final i in r.ingredients) {
+        expect(store.itemOnList(r.id, i.name.en), isTrue);
+      }
+
+      // The facts line reads the recipe's own time.
+      expect(find.textContaining('${r.minutes} min'), findsWidgets);
+      store.removeRecipeFromList(r.id);
+    });
+
     testWidgets('the recipe page: recipe first, the numbers once above, in full below', (tester) async {
       final r = kRecipes.firstWhere((r) => r.fact != null);
       await tester.pumpWidget(MaterialApp(home: RecipeCookScreen(recipe: r, pregnancy: c)));

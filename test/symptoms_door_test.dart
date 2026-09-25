@@ -16,7 +16,11 @@
 //      resolves
 // =============================================================================
 
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:parentveda/localization/app_language.dart';
+import 'package:parentveda/screens/doors/pv_door_screen.dart';
+import 'package:parentveda/services/surface_router.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:parentveda/data/doors/pv_door_data.dart';
 import 'package:parentveda/data/doors/pv_door_symptoms.dart';
@@ -300,6 +304,37 @@ void main() {
         await tester.pump();
         expect(tester.takeException(), isNull, reason: 'a mark threw at $size');
       }
+    });
+
+    test('every way in reaches the door, not the retired companion', () {
+      // The release notes (7db1328) found "Log a symptom" on the home still
+      // opening the old 12-symptom companion, and the "You logged" tap
+      // searched the old 12 — so a card for any of the 21 new symptoms drew
+      // and did nothing. Correct door, unwired: this holds the wiring.
+      final c = PregnancyController(dueDate: DateTime.now().add(const Duration(days: 140)));
+      expect(screenForSurface('symptoms', c, AppLanguage.english), isA<PvDoorScreen>());
+      expect(pvDoorScreenForBracket(kSymptomsBracketId, c), isA<PvDoorScreen>());
+      // Nothing outside the companion's own file may construct it except as a
+      // guarded fallback (`?? SymptomCompanionScreen`) or in a revert comment.
+      for (final f in [
+        'lib/screens/home_v3_screen.dart',
+        'lib/screens/tools_hub_screen.dart',
+        'lib/screens/global_search.dart',
+        'lib/services/surface_router.dart',
+      ]) {
+        final lines = File(f).readAsLinesSync();
+        for (var i = 0; i < lines.length; i++) {
+          final t = lines[i].trim();
+          if (t.startsWith('//') || !t.contains('SymptomCompanionScreen(')) continue;
+          // The `??` may end the line before, once the formatter wraps it.
+          final prev = i > 0 ? lines[i - 1].trim() : '';
+          expect(t.contains('?? SymptomCompanionScreen(') || prev.endsWith('??') || t.startsWith('null =>'), isTrue,
+              reason: '$f still opens the companion directly: $t');
+        }
+      }
+      // The home's "You logged" tap looks the symptom up in the whole library.
+      final home = File('lib/screens/home_v3_screen.dart').readAsStringSync();
+      expect(home.contains('symptomById(c.symptomId'), isTrue);
     });
 
     test('a symptom read shows what helps, credited, or falls back to its mark', () {

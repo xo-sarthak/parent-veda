@@ -352,6 +352,9 @@ class _FoodRecipeScreenState extends State<FoodRecipeScreen> {
         onTap: () {
           FoodStore.instance.addRecipeToShopping(r);
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          // Flutter 3.44 keeps a snackbar with an action on screen until it is
+          // dismissed (`persist` defaults to true when there is an action).
+          persist: false,
             content: const Text('Ingredients added to your shopping list'),
             behavior: SnackBarBehavior.floating,
             action: SnackBarAction(label: 'View', onPressed: () => _push(const FoodShoppingScreen())),

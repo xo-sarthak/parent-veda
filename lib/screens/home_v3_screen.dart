@@ -70,9 +70,9 @@ import 'preg_week_screen.dart';
 import 'v2/pv_insight_rail.dart';
 import '../services/symptom_store.dart';
 import '../services/nutrition_day_store.dart';
-import 'tools/symptom_companion_screen.dart' show SymptomCompanionScreen, openSymptomDetail;
+// import 'tools/symptom_companion_screen.dart' show SymptomCompanionScreen, openSymptomDetail; // kept for revert — the companion the log card used to open
 import 'can_i/can_i_answer.dart' show openCanIAnswer;
-import '../data/symptom_data.dart' show kSymptoms;
+// import '../data/symptom_data.dart' show kSymptoms; // kept for revert — the old 12, which the tap used to search
 import 'profile/pv_you_screen.dart';
 import 'saved_screen.dart';
 // import 'search/pv_search_screen.dart'; // the home bar, kept for revert
@@ -90,9 +90,11 @@ import 'v2/v2_palette.dart';
 import 'v2/v2_sections.dart';
 import '../data/garbh_data.dart';
 import '../services/garbh_store.dart';
-import 'garbh_screen.dart' show GarbhScreen, ShravanScreen, SamvadScreen, KriyaScreen, gameForPuzzle;
+// GarbhScreen dropped from the show list 2026-09-23: "About" opens the door.
+import 'garbh_screen.dart' show ShravanScreen, SamvadScreen, KriyaScreen, gameForPuzzle;
 import 'garbh_buddhi_screen.dart';
-import '../models/journal_entry.dart';
+// journal_entry.dart no longer needed here since Add a memory opens the compose screen (2026-09-23).
+// import '../models/journal_entry.dart';
 import '../services/medicine_store.dart';
 import '../services/reminder_store.dart';
 import '../widgets/journal/journal_create.dart';
@@ -120,6 +122,10 @@ import 'v2/v3_film_screen.dart';
 import 'v2/v3_garbh.dart';
 import 'v2/v3_sections.dart';
 import 'v2/v3_week_film.dart';
+import '../data/doors/pv_door_symptoms.dart' show kSymptomsBracketId;
+import 'symptoms/door/symptoms_today_body.dart' show openSymptomRead;
+import 'journal_compose_screen.dart' show openJournalCompose;
+import 'garbh/garbh_today_practice.dart' show GarbhTodayPractice, openGarbhDoor;
 
 class HomeV3Screen extends StatefulWidget {
   const HomeV3Screen({super.key, required this.pregnancy, required this.home});
@@ -849,12 +855,21 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                   return V3GarbhBlock(
                     day: day,
                     p: p,
-                    rows: rows,
-                    // Was `_open(context, 'garbh_daily')` — classic fallback;
-                    // kept for revert. Now the Garbh Sanskar door itself:
-                    onAbout: () => Navigator.of(context).push(MaterialPageRoute<void>(
-                        settings: const RouteSettings(name: 'garbh'),
-                        builder: (_) => GarbhScreen(controller: pregnancy))),
+                    rows: rows, // the previous drawing, kept for revert
+                    // ⚠️ THE ONE DRAWING OF TODAY'S PRACTICE (2026-09-23) —
+                    // the same component the door's Today tab renders, so
+                    // the home and the door cannot drift again. Each pillar
+                    // opens the DOOR at its tab (the brief); the rows above
+                    // opened the old standalone screens.
+                    body: GarbhTodayPractice(pregnancy: pregnancy, day: cd, week: week),
+                    // ⚠️ THE DOOR, NOT THE OLD LIBRARY. This used to say "Now
+                    // the Garbh Sanskar door itself" and then push
+                    // `GarbhScreen` — the pre-brief library, with the streak
+                    // card the brief forbids. Kept for revert:
+                    //   onAbout: () => Navigator.of(context).push(MaterialPageRoute<void>(
+                    //       settings: const RouteSettings(name: 'garbh'),
+                    //       builder: (_) => GarbhScreen(controller: pregnancy))),
+                    onAbout: () => openGarbhDoor(context, pregnancy),
                   );
                 },
               ),
@@ -954,8 +969,14 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
                     mark: V3DailyMark.memory,
                     hue: 42,
                     label: 'Add a\nmemory',
-                    onTap: () => openJournalText(
-                        context, pregnancy, JournalEntryType.memory)),
+                    // ⚠️ ONE WAY TO WRITE A MEMORY (2026-09-23). This opened
+                    // the small text-only sheet; the journal's own "Add a
+                    // memory" opened the full compose screen — photos, place,
+                    // words. Same action, two screens, and the one on the home
+                    // could not take the photo the tile's icon promised. Was:
+                    //   onTap: () => openJournalText(
+                    //       context, pregnancy, JournalEntryType.memory)),
+                    onTap: () => openJournalCompose(context, pregnancy)),
                 V3QuickAction(
                     icon: Icons.mic_none_rounded,
                     mark: V3DailyMark.voice,
@@ -1583,15 +1604,27 @@ class _HomeV3ScreenState extends State<HomeV3Screen>
   void _openInsight(
       BuildContext context, PregInsight c, int week, WeekContent? content) {
     switch (c.go) {
+      // ⚠️ THE SYMPTOMS DOOR, NOT THE OLD COMPANION (2026-09-23). Both cards
+      // opened the retired 12-symptom companion after the door shipped, and
+      // the second was worse than stale: its lookup searched the old 12, so
+      // for any of the 21 new symptoms the card drew and the tap did nothing.
+      // The old lines are kept below for revert.
       case PregInsightGo.log:
-        Navigator.of(context).push(MaterialPageRoute<void>(
-          settings: const RouteSettings(name: 'symptoms'),
-          builder: (_) => SymptomCompanionScreen(controller: pregnancy),
-        ));
+        _openBracket(context, kSymptomsBracketId); // opens on Today, the check-in
       case PregInsightGo.symptom:
-        final s = kSymptoms.where((x) => x.id == c.symptomId).firstOrNull;
+        final s = symptomById(c.symptomId ?? '');
         if (s == null) return; // the card is only built for a known id
-        openSymptomDetail(context, s, pregnancy);
+        openSymptomRead(context, s, pregnancy);
+      // Kept for revert:
+      // case PregInsightGo.log:
+      //   Navigator.of(context).push(MaterialPageRoute<void>(
+      //     settings: const RouteSettings(name: 'symptoms'),
+      //     builder: (_) => SymptomCompanionScreen(controller: pregnancy),
+      //   ));
+      // case PregInsightGo.symptom:
+      //   final s = kSymptoms.where((x) => x.id == c.symptomId).firstOrNull;
+      //   if (s == null) return;
+      //   openSymptomDetail(context, s, pregnancy);
       case PregInsightGo.scan:
         _openBracket(context, 'pregnancy_scans_tests');
       case PregInsightGo.week:

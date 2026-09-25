@@ -360,12 +360,19 @@ class V3GarbhBlock extends StatelessWidget {
     required this.p,
     required this.rows,
     this.onAbout,
+    this.body,
   });
 
   final HomeDay day;
   final V2Palette p;
   final List<GarbhPillarRow> rows;
   final VoidCallback? onAbout;
+
+  /// The card, when given — `GarbhTodayPractice`, the one drawing of today's
+  /// practice shared with the door's Today tab (2026-09-23). It brings its own
+  /// frame. [rows] and the card below are the previous drawing, kept for
+  /// revert.
+  final Widget? body;
 
   /// The photograph's height, and how far the card climbs onto it.
   static const double _band = 172;
@@ -384,6 +391,12 @@ class V3GarbhBlock extends StatelessWidget {
         height: _band,
         child: _Band(p: p, onAbout: onAbout),
       ),
+      if (body != null)
+        Padding(
+          padding: const EdgeInsets.fromLTRB(18, _band - _overlap, 18, 0),
+          child: body,
+        )
+      else
       Padding(
         padding: const EdgeInsets.fromLTRB(18, _band - _overlap, 18, 0),
         child: Container(

@@ -28,6 +28,8 @@ import '../../../widgets/pv_feedback.dart';
 import '../../can_i/can_i_widgets.dart' show CanIPhoto;
 import '../../v2/v2_palette.dart';
 import 'nutrition_widgets.dart';
+import 'shopping_list_screen.dart';
+import '../../products/pv_store_chrome.dart' show pvSnack;
 
 const String kRecipeRoute = 'nutrition/recipe';
 
@@ -68,7 +70,18 @@ class _RecipeCookScreenState extends State<RecipeCookScreen> {
       animation: Listenable.merge([V2PaletteStore.instance, NutritionDayStore.instance]),
       builder: (context, _) {
         final p = V2PaletteStore.instance.current;
-        final onList = NutritionDayStore.instance.onList(r.id);
+        // ⚠️ ALL, SOME OR NONE — NOT "ANY" (the phone, 2026-09-23). `onList`
+        // is true when ANY ingredient is on the list, so adding the rice alone
+        // flipped this button to "✓ On your list" — and tapping it then
+        // removed the WHOLE recipe. Now: none → add everything; some → add the
+        // rest (never removes what she chose); all → on your list, and only
+        // then does a tap take the recipe off.
+        final store = NutritionDayStore.instance;
+        final names = [for (final i in r.ingredients) i.name.en];
+        final missing = names.where((n) => !store.itemOnList(r.id, n)).length;
+        final allOn = missing == 0;
+        final someOn = !allOn && missing < names.length;
+        // final onList = NutritionDayStore.instance.onList(r.id); // kept for revert — "any", which lied about part of a recipe
         return Scaffold(
           backgroundColor: p.ground,
           body: CustomScrollView(slivers: [
@@ -151,13 +164,27 @@ class _RecipeCookScreenState extends State<RecipeCookScreen> {
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Row(children: [
-                    Expanded(child: nutritionHeading(p, 'Ingredients')),
-                    _stepper(p),
-                  ]),
-                  const SizedBox(height: 4),
-                  Text('For $_servings ${_servings == 1 ? 'serving' : 'servings'}', style: pvManrope(fontSize: 12.5, color: p.ink3)),
+                  // ⚠️ THE SERVINGS CONTROL IS ITS OWN LABELLED ROW (the user,
+                  // 2026-09-23). It sat beside the "Ingredients" heading as a
+                  // bare "− 2 +", with "For 2 servings" on a separate line
+                  // under it: the number did not say what it counted, so it
+                  // read as editing the ingredients, and the control was
+                  // larger than the heading it sat next to. Now the row says
+                  // what it is ("Amounts for"), the unit lives INSIDE the
+                  // control ("2 servings"), and the separate line is gone —
+                  // one statement, not two. Kept for revert:
+                  //   Row(children: [Expanded(child: nutritionHeading(p, 'Ingredients')), _stepper(p)]),
+                  //   Text('For $_servings servings', ...),
+                  nutritionHeading(p, 'Ingredients'),
                   const SizedBox(height: 10),
+                  Row(children: [
+                    Expanded(
+                      child: Text('Amounts for',
+                          style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w600, color: p.ink2)),
+                    ),
+                    _servingsControl(p),
+                  ]),
+                  const SizedBox(height: 6),
                   for (var i = 0; i < r.ingredients.length; i++)
                     Container(
                       padding: const EdgeInsets.symmetric(vertical: 10),
@@ -189,16 +216,44 @@ class _RecipeCookScreenState extends State<RecipeCookScreen> {
                   OutlinedButton.icon(
                     onPressed: () {
                       pvCommitFeedback();
-                      if (onList) {
+                      if (allOn) {
                         NutritionDayStore.instance.removeRecipeFromList(r.id);
+                        pvSnack(context, 'Taken off your list', lift: kRecipeSnackLift);
                       } else {
                         NutritionDayStore.instance.addToList(r.id, r.ingredients.map((i) => i.name.en));
+                        // ⚠️ SAY WHERE IT WENT, AND OFFER THE WAY THERE (the
+                        // user, 2026-09-23: "where is that list? I don't see
+                        // a pop up… at least show a go-to-your-list sort of
+                        // pop up"). The list lives under Nutrition › Today,
+                        // two screens away; an add with no confirmation and
+                        // no route to its result is a dead end.
+                        pvSnack(context, '$missing ingredients added to your list',
+                            action: 'View list', onAction: () => openShoppingList(context),
+                            lift: kRecipeSnackLift, icon: Icons.check_rounded);
                       }
                     },
-                    icon: Icon(onList ? Icons.check_rounded : Icons.add_shopping_cart_outlined, size: 18),
-                    label: Text(onList ? 'On your list' : 'Add everything to my list'),
+                    icon: Icon(allOn ? Icons.check_rounded : Icons.add_shopping_cart_outlined, size: 18),
+                    label: Text(allOn
+                        ? 'All on your list'
+                        : someOn
+                            ? 'Add the other $missing to my list'
+                            : 'Add everything to my list'),
                     style: OutlinedButton.styleFrom(minimumSize: const Size.fromHeight(48)),
                   ),
+                  // The list, one tap away, for as long as anything is on it —
+                  // the confirmation disappears after three seconds; this does
+                  // not.
+                  if (NutritionDayStore.instance.shopping.isNotEmpty) ...[
+                    const SizedBox(height: 6),
+                    Center(
+                      child: TextButton.icon(
+                        onPressed: () => openShoppingList(context),
+                        icon: const Icon(Icons.receipt_long_outlined, size: 17),
+                        label: Text(
+                            'See your list · ${NutritionDayStore.instance.shopping.where((x) => !x.done).length} to buy'),
+                      ),
+                    ),
+                  ],
                 ]),
               ),
               const SizedBox(height: 24),
@@ -272,6 +327,47 @@ class _RecipeCookScreenState extends State<RecipeCookScreen> {
     );
   }
 
+  /// "− 2 servings +", compact. The number carries its unit, so it cannot be
+  /// read as anything else; the buttons are 32pt, not the 48pt IconButtons
+  /// that made the old stepper the loudest thing in the section.
+  Widget _servingsControl(V2Palette p) {
+    Widget step(IconData icon, bool enabled, VoidCallback onTap, String label) => Semantics(
+          button: true,
+          label: label,
+          child: InkWell(
+            onTap: enabled
+                ? () {
+                    pvCommitFeedback();
+                    onTap();
+                  }
+                : null,
+            customBorder: const CircleBorder(),
+            child: SizedBox(
+              width: 32,
+              height: 32,
+              child: Icon(icon, size: 16, color: enabled ? p.ink1 : p.ink3.withValues(alpha: 0.4)),
+            ),
+          ),
+        );
+    return Container(
+      height: 36,
+      padding: const EdgeInsets.symmetric(horizontal: 2),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(999), border: Border.all(color: p.line)),
+      child: Row(mainAxisSize: MainAxisSize.min, children: [
+        step(Icons.remove_rounded, _servings > 1, () => setState(() => _servings--), 'Fewer servings'),
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 160),
+          child: Text('$_servings ${_servings == 1 ? 'serving' : 'servings'}',
+              key: ValueKey(_servings),
+              style: pvManrope(fontSize: 13.5, fontWeight: FontWeight.w800, color: p.ink1)),
+        ),
+        step(Icons.add_rounded, _servings < 8, () => setState(() => _servings++), 'More servings'),
+      ]),
+    );
+  }
+
+  // Kept for revert — the bare stepper that sat beside the heading.
+  // ignore: unused_element
   Widget _stepper(V2Palette p) => Container(
         decoration: BoxDecoration(borderRadius: BorderRadius.circular(999), border: Border.all(color: p.line)),
         child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -489,9 +585,14 @@ class _FactsLine extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final v = estimateRecipe(recipe);
-    final mins = recipe.steps.length * 6;
+    // ⚠️ `recipe.minutes`, NOT `steps.length * 6` (the phone, 2026-09-23).
+    // The line invented its time from the step count — "about 30 min" on a
+    // dish the card, reading the real field, called 35 — two numbers for one
+    // recipe, one of them made up. Kept for revert:
+    //   final mins = recipe.steps.length * 6;
+    final mins = recipe.minutes;
     final parts = [
-      'about $mins min',
+      '$mins min',
       'serves ${recipe.defaultServings}',
       if (v.kcal > 0) '≈ ${v.kcal.round()} kcal a serving',
     ];
@@ -520,6 +621,12 @@ class _AddOne extends StatelessWidget {
               onTap: () {
                 pvCommitFeedback();
                 NutritionDayStore.instance.toggleItem(recipeId, name);
+                final nowOn = NutritionDayStore.instance.itemOnList(recipeId, name);
+                pvSnack(context, nowOn ? '$name is on your list' : '$name is off your list',
+                    action: nowOn ? 'View list' : null,
+                    onAction: nowOn ? () => openShoppingList(context) : null,
+                    lift: kRecipeSnackLift,
+                    icon: nowOn ? Icons.check_rounded : Icons.remove_rounded);
               },
               borderRadius: BorderRadius.circular(999),
               child: AnimatedContainer(
@@ -583,3 +690,13 @@ String kitchenQty(double q, String unit) {
       return '$s $unit'.trim();
   }
 }
+
+/// The shopping list, from anywhere a recipe can add to it.
+void openShoppingList(BuildContext context) => Navigator.of(context).push(MaterialPageRoute<void>(
+      settings: const RouteSettings(name: 'nutrition/list'),
+      builder: (_) => const ShoppingListScreen(),
+    ));
+
+/// Where a confirmation floats on the recipe page: just above the Cook bar,
+/// clear of the ingredient rows.
+const double kRecipeSnackLift = 96;

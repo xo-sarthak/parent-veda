@@ -157,10 +157,15 @@ class PvReadStore extends ChangeNotifier {
     // something that is true within a few percent.
   }
 
-  Future<void> toggleSave(String id) {
+  /// [title] and [subtitle] are what the reader was SHOWING. Without them
+  /// the title came from the two libraries this store knows (TTC and the
+  /// written pregnancy reads), so a bookmark on any door-built read — a
+  /// symptom, a scan, a nutrient — was stored untitled and listed as "Saved
+  /// item" (the persistence audit, 2026-09-23).
+  Future<void> toggleSave(String id, {String? title, String? subtitle}) {
     final r = ttcReadById(id) ?? pregnancyReadById(id);
     return SavedStore.instance.toggle(SavedKind.article, id,
-        title: r?.title.en ?? '', subtitle: r?.kicker.en);
+        title: title ?? r?.title.en ?? '', subtitle: subtitle ?? r?.kicker.en);
   }
   // Kept for revert:
   // Future<void> toggleSave(String id) async {

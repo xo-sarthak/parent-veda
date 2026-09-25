@@ -13,12 +13,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:parentveda/screens/garbh/garbh_today_practice.dart' show garbhTodayItems;
 import 'package:parentveda/data/doors/pv_door_data.dart';
 import 'package:parentveda/data/doors/pv_door_garbh.dart';
 import 'package:parentveda/data/garbh_data.dart';
 import 'package:parentveda/data/garbh_rebuild_data.dart';
 import 'package:parentveda/data/read_to_baby_data.dart';
-import 'package:parentveda/screens/doors/pv_door_chrome.dart';
 import 'package:parentveda/screens/doors/pv_door_router.dart';
 import 'package:parentveda/screens/doors/pv_door_screen.dart';
 import 'package:parentveda/services/bracket_resolver.dart';
@@ -60,11 +60,14 @@ void main() {
       expect(door.groups.first.id, kGarbhTabToday);
     });
 
-    test('Today is a launcher: its four pillar cards open tabs, not screens',
-        () {
-      final today = door.sectionsOf(kGarbhTabToday).first;
-      expect(today.heading, "Today's practice");
-      expect(today.tiles.map(pvDoorTabTarget), [
+    test('Today is a launcher: its four pillars open tabs, not screens', () {
+      // 2026-09-23: the four cards became the home's own component, drawn
+      // inline (garbh_symmetry_test.dart holds the two equal). The targets
+      // are unchanged — Listen, Talk and read, For you, For you.
+      final today = door.groups.first;
+      expect(today.id, kGarbhTabToday);
+      expect(today.inlineSurfaceId, kGarbhSurfaceToday);
+      expect(garbhTodayItems(day: 140, week: 20).map((i) => i.tab), [
         kGarbhTabListen,
         kGarbhTabRead,
         kGarbhTabForYou,
@@ -81,7 +84,7 @@ void main() {
 
     test('Today does not repeat the libraries', () {
       // No track, no affirmation, no game by name on Today — those live on
-      // their own tabs. Today has three rails: the practice, her ritual, the
+      // their own tabs. Today is the practice (the tab's tool), then two rails: her ritual, the
       // journal shortcut.
       final titles = door
           .sectionsOf(kGarbhTabToday)
@@ -97,7 +100,7 @@ void main() {
       for (final p in kPuzzles) {
         expect(titles, isNot(contains(p.title.en)));
       }
-      expect(door.sectionsOf(kGarbhTabToday).length, 3);
+      expect(door.sectionsOf(kGarbhTabToday).length, 2); // the practice is the tab's tool
     });
 
     test('the week line is a function of her week, about what is forming',
@@ -266,8 +269,8 @@ void main() {
     testWidgets('a Today card switches tab instead of pushing',
         (tester) async {
       await pump(tester);
-      expect(find.text("Today's practice"), findsOneWidget);
-      final card = find.widgetWithText(PvDoorRailCard, "Shravan, today's raga");
+      expect(find.byKey(const ValueKey('garbh_today_shravan')), findsOneWidget);
+      final card = find.byKey(const ValueKey('garbh_today_shravan'));
       await tester.ensureVisible(card);
       await tester.pump();
       await tester.tap(card);

@@ -6,15 +6,25 @@
 //  spiritual reading is on, which traditions. Persisted via shared_preferences.
 //  Default: children's stories ON, everything else OFF (no spiritual unless she
 //  chooses it).
+//
+//  ⚠️ SYNCED SINCE 2026-09-23 (the persistence audit). It was phone-only with
+//  no stated reason — unlike the birth plan and the scan checklist, which are
+//  local on purpose and say why. The user's rule: "we should be able to
+//  maintain her activity… if she saves something, likes something". A choice
+//  she made about her own reading is hers on the next phone too. One blob in
+//  `user_state` through `CloudSyncedStore`: cloud wins on first sync, local
+//  seeds the cloud when the cloud is empty, a logged-out phone is unchanged.
 // =============================================================================
 
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'remote/cloud_synced_store.dart';
+
 import '../data/read_to_baby_data.dart';
 import '../data/spiritual_reading_data.dart';
 
-class ReadToBabyStore extends ChangeNotifier {
+class ReadToBabyStore extends ChangeNotifier with CloudSyncedStore {
   ReadToBabyStore._();
   static final ReadToBabyStore instance = ReadToBabyStore._();
 
@@ -61,7 +71,42 @@ class ReadToBabyStore extends ChangeNotifier {
     } catch (_) {/* keep defaults */}
     _loaded = true;
     notifyListeners();
+    await syncStateFromCloud();
   }
+
+  // ---- cloud (CloudSyncedStore) ----------------------------------------------
+  @override
+  String get cloudKey => 'read_to_baby_prefs';
+
+  @override
+  Object cloudData() => {
+        'categories': _categories.toList(),
+        'religions': _religions.toList(),
+        'sections': _sections.toList(),
+        'offset': _promptOffset,
+      };
+
+  @override
+  void applyCloudData(Object data) {
+    if (data is! Map) return;
+    List<String> list(Object? v) => v is List ? v.whereType<String>().toList() : const [];
+    if (data['categories'] != null) {
+      _categories
+        ..clear()
+        ..addAll(list(data['categories']));
+    }
+    _religions
+      ..clear()
+      ..addAll(list(data['religions']));
+    _sections
+      ..clear()
+      ..addAll(list(data['sections']));
+    final o = data['offset'];
+    if (o is num) _promptOffset = o.toInt();
+  }
+
+  @override
+  Future<void> persistLocalCache() => _persist();
 
   Set<String> get categories => Set.unmodifiable(_categories);
   Set<String> get religions => Set.unmodifiable(_religions);

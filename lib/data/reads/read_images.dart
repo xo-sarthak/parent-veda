@@ -28,6 +28,20 @@
 // connection from Indian networks (checked: all ten failed, all 86 others
 // served), so one host — StockSnap — for the whole table.
 const Map<String, String> kReadImageUrls = {
+  // ---- Garbh Sanskar pillars (2026-09-23) --------------------------------
+  // Were hotlinked straight from Unsplash in home_v3_screen.dart — no mirror,
+  // no licence line. Shravan (a tabla) and Samvad (a heart held on a bump)
+  // kept, mirrored; Buddhi (a man with his arms flung wide at a sunset) and
+  // Kriya (cupped hands in the dark) replaced by eye with puzzle pieces and a
+  // lit diya — "a few quiet minutes that are yours" and a still flame.
+  'garbh_pillar_shravan':
+      'https://images.unsplash.com/photo-1633411988188-6e63354a9019?w=960&q=80',
+  'garbh_pillar_samvad':
+      'https://images.unsplash.com/photo-1541956799312-3f9df99e0006?w=960&q=80',
+  'garbh_pillar_buddhi':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c3/Red_jigsaw_puzzle_pieces_2.jpg/960px-Red_jigsaw_puzzle_pieces_2.jpg',
+  'garbh_pillar_kriya':
+      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/A_lit_Diyo.jpg/960px-A_lit_Diyo.jpg',
   // ---- Symptoms: THE THING THAT HELPS, never her body (2026-09-23) ------
   // The user, walking By symptom: "we should be using real images of
   // course". Photographs of pregnant bodies are stock-fake or clinical, and
@@ -875,6 +889,10 @@ const Map<String, String> kReadImageUrls = {
 
 /// Read id → licence · source · creator, for the credit line.
 const Map<String, String> kReadImageCredits = {
+  'garbh_pillar_shravan': 'Unsplash License · Unsplash',
+  'garbh_pillar_samvad': 'Unsplash License · Unsplash',
+  'garbh_pillar_buddhi': 'CC0 · Wikimedia Commons · Profpcde',
+  'garbh_pillar_kriya': 'CC BY-SA 4.0 · Wikimedia Commons · BRPever',
   // Symptoms (2026-09-23)
   'symptom_nausea': 'CC BY-SA 4.0 · Wikimedia Commons · Erasmus Kamugisha',
   'symptom_heartburn': 'CC BY 2.0 · Wikimedia Commons · NIAID',

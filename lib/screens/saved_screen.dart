@@ -44,7 +44,7 @@ import '../theme/pv_fonts.dart';
 import '../ttc/ttc_reads_data.dart';
 import 'can_i_screen.dart' show openCanIAnswer;
 import 'community_screen.dart' show PostDetailScreen;
-import 'doors/pv_door_router.dart' show openPvDoorRead;
+import 'doors/pv_door_router.dart' show openPvDoorRead, pvDoorEntryForReadId, pvDoorEntryTitle, pvDoorEntryScreen;
 import 'garbh_screen.dart' show SamvadScreen;
 import 'post_pregnancy/pp_daily_tips.dart';
 import 'post_pregnancy/pp_reading_data.dart';
@@ -63,6 +63,13 @@ import 'saved_hub_screen.dart' show SavedRtbReadScreen;
 import 'ttc/ttc_surface_router.dart' show openTtcSurface, kTtcReadPrefix;
 import 'v2/v2_palette.dart';
 import 'watch_learn_screen.dart';
+import '../data/cravings_data.dart' show kCravingItems, CravingItem;
+import '../data/reads/nutrition_reads.dart' show kCravingReadPrefix;
+import '../data/reads/can_i_read.dart' show kCanIReadPrefix;
+import '../data/nutrition_data.dart' show kRecipes, Recipe;
+import 'nutrition/craving_detail_screen.dart' show CravingDetailScreen;
+import 'nutrition/door/recipe_cook_screen.dart' show RecipeCookScreen;
+import 'can_i/can_i_answer.dart' show openCanIAnswerById;
 
 /// What a kind is called, and where it is saved from — the words on the chip
 /// and in the empty line. Display only; the identity is [SavedKind.id].
@@ -521,7 +528,12 @@ class SavedItemOpener {
         return ttcReadById(id)?.title.en ??
             pregnancyReadById(id)?.title.en ??
             _readItem(id)?.title.en ??
-            _readArticle(id)?.title;
+            _readArticle(id)?.title ??
+            // A read a door built from its own data (2026-09-23).
+            switch (pvDoorEntryForReadId(id)) {
+              final e? => pvDoorEntryTitle(e.library, e.id),
+              null => _craving(id)?.name.en,
+            };
       case SavedKind.video:
         return _pvVideo(id)?.title.en ?? _watchVideo(id)?.title;
       case SavedKind.product:
@@ -535,6 +547,7 @@ class SavedItemOpener {
       case SavedKind.post:
         return _post(id)?.text;
       case SavedKind.recipe:
+        return _recipe(id)?.name.en;
       case SavedKind.activity:
       case SavedKind.tool:
         return null;
@@ -548,7 +561,12 @@ class SavedItemOpener {
       case SavedKind.article:
         if (ttcReadById(id) != null) return true;
         if (pregnancyReadById(id) != null || _readItem(id) != null) return c != null;
-        return _readArticle(id) != null;
+        if (_readArticle(id) != null) return true;
+        // Door-built reads, cravings and Is-it-safe answers (2026-09-23).
+        if (pvDoorEntryForReadId(id) != null) return c != null;
+        if (_craving(id) != null) return c != null;
+        if (id.startsWith(kCanIReadPrefix)) return c != null;
+        return false;
       case SavedKind.video:
         if (_watchVideo(id) != null) return true;
         return _pvVideo(id) != null && c != null;
@@ -565,7 +583,11 @@ class SavedItemOpener {
         return dailyTipById(id) != null;
       case SavedKind.post:
         return _post(id) != null && c != null;
+      // ⚠️ A SAVED RECIPE HAD NO WAY BACK (2026-09-23). The recipe card's
+      // heart has saved `SavedKind.recipe` since e9d8ac8, and this said
+      // false — every saved recipe was a row that could not be opened.
       case SavedKind.recipe:
+        return _recipe(id) != null && c != null;
       case SavedKind.activity:
       case SavedKind.tool:
         return false;
@@ -588,6 +610,16 @@ class SavedItemOpener {
           push(ReadItemScreen(item: _readItem(id)!, controller: c), name: 'read/$id');
         } else if (_readArticle(id) != null) {
           push(ReadingReaderScreen(article: _readArticle(id)!), name: 'pp/read/$id');
+        } else if (c != null) {
+          // A door-built read opens through its door's own entry opener.
+          if (pvDoorEntryForReadId(id) case final e?) {
+            final w = pvDoorEntryScreen(e.library, e.id, c);
+            if (w != null) push(w, name: 'saved/read/$id');
+          } else if (_craving(id) case final item?) {
+            push(CravingDetailScreen(item: item, pregnancy: c), name: 'saved/craving/$id');
+          } else if (id.startsWith(kCanIReadPrefix)) {
+            openCanIAnswerById(context, id.substring(kCanIReadPrefix.length), c);
+          }
         }
       case SavedKind.video:
         final w = _watchVideo(id);
@@ -623,6 +655,9 @@ class SavedItemOpener {
           push(PostDetailScreen(post: _post(id)!, controller: c), name: 'post/$id');
         }
       case SavedKind.recipe:
+        if (_recipe(id) case final r? when c != null) {
+          push(RecipeCookScreen(recipe: r, pregnancy: c), name: 'saved/recipe/$id');
+        }
       case SavedKind.activity:
       case SavedKind.tool:
         break;
@@ -630,6 +665,22 @@ class SavedItemOpener {
   }
 
   // ---- catalogue lookups, each null for an unknown id --------------------------
+  static Recipe? _recipe(String id) {
+    for (final r in kRecipes) {
+      if (r.id == id) return r;
+    }
+    return null;
+  }
+
+  static CravingItem? _craving(String id) {
+    if (!id.startsWith(kCravingReadPrefix)) return null;
+    final bare = id.substring(kCravingReadPrefix.length);
+    for (final c in kCravingItems) {
+      if (c.id == bare) return c;
+    }
+    return null;
+  }
+
   static ReadItem? _readItem(String id) {
     for (final r in kReadItems) {
       if (r.id == id) return r;

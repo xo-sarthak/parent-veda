@@ -41,6 +41,8 @@ import 'package:flutter/material.dart';
 
 import '../../data/doors/pv_door_data.dart';
 import '../../data/reads/nutrition_reads.dart';
+import '../../data/reads/read_images.dart' show readImageFor;
+import '../../data/nutrition/nutrition_photos.dart' show nutritionRecipePhoto;
 import '../../data/reads/symptom_reads.dart';
 import '../../data/symptoms/symptom_library.dart' show symptomById;
 import '../symptoms/door/symptoms_widgets.dart' show symptomLineMark;
@@ -134,6 +136,8 @@ import '../tools/ready_for_birth_screen.dart';
 import '../reader/pv_reader_screen.dart';
 import '../report_screen.dart';
 import '../tools/tests_scans_reports_screen.dart';
+import '../../data/reads/read_adapters.dart' show kMmReadPrefix, kBsReadPrefix, kConditionReadPrefix, kScanReadPrefix, kFindingReadPrefix;
+import '../garbh/garbh_today_practice.dart' show GarbhTodayPractice;
 
 /// A tile's OWN drawn mark, where the door has something better than its
 /// format's. Null means "the format mark", which is the rule everywhere else.
@@ -148,6 +152,118 @@ import '../tools/tests_scans_reports_screen.dart';
 /// user, walking it 2026-09-22: *"we need images for this tab"*). Each row now
 /// wears the symptom's own mark — the same hand as the check-in, so the two
 /// tabs are visibly the same thirty-three things.
+/// The door entry a reader's read id came from — how a BOOKMARK finds its way
+/// back (the persistence audit, 2026-09-23).
+///
+/// ⚠️ WHY THIS EXISTS: every door opens its writing in the one reader, and the
+/// reader's bookmark saves the READ id (`scan_nt`, `symptom_nausea`,
+/// `dietstage_t2`). The Saved screen could resolve ids from exactly one
+/// library — the written pregnancy reads — so a bookmark on anything a door
+/// BUILT from its own data saved, showed as a row, and could never be opened
+/// again. The mother saw it saved; the app had no way home. Every prefix below
+/// is a read family a door produces; the entry opener (`pvDoorEntryScreen`)
+/// already knows how to open each, so a bookmark reuses it rather than
+/// learning twelve screens of its own.
+({PvDoorLibrary library, String id})? pvDoorEntryForReadId(String readId) {
+  const families = <(String, PvDoorLibrary)>[
+    (kScanReadPrefix, PvDoorLibrary.scan),
+    (kFindingReadPrefix, PvDoorLibrary.finding),
+    (kConditionReadPrefix, PvDoorLibrary.condition),
+    (kNutrientReadPrefix, PvDoorLibrary.nutrient),
+    (kStageReadPrefix, PvDoorLibrary.dietStage),
+    (kDietConditionReadPrefix, PvDoorLibrary.dietCondition),
+    (kDietQuestionReadPrefix, PvDoorLibrary.dietQuestion),
+    (kFastingReadPrefix, PvDoorLibrary.fasting),
+    (kBsReadPrefix, PvDoorLibrary.bellySkin),
+    (kMmReadPrefix, PvDoorLibrary.mindRead),
+    (kSymptomReadPrefix, PvDoorLibrary.symptom),
+    (kNormalReadPrefix, PvDoorLibrary.symptomNormal),
+  ];
+  for (final (prefix, library) in families) {
+    if (readId.startsWith(prefix)) {
+      final id = readId.substring(prefix.length);
+      return pvDoorEntryResolves(library, id) ? (library: library, id: id) : null;
+    }
+  }
+  return null;
+}
+
+/// The title a door shows for an entry — for a bookmark saved before titles
+/// travelled with it.
+String? pvDoorEntryTitle(PvDoorLibrary library, String id) {
+  for (final page in kPvDoorPages) {
+    for (final section in page.sections) {
+      for (final t in section.tiles) {
+        if (t is PvDoorEntryTile && t.library == library && t.entryId == id) return t.title;
+      }
+    }
+  }
+  return null;
+}
+
+/// A tile's PHOTOGRAPH, from wherever its library keeps one — or null, and
+/// the tile draws its mark.
+///
+/// ⚠️ TWO PLACES A PHOTO CAN LIVE, AND THE DOOR ONLY KNEW ONE (2026-09-23).
+/// Scans, findings, conditions, symptoms, guides and myths keep theirs in the
+/// read-image TABLE, looked up by read id (`pvDoorTileReadImageId`). The
+/// Nutrition reads DERIVE theirs from the foods they talk about
+/// (`nutrition_reads.dart`) — so a nutrient's read opened on a photo while its
+/// door row, asking only the table, found nothing and drew a mark. The user,
+/// on What to eat now: *"where are the images for… everything below it?"*
+/// This asks the table first, then the library.
+///
+/// And the rail card never asked at all: `PvDoorRailCard` has taken an
+/// `imageUrl` since the recipe rail, but the door's adapter did not pass one,
+/// so a tile with a photo showed it as a row and hid it as a card. One
+/// resolver, both shapes.
+/// The picture key for a Garbh Sanskar tile: its surface id with '/' as '_'.
+/// Null for any other door's tile, and for tab-switch tiles.
+String? pvDoorGarbhPhotoKey(PvDoorTile t) {
+  final String? id = switch (t) {
+    PvDoorAudioTile(:final surfaceId) => surfaceId,
+    PvDoorReadTile(:final surfaceId) => surfaceId,
+    PvDoorGameTile(:final surfaceId) => surfaceId,
+    PvDoorToolTile(:final surfaceId) => surfaceId,
+    _ => null,
+  };
+  if (id == null || !id.startsWith('garbh/')) return null;
+  return id.replaceAll('/', '_');
+}
+
+String? pvDoorTilePhoto(PvDoorTile t) {
+  if (pvDoorTileReadImageId(t) case final id?) {
+    if (readImageFor(id) case final url?) return url;
+  }
+  // ⚠️ GARBH SANSKAR: ONE PICTURE PER TILE, KEYED BY WHERE IT GOES
+  // (2026-09-23). Tracks, affirmations, shelves, games and the relaxations
+  // have no id of their own on the tile, but each has a stable surface id —
+  // 'garbh/listen/rain' — so the picture's table key is that id with '/'
+  // as '_': `garbh_listen_rain`. Absent until a picture is in the table, and
+  // then the tile draws its format mark exactly as it did before.
+  if (pvDoorGarbhPhotoKey(t) case final key?) {
+    if (readImageFor(key) case final url?) return url;
+  }
+  if (t is! PvDoorEntryTile) return null;
+  // Recipes: each has its own picked photo (`nut_r_<id>`), distinct by design.
+  if (t.library == PvDoorLibrary.recipe) {
+    for (final r in kRecipes) {
+      if (r.id == t.entryId) return nutritionRecipePhoto(r.id, r.name.en);
+    }
+  }
+  // ⚠️ NOT THE FOOD-DERIVED PHOTOS (2026-09-23). The Nutrition reads derive a
+  // header photo from the foods they mention, and an audit of every door
+  // tile found what that does to a LIST: six tiles (pre-pregnancy,
+  // gestational diabetes, folic acid, iron, protein, zinc) resolved to one
+  // photo and all nine fasting tiles to another — the "two tiles wore one
+  // photo and read as one thing" the user already rejected. Nutrients get the
+  // user's icon set; stages, conditions, questions and fasting get photos
+  // picked by eye into the table, which the first branch above reads.
+  // Until then they draw their marks. The derived branch, kept for revert:
+  //   case PvDoorLibrary.nutrient: return readImageFor(r.id, own: pvReadFromNutrient(g).imageUrl) …
+  return null;
+}
+
 /// A tile's own MARK for the big deck card — the card twin of
 /// `pvDoorTileArt`, which draws the row well. Null means the format's mark.
 ///
@@ -435,6 +551,8 @@ Widget? pvDoorInlineToolFor(String id, PregnancyController c) => switch (id) {
   // one section on Today that reads a store.
   kGarbhSurfaceJournal => const GarbhJournalScreen(embedded: true),
   kGarbhSurfaceRitualRail => GarbhRitualRail(pregnancy: c),
+  // Today's practice — the home's own component, as the Today tab's tool.
+  kGarbhSurfaceToday => GarbhTodayPractice(pregnancy: c),
 
   _ => null,
 };
