@@ -17,6 +17,7 @@
 //  shape: a person deleting an account should read what goes with it.
 // =============================================================================
 
+import '../auth/onboarding/onboarding_flow.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -50,8 +51,17 @@ Future<void> pvSignOut(BuildContext context) async {
   }
   nav.push(
     MaterialPageRoute<void>(
-      builder: (_) => AuthFlowScreen(
-        onDone: (due, isFather) async {
+      // ⚠️ SIGN OUT USED TO LAND ON THE OLD SCREEN — 2026-09-22. The splash
+      // has pushed `OnboardingFlow` since it was built, but this door still
+      // opened `AuthFlowScreen`, so the single most common way to see the
+      // first-run experience — sign out and look — showed the retired one.
+      // That is the wiring gate exactly: correct code nobody reaches. The old
+      // screen stays as the DOCTOR and PARTNER branch (the flow pushes it
+      // itself for those), and as the body this is kept for revert:
+      //   builder: (_) => AuthFlowScreen(onDone: …, onDoctor: …),
+      builder: (_) => OnboardingFlow(
+        pregnancy: controller,
+        onDone: (stageId, isFather) async {
           try {
             final prefs = await SharedPreferences.getInstance();
             await prefs.setBool(kAuthCompletedKey, true);

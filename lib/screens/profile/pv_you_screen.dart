@@ -34,6 +34,7 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
+import '../auth/onboarding/onboarding_flow.dart';
 import '../../care_partner/care_visibility.dart';
 import '../../localization/app_language.dart';
 import '../../screens/post_pregnancy/pp_child_profile.dart';
@@ -327,7 +328,8 @@ class _PvYouScreenState extends State<PvYouScreen> {
                   SliverToBoxAdapter(child: _support(p, stage)),
                   // H — account
                   SliverToBoxAdapter(child: _account(p, stage)),
-                  if (kPvShowDeveloper) SliverToBoxAdapter(child: _developer(p)),
+                  if (kPvShowDeveloper)
+                    SliverToBoxAdapter(child: _developer(p)),
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
@@ -995,6 +997,30 @@ class _PvYouScreenState extends State<PvYouScreen> {
               AppNav.instance.goToday();
               nav.popUntil((r) => r.isFirst);
             },
+          ),
+        // ⚠️ A WALK DOOR, NOT A RESET. Onboarding only runs on a fresh
+        // install, so the only way to look at it on a phone that has already
+        // been through it was `adb shell pm clear` — which wipes the due
+        // date, the logs and the saved items the device walk needs. This
+        // opens the real flow with a no-op finish: nothing it writes is kept
+        // and it pops back here. Debug builds only, like everything in this
+        // section.
+        if (ctl != null)
+          PvYouRow(
+            icon: Icons.restart_alt_rounded,
+            title: 'Replay onboarding · testing',
+            subtitle:
+                'Opens the first-run flow; finishing it just comes back here',
+            onTap: () => Navigator.of(context).push(
+              MaterialPageRoute<void>(
+                settings: const RouteSettings(name: 'dev/onboarding'),
+                builder: (ctx) => OnboardingFlow(
+                  pregnancy: ctl,
+                  onDone: (_, _) => Navigator.of(ctx).maybePop(),
+                  onDoctor: (_) => Navigator.of(ctx).maybePop(),
+                ),
+              ),
+            ),
           ),
         const Padding(
           padding: EdgeInsets.fromLTRB(4, 4, 4, 4),

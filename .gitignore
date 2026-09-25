@@ -223,3 +223,8 @@ research/mobbin/**/*.png
 tools/question_miner/.models/
 research/questions/questions.sqlite*
 research/questions/*.log
+
+# The onboarding art ships as JPEG (1.3 MB for the set). The generated PNG
+# originals beside them are ~19 MB and are kept locally for re-cropping, never
+# committed — a download size that matters most in the market this app is for.
+assets/onboarding/*.png

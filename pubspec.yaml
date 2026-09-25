@@ -246,6 +246,7 @@ flutter:
     # originals (7MB -> 668KB); regenerate from docs/IMAGE-PROMPTS.md.
     - assets/blocks/
     - assets/brand/
+    - assets/onboarding/
     - assets/brand/partners/
     # ParentVeda+ Home hero: three CC0 photographs (morning / afternoon /
     # evening), credits in lib/doctor/doctor_hero_images.dart.
