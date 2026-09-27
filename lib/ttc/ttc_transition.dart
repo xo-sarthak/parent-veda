@@ -33,6 +33,24 @@
 //
 //  It is also reversible. A positive test can be mis-tapped, and a stage change
 //  you cannot undo would be the cruellest possible bug in this product.
+//
+//  ---------------------------------------------------------------------------
+//  ⚠️ A POSITIVE AFTER TREATMENT IS DATED BY THE CLINIC (2026-09-26, B8)
+//  ---------------------------------------------------------------------------
+//  CLAUDE.md: "a clinic-owned date is not ours to second-guess". After IVF or
+//  a frozen transfer the pregnancy is dated from the transfer and the
+//  embryo's age, the way the clinic dates it: transfer + (266 − embryo day),
+//  so a day-5 transfer gives transfer + 261, stored as
+//  `DueDateSource.ivfTransfer` (clinic-owned, so the pregnancy side never
+//  offers to recount it: `dueDateMayBeStale` is false for it). A date her
+//  clinic simply told her is `DueDateSource.clinician`. After an IUI or
+//  tablets, the last period dates it as for any pregnancy (ours,
+//  `lastPeriod`), with the IUI day, else the day after the trigger, as the
+//  conception day when no period is logged (ours, `conception`).
+//  [ttcRoundDating] works it out without changing anything, so the screen can
+//  say the date and its basis BEFORE she moves (the user's rule: nothing
+//  changes silently), and [TtcTransitionEngine.confirmPregnancy] takes the
+//  date and its source.
 // =============================================================================
 
 import 'package:shared_preferences/shared_preferences.dart';
@@ -44,6 +62,7 @@ import 'cycle_store.dart';
 import 'ttc_journal_store.dart';
 import 'ttc_store.dart';
 import 'ttc_supplements_store.dart';
+import 'ttc_treatment_store.dart';
 
 /// What survived the transition. Every field is a real count read back from the
 /// stores - the screen shows these numbers rather than claiming "everything is
@@ -78,6 +97,109 @@ class TtcTransitionResult {
   final bool dueDateWasDerived;
 }
 
+/// What a treatment round needs before its pregnancy can be dated.
+enum TtcRoundDatingNeed {
+  /// A date and its source are ready.
+  ready,
+
+  /// A transfer is dated but the embryo's day is not: ask it.
+  embryoDay,
+
+  /// Nothing to count from: offer the transfer date, or her clinic's date.
+  noDate,
+}
+
+/// A due date worked out from a round, with where it came from.
+class TtcRoundDating {
+  const TtcRoundDating({
+    required this.need,
+    this.due,
+    this.source,
+    this.from,
+    this.fromStep,
+    this.embryoDay,
+  });
+
+  final TtcRoundDatingNeed need;
+  final DateTime? due;
+  final DueDateSource? source;
+
+  /// The date it counts from, and which step that is (null: her last
+  /// period).
+  final DateTime? from;
+  final TtcTreatmentStep? fromStep;
+  final int? embryoDay;
+}
+
+/// Whether a round of [kind] is dated from its transfer.
+bool ttcRoundDatesFromTransfer(TtcRoundKind? kind) =>
+    kind != TtcRoundKind.iui && kind != TtcRoundKind.ovulationInduction;
+
+/// How the pregnancy after [round] is dated (B8). Pure: nothing changes.
+///
+/// IVF, freeze-all, frozen transfers, "not sure" and a legacy round: the
+/// transfer day plus (266 − embryo day), [DueDateSource.ivfTransfer]; with
+/// the embryo day missing, [TtcRoundDatingNeed.embryoDay]. An IUI or tablets:
+/// [lastPeriod] + 280 ([DueDateSource.lastPeriod]); with none logged, the IUI
+/// day as conception, else the day after the trigger (ovulation follows a
+/// trigger by about a day and a half), + 266 ([DueDateSource.conception]).
+TtcRoundDating ttcRoundDating(TtcTreatmentCycle round,
+    {DateTime? lastPeriod, int? embryoDay}) {
+  DateTime day(DateTime d) => DateTime(d.year, d.month, d.day);
+  final kind = round.kind;
+  if (ttcRoundDatesFromTransfer(kind)) {
+    final xfer = round[TtcTreatmentStep.transfer];
+    if (xfer == null) {
+      return const TtcRoundDating(need: TtcRoundDatingNeed.noDate);
+    }
+    final e = embryoDay ?? round.embryoDay;
+    if (e == null) {
+      return TtcRoundDating(
+          need: TtcRoundDatingNeed.embryoDay,
+          from: day(xfer),
+          fromStep: TtcTreatmentStep.transfer);
+    }
+    return TtcRoundDating(
+      need: TtcRoundDatingNeed.ready,
+      due: day(xfer).add(Duration(days: 266 - e)),
+      source: DueDateSource.ivfTransfer,
+      from: day(xfer),
+      fromStep: TtcTreatmentStep.transfer,
+      embryoDay: e,
+    );
+  }
+  if (lastPeriod != null) {
+    return TtcRoundDating(
+      need: TtcRoundDatingNeed.ready,
+      due: TtcTransitionEngine.dueDateFrom(lastPeriod),
+      source: DueDateSource.lastPeriod,
+      from: day(lastPeriod),
+    );
+  }
+  final iui = round[TtcTreatmentStep.iui] ??
+      (kind == TtcRoundKind.iui ? round[TtcTreatmentStep.retrieval] : null);
+  if (iui != null) {
+    return TtcRoundDating(
+      need: TtcRoundDatingNeed.ready,
+      due: day(iui).add(const Duration(days: 266)),
+      source: DueDateSource.conception,
+      from: day(iui),
+      fromStep: TtcTreatmentStep.iui,
+    );
+  }
+  final trig = round[TtcTreatmentStep.trigger];
+  if (trig != null) {
+    return TtcRoundDating(
+      need: TtcRoundDatingNeed.ready,
+      due: day(trig).add(const Duration(days: 1 + 266)),
+      source: DueDateSource.conception,
+      from: day(trig),
+      fromStep: TtcTreatmentStep.trigger,
+    );
+  }
+  return const TtcRoundDating(need: TtcRoundDatingNeed.noDate);
+}
+
 class TtcTransitionEngine {
   const TtcTransitionEngine();
 
@@ -107,18 +229,32 @@ class TtcTransitionEngine {
   /// Everything here is idempotent: running it twice produces the same state
   /// and one timeline entry, because a screen rebuild must never be able to
   /// double-apply the most important write in the product.
-  Future<TtcTransitionResult> confirmPregnancy({DateTime? on}) async {
+  ///
+  /// [dueDate] and [source] (2026-09-26, B8): a date worked out from a
+  /// treatment round, or one her clinic gave her. It is stored as given with
+  /// its source, so a clinic-owned date is never recounted from her period.
+  /// Without them, the last period dates it, as before.
+  Future<TtcTransitionResult> confirmPregnancy(
+      {DateTime? on, DateTime? dueDate, DueDateSource? source}) async {
     final when = on ?? DateTime.now();
     final today = DateTime(when.year, when.month, when.day);
 
     // --- 1. the due date ----------------------------------------------------
     final lmp = CycleStore.instance.lastPeriodStart;
-    final derived = lmp != null;
+    final given = dueDate == null
+        ? null
+        : DateTime(dueDate.year, dueDate.month, dueDate.day);
+    final derived = given != null || lmp != null;
     // With no period logged we cannot date the pregnancy properly. Rather than
     // refuse, we assume the common case - a test taken around week four - and
     // the screen states plainly that a scan will correct it.
-    final effectiveLmp = lmp ?? today.subtract(const Duration(days: 28));
-    final due = dueDateFrom(effectiveLmp);
+    //
+    // A given date counts back 280 days to the start the weeks are counted
+    // from, the same arithmetic the pregnancy side uses the other way.
+    final effectiveLmp = given != null
+        ? given.subtract(const Duration(days: gestationDays))
+        : (lmp ?? today.subtract(const Duration(days: 28)));
+    final due = given ?? dueDateFrom(effectiveLmp);
 
     TtcStore.instance.confirmPregnancy(on: today);
 
@@ -128,6 +264,14 @@ class TtcTransitionEngine {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString(
           PregnancyController.kDueDateKey, due.toIso8601String());
+      // Where it came from (2026-09-26, B8), under the controller's own key,
+      // so a date her clinic owns is read back as theirs.
+      if (source != null) {
+        await prefs.setString(
+            PregnancyController.kDueDateSourceKey, source.name);
+      } else {
+        await prefs.remove(PregnancyController.kDueDateSourceKey);
+      }
     } catch (_) {/* local-first: a storage failure never blocks the moment */}
 
     // --- 2. the life stage --------------------------------------------------
@@ -150,7 +294,9 @@ class TtcTransitionEngine {
       kind: TimelineKind.milestone,
       titleEn: 'Pregnancy began',
       titleHi: 'Pregnancy shuru hui',
-      detailEn: 'Dated from your last period, as pregnancies always are.',
+      detailEn: source?.clinicOwned ?? false
+          ? 'Dated by your clinic, from your treatment.'
+          : 'Counted from your last period, the way every pregnancy is.',
       detailHi:
           'Aapke aakhri period se gini gayi, jaise pregnancy hamesha gini jaati hai.',
       on: effectiveLmp,
@@ -182,6 +328,7 @@ class TtcTransitionEngine {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.remove(PregnancyController.kDueDateKey);
+      await prefs.remove(PregnancyController.kDueDateSourceKey);
     } catch (_) {/* best-effort */}
   }
 }

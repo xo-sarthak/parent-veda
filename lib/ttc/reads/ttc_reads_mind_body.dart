@@ -59,104 +59,178 @@ final List<PvRead> kTtcReadsMindBody = [
     hue: 42,
     kicker: _en('Mind & body'),
     title: _en('Stress, and the thing everyone says about it'),
-    teaser: _en('What the evidence actually shows, why "just relax" is both '
-        'wrong and cruel, and what a daily practice is genuinely for.'),
+    teaser: _en('What the evidence shows, why "just relax" is wrong and '
+        'unkind, and what a daily practice is really for.'),
+    shortAnswer: _en("Everyday stress doesn't stop you getting pregnant. Very "
+        'severe, long-lasting stress can delay ovulation, and so your period, '
+        "but ordinary worry isn't why it hasn't happened yet. A daily practice "
+        "is worth doing because it makes the wait easier, not because it's a "
+        'fertility treatment.'),
 
-    scaleSetter: _en('Ordinary stress does not stop you conceiving. The '
-        'largest analyses find that emotional distress before treatment does '
-        'not determine whether it works — so if you have been quietly '
-        'wondering whether your worrying is the reason, it is not.'),
+    scaleSetter: _en("Everyday stress doesn't stop you getting pregnant. The "
+        'largest studies find that feeling upset before treatment does not '
+        "decide whether it works. So if you've been wondering whether your "
+        "worry is the reason, it isn't."),
 
-    author: _en('Dr. Sharanya Menon'),
-    authorRole: _en('Perinatal psychologist · reviewed August 2026'),
+    author: _en('Parmeshwari'),
+    authorRole: _en('Clinical psychologist'),
 
     heroVideoSlot: 'ttc_vid_stress_fertility',
 
     sections: [
       PvReadSection(
         paragraphs: [
-          _en('Almost everyone trying to conceive has been told to relax. It '
-              'is usually said kindly, and it is one of the more harmful '
+          _en('Almost everyone trying to conceive has been told to relax. '
+              "It's usually said kindly. It's also one of the more hurtful "
               'things a person can say.'),
-          _en('It does two things at once. It hands her responsibility for '
-              'something she does not control, and it turns every month that '
-              'does not work into evidence that she was not calm enough. The '
-              'second part is what makes it stick — because after a while she '
-              'is anxious about being anxious, and there is no way out of that '
-              'from the inside.'),
+          _en('It does two things at once. It makes you responsible for '
+              "something you can't control. And it turns every month that "
+              "doesn't work into proof that you weren't calm enough."),
+          _en("That second part is why it sticks. After a while you're "
+              'anxious '
+              "about being anxious, and it's very hard to think your way out "
+              'of that on your own.'),
         ],
       ),
 
       PvReadSection(
-        heading: _en('What the evidence actually says'),
+        heading: _en('What does the evidence say?'),
         paragraphs: [
-          _en('It is genuinely mixed, and the honest summary is more '
-              'reassuring than the folklore.'),
-          _en('The largest piece of it is a meta-analysis of fourteen studies '
-              'covering more than three and a half thousand women, which found '
-              'that emotional distress before treatment was not associated '
-              'with whether assisted reproduction worked. A prospective study '
-              'measuring both psychological stress and cortisol directly found '
-              'neither related to embryo quality or pregnancy rate.'),
-          _en('Some studies do find an association, usually with severe or '
-              'sustained anxiety rather than ordinary worry. So the position '
-              'worth holding is: extreme, chronic stress is a real health '
-              'problem and worth treating for its own sake, and the everyday '
-              'strain of trying to conceive is not why it has not happened.'),
+          _en('The evidence is mixed. The honest summary is more comforting '
+              'than the old sayings.'),
+          _en('The biggest piece of it is a review of fourteen studies with '
+              'more than three and a half thousand women. It found that '
+              "emotional distress before treatment wasn't linked to whether "
+              'fertility treatment worked.'),
+          _en('Another study measured stress and the stress hormone cortisol '
+              'directly. Neither was linked to embryo quality or pregnancy '
+              'rate.'),
+          _en('Some studies do find a link, usually with severe or '
+              'long-lasting anxiety rather than everyday worry.'),
+          _en('So a fair way to see it is this. Extreme, long-term stress is a '
+              'real health '
+              'problem, and worth treating for its own sake. The everyday '
+              "strain of trying isn't why it hasn't happened yet."),
         ],
         mythFact: PvMythFact(
           myth: _en('Stop thinking about it and it will happen.'),
-          fact: _en('People conceive during bereavements, during exams, in '
-              'war zones and in the middle of the worst months of their lives. '
-              'Conception is not gated on a state of mind, and the couples who '
-              'are told this most often are the ones who have already been '
-              'trying longest — which is to say, the ones for whom it is least '
-              'likely to be the explanation.'),
+          fact: _en('People get pregnant while grieving, during exams, in war '
+              'zones and in the worst months of their lives. Conception '
+              "doesn't wait for a calm mind. And the couples told this most "
+              "often are the ones who've been trying longest. For them, it's "
+              'the least likely reason of all.'),
         ),
       ),
 
       PvReadSection(
-        heading: _en('Where stress does have a real effect'),
+        heading: _en('When does stress have a real effect?'),
         paragraphs: [
-          _en('There is one honest exception and it is worth naming, because '
-              'leaving it out would make this page a comfortable half-truth.'),
-          _en('Severe, sustained stress can suppress ovulation. The body reads '
-              'prolonged threat and down-regulates the hormonal signalling '
-              'that drives a cycle — which is why cycles can lengthen or stop '
-              'during bereavement, serious illness, extreme weight loss or '
-              'genuine crisis. That is a large effect and it looks nothing '
-              'like the everyday worry this page is about.'),
-          _en('And stress affects the things around conception even when it '
-              'does not affect conception: sleep, appetite, how often a couple '
-              'has sex, whether either of them can face another conversation '
-              'about it. Those are real and they are worth attending to on '
-              'their own terms.'),
+          _en("There's one honest exception, and it's worth naming. Leaving "
+              'it out would make this page a comfortable half-truth.'),
+          _en('Severe stress that goes on for a long time can stop ovulation. '
+              'The body senses a long threat and turns down the hormone '
+              'signals that run your cycle.'),
+          _en("That's why cycles can get longer "
+              'or stop during grief, serious illness, extreme weight loss or a '
+              "real crisis. That's a big effect, and it looks nothing like the "
+              'everyday worry this page is about.'),
+          _en('Stress also affects the things around conception, even when it '
+              "doesn't affect conception itself: sleep, appetite, how often "
+              'you have sex, and whether either of you can face another talk '
+              'about it. Those are real, and worth caring for in their own '
+              'right.'),
         ],
       ),
 
+      // ⚠️ ADDED 2026-09-26 (TTC gap plan): the late-period question. Stress
+      // works before ovulation, so it moves a period by moving ovulation; the
+      // test comes first, and a pattern goes to a doctor.
       PvReadSection(
-        heading: _en('So what is a daily practice actually for'),
+        heading: _en('How long can stress delay a period?'),
         paragraphs: [
-          _en('Not to make it happen. It is worth being blunt about that, '
-              'because a practice sold as a fertility treatment quietly '
-              'becomes one more thing she is failing at.'),
-          _en('Mind-body programmes — breathing, mindfulness, yoga, '
-              'cognitive-behavioural work — reliably improve how people feel '
-              'while they wait. That is the finding that holds across studies. '
-              'Whether they change pregnancy rates is not consistently '
-              'demonstrated, and it does not need to be.'),
-          _en('Making a long wait bearable is a complete reason to do '
-              'something. It is also the one outcome you can actually '
-              'influence, which after a year of trying is not nothing.'),
+          _en('Stress acts on the part of your cycle that comes before '
+              'ovulation. If a very hard stretch delays ovulation, your period '
+              'comes later by about the same number of days. That can be a few '
+              'days, and sometimes a week or two.'),
+          _en('Once ovulation has happened, the second half of the cycle '
+              'usually runs to its normal length. So stress in the days just '
+              'before a period rarely moves it much. Everyday stress, like a '
+              'busy week, seldom shifts a period at all.'),
+          _en("When a period is over a week late and you've had sex, take a "
+              'pregnancy test first. If periods keep coming very late, '
+              "or stop for three months or more, it's worth telling a doctor. "
+              'Several causes look the same from the outside.'),
+        ],
+      ),
+
+      // ⚠️ ADDED 2026-09-26 (TTC gap plan): the signs of stress, and when
+      // ordinary tension has become constant enough to talk to someone.
+      PvReadSection(
+        heading: _en('How do you know stress is building up?'),
+        paragraphs: [
+          _en('Stress often shows in the body and in habits before you name '
+              'it. A few of these in a hard month are normal.'),
+        ],
+        bullets: [
+          _en("Sleep that won't come, or waking early with your mind racing."),
+          _en('Headaches, a tight jaw or shoulders, or an upset stomach.'),
+          _en('Snapping at people, or crying more easily than usual.'),
+          _en('Checking symptoms, forums or charts over and over.'),
+          _en('Avoiding friends, baby showers or family calls you used to '
+              'manage.'),
+          _en('Eating, drinking or scrolling more to switch off.'),
+        ],
+        tip: PvReadTip(
+          title: _en('When to talk to someone'),
+          body: _en("If these have become most days for a few weeks, and you "
+              "feel on edge all the time, it's worth talking to someone. "
+              "That isn't weakness. Tension that never switches off is tiring, "
+              'and a psychologist can help it ease.'),
+        ),
+      ),
+
+      PvReadSection(
+        heading: _en('So what is a daily practice for?'),
+        paragraphs: [
+          _en("Not to make it happen. It's worth being clear about that. A "
+              'practice sold as a fertility treatment soon becomes one more '
+              "thing you feel you're failing at."),
+          _en('Mind-body programmes, like breathing, mindfulness, yoga and '
+              'talking therapy such as CBT, reliably help people feel better '
+              'while they wait. That finding holds across studies. Whether '
+              "they change pregnancy rates hasn't been clearly shown, and it "
+              "doesn't need to be."),
+          _en('Making a long wait easier to bear is a full reason to do '
+              "something. It's also the one result you can change yourself. "
+              'After a year of trying, that counts for something.'),
         ],
         tip: PvReadTip(
           title: _en('Five minutes, and not as a target'),
           body: _en('Whatever you choose, keep it short enough that missing a '
-              'day costs nothing. The commonest way a calming practice becomes '
-              'a source of stress is by becoming a streak — something else to '
-              'maintain, and something else to have broken. If you skip three '
-              'days, you have not lost anything.'),
+              'day costs nothing. A calming practice most often turns '
+              'stressful when it becomes a streak: one more thing to keep up, '
+              'and one more thing to break. If you skip three days, you '
+              "haven't lost anything."),
         ),
+      ),
+
+      // ⚠️ ADDED 2026-09-26 (TTC gap plan): the "natural boosters" she hears
+      // about. What the trials found, said plainly, without sneering at
+      // anyone who finds a therapy relaxing.
+      PvReadSection(
+        heading: _en('Do acupuncture or hypnosis help?'),
+        paragraphs: [
+          _en("You'll hear about acupuncture, hypnotherapy, reflexology and "
+              'many other therapies. For most of them, good trials have not '
+              'shown that they help people get pregnant.'),
+          _en('Acupuncture has been studied the most, mainly alongside IVF. '
+              'The larger, better trials found no difference in live births. '
+              'NICE does not recommend it for fertility for that reason.'),
+          _en('Some people still find a therapy relaxing, and feeling better '
+              'is a fair reason to use one. Choose a qualified practitioner, '
+              "keep the cost in proportion, and don't let it delay medical "
+              'checks. Tell your doctor about any herbs that come with it.'),
+        ],
       ),
 
       PvReadSection(
@@ -166,20 +240,21 @@ final List<PvRead> kTtcReadsMindBody = [
             'and how to protect the two of you from it.'),
         heading: _en('The people around you'),
         paragraphs: [
-          _en('In most Indian families this is not a private process. The '
-              'advice arrives constantly, it is well-meant, and it is '
-              'relentless — and the strain it creates is frequently larger '
-              'than anything medical.'),
-          _en('A few things that help. Agreeing with your partner what is '
-              'shared and what is not, before the next family gathering rather '
-              'than during it. Having one short sentence ready that ends the '
-              'topic without a fight — "we are seeing someone about it, and we '
-              'will tell you when there is news" closes most conversations. '
-              'And deciding in advance who is allowed to ask, which is usually '
-              'a much shorter list than the one currently asking.'),
-          _en('None of this is rudeness. Protecting a couple from commentary '
-              'is a legitimate thing to do, and the version of you that has '
-              'not done it is the version that dreads every phone call.'),
+          _en("In most Indian families, this isn't a private matter. The "
+              "advice comes all the time. It's kindly meant, and it never "
+              'stops. The strain it causes is often bigger than anything '
+              'medical.'),
+          _en('A few things help. Agree with your partner what you will share '
+              "and what you won't, before the next family gathering, not "
+              'during it.'),
+          _en('Have one short sentence ready that ends the topic '
+              "without a fight. \"We're seeing someone about it, and we'll "
+              "tell you when there's news\" closes most conversations. And "
+              "decide ahead of time who's allowed to ask. It's usually a much "
+              'shorter list than the people asking now.'),
+          _en("None of this is rude. Protecting the two of you from comments "
+              'is a fair thing to do. Without it, you can end up dreading '
+              'every phone call.'),
         ],
       ),
     ],
@@ -188,84 +263,92 @@ final List<PvRead> kTtcReadsMindBody = [
       PvReadFaq(
         question: _en('So should I stop trying to relax?'),
         answer: _en('Stop treating it as a task with a result attached. Rest, '
-              'breathing and quiet are good for you regardless — that is the '
-              'reason to do them. What is worth putting down is the idea that '
-              'you are doing them in order to conceive, because that makes '
-              'every unsuccessful month a failure of relaxation.'),
+              "breathing and calm are good for you anyway, and that's the "
+              "reason to do them. What's worth letting go of is the idea that "
+              "you're doing them to get pregnant. That idea turns every month "
+              "that doesn't work into a failure to relax."),
       ),
       PvReadFaq(
         question: _en('My periods stopped during a very stressful year. Was '
             'that stress?'),
-        answer: _en('It may well have been — severe, sustained stress can '
-            'suppress ovulation, and cycles stopping during a crisis is a '
-            'recognised pattern. That is a different thing from everyday '
-            'worry, and it is worth having looked at rather than assumed, '
-            'because several other causes look the same.'),
+        answer: _en('It may well have been. Severe, long-lasting stress can '
+            'stop ovulation, and cycles stopping during a crisis is a known '
+            "pattern. That's different from everyday worry. It's worth "
+            'getting it checked rather than assuming, because several other '
+            'causes look the same.'),
       ),
       PvReadFaq(
         question: _en('Does his stress matter?'),
-        answer: _en('Sustained stress can affect sperm parameters and '
-            'testosterone, and it affects the same surrounding things it does '
-            'for her — sleep, drinking, whether either of you has any appetite '
-            'for this. It gets discussed far less, largely because he is asked '
-            'about it far less.'),
+        answer: _en('Long-lasting stress can affect sperm and testosterone. It '
+            'also affects the same everyday things it does for you: sleep, '
+            'drinking, and whether either of you has any energy for this. '
+            "It's talked about far less, mostly because men are asked about "
+            'it far less.'),
       ),
       PvReadFaq(
         question: _en('Is anxiety medication safe while trying?'),
-        answer: _en('Several options are considered compatible with trying to '
-            'conceive and with pregnancy, and this is a conversation for the '
-            'person prescribing rather than something to settle from an '
-            'article. What is worth knowing is that stopping abruptly because '
-            'you are trying is its own risk — untreated illness is not the '
-            'safer option it can appear to be.'),
+        answer: _en('Several options are thought to be fine while trying to '
+            'conceive and during pregnancy. This is a talk to have with the '
+            'person who prescribes it, not something to settle from an '
+            "article. What's worth knowing is that stopping suddenly because "
+            "you're trying has its own risk. Untreated illness isn't as safe "
+            'an option as it can seem.'),
       ),
     ],
 
     whenToSeeSomeone: PvCallout(
       tone: PvCalloutTone.urgent,
       title: _en('When this is more than the strain of waiting'),
-      body: _en('Speak to someone if low mood or anxiety has lasted more than '
-          'a couple of weeks, if you cannot sleep or cannot function at work, '
-          'if you have stopped seeing people, if your cycles have stopped, or '
-          'if you are drinking more to get through it. And today, not at the '
-          'next appointment, if you have thoughts of harming yourself. None of '
-          'this is a failure of coping — it is the point at which the right '
-          'help is a person rather than a practice.'),
+      body: _en('Talk to someone if low mood or anxiety has lasted more than a '
+          "couple of weeks, if you can't sleep or can't cope at work, if "
+          "you've stopped seeing people, if your cycles have stopped, or if "
+          "you're drinking more to get through it. And talk to someone today, "
+          'not at the next appointment, if you have thoughts of harming '
+          "yourself. None of this means you've failed to cope. It means the "
+          'right help now is a person rather than a practice.'),
     ),
 
-    evidence: _en('The finding that pre-treatment emotional distress was not '
-        'associated with assisted-reproduction outcomes comes from a '
-        'meta-analysis of 14 studies covering 3,583 women, and from a '
-        'prospective study measuring psychological stress and cortisol against '
-        'embryo quality and pregnancy rate. Mind-body interventions improving '
-        'mental health outcomes, with less consistent effect on pregnancy '
-        'rates, per meta-analyses of CBT, mindfulness-based stress reduction '
-        'and yoga in fertility populations. Reviewed August 2026.'),
+    evidence: _en("The finding that emotional distress before treatment wasn't "
+        'linked to fertility treatment outcomes comes from a meta-analysis of '
+        '14 studies covering 3,583 women, and from a prospective study that '
+        'measured psychological stress and cortisol against embryo quality '
+        'and pregnancy rate. The finding that mind-body approaches improve '
+        'mental health, with a less consistent effect on pregnancy rates, '
+        'comes from meta-analyses of CBT, mindfulness-based stress reduction '
+        'and yoga in people with fertility problems. How stress delays '
+        'ovulation, and seeing a doctor when periods stop for three months, '
+        'follow NICE guidance on fertility problems (CG156) and NHS advice on '
+        'missed periods. The finding of no difference in live births with '
+        'acupuncture alongside IVF is from a large randomised trial (Smith '
+        'and colleagues, JAMA 2018), and NICE CG156 does not recommend '
+        'complementary therapies for fertility. Sources checked September '
+        '2026.'),
 
     nextSteps: [
       PvReadNextStep(
         kind: PvNextKind.activity,
         title: _en("Today's practice"),
-        value: _en('Five minutes. Reflection, breath, conversation, '
-            'gratitude — and a day missed costs nothing.'),
+        value: _en('Five minutes. Reflection, breath, conversation and '
+            'gratitude, and a missed day costs nothing.'),
         surfaceId: 'ttc_ritual',
       ),
       PvReadNextStep(
         kind: PvNextKind.read,
         title: _en('Preconception garbh sanskar, honestly'),
-        value: _en('What it actually is, what it does not promise, and why it '
-            'is offered before conception at all.'),
+        value: _en("What it is, what it doesn't promise, and why it's offered "
+            'before conception at all.'),
         surfaceId: 'ttc_read/ttc_read_garbh_sanskar',
       ),
       PvReadNextStep(
         kind: PvNextKind.consult,
-        title: _en('Talking to a psychologist'),
-        value: _en('Someone who works with people in exactly this waiting.'),
+        title: _en('Talk to a psychologist'),
+        value: _en('Someone who works with people going through this same '
+            'wait.'),
         surfaceId: 'ttc_prepare',
       ),
     ],
 
-    readNext: ['ttc_read_garbh_sanskar'],
+    readNext: ['ttc_read_garbh_sanskar', 'ttc_read_trying_takes_over'],
   ),
 
 
@@ -294,95 +377,102 @@ final List<PvRead> kTtcReadsMindBody = [
     hue: 42,
     kicker: _en('Mind & body'),
     title: _en('Preconception garbh sanskar, honestly'),
-    teaser: _en('What the tradition actually says, what it is good for, and '
-        'what it does not claim — including for people who want the practice '
-        'without the belief.'),
+    teaser: _en("What the tradition says, what it's good for, and what it "
+        "doesn't claim. It's also for people who want the practice without "
+        'the belief.'),
+    shortAnswer: _en('Garbh sanskar is an Indian tradition of small daily '
+        'practices for both parents, started before conception. It will not '
+        'make a pregnancy happen, and it makes no promise about a baby. What '
+        'it can do is give the wait a calm daily shape, for both of you.'),
 
-    scaleSetter: _en('Garbh sanskar is a practice of preparation, not a '
-        'method of conception. Nothing in it will make a pregnancy happen, and '
-        'nothing in it needs to — what it offers is a way to spend the waiting '
-        'that is calming rather than corrosive, which is a real thing to be '
+    scaleSetter: _en('Garbh sanskar is a way to prepare, not a way to '
+        'conceive. Nothing in it will make a pregnancy happen, and it '
+        "doesn't need to. What it offers is a way to spend the wait that "
+        "calms you rather than wears you down. That's a real thing to be "
         'offered.'),
 
-    author: _en('Dr. Sharanya Menon'),
-    authorRole: _en('Perinatal psychologist · reviewed August 2026'),
+    author: _en('Parmeshwari'),
+    authorRole: _en('Clinical psychologist'),
 
     heroVideoSlot: 'ttc_vid_garbh_preconception',
 
     sections: [
       PvReadSection(
-        heading: _en('What it actually is'),
+        heading: _en('What is garbh sanskar?'),
         paragraphs: [
-          _en('Garbh sanskar translates roughly as the education or refinement '
-              'of the womb. It comes from Ayurvedic and broader Indian '
-              'tradition, and in its classical form it is a set of practices '
-              'for the parents — food, routine, music, reading, conduct, '
-              'stillness — undertaken from before conception through '
-              'pregnancy.'),
-          _en('The part most people encounter is the pregnancy version. The '
-              'preconception version is older and is arguably the more '
-              'coherent half of it: the tradition holds that preparation '
-              'begins with the parents rather than with the pregnancy, which '
-              'is a claim modern preconception medicine happens to agree with '
-              'for entirely different reasons.'),
-          _en('Stripped to its structure, it is a daily practice with four or '
-              'five parts, done consistently, by both partners. That '
-              'description is deliberately plain — it is what the practice is, '
-              'whatever framework you hold it in.'),
+          _en('Garbh sanskar roughly means teaching or caring for the womb. '
+              'It comes from Ayurveda and wider Indian tradition. In its '
+              "classic form, it's a set of practices for the parents: food, "
+              'routine, music, reading, behaviour and stillness. They start '
+              'before conception and carry on through pregnancy.'),
+          _en('Most people come across the pregnancy version. The version '
+              'before conception is older, and it may be the half that makes '
+              'more sense. The tradition says getting ready starts with the '
+              'parents, not with the pregnancy. Modern medicine for the months '
+              'before pregnancy happens to agree, for very different '
+              'reasons.'),
+          _en("At its simplest, it's a daily practice with four or five parts, "
+              'done regularly by both partners. We describe it plainly on '
+              "purpose. That's what the practice is, whatever you believe "
+              'about it.'),
         ],
       ),
 
       PvReadSection(
-        heading: _en('What it is good for'),
+        heading: _en('What is it good for?'),
         paragraphs: [
-          _en('Her, now. That is the honest answer and it is not a small '
-              'one.'),
-          _en('A daily practice gives shape to a stretch of time that '
-              'otherwise has none — trying to conceive is months of waiting '
-              'with almost nothing to do, and having something small and yours '
-              'to do each day is genuinely protective. The evidence on '
-              'mind-body practice supports exactly this: better mental health '
-              'through a difficult period, reliably.'),
-          _en('It is also one of the few things in this stage that both '
-              'partners can do together without it being about performance or '
-              'timing. That matters more than it sounds by about month eight.'),
+          _en("You, now. That's the honest answer, and it isn't a small "
+              "one. It's about how you feel today, while you wait, and not "
+              "about a baby who isn't here yet."),
+          _en('A daily practice gives shape to a time that otherwise has '
+              'none. Trying to conceive can mean months of waiting with almost '
+              'nothing to do.'),
+          _en('Having something small of your own to do each '
+              'day really does protect you. The evidence on mind-body practice '
+              'backs exactly this: it reliably helps mental health through a '
+              'hard time.'),
+          _en("It's also one of the few things here that you can both do "
+              'together without it being about performance or timing. By '
+              'about month eight, that matters more than it sounds, for both '
+              'of you.'),
         ],
         callout: PvCallout(
           tone: PvCalloutTone.reassure,
-          title: _en('And if you are not religious'),
-          body: _en('The practice works without the framework. Breath, '
-              'stillness, music, reading aloud, gratitude and conversation are '
-              'the components — none of them requires belief, and the '
-              'tradition itself is more interested in what you do daily than '
-              'in what you profess. Take it as mind-body preparation if that '
-              'is what fits, and nothing about it is diminished.'),
+          title: _en("And if you're not religious"),
+          body: _en('The practice works without the belief. Its parts are '
+              'breath, stillness, music, reading aloud, gratitude and '
+              'conversation. None of them needs faith, and the tradition cares '
+              'more about what you do each day than what you believe. Take it '
+              'as mind-body preparation if that fits you. It loses nothing '
+              'that way.'),
         ),
       ),
 
       PvReadSection(
-        heading: _en('What it does not claim'),
+        heading: _en("What doesn't it claim?"),
         paragraphs: [
-          _en('It will not make you conceive, and no honest teacher of it '
-              'says otherwise. If something you are offered promises '
-              'conception, that promise was added by whoever is selling it.'),
-          _en('It also makes no claim we would repeat about a child who does '
-              'not exist yet. You will find material — a great deal of it '
-              'online, some of it sold at considerable expense — asserting '
-              'that particular practices before conception determine a baby’s '
-              'intelligence, temperament or character. There is no evidence '
-              'for that, and we will not tell you there is.'),
-          _en('What is left after removing those claims is still worth having. '
-              'That is rather the point of writing this down.'),
+          _en("It won't make you conceive, and no honest teacher says "
+              "otherwise. If something you're offered promises conception, "
+              'that promise was added by whoever is selling it.'),
+          _en("It also makes no claim we'd repeat about a child who doesn't "
+              'exist yet.'),
+          _en("You'll find material, a lot of it online and some "
+              'of it sold for a lot of money, saying that certain practices '
+              'before conception decide a baby’s intelligence, temperament or '
+              "character. There's no evidence for that, and we won't tell you "
+              'there is.'),
+          _en("What's left once those claims are gone is still worth having. "
+              "That's why we wrote this down."),
         ],
         mythFact: PvMythFact(
-          myth: _en('Doing it properly influences what the child will be '
+          myth: _en('Doing it properly shapes what your child will be '
               'like.'),
-          fact: _en('There is no evidence that practices before conception '
+          fact: _en("There's no evidence that practices before conception "
               'shape a child’s intelligence or personality. What the '
-              'tradition can reasonably claim — and what modern preconception '
-              'care agrees with — is that the parents’ health and state of '
-              'mind before conception are worth attending to. That is a much '
-              'smaller claim, and it is the one that survives scrutiny.'),
+              'tradition can fairly claim, and what modern care before '
+              'pregnancy agrees with, is that the parents’ health and state '
+              'of mind before conception are worth looking after. That is a '
+              "much smaller claim, and it's the one that holds up."),
         ),
       ),
 
@@ -391,26 +481,56 @@ final List<PvRead> kTtcReadsMindBody = [
         // clutter for someone still working out what it is.
         collapsible: true,
         summary: _en('The five parts, what each is for, and how long it '
-            'actually takes.'),
-        heading: _en('What a daily practice looks like'),
+            'takes.'),
+        heading: _en('What does a daily practice look like?'),
         paragraphs: [
-          _en('Short. Five to fifteen minutes, and the consistency matters far '
-              'more than the duration — which is the one instruction almost '
-              'every version of this agrees on.'),
+          _en('Short. Five to fifteen minutes. Doing it regularly matters far '
+              'more than how long it lasts, and almost every version of this '
+              'agrees on that.'),
         ],
         bullets: [
-          _en('Reflection — a single thought or reading to sit with. Not '
-              'analysis, and not journalling unless you want it to be.'),
-          _en('Breath — a few minutes of slow breathing, which is the '
-              'component with the most direct evidence behind it for calming '
-              'the nervous system.'),
-          _en('Sound — music, chanting or reading aloud, depending entirely on '
-              'what you find settling.'),
-          _en('Conversation — one honest exchange between the two of you that '
-              'is not about timing, tests or money.'),
-          _en('Gratitude — brief, specific and not performed. This is the part '
-              'most likely to feel forced at first and most likely to be '
-              'missed once it stops.'),
+          _en('Reflection: one thought or reading to sit with. Not analysis, '
+              "and not journalling unless you'd like it to be."),
+          _en('Breath: a few minutes of slow breathing. This is the part with '
+              'the most direct evidence behind it for calming the nervous '
+              'system.'),
+          _en('Sound: music, chanting or reading aloud, whichever you find '
+              'settling.'),
+          _en('Conversation: one honest talk between the two of you that '
+              "isn't about timing, tests or money."),
+          _en("Gratitude: short, specific and not for show. It's the part most "
+              'likely to feel forced at first, and the part you will most '
+              'likely miss once it stops.'),
+        ],
+      ),
+
+      // ⚠️ ADDED 2026-09-26 (TTC gap plan): how to begin, and how it sits
+      // beside medical care. The second is the safety half: herbs, fasts and
+      // any teacher who says to stop treatment.
+      PvReadSection(
+        heading: _en('How do you start?'),
+        paragraphs: [
+          _en('Start with one part, like five minutes of slow breathing '
+              'before bed, and add the others when it feels natural. Tie it to '
+              'a time you already have, such as after your morning tea.'),
+          _en("If you'd like a guide, the free course in this app teaches it "
+              'over eight short sessions, for both of you. A missed day costs '
+              'nothing.'),
+        ],
+      ),
+      PvReadSection(
+        heading: _en('Can it sit alongside medical care?'),
+        paragraphs: [
+          _en('Yes, and it should. A daily practice and fertility care do '
+              'different jobs, and neither replaces the other. Keep taking '
+              'folic acid, keep your appointments, and keep to any plan your '
+              'doctor has made.'),
+          _en('Some garbh sanskar courses also recommend herbal mixes, special '
+              'ghee preparations or fasts. Tell your doctor about any of these '
+              'before you start. Some herbs interact with fertility medicines, '
+              'and long fasts can unsettle a cycle.'),
+          _en('If a course or teacher tells you to stop a medicine or skip '
+              'treatment, leave the course, not the treatment.'),
         ],
       ),
     ],
@@ -418,67 +538,68 @@ final List<PvRead> kTtcReadsMindBody = [
     faqs: [
       PvReadFaq(
         question: _en('Is there any scientific evidence for garbh sanskar?'),
-        answer: _en('For the practice as a whole, no — it has not been '
-            'studied as a package, and claims that it has should be treated '
-            'carefully. For its components, yes: breathing, meditation and '
-            'yoga have reasonable evidence for reducing distress. So the '
-            'honest position is that the parts are supported and the promises '
-            'sometimes attached to the whole are not.'),
+        answer: _en("For the practice as a whole, no. It hasn't been studied "
+            'as a package, so be careful with claims that it has. For its '
+            'parts, yes: breathing, meditation and yoga have fair evidence for '
+            'easing distress. So the honest view is that the parts are '
+            'supported, but the promises sometimes attached to the whole are '
+            'not.'),
       ),
       PvReadFaq(
         question: _en('Do both of us need to do it?'),
-        answer: _en('The tradition says yes, and it is one of the few places '
-            'where tradition and the practical answer agree. A practice one '
-            'person does alone becomes another thing she is carrying; a '
-            'practice both do together is the rare part of this stage that is '
-            'shared without being about performance.'),
+        answer: _en('The tradition says yes, and here tradition and the '
+            'practical answer agree. A practice one person does alone becomes '
+            "one more thing you're carrying. A practice you both do together "
+            "is a rare part of this stage that's shared without being about "
+            'performance.'),
       ),
       PvReadFaq(
         question: _en('Should I be following a particular diet for it?'),
-        answer: _en('Classical garbh sanskar includes dietary guidance, and '
-            'much of it is unremarkable — regular meals, fresh food, less '
-            'that is heavy or over-processed. Where it starts prescribing '
-            'expensive preparations or forbidding ordinary foods, that is '
-            'worth questioning. Our nutrition guidance is separate and is '
-            'built on preconception evidence rather than on tradition.'),
+        answer: _en('Classic garbh sanskar includes food advice, and much of '
+            "it is ordinary: regular meals, fresh food, and less that's heavy "
+            'or highly processed. If it starts asking for expensive '
+            "preparations or banning everyday foods, it's worth questioning. "
+            'Our nutrition advice is separate, and based on evidence for the '
+            'months before pregnancy rather than on tradition.'),
       ),
       PvReadFaq(
-        question: _en('We have been trying a long time. Is it too late to '
+        question: _en("We've been trying a long time. Is it too late to "
             'start?'),
-        answer: _en('No, and there is nothing in it that requires you to be at '
-            'a particular point. It is a way of spending the waiting, and '
-            'people who have been waiting longest are the ones with most of it '
-            'to spend.'),
+        answer: _en('No. Nothing in it needs you to be at a certain point. '
+            "It's a way of spending the wait, so it can help however long "
+            "you've been waiting."),
       ),
     ],
 
     whenToSeeSomeone: PvCallout(
       tone: PvCalloutTone.urgent,
-      title: _en('Where a practice is not the right answer'),
+      title: _en("When a practice isn't the right answer"),
       body: _en('Nothing here replaces medical care, and it should never be a '
-          'reason to postpone it. See a doctor rather than waiting if your '
-          'cycles are irregular or absent, if you have been trying for a year '
-          '— six months at 35 or over — or if you have a known condition. And '
-          'speak to a person rather than a practice if the waiting has become '
-          'low mood or anxiety you cannot put down. Be especially careful with '
-          'anyone offering garbh sanskar as an alternative to fertility '
-          'treatment; the tradition itself does not claim that.'),
+          'reason to put it off. See a doctor instead of waiting if your '
+          "cycles are irregular or missing, if you've been trying for a year "
+          "(six months if you're 35 or over), or if you have a known "
+          'condition. And talk to a person, not a practice, if the waiting has '
+          "turned into low mood or anxiety you can't put down. Be extra "
+          'careful with anyone offering garbh sanskar instead of fertility '
+          "treatment. The tradition itself doesn't claim that."),
     ),
 
-    evidence: _en('Description of garbh sanskar follows classical Ayurvedic '
-        'and Indian tradition as commonly practised, rather than any single '
-        'text. Evidence for the components — breathing practice, meditation '
-        'and yoga improving psychological outcomes in fertility populations — '
-        'from meta-analyses of mind-body interventions. We are not aware of '
-        'controlled evidence for the practice as a whole, and none is claimed '
-        'here. Reviewed August 2026.'),
+    evidence: _en('Our description of garbh sanskar follows classical '
+        "Ayurvedic and Indian tradition as it's commonly practised, rather "
+        'than any single text. Evidence for its parts (breathing practice, '
+        'meditation and yoga improving mental health in people with fertility '
+        'problems) comes from meta-analyses of mind-body approaches. We know of '
+        "no controlled evidence for the practice as a whole, and we don't "
+        'claim any here. Folic acid before conception follows WHO and NHS '
+        'advice, and the caution on herbal products reflects their known '
+        'interactions with medicines. Sources checked September 2026.'),
 
     nextSteps: [
       PvReadNextStep(
         kind: PvNextKind.course,
         title: _en('The free preconception garbh sanskar course'),
-        value: _en('Eight short sessions, both of you, no fee — the practice '
-            'taught properly rather than described.'),
+        value: _en('Eight short sessions, for both of you, with no fee. The '
+            'practice taught properly, not just described.'),
         // Was 'ttc_prepare' — the catalogue the course is LISTED in, not the
         // course. See the note on the door's Go deeper tile.
         surfaceId: 'ttc_garbh_course',
@@ -486,7 +607,7 @@ final List<PvRead> kTtcReadsMindBody = [
       PvReadNextStep(
         kind: PvNextKind.activity,
         title: _en("Today's practice"),
-        value: _en('The five parts, already waiting, five minutes.'),
+        value: _en('The five parts, ready for you. Five minutes.'),
         surfaceId: 'ttc_ritual',
       ),
     ],
@@ -516,89 +637,94 @@ final List<PvRead> kTtcReadsMindBody = [
     id: 'ttc_read_sleep_trying',
     hue: 42,
     kicker: _en('Mind & body'),
-    title: _en('Why sleep matters when you are trying'),
+    title: _en("Why sleep matters when you're trying"),
     teaser: _en('Not because it makes conception happen. Because everything '
-        'else you are trying to do gets harder without it.'),
+        "else you're trying to do gets harder without it."),
+    shortAnswer: _en("Short sleep doesn't stop you getting pregnant. Sleep "
+        'matters because every other healthy habit is easier on seven hours '
+        'than on four. A steady wake-up time and daylight in the morning help '
+        'most.'),
 
-    scaleSetter: _en('Short sleep does not stop you conceiving, and nobody '
-        'should add it to the list of things they are doing wrong. It is on '
-        'this page because sleep is the thing every other habit here rests '
-        'on — and because it is one of the few things in this process you can '
-        'actually change this week.'),
+    scaleSetter: _en("Short sleep doesn't stop you getting pregnant, and "
+        'nobody should add it to their list of things they are doing wrong. '
+        "It's here because sleep is what every other habit rests on. It's "
+        'also one of the few things in all this you can change this week.'),
 
-    author: _en('Dr. Sharanya Menon'),
-    authorRole: _en('Perinatal psychologist · reviewed August 2026'),
+    author: _en('Parmeshwari'),
+    authorRole: _en('Clinical psychologist'),
 
     sections: [
       PvReadSection(
         paragraphs: [
-          _en('Sleep advice arrives in this part of life the same way every '
-              'other piece of advice does — as one more thing you are '
-              'presumably failing at. So it is worth saying at the start what '
-              'this page is not doing. It is not telling you that your sleep '
-              'is the reason, and it is not offering eight hours as a target '
-              'to hit and then feel bad about.'),
-          _en('It is here for a plainer reason. Almost everything else this '
-              'area suggests — moving a bit, eating at home, being civil to '
-              'your family, wanting your partner near you — is markedly '
-              'harder on four hours than on seven. Sleep is not one habit '
-              'among several. It is the one the others sit on.'),
+          _en('Sleep advice arrives at this time of life like every other bit '
+              "of advice: as one more thing you're probably failing at."),
+          _en("So let's say at the start what this page isn't doing. It "
+              "isn't saying your sleep is the reason. And it isn't giving you "
+              'eight '
+              'hours as a target to miss and then feel bad about.'),
+          _en("It's here for a simpler reason. Almost everything else this "
+              'area suggests is much harder on four hours than on seven: '
+              'moving a bit, eating at home, staying patient with family, '
+              "wanting your partner close. Sleep isn't one habit among many. "
+              "It's the one the others rest on."),
         ],
       ),
 
       PvReadSection(
-        heading: _en('What is actually known, and what is not'),
+        heading: _en('What does the research show?'),
         paragraphs: [
           _en('The honest summary is narrower than most articles suggest. '
-              'Sustained night-shift work and persistently very short sleep '
-              'have been associated with more irregular cycles in large '
-              'observational studies. Associated is the operative word: those '
-              'studies cannot separate the sleep from the stress, the light, '
-              'the eating times or the job that comes with all four.'),
-          _en('What has not been shown is that an ordinary run of late nights '
+              'Long-term night-shift work and very short sleep, night after '
+              'night, have been linked to more irregular cycles in large '
+              'studies.'),
+          _en('But linked is the key word. Those studies cannot '
+              'separate the sleep from the stress, the light, the meal times '
+              'or the job that comes with all four.'),
+          _en("What hasn't been shown is that a normal run of late nights "
               'changes whether a healthy couple conceives. If you have been '
-              'sleeping badly through the worry of this, that is a consequence '
-              'of what you are going through, not a cause of it.'),
-          _en('There is one exception worth knowing about rather than worrying '
-              'about. If your cycles have become irregular or stopped '
-              'altogether during a long period of shift work or severe sleep '
-              'disruption, that is worth showing a doctor — not because sleep '
-              'is the certain cause, but because irregular cycles have several '
-              'causes and they look the same from outside.'),
+              "sleeping badly because of the worry, that's a result of what "
+              "you're going through, not a cause of it."),
+          _en("There's one exception worth knowing, not worrying, about. If "
+              'your cycles have become irregular or stopped during a long '
+              'stretch of shift work or badly broken sleep, show a doctor.'),
+          _en('Not '
+              'because sleep is surely the cause, but because irregular cycles '
+              'have several causes and they look the same from the outside.'),
         ],
       ),
 
       PvReadSection(
-        heading: _en('The part nobody argues about'),
+        heading: _en('How does sleep shape the next day?'),
         paragraphs: [
-          _en('Sleep sets how the next day goes, and the next day is where all '
-              'of this actually happens. Tired people eat differently — more '
-              'sugar, later, and less of whatever they had planned. Tired '
-              'people move less. Tired people drink a bit more in the evening '
-              'to come down. And tired people are far worse at absorbing a '
-              'remark from a relative without it ruining the afternoon.'),
-          _en('None of that is a moral failing and all of it is predictable. '
-              'If you fix nothing else this month, fixing the hour you go to '
-              'bed quietly improves four other things without you having to '
-              'think about any of them.'),
+          _en('Sleep sets up the next day, and the next day is where all of '
+              'this happens. Tired people eat differently: more sugar, later, '
+              "and less of what they'd planned."),
+          _en('Tired people move less. Tired '
+              'people drink a bit more in the evening to wind down. And tired '
+              "people find it much harder to let a relative's remark go "
+              'without it spoiling the afternoon.'),
+          _en('None of that is a moral failing, and all of it is predictable. '
+              'If you change nothing else this month, fixing the time you go '
+              'to bed will help four other things without you having to think '
+              'about any of them.'),
         ],
       ),
 
       PvReadSection(
-        heading: _en('And it is worse in this particular month'),
+        heading: _en("Why is sleep harder while you're trying?"),
         paragraphs: [
-          _en('Trying to conceive has a specific effect on sleep that ordinary '
-              'sleep advice does not account for. The waiting happens at '
-              'night. The two weeks after ovulation, the night before a test, '
-              'the night after a period arrives — these are when the thinking '
-              'gets loudest, and they arrive on a schedule.'),
-          _en('That means bad sleep here is often not a habit problem at all. '
-              'It is grief and anticipation turning up at eleven at night '
-              'because that is the first moment of the day with nothing in it. '
-              'Treating that as sleep hygiene will not touch it. What helps is '
-              'usually having somewhere else to put the thinking — a '
-              'conversation, something written down, or a practice that gives '
-              'the mind one small thing to hold instead.'),
+          _en('Trying to conceive affects sleep in a way ordinary sleep '
+              "advice doesn't cover. The waiting happens at night. The two "
+              'weeks after ovulation, the night before a test, the night after '
+              'a period comes: these are when the thoughts get loudest, and '
+              'they come on a schedule.'),
+          _en("So bad sleep here often isn't a habit problem at all. It's "
+              'grief and the waiting turning up at eleven at night, because '
+              "that's the first moment of the day with nothing else in it."),
+          _en("Sleep tips won't touch that. What usually helps is having "
+              'somewhere else to put the thoughts: a talk, something written '
+              'down, or a practice that gives your mind one small thing to '
+              'hold instead.'),
         ],
       ),
 
@@ -609,31 +735,31 @@ final List<PvRead> kTtcReadsMindBody = [
       PvReadSection(
         heading: _en('Both of you'),
         paragraphs: [
-          _en('This is not only her. Sleep affects sperm production too, '
-              'through the same hormonal rhythm, and it gets asked about far '
-              'less on his side than on hers.'),
-          _en('It is also the practical argument for doing it together: a '
-              'fixed bedtime is much easier to keep when both people are '
-              'keeping it, and almost impossible when one of you is still up '
-              'with the television on.'),
+          _en("This isn't only about you. Sleep affects sperm production too, "
+              'through the same hormone rhythm, and men get asked about it far '
+              'less than women do.'),
+          _en("It's also the practical reason to do it together. A fixed "
+              'bedtime is much easier to keep when you both keep it, and '
+              'almost impossible when one of you is still up with the TV '
+              'on.'),
         ],
       ),
 
       PvReadSection(
-        heading: _en('What is worth trying'),
+        heading: _en("What's worth trying?"),
         bullets: [
-          _en('Pick a bedtime and hold the wake-up time, not the bedtime. The '
-              'hour you get up is what actually moves your body clock.'),
-          _en('Get outside in daylight in the first hour or two you are awake, '
-              'even for a few minutes. This does more than anything you can do '
-              'at night.'),
-          _en('Stop searching at a fixed hour. Forums and symptom-checking '
-              'after ten at night have never once helped anybody sleep.'),
-          _en('If you are lying awake for more than twenty minutes, get up and '
-              'sit somewhere dim until you are sleepy. Staying in bed teaches '
+          _en('Pick a bedtime, but hold the wake-up time, not the bedtime. The '
+              'time you get up is what moves your body clock.'),
+          _en('Get outside in daylight in the first hour or two after you '
+              'wake, even for a few minutes. This does more than anything you '
+              'can do at night.'),
+          _en('Stop searching at a set time. Forums and symptom checking after '
+              'ten at night have never helped anyone sleep.'),
+          _en("If you're lying awake for more than twenty minutes, get up and "
+              'sit somewhere dim until you feel sleepy. Staying in bed teaches '
               'you that bed is where you think.'),
-          _en('Do not chase lost sleep at the weekend by four hours. An hour '
-              'is fine; four resets the clock you have just built.'),
+          _en("Don't catch up on lost sleep at the weekend by four hours. One "
+              "hour is fine. Four resets the clock you've just built."),
         ],
       ),
     ],
@@ -641,57 +767,57 @@ final List<PvRead> kTtcReadsMindBody = [
     faqs: [
       PvReadFaq(
         question: _en('I work nights. Is that a problem?'),
-        answer: _en('It is worth mentioning to your doctor, particularly if '
-            'your cycles are irregular, because shift work is one of the few '
-            'sleep patterns with a real association in the research. It is not '
-            'a reason to leave your job, and nobody can tell you it is why '
-            'this is taking time. Anchoring light and meals to a consistent '
-            'pattern on the days you are not on shift helps more than trying '
-            'to sleep like a day worker on your days off.'),
+        answer: _en("It's worth telling your doctor, especially if your cycles "
+            'are irregular, because shift work is one of the few sleep '
+            "patterns with a real link in the research. It isn't a reason to "
+            "leave your job, and nobody can tell you it's why this is taking "
+            'time. On the days you are not on shift, keeping light and meals '
+            'to a steady pattern helps more than trying to sleep like a day '
+            'worker.'),
       ),
       PvReadFaq(
         question: _en('Is a sleeping tablet safe while trying?'),
-        answer: _en('That is a question for whoever would prescribe it, and it '
-            'is a reasonable question to ask rather than something to feel bad '
-            'about needing. What is worth knowing is that over-the-counter '
-            'sleep aids and herbal preparations are not automatically the '
-            'safer choice simply because nobody prescribed them — several are '
-            'unstudied in this context, which is not the same as being safe.'),
+        answer: _en("That's a question for whoever would prescribe it. It's a "
+            'fair thing to ask, and nothing to feel bad about needing. It is '
+            'worth knowing that sleep aids from the chemist and herbal '
+            "products aren't safer just because nobody prescribed them. "
+            "Several haven't been studied in people trying to conceive, and "
+            "unstudied isn't the same as safe."),
       ),
       PvReadFaq(
         question: _en('Does his sleep matter too?'),
-        answer: _en('The same practical argument applies to him, and it gets '
-            'asked about far less. Sustained poor sleep is associated with '
-            'lower testosterone, and it affects everything around this in the '
-            'same way it does for you — drinking, mood, and whether either of '
-            'you has any appetite for the process.'),
+        answer: _en('The same practical reasons apply to him, and men get asked '
+            'about it far less. Long-term poor sleep is linked to lower '
+            'testosterone. It also affects everything around this in the same '
+            'way it does for you: drinking, mood, and whether either of you '
+            'has any energy for it all.'),
       ),
     ],
 
     whenToSeeSomeone: PvCallout(
       tone: PvCalloutTone.urgent,
-      title: _en('When sleep is a symptom, not a habit'),
-      body: _en('Speak to a doctor rather than trying harder if you have been '
-          'unable to sleep for more than two or three weeks, if you are waking '
-          'very early every morning and cannot get back to sleep, if you are '
-          'exhausted all day despite spending long enough in bed, if your '
-          'partner has noticed you stop breathing or gasp in your sleep, or if '
-          'you have been drinking to get to sleep. And today, not at the next '
-          'appointment, if you have had thoughts of harming yourself — tell '
+      title: _en('When poor sleep needs a doctor'),
+      body: _en("See a doctor instead of trying harder if you haven't been "
+          'able to sleep for more than two or three weeks, if you wake very '
+          "early every morning and can't get back to sleep, if you're "
+          'exhausted all day even after enough time in bed, if your partner '
+          'has noticed you stop breathing or gasp in your sleep, or if you have '
+          'been drinking to get to sleep. And talk to someone today, not at the '
+          "next appointment, if you've had thoughts of harming yourself. Tell "
           'someone you trust as well as a professional.'),
     ),
 
-    evidence: _en('Associations between night-shift work, very short sleep '
-        'duration and menstrual irregularity are drawn from large '
-        'observational cohorts, which cannot establish cause. No effect of '
-        'ordinary sleep variation on conception is claimed here and we are not '
-        'aware of evidence that would support one. Sleep timing guidance '
-        'follows standard behavioural sleep practice. Reviewed August 2026.'),
+    evidence: _en('Links between night-shift work, very short sleep and '
+        'irregular periods come from large observational studies, which '
+        "can't prove cause. We don't claim that normal changes in sleep "
+        'affect conception, and we know of no evidence that would support '
+        'that. The advice on sleep timing follows standard behavioural sleep '
+        'practice. Sources checked August 2026.'),
 
     nextSteps: [
       PvReadNextStep(
         kind: PvNextKind.activity,
-        title: _en('Fixing a bedtime you will actually keep'),
+        title: _en('Setting a bedtime you can keep'),
         value: _en('The practical half of this, in one short page.'),
         surfaceId: 'ttc_read/ttc_read_bedtime',
       ),
@@ -701,7 +827,7 @@ final List<PvRead> kTtcReadsMindBody = [
         kind: PvNextKind.read,
         title: _en('His sleep, and the shift work question'),
         value: _en('The same rhythm on his side, and the one thing worth '
-            'mentioning at an appointment.'),
+            'raising at an appointment.'),
         surfaceId: 'ttc_read/ttc_read_heat_habits',
       ),
     ],
@@ -715,82 +841,106 @@ final List<PvRead> kTtcReadsMindBody = [
     id: 'ttc_read_bedtime',
     hue: 42,
     kicker: _en('Mind & body'),
-    title: _en('Fixing a bedtime you will actually keep'),
+    title: _en('Setting a bedtime you can keep'),
     teaser: _en('Most bedtimes fail for the same three reasons. None of them '
         'is willpower.'),
+    shortAnswer: _en('Bedtimes usually fail for practical reasons: the evening '
+        'has no clear end, the late hour is your only free time, or bed has '
+        'become where you worry. Fix the wake-up time first and move by '
+        'fifteen minutes at a time. Keeping it four nights a week counts.'),
 
     scaleSetter: _en('A bedtime you keep four nights a week is worth more than '
-        'a perfect one you abandon by Wednesday. Everything below is written '
-        'for the version of you who is tired and does not feel like it, '
-        'because that is the version who decides.'),
+        'a perfect one you give up by Wednesday. Everything below is written '
+        "for the tired you who doesn't feel like it, because that's the one "
+        'who decides.'),
 
-    author: _en('Dr. Sharanya Menon'),
-    authorRole: _en('Perinatal psychologist · reviewed August 2026'),
+    author: _en('Parmeshwari'),
+    authorRole: _en('Clinical psychologist'),
 
     sections: [
       PvReadSection(
         paragraphs: [
-          _en('Almost everybody who wants an earlier night has already tried '
-              'the obvious thing: decide on eleven, and then be in bed at '
-              'eleven. It works for a few days and then stops, and the usual '
-              'explanation is that you did not want it enough.'),
-          _en('That explanation is wrong and it is worth dropping, because it '
-              'is also the reason people stop trying. Bedtimes fail for '
-              'structural reasons, and each of the three has a fix that is not '
-              'about trying harder.'),
+          _en('Almost everyone who wants an earlier night has already tried '
+              'the obvious thing: decide on eleven, then be in bed at eleven. '
+              'It works for a few days and then stops. The usual explanation '
+              "is that you didn't want it enough."),
+          _en("That explanation is wrong, and it's worth letting go of, "
+              "because it's also why people stop trying. Bedtimes fail for "
+              'practical reasons. Each of the three has a fix that has nothing '
+              'to do with trying harder.'),
         ],
       ),
 
       PvReadSection(
         heading: _en('Reason one: the evening has no ending'),
         paragraphs: [
-          _en('Most late nights are not a decision to stay up. They are the '
-              'absence of a decision to stop — the day simply runs on until '
-              'you notice it is half past midnight. Nothing marked the end of '
+          _en("Most late nights aren't a choice to stay up. They happen "
+              'because nothing tells you to stop. The day just runs on until '
+              "you notice it's half past midnight. Nothing marked the end of "
               'it.'),
-          _en('So give the evening an ending that is not getting into bed. '
-              'Something small and repeatable that happens at the same time: '
-              'the kitchen gets tidied, the phone goes on to charge in another '
-              'room, the light in the main room goes off. The point is not the '
-              'task. The point is that something has closed, and everything '
-              'after it is heading for sleep.'),
+          _en("So give the evening an ending that isn't getting into bed. "
+              'Something small you repeat at the same time each night: the '
+              'kitchen gets tidied, the phone goes to charge in another room, '
+              'the main light goes off.'),
+          _en("The task itself doesn't matter. What "
+              'matters is that something has closed, and everything after it '
+              'leads to sleep.'),
         ],
       ),
 
       PvReadSection(
-        heading: _en('Reason two: you are owed an hour'),
+        heading: _en("Reason two: you're owed an hour"),
         paragraphs: [
-          _en('If the whole day belonged to work, family and everybody else, '
-              'the hour after everyone is asleep is often the only hour that '
-              'is yours. Going to bed early means giving that up, and no '
-              'amount of knowing about sleep makes a person volunteer to give '
-              'up the only free hour they had.'),
-          _en('This is the reason most bedtimes really fail, and it does not '
-              'yield to discipline. What works is moving the hour rather than '
-              'deleting it — taking it in the morning, or earlier in the '
-              'evening before the day closes, so that going to bed is not the '
-              'same thing as being finished.'),
+          _en('If the whole day went to work, family and everyone else, the '
+              "hour after they're asleep is often the only hour that's yours. "
+              'Going to bed early means giving it up. No amount of knowing '
+              'about sleep makes a person give up the only free hour they '
+              'had.'),
+          _en("This is the main reason bedtimes fail, and willpower won't fix "
+              'it. What works is moving the hour, not deleting it. Take it in '
+              'the morning, or earlier in the evening before the day winds '
+              "down, so going to bed isn't the end of your own time."),
         ],
       ),
 
       PvReadSection(
         heading: _en('Reason three: bed became where you think'),
         paragraphs: [
-          _en('If you have spent several weeks lying in the dark going over '
-              'cycle dates, then bed is now a place your mind associates with '
-              'thinking. That association builds quickly and it does not care '
-              'how tired you are.'),
-          _en('Breaking it is uncomfortable and reliable: if you are awake and '
+          _en("If you've spent weeks lying in the dark going over cycle dates, "
+              'your mind now links bed with thinking. That link forms quickly, '
+              "and it doesn't care how tired you are."),
+          _en("Breaking it is uncomfortable, but it works. If you're awake and "
               'thinking for more than about twenty minutes, get up. Sit '
-              'somewhere dim and dull until you feel sleepy, then go back. It '
-              'costs a few bad nights and it works, because it stops teaching '
-              'your body that bed is for staying awake in.'),
-          _en('Do not check the time while you are doing it, and do not '
-              'calculate how much sleep is left. That arithmetic is the thing '
-              'that turns being awake into being anxious about being awake, '
-              'and it is the reason a bad night becomes a bad week. Twenty '
-              'minutes here means roughly twenty minutes as it feels, not '
-              'twenty minutes measured.'),
+              'somewhere dim and dull until you feel sleepy, then go back.'),
+          _en('It costs a few bad nights, and it works because it stops '
+              'teaching '
+              'your body that bed is for lying awake.'),
+          _en("Don't check the time while you do this, and don't work out how "
+              'much sleep is left. That sum is what turns being awake into '
+              "worrying about being awake, and it's how a bad night becomes a "
+              'bad week.'),
+          _en('Twenty minutes here means about twenty minutes as it '
+              'feels, not twenty minutes on a clock.'),
+        ],
+      ),
+
+      // ⚠️ ADDED 2026-09-26 (TTC gap plan): what and when to eat in the
+      // evening, the small practical addition the gap analysis asked for.
+      PvReadSection(
+        heading: _en('What and when should you eat in the evening?'),
+        paragraphs: [
+          _en('Dinner timing moves sleep more than most people expect. A big, '
+              'late, spicy or fried meal keeps your stomach busy and can bring '
+              'on heartburn when you lie down. Try to finish dinner two to '
+              'three hours before bed, and keep it lighter than lunch where '
+              'you can.'),
+          _en('Tea and coffee last longer than they feel. A cup after about '
+              'mid-afternoon can still be working at bedtime, so switch to '
+              'something without caffeine after that. Alcohol makes you drowsy '
+              'but breaks up sleep later in the night.'),
+          _en("If you're hungry at bedtime, something small is better than "
+              'lying awake hungry: a glass of warm milk, a banana or a few '
+              'nuts.'),
         ],
       ),
 
@@ -800,69 +950,69 @@ final List<PvRead> kTtcReadsMindBody = [
       // is a bedtime page that does not apply to most of the people reading
       // it here.
       PvReadSection(
-        heading: _en('If you live with family'),
+        heading: _en('What if you live with family?'),
         paragraphs: [
-          _en('Most bedtime advice quietly assumes the household is yours to '
-              'run. If dinner is at ten because that is when it has always '
-              'been, or the television is on in a room you have to walk '
-              'through, a private bedtime is not a matter of willpower — it '
-              'is a matter of a schedule you did not set.'),
-          _en('What works is being plain rather than apologetic. Saying that '
-              'you are both trying to sleep earlier for health reasons is '
-              'true, it needs no further explanation, and it does not invite '
-              'the follow-up question that "we are trying" always does.'),
+          _en('Most bedtime advice assumes you run the household. If dinner is '
+              'at ten because it always has been, or the TV is on in a room '
+              "you have to walk through, a bedtime of your own isn't about "
+              "willpower. It's about a schedule you didn't set."),
+          _en('What works is being plain, not apologetic. Saying you are both '
+              'trying to sleep earlier for your health is true. It needs no '
+              "more explanation, and it doesn't invite the follow-up question "
+              'that "we\'re trying" always does.'),
         ],
         bullets: [
-          _en('Agree a dinner time with whoever cooks, rather than announcing '
-              'a bedtime. Dinner is the thing that actually moves.'),
+          _en('Agree a dinner time with whoever cooks, instead of announcing a '
+              'bedtime. Dinner is the thing that really moves.'),
           _en('Move the phones out of the bedroom. Nobody else needs to be '
-              'involved in that one, and it is the change that does the most.'),
-          _en('Accept the nights it will not hold — a guest, a festival, '
-              'somebody unwell. Two or three nights a week closer to a '
-              'regular time is a real improvement.'),
+              "involved in that one, and it's the change that helps most."),
+          _en("Accept the nights it won't work: a guest, a festival, someone "
+              'unwell. Getting closer to a regular time two or three nights a '
+              'week is a real improvement.'),
         ],
       ),
 
       PvReadSection(
-        heading: _en('If one of you works shifts'),
+        heading: _en('What if one of you works shifts?'),
         paragraphs: [
-          _en('A fixed bedtime may not be possible, and pretending otherwise '
-              'is not useful. What is available is a consistent pattern '
-              'within the shift rather than across the week: the same routine '
-              'before sleep, the room genuinely dark if you are sleeping in '
-              'the day, and meals at roughly the same points of your own '
-              'cycle rather than the household\'s.'),
-          _en('Mention the shift work at your next appointment. It is one of '
-              'the few sleep patterns with a real association behind it, and '
-              'it is almost never asked about.'),
+          _en('A fixed bedtime may not be possible, and pretending it is won\'t '
+              'help.'),
+          _en('What you can do is keep a steady pattern within each shift '
+              'rather than across the week: the same routine before sleep, a '
+              'properly dark room if you sleep in the day, and meals at about '
+              'the same points in your own day rather than the '
+              'household\'s.'),
+          _en("Mention the shift work at your next appointment. It's one of "
+              'the few sleep patterns with a real link behind it, and doctors '
+              'almost never ask about it.'),
         ],
       ),
 
       PvReadSection(
-        heading: _en('What to change first'),
+        heading: _en('What should you change first?'),
         paragraphs: [
-          _en('Pick one of these and leave the rest. A list of five changes '
-              'attempted at once is a list abandoned by the weekend, and the '
-              'first one below does most of the work on its own.'),
-          _en('It is also worth knowing roughly how long this takes, because '
-              'most people give up at the point it is about to work. Shifting '
-              'a body clock is a matter of a week or two of consistent '
-              'mornings, not a matter of a few good nights — and the first '
-              'three or four days usually feel worse rather than better, '
-              'because you are getting up earlier without yet falling asleep '
-              'earlier. That is the change working, not failing.'),
+          _en('Pick one of these and leave the rest. Five changes tried at '
+              'once are usually dropped by the weekend, and the first one '
+              'below does most of the work on its own.'),
+          _en('It also helps to know roughly how long this takes, because most '
+              'people give up just before it starts to work. Shifting your '
+              'body clock takes a week or two of steady mornings, not a few '
+              'good nights.'),
+          _en('The first three or four days usually feel worse, '
+              "not better, because you're getting up earlier before you've "
+              'started falling asleep earlier. That means it is working, not '
+              'failing.'),
         ],
         bullets: [
           _en('Move the wake-up time, not the bedtime. Getting up within the '
-              'same half hour every day is what shifts the clock; the bedtime '
-              'follows within a week or two on its own.'),
-          _en('Shift by fifteen minutes, not by an hour. An hour is a change '
-              'you will notice and resist. Fifteen minutes is one you will '
-              'not.'),
-          _en('Choose the ending ritual before you choose the bedtime.'),
-          _en('Expect to break it. A bedtime is not a streak and there is '
-              'nothing here counting — miss three nights and the fourth is '
-              'not harder than it would have been.'),
+              'same half hour every day is what shifts the clock. Your bedtime '
+              'follows by itself within a week or two.'),
+          _en("Shift by fifteen minutes, not an hour. You'll notice an hour "
+              "and push back against it. You won't notice fifteen minutes."),
+          _en('Choose your evening ending before you choose your bedtime.'),
+          _en("Expect to slip. A bedtime isn't a streak, and nothing here is "
+              'counting. Miss three nights and the fourth is no harder than it '
+              'would have been.'),
         ],
       ),
     ],
@@ -870,47 +1020,48 @@ final List<PvRead> kTtcReadsMindBody = [
     faqs: [
       PvReadFaq(
         question: _en('We go to bed at different times. Does that matter?'),
-        answer: _en('Not for sleep itself — plenty of couples keep different '
-            'hours perfectly well. It matters if it means you have stopped '
-            'having any part of the day together, which happens easily during '
-            'a long stretch of trying and is worth noticing before it becomes '
-            'the normal arrangement.'),
+        answer: _en('Not for sleep itself. Plenty of couples keep different '
+            'hours and are fine. It matters if it means you have stopped '
+            'sharing any part of the day. That happens easily during a long '
+            "stretch of trying, and it's worth noticing before it becomes "
+            'normal.'),
       ),
       PvReadFaq(
         question: _en('What about the phone, honestly?'),
-        answer: _en('The blue light is the least of it. The real problem is '
-            'that a phone in bed reliably delivers the one thing guaranteed to '
-            'wake you up in this particular month — a forum, a symptom search, '
-            'or somebody\'s announcement. Charging it in another room is not '
-            'about the screen; it is about what is on it.'),
+        answer: _en('The blue light is the smallest part of it. The real '
+            'problem is that a phone in bed so easily brings the one thing '
+            'sure to wake you up this month: a forum, a symptom search, or '
+            "someone's pregnancy news. Charging it in another room isn't about "
+            "the screen. It's about what's on it."),
       ),
       PvReadFaq(
-        question: _en('I am fine on six hours. Do I need to change?'),
-        answer: _en('A small number of people genuinely are, and if you wake '
-            'up without an alarm feeling rested, you are probably one of them. '
-            'The test is not the number. It is whether you are relying on '
-            'caffeine to be functional and crashing at the weekend.'),
+        question: _en("I'm fine on six hours. Do I need to change?"),
+        answer: _en('A small number of people really are. If you wake up '
+            "without an alarm and feel rested, you're probably one of them. "
+            "The test isn't the number. It's whether you need caffeine to get "
+            'through the day, and crash at the weekend.'),
       ),
     ],
 
     whenToSeeSomeone: PvCallout(
       tone: PvCalloutTone.urgent,
       title: _en('When this needs more than a routine'),
-      body: _en('See a doctor rather than adjusting your evening if you have '
-          'not slept properly for weeks, if you wake very early and cannot get '
-          'back to sleep, if you are sleeping enough hours and still exhausted '
+      body: _en('See a doctor instead of changing your evening if you have '
+          "not slept properly for weeks, if you wake very early and can't get "
+          'back to sleep, if you sleep enough hours and are still exhausted '
           'all day, or if someone has noticed you stop breathing or gasp at '
-          'night. And speak to someone today, not at the next appointment, if '
+          'night. And talk to someone today, not at the next appointment, if '
           'the nights have become a time you have thoughts of harming '
           'yourself.'),
     ),
 
-    evidence: _en('Behavioural guidance here follows standard practice for '
-        'insomnia — consistent wake time, stimulus control, and gradual '
-        'shifting — which is the first-line approach recommended ahead of '
-        'medication. No claim is made about sleep and conception; see the '
-        'companion piece for what the evidence on that does and does not '
-        'support. Reviewed August 2026.'),
+    evidence: _en('The advice here follows standard practice for insomnia '
+        '(a steady wake time, keeping bed for sleep, and shifting slowly), '
+        'which is the first approach recommended before medicine. The advice '
+        'on meal timing, caffeine and alcohol follows NHS sleep guidance. We '
+        'make no claim about sleep and conception. See the companion piece '
+        "for what the evidence on that does and doesn't support. Sources "
+        'checked September 2026.'),
 
     readNext: ['ttc_read_sleep_trying', 'ttc_read_stress_fertility'],
   ),
@@ -923,90 +1074,110 @@ final List<PvRead> kTtcReadsMindBody = [
     kicker: _en('Mind & body'),
     title: _en('When family keeps asking'),
     teaser: _en('What to say, what you owe them, and how to stop the question '
-        'arriving every week.'),
+        'coming every week.'),
+    shortAnswer: _en("You don't owe anyone an explanation. Agree with your "
+        'partner what you will share, keep one short sentence ready, and say '
+        "it the same way every time. It's fine to leave a gathering early, or "
+        'to skip some for a while.'),
 
-    scaleSetter: _en('You are not obliged to explain your body to anybody, '
-        'including people who love you. That is worth saying plainly, because '
-        'most of the strain here comes from feeling that you are.'),
+    scaleSetter: _en("You don't have to explain your body to anyone, even "
+        "people who love you. It's worth saying plainly, because most of the "
+        'strain here comes from feeling that you do.'),
 
-    author: _en('Dr. Sharanya Menon'),
-    authorRole: _en('Perinatal psychologist · reviewed August 2026'),
+    author: _en('Parmeshwari'),
+    authorRole: _en('Clinical psychologist'),
 
     sections: [
       PvReadSection(
         paragraphs: [
-          _en('In most Indian families this is not a private process. The '
-              'question arrives at weddings, on calls, in kitchens, and from '
-              'people who would be genuinely upset to know they were hurting '
-              'you. That combination — constant, well-meant, and impossible to '
-              'answer — is what makes it so wearing.'),
-          _en('There is no sentence that makes people stop asking forever. '
-              'There are sentences that end the conversation without a fight, '
-              'and a couple of decisions that make the whole thing smaller.'),
+          _en("In most Indian families, this isn't a private matter. The "
+              'question comes at weddings, on calls, in kitchens, and from '
+              "people who'd be really upset to know they were hurting you. "
+              "It's constant and kindly meant, and there's no good answer to "
+              "it. That's what makes it so tiring."),
+          _en('No sentence will make people stop asking forever. But some '
+              'sentences end the conversation without a fight, and a couple of '
+              'decisions make the whole thing smaller.'),
+        ],
+      ),
+
+      // ⚠️ ADDED 2026-09-26 (TTC gap plan): whether to tell anyone at all,
+      // which comes before every decision below it.
+      PvReadSection(
+        heading: _en("Should you tell anyone you're trying?"),
+        paragraphs: [
+          _en('Many couples in India keep it private, at least at first, and '
+              "that's a perfectly good choice. Others tell one or two people, "
+              "a sister or a close friend, so they aren't carrying it alone."),
+          _en('Telling people can bring support, and someone to lean on after '
+              'a hard month. It can also bring more questions, more advice, '
+              "and news that travels further than you'd like."),
+          _en('Many couples find a middle way works. Tell one or two people '
+              'you trust, and ask them plainly to keep it between you.'),
         ],
       ),
 
       PvReadSection(
-        heading: _en('Decide with him first, not in the room'),
+        heading: _en('What should you agree with your partner first?'),
         paragraphs: [
-          _en('The single most useful thing is agreeing in advance — before '
-              'the next gathering rather than during it — what is shared and '
-              'what is not. Whether anyone knows you are trying. Whether '
-              'anyone knows you are seeing a doctor. Whether either set of '
-              'parents is told before the other.'),
-          _en('The reason to do this early is that most of the damage happens '
-              'when one of you answers on behalf of both without knowing what '
-              'the other wanted said. That is how a private thing becomes '
-              'public in one sentence, and it is nobody\'s fault when it has '
-              'never been discussed.'),
-          _en('It also decides who answers. Agreeing that questions to her go '
-              'to him, and questions about his family go to him, takes a '
-              'surprising amount of weight off — largely because in practice '
-              'almost all of the asking is aimed at her.'),
+          _en('The most useful thing is to agree ahead of time, before the '
+              "next gathering and not during it, what you'll share and what "
+              "you won't. Whether anyone knows you're trying. Whether anyone "
+              "knows you're seeing a doctor. Whether one set of parents hears "
+              'before the other.'),
+          _en('Do this early, because most of the hurt happens when one of you '
+              'answers for both without knowing what the other wanted said. '
+              "That's how a private thing becomes public in one sentence. When "
+              "it's never been talked about, it's nobody's fault."),
+          _en('It also decides who answers. Agreeing that he answers the '
+              'questions put to you, and the questions from his family, takes '
+              "a surprising amount of weight off. That's mostly because, in "
+              'practice, nearly all the asking is aimed at you.'),
         ],
       ),
 
       PvReadSection(
-        heading: _en('Have one sentence ready'),
+        heading: _en('What can you say when someone asks?'),
         paragraphs: [
-          _en('The sentence does not need to be clever and should not be a '
+          _en("The sentence doesn't need to be clever, and it shouldn't open a "
               'debate. It needs to be short, warm enough not to start a fight, '
-              'and finished — nothing left dangling for a follow-up question.'),
-          _en('The reason to decide it in advance is that the question never '
-              'arrives at a convenient moment. It comes in a room full of '
-              'people, or in the middle of something else, and whatever you '
-              'produce on the spot will be either sharper than you meant or so '
-              'vague that it invites a second question. Having one line ready '
-              'means you are not composing anything while upset.'),
-          _en('Say it the same way every time, including to people you like. '
-              'A sentence that varies by who asked is a sentence people compare '
-              'notes on, and the version somebody got is then read as how much '
-              'you trust them.'),
+              'and finished, with nothing left hanging for a follow-up '
+              'question.'),
+          _en('Decide it ahead of time, because the question never comes at a '
+              'good moment. It comes in a room full of people, or in the '
+              'middle of something else.'),
+          _en('Whatever you say on the spot will be '
+              'sharper than you meant, or so vague that it invites a second '
+              "question. With a line ready, you don't have to make one up "
+              "while you're upset."),
+          _en('Say it the same way every time, even to people you like. If '
+              'your answer changes with who asked, people compare notes, and '
+              'the version someone got is read as how much you trust them.'),
         ],
         bullets: [
-          _en('"We will tell you when there is news." Warm, closed, and it '
-              'concedes nothing.'),
-          _en('"We are seeing someone about it, and we would rather not '
-              'discuss it." Works when they already suspect, and stops advice '
-              'without inviting sympathy.'),
-          _en('"That is between us — but how are you?" The most reliable one. '
-              'People asked about themselves rarely come back to it.'),
-          _en('"Please do not ask me that again." For the person who has '
-              'ignored the other three. It is allowed.'),
+          _en('"We\'ll tell you when there\'s news." Warm, closed, and it gives '
+              'nothing away.'),
+          _en('"We\'re seeing someone about it, and we\'d rather not discuss '
+              'it." Works when they already guess, and stops advice without '
+              'inviting sympathy.'),
+          _en('"That\'s between us. But how are you?" The one that works most '
+              'often. People asked about themselves rarely come back to it.'),
+          _en('"Please don\'t ask me that again." For the person who has '
+              "ignored the other three. You're allowed to say it."),
         ],
       ),
 
       PvReadSection(
-        heading: _en('Decide who is allowed to ask'),
+        heading: _en("Who's allowed to ask?"),
         paragraphs: [
-          _en('There is usually a much shorter list of people whose asking you '
-              'actually mind than it feels like at three in the afternoon '
-              'after a family lunch. Naming it — to yourself, or out loud with '
-              'him — changes how the next question lands, because you are no '
-              'longer answering everybody at once.'),
-          _en('Everyone else can be handled with the same sentence every time, '
-              'said in the same tone, without you having to decide anything in '
-              'the moment. Deciding in the moment is what is exhausting.'),
+          _en('The list of people whose asking really bothers you is usually '
+              'much shorter than it feels at three in the afternoon after a '
+              'family lunch. Naming them, to yourself or out loud with him, '
+              "changes how the next question lands, because you're no longer "
+              'answering everyone at once.'),
+          _en('Everyone else can get the same sentence every time, in the same '
+              'tone, without you having to decide anything in the moment. '
+              'Deciding in the moment is what wears you out.'),
         ],
       ),
 
@@ -1017,37 +1188,57 @@ final List<PvRead> kTtcReadsMindBody = [
       // it is logistical rather than verbal, and all of it has to be decided
       // before you arrive.
       PvReadSection(
-        heading: _en('Before a wedding or a festival'),
+        heading: _en('How do you get through a wedding or a festival?'),
         paragraphs: [
-          _en('These are the hardest days, because everybody is in one place '
-              'and the questions arrive as a group rather than one at a time. '
-              'Deciding how to handle it on the day, while upset, is much '
-              'harder than deciding it on the way there.'),
+          _en('These are the hardest days, because everyone is in one place '
+              'and the questions come as a group, not one at a time. Deciding '
+              'how to handle it on the day, while upset, is much harder than '
+              'deciding on the way there.'),
         ],
         bullets: [
-          _en('Decide how long you are staying before you go, and say it out '
+          _en("Decide how long you're staying before you go, and say it out "
               'loud to each other.'),
-          _en('Agree a signal between the two of you for wanting out of a '
-              'conversation. It does not have to be subtle; it has to be '
-              'agreed.'),
-          _en('Accept in advance that you might leave early, so that leaving '
-              'early is a plan rather than a failure.'),
-          _en('Decide who takes which room. Whoever\'s family it is, is the '
-              'one who answers.'),
+          _en('Agree a signal between you for wanting out of a conversation. '
+              "It doesn't have to be subtle. It just has to be agreed."),
+          _en('Accept ahead of time that you might leave early, so leaving '
+              'early is a plan and not a failure.'),
+          _en('Decide who handles which room. Whoever\'s family it is answers '
+              'the questions.'),
         ],
       ),
 
       PvReadSection(
-        heading: _en('And the advice, when it comes anyway'),
+        heading: _en('What about all the advice?'),
         paragraphs: [
-          _en('Some of it will be harmless and some of it will not be. Herbal '
-              'preparations bought without a doctor, fasting, and anything '
-              'sold as purifying or detoxifying are not neutral just because a '
-              'relative recommended them — several interact with medication '
-              'and some are not safe in early pregnancy.'),
-          _en('You do not have to argue about any of it. "Our doctor is '
-              'handling that" is a complete answer and it is one almost nobody '
-              'contradicts.'),
+          _en("Some of it will be harmless and some won't. Herbal products "
+              'bought without a doctor, fasting, and anything sold as '
+              "purifying or detoxifying aren't harmless just because a "
+              'relative suggested them. Several interact with medicines, and '
+              "some aren't safe in early pregnancy."),
+          _en("You don't have to argue about any of it. \"Our doctor is "
+              'handling that" is a full answer, and almost nobody argues with '
+              'it.'),
+        ],
+      ),
+
+      // ⚠️ ADDED 2026-09-26 (TTC gap plan): friends, hurtful remarks and
+      // skipping gatherings, which the family-only version left out.
+      PvReadSection(
+        heading: _en('What about friends, and hurtful comments?'),
+        paragraphs: [
+          _en('Friends can be harder than family, because their news is often '
+              'the hard part. A pregnancy announcement, a baby shower or a '
+              "first birthday can hurt, even when you're really glad for "
+              'them.'),
+          _en("You're allowed to skip some of these for a while. Send a kind "
+              "message or a gift, and say you can't make it. A good friend "
+              "will understand, even if you don't give the reason."),
+          _en("When someone says something that stings, you don't have to "
+              'correct them on the spot. "I know you mean well, but that\'s '
+              'hard to hear" is enough.'),
+          _en('Later, you can tell the friends you are closest to what does '
+              'help, like asking how you are rather than whether there is any '
+              'news.'),
         ],
       ),
     ],
@@ -1055,49 +1246,56 @@ final List<PvRead> kTtcReadsMindBody = [
     faqs: [
       PvReadFaq(
         question: _en('They mean well. Am I being unfair?'),
-        answer: _en('Meaning well and causing harm are not opposites, and you '
-            'can hold both without a verdict on anybody. Protecting a couple '
-            'from constant commentary is a legitimate thing to do — it is not '
-            'rudeness, and it is not ingratitude.'),
+        answer: _en('Meaning well and causing hurt can both be true, and you '
+            'can see both without judging anyone. Protecting the two of you '
+            "from constant comments is a fair thing to do. It isn't rude, and "
+            "it isn't ungrateful."),
       ),
       PvReadFaq(
-        question: _en('Should we tell them we are having treatment?'),
-        answer: _en('There is no right answer and it is genuinely yours to '
-            'decide. What is worth thinking about is that telling people '
-            'usually swaps one kind of asking for another — the question stops '
-            'being whether, and becomes how it went this month. Some people '
-            'find the support worth it and some find that far harder.'),
+        question: _en("Should we tell them we're having treatment?"),
+        answer: _en("There's no right answer, and it really is yours to "
+            "decide. It's worth knowing that telling people usually swaps one "
+            'kind of asking for another. The question stops being whether, and '
+            'becomes how it went this month. Some people find the support '
+            'worth it, and some find that much harder.'),
       ),
       PvReadFaq(
-        question: _en('What if it is his family and he will not say anything?'),
-        answer: _en('This is common and it is worth raising as a request '
-            'rather than an accusation, because it usually is not indifference '
-            '— it is a person who has never had to manage his own family '
-            'before and does not know how. Agreeing that he handles his side '
-            'and you handle yours is a fair division and an easier '
-            'conversation than asking him to defend you.'),
+        question: _en("What if it's his family and he won't say anything?"),
+        answer: _en("This is common. It's worth raising as a request, not an "
+            "accusation, because it usually isn't that he doesn't care. More "
+            "often he's never had to manage his own family before and doesn't "
+            'know how. Agreeing that he handles his side and you handle yours '
+            'is a fair split, and an easier talk than asking him to defend '
+            'you.'),
       ),
     ],
 
     whenToSeeSomeone: PvCallout(
       tone: PvCalloutTone.urgent,
       title: _en('When this is more than family being difficult'),
-      body: _en('Speak to someone if the pressure at home has become constant '
-          'criticism, if you are being blamed for not conceiving, if you are '
-          'being made to take anything you have not agreed to, or if you are '
-          'afraid of someone in your household. And today, not at the next '
-          'appointment, if you have had thoughts of harming yourself — tell a '
-          'person you trust as well as a professional. There is a psychologist '
-          'inside this app, and there are free helplines if that is easier.'),
+      body: _en('Talk to someone if the pressure at home has become constant '
+          "criticism, if you're being blamed for not conceiving, if you're "
+          "being made to take anything you haven't agreed to, or if you're "
+          'afraid of someone in your household. And talk to someone today, not '
+          "at the next appointment, if you've had thoughts of harming "
+          'yourself. Tell a person you trust as well as a professional. '
+          "There's a psychologist inside this app, and there are free "
+          "helplines if that's easier."),
     ),
 
-    evidence: _en('This is practical and psychological guidance rather than a '
-        'clinical topic, drawn from standard approaches to boundary-setting in '
-        'infertility counselling. The caution about unprescribed herbal '
-        'preparations reflects known interaction and safety uncertainty rather '
-        'than any claim about efficacy. Reviewed August 2026.'),
+    evidence: _en('This is practical and emotional guidance rather than a '
+        'medical topic. It draws on standard ways of setting boundaries used '
+        'in infertility counselling. The caution about herbal products taken '
+        'without a prescription reflects known risks of mixing them with '
+        'medicines and unclear safety, not any claim about whether they work. '
+        'The advice on friends and gatherings draws on the same counselling '
+        'practice. Sources checked September 2026.'),
 
-    readNext: ['ttc_read_stress_fertility', 'ttc_read_bringing_him_in'],
+    readNext: [
+      'ttc_read_stress_fertility',
+      'ttc_read_bringing_him_in',
+      'ttc_read_telling_family',
+    ],
   ),
 
   // ---------------------------------------------------------------------------
@@ -1107,185 +1305,231 @@ final List<PvRead> kTtcReadsMindBody = [
     hue: 42,
     kicker: _en('Mind & body'),
     title: _en('Bringing him into this'),
-    teaser: _en('Why it usually ends up being her project, and what actually '
-        'changes that.'),
+    teaser: _en('Why it usually ends up being your project, and what changes '
+        'that.'),
+    shortAnswer: _en('It usually becomes one person\'s job because everything '
+        "points at the woman, not because he doesn't care. What helps is "
+        "handing him one task that's fully his, like booking his own test, and "
+        'talking at a set time. About half of couples who take longer have a '
+        'male factor, so this is his too.'),
 
-    scaleSetter: _en('If this has become one person\'s job, that is the '
-        'ordinary outcome of how the whole subject is arranged rather than a '
-        'verdict on him or on your marriage. It is also one of the few things '
-        'here you can change without anybody\'s permission.'),
+    scaleSetter: _en("If this has become one person's job, that's the usual "
+        "result of how the whole subject is set up. It isn't a judgement on "
+        "him or on your marriage. It's also one of the few things here you "
+        "can change without anyone's permission."),
 
-    author: _en('Dr. Sharanya Menon'),
-    authorRole: _en('Perinatal psychologist · reviewed August 2026'),
+    author: _en('Parmeshwari'),
+    authorRole: _en('Clinical psychologist'),
 
     sections: [
       PvReadSection(
         paragraphs: [
-          _en('In most couples one person is carrying this — tracking the '
-              'dates, booking the appointments, reading at night, and '
-              'absorbing the questions. It is almost always her, and it is '
-              'rarely the result of anybody deciding it should be.'),
-          _en('It happens because everything around this points at her. The '
-              'appointments are hers. The tests start with her. The advice '
-              'arrives addressed to her. By the time anyone notices, he has '
-              'become a person who is told what is happening rather than a '
-              'person it is happening to, and that is difficult to reverse '
-              'with a single conversation.'),
+          _en('In most couples, one person carries this: tracking the dates, '
+              'booking the appointments, reading at night, and taking the '
+              "questions. It's almost always the woman, and it's rarely "
+              'because anyone decided it should be.'),
+          _en('It happens because everything around this points at you. The '
+              'appointments are yours. The tests start with you. The advice '
+              "comes addressed to you. By the time anyone notices, he's become "
+              "someone who is told what's happening, rather than someone it's "
+              "happening to. One conversation won't easily undo that."),
         ],
       ),
 
       PvReadSection(
-        heading: _en('The half that is genuinely his'),
+        heading: _en('How much of this is his?'),
         paragraphs: [
-          _en('A male factor is involved in about half of couples who take '
-              'longer than expected, either on its own or alongside something '
-              'on her side. That is the fact that changes the conversation, '
-              'and most couples have never been told it.'),
-          _en('It matters here for a specific reason: it is very hard to ask '
-              'somebody to share the weight of a problem he has been given no '
-              'reason to think is his. A semen analysis is quick, cheap and '
-              'the least invasive test in the whole process, and in many '
-              'couples it is done last or not at all.'),
+          _en('A male factor plays a part in about half of couples who take '
+              'longer than expected, either alone or alongside something on '
+              "the woman's side. That fact changes the conversation, and most "
+              'couples have never been told it.'),
+          _en("It matters here for a clear reason. It's very hard to ask "
+              "someone to share the weight of a problem he's been given no "
+              'reason to think is his.'),
+          _en('A semen analysis is quick, cheap and '
+              'the least invasive test in the whole process. Yet in many '
+              "couples it's done last, or not at all."),
         ],
       ),
 
       PvReadSection(
-        heading: _en('What actually shifts it'),
+        heading: _en('What helps him share it?'),
         paragraphs: [
-          _en('Asking him to care more does not work, and it is usually not '
-              'true that he does not. What works is transferring specific '
-              'things rather than describing a feeling.'),
-          _en('The distinction matters more than it sounds. "I need you to be '
-              'more involved" is a statement about how you feel, and the only '
-              'available reply is either an apology or a defence — neither of '
-              'which moves anything the following week. "Will you book your '
-              'test" is a task with an owner and a date, and it is the kind of '
-              'request that gets done.'),
-          _en('Transferring one thing completely also works better than '
-              'splitting several. A job that is half his is still a job you '
-              'are tracking, and tracking it is most of the weight.'),
+          _en("Asking him to care more doesn't work, and it's usually not true "
+              "that he doesn't care. What works is handing over specific "
+              'tasks, not describing a feeling.'),
+          _en('This difference matters more than it sounds. "I need you to be '
+              'more involved" is about how you feel, and the only reply he has '
+              'is sorry or a defence. Neither changes anything the next week.'),
+          _en('"Will you book your test?" is a task with an owner and a date, '
+              'and that kind of request gets done.'),
+          _en('Handing over one thing completely also works better than '
+              "sharing several. A job that's half his is still a job you're "
+              'tracking, and the tracking is most of the weight.'),
         ],
         bullets: [
-          _en('One thing that is entirely his — booking his own test, or '
-              'handling his own family\'s questions. Not helping with yours; '
+          _en("One thing that's fully his, like booking his own test or "
+              "handling his own family's questions. Not helping with yours; "
               'owning one.'),
-          _en('He comes to one appointment. Not as support — as somebody the '
+          _en('He comes to one appointment. Not as support, but as someone the '
               'appointment is also about.'),
-          _en('He reads one thing. One, chosen, not a folder.'),
-          _en('A fixed time to talk about it, so it stops arriving at eleven '
-              'at night and stops being present at every other hour.'),
+          _en('He reads one thing. Just one, picked out, not a folder.'),
+          _en('A set time to talk about it, so it stops coming up at eleven at '
+              'night and hanging over every other hour.'),
           // ⚠️ THE BRIEF'S OWN POINT, AND IT IS SHARPER THAN THE ONE ABOVE.
           // *"Pick a time to talk that is not the moment a period arrives.
           // That is the worst possible time and it is when it usually comes
           // up."* A fixed time is the mechanism; this is the specific hour to
           // avoid, and it is the hour the conversation nearly always happens.
-          _en('And not on the day a period arrives. That is the worst hour to '
-              'have any version of this conversation, and it is the hour it '
-              'usually gets had.'),
+          _en("And not on the day a period arrives. That's the worst time to "
+              "have any version of this talk, and it's usually when it "
+              'happens.'),
           // ⚠️ THE CROSS-REFERENCE THE PRACTICE LIBRARY WAS BUILT FOR. The
           // brief: *"Do things together that are not about trying. The couple
           // part of the daily practice exists for this reason."* Naming it
           // here is the difference between a card sitting in a library and a
           // card somebody has a reason to open.
-          _en('Something the two of you do together that is not about trying. '
-              'Ten slow breaths in the same room is the whole of it — the '
-              'couple part of the daily practice exists for exactly this.'),
+          _en("Something the two of you do together that isn't about trying. "
+              'Ten slow breaths in the same room is enough. The couple part of '
+              'the daily practice exists for exactly this.'),
         ],
       ),
 
       PvReadSection(
-        heading: _en('Why he may be quiet, and why that is not indifference'),
+        heading: _en('Why might he be quiet, even when he cares?'),
         paragraphs: [
-          _en('Men in this situation are asked about it very rarely — by '
-              'doctors, by families, by friends. A person nobody asks generally '
-              'concludes that his part is to stay steady and not add to it, '
-              'and from the outside that is indistinguishable from not '
-              'minding.'),
-          _en('It is also true that a possible problem he has not tested for '
-              'is easier to leave untested, and that this is fear rather than '
-              'avoidance of you. Saying the half-of-couples fact out loud tends '
-              'to help more than any appeal, because it moves the test from an '
-              'accusation to a normal step.'),
+          _en('Men in this situation are very rarely asked about it, by '
+              'doctors, family or friends. Someone nobody asks usually decides '
+              'his job is to stay steady and not add to the load. From the '
+              'outside, that looks just like not minding.'),
+          _en("It's also true that a possible problem he hasn't been tested "
+              "for is easier to leave untested. That's fear, not avoiding "
+              'you. Saying the half-of-couples fact out loud usually helps more '
+              'than any appeal, because it turns the test from an accusation '
+              'into a normal step.'),
         ],
       ),
 
+      // ⚠️ ADDED 2026-09-26 (TTC gap plan): how to talk when trying strains
+      // the two of you. Practical, one habit per line, and a counsellor
+      // offered as ordinary rather than as a last resort.
       PvReadSection(
-        heading: _en('And a warning about the fix that backfires'),
+        heading: _en("How do you talk when it's straining you both?"),
+        paragraphs: [
+          _en('Months of trying wear on any couple. A few small habits make '
+              'the talks you do have easier.'),
+        ],
+        bullets: [
+          _en('One calm check-in a week, at a time you both agree, instead of '
+              'many tense ones.'),
+          _en('Say what you need rather than what he got wrong. "I\'d like '
+              'you at the next scan" lands better than "you never come".'),
+          _en('One topic at a time. "This month\'s appointment" is easier than '
+              '"everything about this".'),
+          _en('Hear him out, then say back what you heard before you answer. '
+              'It feels stiff, and it stops a lot of arguments growing.'),
+          _en("If it heats up, take a break, and agree when you'll come back "
+              "to it so the break doesn't feel like a door shutting."),
+          _en("Talk about other things too. A walk or a meal where trying "
+              "isn't mentioned counts."),
+        ],
+        tip: PvReadTip(
+          title: _en('If it keeps turning into the same argument'),
+          body: _en('A couples counsellor can help, and going is not a sign '
+              'the marriage is failing. Many couples find it easier to be '
+              'heard with a third person in the room.'),
+        ),
+      ),
+
+      PvReadSection(
+        heading: _en('What tends to backfire?'),
         paragraphs: [
           // ⚠️ THE BRIEF'S "what tends not to work", WHICH THIS SECTION DID NOT
           // HAVE. It warned about scheduling — a real and different failure —
           // and said nothing about the framing that causes the commonest one.
           // Worth keeping because the symptom is not refusal, which is what
           // people watch for; it is agreement followed by nothing.
-          _en('Before the specific one: two framings reliably fail. Putting it '
-              'as his turn, and putting it as a test of whether he is serious '
-              'about this. Both are understandable and both put him on the '
-              'defensive, and the response is almost never a refusal — it is '
-              'delay. Next month, after this project, once work settles. '
-              'Nothing moves, and the resentment builds on both sides while it '
-              'does not.'),
-          _en('The most common attempt is scheduling — telling him which days '
-              'matter and when. It is completely reasonable and it is the one '
-              'thing most likely to make him withdraw further, because it '
-              'turns him into a task on a calendar.'),
-          _en('Where it has already happened, the way back is usually to stop '
-              'announcing the days for a cycle or two. Nothing is lost by it: '
-              'every one to two days across the week does as well as timing '
-              'anything precisely, which means the calendar was never worth '
-              'what it cost.'),
-          _en('This is worth saying to him rather than doing quietly. A month '
-              'in which you stop mentioning dates, without explaining why, '
-              'reads from his side as you having given up or withdrawn — which '
-              'is the opposite of what is happening and a much harder thing to '
-              'come back from than the original problem.'),
+          _en('First, two ways of putting it almost always fail: saying it is '
+              "his turn, or making it a test of whether he's serious about "
+              'this. Both are understandable, and both make him defensive.'),
+          _en("The answer is almost never no. It's delay. Next month, after "
+              'this project, once work settles. Nothing moves, and resentment '
+              "builds on both sides while it doesn't."),
+          _en('The most common attempt is scheduling: telling him which days '
+              "matter and when. It's completely reasonable, and it's the thing "
+              'most likely to make him pull back further, because it turns '
+              'him into a task on a calendar.'),
+        ],
+      ),
+
+      // ⚠️ SPLIT 2026-09-26 (TTC gap plan): the second half of the section
+      // above, given its own heading so no section runs past three
+      // paragraphs. Same words.
+      PvReadSection(
+        heading: _en('What if the calendar has taken over?'),
+        paragraphs: [
+          _en("If that's already happened, the way back is usually to stop "
+              'announcing the days for a cycle or two. You lose nothing by it. '
+              'Sex every one to two days across the week works as well as '
+              'precise timing, which means the calendar was never worth what '
+              'it cost.'),
+          _en("Tell him you're doing this, rather than just doing it. If you "
+              'stop mentioning dates for a month without saying why, it can '
+              "look to him like you've given up or pulled away."),
+          _en("That's the opposite of what's happening, and it's much harder "
+              'to come back from than the first problem.'),
         ],
       ),
     ],
 
     faqs: [
       PvReadFaq(
-        question: _en('He says he does not want to talk about it. Now what?'),
-        answer: _en('Ask for a bounded version rather than a general one — ten '
-            'minutes on Sunday rather than "we need to talk about this". A '
-            'person who has refused an open-ended conversation will often '
-            'agree to a short one with an end, because what he is declining is '
-            'usually the endlessness rather than the subject.'),
+        question: _en("He says he doesn't want to talk about it. Now what?"),
+        answer: _en('Ask for a short version with an end, instead of an open '
+            'one: ten minutes on Sunday, not "we need to talk about this". '
+            'Someone who refuses an open-ended talk will often agree to a '
+            "short one. What he's saying no to is usually the endlessness, "
+            'not the subject.'),
       ),
       PvReadFaq(
         question: _en('Is it fair to ask him to test before I do?'),
-        answer: _en('It is more than fair; it is the cheaper and less invasive '
+        answer: _en("It's more than fair. It's the cheaper and less invasive "
             'order, and several clinics do it that way as standard. If yours '
-            'has not suggested it, asking is reasonable.'),
+            "hasn't suggested it, it's reasonable to ask."),
       ),
       PvReadFaq(
-        question: _en('We have stopped enjoying any of this. Is that normal?'),
-        answer: _en('It is extremely common and it is one of the more '
-            'treatable parts. Sex that has become a scheduled procedure stops '
-            'being something either person wants, and the usual first step is '
-            'taking the calendar out of it for a while rather than trying '
-            'harder inside it.'),
+        question: _en("We've stopped enjoying any of this. Is that normal?"),
+        answer: _en("It's very common, and it's one of the easier parts to "
+            'fix. Sex that has become a scheduled task stops being something '
+            'either of you wants. The usual first step is to take the calendar '
+            'out of it for a while, rather than trying harder within it.'),
       ),
     ],
 
     whenToSeeSomeone: PvCallout(
       tone: PvCalloutTone.urgent,
       title: _en('When to bring in a third person'),
-      body: _en('Speak to a professional together if this has become an '
-          'argument you have every month, if either of you has stopped wanting '
-          'any physical closeness at all, if one of you is drinking more to '
-          'get through it, or if either of you has been low or unable to '
-          'function for more than a couple of weeks. And today, not at the '
+      body: _en('See a professional together if this has become an argument '
+          'you have every month, if either of you has stopped wanting any '
+          'physical closeness at all, if one of you is drinking more to get '
+          'through it, or if either of you has been low or unable to cope for '
+          'more than a couple of weeks. And talk to someone today, not at the '
           'next appointment, if either of you has had thoughts of harming '
           'yourself.'),
     ),
 
-    evidence: _en('The proportion of couples with a contributing male factor '
-        'follows standard infertility epidemiology as reflected in major '
-        'clinical guidance. Guidance on shared decision-making and on the '
-        'effect of scheduled intercourse on couple distress follows '
-        'infertility counselling practice. No claim is made that any of this '
-        'changes the chance of conceiving. Reviewed August 2026.'),
+    evidence: _en('The share of couples with a male factor involved follows '
+        'standard infertility research, as reflected in major clinical '
+        'guidance. The advice on making decisions together, and on how '
+        "scheduled sex affects a couple's distress, follows infertility "
+        'counselling practice, as do the everyday ways of talking when the '
+        'strain builds. We make no claim that any of this changes the '
+        'chance of conceiving. Sources checked September 2026.'),
 
-    readNext: ['ttc_read_stress_fertility', 'ttc_read_family_asking'],
+    readNext: [
+      'ttc_read_stress_fertility',
+      'ttc_read_family_asking',
+      'ttc_read_trying_takes_over',
+    ],
   ),
 ];

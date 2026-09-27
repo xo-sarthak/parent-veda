@@ -129,7 +129,7 @@ class TtcRecordsPdf {
                     pw.Expanded(
                       flex: 4,
                       child: pw.Text(
-                          value.isEmpty ? 'not typed' : value,
+                          value.isEmpty ? 'not entered' : value,
                           style: pw.TextStyle(
                               font: sansBold,
                               fontSize: 10.5,
@@ -156,7 +156,7 @@ class TtcRecordsPdf {
                     padding: const pw.EdgeInsets.only(top: 4, left: 10),
                     child: pw.Text(
                         '${_date(r.takenOn)}   '
-                        '${ttcRecordValue(r).isEmpty ? 'not typed' : ttcRecordValue(r)}',
+                        '${ttcRecordValue(r).isEmpty ? 'not entered' : ttcRecordValue(r)}',
                         style: pw.TextStyle(
                             font: body, fontSize: 9, color: _muted)),
                   ),
@@ -188,8 +188,8 @@ class TtcRecordsPdf {
         child: pw.Row(children: [
           pw.Expanded(
             child: pw.Text(
-                'Saved by ParentVeda exactly as the reports were written. '
-                'Nothing here is interpreted, ranked or flagged.',
+                'Saved in ParentVeda exactly as the reports were written. '
+                'Nothing here has been interpreted, ranked or flagged.',
                 style: pw.TextStyle(font: body, fontSize: 7.5, color: _muted)),
           ),
           pw.Text('${context.pageNumber} / ${context.pagesCount}',
@@ -232,19 +232,19 @@ class TtcRecordsPdf {
           pw.Text(
               '${coverage.notAdded.map((t) => t.name).join(', ')} '
               '${coverage.notAdded.length == 1 ? 'is' : 'are'} not saved in '
-              'ParentVeda. That is a fact about this folder, not about which '
-              'tests were done or should be.',
+              'ParentVeda. This only tells you what is in this folder. It '
+              'says nothing about which tests were done or should be.',
               style: pw.TextStyle(
                   font: body, fontSize: 9.5, lineSpacing: 1.5, color: _ink2)),
         ],
 
         if (unshown.isNotEmpty) ...[
           pw.SizedBox(height: 14),
-          label('Files that could not travel'),
+          label('Files that could not be included'),
           pw.SizedBox(height: 5),
           pw.Text(
               '${unshown.join(', ')}. '
-              'Saved in the app and not reproducible in this document.',
+              "Saved in the app, but they can't be shown in this document.",
               style: pw.TextStyle(
                   font: body, fontSize: 9.5, lineSpacing: 1.5, color: _ink2)),
         ],
@@ -310,7 +310,7 @@ class TtcRecordsPdf {
           try {
             out.add(_Shot(
               bytes: await f.readAsBytes(),
-              caption: '${g.label} — ${_date(r.takenOn)}',
+              caption: '${g.label}, ${_date(r.takenOn)}',
             ));
           } catch (_) {
             // Unreadable on disk. Same call as above.

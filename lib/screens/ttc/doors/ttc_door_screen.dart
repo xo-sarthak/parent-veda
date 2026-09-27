@@ -1,0 +1,1369 @@
+// =============================================================================
+//  TtcDoorScreen — a Trying-to-Conceive door in the new door language
+// -----------------------------------------------------------------------------
+//  Renders a `TtcFocusPage` the way the pregnancy doors render a `PvDoorPage`
+//  (Scans and tests, Complications, Symptoms, Nutrition, Garbh): a photograph
+//  hero whose eyebrow is the door's name and whose headline is a sentence, a
+//  live search field under the blurb, a white sheet, a rail of white cards
+//  with drawn marks straddling the seam, and under it the open tab.
+//
+//  ⚠️ MIRROR, DON'T MERGE (2026-09-26). The pregnancy engine is not generic:
+//  it reads `PregnancyController`, pregnancy stores, pregnancy const gates and
+//  the pregnancy router and search. This is its TTC copy, built from the
+//  stage-neutral pieces it already exposes (`PvDoorSheet`, `PvDoorRailCard`,
+//  `PvDoorDisclaimer`, `pvDoorPad`, `PvLiveSearch`, `V3HeroField`, `PvPress`)
+//  and the TTC side's own model, opener and router. Same precedent as the
+//  parenting and skilling engines. Nothing here touches a pregnancy file.
+//
+//  ⚠️ THE OLD SCREEN STAYS ON DISK. `TtcFocusScreen` renders the same data and
+//  is reachable from nowhere once the three openers call `openTtcDoor`; the
+//  pushes it replaced are commented at each call site, kept for revert.
+//
+//  ---------------------------------------------------------------------------
+//  The build order, top to bottom, and why each is where it is
+//  ---------------------------------------------------------------------------
+//    hero       photo + dark scrim, eyebrow (the tile's own words), the
+//               sentence, the blurb, the search field
+//    rail       one white card per tab, half over the photo, half on the sheet
+//    red flag   the read's own `whenToSeeSomeone`, as an ink rule, a heading
+//               and a coral dot; never retyped, never in a box
+//    note       an icon and a grey line
+//    tool       rendered in place, ABOVE the tab's sections (not instead)
+//    sections   a plain-question heading, then rows if every tile is written,
+//               else a rail of cards
+//    closing    the page's one line, unless the tab's note already says it
+//    disclaimer "general information, not medical advice" (the estimates
+//               line only where a door estimates; review D1, 2026-09-26)
+//
+//  ⚠️ THE REVIEW FIXES, 2026-09-26 (Mobbin review D1, D2, D3, D5):
+//    D1  the disclaimer is `TtcS.doorDisclaimer`, plus the estimates line on
+//        the one door that estimates ([kTtcDoorsThatEstimate]).
+//    D2  the pinned flag is one short line per sign: the read's own callout,
+//        split into its sentences for display ([ttcFlagLines]), never
+//        retyped. Flo's "Seek immediate medical help if", one sign per dot
+//        (https://mobbin.com/screens/0482506d-3f84-42f3-8c1c-f9ec3d6b48ea).
+//    D3  the keyboard's Search key with no match no longer jumps into Ask
+//        Veda: it stays on the rows, where "Ask Veda about ..." is offered.
+//    D5  the whole flag opens its read, and "Read the full piece" is a 44pt
+//        target, as the pregnancy flag is.
+//
+//  ⚠️ THE IVF DOOR'S TOP PANEL (B7): `TtcIvfRoundPanel`, "Your round" /
+//  "Between rounds" / "Positive test" / "Starting treatment?", and while a
+//  round is planned or running "Going through it" and "Track" lead the rail
+//  (`kTtcIvfRoundTabsFirst`, order only).
+//
+//  ⚠️ ADDING A DOOR OR A TAB IS DATA ONLY. A door is a `TtcFocusPage` in
+//  `lib/ttc/focus/` plus one line in `kTtcFocusPages`; a tab is a
+//  `TtcFocusGroup` (with a `mark`) plus sections naming its id. Nothing in
+//  this file is keyed on a bracket id.
+// =============================================================================
+
+import 'package:flutter/material.dart';
+
+import '../../../localization/app_language.dart';
+import '../../../models/bracket.dart';
+import '../../../models/pv_read.dart';
+import '../../../services/bracket_resolver.dart' show bracketById;
+import '../../../services/ttc_search_store.dart';
+import '../../../theme/pv_fonts.dart';
+import '../../../ttc/ttc_content_prefs.dart';
+import '../../../ttc/ttc_fertility_help_rules.dart'
+    show FertilityAgeBand, FertilityAgeBandCopy;
+import '../../../ttc/ttc_fertility_help_store.dart';
+import '../../../ttc/ttc_focus_data.dart';
+import '../../../ttc/ttc_reads_data.dart';
+import '../../../widgets/pv_feedback.dart';
+import '../../brackets/hub/hub_intent_art.dart';
+import '../../doors/pv_door_chrome.dart';
+import '../../doors/pv_live_search.dart';
+import '../../v2/v2_palette.dart';
+import '../../v2/v3_bracket_art.dart';
+import '../../v2/v3_hero_field.dart';
+import '../ttc_askveda_screen.dart' show openTtcAskVeda;
+import '../ttc_focus_screen.dart'
+    show openTtcFocusTile, openTtcArticle, photoForTile, iconForFormat;
+import '../ttc_strings.dart';
+import '../ttc_surface_router.dart' show ttcInlineToolFor, openTtcSurface;
+// Kept for revert: `show TtcStartTreatmentCard` (the panel draws it now).
+import '../ttc_treatment_round_screens.dart'
+    show TtcIvfRoundPanel, ttcIvfRoundLeads;
+import '../../../ttc/ttc_treatment_store.dart';
+import 'ttc_door_rail.dart';
+import 'ttc_door_search.dart';
+
+// -----------------------------------------------------------------------------
+//  Keys a test can find
+// -----------------------------------------------------------------------------
+
+const Key kTtcDoorSearchKey = ValueKey('ttc-door-search');
+Key ttcDoorFlagKey(String readId) => ValueKey('ttc-door-flag-$readId');
+Key ttcDoorRowsKey(String heading) => ValueKey('ttc-door-rows-$heading');
+Key ttcDoorSectionRailKey(String heading) =>
+    ValueKey('ttc-door-section-rail-$heading');
+
+/// How far the photograph runs on under the sheet's rounded top. The rail
+/// lifts by `TtcDoorRail.overlap` on top of this; see `_Hero._bleed`.
+const double kTtcDoorHeroOverlap = 38;
+
+// -----------------------------------------------------------------------------
+//  The one opener
+// -----------------------------------------------------------------------------
+
+/// Open the door for [bracketId]. Returns false, and opens nothing, when the
+/// bracket has no door, so a caller can fall through to a hub.
+///
+/// ⚠️ ONE OPENER, THREE CALLERS (the home's `_openBracket`, the semen report's
+/// IVF gateway, and a "Elsewhere" tile inside another door). Each used to build
+/// its own `MaterialPageRoute`, which is how a door ends up reachable in one
+/// design from one entrance and the old design from another.
+///
+/// ⚠️ THE ROUTE NAME IS UNCHANGED: `ttc/focus/<id>`. `global_ask_fab.dart`
+/// reads route names to decide which Ask Veda opens, so the name is an
+/// identity and survives the redesign.
+bool openTtcDoor(
+  BuildContext context,
+  String bracketId, {
+  String? initialGroup,
+}) {
+  final page = ttcFocusPageFor(bracketId);
+  final bracket = bracketById(bracketId);
+  if (page == null || bracket == null) return false;
+  Navigator.of(context).push(
+    MaterialPageRoute<void>(
+      settings: RouteSettings(name: 'ttc/focus/$bracketId'),
+      builder: (_) => TtcDoorScreen(
+        page: page,
+        bracket: bracket,
+        initialGroup: initialGroup,
+      ),
+    ),
+  );
+  return true;
+}
+
+// -----------------------------------------------------------------------------
+//  Tile helpers, public so the test can hold the rules
+// -----------------------------------------------------------------------------
+
+/// Whether a tile opens a piece of writing in the one reader. A section of
+/// only these draws as rows (DESIGN-SYSTEM §4.0 addendum 2); anything mixed
+/// keeps the rail.
+///
+/// ⚠️ A MYTH IS NOT "WRITTEN" HERE, UNLIKE ON THE PREGNANCY DOORS. A TTC myth
+/// opens the story deck (`TtcStoryScreen`), not the reader, and a row
+/// promises a page to read.
+bool ttcDoorTileIsWritten(TtcTile t) =>
+    t is TtcArticleTile || t is TtcGuideTile;
+
+bool ttcDoorSectionIsRows(List<TtcTile> tiles) =>
+    tiles.isNotEmpty && tiles.every(ttcDoorTileIsWritten);
+
+/// The chip on a card. One word per format (DESIGN-SYSTEM §4.0b): a guide
+/// opens the reader, so it is an Article; the one thing that costs money
+/// says so before she taps.
+String ttcDoorChip(TtcTile t) {
+  if (t.format.isPaid) return 'Paid';
+  if (t is TtcGuideTile) return 'Article';
+  return t.format.label;
+}
+
+/// The format as a drawn mark: the row well and the card's ghost.
+IntentMark ttcDoorFormatMark(TtcTileFormat f) => switch (f) {
+  TtcTileFormat.masterclass => IntentMark.schoolMark,
+  TtcTileFormat.tool => IntentMark.toolMark,
+  TtcTileFormat.article => IntentMark.pageMark,
+  TtcTileFormat.carousel => IntentMark.listMark,
+  TtcTileFormat.video => IntentMark.playMark,
+  TtcTileFormat.mythFact => IntentMark.questionMark,
+  TtcTileFormat.product => IntentMark.bagMark,
+  TtcTileFormat.booking => IntentMark.calendarDay,
+  TtcTileFormat.recipe => IntentMark.cookMark,
+  TtcTileFormat.community => IntentMark.cuppedHands,
+  TtcTileFormat.infographic => IntentMark.compareMark,
+  TtcTileFormat.practice => IntentMark.lotusMark,
+  TtcTileFormat.checklist => IntentMark.checkMark,
+  TtcTileFormat.talk => IntentMark.askDoctor,
+  TtcTileFormat.guide => IntentMark.bookMark,
+  TtcTileFormat.door => IntentMark.nextStep,
+};
+
+/// One small fact above a card's title. The tile's own `meta` wins; else it
+/// is DERIVED, never typed: a read's minutes from its words, a film's
+/// duration, a deck's slide count. A number nobody updates is worse than none.
+String? ttcDoorTileMeta(TtcTile t) {
+  if (t.meta case final m?) return m;
+  String? minutes(String? readId) {
+    if (readId == null) return null;
+    final r = ttcReadById(readId);
+    return r == null ? null : '${r.minutes} min read';
+  }
+
+  return switch (t) {
+    TtcArticleTile(:final readId) => minutes(readId),
+    TtcGuideTile(:final readId) => minutes(readId),
+    TtcVideoTile(:final duration) => '${duration.toLowerCase()} film',
+    TtcCarouselTile(:final cards) => '${cards.length} slides',
+    TtcMythTile(:final slides) =>
+      slides.isEmpty ? null : '${slides.length} slides',
+    _ => null,
+  };
+}
+
+// =============================================================================
+//  The shared-phone switch: what she has chosen not to see
+// -----------------------------------------------------------------------------
+//  "Hide sex and intimacy content" (`TtcContentPrefs.hideIntimate`, gap plan
+//  "Behind — Settings"). Many phones in India are shared with family, so when
+//  it is on, the door leaves out the Sex and closeness tab
+//  (`kTtcIntimateGroupId`) and every tile that opens a read in
+//  `kTtcIntimateReadIds`, wherever that tile sits.
+//
+//  ⚠️ ONE FUNCTION, CALLED BY THE SCREEN AND BY THE SEARCH INDEX. The obvious
+//  build is an `if` in each place that draws a tab, a count, a section and a
+//  search row, and the one that gets missed is the search: the tab vanishes,
+//  and typing "lubricant" into the field still lists the piece. Filtering the
+//  PAGE once, before anything reads it, means every consumer downstream sees
+//  the same smaller page and none of them has to know the switch exists.
+//
+//  ⚠️ CONTENT, NEVER STRUCTURE (CLAUDE.md, personalisation). Every other tab
+//  stays in its place; the switch only takes pieces out. A section left with
+//  no tiles goes, and a tab left with no sections and no tool goes, because a
+//  tab that opens onto nothing is worse than no tab. Timing is never hidden:
+//  it is not the private part, and it lives in other tabs.
+// =============================================================================
+
+/// Whether a tile opens a read the switch hides.
+bool ttcTileIsIntimate(TtcTile t) => switch (t) {
+  TtcArticleTile(:final readId, :final moreReadId) =>
+    kTtcIntimateReadIds.contains(readId) ||
+        kTtcIntimateReadIds.contains(moreReadId),
+  TtcGuideTile(:final readId) => kTtcIntimateReadIds.contains(readId),
+  _ => false,
+};
+
+/// [page] as she has chosen to see it. Returns [page] itself, untouched, when
+/// nothing is hidden, so the common case costs nothing.
+TtcFocusPage ttcDoorVisiblePage(
+  TtcFocusPage page, {
+  required bool hideIntimate,
+}) {
+  if (!hideIntimate) return page;
+  // ⚠️ A FIELD ADDED TO `TtcFocusPage` MUST BE COPIED BELOW, or the switch
+  // quietly drops it from every door while it is on.
+  final sections = <TtcFocusSection>[
+    for (final s in page.sections)
+      if (s.group != kTtcIntimateGroupId)
+        if ([
+          for (final t in s.tiles)
+            if (!ttcTileIsIntimate(t)) t,
+        ] case final tiles when tiles.isNotEmpty)
+          TtcFocusSection(heading: s.heading, group: s.group, tiles: tiles),
+  ];
+  final groups = page.groups == null
+      ? null
+      : <TtcFocusGroup>[
+          for (final g in page.groups!)
+            if (g.id != kTtcIntimateGroupId &&
+                ((g.inlineSurfaceId ?? g.toolSurfaceId) != null ||
+                    sections.any((s) => s.group == g.id)))
+              g,
+        ];
+  return TtcFocusPage(
+    bracketId: page.bracketId,
+    intro: page.intro,
+    sections: sections,
+    heroVideoSlot: page.heroVideoSlot,
+    heroVideoTitle: page.heroVideoTitle,
+    headline: page.headline,
+    groups: groups,
+    heroImageUrl: page.heroImageUrl,
+    heroBlurb: page.heroBlurb,
+    closingLine: page.closingLine,
+    heroTitle: page.heroTitle,
+  );
+}
+
+// =============================================================================
+//  Tab order by her age (2026-09-26, gap plan: "put the age tab higher in
+//  IVF & IUI")
+// -----------------------------------------------------------------------------
+//  ⚠️ ORDER, NEVER STRUCTURE (CLAUDE.md, personalisation). Every tab stays on
+//  the rail; the one change is that "Age and second baby" moves up to second
+//  when she has told us she is 35 or over. Nothing is hidden and nothing is
+//  added, so the door she learns is the same door everyone learns.
+//
+//  ⚠️ THE FIRST TAB NEVER MOVES. A door with no chosen tab opens on the first
+//  one, so moving a tab into first place would change where she lands. Second
+//  is one tap from the top, which is all the analysis asked for.
+//
+//  The age is the fertility-help tool's saved band (`TtcFertilityHelpStore`),
+//  the same answer the six-month rule reads. "35 or over" is
+//  `refersAtPresentation`, so the tab and the rule cannot disagree about where
+//  35 falls.
+// =============================================================================
+
+/// The doors that estimate something (the fertile window), so their
+/// disclaimer keeps the estimates line before the general one (D1).
+const Set<String> kTtcDoorsThatEstimate = {'ttc_conceiving'};
+
+/// The disclaimer at the foot of a door (D1).
+String ttcDoorDisclaimerFor(String bracketId) {
+  final t = TtcS.current();
+  return kTtcDoorsThatEstimate.contains(bracketId)
+      ? '${t.estimatesDisclaimer} ${t.doorDisclaimer}'
+      : t.doorDisclaimer;
+}
+
+/// The callout's body as one short line per sign (D2): split on its own line
+/// breaks, then into sentences. The words are the read's own, in order and
+/// whole; nothing is trimmed or retyped, so the self-harm routing on After a
+/// loss and Mind and body travels intact. A full stop after a short
+/// abbreviation ("Dr.", "e.g.") or before a lowercase word or a number does
+/// not end a line.
+List<String> ttcFlagLines(String body) {
+  final abbrev = RegExp(
+      r'(?:\b(?:Dr|Mr|Mrs|Ms|St|vs|approx|No|e\.g|i\.e|etc)\.)$',
+      caseSensitive: false);
+  final out = <String>[];
+  for (final para in body.split('\n')) {
+    final t = para.trim();
+    if (t.isEmpty) continue;
+    var from = 0;
+    for (final m in RegExp(r'[.!?\u0964]["\u201D\u2019)]*\s+')
+        .allMatches(t)) {
+      final piece = t.substring(from, m.end).trim();
+      final rest = t.substring(m.end);
+      if (abbrev.hasMatch(piece) || RegExp(r'^[a-z0-9]').hasMatch(rest)) {
+        continue;
+      }
+      out.add(piece);
+      from = m.end;
+    }
+    if (from < t.length) out.add(t.substring(from).trim());
+  }
+  return out;
+}
+
+/// The IVF & IUI door's bracket, the only door whose order follows age.
+const String kTtcIvfBracketId = 'ttc_infertility';
+
+/// The "Age and second baby" tab on that door.
+const String kTtcAgeGroupId = 'age';
+
+/// [groups] in the order she should see them. Returns [groups] itself when
+/// nothing moves, so every other door costs nothing.
+///
+/// [roundRunning] (2026-09-26, B7): while a treatment round is planned or
+/// running, the IVF door leads with [kTtcIvfRoundTabsFirst] ("Going through
+/// it", then "Track"), and the age move waits until the round closes. Order
+/// only: every tab stays.
+List<TtcFocusGroup> ttcDoorOrderedGroups(
+  List<TtcFocusGroup> groups, {
+  required String bracketId,
+  required FertilityAgeBand? ageBand,
+  bool roundRunning = false,
+}) {
+  if (bracketId != kTtcIvfBracketId) return groups;
+  if (roundRunning) {
+    final lead = [
+      for (final id in kTtcIvfRoundTabsFirst)
+        ...groups.where((g) => g.id == id),
+    ];
+    if (lead.isEmpty) return groups;
+    return [...lead, ...groups.where((g) => !lead.contains(g))];
+  }
+  if (!(ageBand?.refersAtPresentation ?? false)) return groups;
+  final at = groups.indexWhere((g) => g.id == kTtcAgeGroupId);
+  if (at <= 1) return groups;
+  return [...groups]
+    ..removeAt(at)
+    ..insert(1, groups[at]);
+}
+
+// =============================================================================
+//  The screen
+// =============================================================================
+
+class TtcDoorScreen extends StatefulWidget {
+  const TtcDoorScreen({
+    super.key,
+    required this.page,
+    required this.bracket,
+    this.initialGroup,
+  });
+
+  final TtcFocusPage page;
+
+  /// ⚠️ THE WHOLE BRACKET. The eyebrow is `bracket.label`, the exact words on
+  /// the tile she tapped, so the tile and the door cannot drift apart.
+  final Bracket bracket;
+
+  /// The tab to open on, by group id. Null opens the first. The selector
+  /// does not remember: the first tab is where a newcomer should land.
+  final String? initialGroup;
+
+  @override
+  State<TtcDoorScreen> createState() => _TtcDoorScreenState();
+}
+
+class _TtcDoorScreenState extends State<TtcDoorScreen> {
+  final PvLiveSearch _search = PvLiveSearch();
+  final GlobalKey _selectorAnchor = GlobalKey();
+
+  /// The search index, built once per language and per switch position.
+  List<TtcDoorHit>? _index;
+  AppLanguage? _indexLang;
+  bool? _indexHides;
+
+  /// The open tab, BY ID. ⚠️ NOT AN INDEX, since the shared-phone switch: a
+  /// tab can leave the rail while the door is open, and an index would then
+  /// point at the tab that slid into its place. Null or unknown opens the
+  /// first tab.
+  late String? _groupId = widget.initialGroup;
+
+  /// The page as she has chosen to see it, rebuilt only when the switch moves.
+  TtcFocusPage? _visible;
+  bool? _visibleHides;
+
+  TtcFocusPage get page {
+    final hide = TtcContentPrefs.instance.hideIntimate;
+    if (_visible == null || _visibleHides != hide) {
+      _visible = ttcDoorVisiblePage(widget.page, hideIntimate: hide);
+      _visibleHides = hide;
+    }
+    return _visible!;
+  }
+
+  Bracket get bracket => widget.bracket;
+
+  @override
+  void initState() {
+    super.initState();
+    TtcSearchStore.instance.init();
+    // Idempotent; main.dart has usually loaded it already.
+    TtcContentPrefs.instance.init();
+    // Her age band, for the IVF door's tab order. Idempotent; a failed read
+    // is the default order.
+    TtcFertilityHelpStore.instance.load().catchError((_) {});
+  }
+
+  @override
+  void didUpdateWidget(covariant TtcDoorScreen old) {
+    super.didUpdateWidget(old);
+    if (old.page != widget.page) {
+      _visible = null;
+      _index = null;
+    }
+  }
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
+  AppLanguage get _lang =>
+      TtcLang.instance.hinglish ? AppLanguage.hinglish : AppLanguage.english;
+
+  List<TtcDoorHit> _indexFor(AppLanguage lang) {
+    final hide = TtcContentPrefs.instance.hideIntimate;
+    if (_index == null || _indexLang != lang || _indexHides != hide) {
+      _index = ttcDoorSearchIndex(page, bracket, lang, hideIntimate: hide);
+      _indexLang = lang;
+      _indexHides = hide;
+    }
+    return _index!;
+  }
+
+  List<TtcFocusSection> _sectionsOf(String groupId) => [
+    for (final s in page.sections)
+      if (s.group == groupId) s,
+  ];
+
+  /// The second line on a tab's card. Counted, never typed; a tool tab
+  /// names itself (`inlineLabel`) rather than counting.
+  String _countFor(TtcFocusGroup g) {
+    if (g.inlineLabel case final label?) return label;
+    final n = _sectionsOf(g.id).fold(0, (t, s) => t + s.tiles.length);
+    if (n == 0) {
+      return (g.inlineSurfaceId ?? g.toolSurfaceId) != null ? 'Try it' : '';
+    }
+    return n == 1 ? '1 thing' : '$n things';
+  }
+
+  void _openTile(TtcTile tile) {
+    pvCommitFeedback();
+    openTtcFocusTile(context, tile, bracket.hue);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: Listenable.merge([
+        TtcLang.instance,
+        V2PaletteStore.instance,
+        TtcSearchStore.instance,
+        // The shared-phone switch, so turning it on in You updates a door
+        // that is already open underneath.
+        TtcContentPrefs.instance,
+        // Her age band, so answering it in a read or the tool reorders an
+        // IVF door that is already open underneath.
+        TtcFertilityHelpStore.instance,
+        // The round, so "Starting treatment?" leaves the IVF door the moment
+        // a round is saved (2026-09-26), and the panel and tab order follow
+        // it (B7).
+        TtcTreatmentStore.instance,
+        _search,
+      ]),
+      builder: (context, _) {
+        final p = V2PaletteStore.instance.current;
+        final hue = bracket.hue;
+        final tint = v2BlockTint(hue % 360, p);
+        final lang = _lang;
+        final page = this.page;
+        // Kept for revert: final groups = page.groups ?? const <TtcFocusGroup>[];
+        final groups = ttcDoorOrderedGroups(
+          page.groups ?? const <TtcFocusGroup>[],
+          bracketId: page.bracketId,
+          ageBand: TtcFertilityHelpStore.instance.ageBand,
+          roundRunning: page.bracketId == kTtcIvfBracketId &&
+              ttcIvfRoundLeads(),
+        );
+        final selected = groups.indexWhere((g) => g.id == _groupId);
+        final groupIndex = selected < 0 ? 0 : selected;
+        final group = groups.isEmpty ? null : groups[groupIndex];
+        // A page with no tabs shows every section at once.
+        final sections = group == null ? page.sections : _sectionsOf(group.id);
+
+        return PvLiveSearchScope(
+          search: _search,
+          child: Scaffold(
+            backgroundColor: p.ground,
+            body: Stack(
+              children: [
+                Positioned.fill(
+                  child: V3HeroField(
+                    accent: tint,
+                    ground: p.ground,
+                    variant: 1,
+                    chroma: v3FieldChroma(hue),
+                  ),
+                ),
+                ListView(
+                  // The sheet owns the bottom clearance, not the list.
+                  padding: EdgeInsets.zero,
+                  children: [
+                    _Hero(
+                      page: page,
+                      p: p,
+                      tint: tint,
+                      eyebrow: bracket.label.of(lang),
+                      bracket: bracket,
+                      search: _search,
+                      hasRail: groups.isNotEmpty,
+                      onSubmitted: (q) {
+                        final hits = ttcDoorSearch(q, _indexFor(lang));
+                        if (hits.isNotEmpty) {
+                          openTtcDoorHit(
+                            context,
+                            hits.first,
+                            hue: hue,
+                            query: q,
+                          );
+                        } else if (q.trim().isNotEmpty) {
+                          // D3 (2026-09-26): no silent jump into Ask Veda on
+                          // the keyboard's Search key. The rows stay, with
+                          // "Ask Veda about ..." as a choice she makes.
+                          // Kept for revert:
+                          //   openTtcAskVeda(context, initialQuery: q.trim());
+                          TtcSearchStore.instance.remember(q);
+                        }
+                      },
+                    ),
+                    PvDoorSheet(
+                      p: p,
+                      minHeight: pvLiveSearchSheetMin(context, _search),
+                      children: [
+                        if (_search.searching)
+                          ..._liveResults(p, lang)
+                        else if (_search.recalling &&
+                            TtcSearchStore.instance.recent.isNotEmpty)
+                          ..._liveRecall(p)
+                        else ...[
+                          SizedBox(key: _selectorAnchor, height: 0),
+
+                          // ---- the rail, across the seam ------------------
+                          // A slot `overlap` shorter than the rail, with the
+                          // rail painted upward out of it, puts the cards'
+                          // top half over the photograph (Flo).
+                          if (groups.isNotEmpty) ...[
+                            SizedBox(
+                              height:
+                                  TtcDoorRail.cardHeight - TtcDoorRail.overlap,
+                              child: OverflowBox(
+                                alignment: Alignment.bottomCenter,
+                                minHeight: TtcDoorRail.cardHeight,
+                                maxHeight: TtcDoorRail.cardHeight,
+                                child: TtcDoorRail(
+                                  groups: groups,
+                                  counts: [
+                                    for (final g in groups) _countFor(g),
+                                  ],
+                                  selected: groupIndex,
+                                  p: p,
+                                  onPick: (i) =>
+                                      setState(() => _groupId = groups[i].id),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                          ],
+                          const SizedBox(height: 18),
+
+                          // ---- "Starting treatment?" (2026-09-26, §2b) ------
+                          // The IVF & IUI door only, while no round is saved:
+                          // the obvious way into the round's start flow. The
+                          // surface it opens is the door's own data
+                          // (`kTtcIvfTopCardSurface`). Additive: every tab and
+                          // section below is unchanged.
+                          //
+                          // B7 (2026-09-26): the card is one of four panels
+                          // (`TtcIvfRoundPanel`), always there on this door.
+                          // Kept for revert:
+                          //   if (page.bracketId == kTtcIvfBracketId &&
+                          //       TtcTreatmentStore.instance.cycle.isEmpty) ...[
+                          //     pvDoorPad(TtcStartTreatmentCard(
+                          //       onTap: () => openTtcSurface(
+                          //           context, kTtcIvfTopCardSurface),
+                          //     )),
+                          //     const SizedBox(height: 22),
+                          //   ],
+                          if (page.bracketId == kTtcIvfBracketId) ...[
+                            pvDoorPad(TtcIvfRoundPanel(
+                              onStart: () => openTtcSurface(
+                                  context, kTtcIvfTopCardSurface),
+                              onRead: (id) =>
+                                  openTtcArticle(context, id, hue: hue),
+                            )),
+                            const SizedBox(height: 22),
+                          ],
+
+                          // ---- the pinned red flag, above everything ------
+                          // The read's OWN callout, never retyped here: one
+                          // copy of "go to a hospital today". Rendered whole,
+                          // so the self-harm line travels with it.
+                          if (group != null)
+                            for (final rid in group.pinnedRedFlagReadIds)
+                              if (ttcReadById(rid) case final read?) ...[
+                                pvDoorPad(
+                                  TtcDoorRedFlag(
+                                    key: ttcDoorFlagKey(rid),
+                                    callout: read.whenToSeeSomeone,
+                                    lang: lang,
+                                    p: p,
+                                    onOpen: () =>
+                                        openTtcArticle(context, rid, hue: hue),
+                                  ),
+                                ),
+                                const SizedBox(height: 22),
+                              ],
+
+                          // ---- the tab's standing note --------------------
+                          if (group?.note case final note?) ...[
+                            pvDoorPad(_TabNote(note: note, p: p)),
+                            const SizedBox(height: 20),
+                          ],
+
+                          // ---- the tool, in place, above the sections -----
+                          // ⚠️ NOT PADDED HERE. The TTC tool bodies lay out
+                          // their own gutter (the old screen handed them
+                          // through untouched and `ttc_mind_body_test` holds
+                          // where their cards start); a second pad would
+                          // double the margin and clip their rails.
+                          if (group != null)
+                            if (group.inlineSurfaceId ?? group.toolSurfaceId
+                                case final surface?)
+                              if (ttcInlineToolFor(surface)
+                                  case final tool?) ...[
+                                tool,
+                                const SizedBox(height: 28),
+                              ],
+
+                          // ---- this tab's sections ------------------------
+                          for (final section in sections) ...[
+                            pvDoorPad(
+                              Text(
+                                section.heading,
+                                style: pvFraunces(
+                                  fontSize: 21,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.2,
+                                  letterSpacing: -0.45,
+                                  color: p.ink1,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 13),
+                            // All written: rows into the reader. Mixed: a
+                            // rail, cut off at the right edge so it reads
+                            // as "more this way".
+                            if (ttcDoorSectionIsRows(section.tiles))
+                              pvDoorPad(
+                                _ArticleList(
+                                  key: ttcDoorRowsKey(section.heading),
+                                  tiles: section.tiles,
+                                  p: p,
+                                  hue: hue,
+                                  onOpen: _openTile,
+                                ),
+                              )
+                            else
+                              SizedBox(
+                                key: ttcDoorSectionRailKey(section.heading),
+                                height: kPvRailCardHeight,
+                                child: ListView.separated(
+                                  scrollDirection: Axis.horizontal,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: kPvDoorGutter,
+                                  ),
+                                  itemCount: section.tiles.length,
+                                  separatorBuilder: (_, _) =>
+                                      const SizedBox(width: kPvRailGap),
+                                  itemBuilder: (context, i) {
+                                    final t = section.tiles[i];
+                                    return PvPress(
+                                      child: PvDoorRailCard(
+                                        p: p,
+                                        hue: hue,
+                                        index: i,
+                                        icon: iconForFormat(t.format),
+                                        mark: ttcDoorFormatMark(t.format),
+                                        imageUrl: photoForTile(t),
+                                        chip: ttcDoorChip(t),
+                                        title: t.title,
+                                        meta: ttcDoorTileMeta(t),
+                                        onTap: () => _openTile(t),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                            const SizedBox(height: 26),
+                          ],
+
+                          // ---- the closing line, unless the tab says it ---
+                          if (page.closingLine case final line?
+                              when line != group?.note) ...[
+                            pvDoorPad(
+                              Text(
+                                line,
+                                style: pvFraunces(
+                                  fontSize: 15.5,
+                                  fontWeight: FontWeight.w500,
+                                  height: 1.5,
+                                  color: p.ink2,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 22),
+                          ],
+
+                          // D1: not medical advice, and the estimates line
+                          // only where a door estimates. Kept for revert:
+                          //   text: TtcS.current().estimatesDisclaimer,
+                          pvDoorPad(
+                            PvDoorDisclaimer(
+                              p: p,
+                              text: ttcDoorDisclaimerFor(page.bracketId),
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  // ---- the live field's two states ----------------------------------------
+
+  /// Rows for what she has typed, then the way on: Ask Veda, with her words.
+  List<Widget> _liveResults(V2Palette p, AppLanguage lang) {
+    final q = _search.query;
+    final hits = ttcDoorSearch(q, _indexFor(lang));
+    final label = bracket.label.of(lang);
+    return [
+      const SizedBox(height: 22),
+      pvDoorPad(
+        Text(
+          hits.isEmpty
+              ? 'Nothing here by that name yet'
+              : 'In $label and the library',
+          style: pvFraunces(
+            fontSize: 22,
+            fontWeight: FontWeight.w600,
+            height: 1.15,
+            color: p.ink1,
+          ),
+        ),
+      ),
+      const SizedBox(height: 6),
+      for (var i = 0; i < hits.length && i < 30; i++)
+        TtcDoorHitRow(
+          key: ttcDoorSearchHitKey(i),
+          p: p,
+          hit: hits[i],
+          onTap: () {
+            _search.focus.unfocus();
+            openTtcDoorHit(context, hits[i], hue: bracket.hue, query: q);
+          },
+        ),
+      const SizedBox(height: 14),
+      pvDoorPad(
+        PvLiveSearchWayOn(
+          p: p,
+          icon: Icons.auto_awesome_outlined,
+          title: 'Ask Veda about "$q"',
+          line: 'Ask in your own words and get a calm answer.',
+          onTap: () {
+            pvCommitFeedback();
+            TtcSearchStore.instance.remember(q);
+            _search.focus.unfocus();
+            openTtcAskVeda(context, initialQuery: q);
+          },
+        ),
+      ),
+      const SizedBox(height: 8),
+    ];
+  }
+
+  /// Her recent searches, as rows that put the words back in the field.
+  List<Widget> _liveRecall(V2Palette p) {
+    final recent = TtcSearchStore.instance.recent;
+    return [
+      const SizedBox(height: 22),
+      pvLiveSearchRecallHeading(
+        p,
+        'Recent',
+        onClear: TtcSearchStore.instance.clear,
+      ),
+      const SizedBox(height: 6),
+      for (final r in recent)
+        PvPress(
+          child: InkWell(
+            onTap: () {
+              pvCommitFeedback();
+              _search.run(r);
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+              child: Row(
+                children: [
+                  Icon(Icons.history_rounded, size: 20, color: p.ink2),
+                  const SizedBox(width: 14),
+                  Expanded(
+                    child: Text(
+                      r,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: pvManrope(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                        color: p.ink1,
+                      ),
+                    ),
+                  ),
+                  Icon(Icons.north_west_rounded, size: 16, color: p.ink3),
+                ],
+              ),
+            ),
+          ),
+        ),
+      const SizedBox(height: 8),
+    ];
+  }
+}
+
+// =============================================================================
+//  The hero
+// =============================================================================
+
+class _Hero extends StatelessWidget {
+  const _Hero({
+    required this.page,
+    required this.p,
+    required this.tint,
+    required this.eyebrow,
+    required this.bracket,
+    required this.search,
+    required this.hasRail,
+    required this.onSubmitted,
+  });
+
+  final TtcFocusPage page;
+  final V2Palette p;
+  final Color tint;
+
+  /// `bracket.label`: the exact words on the tile that opened this.
+  final String eyebrow;
+  final Bracket bracket;
+  final PvLiveSearch search;
+  final bool hasRail;
+  final ValueChanged<String> onSubmitted;
+
+  /// How far the picture runs under the sheet. The rail's cards float up over
+  /// the seam, so the picture reaches up behind them too, or a band of the
+  /// tinted field shows between photo and sheet.
+  double get _bleed =>
+      hasRail ? kTtcDoorHeroOverlap + TtcDoorRail.overlap : kTtcDoorHeroOverlap;
+
+  @override
+  Widget build(BuildContext context) {
+    final mark = bracketMarkFor(bracket.id);
+    final photo = page.heroImageUrl;
+    final title = page.heroTitle ?? eyebrow;
+    final blurb = page.heroBlurb ?? page.intro;
+
+    // `Clip.none` is what lets the picture run past the hero's own box.
+    return Stack(
+      clipBehavior: Clip.none,
+      children: [
+        // The photograph is a layer OVER the field. Both builders return
+        // nothing, so offline the hero is the finished field, never a grey box.
+        if (photo != null)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: -_bleed,
+            child: Image.network(
+              photo,
+              fit: BoxFit.cover,
+              alignment: Alignment.topCenter,
+              errorBuilder: (_, _, _) => const SizedBox.shrink(),
+              loadingBuilder: (context, child, progress) =>
+                  progress == null ? child : const SizedBox.shrink(),
+            ),
+          ),
+        // A dark scrim only; fading to the page colour reads as fog.
+        if (photo != null)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: -_bleed,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.black.withValues(alpha: 0.52),
+                    Colors.black.withValues(alpha: 0.30),
+                    Colors.black.withValues(alpha: 0.34),
+                  ],
+                  stops: const [0, 0.62, 1],
+                ),
+              ),
+            ),
+          ),
+        if (photo == null)
+          Positioned(
+            right: -26,
+            top: 52,
+            child: Opacity(
+              opacity: 0.5,
+              child: SizedBox(
+                width: 146,
+                height: 146,
+                child: mark == null
+                    ? const SizedBox.shrink()
+                    : V3BracketArt(mark: mark, tint: tint),
+              ),
+            ),
+          ),
+        SafeArea(
+          bottom: false,
+          child: Padding(
+            padding: EdgeInsets.fromLTRB(
+              20,
+              8,
+              22,
+              20 + (hasRail ? TtcDoorRail.overlap - 12 : 0),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    Material(
+                      color: Colors.white.withValues(alpha: 0.55),
+                      shape: const CircleBorder(),
+                      clipBehavior: Clip.antiAlias,
+                      child: InkWell(
+                        onTap: () => Navigator.of(context).maybePop(),
+                        child: SizedBox(
+                          width: 38,
+                          height: 38,
+                          child: Icon(
+                            Icons.arrow_back_rounded,
+                            size: 19,
+                            color: p.ink1,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                // The only lever on the photograph's size: a taller column.
+                // A fraction of the screen, so a small phone is not eaten.
+                SizedBox(
+                  height: photo == null
+                      ? 20
+                      : MediaQuery.sizeOf(context).height * 0.10,
+                ),
+                PvLiveSearchWords(
+                  search: search,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        eyebrow.toUpperCase(),
+                        style: pvManrope(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 1.4,
+                          color: photo == null
+                              ? p.ink2
+                              : Colors.white.withValues(alpha: 0.82),
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 300),
+                        child: Text(
+                          title,
+                          style: pvFraunces(
+                            fontSize: photo == null ? 27 : 30,
+                            fontWeight: FontWeight.w600,
+                            height: 1.15,
+                            letterSpacing: -0.6,
+                            color: photo == null ? p.ink1 : Colors.white,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 330),
+                        child: Text(
+                          blurb,
+                          style: pvManrope(
+                            fontSize: 13.5,
+                            height: 1.55,
+                            color: photo == null
+                                ? p.ink2
+                                : Colors.white.withValues(alpha: 0.92),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                // Search, in the door: Flo's topic page. Live, so rows draw
+                // in the sheet as she types.
+                PvLiveSearchField(
+                  key: kTtcDoorSearchKey,
+                  search: search,
+                  p: p,
+                  hint: 'Search $eyebrow',
+                  onSubmitted: onSubmitted,
+                ),
+                const SizedBox(height: 4),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// =============================================================================
+//  The pinned red flag, in the new form
+// -----------------------------------------------------------------------------
+//  An ink rule, the heading in the display face, the read's words with one
+//  coral dot, a way to the whole piece, a hairline. No box (DESIGN-SYSTEM §4.0
+//  addendum: "a big blob thrown at the screen"). The dot is the only colour.
+//
+//  ⚠️ THE WORDS ARE THE READ'S OWN `whenToSeeSomeone`, WHOLE. Nothing here is
+//  retyped or shortened: a clinical warning in two places disagrees with
+//  itself the day one is edited, and the self-harm routing on After a loss
+//  and Mind & body must never be trimmed out of an excerpt. A body with line
+//  breaks becomes one dotted line per break; one paragraph stays one line.
+// =============================================================================
+
+class TtcDoorRedFlag extends StatelessWidget {
+  const TtcDoorRedFlag({
+    super.key,
+    required this.callout,
+    required this.lang,
+    required this.p,
+    this.onOpen,
+  });
+
+  final PvCallout callout;
+  final AppLanguage lang;
+  final V2Palette p;
+
+  /// Opens the read the callout belongs to.
+  final VoidCallback? onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    // D2 (2026-09-26): one line per sentence, the read's own words. Kept for
+    // revert, the line-break split only:
+    //   final lines = callout.body.of(lang).split('\n')
+    //       .map((l) => l.trim()).where((l) => l.isNotEmpty).toList();
+    final lines = ttcFlagLines(callout.body.of(lang));
+    final block = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(height: 1.5, color: p.ink1),
+        const SizedBox(height: 14),
+        Text(
+          callout.title.of(lang),
+          style: pvFraunces(
+            fontSize: 21,
+            fontWeight: FontWeight.w600,
+            height: 1.2,
+            letterSpacing: -0.3,
+            color: p.ink1,
+          ),
+        ),
+        const SizedBox(height: 10),
+        for (final line in lines)
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 5),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 8, right: 11),
+                  child: Container(
+                    width: 6,
+                    height: 6,
+                    decoration: const BoxDecoration(
+                      color: kPvUrgentInk,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Text(
+                    line,
+                    style: pvManrope(fontSize: 14, height: 1.5, color: p.ink1),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        if (onOpen != null) ...[
+          const SizedBox(height: 4),
+          // D5: a 44pt row. The whole block opens the read too (below).
+          ConstrainedBox(
+            constraints: const BoxConstraints(minHeight: 44),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Read the full piece',
+                    style: pvManrope(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w800,
+                      color: p.ink1,
+                    ),
+                  ),
+                  Icon(Icons.chevron_right_rounded, size: 17, color: p.ink1),
+                ],
+              ),
+            ),
+          ),
+        ],
+        const SizedBox(height: 10),
+        Container(height: 1, color: p.line),
+      ],
+    );
+    if (onOpen == null) return block;
+    // D5: the whole flag is the tap target, as on the pregnancy doors.
+    return Semantics(
+      button: true,
+      label: '${callout.title.of(lang)}. Read the full piece',
+      child: PvPress(
+        child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
+          onTap: () {
+            pvCommitFeedback();
+            onOpen!();
+          },
+          child: block,
+        ),
+      ),
+    );
+  }
+}
+
+/// A tab's standing note: an icon and a grey line, on the page. No box.
+class _TabNote extends StatelessWidget {
+  const _TabNote({required this.note, required this.p});
+
+  final String note;
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) => Padding(
+    padding: const EdgeInsets.symmetric(vertical: 2),
+    child: Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(top: 2),
+          child: Icon(Icons.info_outline_rounded, size: 15, color: p.ink3),
+        ),
+        const SizedBox(width: 9),
+        Expanded(
+          child: Text(
+            note,
+            style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink2),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
+// =============================================================================
+//  _ArticleList — a section of written tiles, as rows
+// -----------------------------------------------------------------------------
+//  A 56pt thumbnail (the read's photograph, else the format's drawn mark in a
+//  well of the door's tint), the title bold, the blurb in one grey line, the
+//  derived meta, a chevron, a hairline under. Presses and hums.
+// =============================================================================
+
+class _ArticleList extends StatelessWidget {
+  const _ArticleList({
+    super.key,
+    required this.tiles,
+    required this.p,
+    required this.hue,
+    required this.onOpen,
+  });
+
+  final List<TtcTile> tiles;
+  final V2Palette p;
+  final double hue;
+  final void Function(TtcTile) onOpen;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        for (final t in tiles)
+          PvPress(
+            child: InkWell(
+              onTap: () => onOpen(t),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 12),
+                decoration: BoxDecoration(
+                  border: Border(bottom: BorderSide(color: p.line)),
+                ),
+                child: Row(
+                  children: [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: SizedBox(
+                        width: 56,
+                        height: 56,
+                        child: switch (photoForTile(t)) {
+                          final url? => Image.network(
+                            url,
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) => _well(t),
+                            loadingBuilder: (context, child, progress) =>
+                                progress == null ? child : _well(t),
+                          ),
+                          _ => _well(t),
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 14),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            t.title,
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: pvManrope(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              height: 1.25,
+                              color: p.ink1,
+                            ),
+                          ),
+                          const SizedBox(height: 3),
+                          Text(
+                            t.blurb,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: pvManrope(
+                              fontSize: 12.5,
+                              height: 1.4,
+                              color: p.ink2,
+                            ),
+                          ),
+                          if (ttcDoorTileMeta(t) case final m?) ...[
+                            const SizedBox(height: 3),
+                            Text(
+                              m,
+                              style: pvManrope(
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: p.ink3,
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
+                  ],
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _well(TtcTile t) {
+    final tint = v2BlockTint(hue % 360, p);
+    return Container(
+      color: tint,
+      alignment: Alignment.center,
+      padding: const EdgeInsets.all(11),
+      child: HubIntentArt(mark: ttcDoorFormatMark(t.format), tint: tint),
+    );
+  }
+}

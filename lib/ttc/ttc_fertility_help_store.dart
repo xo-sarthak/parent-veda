@@ -25,6 +25,7 @@ import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'cycle_store.dart';
+import 'ttc_chapter.dart' show kTtcIrregularSpreadDays;
 import 'ttc_fertility_help_rules.dart';
 import 'ttc_pcos_check_rules.dart';
 import 'ttc_pcos_check_store.dart';
@@ -46,6 +47,20 @@ class TtcFertilityHelpStore extends ChangeNotifier {
   bool get hasCompleted => _completedAt != null;
 
   String? answerFor(String id) => _answers[id];
+
+  /// Her age band, if she has told us anywhere. Null until she has.
+  ///
+  /// ⚠️ ONE ANSWER, MANY PLACES TO GIVE IT (2026-09-26, gap plan). The tool
+  /// asks it, the IVF readiness flow writes it, and the "Trying after 35"
+  /// read asks it with one tap. All three write the same `age` answer under
+  /// the same key, so answering once anywhere answers it everywhere, and the
+  /// six-month rule (`TtcMessageFacts.monthsBeforeCheck`) and the IVF door's
+  /// tab order read one value. A second key would be two ages that could
+  /// disagree.
+  FertilityAgeBand? get ageBand =>
+      FertilityAgeBand.values.where((b) => b.name == _answers['age']).firstOrNull;
+
+  Future<void> setAgeBand(FertilityAgeBand band) => answer('age', band.name);
 
   Future<void> load() async {
     if (_loaded) return;
@@ -127,9 +142,7 @@ class TtcFertilityHelpStore extends ChangeNotifier {
 
     return FertilityHelpContext(
       daysTrying: TtcStore.instance.daysTrying,
-      ageBand: FertilityAgeBand.values
-          .where((b) => b.name == _answers['age'])
-          .firstOrNull,
+      ageBand: ageBand,
       cyclesLogged: cycles.length,
       cycleShortest: shortest,
       cycleLongest: longest,
@@ -139,7 +152,9 @@ class TtcFertilityHelpStore extends ChangeNotifier {
       cyclesIrregular: cycles.length >= 2 &&
           longest != null &&
           shortest != null &&
-          (longest - shortest) > 7,
+          // The one definition of irregular, shared with the engine
+          // (2026-09-26, FIGO 2018). Kept for revert: `> 7`.
+          (longest - shortest) > kTtcIrregularSpreadDays,
       pcosCheckDone: pcos.hasCompleted,
       pcosPatternFound: pcosResult != null &&
           !pcosResult.stopped &&

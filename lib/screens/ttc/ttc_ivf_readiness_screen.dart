@@ -58,6 +58,13 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
     // a wrong claim she never saw is the worst outcome available.
     _a.cycles = ivfSuggestedCycles(_ctx);
     _a.trying = _tryingFromLogs();
+    // ⚠️ A THIRD PREFILL: HER AGE, IF SHE HAS GIVEN IT ANYWHERE (2026-09-26,
+    // consistency pass). The help tool, the "Trying after 35" read and this
+    // flow all write the one saved answer, and this was the only one of the
+    // three that asked again from blank, so the same woman could be "38 to
+    // 40" on the IVF door's tab order and unanswered here. Selected and
+    // changeable, like the two above.
+    _a.age = _ctx.ageBand;
   }
 
   /// How long she has been trying, from `TtcStore`, mapped onto the bands.
@@ -95,9 +102,9 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
       hue: kIvfHue,
       eyebrow: 'Should I get help?',
       title: 'Is it worth talking\nto someone yet?',
-      intro: 'Six short questions. No score and no verdict — this only says '
-          'whether a conversation is worth having, and a specialist is the '
-          'only one who can say more.',
+      intro: "Six short questions. There's no score and no verdict. This only "
+          "tells you whether it's worth talking to someone. Only a specialist "
+          'can tell you more.',
       children: [
         const SizedBox(height: 22),
 
@@ -112,8 +119,8 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
           // and the one most likely to feel like being judged. Saying what it
           // is for, in the same breath, is the difference between a question
           // and an interrogation.
-          note: 'Age changes how soon a conversation is useful, and nothing '
-              'else on this screen.',
+          note: "Your age only changes how soon it's worth talking to "
+              'someone. Nothing else here depends on it.',
           child: TtcToolChoice<FertilityAgeBand>(
             value: _a.age,
             hue: kIvfHue,
@@ -130,7 +137,8 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
           title: 'How long have you been trying?',
           note: _tryingFromLogs() == null
               ? null
-              : 'Filled in from your journey. Change it if that looks wrong.',
+              : "Filled in from what you've logged. Change it if that looks "
+                  'wrong.',
           child: TtcToolChoice<IvfTrying>(
             value: _a.trying,
             hue: kIvfHue,
@@ -158,7 +166,7 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
         ttcToolPad(TtcToolQuestion(
           n: 4,
           hue: kIvfHue,
-          title: 'Has anything already been mentioned to you?',
+          title: 'Has a doctor already told you about any of these?',
           note: 'Tap anything that applies.',
           child: _Conditions(
             selected: _a.conditions,
@@ -191,8 +199,8 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
           // ⚠️ THIS QUESTION IS THE ONE THE SHIPPED FLOW DID NOT ASK, and it is
           // about half the answer. A tool that investigates only her is a tool
           // that can send a couple down a year of the wrong road.
-          note: 'Male factor is about half of all cases. The test is quick and '
-              'inexpensive.',
+          note: 'His side is part of the picture in about half of all cases. '
+              'The test is quick and not expensive.',
           child: TtcToolChoice<IvfSemen>(
             value: _a.semen,
             hue: kIvfHue,
@@ -252,8 +260,8 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
         ttcToolPad(Builder(builder: (context) {
           final p = V2PaletteStore.instance.current;
           return Text(
-              'You can leave any of these blank. Where this is unsure, it '
-              'points you toward a conversation rather than away from one.',
+              "You can leave any of these blank. When it's unsure, this check "
+              'leans towards talking to someone, not away from it.',
               textAlign: TextAlign.center,
               style: pvManrope(fontSize: 11.5, height: 1.5, color: p.ink3));
         })),
@@ -274,9 +282,9 @@ class _FromYourLogs extends StatelessWidget {
     final p = V2PaletteStore.instance.current;
     final lines = <String>[
       if (ctx.tryingLabel != null)
-        'You have been trying ${ctx.tryingLabel!.en}.',
+        'You\'ve been trying for ${ctx.tryingLabel!.en}.',
       if (ctx.hasEnoughCycleData)
-        'You have ${ctx.cyclesLogged} logged cycles, running '
+        'You\'ve logged ${ctx.cyclesLogged} cycles, lasting '
             '${ctx.cycleShortest} to ${ctx.cycleLongest} days.',
     ];
     if (lines.isEmpty) return const SizedBox.shrink();
@@ -289,7 +297,7 @@ class _FromYourLogs extends StatelessWidget {
         borderRadius: BorderRadius.circular(ttcCardRadius),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Text('WHAT WE ALREADY HAVE',
+        Text('WHAT WE ALREADY KNOW',
             style: pvManrope(
                 fontSize: 9.5,
                 fontWeight: FontWeight.w800,
@@ -370,12 +378,12 @@ class TtcIvfReadinessResultScreen extends StatelessWidget {
     return TtcToolScaffold(
       hue: kIvfHue,
       variant: 3,
-      eyebrow: 'Your read',
+      eyebrow: 'Your answer',
       // ⚠️ THE TITLE DESCRIBES WHAT SHE IS HOLDING, NOT WHAT SHE IS. This is
       // where a "you may be infertile" would go on a worse version of this
       // screen, and it is the first place the eye lands.
       title: 'What this adds up to.',
-      intro: 'No score, no label. One read of where you are, and what is worth '
+      intro: "No score and no label. Just where you are, and what's worth "
           'doing about it.',
       children: [
         const SizedBox(height: 24),
@@ -469,7 +477,8 @@ class TtcIvfNotesScreen extends StatelessWidget {
         variant: 4,
         eyebrow: 'Appointment notes',
         title: 'What to take\nwith you.',
-        intro: 'Screenshot this, or read it out. Six lines, all of them yours.',
+        intro: "Take a screenshot, or read it out. It's six lines, all from "
+            'your answers.',
         children: [
           const SizedBox(height: 24),
           ttcToolPad(TtcToolNotesCard(

@@ -64,7 +64,7 @@ const List<TtcMilestone> ttcMilestones = [
     titleEn: 'You decided to start',
     titleHi: 'Aapne shuru karne ka faisla kiya',
     bodyEn:
-        'The day a family begins is not the day a baby arrives. It is this one.',
+        'A family starts long before a baby arrives. Yours started here.',
     bodyHi:
         'Family us din shuru nahi hoti jis din bachcha aata hai. Isi din hoti hai.',
   ),
@@ -75,7 +75,7 @@ const List<TtcMilestone> ttcMilestones = [
     titleEn: 'Started your supplements',
     titleHi: 'Supplements shuru kiye',
     bodyEn:
-        'Folic acid works before you know you are pregnant. Starting it while trying is the single most evidence-backed thing on this whole list.',
+        "Folic acid works before you even know you're pregnant. Of everything on this list, starting it while trying has the strongest evidence behind it.",
     bodyHi:
         'Folic acid tab kaam karta hai jab pata bhi nahi hota. Koshish ke dauraan ise shuru karna, is poori list ki sabse zyada saboot wali baat hai.',
   ),
@@ -97,7 +97,7 @@ const List<TtcMilestone> ttcMilestones = [
     titleEn: 'Completed a full cycle together',
     titleHi: 'Ek poora cycle saath mein poora kiya',
     bodyEn:
-        'A month of paying attention. Whatever it ended in, you now know something about your body that you did not know last month.',
+        "A month of paying attention. However it ended, you now know something about your body that you didn't know last month.",
     bodyHi:
         'Ek mahina dhyaan dene ka. Wo jaise bhi khatam hua, ab aap apne body ke baare mein kuch jaanti hain jo pichhle mahine nahi jaanti thi.',
   ),
@@ -108,7 +108,7 @@ const List<TtcMilestone> ttcMilestones = [
     titleEn: 'Learned to read your own signals',
     titleHi: 'Apne signals padhna seekha',
     bodyEn:
-        'You recorded a signal from your own body rather than relying on a calendar estimate. That is the shift this chapter is actually for.',
+        "You noted a sign from your own body, instead of relying on a calendar estimate. That's what this chapter is for.",
     bodyHi:
         'Aapne calendar ke andaaze par nirbhar rehne ke bajaye apne body ka signal record kiya. Yahi wo badlaav hai jiske liye ye chapter hai.',
   ),
@@ -119,7 +119,7 @@ const List<TtcMilestone> ttcMilestones = [
     titleEn: 'Your partner joined',
     titleHi: 'Aapka partner juda',
     bodyEn:
-        'This stops being something one of you is doing and becomes something you are both in.',
+        "This is no longer something one of you is doing. It's something you're both in.",
     bodyHi:
         'Ab ye wo cheez nahi rahi jo aap mein se ek kar raha hai - ye wo cheez ban gayi jismein aap dono hain.',
   ),
@@ -130,7 +130,7 @@ const List<TtcMilestone> ttcMilestones = [
     titleEn: 'Started keeping your health records',
     titleHi: 'Apne health records rakhna shuru kiya',
     bodyEn:
-        'Numbers you can show a doctor beat a memory of how you have been feeling.',
+        "Numbers you can show a doctor help more than trying to remember how you've been feeling.",
     bodyHi:
         'Jo numbers aap doctor ko dikha sakein, wo "aisa lag raha tha" se behtar hote hain.',
   ),
@@ -141,7 +141,7 @@ const List<TtcMilestone> ttcMilestones = [
     titleEn: 'Wrote something down',
     titleHi: 'Kuch likha',
     bodyEn:
-        'Years from now this will be the part you are glad you kept - including the hard entries.',
+        "Years from now, you'll be glad you kept this, including the hard entries.",
     bodyHi:
         'Kai saal baad yahi wo hissa hoga jise rakhne ki aapko khushi hogi - mushkil entries bhi.',
   ),
@@ -163,7 +163,7 @@ const List<TtcMilestone> ttcMilestones = [
     titleEn: 'Looked honestly at your habits',
     titleHi: 'Apni aadaton ko imaandaari se dekha',
     bodyEn:
-        'Sleep, movement, and the things that are harder to write down. Noticing is the whole first step.',
+        'Sleep, movement, and the things that are harder to write down. Noticing them is the first step.',
     bodyHi:
         'Neend, movement, aur wo cheezein jo likhna mushkil hai. Notice karna hi pehla poora kadam hai.',
   ),
@@ -173,7 +173,7 @@ const List<TtcMilestone> ttcMilestones = [
     isOutcome: true,
     titleEn: 'A positive test',
     titleHi: 'Positive test',
-    bodyEn: 'A beautiful new chapter begins - and nothing you built here is lost.',
+    bodyEn: 'A beautiful new chapter begins, and nothing you built here is lost.',
     bodyHi:
         'Ek khoobsurat naya chapter shuru hota hai - aur yahan jo banaya, kuch nahi khota.',
   ),

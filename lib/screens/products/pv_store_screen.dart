@@ -25,7 +25,9 @@ import '../../services/life_stage_store.dart';
 import '../../services/pv_catalog_store.dart';
 import '../../services/pv_order_store.dart';
 import '../../theme/pv_fonts.dart';
+import '../../widgets/pv_feedback.dart';
 import '../../widgets/pv_nav_bar.dart';
+import '../doors/pv_list_row.dart';
 import 'pv_cart_screen.dart';
 import 'pv_hero_band.dart';
 import 'pv_orders_screen.dart';
@@ -162,6 +164,10 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
                       ),
                     ),
                     SliverToBoxAdapter(child: _categories(p, cats)),
+                    // TTC's storefront only: shop by need (CVS's "Feeling
+                    // queasy?" cards). Every other storefront is unchanged.
+                    if (_stage == LifeStage.tryingToConceive)
+                      SliverToBoxAdapter(child: _ttcNeeds(p)),
                     if (forYou.isNotEmpty)
                       SliverToBoxAdapter(
                         child: _rail(
@@ -400,6 +406,136 @@ class _PvStoreScreenState extends State<PvStoreScreen> {
             ),
           const SizedBox(height: 12),
           PvCardRail(products: sorted.take(6).toList(), scope: 'shelf_${c.id}'),
+        ],
+      ),
+    );
+  }
+
+  // ---- shop by need (TTC's storefront only) ---------------------------------------
+  //
+  // ⚠️ ADDED 2026-09-26 FROM THE MOBBIN PRODUCTS BRIEF, AND GATED TO TTC. CVS
+  // leads its health aisle with the need ("Feeling queasy?", "Add fiber"),
+  // not the product type, and that is how a woman trying to conceive arrives
+  // at a shop: she has just read about folic acid, or wants to find her
+  // fertile days. Five rows, each to the one product or the one shelf that
+  // answers it. Category names stay the index; this is the way in.
+  //
+  // Gated on the storefront being shown, not on who is looking, so a
+  // pregnancy parent who switches to the TTC storefront sees the same shop.
+  // Pregnancy and parenting storefronts are untouched.
+
+  static const List<(IconData, String, String, String)> _kTtcNeeds = [
+    (
+      Icons.eco_outlined,
+      'Starting folic acid',
+      'The one supplement to begin before you try',
+      'product:ttc_folic',
+    ),
+    (
+      Icons.wb_twilight_rounded,
+      'Finding your fertile days',
+      'Ovulation kits and a thermometer, and when each helps',
+      'shelf:ttc_kits',
+    ),
+    (
+      Icons.science_outlined,
+      'Taking a pregnancy test',
+      'Which test to buy, and how early it can tell',
+      'shelf:ttc_tests',
+    ),
+    (
+      Icons.medication_outlined,
+      'Supplements, sorted',
+      "What's worth taking, and what isn't",
+      'shelf:ttc_supplements',
+    ),
+    (
+      Icons.menu_book_outlined,
+      'Something for the waiting',
+      'Books written for the long weeks',
+      'shelf:ttc_books',
+    ),
+  ];
+
+  /// Whether a need's row leads anywhere (review S3, 2026-09-26). A row
+  /// whose product AND fallback shelf are both gone would be a dead row, so
+  /// it is not drawn; the check runs at build, against the live catalogue.
+  static bool ttcNeedResolves(String target) {
+    final store = PvCatalogStore.instance;
+    final i = target.indexOf(':');
+    final kind = target.substring(0, i);
+    final id = target.substring(i + 1);
+    if (kind == 'product') {
+      return store.byId(id) != null ||
+          store.category('ttc_supplements') != null;
+    }
+    return store.category(id) != null;
+  }
+
+  void _openNeed(String target) {
+    pvCommitFeedback();
+    final store = PvCatalogStore.instance;
+    final i = target.indexOf(':');
+    final kind = target.substring(0, i);
+    final id = target.substring(i + 1);
+    if (kind == 'product') {
+      final prod = store.byId(id);
+      if (prod != null) {
+        pvOpenProduct(context, prod);
+        return;
+      }
+      // A product the catalogue no longer carries opens its shelf instead.
+      final c = store.category('ttc_supplements');
+      if (c != null) _openShelf(c);
+      return;
+    }
+    final c = store.category(id);
+    if (c != null) _openShelf(c);
+  }
+
+  // ⚠️ UNBOXED (review S1, S2, 2026-09-26). The five rows sat in a white
+  // rounded box with its own inset, which DESIGN-SYSTEM §4.13 forbids; they
+  // are now the shared `PvRowGroup` + `PvListRow` that Learn and Tools use,
+  // pressing like every row. Mobbin: Hers "goals", needs as plain rows
+  // (HERS-GOALS, https://mobbin.com/screens/fb081800-9205-4ad5-acd4-b0753e8677e4).
+  // Kept for revert: a Container (white, radius 16, kPvLine border) holding
+  // InkWell rows split by inset Dividers, each with a 38pt surfaceAlt well.
+  Widget _ttcNeeds(V2Palette p) {
+    final needs = [
+      for (final n in _kTtcNeeds)
+        if (ttcNeedResolves(n.$4)) n,
+    ];
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 22, 20, 0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const PvSectionHead(
+            eyebrow: 'Shop by need',
+            title: 'Start from what you need',
+          ),
+          const SizedBox(height: 8),
+          PvRowGroup(p: p, children: [
+            for (final n in needs)
+              PvListRow(
+                key: ValueKey('pv_store_need_${n.$4}'),
+                p: p,
+                leading: Container(
+                  width: 40,
+                  height: 40,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    color: p.surfaceAlt,
+                    borderRadius: BorderRadius.circular(11),
+                  ),
+                  child: Icon(n.$1, size: 19, color: p.ink1),
+                ),
+                title: n.$2,
+                line: n.$3,
+                lineMaxLines: 2,
+                onTap: () => _openNeed(n.$4),
+              ),
+          ]),
         ],
       ),
     );

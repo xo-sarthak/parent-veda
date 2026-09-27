@@ -155,7 +155,7 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
             ? 'No cycles yet'
             : r.start == null
                 ? ''
-                : '${_fmt(r.start!)} – ${_fmt(r.end!)}',
+                : '${_fmt(r.start!)} to ${_fmt(r.end!)}',
         canGoBack: !empty && _index + 1 < r.cyclesAvailable,
         canGoForward: !empty && _index > 0,
         onBack: () => setState(() => _index++),
@@ -185,53 +185,53 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
                 facts: facts,
                 eyebrow: 'Who is guiding this cycle',
                 title: 'Your doctor is timing this one',
-                body: 'You have marked this as a treatment cycle. Your clinic '
+                body: "You've marked this as a treatment cycle. Your clinic "
                     'is scanning you and choosing the dates, and they can see '
                     'things this page never will.',
-                body2: 'So we are not putting our estimate next to theirs. '
-                    'Nothing is wrong with your dates — they are all below, '
+                body2: "So we're not putting our estimate next to theirs. "
+                    "Nothing is wrong with your dates. They're all below, "
                     'and the four stretches come back the month after your '
                     'treatment cycle ends.',
                 actionLabel: 'Prepare questions for your next visit',
                 onAction: () => _openSurface(context, 'ttc_appointments'),
-                footLabel: 'This cycle is not a treatment cycle',
+                footLabel: "This isn't a treatment cycle",
                 onFoot: () => _openSurface(context, 'ttc_profile'),
-                footNote: 'Your rhythm numbers are your own history and keep '
-                    'updating. They are not an estimate for this cycle.',
+                footNote: 'Your rhythm numbers come from your own history and '
+                    "keep updating. They're not an estimate for this cycle.",
               )
             else
               TtcReportRefusalBody(
                 report: r,
                 facts: facts,
                 eyebrow: 'Why there are no phases',
-                title: 'We would rather not guess',
+                title: "We'd rather not guess",
                 // ⚠️ THE ACTUAL NUMBER, READ FROM HER DATA. The design writes
                 // 46 days because that is what its fixture held. A refusal that
                 // cannot name the gap it is refusing over is asking to be
                 // taken on trust, on the one screen that is explaining why it
                 // will not do that itself.
                 body: facts.longestGap == null
-                    ? 'There is not enough here yet to place the four '
+                    ? "There isn't enough here yet to place the four "
                         'stretches on a cycle.'
                     : 'One gap in your dates runs ${facts.longestGap} days. '
-                        'That is long enough to be a month that went unlogged '
-                        'rather than a cycle that really lasted that long.',
-                body2: 'If we averaged it in, the fertile days we drew would '
-                    'be off by more than a week. So we have left the four '
-                    'stretches off this cycle rather than show you dates we do '
-                    'not believe.',
+                        "That's long enough to be a month that went unlogged, "
+                        'not a cycle that really lasted that long.',
+                body2: 'If we counted it in, the fertile days we showed could '
+                    "be off by more than a week. So we've left the four "
+                    'stretches off this cycle, instead of showing you dates we '
+                    "don't trust.",
                 actionLabel: 'Fill in the missing month',
                 onAction: () => _openLog(context),
                 note: facts.longestGap == null
                     ? null
-                    : 'If you did have a ${facts.longestGap}-day cycle, leave '
-                        'it as it is — two more periods will settle the number '
+                    : 'If you really had a ${facts.longestGap}-day cycle, leave '
+                        'it as it is. Two more periods will settle the number '
                         'on their own.',
                 footLabel: 'Open the Cycle Companion',
                 onFoot: () => _openSurface(context, 'ttc_cycle'),
                 footNote: 'Estimates come from your own dates and are never a '
-                    'diagnosis. A cycle that stays irregular is worth a '
-                    "doctor's read.",
+                    "diagnosis. If your cycles stay irregular, it's worth "
+                    'asking a doctor to take a look.',
               ),
             const SizedBox(height: 10),
           ],
@@ -281,7 +281,7 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
               _CyclePicker(
                 label: r.start == null
                     ? ''
-                    : '${_fmt(r.start!)} – ${_fmt(r.end!)}',
+                    : '${_fmt(r.start!)} to ${_fmt(r.end!)}',
                 canGoBack: _index + 1 < r.cyclesAvailable,
                 canGoForward: _index > 0,
                 onBack: () => setState(() => _index++),
@@ -380,15 +380,21 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
       variant: 2,
       eyebrow: t.reportTitle,
       title: _heroLine(here.phase),
-      intro: 'One whole cycle, start to finish. The four stretches are '
-          'estimated from the dates you log, and they move as you log more.',
+      // An earlier cycle's stretches are worked out looking back from its own
+      // length (2026-09-26), so they no longer shift and the words say so.
+      intro: _index > 0
+          ? 'One whole cycle, start to finish. The four stretches are worked '
+              'out looking back, from how long this cycle ran.'
+          : 'One whole cycle, start to finish. The four stretches are '
+              'estimates from the dates you log, and they shift as you log '
+              'more.',
       action: IconButton(
         icon: const Icon(Icons.info_outline_rounded, size: 21),
         color: ttcMuted,
         onPressed: () => _showDisclaimer(context, t),
       ),
       heroLead: _CyclePicker(
-        label: r.start == null ? '' : '${_fmt(r.start!)} – ${_fmt(r.end!)}',
+        label: r.start == null ? '' : '${_fmt(r.start!)} to ${_fmt(r.end!)}',
         canGoBack: _index + 1 < r.cyclesAvailable,
         canGoForward: _index > 0,
         onBack: () => setState(() => _index++),
@@ -399,6 +405,16 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 22),
+
+            // ---- walk me through it (2026-09-26) --------------------------
+            //
+            // The gap analysis ("Behind: Guided help") asked for the report
+            // to be told as well as drawn. The scripted chat walks this cycle
+            // in plain words, from the same report, and ends back here; no AI
+            // and no verdict, only what her dates say.
+            _WalkMeThrough(
+                onTap: () => _openSurface(context, 'ttc_chat/cycle_report')),
+            const SizedBox(height: 20),
 
             // ---- the picture, and the choice of picture ------------------
             Row(children: [
@@ -418,8 +434,8 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
             const SizedBox(height: 6),
             Text(
                 _view == TtcCycleView.dial
-                    ? 'The ring is one cycle. It begins at the top on day 1 — '
-                        'the first day of your period — and moves clockwise, '
+                    ? 'The ring is one cycle. It starts at the top on day 1, '
+                        'the first day of your period, and moves clockwise, '
                         'one step per day.'
                     : 'Every day of this cycle, in order. The colour of a day '
                         'says which stretch it belongs to.',
@@ -451,8 +467,11 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
             TtcCard(child: TtcCycleTimeline(spans: spans)),
             const SizedBox(height: 10),
             Text(
-                'These four stretches are estimated from the dates you log. '
-                'They move as you log more.',
+                _index > 0
+                    ? 'Looking back: the fertile days are placed about 14 '
+                        'days before the period that ended this cycle.'
+                    : 'These four stretches are estimates from the dates you '
+                        'log. They shift as you log more.',
                 style: ttcBody(11.5, color: ttcMuted, h: 1.5)),
             const SizedBox(height: 24),
 
@@ -545,10 +564,10 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
   /// Nothing here may grow into what she should therefore do, which is the
   /// sentence a fertility app is always one edit away from writing.
   static String _heroLine(TtcPhase phase) => switch (phase) {
-        TtcPhase.period => 'You are in your period days',
-        TtcPhase.beforeWindow => 'You are before your fertile window',
-        TtcPhase.fertileWindow => 'You are in your fertile days',
-        TtcPhase.afterWindow => 'You are in the waiting days',
+        TtcPhase.period => "You're in your period days",
+        TtcPhase.beforeWindow => "You're before your fertile window",
+        TtcPhase.fertileWindow => "You're in your fertile days",
+        TtcPhase.afterWindow => "You're in the waiting days",
       };
 
   List<TtcFinding> _notes(TtcCycleReport r) {
@@ -565,6 +584,40 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
           padding: const EdgeInsets.fromLTRB(22, 24, 22, 40),
           child: Column(mainAxisSize: MainAxisSize.min, children: [
             Text(t.reportDisclaimer, style: ttcBody(14, h: 1.65)),
+          ]),
+        ),
+      );
+}
+
+/// "Walk me through it": a quiet row to the cycle report chat.
+class _WalkMeThrough extends StatelessWidget {
+  const _WalkMeThrough({required this.onTap});
+
+  final VoidCallback onTap;
+
+  static const String label = 'Walk me through it';
+
+  @override
+  Widget build(BuildContext context) => InkWell(
+        key: const ValueKey('ttc_report_walk_me_through'),
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(ttcCardRadius),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.fromLTRB(16, 13, 12, 13),
+          decoration: BoxDecoration(
+            color: ttcPanel,
+            borderRadius: BorderRadius.circular(ttcCardRadius),
+          ),
+          child: Row(children: [
+            const Icon(Icons.chat_bubble_outline_rounded,
+                size: 18, color: ttcPurple),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(label,
+                  style: ttcBody(14, color: ttcTitleInk, w: FontWeight.w800)),
+            ),
+            const Icon(Icons.chevron_right_rounded, size: 20, color: ttcPurple),
           ]),
         ),
       );

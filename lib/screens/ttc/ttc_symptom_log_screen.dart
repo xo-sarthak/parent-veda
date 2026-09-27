@@ -38,23 +38,43 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
+import '../../services/bracket_resolver.dart' show bracketById;
 import '../../theme/pv_fonts.dart';
+import '../../ttc/cycle_store.dart';
 import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_cycle_report.dart';
+import '../../ttc/ttc_focus_data.dart' show ttcFocusPageFor;
 import '../../ttc/ttc_log_store.dart';
+import '../../ttc/ttc_logging_extras.dart';
+import '../../ttc/ttc_reads_data.dart' show ttcReadById;
 import '../../ttc/ttc_store.dart';
 import '../../ttc/ttc_symptom_data.dart';
+import '../../widgets/pv_feedback.dart';
 import '../v2/v2_palette.dart';
 import 'ttc_common.dart';
 import 'ttc_cycle_report_screen.dart';
 import 'ttc_edit_categories_screen.dart';
+import 'ttc_focus_screen.dart' show TtcFocusScreen;
+import 'ttc_surface_router.dart' show openTtcSurface, kTtcReadPrefix;
 import 'ttc_symptom_mark.dart';
 import 'ttc_strings.dart';
 
+/// Under the pregnancy test card, to the "Should I test?" chat (2026-09-26).
+const String kTtcShouldTestLink = 'Should I test?';
+
 class TtcSymptomLogScreen extends StatefulWidget {
-  const TtcSymptomLogScreen({super.key, this.day});
+  const TtcSymptomLogScreen({super.key, this.day, this.focusGroup});
 
   final DateTime? day;
+
+  /// A category to bring into view on open (a group id such as
+  /// 'ovulation_test'). Added 2026-09-26 for the home's one-tap "Test": the
+  /// test cards sit below the fold, and a button that said "Test" and opened
+  /// the top of a long form would make her hunt for what she tapped.
+  ///
+  /// When that card is hidden in her categories, the pregnancy test card is
+  /// tried instead; when neither shows, the screen opens at the top as before.
+  final String? focusGroup;
 
   @override
   State<TtcSymptomLogScreen> createState() => _TtcSymptomLogScreenState();
@@ -74,6 +94,34 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
     return d.isAfter(today) ? today : d;
   }
   String _query = '';
+
+  /// One key per category card, so [TtcSymptomLogScreen.focusGroup] can be
+  /// scrolled to after the first layout.
+  final Map<String, GlobalKey> _groupKeys = {};
+  GlobalKey _keyFor(String groupId) =>
+      _groupKeys.putIfAbsent(groupId, () => GlobalKey());
+
+  @override
+  void initState() {
+    super.initState();
+    final focus = widget.focusGroup;
+    if (focus == null) return;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      for (final id in [focus, kTtcPregnancyTestGroup]) {
+        final ctx = _groupKeys[id]?.currentContext;
+        if (ctx == null) continue;
+        Scrollable.ensureVisible(ctx,
+            duration: const Duration(milliseconds: 320),
+            curve: Curves.easeOutCubic,
+            alignment: 0.05);
+        return;
+      }
+    });
+  }
+
+  /// The "Should I test?" chat, from the pregnancy test card.
+  void _openShouldTest() => openTtcSurface(context, 'ttc_chat/should_test');
 
   static DateTime _dayOnly(DateTime d) => DateTime(d.year, d.month, d.day);
 
@@ -135,6 +183,32 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
         builder: (_) => const TtcCycleReportScreen(),
       ));
 
+  /// The Hard days read about trying taking over, or the Mind & body door.
+  ///
+  /// ⚠️ RESOLVED AT THE TAP, NOT AT BUILD. The read was being written in
+  /// parallel with this line; `ttcReadById` finds it the moment it is
+  /// registered in `ttc_reads_data.dart`, with no change here. Until then the
+  /// door it lives behind is the honest next best place, and a line that
+  /// promises help never opens nothing.
+  void _openHardThoughts() {
+    if (ttcReadById(kTtcHardThoughtsReadId) != null) {
+      openTtcSurface(context, '$kTtcReadPrefix$kTtcHardThoughtsReadId');
+      return;
+    }
+    // Same wiring gate as `openTtcFocusTile`: an unknown bracket opens nothing.
+    final page = ttcFocusPageFor(kTtcMindBodyBracket);
+    final bracket = bracketById(kTtcMindBodyBracket);
+    if (page == null || bracket == null) return;
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      settings: const RouteSettings(name: 'ttc/focus/$kTtcMindBodyBracket'),
+      builder: (_) => TtcFocusScreen(page: page, bracket: bracket),
+    ));
+  }
+
+  /// The faint-line read in `ttc_reads_waiting.dart`, through the router.
+  void _openFaintLine() =>
+      openTtcSurface(context, '$kTtcReadPrefix$kTtcFaintLineReadId');
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -142,6 +216,9 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
         TtcLogStore.instance,
         TtcLang.instance,
         TtcCategoryPrefs.instance,
+        // The temperature chart lays readings on her cycle, so a period
+        // logged or moved has to redraw it.
+        CycleStore.instance,
       ]),
       builder: (context, _) {
         final t = TtcS.current();
@@ -222,6 +299,16 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
                 if (_query.isEmpty) ...[
                   _FeelingRow(
                       selected: selected, onTap: _toggle, p: p),
+                  // ⚠️ ONE LINE, AND ONLY AFTER THREE DAYS RUNNING. One hard
+                  // day is a hard day; three in a row of guilt, looping
+                  // thoughts or being hard on herself is the pattern the
+                  // Hard days read was written for. It never counts out
+                  // loud and never names anything, it offers a read.
+                  if (ttcHardThoughtsRunOn(_day)) ...[
+                    const SizedBox(height: 12),
+                    _GentleLine(
+                        text: kTtcHardThoughtsLine, onTap: _openHardThoughts),
+                  ],
                   const SizedBox(height: 22),
                   Row(children: [
                     Expanded(
@@ -251,10 +338,37 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
 
                 for (final group in groups) ...[
                   _CategoryCard(
+                    key: _keyFor(group.id),
                     group: group,
                     selected: selected,
                     onTap: (s) => _toggle(group, s),
                     p: p,
+                    // "Faint line" is the chip people stare at longest, so
+                    // the read that explains it sits under the card.
+                    //
+                    // ⚠️ AND "SHOULD I TEST?" UNDER IT SINCE 2026-09-26 (gap
+                    // analysis, "Behind: Guided help"). The card that records
+                    // a test is where the question comes up, so the chat that
+                    // answers it from her own dates is offered right there.
+                    // Kept for revert, the single link:
+                    //   footer: group.id == kTtcPregnancyTestGroup
+                    //       ? _LinkRow(label: kTtcFaintLineLink, onTap: _openFaintLine)
+                    //       : null,
+                    footer: group.id == kTtcPregnancyTestGroup
+                        ? Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              _LinkRow(
+                                  label: kTtcFaintLineLink,
+                                  onTap: _openFaintLine),
+                              const SizedBox(height: 12),
+                              _LinkRow(
+                                  key: const ValueKey('ttc_log_should_test'),
+                                  label: kTtcShouldTestLink,
+                                  icon: Icons.chat_bubble_outline_rounded,
+                                  onTap: _openShouldTest),
+                            ])
+                        : null,
                   ),
                   const SizedBox(height: 14),
                 ],
@@ -342,10 +456,22 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
                       onSet: (v) =>
                           _setNumber(kTtcTempTracker, kTtcTempField, v),
                       p: p,
+                      // The fourteen-dot line gave way to the whole-cycle
+                      // chart below; this card now points at it.
+                      under: Text(kTtcTempChartBelow,
+                          style: ttcBody(11, color: ttcMuted, h: 1.35)),
                     ),
                   ),
                 ]),
                 ),
+                const SizedBox(height: 14),
+                // ⚠️ THE WHOLE CYCLE ON ONE CHART (gap analysis, Behind ›
+                // Logging, 2026-09-26). A morning temperature means nothing
+                // as a fourteen-day squiggle; what makes it readable is
+                // seeing it against the cycle, with the period and the
+                // fertile days behind it. Still recorded, never interpreted:
+                // nothing on it says "you ovulated here".
+                _TempCycleChart(p: p),
                 const SizedBox(height: 18),
 
                 _QuietButton(label: t.logViewReport, onTap: _openReport),
@@ -571,8 +697,13 @@ class _Bubble extends StatelessWidget {
           // which is the row's longest label and now one of the eight rather
           // than one of four it never used to include. The Row above is
           // top-aligned so a taller label pushes nothing around.
+          // ⚠️ AND NOW THREE. "Can't stop thinking about it" (2026-09-26)
+          // is the longest label the row has held, and cut to two lines it
+          // read "Can't stop thinking…", which drops the "it" that makes it
+          // about trying. The row is top-aligned, so a third line pushes
+          // nothing sideways.
           Text(symptom.label,
-              maxLines: 2,
+              maxLines: 3,
               textAlign: TextAlign.center,
               overflow: TextOverflow.ellipsis,
               style: ttcBody(11.5, color: ttcInk, w: FontWeight.w600)),
@@ -584,15 +715,20 @@ class _Bubble extends StatelessWidget {
 /// One category, as a white card of chips.
 class _CategoryCard extends StatelessWidget {
   const _CategoryCard(
-      {required this.group,
+      {super.key,
+      required this.group,
       required this.selected,
       required this.onTap,
-      required this.p});
+      required this.p,
+      this.footer});
 
   final TtcSymptomGroup group;
   final Set<String> selected;
   final void Function(TtcSymptom) onTap;
   final V2Palette p;
+
+  /// Something that belongs to this card only, under its chips.
+  final Widget? footer;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -619,8 +755,84 @@ class _CategoryCard extends StatelessWidget {
                 onTap: () => onTap(s),
               ),
           ]),
+          if (footer != null) ...[
+            const SizedBox(height: 14),
+            footer!,
+          ],
         ]),
       );
+}
+
+/// A quiet link inside a card: words, and an arrow.
+class _LinkRow extends StatelessWidget {
+  const _LinkRow(
+      {super.key,
+      required this.label,
+      required this.onTap,
+      this.icon = Icons.menu_book_outlined});
+
+  final String label;
+  final VoidCallback onTap;
+
+  /// A book for a read; a speech bubble for a chat.
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) => GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Row(children: [
+          Icon(icon, size: 16, color: ttcPurple),
+          const SizedBox(width: 8),
+          Flexible(
+            child: Text(label,
+                style: ttcBody(13, color: ttcPurple, w: FontWeight.w800)),
+          ),
+          const Icon(Icons.chevron_right_rounded, size: 18, color: ttcPurple),
+        ]),
+      );
+}
+
+/// One gentle line under the feelings, with a way to something that helps.
+///
+/// ⚠️ WHITE, NOT A WARNING. It is not an alert and must not look like one:
+/// no amber, no icon of a triangle. It is the app noticing, kindly.
+class _GentleLine extends StatelessWidget {
+  const _GentleLine({required this.text, required this.onTap});
+
+  final String text;
+  final VoidCallback onTap;
+
+  // G5 (review, 2026-09-26): the heart is ink and the chevron grey, as on
+  // every other row (violet is for eyebrows, links, switches and progress),
+  // and the line presses. Kept for revert: both icons in ttcPurple, a bare
+  // InkWell.
+  @override
+  Widget build(BuildContext context) => PvPress(
+        child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(ttcCardRadius),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(ttcCardRadius),
+          ),
+          child: Row(children: [
+            const Icon(Icons.favorite_border_rounded,
+                size: 18, color: ttcSoft),
+            const SizedBox(width: 11),
+            Expanded(
+              child: Text(text,
+                  style: ttcBody(13.5, color: ttcInk, h: 1.45)),
+            ),
+            const SizedBox(width: 6),
+            const Icon(Icons.chevron_right_rounded,
+                size: 20, color: ttcMuted),
+          ]),
+        ),
+      ));
 }
 
 class _Chip extends StatelessWidget {
@@ -736,7 +948,11 @@ class _MeasureCard extends StatelessWidget {
     required this.max,
     required this.onSet,
     required this.p,
+    this.under,
   });
+
+  /// What sits under the number. Null draws the fourteen-reading sparkline.
+  final Widget? under;
 
   final String label;
   final String unit;
@@ -825,7 +1041,13 @@ class _MeasureCard extends StatelessWidget {
               ]),
             ),
           const SizedBox(height: 10),
-          SizedBox(height: 38, child: _Spark(series: series, ink: deep)),
+          // ⚠️ THE TEMPERATURE CARD NO LONGER DRAWS THE SPARKLINE (2026-09-26).
+          // Fourteen dots of temperature with no cycle behind them could not
+          // show the one thing a morning temperature is for, so the whole-cycle
+          // chart under the two cards replaced it. Weight keeps its line. The
+          // old call, kept for revert, was the unconditional:
+          //   SizedBox(height: 38, child: _Spark(series: series, ink: deep)),
+          under ?? SizedBox(height: 38, child: _Spark(series: series, ink: deep)),
         ]),
       ),
     );
@@ -959,6 +1181,343 @@ class _MeasureCard extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Her morning temperatures across the whole cycle.
+///
+/// ⚠️ WHAT IT DRAWS AND WHAT IT REFUSES TO. Days run along the bottom, the
+/// period and the fertile days are shaded behind, and a dotted line marks the
+/// average of her readings before the estimated ovulation day. It never draws
+/// "the shift", never marks a day as the ovulation, never colours a reading
+/// as good or bad. A rise she can see for herself; the one line of text under
+/// the chart tells her what a rise usually means.
+///
+/// ⚠️ NO SHADING ON A CLINIC'S CYCLE. `ttcBuildTempChart` returns no bands
+/// when a clinic owns the timing or the engine will not estimate, and the
+/// chart then shows her readings alone with a sentence saying why.
+///
+/// ⚠️ A HAND-DRAWN AXIS IS NOT NEEDED HERE, UNLIKE THE PHASE CHARTS. The phase
+/// pictures elsewhere plot against cycle PHASES, which no library ships; this
+/// is day number against temperature, an ordinary chart, so `fl_chart` does it
+/// and its range annotations do the bands.
+class _TempCycleChart extends StatelessWidget {
+  const _TempCycleChart({required this.p});
+
+  final V2Palette p;
+
+  static const double _hue = 42;
+
+  @override
+  Widget build(BuildContext context) {
+    final chart = ttcBuildTempChart();
+    final tint = v2BlockTint(_hue, p);
+    final ink = HSLColor.fromColor(tint)
+        .withSaturation(0.46)
+        .withLightness(0.40)
+        .toColor();
+    final periodTint = v2BlockTint(344, p);
+    final fertileTint = v2BlockTint(160, p);
+
+    final String? message = !chart.hasCycle
+        ? kTtcTempChartNoCycle
+        : chart.state == TtcReportState.clinicHeld
+            ? kTtcTempChartClinic
+            : !chart.shaded
+                ? kTtcTempChartNoEstimate
+                : chart.points.isEmpty
+                    ? kTtcTempChartNoReadings
+                    : null;
+
+    // ⚠️ THE REVIEW PASS (2026-09-26, G1 to G4). G1: the card has its
+    // hairline, because a white card on a white page with no edge is not a
+    // card (§4.0: white plus one hairline). G2: tap a dot to read it, and a
+    // thin line marks today, the way Oura's cycle chart reads (OURA-TEMP,
+    // https://mobbin.com/screens/02bc9ee3-1c59-4141-a934-ef325fc0819d).
+    // G3: the legend names the ovulation day as estimated. G4: axis labels
+    // at 11, the smallest role in the type scale.
+    return Container(
+      key: const ValueKey('ttc_temp_chart_card'),
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(14, 14, 14, 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(ttcCardRadius),
+        border: Border.all(color: ttcLine),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Container(
+            width: 26,
+            height: 26,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+                color: tint, borderRadius: BorderRadius.circular(9)),
+            child: Icon(Icons.show_chart_rounded, size: 15, color: ink),
+          ),
+          const SizedBox(width: 9),
+          Expanded(
+              child: Text(kTtcTempChartTitle, style: ttcJakarta(14.5))),
+        ]),
+        if (message != null) ...[
+          const SizedBox(height: 10),
+          Text(message, style: ttcBody(12.5, color: ttcMuted, h: 1.45)),
+        ],
+        if (chart.hasCycle) ...[
+          const SizedBox(height: 14),
+          SizedBox(
+            height: 170,
+            child: _plot(chart, ink, periodTint, fertileTint),
+          ),
+          const SizedBox(height: 6),
+          Center(
+            child: Text(kTtcTempChartAxis,
+                style: ttcBody(11, color: ttcMuted)),
+          ),
+          const SizedBox(height: 10),
+          // The key. `Wrap`, so three entries never overflow at 360pt.
+          Wrap(spacing: 14, runSpacing: 6, children: [
+            if (chart.shaded) ...[
+              _Key(swatch: _swatch(periodTint), label: kTtcTempLegendPeriod),
+              if (chart.fertileFrom != null)
+                _Key(
+                    swatch: _swatch(fertileTint),
+                    label: kTtcTempLegendFertile),
+            ],
+            if (chart.averageBefore != null)
+              _Key(
+                  swatch: SizedBox(
+                      width: 16,
+                      height: 10,
+                      child: CustomPaint(painter: _DashPainter(ink))),
+                  label: kTtcTempLegendAverage),
+            if (chart.todayDay != null)
+              _Key(
+                  swatch: Container(width: 1.5, height: 12, color: ttcInk),
+                  label: kTtcTempLegendToday),
+          ]),
+        ],
+        const SizedBox(height: 12),
+        Container(height: 1, color: ttcLine),
+        const SizedBox(height: 10),
+        Text(kTtcTempChartNote,
+            style: ttcBody(12, color: ttcInk, h: 1.5)),
+      ]),
+    );
+  }
+
+  static Widget _swatch(Color c) => Container(
+        width: 12,
+        height: 12,
+        decoration:
+            BoxDecoration(color: c, borderRadius: BorderRadius.circular(3)),
+      );
+
+  Widget _plot(
+      TtcTempChart chart, Color ink, Color periodTint, Color fertileTint) {
+    final ys = [
+      for (final pt in chart.points) pt.celsius,
+      if (chart.averageBefore != null) chart.averageBefore!,
+    ];
+    // ⚠️ A FIXED FLOOR WHEN THERE IS NOTHING TO FIT. With no readings the
+    // bands still draw, so she can see where her period and fertile days
+    // fall, and they need a y range to sit in. 36 to 37 is where almost every
+    // waking temperature lands.
+    var lo = ys.isEmpty ? 36.0 : ys.reduce((a, b) => a < b ? a : b) - 0.2;
+    var hi = ys.isEmpty ? 37.0 : ys.reduce((a, b) => a > b ? a : b) + 0.2;
+    if (hi - lo < 0.6) {
+      final mid = (hi + lo) / 2;
+      lo = mid - 0.3;
+      hi = mid + 0.3;
+    }
+    lo = (lo * 10).floorToDouble() / 10;
+    hi = (hi * 10).ceilToDouble() / 10;
+    final yStep = hi - lo > 1.2 ? 0.5 : 0.2;
+
+    // Each band covers its days edge to edge, so it spans day ± half.
+    final bands = <VerticalRangeAnnotation>[
+      if (chart.periodTo != null)
+        VerticalRangeAnnotation(
+            x1: 0.5, x2: chart.periodTo! + 0.5, color: periodTint),
+      if (chart.fertileFrom != null && chart.fertileTo != null)
+        VerticalRangeAnnotation(
+            x1: chart.fertileFrom! - 0.5,
+            x2: chart.fertileTo! + 0.5,
+            color: fertileTint),
+    ];
+
+    return LineChart(
+      LineChartData(
+        minX: 0.5,
+        maxX: chart.days + 0.5,
+        minY: lo,
+        maxY: hi,
+        rangeAnnotations: RangeAnnotations(verticalRangeAnnotations: bands),
+        extraLinesData: ExtraLinesData(horizontalLines: [
+          if (chart.averageBefore != null)
+            HorizontalLine(
+              y: chart.averageBefore!,
+              color: ink.withValues(alpha: 0.75),
+              strokeWidth: 1.4,
+              dashArray: const [4, 4],
+            ),
+        ], verticalLines: [
+          // G2: a thin ink line at today. A position, never a verdict.
+          if (chart.todayDay != null)
+            VerticalLine(
+              x: chart.todayDay!.toDouble(),
+              color: ttcInk.withValues(alpha: 0.55),
+              strokeWidth: 1,
+            ),
+        ]),
+        gridData: FlGridData(
+          show: true,
+          drawVerticalLine: false,
+          horizontalInterval: yStep,
+          getDrawingHorizontalLine: (_) =>
+              const FlLine(color: ttcLine, strokeWidth: 0.6),
+        ),
+        borderData: FlBorderData(show: false),
+        // G2: tap a dot to read it, a small ink label with the day and the
+        // reading, nothing else. Kept for revert:
+        //   lineTouchData: const LineTouchData(enabled: false),
+        lineTouchData: LineTouchData(
+          enabled: chart.points.isNotEmpty,
+          handleBuiltInTouches: true,
+          touchTooltipData: LineTouchTooltipData(
+            getTooltipColor: (_) => ttcInk,
+            tooltipBorderRadius: BorderRadius.circular(10),
+            tooltipPadding:
+                const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+            fitInsideHorizontally: true,
+            fitInsideVertically: true,
+            getTooltipItems: (spots) => [
+              for (final s in spots)
+                LineTooltipItem(
+                  ttcTempTooltip(s.x.round(), s.y),
+                  ttcBody(11.5, color: Colors.white, w: FontWeight.w700),
+                ),
+            ],
+          ),
+          getTouchedSpotIndicator: (bar, indexes) => [
+            for (final _ in indexes)
+              TouchedSpotIndicatorData(
+                FlLine(color: ttcInk.withValues(alpha: 0.3), strokeWidth: 1),
+                FlDotData(
+                  getDotPainter: (_, _, _, _) => FlDotCirclePainter(
+                      radius: 4.2,
+                      color: ink,
+                      strokeWidth: 2,
+                      strokeColor: Colors.white),
+                ),
+              ),
+          ],
+        ),
+        titlesData: FlTitlesData(
+          topTitles: const AxisTitles(),
+          rightTitles: const AxisTitles(),
+          leftTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 34,
+              interval: yStep,
+              getTitlesWidget: (v, meta) {
+                // fl_chart also labels the two edges; skip the ones off-step.
+                final onStep = ((v - lo) / yStep - ((v - lo) / yStep).round())
+                        .abs() <
+                    0.01;
+                if (!onStep) return const SizedBox.shrink();
+                return Text(v.toStringAsFixed(1),
+                    style: ttcBody(11, color: ttcMuted));
+              },
+            ),
+          ),
+          bottomTitles: AxisTitles(
+            sideTitles: SideTitles(
+              showTitles: true,
+              reservedSize: 20,
+              interval: 1,
+              getTitlesWidget: (v, meta) {
+                final d = v.round();
+                // Day 1, then every seventh day: a week to a tick.
+                if ((v - d).abs() > 0.01 || d < 1 || d > chart.days) {
+                  return const SizedBox.shrink();
+                }
+                if (d != 1 && d % 7 != 0) return const SizedBox.shrink();
+                return Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Text('$d', style: ttcBody(11, color: ttcMuted)),
+                );
+              },
+            ),
+          ),
+        ),
+        lineBarsData: [
+          if (chart.points.isNotEmpty)
+            LineChartBarData(
+              spots: [
+                for (final pt in chart.points)
+                  FlSpot(pt.cycleDay.toDouble(), pt.celsius),
+              ],
+              // Straight segments. A curve would invent readings between the
+              // mornings she took one.
+              isCurved: false,
+              barWidth: 1.8,
+              color: ink,
+              dotData: FlDotData(
+                show: true,
+                getDotPainter: (_, _, _, _) => FlDotCirclePainter(
+                    radius: 2.6,
+                    color: ink,
+                    strokeWidth: 1.4,
+                    strokeColor: Colors.white),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Key extends StatelessWidget {
+  const _Key({required this.swatch, required this.label});
+
+  final Widget swatch;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) => Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          swatch,
+          const SizedBox(width: 6),
+          Flexible(
+            child: Text(label,
+                style: ttcBody(11, color: ttcMuted),
+                overflow: TextOverflow.ellipsis),
+          ),
+        ],
+      );
+}
+
+/// The legend's short dotted line, matching the average line on the chart.
+class _DashPainter extends CustomPainter {
+  const _DashPainter(this.ink);
+  final Color ink;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = ink
+      ..strokeWidth = 1.4;
+    final y = size.height / 2;
+    for (var x = 0.0; x < size.width; x += 6) {
+      canvas.drawLine(Offset(x, y), Offset((x + 3).clamp(0, size.width), y),
+          paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_DashPainter old) => old.ink != ink;
 }
 
 /// The last fourteen readings, as a line.

@@ -56,13 +56,17 @@ import '../../services/bracket_resolver.dart';
 import '../../services/life_stage_store.dart';
 import '../../services/ttc_surfaces.dart';
 import '../../theme/pv_fonts.dart';
+import '../../widgets/pv_feedback.dart';
+import '../products/pv_store_chrome.dart' show pvSnack;
 
 import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_daily_data.dart';
 import '../../ttc/ttc_insight_read.dart';
 import '../../ttc/ttc_log_store.dart';
-import '../../ttc/ttc_fertile_window.dart';
-import '../../ttc/ttc_focus_data.dart';
+// Kept for revert: the hero's dates came from `ttcFertileWindowNow`; they
+// come from `ttcDayContext` now (2026-09-26, consistency pass).
+// import '../../ttc/ttc_fertile_window.dart';
+// import '../../ttc/ttc_focus_data.dart'; // kept for revert: the old door push in _openBracket (2026-09-26)
 import '../../ttc/ttc_prepare_data.dart';
 import '../../ttc/ttc_products_data.dart';
 import '../../ttc/ttc_reads_data.dart';
@@ -79,11 +83,27 @@ import '../v2/v3_daily.dart';
 import '../v2/v3_daily_art.dart';
 import '../../ttc/ttc_home_hero.dart';
 import '../../ttc/ttc_treatment_store.dart';
+// ---- the treatment round (2026-09-26, docs/TTC-TREATMENT-FLOW.md B4) --------
+import '../../ttc/ttc_treatment_round.dart' show TtcRoundPhaseX;
+import 'ttc_round_home_card.dart';
+import 'ttc_round_strings.dart';
+import 'ttc_treatment_round_screens.dart' show openTtcTreatmentResult;
+// ---- the gap analysis's home work (2026-09-26) ------------------------------
+import '../../services/pv_read_store.dart';
+import '../../ttc/ttc_content_prefs.dart';
+import '../../ttc/ttc_home_prefs.dart';
+import '../../ttc/ttc_home_situation.dart';
+import '../../ttc/ttc_day_context.dart';
+import '../../ttc/ttc_fertility_help_store.dart';
+import '../../ttc/ttc_messages_store.dart';
+import '../../ttc/ttc_period_due.dart' show TtcTestAdvice;
+import 'ttc_home_gap.dart';
 import '../v2/pv_day_strip.dart';
 import '../v2/pv_insight_rail.dart';
 import '../v2/v3_hero_field.dart';
 import 'ttc_chapter_screen.dart';
-import 'ttc_focus_screen.dart';
+// import 'ttc_focus_screen.dart'; // kept for revert: the old door push in _openBracket (2026-09-26)
+import 'doors/ttc_door_screen.dart' show openTtcDoor;
 import 'ttc_common.dart';
 import 'ttc_cycle_report_screen.dart';
 import 'ttc_daily_insights.dart';
@@ -127,6 +147,16 @@ class TtcHomeV3 extends StatefulWidget {
 
   @override
   State<TtcHomeV3> createState() => _TtcHomeV3State();
+}
+
+/// The reads heading on a day other than today: "Recommended reads for
+/// yesterday", "... for 28 August". [dayTitle] is the insights heading for the
+/// same day, so the two titles always name the same date.
+String ttcReadsTitleFor(String dayTitle) {
+  final t = dayTitle == 'Yesterday' || dayTitle == 'Tomorrow'
+      ? dayTitle.toLowerCase()
+      : dayTitle;
+  return 'Recommended reads for $t';
 }
 
 class _TtcHomeV3State extends State<TtcHomeV3>
@@ -178,6 +208,13 @@ class _TtcHomeV3State extends State<TtcHomeV3>
     // Resume is the moment that matters. A phone that has been in a pocket
     // since last night fires this and nothing else.
     WidgetsBinding.instance.addObserver(this);
+    // Lazy loads for the gap-analysis pieces: the check card's "Not now", the
+    // course card's opened steps, and the reader's progress it also counts.
+    TtcHomePrefs.instance.load();
+    PvReadStore.instance.load().catchError((_) {});
+    // Her age band decides the check card's 6-or-12 months and the door
+    // order. Lazy-loaded store: without this the home can read "unknown".
+    TtcFertilityHelpStore.instance.load().catchError((_) {});
   }
 
   @override
@@ -188,7 +225,12 @@ class _TtcHomeV3State extends State<TtcHomeV3>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) _rollOver();
+    if (state == AppLifecycleState.resumed) {
+      _rollOver();
+      // A phone left in a pocket for a month resumes here rather than
+      // launching: the 30-days-away check-in needs to see it too.
+      TtcTreatmentStore.instance.noteOpened();
+    }
   }
 
   /// Move the screen on if the date has changed under it.
@@ -255,13 +297,44 @@ class _TtcHomeV3State extends State<TtcHomeV3>
       // complaint that started this pass: *"I actually am not able to see it in
       // the home screen."* The markers read that store, so the page has to
       // rebuild when it changes.
-      animation: Listenable.merge(
-          [TtcStore.instance, TtcLang.instance, TtcLogStore.instance]),
+      //
+      // ⚠️ AND THREE MORE SINCE 2026-09-26: the messages store (the envelope's
+      // dot), her content choices (hide intimacy reads and cards) and the home
+      // prefs (the check card's "Not now", the course card's steps). Each is
+      // something on this page that changes while she is looking at it.
+      animation: Listenable.merge([
+        TtcStore.instance,
+        TtcLang.instance,
+        TtcLogStore.instance,
+        TtcMessagesStore.instance,
+        TtcContentPrefs.instance,
+        TtcHomePrefs.instance,
+        // ⚠️ HER AGE BAND (2026-09-26, consistency pass). Answering it in the
+        // "Trying after 35" read or the help tool changes the check card and
+        // the door order; without this the home kept the old answer until
+        // something else rebuilt it.
+        TtcFertilityHelpStore.instance,
+      ]),
       builder: (context, _) {
         final hinglish = TtcLang.instance.hinglish;
         final today = TtcStore.instance.today;
         final chapter = today.chapter;
         final accent = v2BlockTint(_chapterHue(chapter), p);
+
+        // ---- where she is, once per build (ttc_home_situation.dart) --------
+        //
+        // ⚠️ THE PHASE IS FOR THE DAY THE STRIP IS ON; THE DOOR ORDER AND THE
+        // CHECK CARD ARE FOR TODAY. Cards and reads follow the strip like
+        // everything else in the sheet. The doors and the check card do not,
+        // because doors that reshuffled as she walked the week would be a
+        // menu moving under her thumb.
+        final phase = ttcHomePhaseOn(_selected);
+        final checkMonths = TtcHomePrefs.instance.checkDismissed
+            ? null
+            : ttcHomeCheckMonths();
+        final doorIds = ttcHomeDoorOrderNow([
+          for (final b in bracketsFor(LifeStage.tryingToConceive)) b.id,
+        ]);
 
         return Scaffold(
           backgroundColor: p.ground,
@@ -323,9 +396,24 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   onCycle: () => _openSurface(context, 'ttc_cycle'),
                   onCalendar: () => _openSurface(context, 'ttc_calendar'),
                   onProfile: () => openTtcProfile(context),
+                  onMessages: () => _openSurface(context, 'ttc_messages'),
+                  unread: TtcMessagesStore.instance.unreadCount,
                 ),
                 _Sheet(p: p, children: [
                   const SizedBox(height: 26),
+
+                  // ---- THE ROUND'S ONE NOTICE (2026-09-26) -----------------
+                  //
+                  // ⚠️ NOTHING CHANGES SILENTLY (the user's rule). The check-in,
+                  // "Your home now follows your round", the result prompt,
+                  // "Your fertile days are back", a closed round's Undo and
+                  // "Add your clinic's dates" share this one slot, strongest
+                  // first, each said once (`ttcRoundNoticeNow`). Above the
+                  // insights because each is about her, today.
+                  if (ttcRoundNoticeNow() != null) ...[
+                    _pad(const TtcRoundHomeCard()),
+                    const SizedBox(height: 24),
+                  ],
 
                   // ---- THE DAILY INSIGHTS ----------------------------------
                   //
@@ -355,8 +443,35 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   // turns "today's insight" into "Cycle day 8". See
                   // `ttc_daily_insights.dart` for which cards a day earns.
                   _InsightRail(
-                      p: p, hinglish: hinglish, selected: _selected),
+                      p: p,
+                      hinglish: hinglish,
+                      selected: _selected,
+                      phase: phase,
+                      today: _today),
                   const SizedBox(height: 26),
+
+                  // ---- IT MAY BE TIME FOR A CHECK (gap analysis, P2) -------
+                  //
+                  // One calm card at 12 months of trying (6 at 35 and over or
+                  // with cycles that vary), by the same rule as the "trying
+                  // for a while" message so the two agree. "Not now" is
+                  // remembered. Above the doors because it is the one thing on
+                  // this page that is about her, this month, and not a menu.
+                  if (checkMonths != null) ...[
+                    _pad(TtcCheckCard(p: p, months: checkMonths)),
+                    const SizedBox(height: 26),
+                  ],
+
+                  // ---- NEW HERE? (gap analysis, Learning shapes, P1) -------
+                  //
+                  // Until she has opened two steps of "Trying to conceive
+                  // 101". It names the next step instead of counting them:
+                  // the course has done its job as a way in once she is in.
+                  if (TtcHomePrefs.instance.offer101) ...[
+                    _pad(Ttc101Card(
+                        p: p, onAllSteps: () => openTtcTabV3(context, 1))),
+                    const SizedBox(height: 26),
+                  ],
 
                   // ---- THE DOORS -------------------------------------------
                   //
@@ -369,11 +484,20 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                       title: hinglish ? 'Kahin se bhi shuru karein' : 'Start anywhere',
                       p: p)),
                   const SizedBox(height: 14),
+                  // ⚠️ ORDERED BY HER SITUATION, NEVER FILTERED (2026-09-26,
+                  // gap analysis P2). A clinic pathway leads with IVF & IUI,
+                  // trying long enough for a check leads with "Taking a
+                  // while", the waiting and late days lead with the fertile
+                  // window. Every door is still here, in a stable order
+                  // otherwise: CLAUDE.md lets personalisation change order,
+                  // never structure. Kept for revert, the fixed order:
+                  //   for (final b in bracketsFor(LifeStage.tryingToConceive))
                   _pad(V2BlockGrid(
                     palette: p,
                     columns: 4,
                     blocks: [
-                      for (final b in bracketsFor(LifeStage.tryingToConceive))
+                      for (final id in doorIds)
+                        if (bracketById(id) case final b?)
                         V2Block(
                           label: hinglish ? b.label.hi : b.label.en,
                           icon: Icons.circle_outlined,
@@ -591,11 +715,21 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   //       eyebrow: hinglish ? 'Padhne ke liye' : 'To read',
                   //       title: hinglish ? 'Aapke chapter ke liye' : 'Recommended reads',
                   //       p: p)),
+                  // ⚠️ THE TITLE FOLLOWS THE STRIP (2026-09-26, consistency
+                  // pass). The reads under it have followed the selected day
+                  // since they were chosen by phase, while the heading kept
+                  // saying "for today". New wording is English only
+                  // (CLAUDE.md); today's pair is unchanged. Kept for revert:
+                  //   title: hinglish
+                  //       ? 'Aaj ke liye reads'
+                  //       : 'Recommended reads for today',
                   _pad(_Head(
                       eyebrow: hinglish ? 'Padhne ke liye' : 'Read',
-                      title: hinglish
-                          ? 'Aaj ke liye reads'
-                          : 'Recommended reads for today',
+                      title: _selected == _today
+                          ? (hinglish
+                              ? 'Aaj ke liye reads'
+                              : 'Recommended reads for today')
+                          : ttcReadsTitleFor(_dayTitle(_selected)),
                       p: p)),
                   const SizedBox(height: 12),
                   // ⚠️ THE THREE TABS ARE ON THE CARD NOW, as pills — the
@@ -629,7 +763,19 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   // the home linked to none of it — the chapter reader is a
                   // different thing written for a different moment. The rail is
                   // the read equivalent of the door grid: a way in, not a feed.
-                  _ReadRail(p: p, hinglish: hinglish),
+                  // ⚠️ CHOSEN BY HER PHASE SINCE 2026-09-26 (gap analysis,
+                  // P1): "When to take a test" on a period day was the date
+                  // rotation's doing. The rotation now only turns inside the
+                  // phase's own set, and "See everything" is the way to the
+                  // whole library, which four cards never were.
+                  _ReadRail(
+                      p: p, hinglish: hinglish, day: _selected, phase: phase),
+                  const SizedBox(height: 12),
+                  _pad(_SeeAllRow(
+                      key: const ValueKey('ttc_home_reads_see_all'),
+                      label: kTtcSeeEverything,
+                      p: p,
+                      onTap: () => openTtcTabV3(context, 1))),
                   const SizedBox(height: 32),
 
                   // ---- JOURNAL ---------------------------------------------
@@ -850,14 +996,19 @@ class _TtcHomeV3State extends State<TtcHomeV3>
     // config cannot depend on which happens to be found. Six of seven TTC
     // brackets still have no focus page and still open hubs, correctly — a hub
     // is right when an area really is several separate errands.
-    final focus = ttcFocusPageFor(id);
-    if (focus != null) {
-      Navigator.of(context).push(MaterialPageRoute<void>(
-        settings: RouteSettings(name: 'ttc/focus/$id'),
-        builder: (_) => TtcFocusScreen(page: focus, bracket: b),
-      ));
-      return;
-    }
+    // ⚠️ THE NEW DOOR (2026-09-26). Every TTC door now opens `TtcDoorScreen`,
+    // the pregnancy door language, through the one opener; same route name
+    // `ttc/focus/<id>`. The old push, kept for revert:
+    //
+    // final focus = ttcFocusPageFor(id);
+    // if (focus != null) {
+    //   Navigator.of(context).push(MaterialPageRoute<void>(
+    //     settings: RouteSettings(name: 'ttc/focus/$id'),
+    //     builder: (_) => TtcFocusScreen(page: focus, bracket: b),
+    //   ));
+    //   return;
+    // }
+    if (openTtcDoor(context, id)) return;
 
     // ⚠️ THE HUB REGISTRY DECIDES, NOT THIS SCREEN.
     //
@@ -961,41 +1112,41 @@ class _TtcHomeV3State extends State<TtcHomeV3>
       // "your chance this month" -- no personalised probability, ever.
       case kTtcActImproveChances:
         owed('Improve my chances this cycle',
-            'Timing through your fertile days, and the handful of habits that '
-            'genuinely make a difference. No numbers about your odds -- those '
-            'are not ours to give.',
+            'Timing across your fertile days, and the few habits that really '
+            'make a difference. We won\'t put a number on whether it will '
+            'happen. That isn\'t ours to say.',
             meanwhile: 'Your cycle',
             meanwhileWhy: 'Track where you are this month.',
             surface: 'ttc_cycle');
 
       case kTtcActSpermHealth:
         owed('Understand sperm health',
-            'What a semen analysis actually measures, what the numbers mean, '
-            'and the ninety-day window that makes changes worth making.',
+            'What a semen analysis measures, what the numbers mean, and the '
+            'ninety-day window that makes changes worth it.',
             meanwhile: 'For him, today',
             meanwhileWhy: 'His side of it, one thing at a time.',
             surface: 'ttc_partner');
 
       case kTtcActPcosLibrary:
         owed('Understand my PCOS',
-            'What PCOS is doing to your cycle, in plain words, and what the '
-            'usual next steps look like.',
+            'What PCOS does to your cycle, in plain words, and what usually '
+            'comes next.',
             meanwhile: 'Your cycle',
-            meanwhileWhy: 'See how your own cycle is behaving.',
+            meanwhileWhy: 'See what your own cycle is doing.',
             surface: 'ttc_cycle');
 
       case kTtcActFertilityReadinessCheck:
         owed('Should I seek fertility help?',
-            'The guidance on how long to try before seeing someone, by age -- '
-            'so you can decide, rather than wonder.',
+            'How long to try before seeing someone, by age. So you can '
+            'decide, instead of wondering.',
             meanwhile: 'Tests worth knowing about',
             meanwhileWhy: 'What a first appointment usually checks.',
             surface: 'ttc_tests');
 
       case kTtcActPreconceptionReadiness:
         owed('Get ready before trying',
-            'The few things worth doing in the months before -- supplements, '
-            'checks, and what your partner should do too.',
+            'The few things worth doing in the months before: supplements, '
+            'check-ups, and what your partner should do too.',
             meanwhile: 'Supplements',
             meanwhileWhy: 'What to start, and when.',
             surface: 'ttc_supplements');
@@ -1005,8 +1156,9 @@ class _TtcHomeV3State extends State<TtcHomeV3>
       // honestly that it is not ready.
       case kTtcActLossRecoveryLibrary:
         owed('Understand recovery and trying again',
-            'What your body needs before trying again, how long is usually '
-            'suggested, and what to expect of yourself. At your pace.');
+            'What your body needs before trying again, how long doctors '
+            'usually suggest, and what to expect from yourself. At your own '
+            'pace.');
     }
   }
 
@@ -1087,11 +1239,19 @@ class _CycleHeader extends StatelessWidget {
     required this.onCycle,
     required this.onCalendar,
     required this.onProfile,
+    required this.onMessages,
+    required this.unread,
   });
 
   final TtcToday today;
   final V2Palette p;
   final bool hinglish;
+
+  /// The messages list, and how many are unread (drawn as a dot, never a
+  /// number). Added 2026-09-26: the app now speaks first, and the envelope is
+  /// where what it said waits.
+  final VoidCallback onMessages;
+  final int unread;
 
   /// The day the whole page is describing. Owned by the screen, not by the
   /// strip — the heading and the cards below need it too, and a selection that
@@ -1127,19 +1287,46 @@ class _CycleHeader extends StatelessWidget {
     final t = TtcS.current();
     final now = DateTime.now();
 
+    // ---- where she is today (ttc_home_situation.dart) ----------------------
+    final onToday = selected == todayDate;
+    final late = onToday &&
+            ttcHomeHeroLine(on: selected).state == TtcHeroState.periodLate
+        ? ttcHomeLateAdvice()
+        : null;
+    final periodCame = onToday && ttcIsNewPeriodDayOne(selected);
+    final future = selected.isAfter(todayDate);
+    final sexOn = ttcSexLoggedOn(selected);
+
     return SafeArea(
       bottom: false,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(18, 10, 18, 20),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          // ---- avatar · date · calendar ------------------------------------
+          // ---- avatar · date · messages · calendar --------------------------
+          //
+          // ⚠️ THE TWO SIDES ARE EQUAL FIXED WIDTHS NOW (2026-09-26). The
+          // envelope made the right side two buttons and the left one, and
+          // with plain Spacers the date would have slid off centre by half a
+          // button. Each side is the same 84pt box aligned to its edge, and
+          // the date takes the middle and scales down rather than pushing a
+          // button off the screen (the 360pt render tests caught exactly that
+          // with an Expanded on each side). The old row, for revert:
+          //   _RoundButton(avatar), Spacer(), date, Spacer(), _RoundButton(cal)
+          // H6 (2026-09-26): each button is a 44pt target around its 38pt
+          // disc, so each side is 88 (two 44s) and the discs sit 6 apart.
+          // Was 84 with 38pt targets.
           Row(children: [
-            _RoundButton(
-                icon: Icons.person_outline_rounded,
-                p: p,
-                onTap: onProfile,
-                semantic: t.profileTitle),
-            const Spacer(),
+            SizedBox(
+              width: 88,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: _RoundButton(
+                    icon: Icons.person_outline_rounded,
+                    p: p,
+                    onTap: onProfile,
+                    semantic: t.profileTitle),
+              ),
+            ),
             // ⚠️ THE SELECTED DAY, NOT `now`. It read `DateTime.now()`, which
             // was right when the strip was decoration and became a second
             // contradiction the moment it was not: tap back three days and the
@@ -1149,24 +1336,44 @@ class _CycleHeader extends StatelessWidget {
             // The year appears only when the selection leaves the current one,
             // because "30 August" is unambiguous in August and actively
             // misleading the following January.
-            Text(
-                '${selected.day} ${_months[selected.month - 1]}'
-                '${selected.year == now.year ? '' : ' ${selected.year}'}',
-                style: pvManrope(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: 0.1,
-                    color: p.ink1)),
-            const Spacer(),
-            // ⚠️ THE CALENDAR HAD NO ENTRANCE ON THIS HOME AT ALL before the
-            // header. It was a nav tab and nothing else, which meant the one
-            // screen showing a whole month of her own logs was reachable only
-            // by knowing which of five icons it hid behind.
-            _RoundButton(
-                icon: Icons.calendar_today_rounded,
-                p: p,
-                onTap: onCalendar,
-                semantic: t.tabCalendar),
+            Expanded(
+              child: Center(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                      '${selected.day} ${_months[selected.month - 1]}'
+                      '${selected.year == now.year ? '' : ' ${selected.year}'}',
+                      maxLines: 1,
+                      style: pvManrope(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.1,
+                          color: p.ink1)),
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 88,
+              child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    // ⚠️ THE MESSAGES THE APP SENDS HAD NO DOOR ON THE HOME
+                    // (gap analysis, "Behind: Guided help", P1). A dot when
+                    // something is unread; never a count.
+                    TtcMessagesButton(
+                        p: p, unread: unread, onTap: onMessages),
+                    // ⚠️ THE CALENDAR HAD NO ENTRANCE ON THIS HOME AT ALL
+                    // before the header. It was a nav tab and nothing else,
+                    // which meant the one screen showing a whole month of her
+                    // own logs was reachable only by knowing which of five
+                    // icons it hid behind.
+                    _RoundButton(
+                        icon: Icons.calendar_today_rounded,
+                        p: p,
+                        onTap: onCalendar,
+                        semantic: t.tabCalendar),
+                  ]),
+            ),
           ]),
           const SizedBox(height: 16),
 
@@ -1209,8 +1416,24 @@ class _CycleHeader extends StatelessWidget {
               p: p,
               hinglish: hinglish,
               selected: selected,
+              late: late,
               onTap: onCycle),
           const SizedBox(height: 18),
+
+          // ---- the hero's note (gap analysis, "Behind: Home & daily", P1) --
+          //
+          // ⚠️ ONLY ON TODAY, AND ONLY ONE. On a late day of her own cycle, a
+          // way to the "Should I test?" chat; on the first day of a new
+          // period, one kind line and the read about it. Both are about now,
+          // so neither follows the strip into another day, and a clinic cycle
+          // gets neither late wording (her clinic's blood test is the answer).
+          if (late != null) ...[
+            TtcHowToTestButton(p: p),
+            const SizedBox(height: 16),
+          ] else if (periodCame) ...[
+            TtcPeriodCameLine(p: p),
+            const SizedBox(height: 16),
+          ],
 
           // ---- the two actions ---------------------------------------------
           //
@@ -1279,7 +1502,202 @@ class _CycleHeader extends StatelessWidget {
               ),
             ),
           ]),
+
+          // ---- one tap: sex, and a test (gap analysis, P2) ------------------
+          //
+          // ⚠️ SEX WRITES THE LOGGER'S OWN FIELD. One tap records it for the
+          // day on the strip, a second tap takes it off; it is the
+          // `sex_unprotected` chip under `symptoms`, the same fact the logger,
+          // the calendar and the report already read, never a second key.
+          // Test opens the logger at the two test cards, which is the choice
+          // the gap analysis asked for. Both dim on a future day, for the
+          // reason written on "Check symptoms" above.
+          const SizedBox(height: 10),
+          // ⚠️ HIDDEN WHILE AN IVF-SHAPED ROUND RUNS (2026-09-26, §3e), and
+          // the blood test named in its place: a clinic often asks for no sex
+          // before his sample, and a home test before the blood test can
+          // mislead. It comes back the day the round closes
+          // (`ttcHomeHidesQuickRow`). Kept for revert: the row, always.
+          //
+          // ⚠️ THE REVIEW PASS (2026-09-26, H3, H4, H5):
+          //  · SECONDARY WEIGHT. Sex and Test are two compact chips under the
+          //    two main actions (a hairline, no fill), so the hero's pills do
+          //    not compete: one line, two actions, two small chips (Flo's
+          //    late day, FLO-LATE,
+          //    https://mobbin.com/screens/f92aea87-388d-42b6-b3b0-fb36b9b71a84).
+          //  · "HIDE SEX AND INTIMACY CONTENT" REACHES THIS ROW. With it on,
+          //    the Sex chip is not drawn at all and Test takes the row; a
+          //    neutral relabel would still log sex from a word that hides it.
+          //    Logging it stays in the symptom logger, where she chose it.
+          //  · THE ON-STATE IS INK (§4.0: a selected chip is ink1 with a white
+          //    label), with a haptic, and a white notice that says it is
+          //    logged with an Undo (E7).
+          // Kept for revert: two full-width `_HeaderAction` pills, the Sex one
+          // with a rose tinted fill when on, drawn whatever the switch said.
+          if (ttcHomeHidesQuickRow(selected))
+            _BloodTestLine(day: selected, p: p)
+          else
+          Row(children: [
+            if (!TtcContentPrefs.instance.hideIntimate) ...[
+              Expanded(
+                child: _QuickChip(
+                  key: const ValueKey('ttc_home_quick_sex'),
+                  label: kTtcQuickSex,
+                  icon: sexOn
+                      ? Icons.favorite_rounded
+                      : Icons.favorite_border_rounded,
+                  p: p,
+                  on: sexOn,
+                  enabled: !future,
+                  onTap: () {
+                    pvCommitFeedback();
+                    final logged = ttcToggleSexOn(selected);
+                    if (!logged) return;
+                    final day = selected == todayDate
+                        ? 'today'
+                        : '${selected.day} ${_months[selected.month - 1]}';
+                    pvSnack(
+                      context,
+                      'Logged for $day',
+                      icon: Icons.check_rounded,
+                      action: 'Undo',
+                      onAction: () {
+                        if (ttcSexLoggedOn(selected)) ttcToggleSexOn(selected);
+                      },
+                    );
+                  },
+                ),
+              ),
+              const SizedBox(width: 10),
+            ],
+            Expanded(
+              child: _QuickChip(
+                key: const ValueKey('ttc_home_quick_test'),
+                label: kTtcQuickTest,
+                icon: Icons.science_outlined,
+                p: p,
+                enabled: !future,
+                onTap: () {
+                  pvCommitFeedback();
+                  Navigator.of(context).push(MaterialPageRoute<void>(
+                      settings: const RouteSettings(name: 'ttc/symptom_log'),
+                      builder: (_) => TtcSymptomLogScreen(
+                          day: selected, focusGroup: kTtcTestGroupToOpen)));
+                },
+              ),
+            ),
+          ]),
         ]),
+      ),
+    );
+  }
+}
+
+/// One of the two small one-tap chips under the hero's actions (H4, H5):
+/// a hairline, no fill, 44pt tall; ON is an ink fill with a white label and
+/// a filled icon. Dimmed as one object on a day that has not happened.
+class _QuickChip extends StatelessWidget {
+  const _QuickChip({
+    super.key,
+    required this.label,
+    required this.icon,
+    required this.p,
+    required this.onTap,
+    this.enabled = true,
+    this.on,
+  });
+
+  final String label;
+  final IconData icon;
+  final V2Palette p;
+  final VoidCallback onTap;
+  final bool enabled;
+  final bool? on;
+
+  @override
+  Widget build(BuildContext context) {
+    final lit = on == true;
+    final chip = Container(
+      constraints: const BoxConstraints(minHeight: 44),
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: lit ? p.ink1 : Colors.transparent,
+        borderRadius: BorderRadius.circular(999),
+        border: Border.all(color: lit ? p.ink1 : p.ink1.withValues(alpha: 0.22)),
+      ),
+      child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+        Icon(icon, size: 16, color: lit ? Colors.white : p.ink2),
+        const SizedBox(width: 7),
+        Flexible(
+          child: Text(label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: pvManrope(
+                  fontSize: 12.5,
+                  fontWeight: FontWeight.w800,
+                  color: lit ? Colors.white : p.ink1)),
+        ),
+      ]),
+    );
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      toggled: on,
+      label: label,
+      child: PvPress(
+        enabled: enabled,
+        child: InkWell(
+          onTap: enabled ? onTap : null,
+          borderRadius: BorderRadius.circular(999),
+          child: enabled ? chip : Opacity(opacity: 0.42, child: chip),
+        ),
+      ),
+    );
+  }
+}
+
+/// The one-tap row's place while an IVF-shaped round runs (§3e): her blood
+/// test by its DATE, or the way to her round when none is dated yet.
+class _BloodTestLine extends StatelessWidget {
+  const _BloodTestLine({required this.day, required this.p});
+
+  final DateTime day;
+  final V2Palette p;
+
+  @override
+  Widget build(BuildContext context) {
+    final on = ttcHomeBloodTestOn(day);
+    final kind = TtcTreatmentStore.instance.cycle.kind;
+    final label = on == null ? kTtcSeeRound : ttcBloodTestLine(on, kind);
+    return Semantics(
+      button: true,
+      label: label,
+      excludeSemantics: true,
+      child: Material(
+        key: const ValueKey('ttc_home_blood_test_line'),
+        color: p.surface,
+        shape: const StadiumBorder(),
+        child: InkWell(
+          customBorder: const StadiumBorder(),
+          onTap: () => _openSurface(context, 'ttc_treatment'),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 13),
+            child: Row(children: [
+              Icon(Icons.biotech_outlined, size: 18, color: p.ink1),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(label,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: pvManrope(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w700,
+                        color: p.ink1)),
+              ),
+              Icon(Icons.chevron_right_rounded, size: 18, color: p.ink3),
+            ]),
+          ),
+        ),
       ),
     );
   }
@@ -1770,7 +2188,8 @@ class _WindowLine extends StatelessWidget {
       required this.p,
       required this.hinglish,
       required this.selected,
-      required this.onTap});
+      required this.onTap,
+      this.late});
 
   final TtcToday today;
   final V2Palette p;
@@ -1778,6 +2197,10 @@ class _WindowLine extends StatelessWidget {
 
   /// The day the strip is standing on. Not always today.
   final DateTime selected;
+
+  /// Set when today is late on her own cycle and a home test can answer
+  /// (`ttcHomeLateAdvice`). Turns the late state into "Time to test".
+  final TtcTestAdvice? late;
 
   final VoidCallback onTap;
 
@@ -1891,10 +2314,15 @@ class _WindowLine extends StatelessWidget {
       // into a cycle a clinic may be running. What was wrong is that the
       // sentence delivering that refusal was a dead end. It is now the door,
       // and the whole block already opens the treatment screen.
+      // ⚠️ SINCE 2026-09-26 A LABEL CANNOT PUT HER HERE. A cycle is
+      // clinic-held only when her clinic's dates for it are in the tracker
+      // (`TtcStore.ownership`), and the dates lead the hero whenever one is
+      // still ahead, so this state means they have all passed. Kept for
+      // revert: the sub-line was `t.headerNotOnTreatment`.
       TtcHeroState.clinicHolds => (
           t.leadYouAreOn,
           t.headerCycleDayBig(line.days),
-          t.headerNotOnTreatment,
+          t.headerClinicDatesPassed,
         ),
       TtcHeroState.noEstimate => line.days > 0
           ? (t.leadYouAreOn, t.headerCycleDayBig(line.days),
@@ -1957,15 +2385,37 @@ class _WindowLine extends StatelessWidget {
           t.headerBetaOnBody,
         ),
 
+      // ---- a round's step (2026-09-26, §3a) -----------------------------
+      TtcHeroState.treatmentGettingReady ||
+      TtcHeroState.treatmentStimulation ||
+      TtcHeroState.treatmentTrigger ||
+      TtcHeroState.treatmentProcedure ||
+      TtcHeroState.treatmentEmbryoDays ||
+      TtcHeroState.treatmentTransfer ||
+      TtcHeroState.treatmentWait ||
+      TtcHeroState.treatmentTestDay ||
+      TtcHeroState.treatmentResult ||
+      TtcHeroState.treatmentBetweenRounds =>
+        ttcRoundHeroCopy(line, selected),
+
       // ⚠️ `days == 0` MEANS EARLIER THAN ANYTHING SHE HAS LOGGED, which is
       // the one case where there genuinely is no day to name.
+      //
+      // ⚠️ AND AN EARLIER CYCLE NAMES ITS FERTILE DAYS, LOOKING BACK
+      // (2026-09-26): "Day N" with "your fertile days that cycle were around
+      // X to Y". Kept for revert: the sub-line was
+      // `t.headerPastCycleBodyOn(_fmt(line.date!))` and the no-cycle body
+      // `t.headerPastCycleBody`.
       TtcHeroState.pastCycle => line.days > 0
           ? (
               t.leadEarlierCycle,
               t.headerPastCycleDay(line.days),
-              t.headerPastCycleBodyOn(_fmt(line.date!)),
+              line.windowFrom != null && line.windowTo != null
+                  ? t.headerPastCycleWindow(
+                      _fmt(line.windowFrom!), _fmt(line.windowTo!))
+                  : t.headerPastCycleNoWindow(_fmt(line.date!)),
             )
-          : ('', t.headerPastCycle, t.headerPastCycleBody),
+          : ('', t.headerPastCycle, t.headerBeforeFirstPeriodBody),
     };
 
     // ⚠️ THE TAP FOLLOWS THE SENTENCE. The hero has always opened the cycle
@@ -1978,7 +2428,36 @@ class _WindowLine extends StatelessWidget {
       TtcHeroState.treatmentToday,
       TtcHeroState.treatmentSoon,
       TtcHeroState.treatmentBeta,
+      ...kTtcRoundHeroStates,
     };
+
+    // "Waiting to hear" opens the result, since that is what it asks for.
+    if (line.state == TtcHeroState.treatmentTestDay && line.days > 0) {
+      return _block(lead, big, sub,
+          onTapOverride: () => openTtcTreatmentResult(context));
+    }
+    // S1: a planned round's first date in the small line (§3a).
+    if (line.upcomingOn != null) {
+      return _block(lead, big, ttcRoundUpcomingLine(line),
+          openTreatment: true);
+    }
+
+    // ⚠️ "TIME TO TEST" WHEN A TEST CAN ANSWER (2026-09-26, gap analysis,
+    // "Behind: Home & daily", P1). The late state said how many days past her
+    // usual length and stopped there, on the one day she most wants to know
+    // what to do. Now, on her own cycle with a steady history (the same rule
+    // the "late" message uses, so the two cannot name different dates), the
+    // big line says what a test can do today.
+    //
+    // It is not a countdown to a test and it is not a chance: it appears only
+    // once a test is already reliable, and it says so. A clinic cycle never
+    // reaches here (`ttcHomeLateAdvice` refuses first), and neither does a
+    // future day or an irregular history; those keep the words above.
+    final advice = late;
+    if (advice != null && line.state == TtcHeroState.periodLate) {
+      return _block('', kTtcTimeToTest, ttcTimeToTestBody(advice.daysLate),
+          onTapOverride: () => openTtcSurface(context, 'ttc_chat/should_test'));
+    }
 
     return _block(lead, big, sub,
         openTreatment: treatment.contains(line.state));
@@ -2000,21 +2479,35 @@ class _WindowLine extends StatelessWidget {
   /// Two calls to the same function, one bypassing the gate and one not, is a
   /// mismatch nothing catches: both are valid Dart, both compile, and the only
   /// symptom is a missing line under a headline that renders perfectly.
+  ///
+  /// ⚠️ THE SELECTED DAY'S OWN WINDOW SINCE 2026-09-26 (consistency pass).
+  /// `ttcFertileWindowNow` answers for TODAY and rolls forward once today's
+  /// window has closed, so with today in the waiting days and the strip back
+  /// on a day before the window, the big line counted to THIS cycle's window
+  /// ("in 2 days") while this line printed NEXT cycle's dates. The resolver
+  /// gives the window of the cycle the selected day is in, which is the only
+  /// window the two states that print dates ever describe. Kept for revert:
+  ///   final w = ttcFertileWindowNow(ignoreOwnership: true);
+  ///   if (w == null) return '';
+  ///   return w.cyclesAhead > 0
+  ///       ? t.headerWindowProjected(_fmt(w.opensOn), _fmt(w.closesOn))
+  ///       : t.headerWindowDates(_fmt(w.opensOn), _fmt(w.closesOn));
   String _dates() {
     final t = TtcS.current();
-    final w = ttcFertileWindowNow(ignoreOwnership: true);
-    if (w == null) return '';
-    return w.cyclesAhead > 0
-        ? t.headerWindowProjected(_fmt(w.opensOn), _fmt(w.closesOn))
-        : t.headerWindowDates(_fmt(w.opensOn), _fmt(w.closesOn));
+    final ctx = ttcDayContext(selected);
+    final opens = ctx.windowOpensOn;
+    final closes = ctx.windowClosesOn;
+    if (opens == null || closes == null) return '';
+    return t.headerWindowDates(_fmt(opens), _fmt(closes));
   }
 
   Widget _block(String lead, String big, String sub,
-      {bool openTreatment = false}) {
+      {bool openTreatment = false, VoidCallback? onTapOverride}) {
     return Builder(builder: (context) => GestureDetector(
-      onTap: openTreatment
-          ? () => openTtcSurface(context, 'ttc_treatment')
-          : onTap,
+      onTap: onTapOverride ??
+          (openTreatment
+              ? () => openTtcSurface(context, 'ttc_treatment')
+              : onTap),
       behavior: HitTestBehavior.opaque,
       child: SizedBox(
         height: blockHeight,
@@ -2122,6 +2615,13 @@ class _WindowLine extends StatelessWidget {
   }
 }
 
+/// Whether the hero carries the late day's "Should I test?" pill on [today]:
+/// the hero says late for her own cycle and the late advice stands. The one
+/// rule the header and the insight rail both read (H1).
+bool ttcHomeShowsLatePill(DateTime today) =>
+    ttcHomeHeroLine(on: today).state == TtcHeroState.periodLate &&
+    ttcHomeLateAdvice() != null;
+
 class _RoundButton extends StatelessWidget {
   const _RoundButton(
       {required this.icon,
@@ -2138,25 +2638,34 @@ class _RoundButton extends StatelessWidget {
   Widget build(BuildContext context) => Semantics(
         button: true,
         label: semantic,
+        // H6: a 44pt target around the 38pt disc.
         child: InkWell(
           onTap: onTap,
           customBorder: const CircleBorder(),
-          child: Container(
-            width: 38,
-            height: 38,
-            alignment: Alignment.center,
-            decoration: BoxDecoration(
-              color: p.surface.withValues(alpha: 0.85),
-              shape: BoxShape.circle,
-              border: Border.all(color: p.line),
+          child: SizedBox(
+            width: 44,
+            height: 44,
+            child: Center(
+              child: Container(
+                width: 38,
+                height: 38,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: p.surface.withValues(alpha: 0.85),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: p.line),
+                ),
+                child: Icon(icon, size: 18, color: p.ink2),
+              ),
             ),
-            child: Icon(icon, size: 18, color: p.ink2),
           ),
         ),
       );
 }
 
 class _HeaderAction extends StatelessWidget {
+  // `key` and `on` were for the one-tap Sex pill, which is `_QuickChip` since
+  // the review pass (H4, H5). Kept for revert: `super.key,` and `this.on,`.
   const _HeaderAction({
     required this.label,
     required this.icon,
@@ -2169,6 +2678,11 @@ class _HeaderAction extends StatelessWidget {
   final IconData icon;
   final V2Palette p;
   final VoidCallback onTap;
+
+  /// For a toggle (the one-tap Sex button): whether it is recorded for the
+  /// day. Null for an ordinary action. Shown by a filled icon and a tinted
+  /// fill, never by dimming, because dimming already means "not this day".
+  final bool? on = null;
 
   /// False on a day that has not happened yet.
   ///
@@ -2184,7 +2698,7 @@ class _HeaderAction extends StatelessWidget {
     final button = Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
-        color: p.surface,
+        color: on == true ? v2BlockTint(344, p) : p.surface,
         borderRadius: BorderRadius.circular(999),
       ),
       child: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -2205,6 +2719,7 @@ class _HeaderAction extends StatelessWidget {
     return Semantics(
       button: true,
       enabled: enabled,
+      toggled: on,
       label: label,
       child: InkWell(
         // ⚠️ A NULL CALLBACK, NOT AN `onTap` THAT RETURNS EARLY. `InkWell` reads
@@ -2729,11 +3244,21 @@ class _LinkCard extends StatelessWidget {
 // =============================================================================
 class _InsightRail extends StatelessWidget {
   const _InsightRail(
-      {required this.p, required this.hinglish, required this.selected});
+      {required this.p,
+      required this.hinglish,
+      required this.selected,
+      required this.phase,
+      required this.today});
 
   final V2Palette p;
   final bool hinglish;
   final DateTime selected;
+
+  /// Where in her cycle [selected] falls (`ttcHomePhaseOn`).
+  final TtcDayPhase phase;
+
+  /// The screen's one idea of today.
+  final DateTime today;
 
   @override
   Widget build(BuildContext context) {
@@ -2745,13 +3270,75 @@ class _InsightRail extends StatelessWidget {
     // selected day through means walking back through the strip walks back
     // through the content too, so yesterday's insight is genuinely yesterday's
     // rather than today's under a different heading.
-    final insight = ttcPickForToday(ttcInsights, now: selected);
+    //
+    // ⚠️ AND BY PHASE SINCE 2026-09-26 (gap analysis, "Behind: Home & daily",
+    // P1). The date alone could put "your period came" in the fertile window.
+    // `ttcHomeInsightFor` picks from the cards written for this stretch of
+    // her cycle first, rotating by date only inside that set, and leaves the
+    // closeness card out when she has asked to hide intimacy content. Kept
+    // for revert:
+    //   final insight = ttcPickForToday(ttcInsights, now: selected);
+    final insight = ttcHomeInsightFor(selected, phase: phase);
     final myth = ttcPickForToday(ttcMyths, now: selected, offset: 3);
     final n = ttcPickForToday(ttcNutrition, now: selected, offset: 1);
     final m = ttcPickForToday(ttcMovements, now: selected, offset: 2);
     final product = ttcPickForToday(ttcProducts, now: selected, offset: 4);
 
+    // ⚠️ A RUNNING ROUND LEADS THE RAIL (2026-09-26, §3e): its step, and
+    // its blood test named by DATE where "Should I test?" would sit. The
+    // natural "Should I test?" card never shows on a clinic cycle anyway
+    // (its phases are the waiting and late days).
+    final roundStep = ttcHomeRoundPhaseOn(selected);
+    final roundKind = TtcTreatmentStore.instance.cycle.kind;
+    final bloodTest = ttcHomeBloodTestOn(selected);
+
     final cards = <TtcInsightCard>[
+      if (roundStep != null && roundStep.isRunning)
+        TtcInsightCard(
+          id: 'round_step',
+          eyebrow: ttcRoundKindShort(roundKind).toUpperCase(),
+          value: ttcRoundPhaseName(roundStep, roundKind),
+          caption: 'Your round',
+          hue: 206,
+          art: TtcInsightArt.note,
+          go: TtcInsightGo.treatment,
+        ),
+      if (bloodTest != null)
+        TtcInsightCard(
+          id: 'blood_test',
+          eyebrow: ttcStepLabel(TtcTreatmentStep.betaTest, roundKind)
+              .toUpperCase(),
+          value: ttcRoundDate(bloodTest),
+          caption: "Your clinic's date",
+          hue: 268,
+          art: TtcInsightArt.ring,
+          go: TtcInsightGo.treatment,
+        ),
+      // ⚠️ THE WAITING-DAYS CARD OFFERS "SHOULD I TEST?" (2026-09-26). Only on
+      // today, and only in the waiting or late days of her own cycle: the chat
+      // answers from today's dates, so offering it under last Tuesday would
+      // open an answer about a different day than the one she is looking at.
+      // FIRST on the rail on those days, because it is the question those
+      // days are about; past the third card it sat off screen at phone width.
+      //
+      // ⚠️ ONE ENTRANCE ON A LATE DAY (review H1, 2026-09-26). On a late day
+      // the hero already says "Time to test" with the one "Should I test?"
+      // pill under it; a third way in, here, made one question three
+      // buttons. So the card is for the waiting days, and for a late day only
+      // when the hero has no pill to offer. Kept for revert:
+      //   (phase == TtcDayPhase.waiting || phase == TtcDayPhase.late)
+      if (selected == today &&
+          (phase == TtcDayPhase.waiting ||
+              (phase == TtcDayPhase.late && !ttcHomeShowsLatePill(today))))
+        const TtcInsightCard(
+          id: 'should_test',
+          eyebrow: kTtcShouldTestEyebrow,
+          value: kTtcShouldTestValue,
+          caption: kTtcShouldTestCaption,
+          hue: 268,
+          art: TtcInsightArt.ring,
+          go: TtcInsightGo.shouldTest,
+        ),
       ...ttcInsightsFor(selected),
       TtcInsightCard(
         id: 'insight',
@@ -2860,6 +3447,10 @@ void _openInsight(
   required TtcMovement m,
 }) {
   switch (card.go) {
+    case TtcInsightGo.shouldTest:
+      _openSurface(context, 'ttc_chat/should_test');
+    case TtcInsightGo.treatment:
+      _openSurface(context, 'ttc_treatment');
     case TtcInsightGo.window:
       _openSurface(context, 'ttc_window');
     case TtcInsightGo.cycle:
@@ -3379,7 +3970,7 @@ class _Story extends StatelessWidget {
     final tint = v2BlockTint(hue, p);
     return Semantics(
       button: true,
-      label: tooltip == null ? caption : '$caption — $tooltip',
+      label: tooltip == null ? caption : '$caption, $tooltip',
       child: InkWell(
         onTap: onTap,
         borderRadius: BorderRadius.circular(20),
@@ -3637,18 +4228,37 @@ class _ProductRail extends StatelessWidget {
 /// Reads from the stage library, as a rail — the design's card: a tinted
 /// well inside the padding, a "READ · N MIN" chip, the title, the standfirst.
 class _ReadRail extends StatelessWidget {
-  const _ReadRail({required this.p, required this.hinglish});
+  const _ReadRail(
+      {required this.p,
+      required this.hinglish,
+      required this.day,
+      required this.phase});
 
   final V2Palette p;
   final bool hinglish;
 
+  /// The day the strip is on, and where in her cycle it falls.
+  final DateTime day;
+  final TtcDayPhase phase;
+
   @override
   Widget build(BuildContext context) {
     if (kTtcReads.isEmpty) return const SizedBox.shrink();
-    final picks = [
-      for (var i = 0; i < 4 && i < kTtcReads.length; i++)
-        kTtcReads[(_dayOfYear() + i) % kTtcReads.length],
+    // ⚠️ BY PHASE, NOT BY DAY OF YEAR (2026-09-26). `ttcHomeReadIdsFor`
+    // rotates inside the phase's own list (`ttc_phase_reads.dart`) and leaves
+    // out intimacy reads when she has asked for that. The day-of-year pick is
+    // kept for revert, and as the fallback if the phase lists ever come back
+    // empty, so the rail is never a blank strip:
+    //   kTtcReads[(_dayOfYear() + i) % kTtcReads.length]
+    final byPhase = [
+      for (final id in ttcHomeReadIdsFor(day, phase: phase)) ?ttcReadById(id),
     ];
+    final picks = byPhase.isNotEmpty
+        ? byPhase
+        : [
+            for (var i = 0; i < 4 && i < kTtcReads.length; i++)
+              kTtcReads[(_dayOfYear() + i) % kTtcReads.length],
+          ];
 
     return SizedBox(
       height: 236,
@@ -5152,7 +5762,7 @@ class _ExpertRail extends StatelessWidget {
 /// A wide surface card with a label and a chevron — "See everyone".
 class _SeeAllRow extends StatelessWidget {
   const _SeeAllRow(
-      {required this.label, required this.p, required this.onTap});
+      {super.key, required this.label, required this.p, required this.onTap});
 
   final String label;
   final V2Palette p;

@@ -77,6 +77,11 @@ const List<TtcSurface> kTtcSurfaces = [
 
   // ---- Treatment ------------------------------------------------------------
   TtcSurface('ttc_treatment', 'IUI & IVF explained', 'IUI aur IVF samjhein'),
+  // The round (2026-09-26). New work is English, so both columns match.
+  TtcSurface('ttc_treatment/start', 'Start a treatment round',
+      'Start a treatment round'),
+  TtcSurface('ttc_treatment/result', 'Tell us how the test went',
+      'Tell us how the test went'),
   TtcSurface('ttc_records', 'Your records', 'Aapke records'),
   TtcSurface('ttc_medication', 'Medication schedule', 'Dawai ka schedule'),
   TtcSurface('ttc_appointments', 'Appointments', 'Appointments'),
@@ -99,6 +104,16 @@ const List<TtcSurface> kTtcSurfaces = [
 
   // ---- Commerce -------------------------------------------------------------
   TtcSurface('ttc_products', 'Things that help', 'Jo cheezein madad karti hain'),
+
+  // ---- The app speaks first (2026-09-26) ------------------------------------
+  // New work is English (CLAUDE.md), so the second column repeats it, the way
+  // 'Tools' and 'Calendar' already do.
+  TtcSurface('ttc_messages', 'Messages', 'Messages'),
+  TtcSurface('ttc_learn', 'Learn', 'Learn'),
+  TtcSurface('ttc_chat/should_test', 'Should I test?', 'Should I test?'),
+  TtcSurface('ttc_chat/period_came', 'My period came', 'My period came'),
+  TtcSurface('ttc_chat/cycle_report', 'My cycle report', 'My cycle report'),
+  TtcSurface('ttc_cycle_report', 'Cycle report', 'Cycle report'),
 ];
 
 /// The label for a TTC surface, or null when the id is unknown.

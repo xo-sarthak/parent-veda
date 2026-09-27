@@ -78,7 +78,7 @@ extension PrecheckTierCopy on PrecheckTier {
   LocalizedText get label => switch (this) {
         PrecheckTier.core => _en('Core'),
         PrecheckTier.worthDoing => _en('Worth doing'),
-        PrecheckTier.helpful => _en('Helpful if relevant'),
+        PrecheckTier.helpful => _en('Helpful if it applies'),
       };
 }
 
@@ -133,44 +133,45 @@ const List<PrecheckSection> ttcVisiblePrecheckSections = [
 
 extension PrecheckSectionCopy on PrecheckSection {
   LocalizedText get title => switch (this) {
-        PrecheckSection.folate => _en('Folic acid & nutrition'),
-        PrecheckSection.health => _en('Health & medical review'),
-        PrecheckSection.medicines => _en('Medicines & supplements'),
-        PrecheckSection.vaccines => _en('Vaccinations & immunity'),
-        PrecheckSection.lifestyle => _en('Lifestyle'),
-        PrecheckSection.body => _en('Weight & body health'),
-        PrecheckSection.dental => _en('Dental & preventive care'),
-        PrecheckSection.family => _en('Family & genetic history'),
-        PrecheckSection.history => _en('Your reproductive history'),
-        PrecheckSection.partner => _en('Preparing together'),
-        PrecheckSection.practical => _en('Practical preparation'),
+        PrecheckSection.folate => _en('Folic acid and food'),
+        PrecheckSection.health => _en('Health check-up'),
+        PrecheckSection.medicines => _en('Medicines and supplements'),
+        PrecheckSection.vaccines => _en('Vaccines and immunity'),
+        PrecheckSection.lifestyle => _en('Everyday habits'),
+        PrecheckSection.body => _en('Weight and body health'),
+        PrecheckSection.dental => _en('Teeth and routine check-ups'),
+        PrecheckSection.family => _en('Family and genetic history'),
+        PrecheckSection.history => _en('Your pregnancy and fertility history'),
+        PrecheckSection.partner => _en('Getting ready together'),
+        PrecheckSection.practical => _en('Practical things'),
       };
 
   LocalizedText get blurb => switch (this) {
         PrecheckSection.folate =>
-          _en('The one thing with the strongest evidence behind it, and what '
-              'goes around it.'),
+          _en('The step with the strongest evidence behind it, and what goes '
+              'with it.'),
         PrecheckSection.health =>
-          _en('A quick review now prevents surprises later.'),
+          _en('A quick check now saves surprises later.'),
         PrecheckSection.medicines =>
-          _en('The most important section here, and the least talked about.'),
+          _en('The most important section here, and the one least talked '
+              'about.'),
         PrecheckSection.vaccines =>
-          _en('Two of these need a month of notice, which is why they come '
-              'before rather than during.'),
+          _en("Two of these need a month's gap, so they belong before "
+              'pregnancy, not during it.'),
         PrecheckSection.lifestyle =>
-          _en('Small, specific, and none of it about being perfect.'),
+          _en('Small changes. None of it is about being perfect.'),
         PrecheckSection.body =>
           _en('Your health habits matter more than a number.'),
         PrecheckSection.dental =>
-          _en('The single most-forgotten item on any preconception list.'),
+          _en('The item people forget most on any before-pregnancy list.'),
         PrecheckSection.family =>
           _en('What runs in the family, and who needs to know.'),
         PrecheckSection.history =>
           _en('Some past experiences change what a doctor suggests.'),
         PrecheckSection.partner =>
-          _en('Half of this is his, and it is the half most often skipped.'),
+          _en("Half of this is his, and it's the half most often skipped."),
         PrecheckSection.practical =>
-          _en('Not medical, and genuinely useful.'),
+          _en('Not medical, but really useful.'),
       };
 }
 
@@ -241,17 +242,18 @@ final List<PrecheckItem> kPrecheckItems = [
     section: PrecheckSection.folate,
     tier: PrecheckTier.core,
     title: _en('Folic acid'),
-    why: _en('The neural tube closes in the first four weeks after conception '
-        '— often before a period is missed. It has to already be in your body '
-        'by then, which is why it belongs before rather than after.'),
+    why: _en("The baby's neural tube (the start of the brain and spine) "
+        'closes in the first four weeks after conception, often before a '
+        "period is missed. Folic acid needs to be in your body by then. That's "
+        'why you start it before trying, not after.'),
     // ⚠️ NO DOSE. FOGSI puts the standard at 400–500 mcg and 4–5 mg for defined
     // high-risk groups, and which of those applies to HER is a prescription
     // decision. The article carries the numbers with their conditions
     // attached; a checklist item that named one would be prescribing.
-    whatToDo: _en('Ask your doctor or pharmacist which dose is right for you — '
-        'it differs if you have a medical condition, take certain medicines, '
-        'or have had a pregnancy affected by a neural tube defect.'),
-    askDoctor: _en('Which folic acid dose is right for me specifically?'),
+    whatToDo: _en('Ask your doctor or pharmacist which dose is right for you. '
+        "It's different if you have a health condition, take certain "
+        'medicines, or have had a pregnancy affected by a neural tube defect.'),
+    askDoctor: _en('Which folic acid dose is right for me?'),
     surfaceId: 'ttc_supplements',
     readId: 'ttc_read_three_months_before',
     medicalReview: _en('Folic acid wording — deliberately carries no dose. '
@@ -263,11 +265,10 @@ final List<PrecheckItem> kPrecheckItems = [
     section: PrecheckSection.folate,
     tier: PrecheckTier.worthDoing,
     title: _en('Everyday eating'),
-    why: _en('Not a diet. A handful of deficiencies are genuinely common in '
-        'Indian women and genuinely easy to correct — iron, B12, vitamin D, '
-        'iodine.'),
-    whatToDo: _en('Have the common ones tested rather than guessed at, and eat '
-        'the way you already eat with a little more protein in it.'),
+    why: _en('Not a diet. A few shortfalls are very common in Indian women '
+        'and very easy to fix: iron, B12, vitamin D and iodine.'),
+    whatToDo: _en('Get the common ones tested instead of guessing. Keep eating '
+        'the way you already do, with a little more protein.'),
     surfaceId: 'ttc_nutrition',
     readId: 'ttc_read_three_months_before',
     medicalReview: _en('Nutrition priorities for the Indian context — iron, '
@@ -279,12 +280,13 @@ final List<PrecheckItem> kPrecheckItems = [
     section: PrecheckSection.folate,
     tier: PrecheckTier.core,
     title: _en('Supplement review'),
-    why: _en('Supplements are medicines with a friendlier label. Some are '
-        'unhelpful before pregnancy and a few interact with prescriptions.'),
-    whatToDo: _en('Take everything you take — including ayurvedic and herbal '
-        'preparations — to one appointment and have it looked at together.'),
-    askDoctor: _en('Are any of the supplements I take worth stopping or '
-        'changing before pregnancy?'),
+    why: _en('Supplements are medicines with a friendlier label. Some '
+        "don't help before pregnancy, and a few mix badly with prescription "
+        'medicines.'),
+    whatToDo: _en('Take everything you use, including ayurvedic and herbal '
+        'products, to one appointment and have it all checked together.'),
+    askDoctor: _en('Should I stop or change any of my supplements before '
+        'pregnancy?'),
     surfaceId: 'ttc_supplements',
     medicalReview: _en('Herbal and ayurvedic wording — must make no blanket '
         'safety claim in either direction.'),
@@ -295,12 +297,12 @@ final List<PrecheckItem> kPrecheckItems = [
     id: 'preconception_visit',
     section: PrecheckSection.health,
     tier: PrecheckTier.core,
-    title: _en('A preconception conversation'),
-    why: _en('One appointment before trying is worth several after. It is '
-        'where medication, immunity, existing conditions and family history '
-        'all get looked at together instead of one at a time.'),
-    whatToDo: _en('A gynaecologist or a GP can do the whole thing in one '
-        'visit. Take your list.'),
+    title: _en('A check-up before you try'),
+    why: _en('One visit before trying is worth several after. Your medicines, '
+        'immunity, health conditions and family history all get looked at '
+        'together, not one at a time.'),
+    whatToDo: _en('A gynaecologist or a GP can cover all of it in one visit. '
+        'Take your list.'),
     surfaceId: 'ttc_prepare',
   ),
 
@@ -310,10 +312,11 @@ final List<PrecheckItem> kPrecheckItems = [
     tier: PrecheckTier.core,
     title: _en('Existing conditions'),
     why: _en('Thyroid, diabetes, blood pressure, epilepsy, autoimmune '
-        'conditions — control before conception matters more than control '
-        'after it, and for several the medicine itself may need changing.'),
-    whatToDo: _en('Tell whoever manages the condition that you are planning to '
-        'conceive. That sentence is the whole action.'),
+        'conditions: keeping these in control before conception matters more '
+        'than after. For several, the medicine itself may need changing.'),
+    whatToDo: _en('Tell the doctor who looks after your condition that '
+        "you're planning a pregnancy. That one sentence is all you need to "
+        'do.'),
     askDoctor: _en('Does anything about my condition or its treatment need to '
         'change before I try?'),
     medicalReview: _en('Condition-specific preconception guidance — kept '
@@ -325,10 +328,10 @@ final List<PrecheckItem> kPrecheckItems = [
     section: PrecheckSection.health,
     tier: PrecheckTier.worthDoing,
     title: _en('The blood tests worth doing once'),
-    why: _en('Haemoglobin, thyroid, vitamin D, B12, blood sugar — cheap, '
-        'commonly abnormal here, and correctable with a tablet.'),
+    why: _en('Haemoglobin, thyroid, vitamin D, B12 and blood sugar. They '
+        "are cheap, often off in India, and easy to fix with a tablet."),
     whatToDo: _en('One blood draw covers all of them. Not everyone needs '
-        'every test — your doctor decides which apply to you.'),
+        'every test. Your doctor decides which ones apply to you.'),
     surfaceId: 'ttc_tests',
     readId: 'ttc_read_preconception_tests',
     medicalReview: _en('The baseline panel — confirm this list and that it is '
@@ -340,18 +343,17 @@ final List<PrecheckItem> kPrecheckItems = [
     id: 'medication_review',
     section: PrecheckSection.medicines,
     tier: PrecheckTier.core,
-    title: _en('Medication review'),
-    why: _en('Some medicines need changing before conception, and some '
+    title: _en('A review of your medicines'),
+    why: _en('Some medicines need changing before conception. And some '
         'conditions are far more dangerous untreated than the medicine ever '
-        'was. Both are true, which is why this is a conversation rather than a '
-        'rule.'),
+        'was. Both are true, so this needs a conversation, not a rule.'),
     // ⚠️ THE SINGLE MOST SAFETY-CRITICAL LINE IN THIS FEATURE.
-    whatToDo: _en('Take a list of everything you take — prescriptions, '
-        'over-the-counter, supplements, herbal and ayurvedic preparations — to '
-        'a doctor or pharmacist. Do not stop a prescribed medicine on your '
-        'own.'),
-    askDoctor: _en('Are any of my current medicines something I should review '
-        'before pregnancy?'),
+    whatToDo: _en('Take a list of everything you take (prescriptions, '
+        'over-the-counter medicines, supplements, herbal and ayurvedic '
+        'products) to a doctor or pharmacist. Do not stop a prescribed '
+        'medicine on your own.'),
+    askDoctor: _en('Should any of my current medicines be reviewed before '
+        'pregnancy?'),
     surfaceId: 'ttc_medication',
     medicalReview: _en('⚠️ HIGHEST PRIORITY. The do-not-stop-on-your-own '
         'wording, and the inclusion of herbal and traditional preparations in '
@@ -364,12 +366,12 @@ final List<PrecheckItem> kPrecheckItems = [
     section: PrecheckSection.vaccines,
     tier: PrecheckTier.core,
     title: _en('Vaccination and immunity'),
-    why: _en('Rubella and varicella are live vaccines — if you are not immune '
-        'you need the jab and then about a month before conceiving. It is the '
-        'one item on this list with a deadline attached.'),
+    why: _en('Rubella and varicella (chickenpox) vaccines are live vaccines. '
+        "If you're not immune, you need the jab and then about a month before "
+        "trying to conceive. It's the one item on this list with a deadline."),
     whatToDo: _en('Ask for a rubella IgG test by name. About 85 in 100 Indian '
-        'women are already immune, so for most people this is one blood test '
-        'that comes back fine.'),
+        "women are already immune, so for most people it's one blood test that "
+        'comes back fine.'),
     askDoctor: _en('Do I need my rubella or varicella immunity checked?'),
     surfaceId: 'ttc_vaccinations',
     readId: 'ttc_read_preconception_tests',
@@ -383,12 +385,13 @@ final List<PrecheckItem> kPrecheckItems = [
     section: PrecheckSection.lifestyle,
     tier: PrecheckTier.core,
     title: _en('Tobacco'),
-    why: _en('The clearest of the lifestyle factors, for both of you, and the '
-        'one that reverses. This includes gutka, khaini and paan masala, which '
-        'often are not counted as smoking by the person using them.'),
+    why: _en('Of all the everyday habits, this has the clearest evidence, '
+        'for both of you, and its effects reverse when you stop. It includes '
+        "gutka, khaini and paan masala, which people often don't count as "
+        'smoking.'),
     whatToDo: _en('If either of you uses tobacco in any form, this is the '
-        'change worth making first. Support exists and asking for it is '
-        'reasonable.'),
+        "change to make first. Help is out there, and it's fine to ask for "
+        'it.'),
     medicalReview: _en('Smoking and smokeless tobacco language — supportive, '
         'never shaming.'),
   ),
@@ -399,10 +402,10 @@ final List<PrecheckItem> kPrecheckItems = [
     tier: PrecheckTier.worthDoing,
     title: _en('Alcohol'),
     why: _en('Heavy drinking clearly affects fertility in both partners. The '
-        'evidence on occasional drinking is much weaker, and the honest '
-        'position is that heavy is a problem and occasional probably is not.'),
-    whatToDo: _en('Most guidance suggests stopping once you are trying, on the '
-        'grounds that you may be pregnant before you know.'),
+        'evidence on the odd drink is much weaker. The honest answer: heavy '
+        "drinking is a problem, and an occasional drink probably isn't."),
+    whatToDo: _en("Most guidance says to stop once you're trying, because you "
+        'may be pregnant before you know it.'),
     medicalReview: _en('Alcohol wording — the "no established safe level in '
         'pregnancy" position versus the weaker while-trying evidence.'),
   ),
@@ -412,10 +415,10 @@ final List<PrecheckItem> kPrecheckItems = [
     section: PrecheckSection.lifestyle,
     tier: PrecheckTier.helpful,
     title: _en('Caffeine'),
-    why: _en('The one people over-worry about. Moderate intake has not been '
-        'shown to reduce fertility.'),
-    whatToDo: _en('You do not need to give up chai. Around two to three cups '
-        'of coffee a day is the usual figure quoted.'),
+    why: _en('The one people worry about too much. A moderate amount '
+        "hasn't been shown to lower fertility."),
+    whatToDo: _en("You don't need to give up chai. Around two to three cups "
+        'of coffee a day is the figure usually quoted.'),
     medicalReview: _en('Caffeine threshold.'),
   ),
 
@@ -424,11 +427,10 @@ final List<PrecheckItem> kPrecheckItems = [
     section: PrecheckSection.lifestyle,
     tier: PrecheckTier.helpful,
     title: _en('Movement'),
-    why: _en('Regular activity helps insulin sensitivity and sleep. Extremes '
-        'in either direction do not help.'),
-    whatToDo: _en('A walk after dinner is doing something specific rather than '
-        'something virtuous — muscle takes up glucose with very little '
-        'insulin.'),
+    why: _en('Regular activity helps your body use insulin, and helps you '
+        "sleep. Too much or too little doesn't help."),
+    whatToDo: _en('A walk after dinner does something real. Working muscles '
+        'take up sugar from the blood with very little insulin.'),
     surfaceId: 'ttc_ritual',
   ),
 
@@ -437,10 +439,10 @@ final List<PrecheckItem> kPrecheckItems = [
     section: PrecheckSection.lifestyle,
     tier: PrecheckTier.helpful,
     title: _en('Sleep'),
-    why: _en('Broken sleep affects the hormonal rhythm that drives a cycle, '
-        'and it is the first thing to go when this stage gets heavy.'),
-    whatToDo: _en('Worth raising if it has been poor for months rather than '
-        'weeks.'),
+    why: _en('Broken sleep upsets the hormone rhythm that drives your cycle. '
+        "It's also the first thing to go when this stage feels heavy."),
+    whatToDo: _en("Worth mentioning to a doctor if it's been poor for months, "
+        'not just weeks.'),
   ),
 
   // ---- BODY -----------------------------------------------------------------
@@ -453,12 +455,12 @@ final List<PrecheckItem> kPrecheckItems = [
     // and the evidence supports a modest sustained change rather than reaching
     // a figure. A checklist item with a goal weight on it would be the thing
     // this section exists to refuse.
-    why: _en('Weight affects ovulation at both ends, and only one end is ever '
-        'discussed. Being significantly underweight suppresses it as reliably '
-        'as being significantly overweight does.'),
-    whatToDo: _en('Where weight is raised, the figure the evidence keeps '
-        'returning to is a modest five per cent — not a target weight, and not '
-        'a reason to postpone trying for a year.'),
+    why: _en('Weight affects ovulation at both ends, but only one end ever '
+        'gets talked about. Being very underweight can hold back ovulation '
+        'just as surely as being very overweight.'),
+    whatToDo: _en('If weight comes up, the figure the evidence keeps coming '
+        "back to is a modest five per cent. That's not a target weight, and "
+        "it's not a reason to put off trying for a year."),
     readId: 'ttc_read_three_months_before',
     // ⚠️ THE CALCULATOR IS OFFERED, AND THE ITEM STILL CARRIES NO NUMBER.
     // The checklist item is about a conversation; the calculator is one input
@@ -475,10 +477,10 @@ final List<PrecheckItem> kPrecheckItems = [
     section: PrecheckSection.dental,
     tier: PrecheckTier.worthDoing,
     title: _en('A dental check'),
-    why: _en('Gum disease is associated with preterm birth, and treatment is '
-        'more awkward once you are pregnant.'),
-    whatToDo: _en('A routine cleaning now is straightforward. This is the '
-        'single most-forgotten item on any preconception list.'),
+    why: _en('Gum disease is linked with babies being born early (preterm '
+        "birth), and treatment is harder once you're pregnant."),
+    whatToDo: _en("A routine cleaning now is easy. It's the item people forget "
+        'most on any before-pregnancy list.'),
     medicalReview: _en('Dental claim — association with preterm birth is '
         'stated as association, not cause.'),
   ),
@@ -489,13 +491,13 @@ final List<PrecheckItem> kPrecheckItems = [
     section: PrecheckSection.family,
     tier: PrecheckTier.core,
     title: _en('What runs in the family'),
-    why: _en('Thalassaemia carrier screening is recommended for all couples '
-        'here regardless of family history, because carriers have no symptoms '
-        'and it only means anything as a pair.'),
-    whatToDo: _en('Tell your doctor about any inherited condition in either '
-        'family. Not everyone needs genetic testing — they decide whether '
-        'carrier screening or counselling applies to you.'),
-    askDoctor: _en('Given our family histories, is carrier screening worth '
+    why: _en('Thalassaemia carrier screening is advised for all couples in '
+        'India, whatever your family history. Carriers have no symptoms, and '
+        'the result only means something when you look at both of you.'),
+    whatToDo: _en('Tell your doctor about any condition that runs in either '
+        'family. Not everyone needs genetic testing. Your doctor decides '
+        'whether carrier screening or counselling applies to you.'),
+    askDoctor: _en('With our family histories, is carrier screening worth '
         'doing?'),
     readId: 'ttc_read_preconception_tests',
     medicalReview: _en('⚠️ Genetic screening language — must not imply anyone '
@@ -508,12 +510,12 @@ final List<PrecheckItem> kPrecheckItems = [
     section: PrecheckSection.history,
     tier: PrecheckTier.worthDoing,
     title: _en('Your reproductive history'),
-    why: _en('A previous loss, an ectopic pregnancy, fertility treatment or '
-        'pelvic surgery can each change what a doctor suggests before you try '
-        'again.'),
+    why: _en('A past loss, an ectopic pregnancy, fertility treatment or '
+        'surgery in the pelvis can each change what a doctor suggests before '
+        'you try again.'),
     whatToDo: _en('Only if it applies to you, and only as much as you want to '
-        'say. It is on this list because it changes advice, not because it '
-        'needs explaining.'),
+        "share. It's here because it changes the advice, not because you need "
+        'to explain it.'),
     readId: 'ttc_read_trying_again',
   ),
 
@@ -523,10 +525,12 @@ final List<PrecheckItem> kPrecheckItems = [
     section: PrecheckSection.partner,
     tier: PrecheckTier.core,
     title: _en('His side of it'),
-    why: _en('A male factor is involved in about half of couples who take '
-        'longer than expected, and his half is the fastest to check.'),
-    whatToDo: _en('Tobacco, alcohol and heat are the three with evidence. Any '
-        'change he makes shows up in a test about three months later.'),
+    why: _en('A male factor is part of the picture in about half of couples '
+        'who take longer than expected. His side is also the quickest to '
+        'check.'),
+    whatToDo: _en('Tobacco, alcohol and heat are the three with evidence behind '
+        'them. Any change he makes shows up in a test about three months '
+        'later.'),
     readId: 'ttc_read_heat_habits',
     surfaceId: 'ttc_partner',
     medicalReview: _en('Male-factor involvement in roughly half of couples, '
@@ -538,11 +542,11 @@ final List<PrecheckItem> kPrecheckItems = [
     section: PrecheckSection.partner,
     tier: PrecheckTier.worthDoing,
     title: _en('His medicines'),
-    why: _en('Several ordinary medicines affect sperm production — some for '
-        'hair loss, some psychiatric, and anything containing testosterone, '
-        'which suppresses production rather than helping it.'),
+    why: _en('Several ordinary medicines affect sperm production. Some are '
+        'for hair loss, some are for mental health, and anything with '
+        'testosterone in it lowers production instead of helping.'),
     whatToDo: _en('Worth him mentioning what he takes at any appointment. '
-        'Not a reason to stop anything on his own.'),
+        "It's not a reason to stop anything on his own."),
     readId: 'ttc_read_whose_side',
   ),
 
@@ -554,10 +558,10 @@ final List<PrecheckItem> kPrecheckItems = [
     // ⚠️ AUTO-COMPLETABLE. This is a thing she does in the app, so the app can
     // honestly say it is covered.
     autoCompletable: true,
-    title: _en('Understanding your window'),
-    why: _en('The window is about six days and the two days before ovulation '
-        'carry most of it. Every one to two days across it is the whole '
-        'instruction.'),
+    title: _en('Knowing your fertile days'),
+    why: _en('Your fertile window is about six days, and the two days before '
+        'ovulation matter most. Sex every one to two days across it is all '
+        'you need to do.'),
     whatToDo: _en('Nothing to buy and nothing to track, unless you want to.'),
     surfaceId: 'ttc_window',
     readId: 'ttc_read_timing_myths',
@@ -569,9 +573,9 @@ final List<PrecheckItem> kPrecheckItems = [
     tier: PrecheckTier.helpful,
     autoCompletable: true,
     title: _en('A record of your cycles'),
-    why: _en('Three months of dates is the single most useful thing to bring '
-        'to a first appointment, and it is the one thing no doctor can '
-        'reconstruct for you.'),
+    why: _en('Three months of dates is the most useful thing to bring to a '
+        "first appointment. It's also the one thing no doctor can piece "
+        'together for you.'),
     whatToDo: _en('Just the first day of each period is enough.'),
     surfaceId: 'ttc_cycle',
   ),
@@ -581,11 +585,11 @@ final List<PrecheckItem> kPrecheckItems = [
     section: PrecheckSection.practical,
     tier: PrecheckTier.worthDoing,
     title: _en('Knowing when to ask for help'),
-    why: _en('The usual guidance is a year under 36, and at presentation from '
-        '36 — but that assumes predictable cycles, and several situations mean '
-        'the clock does not apply at all.'),
-    whatToDo: _en('Worth the two of you agreeing a point in advance, rather '
-        'than deciding it one disappointing month at a time.'),
+    why: _en("The usual advice is a year of trying if you're under 36, and "
+        "no need to wait from 36. But that assumes regular cycles, and in "
+        "several situations the waiting time doesn't apply at all."),
+    whatToDo: _en('It helps if the two of you agree on a point in advance, '
+        'instead of deciding one hard month at a time.'),
     readId: 'ttc_read_when_to_seek_help',
     medicalReview: _en('Referral thresholds per NICE — 12 months under 36, at '
         'presentation from 36, earlier where a cause is known.'),
@@ -595,11 +599,11 @@ final List<PrecheckItem> kPrecheckItems = [
     id: 'who_to_see',
     section: PrecheckSection.practical,
     tier: PrecheckTier.helpful,
-    title: _en('Knowing who you would see'),
-    why: _en('Working out which doctor or clinic while nothing is wrong is '
-        'much easier than working it out while something is.'),
-    whatToDo: _en('A gynaecologist you can get to is usually where this '
-        'starts, rather than a fertility clinic.'),
+    title: _en("Knowing which doctor you'd see"),
+    why: _en('Choosing a doctor or clinic while nothing is wrong is much '
+        'easier than choosing one once something is.'),
+    whatToDo: _en('This usually starts with a gynaecologist you can easily '
+        'get to, not a fertility clinic.'),
     surfaceId: 'ttc_prepare',
   ),
 ];
@@ -616,6 +620,6 @@ List<PrecheckItem> precheckItemsIn(PrecheckSection s) =>
 
 /// The editorial beat after the first section — §26. Not labelled a tip.
 final LocalizedText kPrecheckPatternBreak = _en(
-    'Preparing for pregnancy is not about getting a perfect score. It is about '
-    'giving yourself a little more information before the next chapter '
+    "Getting ready for pregnancy isn't about a perfect score. It's about "
+    'giving yourself a little more to go on before the next chapter '
     'begins.');

@@ -30,6 +30,8 @@ import '../../services/pregnancy_controller.dart';
 import '../../services/pv_order_store.dart';
 import '../../services/saved_store.dart';
 import '../../services/stage_gateway.dart';
+import '../../ttc/ttc_content_prefs.dart' show TtcContentPrefs;
+import '../../ttc/ttc_messages_store.dart' show TtcMessagesStore;
 import '../../ttc/ttc_records_store.dart';
 import '../../ttc/ttc_treatment_store.dart';
 import '../auth/onboarding/onboarding_questions.dart';
@@ -43,7 +45,14 @@ import '../pregnancy_profile_screen.dart';
 import '../products/pv_orders_screen.dart';
 import '../saved_screen.dart';
 import '../skilling/sk_child_store.dart';
+import '../ttc/ttc_content_prefs_sheet.dart'
+    show showTtcContentPrefsSheet, kTtcWhatYouSee, kTtcHideIntimate;
 import '../ttc/ttc_journal_screen.dart';
+import '../ttc/ttc_prepare_screen.dart' show TtcPrepareScreen;
+// Records now opens through the Tools table (Y2), which calls openTtcRecords.
+// import '../ttc/ttc_records_screen.dart' show openTtcRecords;
+import '../ttc/ttc_surface_router.dart' show openTtcSurface;
+import '../ttc/ttc_tools_screen.dart' show TtcTool, ttcToolById;
 import '../ttc/ttc_transition_screen.dart' show recordPositiveTest;
 import 'pv_details_screen.dart';
 import 'pv_doctor_notes_screen.dart';
@@ -73,12 +82,43 @@ class PvYouThing {
     required this.open,
     this.subtitle,
     this.count,
+    this.dot,
+    this.subtitleNow,
+    this.listen,
   });
   final IconData icon;
   final String title;
   final String? subtitle;
   final int Function()? count;
   final void Function(BuildContext) open;
+
+  /// A small dot at the row's end when this is true, never a number. The
+  /// TTC Messages row uses it, the same signal as the home's envelope
+  /// (review Y1, 2026-09-26: a count of unread messages is a small pressure
+  /// on a screen that is meant to take pressure away, §4.9).
+  final bool Function()? dot;
+
+  /// A subtitle read at build time, for a row whose line is a STATE ("Sex
+  /// and intimacy content: hidden") rather than a description. Wins over
+  /// [subtitle] when set (review Y3).
+  final String Function()? subtitleNow;
+
+  /// What the row's [dot] or [subtitleNow] reads, so the screen repaints
+  /// when it changes. Additive: rows without it are drawn exactly as before.
+  final Listenable? listen;
+}
+
+/// A You row that IS a Tools tile: its name, icon and line read from the
+/// Tools table, so the two tabs print the same thing (review Y2). The
+/// destination is the tool's own too.
+PvYouThing _toolThing(String id) {
+  final TtcTool tool = ttcToolById(id)!;
+  return PvYouThing(
+    icon: tool.icon,
+    title: tool.nameEn,
+    subtitle: tool.descEn,
+    open: tool.open,
+  );
 }
 
 /// The one forward action of a stage.
@@ -240,6 +280,10 @@ PvYouStageContent pvYouContentFor(LifeStage stage) => switch (stage.shopStage) {
   LifeStage.skilling => _skilling,
 };
 
+/// The "What you see" row's state line (Y3). English only.
+const String kTtcIntimateStateShown = 'Sex and intimacy content: shown';
+const String kTtcIntimateStateHidden = 'Sex and intimacy content: hidden';
+
 final PvYouStageContent _trying = PvYouStageContent(
   stage: LifeStage.tryingToConceive,
   clock: () {
@@ -306,7 +350,83 @@ final PvYouStageContent _trying = PvYouStageContent(
     ),
     _orders(),
   ],
-  things: [_bookings(), _addresses(), _doctorNotes(LifeStage.tryingToConceive)],
+  // ⚠️ MORE'S ROWS LIVE HERE SINCE 2026-09-26. The V3 bar became Today ·
+  // Learn · Products · Tools · You, and the More tab went. Everything it held
+  // is below, so nothing lost its entrance: Calendar, the cycle companion,
+  // the fertility window and the unscoped programmes list (Journal was
+  // already a tile; Profile is this screen). Community is held back on
+  // purpose, the user's call. `test/ttc_tabs_v3_test.dart` pins every row.
+  //
+  // The doctor's note leads (Flo's "Report for a doctor" sits first under
+  // the identity card): it says the app is for her and her clinician.
+  //
+  // Kept for revert:
+  //   things: [_bookings(), _addresses(), _doctorNotes(LifeStage.tryingToConceive)],
+  things: [
+    _doctorNotes(LifeStage.tryingToConceive),
+    // ⚠️ TWO ROWS FROM THE GAP ANALYSIS (2026-09-26, "Behind: Guided help" and
+    // "Behind: Settings"), TTC only. The messages the app now sends wait in a
+    // list, and this is its second door after the home's envelope. "What you
+    // see" opens a small sheet with the one content switch, because this
+    // shared screen has no switch row and must not grow one for one stage.
+    // Y1: a dot, not a number, like the home's envelope. Kept for revert:
+    //   count: () => TtcMessagesStore.instance.unreadCount,
+    PvYouThing(
+      icon: Icons.mail_outline_rounded,
+      title: 'Messages',
+      subtitle: 'What we have sent you, and when we send it',
+      dot: () => TtcMessagesStore.instance.unreadCount > 0,
+      listen: TtcMessagesStore.instance,
+      open: (c) => openTtcSurface(c, 'ttc_messages'),
+    ),
+    // Y3: the line says whether hiding is on, so she can see it without
+    // opening the sheet (the Settings value pattern). Kept for revert:
+    //   subtitle: kTtcHideIntimate,
+    PvYouThing(
+      icon: Icons.visibility_outlined,
+      title: kTtcWhatYouSee,
+      subtitle: kTtcHideIntimate,
+      subtitleNow: () => TtcContentPrefs.instance.hideIntimate
+          ? kTtcIntimateStateHidden
+          : kTtcIntimateStateShown,
+      listen: TtcContentPrefs.instance,
+      open: (c) => showTtcContentPrefsSheet(c),
+    ),
+    // ⚠️ THE TREATMENT ROUND'S ROW (2026-09-26, docs/TTC-TREATMENT-FLOW.md
+    // §2b). Additive: one more way to the round, beside records. It opens the
+    // treatment screen, whose top is the start card when no round exists.
+    PvYouThing(
+      icon: Icons.event_note_outlined,
+      title: 'Treatment',
+      subtitle: "Your clinic's dates, step by step",
+      open: (c) => openTtcSurface(c, 'ttc_treatment'),
+    ),
+    // Y2: from the Tools table. Kept for revert: folder_shared_outlined,
+    // 'Records and reports', 'Both your results, in one folder',
+    // openTtcRecords.
+    _toolThing('records'),
+    PvYouThing(
+      icon: Icons.calendar_month_outlined,
+      title: 'Calendar',
+      subtitle: 'Your cycle days, month by month',
+      open: (c) => openTtcSurface(c, 'ttc_calendar'),
+    ),
+    // Y2: from the Tools table, so "Cycle companion" and "Fertility window"
+    // are one name, one icon, one line and one destination on both tabs.
+    // Kept for revert: timeline_rounded / 'Your periods, and what they tell
+    // you' / ttc_cycle, and wb_twilight_rounded / 'The days that count most
+    // this cycle' / ttc_window. The words moved to Tools unchanged.
+    _toolThing('cycle'),
+    _toolThing('window'),
+    PvYouThing(
+      icon: Icons.auto_awesome_outlined,
+      title: 'All programmes and sessions',
+      subtitle: 'Yoga, food, mind, tests, IVF support and more',
+      open: (c) => _push(c, const TtcPrepareScreen(), 'ttc/prepare'),
+    ),
+    _bookings(),
+    _addresses(),
+  ],
   childrenInvitation: 'Your first child\'s page appears here after the birth.',
   whatWeStore: [
     'Your name, phone and email, and the partner you paired with.',

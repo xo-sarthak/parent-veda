@@ -112,16 +112,96 @@ class TtcS {
   String get tabTalkToExpert => _p('Talk to expert', 'Expert se baat');
   String get tabMore => _p('More', 'Aur');
 
+  // ---- the V3 tab set since 2026-09-26: Today · Learn · Products · Tools · You
+  //
+  // English only (new work). The second argument repeats the English on
+  // purpose: it is not a translation owed, see CLAUDE.md "New work is English".
+  String get tabLearn => _p('Learn', 'Learn');
+  String get tabYou => _p('You', 'You');
+
+  // ---- the Learn tab --------------------------------------------------------
+  String get learnTitle => _p('Learn', 'Learn');
+  String get learnIntro => _p(
+      "Everything we've written about trying for a baby, in one place.",
+      "Everything we've written about trying for a baby, in one place.");
+  String get learnSearchHint =>
+      _p('Search reads, films and questions', 'Search reads, films and questions');
+  String get learnRecent => _p('Recent', 'Recent');
+  String get learnPopular => _p('People often look for', 'People often look for');
+  String get learnNoMatch => _p(
+      "Nothing here matches that yet. Try a shorter word, or ask Veda.",
+      "Nothing here matches that yet. Try a shorter word, or ask Veda.");
+  String learnAskVeda(String q) => _p('Ask Veda about "$q"', 'Ask Veda about "$q"');
+  String get learnAskVedaLine =>
+      _p('An answer from what we have written', 'An answer from what we have written');
+  String get learnTopics => _p('Browse by topic', 'Browse by topic');
+  String get learnYourReading => _p('Your reading', 'Your reading');
+  String get learnContinue => _p('Pick up where you left off', 'Pick up where you left off');
+  String get learnSaved => _p('Saved for later', 'Saved for later');
+  String get learnSavedEmpty => _p(
+      'Tap the bookmark on any read and it waits for you here.',
+      'Tap the bookmark on any read and it waits for you here.');
+  String get learnSeeSaved => _p('All saved', 'All saved');
+  String get learnStartEyebrow => _p('Start here', 'Start here');
+  // "Trying to conceive 101" since 2026-09-26 (the gap analysis's seven-step
+  // course). Was: 'Five reads for the first few months'.
+  String get learnStartTitle =>
+      _p('Trying to conceive 101', 'Trying to conceive 101');
+  String get learnStartLead => _p(
+      'Short reads for the first months, in order if you like. Each one makes the next easier.',
+      'Short reads for the first months, in order if you like. Each one makes the next easier.');
+  String get learnFilmsEyebrow => _p('Films', 'Films');
+  String get learnFilmsTitle => _p('Short films on the way', 'Short films on the way');
+  String get learnFilmsLead => _p(
+      "We're still making these. Each one already has its notes, so you can read what it will cover.",
+      "We're still making these. Each one already has its notes, so you can read what it will cover.");
+  String get learnFilmComing => _p('Coming soon', 'Coming soon');
+  String get learnFilmNotYet => _p(
+      "We're still making this film. It will play here when it's ready.",
+      "We're still making this film. It will play here when it's ready.");
+  String get learnFilmTakeaways => _p("What you'll take away", "What you'll take away");
+  String get learnFilmCovers => _p('What it covers', 'What it covers');
+  String get learnFilmReadNow => _p('Read about it now', 'Read about it now');
+  String get learnByTopicEyebrow => _p('By topic', 'By topic');
+  String get learnOpenDoor => _p('Open', 'Open');
+  String get learnAll => _p('All', 'All');
+  String learnShowAll(int n) => _p('Show all $n', 'Show all $n');
+  String get learnShowFewer => _p('Show fewer', 'Show fewer');
+  String get learnMythsEyebrow => _p('Myths and stories', 'Myths and stories');
+  String get learnMythsTitle =>
+      _p("What people say, and what's true", "What people say, and what's true");
+  String get learnCoursesEyebrow => _p('Courses and programmes', 'Courses and programmes');
+  String get learnCoursesTitle =>
+      _p('Go deeper, with someone who knows', 'Go deeper, with someone who knows');
+  String get learnCoursesAll => _p('See all', 'See all');
+  String get learnFaqEyebrow => _p('Common questions', 'Common questions');
+  String get learnFaqTitle => _p('Short answers', 'Short answers');
+  String learnFaqFrom(String title) => _p('From: $title', 'From: $title');
+  String learnMinRead(int m) => _p('$m min read', '$m min read');
+  String learnMinWatch(int m) => _p('$m min film', '$m min film');
+  String get learnFinished => _p('Read', 'Read');
+  String get learnFootnote => _p(
+      "Everything here explains. None of it is a diagnosis, and your own doctor's word comes first.",
+      "Everything here explains. None of it is a diagnosis, and your own doctor's word comes first.");
+
+  // ---- Tools: finding a tool -------------------------------------------------
+  String get toolsSearchHint => _p('Find a tool', 'Find a tool');
+  String get toolsRecent => _p('Recently used', 'Recently used');
+  String get toolsStartWith => _p('Good places to start', 'Good places to start');
+  String get toolsNoMatch => _p(
+      "No tool by that name. Try a shorter word.",
+      "No tool by that name. Try a shorter word.");
+
   // ---- the More screen ------------------------------------------------------
   String get moreTitle => _p('More', 'Aur');
   String get moreIntro => _p(
-      'Everything that is not on the four tabs, in one place.',
+      "Everything that isn't on the four tabs, all in one place.",
       'Jo cheezein chaar tabs par nahi hain, sab yahan.');
   String get moreYourCycle => _p('Your cycle', 'Aapka cycle');
   String get moreEverythingPaid =>
       _p('All programmes and sessions', 'Saare programmes aur sessions');
   String get moreEverythingPaidBody => _p(
-      'Yoga, nutrition, mental wellness, assessments, partner workshops, IVF support and lifestyle programmes — as well as the courses and consultations on their own tabs.',
+      'Yoga, nutrition, mental wellness, assessments, partner workshops, IVF support and lifestyle programmes. Plus the courses and consultations that have their own tabs.',
       'Yoga, khaan-paan, mann ki sehat, jaanch, partner workshops, IVF support aur lifestyle programmes — saath mein courses aur consultations bhi.');
 
   // ---- the first-run flow ---------------------------------------------------
@@ -154,7 +234,7 @@ class TtcS {
   String get introVideoLabel => _p(
       'Trying to conceive, explained', 'Trying to conceive, samjhaaya gaya');
   String get introVideoComing => _p(
-      'The film for this is being made. What it covers is below.',
+      "We're still making this film. Here's what it will cover.",
       'Iska video banaya ja raha hai. Ismein kya hoga, neeche likha hai.');
 
   /// The film's contents, as words, until the film exists.
@@ -166,16 +246,16 @@ class TtcS {
           'Doctor ke paas kab jaana samajhdaari hai — pehle nahi, baad mein bhi nahi.',
         ]
       : const [
-          'What the fertile window actually is, and why the timing of it matters more than anything else you can control.',
-          'What genuinely helps — and which of the things you have read are noise.',
-          'What to avoid, and what is not worth worrying about.',
-          'When seeing a doctor is the sensible next step, rather than earlier or later.',
+          'What the fertile window is, and why its timing matters more than anything else you can control.',
+          "What really helps, and which of the things you've read you can let go of.",
+          "What to avoid, and what isn't worth worrying about.",
+          'When it makes sense to see a doctor, not too early and not too late.',
         ];
 
   String get introPeriodTitle =>
       _p('When did your last period start?', 'Aapka pichhla period kab shuru hua?');
   String get introPeriodBody => _p(
-      'This one date is what your cycle, your fertile days and most of this stage are built from. Nothing else can stand in for it.',
+      'We work out your cycle, your fertile days and most of what you see here from this one date. Nothing else can take its place.',
       'Yahi ek date se aapka cycle, aapke fertile din aur is stage ka zyadatar hissa banta hai. Iski jagah aur kuch nahi le sakta.');
   String get introPickDate => _p('Pick the date', 'Date chunein');
   String introDatePicked(String date) =>
@@ -184,13 +264,13 @@ class TtcS {
   String get introTryingTitle =>
       _p('How long have you been trying?', 'Aap kab se koshish kar rahi hain?');
   String get introTryingBody => _p(
-      'This is only used to know when it is worth suggesting you see someone — not to judge how it is going.',
+      "We only use this to know when to suggest seeing someone. It's never used to judge how things are going.",
       'Yeh sirf yeh jaanne ke liye hai ki kab kisi se milne ki salaah dena theek hoga — yeh aankne ke liye nahi ki kya chal raha hai.');
 
   String get introPathTitle =>
       _p('Is a clinic involved?', 'Kya koi clinic isme shaamil hai?');
   String get introPathBody => _p(
-      'If your treatment decides the timing, we will not put our own estimate next to theirs. This is the answer that stops that happening.',
+      "If your treatment sets the timing, we won't show our own estimate next to your clinic's. Your answer here makes sure of that.",
       'Agar aapka treatment timing tay karta hai, to hum uske saath apna alag andaaza nahi rakhenge. Yeh jawab wahi rokta hai.');
 
   // ---- greetings ------------------------------------------------------------
@@ -199,7 +279,7 @@ class TtcS {
   String get goodEvening => _p('Good evening', 'Shubh sandhya');
 
   // ---- the hero -------------------------------------------------------------
-  String get todaysJourney => _p("Today's journey", 'Aaj ka safar');
+  String get todaysJourney => _p('For today', 'Aaj ka safar');
   String get yourChapter => _p('Your chapter', 'Aapka chapter');
   String get currentFocus => _p('Focus', 'Dhyaan');
   String get currentGoal => _p('Worth doing', 'Karne layak');
@@ -222,16 +302,16 @@ class TtcS {
   String get chanceLabel => _p('Chance of conceiving', 'Conceive karne ka mauka');
 
   String get logPeriodTitle =>
-      _p('Tell us when your last period began', 'Aapka last period kab shuru hua?');
+      _p('When did your last period start?', 'Aapka last period kab shuru hua?');
   String get logPeriodBody => _p(
-      'One date is all we need to start understanding your rhythm. Nothing else is required, and you can change it any time.',
+      'We only need one date to start learning your rhythm. Nothing else is needed, and you can change it any time.',
       'Bas ek date chahiye, taaki hum aapki rhythm samajh sakein. Aur kuch zaroori nahi - aur aap kabhi bhi badal sakti hain.');
   String get logPeriodCta => _p('Add the date', 'Date add karein');
 
   String get noEstimateYet =>
-      _p('We are still learning your rhythm', 'Hum abhi aapki rhythm seekh rahe hain');
+      _p("We're still learning your rhythm", 'Hum abhi aapki rhythm seekh rahe hain');
   String get noEstimateBody => _p(
-      'After a cycle or two we can share a gentle estimate. Until then, nothing here is a guess.',
+      "After a cycle or two, we can share an estimate. Until then, we won't show you a guess.",
       'Ek-do cycle ke baad hum ek halka sa andaaza de payenge. Tab tak, yahan kuch bhi guess nahi hai.');
 
   // ---- why there is no estimate ---------------------------------------------
@@ -243,13 +323,13 @@ class TtcS {
   String get noEstHistoryOffTitle => _p('Something in your dates looks off',
       'Aapki dates mein kuch theek nahi lag raha');
   String get noEstHistoryOffBody => _p(
-      'One of your recorded gaps is far longer than a cycle usually runs - most often a cycle that was never logged. We would rather show nothing than build an estimate on it. Fixing or removing that entry brings the estimate back.',
+      "One gap between your dates is much longer than a cycle usually lasts. Most often, that's a cycle that was never logged. We'd rather show nothing than guess from it. Fix or remove that entry and the estimate comes back.",
       'Aapke record kiye gaps mein se ek cycle se kaafi lamba hai - aksar wo cycle jo log hi nahi hua. Uspe andaaza banane se accha hai kuch na dikhayein. Us entry ko theek ya delete karne par andaaza wapas aa jaayega.');
 
   String get noEstOverdueTitle =>
       _p('This cycle is running long', 'Ye cycle lamba chal raha hai');
   String get noEstOverdueBody => _p(
-      'You are past where your own cycles usually end, so today\'s estimate would be arithmetic on an assumption that has already been contradicted. This happens, and on its own it is not a warning sign - but if it keeps happening, it is worth a doctor knowing.',
+      "You're past the day your cycles usually end, so an estimate today would rest on a guess that's already turned out wrong. This happens, and on its own it's not a warning sign. If it keeps happening, it's worth telling a doctor.",
       'Aap wahan se aage hain jahan aapke cycles aam taur par khatam hote hain, isliye aaj ka andaaza ek galat maani hui baat par hoga. Aisa hota hai, aur akele mein ye chinta ki baat nahi - par baar-baar ho toh doctor ko batana theek rahega.');
 
   /// "28 days" but "1 day". The list said "1 days".
@@ -273,15 +353,15 @@ class TtcS {
   /// not reading her own data.
   String notCountedWhy(int days) => days < 15
       ? _p(
-          'Too close to the next entry to be a separate cycle, so it is kept but not used in the average.',
+          "Too close to the next entry to be a separate cycle. It's kept, but not used in the average.",
           'Agli entry ke itne paas hai ki alag cycle nahi ho sakta, isliye rakha gaya hai par average mein use nahi hota.')
       : _p(
-          'Longer than a cycle usually runs — most often a period that was never logged. Kept, but not used in the average.',
+          "Longer than a cycle usually lasts. Most often, that's a period that was never logged. It's kept, but not used in the average.",
           'Cycle aam taur par itna lamba nahi hota - zyadatar aisa tab hota hai jab koi period log hi nahi hua. Rakha gaya hai, par average mein use nahi hota.');
 
   /// Shown at the moment she logs a start that cannot be a new cycle.
   String tooCloseWarning(int days) => _p(
-      'That is $days days after the last start you logged. Periods do not usually begin that close together - if this is the same period, you may not need a second entry.',
+      'That\'s $days days after the last start you logged. Periods don\'t usually start that close together. If this is the same period, you may not need a second entry.',
       'Ye aapke pichhle start ke $days din baad hai. Periods aam taur par itne paas shuru nahi hote - agar ye wahi period hai toh shayad doosri entry ki zaroorat nahi.');
   String get tooCloseKeep => _p('Add it anyway', 'Phir bhi add karein');
   String get tooCloseCancel => _p('Cancel', 'Rehne dein');
@@ -302,9 +382,9 @@ class TtcS {
 
   String get todaysVideo => _p("Today's video", 'Aaj ka video');
   String whyNow(String chapter) =>
-      _p('Because you are in $chapter', 'Kyunki aap $chapter mein hain');
+      _p('Because you\'re in $chapter', 'Kyunki aap $chapter mein hain');
   String get videoComing => _p(
-      'Video is being filmed for this chapter.',
+      "We're filming a video for this chapter.",
       'Is chapter ke liye video banaya ja raha hai.');
 
   // ---- the cycle header on the V3 home --------------------------------------
@@ -331,17 +411,17 @@ class TtcS {
   String get logViewChart => _p('View chart', 'Chart dekhein');
   String get editCategoriesTitle => _p('Edit categories', 'Categories badlein');
   String get editCategoriesBody => _p(
-      'Turn off anything you do not want to log. You can turn it back on whenever you like.',
+      "Turn off anything you don't want to log. You can turn it back on any time.",
       'Jo log nahi karna, use band kar dein. Kabhi bhi wapas chalu kar sakti hain.');
   String get editCategoriesKeeps => _p(
-      'Turning a category off only hides it here. Days you already logged stay exactly where they are, and come back with it.',
+      "Turning a category off only hides it here. Anything you've already logged stays safe, and shows again when you turn it back on.",
       'Category band karne se wo sirf yahan chhup jaati hai. Jo din pehle log ho chuke hain, wo waise hi rehte hain.');
   String get logOnThisDay => _p('On this day', 'Is din');
   String get logInvite => _p(
-      'Tap whatever fits. Nothing is required, and there is no wrong answer — a few cycles of this is what turns "I think this happens sometimes" into something you can show a doctor.',
+      'Tap whatever fits today. Nothing is required and there\'s no wrong answer. After a few cycles, "I think this happens sometimes" becomes something you can show your doctor.',
       'Jo theek lage, tap karein. Kuch zaroori nahi hai. Kuch cycles ka record hi wo cheez banta hai jo aap doctor ko dikha sakein.');
   String get logDisclaimer => _p(
-      'This records what you noticed. It never interprets it, and it is never a diagnosis. In the two weeks before a period is due, early pregnancy and an approaching period feel identical — they are the same hormone — so nothing here can tell you which it is.',
+      "This keeps a note of what you felt. It doesn't read anything into it, and it's never a diagnosis. In the two weeks before your period, early pregnancy and a period on its way can feel exactly the same, because the same hormone is behind both. So nothing here can tell you which one it is.",
       'Ye sirf record karta hai. Iska matlab nahi nikaalta, aur ye kabhi diagnosis nahi hai.');
 
   // ---- the cycle report -----------------------------------------------------
@@ -361,31 +441,31 @@ class TtcS {
   String get reportWeight => _p('Weight', 'Vazan');
   String get reportTemperature => _p('Temp', 'Temp');
   String get reportNoNumbers => _p(
-      'Add a weight or a morning temperature on any day and a chart appears here. Neither is required — this works on symptoms alone.',
+      "Add a weight or a morning temperature on any day, and a chart shows up here. You don't need either. This works with symptoms alone.",
       'Kisi bhi din vazan ya subah ka temperature daalein, yahan chart aa jayega. Dono zaroori nahi hain.');
 
   String get reportNoPeriod => _p('This fills in as you log', 'Aap log karengi, ye bharta jayega');
   String get reportNoPeriodBody => _p(
-      'Add the date your last period started, then tap whatever you feel on a few days. A cycle later, this page shows you what your own body does — which is the thing worth taking to a doctor.',
+      "Add the date your last period started, then tap how you feel on a few days. After one cycle, this page shows what your own body does. That's the part worth taking to a doctor.",
       'Pehle apne pichhle period ki date daalein, phir kuch dinon mein jo mehsoos ho tap karein. Ek cycle baad ye page dikhayega ki aapka apna sharir kya karta hai.');
 
   String get reportClinicTitle => _p('Your clinic is running this cycle', 'Ye cycle aapki clinic dekh rahi hai');
   String get reportClinicBody => _p(
-      'So we are not drawing our own phases over it. Everything you logged is still here, day by day — take it to your appointment.',
+      "So we won't draw our own phases on top. Everything you logged is still here, day by day. Take it with you to your appointment.",
       'Isliye hum apne phases nahi bana rahe. Aapne jo bhi log kiya wo yahan hai, din-ba-din — apne appointment mein le jaayein.');
 
-  String get reportNoEstimateTitle => _p('Not enough to place the phases', 'Phases batane ke liye kaafi nahi');
+  String get reportNoEstimateTitle => _p('Not enough logged to show the phases', 'Phases batane ke liye kaafi nahi');
   String get reportNoEstimateBody => _p(
-      'There is a gap in what has been logged, so putting fertile days on this chart would be a guess. Your days are all still here — the colours come back once a couple of cycles are recorded.',
+      "A few days are missing from your log, so marking fertile days here would only be a guess. Everything you've logged is safe. The colours come back once a couple of cycles are recorded.",
       'Log mein gap hai, isliye fertile din batana sirf andaaza hoga. Aapke din yahan hain — do-ek cycle log hone par rang wapas aa jayenge.');
 
   String get reportThinTitle => _p('A start', 'Shuruaat');
   String get reportThinBody => _p(
-      'A couple of days is not a pattern yet, and that is fine. Most of what this page can tell you needs about a cycle of logging — there is nothing to catch up on.',
+      "A couple of days isn't a pattern yet, and that's fine. Most of what this page shows needs about one cycle of logging. There's nothing to catch up on.",
       'Do-teen din se pattern nahi banta, aur ye theek hai. Is page ko kuch kehne ke liye lagbhag ek cycle chahiye.');
 
   String get reportDisclaimer => _p(
-      'This describes what you recorded. It does not interpret it, and it is never a diagnosis. If something here worries you, it is exactly the kind of thing worth showing a doctor.',
+      "This shows what you recorded. It doesn't read anything into it, and it's never a diagnosis. If something here worries you, that's just the kind of thing to show a doctor.",
       'Ye sirf batata hai ki aapne kya record kiya. Iska matlab nahi nikaalta, aur ye kabhi diagnosis nahi hai.');
 
   String get logMeasurements => _p('Numbers, if you take them', 'Numbers, agar aap lete hain');
@@ -442,7 +522,7 @@ class TtcS {
       _p('Your period may start', 'Period shuru ho sakta hai');
   String get leadPastUsual =>
       _p('Past your usual length by', 'Aam length se aage');
-  String get leadYouAreOn => _p('You are on', 'Aap hain');
+  String get leadYouAreOn => _p("You're on", 'Aap hain');
   String get leadBetaOn => _p('Beta test on', 'Beta test');
 
   String bigInDays(int days) => _p(
@@ -476,7 +556,7 @@ class TtcS {
   //  appointment would read as us doubting her clinic.
   String headerStepToday(String step) => _p('$step today', 'Aaj $step');
   String get headerStepTodayBody => _p(
-      'From the dates you entered. Your clinic decides everything about it — we are only holding the calendar.',
+      "From the dates you entered. Your clinic decides everything about it. We're only keeping the calendar.",
       'Aapki daali hui dates se. Iske baare mein sab kuch aapki clinic tay karti hai — hum sirf calendar rakh rahe hain.');
 
   String headerStepIn(String step, int days) => _p(
@@ -491,13 +571,13 @@ class TtcS {
   String headerBetaOn(String date) =>
       _p('Beta test on $date', '$date ko beta test');
   String get headerBetaOnBody => _p(
-      'The blood test that gives the real answer. Nothing before it tells you anything, including a home test.',
+      'This blood test gives the real answer. Nothing before it can tell you, not even a home test.',
       'Wo blood test jo asli jawab deta hai. Usse pehle kuch bhi kuch nahi batata — ghar ka test bhi nahi.');
 
   String get headerTreatmentEmpty =>
       _p('Add your clinic dates', 'Clinic ki dates daalein');
   String get headerTreatmentEmptyBody => _p(
-      'Enter them once and the next one leads this screen every morning — with the thing people forget to ask about it.',
+      "Enter them once, and the next date shows at the top of this screen every morning. With it, you'll see the question people often forget to ask.",
       'Ek baar daal dein, phir har subah agli date yahin sabse upar dikhegi — uske saath wo baat bhi jo poochhna log bhool jaate hain.');
 
   /// ⚠️ THE WAY OUT, ON THE SENTENCE THAT TRAPS HER. Choosing a treatment
@@ -506,6 +586,15 @@ class TtcS {
   /// that delivers the bad news is also the door.
   String get headerNotOnTreatment =>
       _p('Not on treatment? Change this ›', 'Treatment par nahi? Yahan badlein ›');
+
+  /// The clinic-held hero's sub-line since 2026-09-26. A cycle is clinic-held
+  /// only when her clinic's dates for it are in the tracker, so this state
+  /// now means "every date she entered has passed": the way on is the next
+  /// date, or clearing the round if it has ended. "Not on treatment?" above
+  /// was the exit from a label she had tapped by mistake, which can no longer
+  /// put her here on its own.
+  String get headerClinicDatesPassed =>
+      "Your clinic's dates for this cycle have passed. Add the next one, or clear them if this round is over ›";
 
   String get headerClinicHoldsShort => _p(
       'Your clinic is running the timing this cycle.',
@@ -516,7 +605,7 @@ class TtcS {
       'Abhi itna log nahi hua ki is cycle ke din bata sakein.');
 
   String get headerClinicHolds =>
-      _p('Your clinic holds this', 'Yeh aapki clinic dekh rahi hai');
+      _p('Your clinic is handling this', 'Yeh aapki clinic dekh rahi hai');
 
   // Kept for revert: the hero's old two-line clinic body. It is good writing
   // and it is the wrong length for a headline slot that has to say something
@@ -531,7 +620,7 @@ class TtcS {
   String get headerNoEstimate =>
       _p('Not enough to say yet', 'Abhi kehna theek nahi');
   String get headerNoEstimateBody => _p(
-      'There is a gap in what has been logged, so an estimate here would be a guess. It gets clearer as you go.',
+      'A few days are missing from your log, so an estimate here would only be a guess. It gets clearer as you log more.',
       'Log mein thoda gap hai, isliye abhi koi estimate sirf andaaza hoga. Jaise-jaise aap log karengi, saaf hota jayega.');
 
   String get headerWindowOpenNow =>
@@ -579,7 +668,7 @@ class TtcS {
   String get headerWindowLastDay =>
       _p('Your fertile days end today', 'Aaj fertile din khatam');
   String get headerWindowLastDayBody => _p(
-      'The last day of the window this cycle. Nothing is lost if today is not a day that suits you.',
+      "The last fertile day this cycle. If today doesn't suit you, that's okay. Nothing is lost.",
       'Is cycle ke window ka aakhri din. Agar aaj theek nahi lagta, koi nuksaan nahi.');
 
   // ---------------------------------------------------------------------------
@@ -597,13 +686,13 @@ class TtcS {
       days == 1 ? 'Your period may start tomorrow' : 'Your period may start in $days days',
       days == 1 ? 'Period kal shuru ho sakta hai' : 'Period $days din mein shuru ho sakta hai');
   String get headerWaitingBody => _p(
-      'The window has closed for this cycle. There is nothing to do now but the ordinary things.',
+      "The fertile window has closed for this cycle. For now, there's nothing to do but carry on with your usual day.",
       'Is cycle ka window band ho gaya. Ab bas roz waale kaam — aur kuch nahi.');
 
   String get headerPeriodDue =>
       _p('Your period may start today', 'Period aaj shuru ho sakta hai');
   String get headerPeriodDueBody => _p(
-      'Based on your usual cycle length. A few days either way is ordinary.',
+      'Based on your usual cycle length. A few days either way is normal.',
       'Aapke aam cycle ke hisaab se. Do-chaar din aage-peechhe aam baat hai.');
 
   /// ⚠️ "NOT ARRIVED", NOT "LATE". Late implies a schedule she has missed,
@@ -614,7 +703,7 @@ class TtcS {
       days == 1 ? 'A day past your usual length' : '$days days past your usual length',
       days == 1 ? 'Aam length se ek din aage' : 'Aam length se $days din aage');
   String get headerPeriodLateBody => _p(
-      'Cycles move, and a week either side of the usual is common. If it has been more than a week, a test is worth doing — and worth mentioning to a doctor if cycles keep shifting.',
+      "Cycles shift, and a week either side of your usual is common. If it's been more than a week, it's worth doing a test. If your cycles keep shifting, mention it to a doctor.",
       'Cycle badalte rehte hain, hafte bhar ka farak aam hai. Agar hafte se zyada ho gaya to test kar lena theek hai — aur cycle baar-baar badal rahe hon to doctor ko batayein.');
 
   /// ⚠️ A REFUSAL FOR AN EARLIER CYCLE, NOT A RECONSTRUCTION. We estimate
@@ -634,16 +723,40 @@ class TtcS {
   /// chances of getting pregnant" is the probability claim we do not make in
   /// any tense.
   String headerPastCycleDay(int day) => _p('Day $day', 'Din $day');
+
+  /// ⚠️ LOOKING BACK, SAID OUT LOUD (2026-09-26). An earlier cycle's fertile
+  /// days, worked out from that cycle's own length (`ttcLookBackOvulationDay`).
+  /// "Were around" and "looking back" keep it from reading as something we
+  /// observed; it is arithmetic on two dates she logged.
+  String headerPastCycleWindow(String from, String to) =>
+      'Your fertile days that cycle were around $from to $to, '
+      'looking back from when your next period came.';
+
+  /// An earlier cycle with no window to show: her clinic ran it, or its
+  /// length looks like a period that was not logged.
+  String headerPastCycleNoWindow(String started) =>
+      'That cycle started on $started. There are no fertile days to show '
+      'for it.';
+
+  /// Kept for revert: the body before earlier cycles showed their window.
   String headerPastCycleBodyOn(String started) => _p(
-      'That cycle started on $started. Fertile days are worked out for the '
-      'cycle you are in, so there is no window to show this far back.',
+      'That cycle started on $started. We only work out fertile days for the '
+      'cycle you\'re in, so there\'s no window to show this far back.',
       'Wo cycle $started ko shuru hua tha. Fertile din us cycle ke nikalte hain '
       'jismein aap abhi hain, isliye itna peechhe window nahi dikhta.');
 
   String get headerPastCycle =>
       _p('An earlier cycle', 'Pichhla cycle');
+  /// Earlier than the first period she logged (2026-09-26 wording: the old
+  /// one said we only work out the current cycle's days, which is no longer
+  /// true).
+  String get headerBeforeFirstPeriodBody =>
+      "This is before the first period you logged, so there's no cycle to "
+      'place it in. What you logged on this day is below.';
+
+  /// Kept for revert.
   String get headerPastCycleBody => _p(
-      'We work out fertile days for the cycle you are in, so we do not have an estimate this far back. What you logged on this day is below.',
+      "We only work out fertile days for the cycle you're in, so there's no estimate this far back. What you logged on this day is below.",
       'Hum fertile din us cycle ke nikalte hain jismein aap abhi hain, isliye itna peechhe ka estimate nahi hai. Us din aapne jo log kiya tha wo neeche hai.');
 
   /// ⚠️ A FUTURE DAY IS NEVER "LATE". The strip runs six days forward, so on
@@ -652,7 +765,7 @@ class TtcS {
   String get headerPeriodExpectedBy =>
       _p('Your period may have started', 'Period shuru ho chuka ho sakta hai');
   String get headerPeriodExpectedByBody => _p(
-      'By this day, going on your usual cycle length. Log it when it arrives and everything here re-draws around the real date.',
+      'By this day, going by your usual cycle length. Log it when it comes, and everything here updates to the real date.',
       'Aapke aam cycle ke hisaab se is din tak. Jab aaye tab log kar dein — sab kuch asli date ke hisaab se dobara ban jayega.');
 
   String headerCycleDay(int day) => _p('Cycle day $day', 'Cycle day $day');
@@ -702,8 +815,8 @@ class TtcS {
   // rest is what the five rows show rather than say. The paragraph is kept
   // for revert.
   String get sanskarBody => _p(
-      'A few minutes a day for the two of you, in the months before. '
-          'Ayurveda calls it Garbhadhana Sanskar.',
+      'A few minutes a day for you both, in the months before you conceive. '
+          'Ayurveda calls this Garbhadhana Sanskar.',
       'Roz ke chand minute, aap dono ke liye, conceive karne se pehle ke '
           'mahinon mein. Ayurveda ise Garbhadhana Sanskar kehta hai.');
   // Kept for revert:
@@ -733,7 +846,7 @@ class TtcS {
   String get dailyRitualTitle =>
       _p('Five minutes, together', 'Paanch minute, saath mein');
   String get dailyRitualBody => _p(
-      'Not meditation, and not a task list. One small thing for your head, your breath, each other, and the day.',
+      "It isn't meditation, and it isn't a to-do list. Just one small thing for your mind, your breath, each other and the day.",
       'Na meditation, na kaamon ki list. Ek chhoti cheez dimaag ke liye, saans ke liye, ek doosre ke liye, aur din ke liye.');
   String dayStreak(int days) =>
       _p(days == 1 ? '1 day' : '$days days', days == 1 ? '1 din' : '$days din');
@@ -757,12 +870,12 @@ class TtcS {
 
   String get chapterYouAreHere => _p('You are here', 'Aap yahan hain');
   String get actionsNoScore => _p(
-      'Suggestions, not a checklist. Nothing here is scored, and doing none of it this month is fine.',
+      "These are ideas, not a checklist. Nothing here is scored, and it's fine to do none of it this month.",
       'Ye sujhaav hain, checklist nahi. Yahan kisi cheez ka score nahi hai, aur is mahine kuch bhi na karein toh bhi theek hai.');
   String get forPartnerTag => _p('For your partner', 'Partner ke liye');
 
   String get chapterOverview => _p('What this chapter is', 'Ye chapter kya hai');
-  String get chapterScience => _p('The science, gently', 'Science, aaram se');
+  String get chapterScience => _p('The science, in plain words', 'Science, aaram se');
   String get chapterBody => _p('Your body right now', 'Aapka body abhi');
   String get chapterPartner => _p('For your partner', 'Aapke partner ke liye');
   String get chapterActions => _p('Worth doing this chapter', 'Is chapter mein karne layak');
@@ -775,7 +888,7 @@ class TtcS {
   String get journalEmptyTitle =>
       _p('Nothing written yet', 'Abhi kuch likha nahi');
   String get journalEmptyBody => _p(
-      'This is where the parts you will want to remember go - including the hard ones. Both of you can write here.',
+      "This is the place for the moments you'll want to remember, the hard ones too. You can both write here.",
       'Yahan wo cheezein aati hain jo aage yaad rakhna chahenge - mushkil waali bhi. Dono yahan likh sakte hain.');
   String get journalWrite => _p('Write', 'Likhein');
   String get journalSave => _p('Save', 'Save karein');
@@ -792,12 +905,12 @@ class TtcS {
 
   // ---- trackers -------------------------------------------------------------
   String get trackerToday => _p('Today', 'Aaj');
-  String get trackerHistory => _p('What you have recorded', 'Jo aapne record kiya');
+  String get trackerHistory => _p("What you've recorded", 'Jo aapne record kiya');
   String get trackerClear => _p('Clear', 'Hatayein');
   String get trackerTapToAdd => _p('Tap to add', 'Add karne ke liye tap karein');
   String get trackerEmptyTitle => _p('Nothing recorded yet', 'Abhi kuch record nahi hua');
   String get trackerEmptyBody => _p(
-      'Log whenever you feel like it. There is no streak to keep and no gap that counts against you.',
+      "Log whenever you like. There's no streak to keep, and missed days don't count against you.",
       'Jab man kare tab log karein. Na koi streak nibhani hai, na koi khaali din aapke khilaf ginta hai.');
 
   // ---- cycle tools ----------------------------------------------------------
@@ -813,10 +926,10 @@ class TtcS {
   String get cycleRange => _p('Range', 'Range');
   String get cycleDays => _p('days', 'din');
   String get cycleIrregularNote => _p(
-      'Your cycles vary quite a lot. That is worth mentioning to a doctor - it makes timing harder, not impossible, and it is common.',
+      "Your cycles vary quite a lot. It's worth mentioning to a doctor. It makes timing harder, not impossible, and it's common.",
       'Aapke cycles kaafi badalte hain. Ye doctor ko batane layak hai - isse timing mushkil hoti hai, namumkin nahi, aur ye aam baat hai.');
   String get cycleNeedMore => _p(
-      'Log one more period and we can start describing your own rhythm instead of an average one.',
+      'Log one more period, and we can start showing your own rhythm instead of an average one.',
       'Ek aur period log karein, phir hum average ki jagah aapki apni rhythm bata payenge.');
 
   String get ovulationCompanion => _p('Ovulation Companion', 'Ovulation Companion');
@@ -824,7 +937,7 @@ class TtcS {
   String get ovulationLh => _p('Positive ovulation strip', 'Ovulation strip positive');
   String get ovulationBbt => _p('Temperature rise seen', 'Temperature badha dikha');
   String get ovulationSignalNote => _p(
-      'A recorded signal from your own body always beats our calendar estimate, so logging one changes what we show you.',
+      'A sign from your own body is always better than our calendar estimate. So when you log one, what we show you changes.',
       'Aapke apne body ka record kiya gaya signal, hamare calendar andaaze se hamesha behtar hai - isliye ise log karne se hum jo dikhate hain wo badal jaata hai.');
   String get ovulationNotYet => _p(
       'Log a period first and we can estimate this.',
@@ -837,11 +950,11 @@ class TtcS {
   //  needed none of it; someone who does not learned nothing.
 
   String get ovulationLhWhat => _p(
-      'A pee-on stick from any pharmacy, around ₹30–60 each. It turns positive in the day or two BEFORE you ovulate, which is what makes it useful - it tells you the window is opening, not that it has closed.',
+      "A stick you pee on, from any chemist, around ₹30 to ₹60 each. It turns positive a day or two before you ovulate, and that's what makes it useful. It tells you the window is opening, not that it has closed.",
       'Kisi bhi pharmacy se milne wali stick, lagbhag ₹30–60 ki. Ovulation se ek-do din PEHLE positive aati hai - isiliye kaam ki hai. Ye batati hai ki window khul rahi hai, band nahi hui.');
 
   String get ovulationBbtWhat => _p(
-      'Your temperature the moment you wake, before sitting up, taken at the same time each day with a basal thermometer. It rises AFTER ovulation, so it confirms what happened rather than predicting what will - useful for learning your pattern over months, not for timing this week.',
+      "Your temperature as soon as you wake, before you sit up, taken at the same time each day with a basal thermometer. It goes up after ovulation, so it tells you what has happened, not what will. It's useful for learning your pattern over months, not for timing this week.",
       'Jagte hi, uthne se pehle, roz ek hi waqt par basal thermometer se liya gaya temperature. Ye ovulation ke BAAD badhta hai - yaani jo ho chuka use confirm karta hai, aage ka nahi batata. Mahino mein pattern samajhne ke liye kaam ka, is hafte ki timing ke liye nahi.');
 
   // ---- declaring the care pathway -------------------------------------------
@@ -855,13 +968,13 @@ class TtcS {
   String get pathwayEntry =>
       _p('Having treatment?', 'Kya aap treatment le rahi hain?');
   String get pathwayEntryBody => _p(
-      'If a clinic is involved in this cycle, telling us changes what we show you - and stops us putting our numbers next to theirs.',
+      "If a clinic is helping with this cycle, tell us. We'll change what we show you, and we won't put our numbers next to theirs.",
       'Agar is cycle mein clinic shaamil hai, toh humein batayein - isse hum jo dikhate hain wo badal jaata hai, aur hum apne numbers unke saath nahi rakhte.');
 
   String get pathwayChooseTitle =>
       _p('What are you doing this cycle?', 'Is cycle mein aap kya kar rahi hain?');
   String get pathwayChooseBody => _p(
-      'You can change this whenever it changes. Nothing you have logged is affected.',
+      "You can update this whenever things change. Nothing you've logged is affected.",
       'Jab bhi badle, aap ise badal sakti hain. Aapka logged data waisa hi rehta hai.');
 
   /// Reassurance under the natural option, because choosing it should not feel
@@ -884,7 +997,7 @@ class TtcS {
   String get severeNoticedTitle =>
       _p('Worth mentioning to a doctor', 'Doctor ko batane layak');
   String get severeNoticedBody => _p(
-      'You have recorded something as severe. That does not mean anything is wrong - but severe pain is one of the things worth saying out loud at your next appointment rather than waiting to see if it settles.',
+      "You've marked something as severe. That doesn't mean anything is wrong. But severe pain is worth bringing up at your next appointment, rather than waiting to see if it settles.",
       'Aapne kuch "bahut zyada" record kiya hai. Iska matlab ye nahi ki kuch galat hai - par tez dard un cheezon mein hai jo agli appointment par khud bata dena behtar hai, ye dekhne se ki apne aap theek hota hai ya nahi.');
   String get severeNoticedAdd =>
       _p('Add it to my questions', 'Mere sawaalon mein jodein');
@@ -898,8 +1011,8 @@ class TtcS {
   String get fertilityWindow => _p('Fertility Window', 'Fertility Window');
   String get fertilityAcross => _p('Across this cycle', 'Is cycle mein');
   String get fertilityWindowNote => _p(
-      'Roughly six days, ending the day after ovulation. Sperm survive about five days; the egg about one. The width is the point - no single day has to be right.',
-      'Lagbhag chhe din, ovulation ke agle din tak. Sperm lagbhag paanch din chalte hain; egg lagbhag ek. Yahi chaudai asli baat hai - kisi ek din ka sahi hona zaroori nahi.');
+      "About six days, ending on the day you ovulate. Sperm live about five days, and the egg about one. We also show the day after, in case ovulation comes a day later than we estimate. That's why it's a window: no single day has to be right.",
+      'Lagbhag chhe din, ovulation ke din tak. Hum agla din bhi dikhate hain, agar ovulation andaaze se ek din baad ho. Sperm lagbhag paanch din chalte hain; egg lagbhag ek. Yahi chaudai asli baat hai - kisi ek din ka sahi hona zaroori nahi.');
 
   // ---- supplements ----------------------------------------------------------
   String get supplements => _p('Supplements', 'Supplements');
@@ -908,20 +1021,20 @@ class TtcS {
   String get supplementsEmptyTitle =>
       _p('Nothing added yet', 'Abhi kuch add nahi kiya');
   String get supplementsEmptyBody => _p(
-      'Add what you actually take, including anything your doctor prescribed. Folic acid is the one with the strongest evidence behind it.',
+      'Add what you take, including anything your doctor prescribed. Folic acid has the strongest evidence behind it.',
       'Jo aap sach mein lete hain wo add karein, doctor ki di hui dawai bhi. Folic acid wo hai jiske peeche sabse mazboot saboot hai.');
   String get supplementsSuggested => _p('Commonly taken', 'Aam taur par liye jaate hain');
   String get supplementsDisclaimer => _p(
-      'This is a record of what you take, not a recommendation to take it. Doses and combinations belong with your doctor.',
+      'This is a note of what you take, not advice to take it. Your doctor decides doses and combinations.',
       'Ye record hai ki aap kya lete hain, ye salaah nahi hai ki lein. Dose aur combination aapke doctor ke saath tay hote hain.');
 
   // ---- medical tests --------------------------------------------------------
   String get medicalTests => _p('Medical Tests', 'Medical Tests');
   String get testsIntro => _p(
-      'What each test actually tells you, in plain language - so you can decide what is worth doing and understand what comes back.',
+      "What each test tells you, in plain words. So you can decide what's worth doing and understand your results.",
       'Har test asal mein kya batata hai, saaf bhaasha mein - taaki aap tay kar sakein ki kya karwana hai, aur jo result aaye use samajh sakein.');
   String get testWhat => _p('What it measures', 'Ye kya naapta hai');
-  String get testWhy => _p('Why it is done', 'Ye kyun hota hai');
+  String get testWhy => _p("Why it's done", 'Ye kyun hota hai');
   String get testWhen => _p('When in the cycle', 'Cycle mein kab');
   String get testCost => _p('Typical cost in India', 'India mein aam kharcha');
   String get testReading => _p('Reading the result', 'Result samajhna');
@@ -933,22 +1046,22 @@ class TtcS {
   // ---- journey map, milestones, timeline ------------------------------------
   String get journeyMap => _p('Journey Map', 'Journey Map');
   String get journeyMapIntro => _p(
-      'The chapters you move through, and everything you have done so far. Chapters two to four come round again with each cycle - that is the shape of this, not a step backwards.',
+      "The chapters you go through, and everything you've done so far. Chapters two to four come round again with every cycle. That's normal, and it isn't a step backwards.",
       'Wo chapters jinse aap guzarti hain, aur ab tak jo kuch kiya. Chapter do se chaar har cycle ke saath dobara aate hain - yahi iska aakaar hai, peechhe jaana nahi.');
-  String get milestones => _p('What you have done', 'Jo aapne kiya');
+  String get milestones => _p("What you've done", 'Jo aapne kiya');
   String get milestonesAhead => _p('Still ahead', 'Aage aur');
   String get milestonesNone => _p(
-      'Your first milestone is already here - you started.',
+      'Your first milestone is already here: you started.',
       'Aapka pehla milestone pehle se hai - aapne shuru kiya.');
 
   String get familyTimeline => _p('Family Timeline', 'Family Timeline');
   String get familyTimelineIntro => _p(
-      'One continuous story - from the day you decided, through pregnancy, into the years after. Nothing here restarts when a stage changes.',
+      'One story that keeps going, from the day you decided, through pregnancy and into the years after. Nothing here starts over when you move to a new stage.',
       'Ek continuous kahani - jis din aapne socha, us din se pregnancy tak, aur uske baad ke saalon tak. Stage badalne par yahan kuch phir se shuru nahi hota.');
   String get timelineEmptyTitle =>
       _p('Your story starts here', 'Aapki kahani yahin se');
   String get timelineEmptyBody => _p(
-      'As you log, write and reach things, they land here in order - and they stay here through pregnancy and parenting.',
+      'As you log, write and reach milestones, they show up here in order. They stay here through pregnancy and parenting too.',
       'Jaise-jaise aap log karengi, likhengi aur cheezein poori karengi, wo yahan kramvaar aati jayengi - aur pregnancy aur parenting tak yahin rahengi.');
 
   // ---- calendar -------------------------------------------------------------
@@ -956,6 +1069,14 @@ class TtcS {
   String get calendarPeriod => _p('Period', 'Period');
   String get calendarFertile => _p('Fertile days', 'Fertile din');
   String get calendarOvulation => _p('Estimated ovulation', 'Ovulation ka andaaza');
+
+  /// An earlier cycle's window and ovulation day on the calendar, worked out
+  /// looking back from that cycle's own length (2026-09-26). No grade: a band
+  /// word beside a past date reads as a verdict on that month.
+  String get calendarFertileLookingBack =>
+      'Fertile days that cycle, looking back';
+  String get calendarOvulationLookingBack =>
+      'Around ovulation that cycle, looking back';
   String get calendarLogged => _p('You logged something', 'Aapne kuch log kiya');
   String get calendarNothing =>
       _p('Nothing on this day', 'Is din kuch nahi');
@@ -967,7 +1088,7 @@ class TtcS {
   String get partnerToday => _p('Today', 'Aaj');
   String get partnerTodayTitle => _p('Your part today', 'Aaj aapka hissa');
   String get partnerMission => _p("Today's mission", 'Aaj ka kaam');
-  String get partnerLearn => _p("Today's learn", 'Aaj seekhein');
+  String get partnerLearn => _p("Today's lesson", 'Aaj seekhein');
   String get partnerSupport => _p('Supporting her', 'Unka saath');
   String get partnerSheMayFeel =>
       _p('What she may be carrying', 'Wo kya jhel rahi hain');
@@ -980,14 +1101,14 @@ class TtcS {
   String get partnerHerBody =>
       _p("What's happening in her body", 'Unke body mein kya ho raha hai');
   String get partnerHerBodyNote => _p(
-      'Written for this chapter, not for today. You are never shown where she is in her cycle.',
+      'Written for this chapter, not for today. We never show you where she is in her cycle.',
       'Ye chapter ke liye likha hai, aaj ke liye nahi. Unka cycle kahan hai, ye aapko kabhi nahi dikhaya jaata.');
   String get partnerReflection => _p("Today's reflection", 'Aaj ka vichaar');
   String get partnerNutrition => _p("Today's nutrition", 'Aaj ka khaana');
   String get partnerMovement => _p("Today's movement", 'Aaj ki harkat');
   String get partnerJournal => _p('Shared journal', 'Shared journal');
   String get partnerJournalNote => _p(
-      'She can read what you write here, and you can read hers. That is the point of it.',
+      "She can read what you write here, and you can read what she writes. That's the idea.",
       'Aap jo yahan likhte hain wo padh sakti hain, aur aap unka. Yahi iska maqsad hai.');
   String get partnerAboutHimself => _p('This one is about you', 'Ye aapke baare mein hai');
   String get partnerReadTogether => _p('Read together', 'Saath padhein');
@@ -1012,30 +1133,30 @@ class TtcS {
       _p(n == 1 ? '1 left' : '$n left', n == 1 ? '1 bacha' : '$n bache');
   String get prepareSlots => _p('Pick a time', 'Samay chunein');
   String get prepareBuyFirst =>
-      _p('Times appear once you have this.', 'Ye lene ke baad samay dikhenge.');
+      _p('Times show up after you get this.', 'Ye lene ke baad samay dikhenge.');
   String get prepareBook => _p('Book', 'Book karein');
   String get prepareBooked => _p('Booked', 'Book ho gaya');
   String get prepareBookFailed => _p(
-      'That time was taken. Please pick another.',
+      'Someone just took that time. Please pick another.',
       'Wo samay le liya gaya. Koi aur chunein.');
   String get prepareNoSlots => _p('No times open right now', 'Abhi koi samay khaali nahi');
   String get prepareNoSlotsBody => _p(
-      'New times open regularly. Nothing has been lost - what you have stays yours.',
+      "New times open up often. You haven't lost anything. What you have stays yours.",
       'Naye samay aate rehte hain. Kuch khoya nahi - jo aapke paas hai wo aapka hi rahega.');
   String get prepareNoPayment => _p(
-      'No payment is taken yet. Buying here records what you chose so the flow can be tested end to end - no money moves.',
+      "We don't take payment yet. Buying here only saves what you chose, so we can test the whole flow. No money changes hands.",
       'Abhi koi payment nahi li jaati. Yahan lene se sirf record hota hai ki aapne kya chuna, taaki poora flow test ho sake - paisa kahin nahi jaata.');
 
   // ---- care circle ----------------------------------------------------------
   String get careCircle => _p('Your Care Circle', 'Aapka Care Circle');
   String get careCircleIntro => _p(
-      'Everyone walking this with you, in one place - and where every recommendation you see comes from.',
+      "Everyone who's with you in this, in one place. It also shows where every recommendation you see comes from.",
       'Wo sab jo is safar mein aapke saath hain, ek jagah - aur aap jo bhi recommendation dekhte hain wo kahan se aati hai.');
   String get careCircleWhy => _p(
-      'Every recommendation in ParentVeda says who it came from. Trust should be visible, not assumed.',
+      "Every recommendation in ParentVeda says who it came from, so you always know whose advice you're reading.",
       'ParentVeda mein har recommendation batati hai ki wo kahan se aayi. Bharosa dikhna chahiye, maana nahi jaana chahiye.');
   String get careCircleEmpty => _p(
-      'Only ParentVeda so far. As you add a doctor, a nutritionist or a clinic, they appear here.',
+      "Only ParentVeda so far. As you add a doctor, a nutritionist or a clinic, they'll show up here.",
       'Abhi sirf ParentVeda. Jaise-jaise aap doctor, nutritionist ya clinic jodenge, wo yahan dikhenge.');
   String get careCircleAdd => _p('Add someone', 'Kisi ko jodein');
   String get careCirclePartner => _p('Your partner', 'Aapka partner');
@@ -1056,7 +1177,7 @@ class TtcS {
   String get medEmptyTitle =>
       _p('Nothing recorded yet', 'Abhi kuch likha nahi hai');
   String get medEmptyBody => _p(
-      'If a clinic has put you on anything - tablets, injections, a schedule - this is where it lives. We hold what you tell us and remind you if you want reminders. Nothing here is advice.',
+      "If a clinic has put you on anything (tablets, injections, a schedule), keep it here. We save what you tell us and remind you if you'd like. Nothing here is advice.",
       'Agar clinic ne kuch shuru karwaya hai - goliyan, injection, koi schedule - wo yahan rehta hai. Jo aap batati hain wo hum rakhte hain, aur agar aap chaahein toh yaad dila dete hain. Yahan kuch bhi salaah nahi hai.');
   String get medName => _p('Name', 'Naam');
   String get medNameHint => _p('Letrozole', 'Letrozole');
@@ -1070,21 +1191,21 @@ class TtcS {
       'Prescribed by Dr Rao, take after food', 'Dr Rao ne di, khaane ke baad');
   String get medReminders => _p('Reminders', 'Yaad dilana');
   String get medRemindersNote => _p(
-      'Optional. Add a time and your phone will remind you; leave it empty and it simply will not.',
+      "Optional. Add a time and your phone will remind you. Leave it empty and it won't.",
       'Marzi ki baat hai. Time daal dein toh phone yaad dila dega; khaali chhod dein toh nahi dilayega.');
   String get medAddTime => _p('Add a time', 'Time jodein');
   String get medNoAdvice => _p(
-      'We hold this exactly as you write it. We do not check doses, we do not warn about combinations, and we never change what we show you because of a medicine name. Your doctor owns all of that.',
+      "We save this exactly as you write it. We don't check doses or warn about combinations, and we never change what we show you because of a medicine name. All of that is for your doctor.",
       'Jo aap likhti hain, bilkul waisa hi rakhte hain. Hum dose nahi jaanchte, combination ki chetavni nahi dete, aur kisi dawai ke naam se aapko dikhne wali cheezein nahi badalte. Ye sab aapke doctor ka kaam hai.');
 
   String get productsTitle => _p('Worth knowing about', 'Jaanne layak');
   String get productsIntro => _p(
-      'Research first, buy second - and several of these say plainly that you probably do not need them. Every entry shows what to look for and what to watch out for.',
+      "Read first, buy later. Several of these say plainly that you probably don't need them. Each one shows what to look for and what to watch out for.",
       'Pehle research, phir kharid - aur inmein se kai saaf kehti hain ki shayad aapko inki zaroorat hi nahi. Har entry batati hai kya dekhna hai aur kis cheez ka dhyaan rakhna hai.');
   String get productsLookFor => _p('What to look for', 'Kya dekhein');
   String get productsWatchOut => _p('What to watch out for', 'Kis baat ka dhyaan');
   String get productsDisclaimer => _p(
-      'Nothing is sold here. Prices are indicative Indian ranges so the advice is usable, and no link takes payment.',
+      'Nothing is sold here. Prices are rough Indian ranges to make the advice useful, and no link takes payment.',
       'Yahan kuch becha nahi jaata. Prices Indian andaaze hain taaki salaah kaam ki rahe, aur koi link payment nahi leta.');
 
   // ---- the transition -------------------------------------------------------
@@ -1095,24 +1216,24 @@ class TtcS {
   String get transitionConfirmTitle =>
       _p('Is the test positive?', 'Kya test positive hai?');
   String get transitionConfirmBody => _p(
-      'We will date the pregnancy from your last period, move you into the pregnancy journey, and keep every single thing you have written here. You can undo this.',
+      "We'll date the pregnancy from your last period and move you to the pregnancy part of the app. Everything you've written here comes with you. You can undo this.",
       'Hum pregnancy ki ginti aapke aakhri period se karenge, aapko pregnancy ke safar mein le jayenge, aur yahan aapne jo bhi likha hai wo sab rakhenge. Aap ise wapas bhi kar sakti hain.');
-  String get transitionYes => _p('Yes, it is positive', 'Haan, positive hai');
+  String get transitionYes => _p("Yes, it's positive", 'Haan, positive hai');
   String get transitionNotYet => _p('Not yet', 'Abhi nahi');
 
   String get transitionTitle =>
       _p('A beautiful new chapter begins', 'Ek khoobsurat naya chapter shuru hota hai');
   String get transitionSubtitle => _p(
-      'Nothing here restarts. Everything you built is already where it should be.',
+      "Nothing starts over. Everything you've added is already where it should be.",
       'Yahan kuch phir se shuru nahi hota. Aapne jo banaya wo pehle se apni jagah par hai.');
   String transitionWeeks(int w) => _p(
-      'You are about $w weeks pregnant', 'Aap lagbhag $w hafte pregnant hain');
+      'You\'re about $w weeks pregnant', 'Aap lagbhag $w hafte pregnant hain');
   String get transitionWhyWeeks => _p(
-      'Pregnancy is dated from the first day of your last period, not from conception - which is why a positive test usually lands around week four. It is a convention, not a mistake in the arithmetic.',
+      "Your pregnancy weeks are counted from the day your last period started, not from conception. That's why a positive test usually comes around week four. It's the standard way of counting, not a mistake.",
       'Pregnancy ki ginti aakhri period ke pehle din se hoti hai, conception se nahi - isiliye positive test aksar chauthe hafte ke aas-paas aata hai. Ye ek convention hai, hisaab ki galti nahi.');
   String get transitionDueDate => _p('Estimated due date', 'Anumaanit due date');
   String get transitionDueDateGuess => _p(
-      'We had no period logged, so this is dated from today assuming about four weeks. Your first scan will correct it - and it usually does, for everyone.',
+      "There was no period logged, so we've counted from today, assuming about four weeks. Your first scan will correct it. It usually does, for everyone.",
       'Koi period log nahi tha, isliye ye aaj se lagbhag chaar hafte maan kar gini gayi hai. Aapka pehla scan ise theek kar dega - aur wo sabke liye karta hai.');
   String get transitionCarried => _p('What came with you', 'Aapke saath kya aaya');
   String transitionJournal(int n) =>
@@ -1129,9 +1250,9 @@ class TtcS {
           n == 1 ? '1 cycle log kiya' : '$n cycles log kiye');
   String get transitionPartner => _p('Your partner, still here', 'Aapka partner, abhi bhi saath');
   String get transitionNext => _p('Book your first appointment', 'Pehli appointment book karein');
-  String get transitionUndo => _p('That was a mistake - undo', 'Wo galti thi - wapas karein');
+  String get transitionUndo => _p('That was a mistake, undo it', 'Wo galti thi - wapas karein');
   String get transitionUndone =>
-      _p('Undone. You are back where you were.', 'Wapas ho gaya. Aap wahin hain jahan thin.');
+      _p("Undone. You're back where you were.", 'Wapas ho gaya. Aap wahin hain jahan thin.');
 
   // ---- community ------------------------------------------------------------
   String get communityYourRooms => _p('Your rooms', 'Aapke rooms');
@@ -1150,14 +1271,14 @@ class TtcS {
   String get communityEmptyTitle =>
       _p('Nothing here yet', 'Abhi yahan kuch nahi');
   String get communityEmptyBody => _p(
-      'This room is quiet today. Join it and you will see new posts as they arrive.',
+      "This room is quiet today. Join it and you'll see new posts as they come in.",
       'Aaj ye room shaant hai. Ismein judein, naye posts aate hi dikhenge.');
 
   // ---- records --------------------------------------------------------------
   String get recordsTitle => _p('Health Records', 'Health Records');
   String get recordsReports => _p('Reports', 'Reports');
   String get recordsIntro => _p(
-      'Both of your results, in one place and one date order - so an appointment starts with facts rather than with trying to remember.',
+      'Both your results, in one place and in date order. So your appointment starts with facts, not with trying to remember.',
       'Aap dono ke results, ek jagah aur ek kram mein - taaki appointment yaad karne se nahi, jaankari se shuru ho.');
   String get recordsAdd => _p('Add', 'Add karein');
   String get recordsBoth => _p('Both', 'Dono');
@@ -1221,16 +1342,16 @@ class TtcS {
   String get recordsAttachPdf => _p('Attach a PDF', 'PDF lagayein');
   String get recordsEmptyTitle => _p('Nothing added yet', 'Abhi kuch add nahi');
   String get recordsEmptyBody => _p(
-      'Add a result the day it arrives, while the paper is still in your hand. A number you can show a doctor beats a memory of how you have been feeling.',
+      "Add a result the day it comes, while the paper is still in your hand. A number you can show your doctor is better than trying to remember how you've felt.",
       'Jis din result aaye usi din add karein, jab kaagaz haath mein ho. Jo number aap doctor ko dikha sakein, wo "aisa lag raha tha" se behtar hai.');
   String get recordsDisclaimer => _p(
-      'ParentVeda stores what your report said. It never interprets a result - that belongs with your doctor.',
+      "ParentVeda saves what your report says. It never reads meaning into a result. That's for your doctor.",
       'ParentVeda wahi rakhta hai jo aapki report mein likha hai. Wo result ka matlab nahi nikaalta - wo aapke doctor ka kaam hai.');
 
   // ---- appointments ---------------------------------------------------------
   String get appointmentsTitle => _p('Appointments', 'Appointments');
   String get appointmentsIntro => _p(
-      'Everything you have booked through ParentVeda and everything you arranged yourselves, on one list in time order.',
+      "Everything you've booked through ParentVeda and everything you've set up yourselves, on one list by date.",
       'Jo aapne ParentVeda se book kiya aur jo aapne khud tay kiya - sab ek list mein, samay ke hisaab se.');
   String get appointmentsAdd => _p('Add', 'Add karein');
   String get appointmentsWhat => _p('What is it?', 'Kya hai?');
@@ -1240,7 +1361,7 @@ class TtcS {
   String get appointmentsEmptyTitle =>
       _p('Nothing coming up', 'Aage kuch nahi');
   String get appointmentsEmptyBody => _p(
-      'Add the clinic visits you arrange yourselves and they will show here and on your calendar.',
+      "Add the clinic visits you set up yourselves, and they'll show here and on your calendar.",
       'Jo clinic visits aap khud tay karte hain wo add karein - wo yahan aur calendar par dikhengi.');
   String get appointmentsQuestions =>
       _p('Questions for the doctor', 'Doctor ke liye sawaal');
@@ -1248,32 +1369,32 @@ class TtcS {
   String get appointmentsNoQuestionsTitle =>
       _p('Nothing saved yet', 'Abhi kuch save nahi');
   String get appointmentsNoQuestionsBody => _p(
-      'Write questions down when they occur to you, not in the waiting room. Walking in with the ones you thought of at 2am is most of what makes a short consultation useful.',
+      'Write questions down when you think of them, not in the waiting room. Going in with the ones you thought of at 2am is what makes a short consultation useful.',
       'Sawaal tab likhein jab dimaag mein aayein, waiting room mein nahi. Raat 2 baje jo sawaal aaye the, unke saath jaana hi chhoti consultation ko kaam ka banata hai.');
 
   // ---- nutrition planner ----------------------------------------------------
   String get nutritionTitle => _p('Nutrition Planner', 'Nutrition Planner');
   String get nutritionIntro => _p(
-      'A week of ideas, not a plan to follow. Nothing to tick, nothing to fall off, and every day is for both of you.',
+      'A week of ideas, not a plan to stick to. Nothing to tick off, no way to fall behind, and every day is for both of you.',
       'Ek hafte ke ideas, koi plan nahi jise nibhana ho. Na kuch tick karna hai, na kuch chhootne ka dar - aur har din aap dono ke liye hai.');
   String get nutritionFocus => _p('What this week leans on', 'Is hafte kis par zor hai');
   String get nutritionWeek => _p('The week ahead', 'Aane wala hafta');
   String get nutritionDisclaimer => _p(
-      'General guidance, not a prescribed diet. If you have diabetes, thyroid disease, PCOS or any condition affecting food, plan it with your doctor.',
+      'General guidance, not a set diet. If you have diabetes, thyroid disease, PCOS or any condition that affects what you eat, plan your food with your doctor.',
       'Ye aam salaah hai, koi tay ki hui diet nahi. Agar aapko diabetes, thyroid, PCOS ya khaane se judi koi condition hai, toh doctor ke saath plan karein.');
 
   // ---- can I...? ------------------------------------------------------------
   String get canITitle => _p('Can I...?', 'Kya main...?');
   String get canIIntro => _p(
-      'The everyday worries, settled quickly. While you are trying, the honest answer to most of these is yes.',
+      "Quick answers to everyday worries. While you're trying, the honest answer to most of these is yes.",
       'Rozmarra ki chintaayein, jaldi se saaf. Koshish ke dauraan, inmein se zyadatar ka imaandaar jawab haan hai.');
   String get canISearch => _p('Chai, travel, painkillers...', 'Chai, safar, painkiller...');
   String get canINoneTitle => _p('Not answered here yet', 'Iska jawab abhi yahan nahi');
   String get canINoneBody => _p(
-      'If it is worrying you, it is worth asking a doctor rather than the internet - and worth telling us, so it gets added.',
+      "If it's worrying you, ask a doctor rather than the internet. And tell us, so we can add it.",
       'Agar ye pareshaan kar raha hai, toh internet se behtar hai doctor se poochhna - aur hume batayein, taaki ise jod dein.');
   String get canIDisclaimer => _p(
-      'General information, never a diagnosis. If you have a medical condition or take regular medication, your doctor\'s answer replaces this one.',
+      "General information, never a diagnosis. If you have a medical condition or take regular medicine, go with your doctor's answer over this one.",
       'Aam jaankari hai, diagnosis nahi. Agar aapko koi medical condition hai ya aap regular dawai lete hain, toh doctor ka jawab isse upar hai.');
 
   // ---- clinic-led cycles ----------------------------------------------------
@@ -1283,10 +1404,10 @@ class TtcS {
   String get clinicLedTitle =>
       _p('Your clinic is running this cycle', 'Ye cycle aapki clinic chala rahi hai');
   String get clinicLedBody => _p(
-      'On this path ovulation is triggered and tracked by scan, so a calendar estimate could disagree with what your clinic told you. Their dates are the ones that count - we will not put a second set of numbers next to them.',
+      "On this path, ovulation is triggered and checked by scan, so a calendar estimate might not match what your clinic told you. Their dates are the ones that count. We won't put a second set of numbers next to them.",
       'Is raaste par ovulation trigger se hota hai aur scan se dekha jaata hai, isliye calendar ka andaaza aapki clinic ki baat se alag ho sakta hai. Unki dates hi asli hain - hum unke saath doosre numbers nahi rakhenge.');
   String get clinicLedStillUseful => _p(
-      'Everything else still works. Keep logging periods, symptoms and results - your clinic will ask for exactly this.',
+      'Everything else still works. Keep logging periods, symptoms and results. Your clinic will ask for just this.',
       'Baaki sab chalta rahega. Periods, symptoms aur results log karti rahein - aapki clinic yahi poochhegi.');
 
   /// Replaces the confidence phrase wherever a clinic owns the timing.
@@ -1312,13 +1433,13 @@ class TtcS {
   String get communityPosted => _p('Posted', 'Post ho gaya');
   String get communityAnonymous => _p('Post without my name', 'Mere naam ke bina');
   String get communityAnonymousNote => _p(
-      'Some of this is hard to say with your name on it. That is allowed here.',
+      "Some things are hard to say with your name on them. That's okay here.",
       'Kuch baatein apne naam ke saath kehna mushkil hota hai. Yahan wo theek hai.');
 
   // ---- treatment cycle ------------------------------------------------------
   String get treatmentTitle => _p('Your treatment cycle', 'Aapka treatment cycle');
   String get treatmentIntro => _p(
-      'The dates your clinic gave you. We do not calculate these - they chose them, and theirs are the ones that count. Fill in what you know; the rest can wait.',
+      "The dates your clinic gave you. We don't work these out. Your clinic chose them, and theirs are the ones that count. Fill in what you know. The rest can wait.",
       'Wo dates jo aapki clinic ne di. Hum inhe calculate nahi karte - unhone tay ki hain, aur unki hi chalti hai. Jo pata hai wo bhar dein; baaki baad mein.');
   String get treatmentNext => _p('Next', 'Agla');
   String get treatmentDates => _p('Your dates', 'Aapki dates');
@@ -1326,18 +1447,18 @@ class TtcS {
   String get treatmentAddDates =>
       _p('Add the dates your clinic gave you', 'Clinic ki di hui dates add karein');
   String get treatmentAddDatesBody => _p(
-      'Then we can remind you about the trigger shot and count to your blood test instead of guessing at a period.',
+      'Then we can remind you about the trigger shot and count the days to your blood test, instead of guessing at a period.',
       'Phir hum trigger shot ki yaad dila payenge aur period ka andaaza lagane ke bajaye blood test tak gin payenge.');
   String get treatmentTriggerTime => _p('What time exactly?', 'Theek kitne baje?');
   String get treatmentTriggerReminder => _p(
-      'We will remind you two hours before the trigger shot.',
-      'Trigger shot se do ghante pehle hum yaad dila denge.');
+      "We'll remind you 4 hours before the trigger shot, and again 15 minutes before.",
+      'Trigger shot se 4 ghante pehle, aur phir 15 minute pehle, hum yaad dila denge.');
   String get treatmentClear => _p('Clear this cycle', 'Ye cycle hata dein');
   String get treatmentClearBody => _p(
-      'Use this when a round ends, so the next one starts clean. Nothing else is deleted.',
+      'Use this when a round ends, so the next one starts fresh. Nothing else is deleted.',
       'Jab ek round khatam ho tab ye istemaal karein, taaki agla saaf shuru ho. Aur kuch nahi hatega.');
   String get treatmentDisclaimer => _p(
-      'These are the dates you entered from your clinic. ParentVeda never changes them and never adds one of its own - if anything here disagrees with your clinic, your clinic is right.',
+      "These are the dates you entered from your clinic. ParentVeda never changes them and never adds its own. If anything here doesn't match your clinic, your clinic is right.",
       'Ye wahi dates hain jo aapne clinic se li hain. ParentVeda inhe kabhi nahi badalta aur apni taraf se koi nahi jodta - agar yahan kuch aapki clinic se alag lage, toh clinic sahi hai.');
 
   String get betaWaitTitle => _p('Until your blood test', 'Blood test tak');
@@ -1345,7 +1466,7 @@ class TtcS {
       days <= 0 ? 'Today' : (days == 1 ? 'Tomorrow' : 'in $days days'),
       days <= 0 ? 'Aaj' : (days == 1 ? 'Kal' : '$days din mein'));
   String get betaWaitNote => _p(
-      'A home test before this can read wrong because of the trigger shot. The blood test is the real answer.',
+      'A home test before this can give a wrong result because of the trigger shot. The blood test gives the real answer.',
       'Isse pehle ghar ka test trigger shot ki wajah se galat aa sakta hai. Blood test hi asli jawab hai.');
 
   // ---- the two pathway questions --------------------------------------------
@@ -1354,8 +1475,15 @@ class TtcS {
   //  product is allowed to ask - and asking is what stops us over-correcting.
   String get pathwayQuestionsTitle =>
       _p('Two questions about this cycle', 'Is cycle ke baare mein do sawaal');
+  // ⚠️ THE ENGLISH SIDE REWRITTEN 2026-09-26 for the round (decisions 1 and
+  // 2): a label no longer switches anything; her clinic's first treatment date
+  // does, and the kind of round and its trigger pick the rest. The Hindi side
+  // is shipped and unchanged (new work is English). Kept for revert:
+  //   "The same treatment works differently depending on these answers. They
+  //   also decide whether we can help with timing at all. If you're not sure,
+  //   leave them, and we'll go with the safer answer."
   String get pathwayQuestionsWhy => _p(
-      'The same treatment works differently depending on these, and they decide whether we can help with timing at all. If you are not sure, leave them — we assume the safer answer.',
+      "We don't go by the treatment's name. From your clinic's first treatment date, we follow your round instead of estimating fertile days. The kind of treatment, and whether there's a trigger shot, tells us the rest.",
       'Ek hi treatment inke hisaab se alag chalta hai, aur inhi se tay hota hai ki hum timing mein madad kar sakte hain ya nahi. Pata na ho toh chhod dein - hum surakshit jawab maan lete hain.');
   /// Asks the PRINCIPLE, not a clinical event.
   ///
@@ -1377,7 +1505,7 @@ class TtcS {
   /// route to the same place, and a fully medicated transfer has no trigger at
   /// all - so asking about the injection would let a medicated cycle answer no.
   String get pathwayQMedicated => _p(
-      'Has medication taken over WHEN ovulation or transfer happens — an injection that sets the hour, or a fully medicated schedule?',
+      'Is medicine deciding when ovulation or transfer happens, like an injection that sets the time, or a fully medicated schedule?',
       'Kya dawai ne tay kar liya hai ki ovulation ya transfer KAB hoga — koi injection jo waqt tay karta hai, ya poori tarah medicated schedule?');
   String get pathwayQMedicatedEg => _p(
       'If your own body still decides the day, answer no.',
@@ -1388,7 +1516,7 @@ class TtcS {
   String get pathwayAnswerCta =>
       _p('Answer two questions', 'Do sawaal ka jawab dein');
   String get pathwayAnswerBody => _p(
-      'It takes a moment, and it may turn your fertile window back on.',
+      'It only takes a moment, and it may bring your fertile window back.',
       'Ek pal lagega, aur ho sakta hai aapki fertile window wapas aa jaye.');
 
   /// The one disclaimer, in one place.
@@ -1397,8 +1525,18 @@ class TtcS {
   /// with the most traffic and the least reliable number - Today - carried no
   /// caveat at all.
   String get estimatesDisclaimer => _p(
-      'These are estimates, never guarantees. If your cycles change, stop, or you are worried, talk to a doctor.',
+      "These are estimates, never guarantees. If your cycles change or stop, or you're worried, talk to a doctor.",
       'Ye andaaze hain, guarantee nahi. Agar aapke cycles badalte hain, periods band hain ya aap chinta mein hain, toh doctor se baat karein.');
+
+  /// The doors' own disclaimer (2026-09-26, Mobbin review D1). A door that
+  /// predicts nothing (Body and cycle, Taking a while, After a loss, Mind and
+  /// body, IVF) ended on "These are estimates", which is prediction language
+  /// where we predict nothing (CLAUDE.md), and never said "not medical
+  /// advice". English only: new work is English.
+  String get doorDisclaimer =>
+      "This is general information, not medical advice. Your doctor knows "
+      'you and your history. If anything here disagrees with them, go with '
+      'your doctor.';
 
   // ---- the hero's position line ---------------------------------------------
   /// "Day 3 of 28" - position WITHIN the chapter, never "chapter 1 of 5".
@@ -1421,7 +1559,7 @@ class TtcS {
   String get profileTesting => _p('Testing', 'Testing');
   String get profileHomeVersion => _p('Home version', 'Home version');
   String get profileHomeVersionBody => _p(
-      'Current is what ships. V3 is the rebuilt home — the cycle header, the daily circles and the new tabs. Not saved between launches.',
+      'Current is what ships. V3 is the rebuilt home, with the cycle header, the daily circles and the new tabs. Not saved between launches.',
       'Current wahi hai jo abhi live hai. V3 naya home hai. Launch ke beech save nahi hota.');
   String get profileViewAs => _p('View as', 'Kis roop mein');
   String get profileViewAsBody => _p(
@@ -1432,7 +1570,7 @@ class TtcS {
   String get profileHinglish => _p('Hinglish', 'Hinglish');
   String get profileSignOut => _p('Sign out', 'Sign out');
   String get profileSignOutBody => _p(
-      'You will be asked to sign in again. Nothing you have logged is deleted.',
+      "You'll need to sign in again. Nothing you've logged is deleted.",
       'Aapko dobara sign in karna hoga. Aapka logged data delete nahi hota.');
 
   /// The partner half, named honestly. Pairing is not built yet, so this says
@@ -1443,7 +1581,7 @@ class TtcS {
       // control that had moved two screens away — the exact failure mode of
       // copy that names a location: it stays confidently wrong and nothing
       // fails. Now it points at the section directly below it.
-      'Pairing his phone to this journey is being built. For now the View as switch under Testing, below, shows you both sides.',
+      'Linking his phone to yours is still being built. For now, the View as switch under Testing, below, shows you both sides.',
       'Unke phone ko is journey se jodna abhi ban raha hai. Filhaal neeche Testing mein "View as" switch se dono taraf dikhti hai.');
 
   /// Testing only, and labelled so - exactly like the pregnancy Profile's
@@ -1474,17 +1612,17 @@ class TtcS {
 
   /// Used by every section that is genuinely not built yet. Honest wording -
   /// "we are building this", never a dead button pretending to work.
-  String get beingBuilt => _p('We are building this', 'Hum ise bana rahe hain');
+  String get beingBuilt => _p("We're building this", 'Hum ise bana rahe hain');
 
   // ---- the five chapters' section names (Prepare / Tools / etc.) ------------
   String get prepareTitle => _p('Prepare for conception', 'Conception ki taiyaari');
   String get prepareBody => _p(
-      'Consultations, courses, fertility yoga, nutrition and mental wellness - the things that make you healthier parents, whenever it happens.',
+      'Consultations, courses, fertility yoga, nutrition and mental wellness. Things that help you both become healthier parents, whenever it happens.',
       'Consultations, courses, fertility yoga, nutrition aur mental wellness - jo aapko behtar parents banate hain, jab bhi ho.');
 
   String get toolsTitle => _p('Tools that help, never judge', 'Tools jo madad karte hain, judge nahi');
   String get toolsBody => _p(
-      'Your cycle, ovulation, supplements, tests, sleep, mood and reports - each one optional, each one yours.',
+      'Your cycle, ovulation, supplements, tests, sleep, mood and reports. Each one is optional, and each one is yours.',
       'Aapka cycle, ovulation, supplements, tests, neend, mood aur reports - har ek optional, har ek aapka.');
 
   /// Was "Your command centre" - a cold, corporate phrase sitting in a stage
@@ -1547,9 +1685,9 @@ class TtcS {
       'Everything in one place: your cycle, appointments, supplements, tests and the moments you write down.',
       'Sab kuch ek jagah: aapka cycle, appointments, supplements, tests aur wo lamhe jo aap likhti hain.');
 
-  String get communityTitle => _p('You are not the only one', 'Aap akeli nahi hain');
+  String get communityTitle => _p("You're not the only one", 'Aap akeli nahi hain');
   String get communityBody => _p(
-      'Rooms for trying naturally, PCOS, endometriosis, IVF, male fertility and emotional support - calm, never competitive.',
+      'Rooms for trying naturally, PCOS, endometriosis, IVF, male fertility and emotional support. Calm, and never competitive.',
       'Trying naturally, PCOS, endometriosis, IVF, male fertility aur emotional support ke rooms - shaant, kabhi competitive nahi.');
 
   // ---- the doorway ----------------------------------------------------------
@@ -1566,6 +1704,6 @@ class TtcS {
   //
   // The rest of this file stays Hinglish until TTC is migrated as a whole.
   String get doorTitle => _p('Trying to conceive', 'बच्चे की तैयारी');
-  String get doorBody => _p('Planning a baby? Start the journey here',
+  String get doorBody => _p('Planning a baby? Start here',
       'बच्चे की सोच रहे हैं? सफ़र यहीं से शुरू कीजिए');
 }

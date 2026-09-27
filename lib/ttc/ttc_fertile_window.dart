@@ -113,6 +113,11 @@ class TtcFertileWindow {
 /// be rendered as words rather than as an empty chart.
 /// [ignoreOwnership] skips refusal (1) ONLY.
 ///
+/// ⚠️ NO CALLERS SINCE 2026-09-26 (consistency pass). The home hero was the
+/// one caller described below; it now reads `ttcDayContext`, which refuses on
+/// a clinic cycle like every other surface (see the note in
+/// `ttc_home_hero.dart`). The parameter is kept, unused, for revert.
+///
 /// ⚠️ ONE CALLER, AND IT IS A PRODUCT DECISION RATHER THAN A CLINICAL ONE —
 /// 2026-09-05. The home hero passes it. Asked for directly and repeatedly, after
 /// four rounds of the hero showing a clinic refusal instead of a cycle message:
@@ -138,7 +143,15 @@ class TtcFertileWindow {
 /// ANSWERS, never a pathway default. That is `docs/STILL-OPEN.md` §30 and it is
 /// the reason this parameter is a named exception with one call site rather
 /// than a change to the rule.
-TtcFertileWindow? ttcFertileWindowNow({DateTime? on, bool ignoreOwnership = false}) {
+///
+/// ⚠️ RETIRED 2026-09-26, FULLY. The exception existed because `ownership`
+/// came from a label she tapped once. It now comes from real clinic dates in
+/// the treatment tracker (`ttcTimingOwnershipFromEvidence` in
+/// `ttc_care_pathway.dart`), so a label alone never reaches refusal (1) and
+/// there is nothing left to bypass. Kept for revert:
+///   TtcFertileWindow? ttcFertileWindowNow(
+///       {DateTime? on, bool ignoreOwnership = false}) {
+TtcFertileWindow? ttcFertileWindowNow({DateTime? on}) {
   final store = TtcStore.instance;
   final today = store.today;
 
@@ -150,15 +163,18 @@ TtcFertileWindow? ttcFertileWindowNow({DateTime? on, bool ignoreOwnership = fals
   //
   // All three are `null`, not a fallback, because the difference between them
   // is a difference in what to SAY, and only the caller knows the screen.
-  if (!ignoreOwnership && !today.behaviour.showsFertilityWindow) return null;
+  // Kept for revert: `if (!ignoreOwnership && ...)`.
+  if (!today.behaviour.showsFertilityWindow) return null;
   // ⚠️ THE GATE IS IN TWO PLACES, AND THE FIRST ATTEMPT ONLY MOVED ONE.
   // `showsFertilityWindow` above is the obvious one; `estimatedOvulationDay` is
   // the real one — the engine computes `ov`, then publishes null whenever a
   // clinic owns the timing. Skipping the first check alone changed nothing, and
   // the test suite said so by continuing to pass.
-  final ov =
-      ignoreOwnership ? today.rawOvulationDay ?? today.estimatedOvulationDay
-                      : today.estimatedOvulationDay;
+  // Kept for revert:
+  //   final ov =
+  //       ignoreOwnership ? today.rawOvulationDay ?? today.estimatedOvulationDay
+  //                       : today.estimatedOvulationDay;
+  final ov = today.estimatedOvulationDay;
   final start = CycleStore.instance.lastPeriodStart;
   if (ov == null || start == null) return null;
 

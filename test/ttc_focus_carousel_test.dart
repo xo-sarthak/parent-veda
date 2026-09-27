@@ -113,6 +113,55 @@ Future<void> settle(WidgetTester tester) async {
   await tester.pump(const Duration(milliseconds: 700));
 }
 
+/// Fertile window as the carousel was designed and tuned for it: five cards.
+///
+/// ⚠️ A FIXTURE BUILT FROM THE SHIPPED SECTIONS, AND WHY IT EXISTS
+/// (2026-09-26). The door now has six tabs (the gap plan merged "Your window"
+/// and "How to try", and added "Waiting and testing" and "Sex and closeness"),
+/// and it renders through `TtcDoorScreen`, not this screen. Design 4a is a
+/// five-card ladder: its rest positions, its back pair and its dot maths are
+/// all about five. So these tests pin the carousel to the shape it was built
+/// for, using the door's REAL sections and tiles regrouped by heading, rather
+/// than asserting five-card geometry against six cards. The five labels are
+/// the ones the tabs had before the merge.
+TtcFocusPage fiveCardConceiving() {
+  final real = ttcFocusPageFor('ttc_conceiving')!;
+  const tabOf = {
+    'When should we have sex?': 'window',
+    'How many times should we try?': 'trying',
+    'Which sex position is best?': 'trying',
+    'Does stress stop pregnancy?': 'trying',
+    'What he should do': 'his',
+    'What you should do': 'hers',
+    'When should we see a doctor?': 'doctor',
+  };
+  final byId = {for (final g in real.groups!) g.id: g};
+  return TtcFocusPage(
+    bracketId: real.bracketId,
+    intro: real.intro,
+    heroImageUrl: real.heroImageUrl,
+    heroBlurb: real.heroBlurb,
+    heroTitle: real.heroTitle,
+    headline: real.headline,
+    groups: [
+      TtcFocusGroup(
+          id: 'window', label: 'Your window',
+          icon: Icons.center_focus_weak_outlined, hue: 344),
+      TtcFocusGroup(
+          id: 'trying', label: 'How to try',
+          icon: Icons.favorite_border_rounded, hue: 42),
+      byId['his']!,
+      byId['hers']!,
+      byId['doctor']!,
+    ],
+    sections: [
+      for (final s in real.sections)
+        if (tabOf[s.heading] case final tab?)
+          TtcFocusSection(heading: s.heading, group: tab, tiles: s.tiles),
+    ],
+  );
+}
+
 void main() {
   setUp(() => HttpOverrides.global = _StubHttpOverrides());
   tearDown(() => HttpOverrides.global = null);
@@ -134,7 +183,9 @@ void main() {
     addTearDown(tester.view.reset);
     await tester.pumpWidget(MaterialApp(
       home: TtcFocusScreen(
-        page: ttcFocusPageFor(id)!,
+        page: id == kTtcCarouselBracketId
+            ? fiveCardConceiving()
+            : ttcFocusPageFor(id)!,
         // The real bracket, not a fixture — the screen reads `bracket.label`
         // for its heading so the tile and the page cannot drift apart.
         bracket: bracketById(id)!,
@@ -145,7 +196,7 @@ void main() {
   }
 
   /// The group cards, in the order the data declares them.
-  final groups = ttcFocusPageFor('ttc_conceiving')!.groups!;
+  final groups = fiveCardConceiving().groups!;
 
   /// How far each card on the track is displaced sideways, in paint order.
   ///

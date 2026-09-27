@@ -125,9 +125,9 @@ class TtcReportEmptyBody extends StatelessWidget {
                   Text('A picture of one month', style: ttcJakarta(16)),
                   const SizedBox(height: 8),
                   Text(
-                      'A cycle is the time from the first day of one period to '
-                      'the day before the next. Drawn as a ring, it splits '
-                      'into four stretches. This is the shape — yours is empty '
+                      'A cycle starts when a period starts, and ends the day '
+                      'before your next one begins. Drawn as a ring, it splits '
+                      "into four stretches. This is the shape. Yours stays empty "
                       'until you enter a date.',
                       style: ttcBody(13, h: 1.55)),
                   const SizedBox(height: 20),
@@ -167,21 +167,21 @@ class TtcReportEmptyBody extends StatelessWidget {
                 n: 1,
                 title: 'Today gets a name',
                 body: 'Enter the first day of your last period and this page '
-                    'tells you which day of the cycle you are on.',
+                    "tells you which day of your cycle you're on.",
               ),
               ttcDivider(),
               _Step(
                 n: 2,
                 title: 'The four stretches appear',
                 body: 'After two periods we can mark your fertile days on the '
-                    'ring instead of describing them in words.',
+                    'ring, instead of just describing them.',
               ),
               ttcDivider(),
               _Step(
                 n: 3,
                 title: 'One page to carry to a doctor',
-                body: 'Your dates and how long your cycles run, in one place, '
-                    'instead of remembered at the appointment.',
+                body: 'Your dates and how long your cycles last, in one place, '
+                    'so you don\'t have to remember them at the appointment.',
                 last: true,
               ),
             ]),
@@ -192,7 +192,7 @@ class TtcReportEmptyBody extends StatelessWidget {
           const TtcReportFact(
             label: 'Period dates',
             placeholder:
-                'The days you mark as bleeding will be listed here, newest '
+                'The days you mark as bleeding will show up here, newest '
                 'first.',
           ),
           const SizedBox(height: 10),
@@ -200,7 +200,7 @@ class TtcReportEmptyBody extends StatelessWidget {
             label: 'How long your cycles run',
             placeholder:
                 'Two periods are enough for a first number. Three make it '
-                'steadier.',
+                'more reliable.',
           ),
           const SizedBox(height: 22),
 
@@ -208,13 +208,13 @@ class TtcReportEmptyBody extends StatelessWidget {
               label: 'Enter the first day of your period', onTap: onLog),
           const SizedBox(height: 10),
           TtcReportAction(
-              label: 'My period was earlier — add a past date',
+              label: 'My period was earlier: add a past date',
               muted: true,
               onTap: onLog),
           const SizedBox(height: 12),
           Text(
               'You can change or remove any date later. Nothing here is shared '
-              'without you asking.',
+              'unless you ask.',
               style: ttcBody(12, color: ttcMuted, h: 1.5)),
         ],
       );
@@ -430,11 +430,11 @@ class TtcReportRefusalBody extends StatelessWidget {
               children: [
                 Text(
                     report.start == null || report.end == null
-                        ? 'In order. Filled days are days you entered '
+                        ? 'In order. A filled day is a day you logged '
                             'something.'
                         : '${ttcShortDate(report.start!)} to '
-                            '${ttcShortDate(report.end!)}, in order. Filled '
-                            'days are days you entered something.',
+                            '${ttcShortDate(report.end!)}, in order. A filled '
+                            'day is a day you logged something.',
                     style: ttcBody(12.5, h: 1.5)),
                 const SizedBox(height: 14),
                 _PlainGrid(report: report),
@@ -474,7 +474,7 @@ class TtcReportRefusalBody extends StatelessWidget {
           value: facts.usualBleedDays == null
               ? null
               : '${facts.usualBleedDays} days',
-          placeholder: 'Say how long a period lasted when you log one.',
+          placeholder: 'When you log a period, add how many days it lasted.',
         ),
         const SizedBox(height: 22),
 
@@ -661,12 +661,12 @@ class TtcReportAbout extends StatelessWidget {
 
 /// What the ⓘ says. Two versions, because one of them is not about her data.
 String ttcReportAboutText({required bool clinic}) => clinic
-    ? 'Everything here comes from the dates you enter yourself. It is a '
+    ? "Everything here comes from the dates you enter yourself. It's a "
         'record, not a medical test. While a clinic is treating you, their '
         'scans and their dates are the ones to follow.'
-    : 'Everything here comes from the dates you enter yourself. It is a '
-        'record, not a medical test, and it cannot tell you whether you are '
-        'pregnant. For anything you are worried about, see a doctor.';
+    : "Everything here comes from the dates you enter yourself. It's a "
+        "record, not a medical test, and it can't tell you whether you're "
+        "pregnant. For anything you're worried about, see a doctor.";
 
 /// "IUI cycle · day 14", or just the cycle day where the path has no name.
 String ttcClinicChip() {

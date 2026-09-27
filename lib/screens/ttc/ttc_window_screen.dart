@@ -135,16 +135,17 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
           'Peak is the strongest day. Ovulation is when the egg is released.',
         ]
       : const [
-          'Left to right is one whole cycle — day one to your last day.',
-          'The line rises as your chance of conceiving rises.',
-          'The shaded band is your fertile window: about six days.',
+          'Left to right is one whole cycle, from day one to your last day.',
+          'The line rises on the days when getting pregnant is more likely.',
+          'The shaded band is your fertile window: about six days, plus one '
+              'day after ovulation, in case it comes a day later.',
           'The dot is ovulation. The dashes show where you are today.',
         ];
 
   static const _terms = [
     (
       'Cycle',
-      'Day 1 is the first day of your period, and the next period starts the '
+      'Day 1 is the first day of your period. The next period starts the '
           'next cycle. Twenty-eight days is only the average.'
     ),
     (
@@ -153,13 +154,14 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
     ),
     (
       'Ovulation',
-      'An egg is released, roughly mid-cycle. It can be fertilised for about '
-          'a day.'
+      'An egg is released, roughly in the middle of the cycle. It can be '
+          'fertilised for about a day.'
     ),
     (
       'Fertile window',
-      'The six days when sex can lead to pregnancy: five before ovulation, the '
-          'day itself, and the day after.'
+      'The six days when sex can lead to pregnancy: the five days before '
+          'ovulation and the day itself. We shade one more day after it, in '
+          'case ovulation comes a day later than we estimate.'
     ),
   ];
 
@@ -482,8 +484,8 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
         // width invites being read as a probability, and this is the line that
         // refuses it. It stays under both views.
         Text(
-            'The shape ranks the days against each other. It is not a '
-            'probability.',
+            'The shape ranks the days against each other. '
+            "It isn't a probability.",
             style: pvManrope(fontSize: 11.5, height: 1.4, color: p.ink3)),
         const SizedBox(height: 14),
         _tourRow(p),
@@ -551,9 +553,10 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
                   color: p.action)),
           const SizedBox(height: 12),
           Text(
-              'Roughly six days, ending the day after ovulation. Sperm survive '
-              'about five days; the egg about one. The width is the point — no '
-              'single day has to be right.',
+              'About six days, ending on the day you ovulate. Sperm survive '
+              'about five days, and the egg about one. We add the day after as '
+              'well, in case ovulation comes a day later than we estimate. '
+              'Because the window is this wide, no single day has to be right.',
               style: pvManrope(fontSize: 14, height: 1.55, color: p.ink2)),
         ],
       );
@@ -659,15 +662,15 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
     final days = date.difference(w.peakOn).inDays;
     return switch (days) {
       0 => 'Ovulation is most likely today, give or take a day.',
-      -1 => 'The day before ovulation — the highest of the six.',
+      -1 => 'The day before ovulation. This is the highest of the six.',
       -2 => 'Two days before ovulation is one of the stronger days.',
-      -3 => 'Three days out from ovulation and climbing.',
-      1 => 'The window closes the day after ovulation.',
+      -3 => 'Three days before ovulation, and rising.',
+      1 => 'The last day we show, in case ovulation came a day late.',
       _ when days < -3 && _sameDay(date, w.opensOn) =>
         'The window opens. Sperm can already be waiting when the egg arrives.',
       _ when days < -3 =>
         'Still early in the window. Nothing has to be timed exactly today.',
-      _ => 'Past ovulation, and the chance falls away quickly.',
+      _ => 'Ovulation has passed, and the chance drops quickly.',
     };
   }
 }

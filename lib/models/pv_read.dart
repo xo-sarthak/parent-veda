@@ -292,6 +292,7 @@ class PvRead {
     this.nextSteps = const [],
     this.imageUrl,
     this.reviewed = true,
+    this.shortAnswer,
   });
 
   /// Whether a named clinician stands behind the piece — true for every
@@ -300,6 +301,18 @@ class PvRead {
   /// insight), where the byline is the desk and the verified mark would be a
   /// claim nobody made. The reader keys the eyebrow and the mark on it.
   final bool reviewed;
+
+  /// "The short answer": two or three plain sentences, boxed under the title,
+  /// before the scale-setter.
+  ///
+  /// ⚠️ ADDED 2026-09-26 FROM THE TTC GAP ANALYSIS (Flo / What to Expect vs
+  /// ParentVeda, "Behind — How reads are written", P1). What to Expect puts a
+  /// KEY TAKEAWAYS box on two thirds of its articles and Flo answers in the
+  /// first lines; someone in a hurry should get the answer in five seconds and
+  /// decide from there whether to read on. Optional, so every read that has
+  /// none renders exactly as before — the other stages are untouched until
+  /// they choose to write one.
+  final LocalizedText? shortAnswer;
 
   /// The picture above the masthead, and on this read's card wherever it is
   /// offered (a Read next tile, a door rail).

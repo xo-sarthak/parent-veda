@@ -107,16 +107,16 @@ final HubConfig kTtcConceiving = HubConfig(
   heroVideoSlot: 'ttc_conceiving_intro',
   template: HubTemplate.trackerLed,
   coreQuestion:
-      'How do I find my fertile window, and what actually helps this cycle?',
+      'How do I find my fertile window, and what really helps this cycle?',
   hero: _en('Trying to conceive, understood.'),
-  heroSupport: _en('How conception actually works, and what helps this '
+  heroSupport: _en('How conception works, and what helps this '
       'cycle.'),
   needsTitle: _en('What do you need?'),
   needs: [
     HubNeed(
       label: _en('Find my fertile window'),
-      blurb: _en('See the days this cycle when trying has the best chance '
-          'of working.'),
+      blurb: _en('See which days in this cycle trying is most likely '
+          'to work.'),
       mark: IntentMark.cycleRing,
       hue: 344,
       surfaceId: 'ttc_window',
@@ -125,8 +125,8 @@ final HubConfig kTtcConceiving = HubConfig(
       // Timing and habits, never a computed number — see kTtcActImproveChances
       // above.
       label: _en('Improve my chances this cycle'),
-      blurb: _en('The timing and everyday habits that genuinely help, '
-          'explained plainly.'),
+      blurb: _en('The timing and everyday habits that really help, in '
+          'plain words.'),
       mark: IntentMark.improveMark,
       hue: 104,
       action: kTtcActImproveChances,
@@ -159,7 +159,7 @@ final HubConfig kTtcPcos = HubConfig(
   needs: [
     HubNeed(
       label: _en('Understand my PCOS'),
-      blurb: _en('What PCOS actually is, how common it is, and what it '
+      blurb: _en('What PCOS is, how common it is, and what it '
           'means for trying.'),
       mark: IntentMark.bodyMark,
       hue: 288,
@@ -204,7 +204,7 @@ final HubConfig kTtcPcos = HubConfig(
 final HubConfig kTtcInfertility = HubConfig(
   bracketId: 'ttc_infertility',
   heroVideoSlot: 'ttc_infertility_intro',
-  heroVideoTitle: _en('When waiting stops being the answer'),
+  heroVideoTitle: _en('When to stop waiting and ask for help'),
   // ⚠️ NOT decisionCommerce. That template names the buying-guide shape, and
   // this hub bans commerce outright three lines above. A template that says
   // 'commerce' on the one hub where products are notApplicable is exactly the
@@ -221,7 +221,7 @@ final HubConfig kTtcInfertility = HubConfig(
       // Not yet built — see kTtcActFertilityReadinessCheck above. A self-check,
       // never a probability.
       label: _en('Should I seek fertility help?'),
-      blurb: _en('A few honest questions to help you decide if it is time '
+      blurb: _en("A few honest questions to help you decide if it's time "
           'to see someone.'),
       mark: IntentMark.questionMark,
       hue: 206,
@@ -231,8 +231,8 @@ final HubConfig kTtcInfertility = HubConfig(
       surfaceId: 'ttc_fertility_help',
     ),
     HubNeed(
-      label: _en('Understand my tests & treatment'),
-      blurb: _en('What IUI and IVF actually involve, step by step, '
+      label: _en('Understand my tests and treatment'),
+      blurb: _en('What IUI and IVF involve, step by step, '
           'including what they cost.'),
       mark: IntentMark.reportPage,
       hue: 42,
@@ -255,7 +255,7 @@ final HubConfig kTtcInfertility = HubConfig(
       // specialists actually have bookable slots. An empty calendar behind this
       // door would be worse than the door not existing.
       label: _en('Speak to a fertility specialist'),
-      blurb: _en('Book a 1:1 with a fertility specialist, when you are '
+      blurb: _en("Book a 1:1 with a fertility specialist, whenever you're "
           'ready.'),
       mark: IntentMark.askDoctor,
       hue: 26,
@@ -299,12 +299,12 @@ final HubConfig kTtcPreconceptionHealth = HubConfig(
 final HubConfig kTtcMaleFertility = HubConfig(
   bracketId: 'ttc_male_fertility',
   heroVideoSlot: 'ttc_male_fertility_intro',
-  heroVideoTitle: _en('His half of it, in four minutes'),
+  heroVideoTitle: _en('His side of it, in four minutes'),
   template: HubTemplate.learnAndPlan,
   coreQuestion: 'What does sperm health depend on, and how do we improve '
       'it?',
   hero: _en('His fertility matters just as much.'),
-  heroSupport: _en('What affects sperm health, and what genuinely helps.'),
+  heroSupport: _en('What affects sperm health, and what really helps.'),
   needsTitle: _en('What do you need?'),
   needs: [
     HubNeed(
@@ -312,7 +312,7 @@ final HubConfig kTtcMaleFertility = HubConfig(
       // ttc_surface_router.dart on why a bracket must never route at his own
       // account.
       label: _en('Understand sperm health'),
-      blurb: _en('What actually affects sperm health, explained plainly '
+      blurb: _en('What affects sperm health, explained plainly '
           'for both of you.'),
       mark: IntentMark.spermMark,
       hue: 186,
@@ -328,8 +328,8 @@ final HubConfig kTtcMaleFertility = HubConfig(
       // talks about" — rather than a module folded into the general
       // conception class. See the ⚑ note on this bracket in ttc_brackets.dart.
       label: _en('Improve sperm health'),
-      blurb: _en('A short course on the lifestyle changes that genuinely '
-          'move the needle.'),
+      blurb: _en('A short course on the lifestyle changes that make a '
+          'real difference.'),
       mark: IntentMark.improveMark,
       hue: 42,
       surfaceId: 'ttc_prepare',
@@ -355,8 +355,8 @@ final HubConfig kTtcAfterLoss = HubConfig(
   heroVideoSlot: 'ttc_after_loss_intro',
   heroVideoTitle: _en('Trying again, at your own pace'),
   template: HubTemplate.afterALoss,
-  coreQuestion: 'What does my body need to recover, and when — if ever — do '
-      'we try again?',
+  coreQuestion: 'What does my body need to recover, and when could we try '
+      'again, if we want to?',
   hero: _en('Trying again, after a loss.'),
   heroSupport: _en('No rush, and no timeline you have to keep.'),
   needsTitle: _en('What do you need?'),
@@ -364,24 +364,25 @@ final HubConfig kTtcAfterLoss = HubConfig(
     HubNeed(
       // Not yet built — see kTtcActLossRecoveryLibrary above. The bracket's
       // content layer is notReady in full.
-      label: _en('Understand recovery & trying again'),
+      label: _en('Understand recovery and trying again'),
       blurb: _en('What your body needs to heal, and when it may be safe '
           'to try again.'),
       mark: IntentMark.bodyMark,
       hue: 26,
       action: kTtcActLossRecoveryLibrary,
     ),
-    HubNeed(
-      // Free, real, and already live — other people who have been exactly
-      // here, not a paid session. This is the layer the bracket table calls
-      // "the one layer the workbook actively wanted here."
-      label: _en('Get emotional support'),
-      blurb: _en('Other people who have been exactly here, whenever you '
-          'want to talk.'),
-      mark: IntentMark.cuppedHands,
-      hue: 268,
-      surfaceId: 'ttc_community',
-    ),
+    // Community held back for launch (2026-09-26, TTC gap plan §7.1) — kept for revert.
+    // HubNeed(
+    //   // Free, real, and already live — other people who have been exactly
+    //   // here, not a paid session. This is the layer the bracket table calls
+    //   // "the one layer the workbook actively wanted here."
+    //   label: _en('Get emotional support'),
+    //   blurb: _en('Others who have been where you are, whenever you '
+    //       'want to talk.'),
+    //   mark: IntentMark.cuppedHands,
+    //   hue: 268,
+    //   surfaceId: 'ttc_community',
+    // ),
   ],
   // ⚠️ NO CLOSING. A consult offer at the foot of this hub is a consult
   // upsell whatever label it carries, and the brief for this hub rules that
@@ -406,7 +407,7 @@ final HubConfig kTtcMindBody = HubConfig(
   needs: [
     HubNeed(
       label: _en("Do today's practice"),
-      blurb: _en('Reflection, breath, conversation and gratitude — five '
+      blurb: _en('Reflection, breath, conversation and gratitude, in five '
           'quiet minutes.'),
       mark: IntentMark.lotusMark,
       hue: 42,
@@ -424,7 +425,7 @@ final HubConfig kTtcMindBody = HubConfig(
     HubNeed(
       label: _en('Understand stress and calm'),
       blurb: _en('What the evidence says about stress and conceiving, and '
-          'what garbh sanskar does and does not claim.'),
+          "what garbh sanskar does and doesn't claim."),
       mark: IntentMark.bodyMark,
       hue: 268,
       surfaceId: 'ttc_read/ttc_read_stress_fertility',
@@ -436,8 +437,8 @@ final HubConfig kTtcMindBody = HubConfig(
   // priced at zero, is exactly the placement it was designed for.
   closing: HubClosing(
     label: _en('The free garbh sanskar course'),
-    blurb: _en('Eight short sessions for both of you, taught rather than '
-        'described. No fee.'),
+    blurb: _en('Eight short guided sessions for both of you, not just '
+        'reading. No fee.'),
     action: kTtcActConsult,
   ),
 );

@@ -109,7 +109,7 @@ class _TtcTestsScreenState extends State<TtcTestsScreen> {
                     child: Text(
                       t.hinglish
                           ? 'Ye jaankari hai, salaah nahi. Kaunsa test kab karwana hai, ye aapke doctor ke saath tay hota hai. Prices sirf andaaza hain aur jagah ke hisaab se badalte hain.'
-                          : 'This is information, not advice. Which tests to do and when belongs with your doctor. Prices are indicative and vary by city and lab.',
+                          : 'This is information, not advice. Which tests to have, and when, is for you and your doctor to decide. Prices are a rough guide and vary by city and lab.',
                       style: ttcBody(11.5, color: ttcMuted, h: 1.5),
                     ),
                   ),

@@ -260,7 +260,7 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
         // score, no streak. The brief bans a celebration animation on finishing
         // and the reasoning goes further than the animation: praise for
         // finishing is what makes not finishing a failure.
-        Text('That is the whole thing.',
+        Text("That's the whole thing.",
             style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
       ],
     ]);
@@ -338,11 +338,11 @@ class _Breath extends StatelessWidget {
                   Text(
                       inhaling
                           ? (rounds.isOdd
-                              ? 'In through the LEFT'
-                              : 'In through the RIGHT')
+                              ? 'In through the left'
+                              : 'In through the right')
                           : (rounds.isOdd
-                              ? 'Out through the RIGHT'
-                              : 'Out through the LEFT'),
+                              ? 'Out through the right'
+                              : 'Out through the left'),
                       style: pvManrope(
                           fontSize: 11.5,
                           fontWeight: FontWeight.w700,
@@ -427,7 +427,7 @@ class _Listen extends StatelessWidget {
       ),
       Padding(
         padding: const EdgeInsets.only(top: 96),
-        child: Text('Play your own',
+        child: Text('Play your own music',
             style: pvManrope(
                 fontSize: 11.5,
                 fontWeight: FontWeight.w700,

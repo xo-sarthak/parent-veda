@@ -577,15 +577,15 @@ void main() {
       expect(saved.label, 'Semen analysis');
 
       // The folder opened on top.
-      expect(find.text('Kept with your reports — open the folder'),
+      expect(find.text('Kept with your reports. Open the folder'),
           findsNothing);
 
       // Back, and a second tap does not write a second row.
       Navigator.of(tester.element(find.byType(Scaffold).last)).pop();
       await tester.pumpAndSettle();
-      expect(find.text('Kept with your reports — open the folder'),
+      expect(find.text('Kept with your reports. Open the folder'),
           findsOneWidget);
-      await tester.tap(find.text('Kept with your reports — open the folder'));
+      await tester.tap(find.text('Kept with your reports. Open the folder'));
       await tester.pumpAndSettle();
       expect(store.count, before + 1);
     });

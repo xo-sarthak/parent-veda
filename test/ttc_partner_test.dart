@@ -27,6 +27,9 @@ import 'package:parentveda/ttc/ttc_journal_store.dart';
 import 'package:parentveda/ttc/ttc_partner_data.dart';
 import 'package:parentveda/ttc/ttc_ritual_store.dart';
 import 'package:parentveda/ttc/ttc_store.dart';
+import 'package:parentveda/ttc/ttc_treatment_store.dart';
+import 'package:parentveda/screens/ttc/ttc_round_strings.dart'
+    show ttcPartnerRoundLine;
 
 Future<void> pumpTall(WidgetTester tester, Widget child) async {
   tester.view.physicalSize = const Size(1200, 6000);
@@ -205,6 +208,93 @@ void main() {
       expect(s.count, 2);
       // Newest first, regardless of who wrote it - not grouped by author.
       expect(s.entries.first.text, 'his');
+    });
+  });
+
+  // ===========================================================================
+  //  His round line (2026-09-26, docs/TTC-TREATMENT-FLOW.md §3g, B10): the
+  //  round is couple-scoped, so he sees its step and date, and what it asks
+  //  of him. Never her cycle, and never the result.
+  // ===========================================================================
+  group('his round line', () {
+    DateTime day(int n) {
+      final t = DateTime.now();
+      return DateTime(t.year, t.month, t.day + n);
+    }
+
+    TtcTreatmentCycle round() => TtcTreatmentCycle(
+          dates: {
+            TtcTreatmentStep.baselineScan: day(-12),
+            TtcTreatmentStep.stimStart: day(-11),
+            TtcTreatmentStep.trigger: DateTime(
+                day(-2).year, day(-2).month, day(-2).day, 22, 15),
+            TtcTreatmentStep.retrieval: day(0),
+            TtcTreatmentStep.transfer: day(5),
+            TtcTreatmentStep.betaTest: day(16),
+          },
+          kind: TtcRoundKind.ivfFresh,
+        );
+
+    setUp(() => TtcTreatmentStore.instance.resetForTest());
+    tearDown(() => TtcTreatmentStore.instance.resetForTest());
+
+    test('every day of the round: the step and its date, never her cycle', () {
+      final banned = RegExp(
+          r'cycle day|period|fertile|ovulat|late|not this time|positive|'
+          r'negative|chance|%',
+          caseSensitive: false);
+      final r = round();
+      for (var n = -14; n <= 20; n++) {
+        final line = ttcPartnerRoundLine(r, day(n));
+        if (line == null) continue;
+        final (a, b, c) = line;
+        final all = '$a $b ${c ?? ''}';
+        expect(banned.hasMatch(all), isFalse, reason: 'day $n: $all');
+      }
+      // Collection day asks for his sample.
+      final (_, what, note) = ttcPartnerRoundLine(r, day(-1))!;
+      expect(what, 'Egg collection tomorrow');
+      expect(note, contains('sample'));
+      // The blood test is named by its date, never counted down to.
+      final (_, test, _) = ttcPartnerRoundLine(r, day(10))!;
+      expect(test, startsWith('Blood test on '));
+      expect(test, isNot(matches(RegExp(r'in \d+ days'))));
+    });
+
+    test('closed: nothing, the result is hers to tell', () {
+      for (final o in TtcRoundOutcome.values) {
+        expect(ttcPartnerRoundLine(round().closed(o, day(0)), day(1)), isNull,
+            reason: o.name);
+      }
+      // Waiting to hear after the test: nothing either.
+      expect(ttcPartnerRoundLine(round(), day(17)), isNull);
+    });
+
+    testWidgets('his home shows the round, and none of her cycle',
+        (tester) async {
+      CycleStore.instance
+        ..logPeriodStart(DateTime.now().subtract(const Duration(days: 40)))
+        ..logPeriodStart(DateTime.now().subtract(const Duration(days: 13)));
+      final r = round();
+      TtcTreatmentStore.instance.startRound(
+          kind: TtcRoundKind.ivfFresh, dates: r.dates);
+      TtcPartnerMode.instance.on = true;
+      await pumpTall(tester, const TtcPartnerTodayScreen());
+      final card = find.byKey(const ValueKey('ttc_partner_round_line'));
+      expect(card, findsOneWidget);
+      final line = ttcPartnerRoundLine(
+          TtcTreatmentStore.instance.cycle, DateTime.now())!;
+      expect(find.descendant(of: card, matching: find.text(line.$2)),
+          findsOneWidget);
+      expect(find.textContaining('Cycle day'), findsNothing);
+      expect(find.textContaining('fertile window', findRichText: true),
+          findsNothing);
+    });
+
+    testWidgets('no round, no line', (tester) async {
+      await pumpTall(tester, const TtcPartnerTodayScreen());
+      expect(find.byKey(const ValueKey('ttc_partner_round_line')),
+          findsNothing);
     });
   });
 }

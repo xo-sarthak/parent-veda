@@ -108,7 +108,7 @@ class TtcSemenEntry {
 const List<({String id, String label})> kTtcSemenRedFlags = [
   (id: 'lump', label: 'Pain, swelling or a lump in a testis'),
   (id: 'volume', label: 'Very little or no semen when you ejaculate'),
-  (id: 'function', label: 'Difficulty with erections or with ejaculating'),
+  (id: 'function', label: 'Trouble with erections or with ejaculating'),
   (id: 'testosterone', label: 'You take testosterone or anabolic steroids'),
 ];
 
@@ -192,9 +192,9 @@ class TtcSemenReading {
     final v = volumeMl;
     if (v == null) return null;
     final n = v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toStringAsFixed(1);
-    return 'Your volume is $n ml. Volume is reported, and it is not one of '
-        'the four numbers with a reference line — nothing here scores it. A '
-        'very low volume on its own is worth mentioning to a doctor.';
+    return 'Your volume is $n ml. The lab reports volume, but it is not one '
+        'of the four numbers with a reference line, so nothing here rates it. '
+        'A very low volume on its own is worth mentioning to a doctor.';
   }
 
   /// True only on the usual-range path: the brief says that when everything
@@ -244,11 +244,11 @@ TtcSemenReading ttcReadSemenReport(TtcSemenEntry e) {
   String? abstinence;
   final d = e.abstinenceDays;
   if (d != null && (d < kTtcAbstinenceMinDays || d > kTtcAbstinenceMaxDays)) {
-    abstinence = 'The sample was produced after $d '
-        '${d == 1 ? 'day' : 'days'}, and the standard window is '
-        '$kTtcAbstinenceMinDays to $kTtcAbstinenceMaxDays days. Outside it the '
-        'numbers may not be reliable, so a repeat done to the standard window '
-        'is worth having whatever this one says.';
+    abstinence = 'This sample was given after $d '
+        '${d == 1 ? 'day' : 'days'}. The standard window is '
+        '$kTtcAbstinenceMinDays to $kTtcAbstinenceMaxDays days. Outside it, the '
+        'numbers may not be reliable, so a repeat within the standard window '
+        'is worth having, whatever this one says.';
   }
 
   if (e.redFlags.isNotEmpty) {
@@ -258,14 +258,14 @@ TtcSemenReading ttcReadSemenReport(TtcSemenEntry e) {
       volumeMl: e.volumeMl,
       abstinenceNote: abstinence,
       headline: 'See a doctor rather than repeating first.',
-      body: 'What you have ticked is worth a person looking at before another '
-          'sample is arranged. None of it means something is badly wrong — a '
-          'few of these are straightforward and one of them is reversible — '
-          'but they are looked at first rather than after a repeat.',
+      body: "What you've ticked is worth a doctor looking at before another "
+          'sample is arranged. None of it means something is badly wrong. A '
+          'few of these are simple to sort out, and one of them can be '
+          "reversed. But they're looked at first, not after a repeat.",
       // ⚠️ SAID ON THIS PATH ALWAYS, because testosterone is one of the four
       // flags and "stop taking it" is exactly what a man reads into this.
-      extra: 'Do not stop any prescribed medication on the strength of '
-          'anything here. Take it to the person who prescribed it.',
+      extra: 'Do not stop any prescribed medicine because of anything here. '
+          'Take it to the person who prescribed it.',
     );
   }
 
@@ -281,12 +281,12 @@ TtcSemenReading ttcReadSemenReport(TtcSemenEntry e) {
       // very often is not: obstruction is treatable and retrieval is frequently
       // possible. Withholding that until an appointment would be accurate and
       // cruel.
-      body: 'A report finding no sperm is not the end of the road, and it is '
-          'the one result that goes straight to an andrologist rather than to '
-          'a second sample. Sperm can often be retrieved directly, and the '
-          'cause is sometimes a blockage that can be treated.',
-      extra: 'There is a piece in this section on exactly this. Read it before '
-          'you read anything else you find tonight.',
+      body: 'A report finding no sperm is not the end of the road. It\'s the '
+          'one result that goes straight to an andrologist rather than to a '
+          'second sample. Sperm can often be retrieved directly, and sometimes '
+          'the cause is a blockage that can be treated.',
+      extra: "There's a piece in this section about exactly this. Read it "
+          'before anything else you find tonight.',
     );
   }
 
@@ -296,11 +296,11 @@ TtcSemenReading ttcReadSemenReport(TtcSemenEntry e) {
       lines: lines,
       volumeMl: e.volumeMl,
       abstinenceNote: abstinence,
-      headline: 'Bring the whole report to somebody who reads them.',
-      body: 'There is not enough here to say anything useful, and guessing at '
+      headline: 'Take the whole report to someone who reads these.',
+      body: "There isn't enough here to say anything useful, and guessing at "
           'a number nobody entered would be worse than saying so. Take the '
-          'printed report itself — an andrologist reads the values together '
-          'and in context, which is more than any list of lines can do.',
+          'printed report itself. An andrologist reads the values together '
+          'and in context, which no list of lines can do.',
     );
   }
 
@@ -322,12 +322,12 @@ TtcSemenReading ttcReadSemenReport(TtcSemenEntry e) {
           ? 'Worth having both reports read together.'
           : 'The usual next step is a repeat, not a decision.',
       body: e.isRepeat
-          ? 'You have more than one sample now, which is what makes a pattern '
-              'readable. Two reports read side by side by an andrologist say '
-              'far more than either one alone, and that is the appointment '
-              'worth making.'
-          : 'Results vary a great deal between samples from the same man — the '
-              'same person can land either side of a line a fortnight apart. '
+          ? "You have more than one sample now, and that's what makes a "
+              'pattern readable. Two reports read side by side by an '
+              "andrologist say far more than either one alone. That's the "
+              'appointment worth making.'
+          : 'Results vary a lot between samples from the same man. The same '
+              'person can land on either side of a line a fortnight apart. '
               'So one number below the line is a reason to repeat, not a '
               'reason to conclude anything. Book the repeat, then have both '
               'read together.',
@@ -346,9 +346,9 @@ TtcSemenReading ttcReadSemenReport(TtcSemenEntry e) {
     // rules out the commonest male causes and rules out nothing else, and a man
     // who reads it as "my side is fine" stops looking — which is how a couple
     // spends another year on her.
-    body: 'A normal result rules out the commonest male causes, which is worth '
-        'having. It does not guarantee anything, and it does not mean the '
-        'question is closed if you have been trying a while.',
+    body: 'A normal result rules out the most common male causes, and that '
+        "is worth having. It does not guarantee anything, and it doesn't mean "
+        "the question is closed if you've been trying for a while.",
   );
 }
 

@@ -158,9 +158,9 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
         const SizedBox(height: 14),
         Text(
             t(
-                'A few thoughtful checks before you start can make the early '
-                    'weeks easier. This shows what you have already covered and '
-                    'what may still be worth discussing.',
+                'A few checks before you start can make the early weeks '
+                    "easier. Here you'll see what you've already covered, and "
+                    'what may be worth talking about with a doctor.',
                 'Shuru karne se pehle kuch soch-samajh kar ki gayi jaanch, '
                     'shuruaati hafton ko aasaan bana deti hai. Ye dikhata hai ki '
                     'kya ho chuka hai aur kis par baat karna baaki hai.'),
@@ -184,7 +184,7 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                      t('WHAT YOU HAVE ALREADY DONE',
+                      t("WHAT YOU'VE ALREADY DONE",
                           'JO AAP PEHLE HI KAR CHUKI HAIN'),
                       style: pvManrope(
                           fontSize: 10,
@@ -217,7 +217,7 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
 
         Text(
             t(
-                'You do not need a perfect checklist. You just need to know '
+                "You don't need a perfect checklist. You just need to know "
                     'what matters for you.',
                 'Aapko perfect checklist ki zaroorat nahi. Bas ye pata hona '
                     'chahiye ki aapke liye kya maayne rakhta hai.'),
@@ -247,29 +247,29 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
     final out = <String>[];
     if (c.loggedCycles >= 2) {
       out.add(t(
-          'You have logged ${c.loggedCycles} cycles — cycle tracking is '
+          'You\'ve logged ${c.loggedCycles} cycles, so cycle tracking is '
               'already covered.',
           'Aapne ${c.loggedCycles} cycles log kiye hain — cycle tracking ho '
               'chuki hai.'));
     }
     if (c.ranPcosCheck) {
-      out.add(t('You have run the PCOS check.',
+      out.add(t("You've done the PCOS check.",
           'Aapne PCOS check kar liya hai.'));
     }
     if (c.supplementCount > 0) {
       out.add(t(
-          'You have ${c.supplementCount} supplements recorded.',
+          'You\'ve noted ${c.supplementCount} supplements.',
           'Aapne ${c.supplementCount} supplements darj kiye hain.'));
     }
     if (c.medicineCount > 0) {
       out.add(t(
-          'You have ${c.medicineCount} medicines saved — worth a '
-              'pre-pregnancy review.',
+          'You\'ve saved ${c.medicineCount} medicines. They\'re worth '
+              'reviewing with a doctor before pregnancy.',
           'Aapne ${c.medicineCount} dawaiyan save ki hain — pregnancy se pehle '
               'review karwane layak.'));
     }
     if (c.vaccinesRecorded > 0) {
-      out.add(t('You have started your vaccination list.',
+      out.add(t("You've started your vaccine list.",
           'Aapne vaccination list shuru kar di hai.'));
     }
     return out;
@@ -521,7 +521,7 @@ class _TtcPrecheckScreenState extends State<TtcPrecheckScreen> {
                         const SizedBox(width: 9),
                         Expanded(
                           child: Text(
-                              t('Discussed with my doctor',
+                              t('I talked to my doctor about this',
                                   'Doctor se baat ho chuki hai'),
                               style: pvManrope(
                                   fontSize: 13.5, color: p.ink2)),
@@ -606,14 +606,14 @@ class _CountBar extends StatelessWidget {
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(
-              t('${counts.done} of ${counts.tracking} you are tracking are done',
+              t('${counts.done} of the ${counts.tracking} you\'re tracking are done',
                   '${counts.tracking} mein se ${counts.done} ho chuke hain'),
               style: pvJakarta(
                   fontSize: 15, fontWeight: FontWeight.w700, color: p.ink1)),
           if (counts.open > 0) ...[
             const SizedBox(height: 5),
             Text(
-                t('${counts.open} may be worth discussing',
+                t('${counts.open} may be worth asking a doctor about',
                     '${counts.open} par baat karna theek rahega'),
                 style: pvManrope(fontSize: 13, color: p.ink2)),
           ],

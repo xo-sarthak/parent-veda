@@ -47,16 +47,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../v2/v2_palette.dart';
-import '../../services/bracket_resolver.dart' show bracketById;
+// import '../../services/bracket_resolver.dart' show bracketById; // kept for revert: the old IVF gateway push (2026-09-26)
 import '../../theme/pv_fonts.dart';
-import '../../ttc/ttc_focus_data.dart' show ttcFocusPageFor;
+// import '../../ttc/ttc_focus_data.dart' show ttcFocusPageFor; // kept for revert: the old IVF gateway push (2026-09-26)
 import '../../ttc/ttc_prepare_data.dart'
     show kTtcOfferingAndrologist, ttcOfferingById;
 import '../../ttc/ttc_records_store.dart';
 import '../../ttc/ttc_semen_limits.dart';
 import '../../ttc/ttc_semen_reading.dart';
 import 'ttc_common.dart';
-import 'ttc_focus_screen.dart' show TtcFocusScreen;
+// import 'ttc_focus_screen.dart' show TtcFocusScreen; // kept for revert: the old IVF gateway push (2026-09-26)
+import 'doors/ttc_door_screen.dart' show openTtcDoor;
 import 'ttc_prepare_screen.dart';
 import 'ttc_surface_router.dart';
 import 'ttc_tool_chrome.dart';
@@ -174,10 +175,10 @@ class _TtcSemenReportScreenState extends State<TtcSemenReportScreen> {
       hue: kHisSideHue,
       eyebrow: 'His side',
       title: 'Read your\nsemen report.',
-      intro: 'Type in what the report says and it will be explained in plain '
-          'English. It will not tell you whether you are fertile — nothing '
-          'can from one sheet of paper — and every answer ends with somebody '
-          'to take it to.',
+      intro: "Type in what the report says and we'll explain it in plain "
+          "English. It won't tell you whether you're fertile, because nothing "
+          'can from one sheet of paper. Every answer ends with someone you can '
+          'take it to.',
       children: [
         ttcToolPad(Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -230,8 +231,9 @@ class _TtcSemenReportScreenState extends State<TtcSemenReportScreen> {
             _NumberQuestion(
               n: base + 1,
               title: 'Volume',
-              note: 'Printed on the report — the lab measures it, you do not. '
-                  'Optional, and it is reported here, not scored.',
+              note: "It's printed on the report, because the lab measures it, "
+                  "not you. This one is optional. It's shown here, not "
+                  'scored.',
               unit: 'ml',
               value: _volumeUnknown ? null : _e.volumeMl,
               enabled: !_volumeUnknown,
@@ -266,7 +268,7 @@ class _TtcSemenReportScreenState extends State<TtcSemenReportScreen> {
               n: base + 3,
               title: 'Days since the last ejaculation',
               note: 'The standard window is $kTtcAbstinenceMinDays to '
-                  '$kTtcAbstinenceMaxDays days. Leave it blank if you are not '
+                  '$kTtcAbstinenceMaxDays days. Leave it blank if you\'re not '
                   'sure.',
               unit: 'days',
               whole: true,
@@ -280,8 +282,8 @@ class _TtcSemenReportScreenState extends State<TtcSemenReportScreen> {
               n: base + 4,
               hue: kHisSideHue,
               title: 'Any of these?',
-              note: 'Tap anything that applies. Nothing here is common, and '
-                  'each one is a reason to see somebody before arranging '
+              note: 'Tap anything that applies. None of these is common, and '
+                  'each one is a reason to see someone before arranging '
                   'another sample.',
               // ⚠️ TICKS, BECAUSE MORE THAN ONE CAN BE TRUE. `TtcToolOptions`
               // draws a checkbox only when a question can hold several
@@ -581,7 +583,7 @@ class _Result extends StatelessWidget {
             const SizedBox(height: 10),
             TtcToolSecondary(
               label: kept
-                  ? 'Kept with your reports — open the folder'
+                  ? 'Kept with your reports. Open the folder'
                   : 'Keep his reports with yours',
               onTap: onKeep,
             ),
@@ -592,10 +594,10 @@ class _Result extends StatelessWidget {
             // ⚠️ THE LAST WORD ON EVERY PATH. Not a legal line — the actual
             // limit of what this screen did, said plainly.
             Text(
-                'This explains numbers against a published reference. It is '
-                'not a diagnosis and it cannot tell you whether you will '
-                'conceive. An andrologist reads these values together, and in '
-                'the context of everything else about you.',
+                'This explains numbers against a published reference. It '
+                "isn't a diagnosis, and it can't tell you whether you'll "
+                'conceive. An andrologist reads these values together, along '
+                'with everything else about you.',
                 style: ttcBody(12, color: ttcMuted, h: 1.6)),
             const SizedBox(height: 30),
           ],
@@ -617,7 +619,7 @@ class _LineCard extends StatelessWidget {
           Text(line.limit.name,
               style: ttcBody(13.5, color: ttcMuted, w: FontWeight.w700)),
           const SizedBox(height: 5),
-          Text('Not entered. Nothing has been guessed for it.',
+          Text("Not entered, so we haven't guessed a number for it.",
               style: ttcBody(12.5, color: ttcMuted, h: 1.45)),
         ]),
       );
@@ -681,14 +683,18 @@ class _IvfGateway extends StatelessWidget {
   const _IvfGateway();
 
   void _open(BuildContext context) {
-    // Same wiring gate as `openTtcFocusTile`: an unknown bracket opens nothing.
-    final page = ttcFocusPageFor(_kIvfBracket);
-    final bracket = bracketById(_kIvfBracket);
-    if (page == null || bracket == null) return;
-    Navigator.of(context).push(MaterialPageRoute<void>(
-      settings: const RouteSettings(name: 'ttc/focus/$_kIvfBracket'),
-      builder: (_) => TtcFocusScreen(page: page, bracket: bracket),
-    ));
+    // The one door opener (2026-09-26): the new door, same route name, same
+    // wiring gate (an unknown bracket opens nothing). The old push, kept for
+    // revert:
+    //
+    // final page = ttcFocusPageFor(_kIvfBracket);
+    // final bracket = bracketById(_kIvfBracket);
+    // if (page == null || bracket == null) return;
+    // Navigator.of(context).push(MaterialPageRoute<void>(
+    //   settings: const RouteSettings(name: 'ttc/focus/$_kIvfBracket'),
+    //   builder: (_) => TtcFocusScreen(page: page, bracket: bracket),
+    // ));
+    openTtcDoor(context, _kIvfBracket);
   }
 
   @override
@@ -727,9 +733,9 @@ class _IvfGateway extends StatelessWidget {
                         style: ttcJakarta(15.5)),
                     const SizedBox(height: 4),
                     Text(
-                        'A normal result on his side moves the question to '
-                        'the two of you. The readiness read there is six '
-                        'questions — never a score.',
+                        'A normal result on his side turns the question to '
+                        'the two of you. The readiness check there asks six '
+                        'questions and never gives a score.',
                         style: ttcBody(12.5, color: ttcSoft, h: 1.5)),
                   ],
                 ),

@@ -25,6 +25,7 @@ import 'package:parentveda/ttc/ttc_care_pathway.dart';
 import 'package:parentveda/ttc/ttc_log_store.dart';
 import 'package:parentveda/ttc/ttc_store.dart';
 import 'package:parentveda/ttc/ttc_symptom_data.dart';
+import 'package:parentveda/ttc/ttc_treatment_store.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -111,6 +112,12 @@ void main() {
       // because the card looks so harmless.
       history();
       TtcStore.instance.setPath(TtcPath.ivf);
+      // 2026-09-26: a clinic owns the timing only with a real date from
+      // her clinic for this cycle in the treatment tracker, never on the
+      // pathway label alone. Kept for revert: the label alone did it.
+      TtcTreatmentStore.instance.setDate(TtcTreatmentStep.betaTest,
+          DateTime.now().add(const Duration(days: 20)));
+      addTearDown(TtcTreatmentStore.instance.resetForTest);
       final ids = ttcInsightsFor(day(0)).map((c) => c.id);
       expect(ids, isNot(contains('chance')));
     });

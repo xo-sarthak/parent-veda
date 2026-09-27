@@ -171,6 +171,33 @@ const List<TtcSymptomGroup> kTtcSymptomGroups = [
           label: 'Tearful',
           icon: Icons.water_drop_outlined,
           hue: 206),
+      // ⚠️ FOUR FEELINGS THAT BELONG TO TRYING (gap analysis, Behind ›
+      // Logging, 2026-09-26). The first eight are feelings anyone has; these
+      // are the ones a month of trying brings. New ids, appended, never a
+      // rename of an old one. No emoji: they draw faces like the rest.
+      //
+      // The last three, logged three days running, bring up one gentle line
+      // in the logger. See `kTtcHardThoughtIds` in `ttc_logging_extras.dart`.
+      TtcSymptom(
+          id: 'hopeful',
+          label: 'Hopeful',
+          icon: Icons.wb_twilight_rounded,
+          hue: 160),
+      TtcSymptom(
+          id: 'guilty',
+          label: 'Guilty',
+          icon: Icons.mood_bad_outlined,
+          hue: 268),
+      TtcSymptom(
+          id: 'cant_stop_thinking',
+          label: "Can't stop thinking about it",
+          icon: Icons.loop_rounded,
+          hue: 268),
+      TtcSymptom(
+          id: 'hard_on_myself',
+          label: 'Hard on myself',
+          icon: Icons.sentiment_dissatisfied_outlined,
+          hue: 344),
     ],
   ),
 
@@ -181,7 +208,7 @@ const List<TtcSymptomGroup> kTtcSymptomGroups = [
     symptoms: [
       TtcSymptom(
           id: 'all_fine',
-          label: 'Everything is fine',
+          label: "Everything's fine",
           icon: Icons.check_circle_outline_rounded,
           hue: 160),
       TtcSymptom(
@@ -224,7 +251,7 @@ const List<TtcSymptomGroup> kTtcSymptomGroups = [
           hue: 42),
       TtcSymptom(
           id: 'insomnia',
-          label: 'Could not sleep',
+          label: "Couldn't sleep",
           icon: Icons.nightlight_outlined,
           hue: 268),
       TtcSymptom(
@@ -244,8 +271,8 @@ const List<TtcSymptomGroup> kTtcSymptomGroups = [
     id: 'discharge',
     title: 'Discharge',
     hue: 206,
-    note: 'The clearest free sign of the fertile window — clear, wet and '
-        'stretchy means the days that matter are close.',
+    note: 'The clearest free sign of your fertile days. Clear, wet and '
+        'stretchy means your most fertile days are close.',
     symptoms: [
       TtcSymptom(
           id: 'disch_none',
@@ -327,7 +354,7 @@ const List<TtcSymptomGroup> kTtcSymptomGroups = [
     symptoms: [
       TtcSymptom(
           id: 'ov_none',
-          label: 'Did not test',
+          label: "Didn't test",
           icon: Icons.remove_rounded,
           hue: 206),
       TtcSymptom(
@@ -348,12 +375,12 @@ const List<TtcSymptomGroup> kTtcSymptomGroups = [
     title: 'Pregnancy test',
     hue: 268,
     single: true,
-    note: 'Recorded, never interpreted. A positive here is yours to confirm '
-        'with a doctor.',
+    note: "We note it and never read into it. If it's positive, please "
+        'confirm it with a doctor.',
     symptoms: [
       TtcSymptom(
           id: 'pt_none',
-          label: 'Did not test',
+          label: "Didn't test",
           icon: Icons.remove_rounded,
           hue: 206),
       TtcSymptom(
@@ -407,6 +434,17 @@ const List<TtcSymptomGroup> kTtcSymptomGroups = [
           label: 'Meditated',
           icon: Icons.spa_rounded,
           hue: 268),
+      // Added 2026-09-26 (gap analysis, Behind › Logging). New ids.
+      TtcSymptom(
+          id: 'kegels',
+          label: 'Kegels',
+          icon: Icons.compress_rounded,
+          hue: 344),
+      TtcSymptom(
+          id: 'breathing',
+          label: 'Breathing',
+          icon: Icons.air_rounded,
+          hue: 206),
     ],
   ),
 ];

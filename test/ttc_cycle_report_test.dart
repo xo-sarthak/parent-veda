@@ -24,6 +24,7 @@ import 'package:parentveda/ttc/ttc_cycle_report.dart';
 import 'package:parentveda/ttc/ttc_log_store.dart';
 import 'package:parentveda/ttc/ttc_store.dart';
 import 'package:parentveda/ttc/ttc_symptom_data.dart';
+import 'package:parentveda/ttc/ttc_treatment_store.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -118,6 +119,12 @@ void main() {
         logSymptom('cramping', d);
       }
       TtcStore.instance.setPath(TtcPath.ivf);
+      // 2026-09-26: a clinic owns the timing only with a real date from
+      // her clinic for this cycle in the treatment tracker, never on the
+      // pathway label alone. Kept for revert: the label alone did it.
+      TtcTreatmentStore.instance.setDate(TtcTreatmentStep.betaTest,
+          DateTime.now().add(const Duration(days: 20)));
+      addTearDown(TtcTreatmentStore.instance.resetForTest);
 
       final r = ttcBuildCycleReport();
       expect(r.state, TtcReportState.clinicHeld);
@@ -133,6 +140,12 @@ void main() {
       cleanHistory();
       logSymptom('fatigue', 1);
       TtcStore.instance.setPath(TtcPath.ivf);
+      // 2026-09-26: a clinic owns the timing only with a real date from
+      // her clinic for this cycle in the treatment tracker, never on the
+      // pathway label alone. Kept for revert: the label alone did it.
+      TtcTreatmentStore.instance.setDate(TtcTreatmentStep.betaTest,
+          DateTime.now().add(const Duration(days: 20)));
+      addTearDown(TtcTreatmentStore.instance.resetForTest);
       final r = ttcBuildCycleReport();
       expect(r.logged.first.symptoms, contains('fatigue'));
     });
@@ -240,6 +253,12 @@ void main() {
       cleanHistory();
       logSymptom('fatigue', 1);
       TtcStore.instance.setPath(TtcPath.ivf);
+      // 2026-09-26: a clinic owns the timing only with a real date from
+      // her clinic for this cycle in the treatment tracker, never on the
+      // pathway label alone. Kept for revert: the label alone did it.
+      TtcTreatmentStore.instance.setDate(TtcTreatmentStep.betaTest,
+          DateTime.now().add(const Duration(days: 20)));
+      addTearDown(TtcTreatmentStore.instance.resetForTest);
       await pump(tester);
     });
   });

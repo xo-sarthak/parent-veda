@@ -118,9 +118,9 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
                         t(
                             'For most people this is one blood test that comes '
                                 'back fine. About 85 in 100 Indian women are '
-                                'already immune to rubella — the test is to '
-                                'find out which you are, not to find something '
-                                'wrong.',
+                                'already immune to rubella. The test is to find '
+                                'out which group you\'re in, not to find '
+                                'something wrong.',
                             'Zyadatar logon ke liye ye ek blood test hai jo '
                                 'theek aata hai. Lagbhag 100 mein se 85 Indian '
                                 'auratein pehle se rubella immune hoti hain — '
@@ -161,7 +161,7 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
                         p,
                         t('BEFORE YOU START TRYING',
                             'KOSHISH SHURU KARNE SE PEHLE'),
-                        t('These can add a month. Record what you find out.',
+                        t('These can add a month. Note down what you find out.',
                             'In se ek mahina lag sakta hai. Jo pata chale, '
                                 'yahan darj karein.')),
                     const SizedBox(height: 14),
@@ -233,10 +233,10 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
 
     if (until != null) {
       final days = until.difference(DateTime.now()).inDays + 1;
-      head = t('Worth waiting until ${_date(until)}',
+      head = t('Best to wait until ${_date(until)}',
           '${_date(until)} tak rukna behtar');
       body = t(
-          'That is about $days more ${days == 1 ? 'day' : 'days'}, counted '
+          'That\'s about $days more ${days == 1 ? 'day' : 'days'}, counted '
               'from your live vaccine. Nothing else on this page needs a wait.',
           'Lagbhag $days aur din, live vaccine se gina hua. Is page par aur '
               'kisi cheez ke liye rukna nahi hai.');
@@ -247,12 +247,12 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
       // useful thing to tell her is that the clock starts when she acts — so
       // acting today is the shortest possible version of this. Never "you
       // must wait"; always "the sooner it is done, the sooner it is over".
-      head = t('$names to have, then a month',
+      head = t('$names first, then a month\'s wait',
           '$names lagwana hai, phir ek mahina');
       body = t(
-          'The month counts from the dose, not from today — so booking it '
-              'this week is the shortest version of this. Nothing else on the '
-              'list needs a wait.',
+          'The month counts from the dose, not from today. So booking it '
+              'this week gets it over with soonest. Nothing else on the list '
+              'needs a wait.',
           'Mahina dose se ginta hai, aaj se nahi — toh isi hafte lagwa lena '
               'sabse chhota rasta hai. List par aur kisi cheez ke liye rukna '
               'nahi hai.');
@@ -268,8 +268,8 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
       head = t('One blood test settles most of this',
           'Ek blood test se zyadatar baat saaf ho jaati hai');
       body = t(
-          'Rubella is the one worth doing first. If it comes back immune — '
-              'which it usually does — there is nothing further to do here.',
+          'Rubella is the one worth doing first. If it shows you\'re immune, '
+              'as it usually does, there\'s nothing more to do here.',
           'Rubella sabse pehle karwane layak hai. Agar immune aaya — jo aksar '
               'aata hai — toh yahan aur kuch karna nahi hai.');
       icon = Icons.science_outlined;
@@ -277,8 +277,8 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
       head = t('Nothing here is holding you back',
           'Yahan kuch bhi aapko rok nahi raha');
       body = t(
-          'Based on what you have recorded. If a result changes, update it '
-              'here so the date stays right.',
+          'This is based on what you\'ve recorded. If a result changes, '
+              'update it here so the date stays right.',
           'Jo aapne darj kiya uske hisaab se. Koi result badle toh yahan bhi '
               'badal dein, taaki tareekh sahi rahe.');
       icon = Icons.check_rounded;
@@ -326,7 +326,7 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(
-              t('YOU WILL NEED TO ASK', 'AAPKO MAANGNA HOGA'),
+              t('YOU\'LL NEED TO ASK', 'AAPKO MAANGNA HOGA'),
               style: pvManrope(
                   fontSize: 10.5,
                   fontWeight: FontWeight.w800,
@@ -337,9 +337,9 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
               t(
                   'India\'s public programme covers Td at ten and sixteen, and '
                       'tetanus cover in pregnancy. Everything else here is '
-                      'private — you pay for it, and a routine antenatal visit '
-                      'will not ask whether you are rubella immune. Take this '
-                      'list with you.',
+                      'private. You pay for it, and a routine pregnancy '
+                      'check-up won\'t ask if you\'re immune to rubella. Take '
+                      'this list with you.',
                   'India ke public programme mein Td das aur solah saal par '
                       'milta hai, aur pregnancy mein tetanus. Baaki sab private '
                       'hai — paisa lagta hai, aur aam antenatal visit mein koi '
@@ -382,8 +382,8 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
           const SizedBox(height: 6),
           Text(
               t(
-                  'One blood draw covers all of them, and everything else on '
-                      'this page follows from the result.',
+                  'One blood sample covers all of them. Everything else on '
+                      'this page depends on the result.',
                   'Ek hi blood test mein teenon ho jaate hain, aur is page ki '
                       'baaki har cheez uske result par tiki hai.'),
               style: pvManrope(fontSize: 13.5, height: 1.6, color: p.ink2)),
@@ -448,9 +448,9 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
                     const SizedBox(height: 5),
                     Text(
                         t(
-                            'Nothing here needs deciding today — two happen '
-                                'during pregnancy, and one you almost certainly '
-                                'already have.',
+                            'Nothing here needs deciding today. Two happen '
+                                'during pregnancy, and you almost certainly '
+                                'have the other one already.',
                             'Yahan aaj kuch tay nahi karna — do pregnancy ke '
                                 'dauraan hote hain, aur ek lagbhag pakka aapke '
                                 'paas pehle se hai.'),
@@ -476,7 +476,7 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
         _groupHead(
             p,
             t('LATER, IN PREGNANCY', 'BAAD MEIN, PREGNANCY MEIN'),
-            t('Given at 27 to 36 weeks. Worth knowing so you can ask then.',
+            t('Given at 27 to 36 weeks. Good to know now, so you can ask then.',
                 '27 se 36 hafte ke beech. Pata ho toh tab maang sakti hain.')),
         const SizedBox(height: 14),
         for (final v in later) ...[
@@ -487,7 +487,7 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
         _groupHead(
             p,
             t('YOU ALMOST CERTAINLY HAVE THIS', 'YE LAGBHAG PAKKA HAI'),
-            t('Covered by the public programme, at ten and sixteen.',
+            t('The public programme gives this at ten and sixteen.',
                 'Sarkari programme mein, das aur solah saal par.')),
         const SizedBox(height: 14),
         for (final v in background) ...[
@@ -607,7 +607,8 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
                         t('PUBLIC PROGRAMME', 'SARKARI PROGRAMME'),
                         LocalizedText(
                             en: 'Covered by the Universal Immunization '
-                                'Programme — the one thing here that is.',
+                                'Programme. It\'s the only one on this page '
+                                'that is.',
                             hi: 'Universal Immunization Programme mein shaamil '
                                 '— is page par sirf yahi.')),
                   if (!interactive) const SizedBox(height: 2),
@@ -724,9 +725,9 @@ class _TtcVaccinesScreenState extends State<TtcVaccinesScreen> {
 
   Widget _disclaimer(V2Palette p, String Function(String, String) t) => Text(
       t(
-          'This records what you tell it and explains what is usually advised. '
-              'Which vaccine you need, and when, is your doctor\'s decision — '
-              'take this list to them rather than acting on it alone.',
+          'This keeps a note of what you tell it and explains what\'s usually '
+              'advised. Which vaccine you need, and when, is your doctor\'s '
+              'decision. Take this list to them instead of acting on it alone.',
           'Ye wahi darj karta hai jo aap batate hain, aur ye batata hai ki aam '
               'taur par kya salaah hoti hai. Aapko kaunsa vaccine chahiye aur '
               'kab — ye faisla aapke doctor ka hai. Ye list unke paas le '

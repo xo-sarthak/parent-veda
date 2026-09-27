@@ -112,9 +112,12 @@ void main() {
 
     test('IVF is grouped too, in the brief order', () {
       expect(ivf.groups, isNotNull);
+      // 'Age and second baby' added 2026-09-26 from the TTC gap analysis
+      // (docs/TTC-GAP-PLAN.md §3 A), a decision, not a drift.
       expect([for (final g in ivf.groups!) g.label], [
         'Understand',
         'Should I get help?',
+        'Age and second baby',
         'Money and clinics',
         'Going through it',
         'Track',

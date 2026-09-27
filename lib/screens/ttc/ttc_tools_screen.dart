@@ -11,11 +11,59 @@
 //  Where a tile is not built yet it says so on tap rather than doing nothing.
 //  The `built` flag on each entry is what the wiring test asserts against, so
 //  a tile cannot quietly claim to work.
+//
+//  ⚠️ THE REVIEW PASS, 2026-09-26 (reviewer MR, scratchpad mobbin_review.md
+//  §2b). What changed:
+//    T1  the V3 tab header, the one Learn uses: a large display title and one
+//        line, no wordmark, no coral eyebrow. The profile circle stays ONLY on
+//        V1, whose bar has no You tab; on V3 the bar's You is the way there.
+//        Mobbin: Apple Health Search, a large title then the list (AH-SEARCH,
+//        https://mobbin.com/screens/cd8919aa-c470-48b8-8716-54343395eab2).
+//    T2  the lists are unboxed: `PvRowGroup` + `PvListRow`, the row Learn and
+//        the store use (DESIGN-SYSTEM §4.13 "Lists are not boxed").
+//    T3  each group has a hue and every tool's glyph sits in that tint's well
+//        in the tint's own ink, instead of 25 identical violet glyphs (violet
+//        is for eyebrows, links, switches and progress only, §4.0). The hue is
+//        the matching door's, so a colour means one subject across the stage.
+//        Mobbin: AH-SEARCH (category colour on each glyph) and Fresha search
+//        (https://mobbin.com/screens/86a0b800-40fe-4cbe-a1b6-1355f84bd38d).
+//    T4  the field is `PvLiveSearchField` on a `PvLiveSearch`, the flow every
+//        door and Learn use (focus rides the field up, Back twice), not a
+//        third copy of the pill. Matching is the doors' word-prefix rule.
+//    T5  every search ends on "Ask Veda about …", as Learn and the doors do.
+//    E11 a search also lists what the library has on it, from the same index
+//        Learn searches (`ttcLibraryIndex`): "HSG" offers the read as well as
+//        any tool. Tools stays the tools list first.
+//    T6  rows and the quick cards press (`PvPress`) and answer with a haptic.
+//    T7  "See a specialist?" wears a compass, not the headset "Talk to an
+//        expert" already wears.
+//    Y2  "Cycle companion", "Fertility window" and "Records and reports" are
+//        spelt here once and the You tab reads them from `ttcToolById`, so
+//        the two tabs cannot drift. The cycle and window tiles open the same
+//        surfaces You and the doors open (`ttc_cycle`, `ttc_window`); the
+//        window tile used to open the pre-design screen the surface router
+//        calls unreached.
 // =============================================================================
 
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../../localization/app_language.dart';
+import '../../theme/pv_fonts.dart';
+import '../../ttc/ttc_content_prefs.dart';
 import '../../ttc/ttc_log_store.dart';
+import '../../widgets/global_ask_fab.dart' show FabState, kAskVedaRoute;
+import '../../widgets/pv_feedback.dart';
+import '../../widgets/pv_nav_bar.dart' show pvNavClearance;
+import '../doors/pv_list_row.dart';
+import '../doors/pv_live_search.dart';
+import '../products/pv_store_chrome.dart' show PvRoundIcon, pvStorePalette;
+import '../v2/v2_palette.dart';
+import 'doors/ttc_door_search.dart' show TtcDoorHit, TtcDoorHitRow, openTtcDoorHit;
+import 'ttc_askveda_screen.dart';
+import 'ttc_home_version.dart';
+import 'ttc_learn_screen.dart' show ttcLibraryIndex, ttcLibrarySearch;
+import 'ttc_profile_screen.dart' show openTtcProfile;
 import '../../ttc/ttc_records_store.dart';
 import '../../services/medicine_store.dart';
 import '../../ttc/ttc_supplements_store.dart';
@@ -81,11 +129,17 @@ class TtcToolGroup {
     required this.titleEn,
     required this.titleHi,
     required this.tools,
+    this.hue = 268,
   });
 
   final String titleEn;
   final String titleHi;
   final List<TtcTool> tools;
+
+  /// The tint of every well in the group (T3). Each is the hue of the door
+  /// that holds the same subject (`kTtcBrackets`), so a colour keeps one
+  /// meaning across the stage.
+  final double hue;
 
   String title(bool hi) => hi ? titleHi : titleEn;
 }
@@ -99,22 +153,27 @@ final List<TtcToolGroup> ttcToolGroups = [
   TtcToolGroup(
     titleEn: 'Your body',
     titleHi: 'Aapka body',
+    // Body and cycle's hue.
+    hue: 172,
     tools: [
+      // ⚠️ Y2 (2026-09-26): one name, one icon, one line and one destination
+      // for this tool on both tabs. You reads all four from here. Kept for
+      // revert: icon favorite_outline_rounded, 'Cycle Companion',
+      // 'Your periods, and what they say', and a push of TtcCycleScreen at
+      // 'ttc/cycle'.
       TtcTool(
         id: 'cycle',
-        icon: Icons.favorite_outline_rounded,
-        nameEn: 'Cycle Companion',
+        icon: Icons.timeline_rounded,
+        nameEn: 'Cycle companion',
         nameHi: 'Cycle Companion',
-        descEn: 'Your periods, and what they say',
+        descEn: 'Your periods, and what they tell you',
         descHi: 'Aapke periods, aur unka matlab',
-        open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
-            builder: (_) => const TtcCycleScreen(),
-            settings: const RouteSettings(name: 'ttc/cycle'))),
+        open: (c) => openTtcSurface(c, 'ttc_cycle'),
       ),
       TtcTool(
         id: 'ovulation',
         icon: Icons.egg_outlined,
-        nameEn: 'Ovulation Companion',
+        nameEn: 'Ovulation companion',
         nameHi: 'Ovulation Companion',
         descEn: 'Signs your body gives',
         descHi: 'Body ke ishaare',
@@ -122,21 +181,25 @@ final List<TtcToolGroup> ttcToolGroups = [
             builder: (_) => const TtcOvulationScreen(),
             settings: const RouteSettings(name: 'ttc/ovulation'))),
       ),
+      // ⚠️ Y2: the designed window screen, through the surface every other
+      // entrance uses. This tile alone still pushed the pre-design
+      // `TtcFertilityWindowScreen`, which `ttc_surface_router.dart` records
+      // as no longer reached. Kept for revert: 'Fertility Window',
+      // 'The days that matter most', a push of TtcFertilityWindowScreen at
+      // 'ttc/window'.
       TtcTool(
         id: 'window',
         icon: Icons.wb_twilight_rounded,
-        nameEn: 'Fertility Window',
+        nameEn: 'Fertility window',
         nameHi: 'Fertility Window',
-        descEn: 'The days that matter most',
+        descEn: 'The days that count most this cycle',
         descHi: 'Sabse ahem din',
-        open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
-            builder: (_) => const TtcFertilityWindowScreen(),
-            settings: const RouteSettings(name: 'ttc/window'))),
+        open: (c) => openTtcSurface(c, 'ttc_window'),
       ),
       TtcTool(
         id: 'symptoms',
         icon: Icons.healing_outlined,
-        nameEn: 'Symptom Companion',
+        nameEn: 'Symptom companion',
         nameHi: 'Symptom Companion',
         descEn: 'Notice patterns, never diagnose',
         descHi: 'Pattern dekhein, diagnose nahi',
@@ -147,7 +210,7 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.monitor_weight_outlined,
         nameEn: 'Weight',
         nameHi: 'Wazan',
-        descEn: 'A number, not a verdict',
+        descEn: 'Just a number, not a judgement',
         descHi: 'Ek number, faisla nahi',
         open: (c) => openTtcTracker(c, 'weight'),
       ),
@@ -213,16 +276,17 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.straighten_rounded,
         nameEn: 'Weight and fertility',
         nameHi: 'Wazan aur fertility',
-        descEn: 'What a BMI does and does not say',
+        descEn: "What BMI does and doesn't tell you",
         descHi: 'BMI kya kehta hai, kya nahi',
         open: (c) => openTtcSurface(c, 'ttc_bmi'),
       ),
       TtcTool(
         id: 'fertility_help',
-        icon: Icons.support_agent_outlined,
+        // T7: a compass. The headset is "Talk to an expert"'s.
+        icon: Icons.explore_outlined,
         nameEn: 'See a specialist?',
         nameHi: 'Specialist se milein?',
-        descEn: 'Whether it is time yet',
+        descEn: 'Is it time yet?',
         descHi: 'Kya ab waqt hai',
         open: (c) => openTtcSurface(c, 'ttc_fertility_help'),
       ),
@@ -231,11 +295,13 @@ final List<TtcToolGroup> ttcToolGroups = [
   TtcToolGroup(
     titleEn: 'Both of you',
     titleHi: 'Aap dono',
+    // His side's hue.
+    hue: 186,
     tools: [
       TtcTool(
         id: 'partner_health',
         icon: Icons.male_rounded,
-        nameEn: 'Partner Health',
+        nameEn: 'Partner health',
         nameHi: 'Partner ki sehat',
         descEn: 'His half of this',
         descHi: 'Unka aadha hissa',
@@ -246,7 +312,7 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.mood_outlined,
         nameEn: 'Mood',
         nameHi: 'Mood',
-        descEn: 'How the day actually felt',
+        descEn: 'How the day really felt',
         descHi: 'Din asal mein kaisa tha',
         open: (c) => openTtcTracker(c, 'mood'),
       ),
@@ -256,7 +322,7 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.spa_outlined,
         nameEn: 'Stress',
         nameHi: 'Stress',
-        descEn: 'What is weighing on you',
+        descEn: "What's weighing on you",
         descHi: 'Kya bojh mehsoos ho raha',
         open: (c) => openTtcTracker(c, 'stress'),
       ),
@@ -286,7 +352,25 @@ final List<TtcToolGroup> ttcToolGroups = [
   TtcToolGroup(
     titleEn: 'Care and medicines',
     titleHi: 'Dekhbhaal aur dawaiyan',
+    // IVF and IUI's hue, the clinic door.
+    hue: 206,
     tools: [
+      // ⚠️ TALK TO AN EXPERT LEFT THE BAR — 2026-09-26. The V3 bar became
+      // Today · Learn · Products · Tools · You, and the consults it opened
+      // are this tile now (the home keeps its Talk to experts rail). Same
+      // screen, same route name, so `ttcV3ActiveFor` lights Tools for it.
+      // 24 -> 25.
+      TtcTool(
+        id: 'expert',
+        icon: Icons.support_agent_outlined,
+        nameEn: 'Talk to an expert',
+        nameHi: 'Talk to an expert',
+        descEn: 'A private video call with a specialist',
+        descHi: 'A private video call with a specialist',
+        open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
+            builder: (_) => const TtcPrepareScreen(onlyCategory: 'consults'),
+            settings: const RouteSettings(name: 'ttc/consults'))),
+      ),
       // Two tiles, because they are two different things and the single
       // "Supplements & medication" tile could only ever do one of them.
       //
@@ -300,7 +384,7 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.eco_outlined,
         nameEn: 'Supplements',
         nameHi: 'Supplements',
-        descEn: 'What is worth taking, and why',
+        descEn: "What's worth taking, and why",
         descHi: 'Kya lena theek hai, aur kyun',
         open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
             builder: (_) => const TtcSupplementsScreen(),
@@ -318,7 +402,7 @@ final List<TtcToolGroup> ttcToolGroups = [
       TtcTool(
         id: 'tests',
         icon: Icons.biotech_outlined,
-        nameEn: 'Medical Tests',
+        nameEn: 'Medical tests',
         nameHi: 'Medical Tests',
         descEn: 'What each one tells you',
         descHi: 'Har test kya batata hai',
@@ -338,9 +422,10 @@ final List<TtcToolGroup> ttcToolGroups = [
       TtcTool(
         id: 'records',
         icon: Icons.folder_shared_outlined,
-        nameEn: 'Records & reports',
+        // Y2. Kept for revert: 'Records & reports'.
+        nameEn: 'Records and reports',
         nameHi: 'Records aur reports',
-        descEn: 'Both of your results, one place',
+        descEn: 'Both your results, in one place',
         descHi: 'Dono ke results, ek jagah',
         open: openTtcRecords,
       ),
@@ -358,6 +443,8 @@ final List<TtcToolGroup> ttcToolGroups = [
   TtcToolGroup(
     titleEn: 'Plan and learn',
     titleHi: 'Plan aur seekhein',
+    // Getting ready's hue.
+    hue: 104,
     tools: [
       // ⚠️ COURSES LEFT THE BAR — 2026-09-17. Slot 2 of the V3 bar became the
       // unified store (docs/PRODUCTS-AUDIT.md); the courses hub is the first
@@ -387,7 +474,7 @@ final List<TtcToolGroup> ttcToolGroups = [
       TtcTool(
         id: 'nutrition',
         icon: Icons.restaurant_outlined,
-        nameEn: 'Nutrition Planner',
+        nameEn: 'Nutrition planner',
         nameHi: 'Nutrition Planner',
         descEn: 'A week of ideas, not a plan',
         descHi: 'Hafte bhar ke ideas, plan nahi',
@@ -396,9 +483,9 @@ final List<TtcToolGroup> ttcToolGroups = [
       TtcTool(
         id: 'map',
         icon: Icons.map_outlined,
-        nameEn: 'Journey Map',
+        nameEn: 'Journey map',
         nameHi: 'Journey Map',
-        descEn: 'The whole journey, at a glance',
+        descEn: 'Everything so far, at a glance',
         descHi: 'Poora safar, ek nazar mein',
         open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
             builder: (_) => const TtcJourneyMapScreen(),
@@ -409,7 +496,7 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.help_outline_rounded,
         nameEn: 'Can I...?',
         nameHi: 'Kya main...?',
-        descEn: 'The everyday worries, settled',
+        descEn: 'Quick answers to everyday worries',
         descHi: 'Rozmarra ki chinta, hal',
         open: openTtcCanI,
       ),
@@ -427,7 +514,7 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.verified_outlined,
         nameEn: 'Worth knowing about',
         nameHi: 'Jaanne layak',
-        descEn: 'Research first, buy second',
+        descEn: 'Read first, buy later',
         descHi: 'Pehle research, phir kharid',
         open: openTtcProducts,
       ),
@@ -435,7 +522,90 @@ final List<TtcToolGroup> ttcToolGroups = [
   ),
 ];
 
-class TtcToolsScreen extends StatelessWidget {
+/// Which tools she opened last, newest first. Local only: a tapping
+/// shortcut, not history anyone else needs.
+///
+/// ⚠️ ORDER, NEVER STRUCTURE. This only decides which three tools sit in the
+/// strip at the top. Every group below still lists every tool, in its fixed
+/// place, whether she has used it or not (CLAUDE.md: personalisation changes
+/// order, never structure; a feature is never hidden).
+class TtcToolRecents extends ChangeNotifier {
+  TtcToolRecents._();
+  static final TtcToolRecents instance = TtcToolRecents._();
+
+  static const String kKey = 'ttc_tools_recent';
+  static const int _max = 3;
+
+  List<String> _ids = const [];
+  bool _loaded = false;
+  List<String> get ids => _ids;
+
+  Future<void> load() async {
+    if (_loaded) return;
+    _loaded = true;
+    try {
+      final p = await SharedPreferences.getInstance();
+      _ids = p.getStringList(kKey) ?? const [];
+      notifyListeners();
+    } catch (_) {/* local-first: none is a fine answer */}
+  }
+
+  Future<void> touch(String id) async {
+    _ids = [id, ..._ids.where((x) => x != id)].take(_max).toList();
+    notifyListeners();
+    try {
+      await (await SharedPreferences.getInstance()).setStringList(kKey, _ids);
+    } catch (_) {}
+  }
+
+  @visibleForTesting
+  void resetForTest() {
+    _ids = const [];
+    _loaded = false;
+  }
+}
+
+/// The heading over library hits in a tools search (E11). English only
+/// (CLAUDE.md, "New work is English").
+const String kTtcToolsFromLibrary = 'From the library';
+
+/// Where someone who has opened nothing yet usually starts.
+const List<String> kTtcToolsStartIds = ['cycle', 'window', 'precheck'];
+
+TtcTool? ttcToolById(String id) {
+  for (final g in ttcToolGroups) {
+    for (final t in g.tools) {
+      if (t.id == id) return t;
+    }
+  }
+  return null;
+}
+
+/// Tools whose name, purpose or group has a word starting with every word
+/// of [query]: the doors' rule (T4), so "sleep" finds the habits tool by its
+/// purpose line and "ppointment" does not find "Appointments".
+List<TtcTool> ttcToolsMatching(String query, bool hi) {
+  final words = query
+      .toLowerCase()
+      .split(RegExp(r'[^a-z0-9]+'))
+      .where((w) => w.isNotEmpty)
+      .toList();
+  if (words.isEmpty) return const [];
+  bool hasAll(String hay) {
+    final ws = hay.toLowerCase().split(RegExp(r'[^a-z0-9]+'));
+    return words.every((q) => ws.any((w) => w.startsWith(q)));
+  }
+
+  return [
+    for (final g in ttcToolGroups)
+      for (final tool in g.tools)
+        if (hasAll('${tool.nameEn} ${tool.descEn} ${tool.name(hi)} '
+            '${tool.desc(hi)} ${g.title(hi)} ${g.titleEn}'))
+          tool,
+  ];
+}
+
+class TtcToolsScreen extends StatefulWidget {
   const TtcToolsScreen({super.key});
 
   /// Total tile count, asserted in tests against the master document's 22.
@@ -443,9 +613,70 @@ class TtcToolsScreen extends StatelessWidget {
       ttcToolGroups.fold(0, (n, g) => n + g.tools.length);
 
   @override
+  State<TtcToolsScreen> createState() => _TtcToolsScreenState();
+}
+
+class _TtcToolsScreenState extends State<TtcToolsScreen> {
+  // ⚠️ 2026-09-26, FROM THE MOBBIN TOOLS BRIEF. The hub was a wall of two-up
+  // cards with no way to find one by name. Three things changed, the ones the
+  // good "all services" screens share (Binance's search on top, Apple Health's
+  // pinned row, Walmart's list with a purpose line):
+  //   · a field that filters by name AND purpose ("sleep" finds the habits
+  //     tool, whose name does not say sleep);
+  //   · a strip of the three she opened last, or three good first tools when
+  //     she has opened none (never empty, never a count);
+  //   · each group as a list: the line icon in its well, the name, one line
+  //     of what it is for, and her own state when it holds something of hers.
+  // The two-up grid is kept for revert as `_tile` below, unreached.
+  // T4: the shared search flow. Kept for revert: a bare
+  // `TextEditingController _q` behind the local `_SearchField` pill.
+  final PvLiveSearch _search = PvLiveSearch();
+
+  /// The library index for E11, rebuilt only when her content choice or the
+  /// language changes.
+  List<(TtcDoorHit, double)>? _index;
+  (bool, bool)? _indexFor;
+
+  @override
+  void initState() {
+    super.initState();
+    TtcToolRecents.instance.load();
+    // `TtcPage` did this, and this screen no longer sits in `TtcPage`: the
+    // Ask button appears only once something marks the app live, and a
+    // woman can land here first. Deferred a frame for the reason on TtcPage.
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => FabState.instance.markAppLive());
+  }
+
+  @override
+  void dispose() {
+    _search.dispose();
+    super.dispose();
+  }
+
+  void _open(BuildContext context, TtcTool tool) {
+    pvCommitFeedback();
+    TtcToolRecents.instance.touch(tool.id);
+    tool.open(context);
+  }
+
+  void _askVeda(String q) => Navigator.of(context).push(MaterialPageRoute<void>(
+        builder: (_) => TtcAskVedaScreen(initialQuery: q),
+        settings: const RouteSettings(name: kAskVedaRoute),
+      ));
+
+  static double _hueOf(TtcTool tool) {
+    for (final g in ttcToolGroups) {
+      if (g.tools.contains(tool)) return g.hue;
+    }
+    return 268;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: Listenable.merge([
+        _search,
         TtcLang.instance,
         TtcLogStore.instance,
         TtcSupplementsStore.instance,
@@ -455,48 +686,257 @@ class TtcToolsScreen extends StatelessWidget {
         MedicineStore.instance,
         TtcRecordsStore.instance,
         TtcAppointmentsStore.instance,
+        TtcToolRecents.instance,
+        TtcHomeVersionStore.instance,
       ]),
       builder: (context, _) {
+        final p = pvStorePalette;
         final t = TtcS.current();
         final hi = t.hinglish;
-        return TtcPage(
-          tab: 2,
-          header: const TtcHeader(),
-          children: [
-            ttcSectionTitle(t.toolsTitle, eyebrow: t.tabTools),
-            Text(t.toolsBody, style: ttcBody(14, h: 1.6)),
-            const SizedBox(height: 20),
-            for (final group in ttcToolGroups) ...[
-              ttcEyebrow(group.title(hi), color: ttcPurple),
-              const SizedBox(height: 11),
-              for (var i = 0; i < group.tools.length; i += 2) ...[
-                // IntrinsicHeight so a tile with a subtitle and one without
-                // still line up. Plain CrossAxisAlignment.stretch cannot be
-                // used here: inside a ListView it forces an infinite height
-                // constraint and the tab fails to lay out at all.
-                IntrinsicHeight(
-                  child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(child: _tile(context, group.tools[i], hi, t)),
-                        const SizedBox(width: 11),
-                        Expanded(
-                          child: i + 1 < group.tools.length
-                              ? _tile(context, group.tools[i + 1], hi, t)
-                              : const SizedBox(),
-                        ),
-                      ]),
+        return PvLiveSearchScope(
+          search: _search,
+          child: Scaffold(
+            backgroundColor: p.ground,
+            body: Stack(children: [
+              Positioned.fill(
+                child: ListView(
+                  padding: EdgeInsets.fromLTRB(
+                      0,
+                      MediaQuery.of(context).padding.top + 12,
+                      0,
+                      pvNavClearance(context)),
+                  children: [
+                    _header(p, t),
+                    const SizedBox(height: 14),
+                    _pad(PvLiveSearchField(
+                      search: _search,
+                      p: p,
+                      hint: t.toolsSearchHint,
+                    )),
+                    ConstrainedBox(
+                      constraints: BoxConstraints(
+                          minHeight: pvLiveSearchSheetMin(context, _search)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: _search.searching
+                            ? _results(context, p, t, hi)
+                            : _page(context, p, t, hi),
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 11),
-              ],
-              const SizedBox(height: 10),
-            ],
-          ],
+              ),
+              // A V1 index (2 = Tools): the bar translates it on V3 and keeps
+              // it on V1, as `TtcPage` did.
+              const Positioned(
+                left: 14,
+                right: 14,
+                bottom: 14,
+                child: SafeArea(top: false, child: TtcBottomNav(active: 2)),
+              ),
+            ]),
+          ),
         );
       },
     );
   }
 
+  static const double _g = 18;
+
+  Widget _pad(Widget child) => Padding(
+      padding: const EdgeInsets.symmetric(horizontal: _g), child: child);
+
+  /// T1: Learn's header. Kept for revert, the classic chrome:
+  ///   TtcPage(tab: 2, header: const TtcHeader(), children: [
+  ///     ttcSectionTitle(t.toolsTitle, eyebrow: t.tabTools),
+  ///     Text(t.toolsBody, style: ttcBody(14, h: 1.6)), ...])
+  Widget _header(V2Palette p, TtcS t) {
+    final v1 = TtcHomeVersionStore.instance.version == TtcHomeVersion.v1;
+    return _pad(Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(children: [
+          Expanded(
+            child: Text(t.tabTools,
+                style: pvFraunces(
+                    fontSize: 30,
+                    fontWeight: FontWeight.w500,
+                    height: 1.1,
+                    color: p.ink1)),
+          ),
+          // V1's bar has no You tab, so on V1 the profile stays one tap away
+          // here. On V3 the bar's You is that tap, and a second door to the
+          // same place would be the duplicate the review found.
+          if (v1)
+            PvRoundIcon(
+              icon: Icons.person_outline_rounded,
+              onTap: () => openTtcProfile(context),
+              size: 42,
+            ),
+        ]),
+        const SizedBox(height: 6),
+        PvLiveSearchWords(
+          search: _search,
+          child: Text(t.toolsBody,
+              style: pvManrope(fontSize: 14, height: 1.45, color: p.ink2)),
+        ),
+      ],
+    ));
+  }
+
+  Widget _eyebrow(V2Palette p, String s) => Text(s.toUpperCase(),
+      style: pvManrope(
+          fontSize: 11,
+          fontWeight: FontWeight.w800,
+          letterSpacing: 1.4,
+          color: p.action));
+
+  List<Widget> _page(BuildContext context, V2Palette p, TtcS t, bool hi) {
+    final recent = [
+      for (final id in TtcToolRecents.instance.ids) ?ttcToolById(id)
+    ];
+    final strip = recent.isNotEmpty
+        ? recent
+        : [for (final id in kTtcToolsStartIds) ?ttcToolById(id)];
+    return [
+      const SizedBox(height: 22),
+      _pad(_eyebrow(p, recent.isNotEmpty ? t.toolsRecent : t.toolsStartWith)),
+      const SizedBox(height: 11),
+      // IntrinsicHeight so three names of different lengths still line up; a
+      // bare stretch inside a ListView cannot lay out.
+      _pad(IntrinsicHeight(
+        child: Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
+          for (var i = 0; i < 3; i++) ...[
+            if (i > 0) const SizedBox(width: 10),
+            Expanded(
+              child: i < strip.length
+                  ? _quick(context, p, strip[i], hi)
+                  : const SizedBox(),
+            ),
+          ],
+        ]),
+      )),
+      for (final group in ttcToolGroups) ...[
+        const SizedBox(height: 28),
+        _pad(_eyebrow(p, group.title(hi))),
+        const SizedBox(height: 6),
+        _pad(PvRowGroup(p: p, children: [
+          for (final tool in group.tools) _row(context, p, tool, hi, group.hue),
+        ])),
+      ],
+      const SizedBox(height: 12),
+    ];
+  }
+
+  List<Widget> _results(BuildContext context, V2Palette p, TtcS t, bool hi) {
+    final q = _search.query;
+    final tools = ttcToolsMatching(q, hi);
+    final key = (
+      TtcContentPrefs.instance.hideIntimate,
+      TtcLang.instance.hinglish,
+    );
+    if (_index == null || _indexFor != key) {
+      _index = ttcLibraryIndex(
+          lang: key.$2 ? AppLanguage.hinglish : AppLanguage.english,
+          hideIntimate: key.$1);
+      _indexFor = key;
+    }
+    final library = ttcLibrarySearch(q, _index!).take(6).toList();
+    return [
+      const SizedBox(height: 14),
+      if (tools.isEmpty && library.isEmpty)
+        _pad(Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Text(t.toolsNoMatch,
+              style: pvManrope(fontSize: 14, height: 1.45, color: p.ink2)),
+        )),
+      if (tools.isNotEmpty)
+        _pad(PvRowGroup(p: p, children: [
+          for (final tool in tools) _row(context, p, tool, hi, _hueOf(tool)),
+        ])),
+      if (library.isNotEmpty) ...[
+        const SizedBox(height: 22),
+        _pad(_eyebrow(p, kTtcToolsFromLibrary)),
+        const SizedBox(height: 6),
+        for (final (h, hue) in library)
+          TtcDoorHitRow(
+            p: p,
+            hit: h,
+            onTap: () => openTtcDoorHit(context, h, hue: hue),
+          ),
+      ],
+      const SizedBox(height: 12),
+      _pad(PvLiveSearchWayOn(
+        p: p,
+        icon: Icons.auto_awesome_outlined,
+        title: t.learnAskVeda(q),
+        line: t.learnAskVedaLine,
+        onTap: () => _askVeda(q),
+      )),
+    ];
+  }
+
+  /// The quick strip: the group's well and the name. Three across. A white
+  /// card with one hairline (§4.0's card), pressing like every tile.
+  Widget _quick(BuildContext context, V2Palette p, TtcTool tool, bool hi) =>
+      PvPress(
+        child: Material(
+          color: Colors.white,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+              side: BorderSide(color: p.line)),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: () => _open(context, tool),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(12, 14, 12, 14),
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    PvMarkWell(
+                        p: p, hue: _hueOf(tool), size: 38, icon: tool.icon),
+                    const SizedBox(height: 10),
+                    Text(tool.name(hi),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: pvManrope(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            height: 1.3,
+                            color: p.ink1)),
+                  ]),
+            ),
+          ),
+        ),
+      );
+
+  /// One row of a group: the well in the group's hue, the name, what it is
+  /// for, and her own state as the small line when it holds something of hers.
+  Widget _row(BuildContext context, V2Palette p, TtcTool tool, bool hi,
+          double hue) =>
+      PvListRow(
+        key: ValueKey('ttc_tool_row_${tool.id}'),
+        p: p,
+        // A quiet marker of what has been logged, so an opened tool feels
+        // different from an untouched one, without ever becoming a score.
+        leading: PvMarkWell(p: p, hue: hue, size: 40, icon: tool.icon),
+        title: tool.name(hi),
+        line: tool.desc(hi),
+        lineMaxLines: 2,
+        meta: _subtitleFor(tool, hi),
+        onTap: () => _open(context, tool),
+      );
+
+  // Kept for revert: the two-up card grid that drew `_tile`. Not reached.
+  //   for (final group in ttcToolGroups) ...[
+  //     ttcEyebrow(group.title(hi), color: ttcPurple),
+  //     for (var i = 0; i < group.tools.length; i += 2)
+  //       IntrinsicHeight(child: Row(children: [
+  //         Expanded(child: _tile(context, group.tools[i], hi, t)),
+  //         Expanded(child: _tile(context, group.tools[i + 1], hi, t)),
+  //       ])),
+  //   ],
+  // ignore: unused_element
   Widget _tile(BuildContext context, TtcTool tool, bool hi, TtcS t) {
     // A quiet marker of what has been logged, so an opened tool feels different
     // from an untouched one - without ever becoming a score.
@@ -586,3 +1026,104 @@ class TtcToolsScreen extends StatelessWidget {
     }
   }
 }
+
+// ⚠️ KEPT FOR REVERT (T2, T3, T4 — 2026-09-26): the violet glyph in the
+// stage's one well, the radius-26 boxed list, and the third copy of the
+// search pill. `PvMarkWell`, `PvRowGroup`/`PvListRow` and `PvLiveSearchField`
+// replaced them.
+// /// The line icon in the stage's quiet well.
+// class _Well extends StatelessWidget {
+//   const _Well({required this.icon});
+//   final IconData icon;
+//
+//   @override
+//   Widget build(BuildContext context) => Container(
+//         width: 38,
+//         height: 38,
+//         alignment: Alignment.center,
+//         decoration: BoxDecoration(
+//           color: ttcPanel,
+//           borderRadius: BorderRadius.circular(12),
+//         ),
+//         child: Icon(icon, size: 20, color: ttcPurple),
+//       );
+// }
+//
+// /// White, one hairline, rows split by hairlines (DESIGN-SYSTEM §4.0 list row).
+// class _ListBox extends StatelessWidget {
+//   const _ListBox({required this.children});
+//   final List<Widget> children;
+//
+//   @override
+//   Widget build(BuildContext context) => Container(
+//         clipBehavior: Clip.antiAlias,
+//         decoration: BoxDecoration(
+//           color: Colors.white,
+//           borderRadius: BorderRadius.circular(ttcCardRadius),
+//           border: Border.all(color: ttcLine),
+//         ),
+//         child: Column(children: [
+//           for (var i = 0; i < children.length; i++) ...[
+//             if (i > 0)
+//               const Divider(
+//                   height: 1,
+//                   thickness: 1,
+//                   color: ttcLine,
+//                   indent: 14,
+//                   endIndent: 14),
+//             children[i],
+//           ],
+//         ]),
+//       );
+// }
+//
+// /// The find field: the base-UI search pill (48 high, white, hairline).
+// class _SearchField extends StatelessWidget {
+//   const _SearchField({required this.controller, required this.hint});
+//   final TextEditingController controller;
+//   final String hint;
+//
+//   @override
+//   Widget build(BuildContext context) => Container(
+//         height: 48,
+//         decoration: BoxDecoration(
+//           color: Colors.white,
+//           borderRadius: BorderRadius.circular(999),
+//           border: Border.all(color: ttcLine),
+//         ),
+//         child: Row(children: [
+//           const SizedBox(width: 14),
+//           const Icon(Icons.search_rounded, size: 19, color: ttcSoft),
+//           const SizedBox(width: 8),
+//           Expanded(
+//             child: TextField(
+//               controller: controller,
+//               textInputAction: TextInputAction.search,
+//               style: ttcBody(15, color: ttcInk),
+//               cursorColor: ttcInk,
+//               decoration: InputDecoration(
+//                 isDense: true,
+//                 hintText: hint,
+//                 hintStyle: ttcBody(15, color: ttcMuted),
+//                 border: InputBorder.none,
+//                 enabledBorder: InputBorder.none,
+//                 focusedBorder: InputBorder.none,
+//                 disabledBorder: InputBorder.none,
+//                 errorBorder: InputBorder.none,
+//                 focusedErrorBorder: InputBorder.none,
+//                 filled: false,
+//                 contentPadding: EdgeInsets.zero,
+//               ),
+//             ),
+//           ),
+//           if (controller.text.isNotEmpty)
+//             IconButton(
+//               onPressed: controller.clear,
+//               icon: const Icon(Icons.close_rounded, size: 18, color: ttcSoft),
+//               visualDensity: VisualDensity.compact,
+//             )
+//           else
+//             const SizedBox(width: 14),
+//         ]),
+//       );
+// }

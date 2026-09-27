@@ -120,7 +120,9 @@ void main() {
       // tile and the findability test above asserts it.
       // ⚠️ 23 -> 24 ON 2026-09-17. Courses left the V3 bar (slot 2 is the
       // unified store) and became the first tile of Plan and learn.
-      expect(TtcToolsScreen.toolCount, 24);
+      // ⚠️ 24 -> 25 ON 2026-09-26. "Talk to expert" left the V3 bar and
+      // became a Tools tile (Care and medicines), opening the same consults.
+      expect(TtcToolsScreen.toolCount, 25);
     });
 
     test('supplements and medication are not the same destination', () {
@@ -455,7 +457,7 @@ void main() {
       expect(find.text('Looking back'), findsOneWidget);
       // The rule the strip exists under: it describes, it never assesses.
       expect(
-          find.text('A blank space is a day you did not write anything down.'),
+          find.text("A blank space is a day you didn't write anything down."),
           findsOneWidget);
     });
 

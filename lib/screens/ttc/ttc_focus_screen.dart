@@ -51,7 +51,7 @@ import '../../localization/app_language.dart';
 import '../../models/pv_read.dart';
 import '../../models/bracket.dart';
 import '../../theme/pv_fonts.dart';
-import '../../services/bracket_resolver.dart';
+// import '../../services/bracket_resolver.dart'; // kept for revert: the old TtcDoorTile push (2026-09-26)
 import '../../ttc/ttc_focus_data.dart';
 import '../../data/nutrition_data.dart' show kRecipes;
 import '../../ttc/ttc_prepare_data.dart';
@@ -75,6 +75,8 @@ import 'ttc_shop_v3.dart';
 import 'ttc_strings.dart';
 import 'ttc_today_parts.dart' show showTtcRowSheet;
 import 'ttc_surface_router.dart';
+import 'ttc_read_blocks_view.dart' show ttcReadCustomBlock;
+import 'doors/ttc_door_screen.dart' show openTtcDoor;
 
 // -----------------------------------------------------------------------------
 //  Rail geometry
@@ -2630,16 +2632,21 @@ void openTtcFocusTile(BuildContext context, TtcTile tile, double hue) {
     // bracket with no focus page, and an unknown bracket id would otherwise
     // build a screen against a null page. Returning is the wiring gate: a card
     // naming a door that does not exist opens nothing, loudly, in the test.
+    //
+    // ⚠️ THE NEW DOOR SINCE 2026-09-26, through the one opener, same route
+    // name. The old push, kept for revert:
+    //
+    // final page = ttcFocusPageFor(bracketId);
+    // final bracket = bracketById(bracketId);
+    // if (page == null || bracket == null) return;
+    // Navigator.of(context).push(
+    //   MaterialPageRoute<void>(
+    //     settings: RouteSettings(name: 'ttc/focus/$bracketId'),
+    //     builder: (_) => TtcFocusScreen(page: page, bracket: bracket),
+    //   ),
+    // );
     case TtcDoorTile(:final bracketId):
-      final page = ttcFocusPageFor(bracketId);
-      final bracket = bracketById(bracketId);
-      if (page == null || bracket == null) return;
-      Navigator.of(context).push(
-        MaterialPageRoute<void>(
-          settings: RouteSettings(name: 'ttc/focus/$bracketId'),
-          builder: (_) => TtcFocusScreen(page: page, bracket: bracket),
-        ),
-      );
+      openTtcDoor(context, bracketId);
 
     // ---- one frame, no swiping ------------------------------------------
     case TtcInfographicTile():
@@ -2742,10 +2749,10 @@ void openTtcFocusTile(BuildContext context, TtcTile tile, double hue) {
               : [
                   TtcCarouselCard(
                       title: 'What people say', body: myth),
-                  TtcCarouselCard(title: 'What is true', body: fact),
+                  TtcCarouselCard(title: "What's true", body: fact),
                 ],
           hue: hue,
-          reviewedBy: 'ParentVeda medical review',
+          reviewedBy: 'ParentVeda team',
           coverTitle: tile.title,
           coverBlurb: tile.blurb,
         ),
@@ -2773,7 +2780,7 @@ void openTtcFocusTile(BuildContext context, TtcTile tile, double hue) {
           ),
           const SizedBox(height: 14),
           Text(
-              'This film is being made. It will play here when it is ready.',
+              "We're still making this film. It will play here when it's ready.",
               style: ttcBody(13.5, color: ttcSoft, h: 1.6)),
         ],
       );
@@ -3366,6 +3373,8 @@ void openTtcArticle(
       resolveRead: ttcReadById,
       openRead: (context, id) => openTtcSurface(context, '$kTtcReadPrefix$id'),
       openSurface: openTtcSurface,
+      // Same renderer as the surface router's `ttc_read/<id>` (2026-09-26).
+      customBlock: ttcReadCustomBlock,
       // The read's own picture wins over the tile's drawn art; the drawn art
       // is the fallback while the picture loads or when there is none.
       hero: (art == null && (imageUrl ?? read.imageUrl) == null)

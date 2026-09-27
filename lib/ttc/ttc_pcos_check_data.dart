@@ -180,8 +180,8 @@ final List<PcosCheckerQuestion> kPcosQuestions = [
     section: PcosSection.safety,
     domain: PcosDomain.safety,
     prompt: _en('Is there any chance you could be pregnant right now?'),
-    whyWeAsk: _en('A late or missing period has one very common explanation, '
-        'and it is worth ruling in or out before we look at anything else.'),
+    whyWeAsk: _en('A late or missed period has one very common cause. '
+        "It's worth ruling that in or out before we look at anything else."),
     options: [
       PcosCheckerOption(id: 'no', label: _en('No')),
       PcosCheckerOption(id: 'maybe', label: _en('Possibly'), weight: 3),
@@ -194,9 +194,9 @@ final List<PcosCheckerQuestion> kPcosQuestions = [
     id: 'q_redflag',
     section: PcosSection.safety,
     domain: PcosDomain.safety,
-    prompt: _en('Are you experiencing any of these right now?'),
-    whyWeAsk: _en('These need a doctor rather than a questionnaire, and we '
-        'would rather ask than let you spend three minutes here first.'),
+    prompt: _en('Do you have any of these right now?'),
+    whyWeAsk: _en('These need a doctor, not a questionnaire. We would rather '
+        'ask now than have you spend three minutes here first.'),
     options: [
       PcosCheckerOption(id: 'none', label: _en('None of these')),
       PcosCheckerOption(
@@ -223,9 +223,9 @@ final List<PcosCheckerQuestion> kPcosQuestions = [
     domain: PcosDomain.cycle,
     prompt: _en('How predictable are your periods?'),
     summaryLabel: _en('Regularity'),
-    whyWeAsk: _en('This is the most useful single thing you can tell a doctor. '
-        'Irregular periods can mean ovulation is not happening predictably — '
-        'which is worth knowing whatever the cause turns out to be.'),
+    whyWeAsk: _en('This is the most useful thing you can tell a doctor. '
+        "Irregular periods can mean ovulation isn't happening on a regular "
+        "schedule. That's worth knowing, whatever the cause turns out to be."),
     options: [
       PcosCheckerOption(id: 'very_regular', label: _en('Very regular')),
       PcosCheckerOption(id: 'usually', label: _en('Usually regular')),
@@ -249,9 +249,8 @@ final List<PcosCheckerQuestion> kPcosQuestions = [
     domain: PcosDomain.cycle,
     prompt: _en('How long is your usual cycle?'),
     summaryLabel: _en('Typical cycle length'),
-    whyWeAsk: _en('Counted from the first day of one period to the first day '
-        'of the next. Anything from about 21 to 35 days is considered '
-        'ordinary.'),
+    whyWeAsk: _en('A cycle runs from the day one period starts until the '
+        'next one starts. Anything from about 21 to 35 days is usual.'),
     options: [
       PcosCheckerOption(
           id: 'short', label: _en('Less than 21 days'), weight: 1),
@@ -270,11 +269,10 @@ final List<PcosCheckerQuestion> kPcosQuestions = [
     section: PcosSection.cycle,
     domain: PcosDomain.cycle,
     prompt: _en('Have you ever gone three months or more without a period, '
-        'when you were not pregnant?'),
+        "when you weren't pregnant?"),
     summaryLabel: _en('Longest gap'),
-    whyWeAsk: _en('A gap that long is one of the clearer signals that a cycle '
-        'is not completing, and it is specific enough to be worth asking about '
-        'separately.'),
+    whyWeAsk: _en('A gap that long is one of the clearer signs that a cycle '
+        "isn't finishing. It's specific enough to ask about on its own."),
     options: [
       PcosCheckerOption(id: 'no', label: _en('No')),
       PcosCheckerOption(id: 'yes', label: _en('Yes'), weight: 3),
@@ -293,9 +291,8 @@ final List<PcosCheckerQuestion> kPcosQuestions = [
     prompt: _en('When your period comes, how long does the bleeding usually '
         'last?'),
     summaryLabel: _en('Period length'),
-    whyWeAsk: _en('This one is for your doctor summary rather than for the '
-        'pattern — bleeding length has many explanations and is not '
-        'particularly a PCOS one.'),
+    whyWeAsk: _en('This one is for your doctor summary, not your pattern. '
+        "Bleeding length has many causes and isn't really a PCOS sign."),
     options: [
       PcosCheckerOption(id: 'short', label: _en('1 to 2 days')),
       PcosCheckerOption(id: 'normal', label: _en('3 to 7 days')),
@@ -313,12 +310,12 @@ final List<PcosCheckerQuestion> kPcosQuestions = [
     id: 'q_mucus',
     section: PcosSection.ovulation,
     domain: PcosDomain.ovulation,
-    prompt: _en('Do you usually notice a clear fertile-window change in your '
-        'cervical mucus?'),
+    prompt: _en('Do you usually notice a clear change in your cervical mucus '
+        '(discharge) around your fertile days?'),
     summaryLabel: _en('Cervical mucus'),
     whyWeAsk: _en('Clear, slippery, stretchy mucus in the days before '
-        'ovulation is a real sign. Not noticing it does not mean you are '
-        'not ovulating — most people have never been told to look.'),
+        "ovulation is a real sign. Not noticing it doesn't mean you're not "
+        'ovulating. Most people have never been told to look.'),
     options: [
       PcosCheckerOption(id: 'most', label: _en('Yes, most cycles')),
       PcosCheckerOption(id: 'sometimes', label: _en('Sometimes'), weight: 1),
@@ -335,18 +332,19 @@ final List<PcosCheckerQuestion> kPcosQuestions = [
     id: 'q_opk',
     section: PcosSection.ovulation,
     domain: PcosDomain.ovulation,
-    prompt: _en('Have you used ovulation predictor strips?'),
+    prompt: _en('Have you used ovulation test strips?'),
     summaryLabel: _en('Ovulation strips'),
-    whyWeAsk: _en('In PCOS these can read positive several times in one cycle '
-        'without ovulation following, because the hormone they detect can sit '
-        'high rather than spiking once. That pattern is itself informative.'),
+    whyWeAsk: _en('With PCOS, these strips can show positive several times '
+        'in one cycle without ovulation following. The hormone they pick up '
+        'can stay high instead of rising once. That pattern tells your doctor '
+        'something too.'),
     options: [
       PcosCheckerOption(
           id: 'positive_expected',
           label: _en('Yes, usually positive around when I expect it')),
       PcosCheckerOption(
           id: 'unpredictable',
-          label: _en('Yes, but the results are unpredictable'),
+          label: _en('Yes, but the results are hard to predict'),
           weight: 2),
       PcosCheckerOption(
           id: 'rarely_positive',
@@ -361,10 +359,10 @@ final List<PcosCheckerQuestion> kPcosQuestions = [
     id: 'q_told_anov',
     section: PcosSection.ovulation,
     domain: PcosDomain.ovulation,
-    prompt: _en('Has a doctor ever told you that you do not ovulate '
+    prompt: _en("Has a doctor ever told you that you don't ovulate "
         'regularly?'),
     summaryLabel: _en('Told about ovulation'),
-    whyWeAsk: _en('If someone has already looked at this, their finding '
+    whyWeAsk: _en('If a doctor has already looked at this, what they found '
         'matters far more than anything a questionnaire can work out.'),
     options: [
       PcosCheckerOption(id: 'no', label: _en('No')),
@@ -384,9 +382,9 @@ final List<PcosCheckerQuestion> kPcosQuestions = [
     prompt: _en('Have you noticed more facial or body hair than feels normal '
         'for you?'),
     summaryLabel: _en('Hair growth'),
-    whyWeAsk: _en('"Normal for you" is the phrase that matters — this varies '
-        'enormously between people and between families, and there is no '
-        'standard to fall short of.'),
+    whyWeAsk: _en('"Normal for you" is what matters here. This varies a lot '
+        "between people and between families, and there's no standard you "
+        'have to meet.'),
     options: [
       PcosCheckerOption(id: 'no', label: _en('No')),
       PcosCheckerOption(id: 'mild', label: _en('Mild'), weight: 1),
@@ -402,17 +400,18 @@ final List<PcosCheckerQuestion> kPcosQuestions = [
     id: 'q_acne',
     section: PcosSection.androgen,
     domain: PcosDomain.androgen,
-    prompt: _en('Have you had persistent acne, particularly since your teenage '
-        'years ended?'),
+    prompt: _en("Have you had acne that doesn't go away, especially after "
+        'your teenage years?'),
     summaryLabel: _en('Acne'),
-    whyWeAsk: _en('Acne that arrives or persists into adulthood — often along '
-        'the jaw and chin — can accompany higher androgens. On its own it is '
-        'extremely common and means little.'),
+    whyWeAsk: _en('Acne that starts or carries on into adult life, often '
+        'along the jaw and chin, can go with higher androgens (hormones like '
+        "testosterone). On its own it's very common and means little."),
     options: [
       PcosCheckerOption(id: 'no', label: _en('No')),
       PcosCheckerOption(id: 'sometimes', label: _en('Sometimes'), weight: 1),
       PcosCheckerOption(id: 'often', label: _en('Often'), weight: 2),
-      PcosCheckerOption(id: 'persistent', label: _en('Persistent'), weight: 3),
+      PcosCheckerOption(
+          id: 'persistent', label: _en('Most of the time'), weight: 3),
       PcosCheckerOption(
           id: 'unsure', label: _en('Not sure'), unknown: true),
     ],
@@ -425,9 +424,9 @@ final List<PcosCheckerQuestion> kPcosQuestions = [
     prompt: _en('Have you noticed thinning at the scalp, or more shedding than '
         'usual?'),
     summaryLabel: _en('Scalp hair'),
-    whyWeAsk: _en('Thinning at the crown specifically can accompany higher '
-        'androgens. Shedding after illness, childbirth or a stressful period '
-        'is a different and much commoner thing.'),
+    whyWeAsk: _en('Thinning on the top of the head in particular can go with '
+        'higher androgens. Shedding after an illness, childbirth or a '
+        'stressful time is a different and much more common thing.'),
     options: [
       PcosCheckerOption(id: 'no', label: _en('No')),
       PcosCheckerOption(id: 'mild', label: _en('Mild'), weight: 1),
@@ -446,9 +445,9 @@ final List<PcosCheckerQuestion> kPcosQuestions = [
     prompt: _en('Have you noticed darker, velvety patches of skin at your neck, '
         'underarms or groin?'),
     summaryLabel: _en('Skin changes'),
-    whyWeAsk: _en('This one is worth asking about specifically because it '
-        'points at insulin rather than at androgens, and because almost nobody '
-        'thinks to mention it.'),
+    whyWeAsk: _en('We ask about this one on its own because it points to '
+        'insulin rather than androgens, and almost nobody thinks to mention '
+        'it.'),
     options: [
       PcosCheckerOption(id: 'no', label: _en('No')),
       PcosCheckerOption(id: 'yes', label: _en('Yes'), weight: 2),
@@ -467,11 +466,11 @@ final List<PcosCheckerQuestion> kPcosQuestions = [
     // telling larger women they are more likely to be ill. It is asked because
     // she may want it in her summary, and for no other reason.
     domain: PcosDomain.recordOnly,
-    prompt: _en('Have you had unexplained weight changes, or found weight hard '
-        'to shift?'),
+    prompt: _en('Have you had unexplained weight changes, or found it hard '
+        'to lose weight?'),
     summaryLabel: _en('Weight changes'),
-    whyWeAsk: _en('This does not affect your result at all — weight neither '
-        'causes nor rules out PCOS, and slim women have it too. It is here '
+    whyWeAsk: _en("This doesn't change your result at all. Weight doesn't "
+        'cause PCOS or rule it out, and slim women have it too. It is here '
         'only in case you want it in your doctor summary.'),
     options: [
       PcosCheckerOption(id: 'no', label: _en('No')),
@@ -489,12 +488,12 @@ final List<PcosCheckerQuestion> kPcosQuestions = [
     id: 'q_trying',
     section: PcosSection.fertility,
     domain: PcosDomain.fertility,
-    prompt: _en('How long have you been trying to conceive?'),
+    prompt: _en('How long have you been trying for a baby?'),
     summaryLabel: _en('Trying for'),
     whyWeAsk: _en('This changes how soon a conversation is worth having, not '
         'what your pattern means.'),
     options: [
-      PcosCheckerOption(id: 'not_trying', label: _en('I am not trying yet')),
+      PcosCheckerOption(id: 'not_trying', label: _en("I'm not trying yet")),
       PcosCheckerOption(id: 'starting', label: _en('Just starting')),
       PcosCheckerOption(id: 'under6', label: _en('Less than 6 months')),
       PcosCheckerOption(id: 'six_twelve', label: _en('6 to 12 months'), weight: 1),
@@ -537,8 +536,8 @@ final List<PcosCheckerQuestion> kPcosQuestions = [
     dependsOn: 'q_evaluated:yes',
     prompt: _en('What were you told?'),
     summaryLabel: _en('Told'),
-    whyWeAsk: _en('If someone has already assessed this, what they found '
-        'outranks anything here.'),
+    whyWeAsk: _en('If a doctor has already checked this, what they found '
+        'counts for more than anything here.'),
     options: [
       PcosCheckerOption(id: 'pcos', label: _en('PCOS'), weight: 3),
       PcosCheckerOption(
@@ -548,7 +547,7 @@ final List<PcosCheckerQuestion> kPcosQuestions = [
       PcosCheckerOption(id: 'other', label: _en('Something else')),
       PcosCheckerOption(
           id: 'unclear',
-          label: _en('I was not given a clear explanation'),
+          label: _en("I wasn't given a clear explanation"),
           unknown: true),
       PcosCheckerOption(id: 'private', label: _en('Prefer not to say')),
     ],
@@ -565,9 +564,9 @@ final List<PcosCheckerQuestion> kPcosQuestions = [
         'recently?'),
     summaryLabel: _en('Hormonal contraception'),
     whyWeAsk: _en('This matters more than it sounds. Hormonal contraception '
-        'sets the bleed rather than letting a cycle run, so period answers stop '
-        'describing ovulation — and cycles can take a few months to settle '
-        'after stopping.'),
+        'controls when you bleed, instead of letting a cycle run on its own. '
+        'So period answers stop telling us about ovulation. Cycles can also '
+        'take a few months to settle after stopping.'),
     options: [
       PcosCheckerOption(id: 'no', label: _en('No')),
       PcosCheckerOption(id: 'yes', label: _en('Yes, currently'), weight: 3),
@@ -586,8 +585,8 @@ final List<PcosCheckerQuestion> kPcosQuestions = [
     domain: PcosDomain.context,
     prompt: _en('Have you given birth or breastfed in the last year?'),
     summaryLabel: _en('Recent birth or breastfeeding'),
-    whyWeAsk: _en('Both change cycles substantially and for entirely ordinary '
-        'reasons, so a pattern during this time says much less than it would '
+    whyWeAsk: _en('Both change cycles a lot, for completely normal reasons. '
+        'So a pattern during this time says much less than it would '
         'otherwise.'),
     options: [
       PcosCheckerOption(id: 'no', label: _en('No')),

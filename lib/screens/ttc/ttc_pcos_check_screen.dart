@@ -26,6 +26,7 @@ import '../../widgets/global_ask_fab.dart';
 
 import '../../localization/app_language.dart';
 import '../../theme/pv_fonts.dart';
+import '../../ttc/ttc_chapter.dart' show kTtcIrregularSpreadDays;
 import '../../ttc/ttc_pcos_check_data.dart';
 import '../../ttc/ttc_pcos_check_store.dart';
 import '../v2/v2_palette.dart';
@@ -305,9 +306,9 @@ class _Intro extends StatelessWidget {
             Text(
                 t(
                     'PCOS affects ovulation, periods and hormones, and it looks '
-                        'different in almost everyone. This looks at your cycle '
-                        'and the patterns that sometimes go with it, so you know '
-                        'what is worth raising with a doctor.',
+                        'different in almost everyone. This check looks at your '
+                        'cycle and the signs that sometimes go with it, so you '
+                        "know what's worth raising with a doctor.",
                     'PCOS ovulation, periods aur hormones par asar daalta hai, '
                         'aur har kisi mein alag dikhta hai. Ye aapke cycle aur '
                         'un patterns ko dekhta hai jo kabhi-kabhi saath chalte '
@@ -351,8 +352,8 @@ class _Intro extends StatelessWidget {
             Center(
               child: Text(
                   t(
-                      'Answers are used to personalise this result. They are not '
-                          'a diagnosis.',
+                      'Your answers only shape this result. It is not a '
+                          'diagnosis.',
                       'Jawab sirf is result ko aapke hisaab se banane ke liye '
                           'hain. Ye diagnosis nahi hai.'),
                   textAlign: TextAlign.center,
@@ -375,7 +376,8 @@ class _CycleFactsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final varied = facts.spread > 7;
+    // The one definition of irregular (2026-09-26). Was `facts.spread > 7`.
+    final varied = facts.spread > kTtcIrregularSpreadDays;
     return Container(
       padding: const EdgeInsets.fromLTRB(16, 15, 16, 16),
       decoration: BoxDecoration(
@@ -384,7 +386,7 @@ class _CycleFactsCard extends StatelessWidget {
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(
-            t('FROM THE CYCLES YOU HAVE LOGGED',
+            t("FROM THE CYCLES YOU'VE LOGGED",
                 'JO CYCLES AAPNE LOG KIYE HAIN'),
             style: pvManrope(
                 fontSize: 10,
@@ -412,9 +414,9 @@ class _CycleFactsCard extends StatelessWidget {
         const SizedBox(height: 8),
         Text(
             t(
-                'We have filled in the cycle questions from this, so you only '
-                    'have to answer what we do not already know. You can change '
-                    'any of it.',
+                "We've filled in the cycle questions from this, so you only "
+                    "answer what we don't already know. You can change any of "
+                    'it.',
                 'Cycle ke sawaal humne isi se bhar diye hain, taaki aapko sirf '
                     'wahi batana pade jo hum nahi jaante. Aap kuch bhi badal '
                     'sakti hain.'),
@@ -450,8 +452,8 @@ class _DerivedNote extends StatelessWidget {
           Expanded(
             child: Text(
                 t(
-                    'We filled this in from the cycles you have logged. Change '
-                        'it if it does not match how it feels.',
+                    "We filled this in from the cycles you've logged. Change "
+                        "it if it doesn't match how things feel to you.",
                     'Ye humne aapke logged cycles se bhara hai. Agar aisa nahi '
                         'lagta toh badal dein.'),
                 style:

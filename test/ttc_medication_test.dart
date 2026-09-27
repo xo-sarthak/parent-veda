@@ -105,7 +105,7 @@ void main() {
     test('the screen says what it will not do, where she can read it', () {
       const t = TtcS(false);
       final s = t.medNoAdvice.toLowerCase();
-      expect(s, contains('do not check doses'));
+      expect(s, contains("don't check doses"));
       expect(s, contains('your doctor'));
 
       final src = File('lib/screens/ttc/ttc_medication_screen.dart')

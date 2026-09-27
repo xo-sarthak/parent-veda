@@ -610,7 +610,7 @@ Future<void> addTtcRecord(BuildContext context) async {
                 ),
               ]),
               const SizedBox(height: 8),
-              Text(hi ? 'Ye sirf record hai, natija nahi.' : 'This is a record, not a verdict.',
+              Text(hi ? 'Ye sirf record hai, natija nahi.' : 'This is a record, not a judgement.',
                   style: ttcBody(11, color: ttcMuted)),
             ]),
           ),

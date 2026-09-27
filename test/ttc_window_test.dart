@@ -27,6 +27,7 @@ import 'package:parentveda/services/life_stage_store.dart';
 import 'package:parentveda/ttc/cycle_store.dart';
 import 'package:parentveda/ttc/ttc_chapter.dart';
 import 'package:parentveda/ttc/ttc_store.dart';
+import 'package:parentveda/ttc/ttc_treatment_store.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -198,6 +199,12 @@ void main() {
     testWidgets('and none on a clinic-run cycle', (tester) async {
       logCleanHistory();
       TtcStore.instance.setPath(TtcPath.ivf);
+      // 2026-09-26: a clinic owns the timing only with a real date from
+      // her clinic for this cycle in the treatment tracker, never on the
+      // pathway label alone. Kept for revert: the label alone did it.
+      TtcTreatmentStore.instance.setDate(TtcTreatmentStep.betaTest,
+          DateTime.now().add(const Duration(days: 20)));
+      addTearDown(TtcTreatmentStore.instance.resetForTest);
       await pumpWindow(tester);
       expect(find.text('Your fertile days'), findsNothing);
       // The fold this once guarded is retired; the assertion that matters on a

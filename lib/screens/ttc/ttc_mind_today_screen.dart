@@ -90,8 +90,8 @@ class TtcMindTodayScreen extends StatelessWidget {
         hue: kTtcBreatheHue,
         eyebrow: 'MIND & BODY',
         title: 'Today',
-        intro: 'One movement, one breath, and two small things. Nothing here '
-            'is counting.',
+        intro: 'One movement, one breath and two small things. Nothing here '
+            'keeps count.',
         children: const [TtcMindTodayBody()],
       );
 }
@@ -191,10 +191,10 @@ class TtcMindTodayBody extends StatelessWidget {
           // than unfinished.
           _inset(Text(
               hers
-                  ? 'This is the practice you chose. Nothing here is counting, '
-                      'and a day you skip is not a day you lost.'
-                  : 'Two cards a day, and they change tomorrow. Nothing here is '
-                      'counting, and a day you skip is not a day you lost.',
+                  ? 'This is the practice you chose. Nothing here keeps count, '
+                      "and a day you skip isn't a day lost."
+                  : 'Two cards a day, and they change tomorrow. Nothing here '
+                      "keeps count, and a day you skip isn't a day lost.",
               style: pvManrope(fontSize: 12.5, height: 1.6, color: p.ink3))),
           const SizedBox(height: 10),
         ]);
@@ -443,14 +443,14 @@ class _CouplePart extends StatelessWidget {
   Widget build(BuildContext context) {
     final (title, blurb) = switch (part) {
       TtcCoupleDaily.gratitude => (
-          'One thing you like about the other',
-          'Out loud, one each. It takes about thirty seconds and it is the part '
-              'people say changed the most.',
+          'One thing you like about each other',
+          'Say it out loud, one each. It takes about thirty seconds, and '
+              "people say it's the part that changed the most.",
         ),
       TtcCoupleDaily.conversation => (
           'One honest question, and just listen',
-          'Ask, and let the answer stand without fixing it. That is the whole '
-              'practice.',
+          'Ask, and let the answer be, without trying to fix it. That is the '
+              'whole practice.',
         ),
     };
 
@@ -503,7 +503,7 @@ class _TickPanel extends StatelessWidget {
           p: p,
           field: kTtcBedtimeField,
           label: bed == null ? 'In bed by about eleven' : 'In bed by about $bed',
-          blurb: 'Roughly is fine. This is not a bedtime you have to defend.',
+          blurb: "Roughly is fine. You don't have to be strict about it.",
         ),
         Divider(height: 1, thickness: 1, color: p.line, indent: 15, endIndent: 15),
         _Tick(
@@ -513,7 +513,7 @@ class _TickPanel extends StatelessWidget {
           // ⚠️ IT DOES NOT TEACH FOOD, AND THAT IS A BOUNDARY THE BRIEF SETS:
           // this area "references Getting ready, does not own or teach food".
           // So the tick records the fact and says nothing about what to eat.
-          blurb: 'Mostly counts. What to actually eat lives in Getting ready.',
+          blurb: 'Mostly home-cooked counts. What to eat is in Getting ready.',
         ),
       ]),
     );

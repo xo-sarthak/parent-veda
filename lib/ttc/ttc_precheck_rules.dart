@@ -51,6 +51,7 @@
 import '../localization/app_language.dart';
 import '../services/medicine_store.dart';
 import 'cycle_store.dart';
+import 'ttc_chapter.dart' show kTtcIrregularSpreadDays;
 import 'ttc_pcos_check_rules.dart';
 import 'ttc_pcos_check_store.dart';
 import 'ttc_precheck_data.dart';
@@ -127,7 +128,9 @@ class PrecheckContext {
       loggedCycles: cycles.length,
       // Two cycles is the floor, matching the PCOS checker's — one interval
       // says nothing about regularity.
-      cyclesLookIrregular: cycles.length >= 2 && spread > 7,
+      // The one definition of irregular (2026-09-26). Was `spread > 7`.
+      cyclesLookIrregular:
+          cycles.length >= 2 && spread > kTtcIrregularSpreadDays,
       ranPcosCheck: pcos.hasCompleted,
       pcosLevelAtLeastDiscuss: pcosResult != null &&
           !pcosResult.stopped &&
@@ -164,53 +167,54 @@ LocalizedText? precheckEvidenceFor(PrecheckItem item, PrecheckContext c) {
     case 'cycle_tracking':
       if (c.loggedCycles == 0) return null;
       return _en('You have logged ${c.loggedCycles} '
-          '${c.loggedCycles == 1 ? 'cycle' : 'cycles'} — this one is already '
+          '${c.loggedCycles == 1 ? 'cycle' : 'cycles'}, so this one is already '
           'covered.');
 
     case 'fertile_window':
       if (c.loggedCycles < 2) return null;
-      return _en('Your logged cycles already drive the fertile-window '
-          'estimate, so you have this.');
+      return _en('Your logged cycles already feed your fertile-window '
+          'estimate, so this one is done.');
 
     case 'medication_review':
       if (c.medicineCount == 0) return null;
       return _en('You have ${c.medicineCount} '
           '${c.medicineCount == 1 ? 'medicine' : 'medicines'} saved in the '
-          'app. That is a list ready to take to a review — not a review.');
+          'app. That gives you a list to take to a review. It is not a review '
+          'itself.');
 
     case 'supplement_review':
       if (c.supplementCount == 0) return null;
       return _en('You have ${c.supplementCount} '
           '${c.supplementCount == 1 ? 'supplement' : 'supplements'} recorded. '
-          'Worth taking the list rather than the bottles.');
+          'Take the list with you, not the bottles.');
 
     case 'folate':
       if (!c.takesFolate) return null;
-      return _en('You have folic acid on your supplement list. The dose is '
-          'still worth confirming with whoever prescribes for you.');
+      return _en('You have folic acid on your supplement list. Still check '
+          'the dose with the doctor who prescribes for you.');
 
     case 'vaccines':
       if (c.liveVaccineOutstanding) {
-        return _en('Your vaccination list has a live vaccine still to have — '
-            'that is the one with a month attached to it.');
+        return _en('Your vaccine list has a live vaccine still to get. '
+            "That's the one that needs a month's gap before trying.");
       }
       if (c.vaccinesRecorded == 0) return null;
-      return _en('You have recorded where you stand on '
-          '${c.vaccinesRecorded} of the vaccination list.');
+      return _en('You have noted where you stand on '
+          '${c.vaccinesRecorded} of the vaccines on your list.');
 
     case 'conditions':
       if (!c.pcosLevelAtLeastDiscuss) return null;
-      return _en('Your PCOS check found a pattern worth discussing, which '
-          'makes this conversation more useful than usual.');
+      return _en('Your PCOS check found a pattern worth talking about, so '
+          'this conversation is more useful than usual.');
 
     case 'when_to_seek_help':
       if (c.tryingOverAYear) {
-        return _en('You have been trying over a year. The usual guidance says '
-            'that is the point to be seen.');
+        return _en("You've been trying for over a year. The usual advice is "
+            'to see a doctor at this point.');
       }
       if (c.cyclesLookIrregular) {
-        return _en('Your logged cycles vary quite a bit — which means the '
-            '"try for a year first" advice was never written for you.');
+        return _en('Your logged cycles vary quite a bit. So the "try for a '
+            'year first" advice was never meant for you.');
       }
       return null;
 
@@ -275,46 +279,46 @@ List<PrecheckPriority> precheckPriorities(
   if (c.liveVaccineOutstanding) {
     consider(
         'vaccines',
-        _en('A live vaccine on your list means about a month before trying — '
-            'the only item here that can move your timing.'));
+        _en('A live vaccine on your list means waiting about a month before '
+            'trying. This is the only item here that can change your timing.'));
   }
 
   if (c.pcosLevelAtLeastDiscuss) {
     consider(
         'preconception_visit',
-        _en('Your PCOS check found a pattern worth discussing, and one visit '
-            'covers that alongside everything else here.'));
+        _en('Your PCOS check found a pattern worth talking about. One visit '
+            'can cover that and everything else here.'));
   }
 
   if (c.medicineCount > 0) {
     consider(
         'medication_review',
         _en('You have ${c.medicineCount} '
-            '${c.medicineCount == 1 ? 'medicine' : 'medicines'} saved — the '
-            'list is ready, the review is not.'));
+            '${c.medicineCount == 1 ? 'medicine' : 'medicines'} saved. The '
+            "list is ready. The review hasn't happened yet."));
   }
 
   if (c.cyclesLookIrregular || c.tryingOverAYear) {
     consider(
         'when_to_seek_help',
         c.tryingOverAYear
-            ? _en('You have been trying over a year, which is the usual point '
-                'to be seen.')
-            : _en('Your cycles vary enough that the "wait a year" advice was '
-                'not written for your situation.'));
+            ? _en("You've been trying for over a year. That's usually when "
+                'to see a doctor.')
+            : _en('Your cycles vary enough that the "wait a year" advice '
+                "wasn't meant for you."));
   }
 
   if (!c.takesFolate) {
     consider(
         'folate',
-        _en('The one item with the strongest evidence behind it, and the one '
-            'that has to be started before rather than after.'));
+        _en('The item with the strongest evidence behind it. It needs to '
+            'start before pregnancy, not after.'));
   }
 
   if (c.loggedCycles < 2) {
     consider(
         'cycle_tracking',
-        _en('Just the first day of each period. It is the most useful thing '
+        _en("Just the first day of each period. It's the most useful thing "
             'you can bring to any appointment.'));
   }
 
@@ -323,7 +327,7 @@ List<PrecheckPriority> precheckPriorities(
     for (final item in kPrecheckItems) {
       if (item.tier != tier) continue;
       if (statusOf(item.id).isOpen) {
-        consider(item.id, _en('You marked this as something to come back to.'));
+        consider(item.id, _en('You marked this to come back to.'));
       }
     }
   }
@@ -331,7 +335,7 @@ List<PrecheckPriority> precheckPriorities(
   // ---- and finally anything core she has not looked at ---------------------
   for (final item in kPrecheckItems) {
     if (item.tier != PrecheckTier.core) continue;
-    consider(item.id, _en('One of the few here that applies to almost '
+    consider(item.id, _en('One of the few items here that applies to almost '
         'everyone.'));
   }
 
@@ -360,7 +364,7 @@ List<({String itemId, String title, String claim})> precheckReviewRegister() =>
 
 /// The disclaimer shown on the intro and on the summary, without exception.
 final LocalizedText kPrecheckDisclaimer = _en(
-    'This checklist is for planning and for preparing a conversation. It is '
-    'not medical clearance, it cannot tell you whether you are ready to '
-    'conceive, and not every item applies to everyone. Your doctor can tell '
-    'you which of these are relevant to you.');
+    'This checklist helps you plan and get ready to talk to a doctor. It is '
+    "not medical clearance. It can't tell you whether you're ready to "
+    "conceive, and not every item applies to everyone. Your doctor can tell "
+    'you which ones matter for you.');

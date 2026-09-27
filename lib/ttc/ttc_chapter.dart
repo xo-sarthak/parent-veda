@@ -112,6 +112,41 @@ enum TtcNoEstimate {
 // treatment* turned out to be the wrong thing to branch on - see the header of
 // that file.
 
+/// ONE definition of "irregular", read by every surface — DECIDED 2026-09-26.
+///
+/// Cycles whose shortest and longest lengths differ by MORE than this many
+/// days are irregular. That is FIGO's 2018 definition of normal variation for
+/// ages 26 to 41 (seven days or less is regular).
+///
+/// ⚠️ THERE WERE TWO NUMBERS, AND THEY DISAGREED BY ONE DAY. The engine used
+/// "more than 8" (which caps confidence and decides whether "late" can be
+/// said), while the "Is it time to get help?" tool, the six-month message, the
+/// pre-check, the PCOS check and the BMI screen used "more than 7". A spread
+/// of exactly 8 days was regular on the home and irregular in the tool that
+/// the home links to. Every reader now uses this constant.
+const int kTtcIrregularSpreadDays = 7;
+
+/// True when [lengths] vary by more than [kTtcIrregularSpreadDays]. Two
+/// completed cycles is the floor: one interval is not a pattern.
+bool ttcCyclesIrregular(List<int> lengths) {
+  if (lengths.length < 2) return false;
+  final lo = lengths.reduce((a, b) => a < b ? a : b);
+  final hi = lengths.reduce((a, b) => a > b ? a : b);
+  return (hi - lo) > kTtcIrregularSpreadDays;
+}
+
+/// The fertility band for a day [offset] days from ovulation (negative =
+/// before). Sperm survive around five days; the egg around a day, so the band
+/// runs ovulation-5 to ovulation+1, graded rather than flagged. Pure, so the
+/// current cycle's estimate and an earlier cycle's look-back grade the same
+/// day the same way.
+FertilityLevel ttcFertilityForOffset(int offset) {
+  if (offset == -1 || offset == 0) return FertilityLevel.peak;
+  if (offset == -3 || offset == -2 || offset == 1) return FertilityLevel.high;
+  if (offset == -5 || offset == -4) return FertilityLevel.medium;
+  return FertilityLevel.low;
+}
+
 /// Everything the engine needs to answer "where are they today?".
 ///
 /// All fields are nullable or defaulted on purpose: a couple who has just
@@ -127,7 +162,17 @@ class TtcJourneyState {
     this.temperatureShiftDay,
     this.ownership = TimingOwnership.parentveda,
     this.today,
+    this.statedCycleLength,
   });
+
+  /// The usual cycle length she TOLD us, before any cycle is complete.
+  ///
+  /// Added 2026-09-26 (first-cycle decision, "like Flo and What to Expect"):
+  /// a first cycle is predicted from her stated usual length when she has
+  /// given one, else from [TtcChapterEngine.defaultCycleLength]. Ignored as
+  /// soon as one completed cycle exists, because a logged cycle is a fact and
+  /// a stated one is a memory.
+  final int? statedCycleLength;
 
   /// The day the couple started their TTC journey in ParentVeda.
   final DateTime? journeyStart;
@@ -172,7 +217,8 @@ class TtcToday {
     required this.cycleDay,
     required this.cycleLength,
     required this.estimatedOvulationDay,
-    this.rawOvulationDay,
+    // Retired 2026-09-26 with the hero's `ignoreOwnership` exception; kept
+    // for revert: this.rawOvulationDay,
     required this.confidence,
     required this.fertility,
     required this.daysIntoChapter,
@@ -197,29 +243,35 @@ class TtcToday {
   /// Why it is null, so a screen can say so instead of showing a hole.
   final TtcNoEstimate noEstimate;
 
-  /// The ovulation day BEFORE the ownership gate, for the home hero only.
-  ///
-  /// ⚠️ THIS IS NOT A SECOND CLINICAL ESTIMATE AND MUST NOT BECOME ONE. The
-  /// engine already computes `ov` to place a couple in the right chapter — the
-  /// waiting days are just as real during an IVF cycle — and then withholds it
-  /// from `estimatedOvulationDay` so no screen can show a date that might
-  /// contradict a clinic. That rule is right and is unchanged: everything that
-  /// reads `estimatedOvulationDay` still gets null.
-  ///
-  /// ⚠️ EXACTLY ONE SURFACE READS THIS, AND ONLY BECAUSE IT WAS ASKED FOR.
-  /// After four rounds of the home hero showing a clinic refusal instead of a
-  /// cycle message: *"the hero section will display something else… not that
-  /// IVF and everything, because it's not happening right now."* The reasoning
-  /// is sound — `ownership` comes from `path.defaultMedicated`, a guess from a
-  /// label she tapped once, and `setPath` clears her real answers so the guess
-  /// always wins.
-  ///
-  /// ⚠️ IF YOU ARE ABOUT TO USE THIS ANYWHERE ELSE, DON'T. The gate exists so
-  /// a clinic is never contradicted, and a second caller is how a one-screen
-  /// exception becomes the behaviour. `docs/STILL-OPEN.md` §30 has the proper
-  /// fix, which is to derive ownership from her ANSWERS rather than a pathway
-  /// default — at which point this field is deleted.
-  final int? rawOvulationDay;
+  // The ovulation day BEFORE the ownership gate, for the home hero only.
+  //
+  // ⚠️ THIS IS NOT A SECOND CLINICAL ESTIMATE AND MUST NOT BECOME ONE. The
+  // engine already computes `ov` to place a couple in the right chapter — the
+  // waiting days are just as real during an IVF cycle — and then withholds it
+  // from `estimatedOvulationDay` so no screen can show a date that might
+  // contradict a clinic. That rule is right and is unchanged: everything that
+  // reads `estimatedOvulationDay` still gets null.
+  //
+  // ⚠️ EXACTLY ONE SURFACE READS THIS, AND ONLY BECAUSE IT WAS ASKED FOR.
+  // After four rounds of the home hero showing a clinic refusal instead of a
+  // cycle message: *"the hero section will display something else… not that
+  // IVF and everything, because it's not happening right now."* The reasoning
+  // is sound — `ownership` comes from `path.defaultMedicated`, a guess from a
+  // label she tapped once, and `setPath` clears her real answers so the guess
+  // always wins.
+  //
+  // ⚠️ IF YOU ARE ABOUT TO USE THIS ANYWHERE ELSE, DON'T. The gate exists so
+  // a clinic is never contradicted, and a second caller is how a one-screen
+  // exception becomes the behaviour. `docs/STILL-OPEN.md` §30 has the proper
+  // fix, which is to derive ownership from her ANSWERS rather than a pathway
+  // default — at which point this field is deleted.
+  //
+  // ⚠️ RETIRED 2026-09-26. The proper fix landed, in a stronger form than
+  // §30 proposed: a clinic owns the timing only when the treatment tracker
+  // holds real dates for the cycle (`ttcTimingOwnershipFromEvidence`), so a
+  // label tapped once no longer switches anything off and the hero needs no
+  // exception. The field had no readers left. Kept for revert:
+  //   final int? rawOvulationDay;
 
   final OvulationConfidence confidence;
 
@@ -282,11 +334,32 @@ class TtcChapterEngine {
   /// Cycles varying by more than this are treated as irregular, which caps
   /// confidence. PCOS and irregular cycles must still feel understood - so we
   /// lower confidence rather than hiding the tool or inventing a prediction.
-  static const int irregularVarianceDays = 8;
+  ///
+  /// ⚠️ NOW THE ONE SHARED DEFINITION (2026-09-26): [kTtcIrregularSpreadDays],
+  /// seven days. Kept for revert: `static const int irregularVarianceDays = 8;`
+  static const int irregularVarianceDays = kTtcIrregularSpreadDays;
+
+  /// A stated usual length is only used inside this range, the same
+  /// plausibility window `CycleStore` holds logged cycles to.
+  static const int statedLengthMin = 15;
+  static const int statedLengthMax = 90;
 
   /// The average cycle length we should reason with.
+  ///
+  /// With no completed cycle: her stated usual length when she gave one, else
+  /// [defaultCycleLength] (2026-09-26, first-cycle decision). The confidence
+  /// stays low either way, and every surface says "early estimate" until her
+  /// next period is logged.
   int cycleLengthFor(TtcJourneyState s) {
-    if (s.cycleLengths.isEmpty) return defaultCycleLength;
+    if (s.cycleLengths.isEmpty) {
+      final stated = s.statedCycleLength;
+      if (stated != null &&
+          stated >= statedLengthMin &&
+          stated <= statedLengthMax) {
+        return stated;
+      }
+      return defaultCycleLength;
+    }
     // Recent cycles describe her better than cycles from a year ago.
     final recent = s.cycleLengths.length <= 6
         ? s.cycleLengths
@@ -296,12 +369,12 @@ class TtcChapterEngine {
   }
 
   /// True when logged cycles vary too much to lean on a calendar estimate.
-  bool isIrregular(TtcJourneyState s) {
-    if (s.cycleLengths.length < 2) return false;
-    final lo = s.cycleLengths.reduce((a, b) => a < b ? a : b);
-    final hi = s.cycleLengths.reduce((a, b) => a > b ? a : b);
-    return (hi - lo) > irregularVarianceDays;
-  }
+  bool isIrregular(TtcJourneyState s) => ttcCyclesIrregular(s.cycleLengths);
+  // Kept for revert (the same test, on the old 8-day threshold):
+  //   if (s.cycleLengths.length < 2) return false;
+  //   final lo = s.cycleLengths.reduce((a, b) => a < b ? a : b);
+  //   final hi = s.cycleLengths.reduce((a, b) => a > b ? a : b);
+  //   return (hi - lo) > irregularVarianceDays;
 
   /// Cycle day today. Day 1 is the first day of the last period.
   int? cycleDay(TtcJourneyState s) {
@@ -331,13 +404,44 @@ class TtcChapterEngine {
   ///     outlier among her normals, so it is a gap she did not log. Refuse.
   ///   * several cycles that are all long - that is simply her rhythm.
   ///     [isIrregular] already softens the confidence. Do not refuse.
-  bool hasUnreliableHistory(TtcJourneyState s) {
-    final lengths = s.cycleLengths;
+  bool hasUnreliableHistory(TtcJourneyState s) =>
+      s.cycleLengths.any((l) => looksLikeMissedLog(l, s.cycleLengths));
+  // Kept for revert (the same rule, before it was split out per cycle):
+  //   final lengths = s.cycleLengths;
+  //   if (lengths.isEmpty) return false;
+  //   if (lengths.length == 1) return lengths.first > 45;
+  //   final sorted = [...lengths]..sort();
+  //   final median = sorted[sorted.length ~/ 2];
+  //   return lengths.any((l) => l > median * 1.8);
+
+  /// One recorded cycle of [length] days, among all of her [lengths], that is
+  /// more likely a period she did not log than a real cycle. The rule
+  /// [hasUnreliableHistory] applies to the whole history, asked of one cycle,
+  /// so an earlier cycle's look-back window refuses on exactly the same terms.
+  bool looksLikeMissedLog(int length, List<int> lengths) {
     if (lengths.isEmpty) return false;
-    if (lengths.length == 1) return lengths.first > 45;
+    if (lengths.length == 1) return length > 45;
     final sorted = [...lengths]..sort();
     final median = sorted[sorted.length ~/ 2];
-    return lengths.any((l) => l > median * 1.8);
+    return length > median * 1.8;
+  }
+
+  /// Ovulation for an EARLIER, completed cycle of [length] days, worked out
+  /// looking back from that cycle's own length — DECIDED 2026-09-26.
+  ///
+  /// Ovulation is placed a luteal phase before the next period, which is the
+  /// same calendar method the current estimate uses, except that the "next
+  /// period" is no longer an estimate: she logged it. So this is arithmetic on
+  /// two facts, labelled as looking back, never a prediction.
+  ///
+  /// Null when that cycle looks like a missed log ([looksLikeMissedLog]),
+  /// which is the same refusal the current estimate makes: a 58-day "cycle"
+  /// among 28s would put ovulation around day 44 of what was really two
+  /// cycles.
+  int? lookBackOvulationDay(int length, List<int> lengths) {
+    if (looksLikeMissedLog(length, lengths)) return null;
+    final day = length - lutealPhaseDays;
+    return day < 1 ? null : day;
   }
 
   /// The current cycle has run well past where her own history says it should
@@ -428,11 +532,9 @@ class TtcChapterEngine {
     final ov = estimatedOvulationDay(s);
     if (day == null || ov == null) return null;
     if (confidence(s) == OvulationConfidence.unknown) return null;
-    final offset = day - ov; // negative = before ovulation
-    if (offset == -1 || offset == 0) return FertilityLevel.peak;
-    if (offset == -3 || offset == -2 || offset == 1) return FertilityLevel.high;
-    if (offset == -5 || offset == -4) return FertilityLevel.medium;
-    return FertilityLevel.low;
+    // negative = before ovulation. The grading is [ttcFertilityForOffset],
+    // shared with the look-back window of an earlier cycle.
+    return ttcFertilityForOffset(day - ov);
   }
 
   /// Days since the journey began. Null when we were never told.
@@ -467,7 +569,7 @@ class TtcChapterEngine {
         cycleDay: day,
         cycleLength: len,
         estimatedOvulationDay: publishedOv,
-      rawOvulationDay: ov,
+      // rawOvulationDay: ov, (retired 2026-09-26, kept for revert)
         confidence: conf,
         noEstimate: why,
         fertility: fert,
@@ -486,7 +588,7 @@ class TtcChapterEngine {
         cycleDay: day,
         cycleLength: len,
         estimatedOvulationDay: publishedOv,
-        rawOvulationDay: ov,
+        // rawOvulationDay: ov, (retired 2026-09-26, kept for revert)
         confidence: conf,
         noEstimate: why,
         fertility: fert,
@@ -507,7 +609,7 @@ class TtcChapterEngine {
         cycleDay: day,
         cycleLength: len,
         estimatedOvulationDay: publishedOv,
-        rawOvulationDay: ov,
+        // rawOvulationDay: ov, (retired 2026-09-26, kept for revert)
         confidence: conf,
         noEstimate: why,
         fertility: fert,
@@ -524,7 +626,7 @@ class TtcChapterEngine {
         cycleDay: day,
         cycleLength: len,
         estimatedOvulationDay: publishedOv,
-        rawOvulationDay: ov,
+        // rawOvulationDay: ov, (retired 2026-09-26, kept for revert)
         confidence: conf,
         noEstimate: why,
         fertility: fert,
@@ -546,7 +648,7 @@ class TtcChapterEngine {
       // clinic cycle reached the waiting days and got a published ovulation
       // day plus the non-clinic card. The IVF defect, alive in one branch.
       estimatedOvulationDay: publishedOv,
-      rawOvulationDay: ov,
+      // rawOvulationDay: ov, (retired 2026-09-26, kept for revert)
       confidence: conf,
       noEstimate: why,
       fertility: fert,
@@ -588,11 +690,11 @@ extension TtcChapterCopy on TtcChapter {
       case TtcChapter.preparingTogether:
         return hinglish
             ? 'Chhote badlaav, dono ke liye. Koi jaldi nahi.'
-            : 'Small changes, for both of you. There is no rush.';
+            : "Small changes, for both of you. There's no rush.";
       case TtcChapter.knowingYourRhythm:
         return hinglish
             ? 'Apne body ko samajhna - bina uspe nazar gadaaye.'
-            : 'Learning your body - without watching it too closely.';
+            : 'Learning your body, without watching it too closely.';
       case TtcChapter.tryingTogether:
         return hinglish
             ? 'Agar aaj dono ko sahi lage, toh yeh naturally fertile din hain.'
@@ -623,15 +725,15 @@ extension TtcChapterCopy on TtcChapter {
       case TtcChapter.preparingTogether:
         return hinglish
             ? 'Aage: Apni rhythm samajhna - jaise hi aapka agla period shuru ho, use log karein'
-            : 'Next: Knowing Your Rhythm — from the day you log your next period';
+            : 'Next: Knowing Your Rhythm, from the day you log your next period';
       case TtcChapter.knowingYourRhythm:
         return hinglish
             ? 'Aage: Saath mein koshish - jab aapke fertile din paas aayenge'
-            : 'Next: Trying Together — as your fertile days come round';
+            : 'Next: Trying Together, as your fertile days come round';
       case TtcChapter.tryingTogether:
         return hinglish
             ? 'Aage: Intezaar ke din - ovulation ke baad'
-            : 'Next: The Waiting Days — after ovulation passes';
+            : 'Next: The Waiting Days, once ovulation has passed';
       case TtcChapter.theWaitingDays:
         return hinglish
             ? 'Aage: ya toh ek nayi shuruaat, ya agla cycle. Dono theek hain.'
@@ -639,7 +741,7 @@ extension TtcChapterCopy on TtcChapter {
       case TtcChapter.aNewBeginning:
         return hinglish
             ? 'Aage: pregnancy ka safar, jab aap taiyaar hon'
-            : 'Next: the pregnancy journey, whenever you are ready';
+            : "Next: your pregnancy, whenever you're ready";
     }
   }
 
@@ -649,13 +751,13 @@ extension TtcChapterCopy on TtcChapter {
       case TtcChapter.preparingTogether:
         return hinglish ? 'Sehat aur aadatein' : 'Health and habits';
       case TtcChapter.knowingYourRhythm:
-        return hinglish ? 'Body ki samajh' : 'Body literacy';
+        return hinglish ? 'Body ki samajh' : 'Getting to know your body';
       case TtcChapter.tryingTogether:
         return hinglish ? 'Judaav aur samay' : 'Connection and timing';
       case TtcChapter.theWaitingDays:
         return hinglish ? 'Aaram aur sambhaal' : 'Rest and self-care';
       case TtcChapter.aNewBeginning:
-        return hinglish ? 'Aage ka safar' : 'The journey ahead';
+        return hinglish ? 'Aage ka safar' : 'What comes next';
     }
   }
 
@@ -673,11 +775,11 @@ extension TtcChapterCopy on TtcChapter {
       case TtcChapter.tryingTogether:
         return hinglish
             ? 'Ek-doosre ke saath rahiye - pressure ke bina'
-            : 'Stay close to each other - without pressure';
+            : 'Stay close to each other, without pressure';
       case TtcChapter.theWaitingDays:
         return hinglish
             ? 'Kuch aisa karein jo aapko achha lage'
-            : 'Do something that is just for you';
+            : "Do something that's just for you";
       case TtcChapter.aNewBeginning:
         return hinglish
             ? 'Apni pehli pregnancy appointment book karein'
@@ -700,23 +802,23 @@ extension TtcChapterCopy on TtcChapter {
       case TtcChapter.preparingTogether:
         return hinglish
             ? 'Isme "peechhe reh jaana" jaisa kuch nahi hai. Ye hissa mahino mein ginne wala hai, dino mein nahi - aur jo aaj shuru karenge wo teen mahine baad kaam aayega.'
-            : 'There is no falling behind in this part. It is measured in months, not days, and what you start today is doing its work three months from now.';
+            : "There's no falling behind in this part. It's measured in months, not days, and what you start today does its work three months from now.";
       case TtcChapter.knowingYourRhythm:
         return hinglish
             ? 'Cycle ka har mahine do-chaar din aage-peechhe hona aam baat hai, kharaabi nahi. Aur agar is mahine kuch bhi log na ho paaye - koi baat nahi, cycle agla bhi aayega.'
-            : 'A cycle moving by a few days from month to month is ordinary, not a fault. And if you log nothing at all this month, nothing is lost — there will be another one.';
+            : "It's normal for your cycle to move by a few days from month to month. It isn't a fault. And if you log nothing at all this month, nothing is lost. There'll be another one.";
       case TtcChapter.tryingTogether:
         return hinglish
             ? 'Ek din chhoot jaana kuch nahi bigaadta. Window chhe din ki isliye hai ki ek din bina nuksaan chhoot sake - aur koi position, koi timing trick isse behtar nahi karti.'
-            : 'Missing a day ruins nothing. The window is six days long precisely so one can be skipped without cost — and no position or timing trick improves on that.';
+            : 'Missing a day ruins nothing. The window is six days long so that one day can be skipped at no cost. No position or timing trick does better than that.';
       case TtcChapter.theWaitingDays:
         return hinglish
             ? 'In dino koi symptom kuch sabit nahi karta - na hona, na dikhna. Ye jaanne ka koi jaldi tareeka nahi hai, aur dhyaan lagane se pata nahi chalta.'
-            : 'No symptom in these days proves anything, present or absent. There is no early way to know, and paying closer attention does not create one.';
+            : "No symptom in these days proves anything, whether you have it or not. There's no early way to know, and watching more closely won't give you one.";
       case TtcChapter.aNewBeginning:
         return hinglish
             ? 'Raahat aur chinta ek saath aana bilkul normal hai. Abhi bas do cheezein maayne rakhti hain - folic acid lete rehna, aur pehli appointment.'
-            : 'Feeling relieved and anxious at the same time is completely ordinary. Only two things matter right now — keep taking folic acid, and book the first appointment.';
+            : 'Feeling relieved and anxious at the same time is completely normal. Only two things matter right now: keep taking folic acid, and book the first appointment.';
     }
   }
 }

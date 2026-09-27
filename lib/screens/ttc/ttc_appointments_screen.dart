@@ -210,7 +210,7 @@ class TtcAppointmentsScreen extends StatelessWidget {
                 Text(
                   hi
                       ? 'Yahan sirf wahi hai jo aap ya ParentVeda ne add kiya. Hum aapke clinic se apne aap kuch nahi laate.'
-                      : 'This holds only what you or ParentVeda added. Nothing is pulled from your clinic automatically.',
+                      : "This only shows what you or ParentVeda added. We don't bring in anything from your clinic on our own.",
                   style: ttcBody(11.5, color: ttcMuted, h: 1.5),
                 ),
                 const SizedBox(height: 26),

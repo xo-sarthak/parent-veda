@@ -53,6 +53,13 @@ void main() {
       ..logPeriodStart(DateTime(2026, 5, 29))
       ..logPeriodStart(DateTime.now().subtract(const Duration(days: 12)));
     TtcStore.instance.setPath(TtcPath.ivf);
+    // 2026-09-26: a clinic owns the timing only with a real date from her
+    // clinic for this cycle in the treatment tracker, never on the pathway
+    // label alone. Her stimulation began on cycle day 2; nothing is ahead, so
+    // every surface below sees a clinic cycle with no upcoming date. Kept for
+    // revert: the label alone made this couple clinic-run.
+    TtcTreatmentStore.instance.setDate(TtcTreatmentStep.stimStart,
+        DateTime.now().subtract(const Duration(days: 11)));
   }
 
   // ===========================================================================
@@ -98,6 +105,12 @@ void main() {
           expect(s.label(hi), isNotEmpty, reason: '$s');
           expect(s.note(hi), isNotEmpty, reason: '$s');
         }
+      }
+      // The original five carry shipped Hindi. The steps added 2026-09-26
+      // for the round are English only (CLAUDE.md, new work is English), so
+      // the difference is asserted for the five. Kept for revert: this ran
+      // over every value.
+      for (final s in kTtcOriginalTreatmentSteps) {
         expect(s.note(true), isNot(s.note(false)), reason: '$s');
       }
     });
@@ -164,7 +177,15 @@ void main() {
           DateTime.now().add(const Duration(days: 9)));
       await pumpTall(tester, const TtcCalendarScreen());
       final t = const TtcS(false);
-      expect(find.text(t.betaWaitTitle), findsOneWidget);
+      // 2026-09-26 (B5): "Coming up" names the next clinic date, and the
+      // blood test by its DATE, never counted down (the hero's rule). Kept
+      // for revert: expect(find.text(t.betaWaitTitle), findsOneWidget).
+      expect(find.byKey(const ValueKey('ttc_calendar_round_upcoming')),
+          findsOneWidget);
+      expect(find.byKey(const ValueKey('ttc_calendar_next_clinic_date')),
+          findsOneWidget);
+      expect(find.textContaining('in 9 days'), findsNothing);
+      expect(find.text(t.betaWaitTitle), findsNothing);
       expect(find.text(t.calendarNextPeriod), findsNothing);
     });
 
@@ -198,7 +219,24 @@ void main() {
     testWidgets("Today invites her to add them", (tester) async {
       seedIvfCouple();
       await pumpTall(tester, const TtcTodayScreen());
+      // With only a past date on the cycle there is no next milestone, so the
+      // card invites the next one. Kept for revert: seeded by the label alone.
       expect(find.text(const TtcS(false).treatmentAddDates), findsOneWidget);
+    });
+
+    testWidgets('a treatment label with no dates keeps her own rhythm card, '
+        'with its way into the treatment screen', (tester) async {
+      // 2026-09-26: the label alone is her own cycle. The way to her clinic's
+      // dates stays one tap away on the rhythm card.
+      CycleStore.instance
+        ..logPeriodStart(DateTime(2026, 5, 1))
+        ..logPeriodStart(DateTime(2026, 5, 29))
+        ..logPeriodStart(DateTime.now().subtract(const Duration(days: 12)));
+      TtcStore.instance.setPath(TtcPath.ivf);
+      await pumpTall(tester, const TtcTodayScreen());
+      final t = const TtcS(false);
+      expect(find.text(t.treatmentAddDates), findsNothing);
+      expect(find.text(t.pathwayEntry), findsOneWidget);
     });
 
     testWidgets('once added, Today shows the next milestone', (tester) async {
@@ -238,9 +276,18 @@ void main() {
       expect(ttcFactsFor(day.add(const Duration(days: 1))).treatment, isEmpty);
     });
 
-    test('the card only appears on a clinic path', () {
+    test('the card only appears on a clinic cycle', () {
       expect(ttcShowTreatment(), isFalse);
       TtcStore.instance.setPath(TtcPath.iui);
+      // 2026-09-26: the label alone is not a clinic cycle; a date is. Kept
+      // for revert: `expect(ttcShowTreatment(), isTrue);` here.
+      expect(ttcShowTreatment(), isFalse);
+      // 2026-09-26: a clinic owns the timing only with a real date from
+      // her clinic for this cycle in the treatment tracker, never on the
+      // pathway label alone. Kept for revert: the label alone did it.
+      TtcTreatmentStore.instance.setDate(TtcTreatmentStep.betaTest,
+          DateTime.now().add(const Duration(days: 20)));
+      addTearDown(TtcTreatmentStore.instance.resetForTest);
       expect(ttcShowTreatment(), isTrue);
     });
   });
@@ -258,10 +305,19 @@ void main() {
       expect(today.clinicInvolved, isTrue);
     });
 
-    test('switching back to natural restores the calendar', () {
+    // 2026-09-26: the label no longer decides, her clinic's dates do, so the
+    // way back to her own calendar is clearing the round. Kept for revert:
+    //
+    // test('switching back to natural restores the calendar', () {
+    //   seedIvfCouple();
+    //   expect(TtcStore.instance.today.fertility, isNull);
+    //   TtcStore.instance.setPath(TtcPath.natural);
+    //   expect(TtcStore.instance.today.fertility, isNotNull);
+    // });
+    test('clearing the round restores the calendar', () {
       seedIvfCouple();
       expect(TtcStore.instance.today.fertility, isNull);
-      TtcStore.instance.setPath(TtcPath.natural);
+      TtcTreatmentStore.instance.clearCycle();
       expect(TtcStore.instance.today.fertility, isNotNull);
     });
   });

@@ -16,6 +16,27 @@
 //  outline, not a solid marker, and is labelled "expected". A calendar that
 //  draws a confident dot on a day her body has not agreed to is exactly the
 //  quiet dishonesty this stage is built to avoid.
+//
+//  ---------------------------------------------------------------------------
+//  ⚠️ A TREATMENT ROUND ON THE CALENDAR (2026-09-26, docs/TTC-TREATMENT-FLOW.md
+//  §3c, B5)
+//  ---------------------------------------------------------------------------
+//  * Her clinic's dates are named markers: a small ink dot under the day, and
+//    the step's own name for her kind of round in the day panel. Scans too.
+//  * Two soft bands, drawn like the fertile capsule in a cooler tint:
+//    "Injection days" (first injection to trigger) and "Waiting for your
+//    blood test" (transfer, IUI or trigger to the test). Only between dates
+//    she entered (`ttcRoundBandOn`); a missing end draws no band.
+//  * "Coming up" names the NEXT clinic date, not only the blood test, and the
+//    blood test by its date, never counted down (the hero's rule).
+//  * Past rounds keep their dates and bands, labelled "Past round".
+//  * Natural marks never land on a round day: the resolver refuses a window,
+//    an expected period and late there (`ttcDayContext` rules 2 and 2b), and
+//    this file only draws what the resolver says.
+//  Mobbin: Stardust's month grid with a multi-day stretch as one capsule
+//  (https://mobbin.com/screens/3e4e004e-47a7-4343-a1d4-eba972fb4905) and
+//  Fresha's "Upcoming" card, "In 7 days · Wed 19 Aug"
+//  (https://mobbin.com/screens/95504603-982b-41db-81ab-e8b7d9216501).
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -23,15 +44,20 @@ import 'package:flutter/material.dart';
 import '../../services/family_timeline.dart';
 import '../../ttc/cycle_store.dart';
 import '../../ttc/ttc_chapter.dart';
+import '../../ttc/ttc_home_situation.dart' show ttcDueDateIfConceivedOn;
+import '../../ttc/ttc_day_context.dart';
 import '../../ttc/ttc_journal_store.dart';
 import '../../ttc/ttc_log_store.dart';
 import '../../ttc/ttc_records_store.dart';
 import '../../ttc/ttc_store.dart';
 import '../../ttc/ttc_trackers_data.dart';
+import '../../ttc/ttc_treatment_round.dart';
 import '../../ttc/ttc_treatment_store.dart';
 import 'ttc_common.dart';
+import 'ttc_round_strings.dart';
 import 'ttc_strings.dart';
 import 'ttc_timeline_screen.dart';
+import 'ttc_treatment_screen.dart' show openTtcTreatment;
 
 class TtcCalendarScreen extends StatefulWidget {
   const TtcCalendarScreen({super.key});
@@ -97,6 +123,9 @@ class _TtcCalendarScreenState extends State<TtcCalendarScreen> {
               hasEstimate: const TtcChapterEngine()
                       .estimatedOvulationDay(TtcStore.instance.state()) !=
                   null,
+              // The round's own marks, only when there is a round to draw.
+              roundKind: ttcCalendarRound()?.kind,
+              hasRound: ttcCalendarRound() != null,
               t: t,
             ),
             const SizedBox(height: 18),
@@ -104,6 +133,33 @@ class _TtcCalendarScreenState extends State<TtcCalendarScreen> {
             const SizedBox(height: 18),
             _Upcoming(t: t),
             const SizedBox(height: 14),
+            // A way to the whole round from the calendar, whenever there is
+            // one to see (2026-09-26, B5). Past rounds live there too.
+            if (!TtcTreatmentStore.instance.cycle.isEmpty ||
+                TtcTreatmentStore.instance.history.isNotEmpty) ...[
+              TtcCard(
+                key: const ValueKey('ttc_calendar_see_round'),
+                onTap: () => openTtcTreatment(context),
+                child: Row(children: [
+                  const Icon(Icons.event_note_outlined,
+                      size: 19, color: ttcTitleInk),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(kTtcCalendarSeeRound, style: ttcJakarta(15.5)),
+                          const SizedBox(height: 2),
+                          Text(kTtcCalendarSeeRoundLine,
+                              style: ttcBody(12, h: 1.4)),
+                        ]),
+                  ),
+                  const Icon(Icons.arrow_forward_rounded,
+                      size: 17, color: ttcMuted),
+                ]),
+              ),
+              const SizedBox(height: 14),
+            ],
             TtcCard(
               onTap: () => openTtcTimeline(context),
               child: Row(children: [
@@ -136,9 +192,18 @@ class TtcDayFacts {
     required this.timelineEvents,
     required this.appointments,
     this.treatment = const [],
+    this.lookingBack = false,
+    this.roundBand,
+    this.roundKind,
   });
 
   final bool isPeriodStart;
+
+  /// True when [fertility] and [isOvulation] describe an EARLIER cycle's
+  /// window, worked out looking back from that cycle's own length
+  /// (2026-09-26, `ttcDayContext` rule 3). The grid shades it like any
+  /// window; the words beside it say "looking back" and carry no grade.
+  final bool lookingBack;
   final FertilityLevel? fertility;
   final bool isOvulation;
 
@@ -151,7 +216,17 @@ class TtcDayFacts {
   final List<TtcAppointment> appointments;
 
   /// Clinic milestones falling on this day - trigger, retrieval, transfer, beta.
+  /// Named for her kind of round since 2026-09-26, scans included, and a
+  /// past round's dates prefixed "Past round".
   final List<String> treatment;
+
+  /// The round's soft band on this day, if any (`ttcRoundBandOn`), and the
+  /// kind of the round it belongs to, for its name.
+  final TtcRoundBand? roundBand;
+  final TtcRoundKind? roundKind;
+
+  /// True when her clinic gave a date for this day.
+  bool get isClinicDate => treatment.isNotEmpty;
 
   bool get hasAnything =>
       isPeriodStart ||
@@ -161,53 +236,127 @@ class TtcDayFacts {
       journalEntries.isNotEmpty ||
       timelineEvents.isNotEmpty ||
       appointments.isNotEmpty ||
-      treatment.isNotEmpty;
+      treatment.isNotEmpty ||
+      roundBand != null;
+}
+
+/// The round the calendar draws its legend for: the open one, else the last
+/// closed. Null with no round at all.
+TtcTreatmentCycle? ttcCalendarRound() {
+  final t = TtcTreatmentStore.instance;
+  if (!t.cycle.isEmpty) return t.cycle;
+  return t.lastClosed;
+}
+
+/// Every clinic date on [d] (her open round first, then past rounds), named.
+///
+/// ⚠️ PAST ROUNDS STAY VISIBLE (§3c). A closed round moves to the history
+/// and its dates are still facts about her; they are drawn with a "Past
+/// round" prefix, never removed from the calendar.
+List<String> ttcCalendarClinicLines(DateTime d) {
+  final t = TtcTreatmentStore.instance;
+  String name(TtcTreatmentStep? step, TtcRoundKind? kind) =>
+      kind == null && step != null
+          // A legacy round keeps the words it always had (and its Hindi).
+          ? step.label(TtcLang.instance.hinglish)
+          : ttcCalendarDateLabel(step, kind);
+  List<String> of(TtcTreatmentCycle r, {String prefix = ''}) => [
+        for (final step in TtcTreatmentStep.values)
+          if (_sameDay(r[step], d)) '$prefix${name(step, r.kind)}',
+        for (final s in r.scans)
+          if (_sameDay(s, d)) '$prefix${name(null, r.kind)}',
+      ];
+  return [
+    ...of(t.cycle),
+    for (final h in t.history.reversed)
+      ...of(h, prefix: '$kTtcCalendarPastRound · '),
+  ];
+}
+
+/// The round band on [d] and the kind of its round: the open round first.
+(TtcRoundBand, TtcRoundKind?)? ttcCalendarBandOn(DateTime d) {
+  final t = TtcTreatmentStore.instance;
+  for (final r in [t.cycle, ...t.history.reversed]) {
+    final b = ttcRoundBandOn(r, d);
+    if (b != null) return (b, r.kind);
+  }
+  return null;
 }
 
 TtcDayFacts ttcFactsFor(DateTime day) {
   final d = DateTime(day.year, day.month, day.day);
   final cycle = CycleStore.instance;
-  final store = TtcStore.instance;
-  const engine = TtcChapterEngine();
+  // Kept for revert, with the arithmetic below that used them:
+  //   final store = TtcStore.instance;
+  //   const engine = TtcChapterEngine();
 
   final isStart = cycle.periodStarts.any((p) =>
       p.year == d.year && p.month == d.month && p.day == d.day);
 
   // Which cycle day this date falls on, relative to the most recent period
-  // start on or before it - so past months read correctly too.
-  DateTime? openedOn;
-  for (final p in cycle.periodStarts) {
-    if (!p.isAfter(d)) openedOn = p;
-  }
+  // start on or before it - so past months read correctly too. (Now
+  // `ctx.cycleStart`; kept for revert.)
+  //   DateTime? openedOn;
+  //   for (final p in cycle.periodStarts) {
+  //     if (!p.isAfter(d)) openedOn = p;
+  //   }
 
-  FertilityLevel? fertility;
-  var isOvulation = false;
-  var isExpected = false;
+  // ⚠️ AND EARLIER CYCLES ARE SHADED AGAIN, LATER THE SAME DAY — FROM THEIR
+  // OWN LENGTH. The user's decision (2026-09-26): earlier cycles show their
+  // fertile days, as competitor calendars do, worked out looking back from
+  // that cycle's own length (never from this cycle's estimate, which is what
+  // the first bullet below removed). The resolver does it once, so the hero
+  // on that date names the same days the grid shades. `lookingBack` tells the
+  // day panel to say so.
+  //
+  // ⚠️ THE CYCLE FACTS COME FROM `ttcDayContext` SINCE 2026-09-26 — the
+  // same resolver the home's hero, cards and reads use. Two things changed on
+  // screen, both disagreements with the hero:
+  //
+  //   * An EARLIER cycle is no longer shaded fertile. It was shaded with THIS
+  //     cycle's estimate (and this cycle's LH strip, when there was one),
+  //     while the hero says in words that we only work out fertile days for
+  //     the cycle she is in.
+  //   * "Period expected" needs the same estimate the window does. On a
+  //     history the engine will not estimate from, the hero says "not enough
+  //     logged" and the calendar no longer puts a date beside it.
+  //
+  // The block below is the previous arithmetic, kept for revert.
+  final ctx = ttcDayContext(d);
+  final FertilityLevel? fertility = ctx.fertility;
+  final isOvulation = ctx.isOvulationDay;
+  final isExpected = ctx.isExpectedPeriodDay;
+  //   FertilityLevel? fertility;
+  //   var isOvulation = false;
+  //   var isExpected = false;
+  // if (openedOn != null) {
+  //   final state = store.state(on: d);
+  //   final cycleDay = d.difference(openedOn).inDays + 1;
+  //   final ov = engine.estimatedOvulationDay(state);
+  //   final len = engine.cycleLengthFor(state);
+  //   fertility = engine.fertilityFor(state, cycleDay);
+  //   isOvulation = ov != null && cycleDay == ov;
+  //   // Only project forward from the CURRENT cycle - drawing an expected period
+  //   // into a month that already happened would be nonsense.
+  //   //
+  //   // And never on a medicated cycle: progesterone support usually delays the
+  //   // period, so an "expected" marker there is a date her body has not agreed
+  //   // to and her clinic never mentioned.
+  //   isExpected = store.behaviour.countsToPeriod &&
+  //       openedOn == cycle.lastPeriodStart &&
+  //       cycleDay == len + 1;
+  // }
 
-  if (openedOn != null) {
-    final state = store.state(on: d);
-    final cycleDay = d.difference(openedOn).inDays + 1;
-    final ov = engine.estimatedOvulationDay(state);
-    final len = engine.cycleLengthFor(state);
-    fertility = engine.fertilityFor(state, cycleDay);
-    isOvulation = ov != null && cycleDay == ov;
-    // Only project forward from the CURRENT cycle - drawing an expected period
-    // into a month that already happened would be nonsense.
-    //
-    // And never on a medicated cycle: progesterone support usually delays the
-    // period, so an "expected" marker there is a date her body has not agreed
-    // to and her clinic never mentioned.
-    isExpected = store.behaviour.countsToPeriod &&
-        openedOn == cycle.lastPeriodStart &&
-        cycleDay == len + 1;
-  }
-
-  // The clinic's real dates, plotted like any other event.
-  final treatment = <String>[
-    for (final step in TtcTreatmentStep.values)
-      if (_sameDay(TtcTreatmentStore.instance.cycle[step], d))
-        step.label(TtcLang.instance.hinglish)
-  ];
+  // The clinic's real dates, plotted like any other event. Since 2026-09-26
+  // named for her kind of round, scans and past rounds included
+  // (`ttcCalendarClinicLines`). Kept for revert:
+  //   final treatment = <String>[
+  //     for (final step in TtcTreatmentStep.values)
+  //       if (_sameDay(TtcTreatmentStore.instance.cycle[step], d))
+  //         step.label(TtcLang.instance.hinglish)
+  //   ];
+  final treatment = ttcCalendarClinicLines(d);
+  final band = ttcCalendarBandOn(d);
 
   final dayKey = TtcLogStore.dayKey(d);
   final logged = <String>[
@@ -240,6 +389,9 @@ TtcDayFacts ttcFactsFor(DateTime day) {
     timelineEvents: timeline,
     appointments: TtcAppointmentsStore.instance.on(d),
     treatment: treatment,
+    lookingBack: ctx.lookingBack,
+    roundBand: band?.$1,
+    roundKind: band?.$2,
   );
 }
 
@@ -339,7 +491,23 @@ class _MonthGrid extends StatelessWidget {
                             firstInRow: col == 0,
                             lastInRow: col == 6,
                           )
-                        : const SizedBox(height: 42),
+                        // A round's soft band, the same capsule in a cooler
+                        // tint (2026-09-26, B5). Never on a fertile day: the
+                        // resolver refuses a window on a round's days.
+                        : TtcRoundBandSlice.bandOf(_dateAt(
+                                    month, row, col, leading, daysInMonth)) !=
+                                null
+                            ? TtcRoundBandSlice(
+                                date: _dateAt(
+                                    month, row, col, leading, daysInMonth),
+                                before: _dateAt(
+                                    month, row, col - 1, leading, daysInMonth),
+                                after: _dateAt(
+                                    month, row, col + 1, leading, daysInMonth),
+                                firstInRow: col == 0,
+                                lastInRow: col == 6,
+                              )
+                            : const SizedBox(height: 42),
                   ),
               ]),
             ),
@@ -486,6 +654,57 @@ class TtcFertileBand extends StatelessWidget {
   }
 }
 
+/// One column's slice of a round's soft band, rounded where the stretch
+/// starts and ends, like [TtcFertileBand]. Public so a test can find it.
+class TtcRoundBandSlice extends StatelessWidget {
+  const TtcRoundBandSlice({
+    super.key,
+    required this.date,
+    required this.before,
+    required this.after,
+    required this.firstInRow,
+    required this.lastInRow,
+  });
+
+  final DateTime? date;
+  final DateTime? before;
+  final DateTime? after;
+  final bool firstInRow;
+  final bool lastInRow;
+
+  static TtcRoundBand? bandOf(DateTime? d) =>
+      d == null ? null : ttcFactsFor(d).roundBand;
+
+  /// The two tints: cool and quiet, never the fertile pink.
+  static Color tintFor(TtcRoundBand b) => switch (b) {
+        TtcRoundBand.medicine => const Color(0xFFE3E8F4),
+        TtcRoundBand.waitingForTest => const Color(0xFFEDE8F5),
+      };
+
+  @override
+  Widget build(BuildContext context) {
+    final mine = bandOf(date);
+    if (mine == null) return const SizedBox(height: 42);
+    final openLeft = bandOf(before) == mine && !firstInRow;
+    final openRight = bandOf(after) == mine && !lastInRow;
+    const r = Radius.circular(999);
+    return Center(
+      child: Container(
+        height: 34,
+        decoration: BoxDecoration(
+          color: tintFor(mine),
+          borderRadius: BorderRadius.only(
+            topLeft: openLeft ? Radius.zero : r,
+            bottomLeft: openLeft ? Radius.zero : r,
+            topRight: openRight ? Radius.zero : r,
+            bottomRight: openRight ? Radius.zero : r,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _DayCell extends StatelessWidget {
   const _DayCell({
     required this.date,
@@ -554,6 +773,10 @@ class _DayCell extends StatelessWidget {
                 children: [
                   if (facts.loggedTrackers.isNotEmpty) _dot(ttcPurple),
                   if (facts.journalEntries.isNotEmpty) _dot(ttcMuted),
+                  // A date her clinic gave her (2026-09-26, B5).
+                  if (facts.isClinicDate)
+                    _dot(ttcTitleInk,
+                        key: const ValueKey('ttc_cal_clinic_dot')),
                 ],
               ),
             ),
@@ -563,7 +786,8 @@ class _DayCell extends StatelessWidget {
     );
   }
 
-  Widget _dot(Color c) => Container(
+  Widget _dot(Color c, {Key? key}) => Container(
+        key: key,
         width: 4,
         height: 4,
         margin: const EdgeInsets.symmetric(horizontal: 1),
@@ -580,7 +804,13 @@ class _Legend extends StatelessWidget {
     required this.behaviour,
     required this.hasEstimate,
     required this.t,
+    this.hasRound = false,
+    this.roundKind,
   });
+
+  /// A round exists (open or past): the key names its marker and bands.
+  final bool hasRound;
+  final TtcRoundKind? roundKind;
 
   final bool open;
   final VoidCallback onToggle;
@@ -633,6 +863,18 @@ class _Legend extends StatelessWidget {
           _row(ttcPurple, t.calendarLogged),
           if (behaviour.countsToPeriod)
             _row(ttcCoral, t.calendarNextPeriod, outline: true),
+          if (hasRound) ...[
+            _row(ttcTitleInk, kTtcCalendarClinicDate),
+            if (roundKind != TtcRoundKind.ovulationInduction &&
+                roundKind != TtcRoundKind.fetMedicated &&
+                roundKind != TtcRoundKind.fetNatural)
+              _row(TtcRoundBandSlice.tintFor(TtcRoundBand.medicine),
+                  ttcRoundBandLabel(TtcRoundBand.medicine, roundKind),
+                  filled: true),
+            _row(TtcRoundBandSlice.tintFor(TtcRoundBand.waitingForTest),
+                ttcRoundBandLabel(TtcRoundBand.waitingForTest, roundKind),
+                filled: true),
+          ],
         ],
       ]),
     );
@@ -685,21 +927,50 @@ class _DayPanel extends StatelessWidget {
         day.month == today.month &&
         day.day == today.day;
 
+    // ---- two lines from the gap analysis (2026-09-26, P3) -----------------
+    //
+    // "Period expected" on the day it is expected, and on a fertile day of
+    // this cycle, the due date a pregnancy from it would have. NATURAL CYCLES
+    // ONLY: `isExpectedPeriod` is already off on a medicated cycle, and the due
+    // line checks the same behaviour flag the window does. A clinic owns its
+    // own dates; we do not put a date of ours next to theirs.
+    //
+    // ⚠️ A CONDITION, NEVER A HOPE AND NEVER A CHANCE. "If this cycle works"
+    // is plain arithmetic (266 days from conception) on a day she chose to
+    // look at. It promises nothing, and it says nothing about how likely.
+    final dueLine = _dueLine(day, facts);
+    final showSomething = facts.hasAnything || facts.isExpectedPeriod;
+
     return TtcCard(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Text(isToday ? t.calendarToday : _fmt(day), style: ttcJakarta(16)),
         const SizedBox(height: 12),
-        if (!facts.hasAnything)
+        if (!showSomething)
           Text(t.calendarNothing, style: ttcBody(13.5))
         else ...[
           if (facts.isPeriodStart)
             _line(Icons.circle, ttcCoral, t.calendarPeriod),
+          if (facts.isExpectedPeriod)
+            _line(Icons.circle_outlined, ttcCoral, kTtcCalendarPeriodExpected),
+          // An earlier cycle's window says "looking back" and carries no
+          // grade (2026-09-26); the current cycle's reads as before.
           if (facts.isOvulation)
-            _line(Icons.egg_outlined, ttcBrown, t.calendarOvulation),
+            _line(
+                Icons.egg_outlined,
+                ttcBrown,
+                facts.lookingBack
+                    ? t.calendarOvulationLookingBack
+                    : t.calendarOvulation),
           if (facts.fertility != null &&
               facts.fertility != FertilityLevel.low)
-            _line(Icons.wb_twilight_rounded, ttcPurple,
-                '${t.calendarFertile} · ${facts.fertility!.label(hi)}'),
+            _line(
+                Icons.wb_twilight_rounded,
+                ttcPurple,
+                facts.lookingBack
+                    ? t.calendarFertileLookingBack
+                    : '${t.calendarFertile} · ${facts.fertility!.label(hi)}'),
+          if (dueLine != null)
+            _line(Icons.child_friendly_outlined, ttcPurple, dueLine),
           for (final id in facts.loggedTrackers)
             _line(Icons.check_circle_outline_rounded, ttcPurple,
                 ttcTrackerById(id)?.title(hi) ?? id),
@@ -708,6 +979,9 @@ class _DayPanel extends StatelessWidget {
                 '${e.kind.label(hi)} · ${e.text}'),
           for (final step in facts.treatment)
             _line(Icons.local_hospital_outlined, ttcPurple, step),
+          if (facts.roundBand case final b?)
+            _line(Icons.linear_scale_rounded, ttcTitleInk,
+                ttcRoundBandLabel(b, facts.roundKind)),
           for (final a in facts.appointments)
             _line(Icons.event_note_outlined, ttcBrown,
                 a.withWhom.isEmpty ? a.title : '${a.title} · ${a.withWhom}'),
@@ -739,6 +1013,32 @@ class _DayPanel extends StatelessWidget {
     ];
     return '${d.day} ${m[d.month - 1]} ${d.year}';
   }
+
+  /// The due-date line for a fertile day of this cycle, or null.
+  static String? _dueLine(DateTime day, TtcDayFacts facts) =>
+      ttcCalendarDueLine(day, facts);
+}
+
+/// "Period expected", on the day the next period is expected (natural cycles).
+const String kTtcCalendarPeriodExpected = 'Period expected';
+
+/// "If this cycle works, your due date would be around 12 Jun 2027" for a
+/// fertile day of the CURRENT cycle on her own timing, else null.
+///
+/// Public so `test/ttc_home_gap_test.dart` can hold the natural-only rule
+/// without pumping the calendar.
+String? ttcCalendarDueLine(DateTime day, TtcDayFacts facts) {
+  final store = TtcStore.instance;
+  if (!store.behaviour.showsFertilityWindow) return null;
+  if (store.today.ownership != TimingOwnership.parentveda) return null;
+  final f = facts.fertility;
+  if (f == null || f == FertilityLevel.low) return null;
+  final last = CycleStore.instance.lastPeriodStart;
+  if (last == null) return null;
+  final d = DateTime(day.year, day.month, day.day);
+  if (d.isBefore(DateTime(last.year, last.month, last.day))) return null;
+  return 'If this cycle works, your due date would be around '
+      '${_DayPanel._fmt(ttcDueDateIfConceivedOn(d))}';
 }
 
 // ---- upcoming ---------------------------------------------------------------
@@ -753,16 +1053,48 @@ class _Upcoming extends StatelessWidget {
     final store = TtcStore.instance;
     final today = store.today;
 
+    // ⚠️ A ROUND'S NEXT CLINIC DATE FIRST (2026-09-26, §3c, B5). While a
+    // round is open and has a date today or ahead, "Coming up" names that
+    // date, not only the blood test, and names the blood test by its DATE:
+    // the old card counted down to it ("in 9 days"), against the hero's rule
+    // that a test is never counted down. While the round is only planned,
+    // her own cycle's next period follows it. See [_RoundUpcoming].
+    final round = TtcTreatmentStore.instance.cycle;
+    if (!round.isEmpty && !round.isClosed) {
+      final nowD = DateTime.now();
+      final todayD = DateTime(nowD.year, nowD.month, nowD.day);
+      final next = ttcRoundNextAfter(
+          round, todayD.subtract(const Duration(days: 1)));
+      if (next != null) {
+        return _RoundUpcoming(
+          round: round,
+          next: next,
+          today: todayD,
+          planned: !ttcTreatmentActive(round, todayD),
+          t: t,
+        );
+      }
+    }
+
     // On a medicated cycle the countdown is to the BLOOD TEST, not a period.
     // Progesterone support usually delays the period, so counting to it
     // produces a "you are late" that means nothing and reads as hope - which is
     // the cruellest possible way for this card to be wrong.
+    //
+    // 2026-09-26: reached now only with nothing ahead in the round (a legacy
+    // blob, or a test already passed); the test is named by its date.
     if (today.behaviour.countsToBeta) {
       final beta = TtcTreatmentStore.instance.cycle.betaTest;
       if (beta == null) return const SizedBox();
+      // From midnight, like every other count on the stage (2026-09-26).
+      // Kept for revert: `.difference(DateTime.now())`, a day short most of
+      // the day.
+      final now = DateTime.now();
       final days = DateTime(beta.year, beta.month, beta.day)
-          .difference(DateTime.now())
+          .difference(DateTime(now.year, now.month, now.day))
           .inDays;
+      // A test already behind her has nothing to come up (2026-09-26).
+      if (days < 0) return const SizedBox();
       return TtcCard(
         color: ttcPanel,
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -772,7 +1104,9 @@ class _Upcoming extends StatelessWidget {
             const Icon(Icons.biotech_outlined, size: 15, color: ttcPurple),
             const SizedBox(width: 10),
             Expanded(child: Text(t.betaWaitTitle, style: ttcBody(13.5))),
-            Text(t.betaWaitDays(days),
+            // Kept for revert: Text(t.betaWaitDays(days), ...). A test is
+            // named by its date, never counted down to.
+            Text(ttcRoundDate(beta),
                 style: ttcBody(12.5, color: ttcTitleInk, w: FontWeight.w800)),
           ]),
           const SizedBox(height: 9),
@@ -781,11 +1115,20 @@ class _Upcoming extends StatelessWidget {
       );
     }
 
-    final last = CycleStore.instance.lastPeriodStart;
-    if (last == null || today.cycleDay == null) return const SizedBox();
-
-    final nextPeriod = last.add(Duration(days: today.cycleLength));
-    final daysAway = nextPeriod.difference(DateTime.now()).inDays;
+    // ⚠️ THE RESOLVER'S DUE DATE, COUNTED FROM MIDNIGHT (2026-09-26,
+    // consistency pass). This counted from `DateTime.now()`, which carries
+    // the time of day, so `inDays` dropped a day before midnight: "in 3 days"
+    // here under a hero saying "in 4 days", and "Any day now" the day before
+    // the hero's "tomorrow". And it counted on a history the engine will not
+    // estimate from. Kept for revert:
+    //   final last = CycleStore.instance.lastPeriodStart;
+    //   if (last == null || today.cycleDay == null) return const SizedBox();
+    //   final nextPeriod = last.add(Duration(days: today.cycleLength));
+    //   final daysAway = nextPeriod.difference(DateTime.now()).inDays;
+    final ctx = ttcDayContext(DateTime.now());
+    final nextPeriod = ctx.periodDueOn;
+    if (nextPeriod == null || today.cycleDay == null) return const SizedBox();
+    final daysAway = nextPeriod.difference(ctx.today).inDays;
 
     return TtcCard(
       color: ttcPanel,
@@ -805,6 +1148,81 @@ class _Upcoming extends StatelessWidget {
             style: ttcBody(12.5, color: ttcTitleInk, w: FontWeight.w800),
           ),
         ]),
+      ]),
+    );
+  }
+}
+
+/// "Coming up" while a round is open with a date today or ahead: the next
+/// clinic date, the blood test by its date when it is not the next one, and,
+/// while the round is only planned, her own next period too.
+class _RoundUpcoming extends StatelessWidget {
+  const _RoundUpcoming({
+    required this.round,
+    required this.next,
+    required this.today,
+    required this.planned,
+    required this.t,
+  });
+
+  final TtcTreatmentCycle round;
+  final (TtcTreatmentStep?, DateTime) next;
+  final DateTime today;
+  final bool planned;
+  final TtcS t;
+
+  @override
+  Widget build(BuildContext context) {
+    final kind = round.kind;
+    final (step, on) = next;
+    final test = ttcRoundBloodTest(round);
+    final testAhead = test != null &&
+        !DateTime(test.year, test.month, test.day).isBefore(today) &&
+        step != TtcTreatmentStep.betaTest &&
+        step != TtcTreatmentStep.repeatBeta;
+    final ownDue = planned ? ttcDayContext(today).periodDueOn : null;
+
+    Widget row(IconData icon, Color c, String label, String when,
+            {Key? key}) =>
+        Padding(
+          key: key,
+          padding: const EdgeInsets.only(bottom: 9),
+          child: Row(children: [
+            Icon(icon, size: 15, color: c),
+            const SizedBox(width: 10),
+            Expanded(child: Text(label, style: ttcBody(13.5))),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(when,
+                  textAlign: TextAlign.right,
+                  style:
+                      ttcBody(12.5, color: ttcTitleInk, w: FontWeight.w800)),
+            ),
+          ]),
+        );
+
+    return TtcCard(
+      key: const ValueKey('ttc_calendar_round_upcoming'),
+      color: ttcPanel,
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        ttcEyebrow(t.calendarUpcoming, color: ttcPurple),
+        const SizedBox(height: 10),
+        row(
+          Icons.local_hospital_outlined,
+          ttcTitleInk,
+          ttcCalendarDateLabel(step, kind),
+          ttcCalendarWhen(step, on, today),
+          key: const ValueKey('ttc_calendar_next_clinic_date'),
+        ),
+        if (testAhead)
+          row(Icons.biotech_outlined, ttcTitleInk,
+              ttcStepLabel(TtcTreatmentStep.betaTest, kind), ttcRoundDate(test)),
+        if (ownDue != null && ownDue.isAfter(today))
+          row(Icons.circle_outlined, ttcCoral, t.calendarNextPeriod,
+              'in ${ownDue.difference(today).inDays} days'),
+        const SizedBox(height: 2),
+        Text(planned ? kTtcCalendarRoundPlannedNote : kTtcCalendarRoundNote,
+            style: ttcBody(11.5, h: 1.5)),
       ]),
     );
   }

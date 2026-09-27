@@ -612,10 +612,17 @@ void main() {
         ..logPeriodStart(start.subtract(const Duration(days: 28)))
         ..logPeriodStart(start);
       TtcStore.instance.setPath(TtcPath.ivf);
+      // ⚠️ THE DATE MOVED INTO THIS CYCLE ON 2026-09-26. The user decided a
+      // clinic owns the timing only when the treatment tracker holds a real
+      // date for the CURRENT cycle, not on the pathway label. A retrieval 40
+      // days back belongs to an earlier cycle, so it no longer makes this one
+      // clinic-run. The retrieval is now on cycle day 1: inside this cycle,
+      // already behind her from day 2. Kept for revert:
+      //   ..setDate(TtcTreatmentStep.retrieval,
+      //       DateTime.now().subtract(const Duration(days: 40)));
       TtcTreatmentStore.instance
         ..clearCycle()
-        ..setDate(TtcTreatmentStep.retrieval,
-            DateTime.now().subtract(const Duration(days: 40)));
+        ..setDate(TtcTreatmentStep.retrieval, start);
     }
 
     tearDown(() {
@@ -635,26 +642,75 @@ void main() {
     // Rewriting them as "it says something different every day" against the new
     // states would duplicate the cycle-walk group above, which already does it
     // for every day of a 28-day cycle.
-    test('the fertile window IS reachable on the hero now — by decision', () {
-      // ⚠️ THIS INVERTED ON 2026-09-05, AND IT IS A PRODUCT DECISION RATHER
-      // THAN A DISCOVERY. It asserted that no window state could appear while a
-      // clinic held the timing, which was the rule everywhere.
-      //
-      // It still IS the rule everywhere except one surface. The hero passes
-      // `ignoreOwnership` — see `ttcFertileWindowNow` for the full reasoning —
-      // because `ownership` is derived from `path.defaultMedicated`, a guess
-      // from a label tapped once, and `setPath` clears her real answers so the
-      // guess always wins. Four rounds of the hero showing a clinic refusal to
-      // an account with no treatment is what settled it.
-      //
-      // What has NOT changed is asserted immediately below.
-      for (var day = 1; day <= 15; day++) {
+    // ⚠️ INVERTED AGAIN ON 2026-09-26 (consistency pass), AND IT NEEDS THE
+    // USER'S CONFIRMATION. The 2026-09-05 decision let the hero alone publish
+    // a window into a clinic-owned cycle. The consistency brief says clinic-
+    // owned cycles get no phase-based prediction anywhere, and with the hero
+    // the only surface still predicting, it disagreed with every card, read,
+    // calendar mark and message beneath it. The part of the old decision that
+    // was about the user's complaint is kept and asserted: the hero is never
+    // the clinic refusal sentence. It carries her cycle day (a fact that moves
+    // every morning) and the way out, "Not on treatment? Change this".
+    // Kept for revert, the old test:
+    //   test('the fertile window IS reachable on the hero now — by decision', () {
+    //     for (var day = 1; day <= 15; day++) {
+    //       seedClinicCycle(day);
+    //       final line = ttcHomeHeroLine();
+    //       expect(line.state, isNot(TtcHeroState.clinicHolds),
+    //           reason: 'day $day still refuses instead of speaking');
+    //     }
+    //   });
+    test('a clinic cycle with no dates ahead carries her cycle day, not a '
+        'window', () {
+      const window = {
+        TtcHeroState.windowOpensIn,
+        TtcHeroState.windowOpen,
+        TtcHeroState.windowLastDay,
+        TtcHeroState.waiting,
+        TtcHeroState.periodDue,
+        TtcHeroState.periodLate,
+        TtcHeroState.periodExpectedBy,
+      };
+      // From day 2: on day 1 the clinic date (on cycle day 1) is today, and
+      // the hero rightly leads on it (2026-09-26, see the seed).
+      for (var day = 2; day <= 15; day++) {
         seedClinicCycle(day);
         final line = ttcHomeHeroLine();
-        expect(line.state, isNot(TtcHeroState.clinicHolds),
-            reason: 'day $day still refuses instead of speaking');
+        expect(window, isNot(contains(line.state)),
+            reason: 'day $day published a prediction into a clinic cycle');
+        expect(line.state, TtcHeroState.clinicHolds);
+        expect(line.days, day,
+            reason: 'day $day: the hero must still move every morning');
       }
+      // The sub-line is still a way on, not a dead end. Since 2026-09-26 a
+      // label alone cannot reach this state, so the way on is the next clinic
+      // date (or clearing the round), not "Not on treatment?". Kept for
+      // revert:
+      //   expect(TtcS.current().headerNotOnTreatment, contains('Change'), ...);
+      expect(TtcS.current().headerClinicDatesPassed, contains('Add the next'),
+          reason: 'the clinic line must stay a way out, not a dead end');
     });
+
+    // The old test's reasoning, kept with it for revert:
+    //  // ⚠️ THIS INVERTED ON 2026-09-05, AND IT IS A PRODUCT DECISION RATHER
+    //  // THAN A DISCOVERY. It asserted that no window state could appear while a
+    //  // clinic held the timing, which was the rule everywhere.
+    //  //
+    //  // It still IS the rule everywhere except one surface. The hero passes
+    //  // `ignoreOwnership` — see `ttcFertileWindowNow` for the full reasoning —
+    //  // because `ownership` is derived from `path.defaultMedicated`, a guess
+    //  // from a label tapped once, and `setPath` clears her real answers so the
+    //  // guess always wins. Four rounds of the hero showing a clinic refusal to
+    //  // an account with no treatment is what settled it.
+    //  //
+    //  // What has NOT changed is asserted immediately below.
+    //  for (var day = 1; day <= 15; day++) {
+    //    seedClinicCycle(day);
+    //    final line = ttcHomeHeroLine();
+    //    expect(line.state, isNot(TtcHeroState.clinicHolds),
+    //        reason: 'day $day still refuses instead of speaking');
+    //  }
+    //});
 
     test('and no OTHER surface gained a window', () {
       // The invariant the 36 clinical tests protect, kept: `estimatedOvulationDay`
@@ -796,6 +852,10 @@ void main() {
       expect(TtcS.current().headerBetaOn('18 Sep'), isNot(contains('9 days')));
     });
 
+    // ⚠️ 2026-09-26 (consistency pass): on a clinic-owned cycle "the cycle
+    // message" is her cycle day (`clinicHolds`), not a window or a count to a
+    // period, which no other surface shows on such a cycle. The window states
+    // are kept in the set below for revert and for the natural-cycle reading.
     test('no dates at all falls through to the cycle message', () {
       // ⚠️ THIS TEST ASSERTED THE OPPOSITE YESTERDAY, AND THE OPPOSITE WAS
       // WRONG. It expected an "Add your clinic dates" hero, built on the
@@ -817,10 +877,17 @@ void main() {
             TtcHeroState.waiting,
             TtcHeroState.periodDue,
             TtcHeroState.periodLate,
+            TtcHeroState.clinicHolds,
           },
           contains(line.state),
           reason: 'a treatment account with no dates still gets a clinic '
               'sentence instead of its cycle');
+      if (TtcStore.instance.today.clinicInvolved) {
+        expect(line.state, TtcHeroState.clinicHolds,
+            reason: 'a clinic-owned cycle got a prediction on the hero');
+        expect(line.days, greaterThan(0),
+            reason: 'the clinic hero must carry her cycle day');
+      }
     });
 
     test('it follows the strip, like everything else on the page', () {

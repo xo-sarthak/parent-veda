@@ -610,10 +610,13 @@ void main() {
       );
     });
 
-    test('TTC: slot 2 is Products, Courses is a Tools tile', () {
+    // ⚠️ SLOT 3 SINCE 2026-09-26: the V3 bar is Today · Learn · Products ·
+    // Tools · You (the user's call after the TTC gap analysis). Was slot 2,
+    // `return 1`.
+    test('TTC: slot 3 is Products, Courses is a Tools tile', () {
       final s = read('lib/screens/ttc/ttc_common.dart');
       expect(s, contains("name: 'ttc/products'"));
-      expect(s, contains("case 'ttc/products':\n      return 1;"));
+      expect(s, contains("case 'ttc/products':\n      return 2;"));
       expect(s, contains('t.tabProducts'));
       expect(
         read('lib/screens/ttc/ttc_tools_screen.dart'),

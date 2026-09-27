@@ -49,6 +49,7 @@
 
 import '../services/family_profile.dart';
 import 'cycle_store.dart';
+import 'ttc_chapter.dart' show kTtcIrregularSpreadDays;
 import 'ttc_pcos_check_store.dart';
 
 // -----------------------------------------------------------------------------
@@ -265,8 +266,13 @@ PcosCycleFacts pcosCycleFacts() {
   if (lens.length >= 3) {
     final lo = lens.reduce((a, b) => a < b ? a : b);
     final hi = lens.reduce((a, b) => a > b ? a : b);
-    regularity =
-        (hi - lo) > 9 ? PcosRegularity.irregular : PcosRegularity.regular;
+    // ⚠️ SEVEN, NOT NINE, SINCE 2026-09-26: the app's one definition of
+    // irregular (`kTtcIrregularSpreadDays`, FIGO 2018 for ages 26 to 41;
+    // nine is FIGO's figure for 18 to 25 and 42 to 45). The three-cycle floor
+    // above stays. Kept for revert: `(hi - lo) > 9`.
+    regularity = (hi - lo) > kTtcIrregularSpreadDays
+        ? PcosRegularity.irregular
+        : PcosRegularity.regular;
   }
   // A logged gap of three months is irregular whatever the average says — and
   // it is the case `cycleLengths` cannot see at all, because it filtered it.
@@ -321,31 +327,31 @@ class PcosStandResult {
 String _cycleLine(PcosCycleFacts facts, PcosStandAnswers a) {
   if (facts.hasLongGap) {
     return 'Your logs show a gap of about ${facts.longestGapDays! ~/ 30} '
-        'months without a period. That can make ovulation hard to predict, '
-        'and it is one of the things a doctor can look into.';
+        'months without a period. That can make ovulation hard to predict. '
+        "It's one of the things a doctor can look into.";
   }
   if (facts.regularity == PcosRegularity.irregular) {
-    return 'Your cycles have varied a fair amount from one to the next. That '
-        'can make ovulation harder to predict. It is one of the things a '
+    return 'Your cycles have changed quite a bit from one to the next. That '
+        "can make ovulation harder to predict. It's one of the things a "
         'doctor can look into.';
   }
   if (facts.regularity == PcosRegularity.regular) {
     return 'Your cycles look regular. That makes your fertile window easier '
-        'to read.';
+        'to spot.';
   }
 
   // Not enough logged. Fall back to what she told us, and say plainly that the
   // app is going on her word rather than on data it does not have.
   return switch (a.cycleLength) {
     PcosCycleLength.typical =>
-      'You said your cycles are usually 21 to 35 days. Once a few more are '
-          'logged here, this will read from your own dates.',
+      'You said your cycles are usually 21 to 35 days. Once you log a few '
+          'more here, this will use your own dates.',
     PcosCycleLength.shorter || PcosCycleLength.longer =>
       'You said your cycles are often outside the usual 21 to 35 days. That '
-          'can make ovulation harder to predict, and it is one of the things '
-          'a doctor can look into.',
-    _ => 'There is not enough logged yet to describe your pattern. Logging a '
-        'few period start dates is the fastest way to change that.',
+          "can make ovulation harder to predict. It's one of the things a "
+          'doctor can look into.',
+    _ => "There isn't enough logged yet to describe your pattern. Logging a "
+        'few period start dates is the quickest way to change that.',
   };
 }
 
@@ -360,21 +366,21 @@ List<String> _noticed(PcosStandAnswers a) {
 
   if (a.hairAreas.isNotEmpty) {
     final where = a.hairAreas.map((h) => h.label.toLowerCase()).join(', ');
-    out.add('You noticed extra hair growth ($where). On its own this can have '
-        'many causes.');
+    out.add('You noticed extra hair growth ($where). On its own, this can '
+        'have many causes.');
   }
   if (a.thinning != null && a.thinning != PcosDegree.none) {
     out.add('You noticed some hair thinning. Worth mentioning at a check-up.');
   }
   if (a.acne != null && a.acne != PcosDegree.none) {
-    out.add('You have had acne that skincare did not fix. Worth mentioning at '
+    out.add("You've had acne that skincare didn't fix. Worth mentioning at "
         'a check-up.');
   }
   if (a.skinDarkening == PcosYesNo.yes) {
     out.add('You noticed some skin darkening. Worth mentioning at a check-up.');
   }
   if (a.family == PcosFamily.yes) {
-    out.add('PCOS runs in your family. That is useful for a doctor to know.');
+    out.add("PCOS runs in your family. That's useful for a doctor to know.");
   }
   return out;
 }
@@ -403,11 +409,11 @@ List<String> _noticed(PcosStandAnswers a) {
 /// had before the field existed, which is why nothing else needed changing.
 String? _nudge(PcosCycleFacts facts, PcosStandAnswers a) {
   if (facts.hasLongGap) {
-    return 'Because you have had a long gap without a period, it is worth '
+    return "Because you've had a long gap without a period, it's worth "
         'booking a check sooner rather than later.';
   }
   if (a.trying == PcosTrying.overAYear) {
-    return 'Because you have been trying for a while, it is worth booking a '
+    return "Because you've been trying for a while, it's worth booking a "
         'check sooner rather than later.';
   }
 
@@ -419,10 +425,10 @@ String? _nudge(PcosCycleFacts facts, PcosStandAnswers a) {
   final sixMonths = a.trying == PcosTrying.sixToTwelve ||
       a.trying == PcosTrying.overAYear;
   if (age != null && age >= 35 && sixMonths) {
-    return 'Because you are ${age >= 40 ? 'over 40' : '35 or over'} and have '
-        'been trying six months or more, it is worth booking a check sooner '
-        'rather than later. Under 35 the usual advice is to give it a year; '
-        'from 35 it is six months.';
+    return 'Because you\'re ${age >= 40 ? 'over 40' : '35 or over'} and have '
+        "been trying six months or more, it's worth booking a check sooner "
+        'rather than later. Under 35, the usual advice is to give it a year. '
+        "From 35, it's six months.";
   }
   return null;
 }
@@ -430,7 +436,7 @@ String? _nudge(PcosCycleFacts facts, PcosStandAnswers a) {
 /// The always-shown line. Deliberately a constant: it is the one sentence that
 /// must be identical on every path, so it is not built.
 const String kPcosAlwaysLine =
-    'Only a doctor can say what is behind this. PCOS is diagnosed by a doctor, '
+    "Only a doctor can say what's behind this. PCOS is diagnosed by a doctor, "
     'with a check-up and sometimes a scan or a blood test, not by an app.';
 
 /// The closing line on the checklist. Also a constant, same reason.
@@ -447,7 +453,7 @@ PcosStandResult pcosBuildStand(PcosStandAnswers a, {PcosCycleFacts? facts}) {
     noticed.add('hair thinning');
   }
   if (a.acne != null && a.acne != PcosDegree.none) {
-    noticed.add('acne that skincare did not fix');
+    noticed.add("acne that skincare didn't fix");
   }
   if (a.skinDarkening == PcosYesNo.yes) noticed.add('skin darkening');
 
@@ -474,14 +480,14 @@ PcosStandResult pcosBuildStand(PcosStandAnswers a, {PcosCycleFacts? facts}) {
             : '${f.longestGapDays} days',
       ),
       (
-        label: 'What I have noticed',
+        label: "What I've noticed",
         // ⚠️ "Nothing in particular" RATHER THAN AN EMPTY LINE. She is taking
         // this to an appointment; a blank next to a heading reads as a question
         // she skipped, which invites the doctor to ask it again.
         value: noticed.isEmpty ? 'Nothing in particular' : noticed.join(', '),
       ),
       (
-        label: 'How long I have been trying',
+        label: "How long I've been trying",
         value: switch (a.trying) {
           PcosTrying.underSix => 'Less than 6 months',
           PcosTrying.sixToTwelve => '6 to 12 months',

@@ -123,23 +123,23 @@ class TtcCourseSession {
 
 /// How the course works. Shown on the course home, above the eight.
 const String kTtcCourseHow =
-    'Eight sessions, about fifteen minutes each, done at your own pace. Every '
-    'session teaches one part of the practice and ends by having you actually '
-    'do it, not just read about it. By session eight you have your own '
-    'five-minute daily practice, which is the same practice that lives on the '
-    'Today tab. It is free and it stays free.';
+    'Eight sessions, about fifteen minutes each, done at your own pace. Each '
+    'session teaches one part of the practice, and ends with you doing it, not '
+    'just reading about it. By session eight you have your own five-minute '
+    'daily practice. It\'s the same practice you\'ll find on the Today tab. '
+    'It\'s free, and it stays free.';
 
 /// ⚠️ THE POSITION, IN THE COURSE'S OWN WORDS. It is stated in session one and
 /// repeated on the course home, because somebody who arrives from a search
 /// result rather than from session one still has to meet it before the first
 /// practice. It is the sentence the whole area is built to be able to defend.
 const String kTtcCourseFrame =
-    'This is preparation, not a method of conception. It will not make a '
-    'pregnancy happen and it does not claim to. It does not shape a child\'s '
-    'intelligence or nature; there is no evidence for that and we will not tell '
-    'you otherwise. What it offers is a calmer way to spend the waiting, and a '
-    'body and mind in better shape when conception happens. Belief is optional. '
-    'Nothing here needs you to hold any particular faith.';
+    'This is a way to get ready, not a way to get pregnant. It will not make a '
+    'pregnancy happen, and it doesn\'t claim to. It does not shape a child\'s '
+    'intelligence or nature. There\'s no evidence for that, and we won\'t tell '
+    'you otherwise. What it gives you is a calmer way to spend the waiting, and '
+    'a body and mind in better shape when you do conceive. Belief is optional. '
+    'You don\'t need to follow any particular faith.';
 
 /// What the course leaves out, and the warning sign at the end of it.
 ///
@@ -150,9 +150,9 @@ const String kTtcCourseFrame =
 const String kTtcCourseNever =
     'No detox, cleanses or panchakarma. No herbs or medicines to buy. No '
     'astrology or auspicious dates. No claims about purifying the seed. No '
-    'promise of better odds. If you are ever offered garbh sanskar as an '
-    'alternative to fertility treatment, that is a warning sign, and the '
-    'tradition itself does not claim it.';
+    'promise that it makes pregnancy more likely. If anyone ever offers you '
+    'garbh sanskar as an alternative to fertility treatment, that\'s a warning '
+    'sign. The tradition itself doesn\'t claim that.';
 
 // -----------------------------------------------------------------------------
 //  The eight
@@ -163,25 +163,25 @@ const List<TtcCourseSession> kTtcCourseSessions = [
   TtcCourseSession(
     id: 'gs_what',
     number: 1,
-    title: 'What this is, and what it is not',
+    title: "What this is, and what it isn't",
     duration: 'About 12 minutes',
     setting: 'Both of you, together if possible',
     betterTogether: true,
-    intro: 'The honest opening. What garbh sanskar actually is, what the '
-        'tradition does and does not claim, and why the preconception version '
-        'is the more sensible half of it. Then your first practice, which is '
-        'simply sitting still.',
+    intro: 'An honest start. What garbh sanskar is, what the tradition does '
+        "and doesn't claim, and why the version before pregnancy is the more "
+        'sensible half of it. Then your first practice, which is just sitting '
+        'still.',
     steps: [
       'Read the opening: where the practice comes from, and what it is for.',
       'Read the four things this course leaves out, and why.',
-      'Sit upright, somewhere quiet, and start the two-minute timer.',
-      'Do nothing. Let the thoughts come and go. You are not trying to empty '
-          'the mind.',
-      'When the timer ends, notice how that felt. It is normal to find it '
+      'Sit upright somewhere quiet, and start the two-minute timer.',
+      "Do nothing. Let your thoughts come and go. You aren't trying to empty "
+          'your mind.',
+      "When the timer ends, notice how that felt. It's normal to find it "
           'uncomfortable at first.',
     ],
-    saidPlainly: 'Sitting still for two minutes is not a small thing when you '
-        'have been waiting for months. Nothing in this session is meant to fix '
+    saidPlainly: "Sitting still for two minutes isn't a small thing when you've "
+        'been waiting for months. Nothing in this session is meant to fix '
         'anything yet.',
     sitSeconds: 120,
   ),
@@ -194,22 +194,22 @@ const List<TtcCourseSession> kTtcCourseSessions = [
     duration: 'About 15 minutes',
     setting: 'Sitting',
     betterTogether: false,
-    intro: 'The part with the clearest effect, and the one you will use most. '
-        'Two breathing practices taught properly, slowly, with the counts on '
-        'screen.',
+    intro: "The part you'll feel working most clearly, and the one you'll use "
+        'most. Two breathing practices, taught slowly and properly, with the '
+        'counts on screen.',
     steps: [
       'Sit tall, shoulders down, hands resting.',
       'Learn the long out-breath: in for four, out for six. Practise for two '
           'minutes.',
       'Learn alternate nostril breathing, one step at a time, with the hand '
           'position shown.',
-      'Practise alternate nostril for two minutes.',
-      'Finish by sitting for thirty seconds with normal breathing, and notice '
+      'Practise alternate nostril breathing for two minutes.',
+      'Finish by sitting for thirty seconds, breathing normally, and notice '
           'the difference.',
-      'Pick whichever of the two you preferred. That is the one you will keep.',
+      "Pick whichever of the two you liked more. That's the one you'll keep.",
     ],
     saidPlainly: 'Slow the counts down if you feel light-headed. Breathing '
-        'practice should never feel like effort.',
+        'practice should never feel like hard work.',
     practiceIds: ['mb_longout', 'mb_nostril'],
   ),
 
@@ -221,20 +221,21 @@ const List<TtcCourseSession> kTtcCourseSessions = [
     duration: 'About 15 minutes',
     setting: 'Sitting or lying',
     betterTogether: false,
-    intro: 'Meditation taught without the mystique. You are training attention '
-        'to come back, over and over. That is the whole skill.',
+    intro: "Meditation, taught plainly with nothing mysterious about it. "
+        "You're teaching your attention to come back, again and again. That's "
+        'the whole skill.',
     steps: [
-      'Sit comfortably and close the eyes.',
-      'Put your attention on the feeling of the breath at the nostrils.',
-      'When the mind wanders, and it will, bring it back. That returning is '
-          'the practice, not a failure.',
+      'Sit comfortably and close your eyes.',
+      'Notice the feeling of your breath at your nostrils.',
+      'When your mind wanders, and it will, bring it back. Coming back is the '
+          "practice. It isn't a failure.",
       'Do this for five minutes, using the timer below.',
-      'Then try a body relaxation instead: move attention from the face down '
-          'to the feet, letting each part go.',
+      'Then try a body relaxation instead: move your attention from your face '
+          'down to your feet, letting each part relax.',
       'Notice which of the two suits you better.',
     ],
-    saidPlainly: 'A wandering mind is not a sign you are doing it wrong. It is '
-        'what minds do. Nobody gets a still mind for five minutes.',
+    saidPlainly: "A wandering mind doesn't mean you're doing it wrong. It's "
+        'what minds do. Nobody keeps a still mind for five minutes.',
     practiceIds: ['mb_bodyrelax'],
     sitSeconds: 300,
   ),
@@ -247,21 +248,21 @@ const List<TtcCourseSession> kTtcCourseSessions = [
     duration: 'About 12 minutes',
     setting: 'Both of you, headphones optional',
     betterTogether: false,
-    intro: 'Chanting, mantra and music, offered as a way to settle rather than '
-        'as a ritual you must believe in. This is the session people are most '
-        'unsure about, so it is deliberately gentle.',
+    intro: 'Chanting, mantra and music, offered as a way to calm down, not as '
+        'a ritual you have to believe in. People feel most unsure about this '
+        "session, so we've kept it gentle on purpose.",
     steps: [
-      'Listen to a short calm piece with the eyes closed, two minutes, doing '
-          'nothing else.',
-      'Try humming on the out-breath for one minute. It naturally lengthens '
-          'the exhale.',
-      'Try a simple repeated sound or mantra, out loud or silently, for two '
-          'minutes. Any word or sound that settles you works.',
-      'If chanting is not for you, use the calm listening instead. Both are on '
+      'Listen to a short, calm piece with your eyes closed for two minutes, '
+          'doing nothing else.',
+      'Try humming as you breathe out, for one minute. It makes the out-breath '
+          'longer on its own.',
+      'Try a short repeated sound or mantra, out loud or silently, for two '
+          'minutes. Any word or sound that calms you works.',
+      "If chanting isn't for you, use the calm listening instead. Both are on "
           'the Today tab.',
       'Notice whether doing it aloud or silently suited you better.',
     ],
-    saidPlainly: 'If a mantra means something to you, use it. If it does not, '
+    saidPlainly: "If a mantra means something to you, use it. If it doesn't, "
         'humming or listening does the same job here. Nothing in this session '
         'depends on the words having power.',
     practiceIds: ['mb_listen'],
@@ -275,21 +276,21 @@ const List<TtcCourseSession> kTtcCourseSessions = [
     duration: 'About 15 minutes',
     setting: 'Both of you',
     betterTogether: true,
-    intro: 'Gentle movement, and the shape of the day. This is where the '
-        'routine side of the tradition and ordinary preconception advice agree '
-        'with each other.',
+    intro: 'Gentle movement, and how your day is shaped. This is where the '
+        'daily routine of the tradition and ordinary advice for before '
+        'pregnancy agree with each other.',
     steps: [
-      'Learn the loosen-up sequence: neck, shoulders, side bends, one forward '
-          'fold.',
-      'Learn cat and cow, and child\'s pose, with the breath.',
-      'Understand why gentle is the instruction: hard training and hot yoga '
-          'work against what you are doing.',
-      'Set one wake time and one sleep time that both of you will keep, aiming '
+      'Learn the loosen-up: neck, shoulders, side bends, one forward fold.',
+      "Learn cat and cow, and child's pose, with your breath.",
+      "See why the advice is to keep it gentle: hard training and hot yoga "
+          "work against what you're doing.",
+      'Set one wake time and one sleep time that you both will keep, aiming '
           'for bed by about eleven.',
-      'Agree one small change to the evening that makes that bedtime possible.',
+      'Agree on one small change to your evening that makes that bedtime '
+          'possible.',
     ],
-    saidPlainly: 'The sleep part matters more than the postures. If you only '
-        'take one thing from this session, take the fixed bedtime.',
+    saidPlainly: 'The sleep part matters more than the poses. If you only take '
+        'one thing from this session, take the fixed bedtime.',
     practiceIds: ['mb_loosen', 'mb_catcow'],
     action: TtcCourseAction.setTimes,
   ),
@@ -305,18 +306,18 @@ const List<TtcCourseSession> kTtcCourseSessions = [
     // ⚠️ IT POINTS AT GETTING READY AND TEACHES NOTHING. Same boundary the
     // door's fourth tab holds: food is owned elsewhere, and a course session
     // that re-taught it would be the second copy that drifts.
-    intro: 'Sattvik eating explained plainly, without a diet plan and without '
-        'anything imported. Regular, home-cooked, mostly fresh. The detail '
-        'lives in Getting ready and this session points there.',
+    intro: 'Sattvik eating in plain words, with no diet plan and nothing '
+        'imported. Regular, home-cooked, mostly fresh. The details are in '
+        'Getting ready, and this session points you there.',
     steps: [
-      'Understand what sattvik traditionally means: fresh, simple, '
-          'home-cooked, eaten calmly and at regular times.',
-      'See how closely that matches ordinary preconception advice.',
+      'Learn what sattvik has always meant: fresh, plain, home-cooked food, '
+          'eaten calmly and at regular times.',
+      'See how closely that matches ordinary advice for before pregnancy.',
       'Pick your regular meal times, for both of you, and keep them.',
-      'Open the food and supplement pages in Getting ready for the specifics, '
+      'Open the food and supplement pages in Getting ready for the details, '
           'including folic acid.',
-      'Agree one meal a day the two of you will eat together, without screens, '
-          'if your timings allow.',
+      'Agree on one meal a day you two will eat together, without screens, if '
+          'your timings allow.',
     ],
     saidPlainly: 'No calorie counting, no banned foods and no weight targets '
         'here. Anything about supplements should come from a doctor, not from '
@@ -332,23 +333,23 @@ const List<TtcCourseSession> kTtcCourseSessions = [
     duration: 'About 15 minutes',
     setting: 'Both of you, together',
     betterTogether: true,
-    intro: 'The conduct and conversation part of the tradition, which turns '
-        'out to be the couple part. This is the session people say changed the '
-        'most.',
+    intro: 'The part of the tradition about how you behave and how you talk, '
+        'which turns out to be about the two of you. People say this is the '
+        'session that changed the most for them.',
     steps: [
-      'Understand the traditional idea plainly: how you live and how you treat '
-          'each other is the preparation, more than any single ritual.',
-      'Do the gratitude practice: each of you names one thing you like about '
+      'Learn the old idea in plain words: how you live and how you treat each '
+          'other is the real preparation, more than any single ritual.',
+      'Do the gratitude practice: each of you says one thing you like about '
           'the other, out loud.',
-      'Do the conversation practice: ask each other one honest question and '
-          'just listen to the answer without fixing it.',
-      'Agree what you will say to relatives who keep asking, so neither of you '
-          'has to improvise it alone.',
-      'Do ten slow breaths together, in the same room, same pace.',
+      'Do the conversation practice: ask each other one honest question, and '
+          'just listen to the answer without trying to fix it.',
+      "Agree on what you'll say to relatives who keep asking, so neither of "
+          'you has to make it up alone.',
+      'Take ten slow breaths together, in the same room, at the same pace.',
     ],
     saidPlainly: 'If one of you is finding this much harder than the other, '
-        'that is normal and not a sign of anything wrong. It is worth saying '
-        'out loud rather than managing alone.',
+        "that's normal. It doesn't mean anything is wrong. It helps to say it "
+        'out loud, instead of carrying it alone.',
     practiceIds: ['mb_together'],
   ),
 
@@ -360,21 +361,21 @@ const List<TtcCourseSession> kTtcCourseSessions = [
     duration: 'About 15 minutes',
     setting: 'Both of you',
     betterTogether: true,
-    intro: 'You build your own five-minute daily practice from what you '
-        'actually liked, and it becomes your Today tab. Nothing is assigned.',
+    intro: 'You build your own five-minute daily practice from the parts you '
+        'liked, and it becomes your Today tab. Nothing is handed to you.',
     steps: [
       'Look back at the seven sessions and pick the breathing practice you '
-          'preferred.',
-      'Pick the movement you will actually do on an ordinary day.',
-      'Confirm your bedtime and your meal times.',
+          'liked best.',
+      "Pick the movement you'll really do on an ordinary day.",
+      'Check your bedtime and your meal times.',
       'Choose whether you want the gratitude or the conversation part daily, '
           'or neither.',
-      'Set it as your daily practice. It should take five minutes, not more.',
+      'Set it as your daily practice. It should take five minutes, no more.',
       'Read the last part: what to do on the days you skip it.',
     ],
-    saidPlainly: 'There is no streak and nothing to maintain. If you skip '
-        'three days you have lost nothing. The moment this becomes another '
-        'thing to feel behind on, it is doing the opposite of its job.',
+    saidPlainly: "There's no streak and nothing to keep up. If you skip three "
+        "days, you've lost nothing. If this ever becomes one more thing to feel "
+        "behind on, it isn't doing its job.",
     action: TtcCourseAction.assemble,
   ),
 ];
@@ -390,5 +391,5 @@ TtcCourseSession? ttcCourseSessionById(String id) =>
 /// ends on a next step; this one ends by lowering the stakes, because the thing
 /// it is competing with is a ninety-day programme somebody can fall behind on.
 const String kTtcCourseSkipNote =
-    'On the days you skip it, skip it. Nothing here is counting, there is '
-    'nothing to catch up on, and the practice is waiting where you left it.';
+    'On the days you skip it, that\'s fine. Nothing here is counting, there\'s '
+    'nothing to catch up on, and the practice will be here when you come back.';

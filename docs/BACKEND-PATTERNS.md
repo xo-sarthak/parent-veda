@@ -2125,6 +2125,94 @@ session. Expand-then-contract says to add the column before any client
 depends on it; a client that tolerates being ahead of the schema makes the
 deploy order a preference rather than a precondition.
 
+## 16m. A message is computed, not queued — `TtcMessagesStore`
+
+**The situation.** TTC now speaks first: five messages (window opens, period came, late by a day, cycle report
+ready, trying for a while), each shown in an in-app Messages list and, if she allowed it, as a phone
+notification. Each must be sent **once**, at its moment. And every one of them is derived from dates she can
+correct at any time.
+
+**The tempting design: an event queue.** "She logged a period, so enqueue *your period came*." It works until
+the first correction. Move a period by a day and the queue has already scheduled the wrong window; delete the
+period and the queue still holds a message about a period that never happened. A queue stores *conclusions*,
+and conclusions go stale when their premises change.
+
+**What we did: recompute the whole set from the facts, every time.** `refresh()` rebuilds the candidate messages
+from the stores (cycle, TTC state, stage, fertility-help answers), the same way `TtcStore.today` is recomputed
+rather than stored. Then it splits them by time:
+
+- a message whose moment has **passed** is *delivered* and **frozen**: written to the list, never recomputed,
+  re-sent or removed. That freezing is what "sent once" means;
+- a message whose moment is still **ahead** is *pending*: thrown away and rebuilt on every refresh, together
+  with its phone notification. So correcting a date corrects the message.
+
+Ids carry the fact they are about (`window:2026-09-20`): a changed date is a *different* message, not a silently
+edited one, which keeps "delivered" honest.
+
+**The trade-off, both sides.** Recomputing costs work on every store change (coalesced to one per microtask; a
+handful of date comparisons and at most five notification calls). What it buys is that there is **no state that
+can drift from the cycle it describes** — the classic event-sourcing lesson in miniature: store facts, derive
+views, and only freeze what the user has already seen.
+
+**A trap found on the way (general, worth remembering).** `ReminderStore.init` ends in
+`NotificationService.syncAll`, which cancels *every* pending notification before re-adding its own. Anything
+scheduled before that finishes is wiped. That had silently been deleting the IVF trigger-shot reminders on every
+app launch. Fix: an explicit order in `main.dart` (`ReminderStore.init()` → `TtcMessagesStore.init()` →
+`TtcTreatmentStore.rearmAfterStartup()`). The general lesson: a "sync all" that starts with "cancel all" makes
+every other scheduler a dependent of it, whether or not the code says so — so say so, in one place.
+
+## 16n. One resolver, not five copies of the arithmetic — `ttcDayContext`
+
+**The situation.** "Where is she in her cycle today?" was being answered in five places: the home's top line, the
+daily cards, the calendar, the messages and a chat. Each was correct on its own terms and they disagreed with each
+other: the due day was "late" in one and "due today" in another; the calendar's "in N days" was a day off the home
+for most of the day; a clinic-labelled cycle showed fertile days at the top and "we don't predict" underneath.
+
+**What we did.** One pure function, `ttcDayContext(day)`, answers every date question (cycle day, phase, window,
+due date, days late, ownership, confidence, age band) from the same stores, and every surface reads it. A scenario
+matrix test walks every day of a cycle for eight kinds of user and asserts that every surface agrees on every day.
+
+**The general lesson.** Duplicated derivations drift even when each copy is "right", because each copy makes its
+own small choices (midnight or now, inclusive or exclusive, which estimate). Derive once, name the rules in one
+place, and test the *agreement* between consumers, not just each consumer — the same instinct as a single source of
+truth in a database, applied to computed facts.
+
+## 16o. A round lives in the blob; a one-time flag lives on the device — treatment rounds
+
+**The situation.** A treatment round (kind, clinic dates, outcome, history) must follow her to a new phone and be
+visible to her partner; "she has already seen the 'your home now follows your round' notice" must not.
+
+**What we did.** The round is stored inside the existing `ttc_treatment` jsonb column, so no migration and old
+five-step rounds load unchanged; one-time announcement flags stay in `shared_preferences` only.
+
+**The trade-off.** A jsonb blob is flexible and additive (new optional fields cost nothing) but the database cannot
+query inside it cheaply; that is fine for per-user state read whole, wrong for anything we would report on across
+users. And a device-local flag can show a notice twice on a second phone — a small cost we accept rather than
+syncing UI state.
+
+## 16p. What decides the truth goes in the cache key; what only tunes the wording stays out — Ask Veda's treatment step
+
+**The situation.** Ask Veda caches answers per "stage bucket" (`ttc:<chapter>:<path>:<ownership>`), shared by
+everyone in that bucket. Its framing always said "she is NOT pregnant". For a woman whose blood test after IVF had
+just come back positive, that is false; in the wait before the test it is unknown.
+
+**What we did.** The app now sends `treatment_step` (the same `TtcRoundPhase` its home shows), the service picks one
+of three truths from it (not pregnant / does not know yet / positive test), and the step joins the cache key:
+`ttc:<chapter>:<path>:<ownership>:<step|->`. The cycle day and the day count inside a step stay OUT of the key.
+
+**The trade-off, and the general rule.** Every field in a shared cache key divides the hit rate: the cycle day
+would split each question 28 ways for a wording nuance, so it is sent for framing but never keyed. The step is
+different in kind: two buckets it separates get *opposite* answers to the same question, so sharing one entry
+would serve something untrue to one of them. It has ten values and only exists while a clinic owns the cycle, so
+the split is small. The test for any new context field: *could two people with different values be correctly
+given the same answer?* If yes, keep it out of the key; if no, it must be in it. Changing the key also orphans
+every old entry, so the rollout clears `veda_cache` rows under `ttc:%` once.
+
+**Two repos, one contract.** The field is sent by `ask_veda_service.dart` and read by the service's `AskRequest`;
+`test/ttc_askveda_pool_test.dart` (app) and `tests/test_wire_contract.py` (service) each pin their half, and the
+app test reads the service's step map when both checkouts sit side by side. An unknown step fails safe to the old
+"not pregnant" framing rather than to "pregnant".
+
 ## 17. Reading list, in order
 
 1. `0001_create_profiles.sql` — the two layers (grant + RLS), own-row.

@@ -228,7 +228,9 @@ class PvStoreNav extends StatelessWidget {
       left: 16,
       right: 16,
       bottom: 18,
-      child: TtcBottomNav(active: 1, v3: true),
+      // Slot 3 on TTC since 2026-09-26 (Today · Learn · Products · Tools ·
+      // You). Was `active: 1`. The V3 bar reads the route name anyway.
+      child: TtcBottomNav(active: 2, v3: true),
     ),
     _ => const SizedBox.shrink(),
   };

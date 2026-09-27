@@ -26,7 +26,11 @@ import '../../ttc/ttc_chapter.dart';
 import '../../widgets/global_ask_fab.dart';
 import 'ttc_calendar_screen.dart';
 import 'ttc_community_screen.dart';
-import 'ttc_more_screen.dart';
+// Kept for revert: More left the bar on 2026-09-26 (its rows live in You).
+// import 'ttc_more_screen.dart';
+import 'ttc_learn_screen.dart';
+import '../profile/pv_you_screen.dart' show PvYouScreen;
+import '../../services/life_stage_store.dart' show LifeStage;
 import 'ttc_prepare_screen.dart';
 import 'ttc_shop_v3.dart' show TtcShopScreen;
 import 'ttc_profile_screen.dart';
@@ -514,7 +518,7 @@ class TtcBuilding extends StatelessWidget {
 void ttcSoon(BuildContext context, String what) {
   ScaffoldMessenger.of(context).showSnackBar(
     SnackBar(
-      content: Text('$what — ${TtcS.current().comingSoon}'),
+      content: Text('$what: ${TtcS.current().comingSoon}'),
       behavior: SnackBarBehavior.floating,
     ),
   );
@@ -589,7 +593,8 @@ void openTtcTab(BuildContext context, int index) {
   }
 }
 
-/// V3's tab navigation: Today · Courses · Tools · Talk to expert · More.
+/// V3's tab navigation: Today · Learn · Products · Tools · You (since
+/// 2026-09-26; before that Today · Products · Tools · Talk to expert · More).
 ///
 /// ⚠️ THIS IS A SECOND TAB SET AND THAT DESERVES AN ARGUMENT, because the file
 /// two hundred lines up says the opposite. `TtcBottomNav`'s own comment
@@ -612,41 +617,63 @@ void openTtcTab(BuildContext context, int index) {
 /// ⚠️ AND THE PARITY TEST NO LONGER COVERS THE NAV. `ttc_home_v3_parity_test`
 /// asserts the two HOMES reach the same places, which is still true and still
 /// worth holding. It says nothing about the tab bars, so the thing keeping
-/// Calendar, Community and seven paid categories reachable on V3 is
-/// `TtcMoreScreen` and the note at the head of that file. Read it before
-/// changing this switch.
+/// Calendar, the cycle companion, the fertility window and the seven paid
+/// categories reachable on V3 is the TTC `things` list in
+/// `lib/screens/profile/pv_you_content.dart` (they were `TtcMoreScreen`'s rows
+/// until 2026-09-26; that screen stays on disk for revert, unreached), and
+/// `test/ttc_tabs_v3_test.dart` pins them. Community is held back on purpose.
+/// Read both before changing this switch.
 void openTtcTabV3(BuildContext context, int index) {
   final nav = Navigator.of(context);
   nav.popUntil((r) => r.isFirst || r.settings.name == ttcHomeRoute);
+  // ⚠️ TODAY · LEARN · PRODUCTS · TOOLS · YOU — 2026-09-26, the user's call
+  // after the TTC gap analysis. Products takes the slot the analysis gave
+  // Community (held back); everything that sat under More now lives in You;
+  // "Talk to expert" became a Tools tile, and the home keeps its Talk to
+  // experts rail. Learn is new: the library of everything the stage teaches,
+  // which had no home at all (four reads on a home rail, no see-all).
+  //
+  // Kept for revert, the 2026-09-17 set (Today · Products · Tools · Talk to
+  // expert · More):
+  //   case 1: TtcShopScreen at 'ttc/products'
+  //   case 2: TtcToolsScreen at 'ttc/tools'
+  //   case 3: TtcPrepareScreen(onlyCategory: 'consults') at 'ttc/consults'
+  //   case 4: TtcMoreScreen at 'ttc/more'
   switch (index) {
-    // ⚠️ SCOPED TO ONE CATEGORY EACH, not the whole of Prepare. Unscoped, both
-    // tabs opened the same nine-category screen and the labels lied about where
-    // they went — the same mistake already fixed once for the consult button in
-    // `ttc_home_v3.dart`'s `kTtcActConsult`.
     case 1:
-      // The unified store with this stage's bar. Kept for revert:
-      //   const TtcPrepareScreen(onlyCategory: 'courses') at 'ttc/courses'
+      nav.push(MaterialPageRoute<void>(
+          builder: (_) => const TtcLearnScreen(),
+          settings: const RouteSettings(name: kTtcLearnRoute)));
+      break;
+    case 2:
+      // The unified store with this stage's bar.
       nav.push(MaterialPageRoute<void>(
           builder: (_) => const TtcShopScreen(),
           settings: const RouteSettings(name: 'ttc/products')));
       break;
-    case 2:
+    case 3:
       nav.push(MaterialPageRoute<void>(
           builder: (_) => const TtcToolsScreen(),
           settings: const RouteSettings(name: 'ttc/tools')));
       break;
-    case 3:
-      nav.push(MaterialPageRoute<void>(
-          builder: (_) => const TtcPrepareScreen(onlyCategory: 'consults'),
-          settings: const RouteSettings(name: 'ttc/consults')));
-      break;
     case 4:
+      // ⚠️ THE SHARED PROFILE, WITH THIS STAGE'S BAR. `PvYouScreen` is one
+      // screen for four stages; the bar is an optional slot on it (the same
+      // idea as `PvStoreChrome`), so pregnancy, parenting and skilling push
+      // it exactly as before, with a back arrow and no bar.
       nav.push(MaterialPageRoute<void>(
-          builder: (_) => const TtcMoreScreen(),
-          settings: const RouteSettings(name: 'ttc/more')));
+          builder: (_) => const PvYouScreen(
+                stage: LifeStage.tryingToConceive,
+                bottomNav: TtcBottomNav(active: 4, v3: true),
+              ),
+          settings: const RouteSettings(name: kTtcYouRoute)));
       break;
   }
 }
+
+/// The You tab's route. A name of its own rather than the shared 'you', so
+/// the bar can tell the tab (lit) from the avatar's push (on V1, no bar).
+const String kTtcYouRoute = 'ttc/you';
 
 /// Which V3 tab a route belongs under.
 ///
@@ -682,28 +709,36 @@ int ttcV3ActiveFor(String? route, int v1Active) {
   switch (route) {
     case ttcHomeRoute:
       return 0;
-    case 'ttc/products':
+    case kTtcLearnRoute:
+    case 'ttc_learn': // the same screen if a door ever opens it as a surface
       return 1;
+    case 'ttc_shop': // the store pushed through the surface router
+    case 'ttc/products':
+      return 2;
     case 'ttc/courses':
-      // Courses lives under Tools now (its first tile).
-      return 2;
-    case 'ttc/tools':
-      return 2;
-    case 'ttc/consults':
+      // Courses lives under Tools (its tile in Plan and learn).
       return 3;
-    case 'ttc/more':
+    case 'ttc/tools':
+      return 3;
+    case 'ttc/consults':
+      // "Talk to an expert" is a Tools tile since 2026-09-26.
+      return 3;
+    case kTtcYouRoute:
+    case 'you':
       return 4;
   }
-  // ⚠️ EVERYTHING ELSE FALLS TO "MORE", WHICH IS THE TRUTH RATHER THAN A
-  // FALLBACK. V3 dropped Calendar and Community as tabs and reaches them —
-  // along with Journal, Profile and the unscoped Prepare — through `More`. So
-  // "More" really is the tab those screens live under.
+  // ⚠️ EVERYTHING ELSE FALLS TO "YOU", WHICH IS THE TRUTH RATHER THAN A
+  // FALLBACK. Calendar, the cycle companion, the fertility window, Journal and
+  // the unscoped Prepare were More's rows and are You's rows now, so You is
+  // the tab those screens live under.
   //
-  // Today and Tools keep their own index because they mean the same thing in
-  // both versions, which is also why they were given identical icons.
+  // Today keeps index 0 in both versions. V1's Tools (2) is V3's Tools (3).
+  //
+  // Kept for revert, the 2026-09-17 mapping: today 0 · products 1 · courses
+  // and tools 2 · consults 3 · more 4; fallback 0→0, 2→2, else 4.
   return switch (v1Active) {
     0 => 0,
-    2 => 2,
+    2 => 3,
     _ => 4,
   };
 }
@@ -763,7 +798,8 @@ class TtcBottomNav extends StatelessWidget {
       {super.key, required this.active, this.slate = false, this.v3});
 
   /// V1: 0 = Today · 1 = Prepare · 2 = Tools · 3 = Calendar · 4 = Community
-  /// V3: 0 = Today · 1 = Courses · 2 = Tools · 3 = Talk to expert · 4 = More
+  /// V3: 0 = Today · 1 = Learn · 2 = Products · 3 = Tools · 4 = You
+  /// (was Today · Products · Tools · Talk to expert · More until 2026-09-26)
   final int active;
 
   /// V3's tab set instead of V1's. **Null means ask `TtcHomeVersionStore`,**
@@ -826,13 +862,23 @@ class TtcBottomNav extends StatelessWidget {
   // ⚠️ SLOT 2 IS THE STORE — 2026-09-17 (docs/PRODUCTS-AUDIT.md). Same word,
   // icon and position on all three stages. Courses moved to the first tile
   // of the Tools hub. Kept for revert: Icons.school_outlined / t.tabCourses.
+  // ⚠️ 2026-09-26: Today · Learn · Products · Tools · You. Line icons, and
+  // each one the glyph the other stages already use for the same word.
   static const List<IconData> _iconsV3 = [
     Icons.home_outlined,
+    Icons.menu_book_outlined,
     Icons.shopping_basket_outlined,
     Icons.handyman_outlined,
-    Icons.chat_bubble_outline_rounded,
-    Icons.more_horiz_rounded,
+    Icons.person_outline_rounded,
   ];
+  // Kept for revert (2026-09-17 to 2026-09-26):
+  //   static const List<IconData> _iconsV3 = [
+  //     Icons.home_outlined,
+  //     Icons.shopping_basket_outlined,
+  //     Icons.handyman_outlined,
+  //     Icons.chat_bubble_outline_rounded,
+  //     Icons.more_horiz_rounded,
+  //   ];
   // Kept for revert:
   //   static const List<IconData> _iconsV3 = [
   //     Icons.home_rounded,
@@ -846,7 +892,9 @@ class TtcBottomNav extends StatelessWidget {
       [t.tabToday, t.tabPrepare, t.tabTools, t.tabCalendar, t.tabCommunity];
 
   static List<String> _labelsV3(TtcS t) =>
-      [t.tabToday, t.tabProducts, t.tabTools, t.tabTalkToExpert, t.tabMore];
+      [t.tabToday, t.tabLearn, t.tabProducts, t.tabTools, t.tabYou];
+  // Kept for revert:
+  //   [t.tabToday, t.tabProducts, t.tabTools, t.tabTalkToExpert, t.tabMore];
 
   // ⚠️ NOW A THIN ADAPTER OVER `PvNavBar`. This bar was the furthest behind of
   // the three: it both re-flowed the row on every tap AND kept a saturated

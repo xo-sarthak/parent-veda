@@ -53,6 +53,7 @@ import '../../services/scans_store.dart';
 import '../../services/stage_gateway.dart';
 import '../../services/whatsapp_prefs.dart';
 import '../../theme/pv_fonts.dart';
+import '../../widgets/pv_nav_bar.dart' show pvNavClearance;
 import '../care_partner/care_partner_card.dart';
 import '../care_partner/care_partner_slot.dart';
 import '../developer_switches.dart';
@@ -96,7 +97,12 @@ void openPvYou(BuildContext context, {LifeStage? stage, bool father = false}) {
 }
 
 class PvYouScreen extends StatefulWidget {
-  const PvYouScreen({super.key, this.stage, this.father = false});
+  const PvYouScreen({
+    super.key,
+    this.stage,
+    this.father = false,
+    this.bottomNav,
+  });
 
   /// Null = her current stage. Skilling passes itself explicitly (it is a
   /// child's chapter and never the persisted stage).
@@ -104,6 +110,16 @@ class PvYouScreen extends StatefulWidget {
 
   /// The partner's view: his card, her journey read-only.
   final bool father;
+
+  /// A stage's tab bar, when You is one of that stage's tabs (TTC since
+  /// 2026-09-26). Null everywhere else, which is exactly the screen as it was:
+  /// a back arrow and no bar.
+  ///
+  /// ⚠️ A SLOT, NOT A STAGE SWITCH. The same idea as `PvStoreChrome`: this
+  /// file still never asks which stage it is on. The caller hands in the bar
+  /// it already owns; the skeleton, the sections and their order do not move,
+  /// which `test/pv_you_test.dart` holds for every stage.
+  final Widget? bottomNav;
 
   @override
   State<PvYouScreen> createState() => _PvYouScreenState();
@@ -341,15 +357,26 @@ class _PvYouScreenState extends State<PvYouScreen> {
                   ),
                   SliverToBoxAdapter(
                     child: SizedBox(
-                      height: _partnerLinked || FatherPreview.instance.on
-                          ? 120
-                          : 40,
+                      height:
+                          (_partnerLinked || FatherPreview.instance.on
+                              ? 120
+                              : 40) +
+                          (widget.bottomNav == null
+                              ? 0
+                              : pvNavClearance(context)),
                     ),
                   ),
                 ],
               ),
               if (_partnerLinked || FatherPreview.instance.on)
                 _viewingAsPill(p),
+              if (widget.bottomNav != null)
+                Positioned(
+                  left: 14,
+                  right: 14,
+                  bottom: 14,
+                  child: SafeArea(top: false, child: widget.bottomNav!),
+                ),
             ],
           ),
         );
@@ -366,11 +393,15 @@ class _PvYouScreenState extends State<PvYouScreen> {
     ),
     child: Row(
       children: [
-        PvRoundIcon(
-          icon: Icons.arrow_back_rounded,
-          onTap: () => Navigator.of(context).maybePop(),
-        ),
-        const SizedBox(width: 12),
+        // A tab root has nowhere to go back to: the bar is the way out.
+        if (widget.bottomNav == null) ...[
+          PvRoundIcon(
+            icon: Icons.arrow_back_rounded,
+            onTap: () => Navigator.of(context).maybePop(),
+          ),
+          const SizedBox(width: 12),
+        ] else
+          const SizedBox(width: 4),
         Expanded(
           child: Text(
             'You',
@@ -624,13 +655,13 @@ class _PvYouScreenState extends State<PvYouScreen> {
                       indent: 16,
                       endIndent: 16,
                     ),
-                  PvYouRow(
-                    icon: content.things[i].icon,
-                    title: content.things[i].title,
-                    subtitle: content.things[i].subtitle,
-                    badge: content.things[i].count?.call(),
-                    onTap: () => content.things[i].open(context),
-                  ),
+                  // ⚠️ ADDITIVE (2026-09-26, the TTC review's Y1 and Y3). A row
+                  // that sets `listen` repaints on its own store; one that sets
+                  // `dot` shows a dot and no number; one that sets
+                  // `subtitleNow` shows its state. Rows that set none of the
+                  // three, every row on the other stages, draw exactly as
+                  // before.
+                  _thingRow(p, content.things[i]),
                 ],
               ],
             ),
@@ -639,6 +670,38 @@ class _PvYouScreenState extends State<PvYouScreen> {
       ],
     ),
   );
+
+  Widget _thingRow(V2Palette p, PvYouThing thing) {
+    Widget row() => PvYouRow(
+      icon: thing.icon,
+      title: thing.title,
+      subtitle: thing.subtitleNow?.call() ?? thing.subtitle,
+      badge: thing.count?.call(),
+      trailing: thing.dot?.call() == true
+          ? Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  key: const ValueKey('pv_you_thing_dot'),
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(
+                    // The TTC coral, the home envelope's dot.
+                    color: Color(0xFFFF5A79),
+                    shape: BoxShape.circle,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
+              ],
+            )
+          : null,
+      onTap: () => thing.open(context),
+    );
+    final l = thing.listen;
+    if (l == null) return row();
+    return ListenableBuilder(listenable: l, builder: (_, _) => row());
+  }
 
   // ---- F: preferences ------------------------------------------------------------------------
 
@@ -1061,16 +1124,25 @@ class _PvYouScreenState extends State<PvYouScreen> {
     return Positioned(
       left: 0,
       right: 0,
-      bottom: MediaQuery.of(context).padding.bottom + 20,
+      // Above the bar when there is one.
+      bottom:
+          MediaQuery.of(context).padding.bottom +
+          (widget.bottomNav == null ? 20 : 96),
       child: Center(
         child: InkWell(
           onTap: () {
             FatherPreview.instance.on = !fatherOn;
             Navigator.of(context).pushReplacement(
               MaterialPageRoute<void>(
-                builder: (_) =>
-                    PvYouScreen(stage: widget.stage, father: !fatherOn),
-                settings: const RouteSettings(name: kPvYouRoute),
+                builder: (_) => PvYouScreen(
+                  stage: widget.stage,
+                  father: !fatherOn,
+                  bottomNav: widget.bottomNav,
+                ),
+                // The same name, so a tab stays the tab it was.
+                settings: RouteSettings(
+                  name: ModalRoute.of(context)?.settings.name ?? kPvYouRoute,
+                ),
               ),
             );
           },

@@ -129,7 +129,7 @@ const List<TtcOffering> ttcOfferings = [
     titleEn: 'Fertility specialist consultation',
     titleHi: 'Fertility specialist se consultation',
     bodyEn:
-        'A private video consultation to look at where you both are, which tests are actually worth doing, and what a sensible next six months looks like. Notes and any recommended tests are saved to your records.',
+        'A private video call to look at where you both are, which tests are worth doing, and what a sensible plan for the next six months looks like. Notes and any suggested tests are saved to your records.',
     bodyHi:
         'Ek private video consultation - ye dekhne ke liye ki aap dono kahan hain, kaunse tests sach mein karwane layak hain, aur agle chhe mahine ka samajhdaari bhara plan kya hai. Notes aur recommend kiye gaye tests aapke records mein save ho jaate hain.',
     forCouple: true,
@@ -144,7 +144,7 @@ const List<TtcOffering> ttcOfferings = [
     titleEn: 'Gynaecologist consultation',
     titleHi: 'Gynaecologist se consultation',
     bodyEn:
-        'For irregular cycles, painful periods, PCOS, endometriosis, or a pre-conception check before you start trying.',
+        'For irregular cycles, painful periods, PCOS or endometriosis. Or for a check-up before you start trying.',
     bodyHi:
         'Irregular cycles, dardnaak periods, PCOS, endometriosis, ya koshish shuru karne se pehle ek pre-conception check ke liye.',
   ),
@@ -158,7 +158,7 @@ const List<TtcOffering> ttcOfferings = [
     titleEn: 'Male fertility consultation',
     titleHi: 'Male fertility consultation',
     bodyEn:
-        'For him. Reading a semen analysis properly, what can be changed and what cannot, and when a urologist or andrologist is worth seeing in person.',
+        "For your partner. How to read a semen analysis properly, what can change and what can't, and when it's worth seeing a urologist or andrologist in person.",
     bodyHi:
         'Unke liye. Semen analysis ko theek se padhna, kya badla ja sakta hai aur kya nahi, aur kab urologist ya andrologist se milkar milna theek hai.',
   ),
@@ -174,7 +174,7 @@ const List<TtcOffering> ttcOfferings = [
     titleEn: 'Fertility, honestly',
     titleHi: 'Fertility, sach-sach',
     bodyEn:
-        'Ninety minutes on what actually affects conception and what does not - including the things the internet gets loudly wrong. Recorded, watch together.',
+        "Ninety minutes on what affects getting pregnant and what doesn't, including the things the internet often gets wrong. Recorded, so you can watch together.",
     bodyHi:
         'Nabbe minute is baat par ki conception par asal mein kya asar daalta hai aur kya nahi - wo baatein bhi jo internet zor-shor se galat batata hai. Recorded, saath mein dekhein.',
     forCouple: true,
@@ -189,7 +189,7 @@ const List<TtcOffering> ttcOfferings = [
     titleEn: 'The PCOS programme',
     titleHi: 'PCOS programme',
     bodyEn:
-        'Six weeks, live, in a small group: understanding PCOS, insulin and food, movement that helps, treatment options, and the emotional side nobody schedules time for.',
+        'Six weeks, live, in a small group. What PCOS is, insulin and food, exercise that helps, treatment choices, and the feelings that rarely get any time.',
     bodyHi:
         'Chhe hafte, live, chhote group mein: PCOS samajhna, insulin aur khaana, kaunsa movement madad karta hai, ilaaj ke vikalp, aur wo emotional hissa jiske liye koi waqt nahi nikalta.',
   ),
@@ -202,10 +202,10 @@ const List<TtcOffering> ttcOfferings = [
     sessions: 8,
     expertId: 'ttc_yoga_lead',
     priceMinor: 199900,
-    titleEn: 'Fertility yoga - eight classes',
+    titleEn: 'Fertility yoga, eight classes',
     titleHi: 'Fertility yoga - aath classes',
     bodyEn:
-        'Live, small, and built around your cycle rather than your fitness. Redeem any time over two months. Nothing here is hot yoga, and nothing here is intense - both work against what you are trying to do.',
+        "Live small classes, planned around your cycle, not your fitness. Use them any time over two months. There's no hot yoga here and nothing intense, because both work against what you're trying to do.",
     bodyHi:
         'Live, chhoti classes, aapki fitness nahi - aapke cycle ke hisaab se. Do mahine mein kabhi bhi istemaal karein. Yahan na hot yoga hai na kuch bahut tez - dono us cheez ke khilaf jaate hain jo aap kar rahi hain.',
   ),
@@ -221,7 +221,7 @@ const List<TtcOffering> ttcOfferings = [
     titleEn: 'Nutritionist consultation',
     titleHi: 'Nutritionist se consultation',
     bodyEn:
-        'An Indian-kitchen plan for both of you, built around what you already cook. No calorie counting, no imported ingredients, no diet culture.',
+        'A food plan for both of you, made from what you already cook in your Indian kitchen. No calorie counting, no imported ingredients, and no dieting rules.',
     bodyHi:
         'Aap dono ke liye Indian rasoi ka plan, usi ke aas-paas jo aap pehle se banate hain. Na calorie ginti, na bahar ki cheezein, na diet culture.',
     forCouple: true,
@@ -238,7 +238,7 @@ const List<TtcOffering> ttcOfferings = [
     titleEn: 'Talking to a psychologist',
     titleHi: 'Psychologist se baat',
     bodyEn:
-        'Because anxiety is the default emotional state of this chapter, and "just relax" is not a treatment. One session, privately, with someone who works with couples trying to conceive.',
+        'Worry is what most people feel at this stage, and "just relax" isn\'t a treatment. One private session with someone who works with couples trying to conceive.',
     bodyHi:
         'Kyunki is chapter mein chinta hi aam haalat hai, aur "bas relax karo" koi ilaaj nahi hai. Ek session, private, kisi aise ke saath jo conceive ki koshish karne wale couples ke saath kaam karta hai.',
   ),
@@ -252,7 +252,7 @@ const List<TtcOffering> ttcOfferings = [
     titleEn: 'After a loss',
     titleHi: 'Ek nuksaan ke baad',
     bodyEn:
-        'Four sessions, small group, for couples after a miscarriage or a failed cycle. There is no timetable for this and nobody will give you one.',
+        "Four sessions in a small group, for couples after a miscarriage or a failed cycle. There's no timetable for this, and no one here will give you one.",
     bodyHi:
         'Chaar sessions, chhota group, un couples ke liye jinhone miscarriage ya failed cycle dekha hai. Iska koi schedule nahi hota, aur koi aapko dega bhi nahi.',
     forCouple: true,
@@ -269,7 +269,7 @@ const List<TtcOffering> ttcOfferings = [
     titleEn: 'Couple assessment',
     titleHi: 'Couple assessment',
     bodyEn:
-        'Both of you, one appointment. Which tests each of you should do, in what order, and read back to you together when the results arrive - rather than her being investigated first while his half waits.',
+        "Both of you, one appointment. Which tests each of you should have, in what order, and your results explained to you together when they come in. So you aren't tested first while your partner's side waits.",
     bodyHi:
         'Aap dono, ek appointment. Kis-kis ko kaunse test karwane hain, kis kram mein, aur results aane par dono ko saath mein samjhaana - na ki pehle unki jaanch aur unka aadha hissa intezaar mein.',
     forCouple: true,
@@ -286,7 +286,7 @@ const List<TtcOffering> ttcOfferings = [
     titleEn: 'The half nobody talks about',
     titleHi: 'Wo aadha hissa jiski baat nahi hoti',
     bodyEn:
-        'Ninety minutes for him: how sperm is actually made, what the ninety-day window means, what a semen analysis does and does not say, and what is genuinely worth changing.',
+        "Ninety minutes for him. How sperm is made, what the ninety days mean, what a semen analysis does and doesn't tell you, and what is worth changing.",
     bodyHi:
         'Unke liye nabbe minute: sperm asal mein kaise banta hai, nabbe din ki window ka matlab kya hai, semen analysis kya batata hai aur kya nahi, aur sach mein badalne layak kya hai.',
   ),
@@ -302,7 +302,7 @@ const List<TtcOffering> ttcOfferings = [
     titleEn: 'Preparing for IVF',
     titleHi: 'IVF ki taiyaari',
     bodyEn:
-        'Five sessions covering what the cycle actually involves, the medications and how to take them, the waiting, the costs nobody quotes upfront, and how to decide what to do next whatever happens.',
+        "Five sessions on what an IVF cycle involves, the medicines and how to take them, the waiting, the costs clinics don't tell you upfront, and how to decide what to do next, whatever happens.",
     bodyHi:
         'Paanch sessions: cycle mein asal mein hota kya hai, dawaiyan aur unhe kaise lena hai, intezaar, wo kharche jo pehle koi nahi batata, aur jo bhi ho uske baad aage kya karna hai ye kaise tay karein.',
     forCouple: true,
@@ -319,7 +319,7 @@ const List<TtcOffering> ttcOfferings = [
     titleEn: 'The ninety-day programme',
     titleHi: 'Nabbe din ka programme',
     bodyEn:
-        'Sperm takes about ninety days to make and an egg about the same to mature. This is a programme for both of you across exactly that window - sleep, food, movement, and the two habits with the clearest evidence behind them.',
+        'Sperm takes about ninety days to make, and an egg takes about the same to grow. This programme is for both of you, across those same ninety days. Sleep, food, exercise, and the two habits with the clearest evidence behind them.',
     bodyHi:
         'Sperm banne mein lagbhag nabbe din lagte hain aur egg pakne mein bhi lagbhag utne hi. Ye programme aap dono ke liye theek usi window ka hai - neend, khaana, movement, aur wo do aadatein jinke saboot sabse saaf hain.',
     forCouple: true,
@@ -342,11 +342,12 @@ const List<TtcOffering> ttcOfferings = [
     titleEn: 'Preconception garbh sanskar',
     titleHi: 'Conceive se pehle ka garbh sanskar',
     bodyEn:
-        'Eight short sessions, for both of you, taught rather than described. '
-        'Breath, stillness, sound, conversation and gratitude - the practice as '
-        'preparation, in whichever framework suits you. It will not make a '
-        'pregnancy happen and it does not claim to. It is a way to spend the '
-        'waiting that is calming rather than corrosive. Free, and it stays free.',
+        'Eight short sessions for both of you, where you do the practice, not '
+        'just read about it. Breath, stillness, sound, talking and gratitude, '
+        'as a way to get ready, in whatever tradition suits you. It won\'t '
+        "make a pregnancy happen, and it doesn't claim to. It's a way to spend "
+        'the waiting that calms you instead of wearing you down. Free, and it '
+        'stays free.',
     bodyHi:
         'Aath chhoti sessions, dono ke liye, sirf batayi nahi - sikhayi gayi. '
         'Saans, thehraav, dhwani, baatcheet aur shukr - abhyas taiyaari ke roop '

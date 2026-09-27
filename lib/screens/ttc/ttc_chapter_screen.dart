@@ -325,7 +325,7 @@ class _MedicalCard extends StatelessWidget {
         Text(
           hi
               ? 'Ye jaankari hai, diagnosis nahi. Faisle apne doctor ke saath lein.'
-              : 'This is information, never a diagnosis. Decisions belong with your doctor.',
+              : 'This is information, never a diagnosis. Make decisions about your care with your doctor.',
           style: ttcBody(11.5, color: ttcMuted, h: 1.5),
         ),
       ]),

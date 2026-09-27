@@ -202,14 +202,14 @@ const List<TtcTracker> ttcTrackers = [
     iconKey: 'healing',
     titleEn: 'Symptom Companion',
     titleHi: 'Symptom Companion',
-    subtitleEn: 'Notice, do not diagnose',
+    subtitleEn: "Notice, don't diagnose",
     subtitleHi: 'Notice karein, diagnosis nahi',
     whyEn:
-        'Logging what your body does across a few cycles turns "I think this happens sometimes" into something you can actually show a doctor. It is not for spotting pregnancy - early pregnancy and an approaching period feel identical, because they are the same hormone.',
+        'Noting what your body does over a few cycles turns "I think this happens sometimes" into something you can show your doctor. It can\'t spot pregnancy. Early pregnancy and a period on its way can feel exactly the same, because the same hormone is behind both.',
     whyHi:
         'Kuch cycles tak apne body ko log karna, "shayad kabhi-kabhi aisa hota hai" ko aisi cheez bana deta hai jo aap doctor ko dikha sakein. Ye pregnancy pehchaanne ke liye nahi hai - shuruaati pregnancy aur aane wala period ek jaise lagte hain, kyunki dono ek hi hormone hain.',
     disclaimerEn:
-        'This records what you noticed. It never interprets it, and it is never a diagnosis.',
+        "This keeps a note of what you noticed. It doesn't read anything into it, and it's never a diagnosis.",
     disclaimerHi:
         'Ye sirf record karta hai ki aapne kya notice kiya. Ye uska matlab nahi nikalta, aur ye kabhi diagnosis nahi hai.',
     fields: [
@@ -290,10 +290,10 @@ const List<TtcTracker> ttcTrackers = [
     iconKey: 'weight',
     titleEn: 'Weight',
     titleHi: 'Wazan',
-    subtitleEn: 'A number, not a verdict',
+    subtitleEn: 'Just a number, not a judgement',
     subtitleHi: 'Ek number, faisla nahi',
     whyEn:
-        'Body fat is part of how the body makes and regulates oestrogen, so cycles can become irregular at both ends of the range. Where weight is a factor, a shift of around five per cent is often enough to restore ovulation - which is a genuinely small number.\n\nThere is no target here and no ideal weight shown, because a number on a screen telling you that you are wrong has never helped anyone.',
+        "Body fat helps your body make and balance oestrogen. So cycles can become irregular when weight is very low or very high. Where weight plays a part, a change of around five per cent is often enough to bring ovulation back. That's a small change.\n\nThere's no target here and no ideal weight shown. A number on a screen telling you you're wrong has never helped anyone.",
     whyHi:
         'Body fat us tareeke ka hissa hai jisse body oestrogen banata aur sambhalta hai, isliye cycles range ke dono siron par irregular ho sakte hain. Jahan wazan ek wajah hai, lagbhag paanch pratishat ka badlaav aksar ovulation wapas laane ke liye kaafi hota hai - jo sach mein chhota number hai.\n\nYahan koi target nahi hai aur koi "sahi wazan" nahi dikhaya jaata, kyunki screen par ek number jo aapko galat batata hai, usse aaj tak kisi ka bhala nahi hua.',
     fields: [
@@ -318,10 +318,10 @@ const List<TtcTracker> ttcTrackers = [
     iconKey: 'mood',
     titleEn: 'Mood',
     titleHi: 'Mood',
-    subtitleEn: 'However today actually was',
+    subtitleEn: 'However today went',
     subtitleHi: 'Aaj jaisa bhi raha',
     whyEn:
-        'This is not here to be improved. It is here because months blur together, and being able to see that the hard days cluster - around the waiting, around a period, around a family gathering - makes them easier to prepare for and much easier to explain to someone else.',
+        "It's not a score to improve. It's here because months blur together. It helps to see when the hard days bunch up: around the waiting, a period or a family gathering. Then they're easier to prepare for, and much easier to explain to someone else.",
     whyHi:
         'Ye yahan "behtar karne" ke liye nahi hai. Ye isliye hai kyunki mahine aapas mein ghul-mil jaate hain, aur ye dekh paana ki mushkil din kab ikatthe aate hain - intezaar ke aas-paas, period ke aas-paas, kisi family function ke aas-paas - unke liye taiyaar rehna aasaan bana deta hai, aur kisi ko samjhana usse bhi aasaan.',
     fields: [
@@ -353,7 +353,7 @@ const List<TtcTracker> ttcTrackers = [
     subtitleEn: 'Half the picture',
     subtitleHi: 'Aadhi tasveer',
     whyEn:
-        'A male factor is involved in roughly forty to fifty per cent of couples who struggle, and sperm takes about ninety days to make - so what is recorded here today shows up around three months from now.\n\nThis exists because in most Indian clinics the woman is investigated first, through tests that are slower, costlier and more invasive. This is the other half.',
+        "In roughly forty to fifty per cent of couples who struggle to conceive, the man's side plays a part. Sperm takes about ninety days to make, so what's noted here today shows up around three months from now.\n\nIn most Indian clinics the woman is tested first, with tests that are slower, cost more and are more invasive. This is the other half.",
     whyHi:
         'Jo couples mushkil jhelte hain unmein lagbhag chalis se pachas pratishat mein mard ka factor hota hai, aur sperm banne mein lagbhag nabbe din lagte hain - toh aaj jo yahan record hota hai, wo teen mahine baad dikhta hai.\n\nYe isliye hai kyunki zyadatar Indian clinics mein pehle aurat ke test hote hain - jo dheere, mehnge aur zyada takleefdeh hote hain. Ye doosra aadha hissa hai.',
     forPartner: true,
@@ -388,7 +388,7 @@ const List<TtcTracker> ttcTrackers = [
       ),
       TtcField(
         id: 'heat',
-        labelEn: 'Long heat exposure - hot bath, sauna, laptop on lap',
+        labelEn: 'Long time in heat (hot bath, sauna, laptop on lap)',
         labelHi: 'Lambi garmi - garam nahaana, sauna, god par laptop',
         kind: TtcFieldKind.choice,
         choicesEn: ['No', 'Yes'],
@@ -443,7 +443,7 @@ const List<TtcTracker> ttcTrackers = [
     subtitleEn: 'A record, not a report card',
     subtitleHi: 'Ek record, report card nahi',
     whyEn:
-        'Sleep, movement and cutting down are the habits with the clearest evidence behind them while trying. This is here so you can see what you have actually been doing. There is no score, no streak and nothing here to beat - log the ones you care about and leave the rest blank.',
+        "Sleep, movement and cutting down are the habits with the strongest proof behind them while you're trying. This lets you see what you've been doing. There's no score, no streak and nothing to beat. Log the ones you care about and leave the rest blank.",
     whyHi:
         'Neend, movement aur kam karna - koshish ke dauraan inhi aadaton ke peeche sabse saaf saboot hain. Ye isliye hai ki aap dekh sakein ki aapne asal mein kya kiya - number dene ke liye nahi. Jo aapko theek lage wahi log karein, baaki chhod dein.',
     fields: [
@@ -561,7 +561,7 @@ const List<TtcTracker> ttcTrackers = [
       ),
       TtcField(
         id: 'smoking',
-        labelEn: 'Smoke today - yours or around you',
+        labelEn: 'Smoke today (yours or around you)',
         labelHi: 'Aaj smoke - apna ya aas-paas ka',
         kind: TtcFieldKind.choice,
         choicesEn: ['None', 'Passive only', 'Yes'],

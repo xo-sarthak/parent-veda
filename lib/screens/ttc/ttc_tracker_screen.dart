@@ -924,7 +924,7 @@ class _LookBackStrip extends StatelessWidget {
       Text(_caption(present, bars),
           style: ttcBody(13, color: ttcInk, h: 1.45)),
       const SizedBox(height: 8),
-      Text('A blank space is a day you did not write anything down.',
+      Text("A blank space is a day you didn't write anything down.",
           style: ttcBody(13, color: ttcMuted, h: 1.45)),
     ]);
   }

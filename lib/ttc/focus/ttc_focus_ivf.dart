@@ -39,6 +39,40 @@ import 'package:flutter/material.dart' show Icons;
 
 import '../ttc_focus_data.dart';
 
+// =============================================================================
+//  "Starting treatment?" — the card at the top of this door (2026-09-26)
+// -----------------------------------------------------------------------------
+//  docs/TTC-TREATMENT-FLOW.md §2b and §3f: while no round is running, the top
+//  of the IVF & IUI door carries one card, "Starting treatment? Tell us your
+//  clinic's plan and we'll follow it with you", into the start flow. This is
+//  the obvious place the user asked for. The door screen draws it above the
+//  tabs for this bracket only (`TtcStartTreatmentCard`), and it goes the day a
+//  round exists; the "Your round" and "Between rounds" panels that replace it
+//  are B7, next pass. ORDER, NEVER STRUCTURE: no tab moves or disappears.
+// =============================================================================
+
+/// The surface the card opens: the round's start flow.
+const String kTtcIvfTopCardSurface = 'ttc_treatment/start';
+
+// -----------------------------------------------------------------------------
+//  B7, built 2026-09-26: the card is one of four panels
+//  (`TtcIvfRoundPanel`): "Starting treatment?" with no round, "Your round"
+//  while one is open (its step, its next date, "See the whole plan"),
+//  "Between rounds" after one closes (the negative-test read, the review
+//  read, "Month after month" and "Start the next round"), and "Positive
+//  test" with the way to Pregnancy.
+//
+//  ⚠️ AND WHILE A ROUND IS PLANNED OR RUNNING, THESE TWO TABS COME FIRST
+//  (§3f). Order only: every tab stays on the rail. "Going through it" is what
+//  a round asks of her; "Track" is where its dates live. This overrides the
+//  door's "the first tab never moves" rule for the length of a round only, a
+//  decision the flow doc makes explicitly; the age reorder waits until the
+//  round closes (`ttcDoorOrderedGroups`).
+// -----------------------------------------------------------------------------
+
+/// The tabs that lead, in this order, while a round is planned or running.
+const List<String> kTtcIvfRoundTabsFirst = ['going', 'track'];
+
 const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
   bracketId: 'ttc_infertility',
 
@@ -61,11 +95,15 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
   // WARNING: A PLACEHOLDER PHOTOGRAPH, TO BE SWAPPED. Same shape as PCOS, which
   // is the structural reference for this door. The V3 field renders behind it,
   // so a dead connection gives the hero this page has always had.
-  heroImageUrl:
-      'https://images.unsplash.com/photo-1584515933487-779824d29309?w=900&h=700&fit=crop',
-  heroBlurb: 'IUI and IVF are treatments, not last resorts. This is what they '
-      'involve, what they cost in India, and how to tell when it is worth '
-      'asking.',
+  // Our own photograph (2026-09-27): generated to the door's brief, checked by
+  // eye, mirrored to the R2 bucket. Kept for revert: the previous value.
+  // heroImageUrl: 'https://images.unsplash.com/photo-1584515933487-779824d29309?w=900&h=700&fit=crop',
+  heroImageUrl: 'https://pub-bfbc0773e60e4c5c851b535f08b384bc.r2.dev/ttc_door_ivf_iui.jpg',
+  // The new door's headline, a sentence (TtcDoorScreen, 2026-09-26).
+  heroTitle: 'Treatment, explained step by step.',
+  heroBlurb: 'IUI and IVF are treatments, not a last resort. Here\'s what '
+      'they involve, what they cost in India, and how to tell when it\'s '
+      'time to ask for help.',
 
   // ---------------------------------------------------------------------------
   //  The selector rail — the brief's five, in the brief's order
@@ -82,27 +120,34 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
   //  cost of a wrong default gone, the brief's own order wins.
   groups: [
     TtcFocusGroup(
-        id: 'understand',
+        id: 'understand', mark: IntentMark.bookMark,
         label: 'Understand',
         icon: Icons.menu_book_outlined,
         hue: 206),
     TtcFocusGroup(
-        id: 'help',
+        id: 'help', mark: IntentMark.questionMark,
         label: 'Should I get help?',
         icon: Icons.center_focus_weak_outlined,
         hue: 344),
+    // Added 2026-09-26 (gap plan, P2). Beside "Should I get help?" because
+    // age is the most common reason that question comes sooner.
     TtcFocusGroup(
-        id: 'money',
+        id: 'age', mark: IntentMark.nextStep,
+        label: 'Age and second baby',
+        icon: Icons.timelapse_outlined,
+        hue: 104),
+    TtcFocusGroup(
+        id: 'money', mark: IntentMark.compareMark,
         label: 'Money and clinics',
         icon: Icons.account_balance_wallet_outlined,
         hue: 42),
     TtcFocusGroup(
-        id: 'going',
+        id: 'going', mark: IntentMark.cuppedHands,
         label: 'Going through it',
         icon: Icons.favorite_border_rounded,
         hue: 268),
     TtcFocusGroup(
-        id: 'track', label: 'Track', icon: Icons.calendar_today_outlined,
+        id: 'track', mark: IntentMark.calendarDay, label: 'Track', icon: Icons.calendar_today_outlined,
         hue: 160),
   ],
 
@@ -122,14 +167,14 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
       tiles: [
         TtcToolTile(
           title: 'Check my readiness',
-          blurb: 'Six short questions. It tells you whether a conversation is '
-              'worth having — never a score, and never a prediction.',
+          blurb: "Six short questions. It tells you whether it's worth talking "
+              'to a doctor. It never gives you a score or a prediction.',
           surfaceId: 'ttc_fertility_help',
         ),
         TtcBookingTile(
           title: 'Speak to a fertility specialist',
-          blurb: 'A 1:1 with someone who does this daily. Bring your dates and '
-              'any results you have.',
+          blurb: 'A 1:1 talk with someone who does this every day. Bring your '
+              'dates and any results you have.',
           action: kTtcActConsult,
         ),
       ],
@@ -139,7 +184,7 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
     //  Understand
     // -------------------------------------------------------------------------
     TtcFocusSection(
-      heading: 'What do the treatments actually involve?',
+      heading: 'What do the treatments involve?',
       group: 'understand',
       tiles: [
         // WARNING: THE FILM LEADS THIS SECTION, AHEAD OF THE ARTICLE. The
@@ -154,59 +199,62 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
         // at the foot of this file.
         TtcVideoTile(
           title: 'An IVF cycle, start to finish',
-          blurb: 'The whole month, walked through by a specialist.',
+          blurb: 'The whole month, explained step by step by a specialist.',
           slotId: 'ttc_ivf_cycle_walkthrough',
           duration: '8 MIN',
         ),
         TtcArticleTile(
           title: 'What IUI and IVF involve',
-          blurb: 'Both procedures, step by step, without the jargon.',
+          blurb: 'Both treatments, step by step, in plain words.',
           readId: 'ttc_read_ivf_explained',
         ),
         TtcCarouselTile(
-          title: 'IUI or IVF, and when you move up',
-          blurb: 'Two different treatments, and the point where one becomes '
-              'the other.',
+          title: 'IUI or IVF, and when to move from one to the other',
+          blurb: 'Two different treatments, and the point where you might '
+              'switch.',
           coverTitle: 'IUI or IVF?',
-          coverBlurb: 'They are not two strengths of the same thing.',
+          coverBlurb: "They're not a weaker and a stronger version of the same "
+              'thing.',
           coverHue: 206,
           cards: [
             TtcCarouselCard(
               title: 'IUI places prepared sperm directly into the uterus.',
               body: 'Fertilisation still happens inside your body, in the '
-                  'usual place, on its own.',
+                  'usual place, by itself.',
             ),
             TtcCarouselCard(
-              title: 'So IUI needs open tubes and reasonable sperm.',
-              body: 'It shortens the journey. It cannot replace a step that '
-                  'is blocked.',
+              title: 'So IUI needs open tubes and fairly good sperm.',
+              body: "It gives sperm a shorter trip. It can't get past a step "
+                  "that's blocked.",
             ),
             TtcCarouselCard(
               title: 'IVF fertilises the egg outside the body.',
-              body: 'Eggs are collected, met with sperm in a laboratory, and '
-                  'an embryo is placed back.',
+              body: 'Eggs are collected and put with sperm in a lab. Then an '
+                  'embryo is placed back inside.',
             ),
             TtcCarouselCard(
-              title: 'Which is why IVF works where tubes are blocked.',
-              body: 'It bypasses the tubes entirely rather than helping '
-                  'something through them.',
+              title: "That's why IVF works even when tubes are blocked.",
+              body: 'It skips the tubes completely, instead of helping '
+                  'anything through them.',
             ),
             TtcCarouselCard(
-              title: 'IUI is cheaper, simpler and less effective per cycle.',
-              body: 'It is usually tried for a limited number of cycles before '
-                  'reviewing, rather than indefinitely.',
+              title: 'IUI is cheaper and simpler, but works less often per '
+                  'cycle.',
+              body: "It's usually tried for a set number of cycles and then "
+                  'reviewed, not kept going forever.',
             ),
             TtcCarouselCard(
-              title: 'Agree that number at the start.',
-              body: 'How many IUI cycles before we reconsider is the single '
-                  'most useful question to settle early.',
+              title: 'Agree on that number at the start.',
+              body: 'How many IUI cycles before we think again? It\'s the most '
+                  'useful question to settle early.',
             ),
           ],
-          reviewedBy: 'Reviewed by Dr. Meera Krishnan, Fertility specialist',
+          // Was 'Reviewed by Dr Ruchika Sood, IVF gynaecologist' (2026-09-26).
+          reviewedBy: 'Reviewed by Dr Surbhi Sharma, IVF gynaecologist, Bloom IVF',
         ),
         TtcArticleTile(
-          title: 'ICSI: when it is needed, when it is routine',
-          blurb: 'One step inside IVF that is sometimes essential and often '
+          title: "ICSI: when it's needed, and when it's just routine",
+          blurb: "One step inside IVF that's sometimes essential, and often "
               'charged for anyway.',
           readId: 'ttc_read_ivf_icsi',
         ),
@@ -219,15 +267,102 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
       tiles: [
         TtcArticleTile(
           title: 'What a fertility check involves',
-          blurb: 'Every test a first round usually orders, and what each one '
-              'is trying to answer.',
+          blurb: 'Every test usually ordered in a first round, and what each '
+              'one is trying to find out.',
           readId: 'ttc_read_ivf_workup',
         ),
         TtcArticleTile(
           title: 'His side of the tests',
-          blurb: 'A semen analysis is the most informative test for the money '
-              'and the one most often delayed.',
+          blurb: 'For what it costs, a semen analysis tells you more than any '
+              "other test. It's also the one most often put off.",
           readId: 'ttc_read_semen_analysis',
+        ),
+      ],
+    ),
+
+    // Added 2026-09-26 (gap plan, P3). The words and first steps that come
+    // before IVF: the glossary, the tablets, the scans that watch them work,
+    // and the PCOS door's medicines piece named here rather than copied.
+    TtcFocusSection(
+      heading: 'What do the words and tablets mean?',
+      group: 'understand',
+      tiles: [
+        TtcArticleTile(
+          title: 'Words your clinic uses',
+          blurb: 'AMH, HSG, ICSI and more, each in a line or two.',
+          readId: 'ttc_read_clinic_glossary',
+          keywords: ['glossary', 'AMH', 'HSG', 'beta'],
+        ),
+        TtcArticleTile(
+          title: 'Ovulation tablets, in plain words',
+          blurb: 'What letrozole and clomiphene do, and what to watch for.',
+          readId: 'ttc_read_ovulation_tablets',
+          keywords: ['letrozole', 'clomiphene', 'clomid'],
+        ),
+        TtcArticleTile(
+          title: 'Follicle scans',
+          blurb: 'What the doctor is looking for, and what the numbers mean.',
+          readId: 'ttc_read_follicle_scans',
+        ),
+        TtcArticleTile(
+          title: 'Medicines for PCOS',
+          blurb: 'From the PCOS door: what each one is for.',
+          readId: 'ttc_read_pcos_meds',
+        ),
+      ],
+    ),
+
+    // -------------------------------------------------------------------------
+    //  Age and second baby (gap plan, 2026-09-26)
+    // -------------------------------------------------------------------------
+    //  ⚠️ DONOR ROUTES AND SURROGACY ARE FACTS ONLY, as the user decided
+    //  (TTC-GAP-PLAN §7.6): what the ART Act 2021 and the Surrogacy Act 2021
+    //  say, who they cover, and nothing that reads as a recommendation.
+    TtcFocusSection(
+      heading: 'Does age change things?',
+      group: 'age',
+      tiles: [
+        TtcArticleTile(
+          title: 'How long it usually takes',
+          blurb: "What's normal, and when it's time to ask for help.",
+          readId: 'ttc_read_how_long_it_takes',
+        ),
+        TtcArticleTile(
+          title: 'Trying after 35',
+          blurb: "What changes, what doesn't, and when to see a doctor sooner.",
+          readId: 'ttc_read_age_after_35',
+        ),
+        TtcArticleTile(
+          title: 'Trying after 40',
+          blurb: 'An honest look, and why seeing a doctor now helps.',
+          readId: 'ttc_read_age_after_40',
+        ),
+        TtcArticleTile(
+          title: 'Harder the second time?',
+          blurb: 'Why it happens, what doctors check, and when to go.',
+          readId: 'ttc_read_second_baby',
+        ),
+      ],
+    ),
+
+    TtcFocusSection(
+      heading: 'What are the other routes?',
+      group: 'age',
+      tiles: [
+        TtcArticleTile(
+          title: 'Egg freezing in India',
+          blurb: "What happens, what it costs, and what it can't promise.",
+          readId: 'ttc_read_egg_freezing',
+        ),
+        TtcArticleTile(
+          title: 'Donor eggs and sperm',
+          blurb: 'Who can use them, and what the ART Act 2021 says.',
+          readId: 'ttc_read_donor_eggs_sperm',
+        ),
+        TtcArticleTile(
+          title: 'Surrogacy in India',
+          blurb: 'The 2021 law in plain words: who it is for, how it works.',
+          readId: 'ttc_read_surrogacy_india',
         ),
       ],
     ),
@@ -240,8 +375,8 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
       group: 'money',
       tiles: [
         TtcArticleTile(
-          title: 'What IVF actually costs in India',
-          blurb: 'Real ranges, with the date they were checked.',
+          title: 'What IVF really costs in India',
+          blurb: 'Real price ranges, with the date we checked them.',
           readId: 'ttc_read_ivf_costs',
         ),
         // WARNING: AN ARTICLE NOW, WHICH IS WHAT THE BRIEF ALWAYS SAID. It
@@ -252,8 +387,9 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
         // reading card five.
         TtcArticleTile(
           title: 'What a package leaves out',
-          blurb: 'The quoted price is rarely the final one. What usually sits '
-              'outside it, and the questions that make two quotes comparable.',
+          blurb: "The price you're quoted is rarely the final one. What usually "
+              'sits outside it, and the questions that let you compare two '
+              'quotes.',
           readId: 'ttc_read_ivf_package',
         ),
       ],
@@ -328,28 +464,28 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
 */
         TtcCarouselTile(
           title: 'Questions to ask before you sign up',
-          blurb: 'Eight things worth settling in the first appointment.',
+          blurb: 'Eight things worth sorting out at the first appointment.',
           coverTitle: 'Before you sign',
           coverBlurb: 'Questions that are easier to ask now than later.',
           coverHue: 160,
           cards: [
             TtcCarouselCard(
-              title: 'Who will actually see me each visit?',
-              body: 'Continuity matters, and in busy centres it is not '
-                  'guaranteed unless you ask.',
+              title: 'Who will I see at each visit?',
+              body: "Seeing the same doctor matters. In busy centres it isn't "
+                  'certain unless you ask.',
             ),
             TtcCarouselCard(
-              title: 'What is included, and what is billed separately?',
-              body: 'In writing. This is the question that prevents most '
-                  'unpleasant surprises.',
+              title: "What's included, and what's charged separately?",
+              body: 'Ask for it in writing. This question prevents most nasty '
+                  'surprises.',
             ),
             TtcCarouselCard(
               title: 'How many cycles before we review the plan?',
-              body: 'Agreeing a number at the start stops a year passing by '
-                  'default.',
+              body: 'Agreeing on a number at the start stops a whole year '
+                  'slipping by without a review.',
             ),
             TtcCarouselCard(
-              title: 'What is your policy on ICSI and on add-ons?',
+              title: "What's your approach to ICSI and add-ons?",
               body: 'A clinic with a reason will give it in a sentence.',
             ),
             TtcCarouselCard(
@@ -363,12 +499,12 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
             ),
             TtcCarouselCard(
               title: 'Are you registered under the ART Act?',
-              body: 'Registration is a legal requirement for clinics in India. '
-                  'It is a fair thing to confirm.',
+              body: 'In India, clinics must be registered by law. It\'s fair '
+                  'to check.',
             ),
             TtcCarouselCard(
               title: 'Can we have the plan in writing?',
-              body: 'Not a challenge — just how you will remember it next '
+              body: "It's not a challenge. It's how you'll remember it next "
                   'week.',
             ),
           ],
@@ -384,15 +520,15 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
       group: 'going',
       tiles: [
         TtcArticleTile(
-          title: 'The injections, honestly',
-          blurb: 'What you will be doing every evening for two weeks, and what '
-              'it feels like.',
+          title: "The injections: what they're really like",
+          blurb: "What you'll be doing every evening for two weeks, and how it "
+              'feels.',
           readId: 'ttc_read_ivf_injections',
         ),
         TtcArticleTile(
           title: 'OHSS: when to call the clinic',
           blurb: 'The one complication worth knowing by name, and the signs '
-              'that mean do not wait until morning.',
+              "that mean you shouldn't wait until morning.",
           readId: 'ttc_read_ivf_ohss',
         ),
         TtcVideoTile(
@@ -414,21 +550,21 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
         // arrives.
         TtcArticleTile(
           title: 'Is egg retrieval painful?',
-          blurb: 'What is actually done, what you are given for it, and what '
-              'the days either side genuinely feel like.',
+          blurb: "What's done, what you're given for it, and how the days "
+              'before and after really feel.',
           readId: 'ttc_read_ivf_retrieval',
         ),
         TtcMythTile(
           title: 'Does bed rest after transfer help?',
-          blurb: 'One of the most persistent beliefs in fertility care.',
+          blurb: 'One of the most widely held beliefs in fertility care.',
           myth: 'I should stay in bed after an embryo transfer to help it '
               'implant.',
-          fact: 'Trials have not found that bed rest improves the chance of a '
-              'pregnancy, and some found slightly worse outcomes. An embryo '
-              'is not held in place by lying still. Ordinary gentle activity '
-              'is what is generally advised — and lying in bed for days is '
-              'hard on the body and harder on the mind. Follow whatever your '
-              'own clinic tells you.',
+          fact: "Trials haven't found that bed rest makes a pregnancy more "
+              'likely, and some found slightly worse results. Lying still '
+              "isn't what keeps an embryo in place. Gentle, everyday activity "
+              "is what's usually advised. Lying in bed for days is hard on "
+              'your body and harder on your mind. Follow whatever your own '
+              'clinic tells you.',
         ),
         // WARNING: AN ARTICLE NOW, AND THE MYTH FORMAT WAS THE WRONG ONE. A
         // myth card needs a false belief to correct, and there is no myth here
@@ -438,7 +574,7 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
         TtcArticleTile(
           title: 'Can I work through a cycle?',
           blurb: 'Most people do. What it asks of your calendar, which days '
-              'are hard to move, and how much you have to tell anyone.',
+              'are hard to move, and how much you need to tell anyone.',
           readId: 'ttc_read_ivf_working',
         ),
       ],
@@ -448,19 +584,19 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
     //  Track — tools you use, not things you read
     // -------------------------------------------------------------------------
     TtcFocusSection(
-      heading: 'Keep track of a cycle you are in',
+      heading: "Keep track of a cycle you're in",
       group: 'track',
       tiles: [
         TtcToolTile(
           title: 'Track this treatment cycle',
-          blurb: 'Trigger, retrieval, transfer and the wait — the dates the '
-              'clinic gave you, in one place.',
+          blurb: 'Trigger, egg collection, transfer and the wait. The dates '
+              'your clinic gave you, all in one place.',
           surfaceId: 'ttc_treatment',
         ),
         TtcToolTile(
           title: 'Keep your reports together',
-          blurb: 'Every result and letter in one place, so the next '
-              'appointment starts from what is known.',
+          blurb: 'Every result and letter in one place, so your next '
+              "appointment starts from what's already known.",
           surfaceId: 'ttc_records',
         ),
         // ⚠️ THE SAFETY TILE BELONGS IN *THIS* SECTION, NOT ONLY IN "GOING
@@ -473,7 +609,7 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
         // the page.
         TtcArticleTile(
           title: 'When to call the clinic',
-          blurb: 'The signs that mean phone now rather than wait for the '
+          blurb: 'The signs that mean you should call now, not wait for the '
               'morning. Worth reading before you need it.',
           readId: 'ttc_read_ivf_ohss',
         ),

@@ -39,7 +39,23 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 
-enum TtcMood { calm, happy, energetic, low, anxious, irritated, swings, tearful }
+/// ⚠️ THE LAST FOUR ARE THE FEELINGS OF TRYING, added 2026-09-26 (gap
+/// analysis, Behind › Logging). Appended, so nothing that stored an index is
+/// disturbed, and drawn in the same hand: features only, one extra stroke.
+enum TtcMood {
+  calm,
+  happy,
+  energetic,
+  low,
+  anxious,
+  irritated,
+  swings,
+  tearful,
+  hopeful,
+  guilty,
+  looping,
+  hardOnSelf,
+}
 
 /// The mood a symptom id represents, or null if it is not a feeling.
 ///
@@ -57,6 +73,10 @@ TtcMood? ttcMoodFor(String symptomId) => switch (symptomId) {
       'irritated' => TtcMood.irritated,
       'mood_swings' => TtcMood.swings,
       'tearful' => TtcMood.tearful,
+      'hopeful' => TtcMood.hopeful,
+      'guilty' => TtcMood.guilty,
+      'cant_stop_thinking' => TtcMood.looping,
+      'hard_on_myself' => TtcMood.hardOnSelf,
       _ => null,
     };
 
@@ -206,6 +226,63 @@ class _FacePainter extends CustomPainter {
           ..quadraticBezierTo(tx - s * 0.075, ty + s * 0.12, tx, ty)
           ..close();
         canvas.drawPath(tear, dot);
+
+      // Eyes lifted and a soft smile, with one small spark above. Hopeful is
+      // looking forward, which is what the raised eyes say; the spark keeps
+      // it from reading as plain happy.
+      case TtcMood.hopeful:
+        canvas.drawCircle(Offset(cx - eyeX, eyeY - s * 0.05), eyeR, dot);
+        canvas.drawCircle(Offset(cx + eyeX, eyeY - s * 0.05), eyeR, dot);
+        mouth(0.13, width: 0.17);
+        final sx = cx + s * 0.34;
+        final sy = cy - s * 0.34;
+        final r = s * 0.07;
+        canvas.drawLine(Offset(sx - r, sy), Offset(sx + r, sy), line);
+        canvas.drawLine(Offset(sx, sy - r), Offset(sx, sy + r), line);
+
+      // Eyes cast down under brows that rise in the middle, and a small flat
+      // mouth. Guilt looks away; that is the whole of the drawing.
+      case TtcMood.guilty:
+        canvas.drawCircle(Offset(cx - eyeX, eyeY + s * 0.05), eyeR, dot);
+        canvas.drawCircle(Offset(cx + eyeX, eyeY + s * 0.05), eyeR, dot);
+        for (final side in [-1, 1]) {
+          canvas.drawLine(
+            Offset(cx + side * s * 0.29, cy - s * 0.22),
+            Offset(cx + side * s * 0.10, cy - s * 0.30),
+            line,
+          );
+        }
+        canvas.drawLine(Offset(cx - s * 0.10, cy + s * 0.22),
+            Offset(cx + s * 0.10, cy + s * 0.22), line);
+
+      // A flat mouth and a loop above the head: the same thought going round.
+      // An open loop rather than a closed ring, so it reads as motion and not
+      // as a halo.
+      case TtcMood.looping:
+        dotEyes();
+        canvas.drawLine(Offset(cx - s * 0.14, cy + s * 0.21),
+            Offset(cx + s * 0.14, cy + s * 0.21), line);
+        canvas.drawArc(
+          Rect.fromCircle(
+              center: Offset(cx + s * 0.30, cy - s * 0.33), radius: s * 0.1),
+          -math.pi / 2,
+          math.pi * 1.6,
+          false,
+          line,
+        );
+
+      // Eyes squeezed shut, a small frown. The face of someone telling
+      // herself off, which is different from sad (low) or tearful.
+      case TtcMood.hardOnSelf:
+        for (final side in [-1, 1]) {
+          final ex = cx + side * eyeX;
+          // "> <": each eye's point faces the middle of the face.
+          canvas.drawLine(Offset(ex + side * s * 0.07, eyeY - s * 0.05),
+              Offset(ex - side * s * 0.03, eyeY), line);
+          canvas.drawLine(Offset(ex - side * s * 0.03, eyeY),
+              Offset(ex + side * s * 0.07, eyeY + s * 0.05), line);
+        }
+        mouth(-0.12, width: 0.17, drop: 0.24);
     }
   }
 

@@ -227,18 +227,18 @@ const List<TtcPractice> _move = [
     blurb: 'A short loosen-up for a stiff body. Good first thing in the '
         'morning, or after a long day at a desk.',
     steps: [
-      'Sit or stand tall. Let the shoulders drop away from the ears.',
-      'Drop the chin slowly towards the chest, then lift it back to centre. '
-          'Do this five times, slowly.',
-      'Turn the head slowly to the right, back to centre, then to the left. '
-          'Five times each side.',
-      'Roll the shoulders backwards five times, then forwards five times.',
-      'Raise the right arm overhead and lean gently to the left. Hold for '
+      'Sit or stand tall. Let your shoulders drop away from your ears.',
+      'Slowly drop your chin towards your chest, then lift it back to the '
+          'middle. Do this five times, slowly.',
+      'Slowly turn your head to the right, back to the middle, then to the '
+          'left. Five times each side.',
+      'Roll your shoulders backwards five times, then forwards five times.',
+      'Raise your right arm overhead and lean gently to the left. Hold for '
           'three slow breaths. Repeat on the other side.',
-      'Come back to centre and take three normal breaths.',
+      'Come back to the middle and take three normal breaths.',
     ],
     skipIf: 'Skip the neck part if you have neck pain or a neck injury. Never '
-        'roll the head in a full circle.',
+        'roll your head in a full circle.',
     anim: TtcFigureAnim(
       seconds: 180,
       brief: 'Looping figure, front view, doing the sequence once through. '
@@ -251,22 +251,22 @@ const List<TtcPractice> _move = [
     title: 'Cat and cow, then child\'s pose',
     duration: 'About 3 minutes',
     setting: 'On the floor, on a mat or a folded blanket',
-    blurb: 'A gentle way to move the back. Helps if you sit all day, and it '
-        'settles the mind because you move with the breath.',
+    blurb: 'A gentle way to move your back. It helps if you sit all day, and '
+        'it calms the mind because you move with your breath.',
     steps: [
-      'Come onto your hands and knees. Hands under the shoulders, knees under '
-          'the hips.',
-      'Breathe in and let the belly drop, chest lifts, look slightly up. That '
-          'is cow.',
-      'Breathe out and round the back upwards, chin towards the chest. That is '
-          'cat.',
+      'Come onto your hands and knees. Hands under your shoulders, knees under '
+          'your hips.',
+      'Breathe in and let your belly drop, chest lifting, looking slightly up. '
+          "That's cow.",
+      'Breathe out and round your back upwards, chin towards your chest. '
+          "That's cat.",
       'Move between the two with your breath, slowly, eight times.',
-      'Then sit back onto the heels, arms stretched forward, forehead down. '
-          'That is child\'s pose.',
-      'Stay in child\'s pose for one minute, breathing normally.',
+      'Then sit back onto your heels, arms stretched forward, forehead down. '
+          "That's child's pose.",
+      "Stay in child's pose for one minute, breathing normally.",
     ],
-    skipIf: 'Put a cushion under the knees if they hurt. Skip if you have a '
-        'wrist or knee injury.',
+    skipIf: 'Put a cushion under your knees if they hurt. Skip this if you '
+        'have a wrist or knee injury.',
     anim: TtcFigureAnim(
       seconds: 180,
       brief: 'Side view, looping between cow and cat in time with a breath '
@@ -279,20 +279,20 @@ const List<TtcPractice> _move = [
     title: 'Hip openers: butterfly and slow lunge',
     duration: 'About 4 minutes',
     setting: 'On the floor',
-    blurb: 'Opens tight hips, which most people have from sitting. Calming '
-        'rather than effortful.',
+    blurb: 'Opens up tight hips, which most of us get from sitting. It feels '
+        'calming, not like hard work.',
     steps: [
-      'Sit with the soles of the feet together, knees falling out to the '
-          'sides. That is butterfly.',
-      'Hold the feet, sit tall, and let the knees relax down. Do not push '
+      'Sit with the soles of your feet together, knees falling out to the '
+          "sides. That's butterfly.",
+      "Hold your feet, sit tall, and let your knees relax down. Don't push "
           'them.',
       'Stay for one minute, breathing slowly.',
-      'Then come to a kneeling position and step the right foot forward, so '
-          'the knee is over the ankle.',
-      'Sink the hips gently forward and down. Hold for five slow breaths.',
+      'Then kneel, and step your right foot forward so the knee is over the '
+          'ankle.',
+      'Gently sink your hips forward and down. Hold for five slow breaths.',
       'Swap sides and repeat.',
     ],
-    skipIf: 'Never push or bounce the knees down in butterfly. Skip the lunge '
+    skipIf: 'Never push or bounce your knees down in butterfly. Skip the lunge '
         'if you have a knee problem.',
     anim: TtcFigureAnim(
       seconds: 240,
@@ -307,14 +307,14 @@ const List<TtcPractice> _move = [
     title: 'A ten-minute walk',
     duration: '10 minutes',
     setting: 'Outdoors if you can',
-    blurb: 'The simplest one, and it counts as the full movement for the day. '
-        'Better outdoors and better together, but any walk works.',
+    blurb: 'The easiest one, and it counts as your full movement for the day. '
+        "It's nicer outdoors and together, but any walk works.",
     steps: [
-      'Walk at a comfortable pace, the speed at which you could still talk.',
-      'If you are together, leave the phones in your pockets.',
-      'Daylight helps sleep later, so earlier in the day is better if you have '
-          'the choice.',
-      'That is it. There is no distance to hit.',
+      'Walk at a comfortable pace, slow enough that you could still talk.',
+      "If you're together, keep your phones in your pockets.",
+      'Daylight helps you sleep later, so earlier in the day is better if you '
+          'can choose.',
+      "That's it. There's no distance to reach.",
     ],
     skipIf: 'Nothing to skip. Slow down if you feel breathless.',
     // ⚠️ NO FIGURE, ON THE BRIEF'S OWN INSTRUCTION. Ten minutes of walking does
@@ -328,17 +328,18 @@ const List<TtcPractice> _move = [
     title: 'Legs up the wall',
     duration: '3 minutes',
     setting: 'Next to a wall',
-    blurb: 'The most restful one. Good in the evening, or on a day when '
-        'nothing else appeals.',
+    blurb: 'The most restful one. Good in the evening, or on a day when you '
+        "don't feel like anything else.",
     steps: [
       'Sit sideways next to a wall, with one hip touching it.',
-      'Lie back and swing the legs up the wall, so the body makes an L shape.',
-      'Rest the arms by your sides. Close the eyes if you like.',
+      'Lie back and swing your legs up the wall, so your body makes an L '
+          'shape.',
+      'Rest your arms by your sides. Close your eyes if you like.',
       'Stay for three minutes and breathe normally.',
-      'To come out, bend the knees, roll to one side, and sit up slowly.',
+      'To come out, bend your knees, roll to one side, and sit up slowly.',
     ],
-    skipIf: 'Come out if the legs tingle or go numb. Skip if you have eye '
-        'pressure problems or uncontrolled blood pressure.',
+    skipIf: 'Come out if your legs tingle or go numb. Skip this if you have eye '
+        'pressure problems or blood pressure that is not under control.',
     anim: TtcFigureAnim(
       seconds: 180,
       brief: 'Simple held pose, side view, with a three-minute timer ring. '
@@ -351,25 +352,25 @@ const List<TtcPractice> _move = [
     title: 'Slow sun salutation, three rounds',
     duration: 'About 5 minutes',
     setting: 'Standing, with room to stretch',
-    blurb: 'The most active card here, and still gentle if you go slowly. Only '
-        'pick this one if you already know the sequence or are happy to learn '
-        'it.',
+    blurb: 'The most active card here, but still gentle if you go slowly. '
+        'Only pick this one if you already know the moves or are happy to '
+        'learn them.',
     steps: [
-      'Stand tall, palms together at the chest.',
-      'Breathe in, raise the arms overhead.',
-      'Breathe out, fold forward from the hips, knees soft.',
-      'Breathe in, half lift, flat back, hands on the shins.',
-      'Step back one leg at a time and lower the knees, chest and chin down '
-          'gently.',
-      'Breathe in, slide forward and lift the chest, elbows soft.',
-      'Breathe out, lift the hips up and back into a downward slope. Stay for '
-          'three breaths.',
-      'Step the feet forward, fold, then rise back up to standing with the '
+      'Stand tall, palms together at your chest.',
+      'Breathe in, and raise your arms overhead.',
+      'Breathe out, and fold forward from the hips, knees soft.',
+      'Breathe in, and lift halfway with a flat back, hands on your shins.',
+      'Step back one leg at a time. Gently lower your knees, then your chest '
+          'and chin.',
+      'Breathe in, slide forward and lift your chest, elbows soft.',
+      'Breathe out, and lift your hips up and back into a downward slope. '
+          'Stay for three breaths.',
+      'Step your feet forward, fold, then rise back up to standing with your '
           'arms overhead.',
       'Repeat the whole thing three times, slowly.',
     ],
-    skipIf: 'Skip if you have back, wrist or shoulder problems, or if you feel '
-        'dizzy on bending forward. Go at half speed the first time.',
+    skipIf: 'Skip this if you have back, wrist or shoulder problems, or if you '
+        'feel dizzy when you bend forward. Go at half speed the first time.',
     anim: TtcFigureAnim(
       seconds: 300,
       sides: true,
@@ -393,14 +394,14 @@ const List<TtcPractice> _breathe = [
     title: 'Long out-breath, in four out six',
     duration: '1 minute',
     setting: 'Sitting or lying',
-    blurb: 'The simplest way to settle the body. A longer out-breath than '
-        'in-breath is what does the work.',
+    blurb: 'The easiest way to calm your body. Breathing out for longer than '
+        'you breathe in is what does the work.',
     steps: [
-      'Sit comfortably and let the shoulders drop.',
-      'Breathe in through the nose while you count to four.',
-      'Breathe out slowly through the nose or mouth while you count to six.',
-      'Keep going for one minute. That is about six rounds.',
-      'If six feels too long, use in for three and out for five.',
+      'Sit comfortably and let your shoulders drop.',
+      'Breathe in through your nose while you count to four.',
+      'Breathe out slowly through your nose or mouth while you count to six.',
+      "Keep going for one minute. That's about six rounds.",
+      'If six feels too long, breathe in for three and out for five.',
     ],
     skipIf: 'Go back to normal breathing if you feel light-headed.',
     anim: TtcBreathAnim(inhale: 4, exhale: 6, seconds: 60),
@@ -411,19 +412,19 @@ const List<TtcPractice> _breathe = [
     title: 'Alternate nostril breathing',
     duration: '1 to 2 minutes',
     setting: 'Sitting',
-    blurb: 'A traditional breathing practice that people find steadying. Uses '
-        'one hand to close one nostril at a time.',
+    blurb: 'A traditional breathing practice that many people find calming. '
+        'You use one hand to close one nostril at a time.',
     steps: [
-      'Sit tall. Use the right hand, thumb and ring finger.',
-      'Close the right nostril with the thumb. Breathe in through the left.',
-      'Close the left nostril with the ring finger, release the thumb, and '
+      'Sit tall. Use your right hand, with the thumb and ring finger.',
+      'Close your right nostril with your thumb. Breathe in through the left.',
+      'Close your left nostril with your ring finger, lift your thumb, and '
           'breathe out through the right.',
       'Breathe in through the right.',
-      'Close the right, release the left, and breathe out through the left. '
-          'That is one round.',
+      'Close the right, open the left, and breathe out through the left. '
+          "That's one round.",
       'Do this for one to two minutes, slowly and without forcing.',
     ],
-    skipIf: 'Skip if the nose is blocked with a cold. Stop if you feel '
+    skipIf: 'Skip this if your nose is blocked with a cold. Stop if you feel '
         'light-headed.',
     anim: TtcBreathAnim(inhale: 4, exhale: 4, seconds: 90, nostrils: true),
   ),
@@ -433,17 +434,17 @@ const List<TtcPractice> _breathe = [
     title: 'Box breathing',
     duration: '1 minute',
     setting: 'Anywhere',
-    blurb: 'Four equal parts, easy to remember. Useful when the mind is '
-        'racing, and it can be done at a desk without anyone noticing.',
+    blurb: 'Four equal parts, easy to remember. Useful when your mind is '
+        'racing, and you can do it at a desk without anyone noticing.',
     steps: [
-      'Breathe in through the nose while you count to four.',
+      'Breathe in through your nose while you count to four.',
       'Hold for a count of four.',
       'Breathe out for a count of four.',
-      'Hold empty for a count of four. That is one round.',
+      "Hold with your lungs empty for a count of four. That's one round.",
       'Do four rounds, which is about one minute.',
     ],
     skipIf: 'Shorten the holds to two counts if holding feels uncomfortable. '
-        'Skip the holds entirely if you are unwell.',
+        "Skip the holds completely if you're unwell.",
     anim: TtcBreathAnim(
         inhale: 4, hold: 4, exhale: 4, holdEmpty: 4, seconds: 64, square: true),
   ),
@@ -453,19 +454,19 @@ const List<TtcPractice> _breathe = [
     title: 'Two-minute body relaxation',
     duration: '2 minutes',
     setting: 'Sitting or lying',
-    blurb: 'Not breathing work. You move attention through the body and let '
-        'each part go. Good at the end of the day.',
+    blurb: "This isn't breathing work. You move your attention through your "
+        'body and let each part relax. Good at the end of the day.',
     steps: [
-      'Lie down or sit back comfortably and close the eyes.',
-      'Bring attention to the face. Unclench the jaw. Let the forehead soften.',
-      'Move to the shoulders. Let them drop.',
-      'Move to the hands. Let the fingers uncurl.',
-      'Move to the belly. Let it be soft rather than held in.',
-      'Move down through the legs to the feet.',
-      'Take three normal breaths and open the eyes slowly.',
+      'Lie down or sit back comfortably and close your eyes.',
+      'Notice your face. Unclench your jaw. Let your forehead soften.',
+      'Move to your shoulders. Let them drop.',
+      'Move to your hands. Let your fingers uncurl.',
+      'Move to your belly. Let it be soft, not held in.',
+      'Move down through your legs to your feet.',
+      'Take three normal breaths and slowly open your eyes.',
     ],
     skipIf: 'Nothing to skip. If you fall asleep doing this in the evening, '
-        'that is fine.',
+        "that's fine.",
     anim: TtcBodyScanAnim(seconds: 120),
   ),
   TtcPractice(
@@ -474,13 +475,13 @@ const List<TtcPractice> _breathe = [
     title: 'Two-minute calm listen',
     duration: '2 minutes',
     setting: 'Anywhere you can close your eyes',
-    blurb: 'For days when you do not want to do anything. You only have to sit '
+    blurb: "For days when you don't want to do anything. You only have to sit "
         'and listen.',
     steps: [
-      'Sit or lie back and close the eyes.',
-      'Play something calm. Soft music, a raag, a chant, or whatever settles '
+      'Sit or lie back and close your eyes.',
+      'Play something calm. Soft music, a raag, a chant, or whatever calms '
           'you.',
-      'Do not try to concentrate. Let your attention wander and come back.',
+      "Don't try to focus. Let your attention wander off and come back.",
       'When it ends, sit for one more breath before you get up.',
     ],
     skipIf: 'Nothing to skip.',
@@ -493,16 +494,16 @@ const List<TtcPractice> _breathe = [
     duration: '1 minute',
     setting: 'Both of you, same room',
     blurb: 'The only one that needs both of you. Nothing to say and nothing to '
-        'decide, which is the point.',
+        "decide. That's what makes it restful.",
     steps: [
       'Sit near each other, wherever you are.',
-      'Agree who counts, or use the screen.',
+      'Decide who counts, or use the screen.',
       'Breathe in and out slowly together, ten times.',
-      'Do not try to match each other exactly. Roughly the same pace is '
+      "Don't try to match each other exactly. About the same pace is "
           'enough.',
-      'That is the whole thing.',
+      "That's all there is to it.",
     ],
-    skipIf: 'Nothing to skip. If one of you is not around, do the long '
+    skipIf: "Nothing to skip. If one of you isn't around, do the long "
         'out-breath card instead.',
     anim: TtcBreathAnim(
         inhale: 4, exhale: 6, seconds: 100, countTo: 10, twoMarkers: true),

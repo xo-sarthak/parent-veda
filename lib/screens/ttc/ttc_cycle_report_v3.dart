@@ -51,17 +51,17 @@ enum TtcCycleView { dial, calendar }
 /// thing. Do not make these more clinical later — that is a regression.
 String ttcPhaseBlurb(TtcPhase phase) => switch (phase) {
       TtcPhase.period =>
-        'The bleeding days. Day 1 is the first day of real bleeding, and it is '
-            'what starts a new cycle.',
+        'The bleeding days. Day 1 is the first day of real bleeding, and '
+            "that's what starts a new cycle.",
       TtcPhase.beforeWindow =>
-        'Bleeding has stopped and the body is preparing an egg. Nothing to '
-            'watch for yet.',
+        'Bleeding has stopped and your body is getting an egg ready. '
+            'Nothing to watch for yet.',
       TtcPhase.fertileWindow =>
         'An egg is released around now. In general, these are the days in a '
             'cycle when a pregnancy can begin.',
       TtcPhase.afterWindow =>
-        'The stretch after the fertile days. Your next period is expected at '
-            'the end of it.',
+        'The days after your fertile days. Your next period is due at the '
+            'end of them.',
     };
 
 const _months = [
@@ -481,7 +481,7 @@ class _Stop extends StatelessWidget {
   Widget build(BuildContext context) {
     final here = span.status == TtcSpanStatus.here;
     final meta = StringBuffer()
-      ..write('${_d(span.firstDay)} – ${_d(span.lastDay)}')
+      ..write('${_d(span.firstDay)} to ${_d(span.lastDay)}')
       ..write(' · ${span.days} ${span.days == 1 ? 'day' : 'days'}');
     if (here) {
       meta.write(' · day ${span.dayInto} of ${span.days}');

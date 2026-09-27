@@ -55,6 +55,19 @@ import 'reads/ttc_reads_getting_ready.dart';
 import 'reads/ttc_reads_his_side.dart';
 import 'reads/ttc_reads_after_loss.dart';
 import 'reads/ttc_reads_mind_body.dart';
+// TTC gap plan (2026-09-26): the new sections the gap analysis asked for.
+import 'reads/ttc_reads_waiting.dart';
+import 'reads/ttc_reads_hard_days.dart';
+import 'reads/ttc_reads_meal_plan.dart';
+import 'reads/ttc_reads_body_intimate.dart';
+import 'reads/ttc_reads_sex.dart';
+import 'reads/ttc_reads_loss_more.dart';
+import 'reads/ttc_reads_body_cycle.dart';
+import 'reads/ttc_reads_body_conditions.dart';
+import 'reads/ttc_reads_extra.dart';
+import 'reads/ttc_reads_age.dart';
+import 'reads/ttc_reads_safety.dart';
+import 'reads/ttc_reads_treatment.dart';
 
 /// Every TTC read, in bracket order.
 ///
@@ -75,6 +88,19 @@ final List<PvRead> kTtcReads = [
   ...kTtcReadsHisSide,
   ...kTtcReadsAfterLoss,
   ...kTtcReadsMindBody,
+  // TTC gap plan, 2026-09-26.
+  ...kTtcReadsWaiting,
+  ...kTtcReadsHardDays,
+  ...kTtcReadsMealPlan,
+  ...kTtcReadsBodyIntimate,
+  ...kTtcReadsSex,
+  ...kTtcReadsLossMore,
+  ...kTtcReadsBodyCycle,
+  ...kTtcReadsBodyConditions,
+  ...kTtcReadsExtra,
+  ...kTtcReadsAge,
+  ...kTtcReadsSafety,
+  ...kTtcReadsTreatment,
 ];
 
 /// Lookup by id. Null is a real answer — see `ttc_surface_router.dart`.
@@ -87,3 +113,32 @@ PvRead? ttcReadById(String id) {
 
 /// Title for a read-next card, without handing the reader the whole library.
 LocalizedText? ttcReadTitle(String id) => ttcReadById(id)?.title;
+
+/// The TTC reads whose words best match a free-text question, best first.
+///
+/// Added 2026-09-26 so Ask Veda's "More information" can offer our own reads
+/// instead of saying "coming soon" (TTC gap plan). Plain word overlap on the
+/// title, teaser and headings: no service, works offline, and never invents a
+/// read. Words under four letters are ignored so "can i eat" does not match
+/// every read with "can" in it.
+List<PvRead> ttcReadsMatching(String question, {int max = 3}) {
+  final words = question
+      .toLowerCase()
+      .split(RegExp(r'[^a-z0-9]+'))
+      .where((w) => w.length >= 4)
+      .toSet();
+  if (words.isEmpty) return const [];
+  final scored = <(int, PvRead)>[];
+  for (final r in kTtcReads) {
+    final title = r.title.en.toLowerCase();
+    final rest = [r.teaser.en, ...r.toc.map((h) => h.en)].join(' ').toLowerCase();
+    var score = 0;
+    for (final w in words) {
+      if (title.contains(w)) score += 3;
+      if (rest.contains(w)) score += 1;
+    }
+    if (score >= 2) scored.add((score, r));
+  }
+  scored.sort((a, b) => b.$1.compareTo(a.$1));
+  return [for (final e in scored.take(max)) e.$2];
+}

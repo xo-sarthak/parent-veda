@@ -31,10 +31,10 @@ class TtcCareCircleScreen extends StatelessWidget {
   /// The roles a circle can eventually hold, from §2.15.
   static const List<(String, String, String)> roles = [
     ('parentveda', 'ParentVeda', 'Everything you see here, and why'),
-    ('partner', 'Your partner', 'The other half of this'),
-    ('doctor', 'Your doctor', 'Consultations, notes and prescriptions'),
-    ('nutritionist', 'Nutritionist', 'Food plans built for your kitchen'),
-    ('psychologist', 'Psychologist', 'For the days that are simply hard'),
+    ('partner', 'Your partner', 'In this with you'),
+    ('doctor', 'Your doctor', 'Visits, notes and prescriptions'),
+    ('nutritionist', 'Nutritionist', 'Food plans that fit your kitchen'),
+    ('psychologist', 'Psychologist', 'For the days that just feel hard'),
     ('clinic', 'Clinic or hospital', 'Where your tests and scans happen'),
   ];
 

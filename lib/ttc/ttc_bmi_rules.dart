@@ -148,13 +148,13 @@ BmiInputError validateBmiInput(BmiInput input) {
 LocalizedText bmiErrorCopy(BmiInputError e) => switch (e) {
       BmiInputError.none => _en(''),
       BmiInputError.heightMissing =>
-        _en('Add your height. If you are 165 cm, enter 165.'),
+        _en("Add your height. If you're 165 cm, enter 165."),
       BmiInputError.heightImplausible =>
-        _en('That height looks like a typo — check the number and the unit.'),
+        _en('That height looks like a typo. Check the number and the unit.'),
       BmiInputError.weightMissing =>
-        _en('Add your weight. If you are 62 kg, enter 62.'),
+        _en("Add your weight. If you're 62 kg, enter 62."),
       BmiInputError.weightImplausible =>
-        _en('That weight looks like a typo — check the number and the unit.'),
+        _en('That weight looks like a typo. Check the number and the unit.'),
       BmiInputError.inchesOutOfRange =>
         _en('Inches should be between 0 and 11. For 5 foot 4, enter 5 and 4.'),
     };
@@ -326,24 +326,24 @@ BmiInterpretation interpretBmi(BmiCalculation? calc, BmiContext context,
   if (context.isPregnant) {
     return BmiInterpretation(
       scope: BmiScope.pregnant,
-      headline: _en('This is not the right tool right now'),
-      body: _en('BMI is calculated differently from pregnancy weight gain, and '
-          'a preconception reading of it would not tell you anything useful '
-          'now that you are pregnant.'),
-      preconception: _en('Your pregnancy journey tracks weight the way it is '
-          'actually monitored in pregnancy.'),
+      headline: _en("This isn't the right tool right now"),
+      body: _en('BMI works differently from pregnancy weight gain. A '
+          "before-pregnancy reading won't tell you anything useful now that "
+          "you're pregnant."),
+      preconception: _en('Your pregnancy section tracks weight the way it is '
+          'checked in pregnancy.'),
     );
   }
 
   if (context.isMinor) {
     return BmiInterpretation(
       scope: BmiScope.minor,
-      headline: _en('Adult BMI bands do not apply here'),
+      headline: _en("Adult BMI ranges don't apply here"),
       body: _en('BMI is read differently under 18, because age and sex are '
           'taken into account while a body is still growing. This calculator '
-          'is built for adults, so it will not give you a category.'),
-      preconception: _en('A doctor can interpret it properly using the charts '
-          'made for it.'),
+          "is made for adults, so it won't give you a category."),
+      preconception: _en('A doctor can read it properly using the charts made '
+          'for your age.'),
     );
   }
 
@@ -351,7 +351,7 @@ BmiInterpretation interpretBmi(BmiCalculation? calc, BmiContext context,
     return BmiInterpretation(
       scope: BmiScope.adultPreconception,
       headline: _en('Add your height and weight'),
-      body: _en('Both are needed to work anything out.'),
+      body: _en('We need both to work anything out.'),
       preconception: _en(''),
     );
   }
@@ -365,7 +365,7 @@ BmiInterpretation interpretBmi(BmiCalculation? calc, BmiContext context,
     // ⚠️ NAMES NO REASON AND OFFERS NO CONGRATULATION. Weight moves for many
     // reasons, several of them worth a doctor and none of them ours to guess.
     change = _en('This is quite different from your last entry. If the change '
-        'was unexpected, it is worth mentioning to your doctor.');
+        "was unexpected, it's worth mentioning to your doctor.");
   }
 
   // ---- CONTEXT NOTE --------------------------------------------------------
@@ -376,13 +376,13 @@ BmiInterpretation interpretBmi(BmiCalculation? calc, BmiContext context,
   // may be useful.
   LocalizedText? contextNote;
   if (context.hasPcosPattern) {
-    contextNote = _en('You have already told us about a PCOS pattern. That '
-        'makes a preconception conversation more useful than usual — not '
-        'because of this number, but because it is worth looking at these '
+    contextNote = _en("You've already told us about a PCOS pattern. That "
+        'makes a check-up before pregnancy more useful than usual. Not '
+        'because of this number, but because it helps to look at these '
         'things together.');
   } else if (context.irregularCycles) {
-    contextNote = _en('You have logged cycles that vary quite a bit. Worth '
-        'raising alongside anything else, rather than on its own.');
+    contextNote = _en("You've logged cycles that vary quite a bit. Worth "
+        'raising along with anything else, not on its own.');
   }
 
   return BmiInterpretation(
@@ -398,88 +398,88 @@ BmiInterpretation interpretBmi(BmiCalculation? calc, BmiContext context,
 LocalizedText _bandBody(BmiCategory cat) {
   final southAsian = cat.standard == BmiStandard.southAsian;
   return switch (cat.band) {
-    BmiBand.healthy => _en('Your BMI falls within the standard adult range '
-        '${southAsian ? 'used for South Asian populations' : 'used '
-            'internationally'}. BMI is one measure among several, and it is '
-        'best read alongside your overall health, nutrition, activity and '
-        'medical history.'),
+    BmiBand.healthy => _en('Your BMI is within the standard adult range '
+        '${southAsian ? 'used for South Asian people' : 'used '
+            'internationally'}. BMI is one measure among several. It\'s best '
+        'read alongside your overall health, food, activity and medical '
+        'history.'),
     BmiBand.under => _en('Your BMI is below the standard adult range. That on '
-        'its own does not tell us why. If you have irregular periods, '
-        'unintentional weight loss, low appetite or any concern about '
-        'nutrition, those are the things worth raising with a doctor.'),
+        'its own does not tell us why. If you have irregular periods, weight '
+        "loss you didn't plan, a low appetite or any worry about nutrition, "
+        'those are worth raising with a doctor.'),
     BmiBand.over => _en('Your BMI is above the standard adult range '
-        '${southAsian ? 'used for South Asian populations' : 'used '
-            'internationally'}. BMI alone cannot tell you how healthy you '
+        '${southAsian ? 'used for South Asian people' : 'used '
+            'internationally'}. BMI alone can\'t tell you how healthy you '
         'are, and it cannot tell you whether you will have difficulty '
-        'conceiving. It is a starting point for a conversation, not a '
+        "conceiving. It's a starting point for a conversation, not a "
         'conclusion.'),
     BmiBand.obese => _en('Your BMI falls in the obesity category used in '
-        'standard adult classifications. This is a screening category, not '
-        'a diagnosis. Some pregnancy risks are higher at this BMI, which makes '
-        'a preconception conversation worth having — and it says nothing about '
-        'whether you can have a healthy pregnancy.'),
+        'standard adult ranges. This is a screening category, not a '
+        'diagnosis. Some pregnancy risks are higher at this BMI, so a check-up '
+        'before pregnancy is worth having. And it says nothing about whether '
+        'you can have a healthy pregnancy.'),
   };
 }
 
 LocalizedText _bandPreconception(BmiBand band) => switch (band) {
-      BmiBand.healthy => _en('BMI can be one part of a preconception '
-          'conversation. A doctor reads it alongside blood pressure, blood '
-          'sugar, nutrition, activity and your history — which is why none of '
-          'them is looked at on its own.'),
-      BmiBand.under => _en('Rather than focusing on the number, the useful '
-          'questions are whether you are getting enough energy and nutrients, '
+      BmiBand.healthy => _en('BMI can be one part of a check-up before '
+          'pregnancy. A doctor reads it alongside blood pressure, blood sugar, '
+          "food, activity and your history. That's why none of them is looked "
+          'at on its own.'),
+      BmiBand.under => _en('Instead of focusing on the number, the useful '
+          "questions are whether you're getting enough energy and nutrients, "
           'and whether your cycles are regular. Both are worth raising.'),
       // ⚠️ NO TARGET, NO DIET, NO "LOSE WEIGHT BEFORE TRYING". The evidence
       // supports a modest sustained change where weight is raised — and
       // postponing trying for a year to reach a number trades a small benefit
       // for a year of age, which for many women is the worse deal.
-      BmiBand.over => _en('Rather than aiming at a number, the more useful '
-          'question is overall health. If you have concerns about blood '
-          'pressure, blood sugar, PCOS, periods or nutrition, a preconception '
-          'review covers all of it at once. Any change to eating or weight is '
-          'more useful gradual and sustainable than rapid — and that is a '
+      BmiBand.over => _en('Instead of aiming for a number, the more useful '
+          'question is your overall health. If you have concerns about blood '
+          'pressure, blood sugar, PCOS, periods or nutrition, a check-up '
+          'before pregnancy covers all of it at once. Any change to eating or '
+          "weight works better slow and steady than fast. That's a "
           'conversation for a doctor or dietitian who knows you.'),
-      BmiBand.obese => _en('Rather than aiming at a number, the more useful '
-          'question is overall health. A preconception review can look at '
-          'blood pressure, blood sugar and anything else relevant together. If '
-          'you are considering changes to eating or weight, gradual and '
-          'sustainable is generally more useful than rapid dieting, and a '
-          'doctor or dietitian can tailor it to you.'),
+      BmiBand.obese => _en('Instead of aiming for a number, the more useful '
+          'question is your overall health. A check-up before pregnancy can '
+          'look at blood pressure, blood sugar and anything else relevant, all '
+          "together. If you're thinking about changes to eating or weight, "
+          'slow and steady usually works better than crash dieting. A doctor '
+          'or dietitian can fit it to you.'),
     };
 
 /// The "not the whole picture" card. Editorial, never labelled a tip.
 final LocalizedText kBmiNotTheWholeStory = _en(
-    'Two people can have the same BMI and completely different health. Muscle, '
-    'body composition, where fat sits, nutrition and medical history all '
-    'matter, and BMI sees none of them.');
+    'Two people can have the same BMI and very different health. Muscle, '
+    'body build, where fat sits, nutrition and medical history all matter, '
+    'and BMI sees none of them.');
 
 /// What BMI does not measure. Shown in a collapsible section.
 final List<LocalizedText> kBmiLimitations = [
   _en('Body fat percentage, or how much of your weight is muscle'),
-  _en('Where body fat is distributed — which matters more than the total'),
-  _en('Nutritional status'),
-  _en('Metabolic health, such as blood sugar or blood pressure'),
+  _en('Where body fat sits, which matters more than the total'),
+  _en('How well nourished you are'),
+  _en('Metabolic health, like blood sugar or blood pressure'),
   _en('Fertility'),
   _en('Fitness'),
 ];
 
 /// The disclaimer, on every result.
 final LocalizedText kBmiDisclaimer = _en(
-    'BMI is a screening measure. It does not diagnose any condition and it '
-    'does not predict fertility. A healthcare professional can read it '
+    'BMI is a screening measure. It does not diagnose any condition, and it '
+    'does not predict fertility. A doctor or health worker can read it '
     'alongside your overall health and history.');
 
 /// Why the two sets of numbers differ. Shown beside the second reading.
 final LocalizedText kBmiStandardsExplainer = _en(
-    'We use the South Asian thresholds, because you are being read against '
-    'people built like you. ICMR, the WHO Asia-Pacific classification and NICE '
-    'all set overweight at 23 and obesity at 25 for South Asian people, since '
-    'metabolic risk tends to appear at a lower BMI than the international '
-    'numbers assume — those were derived largely from European populations. '
-    'The international figure is shown below it because you will meet it: '
-    'plenty of labs, apps and doctors still quote it. The same number can be '
-    '"above the range" here and "within" there, and neither is broken. Waist '
-    'measurement is often more informative than either.');
+    'We use the South Asian cut-offs, because they compare you with people '
+    'built like you. ICMR, the WHO Asia-Pacific classification and NICE all '
+    'set overweight at 23 and obesity at 25 for South Asian people. Risks like '
+    'high blood sugar tend to show up at a lower BMI than the international '
+    'numbers assume, and those numbers came mostly from European '
+    "populations. The international figure is shown below because you'll "
+    'come across it: many labs, apps and doctors still use it. The same '
+    'number can be "above the range" here and "within" there, and neither is '
+    'wrong. A waist measurement often tells you more than either.');
 
 // -----------------------------------------------------------------------------
 //  Clinical-review register

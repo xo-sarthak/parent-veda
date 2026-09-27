@@ -73,15 +73,15 @@ const List<TtcTest> ttcTests = [
     whatEn: 'How hard your body is pushing your thyroid to work.',
     whatHi: 'Aapka body thyroid se kitna kaam karwa raha hai.',
     whyEn:
-        'An underactive thyroid causes irregular cycles, disrupts ovulation and raises the risk of early miscarriage. It is common in Indian women and often has no obvious symptoms.',
+        "A slow, underactive thyroid causes irregular cycles, upsets ovulation and raises the risk of early miscarriage. It's common in Indian women, and often there are no clear symptoms.",
     whyHi:
         'Kam kaam karta thyroid irregular cycles karta hai, ovulation bigaadta hai aur shuruaati miscarriage ka khatra badhata hai. Ye Indian auraton mein aam hai aur aksar iske saaf symptoms nahi hote.',
-    whenEn: 'Any day of the cycle. Fasting is not required.',
+    whenEn: "Any day of the cycle. You don't need to fast.",
     whenHi: 'Cycle ke kisi bhi din. Khaali pet hona zaroori nahi.',
-    costEn: '₹150 – ₹400',
+    costEn: '₹150 to ₹400',
     costHi: '₹150 – ₹400',
     readingEn:
-        'Many fertility specialists prefer TSH below 2.5 when trying, which is stricter than the general lab range - so a result marked "normal" may still be worth discussing. Treatment is usually a single daily tablet.',
+        'Many fertility specialists like TSH to be below 2.5 while you\'re trying. That\'s stricter than the usual lab range, so a result marked "normal" may still be worth talking about. Treatment is usually one tablet a day.',
     readingHi:
         'Bahut se fertility specialists koshish ke dauraan TSH 2.5 se neeche pasand karte hain, jo aam lab range se sakht hai - toh "normal" likha result bhi baat karne layak ho sakta hai. Ilaaj aam taur par roz ki ek goli hoti hai.',
   ),
@@ -96,19 +96,19 @@ const List<TtcTest> ttcTests = [
     // framing that invites "I am running out". Nothing new is claimed here;
     // the vetted wording was moved to where the fear starts.
     whatEn:
-        'How your ovaries are likely to respond to IVF stimulation - a planning number, not a count of what is left.',
+        "How your ovaries are likely to respond to the medicines used in IVF. It's a number for planning, not a count of what's left.",
     whatHi:
         'Ovaries IVF stimulation par kaisa jawab dengi, iska andaaza - planning ka number hai, ye nahi ki kitna bacha hai.',
     whyEn:
-        'Mainly used to predict how ovaries will respond to IVF stimulation. It is a planning number for a specialist, not a fertility score.',
+        "It's mainly used to predict how the ovaries will respond to IVF medicines. It's a planning number for a specialist, not a fertility score.",
     whyHi:
         'Zyadatar ye batane ke liye ki ovaries IVF stimulation par kaisa jawab denge. Ye specialist ke liye planning ka number hai, fertility score nahi.',
-    whenEn: 'Any day of the cycle - AMH is stable across the month.',
+    whenEn: 'Any day of the cycle. AMH stays steady through the month.',
     whenHi: 'Cycle ke kisi bhi din - AMH poore mahine sthir rehta hai.',
-    costEn: '₹1,200 – ₹2,500',
+    costEn: '₹1,200 to ₹2,500',
     costHi: '₹1,200 – ₹2,500',
     readingEn:
-        'It says almost nothing about egg QUALITY, and on its own it is a poor predictor of natural conception. A low AMH with regular cycles is not a verdict. The useful question to ask your doctor is: what does this number change about our plan? If the answer is nothing, it changes nothing.',
+        "It says almost nothing about egg quality, and on its own it doesn't predict natural conception well. A low AMH with regular cycles isn't a verdict. A helpful question for your doctor is: what does this number change about our plan? If the answer is nothing, then nothing changes.",
     readingHi:
         'Ye egg ki QUALITY ke baare mein lagbhag kuch nahi batata, aur akele ye natural conception ka kharaab predictor hai. Regular cycles ke saath kam AMH koi faisla nahi hai. Doctor se poochhne layak sawaal: ye number hamare plan mein kya badalta hai? Agar jawab "kuch nahi" hai, toh sach mein kuch nahi badalta.',
   ),
@@ -116,20 +116,20 @@ const List<TtcTest> ttcTests = [
     id: 'fsh_lh',
     name: 'FSH and LH',
     forHim: false,
-    whatEn: 'The two pituitary hormones that drive the ovaries each cycle.',
+    whatEn: 'Two hormones from the pituitary gland in the brain that drive the ovaries each cycle.',
     whatHi: 'Do pituitary hormones jo har cycle ovaries ko chalate hain.',
     whyEn:
-        'Read together they help explain irregular or absent cycles, and the ratio between them is one of the signals used when PCOS is suspected.',
+        'Read together, they help explain irregular or missing cycles. The balance between them is also one of the signs doctors look at when PCOS is suspected.',
     whyHi:
         'Saath mein padhne par ye irregular ya band cycles samjhane mein madad karte hain, aur inka aapasi anupaat un signals mein hai jinse PCOS ka shak hota hai.',
     whenEn:
-        'Day 2 or 3 of the cycle - counted from the first day of full flow. Taken on the wrong day, the result is not interpretable and has to be repeated.',
+        "Day 2 or 3 of your cycle, counting from the first day of full flow. If it's taken on the wrong day, the result can't be read and has to be repeated.",
     whenHi:
         'Cycle ke din 2 ya 3 - poore flow ke pehle din se ginti. Galat din liya gaya result samajh mein nahi aata aur dobara karwana padta hai.',
-    costEn: '₹500 – ₹1,200 for both',
+    costEn: '₹500 to ₹1,200 for both',
     costHi: '₹500 – ₹1,200 dono ke liye',
     readingEn:
-        'This is the test most often wasted by being taken on the wrong day. If your cycles are irregular and day 2 is hard to identify, ask your doctor when to go rather than guessing.',
+        'This is the test most often wasted by being done on the wrong day. If your cycles are irregular and day 2 is hard to pin down, ask your doctor when to go instead of guessing.',
     readingHi:
         'Ye wo test hai jo sabse zyada galat din liye jaane se barbaad hota hai. Agar aapke cycles irregular hain aur din 2 pehchaanna mushkil hai, toh andaaza lagane ke bajaye doctor se poochhein ki kab jaana hai.',
   ),
@@ -137,20 +137,20 @@ const List<TtcTest> ttcTests = [
     id: 'semen',
     name: 'Semen analysis',
     forHim: true,
-    whatEn: 'Sperm count, movement and shape, plus semen volume.',
+    whatEn: 'How many sperm there are, how they move and their shape, plus the amount of semen.',
     whatHi: 'Sperm ki ginti, chaal aur aakaar, aur semen ki matra.',
     whyEn:
-        'A male factor is involved in roughly forty to fifty per cent of couples who struggle - yet the woman is usually investigated first, through tests that are slower, costlier and more invasive. This one is cheap, same-day and non-invasive.',
+        "A male factor plays a part in roughly forty to fifty per cent of couples who struggle. Yet the woman is usually tested first, with tests that are slower, cost more and are harder on the body. This one is cheap and painless, and it's done the same day.",
     whyHi:
         'Jo couples mushkil jhelte hain unmein lagbhag chalis se pachas pratishat mein mard ka factor hota hai - phir bhi aam taur par pehle aurat ke test hote hain, jo dheere, mehnge aur zyada takleefdeh hote hain. Ye sasta, usi din ka aur bina takleef ka hai.',
     whenEn:
-        'After two to five days without ejaculation. Less or more than that changes the result.',
+        'After two to five days without ejaculating. Fewer or more days than that changes the result.',
     whenHi:
         'Do se paanch din bina ejaculation ke baad. Isse kam ya zyada hone par result badal jaata hai.',
-    costEn: '₹300 – ₹1,000',
+    costEn: '₹300 to ₹1,000',
     costHi: '₹300 – ₹1,000',
     readingEn:
-        'Results vary a great deal between samples, including in men with no problem at all. One unexpected result is not a conclusion - repeat it after two to three months, which is also roughly how long it takes for lifestyle changes to show.',
+        "Results change a lot from one sample to the next, even in men with no problem at all. One unexpected result isn't the final word. Repeat it after two to three months, which is also about how long lifestyle changes take to show.",
     readingHi:
         'Samples ke beech results kaafi badalte hain, un mardon mein bhi jinhe koi dikkat nahi. Ek unexpected result nateeja nahi hai - do-teen mahine baad dobara karwayein, jo lagbhag utna hi samay hai jitna lifestyle badlaav dikhne mein lagta hai.',
   ),
@@ -158,18 +158,18 @@ const List<TtcTest> ttcTests = [
     id: 'vitd',
     name: 'Vitamin D',
     forHim: false,
-    whatEn: 'How much vitamin D is circulating in your blood.',
+    whatEn: 'How much vitamin D is in your blood.',
     whatHi: 'Aapke khoon mein kitna vitamin D chal raha hai.',
     whyEn:
-        'A majority of Indian adults are low, including people who spend time outdoors. Low levels are linked to cycle irregularity and to sperm quality, so it is worth testing both of you.',
+        "Most Indian adults are low, even people who spend time outdoors. Low levels are linked to irregular cycles and to sperm quality, so it's worth testing both of you.",
     whyHi:
         'Zyadatar Indian adults mein kami hai, un logon mein bhi jo dhoop mein rehte hain. Kam level cycle ki irregularity aur sperm quality dono se juda hai, toh dono ka test karwana theek hai.',
     whenEn: 'Any day. No fasting needed.',
     whenHi: 'Kisi bhi din. Khaali pet hona zaroori nahi.',
-    costEn: '₹500 – ₹1,500',
+    costEn: '₹500 to ₹1,500',
     costHi: '₹500 – ₹1,500',
     readingEn:
-        'Test before supplementing rather than after - the dose depends on how low you are, and high-dose weekly sachets are commonly sold without anyone checking whether you needed them.',
+        'Test before you start a supplement, not after. The dose depends on how low you are, and high-dose weekly sachets are often sold without anyone checking whether you need them.',
     readingHi:
         'Supplement lene se pehle test karwayein, baad mein nahi - dose is par nirbhar hai ki kami kitni hai, aur high-dose weekly sachets aam taur par bina ye dekhe bech diye jaate hain ki aapko zaroorat thi ya nahi.',
   ),
@@ -180,15 +180,15 @@ const List<TtcTest> ttcTests = [
     whatEn: 'Your B12 level.',
     whatHi: 'Aapka B12 level.',
     whyEn:
-        'Deficiency is very common in Indian vegetarians and is linked to ovulation problems and to early pregnancy risk.',
+        "Low B12 is very common in Indian vegetarians. It's linked to ovulation problems and to risks in early pregnancy.",
     whyHi:
         'Indian vegetarians mein iski kami bahut aam hai, aur ye ovulation ki dikkat aur shuruaati pregnancy ke khatre se judi hai.',
     whenEn: 'Any day.',
     whenHi: 'Kisi bhi din.',
-    costEn: '₹500 – ₹1,200',
+    costEn: '₹500 to ₹1,200',
     costHi: '₹500 – ₹1,200',
     readingEn:
-        'If you have been taking a B12 supplement, say so - it raises the measured level and can mask a deficiency that is still there in your tissues.',
+        "If you've been taking a B12 supplement, say so. It raises the level the test measures, and it can hide a shortage that's still there in your body.",
     readingHi:
         'Agar aap B12 supplement le rahe hain toh bata dein - isse naapa gaya level badh jaata hai aur wo kami chhup sakti hai jo tissues mein abhi bhi hai.',
   ),
@@ -196,18 +196,18 @@ const List<TtcTest> ttcTests = [
     id: 'hba1c',
     name: 'HbA1c (blood sugar)',
     forHim: false,
-    whatEn: 'Your average blood sugar over roughly the last three months.',
+    whatEn: 'Your average blood sugar over about the last three months.',
     whatHi: 'Pichhle lagbhag teen mahine ka aapka average blood sugar.',
     whyEn:
-        'Insulin resistance is central to PCOS and affects ovulation. India has one of the highest rates of diabetes in the world, and it is frequently undiagnosed at the age most couples are trying.',
+        'Insulin resistance, where the body struggles to use insulin well, is at the heart of PCOS and affects ovulation. India has one of the highest rates of diabetes in the world. It often goes undiagnosed at the age when most couples are trying.',
     whyHi:
         'Insulin resistance PCOS ka kendra hai aur ovulation par asar daalta hai. India mein duniya ki sabse zyada diabetes dar mein se ek hai, aur jis umar mein zyadatar couples koshish karte hain us umar mein ye aksar pakda nahi jaata.',
-    whenEn: 'Any day. Unlike a fasting sugar test, this one needs no fasting.',
+    whenEn: "Any day. Unlike a fasting sugar test, you don't need to fast for this one.",
     whenHi: 'Kisi bhi din. Fasting sugar test ke ulat, iske liye khaali pet hona zaroori nahi.',
-    costEn: '₹400 – ₹800',
+    costEn: '₹400 to ₹800',
     costHi: '₹400 – ₹800',
     readingEn:
-        'Worth doing before pregnancy rather than during: sugar control in the first weeks matters, and those weeks pass before most women know they are pregnant.',
+        "Worth doing before pregnancy, not during. Sugar control matters in the first weeks, and those weeks pass before most women know they're pregnant.",
     readingHi:
         'Pregnancy ke dauraan nahi, pehle karwana theek hai: pehle hafton mein sugar ka control maayne rakhta hai, aur wo hafte tab guzar jaate hain jab zyadatar auraton ko pata bhi nahi hota.',
   ),
@@ -218,17 +218,17 @@ const List<TtcTest> ttcTests = [
     whatEn: 'A scan of the uterus and ovaries.',
     whatHi: 'Uterus aur ovaries ka scan.',
     whyEn:
-        'Shows fibroids, ovarian cysts, the polycystic appearance seen in PCOS, and the thickness of the uterine lining. It can also be used across a cycle to watch a follicle grow, which is the most direct way to confirm ovulation.',
+        'It shows fibroids, cysts on the ovaries, the polycystic look seen in PCOS, and how thick the womb lining is. It can also be repeated through a cycle to watch a follicle, the small sac an egg grows in, get bigger. That\'s the most direct way to confirm ovulation.',
     whyHi:
         'Fibroids, ovarian cysts, PCOS mein dikhne wala polycystic roop, aur uterus ki lining ki motai dikhata hai. Ise cycle bhar follicle ka badhna dekhne ke liye bhi istemaal kiya ja sakta hai, jo ovulation confirm karne ka sabse seedha tareeka hai.',
     whenEn:
-        'Usually early in the cycle for a baseline. Follicle tracking runs across several visits mid-cycle.',
+        'Usually early in the cycle, to see how things look at the start. Follicle tracking takes several visits in the middle of the cycle.',
     whenHi:
         'Baseline ke liye aam taur par cycle ki shuruaat mein. Follicle tracking mein cycle ke beech kai visits hoti hain.',
-    costEn: '₹800 – ₹2,500',
+    costEn: '₹800 to ₹2,500',
     costHi: '₹800 – ₹2,500',
     readingEn:
-        'A "polycystic appearance" on a scan is not by itself a PCOS diagnosis - it is one of three criteria, and plenty of women have it without the condition.',
+        'A "polycystic appearance" on a scan isn\'t a PCOS diagnosis on its own. It\'s one of three signs doctors use, and many women have it without having the condition.',
     readingHi:
         'Scan par "polycystic appearance" akele PCOS ka diagnosis nahi hai - ye teen mein se ek criteria hai, aur bahut si auraton mein ye bina condition ke bhi hota hai.',
   ),
@@ -237,21 +237,21 @@ const List<TtcTest> ttcTests = [
     name: 'HSG (tube test)',
     forHim: false,
     whatEn:
-        'An X-ray taken while dye is passed through the uterus, to see whether the fallopian tubes are open.',
+        'An X-ray taken while dye is passed through the uterus, to see if the fallopian tubes are open.',
     whatHi:
         'Uterus se dye guzaarte hue liya gaya X-ray, ye dekhne ke liye ki fallopian tubes khuli hain ya nahi.',
     whyEn:
-        'Blocked tubes are a common and completely silent cause. No amount of timing helps if the path is closed, which is why this is usually done before moving to treatment.',
+        "Blocked tubes are a common cause, and they give no signs at all. No amount of timing helps if the path is closed. That's why this is usually done before moving on to treatment.",
     whyHi:
         'Band tubes ek aam aur bilkul chupchaap wajah hain. Agar raasta band hai toh koi bhi timing kaam nahi karti - isiliye ye aam taur par treatment par jaane se pehle hota hai.',
     whenEn:
-        'Between the end of your period and ovulation - after bleeding stops, before an egg is released.',
+        'Between the end of your period and ovulation: after bleeding stops, and before an egg is released.',
     whenHi:
         'Period khatam hone aur ovulation ke beech - bleeding rukne ke baad, egg release hone se pehle.',
-    costEn: '₹2,000 – ₹5,000',
+    costEn: '₹2,000 to ₹5,000',
     costHi: '₹2,000 – ₹5,000',
     readingEn:
-        'It is uncomfortable and it is normal to be nervous about it - ask about pain relief beforehand rather than hoping. Some studies find a small rise in conception in the months right after, thought to be a flushing effect.',
+        "It's uncomfortable, and it's normal to feel nervous about it. Ask about pain relief beforehand instead of hoping for the best. Some studies find a small rise in conception in the months right after, thought to come from the tubes being flushed.",
     readingHi:
         'Ye takleefdeh hota hai aur ismein ghabraahat hona normal hai - ummeed karne ke bajaye pehle hi dard ki dawai ke baare mein poochhein. Kuch studies iske turant baad ke mahinon mein conception mein halka izaafa paati hain, jise flushing ka asar maana jaata hai.',
   ),
@@ -259,20 +259,20 @@ const List<TtcTest> ttcTests = [
     id: 'prolactin',
     name: 'Prolactin',
     forHim: false,
-    whatEn: 'The hormone that drives milk production.',
+    whatEn: 'The hormone behind making breast milk.',
     whatHi: 'Wo hormone jo doodh banne ko chalata hai.',
     whyEn:
-        'When it is high outside breastfeeding it can suppress ovulation entirely. It is a straightforward thing to find and usually straightforward to treat.',
+        "If it's high when you're not breastfeeding, it can stop ovulation completely. It's easy to find, and usually easy to treat.",
     whyHi:
         'Breastfeeding ke bahar jab ye zyada hota hai toh ovulation poori tarah rok sakta hai. Ise pakadna seedha hai aur ilaaj bhi aam taur par seedha hota hai.',
     whenEn:
-        'Morning, and ideally not straight after exercise, stress or a breast examination - all of which raise it temporarily.',
+        'In the morning. Ideally not straight after exercise, stress or a breast examination, because all of these raise it for a while.',
     whenHi:
         'Subah, aur behtar hai ki exercise, stress ya breast examination ke turant baad nahi - ye sab ise thodi der ke liye badha dete hain.',
-    costEn: '₹300 – ₹700',
+    costEn: '₹300 to ₹700',
     costHi: '₹300 – ₹700',
     readingEn:
-        'A single mildly high result is often just the morning it was taken. It is normally repeated before anyone acts on it.',
+        "One slightly high result is often just down to the morning it was taken. It's usually repeated before anyone acts on it.",
     readingHi:
         'Ek baar ka halka zyada result aksar bas us subah ki baat hoti hai. Ispar kuch karne se pehle aam taur par dobara karwaya jaata hai.',
   ),

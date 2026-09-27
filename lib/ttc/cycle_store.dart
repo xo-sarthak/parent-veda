@@ -476,6 +476,7 @@ TtcJourneyState cycleStateFrom({
   bool pregnancyConfirmed = false,
   TimingOwnership ownership = TimingOwnership.parentveda,
   DateTime? today,
+  int? statedCycleLength,
 }) =>
     TtcJourneyState(
       journeyStart: journeyStart,
@@ -486,4 +487,5 @@ TtcJourneyState cycleStateFrom({
       temperatureShiftDay: cycle.temperatureShiftDay,
       ownership: ownership,
       today: today,
+      statedCycleLength: statedCycleLength,
     );

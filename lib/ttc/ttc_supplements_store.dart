@@ -85,7 +85,7 @@ const List<TtcSuggestedSupplement> ttcSuggestedSupplements = [
     name: 'Folic acid',
     dose: '400 mcg daily',
     noteEn:
-        'The one with the strongest evidence. Needed before conception, not after - the neural tube closes in the first four weeks.',
+        'The one with the strongest evidence. You need it before conception, not after. The neural tube, which becomes the baby\'s brain and spine, closes in the first four weeks.',
     noteHi:
         'Iske peeche sabse mazboot saboot hai. Conception se pehle chahiye, baad mein nahi - neural tube pehle chaar hafton mein band ho jaata hai.',
   ),
@@ -93,7 +93,7 @@ const List<TtcSuggestedSupplement> ttcSuggestedSupplements = [
     name: 'Vitamin D',
     dose: 'As advised',
     noteEn:
-        'Most Indian adults are low. Test before supplementing - the dose depends on how low you are, which only a test can say.',
+        'Most Indian adults are low. Test before you start taking it. The dose depends on how low you are, and only a test can tell you that.',
     noteHi:
         'Zyadatar Indian adults mein kami hai. Lene se pehle test karwayein - dose is par nirbhar hai ki kami kitni hai, jo sirf test bata sakta hai.',
   ),
@@ -101,7 +101,7 @@ const List<TtcSuggestedSupplement> ttcSuggestedSupplements = [
     name: 'Vitamin B12',
     dose: 'As advised',
     noteEn:
-        'A pure vegetarian diet almost always needs this. One of the few places where food genuinely is not enough.',
+        "A pure vegetarian diet almost always needs this. It's one of the few cases where food alone isn't enough.",
     noteHi:
         'Shuddh shakahari khaane mein ye lagbhag hamesha chahiye. Un gine-chune jagahon mein se ek jahan khana sach mein kaafi nahi hai.',
   ),
@@ -109,7 +109,7 @@ const List<TtcSuggestedSupplement> ttcSuggestedSupplements = [
     name: 'Iron',
     dose: 'As advised',
     noteEn:
-        'Common to be low, and linked to tiredness and irregular ovulation. Keep it an hour away from chai or coffee, which block absorption.',
+        "It's common to be low, and that's linked to tiredness and irregular ovulation. Take it an hour apart from chai or coffee, which stop your body absorbing it.",
     noteHi:
         'Iski kami aam hai, aur ye thakaan aur irregular ovulation se judi hai. Chai ya coffee se ek ghanta door rakhein - wo sokhne se rokte hain.',
   ),
@@ -117,7 +117,7 @@ const List<TtcSuggestedSupplement> ttcSuggestedSupplements = [
     name: 'Omega-3',
     dose: 'As advised',
     noteEn:
-        'Supports hormone production in both of you. Ground flaxseed works too - whole seeds pass straight through.',
+        'Helps hormone production in both of you. Ground flaxseed works too. Whole seeds pass straight through.',
     noteHi:
         'Dono mein hormone banne ko support karta hai. Pisi alsi bhi chalti hai - sabut beej seedhe nikal jaate hain.',
   ),
@@ -125,7 +125,7 @@ const List<TtcSuggestedSupplement> ttcSuggestedSupplements = [
     name: 'CoQ10',
     dose: 'As advised',
     noteEn:
-        'Studied for egg and sperm quality, particularly over thirty-five. Promising rather than proven - ask a doctor, not a chemist.',
+        "Studied for egg and sperm quality, especially over thirty-five. It looks promising but isn't proven. Ask a doctor, not a chemist.",
     noteHi:
         'Egg aur sperm quality ke liye study hua hai, khaaskar pentiis ke baad. Ummeed jagata hai, sabit nahi hua - chemist se nahi, doctor se poochhein.',
   ),
@@ -142,10 +142,10 @@ const List<TtcSuggestedSupplement> ttcSuggestedSupplements = [
     dose: 'As advised',
     forPartner: true,
     noteEn:
-        'Some evidence for sperm count and motility, more so where a result '
-        'is already low. Worth far less than stopping tobacco - and the '
-        'evidence for antioxidant supplements in male infertility is weak '
-        'rather than absent.',
+        'Some evidence it helps sperm count and movement, more so when a '
+        'result is already low. It does far less than stopping tobacco. The '
+        'evidence for antioxidant supplements in male infertility is weak, '
+        'though not absent.',
     noteHi:
         'Sperm count aur motility ke liye kuch saboot hai, khaaskar jab result '
         'pehle se kam ho. Tambaku chhodne se bahut kam faayda - aur male '
@@ -157,7 +157,7 @@ const List<TtcSuggestedSupplement> ttcSuggestedSupplements = [
     dose: 'As advised',
     forPartner: true,
     noteEn:
-        'Directly involved in sperm production and testosterone. A fistful of roasted chana does more than most supplements sold for it.',
+        'Plays a direct part in making sperm and testosterone. A handful of roasted chana does more than most supplements sold for it.',
     noteHi:
         'Seedhe sperm banne aur testosterone se juda. Ek mutthi bhuna chana, iske liye beche jaane wale zyadatar supplements se zyada karta hai.',
   ),

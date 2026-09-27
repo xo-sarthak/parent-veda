@@ -131,7 +131,7 @@ class TtcCycleScreen extends StatelessWidget {
                           const SizedBox(width: 14),
                           Expanded(
                             child: _stat(t.cycleRange,
-                                '${lengths.reduce((a, b) => a < b ? a : b)}–${lengths.reduce((a, b) => a > b ? a : b)} ${t.cycleDays}'),
+                                '${lengths.reduce((a, b) => a < b ? a : b)} to ${lengths.reduce((a, b) => a > b ? a : b)} ${t.cycleDays}'),
                           ),
                         ] else
                           const Spacer(),

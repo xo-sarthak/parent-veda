@@ -47,6 +47,7 @@
 
 import 'ttc_chapter.dart';
 import 'cycle_store.dart';
+import 'ttc_day_context.dart' show ttcLookBackOvulationDay;
 import 'ttc_fertile_window.dart';
 import 'ttc_log_store.dart';
 import 'ttc_store.dart';
@@ -264,9 +265,39 @@ TtcCycleReport ttcBuildCycleReport({int index = 0}) {
 
   // ---- may we draw phases at all? -----------------------------------------
   const engine = TtcChapterEngine();
-  final state = store.state(on: end);
-  final ov = engine.estimatedOvulationDay(state);
-  final clinic = !store.today.behaviour.showsFertilityWindow;
+  // ⚠️ THE CURRENT CYCLE IS ASKED ABOUT TODAY (2026-09-26, consistency pass).
+  // `end` stops at her usual length, so a cycle that has run a fortnight past
+  // it was asked about its last "usual" day, where the engine still estimates,
+  // and drew phase bands under a hero saying "not enough logged". Today's
+  // state is the one every other surface reads (`ttcDayContext`). An earlier
+  // cycle is still asked about its own end. Kept for revert:
+  //   final state = store.state(on: end);
+  //
+  // ⚠️ AN EARLIER CYCLE IS DRAWN FROM ITS OWN LENGTH SINCE 2026-09-26 (the
+  // user's decision: earlier cycles show their fertile days, looking back).
+  // It used to be asked of the engine on its last day, which answers with the
+  // CURRENT history's average, so every past cycle was banded as if it had
+  // been her usual length. `ttcLookBackOvulationDay` is the one look-back the
+  // calendar and the hero read too. Kept for revert:
+  //   final state = index == 0 ? store.state() : store.state(on: end);
+  //   final ov = engine.estimatedOvulationDay(state);
+  //   final clinic = !store.today.behaviour.showsFertilityWindow;
+  final ov = index == 0 || nextStart == null
+      ? engine.estimatedOvulationDay(store.state())
+      : ttcLookBackOvulationDay(start, nextStart);
+  // A clinic cycle is refused whether it is the one she is in or an earlier
+  // one whose own dates show her clinic ran it (`TtcStore.ownershipOfCycle`).
+  //
+  // ⚠️ AN EARLIER CYCLE ANSWERS FOR ITS OWN DATES ONLY, SINCE 2026-09-26 (the
+  // treatment flow's resolver decision): during a round, the cycles from
+  // before treatment keep their look-back window on every surface, this
+  // report included. Kept for revert:
+  //   final clinic = !store.today.behaviour.showsFertilityWindow ||
+  //       (nextStart != null && store.ownershipOfCycle(...) != parentveda);
+  final clinic = (index == 0 || nextStart == null)
+      ? !store.today.behaviour.showsFertilityWindow
+      : store.ownershipOfCycle(start, nextStart: nextStart) !=
+          TimingOwnership.parentveda;
 
   TtcReportState reportState;
   if (clinic) {
@@ -442,7 +473,7 @@ TtcFinding? ttcCycleLengthNote() {
         '${diff.abs() == 1 ? 'day' : 'days'} '
         '${diff > 0 ? 'longer' : 'shorter'} than usual',
     detail: 'Your recent cycles have averaged $usual days. Cycles vary, and '
-        'a few days either way is ordinary.',
+        'a few days either way is normal.',
   );
 }
 
@@ -534,11 +565,27 @@ List<TtcPhaseSpan> ttcCyclePhaseSpans({int index = 0}) {
       : store.today.cycleLength;
   if (length < 1) return const [];
 
-  final last = start.add(Duration(days: length - 1));
+  // Kept for revert: `last`, which only the old ov line below read.
+  //   final last = start.add(Duration(days: length - 1));
   const engine = TtcChapterEngine();
-  final ov = engine.estimatedOvulationDay(store.state(on: last));
+  // The current cycle is asked about today, like the report above and every
+  // other surface (2026-09-26). An earlier cycle is drawn from its own length,
+  // looking back, with the report's own look-back (2026-09-26, the user's
+  // decision). Kept for revert:
+  //   final ov = engine.estimatedOvulationDay(store.state(on: last));
+  //   final ov = engine.estimatedOvulationDay(
+  //       index == 0 ? store.state() : store.state(on: last));
+  final ov = index == 0 || nextStart == null
+      ? engine.estimatedOvulationDay(store.state())
+      : ttcLookBackOvulationDay(start, nextStart);
   if (ov == null) return const [];
-  if (!store.today.behaviour.showsFertilityWindow) return const [];
+  // The cycle she is in only (2026-09-26): an earlier cycle's own clinic
+  // dates already refused its look-back above. Kept for revert:
+  //   if (!store.today.behaviour.showsFertilityWindow) return const [];
+  if ((index == 0 || nextStart == null) &&
+      !store.today.behaviour.showsFertilityWindow) {
+    return const [];
+  }
 
   // Where today falls. Outside the cycle entirely is the ordinary case for a
   // cycle she has paged back to.

@@ -447,41 +447,36 @@ TTC_V3 = dict(
               ('Journal quick actions', 'Journal · Journal · Calendar · Partner'),
               ('“Fertility experts”', 'TtcPrepareScreen, unscoped'),
           ]),
-        T('Courses', 'school', 'TtcPrepareScreen(onlyCategory: "courses")',
-          'lib/screens/ttc/ttc_prepare_screen.dart', 'ttc/courses',
-          'Prepare, scoped to one category.',
-          notes=['<b>Scoping is the fix, not a limitation.</b> Unscoped, Courses and Talk-to-'
-                 'expert opened the identical nine-category screen and both labels lied about '
-                 'where they went.']),
-        T('Tools', 'widgets', 'TtcToolsScreen',
+        # ⚠️ 2026-09-26, TTC gap plan: the V3 bar became Today · Learn · Products · Tools · You.
+        # Community is held back for launch; everything that was under More moved into You;
+        # Talk to expert became a Tools tile (and the home keeps its experts rail).
+        T('Learn', 'menu_book', 'TtcLearnScreen',
+          'lib/screens/ttc/ttc_learn_screen.dart', 'ttc/learn',
+          'The library of everything TTC teaches: search, browse by topic (one tile per door), '
+          'your reading (continue and saved), <b>Trying to conceive 101</b> as the start path, '
+          'upcoming films, one shelf per door, myths and stories, courses and programmes, and '
+          'common questions pulled from the reads. Every read opens in the one reader.',
+          notes=['Lists every read in <code>kTtcReads</code> automatically, so a new read '
+                 'appears with no code change.',
+                 'Honours the shared-phone switch: intimacy reads are hidden when she turns '
+                 'it on.']),
+        T('Products', 'shopping_basket', 'TtcShopScreen',
+          'lib/screens/ttc/ttc_shop_v3.dart', 'ttc/products',
+          'The unified store with the TTC chrome, plus a TTC-only “Shop by need” list.',
+          notes=['<code>PvStoreNav</code> lights index 2.']),
+        T('Tools', 'handyman', 'TtcToolsScreen',
           'lib/screens/ttc/ttc_tools_screen.dart', 'ttc/tools',
-          'Identical to V1’s Tools — same twenty-two tiles, same four groups.',
-          notes=['Tabs 0 and 2 keep V1’s icons deliberately: Today and Tools mean the same '
-                 'thing in both versions, so flipping the pill should not make her re-find them.']),
-        T('Talk to expert', 'chat_bubble', 'TtcPrepareScreen(onlyCategory: "consults")',
-          'lib/screens/ttc/ttc_prepare_screen.dart', 'ttc/consults',
-          'Prepare, scoped to expert consultations.',
-          goes=[('An offering', 'Buy → the calendar case of the booking engine → a real slot')]),
-        T('More', 'more_horiz', 'TtcMoreScreen',
-          'lib/screens/ttc/ttc_more_screen.dart', 'ttc/more',
-          '<b>Not a junk drawer — the other half of a deliberate trade.</b> V3 dropped two tabs '
-          'and narrowed a third, and the trade only holds if this screen is complete.',
-          blocks=[
-              ('Your cycle', 'Calendar · Cycle companion · Fertility window.'),
-              ('Community', 'Community · My journal · Profile.'),
-              ('Prepare', 'One row into the <b>unfiltered</b> nine-category Prepare screen.'),
-          ],
-          goes=[('Calendar', 'TtcCalendarScreen'), ('Cycle companion', 'the cycle surface'),
-                ('Fertility window', 'TtcFertilityWindowScreen'),
-                ('Community', 'TtcCommunityScreen'), ('My journal', 'TtcJournalScreen'),
-                ('Profile', 'TtcProfileScreen'),
-                ('Everything else', 'TtcPrepareScreen, all nine categories')],
-          notes=['⚠️ The seven Prepare categories without a tab — yoga, nutrition, mental '
-                 'wellness, assessments, partner workshops, IVF support, lifestyle — are '
-                 'reachable through <b>this one row and nowhere else</b>. Scoping it would '
-                 'delete six of them. Caught by asking “where did yoga go?”, not by a test.',
-                 'The parity test (<code>ttc_home_v3_parity_test</code>) covers the two '
-                 '<i>homes</i>, not the nav. This screen is what keeps V3 complete.']),
+          'Twenty-five tools as list rows with one line of purpose each, a “Find a tool” field, '
+          'recently used first, and a new “Talk to an expert” tile.'),
+        T('You', 'person', 'PvYouScreen(bottomNav: TtcBottomNav)',
+          'lib/screens/profile/pv_you_screen.dart', 'ttc/you',
+          'The shared You screen with the TTC bar (an optional slot; other stages unchanged). '
+          'Holds what used to be under More: notes for your doctor, records, calendar, cycle '
+          'companion, fertility window, all programmes, bookings, addresses; plus Messages and '
+          'the “Hide sex and intimacy content” switch.',
+          notes=['<code>TtcMoreScreen</code> stays on disk for revert; nothing pushes it.']),
+        # Kept for revert: the Courses / Talk to expert / More entries described the bar
+        # before 2026-09-26 (see git history of this file).
     ],
 )
 

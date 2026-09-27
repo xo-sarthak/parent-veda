@@ -82,6 +82,9 @@ import 'services/read_to_baby_store.dart';
 import 'services/size_view_pref.dart';
 import 'services/journey_dates_store.dart';
 import 'services/reminder_store.dart';
+import 'ttc/ttc_content_prefs.dart';
+import 'ttc/ttc_messages_store.dart';
+import 'ttc/ttc_treatment_store.dart';
 import 'services/scans_store.dart';
 import 'services/symptom_store.dart';
 import 'services/tools_store.dart';
@@ -248,8 +251,21 @@ class _ParentVedaAppState extends State<ParentVedaApp>
     SymptomStore.instance.init();
     // Load Scans & Appointments data.
     ScansStore.instance.init();
+    // What she chose to see in TTC (the shared-phone switch).
+    TtcContentPrefs.instance.init();
     // Load customizable reminders.
-    ReminderStore.instance.init();
+    //
+    // ⚠️ THEN the TTC messages, and only then: `ReminderStore.init` ends in
+    // `NotificationService.syncAll`, which cancels EVERY pending notification.
+    // Anything scheduled before it finishes is wiped. See the header of
+    // lib/ttc/ttc_messages_store.dart.
+    ReminderStore.instance
+        .init()
+        .then((_) => TtcMessagesStore.instance.init())
+        // The IVF trigger reminders are re-armed here too, for the same
+        // reason (they used to be wiped on every launch).
+        .then((_) => TtcTreatmentStore.instance.rearmAfterStartup())
+        .catchError((_) {});
     // Load Read-to-your-baby feed preferences + saved pieces.
     ReadToBabyStore.instance.init();
     ReadToBabySavedStore.instance.init();

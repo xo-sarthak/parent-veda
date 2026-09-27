@@ -60,8 +60,8 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
   // stage's best piece of copy and it belongs to this area; rewriting it while
   // restructuring underneath would have thrown away the one line users of the
   // old screen would recognise.
-  intro: 'PCOS, without the panic. What it means for your body, and what '
-      'helps while you are trying.',
+  intro: "PCOS, without the panic. What it means for your body, and what "
+      "helps while you're trying.",
 
   // ⚠️ THE FILM CAME OFF THE TOP, AND IT WAS ALREADY DOWN THE PAGE. The same
   // slot was the hero AND the first tile in "What is PCOS, really?", so the
@@ -76,11 +76,15 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
   // catalogue and the conceiving page already use. The V3 field renders behind
   // it, so a dead connection gives the hero this page has always had rather
   // than a grey box — local-first is absolute.
-  heroImageUrl:
-      'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=900&h=700&fit=crop',
+  // Our own photograph (2026-09-27): generated to the door's brief, checked by
+  // eye, mirrored to the R2 bucket. Kept for revert: the previous value.
+  // heroImageUrl: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=900&h=700&fit=crop',
+  heroImageUrl: 'https://pub-bfbc0773e60e4c5c851b535f08b384bc.r2.dev/ttc_door_pcos.jpg',
+  // The new door's headline, a sentence (TtcDoorScreen, 2026-09-26).
+  heroTitle: 'PCOS, without the panic.',
   heroBlurb: 'PCOS is a condition where a hormone imbalance changes how the '
-      'ovaries work. It is common, it varies a lot from person to person, and '
-      'it is managed rather than cured.',
+      "ovaries work. It's common, and it looks different in every person. "
+      "It's managed rather than cured.",
 
   // ---------------------------------------------------------------------------
   //  The selector rail — five cards under the hero, Understand first
@@ -96,7 +100,7 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
   // because it matters most.
   groups: [
     TtcFocusGroup(
-        id: 'understand',
+        id: 'understand', mark: IntentMark.bookMark,
         label: 'Understand',
         icon: Icons.menu_book_outlined,
         hue: 206),
@@ -104,23 +108,23 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
     // toolSurfaceId` — a tile in front of a tool, inside a group whose only
     // content is that tool, is a door in front of a door.
     TtcFocusGroup(
-        id: 'stand',
+        id: 'stand', mark: IntentMark.compassMark, inlineLabel: 'A quick check',
         label: 'Where do I stand',
         icon: Icons.center_focus_weak_outlined,
         hue: 344,
         toolSurfaceId: 'ttc_pcos_check'),
     TtcFocusGroup(
-        id: 'helps',
+        id: 'helps', mark: IntentMark.improveMark,
         label: 'What helps',
         icon: Icons.eco_outlined,
         hue: 104),
     TtcFocusGroup(
-        id: 'trying',
+        id: 'trying', mark: IntentMark.cycleRing,
         label: 'Trying with PCOS',
         icon: Icons.favorite_border_rounded,
         hue: 42),
     TtcFocusGroup(
-        id: 'track',
+        id: 'track', mark: IntentMark.chartLog,
         // ⚠️ "Track", NOT "Keep track of it". The design's mock data uses the
         // longer name and the section inside this group is already called
         // "Keep track of it" — so the tab and the heading under it would say
@@ -152,30 +156,30 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
       tiles: [
         TtcVideoTile(
           title: 'PCOS in five minutes',
-          blurb: 'The whole picture, without the jargon.',
+          blurb: 'The whole picture, in plain words.',
           slotId: 'ttc_pcos_intro',
           duration: '5 MIN',
         ),
         TtcArticleTile(
           title: 'PCOS and your cycle',
-          blurb: 'What the condition does to the month you are living in.',
+          blurb: 'What PCOS does to your month, day by day.',
           readId: 'ttc_read_pcos_cycle',
         ),
         TtcArticleTile(
           title: 'Irregular periods, explained',
-          blurb: 'What "irregular" means, and the long list of things that '
+          blurb: 'What "irregular" means, and the many things that can '
               'cause it.',
           readId: 'ttc_read_pcos_irregular',
         ),
         TtcMythTile(
-          title: 'How common is PCOS',
-          blurb: 'Common enough that you know several people with it.',
+          title: 'How common is PCOS?',
+          blurb: "So common that you likely know a few people who have it.",
           myth: 'PCOS is rare, and having it means something has gone '
-              'seriously wrong.',
+              'badly wrong.',
           fact: 'Around one in ten people of reproductive age have PCOS. It '
-              'runs on a wide spectrum — many have a mild version that shows '
-              'up only as slightly unpredictable cycles — and it is managed '
-              'rather than cured.',
+              'ranges from mild to more marked. Many people have a mild kind '
+              'that only shows up as cycles that are a little hard to '
+              "predict. It's managed rather than cured.",
         ),
       ],
     ),
@@ -193,56 +197,58 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         // something to remember across a swipe.
         TtcInfographicTile(
           title: 'PCOS or ovarian cysts',
-          blurb: 'Two different things with one confusing name.',
-          headline: 'The "cysts" in polycystic are not cysts at all.',
+          blurb: 'Two different things that sound alike.',
+          headline: "The \"cysts\" in polycystic aren't cysts at all.",
           left: TtcInfographicColumn(
             label: 'What a scan sees in PCOS',
             hue: 288,
             points: [
-              'Follicles — the small fluid sacs every ovary makes each month, '
-                  'each holding an immature egg.',
-              'In PCOS there are simply more of them than usual.',
-              'Not growths, not dangerous, and not removed.',
+              'Follicles. These are the small fluid sacs every ovary makes each '
+                  'month, and each one holds an egg that is not yet ripe.',
+              'In PCOS there are just more of them than usual.',
+              "They aren't growths, they aren't dangerous, and they aren't "
+                  'removed.',
             ],
           ),
           right: TtcInfographicColumn(
             label: 'An ovarian cyst',
             hue: 206,
             points: [
-              'A single fluid-filled sac, usually much larger.',
-              'Common, and often found by accident.',
-              'Most resolve on their own and are watched rather than acted on.',
+              'A single sac filled with fluid, usually much bigger.',
+              "It's common, and often found by chance.",
+              'Most go away on their own, so doctors watch them rather than '
+                  'treat them.',
             ],
           ),
-          footnote: 'A scan alone does not diagnose PCOS — plenty of people '
-              'have ovaries that look like this and no other feature of it. '
-              'The diagnosis needs two of three things: irregular ovulation, '
-              'signs of raised androgens, and the scan, with other causes '
-              'excluded first.',
-          reviewedBy: 'Reviewed by Dr. Ananya Rao, Gynaecologist',
+          footnote: "A scan alone doesn't diagnose PCOS. Plenty of people have "
+              'ovaries that look like this and no other sign of it. To '
+              'diagnose PCOS, a doctor needs two of three things: irregular '
+              'ovulation, signs of raised androgens (male-type hormones), and '
+              'the scan. Other causes are ruled out first.',
+          reviewedBy: 'Reviewed by Dr Ruchika Sood, IVF gynaecologist',
         ),
         TtcInfographicTile(
           title: 'PCOS or thyroid',
-          blurb: 'One blood test separates them, and it is often skipped.',
+          blurb: 'One blood test tells them apart, and it often gets missed.',
           headline: 'They look alike from the outside. One blood test tells '
               'them apart.',
           left: TtcInfographicColumn(
             label: 'What overlaps',
             hue: 42,
             points: [
-              'Periods that are irregular or absent.',
+              'Periods that are irregular or missing.',
               'Tiredness, hair changes, weight change.',
-              'Enough overlap that you cannot reason it out at home.',
+              "So much overlap that you can't work it out at home.",
             ],
           ),
           right: TtcInfographicColumn(
             label: 'What separates them',
             hue: 206,
             points: [
-              'A thyroid problem shows on one blood test — TSH, sometimes with '
-                  'T3 and T4.',
-              'Treated, it often settles cycles on its own.',
-              'PCOS has no single test. It is a pattern, and thyroid is ruled '
+              'A thyroid problem shows up on one blood test: TSH, sometimes '
+                  'with T3 and T4.',
+              'Once it is treated, cycles often settle by themselves.',
+              "PCOS has no single test. It's a pattern, and thyroid is ruled "
                   'out first.',
             ],
           ),
@@ -250,56 +256,64 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
           // reads as either-or unless it says otherwise, and a woman told she
           // has PCOS can stop asking about her thyroid on exactly that
           // reasoning.
-          footnote: 'You can have both — a normal thyroid does not rule out '
-              'PCOS, and PCOS does not rule out a thyroid problem. If nobody '
-              'has checked yours, ask. It is a one-line addition to a blood '
-              'form and it is often skipped.',
-          reviewedBy: 'Reviewed by Dr. Ananya Rao, Gynaecologist',
+          footnote: "You can have both. A normal thyroid doesn't rule out "
+              "PCOS, and PCOS doesn't rule out a thyroid problem. If no one "
+              "has checked yours, ask. It's one more line on a blood test "
+              'form, and it often gets missed.',
+          reviewedBy: 'Reviewed by Dr Ruchika Sood, IVF gynaecologist',
         ),
         TtcCarouselTile(
           title: 'Hair changes, explained',
-          blurb: 'Growth where you would rather not, thinning where you would '
-              'rather not.',
+          blurb: "More hair where you don't want it, less where you do.",
           coverTitle: 'Hair changes, explained',
-          coverBlurb: 'Why both directions happen at once.',
+          coverBlurb: 'Why hair can grow and thin at the same time.',
           coverHue: 42,
           cards: [
             TtcCarouselCard(
               title: 'Androgens are hormones everyone has, in different '
                   'amounts.',
-              body: 'In PCOS they can run higher than usual.',
+              body: 'In PCOS they can be higher than usual.',
             ),
             TtcCarouselCard(
-              title: 'They make body hair coarser and darker.',
+              title: 'They make body hair thicker and darker.',
               body: 'Most often on the upper lip, chin, chest, belly or '
                   'thighs.',
             ),
             TtcCarouselCard(
-              title: 'And they can thin hair on the scalp.',
-              body: 'Usually at the crown and along the parting rather than '
-                  'at the hairline.',
+              title: 'They can also thin the hair on your head.',
+              body: 'Usually on top and along the parting, not at the '
+                  'hairline.',
             ),
             TtcCarouselCard(
-              title: 'Both directions, from the same cause.',
-              body: 'Scalp follicles and body follicles respond to the same '
+              title: 'Both changes come from the same cause.',
+              body: 'Hair on your head and hair on your body react to the same '
                   'hormone in opposite ways.',
             ),
+            // Added 2026-09-26 (gap plan, W10 note): thinning has common
+            // causes besides PCOS, and they are one blood test away. No dose,
+            // on purpose; that is the doctor's call once the result is back.
             TtcCarouselCard(
-              title: 'It is slow, and so is anything that changes it.',
-              body: 'A hair follicle takes months to respond, so give any '
+              title: 'Check iron, vitamin D and thyroid first.',
+              body: 'Thinning on your head often has other, simple causes. '
+                  'Ask for these blood tests before you put it all down to '
+                  'PCOS.',
+            ),
+            TtcCarouselCard(
+              title: "It's slow, and so is anything that changes it.",
+              body: 'A hair root takes months to respond, so give any '
                   'treatment at least six.',
             ),
             TtcCarouselCard(
-              title: 'Rapid change is the one thing to raise quickly.',
-              body: 'Hair growth or loss that has changed sharply over weeks '
-                  'deserves an appointment rather than a wait.',
+              title: 'Fast change is worth raising soon.',
+              body: 'If hair growth or hair loss has changed sharply over a few '
+                  "weeks, book a visit. Don't wait.",
             ),
           ],
-          reviewedBy: 'Reviewed by Dr. Ananya Rao, Gynaecologist',
+          reviewedBy: 'Reviewed by Dr Ruchika Sood, IVF gynaecologist',
         ),
         TtcArticleTile(
           title: 'If a doctor says PCOS',
-          blurb: 'What the diagnosis rests on, and what to ask before you '
+          blurb: 'What the diagnosis is based on, and what to ask before you '
               'leave the room.',
           readId: 'ttc_read_pcos_diagnosed',
         ),
@@ -336,14 +350,15 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         // the file lands. Recorded in `docs/STILL-OPEN.md` 18.6.
         TtcVideoTile(
           title: 'Food, insulin and PCOS',
-          blurb: 'Why the same meal lands differently, and what that changes.',
+          blurb: 'Why the same meal affects you differently, and what that '
+              'means.',
           slotId: 'ttc_pcos_food_insulin',
           duration: '4 MIN',
         ),
         TtcArticleTile(
-          title: 'What changes the curve, nothing banned',
-          blurb: 'Insulin is the lever worth understanding, and none of it '
-              'requires giving up rice.',
+          title: 'Eating for steadier blood sugar, with nothing banned',
+          blurb: "Insulin is the part worth understanding, and none of it "
+              "means giving up rice.",
           readId: 'ttc_read_pcos_insulin',
         ),
         // WARNING: A REAL RECIPE ON THE REAL RECIPE PAGE, NOT AN ARTICLE ABOUT
@@ -352,46 +367,47 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         // meals is the shape of a thing nobody cooks from.
         TtcRecipeTile(
           title: 'Moong dal chilla with curd',
-          blurb: 'Protein and fibre instead of refined flour. Scales to the '
-              'number you are cooking for.',
+          blurb: 'Protein and fibre in place of refined flour (maida). Makes '
+              "as many as you're cooking for.",
           recipeId: 'pcos_moong_chilla',
         ),
         TtcMythTile(
-          title: 'Is rice really the enemy?',
-          blurb: 'The most repeated piece of PCOS advice in India.',
+          title: 'Do you have to give up rice?',
+          blurb: 'The PCOS advice you will hear most often in India.',
           myth: 'People with PCOS have to give up rice, roti and all Indian '
               'carbohydrates.',
-          fact: 'What a carbohydrate is eaten with changes the response far '
-              'more than removing it would. A traditional thali already pairs '
-              'carbohydrate with protein, fat, fibre and fermented food — '
-              'which is exactly what flattens the rise.',
+          fact: 'What you eat a carbohydrate with matters far more than '
+              'cutting it out. A home thali already puts carbohydrate '
+              'together with protein, fat, fibre and curd or other fermented '
+              "food. That's exactly what keeps blood sugar from rising fast.",
         ),
       ],
     ),
 
     TtcFocusSection(
-      heading: 'Do supplements actually do anything?',
+      heading: 'Do supplements help at all?',
       group: 'helps',
       tiles: [
         TtcArticleTile(
-          title: 'Inositol: what is shown to help',
-          blurb: 'The one with real trials behind it, and an honest account '
-              'of how strong they are.',
+          title: 'Inositol: what the studies show',
+          blurb: 'The one supplement with real trials behind it, and an '
+              'honest look at how strong they are.',
           readId: 'ttc_read_pcos_inositol',
         ),
         TtcMythTile(
-          title: 'Worth it vs hype',
-          blurb: 'What the rest of the shelf is doing.',
-          myth: 'The fertility blends, detox teas and PCOS-branded mixes are '
-              'worth trying because they cannot hurt.',
-          fact: 'Most have no evidence in PCOS at all. Some are harmless and '
-              'expensive; a few, including berberine, interact with real '
-              'medicines. Whatever you take, write it down and mention it at '
-              'appointments.',
+          title: 'Worth it or hype?',
+          blurb: 'What the rest of the chemist shelf is doing.',
+          myth: 'Fertility blends, detox teas and PCOS mixes are worth trying '
+              "because they can't hurt.",
+          fact: 'Most have no proof of working in PCOS at all. Some are '
+              'harmless but costly. A few, including berberine, clash with '
+              'real medicines. Whatever you take, write it down and tell your '
+              'doctor at each visit.',
         ),
         TtcProductTile(
           title: 'Myo-inositol',
-          blurb: 'If you decide to try it, this is the form the trials used.',
+          blurb: 'If you decide to try it, this is the form used in the '
+              'trials.',
           productId: 'myo_inositol',
         ),
       ],
@@ -403,18 +419,19 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
       tiles: [
         TtcArticleTile(
           title: 'Weight and PCOS, said kindly',
-          blurb: 'No number, no target, no plan. What the relationship '
-              'actually is.',
+          blurb: 'No number, no target, no plan. Just how weight and PCOS '
+              'are linked.',
           readId: 'ttc_read_pcos_weight',
         ),
         TtcArticleTile(
           title: 'Stress, sleep and trying',
-          blurb: 'What sustained stress does and does not do to a cycle.',
+          blurb: "What long-lasting stress does and doesn't do to your "
+              'cycle.',
           readId: 'ttc_read_stress_fertility',
         ),
         TtcVideoTile(
           title: 'Gentle movement for PCOS',
-          blurb: 'Ten minutes, nothing that needs a gym.',
+          blurb: 'Ten minutes, and you won\'t need a gym.',
           slotId: 'ttc_pcos_movement',
           duration: '10 MIN',
         ),
@@ -430,51 +447,53 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
       tiles: [
         TtcArticleTile(
           title: 'PCOS and ovulation',
-          blurb: 'Why the egg is usually fine and the release is the problem.',
+          blurb: 'Why the egg is usually fine, and the problem is getting it '
+              'released.',
           readId: 'ttc_read_pcos_ovulation',
         ),
         TtcCarouselTile(
-          title: 'Anovulatory cycles',
-          blurb: 'A month that bleeds but did not release an egg.',
-          coverTitle: 'A cycle that bleeds but did not ovulate',
-          coverBlurb: 'How that happens, and how you would know.',
+          title: 'Cycles without ovulation',
+          blurb: "A month with a bleed but no egg released.",
+          coverTitle: "A cycle with a bleed but no ovulation",
+          coverBlurb: "How that happens, and how you'd know.",
           coverHue: 268,
           cards: [
             TtcCarouselCard(
-              title: 'Ovulation is the hinge of a cycle.',
-              body: 'Once it happens, the second half runs to a fairly fixed '
-                  'length of about twelve to fourteen days.',
+              title: 'Ovulation is the turning point of a cycle.',
+              body: 'Once it happens, the second half lasts a fairly set '
+                  'time of about twelve to fourteen days.',
             ),
             TtcCarouselCard(
-              title: 'Sometimes no follicle becomes dominant.',
-              body: 'Several start, none finishes, and no egg is released.',
+              title: 'Sometimes no follicle takes the lead.',
+              body: 'Several start to grow, none finishes, and no egg is '
+                  'released.',
             ),
             TtcCarouselCard(
-              title: 'Bleeding can still happen.',
-              body: 'The lining builds and eventually breaks down without the '
-                  'usual hormonal sequence behind it.',
+              title: 'You can still bleed.',
+              body: 'The lining of the womb builds up and in the end breaks '
+                  'down, without the usual hormone steps behind it.',
             ),
             TtcCarouselCard(
-              title: 'Which is why these are easy to miss.',
-              body: 'It looks like a period, so it is counted as one.',
+              title: "That's why these cycles are easy to miss.",
+              body: 'It looks like a period, so it gets counted as one.',
             ),
             TtcCarouselCard(
               title: 'Very long cycles are the clue.',
-              body: 'A cycle running well past forty-five days is more likely '
+              body: 'A cycle that goes well past forty-five days is more likely '
                   'to be one of these.',
             ),
             TtcCarouselCard(
-              title: 'A blood test settles it.',
-              body: 'Taken about a week before a period is due, it is the '
-                  'straightforward way to check whether ovulation happened.',
+              title: 'A blood test gives the answer.',
+              body: 'Done about a week before your period is due, it is the '
+                  'easy way to check whether you ovulated.',
             ),
           ],
-          reviewedBy: 'Reviewed by Dr. Ananya Rao, Gynaecologist',
+          reviewedBy: 'Reviewed by Dr Ruchika Sood, IVF gynaecologist',
         ),
         TtcArticleTile(
-          title: 'Conceiving with PCOS, realistically',
-          blurb: 'What the research says about how long it takes, without '
-              'false cheer or doom.',
+          title: 'Getting pregnant with PCOS: what to expect',
+          blurb: 'What research says about how long it takes, honestly and '
+              'without doom.',
           readId: 'ttc_read_pcos_timelines',
         ),
       ],
@@ -486,17 +505,17 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
       tiles: [
         TtcArticleTile(
           title: 'What treatment usually looks like',
-          blurb: 'The shape of it, before anyone offers you anything.',
+          blurb: 'The usual steps, before anyone offers you anything.',
           readId: 'ttc_read_pcos_treatment',
         ),
         TtcArticleTile(
           title: 'Letrozole, metformin and the usual order',
-          blurb: 'What gets tried first, and what each one is actually doing.',
+          blurb: 'What gets tried first, and what each one does.',
           readId: 'ttc_read_pcos_meds',
         ),
         TtcArticleTile(
           title: 'When to see a specialist',
-          blurb: 'The point at which waiting stops being the better plan.',
+          blurb: 'The point where waiting is no longer the better plan.',
           readId: 'ttc_read_when_to_seek_help',
         ),
       ],
@@ -527,8 +546,8 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
       tiles: [
         TtcToolTile(
           title: 'Cycle Companion',
-          blurb: 'The log your read is built from. Three months of dates '
-              'changes what it can say.',
+          blurb: 'Your pattern is read from this log. Three months of dates '
+              'lets it tell you much more.',
           surfaceId: 'ttc_cycle',
         ),
         TtcToolTile(
@@ -536,13 +555,13 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
           // WARNING: WAS `ttc_tools`, WHICH OPENED THE TOOLS HUB. The tile said
           // "log your symptoms" and delivered a menu -- reachable, wrong, and
           // exactly the failure this stage tests for.
-          blurb: 'Cycle, skin, hair and how you felt. This is what the read '
-              'gets better from.',
+          blurb: 'Your cycle, skin, hair and how you felt. The more you log, '
+              'the better your pattern read gets.',
           surfaceId: 'ttc_symptom_log',
         ),
         TtcToolTile(
           title: 'What your cycle shows',
-          blurb: 'Your logged months, read back as a pattern in plain words.',
+          blurb: 'The months you logged, turned into a pattern in plain words.',
           surfaceId: 'ttc_pcos_check',
         ),
         // WARNING: QUIET, AND THE BRIEF SAYS SO TWICE. "Calm card, quiet, not
@@ -555,45 +574,47 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         // finishes and everybody skims for the frightening part.
         TtcCarouselTile(
           title: 'When to see a doctor',
-          blurb: 'Four things worth a check, and none of them are emergencies.',
+          blurb: 'Four things worth a check. None of them is an emergency.',
           coverTitle: 'When to see a doctor',
           coverBlurb: 'Not urgent. Just worth booking.',
           coverHue: 206,
-          reviewedBy: 'Reviewed by a gynaecologist',
+          reviewedBy: 'Reviewed by Dr Ruchika Sood, IVF gynaecologist',
           cards: [
             TtcCarouselCard(
               title: 'Your periods have stopped for three months or more',
-              body: 'Leaving aside pregnancy, breastfeeding and birth control. '
-                  'A long gap has many causes and a doctor can find which one.',
+              body: "This doesn't count pregnancy, breastfeeding or birth "
+                  'control. A long gap can have many causes, and a doctor can '
+                  'find which one it is.',
               hue: 344,
             ),
             TtcCarouselCard(
-              title: 'You have been trying for a year, or six months if you '
-                  'are 35 or older',
-              body: 'These are the points at which a fertility check is usual. '
-                  'It is a starting conversation, not a last resort.',
+              title: "You've been trying for a year, or six months if you're "
+                  '35 or older',
+              body: "That's when a fertility check is usual. It's a first "
+                  'conversation, not a last resort.',
               hue: 206,
             ),
             TtcCarouselCard(
-              title: 'Something changed and it has stayed changed',
-              body: 'Hair, skin, weight or your cycle behaving differently for '
-                  'a few months is worth mentioning, even if each thing on its '
-                  'own seems small.',
+              title: "Something changed and hasn't gone back",
+              body: 'If your hair, skin, weight or cycle has been different for '
+                  'a few months, mention it, even if each thing seems small on '
+                  'its own.',
               hue: 42,
             ),
             TtcCarouselCard(
-              title: 'You are worried',
-              body: 'That is reason enough. You do not need a symptom list to '
-                  'be allowed to ask someone.',
+              title: "You're worried",
+              body: "That's reason enough. You don't need a list of symptoms "
+                  'to ask someone.',
               hue: 160,
             ),
           ],
         ),
-        TtcCommunityTile(
-          title: 'PCOS circle',
-          blurb: 'Other people managing PCOS, in their own words.',
-          surfaceId: 'ttc_community',
-        ),
+        // Community held back for launch (2026-09-26, TTC gap plan §7.1) — kept for revert.
+        // TtcCommunityTile(
+        //   title: 'PCOS circle',
+        //   blurb: 'Other people living with PCOS, in their own words.',
+        //   surfaceId: 'ttc_community',
+        // ),
       ],
     ),
 
@@ -624,7 +645,7 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
       tiles: [
         TtcBookingTile(
           title: 'Talk to a PCOS specialist',
-          blurb: 'Book a 1:1 and ask about managing PCOS while trying.',
+          blurb: 'Book a 1:1 and ask about managing PCOS while you try.',
           action: kTtcActConsult,
         ),
         TtcMasterclassTile(

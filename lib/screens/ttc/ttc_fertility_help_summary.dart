@@ -103,9 +103,9 @@ class TtcFertilityHelpSummaryScreen extends StatelessWidget {
                     const SizedBox(height: 11),
                     Text(
                         t(
-                            'What you have told us and what you have logged, in '
-                                'the order a doctor asks for it. Read it off '
-                                'your phone or copy it into a message.',
+                            "What you've told us and what you've logged, in "
+                                'the order a doctor asks for it. Read it from '
+                                'your phone, or copy it into a message.',
                             'Jo aapne bataya aur jo log kiya, usi kram mein '
                                 'jismein doctor poochhte hain. Phone se padh '
                                 'lein ya copy karke bhej dein.'),
@@ -116,9 +116,9 @@ class TtcFertilityHelpSummaryScreen extends StatelessWidget {
                     if (rows.isEmpty)
                       Text(
                           t(
-                              'There is nothing recorded yet. Logging a few '
-                                  'cycles is the single most useful thing to '
-                                  'bring to a first appointment.',
+                              'Nothing is recorded yet. Logging a few cycles '
+                                  'is the most useful thing to bring to a first '
+                                  'appointment.',
                               'Abhi kuch darj nahi hai. Kuch cycles log karna '
                                   'pehli appointment ke liye sabse kaam ki cheez '
                                   'hai.'),
@@ -222,21 +222,23 @@ class TtcFertilityHelpSummaryScreen extends StatelessWidget {
   void _copy(BuildContext context, FertilityHelpContext c, AppLanguage lang,
       String Function(String, String) t) {
     final buf = StringBuffer()
-      ..writeln('MY FERTILITY SNAPSHOT')
+      ..writeln('My fertility snapshot')
       ..writeln();
     for (final r in buildFertilitySnapshot(c, lang)) {
       buf.writeln('${r.label}: ${r.value}');
     }
     buf
       ..writeln()
-      ..writeln('Questions:');
+      ..writeln('My questions:');
     for (final q in fertilityQuestionsFor(c, lang)) {
       buf.writeln('- $q');
     }
     Clipboard.setData(ClipboardData(text: buf.toString()));
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       behavior: SnackBarBehavior.floating,
-      content: Text(t('Snapshot copied', 'Snapshot copy ho gaya')),
+      content: Text(
+          t('Snapshot copied. Paste it into a message or your notes.',
+              'Snapshot copy ho gaya')),
     ));
   }
 }
@@ -264,7 +266,7 @@ List<FertilitySnapshotRow> buildFertilitySnapshot(
     out.add(FertilitySnapshotRow(
         'Cycle pattern',
         '${c.cyclesLogged} logged, '
-            '${c.cycleShortest}–${c.cycleLongest} days'));
+            '${c.cycleShortest} to ${c.cycleLongest} days'));
   }
   if (c.pcosCheckDone) {
     // ⚠️ A SUMMARY OF THE CHECK, NEVER A DIAGNOSIS. The PCOS tool's own
@@ -273,7 +275,7 @@ List<FertilitySnapshotRow> buildFertilitySnapshot(
     out.add(FertilitySnapshotRow(
         'PCOS check',
         c.pcosPatternFound
-            ? 'App check showed patterns worth discussing (not a diagnosis)'
+            ? 'App check found things worth talking about (not a diagnosis)'
             : 'App check showed no strong pattern (not a rule-out)'));
   }
   if (c.knownConditions.isNotEmpty) {
@@ -299,9 +301,9 @@ List<FertilitySnapshotRow> buildFertilitySnapshot(
     out.add(const FertilitySnapshotRow('Partner', 'A known concern'));
   }
   if (c.pathway == FertilityCarePathway.evaluated) {
-    out.add(const FertilitySnapshotRow('Evaluation', 'Had one previously'));
+    out.add(const FertilitySnapshotRow('Fertility check-up', 'Had one before'));
   } else if (c.pathway == FertilityCarePathway.currentlyInCare) {
-    out.add(const FertilitySnapshotRow('Evaluation', 'Currently under care'));
+    out.add(const FertilitySnapshotRow('Fertility check-up', 'Having care now'));
   }
   return out;
 }
@@ -316,25 +318,25 @@ List<String> fertilityQuestionsFor(FertilityHelpContext c, AppLanguage lang) {
 
   final trying = c.tryingLabel;
   if (trying != null) {
-    out.add('We have been trying ${trying.en}. Would you recommend an '
-        'evaluation at this point?');
+    out.add('We\'ve been trying ${trying.en}. Would you suggest a fertility '
+        'check-up now?');
   }
   if (c.cyclesIrregular) {
     out.add('My cycles have ranged from ${c.cycleShortest} to '
-        '${c.cycleLongest} days. Could that suggest ovulation is not '
-        'happening predictably?');
+        '${c.cycleLongest} days. Could that mean I\'m not ovulating '
+        'regularly?');
   }
   if (c.pcosPatternFound) {
-    out.add('An app check suggested some patterns that can occur with PCOS. '
-        'Is that worth looking into properly?');
+    out.add('An app check found some signs that can go with PCOS. Is that '
+        'worth looking into properly?');
   }
-  out.add('Should both of us be evaluated, or just me?');
+  out.add('Should both of us have tests, or just me?');
   if (c.knownConditions.isNotEmpty || c.priorMiscarriages > 0) {
-    out.add('Given my history, is there anything you would want to '
-        'investigate first?');
+    out.add("With my history, is there anything you'd want to check "
+        'first?');
   }
   if (out.length < 4) {
-    out.add('Is there anything in my history that changes what you would '
+    out.add("Is there anything in my history that changes what you'd "
         'suggest?');
   }
   return out.take(5).toList();

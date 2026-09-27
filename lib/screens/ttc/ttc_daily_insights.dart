@@ -91,6 +91,14 @@ enum TtcInsightGo {
   nutrition,
   movement,
   products,
+
+  /// The "Should I test?" chat (`ttc_chat/should_test`). Added 2026-09-26 for
+  /// the waiting-days card on the home.
+  shouldTest,
+
+  /// The treatment screen: her round's step and its blood test. Added
+  /// 2026-09-26 (docs/TTC-TREATMENT-FLOW.md §3e).
+  treatment,
 }
 
 /// One card on the rail.
@@ -180,7 +188,14 @@ List<TtcInsightCard> ttcInsightsFor(DateTime day) {
   //
   // ⚠️ ABSENT ON A CLINIC-RUN CYCLE. Not "Low", not "unknown" — absent. A band
   // on a cycle a clinician is directing is a second opinion beside theirs.
-  if (!clinic && fertility != null) {
+  //
+  // ⚠️ AND ABSENT ON AN EARLIER CYCLE (2026-09-26). Earlier cycles now carry
+  // their fertile days, worked out looking back, so the calendar can shade
+  // them and the hero can name them. A grade in words beside a past date is
+  // the "low chances" pairing the hero refuses in every tense, so this card
+  // stays with the cycle she is in. Kept for revert:
+  //   if (!clinic && fertility != null) {
+  if (!clinic && fertility != null && !facts.lookingBack) {
     out.add(TtcInsightCard(
       id: 'chance',
       eyebrow: 'CHANCE OF CONCEIVING',
@@ -226,7 +241,7 @@ List<TtcInsightCard> ttcInsightsFor(DateTime day) {
       eyebrow: 'DISCHARGE',
       value: sym?.label ?? 'Logged',
       caption: discharge == 'disch_eggwhite'
-          ? 'The clearest sign the window is close'
+          ? 'The clearest sign your fertile days are near'
           : null,
       hue: 206,
       art: TtcInsightArt.droplet,

@@ -124,6 +124,7 @@ class JourneyInputs {
   const JourneyInputs({
     this.stage,
     this.pathway,
+    this.timingOwnership,
     this.ttcToday,
     this.nextTreatmentStep,
     this.pregnancyWeek,
@@ -136,6 +137,15 @@ class JourneyInputs {
 
   /// TTC only.
   final TtcCarePathway? pathway;
+
+  /// Who owns the timing, when the caller has already weighed the evidence.
+  ///
+  /// ⚠️ ADDED 2026-09-26. The app's ownership now comes from real clinic dates
+  /// (`TtcStore.ownership`, `ttcTimingOwnershipFromEvidence`), not from the
+  /// pathway label alone, so [currentJourneyState] passes the store's answer
+  /// here and the journey state agrees with every TTC screen. Null falls back
+  /// to [pathway]'s own tier, which is what a caller with only a pathway means.
+  final TimingOwnership? timingOwnership;
   final TtcToday? ttcToday;
   final (String, DateTime)? nextTreatmentStep;
 
@@ -242,9 +252,12 @@ class JourneyStateEngine {
 
   JourneyState _trying(JourneyInputs input) {
     final pathway = input.pathway ?? const TtcCarePathway(path: TtcPath.natural);
-    final behaviour = ttcBehaviourFor(pathway);
+    // Kept for revert: `final behaviour = ttcBehaviourFor(pathway);` and the
+    // switch below read `pathway.ownership`.
+    final timing = input.timingOwnership ?? pathway.ownership;
+    final behaviour = TtcPathwayBehaviour(timing);
 
-    final ownership = switch (pathway.ownership) {
+    final ownership = switch (timing) {
       TimingOwnership.parentveda => ClinicalOwnership.parentveda,
       TimingOwnership.clinicGuided => ClinicalOwnership.shared,
       TimingOwnership.clinicControlled => ClinicalOwnership.clinic,
@@ -337,6 +350,8 @@ JourneyState currentJourneyState({
   return const JourneyStateEngine().resolve(JourneyInputs(
     stage: stage,
     pathway: stage == LifeStage.tryingToConceive ? ttc.pathway : null,
+    timingOwnership:
+        stage == LifeStage.tryingToConceive ? ttc.ownership : null,
     ttcToday: stage == LifeStage.tryingToConceive ? ttc.today : null,
     nextTreatmentStep: nextStep,
     pregnancyWeek: pregnancyWeek,

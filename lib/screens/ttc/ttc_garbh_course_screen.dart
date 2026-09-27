@@ -98,7 +98,7 @@ class TtcGarbhCourseScreenClassic extends StatelessWidget {
                   _Panel(
                     p: p,
                     tint: v2BlockTint(kTtcCourseHue, p),
-                    heading: 'WHAT THIS IS, AND WHAT IT IS NOT',
+                    heading: "WHAT THIS IS, AND WHAT IT ISN'T",
                     body: kTtcCourseFrame,
                   ),
                   const SizedBox(height: 12),
@@ -124,8 +124,9 @@ class TtcGarbhCourseScreenClassic extends StatelessWidget {
                   // up with.
                   Text(
                       TtcGarbhCourseStore.instance.openedCount == 0
-                          ? 'Start anywhere. Session one is the honest opening, '
-                              'and session two is the one most people use most.'
+                          ? 'Start wherever you like. Session one explains '
+                              'what this is, and session two is the one most '
+                              'people use most.'
                           : 'Open them in any order, and open them again '
                               'whenever you like.',
                       style: pvManrope(
@@ -320,8 +321,9 @@ class _TtcCourseSessionScreenState extends State<TtcCourseSessionScreen> {
                         const SizedBox(width: 10),
                         Expanded(
                           child: Text(
-                              'Better done together. Nothing here waits for '
-                              'anyone, and doing it alone is doing it.',
+                              'Better done together. But nothing here waits '
+                              'for anyone, and doing it on your own counts '
+                              'just the same.',
                               style: pvManrope(
                                   fontSize: 12.5,
                                   height: 1.5,
@@ -340,7 +342,7 @@ class _TtcCourseSessionScreenState extends State<TtcCourseSessionScreen> {
                     _Panel(
                       p: p,
                       tint: tint,
-                      heading: 'THE HONEST FRAME',
+                      heading: 'WHAT THIS IS, PLAINLY',
                       body: kTtcCourseFrame,
                     ),
                     const SizedBox(height: 12),
@@ -545,8 +547,8 @@ class _TimesBlock extends StatelessWidget {
     return _Keep(
       p: p,
       heading: 'THE TWO TIMES',
-      blurb: 'Pick the wake time first, because work usually decides it. Count '
-          'back about eight hours and that is the bedtime.',
+      blurb: 'Pick your wake time first, because work usually decides it. '
+          "Count back about eight hours, and that's your bedtime.",
       children: [
         _TimeRow(
           p: p,
@@ -591,8 +593,8 @@ class _MealsBlockState extends State<_MealsBlock> {
       // ⚠️ TIMES, NOT FOOD, AND THAT IS THE WHOLE BOUNDARY. The session teaches
       // that sattvik means regular and home-cooked; WHAT to eat is owned by
       // Getting ready and is linked below rather than restated here.
-      blurb: 'Regular matters more than perfect. The same three times most '
-          'days is the whole practice.',
+      blurb: 'Regular matters more than perfect. Eating at the same three '
+          'times on most days is all this asks.',
       children: [
         for (var i = 0; i < _names.length; i++)
           _TimeRow(
@@ -628,7 +630,7 @@ class _GettingReadyLinks extends StatelessWidget {
   Widget build(BuildContext context) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('THE SPECIFICS LIVE IN GETTING READY',
+        Text('THE DETAILS ARE IN GETTING READY',
             style: pvManrope(
                 fontSize: 10.5,
                 fontWeight: FontWeight.w800,
@@ -706,11 +708,11 @@ class _AssembleBlockState extends State<_AssembleBlock> {
       _Keep(
         p: p,
         heading: 'YOUR FIVE MINUTES',
-        blurb: 'Pick what you actually liked. Nothing is assigned, and leaving '
-            'one of these blank is a real answer.',
+        blurb: 'Pick the parts you liked. Nothing is set for you, and leaving '
+            'one of these blank is a fine answer.',
         children: [
           const SizedBox(height: 4),
-          _pickerLabel('The breathing you preferred', p),
+          _pickerLabel('The breathing you liked best', p),
           for (final pr in ttcPracticesOfKind(TtcPracticeKind.breathe))
             _Pick(
               p: p,
@@ -721,7 +723,7 @@ class _AssembleBlockState extends State<_AssembleBlock> {
                   () => _breathe = _breathe == pr.id ? null : pr.id),
             ),
           const SizedBox(height: 16),
-          _pickerLabel('The movement you will actually do', p),
+          _pickerLabel("The movement you'll really do", p),
           for (final pr in ttcPracticesOfKind(TtcPracticeKind.move))
             _Pick(
               p: p,
@@ -764,8 +766,8 @@ class _AssembleBlockState extends State<_AssembleBlock> {
       _Keep(
         p: p,
         heading: 'AND CONFIRM THESE',
-        blurb: 'Set in sessions five and six. Change either here if it has '
-            'stopped being true.',
+        blurb: 'You set these in sessions five and six. Change either one '
+            'here if it no longer fits.',
         children: [
           _TimeRow(
             p: p,
@@ -827,7 +829,7 @@ class _AssembleBlockState extends State<_AssembleBlock> {
                 letterSpacing: 1.4,
                 color: p.ink3)),
         const SizedBox(height: 6),
-        Text('Mind & body opens on this. Nothing is counting it.',
+        Text('Mind & body opens on this. Nothing here keeps count.',
             style: pvManrope(fontSize: 12.5, height: 1.6, color: p.ink3)),
         const SizedBox(height: 4),
         // ⚠️ `padded: false`, AND IT IS NOT A STYLE CHOICE. Today insets itself

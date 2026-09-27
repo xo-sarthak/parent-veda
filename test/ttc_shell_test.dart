@@ -120,7 +120,9 @@ void main() {
       // tile and the findability test above asserts it.
       // ⚠️ 23 -> 24 ON 2026-09-17. Courses left the V3 bar (slot 2 is the
       // unified store) and became the first tile of Plan and learn.
-      expect(TtcToolsScreen.toolCount, 24);
+      // ⚠️ 24 -> 25 ON 2026-09-26. "Talk to expert" left the V3 bar and
+      // became a Tools tile (Care and medicines), opening the same consults.
+      expect(TtcToolsScreen.toolCount, 25);
     });
 
     testWidgets('all nine Prepare categories render', (tester) async {

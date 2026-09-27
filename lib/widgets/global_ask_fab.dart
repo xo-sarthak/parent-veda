@@ -174,6 +174,11 @@ class FabRouteObserver extends NavigatorObserver {
             // 'pp/<section>/story/<page>' (and interactives as '…/interactive/…');
             // TTC as 'ttc/story'.
             name == 'ttc/story' ||
+            // The TTC scripted chats pin their answers in a tray at the foot
+            // (the review's C1, 2026-09-26), where the button would sit on
+            // the last answer. Ask Veda is the place for open questions and
+            // the chat has its own way out.
+            name.startsWith('ttc_chat/') ||
             name.contains('/story/') ||
             name.contains('/interactive/'));
     FabState.instance

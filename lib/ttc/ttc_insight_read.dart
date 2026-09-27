@@ -45,7 +45,40 @@ import '../models/pv_read.dart';
 import '../screens/reader/pv_reader_screen.dart';
 import '../screens/ttc/ttc_surface_router.dart';
 import 'ttc_daily_data.dart';
+import 'ttc_reads_data.dart' show ttcReadById;
 import '../screens/ttc/ttc_strings.dart';
+
+/// Each phase card's companion read, the longer piece the card is the short
+/// version of (2026-09-26, from the phase-cards pass). The card's "Read next"
+/// leads with it, so a card read on a hard day has somewhere to go that says
+/// more. Ids only; one that does not resolve is left out where the rail is
+/// built, never shown as a dead tile.
+const Map<String, String> kTtcPhaseCardReads = {
+  'period_new_start': 'ttc_read_period_came',
+  'period_day_one': 'ttc_read_normal_cycle',
+  'period_be_gentle': 'ttc_read_period_pain',
+  'period_what_it_means': 'ttc_read_how_long_it_takes',
+  'period_nothing_to_time': 'ttc_read_how_conception_works',
+  'wait_first_week': 'ttc_read_two_week_wait',
+  'wait_implantation': 'ttc_read_implantation_bleeding',
+  'wait_symptoms_same': 'ttc_read_early_signs',
+  'wait_test_timing': 'ttc_read_when_to_test',
+  'wait_pick_test_day': 'ttc_read_how_to_test',
+  'wait_something_kind': 'ttc_read_trying_takes_over',
+  'wait_live_normally': 'ttc_read_two_week_wait',
+  'late_how_to_test': 'ttc_read_how_to_test',
+  'late_negative': 'ttc_read_late_negative',
+  'late_see_doctor': 'ttc_read_late_period',
+  'window_every_day_or_two': 'ttc_read_timing_myths',
+  'window_no_single_day': 'ttc_read_how_conception_works',
+  'window_closeness': 'ttc_read_sex_homework',
+  'window_he_helps': 'ttc_read_bringing_him_in',
+  'window_no_tracking': 'ttc_read_ovulation_kits',
+};
+
+/// An insight id or a stage read id, as a read. What the insight reader's
+/// "Read next" resolves, now that a phase card's rail can hold a stage read.
+PvRead? _insightOrRead(String id) => ttcInsightReadById(id) ?? ttcReadById(id);
 
 /// The id a daily insight carries as a read: `ttc_insight_<insight.id>`.
 const String kTtcInsightReadPrefix = 'ttc_insight_';
@@ -93,7 +126,11 @@ PvRead ttcInsightAsRead(TtcInsight i) {
   // piece on a topic still has a rail.
   final peers = ttcInsights.where((o) => o.topic == i.topic && o.id != i.id).toList();
   final at = ttcInsights.where((o) => o.topic == i.topic).toList().indexOf(i);
+  // ⚠️ A PHASE CARD LEADS WITH ITS COMPANION READ (2026-09-26). The card is
+  // the short version of a longer piece, and the rail is where she finds it.
+  final paired = kTtcPhaseCardReads[i.id];
   final next = <String>[
+    if (paired != null && ttcReadById(paired) != null) paired,
     for (var k = 0; k < 2 && k < peers.length; k++)
       kTtcInsightReadPrefix + peers[(at + k) % peers.length].id,
   ];
@@ -142,11 +179,18 @@ void openTtcInsight(BuildContext context, TtcInsight insight) {
     builder: (_) => PvReaderScreen(
       read: read,
       lang: lang,
-      resolveRead: ttcInsightReadById,
-      readTitle: (id) => ttcInsightReadById(id)?.title,
+      // ⚠️ AN INSIGHT OR A STAGE READ (2026-09-26): a phase card's rail
+      // leads with its companion read, which opens through the router like
+      // every other read. Was `resolveRead: ttcInsightReadById`, kept for
+      // revert with the two lines below.
+      resolveRead: _insightOrRead,
+      readTitle: (id) => _insightOrRead(id)?.title,
       openRead: (ctx, id) {
         final i = ttcInsightReadById(id);
-        if (i == null) return;
+        if (i == null) {
+          if (ttcReadById(id) != null) openTtcSurface(ctx, '$kTtcReadPrefix$id');
+          return;
+        }
         for (final raw in ttcInsights) {
           if (kTtcInsightReadPrefix + raw.id == i.id) {
             openTtcInsight(ctx, raw);

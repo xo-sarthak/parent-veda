@@ -344,11 +344,11 @@ class _TtcShopScreenState extends State<TtcShopScreenClassic> {
   };
 
   static const _promise = <String, String>{
-    'supplements': 'What has evidence, what does not, and what to skip.',
+    'supplements': "What has evidence, what doesn't, and what to skip.",
     'kits': 'Useful for a cycle or two. Less so every month after.',
-    'tests': 'They all work. The trap is testing too early.',
-    'wellness': 'The few things worth buying, and the many that are not.',
-    'books': 'For the waiting, which is the part nobody prepares you for.',
+    'tests': 'They all work. The catch is testing too early.',
+    'wellness': "The few things worth buying, and the many that aren't.",
+    'books': 'For the waiting, the part no one gets you ready for.',
   };
 
   @override
@@ -369,9 +369,9 @@ class _TtcShopScreenState extends State<TtcShopScreenClassic> {
           // ⚠️ THE PROMISE IS MADE BEFORE THE FIRST ROW, not at the bottom in
           // small print. Everything under this line is chosen to be defensible
           // rather than to be bought.
-          intro: 'Ten things people buy while trying, and an honest line on '
-              'each. Several of them are here to talk you out of the '
-              'purchase.',
+          intro: 'Ten things people buy while trying, with an honest line on '
+              'each. Some of them are here to talk you out of buying '
+              'them.',
           children: [
             ttcToolPad(Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -413,9 +413,9 @@ class _TtcShopScreenState extends State<TtcShopScreenClassic> {
                                 style: ttcJakarta(15)),
                             const SizedBox(height: 7),
                             Text(
-                                'This is a short, deliberately short list — not '
-                                'a catalogue. If what you are looking for is '
-                                'not here, it is usually because there is '
+                                "We've kept this list short on purpose. It "
+                                "isn't a catalogue. If what you're looking for "
+                                "isn't here, it's usually because there's "
                                 'nothing worth saying about it yet.',
                                 style: ttcBody(13, h: 1.5)),
                             const SizedBox(height: 14),
@@ -475,9 +475,9 @@ class _TtcShopScreenState extends State<TtcShopScreenClassic> {
                   const SizedBox(width: 9),
                   Expanded(
                     child: Text(
-                        'Nothing here is sold by ParentVeda and nothing is '
-                        'sponsored. Prices are indicative Indian ranges and '
-                        'will drift.',
+                        "ParentVeda doesn't sell anything here, and nothing "
+                        'is sponsored. Prices are rough Indian ranges and '
+                        'will change over time.',
                         style: ttcBody(11.5, color: ttcMuted, h: 1.5)),
                   ),
                 ]),
@@ -860,9 +860,9 @@ class _TtcShelfScreenState extends State<TtcShelfScreenClassic> {
                             const SizedBox(height: 7),
                             Text(
                                 'Either the filter is narrower than the shelf, '
-                                'or everything here is something we would only '
-                                'suggest in a narrow case. Both are answers '
-                                'rather than empty screens.',
+                                "or everything here is something we'd only "
+                                'suggest in a few cases. Either way, that '
+                                'tells you something too.',
                                 style: ttcBody(13, h: 1.5)),
                             const SizedBox(height: 14),
                             TtcRecordsAction(
@@ -892,8 +892,8 @@ class _TtcShelfScreenState extends State<TtcShelfScreenClassic> {
                   const SizedBox(height: 20),
                   _RowLink(
                     label: 'The other shelves',
-                    sub: 'Supplements, kits, tests, wellness and books — and '
-                        'what we would not buy.',
+                    sub: 'Supplements, kits, tests, wellness and books, and '
+                        "what we wouldn't buy.",
                     onTap: () => openTtcShop(context),
                   ),
                   SizedBox(height: tray.ids.length == 2 ? 110 : 26),
@@ -939,24 +939,24 @@ class _TtcShelfScreenState extends State<TtcShelfScreenClassic> {
   /// to buy nothing.
   static String _guidanceFor(String category) => switch (category) {
         'supplements' =>
-          'One of these has settled evidence behind it. Most of the rest are '
+          'One of these has solid evidence behind it. Most of the rest are '
               'sold on hope, and one is here so you can stop feeling guilty '
               'about not buying it.',
         'kits' =>
           'Useful while you learn your own pattern, and much less useful after '
-              'that. If testing daily is making the month heavier, stopping is '
-              'a good decision.',
+              "that. If testing every day is making the month harder, it's okay "
+              'to stop.',
         'tests' =>
           'They all work, and the cheap ones work as well as the expensive '
-              'ones. Almost every disappointment here is a test taken too '
+              'ones. Most letdowns here come from testing too '
               'early.',
         'wellness' =>
-          'A short shelf on purpose. Most of what is sold under this word for '
+          "A short shelf on purpose. Most of what's sold as wellness for "
               'fertility has nothing behind it.',
         'books' =>
-          'For the waiting rather than the trying. Avoid anything promising a '
-              'method or a number of days.',
-        _ => 'What is worth buying, and what is not.',
+          'For the waiting rather than the trying. Skip anything that promises '
+              'a method or a number of days.',
+        _ => "What's worth buying, and what isn't.",
       };
 }
 
@@ -1238,7 +1238,7 @@ class _CompareBar extends StatelessWidget {
           Row(children: [
             Expanded(
               child: Text(
-                  'Two at a time. A third would be a table nobody reads.',
+                  'Two at a time, so the table stays easy to read.',
                   style: ttcBody(11, color: ttcMuted)),
             ),
             GestureDetector(
@@ -1392,8 +1392,8 @@ class _CompareEmpty extends StatelessWidget {
                   style: ttcFraunces(25, h: 1.15, color: ttcTitleInk))),
               const SizedBox(height: 12),
               _comparePad(Text(
-                  'Tap Compare on any two products on a shelf and they will '
-                  'come here, side by side.',
+                  "Tap Compare on any two products on a shelf, and they'll "
+                  'show up here side by side.',
                   textAlign: TextAlign.center,
                   style: ttcBody(14, color: ttcSoft, h: 1.6))),
               const SizedBox(height: 26),
@@ -1595,8 +1595,8 @@ class _CompareBoth extends StatelessWidget {
                       const SizedBox(width: 10),
                       Expanded(
                         child: Text(
-                            'Before you read it: the evidence row matters more '
-                            'than the price row, and neither of these is a '
+                            'Before you read on: the evidence row matters more '
+                            "than the price row, and neither of these is a "
                             'treatment.',
                             style: ttcBody(12.5, color: ttcSoft, h: 1.5)),
                       ),
@@ -1696,8 +1696,8 @@ class _CompareBoth extends StatelessWidget {
 
               const SizedBox(height: 20),
               _comparePad(Text(
-                  'Our take is written the same way whether or not anyone pays '
-                  'us. Where the honest answer is "neither", the page says so.',
+                  'We write our take the same way whether or not anyone pays '
+                  'us. If the honest answer is "neither", we say so.',
                   textAlign: TextAlign.center,
                   style: ttcBody(12, color: ttcMuted, h: 1.55))),
             ],
@@ -2126,11 +2126,11 @@ class _TtcProductPageState extends State<TtcProductPageClassic> {
                         ..showSnackBar(SnackBar(
                           content: Text(
                               v == 'up'
-                                  ? 'Good — thank you. That helps us know '
-                                      'which pages are worth writing.'
-                                  : 'Noted, and thank you for saying so. '
-                                      'Pages people mark this way get rewritten '
-                                      'before new ones get written.',
+                                  ? 'Thank you. That helps us know which '
+                                      'pages are worth writing.'
+                                  : 'Thanks for telling us. We rewrite pages '
+                                      'people mark this way before we write '
+                                      'new ones.',
                               style: ttcBody(13, color: Colors.white, h: 1.4)),
                         ));
                     },
@@ -2143,9 +2143,9 @@ class _TtcProductPageState extends State<TtcProductPageClassic> {
                   _BestForChips(chips: p.bestFor),
                   const SizedBox(height: 8),
                   Text(
-                      'Ticked chips are the ones this actually applies to — '
-                      'the rest are true of the product but may not be true '
-                      'of you.',
+                      'The ticked chips are the ones that apply to you. The '
+                      'rest are true of the product, but may not be true '
+                      'for you.',
                       style: ttcBody(13, color: ttcMuted, h: 1.5)),
 
                   // 7 ---- price, Compare, Buy -------------------------------
@@ -2318,10 +2318,10 @@ class _TtcProductPageState extends State<TtcProductPageClassic> {
               // 18 ---- the disclaimer -------------------------------------
               const SizedBox(height: 28),
               ttcToolPad(Text(
-                  'ParentVeda does not sell this. Prices and brands are '
-                  'examples of what an Indian chemist stocks, not '
-                  'recommendations of one brand over another. General '
-                  'information, not medical advice — if you are unsure whether '
+                  "ParentVeda doesn't sell this. Prices and brands are "
+                  "examples of what an Indian chemist stocks. We're not "
+                  'recommending one brand over another. This is general '
+                  "information, not medical advice. If you're not sure whether "
                   'something applies to you, ask your doctor.',
                   textAlign: TextAlign.center,
                   style: ttcBody(11.5, color: ttcMuted, h: 1.6))),
@@ -2424,8 +2424,8 @@ class _ThumbRail extends StatelessWidget {
         const SizedBox(width: 10),
         Expanded(
           child: Text(
-              'One drawing, not a photograph. We photograph products '
-              'ourselves and this one is in the queue.',
+              "This is a drawing, not a photo. We take our own product "
+              "photos, and this one is on the list.",
               style: ttcBody(11.5, color: ttcMuted, h: 1.45)),
         ),
       ]);
@@ -3205,7 +3205,7 @@ class _GoneProduct extends StatelessWidget {
         hue: kTtcShopHue,
         eyebrow: 'Products',
         title: 'That one is gone.',
-        intro: 'It is no longer in the library.',
+        intro: "It isn't in the library any more.",
         children: [
           ttcToolPad(TtcRecordsAction(
             label: 'Back to products',
@@ -3472,18 +3472,18 @@ class _BuySheet extends StatelessWidget {
               children: [
                 ttcShopEyebrow('Before you go'),
                 const SizedBox(height: 12),
-                Text('You are leaving for ${product.retailer}',
+                Text('You\'re leaving for ${product.retailer}',
                     style: ttcFraunces(22,
                         w: FontWeight.w600, color: ttcTitleInk, h: 1.2)),
                 const SizedBox(height: 12),
                 Text(
                     'This opens a search on ${product.retailer}. ParentVeda '
-                    'earns nothing from it — there is no affiliate '
-                    'arrangement in this stage.',
+                    'earns nothing from it. There\'s no affiliate deal in '
+                    'this part of the app.',
                     style: ttcBody(13, color: ttcSoft, h: 1.55)),
                 const SizedBox(height: 8),
                 Text(
-                    'If that ever changes, we will say so here. It would '
+                    'If that ever changes, we\'ll tell you here. It would '
                     'still never change what we recommend, how we rate a '
                     'product, or the order of a shelf.',
                     style: ttcBody(13, color: ttcTitleInk, h: 1.55)),
@@ -3858,7 +3858,7 @@ class _CompareEntry extends StatelessWidget {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Compare two you are torn between',
+                  Text("Compare two you can't decide between",
                       style: ttcJakarta(14.5)),
                   const SizedBox(height: 4),
                   // ⚠️ IT STATES THE MECHANISM WHEN THE TRAY IS EMPTY. "Nothing
@@ -3867,7 +3867,7 @@ class _CompareEntry extends StatelessWidget {
                   // this.
                   Text(
                       picked.isEmpty
-                          ? 'Nothing picked yet — tick two on any shelf.'
+                          ? 'Nothing picked yet. Tick two on any shelf.'
                           : picked.length == 1
                               ? '${picked.first.name(hi)}. Tick one more.'
                               : picked.map((p) => p.name(hi)).join('  ·  '),

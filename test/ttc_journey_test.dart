@@ -313,13 +313,27 @@ void main() {
       expect(ttcFactsFor(d.add(const Duration(days: 1))).isPeriodStart, isFalse);
     });
 
+    // ⚠️ RELATIVE TO TODAY SINCE 2026-09-26 (consistency pass). These two used
+    // fixed dates in June 2026. The calendar used to ask the engine about each
+    // date as if it were today, so a cycle that is three months overdue today
+    // still drew its July window and a "Period expected" beside a hero saying
+    // "not enough logged". The calendar now reads `ttcDayContext`, which asks
+    // about the cycle as it stands today, so the fixture has to be a cycle
+    // that is current today. The fixed-date versions are kept for revert.
+    //
+    //   CycleStore.instance
+    //     ..logPeriodStart(DateTime(2026, 5, 1))
+    //     ..logPeriodStart(DateTime(2026, 5, 29))
+    //     ..logPeriodStart(DateTime(2026, 6, 26));
+    //   final start = DateTime(2026, 6, 26);
     test('the fertile window on the calendar matches the engine', () {
       // 28-day cycles → ovulation day 14, window 9-15.
+      final n = DateTime.now();
+      final start = DateTime(n.year, n.month, n.day - 5);
       CycleStore.instance
-        ..logPeriodStart(DateTime(2026, 5, 1))
-        ..logPeriodStart(DateTime(2026, 5, 29))
-        ..logPeriodStart(DateTime(2026, 6, 26));
-      final start = DateTime(2026, 6, 26);
+        ..logPeriodStart(start.subtract(const Duration(days: 56)))
+        ..logPeriodStart(start.subtract(const Duration(days: 28)))
+        ..logPeriodStart(start);
       expect(ttcFactsFor(start.add(const Duration(days: 13))).isOvulation, isTrue);
       expect(ttcFactsFor(start.add(const Duration(days: 12))).fertility,
           FertilityLevel.peak);
@@ -329,13 +343,22 @@ void main() {
 
     test('the expected next period is projected only from the current cycle',
         () {
+      // Kept for revert (fixed dates, see the note above):
+      //   ..logPeriodStart(DateTime(2026, 5, 1))
+      //   ..logPeriodStart(DateTime(2026, 5, 29));
+      //   expect(ttcFactsFor(DateTime(2026, 6, 26)).isExpectedPeriod, isTrue);
+      //   expect(ttcFactsFor(DateTime(2026, 5, 29)).isExpectedPeriod, isFalse);
+      final n = DateTime.now();
+      final last = DateTime(n.year, n.month, n.day - 10);
+      final older = last.subtract(const Duration(days: 28));
       CycleStore.instance
-        ..logPeriodStart(DateTime(2026, 5, 1))
-        ..logPeriodStart(DateTime(2026, 5, 29));
+        ..logPeriodStart(older)
+        ..logPeriodStart(last);
       // 28-day cycle from the LAST start → expected on day 29 of that cycle.
-      expect(ttcFactsFor(DateTime(2026, 6, 26)).isExpectedPeriod, isTrue);
+      expect(ttcFactsFor(last.add(const Duration(days: 28))).isExpectedPeriod,
+          isTrue);
       // Never projected from an older cycle that has already ended.
-      expect(ttcFactsFor(DateTime(2026, 5, 29)).isExpectedPeriod, isFalse);
+      expect(ttcFactsFor(last).isExpectedPeriod, isFalse);
     });
 
     test('a logged tracker and a journal entry both surface on their day', () {

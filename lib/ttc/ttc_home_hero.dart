@@ -49,8 +49,11 @@
 
 import 'cycle_store.dart';
 import 'ttc_chapter.dart';
-import 'ttc_fertile_window.dart';
+import 'ttc_day_context.dart';
+// Kept for revert: the hero read `ttcFertileWindowNow(ignoreOwnership: true)`.
+// import 'ttc_fertile_window.dart';
 import 'ttc_store.dart';
+import 'ttc_treatment_round.dart';
 import 'ttc_treatment_store.dart';
 
 enum TtcHeroState {
@@ -86,6 +89,17 @@ enum TtcHeroState {
   // ---------------------------------------------------------------------------
 
   /// The selected day is in a cycle BEFORE the current one.
+  ///
+  /// ⚠️ NO LONGER A REFUSAL — DECIDED 2026-09-26. An earlier cycle now carries
+  /// the fertile days it had, worked out looking back from THAT cycle's own
+  /// length (`ttcLookBackOvulationDay`): "Cycle day N · your fertile days that
+  /// cycle were around X to Y", in [TtcHeroLine.windowFrom] and
+  /// [TtcHeroLine.windowTo]. The objection below was to reconstructing a past
+  /// window from THIS cycle's assumptions; a completed cycle's own length is a
+  /// fact she logged, so the arithmetic rests on two facts, not two guesses,
+  /// and the copy says "looking back" rather than presenting it as history we
+  /// observed. Still no grade, in any tense. The note below is kept for the
+  /// reasoning.
   ///
   /// ⚠️ A REFUSAL, AND IT HAS TO BE. The window engine estimates ovulation for
   /// the cycle she is in now, from the signals of that cycle. It has no
@@ -135,7 +149,63 @@ enum TtcHeroState {
   /// so on day 26 of a 28-day cycle she can select a day that is arithmetically
   /// "late" and factually just Thursday.
   periodExpectedBy,
+
+  // ---------------------------------------------------------------------------
+  //  A treatment ROUND's steps — 2026-09-26 (docs/TTC-TREATMENT-FLOW.md §3a)
+  // ---------------------------------------------------------------------------
+  //  Additive. A round saved by the start flow (one with a kind) leads with
+  //  the STEP it is on, derived from her clinic's dates (`ttcTreatmentPhase`),
+  //  and the next date after it: "IVF · Stimulation / Injection day 6 / Next
+  //  scan Thursday". The three states above stay for a legacy round (dates
+  //  with no kind). The rule is unchanged: count days she DOES things, name
+  //  the DATE of the test that judges. The blood test is never counted down.
+
+  /// S2: pill cycle, down-regulation, baseline scan, estrogen.
+  treatmentGettingReady,
+
+  /// S3: injection or tablet day N ([TtcHeroLine.days]).
+  treatmentStimulation,
+
+  /// S4: trigger day ([TtcHeroLine.days] == 0, [TtcHeroLine.date] carries the
+  /// time), or the day and a half after it.
+  treatmentTrigger,
+
+  /// S5: egg collection or IUI today ([TtcHeroLine.step]).
+  treatmentProcedure,
+
+  /// S6: embryo day N, or the lab's days on a freeze-all.
+  treatmentEmbryoDays,
+
+  /// S7: transfer day.
+  treatmentTransfer,
+
+  /// S8: the wait, with the blood test named by its DATE.
+  treatmentWait,
+
+  /// S9: blood test today ([TtcHeroLine.days] == 0), then waiting to hear.
+  treatmentTestDay,
+
+  /// S10: the round closed with a positive test.
+  treatmentResult,
+
+  /// S11: a closed round still holds this cycle; her own cycle comes back
+  /// with the next period she logs.
+  treatmentBetweenRounds,
 }
+
+/// The round states, for surfaces that treat them as one family.
+const Set<TtcHeroState> kTtcRoundHeroStates = {
+  TtcHeroState.treatmentGettingReady,
+  TtcHeroState.treatmentStimulation,
+  TtcHeroState.treatmentTrigger,
+  TtcHeroState.treatmentProcedure,
+  TtcHeroState.treatmentEmbryoDays,
+  TtcHeroState.treatmentTransfer,
+  TtcHeroState.treatmentWait,
+  TtcHeroState.treatmentTestDay,
+  TtcHeroState.treatmentResult,
+  TtcHeroState.treatmentBetweenRounds,
+};
 
 /// Which state the home hero is in, and the numbers it needs.
 ///
@@ -146,15 +216,70 @@ enum TtcHeroState {
 /// without anybody reviewing a string.
 class TtcHeroLine {
   const TtcHeroLine(this.state,
-      {this.days = 0, this.cycleDay, this.step, this.date});
+      {this.days = 0,
+      this.cycleDay,
+      this.step,
+      this.date,
+      this.windowFrom,
+      this.windowTo,
+      this.kind,
+      this.countStep,
+      this.nextStep,
+      this.nextOn,
+      this.upcomingStep,
+      this.upcomingOn});
 
   final TtcHeroState state;
+
+  // ---- a round (2026-09-26) -------------------------------------------------
+
+  /// The round's kind, for the eyebrow ("IVF · Stimulation").
+  final TtcRoundKind? kind;
+
+  /// The step [days] counts from (estrogen, stimulation, collection,
+  /// transfer), when the state counts days.
+  final TtcTreatmentStep? countStep;
+
+  /// The next clinic date after the day: a step, or a scan when [nextStep]
+  /// is null and [nextOn] is set.
+  final TtcTreatmentStep? nextStep;
+  final DateTime? nextOn;
+
+  /// S1: a planned round's first date, shown under her own cycle's line
+  /// ("IVF starts with a scan on Tue 14 Oct"). A scan when [upcomingStep] is
+  /// null and [upcomingOn] is set.
+  final TtcTreatmentStep? upcomingStep;
+  final DateTime? upcomingOn;
+
+  /// This line with a planned round's first date added.
+  TtcHeroLine withUpcoming(TtcTreatmentStep? step, DateTime on) => TtcHeroLine(
+        state,
+        days: days,
+        cycleDay: cycleDay,
+        step: this.step,
+        date: date,
+        windowFrom: windowFrom,
+        windowTo: windowTo,
+        kind: kind,
+        countStep: countStep,
+        nextStep: nextStep,
+        nextOn: nextOn,
+        upcomingStep: step,
+        upcomingOn: on,
+      );
 
   /// Which clinic step the treatment states are about.
   final TtcTreatmentStep? step;
 
   /// The date that step falls on. Only the beta state prints it.
   final DateTime? date;
+
+  /// An earlier cycle's fertile days, worked out looking back from that
+  /// cycle's own length ([TtcHeroState.pastCycle] only). Null when there is no
+  /// window to show for it (a clinic ran it, or its length looks like a missed
+  /// log).
+  final DateTime? windowFrom;
+  final DateTime? windowTo;
 
   /// Meaning depends on the state: days until the window opens, days of window
   /// remaining including today, days until the period, or days late.
@@ -179,6 +304,38 @@ class TtcHeroLine {
 /// two actions, which already dim on a future day. The hero was the one piece
 /// still describing today from inside a page describing another day.
 TtcHeroLine ttcHomeHeroLine({DateTime? on}) {
+  final line = _heroLine(on);
+  // ---- S1: a planned round, named under her own cycle's line ---------------
+  //
+  // ⚠️ ADDITIVE, AND ONLY UNDER HER OWN CYCLE'S STATES (2026-09-26, §3a). A
+  // round whose first treatment date is still ahead does not hand the cycle
+  // over (decision 1), so the big line stays hers; the round's first date
+  // rides along for the small line: "IVF starts with a scan on Tue 14 Oct."
+  final round = TtcTreatmentStore.instance.cycle;
+  if (round.kind == null || round.isClosed) return line;
+  if (line.state == TtcHeroState.clinicHolds ||
+      line.state == TtcHeroState.treatmentToday ||
+      line.state == TtcHeroState.treatmentSoon ||
+      line.state == TtcHeroState.treatmentBeta ||
+      kTtcRoundHeroStates.contains(line.state)) {
+    return line;
+  }
+  final day = _dayOnly(on ?? DateTime.now());
+  if (ttcTreatmentPhase(round, day) != TtcRoundPhase.planned) return line;
+  final first = ttcFirstTreatmentDate(round);
+  if (first == null) return line;
+  TtcTreatmentStep? step;
+  for (final s in TtcTreatmentStep.values) {
+    final at = round[s];
+    if (at != null && _dayOnly(at) == first) {
+      step = s;
+      break;
+    }
+  }
+  return line.withUpcoming(step, first);
+}
+
+TtcHeroLine _heroLine(DateTime? on) {
   final today = TtcStore.instance.today;
 
   if (today.noEstimate == TtcNoEstimate.noPeriodLogged) {
@@ -212,23 +369,71 @@ TtcHeroLine ttcHomeHeroLine({DateTime? on}) {
   // calculation second from the bottom. A date her clinic gave her is not our
   // estimate at all — it is the strongest fact on this screen, and it was the
   // only one the hero never looked at.
+  //
+  // ⚠️ A ROUND LEADS WITH ITS STEP, A LEGACY ROUND WITH ITS NEXT DATE
+  // (2026-09-26). A round saved by the start flow has a kind, and on a day it
+  // is running the hero names the step (`_roundLine`). A legacy round keeps
+  // the next-date line, now only for a day in the cycle she is in or in a
+  // cycle the round ran in: earlier cycles from before treatment keep their
+  // own look-back line (the resolver's decision). Kept for revert:
+  //   final line = _treatmentLine(on);
+  //   if (line != null) return line;
   if (today.clinicInvolved) {
-    final line = _treatmentLine(on);
-    if (line != null) return line;
+    final round = TtcTreatmentStore.instance.cycle;
+    final at = _dayOnly(on ?? DateTime.now());
+    if (round.kind != null) {
+      final line = _roundLine(round, at);
+      if (line != null) return line;
+    } else {
+      final c = ttcDayContext(at);
+      if (!c.isPastCycle || c.cycleClinicOwned) {
+        final line = _treatmentLine(on);
+        if (line != null) return line;
+      }
+    }
+    final between = _betweenRoundsLine(at);
+    if (between != null) return between;
   }
 
-  // ⚠️ `ignoreOwnership: true` — SEE THE NOTE ON `ttcFertileWindowNow`. The
-  // hero does not act on the pathway guess. Her clinic's real dates are checked
-  // FIRST, just above, so this only ever runs when there are none.
-  final window = ttcFertileWindowNow(ignoreOwnership: true);
+  // ⚠️ `ignoreOwnership: true` IS GONE — 2026-09-26, CONSISTENCY PASS. The
+  // hero was the one surface that published a window into a clinic-owned
+  // cycle (by the 2026-09-05 decision recorded on `ttcFertileWindowNow`),
+  // which made it the one surface disagreeing with everything below it: on
+  // such a cycle the insight cards, the reads, the calendar, the window door
+  // and the messages all (correctly) refuse, so the hero said "your fertile
+  // days open in 3 days" above cards chosen for "we do not know". The brief
+  // for this pass says it in as many words: clinic-owned cycles get no
+  // phase-based prediction anywhere, consistently.
+  //
+  // What the 2026-09-05 decision was protecting is kept: the hero does NOT go
+  // back to a clinic refusal. It leads on her clinic's dates when there are
+  // any (above), and otherwise on her own cycle day, with the way out ("Not on
+  // treatment? Change this") as its second line, so it still moves every
+  // morning and is never a dead end. Kept for revert:
+  //   final window = ttcFertileWindowNow(ignoreOwnership: true);
+  //
+  // ⚠️ AND THE LABEL CAN NO LONGER PUT HER HERE (2026-09-26, the user's
+  // decision). A clinic owns the timing only when the treatment tracker holds
+  // a real date for this cycle (`TtcStore.ownership`), so the account with
+  // "one stray tap on IVF" that the 2026-09-05 exception protected now gets
+  // her own cycle's window on the hero AND on every card, and a clinic-held
+  // hero always has her clinic's dates behind it: the next one leads, and
+  // once all have passed, her cycle day with a way to add the next.
+  // `ignoreOwnership` itself is retired in `ttc_fertile_window.dart`.
   final start = CycleStore.instance.lastPeriodStart;
   if (start == null) {
-    return const TtcHeroLine(TtcHeroState.noEstimate);
+    // Nothing logged is the invitation on every pathway, not a refusal.
+    return const TtcHeroLine(TtcHeroState.startHere);
+    // Kept for revert: return const TtcHeroLine(TtcHeroState.noEstimate);
   }
 
   final now = _dayOnly(DateTime.now());
   final day = on == null ? now : _dayOnly(on);
   final anchor = _dayOnly(start);
+
+  // THE one resolver: the same window, due date and history test the cards,
+  // the calendar, the window door and the messages read.
+  final ctx = ttcDayContext(day);
 
   // ---- a day in an earlier cycle -------------------------------------------
   //
@@ -259,8 +464,14 @@ TtcHeroLine ttcHomeHeroLine({DateTime? on}) {
       // Earlier than anything she has logged. There is no cycle to be a day of.
       return const TtcHeroLine(TtcHeroState.pastCycle);
     }
+    // ⚠️ AND ITS FERTILE DAYS, LOOKING BACK (2026-09-26): the resolver's own
+    // look-back window for that cycle, the one the calendar shades and the
+    // report bands, so all three name the same days.
     return TtcHeroLine(TtcHeroState.pastCycle,
-        days: day.difference(was).inDays + 1, date: was);
+        days: day.difference(was).inDays + 1,
+        date: was,
+        windowFrom: ctx.lookingBack ? ctx.windowOpensOn : null,
+        windowTo: ctx.lookingBack ? ctx.windowClosesOn : null);
   }
 
   final cycleDay = day.difference(anchor).inDays + 1;
@@ -272,7 +483,9 @@ TtcHeroLine ttcHomeHeroLine({DateTime? on}) {
   // `cycleDay`, because `cycleDay` draws the tappable footer and these two
   // states put the number in the HEADLINE — printing it twice on one small
   // block is how a refusal ends up looking like a dashboard.
-  if (window == null) {
+  final opensDay = ctx.windowOpensCycleDay;
+  final closesDay = ctx.windowClosesCycleDay;
+  if (opensDay == null || closesDay == null) {
     return today.clinicInvolved
         ? TtcHeroLine(TtcHeroState.clinicHolds, days: cycleDay)
         : TtcHeroLine(TtcHeroState.noEstimate, days: cycleDay);
@@ -286,15 +499,15 @@ TtcHeroLine ttcHomeHeroLine({DateTime? on}) {
   // pinned the hero to today no matter which day was selected, which is the bug
   // being fixed. The cycle-day fields are the same window described in a frame
   // that does not move.
-  if (cycleDay < window.opensCycleDay) {
+  if (cycleDay < opensDay) {
     return TtcHeroLine(TtcHeroState.windowOpensIn,
-        days: window.opensCycleDay - cycleDay, cycleDay: cycleDay);
+        days: opensDay - cycleDay, cycleDay: cycleDay);
   }
-  if (cycleDay < window.closesCycleDay) {
+  if (cycleDay < closesDay) {
     return TtcHeroLine(TtcHeroState.windowOpen,
-        days: window.closesCycleDay - cycleDay + 1, cycleDay: cycleDay);
+        days: closesDay - cycleDay + 1, cycleDay: cycleDay);
   }
-  if (cycleDay == window.closesCycleDay) {
+  if (cycleDay == closesDay) {
     return TtcHeroLine(TtcHeroState.windowLastDay, cycleDay: cycleDay);
   }
 
@@ -323,11 +536,120 @@ TtcHeroLine ttcHomeHeroLine({DateTime? on}) {
   if (untilPeriod == 0) {
     return TtcHeroLine(TtcHeroState.periodDue, cycleDay: cycleDay);
   }
+  // ⚠️ "PAST YOUR USUAL LENGTH" NEEDS A USUAL LENGTH — 2026-09-26. This said
+  // it on a first cycle, where the length is the engine's 28-day default, and
+  // on a history too uneven to lean on, while the cards below it (rightly)
+  // stayed on the waiting days and the "late" message stayed silent. The word
+  // now needs the same history the message needs (`ttcLateHistoryReliable`,
+  // via `ttcDayContext`). Without it the hero says the period "may have
+  // started" by now, which is true on any history. Kept for revert: the
+  // periodLate return below ran unconditionally.
+  if (!ctx.lateReliable) {
+    return TtcHeroLine(TtcHeroState.periodExpectedBy, cycleDay: cycleDay);
+  }
   return TtcHeroLine(TtcHeroState.periodLate,
       days: -untilPeriod, cycleDay: cycleDay);
 }
 
 DateTime _dayOnly(DateTime d) => DateTime(d.year, d.month, d.day);
+
+/// The hero for a day a round is running on: its step, the day count that
+/// step keeps, and the next clinic date after the day (§3a). Null on a day
+/// the round is not running (planned, or before its first treatment date).
+///
+/// ⚠️ THE BLOOD TEST IS A DATE, NEVER A COUNT. In the wait the big line is
+/// "Blood test on Fri 24 Oct"; the count is the days AFTER transfer, which is
+/// a thing that has happened, not a verdict getting closer.
+TtcHeroLine? _roundLine(TtcTreatmentCycle round, DateTime day) {
+  final phase = ttcTreatmentPhase(round, day);
+  if (!phase.isRunning) return null;
+  final count = ttcRoundDayCount(round, phase, day);
+  final next = ttcRoundNextAfter(round, day);
+
+  TtcHeroLine line(TtcHeroState s,
+          {int days = 0, TtcTreatmentStep? step, DateTime? date}) =>
+      TtcHeroLine(s,
+          days: count?.$1 ?? days,
+          countStep: count?.$2,
+          kind: round.kind,
+          nextStep: next?.$1,
+          nextOn: next?.$2,
+          step: step,
+          date: date);
+
+  switch (phase) {
+    case TtcRoundPhase.gettingReady:
+      return line(TtcHeroState.treatmentGettingReady);
+    case TtcRoundPhase.stimulation:
+      return line(TtcHeroState.treatmentStimulation);
+    case TtcRoundPhase.trigger:
+      final trig = round[TtcTreatmentStep.trigger]!;
+      return line(TtcHeroState.treatmentTrigger,
+          days: day.difference(_dayOnly(trig)).inDays,
+          step: TtcTreatmentStep.trigger,
+          date: trig);
+    case TtcRoundPhase.procedure:
+      final iui = round[TtcTreatmentStep.iui];
+      final isIui = (iui != null && _dayOnly(iui) == day) ||
+          round.kind == TtcRoundKind.iui;
+      return line(TtcHeroState.treatmentProcedure,
+          step: isIui ? TtcTreatmentStep.iui : TtcTreatmentStep.retrieval,
+          date: day);
+    case TtcRoundPhase.embryoDays:
+      return line(TtcHeroState.treatmentEmbryoDays);
+    case TtcRoundPhase.transfer:
+      return line(TtcHeroState.treatmentTransfer,
+          step: TtcTreatmentStep.transfer, date: day);
+    case TtcRoundPhase.waiting:
+      final beta = round[TtcTreatmentStep.betaTest];
+      return line(TtcHeroState.treatmentWait,
+          step: TtcTreatmentStep.betaTest,
+          date: beta == null || _dayOnly(beta).isBefore(day)
+              ? null
+              : _dayOnly(beta));
+    case TtcRoundPhase.testDay:
+      // The latest test on or before the day: the repeat, once it is here.
+      final rep = round[TtcTreatmentStep.repeatBeta];
+      final beta = round[TtcTreatmentStep.betaTest];
+      final useRep = rep != null && !_dayOnly(rep).isAfter(day);
+      final at = _dayOnly(useRep ? rep : beta!);
+      return TtcHeroLine(TtcHeroState.treatmentTestDay,
+          days: day.difference(at).inDays,
+          kind: round.kind,
+          step: useRep ? TtcTreatmentStep.repeatBeta : TtcTreatmentStep.betaTest,
+          date: at,
+          nextStep: next?.$1,
+          nextOn: next?.$2);
+    case TtcRoundPhase.ownCycle ||
+          TtcRoundPhase.planned ||
+          TtcRoundPhase.result ||
+          TtcRoundPhase.betweenRounds:
+      return null;
+  }
+}
+
+/// S10 and S11: the round she last closed still holds the cycle she is in
+/// (its dates fall in it), so predictions stay off until her next period. The
+/// review appointment, when she added one still ahead, rides in [date].
+TtcHeroLine? _betweenRoundsLine(DateTime day) {
+  final store = TtcTreatmentStore.instance;
+  final last = store.lastClosed;
+  final start = CycleStore.instance.lastPeriodStart;
+  if (last == null) return null;
+  if (start != null && day.isBefore(_dayOnly(start))) return null;
+  if (!ttcRoundRanDuring(last, start, null, DateTime.now())) return null;
+  final review = last[TtcTreatmentStep.reviewAppointment];
+  return TtcHeroLine(
+    last.outcome == TtcRoundOutcome.positive
+        ? TtcHeroState.treatmentResult
+        : TtcHeroState.treatmentBetweenRounds,
+    kind: last.kind,
+    step: TtcTreatmentStep.reviewAppointment,
+    date: review == null || _dayOnly(review).isBefore(day)
+        ? null
+        : _dayOnly(review),
+  );
+}
 
 
 /// The next thing her clinic has her booked for, on or after [on].

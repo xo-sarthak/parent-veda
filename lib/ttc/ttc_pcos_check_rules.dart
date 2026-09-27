@@ -191,11 +191,11 @@ PcosInterpretation interpretPcos(Map<String, String> answers) {
       stop: PcosStop.urgent,
       patterns: const [],
       cappedByContext: false,
-      headline: _en('This needs a medical conversation rather than a check'),
-      body: _en('What you have described is not something a questionnaire '
-          'should try to interpret. Please contact your doctor, or seek urgent '
-          'care if the pain or bleeding is severe. We have not worked out a '
-          'pattern, because this comes first.'),
+      headline: _en('This needs a doctor, not a check'),
+      body: _en("What you've described isn't something a questionnaire should "
+          'try to read. Please contact your doctor, or seek urgent care if the '
+          "pain or bleeding is severe. We haven't worked out a pattern, "
+          'because this comes first.'),
       confidenceNote: null,
     );
   }
@@ -208,10 +208,10 @@ PcosInterpretation interpretPcos(Map<String, String> answers) {
       patterns: const [],
       cappedByContext: false,
       headline: _en('Worth ruling this out first'),
-      body: _en('A late or missing period has one very common explanation, and '
-          'until that is settled a cycle pattern cannot be read as anything '
-          'else. A home test is accurate from the day your period is due. If '
-          'it is negative and your period still does not come, this check will '
+      body: _en('A late or missed period has one very common cause. Until '
+          "that's settled, a cycle pattern can't be read as anything else. A "
+          'home pregnancy test is accurate from the day your period is due. If '
+          "it's negative and your period still doesn't come, this check will "
           'be here.'),
       confidenceNote: null,
     );
@@ -321,11 +321,11 @@ PcosInterpretation interpretPcos(Map<String, String> answers) {
     headline: _headline(level, capped),
     body: _body(level, capped, strengthOf),
     confidenceNote: totalUnknowns >= 3
-        ? _en('You answered "not sure" to a few of these, which is completely '
-            'normal — most people have never been asked to watch for them. It '
-            'means this reading is a rough sketch rather than a full picture, '
-            'and tracking a couple of cycles would sharpen it more than '
-            'answering again would.')
+        ? _en('You answered "not sure" to a few of these, and that\'s '
+            'completely normal. Most people have never been asked to watch for '
+            'them. It means this reading is a rough sketch, not a full picture. '
+            'Tracking a couple of cycles would make it clearer than answering '
+            'again.')
         : null,
   );
 }
@@ -333,49 +333,49 @@ PcosInterpretation interpretPcos(Map<String, String> answers) {
 LocalizedText _headline(PcosLevel level, bool capped) {
   if (capped) return _en('Your cycle is hard to read right now');
   return switch (level) {
-    PcosLevel.none => _en('No strong pattern in what you described'),
+    PcosLevel.none => _en('No strong pattern in what you told us'),
     PcosLevel.watch => _en('A few things worth keeping an eye on'),
-    PcosLevel.discuss => _en('Worth discussing with a doctor'),
-    PcosLevel.soon => _en('Worth a conversation sooner rather than later'),
+    PcosLevel.discuss => _en('Worth talking to a doctor about'),
+    PcosLevel.soon => _en('Worth seeing a doctor sooner rather than later'),
   };
 }
 
 LocalizedText _body(
     PcosLevel level, bool capped, PcosStrength Function(PcosDomain) strength) {
   if (capped) {
-    return _en('Hormonal contraception sets the bleed rather than letting a '
-        'cycle run, and a recent birth or breastfeeding changes cycles for '
-        'entirely ordinary reasons. Either way, what you have described cannot '
-        'be read as evidence about ovulation — in either direction. That is '
-        'not the same as nothing being there. If you have other symptoms, or '
-        'if your cycles were irregular before, those are still worth raising.');
+    return _en('Hormonal contraception controls when you bleed, instead of '
+        'letting a cycle run on its own. A recent birth or breastfeeding also '
+        'changes cycles, for completely normal reasons. Either way, what '
+        "you've described cannot be read as a sign about ovulation, in either "
+        "direction. That isn't the same as nothing being there. If you have "
+        'other symptoms, or your cycles were irregular before, those are still '
+        'worth raising.');
   }
 
   return switch (level) {
-    PcosLevel.none => _en('From what you have entered, your answers do not '
-        'show a pattern of the kind commonly associated with PCOS. That is '
-        'not the same as ruling it out — this is a description of what you '
-        'reported, not a test. If you are having difficulty conceiving, plenty '
-        'of things other than PCOS can be involved, and that is a separate and '
-        'worthwhile conversation.'),
-    PcosLevel.watch => _en('One part of what you described — a cycle that is '
-        'not always predictable, or a symptom that can accompany hormonal '
-        'changes — is worth noticing. On its own it does not make a pattern, '
-        'and things like this are common and often mean nothing. A couple of '
-        'tracked cycles would tell you far more than another questionnaire.'),
+    PcosLevel.none => _en("From what you've entered, your answers don't show "
+        'the kind of pattern often linked with PCOS. That is not the same as '
+        'ruling it out. This describes what you told us. It is not a test. If '
+        "you're finding it hard to conceive, many things other than PCOS can "
+        "be involved, and that's worth a conversation of its own."),
+    PcosLevel.watch => _en('One part of what you described is worth noticing: '
+        "a cycle that isn't always regular, or a symptom that can go with "
+        "hormone changes. On its own it doesn't make a pattern. Things like "
+        'this are common and often mean nothing. A couple of tracked cycles '
+        'would tell you far more than another questionnaire.'),
     PcosLevel.discuss => _en('More than one part of what you described can '
-        'occur together in PCOS or with irregular ovulation. This does not '
-        'diagnose anything — the same combination has other explanations, '
-        'including thyroid and raised prolactin, both ruled out with a simple '
-        'blood test. What it does mean is that there is something specific to '
-        'take to a doctor, rather than a vague worry.'),
+        "happen together in PCOS or with irregular ovulation. This doesn't "
+        'diagnose anything. The same mix has other causes too, including '
+        'thyroid problems and raised prolactin (a hormone), and a simple blood '
+        'test rules out both. What it does mean is that there is something '
+        'specific to take to a doctor, not just a vague worry.'),
     PcosLevel.soon => _en('What you described suggests your cycle may not be '
-        'completing predictably, and that is worth raising now rather than '
-        'waiting for it to settle. The usual advice to try for a year first '
-        'assumes predictable ovulation — if yours is not predictable, that '
-        'assumption does not hold and the year was never your number. Irregular '
+        "finishing on a regular schedule. That's worth raising now, instead "
+        'of waiting for it to settle. The usual advice to try for a year first '
+        "assumes regular ovulation. If yours isn't regular, that advice "
+        "doesn't fit you, and you don't need to wait the full year. Irregular "
         'ovulation is also one of the most treatable things in fertility '
-        'medicine, which is the more useful half of this.'),
+        'care, and that is the more useful half of this.'),
   };
 }
 
@@ -392,24 +392,24 @@ List<LocalizedText> pcosDetailLines(PcosInterpretation r) {
 
   final out = <LocalizedText>[];
   if (cycle) {
-    out.add(_en('Your cycle pattern is the most useful single thing to '
-        'describe to a doctor, because irregular or absent periods can mean '
-        'ovulation is not happening predictably.'));
+    out.add(_en('Your cycle pattern is the most useful thing to describe to '
+        'a doctor. Irregular or missing periods can mean ovulation '
+        "isn't happening on a regular schedule."));
   }
   if (ovul && !cycle) {
-    out.add(_en('The ovulation signs you described are worth mentioning — not '
-        'noticing them does not prove anything on its own, but an unpredictable '
-        'strip pattern is itself informative.'));
+    out.add(_en('The ovulation signs you described are worth mentioning. Not '
+        "noticing them doesn't prove anything on its own, but strips that give "
+        'unpredictable results do tell a doctor something.'));
   }
   if (andro) {
-    out.add(_en('You also mentioned things like hair growth, acne or scalp '
-        'thinning. These can accompany higher androgen levels, and they each '
-        'have other causes too.'));
+    out.add(_en('You also mentioned things like hair growth, acne or thinning '
+        'hair. These can go with higher androgen levels (hormones like '
+        'testosterone), and each one has other causes too.'));
   }
   if (cycle && andro) {
-    out.add(_en('Taken together, those two are the combination worth raising. '
-        'They help a doctor work out whether PCOS, another hormonal cause, or '
-        'something else entirely is affecting ovulation.'));
+    out.add(_en('Together, those two are the mix worth raising. They help a '
+        'doctor work out whether PCOS, another hormone cause, or something '
+        'else is affecting ovulation.'));
   }
   // ---- THE EMPTY CASE IS NOT ONE CASE ---------------------------------------
   //
@@ -442,26 +442,25 @@ List<LocalizedText> pcosDetailLines(PcosInterpretation r) {
     // reassurance line — directly under a body paragraph that has just said
     // these answers cannot be read as evidence in either direction.
     if (r.cappedByContext) {
-      out.add(_en('While the pill is setting your bleed, or while things are '
-          'still settling after a birth, a symptom questionnaire cannot tell '
-          'you much either way. A few cycles once that changes will say far '
-          'more than answering this again.'));
+      out.add(_en('While the pill is controlling your bleed, or while things '
+          "are still settling after a birth, a symptom questionnaire can't "
+          'tell you much either way. A few cycles after that changes will say '
+          'far more than answering this again.'));
       return out;
     }
     out.add(switch (r.level) {
       // Her answers were unremarkable but the verdict was not. Say why, rather
       // than reassuring her against it.
       PcosLevel.soon || PcosLevel.discuss => _en('Nothing in the symptoms you '
-          'described stood out on its own. What moves this is what you have '
-          'already been told, or how long you have been trying — and that '
-          'outranks a questionnaire. It is worth going in with the cycle '
+          'described stood out on its own. What moves this is what you\'ve '
+          "already been told, or how long you've been trying, and that counts "
+          "for more than a questionnaire. It's worth going in with the cycle "
           'history you have.'),
       // Quiet answers, quiet verdict, and the reassurance is earned.
       PcosLevel.watch || PcosLevel.none => _en('If your periods are regular '
-          'and nothing else concerns you, that is genuinely reassuring as far '
-          'as it goes. Fertility can be affected by many things beyond PCOS, '
-          'so difficulty conceiving is still worth a conversation on its own '
-          'terms.'),
+          "and nothing else worries you, that's reassuring as far as it goes. "
+          'Many things beyond PCOS can affect fertility, so if conceiving is '
+          "taking a while, that's still worth a conversation of its own."),
     });
   }
   return out;
@@ -469,7 +468,7 @@ List<LocalizedText> pcosDetailLines(PcosInterpretation r) {
 
 /// The disclaimer that appears on EVERY result, without exception.
 final LocalizedText kPcosResultDisclaimer = _en(
-    'This check is for understanding and for preparing a conversation. It '
-    'cannot diagnose PCOS or anything else, and a result either way does not '
-    'confirm or rule anything out. A doctor can assess your symptoms, your '
-    'cycle history and, where appropriate, an examination and tests.');
+    'This check helps you understand your symptoms and get ready to talk to '
+    'a doctor. It cannot diagnose PCOS or anything else. A result either way '
+    "doesn't confirm or rule anything out. A doctor can look at your symptoms "
+    'and cycle history and, where needed, examine you and run tests.');

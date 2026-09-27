@@ -515,8 +515,24 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                   // is the question she arrived with. Answer it, then explain.
                   // A piece with no scale-setter — a chart page that opens on
                   // its chart — draws no empty rule (2026-09-18).
+                  // ---- THE SHORT ANSWER ------------------------------------
+                  //
+                  // Before the lede, because it is the answer and the lede is
+                  // the scale. Absent on reads that have not written one.
+                  if ((a.shortAnswer?.of(_lang).trim() ?? '').isNotEmpty) ...[
+                    _pad(_shortAnswer(s)),
+                    const SizedBox(height: 22),
+                  ],
+
+                  // ⚠️ ONE "ANSWER FIRST" BLOCK, NOT TWO (review R2,
+                  // 2026-09-26). With a short answer above, the lede is the
+                  // first paragraph under it, without its own rule, so the
+                  // page does not open on two different treatments of the
+                  // same idea.
                   if (a.scaleSetter.of(_lang).trim().isNotEmpty) ...[
-                    _pad(_lede(s)),
+                    _pad(_lede(s,
+                        ruled: (a.shortAnswer?.of(_lang).trim() ?? '')
+                            .isEmpty)),
                     const SizedBox(height: 28),
                   ],
 
@@ -782,6 +798,51 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
     ]);
   }
 
+  /// "The short answer": the eyebrow, then two or three sentences set a size
+  /// up, BETWEEN TWO HAIRLINES, the reader's own aside form.
+  ///
+  /// ⚠️ NOT A TINTED BOX (review R1, 2026-09-26). It was a paragraph on an
+  /// `accent @ 8%` rounded rectangle, which is exactly the "lavender panel for
+  /// a callout" DESIGN-SYSTEM §4.0 addendum 1 banned. The hairlines and the
+  /// weight say "this is the answer" without a fill. Mobbin: Gentler Streak's
+  /// bold lede as the short answer, no box (GS-LEDE,
+  /// https://mobbin.com/screens/d2190af3-708e-414c-aac4-cae0effcde8b); Clue's
+  /// "Top things to know" under the byline, no box (CLUE-TOP,
+  /// https://mobbin.com/screens/8aa23c54-85d1-4da6-acf6-53d62ded4628).
+  /// Blinkist's tinted key takeaways (BLINK-KT) is the counter-example.
+  ///
+  /// ⚠️ THE EYEBROW IS ENGLISH ONLY (R3). It carried `'SEEDHA JAWAB'`, a new
+  /// Hindi string in Latin script, which CLAUDE.md dropped ("Hinglish in
+  /// Latin script") and new work is English. Kept for revert:
+  ///   Container(padding: 16/14/16/16, decoration: BoxDecoration(
+  ///     color: s.accent.withValues(alpha: 0.08),
+  ///     borderRadius: BorderRadius.circular(14)), child: ...
+  ///   Text(_t('THE SHORT ANSWER', 'SEEDHA JAWAB'), style: _meta(s))
+  Widget _shortAnswer(_Skin s) => Container(
+        key: const ValueKey('pv_reader_short_answer'),
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          border: Border(
+            top: BorderSide(color: s.rule),
+            bottom: BorderSide(color: s.rule),
+          ),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('THE SHORT ANSWER', style: _meta(s)),
+            const SizedBox(height: 8),
+            Text(a.shortAnswer!.of(_lang),
+                style: pvManrope(
+                    fontSize: 15.5 * _fs,
+                    height: 1.55,
+                    fontWeight: FontWeight.w600,
+                    color: s.ink)),
+          ],
+        ),
+      );
+
   /// The scale-setter, as a lede rather than as a card.
   ///
   /// ⚠️ WAS A FILLED PASTEL PANEL WITH AN ICON. On a hub that treatment is
@@ -789,10 +850,15 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
   /// it lands on the one sentence that most needs to read as considered rather
   /// than as a callout. A rule and a size change say "this matters" without
   /// shouting, which is how print has done it for two hundred years.
-  Widget _lede(_Skin s) => Container(
-        padding: const EdgeInsets.only(left: 16),
+  ///
+  /// [ruled] is false under a short answer (R2): the same words and face, no
+  /// rule, so there is one "answer first" treatment on the page.
+  Widget _lede(_Skin s, {bool ruled = true}) => Container(
+        padding: EdgeInsets.only(left: ruled ? 16 : 0),
         decoration: BoxDecoration(
-          border: Border(left: BorderSide(color: s.accent, width: 2)),
+          border: ruled
+              ? Border(left: BorderSide(color: s.accent, width: 2))
+              : null,
         ),
         child: Text(a.scaleSetter.of(_lang),
             style: pvFraunces(

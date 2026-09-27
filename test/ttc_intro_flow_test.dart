@@ -29,6 +29,7 @@ import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/ttc/cycle_store.dart';
 import 'package:parentveda/ttc/ttc_care_pathway.dart';
 import 'package:parentveda/ttc/ttc_store.dart';
+import 'package:parentveda/ttc/ttc_treatment_store.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -162,6 +163,21 @@ void main() {
       // generate a fertile window at all — a woman on IVF shown an ovulation
       // estimate is being handed a second opinion against a clinician who
       // outranks our calculation by six places in the truth hierarchy.
+      //
+      // ⚠️ 2026-09-26, THE USER'S DECISION: the answer sets the pathway (and
+      // with it the tier), and the first date her clinic gives her for this
+      // cycle hands the timing over. The label alone is her own cycle. Kept
+      // for revert: the two expectations below held straight after the tap.
+      expect(TtcStore.instance.path, TtcPath.ivf);
+      expect(TtcStore.instance.pathway.ownership,
+          TimingOwnership.clinicControlled);
+      expect(TtcStore.instance.today.clinicInvolved, isFalse);
+      // 2026-09-26: a clinic owns the timing only with a real date from
+      // her clinic for this cycle in the treatment tracker, never on the
+      // pathway label alone. Kept for revert: the label alone did it.
+      TtcTreatmentStore.instance.setDate(TtcTreatmentStep.betaTest,
+          DateTime.now().add(const Duration(days: 20)));
+      addTearDown(TtcTreatmentStore.instance.resetForTest);
       expect(TtcStore.instance.today.clinicInvolved, isTrue);
       expect(TtcStore.instance.today.behaviour.showsFertilityWindow, isFalse,
           reason: 'a clinic-run cycle must not get an app-made window');

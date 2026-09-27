@@ -81,7 +81,14 @@ void main() {
       await pumpTall(tester, const TtcTodayScreen());
       await tester.tap(find.text('Having treatment?'));
       await tester.pumpAndSettle();
-      expect(find.byType(TtcPathChooser), findsOneWidget);
+      // 2026-09-26 (docs/TTC-TREATMENT-FLOW.md decision 2): the chooser is
+      // commented out of the treatment screen; the start flow asks the kind
+      // of round. The door still lands on the treatment screen, which opens
+      // on "Starting treatment?". Kept for revert:
+      //   expect(find.byType(TtcPathChooser), findsOneWidget);
+      expect(find.byType(TtcTreatmentScreen), findsOneWidget);
+      expect(find.byKey(const ValueKey('ttc_start_treatment_card')),
+          findsOneWidget);
     });
   });
 
@@ -125,33 +132,75 @@ void main() {
       await tester.tap(find.text(TtcPath.ivf.label(false)));
       await tester.pumpAndSettle();
 
+      // 2026-09-26: the tap sets the label, and the label alone is her own
+      // cycle; the first date from her clinic hands the timing over. Kept for
+      // revert: the three expectations below held straight after the tap.
+      expect(TtcStore.instance.path, TtcPath.ivf);
+      expect(TtcStore.instance.today.clinicInvolved, isFalse);
+      // 2026-09-26: a clinic owns the timing only with a real date from
+      // her clinic for this cycle in the treatment tracker, never on the
+      // pathway label alone. Kept for revert: the label alone did it.
+      TtcTreatmentStore.instance.setDate(TtcTreatmentStep.betaTest,
+          DateTime.now().add(const Duration(days: 20)));
+      addTearDown(TtcTreatmentStore.instance.resetForTest);
+
       // This is the defect the design existed to fix, now actually reachable.
       expect(TtcStore.instance.today.fertility, isNull);
       expect(TtcStore.instance.today.estimatedOvulationDay, isNull);
       expect(TtcStore.instance.today.clinicInvolved, isTrue);
     });
 
-    testWidgets('and the two questions become answerable', (tester) async {
+    // 2026-09-26 (decision 2): the two questions are worked out from the
+    // round's kind and trigger, and are no longer on the treatment screen.
+    // The widget is kept (commented out of the screen) for revert. Kept for
+    // revert: `expect(find.byType(TtcPathwayQuestions), findsOneWidget);`
+    testWidgets('and the two questions are no longer asked', (tester) async {
       logCleanHistory();
       TtcStore.instance.setPath(TtcPath.iui);
       await pumpTall(tester, const TtcTreatmentScreen());
-      expect(find.byType(TtcPathwayQuestions), findsOneWidget);
+      expect(find.byType(TtcPathwayQuestions), findsNothing);
+      expect(find.byKey(const ValueKey('ttc_start_treatment_card')),
+          findsOneWidget);
     });
 
-    testWidgets('answering them can hand the window back', (tester) async {
+    // ⚠️ REPLACED 2026-09-26. Her answers now pick the tier once her clinic's
+    // dates are in; they do not decide on their own whether the window shows.
+    // Kept for revert:
+    //
+    // testWidgets('answering them can hand the window back', (tester) async {
+    //   logCleanHistory();
+    //   await pumpTall(tester, const TtcPathChooser());
+    //   await tester.tap(find.text(TtcPath.iui.label(false)));
+    //   await tester.pumpAndSettle();
+    //   expect(TtcStore.instance.today.fertility, isNull,
+    //       reason: 'the default is to withhold');
+    //
+    //   // Unmonitored, unmedicated: her body still owns the timing.
+    //   TtcStore.instance
+    //     ..setClinicMonitors(false)
+    //     ..setMedicationControlsOvulation(false);
+    //   expect(TtcStore.instance.today.fertility, isNotNull,
+    //       reason: 'the middle tier is the whole point of the model');
+    // });
+    testWidgets('clearing her clinic dates hands the window back',
+        (tester) async {
       logCleanHistory();
       await pumpTall(tester, const TtcPathChooser());
       await tester.tap(find.text(TtcPath.iui.label(false)));
       await tester.pumpAndSettle();
-      expect(TtcStore.instance.today.fertility, isNull,
-          reason: 'the default is to withhold');
-
-      // Unmonitored, unmedicated: her body still owns the timing.
-      TtcStore.instance
-        ..setClinicMonitors(false)
-        ..setMedicationControlsOvulation(false);
       expect(TtcStore.instance.today.fertility, isNotNull,
-          reason: 'the middle tier is the whole point of the model');
+          reason: 'a label with no clinic dates is her own cycle');
+      // 2026-09-26: a clinic owns the timing only with a real date from
+      // her clinic for this cycle in the treatment tracker, never on the
+      // pathway label alone. Kept for revert: the label alone did it.
+      TtcTreatmentStore.instance.setDate(TtcTreatmentStep.betaTest,
+          DateTime.now().add(const Duration(days: 20)));
+      addTearDown(TtcTreatmentStore.instance.resetForTest);
+      expect(TtcStore.instance.today.fertility, isNull,
+          reason: 'a clinic date for this cycle withholds it');
+      TtcTreatmentStore.instance.clearCycle();
+      expect(TtcStore.instance.today.fertility, isNotNull,
+          reason: 'the round is over: her own cycle again');
     });
 
     test('the ownership tiers are all reachable from the chooser', () {

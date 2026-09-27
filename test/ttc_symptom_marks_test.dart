@@ -36,12 +36,13 @@ void main() {
             'different app inside their own card: $bare');
   });
 
-  test('the eight feelings are the only ones drawn as faces', () {
+  test('the feelings are the only ones drawn as faces', () {
     // ⚠️ A FACE IS A CLAIM ABOUT AN EXPRESSION, so it belongs only where the
     // subject is genuinely how she felt. A smiling face on "cramping" would be
     // the app editorialising about a symptom.
     final faces = [for (final s in all) if (ttcMoodFor(s.id) != null) s.id];
-    expect(faces.length, 8);
+    // Twelve since 2026-09-26: the eight, plus the four feelings of trying.
+    expect(faces.length, 12);
     final feelings =
         kTtcSymptomGroups.firstWhere((g) => g.id == kTtcFeelingGroup);
     expect(faces.toSet(), feelings.symptoms.map((s) => s.id).toSet());

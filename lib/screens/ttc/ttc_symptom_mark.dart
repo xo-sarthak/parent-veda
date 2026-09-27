@@ -175,6 +175,12 @@ TtcGlyph? ttcGlyphFor(String id) => switch (id) {
       'alcohol' => TtcGlyph.glass,
       'illness' => TtcGlyph.thermometer,
       'meditation' => TtcGlyph.ripples,
+      // ⚠️ BORROWED FROM THE PREGNANCY SYMPTOMS DOOR, and safe to borrow: no
+      // other TTC chip draws either, and the shared-glyph test only guards
+      // marks that can meet inside one TTC card. A squeeze drawn inward for
+      // Kegels, the three soft lines of a slow breath for Breathing.
+      'kegels' => TtcGlyph.tighten,
+      'breathing' => TtcGlyph.breath,
       _ => null,
     };
 

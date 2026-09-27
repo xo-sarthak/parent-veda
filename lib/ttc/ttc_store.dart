@@ -24,12 +24,18 @@ import '../services/remote/supabase_repo.dart';
 import 'cycle_store.dart';
 import 'ttc_chapter.dart';
 import 'ttc_sync.dart';
+import 'ttc_treatment_round.dart';
+import 'ttc_treatment_store.dart';
 
 class TtcStore extends ChangeNotifier with TtcSyncedStore {
   TtcStore._() {
     // A cycle change is a journey change: rebroadcast so a screen only has to
     // listen to one store.
     CycleStore.instance.addListener(notifyListeners);
+    // And so is a clinic date: since 2026-09-26 the dates in the treatment
+    // tracker decide who owns the timing ([ownership]), so entering or
+    // clearing one must rebuild every screen bound to this store.
+    TtcTreatmentStore.instance.addListener(notifyListeners);
     _load();
   }
   static final TtcStore instance = TtcStore._();
@@ -40,6 +46,7 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
   static const _partnerKey = 'ttc_partner_joined';
   static const _monitorsKey = 'ttc_clinic_monitors';
   static const _medicatedKey = 'ttc_medicated_cycle';
+  static const _statedLengthKey = 'ttc_stated_cycle_length';
 
   static const _engine = TtcChapterEngine();
 
@@ -47,6 +54,7 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
   TtcPath _path = TtcPath.natural;
   bool? _clinicMonitors;
   bool? _medicated;
+  int? _statedLength;
   DateTime? _pregnancyConfirmedOn;
   bool _partnerJoined = false;
   bool _loaded = false;
@@ -93,7 +101,105 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
   /// Entering it takes one tap; leaving it means finding two questions on the
   /// treatment screen that nothing points at. The fix belongs at the door, not
   /// in the rule — see `docs/STILL-OPEN.md` §30.
-  TimingOwnership get ownership => pathway.ownership;
+  ///
+  /// ⚠️ DECIDED 2026-09-26: THE EVIDENCE IS REAL CLINIC DATES. The user's
+  /// decision, and the fix §30 was waiting for, made in the one place every
+  /// surface already reads: a clinic owns the timing of the cycle she is in
+  /// only when the treatment tracker holds a date her clinic gave her for it
+  /// ([ownershipOfCycle], `ttcTimingOwnershipFromEvidence`). The label and
+  /// her two answers still pick the tier once dates exist. With a label and no
+  /// dates, the whole app treats the cycle as hers.
+  ///
+  /// This is not the 2026-09-05 weakening above. That kept the label as the
+  /// evidence and simply ignored it until she answered; this keeps the rule
+  /// exactly as strict (a clinic that owns the timing is never contradicted,
+  /// on any surface) and changes only what proves a clinic owns it. The tests
+  /// that assumed label-only ownership now enter a clinic date, with a note
+  /// citing this decision. Kept for revert:
+  ///   TimingOwnership get ownership => pathway.ownership;
+  ///
+  /// ⚠️ AND A ROUND RUNS IT FROM ITS FIRST TREATMENT DAY (2026-09-26,
+  /// docs/TTC-TREATMENT-FLOW.md decision 1). A round with a kind (saved by the
+  /// start flow) owns the cycle she is in from its first treatment date until
+  /// she closes it (`ttcTreatmentActive`), whatever period she logs in
+  /// between, and its kind and trigger pick the tier (`ttcRoundTier`,
+  /// decision 2). Its dates for NEXT month do not hand this month over: a
+  /// planned round leaves her on her own cycle. Once closed, it moves to the
+  /// round history, whose dates still hold the cycle they fall in, so her
+  /// fertile days come back with the next period she logs (decision 5). A
+  /// legacy round (an older blob with no kind) keeps the evidence rule below
+  /// unchanged. Kept for revert:
+  ///   TimingOwnership get ownership =>
+  ///       ownershipOfCycle(CycleStore.instance.lastPeriodStart);
+  TimingOwnership get ownership {
+    final round = TtcTreatmentStore.instance.cycle;
+    final start = CycleStore.instance.lastPeriodStart;
+    if (round.kind == null) return ownershipOfCycle(start);
+    if (ttcTreatmentActive(round, DateTime.now())) return ttcRoundTier(round);
+    return _ownershipOf(start, null, includeCurrent: false);
+  }
+
+  /// Who owns the timing of the cycle that began on [start] and ran until
+  /// [nextStart] (null for the cycle she is in). The same evidence rule as
+  /// [ownership], asked of any cycle, so an earlier cycle her clinic ran keeps
+  /// its refusal when she looks back at it.
+  ///
+  /// ⚠️ EVERY ROUND COUNTS, THE CLOSED ONES TOO (2026-09-26). The current
+  /// round and each round in her history answer for the cycles they ran in:
+  /// a round with a kind by its tier (`ttcRoundTier`) wherever it ran
+  /// (`ttcRoundRanDuring`), a legacy round by the evidence rule it always had.
+  /// Only cycles a round ran in are held; earlier cycles before any round keep
+  /// their look-back fertile days. Kept for revert, the one-round rule:
+  ///   final steps =
+  ///       TtcTreatmentStore.instance.cycle.stepsWithin(start, nextStart);
+  ///   return ttcTimingOwnershipFromEvidence(
+  ///     pathway: pathway,
+  ///     hasClinicDates: steps.isNotEmpty,
+  ///     medicationDated: steps.contains(TtcTreatmentStep.stimStart) ||
+  ///         steps.contains(TtcTreatmentStep.trigger) ||
+  ///         steps.contains(TtcTreatmentStep.transfer),
+  ///   );
+  TimingOwnership ownershipOfCycle(DateTime? start, {DateTime? nextStart}) =>
+      _ownershipOf(start, nextStart, includeCurrent: true);
+
+  TimingOwnership _ownershipOf(DateTime? start, DateTime? nextStart,
+      {required bool includeCurrent}) {
+    final t = TtcTreatmentStore.instance;
+    final today = DateTime.now();
+    var best = TimingOwnership.parentveda;
+    for (final r in [if (includeCurrent) t.cycle, ...t.history]) {
+      if (r.isEmpty) continue;
+      final TimingOwnership own;
+      if (r.kind != null) {
+        if (!ttcRoundRanDuring(r, start, nextStart, today)) continue;
+        own = ttcRoundTier(r);
+      } else {
+        final steps = r.stepsWithin(start, nextStart);
+        own = ttcTimingOwnershipFromEvidence(
+          pathway: pathway,
+          hasClinicDates: steps.isNotEmpty,
+          medicationDated: steps.contains(TtcTreatmentStep.stimStart) ||
+              steps.contains(TtcTreatmentStep.trigger) ||
+              steps.contains(TtcTreatmentStep.transfer),
+        );
+      }
+      if (own == TimingOwnership.clinicControlled) return own;
+      if (own == TimingOwnership.clinicGuided) best = own;
+    }
+    return best;
+  }
+
+  /// The usual cycle length she TOLD us (the "Should I test?" chat asks when
+  /// it has nothing to count with). Read by the engine only until her first
+  /// cycle completes; see `TtcJourneyState.statedCycleLength`. Null = never
+  /// said, and the engine's 28 days applies.
+  ///
+  /// ⚠️ LOCAL ONLY. `ttc_journeys` has no column for it, and a field sent to
+  /// a column that does not exist fails silently (CLAUDE.md, cloud writes are
+  /// fire-and-forget). It stops mattering the day her first cycle completes,
+  /// so a reinstall before then falls back to 28 days, which is the default
+  /// the engine would use anyway.
+  int? get statedCycleLength => _statedLength;
 
   TtcPathwayBehaviour get behaviour => TtcPathwayBehaviour(ownership);
 
@@ -140,10 +246,12 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
         cycle: CycleStore.instance,
         journeyStart: journeyStart,
         pregnancyConfirmed: pregnancyConfirmed,
-        // The one fertility rule: who owns the timing. Derived from the pathway
-        // plus her two answers, never from the treatment name alone.
+        // The one fertility rule: who owns the timing. Since 2026-09-26, real
+        // clinic dates for this cycle; the pathway and her two answers pick
+        // the tier. Never the treatment name alone.
         ownership: ownership,
         today: on,
+        statedCycleLength: _statedLength,
       );
 
   // ---- writes ---------------------------------------------------------------
@@ -184,6 +292,14 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
     notifyListeners();
   }
 
+  /// Records the usual cycle length she stated. Null clears it.
+  void setStatedCycleLength(int? days) {
+    if (_statedLength == days) return;
+    _statedLength = days;
+    _persist();
+    notifyListeners();
+  }
+
   void setPartnerJoined(bool joined) {
     if (_partnerJoined == joined) return;
     _partnerJoined = joined;
@@ -218,6 +334,7 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
     _path = TtcPath.natural;
     _clinicMonitors = null;
     _medicated = null;
+    _statedLength = null;
     _pregnancyConfirmedOn = null;
     _partnerJoined = false;
     _partnerChapter = null;
@@ -239,6 +356,7 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
       // from "answered no", and the pathway default fills in until she says.
       _clinicMonitors = p.getBool(_monitorsKey);
       _medicated = p.getBool(_medicatedKey);
+      _statedLength = p.getInt(_statedLengthKey);
       final raw = p.getString(_pathKey);
       _path = TtcPath.values.firstWhere(
         (e) => e.name == raw,
@@ -345,6 +463,11 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
         await p.remove(_medicatedKey);
       } else {
         await p.setBool(_medicatedKey, _medicated!);
+      }
+      if (_statedLength == null) {
+        await p.remove(_statedLengthKey);
+      } else {
+        await p.setInt(_statedLengthKey, _statedLength!);
       }
     } catch (_) {/* best-effort */}
   }

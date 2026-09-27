@@ -34,8 +34,8 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
   // twenty-five things she is failing to do unless something tells her, early
   // and plainly, that it is not a list to finish. This stage exists to take
   // pressure off; an unread instruction to relax at the bottom does not.
-  intro: 'Some things really help. Some things do not. '
-      'You do not need to do everything.',
+  intro: "Some things really help. Some things don't. "
+      "You don't need to do everything.",
 
   // ⚠️ THE FILM CAME OFF THE TOP — 2026-09-04, and for the same reason it came
   // off PCOS and IVF: `ttc_conceiving_intro` has no entry in
@@ -60,11 +60,15 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
   // is about to be, warm, and dark enough round the edges for the white type
   // to sit on it under the scrim. The V3 field still renders behind it, so a
   // dead connection gives the hero rather than a grey box.
-  heroImageUrl:
-      'https://images.unsplash.com/photo-1779635163668-61db66b24fc7?w=900&h=700&fit=crop',
+  // Our own photograph (2026-09-27): generated to the door's brief, checked by
+  // eye, mirrored to the R2 bucket. Kept for revert: the previous value.
+  // heroImageUrl: 'https://images.unsplash.com/photo-1779635163668-61db66b24fc7?w=900&h=700&fit=crop',
+  heroImageUrl: 'https://pub-bfbc0773e60e4c5c851b535f08b384bc.r2.dev/ttc_door_fertile_window.jpg',
+  // The new door's headline, a sentence (TtcDoorScreen, 2026-09-26).
+  heroTitle: 'The days that count, and how to use them.',
   heroBlurb: 'About six days in each cycle are the ones that count. Everything '
-      'on this page is either about finding them, or about the things people '
-      'worry about that turn out not to matter.',
+      'on this page helps you find them, or covers the worries that turn out '
+      'not to matter.',
 
   // ---------------------------------------------------------------------------
   //  The selector rail — five cards under the hero, the window first
@@ -89,37 +93,70 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
   // ⚠️ HUES ARE THE APP'S OWN, as on PCOS: 344 `V2BlockHues.watch`, 42
   // `.read`, 104 `.practice`, 206 the clinical blue. 186 is the cyan His side
   // already uses for him, which is the one cross-door consistency worth having.
+  //
+  // ⚠️ SIX TABS, NOT SEVEN, SINCE THE GAP PLAN (2026-09-26). "Waiting and
+  // testing" and "Sex and closeness" arrived as two new tabs, and seven cards
+  // is a rail she scrolls instead of reads. So "Your window" and "How to try"
+  // became ONE tab, "When and how": when in the cycle, how often, which
+  // position, and whether stress stops it. That was the order of the page
+  // before it had a rail, and it is one question asked four ways. Nothing
+  // came off; the two old cards are kept below for revert. His stays before
+  // hers and the doctor stays last, which is what the tests hold.
+  //
+  // ⚠️ THE MERGED TAB KEEPS THE ID 'trying', NOT 'window'. The stress section
+  // is pinned to 'trying' by `ttc_focus_groups_test`, and nothing outside this
+  // file opens the door on 'window'.
+  //
+  // ⚠️ 'sex' IS NOT A FREE CHOICE OF ID. It is `kTtcIntimateGroupId`
+  // (ttc_content_prefs.dart), the one the "Hide sex and intimacy content"
+  // switch removes. Rename it and the switch silently stops working.
   groups: [
+    // Kept for revert (the two tabs before the merge):
+    // TtcFocusGroup(
+    //     id: 'window', mark: IntentMark.cycleRing,
+    //     label: 'Your window',
+    //     icon: Icons.center_focus_weak_outlined,
+    //     hue: 344),
+    // TtcFocusGroup(
+    //     id: 'trying', mark: IntentMark.questionMark,
+    //     label: 'How to try',
+    //     icon: Icons.favorite_border_rounded,
+    //     hue: 42),
     TtcFocusGroup(
-        id: 'window',
-        label: 'Your window',
+        id: 'trying', mark: IntentMark.cycleRing,
+        label: 'When and how',
         icon: Icons.center_focus_weak_outlined,
         hue: 344),
     TtcFocusGroup(
-        id: 'trying',
-        label: 'How to try',
+        id: 'waiting', mark: IntentMark.calendarDay,
+        label: 'Waiting and testing',
+        icon: Icons.hourglass_empty_rounded,
+        hue: 268),
+    TtcFocusGroup(
+        id: 'sex', mark: IntentMark.cuppedHands,
+        label: 'Sex and closeness',
         icon: Icons.favorite_border_rounded,
         hue: 42),
     TtcFocusGroup(
-        id: 'his',
+        id: 'his', mark: IntentMark.spermMark,
         label: 'What he can do',
         icon: Icons.self_improvement_outlined,
         hue: 186),
     TtcFocusGroup(
-        id: 'hers',
-        label: 'What she can do',
+        id: 'hers', mark: IntentMark.improveMark,
+        label: 'What you can do',
         icon: Icons.eco_outlined,
         hue: 104),
     TtcFocusGroup(
-        id: 'doctor',
+        id: 'doctor', mark: IntentMark.askDoctor,
         label: 'See a doctor',
         icon: Icons.medical_services_outlined,
         hue: 206),
   ],
 
   headline: TtcMasterclassTile(
-    title: 'How to improve your chances of getting pregnant',
-    blurb: 'A short course with a fertility doctor. Watch at your own time.',
+    title: 'What helps you get pregnant',
+    blurb: 'A short course with a fertility doctor. Watch in your own time.',
     offeringId: 'ttc_course_basics',
   ),
 
@@ -127,7 +164,7 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
     // -------------------------------------------------------------------------
     TtcFocusSection(
       heading: 'When should we have sex?',
-      group: 'window',
+      group: 'trying', // was 'window', before the merge
       tiles: [
         // ⚠️ THE TOOL IS SECTION ONE, WHICH IS THE WHOLE MERGE. It used to be
         // one of three cards on a menu in front of this page. It is the thing
@@ -141,8 +178,8 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
         // used in two places: the thumbnail on the rail and the header of the
         // piece it opens.
         TtcArticleTile(
-          title: 'Which days can she get pregnant?',
-          blurb: 'About six days each cycle. Here is why.',
+          title: 'Which days can you get pregnant?',
+          blurb: "About six days each cycle. Here's why.",
           art: TtcArt.fertileWindow,
           // The picture lives on the read now (`PvRead.imageUrl`, 2026-09-17)
           // and the rail reads it from there — see `photoForTile`. The URL
@@ -157,30 +194,37 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
               title: 'Wetness changes',
               body: 'A few days before the egg is released, the fluid becomes '
                   'clear, wet and stretchy. It looks a little like raw egg '
-                  'white. This is the clearest free sign, and it comes BEFORE '
-                  'the best days — which is what makes it useful.',
+                  'white. This is the clearest free sign, and it comes before '
+                  "the best days. That's what makes it useful.",
             ),
             TtcCarouselCard(
               title: 'Body temperature',
               body: 'Your temperature rises slightly after the egg is '
-                  'released. Useful for learning your own pattern over a few '
-                  'months. Not useful for this month, because by the time it '
+                  "released. It's useful for learning your own pattern over a "
+                  "few months. It won't help this month, because by the time it "
                   'rises, the best days have passed.',
             ),
             TtcCarouselCard(
               title: 'A kit, if you want one',
               body: 'An ovulation kit tests your urine for a hormone that '
                   'rises about a day before the egg is released. It tells you '
-                  'the same thing your body is already telling you. Helpful if '
-                  'your cycles are hard to predict.',
+                  'the same thing your body is already telling you. It helps '
+                  'if your cycles are hard to predict.',
             ),
           ],
         ),
         TtcArticleTile(
           title: 'Ovulation kits: do they help?',
-          blurb: 'Sometimes. Here is when they are worth the money.',
+          blurb: "Sometimes. Here's when they're worth the money.",
           art: TtcArt.fertileWindow,
           readId: 'ttc_read_ovulation_kits',
+        ),
+        // Beside the kits piece, because it is the question the kits piece
+        // leaves open: what to do when your cycle won't tell you when to start.
+        TtcArticleTile(
+          title: 'Kits when your cycles are irregular',
+          blurb: 'When to start, how often to test, and what the strips mean.',
+          readId: 'ttc_read_ovulation_tests_irregular',
         ),
         TtcProductTile(
           title: 'Buy an ovulation kit',
@@ -202,13 +246,21 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
           blurb: 'Every two days is enough. Really.',
           readId: 'ttc_read_timing_myths',
         ),
+        // "How many times" is also asked in months, not only in nights. The
+        // IVF door owns this read (Age and second baby); it is named here too
+        // because this is where the question first comes up.
+        TtcArticleTile(
+          title: 'How many months it usually takes',
+          blurb: "Most couples need several cycles. Here's what's normal.",
+          readId: 'ttc_read_how_long_it_takes',
+        ),
         TtcMythTile(
           title: 'Every day or not?',
-          blurb: 'Does more times mean a better chance?',
+          blurb: 'Does more often mean more likely?',
           myth: 'The more you have sex, the better the chance.',
           fact: 'Only up to a point. Every two days in the fertile week gives '
-              'you the same result as every day. Beyond that, more does not '
-              'add anything — it only adds pressure.',
+              "you the same result as every day. Beyond that, more doesn't "
+              'add anything except pressure.',
         ),
       ],
     ),
@@ -226,25 +278,25 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
           blurb: 'The short answer is no.',
           myth: 'Some positions make a baby more likely.',
           fact: 'No position has been shown to work better than another. '
-              'Sperm reach the cervix within minutes whatever position you '
-              'used. Pick what is comfortable.',
+              'Sperm reach the cervix within minutes, whatever position you '
+              "used. Pick what's comfortable.",
         ),
         TtcMythTile(
-          title: 'Should she lie down after?',
-          blurb: 'You do not have to. Here is why.',
+          title: 'Should you lie down after?',
+          blurb: "You don't have to. Here's why.",
           myth: 'You must lie down with your legs up afterwards.',
           fact: 'Sperm are already past the cervix within minutes. Lying down '
-              'does no harm if you like it, but getting up straight away does '
-              'not wash anything away or undo anything.',
+              'does no harm if you like it. But getting up straight away '
+              "doesn't wash anything away or undo anything.",
         ),
         TtcMythTile(
-          title: 'Does the woman need to finish?',
-          blurb: 'No. It is not needed to conceive.',
-          myth: 'She has to orgasm for it to work.',
-          fact: 'Conception does not need her orgasm. There is a theory that '
-              'it may help sperm move, but it has never been shown to change '
-              'whether someone conceives. Nothing has gone wrong if it does '
-              'not happen.',
+          title: 'Do you need to orgasm?',
+          blurb: "No. It isn't needed to get pregnant.",
+          myth: 'You have to orgasm for it to work.',
+          fact: "Getting pregnant doesn't depend on your orgasm. There's a "
+              'theory that it may help sperm move, but it has never been shown '
+              'to change whether someone gets pregnant. Nothing has gone wrong '
+              "if it doesn't happen.",
         ),
       ],
     ),
@@ -277,6 +329,131 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
     ),
 
     // -------------------------------------------------------------------------
+    //  Waiting and testing — the gap plan's P1 tab (2026-09-26)
+    // -------------------------------------------------------------------------
+    //  ⚠️ THE CHAT SITS WITH THE TEST READS, NOT ON ITS OWN. "Should I test?"
+    //  is a scripted chat of rules, no AI, and it answers the same question
+    //  the reads beside it do, in a few taps instead of a page. Both routes
+    //  to one answer, side by side, so she picks the one that suits the night.
+    TtcFocusSection(
+      heading: 'What happens in the two weeks after?',
+      group: 'waiting',
+      tiles: [
+        TtcArticleTile(
+          title: 'The two-week wait, day by day',
+          blurb: "What's going on inside, and why you can't feel it yet.",
+          readId: 'ttc_read_two_week_wait',
+        ),
+        TtcArticleTile(
+          title: 'Early signs, and why most are also PMS',
+          blurb: "Why your body can't answer before a test can.",
+          readId: 'ttc_read_early_signs',
+        ),
+        TtcArticleTile(
+          title: 'Implantation bleeding or your period?',
+          blurb: 'How to tell them apart, and when bleeding needs a doctor.',
+          readId: 'ttc_read_implantation_bleeding',
+        ),
+      ],
+    ),
+
+    TtcFocusSection(
+      heading: 'When should you test, and how?',
+      group: 'waiting',
+      tiles: [
+        TtcToolTile(
+          title: 'Should I test?',
+          blurb: 'A few taps to work out if a test can tell you anything yet.',
+          surfaceId: 'ttc_chat/should_test',
+        ),
+        TtcArticleTile(
+          title: 'When to take a test, and which one',
+          blurb: 'The first day a test can give you a real answer.',
+          readId: 'ttc_read_when_to_test',
+        ),
+        TtcArticleTile(
+          title: 'How to take a test, step by step',
+          blurb: 'So you can trust what it says.',
+          readId: 'ttc_read_how_to_test',
+        ),
+        TtcArticleTile(
+          title: 'A faint line, explained',
+          blurb: 'What a pale line usually means, and when to test again.',
+          readId: 'ttc_read_faint_line',
+        ),
+      ],
+    ),
+
+    TtcFocusSection(
+      heading: 'What if the test says no?',
+      group: 'waiting',
+      tiles: [
+        TtcArticleTile(
+          title: 'Late period, negative test',
+          blurb: 'The usual reasons, and when to see a doctor.',
+          readId: 'ttc_read_late_negative',
+        ),
+        TtcArticleTile(
+          title: 'Feeling pregnant, but the test says no',
+          blurb: 'Why it can feel so real, and what helps.',
+          readId: 'ttc_read_feeling_pregnant',
+        ),
+      ],
+    ),
+
+    // -------------------------------------------------------------------------
+    //  Sex and closeness — the gap plan's tab, behind the shared-phone switch
+    // -------------------------------------------------------------------------
+    //  ⚠️ THIS WHOLE TAB DISAPPEARS WHEN SHE TURNS ON "Hide sex and intimacy
+    //  content". The door screen removes group `kTtcIntimateGroupId` and any
+    //  tile whose read is in `kTtcIntimateReadIds`, in one place
+    //  (`ttcDoorVisiblePage`). Timing stays in "When and how", because timing
+    //  is not the private part and hiding it would take away the tool.
+    TtcFocusSection(
+      heading: 'When trying changes your sex life',
+      group: 'sex',
+      tiles: [
+        TtcArticleTile(
+          title: 'When sex starts to feel like homework',
+          blurb: 'Small changes that take the pressure off.',
+          readId: 'ttc_read_sex_homework',
+        ),
+        TtcArticleTile(
+          title: 'Low desire, yours and his',
+          blurb: "What's normal, and when it's worth a word with a doctor.",
+          readId: 'ttc_read_low_desire',
+        ),
+        TtcArticleTile(
+          title: 'Staying close through the months',
+          blurb: 'Everyday ways to stay a couple, not just a plan.',
+          readId: 'ttc_read_keeping_close',
+        ),
+      ],
+    ),
+
+    TtcFocusSection(
+      heading: 'The questions that are hard to ask',
+      group: 'sex',
+      tiles: [
+        TtcArticleTile(
+          title: 'Pain during sex',
+          blurb: 'Including vaginismus, and how treatable it is.',
+          readId: 'ttc_read_pain_vaginismus',
+        ),
+        TtcArticleTile(
+          title: 'Which lubricants are sperm-friendly?',
+          blurb: 'Why dryness happens, and what to use instead.',
+          readId: 'ttc_read_lubricants',
+        ),
+        TtcArticleTile(
+          title: 'Sex after the window',
+          blurb: 'Can it affect an early pregnancy? For most couples, no.',
+          readId: 'ttc_read_sex_after_window',
+        ),
+      ],
+    ),
+
+    // -------------------------------------------------------------------------
     //  ⚠️ HIS IS ITS OWN TAB NOW, AND IT SITS BEFORE HERS ON THE RAIL. The
     //  argument is unchanged and is written out at the `groups` list above: a
     //  male factor is involved in about half of couples who take longer than
@@ -304,59 +481,59 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
         // the count made the heading wrong the moment the mechanism was added.
         TtcCarouselTile(
           title: 'How sperm are made',
-          blurb: 'The mechanism, and the three things that change it.',
+          blurb: 'How it works, and the three things that change it.',
           art: TtcArt.hisSideCover,
-          reviewedBy: 'ParentVeda medical review',
+          reviewedBy: 'ParentVeda team',
           coverHue: 268,
           coverTitle: 'His body, from the inside',
-          coverBlurb: 'Six short slides on how sperm are actually made — and '
-              'the three things that genuinely change it.',
+          coverBlurb: 'Six short slides on how sperm are made, and the three '
+              'things that really change it.',
           cards: [
             TtcCarouselCard(
               title: 'His half is *half of it*',
               hue: 268,
               body: 'In about half of couples who take longer than expected, '
-                  'something on his side is part of the reason. It is also the '
-                  'faster half to check — *one test, no procedure*.',
+                  "something on his side is part of the reason. It's also the "
+                  'quicker half to check: *one test, no procedure*.',
               art: TtcArt.hisSideCover,
             ),
             TtcCarouselCard(
-              title: 'Sperm are not stored. They are made, *continuously*.',
+              title: "Sperm aren't stored. They're made *all the time*.",
               hue: 206,
-              body: 'His body is producing them right now, and will keep going '
-                  'all week. What you are looking after is *a production line, not '
-                  'a reserve*.',
+              body: 'His body is making them right now, and will keep going '
+                  "all week. What you're looking after is *a production line, "
+                  'not a store*.',
               art: TtcArt.spermProduction,
             ),
             TtcCarouselCard(
               title: 'Each one takes about *two and a half months* to finish',
               hue: 160,
-              body: 'Roughly *74 days* from start to ready. So the sperm that matter '
-                  'next month were begun before you read this.',
+              body: 'Roughly *74 days* from start to ready. So the sperm that '
+                  'matter next month started growing before you read this.',
               art: TtcArt.threeMonths,
             ),
             TtcCarouselCard(
               title: 'Heat *slows that line down*',
               hue: 42,
               body: 'Sperm are made a little below body temperature, which is '
-                  'why the testes sit outside. Long hot baths, saunas, and a '
-                  'laptop on the lap for hours all add heat. None of it is a '
-                  'disaster. All of it is easy to change.',
+                  'why the testes sit outside the body. Long hot baths, saunas '
+                  'and a laptop on the lap for hours all add heat. None of it is '
+                  'a disaster, and all of it is easy to change.',
               art: TtcArt.heat,
             ),
             TtcCarouselCard(
               title: 'Smoking and heavy drinking *lower the count*',
               hue: 344,
               body: 'Both reduce how many are made and how well they move. '
-                  'Stopping smoking is the single biggest thing most men can '
-                  'do. An occasional drink is not the problem.',
+                  'Stopping smoking is the biggest single thing most men can '
+                  "do. An occasional drink isn't the problem.",
               art: TtcArt.smokeAndDrink,
             ),
             TtcCarouselCard(
               title: 'So a change today shows up in *about three months*',
               hue: 104,
-              body: 'That is slow, and it is also the reason to start now '
-                  'rather than wait for a result. If he is having a test, it is '
+              body: "That's slow, and it's also the reason to start now "
+                  "instead of waiting for a result. If he's having a test, it's "
                   'worth making the changes first.',
               art: TtcArt.threeMonths,
             ),
@@ -364,7 +541,7 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
         ),
         TtcVideoTile(
           title: 'Keep his sperm healthy',
-          blurb: 'What helps, what does not, and how long it takes.',
+          blurb: "What helps, what doesn't, and how long it takes.",
           slotId: 'ttc_video_sperm_health',
           duration: '4 MIN',
         ),
@@ -379,13 +556,13 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
         TtcArticleTile(
           title: 'Whose "side" is it, really',
           blurb: 'About half of couples having difficulty have a male factor '
-              'somewhere in it — very often alongside a female one.',
+              'somewhere in it, very often alongside a female one.',
           readId: 'ttc_read_whose_side',
         ),
         TtcArticleTile(
           title: 'Heat, habits and time',
-          blurb: 'The three levers that genuinely move sperm health, including '
-              'the smokeless tobacco nobody counts.',
+          blurb: 'The three things that really change sperm health, '
+              'including the smokeless tobacco nobody counts.',
           readId: 'ttc_read_heat_habits',
         ),
       ],
@@ -393,32 +570,32 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
 
     // -------------------------------------------------------------------------
     TtcFocusSection(
-      heading: 'What she should do',
+      heading: 'What you should do',
       group: 'hers',
       tiles: [
         TtcCarouselTile(
-          title: '3 things for her',
+          title: '3 things for you',
           blurb: 'Start here. The rest can wait.',
           cards: [
             TtcCarouselCard(
               title: 'Folic acid, today',
               body: 'Start it now, not when you get a positive test. It '
-                  'protects the baby\'s spine and brain in the first few weeks '
-                  '— often before anyone knows they are pregnant. This is the '
-                  'one item on the whole page with the strongest evidence.',
+                  "protects the baby's spine and brain in the first few weeks, "
+                  "often before anyone knows they're pregnant. Of everything on "
+                  'this page, this has the strongest evidence.',
             ),
             TtcCarouselCard(
               title: 'Smoking and alcohol',
-              body: 'Both make conception take longer, and both matter more '
-                  'once you are pregnant. If you are trying, it is worth '
+              body: 'Both make it take longer to get pregnant, and both matter '
+                  "more once you're pregnant. If you're trying, it's worth "
                   'stopping now rather than later.',
             ),
             TtcCarouselCard(
               title: 'Weight, gently',
               body: 'Being well under or well over a healthy weight can make '
                   'cycles irregular, which makes timing harder. Small, steady '
-                  'change helps. Crash dieting does not — it can stop ovulation '
-                  'altogether.',
+                  "changes help. Crash dieting doesn't, and it can stop "
+                  'ovulation altogether.',
             ),
           ],
         ),
@@ -428,7 +605,7 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
           readId: 'ttc_read_three_months_before',
         ),
         TtcArticleTile(
-          title: 'Folic acid: why she needs it',
+          title: 'Folic acid: why you need it',
           blurb: '400 mcg a day, starting before you conceive.',
           readId: 'ttc_read_folic_acid',
         ),
@@ -454,8 +631,8 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
         ),
         TtcArticleTile(
           title: 'Weight, said kindly',
-          blurb: 'What it actually does, why direction beats any destination, '
-              'and no numbers at all.',
+          blurb: 'What it really does, why the direction matters more than '
+              'any goal, and no numbers at all.',
           readId: 'ttc_read_weight_kindly',
         ),
       ],
@@ -476,19 +653,19 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
           readId: 'ttc_read_when_to_seek_help',
         ),
         TtcCarouselTile(
-          title: 'Signs to not wait',
+          title: 'Signs not to wait',
           blurb: 'Reasons to see someone sooner, whatever the calendar says.',
           cards: [
             TtcCarouselCard(
               title: 'Periods that are irregular or missing',
-              body: 'If your cycles vary a lot, or stop for months, it is hard '
-                  'to time anything — and it usually has a treatable cause. '
-                  'Worth checking rather than waiting a year.',
+              body: "If your cycles vary a lot, or stop for months, it's hard "
+                  'to time anything. It usually has a treatable cause, so '
+                  "it's worth checking rather than waiting a year.",
             ),
             TtcCarouselCard(
               title: 'Periods that are very painful',
               body: 'Pain that stops you working or needs strong medicine every '
-                  'month is not something to put up with. It can point to '
+                  "month isn't something to put up with. It can point to "
                   'endometriosis, which is worth finding early.',
             ),
             TtcCarouselCard(
@@ -500,7 +677,7 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
             TtcCarouselCard(
               title: 'Age, honestly',
               body: 'Over 35, the usual advice is to ask after six months '
-                  'rather than twelve. This is not a warning and it is not a '
+                  "rather than twelve. This isn't a warning and it isn't a "
                   'deadline. It only means an earlier look is worth having.',
             ),
           ],

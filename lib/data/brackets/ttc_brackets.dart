@@ -73,8 +73,8 @@ final List<Bracket> kTtcBrackets = [
     label: _t(en: 'Fertile window', hi: 'Fertile window'),
     title: _t(en: 'Conceiving & the fertile window', hi: 'Conceive karna aur fertile window'),
     blurb: _t(
-        en: 'How conception actually works — timing, cycle basics, and the '
-            'myths worth putting down.',
+        en: 'How conception works: timing, cycle basics, and the myths you '
+            'can let go of.',
         hi: 'Conception hota kaise hai — timing, cycle ki basics, aur wo myths '
             'jinhe chhod dena behtar hai.'),
     layers: {
@@ -104,8 +104,8 @@ final List<Bracket> kTtcBrackets = [
     label: _t(en: 'PCOS', hi: 'PCOS'),
     title: _t(en: 'PCOS & hormonal blocks', hi: 'PCOS aur hormonal rukawatein'),
     blurb: _t(
-        en: 'PCOS and fertility — symptoms, insulin and diet, and getting a '
-            'cycle back to something readable.',
+        en: 'PCOS and fertility: symptoms, insulin and diet, and getting your '
+            'cycle back to something you can follow.',
         hi: 'PCOS aur fertility — symptoms, insulin aur diet, aur cycle ko wapas '
             'padhne layak banana.'),
     layers: {
@@ -138,8 +138,8 @@ final List<Bracket> kTtcBrackets = [
     label: _t(en: 'IVF & IUI', hi: 'IVF aur IUI'),
     title: _t(en: 'Infertility & IVF', hi: 'Infertility aur IVF'),
     blurb: _t(
-        en: 'When to seek help, which tests matter, and what IUI and IVF '
-            'actually involve — including what they cost.',
+        en: 'When to get help, which tests matter, and what IUI and IVF '
+            'involve, including what they cost.',
         hi: 'Madad kab lein, kaunse tests maayne rakhte hain, aur IUI-IVF mein '
             'hota kya hai — kharch samet.'),
     layers: {
@@ -226,8 +226,8 @@ final List<Bracket> kTtcBrackets = [
     label: _t(en: 'His side', hi: 'Unki taraf'),
     title: _t(en: 'Male fertility', hi: 'Male fertility'),
     blurb: _t(
-        en: 'Sperm health, the lifestyle factors that genuinely move it, and '
-            'when a test is worth doing.',
+        en: 'Sperm health, the lifestyle changes that really make a '
+            'difference, and when a test is worth doing.',
         hi: 'Sperm health, wo lifestyle cheezein jo sach mein farq daalti hain, '
             'aur test kab karwana theek hai.'),
     layers: {
@@ -268,8 +268,8 @@ final List<Bracket> kTtcBrackets = [
     label: _t(en: 'After a loss', hi: 'Nuksaan ke baad'),
     title: _t(en: 'Trying again after loss', hi: 'Nuksaan ke baad phir se koshish'),
     blurb: _t(
-        en: 'Physical recovery, when it is safe to try again, and support for '
-            'the part that has no timeline.',
+        en: "Physical recovery, when it's safe to try again, and support for "
+            "the feelings that don't follow a timeline.",
         hi: 'Sharir ka theek hona, phir se koshish kab safe hai, aur us hisse ke '
             'liye sahara jiska koi timeline nahi hota.'),
     layers: {
@@ -297,10 +297,14 @@ final List<Bracket> kTtcBrackets = [
       // The one layer the workbook actively wanted here, and it is real:
       // `ttc_consult_psych`, "Talking to a psychologist", plus the gynae.
       BracketLayer.consult: BracketLayerSpec.live(['ttc_prepare']),
-      BracketLayer.extras: BracketLayerSpec.live(['ttc_community'],
-          heading: _t(
-              en: 'Others who have been here',
-              hi: 'Aur log jo yahan se guzre hain')),
+      // Community held back for launch (2026-09-26, TTC gap plan §7.1) — kept for revert.
+      // BracketLayer.extras: BracketLayerSpec.live(['ttc_community'],
+      //     heading: _t(
+      //         en: 'Others who have been here',
+      //         hi: 'Aur log jo yahan se guzre hain')),
+      BracketLayer.extras: BracketLayerSpec(
+          state: LayerState.notApplicable,
+          reason: 'Community held back for launch (TTC gap plan §7.1)'),
     },
   ),
 
@@ -316,7 +320,7 @@ final List<Bracket> kTtcBrackets = [
     title: _t(en: 'Mind-body preparation', hi: 'Mann-sharir ki taiyaari'),
     blurb: _t(
         en: 'Stress and fertility, daily practice, and preconception garbh '
-            'sanskar — calm as preparation, not as pressure.',
+            'sanskar. Calm as a way to get ready, not one more pressure.',
         hi: 'Stress aur fertility, roz ka abhyas, aur conceive se pehle ka garbh '
             'sanskar — shanti taiyaari hai, dabaav nahi.'),
     layers: {
@@ -346,6 +350,97 @@ final List<Bracket> kTtcBrackets = [
       BracketLayer.course: BracketLayerSpec.live(['ttc_prepare']),
       BracketLayer.consult:
           BracketLayerSpec(state: LayerState.notCore, reason: 'Not core'),
+      BracketLayer.extras: BracketLayerSpec(
+          state: LayerState.notApplicable, reason: 'Nothing proposed'),
+    },
+  ),
+
+  // ---------------------------------------------------------------------------
+  //  8. Body and cycle — added 2026-09-26 from the TTC gap analysis
+  // ---------------------------------------------------------------------------
+  //  ⚠️ NOT IN THE WORKBOOK, AND THE TEST THAT SAID "SEVEN" WAS TOLD SO. The
+  //  Level Map had seven PRECONCEPTION rows. The gap analysis (the user's
+  //  source of truth since 2026-09-26, docs/TTC-GAP-PLAN.md §8) found about
+  //  120 competitor pieces on the cycle, bleeding, intimate health and the
+  //  conditions that slow conception, with no home here. So this is a decided
+  //  eighth door, not an invented one.
+  //
+  //  ⚠️ ENGLISH ON BOTH SIDES. New work is English (CLAUDE.md, 2026-08-27):
+  //  the Hindi build shows English here, which is now the expected state.
+  //  `bracket_model_test` names both new brackets as English by policy.
+  Bracket(
+    id: 'ttc_body_cycle',
+    stage: LifeStage.tryingToConceive,
+    theme: 'body',
+    hue: 172,
+    label: _t(en: 'Body and cycle', hi: 'Body and cycle'),
+    title: _t(en: 'Your body and your cycle', hi: 'Your body and your cycle'),
+    blurb: _t(
+        en: 'Late periods, bleeding and spotting, intimate health, and the '
+            'conditions that can slow things down.',
+        hi: 'Late periods, bleeding and spotting, intimate health, and the '
+            'conditions that can slow things down.'),
+    layers: {
+      BracketLayer.content: BracketLayerSpec.live([
+        'ttc_read/ttc_read_bleeding_kinds',
+        'ttc_read/ttc_read_slow_conception',
+      ]),
+      BracketLayer.activities:
+          BracketLayerSpec(state: LayerState.notCore, reason: 'Not core'),
+      BracketLayer.tools:
+          BracketLayerSpec.live(['ttc_cycle', 'ttc_calendar']),
+      BracketLayer.products:
+          BracketLayerSpec(state: LayerState.notCore, reason: 'Not core'),
+      BracketLayer.course:
+          BracketLayerSpec(state: LayerState.notCore, reason: 'Not core'),
+      BracketLayer.consult: BracketLayerSpec.live(['ttc_prepare']),
+      BracketLayer.extras: BracketLayerSpec(
+          state: LayerState.notApplicable, reason: 'Nothing proposed'),
+    },
+  ),
+
+  // ---------------------------------------------------------------------------
+  //  9. Trying, but not pregnant yet? — added 2026-09-26 (gap plan, P2)
+  // ---------------------------------------------------------------------------
+  //  ⚠️ A DOOR THAT GATHERS, IT WRITES NOTHING NEW. Every piece behind it
+  //  already lives in another door; this puts the ones she needs after some
+  //  months of trying in one place. Its home position (first after six
+  //  months) is the home's job, not this table's.
+  //
+  //  ⚠️ THE LABEL IS SHORT ON PURPOSE: "Taking a while". A tile on the four
+  //  column grid is about 73dp and the full question would be cut off. The
+  //  door's own headline asks it in full.
+  //
+  //  ⚠️ PRODUCTS ARE REFUSED HERE, the same call as IVF's: a shop on the page
+  //  she opens because it is taking longer is the wrong placement.
+  Bracket(
+    id: 'ttc_not_yet',
+    stage: LifeStage.tryingToConceive,
+    theme: 'treatment',
+    hue: 250,
+    label: _t(en: 'Taking a while', hi: 'Taking a while'),
+    title: _t(
+        en: 'Trying, but not pregnant yet?',
+        hi: 'Trying, but not pregnant yet?'),
+    blurb: _t(
+        en: 'How long it usually takes, when to see a doctor, what a first '
+            'check involves, and getting through the months.',
+        hi: 'How long it usually takes, when to see a doctor, what a first '
+            'check involves, and getting through the months.'),
+    layers: {
+      BracketLayer.content: BracketLayerSpec.live([
+        'ttc_read/ttc_read_how_long_it_takes',
+        'ttc_read/ttc_read_when_to_seek_help',
+      ]),
+      BracketLayer.activities:
+          BracketLayerSpec(state: LayerState.notCore, reason: 'Not core'),
+      BracketLayer.tools:
+          BracketLayerSpec.live(['ttc_fertility_help', 'ttc_tests']),
+      BracketLayer.products: BracketLayerSpec(
+          state: LayerState.notApplicable, reason: 'Not a fit (clinical)'),
+      BracketLayer.course:
+          BracketLayerSpec(state: LayerState.notCore, reason: 'Not core'),
+      BracketLayer.consult: BracketLayerSpec.live(['ttc_prepare']),
       BracketLayer.extras: BracketLayerSpec(
           state: LayerState.notApplicable, reason: 'Nothing proposed'),
     },

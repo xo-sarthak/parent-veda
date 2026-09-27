@@ -28,6 +28,7 @@ import 'package:parentveda/services/life_stage_store.dart';
 import 'package:parentveda/ttc/cycle_store.dart';
 import 'package:parentveda/ttc/ttc_chapter.dart';
 import 'package:parentveda/ttc/ttc_store.dart';
+import 'package:parentveda/ttc/ttc_treatment_store.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -183,6 +184,12 @@ void main() {
       CycleStore.instance.logPeriodStart(DateTime.now().subtract(
           const Duration(days: 5)));
       TtcStore.instance.setPath(TtcPath.ivf);
+      // 2026-09-26: a clinic owns the timing only with a real date from
+      // her clinic for this cycle in the treatment tracker, never on the
+      // pathway label alone. Kept for revert: the label alone did it.
+      TtcTreatmentStore.instance.setDate(TtcTreatmentStep.betaTest,
+          DateTime.now().add(const Duration(days: 20)));
+      addTearDown(TtcTreatmentStore.instance.resetForTest);
       final s = TtcStore.instance.state();
       expect(engine.whyNoEstimate(s), TtcNoEstimate.clinicOwnsTiming);
     });

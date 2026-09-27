@@ -117,6 +117,13 @@ class AskVedaService {
     ///
     /// Still framing, never a filter: she can ask anything from any pathway.
     String? timingOwnership,
+
+    /// Where a clinic round stands today: a `TtcRoundPhase` name (waiting,
+    /// testDay, result, …). Decides whether the service tells the model she is
+    /// not pregnant, does not know yet, or has just had a positive test. Send
+    /// it only while a clinic owns the cycle, and NEVER from the partner's
+    /// account (same rule as [cycleDay]).
+    String? treatmentStep,
     int? monthsTrying,
     /// 'en' | 'hi' — which language's content cards to show (bilingual content
     /// is stored as an English doc plus a Hinglish twin).
@@ -146,6 +153,7 @@ class AskVedaService {
               if (cycleDay != null) 'cycle_day': cycleDay,
               if (ttcPath != null) 'ttc_path': ttcPath,
               if (timingOwnership != null) 'timing_ownership': timingOwnership,
+              if (treatmentStep != null) 'treatment_step': treatmentStep,
               if (monthsTrying != null) 'months_trying': monthsTrying,
               if (lang != null) 'lang': lang,
               if (domain != null) 'domain': domain,

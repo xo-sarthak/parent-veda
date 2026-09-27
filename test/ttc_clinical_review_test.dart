@@ -266,6 +266,12 @@ void main() {
         ..setPath(TtcPath.ovulationInduction)
         ..setClinicMonitors(true)
         ..setMedicationControlsOvulation(false);
+      // 2026-09-26: a clinic owns the timing only with a real date from
+      // her clinic for this cycle in the treatment tracker, never on the
+      // pathway label alone. Kept for revert: the label alone did it.
+      TtcTreatmentStore.instance.setDate(TtcTreatmentStep.betaTest,
+          DateTime.now().add(const Duration(days: 20)));
+      addTearDown(TtcTreatmentStore.instance.resetForTest);
       final today = TtcStore.instance.today;
       expect(today.behaviour.predictsOvulation, isFalse);
       expect(today.behaviour.logsBodySignals, isTrue);

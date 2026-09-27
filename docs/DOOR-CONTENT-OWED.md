@@ -523,3 +523,14 @@ only. Rows carry `MK`.
 | MK8 | `mk_parent_note` — Why this is a real skill, in plain words | Parent note | Coming soon | The brief's own title. The authored half: process not product; never graded or compared to an example; the way back in for the child who has decided she cannot draw. |
 | MK9 | Cross-links to parenting Early Learning (the 6 to 8 edge), Confidence and Communication (sharing is not speaking), Coding (`cd_1114_12`'s private-showcase posture) | Windows | Part built | Coding's window is now real: this door's Show it is the "private, family-only showcase posture" it named. Early Learning exists on the parent side; the 6 to 8 fill cross-links, does not duplicate. Confidence and Communication built; sharing here is a made thing, not a speech. Review file, cross-door table. |
 | MK10 | An art or music teacher | Consult | Held | "Rarely. Held." No row. |
+
+## Trying to conceive
+
+Added 2026-09-26 by the door data pass (TTC gap plan). Both new doors ship with `heroImageUrl: null`, which the door screen handles: the hero draws the V3 field and the bracket's own mark, the same thing every door shows offline. Nothing is broken; a photograph is owed.
+
+| # | What | Format | State | Notes |
+|---|---|---|---|---|
+| TTC1 | Hero photograph for **Body and cycle** (`ttc_body_cycle`, `lib/ttc/focus/ttc_focus_body_cycle.dart`) | Photo | Owed | Calm and warm, dark enough at the edges for white type under the scrim. Never a body, never someone in pain. Something like a folded towel and a cup of tea, or morning light on a bedside table. |
+| TTC2 | Hero photograph for **Trying, but not pregnant yet?** (`ttc_not_yet`, `lib/ttc/focus/ttc_focus_not_yet.dart`) | Photo | Owed | Patience rather than sadness. Never a crying person, never a pregnancy test, never a baby. Something like a window at dusk, or two cups on a table. |
+
+- 2026-09-27: the TTC door hero photos are DONE for all nine doors (our own images, generated to the brief, checked by eye, mirrored to R2 as ttc_door_*.jpg). Possible redo: His side (the running shoes carry a swoosh-like mark).

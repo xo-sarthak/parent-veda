@@ -24,14 +24,23 @@ import '../../ttc/ttc_chapter_data.dart';
 import '../../ttc/ttc_daily_data.dart';
 import '../../ttc/ttc_insight_read.dart';
 import '../../ttc/ttc_prepare_data.dart';
+import '../../ttc/ttc_reads_data.dart';
+import '../../models/pv_read.dart';
 import '../../ttc/ttc_store.dart';
+import '../../services/bracket_resolver.dart';
+import '../../ttc/ttc_content_prefs.dart';
+import '../../ttc/ttc_focus_data.dart';
+import '../../ttc/ttc_home_situation.dart';
+import '../../ttc/ttc_treatment_content.dart';
 import '../../widgets/global_ask_fab.dart' show kAskVedaRoute;
+import 'ttc_focus_screen.dart' show openTtcFocusTile;
 import 'ttc_can_i_screen.dart';
 import 'ttc_common.dart';
 // import 'ttc_insight_screen.dart'; // kept for revert — the insight opens in the reader now
 import 'ttc_prepare_screen.dart';
 import 'ttc_products_screen.dart';
 import 'ttc_strings.dart';
+import 'ttc_surface_router.dart';
 import 'ttc_tests_screen.dart';
 
 /// What these lists have to clear at the bottom: the pinned composer, and
@@ -121,6 +130,13 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
       // opposite ways depending on who is monitoring it, so this is what the
       // service should frame the answer around.
       timingOwnership: s.ownership.id,
+      // Where her clinic round stands today, from the SAME resolver the home
+      // uses, so Ask Veda and the home never disagree about her day. Null
+      // (not sent) on her own cycle. Her round never leaves the partner's
+      // device, the same rule as the cycle day.
+      treatmentStep: widget.partnerMode
+          ? null
+          : ttcHomeRoundPhaseOn(DateTime.now())?.name,
       monthsTrying: days == null ? null : (days / 30).floor(),
       // PRIVACY: her cycle day never leaves the partner's device. See the header.
       cycleDay: widget.partnerMode ? null : s.today.cycleDay,
@@ -333,7 +349,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
         ],
         if (f.actions.isNotEmpty) ...[
           _head(Icons.task_alt_rounded,
-              t.hinglish ? 'Aage kya kar sakte ho' : 'Recommended next actions'),
+              t.hinglish ? 'Aage kya kar sakte ho' : 'What you can do next'),
           TtcCard(
             child: Column(children: [
               for (var i = 0; i < f.actions.length; i++) ...[
@@ -356,12 +372,21 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
         ],
         _head(Icons.menu_book_outlined,
             t.hinglish ? 'Aur jaankari' : 'More information'),
-        if (f.content.isEmpty)
-          _comingSoon(t.hinglish
-              ? 'Is par aur padhne ko jaldi aayega'
-              : 'More reading on this is coming soon')
+        // ⚠️ BUILT, NOT "COMING SOON" (2026-09-26, TTC gap plan: neither
+        // competitor shows an empty section). When the service sends no
+        // reading, we find our own: the TTC reads whose words match the
+        // question, matched on the phone, so it works offline too.
+        // Kept for revert:
+        // if (f.content.isEmpty)
+        //   _comingSoon(t.hinglish
+        //       ? 'Is par aur padhne ko jaldi aayega'
+        //       : 'More reading on this is coming soon')
+        // Her "Hide sex and intimacy content" choice holds here too: a card
+        // the service found is left out the same way the door leaves it out.
+        if (_shownContent(f).isEmpty)
+          for (final r in _matchingReads()) _readCard(r)
         else
-          for (final it in f.content) _itemCard(it),
+          for (final it in _shownContent(f)) _itemCard(it),
         _head(Icons.play_circle_outline_rounded,
             t.hinglish ? 'Videos' : 'Videos'),
         if (f.videos.isEmpty)
@@ -370,23 +395,38 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
               : 'Videos for this are coming soon')
         else
           for (final it in f.videos) _itemCard(it),
-        _head(Icons.forum_outlined,
-            t.hinglish ? 'Community' : 'Community insights'),
-        _comingSoon(t.hinglish
-            ? 'Community insights jaldi aayenge'
-            : 'Community insights are coming soon'),
+        // Community held back for launch (2026-09-26, TTC gap plan §7.1),
+        // kept for revert:
+        // _head(Icons.forum_outlined,
+        //     t.hinglish ? 'Community' : 'Community insights'),
+        // _comingSoon(t.hinglish
+        //     ? 'Community insights jaldi aayenge'
+        //     : 'Community insights are coming soon'),
         _head(Icons.redeem_outlined, t.hinglish ? 'Products' : 'Products'),
+        // Built instead of "coming soon" (2026-09-26): the shelf we already
+        // have, with its reasons. Kept for revert:
+        // _comingSoon(t.hinglish
+        //     ? 'Relevant products jaldi aayenge'
+        //     : 'Relevant products are coming soon')
         if (f.products.isEmpty)
-          _comingSoon(t.hinglish
-              ? 'Relevant products jaldi aayenge'
-              : 'Relevant products are coming soon')
+          _linkCard(Icons.shopping_bag_outlined, "What's worth buying",
+              "The few things worth having while you're trying, and what to skip.",
+              () => openTtcSurface(context, 'ttc_products'))
         else
           for (final it in f.products) _itemCard(it),
         _head(Icons.verified_user_outlined, t.hinglish ? 'Services' : 'Services'),
+        // Built instead of "coming soon" (2026-09-26). Kept for revert:
+        // _comingSoon(t.hinglish
+        //     ? 'Relevant services jaldi aayenge'
+        //     : 'Relevant services are coming soon')
         if (f.services.isEmpty)
-          _comingSoon(t.hinglish
-              ? 'Relevant services jaldi aayenge'
-              : 'Relevant services are coming soon')
+          _linkCard(Icons.support_agent_outlined, 'Talk to an expert',
+              'A fertility specialist, a gynaecologist or a counsellor, when you want a person.',
+              () => Navigator.of(context).push(MaterialPageRoute<void>(
+                    settings: const RouteSettings(name: 'ttc/consults'),
+                    builder: (_) =>
+                        const TtcPrepareScreen(onlyCategory: 'consults'),
+                  )))
         else
           for (final it in f.services) _itemCard(it),
         const SizedBox(height: 18),
@@ -407,7 +447,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
           Row(children: [
             const Icon(Icons.auto_awesome_rounded, size: 18, color: ttcPurple),
             const SizedBox(width: 9),
-            Text(t.hinglish ? 'Veda ka jawaab' : 'Veda Answer',
+            Text(t.hinglish ? 'Veda ka jawaab' : "Veda's answer",
                 style: ttcJakarta(15.5)),
           ]),
           const SizedBox(height: 12),
@@ -443,7 +483,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
           Text(
               t.hinglish
                   ? 'Ask Veda ko personalised jawaab dene ke liye internet chahiye. Connection check karke dobara try karo.'
-                  : 'Ask Veda needs a connection to give you a personalised answer. Please check your internet and try again.',
+                  : "Ask Veda needs the internet to answer you. Please check your connection and try again.",
               style: ttcBody(13.5)),
           const SizedBox(height: 15),
           GestureDetector(
@@ -458,6 +498,60 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
             ),
           ),
         ]),
+      );
+
+  /// A TTC read offered under "More information": same card as a feed item,
+  /// opened through the one reader.
+  Widget _readCard(PvRead r) => _linkCard(
+        Icons.menu_book_outlined,
+        r.title.en,
+        r.teaser.en,
+        () => openTtcSurface(context, 'ttc_read/${r.id}'),
+        kind: 'READ',
+      );
+
+  Widget _linkCard(IconData icon, String title, String body, VoidCallback onTap,
+          {String? kind}) =>
+      Padding(
+        padding: const EdgeInsets.only(bottom: 10),
+        child: TtcCard(
+          padding: const EdgeInsets.all(14),
+          onTap: onTap,
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Container(
+              width: 44,
+              height: 44,
+              alignment: Alignment.center,
+              decoration: const BoxDecoration(
+                  color: ttcPanel,
+                  borderRadius: BorderRadius.all(Radius.circular(13))),
+              child: Icon(icon, size: 20, color: ttcPurple),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (kind != null) ...[
+                      Text(kind,
+                          style: ttcBody(10,
+                              color: ttcPurple, w: FontWeight.w800)),
+                      const SizedBox(height: 3),
+                    ],
+                    Text(title,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: ttcJakarta(14)),
+                    const SizedBox(height: 4),
+                    Text(body,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: ttcBody(12.5, color: ttcMuted, h: 1.4)),
+                  ]),
+            ),
+            const Icon(Icons.chevron_right_rounded, color: ttcMuted),
+          ]),
+        ),
       );
 
   Widget _comingSoon(String label) => TtcCard(
@@ -569,6 +663,62 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
   /// Everything opens ON TOP of Ask Veda, so Back returns to the conversation.
   /// Returns false when there's no specific screen — the caller falls back to
   /// the reader sheet, which still shows the real content.
+  bool get _hideIntimate => TtcContentPrefs.instance.hideIntimate;
+
+  /// Our own reads that match the question, when the service sent none.
+  List<PvRead> _matchingReads() => [
+        for (final r in ttcReadsMatching(_query ?? ''))
+          if (!_hideIntimate || !kTtcIntimateReadIds.contains(r.id)) r,
+      ];
+
+  /// The service's cards, less any she has asked not to see.
+  List<VedaFeedItem> _shownContent(AskVedaResult f) => _hideIntimate
+      ? f.content.where((it) => !_isIntimate(it.docId)).toList()
+      : f.content;
+
+  /// Whether a card is one "Hide sex and intimacy content" takes away: an
+  /// intimate read, an intimate daily card, or a tile on a door's Sex tab.
+  bool _isIntimate(String docId) {
+    var id = docId;
+    if (id.endsWith('_hi')) id = id.substring(0, id.length - 3);
+    if (id.startsWith('ttcread_')) {
+      return kTtcIntimateReadIds.contains(id.substring('ttcread_'.length));
+    }
+    if (id.startsWith('ttcinsight_')) {
+      return kTtcIntimateInsightIds.contains(id.substring('ttcinsight_'.length));
+    }
+    if (id.startsWith('ttcdoor_')) {
+      final tile = _doorTile(id.substring('ttcdoor_'.length));
+      return tile?.$3 == kTtcIntimateGroupId;
+    }
+    return false;
+  }
+
+  /// `<bracketId>__<tile slug>` → the page, the tile and its group, or null.
+  (TtcFocusPage, TtcTile?, String?)? _doorTile(String key) {
+    final cut = key.indexOf('__');
+    final bracketId = cut < 0 ? key : key.substring(0, cut);
+    final page = ttcFocusPageFor(bracketId);
+    if (page == null) return null;
+    if (cut < 0) return (page, null, null);
+    final hit = ttcTileBySlug(page, key.substring(cut + 2));
+    return (page, hit?.$1, hit?.$2);
+  }
+
+  /// A daily card by id, from every set that can show one: the general and
+  /// phase cards and the treatment round's cards.
+  TtcInsight? _insightById(String id) {
+    for (final i in ttcAllInsights) {
+      if (i.id == id) return i;
+    }
+    for (final set in kTtcTreatmentInsights.values) {
+      for (final i in set) {
+        if (i.id == id) return i;
+      }
+    }
+    return null;
+  }
+
   bool _deepLink(VedaFeedItem it) {
     // Hinglish twins carry the same id with a `_hi` suffix.
     var id = it.docId;
@@ -577,9 +727,37 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
     void push(Widget w, String name) => Navigator.of(context).push(
         MaterialPageRoute<void>(builder: (_) => w, settings: RouteSettings(name: name)));
 
+    // A long read (2026-09-27): opens in the one reader through the router,
+    // the same way a door or a message opens it. An id the library no longer
+    // has falls through to the sheet rather than opening the wrong read.
+    if (id.startsWith('ttcread_')) {
+      final readId = id.substring('ttcread_'.length);
+      if (ttcReadById(readId) == null) return false;
+      openTtcSurface(context, '$kTtcReadPrefix$readId');
+      return true;
+    }
+    // A door tile: opens the tile itself, the way the door opens it; the door
+    // when the tile has since moved or gone.
+    if (id.startsWith('ttcdoor_')) {
+      final hit = _doorTile(id.substring('ttcdoor_'.length));
+      if (hit == null) return false;
+      final (page, tile, _) = hit;
+      if (tile != null) {
+        final bracket = bracketById(page.bracketId);
+        if (bracket != null) {
+          openTtcFocusTile(context, tile, bracket.hue);
+          return true;
+        }
+      }
+      openTtcSurface(context, 'ttc_door/${page.bracketId}');
+      return true;
+    }
     if (id.startsWith('ttcinsight_')) {
       final key = id.substring('ttcinsight_'.length);
-      final match = ttcInsights.where((i) => i.id == key);
+      // Every card set, not just the general one: the phase and treatment
+      // cards are in the pool too since 2026-09-27.
+      final found = _insightById(key);
+      final match = [if (found != null) found];
       if (match.isEmpty) return false;
       // The article format (ttc_insight_read.dart). Kept for revert:
       // push(TtcInsightScreen(insight: match.first), 'ttc/insight');
@@ -626,7 +804,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
             child: Text(
                 t.hinglish
                     ? 'Yeh general guidance hai — kuch bhi zaroori ho to apne doctor se zaroor poochho.'
-                    : 'This is general guidance — please confirm anything important with your doctor.',
+                    : 'This is general guidance. Please check anything important with your doctor.',
                 style: ttcBody(11.5, color: ttcMuted, h: 1.5)),
           ),
         ],

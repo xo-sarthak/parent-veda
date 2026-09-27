@@ -32,6 +32,7 @@ import 'package:parentveda/ttc/ttc_cycle_report.dart';
 import 'package:parentveda/ttc/ttc_log_store.dart';
 import 'package:parentveda/ttc/ttc_symptom_data.dart';
 import 'package:parentveda/ttc/ttc_store.dart';
+import 'package:parentveda/ttc/ttc_treatment_store.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -158,6 +159,12 @@ void main() {
     test('a clinic-run cycle draws nothing', () {
       midCycle();
       TtcStore.instance.setPath(TtcPath.ivf);
+      // 2026-09-26: a clinic owns the timing only with a real date from
+      // her clinic for this cycle in the treatment tracker, never on the
+      // pathway label alone. Kept for revert: the label alone did it.
+      TtcTreatmentStore.instance.setDate(TtcTreatmentStep.betaTest,
+          DateTime.now().add(const Duration(days: 20)));
+      addTearDown(TtcTreatmentStore.instance.resetForTest);
       expect(ttcCyclePhaseSpans(), isEmpty,
           reason: 'we laid our own stretches over a cycle a clinician is '
               'directing — truth hierarchy, six places');
@@ -241,6 +248,12 @@ void main() {
         (tester) async {
       midCycle();
       TtcStore.instance.setPath(TtcPath.ivf);
+      // 2026-09-26: a clinic owns the timing only with a real date from
+      // her clinic for this cycle in the treatment tracker, never on the
+      // pathway label alone. Kept for revert: the label alone did it.
+      TtcTreatmentStore.instance.setDate(TtcTreatmentStep.betaTest,
+          DateTime.now().add(const Duration(days: 20)));
+      addTearDown(TtcTreatmentStore.instance.resetForTest);
       await pump(tester);
 
       expect(find.text('Dial'), findsNothing,
@@ -269,8 +282,14 @@ void main() {
       // woman's logging for her clinic's involvement.
       midCycle();
       TtcStore.instance.setPath(TtcPath.ivf);
+      // 2026-09-26: a clinic owns the timing only with a real date from
+      // her clinic for this cycle in the treatment tracker, never on the
+      // pathway label alone. Kept for revert: the label alone did it.
+      TtcTreatmentStore.instance.setDate(TtcTreatmentStep.betaTest,
+          DateTime.now().add(const Duration(days: 20)));
+      addTearDown(TtcTreatmentStore.instance.resetForTest);
       await pump(tester);
-      expect(find.text('We would rather not guess'), findsNothing);
+      expect(find.text("We'd rather not guess"), findsNothing);
       expect(find.textContaining('unlogged'), findsNothing,
           reason: 'the clinic state explained itself as a data problem');
     });

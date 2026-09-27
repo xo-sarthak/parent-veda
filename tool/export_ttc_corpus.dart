@@ -25,7 +25,13 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
+import 'package:parentveda/localization/app_language.dart';
+import 'package:parentveda/models/pv_read.dart';
+import 'package:parentveda/services/bracket_resolver.dart';
 import 'package:parentveda/services/content_ownership.dart';
+import 'package:parentveda/ttc/ttc_focus_data.dart';
+import 'package:parentveda/ttc/ttc_reads_data.dart';
+import 'package:parentveda/ttc/ttc_treatment_content.dart';
 import 'package:parentveda/ttc/ttc_can_i_data.dart';
 import 'package:parentveda/ttc/ttc_chapter_data.dart';
 import 'package:parentveda/ttc/ttc_daily_data.dart';
@@ -72,7 +78,11 @@ void main() {
         'keywords': keywords,
       });
       // The Hinglish twin — same knowledge, retrievable by a Hinglish question.
-      if (clean(bodyHi).isNotEmpty) {
+      // Only when it IS a second language (2026-09-27): new TTC work is English
+      // and many items carry the English in both fields, and an identical twin
+      // is the same text embedded twice, so it takes two of the answer's card
+      // slots with one piece.
+      if (clean(bodyHi).isNotEmpty && clean(bodyHi) != clean(bodyEn)) {
         out.add(<String, dynamic>{
           'doc_id': '${docId}_hi',
           'kind': kind,
@@ -307,6 +317,140 @@ void main() {
         keywords: [m.kind],
       );
     }
+
+    // ---- long reads (S4), 2026-09-27 ----------------------------------------
+    // The 134 reads the gap plan built. Kind 'ttcread', NOT 'read': 'read' is
+    // the editor-owned reads table (content_ownership.dart), and the ratchet
+    // would silently skip every one. The body is what the reader shows, in
+    // its order, with each heading kept beside its words so a chunk that
+    // lands on one section still says what it is about. Custom blocks (the
+    // age question, the faint-line drawing) have no words to embed.
+    String lt(LocalizedText? t, {bool hi = false}) =>
+        t == null ? '' : (hi ? t.hi : t.en);
+    String readBody(PvRead r, {bool hi = false}) {
+      String l(LocalizedText? t) => lt(t, hi: hi);
+      return join([
+        l(r.shortAnswer),
+        l(r.scaleSetter),
+        l(r.teaser),
+        for (final s in r.sections)
+          if (s.custom == null)
+            join([
+              l(s.heading),
+              l(s.summary),
+              ...s.paragraphs.map(l),
+              ...s.bullets.map((b) => '- ${l(b)}'),
+              if (s.tip != null) join([l(s.tip!.title), l(s.tip!.body)]),
+              if (s.mythFact != null)
+                join([
+                  'Myth: ${l(s.mythFact!.myth)}',
+                  'Fact: ${l(s.mythFact!.fact)}',
+                ]),
+              if (s.callout != null)
+                join([l(s.callout!.title), l(s.callout!.body)]),
+            ]),
+        for (final q in r.faqs) 'Q: ${l(q.question)}\nA: ${l(q.answer)}',
+        join([l(r.whenToSeeSomeone.title), l(r.whenToSeeSomeone.body)]),
+        l(r.evidence),
+      ]);
+    }
+
+    for (final r in kTtcReads) {
+      add(
+        docId: 'ttcread_${r.id}',
+        kind: 'ttcread',
+        sourceLabel: 'Trying to conceive',
+        titleEn: r.title.en,
+        titleHi: r.title.hi,
+        bodyEn: readBody(r),
+        bodyHi: readBody(r, hi: true),
+        keywords: [r.kicker.en],
+      );
+    }
+
+    // ---- the phase and treatment daily cards (S4), 2026-09-27 ----------------
+    // Same kind and id prefix as the general cards, so they open the same way
+    // (`openTtcInsight`); the app's deep link now looks in every set.
+    final seenInsights = {for (final i in ttcInsights) i.id};
+    final moreInsights = <TtcInsight>[
+      ...ttcPhaseInsights,
+      for (final set in kTtcTreatmentInsights.values) ...set,
+    ];
+    for (final i in moreInsights) {
+      if (!seenInsights.add(i.id)) continue;
+      add(
+        docId: 'ttcinsight_${i.id}',
+        kind: 'ttcinsight',
+        sourceLabel: 'Trying to conceive',
+        titleEn: i.titleEn,
+        titleHi: i.titleHi,
+        bodyEn: join([i.bodyEn, i.takeawayEn]),
+        bodyHi: join([i.bodyHi, i.takeawayHi]),
+        keywords: [i.topic],
+      );
+    }
+
+    // ---- door prose (S4), 2026-09-27 ----------------------------------------
+    // Only the tiles whose words live on the door itself: an answer sheet, a
+    // myth, a carousel, a side-by-side. A tile that opens a read is already in
+    // the pool as that read. Doc id `ttcdoor_<bracket>__<tile slug>`; the app
+    // opens the tile, or the door if the tile has gone.
+    for (final page in kTtcFocusPages) {
+      add(
+        docId: 'ttcdoor_${page.bracketId}',
+        kind: 'ttcdoor',
+        sourceLabel: 'Trying to conceive',
+        titleEn: bracketById(page.bracketId)?.label.en ?? page.bracketId,
+        titleHi: '',
+        bodyEn: join([page.intro, page.closingLine ?? '']),
+        bodyHi: '',
+      );
+      final seenTiles = <String>{};
+      for (final s in page.sections) {
+        for (final t in s.tiles) {
+          final body = switch (t) {
+            TtcArticleTile(:final readId, :final body) when readId == null =>
+              join(body),
+            TtcMythTile(:final myth, :final fact, :final slides) => join([
+                'Myth: $myth',
+                'Fact: $fact',
+                for (final c in slides) join([c.title, c.body]),
+              ]),
+            TtcCarouselTile(:final cards) => join([
+                for (final c in cards) join([c.title, c.body]),
+              ]),
+            TtcInfographicTile(:final headline, :final left, :final right,
+                    :final footnote) =>
+              join([
+                headline,
+                '${left.label}: ${left.points.join('; ')}',
+                '${right.label}: ${right.points.join('; ')}',
+                footnote ?? '',
+              ]),
+            _ => '',
+          };
+          if (body.trim().isEmpty) continue;
+          final slug = ttcTileSlug(t);
+          if (slug.isEmpty || !seenTiles.add(slug)) continue;
+          add(
+            docId: 'ttcdoor_${page.bracketId}__$slug',
+            kind: 'ttcdoor',
+            sourceLabel: 'Trying to conceive',
+            titleEn: t.title,
+            titleHi: '',
+            bodyEn: join([t.blurb, body]),
+            bodyHi: '',
+            keywords: t.keywords,
+          );
+        }
+      }
+    }
+
+    // Two items must never share an id: the import upserts on doc_id, so the
+    // second would silently replace the first.
+    final ids = <String>{};
+    final dupes = [for (final m in out) if (!ids.add(m['doc_id'] as String)) m['doc_id']];
+    expect(dupes, isEmpty, reason: 'duplicate doc ids: $dupes');
 
     final f = File('build/ttc_corpus.json');
     f.parent.createSync(recursive: true);

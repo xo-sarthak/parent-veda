@@ -42,8 +42,11 @@ import 'ttc_partner_screen.dart';
 import 'ttc_products_screen.dart';
 import 'ttc_transition_screen.dart';
 import 'ttc_treatment_screen.dart';
+import 'ttc_treatment_round_screens.dart' show showTtcCheckInSheet;
+import '../../ttc/ttc_treatment_store.dart' show TtcTreatmentStore;
 import 'ttc_ritual_screen.dart';
 import 'ttc_strings.dart';
+import 'ttc_home_gap.dart' show showTtcPeriodCameNudge;
 
 class TtcTodayScreen extends StatelessWidget {
   const TtcTodayScreen({super.key});
@@ -652,6 +655,28 @@ Future<void> logTtcPeriod(BuildContext context) async {
     if (ok != true) return;
   }
   CycleStore.instance.logPeriodStart(picked);
+  // ⚠️ AN OPEN ROUND ASKS FIRST (2026-09-26, docs/TTC-TREATMENT-FLOW.md
+  // decision 3). A period logged while her round is waiting on a check-in (7
+  // quiet days, or back after 30 days away) never closes it or reads as
+  // either answer: the check-in opens, and the round changes only when she
+  // chooses. The period itself is saved either way.
+  if (!context.mounted) return;
+  if (TtcTreatmentStore.instance.checkInDue()) {
+    await showTtcCheckInSheet(context);
+    return;
+  }
+  // "Talk it through", once, for a new period (2026-09-26). The home's
+  // "Edit period dates" comes through here; the rule is in
+  // `ttcShouldOfferPeriodTalk`.
+  if (!context.mounted) return;
+  final messenger = ScaffoldMessenger.maybeOf(context);
+  if (messenger == null) return;
+  showTtcPeriodCameNudge(
+    navigator: Navigator.of(context),
+    messenger: messenger,
+    start: picked,
+    starts: CycleStore.instance.periodStarts,
+  );
 }
 
 Future<bool?> _confirmCloseStart(BuildContext context, int gap) {

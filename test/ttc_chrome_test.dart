@@ -68,7 +68,10 @@ void main() {
 
     testWidgets('and it still pops', (tester) async {
       await pumpTall(tester, const TtcToolsScreen());
-      await tester.tap(find.text('Open').first);
+      // The hub's rows end in a chevron since 2026-09-26 (see the action
+      // test below); the first row is Cycle Companion, which has a back bar.
+      // Was: find.text('Open').first
+      await tester.tap(find.byIcon(Icons.chevron_right_rounded).first);
       await tester.pumpAndSettle();
       expect(find.byType(TtcToolsScreen), findsNothing);
       await tester.tap(find.byIcon(Icons.arrow_back).first);
@@ -102,10 +105,17 @@ void main() {
           reason: 'two tiles read as the same tool');
     });
 
+    // ⚠️ THE ACTION IS A CHEVRON SINCE 2026-09-26, NOT THE WORD "Open". The
+    // hub became a list (the Mobbin Tools brief: Walmart's services list, a
+    // line icon, the name, one line of purpose, a chevron), and in a list
+    // row the chevron IS the explicit action: the base-UI rule's list row is
+    // "white, hairline separators, ink2 icons, chevron" (DESIGN-SYSTEM §4.0).
+    // The rule this protects is unchanged: every tile shows that it opens.
+    // Was: expect(find.text('Open'), findsNWidgets(tiles));
     testWidgets('and each tile offers an explicit action', (tester) async {
       await pumpTall(tester, const TtcToolsScreen());
       final tiles = [for (final g in ttcToolGroups) ...g.tools].length;
-      expect(find.text('Open'), findsNWidgets(tiles));
+      expect(find.byIcon(Icons.chevron_right_rounded), findsNWidgets(tiles));
     });
   });
 
@@ -154,7 +164,7 @@ void main() {
 
     testWidgets('records still opens', (tester) async {
       await pumpTall(tester, const TtcToolsScreen());
-      await tester.tap(find.text('Records & reports'));
+      await tester.tap(find.text('Records and reports'));
       await tester.pumpAndSettle();
       expect(find.byType(TtcRecordsScreen), findsOneWidget);
     });

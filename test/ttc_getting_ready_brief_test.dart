@@ -45,6 +45,16 @@ const _brief = <(String, String, TtcTileFormat)>[
   ('diet', 'Folic acid and preconception supplements', TtcTileFormat.product),
   ('diet', 'When to start what, and how early', TtcTileFormat.article),
 
+  // 1b) Meal plan — ADDED ON PURPOSE 2026-09-26, from the TTC gap analysis
+  // (docs/TTC-GAP-PLAN.md §3 A, "Getting ready › Meal plan"). A decision, not
+  // a drift: the gap analysis is now the brief for this door.
+  ('meals', 'A week of Indian meals for trying', TtcTileFormat.article),
+  ('meals', 'Ten everyday recipes', TtcTileFormat.article),
+  ('meals', 'Plan your own week', TtcTileFormat.tool),
+  ('meals', 'Iron before pregnancy', TtcTileFormat.article),
+  ('meals', 'Omega-3 without fish', TtcTileFormat.article),
+  ('meals', 'Ask a dietitian: ten questions', TtcTileFormat.article),
+
   // 2) Tests and vaccines
   ('tests', 'Tests and vaccines worth doing first', TtcTileFormat.article),
   ('tests', 'The carrier screening that matters in India',
@@ -62,6 +72,10 @@ const _brief = <(String, String, TtcTileFormat)>[
   ('before', 'Medicines and conditions to check with a doctor',
       TtcTileFormat.article),
   ('before', 'His part', TtcTileFormat.article),
+  // ADDED ON PURPOSE 2026-09-26, same source as the meal plan rows above.
+  ('before', 'Your first gynaecologist visit', TtcTileFormat.article),
+  ('before', 'Can a past abortion affect trying now?', TtcTileFormat.article),
+  ('before', 'Money before a baby', TtcTileFormat.article),
 
   // 5) Your checklist
   ('checklist', 'Your pre-pregnancy checklist', TtcTileFormat.checklist),

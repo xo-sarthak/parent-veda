@@ -227,14 +227,23 @@ void main() {
       expect(currentJourneyState().ownership, ClinicalOwnership.parentveda);
 
       TtcStore.instance.setPath(TtcPath.ivf);
+      // 2026-09-26: the label alone is her own cycle; her clinic's dates hand
+      // the timing over. Kept for revert: `ClinicalOwnership.clinic` and a
+      // refused `fertilityTiming` straight after the label.
+      expect(currentJourneyState().ownership, ClinicalOwnership.parentveda);
+      expect(currentJourneyState().mayInfer(Inferable.fertilityTiming), isTrue);
+      // 2026-09-26: a clinic owns the timing only with a real date from
+      // her clinic for this cycle in the treatment tracker, never on the
+      // pathway label alone. Kept for revert: the label alone did it.
+      TtcTreatmentStore.instance.setDate(TtcTreatmentStep.betaTest,
+          DateTime.now().add(const Duration(days: 20)));
+      addTearDown(TtcTreatmentStore.instance.resetForTest);
       expect(currentJourneyState().ownership, ClinicalOwnership.clinic);
       expect(currentJourneyState().mayInfer(Inferable.fertilityTiming), isFalse);
 
-      TtcStore.instance.setPath(TtcPath.iui);
-      TtcStore.instance.setClinicMonitors(false);
-      TtcStore.instance.setMedicationControlsOvulation(false);
+      TtcTreatmentStore.instance.clearCycle();
       expect(currentJourneyState().ownership, ClinicalOwnership.parentveda,
-          reason: 'her answers should have handed timing back to her');
+          reason: 'clearing the round should have handed timing back to her');
     });
 
     test('it picks up a treatment milestone without being told', () {
@@ -256,6 +265,12 @@ void main() {
       LifeStageStore.instance.setStage(LifeStage.tryingToConceive);
       final before = currentJourneyState().ownership;
       TtcStore.instance.setPath(TtcPath.ivf);
+      // 2026-09-26: a clinic owns the timing only with a real date from
+      // her clinic for this cycle in the treatment tracker, never on the
+      // pathway label alone. Kept for revert: the label alone did it.
+      TtcTreatmentStore.instance.setDate(TtcTreatmentStep.betaTest,
+          DateTime.now().add(const Duration(days: 20)));
+      addTearDown(TtcTreatmentStore.instance.resetForTest);
       expect(currentJourneyState().ownership, isNot(before));
     });
   });

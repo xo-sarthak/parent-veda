@@ -82,7 +82,19 @@ void main() {
           ids.add(tile.readId!);
         }
       }
-      expect(ids, {'ttc_read_loss_recovery', 'ttc_read_trying_again'});
+      // ⚠️ WIDENED 2026-09-26, ON PURPOSE. The gap plan added five loss reads
+      // (chemical, ectopic, causes, recurrent, feelings), each its own piece.
+      // The rule this test holds is unchanged: every card opens a read, and
+      // no prose is typed onto the door.
+      expect(ids, {
+        'ttc_read_loss_recovery',
+        'ttc_read_trying_again',
+        'ttc_read_chemical_pregnancy',
+        'ttc_read_ectopic_pregnancy',
+        'ttc_read_miscarriage_causes',
+        'ttc_read_recurrent_miscarriage',
+        'ttc_read_loss_feelings',
+      });
     });
   });
 

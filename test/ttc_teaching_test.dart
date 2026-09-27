@@ -61,7 +61,7 @@ void main() {
       CycleStore.instance
           .logPeriodStart(DateTime.now().subtract(const Duration(days: 8)));
       await pumpTall(tester, const TtcOvulationScreen());
-      expect(find.textContaining('pharmacy'), findsOneWidget);
+      expect(find.textContaining('chemist'), findsOneWidget);
       // A price, because "buy an ovulation strip" is a different sentence when
       // you do not know if it costs thirty rupees or three thousand.
       expect(find.textContaining('₹'), findsWidgets);
@@ -73,7 +73,7 @@ void main() {
           .logPeriodStart(DateTime.now().subtract(const Duration(days: 8)));
       await pumpTall(tester, const TtcOvulationScreen());
       // The single most important fact about BBT, and it was nowhere.
-      expect(find.textContaining('AFTER ovulation'), findsOneWidget);
+      expect(find.textContaining('It goes up after ovulation'), findsOneWidget);
       expect(find.textContaining('basal thermometer'), findsOneWidget);
     });
 
@@ -115,7 +115,7 @@ void main() {
       const t = TtcS(false);
       // The tracker's whole premise is notice, never diagnose - so this names
       // the thing worth saying and stops.
-      expect(t.severeNoticedBody, contains('does not mean anything is wrong'));
+      expect(t.severeNoticedBody, contains("doesn't mean anything is wrong"));
       expect(t.severeNoticedBody, contains('appointment'));
     });
   });

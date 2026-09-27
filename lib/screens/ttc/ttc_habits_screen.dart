@@ -88,8 +88,8 @@ class TtcHabitsScreen extends StatelessWidget {
           hue: kTtcHabitsHue,
           eyebrow: 'Getting ready',
           title: "Track what you're\nworking on.",
-          intro: 'Whatever you are actually changing. Log the ones you care '
-              'about and leave the rest alone — this is a record, not a '
+          intro: "Whatever you're changing right now. Log the ones you care "
+              'about and leave the rest. This is a record, not a '
               'report card.',
           children: [
             ttcToolPad(Column(
@@ -113,8 +113,8 @@ class TtcHabitsScreen extends StatelessWidget {
                   Expanded(
                     child: Text(
                         'Your cycle, symptoms, weight, mood and his side are '
-                        'all still in Tools. These four are here because they '
-                        'are the ones this section is about.',
+                        'all still in Tools. These four are here because this '
+                        'section is about them.',
                         style: ttcBody(11.5, color: ttcMuted, h: 1.5)),
                   ),
                 ]),

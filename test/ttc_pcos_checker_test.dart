@@ -41,7 +41,7 @@ void main() {
       expect(r.level, PcosLevel.soon);
 
       final lines = pcosDetailLines(r).map((l) => l.en).join(' ');
-      expect(lines, isNot(contains('genuinely reassuring')),
+      expect(lines, isNot(contains('reassuring as far as it goes')),
           reason: 'the detail line reassured her directly underneath a body '
               'paragraph telling her to raise it now');
     });
@@ -61,7 +61,7 @@ void main() {
       expect(r.cappedByContext, isTrue);
 
       final lines = pcosDetailLines(r).map((l) => l.en).join(' ');
-      expect(lines, isNot(contains('genuinely reassuring')),
+      expect(lines, isNot(contains('reassuring as far as it goes')),
           reason: 'a capped reading is an absence of evidence, and an absence '
               'of evidence must never be rendered as good news');
     });
@@ -81,7 +81,7 @@ void main() {
       });
       expect(r.level, PcosLevel.none);
       expect(pcosDetailLines(r).map((l) => l.en).join(' '),
-          contains('genuinely reassuring'));
+          contains('reassuring as far as it goes'));
     });
   });
 

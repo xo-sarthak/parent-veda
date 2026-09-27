@@ -194,7 +194,7 @@ class _GroupRow extends StatelessWidget {
                       Expanded(
                         child: Text(
                             '${ttcRecordDate(latest.takenOn)} · photo saved, '
-                            'number not typed',
+                            'number not entered',
                             style: ttcBody(13, color: ttcSoft, h: 1.4)),
                       ),
                       // The one thing that would complete this row, offered on
@@ -294,7 +294,7 @@ class _Coverage extends StatelessWidget {
                   ],
                   const SizedBox(height: 4),
                   Text(
-                      'Not having one saved here does not mean you have not '
+                      "If one isn't saved here, that doesn't mean you haven't "
                       'had it. Your clinic decides which of these you need.',
                       style: ttcBody(12, color: ttcMuted, h: 1.5)),
                 ]),
@@ -325,7 +325,7 @@ class _CoverRow extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: Text(added ? name : '$name — not added',
+          child: Text(added ? name : '$name · not added',
               style: ttcBody(13,
                   color: added ? ttcTitleInk : ttcMuted,
                   w: added ? FontWeight.w700 : FontWeight.w600)),
@@ -366,8 +366,8 @@ class TtcRecordsEmpty extends StatelessWidget {
               // from a photograph. It cannot, and copy that makes somebody ask
               // "wait, can it do that?" has failed regardless of how it scans.
               Text(
-                  'Photograph it now, and it is on your phone when a doctor '
-                  'asks — with the date, and next to whatever came before it.',
+                  "Take a photo now, and it's on your phone when a doctor "
+                  'asks. It keeps the date, next to whatever came before it.',
                   textAlign: TextAlign.center,
                   style: ttcBody(13.5, h: 1.55)),
               const SizedBox(height: 18),
@@ -389,19 +389,19 @@ class TtcRecordsEmpty extends StatelessWidget {
           ttcSectionTitle('What this becomes'),
           const _Becomes(
             title: 'The same test, twice',
-            body: 'A second AMH sits with the first, so the direction it moved '
-                'is on the row rather than in your memory.',
+            body: 'A second AMH sits next to the first, so you can see which '
+                'way it moved without having to remember.',
           ),
           const SizedBox(height: 10),
           const _Becomes(
             title: 'His results and yours',
-            body: 'Every result carries whose it is, so a semen analysis is as '
-                'findable as an AMH.',
+            body: 'Every result shows whose it is, so a semen analysis is as '
+                'easy to find as an AMH.',
           ),
           const SizedBox(height: 10),
           const _Becomes(
             title: 'The sheet itself, on the phone',
-            body: 'In the waiting room you hold up the report rather than '
+            body: 'In the waiting room, you can show the report instead of '
                 'describing it.',
           ),
         ],
@@ -555,7 +555,7 @@ class TtcRecordTrendScreen extends StatelessWidget {
                   const SizedBox(height: 18),
                   Text(
                       'These are your own readings, in the order you saved '
-                      'them. What they mean is a question for your clinic.',
+                      'them. Your clinic can tell you what they mean.',
                       style: ttcBody(12.5, color: ttcMuted, h: 1.5)),
                   const SizedBox(height: 10),
                 ],
@@ -617,7 +617,7 @@ class _Reading extends StatelessWidget {
                       style: ttcFraunces(26,
                           w: FontWeight.w600, color: ttcTitleInk))
                 else
-                  Text('Photo only, number not typed',
+                  Text('Photo only, number not entered',
                       style: ttcBody(14, color: ttcSoft, w: FontWeight.w700)),
                 const SizedBox(height: 5),
                 Text(ttcRecordDate(record.takenOn),
@@ -723,7 +723,7 @@ class TtcRecordDetailScreen extends StatelessWidget {
                                 style: ttcFraunces(28,
                                     w: FontWeight.w600, color: ttcTitleInk))
                           else ...[
-                            Text('Number not typed',
+                            Text('Number not entered',
                                 style: ttcBody(15,
                                     color: ttcSoft, w: FontWeight.w700)),
                             const SizedBox(height: 12),
@@ -1305,7 +1305,7 @@ class _AddSheetState extends State<_AddSheet> {
                       onTap: _canSave ? _save : () {}),
                   const SizedBox(height: 10),
                   Center(
-                    child: Text('This is a record, not a verdict.',
+                    child: Text('This is a record, not a judgement.',
                         style: ttcBody(12, color: ttcMuted)),
                   ),
                 ]),
@@ -1472,8 +1472,8 @@ class _AppointmentSheetState extends State<_AppointmentSheet> {
         // document that may print as empty boxes.
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text(
-              'Could not prepare the file — it needs a connection the first '
-              'time. Your records are safe either way.',
+              "We couldn't make the file. It needs an internet connection the "
+              'first time. Your records are safe either way.',
               style: ttcBody(13, color: Colors.white)),
         ));
         return;
@@ -1587,7 +1587,7 @@ class _AppointmentSheetState extends State<_AppointmentSheet> {
                 ],
                 const SizedBox(height: 18),
                 Text(
-                    'Photos of each report are one tap from every row on the '
+                    'To see the photo of a report, tap its row on the '
                     'previous screen.',
                     style: ttcBody(12.5, color: ttcMuted, h: 1.5)),
               ]),
@@ -1711,7 +1711,7 @@ class _TypeSheetState extends State<_TypeSheet> {
                             w: FontWeight.w600, color: ttcTitleInk, h: 1.2)),
                     const SizedBox(height: 6),
                     Text(
-                        'Copy the number across exactly as it is printed. '
+                        'Copy the number exactly as it\'s printed. '
                         '${ttcRecordDate(widget.record.takenOn)}.',
                         style: ttcBody(13, h: 1.45)),
                     const SizedBox(height: 18),

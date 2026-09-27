@@ -89,7 +89,7 @@ const List<TtcSemenLimit> kTtcSemenLimits = [
     limit: 30,
     unit: 'per cent',
     plain: 'The share moving forwards rather than in place.',
-    note: 'Usually the most informative single number on the report.',
+    note: 'Usually the most useful single number on the report.',
   ),
   TtcSemenLimit(
     id: 'morphology',
@@ -102,8 +102,8 @@ const List<TtcSemenLimit> kTtcSemenLimits = [
     // man reading "5%" next to a line at "4%" concludes he has scraped past
     // something. He has not — 5 is normal, comfortably. The brief names this
     // explicitly: "do not let a low-looking morphology number read as bad".
-    note: 'Measured strictly. 4 per cent or above is normal — so 5 per cent is '
-        'a normal result, not a borderline one.',
+    note: "It's measured strictly. 4 per cent or above is normal, so "
+        '5 per cent is a normal result, not a borderline one.',
   ),
 ];
 

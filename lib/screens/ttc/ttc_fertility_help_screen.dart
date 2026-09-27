@@ -156,10 +156,10 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
         const SizedBox(height: 14),
         Text(
             t(
-                'You do not have to guess. We will look at where you are and a '
-                    'few fertility factors, and tell you whether it is '
-                    'reasonable to keep trying for now or worth speaking to '
-                    'someone.',
+                "You don't have to guess. We'll look at where you are and a "
+                    'few things that affect fertility. Then we\'ll tell you '
+                    "whether it's fine to keep trying for now, or worth talking "
+                    'to someone.',
                 'Andaaza lagane ki zaroorat nahi. Hum dekhenge ki aap kahan '
                     'hain aur kuch fertility baatein, aur batayenge ki abhi '
                     'koshish jaari rakhna theek hai ya kisi se milna behtar.'),
@@ -237,7 +237,7 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
                   const SizedBox(height: 3),
                   Text(
                       missing == 0
-                          ? t('That is everything we need.',
+                          ? t("That's everything we need.",
                               'Bas itna hi chahiye tha.')
                           : t(
                               'We only need $missing more '
@@ -272,7 +272,7 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
         _Button(
             p: p,
             filled: false,
-            label: t('I already want to speak to someone',
+            label: t('I already want to talk to someone',
                 'Main pehle se hi kisi se baat karna chahti hoon'),
             onTap: _openSummary),
       ],
@@ -290,7 +290,7 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
       out.add((
         t('Cycles', 'Cycles'),
         c.cyclesIrregular
-            ? t('${c.cycleShortest}–${c.cycleLongest} days — variable',
+            ? t('${c.cycleShortest} to ${c.cycleLongest} days, varies',
                 '${c.cycleShortest}–${c.cycleLongest} din — badalta hua')
             : t('${c.cyclesLogged} logged, fairly steady',
                 '${c.cyclesLogged} log kiye, kaafi sthir')
@@ -300,7 +300,7 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
       out.add((
         t('PCOS check', 'PCOS check'),
         c.pcosPatternFound
-            ? t('Showed patterns worth discussing',
+            ? t('Found things worth talking about',
                 'Kuch patterns mile jinpar baat karni chahiye')
             : t('No strong pattern', 'Koi mazboot pattern nahi')
       ));
@@ -427,8 +427,8 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
         return (
           prompt: t('How old are you?', 'Aapki umar kya hai?'),
           note: t(
-              'Age changes when the guidance suggests being seen, not what it '
-                  'says about you.',
+              "Age only changes when it's worth being seen. It isn't a "
+                  'judgement about you.',
               'Umar se ye badalta hai ki guidance kab milne ko kehti hai, aapke '
                   'baare mein kya kehti hai wo nahi.'),
           multi: false,
@@ -438,14 +438,14 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
         );
       case 'pathway':
         return (
-          prompt: t('Have you had a fertility evaluation?',
+          prompt: t('Have you had a fertility check-up?',
               'Kya aapki fertility evaluation hui hai?'),
           note: null,
           multi: false,
           options: [
             ('no', t('No', 'Nahi')),
             ('done', t('Yes, in the past', 'Haan, pehle hui thi')),
-            ('current', t('I am in it right now', 'Abhi chal rahi hai')),
+            ('current', t("I'm having one right now", 'Abhi chal rahi hai')),
           ]
         );
       case 'conditions':
@@ -488,8 +488,8 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
       case 'pelvic':
         return (
           prompt: t(
-              'Have you had pelvic surgery, a ruptured appendix, or a pelvic '
-                  'infection?',
+              'Have you had surgery in your pelvis, a burst appendix, or a '
+                  'pelvic infection?',
               'Kya aapki pelvic surgery, appendix phatna, ya pelvic infection '
                   'hua hai?'),
           note: null,
@@ -501,10 +501,11 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
         );
       case 'partner':
         return (
-          prompt: t('Is there a known concern about his side?',
+          prompt: t('Is there a known concern on his side?',
               'Kya unki taraf koi baat pata hai?'),
           note: t(
-              'An abnormal semen analysis, or anything a doctor has raised.',
+              'Like a semen test that came back abnormal, or anything a doctor '
+                  'has raised.',
               'Semen analysis theek na aana, ya doctor ne kuch kaha ho.'),
           multi: false,
           options: [
@@ -520,8 +521,8 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
               'Kya aap dono mein se kisi ka cancer treatment shuru hone wala '
                   'hai?'),
           note: t(
-              'Asked because fertility preservation has to happen before '
-                  'treatment starts.',
+              'We ask because fertility preservation (saving eggs or sperm) '
+                  'has to happen before treatment starts.',
               'Isliye poochh rahe hain kyunki fertility preservation treatment '
                   'se pehle karni hoti hai.'),
           multi: false,
@@ -560,7 +561,7 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
         // 2. WHY — her own facts, at most three
         if (r.reasons.isNotEmpty) ...[
           const SizedBox(height: 24),
-          Text(t('WHAT LED US HERE', 'HUM YAHAN KAISE PAHUNCHE'),
+          Text(t('WHY WE SAY THIS', 'HUM YAHAN KAISE PAHUNCHE'),
               style: pvManrope(
                   fontSize: 10.5,
                   fontWeight: FontWeight.w800,
@@ -600,7 +601,7 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(t('What this does not mean', 'Iska matlab ye nahi hai'),
+                  Text(t("What this doesn't mean", 'Iska matlab ye nahi hai'),
                       style: pvJakarta(
                           fontSize: 14.5,
                           fontWeight: FontWeight.w700,
@@ -628,7 +629,7 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
           label: inCare
               ? t('Prepare for your next appointment',
                   'Agli appointment ki taiyaari')
-              : t('Prepare for a fertility consultation',
+              : t('Get ready for a fertility appointment',
                   'Fertility consultation ki taiyaari'),
           onTap: _openSummary,
         ),
@@ -646,7 +647,7 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
         const SizedBox(height: 10),
         _Link(
             p: p,
-            label: t('Read: when to seek fertility help',
+            label: t('Read: when to get help with fertility',
                 'Padhein: fertility madad kab lein'),
             onTap: () => _open('ttc_read/ttc_read_when_to_seek_help')),
 
@@ -669,7 +670,8 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
         const SizedBox(height: 30),
         Divider(color: p.line, height: 1),
         const SizedBox(height: 20),
-        Text(t('Prefer to speak to someone?', 'Kisi se baat karna chahengi?'),
+        Text(t('Would you rather talk to someone?',
+                'Kisi se baat karna chahengi?'),
             style: pvJakarta(
                 fontSize: 14.5, fontWeight: FontWeight.w700, color: p.ink1)),
         const SizedBox(height: 8),
@@ -691,7 +693,7 @@ class _TtcFertilityHelpScreenState extends State<TtcFertilityHelpScreen> {
         _Button(
             p: p,
             filled: false,
-            label: t('Start this again', 'Phir se shuru karein'),
+            label: t('Start again', 'Phir se shuru karein'),
             onTap: () async {
               await _store.reset();
               if (mounted) setState(() => _stage = _Stage.intro);

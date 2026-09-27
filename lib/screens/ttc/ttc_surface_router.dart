@@ -61,8 +61,22 @@ import 'ttc_supplements_screen.dart';
 import 'ttc_tests_screen.dart';
 import 'ttc_tools_screen.dart';
 import 'ttc_treatment_screen.dart';
+import 'ttc_treatment_round_screens.dart'
+    show TtcTreatmentStartScreen, TtcTreatmentResultScreen;
 import 'ttc_vaccines_screen.dart';
 import 'ttc_window_screen.dart';
+// ---- the app speaks first (2026-09-26) ------------------------------------
+import '../../services/bracket_resolver.dart';
+import '../../ttc/ttc_focus_data.dart';
+import 'chats/ttc_cycle_report_chat.dart';
+import 'chats/ttc_period_came_chat.dart';
+import 'chats/ttc_should_test_chat.dart';
+import 'ttc_cycle_report_screen.dart';
+import 'doors/ttc_door_screen.dart';
+// import 'ttc_focus_screen.dart'; // kept for revert: ttc_door/<id> opened TtcFocusScreen before 2026-09-26
+import 'ttc_learn_screen.dart';
+import 'ttc_messages_screen.dart';
+import 'ttc_read_blocks_view.dart' show ttcReadCustomBlock;
 
 /// The prefix that opens a long-form read.
 ///
@@ -97,6 +111,9 @@ Widget? ttcScreenForSurface(String id) {
       openRead: (context, readId) =>
           _push(context, kTtcReadPrefix + readId),
       openSurface: _push,
+      // The age question and the faint-line drawing (2026-09-26). Same
+      // renderer as `openTtcArticle`, so a read draws the same either way in.
+      customBlock: ttcReadCustomBlock,
     );
   }
 
@@ -142,6 +159,24 @@ Widget? ttcScreenForSurface(String id) {
     final session = ttcCourseSessionById(id.substring(coursePrefix.length));
     if (session == null) return null;
     return TtcCourseSessionScreen(session: session);
+  }
+
+  // ---- a whole door, by bracket id -----------------------------------------
+  //
+  // ⚠️ ADDED SO A MESSAGE CAN NAME A DOOR (2026-09-26). "Your period came"
+  // falls back to the Mind & body door while its Hard days read is not yet in
+  // the library, and a message holds a surface id, not a widget. Resolved
+  // against the focus pages and the bracket list rather than trusted, the same
+  // way `openTtcFocusTile` does it, so an unknown bracket opens nothing.
+  const doorPrefix = 'ttc_door/';
+  if (id.startsWith(doorPrefix)) {
+    final bracketId = id.substring(doorPrefix.length);
+    final page = ttcFocusPageFor(bracketId);
+    final bracket = bracketById(bracketId);
+    if (page == null || bracket == null) return null;
+    // The new door design (2026-09-26); the old screen is kept for revert:
+    // return TtcFocusScreen(page: page, bracket: bracket);
+    return TtcDoorScreen(page: page, bracket: bracket);
   }
 
   return _ttcStaticSurface(id);
@@ -313,6 +348,12 @@ Widget? _ttcStaticSurface(String id) => switch (id) {
 
       // ---- Treatment ---------------------------------------------------------
       'ttc_treatment' => const TtcTreatmentScreen(),
+      // The round's start flow and its result (2026-09-26,
+      // docs/TTC-TREATMENT-FLOW.md B3), so a card, a chat or a message can
+      // name them. Their own openers push the same screens under
+      // 'ttc/treatment/start' and 'ttc/treatment/result'.
+      'ttc_treatment/start' => const TtcTreatmentStartScreen(),
+      'ttc_treatment/result' => const TtcTreatmentResultScreen(),
       'ttc_records' => const TtcRecordsScreen(),
       'ttc_medication' => const TtcMedicationScreen(),
       'ttc_appointments' => const TtcAppointmentsScreen(),
@@ -355,6 +396,20 @@ Widget? _ttcStaticSurface(String id) => switch (id) {
 
       // ---- Commerce ----------------------------------------------------------
       'ttc_products' => const TtcProductsScreen(),
+
+      // ---- The app speaks first (2026-09-26) --------------------------------
+      // The Messages list, the three scripted chats, and the cycle report as a
+      // surface of its own so a message and a chat chip can name it. It was
+      // reachable only by direct `MaterialPageRoute`s under the route name
+      // 'ttc/cycle_report', which those call sites keep.
+      'ttc_messages' => const TtcMessagesScreen(),
+      // The Learn tab as a surface, so a read or a home rail can say "see
+      // everything" (TTC gap plan, 2026-09-26).
+      'ttc_learn' => const TtcLearnScreen(),
+      'ttc_chat/should_test' => const TtcShouldTestChatScreen(),
+      'ttc_chat/period_came' => const TtcPeriodCameChatScreen(),
+      'ttc_chat/cycle_report' => const TtcCycleReportChatScreen(),
+      'ttc_cycle_report' => const TtcCycleReportScreen(),
 
       _ => null,
     };

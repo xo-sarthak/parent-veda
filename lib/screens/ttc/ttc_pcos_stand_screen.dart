@@ -63,10 +63,10 @@ class _TtcPcosStandScreenState extends State<TtcPcosStandScreen> {
 /// sentence that stops the flow reading as a diagnostic quiz. Two typed copies
 /// of a safety line become two lines that say different things.
 const String kPcosStandEyebrow = 'WHERE DO I STAND';
-const String kPcosStandTitle = 'A read of your own pattern.';
+const String kPcosStandTitle = 'A look at your own pattern.';
 const String kPcosStandIntro =
-    'No score, no match, no verdict. Just your pattern in plain words, and '
-    'what is worth taking to a doctor.';
+    "This won't give you a score or a verdict. It puts your pattern into plain "
+    "words, and shows what's worth taking to a doctor.";
 
 /// The eight questions and the button, with no frame of their own.
 ///
@@ -169,8 +169,8 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
                 n: 2,
                 title: 'Have you gone 3 months or more without a period in '
                     'the last year?',
-                note: 'Leaving aside pregnancy, breastfeeding or birth '
-                    'control.',
+                note: "Don't count time when you were pregnant, "
+                    'breastfeeding or on birth control.',
                 child: _YesNo(
                     value: _a.longGaps,
                     onTap: (v) => _set(() => _a.longGaps = v),
@@ -223,7 +223,7 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
               ttcToolPad(TtcToolQuestion(
                 hue: kPcosHue,
                 n: 5,
-                title: 'Acne for 6 months or more that skincare did not fix?',
+                title: "Acne for 6 months or more that skincare didn't fix?",
                 child: _Degree(
                     value: _a.acne,
                     onTap: (v) => _set(() => _a.acne = v),
@@ -276,7 +276,7 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
 
               const SizedBox(height: 6),
               _pad(TtcToolPrimary(
-                label: 'See my read',
+                label: 'See my pattern',
                 onTap: () {
                   // ⚠️ FIRE AND FORGET, LIKE EVERY OTHER WRITE IN THIS APP.
                   // Local-first: the read is built from `_a` in memory and does
@@ -293,7 +293,8 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
               )),
               const SizedBox(height: 14),
               _pad(Text(
-                  'You can leave any of these blank. The read just says less.',
+                  "You can leave any of these blank. You'll just see a little "
+                  'less.',
                   textAlign: TextAlign.center,
                   style: pvManrope(
                       fontSize: 11.5, height: 1.5, color: p.ink3))),
@@ -350,7 +351,7 @@ class _FactsCard extends StatelessWidget {
       PcosRegularity.irregular =>
         'Across ${facts.completedCycles} logged cycles, your dates have varied.',
       PcosRegularity.notEnoughData =>
-        'Not much logged yet, so the questions below do more of the work.',
+        "You haven't logged much yet, so your answers do more of the work.",
     };
 
     return Container(
@@ -395,8 +396,8 @@ class TtcPcosStandResultScreen extends StatelessWidget {
     return TtcToolScaffold(
       hue: kPcosHue,
       variant: 3,
-      eyebrow: 'Your read',
-      title: 'Here is what you told us,\nsaid back plainly.',
+      eyebrow: 'Your pattern',
+      title: "Here's what you told us,\nin plain words.",
       children: [
               const SizedBox(height: 24),
 
@@ -426,7 +427,7 @@ class TtcPcosStandResultScreen extends StatelessWidget {
 
               const SizedBox(height: 26),
               _pad(TtcToolBlockHead(
-                  label: 'What is worth doing next',
+                  label: "What's worth doing next",
                   hue: 160,
                   mark: _standPainter(_StandMark.next, 160))),
               const SizedBox(height: 10),
@@ -488,7 +489,7 @@ class TtcPcosChecklistScreen extends StatelessWidget {
       variant: 4,
       eyebrow: 'Appointment notes',
       title: 'What to take\nwith you.',
-      intro: 'Screenshot this, or read it out. It is four lines.',
+      intro: "Take a screenshot, or read it out. It's only four lines.",
       children: [
               const SizedBox(height: 24),
               // ⚠️ THE SHARED CARD, NOT A LOCAL COPY OF IT — FOLDED IN

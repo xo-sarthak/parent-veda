@@ -288,10 +288,10 @@ final List<FertilityHelpRule> kFertilityHelpRules = [
     trigger: 'Cancer treatment planned for either partner',
     requiredContext: ['cancerTreatmentPlanned'],
     resultState: FertilityHelpState.dontWait,
-    article: 'Reasons not to wait at all — cancer treatment',
-    displayReason: (_) => _en('Fertility preservation has to happen before '
-        'cancer treatment starts, which makes this the one situation here that '
-        'is genuinely time-critical.'),
+    article: "When shouldn't you wait at all? (cancer treatment)",
+    displayReason: (_) => _en('Fertility preservation (saving eggs or sperm) '
+        'has to happen before cancer treatment starts. That makes this the one '
+        'situation here where timing really matters.'),
   ),
   FertilityHelpRule(
     id: 'irregular_cycles',
@@ -299,16 +299,15 @@ final List<FertilityHelpRule> kFertilityHelpRules = [
         'PCOS diagnosis',
     requiredContext: ['cyclesIrregular', 'knownConditions', 'pcosPatternFound'],
     resultState: FertilityHelpState.dontWait,
-    article: 'Reasons not to wait at all — irregular cycles',
+    article: "When shouldn't you wait at all? (irregular cycles)",
     displayReason: (c) {
       if (c.cycleShortest != null && c.cycleLongest != null) {
         return _en('Your logged cycles have ranged from ${c.cycleShortest} to '
-            '${c.cycleLongest} days. The "try for a year first" guidance '
-            'assumes predictable ovulation — so it was never written for your '
-            'situation.');
+            '${c.cycleLongest} days. The "try for a year first" advice assumes '
+            'regular ovulation, so it was never meant for you.');
       }
-      return _en('Irregular cycles mean the usual waiting period does not '
-          'apply, because it assumes ovulation is predictable.');
+      return _en("Irregular cycles mean the usual waiting time doesn't apply, "
+          'because it assumes ovulation is regular.');
     },
   ),
   FertilityHelpRule(
@@ -316,9 +315,9 @@ final List<FertilityHelpRule> kFertilityHelpRules = [
     trigger: 'Two or more previous miscarriages',
     requiredContext: ['priorMiscarriages'],
     resultState: FertilityHelpState.dontWait,
-    article: 'Reasons not to wait at all — two or more losses',
-    displayReason: (_) => _en('Two or more losses is the point at which '
-        'investigation can reasonably start, rather than after a third.'),
+    article: "When shouldn't you wait at all? (two or more losses)",
+    displayReason: (_) => _en("After two or more losses, it's reasonable to "
+        "start looking for a cause. You don't need to wait for a third."),
   ),
   FertilityHelpRule(
     id: 'known_condition',
@@ -326,10 +325,10 @@ final List<FertilityHelpRule> kFertilityHelpRules = [
         'factor, reduced reserve, previous ectopic',
     requiredContext: ['knownConditions'],
     resultState: FertilityHelpState.dontWait,
-    article: 'Reasons not to wait at all — a known cause',
+    article: "When shouldn't you wait at all? (a known cause)",
     displayReason: (_) => _en('You already know about something that can '
-        'affect conception, which is itself a reason not to wait out a general '
-        'timeline.'),
+        "affect getting pregnant. That's a reason in itself not to wait out the "
+        'usual timeline.'),
   ),
   FertilityHelpRule(
     id: 'partner_factor',
@@ -337,28 +336,28 @@ final List<FertilityHelpRule> kFertilityHelpRules = [
         'analysis',
     requiredContext: ['partnerConcern'],
     resultState: FertilityHelpState.dontWait,
-    article: 'Reasons not to wait at all — a male factor',
+    article: "When shouldn't you wait at all? (a male factor)",
     displayReason: (_) => _en('A known concern on his side is a reason to be '
-        'seen now — and his half is the fastest part of any workup.'),
+        'seen now. His tests are also the quickest part of any check-up.'),
   ),
   FertilityHelpRule(
     id: 'pelvic_history',
     trigger: 'Previous pelvic surgery, ruptured appendix or pelvic infection',
     requiredContext: ['pelvicSurgeryOrInfection'],
     resultState: FertilityHelpState.dontWait,
-    article: 'Reasons not to wait at all — pelvic history',
-    displayReason: (_) => _en('Previous pelvic surgery or infection can affect '
-        'the tubes, which is worth checking rather than waiting out.'),
+    article: "When shouldn't you wait at all? (pelvic history)",
+    displayReason: (_) => _en('Past surgery or infection in the pelvis can '
+        "affect the tubes. That's worth checking, not waiting out."),
   ),
   FertilityHelpRule(
     id: 'painful_periods',
     trigger: 'Very painful or very heavy periods, or pain during sex',
     requiredContext: ['painfulOrHeavyPeriods'],
     resultState: FertilityHelpState.dontWait,
-    article: 'Reasons not to wait at all — pain and heavy bleeding',
+    article: "When shouldn't you wait at all? (pain and heavy bleeding)",
     displayReason: (_) => _en('Very painful or heavy periods are the usual '
-        'reason endometriosis is looked for, and that is a conversation worth '
-        'having sooner.'),
+        "reason doctors look for endometriosis. That's worth talking about "
+        'sooner.'),
   ),
 
   // ---- the normal thresholds ----------------------------------------------
@@ -368,21 +367,20 @@ final List<FertilityHelpRule> kFertilityHelpRules = [
         'a waiting period',
     requiredContext: ['ageBand'],
     resultState: FertilityHelpState.maySeeSpecialist,
-    article: 'The usual guideline — 36 and over',
-    displayReason: (c) => _en('From 36, the guidance is to be seen when you '
-        'first raise it rather than after a waiting period — not because '
-        'anything changes suddenly, but because investigation and treatment '
-        'both take months.'),
+    article: 'How long should you try first? (36 and over)',
+    displayReason: (c) => _en('From 36, the advice is to be seen as soon as '
+        'you ask, not after a waiting period. Nothing changes suddenly at that '
+        "age. It's because tests and treatment both take months."),
   ),
   FertilityHelpRule(
     id: 'twelve_months',
     trigger: 'Twelve months of trying, under 36',
     requiredContext: ['daysTrying', 'ageBand'],
     resultState: FertilityHelpState.maySeeSpecialist,
-    article: 'The usual guideline — twelve months',
-    displayReason: (c) => _en('You have been trying for '
-        '${c.tryingLabel?.en ?? 'over a year'}, which is the point the usual '
-        'guidance describes as worth investigating.'),
+    article: 'How long should you try first? (twelve months)',
+    displayReason: (c) => _en('You\'ve been trying for '
+        '${c.tryingLabel?.en ?? 'over a year'}, which is when the usual advice '
+        'says it\'s worth looking into.'),
   ),
 ];
 
@@ -423,13 +421,13 @@ FertilityHelpResult evaluateFertilityHelp(FertilityHelpContext c) {
     return FertilityHelpResult(
       state: FertilityHelpState.alreadyInCare,
       reasons: const [],
-      headline: _en('You are already in the fertility-care pathway'),
-      body: _en('This check is for working out whether it is time to see '
-          'someone, and you are past that. Nothing here would tell you '
-          'anything your own team cannot.'),
+      headline: _en("You're already getting fertility care"),
+      body: _en("This check helps you work out whether it's time to see "
+          "someone, and you're past that. Nothing here would tell you anything "
+          "your own team can't."),
       notMeaning: _en(''),
-      nextStep: _en('What is worth doing instead is arriving at the next '
-          'appointment with your dates, your reports and your questions in one '
+      nextStep: _en('What helps more now is going to your next appointment '
+          'with your dates, your reports and your questions all in one '
           'place.'),
     );
   }
@@ -457,18 +455,17 @@ FertilityHelpResult evaluateFertilityHelp(FertilityHelpContext c) {
       state: FertilityHelpState.dontWait,
       reasons: reasonsFrom(dontWait),
       urgent: urgent,
-      headline: _en('It is worth speaking to a doctor sooner'),
-      body: _en('Something you have shared is one of the situations the '
-          'guidance suggests raising earlier, rather than waiting out a '
-          'general timeline.'),
+      headline: _en("It's worth talking to a doctor sooner"),
+      body: _en("Something you've shared is one of the situations where the "
+          'advice is to raise it earlier, not wait out the usual timeline.'),
       notMeaning: _en('This does not mean anything is wrong, and it does not '
-          'mean you are infertile. It means the standard "wait and see" advice '
-          'was written for a situation that is not yours.'),
+          'mean you are infertile. It means the usual "wait and see" advice '
+          'was written for a different situation from yours.'),
       nextStep: urgent
           ? _en('Ask about fertility preservation this week, before treatment '
               'starts.')
-          : _en('Book with a gynaecologist. That is where this starts in '
-              'India, not a fertility clinic.'),
+          : _en("Book a visit with a gynaecologist. In India, that's where "
+              'this starts, not at a fertility clinic.'),
     );
   }
 
@@ -476,48 +473,47 @@ FertilityHelpResult evaluateFertilityHelp(FertilityHelpContext c) {
     return FertilityHelpResult(
       state: FertilityHelpState.maySeeSpecialist,
       reasons: reasonsFrom(maySee),
-      headline: _en('It may be a good time to speak with someone'),
-      body: _en('Based on what you have shared, you have reached a point the '
-          'usual guidance describes as worth investigating.'),
+      headline: _en('It may be a good time to talk to someone'),
+      body: _en("From what you've shared, you've reached the point where the "
+          "usual advice says it's worth looking into."),
       // ⚠️ THE MOST IMPORTANT SENTENCE IN THE TOOL. Left unsaid, she supplies
       // it herself, and what she supplies is "I need IVF".
       notMeaning: _en('This does not mean you need IVF, and it does not mean '
-          'you cannot conceive without help. Most couples who are investigated '
-          'do not end up having IVF — an evaluation is how the specific reason '
-          'gets found, and the specific reason is frequently something small.'),
-      nextStep: _en('Consider arranging a fertility evaluation. A '
-          'gynaecologist runs the first round; a referral onward comes later if '
-          'it is needed.'),
+          'you cannot conceive without help. Most couples who have tests '
+          "don't end up having IVF. Tests are how the exact reason gets found, "
+          "and it's often something small."),
+      nextStep: _en('Think about getting a fertility check-up. A gynaecologist '
+          'does the first round of tests. A referral to a specialist comes '
+          "later, if it's needed."),
     );
   }
 
   return FertilityHelpResult(
     state: FertilityHelpState.keepTrying,
     reasons: const [],
-    headline: _en('There is no obvious reason to see a specialist yet'),
-    body: _en('Based on what you have shared, none of the situations that '
-        'usually prompt an evaluation applies to you right now.'),
+    headline: _en("There's no clear reason to see a specialist yet"),
+    body: _en("From what you've shared, none of the situations that usually "
+        'lead to a check-up applies to you right now.'),
     // ⚠️ NOT A GUARANTEE, AND THIS IS WHERE ONE WOULD SLIP IN. "Everything is
     // fine" is the sentence a reassuring result wants to write and must not.
-    notMeaning: _en('That is not the same as a promise that everything is '
-        'fine, and it is not a prediction. It only means nothing you have told '
-        'us is a reason to bring the conversation forward.'),
-    nextStep: _en('If you are comfortable continuing, keep tracking your '
-        'cycles — and come back to this whenever something changes.'),
+    notMeaning: _en("That's not the same as a promise that everything is "
+        "fine, and it's not a prediction. It only means nothing you've told us "
+        'is a reason to have the conversation sooner.'),
+    nextStep: _en("If you're happy to keep going, keep tracking your cycles. "
+        'Come back to this whenever something changes.'),
   );
 }
 
 /// The editorial beat after the result. Not labelled a tip — §23.
 final LocalizedText kFertilityHelpPatternBreak = _en(
-    'Seeing a specialist does not mean you have stopped believing it can '
-    'happen on its own. Often it is just a way of replacing guessing with '
+    "Seeing a specialist doesn't mean you've stopped believing it can happen "
+    'on its own. Often it just means swapping guesswork for real '
     'information.');
 
 final LocalizedText kFertilityHelpDisclaimer = _en(
-    'This is a way of working out whether a conversation is worth having. It '
-    'does not diagnose infertility, it does not predict whether you will '
-    'conceive, and it is not a substitute for your own doctor reading your '
-    'history.');
+    'This helps you work out whether a talk with a doctor is worth having. It '
+    'does not diagnose infertility, and it does not predict whether you will '
+    "conceive. It can't replace your own doctor looking at your history.");
 
 /// The review pack — generated from the rules so it cannot drift from them.
 List<({String id, String trigger, String article, String status})>

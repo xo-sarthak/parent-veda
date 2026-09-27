@@ -53,6 +53,7 @@ import '../v2/v3_hero_field.dart';
 import 'ttc_common.dart';
 import 'ttc_cycle_report_screen.dart';
 import 'ttc_cycle_report_v3.dart';
+import 'ttc_home_gap.dart' show showTtcPeriodCameNudge;
 import 'ttc_phase_colours.dart';
 import 'ttc_strings.dart';
 
@@ -166,7 +167,7 @@ class _Hero extends StatelessWidget {
     final (String title, String line) = switch (screen) {
       TtcCompanionState.empty => (
           'One date to start',
-          'Understand your own pattern, at your own pace.',
+          'Get to know your own pattern, at your own pace.',
         ),
       TtcCompanionState.clinicHeld => (
           today.cycleDay == null ? 'Your cycle' : 'Cycle day ${today.cycleDay}',
@@ -174,14 +175,14 @@ class _Hero extends StatelessWidget {
         ),
       TtcCompanionState.noEstimate => (
           today.cycleDay == null ? 'Your cycle' : 'Cycle day ${today.cycleDay}',
-          'No estimate this month, and that is deliberate.',
+          "No estimate this month. That's on purpose.",
         ),
       TtcCompanionState.healthy => (
           here?.phase.label ?? 'Your cycle',
           here == null
-              ? 'Understanding, not predicting.'
-              : '${ttcShortDate(here.firstDay)} – ${ttcShortDate(here.lastDay)}'
-                  ' · understanding, not predicting',
+              ? 'Here to understand, not to predict.'
+              : '${ttcShortDate(here.firstDay)} to ${ttcShortDate(here.lastDay)}'
+                  ' · here to understand, not to predict',
         ),
     };
 
@@ -393,8 +394,8 @@ class _CompanionSheet extends StatelessWidget {
                     w: FontWeight.w600, color: ttcTitleInk, h: 1.25)),
             const SizedBox(height: 9),
             Text(
-                'Tell us the day your last period began. That is enough for us '
-                'to show your cycle day, every day.',
+                'Tell us the day your last period started. With that one date '
+                "we can show your cycle day, every day.",
                 textAlign: TextAlign.center,
                 style: ttcBody(13.5, h: 1.55)),
             const SizedBox(height: 18),
@@ -420,8 +421,8 @@ class _CompanionSheet extends StatelessWidget {
             value: 'The spread, and a picture of the whole cycle'),
         const SizedBox(height: 20),
         Text(
-            'Nothing here is shared with anyone. You can remove a date at any '
-            'time.',
+            "Nothing here is shared with anyone. You can remove a date any "
+            'time you like.',
             style: ttcBody(13, h: 1.5)),
         const SizedBox(height: 24),
         _Estimates(p: p),
@@ -442,7 +443,7 @@ class _CompanionSheet extends StatelessWidget {
             CycleStore.instance.cycleLengths.isNotEmpty;
     return [
       _Eyebrow(
-          clinic ? 'Who is guiding this cycle' : 'Why there is no picture yet',
+          clinic ? 'Who is guiding this cycle' : "Why there's no picture yet",
           p: p),
       const SizedBox(height: 12),
       TtcCard(
@@ -450,7 +451,7 @@ class _CompanionSheet extends StatelessWidget {
           Text(
               clinic
                   ? 'Your clinic is tracking this cycle'
-                  : 'We are not drawing this cycle',
+                  : "We're not drawing this cycle",
               style: ttcFraunces(20,
                   w: FontWeight.w600, color: ttcTitleInk, h: 1.22)),
           const SizedBox(height: 10),
@@ -461,19 +462,19 @@ class _CompanionSheet extends StatelessWidget {
           Text(
               clinic
                   ? 'Your fertility clinic is following your dates this month. '
-                      'Where a doctor is guiding you, we do not put a second '
-                      'estimate beside theirs.'
-                  : 'One gap in your history is long enough to be a month that '
-                      'was not logged, rather than a cycle that long.',
+                      "When a doctor is guiding you, we don't put our own "
+                      'estimate next to theirs.'
+                  : 'One gap in your dates is so long that it was probably a '
+                      "month that wasn't logged, not a cycle that long.",
               style: ttcBody(14, h: 1.55)),
           const SizedBox(height: 10),
           Text(
               clinic
-                  ? 'Everything you log here stays yours, and we will keep it '
+                  ? "Everything you log here stays yours, and we'll keep it "
                       'ready for your next visit.'
-                  : 'Estimating from it would give you dates we do not '
-                      'believe, so we are waiting instead. Irregular cycles '
-                      'are common and are not a failing.',
+                  : "Guessing from it would give you dates we don't trust, "
+                      "so we're waiting instead. Irregular cycles are common, "
+                      "and they're nothing you did wrong.",
               style: ttcBody(14, h: 1.55)),
           if (!showsRhythm) ...[
             const SizedBox(height: 16),
@@ -481,9 +482,9 @@ class _CompanionSheet extends StatelessWidget {
               p: p,
               label: 'Your rhythm',
               placeholder: clinic
-                  ? 'While your clinic is guiding this cycle, they hold the '
-                      'dates.'
-                  : 'Once your next period is logged, the picture comes back.',
+                  ? 'While your clinic is guiding this cycle, the dates are '
+                      'theirs.'
+                  : 'Once you log your next period, the picture comes back.',
             ),
           ],
           const SizedBox(height: 16),
@@ -532,7 +533,7 @@ class _CompanionSheet extends StatelessWidget {
         ),
       ]),
       const SizedBox(height: 6),
-      Text('Swipe a row left to correct or remove it.',
+      Text('Swipe a row left to fix or remove it.',
           style: ttcBody(13, h: 1.45)),
       const SizedBox(height: 12),
       for (var i = starts.length - 1; i >= 0; i--) ...[
@@ -632,7 +633,7 @@ class _ThisCycleCard extends StatelessWidget {
             ]),
           ),
         ),
-        Text('These dates are estimates from your own history.',
+        Text('These dates are estimates, worked out from your own past cycles.',
             style: ttcBody(13, h: 1.45)),
       ]),
     );
@@ -891,9 +892,9 @@ class _RhythmCard extends StatelessWidget {
           const SizedBox(height: 14),
           Text(
               'Across your last ${lengths.length} cycles. '
-              '${spread == 0 ? 'Yours has not varied at all' : 'Yours varies by '
+              '${spread == 0 ? "Yours hasn't changed at all" : 'Yours changes by '
                   '$spread ${spread == 1 ? 'day' : 'days'}'}'
-              '${spread != null && spread <= 4 ? ', which is a steady rhythm.' : '.'}',
+              '${spread != null && spread <= 4 ? '. That\'s a steady rhythm.' : '.'}',
               style: ttcBody(13, h: 1.45, color: ttcSoft)),
         ],
         if (next != null) ...[
@@ -1092,8 +1093,8 @@ class _DateRowState extends State<_DateRow> {
                           const SizedBox(width: 10),
                           Expanded(
                             child: Text(
-                                'A gap this long is usually a month that was '
-                                'not logged. It is kept, but not used for your '
+                                "A gap this long is usually a month that wasn't "
+                                "logged. We keep it, but we don't use it for your "
                                 'usual length.',
                                 style: ttcBody(13, h: 1.45)),
                           ),
@@ -1237,7 +1238,23 @@ class _LogSheetState extends State<_LogSheet> {
     }
     store.logBleedDays(picked, _bleed);
     HapticFeedback.selectionClick();
-    Navigator.of(context).maybePop();
+    // ⚠️ "TALK IT THROUGH" AFTER A NEW PERIOD (2026-09-26, gap analysis,
+    // "Behind: Guided help"). Offered once, as the sheet closes, and only for
+    // a period that started today or yesterday and is not the first she ever
+    // logged (`ttcShouldOfferPeriodTalk`). A move is a correction, not news,
+    // so editing a date never offers it. The navigator and messenger are
+    // taken now because this sheet's context is gone after the pop.
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.maybeOf(context);
+    navigator.maybePop();
+    if (!_isEdit && messenger != null) {
+      showTtcPeriodCameNudge(
+        navigator: navigator,
+        messenger: messenger,
+        start: picked,
+        starts: store.periodStarts,
+      );
+    }
   }
 
   @override
@@ -1324,7 +1341,7 @@ class _LogSheetState extends State<_LogSheet> {
                   ]),
                   const SizedBox(height: 10),
                   Text(
-                      'Choose "Still on" if it has not finished. You can change '
+                      'Choose "Still on" if it hasn\'t finished. You can change '
                       'this later.',
                       style: ttcBody(13, h: 1.45)),
 
@@ -1687,8 +1704,8 @@ class _Estimates extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-                'These are estimates, never guarantees. If your cycles change, '
-                'stop, or you are worried, talk to a doctor.',
+                'These are estimates, never guarantees. If your cycles change or '
+                "stop, or you're worried, talk to a doctor.",
                 style: ttcBody(13, h: 1.45)),
           ),
         ],

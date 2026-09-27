@@ -16,6 +16,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'package:parentveda/data/brackets/ttc_brackets.dart';
 import 'package:parentveda/data/hubs/hub_registry.dart';
 import 'package:parentveda/services/bracket_resolver.dart';
 import 'package:parentveda/screens/ttc/ttc_focus_screen.dart';
@@ -147,8 +148,18 @@ void main() {
     test('and no tool or tracker was added to the door', () {
       // "Do not add a tool or tracker; this area has none." The Today surface
       // is a group tool, which is a different thing from a tile promising one.
+      //
+      // ⚠️ ONE NAMED EXCEPTION, 2026-09-26: the "My period came" chat on Hard
+      // days (TTC gap plan). It rides a Tool tile because the model has no
+      // chat format, but it measures nothing and records nothing: a few
+      // scripted lines of kindness and a way on. The rule is about trackers
+      // and instruments, and a `ttc_chat/` surface is neither.
       for (final s in page.sections) {
         for (final t in s.tiles) {
+          if (t case TtcToolTile(:final surfaceId)
+              when surfaceId == 'ttc_chat/period_came') {
+            continue;
+          }
           expect(t, isNot(isA<TtcToolTile>()),
               reason: '"${t.title}" is a Tool tile on a door with no tools');
           expect(t, isNot(isA<TtcChecklistTile>()));
@@ -437,7 +448,11 @@ void main() {
     test('every door in the stage is now a focus page', () {
       // The seventh completes it. If a bracket is added later without a page,
       // this says so rather than letting it quietly open a hub.
-      expect(kTtcFocusPages, hasLength(7));
+      // Nine since 2026-09-26: the gap plan's Body and cycle and "Trying, but
+      // not pregnant yet?" doors, both registered with a bracket.
+      expect(kTtcFocusPages, hasLength(9));
+      expect(kTtcFocusPages.length, kTtcBrackets.length,
+          reason: 'a TTC bracket has no door, or a door has no bracket');
     });
 
     testWidgets('the page builds, and opens on Today', (tester) async {

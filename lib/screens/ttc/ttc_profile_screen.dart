@@ -49,8 +49,21 @@ import 'ttc_strings.dart';
 // `TtcProfileScreenClassic` for revert; nothing pushes it. Its language,
 // sign-out and testing switches all have a home on You (Preferences, Account
 // and the debug-only Developer section).
-void openTtcProfile(BuildContext context) =>
-    openPvYou(context, stage: LifeStage.tryingToConceive);
+//
+// ⚠️ ON V3, THE AVATAR OPENS THE YOU TAB — 2026-09-26. You is a tab of the V3
+// bar now, so the avatar on the home and on every `TtcHeader` lands on that
+// tab, lit, rather than pushing a second copy of the same screen with a back
+// arrow over it. V1 has no You tab and keeps the push.
+void openTtcProfile(BuildContext context) {
+  if (TtcHomeVersionStore.instance.version == TtcHomeVersion.v3) {
+    openTtcTabV3(context, 4);
+    return;
+  }
+  openPvYou(context, stage: LifeStage.tryingToConceive);
+}
+// Kept for revert:
+// void openTtcProfile(BuildContext context) =>
+//     openPvYou(context, stage: LifeStage.tryingToConceive);
 
 class TtcProfileScreen extends StatelessWidget {
   const TtcProfileScreen({super.key});

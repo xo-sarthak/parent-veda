@@ -164,7 +164,7 @@ class _EntryCard extends StatelessWidget {
         content: Text(
           t.hinglish
               ? 'Ye wapas nahi aayega.'
-              : 'This cannot be brought back.',
+              : "Once it's deleted, you can't get it back.",
           style: ttcBody(13.5),
         ),
         actions: [

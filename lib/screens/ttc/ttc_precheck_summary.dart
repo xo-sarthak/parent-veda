@@ -101,9 +101,9 @@ class TtcPrecheckSummaryScreen extends StatelessWidget {
                     const SizedBox(height: 12),
                     Text(
                         t(
-                            'You have a clearer picture now of what is already '
-                                'taken care of and what may still be worth '
-                                'discussing.',
+                            "You can now see what's already taken care of, "
+                                'and what may be worth talking about with a '
+                                'doctor.',
                             'Ab aapke paas saaf tasveer hai ki kya ho chuka hai '
                                 'aur kis par baat karna baaki hai.'),
                         style: pvFraunces(
@@ -233,7 +233,7 @@ class TtcPrecheckSummaryScreen extends StatelessWidget {
   void _copy(BuildContext context, TtcPrecheckStore store, PrecheckContext c,
       AppLanguage lang, String Function(String, String) t) {
     final buf = StringBuffer()
-      ..writeln('PRE-PREGNANCY DISCUSSION SUMMARY')
+      ..writeln('Getting ready for pregnancy: notes for my doctor')
       ..writeln();
 
     if (c.loggedCycles >= 2) {
@@ -244,7 +244,7 @@ class TtcPrecheckSummaryScreen extends StatelessWidget {
     }
     if (c.medicineCount > 0) {
       buf.writeln('Medicines saved in app: ${c.medicineCount} '
-          '(list available on request)');
+          '(I can share the list)');
     }
     if (c.supplementCount > 0) {
       buf.writeln('Supplements recorded: ${c.supplementCount}');
@@ -256,7 +256,9 @@ class TtcPrecheckSummaryScreen extends StatelessWidget {
       buf.writeln('Already covered:');
       for (final i in done) {
         final e = store.entryFor(i.id);
-        final flag = (e?.discussedWithDoctor ?? false) ? ' (discussed)' : '';
+        final flag = (e?.discussedWithDoctor ?? false)
+            ? ' (talked about with a doctor)'
+            : '';
         buf.writeln('- ${i.title.of(lang)}$flag');
       }
       buf.writeln();
@@ -264,14 +266,14 @@ class TtcPrecheckSummaryScreen extends StatelessWidget {
 
     final open = store.openItems(c);
     if (open.isNotEmpty) {
-      buf.writeln("I'd like to discuss:");
+      buf.writeln("I'd like to talk about:");
       for (final i in open) {
         buf.writeln('- ${i.title.of(lang)}');
       }
       buf.writeln();
     }
 
-    buf.writeln('Questions:');
+    buf.writeln('My questions:');
     // Her own open items supply the questions, so the list is hers rather than
     // a generic set.
     final asked = <String>{};
@@ -287,7 +289,8 @@ class TtcPrecheckSummaryScreen extends StatelessWidget {
     Clipboard.setData(ClipboardData(text: buf.toString()));
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       behavior: SnackBarBehavior.floating,
-      content: Text(t('Summary copied', 'Summary copy ho gayi')),
+      content: Text(t('Summary copied. Paste it into a message or your notes.',
+          'Summary copy ho gayi')),
     ));
   }
 }
@@ -297,19 +300,19 @@ class TtcPrecheckSummaryScreen extends StatelessWidget {
 /// ⚠️ QUESTIONS, NOT REQUESTS. None asks for a test or a drug — §13 and §27.
 final List<LocalizedText> kPrecheckFallbackQuestions = [
   LocalizedText(
-      en: 'Is there anything in my medical history I should address before '
+      en: 'Is there anything in my health history I should sort out before '
           'trying?',
       hi: 'Meri medical history mein aisa kuch hai jise koshish se pehle dekhna '
           'chahiye?'),
   LocalizedText(
-      en: 'Should my vaccination or immunity history be checked?',
+      en: 'Should my vaccines or immunity be checked?',
       hi: 'Kya meri vaccination ya immunity history check karni chahiye?'),
   LocalizedText(
-      en: 'Is my current nutrition meeting what I need before pregnancy?',
+      en: 'Is what I eat now giving me what I need before pregnancy?',
       hi: 'Kya mera abhi ka khaan-paan pregnancy se pehle ki zarooraton ke '
           'liye theek hai?'),
   LocalizedText(
-      en: 'Given our family histories, is there anything worth looking into?',
+      en: 'With our family histories, is there anything worth looking into?',
       hi: 'Hamare parivaaron ki history dekhte hue, kuch dekhne layak hai?'),
 ];
 

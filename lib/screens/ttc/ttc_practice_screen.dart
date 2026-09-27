@@ -210,8 +210,8 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: Text(
-                      'This one changes sides. Do the whole thing on one side, '
-                      'then the other.',
+                      'This one uses both sides. Do the whole thing on one '
+                      'side, then on the other.',
                       style: pvManrope(
                           fontSize: 12.5, height: 1.5, color: pal.ink2)),
                 ),

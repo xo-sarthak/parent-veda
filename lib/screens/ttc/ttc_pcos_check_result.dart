@@ -251,10 +251,10 @@ class TtcPcosCheckResultScreen extends StatelessWidget {
       if (r.level == PcosLevel.discuss || r.level == PcosLevel.soon) ...[
         _NextCard(
           p: p,
-          title: t('Create my doctor summary', 'Doctor summary banayein'),
+          title: t('Make my doctor summary', 'Doctor summary banayein'),
           body: t(
-              'Everything you just told us, in the order a doctor asks for it '
-                  '— plus the questions worth asking.',
+              'Everything you just told us, in the order a doctor asks for it, '
+                  'with the questions worth asking.',
               'Jo abhi aapne bataya, usi kram mein jismein doctor poochhte hain '
                   '— aur poochhne layak sawaal bhi.'),
           onTap: () => _openSummary(context),
@@ -266,8 +266,9 @@ class TtcPcosCheckResultScreen extends StatelessWidget {
         p: p,
         title: t('Track your cycles', 'Apne cycles track karein'),
         body: t(
-            'Three months of dates says more than any questionnaire, and it is '
-                'the single most useful thing to bring to an appointment.',
+            'Three months of dates tells a doctor more than any '
+                "questionnaire. It's the most useful thing to bring to an "
+                'appointment.',
             'Teen mahine ki tareekhein kisi bhi sawaal-jawaab se zyada batati '
                 'hain, aur appointment par le jaane ke liye sabse kaam ki cheez '
                 'hain.'),
@@ -278,8 +279,8 @@ class TtcPcosCheckResultScreen extends StatelessWidget {
         p: p,
         title: t('Read about PCOS', 'PCOS ke baare mein padhein'),
         body: t(
-            'What the pattern actually is, how common it is, and what genuinely '
-                'shifts it.',
+            'What PCOS is, how common it is, and what can really change '
+                'it.',
             'Pattern asal mein kya hai, kitna aam hai, aur ise sach mein kya '
                 'badalta hai.'),
         onTap: () => _open(context, 'ttc_read/ttc_read_pcos_cycle'),
@@ -288,8 +289,8 @@ class TtcPcosCheckResultScreen extends StatelessWidget {
         const SizedBox(height: 10),
         _NextCard(
           p: p,
-          title: t('Create my doctor summary', 'Doctor summary banayein'),
-          body: t('Worth having anyway, whenever you next see someone.',
+          title: t('Make my doctor summary', 'Doctor summary banayein'),
+          body: t('Good to have anyway, for whenever you next see a doctor.',
               'Waise bhi kaam aayegi, jab bhi agli baar kisi se milein.'),
           onTap: () => _openSummary(context),
         ),
@@ -551,7 +552,7 @@ class TtcPcosDoctorSummaryScreen extends StatelessWidget {
                     Text(
                         t(
                             'Everything you told us, in the order a doctor '
-                                'usually asks for it. Read it off your phone, '
+                                'usually asks for it. Read it from your phone, '
                                 'or copy it into a message.',
                             'Jo aapne bataya, usi kram mein jismein doctor aam '
                                 'taur par poochhte hain. Phone se padh lein, ya '
@@ -571,7 +572,7 @@ class TtcPcosDoctorSummaryScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                  t('MEASURED, NOT REMEMBERED',
+                                  t('FROM YOUR LOG, NOT FROM MEMORY',
                                       'NAAPA HUA, YAAD KIYA HUA NAHI'),
                                   style: pvManrope(
                                       fontSize: 10,
@@ -583,7 +584,7 @@ class TtcPcosDoctorSummaryScreen extends StatelessWidget {
                                   t(
                                       '${facts.count} cycles logged, from '
                                           '${facts.shortest} to ${facts.longest} '
-                                          'days. Typical: about ${facts.median}.',
+                                          'days. Usually about ${facts.median}.',
                                       '${facts.count} cycles log kiye, '
                                           '${facts.shortest} se ${facts.longest} '
                                           'din. Aam taur par: lagbhag '
@@ -683,20 +684,22 @@ class TtcPcosDoctorSummaryScreen extends StatelessWidget {
     final buf = StringBuffer();
     if (facts != null) {
       buf.writeln('Cycles logged: ${facts.count}, '
-          '${facts.shortest}-${facts.longest} days (typical ~${facts.median})');
+          '${facts.shortest} to ${facts.longest} days (usually about '
+          '${facts.median})');
     }
     for (final r in rows) {
       buf.writeln('${r.label}: ${r.value}');
     }
     buf.writeln();
-    buf.writeln('Questions:');
+    buf.writeln('My questions:');
     for (final q in kPcosDoctorQuestions) {
       buf.writeln('- ${q.of(lang)}');
     }
     Clipboard.setData(ClipboardData(text: buf.toString()));
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
       behavior: SnackBarBehavior.floating,
-      content: Text(t('Summary copied', 'Summary copy ho gayi')),
+      content: Text(t('Summary copied. Paste it into a message or your notes.',
+          'Summary copy ho gayi')),
     ));
   }
 }
@@ -735,21 +738,21 @@ List<PcosDoctorSummaryRow> buildPcosDoctorSummary(
 /// not a better one.
 final List<LocalizedText> kPcosDoctorQuestions = [
   LocalizedText(
-      en: 'Could my cycle pattern mean I am not ovulating regularly?',
+      en: "Could my cycle pattern mean I'm not ovulating regularly?",
       hi: 'Kya mere cycle ka pattern ye bata raha hai ki ovulation niyamit nahi '
           'ho raha?'),
   LocalizedText(
-      en: 'Is there a way to check whether I am ovulating?',
+      en: "Is there a way to check whether I'm ovulating?",
       hi: 'Kya ye check karne ka koi tareeka hai ki ovulation ho raha hai ya '
           'nahi?'),
   LocalizedText(
-      en: 'Should I be assessed for PCOS, or for another hormonal cause?',
+      en: 'Should I be checked for PCOS, or for another hormone cause?',
       hi: 'Kya mujhe PCOS ya kisi aur hormonal wajah ke liye jaanch karwani '
           'chahiye?'),
   LocalizedText(
       en: 'Could thyroid or prolactin explain any of this?',
       hi: 'Kya thyroid ya prolactin isme se kuch samjha sakte hain?'),
   LocalizedText(
-      en: 'Given how long we have been trying, is it time to look further?',
+      en: "We've been trying a while now. Is it time to look further?",
       hi: 'Hum jitne samay se koshish kar rahe hain, kya ab aage dekhna chahiye?'),
 ];

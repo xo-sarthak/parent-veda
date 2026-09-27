@@ -28,6 +28,7 @@ import 'package:parentveda/ttc/cycle_store.dart';
 import 'package:parentveda/ttc/ttc_care_pathway.dart';
 import 'package:parentveda/ttc/ttc_cycle_report.dart';
 import 'package:parentveda/ttc/ttc_store.dart';
+import 'package:parentveda/ttc/ttc_treatment_store.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -200,6 +201,12 @@ void main() {
         (tester) async {
       healthy();
       TtcStore.instance.setPath(TtcPath.ivf);
+      // 2026-09-26: a clinic owns the timing only with a real date from
+      // her clinic for this cycle in the treatment tracker, never on the
+      // pathway label alone. Kept for revert: the label alone did it.
+      TtcTreatmentStore.instance.setDate(TtcTreatmentStep.betaTest,
+          DateTime.now().add(const Duration(days: 20)));
+      addTearDown(TtcTreatmentStore.instance.resetForTest);
       await pump(tester);
 
       expect(find.text('Your clinic is tracking this cycle'), findsOneWidget);
@@ -215,6 +222,12 @@ void main() {
       // this cycle is no reason to withhold them.
       healthy();
       TtcStore.instance.setPath(TtcPath.ivf);
+      // 2026-09-26: a clinic owns the timing only with a real date from
+      // her clinic for this cycle in the treatment tracker, never on the
+      // pathway label alone. Kept for revert: the label alone did it.
+      TtcTreatmentStore.instance.setDate(TtcTreatmentStep.betaTest,
+          DateTime.now().add(const Duration(days: 20)));
+      addTearDown(TtcTreatmentStore.instance.resetForTest);
       await pump(tester);
       expect(find.text('Your rhythm'.toUpperCase()), findsOneWidget);
     });

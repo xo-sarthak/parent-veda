@@ -502,7 +502,7 @@ class _Disclaimer extends StatelessWidget {
         child: Text(
           hi
               ? 'Ye jaankari padhne ke liye hai, diagnosis ke liye nahi. Apni sehat ke faisle apne doctor ke saath lein.'
-              : 'This is information, never a diagnosis. Decisions about your health belong with your doctor.',
+              : 'This is general information, never a diagnosis. Please make decisions about your health with your doctor.',
           style: ttcBody(11.5, color: p.soft, h: 1.5),
         ),
       ),

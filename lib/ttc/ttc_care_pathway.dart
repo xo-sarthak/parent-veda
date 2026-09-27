@@ -158,6 +158,11 @@ class TtcCarePathway {
       clinicMonitors != null && medicationControlsOvulation != null;
 
   /// THE rule. Everything else in the product reads this.
+  ///
+  /// ⚠️ SINCE 2026-09-26 THIS IS THE TIER, NOT THE VERDICT. The app reads
+  /// `TtcStore.ownership`, which asks [ttcTimingOwnershipFromEvidence]: this
+  /// label-and-answers tier applies only once the treatment tracker holds a
+  /// clinic date for the cycle. Without one, the cycle is hers.
   TimingOwnership get ownership {
     // Medication deciding the moment is the strongest signal there is - it does
     // not matter what the pathway is called.
@@ -235,6 +240,58 @@ class TtcPathwayBehaviour {
 TtcPathwayBehaviour ttcBehaviourFor(TtcCarePathway pathway) =>
     TtcPathwayBehaviour(pathway.ownership);
 
+// =============================================================================
+//  THE EVIDENCE FOR "A CLINIC OWNS THIS CYCLE" — DECIDED 2026-09-26
+// -----------------------------------------------------------------------------
+//  The user's decision: "clinic ownership = real clinic dates". Until then the
+//  app treated a cycle as clinic-run on the strength of the pathway LABEL she
+//  tapped in setup (`TtcCarePathway.ownership`, from `path.defaultMedicated` /
+//  `defaultMonitored`), and `TtcStore.setPath` clears her two answers, so the
+//  label's guess always applied. One stray tap on "IVF" switched the fertile
+//  window off everywhere, with the hero as the one exception
+//  (`ignoreOwnership`, now retired) — which is how the hero and the cards came
+//  to disagree.
+//
+//  ⚠️ WHAT CHANGED IS THE EVIDENCE, NOT THE RULE. `TimingOwnership` and
+//  `TtcPathwayBehaviour` mean exactly what they meant: when a clinic owns the
+//  timing we publish no window, no due date and no "late", and never compete
+//  with their dates. What changed is what counts as proof that a clinic owns
+//  it: a date her clinic gave her for THIS cycle (a stimulation start, a
+//  trigger, a retrieval or IUI, a transfer or a blood test), entered in the
+//  treatment tracker. A label with no dates behind it is her own cycle, top of
+//  the screen and cards alike, because nothing a clinic said is there to
+//  contradict.
+//
+//  The tier (guided or controlled) still comes from the pathway and her two
+//  answers when they name one. When they do not (the label is "trying
+//  naturally", yet she has entered clinic dates), the dates choose: a
+//  stimulation start, a trigger or a transfer means medication is timing the
+//  cycle; a retrieval/IUI or a blood test alone means a clinic is watching it.
+//  Both tiers refuse every prediction; the tier only decides whether her own
+//  body signals are still worth logging.
+//
+//  Pure, like everything in this file: the caller gathers the dates
+//  (`TtcStore.ownershipOfCycle`), this decides.
+// =============================================================================
+
+/// Who owns the timing of one cycle, from the evidence.
+///
+/// [hasClinicDates] — the treatment tracker holds at least one clinic date
+/// inside this cycle. [medicationDated] — one of those is a stimulation start,
+/// a trigger or a transfer.
+TimingOwnership ttcTimingOwnershipFromEvidence({
+  required TtcCarePathway pathway,
+  required bool hasClinicDates,
+  bool medicationDated = false,
+}) {
+  if (!hasClinicDates) return TimingOwnership.parentveda;
+  final labelled = pathway.ownership;
+  if (labelled != TimingOwnership.parentveda) return labelled;
+  return medicationDated
+      ? TimingOwnership.clinicControlled
+      : TimingOwnership.clinicGuided;
+}
+
 extension TimingOwnershipCopy on TimingOwnership {
   /// The value sent to Ask Veda, and stored. Stable - renaming needs a
   /// migration.
@@ -282,15 +339,15 @@ extension TimingOwnershipCopy on TimingOwnership {
       case TimingOwnership.parentveda:
         return hi
             ? 'Aapka body hi tay karta hai kab. Hum uska andaaza lagate hain aur imaandaari se batate hain ki kitna pakka hai.'
-            : 'Your body decides when. We estimate it, and always say how sure we are.';
+            : "Your body decides when. We estimate it, and we always tell you how sure we are.";
       case TimingOwnership.clinicGuided:
         return hi
             ? 'Ovulation aapka apna hai, lekin aapki clinic use scan se dekh rahi hai - aur unka scan hamare hisaab se behtar hai. Isliye hum koi date nahi batate. Aapke apne signals log karte rahiye: clinic unhi ke hisaab se timing tay karti hai.'
-            : 'Ovulation is still yours, but your clinic is watching it on a scan — and their scan beats our arithmetic, so we do not name a date. Keep logging your own signals: they are what the clinic is timing around.';
+            : "You still ovulate on your own, but your clinic is watching it on a scan. Their scan is more accurate than our maths, so we don't give you a date. Keep logging your own signals, because they're what your clinic is timing things around.";
       case TimingOwnership.clinicControlled:
         return hi
             ? 'Is cycle mein ovulation dawai se hota hai aur clinic uska samay tay karti hai. Calendar ka andaaza unki baat se alag ho sakta hai, isliye hum koi nahi dete. Unki dates hi asli hain.'
-            : 'On this cycle ovulation is caused by medication and scheduled by your clinic. A calendar estimate could disagree with them, so we do not offer one. Their dates are the ones that count.';
+            : "On this cycle, medicine causes ovulation and your clinic sets the timing. A calendar estimate could disagree with them, so we don't give one. Their dates are the ones that count.";
     }
   }
 }

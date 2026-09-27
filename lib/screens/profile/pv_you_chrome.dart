@@ -566,12 +566,19 @@ class PvPersonCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Text(
-                        name,
-                        style: pvManrope(
-                          fontSize: 14.5,
-                          fontWeight: FontWeight.w700,
-                          color: p.ink1,
+                      // Flexible, so a long name ellipsises instead of
+                      // overflowing the card (seen at phone width,
+                      // 2026-09-26). Unchanged whenever the name fits.
+                      Flexible(
+                        child: Text(
+                          name,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: pvManrope(
+                            fontSize: 14.5,
+                            fontWeight: FontWeight.w700,
+                            color: p.ink1,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 8),

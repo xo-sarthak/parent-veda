@@ -21,6 +21,7 @@ import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/ttc/cycle_store.dart';
 import 'package:parentveda/ttc/ttc_care_pathway.dart';
 import 'package:parentveda/ttc/ttc_store.dart';
+import 'package:parentveda/ttc/ttc_treatment_store.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -215,16 +216,30 @@ void main() {
   // ===========================================================================
   group('the store', () {
     test('changing pathway clears her answers', () {
+      // 2026-09-26: the pathway and her answers now pick the TIER
+      // (`pathway.ownership`); whether a clinic owns the timing at all is
+      // decided by real clinic dates (`TtcStore.ownership`). The clearing this
+      // test holds is about the tier, so it reads the tier. Kept for revert:
+      // the two ownership expectations read `s.ownership`.
       final s = TtcStore.instance;
       s.setPath(TtcPath.iui);
       s.setClinicMonitors(false);
       s.setMedicationControlsOvulation(false);
-      expect(s.ownership, TimingOwnership.parentveda);
+      expect(s.pathway.ownership, TimingOwnership.parentveda);
 
       s.setPath(TtcPath.ivf);
       // A stale "my clinic does not scan me" from an old IUI round must not
       // follow her into IVF.
       expect(s.pathwayAnswered, isFalse);
+      expect(s.pathway.ownership, TimingOwnership.clinicControlled);
+      expect(s.ownership, TimingOwnership.parentveda,
+          reason: 'no clinic dates: her own cycle');
+      // 2026-09-26: a clinic owns the timing only with a real date from
+      // her clinic for this cycle in the treatment tracker, never on the
+      // pathway label alone. Kept for revert: the label alone did it.
+      TtcTreatmentStore.instance.setDate(TtcTreatmentStep.betaTest,
+          DateTime.now().add(const Duration(days: 20)));
+      addTearDown(TtcTreatmentStore.instance.resetForTest);
       expect(s.ownership, TimingOwnership.clinicControlled);
     });
 
@@ -238,18 +253,43 @@ void main() {
       expect(s.pathwayAnswered, isFalse);
     });
 
-    test('unmonitored IUI gives her the window back', () {
+    // ⚠️ REPLACED 2026-09-26. The label no longer withholds anything on its
+    // own; a clinic date for this cycle does, and clearing the round is what
+    // hands the window back. Kept for revert:
+    //
+    // test('unmonitored IUI gives her the window back', () {
+    //   CycleStore.instance
+    //     ..logPeriodStart(DateTime(2026, 5, 1))
+    //     ..logPeriodStart(DateTime(2026, 5, 29))
+    //     ..logPeriodStart(DateTime.now().subtract(const Duration(days: 12)));
+    //   final s = TtcStore.instance;
+    //   s.setPath(TtcPath.iui);
+    //   expect(s.today.fertility, isNull, reason: 'default is to withhold');
+    //   s.setClinicMonitors(false);
+    //   s.setMedicationControlsOvulation(false);
+    //   expect(s.today.fertility, isNotNull,
+    //       reason: 'her answer should have restored it');
+    // });
+    test('an IUI label keeps her window until a clinic date arrives', () {
       CycleStore.instance
         ..logPeriodStart(DateTime(2026, 5, 1))
         ..logPeriodStart(DateTime(2026, 5, 29))
         ..logPeriodStart(DateTime.now().subtract(const Duration(days: 12)));
       final s = TtcStore.instance;
       s.setPath(TtcPath.iui);
-      expect(s.today.fertility, isNull, reason: 'default is to withhold');
-      s.setClinicMonitors(false);
-      s.setMedicationControlsOvulation(false);
       expect(s.today.fertility, isNotNull,
-          reason: 'her answer should have restored it');
+          reason: 'a label with no clinic dates is her own cycle');
+      // 2026-09-26: a clinic owns the timing only with a real date from
+      // her clinic for this cycle in the treatment tracker, never on the
+      // pathway label alone. Kept for revert: the label alone did it.
+      TtcTreatmentStore.instance.setDate(TtcTreatmentStep.betaTest,
+          DateTime.now().add(const Duration(days: 20)));
+      addTearDown(TtcTreatmentStore.instance.resetForTest);
+      expect(s.today.fertility, isNull,
+          reason: 'a date from her clinic for this cycle withholds it');
+      TtcTreatmentStore.instance.clearCycle();
+      expect(s.today.fertility, isNotNull,
+          reason: 'clearing the round should have restored it');
     });
   });
 

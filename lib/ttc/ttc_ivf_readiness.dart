@@ -121,7 +121,7 @@ extension IvfCheckCopy on IvfCheck {
   String get label => switch (this) {
         IvfCheck.no => 'No',
         IvfCheck.past => 'Yes, in the past',
-        IvfCheck.inItNow => 'I am in it right now',
+        IvfCheck.inItNow => "I'm having one right now",
       };
 }
 
@@ -163,7 +163,7 @@ class IvfReadinessAnswers {
     final out = <String>[];
     if (cycles == IvfCycles.irregular) out.add('your cycles are irregular');
     if (cycles == IvfCycles.longGaps) {
-      out.add('you have had long gaps without a period');
+      out.add("you've had long gaps without a period");
     }
     for (final c in kIvfKnownConditions) {
       if (c.flag && conditions.contains(c.id)) {
@@ -316,8 +316,8 @@ class IvfReadinessResult {
 /// The line that closes every path, unchanged. A constant because it must be
 /// identical everywhere and therefore must not be built.
 const String kIvfAlwaysLine =
-    'This is not a diagnosis. A specialist reading your full history is the '
-    'only way to know.';
+    'This is not a diagnosis. Only a specialist who looks at your full '
+    'history can tell you for sure.';
 
 const String kIvfChecklistDisclaimer =
     'These are my notes for my appointment. They are not a diagnosis.';
@@ -344,20 +344,20 @@ IvfReadinessResult ivfBuildReadiness(
     IvfReadinessAnswers a, FertilityHelpContext ctx) {
   // ---- Block 1: where she is ----------------------------------------------
   final bits = <String>[];
-  if (a.age != null) bits.add('You are ${a.age!.label.en.toLowerCase()}');
+  if (a.age != null) bits.add('You\'re ${a.age!.label.en.toLowerCase()}');
   if (a.trying != null) {
     bits.add(a.trying == IvfTrying.underSix
-        ? 'and have been trying less than six months'
-        : 'and have been trying ${a.trying!.label.toLowerCase()}');
+        ? 'and have been trying for less than six months'
+        : 'and have been trying for ${a.trying!.label.toLowerCase()}');
   }
   var where = bits.isEmpty
-      ? 'You have not told us enough yet for this to say much.'
+      ? "You haven't told us enough yet for this to say much."
       : '${bits.join(' ')}.';
   if (a.cycles != null) {
     where += switch (a.cycles!) {
       IvfCycles.regular => ' Your cycles look fairly regular.',
       IvfCycles.irregular => ' Your cycles have been irregular.',
-      IvfCycles.longGaps => ' You have had long gaps without a period.',
+      IvfCycles.longGaps => " You've had long gaps without a period.",
     };
   }
 
@@ -371,38 +371,38 @@ IvfReadinessResult ivfBuildReadiness(
   final (IvfVerdict verdict, String timing) = switch (a) {
     _ when a.check == IvfCheck.inItNow => (
         IvfVerdict.alreadyInCare,
-        'You are already being seen, which is the right place to be. Keep '
-            'logging what happens in the cycle you are in, and take your '
-            'questions to the team who know your history.'
+        "You're already being seen, which is the right place to be. Keep "
+            'logging what happens this cycle, and take your questions to the '
+            'team who know your history.'
       ),
     _ when a.hasFlag => (
         IvfVerdict.flagged,
-        'It is worth a conversation now, whatever the timeline — because '
-            '${_join(a.flags)}. That is not a verdict on anything; it is a '
+        'It\'s worth talking to someone now, whatever the timeline, because '
+            '${_join(a.flags)}. That isn\'t a verdict on anything. It\'s a '
             'reason a specialist would want to look sooner rather than later.'
       ),
     _ when a.age == FertilityAgeBand.over40 => (
         IvfVerdict.soon,
-        'It is worth speaking to someone soon. Over 40, the usual advice to '
-            'wait and see does not apply, and an early conversation keeps more '
-            'options open.'
+        "It's worth talking to someone soon. Over 40, the usual advice to "
+            "wait and see doesn't apply, and talking early keeps more options "
+            'open.'
       ),
     _
         when (a.age?.holdsBackReassurance ?? false) &&
             (a.trying?.atLeastSixMonths ?? false) =>
       (
         IvfVerdict.nowByAge,
-        'It is worth a conversation now. At 35 or over, six months of trying '
-            'is the point at which most guidance suggests looking into it '
-            'rather than waiting the full year.'
+        "It's worth talking to someone now. At 35 or over, six months of "
+            'trying is when most advice says to look into it, instead of '
+            'waiting the full year.'
       ),
     _
         when a.age == FertilityAgeBand.under35 &&
             (a.trying?.overAYearOrMore ?? false) =>
       (
         IvfVerdict.nowByDuration,
-        'It is worth a conversation now. A year of trying is the usual point '
-            'to have someone look, and there is nothing to be gained by '
+        "It's worth talking to someone now. A year of trying is the usual "
+            "point to have someone look, and there's nothing to gain by "
             'waiting longer.'
       ),
     _
@@ -410,42 +410,43 @@ IvfReadinessResult ivfBuildReadiness(
             (a.trying?.atLeastSixMonths ?? false) =>
       (
         IvfVerdict.nowBySemenUnknown,
-        'It is worth a conversation now, and getting his semen test done is a '
-            'good first step. It is quick, inexpensive, and it answers about '
-            'half the question.'
+        "It's worth talking to someone now, and getting his semen test done "
+            "is a good first step. It's quick and not expensive, and it answers "
+            'about half the question.'
       ),
     // ⚠️ 35 OR OVER, AND NOTHING ELSE TO GO ON. Not a red flag, not six months
     // yet — but old enough that "keep trying" is not ours to say. So the answer
     // is the conversation, framed as available rather than overdue.
     _ when (a.age?.holdsBackReassurance ?? false) && a.enoughToReassure => (
         IvfVerdict.nowByAgeEarly,
-        'A conversation is worth having whenever you are ready. Nothing here '
-            'looks unusual — but at 35 or over the advice to give it a full '
-            'year before asking does not really apply, so there is no reason '
-            'to hold off if you would rather know.'
+        "You can talk to someone whenever you're ready. Nothing here looks "
+            'unusual. But at 35 or over, the advice to wait a full year before '
+            "asking doesn't really apply, so there's no reason to hold off if "
+            "you'd rather "
+            'know.'
       ),
     // ⚠️ THE REASSURING BRANCH IS THE NARROWEST ONE. It requires every answer
     // to be present AND her to be under 35 — see `enoughToReassure` for the
     // first half and the branch above for why the second half is not optional.
     _ when a.age == FertilityAgeBand.under35 && a.enoughToReassure => (
         IvfVerdict.keepTrying,
-        'It is reasonable to keep trying for now. Most couples in this '
-            'situation conceive within a year, and nothing you have told us '
-            'suggests a reason to hurry.'
+        "It's fine to keep trying for now. Most couples in this situation "
+            "conceive within a year, and nothing you've told us suggests a "
+            'reason to hurry.'
       ),
     // ⚠️ THE DEFAULT, AND IT IS THE CONVERSATION. Anything unanswered lands
     // here rather than in the branch above. Never default to waiting.
     _ => (
         IvfVerdict.nowByMissingInfo,
-        'It is worth a conversation now. There are a few things here we do not '
-            'know, and a specialist can settle them far faster than waiting '
-            'will.'
+        "It's worth talking to someone now. There are a few things here we "
+            "don't know, and a specialist can sort them out much faster than "
+            'waiting will.'
       ),
   };
 
   // ---- Block 3's second line ----------------------------------------------
   final openDoor = verdict == IvfVerdict.keepTrying
-      ? 'If you would feel better talking to someone, that is always okay. '
+      ? "If you'd feel better talking to someone, that's always okay. "
           '$kIvfAlwaysLine'
       : kIvfAlwaysLine;
 
@@ -457,7 +458,7 @@ IvfReadinessResult ivfBuildReadiness(
     checklist: [
       (label: 'My age', value: a.age?.label.en ?? 'Not answered'),
       (
-        label: 'How long we have been trying',
+        label: "How long we've been trying",
         value: a.trying?.label ?? 'Not answered'
       ),
       (

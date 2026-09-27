@@ -64,12 +64,17 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
   // second sentence is the most important one in the area.
   intro: 'Trying again, after a loss. No rush, and no timeline you have to '
       'keep.',
+  // Our own photograph (2026-09-27): generated to the door's brief, checked by
+  // eye, mirrored to the R2 bucket. Kept for revert: the previous value.
 
-  heroImageUrl:
-      'https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=900&h=700&fit=crop',
-  heroBlurb: 'What your body is doing now, what almost certainly did not cause '
-      'this, when trying again is safe if you want to, and people who have '
-      'been exactly here.',
+  // heroImageUrl: 'https://images.unsplash.com/photo-1499209974431-9dddcece7f88?w=900&h=700&fit=crop',
+
+  heroImageUrl: 'https://pub-bfbc0773e60e4c5c851b535f08b384bc.r2.dev/ttc_door_after_a_loss.jpg',
+  // The new door's headline, a sentence (TtcDoorScreen, 2026-09-26).
+  heroTitle: 'No rush, and no timeline to keep.',
+  heroBlurb: "What your body is doing now, what almost certainly didn't cause "
+      "this, when it's safe to try again if you want to, and people who've "
+      'been through it too.',
 
   // ---------------------------------------------------------------------------
   //  Four tabs. Your body first — see the header.
@@ -79,7 +84,7 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
   // stage uses for its own logged data; 344 the rose the community rooms wear.
   groups: [
     TtcFocusGroup(
-      id: 'body',
+      id: 'body', mark: IntentMark.bodyMark,
       label: 'Your body',
       icon: Icons.favorite_border_rounded,
       hue: 26,
@@ -88,17 +93,17 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
       pinnedRedFlagReadIds: [_kRecovery],
     ),
     TtcFocusGroup(
-        id: 'understand',
+        id: 'understand', mark: IntentMark.bookMark,
         label: 'Understand',
         icon: Icons.menu_book_outlined,
         hue: 206),
     TtcFocusGroup(
-        id: 'again',
+        id: 'again', mark: IntentMark.sunMark,
         label: 'Trying again',
         icon: Icons.wb_twilight_rounded,
         hue: 160),
     TtcFocusGroup(
-      id: 'support',
+      id: 'support', mark: IntentMark.cuppedHands,
       label: 'Support',
       icon: Icons.diversity_1_outlined,
       hue: 344,
@@ -134,7 +139,7 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
         ),
         TtcVideoTile(
           title: 'What the next few weeks look like',
-          blurb: 'Walked through gently, by a doctor who does this.',
+          blurb: 'Talked through gently, by a doctor who does this work.',
           slotId: 'ttc_vid_loss_recovery',
           duration: '5 MIN',
         ),
@@ -154,10 +159,10 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
         // Recorded in `docs/STILL-OPEN.md` §26.
         TtcGuideTile(
           title: 'What normal bleeding and spotting looks like',
-          blurb: 'How long, how heavy, and how it differs depending on how the '
-              'loss was managed.',
+          blurb: 'How long it lasts, how heavy it is, and how it changes with '
+              'how the loss was managed.',
           readId: _kRecovery,
-          atHeading: 'The bleeding',
+          atHeading: 'How long does the bleeding last?',
         ),
       ],
     ),
@@ -179,14 +184,14 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
         ),
         TtcMythTile(
           title: 'You can ovulate before your first period',
-          blurb: 'Which matters a great deal if you are not ready.',
-          myth: 'You cannot get pregnant again until your period comes back.',
-          fact: 'Ovulation usually returns before the first period — often two '
-              'to four weeks after a loss — so pregnancy is possible again '
-              'before you have had a period at all. If you would not want to '
-              'conceive yet, that means using contraception now rather than '
-              'waiting for a period to arrive. This is not usually mentioned, '
-              'and finding out afterwards is worse than reading it here.',
+          blurb: "This matters a lot if you're not ready.",
+          myth: "You can't get pregnant again until your period comes back.",
+          fact: 'Ovulation usually comes back before the first period, often '
+              'two to four weeks after a loss. So you can get pregnant again '
+              "before you've had a period at all. If you don't want to "
+              'conceive yet, use contraception now rather than waiting for a '
+              "period to come. This isn't often mentioned, and it's kinder to "
+              'read it here than to find out later.',
         ),
       ],
     ),
@@ -195,25 +200,31 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
     //  2 — Understand
     // =========================================================================
     TtcFocusSection(
-      heading: 'Was this preventable?',
+      heading: 'Could this have been prevented?',
       group: 'understand',
       tiles: [
         TtcGuideTile(
-          title: 'It was almost certainly not preventable',
-          blurb: 'Most early losses are a chromosomal error present from the '
-              'beginning. Not inherited, not caused, not preventable.',
+          title: "It almost certainly couldn't have been prevented",
+          blurb: 'Most early losses are a chromosome error that was there from '
+              "the beginning. It isn't inherited, and nobody caused it.",
           readId: _kTryingAgain,
-          atHeading: 'It was almost certainly not preventable',
+          atHeading: "It almost certainly couldn't have been prevented",
+        ),
+        // The whole piece behind the card above: the real causes, and the
+        // long list of everyday things that don't cause a loss.
+        TtcArticleTile(
+          title: 'What causes a miscarriage, and what doesn\'t',
+          blurb: 'The real reasons, and the everyday things you can let go of.',
+          readId: 'ttc_read_miscarriage_causes',
         ),
         TtcMythTile(
-          title: 'A miscarriage is not a pattern',
-          blurb: 'One loss does not change what comes next.',
-          myth: 'One miscarriage means it is likely to happen again.',
+          title: "One miscarriage isn't a pattern",
+          blurb: "One loss doesn't change what comes next.",
+          myth: "One miscarriage means it's likely to happen again.",
           fact: 'After a single loss, the chance for a next pregnancy is close '
-              'to what it was before. One loss is not a pattern, and it is not '
-              'evidence of anything about your body. The picture changes after '
-              'two or more, which is exactly why the threshold for looking '
-              'into it sits there and not here.',
+              "to what it was before. One loss isn't a pattern, and it says "
+              'nothing about your body. Things change after two or more, '
+              'which is exactly why testing starts there and not here.',
         ),
       ],
     ),
@@ -223,11 +234,11 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
       group: 'understand',
       tiles: [
         TtcGuideTile(
-          title: 'When investigation is worth asking for',
-          blurb: 'After two losses, not three. ESHRE moved that threshold and '
-              'many places have not caught up.',
+          title: 'When to ask for tests',
+          blurb: 'After two losses, not three. ESHRE changed that line, and '
+              "many places haven't caught up.",
           readId: _kTryingAgain,
-          atHeading: 'When investigation is worth asking for',
+          atHeading: 'When should you ask for tests?',
         ),
         // ⚠️ THE BRIEF ASKS FOR A SECOND CARD HERE — "What recurrent-loss
         // investigation looks like" — and it is NOT built. That content is the
@@ -243,6 +254,27 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
       ],
     ),
 
+    // ⚠️ ADDED 2026-09-26 FROM THE GAP PLAN. Two kinds of early loss that are
+    // named on a report and rarely explained, each with its own piece. The ectopic
+    // read carries "go to a hospital today" in its own callout; the Your body
+    // tab's pinned flag still covers heavy bleeding, fever and fainting.
+    TtcFocusSection(
+      heading: 'What kind of loss was it?',
+      group: 'understand',
+      tiles: [
+        TtcArticleTile(
+          title: 'Chemical pregnancy',
+          blurb: 'When a positive test turns into a period, and what it means.',
+          readId: 'ttc_read_chemical_pregnancy',
+        ),
+        TtcArticleTile(
+          title: 'Ectopic pregnancy',
+          blurb: 'The signs that need a hospital today, and what comes after.',
+          readId: 'ttc_read_ectopic_pregnancy',
+        ),
+      ],
+    ),
+
     // =========================================================================
     //  3 — Trying again
     // =========================================================================
@@ -252,24 +284,24 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
       tiles: [
         TtcArticleTile(
           title: 'On trying again',
-          blurb: 'When it is safe, what the evidence actually says about '
-              'waiting, and who decides.',
+          blurb: "When it's safe, what the evidence says about waiting, and "
+              'who decides.',
           readId: _kTryingAgain,
         ),
         TtcMythTile(
           title: 'The six-month wait, and where it came from',
           blurb: 'One 2007 recommendation, one study, and what the evidence '
-              'has done since.',
+              'has shown since.',
           myth: 'You have to wait three to six months before trying again.',
-          fact: 'That advice traces back to a 2007 WHO recommendation resting '
-              'largely on a single study. Larger work since — including a '
-              'Norwegian cohort of nearly seventy-three thousand pregnancies — '
-              'has not found the harm it assumed. For an early loss with no '
-              'complications there is no medical reason to wait months. Many '
-              'clinicians suggest one normal period, and the reason is '
-              'practical: it makes dating a next pregnancy easier. If your own '
+          fact: 'That advice goes back to a 2007 WHO recommendation based '
+              'mostly on a single study. Larger studies since then, including '
+              'a Norwegian one of nearly seventy-three thousand pregnancies, '
+              "haven't found the harm it assumed. For an early loss with no "
+              "complications, there's no medical reason to wait months. Many "
+              'doctors suggest waiting for one normal period, for a practical '
+              'reason: it makes the next pregnancy easier to date. If your own '
               'doctor has told you to wait, ask what their reason is rather '
-              'than assuming it is the general advice.',
+              "than assuming it's the general advice.",
         ),
       ],
     ),
@@ -280,7 +312,7 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
       tiles: [
         TtcGuideTile(
           title: 'What to do differently next time',
-          blurb: 'A short list, and a shorter one than the internet suggests.',
+          blurb: "It's a short list, shorter than the internet suggests.",
           readId: _kTryingAgain,
           atHeading: 'If and when you do try again',
         ),
@@ -289,6 +321,27 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
         // Inventing a second slot id would put a card on the page that no file
         // can ever be mapped to — a coming-soon that is coming from nowhere.
         // Recorded in §26; it is one entry in `ttc_videos_data.dart` away.
+        TtcArticleTile(
+          title: 'Trying again: the feelings',
+          blurb: 'Fear, guilt and hope, often in the same day.',
+          readId: 'ttc_read_loss_feelings',
+        ),
+      ],
+    ),
+
+    // ⚠️ ADDED 2026-09-26. Testing after more than one loss, in Trying again
+    // because it is the question asked before the next attempt. The
+    // Understand card "When to ask for tests" opens the short answer in the
+    // older read; this is the full piece.
+    TtcFocusSection(
+      heading: 'What if it has happened more than once?',
+      group: 'again',
+      tiles: [
+        TtcArticleTile(
+          title: 'Recurrent miscarriage',
+          blurb: 'Which tests help after more than one loss, and when.',
+          readId: 'ttc_read_recurrent_miscarriage',
+        ),
       ],
     ),
 
@@ -299,12 +352,13 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
       heading: 'People who have been here',
       group: 'support',
       tiles: [
-        TtcCommunityTile(
-          title: 'Loss & Recovery room',
-          blurb: 'Held gently. No timelines, no silver linings, and no advice '
-              'unless it is asked for.',
-          surfaceId: 'ttc_community',
-        ),
+        // Community held back for launch (2026-09-26, TTC gap plan §7.1) — kept for revert.
+        // TtcCommunityTile(
+        //   title: 'Loss & Recovery room',
+        //   blurb: 'A gentle space. Nobody gives you a timeline or a bright side, '
+        //       'and nobody gives advice unless you ask for it.',
+        //   surfaceId: 'ttc_community',
+        // ),
         TtcCommunityTile(
           title: 'Your Care Circle',
           blurb: 'The people you chose. As much or as little as you want.',
@@ -318,9 +372,9 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
       group: 'support',
       tiles: [
         TtcTalkTile(
-          title: 'Talking to someone who does this',
+          title: 'Someone who knows this kind of loss',
           blurb: 'A counsellor who works with pregnancy loss, or a doctor who '
-              'can look at what happened. At your pace.',
+              'can look at what happened. At your own pace.',
           action: kTtcActConsult,
         ),
         // ⚠️ THE ONE PAID THING THIS AREA ALLOWS, AND IT IS LAST, AND IT IS
@@ -331,7 +385,7 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
         TtcMasterclassTile(
           title: 'After a loss, four sessions',
           blurb: 'A small group, led by a counsellor, over four weeks. With '
-              'people who are where you are.',
+              "people who've been through what you have.",
           offeringId: 'ttc_loss_support',
         ),
       ],

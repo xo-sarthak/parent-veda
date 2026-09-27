@@ -1,6 +1,13 @@
 // =============================================================================
 //  TTC — the More tab
 // -----------------------------------------------------------------------------
+//  ⚠️ RETIRED 2026-09-26, KEPT FOR REVERT. The V3 bar is Today · Learn ·
+//  Products · Tools · You; nothing pushes this screen any more. Its rows moved
+//  to the TTC `things` in `lib/screens/profile/pv_you_content.dart` (Calendar,
+//  Cycle companion, Fertility window, All programmes and sessions; Journal and
+//  Profile were already on You). Community is held back. The reasoning below
+//  is the 2026-09-17 version and still explains why every row needs a home.
+// -----------------------------------------------------------------------------
 //  ⚠️ THIS SCREEN EXISTS BECAUSE THE V3 NAV DROPPED TWO TABS AND NARROWED A
 //  THIRD. It is not a junk drawer, it is the other half of a deliberate trade,
 //  and the trade only holds if this screen is complete.

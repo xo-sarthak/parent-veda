@@ -80,12 +80,23 @@ void main() {
       'Male fertility', // ditto — a Hinglish speaker does not say a translation
     };
 
+    // ⚠️ AND A SECOND, NARROWER LIST: brackets added after 2026-08-27, when
+    // CLAUDE.md made new work English only ("English in the Hindi build is now
+    // the expected state"). Their `hi` is filled, so nothing renders blank, and
+    // it is English on purpose. Named by id, one line each, so the friction
+    // stays: a bracket earns its place here by a date, not by convenience.
+    const englishByPolicy = <String>{
+      'ttc_body_cycle', // TTC gap plan, 2026-09-26
+      'ttc_not_yet', // TTC gap plan, 2026-09-26
+    };
+
     test('every user-visible string has Hindi', () {
       for (final b in kAllBrackets) {
         for (final pair in [b.label, b.title, b.blurb]) {
           expect(pair.hi.trim(), isNotEmpty,
               reason: '${b.id}: "${pair.en}" has no Hindi');
           if (identicalByNature.contains(pair.en)) continue;
+          if (englishByPolicy.contains(b.id)) continue;
           expect(pair.hi, isNot(equals(pair.en)),
               reason: '${b.id}: "${pair.en}" is identical in both languages — '
                   'if that is genuinely correct it needs saying explicitly, '
@@ -247,9 +258,16 @@ void main() {
     // exactly seven rows; a stage that grew an eighth door without the workbook
     // growing a row would mean someone invented a problem bracket, which is the
     // one thing the whole Level Map exists to stop.
-    test('seven TTC brackets, forty-nine cells', () {
-      expect(kTtcBrackets.length, 7);
-      expect(kTtcBrackets.fold<int>(0, (n, b) => n + b.layers.length), 49);
+    //
+    // ⚠️ NINE SINCE 2026-09-26, AND THE RULE ABOVE WAS ANSWERED, NOT BROKEN.
+    // `ttc_body_cycle` and `ttc_not_yet` were not invented here: they come from
+    // the TTC gap analysis, which the user made the source of truth for this
+    // stage (docs/TTC-GAP-PLAN.md §8). The workbook is no longer the only
+    // table a TTC door can come from; the gap analysis is the second, and a
+    // tenth door still needs one of the two behind it.
+    test('nine TTC brackets, sixty-three cells', () {
+      expect(kTtcBrackets.length, 9);
+      expect(kTtcBrackets.fold<int>(0, (n, b) => n + b.layers.length), 63);
     });
 
     // ⚠️ THE FINDING, PINNED. TTC's paid layers are the strongest in the
@@ -289,9 +307,12 @@ void main() {
             reason: 'ttc_after_loss → ${l.name} must be notApplicable');
         expect(canRender(b, l), isFalse);
       }
-      // What she IS shown: a person, and other people.
+      // What she IS shown: a person. "And other people" (the community
+      // room) is held back for launch, 2026-09-26, TTC gap plan §7.1; when
+      // community returns, restore the second expectation below.
       expect(canRender(b, BracketLayer.consult), isTrue);
-      expect(canRender(b, BracketLayer.extras), isTrue);
+      // expect(canRender(b, BracketLayer.extras), isTrue);
+      expect(canRender(b, BracketLayer.extras), isFalse);
     });
 
     // =========================================================================

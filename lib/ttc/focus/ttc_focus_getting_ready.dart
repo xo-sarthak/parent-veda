@@ -72,13 +72,18 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
   // restructuring underneath would throw away the one sentence somebody
   // returning to this area would recognise.
   intro: "A short, practical list of what's worth sorting out before you start "
-      "trying — nothing urgent, nothing you have to rush.",
+      "trying. Nothing urgent, nothing you have to rush.",
+  // Our own photograph (2026-09-27): generated to the door's brief, checked by
+  // eye, mirrored to the R2 bucket. Kept for revert: the previous value.
 
-  heroImageUrl:
-      'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=900&h=700&fit=crop',
-  heroBlurb: 'The months before you start trying are the easiest ones to use '
-      'well. Diet, a few tests, folic acid and a couple of habits — done '
-      'calmly, in your own time, and mostly by both of you.',
+  // heroImageUrl: 'https://images.unsplash.com/photo-1490645935967-10de6ba17061?w=900&h=700&fit=crop',
+
+  heroImageUrl: 'https://pub-bfbc0773e60e4c5c851b535f08b384bc.r2.dev/ttc_door_getting_ready.jpg',
+  // The new door's headline, a sentence (TtcDoorScreen, 2026-09-26).
+  heroTitle: 'Getting ready, at your own pace.',
+  heroBlurb: 'The months before you start trying are a good time to get '
+      'ready. Diet, a few tests, folic acid and a couple of habits. Take it '
+      'calmly, at your own pace, and do most of it together.',
 
   // ---------------------------------------------------------------------------
   //  The selector rail — five cards, Diet first, exactly the brief's order
@@ -94,27 +99,34 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
   // it is where the section ends.
   groups: [
     TtcFocusGroup(
-        id: 'diet',
+        id: 'diet', mark: IntentMark.plate,
         label: 'Diet and supplements',
         icon: Icons.restaurant_outlined,
         hue: 104),
+    // Added 2026-09-26 (gap plan, P1): the Indian meal plan, beside Diet
+    // because it is Diet made practical. Six tabs; Your checklist stays last.
     TtcFocusGroup(
-        id: 'tests',
+        id: 'meals', mark: IntentMark.cookMark,
+        label: 'Meal plan',
+        icon: Icons.soup_kitchen_outlined,
+        hue: 26),
+    TtcFocusGroup(
+        id: 'tests', mark: IntentMark.reportPage,
         label: 'Tests and vaccines',
         icon: Icons.biotech_outlined,
         hue: 206),
     TtcFocusGroup(
-        id: 'habits',
+        id: 'habits', mark: IntentMark.stepsMark,
         label: 'Weight and habits',
         icon: Icons.self_improvement_outlined,
         hue: 42),
     TtcFocusGroup(
-        id: 'before',
+        id: 'before', mark: IntentMark.nextStep,
         label: 'Before you start',
         icon: Icons.event_note_outlined,
         hue: 344),
     TtcFocusGroup(
-        id: 'checklist',
+        id: 'checklist', mark: IntentMark.checkMark,
         label: 'Your checklist',
         icon: Icons.checklist_rtl_rounded,
         hue: 160),
@@ -144,8 +156,8 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         // job alone.
         TtcArticleTile(
           title: 'The three months before',
-          blurb: 'What actually changes in the months before you start — for '
-              'both of you, not just for her.',
+          blurb: "What's worth changing in the months before you start, and "
+              "why it's for both of you, not just you.",
           readId: 'ttc_read_three_months_before',
         ),
         // ⚠️ A FILM WAS HERE AND THE BRIEF NEVER ASKED FOR ONE — removed
@@ -169,8 +181,8 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         // journey's own note records.
         TtcToolTile(
           title: 'Eating, day to day',
-          blurb: 'A week of real meals from an Indian kitchen, with what each '
-              'one is actually doing.',
+          blurb: 'A week of real meals from an Indian kitchen, and what each '
+              'one does for you.',
           surfaceId: 'ttc_nutrition',
         ),
         TtcArticleTile(
@@ -210,8 +222,8 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         // the fertile-window door, which references the same id.
         TtcArticleTile(
           title: 'When to start what, and how early',
-          blurb: 'Folic acid has a deadline that has usually passed by the '
-              'time a test turns positive. Almost nothing else does.',
+          blurb: 'Folic acid works best when it starts before a test turns '
+              'positive. Almost nothing else has a deadline like that.',
           readId: 'ttc_read_supplement_timing',
           moreReadId: 'ttc_read_folic_acid',
         ),
@@ -238,8 +250,8 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         // was built in the same session and this tile pointed at none of it.
         TtcProductTile.shelf(
           title: 'Folic acid and preconception supplements',
-          blurb: 'What is worth buying, what is not, and what one of these is '
-              'here to talk you out of.',
+          blurb: "What's worth buying, and what we'd gently talk you out "
+              'of.',
           category: 'supplements',
         ),
         // ⚠️ AND NOTHING ELSE. The brief's Supplements section is TWO rows —
@@ -252,6 +264,57 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
     ),
 
     // =========================================================================
+    //  1b — Meal plan (gap plan, 2026-09-26)
+    // =========================================================================
+    //  ⚠️ THE NUTRITION TOOL IS ON THIS TAB TOO, UNDER ITS OWN TITLE. Diet's
+    //  "Eating, day to day" opens the same surface; one tool, two doors in,
+    //  the way His side and IVF share the records folder. The brief test holds
+    //  every title to one tile, so this one says what she does here: plan.
+    TtcFocusSection(
+      heading: 'What can we cook this week?',
+      group: 'meals',
+      tiles: [
+        TtcArticleTile(
+          title: 'A week of Indian meals for trying',
+          blurb: 'Seven days of home food, with eggless and Jain swaps.',
+          readId: 'ttc_read_meal_plan_week',
+        ),
+        TtcArticleTile(
+          title: 'Ten everyday recipes',
+          blurb: 'Home dishes under 40 minutes that add iron, folate or protein.',
+          readId: 'ttc_read_everyday_recipes',
+        ),
+        TtcToolTile(
+          title: 'Plan your own week',
+          blurb: 'Pick meals from an Indian kitchen and see what each one does.',
+          surfaceId: 'ttc_nutrition',
+        ),
+      ],
+    ),
+
+    TtcFocusSection(
+      heading: 'What else is worth knowing about food?',
+      group: 'meals',
+      tiles: [
+        TtcArticleTile(
+          title: 'Iron before pregnancy',
+          blurb: 'Indian foods that help, and the tea timing that matters.',
+          readId: 'ttc_read_iron_before_pregnancy',
+        ),
+        TtcArticleTile(
+          title: 'Omega-3 without fish',
+          blurb: 'Where a vegetarian kitchen finds it.',
+          readId: 'ttc_read_omega3_without_fish',
+        ),
+        TtcArticleTile(
+          title: 'Ask a dietitian: ten questions',
+          blurb: 'The food questions people ask most, answered plainly.',
+          readId: 'ttc_read_ask_dietitian',
+        ),
+      ],
+    ),
+
+    // =========================================================================
     //  2 — Tests and vaccines
     // =========================================================================
     TtcFocusSection(
@@ -260,8 +323,8 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
       tiles: [
         TtcArticleTile(
           title: 'Tests and vaccines worth doing first',
-          blurb: 'A short list to take to a doctor, and the reason each one is '
-              'on it.',
+          blurb: 'A short list to take to a doctor, and why each one is on '
+              'it.',
           readId: 'ttc_read_preconception_tests',
         ),
         // ⚠️ THE BRIEF'S SECOND ROW, WRITTEN 2026-09-03 ONCE THE TEST WAS
@@ -277,8 +340,8 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         // is the only difference, which is the entire point of it.
         TtcGuideTile(
           title: 'The carrier screening that matters in India',
-          blurb: 'One cheap blood test, done once, that most Western '
-              'preconception advice never mentions — and that matters here '
+          blurb: 'One cheap blood test, done once. Most Western advice '
+              'for before pregnancy never mentions it, but it matters here '
               'more than almost anywhere.',
           readId: 'ttc_read_carrier_screening',
         ),
@@ -306,14 +369,14 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
       tiles: [
         TtcToolTile(
           title: 'Check your vaccinations',
-          blurb: 'Which ones matter before pregnancy, and which need to be '
-              'done a month ahead.',
+          blurb: 'Which ones matter before pregnancy, and which need doing '
+              'a month ahead.',
           surfaceId: 'ttc_vaccinations',
         ),
         TtcToolTile(
           title: 'The full test library',
-          blurb: 'Every test, what it is for, when in the cycle to do it, and '
-              'a real Indian price range.',
+          blurb: "Every test, what it's for, when in your cycle to do it, "
+              'and a real Indian price range.',
           surfaceId: 'ttc_tests',
         ),
         // ⚠️ A RECORDS TILE WAS HERE AND THE BRIEF DOES NOT LIST IT.
@@ -340,8 +403,8 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         // `ttc_bmi` surface.
         TtcArticleTile(
           title: 'Weight before pregnancy, said kindly',
-          blurb: 'What it actually does, why direction matters more than any '
-              'destination, and no numbers at all.',
+          blurb: 'What weight really does, why the direction matters more '
+              'than a goal, and no numbers at all.',
           readId: 'ttc_read_weight_kindly',
         ),
       ],
@@ -356,7 +419,7 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         // `TtcDoTile`.
         TtcDoTile(
           title: 'Habits worth building now',
-          blurb: 'Sleep, movement, alcohol and tobacco — the four with the '
+          blurb: 'Sleep, movement, alcohol and tobacco. These four have the '
               'clearest evidence behind them.',
           surfaceId: 'ttc_precheck/lifestyle',
         ),
@@ -367,8 +430,8 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         // it with. Two rows, two formats, and the brief had them right.
         TtcToolTile(
           title: "Track what you're working on",
-          blurb: 'The four habit trackers in one place. A record, not a report '
-              'card — no streaks and no score.',
+          blurb: "The four habit trackers in one place. It's a record, not a "
+              'report card: no streaks and no score.',
           surfaceId: 'ttc_habits',
         ),
         // ⚠️ A STRESS ARTICLE WAS HERE, AND IT MISREAD THE BRIEF.
@@ -390,7 +453,7 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
       tiles: [
         TtcArticleTile(
           title: 'Coming off birth control',
-          blurb: 'What returns quickly, what genuinely takes months, and why '
+          blurb: 'What comes back quickly, what really takes months, and why '
               '"let it clear out of your system" costs people time.',
           readId: 'ttc_read_coming_off_birth_control',
         ),
@@ -400,16 +463,41 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         // meant, and the most avoidable harm in this whole area.
         TtcArticleTile(
           title: 'Medicines and conditions to check with a doctor',
-          blurb: 'Never stop a prescribed medicine to prepare. What to ask '
+          blurb: 'Never stop a prescribed medicine to get ready. What to ask '
               'instead, and how far ahead.',
           readId: 'ttc_read_meds_and_conditions',
         ),
         // ⚠️ REFERENCED, NOT COPIED — Step 5c again. His side owns this.
         TtcArticleTile(
           title: 'His part',
-          blurb: 'Whose "side" it really is, and what half of this actually '
+          blurb: 'Whose "side" it really is, and the half of this that '
               'depends on him.',
           readId: 'ttc_read_whose_side',
+        ),
+      ],
+    ),
+
+    // Added 2026-09-26 (gap plan). A second section rather than three more
+    // rows under the first, so "Before you start" stays about what to stop,
+    // keep and ask, and this one is the visit and the practical side.
+    TtcFocusSection(
+      heading: 'What is worth asking early?',
+      group: 'before',
+      tiles: [
+        TtcArticleTile(
+          title: 'Your first gynaecologist visit',
+          blurb: 'What to take along, and the questions that make it count.',
+          readId: 'ttc_read_first_gyn_visit',
+        ),
+        TtcArticleTile(
+          title: 'Can a past abortion affect trying now?',
+          blurb: 'What the evidence says, and the few things worth checking.',
+          readId: 'ttc_read_after_abortion',
+        ),
+        TtcArticleTile(
+          title: 'Money before a baby',
+          blurb: 'Insurance waiting periods, leave and help, written for India.',
+          readId: 'ttc_read_money_before_baby',
         ),
       ],
     ),
@@ -429,8 +517,8 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         // "Talk" offers a conversation where "Booking" offers a calendar slot.
         TtcChecklistTile(
           title: 'Your pre-pregnancy checklist',
-          blurb: "What's covered, what's still worth discussing, and the next "
-              'three things — at your own pace.',
+          blurb: "What's done, what's still worth talking about, and your "
+              'next three things. Go at your own pace.',
           surfaceId: 'ttc_precheck',
         ),
         // ⚠️ THE PAGE CLOSES ON A PERSON, NOT ON A PRICE — the same rule the
@@ -440,8 +528,8 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         // down the page.
         TtcTalkTile(
           title: 'Talk to someone before you start',
-          blurb: 'A doctor or a preconception nutritionist, for the questions '
-              'that are specifically yours.',
+          blurb: 'A doctor or a nutritionist who helps before pregnancy, for '
+              'the questions that are yours.',
           action: kTtcActConsult,
         ),
       ],

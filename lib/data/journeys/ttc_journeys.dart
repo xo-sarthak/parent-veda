@@ -45,8 +45,8 @@ LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
 final JourneyConfig kTtcImproveChances = JourneyConfig(
   doorId: kTtcActImproveChances,
   title: _en('Improve my chances this cycle'),
-  intro: _en("Nothing here is a number we calculate for you — just the "
-      'timing and everyday habits that genuinely help this cycle.'),
+  intro: _en("We don't work out a number for you here. Just the timing "
+      'and the everyday habits that really help this cycle.'),
   steps: [
     JourneyStep(
       question: _en('When exactly should we be trying?'),
@@ -54,23 +54,23 @@ final JourneyConfig kTtcImproveChances = JourneyConfig(
         JourneyElement(
           type: SolutionType.tool,
           title: _en('Find your fertile window'),
-          value: _en('See the days this cycle when trying has the best '
-              'chance of counting.'),
+          value: _en('See which days in this cycle trying is most likely '
+              'to count.'),
           surfaceId: 'ttc_window',
         ),
       ],
     ),
     JourneyStep(
-      question: _en("What actually helps, and what's just noise?"),
+      question: _en("What really helps, and what's just noise?"),
       elements: [
         // Real, as of the fertile-window content pass. Carries the six-day
         // window, the every-one-to-two-days guidance, and the four myths —
         // sourced to the ASRM/SREI committee opinion.
         JourneyElement(
           type: SolutionType.read,
-          title: _en('Timing, and the advice worth putting down'),
-          value: _en('Positions, "saving it up", lying down after — what the '
-              'evidence actually says about each.'),
+          title: _en('Timing, and the advice you can let go of'),
+          value: _en('Positions, "saving it up", lying down after. What the '
+              'evidence says about each one.'),
           meta: _en('7 MIN'),
           surfaceId: 'ttc_read/ttc_read_timing_myths',
         ),
@@ -84,27 +84,28 @@ final JourneyConfig kTtcImproveChances = JourneyConfig(
         // tile. Two tiles in one row, which is exactly what the grid is for.
         JourneyElement(
           type: SolutionType.read,
-          title: _en('How conception actually works'),
-          value: _en('The cycle, in two halves — and why only one of them '
-              'moves.'),
+          title: _en('How conception works'),
+          value: _en('Your cycle comes in two halves. Here is why only one '
+              'of them changes length.'),
           meta: _en('8 MIN'),
           surfaceId: 'ttc_read/ttc_read_how_conception_works',
         ),
       ],
     ),
     JourneyStep(
-      question: _en('Is there anything worth adding — a strip, a supplement?'),
+      question: _en('Is there anything worth adding, like a strip or a '
+          'supplement?'),
       elements: [
         JourneyElement(
           type: SolutionType.product,
-          title: _en('Ovulation strips & folic acid'),
-          value: _en("The two things worth having in the house — nothing "
+          title: _en('Ovulation strips and folic acid'),
+          value: _en("The two things worth keeping at home, and nothing "
               "you don't need."),
           surfaceId: 'ttc_products',
         ),
       ],
-      note: _en('Nothing here is a guarantee — just a sensible, inexpensive '
-          'baseline.'),
+      note: _en("None of this is a guarantee. It's a sensible, low-cost "
+          'place to start.'),
     ),
     JourneyStep(
       question: _en('How do I know if this cycle is different from the last?'),
@@ -112,16 +113,16 @@ final JourneyConfig kTtcImproveChances = JourneyConfig(
         JourneyElement(
           type: SolutionType.tool,
           title: _en('Keep a simple log'),
-          value: _en('Note what you notice, so a pattern — if there is one — '
-              'has somewhere to show up.'),
+          value: _en('Write down what you notice. If there is a pattern, '
+              'this is where it will show up.'),
           surfaceId: 'ttc_calendar',
         ),
       ],
     ),
   ],
-  closesWhen: _en("This closes when you know this cycle's fertile days, have "
-      "picked up one or two habits worth keeping, and have stopped chasing "
-      "the ones that don't."),
+  closesWhen: _en("You're done here when you know this cycle's fertile "
+      "days, have picked up one or two habits worth keeping, and have "
+      "stopped chasing the ones that don't help."),
 );
 
 // -----------------------------------------------------------------------------
@@ -141,9 +142,9 @@ final JourneyConfig kTtcImproveChances = JourneyConfig(
 final JourneyConfig kTtcPcosLibrary = JourneyConfig(
   doorId: kTtcActPcosLibrary,
   title: _en('Understand my PCOS'),
-  intro: _en("You've been told the word, or you suspect it. Here is what "
-      'PCOS actually means for someone trying to conceive — not the '
-      'worst-case version.'),
+  intro: _en("Maybe a doctor has said PCOS, or maybe you think you have "
+      "it. Here's what it really means when you're trying to conceive. "
+      'Not the worst-case version.'),
   steps: [
     JourneyStep(
       question: _en('How worried should I be?'),
@@ -157,15 +158,15 @@ final JourneyConfig kTtcPcosLibrary = JourneyConfig(
         JourneyElement(
           type: SolutionType.read,
           title: _en('What PCOS is doing to your cycle'),
-          value: _en('How common it actually is, what the pattern really is, '
-              'and why irregular is not the same as closed.'),
+          value: _en("How common it is, what's really going on, and why "
+              "irregular cycles don't mean it can't happen."),
           meta: _en('8 MIN'),
           surfaceId: 'ttc_read/ttc_read_pcos_cycle',
         ),
       ],
     ),
     JourneyStep(
-      question: _en('What is actually happening in my body?'),
+      question: _en('What is happening in my body?'),
       elements: [
         // ⚠️ NAMES THE DECLARED FILM. Without `videoSlot` this placeholder
         // generates its own id from the door and the title, while the same
@@ -175,8 +176,8 @@ final JourneyConfig kTtcPcosLibrary = JourneyConfig(
         JourneyElement(
           type: SolutionType.watch,
           title: _en('PCOS, explained in five minutes'),
-          value: _en('The hormones and the cycle, drawn simply, by a '
-              'doctor.'),
+          value: _en('A doctor draws out the hormones and the cycle in '
+              'plain pictures.'),
           meta: _en('5 MIN'),
           owed: true,
           videoSlot: 'ttc_vid_pcos_explained',
@@ -192,37 +193,38 @@ final JourneyConfig kTtcPcosLibrary = JourneyConfig(
         JourneyElement(
           type: SolutionType.read,
           title: _en('What treatment usually looks like'),
-          value: _en('The order things are tried in, and what to ask before '
-              'you agree to any of it.'),
+          value: _en('The order doctors usually try things in, and what to '
+              'ask before you agree to any of it.'),
           meta: _en('9 MIN'),
           surfaceId: 'ttc_read/ttc_read_pcos_treatment',
         ),
       ],
-      note: _en("What's right for you is a question for your own doctor, "
-          'not a general answer.'),
+      note: _en("What's right for you is one for your own doctor to "
+          'answer. They know your case.'),
     ),
     JourneyStep(
-      question: _en('What actually helps day to day — diet and insulin?'),
+      question: _en('What helps day to day, with food and insulin?'),
       elements: [
         JourneyElement(
           type: SolutionType.read,
           title: _en('Food, insulin and PCOS'),
-          value: _en('What actually changes the curve in an Indian kitchen — '
-              'and why nothing has to leave it.'),
+          value: _en('What makes a real difference to blood sugar in an '
+              'Indian kitchen. And no food has to be cut out.'),
           meta: _en('9 MIN'),
           surfaceId: 'ttc_read/ttc_read_pcos_food',
         ),
         JourneyElement(
           type: SolutionType.product,
-          title: _en('Inositol & the supplements worth it'),
-          value: _en("What's actually shown to help, and what's just "
+          title: _en('Inositol and the supplements worth taking'),
+          value: _en("What has been shown to help, and what's just "
               'marketing.'),
           surfaceId: 'ttc_supplements',
         ),
       ],
     ),
     JourneyStep(
-      question: _en('How do I keep my cycle readable enough to plan around?'),
+      question: _en('How do I keep track of my cycle well enough to plan '
+          'around it?'),
       elements: [
         // ⚠️ THE CHECKER FIRST, THE TRACKER SECOND, and the order is the
         // point. The checker reads her logged cycles and tells her what they
@@ -232,28 +234,28 @@ final JourneyConfig kTtcPcosLibrary = JourneyConfig(
         JourneyElement(
           type: SolutionType.tool,
           title: _en('Check your own pattern'),
-          value: _en('Three minutes, built on the cycles you have already '
-              'logged. It does not diagnose anything.'),
+          value: _en("Three minutes, using the cycles you've already "
+              "logged. It doesn't diagnose anything."),
           meta: _en('3 MIN'),
           surfaceId: 'ttc_pcos_check',
         ),
         JourneyElement(
           type: SolutionType.tool,
           title: _en('Track your cycle'),
-          value: _en('PCOS can make your cycle hard to read — keep enough '
-              'of a record to spot the pattern that is there.'),
+          value: _en('PCOS can make your cycle hard to read. A steady record '
+              "helps you spot the pattern that's there."),
           surfaceId: 'ttc_cycle',
         ),
       ],
     ),
     JourneyStep(
-      question: _en('Is there a more structured programme?'),
+      question: _en('Is there a step-by-step programme?'),
       elements: [
         JourneyElement(
           type: SolutionType.course,
           title: _en('The PCOS programme'),
-          value: _en("A guided course built around exactly this — for when "
-              "reading isn't enough on its own."),
+          value: _en("A guided course made for exactly this, for when "
+              "reading on your own isn't enough."),
           surfaceId: 'ttc_prepare',
         ),
       ],
@@ -264,16 +266,16 @@ final JourneyConfig kTtcPcosLibrary = JourneyConfig(
         JourneyElement(
           type: SolutionType.consult,
           title: _en('Talk to a PCOS specialist'),
-          value: _en('Book a 1:1 and ask about managing PCOS while trying — '
-              'with someone who can see your own reports.'),
+          value: _en('Book a 1:1 with someone who can look at your own '
+              'reports, and ask about managing PCOS while trying.'),
           action: kTtcActConsult,
         ),
       ],
     ),
   ],
-  closesWhen: _en('This closes when you understand what PCOS means for '
-      "trying to conceive, know what's worth changing day to day, and have "
-      'a way to track your own cycle going forward.'),
+  closesWhen: _en("You're done here when you understand what PCOS means "
+      "for trying to conceive, know what's worth changing day to day, and "
+      'have a way to keep track of your cycle from here on.'),
 );
 
 // -----------------------------------------------------------------------------
@@ -293,9 +295,8 @@ final JourneyConfig kTtcPcosLibrary = JourneyConfig(
 final JourneyConfig kTtcFertilityReadinessCheck = JourneyConfig(
   doorId: kTtcActFertilityReadinessCheck,
   title: _en('Should I seek fertility help?'),
-  intro: _en("This is not a test you can fail. It's a way to work out, "
-      'honestly, whether it is time to see someone — or whether it is still '
-      'early.'),
+  intro: _en("This isn't a test you can fail. It helps you work out, "
+      "honestly, if it's time to see someone or if it's still early."),
   steps: [
     JourneyStep(
       question: _en("How long is 'long enough' to have been trying on our "
@@ -308,15 +309,15 @@ final JourneyConfig kTtcFertilityReadinessCheck = JourneyConfig(
         // opening the same page.
         JourneyElement(
           type: SolutionType.read,
-          title: _en('When it is time to see someone'),
-          value: _en('The twelve-month guideline, and the reasons not to wait '
-              'it out at all.'),
+          title: _en("When it's time to see a doctor"),
+          value: _en('The twelve-month guideline, and the times when you '
+              "shouldn't wait that long at all."),
           meta: _en('8 MIN'),
           surfaceId: 'ttc_read/ttc_read_when_to_seek_help',
         ),
       ],
-      note: _en('These are population guidelines, not a calculation of your '
-          'own case.'),
+      note: _en('These are general guidelines for most couples. They are '
+          'not worked out for you.'),
     ),
     JourneyStep(
       question: _en('Where do I honestly stand?'),
@@ -329,28 +330,28 @@ final JourneyConfig kTtcFertilityReadinessCheck = JourneyConfig(
           type: SolutionType.tool,
           title: _en('The honest self-check'),
           value: _en('It already knows most of this. A couple of questions, '
-              'then a straight answer — never a probability.'),
+              'then a clear answer. Never a probability.'),
           meta: _en('2 MIN'),
           surfaceId: 'ttc_fertility_help',
         ),
       ],
     ),
     JourneyStep(
-      question: _en("I think it's time — who do I talk to?"),
+      question: _en("I think it's time. Who do I talk to?"),
       elements: [
         JourneyElement(
           type: SolutionType.consult,
           title: _en('Speak to a fertility specialist'),
-          value: _en('Book a 1:1 and start from where you actually are, not '
+          value: _en('Book a 1:1 and start from where you are now, not '
               'where you think you should be.'),
           action: kTtcActConsult,
         ),
       ],
     ),
   ],
-  closesWhen: _en("This closes when you know — clearly, in your own words — "
-      'whether it is time to book, or whether it is still early. Not when '
-      "you've booked."),
+  closesWhen: _en("You're done here when you can say clearly, in your own "
+      "words, whether it's time to book or still early. You don't need to "
+      'have booked.'),
 );
 
 // -----------------------------------------------------------------------------
@@ -369,7 +370,7 @@ final JourneyConfig kTtcPreconceptionReadiness = JourneyConfig(
   doorId: kTtcActPreconceptionReadiness,
   title: _en('Get ready before trying'),
   intro: _en("A short, practical list of what's worth sorting out before "
-      "you start trying — nothing urgent, nothing you have to rush."),
+      "you start trying. Nothing urgent, nothing you have to rush."),
   steps: [
     JourneyStep(
       question: _en('What should I be eating, and what should I cut out?'),
@@ -382,16 +383,16 @@ final JourneyConfig kTtcPreconceptionReadiness = JourneyConfig(
         JourneyElement(
           type: SolutionType.read,
           title: _en('The three months before'),
-          value: _en('Why this window, what folic acid is doing, and how much '
-              'weight really matters — for both of you.'),
+          value: _en('Why these months matter, what folic acid does, and '
+              'how much weight really matters. For both of you.'),
           meta: _en('9 MIN'),
           surfaceId: 'ttc_read/ttc_read_three_months_before',
         ),
         JourneyElement(
           type: SolutionType.tool,
           title: _en('Eating, day to day'),
-          value: _en('The planner, built around what an Indian kitchen '
-              'already cooks.'),
+          value: _en('A meal planner built around the Indian food you '
+              'already cook.'),
           surfaceId: 'ttc_nutrition',
         ),
       ],
@@ -407,8 +408,8 @@ final JourneyConfig kTtcPreconceptionReadiness = JourneyConfig(
         JourneyElement(
           type: SolutionType.read,
           title: _en('The tests and vaccinations worth doing first'),
-          value: _en('Including two vaccines that need a month of notice, and '
-              'one screening test that matters more in India.'),
+          value: _en('Including two vaccines to have a month before you '
+              'start, and one screening test that matters more in India.'),
           meta: _en('8 MIN'),
           surfaceId: 'ttc_read/ttc_read_preconception_tests',
         ),
@@ -422,7 +423,8 @@ final JourneyConfig kTtcPreconceptionReadiness = JourneyConfig(
         JourneyElement(
           type: SolutionType.tool,
           title: _en('The full test library'),
-          value: _en('Every test, when to take it, and what it costs here.'),
+          value: _en('Every test, when to have it, and what it costs in '
+              'India.'),
           surfaceId: 'ttc_tests',
         ),
       ],
@@ -432,9 +434,9 @@ final JourneyConfig kTtcPreconceptionReadiness = JourneyConfig(
       elements: [
         JourneyElement(
           type: SolutionType.product,
-          title: _en('Folic acid & preconception supplements'),
-          value: _en('What is worth starting now, and how early it actually '
-              'needs to start.'),
+          title: _en('Folic acid and other supplements before pregnancy'),
+          value: _en("What's worth starting now, and how early to start "
+              'it.'),
           surfaceId: 'ttc_supplements',
         ),
       ],
@@ -455,15 +457,15 @@ final JourneyConfig kTtcPreconceptionReadiness = JourneyConfig(
         JourneyElement(
           type: SolutionType.tool,
           title: _en('Your pre-pregnancy checklist'),
-          value: _en('What you have already covered, what is still worth '
-              'discussing, and your next three steps.'),
+          value: _en("What you've already covered, what's still worth "
+              'talking over, and your next three steps.'),
           meta: _en('CHECKLIST'),
           surfaceId: 'ttc_precheck',
         ),
       ],
     ),
     JourneyStep(
-      question: _en('What small habits actually help, day to day?'),
+      question: _en('What small habits help, day to day?'),
       elements: [
         // ⚠️ THE WORKBOOK'S ACTIVITIES CELL HERE IS THREE WORDS — "Light
         // habit-building" — AND IT SPECIFIES NO MECHANISM.
@@ -478,15 +480,15 @@ final JourneyConfig kTtcPreconceptionReadiness = JourneyConfig(
         JourneyElement(
           type: SolutionType.activity,
           title: _en('Habits worth building now'),
-          value: _en('Sleep, movement, alcohol and tobacco — decide where you '
-              'stand on each, in one place.'),
+          value: _en('Sleep, movement, alcohol and tobacco. Decide where you '
+              'stand on each, all in one place.'),
           surfaceId: 'ttc_precheck/lifestyle',
         ),
         JourneyElement(
           type: SolutionType.tool,
-          title: _en('Track the ones you are working on'),
-          value: _en('Sleep, movement and stress each have a tracker, for when '
-              'a decision needs repeating.'),
+          title: _en("Track the ones you're working on"),
+          value: _en('Sleep, movement and stress each have a tracker, to '
+              'help a new habit stick.'),
           surfaceId: 'ttc_tools',
         ),
       ],
@@ -498,15 +500,15 @@ final JourneyConfig kTtcPreconceptionReadiness = JourneyConfig(
           type: SolutionType.consult,
           title: _en('Talk to someone before you start'),
           value: _en('Book a short session and ask a doctor or nutritionist '
-              "what's actually worth doing first."),
+              "what's really worth doing first."),
           action: kTtcActConsult,
         ),
       ],
     ),
   ],
-  closesWhen: _en('This closes when your diet, tests and supplements are '
-      "sorted, and you know there's nothing urgent left to do before you "
-      'start trying.'),
+  closesWhen: _en("You're done here when your diet, tests and supplements "
+      "are sorted, and you know there's nothing urgent left to do before "
+      'you start trying.'),
 );
 
 // -----------------------------------------------------------------------------
@@ -525,9 +527,9 @@ final JourneyConfig kTtcPreconceptionReadiness = JourneyConfig(
 final JourneyConfig kTtcSpermHealth = JourneyConfig(
   doorId: kTtcActSpermHealth,
   title: _en('Understand sperm health'),
-  intro: _en('Fertility is often a shared picture, not just hers. Here is '
-      "what's actually known about sperm health — written so either of you "
-      'can read it.'),
+  intro: _en('Fertility is often about both of you, not only her. Here '
+      "is what's known about sperm health, written so either of you can "
+      'read it.'),
   steps: [
     JourneyStep(
       question: _en('Is this even about him, or could it be both of us?'),
@@ -540,8 +542,8 @@ final JourneyConfig kTtcSpermHealth = JourneyConfig(
         JourneyElement(
           type: SolutionType.read,
           title: _en('Whose "side" is it, really'),
-          value: _en('A male factor is involved in about half of couples — '
-              'and his half is the fastest thing to check.'),
+          value: _en('A male factor is involved in about half of couples. '
+              'His side is also the quickest to check.'),
           meta: _en('8 MIN'),
           surfaceId: 'ttc_read/ttc_read_whose_side',
         ),
@@ -550,13 +552,13 @@ final JourneyConfig kTtcSpermHealth = JourneyConfig(
           'rarely just one person.'),
     ),
     JourneyStep(
-      question: _en('What actually affects sperm health?'),
+      question: _en('What affects sperm health?'),
       elements: [
         JourneyElement(
           type: SolutionType.read,
           title: _en('Heat, habits and time'),
-          value: _en('Three levers with real evidence, what each is worth, '
-              'and how long before any of it shows.'),
+          value: _en('Three things with real evidence behind them, how much '
+              'each helps, and how long before it shows.'),
           meta: _en('8 MIN'),
           surfaceId: 'ttc_read/ttc_read_heat_habits',
         ),
@@ -567,28 +569,28 @@ final JourneyConfig kTtcSpermHealth = JourneyConfig(
       elements: [
         JourneyElement(
           type: SolutionType.read,
-          title: _en('What a semen analysis actually involves'),
-          value: _en('How it is done, and why "below normal" does not mean '
-              'what it looks like it means.'),
+          title: _en('What a semen analysis involves'),
+          value: _en('How it\'s done, and why "below normal" doesn\'t mean '
+              'what it sounds like.'),
           meta: _en('9 MIN'),
           surfaceId: 'ttc_read/ttc_read_semen_analysis',
         ),
       ],
     ),
     JourneyStep(
-      question: _en('What can we actually change, starting now?'),
+      question: _en('What can we change, starting now?'),
       elements: [
         JourneyElement(
           type: SolutionType.course,
           title: _en('The half nobody talks about'),
-          value: _en('A short course on the lifestyle changes that '
-              'genuinely move the needle.'),
+          value: _en('A short course on the lifestyle changes that make a '
+              'real difference.'),
           surfaceId: 'ttc_prepare',
         ),
         JourneyElement(
           type: SolutionType.product,
           title: _en('Supplements worth considering'),
-          value: _en('Zinc and CoQ10, framed for him — and honest that the '
+          value: _en('Zinc and CoQ10, explained for him, and honest that the '
               'evidence here is weak.'),
           surfaceId: 'ttc_supplements',
         ),
@@ -600,17 +602,16 @@ final JourneyConfig kTtcSpermHealth = JourneyConfig(
         JourneyElement(
           type: SolutionType.consult,
           title: _en('Talk to a specialist'),
-          value: _en('Book a 1:1 and go through his results in confidence, '
-              'without it feeling like a verdict.'),
+          value: _en('Book a 1:1 and go through his results privately, '
+              'without it feeling like a judgement.'),
           action: kTtcActConsult,
         ),
       ],
     ),
   ],
-  closesWhen: _en('This closes when you both understand what actually '
-      "affects sperm health, know whether testing is worth doing, and know "
-      "what's genuinely worth changing — without either of you feeling "
-      'blamed.'),
+  closesWhen: _en("You're done here when you both understand what affects "
+      'sperm health, know if testing is worth doing, and know what is worth '
+      'changing. And neither of you is left feeling blamed.'),
 );
 
 // -----------------------------------------------------------------------------
@@ -630,9 +631,9 @@ final JourneyConfig kTtcSpermHealth = JourneyConfig(
 //  is exactly the false momentum this door must never carry.
 final JourneyConfig kTtcLossRecoveryLibrary = JourneyConfig(
   doorId: kTtcActLossRecoveryLibrary,
-  title: _en('Understand recovery & trying again'),
-  intro: _en("No rush here, and nothing you have to decide today. Just "
-      "what's actually known, said plainly."),
+  title: _en('Understand recovery and trying again'),
+  intro: _en("There's no rush here, and nothing you have to decide today. "
+      "Just what's known, said plainly."),
   steps: [
     JourneyStep(
       question: _en('What does my body need to heal?'),
@@ -641,29 +642,29 @@ final JourneyConfig kTtcLossRecoveryLibrary = JourneyConfig(
           type: SolutionType.read,
           title: _en('Physical recovery, in plain terms'),
           value: _en('What usually happens over the next few weeks, and the '
-              'small number of things that need a doctor today.'),
+              'few signs that need a doctor today.'),
           meta: _en('8 MIN'),
           surfaceId: 'ttc_read/ttc_read_loss_recovery',
         ),
       ],
     ),
     JourneyStep(
-      question: _en('When — if ever — is it safe to try again?'),
+      question: _en('When is it safe to try again, if I want to?'),
       elements: [
         JourneyElement(
           type: SolutionType.read,
           title: _en('On trying again'),
-          value: _en('What the evidence says about waiting, and the part no '
-              'evidence can answer.'),
+          value: _en('What the evidence says about waiting, and the part '
+              'only you can answer.'),
           meta: _en('8 MIN'),
           surfaceId: 'ttc_read/ttc_read_trying_again',
         ),
       ],
-      note: _en('This is a guideline, not a deadline.'),
+      note: _en('This is a guide. There is no deadline.'),
     ),
   ],
-  closesWhen: _en("This closes when you know roughly what your body is "
-      "doing right now, and that there's no clock you have to beat."),
+  closesWhen: _en("You're done here when you know roughly what your body "
+      "is doing right now, and that there's no deadline you have to meet."),
 );
 
 /// Every TTC journey, keyed by the door that opens it.

@@ -363,13 +363,22 @@ void main() {
       // hers and the doctor, which is where a scroll had put it rather than
       // where it belongs: it is the third of three myth-corrections about the
       // act of trying. Grouping is what made the mis-filing visible.
+      // ⚠️ FIVE ADDED 2026-09-26 FROM THE TTC GAP ANALYSIS, in rail order:
+      // three for "Waiting and testing" and two for "Sex and closeness", both
+      // placed after the trying myths and before his tab. The first four
+      // headings are unchanged; they now share one tab, "When and how".
       expect(page.sections.map((s) => s.heading).toList(), [
         'When should we have sex?',
         'How many times should we try?',
         'Which sex position is best?',
         'Does stress stop pregnancy?',
+        'What happens in the two weeks after?',
+        'When should you test, and how?',
+        'What if the test says no?',
+        'When trying changes your sex life',
+        'The questions that are hard to ask',
         'What he should do',
-        'What she should do',
+        'What you should do',
         'When should we see a doctor?',
       ]);
     });

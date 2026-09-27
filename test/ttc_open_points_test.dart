@@ -33,6 +33,7 @@ import 'package:parentveda/ttc/ttc_chapter.dart';
 import 'package:parentveda/ttc/ttc_products_data.dart';
 import 'package:parentveda/ttc/ttc_store.dart';
 import 'package:parentveda/ttc/ttc_tests_data.dart';
+import 'package:parentveda/ttc/ttc_treatment_store.dart';
 
 Future<void> pumpTall(WidgetTester tester, Widget child) async {
   tester.view.physicalSize = const Size(1200, 6000);
@@ -126,6 +127,12 @@ void main() {
       seedDay13();
       expect(TtcStore.instance.today.fertility, isNotNull);
       TtcStore.instance.setPath(TtcPath.ivf);
+      // 2026-09-26: a clinic owns the timing only with a real date from
+      // her clinic for this cycle in the treatment tracker, never on the
+      // pathway label alone. Kept for revert: the label alone did it.
+      TtcTreatmentStore.instance.setDate(TtcTreatmentStep.betaTest,
+          DateTime.now().add(const Duration(days: 20)));
+      addTearDown(TtcTreatmentStore.instance.resetForTest);
       expect(TtcStore.instance.ownership, TimingOwnership.clinicControlled);
       expect(TtcStore.instance.today.fertility, isNull,
           reason: 'an IVF couple is still being shown a calendar window');
@@ -135,6 +142,12 @@ void main() {
         (tester) async {
       seedDay13();
       TtcStore.instance.setPath(TtcPath.ivf);
+      // 2026-09-26: a clinic owns the timing only with a real date from
+      // her clinic for this cycle in the treatment tracker, never on the
+      // pathway label alone. Kept for revert: the label alone did it.
+      TtcTreatmentStore.instance.setDate(TtcTreatmentStep.betaTest,
+          DateTime.now().add(const Duration(days: 20)));
+      addTearDown(TtcTreatmentStore.instance.resetForTest);
       await pumpTall(tester, const TtcTodayScreen());
       final t = const TtcS(false);
       expect(find.text(TtcStore.instance.ownership.title(false)), findsOneWidget);
@@ -145,6 +158,12 @@ void main() {
     testWidgets('Fertility Window replaces the six-day model', (tester) async {
       seedDay13();
       TtcStore.instance.setPath(TtcPath.iui);
+      // 2026-09-26: a clinic owns the timing only with a real date from
+      // her clinic for this cycle in the treatment tracker, never on the
+      // pathway label alone. Kept for revert: the label alone did it.
+      TtcTreatmentStore.instance.setDate(TtcTreatmentStep.betaTest,
+          DateTime.now().add(const Duration(days: 20)));
+      addTearDown(TtcTreatmentStore.instance.resetForTest);
       await pumpTall(tester, const TtcFertilityWindowScreen());
       final t = const TtcS(false);
       expect(find.text(TtcStore.instance.ownership.title(false)), findsOneWidget);
@@ -156,6 +175,12 @@ void main() {
         (tester) async {
       seedDay13();
       TtcStore.instance.setPath(TtcPath.ivf);
+      // 2026-09-26: a clinic owns the timing only with a real date from
+      // her clinic for this cycle in the treatment tracker, never on the
+      // pathway label alone. Kept for revert: the label alone did it.
+      TtcTreatmentStore.instance.setDate(TtcTreatmentStep.betaTest,
+          DateTime.now().add(const Duration(days: 20)));
+      addTearDown(TtcTreatmentStore.instance.resetForTest);
       await pumpTall(tester, const TtcOvulationScreen());
       final t = const TtcS(false);
       expect(find.text(TtcStore.instance.ownership.title(false)), findsOneWidget);
@@ -171,6 +196,12 @@ void main() {
       // around - so we stop predicting, but we keep listening.
       seedDay13();
       TtcStore.instance.setPath(TtcPath.ovulationInduction);
+      // 2026-09-26: a clinic owns the timing only with a real date from
+      // her clinic for this cycle in the treatment tracker, never on the
+      // pathway label alone. Kept for revert: the label alone did it.
+      TtcTreatmentStore.instance.setDate(TtcTreatmentStep.betaTest,
+          DateTime.now().add(const Duration(days: 20)));
+      addTearDown(TtcTreatmentStore.instance.resetForTest);
       expect(TtcStore.instance.ownership, TimingOwnership.clinicGuided);
       await pumpTall(tester, const TtcOvulationScreen());
       final t = const TtcS(false);

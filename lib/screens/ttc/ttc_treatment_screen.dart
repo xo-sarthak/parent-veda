@@ -22,12 +22,17 @@ import 'package:flutter/material.dart';
 
 import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_store.dart';
+import '../../ttc/ttc_treatment_round.dart';
 import '../../ttc/ttc_treatment_store.dart';
 import '../v2/v2_palette.dart';
 import 'ttc_common.dart';
 import 'ttc_ivf_readiness_screen.dart' show kIvfHue;
 import 'ttc_tool_chrome.dart';
 import 'ttc_strings.dart';
+import 'ttc_round_strings.dart';
+import 'ttc_surface_router.dart' show openTtcSurface;
+import 'ttc_round_home_card.dart' show TtcRoundCheckInCard;
+import 'ttc_treatment_round_screens.dart';
 
 void openTtcTreatment(BuildContext context) {
   Navigator.of(context).push(MaterialPageRoute<void>(
@@ -60,6 +65,27 @@ class TtcTreatmentScreen extends StatelessWidget {
         // A tool reached from a focus page has to look like it belongs to the
         // page that sent her. `TtcToolScaffold` is the shared shell every TTC
         // tool now wears — see `ttc_tool_chrome.dart`.
+        // ⚠️ A ROUND SINCE 2026-09-26 (docs/TTC-TREATMENT-FLOW.md, B3). With
+        // no round, the screen opens on "Starting treatment?"; with a round
+        // saved by the start flow, on its plan ("Here's how your round
+        // usually goes") and the actions that change it, each confirmed and
+        // undoable. A legacy round (dates from before rounds, no kind) keeps
+        // the five date rows below and is asked what kind it is.
+        if (!store.isLoaded) {
+          return const Scaffold(
+              backgroundColor: Colors.white,
+              body: Center(
+                  child: CircularProgressIndicator(color: ttcTitleInk)));
+        }
+        final round = cycle;
+        final hasKind = round.kind != null && !round.isEmpty;
+        final legacy = round.kind == null && !round.isEmpty;
+        final phase = ttcTreatmentPhase(round, DateTime.now());
+        final canResult = hasKind &&
+            (phase == TtcRoundPhase.testDay ||
+                ttcRoundBloodTest(round) != null &&
+                    !ttcRoundBloodTest(round)!.isAfter(DateTime.now()));
+
         return TtcToolScaffold(
           hue: kIvfHue,
           eyebrow: t.treatmentTitle,
@@ -71,9 +97,95 @@ class TtcTreatmentScreen extends StatelessWidget {
           children: [
                 const SizedBox(height: 22),
 
+                // ---- no round: the way in -----------------------------------
+                if (round.isEmpty) ...[
+                  ttcToolPad(const TtcStartTreatmentCard()),
+                  const SizedBox(height: 20),
+                ],
+
+                // ---- the round she can still reopen (7 days) ----------------
+                if (store.canUndoClose()) ...[
+                  ttcToolPad(_UndoCloseCard(store: store)),
+                  const SizedBox(height: 20),
+                ],
+
+                // ---- the check-in, when it is due ----------------------------
+                if (store.checkInDue()) ...[
+                  ttcToolPad(TtcRoundCheckInCard(
+                      onAnswer: () => showTtcCheckInSheet(context))),
+                  const SizedBox(height: 20),
+                ],
+
+                // ---- a legacy round: what kind is it? ------------------------
+                if (legacy) ...[
+                  ttcToolPad(TtcRoundOption(
+                    key: const ValueKey('ttc_round_legacy_kind'),
+                    title: kTtcRoundLegacyTitle,
+                    line: kTtcRoundLegacyBody,
+                    icon: Icons.help_outline_rounded,
+                    onTap: () => openTtcTreatmentStart(context),
+                  )),
+                  const SizedBox(height: 20),
+                ],
+
+                // ---- a round: its step today, then the plan ------------------
+                if (hasKind) ...[
+                  ttcToolPad(_RoundHeader(round: round, phase: phase)),
+                  const SizedBox(height: 18),
+                  if (canResult) ...[
+                    ttcToolPad(TtcRoundButton(
+                      key: const ValueKey('ttc_round_tell_result'),
+                      label: kTtcRoundTellResult,
+                      onTap: () => openTtcTreatmentResult(context),
+                    )),
+                    const SizedBox(height: 18),
+                  ],
+                  ttcToolPad(ttcSectionTitle(kTtcRoundPlanTitle)),
+                  ttcToolPad(Text(kTtcRoundPlanBody,
+                      style: ttcBody(12.5, h: 1.5))),
+                  const SizedBox(height: 16),
+                  ttcToolPad(TtcRoundTimeline(round: round)),
+                  const SizedBox(height: 6),
+                  // Daily injections live in the medication schedule
+                  // (decision 4), which already has times and a taken tick.
+                  ttcToolPad(TtcCard(
+                    onTap: () => openTtcSurface(context, 'ttc_medication'),
+                    color: ttcPanel,
+                    child: Row(children: [
+                      const Icon(Icons.medication_outlined,
+                          size: 18, color: ttcTitleInk),
+                      const SizedBox(width: 11),
+                      Expanded(
+                        child: Text(kTtcRoundMedicationLink,
+                            style: ttcBody(12.5, h: 1.5)),
+                      ),
+                      const Icon(Icons.chevron_right_rounded,
+                          size: 18, color: ttcMuted),
+                    ]),
+                  )),
+                  const SizedBox(height: 22),
+                  ttcToolPad(TtcRoundButton(
+                    key: const ValueKey('ttc_round_plan_changed'),
+                    label: kTtcRoundPlanChanged,
+                    primary: false,
+                    onTap: () => showTtcPlanChangedSheet(context),
+                  )),
+                  const SizedBox(height: 8),
+                  ttcToolPad(TtcRoundButton(
+                    key: const ValueKey('ttc_round_pause'),
+                    label: kTtcRoundTakeBreak,
+                    primary: false,
+                    onTap: () =>
+                        ttcConfirmCloseRound(context, TtcRoundOutcome.paused),
+                  )),
+                  const SizedBox(height: 20),
+                ],
+
                 // The next milestone, made large - it is the one thing she
                 // opens this screen to check.
-                if (next != null) ...[
+                // A round shows its step in the header above; the big card
+                // stays for a legacy round (2026-09-26).
+                if (next != null && !hasKind) ...[
                   // ⚠️ FLAT, NOT A DIAGONAL GRADIENT. The two-stop purple wash
                   // was the loudest object in the stage, on a screen someone
                   // opens while anxious. It is also the exact texture that was
@@ -139,19 +251,29 @@ class TtcTreatmentScreen extends StatelessWidget {
                 // the whole ownership model, the two questions, the treatment
                 // cycle, the trigger reminders and the beta countdown were
                 // unreachable code with forty-seven passing tests over the top.
-                ttcToolPad(const TtcPathChooser()),
-                const SizedBox(height: 20),
+                //
+                // ⚠️ COMMENTED OUT 2026-09-26, KEPT FOR REVERT (the user's
+                // decision 2, docs/TTC-TREATMENT-FLOW.md §7). The kind of round
+                // is asked by the start flow, and who owns the timing is worked
+                // out from the kind and whether a trigger is dated
+                // (`ttcRoundTier`), so neither the path chooser nor the two
+                // questions are asked here any more. Both widgets still exist
+                // below. To revert, restore these four lines:
+                //
+                // ttcToolPad(const TtcPathChooser()),
+                // const SizedBox(height: 20),
+                // ttcToolPad(const TtcPathwayQuestions()),
+                // const SizedBox(height: 20),
 
-                // Asked here rather than at signup: this is where she has come
-                // BECAUSE the app stopped predicting, so it is the one moment
-                // the questions obviously earn their place.
-                ttcToolPad(const TtcPathwayQuestions()),
-                const SizedBox(height: 20),
-
-                ttcToolPad(ttcSectionTitle(t.treatmentDates)),
-                for (final step in TtcTreatmentStep.values) ...[
-                  ttcToolPad(_StepRow(step: step, at: cycle[step], t: t)),
-                  const SizedBox(height: 10),
+                // The five original rows, for a legacy round only: a round
+                // with a kind shows its own timeline above. Kept for revert:
+                // the rows rendered for every round, over all five steps.
+                if (legacy) ...[
+                  ttcToolPad(ttcSectionTitle(t.treatmentDates)),
+                  for (final step in kTtcOriginalTreatmentSteps) ...[
+                    ttcToolPad(_StepRow(step: step, at: cycle[step], t: t)),
+                    const SizedBox(height: 10),
+                  ],
                 ],
 
                 const SizedBox(height: 14),
@@ -170,19 +292,41 @@ class TtcTreatmentScreen extends StatelessWidget {
                   )),
 
                 const SizedBox(height: 16),
+                // "Remove these dates": for a round entered by mistake. Ending
+                // a round is closing it (kept in history); this is the one
+                // action that removes dates, so it says so before it does.
+                // Kept for revert: the label was `t.treatmentClear`.
                 if (store.hasDates)
-                  ttcToolPad(GestureDetector(
-                    onTap: () => _confirmClear(context, t),
-                    behavior: HitTestBehavior.opaque,
-                    child: Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Text(t.treatmentClear,
-                            style: ttcBody(12.5,
-                                color: ttcMuted, w: FontWeight.w700)),
+                  ttcToolPad(Semantics(
+                    button: true,
+                    child: GestureDetector(
+                      key: const ValueKey('ttc_round_remove'),
+                      onTap: () => _confirmClear(context, t),
+                      behavior: HitTestBehavior.opaque,
+                      child: Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Text(kTtcRoundRemove,
+                              style: ttcBody(12.5,
+                                  color: ttcMuted, w: FontWeight.w700)),
+                        ),
                       ),
                     ),
                   )),
+
+                // ---- past rounds: kept, never deleted ------------------------
+                if (store.history.isNotEmpty) ...[
+                  const SizedBox(height: 14),
+                  ttcToolPad(ttcSectionTitle(kTtcRoundPastTitle)),
+                  ttcToolPad(Text(kTtcRoundHistoryNote,
+                      style: ttcBody(12, color: ttcMuted))),
+                  const SizedBox(height: 10),
+                  for (var i = store.history.length - 1; i >= 0; i--) ...[
+                    ttcToolPad(_PastRoundRow(
+                        n: i + 1, round: store.history[i])),
+                    const SizedBox(height: 8),
+                  ],
+                ],
 
                 const SizedBox(height: 14),
                 ttcToolPad(Row(
@@ -234,8 +378,10 @@ class TtcTreatmentScreen extends StatelessWidget {
       builder: (ctx) => AlertDialog(
         backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
-        title: Text(t.treatmentClear, style: ttcJakarta(16)),
-        content: Text(t.treatmentClearBody, style: ttcBody(13.5, h: 1.5)),
+        // Kept for revert: `t.treatmentClear` and `t.treatmentClearBody`,
+        // which said to clear a round when it ENDS. Ending is closing now.
+        title: Text(kTtcRoundRemove, style: ttcJakarta(16)),
+        content: Text(kTtcRoundRemoveBody, style: ttcBody(13.5, h: 1.5)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
@@ -244,13 +390,127 @@ class TtcTreatmentScreen extends StatelessWidget {
           ),
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(true),
-            child: Text(t.treatmentClear,
+            child: Text(kTtcRoundRemove,
                 style: ttcBody(13, color: ttcPurple, w: FontWeight.w800)),
           ),
         ],
       ),
     );
     if (ok == true) TtcTreatmentStore.instance.clearCycle();
+  }
+}
+
+/// Where the round stands today: its kind, clinic, step and next date.
+class _RoundHeader extends StatelessWidget {
+  const _RoundHeader({required this.round, required this.phase});
+
+  final TtcTreatmentCycle round;
+  final TtcRoundPhase phase;
+
+  @override
+  Widget build(BuildContext context) {
+    final now = DateTime.now();
+    final next = ttcRoundNextAfter(round, now);
+    final first = ttcFirstTreatmentDate(round);
+    String? nextLine;
+    if (phase == TtcRoundPhase.planned && first != null) {
+      nextLine = 'Your home follows your round from ${ttcRoundDate(first)}.';
+    } else if (next != null) {
+      final name = next.$1 == null
+          ? ttcScanLabel(round.kind)
+          : ttcStepLabel(next.$1!, round.kind);
+      nextLine = 'Next: $name, ${ttcRoundDate(next.$2)}.';
+    }
+    return Container(
+      key: const ValueKey('ttc_round_header'),
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+          color: ttcPanel, borderRadius: BorderRadius.circular(20)),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(
+            [
+              ttcRoundKindName(round.kind!).toUpperCase(),
+              if (round.clinic.isNotEmpty) round.clinic.toUpperCase(),
+            ].join(' · '),
+            style: ttcBody(10, color: ttcSoft, w: FontWeight.w800)),
+        const SizedBox(height: 8),
+        Text(ttcRoundPhaseName(phase, round.kind),
+            style: ttcFraunces(24, w: FontWeight.w600, color: ttcTitleInk)),
+        if (nextLine != null) ...[
+          const SizedBox(height: 6),
+          Text(nextLine,
+              style: ttcBody(13.5, color: ttcTitleInk, w: FontWeight.w700)),
+        ],
+      ]),
+    );
+  }
+}
+
+/// A round closed in the last 7 days, and the way to reopen it exactly.
+class _UndoCloseCard extends StatelessWidget {
+  const _UndoCloseCard({required this.store});
+  final TtcTreatmentStore store;
+
+  @override
+  Widget build(BuildContext context) {
+    final last = store.lastClosed!;
+    return TtcCard(
+      key: const ValueKey('ttc_round_undo_card'),
+      color: ttcPanel,
+      child: Row(children: [
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(kTtcUndoCardLine,
+                style: ttcBody(13, color: ttcTitleInk, w: FontWeight.w800)),
+            const SizedBox(height: 4),
+            Text(
+                '${ttcRoundHistoryLabel(store.history.length, last)} · '
+                '${ttcRoundOutcomeLabel(last.outcome)}',
+                style: ttcBody(12, h: 1.4)),
+          ]),
+        ),
+        const SizedBox(width: 10),
+        TextButton(
+          key: const ValueKey('ttc_round_undo'),
+          onPressed: store.undoClose,
+          child: Text(kTtcRoundUndoCta,
+              style: ttcBody(13.5, color: ttcTitleInk, w: FontWeight.w800)),
+        ),
+      ]),
+    );
+  }
+}
+
+/// One closed round, kept: "Round 1, Sep to Oct · Not this time".
+class _PastRoundRow extends StatelessWidget {
+  const _PastRoundRow({required this.n, required this.round});
+  final int n;
+  final TtcTreatmentCycle round;
+
+  @override
+  Widget build(BuildContext context) {
+    return TtcCard(
+      padding: const EdgeInsets.all(14),
+      child: Row(children: [
+        const Icon(Icons.history_rounded, size: 18, color: ttcMuted),
+        const SizedBox(width: 11),
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(ttcRoundHistoryLabel(n, round),
+                style: ttcBody(13.5, color: ttcTitleInk, w: FontWeight.w800)),
+            const SizedBox(height: 3),
+            Text(
+                [
+                  if (round.kind != null) ttcRoundKindName(round.kind!),
+                  ttcRoundOutcomeLabel(round.outcome),
+                  '${round.allDates.length} dates',
+                ].join(' · '),
+                style: ttcBody(12, h: 1.4)),
+          ]),
+        ),
+      ]),
+    );
   }
 }
 
@@ -288,7 +548,7 @@ class _TakenTick extends StatelessWidget {
         Text(
           taken
               ? (hi ? 'Le liya - reminder band' : 'Taken · reminders off')
-              : (hi ? 'Le liya? Yahan tick karein' : 'Taken? Tick this'),
+              : (hi ? 'Le liya? Yahan tick karein' : 'Taken it? Tick here'),
           style: ttcBody(11.5,
               color: taken ? ttcPurple : ttcSoft, w: FontWeight.w700),
         ),
@@ -405,6 +665,8 @@ class _StepRow extends StatelessWidget {
         return Icons.spa_outlined;
       case TtcTreatmentStep.betaTest:
         return Icons.biotech_outlined;
+      default:
+        return Icons.event_outlined; // the steps added 2026-09-26
     }
   }
 }
@@ -473,28 +735,32 @@ class TtcTreatmentEntryCard extends StatelessWidget {
         // If we are assuming rather than knowing, say so and offer the fix.
         // Someone on unmonitored letrozole is currently having their fertile
         // window withheld on a default, and two taps would give it back.
-        if (!TtcStore.instance.pathwayAnswered &&
-            TtcStore.instance.path.answersMatter) ...[
-          const SizedBox(height: 12),
-          ttcDivider(),
-          const SizedBox(height: 11),
-          Row(children: [
-            const Icon(Icons.help_outline_rounded, size: 16, color: ttcBrown),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(t.pathwayAnswerCta,
-                        style:
-                            ttcBody(12.5, color: ttcBrown, w: FontWeight.w800)),
-                    const SizedBox(height: 3),
-                    Text(t.pathwayAnswerBody,
-                        style: ttcBody(11.5, color: ttcBrown, h: 1.45)),
-                  ]),
-            ),
-          ]),
-        ],
+        // ⚠️ COMMENTED OUT 2026-09-26 WITH THE TWO QUESTIONS (decision 2):
+        // the tier comes from the round now, so there is nothing to answer.
+        // Kept for revert: the condition was
+        //   !TtcStore.instance.pathwayAnswered &&
+        //       TtcStore.instance.path.answersMatter
+        // if (...) ...[
+          // const SizedBox(height: 12),
+          // ttcDivider(),
+          // const SizedBox(height: 11),
+          // Row(children: [
+            // const Icon(Icons.help_outline_rounded, size: 16, color: ttcBrown),
+            // const SizedBox(width: 8),
+            // Expanded(
+              // child: Column(
+                  // crossAxisAlignment: CrossAxisAlignment.start,
+                  // children: [
+                    // Text(t.pathwayAnswerCta,
+                        // style:
+                            // ttcBody(12.5, color: ttcBrown, w: FontWeight.w800)),
+                    // const SizedBox(height: 3),
+                    // Text(t.pathwayAnswerBody,
+                        // style: ttcBody(11.5, color: ttcBrown, h: 1.45)),
+                  // ]),
+            // ),
+          // ]),
+        // ],
       ]),
     );
   }

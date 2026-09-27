@@ -2723,9 +2723,11 @@ class S {
           'निमंत्रण कॉपी हो गया। जहाँ चाहें चिपका दीजिए।');
 
   String pairingShareText(String code) => _p(
-      'Join me on ParentVeda 💜  Download the app, choose "I\'m the father", '
+      // No emoji (gap analysis, Behind › Partner, 2026-09-26): CLAUDE.md bans
+      // decorative emoji, and a share text is the app speaking in her voice.
+      'Join me on ParentVeda. Download the app, choose "I\'m the father", '
           'and enter my pairing code: $code',
-      'ParentVeda पर मेरे साथ जुड़िए 💜  ऐप डाउनलोड कीजिए, "मैं पिता हूँ" चुनिए, '
+      'ParentVeda पर मेरे साथ जुड़िए। ऐप डाउनलोड कीजिए, "मैं पिता हूँ" चुनिए, '
           'और मेरा कोड डालिए: $code');
 
   String get pairingShareSubject =>

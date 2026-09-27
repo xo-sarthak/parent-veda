@@ -78,6 +78,9 @@
 import 'package:flutter/material.dart' show IconData;
 
 import '../screens/ttc/ttc_illustrations.dart';
+// The new door's drawn tab marks (`TtcFocusGroup.mark`). Exported below so a
+// focus file can name `IntentMark.cycleRing` without a second import.
+import '../screens/brackets/hub/hub_intent_art.dart' show IntentMark;
 import 'focus/ttc_focus_conceiving.dart';
 import 'focus/ttc_focus_after_loss.dart';
 import 'focus/ttc_focus_mind_body.dart';
@@ -85,10 +88,13 @@ import 'focus/ttc_focus_getting_ready.dart';
 import 'focus/ttc_focus_his_side.dart';
 import 'focus/ttc_focus_ivf.dart';
 import 'focus/ttc_focus_pcos.dart';
+import 'focus/ttc_focus_body_cycle.dart';
+import 'focus/ttc_focus_not_yet.dart';
 
 export 'focus/ttc_focus_conceiving.dart';
 export 'focus/ttc_focus_ivf.dart';
 export 'focus/ttc_focus_pcos.dart';
+export '../screens/brackets/hub/hub_intent_art.dart' show IntentMark;
 
 /// What kind of thing a tile is. Drives the chip, the icon and the shape.
 enum TtcTileFormat {
@@ -207,7 +213,12 @@ class TtcCarouselCard {
 // -----------------------------------------------------------------------------
 
 sealed class TtcTile {
-  const TtcTile({required this.title, required this.blurb});
+  const TtcTile({
+    required this.title,
+    required this.blurb,
+    this.meta,
+    this.keywords = const [],
+  });
 
   /// Short and plain. The one line she reads.
   final String title;
@@ -218,13 +229,29 @@ sealed class TtcTile {
   /// `JourneyElement.value`.
   final String blurb;
 
+  /// One small fact above the title on the new door (`TtcDoorScreen`), where
+  /// it helps her decide before tapping: "6 min read", "5 min film".
+  ///
+  /// ⚠️ OPTIONAL, AND USUALLY LEFT NULL ON PURPOSE (2026-09-26). The door
+  /// derives the common cases itself (`ttcDoorTileMeta`): a read's minutes come
+  /// from `PvRead.minutes`, which is computed from the words, and a film's from
+  /// its `duration`. A number typed here goes stale the day the read is
+  /// rewritten, so set this only for a fact the door cannot work out.
+  /// The old `TtcFocusScreen` never reads it.
+  final String? meta;
+
+  /// Extra words the door's search matches on, beyond the title and blurb —
+  /// the word she would type that the title does not use ("HSG", "sperm
+  /// test", "AMH"). Read only by `ttc_door_search.dart`.
+  final List<String> keywords;
+
   TtcTileFormat get format;
 }
 
 /// Opens a screen that already exists elsewhere in the stage.
 final class TtcToolTile extends TtcTile {
   const TtcToolTile(
-      {required super.title, required super.blurb, required this.surfaceId});
+      {required super.title, required super.blurb, super.meta, super.keywords, required this.surfaceId});
 
   /// ⚠️ A SURFACE ID, NOT A WIDGET. The tool is built, shipped and tested; this
   /// opens it through `openTtcSurface` so the route NAME stays the surface id —
@@ -240,7 +267,7 @@ final class TtcToolTile extends TtcTile {
 final class TtcArticleTile extends TtcTile {
   const TtcArticleTile({
     required super.title,
-    required super.blurb,
+    required super.blurb, super.meta, super.keywords,
     this.body = const [],
     this.readId,
     this.moreReadId,
@@ -326,7 +353,7 @@ class TtcInfographicColumn {
 final class TtcInfographicTile extends TtcTile {
   const TtcInfographicTile({
     required super.title,
-    required super.blurb,
+    required super.blurb, super.meta, super.keywords,
     required this.headline,
     required this.left,
     required this.right,
@@ -357,7 +384,7 @@ final class TtcInfographicTile extends TtcTile {
 final class TtcCarouselTile extends TtcTile {
   const TtcCarouselTile(
       {required super.title,
-      required super.blurb,
+      required super.blurb, super.meta, super.keywords,
       required this.cards,
       this.art,
       this.reviewedBy,
@@ -389,7 +416,7 @@ final class TtcCarouselTile extends TtcTile {
 final class TtcVideoTile extends TtcTile {
   const TtcVideoTile({
     required super.title,
-    required super.blurb,
+    required super.blurb, super.meta, super.keywords,
     required this.slotId,
     required this.duration,
   });
@@ -415,7 +442,7 @@ final class TtcVideoTile extends TtcTile {
 final class TtcMythTile extends TtcTile {
   const TtcMythTile({
     required super.title,
-    required super.blurb,
+    required super.blurb, super.meta, super.keywords,
     required this.myth,
     required this.fact,
     this.slides = const [],
@@ -463,13 +490,13 @@ final class TtcMythTile extends TtcTile {
 final class TtcProductTile extends TtcTile {
   /// One product, straight to its page.
   const TtcProductTile(
-      {required super.title, required super.blurb, required this.productId})
+      {required super.title, required super.blurb, super.meta, super.keywords, required this.productId})
       : category = null;
 
   /// A whole shelf — every product in one category, ranked, with the
   /// recommendation band on each card.
   const TtcProductTile.shelf(
-      {required super.title, required super.blurb, required this.category})
+      {required super.title, required super.blurb, super.meta, super.keywords, required this.category})
       : productId = null;
 
   /// Exactly one of these is set, and which one decides where it opens.
@@ -502,7 +529,7 @@ final class TtcProductTile extends TtcTile {
 final class TtcGuideTile extends TtcTile {
   const TtcGuideTile({
     required super.title,
-    required super.blurb,
+    required super.blurb, super.meta, super.keywords,
     required this.readId,
     this.atHeading,
   });
@@ -535,7 +562,7 @@ final class TtcGuideTile extends TtcTile {
 /// something you come back to and add to, not something you use once.
 final class TtcChecklistTile extends TtcTile {
   const TtcChecklistTile(
-      {required super.title, required super.blurb, required this.surfaceId});
+      {required super.title, required super.blurb, super.meta, super.keywords, required this.surfaceId});
 
   final String surfaceId;
 
@@ -552,7 +579,7 @@ final class TtcChecklistTile extends TtcTile {
 /// before you start" is offering somebody who has not started trying yet.
 final class TtcTalkTile extends TtcTile {
   const TtcTalkTile(
-      {required super.title, required super.blurb, required this.action});
+      {required super.title, required super.blurb, super.meta, super.keywords, required this.action});
 
   /// A hub action, resolved by the caller — the same booking engine underneath.
   /// Only the promise on the card differs.
@@ -577,7 +604,7 @@ final class TtcTalkTile extends TtcTile {
 /// recipe page format so do that."*
 final class TtcRecipeTile extends TtcTile {
   const TtcRecipeTile(
-      {required super.title, required super.blurb, required this.recipeId});
+      {required super.title, required super.blurb, super.meta, super.keywords, required this.recipeId});
 
   /// Must exist in `kRecipes`. Held by `ttc_focus_page_test.dart` for the same
   /// reason every other id here is: a tile whose id is wrong renders perfectly
@@ -603,7 +630,7 @@ final class TtcRecipeTile extends TtcTile {
 /// clinical claim on this page may point at it.
 final class TtcCommunityTile extends TtcTile {
   const TtcCommunityTile(
-      {required super.title, required super.blurb, required this.surfaceId});
+      {required super.title, required super.blurb, super.meta, super.keywords, required this.surfaceId});
 
   /// Resolved by `ttcScreenForSurface`, like a tool's.
   final String surfaceId;
@@ -629,7 +656,7 @@ final class TtcCommunityTile extends TtcTile {
 /// tiles open the checklist and the trackers, which record without ranking.
 final class TtcDoTile extends TtcTile {
   const TtcDoTile(
-      {required super.title, required super.blurb, required this.surfaceId});
+      {required super.title, required super.blurb, super.meta, super.keywords, required this.surfaceId});
 
   /// Resolved by `ttcScreenForSurface`, exactly like a tool's — the difference
   /// is what the chip promises, not how it opens.
@@ -659,7 +686,7 @@ final class TtcDoTile extends TtcTile {
 /// of describing the tap — nobody outside this repo knows what a reference is.
 final class TtcDoorTile extends TtcTile {
   const TtcDoorTile(
-      {required super.title, required super.blurb, required this.bracketId});
+      {required super.title, required super.blurb, super.meta, super.keywords, required this.bracketId});
 
   /// Must resolve through `ttcFocusPageFor`. An unknown id opens nothing, which
   /// `ttc_mind_body_test.dart` checks for — the wiring gate, again.
@@ -672,7 +699,7 @@ final class TtcDoorTile extends TtcTile {
 /// A paid course.
 final class TtcMasterclassTile extends TtcTile {
   const TtcMasterclassTile(
-      {required super.title, required super.blurb, required this.offeringId});
+      {required super.title, required super.blurb, super.meta, super.keywords, required this.offeringId});
 
   final String offeringId;
 
@@ -683,7 +710,7 @@ final class TtcMasterclassTile extends TtcTile {
 /// Time with a real person.
 final class TtcBookingTile extends TtcTile {
   const TtcBookingTile(
-      {required super.title, required super.blurb, required this.action});
+      {required super.title, required super.blurb, super.meta, super.keywords, required this.action});
 
   /// A hub action, resolved by the caller — never a booking flow rebuilt here.
   final String action;
@@ -760,7 +787,40 @@ class TtcFocusGroup {
     this.toolSurfaceId,
     this.pinnedRedFlagReadIds = const [],
     this.note,
+    this.mark,
+    this.inlineLabel,
+    this.inlineSurfaceId,
   });
+
+  // ---------------------------------------------------------------------------
+  //  The new door (TtcDoorScreen, 2026-09-26) — three optional fields
+  // ---------------------------------------------------------------------------
+  //  ⚠️ ADDITIVE, SO THE OLD SCREEN IS UNTOUCHED. `TtcFocusScreen` stays on
+  //  disk for revert and reads none of these; the new door reads all three.
+  //  Same mirror-not-merge choice as the pregnancy engine (`PvDoorGroup`).
+
+  /// The group's DRAWN mark on the new door's straddling rail — the same
+  /// hand-drawn family every pregnancy door tab wears (DESIGN-SYSTEM §4.0).
+  /// Null falls back to [icon], which is what a stock glyph looks like next
+  /// to drawn ones, so every tab on a shipped door has one
+  /// (`test/ttc_door_screen_test.dart`).
+  final IntentMark? mark;
+
+  /// The second line on a tool tab's rail card, instead of a count. "1 thing"
+  /// over a tool is true and useless. Set per tab, never inferred from the
+  /// surface id: a value inferred from the first caller is wrong at the
+  /// second, which is how the old rail came to call a practice "Quick check".
+  final String? inlineLabel;
+
+  /// A tool rendered in place ABOVE this tab's sections on the new door.
+  ///
+  /// ⚠️ ABOVE, NOT INSTEAD OF. [toolSurfaceId] is the old either/or (a tool
+  /// tab had no sections); on the new door a tab may carry a tool and then
+  /// its reading under it, the pregnancy shape. The new door reads
+  /// `inlineSurfaceId ?? toolSurfaceId`, so the two existing tool tabs keep
+  /// working without the id being written twice. Resolved by
+  /// `ttcInlineToolFor`; a surface with no inline body there renders nothing.
+  final String? inlineSurfaceId;
 
   /// One line above this group's rails.
   ///
@@ -881,7 +941,19 @@ class TtcFocusPage {
     this.heroImageUrl,
     this.heroBlurb,
     this.closingLine,
+    this.heroTitle,
   });
+
+  /// The new door's headline: a SENTENCE, set large under the eyebrow
+  /// (`TtcDoorScreen`), the way every pregnancy door reads ("Your scans, in
+  /// one place.").
+  ///
+  /// ⚠️ NOT THE DOOR'S NAME, AND THAT IS WHY IT DOES NOT BREAK THE RULE ON
+  /// [intro]. The name is still taken from the bracket, as the eyebrow, so
+  /// the tile she tapped and the page she lands on still say the same words.
+  /// This line is what the door is FOR, in her voice (docs/TTC-VOICE.md).
+  /// Null falls back to the bracket's label. The old screen never reads it.
+  final String? heroTitle;
 
   /// One sentence at the foot of the door, under whichever tab is open.
   ///
@@ -996,6 +1068,9 @@ final List<TtcFocusPage> kTtcFocusPages = [
   kTtcHisSideFocus,
   kTtcAfterLossFocus,
   kTtcMindBodyFocus,
+  // The gap plan's two new doors (2026-09-26, docs/TTC-GAP-PLAN.md §8).
+  kTtcBodyCycleFocus,
+  kTtcNotYetFocus,
 ];
 
 /// The page for a bracket, or null when that bracket still uses a hub.
@@ -1008,6 +1083,28 @@ final List<TtcFocusPage> kTtcFocusPages = [
 TtcFocusPage? ttcFocusPageFor(String bracketId) {
   for (final page in kTtcFocusPages) {
     if (page.bracketId == bracketId) return page;
+  }
+  return null;
+}
+
+/// A door tile's name in Ask Veda's content pool (2026-09-27).
+///
+/// Tiles have no id of their own, and an index would shift the day a tile is
+/// added above it, so the exported doc names the tile by its title. Hyphens,
+/// not underscores: Ask Veda strips a trailing `_hi` from every doc id, and
+/// "Say hi" must not lose its last word to that.
+String ttcTileSlug(TtcTile t) => t.title
+    .toLowerCase()
+    .replaceAll(RegExp(r'[^a-z0-9]+'), '-')
+    .replaceAll(RegExp(r'^-+|-+$'), '');
+
+/// The tile on [page] named [slug], and the group of the section it sits in,
+/// or null when the door no longer has it (the door itself then opens).
+(TtcTile, String?)? ttcTileBySlug(TtcFocusPage page, String slug) {
+  for (final s in page.sections) {
+    for (final t in s.tiles) {
+      if (ttcTileSlug(t) == slug) return (t, s.group);
+    }
   }
   return null;
 }

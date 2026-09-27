@@ -26,6 +26,7 @@ import '../../theme/pv_fonts.dart';
 import '../../ttc/cycle_store.dart';
 import '../../ttc/ttc_bmi_rules.dart';
 import '../../ttc/ttc_bmi_store.dart';
+import '../../ttc/ttc_chapter.dart' show kTtcIrregularSpreadDays;
 import '../../ttc/ttc_pcos_check_rules.dart';
 import '../../ttc/ttc_pcos_check_store.dart';
 import '../v2/v2_palette.dart';
@@ -100,7 +101,9 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
       hasPcosPattern: r != null &&
           !r.stopped &&
           (r.level == PcosLevel.discuss || r.level == PcosLevel.soon),
-      irregularCycles: cycles.length >= 2 && spread > 7,
+      // The one definition of irregular (2026-09-26). Was `spread > 7`.
+      irregularCycles:
+          cycles.length >= 2 && spread > kTtcIrregularSpreadDays,
       previousKg: _store.latest?.kilograms,
     );
   }
@@ -185,10 +188,10 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
           const SizedBox(height: 14),
           Text(
               t(
-                  'BMI is one simple measure from your height and weight. It '
-                      'can be a useful starting point, and it does not tell the '
+                  'BMI is one measure worked out from your height and weight. '
+                      "It can be a useful place to start. It doesn't tell the "
                       'whole story about your health, your fertility, or '
-                      'whether you are ready for pregnancy.',
+                      "whether you're ready for pregnancy.",
                   'BMI aapki height aur weight se nikla ek saada maap hai. Ye '
                       'shuruaat ke liye kaam ka hai, aur ye aapki sehat, '
                       'fertility ya pregnancy ki taiyaari ki poori kahani nahi '
@@ -241,8 +244,8 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                    t('Using your saved measurements. Edit anything that has '
-                        'changed.',
+                    t("We've used your saved measurements. Change anything "
+                        "that's different now.",
                         'Aapke save kiye maap istemaal ho rahe hain. Jo badla '
                             'ho use badal dein.'),
                     style: pvManrope(
@@ -421,7 +424,7 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
                 color: p.ink1)),
         const SizedBox(height: 4),
         Text(
-            t('by the South Asian thresholds',
+            t('using the South Asian cut-offs',
                 'South Asian thresholds ke hisaab se'),
             style: pvManrope(fontSize: 13, color: p.ink3)),
 
@@ -438,7 +441,7 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
           ),
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
             Text(
-                t('YOU MAY SEE THIS QUOTED DIFFERENTLY',
+                t('YOU MAY SEE THIS DESCRIBED DIFFERENTLY',
                     'AAPKO YE ALAG BATAYA JA SAKTA HAI'),
                 style: pvManrope(
                     fontSize: 10,
@@ -448,7 +451,7 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
             const SizedBox(height: 9),
             Text(
                 t(
-                    'By the international thresholds, ${calc.display} is '
+                    'Using the international cut-offs, ${calc.display} is '
                         '"${secondary.label.en.toLowerCase()}".',
                     'International thresholds ke hisaab se, ${calc.display} '
                         '"${secondary.label.en.toLowerCase()}" hai.'),
@@ -580,8 +583,8 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
                     const SizedBox(height: 6),
                     Text(
                         t(
-                            'Which is why a doctor never uses BMI on its own to '
-                                'decide whether someone is healthy or ready for '
+                            "That's why a doctor never uses BMI on its own to "
+                                'decide if someone is healthy or ready for '
                                 'pregnancy.',
                             'Isiliye doctor akele BMI se ye tay nahi karte ki '
                                 'koi sehatmand hai ya pregnancy ke liye taiyaar.'),
@@ -603,15 +606,16 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
                 ? t('Added to your checklist', 'Checklist mein jud gaya')
                 : t('Add this to my checklist', 'Isse meri checklist mein jodein'),
             body: t(
-                'Kept with your pre-pregnancy snapshot, as a measurement — not '
-                    'as a completed medical task.',
+                'Saved with your before-pregnancy checklist as a measurement. '
+                    "It won't mark any medical item as done.",
                 'Aapke pre-pregnancy snapshot ke saath, ek maap ki tarah — kisi '
                     'poore ho chuke medical kaam ki tarah nahi.'),
             onTap: () => _store.setOnChecklist(true)),
         const SizedBox(height: 10),
         _Next(
             p: p,
-            title: t('Pre-pregnancy nutrition', 'Pregnancy se pehle ka khaana'),
+            title: t('Eating well before pregnancy',
+                'Pregnancy se pehle ka khaana'),
             body: t('Built around what an Indian kitchen already cooks.',
                 'Jo Indian kitchen mein pehle se banta hai, usi par bana.'),
             onTap: () => _open('ttc_nutrition')),
@@ -619,7 +623,7 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
         _Next(
             p: p,
             title: t('The three months before', 'Pehle ke teen mahine'),
-            body: t('Why this window, and how much weight really matters.',
+            body: t('Why these months matter, and how much weight really does.',
                 'Ye window kyun, aur weight sach mein kitna maayne rakhta hai.'),
             onTap: () => _open('ttc_read/ttc_read_three_months_before')),
 
@@ -632,7 +636,7 @@ class _TtcBmiScreenState extends State<TtcBmiScreen> {
               if (!mounted) return;
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 behavior: SnackBarBehavior.floating,
-                content: Text(t('Saved', 'Save ho gaya')),
+                content: Text(t('Measurement saved.', 'Save ho gaya')),
               ));
             }),
         const SizedBox(height: 10),

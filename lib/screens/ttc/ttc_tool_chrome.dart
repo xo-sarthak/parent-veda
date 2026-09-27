@@ -930,7 +930,7 @@ class TtcToolPrivacyLine extends StatelessWidget {
       Icon(Icons.lock_outline_rounded, size: 15, color: p.ink3),
       const SizedBox(width: 9),
       Expanded(
-        child: Text('This stays on your phone. It is not a medical record.',
+        child: Text("This stays on your phone. It isn't a medical record.",
             style: pvManrope(fontSize: 11.5, height: 1.5, color: p.ink3)),
       ),
     ]);

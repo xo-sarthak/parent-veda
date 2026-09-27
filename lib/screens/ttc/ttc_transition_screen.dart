@@ -18,12 +18,30 @@ import 'package:flutter/material.dart';
 import '../../memories/memory_models.dart';
 import '../../ttc/cycle_store.dart';
 import '../../ttc/ttc_transition.dart';
+import '../../ttc/ttc_treatment_store.dart' show TtcTreatmentStep;
 import '../memories/memory_personalize_screen.dart';
 import 'ttc_common.dart';
 import 'ttc_strings.dart';
+import 'ttc_treatment_round_screens.dart'
+    show ttcRoundForPregnancy, openTtcRoundPregnancy;
 
 /// Asks first, then transitions. Returns true if the couple went through.
+///
+/// ⚠️ AFTER TREATMENT, THE CLINIC DATES IT (2026-09-26, B8). With a round
+/// open, or one just closed as positive, a positive test goes to
+/// `TtcRoundPregnancyScreen`, which dates the pregnancy from the transfer
+/// and the embryo's day (or her clinic's own date) and says so before
+/// anything moves. Counting from her last period after IVF would be our
+/// arithmetic competing with the clinic's. A legacy round with no transfer
+/// date keeps the flow below. Returns false there: that screen reports its
+/// own outcome.
 Future<bool> recordPositiveTest(BuildContext context) async {
+  final round = ttcRoundForPregnancy();
+  if (round != null &&
+      (round.kind != null || round[TtcTreatmentStep.transfer] != null)) {
+    openTtcRoundPregnancy(context);
+    return false;
+  }
   final t = TtcS.current();
   final confirmed = await showDialog<bool>(
     context: context,
@@ -220,9 +238,14 @@ class TtcTransitionScreen extends StatelessWidget {
                         const Icon(Icons.auto_awesome_outlined,
                             size: 16, color: ttcPurple),
                         const SizedBox(width: 8),
-                        Text(t.transitionMakeCard,
-                            style: ttcBody(13,
-                                color: ttcPurple, w: FontWeight.w700)),
+                        // Flexible (2026-09-26): at 360dp the line ran 58pt
+                        // past the edge. Found walking the B8 flow in a test.
+                        Flexible(
+                          child: Text(t.transitionMakeCard,
+                              textAlign: TextAlign.center,
+                              style: ttcBody(13,
+                                  color: ttcPurple, w: FontWeight.w700)),
+                        ),
                       ]),
                     ),
                   ),

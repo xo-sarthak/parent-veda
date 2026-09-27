@@ -30,12 +30,15 @@ import '../../ttc/ttc_mind_today.dart';
 import '../../ttc/ttc_partner_data.dart';
 import '../../ttc/ttc_practice_data.dart';
 import '../../ttc/ttc_store.dart';
+import '../../ttc/ttc_treatment_store.dart';
 import 'ttc_askveda_screen.dart';
 import 'ttc_chapter_screen.dart';
 import 'ttc_common.dart';
 // import 'ttc_insight_screen.dart'; // kept for revert — the insight opens in the reader now
 import 'ttc_journal_screen.dart';
 import 'ttc_journey_map_screen.dart';
+import 'ttc_round_strings.dart'
+    show ttcPartnerRoundLine, kTtcPartnerRoundEyebrow;
 import 'ttc_strings.dart';
 import 'ttc_surface_router.dart';
 
@@ -51,6 +54,8 @@ class TtcPartnerTodayScreen extends StatelessWidget {
         TtcLang.instance,
         // His two practice cards carry a done state, and it is his own row.
         TtcLogStore.instance,
+        // The couple's treatment round, for his round line (B10).
+        TtcTreatmentStore.instance,
       ]),
       builder: (context, _) {
         final t = TtcS.current();
@@ -93,6 +98,18 @@ class TtcPartnerTodayScreen extends StatelessWidget {
             const SizedBox(height: 18),
             _Hero(chapter: chapter, today: today, t: t),
             const SizedBox(height: 20),
+            // ⚠️ HIS ROUND LINE (2026-09-26, docs/TTC-TREATMENT-FLOW.md §3g,
+            // B10). The `ttc_treatment` row is couple-scoped, so his device
+            // holds the round: "IVF · Transfer on Thursday", and what it
+            // asks of him. Never her cycle: no cycle day, no period, no
+            // fertile days, and no result (a closed round shows nothing;
+            // how the test went is hers to tell). `ttcPartnerRoundLine`.
+            if (ttcPartnerRoundLine(
+                    TtcTreatmentStore.instance.cycle, DateTime.now())
+                case final round?) ...[
+              _RoundLineCard(line: round),
+              const SizedBox(height: 12),
+            ],
 
             _MissionCard(mission: mission, t: t),
             const SizedBox(height: 12),
@@ -111,6 +128,12 @@ class TtcPartnerTodayScreen extends StatelessWidget {
             const _PracticeCard(),
             const SizedBox(height: 12),
             _SupportCard(brief: brief, t: t),
+            const SizedBox(height: 12),
+            // ⚠️ ONE QUESTION, UNDER "SUPPORTING HER" (gap analysis, Behind ›
+            // Partner, 2026-09-26). He had missions and no easy way into a
+            // conversation. It sits here because asking is the most useful
+            // form support takes, and above the reading so it is seen.
+            const _TonightCard(),
             const SizedBox(height: 12),
             // Understanding before advice, and her body before his. He was
             // being told how to help with something he had never had explained.
@@ -165,8 +188,8 @@ class _PracticeCard extends StatelessWidget {
         // ⚠️ IT SAYS THE CARDS ARE NOT HERS, BECAUSE HE WILL ASSUME THEY ARE.
         // Everything else on this screen is about her; a practice card with no
         // such line reads as a chore she has set him.
-        Text('Different cards from hers, on purpose. Nothing here is counting, '
-            'and neither of you is waiting on the other.',
+        Text('These are different from hers, on purpose. Nothing here keeps '
+            'score, and neither of you is waiting on the other.',
             style: ttcBody(13, color: ttcSlateSoft, h: 1.6)),
         const SizedBox(height: 14),
         _PracticeRow(practice: move),
@@ -528,6 +551,86 @@ class _SupportCard extends StatelessWidget {
       );
 }
 
+// ---- tonight, ask her -------------------------------------------------------
+
+/// One gentle question a day, from `kTtcTonightQuestions`.
+///
+/// English only, including in his Hinglish view: new work is English
+/// (CLAUDE.md), and a question he reads in English he can still ask her in
+/// any language they share.
+class _TonightCard extends StatelessWidget {
+  const _TonightCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return _SlateCard(
+      color: ttcSlatePanel,
+      child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        const Padding(
+          padding: EdgeInsets.only(top: 2),
+          child: Icon(Icons.chat_bubble_outline_rounded,
+              size: 18, color: ttcSlate),
+        ),
+        const SizedBox(width: 11),
+        Expanded(
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(kTtcTonightLabel.toUpperCase(),
+                style: ttcBody(10, color: ttcSlateAmber, w: FontWeight.w800)),
+            const SizedBox(height: 7),
+            Text(ttcTonightQuestion(),
+                style: ttcFraunces(17, w: FontWeight.w600, color: ttcSlateInk)),
+          ]),
+        ),
+      ]),
+    );
+  }
+}
+
+/// His one round line (B10): an eyebrow, the step and its day, and what it
+/// asks of him. A white card in his palette, like the mission.
+class _RoundLineCard extends StatelessWidget {
+  const _RoundLineCard({required this.line});
+  final (String, String, String?) line;
+
+  @override
+  Widget build(BuildContext context) {
+    final (kind, what, note) = line;
+    return Semantics(
+      container: true,
+      label: '$kTtcPartnerRoundEyebrow, $kind. $what.${note == null ? '' : ' $note'}',
+      child: _SlateCard(
+        key: const ValueKey('ttc_partner_round_line'),
+        child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Padding(
+            padding: EdgeInsets.only(top: 2),
+            child: Icon(Icons.event_note_outlined, size: 18, color: ttcSlate),
+          ),
+          const SizedBox(width: 11),
+          Expanded(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('${kTtcPartnerRoundEyebrow.toUpperCase()} · ${kind.toUpperCase()}',
+                      style: ttcBody(10,
+                          color: ttcSlateAmber, w: FontWeight.w800)),
+                  const SizedBox(height: 7),
+                  Text(what,
+                      style: ttcFraunces(17,
+                          w: FontWeight.w600, color: ttcSlateInk)),
+                  if (note != null) ...[
+                    const SizedBox(height: 6),
+                    Text(note,
+                        style: ttcBody(13, color: ttcSlateInk, h: 1.45)),
+                  ],
+                ]),
+          ),
+        ]),
+      ),
+    );
+  }
+}
+
 // ---- her half ---------------------------------------------------------------
 
 /// The explanation his side was missing entirely.
@@ -694,7 +797,7 @@ class _AskVedaCard extends StatelessWidget {
         Text(
             hi
                 ? 'Sawaal jo poochhne mein ajeeb lage — yahin poochho. Jawaab tumhare liye, is safar ke hisaab se.'
-                : "The questions that feel awkward to ask out loud. Answered for where the two of you are.",
+                : "Ask the questions that feel awkward to say out loud. The answers fit where the two of you are right now.",
             style: ttcBody(13.5, color: ttcSlateSoft, h: 1.6)),
       ]),
     );
@@ -781,7 +884,8 @@ class _JournalCard extends StatelessWidget {
 //  TtcCard: her surfaces must never accidentally render in his colours.
 
 class _SlateCard extends StatelessWidget {
-  const _SlateCard({required this.child, this.onTap, this.color = Colors.white});
+  const _SlateCard(
+      {super.key, required this.child, this.onTap, this.color = Colors.white});
 
   final Widget child;
   final VoidCallback? onTap;

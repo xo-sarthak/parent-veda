@@ -26,6 +26,7 @@ import '../../models/pv_product.dart' show PvStageCopy;
 import '../../services/life_stage_store.dart';
 import '../../services/remote/supabase_repo.dart';
 import '../../theme/pv_fonts.dart';
+import '../ttc/ttc_partner_day_example.dart';
 import 'pv_you_chrome.dart';
 
 /// Local preference the partner shell reads. True = week + calendar shared.
@@ -84,10 +85,14 @@ class _PvPartnerScreenState extends State<PvPartnerScreen> {
       : 'your partner';
 
   List<String> get _canSee => switch (widget.stage.shopStage) {
+    // TTC gap plan, 2026-09-26 ("Behind — Partner", P1): the promise has to
+    // be true. His view shares a journal both of you can read, so it is said
+    // here rather than hidden under "never sees".
     LifeStage.tryingToConceive => [
-      'Where you are in the month — the window, not the dates you logged',
+      'Where you are in the month: the window, not the dates you logged',
       'Appointments and tests you have booked',
       'What you save and share on purpose',
+      'The shared journal, only what either of you writes there',
     ],
     LifeStage.pregnancy => [
       'Your week, and what is happening this week',
@@ -104,7 +109,7 @@ class _PvPartnerScreenState extends State<PvPartnerScreen> {
   List<String> get _neverSees => switch (widget.stage.shopStage) {
     LifeStage.tryingToConceive => [
       'Your symptoms and cycle logs',
-      'Your journal',
+      'Your private journal',
       'Your test readings',
     ],
     LifeStage.pregnancy => [
@@ -157,6 +162,13 @@ class _PvPartnerScreenState extends State<PvPartnerScreen> {
                       color: p.ink2,
                     ),
                   ),
+                  // TTC gap plan, 2026-09-26 ("Behind — Partner", P2): a
+                  // picture of his day makes the invitation concrete.
+                  if (widget.stage.shopStage ==
+                      LifeStage.tryingToConceive) ...[
+                    const SizedBox(height: 14),
+                    const TtcPartnerDayExample(),
+                  ],
                   const SizedBox(height: 18),
                   _list(
                     p,

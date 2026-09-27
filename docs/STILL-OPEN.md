@@ -9575,3 +9575,101 @@ now removes his uploaded photos when an entry is deleted.
 - **§77.4 First sync after upgrading** has no seen-ids yet, so an entry
   deleted on another phone BEFORE this build can come back once. Cannot be
   told apart from a new one without that history.
+
+## 78.0 TTC warmth pass — every word in the stage, rewritten warm and simple — 2026-09-26
+
+Every user-facing English string in the TTC V3 stage (141 files, ~111k words) was rewritten to
+`docs/TTC-VOICE.md` (the user approved it: "simple… understood in one go, don't flex your English").
+Facts, numbers, doses, warnings, keys and the Hindi side were held; the free competitor check
+(8-word overlap vs the captured Flo and What to Expect text) is 0 on every file. The made-up
+reviewer names are gone from TTC. The ledger is `docs/TTC-WARMTH-PASS.md`. Owed:
+
+- **§78.1 Expert sign-off.** The app now shows "REVIEWED BY" and a tick next to REAL roster
+  names (Dr Ruchika Sood 48 pieces, Parmeshwari 7, Akanksha Srivastava 4, Dr Kajal Sharma 2).
+  True only once each reads her list: `docs/TTC-EXPERT-SIGNOFF.md`. His side (10 reads) says
+  "By ParentVeda team", no tick, because the roster has no male-fertility specialist.
+  Dr Ruchika Sood is not in `kExperts`, so her byline may not open a profile.
+- **§78.2 The fertile window's length — RESOLVED 2026-09-26.** It disagreed across the stage
+  (reads: six days ending ON ovulation; chapter data and window screen: ending the day AFTER;
+  the window glossary: seven days). The user chose the standard definition. Every explanation
+  now says six days ending on ovulation day (both language sides where the fact was stated).
+  The tool still shades seven days (`ttcWindowClosesAfterOvulation = 1`, unchanged by
+  decision: no tool changes in this pass); the words now say the extra day is a margin
+  because our ovulation date is an estimate.
+- **§78.1a** The sign-off list is regenerated from code by `tools/ttc_expert_signoff.py`
+  and has Sent / Signed off columns. Nothing is sent yet; the user will send it later.
+- **§78.3 Tool behaviour found while rewriting** (notes only, nothing changed):
+  `docs/TTC-TOOLS-UX-NOTES.md`, "Start here" — two symptom loggers sharing saved keys, the
+  records Save silently doing nothing, vaccine "Had it" saving today's date, supplements that
+  cannot be typed and a CoQ10 name clash between partners, made-up product scores and badges,
+  the language button offering Devanagari and giving Latin Hindi, duplicated PCOS and
+  "get help" tools, the trigger picker saving 9 pm when dismissed.
+- **§78.4 Same made-up names outside TTC:** `lib/data/community_data.dart`,
+  `lib/data/mind_mood_data.dart` and several pregnancy reads still carry them.
+- **§78.5 Hindi drift.** Only the English side was rewritten; the Latin-script Hindi
+  sides of `_p`/`_t` pairs still carry the old meaning word for word (two factual fixes made on
+  both sides: the trigger reminder timing, and the fertile window ending on ovulation day).
+
+## 79.0 TTC gap plan — the golden gap analysis built into the stage — 2026-09-26
+
+The TTC gap analysis v2 (Flo + What to Expect vs ParentVeda) is the source of truth for the TTC stage, on the
+user's decision. Plan, decisions and full execution log: `docs/TTC-GAP-PLAN.md`. Built this session: 70 new reads
+(122 total, every read with a "short answer", question headings, paragraphs of 50 words or fewer), new door tabs
+(Waiting and testing, Sex and closeness, Hard days, Meal plan, Age and second baby), two new doors (Body and cycle;
+Trying, but not pregnant yet?), all nine doors in the new door design (`TtcDoorScreen`, mirrored from the pregnancy
+engine, pregnancy untouched), the tabs Today · Learn · Products · Tools · You, five messages + three scripted chats,
+logging additions, partner fixes, the shared-phone switch, phase-aware daily cards. Community hidden for launch.
+Owed:
+
+- **§79.1 Hero photos** for the two new doors (`docs/DOOR-CONTENT-OWED.md`).
+- **§79.2 Notification tap** does not open the message's destination (NotificationService has no tap handler).
+- **§79.3 Facts to confirm by the named experts** (listed per helper in the gap-plan log): ART and Surrogacy Act
+  details, egg-freezing costs, letrozole status in India, the NICE age table, NFHS-5 figures, helpline numbers
+  (1091 varies by state), lab and strip prices, the ibuprofen-around-ovulation tip, Suraksha/ICTC naming.
+- **§79.4 Setup screens**: the PDF's onboarding feedback is NOTED ONLY in `docs/TTC-GAP-PLAN.md` §9 (the user
+  handles it separately), plus carrying the onboarding reminders choice into `TtcMessagesStore.setPhoneOn`.
+- **§79.5 Community** (held back): its PDF items (honest counts, votable poll, two-week-wait and over-35 rooms,
+  pinned threads, live thread on the home) wait for the release decision; every entry point is commented, not
+  deleted.
+- **§79.6 Faint-line drawing** (a design asset) for `ttc_read_faint_line`.
+- **§79.7 Six videos** the PDF names (fertile window, when to test, stress, his side, PCOS, when to see someone):
+  the placeholder tiles stay until the films are uploaded.
+- **§79.8 Treatment rounds** (built 2026-09-26, `docs/TTC-TREATMENT-FLOW.md`): round model in the `ttc_treatment`
+  blob, clinic mode only on real clinic dates from the first treatment date, check-ins never close a round on their
+  own, announcements + 7-day undo, start/plan/result screens, calendar bands, treatment messages, IVF door panels,
+  pregnancy dated from the transfer (`DueDateSource.ivfTransfer`), a round line on his side. Owed: **B11 Ask Veda**
+  (send the treatment step; two-repo change, needs `C:\Projects\parentveda-askveda`), **B12 partner clinics**
+  (later), and Dr Surbhi Sharma's check of the "(confirm)" timings and of IUI dating when no period is logged.
+- **§79.9 Date consistency** (built 2026-09-26): every date surface reads `ttcDayContext`
+  (`lib/ttc/ttc_day_context.dart`), proven by `test/ttc_date_consistency_test.dart`. Decided: ownership = real clinic
+  dates; first cycle predicts from her stated length else 28 (rough guess); irregular = spread over 7 days
+  (`kTtcIrregularSpreadDays`); earlier cycles show look-back windows. Owed: syncing her stated cycle length (local
+  only; needs a `ttc_journeys` column); STILL-OPEN §30 is effectively resolved by the ownership rule.
+- **§79.10 Shared 360dp overflows found, not fixed** (all stages): the You screen's journey row
+  (`pv_you_screen.dart:438`), the store's honesty strip (`pv_store_screen.dart:552`) and the hero band
+  (`pv_hero_band.dart:289`, `:342`).
+- **§79.11 Doors with six tabs** (four doors, IVF included): a later call on whether to trim; hero photos for all
+  nine doors are coming from the user (prompts given 2026-09-26).
+- **§79.12 Ask Veda B11 + TTC content pool — CODE DONE 2026-09-27, live refresh waits on the user.** Both repos:
+  the app sends `treatment_step` (`ttcHomeRoundPhaseOn(...).name`, never from the partner) and the service
+  (`parentveda-askveda/app/prompt.py` `_TREATMENT_STEPS`) makes the opener step-aware: *not pregnant* through
+  collection and between rounds, *does not know yet* from transfer to test day, *a positive blood test* at result.
+  Cache key gains the step (`ttc:<chapter>:<path>:<ownership>:<step|->`). The export (`tool/export_ttc_corpus.dart`)
+  now adds the 134 reads (`ttcread_`), the phase and treatment cards (`ttcinsight_`) and door prose (`ttcdoor_`);
+  the screen opens each, and "Hide sex and intimacy content" also filters Ask Veda's cards. **Owed:** (a) the user's
+  go-ahead for the live Supabase steps (delete old `trying` rows and chunks, import, embed, clear `veda_cache`
+  `ttc:%`, smoke test); (b) **Dr Surbhi Sharma to review the three openers and closers** in `prompt.py` (the wait
+  says symptoms are mostly the medicines and no home test before the blood test; the result says very early, no
+  odds, her clinic plans the next tests).
+  - **LIVE REFRESH DONE 2026-09-27** (user's go-ahead): 324 old `trying` rows and chunks deleted, 530 imported,
+    1834 chunks embedded, `ttc:%` cache cleared (script: session scratchpad `refresh_ttc_pool.py`). The
+    embedding model's cache had lost its tokenizer files and Hugging Face (and hf-mirror) are blocked by the ISP;
+    restored from Qdrant's GCS tarball (`tokenizer.json`/`vocab.txt` byte-identical to HF, `model_max_length` set
+    to HF's 512), verified cosine 1.0 against 8 stored vectors. Run ingest with `HF_HUB_OFFLINE=1`.
+  - **§79.12a GROQ RETIRED `llama-3.1-8b-instant`** (found in the smoke test): every Ask Veda answer, all stages,
+    fails with model_not_found until `LLM_MODEL` changes. Tested `openai/gpt-oss-20b` (process override only):
+    format followed, answers grounded, new `ttcread_` cards returned. Decision owed: which model; then update
+    `app/config.py` default and the cost constants in `app/answer.py` (priced for the old model).
+  - **§79.12b Retrieval rank:** "cramps after embryo transfer" gets NO_ANSWER although the two-week-wait read's
+    FAQ answers it: that chunk ranks 10th and the model reads the top 6 (`answer_context_k`). Options: raise
+    `answer_context_k` (shared by all stages), or export each FAQ as its own question-shaped doc.
