@@ -80,6 +80,11 @@ void main() {
       expect(r.state, FertilityHelpState.keepTrying);
     });
 
+    // ⚠️ AND AGAIN ON 2026-09-27 (TTC launch walk): one age rule across the
+    // app, the one Flo and What to Expect use (ASRM/ACOG): six months at 35
+    // and over, straight away over 40. This test asserted "refers at
+    // presentation from 35"; kept for revert under its old name below, now
+    // asserting the six-month rule.
     test('36 and over refers at presentation, with no waiting period', () {
       // ⚠️ THIS PAIR CHANGED ON 2026-09-03 AND THE CHANGE IS THE POINT.
       //
@@ -97,9 +102,23 @@ void main() {
       //
       // It refers from 35. If that year ever needs to be exact the answer is a
       // date of birth, not a fifth band — see the enum's own note.
-      final r = evaluateFertilityHelp(
+      // Kept for revert:
+      //   final r = evaluateFertilityHelp(
+      //       _ctx(daysTrying: 30, ageBand: FertilityAgeBand.thirtyFiveTo37));
+      //   expect(r.state, FertilityHelpState.maySeeSpecialist);
+      final early = evaluateFertilityHelp(
           _ctx(daysTrying: 30, ageBand: FertilityAgeBand.thirtyFiveTo37));
-      expect(r.state, FertilityHelpState.maySeeSpecialist);
+      expect(early.state, isNot(FertilityHelpState.maySeeSpecialist),
+          reason: 'at 35 to 37 the line is six months, not at once');
+      final six = evaluateFertilityHelp(
+          _ctx(daysTrying: 190, ageBand: FertilityAgeBand.thirtyFiveTo37));
+      expect(six.state, FertilityHelpState.maySeeSpecialist);
+    });
+
+    test('over 40 is straight away (2026-09-27)', () {
+      final r = evaluateFertilityHelp(
+          _ctx(daysTrying: 20, ageBand: FertilityAgeBand.over40));
+      expect(r.state, FertilityHelpState.dontWait);
     });
 
     test('under 35 is still inside the waiting period', () {

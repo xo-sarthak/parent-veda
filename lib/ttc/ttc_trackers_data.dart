@@ -52,6 +52,7 @@ class TtcField {
     this.readId,
     this.group,
     this.start,
+    this.presets = const [],
   });
 
   final String id;
@@ -115,6 +116,11 @@ class TtcField {
   /// Null falls back to `min`, which is right for a field with no obvious
   /// middle.
   final double? start;
+
+  /// One-tap answers for a number (tools pass, 2026-09-27): 6, 7 or 8
+  /// hours; 10, 20 or 30 minutes. The stepper and typing stay for anything
+  /// else. Empty on most fields.
+  final List<double> presets;
 
   String label(bool hi) => hi ? labelHi : labelEn;
   String low(bool hi) => hi ? lowHi : lowEn;
@@ -348,7 +354,9 @@ const List<TtcTracker> ttcTrackers = [
   TtcTracker(
     id: 'partner_health',
     iconKey: 'partner',
-    titleEn: 'Partner Health',
+    // One name with its Tools tile (2026-09-27, the tool rebuild). Kept for
+    // revert: 'Partner Health'.
+    titleEn: 'Partner health',
     titleHi: 'Partner ki sehat',
     subtitleEn: 'Half the picture',
     subtitleHi: 'Aadhi tasveer',
@@ -358,8 +366,13 @@ const List<TtcTracker> ttcTrackers = [
         'Jo couples mushkil jhelte hain unmein lagbhag chalis se pachas pratishat mein mard ka factor hota hai, aur sperm banne mein lagbhag nabbe din lagte hain - toh aaj jo yahan record hota hai, wo teen mahine baad dikhta hai.\n\nYe isliye hai kyunki zyadatar Indian clinics mein pehle aurat ke test hote hain - jo dheere, mehnge aur zyada takleefdeh hote hain. Ye doosra aadha hissa hai.',
     forPartner: true,
     fields: [
+      // ⚠️ EVERY FIELD UNDER A HEADING (tools pass, 2026-09-27). Three of
+      // the five had none, so a divider with no eyebrow sat between them.
       TtcField(
         id: 'sleep',
+        group: 'Sleep',
+        start: 7,
+        presets: [6, 7, 8],
         labelEn: 'Hours slept',
         labelHi: 'Kitne ghante soye',
         kind: TtcFieldKind.number,
@@ -388,6 +401,7 @@ const List<TtcTracker> ttcTrackers = [
       ),
       TtcField(
         id: 'heat',
+        group: 'Heat',
         labelEn: 'Long time in heat (hot bath, sauna, laptop on lap)',
         labelHi: 'Lambi garmi - garam nahaana, sauna, god par laptop',
         kind: TtcFieldKind.choice,
@@ -396,6 +410,7 @@ const List<TtcTracker> ttcTrackers = [
       ),
       TtcField(
         id: 'movement',
+        group: 'Movement',
         labelEn: 'Moved today',
         labelHi: 'Aaj movement kiya',
         kind: TtcFieldKind.choice,
@@ -451,6 +466,7 @@ const List<TtcTracker> ttcTrackers = [
         id: 'hours',
         group: 'Sleep',
         start: 7,
+        presets: [6, 7, 8],
         labelEn: 'Hours slept',
         labelHi: 'Kitne ghante soye',
         kind: TtcFieldKind.number,
@@ -476,6 +492,7 @@ const List<TtcTracker> ttcTrackers = [
         id: 'minutes',
         group: 'Movement',
         start: 20,
+        presets: [10, 20, 30],
         labelEn: 'Minutes moved',
         labelHi: 'Kitne minute',
         kind: TtcFieldKind.number,
@@ -535,7 +552,8 @@ const List<TtcTracker> ttcTrackers = [
       ),
       TtcField(
         id: 'homecooked',
-        group: 'Food',
+        // Kept for revert: group: 'Food' (2026-09-27, water joined it).
+        group: 'Food and water',
         labelEn: 'Home-cooked meals today',
         labelHi: 'Aaj ghar ka khana',
         kind: TtcFieldKind.choice,
@@ -551,8 +569,11 @@ const List<TtcTracker> ttcTrackers = [
         choicesEn: ['None', '1 cup', '2 cups', '3 cups', 'More than 3'],
         choicesHi: ['Bilkul nahi', '1 cup', '2 cup', '3 cup', '3 se zyada'],
       ),
+      // Named under "Cutting down" like caffeine (2026-09-27): with no group
+      // they sat under a divider and no heading.
       TtcField(
         id: 'alcohol',
+        group: 'Cutting down',
         labelEn: 'Alcohol today',
         labelHi: 'Aaj sharab',
         kind: TtcFieldKind.choice,
@@ -561,6 +582,7 @@ const List<TtcTracker> ttcTrackers = [
       ),
       TtcField(
         id: 'smoking',
+        group: 'Cutting down',
         labelEn: 'Smoke today (yours or around you)',
         labelHi: 'Aaj smoke - apna ya aas-paas ka',
         kind: TtcFieldKind.choice,
@@ -569,8 +591,11 @@ const List<TtcTracker> ttcTrackers = [
       ),
       TtcField(
         id: 'water',
-        group: 'Cutting down',
+        // Water is not something to cut down (2026-09-27). Kept for revert:
+        // group: 'Cutting down'.
+        group: 'Food and water',
         start: 1,
+        presets: [4, 6, 8],
         labelEn: 'Glasses of water',
         labelHi: 'Paani ke glass',
         kind: TtcFieldKind.number,

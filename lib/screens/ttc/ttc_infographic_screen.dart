@@ -37,10 +37,27 @@ class TtcInfographicScreen extends StatelessWidget {
     super.key,
     required this.tile,
     required this.hue,
+    this.topic,
   });
 
   final TtcInfographicTile tile;
   final double hue;
+
+  /// What the comparison is about, for the eyebrow ("PCOS"). Optional: when a
+  /// caller does not pass one, the part of an "X or Y" title before "or" is
+  /// the topic, which is true of every infographic that exists.
+  final String? topic;
+
+  /// Below this sheet width the two columns stack, left over right, so long
+  /// points stop wrapping every three words. Every phone we test on is under
+  /// it; a tablet or an unfolded phone keeps them side by side.
+  static const double kStackBelow = 400;
+
+  String? get _topic {
+    if (topic != null) return topic;
+    final i = tile.title.indexOf(' or ');
+    return i > 0 ? tile.title.substring(0, i) : null;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -70,13 +87,19 @@ class TtcInfographicScreen extends StatelessWidget {
                     children: [
                       _Back(p: p),
                       const SizedBox(height: 14),
-                      Text('INFOGRAPHIC',
-                          style: pvManrope(
-                              fontSize: 10,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1.3,
-                              color: p.ink2)),
-                      const SizedBox(height: 8),
+                      // ⚠️ THE TOPIC, NOT THE FORMAT (2026-09-27).
+                      // "INFOGRAPHIC" told her what kind of page this is and
+                      // nothing about what it is on. Kept for revert:
+                      //   Text('INFOGRAPHIC', ...)
+                      if (_topic != null) ...[
+                        Text(_topic!.toUpperCase(),
+                            style: pvManrope(
+                                fontSize: 10,
+                                fontWeight: FontWeight.w800,
+                                letterSpacing: 1.3,
+                                color: p.ink2)),
+                        const SizedBox(height: 8),
+                      ],
                       Text(tile.title,
                           style: pvFraunces(
                               fontSize: 27,
@@ -121,15 +144,36 @@ class TtcInfographicScreen extends StatelessWidget {
                   // `CrossAxisAlignment.stretch` on a Row inside a ListView
                   // throws on an infinite height, and `IntrinsicHeight` is the
                   // remedy — over two small boxes, not a list.
-                  IntrinsicHeight(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Expanded(child: _Column(column: tile.left, p: p)),
-                        const SizedBox(width: 10),
-                        Expanded(child: _Column(column: tile.right, p: p)),
-                      ],
-                    ),
+                  //
+                  // ⚠️ STACKED ON A PHONE (2026-09-27). Two columns of about
+                  // 160pt wrapped every point every few words, and comparing
+                  // rows of different lengths across them was hard. Below
+                  // [kStackBelow] the two halves sit one above the other,
+                  // each whole; wider, they stay side by side.
+                  LayoutBuilder(
+                    builder: (context, box) => box.maxWidth < kStackBelow
+                        ? Column(
+                            key: const ValueKey('ttc_infographic_stacked'),
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              _Column(column: tile.left, p: p),
+                              const SizedBox(height: 10),
+                              _Column(column: tile.right, p: p),
+                            ],
+                          )
+                        : IntrinsicHeight(
+                            key: const ValueKey('ttc_infographic_side_by_side'),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(
+                                    child: _Column(column: tile.left, p: p)),
+                                const SizedBox(width: 10),
+                                Expanded(
+                                    child: _Column(column: tile.right, p: p)),
+                              ],
+                            ),
+                          ),
                   ),
 
                   if (tile.footnote != null) ...[

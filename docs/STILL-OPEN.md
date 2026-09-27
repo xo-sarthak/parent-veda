@@ -9666,6 +9666,13 @@ Owed:
     embedding model's cache had lost its tokenizer files and Hugging Face (and hf-mirror) are blocked by the ISP;
     restored from Qdrant's GCS tarball (`tokenizer.json`/`vocab.txt` byte-identical to HF, `model_max_length` set
     to HF's 512), verified cosine 1.0 against 8 stored vectors. Run ingest with `HF_HUB_OFFLINE=1`.
+  - **§79.12a and §79.12b RESOLVED 2026-09-27:** the service runs `openai/gpt-oss-20b` (the user's choice; low
+    reasoning effort; prices 0.075 / 0.30 per 1M, confirm on groq.com/pricing), and each read's FAQ is its own
+    document (`ttcfaq_`, 522 of them; live pool refreshed with the user's go-ahead: 1052 rows, 2177 chunks, ttc:%
+    cache cleared). "Cramps after embryo transfer" is answered from its FAQ. A daily model probe now alerts on a
+    retired model (`scripts/llm_smoke.py`, `.github/workflows/llm-smoke.yml`; needs the `LLM_API_KEY` repo secret).
+    Owed: free-tier limits (8K tokens/min, 200K/day, about 75 answers a day) do not carry a launch, so the paid tier
+    before launch; doctor note: the cramps answer mentions egg retrieval, which a frozen transfer does not have.
   - **§79.12a GROQ RETIRED `llama-3.1-8b-instant`** (found in the smoke test): every Ask Veda answer, all stages,
     fails with model_not_found until `LLM_MODEL` changes. Tested `openai/gpt-oss-20b` (process override only):
     format followed, answers grounded, new `ttcread_` cards returned. Decision owed: which model; then update
@@ -9673,3 +9680,19 @@ Owed:
   - **§79.12b Retrieval rank:** "cramps after embryo transfer" gets NO_ANSWER although the two-week-wait read's
     FAQ answers it: that chunk ranks 10th and the model reads the top 6 (`answer_context_k`). Options: raise
     `answer_context_k` (shared by all stages), or export each FAQ as its own question-shaped doc.
+  - **§79.14 TTC tools pass, owed (2026-09-27):** the full list with reasons is at the top of
+    `docs/TTC-TOOLS-UX-NOTES.md` ("Not done, and why"). The ones with teeth: (a) **for a doctor**: the window's two
+    Peak bars are now equal and the day before ovulation reads "One of your two best days"; a cancer-treatment
+    question and a "Doesn't apply" semen chip in Should I get help?. (b) **engineering**: `NotificationService.syncAll`
+    should cancel only the ids it owns; until then every scheduler must join the launch chain in `main.dart`
+    (BACKEND-PATTERNS §16m). (c) **the user's decisions**: the Companion's "this was a real long cycle" override, the
+    Records PDF only from an appointment within 7 days, pinning the free course and the payment note beside the price
+    (shared Learn screens), and the rest of that list. Journal note: a partner's entries are read-only on her phone
+    (a delete would return on the next sync).
+  - **§79.13 His side, owed (2026-09-27):** (a) **his products**: one TTC product carries `forPartner` (zinc and
+    folic acid); `PvCatalogStore.forYou` excludes it for her, and there is nothing to make his own shelf from. Owed:
+    a semen analysis kit and the CoQ10 / antioxidant entries the His side door already names, then a `forPartner`
+    branch in `forYou` read by the Products tab when `TtcPartnerMode` is on. (b) **the account path**: `TtcPartnerMode`
+    is set only by the developer switch; how a paired partner's own phone lands on his side is the father-mode pass the
+    user scheduled as a whole. (c) **his messages at key moments** (Flo: "Her period is due soon, ways to support
+    her"): not built; the five computed messages are hers.

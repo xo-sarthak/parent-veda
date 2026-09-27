@@ -31,13 +31,13 @@ LocalizedText _en(String s) => LocalizedText(en: s, hi: s);
 
 final List<PvRead> kTtcReadsTreatment = [
   // ===========================================================================
-  //  G4 · S4 · The trigger shot (P1)
+  //  G4 · S4 · The trigger injection (P1)
   // ===========================================================================
   PvRead(
     id: 'ttc_read_tx_trigger_shot',
     hue: 206,
     kicker: _en('IVF & IUI'),
-    title: _en('The trigger shot: why the time is exact'),
+    title: _en('The trigger injection: why the time is exact'),
     teaser: _en("What the trigger does, why your clinic gives you a time to the minute, and what to do if something goes wrong."),
     shortAnswer: _en("The trigger is one injection that finishes getting your eggs ready. In IVF, egg collection is booked about 34 to 36 hours after it, so the time your clinic gives you is exact. If you're late, unsure or missed it, call your clinic straight away and let them decide what happens next."),
     scaleSetter: _en("This is one injection, and most people give it without any trouble. It feels bigger than it is because of the exact time. A little planning takes away most of the worry, and every clinic has a plan for when something goes wrong."),
@@ -51,7 +51,7 @@ final List<PvRead> kTtcReadsTreatment = [
         ],
       ),
       PvReadSection(
-        heading: _en('What does the trigger shot do?'),
+        heading: _en('What does the trigger injection do?'),
         paragraphs: [
           _en("In a natural cycle, your brain sends a surge of LH, the hormone that makes a ripe egg ready to be released. The trigger does the same job on purpose, at a time your clinic chooses."),
           _en("It starts the last stage of ripening inside each follicle. That takes about a day and a half. After that, the eggs would be released on their own."),

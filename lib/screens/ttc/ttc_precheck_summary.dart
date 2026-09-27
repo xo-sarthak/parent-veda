@@ -10,11 +10,19 @@
 //  What it shows: what she has covered, what is still open, and — at most —
 //  three things worth doing next. The three is the whole value: a summary the
 //  same length as the checklist has summarised nothing.
+//
+//  ⚠️ EVERY STEP GOES SOMEWHERE (tool rebuild, 2026-09-27). A step whose item
+//  has no tool or read (tobacco, alcohol, caffeine, sleep, dental, known
+//  conditions) was a card that looked tappable and did nothing. It now takes
+//  her back to the checklist with that item open, and every step card carries
+//  an arrow, as the BMI tool's next-step cards do.
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
-import '../../widgets/global_ask_fab.dart';
+// Kept for revert (2026-09-27): only the old list's bottom padding read
+// `kAskFabReserve`; `TtcToolScaffold`'s sheet clears the reserve itself.
+// import '../../widgets/global_ask_fab.dart';
 import 'package:flutter/services.dart';
 
 import '../../localization/app_language.dart';
@@ -26,6 +34,7 @@ import '../v2/v2_palette.dart';
 import 'ttc_precheck_screen.dart' show PrecheckButton, kPrecheckHue;
 import 'ttc_strings.dart';
 import 'ttc_surface_router.dart';
+import 'ttc_tool_chrome.dart';
 
 class TtcPrecheckSummaryScreen extends StatelessWidget {
   const TtcPrecheckSummaryScreen({super.key});
@@ -49,65 +58,94 @@ class TtcPrecheckSummaryScreen extends StatelessWidget {
         final done = store.doneItems(c);
         final open = store.openItems(c);
 
-        return Scaffold(
-          backgroundColor: p.ground,
-          body: SafeArea(
-            bottom: false,
-            child: Column(children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(8, 4, 16, 4),
-                child: Row(children: [
-                  GestureDetector(
-                    onTap: () => Navigator.of(context).maybePop(),
-                    behavior: HitTestBehavior.opaque,
-                    child: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Icon(Icons.arrow_back_rounded,
-                          size: 21, color: p.ink1),
-                    ),
-                  ),
-                  Expanded(
-                    child: Text(t('YOUR SNAPSHOT', 'AAPKA SNAPSHOT'),
-                        style: pvManrope(
-                            fontSize: 10.5,
-                            fontWeight: FontWeight.w800,
-                            letterSpacing: 1.1,
-                            color: p.ink3)),
-                  ),
-                  GestureDetector(
-                    onTap: () => _copy(context, store, c, lang, t),
-                    behavior: HitTestBehavior.opaque,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child:
-                          Icon(Icons.copy_rounded, size: 19, color: p.ink2),
-                    ),
-                  ),
-                ]),
-              ),
-              Expanded(
-                child: ListView(
-                  padding: const EdgeInsets.fromLTRB(20, 12, 20, kAskFabReserve + 24),
-                  children: [
-                    Text(
-                        t("You don't need to have everything perfect.",
-                            'Sab kuch perfect hona zaroori nahi hai.'),
-                        style: pvFraunces(
-                            fontSize: 27,
-                            height: 1.2,
-                            fontWeight: FontWeight.w600,
-                            letterSpacing: -0.3,
-                            color: p.ink1)),
-                    const SizedBox(height: 12),
-                    Text(
-                        t(
-                            "You can now see what's already taken care of, "
-                                'and what may be worth talking about with a '
-                                'doctor.',
-                            'Ab aapke paas saaf tasveer hai ki kya ho chuka hai '
-                                'aur kis par baat karna baaki hai.'),
-                        style: pvFraunces(
-                            fontSize: 16.5, height: 1.58, color: p.ink2)),
+        // ⚠️ ONE SHELL FOR EVERY TOOL (2026-09-27). The checklist's own
+        // page moved onto `TtcToolScaffold`, so the page it opens does too:
+        // same eyebrow (the Tools tile's name, word for word), the link's
+        // name "My next 3 steps" as the title, and what the page shows as
+        // the intro. Everything below sits in the sheet unchanged.
+        // Kept for revert (2026-09-27): the old page and its bar.
+        // return Scaffold(
+        //   backgroundColor: p.ground,
+        //   body: SafeArea(
+        //     bottom: false,
+        //     child: Column(children: [
+        //       Padding(
+        //         padding: const EdgeInsets.fromLTRB(8, 4, 16, 4),
+        //         child: Row(children: [
+        //           GestureDetector(
+        //             onTap: () => Navigator.of(context).maybePop(),
+        //             behavior: HitTestBehavior.opaque,
+        //             child: Padding(
+        //               padding: const EdgeInsets.all(10),
+        //               child: Icon(Icons.arrow_back_rounded,
+        //                   size: 21, color: p.ink1),
+        //             ),
+        //           ),
+        //           Expanded(
+        //             // One name with the link that opens it (tools pass,
+        //             // 2026-09-27). Kept for revert: t('YOUR SNAPSHOT', ...).
+        //             child: Text(t('MY NEXT 3 STEPS', 'AAPKA SNAPSHOT'),
+        //                 style: pvManrope(
+        //                     fontSize: 10.5,
+        //                     fontWeight: FontWeight.w800,
+        //                     letterSpacing: 1.1,
+        //                     color: p.ink3)),
+        //           ),
+        //           // ⚠️ COMMENTED OUT 2026-09-27 (tools pass, simplicity): an
+        //           // unlabelled copy icon doing what "Copy for my appointment"
+        //           // below already does. Kept for revert:
+        //           // GestureDetector(
+        //           //   onTap: () => _copy(context, store, c, lang, t),
+        //           //   behavior: HitTestBehavior.opaque,
+        //           //   child: Padding(
+        //           //     padding: const EdgeInsets.all(8),
+        //           //     child:
+        //           //         Icon(Icons.copy_rounded, size: 19, color: p.ink2),
+        //           //   ),
+        //           // ),
+        //         ]),
+        //       ),
+        //       Expanded(
+        //         child: ListView(
+        //           padding: const EdgeInsets.fromLTRB(20, 12, 20, kAskFabReserve + 24),
+        //           children: [
+        //             Text(
+        //                 t('Where you are, and what to do next.',
+        //                     'Sab kuch perfect hona zaroori nahi hai.'),
+        //                 style: pvFraunces(
+        //                     fontSize: 27,
+        //                     height: 1.2,
+        //                     fontWeight: FontWeight.w600,
+        //                     letterSpacing: -0.3,
+        //                     color: p.ink1)),
+        //             const SizedBox(height: 12),
+        //             Text(
+        //                 t(
+        //                     "What's done, what may be worth asking a doctor "
+        //                         'about, and a copy to take to your '
+        //                         'appointment.',
+        //                     'Ab aapke paas saaf tasveer hai ki kya ho chuka hai '
+        //                         'aur kis par baat karna baaki hai.'),
+        //                 style: pvFraunces(
+        //                     fontSize: 16.5, height: 1.58, color: p.ink2)),
+        //             const SizedBox(height: 22),
+        return TtcToolScaffold(
+          hue: kPrecheckHue,
+          variant: 3,
+          // ⚠️ ONE TOOL, ONE NAME: the Tools tile's name, word for word.
+          eyebrow: 'Pre-pregnancy checklist',
+          // The name of the link that opens this page.
+          title: t('My next 3 steps', 'Aapke agle 3 kadam'),
+          intro: t(
+              "Where you are, and what to do next: what's done, what may be "
+                  'worth asking a doctor about, and a copy to take to your '
+                  'appointment.',
+              'Ab aapke paas saaf tasveer hai ki kya ho chuka hai '
+                  'aur kis par baat karna baaki hai.'),
+          children: [
+            ttcToolPad(Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
                     const SizedBox(height: 22),
 
                     // ---- COUNTS, NEVER A SCORE ------------------------------
@@ -199,11 +237,16 @@ class TtcPrecheckSummaryScreen extends StatelessWidget {
                     Text(kPrecheckDisclaimer.of(lang),
                         style: pvManrope(
                             fontSize: 12, height: 1.6, color: p.ink3)),
-                  ],
-                ),
-              ),
-            ]),
-          ),
+                    const SizedBox(height: 26),
+              ],
+            )),
+          ],
+          // Kept for revert (2026-09-27): the old page's closing.
+          //         ],
+          //       ),
+          //     ),
+          //   ]),
+          // ),
         );
       },
     );
@@ -212,7 +255,12 @@ class TtcPrecheckSummaryScreen extends StatelessWidget {
   void _open(BuildContext context, PrecheckItem item) {
     final id = item.surfaceId ??
         (item.readId != null ? 'ttc_read/${item.readId}' : null);
-    if (id == null) return;
+    // Back to the list, with this item open (2026-09-27). Kept for revert:
+    // `if (id == null) return;`
+    if (id == null) {
+      Navigator.of(context).maybePop(item.id);
+      return;
+    }
     final screen = ttcScreenForSurface(id);
     if (screen == null) return;
     Navigator.of(context).push(MaterialPageRoute<void>(
@@ -404,6 +452,13 @@ class _PriorityCard extends StatelessWidget {
                             color:
                                 n == 1 ? const Color(0xFF3D4A38) : p.ink2)),
                   ]),
+            ),
+            // Says the card goes somewhere (2026-09-27).
+            const SizedBox(width: 10),
+            Padding(
+              padding: const EdgeInsets.only(top: 2),
+              child:
+                  Icon(Icons.arrow_forward_rounded, size: 17, color: p.ink3),
             ),
           ]),
         ),

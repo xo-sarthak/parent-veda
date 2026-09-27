@@ -166,16 +166,20 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.timeline_rounded,
         nameEn: 'Cycle companion',
         nameHi: 'Cycle Companion',
-        descEn: 'Your periods, and what they tell you',
+        // Plain line, 2026-09-27 (simplicity pass). Kept for revert: 'Your periods, and what they tell you'.
+        descEn: 'Log your period dates and see your cycle',
         descHi: 'Aapke periods, aur unka matlab',
         open: (c) => openTtcSurface(c, 'ttc_cycle'),
       ),
       TtcTool(
         id: 'ovulation',
         icon: Icons.egg_outlined,
-        nameEn: 'Ovulation companion',
+        // What it is, not an invented word (2026-09-28): the screen became a
+        // test log in the tool rebuild. Kept for revert: 'Ovulation companion'.
+        nameEn: 'Ovulation tests',
         nameHi: 'Ovulation Companion',
-        descEn: 'Signs your body gives',
+        // Plain line, 2026-09-27 (simplicity pass). Kept for revert: 'Signs your body gives'.
+        descEn: 'Log ovulation tests and signs from your body',
         descHi: 'Body ke ishaare',
         open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
             builder: (_) => const TtcOvulationScreen(),
@@ -190,20 +194,31 @@ final List<TtcToolGroup> ttcToolGroups = [
       TtcTool(
         id: 'window',
         icon: Icons.wb_twilight_rounded,
-        nameEn: 'Fertility window',
+        // One name (2026-09-27); kept for revert: 'Fertility window'.
+        nameEn: 'Fertile window',
         nameHi: 'Fertility Window',
-        descEn: 'The days that count most this cycle',
+        // Plain line, 2026-09-27 (simplicity pass). Kept for revert: 'The days that count most this cycle'.
+        descEn: "The six days you're most likely to get pregnant",
         descHi: 'Sabse ahem din',
         open: (c) => openTtcSurface(c, 'ttc_window'),
       ),
       TtcTool(
         id: 'symptoms',
         icon: Icons.healing_outlined,
-        nameEn: 'Symptom companion',
+        // ⚠️ ONE TILE FOR THE ONE LOGGER (2026-09-27, build 11 on the phone):
+        // "Symptom companion" and "Mood" both opened this same screen, which
+        // logs feelings and body together. One tile, named for both. Kept for
+        // revert: 'Symptom companion', 'Log how your body feels each day'.
+        nameEn: 'Symptoms and mood',
         nameHi: 'Symptom Companion',
-        descEn: 'Notice patterns, never diagnose',
+        // Plain line, 2026-09-27 (simplicity pass). Kept for revert: 'Notice patterns, never diagnose'.
+        descEn: 'How you feel and what your body does, each day',
         descHi: 'Pattern dekhein, diagnose nahi',
-        open: (c) => openTtcTracker(c, 'symptoms'),
+        // ⚠️ THE NEW LOGGER, the one the home's Symptoms opens (launch walk,
+        // 2026-09-27): this row still opened the retired five-point tracker,
+        // so one job had two screens. Same `symptoms` store underneath.
+        // Kept for revert: open: (c) => openTtcTracker(c, 'symptoms'),
+        open: (c) => openTtcSurface(c, 'ttc_symptom_log'),
       ),
       TtcTool(
         id: 'weight',
@@ -286,7 +301,8 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.explore_outlined,
         nameEn: 'See a specialist?',
         nameHi: 'Specialist se milein?',
-        descEn: 'Is it time yet?',
+        // Plain line, 2026-09-27 (simplicity pass). Kept for revert: 'Is it time yet?'.
+        descEn: "Check if it's time to see a fertility doctor",
         descHi: 'Kya ab waqt hai',
         open: (c) => openTtcSurface(c, 'ttc_fertility_help'),
       ),
@@ -303,19 +319,22 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.male_rounded,
         nameEn: 'Partner health',
         nameHi: 'Partner ki sehat',
-        descEn: 'His half of this',
+        // Plain line, 2026-09-27 (simplicity pass). Kept for revert: 'His half of this'.
+        descEn: 'His health, tests and habits',
         descHi: 'Unka aadha hissa',
         open: (c) => openTtcTracker(c, 'partner_health'),
       ),
-      TtcTool(
-        id: 'mood',
-        icon: Icons.mood_outlined,
-        nameEn: 'Mood',
-        nameHi: 'Mood',
-        descEn: 'How the day really felt',
-        descHi: 'Din asal mein kaisa tha',
-        open: (c) => openTtcTracker(c, 'mood'),
-      ),
+      // The Mood tile opened the same logger as "Symptoms and mood" above
+      // (2026-09-27), so it is folded into that one. Kept for revert:
+      // TtcTool(
+      //   id: 'mood',
+      //   icon: Icons.mood_outlined,
+      //   nameEn: 'Mood',
+      //   nameHi: 'Mood',
+      //   descEn: "Log how you're feeling today",
+      //   descHi: 'Din asal mein kaisa tha',
+      //   open: (c) => openTtcSurface(c, 'ttc_symptom_log'),
+      // ),
       /*
       TtcTool(
         id: 'stress',
@@ -341,7 +360,8 @@ final List<TtcToolGroup> ttcToolGroups = [
       TtcTool(
         id: 'journal',
         icon: Icons.edit_note_rounded,
-        nameEn: 'Journal',
+        // The page's own name (2026-09-27). Kept for revert: 'Journal'.
+        nameEn: 'Our journal',
         nameHi: 'Journal',
         descEn: 'Both of you can write here',
         descHi: 'Aap dono yahan likh sakte hain',
@@ -384,7 +404,10 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.eco_outlined,
         nameEn: 'Supplements',
         nameHi: 'Supplements',
-        descEn: "What's worth taking, and why",
+        // ⚠️ THE DIFFERENCE IS SAID IN THE TWO ROWS (2026-09-27): a
+        // supplement is something you choose to take; a medication is what a
+        // doctor prescribed. Kept for revert: "What's worth taking, and why".
+        descEn: 'What you choose to take, like folic acid',
         descHi: 'Kya lena theek hai, aur kyun',
         open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
             builder: (_) => const TtcSupplementsScreen(),
@@ -395,7 +418,8 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.medication_outlined,
         nameEn: 'Medication',
         nameHi: 'Dawaiyan',
-        descEn: 'What your clinic put you on',
+        // Kept for revert: 'What your clinic put you on'.
+        descEn: 'Medicines your doctor prescribed for you',
         descHi: 'Clinic ne jo shuru karwaya',
         open: openTtcMedication,
       ),
@@ -415,7 +439,8 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.vaccines_outlined,
         nameEn: 'Vaccinations',
         nameHi: 'Vaccinations',
-        descEn: 'What to sort before, not during',
+        // Plain line, 2026-09-27 (simplicity pass). Kept for revert: 'What to sort before, not during'.
+        descEn: 'Jabs to have before you get pregnant',
         descHi: 'Pehle nipta lein, baad mein nahi',
         open: (c) => openTtcSurface(c, 'ttc_vaccinations'),
       ),
@@ -454,7 +479,8 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.school_outlined,
         nameEn: 'Courses',
         nameHi: 'Courses',
-        descEn: 'Guided, by people who know',
+        // Plain line, 2026-09-27 (simplicity pass). Kept for revert: 'Guided, by people who know'.
+        descEn: 'Classes from experts, and one free course',
         descHi: 'Guided, jaankaar logon se',
         open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
             builder: (_) => const TtcPrepareScreen(onlyCategory: 'courses'),
@@ -474,7 +500,10 @@ final List<TtcToolGroup> ttcToolGroups = [
       TtcTool(
         id: 'nutrition',
         icon: Icons.restaurant_outlined,
-        nameEn: 'Nutrition planner',
+        // One name with its page (2026-09-27): the page is "This week's
+        // food ideas" since the tools pass; it never planned anything.
+        // Kept for revert: 'Nutrition planner'.
+        nameEn: "This week's food ideas",
         nameHi: 'Nutrition Planner',
         descEn: 'A week of ideas, not a plan',
         descHi: 'Hafte bhar ke ideas, plan nahi',
@@ -485,7 +514,8 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.map_outlined,
         nameEn: 'Journey map',
         nameHi: 'Journey Map',
-        descEn: 'Everything so far, at a glance',
+        // Plain line, 2026-09-27 (simplicity pass). Kept for revert: 'Everything so far, at a glance'.
+        descEn: 'Where you are this month, and what comes next',
         descHi: 'Poora safar, ek nazar mein',
         open: (c) => Navigator.of(c).push(MaterialPageRoute<void>(
             builder: (_) => const TtcJourneyMapScreen(),
@@ -505,16 +535,21 @@ final List<TtcToolGroup> ttcToolGroups = [
         icon: Icons.fact_check_outlined,
         nameEn: 'Pre-pregnancy checklist',
         nameHi: 'Pre-pregnancy checklist',
-        descEn: 'The three months before',
+        // Plain line, 2026-09-27 (simplicity pass). Kept for revert: 'The three months before'.
+        descEn: 'What to sort in the three months before',
         descHi: 'Pehle ke teen mahine',
         open: (c) => openTtcSurface(c, 'ttc_precheck'),
       ),
       TtcTool(
         id: 'guide',
         icon: Icons.verified_outlined,
-        nameEn: 'Worth knowing about',
+        // ⚠️ SAYS WHAT IT IS (2026-09-27). "Worth knowing about" never said
+        // it was the products page, and it opens the same store as the bar's
+        // Products tab, so it takes that one name. Kept for revert:
+        // nameEn: 'Worth knowing about', descEn: 'Read first, buy later'.
+        nameEn: 'Products',
         nameHi: 'Jaanne layak',
-        descEn: 'Read first, buy later',
+        descEn: "What's worth buying, and what to skip",
         descHi: 'Pehle research, phir kharid',
         open: openTtcProducts,
       ),
@@ -569,8 +604,69 @@ class TtcToolRecents extends ChangeNotifier {
 /// (CLAUDE.md, "New work is English").
 const String kTtcToolsFromLibrary = 'From the library';
 
+/// Her hub's opening line: what this page is, first (2026-09-27).
+const String kTtcToolsBody =
+    'Tools to track your cycle, check a worry and keep your records. '
+    'Tap one to open it. None of them are required.';
+
 /// Where someone who has opened nothing yet usually starts.
 const List<String> kTtcToolsStartIds = ['cycle', 'window', 'precheck'];
+
+// ⚠️ HIS SIDE OF TOOLS (2026-09-27). Viewed as him, the hub showed all of her
+// private logs: her period, her symptoms, her weight, a PCOS check. Flo for
+// Partners draws the line we copy: he sees what is shared and what is his, and
+// never logs or edits hers. So his hub is his own health, her window to read,
+// the journal they share, and the care they book and keep together.
+
+/// The tools he sees, in the order the groups already hold them.
+const Set<String> kTtcHisToolIds = {
+  'window',
+  'partner_health',
+  'journal',
+  'expert',
+  'tests',
+  'records',
+  'appointments',
+  'courses',
+  'map',
+};
+
+/// Where he starts when he has opened nothing yet.
+const List<String> kTtcHisToolsStartIds = ['partner_health', 'window', 'journal'];
+
+/// A tool's name and line said to him, where hers would be wrong from his
+/// side ("Partner health · His half of this" names him in the third person).
+const Map<String, (String, String)> kTtcHisToolWords = {
+  'partner_health': ('Your health', 'Your tests, habits and half of this'),
+  // Kept for revert: 'The days that count most this cycle'.
+  'window': ('Her fertile window', "The six days she's most likely to get pregnant"),
+};
+
+/// A group's heading said to him, where hers would be wrong from his side
+/// ("Your body" over her fertile window).
+const Map<String, String> kTtcHisGroupTitles = {'Your body': 'Her cycle'};
+
+/// His hub's opening line. Hers lists her cycle, mood and supplements.
+const String kTtcHisToolsBody =
+    'Her window to read, your own health, and what the two of you share.';
+
+/// The groups for whoever is looking: all of them for her, his subset for him,
+/// with any group left empty dropped.
+List<TtcToolGroup> ttcToolGroupsFor({required bool him}) => !him
+    ? ttcToolGroups
+    : [
+        for (final g in ttcToolGroups)
+          if (g.tools.any((t) => kTtcHisToolIds.contains(t.id)))
+            TtcToolGroup(
+              titleEn: kTtcHisGroupTitles[g.titleEn] ?? g.titleEn,
+              titleHi: kTtcHisGroupTitles[g.titleEn] ?? g.titleHi,
+              hue: g.hue,
+              tools: [
+                for (final t in g.tools)
+                  if (kTtcHisToolIds.contains(t.id)) t,
+              ],
+            ),
+      ];
 
 TtcTool? ttcToolById(String id) {
   for (final g in ttcToolGroups) {
@@ -584,7 +680,7 @@ TtcTool? ttcToolById(String id) {
 /// Tools whose name, purpose or group has a word starting with every word
 /// of [query]: the doors' rule (T4), so "sleep" finds the habits tool by its
 /// purpose line and "ppointment" does not find "Appointments".
-List<TtcTool> ttcToolsMatching(String query, bool hi) {
+List<TtcTool> ttcToolsMatching(String query, bool hi, {bool him = false}) {
   final words = query
       .toLowerCase()
       .split(RegExp(r'[^a-z0-9]+'))
@@ -597,7 +693,7 @@ List<TtcTool> ttcToolsMatching(String query, bool hi) {
   }
 
   return [
-    for (final g in ttcToolGroups)
+    for (final g in ttcToolGroupsFor(him: him))
       for (final tool in g.tools)
         if (hasAll('${tool.nameEn} ${tool.descEn} ${tool.name(hi)} '
             '${tool.desc(hi)} ${g.title(hi)} ${g.titleEn}'))
@@ -688,6 +784,7 @@ class _TtcToolsScreenState extends State<TtcToolsScreen> {
         TtcAppointmentsStore.instance,
         TtcToolRecents.instance,
         TtcHomeVersionStore.instance,
+        TtcPartnerMode.instance,
       ]),
       builder: (context, _) {
         final p = pvStorePalette;
@@ -777,7 +874,9 @@ class _TtcToolsScreenState extends State<TtcToolsScreen> {
         const SizedBox(height: 6),
         PvLiveSearchWords(
           search: _search,
-          child: Text(t.toolsBody,
+          // Kept for revert: `t.toolsBody` (a list of seven things that did
+          // not say what the page is for).
+          child: Text(_him ? kTtcHisToolsBody : kTtcToolsBody,
               style: pvManrope(fontSize: 14, height: 1.45, color: p.ink2)),
         ),
       ],
@@ -791,13 +890,25 @@ class _TtcToolsScreenState extends State<TtcToolsScreen> {
           letterSpacing: 1.4,
           color: p.action));
 
+  bool get _him => TtcPartnerMode.instance.on;
+
+  String _name(TtcTool tool, bool hi) =>
+      (_him ? kTtcHisToolWords[tool.id]?.$1 : null) ?? tool.name(hi);
+
+  String _desc(TtcTool tool, bool hi) =>
+      (_him ? kTtcHisToolWords[tool.id]?.$2 : null) ?? tool.desc(hi);
+
   List<Widget> _page(BuildContext context, V2Palette p, TtcS t, bool hi) {
     final recent = [
-      for (final id in TtcToolRecents.instance.ids) ?ttcToolById(id)
+      for (final id in TtcToolRecents.instance.ids)
+        if (!_him || kTtcHisToolIds.contains(id)) ?ttcToolById(id)
     ];
     final strip = recent.isNotEmpty
         ? recent
-        : [for (final id in kTtcToolsStartIds) ?ttcToolById(id)];
+        : [
+            for (final id in _him ? kTtcHisToolsStartIds : kTtcToolsStartIds)
+              ?ttcToolById(id)
+          ];
     return [
       const SizedBox(height: 22),
       _pad(_eyebrow(p, recent.isNotEmpty ? t.toolsRecent : t.toolsStartWith)),
@@ -816,7 +927,7 @@ class _TtcToolsScreenState extends State<TtcToolsScreen> {
           ],
         ]),
       )),
-      for (final group in ttcToolGroups) ...[
+      for (final group in ttcToolGroupsFor(him: _him)) ...[
         const SizedBox(height: 28),
         _pad(_eyebrow(p, group.title(hi))),
         const SizedBox(height: 6),
@@ -830,7 +941,7 @@ class _TtcToolsScreenState extends State<TtcToolsScreen> {
 
   List<Widget> _results(BuildContext context, V2Palette p, TtcS t, bool hi) {
     final q = _search.query;
-    final tools = ttcToolsMatching(q, hi);
+    final tools = ttcToolsMatching(q, hi, him: _him);
     final key = (
       TtcContentPrefs.instance.hideIntimate,
       TtcLang.instance.hinglish,
@@ -896,7 +1007,7 @@ class _TtcToolsScreenState extends State<TtcToolsScreen> {
                     PvMarkWell(
                         p: p, hue: _hueOf(tool), size: 38, icon: tool.icon),
                     const SizedBox(height: 10),
-                    Text(tool.name(hi),
+                    Text(_name(tool, hi),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                         style: pvManrope(
@@ -920,8 +1031,8 @@ class _TtcToolsScreenState extends State<TtcToolsScreen> {
         // A quiet marker of what has been logged, so an opened tool feels
         // different from an untouched one, without ever becoming a score.
         leading: PvMarkWell(p: p, hue: hue, size: 40, icon: tool.icon),
-        title: tool.name(hi),
-        line: tool.desc(hi),
+        title: _name(tool, hi),
+        line: _desc(tool, hi),
         lineMaxLines: 2,
         meta: _subtitleFor(tool, hi),
         onTap: () => _open(context, tool),
@@ -1022,7 +1133,10 @@ class _TtcToolsScreenState extends State<TtcToolsScreen> {
         if (ttcTrackerById(tool.id) == null) return null;
         final days = TtcLogStore.instance.daysLogged(tool.id).length;
         if (days == 0) return null;
-        return hi ? '$days din log kiye' : '$days days logged';
+        // "1 days logged" (2026-09-27). Kept for revert: '$days days logged'.
+        return hi
+            ? '$days din log kiye'
+            : '$days ${days == 1 ? 'day' : 'days'} logged';
     }
   }
 }

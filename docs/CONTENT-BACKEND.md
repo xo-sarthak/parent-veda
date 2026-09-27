@@ -333,3 +333,22 @@ content should go live.
 ## Next (this terminal)
 - Guide the **Vercel deploy** once the website terminal finishes.
 - Then, app content when wanted: recipes / videos content types · parenting "Learn" wiring (`domain='parenting'`) · images → Cloudflare R2 · the deferred Directus field-polish pass.
+
+## A question should be found by a question — FAQs as their own documents (2026-09-27)
+
+**The bug.** "Cramps after embryo transfer" got "no answer" although a read's FAQ answered it word for word. The
+FAQ was inside the read's body, and the chunker packs paragraphs into pieces of up to 800 characters, so that Q and A
+was embedded together with its neighbours (other FAQs, "when to see someone"). An embedding is roughly the average
+meaning of its text: the question's meaning was diluted, the piece ranked **10th**, and the model reads the **top 6**
+(`answer_context_k`). The model then did the right thing — "no answer rather than improvise".
+
+**The two fixes, and why this one.** Raising 6 to 10 widens the net for every question in every stage: longer
+prompts, higher cost, more noise for the model to ignore. Exporting each FAQ as its own tiny document
+(`ttcfaq_<read>_<n>`, body "Q: … A: … From the read: …") fixes the cause: one short chunk whose meaning *is* the
+question, which is what her question is compared against. The FAQs also left the read's body, so one answer cannot
+fill two of the six places. The general fact: **retrieval quality is decided at chunking time** — what you put in one
+chunk is what gets matched as one meaning.
+
+**And the model.** Groq retired `llama-3.1-8b-instant`; the service runs `openai/gpt-oss-20b` with low reasoning
+effort. A hosted model name is a dependency with an expiry date, so a daily probe now asks it for one word and fails
+loudly (BACKEND-PATTERNS has the launch-order lesson; this is the same "a silent dependency must be made to shout").

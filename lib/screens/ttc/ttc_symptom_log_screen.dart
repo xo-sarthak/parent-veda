@@ -33,10 +33,48 @@
 //  cycle day beneath it, an arrow either side. "Yesterday · Cycle day 7"
 //  answers the question in four words and takes one line instead of eighty
 //  vertical pixels.
+//
+//  ---------------------------------------------------------------------------
+//  ⚠️ REBUILT INTO THE TOOL SHELL — 2026-09-27, night (the tool rebuild)
+//  ---------------------------------------------------------------------------
+//
+//  The user, walking build 13: "old tools in new clothes… poor functionality".
+//  This screen was the last logger on its own plain page (close icon, arrows,
+//  a long disclaimer at the foot) while every other tool wore `TtcToolScaffold`.
+//  What changed, each against the apps that do it best:
+//
+//  · THE SHELL. Eyebrow "Symptoms and mood" (the Tools tile, word for word),
+//    the title asks about the day she is on, the intro says every tap saves.
+//  · THE DAY IS A SCOPE, IN THE HERO, AND ITS NAME OPENS A CALENDAR. Arrows
+//    either side, the cycle day under it, the way Flo's logger heads its sheet
+//    (https://mobbin.com/screens/77dd11a7-932c-4589-a0f2-8cc4ccd6999f), and a
+//    tap on the name jumps to any past day, the way Stardust's "Mon, Jul 06 ▾"
+//    and Clue's calendar button do
+//    (https://mobbin.com/screens/999c811f-e1cd-4eff-9b18-c129a7b7a2fe,
+//    https://mobbin.com/screens/2104b1ea-fed5-445f-bb8b-435213c91ff9). Two
+//    weeks back used to be fourteen taps on an arrow.
+//  · WHAT IS SAVED FOR THE DAY IS LISTED, AND EACH ONE COMES OFF WITH AN ×.
+//    Clue's "Tracked on Aug 12" list and Oura's chosen tags with an ×
+//    (https://mobbin.com/screens/796f9cfb-72ef-41d0-bfa1-aca3a3602ada,
+//    https://mobbin.com/screens/268d6262-a98a-4704-a6cb-1b1d25a691db). A chip
+//    she tapped by mistake was only removable by finding it again in fifty;
+//    now it is at the top, and the × has an Undo.
+//  · WEIGHT AND TEMPERATURE SAY THEIR ACTION ON THE CARD ("Add" / "Change"),
+//    and the sheet says which day it saves to, has − and + either side of the
+//    number (Lifesum, https://mobbin.com/screens/34100a72-7705-4c51-a302-6b19ccea394f),
+//    types as well as scrolls, says Save, and removes with an Undo. Flo's
+//    temperature sheet (https://mobbin.com/screens/a3b4647a-7620-47fb-b22f-6bdff85002fd)
+//    and Stardust's "Add daily temperature · Cycle day 9"
+//    (https://mobbin.com/screens/6b197a60-bde3-4e10-9355-1c51a277b3e7).
+//  · A "DONE" THAT CONFIRMS. Taps still save as they happen (no Apply to
+//    forget, unlike Flo), but the way out says what was kept.
+//  · THE LONG DISCLAIMER IS A QUESTION SHE CAN OPEN, not a paragraph at the
+//    foot; the short line in the hero is the one disclaimer on show.
 // =============================================================================
 
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../services/bracket_resolver.dart' show bracketById;
 import '../../theme/pv_fonts.dart';
@@ -50,14 +88,17 @@ import '../../ttc/ttc_reads_data.dart' show ttcReadById;
 import '../../ttc/ttc_store.dart';
 import '../../ttc/ttc_symptom_data.dart';
 import '../../widgets/pv_feedback.dart';
+import '../products/pv_store_chrome.dart' show pvSnack;
 import '../v2/v2_palette.dart';
 import 'ttc_common.dart';
+import 'ttc_cycle_palette.dart';
 import 'ttc_cycle_report_screen.dart';
 import 'ttc_edit_categories_screen.dart';
 import 'ttc_focus_screen.dart' show TtcFocusScreen;
 import 'ttc_surface_router.dart' show openTtcSurface, kTtcReadPrefix;
 import 'ttc_symptom_mark.dart';
 import 'ttc_strings.dart';
+import 'ttc_tool_chrome.dart';
 
 /// Under the pregnancy test card, to the "Should I test?" chat (2026-09-26).
 const String kTtcShouldTestLink = 'Should I test?';
@@ -104,6 +145,11 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
   @override
   void initState() {
     super.initState();
+    // ⚠️ A BUG, FOUND IN THE REBUILD (2026-09-27): only the Show or hide
+    // page loaded her choices, so after a restart every card she had hidden
+    // came back until she happened to open that page. The logger reads them,
+    // so the logger loads them. `load` runs once and is safe to call twice.
+    TtcCategoryPrefs.instance.load();
     final focus = widget.focusGroup;
     if (focus == null) return;
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -135,8 +181,14 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
     final diff = today.difference(_day).inDays;
     if (diff == 0) return 'Today';
     if (diff == 1) return 'Yesterday';
-    return '${_day.day} ${_months[_day.month - 1]}';
+    // The weekday too (tool rebuild, 2026-09-27): "Wed 24 Sep" is a day she
+    // can place; "24 Sep" alone makes her count. Kept for revert:
+    //   return '${_day.day} ${_months[_day.month - 1]}';
+    return '${_weekdays[_day.weekday - 1]} ${_day.day} '
+        '${_months[_day.month - 1]}';
   }
+
+  static const _weekdays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
   bool get _canGoForward => _day.isBefore(_dayOnly(DateTime.now()));
 
@@ -150,6 +202,94 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
     final next = DateTime(_day.year, _day.month, _day.day + days);
     if (next.isAfter(_dayOnly(DateTime.now()))) return;
     setState(() => _day = next);
+  }
+
+  /// ⚠️ ANY PAST DAY IN ONE TAP (tool rebuild, 2026-09-27). The arrows walk
+  /// one day at a time, so a day two weeks ago was fourteen taps, and nothing
+  /// said the day's name could be tapped. A calendar that stops at today, the
+  /// same guard `_step` and the entry point keep.
+  Future<void> _pickDay() async {
+    final today = _dayOnly(DateTime.now());
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _day,
+      firstDate: DateTime(today.year - 2, today.month, today.day),
+      lastDate: today,
+      helpText: kTtcLogPickDayTitle,
+      routeSettings: const RouteSettings(name: 'ttc/symptom_log/day'),
+    );
+    if (picked == null || !mounted) return;
+    setState(() => _day = _clampToToday(_dayOnly(picked)));
+  }
+
+  /// Takes one thing off the day, from the list of what is saved, with Undo.
+  ///
+  /// ⚠️ UNDO, NOT A CONFIRM, and the trade is the opposite of the one
+  /// `ttcConfirmRemove` makes. A chip is one value in the store, so holding it
+  /// for four seconds costs nothing, and a question before every × on a list
+  /// she is tidying would be a tax on the common case.
+  void _removeSaved(_SavedItem item) {
+    final store = TtcLogStore.instance;
+    final day = _day;
+    final old = store.valueFor(item.tracker, item.field, on: day)?.value;
+    if (old == null) return;
+    store.clear(item.tracker, item.field, on: day);
+    setState(() {});
+    pvSnack(
+      context,
+      ttcLogRemovedLine(item.label),
+      action: 'Undo',
+      lift: 24,
+      onAction: () {
+        // A single-choice card may have taken another answer since; the undo
+        // puts the old one back the same way a tap would.
+        final group = ttcGroupOf(item.field);
+        if (item.tracker == kTtcSymptomTracker && group != null && group.single) {
+          for (final other in group.symptoms) {
+            if (other.id != item.field) {
+              store.clear(kTtcSymptomTracker, other.id, on: day);
+            }
+          }
+        }
+        store.log(item.tracker, item.field, old, on: day);
+      },
+    );
+  }
+
+  /// The way out that says what was kept. Taps have already saved; this only
+  /// closes, and the confirmation lands on the screen she returns to.
+  void _done(int saved) {
+    // ⚠️ SHOWN BEFORE THE POP, ON PURPOSE. The app's one ScaffoldMessenger
+    // carries a snack across a route change, so it arrives on the screen she
+    // goes back to; asked for after the pop, this context is already gone.
+    if (saved > 0) {
+      // Lifted clear of the home's bar, where it usually lands.
+      pvSnack(context, ttcLogDoneLine(saved, _dayName),
+          icon: Icons.check_rounded, lift: 96);
+    }
+    Navigator.of(context).maybePop();
+  }
+
+  /// Everything saved for the day on screen, in the order the screen shows it.
+  List<_SavedItem> _savedItems(Set<String> selected) {
+    final log = TtcLogStore.instance;
+    final out = <_SavedItem>[
+      for (final g in kTtcSymptomGroups)
+        for (final s in g.symptoms)
+          if (selected.contains(s.id))
+            _SavedItem(kTtcSymptomTracker, s.id, s.label),
+    ];
+    final w = log.valueFor(kTtcWeightTracker, kTtcWeightField, on: _day);
+    if (w != null) {
+      out.add(_SavedItem(kTtcWeightTracker, kTtcWeightField,
+          'Weight ${w.value.toStringAsFixed(1)} kg'));
+    }
+    final c = log.valueFor(kTtcTempTracker, kTtcTempField, on: _day);
+    if (c != null) {
+      out.add(_SavedItem(kTtcTempTracker, kTtcTempField,
+          'Temperature ${c.value.toStringAsFixed(2)} °C'));
+    }
+    return out;
   }
 
   void _toggle(TtcSymptomGroup group, TtcSymptom symptom) {
@@ -227,42 +367,74 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
         final cycleDay = engine.cycleDay(TtcStore.instance.state(on: _day));
         final selected = _selected;
         final groups = _filtered();
+        final saved = _savedItems(selected);
+        final savedCount = _savedCount(selected);
+        final hidden = TtcCategoryPrefs.instance.hidden.length;
 
-        return Scaffold(
-          backgroundColor: ttcBg,
-          body: SafeArea(
-            child: ListView(
-              padding: const EdgeInsets.fromLTRB(
-                  ttcGutter, 4, ttcGutter, ttcBottomInset),
+        // Kept for revert (2026-09-27, tool rebuild): the plain page this
+        // was, before it moved into the tool shell. Everything from the
+        // search pill down is unchanged below.
+        //   return Scaffold(
+        //     backgroundColor: ttcBg,
+        //     body: SafeArea(
+        //       child: ListView(
+        //         padding: const EdgeInsets.fromLTRB(
+        //             ttcGutter, 4, ttcGutter, ttcBottomInset),
+        //         children: [
+        //           Align(alignment: Alignment.centerLeft,
+        //               child: IconButton(icon: const Icon(Icons.close_rounded),
+        //                   color: ttcTitleInk,
+        //                   onPressed: () => Navigator.of(context).maybePop())),
+        //           Row(children: [
+        //             _Arrow(icon: Icons.chevron_left_rounded, on: true,
+        //                 onTap: () => _step(-1)),
+        //             Expanded(child: Column(children: [
+        //               Text(_dayName, style: ttcJakarta(19)),
+        //               if (cycleDay != null) ...[const SizedBox(height: 2),
+        //                 Text(t.headerCycleDay(cycleDay),
+        //                     style: ttcBody(13, color: ttcMuted))],
+        //             ])),
+        //             _Arrow(icon: Icons.chevron_right_rounded,
+        //                 on: _canGoForward, onTap: () => _step(1)),
+        //           ]),
+        //           const SizedBox(height: 6),
+        //           Center(child: _SavedCount(count: _savedCount(selected))),
+        //           const SizedBox(height: 14),
+        //           Text(kTtcLogHowItWorks,
+        //               key: const ValueKey('ttc_log_how_it_works'),
+        //               style: ttcBody(13.5, color: ttcInk, h: 1.5)),
+        //           const SizedBox(height: 14),
+        //           ...the search pill and everything below...
+        return TtcToolScaffold(
+          hue: kTtcLogHue,
+          variant: 3,
+          // ⚠️ ONE NAME: the Tools tile's, word for word.
+          eyebrow: kTtcLogEyebrow,
+          title: ttcLogTitle(_dayName),
+          // The one disclaimer on show; the long one is a question at the
+          // foot she can open.
+          intro: kTtcLogHowItWorks,
+          heroLead: _DayPicker(
+            label: _dayName,
+            caption: cycleDay == null ? null : t.headerCycleDay(cycleDay),
+            canGoForward: _canGoForward,
+            onBack: () => _step(-1),
+            onForward: () => _step(1),
+            onPick: _pickDay,
+            onToday: _canGoForward
+                ? () => setState(() => _day = _dayOnly(DateTime.now()))
+                : null,
+          ),
+          children: [
+            ttcToolPad(Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: IconButton(
-                    icon: const Icon(Icons.close_rounded),
-                    color: ttcTitleInk,
-                    onPressed: () => Navigator.of(context).maybePop(),
-                  ),
-                ),
-                Row(children: [
-                  _Arrow(
-                      icon: Icons.chevron_left_rounded,
-                      on: true,
-                      onTap: () => _step(-1)),
-                  Expanded(
-                    child: Column(children: [
-                      Text(_dayName, style: ttcJakarta(19)),
-                      if (cycleDay != null) ...[
-                        const SizedBox(height: 2),
-                        Text(t.headerCycleDay(cycleDay),
-                            style: ttcBody(13, color: ttcMuted)),
-                      ],
-                    ]),
-                  ),
-                  _Arrow(
-                      icon: Icons.chevron_right_rounded,
-                      on: _canGoForward,
-                      onTap: () => _step(1)),
-                ]),
+                const SizedBox(height: 22),
+                // ⚠️ "DID IT SAVE?" ANSWERED ON THE SCREEN (tools pass,
+                // 2026-09-27), and since the rebuild WHAT was saved, each
+                // with an × (Clue's "Tracked on", Oura's tags).
+                _SavedCard(
+                    count: savedCount, items: saved, onRemove: _removeSaved),
                 const SizedBox(height: 16),
 
                 // ⚠️ A PLAIN GREY PILL. A search box looks like this on every
@@ -282,9 +454,15 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
                         onChanged: (v) => setState(() => _query = v),
                         style: ttcBody(14, color: ttcInk),
                         cursorColor: ttcSoft,
+                        // ⚠️ NOT FILLED (launch walk, 2026-09-27): the app's
+                        // input theme fills fields white, so a white box sat
+                        // inside the grey pill, offset, like a box in a box.
                         decoration: InputDecoration(
                           isDense: true,
+                          filled: false,
                           border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
                           contentPadding:
                               const EdgeInsets.symmetric(vertical: 13),
                           hintText: t.logSearch,
@@ -296,6 +474,15 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
                 ),
                 const SizedBox(height: 20),
 
+                // When a search finds no chip, say so, and point at the two
+                // number cards for the words that mean them (2026-09-27).
+                if (_query.isNotEmpty && groups.isEmpty) ...[
+                  Text(
+                      ttcLogNumberHint(_query) ?? kTtcLogSearchNothing,
+                      key: const ValueKey('ttc_log_search_nothing'),
+                      style: ttcBody(13.5, color: ttcSoft, h: 1.5)),
+                  const SizedBox(height: 18),
+                ],
                 if (_query.isEmpty) ...[
                   _FeelingRow(
                       selected: selected, onTap: _toggle, p: p),
@@ -311,8 +498,10 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
                   ],
                   const SizedBox(height: 22),
                   Row(children: [
+                    // Says what is below, not what kind of thing it is
+                    // (2026-09-27). Kept for revert: Text(t.logCategories, ...).
                     Expanded(
-                        child: Text(t.logCategories, style: ttcJakarta(18))),
+                        child: Text(kTtcLogMoreHeading, style: ttcJakarta(18))),
                     // ⚠️ PURPLE, AND IT DOES SOMETHING. It shipped coral —
                     // borrowed straight off the reference — and did nothing at
                     // all. Both halves of that were wrong: coral in this stage
@@ -328,11 +517,23 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
                         builder: (_) => const TtcEditCategoriesScreen(),
                       )),
                       behavior: HitTestBehavior.opaque,
-                      child: Text(t.logEdit,
+                      // Says what the tap does (2026-09-27). Kept for revert:
+                      //   Text(t.logEdit, ...)
+                      child: Text(kTtcLogShowHide,
+                          key: const ValueKey('ttc_log_show_hide'),
                           style: ttcBody(13.5,
                               color: ttcPurple, w: FontWeight.w800)),
                     ),
                   ]),
+                  // ⚠️ A HIDDEN CARD IS SAID, NOT SILENT (tool rebuild). A
+                  // feature is never hidden without a trace: she hid it a
+                  // month ago and wonders where "Sex" went.
+                  if (hidden > 0) ...[
+                    const SizedBox(height: 4),
+                    Text(ttcLogHiddenLine(hidden),
+                        key: const ValueKey('ttc_log_hidden_line'),
+                        style: ttcBody(12.5, color: ttcMuted)),
+                  ],
                   const SizedBox(height: 12),
                 ],
 
@@ -418,6 +619,9 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
                 // cards, laid out once per rebuild of a screen that is not
                 // animating.
                 IntrinsicHeight(
+                  // So "Add today's temperature or weight" can open the log
+                  // scrolled to these two (2026-09-28).
+                  key: _keyFor(kTtcLogMeasurementsGroup),
                   child:
                       Row(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
                   Expanded(
@@ -437,6 +641,8 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
                       onSet: (v) =>
                           _setNumber(kTtcWeightTracker, kTtcWeightField, v),
                       p: p,
+                      forLine: ttcLogSheetFor(_dayName, cycleDay),
+                      dayName: _dayName,
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -456,10 +662,38 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
                       onSet: (v) =>
                           _setNumber(kTtcTempTracker, kTtcTempField, v),
                       p: p,
+                      forLine: ttcLogSheetFor(_dayName, cycleDay),
+                      dayName: _dayName,
                       // The fourteen-dot line gave way to the whole-cycle
-                      // chart below; this card now points at it.
-                      under: Text(kTtcTempChartBelow,
-                          style: ttcBody(11, color: ttcMuted, h: 1.35)),
+                      // chart below.
+                      //
+                      // ⚠️ AND THE CARD NOW SAYS HOW TO TAKE IT (tools pass,
+                      // 2026-09-27). A reading taken at noon looks like any
+                      // other and means nothing; nothing said so. One line,
+                      // and the read that explains it. Kept for revert:
+                      //   under: Text(kTtcTempChartBelow,
+                      //       style: ttcBody(11, color: ttcMuted, h: 1.35)),
+                      under: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(kTtcTempHowTo,
+                                key: const ValueKey('ttc_temp_how_to'),
+                                style: ttcBody(11.5, color: ttcSoft, h: 1.4)),
+                            if (ttcReadById(kTtcTempReadId) != null) ...[
+                              const SizedBox(height: 6),
+                              GestureDetector(
+                                key: const ValueKey('ttc_temp_read_link'),
+                                behavior: HitTestBehavior.opaque,
+                                onTap: () => openTtcSurface(context,
+                                    '$kTtcReadPrefix$kTtcTempReadId'),
+                                child: Text(kTtcTempReadLink,
+                                    style: ttcBody(11.5,
+                                        color: ttcPurple,
+                                        w: FontWeight.w800,
+                                        h: 1.35)),
+                              ),
+                            ],
+                          ]),
                     ),
                   ),
                 ]),
@@ -472,23 +706,38 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
                 // fertile days behind it. Still recorded, never interpreted:
                 // nothing on it says "you ovulated here".
                 _TempCycleChart(p: p),
-                const SizedBox(height: 18),
-
-                _QuietButton(label: t.logViewReport, onTap: _openReport),
                 const SizedBox(height: 22),
 
-                Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  const Icon(Icons.info_outline_rounded,
-                      size: 15, color: ttcMuted),
-                  const SizedBox(width: 9),
-                  Expanded(
-                    child: Text(t.logDisclaimer,
-                        style: ttcBody(11.5, color: ttcMuted, h: 1.5)),
-                  ),
-                ]),
+                // ⚠️ ONE BUTTON, AND IT SAYS WHAT WAS KEPT (tool rebuild).
+                // Taps save as they happen, so this saves nothing; it closes
+                // and the screen she returns to says "3 things saved for
+                // today". Without it the only way out was an × at the top,
+                // which reads as "cancel" on every other screen she knows.
+                TtcToolPrimary(
+                    key: const ValueKey('ttc_log_done'),
+                    label: kTtcLogDone,
+                    onTap: () => _done(savedCount)),
+                const SizedBox(height: 16),
+                // Where the log is read back: the report shows every tap
+                // across the cycle. A link, not a second button of the same
+                // weight. Kept for revert:
+                //   _QuietButton(label: t.logViewReport, onTap: _openReport),
+                _LinkRow(
+                    key: const ValueKey('ttc_log_open_report'),
+                    label: t.logViewReport,
+                    icon: Icons.insights_rounded,
+                    onTap: _openReport),
+                const SizedBox(height: 22),
+
+                // The long disclaimer, as the question it answers. Kept for
+                // revert: an info icon and t.logDisclaimer in full, always
+                // open, at the very foot.
+                _Fold(
+                    question: kTtcLogPregnancyQuestion,
+                    answer: t.logDisclaimer),
               ],
-            ),
-          ),
+            )),
+          ],
         );
       },
     );
@@ -517,10 +766,25 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
         if (!TtcCategoryPrefs.instance.isHidden(g.id)) g,
     ];
     if (_query.isEmpty) return visible;
-    final q = _query.toLowerCase();
+    // ⚠️ SEARCH FINDS THE WORDS SHE WOULD TYPE (tools pass, 2026-09-27). It
+    // matched chip labels only, so "could not sleep" missed "Couldn't sleep",
+    // "cramps" missed "Cramping", and the feelings could not be searched at
+    // all because their row hides while searching. Now a chip matches on its
+    // label, a few everyday words (`kTtcLogSearchWords`), or its card's
+    // title, and the feelings are searched as a card of their own. Kept for
+    // revert:
+    //   final q = _query.toLowerCase();
+    //   return [
+    //     for (final g in visible)
+    //       if (g.symptoms.any((s) => s.label.toLowerCase().contains(q)))
+    //         TtcSymptomGroup(... symptoms: g.symptoms
+    //             .where((s) => s.label.toLowerCase().contains(q)).toList()),
+    //   ];
+    final feelings =
+        kTtcSymptomGroups.firstWhere((g) => g.id == kTtcFeelingGroup);
     return [
-      for (final g in visible)
-        if (g.symptoms.any((s) => s.label.toLowerCase().contains(q)))
+      for (final g in [feelings, ...visible])
+        if (g.symptoms.any((s) => ttcLogSearchMatches(g, s, _query)))
           TtcSymptomGroup(
             id: g.id,
             title: g.title,
@@ -528,26 +792,40 @@ class _TtcSymptomLogScreenState extends State<TtcSymptomLogScreen> {
             single: g.single,
             note: g.note,
             symptoms: g.symptoms
-                .where((s) => s.label.toLowerCase().contains(q))
+                .where((s) => ttcLogSearchMatches(g, s, _query))
                 .toList(),
           ),
     ];
   }
+
+  /// What is saved for the day on screen: chips, plus weight and temperature.
+  int _savedCount(Set<String> selected) {
+    final log = TtcLogStore.instance;
+    return selected.length +
+        (log.valueFor(kTtcWeightTracker, kTtcWeightField, on: _day) == null
+            ? 0
+            : 1) +
+        (log.valueFor(kTtcTempTracker, kTtcTempField, on: _day) == null
+            ? 0
+            : 1);
+  }
 }
 
-class _Arrow extends StatelessWidget {
-  const _Arrow({required this.icon, required this.on, required this.onTap});
-  final IconData icon;
-  final bool on;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) => IconButton(
-        icon: Icon(icon),
-        color: on ? ttcTitleInk : ttcBorder,
-        onPressed: on ? onTap : null,
-      );
-}
+// Kept for revert (2026-09-27, tool rebuild): the day arrows now live in
+// `_DayPicker`, in the hero.
+// class _Arrow extends StatelessWidget {
+//   const _Arrow({required this.icon, required this.on, required this.onTap});
+//   final IconData icon;
+//   final bool on;
+//   final VoidCallback onTap;
+//
+//   @override
+//   Widget build(BuildContext context) => IconButton(
+//         icon: Icon(icon),
+//         color: on ? ttcTitleInk : ttcBorder,
+//         onPressed: on ? onTap : null,
+//       );
+// }
 
 /// Every mood, as bubbles — the screen's primary control.
 ///
@@ -589,9 +867,12 @@ class _FeelingRow extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(12, 16, 12, 18),
+      // A hairline since the rebuild: a white card on the tool sheet with no
+      // edge is not a card (DESIGN-SYSTEM §4.0, white plus one hairline).
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(ttcCardRadius),
+        border: Border.all(color: ttcLine),
       ),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Padding(
@@ -737,9 +1018,21 @@ class _CategoryCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(ttcCardRadius),
+          border: Border.all(color: ttcLine),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Text(group.title, style: ttcJakarta(16)),
+          // ⚠️ "PICK ONE" ON THE TWO TEST CARDS (tools pass, 2026-09-27).
+          // Every other card takes as many taps as she likes; these two swap
+          // the old answer for the new one, and nothing said so, so a second
+          // tap looked like it undid the first. Kept for revert:
+          //   Text(group.title, style: ttcJakarta(16)),
+          Row(crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic, children: [
+            Expanded(child: Text(group.title, style: ttcJakarta(16))),
+            if (group.single)
+              Text(kTtcLogPickOne,
+                  style: ttcBody(12, color: ttcMuted, w: FontWeight.w700)),
+          ]),
           if (group.note != null) ...[
             const SizedBox(height: 5),
             Text(group.note!, style: ttcBody(12.5, color: ttcMuted, h: 1.45)),
@@ -818,6 +1111,7 @@ class _GentleLine extends StatelessWidget {
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(ttcCardRadius),
+            border: Border.all(color: ttcLine),
           ),
           child: Row(children: [
             const Icon(Icons.favorite_border_rounded,
@@ -949,10 +1243,19 @@ class _MeasureCard extends StatelessWidget {
     required this.onSet,
     required this.p,
     this.under,
+    this.forLine = '',
+    this.dayName = 'Today',
   });
 
   /// What sits under the number. Null draws the fourteen-reading sparkline.
   final Widget? under;
+
+  /// "For today · Cycle day 7", at the top of the sheet: which day the number
+  /// lands on, because the logger can be on any past day (tool rebuild).
+  final String forLine;
+
+  /// "Today", "Yesterday", "Wed 24 Sep", for the saved line.
+  final String dayName;
 
   final String label;
   final String unit;
@@ -986,6 +1289,7 @@ class _MeasureCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(ttcCardRadius),
+          border: Border.all(color: ttcLine),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
@@ -1047,140 +1351,515 @@ class _MeasureCard extends StatelessWidget {
           // chart under the two cards replaced it. Weight keeps its line. The
           // old call, kept for revert, was the unconditional:
           //   SizedBox(height: 38, child: _Spark(series: series, ink: deep)),
-          under ?? SizedBox(height: 38, child: _Spark(series: series, ink: deep)),
+          // ⚠️ AND THE LINE SAYS WHICH DAYS IT COVERS (tools pass,
+          // 2026-09-27): a shape with no dates could not be read. Kept for
+          // revert:
+          //   under ?? SizedBox(height: 38, child: _Spark(series: series, ink: deep)),
+          under ??
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                SizedBox(height: 38, child: _Spark(series: series, ink: deep)),
+                if (ttcSparkSpan(series) case final span?) ...[
+                  const SizedBox(height: 4),
+                  Text(span,
+                      key: const ValueKey('ttc_spark_span'),
+                      style: ttcBody(10.5, color: ttcMuted)),
+                ],
+              ]),
+          // ⚠️ THE CARD SAYS WHAT A TAP DOES (tool rebuild, 2026-09-27). It
+          // was a whole card that happened to be tappable, reading "Not
+          // recorded", with nothing on it that looked like a control. Flo's
+          // weight card carries its pencil on the face; ours says the word.
+          const SizedBox(height: 10),
+          Row(
+              key: ValueKey('ttc_measure_action_$unit'),
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(value == null ? Icons.add_rounded : Icons.edit_outlined,
+                    size: 15, color: ttcPurple),
+                const SizedBox(width: 5),
+                Flexible(
+                  child: Text(value == null ? kTtcMeasureAdd : kTtcMeasureChange,
+                      style: ttcBody(12.5, color: ttcPurple, w: FontWeight.w800)),
+                ),
+              ]),
         ]),
       ),
     );
   }
 
+  // ⚠️ THE SHEET, REBUILT (tool rebuild, 2026-09-27). What changed, and why:
+  //  · It says which day the number lands on ("For Wed 24 Sep · Cycle day
+  //    7"). The logger can be on any past day, and a sheet that did not say so
+  //    was one way a reading ended up on the wrong morning.
+  //  · − and + either side of the number (Lifesum's "Update your weight"),
+  //    one step each, for the nudge from yesterday's reading. The ruler stays
+  //    for a bigger move and a tap on the number still types it.
+  //  · The units are one segment, white on grey like every other tool sheet's
+  //    choice, not two purple chips stacked beside the number.
+  //  · "Save", because that is what it does ("Done" is the logger's way out).
+  //  · "Remove this reading" in words, with an Undo on the screen behind,
+  //    instead of a bare bin icon in the corner with no way back.
+  //  · The temperature sheet repeats how to take it, where she is entering it.
   Future<void> _pick(BuildContext context) async {
-    final metric = unit == 'kg' ? 'kg' : '\u00B0C';
-    final imperial = unit == 'kg' ? 'lbs' : '\u00B0F';
+    final metric = unit == 'kg' ? 'kg' : '°C';
+    final imperial = unit == 'kg' ? 'lbs' : '°F';
+    final isTemp = unit != 'kg';
     var useImperial = false;
     var v = value ?? (unit == 'kg' ? 60.0 : 36.5);
+    var typing = false;
+    var typedText = '';
+    // Bumped when the number moves by anything but the ruler, so the ruler
+    // remounts on it.
+    var moved = 0;
 
-    // ⚠️ THE UNIT TOGGLE IS THE POINT OF THIS SHEET, and it was missing.
-    //
-    // The reference offers kg/lbs and °C/°F right in the picker, and for an
-    // India-first product that ships to people who think in either, a logger
-    // that only accepts kilograms is a logger some people cannot use honestly.
-    //
-    // ⚠️ THE STORE ALWAYS HOLDS METRIC. The toggle converts for display only,
-    // and the value written back is always kg or °C. A unit stored alongside
-    // each reading would mean the chart has to convert per point and any code
-    // that forgets is silently wrong by a factor of two.
-    double toDisplay(double metricValue) => useImperial
-        ? (unit == 'kg' ? metricValue * 2.20462 : metricValue * 9 / 5 + 32)
-        : metricValue;
+    // ⚠️ THE STORE ALWAYS HOLDS METRIC. The toggle converts for display only.
+    double toDisplay(double m) => useImperial
+        ? (unit == 'kg' ? m * 2.20462 : m * 9 / 5 + 32)
+        : m;
     double fromDisplay(double shown) => useImperial
         ? (unit == 'kg' ? shown / 2.20462 : (shown - 32) * 5 / 9)
         : shown;
 
+    void takeTyped() {
+      if (!typing) return;
+      final n = double.tryParse(typedText.trim());
+      if (n != null) {
+        v = fromDisplay(n).clamp(min, max).toDouble();
+        moved++;
+      }
+      typing = false;
+    }
+
+    final messengerContext = context;
+    final old = value;
+
     await showModalBottomSheet<void>(
       context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(26))),
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      routeSettings: RouteSettings(name: 'ttc/symptom_log/$unit'),
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setSheet) {
           final shown = toDisplay(v);
-
-          // ⚠️ THE RULER IS BUILT IN DISPLAY UNITS, so its range and its step
-          // both have to convert with the toggle. A ruler ticking every 0.1 kg
-          // ticks every 0.22 lb, which reads as a broken scale — so each unit
-          // gets a step chosen for itself rather than a converted one.
-          final dp = useImperial && unit != 'kg' ? 1 : decimals;
+          final dp = useImperial && isTemp ? 1 : decimals;
           final step = unit == 'kg'
               ? (useImperial ? 0.2 : 0.1)
               : (useImperial ? 0.1 : 0.05);
 
+          void nudge(int dir) => setSheet(() {
+                takeTyped();
+                final next = toDisplay(v) + dir * step;
+                v = fromDisplay(next).clamp(min, max).toDouble();
+                moved++;
+              });
+
           return Padding(
-            padding: const EdgeInsets.fromLTRB(0, 10, 0, 26),
-            child: Column(mainAxisSize: MainAxisSize.min, children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: Row(children: [
-                  IconButton(
-                    icon: const Icon(Icons.close_rounded),
-                    color: ttcTitleInk,
-                    onPressed: () => Navigator.of(ctx).pop(),
-                  ),
-                  Expanded(
-                      child: Text(label,
-                          textAlign: TextAlign.center,
-                          style: ttcJakarta(16))),
-                  // ⚠️ CLEARING MOVED HERE FROM THE CARD FACE. It was a bin
-                  // icon sitting on the card next to a pencil, so a card
-                  // holding one number carried two controls and neither was
-                  // the obvious one. Deleting a reading is rare and belongs
-                  // where you already are to change it.
-                  SizedBox(
-                    width: 48,
-                    child: value == null
-                        ? null
-                        : IconButton(
-                            icon: const Icon(Icons.delete_outline_rounded,
-                                size: 20),
-                            color: ttcMuted,
-                            onPressed: () {
-                              onSet(null);
-                              Navigator.of(ctx).pop();
-                            },
+            padding:
+                EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(ctx).bottom),
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
+              ),
+              padding: const EdgeInsets.fromLTRB(0, 14, 0, 20),
+              child: SafeArea(
+                top: false,
+                child: SingleChildScrollView(
+                  child: Column(mainAxisSize: MainAxisSize.min, children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                            color: ttcLine,
+                            borderRadius: BorderRadius.circular(999)),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 12),
+                      child: Row(children: [
+                        IconButton(
+                          tooltip: 'Close',
+                          icon: const Icon(Icons.close_rounded),
+                          color: ttcTitleInk,
+                          onPressed: () => Navigator.of(ctx).pop(),
+                        ),
+                        Expanded(
+                          child: Column(children: [
+                            Text(label,
+                                textAlign: TextAlign.center,
+                                style: ttcJakarta(17)),
+                            if (forLine.isNotEmpty) ...[
+                              const SizedBox(height: 2),
+                              Text(forLine,
+                                  key: const ValueKey('ttc_measure_for'),
+                                  textAlign: TextAlign.center,
+                                  style: ttcBody(12, color: ttcMuted)),
+                            ],
+                          ]),
+                        ),
+                        // Balances the close button so the title centres.
+                        const SizedBox(width: 48),
+                      ]),
+                    ),
+                    const SizedBox(height: 14),
+                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+                      _Nudge(
+                          key: const ValueKey('ttc_measure_minus'),
+                          icon: Icons.remove_rounded,
+                          label: 'Less',
+                          onTap: () => nudge(-1)),
+                      const SizedBox(width: 14),
+                      if (typing)
+                        SizedBox(
+                          width: 140,
+                          child: _TypedNumber(
+                            initial: typedText,
+                            onChanged: (t) => typedText = t,
+                            onSubmitted: () => setSheet(takeTyped),
                           ),
-                  ),
-                ]),
-              ),
-              const SizedBox(height: 6),
-              Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                Text(shown.toStringAsFixed(dp),
-                    style:
-                        ttcFraunces(38, w: FontWeight.w600, color: ttcTitleInk)),
-                const SizedBox(width: 8),
-                // The two units, as a segment. Tapping converts what is on
-                // screen; it never changes what is stored.
-                Column(mainAxisSize: MainAxisSize.min, children: [
-                  _UnitChip(
-                      label: metric,
-                      on: !useImperial,
-                      onTap: () => setSheet(() => useImperial = false)),
-                  const SizedBox(height: 4),
-                  _UnitChip(
-                      label: imperial,
-                      on: useImperial,
-                      onTap: () => setSheet(() => useImperial = true)),
-                ]),
-              ]),
-              const SizedBox(height: 14),
-              _Ruler(
-                // ⚠️ REMOUNTS ON A UNIT CHANGE. The ruler holds a scroll
-                // offset, and an offset means a different number once the
-                // range under it changes — without the key it would keep the
-                // pixel position and silently report the wrong value.
-                key: ValueKey(useImperial),
-                value: shown,
-                min: toDisplay(min),
-                max: toDisplay(max),
-                step: step,
-                decimals: dp,
-                onChanged: (n) => setSheet(() => v = fromDisplay(n)),
-              ),
-              const SizedBox(height: 18),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
-                child: _QuietButton(
-                  label: 'Done',
-                  onTap: () {
-                    onSet(double.parse(v.toStringAsFixed(decimals)));
-                    Navigator.of(ctx).pop();
-                  },
+                        )
+                      else
+                        Flexible(
+                          child: Semantics(
+                            button: true,
+                            label:
+                                '${shown.toStringAsFixed(dp)}. $kTtcMeasureTypeHint',
+                            excludeSemantics: true,
+                            child: GestureDetector(
+                              key: const ValueKey('ttc_measure_number'),
+                              behavior: HitTestBehavior.opaque,
+                              onTap: () => setSheet(() {
+                                typing = true;
+                                typedText = shown.toStringAsFixed(dp);
+                              }),
+                              child: FittedBox(
+                                fit: BoxFit.scaleDown,
+                                child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Text(shown.toStringAsFixed(dp),
+                                          style: ttcFraunces(38,
+                                              w: FontWeight.w600,
+                                              color: ttcTitleInk)),
+                                      const SizedBox(width: 4),
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 7),
+                                        child: Text(
+                                            useImperial ? imperial : metric,
+                                            style:
+                                                ttcBody(13, color: ttcMuted)),
+                                      ),
+                                    ]),
+                              ),
+                            ),
+                          ),
+                        ),
+                      const SizedBox(width: 14),
+                      _Nudge(
+                          key: const ValueKey('ttc_measure_plus'),
+                          icon: Icons.add_rounded,
+                          label: 'More',
+                          onTap: () => nudge(1)),
+                    ]),
+                    const SizedBox(height: 4),
+                    Text(typing ? kTtcMeasureTypingHint : kTtcMeasureTypeHint,
+                        style: ttcBody(11.5, color: ttcMuted)),
+                    const SizedBox(height: 10),
+                    _Ruler(
+                      // ⚠️ REMOUNTS ON A UNIT CHANGE OR ANY OTHER MOVE. The
+                      // ruler holds a scroll offset, and an offset means a
+                      // different number once the range under it changes.
+                      key: ValueKey((useImperial, moved)),
+                      value: shown,
+                      min: toDisplay(min),
+                      max: toDisplay(max),
+                      step: step,
+                      decimals: dp,
+                      onChanged: (n) => setSheet(() => v = fromDisplay(n)),
+                    ),
+                    const SizedBox(height: 12),
+                    // The units, as one segment.
+                    SizedBox(
+                      width: 200,
+                      child: Container(
+                        padding: const EdgeInsets.all(4),
+                        decoration: BoxDecoration(
+                            color: ttcPanel,
+                            borderRadius: BorderRadius.circular(999)),
+                        child: Row(children: [
+                          _UnitSeg(
+                              label: metric,
+                              on: !useImperial,
+                              onTap: () => setSheet(() {
+                                    takeTyped();
+                                    useImperial = false;
+                                    moved++;
+                                  })),
+                          _UnitSeg(
+                              label: imperial,
+                              on: useImperial,
+                              onTap: () => setSheet(() {
+                                    takeTyped();
+                                    useImperial = true;
+                                    moved++;
+                                  })),
+                        ]),
+                      ),
+                    ),
+                    if (isTemp) ...[
+                      const SizedBox(height: 14),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 24),
+                        child: Text(kTtcTempHowTo,
+                            key: const ValueKey('ttc_measure_temp_how_to'),
+                            textAlign: TextAlign.center,
+                            style: ttcBody(12.5, color: ttcSoft, h: 1.45)),
+                      ),
+                    ],
+                    const SizedBox(height: 18),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: TtcToolPrimary(
+                        key: const ValueKey('ttc_measure_save'),
+                        label: kTtcMeasureSave,
+                        onTap: () {
+                          takeTyped();
+                          onSet(double.parse(v.toStringAsFixed(decimals)));
+                          Navigator.of(ctx).pop();
+                          pvSnack(messengerContext,
+                              ttcLogMeasureSaved(label, dayName),
+                              icon: Icons.check_rounded, lift: 24);
+                        },
+                      ),
+                    ),
+                    if (old != null) ...[
+                      const SizedBox(height: 6),
+                      GestureDetector(
+                        key: const ValueKey('ttc_measure_remove'),
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () {
+                          onSet(null);
+                          Navigator.of(ctx).pop();
+                          pvSnack(messengerContext, ttcLogRemovedLine(label),
+                              action: 'Undo',
+                              lift: 24,
+                              onAction: () => onSet(old));
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Text(kTtcMeasureRemove,
+                              style: ttcBody(13,
+                                  color: ttcMuted, w: FontWeight.w700)),
+                        ),
+                      ),
+                    ],
+                  ]),
                 ),
               ),
-            ]),
+            ),
           );
         },
       ),
     );
   }
+
+  // Kept for revert (2026-09-27, tool rebuild): the sheet before, with Done,
+  // a bin icon in the corner and the units as two purple chips.
+  // Future<void> _pick(BuildContext context) async {
+  //   final metric = unit == 'kg' ? 'kg' : '\u00B0C';
+  //   final imperial = unit == 'kg' ? 'lbs' : '\u00B0F';
+  //   var useImperial = false;
+  //   var v = value ?? (unit == 'kg' ? 60.0 : 36.5);
+  //
+  //   // ⚠️ TYPE IT AS WELL AS SCROLL IT (tools pass, 2026-09-27). Reaching
+  //   // 68.4 kg from 60 was a long scroll; a number she already knows is a
+  //   // number she wants to type (Amazon's typed weight with a unit switch,
+  //   // mobbin 28d92f63). Tapping the big number turns it into a field; the
+  //   // ruler stays for a nudge.
+  //   var typing = false;
+  //   // The typed text. The field owns its controller (`_TypedNumber`), so it
+  //   // is disposed with the field and never while the sheet animates away.
+  //   var typedText = '';
+  //   // Bumped when a typed number lands, so the ruler remounts on it.
+  //   var typedTimes = 0;
+  //
+  //   // ⚠️ THE UNIT TOGGLE IS THE POINT OF THIS SHEET, and it was missing.
+  //   //
+  //   // The reference offers kg/lbs and °C/°F right in the picker, and for an
+  //   // India-first product that ships to people who think in either, a logger
+  //   // that only accepts kilograms is a logger some people cannot use honestly.
+  //   //
+  //   // ⚠️ THE STORE ALWAYS HOLDS METRIC. The toggle converts for display only,
+  //   // and the value written back is always kg or °C. A unit stored alongside
+  //   // each reading would mean the chart has to convert per point and any code
+  //   // that forgets is silently wrong by a factor of two.
+  //   double toDisplay(double metricValue) => useImperial
+  //       ? (unit == 'kg' ? metricValue * 2.20462 : metricValue * 9 / 5 + 32)
+  //       : metricValue;
+  //   double fromDisplay(double shown) => useImperial
+  //       ? (unit == 'kg' ? shown / 2.20462 : (shown - 32) * 5 / 9)
+  //       : shown;
+  //
+  //   // A typed number, in the units on screen, into [v] (kept in metric and
+  //   // inside the ruler's range). Anything that is not a number leaves [v].
+  //   void takeTyped() {
+  //     if (!typing) return;
+  //     final n = double.tryParse(typedText.trim());
+  //     if (n != null) {
+  //       v = fromDisplay(n).clamp(min, max).toDouble();
+  //       typedTimes++;
+  //     }
+  //     typing = false;
+  //   }
+  //
+  //   await showModalBottomSheet<void>(
+  //     context: context,
+  //     backgroundColor: Colors.white,
+  //     // Scroll-controlled, so the keyboard can push the sheet up.
+  //     isScrollControlled: true,
+  //     shape: const RoundedRectangleBorder(
+  //         borderRadius: BorderRadius.vertical(top: Radius.circular(26))),
+  //     builder: (ctx) => StatefulBuilder(
+  //       builder: (ctx, setSheet) {
+  //         final shown = toDisplay(v);
+  //
+  //         // ⚠️ THE RULER IS BUILT IN DISPLAY UNITS, so its range and its step
+  //         // both have to convert with the toggle. A ruler ticking every 0.1 kg
+  //         // ticks every 0.22 lb, which reads as a broken scale — so each unit
+  //         // gets a step chosen for itself rather than a converted one.
+  //         final dp = useImperial && unit != 'kg' ? 1 : decimals;
+  //         final step = unit == 'kg'
+  //             ? (useImperial ? 0.2 : 0.1)
+  //             : (useImperial ? 0.1 : 0.05);
+  //
+  //         return Padding(
+  //           padding: EdgeInsets.fromLTRB(
+  //               0, 10, 0, 26 + MediaQuery.viewInsetsOf(ctx).bottom),
+  //           child: Column(mainAxisSize: MainAxisSize.min, children: [
+  //             Padding(
+  //               padding: const EdgeInsets.symmetric(horizontal: 20),
+  //               child: Row(children: [
+  //                 IconButton(
+  //                   icon: const Icon(Icons.close_rounded),
+  //                   color: ttcTitleInk,
+  //                   onPressed: () => Navigator.of(ctx).pop(),
+  //                 ),
+  //                 Expanded(
+  //                     child: Text(label,
+  //                         textAlign: TextAlign.center,
+  //                         style: ttcJakarta(16))),
+  //                 // ⚠️ CLEARING MOVED HERE FROM THE CARD FACE. It was a bin
+  //                 // icon sitting on the card next to a pencil, so a card
+  //                 // holding one number carried two controls and neither was
+  //                 // the obvious one. Deleting a reading is rare and belongs
+  //                 // where you already are to change it.
+  //                 SizedBox(
+  //                   width: 48,
+  //                   child: value == null
+  //                       ? null
+  //                       : IconButton(
+  //                           icon: const Icon(Icons.delete_outline_rounded,
+  //                               size: 20),
+  //                           color: ttcMuted,
+  //                           onPressed: () {
+  //                             onSet(null);
+  //                             Navigator.of(ctx).pop();
+  //                           },
+  //                         ),
+  //                 ),
+  //               ]),
+  //             ),
+  //             const SizedBox(height: 6),
+  //             Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+  //               // Kept for revert: the bare Text(shown.toStringAsFixed(dp)).
+  //               if (typing)
+  //                 SizedBox(
+  //                   width: 150,
+  //                   child: _TypedNumber(
+  //                     initial: typedText,
+  //                     onChanged: (t) => typedText = t,
+  //                     onSubmitted: () => setSheet(takeTyped),
+  //                   ),
+  //                 )
+  //               else
+  //                 Semantics(
+  //                   button: true,
+  //                   label: '${shown.toStringAsFixed(dp)}. $kTtcMeasureTypeHint',
+  //                   excludeSemantics: true,
+  //                   child: GestureDetector(
+  //                     key: const ValueKey('ttc_measure_number'),
+  //                     behavior: HitTestBehavior.opaque,
+  //                     onTap: () => setSheet(() {
+  //                       typing = true;
+  //                       typedText = shown.toStringAsFixed(dp);
+  //                     }),
+  //                     child: Text(shown.toStringAsFixed(dp),
+  //                         style: ttcFraunces(38,
+  //                             w: FontWeight.w600, color: ttcTitleInk)),
+  //                   ),
+  //                 ),
+  //               const SizedBox(width: 8),
+  //               // The two units, as a segment. Tapping converts what is on
+  //               // screen; it never changes what is stored.
+  //               Column(mainAxisSize: MainAxisSize.min, children: [
+  //                 _UnitChip(
+  //                     label: metric,
+  //                     on: !useImperial,
+  //                     onTap: () => setSheet(() {
+  //                           takeTyped();
+  //                           useImperial = false;
+  //                         })),
+  //                 const SizedBox(height: 4),
+  //                 _UnitChip(
+  //                     label: imperial,
+  //                     on: useImperial,
+  //                     onTap: () => setSheet(() {
+  //                           takeTyped();
+  //                           useImperial = true;
+  //                         })),
+  //               ]),
+  //             ]),
+  //             const SizedBox(height: 4),
+  //             Text(typing ? kTtcMeasureTypingHint : kTtcMeasureTypeHint,
+  //                 style: ttcBody(11.5, color: ttcMuted)),
+  //             const SizedBox(height: 10),
+  //             _Ruler(
+  //               // ⚠️ REMOUNTS ON A UNIT CHANGE. The ruler holds a scroll
+  //               // offset, and an offset means a different number once the
+  //               // range under it changes — without the key it would keep the
+  //               // pixel position and silently report the wrong value.
+  //               // The value too, so a typed number moves the ruler to it.
+  //               // Kept for revert: key: ValueKey(useImperial),
+  //               key: ValueKey((useImperial, typedTimes)),
+  //               value: shown,
+  //               min: toDisplay(min),
+  //               max: toDisplay(max),
+  //               step: step,
+  //               decimals: dp,
+  //               onChanged: (n) => setSheet(() => v = fromDisplay(n)),
+  //             ),
+  //             const SizedBox(height: 18),
+  //             Padding(
+  //               padding: const EdgeInsets.symmetric(horizontal: 20),
+  //               child: _QuietButton(
+  //                 label: 'Done',
+  //                 onTap: () {
+  //                   takeTyped();
+  //                   onSet(double.parse(v.toStringAsFixed(decimals)));
+  //                   Navigator.of(ctx).pop();
+  //                 },
+  //               ),
+  //             ),
+  //           ]),
+  //         );
+  //       },
+  //     ),
+  //   );
+  // }
 }
 
 /// Her morning temperatures across the whole cycle.
@@ -1211,12 +1890,23 @@ class _TempCycleChart extends StatelessWidget {
   Widget build(BuildContext context) {
     final chart = ttcBuildTempChart();
     final tint = v2BlockTint(_hue, p);
-    final ink = HSLColor.fromColor(tint)
+    // ⚠️ THE CYCLE PALETTE, NOT HUES TYPED HERE (tool rebuild, 2026-09-27).
+    // Fertile days were green on this chart (hue 160) while the Companion,
+    // calendar and report now draw them violet: one fact, two colours,
+    // which is the "colours thrown around randomly" the user named. The
+    // bands take the cycle palette's tints, and her readings are ink, the
+    // palette's colour for a thing she logged. Kept for revert:
+    //   final ink = HSLColor.fromColor(tint)
+    //       .withSaturation(0.46).withLightness(0.40).toColor();
+    //   final periodTint = v2BlockTint(344, p);
+    //   final fertileTint = v2BlockTint(160, p);
+    const ink = TtcCycleColours.logged;
+    const periodTint = TtcCycleColours.periodTint;
+    const fertileTint = TtcCycleColours.fertileTint;
+    final wellInk = HSLColor.fromColor(tint)
         .withSaturation(0.46)
         .withLightness(0.40)
         .toColor();
-    final periodTint = v2BlockTint(344, p);
-    final fertileTint = v2BlockTint(160, p);
 
     final String? message = !chart.hasCycle
         ? kTtcTempChartNoCycle
@@ -1252,7 +1942,7 @@ class _TempCycleChart extends StatelessWidget {
             alignment: Alignment.center,
             decoration: BoxDecoration(
                 color: tint, borderRadius: BorderRadius.circular(9)),
-            child: Icon(Icons.show_chart_rounded, size: 15, color: ink),
+            child: Icon(Icons.show_chart_rounded, size: 15, color: wellInk),
           ),
           const SizedBox(width: 9),
           Expanded(
@@ -1725,7 +2415,13 @@ class _RulerState extends State<_Ruler> {
                     ),
                     if (major) ...[
                       const SizedBox(height: 5),
+                      // One line, drawn past the 9pt slot (2026-09-27): in a
+                      // 9pt-wide column "60" wrapped to two lines and pushed
+                      // the column past the ruler's height.
                       Text((widget.min + i * widget.step).round().toString(),
+                          maxLines: 1,
+                          softWrap: false,
+                          overflow: TextOverflow.visible,
                           style: ttcBody(9.5, color: ttcMuted)),
                     ],
                   ]),
@@ -1741,8 +2437,10 @@ class _RulerState extends State<_Ruler> {
                 width: 3,
                 height: 34,
                 margin: const EdgeInsets.only(top: 2),
+                // Ink since the rebuild, the colour of the number it points
+                // at; purple is for links and switches. Was ttcPurple.
                 decoration: BoxDecoration(
-                  color: ttcPurple,
+                  color: ttcTitleInk,
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -1754,64 +2452,609 @@ class _RulerState extends State<_Ruler> {
   }
 }
 
-/// kg | lbs, °C | °F.
-class _UnitChip extends StatelessWidget {
-  const _UnitChip(
-      {required this.label, required this.on, required this.onTap});
+// kg | lbs, °C | °F.
+// Kept for revert (2026-09-27, tool rebuild): the purple unit chips, now
+// `_UnitSeg` in one segment.
+// class _UnitChip extends StatelessWidget {
+//   const _UnitChip(
+//       {required this.label, required this.on, required this.onTap});
+//
+//   final String label;
+//   final bool on;
+//   final VoidCallback onTap;
+//
+//   @override
+//   Widget build(BuildContext context) => GestureDetector(
+//         onTap: onTap,
+//         behavior: HitTestBehavior.opaque,
+//         child: Container(
+//           padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 4),
+//           decoration: BoxDecoration(
+//             color: on ? ttcPurple : Colors.transparent,
+//             borderRadius: BorderRadius.circular(999),
+//             border: on ? null : Border.all(color: ttcLine),
+//           ),
+//           child: Text(label,
+//               style: ttcBody(12,
+//                   color: on ? Colors.white : ttcMuted, w: FontWeight.w800)),
+//         ),
+//       );
+// }
+
+// This stage's button: white with a hairline, or coral when it is genuinely
+// the single action on a sheet.
+//
+// ⚠️ NOT PURPLE, EITHER WAY — see the head of the file.
+// Kept for revert (2026-09-27, tool rebuild): the stage button, now
+// `TtcToolPrimary` from the tool shell, which is the same white with a hairline.
+// class _QuietButton extends StatelessWidget {
+//   const _QuietButton({required this.label, required this.onTap});
+//
+//   final String label;
+//   final VoidCallback onTap;
+//
+//   /// ⚠️ ONE BUTTON TREATMENT ON THIS STAGE: white with a hairline. The filled
+//   /// variant is gone — it existed for one "Done" and shipped coral, which is
+//   /// the period marker in this stage and belongs to nothing else.
+//   @override
+//   Widget build(BuildContext context) => InkWell(
+//         onTap: onTap,
+//         borderRadius: BorderRadius.circular(999),
+//         child: Container(
+//           width: double.infinity,
+//           padding: const EdgeInsets.symmetric(vertical: 15),
+//           alignment: Alignment.center,
+//           decoration: BoxDecoration(
+//             color: Colors.white,
+//             borderRadius: BorderRadius.circular(999),
+//             border: Border.all(color: ttcLine),
+//           ),
+//           child: Text(label,
+//               style: pvManrope(
+//                   fontSize: 14,
+//                   fontWeight: FontWeight.w800,
+//                   color: ttcTitleInk)),
+//         ),
+//       );
+// }
+
+// ---- plain words for the logger (tools pass, 2026-09-27) -------------------
+
+/// The one line at the top: what she does here, that it saves, and what it
+/// is not. The full disclaimer stays at the foot.
+const String kTtcLogHowItWorks =
+    'Tap anything that fits the day. Each tap saves straight away. This is a '
+    'record for you, never a diagnosis.';
+
+/// The heading over the cards, and the link that shows or hides them.
+const String kTtcLogMoreHeading = 'More to log';
+const String kTtcLogShowHide = kTtcEditCategoriesTitle;
+
+/// On the two test cards, where a new answer replaces the old one.
+const String kTtcLogPickOne = 'Pick one';
+
+/// A search that finds no chip.
+const String kTtcLogSearchNothing =
+    'Nothing here matches that. Try a shorter word, like "sleep" or "pain".';
+
+/// Under the temperature card: how to take it, and the read that explains it.
+const String kTtcTempHowTo =
+    'Take it before you get up, at the same time each morning.';
+const String kTtcTempReadLink = 'How temperature tracking works';
+const String kTtcTempReadId = 'ttc_read_ovulation_kits';
+
+/// The number sheet's hint, before and while typing.
+const String kTtcMeasureTypeHint = 'Tap the number to type it';
+const String kTtcMeasureTypingHint = 'Type the number, then tap Done';
+
+/// "3 things saved", under the day, or an invitation when nothing is.
+String ttcLogSavedLine(int n) => n == 0
+    ? 'Nothing saved for this day yet'
+    : n == 1
+        ? '1 thing saved for this day'
+        : '$n things saved for this day';
+
+class _SavedCount extends StatelessWidget {
+  const _SavedCount({required this.count});
+  final int count;
+
+  @override
+  Widget build(BuildContext context) => Row(
+        key: const ValueKey('ttc_log_saved_count'),
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (count > 0) ...[
+            const Icon(Icons.check_circle_rounded, size: 15, color: ttcSoft),
+            const SizedBox(width: 6),
+          ],
+          // Flexible, so a large text size wraps instead of overflowing.
+          Flexible(
+            child: Text(ttcLogSavedLine(count),
+                textAlign: TextAlign.center,
+                style: ttcBody(12.5, color: ttcSoft, w: FontWeight.w700)),
+          ),
+        ],
+      );
+}
+
+/// The everyday words a chip also answers to, by symptom id. Search only:
+/// nothing here is saved, and a chip's label is still its name.
+const Map<String, List<String>> kTtcLogSearchWords = {
+  'insomnia': ['sleep', 'could not sleep', 'cant sleep', 'sleepless'],
+  'fatigue': ['tired', 'exhausted', 'energy', 'fatigue', 'sleepy'],
+  'cramping': ['cramp', 'period pain', 'pain'],
+  'pelvic_pain': ['pain', 'ovary', 'ovulation pain', 'pelvic'],
+  'backache': ['back pain', 'pain'],
+  'headache': ['head', 'migraine', 'pain'],
+  'breast': ['breast', 'boobs', 'chest', 'sore'],
+  'nausea': ['sick', 'vomit', 'queasy'],
+  'bloating': ['bloated', 'gas', 'swollen'],
+  'disch_spotting': ['spot', 'bleeding', 'blood'],
+  'disch_eggwhite': ['mucus', 'cervical', 'stretchy', 'clear'],
+  'disch_watery': ['mucus', 'cervical', 'wet'],
+  'disch_creamy': ['mucus', 'cervical', 'white'],
+  'disch_sticky': ['mucus', 'cervical'],
+  'ov_positive': ['lh', 'opk', 'ovulation', 'strip'],
+  'ov_negative': ['lh', 'opk', 'ovulation', 'strip'],
+  'ov_none': ['lh', 'opk', 'ovulation', 'strip'],
+  'pt_positive': ['hcg', 'pregnant', 'upt', 'pregnancy'],
+  'pt_negative': ['hcg', 'pregnant', 'upt', 'pregnancy'],
+  'pt_faint': ['hcg', 'pregnant', 'upt', 'pregnancy', 'faint'],
+  'pt_none': ['hcg', 'pregnant', 'upt', 'pregnancy'],
+  'sex_unprotected': ['intercourse', 'sex', 'intimate'],
+  'sex_protected': ['intercourse', 'sex', 'condom'],
+  'anxious': ['worried', 'worry', 'anxiety', 'nervous'],
+  'low': ['sad', 'down', 'depressed', 'upset'],
+  'tearful': ['cry', 'crying', 'tears'],
+  'irritated': ['angry', 'annoyed', 'irritable'],
+  'stress': ['stressed', 'tension'],
+  'exercise': ['workout', 'gym', 'exercise'],
+  'walk': ['walking', 'steps'],
+};
+
+/// True when a search for [query] should show [symptom] from [group].
+bool ttcLogSearchMatches(
+    TtcSymptomGroup group, TtcSymptom symptom, String query) {
+  String norm(String s) =>
+      s.toLowerCase().replaceAll("'", '').replaceAll('’', '').trim();
+  final q = norm(query);
+  if (q.isEmpty) return true;
+  if (norm(symptom.label).contains(q)) return true;
+  if (norm(group.title).contains(q)) return true;
+  for (final w in kTtcLogSearchWords[symptom.id] ?? const <String>[]) {
+    if (norm(w).contains(q) || q.contains(norm(w))) return true;
+  }
+  return false;
+}
+
+/// For a search that means one of the two number cards, where to find it.
+String? ttcLogNumberHint(String query) {
+  final q = query.toLowerCase().trim();
+  const temp = ['bbt', 'temp', 'temperature', 'thermometer', 'basal'];
+  const weight = ['weight', 'kg', 'weigh'];
+  if (temp.any((w) => w.startsWith(q) || q.startsWith(w))) {
+    return 'Morning temperature has its own card, further down this page.';
+  }
+  if (weight.any((w) => w.startsWith(q) || q.startsWith(w))) {
+    return 'Weight has its own card, further down this page.';
+  }
+  return null;
+}
+
+/// "12 Sep to 26 Sep" for the readings a sparkline draws, or null below two.
+String? ttcSparkSpan(List<TtcLogValue> series) {
+  final recent =
+      series.length <= 14 ? series : series.sublist(series.length - 14);
+  if (recent.length < 2) return null;
+  const m = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  ];
+  String fmt(String key) {
+    final d = DateTime.tryParse(key);
+    return d == null ? key : '${d.day} ${m[d.month - 1]}';
+  }
+
+  return '${fmt(recent.first.dayKey)} to ${fmt(recent.last.dayKey)}';
+}
+
+/// The number field in the measure sheet, owning its own controller.
+class _TypedNumber extends StatefulWidget {
+  const _TypedNumber({
+    required this.initial,
+    required this.onChanged,
+    required this.onSubmitted,
+  });
+
+  final String initial;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onSubmitted;
+
+  @override
+  State<_TypedNumber> createState() => _TypedNumberState();
+}
+
+class _TypedNumberState extends State<_TypedNumber> {
+  late final TextEditingController _c =
+      TextEditingController(text: widget.initial);
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => TextField(
+        key: const ValueKey('ttc_measure_type_field'),
+        controller: _c,
+        autofocus: true,
+        textAlign: TextAlign.center,
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+        ],
+        onChanged: widget.onChanged,
+        onSubmitted: (_) => widget.onSubmitted(),
+        style: ttcFraunces(34, w: FontWeight.w600, color: ttcTitleInk),
+        decoration: InputDecoration(
+          isDense: true,
+          filled: true,
+          fillColor: ttcPanel,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(14),
+            borderSide: BorderSide.none,
+          ),
+        ),
+      );
+}
+
+// =============================================================================
+//  The rebuilt logger's parts and words (tool rebuild, 2026-09-27, night)
+// =============================================================================
+
+/// Body and cycle's hue in Tools, where the "Symptoms and mood" tile sits.
+const double kTtcLogHue = 172;
+
+/// The Tools tile's name, word for word: the eyebrow is the tool's name.
+const String kTtcLogEyebrow = 'Symptoms and mood';
+
+/// The hero title, a question about the day on screen.
+String ttcLogTitle(String dayName) => switch (dayName) {
+      'Today' => 'How is today going?',
+      'Yesterday' => 'How was yesterday?',
+      _ => 'How was $dayName?',
+    };
+
+/// The day as it sits inside a sentence: "today", "yesterday", "Wed 24 Sep".
+String ttcLogDayInLine(String dayName) =>
+    dayName == 'Today' || dayName == 'Yesterday'
+        ? dayName.toLowerCase()
+        : dayName;
+
+/// Over the calendar the day's name opens.
+const String kTtcLogPickDayTitle = 'Which day do you want to log?';
+
+/// Under the day picker when she is on a past day.
+const String kTtcLogBackToToday = 'Back to today';
+
+/// The logger's one button, and the line it leaves behind.
+const String kTtcLogDone = 'Done';
+String ttcLogDoneLine(int n, String dayName) {
+  final d = ttcLogDayInLine(dayName);
+  return n == 1 ? '1 thing saved for $d' : '$n things saved for $d';
+}
+
+/// The snack after an × in the saved list, or "Remove this reading".
+String ttcLogRemovedLine(String label) => 'Removed: $label';
+
+/// Under "More to log", when she has hidden cards.
+String ttcLogHiddenLine(int n) => n == 1
+    ? '1 card is hidden. Tap Show or hide to bring it back.'
+    : '$n cards are hidden. Tap Show or hide to bring them back.';
+
+/// The fold at the foot that holds the long disclaimer.
+const String kTtcLogPregnancyQuestion = "Can these tell me if I'm pregnant?";
+
+/// On the weight and temperature cards, and in their sheet.
+const String kTtcMeasureAdd = 'Add';
+const String kTtcMeasureChange = 'Change';
+const String kTtcMeasureSave = 'Save';
+const String kTtcMeasureRemove = 'Remove this reading';
+
+/// "For today · Cycle day 7", at the top of the number sheet.
+String ttcLogSheetFor(String dayName, int? cycleDay) {
+  final d = 'For ${ttcLogDayInLine(dayName)}';
+  return cycleDay == null ? d : '$d · Cycle day $cycleDay';
+}
+
+/// "Weight saved for today".
+String ttcLogMeasureSaved(String label, String dayName) =>
+    '$label saved for ${ttcLogDayInLine(dayName)}';
+
+/// One thing saved for the day, as the saved list shows it.
+class _SavedItem {
+  const _SavedItem(this.tracker, this.field, this.label);
+  final String tracker;
+  final String field;
+  final String label;
+}
+
+/// The day, in the hero: arrows either side, and a name that opens a calendar.
+///
+/// ⚠️ THE SAME SHAPE AS THE CYCLE REPORT'S PICKER, on purpose. Two tools that
+/// both scope a page to "which one" should look like one control, so she
+/// learns it once (the user: "maintain symmetry in design").
+class _DayPicker extends StatelessWidget {
+  const _DayPicker({
+    required this.label,
+    required this.caption,
+    required this.canGoForward,
+    required this.onBack,
+    required this.onForward,
+    required this.onPick,
+    this.onToday,
+  });
+
+  final String label;
+  final String? caption;
+  final bool canGoForward;
+  final VoidCallback onBack;
+  final VoidCallback onForward;
+  final VoidCallback onPick;
+
+  /// Shown only on a past day.
+  final VoidCallback? onToday;
+
+  @override
+  Widget build(BuildContext context) => Column(children: [
+        Row(children: [
+          IconButton(
+            key: const ValueKey('ttc_log_day_back'),
+            icon: const Icon(Icons.chevron_left_rounded),
+            tooltip: 'Day before',
+            color: ttcTitleInk,
+            onPressed: onBack,
+          ),
+          Expanded(
+            child: Semantics(
+              button: true,
+              label: '$label. Pick another day',
+              excludeSemantics: true,
+              child: GestureDetector(
+                key: const ValueKey('ttc_log_day_name'),
+                behavior: HitTestBehavior.opaque,
+                onTap: onPick,
+                child: Column(children: [
+                  Row(mainAxisSize: MainAxisSize.min, children: [
+                    Flexible(child: Text(label, style: ttcJakarta(16))),
+                    const SizedBox(width: 6),
+                    const Icon(Icons.calendar_today_rounded,
+                        size: 14, color: ttcPurple),
+                  ]),
+                  if (caption != null) ...[
+                    const SizedBox(height: 2),
+                    Text(caption!,
+                        style: ttcBody(11.5,
+                            color: ttcMuted, w: FontWeight.w700)),
+                  ],
+                ]),
+              ),
+            ),
+          ),
+          IconButton(
+            key: const ValueKey('ttc_log_day_forward'),
+            icon: const Icon(Icons.chevron_right_rounded),
+            tooltip: 'Day after',
+            color: canGoForward ? ttcTitleInk : ttcBorder,
+            onPressed: canGoForward ? onForward : null,
+          ),
+        ]),
+        if (onToday != null)
+          GestureDetector(
+            key: const ValueKey('ttc_log_back_to_today'),
+            behavior: HitTestBehavior.opaque,
+            onTap: onToday,
+            child: Padding(
+              padding: const EdgeInsets.all(4),
+              child: Text(kTtcLogBackToToday,
+                  style: ttcBody(12.5, color: ttcPurple, w: FontWeight.w800)),
+            ),
+          ),
+      ]);
+}
+
+/// What is saved for the day, each with an × that takes it off.
+class _SavedCard extends StatelessWidget {
+  const _SavedCard(
+      {required this.count, required this.items, required this.onRemove});
+
+  final int count;
+  final List<_SavedItem> items;
+  final void Function(_SavedItem) onRemove;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        key: const ValueKey('ttc_log_saved_card'),
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: ttcLine),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          _SavedCount(count: count),
+          if (items.isNotEmpty) ...[
+            const SizedBox(height: 10),
+            Wrap(spacing: 8, runSpacing: 8, children: [
+              for (final i in items)
+                _SavedChip(item: i, onRemove: () => onRemove(i)),
+            ]),
+          ],
+        ]),
+      );
+}
+
+class _SavedChip extends StatelessWidget {
+  const _SavedChip({required this.item, required this.onRemove});
+
+  final _SavedItem item;
+  final VoidCallback onRemove;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: 'Remove ${item.label}',
+        excludeSemantics: true,
+        child: GestureDetector(
+          key: ValueKey('ttc_log_saved_${item.field}'),
+          behavior: HitTestBehavior.opaque,
+          onTap: onRemove,
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(12, 7, 8, 7),
+            decoration: BoxDecoration(
+              color: ttcPanel,
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Flexible(
+                child: Text(item.label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: ttcBody(12.5,
+                        color: ttcTitleInk, w: FontWeight.w700)),
+              ),
+              const SizedBox(width: 5),
+              const Icon(Icons.close_rounded, size: 15, color: ttcSoft),
+            ]),
+          ),
+        ),
+      );
+}
+
+/// − or + beside the number in the sheet: one step of the ruler.
+class _Nudge extends StatelessWidget {
+  const _Nudge(
+      {super.key,
+      required this.icon,
+      required this.label,
+      required this.onTap});
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: label,
+        child: InkWell(
+          onTap: onTap,
+          customBorder: const CircleBorder(),
+          child: Container(
+            width: 44,
+            height: 44,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+              border: Border.all(color: ttcLine, width: 1.5),
+            ),
+            child: Icon(icon, size: 20, color: ttcTitleInk),
+          ),
+        ),
+      );
+}
+
+/// One half of the unit segment: white on grey when chosen, like every other
+/// choice on a TTC tool sheet.
+class _UnitSeg extends StatelessWidget {
+  const _UnitSeg({required this.label, required this.on, required this.onTap});
 
   final String label;
   final bool on;
   final VoidCallback onTap;
 
   @override
-  Widget build(BuildContext context) => GestureDetector(
-        onTap: onTap,
-        behavior: HitTestBehavior.opaque,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 4),
-          decoration: BoxDecoration(
-            color: on ? ttcPurple : Colors.transparent,
-            borderRadius: BorderRadius.circular(999),
-            border: on ? null : Border.all(color: ttcLine),
+  Widget build(BuildContext context) => Expanded(
+        child: GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            decoration: BoxDecoration(
+              color: on ? Colors.white : Colors.transparent,
+              borderRadius: BorderRadius.circular(999),
+            ),
+            child: Text(label,
+                style: ttcBody(13,
+                    color: on ? ttcTitleInk : ttcMuted,
+                    w: on ? FontWeight.w800 : FontWeight.w600)),
           ),
-          child: Text(label,
-              style: ttcBody(12,
-                  color: on ? Colors.white : ttcMuted, w: FontWeight.w800)),
         ),
       );
 }
 
-/// This stage's button: white with a hairline, or coral when it is genuinely
-/// the single action on a sheet.
-///
-/// ⚠️ NOT PURPLE, EITHER WAY — see the head of the file.
-class _QuietButton extends StatelessWidget {
-  const _QuietButton({required this.label, required this.onTap});
+/// A question she can open, for the long disclaimer at the foot.
+class _Fold extends StatefulWidget {
+  const _Fold({required this.question, required this.answer});
 
-  final String label;
-  final VoidCallback onTap;
+  final String question;
+  final String answer;
 
-  /// ⚠️ ONE BUTTON TREATMENT ON THIS STAGE: white with a hairline. The filled
-  /// variant is gone — it existed for one "Done" and shipped coral, which is
-  /// the period marker in this stage and belongs to nothing else.
   @override
-  Widget build(BuildContext context) => InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(999),
-        child: Container(
-          width: double.infinity,
-          padding: const EdgeInsets.symmetric(vertical: 15),
-          alignment: Alignment.center,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(999),
-            border: Border.all(color: ttcLine),
-          ),
-          child: Text(label,
-              style: pvManrope(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
-                  color: ttcTitleInk)),
+  State<_Fold> createState() => _FoldState();
+}
+
+class _FoldState extends State<_Fold> {
+  bool _open = false;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        key: const ValueKey('ttc_log_fold'),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: ttcLine),
         ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          InkWell(
+            onTap: () => setState(() => _open = !_open),
+            borderRadius: BorderRadius.circular(20),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+              child: Row(children: [
+                const Icon(Icons.info_outline_rounded,
+                    size: 17, color: ttcSoft),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(widget.question,
+                      style: ttcBody(13.5,
+                          color: ttcTitleInk, w: FontWeight.w700)),
+                ),
+                AnimatedRotation(
+                  turns: _open ? 0.5 : 0,
+                  duration: const Duration(milliseconds: 180),
+                  child: const Icon(Icons.expand_more_rounded,
+                      size: 20, color: ttcMuted),
+                ),
+              ]),
+            ),
+          ),
+          if (_open)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: Text(widget.answer,
+                  style: ttcBody(13, color: ttcInk, h: 1.55)),
+            ),
+        ]),
       );
 }
+
+/// The focus id for the weight and morning temperature cards (2026-09-28): pass
+/// it as [TtcSymptomLogScreen.focusGroup] to open the log scrolled to them.
+const String kTtcLogMeasurementsGroup = 'measurements';

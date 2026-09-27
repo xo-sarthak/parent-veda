@@ -92,9 +92,16 @@ void main() {
         await pumpTall(tester, PvYouScreen(stage: stage));
         expect(tester.takeException(), isNull);
         expect(find.text('You'), findsWidgets);
+        // ⚠️ TRYING TO CONCEIVE IS SHORT AND GROUPED (2026-09-27, the user's
+        // choice after the launch walk): "Your details" folds into a "Your
+        // answers" row, so that one section is absent there. Every other
+        // section is where it was, in the same order.
+        final expected = stage == LifeStage.tryingToConceive
+            ? [for (final e in kSkeleton) if (e != 'YOUR DETAILS') e]
+            : kSkeleton;
         expect(
           eyebrows(tester),
-          kSkeleton,
+          expected,
           reason:
               '${stage.name} bent the skeleton — a stage changes what is '
               'inside a section, never which sections exist or where',

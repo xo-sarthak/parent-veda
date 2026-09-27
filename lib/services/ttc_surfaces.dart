@@ -59,7 +59,9 @@ const List<TtcSurface> kTtcSurfaces = [
 
   // ---- Body and health ------------------------------------------------------
   TtcSurface('ttc_tests', 'Tests & results', 'Tests aur results'),
-  TtcSurface('ttc_vaccinations', 'Vaccinations before trying',
+  // The tile's and the page's name (2026-09-27). Kept for revert:
+  // 'Vaccinations before trying'.
+  TtcSurface('ttc_vaccinations', 'Vaccinations',
       'Koshish se pehle vaccinations'),
   TtcSurface('ttc_pcos_check', 'PCOS symptom checker',
       'PCOS symptom checker'),
@@ -71,7 +73,9 @@ const List<TtcSurface> kTtcSurfaces = [
       'Kya fertility madad leni chahiye?'),
   TtcSurface('ttc_precheck/lifestyle', 'Habits worth building',
       'Banane layak aadatein'),
-  TtcSurface('ttc_nutrition', 'Eating for fertility', 'Fertility ke liye khana'),
+  // Labels match the page each opens (2026-09-27, one name per thing).
+  // Kept for revert: 'Eating for fertility', "Today's practice", 'Journal'.
+  TtcSurface('ttc_nutrition', "This week's food ideas", 'Fertility ke liye khana'),
   TtcSurface('ttc_supplements', 'Supplements', 'Supplements'),
   TtcSurface('ttc_tracker', 'Daily log', 'Roz ka log'),
 
@@ -87,12 +91,12 @@ const List<TtcSurface> kTtcSurfaces = [
   TtcSurface('ttc_appointments', 'Appointments', 'Appointments'),
 
   // ---- Mind and body --------------------------------------------------------
-  TtcSurface('ttc_ritual', "Today's practice", 'Aaj ka abhyas'),
+  TtcSurface('ttc_ritual', 'Your daily ritual', 'Aaj ka abhyas'),
   // Both columns carry the same words: "garbh sanskar" is the term in either
   // language, and the rest of the label is the course's own name.
   TtcSurface('ttc_garbh_course', 'Preconception garbh sanskar',
       'Preconception garbh sanskar'),
-  TtcSurface('ttc_journal', 'Journal', 'Journal'),
+  TtcSurface('ttc_journal', 'Our journal', 'Journal'),
 
   // ---- Partner --------------------------------------------------------------
   TtcSurface('ttc_partner', 'For your partner', 'Aapke partner ke liye'),

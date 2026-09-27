@@ -92,6 +92,16 @@ class TtcVaccineStore extends ChangeNotifier {
     ]);
   }
 
+  /// Empties the store in memory, for a test that needs a first open.
+  /// (Added 2026-09-27, tool rebuild: tests used to tidy up by hand.)
+  @visibleForTesting
+  void resetForTest() {
+    _status.clear();
+    _doneOn.clear();
+    _loaded = true;
+    notifyListeners();
+  }
+
   // ---------------------------------------------------------------------------
   //  The one question the screen actually answers
   // ---------------------------------------------------------------------------

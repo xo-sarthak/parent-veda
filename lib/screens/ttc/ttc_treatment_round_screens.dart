@@ -146,6 +146,9 @@ class TtcRoundButton extends StatelessWidget {
       button: true,
       enabled: enabled,
       label: label,
+      // excludeSemantics drops the child's tap action, so the node
+      // carries it (accessibility sweep, TTC launch walk, 2026-09-27).
+      onTap: onTap,
       excludeSemantics: true,
       child: Opacity(
         opacity: enabled ? 1 : 0.4,
@@ -203,6 +206,9 @@ class TtcRoundOption extends StatelessWidget {
       button: true,
       selected: selected,
       label: '$title. $line',
+      // excludeSemantics drops the child's tap action, so the node
+      // carries it (accessibility sweep, TTC launch walk, 2026-09-27).
+      onTap: onTap,
       excludeSemantics: true,
       child: Material(
         color: Colors.white,
@@ -306,15 +312,16 @@ Future<DateTime?> ttcPickRoundDate(
   if (day == null || !context.mounted) return null;
   var value = DateTime(day.year, day.month, day.day);
   if (step != null && step.needsTime) {
-    final prev = round[step];
-    final time = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.fromDateTime(prev ?? DateTime(0, 1, 1, 21, 0)),
-      helpText: 'What time exactly?',
-    );
-    if (!context.mounted) return null;
-    value = DateTime(
-        day.year, day.month, day.day, time?.hour ?? 21, time?.minute ?? 0);
+    // ⚠️ A CLOSED TIME PICKER NEVER INVENTS A TIME (tools pass, 2026-09-27).
+    // This used to save `time?.hour ?? 21`, so closing the clock saved 9:00pm
+    // without a word and armed reminders for 5:00pm and 8:45pm on the one
+    // evening the hour is exact. Kept for revert:
+    //   final time = await showTimePicker(..., helpText: 'What time exactly?');
+    //   value = DateTime(day.year, day.month, day.day,
+    //       time?.hour ?? 21, time?.minute ?? 0);
+    final timed = await ttcPickTriggerTime(context, day, prev: round[step]);
+    if (timed == null || !context.mounted) return null;
+    value = timed;
   }
   // A scan has no order to check, only distance, which the review step shares.
   final problem = ttcTreatmentDateProblem(
@@ -336,6 +343,76 @@ Future<DateTime?> ttcPickRoundDate(
     return ttcPickRoundDate(context, round: round, step: step, help: help);
   }
   return null;
+}
+
+/// The trigger injection's time on [day], asked until she gives one or says
+/// not to save.
+///
+/// ⚠️ WHY THE ENTRY IS CANCELLED RATHER THAN KEPT WITHOUT A TIME. The round
+/// stores one `DateTime` per step and the reminders are armed from it, so a
+/// date with no time would have to be stored as midnight, which arms an 8:00pm
+/// reminder the night before. A "time not set" state would need a new saved
+/// field in the store and every reader of it (calendar, home, reminders). So
+/// a dismissed clock asks once, in words, and then either reopens the clock or
+/// saves nothing and says so. Trade-off: one extra dialog for a mis-tap; what
+/// it buys is that no reminder ever fires at a time she did not choose.
+Future<DateTime?> ttcPickTriggerTime(BuildContext context, DateTime day,
+    {DateTime? prev}) async {
+  while (true) {
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(prev ?? DateTime(0, 1, 1, 21, 0)),
+      helpText: kTtcTriggerTimeHelp,
+    );
+    if (!context.mounted) return null;
+    if (time != null) {
+      return DateTime(day.year, day.month, day.day, time.hour, time.minute);
+    }
+    final again = await showDialog<bool>(
+      context: context,
+      routeSettings: const RouteSettings(name: 'ttc/treatment/trigger_time'),
+      builder: (_) => _ConfirmDialog(
+        title: kTtcTriggerNoTimeTitle,
+        body: prev == null ? kTtcTriggerNoTimeBody : kTtcTriggerNoTimeKeepBody,
+        yes: kTtcTriggerNoTimeAdd,
+        no: prev == null ? kTtcTriggerNoTimeSkip : kTtcTriggerNoTimeKeep,
+      ),
+    );
+    if (!context.mounted) return null;
+    if (again == true) continue;
+    pvSnack(context, prev == null ? kTtcTriggerNotSaved : kTtcTriggerUnchanged,
+        lift: 24);
+    return null;
+  }
+}
+
+/// The trigger's time picker and its "no time" check (tools pass, 2026-09-27).
+const String kTtcTriggerTimeHelp = 'What time is your trigger injection?';
+const String kTtcTriggerNoTimeTitle = 'Add the time too?';
+const String kTtcTriggerNoTimeBody =
+    'Your clinic gives the trigger injection an exact time. Your reminders go '
+    "off 4 hours and 15 minutes before it, so we won't save the date without "
+    'the time.';
+const String kTtcTriggerNoTimeKeepBody =
+    'Your clinic gives the trigger injection an exact time, and your reminders '
+    'are set from it. Without a new time, your trigger stays as it was.';
+const String kTtcTriggerNoTimeAdd = 'Add the time';
+const String kTtcTriggerNoTimeSkip = "Don't save it";
+const String kTtcTriggerNoTimeKeep = 'Keep it as it was';
+const String kTtcTriggerNotSaved =
+    'Trigger date not saved. Add it when you have the time.';
+const String kTtcTriggerUnchanged = 'Your trigger time is unchanged.';
+
+/// "Date removed", with Undo that puts [was] back (tools pass, 2026-09-27).
+/// A date copied off a clinic printout is precious, and the remove link sits
+/// right beside the one she taps to change it.
+void ttcRoundDateRemoved(
+    BuildContext context, String label, VoidCallback undo) {
+  pvSnack(context, '$label removed.',
+      icon: Icons.check_rounded,
+      lift: 24,
+      action: kTtcRoundUndoCta,
+      onAction: undo);
 }
 
 class _ConfirmDialog extends StatelessWidget {
@@ -385,6 +462,25 @@ class _ConfirmDialog extends StatelessWidget {
   }
 }
 
+/// The round's own confirm, for the treatment screen too (2026-09-27, the
+/// tool rebuild): "Remove these dates" asked in an old grey `AlertDialog`
+/// with a violet button, a second look on the same screen as this one.
+Future<bool> ttcRoundConfirm(
+  BuildContext context, {
+  required String title,
+  required String body,
+  required String yes,
+  required String no,
+  String route = 'ttc/treatment/confirm',
+}) async {
+  final ok = await showDialog<bool>(
+    context: context,
+    routeSettings: RouteSettings(name: route),
+    builder: (_) => _ConfirmDialog(title: title, body: body, yes: yes, no: no),
+  );
+  return ok == true;
+}
+
 /// Asks, restating the consequence, then closes the round with [how] and
 /// shows the closed card with Undo. Returns true when it closed.
 Future<bool> ttcConfirmCloseRound(
@@ -431,7 +527,15 @@ class _TtcTreatmentStartScreenState extends State<TtcTreatmentStartScreen> {
     super.initState();
     final c = TtcTreatmentStore.instance.cycle;
     // A legacy round is adopted: its kind is asked, its dates are kept.
-    if (c.kind == null && c.clinic.isNotEmpty) _clinic.text = c.clinic;
+    // The next round is usually at the same clinic, so an open or just
+    // closed round's name is offered too (2026-09-27, the tool rebuild).
+    // Kept for revert: `if (c.kind == null && c.clinic.isNotEmpty) ...`.
+    final last = TtcTreatmentStore.instance.lastClosed;
+    if (c.clinic.isNotEmpty) {
+      _clinic.text = c.clinic;
+    } else if (last != null && last.clinic.isNotEmpty) {
+      _clinic.text = last.clinic;
+    }
   }
 
   @override
@@ -572,7 +676,7 @@ class _TtcTreatmentStartScreenState extends State<TtcTreatmentStartScreen> {
     final rows = ttcRoundOpeningRows(kind);
     return [
       for (final row in rows) ...[
-        ttcToolPad(_DateRow(
+        ttcToolPad(TtcRoundDateRow(
           key: ValueKey('ttc_start_date_${row.step?.name ?? 'scan'}'),
           label: row.step == null
               ? 'First ${ttcScanLabel(kind).toLowerCase()}'
@@ -583,13 +687,35 @@ class _TtcTreatmentStartScreenState extends State<TtcTreatmentStartScreen> {
               : _dates[row.step!],
           withTime: row.step?.needsTime ?? false,
           onTap: () => _pick(row),
-          onClear: () => setState(() {
-            if (row.step == null) {
-              _scans.clear();
-            } else {
-              _dates.remove(row.step);
-            }
-          }),
+          // Undo after a clear (tools pass, 2026-09-27). Kept for revert: the
+          // clear was the setState below with no snack.
+          onClear: () {
+            final wasScans = List.of(_scans);
+            final was = row.step == null ? null : _dates[row.step!];
+            setState(() {
+              if (row.step == null) {
+                _scans.clear();
+              } else {
+                _dates.remove(row.step);
+              }
+            });
+            ttcRoundDateRemoved(
+                context,
+                row.step == null
+                    ? ttcScanLabel(kind)
+                    : ttcStepLabel(row.step!, kind), () {
+              if (!mounted) return;
+              setState(() {
+                if (row.step == null) {
+                  _scans
+                    ..clear()
+                    ..addAll(wasScans);
+                } else if (was != null) {
+                  _dates[row.step!] = was;
+                }
+              });
+            });
+          },
         )),
         _gap(10),
       ],
@@ -624,9 +750,12 @@ class _TtcTreatmentStartScreenState extends State<TtcTreatmentStartScreen> {
       ttcToolPad(Container(
         key: const ValueKey('ttc_start_statement'),
         padding: const EdgeInsets.all(18),
+        // White with a hairline, the round's object card (2026-09-27, the
+        // tool rebuild). Kept for revert: color: ttcPanel, no border.
         decoration: BoxDecoration(
-          color: ttcPanel,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: ttcLine, width: 1.2),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Row(children: [
@@ -719,9 +848,10 @@ class _Note extends StatelessWidget {
           ]);
 }
 
-/// One date to add in the start flow.
-class _DateRow extends StatelessWidget {
-  const _DateRow({
+/// One date to add in the start flow, and (since 2026-09-27) a legacy
+/// round's date on the treatment screen, which had its own older row.
+class TtcRoundDateRow extends StatelessWidget {
+  const TtcRoundDateRow({
     super.key,
     required this.label,
     required this.line,
@@ -729,12 +859,20 @@ class _DateRow extends StatelessWidget {
     required this.onTap,
     required this.onClear,
     this.withTime = false,
+    this.clearKey,
+    this.below,
   });
 
   final String label, line;
   final DateTime? value;
   final bool withTime;
   final VoidCallback onTap, onClear;
+
+  /// For tests: the key on the remove button.
+  final Key? clearKey;
+
+  /// Under the date, inside the row: the trigger's "taken" tick.
+  final Widget? below;
 
   @override
   Widget build(BuildContext context) {
@@ -780,10 +918,15 @@ class _DateRow extends StatelessWidget {
                               fontSize: 13,
                               fontWeight: FontWeight.w800,
                               color: v == null ? ttcMuted : ttcTitleInk)),
+                      if (below case final b?) ...[
+                        const SizedBox(height: 8),
+                        b,
+                      ],
                     ]),
               ),
               if (v != null)
                 IconButton(
+                  key: clearKey,
                   tooltip: 'Remove this date',
                   onPressed: onClear,
                   icon: const Icon(Icons.close_rounded,
@@ -802,19 +945,31 @@ class _DateRow extends StatelessWidget {
 // =============================================================================
 
 class TtcRoundTimeline extends StatelessWidget {
-  const TtcRoundTimeline({super.key, required this.round, this.today});
+  const TtcRoundTimeline(
+      {super.key, required this.round, this.today, this.readOnly = false});
 
   final TtcTreatmentCycle round;
 
   /// For tests; the app passes nothing.
   final DateTime? today;
 
+  /// A closed round, shown to look back at (2026-09-27, the tool rebuild):
+  /// only the steps that have a date, and nothing to tap but "Read about it".
+  /// Every edit on this timeline writes to the OPEN round, so a past round's
+  /// rows must not offer one.
+  final bool readOnly;
+
   @override
   Widget build(BuildContext context) {
     final now = today ?? DateTime.now();
     final t = DateTime(now.year, now.month, now.day);
     final kind = round.kind;
-    final rows = ttcRoundRows(kind);
+    final rows = [
+      for (final r in ttcRoundRows(kind))
+        if (!readOnly ||
+            (r.scans ? round.scans.isNotEmpty : round[r.step!] != null))
+          r,
+    ];
     final phase = ttcTreatmentPhase(round, t);
     return Column(
       key: const ValueKey('ttc_round_timeline'),
@@ -826,6 +981,7 @@ class TtcRoundTimeline extends StatelessWidget {
             round: round,
             today: t,
             last: i == rows.length - 1,
+            readOnly: readOnly,
           ),
         if (phase == TtcRoundPhase.planned || phase.isRunning) ...[
           _gap(4),
@@ -841,7 +997,10 @@ class _TimelineRow extends StatelessWidget {
     required this.round,
     required this.today,
     required this.last,
+    this.readOnly = false,
   });
+
+  final bool readOnly;
 
   final TtcRoundRow row;
   final TtcTreatmentCycle round;
@@ -865,7 +1024,12 @@ class _TimelineRow extends StatelessWidget {
 
     String dateText() {
       if (dates.isEmpty) return kTtcRoundClinicWillTell;
-      if (row.scans) return dates.map(ttcRoundDate).join(', ');
+      // A count in the eyebrow; each scan is its own chip below, which can
+      // be changed or removed (2026-09-27, the tool rebuild). Kept for
+      // revert: `return dates.map(ttcRoundDate).join(', ');`.
+      if (row.scans) {
+        return dates.length == 1 ? '1 scan' : '${dates.length} scans';
+      }
       final d = dates.first;
       final base = isToday ? 'Today, ${ttcRoundDate(d)}' : ttcRoundDate(d);
       return step!.needsTime ? '$base · ${ttcRoundTime(d)}' : base;
@@ -918,7 +1082,7 @@ class _TimelineRow extends StatelessWidget {
             child: InkWell(
               key: ValueKey('ttc_round_row_${step?.name ?? 'scans'}'),
               borderRadius: BorderRadius.circular(14),
-              onTap: () => _edit(context),
+              onTap: readOnly ? null : () => _edit(context),
               child: Padding(
                 padding: const EdgeInsets.only(bottom: 18, top: 2),
                 child: Column(
@@ -940,17 +1104,31 @@ class _TimelineRow extends StatelessWidget {
                       Text(ttcRowLine(row, kind),
                           style: pvManrope(
                               fontSize: 12.5, height: 1.45, color: ttcSoft)),
-                      if (step == TtcTreatmentStep.trigger &&
+                      if (row.scans && dates.isNotEmpty) ...[
+                        _gap(8),
+                        Wrap(spacing: 8, runSpacing: 8, children: [
+                          for (final d in dates)
+                            _ScanChip(
+                              day: d,
+                              kind: kind,
+                              readOnly: readOnly,
+                            ),
+                        ]),
+                      ],
+                      if (!readOnly &&
+                          step == TtcTreatmentStep.trigger &&
                           dates.isNotEmpty) ...[
                         _gap(8),
-                        _TakenTick(taken: round.triggerTaken),
+                        TtcRoundTakenTick(taken: round.triggerTaken),
                       ],
-                      if (step == TtcTreatmentStep.transfer &&
+                      if (!readOnly &&
+                          step == TtcTreatmentStep.transfer &&
                           dates.isNotEmpty) ...[
                         _gap(8),
                         _EmbryoDay(value: round.embryoDay),
                       ],
                       Wrap(spacing: 14, runSpacing: 2, children: [
+                        if (!readOnly)
                         _Link(
                           key: ValueKey(
                               'ttc_round_edit_${step?.name ?? 'scans'}'),
@@ -959,18 +1137,45 @@ class _TimelineRow extends StatelessWidget {
                               : (dates.isEmpty ? 'Add date' : 'Change date'),
                           onTap: () => _edit(context),
                         ),
-                        if (!row.scans && dates.isNotEmpty)
+                        // Removing now offers Undo (tools pass, 2026-09-27).
+                        // Kept for revert: the two onTaps called
+                        // `setDate(step!, null)` and `removeScan(dates.last)`
+                        // with no way back.
+                        if (!readOnly && !row.scans && dates.isNotEmpty)
                           _Link(
+                            key: ValueKey('ttc_round_remove_${step!.name}'),
                             label: 'Remove',
-                            onTap: () =>
-                                TtcTreatmentStore.instance.setDate(step!, null),
+                            onTap: () {
+                              final store = TtcTreatmentStore.instance;
+                              final was = round[step];
+                              final taken = round.triggerTaken;
+                              store.setDate(step, null);
+                              ttcRoundDateRemoved(context, label, () {
+                                store.setDate(step, was);
+                                // Undo puts the tick back too, so a trigger
+                                // she already took does not re-arm reminders.
+                                if (step == TtcTreatmentStep.trigger &&
+                                    taken) {
+                                  store.setTriggerTaken(true);
+                                }
+                              });
+                            },
                           ),
-                        if (row.scans && dates.isNotEmpty)
-                          _Link(
-                            label: 'Remove last scan',
-                            onTap: () => TtcTreatmentStore.instance
-                                .removeScan(dates.last),
-                          ),
+                        // Kept for revert (2026-09-27, the tool rebuild): one
+                        // link removed only the LAST scan, so a wrong date
+                        // in the middle could not be taken out. Each scan is
+                        // a chip now with its own change and remove.
+                        // if (row.scans && dates.isNotEmpty)
+                        //   _Link(
+                        //     label: 'Remove last scan',
+                        //     onTap: () {
+                        //       final store = TtcTreatmentStore.instance;
+                        //       final was = dates.last;
+                        //       store.removeScan(dates.last);
+                        //       ttcRoundDateRemoved(context,
+                        //           ttcScanLabel(kind), () => store.addScan(was));
+                        //     },
+                        //   ),
                         if (readId != null)
                           _Link(
                             label: 'Read about it',
@@ -1025,9 +1230,96 @@ class _Link extends StatelessWidget {
       );
 }
 
+/// One scan's date. A tap offers "Change date" and "Remove" (with Undo),
+/// the shape of an event's action sheet (LinkedIn's event menu,
+/// https://mobbin.com/screens/415244fa-a70c-4334-972d-508b3b18151c).
+class _ScanChip extends StatelessWidget {
+  const _ScanChip(
+      {required this.day, required this.kind, required this.readOnly});
+
+  final DateTime day;
+  final TtcRoundKind? kind;
+  final bool readOnly;
+
+  Future<void> _open(BuildContext context) async {
+    final store = TtcTreatmentStore.instance;
+    final label = ttcScanLabel(kind);
+    final choice = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      routeSettings: const RouteSettings(name: 'ttc/treatment/scan'),
+      shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(top: Radius.circular(26))),
+      builder: (ctx) => _SheetBody(
+        title: label,
+        body: ttcRoundDate(day),
+        options: const [
+          ('change', 'Change date', 'Pick the right day for this scan.',
+              Icons.edit_calendar_outlined),
+          ('remove', 'Remove this scan', 'You can undo this straight after.',
+              Icons.delete_outline_rounded),
+        ],
+        links: const [('cancel', 'Keep it')],
+      ),
+    );
+    if (!context.mounted) return;
+    switch (choice) {
+      case 'change':
+        final picked = await ttcPickRoundDate(context,
+            round: store.cycle, step: null, help: label);
+        if (picked == null) return;
+        store.removeScan(day);
+        store.addScan(picked);
+      case 'remove':
+        store.removeScan(day);
+        ttcRoundDateRemoved(context, label, () => store.addScan(day));
+      default:
+        break;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final text = ttcRoundDate(day);
+    return Semantics(
+      button: !readOnly,
+      label: '${ttcScanLabel(kind)}, $text',
+      excludeSemantics: true,
+      onTap: readOnly ? null : () => _open(context),
+      child: InkWell(
+        key: ValueKey('ttc_round_scan_${day.toIso8601String()}'),
+        onTap: readOnly ? null : () => _open(context),
+        borderRadius: BorderRadius.circular(999),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(color: ttcLine, width: 1.3),
+          ),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            Text(text,
+                style: pvManrope(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w800,
+                    color: ttcTitleInk)),
+            if (!readOnly) ...[
+              const SizedBox(width: 6),
+              const Icon(Icons.edit_outlined, size: 13, color: ttcSoft),
+            ],
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
 /// The tick that silences the trigger reminders (see the screen's own note).
-class _TakenTick extends StatelessWidget {
-  const _TakenTick({required this.taken});
+/// Public since 2026-09-27 so a legacy round's trigger row wears this one
+/// rather than the older violet box.
+class TtcRoundTakenTick extends StatelessWidget {
+  const TtcRoundTakenTick({super.key, required this.taken});
   final bool taken;
 
   @override
@@ -1230,6 +1522,12 @@ Future<void> showTtcPlanChangedSheet(BuildContext context) async {
         if (ivf)
           ('freeze', kTtcPlanFreeze, kTtcPlanFreezeLine,
               Icons.ac_unit_rounded),
+        // A mis-tap on the first screen of the start flow had no fix short
+        // of starting again, which closes the round (2026-09-27, the tool
+        // rebuild). The same confirmed, undoable kind change as "It became
+        // an IUI", for any kind.
+        ('kind', kTtcPlanWrongKind, kTtcPlanWrongKindLine,
+            Icons.edit_outlined),
       ],
       links: const [('cancel', 'Nothing changed')],
     ),
@@ -1242,14 +1540,69 @@ Future<void> showTtcPlanChangedSheet(BuildContext context) async {
       await _confirmKind(context, TtcRoundKind.iui);
     case 'freeze':
       await _confirmKind(context, TtcRoundKind.ivfFreezeAll);
+    case 'kind':
+      await ttcPickRoundKind(context);
     default:
       break;
   }
 }
 
+const String kTtcPlanWrongKind = 'I picked the wrong treatment';
+const String kTtcPlanWrongKindLine =
+    'Choose the right one. Every date you added stays.';
+
+/// Every kind but the one she has, as a sheet, then the kind's confirm.
+/// The treatment screen offers it directly on a round with no dates yet.
+Future<void> ttcPickRoundKind(BuildContext context) async {
+  final now = TtcTreatmentStore.instance.cycle.kind;
+  final kinds = [
+    for (final k in const [
+      TtcRoundKind.ivfFresh,
+      TtcRoundKind.ivfFreezeAll,
+      TtcRoundKind.fetMedicated,
+      TtcRoundKind.fetNatural,
+      TtcRoundKind.iui,
+      TtcRoundKind.ovulationInduction,
+      TtcRoundKind.notSure,
+    ])
+      if (k != now) k,
+  ];
+  final picked = await showModalBottomSheet<String>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.white,
+    routeSettings: const RouteSettings(name: 'ttc/treatment/pick_kind'),
+    shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(26))),
+    builder: (_) => ConstrainedBox(
+      constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(context).height * 0.85),
+      child: _SheetBody(
+        title: kTtcStartKindTitle,
+        body: now == null
+            ? kTtcStartKindBody
+            : 'Now: ${ttcRoundKindName(now)}.',
+        options: [
+          for (final k in kinds)
+            (k.name, ttcRoundKindName(k), ttcRoundKindNote(k),
+                Icons.circle_outlined),
+        ],
+        links: const [('cancel', 'Keep it as it is')],
+      ),
+    ),
+  );
+  if (picked == null || picked == 'cancel' || !context.mounted) return;
+  final kind = TtcRoundKind.values.firstWhere((k) => k.name == picked);
+  await _confirmKind(context, kind);
+}
+
 Future<void> _confirmKind(BuildContext context, TtcRoundKind kind) async {
   final store = TtcTreatmentStore.instance;
   final before = store.cycle.kind;
+  // The path is put back by Undo too (2026-09-27, the tool rebuild): Undo
+  // restored the kind and left the path on the new one, so the calendar
+  // and the home kept following a treatment she had just taken back.
+  final beforePath = TtcStore.instance.path;
   final (title, body, yes) = ttcConfirmKind(kind);
   final ok = await showDialog<bool>(
     context: context,
@@ -1266,7 +1619,13 @@ Future<void> _confirmKind(BuildContext context, TtcRoundKind kind) async {
       icon: Icons.check_rounded,
       lift: 24,
       action: kTtcRoundUndoCta,
-      onAction: before == null ? null : () => store.changeKind(before));
+      // Kept for revert: onAction: ... () => store.changeKind(before));
+      onAction: before == null
+          ? null
+          : () {
+              store.changeKind(before);
+              TtcStore.instance.setPath(beforePath);
+            });
 }
 
 // =============================================================================
@@ -1391,11 +1750,19 @@ class TtcStartTreatmentCard extends StatelessWidget {
     return Semantics(
       button: true,
       label: '$kTtcRoundStartCardTitle $kTtcRoundStartCardBody',
+      // excludeSemantics drops the child's tap action, so the node
+      // carries it (accessibility sweep, TTC launch walk, 2026-09-27).
+      onTap: onTap ?? () => openTtcTreatmentStart(context),
       excludeSemantics: true,
+      // White with a hairline (2026-09-27, the tool rebuild), like the IVF
+      // door's round panel beside it. Kept for revert: color: ttcPanel and
+      // no border.
       child: Material(
         key: const ValueKey('ttc_start_treatment_card'),
-        color: ttcPanel,
-        borderRadius: BorderRadius.circular(22),
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(22),
+            side: const BorderSide(color: ttcLine, width: 1.2)),
         child: InkWell(
           borderRadius: BorderRadius.circular(22),
           onTap: onTap ?? () => openTtcTreatmentStart(context),
@@ -1586,6 +1953,9 @@ class _Panel extends StatelessWidget {
     Widget pill(String label, VoidCallback onTap, bool ink) => Semantics(
           button: true,
           label: label,
+          // excludeSemantics drops the child's tap action, so the node
+          // carries it (accessibility sweep, TTC launch walk, 2026-09-27).
+          onTap: onTap,
           excludeSemantics: true,
           child: Material(
             color: ink ? ttcTitleInk : Colors.white,
@@ -1647,6 +2017,9 @@ class _Panel extends StatelessWidget {
             Semantics(
               button: true,
               label: t,
+              // excludeSemantics drops the child's tap action, so the node
+              // carries it (accessibility sweep, TTC launch walk, 2026-09-27).
+              onTap: onRead == null ? null : () => onRead!(id),
               excludeSemantics: true,
               child: InkWell(
                 key: ValueKey('ttc_ivf_panel_read_$id'),

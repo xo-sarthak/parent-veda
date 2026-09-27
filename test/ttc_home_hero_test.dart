@@ -839,7 +839,7 @@ void main() {
 
     test('the beta test is named by date and never counted down to', () {
       // ⚠️ THE RULE: count down to things she DOES, name the date of things
-      // that JUDGE. A trigger shot is an action and a shrinking number helps
+      // that JUDGE. A trigger injection is an action and a shrinking number helps
       // her prepare. The beta is a verdict, and the largest type on the screen
       // counting towards it is the shape that makes a wait worse — the same
       // reason the natural hero counts to a period, never to a test.

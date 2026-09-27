@@ -79,7 +79,9 @@ void main() {
       await pumpWindow(tester);
       // One of the three, never none - a summary that says nothing about now
       // is just a date range.
-      final open = find.text('Open now').evaluate().isNotEmpty;
+      // 'Open now' reads 'Your fertile days have begun' since 2026-09-27.
+      final open =
+          find.text('Your fertile days have begun').evaluate().isNotEmpty;
       final soon = find.textContaining('Opens').evaluate().isNotEmpty;
       final past = find.textContaining('has passed').evaluate().isNotEmpty;
       expect(open || soon || past, isTrue);

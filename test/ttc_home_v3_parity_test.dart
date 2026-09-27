@@ -19,6 +19,8 @@
 //  says nothing about how.
 // =============================================================================
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -86,23 +88,42 @@ void main() {
     expect(f, findsWidgets);
   });
 
-  testWidgets('Me / Us / What\'s next reach the chapter reader',
-      (tester) async {
-    final t = TtcS.current();
+  // ⚠️ THE CHAPTER CARD LEFT THE HOME (the user, 2026-09-27: "Recommended
+  // reads for today should only carry the reads… what is this Trying
+  // Together?"). The chapter reader stays reachable from the journey map.
+  // Kept for revert, the test that held the card's three pills:
+  // testWidgets('Me / Us / What\'s next reach the chapter reader',
+  //     (tester) async {
+  //   final t = TtcS.current();
+  //   await pumpV3(tester);
+  //
+  //   // ⚠️ THE POINT OF THESE THREE. `ttc_chapter` opens the reader at its
+  //   // DEFAULT tab, so a single chapter link reaches "Me" and nothing else —
+  //   // which is what V3 had. Us and What's next were unreachable in this
+  //   // version of the app entirely.
+  //   // The pills on the chapter card draw their labels in uppercase (the
+  //   // 2026-09-16 design); the strings themselves are unchanged.
+  //   // Since 2026-09-27 the first two say who they are for ("For you", "For
+  //   // you both"). Kept for revert: t.shortcutMe, t.shortcutUs.
+  //   final f = find.text('For you both'.toUpperCase(), skipOffstage: false);
+  //   await _scrollTo(tester, f);
+  //   for (final label in ['For you', 'For you both', t.shortcutNext]) {
+  //     expect(find.text(label.toUpperCase(), skipOffstage: false), findsWidgets,
+  //         reason: '"$label" opens a chapter tab and V3 cannot reach it');
+  //   }
+  // });
+  testWidgets('the reads section carries only reads', (tester) async {
     await pumpV3(tester);
-
-    // ⚠️ THE POINT OF THESE THREE. `ttc_chapter` opens the reader at its
-    // DEFAULT tab, so a single chapter link reaches "Me" and nothing else —
-    // which is what V3 had. Us and What's next were unreachable in this
-    // version of the app entirely.
-    // The pills on the chapter card draw their labels in uppercase (the
-    // 2026-09-16 design); the strings themselves are unchanged.
-    final f = find.text(t.shortcutUs.toUpperCase(), skipOffstage: false);
-    await _scrollTo(tester, f);
-    for (final label in [t.shortcutMe, t.shortcutUs, t.shortcutNext]) {
-      expect(find.text(label.toUpperCase(), skipOffstage: false), findsWidgets,
-          reason: '"$label" opens a chapter tab and V3 cannot reach it');
-    }
+    expect(find.text('For you both'.toUpperCase(), skipOffstage: false),
+        findsNothing);
+    expect(
+        find.byKey(const ValueKey('ttc_home_reads_see_all'),
+            skipOffstage: false),
+        findsNothing);
+    final src = File('lib/screens/ttc/ttc_journey_map_screen.dart')
+        .readAsStringSync();
+    expect(src, contains('openTtcChapter('),
+        reason: 'the chapter reader must stay reachable');
   });
 
   testWidgets('the ritual can be COMPLETED from the home, not just opened',

@@ -17,7 +17,8 @@ void main() {
       expect(r.teaser.en, i.takeawayEn, reason: 'the takeaway is the teaser');
       expect(r.scaleSetter.en.isNotEmpty, isTrue);
       expect(r.reviewed, isFalse, reason: 'no clinician reviewed an insight');
-      expect(r.whenToSeeSomeone, same(kPvShortPieceCallout));
+      // TTC's own copy since 2026-09-27 (no em dash); was kPvShortPieceCallout.
+      expect(r.whenToSeeSomeone, same(kTtcShortPieceCallout));
       expect(r.whenToSeeSomeone.tone, isNot(PvCalloutTone.urgent));
       expect(r.readNext, isNotEmpty, reason: '${i.id}: a foot with no rail');
       for (final id in r.readNext) {

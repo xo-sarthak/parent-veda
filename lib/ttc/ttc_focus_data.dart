@@ -81,6 +81,8 @@ import '../screens/ttc/ttc_illustrations.dart';
 // The new door's drawn tab marks (`TtcFocusGroup.mark`). Exported below so a
 // focus file can name `IntentMark.cycleRing` without a second import.
 import '../screens/brackets/hub/hub_intent_art.dart' show IntentMark;
+// The TTC tab family (2026-09-27), narrowed and exported the same way.
+import '../screens/ttc/doors/ttc_tab_art.dart' show TtcTabMark;
 import 'focus/ttc_focus_conceiving.dart';
 import 'focus/ttc_focus_after_loss.dart';
 import 'focus/ttc_focus_mind_body.dart';
@@ -95,6 +97,7 @@ export 'focus/ttc_focus_conceiving.dart';
 export 'focus/ttc_focus_ivf.dart';
 export 'focus/ttc_focus_pcos.dart';
 export '../screens/brackets/hub/hub_intent_art.dart' show IntentMark;
+export '../screens/ttc/doors/ttc_tab_art.dart' show TtcTabMark;
 
 /// What kind of thing a tile is. Drives the chip, the icon and the shape.
 enum TtcTileFormat {
@@ -686,11 +689,21 @@ final class TtcDoTile extends TtcTile {
 /// of describing the tap — nobody outside this repo knows what a reference is.
 final class TtcDoorTile extends TtcTile {
   const TtcDoorTile(
-      {required super.title, required super.blurb, super.meta, super.keywords, required this.bracketId});
+      {required super.title,
+      required super.blurb,
+      super.meta,
+      super.keywords,
+      required this.bracketId,
+      this.group});
 
   /// Must resolve through `ttcFocusPageFor`. An unknown id opens nothing, which
   /// `ttc_mind_body_test.dart` checks for — the wiring gate, again.
   final String bracketId;
+
+  /// The tab the door opens on (2026-09-27, relevance audit): "Mind and body"
+  /// from Taking a while means its Hard days, not its first tab. Null opens
+  /// the door as usual.
+  final String? group;
 
   @override
   TtcTileFormat get format => TtcTileFormat.door;
@@ -788,6 +801,7 @@ class TtcFocusGroup {
     this.pinnedRedFlagReadIds = const [],
     this.note,
     this.mark,
+    this.tabMark,
     this.inlineLabel,
     this.inlineSurfaceId,
   });
@@ -805,6 +819,15 @@ class TtcFocusGroup {
   /// to drawn ones, so every tab on a shipped door has one
   /// (`test/ttc_door_screen_test.dart`).
   final IntentMark? mark;
+
+  /// The tab's mark from the TTC tab family (`TtcTabArt`, 2026-09-27).
+  ///
+  /// ⚠️ PREFERRED OVER [mark], WHICH STAYS AS THE FALLBACK. The shared
+  /// `IntentMark`s were drawn for pregnancy hub questions, and on a TTC tab
+  /// they read as stock (the user: "very random"). This family is drawn for
+  /// the rail. [mark] is kept, set and live, so a tab that loses its
+  /// [tabMark] still shows a drawn mark and never an empty well.
+  final TtcTabMark? tabMark;
 
   /// The second line on a tool tab's rail card, instead of a count. "1 thing"
   /// over a tool is true and useless. Set per tab, never inferred from the

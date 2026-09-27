@@ -140,6 +140,29 @@ class TtcBmiStore extends ChangeNotifier {
     await p.setBool(_kOnChecklist, value);
   }
 
+  /// Take one measurement out of her history (tool rebuild, 2026-09-27).
+  ///
+  /// ⚠️ ADDITIVE. A saved measurement could never be removed, so a typo (a
+  /// weight in pounds saved as kilograms) stayed in her history and fed the
+  /// change note for ever. The screen offers Undo, which is [restoreEntry].
+  Future<void> removeEntry(BmiHistoryEntry e) async {
+    if (!_history.remove(e)) return;
+    notifyListeners();
+    final p = await SharedPreferences.getInstance();
+    await p.setStringList(_kHistory, [for (final e in _history) e.encode()]);
+  }
+
+  /// Put a removed measurement back, in date order.
+  Future<void> restoreEntry(BmiHistoryEntry e) async {
+    if (_history.contains(e)) return;
+    _history
+      ..add(e)
+      ..sort((a, b) => a.at.compareTo(b.at));
+    notifyListeners();
+    final p = await SharedPreferences.getInstance();
+    await p.setStringList(_kHistory, [for (final e in _history) e.encode()]);
+  }
+
   Future<void> clearHistory() async {
     _history.clear();
     notifyListeners();

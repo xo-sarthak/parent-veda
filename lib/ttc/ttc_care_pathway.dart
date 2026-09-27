@@ -15,7 +15,7 @@
 //    Letrozole, no monitoring, no trigger, told to time intercourse
 //      → her body decides when. ParentVeda SHOULD estimate the window.
 //
-//    Letrozole, follicular scans, trigger shot, timed intercourse
+//    Letrozole, follicular scans, trigger injection, timed intercourse
 //      → the clinic decides when. ParentVeda must NOT estimate.
 //
 //  Both are "ovulation induction". Same for natural-cycle FET versus a fully

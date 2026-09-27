@@ -39,9 +39,15 @@ import 'package:parentveda/ttc/ttc_reads_data.dart';
 /// The brief's own table: tab, title, format.
 const _brief = <(String, String, TtcTileFormat)>[
   // 1) Diet and supplements
-  ('diet', 'The three months before', TtcTileFormat.article),
-  ('diet', 'Eating, day to day', TtcTileFormat.tool),
-  ('diet', 'What to cut before trying', TtcTileFormat.article),
+  // ⚠️ CHANGED ON PURPOSE 2026-09-27 (relevance audit). "The three months
+  // before" moved to Before you start and the eating question now opens the
+  // same read at "What should I eat?"; "What to cut before trying" moved to
+  // Weight and habits; "Eating, day to day" came off, because Meal plan's
+  // "Plan your own week" opens the same tool. Kept for revert:
+  // ('diet', 'The three months before', TtcTileFormat.article),
+  // ('diet', 'Eating, day to day', TtcTileFormat.tool),
+  // ('diet', 'What to cut before trying', TtcTileFormat.article),
+  ('diet', 'What to eat and avoid', TtcTileFormat.article),
   ('diet', 'Folic acid and preconception supplements', TtcTileFormat.product),
   ('diet', 'When to start what, and how early', TtcTileFormat.article),
 
@@ -66,8 +72,12 @@ const _brief = <(String, String, TtcTileFormat)>[
   ('habits', 'Weight before pregnancy, said kindly', TtcTileFormat.article),
   ('habits', 'Habits worth building now', TtcTileFormat.practice),
   ('habits', "Track what you're working on", TtcTileFormat.tool),
+  // Moved here from diet, 2026-09-27 (relevance audit).
+  ('habits', 'What to cut before trying', TtcTileFormat.article),
 
   // 4) Before you start
+  // Moved here from diet, 2026-09-27 (relevance audit).
+  ('before', 'The three months before', TtcTileFormat.article),
   ('before', 'Coming off birth control', TtcTileFormat.article),
   ('before', 'Medicines and conditions to check with a doctor',
       TtcTileFormat.article),
@@ -80,6 +90,9 @@ const _brief = <(String, String, TtcTileFormat)>[
   // 5) Your checklist
   ('checklist', 'Your pre-pregnancy checklist', TtcTileFormat.checklist),
   ('checklist', 'Talk to someone before you start', TtcTileFormat.talk),
+  // ADDED ON PURPOSE 2026-09-27 (relevance audit): the consults shelf has no
+  // nutritionist, so the one Talk tile promised a person it could not open.
+  ('checklist', 'Talk to a nutritionist', TtcTileFormat.talk),
 ];
 
 void main() {

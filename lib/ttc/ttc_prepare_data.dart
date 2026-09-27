@@ -370,3 +370,43 @@ TtcOffering? ttcOfferingById(String id) {
   }
   return null;
 }
+
+/// ⚠️ ONE PLAIN LINE PER OFFERING, SAYING WHAT SHE GETS (2026-09-27, TTC tools
+/// pass). Several titles don't say what they are ("The half nobody talks
+/// about" is a talk for him about sperm health; "Fertility, honestly" is a
+/// recorded class), so she had to open each one to find out. The lines are
+/// drawn from each offering's own body; no fact is new.
+///
+/// ⚠️ NOT YET ON SCREEN. The list she sees is the unified learn screen, which
+/// builds its rows in `lib/screens/learn/pv_learn_catalog.dart` (`_fromTtc`,
+/// `subtitle: who`). One line there (`subtitle: ttcOfferingPlainLine(o.id) ??
+/// who`, or a separate row line) makes these reachable. Handed over rather
+/// than edited, because that file belongs to another area.
+const Map<String, String> kTtcOfferingPlainLine = {
+  'ttc_consult_fertility':
+      'One video call with a fertility specialist about your next six months',
+  'ttc_consult_gynae':
+      'One video call about your cycles, periods, PCOS or a check-up',
+  kTtcOfferingAndrologist:
+      'One video call for him about his semen report',
+  'ttc_course_basics':
+      'A recorded 90-minute class on what affects getting pregnant',
+  'ttc_course_pcos': 'Six live group sessions on living with PCOS',
+  'ttc_yoga_pack': 'Eight gentle live yoga classes to use over two months',
+  'ttc_nutrition_consult':
+      'One video call for a food plan from your own kitchen',
+  'ttc_psych_consult':
+      'One private session with a psychologist for the worry of trying',
+  'ttc_loss_support':
+      'Four small-group sessions after a miscarriage or a failed cycle',
+  'ttc_assessment_couple':
+      'One appointment for you both: which tests, and your results together',
+  'ttc_partner_workshop': 'A 90-minute talk for him about sperm health',
+  'ttc_ivf_prep': 'Five sessions on what an IVF cycle involves',
+  'ttc_lifestyle_90':
+      'Six sessions for you both, across the 90 days sperm and eggs take to grow',
+  kTtcOfferingGarbhCourse: 'Free: eight short sessions of calm practices',
+};
+
+/// The plain line for an offering, or null.
+String? ttcOfferingPlainLine(String id) => kTtcOfferingPlainLine[id];

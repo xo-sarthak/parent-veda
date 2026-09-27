@@ -49,6 +49,12 @@ class TtcRitualStore extends ChangeNotifier with TtcSyncedStore {
 
   int get total => TtcRitualPart.values.length;
 
+  /// ⚠️ NOT FOR DISPLAY (tools pass, 2026-09-27). The Mind & body brief rules
+  /// out streaks, and the ritual screen no longer shows a count at all. Kept
+  /// (not commented out) only because the `ritual_week` milestone and two home
+  /// cards still read it; those cards are owned elsewhere and flagged for
+  /// removal. Do not add a new reader.
+  ///
   /// Consecutive days with at least one part completed, counting back from
   /// today. Today not being started yet does NOT break the streak - a streak
   /// that resets at midnight would punish someone for not having got to it yet.

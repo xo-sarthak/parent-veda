@@ -19,6 +19,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/family_profile.dart' show FamilyProfileStore;
 import '../services/life_stage_store.dart';
 import '../services/remote/supabase_repo.dart';
 import 'cycle_store.dart';
@@ -64,8 +65,21 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
   /// When this couple began trying with us. Falls back to the day they declared
   /// the life stage, so a couple who never explicitly set a start date still
   /// has a real journey rather than a null one.
+  ///
+  /// ⚠️ THEN FROM HER OWN ANSWER, BEFORE THE DAY SHE ARRIVED (2026-09-27, found on
+  /// the phone: You said "Trying · over a year" while Should I get help? filled
+  /// in "Less than 6 months"). Onboarding V2 asks "How long have you been
+  /// trying?" and saves only the profile answer; only the older TTC intro set a
+  /// start date. So every "how long" in the stage counted from her install
+  /// day, including the six-months-at-35 and one-year checks. The answer is
+  /// read at its LOW end (a year, six months, three months, none), so nothing
+  /// ever says she has tried longer than she told us. Kept for revert:
+  ///   _journeyStart ?? LifeStageStore.instance.enteredAt;
   DateTime? get journeyStart =>
-      _journeyStart ?? LifeStageStore.instance.enteredAt;
+      _journeyStart ??
+      ttcStartFromAnswer(FamilyProfileStore.instance.otherFor('ttc_duration'),
+          LifeStageStore.instance.enteredAt) ??
+      LifeStageStore.instance.enteredAt;
 
   /// Which medical pathway they are on. Never forced, always changeable.
   ///
@@ -474,3 +488,21 @@ class TtcStore extends ChangeNotifier with TtcSyncedStore {
 }
 
 // TtcPathCopy moved to ttc_care_pathway.dart alongside the pathway itself.
+
+/// The day she started trying, from her onboarding answer to "How long have you
+/// been trying?" (ids `starting`, `months`, `six`, `year`), counted back from
+/// the day she entered the stage. Each answer at its low end. Null when there is
+/// no answer or no day to count from.
+DateTime? ttcStartFromAnswer(String? answer, DateTime? answeredAround) {
+  if (answeredAround == null) return null;
+  final months = switch (answer) {
+    'starting' => 0,
+    'months' => 3,
+    'six' => 6,
+    'year' => 12,
+    _ => null,
+  };
+  if (months == null) return null;
+  final d = answeredAround.subtract(Duration(days: (months * 30.44).round()));
+  return DateTime(d.year, d.month, d.day);
+}

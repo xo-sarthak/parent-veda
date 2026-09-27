@@ -21,6 +21,7 @@ import 'package:parentveda/models/community_models.dart';
 import 'package:parentveda/screens/ttc/ttc_can_i_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_community_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_cycle_screens.dart';
+import 'package:parentveda/screens/ttc/ttc_ovulation_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_products_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/screens/ttc/ttc_tests_screen.dart';
@@ -187,7 +188,10 @@ void main() {
       // On IVF the surge is caused by a trigger, so a strip tells us nothing we
       // would act on - and asking for data we intend to ignore breaks the rule
       // about never collecting what we cannot use.
-      expect(find.text(t.ovulationSignals), findsNothing);
+      // The strip log's heading since the tool rebuild (2026-09-27). Was:
+      //   expect(find.text(t.ovulationSignals), findsNothing);
+      expect(t.ovulationSignals, isNotEmpty);
+      expect(find.text(kTtcOvTestsHeading), findsNothing);
     });
 
     testWidgets('but a clinic-GUIDED cycle keeps them', (tester) async {
@@ -205,7 +209,10 @@ void main() {
       expect(TtcStore.instance.ownership, TimingOwnership.clinicGuided);
       await pumpTall(tester, const TtcOvulationScreen());
       final t = const TtcS(false);
-      expect(find.text(t.ovulationSignals), findsOneWidget,
+      // The strip log's heading since the tool rebuild (2026-09-27). Was:
+      //   expect(find.text(t.ovulationSignals), findsOneWidget, ...);
+      expect(t.ovulationSignals, isNotEmpty);
+      expect(find.text(kTtcOvTestsHeading), findsOneWidget,
           reason: 'the middle tier has collapsed back into the binary');
       // Still no prediction, though.
       expect(TtcStore.instance.today.fertility, isNull);
@@ -340,6 +347,10 @@ void main() {
   group('S9.2 - Ask Veda deep-links land on the item', () {
     testWidgets('a test pointer opens that test expanded', (tester) async {
       await pumpTall(tester, const TtcTestsScreen(focusId: 'amh'));
+      // ⚠️ 2026-09-27, night (tool rebuild): the pointer opens the item as a
+      // page on top of the library, one frame after the library; settle so
+      // the pushed page is on stage. Kept for revert: no settle here.
+      await tester.pumpAndSettle();
       final amh = ttcTestById('amh')!;
       // The expanded half is on screen, not just the title.
       expect(find.text(amh.reading(false)), findsOneWidget);
@@ -349,12 +360,20 @@ void main() {
         (tester) async {
       // Otherwise the card being scrolled to is not rendered at all.
       await pumpTall(tester, const TtcTestsScreen(focusId: 'semen'));
+      // ⚠️ 2026-09-27, night (tool rebuild): the pointer opens the item as a
+      // page on top of the library, one frame after the library; settle so
+      // the pushed page is on stage. Kept for revert: no settle here.
+      await tester.pumpAndSettle();
       expect(find.text('Semen analysis'), findsOneWidget);
       expect(find.text(ttcTestById('semen')!.reading(false)), findsOneWidget);
     });
 
     testWidgets('a Can I pointer opens that answer expanded', (tester) async {
       await pumpTall(tester, const TtcCanIScreen(focusId: 'papaya'));
+      // ⚠️ 2026-09-27, night (tool rebuild): the pointer opens the item as a
+      // page on top of the library, one frame after the library; settle so
+      // the pushed page is on stage. Kept for revert: no settle here.
+      await tester.pumpAndSettle();
       expect(find.text(ttcCanIById('papaya')!.why(false)), findsOneWidget);
     });
 
@@ -362,6 +381,13 @@ void main() {
       // A research page that narrows to the one pointed-at item starts to look
       // like a shop.
       await pumpTall(tester, const TtcCanIScreen(focusId: 'papaya'));
+      // ⚠️ CHANGED 2026-09-27, night (tool rebuild): the pointer opens the
+      // answer as a read ON TOP of the whole library, so the library is one
+      // Back away rather than on the same page. Kept for revert: the expect
+      // below ran straight after pumpTall.
+      await tester.pumpAndSettle();
+      tester.state<NavigatorState>(find.byType(Navigator).first).pop();
+      await tester.pumpAndSettle();
       expect(find.text(ttcCanIById('chai')!.question(false)), findsOneWidget);
     });
 

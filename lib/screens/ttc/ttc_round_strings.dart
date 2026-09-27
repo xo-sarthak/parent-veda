@@ -301,7 +301,7 @@ String ttcRoundUpcomingLine(TtcHeroLine line) {
       if (line.days == 0 && line.date != null) {
         return (
           '$short · Trigger day',
-          'Trigger shot at ${ttcRoundTime(line.date!)}',
+          'Trigger injection at ${ttcRoundTime(line.date!)}',
           next ?? "Your clinic's time is the one to keep.",
         );
       }

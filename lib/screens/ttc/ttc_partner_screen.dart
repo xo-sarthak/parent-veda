@@ -37,6 +37,7 @@ import 'ttc_common.dart';
 // import 'ttc_insight_screen.dart'; // kept for revert — the insight opens in the reader now
 import 'ttc_journal_screen.dart';
 import 'ttc_journey_map_screen.dart';
+import 'ttc_profile_screen.dart' show openTtcProfile;
 import 'ttc_round_strings.dart'
     show ttcPartnerRoundLine, kTtcPartnerRoundEyebrow;
 import 'ttc_strings.dart';
@@ -69,7 +70,8 @@ class TtcPartnerTodayScreen extends StatelessWidget {
         // His insight comes from the shared library, filtered to the ones
         // written for him - one brain, two doors, not a second library.
         final insights = ttcInsights.where((i) => i.forPartner).toList();
-        final insight = ttcPickForToday(insights, offset: 1);
+        // The single pick fed `_LearnCard`, kept for revert with it:
+        // final insight = ttcPickForToday(insights, offset: 1);
 
         // His half was a raw Scaffold with no navigation at all: five cards,
         // and the only way out was toggling back to Her. He could not reach
@@ -87,14 +89,22 @@ class TtcPartnerTodayScreen extends StatelessWidget {
         return TtcPage(
           tab: 0,
           slate: true,
-          overlay: _ModePill(t: t, him: true),
+          // ⚠️ NO FLOATING HER / HIM PILL (2026-09-27, build 10 on the
+          // phone). It sat over his cards on every scroll and was never a
+          // thing he should see: his phone reaches this screen by pairing,
+          // and the preview switch lives in You › Developer, as it does for
+          // her V3 home. Kept for revert:
+          //   overlay: _ModePill(t: t, him: true),
           children: [
             // The SHARED header, in his palette - not a private one. His was a
             // logo row with no actions, so the profile door added to fix A-2 /
             // A-3 / A-61 (no language control, no sign-out, no way to correct
             // anything) never reached his half. Two headers is exactly how his
             // came to be missing it.
-            const TtcHeader(slate: true),
+            // Her V3 header's shape (the date between the round buttons),
+            // not the wordmark row (2026-09-27). Kept for revert:
+            // const TtcHeader(slate: true),
+            const _HisTop(),
             const SizedBox(height: 18),
             _Hero(chapter: chapter, today: today, t: t),
             const SizedBox(height: 20),
@@ -112,6 +122,15 @@ class TtcPartnerTodayScreen extends StatelessWidget {
             ],
 
             _MissionCard(mission: mission, t: t),
+            const SizedBox(height: 12),
+            // ⚠️ TODAY'S INSIGHTS FOR HIM, A RAIL (2026-09-27; the user's
+            // brief keeps today's insights, Flo for Partners' "insights about
+            // her · Today"). Up to three pieces written for him, turning over
+            // with the day; one card was all he had. Directly under his
+            // mission, near the top where Flo puts them: on build 10 it sat
+            // eighth, under his door. Kept for revert, in its old place below:
+            //   _LearnCard(insight: insight, t: t),
+            _HisInsights(insights: insights, t: t),
             const SizedBox(height: 12),
             // ⚠️ THE HALF OF MIND & BODY'S BRIEF THAT WAS LOGIC WITH NO CALLER
             // — WIRED 2026-09-10. Its Today spec says *"Both partners see
@@ -141,8 +160,12 @@ class TtcPartnerTodayScreen extends StatelessWidget {
             const SizedBox(height: 12),
             _YourBodyCard(brief: brief, t: t),
             const SizedBox(height: 12),
-            _LearnCard(insight: insight, t: t),
+            // His one door (2026-09-27): the rest are hers, and the user's
+            // brief takes them away from his home. His body, his tests, his
+            // habits live behind this one.
+            const _HisDoorCard(),
             const SizedBox(height: 12),
+            // The insights rail moved up under his mission (above).
             _AskVedaCard(t: t),
             const SizedBox(height: 12),
             _JournalCard(t: t),
@@ -364,11 +387,10 @@ class _Hero extends StatelessWidget {
               right: -34,
               top: -40,
               child: _softCircle(150, Colors.white.withValues(alpha: 0.06))),
-          Positioned(
-              right: 26,
-              bottom: -42,
-              child:
-                  _softCircle(96, ttcSlateAmber.withValues(alpha: 0.20))),
+          // The amber circle sat behind "What's next" like a stuck blob on
+          // a phone (2026-09-27). Kept for revert:
+          // Positioned(right: 26, bottom: -42,
+          //     child: _softCircle(96, ttcSlateAmber.withValues(alpha: 0.20))),
           _body(context, hi),
         ]),
       ),
@@ -412,7 +434,10 @@ class _Hero extends StatelessWidget {
                 w: FontWeight.w600)),
         const SizedBox(height: 6),
         // Fraunces, as the father mode does for its headers.
-        Text(chapter.title(hi),
+        // ⚠️ THE DAYS, NOT THE CHAPTER NAME (the user, 2026-09-27: "Trying
+        // Together… how does that make sense? Why are we even using it?").
+        // Kept for revert: Text(chapter.title(hi), ...)
+        Text(ttcChapterHisTitle(chapter),
             style: ttcFraunces(26, w: FontWeight.w600, color: Colors.white)),
         const SizedBox(height: 8),
         Text(chapter.tagline(hi),
@@ -434,15 +459,14 @@ class _Hero extends StatelessWidget {
                 size: 17, color: Colors.white),
           ]),
         ),
-        const SizedBox(height: 18),
-        TtcChapterBar(today: today),
-        const SizedBox(height: 14),
-        // What is coming, named by its trigger rather than a countdown - the
-        // same copy hers uses, so the two cannot describe the journey
-        // differently to the two people on it.
-        Text(chapter.nextUp(hi),
-            style: ttcBody(12.5,
-                color: Colors.white.withValues(alpha: 0.9), h: 1.5)),
+        // ⚠️ NO FIVE-STEP CHAPTER BAR AND NO "Next: The Waiting Days" LINE
+        // (2026-09-27): both spoke in chapter names, which the user asked to
+        // stop showing on their own. Her home dropped the same pair. Kept for
+        // revert:
+        //   const SizedBox(height: 18),
+        //   TtcChapterBar(today: today),
+        //   const SizedBox(height: 14),
+        //   Text(chapter.nextUp(hi), style: ttcBody(12.5, ...)),
         const SizedBox(height: 16),
         Container(height: 1, color: Colors.white.withValues(alpha: 0.16)),
         const SizedBox(height: 14),
@@ -451,12 +475,14 @@ class _Hero extends StatelessWidget {
         Row(children: [
           TtcHeroShortcut(
               icon: Icons.self_improvement_rounded,
-              label: t.shortcutMe,
+              // Who each is for (2026-09-27). Kept for revert: t.shortcutMe.
+              label: 'For you',
               onTap: () =>
                   openTtcChapter(context, chapter, tab: TtcChapterTab.me)),
           TtcHeroShortcut(
               icon: Icons.favorite_rounded,
-              label: t.shortcutUs,
+              // Kept for revert: t.shortcutUs.
+              label: 'You both',
               onTap: () =>
                   openTtcChapter(context, chapter, tab: TtcChapterTab.us)),
           TtcHeroShortcut(
@@ -710,6 +736,7 @@ class _YourBodyCard extends StatelessWidget {
 
 // ---- learn ------------------------------------------------------------------
 
+// ignore: unused_element (kept for revert since 2026-09-27; `_HisInsights` replaced it)
 class _LearnCard extends StatelessWidget {
   const _LearnCard({required this.insight, required this.t});
 
@@ -910,4 +937,145 @@ class _SlateCard extends StatelessWidget {
     return GestureDetector(
         onTap: onTap, behavior: HitTestBehavior.opaque, child: card);
   }
+}
+
+/// His top: the profile door and today's date, the shape of her V3 header
+/// (2026-09-27).
+class _HisTop extends StatelessWidget {
+  const _HisTop();
+
+  static const _m = [
+    'January', 'February', 'March', 'April', 'May', 'June',
+    'July', 'August', 'September', 'October', 'November', 'December',
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final now = DateTime.now();
+    return Row(children: [
+      Semantics(
+        button: true,
+        label: 'Profile',
+        child: InkWell(
+          onTap: () => openTtcProfile(context),
+          customBorder: const CircleBorder(),
+          child: Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: ttcSlatePanel,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.person_outline_rounded,
+                size: 22, color: ttcSlateInk),
+          ),
+        ),
+      ),
+      Expanded(
+        child: Text('${now.day} ${_m[now.month - 1]}',
+            textAlign: TextAlign.center,
+            style: ttcBody(15, color: ttcSlateInk, w: FontWeight.w700)),
+      ),
+      const SizedBox(width: 44),
+    ]);
+  }
+}
+
+/// Today's insights for him: a rail of up to three pieces written for him
+/// (2026-09-27). Each opens in the one reader.
+class _HisInsights extends StatelessWidget {
+  const _HisInsights({required this.insights, required this.t});
+  final List<TtcInsight> insights;
+  final TtcS t;
+
+  @override
+  Widget build(BuildContext context) {
+    final hi = t.hinglish;
+    if (insights.isEmpty) return const SizedBox.shrink();
+    final picks = [
+      for (var i = 0; i < 3 && i < insights.length; i++)
+        ttcPickForToday(insights, offset: 1 + i),
+    ];
+    final seen = <String>{};
+    final unique = [for (final p in picks) if (seen.add(p.id)) p];
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Padding(
+        padding: const EdgeInsets.fromLTRB(4, 6, 4, 10),
+        child: Text('FOR YOU TODAY',
+            style: ttcBody(10.5, color: ttcSlateAmber, w: FontWeight.w800)),
+      ),
+      SizedBox(
+        // 176 left a third of each card blank on the phone (build 10).
+        height: 142,
+        child: ListView.separated(
+          scrollDirection: Axis.horizontal,
+          clipBehavior: Clip.none,
+          itemCount: unique.length,
+          separatorBuilder: (_, _) => const SizedBox(width: 10),
+          itemBuilder: (context, i) {
+            final ins = unique[i];
+            return SizedBox(
+              width: 236,
+              child: _SlateCard(
+                onTap: () => openTtcInsight(context, ins),
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(t.readSeconds(ins.readTime(hi)),
+                          style: ttcBody(11,
+                              color: ttcSlateSoft, w: FontWeight.w700)),
+                      const SizedBox(height: 8),
+                      Text(ins.title(hi),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: ttcJakarta(15.5, color: ttcSlateInk)),
+                      const SizedBox(height: 6),
+                      Expanded(
+                        child: Text(ins.takeaway(hi),
+                            maxLines: 2,
+                            overflow: TextOverflow.ellipsis,
+                            style: ttcBody(12.5,
+                                color: ttcSlateSoft, h: 1.45)),
+                      ),
+                    ]),
+              ),
+            );
+          },
+        ),
+      ),
+    ]);
+  }
+}
+
+/// His one door: the His side door (2026-09-27).
+class _HisDoorCard extends StatelessWidget {
+  const _HisDoorCard();
+
+  @override
+  Widget build(BuildContext context) => _SlateCard(
+        key: const ValueKey('ttc_partner_his_door'),
+        onTap: () => openTtcSurface(context, 'ttc_door/ttc_male_fertility'),
+        child: Row(children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: ttcSlatePanel,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: const Icon(Icons.biotech_outlined,
+                size: 22, color: ttcSlateInk),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text('His side', style: ttcJakarta(16, color: ttcSlateInk)),
+              const SizedBox(height: 3),
+              Text('Your tests, your habits and what really changes sperm health.',
+                  style: ttcBody(12.5, color: ttcSlateSoft, h: 1.45)),
+            ]),
+          ),
+          const Icon(Icons.chevron_right_rounded, size: 20, color: ttcSlateSoft),
+        ]),
+      );
 }

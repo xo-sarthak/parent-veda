@@ -41,6 +41,32 @@
 //    says "opens the andrologist consult". It opens that offering.
 //  · And the usual-range path now carries the brief's pointer to the
 //    couple-level readiness read in the IVF and IUI area.
+//
+//  ---------------------------------------------------------------------------
+//  ⚠️ THE TOOL REBUILD, 2026-09-27 — what a saved report could not do
+//  ---------------------------------------------------------------------------
+//
+//  The user: "The last report added… 6 September, no sperm found. Now I cannot
+//  delete it." Two causes, one on each side of the save:
+//
+//  · **The date was never asked.** `_keep` filed every report under the day
+//    it was typed in (`DateTime.now()`), so a report from March saved in
+//    September read as September's, and sorted as the "latest" semen analysis
+//    over any real later one. The form now asks "Date on the report" (today
+//    unless changed, past dates only), and the save uses it.
+//  · **Once kept, it could not be reached to change or remove.** That half
+//    lives in Records: every result's page now has Edit and Remove
+//    (`ttc_records_v2.dart`, `ttc_record_edit_screen.dart`). Here, a kept
+//    report that has since been removed from Records no longer claims to be
+//    kept, so "Keep" works again instead of opening a folder without it.
+//  · The result's cards were V1 shadowed cards (`TtcCard`); they are the
+//    tool's white-and-hairline blocks now, the same as Records.
+//
+//  Mobbin, 2026-09-27: Noom's result sheet (the value, one plain paragraph,
+//  one clear button, https://mobbin.com/screens/1f2f8877-44b0-49b8-a833-9615bb596c9a)
+//  and Zocdoc's "What you can do after your visit" rows
+//  (https://mobbin.com/screens/51f39cd3-2442-40e5-97ca-0fb69840d0ab) back the
+//  order already chosen: next steps under the headline, numbers after.
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -56,8 +82,11 @@ import '../../ttc/ttc_records_store.dart';
 import '../../ttc/ttc_semen_limits.dart';
 import '../../ttc/ttc_semen_reading.dart';
 import 'ttc_common.dart';
+import 'ttc_record_edit_screen.dart' show TtcRecordDateField;
+import 'ttc_records_v2.dart' show TtcRecordPanel;
 // import 'ttc_focus_screen.dart' show TtcFocusScreen; // kept for revert: the old IVF gateway push (2026-09-26)
 import 'doors/ttc_door_screen.dart' show openTtcDoor;
+import '../products/pv_store_chrome.dart' show pvSnack;
 import 'ttc_prepare_screen.dart';
 import 'ttc_surface_router.dart';
 import 'ttc_tool_chrome.dart';
@@ -107,6 +136,17 @@ class _TtcSemenReportScreenState extends State<TtcSemenReportScreen> {
   /// rather than writing a duplicate.
   String? _keptId;
 
+  /// The date printed on the report, which is the date the record is filed
+  /// under. Today until he changes it. See the header: this used to be
+  /// `DateTime.now()` at the moment of saving, never asked.
+  DateTime _takenOn = DateTime.now();
+
+  /// Kept, and still in Records. A report he has since removed from Records
+  /// is not "kept" any more, so the button offers to keep it again.
+  bool get _isKept =>
+      _keptId != null &&
+      TtcRecordsStore.instance.records.any((r) => r.id == _keptId);
+
   void _set(TtcSemenEntry next) => setState(() {
         _e = next;
         // ⚠️ EDITING A NUMBER CLOSES THE READING. Leaving an old reading on
@@ -138,10 +178,12 @@ class _TtcSemenReportScreenState extends State<TtcSemenReportScreen> {
     // cleared by the read.
     await store.ensureLoaded();
     if (!mounted) return;
-    if (_keptId == null) {
+    if (!_isKept) {
       final r = store.add(
         label: 'Semen analysis',
-        takenOn: DateTime.now(),
+        // The report's own date (2026-09-27). Kept for revert:
+        // takenOn: DateTime.now(),
+        takenOn: _takenOn,
         testId: 'semen',
         value: ttcSemenRecordValue(_e),
         note: ttcSemenRecordNote(_e),
@@ -153,6 +195,10 @@ class _TtcSemenReportScreenState extends State<TtcSemenReportScreen> {
       // that was already kept. The test caught it; the user would have
       // tapped twice and trusted the app less.
       setState(() => _keptId = r.id);
+      // Said at the moment it happens (tools pass, 2026-09-27): the folder
+      // used to just open on top, so nothing said the tap had worked.
+      pvSnack(context, 'Saved to your reports.',
+          icon: Icons.check_rounded, lift: 24);
     }
     openTtcSurface(context, 'ttc_records');
   }
@@ -160,11 +206,27 @@ class _TtcSemenReportScreenState extends State<TtcSemenReportScreen> {
   @override
   Widget build(BuildContext context) {
     if (_read) {
-      return _Result(
-        reading: ttcReadSemenReport(_e),
-        kept: _keptId != null,
-        onKeep: _keep,
-        onEdit: () => setState(() => _read = false),
+      Widget result(BuildContext context) => _Result(
+            reading: ttcReadSemenReport(_e),
+            kept: _isKept,
+            onKeep: _keep,
+            onEdit: () => setState(() => _read = false),
+          );
+      // Listens to Records once something is kept, so removing the saved
+      // report there turns "Kept" back into "Keep" here when he comes back
+      // (2026-09-27).
+      //
+      // ⚠️ ONLY ONCE KEPT, AND THE REASON IS WHERE A SINGLETON IS BORN.
+      // Touching `TtcRecordsStore.instance` builds the store, and its
+      // constructor starts an async load in whatever zone it is built in.
+      // Listening from the first frame built it during the reading, before
+      // any save, and under a test's fake clock that load never finished,
+      // so a later "Keep" waited for ever. A store should be first touched
+      // by the code that needs it; here that is `_keep`.
+      if (_keptId == null) return result(context);
+      return ListenableBuilder(
+        listenable: TtcRecordsStore.instance,
+        builder: (context, _) => result(context),
       );
     }
 
@@ -175,10 +237,13 @@ class _TtcSemenReportScreenState extends State<TtcSemenReportScreen> {
       hue: kHisSideHue,
       eyebrow: 'His side',
       title: 'Read your\nsemen report.',
-      intro: "Type in what the report says and we'll explain it in plain "
-          "English. It won't tell you whether you're fertile, because nothing "
-          'can from one sheet of paper. Every answer ends with someone you can '
-          'take it to.',
+      // Shorter, and says what to do first (2026-09-27). Kept for revert:
+      // "Type in what the report says and we'll explain it in plain English.
+      // It won't tell you whether you're fertile, because nothing can from
+      // one sheet of paper. Every answer ends with someone you can take it to."
+      intro: 'Copy the numbers from the lab report and we\'ll explain each '
+          "one in plain words. One report can't tell you whether you're "
+          'fertile, so every answer ends with someone you can take it to.',
       children: [
         ttcToolPad(Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -194,7 +259,10 @@ class _TtcSemenReportScreenState extends State<TtcSemenReportScreen> {
               n: 1,
               hue: kHisSideHue,
               title: 'Does the report say no sperm were found?',
-              note: 'Sometimes written as azoospermia.',
+              // Says what to do if unsure (2026-09-27). Kept for revert:
+              // 'Sometimes written as azoospermia.'
+              note: "Sometimes written as azoospermia. If you're not sure, "
+                  'choose No and type in the numbers.',
               child: TtcToolChoice<bool>(
                 value: _noSperm,
                 hue: kHisSideHue,
@@ -206,17 +274,54 @@ class _TtcSemenReportScreenState extends State<TtcSemenReportScreen> {
               ),
             ),
 
+            // ⚠️ TWO SHORT PARTS, ONE SCROLL (tools pass, 2026-09-27): the
+            // four numbers that matter, then a few details, each under its
+            // own heading, so he can see what counts and how long it is.
+            //
+            // ⚠️ EACH NUMBER SAYS WHAT HIS LAB MAY CALL IT, AND CHECKS ITS
+            // UNIT. Labs print these in different words and units, and a
+            // total count typed as a per-ml number is the likeliest way to a
+            // wrong line. Presentation only: the WHO reference values in
+            // `ttc_semen_limits.dart` are untouched. Kept for revert: each
+            // question's note was `kTtcSemenLimits[i].plain` alone.
             if (!_e.noSpermFound) ...[
+              const SizedBox(height: 6),
+              ttcSectionTitle('The four main numbers'),
               for (var i = 0; i < kTtcSemenLimits.length; i++)
                 _NumberQuestion(
+                  key: ValueKey('ttc_semen_q_${kTtcSemenLimits[i].id}'),
                   n: i + 2,
                   title: kTtcSemenLimits[i].name,
                   note: kTtcSemenLimits[i].plain,
+                  labNames: kTtcSemenLabNames[kTtcSemenLimits[i].id],
+                  check: ttcSemenUnitCheck(kTtcSemenLimits[i].id, _e.values),
                   unit: kTtcSemenLimits[i].unit,
                   value: _e.values[kTtcSemenLimits[i].id],
                   onChanged: (v) => _put(kTtcSemenLimits[i].id, v),
                 ),
             ],
+            const SizedBox(height: 6),
+            ttcSectionTitle('A few details'),
+
+            // ⚠️ ASKED, BECAUSE IT IS THE DATE THE REPORT IS FILED UNDER
+            // (2026-09-27). It was never asked, and a saved report took the
+            // day it was typed in. Past dates only.
+            TtcToolQuestion(
+              n: base + 1,
+              hue: kHisSideHue,
+              title: 'Date on the report',
+              note: 'The day the lab tested the sample. It is the date your '
+                  'reports will show.',
+              child: TtcRecordDateField(
+                fieldKey: const ValueKey('ttc_semen_date'),
+                taken: _takenOn,
+                onPick: (d) => setState(() {
+                  _takenOn = d;
+                  // A different date is a different save.
+                  _keptId = null;
+                }),
+              ),
+            ),
 
             // ⚠️ VOLUME IS ASKED AND NEVER COMPARED. It is on the report, it is
             // worth keeping with the result, and it is not one of the four
@@ -229,7 +334,7 @@ class _TtcSemenReportScreenState extends State<TtcSemenReportScreen> {
             // report" is a real answer rather than a blank he has to decide
             // about.
             _NumberQuestion(
-              n: base + 1,
+              n: base + 2,
               title: 'Volume',
               note: "It's printed on the report, because the lab measures it, "
                   "not you. This one is optional. It's shown here, not "
@@ -249,7 +354,7 @@ class _TtcSemenReportScreenState extends State<TtcSemenReportScreen> {
             ),
 
             TtcToolQuestion(
-              n: base + 2,
+              n: base + 3,
               hue: kHisSideHue,
               title: 'Was this the first test, or a repeat?',
               child: TtcToolChoice<bool>(
@@ -265,7 +370,7 @@ class _TtcSemenReportScreenState extends State<TtcSemenReportScreen> {
             // result could say "produced after 1 day" about a sample produced
             // after twelve hours. He knows the number; he types it.
             _NumberQuestion(
-              n: base + 3,
+              n: base + 4,
               title: 'Days since the last ejaculation',
               note: 'The standard window is $kTtcAbstinenceMinDays to '
                   '$kTtcAbstinenceMaxDays days. Leave it blank if you\'re not '
@@ -279,7 +384,7 @@ class _TtcSemenReportScreenState extends State<TtcSemenReportScreen> {
             ),
 
             TtcToolQuestion(
-              n: base + 4,
+              n: base + 5,
               hue: kHisSideHue,
               title: 'Any of these?',
               note: 'Tap anything that applies. None of these is common, and '
@@ -335,6 +440,7 @@ class _TtcSemenReportScreenState extends State<TtcSemenReportScreen> {
 /// blocks now white-and-hairline, a grey field would be the odd one out.
 class _NumberQuestion extends StatefulWidget {
   const _NumberQuestion({
+    super.key,
     required this.n,
     required this.title,
     required this.note,
@@ -346,11 +452,19 @@ class _NumberQuestion extends StatefulWidget {
     this.unknownLabel,
     this.unknown = false,
     this.onUnknown,
+    this.labNames,
+    this.check,
   });
 
   final int n;
   final String title;
   final String note;
+
+  /// "On your report it may say ...": the other names labs print it under.
+  final String? labNames;
+
+  /// A gentle "check this" line when the number looks like the wrong unit.
+  final String? check;
   final String unit;
   final double? value;
   final ValueChanged<double?> onChanged;
@@ -399,67 +513,125 @@ class _NumberQuestionState extends State<_NumberQuestion> {
       n: widget.n,
       hue: kHisSideHue,
       title: widget.title,
-      note: widget.note,
-      child: Row(children: [
-        SizedBox(
-          width: 108,
-          child: AnimatedOpacity(
-            duration: const Duration(milliseconds: 160),
-            opacity: widget.enabled ? 1 : 0.45,
-            child: TextField(
-              controller: _c,
-              enabled: widget.enabled,
-              keyboardType:
-                  TextInputType.numberWithOptions(decimal: !widget.whole),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(
-                    RegExp(widget.whole ? r'[0-9]' : r'[0-9.]')),
-              ],
-              onChanged: (s) {
-                setState(() {});
-                widget.onChanged(
-                    s.trim().isEmpty ? null : double.tryParse(s));
-              },
-              style: ttcBody(15, color: ttcTitleInk, w: FontWeight.w800),
-              decoration: InputDecoration(
-                isDense: true,
-                filled: true,
-                fillColor: Colors.white,
-                hintText: '—',
-                hintStyle: ttcBody(15, color: ttcMuted),
-                contentPadding:
-                    const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide:
-                      BorderSide(color: has ? ttcTitleInk : ttcLine, width: 1.5),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: ttcTitleInk, width: 1.5),
-                ),
-                disabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(14),
-                  borderSide: const BorderSide(color: ttcLine, width: 1.5),
+      note: widget.labNames == null
+          ? widget.note
+          : '${widget.note} ${widget.labNames}',
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          SizedBox(
+            width: 108,
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 160),
+              opacity: widget.enabled ? 1 : 0.45,
+              child: TextField(
+                controller: _c,
+                enabled: widget.enabled,
+                keyboardType:
+                    TextInputType.numberWithOptions(decimal: !widget.whole),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(
+                      RegExp(widget.whole ? r'[0-9]' : r'[0-9.]')),
+                ],
+                onChanged: (s) {
+                  setState(() {});
+                  widget.onChanged(
+                      s.trim().isEmpty ? null : double.tryParse(s));
+                },
+                style: ttcBody(15, color: ttcTitleInk, w: FontWeight.w800),
+                decoration: InputDecoration(
+                  isDense: true,
+                  filled: true,
+                  fillColor: Colors.white,
+                  // No dash placeholder (2026-09-27): it read like a value
+                  // already filled in. Kept for revert: hintText: '—'.
+                  hintStyle: ttcBody(15, color: ttcMuted),
+                  contentPadding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide:
+                        BorderSide(color: has ? ttcTitleInk : ttcLine, width: 1.5),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(color: ttcTitleInk, width: 1.5),
+                  ),
+                  disabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(14),
+                    borderSide: const BorderSide(color: ttcLine, width: 1.5),
+                  ),
                 ),
               ),
             ),
           ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Text(widget.unit, style: ttcBody(13, color: ttcSoft, h: 1.4)),
-        ),
-        if (widget.unknownLabel case final label?)
-          TtcToolPill(
-            label: label,
-            on: widget.unknown,
-            hue: kHisSideHue,
-            onTap: () => widget.onUnknown?.call(!widget.unknown),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(widget.unit, style: ttcBody(13, color: ttcSoft, h: 1.4)),
           ),
+          // Flexible (2026-09-27): at phone width the pill beside a wide
+          // field overflowed the row.
+          if (widget.unknownLabel case final label?)
+            Flexible(
+              child: TtcToolPill(
+                label: label,
+                on: widget.unknown,
+                hue: kHisSideHue,
+                onTap: () => widget.onUnknown?.call(!widget.unknown),
+              ),
+            ),
+        ]),
+        if (widget.check case final c?) ...[
+          const SizedBox(height: 10),
+          Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            const Icon(Icons.info_outline_rounded, size: 16, color: ttcSoft),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(c,
+                  key: const ValueKey('ttc_semen_unit_check'),
+                  style: ttcBody(12.5, color: ttcTitleInk, h: 1.5)),
+            ),
+          ]),
+        ],
       ]),
     );
   }
+}
+
+/// What labs may call each of the four numbers, so he can match his report's
+/// words to ours (tools pass, 2026-09-27). Names only; no value changes.
+const Map<String, String> kTtcSemenLabNames = {
+  'concentration': 'Your report may call it sperm count or sperm '
+      'concentration, per ml.',
+  'total_motility': 'Your report may call it motility or total motility '
+      "(PR + NP). If it lists grades, it's a + b + c added together.",
+  'progressive_motility': 'Your report may call it progressive motility, '
+      "PR, or rapid and slow progressive. If it lists grades, it's a + b.",
+  'morphology': 'Your report may call it normal forms, normal morphology or '
+      'Kruger (strict).',
+};
+
+/// A gentle "check this" when a typed number looks like the wrong unit.
+/// Never blocks and never changes a value: it only asks him to look again.
+String? ttcSemenUnitCheck(String id, Map<String, double> values) {
+  final v = values[id];
+  if (v == null) return null;
+  final percent = id != 'concentration';
+  if (percent && v > 100) {
+    return "A share can't be more than 100 per cent. Check this number "
+        'on your report.';
+  }
+  if (id == 'concentration' && v > 150) {
+    return 'Just checking: is this the per ml number? Some reports also '
+        'print a total for the whole sample, which is much bigger.';
+  }
+  if (id == 'progressive_motility') {
+    final total = values['total_motility'];
+    if (total != null && v > total) {
+      return "Progressive motility is part of total motility, so it's "
+          "usually the smaller number. Check the two aren't swapped.";
+    }
+  }
+  return null;
 }
 
 // =============================================================================
@@ -511,8 +683,8 @@ class _Result extends StatelessWidget {
             const SizedBox(height: 22),
 
             if (reading.extra != null) ...[
-              TtcCard(
-                color: ttcPanel,
+              // Kept for revert (2026-09-27): a shadowed V1 TtcCard in grey.
+              TtcRecordPanel(
                 child: Text(reading.extra!,
                     style: ttcBody(13.5, color: ttcTitleInk, h: 1.6)),
               ),
@@ -520,7 +692,7 @@ class _Result extends StatelessWidget {
             ],
 
             if (reading.abstinenceNote != null) ...[
-              TtcCard(
+              TtcRecordPanel(
                 child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -536,6 +708,45 @@ class _Result extends StatelessWidget {
               const SizedBox(height: 18),
             ],
 
+            // ---- what to do, FIRST (tools pass, 2026-09-27) -----------------
+            // It sat under every number card, at the very bottom. The next
+            // step is what he most needs, so it comes straight after the
+            // headline. The free step leads; the paid consult leads only when
+            // the reading itself says to see someone first (no sperm found,
+            // or a warning sign). Kept for revert: this section came after
+            // the numbers and the gateway, with the consult always primary
+            // and the save labelled 'Keep his reports with yours'.
+            ttcSectionTitle('What to do with this'),
+            if (reading.route == TtcSemenRoute.urgent ||
+                reading.route == TtcSemenRoute.azoospermia) ...[
+              TtcToolPrimary(
+                label: 'Have the report read properly',
+                onTap: () => _openAndrologist(context),
+              ),
+              const SizedBox(height: 10),
+              TtcToolSecondary(
+                label: kept
+                    ? 'Kept with your reports. Open the folder'
+                    : 'Keep this with your reports',
+                onTap: onKeep,
+              ),
+            ] else ...[
+              TtcToolPrimary(
+                label: kept
+                    ? 'Kept with your reports. Open the folder'
+                    : 'Keep this with your reports',
+                onTap: onKeep,
+              ),
+              const SizedBox(height: 10),
+              TtcToolSecondary(
+                label: 'Have the report read properly',
+                onTap: () => _openAndrologist(context),
+              ),
+            ],
+            const SizedBox(height: 10),
+            TtcToolSecondary(label: 'Change an answer', onTap: onEdit),
+            const SizedBox(height: 24),
+
             // ---- the numbers, one line each --------------------------------
             if (reading.entered.isNotEmpty ||
                 reading.volumeSentence != null) ...[
@@ -546,7 +757,7 @@ class _Result extends StatelessWidget {
                   const SizedBox(height: 10),
                 ],
               if (reading.volumeSentence case final v?) ...[
-                TtcCard(
+                TtcRecordPanel(
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -575,20 +786,12 @@ class _Result extends StatelessWidget {
             ],
 
             // ---- the two actions every path ends with ----------------------
-            ttcSectionTitle('What to do with this'),
-            TtcToolPrimary(
-              label: 'Have the report read properly',
-              onTap: () => _openAndrologist(context),
-            ),
-            const SizedBox(height: 10),
-            TtcToolSecondary(
-              label: kept
-                  ? 'Kept with your reports. Open the folder'
-                  : 'Keep his reports with yours',
-              onTap: onKeep,
-            ),
-            const SizedBox(height: 10),
-            TtcToolSecondary(label: 'Change something', onTap: onEdit),
+            // Moved above the numbers (2026-09-27); kept for revert:
+            // ttcSectionTitle('What to do with this'),
+            // TtcToolPrimary(label: 'Have the report read properly', ...),
+            // TtcToolSecondary(label: kept ? 'Kept with your reports. Open
+            //     the folder' : 'Keep his reports with yours', ...),
+            // TtcToolSecondary(label: 'Change something', onTap: onEdit),
 
             const SizedBox(height: 22),
             // ⚠️ THE LAST WORD ON EVERY PATH. Not a legal line — the actual
@@ -614,7 +817,7 @@ class _LineCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (!line.entered) {
-      return TtcCard(
+      return TtcRecordPanel(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(line.limit.name,
               style: ttcBody(13.5, color: ttcMuted, w: FontWeight.w700)),
@@ -625,7 +828,7 @@ class _LineCard extends StatelessWidget {
       );
     }
 
-    return TtcCard(
+    return TtcRecordPanel(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Expanded(child: Text(line.limit.name, style: ttcJakarta(14.5))),

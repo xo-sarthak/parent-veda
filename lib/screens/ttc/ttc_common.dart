@@ -26,6 +26,7 @@ import '../../ttc/ttc_chapter.dart';
 import '../../widgets/global_ask_fab.dart';
 import 'ttc_calendar_screen.dart';
 import 'ttc_community_screen.dart';
+import 'ttc_cycle_palette.dart' show TtcCycleColours;
 // Kept for revert: More left the bar on 2026-09-26 (its rows live in You).
 // import 'ttc_more_screen.dart';
 import 'ttc_learn_screen.dart';
@@ -370,21 +371,19 @@ class TtcEmpty extends StatelessWidget {
 //  Intensity carries the meaning instead of hue, which also means the reading
 //  survives colour blindness and a greyscale screenshot.
 
-Color ttcFertilityTint(FertilityLevel f) {
-  switch (f) {
-    case FertilityLevel.low:
-      return ttcPanel;
-    case FertilityLevel.medium:
-      return const Color(0xFFF6ECFA);
-    case FertilityLevel.high:
-      return ttcCoralTint;
-    case FertilityLevel.peak:
-      return const Color(0xFFFFE3EA);
-  }
-}
+//
+//  ⚠️ NOW THE CYCLE PALETTE'S VIOLET RAMP (2026-09-27, night): fertile days
+//  were pink here, green on the ring and violet on the Fertile window tool.
+//  One ramp (`TtcCycleColours.fertileLevel`) for all of them. Still one hue
+//  with intensity carrying the meaning, as above. Kept for revert: low
+//  ttcPanel, medium 0xFFF6ECFA, high ttcCoralTint, peak 0xFFFFE3EA, and
+//  ttcFertilityInk returning ttcCoral.
+Color ttcFertilityTint(FertilityLevel f) => f == FertilityLevel.low
+    ? ttcPanel
+    : TtcCycleColours.fertileLevel(f);
 
 Color ttcFertilityInk(FertilityLevel f) =>
-    f == FertilityLevel.low ? ttcSoft : ttcCoral;
+    f == FertilityLevel.low ? ttcSoft : TtcCycleColours.fertileInk;
 
 /// Diagonal-striped placeholder standing in for imagery and video until real
 /// media exists. The same convention the parenting module uses, so a missing
@@ -709,6 +708,12 @@ int ttcV3ActiveFor(String? route, int v1Active) {
   switch (route) {
     case ttcHomeRoute:
       return 0;
+    // ⚠️ THE CALENDAR IS TODAY'S (launch walk, 2026-09-27). Its front door is
+    // the home header's calendar button, so lighting "You" told her she had
+    // changed tab when she had only opened a page of Today.
+    case 'ttc_calendar':
+    case 'ttc/calendar':
+      return 0;
     case kTtcLearnRoute:
     case 'ttc_learn': // the same screen if a door ever opens it as a surface
       return 1;
@@ -924,6 +929,26 @@ class TtcBottomNav extends StatelessWidget {
           activeIndex: index,
           onTap: (i) =>
               onV3 ? openTtcTabV3(context, i) : openTtcTab(context, i),
+          // The lit tab still answers (launch walk, 2026-09-27): from a page
+          // pushed on Today (the calendar) Today goes home; on a tab's own
+          // screen it scrolls that screen back to the top.
+          onReselect: onV3
+              ? (i) {
+                  final route = ModalRoute.of(context);
+                  if (route != null && !route.isFirst &&
+                      route.settings.name != ttcHomeRoute &&
+                      i == 0) {
+                    openTtcTabV3(context, 0);
+                    return;
+                  }
+                  final c = PrimaryScrollController.maybeOf(context);
+                  if (c != null && c.hasClients) {
+                    c.animateTo(0,
+                        duration: const Duration(milliseconds: 350),
+                        curve: Curves.easeOutCubic);
+                  }
+                }
+              : null,
           accent: slate ? ttcSlate : ttcPurple,
         );
       },
@@ -984,7 +1009,10 @@ class _TtcPageState extends State<TtcPage> {
     final overlay = widget.overlay;
     final children = widget.children;
     return Scaffold(
-      backgroundColor: widget.slate ? ttcSlateBg : ttcBg,
+      // White for both halves (2026-09-27): her V3 home is on white, and
+      // his sand ground made his half read as the older app beside hers.
+      // Kept for revert: widget.slate ? ttcSlateBg : ttcBg,
+      backgroundColor: ttcBg,
       body: Stack(children: [
         Positioned.fill(
           child: SafeArea(

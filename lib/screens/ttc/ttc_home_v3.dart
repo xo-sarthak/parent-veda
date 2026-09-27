@@ -45,6 +45,8 @@
 import 'package:flutter/material.dart';
 import '../brackets/hub/journey_screen.dart';
 import '../../data/journeys/journey_registry.dart';
+import 'ttc_journal_screen.dart' show writeTtcEntry;
+import '../../ttc/ttc_journal_store.dart' show TtcEntryKind;
 import 'ttc_prepare_screen.dart';
 import '../../data/hubs/ttc_hubs.dart';
 import '../brackets/hub/hub_owed_screen.dart';
@@ -57,7 +59,8 @@ import '../../services/life_stage_store.dart';
 import '../../services/ttc_surfaces.dart';
 import '../../theme/pv_fonts.dart';
 import '../../widgets/pv_feedback.dart';
-import '../products/pv_store_chrome.dart' show pvSnack;
+import '../products/pv_store_chrome.dart' show pvSnack, PvCardRail;
+import '../../services/pv_catalog_store.dart';
 
 import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_daily_data.dart';
@@ -110,6 +113,11 @@ import 'ttc_daily_insights.dart';
 // import 'ttc_insight_screen.dart'; // kept for revert — the insight opens in the reader now
 import 'ttc_journey_map_screen.dart';
 import 'ttc_symptom_mark.dart';
+import 'ttc_cycle_palette.dart' show TtcCycleColours;
+import '../brackets/hub/hub_intent_art.dart' show IntentMark;
+import '../doors/pv_list_row.dart' show PvMarkWell, pvWellInk;
+import '../../data/brackets/ttc_brackets.dart' show kTtcBrackets;
+import '../../models/pv_read.dart' show PvRead;
 import 'ttc_shop_v3.dart' show openTtcProductPage;
 import 'ttc_products_screen.dart';
 import 'ttc_profile_screen.dart';
@@ -705,7 +713,24 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                           : 'Recommended products for you',
                       p: p)),
                   const SizedBox(height: 14),
-                  _ProductRail(p: p, hinglish: hinglish),
+                  // ⚠️ THE STORE'S OWN CARDS, WITH THEIR PHOTOGRAPHS (launch
+                  // walk, 2026-09-27). This rail drew TTC's product guides as
+                  // flat tinted blocks with a bag glyph, on the first screen a
+                  // new user scrolls, while the Products tab showed the same
+                  // things photographed. The same "where most couples start"
+                  // pick as the Products tab; the guide rail stays for when
+                  // the catalogue has nothing (a feature is never hidden).
+                  // Kept for revert: _ProductRail(p: p, hinglish: hinglish),
+                  ListenableBuilder(
+                    listenable: PvCatalogStore.instance,
+                    builder: (context, _) {
+                      final picks = PvCatalogStore.instance
+                          .forYou(LifeStage.tryingToConceive);
+                      return picks.isEmpty
+                          ? _ProductRail(p: p, hinglish: hinglish)
+                          : PvCardRail(products: picks, scope: 'ttc_home');
+                    },
+                  ),
                   const SizedBox(height: 32),
 
                   // ---- RECOMMENDED READS -----------------------------------
@@ -751,12 +776,18 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   //   )),
                   //   const SizedBox(height: 10),
                   //   _pad(_ChapterTabs(p: p, chapter: chapter)),
-                  _pad(_ChapterCard(
-                      p: p,
-                      hinglish: hinglish,
-                      chapter: chapter,
-                      onOpen: () => _openSurface(context, 'ttc_chapter'))),
-                  const SizedBox(height: 12),
+                  // ⚠️ NO CHAPTER CARD UNDER "RECOMMENDED READS" (the user,
+                  // 2026-09-27: "Recommended reads for today should only carry
+                  // the reads… what is this Trying Together… why is it even
+                  // present?"). A chapter card is not a read, and its name
+                  // explained nothing. The chapter reader stays reachable from
+                  // the journey map and Learn. Kept for revert:
+                  //   _pad(_ChapterCard(
+                  //       p: p,
+                  //       hinglish: hinglish,
+                  //       chapter: chapter,
+                  //       onOpen: () => _openSurface(context, 'ttc_chapter'))),
+                  //   const SizedBox(height: 12),
 
                   // ⚠️ THE LIBRARY, WHICH THE CHAPTER CARD ALSO CANNOT REACH.
                   // `kTtcReads` is the largest body of content in the stage and
@@ -770,12 +801,16 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   // whole library, which four cards never were.
                   _ReadRail(
                       p: p, hinglish: hinglish, day: _selected, phase: phase),
-                  const SizedBox(height: 12),
-                  _pad(_SeeAllRow(
-                      key: const ValueKey('ttc_home_reads_see_all'),
-                      label: kTtcSeeEverything,
-                      p: p,
-                      onTap: () => openTtcTabV3(context, 1))),
+                  // ⚠️ NO "SEE EVERYTHING" ROW (the user, 2026-09-27: "see
+                  // everything is not needed"). The reads are the section;
+                  // every read is one tap away on the Learn tab in the bar.
+                  // Kept for revert:
+                  //   const SizedBox(height: 12),
+                  //   _pad(_SeeAllRow(
+                  //       key: const ValueKey('ttc_home_reads_see_all'),
+                  //       label: kTtcSeeEverything,
+                  //       p: p,
+                  //       onTap: () => openTtcTabV3(context, 1))),
                   const SizedBox(height: 32),
 
                   // ---- JOURNAL ---------------------------------------------
@@ -843,17 +878,49 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                       title: hinglish
                           ? 'Aaj ka kuch rakh lein'
                           : 'Keep something from today',
+                      action: 'See all',
+                      onAction: () => _openSurface(context, 'ttc_journal'),
                       p: p)),
                   const SizedBox(height: 14),
-                  _pad(_JournalInvite(
+                  // ⚠️ THE JOURNAL, AS THE PREGNANCY HOME DRAWS IT (the user,
+                  // 2026-09-27: "looks very vague… improve the
+                  // representation"). A pen in a well, a paragraph and four
+                  // grey chips read as a form. Now three drawn tiles, one per
+                  // kind of writing, each opening that writer; the way to
+                  // everything written is "See all" in the heading, not a row
+                  // of its own. Kept for revert: the `_JournalInvite` call below.
+                  _pad(_TtcJournalTiles(
                     p: p,
-                    hinglish: hinglish,
-                    onWrite: () => _openSurface(context, 'ttc_journal'),
-                    onFelt: () => _openSurface(context, 'ttc_journal'),
-                    onLog: () => _openSurface(context, 'ttc_calendar'),
-                    onUs: () => _openSurface(context, 'ttc_partner'),
-                    onOpenAll: () => _openSurface(context, 'ttc_journal'),
+                    onNoticed: () =>
+                        writeTtcEntry(context, kind: TtcEntryKind.memory),
+                    onFelt: () =>
+                        writeTtcEntry(context, kind: TtcEntryKind.feeling),
+                    onDoctor: () =>
+                        writeTtcEntry(context, kind: TtcEntryKind.question),
                   )),
+                  // _pad(_JournalInvite(
+                    // p: p,
+                    // hinglish: hinglish,
+                    // // ⚠️ EACH CHIP OPENS WHAT IT SAYS (launch walk,
+                    // // 2026-09-27). "Write" and "How today felt" opened the
+                    // // journal's front page, one tap short; "Log for today"
+                    // // opened the CALENDAR; "The two of you" opened the
+                    // // partner screen (his side is its own pass, the user's
+                    // // call). Now: a memory, a feeling, the logger, and a
+                    // // question for the doctor, the journal's own kinds.
+                    // // Kept for revert:
+                    // //   onWrite/onFelt: _openSurface(context, 'ttc_journal'),
+                    // //   onLog: _openSurface(context, 'ttc_calendar'),
+                    // //   onUs: _openSurface(context, 'ttc_partner'),
+                    // onWrite: () =>
+                        // writeTtcEntry(context, kind: TtcEntryKind.memory),
+                    // onFelt: () =>
+                        // writeTtcEntry(context, kind: TtcEntryKind.feeling),
+                    // onLog: () => _openSurface(context, 'ttc_symptom_log'),
+                    // onUs: () =>
+                        // writeTtcEntry(context, kind: TtcEntryKind.question),
+                    // onOpenAll: () => _openSurface(context, 'ttc_journal'),
+                  // )),
                   const SizedBox(height: 32),
 
                   // ---- PEOPLE ----------------------------------------------
@@ -885,17 +952,38 @@ class _TtcHomeV3State extends State<TtcHomeV3>
                   //     mark: V3DailyMark.capsule,
                   //     onTap: () => _openSurface(context, 'ttc_prepare'),
                   //   )),
+                  // ⚠️ "SEE ALL" SITS IN THE HEADING (the user, 2026-09-27:
+                  // "a button with that functionality taking so much space
+                  // like its own row… how is that a good user experience?").
+                  // The consults, not the whole catalogue, as before.
                   _pad(_Head(
                       eyebrow: hinglish ? 'Log' : 'People',
                       title: hinglish ? 'Expert se baat karein' : 'Talk to experts',
+                      action: 'See all',
+                      onAction: () => Navigator.of(context).push(
+                          MaterialPageRoute<void>(
+                              settings:
+                                  const RouteSettings(name: 'ttc/consults'),
+                              builder: (_) => const TtcPrepareScreen(
+                                  onlyCategory: 'consults'))),
                       p: p)),
                   const SizedBox(height: 14),
                   _ExpertRail(p: p, hinglish: hinglish),
-                  const SizedBox(height: 12),
-                  _pad(_SeeAllRow(
-                      label: hinglish ? 'Sabko dekhein' : 'See everyone',
-                      p: p,
-                      onTap: () => _openSurface(context, 'ttc_prepare'))),
+                  // Kept for revert: the full-width "See everyone" row.
+                  // const SizedBox(height: 12),
+                  // _pad(_SeeAllRow(
+                      // label: hinglish ? 'Sabko dekhein' : 'See everyone',
+                      // p: p,
+                      // // The consults, not the whole catalogue (2026-09-27):
+                      // // "See everyone" under "Talk to experts" opened every
+                      // // course and class, pregnancy's included. Kept for
+                      // // revert: _openSurface(context, 'ttc_prepare').
+                      // onTap: () => Navigator.of(context).push(
+                          // MaterialPageRoute<void>(
+                              // settings:
+                                  // const RouteSettings(name: 'ttc/consults'),
+                              // builder: (_) => const TtcPrepareScreen(
+                                  // onlyCategory: 'consults'))))),
                   const SizedBox(height: 26),
 
                   // ---- THE DOOR OUT ----------------------------------------
@@ -1418,7 +1506,8 @@ class _CycleHeader extends StatelessWidget {
               selected: selected,
               late: late,
               onTap: onCycle),
-          const SizedBox(height: 18),
+          // 18 before the launch walk tightened the hero (2026-09-27).
+          const SizedBox(height: 10),
 
           // ---- the hero's note (gap analysis, "Behind: Home & daily", P1) --
           //
@@ -1449,50 +1538,39 @@ class _CycleHeader extends StatelessWidget {
           // reader cannot tell a disabled button from the button that always
           // looked like that. **A resting state that borrows the disabled
           // state's only signal leaves you with no disabled state.**
-          Row(children: [
-            Expanded(
-              child: _HeaderAction(
-                label: t.headerEditPeriod,
+          // ⚠️ ONE ROW OF FOUR, ONE DESIGN (2026-09-27). Asked for directly:
+          // "they seem to take so much space and don't look good, also unify
+          // their button design". The four were two families on two rows
+          // (white filled pills, then hairline chips), about 106pt of the
+          // hero. Now they are one row of the same round button with a short
+          // word under it, the shape of the header's own circles and of a
+          // quick-log row in Withings
+          // (https://mobbin.com/screens/4bbe6258-860c-4a84-8287-df86a6702988):
+          // about 70pt, and none of the four looks more important than
+          // another. Every rule the old rows held still holds: the SELECTED
+          // day, never today by default; dimmed on a day not lived yet; Sex
+          // drawn only when intimacy content is shown; Sex and Test making way
+          // for the blood test while an IVF-shaped round runs; a selected Sex
+          // is ink with a white icon (§4.0), with a haptic and an Undo.
+          // Kept for revert below: the two rows as they were.
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _HeroQuickAction(
+                key: const ValueKey('ttc_home_quick_period'),
+                label: 'Period',
+                semantic: t.headerEditPeriod,
                 icon: Icons.water_drop_outlined,
                 p: p,
                 onTap: () => logTtcPeriod(context),
               ),
-            ),
-            const SizedBox(width: 10),
-            Expanded(
-              child: _HeaderAction(
-                label: t.headerCheckSymptoms,
-                icon: Icons.favorite_border_rounded,
+              _HeroQuickAction(
+                key: const ValueKey('ttc_home_quick_symptoms'),
+                label: 'Symptoms',
+                semantic: t.headerCheckSymptoms,
+                icon: Icons.checklist_rounded,
                 p: p,
-                // ⚠️ A DAY THAT HAS NOT HAPPENED CANNOT BE LOGGED. Asked for
-                // directly — *"I should not be able to log symptoms in future
-                // dates"* — and it is the right rule for a reason beyond
-                // tidiness: this store is what the cycle report reads, and a
-                // symptom recorded against next Tuesday would sit in her
-                // history as a fact about a day nobody has lived.
-                //
-                // Disabled, not hidden. A control that vanishes on some dates
-                // makes the row jump as she walks the strip, and she would have
-                // to work out why. Dimmed, it says "not this day" and stays
-                // where her thumb expects it.
-                enabled: !selected.isAfter(todayDate),
-                // ⚠️ THE SELECTED DAY, NOT TODAY. Reported as *"if I go back to
-                // 29th August and click Check symptoms, it opens the symptoms
-                // for the current day."* It did: the push named no date, so the
-                // logger defaulted to `DateTime.now()`.
-                //
-                // That is the worst class of bug on a logging screen, because
-                // it is silent and it CORRUPTS. She thinks she is recording
-                // Saturday, the row lands on Monday, and every surface reading
-                // this store — the strip, the report, the calendar — is now
-                // confidently wrong about her body.
-                //
-                // ⚠️ THE NEW LOGGER, NOT `TtcTrackerScreen`. The generic
-                // tracker rendered six five-point sliders, which asked her to
-                // GRADE feelings she had already had and gave nothing back.
-                // `TtcSymptomLogScreen` writes to the same tracker id, so the
-                // calendar, the day strip and everything else reading
-                // `symptoms` keeps working across the change.
+                enabled: !future,
                 onTap: () => Navigator.of(context).push(
                     MaterialPageRoute<void>(
                         settings:
@@ -1500,49 +1578,12 @@ class _CycleHeader extends StatelessWidget {
                         builder: (_) =>
                             TtcSymptomLogScreen(day: selected))),
               ),
-            ),
-          ]),
-
-          // ---- one tap: sex, and a test (gap analysis, P2) ------------------
-          //
-          // ⚠️ SEX WRITES THE LOGGER'S OWN FIELD. One tap records it for the
-          // day on the strip, a second tap takes it off; it is the
-          // `sex_unprotected` chip under `symptoms`, the same fact the logger,
-          // the calendar and the report already read, never a second key.
-          // Test opens the logger at the two test cards, which is the choice
-          // the gap analysis asked for. Both dim on a future day, for the
-          // reason written on "Check symptoms" above.
-          const SizedBox(height: 10),
-          // ⚠️ HIDDEN WHILE AN IVF-SHAPED ROUND RUNS (2026-09-26, §3e), and
-          // the blood test named in its place: a clinic often asks for no sex
-          // before his sample, and a home test before the blood test can
-          // mislead. It comes back the day the round closes
-          // (`ttcHomeHidesQuickRow`). Kept for revert: the row, always.
-          //
-          // ⚠️ THE REVIEW PASS (2026-09-26, H3, H4, H5):
-          //  · SECONDARY WEIGHT. Sex and Test are two compact chips under the
-          //    two main actions (a hairline, no fill), so the hero's pills do
-          //    not compete: one line, two actions, two small chips (Flo's
-          //    late day, FLO-LATE,
-          //    https://mobbin.com/screens/f92aea87-388d-42b6-b3b0-fb36b9b71a84).
-          //  · "HIDE SEX AND INTIMACY CONTENT" REACHES THIS ROW. With it on,
-          //    the Sex chip is not drawn at all and Test takes the row; a
-          //    neutral relabel would still log sex from a word that hides it.
-          //    Logging it stays in the symptom logger, where she chose it.
-          //  · THE ON-STATE IS INK (§4.0: a selected chip is ink1 with a white
-          //    label), with a haptic, and a white notice that says it is
-          //    logged with an Undo (E7).
-          // Kept for revert: two full-width `_HeaderAction` pills, the Sex one
-          // with a rose tinted fill when on, drawn whatever the switch said.
-          if (ttcHomeHidesQuickRow(selected))
-            _BloodTestLine(day: selected, p: p)
-          else
-          Row(children: [
-            if (!TtcContentPrefs.instance.hideIntimate) ...[
-              Expanded(
-                child: _QuickChip(
+              if (!ttcHomeHidesQuickRow(selected) &&
+                  !TtcContentPrefs.instance.hideIntimate)
+                _HeroQuickAction(
                   key: const ValueKey('ttc_home_quick_sex'),
                   label: kTtcQuickSex,
+                  semantic: sexOn ? 'Sex logged. Tap to take it off' : 'Log sex',
                   icon: sexOn
                       ? Icons.favorite_rounded
                       : Icons.favorite_border_rounded,
@@ -1567,43 +1608,269 @@ class _CycleHeader extends StatelessWidget {
                     );
                   },
                 ),
-              ),
-              const SizedBox(width: 10),
+              if (!ttcHomeHidesQuickRow(selected))
+                _HeroQuickAction(
+                  key: const ValueKey('ttc_home_quick_test'),
+                  label: kTtcQuickTest,
+                  semantic: 'Log a test',
+                  icon: Icons.science_outlined,
+                  p: p,
+                  enabled: !future,
+                  onTap: () {
+                    pvCommitFeedback();
+                    Navigator.of(context).push(MaterialPageRoute<void>(
+                        settings: const RouteSettings(name: 'ttc/symptom_log'),
+                        builder: (_) => TtcSymptomLogScreen(
+                            day: selected, focusGroup: kTtcTestGroupToOpen)));
+                  },
+                ),
             ],
-            Expanded(
-              child: _QuickChip(
-                key: const ValueKey('ttc_home_quick_test'),
-                label: kTtcQuickTest,
-                icon: Icons.science_outlined,
-                p: p,
-                enabled: !future,
-                onTap: () {
-                  pvCommitFeedback();
-                  Navigator.of(context).push(MaterialPageRoute<void>(
-                      settings: const RouteSettings(name: 'ttc/symptom_log'),
-                      builder: (_) => TtcSymptomLogScreen(
-                          day: selected, focusGroup: kTtcTestGroupToOpen)));
-                },
-              ),
-            ),
-          ]),
+          ),
+          if (ttcHomeHidesQuickRow(selected)) ...[
+            const SizedBox(height: 10),
+            _BloodTestLine(day: selected, p: p),
+          ],
+          // Kept for revert (2026-09-27): the two rows of pills and chips.
+          // Row(children: [
+          // Expanded(
+          // child: _HeaderAction(
+          // label: t.headerEditPeriod,
+          // icon: Icons.water_drop_outlined,
+          // p: p,
+          // onTap: () => logTtcPeriod(context),
+          // ),
+          // ),
+          // const SizedBox(width: 10),
+          // Expanded(
+          // child: _HeaderAction(
+          // label: t.headerCheckSymptoms,
+          // icon: Icons.favorite_border_rounded,
+          // p: p,
+          // // ⚠️ A DAY THAT HAS NOT HAPPENED CANNOT BE LOGGED. Asked for
+          // // directly — *"I should not be able to log symptoms in future
+          // // dates"* — and it is the right rule for a reason beyond
+          // // tidiness: this store is what the cycle report reads, and a
+          // // symptom recorded against next Tuesday would sit in her
+          // // history as a fact about a day nobody has lived.
+          // //
+          // // Disabled, not hidden. A control that vanishes on some dates
+          // // makes the row jump as she walks the strip, and she would have
+          // // to work out why. Dimmed, it says "not this day" and stays
+          // // where her thumb expects it.
+          // enabled: !selected.isAfter(todayDate),
+          // // ⚠️ THE SELECTED DAY, NOT TODAY. Reported as *"if I go back to
+          // // 29th August and click Check symptoms, it opens the symptoms
+          // // for the current day."* It did: the push named no date, so the
+          // // logger defaulted to `DateTime.now()`.
+          // //
+          // // That is the worst class of bug on a logging screen, because
+          // // it is silent and it CORRUPTS. She thinks she is recording
+          // // Saturday, the row lands on Monday, and every surface reading
+          // // this store — the strip, the report, the calendar — is now
+          // // confidently wrong about her body.
+          // //
+          // // ⚠️ THE NEW LOGGER, NOT `TtcTrackerScreen`. The generic
+          // // tracker rendered six five-point sliders, which asked her to
+          // // GRADE feelings she had already had and gave nothing back.
+          // // `TtcSymptomLogScreen` writes to the same tracker id, so the
+          // // calendar, the day strip and everything else reading
+          // // `symptoms` keeps working across the change.
+          // onTap: () => Navigator.of(context).push(
+          // MaterialPageRoute<void>(
+          // settings:
+          // const RouteSettings(name: 'ttc/symptom_log'),
+          // builder: (_) =>
+          // TtcSymptomLogScreen(day: selected))),
+          // ),
+          // ),
+          // ]),
+          //
+          // // ---- one tap: sex, and a test (gap analysis, P2) ------------------
+          // //
+          // // ⚠️ SEX WRITES THE LOGGER'S OWN FIELD. One tap records it for the
+          // // day on the strip, a second tap takes it off; it is the
+          // // `sex_unprotected` chip under `symptoms`, the same fact the logger,
+          // // the calendar and the report already read, never a second key.
+          // // Test opens the logger at the two test cards, which is the choice
+          // // the gap analysis asked for. Both dim on a future day, for the
+          // // reason written on "Check symptoms" above.
+          // const SizedBox(height: 10),
+          // // ⚠️ HIDDEN WHILE AN IVF-SHAPED ROUND RUNS (2026-09-26, §3e), and
+          // // the blood test named in its place: a clinic often asks for no sex
+          // // before his sample, and a home test before the blood test can
+          // // mislead. It comes back the day the round closes
+          // // (`ttcHomeHidesQuickRow`). Kept for revert: the row, always.
+          // //
+          // // ⚠️ THE REVIEW PASS (2026-09-26, H3, H4, H5):
+          // //  · SECONDARY WEIGHT. Sex and Test are two compact chips under the
+          // //    two main actions (a hairline, no fill), so the hero's pills do
+          // //    not compete: one line, two actions, two small chips (Flo's
+          // //    late day, FLO-LATE,
+          // //    https://mobbin.com/screens/f92aea87-388d-42b6-b3b0-fb36b9b71a84).
+          // //  · "HIDE SEX AND INTIMACY CONTENT" REACHES THIS ROW. With it on,
+          // //    the Sex chip is not drawn at all and Test takes the row; a
+          // //    neutral relabel would still log sex from a word that hides it.
+          // //    Logging it stays in the symptom logger, where she chose it.
+          // //  · THE ON-STATE IS INK (§4.0: a selected chip is ink1 with a white
+          // //    label), with a haptic, and a white notice that says it is
+          // //    logged with an Undo (E7).
+          // // Kept for revert: two full-width `_HeaderAction` pills, the Sex one
+          // // with a rose tinted fill when on, drawn whatever the switch said.
+          // if (ttcHomeHidesQuickRow(selected))
+          // _BloodTestLine(day: selected, p: p)
+          // else
+          // Row(children: [
+          // if (!TtcContentPrefs.instance.hideIntimate) ...[
+          // Expanded(
+          // child: _QuickChip(
+          // key: const ValueKey('ttc_home_quick_sex'),
+          // label: kTtcQuickSex,
+          // icon: sexOn
+          // ? Icons.favorite_rounded
+          // : Icons.favorite_border_rounded,
+          // p: p,
+          // on: sexOn,
+          // enabled: !future,
+          // onTap: () {
+          // pvCommitFeedback();
+          // final logged = ttcToggleSexOn(selected);
+          // if (!logged) return;
+          // final day = selected == todayDate
+          // ? 'today'
+          // : '${selected.day} ${_months[selected.month - 1]}';
+          // pvSnack(
+          // context,
+          // 'Logged for $day',
+          // icon: Icons.check_rounded,
+          // action: 'Undo',
+          // onAction: () {
+          // if (ttcSexLoggedOn(selected)) ttcToggleSexOn(selected);
+          // },
+          // );
+          // },
+          // ),
+          // ),
+          // const SizedBox(width: 10),
+          // ],
+          // Expanded(
+          // child: _QuickChip(
+          // key: const ValueKey('ttc_home_quick_test'),
+          // label: kTtcQuickTest,
+          // icon: Icons.science_outlined,
+          // p: p,
+          // enabled: !future,
+          // onTap: () {
+          // pvCommitFeedback();
+          // Navigator.of(context).push(MaterialPageRoute<void>(
+          // settings: const RouteSettings(name: 'ttc/symptom_log'),
+          // builder: (_) => TtcSymptomLogScreen(
+          // day: selected, focusGroup: kTtcTestGroupToOpen)));
+          // },
+          // ),
+          // ),
+          // ]),
         ]),
       ),
     );
   }
 }
 
+/// One of the hero's four quick actions (2026-09-27): a round button with a
+/// short word under it, the same object for all four, so the row reads as one
+/// set rather than two kinds of button. A white disc like the header's own
+/// circles; ON (Sex logged) is an ink disc with a white filled icon (§4.0).
+/// Dimmed as one object on a day that has not happened. The whole column is
+/// the tap target, well over 44pt.
+class _HeroQuickAction extends StatelessWidget {
+  const _HeroQuickAction({
+    super.key,
+    required this.label,
+    required this.semantic,
+    required this.icon,
+    required this.p,
+    required this.onTap,
+    this.enabled = true,
+    this.on,
+  });
+
+  /// The short word under the disc.
+  final String label;
+
+  /// What a screen reader says: the full action ("Edit period dates").
+  final String semantic;
+  final IconData icon;
+  final V2Palette p;
+  final VoidCallback onTap;
+  final bool enabled;
+  final bool? on;
+
+  @override
+  Widget build(BuildContext context) {
+    final lit = on == true;
+    final body = SizedBox(
+      width: 72,
+      child: Column(mainAxisSize: MainAxisSize.min, children: [
+        Container(
+          width: 48,
+          height: 48,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: lit ? p.ink1 : p.surface,
+            shape: BoxShape.circle,
+            border: Border.all(color: lit ? p.ink1 : p.line),
+          ),
+          child: Icon(icon, size: 20, color: lit ? Colors.white : p.ink1),
+        ),
+        const SizedBox(height: 6),
+        Text(label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: pvManrope(
+                fontSize: 11.5, fontWeight: FontWeight.w700, color: p.ink1)),
+      ]),
+    );
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      toggled: on,
+      label: semantic,
+      // ⚠️ excludeSemantics DROPS THE INKWELL'S TAP ACTION TOO, so the node
+      // must carry it itself, or a screen reader hears "button" and cannot
+      // press it (found on the device walk, 2026-09-27).
+      onTap: enabled ? onTap : null,
+      excludeSemantics: true,
+      child: PvPress(
+        enabled: enabled,
+        child: InkWell(
+          onTap: enabled ? onTap : null,
+          borderRadius: BorderRadius.circular(16),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 2),
+            child: enabled ? body : Opacity(opacity: 0.42, child: body),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
 /// One of the two small one-tap chips under the hero's actions (H4, H5):
 /// a hairline, no fill, 44pt tall; ON is an ink fill with a white label and
 /// a filled icon. Dimmed as one object on a day that has not happened.
+// ignore: unused_element (kept for revert since 2026-09-27; `_HeroQuickAction` draws all four)
 class _QuickChip extends StatelessWidget {
   const _QuickChip({
+    // ignore: unused_element_parameter
     super.key,
     required this.label,
     required this.icon,
     required this.p,
     required this.onTap,
+    // ignore: unused_element_parameter
     this.enabled = true,
+    // ignore: unused_element_parameter
     this.on,
   });
 
@@ -1672,6 +1939,9 @@ class _BloodTestLine extends StatelessWidget {
     return Semantics(
       button: true,
       label: label,
+      // excludeSemantics drops the child's tap action, so the node
+      // carries it (accessibility sweep, TTC launch walk, 2026-09-27).
+      onTap: () => _openSurface(context, 'ttc_treatment'),
       excludeSemantics: true,
       child: Material(
         key: const ValueKey('ttc_home_blood_test_line'),
@@ -1757,7 +2027,11 @@ class _WeekStrip extends StatelessWidget {
         selected: selected,
         today: today,
         onSelect: onSelect,
-        accent: ttcCoral,
+        // ⚠️ INK, NOT CORAL (2026-09-28): the cycle palette gives rose to the
+        // period alone (`TtcCycleColours`); a rose "today" circle read as a
+        // period day. Today and selected are ink on every cycle view.
+        // Kept for revert: accent: ttcCoral,
+        accent: TtcCycleColours.today,
         keyPrefix: 'ttc_day_',
         // ---- WHAT SHE LOGGED ------------------------------------------------
         //
@@ -1773,8 +2047,11 @@ class _WeekStrip extends StatelessWidget {
           if (marks.shown.isEmpty) return null;
           return selected
               ? _MarkRow(marks: marks, p: p)
+              // The heart she asked for, in the palette's "logged" ink
+              // (2026-09-28). Kept for revert: ttcCoral at 0.75.
               : Icon(Icons.favorite_rounded,
-                  size: 10, color: ttcCoral.withValues(alpha: 0.75));
+                  size: 10,
+                  color: TtcCycleColours.logged.withValues(alpha: 0.75));
         },
       );
 }
@@ -2279,7 +2556,12 @@ class _WindowLine extends StatelessWidget {
   /// Centred, so the ~25 of slack on a short day splits either side and is
   /// invisible instead of pooling at one end. Measure the worst case that
   /// HAPPENS, not the worst case the layout can express.
-  static const double blockHeight = 150;
+  /// ⚠️ 128 SINCE THE LAUNCH WALK (2026-09-27): at 150 the usual one-line
+  /// answer left about sixty points of empty band between the date range and
+  /// the four quick buttons. The FittedBox below scales the rare long pairing
+  /// down rather than clipping it, so tightening costs nothing there.
+  /// Kept for revert: static const double blockHeight = 150;
+  static const double blockHeight = 128;
 
   @override
   Widget build(BuildContext context) {
@@ -2592,21 +2874,44 @@ class _WindowLine extends StatelessWidget {
               // The whole block has always been tappable; the mark is what says
               // so. The cycle day itself did not go anywhere: it is the first
               // insight card, six lines down this same screen.
-              Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                Expanded(
-                  child: Text(sub,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                      style: pvManrope(
-                          fontSize: 13, height: 1.4, color: p.ink2)),
+              // ⚠️ THE ⓘ FOLLOWS THE WORDS IT EXPLAINS (the user, launch walk,
+              // 2026-09-27: "that i button on hero seems in odd position").
+              // It sat at the far right of the block, level with a short date
+              // line, so it floated alone at the screen's edge. Inline now,
+              // right after the dates. Kept for revert: Row(Expanded(Text(sub)),
+              // SizedBox(width: 8), Padding(top: 2, Icon(info, 15, ink3))).
+              // ⚠️ A PILL WITH A CHEVRON, NOT AN ⓘ (the user, 2026-09-27:
+              // "do we even need the i button… it looks out of form"). An ⓘ
+              // promises an explanation; this opens her cycle. The dates sit
+              // in a soft pill that ends in a chevron, the way a tappable
+              // summary reads everywhere else in the app. Kept for revert: the
+              // Row of Flexible(Text(sub)), SizedBox(6) and
+              // Icon(info_outline_rounded, 17, p.action).
+              Container(
+                padding: const EdgeInsets.fromLTRB(12, 7, 8, 7),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.72),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: p.line),
                 ),
-                const SizedBox(width: 8),
-                Padding(
-                  padding: const EdgeInsets.only(top: 2),
-                  child: Icon(Icons.info_outline_rounded,
-                      size: 15, color: p.ink3),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Flexible(
+                      child: Text(sub,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: pvManrope(
+                              fontSize: 13,
+                              height: 1.3,
+                              fontWeight: FontWeight.w600,
+                              color: p.ink1)),
+                    ),
+                    const SizedBox(width: 2),
+                    Icon(Icons.chevron_right_rounded, size: 18, color: p.ink2),
+                  ],
                 ),
-              ]),
+              ),
             ]),
         ),
         ),
@@ -2663,6 +2968,7 @@ class _RoundButton extends StatelessWidget {
       );
 }
 
+// ignore: unused_element (kept for revert since 2026-09-27; `_HeroQuickAction` draws all four)
 class _HeaderAction extends StatelessWidget {
   // `key` and `on` were for the one-tap Sex pill, which is `_QuickChip` since
   // the review pass (H4, H5). Kept for revert: `super.key,` and `this.on,`.
@@ -2671,6 +2977,7 @@ class _HeaderAction extends StatelessWidget {
     required this.icon,
     required this.p,
     required this.onTap,
+    // ignore: unused_element_parameter
     this.enabled = true,
   });
 
@@ -2927,11 +3234,21 @@ class _Sheet extends StatelessWidget {
 }
 
 class _Head extends StatelessWidget {
-  const _Head({required this.eyebrow, required this.title, required this.p});
+  const _Head(
+      {required this.eyebrow,
+      required this.title,
+      required this.p,
+      this.action,
+      this.onAction});
 
   final String eyebrow;
   final String title;
   final V2Palette p;
+
+  /// A short link at the right of the title ("See all"), in place of a
+  /// full-width row under the section (2026-09-27).
+  final String? action;
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) =>
@@ -2963,13 +3280,40 @@ class _Head extends StatelessWidget {
                   color: p.action)),
           const SizedBox(height: 5),
         ],
-        Text(title,
-            style: pvFraunces(
-                fontSize: 22,
-                fontWeight: FontWeight.w600,
-                height: 1.2,
-                letterSpacing: -0.5,
-                color: p.ink1)),
+        Row(crossAxisAlignment: CrossAxisAlignment.end, children: [
+          Expanded(
+            child: Text(title,
+                style: pvFraunces(
+                    fontSize: 22,
+                    fontWeight: FontWeight.w600,
+                    height: 1.2,
+                    letterSpacing: -0.5,
+                    color: p.ink1)),
+          ),
+          if (action != null && onAction != null)
+            Semantics(
+              button: true,
+              label: action,
+              excludeSemantics: true,
+              onTap: onAction,
+              child: InkWell(
+                onTap: onAction,
+                borderRadius: BorderRadius.circular(999),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(10, 6, 2, 3),
+                  child: Row(mainAxisSize: MainAxisSize.min, children: [
+                    Text(action!,
+                        style: pvManrope(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w700,
+                            color: p.action)),
+                    Icon(Icons.chevron_right_rounded,
+                        size: 18, color: p.action),
+                  ]),
+                ),
+              ),
+            ),
+        ]),
       ]);
 }
 
@@ -4260,83 +4604,128 @@ class _ReadRail extends StatelessWidget {
               kTtcReads[(_dayOfYear() + i) % kTtcReads.length],
           ];
 
-    return SizedBox(
-      height: 236,
-      child: ListView.separated(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 18),
-        itemCount: picks.length,
-        separatorBuilder: (_, _) => const SizedBox(width: 12),
-        itemBuilder: (context, i) {
-          final read = picks[i];
-          final tint = v2BlockTint(read.hue, p);
-          final deep = HSLColor.fromColor(tint).withLightness(0.82).toColor();
-          return SizedBox(
-            width: 210,
-            child: InkWell(
-              onTap: () =>
-                  openTtcSurface(context, '$kTtcReadPrefix${read.id}'),
-              borderRadius: BorderRadius.circular(20),
-              child: Container(
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: p.surface,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: p.line),
-                ),
-                child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        height: 86,
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(14),
-                          gradient: LinearGradient(
-                              begin: Alignment.topLeft,
-                              end: Alignment.bottomRight,
-                              colors: [tint, deep]),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      _Chip(
-                          label:
-                              '${TtcS.current().readOpen} · ${read.minutes} min',
-                          p: p),
-                      const SizedBox(height: 8),
-                      Text(hinglish ? read.title.hi : read.title.en,
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                          style: pvFraunces(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w600,
-                              height: 1.25,
-                              letterSpacing: -0.3,
-                              color: p.ink1)),
-                      const SizedBox(height: 4),
-                      // ⚠️ `Expanded`, so a two-line title and a standfirst
-                      // share the card's fixed height without either
-                      // overflowing — the parenting rail's lesson.
-                      Expanded(
-                        child: Text(
-                            hinglish ? read.teaser.hi : read.teaser.en,
-                            maxLines: 2,
-                            overflow: TextOverflow.ellipsis,
-                            style: pvManrope(
-                                fontSize: 12.5, height: 1.4, color: p.ink2)),
-                      ),
-                    ]),
-              ),
-            ),
-          );
-        },
-      ),
+    // ⚠️ ROWS, NOT A RAIL (the user, 2026-09-27: one app, one way to show
+    // the same section, and the best one). Three reads as rows: the photo or
+    // the door's drawn page mark, the title in the serif, and the topic with
+    // its reading time. The pregnancy home already shows reads this way, and
+    // Learn and the doors draw a read as a row too. Flo's rail of full-photo
+    // cards (Mobbin 05fec5cd-4ac8-4fab-b374-04d47cc994ab) needs a strong
+    // picture for every read; without one our rail showed empty book-icon
+    // boxes. Rows also make reading the thing to do, not something to swipe
+    // past. The rail below is kept for revert, unreached.
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 18),
+      child: Column(children: [
+        for (final read in picks.take(3))
+          _ReadRow(
+            key: ValueKey('ttc_home_read_${read.id}'),
+            read: read,
+            p: p,
+            hinglish: hinglish,
+            onTap: () => openTtcSurface(context, '$kTtcReadPrefix${read.id}'),
+          ),
+      ]),
     );
+    // return SizedBox(
+    //   height: 236,
+    //   child: ListView.separated(
+    //     scrollDirection: Axis.horizontal,
+    //     padding: const EdgeInsets.symmetric(horizontal: 18),
+    //     itemCount: picks.length,
+    //     separatorBuilder: (_, _) => const SizedBox(width: 12),
+    //     itemBuilder: (context, i) {
+    //       final read = picks[i];
+    //       final tint = v2BlockTint(read.hue, p);
+    //       final deep = HSLColor.fromColor(tint).withLightness(0.82).toColor();
+    //       return SizedBox(
+    //         width: 210,
+    //         child: InkWell(
+    //           onTap: () =>
+    //               openTtcSurface(context, '$kTtcReadPrefix${read.id}'),
+    //           borderRadius: BorderRadius.circular(20),
+    //           child: Container(
+    //             padding: const EdgeInsets.all(14),
+    //             decoration: BoxDecoration(
+    //               color: p.surface,
+    //               borderRadius: BorderRadius.circular(20),
+    //               border: Border.all(color: p.line),
+    //             ),
+    //             child: Column(
+    //                 crossAxisAlignment: CrossAxisAlignment.start,
+    //                 children: [
+    //                   // ⚠️ NEVER AN EMPTY BLOCK (launch walk, 2026-09-27):
+    //                   // the tinted gradient read as a picture that failed to
+    //                   // load. The read's photograph when it has one, else the
+    //                   // same tint carrying a book mark, so it reads as meant.
+    //                   // Kept for revert: the bare gradient Container.
+    //                   ClipRRect(
+    //                     borderRadius: BorderRadius.circular(14),
+    //                     child: SizedBox(
+    //                       height: 86,
+    //                       width: double.infinity,
+    //                       child: read.imageUrl != null
+    //                           ? Image.network(read.imageUrl!,
+    //                               fit: BoxFit.cover,
+    //                               errorBuilder: (_, _, _) =>
+    //                                   _readMark(tint, deep))
+    //                           : _readMark(tint, deep),
+    //                     ),
+    //                   ),
+    //                   const SizedBox(height: 10),
+    //                   _Chip(
+    //                       label:
+    //                           '${TtcS.current().readOpen} · ${read.minutes} min',
+    //                       p: p),
+    //                   const SizedBox(height: 8),
+    //                   Text(hinglish ? read.title.hi : read.title.en,
+    //                       maxLines: 2,
+    //                       overflow: TextOverflow.ellipsis,
+    //                       style: pvFraunces(
+    //                           fontSize: 15,
+    //                           fontWeight: FontWeight.w600,
+    //                           height: 1.25,
+    //                           letterSpacing: -0.3,
+    //                           color: p.ink1)),
+    //                   const SizedBox(height: 4),
+    //                   // ⚠️ `Expanded`, so a two-line title and a standfirst
+    //                   // share the card's fixed height without either
+    //                   // overflowing — the parenting rail's lesson.
+    //                   Expanded(
+    //                     child: Text(
+    //                         hinglish ? read.teaser.hi : read.teaser.en,
+    //                         maxLines: 2,
+    //                         overflow: TextOverflow.ellipsis,
+    //                         style: pvManrope(
+    //                             fontSize: 12.5, height: 1.4, color: p.ink2)),
+    //                   ),
+    //                 ]),
+    //           ),
+    //         ),
+    //       );
+    //     },
+    //   ),
+    // );
   }
 
   /// Same day-of-year rotation `ttcPickForToday` uses, so the reads rail turns
   /// over on the same schedule as everything else on this page rather than on
   /// one of its own.
+  /// The tint with a book mark, for a read without a photograph.
+  // Unreached since the reads became rows (2026-09-27); kept for revert.
+  // ignore: unused_element
+  Widget _readMark(Color tint, Color deep) => DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [tint, deep]),
+        ),
+        child: Center(
+          child: Icon(Icons.menu_book_rounded,
+              size: 30, color: p.ink1.withValues(alpha: 0.55)),
+        ),
+      );
+
   static int _dayOfYear() {
     final now = DateTime.now();
     return now.difference(DateTime(now.year, 1, 1)).inDays;
@@ -4791,29 +5180,56 @@ class _TestDoor extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final t = TtcS.current();
-    return InkWell(
-      onTap: () => recordPositiveTest(context),
-      borderRadius: BorderRadius.circular(8),
-      child: Container(
-        padding: const EdgeInsets.only(top: 20),
-        decoration: BoxDecoration(
-          border: Border(top: BorderSide(color: p.line)),
-        ),
-        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-          Row(children: [
-            Expanded(
-              child: Text(t.transitionRecord,
-                  style: pvManrope(
-                      fontSize: 13.5,
-                      fontWeight: FontWeight.w700,
-                      color: p.ink1)),
+    // ⚠️ A CARD SHE WILL SEE (the user, 2026-09-27: "record a positive test is
+    // just plain text that won't even get noticed"). Still no celebration,
+    // no push to test: a white card with a drawn well, the words, and a
+    // chevron, like every other door on this page. Kept for revert: the
+    // hairline-topped text row (padding top 20, Border(top: p.line)).
+    return Material(
+      color: p.surface,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(color: p.line)),
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: () => recordPositiveTest(context),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(14, 14, 12, 14),
+          child: Row(children: [
+            // The Test button's icon (2026-09-27): the drawn capsule read as
+            // a medicine. Kept for revert: V3DailyArt(mark: V3DailyMark.capsule).
+            Container(
+              width: 48,
+              height: 48,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: v2BlockTint(152, p),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Icon(Icons.science_outlined,
+                  size: 24, color: pvWellInk(v2BlockTint(152, p))),
             ),
-            Icon(Icons.chevron_right_rounded, size: 18, color: p.ink3),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(t.transitionRecord,
+                        style: pvFraunces(
+                            fontSize: 17,
+                            fontWeight: FontWeight.w600,
+                            height: 1.25,
+                            color: p.ink1)),
+                    const SizedBox(height: 3),
+                    Text(t.transitionRecordBody,
+                        style: pvManrope(
+                            fontSize: 13, height: 1.45, color: p.ink2)),
+                  ]),
+            ),
+            const SizedBox(width: 6),
+            Icon(Icons.chevron_right_rounded, size: 20, color: p.ink3),
           ]),
-          const SizedBox(height: 4),
-          Text(t.transitionRecordBody,
-              style: pvManrope(fontSize: 13, height: 1.45, color: p.ink2)),
-        ]),
+        ),
       ),
     );
   }
@@ -5067,6 +5483,8 @@ class _RitualRow extends StatelessWidget {
 
 /// A small uppercase format chip, sized to its word wherever it is placed.
 /// Same widget as parenting's, including the `widthFactor` fix.
+// Unreached since the reads became rows (2026-09-27); kept for revert.
+// ignore: unused_element
 class _Chip extends StatelessWidget {
   const _Chip({required this.label, required this.p});
 
@@ -5379,8 +5797,15 @@ class _SanskarCard extends StatelessWidget {
                                 letterSpacing: -0.3,
                                 color: p.ink1)),
                         const SizedBox(height: 3),
-                        Text(item.part.why(hinglish),
-                            maxLines: 2,
+                        // ⚠️ THE THING ITSELF, NOT WHAT IT IS FOR (2026-09-27,
+                        // the user's simplicity pass). "One small thought, to
+                        // read slowly" beside a Done button left her asking
+                        // what the thought was. The card shows today's
+                        // thought, question or step, so she can do it here and
+                        // tap Done. Kept for revert: item.part.why(hinglish),
+                        // two lines.
+                        Text(item.text(hinglish),
+                            maxLines: 3,
                             overflow: TextOverflow.ellipsis,
                             style: pvManrope(
                                 fontSize: 12.5, height: 1.4, color: p.ink2)),
@@ -5453,6 +5878,8 @@ class _SanskarCard extends StatelessWidget {
 /// The chapter card with its three tabs ON it, as pills: Me · Us · What's
 /// next, each opening the chapter reader at that tab. Tapping the card body
 /// opens the reader at its default.
+// Unreached since 2026-09-27 (the user's simplicity pass); kept for revert.
+// ignore: unused_element
 class _ChapterCard extends StatelessWidget {
   const _ChapterCard(
       {required this.p,
@@ -5470,10 +5897,14 @@ class _ChapterCard extends StatelessWidget {
       InkWell(
         onTap: () => openTtcChapter(context, chapter, tab: tab),
         borderRadius: BorderRadius.circular(999),
+        // ⚠️ NO `alignment` ON A CONTAINER INSIDE A WRAP (launch walk,
+        // 2026-09-27): a Container with an alignment expands to the width it
+        // is offered, so the three pills each filled the line and stacked as
+        // three full-width buttons. Sized by padding instead. Kept for revert:
+        //   height: 30, padding: symmetric(horizontal: 13),
+        //   alignment: Alignment.center,
         child: Container(
-          height: 30,
-          padding: const EdgeInsets.symmetric(horizontal: 13),
-          alignment: Alignment.center,
+          padding: const EdgeInsets.symmetric(horizontal: 13, vertical: 8),
           decoration: BoxDecoration(
             color: lead
                 ? p.action.withValues(alpha: 0.08)
@@ -5529,7 +5960,12 @@ class _ChapterCard extends StatelessWidget {
                             letterSpacing: -0.3,
                             color: p.ink1)),
                     const SizedBox(height: 4),
-                    Text(chapter.nextUp(hinglish),
+                    // ⚠️ WHAT THIS PART OF THE MONTH IS, NOT WHAT COMES
+                    // NEXT (2026-09-27). "Next: The Waiting Days, once
+                    // ovulation has passed" explained one invented name with
+                    // another. Kept for revert:
+                    //   Text(chapter.nextUp(hinglish), ...)
+                    Text(ttcChapterPlainPart(chapter),
                         style: pvManrope(
                             fontSize: 12.5, height: 1.4, color: p.ink2)),
                   ]),
@@ -5540,8 +5976,11 @@ class _ChapterCard extends StatelessWidget {
         // "Me" leads because it is the reader's default tab — the one the
         // card body opens — and the pill says so before she taps.
         Wrap(spacing: 8, runSpacing: 8, children: [
-          _pill(context, t.shortcutMe, TtcChapterTab.me, lead: true),
-          _pill(context, t.shortcutUs, TtcChapterTab.us),
+          // Who each tab is for, said plainly (2026-09-27). "Me" and "Us"
+          // on a card that also names a chapter read as labels, not doors.
+          // Kept for revert: t.shortcutMe, t.shortcutUs, t.shortcutNext.
+          _pill(context, 'For you', TtcChapterTab.me, lead: true),
+          _pill(context, 'For you both', TtcChapterTab.us),
           _pill(context, t.shortcutNext, TtcChapterTab.next),
         ]),
       ]),
@@ -5552,6 +5991,8 @@ class _ChapterCard extends StatelessWidget {
 /// "Keep something from today": the design's card — a tinted well with a
 /// pen beside the prompt, then four entry chips across the card, and "Open
 /// the journal" under it.
+// Unreached since 2026-09-27 (the user's simplicity pass); kept for revert.
+// ignore: unused_element
 class _JournalInvite extends StatelessWidget {
   const _JournalInvite({
     required this.p,
@@ -5628,18 +6069,28 @@ class _JournalInvite extends StatelessWidget {
                         hinglish
                             ? 'Aaj kaisa laga, kuch jo dhyaan mein aaya, ya '
                                 'aap dono ke liye ek note.'
-                            : 'How today felt, something you noticed, or a '
-                                'note for the two of you.',
+                            // Matches the three chips below (2026-09-27).
+                            // Kept for revert: 'How today felt, something you
+                            // noticed, or a note for the two of you.'
+                            : 'Write how today felt, something you noticed, '
+                                'or a question for your doctor.',
                         style: pvManrope(
                             fontSize: 13, height: 1.5, color: p.ink2)),
                   ),
                 ]),
                 const SizedBox(height: 16),
                 Wrap(spacing: 8, runSpacing: 8, children: [
-                  _chip(hinglish ? 'Likhein' : 'Write', onWrite),
+                  // ⚠️ THREE CHIPS, EACH NAMING WHAT IT WRITES (2026-09-27).
+                  // "Write" wrote a memory without saying so, and "Log for
+                  // today" opened the symptom logger: not journal writing, and
+                  // already the Symptoms button at the top of the home. Kept
+                  // for revert:
+                  //   _chip(hinglish ? 'Likhein' : 'Write', onWrite),
+                  //   _chip(hinglish ? 'Aaj ka log' : 'Log for today', onLog),
+                  _chip(hinglish ? 'Likhein' : 'Something you noticed', onWrite),
                   _chip(hinglish ? 'Aaj kaisa laga' : 'How today felt', onFelt),
-                  _chip(hinglish ? 'Aaj ka log' : 'Log for today', onLog),
-                  _chip(hinglish ? 'Aap dono' : 'The two of you', onUs),
+                  // Kept for revert: 'The two of you' (it opened his side).
+                  _chip(hinglish ? 'Doctor ke liye' : 'For the doctor', onUs),
                 ]),
               ]),
         ),
@@ -5677,13 +6128,35 @@ class _ExpertRail extends StatelessWidget {
   final V2Palette p;
   final bool hinglish;
 
+  // ⚠️ PEOPLE, NOT ROLES (TTC launch walk, 2026-09-27; the user: "put them
+  // for now", from the expert roster). The rail showed four bare roles with a
+  // grey person glyph. Now the roster name, a verified tick, what she does and
+  // the price, the same people the consults page lists. Kept for revert:
+  //   ('ttc_consult_gynae', 'Gynaecologist', 'Gynaecologist', 206),
+  //   ('ttc_consult_fertility', 'Fertility specialist', 'Fertility specialist', 268),
+  //   ('ttc_nutrition_consult', 'Nutritionist', 'Nutritionist', 104),
+  //   ('ttc_psych_consult', 'Psychologist', 'Psychologist', 344),
+  // ⚠️ THE ROSTER'S OWN TITLES (2026-09-27, build 11): the home said
+  // "Gynaecologist" and "Fertility specialist" where the consults page, from
+  // the same roster, says "IVF gynaecologist". One person, one title.
+  // Kept for revert: 'Gynaecologist', 'Fertility specialist', 'Nutritionist',
+  // 'Psychologist'.
   static const List<(String, String, String, double)> _experts = [
-    ('ttc_consult_gynae', 'Gynaecologist', 'Gynaecologist', 206),
-    ('ttc_consult_fertility', 'Fertility specialist', 'Fertility specialist',
-        268),
-    ('ttc_nutrition_consult', 'Nutritionist', 'Nutritionist', 104),
-    ('ttc_psych_consult', 'Psychologist', 'Psychologist', 344),
+    ('ttc_consult_gynae', 'Dr Ruchika Sood', 'IVF gynaecologist', 206),
+    ('ttc_consult_fertility', 'Dr Surbhi Sharma',
+        'IVF gynaecologist, Bloom IVF', 268),
+    ('ttc_nutrition_consult', 'Akanksha Srivastava',
+        'Maternal and child nutritionist', 104),
+    ('ttc_psych_consult', 'Parmeshwari', 'Clinical psychologist', 344),
   ];
+
+  static String _initials(String name) => name
+      .replaceAll('Dr ', '')
+      .split(' ')
+      .where((w) => w.isNotEmpty)
+      .take(2)
+      .map((w) => w[0])
+      .join();
 
   @override
   Widget build(BuildContext context) => SizedBox(
@@ -5694,8 +6167,11 @@ class _ExpertRail extends StatelessWidget {
           itemCount: _experts.length,
           separatorBuilder: (_, _) => const SizedBox(width: 12),
           itemBuilder: (context, i) {
-            final (id, en, hi, hue) = _experts[i];
+            final (id, name, role, hue) = _experts[i];
             final offering = ttcOfferingById(id);
+            final price = offering == null
+                ? null
+                : '₹${(offering.priceMinor ~/ 100).toString().replaceAllMapped(RegExp(r'(\d)(?=(\d{3})+$)'), (m) => '${m[1]},')}';
             return SizedBox(
               width: 152,
               child: InkWell(
@@ -5728,24 +6204,37 @@ class _ExpertRail extends StatelessWidget {
                             color: v2BlockTint(hue, p),
                             shape: BoxShape.circle,
                           ),
-                          child: Icon(Icons.person_outline_rounded,
-                              size: 26, color: p.ink1),
+                          // Kept for revert: Icon(Icons.person_outline_rounded,
+                          //     size: 26, color: p.ink1),
+                          child: Text(_initials(name),
+                              style: pvManrope(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                  color: p.ink1)),
                         ),
                         const SizedBox(height: 10),
-                        Text(hinglish ? hi : en,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: pvFraunces(
-                                fontSize: 15,
-                                fontWeight: FontWeight.w600,
-                                height: 1.25,
-                                letterSpacing: -0.3,
-                                color: p.ink1)),
+                        Row(children: [
+                          Flexible(
+                            child: Text(name,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: pvFraunces(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.w600,
+                                    height: 1.25,
+                                    letterSpacing: -0.3,
+                                    color: p.ink1)),
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(Icons.verified_rounded,
+                              size: 14, color: p.action),
+                        ]),
                         const SizedBox(height: 4),
+                        // Kept for revert: 'On video, at a time you choose'.
                         Text(
-                            hinglish
-                                ? 'Video par, aapke waqt par'
-                                : 'On video, at a time you choose',
+                            price == null
+                                ? '$role · on video'
+                                : '$role · $price · on video',
                             maxLines: 2,
                             overflow: TextOverflow.ellipsis,
                             style: pvManrope(
@@ -5760,8 +6249,11 @@ class _ExpertRail extends StatelessWidget {
 }
 
 /// A wide surface card with a label and a chevron — "See everyone".
+// Unreached since 2026-09-27 (the user's simplicity pass); kept for revert.
+// ignore: unused_element
 class _SeeAllRow extends StatelessWidget {
   const _SeeAllRow(
+      // ignore: unused_element_parameter
       {super.key, required this.label, required this.p, required this.onTap});
 
   final String label;
@@ -5791,4 +6283,182 @@ class _SeeAllRow extends StatelessWidget {
           ]),
         ),
       );
+}
+
+/// The home's journal (2026-09-27): three drawn tiles in one card, one per
+/// kind of writing, in the pregnancy home's shape (`V3JournalSection`'s tile
+/// look), and one honest line on who reads it. The way to everything written
+/// is the section heading's "See all", not a full-width row.
+class _TtcJournalTiles extends StatelessWidget {
+  const _TtcJournalTiles({
+    required this.p,
+    required this.onNoticed,
+    required this.onFelt,
+    required this.onDoctor,
+  });
+
+  final V2Palette p;
+  final VoidCallback onNoticed;
+  final VoidCallback onFelt;
+  final VoidCallback onDoctor;
+
+  Widget _tile(String key, String label, V3DailyMark mark, double hue,
+          VoidCallback onTap) =>
+      Expanded(
+        child: Semantics(
+          button: true,
+          label: label.replaceAll('\n', ' '),
+          excludeSemantics: true,
+          onTap: onTap,
+          child: InkWell(
+            key: ValueKey(key),
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(14),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6),
+              child: Column(mainAxisSize: MainAxisSize.min, children: [
+                Container(
+                  height: 58,
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(9),
+                  decoration: BoxDecoration(
+                    color: v2BlockTint(hue, p),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: V3DailyArt(mark: mark, tint: v2BlockTint(hue, p)),
+                ),
+                const SizedBox(height: 8),
+                Text(label,
+                    textAlign: TextAlign.center,
+                    maxLines: 2,
+                    style: pvManrope(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        height: 1.25,
+                        color: p.ink1)),
+              ]),
+            ),
+          ),
+        ),
+      );
+
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.fromLTRB(12, 12, 12, 14),
+        decoration: BoxDecoration(
+          color: p.surface,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: p.line),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Row(children: [
+            // The journal's own name for this kind (2026-09-27): the writer
+            // calls it "A memory". Kept for revert: 'Something\nyou noticed'.
+            _tile('ttc_home_journal_noticed', 'A memory',
+                V3DailyMark.memory, 42, onNoticed),
+            const SizedBox(width: 8),
+            _tile('ttc_home_journal_felt', 'How today\nfelt',
+                V3DailyMark.note, 344, onFelt),
+            const SizedBox(width: 8),
+            _tile('ttc_home_journal_doctor', 'For the\ndoctor',
+                V3DailyMark.capsule, 206, onDoctor),
+          ]),
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 4),
+            child: Row(children: [
+              Icon(Icons.people_outline_rounded, size: 16, color: p.ink3),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text('Your partner can read what you write here.',
+                    style: pvManrope(
+                        fontSize: 12.5, height: 1.4, color: p.ink3)),
+              ),
+            ]),
+          ),
+        ]),
+      );
+}
+
+/// One read on the home, as a row (2026-09-27): 74dp photo or the door's
+/// drawn page mark, the title in the serif, "TOPIC · N MIN READ" under it.
+/// The pregnancy home's row shape (`V3ReadRow`), fed by a `PvRead`.
+class _ReadRow extends StatelessWidget {
+  const _ReadRow({
+    super.key,
+    required this.read,
+    required this.p,
+    required this.hinglish,
+    required this.onTap,
+  });
+
+  final PvRead read;
+  final V2Palette p;
+  final bool hinglish;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final topic = read.kicker.en.trim();
+    // ⚠️ THE DOOR'S OWN DRAWING WHEN THERE IS NO PHOTO (2026-09-27, build 11 on
+    // the phone): three identical pink page icons said nothing. A read's
+    // topic is its door, so it wears that door's mark and tint (the moon for
+    // Fertile window), the same mark the door grid above shows.
+    final door = [
+      for (final b in kTtcBrackets)
+        if (b.label.en == read.kicker.en) b
+    ].firstOrNull;
+    final doorMark = door == null ? null : bracketMarkFor(door.id);
+    final meta = [
+      if (topic.isNotEmpty) topic.toUpperCase(),
+      '${read.minutes} MIN READ',
+    ].join(' · ');
+    return Semantics(
+      button: true,
+      label: '${read.title.en}, ${read.minutes} minute read',
+      excludeSemantics: true,
+      onTap: onTap,
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 7),
+          child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            PvMarkWell(
+                p: p,
+                hue: door?.hue ?? read.hue,
+                size: 74,
+                photo: read.imageUrl,
+                bracket: doorMark,
+                mark: doorMark == null ? IntentMark.pageMark : null),
+            const SizedBox(width: 13),
+            Expanded(
+              child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(hinglish ? read.title.hi : read.title.en,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: pvFraunces(
+                            fontSize: 16,
+                            letterSpacing: -0.4,
+                            fontWeight: FontWeight.w600,
+                            height: 1.25,
+                            color: p.ink1)),
+                    const SizedBox(height: 5),
+                    Text(meta,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: pvManrope(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w700,
+                            letterSpacing: 1.1,
+                            color: p.ink3)),
+                  ]),
+            ),
+          ]),
+        ),
+      ),
+    );
+  }
 }

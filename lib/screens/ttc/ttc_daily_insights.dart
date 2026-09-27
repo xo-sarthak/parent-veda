@@ -198,7 +198,12 @@ List<TtcInsightCard> ttcInsightsFor(DateTime day) {
   if (!clinic && fertility != null && !facts.lookingBack) {
     out.add(TtcInsightCard(
       id: 'chance',
-      eyebrow: 'CHANCE OF CONCEIVING',
+      // ⚠️ SAID PLAINLY (2026-09-27): "Chance of conceiving · Medium" left
+      // her to work out what medium meant and what it was about. The eyebrow
+      // says what is being graded and when; every level says where she is.
+      // Kept for revert: eyebrow 'CHANCE OF CONCEIVING', caption only on
+      // peak and high ('Your fertile days').
+      eyebrow: 'CHANCE OF PREGNANCY TODAY',
       value: switch (fertility) {
         FertilityLevel.peak => 'Highest',
         FertilityLevel.high => 'High',
@@ -206,8 +211,10 @@ List<TtcInsightCard> ttcInsightsFor(DateTime day) {
         FertilityLevel.low => 'Low',
       },
       caption: switch (fertility) {
-        FertilityLevel.peak || FertilityLevel.high => 'Your fertile days',
-        _ => null,
+        FertilityLevel.peak => 'Your best days to try',
+        FertilityLevel.high => 'Your fertile days',
+        FertilityLevel.medium => 'Your fertile days have begun',
+        FertilityLevel.low => 'Not one of your fertile days',
       },
       hue: 42,
       art: TtcInsightArt.level,
@@ -219,8 +226,11 @@ List<TtcInsightCard> ttcInsightsFor(DateTime day) {
   if (cycleDay != null) {
     out.add(TtcInsightCard(
       id: 'cycle_day',
-      eyebrow: 'CYCLE DAY',
+      // "Cycle day 9" assumed she counts from her period (2026-09-27).
+      // Kept for revert: eyebrow 'CYCLE DAY', no caption.
+      eyebrow: 'DAY OF YOUR CYCLE',
       value: '$cycleDay',
+      caption: 'Counted from day 1 of your period',
       hue: 268,
       art: TtcInsightArt.number,
       go: TtcInsightGo.cycle,

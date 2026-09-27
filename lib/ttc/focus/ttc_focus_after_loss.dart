@@ -46,7 +46,9 @@
 
 import 'package:flutter/material.dart' show Icons;
 
-import '../../data/hubs/ttc_hubs.dart' show kTtcActConsult;
+// Unused since the consult tiles name their offering (2026-09-27,
+// relevance audit). Kept for revert:
+// import '../../data/hubs/ttc_hubs.dart' show kTtcActConsult;
 import '../ttc_focus_data.dart';
 
 /// The two articles this whole area references.
@@ -72,9 +74,14 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
   heroImageUrl: 'https://pub-bfbc0773e60e4c5c851b535f08b384bc.r2.dev/ttc_door_after_a_loss.jpg',
   // The new door's headline, a sentence (TtcDoorScreen, 2026-09-26).
   heroTitle: 'No rush, and no timeline to keep.',
+  // ⚠️ NO PROMISE OF A COMMUNITY (launch walk, 2026-09-27): community is
+  // held back for launch, so "people who've been through it too" pointed at
+  // nothing. What is here: her Care Circle and a counsellor. Kept for revert:
+  //   "…when it's safe to try again if you want to, and people who've "
+  //   'been through it too.',
   heroBlurb: "What your body is doing now, what almost certainly didn't cause "
-      "this, when it's safe to try again if you want to, and people who've "
-      'been through it too.',
+      "this, when it's safe to try again if you want to, and someone to talk "
+      'to when you need it.',
 
   // ---------------------------------------------------------------------------
   //  Four tabs. Your body first — see the header.
@@ -84,26 +91,34 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
   // stage uses for its own logged data; 344 the rose the community rooms wear.
   groups: [
     TtcFocusGroup(
-      id: 'body', mark: IntentMark.bodyMark,
+      id: 'body', mark: IntentMark.bodyMark, tabMark: TtcTabMark.hotBottle,
       label: 'Your body',
       icon: Icons.favorite_border_rounded,
       hue: 26,
       // The hospital red flag — heavy bleeding, fever, severe pain. Rendered
       // from the article's own callout, not copied.
+      //
+      // ⚠️ THE ECTOPIC SIGNS ARE A TILE BELOW, NOT A SECOND PIN (2026-09-27,
+      // relevance audit). Pinning the ectopic read's callout was tried: its
+      // title is the same words as this one ("Go to a hospital today, not
+      // tomorrow"), so the tab opened on two identical headlines stacked,
+      // which reads as one card printed twice. The signs are a tile in
+      // "What's happening now" instead. Tried and not kept:
+      // pinnedRedFlagReadIds: [_kRecovery, 'ttc_read_ectopic_pregnancy'],
       pinnedRedFlagReadIds: [_kRecovery],
     ),
     TtcFocusGroup(
-        id: 'understand', mark: IntentMark.bookMark,
+        id: 'understand', mark: IntentMark.bookMark, tabMark: TtcTabMark.openBook,
         label: 'Understand',
         icon: Icons.menu_book_outlined,
         hue: 206),
     TtcFocusGroup(
-        id: 'again', mark: IntentMark.sunMark,
+        id: 'again', mark: IntentMark.sunMark, tabMark: TtcTabMark.sunrise,
         label: 'Trying again',
         icon: Icons.wb_twilight_rounded,
         hue: 160),
     TtcFocusGroup(
-      id: 'support', mark: IntentMark.cuppedHands,
+      id: 'support', mark: IntentMark.cuppedHands, tabMark: TtcTabMark.heartHand,
       label: 'Support',
       icon: Icons.diversity_1_outlined,
       hue: 344,
@@ -164,6 +179,17 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
           readId: _kRecovery,
           atHeading: 'How long does the bleeding last?',
         ),
+        // ⚠️ THE ECTOPIC SIGNS, ON THE TAB SHE OPENS FIRST (2026-09-27,
+        // relevance audit). They were only in the third section of the
+        // second tab. This opens the ectopic read at its signs; the read's
+        // own urgent callout says go to a hospital today.
+        TtcGuideTile(
+          title: 'Ectopic signs that need a hospital today',
+          blurb: 'Pain on one side, shoulder-tip pain, bleeding with pain, or '
+              'feeling faint.',
+          readId: 'ttc_read_ectopic_pregnancy',
+          atHeading: 'What are the signs?',
+        ),
       ],
     ),
 
@@ -217,15 +243,18 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
           blurb: 'The real reasons, and the everyday things you can let go of.',
           readId: 'ttc_read_miscarriage_causes',
         ),
-        TtcMythTile(
-          title: "One miscarriage isn't a pattern",
-          blurb: "One loss doesn't change what comes next.",
-          myth: "One miscarriage means it's likely to happen again.",
-          fact: 'After a single loss, the chance for a next pregnancy is close '
-              "to what it was before. One loss isn't a pattern, and it says "
-              'nothing about your body. Things change after two or more, '
-              'which is exactly why testing starts there and not here.',
-        ),
+        // Moved to "When it's worth looking further" (2026-09-27, relevance
+        // audit): it is about it happening again, not about prevention.
+        // Kept for revert:
+        // TtcMythTile(
+        //   title: "One miscarriage isn't a pattern",
+        //   blurb: "One loss doesn't change what comes next.",
+        //   myth: "One miscarriage means it's likely to happen again.",
+        //   fact: 'After a single loss, the chance for a next pregnancy is close '
+        //       "to what it was before. One loss isn't a pattern, and it says "
+        //       'nothing about your body. Things change after two or more, '
+        //       'which is exactly why testing starts there and not here.',
+        // ),
       ],
     ),
 
@@ -251,6 +280,26 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
         // doctor-reviewed piece, which Step 2's rules forbid. Recorded in
         // `docs/STILL-OPEN.md` §26 as a content decision rather than papered
         // over.
+        //
+        // 2026-09-27 (relevance audit): that second card now exists as its
+        // own piece, "Recurrent miscarriage", moved here from Trying again so
+        // the one question is answered in one tab.
+        TtcArticleTile(
+          title: 'Recurrent miscarriage',
+          blurb: 'Which tests help after more than one loss, and when.',
+          readId: 'ttc_read_recurrent_miscarriage',
+        ),
+        // Moved here from "Could this have been prevented?" (2026-09-27,
+        // relevance audit).
+        TtcMythTile(
+          title: "One miscarriage isn't a pattern",
+          blurb: "One loss doesn't change what comes next.",
+          myth: "One miscarriage means it's likely to happen again.",
+          fact: 'After a single loss, the chance for a next pregnancy is close '
+              "to what it was before. One loss isn't a pattern, and it says "
+              'nothing about your body. Things change after two or more, '
+              'which is exactly why testing starts there and not here.',
+        ),
       ],
     ),
 
@@ -329,27 +378,34 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
       ],
     ),
 
-    // ⚠️ ADDED 2026-09-26. Testing after more than one loss, in Trying again
-    // because it is the question asked before the next attempt. The
-    // Understand card "When to ask for tests" opens the short answer in the
-    // older read; this is the full piece.
-    TtcFocusSection(
-      heading: 'What if it has happened more than once?',
-      group: 'again',
-      tiles: [
-        TtcArticleTile(
-          title: 'Recurrent miscarriage',
-          blurb: 'Which tests help after more than one loss, and when.',
-          readId: 'ttc_read_recurrent_miscarriage',
-        ),
-      ],
-    ),
+    // ⚠️ MOVED TO UNDERSTAND, "When it's worth looking further" (2026-09-27,
+    // relevance audit). The same question was answered in two tabs.
+    // Kept for revert (2026-09-27, relevance audit):
+    // // ⚠️ ADDED 2026-09-26. Testing after more than one loss, in Trying again
+    // // because it is the question asked before the next attempt. The
+    // // Understand card "When to ask for tests" opens the short answer in the
+    // // older read; this is the full piece.
+    // TtcFocusSection(
+    //   heading: 'What if it has happened more than once?',
+    //   group: 'again',
+    //   tiles: [
+    //     TtcArticleTile(
+    //       title: 'Recurrent miscarriage',
+    //       blurb: 'Which tests help after more than one loss, and when.',
+    //       readId: 'ttc_read_recurrent_miscarriage',
+    //     ),
+    //   ],
+    // ),
 
     // =========================================================================
     //  4 — Support
     // =========================================================================
     TtcFocusSection(
-      heading: 'People who have been here',
+      // Retitled (2026-09-27, relevance audit). The heading promised people
+      // with lived loss, a room that is held back for launch; what is here
+      // is her Care Circle, the people she chose. Kept for revert:
+      // heading: 'People who have been here',
+      heading: 'The people close to you',
       group: 'support',
       tiles: [
         // Community held back for launch (2026-09-26, TTC gap plan §7.1) — kept for revert.
@@ -361,7 +417,10 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
         // ),
         TtcCommunityTile(
           title: 'Your Care Circle',
-          blurb: 'The people you chose. As much or as little as you want.',
+          // She has not chosen anyone yet: the circle is filled by the app
+          // and her partner (2026-09-27). Kept for revert: 'The people you
+          // chose. As much or as little as you want.'
+          blurb: 'Who is with you in this, and where advice comes from.',
           surfaceId: 'ttc_care_circle',
         ),
       ],
@@ -371,11 +430,31 @@ const TtcFocusPage kTtcAfterLossFocus = TtcFocusPage(
       heading: 'Talk to someone',
       group: 'support',
       tiles: [
+        // ⚠️ THE PSYCHOLOGIST, NOT THE MEDICAL SHELF (2026-09-27, relevance
+        // audit). `kTtcActConsult` opens fertility, gynaecology and male
+        // fertility; no counsellor is on it. `ttc_psych_consult` is the
+        // private session with the psychologist.
+        // Kept for revert (2026-09-27, relevance audit):
+        // TtcTalkTile(
+        //   title: 'Someone who knows this kind of loss',
+        //   blurb: 'A counsellor who works with pregnancy loss, or a doctor who '
+        //       'can look at what happened. At your own pace.',
+        //   action: kTtcActConsult,
+        // ),
         TtcTalkTile(
           title: 'Someone who knows this kind of loss',
-          blurb: 'A counsellor who works with pregnancy loss, or a doctor who '
-              'can look at what happened. At your own pace.',
-          action: kTtcActConsult,
+          blurb: 'A private talk with a psychologist, at your own pace.',
+          action: 'ttc_psych_consult',
+        ),
+        // "When grief needs extra help", which the checklist asks for here
+        // (2026-09-27, relevance audit). The read's own section, with the
+        // signs and where to call.
+        TtcGuideTile(
+          title: 'When grief needs more help',
+          blurb: 'The signs it is getting heavier, not easier, and who to '
+              'call.',
+          readId: 'ttc_read_loss_feelings',
+          atHeading: 'When does grief need more help?',
         ),
         // ⚠️ THE ONE PAID THING THIS AREA ALLOWS, AND IT IS LAST, AND IT IS
         // DESCRIBED AS PEOPLE. The bracket marks course `notCore` — "reached

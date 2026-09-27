@@ -238,6 +238,9 @@ class TtcRoundNoticeCard extends StatelessWidget {
         Semantics(
           button: true,
           label: label,
+          // excludeSemantics drops the child's tap action, so the node
+          // carries it (accessibility sweep, TTC launch walk, 2026-09-27).
+          onTap: onTap,
           excludeSemantics: true,
           child: Material(
             color: ink ? ttcTitleInk : Colors.white,

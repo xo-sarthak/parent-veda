@@ -34,7 +34,9 @@
 //  published number critically, which is the opposite of quoting one.
 // =============================================================================
 
-import '../../data/hubs/ttc_hubs.dart' show kTtcActConsult;
+// Unused since the consult tiles name their offering (2026-09-27,
+// relevance audit). Kept for revert:
+// import '../../data/hubs/ttc_hubs.dart' show kTtcActConsult;
 import 'package:flutter/material.dart' show Icons;
 
 import '../ttc_focus_data.dart';
@@ -120,34 +122,34 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
   //  cost of a wrong default gone, the brief's own order wins.
   groups: [
     TtcFocusGroup(
-        id: 'understand', mark: IntentMark.bookMark,
+        id: 'understand', mark: IntentMark.bookMark, tabMark: TtcTabMark.openBook,
         label: 'Understand',
         icon: Icons.menu_book_outlined,
         hue: 206),
     TtcFocusGroup(
-        id: 'help', mark: IntentMark.questionMark,
+        id: 'help', mark: IntentMark.questionMark, tabMark: TtcTabMark.signpost,
         label: 'Should I get help?',
         icon: Icons.center_focus_weak_outlined,
         hue: 344),
     // Added 2026-09-26 (gap plan, P2). Beside "Should I get help?" because
     // age is the most common reason that question comes sooner.
     TtcFocusGroup(
-        id: 'age', mark: IntentMark.nextStep,
+        id: 'age', mark: IntentMark.nextStep, tabMark: TtcTabMark.bigSmallHearts,
         label: 'Age and second baby',
         icon: Icons.timelapse_outlined,
         hue: 104),
     TtcFocusGroup(
-        id: 'money', mark: IntentMark.compareMark,
+        id: 'money', mark: IntentMark.compareMark, tabMark: TtcTabMark.wallet,
         label: 'Money and clinics',
         icon: Icons.account_balance_wallet_outlined,
         hue: 42),
     TtcFocusGroup(
-        id: 'going', mark: IntentMark.cuppedHands,
+        id: 'going', mark: IntentMark.cuppedHands, tabMark: TtcTabMark.heartHand,
         label: 'Going through it',
         icon: Icons.favorite_border_rounded,
         hue: 268),
     TtcFocusGroup(
-        id: 'track', mark: IntentMark.calendarDay, label: 'Track', icon: Icons.calendar_today_outlined,
+        id: 'track', mark: IntentMark.calendarDay, tabMark: TtcTabMark.timelineDots, label: 'Track', icon: Icons.calendar_today_outlined,
         hue: 160),
   ],
 
@@ -165,17 +167,42 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
       heading: 'Is it time to get help?',
       group: 'help',
       tiles: [
+        // ⚠️ ONE NAME FOR ONE TOOL (2026-09-27, relevance audit). "Readiness"
+        // read as IVF readiness; the screen asks whether it is worth talking
+        // to someone yet, and Taking a while already calls it this.
+        // Kept for revert (2026-09-27, relevance audit):
+        //   title: 'Check my readiness',
         TtcToolTile(
-          title: 'Check my readiness',
+          title: 'Should I seek fertility help?',
           blurb: "Six short questions. It tells you whether it's worth talking "
               'to a doctor. It never gives you a score or a prediction.',
           surfaceId: 'ttc_fertility_help',
         ),
-        TtcBookingTile(
+        // ⚠️ A READ HERE AFTER ALL (2026-09-27, relevance audit). It was parked
+        // on the old brief (see the foot of this file, "When to stop waiting
+        // and ask"); the gap analysis checklist now puts "when it's time" in
+        // this tab, and the tab had a tool and a person but nothing to read.
+        TtcArticleTile(
+          title: 'When to see a doctor',
+          blurb: 'The usual guideline, and the reasons not to wait.',
+          readId: 'ttc_read_when_to_seek_help',
+        ),
+        // ⚠️ THE FERTILITY SPECIALIST, NOT THE CONSULTS SHELF (2026-09-27,
+        // relevance audit). A Talk tile, because `openTtcFocusTile` resolves
+        // an offering id only on Talk; a Booking tile with any action but the
+        // shared one opens nothing.
+        // Kept for revert (2026-09-27, relevance audit):
+        // TtcBookingTile(
+        //   title: 'Speak to a fertility specialist',
+        //   blurb: 'A 1:1 talk with someone who does this every day. Bring your '
+        //       'dates and any results you have.',
+        //   action: kTtcActConsult,
+        // ),
+        TtcTalkTile(
           title: 'Speak to a fertility specialist',
           blurb: 'A 1:1 talk with someone who does this every day. Bring your '
               'dates and any results you have.',
-          action: kTtcActConsult,
+          action: 'ttc_consult_fertility',
         ),
       ],
     ),
@@ -197,11 +224,15 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
         // It is a coming-soon placeholder until the file lands, and a
         // placeholder in first position is a deliberate cost -- see the note
         // at the foot of this file.
+        // Repointed to the written film with this exact title (2026-09-27,
+        // relevance audit). Kept for revert:
+        //   slotId: 'ttc_ivf_cycle_walkthrough',
+        //   duration: '8 MIN',
         TtcVideoTile(
           title: 'An IVF cycle, start to finish',
           blurb: 'The whole month, explained step by step by a specialist.',
-          slotId: 'ttc_ivf_cycle_walkthrough',
-          duration: '8 MIN',
+          slotId: 'ttc_vid_ivf_walkthrough',
+          duration: '9 MIN',
         ),
         TtcArticleTile(
           title: 'What IUI and IVF involve',
@@ -304,10 +335,34 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
           blurb: 'What the doctor is looking for, and what the numbers mean.',
           readId: 'ttc_read_follicle_scans',
         ),
+        // ⚠️ OFF THIS DOOR (2026-09-27, relevance audit). A second letrozole
+        // read beside "Ovulation tablets", and PCOS-only in a general door.
+        // It lives in the PCOS door. Kept for revert (2026-09-27, relevance
+        // audit):
+        // TtcArticleTile(
+        //   title: 'Medicines for PCOS',
+        //   blurb: 'From the PCOS door: what each one is for.',
+        //   readId: 'ttc_read_pcos_meds',
+        // ),
+      ],
+    ),
+
+    // ⚠️ MOVED HERE FROM "Age and second baby" (2026-09-27, relevance audit).
+    // Donor routes and surrogacy are not age topics, and the checklist puts
+    // them under Understand. Facts only, as TTC-GAP-PLAN §7.6 decided.
+    TtcFocusSection(
+      heading: 'What about donor eggs, sperm or surrogacy?',
+      group: 'understand',
+      tiles: [
         TtcArticleTile(
-          title: 'Medicines for PCOS',
-          blurb: 'From the PCOS door: what each one is for.',
-          readId: 'ttc_read_pcos_meds',
+          title: 'Donor eggs and sperm',
+          blurb: 'Who can use them, and what the ART Act 2021 says.',
+          readId: 'ttc_read_donor_eggs_sperm',
+        ),
+        TtcArticleTile(
+          title: 'Surrogacy in India',
+          blurb: 'The 2021 law in plain words: who it is for, how it works.',
+          readId: 'ttc_read_surrogacy_india',
         ),
       ],
     ),
@@ -322,10 +377,14 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
       heading: 'Does age change things?',
       group: 'age',
       tiles: [
+        // Lands on the age section of the read (2026-09-27, relevance
+        // audit), not the top of a general piece.
         TtcArticleTile(
           title: 'How long it usually takes',
-          blurb: "What's normal, and when it's time to ask for help.",
+          blurb: "What's normal at each age, and when it's time to ask for "
+              'help.',
           readId: 'ttc_read_how_long_it_takes',
+          atHeading: 'Does age change how long it takes?',
         ),
         TtcArticleTile(
           title: 'Trying after 35',
@@ -337,6 +396,21 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
           blurb: 'An honest look, and why seeing a doctor now helps.',
           readId: 'ttc_read_age_after_40',
         ),
+        // ⚠️ MOVED TO ITS OWN SECTION BELOW (2026-09-27, relevance audit): a
+        // second baby is not an age question. Kept for revert:
+        // TtcArticleTile(
+        //   title: 'Harder the second time?',
+        //   blurb: 'Why it happens, what doctors check, and when to go.',
+        //   readId: 'ttc_read_second_baby',
+        // ),
+      ],
+    ),
+
+    // Its own question (2026-09-27, relevance audit).
+    TtcFocusSection(
+      heading: 'What about a second baby?',
+      group: 'age',
+      tiles: [
         TtcArticleTile(
           title: 'Harder the second time?',
           blurb: 'Why it happens, what doctors check, and when to go.',
@@ -346,7 +420,10 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
     ),
 
     TtcFocusSection(
-      heading: 'What are the other routes?',
+      // Retitled (2026-09-27, relevance audit): donor routes and surrogacy
+      // moved to Understand, and egg freezing, the age answer, stays.
+      // Kept for revert: heading: 'What are the other routes?',
+      heading: 'Can I freeze my eggs?',
       group: 'age',
       tiles: [
         TtcArticleTile(
@@ -354,16 +431,18 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
           blurb: "What happens, what it costs, and what it can't promise.",
           readId: 'ttc_read_egg_freezing',
         ),
-        TtcArticleTile(
-          title: 'Donor eggs and sperm',
-          blurb: 'Who can use them, and what the ART Act 2021 says.',
-          readId: 'ttc_read_donor_eggs_sperm',
-        ),
-        TtcArticleTile(
-          title: 'Surrogacy in India',
-          blurb: 'The 2021 law in plain words: who it is for, how it works.',
-          readId: 'ttc_read_surrogacy_india',
-        ),
+        // Moved to Understand, "What about donor eggs, sperm or
+        // surrogacy?" (2026-09-27, relevance audit). Kept for revert:
+        // TtcArticleTile(
+        //   title: 'Donor eggs and sperm',
+        //   blurb: 'Who can use them, and what the ART Act 2021 says.',
+        //   readId: 'ttc_read_donor_eggs_sperm',
+        // ),
+        // TtcArticleTile(
+        //   title: 'Surrogacy in India',
+        //   blurb: 'The 2021 law in plain words: who it is for, how it works.',
+        //   readId: 'ttc_read_surrogacy_india',
+        // ),
       ],
     ),
 
@@ -531,11 +610,100 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
               "that mean you shouldn't wait until morning.",
           readId: 'ttc_read_ivf_ohss',
         ),
+        // Moved to "The wait, and after the result" (2026-09-27, relevance
+        // audit). Kept for revert:
+        // TtcVideoTile(
+        //   title: 'Getting through the two-week wait',
+        //   blurb: 'The hardest fortnight of the cycle, and what helps.',
+        //   slotId: 'ttc_ivf_two_week_wait',
+        //   duration: '6 MIN',
+        // ),
+      ],
+    ),
+
+    // ⚠️ THE ROUND, STEP BY STEP (launch walk, 2026-09-27). The twelve
+    // treatment reads were reachable only from inside a running round and
+    // from Learn, so someone reading up before her first round, most of this
+    // door's visitors, could not find them here. Order: the order a round
+    // runs in, then the wait and what comes after it.
+    TtcFocusSection(
+      heading: 'What happens at each step?',
+      group: 'going',
+      tiles: [
+        TtcArticleTile(
+          title: 'Your first visit: the baseline scan',
+          blurb: 'What the first scan of a round checks, and why it comes before any medicine.',
+          readId: 'ttc_read_tx_baseline_scan',
+        ),
+        TtcArticleTile(
+          title: 'Monitoring scans',
+          blurb: 'What the clinic is measuring every few days, and what the numbers mean.',
+          readId: 'ttc_read_tx_monitoring_scans',
+        ),
+        TtcArticleTile(
+          title: 'The trigger injection',
+          blurb: 'Why it is timed to the hour, and what to do if you are late.',
+          readId: 'ttc_read_tx_trigger_shot',
+        ),
+        TtcArticleTile(
+          title: 'IUI day',
+          blurb: 'What happens on the day, how long it takes, and how it feels.',
+          readId: 'ttc_read_tx_iui_day',
+        ),
+        TtcArticleTile(
+          title: 'Day 1, day 3, day 5',
+          blurb: 'The words the lab uses about embryos, in plain words.',
+          readId: 'ttc_read_tx_embryo_days',
+        ),
+        TtcArticleTile(
+          title: 'Fresh or frozen transfer',
+          blurb: 'How clinics decide, and why frozen is common now.',
+          readId: 'ttc_read_tx_fresh_or_frozen',
+        ),
+        TtcArticleTile(
+          title: 'Frozen embryo transfer, step by step',
+          blurb: 'Estrogen, the lining scan, then the transfer.',
+          readId: 'ttc_read_tx_frozen_transfer',
+        ),
+        TtcArticleTile(
+          title: 'Transfer day, and the progesterone after',
+          blurb: 'What happens on the day, and the medicine that comes next.',
+          readId: 'ttc_read_tx_transfer_day',
+        ),
+      ],
+    ),
+
+    TtcFocusSection(
+      heading: 'The wait, and after the result',
+      group: 'going',
+      tiles: [
+        TtcArticleTile(
+          title: 'The two-week wait after IVF or IUI',
+          blurb: 'What your body is doing, and why the medicines can feel like signs.',
+          readId: 'ttc_read_tx_wait_after_treatment',
+        ),
+        // Moved here from "What will a cycle ask of me?" (2026-09-27,
+        // relevance audit): it is about the wait.
         TtcVideoTile(
           title: 'Getting through the two-week wait',
           blurb: 'The hardest fortnight of the cycle, and what helps.',
           slotId: 'ttc_ivf_two_week_wait',
           duration: '6 MIN',
+        ),
+        TtcArticleTile(
+          title: 'The beta test',
+          blurb: "What the blood test measures, and why it's sometimes repeated.",
+          readId: 'ttc_read_tx_beta_test',
+        ),
+        TtcArticleTile(
+          title: 'When the test is negative',
+          blurb: 'The next few weeks, for your body and for the two of you.',
+          readId: 'ttc_read_tx_negative_after_treatment',
+        ),
+        TtcArticleTile(
+          title: 'Your review appointment',
+          blurb: 'The questions worth taking to the clinic after a round.',
+          readId: 'ttc_read_tx_review_appointment',
         ),
       ],
     ),
@@ -599,6 +767,15 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
               "appointment starts from what's already known.",
           surfaceId: 'ttc_records',
         ),
+        // ⚠️ BACK ON THE DOOR (2026-09-27, relevance audit). Parked on the old
+        // brief (see the foot of this file); the checklist names injection
+        // times and reminders as the third thing someone mid-cycle tracks.
+        TtcToolTile(
+          title: 'Your medicines and timings',
+          blurb: 'What to take and when, including the trigger time that '
+              'really matters.',
+          surfaceId: 'ttc_medication',
+        ),
         // ⚠️ THE SAFETY TILE BELONGS IN *THIS* SECTION, NOT ONLY IN "GOING
         // THROUGH IT". OHSS has an article three sections up, which is the
         // right place to learn about it and the wrong place to find it at
@@ -607,11 +784,22 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
         //
         // The duplication is deliberate and it is the only duplicated tile on
         // the page.
+        // ⚠️ SAYS WHAT IT COVERS AND OPENS ON THE SIGNS (2026-09-27,
+        // relevance audit). The read is about OHSS only, so the title says
+        // so rather than promising every reason to call.
+        // Kept for revert (2026-09-27, relevance audit):
+        // TtcArticleTile(
+        //   title: 'When to call the clinic',
+        //   blurb: 'The signs that mean you should call now, not wait for the '
+        //       'morning. Worth reading before you need it.',
+        //   readId: 'ttc_read_ivf_ohss',
+        // ),
         TtcArticleTile(
-          title: 'When to call the clinic',
+          title: 'OHSS: the signs to call about now',
           blurb: 'The signs that mean you should call now, not wait for the '
               'morning. Worth reading before you need it.',
           readId: 'ttc_read_ivf_ohss',
+          atHeading: 'Which signs mean you should call now?',
         ),
       ],
     ),
@@ -636,6 +824,11 @@ const TtcFocusPage kTtcIvfFocus = TtcFocusPage(
 //      flow. Removing them from this door strands nothing.
 //
 //  Restoring any of them is uncommenting it back into its section.
+//
+//  2026-09-27 (relevance audit): two of these are back on the door. The
+//  when-to-see-a-doctor read sits in "Is it time to get help?" (as "When to
+//  see a doctor"), and "Your medicines and timings" sits in Track. The gap
+//  analysis checklist asks for both. The copies below stay as the record.
 //
 //         TtcMythTile(
 //           title: 'Does a low AMH mean it is over?',

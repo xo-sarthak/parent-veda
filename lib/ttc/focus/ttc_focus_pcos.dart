@@ -17,7 +17,9 @@
 //  resolve at a glance.
 // =============================================================================
 
-import '../../data/hubs/ttc_hubs.dart' show kTtcActConsult;
+// Unused since the consult tiles name their offering (2026-09-27,
+// relevance audit). Kept for revert:
+// import '../../data/hubs/ttc_hubs.dart' show kTtcActConsult;
 import 'package:flutter/material.dart' show Icons;
 
 import '../ttc_focus_data.dart';
@@ -100,7 +102,7 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
   // because it matters most.
   groups: [
     TtcFocusGroup(
-        id: 'understand', mark: IntentMark.bookMark,
+        id: 'understand', mark: IntentMark.bookMark, tabMark: TtcTabMark.openBook,
         label: 'Understand',
         icon: Icons.menu_book_outlined,
         hue: 206),
@@ -108,23 +110,23 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
     // toolSurfaceId` — a tile in front of a tool, inside a group whose only
     // content is that tool, is a door in front of a door.
     TtcFocusGroup(
-        id: 'stand', mark: IntentMark.compassMark, inlineLabel: 'A quick check',
+        id: 'stand', mark: IntentMark.compassMark, tabMark: TtcTabMark.pin, inlineLabel: 'A quick check',
         label: 'Where do I stand',
         icon: Icons.center_focus_weak_outlined,
         hue: 344,
         toolSurfaceId: 'ttc_pcos_check'),
     TtcFocusGroup(
-        id: 'helps', mark: IntentMark.improveMark,
+        id: 'helps', mark: IntentMark.improveMark, tabMark: TtcTabMark.sprout,
         label: 'What helps',
         icon: Icons.eco_outlined,
         hue: 104),
     TtcFocusGroup(
-        id: 'trying', mark: IntentMark.cycleRing,
+        id: 'trying', mark: IntentMark.cycleRing, tabMark: TtcTabMark.windowRing,
         label: 'Trying with PCOS',
         icon: Icons.favorite_border_rounded,
         hue: 42),
     TtcFocusGroup(
-        id: 'track', mark: IntentMark.chartLog,
+        id: 'track', mark: IntentMark.chartLog, tabMark: TtcTabMark.chartLine,
         // ⚠️ "Track", NOT "Keep track of it". The design's mock data uses the
         // longer name and the section inside this group is already called
         // "Keep track of it" — so the tab and the heading under it would say
@@ -154,10 +156,21 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
       heading: 'What is PCOS, really?',
       group: 'understand',
       tiles: [
+        // ⚠️ THE WRITTEN FILM WITH THIS PROMISE (2026-09-27, relevance
+        // audit). `ttc_pcos_intro` has no entry in `ttc_videos_data.dart`;
+        // `ttc_vid_pcos_explained` is written, chaptered and was on no door.
+        // Kept for revert (2026-09-27, relevance audit):
+        // TtcVideoTile(
+        //   title: 'PCOS in five minutes',
+        //   blurb: 'The whole picture, in plain words.',
+        //   slotId: 'ttc_pcos_intro',
+        //   duration: '5 MIN',
+        // ),
         TtcVideoTile(
-          title: 'PCOS in five minutes',
-          blurb: 'The whole picture, in plain words.',
-          slotId: 'ttc_pcos_intro',
+          title: 'PCOS, explained in five minutes',
+          blurb: "What's going on in your ovaries, without the confusing "
+              'diagrams.',
+          slotId: 'ttc_vid_pcos_explained',
           duration: '5 MIN',
         ),
         TtcArticleTile(
@@ -348,18 +361,39 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
         // what the author expected to find, not what is there. It renders the
         // honest 16:9 placeholder like the other four, so nothing shifts when
         // the file lands. Recorded in `docs/STILL-OPEN.md` 18.6.
+        // ⚠️ THE WRITTEN FILM ON THIS QUESTION (2026-09-27, relevance
+        // audit). `ttc_pcos_food_insulin` has no entry in
+        // `ttc_videos_data.dart`; `ttc_vid_pcos_plate` is written and was on
+        // no door. Kept for revert (2026-09-27, relevance audit):
+        // TtcVideoTile(
+        //   title: 'Food, insulin and PCOS',
+        //   blurb: 'Why the same meal affects you differently, and what that '
+        //       'means.',
+        //   slotId: 'ttc_pcos_food_insulin',
+        //   duration: '4 MIN',
+        // ),
         TtcVideoTile(
-          title: 'Food, insulin and PCOS',
-          blurb: 'Why the same meal affects you differently, and what that '
-              'means.',
-          slotId: 'ttc_pcos_food_insulin',
-          duration: '4 MIN',
+          title: 'What a PCOS-friendly Indian plate looks like',
+          blurb: "Roti, rice and dal aren't the problem. What you eat with "
+              'them is what matters.',
+          slotId: 'ttc_vid_pcos_plate',
+          duration: '7 MIN',
         ),
         TtcArticleTile(
           title: 'Eating for steadier blood sugar, with nothing banned',
           blurb: "Insulin is the part worth understanding, and none of it "
               "means giving up rice.",
           readId: 'ttc_read_pcos_insulin',
+        ),
+        // ⚠️ THE READ THE PDF ASKED FOR, NOW ON THE DOOR (launch walk,
+        // 2026-09-27): it existed with a sample Indian day of eating and no
+        // door linked it, while a film of the same name sat here unmade.
+        TtcArticleTile(
+          title: 'A day of eating, with PCOS',
+          blurb: 'What helps in an Indian kitchen, and what a whole day can '
+              'look like.',
+          readId: 'ttc_read_pcos_food',
+          atHeading: 'What does a day of eating like this look like?',
         ),
         // WARNING: A REAL RECIPE ON THE REAL RECIPE PAGE, NOT AN ARTICLE ABOUT
         // RECIPES. This shipped as prose because the tile union had no recipe
@@ -423,11 +457,29 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
               'are linked.',
           readId: 'ttc_read_pcos_weight',
         ),
+        // ⚠️ THE PCOS ANSWER, NOT THE GENERAL STRESS READ (2026-09-27,
+        // relevance audit). The stress read has no sleep section and nothing
+        // on PCOS; the insulin read answers sleep, movement and yoga for PCOS.
+        // Kept for revert (2026-09-27, relevance audit):
+        // TtcArticleTile(
+        //   title: 'Stress, sleep and trying',
+        //   blurb: "What long-lasting stress does and doesn't do to your "
+        //       'cycle.',
+        //   readId: 'ttc_read_stress_fertility',
+        // ),
         TtcArticleTile(
-          title: 'Stress, sleep and trying',
-          blurb: "What long-lasting stress does and doesn't do to your "
-              'cycle.',
-          readId: 'ttc_read_stress_fertility',
+          title: 'Sleep, movement and insulin',
+          blurb: 'Why a few short nights and a little strength work change '
+              'how your body handles sugar.',
+          readId: 'ttc_read_pcos_insulin',
+          atHeading: 'Why do sleep and exercise matter?',
+        ),
+        TtcArticleTile(
+          title: 'Yoga, and your mood',
+          blurb: 'What the small trials found, and why moving helps how you '
+              'feel.',
+          readId: 'ttc_read_pcos_insulin',
+          atHeading: 'Does yoga help, and what about your mood?',
         ),
         TtcVideoTile(
           title: 'Gentle movement for PCOS',
@@ -503,21 +555,46 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
       heading: 'What happens if we need treatment?',
       group: 'trying',
       tiles: [
+        // ⚠️ THE WRITTEN FILM ON THIS QUESTION (2026-09-27, relevance
+        // audit): `ttc_vid_pcos_treatment` was on no door.
+        TtcVideoTile(
+          title: 'The PCOS treatments your doctor may offer',
+          blurb: 'The order treatments are tried in, and what to ask before '
+              'you agree to any of them.',
+          slotId: 'ttc_vid_pcos_treatment',
+          duration: '7 MIN',
+        ),
+        // ⚠️ NARROWED TO ITS OWN STEP (2026-09-27, relevance audit). Both
+        // reads opened on the same short answer (lifestyle, then letrozole,
+        // then metformin), so this one now lands on the step before any
+        // tablet and the medicines read keeps the order.
+        // Kept for revert (2026-09-27, relevance audit):
+        // TtcArticleTile(
+        //   title: 'What treatment usually looks like',
+        //   blurb: 'The usual steps, before anyone offers you anything.',
+        //   readId: 'ttc_read_pcos_treatment',
+        // ),
         TtcArticleTile(
-          title: 'What treatment usually looks like',
-          blurb: 'The usual steps, before anyone offers you anything.',
+          title: 'Before any tablet',
+          blurb: 'The first step a doctor usually suggests, and why it keeps '
+              'mattering.',
           readId: 'ttc_read_pcos_treatment',
+          atHeading: 'What comes before any tablet?',
         ),
         TtcArticleTile(
           title: 'Letrozole, metformin and the usual order',
           blurb: 'What gets tried first, and what each one does.',
           readId: 'ttc_read_pcos_meds',
         ),
-        TtcArticleTile(
-          title: 'When to see a specialist',
-          blurb: 'The point where waiting is no longer the better plan.',
-          readId: 'ttc_read_when_to_seek_help',
-        ),
+        // ⚠️ MOVED TO "Talk to someone who knows PCOS" AND REPOINTED
+        // (2026-09-27, relevance audit): the general read gives the 12 and 6
+        // month rule, and with PCOS the answer is sooner.
+        // Kept for revert (2026-09-27, relevance audit):
+        // TtcArticleTile(
+        //   title: 'When to see a specialist',
+        //   blurb: 'The point where waiting is no longer the better plan.',
+        //   readId: 'ttc_read_when_to_seek_help',
+        // ),
       ],
     ),
 
@@ -559,10 +636,20 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
               'the better your pattern read gets.',
           surfaceId: 'ttc_symptom_log',
         ),
+        // ⚠️ THE CYCLE REPORT, NOT THE SELF-CHECK (2026-09-27, relevance
+        // audit). `ttc_pcos_check` is the eight-question check that already
+        // fills the "Where do I stand" tab. The report is what this tile
+        // promises: the months she logged, in plain words.
+        // Kept for revert (2026-09-27, relevance audit):
+        // TtcToolTile(
+        //   title: 'What your cycle shows',
+        //   blurb: 'The months you logged, turned into a pattern in plain words.',
+        //   surfaceId: 'ttc_pcos_check',
+        // ),
         TtcToolTile(
           title: 'What your cycle shows',
           blurb: 'The months you logged, turned into a pattern in plain words.',
-          surfaceId: 'ttc_pcos_check',
+          surfaceId: 'ttc_cycle_report',
         ),
         // WARNING: QUIET, AND THE BRIEF SAYS SO TWICE. "Calm card, quiet, not
         // alarming." So: no red, no warning mark, no urgency, and every slide
@@ -643,10 +730,30 @@ const TtcFocusPage kTtcPcosFocus = TtcFocusPage(
       heading: 'Talk to someone who knows PCOS',
       group: 'trying',
       tiles: [
-        TtcBookingTile(
+        // Moved here from "What happens if we need treatment?" and pointed at
+        // the PCOS answer (2026-09-27, relevance audit).
+        TtcArticleTile(
+          title: 'When to see a specialist',
+          blurb: 'With PCOS the clock starts sooner. The point where waiting '
+              'is no longer the better plan.',
+          readId: 'ttc_read_pcos_timelines',
+          atHeading: 'When should you stop waiting and ask?',
+        ),
+        // ⚠️ THE GYNAECOLOGIST, NOT THE CONSULTS SHELF (2026-09-27, relevance
+        // audit). That offering names PCOS in its own description. A Talk
+        // tile, because `openTtcFocusTile` resolves an offering id only on
+        // Talk; a Booking tile with any other action opens nothing.
+        // Kept for revert (2026-09-27, relevance audit):
+        // TtcBookingTile(
+        //   title: 'Talk to a PCOS specialist',
+        //   blurb: 'Book a 1:1 and ask about managing PCOS while you try.',
+        //   action: kTtcActConsult,
+        // ),
+        TtcTalkTile(
           title: 'Talk to a PCOS specialist',
-          blurb: 'Book a 1:1 and ask about managing PCOS while you try.',
-          action: kTtcActConsult,
+          blurb: 'A 1:1 with a gynaecologist about managing PCOS while you '
+              'try.',
+          action: 'ttc_consult_gynae',
         ),
         TtcMasterclassTile(
           title: 'The PCOS programme',

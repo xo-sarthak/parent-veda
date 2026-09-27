@@ -112,6 +112,12 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../services/life_stage_store.dart';
 import '../services/notification_service.dart';
+// ⚠️ A STORE IMPORTING A SCREEN, ON PURPOSE AND FOR ONE FUNCTION (2026-09-27).
+// A phone tap has to end on a screen, and the only code that runs at startup
+// for this feature is this store's `init` (main.dart). The opener lives with
+// the screen it is about; the store only decides WHICH message was tapped.
+// `ttc_focus_data.dart` does the same. The import cycle is legal Dart.
+import '../screens/ttc/ttc_messages_screen.dart' show ttcOpenMessageFromPhone;
 import 'cycle_store.dart';
 import 'ttc_chapter.dart';
 import 'ttc_fertile_window.dart';
@@ -711,8 +717,8 @@ List<TtcMessage> ttcTreatmentMessages(
           trig,
           7,
           trig.hour >= 17
-              ? 'Trigger shot tonight at $time'
-              : 'Trigger shot today at $time',
+              ? 'Trigger injection tonight at $time'
+              : 'Trigger injection today at $time',
           ivf
               ? 'Your clinic set this time. Egg collection is timed from it, '
                   'about 34 to 36 hours later. If anything is unclear, call '
@@ -926,8 +932,49 @@ class TtcMessagesStore extends ChangeNotifier with WidgetsBindingObserver {
       try {
         WidgetsBinding.instance.addObserver(this);
       } catch (_) {/* no binding in a pure test */}
+      // ⚠️ A PHONE TAP OPENS THE MESSAGE'S PLACE (2026-09-27). It used to
+      // only open the app, so she had to find what the notification was
+      // about herself. Registered after `_load`, so a tap that launched the
+      // app finds the message it was for.
+      NotificationService.instance.addTapListener(handlePhoneTap);
     }
     await refresh();
+  }
+
+  /// Opens a tapped message. Swappable in tests; defaults to the screen's
+  /// opener, which pushes the message's first destination that resolves.
+  @visibleForTesting
+  static void Function(TtcMessage? m) phoneTapOpener = ttcOpenMessageFromPhone;
+
+  /// The message a phone notification [id] was for, or null when the id is
+  /// not one of ours.
+  ///
+  /// ⚠️ BY KIND, NEWEST DELIVERED FIRST. The OS gives back only the id, and
+  /// each kind has one fixed id (a treatment block of them), with never more
+  /// than one pending message of a kind. So the tapped message is the newest
+  /// of that kind which has already arrived.
+  TtcMessage? messageForPhoneId(int id, {DateTime? now}) {
+    TtcMessageKind? kind;
+    for (final k in TtcMessageKind.values) {
+      if (k.phoneIds.contains(id)) {
+        kind = k;
+        break;
+      }
+    }
+    if (kind == null) return null;
+    final arrived = delivered(now: now).where((m) => m.kind == kind);
+    return arrived.isEmpty ? null : arrived.first;
+  }
+
+  /// The [NotificationService] tap listener. Claims only our own ids, so
+  /// every other feature's notification behaves as it always did.
+  bool handlePhoneTap(int id) {
+    final ours = TtcMessageKind.values.any((k) => k.phoneIds.contains(id));
+    if (!ours) return false;
+    final m = messageForPhoneId(id);
+    if (m != null) markRead(m.id);
+    phoneTapOpener(m);
+    return true;
   }
 
   /// A new day may have made a pending message due, or a window newly

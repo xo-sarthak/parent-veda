@@ -135,7 +135,7 @@ enum TtcHeroState {
   ///
   /// ⚠️ THE ONE STEP THAT DOES NOT GET A COUNTDOWN, AND THE RULE IS WORTH
   /// STATING: count down to things she DOES, name the date of things that
-  /// JUDGE. A trigger shot and a retrieval are actions and a shrinking number
+  /// JUDGE. A trigger injection and a retrieval are actions and a shrinking number
   /// helps her prepare. The beta is a verdict, and a number getting smaller in
   /// the largest type on the screen is the shape that makes a two-week wait
   /// worse — the same reason the natural-cycle hero counts to a period and

@@ -24,6 +24,8 @@ import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_store.dart';
 import '../../ttc/ttc_treatment_round.dart';
 import '../../ttc/ttc_treatment_store.dart';
+import '../../theme/pv_fonts.dart';
+import '../products/pv_store_chrome.dart' show pvSnack;
 import '../v2/v2_palette.dart';
 import 'ttc_common.dart';
 import 'ttc_ivf_readiness_screen.dart' show kIvfHue;
@@ -41,8 +43,11 @@ void openTtcTreatment(BuildContext context) {
   ));
 }
 
-class TtcTreatmentScreen extends StatelessWidget {
-  const TtcTreatmentScreen({super.key});
+// ⚠️ KEPT FOR REVERT (2026-09-27, the tool rebuild): the screen until the
+// rebuild at the foot of this file. Unreached; `TtcTreatmentScreen` below is
+// the one every opener pushes. Its static helpers are still shared.
+class TtcTreatmentScreenClassic extends StatelessWidget {
+  const TtcTreatmentScreenClassic({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -93,7 +98,16 @@ class TtcTreatmentScreen extends StatelessWidget {
           // called". A tool opened mid-cycle at speed needs the sentence, not
           // the label — the label is the eyebrow above it.
           title: 'The dates your\nclinic gave you.',
-          intro: t.treatmentIntro,
+          // ⚠️ SAYS WHAT SHE DOES HERE, ONCE (tools pass, 2026-09-27). The
+          // old intro opened by repeating the title, and its "your clinic's
+          // dates count" line is said again by the note at the foot, so it
+          // now says the job and what she gets for it. The Hindi build keeps
+          // the shipped pair. Kept for revert: `intro: t.treatmentIntro,`.
+          intro: hi
+              ? t.treatmentIntro
+              : "Add the dates your clinic gave you, and we'll remind you "
+                  'before the trigger injection. Fill in what you know. '
+                  'The rest can wait.',
           children: [
                 const SizedBox(height: 22),
 
@@ -210,7 +224,9 @@ class TtcTreatmentScreen extends StatelessWidget {
                                   color: Colors.white.withValues(alpha: 0.8),
                                   w: FontWeight.w800)),
                           const SizedBox(height: 9),
-                          Text(next.$1.label(hi),
+                          // One name with the rows (2026-09-27). Kept for
+                          // revert: Text(next.$1.label(hi), ...).
+                          Text(_StepRow._label(next.$1, hi),
                               style: ttcFraunces(25,
                                   w: FontWeight.w600, color: Colors.white)),
                           const SizedBox(height: 8),
@@ -268,9 +284,16 @@ class TtcTreatmentScreen extends StatelessWidget {
                 // The five original rows, for a legacy round only: a round
                 // with a kind shows its own timeline above. Kept for revert:
                 // the rows rendered for every round, over all five steps.
+                //
+                // ⚠️ AN IUI OR TABLETS CYCLE IS NOT SHOWN IVF ROWS (tools pass,
+                // 2026-09-27). A legacy round has no kind, but her path does:
+                // on IUI or ovulation induction the transfer row (and, on
+                // tablets, egg collection) could only ever sit empty and read
+                // like something missed, so it is left out unless a date is
+                // already on it. On IUI the retrieval row is named "IUI".
                 if (legacy) ...[
                   ttcToolPad(ttcSectionTitle(t.treatmentDates)),
-                  for (final step in kTtcOriginalTreatmentSteps) ...[
+                  for (final step in _legacySteps(cycle)) ...[
                     ttcToolPad(_StepRow(step: step, at: cycle[step], t: t)),
                     const SizedBox(height: 10),
                   ],
@@ -347,16 +370,28 @@ class TtcTreatmentScreen extends StatelessWidget {
     );
   }
 
+  // ⚠️ WITH THE WEEKDAY (tools pass, 2026-09-27): "Thu 12 Oct", the round's
+  // own format, because people plan an early scan by the day of the week.
+  // Kept for revert: the body built '${at.day} ${m[at.month - 1]}' from a
+  // local month list and its own am/pm maths.
   static String _when(TtcTreatmentStep step, DateTime at, bool hi) {
-    const m = [
-      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
-    ];
-    final date = '${at.day} ${m[at.month - 1]}';
+    final date = ttcRoundDate(at);
     if (!step.needsTime) return date;
-    final h = at.hour % 12 == 0 ? 12 : at.hour % 12;
-    final ampm = at.hour < 12 ? 'am' : 'pm';
-    return '$date · $h:${at.minute.toString().padLeft(2, '0')}$ampm';
+    return '$date · ${ttcRoundTime(at)}';
+  }
+
+  /// The legacy rows that apply to her path (see the note where they render).
+  static List<TtcTreatmentStep> _legacySteps(TtcTreatmentCycle cycle) {
+    final path = TtcStore.instance.path;
+    final iui = path == TtcPath.iui;
+    final tablets = path == TtcPath.ovulationInduction;
+    return [
+      for (final step in kTtcOriginalTreatmentSteps)
+        if (cycle[step] != null ||
+            !((iui || tablets) && step == TtcTreatmentStep.transfer) &&
+                !(tablets && step == TtcTreatmentStep.retrieval))
+          step,
+    ];
   }
 
   /// "in 9 days" rather than "9 days remaining" - remaining is a sentence being
@@ -588,12 +623,12 @@ class _StepRow extends StatelessWidget {
         const SizedBox(width: 13),
         Expanded(
           child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-            Text(step.label(hi),
+            Text(_label(step, hi),
                 style: ttcJakarta(14.5, color: set ? ttcTitleInk : ttcSoft)),
             const SizedBox(height: 3),
             Text(
               set
-                  ? TtcTreatmentScreen._when(step, at!, hi)
+                  ? TtcTreatmentScreenClassic._when(step, at!, hi)
                   : t.treatmentNotSet,
               style: ttcBody(12.5,
                   color: set ? ttcPurple : ttcMuted, w: FontWeight.w700),
@@ -610,47 +645,65 @@ class _StepRow extends StatelessWidget {
             ],
           ]),
         ),
+        // The cross now offers Undo (tools pass, 2026-09-27): it sits right
+        // beside the row she taps to edit, and the date came off a printout.
+        // Kept for revert: onTap was `setDate(step, null)` alone.
         if (set)
-          GestureDetector(
-            onTap: () => TtcTreatmentStore.instance.setDate(step, null),
-            behavior: HitTestBehavior.opaque,
-            child: const Padding(
-              padding: EdgeInsets.only(left: 8),
-              child: Icon(Icons.close_rounded, size: 16, color: ttcMuted),
+          Semantics(
+            button: true,
+            label: 'Remove this date',
+            child: GestureDetector(
+              key: ValueKey('ttc_legacy_clear_${step.name}'),
+              onTap: () {
+                final store = TtcTreatmentStore.instance;
+                final was = at;
+                final taken = store.cycle.triggerTaken;
+                store.setDate(step, null);
+                ttcRoundDateRemoved(context, _label(step, hi), () {
+                  store.setDate(step, was);
+                  if (step == TtcTreatmentStep.trigger && taken) {
+                    store.setTriggerTaken(true);
+                  }
+                });
+              },
+              behavior: HitTestBehavior.opaque,
+              child: const Padding(
+                padding: EdgeInsets.only(left: 8),
+                child: Icon(Icons.close_rounded, size: 16, color: ttcMuted),
+              ),
             ),
           ),
       ]),
     );
   }
 
-  Future<void> _pick(BuildContext context) async {
-    final now = DateTime.now();
-    final day = await showDatePicker(
-      context: context,
-      initialDate: at ?? now,
-      firstDate: now.subtract(const Duration(days: 120)),
-      lastDate: now.add(const Duration(days: 365)),
-    );
-    if (day == null || !context.mounted) return;
+  /// On an IUI path the retrieval row is the IUI itself.
+  /// ⚠️ ONE NAME PER STEP (tools pass, 2026-09-27): in English these rows now
+  /// use the round's names (`ttcStepLabel`: "Trigger injection", "Blood
+  /// test"), the ones her plan and calendar show, instead of the older
+  /// "Beta hCG blood test". The Hindi build keeps the shipped labels.
+  static String _label(TtcTreatmentStep step, bool hi) =>
+      step == TtcTreatmentStep.retrieval &&
+              TtcStore.instance.path == TtcPath.iui
+          ? 'IUI'
+          : hi
+              ? step.label(hi)
+              : ttcStepLabel(step, null);
 
-    // Only the trigger asks for a time. Making her set one for every date would
-    // be five extra taps for four values nobody needs to the minute.
-    if (!step.needsTime) {
-      TtcTreatmentStore.instance
-          .setDate(step, DateTime(day.year, day.month, day.day));
-      return;
-    }
-    final time = await showTimePicker(
-      context: context,
-      initialTime: TimeOfDay.fromDateTime(at ?? DateTime(0, 1, 1, 21, 0)),
-      helpText: t.treatmentTriggerTime,
-    );
-    if (!context.mounted) return;
-    TtcTreatmentStore.instance.setDate(
-      step,
-      DateTime(day.year, day.month, day.day, time?.hour ?? 21,
-          time?.minute ?? 0),
-    );
+  // ⚠️ THE ROUND'S OWN PICKER NOW (tools pass, 2026-09-27). It titles the
+  // calendar with the step's name, checks an out-of-order date, and never
+  // invents a trigger time: a closed clock used to save 9:00pm here
+  // (`time?.hour ?? 21`) and arm reminders for it. Kept for revert, the old
+  // body: showDatePicker (120 days back, 365 ahead, no title), then for the
+  // trigger showTimePicker(helpText: t.treatmentTriggerTime) and
+  //   setDate(step, DateTime(day.year, day.month, day.day,
+  //       time?.hour ?? 21, time?.minute ?? 0));
+  Future<void> _pick(BuildContext context) async {
+    final store = TtcTreatmentStore.instance;
+    final picked = await ttcPickRoundDate(context,
+        round: store.cycle, step: step, help: _label(step, t.hinglish));
+    if (picked == null || !context.mounted) return;
+    store.setDate(step, picked);
   }
 
   static IconData _icon(TtcTreatmentStep step) {
@@ -684,52 +737,82 @@ class TtcTreatmentEntryCard extends StatelessWidget {
     final store = TtcTreatmentStore.instance;
     final next = store.cycle.next;
 
-    return TtcCard(
-      color: ttcCautionCard,
+    // ⚠️ V3 (2026-09-27, the tool rebuild): a white object card with a
+    // hairline and ink, the round's own vocabulary, where it was a V1
+    // `TtcCard` in the caution cream with brown type. Same words, same tap.
+    // Kept for revert: TtcCard(color: ttcCautionCard, ...) with ttcBrown
+    // ttcJakarta/ttcBody type throughout.
+    final p = V2PaletteStore.instance.current;
+    return Semantics(
+      button: true,
       onTap: () => openTtcTreatment(context),
+      child: Material(
+      key: const ValueKey('ttc_treatment_entry_card'),
+      color: Colors.white,
+      shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: const BorderSide(color: ttcLine, width: 1.2)),
+      child: InkWell(
+      borderRadius: BorderRadius.circular(20),
+      onTap: () => openTtcTreatment(context),
+      child: Padding(
+      padding: const EdgeInsets.all(18),
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
-          const Icon(Icons.local_hospital_outlined, size: 18, color: ttcBrown),
+          const Icon(Icons.local_hospital_outlined,
+              size: 18, color: ttcTitleInk),
           const SizedBox(width: 9),
           Expanded(
             child: Text(TtcStore.instance.ownership.title(hi),
-                style: ttcJakarta(15.5, color: ttcBrown)),
+                style: pvManrope(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: p.ink1)),
           ),
         ]),
-        const SizedBox(height: 11),
+        const SizedBox(height: 10),
         // The copy differs between the two clinic tiers on purpose: "we are not
         // naming a date, keep logging" is a different message from "nothing of
         // your natural cycle applies here".
         Text(TtcStore.instance.ownership.body(hi),
-            style: ttcBody(13.5, color: ttcBrown, h: 1.6)),
+            style: pvManrope(fontSize: 13.5, height: 1.55, color: p.ink2)),
         const SizedBox(height: 12),
-        ttcDivider(),
+        Divider(color: p.line, height: 1),
         const SizedBox(height: 12),
 
         if (next != null) ...[
           Text(t.treatmentNext.toUpperCase(),
-              style: ttcBody(9.5, color: ttcBrown, w: FontWeight.w800)),
+              style: pvManrope(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.1,
+                  color: p.ink3)),
           const SizedBox(height: 6),
           Text(
-            '${next.$1.label(hi)} · '
-            '${TtcTreatmentScreen._when(next.$1, next.$2, hi)}',
-            style: ttcBody(14, color: ttcBrown, w: FontWeight.w800),
+            // One name with the rows (2026-09-27). Was next.$1.label(hi).
+            '${_StepRow._label(next.$1, hi)} · '
+            '${TtcTreatmentScreenClassic._when(next.$1, next.$2, hi)}',
+            style: pvManrope(
+                fontSize: 14, fontWeight: FontWeight.w800, color: p.ink1),
           ),
         ] else ...[
           // The invitation - this is what turns "we cannot help" into "tell us
           // and we can".
           Row(children: [
             const Icon(Icons.add_circle_outline_rounded,
-                size: 17, color: ttcBrown),
+                size: 17, color: ttcTitleInk),
             const SizedBox(width: 8),
             Expanded(
               child: Text(t.treatmentAddDates,
-                  style: ttcBody(13, color: ttcBrown, w: FontWeight.w800)),
+                  style: pvManrope(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w800,
+                      color: p.ink1)),
             ),
           ]),
           const SizedBox(height: 6),
           Text(t.treatmentAddDatesBody,
-              style: ttcBody(12, color: ttcBrown, h: 1.5)),
+              style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink2)),
         ],
 
         // If we are assuming rather than knowing, say so and offer the fix.
@@ -762,6 +845,9 @@ class TtcTreatmentEntryCard extends StatelessWidget {
           // ]),
         // ],
       ]),
+      ),
+      ),
+      ),
     );
   }
 }
@@ -990,5 +1076,786 @@ class _Question extends StatelessWidget {
               style: ttcBody(11.5, color: ttcMuted, w: FontWeight.w700)),
       ]),
     ]);
+  }
+}
+
+// =============================================================================
+//  THE REBUILD — 2026-09-27, the tool rebuild (the user, walking build 13:
+//  "old tools in new clothes… poor functionality")
+// -----------------------------------------------------------------------------
+//  Used like a first-time user, every tap, the round screen had these holes:
+//
+//  * **"I'll add it later" undid itself.** Saving a round with no dates yet
+//    (the start flow's own second button) came back to "Starting treatment?"
+//    as if nothing had been saved, because the screen asked "does the round
+//    have dates" where it meant "is there a round". A round with a kind and
+//    no dates now shows its plan, every step saying "Your clinic will tell
+//    you" with "Add date" beside it.
+//  * **The clinic's name could only be typed once,** on the last start
+//    screen. It shows on the round now with "Add clinic" / "Change".
+//  * **Past rounds were names in a list that opened nothing.** A tap opens
+//    the round's dates to look back at (read-only: every edit on a timeline
+//    writes to the open round).
+//  * **Today was not said.** The header named the phase; it now says what is
+//    on today, the day count, and the next date with how far off it is, the
+//    shape of Oura's "7 days until next dose" hero
+//    (https://mobbin.com/screens/34b5f9ab-7c53-4b07-a724-d4db1b297e63).
+//  * **Old chrome:** `TtcCard`s, a violet reminder icon, a solid violet
+//    "Next" card on a legacy round, a grey Material `AlertDialog` for "Remove
+//    these dates", `ttcSectionTitle` from the V1 look. All of it is the
+//    round's own vocabulary now: white objects with a hairline, ink, the
+//    round's confirm dialog, the tool shell's headings.
+//
+//  Unchanged on purpose (the user's rule): every date rule, the reminder
+//  times, when a round closes, the check-in that never closes a round, the
+//  7-day undo on every close, and every stored key.
+// =============================================================================
+
+/// The screen's section heading, in the tool shell's type.
+Widget _heading(String text) {
+  final p = V2PaletteStore.instance.current;
+  return Text(text,
+      style: pvFraunces(
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          height: 1.25,
+          color: p.ink1));
+}
+
+/// A white row with a hairline: an icon, words, and a chevron when it opens
+/// something. What `TtcCard(color: ttcPanel)` was used for here.
+class TtcRoundInfoRow extends StatelessWidget {
+  const TtcRoundInfoRow({
+    super.key,
+    required this.icon,
+    required this.text,
+    this.onTap,
+  });
+
+  final IconData icon;
+  final String text;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    return Semantics(
+      button: onTap != null,
+      label: text,
+      excludeSemantics: true,
+      onTap: onTap,
+      child: Material(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: const BorderSide(color: ttcLine, width: 1.2)),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(14, 13, 12, 13),
+            child: Row(children: [
+              Icon(icon, size: 18, color: ttcTitleInk),
+              const SizedBox(width: 11),
+              Expanded(
+                child: Text(text,
+                    style: pvManrope(
+                        fontSize: 13, height: 1.45, color: p.ink1)),
+              ),
+              if (onTap != null) ...[
+                const SizedBox(width: 6),
+                Icon(Icons.chevron_right_rounded, size: 18, color: p.ink3),
+              ],
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// "Add clinic" or "Change": the clinic's name, after the start flow.
+const String kTtcClinicSheetTitle = 'Which clinic?';
+const String kTtcClinicSheetBody =
+    'Only you see this, and your partner if he has joined.';
+
+Future<void> showTtcClinicSheet(BuildContext context) async {
+  final store = TtcTreatmentStore.instance;
+  final was = store.cycle.clinic;
+  final name = await showModalBottomSheet<String>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    routeSettings: const RouteSettings(name: 'ttc/treatment/clinic'),
+    builder: (_) => _ClinicSheet(initial: was),
+  );
+  if (name == null || !context.mounted) return;
+  store.setClinic(name);
+  final now = name.trim();
+  if (now == was) return;
+  pvSnack(context, now.isEmpty ? 'Clinic name removed.' : 'Clinic saved.',
+      icon: Icons.check_rounded,
+      lift: 24,
+      action: kTtcRoundUndoCta,
+      onAction: () => store.setClinic(was));
+}
+
+class _ClinicSheet extends StatefulWidget {
+  const _ClinicSheet({required this.initial});
+  final String initial;
+
+  @override
+  State<_ClinicSheet> createState() => _ClinicSheetState();
+}
+
+class _ClinicSheetState extends State<_ClinicSheet> {
+  late final TextEditingController _c =
+      TextEditingController(text: widget.initial);
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      child: Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(26)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(18, 12, 18, 18),
+            child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 38,
+                      height: 4,
+                      decoration: BoxDecoration(
+                          color: ttcLine,
+                          borderRadius: BorderRadius.circular(4)),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(kTtcClinicSheetTitle,
+                      style: pvFraunces(
+                          fontSize: 23,
+                          fontWeight: FontWeight.w600,
+                          color: p.ink1)),
+                  const SizedBox(height: 6),
+                  Text(kTtcClinicSheetBody,
+                      style: pvManrope(
+                          fontSize: 13, height: 1.5, color: p.ink2)),
+                  const SizedBox(height: 14),
+                  TextField(
+                    key: const ValueKey('ttc_clinic_field'),
+                    controller: _c,
+                    autofocus: true,
+                    textCapitalization: TextCapitalization.words,
+                    onSubmitted: (v) => Navigator.of(context).pop(v),
+                    style: pvManrope(fontSize: 14.5, color: ttcTitleInk),
+                    decoration: InputDecoration(
+                      hintText: 'Clinic name',
+                      filled: true,
+                      fillColor: Colors.white,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: const BorderSide(color: ttcLine)),
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide:
+                              const BorderSide(color: ttcTitleInk, width: 1.4)),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  TtcRoundButton(
+                    key: const ValueKey('ttc_clinic_save'),
+                    label: 'Save',
+                    onTap: () => Navigator.of(context).pop(_c.text),
+                  ),
+                ]),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class TtcTreatmentScreen extends StatelessWidget {
+  const TtcTreatmentScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation:
+          Listenable.merge([TtcTreatmentStore.instance, TtcLang.instance]),
+      builder: (context, _) {
+        final t = TtcS.current();
+        final hi = t.hinglish;
+        final store = TtcTreatmentStore.instance;
+        if (!store.isLoaded) {
+          return const Scaffold(
+              backgroundColor: Colors.white,
+              body: Center(
+                  child: CircularProgressIndicator(color: ttcTitleInk)));
+        }
+        final p = V2PaletteStore.instance.current;
+        final round = store.cycle;
+        // ⚠️ A ROUND IS A KIND, WITH OR WITHOUT DATES (see the header above).
+        // Kept for revert: `round.kind != null && !round.isEmpty`.
+        final hasKind = round.kind != null;
+        final legacy = round.kind == null && !round.isEmpty;
+        final none = round.kind == null && round.isEmpty;
+        final now = DateTime.now();
+        final phase = ttcTreatmentPhase(round, now);
+        final blood = ttcRoundBloodTest(round);
+        final canResult = hasKind &&
+            !round.isEmpty &&
+            (phase == TtcRoundPhase.testDay ||
+                blood != null && !blood.isAfter(now));
+        final next = round.next;
+
+        return TtcToolScaffold(
+          hue: kIvfHue,
+          eyebrow: t.treatmentTitle,
+          title: 'The dates your\nclinic gave you.',
+          intro: hi
+              ? t.treatmentIntro
+              : "Add the dates your clinic gave you, and we'll remind you "
+                  'before the trigger injection. Fill in what you know. '
+                  'The rest can wait.',
+          children: [
+            const SizedBox(height: 22),
+
+            // ---- no round: the way in ---------------------------------------
+            if (none) ...[
+              ttcToolPad(const TtcStartTreatmentCard()),
+              const SizedBox(height: 20),
+            ],
+
+            // ---- the round she can still reopen (7 days) --------------------
+            if (store.canUndoClose()) ...[
+              ttcToolPad(_UndoCloseRow(store: store)),
+              const SizedBox(height: 20),
+            ],
+
+            // ---- the check-in, when it is due --------------------------------
+            if (store.checkInDue()) ...[
+              ttcToolPad(TtcRoundCheckInCard(
+                  onAnswer: () => showTtcCheckInSheet(context))),
+              const SizedBox(height: 20),
+            ],
+
+            // ---- a legacy round: what kind is it? ----------------------------
+            if (legacy) ...[
+              ttcToolPad(TtcRoundOption(
+                key: const ValueKey('ttc_round_legacy_kind'),
+                title: kTtcRoundLegacyTitle,
+                line: kTtcRoundLegacyBody,
+                icon: Icons.help_outline_rounded,
+                onTap: () => openTtcTreatmentStart(context),
+              )),
+              const SizedBox(height: 20),
+            ],
+
+            // ---- a round: today, then the plan -------------------------------
+            if (hasKind) ...[
+              ttcToolPad(_TodayCard(round: round, phase: phase)),
+              const SizedBox(height: 18),
+              if (canResult) ...[
+                ttcToolPad(TtcRoundButton(
+                  key: const ValueKey('ttc_round_tell_result'),
+                  label: kTtcRoundTellResult,
+                  onTap: () => openTtcTreatmentResult(context),
+                )),
+                const SizedBox(height: 18),
+              ],
+              ttcToolPad(_heading(kTtcRoundPlanTitle)),
+              const SizedBox(height: 6),
+              ttcToolPad(Text(kTtcRoundPlanBody,
+                  style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2))),
+              const SizedBox(height: 18),
+              ttcToolPad(TtcRoundTimeline(round: round)),
+              const SizedBox(height: 6),
+              // Daily injections live in the medication schedule (decision
+              // 4), which already has times and a taken tick.
+              ttcToolPad(TtcRoundInfoRow(
+                key: const ValueKey('ttc_round_medication_link'),
+                icon: Icons.medication_outlined,
+                text: kTtcRoundMedicationLink,
+                onTap: () => openTtcSurface(context, 'ttc_medication'),
+              )),
+              const SizedBox(height: 22),
+              if (!round.isEmpty) ...[
+                ttcToolPad(TtcRoundButton(
+                  key: const ValueKey('ttc_round_plan_changed'),
+                  label: kTtcRoundPlanChanged,
+                  primary: false,
+                  onTap: () => showTtcPlanChangedSheet(context),
+                )),
+                const SizedBox(height: 8),
+                ttcToolPad(TtcRoundButton(
+                  key: const ValueKey('ttc_round_pause'),
+                  label: kTtcRoundTakeBreak,
+                  primary: false,
+                  onTap: () =>
+                      ttcConfirmCloseRound(context, TtcRoundOutcome.paused),
+                )),
+              ] else
+                // A round with no dates has nothing to pause or close; the
+                // one thing worth changing is the kind (confirmed, undoable).
+                ttcToolPad(TtcRoundButton(
+                  key: const ValueKey('ttc_round_change_kind'),
+                  label: kTtcPlanWrongKind,
+                  primary: false,
+                  onTap: () => ttcPickRoundKind(context),
+                )),
+              const SizedBox(height: 20),
+            ],
+
+            // ---- a legacy round: its next date, then its rows ------------------
+            if (legacy && next != null) ...[
+              ttcToolPad(_LegacyNextCard(step: next.$1, at: next.$2, t: t)),
+              const SizedBox(height: 20),
+            ],
+            if (legacy) ...[
+              ttcToolPad(_heading(t.treatmentDates)),
+              const SizedBox(height: 12),
+              for (final step in TtcTreatmentScreenClassic._legacySteps(round))
+                ...[
+                ttcToolPad(_LegacyRow(step: step, at: round[step], t: t)),
+                const SizedBox(height: 10),
+              ],
+            ],
+
+            if (round[TtcTreatmentStep.trigger] != null) ...[
+              const SizedBox(height: 4),
+              ttcToolPad(TtcRoundInfoRow(
+                icon: Icons.notifications_active_outlined,
+                text: t.treatmentTriggerReminder,
+              )),
+            ],
+
+            // "Remove these dates": for a round entered by mistake. Ending a
+            // round is closing it (kept in history); this is the one action
+            // that removes dates, so it says so before it does.
+            if (store.hasDates) ...[
+              const SizedBox(height: 10),
+              Center(
+                child: TextButton(
+                  key: const ValueKey('ttc_round_remove'),
+                  onPressed: () async {
+                    // The round's own confirm (2026-09-27). Kept for revert:
+                    // `TtcTreatmentScreenClassic._confirmClear(context, t)`.
+                    if (await ttcRoundConfirm(context,
+                        title: '$kTtcRoundRemove?',
+                        body: kTtcRoundRemoveBody,
+                        yes: kTtcRoundRemove,
+                        no: 'Keep them',
+                        route: 'ttc/treatment/confirm_remove')) {
+                      store.clearCycle();
+                    }
+                  },
+                  child: Text(kTtcRoundRemove,
+                      style: pvManrope(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: p.ink3,
+                          decoration: TextDecoration.underline)),
+                ),
+              ),
+            ],
+
+            // ---- past rounds: kept, never deleted, and open to look back at -
+            if (store.history.isNotEmpty) ...[
+              const SizedBox(height: 18),
+              ttcToolPad(_heading(kTtcRoundPastTitle)),
+              const SizedBox(height: 4),
+              ttcToolPad(Text(
+                  '$kTtcRoundHistoryNote Tap one to see its dates.',
+                  style: pvManrope(fontSize: 12.5, color: p.ink3))),
+              const SizedBox(height: 10),
+              for (var i = store.history.length - 1; i >= 0; i--) ...[
+                ttcToolPad(_PastRow(n: i + 1, round: store.history[i])),
+                const SizedBox(height: 8),
+              ],
+            ],
+
+            const SizedBox(height: 16),
+            ttcToolPad(Text(t.treatmentDisclaimer,
+                style: pvManrope(fontSize: 11.5, height: 1.5, color: p.ink3))),
+            const SizedBox(height: 26),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// What today is in the round: the phase and its day, what is on today,
+/// the next date and how far off it is, and the clinic.
+class _TodayCard extends StatelessWidget {
+  const _TodayCard({required this.round, required this.phase});
+
+  final TtcTreatmentCycle round;
+  final TtcRoundPhase phase;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final kind = round.kind;
+    DateTime day(DateTime d) => DateTime(d.year, d.month, d.day);
+
+    final count = ttcRoundDayCount(round, phase, today);
+    final title = round.isEmpty
+        ? kTtcPanelNoDatesTitle
+        : count == null || count.$1 <= 0
+            ? ttcRoundPhaseName(phase, kind)
+            : '${ttcRoundPhaseName(phase, kind)} · day ${count.$1}';
+
+    // What is on today, named.
+    final todays = <String>[
+      for (final e in round.dates.entries)
+        if (day(e.value) == today)
+          e.key.needsTime
+              ? '${ttcStepLabel(e.key, kind)} at ${ttcRoundTime(e.value)}'
+              : ttcStepLabel(e.key, kind),
+      if (round.scans.any((s) => day(s) == today)) ttcScanLabel(kind),
+    ];
+
+    final first = ttcFirstTreatmentDate(round);
+    final next = ttcRoundNextAfter(round, today);
+    String? nextLine;
+    if (round.isEmpty) {
+      nextLine = kTtcPanelNoDatesLine;
+    } else if (phase == TtcRoundPhase.planned && first != null) {
+      nextLine = 'Your home follows your round from ${ttcRoundDate(first)}.';
+    } else if (next != null) {
+      final name =
+          next.$1 == null ? ttcScanLabel(kind) : ttcStepLabel(next.$1!, kind);
+      final gap = day(next.$2).difference(today).inDays;
+      final when = gap == 1 ? 'tomorrow' : 'in $gap days';
+      final at = next.$1?.needsTime == true
+          ? '${ttcRoundDate(next.$2)} at ${ttcRoundTime(next.$2)}'
+          : ttcRoundDate(next.$2);
+      nextLine = 'Next: $name, $at ($when).';
+    } else {
+      nextLine = kTtcPanelNoNext;
+    }
+
+    return Container(
+      key: const ValueKey('ttc_round_header'),
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(18, 16, 18, 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: ttcLine, width: 1.2),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(ttcRoundKindName(kind!).toUpperCase(),
+            style: pvManrope(
+                fontSize: 10.5,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.1,
+                color: p.ink3)),
+        const SizedBox(height: 8),
+        Text(title,
+            style: pvFraunces(
+                fontSize: 24,
+                fontWeight: FontWeight.w600,
+                height: 1.2,
+                color: p.ink1)),
+        if (todays.isNotEmpty) ...[
+          const SizedBox(height: 8),
+          Text('Today: ${todays.join(', ')}.',
+              key: const ValueKey('ttc_round_today_line'),
+              style: pvManrope(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w800,
+                  height: 1.4,
+                  color: p.ink1)),
+        ],
+        const SizedBox(height: 6),
+        Text(nextLine,
+            key: const ValueKey('ttc_round_next_line'),
+            style: pvManrope(fontSize: 13.5, height: 1.45, color: p.ink2)),
+        const SizedBox(height: 10),
+        Divider(color: p.line, height: 1),
+        Row(children: [
+          Icon(Icons.local_hospital_outlined, size: 16, color: p.ink3),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+                round.clinic.isEmpty ? 'No clinic added' : round.clinic,
+                style: pvManrope(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: round.clinic.isEmpty ? p.ink3 : p.ink1)),
+          ),
+          TextButton(
+            key: const ValueKey('ttc_round_clinic'),
+            onPressed: () => showTtcClinicSheet(context),
+            child: Text(round.clinic.isEmpty ? 'Add clinic' : 'Change',
+                style: pvManrope(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                    color: ttcTitleInk,
+                    decoration: TextDecoration.underline)),
+          ),
+        ]),
+      ]),
+    );
+  }
+}
+
+/// A round closed in the last 7 days, and the way to reopen it exactly.
+class _UndoCloseRow extends StatelessWidget {
+  const _UndoCloseRow({required this.store});
+  final TtcTreatmentStore store;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    final last = store.lastClosed!;
+    return Container(
+      key: const ValueKey('ttc_round_undo_card'),
+      padding: const EdgeInsets.fromLTRB(16, 12, 8, 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: ttcLine, width: 1.2),
+      ),
+      child: Row(children: [
+        Expanded(
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text(kTtcUndoCardLine,
+                style: pvManrope(
+                    fontSize: 13, fontWeight: FontWeight.w800, color: p.ink1)),
+            const SizedBox(height: 3),
+            Text(
+                '${ttcRoundHistoryLabel(store.history.length, last)} · '
+                '${ttcRoundOutcomeLabel(last.outcome)}',
+                style: pvManrope(fontSize: 12, height: 1.4, color: p.ink2)),
+          ]),
+        ),
+        TextButton(
+          key: const ValueKey('ttc_round_undo'),
+          onPressed: store.undoClose,
+          child: Text(kTtcRoundUndoCta,
+              style: pvManrope(
+                  fontSize: 13.5,
+                  fontWeight: FontWeight.w800,
+                  color: ttcTitleInk,
+                  decoration: TextDecoration.underline)),
+        ),
+      ]),
+    );
+  }
+}
+
+/// One closed round. A tap opens its dates.
+class _PastRow extends StatelessWidget {
+  const _PastRow({required this.n, required this.round});
+  final int n;
+  final TtcTreatmentCycle round;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    void open() => Navigator.of(context).push(MaterialPageRoute<void>(
+          builder: (_) => TtcPastRoundScreen(n: n, round: round),
+          settings: const RouteSettings(name: 'ttc/treatment/past'),
+        ));
+    final label = ttcRoundHistoryLabel(n, round);
+    final line = [
+      if (round.kind != null) ttcRoundKindName(round.kind!),
+      ttcRoundOutcomeLabel(round.outcome),
+      '${round.allDates.length} dates',
+    ].join(' · ');
+    return Semantics(
+      button: true,
+      label: '$label. $line',
+      excludeSemantics: true,
+      onTap: open,
+      child: Material(
+        color: Colors.white,
+        shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+            side: const BorderSide(color: ttcLine, width: 1.2)),
+        child: InkWell(
+          key: ValueKey('ttc_round_past_$n'),
+          borderRadius: BorderRadius.circular(16),
+          onTap: open,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(14, 13, 10, 13),
+            child: Row(children: [
+              Icon(Icons.history_rounded, size: 18, color: p.ink3),
+              const SizedBox(width: 11),
+              Expanded(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(label,
+                          style: pvManrope(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w800,
+                              color: p.ink1)),
+                      const SizedBox(height: 3),
+                      Text(line,
+                          style: pvManrope(
+                              fontSize: 12, height: 1.4, color: p.ink2)),
+                    ]),
+              ),
+              Icon(Icons.chevron_right_rounded, size: 18, color: p.ink3),
+            ]),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// A closed round's dates, to look back at. Nothing here edits it: a round
+/// in history is a record.
+class TtcPastRoundScreen extends StatelessWidget {
+  const TtcPastRoundScreen({super.key, required this.n, required this.round});
+
+  final int n;
+  final TtcTreatmentCycle round;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    final closed = round.closedOn;
+    final parts = [
+      if (round.kind != null) ttcRoundKindName(round.kind!),
+      ttcRoundOutcomeLabel(round.outcome),
+      if (closed != null) 'Closed ${ttcRoundDate(closed)}',
+    ];
+    return TtcToolScaffold(
+      hue: kIvfHue,
+      variant: 3,
+      eyebrow: kTtcRoundPastTitle,
+      title: ttcRoundHistoryLabel(n, round),
+      intro: '${parts.join(' · ')}. Kept as a record: nothing here can be '
+          'changed.',
+      children: [
+        const SizedBox(height: 22),
+        if (round.clinic.isNotEmpty) ...[
+          ttcToolPad(Text(round.clinic,
+              style: pvManrope(
+                  fontSize: 13.5, fontWeight: FontWeight.w800, color: p.ink1))),
+          const SizedBox(height: 14),
+        ],
+        if (round.isEmpty)
+          ttcToolPad(Text('This round had no dates.',
+              style: pvManrope(fontSize: 13.5, color: p.ink2)))
+        else
+          ttcToolPad(TtcRoundTimeline(round: round, readOnly: true)),
+        const SizedBox(height: 28),
+      ],
+    );
+  }
+}
+
+/// A legacy round's next date, as a white card (it was a solid violet one).
+class _LegacyNextCard extends StatelessWidget {
+  const _LegacyNextCard({required this.step, required this.at, required this.t});
+
+  final TtcTreatmentStep step;
+  final DateTime at;
+  final TtcS t;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    final hi = t.hinglish;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: ttcLine, width: 1.2),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(t.treatmentNext.toUpperCase(),
+            style: pvManrope(
+                fontSize: 10.5,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.1,
+                color: p.ink3)),
+        const SizedBox(height: 8),
+        Text(_StepRow._label(step, hi),
+            style: pvFraunces(
+                fontSize: 23, fontWeight: FontWeight.w600, color: p.ink1)),
+        const SizedBox(height: 6),
+        Text(
+            '${TtcTreatmentScreenClassic._when(step, at, hi)} · '
+            '${TtcTreatmentScreenClassic._daysAway(at, hi)}',
+            style: pvManrope(
+                fontSize: 14, fontWeight: FontWeight.w800, color: p.ink1)),
+        const SizedBox(height: 6),
+        Text(step.note(hi),
+            style: pvManrope(fontSize: 12.5, height: 1.5, color: p.ink2)),
+      ]),
+    );
+  }
+}
+
+/// A legacy round's date row, in the round's own row.
+class _LegacyRow extends StatelessWidget {
+  const _LegacyRow({required this.step, required this.at, required this.t});
+
+  final TtcTreatmentStep step;
+  final DateTime? at;
+  final TtcS t;
+
+  @override
+  Widget build(BuildContext context) {
+    final hi = t.hinglish;
+    final label = _StepRow._label(step, hi);
+    final store = TtcTreatmentStore.instance;
+    return TtcRoundDateRow(
+      label: label,
+      line: step.note(hi),
+      value: at,
+      withTime: step.needsTime,
+      clearKey: ValueKey('ttc_legacy_clear_${step.name}'),
+      below: step == TtcTreatmentStep.trigger && at != null
+          ? TtcRoundTakenTick(taken: store.cycle.triggerTaken)
+          : null,
+      onTap: () async {
+        final picked = await ttcPickRoundDate(context,
+            round: store.cycle, step: step, help: label);
+        if (picked == null || !context.mounted) return;
+        store.setDate(step, picked);
+      },
+      onClear: () {
+        final was = at;
+        final taken = store.cycle.triggerTaken;
+        store.setDate(step, null);
+        ttcRoundDateRemoved(context, label, () {
+          store.setDate(step, was);
+          if (step == TtcTreatmentStep.trigger && taken) {
+            store.setTriggerTaken(true);
+          }
+        });
+      },
+    );
   }
 }

@@ -65,9 +65,14 @@ import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_log_store.dart';
 import '../../ttc/ttc_reads_data.dart';
 import '../../ttc/ttc_trackers_data.dart';
+import '../products/pv_store_chrome.dart' show pvSnack;
+import '../v2/v2_palette.dart';
 import 'ttc_common.dart';
 import 'ttc_focus_screen.dart' show openTtcArticle;
+import 'ttc_round_strings.dart' show ttcRoundDate;
 import 'ttc_strings.dart';
+import 'ttc_tool_chrome.dart';
+import 'ttc_tools_screen.dart' show ttcToolById;
 
 /// The hue a field's linked read opens in. 42 is the stage's warm read tone —
 /// the same one `ttc_read_stress_fertility` carries in its own definition, so
@@ -98,14 +103,16 @@ const Color _kGreenInk = Color(0xFF6A30B6);
 /// A chosen control. `hsl(104 32% 91%)`.
 const Color _kTint = Color(0xFFE5F0E1);
 
-/// A bar's body. `hsl(104 32% 90%)`.
-const Color _kBar = Color(0xFFE2EEDD);
+/// A bar's body. Kept for revert (2026-09-27, the tool rebuild): the
+/// design's green, `hsl(104 32% 90%)` = 0xFFE2EEDD. Ink-led now, so the
+/// look-back matches every other tool's chart.
+const Color _kBar = Color(0xFFE9E6EF);
 
-/// A bar's cap and a matrix dot's edge. `hsl(104 26% 44%)`.
-const Color _kBarCap = Color(0xFF548D46);
+/// A bar's cap and a matrix dot's edge. Kept for revert: 0xFF548D46.
+const Color _kBarCap = ttcTitleInk;
 
-/// A matrix dot's fill. `hsl(104 32% 88%)`.
-const Color _kDot = Color(0xFFDDEBD8);
+/// A matrix dot's fill. Kept for revert: 0xFFDDEBD8.
+const Color _kDot = ttcTitleInk;
 
 /// How many days the looking-back view covers. Four weeks, so a week's shape is
 /// visible four times over — enough to see a rhythm and short enough that a bad
@@ -130,16 +137,22 @@ Widget? ttcTrackerScreenFor(String id) {
   return t == null ? null : TtcTrackerScreen(tracker: t);
 }
 
-class TtcTrackerScreen extends StatefulWidget {
-  const TtcTrackerScreen({super.key, required this.tracker});
+// ⚠️ KEPT FOR REVERT (2026-09-27, the tool rebuild): the screen below was
+// the tracker until the rebuild at the foot of this file. It logged TODAY
+// only, sat on its own back bar and ground rather than the tool shell, and
+// its look-back could not open a day. Unreached; `TtcTrackerScreen` is the
+// rebuilt one. To revert, swap the two class names back.
+class TtcTrackerScreenClassic extends StatefulWidget {
+  const TtcTrackerScreenClassic({super.key, required this.tracker});
 
   final TtcTracker tracker;
 
   @override
-  State<TtcTrackerScreen> createState() => _TtcTrackerScreenState();
+  State<TtcTrackerScreenClassic> createState() =>
+      _TtcTrackerScreenClassicState();
 }
 
-class _TtcTrackerScreenState extends State<TtcTrackerScreen> {
+class _TtcTrackerScreenClassicState extends State<TtcTrackerScreenClassic> {
   bool _lookBack = false;
   late String _backField = widget.tracker.fields.first.id;
 
@@ -154,8 +167,12 @@ class _TtcTrackerScreenState extends State<TtcTrackerScreen> {
           body: SafeArea(
             bottom: false,
             child: Column(children: [
+              // ⚠️ THE CRUMB NAMES WHERE THE ARROW GOES (tools pass,
+              // 2026-09-27). "GETTING READY" showed on every tracker, even
+              // Partner health opened from his side. Kept for revert:
+              //   crumb: _lookBack ? 'TODAY' : 'GETTING READY',
               _Header(
-                crumb: _lookBack ? 'TODAY' : 'GETTING READY',
+                crumb: _lookBack ? 'BACK TO TODAY' : '',
                 // ⚠️ THE LINK IS ALSO THE WAY BACK. From the looking-back view
                 // the header's arrow returns to today rather than leaving the
                 // tracker, because she came from today and expects to.
@@ -228,7 +245,9 @@ class _Header extends StatelessWidget {
                 height: 44,
                 alignment: Alignment.center,
                 padding: const EdgeInsets.symmetric(horizontal: 12),
-                child: Text('Look back',
+                // Says what it shows (2026-09-27). Kept for revert:
+                // 'Look back'.
+                child: Text(kTtcTrackerLookBack,
                     style: pvManrope(
                         fontSize: 13,
                         fontWeight: FontWeight.w700,
@@ -311,12 +330,30 @@ class _TodayBody extends StatelessWidget {
     // ⚠️ GROUPS COME OUT OF THE FIELD LIST, IN FIELD ORDER. Not a map, not a
     // sort — a tracker's field order is a decision somebody made about what to
     // ask first, and grouping must not quietly re-order it.
+    //
+    // ⚠️ AND ONE BLOCK PER HEADING (tools pass, 2026-09-27). A field added
+    // later under an earlier heading ("In bed by about eleven", Sleep, after
+    // Stress) opened a second "Sleep" further down. Fields now join the first
+    // block with their heading, still in field order inside it. Kept for
+    // revert:
+    //   if (blocks.isEmpty || blocks.last.$1 != f.group) {
+    //     blocks.add((f.group, [f]));
+    //   } else {
+    //     blocks.last.$2.add(f);
+    //   }
     final blocks = <(String?, List<TtcField>)>[];
     for (final f in tracker.fields) {
-      if (blocks.isEmpty || blocks.last.$1 != f.group) {
-        blocks.add((f.group, [f]));
-      } else {
+      final at = f.group == null
+          ? -1
+          : blocks.indexWhere((b) => b.$1 == f.group);
+      if (at >= 0) {
+        blocks[at].$2.add(f);
+      } else if (f.group == null &&
+          blocks.isNotEmpty &&
+          blocks.last.$1 == null) {
         blocks.last.$2.add(f);
+      } else {
+        blocks.add((f.group, [f]));
       }
     }
 
@@ -332,9 +369,18 @@ class _TodayBody extends StatelessWidget {
                 // fields read as nine things she has failed to do unless
                 // something says otherwise first. This is that sentence and it
                 // is the most important copy on the screen.
+                // "Did it save?" answered up front (2026-09-27): there is no
+                // save button. Kept for revert: the first two sentences only.
                 Text('Write down as much or as little as you like. One thing '
-                    'is enough.',
+                    'is enough. Each answer saves as you tap.',
                     style: ttcBody(14, color: ttcInk, h: 1.55)),
+                // Who fills in his tracker, said on it (2026-09-27).
+                if (tracker.forPartner) ...[
+                  const SizedBox(height: 10),
+                  Text(kTtcTrackerPartnerWho,
+                      key: const ValueKey('ttc_tracker_partner_who'),
+                      style: ttcBody(13, color: ttcSoft, h: 1.55)),
+                ],
 
                 // ⚠️ THE TRACKER'S OWN "WHY", KEPT — AND THE DESIGN HAS NO
                 // SLOT FOR IT.
@@ -475,6 +521,14 @@ class _FieldRow extends StatelessWidget {
         // no instruction and no obligation — and clearing must always be
         // possible, because a mis-tap that cannot be undone turns a log into a
         // permanent record of a mistake.
+        // A small "Saved" beside a field that holds something (2026-09-27),
+        // so a tap is seen to stick.
+        if (current != null) ...[
+          const Icon(Icons.check_rounded, size: 14, color: ttcSoft),
+          const SizedBox(width: 3),
+          Text(kTtcTrackerSaved,
+              style: ttcBody(12.5, color: ttcSoft, w: FontWeight.w600)),
+        ],
         if (current != null)
           GestureDetector(
             onTap: () => TtcLogStore.instance.clear(tracker.id, field.id),
@@ -487,9 +541,15 @@ class _FieldRow extends StatelessWidget {
           ),
       ]),
       const SizedBox(height: 8),
-      if (field.kind == TtcFieldKind.number)
-        _Stepper(tracker: tracker, field: field, current: current)
-      else
+      if (field.kind == TtcFieldKind.number) ...[
+        _Stepper(tracker: tracker, field: field, current: current),
+        // One-tap answers for the usual values (2026-09-27): 40 minutes
+        // was eight taps from zero.
+        if (field.presets.isNotEmpty) ...[
+          const SizedBox(height: 10),
+          _Presets(tracker: tracker, field: field, current: current),
+        ],
+      ] else
         _Segments(tracker: tracker, field: field, hi: hi, current: current),
       if (read != null) ...[
         const SizedBox(height: 10),
@@ -1254,9 +1314,12 @@ class _NumberSheetState extends State<_NumberSheet> {
                                 color: ttcSoft, w: FontWeight.w600)),
                       ],
                     ]),
-                    const SizedBox(height: 8),
-                    Text('Leave it blank to clear it.',
-                        style: ttcBody(12, color: ttcMuted)),
+                    // ⚠️ ONE WAY TO CLEAR (tools pass, 2026-09-27): the field
+                    // already says "Clear" once it holds a value. A blank
+                    // still clears. Kept for revert:
+                    //   const SizedBox(height: 8),
+                    //   Text('Leave it blank to clear it.',
+                    //       style: ttcBody(12, color: ttcMuted)),
                     const SizedBox(height: 18),
                     SizedBox(
                       width: double.infinity,
@@ -1282,4 +1345,1146 @@ class _NumberSheetState extends State<_NumberSheet> {
           ),
         ),
       );
+}
+
+// ---- tools pass, 2026-09-27 ------------------------------------------------
+
+/// The header link to the four-week view, saying what it shows.
+const String kTtcTrackerLookBack = 'Past 4 weeks';
+
+/// Beside a field that holds a value.
+const String kTtcTrackerSaved = 'Saved';
+
+/// On his tracker: who fills it in.
+const String kTtcTrackerPartnerWho =
+    'You can fill this in together, or your partner can fill it in from his '
+    'side of the app.';
+
+/// 6 · 7 · 8 hrs. A tap writes the value; tapping the chosen one clears it,
+/// like every other choice on this screen.
+class _Presets extends StatelessWidget {
+  const _Presets({
+    required this.tracker,
+    required this.field,
+    required this.current,
+  });
+
+  final TtcTracker tracker;
+  final TtcField field;
+  final TtcLogValue? current;
+
+  @override
+  Widget build(BuildContext context) {
+    String fmt(double v) =>
+        v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toStringAsFixed(1);
+    return Wrap(spacing: 8, runSpacing: 8, children: [
+      for (final v in field.presets)
+        Builder(builder: (context) {
+          final on = current != null && (current!.value - v).abs() < 1e-6;
+          final label = field.unit == null ? fmt(v) : '${fmt(v)} ${field.unit}';
+          return Semantics(
+            button: true,
+            selected: on,
+            label: label,
+            excludeSemantics: true,
+            child: GestureDetector(
+              key: ValueKey('ttc_preset_${field.id}_${fmt(v)}'),
+              behavior: HitTestBehavior.opaque,
+              onTap: () => on
+                  ? TtcLogStore.instance.clear(tracker.id, field.id)
+                  : TtcLogStore.instance.log(tracker.id, field.id, v),
+              child: Container(
+                constraints: const BoxConstraints(minHeight: 40),
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: on ? _kTint : Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                      color: on ? ttcTitleInk : ttcBorder, width: on ? 1.5 : 1),
+                ),
+                child: Text(label,
+                    style: ttcBody(12.5,
+                        color: on ? ttcTitleInk : ttcInk,
+                        w: on ? FontWeight.w800 : FontWeight.w600)),
+              ),
+            ),
+          );
+        }),
+    ]);
+  }
+}
+
+// =============================================================================
+//  THE REBUILD — 2026-09-27, the tool rebuild (the user, walking build 13:
+//  "old tools in new clothes… poor functionality")
+// -----------------------------------------------------------------------------
+//  What a first-time user hit on the old screen, and what happens now:
+//
+//  * **Only today could be logged.** Sleep is logged the next morning, a
+//    weigh-in gets missed, a Sunday is remembered on Monday, and there was no
+//    way to put any of it on the right day. A week strip now sits at the top
+//    (Bevel's Journal and Clue's log both open on one): tap a day, log it.
+//  * **The look-back could look, not touch.** "Past 4 weeks" drew a chart and
+//    nothing on it opened. It now lists every day with an entry under the
+//    chart, and a tap opens that day to change or clear it (the weight apps'
+//    "All entries" list: Alma, MacroFactor, Hevy).
+//  * **Weight was drawn as bars from zero,** so 61 kg and 62 kg looked the
+//    same height. Weight is a line now, scaled to her own range.
+//  * **Clear had no way back.** A mis-tap on "Clear" lost the value; it now
+//    says so and offers Undo.
+//  * **Old chrome.** Its own back bar, `ttcBg`, a coral `TtcCard` and green
+//    tints: none of it matched the tool shell the other tools wear. It is the
+//    tool shell now (`TtcToolScaffold`), with the tile's name as the eyebrow,
+//    a chosen answer in ink like every other tool, and hairlines for depth.
+//
+//  Mobbin (2026-09-27):
+//    Bevel Journal, a week strip over the day's rows
+//      https://mobbin.com/screens/be4c91e4-d0a8-4840-9654-6834039006b0
+//    Clue log, the day strip above the categories
+//      https://mobbin.com/screens/061215bd-34ed-4f9d-909e-e4481b6faafb
+//    Alma weight, a line then "All entries"
+//      https://mobbin.com/screens/f28eba19-4f70-46e3-aa06-78501c448430
+//    MacroFactor Scale Weight, dated entries each with an edit mark
+//      https://mobbin.com/screens/3670bd7d-82d1-4015-940a-8cf38d5d90a0
+//
+//  Unchanged on purpose: the store and every key (`tracker/field/day`), the
+//  no-score rule, "a gap draws nothing", the severe-scale notice, the field
+//  presets and typing, and the tracker's own `why`.
+// =============================================================================
+
+/// The hue each tracker's field takes: the group its Tools tile sits in.
+double _trackerHue(TtcTracker t) => t.id == 'partner_health' ? 186 : 172;
+
+/// The eyebrow is the Tools tile's name, so tile, eyebrow and title agree.
+String _trackerEyebrow(TtcTracker t, bool hi) {
+  if (t.forPartner && TtcPartnerMode.instance.on) return 'Your health';
+  return ttcToolById(t.id)?.name(hi) ?? t.title(hi);
+}
+
+/// One plain line saying what this screen is for.
+String ttcTrackerTitle(TtcTracker t) {
+  final him = TtcPartnerMode.instance.on;
+  return switch (t.id) {
+    'weight' => 'Note your weight.',
+    'habits' => 'Sleep, movement and what you cut down.',
+    'partner_health' => him
+        ? 'Your sleep, drinks, smoke and heat.'
+        : 'His sleep, drinks, smoke and heat.',
+    'mood' => 'How today felt.',
+    'symptoms' => 'What your body did today.',
+    _ => t.subtitle(false),
+  };
+}
+
+/// The intro: what she does here, and that it saves.
+const String kTtcTrackerIntro =
+    'Pick a day, then tap what fits. Each answer saves as you tap. One thing '
+    'is enough.';
+
+/// On his tracker, when he is the one looking.
+const String kTtcTrackerPartnerWhoHim = 'This one is yours to fill in.';
+
+/// The first of the two views; the second is [kTtcTrackerLookBack].
+const String kTtcTrackerLogView = 'Log a day';
+
+/// Under the day strip.
+String ttcTrackerDayLine(DateTime day, DateTime today) {
+  final gap = today.difference(day).inDays;
+  final date = ttcRoundDate(day);
+  if (gap == 0) return 'Logging for today, $date';
+  if (gap == 1) return 'Logging for yesterday, $date';
+  return 'Logging for $date';
+}
+
+/// Above the entries under the chart.
+const String kTtcTrackerEntriesTitle = 'Days with an entry';
+const String kTtcTrackerEntriesHint = 'Tap a day to change or clear it.';
+const String kTtcTrackerEntriesEmpty =
+    'Nothing written down in the past four weeks. Tap "Log a day" to add one.';
+
+DateTime _dayOnly(DateTime d) => DateTime(d.year, d.month, d.day);
+
+String _fmtNum(double v) =>
+    v == v.roundToDouble() ? v.toStringAsFixed(0) : v.toStringAsFixed(1);
+
+class TtcTrackerScreen extends StatefulWidget {
+  const TtcTrackerScreen({super.key, required this.tracker, this.day});
+
+  final TtcTracker tracker;
+
+  /// The day to open on. Null is today.
+  final DateTime? day;
+
+  @override
+  State<TtcTrackerScreen> createState() => _TtcTrackerScreenState();
+}
+
+class _TtcTrackerScreenState extends State<TtcTrackerScreen> {
+  late DateTime _day = _dayOnly(widget.day ?? DateTime.now());
+  bool _past = false;
+  late String _pastField = widget.tracker.fields.first.id;
+
+  void _openDay(DateTime d) => setState(() {
+        _day = _dayOnly(d);
+        _past = false;
+      });
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: Listenable.merge(
+          [TtcLogStore.instance, TtcLang.instance, TtcPartnerMode.instance]),
+      builder: (context, _) {
+        final t = TtcS.current();
+        final hi = t.hinglish;
+        final tracker = widget.tracker;
+        final hue = _trackerHue(tracker);
+        return TtcToolScaffold(
+          hue: hue,
+          eyebrow: _trackerEyebrow(tracker, hi),
+          title: ttcTrackerTitle(tracker),
+          intro: kTtcTrackerIntro,
+          children: [
+            const SizedBox(height: 20),
+            // A Wrap, so a large text size puts the second pill under the
+            // first rather than off the edge at 360dp.
+            ttcToolPad(Wrap(spacing: 8, runSpacing: 8, children: [
+              TtcToolPill(
+                key: const ValueKey('ttc_tracker_view_log'),
+                label: kTtcTrackerLogView,
+                on: !_past,
+                hue: hue,
+                onTap: () => setState(() => _past = false),
+              ),
+              TtcToolPill(
+                key: const ValueKey('ttc_tracker_view_past'),
+                label: kTtcTrackerLookBack,
+                on: _past,
+                hue: hue,
+                onTap: () => setState(() => _past = true),
+              ),
+            ])),
+            const SizedBox(height: 20),
+            if (!_past)
+              ..._log(context, tracker, t)
+            else
+              ..._pastView(tracker, t),
+            const SizedBox(height: 28),
+          ],
+        );
+      },
+    );
+  }
+
+  List<Widget> _log(BuildContext context, TtcTracker tracker, TtcS t) {
+    final hi = t.hinglish;
+    final p = V2PaletteStore.instance.current;
+    final today = _dayOnly(DateTime.now());
+
+    // One block per heading, in field order (the same rule as `_TodayBody`).
+    final blocks = <(String?, List<TtcField>)>[];
+    for (final f in tracker.fields) {
+      final at =
+          f.group == null ? -1 : blocks.indexWhere((b) => b.$1 == f.group);
+      if (at >= 0) {
+        blocks[at].$2.add(f);
+      } else if (f.group == null &&
+          blocks.isNotEmpty &&
+          blocks.last.$1 == null) {
+        blocks.last.$2.add(f);
+      } else {
+        blocks.add((f.group, [f]));
+      }
+    }
+
+    return [
+      ttcToolPad(_DayStrip(
+        tracker: tracker,
+        selected: _day,
+        today: today,
+        onPick: (d) => setState(() => _day = d),
+      )),
+      const SizedBox(height: 12),
+      ttcToolPad(Row(children: [
+        Expanded(
+          child: Text(ttcTrackerDayLine(_day, today),
+              key: const ValueKey('ttc_tracker_day_line'),
+              style: pvManrope(
+                  fontSize: 13.5, fontWeight: FontWeight.w800, color: p.ink1)),
+        ),
+        if (_day != today)
+          InkWell(
+            key: const ValueKey('ttc_tracker_back_today'),
+            onTap: () => setState(() => _day = today),
+            borderRadius: BorderRadius.circular(8),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+              child: Text('Back to today',
+                  style: pvManrope(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w800,
+                      color: ttcTitleInk,
+                      decoration: TextDecoration.underline)),
+            ),
+          ),
+      ])),
+      const SizedBox(height: 14),
+      // The tracker's own "why", kept visible: `ttc_tools_test.dart` holds
+      // that the reason comes before anything is asked for.
+      ttcToolPad(Text(tracker.why(hi),
+          style: pvManrope(fontSize: 12.5, height: 1.55, color: p.ink2))),
+      if (tracker.forPartner) ...[
+        const SizedBox(height: 10),
+        ttcToolPad(Text(
+            TtcPartnerMode.instance.on
+                ? kTtcTrackerPartnerWhoHim
+                : kTtcTrackerPartnerWho,
+            key: const ValueKey('ttc_tracker_partner_who'),
+            style: pvManrope(
+                fontSize: 12.5,
+                height: 1.5,
+                fontWeight: FontWeight.w700,
+                color: p.ink2))),
+      ],
+      const SizedBox(height: 24),
+      for (var b = 0; b < blocks.length; b++) ...[
+        if (b > 0) ...[
+          const SizedBox(height: 22),
+          ttcToolPad(Container(height: 1, color: p.line)),
+          const SizedBox(height: 22),
+        ],
+        if (blocks[b].$1 != null) ...[
+          ttcToolPad(Text(blocks[b].$1!.toUpperCase(),
+              style: pvManrope(
+                  fontSize: 10.5,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: 1.3,
+                  color: p.ink3))),
+          const SizedBox(height: 14),
+        ],
+        for (var i = 0; i < blocks[b].$2.length; i++) ...[
+          if (i > 0) const SizedBox(height: 20),
+          ttcToolPad(_FieldBlock(
+              tracker: tracker, field: blocks[b].$2[i], day: _day, t: t)),
+        ],
+      ],
+      ttcToolPad(_SevereLine(tracker: tracker, day: _day, t: t)),
+      if (tracker.disclaimer(hi) != null) ...[
+        const SizedBox(height: 24),
+        ttcToolPad(Text(tracker.disclaimer(hi)!,
+            style: pvManrope(fontSize: 11.5, height: 1.5, color: p.ink3))),
+      ],
+    ];
+  }
+
+  List<Widget> _pastView(TtcTracker tracker, TtcS t) {
+    final hi = t.hinglish;
+    final p = V2PaletteStore.instance.current;
+    final field = tracker.fields.firstWhere((f) => f.id == _pastField,
+        orElse: () => tracker.fields.first);
+    final today = _dayOnly(DateTime.now());
+    final entries = <(DateTime, double)>[
+      for (var i = 0; i < _kLookBackDays; i++)
+        if (TtcLogStore.instance.valueFor(tracker.id, field.id,
+                on: today.subtract(Duration(days: i)))
+            case final v?)
+          (today.subtract(Duration(days: i)), v.value),
+    ];
+    return [
+      if (tracker.fields.length > 1) ...[
+        SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          padding: const EdgeInsets.symmetric(horizontal: 18),
+          child: Row(children: [
+            for (final f in tracker.fields) ...[
+              TtcToolPill(
+                key: ValueKey('ttc_tracker_past_${f.id}'),
+                label: f.label(hi),
+                on: f.id == field.id,
+                hue: _trackerHue(tracker),
+                onTap: () => setState(() => _pastField = f.id),
+              ),
+              if (f != tracker.fields.last) const SizedBox(width: 8),
+            ],
+          ]),
+        ),
+        const SizedBox(height: 22),
+      ],
+      ttcToolPad(field.kind == TtcFieldKind.number && field.unit == 'kg'
+          ? _WeightLook(tracker: tracker, field: field)
+          : _LookBackStrip(tracker: tracker, field: field, hi: hi)),
+      const SizedBox(height: 26),
+      ttcToolPad(Text(kTtcTrackerEntriesTitle,
+          style: pvFraunces(
+              fontSize: 19, fontWeight: FontWeight.w600, color: p.ink1))),
+      const SizedBox(height: 4),
+      ttcToolPad(Text(
+          entries.isEmpty ? kTtcTrackerEntriesEmpty : kTtcTrackerEntriesHint,
+          style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink3))),
+      const SizedBox(height: 8),
+      for (final (d, v) in entries)
+        ttcToolPad(InkWell(
+          key: ValueKey('ttc_tracker_entry_${TtcLogStore.dayKey(d)}'),
+          onTap: () => _openDay(d),
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 48),
+            padding: const EdgeInsets.symmetric(vertical: 10),
+            decoration:
+                BoxDecoration(border: Border(bottom: BorderSide(color: p.line))),
+            child: Row(children: [
+              Expanded(
+                child: Text(
+                    d == today ? 'Today, ${ttcRoundDate(d)}' : ttcRoundDate(d),
+                    style: pvManrope(
+                        fontSize: 13.5,
+                        fontWeight: FontWeight.w700,
+                        color: p.ink1)),
+              ),
+              Text(field.display(hi, v),
+                  style: pvManrope(
+                      fontSize: 13.5,
+                      fontWeight: FontWeight.w800,
+                      color: p.ink1)),
+              const SizedBox(width: 6),
+              Icon(Icons.chevron_right_rounded, size: 18, color: p.ink3),
+            ]),
+          ),
+        )),
+    ];
+  }
+}
+
+/// The last seven days, today on the right. A dot under a day that holds
+/// anything for this tracker; the chosen day in ink.
+class _DayStrip extends StatelessWidget {
+  const _DayStrip({
+    required this.tracker,
+    required this.selected,
+    required this.today,
+    required this.onPick,
+  });
+
+  final TtcTracker tracker;
+  final DateTime selected;
+  final DateTime today;
+  final ValueChanged<DateTime> onPick;
+
+  static const _letters = ['M', 'T', 'W', 'T', 'F', 'S', 'S'];
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    final logged = TtcLogStore.instance.daysLogged(tracker.id).toSet();
+    return Row(children: [
+      for (var i = 6; i >= 0; i--)
+        Expanded(
+          child: Builder(builder: (_) {
+            final d = today.subtract(Duration(days: i));
+            final on = d == selected;
+            final has = logged.contains(TtcLogStore.dayKey(d));
+            return Semantics(
+              button: true,
+              selected: on,
+              label: '${ttcRoundDate(d)}${has ? ', has an entry' : ''}',
+              excludeSemantics: true,
+              onTap: () => onPick(d),
+              child: GestureDetector(
+                key: ValueKey('ttc_tracker_day_${TtcLogStore.dayKey(d)}'),
+                behavior: HitTestBehavior.opaque,
+                onTap: () => onPick(d),
+                child: Column(children: [
+                  Text(_letters[d.weekday - 1],
+                      style: pvManrope(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: p.ink3)),
+                  const SizedBox(height: 6),
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 140),
+                    width: 38,
+                    height: 38,
+                    alignment: Alignment.center,
+                    decoration: BoxDecoration(
+                      color: on ? ttcTitleInk : Colors.white,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                          color: on ? ttcTitleInk : ttcLine, width: 1.4),
+                    ),
+                    child: Text('${d.day}',
+                        style: pvManrope(
+                            fontSize: 13.5,
+                            fontWeight: FontWeight.w800,
+                            color: on ? Colors.white : ttcTitleInk)),
+                  ),
+                  const SizedBox(height: 5),
+                  Container(
+                    width: 5,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: has ? ttcTitleInk : Colors.transparent,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ]),
+              ),
+            );
+          }),
+        ),
+    ]);
+  }
+}
+
+/// One field for one day: its label, "Saved" and Clear, then the control.
+class _FieldBlock extends StatelessWidget {
+  const _FieldBlock({
+    required this.tracker,
+    required this.field,
+    required this.day,
+    required this.t,
+  });
+
+  final TtcTracker tracker;
+  final TtcField field;
+  final DateTime day;
+  final TtcS t;
+
+  /// Clear, then say so with Undo: a mis-tap on "Clear" used to lose the value.
+  void _clear(BuildContext context, TtcLogValue was) {
+    final log = TtcLogStore.instance;
+    log.clear(tracker.id, field.id, on: day);
+    pvSnack(context, '${field.labelEn} cleared.',
+        icon: Icons.check_rounded,
+        lift: 24,
+        action: 'Undo',
+        onAction: () => log.log(tracker.id, field.id, was.value, on: day));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hi = t.hinglish;
+    final p = V2PaletteStore.instance.current;
+    final current =
+        TtcLogStore.instance.valueFor(tracker.id, field.id, on: day);
+    final read = field.readId == null ? null : ttcReadById(field.readId!);
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Row(children: [
+        Expanded(
+          child: Text(field.label(hi),
+              style: pvManrope(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  height: 1.35,
+                  color: p.ink1)),
+        ),
+        if (current != null) ...[
+          Icon(Icons.check_rounded, size: 14, color: p.ink2),
+          const SizedBox(width: 3),
+          Text(kTtcTrackerSaved,
+              style: pvManrope(
+                  fontSize: 12, fontWeight: FontWeight.w700, color: p.ink2)),
+          InkWell(
+            key: ValueKey('ttc_tracker_clear_${field.id}'),
+            onTap: () => _clear(context, current),
+            borderRadius: BorderRadius.circular(8),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(10, 8, 2, 8),
+              child: Text(t.trackerClear,
+                  style: pvManrope(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w800,
+                      color: ttcTitleInk,
+                      decoration: TextDecoration.underline)),
+            ),
+          ),
+        ],
+      ]),
+      const SizedBox(height: 10),
+      switch (field.kind) {
+        TtcFieldKind.number => _NumberRow(
+            tracker: tracker, field: field, day: day, current: current),
+        TtcFieldKind.scale => _ScaleRow(
+            tracker: tracker, field: field, day: day, hi: hi, current: current),
+        TtcFieldKind.choice => _ChoiceWrap(
+            tracker: tracker, field: field, day: day, hi: hi, current: current),
+      },
+      if (read != null) ...[
+        const SizedBox(height: 12),
+        Semantics(
+          button: true,
+          label: read.title.of(AppLanguage.english),
+          excludeSemantics: true,
+          onTap: () =>
+              openTtcArticle(context, field.readId!, hue: kTtcTrackerReadHue),
+          child: InkWell(
+            onTap: () =>
+                openTtcArticle(context, field.readId!, hue: kTtcTrackerReadHue),
+            borderRadius: BorderRadius.circular(14),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(color: ttcLine),
+              ),
+              child: Row(children: [
+                const Icon(Icons.article_outlined,
+                    size: 16, color: ttcTitleInk),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(read.title.of(AppLanguage.english),
+                      maxLines: 2,
+                      style: pvManrope(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          height: 1.35,
+                          color: ttcTitleInk)),
+                ),
+                Icon(Icons.chevron_right_rounded, size: 18, color: p.ink3),
+              ]),
+            ),
+          ),
+        ),
+      ],
+    ]);
+  }
+}
+
+/// White with a hairline at rest, ink when chosen: the one selection
+/// treatment every tool uses (`ttc_tool_chrome.dart`).
+BoxDecoration _block(bool on) => BoxDecoration(
+      color: on ? ttcTitleInk : Colors.white,
+      borderRadius: BorderRadius.circular(14),
+      border: Border.all(color: on ? ttcTitleInk : ttcLine, width: 1.4),
+    );
+
+TextStyle _blockText(bool on, {double size = 12}) => pvManrope(
+    fontSize: size,
+    fontWeight: on ? FontWeight.w800 : FontWeight.w600,
+    color: on ? Colors.white : ttcTitleInk);
+
+/// An ordered scale: one row, equal widths, never wrapping (see `_Segments`).
+class _ScaleRow extends StatelessWidget {
+  const _ScaleRow({
+    required this.tracker,
+    required this.field,
+    required this.day,
+    required this.hi,
+    required this.current,
+  });
+
+  final TtcTracker tracker;
+  final TtcField field;
+  final DateTime day;
+  final bool hi;
+  final TtcLogValue? current;
+
+  @override
+  Widget build(BuildContext context) {
+    final options = field.choices(hi);
+    final chosen = current?.value.round();
+    return Row(children: [
+      for (var i = 0; i < options.length; i++) ...[
+        Expanded(
+          child: Semantics(
+            button: true,
+            selected: i == chosen,
+            label: options[i],
+            excludeSemantics: true,
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => i == chosen
+                  ? TtcLogStore.instance.clear(tracker.id, field.id, on: day)
+                  : TtcLogStore.instance
+                      .log(tracker.id, field.id, i.toDouble(), on: day),
+              child: Container(
+                height: 44,
+                alignment: Alignment.center,
+                padding: const EdgeInsets.symmetric(horizontal: 3),
+                decoration: _block(i == chosen),
+                child: Text(options[i],
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    textAlign: TextAlign.center,
+                    style: _blockText(i == chosen, size: 11.5)),
+              ),
+            ),
+          ),
+        ),
+        if (i < options.length - 1) const SizedBox(width: 6),
+      ],
+    ]);
+  }
+}
+
+/// Named choices with no order: they may wrap.
+class _ChoiceWrap extends StatelessWidget {
+  const _ChoiceWrap({
+    required this.tracker,
+    required this.field,
+    required this.day,
+    required this.hi,
+    required this.current,
+  });
+
+  final TtcTracker tracker;
+  final TtcField field;
+  final DateTime day;
+  final bool hi;
+  final TtcLogValue? current;
+
+  @override
+  Widget build(BuildContext context) {
+    final options = field.choices(hi);
+    final chosen = current?.value.round();
+    return Wrap(spacing: 8, runSpacing: 8, children: [
+      for (var i = 0; i < options.length; i++)
+        TtcToolPill(
+          label: options[i],
+          on: i == chosen,
+          hue: _trackerHue(tracker),
+          onTap: () => i == chosen
+              ? TtcLogStore.instance.clear(tracker.id, field.id, on: day)
+              : TtcLogStore.instance
+                  .log(tracker.id, field.id, i.toDouble(), on: day),
+        ),
+    ]);
+  }
+}
+
+/// − · the number (tap to type) · +, then the usual values in one tap.
+class _NumberRow extends StatelessWidget {
+  const _NumberRow({
+    required this.tracker,
+    required this.field,
+    required this.day,
+    required this.current,
+  });
+
+  final TtcTracker tracker;
+  final TtcField field;
+  final DateTime day;
+  final TtcLogValue? current;
+
+  void _bump(double delta) {
+    // The first tap lands on `start`, whichever button it was (see _Stepper).
+    final next = current != null
+        ? (current!.value + delta).clamp(field.min, field.max)
+        : (field.start ?? field.min);
+    TtcLogStore.instance
+        .log(tracker.id, field.id, (next * 10).roundToDouble() / 10, on: day);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    final has = current != null;
+    Widget stepButton(String label, String semantics, VoidCallback onTap) =>
+        Semantics(
+          button: true,
+          label: semantics,
+          excludeSemantics: true,
+          onTap: onTap,
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTap: onTap,
+            child: Container(
+              width: 44,
+              height: 44,
+              alignment: Alignment.center,
+              decoration: _block(false),
+              child: Text(label,
+                  style: pvManrope(
+                      fontSize: 19,
+                      fontWeight: FontWeight.w600,
+                      color: ttcTitleInk)),
+            ),
+          ),
+        );
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Row(children: [
+        stepButton('−', 'Less', () => _bump(-field.step)),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Semantics(
+            button: true,
+            label: has
+                ? '${field.labelEn}: ${field.display(false, current!.value)}. '
+                    'Tap to type'
+                : '${field.labelEn}. Tap to type',
+            excludeSemantics: true,
+            child: GestureDetector(
+              key: ValueKey('ttc_tracker_type_${field.id}'),
+              behavior: HitTestBehavior.opaque,
+              onTap: () => _showTypeSheet(context, tracker, field, day, current),
+              child: Container(
+                height: 44,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  border:
+                      Border.all(color: has ? ttcTitleInk : ttcLine, width: 1.4),
+                ),
+                child: has
+                    ? Row(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.baseline,
+                        textBaseline: TextBaseline.alphabetic,
+                        children: [
+                          Text(_fmtNum(current!.value),
+                              style: pvFraunces(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                  color: p.ink1)),
+                          if (field.unit != null) ...[
+                            const SizedBox(width: 5),
+                            Text(field.unit!,
+                                style: pvManrope(
+                                    fontSize: 12.5,
+                                    fontWeight: FontWeight.w700,
+                                    color: p.ink2)),
+                          ],
+                        ],
+                      )
+                    : Text(
+                        field.unit == null
+                            ? 'Tap to type'
+                            : 'Tap to type ${field.unit}',
+                        style: pvManrope(
+                            fontSize: 12.5,
+                            fontWeight: FontWeight.w700,
+                            color: p.ink3)),
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(width: 10),
+        stepButton('+', 'More', () => _bump(field.step)),
+      ]),
+      if (field.presets.isNotEmpty) ...[
+        const SizedBox(height: 10),
+        Wrap(spacing: 8, runSpacing: 8, children: [
+          for (final v in field.presets)
+            Builder(builder: (_) {
+              final on = has && (current!.value - v).abs() < 1e-6;
+              return TtcToolPill(
+                key: ValueKey('ttc_preset_${field.id}_${_fmtNum(v)}'),
+                label:
+                    field.unit == null ? _fmtNum(v) : '${_fmtNum(v)} ${field.unit}',
+                on: on,
+                hue: _trackerHue(tracker),
+                onTap: () => on
+                    ? TtcLogStore.instance.clear(tracker.id, field.id, on: day)
+                    : TtcLogStore.instance.log(tracker.id, field.id, v, on: day),
+              );
+            }),
+        ]),
+      ],
+    ]);
+  }
+}
+
+/// The severe-scale line, as a result block in the tool's own shape. Same
+/// trigger and words as `_SevereNotice`: the far end of a scale, never a
+/// value judged "bad".
+class _SevereLine extends StatelessWidget {
+  const _SevereLine(
+      {required this.tracker, required this.day, required this.t});
+
+  final TtcTracker tracker;
+  final DateTime day;
+  final TtcS t;
+
+  @override
+  Widget build(BuildContext context) {
+    final severe = tracker.fields.any((f) {
+      if (f.kind != TtcFieldKind.scale) return false;
+      final v = TtcLogStore.instance.valueFor(tracker.id, f.id, on: day);
+      return v != null && v.value.round() >= f.choicesEn.length - 1;
+    });
+    if (!severe) return const SizedBox.shrink();
+    final p = V2PaletteStore.instance.current;
+    return Padding(
+      padding: const EdgeInsets.only(top: 24),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: ttcTitleInk, width: 1.2),
+        ),
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          Text(t.severeNoticedTitle,
+              style: pvManrope(
+                  fontSize: 14.5, fontWeight: FontWeight.w800, color: p.ink1)),
+          const SizedBox(height: 6),
+          Text(t.severeNoticedBody,
+              style: pvManrope(fontSize: 13, height: 1.55, color: p.ink2)),
+        ]),
+      ),
+    );
+  }
+}
+
+/// Four weeks of weight, as a line scaled to her own range: from zero, 61 and
+/// 62 kg drew the same bar.
+class _WeightLook extends StatelessWidget {
+  const _WeightLook({required this.tracker, required this.field});
+
+  final TtcTracker tracker;
+  final TtcField field;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    final today = _dayOnly(DateTime.now());
+    final data = <double?>[
+      for (var i = _kLookBackDays - 1; i >= 0; i--)
+        TtcLogStore.instance
+            .valueFor(tracker.id, field.id,
+                on: today.subtract(Duration(days: i)))
+            ?.value,
+    ];
+    final present = data.whereType<double>().toList();
+    String caption() {
+      if (present.isEmpty) return 'Nothing written down here yet.';
+      final lo = present.reduce((a, b) => a < b ? a : b);
+      final hi = present.reduce((a, b) => a > b ? a : b);
+      if (lo == hi) return '${_fmtNum(lo)} kg on the days you wrote it down.';
+      return 'Between ${_fmtNum(lo)} and ${_fmtNum(hi)} kg, on the days you '
+          'wrote it down.';
+    }
+
+    return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Text(field.labelEn,
+          style: pvFraunces(
+              fontSize: 20, fontWeight: FontWeight.w600, color: p.ink1)),
+      const SizedBox(height: 4),
+      Text('Last four weeks', style: pvManrope(fontSize: 13, color: p.ink3)),
+      const SizedBox(height: 16),
+      SizedBox(
+        height: 120,
+        width: double.infinity,
+        child: CustomPaint(
+          key: const ValueKey('ttc_tracker_weight_line'),
+          painter: _LinePainter(data: data, line: p.line),
+        ),
+      ),
+      const SizedBox(height: 6),
+      Container(height: 1, color: p.line),
+      const SizedBox(height: 7),
+      const _WeekLabels(),
+      const SizedBox(height: 14),
+      Text(caption(),
+          style: pvManrope(fontSize: 13, height: 1.45, color: p.ink1)),
+    ]);
+  }
+}
+
+class _LinePainter extends CustomPainter {
+  _LinePainter({required this.data, required this.line});
+
+  final List<double?> data;
+  final Color line;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final present = data.whereType<double>().toList();
+    if (present.isEmpty) return;
+    var lo = present.reduce((a, b) => a < b ? a : b);
+    var hi = present.reduce((a, b) => a > b ? a : b);
+    // At least a two-kilo range, so a steady weight draws a steady line
+    // rather than a zig-zag of tenths.
+    if (hi - lo < 2) {
+      final mid = (hi + lo) / 2;
+      lo = mid - 1;
+      hi = mid + 1;
+    }
+    final grid = Paint()
+      ..color = line
+      ..strokeWidth = 1;
+    canvas.drawLine(const Offset(0, 8), Offset(size.width, 8), grid);
+    Offset at(int i, double v) => Offset(
+          data.length == 1 ? size.width / 2 : i * size.width / (data.length - 1),
+          8 + (1 - (v - lo) / (hi - lo)) * (size.height - 16),
+        );
+    final stroke = Paint()
+      ..color = ttcTitleInk
+      ..strokeWidth = 2
+      ..style = PaintingStyle.stroke;
+    final path = Path();
+    var started = false;
+    for (var i = 0; i < data.length; i++) {
+      final v = data[i];
+      if (v == null) continue;
+      final o = at(i, v);
+      if (!started) {
+        path.moveTo(o.dx, o.dy);
+        started = true;
+      } else {
+        path.lineTo(o.dx, o.dy);
+      }
+    }
+    canvas.drawPath(path, stroke);
+    final dot = Paint()..color = ttcTitleInk;
+    for (var i = 0; i < data.length; i++) {
+      final v = data[i];
+      if (v != null) canvas.drawCircle(at(i, v), 3.5, dot);
+    }
+  }
+
+  @override
+  bool shouldRepaint(_LinePainter old) => old.data != data;
+}
+
+/// Type a number for [day]: the tool's own sheet and Save.
+Future<void> _showTypeSheet(BuildContext context, TtcTracker tracker,
+        TtcField field, DateTime day, TtcLogValue? current) =>
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      routeSettings: const RouteSettings(name: 'ttc/tracker/type'),
+      builder: (_) => _TypeSheet(
+          tracker: tracker, field: field, day: day, current: current?.value),
+    );
+
+class _TypeSheet extends StatefulWidget {
+  const _TypeSheet({
+    required this.tracker,
+    required this.field,
+    required this.day,
+    required this.current,
+  });
+
+  final TtcTracker tracker;
+  final TtcField field;
+  final DateTime day;
+  final double? current;
+
+  @override
+  State<_TypeSheet> createState() => _TypeSheetState();
+}
+
+class _TypeSheetState extends State<_TypeSheet> {
+  late final TextEditingController _c = TextEditingController(
+      text: widget.current == null ? '' : _fmtNum(widget.current!));
+
+  @override
+  void dispose() {
+    _c.dispose();
+    super.dispose();
+  }
+
+  void _save() {
+    final v = double.tryParse(_c.text.trim());
+    final log = TtcLogStore.instance;
+    if (v == null) {
+      // A blank clears rather than writing a zero she did not enter.
+      log.clear(widget.tracker.id, widget.field.id, on: widget.day);
+    } else {
+      log.log(widget.tracker.id, widget.field.id,
+          v.clamp(widget.field.min, widget.field.max).toDouble(),
+          on: widget.day);
+    }
+    Navigator.of(context).maybePop();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    return Padding(
+      padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(context).bottom),
+      child: Container(
+        decoration: BoxDecoration(
+          color: p.ground,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(18, 12, 18, 20),
+            child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 38,
+                      height: 4,
+                      decoration: BoxDecoration(
+                          color: p.line,
+                          borderRadius: BorderRadius.circular(999)),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Text(widget.field.label(TtcS.current().hinglish),
+                      style: pvFraunces(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
+                          height: 1.2,
+                          color: p.ink1)),
+                  const SizedBox(height: 4),
+                  Text('For ${ttcRoundDate(widget.day)}',
+                      style: pvManrope(fontSize: 13, color: p.ink2)),
+                  const SizedBox(height: 14),
+                  Row(children: [
+                    Expanded(
+                      child: TextField(
+                        key: const ValueKey('ttc_tracker_type_field'),
+                        controller: _c,
+                        autofocus: true,
+                        keyboardType: const TextInputType.numberWithOptions(
+                            decimal: true),
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                        ],
+                        onSubmitted: (_) => _save(),
+                        style: pvFraunces(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w600,
+                            color: p.ink1),
+                        decoration: InputDecoration(
+                          isDense: true,
+                          filled: true,
+                          fillColor: Colors.white,
+                          hintText: '—',
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 14),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide: const BorderSide(color: ttcLine),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                            borderSide:
+                                const BorderSide(color: ttcTitleInk, width: 1.4),
+                          ),
+                        ),
+                      ),
+                    ),
+                    if (widget.field.unit != null) ...[
+                      const SizedBox(width: 12),
+                      Text(widget.field.unit!,
+                          style: pvManrope(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: p.ink2)),
+                    ],
+                  ]),
+                  const SizedBox(height: 18),
+                  TtcToolPrimary(
+                      key: const ValueKey('ttc_tracker_type_save'),
+                      label: 'Save',
+                      onTap: _save),
+                ]),
+          ),
+        ),
+      ),
+    );
+  }
 }

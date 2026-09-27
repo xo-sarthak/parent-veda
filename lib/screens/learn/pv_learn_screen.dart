@@ -30,8 +30,10 @@ import '../../models/pv_product.dart' show PvStageCopy;
 import '../../services/life_stage_store.dart';
 import '../../services/pv_learn_progress_store.dart';
 import '../../theme/pv_fonts.dart';
-import '../../ttc/ttc_chapter.dart';
-import '../../ttc/ttc_store.dart';
+// Unused since the eyebrow names the stage (2026-09-27); kept for revert:
+// import '../../ttc/ttc_chapter.dart';
+// Unused since the eyebrow names the stage (2026-09-27); kept for revert:
+// import '../../ttc/ttc_store.dart';
 import '../post_pregnancy/pp_expert_link.dart' show openExpertProfile;
 import '../profile/pv_you_screen.dart' show openPvYou;
 import 'pv_learn_art.dart';
@@ -285,7 +287,12 @@ class _PvLearnScreenState extends State<PvLearnScreen> {
     PvOfferingView? cont;
     for (final id in progress.recentCourses) {
       final v = PvLearnCatalog.instance.byId(id);
+      // ⚠️ THIS STAGE'S COURSES ONLY (TTC launch walk, 2026-09-27): the
+      // trying Learn page offered "Continue · The Complete Pregnancy Guide".
+      // The same leak the booking strip below closed on 2026-09-22.
+      // Kept for revert: the check without `v.stage == _stage`.
       if (v != null &&
+          v.stage == _stage &&
           v.lessons.isNotEmpty &&
           progress.doneCount(id) < v.lessons.length) {
         cont = v;
@@ -886,7 +893,12 @@ class _PvLearnScreenState extends State<PvLearnScreen> {
   };
 
   static String _stageWord(LifeStage s) => switch (s) {
-    LifeStage.tryingToConceive => TtcStore.instance.today.chapter.title(false),
+    // ⚠️ THE STAGE, NOT THE CHAPTER (the user, 2026-09-27: "why is the
+    // eyebrow Trying Together… that word is not making any sense, especially
+    // for this section"). A chapter name over a list of experts explained
+    // nothing and read as a heading of its own. Kept for revert:
+    //   LifeStage.tryingToConceive => TtcStore.instance.today.chapter.title(false),
+    LifeStage.tryingToConceive => 'Trying to conceive',
     LifeStage.pregnancy => 'Pregnancy',
     LifeStage.parenting => 'Parenting',
     LifeStage.skilling => 'Parenting',

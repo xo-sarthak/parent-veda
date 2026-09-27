@@ -334,8 +334,10 @@ class _PvYouScreenState extends State<PvYouScreen> {
                   SliverToBoxAdapter(child: _journey(p, stage, content)),
                   // C — family
                   SliverToBoxAdapter(child: _family(p, stage, content)),
-                  // D — your details
-                  SliverToBoxAdapter(child: _details(p, content)),
+                  // D — your details (folded into "Your answers" when the
+                  // stage gives groups, 2026-09-27)
+                  if (content.groups == null)
+                    SliverToBoxAdapter(child: _details(p, content)),
                   // E — your things
                   SliverToBoxAdapter(child: _things(p, content)),
                   // F — preferences
@@ -344,8 +346,6 @@ class _PvYouScreenState extends State<PvYouScreen> {
                   SliverToBoxAdapter(child: _support(p, stage)),
                   // H — account
                   SliverToBoxAdapter(child: _account(p, stage)),
-                  if (kPvShowDeveloper)
-                    SliverToBoxAdapter(child: _developer(p)),
                   SliverToBoxAdapter(
                     child: Padding(
                       padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
@@ -355,6 +355,12 @@ class _PvYouScreenState extends State<PvYouScreen> {
                       ),
                     ),
                   ),
+                  // ⚠️ DEVELOPER LAST, UNDER THE FOOTER (the user, 2026-09-27):
+                  // it is never in a release build, so it must read as apart
+                  // from the screen she will get. Kept for revert: it sat above
+                  // the "ParentVeda" line.
+                  if (kPvShowDeveloper)
+                    SliverToBoxAdapter(child: _developer(p)),
                   SliverToBoxAdapter(
                     child: SizedBox(
                       height:
@@ -516,9 +522,13 @@ class _PvYouScreenState extends State<PvYouScreen> {
               (id: c.id, name: c.name, age: _ageOf(c)),
           ]
         : <({String id, String name, String age})>[];
+    // TTC says it without the dash its voice leaves out (2026-09-27); the
+    // other stages keep their line.
     final partnerLine = _partnerLinked
         ? 'Paired · sees your week and calendar'
-        : 'Invite ${widget.father ? 'her' : 'your partner'} — their own side, in step with yours';
+        : stage == LifeStage.tryingToConceive
+            ? 'Invite ${widget.father ? 'her' : 'your partner'}: their own side, in step with yours'
+            : 'Invite ${widget.father ? 'her' : 'your partner'} — their own side, in step with yours';
     return PvYouSection(
       title: 'Family',
       children: [
@@ -526,7 +536,10 @@ class _PvYouScreenState extends State<PvYouScreen> {
           name: _partnerLinked
               ? _partnerName
               : (widget.father ? _partnerName : 'Your partner'),
-          role: widget.father ? '' : 'partner',
+          // No "partner" tag after "Your partner" (2026-09-27, build 11: it
+          // read "Your partner partner"). The tag stays when a real name is
+          // shown, where it says who that person is.
+          role: widget.father || !_partnerLinked ? '' : 'partner',
           line: partnerLine,
           verified: false,
           hue: 206,
@@ -557,7 +570,9 @@ class _PvYouScreenState extends State<PvYouScreen> {
             ),
             onAdd: () => showPvAddChildSheet(context),
           )
-        else
+        // While trying there is no child's page to add or open; the row
+        // was a dash that could not be tapped (2026-09-27).
+        else if (content.groups == null)
           PvYouRow(
             icon: Icons.child_care_outlined,
             title: 'Children',
@@ -618,9 +633,16 @@ class _PvYouScreenState extends State<PvYouScreen> {
           ),
         ),
         const SizedBox(height: 10),
+        // ⚠️ ONE HEIGHT FOR ALL THREE (the user, 2026-09-27: "why is the
+        // Journal tab smaller than the tab on the left and the right?"). A
+        // tile with a count draws two lines and one without draws one, so the
+        // countless tile came out short. IntrinsicHeight + stretch makes the
+        // row as tall as its tallest tile. Kept for revert: a bare Row.
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Row(
+          child: IntrinsicHeight(
+           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               for (var i = 0; i < content.tiles.length; i++) ...[
                 if (i > 0) const SizedBox(width: 10),
@@ -633,9 +655,14 @@ class _PvYouScreenState extends State<PvYouScreen> {
                 ),
               ],
             ],
+           ),
           ),
         ),
         const SizedBox(height: 10),
+        // Short and grouped (2026-09-27): a titled card per group.
+        if (content.groups != null)
+          for (final g in content.groups!) _group(p, g)
+        else
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Container(
@@ -662,6 +689,54 @@ class _PvYouScreenState extends State<PvYouScreen> {
                   // three, every row on the other stages, draw exactly as
                   // before.
                   _thingRow(p, content.things[i]),
+                ],
+              ],
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+
+  /// One titled group: the section label, then its rows in one card.
+  Widget _group(V2Palette p, PvYouGroup g) => Padding(
+    padding: const EdgeInsets.only(top: 18),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Text(
+            g.title.toUpperCase(),
+            style: pvManrope(
+              fontSize: 10.5,
+              fontWeight: FontWeight.w800,
+              letterSpacing: 1.1,
+              color: p.action,
+            ),
+          ),
+        ),
+        const SizedBox(height: 10),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(color: kPvLine),
+            ),
+            child: Column(
+              children: [
+                for (var i = 0; i < g.things.length; i++) ...[
+                  if (i > 0)
+                    const Divider(
+                      height: 1,
+                      thickness: 1,
+                      color: kPvLine,
+                      indent: 16,
+                      endIndent: 16,
+                    ),
+                  _thingRow(p, g.things[i]),
                 ],
               ],
             ),

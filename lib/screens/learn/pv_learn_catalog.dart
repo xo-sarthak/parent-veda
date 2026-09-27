@@ -547,7 +547,11 @@ class PvLearnCatalog {
       _ => PvLearnKind.masterclass,
     };
     final engine = _engine(o.id);
-    final who = _ttcExpertName(o.expertId);
+    // ⚠️ THE ROSTER, BY NAME (TTC launch walk, 2026-09-27; the user: "put them
+    // for now", from the expert roster in MASTER-CONTENT-PLAN-v3.xlsx). The
+    // rows read "A fertility specialist" twice at two prices with nothing to
+    // tell them apart. Kept for revert: final who = _ttcExpertName(o.expertId);
+    final (who, qualification) = _ttcRosterFor(o);
     final facts = switch (kind) {
       PvLearnKind.consult => [
         const PvLearnFact('45 min', 'video session'),
@@ -573,12 +577,16 @@ class PvLearnCatalog {
       stage: LifeStage.tryingToConceive,
       kind: kind,
       title: o.titleEn,
-      subtitle: who,
+      // ⚠️ WHAT IT IS, IN ONE PLAIN LINE (2026-09-27, the tools pass): titles
+      // like "The half nobody talks about" said nothing until opened. The
+      // person stays on the expert block below. Kept for revert: subtitle: who.
+      subtitle: ttcOfferingPlainLine(o.id) ?? who,
       about: o.bodyEn,
+      // Kept for revert: role: 'ParentVeda expert',
       expert: PvLearnExpert(
         id: o.expertId,
         name: who,
-        role: 'ParentVeda expert',
+        role: qualification,
       ),
       hue: 344,
       cover: pvLearnCoverFor(o.id, [o.category, 'trying'], kind),
@@ -672,6 +680,33 @@ class PvLearnCatalog {
   );
 
   // ---- small helpers -----------------------------------------------------------
+
+  /// Who runs a TTC offering, from the expert roster (2026-09-27): the
+  /// offering first where one role has two people, then the role. A role the
+  /// roster has nobody for (an andrologist) stays a role.
+  static (String, String) _ttcRosterFor(TtcOffering o) => switch (o.id) {
+        'ttc_consult_fertility' ||
+        'ttc_ivf_prep' =>
+          ('Dr Surbhi Sharma', 'IVF gynaecologist, Bloom IVF'),
+        // A person with two consults is told apart by what each one is: the
+        // row shows the role up to its first "·", so the consult leads.
+        'ttc_assessment_couple' =>
+          ('Dr Ruchika Sood', 'Couple assessment · IVF gynaecologist'),
+        'ttc_consult_gynae' ||
+        'ttc_course_basics' ||
+        'ttc_course_pcos' =>
+          ('Dr Ruchika Sood', 'IVF gynaecologist'),
+        _ => switch (o.expertId) {
+            'ttc_dr_fertility' => ('Dr Surbhi Sharma', 'IVF gynaecologist, Bloom IVF'),
+            'ttc_dr_gynae' => ('Dr Ruchika Sood', 'IVF gynaecologist'),
+            'ttc_nutritionist' =>
+              ('Akanksha Srivastava', 'Maternal and child nutritionist'),
+            'ttc_psychologist' => ('Parmeshwari', 'Clinical psychologist'),
+            'ttc_yoga_lead' =>
+              ('Dr Kajal Sharma', 'Ayurvedic garbh sanskar and yoga'),
+            _ => (_ttcExpertName(o.expertId), 'ParentVeda expert'),
+          },
+      };
 
   static String _ttcExpertName(String id) => switch (id) {
     'ttc_dr_fertility' => 'A fertility specialist',

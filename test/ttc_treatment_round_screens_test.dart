@@ -140,7 +140,10 @@ void main() {
       expect(find.textContaining('9:15PM'), findsOneWidget,
           reason: 'the trigger keeps its minute');
       expect(find.byKey(const ValueKey('ttc_round_header')), findsOneWidget);
-      expect(find.text('Stimulation'), findsOneWidget,
+      // The header counts the day since the tool rebuild (2026-09-27), as
+      // the IVF door's panel does. Was:
+      //   expect(find.text('Stimulation'), findsOneWidget, ...);
+      expect(find.text('Stimulation · day 4'), findsOneWidget,
           reason: 'the step, derived from her dates');
       // The old chooser and questions are gone (decision 2).
       expect(find.byType(TtcPathChooser), findsNothing);
@@ -164,7 +167,10 @@ void main() {
       await pumpAt360(tester, const TtcTreatmentScreen(), height: 5000);
       expect(find.byKey(const ValueKey('ttc_round_legacy_kind')),
           findsOneWidget);
-      expect(find.text(TtcTreatmentStep.betaTest.label(false)), findsWidgets);
+      // The legacy rows use the round's names since 2026-09-27 ("Blood test").
+      // Was: find.text(TtcTreatmentStep.betaTest.label(false)).
+      expect(find.text(ttcStepLabel(TtcTreatmentStep.betaTest, null)),
+          findsWidgets);
     });
 
     testWidgets('pausing is confirmed, closes into history, and undoes',

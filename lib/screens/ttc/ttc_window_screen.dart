@@ -62,6 +62,8 @@ import '../../ttc/ttc_store.dart';
 import '../v2/v2_palette.dart';
 import '../v2/v3_hero_field.dart';
 import 'ttc_common.dart';
+import 'ttc_cycle_palette.dart';
+import 'ttc_cycle_companion.dart' show TtcCycleCompanionScreen;
 import 'ttc_strings.dart';
 import 'ttc_today_screen.dart' show logTtcPeriod;
 import 'ttc_treatment_screen.dart' show TtcTreatmentEntryCard;
@@ -72,7 +74,13 @@ import 'ttc_treatment_screen.dart' show TtcTreatmentEntryCard;
 /// ovulation dot. The conceiving bracket this screen opens from is 344, so the
 /// tile is rose and the screen is violet. That is what the design specifies and
 /// it is implemented as specified; see the note handed back with this build.
-const double kWindowHue = 273;
+///
+/// ⚠️ AND NOW THE CYCLE PALETTE'S FERTILE HUE (2026-09-27, night): the same
+/// number, read from `TtcCycleColours` so the window, the calendar capsule and
+/// the ring's fertile arc are one violet. Every colour on this screen that
+/// means "fertile" or "ovulation" reads from the palette; the old hexes are
+/// noted where they were. Kept for revert: const double kWindowHue = 273;
+const double kWindowHue = TtcCycleColours.fertileHue;
 
 /// Which picture the "Across this cycle" card is showing.
 enum _Across { list, curve }
@@ -137,8 +145,10 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
       : const [
           'Left to right is one whole cycle, from day one to your last day.',
           'The line rises on the days when getting pregnant is more likely.',
-          'The shaded band is your fertile window: about six days, plus one '
-              'day after ovulation, in case it comes a day later.',
+          // Six days since 2026-09-27; kept for revert: 'about six days, plus
+          // one day after ovulation, in case it comes a day later.'
+          'The shaded band is your fertile window: about six days, ending on '
+              'the day you ovulate.',
           'The dot is ovulation. The dashes show where you are today.',
         ];
 
@@ -159,9 +169,10 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
     ),
     (
       'Fertile window',
+      // Six days since 2026-09-27; kept for revert: '… We shade one more day
+      // after it, in case ovulation comes a day later than we estimate.'
       'The six days when sex can lead to pregnancy: the five days before '
-          'ovulation and the day itself. We shade one more day after it, in '
-          'case ovulation comes a day later than we estimate.'
+          'ovulation and the day itself.'
     ),
   ];
 
@@ -204,7 +215,10 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
   //  Hero — chroma lives here, and the ink on it is dark
   // ---------------------------------------------------------------------------
   Widget _hero(TtcS t, V2Palette p, TtcToday today) {
-    final month = _months[DateTime.now().month - 1];
+    // The date, not the month alone (2026-09-27: it read "Cycle day 9 · Sep").
+    // Kept for revert: `final month = _months[DateTime.now().month - 1];`
+    final now = DateTime.now();
+    final month = '${now.day} ${_months[now.month - 1]}';
     return SafeArea(
       bottom: false,
       child: Padding(
@@ -221,27 +235,41 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
                 child: Icon(Icons.arrow_back_rounded, size: 20, color: p.ink1),
               ),
             ),
-            const SizedBox(width: 8),
-            Text(t.fertilityWindow,
-                style: pvManrope(
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 0.2,
-                    color: p.ink1)),
+            // ⚠️ ONE NAME, SAID ONCE (2026-09-27, simplicity pass). The back
+            // bar said "Fertile window" and the title under it said "Your
+            // fertile days": two names for one tool, one line apart. The title
+            // now carries the tool's one name, and the bar is only a back arrow.
+            // Kept for revert:
+            // const SizedBox(width: 8),
+            // Text(t.fertilityWindow,
+            //     style: pvManrope(
+            //         fontSize: 13.5,
+            //         fontWeight: FontWeight.w700,
+            //         letterSpacing: 0.2,
+            //         color: p.ink1)),
           ]),
           const SizedBox(height: 20),
-          Text(t.windowYourDays,
+          // Kept for revert: `Text(t.windowYourDays, ...)`.
+          Text(t.fertilityWindow,
               style: pvFraunces(
                   fontSize: 27,
                   fontWeight: FontWeight.w600,
                   height: 1.15,
                   letterSpacing: -0.6,
                   color: p.ink1)),
-          const SizedBox(height: 6),
+          const SizedBox(height: 8),
+          // ⚠️ WHAT THIS IS, FIRST. A first-time reader has to know what the
+          // coloured days are before she meets them, not after a walkthrough.
+          Text(
+              "The six days each cycle when you're most likely to get "
+              'pregnant. The coloured days below are yours.',
+              style: pvManrope(fontSize: 14, height: 1.45, color: p.ink1)),
+          const SizedBox(height: 8),
+          // Kept for revert: 'Cycle day ${today.cycleDay} · $month'.
           Text(
               today.cycleDay == null
-                  ? month
-                  : 'Cycle day ${today.cycleDay} · $month',
+                  ? 'Today is $month'
+                  : 'Today is day ${today.cycleDay} of your cycle · $month',
               style: pvManrope(
                   fontSize: 12.5, fontWeight: FontWeight.w600, color: p.ink2)),
         ]),
@@ -284,13 +312,20 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
           const SizedBox(height: 20),
           TtcDisclaimer(t: t),
         ] else if (window == null) ...[
-          TtcEmpty(
-            icon: Icons.wb_twilight_rounded,
-            title: t.noEstimateYet,
-            body: today.cycleDay == null ? t.ovulationNotYet : t.noEstimateBody,
-            cta: today.cycleDay == null ? t.logPeriodCta : null,
-            onTap: today.cycleDay == null ? () => logTtcPeriod(context) : null,
-          ),
+          // ⚠️ A WITHHELD WINDOW SAYS WHAT UNLOCKS IT, AND THE WAY TO DO IT IS
+          // ON SCREEN (2026-09-27). It used to tell anyone with a period
+          // logged "after a cycle or two", with no button, which was untrue
+          // for the two real reasons a logged history is refused (a gap that
+          // looks like a missed period, a cycle running late) and a dead end
+          // for all of them. Kept for revert:
+          //   TtcEmpty(
+          //     icon: Icons.wb_twilight_rounded,
+          //     title: t.noEstimateYet,
+          //     body: today.cycleDay == null ? t.ovulationNotYet : t.noEstimateBody,
+          //     cta: today.cycleDay == null ? t.logPeriodCta : null,
+          //     onTap: today.cycleDay == null ? () => logTtcPeriod(context) : null,
+          //   ),
+          _withheld(t, today),
           const SizedBox(height: 20),
           TtcDisclaimer(t: t),
         ] else ...[
@@ -299,8 +334,11 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
           _acrossHeader(t, p),
           const SizedBox(height: 10),
           _acrossCard(t, p, window),
-          const SizedBox(height: 28),
-          _whySixDays(p),
+          // ⚠️ "WHY SIX DAYS" NOW SITS IN THE CYCLE CARD (2026-09-27). The
+          // reason is what makes the coloured days make sense, so it is said
+          // beside them, not three sections further down. Kept for revert:
+          //   const SizedBox(height: 28),
+          //   _whySixDays(p),
           const SizedBox(height: 22),
           _glossary(p),
           const SizedBox(height: 24),
@@ -313,12 +351,68 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
   // ---------------------------------------------------------------------------
   //  The cycle card — replaces the violet slab
   // ---------------------------------------------------------------------------
+  /// The window is withheld: say why in plain words, and put the one thing
+  /// that brings it back on the card itself.
+  Widget _withheld(TtcS t, TtcToday today) {
+    if (today.cycleDay == null ||
+        today.noEstimate == TtcNoEstimate.noPeriodLogged) {
+      return TtcEmpty(
+        icon: Icons.wb_twilight_rounded,
+        title: 'Add your last period to see your window',
+        body: 'Tell us the day your last period started. We work out your '
+            'fertile days from that one date, and you can change it any time.',
+        cta: t.logPeriodCta,
+        onTap: () => logTtcPeriod(context),
+      );
+    }
+    return switch (today.noEstimate) {
+      TtcNoEstimate.historyLooksOff => TtcEmpty(
+          icon: Icons.event_note_rounded,
+          title: t.noEstHistoryOffTitle,
+          body: 'One gap between your period dates is much longer than a '
+              'cycle usually lasts. Most often, a period was never logged. '
+              "We won't guess from it. Fix or remove that date and your "
+              'fertile days come back here.',
+          cta: 'Check my period dates',
+          onTap: () => Navigator.of(context).push(MaterialPageRoute(
+              builder: (_) => const TtcCycleCompanionScreen())),
+        ),
+      TtcNoEstimate.cycleOverdue => TtcEmpty(
+          icon: Icons.wb_twilight_rounded,
+          title: t.noEstOverdueTitle,
+          body: "Your period is later than your cycles usually run, so we "
+              "won't guess a window this month. When your period starts, add "
+              'the date and your fertile days come back here. A late period '
+              "on its own isn't a warning sign. If it keeps happening, tell a "
+              'doctor.',
+          cta: 'My period started',
+          onTap: () => logTtcPeriod(context),
+        ),
+      _ => TtcEmpty(
+          icon: Icons.wb_twilight_rounded,
+          title: t.noEstimateYet,
+          body: "We can't place your fertile days from the dates we have. "
+              'When your next period starts, add the date and we will try '
+              'again here.',
+          cta: 'My period started',
+          onTap: () => logTtcPeriod(context),
+        ),
+    };
+  }
+
+  static DateTime _dayBefore(DateTime d) => DateTime(d.year, d.month, d.day - 1);
+
   Widget _cycleCard(TtcS t, V2Palette p, TtcFertileWindow w) {
     final status = w.cyclesAhead > 0
         ? t.windowExpected
         : w.openNow
             ? t.windowOpenNow
             : t.windowOpensIn(w.daysUntilOpen);
+    // The two Peak days, in the engine's own grading (the day before
+    // ovulation and the day itself). Said in words so she never has to read
+    // them off a bar.
+    final before = _dayBefore(w.peakOn);
+    final hasBefore = w.days.any((d) => _sameDay(d, before));
 
     return _Card(
       p: p,
@@ -328,8 +422,13 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // Kept for revert: 'This cycle' : 'A cycle ahead'.
                   Text(
-                      (w.cyclesAhead == 0 ? 'This cycle' : 'A cycle ahead')
+                      (w.cyclesAhead == 0
+                              ? 'Your fertile days this cycle'
+                              : w.cyclesAhead == 1
+                                  ? 'Your fertile days next cycle'
+                                  : 'Your fertile days in ${w.cyclesAhead} cycles')
                           .toUpperCase(),
                       style: pvManrope(
                           fontSize: 9.5,
@@ -347,21 +446,19 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
                           color: p.ink1)),
                 ]),
           ),
-          const SizedBox(width: 10),
-          // ⚠️ BACK IS DISABLED AT ZERO RATHER THAN WRAPPING. Paging past the
-          // soonest actionable window should stop; wrapping would silently
-          // return her to a cycle she has already passed.
-          _Round(
-              icon: Icons.chevron_left_rounded,
-              p: p,
-              enabled: _cyclesAhead > 0,
-              onTap: () => setState(() => _cyclesAhead -= 1)),
-          const SizedBox(width: 8),
-          _Round(
-              icon: Icons.chevron_right_rounded,
-              p: p,
-              enabled: _cyclesAhead < 5,
-              onTap: () => setState(() => _cyclesAhead += 1)),
+          // ⚠️ THE UNLABELLED ROUND ARROWS MOVED TO THE FOOT OF THE CARD AS
+          // WORDS (2026-09-27): "Next cycle" says what the tap does, and the
+          // back one only appears once there is somewhere to go back to,
+          // instead of sitting greyed out with no reason given. Kept for
+          // revert:
+          //   const SizedBox(width: 10),
+          //   _Round(icon: Icons.chevron_left_rounded, p: p,
+          //       enabled: _cyclesAhead > 0,
+          //       onTap: () => setState(() => _cyclesAhead -= 1)),
+          //   const SizedBox(width: 8),
+          //   _Round(icon: Icons.chevron_right_rounded, p: p,
+          //       enabled: _cyclesAhead < 5,
+          //       onTap: () => setState(() => _cyclesAhead += 1)),
         ]),
         const SizedBox(height: 18),
         // The whole window as one ramp, before any detail. This is the "width
@@ -380,10 +477,83 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
             if (date != w.days.last) const SizedBox(width: 3),
           ],
         ]),
+        const SizedBox(height: 6),
+        // ⚠️ EVERY SEGMENT IS NAMED WHERE IT IS DRAWN (2026-09-27): the date
+        // under each one, and the ovulation dot under its own day, so the ramp
+        // is not a row of colours she has to decode.
+        Row(children: [
+          for (final date in w.days) ...[
+            Expanded(
+              child: Column(children: [
+                Text('${date.day}',
+                    style: pvManrope(
+                        fontSize: 11,
+                        fontWeight: _sameDay(date, w.peakOn) ||
+                                _sameDay(date, before)
+                            ? FontWeight.w800
+                            : FontWeight.w600,
+                        color: p.ink2)),
+                if (_sameDay(date, w.peakOn))
+                  Container(
+                    width: 6,
+                    height: 6,
+                    margin: const EdgeInsets.only(top: 3),
+                    decoration: const BoxDecoration(
+                        color: TtcCycleColours.ovulation,
+                        shape: BoxShape.circle),
+                  ),
+              ]),
+            ),
+            if (date != w.days.last) const SizedBox(width: 3),
+          ],
+        ]),
         const SizedBox(height: 12),
-        Text('$status · most likely ${_d(w.peakOn)}',
+        // Kept for revert: '$status · most likely ${_d(w.peakOn)}' ("most
+        // likely" what? It meant ovulation, and never said so).
+        Text(
+            w.cyclesAhead > 0
+                ? 'A guess from your usual cycle length. Nothing is logged '
+                    'for that cycle yet.'
+                : status,
             style: pvManrope(
-                fontSize: 12.5, fontWeight: FontWeight.w600, color: p.ink2)),
+                fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink1)),
+        const SizedBox(height: 14),
+        Container(height: 1, color: p.line),
+        const SizedBox(height: 14),
+        // ---- which day is best, and why, in words -------------------------
+        Text(
+            hasBefore
+                ? 'Your best days are ${_d(before)} and ${_d(w.peakOn)}. '
+                    "That's the day before you're likely to release an egg "
+                    '(ovulation, the dot), and that day itself.'
+                : 'Your best day is ${_d(w.peakOn)}, the day you\'re likely '
+                    'to release an egg (ovulation, the dot).',
+            style: pvManrope(fontSize: 14, height: 1.5, color: p.ink1)),
+        const SizedBox(height: 10),
+        Text(
+            'Why six days: sperm can live inside you for about five days, and '
+            'an egg for about one. So sex in the days before ovulation counts '
+            'too, and no single day has to be exactly right.',
+            style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
+        const SizedBox(height: 16),
+        // ⚠️ PAGING STOPS AT THIS CYCLE RATHER THAN WRAPPING. Paging past the
+        // soonest actionable window should stop; wrapping would silently
+        // return her to a cycle she has already passed.
+        Wrap(spacing: 8, runSpacing: 8, children: [
+          if (_cyclesAhead > 0)
+            _StepPill(
+              p: p,
+              label: _cyclesAhead == 1 ? 'Back to this cycle' : t.windowPrevCycle,
+              back: true,
+              onTap: () => setState(() => _cyclesAhead -= 1),
+            ),
+          if (_cyclesAhead < 5)
+            _StepPill(
+              p: p,
+              label: t.windowNextCycle,
+              onTap: () => setState(() => _cyclesAhead += 1),
+            ),
+        ]),
       ]),
     );
   }
@@ -394,7 +564,9 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
   Widget _acrossHeader(TtcS t, V2Palette p) {
     return Row(children: [
       Expanded(
-        child: Text(t.fertilityAcross.toUpperCase(),
+        // Kept for revert: `t.fertilityAcross` ("Across this cycle", which
+        // named the list as if it were the whole cycle; the curve is).
+        child: Text('Day by day'.toUpperCase(),
             style: pvManrope(
                 fontSize: 11,
                 fontWeight: FontWeight.w800,
@@ -421,6 +593,21 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
     return _Card(
       p: p,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        // ⚠️ HOW TO READ IT COMES FIRST, IN ONE LINE, NOT A WALKTHROUGH
+        // (2026-09-27). The "not a percentage" line used to sit small and grey
+        // under the graphic, after the bars had already been read as numbers,
+        // and the "How to read this" pill sat below that. The sentence now
+        // leads the card, and every mark is named where it is drawn.
+        Text(
+            _view == _Across.list
+                ? 'A longer bar means a better day to try. The bars compare '
+                    "these six days with each other. They aren't percentages."
+                : 'One whole cycle, from the first day of your period to the '
+                    'day before the next. The shaded band is your six fertile '
+                    "days. The line is highest on your best days. It isn't a "
+                    'percentage.',
+            style: pvManrope(fontSize: 12.5, height: 1.45, color: p.ink2)),
+        const SizedBox(height: 16),
         // ⚠️ ONE `AnimatedSwitcher`, SIZED BY ITS CHILD, AND THE SLIDE IS
         // HORIZONTAL. Asked for as "a carousel type" — the two pictures are
         // alternatives at the same level, and a horizontal move is how a reader
@@ -463,6 +650,7 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
                     rank: _rankLabel,
                     fill: _rampColour,
                     width: _barWidth,
+                    isOv: _isOvulation,
                   )
                 : _CurveView(
                     key: const ValueKey(_Across.curve),
@@ -479,21 +667,23 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
                   ),
           ),
         ),
-        const SizedBox(height: 14),
         // ⚠️ THIS SENTENCE IS NOT DECORATION. A graphic with a height and a
         // width invites being read as a probability, and this is the line that
-        // refuses it. It stays under both views.
-        Text(
-            'The shape ranks the days against each other. '
-            "It isn't a probability.",
-            style: pvManrope(fontSize: 11.5, height: 1.4, color: p.ink3)),
-        const SizedBox(height: 14),
-        _tourRow(p),
+        // refuses it. Since 2026-09-27 it is said at the TOP of the card (see
+        // above), before the bars are read. Kept for revert:
+        //   const SizedBox(height: 14),
+        //   Text('The shape ranks the days against each other. '
+        //       "It isn't a probability.", ...),
+        //   const SizedBox(height: 14),
+        //   _tourRow(p),
+        // The walkthrough is retired with it: the lead line and the labels on
+        // the picture say what its steps said, without four taps.
       ]),
     );
   }
 
   /// The walkthrough: one short line at a time, opened from its own pill.
+  // ignore: unused_element
   Widget _tourRow(V2Palette p) {
     final steps = _tourSteps;
     final on = _tour >= 0;
@@ -542,6 +732,7 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
     );
   }
 
+  // ignore: unused_element
   Widget _whySixDays(V2Palette p) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -554,9 +745,12 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
           const SizedBox(height: 12),
           Text(
               'About six days, ending on the day you ovulate. Sperm survive '
-              'about five days, and the egg about one. We add the day after as '
-              'well, in case ovulation comes a day later than we estimate. '
-              'Because the window is this wide, no single day has to be right.',
+              'about five days, and the egg about one. Because the window is '
+              'this wide, no single day has to be right.',
+              // Kept for revert (the seventh, margin day is gone, 2026-09-27):
+              // 'about five days, and the egg about one. We add the day after as '
+              // 'well, in case ovulation comes a day later than we estimate. '
+              // 'Because the window is this wide, no single day has to be right.',
               style: pvManrope(fontSize: 14, height: 1.55, color: p.ink2)),
         ],
       );
@@ -608,8 +802,13 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
   //  list bars and the curve. They are three drawings of one fact, and the only
   //  way they cannot disagree is for there to be one place that decides.
 
+  /// ⚠️ ONE SCALE (2026-09-27). "Ovulation" used to sit in this column as if
+  /// it were a fourth level above Peak, mixing an event into a scale. The
+  /// ovulation day is graded Peak by the engine like the day before it, and
+  /// is marked with its own dot and word beside the level instead
+  /// ([_isOvulation]). Kept for revert:
+  ///   if (_sameDay(date, w.peakOn)) return 'Ovulation';
   static String _rankLabel(TtcFertileWindow w, DateTime date) {
-    if (_sameDay(date, w.peakOn)) return 'Ovulation';
     return switch (ttcFertilityOnDate(w, date)) {
       FertilityLevel.peak => 'Peak',
       FertilityLevel.high => 'High',
@@ -627,21 +826,31 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
     // hsl(273 46% 69%), hsl(273 40% 79%), hsl(273 34% 87%) — one hue, rising
     // saturation and falling lightness, which is what makes four bars read as
     // one scale rather than four colours.
-    if (_sameDay(date, w.peakOn)) return const Color(0xFF995CCC);
+    // ⚠️ THE CYCLE PALETTE'S RAMP (2026-09-27, night), fuller than the
+    // design's four stops and shared with the calendar's capsule, so a Peak
+    // day is one colour on both. Kept for revert: ovulation 0xFF995CCC, peak
+    // 0xFFB48CD4, high 0xFFCCB4DF, medium 0xFFDFD3E9.
+    if (_sameDay(date, w.peakOn)) return TtcCycleColours.fertile;
     return switch (ttcFertilityOnDate(w, date)) {
-      FertilityLevel.peak => const Color(0xFFB48CD4),
-      FertilityLevel.high => const Color(0xFFCCB4DF),
-      FertilityLevel.medium => const Color(0xFFDFD3E9),
+      FertilityLevel.peak => TtcCycleColours.fertileLevel(FertilityLevel.peak),
+      FertilityLevel.high => TtcCycleColours.fertileLevel(FertilityLevel.high),
+      FertilityLevel.medium =>
+        TtcCycleColours.fertileLevel(FertilityLevel.medium),
       _ => p.surfaceAlt,
     };
   }
 
   /// How full the bar runs, 0..1. Derived from the rank rather than stored, so
   /// a day cannot be drawn long and labelled Medium.
+  ///
+  /// ⚠️ BOTH PEAK DAYS RUN FULL (2026-09-27). The ovulation day used to run
+  /// longer than the day before it, while the words said the day before was
+  /// the highest: the picture and the sentence disagreed. The engine grades
+  /// both Peak, so both bars are the same length. Kept for revert:
+  ///   'Ovulation' => 1.0, 'Peak' => 0.86,
   static double _barWidth(TtcFertileWindow w, DateTime date) =>
       switch (_rankLabel(w, date)) {
-        'Ovulation' => 1.0,
-        'Peak' => 0.86,
+        'Peak' => 1.0,
         'High' => 0.68,
         'Medium' => 0.4,
         _ => 0.2,
@@ -649,6 +858,10 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
 
   static bool _sameDay(DateTime a, DateTime b) =>
       a.year == b.year && a.month == b.month && a.day == b.day;
+
+  /// The day we estimate the egg is released. A marker, not a level.
+  static bool _isOvulation(TtcFertileWindow w, DateTime date) =>
+      _sameDay(date, w.peakOn);
 
   /// The one line under the fact block.
   ///
@@ -661,8 +874,12 @@ class _TtcWindowScreenState extends State<TtcWindowScreen> {
   static String _dayNote(TtcFertileWindow w, DateTime date) {
     final days = date.difference(w.peakOn).inDays;
     return switch (days) {
-      0 => 'Ovulation is most likely today, give or take a day.',
-      -1 => 'The day before ovulation. This is the highest of the six.',
+      // Kept for revert (2026-09-27, both Peak days are drawn the same now):
+      //   0 => 'Ovulation is most likely today, give or take a day.',
+      //   -1 => 'The day before ovulation. This is the highest of the six.',
+      0 => 'Ovulation, the day an egg is most likely released, give or take '
+          'a day. One of your two best days.',
+      -1 => 'The day before ovulation. One of your two best days.',
       -2 => 'Two days before ovulation is one of the stronger days.',
       -3 => 'Three days before ovulation, and rising.',
       1 => 'The last day we show, in case ovulation came a day late.',
@@ -690,6 +907,7 @@ class _ListView extends StatelessWidget {
     required this.rank,
     required this.fill,
     required this.width,
+    required this.isOv,
   });
 
   final TtcFertileWindow window;
@@ -700,36 +918,36 @@ class _ListView extends StatelessWidget {
   final String Function(TtcFertileWindow, DateTime) rank;
   final Color Function(TtcFertileWindow, DateTime, V2Palette) fill;
   final double Function(TtcFertileWindow, DateTime) width;
+  final bool Function(TtcFertileWindow, DateTime) isOv;
 
   /// ⚠️ THE WALKTHROUGH DIMS THE COLUMNS IT IS NOT TALKING ABOUT. That is the
   /// whole reason the header row exists as three separately-coloured labels
   /// rather than one string — the graphic teaches itself instead of being
   /// captioned underneath.
+  // ignore: unused_element
   Color _head(int index) =>
       tour == index ? p.action : p.ink3;
 
   @override
   Widget build(BuildContext context) {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-      Padding(
-        padding: const EdgeInsets.only(bottom: 12),
-        child: Row(children: [
-          SizedBox(
-            width: 50,
-            child: Text('DAY', style: _label(_head(0))),
-          ),
-          const SizedBox(width: 10),
-          Expanded(child: Text('CHANCE ON THAT DAY', style: _label(_head(1)))),
-          const SizedBox(width: 10),
-          SizedBox(
-            width: 66,
-            child: Text('RANKED',
-                textAlign: TextAlign.right, style: _label(_head(2))),
-          ),
-        ]),
-      ),
-      Container(height: 1, color: p.line),
-      const SizedBox(height: 16),
+      // ⚠️ THE HEADER ROW IS RETIRED (2026-09-27). "CHANCE ON THAT DAY" over a
+      // bar read as a percentage, and "RANKED" was our word, not hers. The
+      // card's lead line now says what a bar means before she reads one.
+      // Kept for revert:
+      //   Padding(
+      //     padding: const EdgeInsets.only(bottom: 12),
+      //     child: Row(children: [
+      //       SizedBox(width: 50, child: Text('DAY', style: _label(_head(0)))),
+      //       const SizedBox(width: 10),
+      //       Expanded(child: Text('CHANCE ON THAT DAY', style: _label(_head(1)))),
+      //       const SizedBox(width: 10),
+      //       SizedBox(width: 66, child: Text('RANKED',
+      //           textAlign: TextAlign.right, style: _label(_head(2)))),
+      //     ]),
+      //   ),
+      //   Container(height: 1, color: p.line),
+      //   const SizedBox(height: 16),
       for (final date in window.days) ...[
         Row(children: [
           SizedBox(
@@ -764,14 +982,15 @@ class _ListView extends StatelessWidget {
               ),
               // The ovulation day gets one extra dot, so the strongest row is
               // distinguishable in a greyscale screenshot too.
-              if (rank(window, date) == 'Ovulation') ...[
+              // Kept for revert: `if (rank(window, date) == 'Ovulation')`.
+              if (isOv(window, date)) ...[
                 const SizedBox(width: 7),
                 Container(
                   width: 8,
                   height: 8,
                   decoration: const BoxDecoration(
-                      // hsl(273 52% 40%)
-                      color: Color(0xFF6B319B),
+                      // Was hsl(273 52% 40%), 0xFF6B319B: the palette's value.
+                      color: TtcCycleColours.ovulation,
                       shape: BoxShape.circle),
                 ),
               ],
@@ -780,21 +999,54 @@ class _ListView extends StatelessWidget {
           const SizedBox(width: 10),
           SizedBox(
             width: 66,
-            child: Text(rank(window, date),
-                textAlign: TextAlign.right,
-                style: pvManrope(
-                    fontSize: 12,
-                    fontWeight: rank(window, date) == 'Ovulation'
-                        ? FontWeight.w800
-                        : FontWeight.w600,
-                    color: rank(window, date) == 'Medium' ? p.ink3 : p.ink1)),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(rank(window, date),
+                      textAlign: TextAlign.right,
+                      style: pvManrope(
+                          fontSize: 12,
+                          fontWeight: rank(window, date) == 'Peak'
+                              ? FontWeight.w800
+                              : FontWeight.w600,
+                          color: rank(window, date) == 'Medium'
+                              ? p.ink3
+                              : p.ink1)),
+                  // The event, named beside the level rather than as one.
+                  if (isOv(window, date))
+                    Text('Ovulation',
+                        textAlign: TextAlign.right,
+                        style: pvManrope(
+                            fontSize: 10.5,
+                            fontWeight: FontWeight.w700,
+                            color: TtcCycleColours.ovulation)),
+                ]),
           ),
         ]),
         if (date != window.days.last) const SizedBox(height: 17),
       ],
+      const SizedBox(height: 16),
+      // ⚠️ THE MARK IS NAMED WHERE IT IS DRAWN.
+      Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Container(
+          width: 8,
+          height: 8,
+          margin: const EdgeInsets.only(top: 5),
+          decoration: const BoxDecoration(
+              color: TtcCycleColours.ovulation, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 8),
+        Expanded(
+          child: Text(
+              "Ovulation: the day you're likely to release an egg. Medium, "
+              'High and Peak compare the six days. Peak days are the best.',
+              style: pvManrope(fontSize: 11.5, height: 1.45, color: p.ink3)),
+        ),
+      ]),
     ]);
   }
 
+  // ignore: unused_element
   TextStyle _label(Color c) => pvManrope(
       fontSize: 9, fontWeight: FontWeight.w800, letterSpacing: 1, color: c);
 }
@@ -922,7 +1174,9 @@ class _CurveView extends StatelessWidget {
         p: p,
         label: '${fmtDay(window.days[_index])} · '
             '${weekday(window.days[_index])}',
-        value: rank(window, window.days[_index]),
+        value: _TtcWindowScreenState._isOvulation(window, window.days[_index])
+            ? '${rank(window, window.days[_index])} · ovulation'
+            : rank(window, window.days[_index]),
         note: note(window, window.days[_index]),
       ),
     ]);
@@ -1069,17 +1323,21 @@ class _CurvePainter extends CustomPainter {
   final Color ink3;
   final int tour;
 
-  /// hsl(273 52% 52%) — the curve's stroke.
-  static const _violet = Color(0xFF8B45C4);
+  // From the cycle palette (2026-09-27, night). Kept for revert: _violet
+  // 0xFF8B45C4, _violetSoft 0xFFA36CD1, _band 0xFFE6DCEF, _violetDeep
+  // 0xFF7133A3.
 
-  /// hsl(273 52% 62%) — the area gradient's top stop.
-  static const _violetSoft = Color(0xFFA36CD1);
+  /// The curve's stroke: fertile days.
+  static const _violet = TtcCycleColours.fertile;
 
-  /// hsl(273 36% 90%) — the fertile band behind the curve.
-  static const _band = Color(0xFFE6DCEF);
+  /// The area gradient's top stop.
+  static const _violetSoft = TtcCycleColours.fertile;
 
-  /// hsl(273 52% 42%) — the OVULATION label, darker so it holds on the band.
-  static const _violetDeep = Color(0xFF7133A3);
+  /// The fertile band behind the curve.
+  static const _band = TtcCycleColours.fertileTint;
+
+  /// The OVULATION label, darker so it holds on the band.
+  static const _violetDeep = TtcCycleColours.ovulation;
 
   /// The walkthrough dims everything except the part being explained.
   double _op(String part) {
@@ -1316,6 +1574,54 @@ class _Pill extends StatelessWidget {
       );
 }
 
+/// A labelled step between cycles: "Next cycle", "Back to this cycle".
+class _StepPill extends StatelessWidget {
+  const _StepPill({
+    required this.p,
+    required this.label,
+    required this.onTap,
+    this.back = false,
+  });
+
+  final V2Palette p;
+  final String label;
+  final VoidCallback onTap;
+  final bool back;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        child: GestureDetector(
+          onTap: onTap,
+          behavior: HitTestBehavior.opaque,
+          child: Container(
+            height: 36,
+            padding: const EdgeInsets.symmetric(horizontal: 14),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: p.line, width: 1.2),
+            ),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              if (back) ...[
+                Icon(Icons.chevron_left_rounded, size: 18, color: p.ink2),
+                const SizedBox(width: 2),
+              ],
+              Text(label,
+                  style: pvManrope(
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
+                      color: p.ink1)),
+              if (!back) ...[
+                const SizedBox(width: 2),
+                Icon(Icons.chevron_right_rounded, size: 18, color: p.ink2),
+              ],
+            ]),
+          ),
+        ),
+      );
+}
+
+// ignore: unused_element
 class _Round extends StatelessWidget {
   const _Round({
     required this.icon,
@@ -1368,6 +1674,10 @@ class _ViewToggle extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // ⚠️ WORDS, NOT TWO ICONS (2026-09-27). Two unlabelled glyphs did not say
+    // a second view existed or what it showed. Oura's Daily | Trend and
+    // Public's Chart | Data both name their halves; so does this one.
+    // Kept for revert: the `Icon(icon, ...)` child below, 38pt wide.
     Widget seg(_Across v, IconData icon, String semantic) {
       final on = v == value;
       return Semantics(
@@ -1380,8 +1690,8 @@ class _ViewToggle extends StatelessWidget {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 180),
             curve: Curves.easeOut,
-            width: 38,
             height: 28,
+            padding: const EdgeInsets.symmetric(horizontal: 11),
             alignment: Alignment.center,
             decoration: BoxDecoration(
               color: on ? p.surface : Colors.transparent,
@@ -1396,7 +1706,11 @@ class _ViewToggle extends StatelessWidget {
                     ]
                   : null,
             ),
-            child: Icon(icon, size: 16, color: on ? p.action : p.ink3),
+            child: Text(v == _Across.list ? 'Six days' : 'Whole cycle',
+                style: pvManrope(
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w700,
+                    color: on ? p.action : p.ink3)),
           ),
         ),
       );

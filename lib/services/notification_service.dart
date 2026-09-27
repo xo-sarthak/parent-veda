@@ -46,12 +46,72 @@ class NotificationService {
       requestSoundPermission: false,
     );
     try {
+      // ⚠️ THE TAP HANDLER IS ADDITIVE AND OPTIONAL (2026-09-27). Before it,
+      // a tap on any notification only opened the app. It still does, for
+      // every notification nobody has claimed: a tap is offered to the
+      // listeners added with [addTapListener], and a feature that does not
+      // recognise the id returns false and nothing else happens. Pregnancy,
+      // parenting, medication and reminder notifications register no
+      // listener, so they behave exactly as before.
       await _plugin.initialize(
         const InitializationSettings(android: android, iOS: ios),
+        onDidReceiveNotificationResponse: (r) {
+          final id = r.id;
+          if (id != null) _deliverTap(id);
+        },
       );
       _ready = true;
+      // A tap that LAUNCHED the app arrives here instead, before any
+      // listener exists. Held until one claims it.
+      try {
+        final launch = await _plugin.getNotificationAppLaunchDetails();
+        final id = launch?.notificationResponse?.id;
+        if ((launch?.didNotificationLaunchApp ?? false) && id != null) {
+          _deliverTap(id);
+        }
+      } catch (_) {/* best-effort */}
     } catch (_) {/* platform not ready - schedule() will simply no-op */}
   }
+
+  // ---- notification taps (additive, 2026-09-27) ----------------------------
+
+  final List<bool Function(int id)> _tapListeners = [];
+
+  /// A tapped id no listener has claimed yet (a tap that launched the app
+  /// before its feature was listening). Offered to each new listener once.
+  int? _unclaimedTap;
+
+  /// Offer every notification tap to [onTap]. It returns true when the id is
+  /// one of its own and it handled it. Adding the same listener twice is a
+  /// no-op.
+  void addTapListener(bool Function(int id) onTap) {
+    if (_tapListeners.contains(onTap)) return;
+    _tapListeners.add(onTap);
+    final pending = _unclaimedTap;
+    if (pending != null && _safeTap(onTap, pending)) _unclaimedTap = null;
+  }
+
+  void removeTapListener(bool Function(int id) onTap) =>
+      _tapListeners.remove(onTap);
+
+  void _deliverTap(int id) {
+    for (final l in List.of(_tapListeners)) {
+      if (_safeTap(l, id)) return;
+    }
+    _unclaimedTap = id;
+  }
+
+  static bool _safeTap(bool Function(int id) l, int id) {
+    try {
+      return l(id);
+    } catch (_) {
+      return false;
+    }
+  }
+
+  /// Test seam: behave as if the notification [id] was tapped.
+  @visibleForTesting
+  void debugTap(int id) => _deliverTap(id);
 
   /// Ask the OS for permission to post notifications (Android 13+ / iOS).
   Future<bool> requestPermission() async {

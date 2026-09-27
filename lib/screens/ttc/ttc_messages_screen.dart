@@ -32,6 +32,7 @@ import 'package:flutter/material.dart';
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_messages_store.dart';
 import '../../ttc/ttc_period_due.dart';
+import '../../widgets/global_ask_fab.dart' show FabState, appNavigatorKey;
 import '../../widgets/pv_feedback.dart';
 import '../brackets/hub/hub_intent_art.dart';
 import '../v2/v2_palette.dart';
@@ -51,6 +52,28 @@ const List<(IconData, String)> kTtcMessagesEmptyLines = [
   (Icons.favorite_border_rounded, 'After a hard month, a few kind words'),
 ];
 const String kTtcMessagesChoose = 'Choose what we send';
+
+/// ⚠️ WHERE A PHONE TAP LANDS (2026-09-27). A tapped notification opens the
+/// place the message is about (the same first destination a tap on the row
+/// in this screen opens), or this screen when nothing resolves.
+///
+/// It waits for the TTC stage to be on screen: on a cold launch the splash
+/// and the shell come first, and a route pushed under them would be replaced
+/// by the shell's own first push. Ten seconds of short retries, then it gives
+/// up and the app has simply opened, which is what a tap did before.
+/// Flo's notification opens its message in place; so does this.
+void ttcOpenMessageFromPhone(TtcMessage? m, {int attempt = 0}) {
+  final ctx = appNavigatorKey.currentContext;
+  if (ctx == null || !FabState.instance.inTtc) {
+    if (attempt < 20) {
+      Future<void>.delayed(const Duration(milliseconds: 500),
+          () => ttcOpenMessageFromPhone(m, attempt: attempt + 1));
+    }
+    return;
+  }
+  final dest = m == null ? null : ttcFirstOpenable(m.destinations);
+  openTtcSurface(ctx, dest ?? 'ttc_messages');
+}
 
 /// The drawn mark for each kind of message (M2).
 IntentMark ttcMessageMark(TtcMessageKind k) => switch (k) {
@@ -127,6 +150,14 @@ class _TtcMessagesScreenState extends State<TtcMessagesScreen> {
                                   h: 1.2)),
                         ),
                 ),
+                // What this screen is, first (2026-09-27, simplicity pass).
+                if (list.isNotEmpty) ...[
+                  const SizedBox(height: 10),
+                  Text(
+                      "What we've sent you, newest first. Tap one to open "
+                      "what it's about.",
+                      style: ttcBody(13.5, h: 1.5)),
+                ],
                 const SizedBox(height: 14),
                 // Kept for revert: `const _Empty()` and a row + divider pair.
                 if (list.isEmpty)

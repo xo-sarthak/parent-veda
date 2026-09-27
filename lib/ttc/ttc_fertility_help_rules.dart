@@ -361,16 +361,39 @@ final List<FertilityHelpRule> kFertilityHelpRules = [
   ),
 
   // ---- the normal thresholds ----------------------------------------------
+  // At 40 and over, straight away (ASRM/ACOG, as Flo and What to Expect say
+  // it; TTC launch walk, 2026-09-27).
+  FertilityHelpRule(
+    id: 'age_forty',
+    trigger: 'Age over 40',
+    requiredContext: ['ageBand'],
+    resultState: FertilityHelpState.dontWait,
+    article: 'How long should you try first? (40 and over)',
+    displayReason: (c) => _en('Over 40, the usual advice is to see someone as '
+        "soon as you start trying. It isn't a verdict; it gives the most time "
+        'to act on what a first check finds.'),
+  ),
+  // ⚠️ ONE AGE RULE ACROSS THE APP (launch walk, 2026-09-27): six months at
+  // 35 and over, as the home's check card, the messages and every read say.
+  // This rule said "From 36 … as soon as you ask" (NICE) on a band that starts
+  // at 35, so a 35-year-old was told two things. Owed a check by the reviewing
+  // doctor. Kept for revert:
+  //   trigger: 'Age 36 or over — NICE refers at presentation rather than after '
+  //       'a waiting period',
+  //   requiredContext: ['ageBand'],
+  //   article: 'How long should you try first? (36 and over)',
+  //   displayReason: (c) => _en('From 36, the advice is to be seen as soon as '
+  //       'you ask, not after a waiting period. Nothing changes suddenly at that '
+  //       "age. It's because tests and treatment both take months."),
   FertilityHelpRule(
     id: 'age_at_presentation',
-    trigger: 'Age 36 or over — NICE refers at presentation rather than after '
-        'a waiting period',
-    requiredContext: ['ageBand'],
+    trigger: 'Six months of trying, at 35 or over',
+    requiredContext: ['daysTrying', 'ageBand'],
     resultState: FertilityHelpState.maySeeSpecialist,
-    article: 'How long should you try first? (36 and over)',
-    displayReason: (c) => _en('From 36, the advice is to be seen as soon as '
-        'you ask, not after a waiting period. Nothing changes suddenly at that '
-        "age. It's because tests and treatment both take months."),
+    article: 'How long should you try first? (35 and over)',
+    displayReason: (c) => _en('At 35 and over, the usual advice is to be seen '
+        'after six months of trying rather than twelve. Nothing changes '
+        "suddenly at 35. It's because tests and treatment both take months."),
   ),
   FertilityHelpRule(
     id: 'twelve_months',
@@ -407,7 +430,11 @@ List<FertilityHelpRule> firedRules(FertilityHelpContext c) {
         'partner_factor' => c.partnerConcern,
         'pelvic_history' => c.pelvicSurgeryOrInfection,
         'painful_periods' => c.painfulOrHeavyPeriods,
-        'age_at_presentation' => c.ageBand?.refersAtPresentation ?? false,
+        // Six months at 35 and over (2026-09-27). Kept for revert:
+        //   'age_at_presentation' => c.ageBand?.refersAtPresentation ?? false,
+        'age_at_presentation' => (c.ageBand?.refersAtPresentation ?? false) &&
+            (c.daysTrying ?? 0) >= 182,
+        'age_forty' => c.ageBand == FertilityAgeBand.over40,
         'twelve_months' => (c.daysTrying ?? 0) >= 365 &&
             !(c.ageBand?.refersAtPresentation ?? false),
         _ => false,

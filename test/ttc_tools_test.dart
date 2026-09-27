@@ -84,7 +84,10 @@ void main() {
         'cycle', 'ovulation', 'fertility', 'symptom', 'weight', 'sleep',
         'partner', 'mood', 'stress', 'lifestyle', 'journal',
         'supplement', 'medication', 'test', 'report', 'record', 'appointment',
-        'movement', 'nutrition', 'journey', 'can i', 'worth knowing',
+        'movement', 'nutrition', 'journey', 'can i',
+        // 2026-09-27: the product guide is named "Products" now. Kept for
+        // revert: 'worth knowing',
+        'products',
         // The five checks the level-map checklist added. Each was reachable
         // only from inside one journey step before this, which is the
         // contextual entrance, not an index. A woman told "you might have
@@ -122,7 +125,9 @@ void main() {
       // unified store) and became the first tile of Plan and learn.
       // ⚠️ 24 -> 25 ON 2026-09-26. "Talk to expert" left the V3 bar and
       // became a Tools tile (Care and medicines), opening the same consults.
-      expect(TtcToolsScreen.toolCount, 25);
+      // ⚠️ 25 -> 24 ON 2026-09-27: Mood folded into "Symptoms and mood"
+      // (both opened the one logger). Kept for revert: 25.
+      expect(TtcToolsScreen.toolCount, 24);
     });
 
     test('supplements and medication are not the same destination', () {
@@ -442,8 +447,11 @@ void main() {
       await pumpTall(
           tester, TtcTrackerScreen(tracker: ttcTrackerById('habits')!));
       expect(
-          find.text('Write down as much or as little as you like. One thing '
-              'is enough.'),
+          // The tool shell's intro since the tool rebuild (2026-09-27): it
+          // names the day strip too. Was (tools pass, the same day):
+          //   find.text('Write down as much or as little as you like. One '
+          //       'thing is enough. Each answer saves as you tap.'),
+          find.text(kTtcTrackerIntro),
           findsOneWidget);
     });
 
@@ -451,10 +459,14 @@ void main() {
         (tester) async {
       await pumpTall(
           tester, TtcTrackerScreen(tracker: ttcTrackerById('habits')!));
-      expect(find.text('Look back'), findsOneWidget);
-      await tester.tap(find.text('Look back'));
+      // "Past 4 weeks" since 2026-09-27 (tools pass). Was: 'Look back'.
+      expect(find.text('Past 4 weeks'), findsOneWidget);
+      await tester.tap(find.text('Past 4 weeks'));
       await tester.pumpAndSettle();
-      expect(find.text('Looking back'), findsOneWidget);
+      // The chart heads with the field's own name since the tool rebuild
+      // (2026-09-27), under a two-view switch. Was:
+      //   expect(find.text('Looking back'), findsOneWidget);
+      expect(find.text(kTtcTrackerEntriesTitle), findsOneWidget);
       // The rule the strip exists under: it describes, it never assesses.
       expect(
           find.text("A blank space is a day you didn't write anything down."),
@@ -523,8 +535,12 @@ void main() {
           DateTime.now().subtract(const Duration(days: 15))); // day 16
       CycleStore.instance.logLhPositive(16);
       await pumpTall(tester, const TtcOvulationScreen());
-      // The engine puts ovulation the day after the surge.
-      expect(find.text(const TtcS(false).estimatedOvulation(17)), findsOneWidget);
+      // The engine puts ovulation the day after the surge. The rebuilt tool
+      // (2026-09-27) says it as "Day 17, <date>" and names the test. Was:
+      //   expect(find.text(const TtcS(false).estimatedOvulation(17)),
+      //       findsOneWidget);
+      expect(find.textContaining('Day 17, '), findsOneWidget);
+      expect(find.text('From your positive test on day 16.'), findsOneWidget);
     });
 
     testWidgets('the fertility window renders a graded cycle', (tester) async {

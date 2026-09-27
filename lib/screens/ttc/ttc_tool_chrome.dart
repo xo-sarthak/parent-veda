@@ -51,6 +51,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../theme/pv_fonts.dart';
+import '../products/pv_store_chrome.dart' show pvSnack;
 import '../v2/v2_palette.dart';
 import '../v2/v3_hero_field.dart';
 import 'ttc_common.dart';
@@ -1003,4 +1004,147 @@ class TtcToolNotesCard extends StatelessWidget {
       ]),
     );
   }
+}
+
+// =============================================================================
+//  The last check, kept (tool rebuild, 2026-09-27)
+// -----------------------------------------------------------------------------
+//  ⚠️ ADDITIVE. Nothing above changed. Every self-check in this stage (Weight
+//  and fertility, PCOS symptom check, See a specialist?) used to forget her the
+//  moment she closed it: the next visit was a blank form, so looking at her
+//  result again meant answering everything again. Flo's Symptom Checker keeps
+//  "last-updated … Updated Aug 29 · Review conditions" (the gap analysis,
+//  Appendix B); on Mobbin, Lifesum's Life Score shows the last result on the
+//  way in with "Retake the test", Tempo dates its report and offers "Start a
+//  new scan", Equinox+ heads its results with "Retake".
+//
+//  So each check now opens with this card when there is a saved one: the date,
+//  one plain line of what it said, the way to see it, and the way to start
+//  again. One card, three tools, so the three read as one app.
+// =============================================================================
+
+/// "12 Sep", or "12 Sep 2025" when it is not this year.
+String ttcToolDate(DateTime d) {
+  const m = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  ];
+  final y = d.year == DateTime.now().year ? '' : ' ${d.year}';
+  return '${d.day} ${m[d.month - 1]}$y';
+}
+
+/// Her last saved check, above the questions.
+class TtcToolLastCheck extends StatelessWidget {
+  const TtcToolLastCheck({
+    super.key,
+    required this.at,
+    required this.line,
+    required this.seeLabel,
+    required this.onSee,
+    this.againLabel,
+    this.onAgain,
+  });
+
+  /// When she saved it.
+  final DateTime at;
+
+  /// One plain sentence: what it said, or what is filled in below.
+  final String line;
+
+  final String seeLabel;
+  final VoidCallback onSee;
+
+  /// "Start again", when the tool can clear it. Null hides it.
+  final String? againLabel;
+  final VoidCallback? onAgain;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.fromLTRB(16, 15, 16, 16),
+      decoration: BoxDecoration(
+        color: p.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: p.line),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Row(children: [
+          Icon(Icons.history_rounded, size: 15, color: p.ink2),
+          const SizedBox(width: 7),
+          Expanded(
+            child: Text('YOUR LAST CHECK · ${ttcToolDate(at).toUpperCase()}',
+                style: pvManrope(
+                    fontSize: 9.5,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 1.0,
+                    color: p.ink2)),
+          ),
+        ]),
+        const SizedBox(height: 8),
+        Text(line,
+            style: pvManrope(fontSize: 13.5, height: 1.55, color: p.ink1)),
+        const SizedBox(height: 14),
+        TtcToolPrimary(
+            key: const ValueKey('ttc_tool_last_see'),
+            label: seeLabel,
+            onTap: onSee),
+        if (againLabel != null && onAgain != null) ...[
+          const SizedBox(height: 4),
+          Center(
+            child: TextButton(
+              key: const ValueKey('ttc_tool_last_again'),
+              onPressed: onAgain,
+              child: Text(againLabel!,
+                  style: pvManrope(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w700,
+                      color: p.ink2)),
+            ),
+          ),
+        ],
+      ]),
+    );
+  }
+}
+
+/// "Copy my notes": the notes card's rows as plain text on the clipboard.
+///
+/// ⚠️ THE NOTES PAGES SAID "TAKE A SCREENSHOT, OR READ IT OUT" AND OFFERED
+/// NOTHING ELSE. The checklist already copies its summary for an appointment;
+/// the two notes pages now do the same, so all three tools that make notes
+/// hand them over the same way.
+class TtcToolCopyNotes extends StatelessWidget {
+  const TtcToolCopyNotes({
+    super.key,
+    required this.heading,
+    required this.rows,
+    required this.disclaimer,
+  });
+
+  final String heading;
+  final List<({String label, String value})> rows;
+  final String disclaimer;
+
+  String get text => [
+        heading,
+        '',
+        for (final r in rows) '${r.label}: ${r.value}',
+        '',
+        disclaimer,
+      ].join('\n');
+
+  @override
+  Widget build(BuildContext context) => TtcToolPrimary(
+        key: const ValueKey('ttc_tool_copy_notes'),
+        label: 'Copy my notes',
+        onTap: () {
+          Clipboard.setData(ClipboardData(text: text));
+          // The house notice, as on every other tool.
+          pvSnack(context,
+              'Notes copied. Paste them into a message or your notes.',
+              icon: Icons.check_rounded, lift: 24);
+        },
+      );
 }

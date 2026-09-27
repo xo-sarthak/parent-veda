@@ -2645,8 +2645,10 @@ void openTtcFocusTile(BuildContext context, TtcTile tile, double hue) {
     //     builder: (_) => TtcFocusScreen(page: page, bracket: bracket),
     //   ),
     // );
-    case TtcDoorTile(:final bracketId):
-      openTtcDoor(context, bracketId);
+    // On the tab the tile names, when it names one (2026-09-27). Kept for
+    // revert: case TtcDoorTile(:final bracketId): openTtcDoor(context, bracketId);
+    case TtcDoorTile(:final bracketId, :final group):
+      openTtcDoor(context, bracketId, initialGroup: group);
 
     // ---- one frame, no swiping ------------------------------------------
     case TtcInfographicTile():
@@ -2863,6 +2865,16 @@ void openTtcFocusTile(BuildContext context, TtcTile tile, double hue) {
 
     // ---- a person --------------------------------------------------------
     case TtcBookingTile(:final action):
+      // An offering id opens that offering, as a Talk tile does (2026-09-27,
+      // relevance audit): a Booking tile with one used to open nothing while
+      // the reachability test passed it.
+      if (ttcOfferingById(action) case final offering?) {
+        Navigator.of(context).push(MaterialPageRoute<void>(
+          settings: RouteSettings(name: 'ttc/offering/$action'),
+          builder: (_) => TtcOfferingScreen(offering: offering),
+        ));
+        return;
+      }
       // The booking engine, configured, scoped to consults — never a second
       // appointment feature.
       if (action != kTtcActConsult) return;

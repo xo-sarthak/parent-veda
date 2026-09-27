@@ -65,7 +65,10 @@ enum TtcPhase { period, beforeWindow, fertileWindow, afterWindow }
 extension TtcPhaseCopy on TtcPhase {
   String get label => switch (this) {
         TtcPhase.period => 'Period',
-        TtcPhase.beforeWindow => 'Before your window',
+        // One name for the stretch (2026-09-27, build 11): the line above the
+        // legend says "the days before your fertile days". Kept for revert:
+        // 'Before your window'.
+        TtcPhase.beforeWindow => 'Before your fertile days',
         TtcPhase.fertileWindow => 'Fertile days',
         TtcPhase.afterWindow => 'The waiting days',
       };

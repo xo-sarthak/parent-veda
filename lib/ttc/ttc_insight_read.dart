@@ -141,14 +141,19 @@ PvRead ttcInsightAsRead(TtcInsight i) {
     title: LocalizedText(en: i.titleEn, hi: i.titleHi),
     teaser: LocalizedText(en: i.takeawayEn, hi: i.takeawayHi),
     scaleSetter: lede,
-    author: const LocalizedText(en: 'ParentVeda editorial', hi: 'ParentVeda editorial'),
+    // The byline rule is "ParentVeda team" (2026-09-27, launch walk). Kept
+    // for revert: LocalizedText(en: 'ParentVeda editorial', hi: 'ParentVeda editorial').
+    author: const LocalizedText(en: 'ParentVeda team', hi: 'ParentVeda team'),
     authorRole: const LocalizedText(en: 'Daily insight', hi: 'Aaj ki baat'),
     reviewed: false,
     hue: _hueForTopic(i.topic),
     sections: [
       if (body.isNotEmpty) PvReadSection(paragraphs: body),
     ],
-    whenToSeeSomeone: kPvShortPieceCallout,
+    // TTC's own copy of the shared note, without the em dash the TTC voice
+    // leaves out; the shared one stays as pregnancy has it (2026-09-27).
+    // Kept for revert: whenToSeeSomeone: kPvShortPieceCallout,
+    whenToSeeSomeone: kTtcShortPieceCallout,
     faqs: const [],
     readNext: next,
   );
@@ -202,3 +207,19 @@ void openTtcInsight(BuildContext context, TtcInsight insight) {
     ),
   ));
 }
+
+/// The short-piece note in the TTC voice: the same words as
+/// `kPvShortPieceCallout`, the em dash made a full stop (2026-09-27).
+const PvCallout kTtcShortPieceCallout = PvCallout(
+  tone: PvCalloutTone.note,
+  title: LocalizedText(
+      en: 'A general note, not advice about you',
+      hi: 'Aam baat, aapke baare mein salah nahi'),
+  body: LocalizedText(
+      en: 'Nothing here is written with your history in front of it. If '
+          'anything worries you, or a clinic is already looking after you, '
+          'ask them. They know your case and this page does not.',
+      hi: 'Yahan kuch bhi aapki history dekh kar nahi likha gaya. Agar kuch '
+          'pareshan kare, ya koi clinic pehle se aapko dekh raha hai, unse '
+          'poochhein. Wo aapka case jaante hain, ye page nahi.'),
+);

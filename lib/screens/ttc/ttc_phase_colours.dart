@@ -30,42 +30,60 @@
 //
 //  Recorded in `docs/STILL-OPEN.md` §18 as a deliberate deviation from the door
 //  playbook's "`v2BlockTint` for every tint".
+//  ⚠️ SUPERSEDED 2026-09-27 (night) BY `ttc_cycle_palette.dart`. The four
+//  hues below (rose, blue, green, lilac at 32 to 40% saturation) were the
+//  "so many colours, and faded" the user walked on build 13. These three
+//  functions now answer from `TtcCycleColours`, so any caller left over draws
+//  the one palette; the old values are kept below for revert.
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
 import '../../ttc/ttc_cycle_report.dart';
+import 'ttc_cycle_palette.dart';
 
-/// The fill behind a stretch — a ring arc, a calendar day, a legend chip.
-Color ttcPhaseBand(TtcPhase phase) => switch (phase) {
-      TtcPhase.period => const Color(0xFFE2B6C2),
-      TtcPhase.beforeWindow => const Color(0xFFB9CFDF),
-      TtcPhase.fertileWindow => const Color(0xFFA9D1C3),
-      TtcPhase.afterWindow => const Color(0xFFD5C9E3),
-    };
+/// The fill behind a stretch. Now [TtcCycleColours.fill].
+Color ttcPhaseBand(TtcPhase phase) => TtcCycleColours.fill(phase);
 
-/// The solid mark — a timeline node, the dot on today, a legend key.
-///
-/// ⚠️ SOLID, NOT A DARKER BAND. A mark and a fill are doing different jobs: the
-/// fill says "these days belong together", the mark says "this one thing". They
-/// are far enough apart in strength that neither is mistaken for the other at
-/// the size a phone renders them.
-Color ttcPhaseMark(TtcPhase phase) => switch (phase) {
-      TtcPhase.period => const Color(0xFFCB7289),
-      TtcPhase.beforeWindow => const Color(0xFF77A3C5),
-      TtcPhase.fertileWindow => const Color(0xFF438972),
-      TtcPhase.afterWindow => const Color(0xFFB198CD),
-    };
+/// The solid mark. Now [TtcCycleColours.mark].
+Color ttcPhaseMark(TtcPhase phase) => TtcCycleColours.mark(phase);
 
-/// Text and numerals sitting **on** [ttcPhaseBand].
-///
-/// ⚠️ NOT `ttcTitleInk` ON A TINT. A calendar sets a day number on every one of
-/// twenty-eight coloured squares; one neutral ink across four different fills
-/// reads correctly on some and muddily on others. Each of these is the phase's
-/// own hue taken dark, so the number belongs to the square it is on.
-Color ttcPhaseInk(TtcPhase phase) => switch (phase) {
-      TtcPhase.period => const Color(0xFF8C364D),
-      TtcPhase.beforeWindow => const Color(0xFF376181),
-      TtcPhase.fertileWindow => const Color(0xFF366D5B),
-      TtcPhase.afterWindow => const Color(0xFF5F4082),
-    };
+/// Text naming a phase. Now [TtcCycleColours.ink].
+Color ttcPhaseInk(TtcPhase phase) => TtcCycleColours.ink(phase);
+
+// Kept for revert (2026-09-27): the original three functions.
+//
+// /// The fill behind a stretch — a ring arc, a calendar day, a legend chip.
+// Color ttcPhaseBand(TtcPhase phase) => switch (phase) {
+//       TtcPhase.period => const Color(0xFFE2B6C2),
+//       TtcPhase.beforeWindow => const Color(0xFFB9CFDF),
+//       TtcPhase.fertileWindow => const Color(0xFFA9D1C3),
+//       TtcPhase.afterWindow => const Color(0xFFD5C9E3),
+//     };
+//
+// /// The solid mark — a timeline node, the dot on today, a legend key.
+// ///
+// /// ⚠️ SOLID, NOT A DARKER BAND. A mark and a fill are doing different jobs: the
+// /// fill says "these days belong together", the mark says "this one thing". They
+// /// are far enough apart in strength that neither is mistaken for the other at
+// /// the size a phone renders them.
+// Color ttcPhaseMark(TtcPhase phase) => switch (phase) {
+//       TtcPhase.period => const Color(0xFFCB7289),
+//       TtcPhase.beforeWindow => const Color(0xFF77A3C5),
+//       TtcPhase.fertileWindow => const Color(0xFF438972),
+//       TtcPhase.afterWindow => const Color(0xFFB198CD),
+//     };
+//
+// /// Text and numerals sitting **on** [ttcPhaseBand].
+// ///
+// /// ⚠️ NOT `ttcTitleInk` ON A TINT. A calendar sets a day number on every one of
+// /// twenty-eight coloured squares; one neutral ink across four different fills
+// /// reads correctly on some and muddily on others. Each of these is the phase's
+// /// own hue taken dark, so the number belongs to the square it is on.
+// Color ttcPhaseInk(TtcPhase phase) => switch (phase) {
+//       TtcPhase.period => const Color(0xFF8C364D),
+//       TtcPhase.beforeWindow => const Color(0xFF376181),
+//       TtcPhase.fertileWindow => const Color(0xFF366D5B),
+//       TtcPhase.afterWindow => const Color(0xFF5F4082),
+//     };
+//

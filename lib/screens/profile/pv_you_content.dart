@@ -31,6 +31,7 @@ import '../../services/pv_order_store.dart';
 import '../../services/saved_store.dart';
 import '../../services/stage_gateway.dart';
 import '../../ttc/ttc_content_prefs.dart' show TtcContentPrefs;
+import '../../ttc/ttc_journal_store.dart' show TtcJournalStore;
 import '../../ttc/ttc_messages_store.dart' show TtcMessagesStore;
 import '../../ttc/ttc_records_store.dart';
 import '../../ttc/ttc_treatment_store.dart';
@@ -135,6 +136,13 @@ class PvYouAction {
   final Future<void> Function(BuildContext) run;
 }
 
+/// A titled group of rows ("Your health", "Your app").
+class PvYouGroup {
+  const PvYouGroup({required this.title, required this.things});
+  final String title;
+  final List<PvYouThing> things;
+}
+
 class PvYouStageContent {
   const PvYouStageContent({
     required this.stage,
@@ -145,6 +153,7 @@ class PvYouStageContent {
     required this.things,
     required this.childrenInvitation,
     required this.whatWeStore,
+    this.groups,
   });
   final LifeStage stage;
 
@@ -160,6 +169,14 @@ class PvYouStageContent {
 
   /// The plain-language list for Data and privacy.
   final List<String> whatWeStore;
+
+  /// ⚠️ SHORT AND GROUPED (2026-09-27, trying to conceive only, the user's
+  /// choice after the launch walk; Flo, Clue and Lifesum on Mobbin). When
+  /// set, the screen draws these titled groups under the tiles instead of
+  /// [things] in one long card, and folds [details] into a row of its own
+  /// ("Your answers"), so the top level is short and nothing sits twice.
+  /// Null on every other stage, which draws exactly as before.
+  final List<PvYouGroup>? groups;
 }
 
 // ---- helpers ------------------------------------------------------------------
@@ -286,9 +303,18 @@ const String kTtcIntimateStateHidden = 'Sex and intimacy content: hidden';
 
 final PvYouStageContent _trying = PvYouStageContent(
   stage: LifeStage.tryingToConceive,
+  // The card's line carries the facts that matter (Lifesum's profile card):
+  // how long, and her cycle when she has said. Kept for revert: the "Trying ·
+  // <duration>" line alone.
   clock: () {
     final d = _answer('trying', 'ttc_duration');
-    return d == '--' ? 'Trying' : 'Trying · ${d.toLowerCase()}';
+    final c = _answer('trying', 'ttc_cycles');
+    return [
+      d == '--' ? 'Trying' : 'Trying · ${d.toLowerCase()}',
+      // Only a real answer; "cycles not sure" read as a slip.
+      if (c != '--' && !c.toLowerCase().contains('not sure'))
+        'cycles ${c.toLowerCase()}',
+    ].join(' · ');
   },
   action: PvYouAction(
     label: 'I got a positive test',
@@ -343,9 +369,13 @@ final PvYouStageContent _trying = PvYouStageContent(
   ],
   tiles: [
     _saved(),
+    // A count like its two neighbours (2026-09-27, build 11): "11 Saved",
+    // "2 Orders" and a bare "Journal" read as three different kinds of tile.
+    // Kept for revert: no count.
     PvYouThing(
       icon: Icons.edit_note_rounded,
       title: 'Journal',
+      count: () => TtcJournalStore.instance.count,
       open: (c) => _push(c, const TtcJournalScreen(), 'ttc/journal'),
     ),
     _orders(),
@@ -426,6 +456,67 @@ final PvYouStageContent _trying = PvYouStageContent(
     ),
     _bookings(),
     _addresses(),
+  ],
+  // ⚠️ THE TOP LEVEL, SHORT (2026-09-27). `things` above stays as the list
+  // any older caller reads; the screen draws these groups for TTC. Calendar,
+  // the cycle companion and the fertile window left You: they live on Today
+  // (the header's calendar, the hero) and on Tools, and three doors to one
+  // screen made You the longest list in the app.
+  groups: [
+    PvYouGroup(title: 'Your health', things: [
+      _doctorNotes(LifeStage.tryingToConceive),
+      _toolThing('records'),
+      PvYouThing(
+        icon: Icons.event_note_outlined,
+        title: 'Treatment',
+        subtitle: "Your clinic's dates, step by step",
+        subtitleNow: () => TtcTreatmentStore.instance.hasDates
+            ? 'A round is in progress'
+            : "Your clinic's dates, step by step",
+        listen: TtcTreatmentStore.instance,
+        open: (c) => openTtcSurface(c, 'ttc_treatment'),
+      ),
+      PvYouThing(
+        icon: Icons.fact_check_outlined,
+        title: 'Your answers',
+        subtitle: 'How long you have been trying, your cycles, folic acid',
+        open: (c) => _push(
+          c,
+          const PvDetailsScreen(stageId: 'trying'),
+          'you/details',
+        ),
+      ),
+    ]),
+    PvYouGroup(title: 'Your app', things: [
+      PvYouThing(
+        icon: Icons.mail_outline_rounded,
+        title: 'Messages',
+        subtitle: 'What we have sent you, and when we send it',
+        dot: () => TtcMessagesStore.instance.unreadCount > 0,
+        listen: TtcMessagesStore.instance,
+        open: (c) => openTtcSurface(c, 'ttc_messages'),
+      ),
+      PvYouThing(
+        icon: Icons.visibility_outlined,
+        title: kTtcWhatYouSee,
+        subtitle: kTtcHideIntimate,
+        subtitleNow: () => TtcContentPrefs.instance.hideIntimate
+            ? kTtcIntimateStateHidden
+            : kTtcIntimateStateShown,
+        listen: TtcContentPrefs.instance,
+        open: (c) => showTtcContentPrefsSheet(c),
+      ),
+    ]),
+    PvYouGroup(title: 'Bookings and orders', things: [
+      PvYouThing(
+        icon: Icons.auto_awesome_outlined,
+        title: 'Programmes and sessions',
+        subtitle: 'Consults, courses and classes you can book',
+        open: (c) => _push(c, const TtcPrepareScreen(), 'ttc/prepare'),
+      ),
+      _bookings(),
+      _addresses(),
+    ]),
   ],
   childrenInvitation: 'Your first child\'s page appears here after the birth.',
   whatWeStore: [

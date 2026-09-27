@@ -201,10 +201,11 @@ void main() {
           reason: 'the fixture no longer reproduces the case that was broken');
 
       await pump(tester);
-      expect(find.text('Dial'), findsOneWidget,
+      expect(find.text('Circle') /* was 'Dial' until 2026-09-27 */, findsOneWidget,
           reason: 'the old report rendered — the picture was withheld because '
               'there were no FINDINGS, which is a different question');
-      expect(find.text('The four stretches, in order'), findsOneWidget);
+      // Was 'The four stretches, in order' until 2026-09-27 (tools pass).
+      expect(find.text('The four parts of your cycle'), findsOneWidget);
     });
 
     testWidgets('and it says so instead of leaving the section blank',
@@ -237,7 +238,8 @@ void main() {
         t.reportWhatYouLogged,
         t.reportChanges,
         t.reportThisCycle,
-        'The four stretches, in order',
+        // Was 'The four stretches, in order' until 2026-09-27 (tools pass).
+        'The four parts of your cycle',
       ]) {
         expect(find.text(heading).evaluate().length, lessThanOrEqualTo(1),
             reason: '"$heading" is on the report more than once');
@@ -256,7 +258,7 @@ void main() {
       addTearDown(TtcTreatmentStore.instance.resetForTest);
       await pump(tester);
 
-      expect(find.text('Dial'), findsNothing,
+      expect(find.text('Circle') /* was 'Dial' until 2026-09-27 */, findsNothing,
           reason: 'phases were drawn over a cycle a clinician is directing');
       expect(find.text('Your doctor is timing this one'), findsOneWidget);
       // ⚠️ HER DAYS AND HER HISTORY BOTH SURVIVE THE REFUSAL. Refusing to

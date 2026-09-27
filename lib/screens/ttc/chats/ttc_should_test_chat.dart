@@ -161,6 +161,13 @@ class TtcShouldTestChat extends TtcChatScript {
   DateTime? _pickedStart;
   int? _pickedLength;
 
+  /// "Start again" asks her dates afresh (2026-09-27).
+  @override
+  void resetAnswers() {
+    _pickedStart = null;
+    _pickedLength = null;
+  }
+
   @override
   String get title => 'Should I test?';
 
@@ -276,7 +283,7 @@ class TtcShouldTestChat extends TtcChatScript {
         'Your clinic will tell you when to test. A blood test (beta) on their '
             'date is the one to trust.',
         if (beta != null) 'Your clinic set your blood test for ${ttcDayDate(beta)}.',
-        'A home test before then can mislead you. Some trigger shots contain '
+        'A home test before then can mislead you. Some trigger injections contain '
             'the same hormone a home test looks for, and it can stay in your '
             'body for up to two weeks.',
       ],

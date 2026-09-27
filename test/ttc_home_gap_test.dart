@@ -319,18 +319,19 @@ void main() {
       }
     });
 
-    testWidgets('the rail and "See everything" are on the home',
+    // ⚠️ "SEE EVERYTHING" LEFT THE HOME (the user, 2026-09-27: "see
+    // everything is not needed… recommended reads should only talk about
+    // recommended reads"). Every read is on the Learn tab in the bar. Kept for
+    // revert: the test tapped `ttc_home_reads_see_all` and expected
+    // TtcLearnScreen.
+    testWidgets('the phase reads are on the home, as rows, with no extra row',
         (tester) async {
       inWindow();
       await pumpHome(tester);
       final ids = ttcHomeReadIdsFor(today, phase: TtcDayPhase.window);
       expect(find.text(ttcReadById(ids.first)!.title.en), findsWidgets);
-      final see = find.byKey(const ValueKey('ttc_home_reads_see_all'));
-      await tester.ensureVisible(see);
-      await tester.pumpAndSettle();
-      await tester.tap(see);
-      await tester.pumpAndSettle();
-      expect(find.byType(TtcLearnScreen), findsOneWidget);
+      expect(find.byKey(ValueKey('ttc_home_read_${ids.first}')), findsOneWidget);
+      expect(find.byKey(const ValueKey('ttc_home_reads_see_all')), findsNothing);
     });
 
     testWidgets('the waiting days offer "Should I test?"', (tester) async {
@@ -763,6 +764,12 @@ void main() {
       await tester.pumpWidget(MaterialApp(
           home: TtcSymptomLogScreen(day: today, focusGroup: 'ovulation_test')));
       await tester.pump(const Duration(milliseconds: 500));
+      // The logger wears the tool shell since 2026-09-27, whose sheet is a
+      // full screen tall, so even this tall surface scrolls to the test card;
+      // the scroll to the test card starts on the frame above, so its 320ms
+      // run and the frame after it have to pass before a tap lands.
+      await tester.pump(const Duration(milliseconds: 400));
+      await tester.pump(const Duration(milliseconds: 50));
       expect(tester.takeException(), isNull);
       final link = find.byKey(const ValueKey('ttc_log_should_test'));
       expect(link, findsOneWidget);

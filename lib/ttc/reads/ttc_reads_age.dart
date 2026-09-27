@@ -1711,7 +1711,7 @@ final List<PvRead> kTtcReadsAge = [
         bullets: [
           _en('Stimulation, or stims: daily hormone injections that grow '
               'several follicles at once.'),
-          _en('Trigger shot: a timed injection that ripens the eggs. Egg '
+          _en('Trigger injection: timed to ripen the eggs. Egg '
               'collection is about 34 to 36 hours later.'),
           _en('OPU (ovum pick-up), or egg retrieval: collecting eggs with a '
               'fine needle under sedation.'),

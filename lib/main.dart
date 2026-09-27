@@ -73,6 +73,7 @@ import 'services/hospital_bag_store.dart';
 import 'services/father_journal_store.dart';
 import 'services/journal_store.dart';
 import 'services/medicine_store.dart';
+import 'services/notification_service.dart' show NotificationService;
 import 'services/memory_store.dart';
 import 'services/pregnancy_controller.dart';
 import 'services/product_checklist_store.dart';
@@ -84,6 +85,7 @@ import 'services/journey_dates_store.dart';
 import 'services/reminder_store.dart';
 import 'ttc/ttc_content_prefs.dart';
 import 'ttc/ttc_messages_store.dart';
+import 'ttc/ttc_records_store.dart' show TtcAppointmentsStore;
 import 'ttc/ttc_treatment_store.dart';
 import 'services/scans_store.dart';
 import 'services/symptom_store.dart';
@@ -265,6 +267,18 @@ class _ParentVedaAppState extends State<ParentVedaApp>
         // The IVF trigger reminders are re-armed here too, for the same
         // reason (they used to be wiped on every launch).
         .then((_) => TtcTreatmentStore.instance.rearmAfterStartup())
+        // And the appointments' "remind me the evening before" (2026-09-27),
+        // which the same cancelAll() would otherwise wipe on every launch.
+        .then((_) => TtcAppointmentsStore.instance.rearmAfterStartup())
+        // ⚠️ AND THE MEDICATION ALARMS, EVERY STAGE (2026-09-27, found in the
+        // TTC tools pass). `MedicineStore.init` above arms them as soon as it
+        // loads, racing this chain: when it won, `syncAll`'s cancelAll() wiped
+        // them and no medicine reminder fired until she next edited one.
+        // Re-arming after the wipe makes the order irrelevant. If the store has
+        // not loaded yet, `all` is empty here and its own init arms them later,
+        // which is also after the wipe.
+        .then((_) => NotificationService.instance
+            .syncMedicationAlarms(MedicineStore.instance.all))
         .catchError((_) {});
     // Load Read-to-your-baby feed preferences + saved pieces.
     ReadToBabyStore.instance.init();

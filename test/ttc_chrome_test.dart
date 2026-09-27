@@ -172,8 +172,9 @@ void main() {
     test('the tile name matches the screen it opens', () {
       // The tile said "Product Guide"; the screen says "Worth knowing about".
       final all = [for (final g in ttcToolGroups) ...g.tools];
-      expect(all.firstWhere((t) => t.id == 'guide').name(false),
-          'Worth knowing about');
+      // 2026-09-27: the tile opens the same store as the bar's Products tab,
+      // so it takes that one name. Kept for revert: 'Worth knowing about'.
+      expect(all.firstWhere((t) => t.id == 'guide').name(false), 'Products');
     });
   });
 

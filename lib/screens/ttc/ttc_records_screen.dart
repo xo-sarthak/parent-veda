@@ -49,23 +49,33 @@ import 'package:flutter/material.dart';
 import '../../ttc/ttc_records_grouping.dart';
 import '../../ttc/ttc_records_store.dart';
 import 'ttc_common.dart';
+import 'ttc_record_edit_screen.dart' show openTtcRecordEdit;
 import 'ttc_records_v2.dart';
 import 'ttc_strings.dart';
 import 'ttc_tool_chrome.dart';
 
-void openTtcRecords(BuildContext context, {bool resultsOnly = false}) {
+/// [addTestId] opens the add form on arrival with that library test chosen,
+/// from the test library's "Add my result" (tools pass, 2026-09-27). She lands
+/// in the folder, so the saved result is in front of her when the form shuts.
+void openTtcRecords(BuildContext context,
+    {bool resultsOnly = false, String? addTestId}) {
   Navigator.of(context).push(MaterialPageRoute<void>(
-    builder: (_) => TtcRecordsScreen(resultsOnly: resultsOnly),
+    builder: (_) =>
+        TtcRecordsScreen(resultsOnly: resultsOnly, addTestId: addTestId),
     settings: RouteSettings(name: resultsOnly ? 'ttc/reports' : 'ttc/records'),
   ));
 }
 
 class TtcRecordsScreen extends StatefulWidget {
-  const TtcRecordsScreen({super.key, this.resultsOnly = false});
+  const TtcRecordsScreen(
+      {super.key, this.resultsOnly = false, this.addTestId});
 
   /// True when opened from the Reports tile - the same folder, filtered to
   /// entries that came from the test library.
   final bool resultsOnly;
+
+  /// A library test to open the add form on, straight away.
+  final String? addTestId;
 
   @override
   State<TtcRecordsScreen> createState() => _TtcRecordsScreenState();
@@ -74,6 +84,17 @@ class TtcRecordsScreen extends StatefulWidget {
 class _TtcRecordsScreenState extends State<TtcRecordsScreen> {
   /// null = everyone. Otherwise narrow to one person's results.
   bool? _partner;
+
+  @override
+  void initState() {
+    super.initState();
+    final id = widget.addTestId;
+    if (id != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) showTtcRecordAdd(context, testId: id);
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -90,14 +111,43 @@ class _TtcRecordsScreenState extends State<TtcRecordsScreen> {
 
         return TtcToolScaffold(
           hue: kTtcRecordsHue,
-          eyebrow: widget.resultsOnly ? t.recordsReports : t.recordsTitle,
-          title: 'Every result and letter, in one place.',
-          intro: t.recordsIntro,
+          // ⚠️ ONE NAME (tools pass, 2026-09-27): the Tools tile says
+          // "Records and reports" and this said "Health Records". Kept for
+          // revert: eyebrow: widget.resultsOnly ? t.recordsReports : t.recordsTitle,
+          eyebrow: widget.resultsOnly
+              ? t.recordsReports
+              : t.hinglish
+                  ? t.recordsTitle
+                  : 'Records and reports',
+          // Plainer (2026-09-27). Kept for revert:
+          // title: 'Every result and letter, in one place.',
+          title: 'Your test results, in one place.',
+          // ⚠️ SAY WHAT SHE DOES HERE, AND SAY IT TRUE. The intro promised
+          // "in date order" over a folder grouped by test. Kept for revert:
+          // intro: t.recordsIntro,
+          intro: t.hinglish
+              ? t.recordsIntro
+              : "Keep each test report here, yours and your partner's. Take "
+                  'a photo of the paper, or type the number in.',
           // ⚠️ WHITE WITH A HAIRLINE, NOT A FILLED PURPLE PILL. It was
           // `ttcPurple`, which is the one thing this stage stopped doing: a
           // solid brand-coloured control shouts, and this one was the loudest
           // object on a screen whose entire job is to be calm about medical
           // results.
+          // ⚠️ ONE ADD, ONE PAGE (2026-09-27). This opened a sheet that
+          // opened a second, older sheet on top of itself: "two screens open
+          // to add". It opens the add page now, with the three ways to bring
+          // the report in as rows on it. It does not start the camera: from
+          // here she may be holding a PDF, not a sheet of paper. The empty
+          // state's "Photograph a report" is the camera-first door.
+          action: TtcRecordsHeroPill(
+            key: const ValueKey('ttc_rec_add'),
+            icon: Icons.add_rounded,
+            label: t.recordsAdd,
+            onTap: () => openTtcRecordEdit(context),
+          ),
+          /*
+          // Kept for revert (2026-09-27): the same pill, opening the sheet.
           action: GestureDetector(
             onTap: () => showTtcRecordAdd(context),
             behavior: HitTestBehavior.opaque,
@@ -117,6 +167,7 @@ class _TtcRecordsScreenState extends State<TtcRecordsScreen> {
               ]),
             ),
           ),
+          */
           children: [
             ttcToolPad(Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -135,19 +186,52 @@ class _TtcRecordsScreenState extends State<TtcRecordsScreen> {
                           style: ttcBody(12.5, color: ttcSoft, h: 1.4)),
                     ),
                     const SizedBox(width: 10),
-                    _WhoseChip(
+                    // Kept for revert (2026-09-27): the one-word chip that
+                    // cycled Everyone, You, Partner on each tap. Nobody could
+                    // tell it was a filter until it changed under them.
+                    // _WhoseChip(
+                    //   whose: _partner,
+                    //   onPick: (v) => setState(() => _partner = v),
+                    // ),
+                  ]),
+                  const SizedBox(height: 10),
+                  // Three answers side by side, so she can see all of them
+                  // before she taps. Only drawn when both of you have results:
+                  // a filter with one side empty is a control for nothing.
+                  if (his > 0 && his < total)
+                    _WhoseSegments(
                       whose: _partner,
                       onPick: (v) => setState(() => _partner = v),
                     ),
-                  ]),
                   const SizedBox(height: 18),
                 ],
 
                 TtcRecordsBody(
-                  onlyPartner: _partner,
+                  // The filter only exists while both of you have results; if
+                  // one side empties, it must not keep narrowing to nothing
+                  // with no control left to undo it.
+                  onlyPartner: his > 0 && his < total ? _partner : null,
                   resultsOnly: widget.resultsOnly,
                 ),
 
+                // ⚠️ THE WAY OUT OF THE PHONE IS ALWAYS HERE NOW (2026-09-27).
+                // It used to exist only with an appointment booked within
+                // seven days, so the PDF (the one thing a new clinic asks
+                // for) could not be made at all the rest of the time. The row
+                // is always there once something is filed; an appointment
+                // soon only changes its words, not whether it exists.
+                // Kept for revert: `if (total > 0 && soon != null)`.
+                if (total > 0) ...[
+                  const SizedBox(height: 20),
+                  _IntoTheAppointment(
+                    appointment: soon,
+                    onTap: () =>
+                        showTtcRecordsForAppointment(context, appointment: soon),
+                  ),
+                ],
+
+                /*
+                // Kept for revert (2026-09-27):
                 // ⚠️ THE WAITING-ROOM DOOR, AND IT ONLY EXISTS WHEN THERE IS
                 // SOMETHING TO WALK INTO. An "into the appointment" link on a
                 // folder with nothing in it, or with no appointment booked, is
@@ -165,6 +249,7 @@ class _TtcRecordsScreenState extends State<TtcRecordsScreen> {
                   ),
                 ],
 
+                */
                 const SizedBox(height: 18),
                 Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   const Icon(Icons.info_outline_rounded,
@@ -216,6 +301,74 @@ class _TtcRecordsScreenState extends State<TtcRecordsScreen> {
 class _IntoTheAppointment extends StatelessWidget {
   const _IntoTheAppointment({required this.appointment, required this.onTap});
 
+  /// Null when nothing is booked soon: the row still opens the card and the
+  /// PDF, it just does not name a visit.
+  final TtcAppointment? appointment;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final a = appointment;
+    final String eyebrow;
+    final String title;
+    final String body;
+    if (a == null) {
+      eyebrow = 'For a doctor';
+      title = 'Show or send your results';
+      body = 'Your latest results on one card, or a PDF to print or send.';
+    } else {
+      final d = a.startsLocal;
+      final today = DateTime.now();
+      final isToday =
+          d.year == today.year && d.month == today.month && d.day == today.day;
+      eyebrow = isToday ? 'For today' : 'Before ${ttcRecordDate(d)}';
+      title = a.title;
+      body = 'The most recent results, in one card you can hand over.';
+    }
+
+    return InkWell(
+      key: const ValueKey('ttc_rec_share_row'),
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.fromLTRB(16, 14, 10, 14),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: ttcLine),
+        ),
+        child: Row(children: [
+          const Icon(Icons.ios_share_rounded, size: 19, color: ttcTitleInk),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(eyebrow,
+                      style: ttcBody(11, color: ttcMuted, w: FontWeight.w800)),
+                  const SizedBox(height: 4),
+                  Text(title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: ttcJakarta(14.5)),
+                  const SizedBox(height: 3),
+                  Text(body, style: ttcBody(12.5, color: ttcSoft, h: 1.45)),
+                ]),
+          ),
+          const SizedBox(width: 6),
+          const Icon(Icons.chevron_right_rounded, size: 20, color: ttcMuted),
+        ]),
+      ),
+    );
+  }
+}
+
+/*
+// Kept for revert (2026-09-27): the appointment-only row.
+class _IntoTheAppointment extends StatelessWidget {
+  const _IntoTheAppointment({required this.appointment, required this.onTap});
+
   final TtcAppointment appointment;
   final VoidCallback onTap;
 
@@ -263,7 +416,52 @@ class _IntoTheAppointment extends StatelessWidget {
   }
 }
 
+*/
+
+/// The filter as three visible answers: Everyone, You, Partner.
+class _WhoseSegments extends StatelessWidget {
+  const _WhoseSegments({required this.whose, required this.onPick});
+
+  final bool? whose;
+  final ValueChanged<bool?> onPick;
+
+  @override
+  Widget build(BuildContext context) => Container(
+        padding: const EdgeInsets.all(4),
+        decoration: BoxDecoration(
+            color: ttcPanel, borderRadius: BorderRadius.circular(999)),
+        child: Row(children: [
+          for (final (label, value) in const [
+            ('Everyone', null),
+            ('You', false),
+            ('Partner', true),
+          ])
+            Expanded(
+              child: GestureDetector(
+                onTap: () => onPick(value),
+                behavior: HitTestBehavior.opaque,
+                child: Container(
+                  alignment: Alignment.center,
+                  padding: const EdgeInsets.symmetric(vertical: 9),
+                  decoration: BoxDecoration(
+                    color: whose == value ? Colors.white : Colors.transparent,
+                    borderRadius: BorderRadius.circular(999),
+                    boxShadow: whose == value ? ttcCardShadow : null,
+                  ),
+                  child: Text(label,
+                      style: ttcBody(12.5,
+                          color: whose == value ? ttcTitleInk : ttcSoft,
+                          w: FontWeight.w800)),
+                ),
+              ),
+            ),
+        ]),
+      );
+}
+
 /// The filter, as one word that cycles rather than as a row of segments.
+/// Kept for revert (2026-09-27); nothing draws it now.
+// ignore: unused_element
 class _WhoseChip extends StatelessWidget {
   const _WhoseChip({required this.whose, required this.onPick});
 

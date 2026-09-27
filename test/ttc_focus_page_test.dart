@@ -367,11 +367,16 @@ void main() {
       // three for "Waiting and testing" and two for "Sex and closeness", both
       // placed after the trying myths and before his tab. The first four
       // headings are unchanged; they now share one tab, "When and how".
+      // ⚠️ 2026-09-27 (relevance audit): the positions heading was retitled
+      // because two of its three myths are not about position, and "How does
+      // it happen?" was added for the one read no door linked. Kept for
+      // revert: 'Which sex position is best?', and no 'How does it happen?'.
       expect(page.sections.map((s) => s.heading).toList(), [
         'When should we have sex?',
         'How many times should we try?',
-        'Which sex position is best?',
+        'Positions, lying down and other myths',
         'Does stress stop pregnancy?',
+        'How does it happen?',
         'What happens in the two weeks after?',
         'When should you test, and how?',
         'What if the test says no?',
@@ -439,8 +444,18 @@ void main() {
     test('this page has exactly one paid booking tile', () {
       // Re-homed with the two below, and for the same reason: it is a fact
       // about the conceiving page, not a requirement on every door.
-      final bookings = page.allTiles.whereType<TtcBookingTile>().toList();
-      expect(bookings, hasLength(1));
+      //
+      // ⚠️ A TALK TILE SINCE 2026-09-27 (relevance audit). "Talk to a doctor"
+      // names the gynaecologist offering, and `openTtcFocusTile` resolves an
+      // offering id only on a Talk tile. Still one tile that reaches a person.
+      // Kept for revert:
+      // final bookings = page.allTiles.whereType<TtcBookingTile>().toList();
+      // expect(bookings, hasLength(1));
+      final people = [
+        ...page.allTiles.whereType<TtcBookingTile>(),
+        ...page.allTiles.whereType<TtcTalkTile>(),
+      ];
+      expect(people, hasLength(1));
     });
 
     test('this page uses both a carousel and a film', () {
@@ -456,7 +471,11 @@ void main() {
     test('the page closes on a person, not on a price', () {
       // Same call as the V3 home. The last thing she reads is that there is
       // someone to talk to.
-      expect(page.sections.last.tiles.last, isA<TtcBookingTile>());
+      // A Talk tile since 2026-09-27 (relevance audit), see above. Kept for
+      // revert: expect(page.sections.last.tiles.last, isA<TtcBookingTile>());
+      final last = page.sections.last.tiles.last;
+      expect(last, isA<TtcTalkTile>());
+      expect(ttcOfferingById((last as TtcTalkTile).action)?.kind, 'consult');
     });
 
     test('the heading is the bracket label, so it matches the tile tapped', () {

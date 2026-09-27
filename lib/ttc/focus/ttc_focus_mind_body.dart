@@ -37,7 +37,9 @@
 
 import 'package:flutter/material.dart' show Icons;
 
-import '../../data/hubs/ttc_hubs.dart' show kTtcActConsult;
+// Unused since the consult tiles name their offering (2026-09-27,
+// relevance audit). Kept for revert:
+// import '../../data/hubs/ttc_hubs.dart' show kTtcActConsult;
 import '../ttc_focus_data.dart';
 import '../ttc_practice_data.dart';
 
@@ -91,7 +93,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
   // than a matter of remembering.
   groups: [
     TtcFocusGroup(
-      id: 'today', mark: IntentMark.sunMark, inlineLabel: 'A few minutes',
+      id: 'today', mark: IntentMark.sunMark, tabMark: TtcTabMark.sun, inlineLabel: 'A few minutes',
       label: 'Today',
       icon: Icons.wb_sunny_outlined,
       hue: 160,
@@ -102,19 +104,19 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
     // FLAG CARRIES THE SELF-HARM ROUTING (Tele-MANAS, 112), rendered whole
     // from the read's own callout, as on Talk.
     TtcFocusGroup(
-      id: 'hard', mark: IntentMark.cuppedHands,
+      id: 'hard', mark: IntentMark.cuppedHands, tabMark: TtcTabMark.cloudRain,
       label: 'Hard days',
       icon: Icons.cloud_outlined,
       hue: 268,
       pinnedRedFlagReadIds: ['ttc_read_month_after_month'],
     ),
     TtcFocusGroup(
-        id: 'understand', mark: IntentMark.bookMark,
+        id: 'understand', mark: IntentMark.bookMark, tabMark: TtcTabMark.openBook,
         label: 'Understand',
         icon: Icons.menu_book_outlined,
         hue: 206),
     TtcFocusGroup(
-      id: 'practice', mark: IntentMark.lotusMark,
+      id: 'practice', mark: IntentMark.lotusMark, tabMark: TtcTabMark.lotus,
       label: 'The practice',
       icon: Icons.self_improvement_outlined,
       hue: 104,
@@ -125,7 +127,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
       note: kTtcPracticeSafety,
     ),
     TtcFocusGroup(
-        id: 'ready', mark: IntentMark.checkMark,
+        id: 'ready', mark: IntentMark.checkMark, tabMark: TtcTabMark.checklist,
         label: 'Getting ready',
         icon: Icons.checklist_rtl_rounded,
         hue: 42),
@@ -136,7 +138,7 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
     // and the brief says explicitly not to bury it; rendering the article's own
     // callout whole is what guarantees it travels.
     TtcFocusGroup(
-      id: 'talk', mark: IntentMark.moodArc,
+      id: 'talk', mark: IntentMark.moodArc, tabMark: TtcTabMark.twoBubbles,
       label: 'Talk',
       icon: Icons.chat_bubble_outline_rounded,
       hue: 344,
@@ -200,6 +202,13 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
           title: 'Three answers for "Koi good news?"',
           blurb: 'A gentle answer and a firmer one, for each person who asks.',
           readId: 'ttc_read_good_news_answers',
+        ),
+        // Moved here from Talk, "The people around you" (2026-09-27,
+        // relevance audit): it answers the same questions as the two above.
+        TtcGuideTile(
+          title: 'When family keeps asking',
+          blurb: "What to say, what you owe them, and what you don't.",
+          readId: 'ttc_read_family_asking',
         ),
       ],
     ),
@@ -338,11 +347,17 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
           readId: _kStress,
           atHeading: 'So what is a daily practice for?',
         ),
+        // ⚠️ ITS OWN LANDING (2026-09-27, relevance audit). It opened the
+        // same section as the card above. The garbh sanskar read's "What does
+        // a daily practice look like?" is the one that says keep it short.
+        // Kept for revert (2026-09-27, relevance audit):
+        //   readId: _kStress,
+        //   atHeading: 'So what is a daily practice for?',
         TtcGuideTile(
           title: 'Five minutes, and not as a target',
           blurb: 'Keep it short enough that missing a day costs nothing.',
-          readId: _kStress,
-          atHeading: 'So what is a daily practice for?',
+          readId: _kGarbh,
+          atHeading: 'What does a daily practice look like?',
         ),
       ],
     ),
@@ -409,79 +424,87 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
     // article itself. The brief's rule is *"do not re-teach food, supplements,
     // smoking, alcohol, weight or tests in Sub-tab 4"*, and the only way to
     // keep that rule permanently is to have nothing here that could drift.
-    TtcFocusSection(
-      heading: 'Food and supplements',
-      group: 'ready',
-      tiles: [
-        TtcArticleTile(
-          title: 'What to eat before you start',
-          blurb: 'From Getting ready. Real food, no targets.',
-          readId: 'ttc_read_three_months_before',
-          atHeading: 'What should I eat?',
-        ),
-        TtcArticleTile(
-          title: 'Folic acid, and when to start it',
-          blurb: 'The one item here with really strong evidence behind it.',
-          readId: 'ttc_read_folic_acid',
-        ),
-        TtcArticleTile(
-          title: 'Vitamin D, B12 and iron',
-          blurb: 'When to start what, and how early.',
-          readId: 'ttc_read_supplement_timing',
-        ),
-      ],
-    ),
-
-    TtcFocusSection(
-      heading: 'Habits worth changing',
-      group: 'ready',
-      tiles: [
-        TtcArticleTile(
-          title: 'Smoking and tobacco, in every form',
-          blurb: 'Including being around it.',
-          readId: 'ttc_read_what_to_cut',
-          atHeading: 'Does smoking matter, even second-hand?',
-        ),
-        TtcArticleTile(
-          title: 'Alcohol, honestly',
-          blurb: "What's known, without the scolding.",
-          readId: 'ttc_read_what_to_cut',
-          atHeading: 'Do I need to stop drinking?',
-        ),
-        TtcArticleTile(
-          title: 'Weight, said kindly',
-          blurb: 'In both directions, and with no number to hit.',
-          readId: 'ttc_read_weight_kindly',
-        ),
-      ],
-    ),
-
-    TtcFocusSection(
-      heading: 'Checks worth doing',
-      group: 'ready',
-      tiles: [
-        TtcArticleTile(
-          title: 'Tests before you start trying',
-          blurb: 'The blood tests worth doing once.',
-          readId: 'ttc_read_preconception_tests',
-          atHeading: 'Which blood tests should I have?',
-        ),
-        TtcArticleTile(
-          title: 'Vaccines to check',
-          blurb: 'And why the timing matters more than the list.',
-          readId: 'ttc_read_preconception_tests',
-          atHeading: 'Which vaccines do I need, and why does timing matter?',
-        ),
-        // ⚠️ THE ONE CARD THAT OPENS AN AREA RATHER THAN A PIECE, and the
-        // reason `TtcDoorTile` exists. The brief marks it "reference (opens
-        // the His side focus area)".
-        TtcDoorTile(
-          title: 'His part of this',
-          blurb: 'Half of this is his. The His side area covers all of it.',
-          bracketId: 'ttc_male_fertility',
-        ),
-      ],
-    ),
+    // ⚠️ THE THREE REFERENCE SECTIONS ARE OFF THIS TAB (2026-09-27, relevance
+    // audit). A door that promises a few calm minutes a day was showing
+    // blood tests, vaccines, folic acid and tobacco, and all nine tiles
+    // repeated Getting ready. The tab stays, as the checklist lists it, cut
+    // to Sleep and routine and one labelled way to Getting ready below.
+    // Kept for revert (2026-09-27, relevance audit):
+    // TtcFocusSection(
+    //   heading: 'Food and supplements',
+    //   group: 'ready',
+    //   tiles: [
+    //     TtcArticleTile(
+    //       title: 'What to eat before you start',
+    //       blurb: 'From Getting ready. Real food, no targets.',
+    //       readId: 'ttc_read_three_months_before',
+    //       atHeading: 'What should I eat?',
+    //     ),
+    //     TtcArticleTile(
+    //       title: 'Folic acid, and when to start it',
+    //       blurb: 'The one item here with really strong evidence behind it.',
+    //       readId: 'ttc_read_folic_acid',
+    //     ),
+    //     TtcArticleTile(
+    //       title: 'Vitamin D, B12 and iron',
+    //       blurb: 'When to start what, and how early.',
+    //       readId: 'ttc_read_supplement_timing',
+    //       // Lands on the section that answers the tile (launch walk, 2026-09-27).
+    //       atHeading: 'Should I take vitamin D?',
+    //     ),
+    //   ],
+    // ),
+    //
+    // TtcFocusSection(
+    //   heading: 'Habits worth changing',
+    //   group: 'ready',
+    //   tiles: [
+    //     TtcArticleTile(
+    //       title: 'Smoking and tobacco, in every form',
+    //       blurb: 'Including being around it.',
+    //       readId: 'ttc_read_what_to_cut',
+    //       atHeading: 'Does smoking matter, even second-hand?',
+    //     ),
+    //     TtcArticleTile(
+    //       title: 'Alcohol, honestly',
+    //       blurb: "What's known, without the scolding.",
+    //       readId: 'ttc_read_what_to_cut',
+    //       atHeading: 'Do I need to stop drinking?',
+    //     ),
+    //     TtcArticleTile(
+    //       title: 'Weight, said kindly',
+    //       blurb: 'In both directions, and with no number to hit.',
+    //       readId: 'ttc_read_weight_kindly',
+    //     ),
+    //   ],
+    // ),
+    //
+    // TtcFocusSection(
+    //   heading: 'Checks worth doing',
+    //   group: 'ready',
+    //   tiles: [
+    //     TtcArticleTile(
+    //       title: 'Tests before you start trying',
+    //       blurb: 'The blood tests worth doing once.',
+    //       readId: 'ttc_read_preconception_tests',
+    //       atHeading: 'Which blood tests should I have?',
+    //     ),
+    //     TtcArticleTile(
+    //       title: 'Vaccines to check',
+    //       blurb: 'And why the timing matters more than the list.',
+    //       readId: 'ttc_read_preconception_tests',
+    //       atHeading: 'Which vaccines do I need, and why does timing matter?',
+    //     ),
+    //     // ⚠️ THE ONE CARD THAT OPENS AN AREA RATHER THAN A PIECE, and the
+    //     // reason `TtcDoorTile` exists. The brief marks it "reference (opens
+    //     // the His side focus area)".
+    //     TtcDoorTile(
+    //       title: 'His part of this',
+    //       blurb: 'Half of this is his. The His side area covers all of it.',
+    //       bracketId: 'ttc_male_fertility',
+    //     ),
+    //   ],
+    // ),
 
     // The one section in this tab that Mind & body owns.
     TtcFocusSection(
@@ -498,11 +521,38 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
           blurb: 'Bedtimes fail for three reasons. None is willpower.',
           readId: 'ttc_read_bedtime',
         ),
-        TtcGuideTile(
-          title: 'Ways to stay calm',
-          blurb: 'What helps while you wait.',
-          readId: _kStress,
-          atHeading: 'So what is a daily practice for?',
+        // ⚠️ A WAY TO CALM DOWN, NOT AN ESSAY ABOUT WHY (2026-09-27,
+        // relevance audit). The card promised ways to stay calm and opened
+        // the stress read's section on what a practice is for. The long
+        // out-breath is the practice library's own, done sitting or lying,
+        // which is what a bedtime section wants.
+        // Kept for revert (2026-09-27, relevance audit):
+        // TtcGuideTile(
+        //   title: 'Ways to stay calm',
+        //   blurb: 'What helps while you wait.',
+        //   readId: _kStress,
+        //   atHeading: 'So what is a daily practice for?',
+        // ),
+        TtcDoTile(
+          title: 'A calming breath for bedtime',
+          blurb: 'One minute, sitting or lying. Breathing out for longer than '
+              'you breathe in is what does the work.',
+          surfaceId: 'ttc_practice/mb_longout',
+        ),
+      ],
+    ),
+
+    // The one labelled way to the rest of getting ready (2026-09-27,
+    // relevance audit). It replaces the three sections commented out above.
+    TtcFocusSection(
+      heading: 'Food, tests and habits',
+      group: 'ready',
+      tiles: [
+        TtcDoorTile(
+          title: 'More in Getting ready',
+          blurb: 'Food, folic acid, tests, vaccines and habits for the months '
+              'before, for both of you, in their own door.',
+          bracketId: 'ttc_preconception_health',
         ),
       ],
     ),
@@ -514,16 +564,28 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
       heading: 'The people around you',
       group: 'talk',
       tiles: [
+        // Retitled (2026-09-27, relevance audit): "this advice" meant "just
+        // relax", which nothing on this tab had said. Kept for revert:
+        //   title: 'What to say to people who keep offering this advice',
         TtcGuideTile(
-          title: 'What to say to people who keep offering this advice',
-          blurb: 'And how to protect the two of you from it.',
+          title: 'When people tell you to "just relax"',
+          blurb: 'What to say, and how to protect the two of you from it.',
           readId: _kStress,
           atHeading: 'The people around you',
         ),
+        // Moved to Hard days, "When other people make it harder" (2026-09-27,
+        // relevance audit). Kept for revert:
+        // TtcGuideTile(
+        //   title: 'When family keeps asking',
+        //   blurb: "What to say, what you owe them, and what you don't.",
+        //   readId: 'ttc_read_family_asking',
+        // ),
+        // Moved here from "Talk to someone" (2026-09-27, relevance audit): it
+        // is about the two of you, not about a professional.
         TtcGuideTile(
-          title: 'When family keeps asking',
-          blurb: "What to say, what you owe them, and what you don't.",
-          readId: 'ttc_read_family_asking',
+          title: 'Bringing him into this',
+          blurb: 'Why it becomes one person\'s job, and what changes it.',
+          readId: 'ttc_read_bringing_him_in',
         ),
       ],
     ),
@@ -532,16 +594,28 @@ final TtcFocusPage kTtcMindBodyFocus = TtcFocusPage(
       heading: 'Talk to someone',
       group: 'talk',
       tiles: [
+        // ⚠️ THE PSYCHOLOGIST THE CARD NAMES AND PRICES (2026-09-27, relevance
+        // audit). `kTtcActConsult` opens fertility, gynaecology and male
+        // fertility, with no psychologist on it. `ttc_psych_consult` is the
+        // ₹799 session this blurb quotes.
+        // Kept for revert (2026-09-27, relevance audit):
+        // TtcTalkTile(
+        //   title: 'Talk to a psychologist',
+        //   blurb: 'A private talk with someone who does this work. ₹799.',
+        //   action: kTtcActConsult,
+        // ),
         TtcTalkTile(
           title: 'Talk to a psychologist',
           blurb: 'A private talk with someone who does this work. ₹799.',
-          action: kTtcActConsult,
+          action: 'ttc_psych_consult',
         ),
-        TtcGuideTile(
-          title: 'Bringing him into this',
-          blurb: 'Why it becomes one person\'s job, and what changes it.',
-          readId: 'ttc_read_bringing_him_in',
-        ),
+        // Moved to "The people around you" (2026-09-27, relevance audit).
+        // Kept for revert:
+        // TtcGuideTile(
+        //   title: 'Bringing him into this',
+        //   blurb: 'Why it becomes one person\'s job, and what changes it.',
+        //   readId: 'ttc_read_bringing_him_in',
+        // ),
         // Added 2026-09-26 (gap plan, owed from W5). On Talk because it is
         // about who to talk to; its own callout carries 112 and 181.
         TtcArticleTile(

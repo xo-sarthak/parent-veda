@@ -471,7 +471,8 @@ void main() {
             reason: '"${g.label}" is not on the rail');
       }
       // Today is open, so its own content is on screen rather than a rail.
-      expect(find.text("TODAY'S MOVEMENT"), findsOneWidget);
+      // Sentence case since 2026-09-27; was: find.text("TODAY'S MOVEMENT")
+      expect(find.text("Today's movement"), findsOneWidget);
       expect(find.text(page.closingLine!), findsOneWidget);
     });
   });
@@ -508,7 +509,8 @@ void main() {
       // The heading and the card under it have to start at the same x. That is
       // the entire bug, stated as an assertion.
       final heading =
-          tester.getTopLeft(find.text("TODAY'S MOVEMENT")).dx;
+          // Was "TODAY'S MOVEMENT" before the 2026-09-27 sentence case.
+          tester.getTopLeft(find.text("Today's movement")).dx;
       final title = tester.getTopLeft(
           find.text(ttcTodaysMove().title, skipOffstage: false));
       expect(heading, greaterThan(0),

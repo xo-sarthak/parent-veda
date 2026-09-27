@@ -21,6 +21,7 @@
 import 'package:flutter/material.dart';
 
 import '../../theme/pv_fonts.dart';
+import '../products/pv_store_chrome.dart' show pvSnack;
 import '../../ttc/ttc_log_store.dart';
 import '../../ttc/ttc_mind_today.dart';
 import '../../ttc/ttc_practice_data.dart';
@@ -60,6 +61,65 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
   /// current step is highlighted, and the session ring above still runs the
   /// clock. Written down rather than silently substituted; see §31.
   int _step = 0;
+
+  // ⚠️ THE STEPS CAN NOW FOLLOW THE TIMER, AND SHE DECIDES (2026-09-27, tools
+  // rebuild). The note above is still right that a list which moves on its
+  // own takes a step away while you are in it; the user's verdict on the
+  // player was that tapping from the mat is worse ("poor functionality"), and
+  // every workout player on Mobbin moves with its clock (Future Pro's move
+  // name over its countdown, https://mobbin.com/screens/72efd39a-7519-4765-8b86-eb7494d029ef;
+  // Life Reset's workout counter with previous and next either side,
+  // https://mobbin.com/screens/126e582a-4c14-4201-87c3-3d70ef52c059).
+  //
+  // So: ON by default where the steps are a sequence through the time (the
+  // drawn movement cards, and the body relaxation whose figure already walks
+  // down the body), with a labelled switch, and the moment she moves a step
+  // herself the switch turns off, visibly, and the list is hers again. The
+  // walk and the breathing cards keep their steps still: their steps are
+  // how-to lines, not a sequence the clock can split.
+  bool get _followable =>
+      widget.practice.anim is TtcFigureAnim ||
+      widget.practice.anim is TtcBodyScanAnim;
+  late bool _follow = _followable;
+
+  /// Which step the timer is on, `progress` 0 to 1.
+  int _stepAt(double progress) {
+    final n = widget.practice.steps.length;
+    if (n == 0) return 0;
+    if (progress >= 1) return n - 1;
+    // The body relaxation's first and last steps are settling in and coming
+    // out; its figure runs over the middle ones, so the list does too.
+    if (widget.practice.anim is TtcBodyScanAnim && n > 2) {
+      if (progress <= 0) return 0;
+      return (1 + (progress * (n - 2)).floor()).clamp(1, n - 2);
+    }
+    return (progress * n).floor().clamp(0, n - 1);
+  }
+
+  void _onProgress(double progress, bool running) {
+    if (!_follow || !mounted) return;
+    final next = _stepAt(progress);
+    if (next != _step) setState(() => _step = next);
+  }
+
+  /// She moved a step herself: the list is hers, and the switch says so.
+  void _setStepByHand(int i) => setState(() {
+        _step = i;
+        _follow = false;
+      });
+
+  /// The timer ran to the end: mark it done, say so, offer the way back.
+  void _onFinished() {
+    final kind = widget.practice.kind;
+    if (ttcPracticeDoneToday(kind)) return;
+    ttcSetPracticeDone(kind, true);
+    if (!mounted) return;
+    pvSnack(context, 'Marked done on your Mind and body Today tab.',
+        icon: Icons.check_rounded,
+        action: 'Undo',
+        onAction: () => ttcSetPracticeDone(kind, false),
+        lift: 24);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,32 +177,43 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
             ]),
 
             const SizedBox(height: 20),
-            TtcPracticeSession(practice: pr),
+            TtcPracticeSession(
+              practice: pr,
+              onFinished: _onFinished,
+              onProgress: _onProgress,
+              caption: pr.anim is TtcFigureAnim && _follow
+                  ? 'Step ${_step + 1} of ${pr.steps.length}'
+                  : null,
+            ),
             const SizedBox(height: 24),
 
             // ---- the steps -------------------------------------------
+            // Kept for revert (2026-09-27): 'WHAT TO DO' in tracked capitals,
+            // with two small unlabelled up and down arrows beside it. The
+            // arrows are now the labelled buttons under the list.
+            //   Row(children: [Text('WHAT TO DO'), Spacer(),
+            //     _StepNudge(up), _StepNudge(down)]),
             Row(children: [
-              Text('WHAT TO DO',
+              Expanded(
+                child: Text('What to do',
+                    style: pvManrope(
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w800,
+                        color: pal.ink1)),
+              ),
+              Text('Step ${_step + 1} of ${pr.steps.length}',
                   style: pvManrope(
-                      fontSize: 10.5,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: 1.4,
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w700,
                       color: pal.ink3)),
-              const Spacer(),
-              // ⚠️ BACK ONE STEP, WHICH THE BRIEF NAMES. On a floor practice the
-              // commonest thing that happens is missing a line and needing it
-              // again, and a list you can only go forward in makes that a
-              // restart.
-              _StepNudge(
-                  icon: Icons.keyboard_arrow_up_rounded,
-                  enabled: _step > 0,
-                  onTap: () => setState(() => _step--)),
-              const SizedBox(width: 6),
-              _StepNudge(
-                  icon: Icons.keyboard_arrow_down_rounded,
-                  enabled: _step < pr.steps.length - 1,
-                  onTap: () => setState(() => _step++)),
             ]),
+            if (_followable) ...[
+              const SizedBox(height: 4),
+              _FollowSwitch(
+                on: _follow,
+                onChanged: (v) => setState(() => _follow = v),
+              ),
+            ],
             const SizedBox(height: 12),
 
             //  ⚠️ THE LIVE STEP IS A FILLED ROW, NOT A BOLDER FONT. Weight
@@ -153,7 +224,7 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
             //  glance, which is the only interaction this list ever gets.
             for (var i = 0; i < pr.steps.length; i++) ...[
               GestureDetector(
-                onTap: () => setState(() => _step = i),
+                onTap: () => _setStepByHand(i),
                 behavior: HitTestBehavior.opaque,
                 child: AnimatedContainer(
                   duration: const Duration(milliseconds: 140),
@@ -202,6 +273,37 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
               ),
             ],
 
+            // ⚠️ PREVIOUS AND NEXT, LABELLED AND BIG ENOUGH FOR THE MAT
+            // (tools pass, 2026-09-27). Two 30pt arrows with no words were the
+            // only way to move, and on a floor practice the phone is at arm's
+            // length. Now two full-width halves, 52 tall, that say what they
+            // do. Still moved by her, never by a clock (see `_step`). Mobbin:
+            // Future's workout player (a large next control at the foot).
+            const SizedBox(height: 8),
+            Row(children: [
+              Expanded(
+                child: _StepButton(
+                  label: 'Previous step',
+                  icon: Icons.arrow_back_rounded,
+                  enabled: _step > 0,
+                  filled: false,
+                  deep: deep,
+                  onTap: () => _setStepByHand(_step - 1),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Expanded(
+                child: _StepButton(
+                  label: 'Next step',
+                  icon: Icons.arrow_forward_rounded,
+                  enabled: _step < pr.steps.length - 1,
+                  filled: true,
+                  deep: deep,
+                  onTap: () => _setStepByHand(_step + 1),
+                ),
+              ),
+            ]),
+
             // ---- which side, where sides matter ----------------------
             if (pr.anim case TtcFigureAnim(sides: true)) ...[
               const SizedBox(height: 6),
@@ -248,12 +350,12 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
                       child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text('SKIP IT IF',
+                            // Kept for revert (2026-09-27): 'SKIP IT IF'.
+                            Text('Skip it if',
                                 style: pvManrope(
-                                    fontSize: 9.5,
+                                    fontSize: 13,
                                     fontWeight: FontWeight.w800,
-                                    letterSpacing: 1,
-                                    color: pal.ink2)),
+                                    color: pal.ink1)),
                             const SizedBox(height: 5),
                             Text(pr.skipIf,
                                 style: pvManrope(
@@ -299,6 +401,24 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
                 ]),
               ),
             ),
+            // What the button does, under it (tools pass, 2026-09-27): it
+            // was not clear that it feeds Today or that a second tap undoes.
+            // Since the rebuild the timer marks it done on its own at the
+            // end, so the line says that first. Kept for revert:
+            //   'Shows as done on your Mind and body Today tab. '
+            //   'Tap again to undo.'
+            const SizedBox(height: 8),
+            Center(
+              child: Text(
+                  done
+                      ? 'Shows as done on your Mind and body Today tab. '
+                          'Tap again to undo.'
+                      : 'Finishing the timer marks it done for you. It shows '
+                          'on your Mind and body Today tab.',
+                  textAlign: TextAlign.center,
+                  style: pvManrope(
+                      fontSize: 12.5, height: 1.45, color: pal.ink3)),
+            ),
             const SizedBox(height: 10),
                 ])),
           ],
@@ -308,6 +428,101 @@ class _TtcPracticeScreenState extends State<TtcPracticeScreen> {
   }
 }
 
+/// The switch that lets the lit step follow the timer. Says what it does in
+/// both states, so a switch that turned itself off (she moved a step by hand)
+/// is never a mystery.
+class _FollowSwitch extends StatelessWidget {
+  const _FollowSwitch({required this.on, required this.onChanged});
+
+  final bool on;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    return MergeSemantics(
+      child: Row(children: [
+        Expanded(
+          child: Text(
+              on
+                  ? 'The steps move along with the timer.'
+                  : 'You move the steps. Turn on to follow the timer.',
+              style: pvManrope(fontSize: 12.5, height: 1.4, color: p.ink2)),
+        ),
+        Switch(
+          value: on,
+          onChanged: onChanged,
+          activeTrackColor: p.ink1,
+        ),
+      ]),
+    );
+  }
+}
+
+/// One of the two step controls under the list: a word and an arrow, 52 tall.
+class _StepButton extends StatelessWidget {
+  const _StepButton({
+    required this.label,
+    required this.icon,
+    required this.enabled,
+    required this.filled,
+    required this.deep,
+    required this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final bool enabled;
+  final bool filled;
+  final Color deep;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    final fg = !enabled
+        ? p.ink3.withValues(alpha: 0.5)
+        : (filled ? Colors.white : p.ink1);
+    return Semantics(
+      button: true,
+      enabled: enabled,
+      label: label,
+      excludeSemantics: true,
+      child: GestureDetector(
+        onTap: enabled ? onTap : null,
+        behavior: HitTestBehavior.opaque,
+        child: Container(
+          height: 52,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: filled && enabled ? deep : p.surfaceAlt,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Row(mainAxisSize: MainAxisSize.min, children: [
+            if (!filled) ...[
+              Icon(icon, size: 18, color: fg),
+              const SizedBox(width: 7),
+            ],
+            Flexible(
+              child: Text(label,
+                  overflow: TextOverflow.ellipsis,
+                  style: pvManrope(
+                      fontSize: 14, fontWeight: FontWeight.w700, color: fg)),
+            ),
+            if (filled) ...[
+              const SizedBox(width: 7),
+              Icon(icon, size: 18, color: fg),
+            ],
+          ]),
+        ),
+      ),
+    );
+  }
+}
+
+// Kept for revert (2026-09-27): the small unlabelled arrow, replaced by
+// `_StepButton`. Nothing uses it.
+// ignore: unused_element
 class _StepNudge extends StatelessWidget {
   const _StepNudge(
       {required this.icon, required this.enabled, required this.onTap});

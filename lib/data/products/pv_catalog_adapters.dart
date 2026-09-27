@@ -310,8 +310,16 @@ PvProduct _fromTtc(ttc.TtcProduct p) {
     retailer: p.retailer,
     buyUrl: p.retailerUrl.isNotEmpty ? p.retailerUrl : null,
     soldHere: false,
-    rating: p.rating,
-    reviewCount: p.reviews,
+    // ⚠️ NO SEED REVIEWS ON SHOW (TTC launch walk, 2026-09-27). `rating`,
+    // `reviews`, `voices`, `parentsPct`, `expertsPct` and `badge` are SEED
+    // values (ttc_products_data.dart says they "MUST BE REPLACED BEFORE
+    // LAUNCH", STILL-OPEN §24.2): star ratings, counts like "(9450)", quotes
+    // from named parents and a "BESTSELLER" badge nobody earned. Until real
+    // ones exist the store shows none; the editorial band, the reason, the
+    // evidence and "before you buy" stay. Flip [kTtcShowSeedReviews] to
+    // restore. Kept for revert: rating: p.rating, reviewCount: p.reviews,
+    rating: kTtcShowSeedReviews ? p.rating : 0,
+    reviewCount: kTtcShowSeedReviews ? p.reviews : 0,
     reco: PvRecommend(
       band: _bandOfTtc(p.band),
       reason: p.whyEn,
@@ -323,11 +331,12 @@ PvProduct _fromTtc(ttc.TtcProduct p) {
     bestFor: [for (final (label, _) in p.bestFor) label],
     specs: p.specs,
     reviews: [
-      for (final (author, stars, context, text) in p.voices)
-        PvParentReview(author: author, context: context, stars: stars, text: text),
+      if (kTtcShowSeedReviews)
+        for (final (author, stars, context, text) in p.voices)
+          PvParentReview(author: author, context: context, stars: stars, text: text),
     ],
-    parentsPct: p.parentsPct > 0 ? p.parentsPct : null,
-    expertsPct: p.expertsPct > 0 ? p.expertsPct : null,
+    parentsPct: kTtcShowSeedReviews && p.parentsPct > 0 ? p.parentsPct : null,
+    expertsPct: kTtcShowSeedReviews && p.expertsPct > 0 ? p.expertsPct : null,
     ingredients: [
       for (final (name, purpose, note, caution) in p.inside)
         PvIngredient(name: name, purpose: purpose, note: note, caution: caution),
@@ -342,7 +351,7 @@ PvProduct _fromTtc(ttc.TtcProduct p) {
             byMaker: byMaker),
     ],
     forPartner: p.forPartner,
-    badge: p.badge,
+    badge: kTtcShowSeedReviews ? p.badge : '',
     hue: p.hue,
     compare: {for (final (k, v) in p.specs) k: v},
   );
@@ -419,3 +428,8 @@ String pvProductIdForGuide(String guideId) {
   }
   return guideId;
 }
+
+/// Whether the TTC shelf shows its SEED review numbers, quotes and badges.
+/// Off until real reviews exist (TTC launch walk, 2026-09-27); a demo build
+/// can turn it on with `--dart-define=PV_TTC_SEED_REVIEWS=true`.
+const bool kTtcShowSeedReviews = bool.fromEnvironment('PV_TTC_SEED_REVIEWS');

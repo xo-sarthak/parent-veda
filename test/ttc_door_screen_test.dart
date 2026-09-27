@@ -27,9 +27,11 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/localization/app_language.dart';
+import 'package:parentveda/screens/ttc/doors/ttc_door_card.dart';
 import 'package:parentveda/screens/ttc/doors/ttc_door_rail.dart';
 import 'package:parentveda/screens/ttc/doors/ttc_door_screen.dart';
 import 'package:parentveda/screens/ttc/doors/ttc_door_search.dart';
+import 'package:parentveda/screens/v2/v2_palette.dart';
 import 'package:parentveda/services/bracket_resolver.dart';
 import 'package:parentveda/ttc/ttc_focus_data.dart';
 import 'package:parentveda/ttc/ttc_reads_data.dart';
@@ -282,8 +284,14 @@ void main() {
   });
 
   // ===========================================================================
+  //  ONE FORMAT since 2026-09-27 (the user, walking build 13: rows and cards
+  //  in one tab read as random). Every section is a rail of the one card,
+  //  edge to edge, on every door. Kept for revert, the old split:
+  //    if (ttcDoorSectionIsRows(s.tiles)) expect rows key, else expect rail;
+  //    and "at least one section of each kind exists, or the rule is
+  //    untested" (expected both kinds to exist in the data).
   group(
-    'sections: written is rows, mixed is a rail that runs edge to edge',
+    'sections: every one is a rail that runs edge to edge, never rows',
     () {
       for (final page in kTtcFocusPages) {
         testWidgets(page.bracketId, (tester) async {
@@ -292,46 +300,175 @@ void main() {
             await pickTab(tester, i);
             final g = page.groups![i];
             for (final s in page.sections.where((s) => s.group == g.id)) {
-              if (ttcDoorSectionIsRows(s.tiles)) {
-                expect(
-                  find.byKey(ttcDoorRowsKey(s.heading), skipOffstage: false),
-                  findsOneWidget,
-                  reason: '"${s.heading}" is all written and is not rows',
-                );
-              } else {
-                final rail = find.byKey(
-                  ttcDoorSectionRailKey(s.heading),
-                  skipOffstage: false,
-                );
-                expect(
-                  rail,
-                  findsOneWidget,
-                  reason: '"${s.heading}" is mixed and is not a rail',
-                );
-                // Edge to edge: the rail is the full screen wide and starts at
-                // the screen's edge; its own padding is the gutter.
-                expect(
-                  tester.getSize(rail).width,
-                  360,
-                  reason: '"${s.heading}" is padded in from the edge',
-                );
-                expect(tester.getTopLeft(rail).dx, 0);
-              }
+              expect(
+                find.byKey(ttcDoorRowsKey(s.heading), skipOffstage: false),
+                findsNothing,
+                reason: '"${s.heading}" drew as rows again',
+              );
+              final rail = find.byKey(
+                ttcDoorSectionRailKey(s.heading),
+                skipOffstage: false,
+              );
+              expect(
+                rail,
+                findsOneWidget,
+                reason: '"${s.heading}" is not a rail',
+              );
+              // Edge to edge: the rail is the full screen wide and starts at
+              // the screen's edge; its own padding is the gutter.
+              expect(
+                tester.getSize(rail).width,
+                360,
+                reason: '"${s.heading}" is padded in from the edge',
+              );
+              expect(tester.getTopLeft(rail).dx, 0);
+              // The one card, and only it, in the rail.
+              expect(
+                find.descendant(
+                  of: rail,
+                  matching: find.byType(TtcDoorSectionCard),
+                ),
+                findsWidgets,
+                reason: '"${s.heading}" draws some other card',
+              );
             }
           }
         });
       }
 
-      test(
-        'at least one section of each kind exists, or the rule is untested',
-        () {
-          final all = [for (final p in kTtcFocusPages) ...p.sections];
-          expect(all.where((s) => ttcDoorSectionIsRows(s.tiles)), isNotEmpty);
-          expect(all.where((s) => !ttcDoorSectionIsRows(s.tiles)), isNotEmpty);
-        },
-      );
+      test('the screen no longer chooses rows for any section', () {
+        final src = _src('lib/screens/ttc/doors/ttc_door_screen.dart');
+        final build = _fn(src, 'Widget build(BuildContext context) {');
+        final live = _live(build).join('\n');
+        expect(live.contains('ttcDoorSectionIsRows('), isFalse);
+        expect(live.contains('_ArticleList('), isFalse);
+        expect(live.contains('PvDoorRailCard('), isFalse,
+            reason: 'the shared pregnancy card is back on a TTC rail');
+        expect(live.contains('TtcDoorSectionCard('), isTrue);
+      });
+
+      testWidgets('a card with no photo is typographic, not a ghost shape',
+          (tester) async {
+        tester.view.physicalSize = const Size(360, 400);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.reset);
+        final p = V2PaletteStore.instance.current;
+        await tester.pumpWidget(MaterialApp(
+          home: Scaffold(
+            body: Row(children: [
+              TtcDoorSectionCard(
+                p: p,
+                hue: 200,
+                mark: ttcDoorFormatMark(TtcTileFormat.article),
+                kind: 'Article',
+                title: 'A long title that runs on to fill four lines of '
+                    'the card and then some more words after that',
+                meta: '4 min read',
+              ),
+            ]),
+          ),
+        ));
+        expect(tester.takeException(), isNull);
+        expect(find.text('Article · 4 min read'), findsOneWidget);
+        expect(find.byType(Image), findsNothing);
+        expect(tester.getSize(find.byType(TtcDoorSectionCard)),
+            const Size(kTtcDoorCardWidth, kTtcDoorCardHeight));
+      });
     },
   );
+
+  // ===========================================================================
+  //  The hero is one height on every door (2026-09-27, the user: "the hero
+  //  image height differs door to door").
+  group('the hero', () {
+    testWidgets('is the same height on all nine doors', (tester) async {
+      final heights = <String, double>{};
+      for (final page in kTtcFocusPages) {
+        await pumpDoor(tester, page);
+        heights[page.bracketId] =
+            tester.getSize(find.byKey(kTtcDoorHeroKey)).height;
+      }
+      expect(heights.values.toSet(), {kTtcDoorHeroHeight},
+          reason: 'hero heights differ: $heights');
+    });
+
+    testWidgets('the photo parallaxes: it climbs slower than the page',
+        (tester) async {
+      final page = kTtcFocusPages.firstWhere((p) => p.bracketId == 'ttc_pcos');
+      await pumpDoor(tester, page, height: 800);
+      final photo = find.descendant(
+          of: find.byKey(kTtcDoorHeroKey), matching: find.byType(Image));
+      final hero0 = tester.getTopLeft(find.byKey(kTtcDoorHeroKey)).dy;
+      final photo0 = tester.getTopLeft(photo.first).dy;
+      await tester.drag(find.byType(ListView).first, const Offset(0, -200));
+      await tester.pump();
+      final heroMoved = hero0 - tester.getTopLeft(find.byKey(kTtcDoorHeroKey)).dy;
+      final photoMoved = photo0 - tester.getTopLeft(photo.first).dy;
+      expect(heroMoved, greaterThan(100));
+      expect(photoMoved, lessThan(heroMoved * 0.7),
+          reason: 'the photo scrolls with the page, no parallax');
+      expect(photoMoved, greaterThan(0));
+    });
+
+    testWidgets('the field on a photograph is glass, and still a field',
+        (tester) async {
+      final page = kTtcFocusPages.firstWhere((p) => p.bracketId == 'ttc_pcos');
+      await pumpDoor(tester, page);
+      expect(
+          find.descendant(
+              of: find.byKey(kTtcDoorSearchKey),
+              matching: find.byType(BackdropFilter)),
+          findsOneWidget);
+      expect(tester.getSize(find.byKey(kTtcDoorSearchKey)).height,
+          TtcDoorGlassSearchField.height);
+    });
+  });
+
+  // ===========================================================================
+  //  One heading style (2026-09-27, the user: "don't add random fonts").
+  group('one heading style', () {
+    testWidgets('every section heading on every tab of every door',
+        (tester) async {
+      final want = ttcDoorHeadingStyle(V2PaletteStore.instance.current);
+      var checked = 0;
+      for (final page in kTtcFocusPages) {
+        await pumpDoor(tester, page, height: 12000);
+        for (var i = 0; i < page.groups!.length; i++) {
+          await pickTab(tester, i);
+          final g = page.groups![i];
+          for (final s in page.sections.where((s) => s.group == g.id)) {
+            final styles = find
+                .text(s.heading, skipOffstage: false)
+                .evaluate()
+                .map((e) => (e.widget as Text).style);
+            expect(
+                styles.any((st) =>
+                    st?.fontSize == want.fontSize &&
+                    st?.fontFamily == want.fontFamily &&
+                    st?.fontWeight == want.fontWeight),
+                isTrue,
+                reason: '${page.bracketId} / "${s.heading}" is not the '
+                    'door heading style');
+            checked++;
+          }
+        }
+      }
+      expect(checked, greaterThan(20));
+    });
+
+    testWidgets("Mind and body's Today panel uses it too", (tester) async {
+      final want = ttcDoorHeadingStyle(V2PaletteStore.instance.current);
+      final page =
+          kTtcFocusPages.firstWhere((p) => p.bracketId == 'ttc_mind_body');
+      await pumpDoor(tester, page, height: 6000);
+      for (final h in ["Today's movement", "Today's breathing",
+          'Two small things']) {
+        final st = tester.widget<Text>(find.text(h)).style!;
+        expect(st.fontFamily, want.fontFamily, reason: h);
+        expect(st.fontSize, want.fontSize, reason: h);
+      }
+    });
+  });
 
   // ===========================================================================
   group('the pinned red flag, in the new form', () {
@@ -346,6 +483,13 @@ void main() {
         expect(find.byKey(ttcDoorFlagKey(rid)), findsOneWidget);
         final read = ttcReadById(rid)!;
         expect(find.text(read.whenToSeeSomeone.title.en), findsOneWidget);
+        // FOLDED since 2026-09-27: the tab shows one compact row with the
+        // read's own title; the lines open in a sheet from it. Kept for
+        // revert: the lines were on the tab itself, before any tap.
+        expect(find.byType(TtcDoorFlagRow), findsOneWidget);
+        await tester.tap(find.byKey(ttcDoorFlagKey(rid)));
+        await tester.pump();
+        await tester.pump(const Duration(milliseconds: 600));
         // Whole, not an excerpt: one line per sentence since 2026-09-26
         // (review D2), every sentence the read's own, in order. Kept for
         // revert: find.text(read.whenToSeeSomeone.body.en), findsOneWidget.
@@ -354,8 +498,44 @@ void main() {
         for (final l in lines) {
           expect(find.text(l), findsOneWidget, reason: l);
         }
+        for (final para in ttcFlagProse(read.whenToSeeSomeone.body.en)) {
+          expect(find.text(para), findsOneWidget, reason: para);
+        }
       },
     );
+
+    testWidgets('the folded flag is compact and sits above the content',
+        (tester) async {
+      final page =
+          kTtcFocusPages.firstWhere((p) => p.bracketId == 'ttc_mind_body');
+      await pumpDoor(tester, page, height: 6000);
+      var seen = 0;
+      for (var i = 0; i < page.groups!.length; i++) {
+        final g = page.groups![i];
+        if (g.pinnedRedFlagReadIds.isEmpty) continue;
+        await pickTab(tester, i);
+        for (final rid in g.pinnedRedFlagReadIds) {
+          final row = find.byKey(ttcDoorFlagKey(rid), skipOffstage: false);
+          expect(row, findsOneWidget, reason: rid);
+          expect(tester.getSize(row).height, lessThan(90),
+              reason: '$rid: the flag is a block again, not a row');
+          seen++;
+        }
+        // Above every section heading on the tab.
+        final flagTop = tester
+            .getTopLeft(find.byKey(ttcDoorFlagKey(g.pinnedRedFlagReadIds.first),
+                skipOffstage: false))
+            .dy;
+        for (final s in page.sections.where((s) => s.group == g.id)) {
+          expect(
+              tester.getTopLeft(find.text(s.heading, skipOffstage: false).first)
+                  .dy,
+              greaterThan(flagTop),
+              reason: '${g.id}: "${s.heading}" sits above the flag');
+        }
+      }
+      expect(seen, greaterThan(0));
+    });
 
     testWidgets('Mind and body Talk carries both flags', (tester) async {
       final page = kTtcFocusPages.firstWhere(
@@ -486,7 +666,9 @@ void main() {
       );
       expect(pushes, isEmpty, reason: 'something still pushes the old door');
       expect(
-        focus.any((l) => l.contains('openTtcDoor(context, bracketId)')),
+        // A door tile may name the tab it opens on (2026-09-27), so the call
+        // carries `initialGroup:`. Kept for revert: 'openTtcDoor(context, bracketId)'.
+        focus.any((l) => l.contains('openTtcDoor(context, bracketId')),
         isTrue,
       );
     });
@@ -539,7 +721,10 @@ void main() {
             if (read == null) continue;
             final body = read.whenToSeeSomeone.body.en;
             final lines = ttcFlagLines(body);
-            expect(norm(lines.join(' ')), norm(body),
+            // Signs as lines, the closing advice as paragraphs (2026-09-27):
+            // together still exactly the read's own words.
+            final prose = ttcFlagProse(body);
+            expect(norm([...lines, ...prose].join(' ')), norm(body),
                 reason: '$rid: the lines must be the read\'s own words');
             // One sentence per line. A sentence is never cut: the longest
             // today is one 52-word list in when_to_seek_help, and shortening
@@ -597,10 +782,20 @@ void main() {
       final rid = page.groups!.first.pinnedRedFlagReadIds.first;
       final title = ttcReadById(rid)!.whenToSeeSomeone.title.en;
       await tester.tap(find.text(title));
-      await tester.pump(const Duration(milliseconds: 400));
+      await tester.pump();
+        await tester.pump(const Duration(milliseconds: 600));
       expect(names.length, greaterThan(1), reason: 'the flag opened nothing');
+      // Folded since 2026-09-27: the row opens the sheet, and the sheet's
+      // "Read the full piece" (a 44pt row) opens the read. Kept for revert:
+      // the tap on the title opened the read directly, and the size check
+      // below was the whole of the second half.
       final size = tester.getSize(find.text('Read the full piece'));
       expect(size.height, greaterThan(0));
+      final before = names.length;
+      await tester.tap(find.text('Read the full piece'));
+      await tester.pump(const Duration(milliseconds: 600));
+      expect(names.length, greaterThan(before),
+          reason: 'the sheet did not open the read');
     });
   });
 

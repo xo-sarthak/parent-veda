@@ -290,7 +290,7 @@ final List<PvRead> kTtcReadsAfterLoss = [
           'hours in a row. Passing clots bigger than a lemon. A fever above '
           "38°C. Severe pain that painkillers don't touch, or pain in the tip "
           'of one shoulder. Discharge that smells bad. Feeling faint, or '
-          'fainting. These are signs of heavy bleeding or infection. Both can '
+          'fainting.\n\nThese are signs of heavy bleeding or infection. Both can '
           'be treated, and neither should wait for a morning appointment. '
           'Trust yourself on this. If something feels wrong, get seen.'),
     ),
@@ -577,7 +577,7 @@ final List<PvRead> kTtcReadsAfterLoss = [
           'disorder. And talk to someone (a counsellor, your doctor, anyone) '
           "if the grief isn't easing at all after several weeks, if you "
           "can't sleep or get through the day, or if you have thoughts of "
-          "harming yourself. That last one isn't a reason to wait for an "
+          "harming yourself.\n\nThat last one isn't a reason to wait for an "
           "appointment. It's a reason to tell someone today."),
     ),
 

@@ -27,6 +27,8 @@
 // =============================================================================
 
 import 'ttc_care_pathway.dart';
+import 'ttc_fertile_window.dart'
+    show ttcWindowOpensBeforeOvulation, ttcWindowClosesAfterOvulation;
 
 export 'ttc_care_pathway.dart';
 
@@ -142,7 +144,16 @@ bool ttcCyclesIrregular(List<int> lengths) {
 /// day the same way.
 FertilityLevel ttcFertilityForOffset(int offset) {
   if (offset == -1 || offset == 0) return FertilityLevel.peak;
-  if (offset == -3 || offset == -2 || offset == 1) return FertilityLevel.high;
+  // The day after ovulation is graded only while the window reaches it
+  // (`ttcWindowClosesAfterOvulation`, 0 since 2026-09-27: six days ending on
+  // ovulation). It was always "high", so the calendar shaded a seventh day
+  // the hero no longer counted. Kept for revert:
+  //   if (offset == -3 || offset == -2 || offset == 1) return FertilityLevel.high;
+  if (offset == -3 ||
+      offset == -2 ||
+      (offset >= 1 && offset <= ttcWindowClosesAfterOvulation)) {
+    return FertilityLevel.high;
+  }
   if (offset == -5 || offset == -4) return FertilityLevel.medium;
   return FertilityLevel.low;
 }
@@ -581,8 +592,17 @@ class TtcChapterEngine {
 
     // --- Chapter 1: the opening stretch, or no cycle data to ride yet.
     final into = daysIntoJourney(s);
-    final young = into != null && into < preparingChapterDays;
-    if (day == null || ov == null || young) {
+    // ⚠️ THE CYCLE WINS ONCE THERE IS ONE (launch walk, 2026-09-27). The first
+    // 28 days of a journey were "Preparing Together" whatever she logged, so
+    // the home said "Your fertile days are today" in its hero and "Preparing
+    // Together · Next: from the day you log your next period" further down,
+    // two clocks on one screen. The user's rule is that everything follows the
+    // date she is on; the opening chapter is now for someone with no cycle to
+    // ride yet. `into` still sizes the chapter's progress below.
+    // Kept for revert:
+    //   final young = into != null && into < preparingChapterDays;
+    //   if (day == null || ov == null || young) {
+    if (day == null || ov == null) {
       return TtcToday(
         chapter: TtcChapter.preparingTogether,
         cycleDay: day,
@@ -599,8 +619,11 @@ class TtcChapterEngine {
     }
 
     // --- Chapters 2-4 ride the cycle.
-    final windowOpens = ov - 5;
-    final windowCloses = ov + 1;
+    // The shared constants, not a second copy of the arithmetic (2026-09-27):
+    // the chapters must turn on the same days the window shows.
+    // Kept for revert: `ov - 5` and `ov + 1`.
+    final windowOpens = ov - ttcWindowOpensBeforeOvulation;
+    final windowCloses = ov + ttcWindowClosesAfterOvulation;
 
     if (day < windowOpens) {
       // Chapter 2 - Knowing Your Rhythm: day 1 until the window opens.
@@ -863,3 +886,32 @@ extension OvulationConfidenceCopy on OvulationConfidence {
     }
   }
 }
+
+/// ⚠️ WHAT PART OF HER MONTH A CHAPTER IS, IN PLAIN WORDS (2026-09-27, the
+/// user: "the whole cycle of a month, the fertile window, the period… is
+/// complex to understand"). The chapter names are ours and poetic ("Knowing
+/// Your Rhythm"); nothing said which days they meant. Every place that shows
+/// a chapter name to her says this line with it, so the name is never alone.
+/// English only (CLAUDE.md, "New work is English").
+String ttcChapterPlainPart(TtcChapter c) => switch (c) {
+      TtcChapter.preparingTogether =>
+        'Getting ready. Add your period date and we can show your month.',
+      TtcChapter.knowingYourRhythm =>
+        'The days from your period to your fertile days.',
+      TtcChapter.tryingTogether =>
+        'Your fertile days: the best time to try this month.',
+      TtcChapter.theWaitingDays =>
+        'After your fertile days, until your period or a test.',
+      TtcChapter.aNewBeginning => 'After a positive test.',
+    };
+
+/// The part of her month, as a title said to HIM (2026-09-27). His hero led
+/// with the chapter name ("Trying Together"), which the user found meant
+/// nothing; this names the days instead.
+String ttcChapterHisTitle(TtcChapter c) => switch (c) {
+      TtcChapter.preparingTogether => 'Getting ready together',
+      TtcChapter.knowingYourRhythm => 'Before her fertile days',
+      TtcChapter.tryingTogether => 'Her fertile days',
+      TtcChapter.theWaitingDays => 'The wait before testing',
+      TtcChapter.aNewBeginning => 'A positive test',
+    };

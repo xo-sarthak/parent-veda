@@ -23,17 +23,49 @@
 //  don't know", and "not sure" is the honest answer to at least three of these.
 //  `pcosBuildStand` takes a half-filled `PcosStandAnswers` and returns a real
 //  read — thinner, but real.
+//
+//  ---------------------------------------------------------------------------
+//  ⚠️ HER ANSWERS ARE KEPT (tool rebuild, 2026-09-27)
+//  ---------------------------------------------------------------------------
+//
+//  The eight answers used to live only in this widget's state: they were
+//  written through to the PCOS store (lossily, see `writeThrough`) and then
+//  forgotten, so every visit opened on a blank form and the only way to see
+//  her pattern again was to answer all eight again. They are now kept whole in
+//  `TtcSelfCheckStore` when she taps "See my pattern", come back filled in on
+//  the next visit under a "Your last check" card (date, one line, "See my
+//  pattern", "Clear my answers" with Undo), and any one can be changed. The
+//  result says "Change my answers" instead of leaving it to the close button.
+//
+//  Still one scroll, not one question per screen: eight short cards is the
+//  signed-off shape (STILL-OPEN §18.5), and Mobbin's one-per-screen flows
+//  (Hers consultation, QUITTR quiz) run 18 to 29 screens for this job, which is
+//  the dread the note above describes.
+//
+//  Mobbin: Lifesum "Completing a test (life score)" (last result on the way
+//  in, "Retake the test"),
+//  https://mobbin.com/flows/376a68ad-85c8-4071-a09d-bbfe73ce7cf0 ; Tempo body
+//  scan report (dated, "Start a new scan"),
+//  https://mobbin.com/screens/6d7a03a8-17eb-4144-8015-4a42b705e3ad ; Me+
+//  result ("Ask for help" and "Retake test"),
+//  https://mobbin.com/screens/130988c9-87a4-43dd-a606-f056970ef0ac . Gap
+//  analysis: Flo's Symptom Checker keeps "Updated Aug 29 · Review conditions";
+//  Flo's PCOS self-assessment is a chat, ours a form ("not a gap").
 // =============================================================================
 
 import 'package:flutter/material.dart';
 
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_pcos_stand.dart';
+import '../../ttc/ttc_selfcheck_store.dart';
+import '../../ttc/ttc_store.dart';
+import '../products/pv_store_chrome.dart' show pvSnack;
 import '../v2/v2_palette.dart';
 import 'ttc_common.dart';
 import 'ttc_tool_chrome.dart';
 import 'ttc_pcos_check_screen.dart' show kPcosHue;
 import 'ttc_prepare_screen.dart';
+import 'ttc_focus_screen.dart' show openTtcArticle;
 
 class TtcPcosStandScreen extends StatefulWidget {
   const TtcPcosStandScreen({super.key});
@@ -62,11 +94,19 @@ class _TtcPcosStandScreenState extends State<TtcPcosStandScreen> {
 /// AND renders inline inside the PCOS door, and the third of these is the
 /// sentence that stops the flow reading as a diagnostic quiz. Two typed copies
 /// of a safety line become two lines that say different things.
-const String kPcosStandEyebrow = 'WHERE DO I STAND';
+// ⚠️ ONE TOOL, ONE NAME (2026-09-27): the Tools tile's name, word for word.
+// Kept for revert: 'WHERE DO I STAND'.
+const String kPcosStandEyebrow = 'PCOS symptom check';
 const String kPcosStandTitle = 'A look at your own pattern.';
+// ⚠️ SAYS WHAT PCOS IS AND WHAT SHE IS DOING, FIRST (tools pass, 2026-09-27,
+// the user's simplicity rule). Kept for revert:
+//   "This won't give you a score or a verdict. It puts your pattern into plain "
+//   "words, and shows what's worth taking to a doctor."
 const String kPcosStandIntro =
-    "This won't give you a score or a verdict. It puts your pattern into plain "
-    "words, and shows what's worth taking to a doctor.";
+    'Eight short questions about your periods, skin and hair. These are the '
+    'signs doctors look at for PCOS, a common hormone condition that can make '
+    "periods irregular. You'll get your answers back in plain words, with "
+    'notes for a doctor. No score and no verdict.';
 
 /// The eight questions and the button, with no frame of their own.
 ///
@@ -89,18 +129,92 @@ class TtcPcosStandBody extends StatefulWidget {
 }
 
 class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
-  final _a = PcosStandAnswers();
+  // Not final since 2026-09-27: her saved answers replace it when they load,
+  // and "Clear my answers" puts a fresh one back. Kept for revert:
+  // final _a = PcosStandAnswers();
+  var _a = PcosStandAnswers();
   late final PcosCycleFacts _facts = pcosCycleFacts();
+
+  TtcSelfCheckStore get _saved => TtcSelfCheckStore.instance;
 
   @override
   void initState() {
     super.initState();
+    _prefill();
+    _saved.load().then((_) {
+      if (!mounted) return;
+      setState(_restore);
+    });
+  }
+
+  /// Her saved answers, over the prefills.
+  ///
+  /// ⚠️ HER ANSWER WINS, WITH ONE EXCEPTION: TIME. "How long have you been
+  /// trying?" moves on its own. If her logs now put her in a later band than
+  /// the one she saved, the later band is shown (still changeable), because a
+  /// saved "6 to 12 months" from last spring is no longer true. Every other
+  /// answer is hers and stands as she left it.
+  void _restore() {
+    final s = _saved.pcosAnswers;
+    if (s == null) return;
+    final derived = _a.trying;
+    s.cycleLength ??= _a.cycleLength;
+    if (s.trying == null ||
+        (derived != null &&
+            s.trying != PcosTrying.notTrying &&
+            derived.index > s.trying!.index)) {
+      s.trying = derived;
+    }
+    _a = s;
+  }
+
+  void _see() {
+    // ⚠️ FIRE AND FORGET, LIKE EVERY OTHER WRITE IN THIS APP. Local-first: the
+    // read is built from `_a` in memory and does not wait on storage, so a
+    // slow disk cannot hold up a screen she has finished answering.
+    _a.writeThrough();
+    _saved.savePcos(_a);
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      settings: const RouteSettings(name: 'ttc/pcos_stand_result'),
+      builder: (_) => TtcPcosStandResultScreen(result: pcosBuildStand(_a)),
+    ));
+  }
+
+  /// "Clear my answers": the form goes back to its prefills, with Undo.
+  Future<void> _clear() async {
+    final was = await _saved.clearPcos();
+    if (!mounted) return;
+    setState(() {
+      _a = PcosStandAnswers();
+      _prefill();
+    });
+    pvSnack(context, 'Your answers are cleared.',
+        action: 'Undo',
+        lift: 24,
+        onAction: () async {
+          await _saved.restorePcos(was);
+          if (mounted) setState(_restore);
+        });
+  }
+
+  /// What the app can fill in from her logs.
+  void _prefill() {
     // ⚠️ PREFILLED FROM HER LOGS, NOT ASSUMED. The spec asks Q1 to prefill and
     // *confirm* rather than ask cold, which is the "derive, never ask" rule
     // applied to a question we can mostly answer ourselves. The chip is
     // selected but changeable — a prefill she cannot override is a claim, not
     // a convenience.
     _a.cycleLength = _facts.suggestedLength;
+    // Q7 the same way (launch walk, 2026-09-27): the app knows how long she has
+    // been trying, so it is selected and changeable rather than asked cold.
+    final days = TtcStore.instance.daysTrying;
+    if (days != null) {
+      _a.trying = days < 183
+          ? PcosTrying.underSix
+          : days < 365
+              ? PcosTrying.sixToTwelve
+              : PcosTrying.overAYear;
+    }
   }
 
   void _set(VoidCallback f) => setState(f);
@@ -137,6 +251,20 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
               // exactly what that feels like. A filling line answers the same
               // question without putting a number on the remainder, and it
               // moves visibly on every tap, which is the part that reassures.
+              // ⚠️ HER LAST CHECK, FIRST (2026-09-27). See the file header.
+              if (_saved.pcosAt case final at?) ...[
+                ttcToolPad(TtcToolLastCheck(
+                  key: const ValueKey('ttc_pcos_stand_last'),
+                  at: at,
+                  line: 'Your answers are filled in below. Change anything '
+                      "that's different, then see your pattern again.",
+                  seeLabel: 'See my pattern',
+                  onSee: _see,
+                  againLabel: 'Clear my answers',
+                  onAgain: _clear,
+                )),
+                const SizedBox(height: 18),
+              ],
               ttcToolPad(TtcToolProgress(
                   done: _answered,
                   total: 8,
@@ -169,8 +297,11 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
                 n: 2,
                 title: 'Have you gone 3 months or more without a period in '
                     'the last year?',
+                // The longest logged gap moved here from the "From your logs"
+                // card, next to the question it helps answer (2026-09-27).
                 note: "Don't count time when you were pregnant, "
-                    'breastfeeding or on birth control.',
+                    'breastfeeding or on birth control.'
+                    '${_facts.hasLongGap ? ' Your logs show a gap of ${_facts.longestGapDays} days.' : ''}',
                 child: _YesNo(
                     value: _a.longGaps,
                     onTap: (v) => _set(() => _a.longGaps = v),
@@ -214,6 +345,7 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
                 hue: kPcosHue,
                 n: 4,
                 title: 'Any hair thinning or loss?',
+                note: kPcosDegreeHint,
                 child: _Degree(
                     value: _a.thinning,
                     onTap: (v) => _set(() => _a.thinning = v),
@@ -224,6 +356,7 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
                 hue: kPcosHue,
                 n: 5,
                 title: "Acne for 6 months or more that skincare didn't fix?",
+                note: kPcosDegreeHint,
                 child: _Degree(
                     value: _a.acne,
                     onTap: (v) => _set(() => _a.acne = v),
@@ -275,26 +408,18 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
               )),
 
               const SizedBox(height: 6),
+              // Saves her answers as well as showing the read (2026-09-27).
+              // Kept for revert: an inline onTap doing the write-through and
+              // the push, which is `_see` now.
               _pad(TtcToolPrimary(
+                key: const ValueKey('ttc_pcos_stand_see'),
                 label: 'See my pattern',
-                onTap: () {
-                  // ⚠️ FIRE AND FORGET, LIKE EVERY OTHER WRITE IN THIS APP.
-                  // Local-first: the read is built from `_a` in memory and does
-                  // not wait on storage, so a slow disk cannot hold up a screen
-                  // she has finished answering.
-                  _a.writeThrough();
-                  Navigator.of(context).push(MaterialPageRoute<void>(
-                    settings:
-                        const RouteSettings(name: 'ttc/pcos_stand_result'),
-                    builder: (_) =>
-                        TtcPcosStandResultScreen(result: pcosBuildStand(_a)),
-                  ));
-                },
+                onTap: _see,
               )),
               const SizedBox(height: 14),
               _pad(Text(
                   "You can leave any of these blank. You'll just see a little "
-                  'less.',
+                  'less. Your answers are kept for next time.',
                   textAlign: TextAlign.center,
                   style: pvManrope(
                       fontSize: 11.5, height: 1.5, color: p.ink3))),
@@ -314,14 +439,25 @@ class _TtcPcosStandBodyState extends State<TtcPcosStandBody> {
               // what actually stops the double-asking; this card only explains
               // where that prefill came from, and an explanation is worth more
               // once someone has met the thing being explained.
-              const SizedBox(height: 30),
-              _pad(_FactsCard(facts: _facts, p: p)),
+              // ⚠️ COMMENTED OUT 2026-09-27 (tools pass, simplicity): it sat
+              // below the button, so she learned why Q1 was filled in only
+              // after finishing, and Q1 already says "Filled in from your
+              // logs". Its one extra fact, the longest gap, now sits in Q2's
+              // note. Kept for revert:
+              // const SizedBox(height: 30),
+              // _pad(_FactsCard(facts: _facts, p: p)),
               const SizedBox(height: 24),
         ]);
   }
 }
 
-/// The one door out of this flow that costs money, and the only one it has.
+/// What "mild", "moderate" and "severe" mean on questions 4 and 5, so the
+/// three chips are not a guess (tools pass, 2026-09-27).
+const String kPcosDegreeHint =
+    "Mild: you notice it, others don't. Moderate: others may notice it. "
+    'Severe: it bothers you most days.';
+
+/// The one door out of this flow that costs money.
 void _openConsults(BuildContext context) =>
     Navigator.of(context).push(MaterialPageRoute<void>(
       settings: const RouteSettings(name: 'ttc/consults'),
@@ -337,6 +473,8 @@ Widget _pad(Widget child) =>
 /// the honest version of a progress cue: rather than "2 of 8", it says what the
 /// app has brought to the conversation, which is the thing that makes a
 /// questionnaire feel less like starting from nothing.
+// Unreached since 2026-09-27 (see the note where it rendered); kept for revert.
+// ignore: unused_element
 class _FactsCard extends StatelessWidget {
   const _FactsCard({required this.facts, required this.p});
 
@@ -396,7 +534,8 @@ class TtcPcosStandResultScreen extends StatelessWidget {
     return TtcToolScaffold(
       hue: kPcosHue,
       variant: 3,
-      eyebrow: 'Your pattern',
+      // One tool, one name (2026-09-27). Kept for revert: 'Your pattern'.
+      eyebrow: kPcosStandEyebrow,
       title: "Here's what you told us,\nin plain words.",
       children: [
               const SizedBox(height: 24),
@@ -441,13 +580,13 @@ class TtcPcosStandResultScreen extends StatelessWidget {
                     text: result.nudge!, hue: 42, outlined: true)),
               ],
 
+              // ⚠️ THE FREE STEPS LEAD, THE PAID ONE IS LAST (tools pass,
+              // 2026-09-27). The result used to offer only the consult as its
+              // main action. Kept for revert: 'Talk to a PCOS specialist' was
+              // the TtcToolPrimary and 'What to take with you' the secondary,
+              // with no read.
               const SizedBox(height: 20),
               _pad(TtcToolPrimary(
-                label: 'Talk to a PCOS specialist',
-                onTap: () => _openConsults(context),
-              )),
-              const SizedBox(height: 10),
-              _pad(TtcToolSecondary(
                 label: 'What to take with you',
                 onTap: () => Navigator.of(context).push(
                     MaterialPageRoute<void>(
@@ -456,8 +595,35 @@ class TtcPcosStandResultScreen extends StatelessWidget {
                         builder: (_) =>
                             TtcPcosChecklistScreen(result: result))),
               )),
+              const SizedBox(height: 10),
+              _pad(TtcToolSecondary(
+                key: const ValueKey('ttc_pcos_stand_read'),
+                label: 'Read: irregular periods, explained',
+                onTap: () => openTtcArticle(
+                    context, 'ttc_read_pcos_irregular',
+                    hue: kPcosHue),
+              )),
+              const SizedBox(height: 10),
+              _pad(TtcToolSecondary(
+                label: 'Book a PCOS specialist',
+                onTap: () => _openConsults(context),
+              )),
+              // ⚠️ THE WAY BACK TO HER ANSWERS, SAID (2026-09-27). The close
+              // button did it, but "close" reads as leaving the tool.
+              const SizedBox(height: 6),
+              Center(
+                child: TextButton(
+                  key: const ValueKey('ttc_pcos_stand_change'),
+                  onPressed: () => Navigator.of(context).maybePop(),
+                  child: Text('Change my answers',
+                      style: pvManrope(
+                          fontSize: 13,
+                          fontWeight: FontWeight.w700,
+                          color: V2PaletteStore.instance.current.ink2)),
+                ),
+              ),
 
-              const SizedBox(height: 22),
+              const SizedBox(height: 16),
               _pad(const TtcToolPrivacyLine()),
               const SizedBox(height: 26),
       ],
@@ -487,9 +653,14 @@ class TtcPcosChecklistScreen extends StatelessWidget {
     return TtcToolScaffold(
       hue: kPcosHue,
       variant: 4,
-      eyebrow: 'Appointment notes',
+      // One tool, one name (2026-09-27). Kept for revert:
+      // eyebrow: 'Appointment notes',
+      eyebrow: kPcosStandEyebrow,
       title: 'What to take\nwith you.',
-      intro: "Take a screenshot, or read it out. It's only four lines.",
+      // Copy is offered now (2026-09-27). Kept for revert:
+      // intro: "Take a screenshot, or read it out. It's only four lines.",
+      intro: 'Copy them into a message, take a screenshot, or read them '
+          "out. It's only four lines.",
       children: [
               const SizedBox(height: 24),
               // ⚠️ THE SHARED CARD, NOT A LOCAL COPY OF IT — FOLDED IN
@@ -507,8 +678,15 @@ class TtcPcosChecklistScreen extends StatelessWidget {
                   rows: result.checklist,
                   disclaimer: kPcosChecklistDisclaimer)),
               const SizedBox(height: 18),
-              _pad(TtcToolPrimary(
-                label: 'Talk to a PCOS specialist',
+              _pad(TtcToolCopyNotes(
+                  heading: 'My notes: PCOS symptom check',
+                  rows: result.checklist,
+                  disclaimer: kPcosChecklistDisclaimer)),
+              const SizedBox(height: 10),
+              // Secondary since 2026-09-27: the page is her notes, whoever she
+              // takes them to. Kept for revert: a TtcToolPrimary.
+              _pad(TtcToolSecondary(
+                label: 'Book a PCOS specialist',
                 onTap: () => _openConsults(context),
               )),
               const SizedBox(height: 22),

@@ -241,16 +241,380 @@ class _SessionRow extends StatelessWidget {
 //  One session
 // =============================================================================
 
+/// The parts a session is split into. Read is always there; Do only when the
+/// session has something to play; Keep only when it saves something.
+enum TtcCoursePart { read, doIt, keep }
+
+extension TtcCoursePartCopy on TtcCoursePart {
+  String get label => switch (this) {
+        TtcCoursePart.read => 'Read',
+        TtcCoursePart.doIt => 'Do it',
+        TtcCoursePart.keep => 'Keep it',
+      };
+
+  /// One plain line under the part picker: what this part is.
+  String get line => switch (this) {
+        TtcCoursePart.read => "What this session is about, and what you'll do.",
+        TtcCoursePart.doIt => "The practice itself. Start the timer when you're ready.",
+        TtcCoursePart.keep => 'What this session saves for your days.',
+      };
+}
+
+/// Which parts one session has, in order.
+List<TtcCoursePart> ttcCourseParts(TtcCourseSession s) => [
+      TtcCoursePart.read,
+      if (s.sitSeconds != null ||
+          s.practiceIds.any((id) => ttcPracticeById(id) != null))
+        TtcCoursePart.doIt,
+      if (s.action != TtcCourseAction.none) TtcCoursePart.keep,
+    ];
+
+// ⚠️ A SESSION IS TWO OR THREE SHORT PARTS NOW, NOT ONE LONG SCROLL
+// (2026-09-27, tools rebuild). The notes' "too big for this pass" item, done:
+// session one stacked an intro, two dense panels, five steps and a timer
+// before she got to sit still; session eight put twelve options, two clocks,
+// a meals line and a save on one page. Each session is now Read, Do it and
+// Keep it (only the parts it has), with a picker at the top she can jump
+// around in (nothing locks, the course's own rule) and Back / Next at the
+// foot. The last part offers the next session, the way a course app hands
+// you the next lesson.
+//
+// Mobbin: Blue Apron's stepped flow with Back and Next at the foot
+// (https://mobbin.com/screens/abae8f67-deed-43a5-b14b-12094e2fdac1), Monzo's
+// lesson opener with its length
+// (https://mobbin.com/screens/4084ed06-2074-456f-b386-d48cab07b5b2), Noom's
+// "Continue learning" list (https://mobbin.com/screens/e53b47e7-1acd-4689-bc75-909b8a6868b0).
+// The gap analysis asks for "courses she can follow step by step" (Flo's
+// "Getting pregnant 101", chapter by chapter).
+//
+// NOTHING ELSE CHANGED: the words, the practices, what is saved and when
+// "opened" is recorded. The single scroll is kept as
+// `TtcCourseSessionScreenClassic`.
 class TtcCourseSessionScreen extends StatefulWidget {
-  const TtcCourseSessionScreen({super.key, required this.session});
+  const TtcCourseSessionScreen(
+      {super.key, required this.session, this.startAt = TtcCoursePart.read});
 
   final TtcCourseSession session;
+
+  /// Which part opens first. Read, unless a caller has a reason.
+  final TtcCoursePart startAt;
 
   @override
   State<TtcCourseSessionScreen> createState() => _TtcCourseSessionScreenState();
 }
 
 class _TtcCourseSessionScreenState extends State<TtcCourseSessionScreen> {
+  final _scroll = ScrollController();
+  late List<TtcCoursePart> _parts = ttcCourseParts(widget.session);
+  late int _at = _startIndex();
+
+  int _startIndex() =>
+      _parts.contains(widget.startAt) ? _parts.indexOf(widget.startAt) : 0;
+
+  @override
+  void didUpdateWidget(TtcCourseSessionScreen old) {
+    super.didUpdateWidget(old);
+    // The same state can be handed another session (a rebuild in place);
+    // its parts and its place in them belong to the old one.
+    if (old.session.id != widget.session.id) {
+      _parts = ttcCourseParts(widget.session);
+      _at = _startIndex();
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        TtcGarbhCourseStore.instance.markOpened(widget.session.id);
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    // ⚠️ ON OPEN, NOT ON FINISH. Same rule as before the split: "opened" is
+    // the only fact this course records.
+    //
+    // ⚠️ AFTER THE FIRST FRAME, NOT IN `initState`. "Next session" replaces
+    // this route with the next one, and the outgoing session still listens
+    // to the store while the new one is being built: a notify from inside
+    // that build marks a widget dirty mid-build, which Flutter refuses. One
+    // frame later it is the same fact, recorded safely.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      TtcGarbhCourseStore.instance.markOpened(widget.session.id);
+    });
+  }
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  void _go(int i) {
+    if (i == _at || i < 0 || i >= _parts.length) return;
+    setState(() => _at = i);
+    if (_scroll.hasClients) _scroll.jumpTo(0);
+  }
+
+  void _openNextSession(TtcCourseSession next) =>
+      Navigator.of(context).pushReplacement(MaterialPageRoute<void>(
+        builder: (_) => TtcCourseSessionScreen(session: next),
+        settings: RouteSettings(name: 'ttc_garbh_course/${next.id}'),
+      ));
+
+  @override
+  Widget build(BuildContext context) {
+    final s = widget.session;
+    final part = _parts[_at];
+    final next = kTtcCourseSessions
+        .where((x) => x.number == s.number + 1)
+        .firstOrNull;
+
+    return AnimatedBuilder(
+      animation: Listenable.merge(
+          [TtcGarbhCourseStore.instance, V2PaletteStore.instance]),
+      builder: (context, _) {
+        final p = V2PaletteStore.instance.current;
+        final tint = v2BlockTint(kTtcCourseHue, p);
+
+        return TtcToolScaffold(
+          hue: kTtcCourseHue,
+          scrollController: _scroll,
+          eyebrow: 'SESSION ${s.number} OF 8',
+          title: s.title,
+          intro: s.intro,
+          children: [
+            ttcToolPad(Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 2),
+                  Row(children: [
+                    Icon(Icons.schedule_rounded, size: 15, color: p.ink3),
+                    const SizedBox(width: 7),
+                    Text(s.duration,
+                        style: pvManrope(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w700,
+                            color: p.ink2)),
+                    const SizedBox(width: 12),
+                    Icon(Icons.people_outline_rounded, size: 15, color: p.ink3),
+                    const SizedBox(width: 7),
+                    Expanded(
+                      child: Text(s.setting,
+                          style: pvManrope(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w700,
+                              color: p.ink2)),
+                    ),
+                  ]),
+
+                  // ---- the part picker: where she is, and free to jump -----
+                  const SizedBox(height: 16),
+                  TtcToolOptions(
+                    p: p,
+                    hue: kTtcCourseHue,
+                    items: [
+                      for (var i = 0; i < _parts.length; i++)
+                        TtcToolOption(
+                          label: '${i + 1}  ${_parts[i].label}',
+                          on: i == _at,
+                          onTap: () => _go(i),
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Text(part.line,
+                      style: pvManrope(
+                          fontSize: 12.5, height: 1.5, color: p.ink3)),
+
+                  if (part == TtcCoursePart.read)
+                    ..._readPart(s, p, tint)
+                  else if (part == TtcCoursePart.doIt)
+                    ..._doPart(s, p)
+                  else
+                    ..._keepPart(s, p),
+
+                  // ---- Back and Next -----------------------------------------
+                  const SizedBox(height: 26),
+                  if (_at < _parts.length - 1)
+                    Row(children: [
+                      if (_at > 0) ...[
+                        Expanded(
+                          child: TtcToolSecondary(
+                              label: 'Back', onTap: () => _go(_at - 1)),
+                        ),
+                        const SizedBox(width: 10),
+                      ],
+                      Expanded(
+                        flex: 2,
+                        child: TtcToolPrimary(
+                            label: 'Next: ${_parts[_at + 1].label}',
+                            onTap: () => _go(_at + 1)),
+                      ),
+                    ])
+                  else ...[
+                    if (next != null)
+                      TtcToolPrimary(
+                          label: 'Next session: ${next.title}',
+                          onTap: () => _openNextSession(next))
+                    else
+                      TtcToolPrimary(
+                          label: 'Back to the course',
+                          onTap: () => Navigator.of(context).maybePop()),
+                    if (_at > 0) ...[
+                      const SizedBox(height: 10),
+                      TtcToolSecondary(
+                          label: 'Back', onTap: () => _go(_at - 1)),
+                    ],
+                  ],
+                  const SizedBox(height: 12),
+                ])),
+          ],
+        );
+      },
+    );
+  }
+
+  // ---- Read: the frame, the steps, and the line that lowers the stakes -----
+  List<Widget> _readPart(TtcCourseSession s, V2Palette p, Color tint) => [
+        // ⚠️ "Better together" ALSO SAYS "and it does not wait". See the
+        // Classic below for the reasoning; the words are unchanged.
+        if (s.betterTogether) ...[
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(13),
+            decoration: BoxDecoration(
+              color: p.surfaceAlt,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Row(children: [
+              Icon(Icons.people_outline_rounded, size: 15, color: p.ink3),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                    'Better done together. But nothing here waits for anyone, '
+                    'and doing it on your own counts just the same.',
+                    style: pvManrope(
+                        fontSize: 12.5, height: 1.5, color: p.ink2)),
+              ),
+            ]),
+          ),
+        ],
+        if (s.number == 1) ...[
+          const SizedBox(height: 16),
+          _Panel(p: p, tint: tint, heading: 'What this is', body: kTtcCourseFrame),
+          const SizedBox(height: 12),
+          _Panel(
+            p: p,
+            tint: v2BlockTint(42, p),
+            heading: 'What this course leaves out',
+            body: kTtcCourseNever,
+          ),
+        ],
+        const SizedBox(height: 22),
+        Text("What you'll do",
+            style: pvManrope(
+                fontSize: 13.5, fontWeight: FontWeight.w800, color: p.ink2)),
+        const SizedBox(height: 12),
+        for (var i = 0; i < s.steps.length; i++)
+          Padding(
+            padding: const EdgeInsets.only(bottom: 11),
+            child: Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Container(
+                width: 22,
+                height: 22,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                    color: tint, borderRadius: BorderRadius.circular(999)),
+                child: Text('${i + 1}',
+                    style: pvManrope(
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w800,
+                        color: p.ink1)),
+              ),
+              const SizedBox(width: 11),
+              Expanded(
+                child: Text(s.steps[i],
+                    style: pvManrope(
+                        fontSize: 13.5, height: 1.55, color: p.ink1)),
+              ),
+            ]),
+          ),
+        // ⚠️ SAID PLAINLY STAYS ON THE FIRST PART, never behind a tap: it is
+        // the sentence that lowers the stakes, and the first part is the one
+        // every visit sees.
+        const SizedBox(height: 16),
+        Container(
+          width: double.infinity,
+          padding: const EdgeInsets.all(15),
+          decoration: BoxDecoration(
+            color: p.surfaceAlt,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('Said plainly',
+                style: pvManrope(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w800,
+                    color: p.ink2)),
+            const SizedBox(height: 6),
+            Text(s.saidPlainly,
+                style: pvManrope(fontSize: 13, height: 1.6, color: p.ink1)),
+          ]),
+        ),
+      ];
+
+  // ---- Do it: the sit and the practices, nothing to read around them ------
+  List<Widget> _doPart(TtcCourseSession s, V2Palette p) => [
+        if (s.sitSeconds case final seconds?) ...[
+          const SizedBox(height: 20),
+          Text(
+              seconds >= 300 ? 'Sit for five minutes' : 'Sit for two minutes',
+              style: pvManrope(
+                  fontSize: 13.5, fontWeight: FontWeight.w800, color: p.ink2)),
+          const SizedBox(height: 12),
+          TtcPracticeSession.sit(seconds: seconds),
+        ],
+        for (final id in s.practiceIds)
+          if (ttcPracticeById(id) case final practice?) ...[
+            const SizedBox(height: 26),
+            _TaughtPractice(practice: practice, p: p),
+          ],
+      ];
+
+  // ---- Keep it: what the session saves ------------------------------------
+  List<Widget> _keepPart(TtcCourseSession s, V2Palette p) => [
+        const SizedBox(height: 18),
+        if (s.action == TtcCourseAction.setTimes) _TimesBlock(p: p),
+        if (s.action == TtcCourseAction.setMeals) ...[
+          _MealsBlock(p: p),
+          const SizedBox(height: 16),
+          _GettingReadyLinks(p: p),
+        ],
+        if (s.action == TtcCourseAction.assemble) _AssembleBlock(p: p),
+        if (s.number == 8) ...[
+          const SizedBox(height: 20),
+          Text(kTtcCourseSkipNote,
+              style: pvFraunces(
+                  fontSize: 15.5,
+                  fontWeight: FontWeight.w500,
+                  height: 1.55,
+                  color: p.ink2)),
+        ],
+      ];
+}
+
+/// One session as a single long scroll, before the 2026-09-27 rebuild split it
+/// into parts. Kept for revert; nothing pushes it.
+class TtcCourseSessionScreenClassic extends StatefulWidget {
+  const TtcCourseSessionScreenClassic({super.key, required this.session});
+
+  final TtcCourseSession session;
+
+  @override
+  State<TtcCourseSessionScreenClassic> createState() =>
+      _TtcCourseSessionScreenClassicState();
+}
+
+class _TtcCourseSessionScreenClassicState
+    extends State<TtcCourseSessionScreenClassic> {
   @override
   void initState() {
     super.initState();
@@ -342,20 +706,26 @@ class _TtcCourseSessionScreenState extends State<TtcCourseSessionScreen> {
                     _Panel(
                       p: p,
                       tint: tint,
-                      heading: 'WHAT THIS IS, PLAINLY',
+                      // Sentence case (tools pass, 2026-09-27). Kept for
+                      // revert: 'WHAT THIS IS, PLAINLY'
+                      heading: 'What this is',
                       body: kTtcCourseFrame,
                     ),
                     const SizedBox(height: 12),
                     _Panel(
                       p: p,
                       tint: v2BlockTint(42, p),
-                      heading: 'AND THE FOUR THINGS IT LEAVES OUT',
+                      // Kept for revert (2026-09-27): 'AND THE FOUR THINGS
+                      // IT LEAVES OUT'. The panel lists five, and a count
+                      // that does not match makes her recount.
+                      heading: 'What this course leaves out',
                       body: kTtcCourseNever,
                     ),
                   ],
 
                   const SizedBox(height: 24),
-                  _label('WHAT YOU DO', p),
+                  // Kept for revert (2026-09-27): 'WHAT YOU DO'.
+                  _label('What you do', p),
                   const SizedBox(height: 12),
                   for (var i = 0; i < s.steps.length; i++)
                     Padding(
@@ -394,8 +764,13 @@ class _TtcCourseSessionScreenState extends State<TtcCourseSessionScreen> {
                   // ---- the sit, where the session asks for one --------------
                   if (s.sitSeconds case final seconds?) ...[
                     const SizedBox(height: 18),
+                    // Kept for revert (2026-09-27): 'FIVE MINUTES' /
+                    // 'TWO MINUTES', which named a length, not an action.
                     _label(
-                        seconds >= 300 ? 'FIVE MINUTES' : 'TWO MINUTES', p),
+                        seconds >= 300
+                            ? 'Sit for five minutes'
+                            : 'Sit for two minutes',
+                        p),
                     const SizedBox(height: 12),
                     TtcPracticeSession.sit(seconds: seconds),
                   ],
@@ -444,12 +819,13 @@ class _TtcCourseSessionScreenState extends State<TtcCourseSessionScreen> {
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('SAID PLAINLY',
+                          // Kept for revert (2026-09-27): 'SAID PLAINLY'
+                          // at 9.5 in capitals.
+                          Text('Said plainly',
                               style: pvManrope(
-                                  fontSize: 9.5,
+                                  fontSize: 12.5,
                                   fontWeight: FontWeight.w800,
-                                  letterSpacing: 1,
-                                  color: p.ink3)),
+                                  color: p.ink2)),
                           const SizedBox(height: 6),
                           Text(s.saidPlainly,
                               style: pvManrope(
@@ -474,12 +850,13 @@ class _TtcCourseSessionScreenState extends State<TtcCourseSessionScreen> {
     );
   }
 
+  // Sentence-case labels (2026-09-27) read at 13.5 with no tracking; the old
+  // style was 10.5 with 1.4 letter spacing, for capitals.
   static Widget _label(String s, V2Palette p) => Text(s,
       style: pvManrope(
-          fontSize: 10.5,
+          fontSize: 13.5,
           fontWeight: FontWeight.w800,
-          letterSpacing: 1.4,
-          color: p.ink3));
+          color: p.ink2));
 }
 
 /// One practice, played here, with its own card one tap away.
@@ -546,7 +923,7 @@ class _TimesBlock extends StatelessWidget {
     final store = TtcGarbhCourseStore.instance;
     return _Keep(
       p: p,
-      heading: 'THE TWO TIMES',
+      heading: 'Your two times',
       blurb: 'Pick your wake time first, because work usually decides it. '
           "Count back about eight hours, and that's your bedtime.",
       children: [
@@ -554,12 +931,14 @@ class _TimesBlock extends StatelessWidget {
           p: p,
           label: 'Wake',
           value: store.wakeTime,
+          fallback: kTtcDefaultWake,
           onPick: (t) => store.setTimes(wake: t),
         ),
         _TimeRow(
           p: p,
           label: 'In bed by',
           value: store.bedtime,
+          fallback: kTtcDefaultBed,
           onPick: (t) => store.setTimes(bed: t),
         ),
       ],
@@ -589,7 +968,7 @@ class _MealsBlockState extends State<_MealsBlock> {
 
     return _Keep(
       p: widget.p,
-      heading: 'YOUR REGULAR MEAL TIMES',
+      heading: 'Your regular meal times',
       // ⚠️ TIMES, NOT FOOD, AND THAT IS THE WHOLE BOUNDARY. The session teaches
       // that sattvik means regular and home-cooked; WHAT to eat is owned by
       // Getting ready and is linked below rather than restated here.
@@ -601,6 +980,7 @@ class _MealsBlockState extends State<_MealsBlock> {
             p: widget.p,
             label: _names[i],
             value: i < meals.length && meals[i].isNotEmpty ? meals[i] : null,
+            fallback: kTtcDefaultMeals[i],
             onPick: (t) {
               final next = [
                 for (var j = 0; j < _names.length; j++)
@@ -630,12 +1010,12 @@ class _GettingReadyLinks extends StatelessWidget {
   Widget build(BuildContext context) => Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('THE DETAILS ARE IN GETTING READY',
+        // Kept for revert (2026-09-27): 'THE DETAILS ARE IN GETTING READY'.
+        Text('What to eat: read more',
             style: pvManrope(
-                fontSize: 10.5,
+                fontSize: 13.5,
                 fontWeight: FontWeight.w800,
-                letterSpacing: 1.4,
-                color: p.ink3)),
+                color: p.ink2)),
         const SizedBox(height: 10),
         for (final (title, readId) in _links)
           GestureDetector(
@@ -707,7 +1087,7 @@ class _AssembleBlockState extends State<_AssembleBlock> {
     return Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
       _Keep(
         p: p,
-        heading: 'YOUR FIVE MINUTES',
+        heading: 'Your five minutes',
         blurb: 'Pick the parts you liked. Nothing is set for you, and leaving '
             'one of these blank is a fine answer.',
         children: [
@@ -765,7 +1145,8 @@ class _AssembleBlockState extends State<_AssembleBlock> {
       // ---- confirm what sessions 5 and 6 already set ------------------------
       _Keep(
         p: p,
-        heading: 'AND CONFIRM THESE',
+        // Kept for revert (2026-09-27): 'AND CONFIRM THESE'.
+        heading: 'Check your times',
         blurb: 'You set these in sessions five and six. Change either one '
             'here if it no longer fits.',
         children: [
@@ -773,12 +1154,14 @@ class _AssembleBlockState extends State<_AssembleBlock> {
             p: p,
             label: 'Wake',
             value: store.wakeTime,
+            fallback: kTtcDefaultWake,
             onPick: (t) => store.setTimes(wake: t),
           ),
           _TimeRow(
             p: p,
             label: 'In bed by',
             value: store.bedtime,
+            fallback: kTtcDefaultBed,
             onPick: (t) => store.setTimes(bed: t),
           ),
           if (store.meals.isNotEmpty)
@@ -791,7 +1174,13 @@ class _AssembleBlockState extends State<_AssembleBlock> {
         ],
       ),
 
+      // WHAT TODAY WILL SHOW, BEFORE SHE SAVES (tools pass, 2026-09-27). The
+      // live Today appeared only after the tap, so the button asked her to
+      // commit to something she had not seen.
       const SizedBox(height: 18),
+      _TodayPreview(
+          p: p, moveId: _move, breatheId: _breathe, couple: _couple),
+      const SizedBox(height: 12),
       GestureDetector(
         onTap: () {
           store.setDailyPractice(
@@ -822,12 +1211,12 @@ class _AssembleBlockState extends State<_AssembleBlock> {
       // have been easier and would drift the first time Today changed.
       if (_saved) ...[
         const SizedBox(height: 26),
-        Text('THIS IS NOW YOUR TODAY',
+        // Kept for revert (2026-09-27): 'THIS IS NOW YOUR TODAY'.
+        Text('This is now your Today',
             style: pvManrope(
-                fontSize: 10.5,
+                fontSize: 13.5,
                 fontWeight: FontWeight.w800,
-                letterSpacing: 1.4,
-                color: p.ink3)),
+                color: p.ink2)),
         const SizedBox(height: 6),
         Text('Mind & body opens on this. Nothing here keeps count.',
             style: pvManrope(fontSize: 12.5, height: 1.6, color: p.ink3)),
@@ -903,6 +1292,52 @@ class _Pick extends StatelessWidget {
       );
 }
 
+/// One line of what Today will show once she saves, from her picks so far.
+class _TodayPreview extends StatelessWidget {
+  const _TodayPreview(
+      {required this.p,
+      required this.moveId,
+      required this.breatheId,
+      required this.couple});
+
+  final V2Palette p;
+  final String? moveId;
+  final String? breatheId;
+  final TtcCoupleDaily? couple;
+
+  @override
+  Widget build(BuildContext context) {
+    final b = breatheId == null ? null : ttcPracticeById(breatheId!);
+    final m = moveId == null ? null : ttcPracticeById(moveId!);
+    final parts = <String>[
+      ?b?.title,
+      ?m?.title,
+      if (couple == TtcCoupleDaily.gratitude)
+        'One thing you like about the other',
+      if (couple == TtcCoupleDaily.conversation)
+        'One honest question, and just listen',
+    ];
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(13),
+      decoration: BoxDecoration(
+        color: p.surfaceAlt,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Text(
+          parts.isEmpty
+              ? 'Nothing picked yet. If you save now, Today goes on showing a '
+                  'different card each day.'
+              : 'Your Today will show: ${parts.join(', ')}.',
+          style: pvManrope(
+              fontSize: 12.5,
+              height: 1.5,
+              fontWeight: FontWeight.w600,
+              color: p.ink1)),
+    );
+  }
+}
+
 // =============================================================================
 //  Small shared pieces
 // =============================================================================
@@ -927,12 +1362,12 @@ class _Panel extends StatelessWidget {
           borderRadius: BorderRadius.circular(18),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          // Sentence case since 2026-09-27; was 9.5, tracked, for capitals.
           Text(heading,
               style: pvManrope(
-                  fontSize: 9.5,
+                  fontSize: 13,
                   fontWeight: FontWeight.w800,
-                  letterSpacing: 1,
-                  color: p.ink2)),
+                  color: p.ink1)),
           const SizedBox(height: 7),
           Text(body,
               style: pvManrope(fontSize: 13, height: 1.65, color: p.ink1)),
@@ -962,12 +1397,12 @@ class _Keep extends StatelessWidget {
           border: Border.all(color: p.line),
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          // Sentence case since 2026-09-27; was 9.5, tracked, for capitals.
           Text(heading,
               style: pvManrope(
-                  fontSize: 9.5,
+                  fontSize: 13,
                   fontWeight: FontWeight.w800,
-                  letterSpacing: 1,
-                  color: p.ink3)),
+                  color: p.ink1)),
           const SizedBox(height: 6),
           Text(blurb,
               style: pvManrope(fontSize: 12.5, height: 1.55, color: p.ink2)),
@@ -977,16 +1412,34 @@ class _Keep extends StatelessWidget {
       );
 }
 
+/// Where an empty clock opens, per row (tools pass, 2026-09-27).
+///
+/// A STARTING POINT FOR THE CLOCK, NEVER A SAVED VALUE. Every empty row used
+/// to open at 23:00, which is right for bed and means scrolling from 11 pm to
+/// 7 am for "Wake". Nothing is stored until she picks, and a cancelled picker
+/// still stores nothing.
+const TimeOfDay kTtcDefaultWake = TimeOfDay(hour: 6, minute: 30);
+const TimeOfDay kTtcDefaultBed = TimeOfDay(hour: 23, minute: 0);
+const List<TimeOfDay> kTtcDefaultMeals = [
+  TimeOfDay(hour: 8, minute: 0), // breakfast
+  TimeOfDay(hour: 13, minute: 0), // lunch
+  TimeOfDay(hour: 20, minute: 0), // dinner
+];
+
 class _TimeRow extends StatelessWidget {
   const _TimeRow(
       {required this.p,
       required this.label,
       required this.value,
+      required this.fallback,
       required this.onPick});
 
   final V2Palette p;
   final String label;
   final String? value;
+
+  /// Where the clock opens when nothing is set yet.
+  final TimeOfDay fallback;
   final void Function(String) onPick;
 
   @override
@@ -994,7 +1447,9 @@ class _TimeRow extends StatelessWidget {
         onTap: () async {
           final t = await showTimePicker(
             context: context,
-            initialTime: _parse(value) ?? const TimeOfDay(hour: 23, minute: 0),
+            // Kept for revert (2026-09-27):
+            //   initialTime: _parse(value) ?? const TimeOfDay(hour: 23, minute: 0),
+            initialTime: _parse(value) ?? fallback,
           );
           if (t == null) return;
           onPick(
@@ -1018,11 +1473,18 @@ class _TimeRow extends StatelessWidget {
                 color: p.surfaceAlt,
                 borderRadius: BorderRadius.circular(999),
               ),
-              child: Text(value ?? 'Set',
-                  style: pvManrope(
-                      fontSize: 12.5,
-                      fontWeight: FontWeight.w800,
-                      color: value == null ? p.action : p.ink1)),
+              // An empty row says it opens a clock: an icon and "Set time"
+              // instead of a bare "Set" (2026-09-27).
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(Icons.schedule_rounded,
+                    size: 14, color: value == null ? p.action : p.ink3),
+                const SizedBox(width: 5),
+                Text(value ?? 'Set time',
+                    style: pvManrope(
+                        fontSize: 12.5,
+                        fontWeight: FontWeight.w800,
+                        color: value == null ? p.action : p.ink1)),
+              ]),
             ),
           ]),
         ),

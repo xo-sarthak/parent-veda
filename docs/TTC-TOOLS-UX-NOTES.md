@@ -1,4 +1,4 @@
-# TTC tools: how each could be simpler (notes only, nothing changed)
+# TTC tools: how each could be simpler (notes, and since 2026-09-27 the tools pass that acted on them)
 
 Kept alongside the TTC warmth pass (`docs/TTC-WARMTH-PASS.md`). The user, 2026-09-25: tools are not just text. For
 every tool, note how it could be simpler, more usable and easier to understand for someone new to trying to
@@ -23,6 +23,140 @@ user's point of view; merged and summarised by the lead. 43 tools covered.
   (five before ovulation, ovulation day, and the day after). The medical window is six days ending on
   ovulation day; the seventh is a margin because our ovulation date is an estimate. Since 2026-09-26 every
   explanation says exactly that, so the words and the shaded days agree.
+
+## The rebuild — 2026-09-27 night to 2026-09-28 (READ THIS FIRST)
+
+The user on build 13: the tools were "old tools in new clothes… poor functionality… check the usability of each and
+every tool… use Mobbin well… the gap PDF has how the other apps do it", and the doors looked "bland" and "random".
+One helper per tool, each from the gap PDF and Mobbin (screens cited in every file's header), each walking every tap.
+Pregnancy doors untouched. Suite green after (5359). Walk on build 14 next.
+
+**Doors:** one fixed hero height with parallax and a lighter scrim; a frosted search pill; every section one card rail
+(no rows), typographic cards when there is no photo; the safety list folded into one tinted row that opens a sheet;
+one heading style (Mind & body Today too); one spacing rhythm; 31 drawn tab marks for all 47 tabs
+(`ttc_tab_art.dart`).
+**Reader:** no hairlines round the short answer; the lede no longer repeats it; a TTC read with no photo wears its
+door's drawing.
+**Records + semen report:** Add is one page (the old picker sheet opened itself under the new one); every result can be
+changed or removed with Undo, a whole test too; the report asks its date; ids never collide; the PDF is always on the
+folder.
+**Cycle views:** one palette (`ttc_cycle_palette.dart`: rose period, violet fertile, deep violet ovulation, greys, ink
+today/logged); every "add" line has its button; no second period inside a period; calendar appointments open.
+**Logger:** a day picker for past days, a saved-today card with remove and Undo, a Done that confirms, Add/Change on
+weight and temperature, hidden cards stay hidden after a restart.
+**Supplements + Medication:** one set of parts; a 7-day strip to tick a missed day; an item page with four weeks,
+change, remove; merge duplicates on her tap; finished courses; one-tap reminder times; pregnancy weekday alarms kept.
+**Appointments + Vaccinations:** Coming up / Past, a "NEXT" box, a page per visit with its reminder and questions,
+undo; vaccines answer in one line with Change, "I've had it now", undo on clear.
+**Checks:** the last result on top with answers kept; BMI history with remove; ticked multi-select; notes copyable;
+checklist one tap to mark; dead next steps open the item.
+**Mind tools:** player stops and marks done with Undo, optional steps-follow-timer and breath vibration, screen stays
+awake; ritual in the tool shell with a breath timer; journal month headings, change kind, undo delete; course sessions
+in Read / Do it / Keep it; care circle rows that act.
+**Reference tools:** tests and Can I open in the one reader; search first; "Yes, with a limit" names each limit; food
+ideas as a day strip with remembered swaps; journey map actions on every "still ahead"; timeline in the tool shell and
+filled without the map.
+**Treatment, trackers, ovulation:** a round saved without dates shows its plan; clinic name changeable; past rounds open;
+scans changed or removed singly; "I picked the wrong treatment"; trackers take any of the last 7 days, weight as a line;
+"Ovulation tests" is a real strip log sharing the logger's keys, a positive moves the window only with Undo.
+**Also:** Saved opens bookmarked tests, Can I answers and daily cards; the home's day strip is ink, not rose.
+
+**Decisions for the user (none blocking):** supplement reminders; a "whose" field for his medicines; questions attached
+to one visit; the practice's steps-follow-timer default (goes against "moved by her") and auto-done at the timer's end;
+one-question-per-screen for the PCOS and specialist checks (signed-off as one scroll, STILL-OPEN §18.5); the PDF now
+always on the folder (reverses "within 7 days of an appointment"); only period and fertile days coloured (Flo/Clue);
+the home's food card ignoring swaps; logger card folding and a temperature reminder (parked).
+**For a doctor:** "Start testing around day N" (three days before her estimate); the earlier list (six-day window, two
+Peak days, age wording, transfer-cramps wording).
+
+## State after the tools pass — 2026-09-27, evening (superseded by the rebuild above)
+
+The user asked for every pending note below to be cleared, Mobbin-led, and then, mid-pass, set the main goal:
+**every screen simple to understand** (say what it is first, plain words, nothing that doesn't serve the screen, one
+name per thing). Five helpers worked the areas in parallel; the lead took her home and the cross-file hand-overs. Every
+decision cites a Mobbin screen in the code comments. Nothing below has been walked on a phone yet (build 11 next).
+
+**Done, by tool** (one line each; the detail is in each file's dated ⚠️ comments):
+
+| Tool | Done |
+|---|---|
+| Tools hub | Opening line says what the page is; 14 purpose lines plain; "Worth knowing about" is "Products"; a supplements-vs-medication line; "Nutrition planner" tile is "This week's food ideas"; his side (his and shared tools only, his words). |
+| Fertile window | Opens with one plain sentence; one name ("Fertile window"); dates under the ramp, an ovulation dot; best two days said in words; "Why six days" moved up; "Six days / Whole cycle" text toggle, each view says how to read it ("not percentages") above the bars; no header row, no walkthrough; ovulation is a tag beside Peak, not a level; "Next cycle" / "Previous cycle" word buttons; every withheld estimate says why and carries its fix. |
+| Chapter page | Plain part-of-month line under the name (`ttcChapterPlainPart`); doctor card on every tab; "For him" / "For you both" on Us cards; a way back to her current chapter. |
+| Journey map | The three repeating chapters in one loop box; plain line per card; no zero count; "chapter" explained. |
+| Family timeline | Empty state names where entries come from, with two actions; no repeated stage tag; smaller year heading. |
+| Infographic | Topic eyebrow, not "INFOGRAPHIC"; columns stack under 400pt. |
+| Messages | One line on what this is; a phone notification tap now opens its message (additive tap handler in `NotificationService`). |
+| Guided chats | "Start again" at the end. |
+| Intimacy switch | Offered once, gently, the first time she opens Sex and closeness, with Undo. |
+| Calendar | A line on what it shows; "Add my last period" when empty; clinic line with "Add your clinic's dates"; "Due" on the expected period; trigger time on its day; "Change this period" / "Log a period" on the day card. |
+| Cycle companion | Pencil on every date row → Change / Remove sheet (undo kept); "Circle / Calendar"; one line naming the four parts; "NOT IN YOUR AVERAGE". |
+| Symptom log | "Each tap saves straight away"; "3 things saved for this day"; search knows everyday words (cramps, BBT, sleep…) and feelings; test cards say "Pick one"; "Show or hide". |
+| Weight / temperature | "Take it before you get up…" with a link; type the number; sparkline dates. |
+| Cycle report | One ⓘ behaviour; "Last cycle · 2 of 3"; the fix above the explanation; "parts" not "stretches"; "Circle". |
+| Habits / tracker screen | "Saves as you tap" + "✓ Saved"; presets (6/7/8 h, 10/20/30 min, 4/6/8 glasses); headings once; "Past 4 weeks"; Partner health says who fills it; one way to clear. |
+| Mood faces | Screen-reader label per face. |
+| Records | Honest disabled Save with a reason; test-name suggestions so repeats group; Yours / Your partner's switch; three-segment filter; "needs internet the first time" + fonts fetched early; "Add my result" from the test library. |
+| Records PDF | "Bring or send these files separately". |
+| Test library | "Add my result"; order people meet the tests; For him links to the semen reader; quiet price line. |
+| Vaccines | "Had it" asks when (today by default); status buttons on the closed card; what "live" means; Hep B "Only if a risk applies". |
+| Supplements | Add your own (name, dose, whose); edit; confirm before removing; "Added to your partner's list"; his CoQ10 and hers both allowed. |
+| Medication | Optional last day for reminders; "Add a name to save"; confirm before removing; no made-up "Dr Rao" in English. |
+| Appointments | Tap to edit; remove inside the sheet with a confirm; labelled fields; "Remind me the evening before" (re-armed on launch in `main.dart`); "Add what it is to save". |
+| Treatment tracker / round | A cancelled time picker never invents 9pm (asks "Add the time too?"); every picker titled; undo on clearing a date; weekday on dates; IUI path has no empty transfer row; one step vocabulary; "trigger injection" everywhere in English. |
+| Should I get help? | Says what it is and that personal questions can be skipped; "Pick as many as apply"; "What to take with you" first, the consult second. |
+| Where do I stand (PCOS) | PCOS explained in the intro; mild/moderate/severe explained; free read before the paid consult. |
+| BMI | No intro screen; Save under the number (one tap, history + checklist); result shortened to number, band, save, meaning, two folds; band names under the scale. |
+| Pre-pregnancy checklist | No intro screen; tier key once; no count until she marks something; chips first; one route to the summary. |
+| Semen report | Lab-name helpers per number; gentle unit check (never blocks; WHO values untouched); two headed parts; next steps under the headline; "Keep this with your reports" + "Saved" snack. |
+| Can I...? | Search covers the why and India lines; grouped; empty search offers "Ask Veda". |
+| Our journal | **Redesigned** in the pregnancy journal's shape: white page, rows with a date block, serif words, kind as a calm choice in a full-page writer, tap to read, edit in the bar, delete behind a menu with a confirm, who-can-read line, prompts carried in. |
+| Your daily ritual | No "0/5" or bar; "Done today: …"; one part open at a time; "Do any one and that's enough"; no chapter name alone. |
+| Care circle | One honest line instead of four dead plus buttons; partner card invites when not joined. |
+| Mind & body Today | Says what Start opens; why the two ticks; bedtime set right here; sentence case. |
+| Garbh course | Sensible default times per row; sentence case; "What this course leaves out" matches its panel; a preview before saving session 8. |
+| Practice player | "Previous step" / "Next step" 52pt buttons + "Step n of N"; line under Mark done; "Start again". |
+| Food ideas (was Nutrition Planner) | Renamed; "Nutrients this week" with why on tap; "Swap this day"; recipe links where the dish is the idea. |
+| Programmes | A plain line per offering under its title (`ttcOfferingPlainLine`). |
+
+**Not done, and why** (decisions for the user unless marked):
+- **Needs the user's decision:** the "this was a real long cycle" override on the Companion (changes how cycles are
+  averaged); folding unused logger cards; pinning favourite habit fields; a temperature reminder; "copy last round's
+  schedule" and partner-clinic dates; remembering a chat's last answer for a day; a TTC-wide search screen (door
+  search + hub search already cover it); "In moderation" meaning two things on Can I (data); a reminder vibration or
+  tone in the practice player; the Records PDF only reachable from an appointment within 7 days (documented ⚠️
+  decision); pinning the free course first and the payment note beside the price (shared Learn/offering screens).
+- **Clinical, for a doctor:** the two Peak bars on the window are now equal (the engine already grades both peak;
+  the day-before line says "One of your two best days", was "the highest of the six"); a cancer-treatment question and a
+  "Doesn't apply" semen chip in Should I get help? (both change who is reassured).
+- **Needs data or art:** diet filters for food ideas (ideas are not tagged veg/egg/Jain); pose sketches for the movement
+  practices; names on the Records PDF (the app stores no names, STILL-OPEN §22.4).
+- **Too big for this pass:** splitting each course session into two or three screens; status chips on the checklist's
+  closed rows (one tap still opens the item).
+- **Parked:** the first-run language button (new work is English; the user handles setup screens separately).
+- **Found, not fixed:** `MedicineStore.init`'s alarm re-arm may race `ReminderStore`'s `cancelAll()` on launch, the
+  trap the trigger and appointment reminders were fixed for; worth a code check.
+
+## State on 2026-09-27, afternoon (superseded by the section above; kept for the record)
+
+The twelve problems below, one line each on where they stand now. Checked against the code on 2026-09-27.
+
+| # | Problem | State |
+|---|---|---|
+| 1 | Trigger shot: words vs reminders; a cancelled time picker still saves 9:00 pm | Words FIXED (2026-09-26). The cancelled picker still saves 9:00 pm in both the round screen and the old tracker: **OPEN, fix next**. |
+| 2 | Two symptom loggers writing the same keys | **FIXED** (walk W8.4): Tools' Symptom companion and Mood open the one logger; the old tracker is unreached. |
+| 3 | Vaccines "Had it" saves today's date | **OPEN**. |
+| 4 | Records Save silently does nothing | **OPEN** (`_canSave ? _save : () {}` still there). |
+| 5 | Supplements: no free entry; his CoQ10 blocked by hers | His and hers FIXED (walk: a name is "already added" only for the same person). Free entry: **OPEN**. |
+| 6 | Made-up scores, stars, reviews, badges on products | **FIXED** (walk W8.2): hidden on the TTC shelf until real ones exist (`kTtcShowSeedReviews`). |
+| 7 | First-run language button promises Devanagari, gives Latin Hindi | **PARKED**: new work is English first (the user, 2026-09-27); not touched. |
+| 8 | Duplicate tools (two PCOS, two "get help") | **FIXED** in the gap build: each pair now opens one screen (`ttc_surface_router.dart`). |
+| 9 | Journal: tapping an entry only offers delete; prompt not tappable | Prompts FIXED (they open the writer). Tap-to-delete on an entry: **OPEN**. |
+| 10 | Fertile window has three names; dead end with no estimate | Names **FIXED** (walk W2.1: "Fertile window" everywhere). The window is now six days ending on ovulation on every screen; the seven-day note under "How these notes were made" is superseded. |
+| 11 | Ritual "0/5" counter; store computes a streak | **OPEN**: the counter still shows; the streak is computed and never shown. |
+| 12 | Smaller (care circle, habits ids, setClinic, 23:00 pickers, practice player) | Care circle's "coming soon" gone; the rest **OPEN**. |
+
+The priority table further down is the 2026-09-26 reading and has not been re-ranked.
 
 ## Start here: the problems that are more than wording
 

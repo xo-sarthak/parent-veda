@@ -42,7 +42,8 @@ import '../../ttc/ttc_care_pathway.dart';
 import '../../ttc/ttc_cycle_report.dart';
 import '../../ttc/ttc_store.dart';
 import 'ttc_common.dart';
-import 'ttc_cycle_companion.dart' show ttcShortDate;
+import 'ttc_cycle_companion.dart' show showTtcPeriodLogSheet, ttcShortDate;
+import 'ttc_cycle_palette.dart';
 
 /// Everything the three states need that the report itself does not carry.
 ///
@@ -108,6 +109,9 @@ class TtcReportFacts {
 /// what each of the first three dates buys her. An empty state that shows the
 /// shape of the thing is an advertisement; one that only reports its own
 /// emptiness is an error message in a nicer font.
+///
+/// ⚠️ EVERY CARD IN THIS FILE IS `TtcCycleCard` SINCE 2026-09-27: a hairline,
+/// not the V1 `TtcCard` shadow. Kept for revert: TtcCard( at the four sites.
 class TtcReportEmptyBody extends StatelessWidget {
   const TtcReportEmptyBody({super.key, required this.onLog});
 
@@ -117,25 +121,29 @@ class TtcReportEmptyBody extends StatelessWidget {
   Widget build(BuildContext context) => Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ttcSectionTitle('What this page becomes'),
-          TtcCard(
+          // Kept for revert: 'What this page becomes' (2026-09-27).
+          ttcSectionTitle("What you'll see here"),
+          TtcCycleCard(
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text('A picture of one month', style: ttcJakarta(16)),
                   const SizedBox(height: 8),
                   Text(
+                      // "Stretches" was our word; "parts" is hers
+                      // (2026-09-27).
                       'A cycle starts when a period starts, and ends the day '
-                      'before your next one begins. Drawn as a ring, it splits '
-                      "into four stretches. This is the shape. Yours stays empty "
-                      'until you enter a date.',
+                      'before your next one begins. Drawn as a circle, it '
+                      'splits into four parts. This is the shape. Yours stays '
+                      'empty until you enter a date.',
                       style: ttcBody(13, h: 1.55)),
                   const SizedBox(height: 20),
                   const _EmptyRing(),
                   const SizedBox(height: 20),
                   for (final line in const [
                     'Period · the bleeding days',
-                    'Before your window · nothing to watch for yet',
+                    // Kept for revert: 'Before your window · nothing to watch for yet'.
+                    'Before your fertile days · nothing to watch for yet',
                     'Fertile days · when a pregnancy can begin',
                     'The waiting days · until the next period',
                   ])
@@ -144,7 +152,7 @@ class TtcReportEmptyBody extends StatelessWidget {
                       child: Row(children: [
                         // ⚠️ DASHED AND UNCOLOURED, LIKE THE RING. Colouring the
                         // legend of a cycle she has not logged would promise
-                        // four stretches the page cannot yet place.
+                        // four parts the page cannot yet place.
                         CustomPaint(
                           size: const Size(11, 11),
                           painter: _DashedSquare(),
@@ -161,7 +169,7 @@ class TtcReportEmptyBody extends StatelessWidget {
           const SizedBox(height: 24),
 
           ttcSectionTitle('What one date gives you'),
-          TtcCard(
+          TtcCycleCard(
             child: Column(children: [
               _Step(
                 n: 1,
@@ -172,7 +180,8 @@ class TtcReportEmptyBody extends StatelessWidget {
               ttcDivider(),
               _Step(
                 n: 2,
-                title: 'The four stretches appear',
+                // Kept for revert: 'The four stretches appear'.
+                title: 'The four parts appear',
                 body: 'After two periods we can mark your fertile days on the '
                     'ring, instead of just describing them.',
               ),
@@ -204,13 +213,19 @@ class TtcReportEmptyBody extends StatelessWidget {
           ),
           const SizedBox(height: 22),
 
+          // ⚠️ ONE BUTTON (tools pass, 2026-09-27). Two buttons opened the
+          // same sheet, which already lets her pick any past day, so the
+          // second asked her to choose between two things that were one.
+          // Kept for revert:
+          //   TtcReportAction(
+          //       label: 'Enter the first day of your period', onTap: onLog),
+          //   const SizedBox(height: 10),
+          //   TtcReportAction(
+          //       label: 'My period was earlier: add a past date',
+          //       muted: true,
+          //       onTap: onLog),
           TtcReportAction(
-              label: 'Enter the first day of your period', onTap: onLog),
-          const SizedBox(height: 10),
-          TtcReportAction(
-              label: 'My period was earlier: add a past date',
-              muted: true,
-              onTap: onLog),
+              label: 'Add the day your last period started', onTap: onLog),
           const SizedBox(height: 12),
           Text(
               'You can change or remove any date later. Nothing here is shared '
@@ -380,7 +395,12 @@ class TtcReportRefusalBody extends StatelessWidget {
     required this.onFoot,
     required this.footNote,
     this.note,
+    this.actionFirst = false,
   });
+
+  /// The action above the reason, where the action is what fixes it (the
+  /// no-estimate state, 2026-09-27).
+  final bool actionFirst;
 
   final TtcCycleReport report;
   final TtcReportFacts facts;
@@ -404,17 +424,23 @@ class TtcReportRefusalBody extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         ttcSectionTitle(eyebrow),
-        TtcCard(
+        TtcCycleCard(
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: ttcJakarta(16)),
+                if (actionFirst) ...[
+                  const SizedBox(height: 14),
+                  TtcReportAction(label: actionLabel, onTap: onAction),
+                ],
                 const SizedBox(height: 8),
                 Text(body, style: ttcBody(13, h: 1.55)),
                 const SizedBox(height: 12),
                 Text(body2, style: ttcBody(13, h: 1.55)),
-                const SizedBox(height: 18),
-                TtcReportAction(label: actionLabel, onTap: onAction),
+                if (!actionFirst) ...[
+                  const SizedBox(height: 18),
+                  TtcReportAction(label: actionLabel, onTap: onAction),
+                ],
                 if (note != null) ...[
                   const SizedBox(height: 10),
                   Text(note!, style: ttcBody(12, color: ttcMuted, h: 1.5)),
@@ -424,7 +450,7 @@ class TtcReportRefusalBody extends StatelessWidget {
         const SizedBox(height: 24),
 
         ttcSectionTitle('The days you logged'),
-        TtcCard(
+        TtcCycleCard(
           child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -440,10 +466,14 @@ class TtcReportRefusalBody extends StatelessWidget {
                 _PlainGrid(report: report),
                 const SizedBox(height: 14),
                 Wrap(spacing: 18, runSpacing: 8, children: [
-                  _Key(
-                      alpha: 0.34,
+                  // The period in the palette's rose (2026-09-27): her own
+                  // dates, so the one colour that means bleeding. Kept for
+                  // revert: _Key(alpha: 0.34, label: 'Period you marked').
+                  const _Key(
+                      alpha: 1,
+                      colour: TtcCycleColours.period,
                       label: 'Period you marked'),
-                  _Key(alpha: 0.12, label: 'Something else logged'),
+                  const _Key(alpha: 0.12, label: 'Something else logged'),
                 ]),
               ]),
         ),
@@ -469,12 +499,22 @@ class TtcReportRefusalBody extends StatelessWidget {
           placeholder: 'Two periods give the first gap.',
         ),
         const SizedBox(height: 10),
+        // ⚠️ THE ASK CARRIES ITS BUTTON (2026-09-27). "Add how many days it
+        // lasted" had nowhere to tap; it now opens her latest period in the
+        // log sheet, where the bleeding-days chips are. Kept for revert: the
+        // fact with the placeholder only.
         TtcReportFact(
           label: 'Period usually lasts',
           value: facts.usualBleedDays == null
               ? null
               : '${facts.usualBleedDays} days',
           placeholder: 'When you log a period, add how many days it lasted.',
+          actionLabel: facts.usualBleedDays == null &&
+                  CycleStore.instance.lastPeriodStart != null
+              ? 'Add how long your last period lasted'
+              : null,
+          onAction: () => showTtcPeriodLogSheet(context,
+              correcting: CycleStore.instance.lastPeriodStart),
         ),
         const SizedBox(height: 22),
 
@@ -501,42 +541,57 @@ class _PlainGrid extends StatelessWidget {
   const _PlainGrid({required this.report});
   final TtcCycleReport report;
 
+  // ⚠️ THE PERIOD IN ROSE, THE REST IN INK (2026-09-27). The period was ink
+  // at 34%, a grey that read as "logged a lot". Her bleeding days are a fact
+  // she gave us, not an inference, so they wear the one colour that means
+  // bleeding; the length is hers when she said it. Kept for revert: every
+  // cell ttcTitleInk at 0.34 (cycleDay <= kTtcAssumedBleedDays), 0.12 or
+  // 0.05, numerals in ttcTitleInk.
   @override
-  Widget build(BuildContext context) => GridView.count(
-        crossAxisCount: 7,
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        padding: EdgeInsets.zero,
-        mainAxisSpacing: 5,
-        crossAxisSpacing: 5,
-        children: [
-          for (final day in report.days)
-            Container(
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                color: ttcTitleInk.withValues(
-                    alpha: day.cycleDay <= kTtcAssumedBleedDays
-                        ? 0.34
-                        : day.hasAnything
-                            ? 0.12
-                            : 0.05),
-                borderRadius: BorderRadius.circular(11),
-              ),
-              child: FittedBox(
-                fit: BoxFit.scaleDown,
-                child: Text('${day.date.day}',
-                    style: ttcBody(11.5,
-                        color: ttcTitleInk, w: FontWeight.w700)),
-              ),
+  Widget build(BuildContext context) {
+    final bleed = report.start == null
+        ? kTtcAssumedBleedDays
+        : ttcBleedDaysFor(report.start!);
+    return GridView.count(
+      crossAxisCount: 7,
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.zero,
+      mainAxisSpacing: 5,
+      crossAxisSpacing: 5,
+      children: [
+        for (final day in report.days)
+          Container(
+            alignment: Alignment.center,
+            decoration: BoxDecoration(
+              color: day.cycleDay <= bleed
+                  ? TtcCycleColours.period
+                  : ttcTitleInk.withValues(
+                      alpha: day.hasAnything ? 0.12 : 0.05),
+              borderRadius: BorderRadius.circular(11),
             ),
-        ],
-      );
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text('${day.date.day}',
+                  style: ttcBody(11.5,
+                      color: day.cycleDay <= bleed
+                          ? Colors.white
+                          : ttcTitleInk,
+                      w: FontWeight.w700)),
+            ),
+          ),
+      ],
+    );
+  }
 }
 
 class _Key extends StatelessWidget {
-  const _Key({required this.alpha, required this.label});
+  const _Key({required this.alpha, required this.label, this.colour});
   final double alpha;
   final String label;
+
+  /// A palette colour in place of ink at [alpha].
+  final Color? colour;
 
   @override
   Widget build(BuildContext context) =>
@@ -545,7 +600,7 @@ class _Key extends StatelessWidget {
           width: 11,
           height: 11,
           decoration: BoxDecoration(
-            color: ttcTitleInk.withValues(alpha: alpha),
+            color: colour ?? ttcTitleInk.withValues(alpha: alpha),
             borderRadius: BorderRadius.circular(3),
           ),
         ),
@@ -565,11 +620,17 @@ class TtcReportFact extends StatelessWidget {
     required this.label,
     this.value,
     this.placeholder,
+    this.actionLabel,
+    this.onAction,
   });
 
   final String label;
   final String? value;
   final String? placeholder;
+
+  /// A button under the placeholder, for a fact she can fill in right here.
+  final String? actionLabel;
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) => Container(
@@ -589,6 +650,32 @@ class TtcReportFact extends StatelessWidget {
               style: value != null
                   ? ttcFraunces(17, w: FontWeight.w600, color: ttcTitleInk)
                   : ttcBody(12.5, h: 1.45)),
+          if (actionLabel != null && onAction != null) ...[
+            const SizedBox(height: 10),
+            InkWell(
+              key: const ValueKey('ttc_report_fact_action'),
+              onTap: onAction,
+              borderRadius: BorderRadius.circular(999),
+              child: Container(
+                constraints: const BoxConstraints(minHeight: 40),
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(color: ttcLine, width: 1.2),
+                ),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  const Icon(Icons.add_rounded, size: 16, color: ttcTitleInk),
+                  const SizedBox(width: 6),
+                  Flexible(
+                    child: Text(actionLabel!,
+                        style: ttcBody(13,
+                            color: ttcTitleInk, w: FontWeight.w800)),
+                  ),
+                ]),
+              ),
+            ),
+          ],
         ]),
       );
 }
@@ -648,6 +735,7 @@ class TtcReportAbout extends StatelessWidget {
         ),
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text('ABOUT THIS PAGE',
+              key: const ValueKey('ttc_report_about'),
               style: pvManrope(
                   fontSize: 9.5,
                   fontWeight: FontWeight.w800,

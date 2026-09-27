@@ -251,7 +251,11 @@ void main() {
         for (final t in pcos.allTiles)
           if (t is TtcVideoTile) t.slotId,
       ];
-      expect(slots, contains('ttc_pcos_intro'));
+      // ⚠️ THE WRITTEN FILM SINCE 2026-09-27 (relevance audit): the tile now
+      // names `ttc_vid_pcos_explained`, which has an entry in
+      // `ttc_videos_data.dart`, where `ttc_pcos_intro` had none.
+      // Kept for revert: expect(slots, contains('ttc_pcos_intro'));
+      expect(slots, contains('ttc_vid_pcos_explained'));
     });
   });
 

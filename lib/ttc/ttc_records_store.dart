@@ -19,6 +19,7 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../services/notification_service.dart';
 import '../services/remote/supabase_repo.dart';
 import 'ttc_sync.dart';
 
@@ -117,23 +118,39 @@ class TtcRecord {
 
   /// ⚠️ ONLY THE FIELDS SOMETHING ACTUALLY EDITS. `value`/`unit` exist because
   /// a photo-first record can be completed later ("Type it"); `forPartner`
-  /// because whose result it is was moved off the add form and onto a quiet
-  /// correction line. The rest are deliberately absent — a record's identity,
-  /// its label and its date are not things a screen may quietly rewrite.
+  /// because whose result it is can be corrected.
+  ///
+  /// ⚠️ LABEL, DATE, TEST AND NOTE JOINED ON 2026-09-27, and the reason is a
+  /// defect the user hit on the phone: a result filed with the wrong date or
+  /// the wrong name could only be lived with, never fixed, and "Change this
+  /// result" is now a screen. The identity rule still holds where it matters:
+  /// `id` is not here, so an edit is always the same row, and the cloud upsert
+  /// by id makes it the same row there too. It is an explicit screen with a
+  /// Save button that rewrites these fields, never a side effect.
+  ///
+  /// `clearTestId` because `testId` is nullable: a renamed result that no
+  /// longer matches a library test must be able to drop its old test.
   TtcRecord copyWith({
     List<String>? attachments,
     String? value,
     String? unit,
     bool? forPartner,
+    String? label,
+    DateTime? takenOn,
+    String? testId,
+    bool clearTestId = false,
+    String? note,
   }) =>
       TtcRecord(
         id: id,
-        testId: testId,
-        label: label,
+        testId: clearTestId ? null : (testId ?? this.testId),
+        label: label?.trim() ?? this.label,
         value: value ?? this.value,
         unit: unit ?? this.unit,
-        takenOn: takenOn,
-        note: note,
+        takenOn: takenOn == null
+            ? this.takenOn
+            : DateTime(takenOn.year, takenOn.month, takenOn.day),
+        note: note ?? this.note,
         forPartner: forPartner ?? this.forPartner,
         attachments: attachments ?? this.attachments,
       );
@@ -196,7 +213,7 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
     bool forPartner = false,
   }) {
     final r = TtcRecord(
-      id: 'ttcr_${DateTime.now().microsecondsSinceEpoch}',
+      id: 'ttcr_${_nextStamp()}',
       testId: testId,
       label: label.trim(),
       value: value.trim(),
@@ -211,6 +228,19 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
     return r;
   }
 
+  /// ⚠️ A CLOCK IS NOT AN ID GENERATOR ON ITS OWN (found 2026-09-27). Two
+  /// adds inside one tick of the clock (Windows ticks coarser than a
+  /// microsecond) got the SAME id, and every id-keyed operation then treated
+  /// two results as one: remove took both, Undo put back one. So the stamp
+  /// only ever moves forward. Same format as before, so nothing stored
+  /// changes shape.
+  static int _lastStamp = 0;
+  static int _nextStamp() {
+    final now = DateTime.now().microsecondsSinceEpoch;
+    _lastStamp = now > _lastStamp ? now : _lastStamp + 1;
+    return _lastStamp;
+  }
+
   void remove(String id) {
     final before = _items.length;
     _items.removeWhere((e) => e.id == id);
@@ -222,14 +252,50 @@ class TtcRecordsStore extends ChangeNotifier with TtcSyncedStore {
     notifyListeners();
   }
 
+  /// Put back rows that were just removed, with their own ids: the Undo on
+  /// "Result removed" (added 2026-09-27).
+  ///
+  /// ⚠️ WHY AN UNDO CAN WORK AFTER A CLOUD DELETE HAS ALREADY GONE OUT. The
+  /// app generates the id, so the restored row is the same identity, not a
+  /// copy. `remove` fired a delete for that id; `notifyListeners` here fires
+  /// the mixin's debounced upsert-by-id, which writes the row back.
+  ///
+  /// The trade-off, named: two requests on one id are not ordered. If the
+  /// delete were still in flight when the upsert landed, the delete would
+  /// win. The debounce (700 ms) plus the seconds a person takes to read a
+  /// snackbar and tap Undo make that window small, and the next sync pushes
+  /// the local row again anyway, because local is the source of truth here.
+  /// That second push is what makes it safe rather than lucky.
+  void restore(Iterable<TtcRecord> rows) {
+    var changed = false;
+    for (final r in rows) {
+      if (_items.any((e) => e.id == r.id)) continue;
+      _items.add(r);
+      changed = true;
+    }
+    if (!changed) return;
+    _persist();
+    notifyListeners();
+  }
+
+  /// Remove several rows at once: a whole test, every reading of it.
+  void removeAll(Iterable<String> ids) {
+    for (final id in [...ids]) {
+      remove(id);
+    }
+  }
+
   /// Swap a record for an edited copy, keeping its id.
   ///
-  /// Persists locally and does NOT push. Today its only caller is attaching or
-  /// detaching a document, and the attachment list has no column in
-  /// `ttc_records` — so a push here would upload a row identical to the one
-  /// already there, which is a network call that changes nothing. When
-  /// attachments gain a column this grows a push, and that is the moment to add
-  /// it, not before.
+  /// Persists locally. It names no cloud call of its own, and it does not
+  /// need one: `notifyListeners` is the `TtcSyncedStore` mixin's, which
+  /// schedules the debounced upsert of every row by id. So a changed label,
+  /// date or number travels; the attachment list does not, because
+  /// `pushToCloud` names no column for it (see `attachments`).
+  ///
+  /// (Corrected 2026-09-27. This comment used to say "does NOT push", which
+  /// was never true of the mixin, and mattered once edits of synced fields
+  /// arrived.)
   void replace(TtcRecord updated) {
     final i = _items.indexWhere((e) => e.id == updated.id);
     if (i < 0) return;
@@ -341,6 +407,7 @@ class TtcAppointment {
     required this.startsUtc,
     this.withWhom = '',
     this.note,
+    this.remindEveningBefore = false,
   });
 
   final String id;
@@ -351,8 +418,45 @@ class TtcAppointment {
   final DateTime startsUtc;
   final String? note;
 
+  /// A phone reminder at 7 pm the day before (added 2026-09-27).
+  ///
+  /// ⚠️ LOCAL ONLY, NOT A COLUMN, AND THAT IS THE RIGHT HOME FOR IT. A
+  /// reminder is a fact about THIS phone: the OS notification lives here, and
+  /// her partner's phone pulling the same appointment should not start ringing
+  /// because she asked hers to. So it rides in the local JSON and never in
+  /// `pushToCloud`. The cost: a reinstall forgets the switch, while the
+  /// appointment itself comes back from the cloud. That is the cheap side.
+  final bool remindEveningBefore;
+
   DateTime get startsLocal => startsUtc.toLocal();
   bool get isUpcoming => startsUtc.isAfter(DateTime.now().toUtc());
+
+  /// When the evening-before reminder rings: 7 pm on the day before.
+  DateTime get reminderAt {
+    final d = startsLocal.subtract(const Duration(days: 1));
+    return DateTime(d.year, d.month, d.day, 19);
+  }
+
+  TtcAppointment copyWith({
+    String? title,
+    String? withWhom,
+    DateTime? startsLocal,
+    bool? remindEveningBefore,
+    // Added 2026-09-27 (tool rebuild): the notes box on the appointment
+    // page. Null keeps the note; an empty string clears it, because a
+    // cleared box has to be able to say "no note now".
+    String? note,
+  }) =>
+      TtcAppointment(
+        id: id,
+        title: title?.trim() ?? this.title,
+        withWhom: withWhom?.trim() ?? this.withWhom,
+        startsUtc: startsLocal?.toUtc() ?? startsUtc,
+        note: note == null
+            ? this.note
+            : (note.trim().isEmpty ? null : note.trim()),
+        remindEveningBefore: remindEveningBefore ?? this.remindEveningBefore,
+      );
 
   Map<String, Object?> toJson() => {
         'id': id,
@@ -360,6 +464,7 @@ class TtcAppointment {
         'with': withWhom,
         'at': startsUtc.toIso8601String(),
         if (note != null) 'note': note,
+        if (remindEveningBefore) 'remind': true,
       };
 
   static TtcAppointment? fromJson(Object? raw) {
@@ -374,14 +479,40 @@ class TtcAppointment {
       withWhom: (raw['with'] as String?) ?? '',
       startsUtc: at.toUtc(),
       note: raw['note'] as String?,
+      remindEveningBefore: raw['remind'] == true,
     );
   }
 }
 
+/// The phone id for one appointment's evening-before reminder.
+///
+/// ⚠️ A HASH WE OWN, NOT `String.hashCode`. Dart does not promise that a
+/// string hashes the same on the next launch, and this id has to find the same
+/// notification tomorrow to cancel or move it. FNV-1a is five lines and never
+/// changes. The block (0x3A000000 up) sits clear of the TTC messages (918201
+/// up) and the medication alarms.
+int ttcAppointmentReminderId(String appointmentId) {
+  var h = 0x811c9dc5;
+  for (final c in appointmentId.codeUnits) {
+    h ^= c;
+    h = (h * 0x01000193) & 0xFFFFFFFF;
+  }
+  return 0x3A000000 | (h & 0xFFFFF);
+}
+
+/// What the store needs from the phone, so a test can watch it.
+typedef TtcApptSchedule = Future<void> Function(
+    {required int id,
+    required String title,
+    required String body,
+    required DateTime when});
+
 class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
   TtcAppointmentsStore._() {
-    _load();
+    _loading = _load();
   }
+
+  late final Future<void> _loading;
   static final TtcAppointmentsStore instance = TtcAppointmentsStore._();
 
   static const _key = 'ttc_appointments';
@@ -415,6 +546,7 @@ class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
     required DateTime startsLocal,
     String withWhom = '',
     String? note,
+    bool remindEveningBefore = false,
   }) {
     final a = TtcAppointment(
       id: 'ttca_${DateTime.now().microsecondsSinceEpoch}',
@@ -422,21 +554,108 @@ class TtcAppointmentsStore extends ChangeNotifier with TtcSyncedStore {
       withWhom: withWhom.trim(),
       startsUtc: startsLocal.toUtc(),
       note: note,
+      remindEveningBefore: remindEveningBefore,
     );
     _items.add(a);
     _persist();
+    _arm(a);
     notifyListeners();
     return a;
+  }
+
+  /// Swap an appointment for an edited copy, keeping its id (added
+  /// 2026-09-27: a moved scan used to mean delete and add again).
+  ///
+  /// The push rides on `notifyListeners`, like every change here: the synced
+  /// mixin upserts the whole list by id, so an edit is the same write as an
+  /// add. The reminder is cancelled and set again, because the date may have
+  /// moved.
+  void update(TtcAppointment updated) {
+    final i = _items.indexWhere((e) => e.id == updated.id);
+    if (i < 0) return;
+    _items[i] = updated;
+    _persist();
+    _arm(updated);
+    notifyListeners();
+  }
+
+  // ---- the evening-before reminder ------------------------------------------
+
+  /// Swappable so a test can see what would be scheduled.
+  @visibleForTesting
+  static TtcApptSchedule schedulePhone = ({
+    required int id,
+    required String title,
+    required String body,
+    required DateTime when,
+  }) =>
+      NotificationService.instance
+          .scheduleOneOff(id: id, title: title, body: body, when: when);
+
+  @visibleForTesting
+  static Future<void> Function(int id) cancelPhone =
+      (id) => NotificationService.instance.cancel(id);
+
+  /// Cancels this appointment's reminder, then sets it again if she asked for
+  /// one and the evening has not passed. Fire-and-forget: a phone that cannot
+  /// schedule must never stop an appointment being saved.
+  void _arm(TtcAppointment a) {
+    final id = ttcAppointmentReminderId(a.id);
+    cancelPhone(id).catchError((_) {});
+    if (!a.remindEveningBefore) return;
+    if (!a.reminderAt.isAfter(DateTime.now())) return;
+    final l = a.startsLocal;
+    final h = l.hour % 12 == 0 ? 12 : l.hour % 12;
+    final time = '$h:${l.minute.toString().padLeft(2, '0')}'
+        '${l.hour < 12 ? 'am' : 'pm'}';
+    schedulePhone(
+      id: id,
+      title: 'Tomorrow: ${a.title}',
+      body: a.withWhom.isEmpty
+          ? 'At $time.'
+          : 'At $time, with ${a.withWhom}.',
+      when: a.reminderAt,
+    ).catchError((_) {});
+  }
+
+  /// Sets every upcoming reminder again after launch.
+  ///
+  /// ⚠️ MUST RUN AFTER `ReminderStore.init`, for the reason the TTC messages
+  /// and the trigger injection already follow: `NotificationService.syncAll` calls
+  /// `cancelAll()` on every launch and wipes anything scheduled before it.
+  /// See `main.dart` and the head of `ttc_messages_store.dart`.
+  Future<void> rearmAfterStartup() async {
+    await _loading;
+    for (final a in _items) {
+      if (a.remindEveningBefore && a.isUpcoming) _arm(a);
+    }
   }
 
   void remove(String id) {
     final before = _items.length;
     _items.removeWhere((e) => e.id == id);
     if (_items.length == before) return;
+    cancelPhone(ttcAppointmentReminderId(id)).catchError((_) {});
     _persist();
     if (SupabaseRepo.isLoggedIn) {
       SupabaseRepo.delete('ttc_appointments', id).catchError((_) {});
     }
+    notifyListeners();
+  }
+
+  /// Puts a removed appointment back, same id, for the Undo after a remove
+  /// (added 2026-09-27, tool rebuild).
+  ///
+  /// ⚠️ THE SAME ID IS THE WHOLE TRICK. The cloud delete has already gone
+  /// out; because the app owns row ids, putting the row back is an ordinary
+  /// upsert by id on the next push, not a new appointment with a new
+  /// identity. The reminder is armed again if it still has an evening to
+  /// ring on.
+  void restore(TtcAppointment a) {
+    if (_items.any((e) => e.id == a.id)) return;
+    _items.add(a);
+    _persist();
+    _arm(a);
     notifyListeners();
   }
 

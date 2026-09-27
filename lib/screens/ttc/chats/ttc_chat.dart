@@ -109,11 +109,22 @@ abstract class TtcChatScript {
   String get title;
 
   TtcChatStep start();
+
+  /// Forget the answers given so far, before "Start again" plays [start]
+  /// once more. Facts the chat has already acted on (a period it logged)
+  /// are not answers and stay remembered, so starting again never asks to
+  /// log the same thing twice.
+  void resetAnswers() {}
 }
 
 /// The line under every chat's answers (C3). English only.
 const String kTtcChatDisclaimer =
     "General information, not medical advice. Your doctor's word comes first.";
+
+/// The answer that plays the conversation again from its first line. English
+/// only. Thrive Market's finished chat ends on one "Start new chat" button
+/// (https://mobbin.com/screens/70219959-ebb5-44bd-ab23-f86ebcf12640).
+const String kTtcChatStartAgain = 'Start again';
 
 /// The tray's key, for tests and for anyone looking for it.
 const Key kTtcChatTrayKey = ValueKey('ttc_chat_tray');
@@ -157,6 +168,9 @@ class _TtcChatScreenState extends State<TtcChatScreen> {
   List<TtcChatChoice> _choices = const [];
   bool _typing = false;
 
+  /// True while a step is being said, so "Start again" never races it.
+  bool _playing = false;
+
   @override
   void initState() {
     super.initState();
@@ -170,7 +184,10 @@ class _TtcChatScreenState extends State<TtcChatScreen> {
   }
 
   Future<void> _play(TtcChatStep step) async {
-    setState(() => _choices = const []);
+    setState(() {
+      _choices = const [];
+      _playing = true;
+    });
     for (final line in step.say) {
       if (!mounted) return;
       setState(() => _typing = true);
@@ -184,9 +201,30 @@ class _TtcChatScreenState extends State<TtcChatScreen> {
       _toBottom();
     }
     if (!mounted) return;
-    setState(() => _choices = step.choices);
+    setState(() {
+      _choices = step.choices;
+      _playing = false;
+    });
     _toBottom();
   }
+
+  /// ⚠️ A FINISHED CHAT CAN BE HAD AGAIN (2026-09-27). Once it reached
+  /// "Done" there was no way to go back through it with a different answer
+  /// except leaving and finding the entry point again. Nothing is saved by
+  /// a chat, so starting again loses nothing and needs no confirm.
+  void _restart() {
+    pvCommitFeedback();
+    _script.resetAnswers();
+    setState(() => _lines.clear());
+    _play(_script.start());
+  }
+
+  /// The end of a conversation: it offers "Done", or it has nothing left to
+  /// offer at all.
+  bool get _atEnd =>
+      !_playing &&
+      _lines.isNotEmpty &&
+      (_choices.isEmpty || _choices.any((c) => c.done));
 
   void _toBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -265,7 +303,18 @@ class _TtcChatScreenState extends State<TtcChatScreen> {
           _Tray(
             chips: [
               for (final c in chips)
-                _Answer(label: c.label, done: c.done, onTap: () => _pick(c)),
+                if (!c.done)
+                  _Answer(label: c.label, done: c.done, onTap: () => _pick(c)),
+              // "Start again" sits just above the one ink "Done" pill.
+              if (_atEnd)
+                _Answer(
+                  key: const ValueKey('ttc_chat_start_again'),
+                  label: kTtcChatStartAgain,
+                  onTap: _restart,
+                ),
+              for (final c in chips)
+                if (c.done)
+                  _Answer(label: c.label, done: c.done, onTap: () => _pick(c)),
             ],
           ),
         ]),
@@ -413,7 +462,8 @@ class _Typing extends StatelessWidget {
 /// One answer: a full-width outlined pill at 48pt (C2: 44 is the floor),
 /// or, for "Done", the one ink commit pill. Presses like every tile.
 class _Answer extends StatelessWidget {
-  const _Answer({required this.label, required this.onTap, this.done = false});
+  const _Answer(
+      {super.key, required this.label, required this.onTap, this.done = false});
   final String label;
   final VoidCallback onTap;
   final bool done;

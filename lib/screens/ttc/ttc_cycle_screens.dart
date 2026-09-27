@@ -20,6 +20,7 @@ import '../../ttc/ttc_fertile_window.dart';
 import '../../ttc/ttc_store.dart';
 import 'ttc_common.dart';
 import 'ttc_cycle_companion.dart';
+import 'ttc_ovulation_screen.dart';
 import 'ttc_strings.dart';
 import 'ttc_today_screen.dart' show logTtcPeriod;
 import 'ttc_treatment_screen.dart';
@@ -344,8 +345,20 @@ class _PeriodRow extends StatelessWidget {
 //  Ovulation Companion
 // =============================================================================
 
+// ⚠️ REBUILT 2026-09-27 (the tool rebuild): the Tools tile and the
+// `ttc_ovulation` surface open this class, so it stays here and the tool it
+// shows is the strip log in `ttc_ovulation_screen.dart`. The old body is
+// `TtcOvulationScreenClassic` below, kept for revert: to revert, make this
+// build return `const TtcOvulationScreenClassic()`.
 class TtcOvulationScreen extends StatelessWidget {
   const TtcOvulationScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) => const TtcOvulationTestsScreen();
+}
+
+class TtcOvulationScreenClassic extends StatelessWidget {
+  const TtcOvulationScreenClassic({super.key});
 
   @override
   Widget build(BuildContext context) {

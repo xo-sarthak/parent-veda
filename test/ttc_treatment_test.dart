@@ -20,6 +20,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:parentveda/screens/ttc/ttc_calendar_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_cycle_screens.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
+import 'package:parentveda/screens/ttc/ttc_round_strings.dart' show ttcStepLabel;
 import 'package:parentveda/screens/ttc/ttc_today_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_treatment_screen.dart';
 import 'package:parentveda/ttc/cycle_store.dart';
@@ -264,7 +265,11 @@ void main() {
         ..setDate(TtcTreatmentStep.betaTest, DateTime(2026, 8, 20));
       await pumpTall(tester, const TtcTreatmentScreen());
       expect(tester.takeException(), isNull);
-      expect(find.text(TtcTreatmentStep.trigger.label(false)), findsWidgets);
+      // The legacy rows use the round's names since 2026-09-27 (tools pass):
+      // "Trigger injection". Was:
+      //   expect(find.text(TtcTreatmentStep.trigger.label(false)), findsWidgets);
+      expect(find.text(ttcStepLabel(TtcTreatmentStep.trigger, null)),
+          findsWidgets);
     });
 
     test('treatment dates land on the calendar day they fall on', () {

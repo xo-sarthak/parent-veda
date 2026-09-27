@@ -21,7 +21,7 @@
 //  ⚠️ CLINICAL LINES THAT MUST SURVIVE EDITING: never a personal probability
 //  (population figures only, test/pv_read_shape_test.dart); ectopic warning
 //  signs route to a hospital the same day in every read; a clinic's own test
-//  date after a trigger shot beats anything a home test or this page says.
+//  date after a trigger injection beats anything a home test or this page says.
 //
 //  English only (CLAUDE.md, "New work is English"). `_en` marks the Hindi owed.
 // =============================================================================
@@ -305,7 +305,7 @@ final List<PvRead> kTtcReadsWaiting = [
   //  When to take a pregnancy test, and which one
   //  Grows the chapter section "When a test can tell you something" into a full piece.
   //  Covers: how early, how soon after ovulation, a late period, accuracy before a missed
-  //  period, the blood test, tests in India, irregular cycles, trigger shots.
+  //  period, the blood test, tests in India, irregular cycles, trigger injections.
   // ===========================================================================
   PvRead(
     id: 'ttc_read_when_to_test',
@@ -720,7 +720,7 @@ final List<PvRead> kTtcReadsWaiting = [
           _en('hCG still in your body after a recent pregnancy '
               'or pregnancy loss. It can take a few weeks to clear.'),
           _en('A fertility injection that contains hCG, often '
-              'called a trigger shot.'),
+              'called a trigger injection.'),
           _en('Rarely, a medical condition, which a doctor can '
               'check with blood tests.'),
         ],

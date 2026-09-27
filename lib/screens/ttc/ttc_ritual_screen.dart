@@ -18,19 +18,383 @@
 
 import 'package:flutter/material.dart';
 
+import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_chapter.dart';
 import '../../ttc/ttc_daily_data.dart';
+import '../../ttc/ttc_journal_store.dart' show TtcEntryKind;
 import '../../ttc/ttc_ritual_store.dart';
+import '../products/pv_store_chrome.dart' show pvSnack;
+import '../v2/v2_palette.dart';
 import 'ttc_common.dart';
+import 'ttc_journal_screen.dart' show writeTtcEntry;
+import 'ttc_practice_player.dart' show TtcPracticeSession;
 import 'ttc_strings.dart';
+import 'ttc_tool_chrome.dart';
 
-class TtcRitualScreen extends StatelessWidget {
+/// Sand, the hue the Mind and body hub gives this ritual ("Do today's
+/// practice"), so the tile she tapped and the page she lands on match.
+const double kTtcRitualHue = 42;
+
+// =============================================================================
+//  The ritual, rebuilt in the tool shell (2026-09-27, tools rebuild)
+// -----------------------------------------------------------------------------
+//  The user on the phone: "old tools in new clothes". The morning pass took
+//  the 0/5 off and opened one part at a time, but the page still wore the V1
+//  look (a purple gradient header, `TtcCard`s, purple buttons), and every
+//  part was words to read with nothing to DO beyond ticking. Now:
+//
+//   · the tool shell every rebuilt TTC tool wears (field, hero, white sheet),
+//     so it sits beside Mind and body Today as one family;
+//   · rows with a hairline, not boxed purple cards (Superpower's "Today's
+//     actions", https://mobbin.com/screens/92693ca8-42cd-48d1-b1e5-a1a35ac02a55);
+//   · the breath part carries a one-minute timer she can follow with her
+//     eyes on the ring, and finishing it ticks the part, with an undo;
+//   · reflection, conversation and gratitude each offer "Write about it in
+//     our journal", opening the journal's writer with the prompt carried in
+//     (5 Minute Journal and Stardust let the answer be written where the
+//     prompt is, https://mobbin.com/screens/999c811f-e1cd-4eff-9b18-c129a7b7a2fe).
+//
+//  WHAT DID NOT CHANGE: the store, its keys, what counts as done, and the
+//  words of every part. The page as it was this morning is kept below as
+//  `TtcRitualScreenClassic`; nothing pushes it.
+// =============================================================================
+class TtcRitualScreen extends StatefulWidget {
   const TtcRitualScreen({super.key, required this.chapter, this.focus});
 
   final TtcChapter chapter;
 
-  /// Which part was tapped to get here - scrolled into view and opened.
+  /// Which part was tapped to get here - opened on arrival.
   final TtcRitualPart? focus;
+
+  @override
+  State<TtcRitualScreen> createState() => _TtcRitualScreenState();
+}
+
+class _TtcRitualScreenState extends State<TtcRitualScreen> {
+  /// The one open part. Starts on the part she tapped to get here, else on
+  /// the first part not done yet, so the page opens on something to do.
+  TtcRitualPart? _open;
+  bool _openSet = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedBuilder(
+      animation: Listenable.merge([
+        TtcRitualStore.instance,
+        TtcLang.instance,
+        V2PaletteStore.instance,
+      ]),
+      builder: (context, _) {
+        final t = TtcS.current();
+        final hi = t.hinglish;
+        final pal = V2PaletteStore.instance.current;
+        final store = TtcRitualStore.instance;
+        final chapter = widget.chapter;
+        final items = ttcRituals[chapter] ?? const <TtcRitualItem>[];
+        if (!_openSet) {
+          _openSet = true;
+          _open = widget.focus ??
+              items
+                  .where((i) => !store.isDone(i.part))
+                  .map((i) => i.part)
+                  .firstOrNull;
+        }
+        final doneParts = [
+          for (final i in items)
+            if (store.isDone(i.part)) i.part.title(hi),
+        ];
+
+        return TtcToolScaffold(
+          hue: kTtcRitualHue,
+          // The tile's name is the eyebrow; the title says what the page is.
+          eyebrow: t.ritualTitle,
+          title: 'Five small things for today',
+          intro: "Each one takes about a minute. Do any one and that's "
+              'enough for today.',
+          children: [
+            ttcToolPad(Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // ⚠️ NO CHAPTER NAME ON ITS OWN (the user, 2026-09-27:
+                // "Trying Together... that word is not making any sense").
+                Text(
+                    'Picked for this part of your month. '
+                    '${ttcChapterPlainPart(chapter)}',
+                    style: pvManrope(
+                        fontSize: 13, height: 1.5, color: pal.ink2)),
+                const SizedBox(height: 12),
+                if (doneParts.isNotEmpty)
+                  Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 1),
+                      child: Icon(Icons.check_circle_rounded,
+                          size: 16, color: pal.ink1),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text('Done today: ${doneParts.join(', ')}',
+                          style: pvManrope(
+                              fontSize: 13,
+                              height: 1.45,
+                              fontWeight: FontWeight.w700,
+                              color: pal.ink1)),
+                    ),
+                  ])
+                else
+                  Text('Tap a part to open it.',
+                      style: pvManrope(fontSize: 13, color: pal.ink3)),
+                const SizedBox(height: 16),
+                for (final item in items) ...[
+                  _RitualRow(
+                    item: item,
+                    t: t,
+                    pal: pal,
+                    done: store.isDone(item.part),
+                    expanded: _open == item.part,
+                    onHeaderTap: () => setState(() =>
+                        _open = _open == item.part ? null : item.part),
+                  ),
+                  const SizedBox(height: 10),
+                ],
+                const SizedBox(height: 8),
+              ],
+            )),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// One part: a row with a hairline that opens in place.
+class _RitualRow extends StatelessWidget {
+  const _RitualRow({
+    required this.item,
+    required this.t,
+    required this.pal,
+    required this.done,
+    required this.expanded,
+    required this.onHeaderTap,
+  });
+
+  final TtcRitualItem item;
+  final TtcS t;
+  final V2Palette pal;
+  final bool done;
+  final bool expanded;
+  final VoidCallback onHeaderTap;
+
+  /// Which journal kind an answer to this part is saved as, or null where
+  /// there is nothing to write (the breath and the action).
+  TtcEntryKind? get _journalKind => switch (item.part) {
+        TtcRitualPart.reflection => TtcEntryKind.feeling,
+        TtcRitualPart.gratitude => TtcEntryKind.feeling,
+        TtcRitualPart.conversation => TtcEntryKind.memory,
+        TtcRitualPart.breath => null,
+        TtcRitualPart.action => null,
+      };
+
+  void _finishBreath(BuildContext context) {
+    final store = TtcRitualStore.instance;
+    if (store.isDone(item.part)) return;
+    store.toggle(item.part);
+    pvSnack(context, 'Breath marked done for today.',
+        icon: Icons.check_rounded,
+        action: 'Undo',
+        onAction: () {
+          if (store.isDone(item.part)) store.toggle(item.part);
+        },
+        lift: 24);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final hi = t.hinglish;
+    final tint = v2BlockTint(kTtcRitualHue, pal);
+    final kind = _journalKind;
+    return Container(
+      decoration: BoxDecoration(
+        color: pal.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: expanded ? pal.ink3 : pal.line),
+      ),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Semantics(
+          button: true,
+          expanded: expanded,
+          child: InkWell(
+            onTap: onHeaderTap,
+            borderRadius: BorderRadius.circular(20),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(14, 14, 12, 14),
+              child: Row(children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  alignment: Alignment.center,
+                  decoration:
+                      BoxDecoration(color: tint, shape: BoxShape.circle),
+                  child: Icon(_icon(item.part), size: 19, color: pal.ink1),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(item.part.title(hi),
+                            style: pvJakarta(
+                                fontSize: 15.5,
+                                fontWeight: FontWeight.w700,
+                                color: pal.ink1)),
+                        const SizedBox(height: 2),
+                        Text(item.part.why(hi),
+                            style: pvManrope(
+                                fontSize: 12.5, height: 1.4, color: pal.ink2)),
+                      ]),
+                ),
+                const SizedBox(width: 8),
+                if (done)
+                  Icon(Icons.check_circle_rounded, size: 22, color: pal.ink1)
+                else
+                  Icon(
+                      expanded
+                          ? Icons.keyboard_arrow_up_rounded
+                          : Icons.keyboard_arrow_down_rounded,
+                      size: 22,
+                      color: pal.ink3),
+              ]),
+            ),
+          ),
+        ),
+        if (expanded)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Divider(height: 1, thickness: 1, color: pal.line),
+                  const SizedBox(height: 14),
+                  Text(item.text(hi),
+                      style: pvFraunces(
+                          fontSize: 18, height: 1.45, color: pal.ink1)),
+                  // ---- the breath: a minute she can follow on the ring ----
+                  if (item.part == TtcRitualPart.breath) ...[
+                    const SizedBox(height: 16),
+                    Text('Use this one-minute timer if it helps.',
+                        textAlign: TextAlign.center,
+                        style: pvManrope(fontSize: 12.5, color: pal.ink3)),
+                    const SizedBox(height: 8),
+                    TtcPracticeSession.sit(
+                      seconds: 60,
+                      onFinished: () => _finishBreath(context),
+                    ),
+                  ],
+                  // ---- somewhere to put the answer ----------------------
+                  if (kind != null) ...[
+                    const SizedBox(height: 12),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: TextButton.icon(
+                        onPressed: () => writeTtcEntry(context,
+                            kind: kind, prompt: item.text(hi)),
+                        icon: Icon(Icons.edit_outlined,
+                            size: 17, color: pal.ink1),
+                        label: Text('Write about it in our journal',
+                            style: pvManrope(
+                                fontSize: 13.5,
+                                fontWeight: FontWeight.w700,
+                                color: pal.ink1)),
+                        style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 4, vertical: 8)),
+                      ),
+                    ),
+                  ],
+                  const SizedBox(height: 12),
+                  // ---- the tick: ink when it is still to do --------------
+                  InkWell(
+                    onTap: () => TtcRitualStore.instance.toggle(item.part),
+                    borderRadius: BorderRadius.circular(999),
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 140),
+                      height: 48,
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(
+                        color: done ? pal.surfaceAlt : pal.ink1,
+                        borderRadius: BorderRadius.circular(999),
+                        border: done ? Border.all(color: pal.line) : null,
+                      ),
+                      child: Row(mainAxisSize: MainAxisSize.min, children: [
+                        Icon(
+                            done
+                                ? Icons.check_circle_rounded
+                                : Icons.circle_outlined,
+                            size: 17,
+                            color: done ? pal.ink1 : Colors.white),
+                        const SizedBox(width: 8),
+                        Text(done ? t.ritualDone : t.ritualMarkDone,
+                            style: pvManrope(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w800,
+                                color: done ? pal.ink1 : Colors.white)),
+                      ]),
+                    ),
+                  ),
+                  if (done) ...[
+                    const SizedBox(height: 7),
+                    Center(
+                      child: Text('Tap again to undo.',
+                          style: pvManrope(fontSize: 12, color: pal.ink3)),
+                    ),
+                  ],
+                ]),
+          ),
+      ]),
+    );
+  }
+
+  static IconData _icon(TtcRitualPart part) => switch (part) {
+        TtcRitualPart.reflection => Icons.psychology_outlined,
+        TtcRitualPart.breath => Icons.air_rounded,
+        TtcRitualPart.conversation => Icons.forum_outlined,
+        TtcRitualPart.gratitude => Icons.wb_sunny_outlined,
+        TtcRitualPart.action => Icons.task_alt_rounded,
+      };
+}
+
+// =============================================================================
+//  Kept for revert (2026-09-27): the page as it was this morning
+// =============================================================================
+
+// ⚠️ TICKS ONLY, ONE PART OPEN AT A TIME (tools pass, 2026-09-27).
+//  The "0/5" count and the progress bar pulled against the promise that there
+//  is no way to fail: an empty bar at night reads as a score. Five cards fully
+//  open was a long scroll for something sold as five minutes. Now the header
+//  says what this is and that any one part is enough (which is how the store
+//  already counts a day); each part is a row with its title, its reason and a
+//  tick when done; tapping a row opens it, and only one is open at a time.
+//  Mobbin: Noom "Today's plan" (rows with a tick each, no bar), Garmin
+//  Connect workout steps (a step opens in place).
+/// The ritual page before the 2026-09-27 rebuild. Kept for revert; nothing
+/// pushes it.
+class TtcRitualScreenClassic extends StatefulWidget {
+  const TtcRitualScreenClassic({super.key, required this.chapter, this.focus});
+
+  final TtcChapter chapter;
+
+  /// Which part was tapped to get here - opened on arrival.
+  final TtcRitualPart? focus;
+
+  @override
+  State<TtcRitualScreenClassic> createState() =>
+      _TtcRitualScreenClassicState();
+}
+
+class _TtcRitualScreenClassicState extends State<TtcRitualScreenClassic> {
+  /// The one open part. Starts on the part she tapped to get here, else on
+  /// the first part not done yet, so the page opens on something to do.
+  TtcRitualPart? _open;
+  bool _openSet = false;
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +404,20 @@ class TtcRitualScreen extends StatelessWidget {
         final t = TtcS.current();
         final hi = t.hinglish;
         final store = TtcRitualStore.instance;
+        final chapter = widget.chapter;
         final items = ttcRituals[chapter] ?? const <TtcRitualItem>[];
+        if (!_openSet) {
+          _openSet = true;
+          _open = widget.focus ??
+              items
+                  .where((i) => !store.isDone(i.part))
+                  .map((i) => i.part)
+                  .firstOrNull;
+        }
+        final doneParts = [
+          for (final i in items)
+            if (store.isDone(i.part)) i.part.title(hi),
+        ];
         return Scaffold(
           backgroundColor: ttcBg,
           body: SafeArea(
@@ -51,8 +428,9 @@ class TtcRitualScreen extends StatelessWidget {
                 TtcBackBar(title: t.ritualTitle),
                 const SizedBox(height: 18),
 
-                // The chapter this ritual belongs to, so it never reads as
-                // generic wellness content bolted on.
+                // What this is, first. The chapter this ritual belongs to is
+                // named under it, so it never reads as generic wellness
+                // content bolted on.
                 Container(
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
@@ -66,25 +444,61 @@ class TtcRitualScreen extends StatelessWidget {
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(chapter.title(hi),
+                        // Kept for revert (2026-09-27): the chapter name was
+                        // the heading. It said where she is, not what the
+                        // page is.
+                        //   Text(chapter.title(hi), style: ttcFraunces(21,
+                        //       w: FontWeight.w600, color: Colors.white)),
+                        Text('Five small things for today',
                             style: ttcFraunces(21,
                                 w: FontWeight.w600, color: Colors.white)),
                         const SizedBox(height: 7),
-                        Text(t.dailyRitualBody,
+                        // Kept for revert (2026-09-27): an "it isn't X" line
+                        // (TTC-VOICE rule 10) that said what this is not.
+                        //   Text(t.dailyRitualBody, style: ...),
+                        Text(
+                            "Each one takes about a minute. Do any one and "
+                            "that's enough for today. Tap a part to open it.",
                             style: ttcBody(13,
                                 color: Colors.white.withValues(alpha: 0.93),
                                 h: 1.5)),
-                        const SizedBox(height: 14),
-                        Row(children: [
-                          Text('${store.completedToday()}/${store.total}',
-                              style: ttcBody(13,
-                                  color: Colors.white, w: FontWeight.w800)),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: TtcProgressBar(
-                                value: store.completedToday() / store.total),
-                          ),
-                        ]),
+                        const SizedBox(height: 10),
+                        // ⚠️ NO CHAPTER NAME ON ITS OWN (the user,
+                        // 2026-09-27: "Trying Together... that word is not
+                        // making any sense"). The part of her month is said
+                        // in plain words instead. Kept for revert:
+                        //   'Picked for where you are now: ${chapter.title(hi)}'
+                        Text(
+                            'Picked for this part of your month. '
+                            '${ttcChapterPlainPart(chapter)}',
+                            style: ttcBody(12,
+                                color: Colors.white.withValues(alpha: 0.8),
+                                w: FontWeight.w700,
+                                h: 1.4)),
+                        // Kept for revert (2026-09-27): the "0/5" count and
+                        // the progress bar, a score on a page that promises
+                        // no way to fail.
+                        //   Row(children: [
+                        //     Text('${store.completedToday()}/${store.total}'),
+                        //     Expanded(child: TtcProgressBar(
+                        //         value: store.completedToday() / store.total)),
+                        //   ]),
+                        if (doneParts.isNotEmpty) ...[
+                          const SizedBox(height: 12),
+                          Row(children: [
+                            const Icon(Icons.check_circle_rounded,
+                                size: 15, color: Colors.white),
+                            const SizedBox(width: 7),
+                            Expanded(
+                              child: Text(
+                                  'Done today: ${doneParts.join(', ')}',
+                                  style: ttcBody(12.5,
+                                      color: Colors.white,
+                                      w: FontWeight.w700,
+                                      h: 1.4)),
+                            ),
+                          ]),
+                        ],
                       ]),
                 ),
                 const SizedBox(height: 20),
@@ -94,7 +508,11 @@ class TtcRitualScreen extends StatelessWidget {
                     item: item,
                     t: t,
                     done: store.isDone(item.part),
-                    expanded: focus == null || focus == item.part,
+                    // Kept for revert (2026-09-27): every card open.
+                    //   expanded: focus == null || focus == item.part,
+                    expanded: _open == item.part,
+                    onHeaderTap: () => setState(() =>
+                        _open = _open == item.part ? null : item.part),
                   ),
                   const SizedBox(height: 12),
                 ],
@@ -113,62 +531,108 @@ class _RitualPartCard extends StatelessWidget {
     required this.t,
     required this.done,
     required this.expanded,
+    required this.onHeaderTap,
   });
 
   final TtcRitualItem item;
   final TtcS t;
   final bool done;
   final bool expanded;
+  final VoidCallback onHeaderTap;
 
   @override
   Widget build(BuildContext context) {
     final hi = t.hinglish;
     return TtcCard(
+      padding: EdgeInsets.zero,
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        Row(children: [
-          Container(
-            width: 38,
-            height: 38,
-            alignment: Alignment.center,
-            decoration: const BoxDecoration(
-                color: ttcPanel, shape: BoxShape.circle),
-            child: Icon(_icon(item.part), size: 19, color: ttcPurple),
+        // The row: title, reason, and a tick when done. A tap opens or
+        // closes the part.
+        Semantics(
+          button: true,
+          expanded: expanded,
+          child: GestureDetector(
+            onTap: onHeaderTap,
+            behavior: HitTestBehavior.opaque,
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(18, 16, 14, 16),
+              child: Row(children: [
+                Container(
+                  width: 38,
+                  height: 38,
+                  alignment: Alignment.center,
+                  decoration: const BoxDecoration(
+                      color: ttcPanel, shape: BoxShape.circle),
+                  child: Icon(_icon(item.part), size: 19, color: ttcPurple),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(item.part.title(hi), style: ttcJakarta(15.5)),
+                        const SizedBox(height: 2),
+                        Text(item.part.why(hi), style: ttcBody(11.5)),
+                      ]),
+                ),
+                const SizedBox(width: 8),
+                if (done)
+                  const Icon(Icons.check_circle_rounded,
+                      size: 22, color: ttcPurple)
+                else
+                  Icon(
+                      expanded
+                          ? Icons.keyboard_arrow_up_rounded
+                          : Icons.keyboard_arrow_down_rounded,
+                      size: 22,
+                      color: ttcMuted),
+              ]),
+            ),
           ),
-          const SizedBox(width: 12),
-          Expanded(
+        ),
+        if (expanded)
+          Padding(
+            padding: const EdgeInsets.fromLTRB(18, 0, 18, 18),
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(item.part.title(hi), style: ttcJakarta(15.5)),
-                  const SizedBox(height: 2),
-                  Text(item.part.why(hi), style: ttcBody(11.5)),
+                  Text(item.text(hi),
+                      style: ttcBody(14.5, color: ttcInk, h: 1.68)),
+                  const SizedBox(height: 16),
+                  GestureDetector(
+                    onTap: () => TtcRitualStore.instance.toggle(item.part),
+                    behavior: HitTestBehavior.opaque,
+                    child: Container(
+                      alignment: Alignment.center,
+                      padding: const EdgeInsets.symmetric(vertical: 13),
+                      decoration: BoxDecoration(
+                        color: done ? ttcPanel : ttcPurple,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Row(mainAxisSize: MainAxisSize.min, children: [
+                        Icon(
+                            done
+                                ? Icons.check_circle_rounded
+                                : Icons.circle_outlined,
+                            size: 17,
+                            color: done ? ttcPurple : Colors.white),
+                        const SizedBox(width: 8),
+                        Text(done ? t.ritualDone : t.ritualMarkDone,
+                            style: ttcBody(13.5,
+                                color: done ? ttcPurple : Colors.white,
+                                w: FontWeight.w800)),
+                      ]),
+                    ),
+                  ),
+                  if (done) ...[
+                    const SizedBox(height: 7),
+                    Center(
+                      child: Text('Tap again to undo.',
+                          style: ttcBody(11.5, color: ttcMuted)),
+                    ),
+                  ],
                 ]),
           ),
-        ]),
-        const SizedBox(height: 14),
-        Text(item.text(hi), style: ttcBody(14.5, color: ttcInk, h: 1.68)),
-        const SizedBox(height: 16),
-        GestureDetector(
-          onTap: () => TtcRitualStore.instance.toggle(item.part),
-          behavior: HitTestBehavior.opaque,
-          child: Container(
-            alignment: Alignment.center,
-            padding: const EdgeInsets.symmetric(vertical: 13),
-            decoration: BoxDecoration(
-              color: done ? ttcPanel : ttcPurple,
-              borderRadius: BorderRadius.circular(15),
-            ),
-            child: Row(mainAxisSize: MainAxisSize.min, children: [
-              Icon(done ? Icons.check_circle_rounded : Icons.circle_outlined,
-                  size: 17, color: done ? ttcPurple : Colors.white),
-              const SizedBox(width: 8),
-              Text(done ? t.ritualDone : t.ritualMarkDone,
-                  style: ttcBody(13.5,
-                      color: done ? ttcPurple : Colors.white,
-                      w: FontWeight.w800)),
-            ]),
-          ),
-        ),
       ]),
     );
   }

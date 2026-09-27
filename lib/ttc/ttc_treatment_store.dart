@@ -107,7 +107,7 @@ extension TtcTreatmentStepCopy on TtcTreatmentStep {
       case TtcTreatmentStep.stimStart:
         return hi ? 'Stimulation shuru' : 'Stimulation starts';
       case TtcTreatmentStep.trigger:
-        return hi ? 'Trigger shot' : 'Trigger shot';
+        return hi ? 'Trigger injection' : 'Trigger injection';
       case TtcTreatmentStep.retrieval:
         return hi ? 'Egg retrieval / IUI' : 'Egg retrieval / IUI';
       case TtcTreatmentStep.transfer:
@@ -156,7 +156,7 @@ extension TtcTreatmentStepCopy on TtcTreatmentStep {
       case TtcTreatmentStep.betaTest:
         return hi
             ? 'Yahi asli jawab hai. Ghar ka test isse pehle trigger ki wajah se galat aa sakta hai.'
-            : 'This test gives you the real answer. A home test taken before it can be wrong because of the trigger shot.';
+            : 'This test gives you the real answer. A home test taken before it can be wrong because of the trigger injection.';
       case TtcTreatmentStep.pillStart:
         return 'Some clinics use a month of pills first, to time when the round starts.';
       case TtcTreatmentStep.downRegStart:
@@ -807,13 +807,13 @@ class TtcTreatmentStore extends ChangeNotifier with TtcSyncedStore {
     //       'A good time to get the injection ready.'
     await service.scheduleOneOff(
       id: triggerPrepNotificationId,
-      title: 'Trigger shot in 4 hours',
+      title: 'Trigger injection in 4 hours',
       body: ttcTriggerPrepBody(_cycle.kind, at),
       when: at.subtract(const Duration(hours: 4)),
     );
     await service.scheduleOneOff(
       id: triggerNotificationId,
-      title: 'Time to take your trigger shot',
+      title: 'Time to take your trigger injection',
       body: 'Your clinic set this for ${_hhmm(at)}. '
           'If anything is unclear, call them now instead of guessing.',
       when: at.subtract(const Duration(minutes: 15)),

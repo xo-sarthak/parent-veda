@@ -25,7 +25,9 @@
 
 import 'package:flutter/material.dart' show Icons;
 
-import '../../data/hubs/ttc_hubs.dart' show kTtcActConsult;
+// Unused since the consult tiles name their offering (2026-09-27,
+// relevance audit). Kept for revert:
+// import '../../data/hubs/ttc_hubs.dart' show kTtcActConsult;
 import '../ttc_focus_data.dart';
 
 const TtcFocusPage kTtcNotYetFocus = TtcFocusPage(
@@ -51,29 +53,29 @@ const TtcFocusPage kTtcNotYetFocus = TtcFocusPage(
   //  and must never be trimmed.
   groups: [
     TtcFocusGroup(
-      id: 'time', mark: IntentMark.compassMark,
+      id: 'time', mark: IntentMark.compassMark, tabMark: TtcTabMark.clock,
       label: 'Is it time?',
       icon: Icons.schedule_rounded,
       hue: 344,
       pinnedRedFlagReadIds: ['ttc_read_when_to_seek_help'],
     ),
     TtcFocusGroup(
-        id: 'check', mark: IntentMark.reportPage,
+        id: 'check', mark: IntentMark.reportPage, tabMark: TtcTabMark.vialReport,
         label: 'What a check involves',
         icon: Icons.biotech_outlined,
         hue: 206),
     TtcFocusGroup(
-        id: 'both', mark: IntentMark.spermMark,
+        id: 'both', mark: IntentMark.spermMark, tabMark: TtcTabMark.twoFigures,
         label: 'Both of you',
         icon: Icons.people_outline_rounded,
         hue: 186),
     TtcFocusGroup(
-        id: 'slow', mark: IntentMark.bodyMark,
+        id: 'slow', mark: IntentMark.bodyMark, tabMark: TtcTabMark.windingPath,
         label: 'What can slow it',
         icon: Icons.hourglass_empty_rounded,
         hue: 104),
     TtcFocusGroup(
-      id: 'through', mark: IntentMark.cuppedHands,
+      id: 'through', mark: IntentMark.cuppedHands, tabMark: TtcTabMark.heartHand,
       label: 'Getting through it',
       icon: Icons.favorite_border_rounded,
       hue: 268,
@@ -116,6 +118,15 @@ const TtcFocusPage kTtcNotYetFocus = TtcFocusPage(
           blurb: 'The usual guideline, and the reasons not to wait.',
           readId: 'ttc_read_when_to_seek_help',
         ),
+        // The "When to see someone" film the checklist asks for (2026-09-27,
+        // relevance audit). Written and chaptered, and was on no door.
+        TtcVideoTile(
+          title: 'Is it time to see someone?',
+          blurb: 'The twelve-month rule, and the situations where it does not '
+              'apply.',
+          slotId: 'ttc_vid_when_to_seek_help',
+          duration: '5 MIN',
+        ),
       ],
     ),
 
@@ -143,15 +154,37 @@ const TtcFocusPage kTtcNotYetFocus = TtcFocusPage(
       heading: 'Who should we see first?',
       group: 'check',
       tiles: [
+        // ⚠️ THE EXACT ANSWER, NOT THE BEFORE-TRYING READ (2026-09-27,
+        // relevance audit). "Seeing a gynaecologist" is written for a visit
+        // before you start trying, which is the wrong read for someone who
+        // has tried for a year. This section answers the heading word for
+        // word. Kept for revert (2026-09-27, relevance audit):
+        // TtcArticleTile(
+        //   title: 'Seeing a gynaecologist: what to ask',
+        //   blurb: 'What to take along, and the questions that make it count.',
+        //   readId: 'ttc_read_first_gyn_visit',
+        // ),
         TtcArticleTile(
-          title: 'Seeing a gynaecologist: what to ask',
-          blurb: 'What to take along, and the questions that make it count.',
-          readId: 'ttc_read_first_gyn_visit',
+          title: 'Who to see first',
+          blurb: 'Usually a gynaecologist before a fertility clinic, and why '
+              "that's a sensible order.",
+          readId: 'ttc_read_when_to_seek_help',
+          atHeading: 'Who should you see first?',
         ),
-        TtcBookingTile(
+        // ⚠️ THE FERTILITY SPECIALIST, NOT THE CONSULTS SHELF (2026-09-27,
+        // relevance audit). A Talk tile, because `openTtcFocusTile` resolves
+        // an offering id only on Talk; a Booking tile with any action but the
+        // shared one opens nothing.
+        // Kept for revert (2026-09-27, relevance audit):
+        // TtcBookingTile(
+        //   title: 'Talk to a fertility doctor',
+        //   blurb: 'A private talk about your own dates and results.',
+        //   action: kTtcActConsult,
+        // ),
+        TtcTalkTile(
           title: 'Talk to a fertility doctor',
           blurb: 'A private talk about your own dates and results.',
-          action: kTtcActConsult,
+          action: 'ttc_consult_fertility',
         ),
       ],
     ),
@@ -261,6 +294,8 @@ const TtcFocusPage kTtcNotYetFocus = TtcFocusPage(
           title: 'Mind and body',
           blurb: 'Hard days, a few calm minutes, and someone to talk to.',
           bracketId: 'ttc_mind_body',
+          // Lands on Hard days, the tab this link is about (2026-09-27).
+          group: 'hard',
         ),
       ],
     ),

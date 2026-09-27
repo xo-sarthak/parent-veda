@@ -75,6 +75,28 @@ class _Shot {
 }
 
 class TtcRecordsPdf {
+  static bool _warmed = false;
+
+  /// Fetches the fonts once in the background, so the first export does not
+  /// fail offline (tools pass, 2026-09-27).
+  ///
+  /// ⚠️ WHY THIS WORKS: `PdfGoogleFonts` keeps what it downloads, so a fetch
+  /// made while she is still reading the sheet is the same fetch the export
+  /// would have made, done earlier. Fire-and-forget: a failure here changes
+  /// nothing, because [build] still checks and refuses on its own.
+  ///
+  /// Skipped under `flutter test`, which answers every HTTP call with a 400
+  /// and would only add noise to widget tests that open the sheet.
+  static void warmFonts(AppLanguage lang) {
+    if (_warmed || Platform.environment.containsKey('FLUTTER_TEST')) return;
+    _warmed = true;
+    PdfFontSet.load(lang).then((f) {
+      if (!f.complete) _warmed = false; // try again next time
+    }).catchError((_) {
+      _warmed = false;
+    });
+  }
+
   /// Null when the fonts could not be loaded.
   ///
   /// ⚠️ REFUSING IS THE CORRECT FAILURE HERE, and it is the house rule from
@@ -199,12 +221,17 @@ class TtcRecordsPdf {
       build: (context) => [
         label(forAppointment == null ? 'Test results' : 'For $forAppointment'),
         pw.SizedBox(height: 6),
-        pw.Text('Everything on file, in date order.',
+        // ⚠️ SAYS WHAT THE PAGE IS, TRUE TO ITS ORDER (2026-09-27). It said
+        // "in date order" over a table grouped by test, newest test first,
+        // with older readings under each. Kept for revert:
+        // pw.Text('Everything on file, in date order.',
+        pw.Text('Every result on file, one test to a row.',
             style: pw.TextStyle(font: serif, fontSize: 19, color: _ink)),
         pw.SizedBox(height: 5),
         pw.Text(
             '${groups.fold<int>(0, (n, g) => n + g.count)} results across '
-            '${groups.length} ${groups.length == 1 ? 'test' : 'tests'}. '
+            '${groups.length} ${groups.length == 1 ? 'test' : 'tests'}, '
+            'the most recent first, with earlier readings under each. '
             'Prepared ${_date(DateTime.now())}.',
             style: pw.TextStyle(font: body, fontSize: 9.5, color: _ink2)),
         pw.SizedBox(height: 18),
@@ -242,9 +269,13 @@ class TtcRecordsPdf {
           pw.SizedBox(height: 14),
           label('Files that could not be included'),
           pw.SizedBox(height: 5),
+          // Kept for revert (2026-09-27): "Saved in the app, but they can't
+          // be shown in this document." It said what was missing and not
+          // what to do about it.
           pw.Text(
               '${unshown.join(', ')}. '
-              "Saved in the app, but they can't be shown in this document.",
+              "Saved in the app, but they can't be shown in this document. "
+              'Bring or send these files separately.',
               style: pw.TextStyle(
                   font: body, fontSize: 9.5, lineSpacing: 1.5, color: _ink2)),
         ],

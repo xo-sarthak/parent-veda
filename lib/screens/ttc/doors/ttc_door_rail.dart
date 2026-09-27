@@ -13,7 +13,7 @@
 //  read rather than retyped, so the two rails cannot drift apart in size.
 //
 //  The card: white, radius 24, the page hairline, the group's DRAWN mark at
-//  48pt top-left, the label bold with room for two lines, a grey count line,
+//  48pt top-left (the TTC tab family in `ttc_tab_art.dart` since 2026-09-27), the label bold with room for two lines, a grey count line,
 //  a chevron. The chosen card is ringed in ink. Tapping presses and hums, and
 //  the rail scrolls the chosen card towards the left edge (Flo's behaviour).
 // =============================================================================
@@ -27,6 +27,7 @@ import '../../brackets/hub/hub_intent_art.dart';
 import '../../doors/pv_door_chrome.dart' show kPvDoorGutter;
 import '../../doors/pv_door_rail.dart' show PvDoorRail;
 import '../../v2/v2_palette.dart';
+import 'ttc_tab_art.dart';
 
 const Key kTtcDoorRailKey = ValueKey('ttc-door-rail');
 Key ttcDoorRailCardKey(int i) => ValueKey('ttc-door-rail-$i');
@@ -48,7 +49,12 @@ class TtcDoorRail extends StatefulWidget {
   final ValueChanged<int> onPick;
 
   // One set of numbers with the pregnancy rail. Change them there.
-  static const double cardWidth = PvDoorRail.cardWidth;
+  // ⚠️ A PEEK OF THE THIRD TAB (launch walk, 2026-09-27). At 168 (the
+  // pregnancy rail's width) two cards filled a 360dp phone edge to edge, so a
+  // door with six tabs showed two and gave no sign of the other four. At 150
+  // about a fifth of the third card shows. Pregnancy keeps its own constant.
+  // Kept for revert: static const double cardWidth = PvDoorRail.cardWidth;
+  static const double cardWidth = 150;
   static const double cardHeight = PvDoorRail.cardHeight;
   static const double markSize = PvDoorRail.markSize;
   static const double overlap = PvDoorRail.overlap;
@@ -145,15 +151,23 @@ class _TtcDoorRailState extends State<TtcDoorRail> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // The mark, bare on the white card, drawn in the group's tint.
-              // A group with no mark falls back to its Material glyph, which
-              // is why the door's test requires every tab to carry one.
+              // ⚠️ THE TTC TAB FAMILY FIRST (2026-09-27). The shared intent
+              // marks read as stock on these cards (the user: "very random");
+              // `TtcTabArt` is drawn for this rail, an object on a disc of the
+              // tab's tint. The intent mark stays as the fallback, and the
+              // Material glyph after it, so a card never shows an empty well.
+              // Kept for revert (2026-09-27): the intent mark drawn bare.
+              //   child: g.mark != null
+              //       ? HubIntentArt(mark: g.mark!, tint: tint)
+              //       : Icon(g.icon, size: 28, color: p.ink1),
               SizedBox(
                 width: TtcDoorRail.markSize,
                 height: TtcDoorRail.markSize,
-                child: g.mark != null
-                    ? HubIntentArt(mark: g.mark!, tint: tint)
-                    : Icon(g.icon, size: 28, color: p.ink1),
+                child: g.tabMark != null
+                    ? TtcTabArt(mark: g.tabMark!, tint: tint)
+                    : g.mark != null
+                        ? HubIntentArt(mark: g.mark!, tint: tint)
+                        : Icon(g.icon, size: 28, color: p.ink1),
               ),
               const Spacer(),
               Row(

@@ -70,9 +70,17 @@ final List<PvRead> kTtcReadsIvf = [
     title: _en("When it's time to see a doctor"),
     teaser: _en("How long to try first, who shouldn't wait, and what really "
         'happens at a first appointment.'),
-    shortAnswer: _en("If you're under 36, see a doctor after twelve months of "
-        "regular sex without contraception. If you're 36 or over, go as soon "
-        'as you want to, with no waiting period. At any age, go now if your '
+    // ⚠️ ONE AGE RULE (launch walk, 2026-09-27): this read said 36 (NICE)
+    // while the check card, the fertility-help tool and every other page say
+    // 35 and six months. The user's rule is that age is said the same way
+    // everywhere; owed a check by the reviewing doctor. Kept for revert:
+    //   "If you're under 36, see a doctor after twelve months of "
+    //   "regular sex without contraception. If you're 36 or over, go as soon "
+    //   'as you want to, with no waiting period. At any age, go now if your '
+    shortAnswer: _en("If you're under 35, see a doctor after twelve months of "
+        "regular sex without contraception. If you're 35 or over, go after "
+        "six months, or sooner if you want to. If you're 40 or over, go as "
+        'soon as you start trying. At any age, go now if your '
         'cycles are irregular, periods are very painful, or there is a known '
         'problem on either side.'),
 
@@ -99,15 +107,35 @@ final List<PvRead> kTtcReadsIvf = [
       PvReadSection(
         heading: _en('How long should you try first?'),
         paragraphs: [
-          _en("If you're under 36, the guideline is twelve months of regular "
-              "sex without contraception. That's the line used by NICE and "
-              'most health bodies around the world. "Regular" means every two '
+          // 35, as everywhere (2026-09-27); kept for revert: "under 36".
+          _en("If you're under 35, the guideline is twelve months of regular "
+              "sex without contraception. That's the line used by Indian "
+              'fertility specialists and most health bodies around the world. '
+              '"Regular" means every two '
               'or three days all through the cycle, not only timed tries '
               'around your fertile days.'),
-          _en("If you're 36 or over, the advice is to be seen as soon as you "
-              "bring it up, with no waiting period first. Fertility doesn't "
-              'suddenly drop at 36. The reason is that tests and treatment '
+          // Age line: 35 and six months, as everywhere (2026-09-27). Kept
+          // for revert: "If you're 36 or over, the advice is to be seen as
+          // soon as you bring it up, with no waiting period first. Fertility
+          // doesn't suddenly drop at 36. …"
+          _en("If you're 35 or over, the usual advice is to be seen after six "
+              'months of trying rather than twelve, and sooner if you want to. '
+              "Fertility doesn't suddenly drop at 35. The reason is that tests "
+              'and treatment '
               "both take months, and a year spent waiting can't be won back."),
+          _en("If you're 40 or over, see someone as soon as you start trying. "
+              'A first visit can check how things stand while there is the '
+              'most time to act on it.'),
+          // ⚠️ THE INDIAN NOTE, A POPULATION FACT (2026-09-27). Large Indian
+          // studies find ovarian reserve (AMH) falls earlier in Indian women
+          // than in Caucasian women, about six years in one comparison. Said
+          // as a fact about a group and a question to ask, never as a
+          // prediction about her (ttc_clinical_review_test holds that line).
+          _en('Studies of Indian women have found that the egg reserve tends '
+              'to fall a few years earlier than in European women. It says '
+              'nothing about you on its own. But if you are in your early '
+              "thirties and planning, it's reasonable to ask your doctor about "
+              'an AMH blood test, which gives a picture of your egg reserve.'),
           _en("It helps to be clear about what the twelve months means. It's "
               'the point where tests become worth doing across a whole '
               "population. It isn't a diagnosis, it isn't a deadline, and "
@@ -304,18 +332,26 @@ final List<PvRead> kTtcReadsIvf = [
       body: _en("Book now if your cycles are irregular or missing. Book now if "
           "periods are very painful or very heavy, or if sex is painful. Book "
           "now if you've had pelvic surgery or a pelvic infection. Book now if "
-          'there have been two or more miscarriages, or if you\'re 36 or over. '
+          // Kept for revert (2026-09-27): '… or if you\'re 36 or over. '
+          "there have been two or more miscarriages, or if you're 40 or "
+          'over. Book after six months, not twelve, if you\'re 35 or over. '
           'Treat it as urgent (days, not weeks) if either of you is about to '
           'start cancer treatment, because saving fertility has to happen '
           'first.'),
     ),
 
-    evidence: _en('When to be referred follows the NICE fertility guidance: '
-        'after 12 months of regular sex without contraception for women under '
-        "36; as soon as you ask for women 36 or over, or where there's a known "
-        'or suspected cause or a history that makes one likely; and faster '
-        'still where planned treatment may cause infertility. Sources checked '
-        'August 2026.'),
+    // Kept for revert (2026-09-27): the NICE-only wording, "…for women under
+    // 36; as soon as you ask for women 36 or over…".
+    evidence: _en('When to be seen follows the ASRM and ACOG guidance used '
+        'across this app, and by the apps most women in India use: after 12 '
+        'months of regular sex without contraception under 35, after 6 months '
+        'at 35 and over, and straight away at 40 and over. NICE in the UK '
+        'suggests being seen as soon as you ask from 36. The earlier fall in '
+        'ovarian reserve among Indian women is from Indian AMH studies (J Hum '
+        'Reprod Sci 2022; Fertil Steril 2013). Sooner at any '
+        "age where there's a known or suspected cause or a history that makes "
+        'one likely, and faster still where planned treatment may cause '
+        'infertility. Sources checked August 2026.'),
 
     nextSteps: [
       PvReadNextStep(
@@ -1545,7 +1581,8 @@ final List<PvRead> kTtcReadsIvf = [
     whenToSeeSomeone: PvCallout(
       tone: PvCalloutTone.urgent,
       title: _en("Don't wait the full year if any of this applies"),
-      body: _en("Book before twelve months if you're 36 or over, if your "
+      // 35, as everywhere (2026-09-27); kept for revert: "…if you're 36 or over, …"
+      body: _en("Book before twelve months if you're 35 or over, if your "
           "cycles are irregular or missing, if you've had two or more "
           "miscarriages, if you've had pelvic surgery or a pelvic infection, or "
           'if either of you has been told about a condition that affects '

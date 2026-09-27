@@ -104,6 +104,27 @@ void main() {
       // 'read' would be skipped by the editor-owned ratchet.
       expect(tool, contains("kind: 'ttcread'"));
     });
+
+    // STILL-OPEN 79.12b (2026-09-27): a read's FAQ is its own document, so a
+    // question can be found by a question. It must open its read, and it must
+    // not also sit inside the read's body, or the same answer fills two of the
+    // six places the model reads.
+    test('each FAQ is exported on its own and opens its read', () {
+      final tool = File('tool/export_ttc_corpus.dart').readAsStringSync();
+      expect(tool, contains("docId: 'ttcfaq_\${r.id}_\$i'"));
+      expect(tool, contains("kind: 'ttcfaq'"));
+      final live = tool
+          .split('\n')
+          .where((l) => !l.trimLeft().startsWith('//'))
+          .join('\n');
+      expect(live, isNot(contains("for (final q in r.faqs) 'Q: ")),
+          reason: 'the FAQ would be in the read body and its own document');
+      expect(screen, contains("id.startsWith('ttcfaq_')"));
+      expect(screen, contains("rest.lastIndexOf('_')"),
+          reason: 'read ids hold underscores; the index is cut from the end');
+      // Some read has FAQs, or the export has nothing to split out.
+      expect(kTtcReads.any((r) => r.faqs.isNotEmpty), isTrue);
+    });
   });
 
   group('her hide-intimacy choice', () {

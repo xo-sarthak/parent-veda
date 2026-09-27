@@ -58,6 +58,8 @@ import '../../widgets/pv_placeholders.dart';
 import '../../widgets/pv_feedback.dart';
 import '../brackets/hub/hub_solution_cards.dart';
 import '../v2/v2_palette.dart';
+import '../v2/v3_bracket_art.dart' show V3BracketArt, bracketMarkFor;
+import '../../data/brackets/ttc_brackets.dart' show kTtcBrackets;
 
 /// The six colours a reading surface needs. Deliberately a small, closed set —
 /// a reading mode is not a theme and must not grow into one.
@@ -529,10 +531,15 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
                   // first paragraph under it, without its own rule, so the
                   // page does not open on two different treatments of the
                   // same idea.
-                  if (a.scaleSetter.of(_lang).trim().isNotEmpty) ...[
-                    _pad(_lede(s,
-                        ruled: (a.shortAnswer?.of(_lang).trim() ?? '')
-                            .isEmpty)),
+                  // ⚠️ AND NOT AT ALL UNDER A SHORT ANSWER (the user,
+                  // 2026-09-27): the lede restated the short answer in other
+                  // words, so she read the point twice before the article
+                  // began (three times with the standfirst). The short answer
+                  // is the one "answer first" block; a read without one keeps
+                  // its lede. Kept for revert: the lede drawn unruled here.
+                  if (a.scaleSetter.of(_lang).trim().isNotEmpty &&
+                      (a.shortAnswer?.of(_lang).trim() ?? '').isEmpty) ...[
+                    _pad(_lede(s, ruled: true)),
                     const SizedBox(height: 28),
                   ],
 
@@ -653,6 +660,49 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
 
   Widget _defaultHero(_Skin s) {
     final p = V2PaletteStore.instance.current;
+    // ⚠️ A TRYING-TO-CONCEIVE READ WEARS ITS DOOR (2026-09-27, the user: the
+    // grey band with a white book looked like a placeholder, which it was).
+    // Until a photograph is chosen, the frame is the door's own tint with the
+    // door's drawn mark, the same mark the home grid and the door show. Only
+    // reads whose kicker is a TTC door; every other read keeps the band below.
+    final door = [
+      for (final b in kTtcBrackets)
+        if (b.label.en == a.kicker.en) b
+    ].firstOrNull;
+    final doorMark = door == null ? null : bracketMarkFor(door.id);
+    if (door != null && doorMark != null) {
+      final tint = v2BlockTint(door.hue, p);
+      final url = readImageFor(a.id, own: a.imageUrl);
+      final art = DecoratedBox(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              tint,
+              HSLColor.fromColor(tint).withLightness(0.80).toColor(),
+            ],
+          ),
+        ),
+        child: Stack(children: [
+          Positioned(
+            right: 18,
+            top: 10,
+            bottom: 10,
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: V3BracketArt(mark: doorMark, tint: tint),
+            ),
+          ),
+        ]),
+      );
+      if (url == null || url.isEmpty) return art;
+      return Image.network(url,
+          fit: BoxFit.cover,
+          errorBuilder: (_, _, _) => art,
+          loadingBuilder: (context, child, progress) =>
+              progress == null ? child : art);
+    }
     final band = ColoredBox(
       color: v2BlockTint(SolutionType.read.hue, p),
       child: Stack(children: [
@@ -821,13 +871,13 @@ class _PvReaderScreenState extends State<PvReaderScreen> {
   Widget _shortAnswer(_Skin s) => Container(
         key: const ValueKey('pv_reader_short_answer'),
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(vertical: 14),
-        decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(color: s.rule),
-            bottom: BorderSide(color: s.rule),
-          ),
-        ),
+        // ⚠️ NO HAIRLINES (the user, 2026-09-27: "two lines above the short
+        // answer, for what reason?"). The byline's rule sits just above, so
+        // the top hairline made two stacked lines, and the bottom one a third.
+        // The eyebrow and the weight carry "this is the answer"; space does
+        // the separating. Kept for revert: vertical 14 padding and
+        // Border(top: s.rule, bottom: s.rule).
+        padding: const EdgeInsets.only(top: 2, bottom: 4),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

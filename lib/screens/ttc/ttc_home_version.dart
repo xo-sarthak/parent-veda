@@ -23,6 +23,8 @@ import '../../theme/app_theme.dart';
 import 'ttc_common.dart';
 import 'ttc_home_v3.dart';
 import 'ttc_intro_flow.dart';
+import 'ttc_partner_screen.dart' show TtcPartnerTodayScreen;
+import 'ttc_strings.dart' show TtcPartnerMode;
 import 'ttc_today_screen.dart';
 
 enum TtcHomeVersion {
@@ -106,8 +108,17 @@ class _TtcHomeBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ListenableBuilder(
-        listenable: TtcHomeVersionStore.instance,
+        // ⚠️ HIS SIDE ON V3 TOO (TTC launch walk, 2026-09-27). Only V1's
+        // Today checked `TtcPartnerMode`, so on V3, the home that ships, he
+        // saw her home: her symptoms, her Sex log, her doors. His Today is
+        // his whichever version is on. Kept for revert: listenable was
+        // TtcHomeVersionStore alone and the switch had no partner branch.
+        listenable: Listenable.merge(
+            [TtcHomeVersionStore.instance, TtcPartnerMode.instance]),
         builder: (context, _) => Stack(children: [
+          if (TtcPartnerMode.instance.on)
+            const TtcPartnerTodayScreen()
+          else
           switch (TtcHomeVersionStore.instance.version) {
             TtcHomeVersion.v1 => const TtcTodayScreen(),
             TtcHomeVersion.v3 => const TtcHomeV3(),

@@ -46,12 +46,19 @@ import 'cycle_store.dart';
 import 'ttc_store.dart';
 
 /// Sperm survive about five days; the egg about one. The window is the five
-/// days before ovulation, ovulation itself, and the day after.
+/// days before ovulation and ovulation itself: SIX DAYS ENDING ON OVULATION
+/// (ASRM), the user's decision of 2026-09-26.
+///
+/// ⚠️ IT WAS SEVEN (the day after too) until the launch walk of 2026-09-27
+/// found the app saying both: every read and the window screen's words said
+/// six days, while the home hero ("today and 6 more days") and the Companion
+/// ("Fertile days · 7 days") counted seven from this constant. Kept for revert:
+/// `const int ttcWindowClosesAfterOvulation = 1;`
 ///
 /// These two live here rather than in each screen because they were already
 /// duplicated in `ttc_cycle_screens.dart` and about to be duplicated again.
 const int ttcWindowOpensBeforeOvulation = 5;
-const int ttcWindowClosesAfterOvulation = 1;
+const int ttcWindowClosesAfterOvulation = 0;
 
 /// A fertile window, resolved to real dates.
 ///

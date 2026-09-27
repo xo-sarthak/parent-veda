@@ -117,8 +117,11 @@ void main() {
       expect(ttcV3ActiveFor('ttc/consults', 0), 3,
           reason: 'the consults are a Tools tile now');
       expect(ttcV3ActiveFor(kTtcYouRoute, 0), 4);
-      // More's old rows live under You.
-      expect(ttcV3ActiveFor('ttc/calendar', 3), 4);
+      // More's old rows live under You; the calendar is Today's since the
+      // launch walk (its front door is the home header). Was 4.
+      expect(ttcV3ActiveFor('ttc/calendar', 3), 0);
+      expect(ttcV3ActiveFor('ttc_calendar', 3), 0);
+      expect(ttcV3ActiveFor('ttc/journal', 3), 4);
       // V1's Tools index still lands on Tools.
       expect(ttcV3ActiveFor('ttc/something', 2), 3);
     });
@@ -221,7 +224,7 @@ void main() {
         'Notes for your doctor',
         'Calendar',
         'Cycle companion',
-        'Fertility window',
+        'Fertile window',
         'All programmes and sessions',
       ]) {
         expect(titles, contains(row), reason: '"$row" lost its entrance');
@@ -246,13 +249,25 @@ void main() {
         ),
         height: 9000,
       );
+      // ⚠️ SHORT AND GROUPED (2026-09-27): Calendar, the cycle companion
+      // and the fertile window left You (they live on Today and Tools), and
+      // the programmes row is "Programmes and sessions". Kept for revert:
+      //   'Calendar', 'Cycle companion', 'Fertile window',
+      //   'All programmes and sessions'
       for (final row in [
-        'Calendar',
-        'Cycle companion',
-        'Fertility window',
-        'All programmes and sessions',
+        'Notes for your doctor',
+        'Records and reports',
+        'Treatment',
+        'Your answers',
+        'Messages',
+        'What you see',
+        'Programmes and sessions',
+        'Bookings',
       ]) {
         expect(find.text(row), findsWidgets, reason: row);
+      }
+      for (final gone in ['Calendar', 'Cycle companion', 'Fertile window']) {
+        expect(find.text(gone), findsNothing, reason: '$gone lives on Today and Tools');
       }
       expect(find.byType(TtcBottomNav), findsOneWidget);
       expect(find.byIcon(Icons.arrow_back_rounded), findsNothing,
@@ -294,7 +309,8 @@ void main() {
         (tester) async {
       await pumpTall(tester, const TtcToolsScreen());
       expect(find.text('GOOD PLACES TO START'), findsOneWidget);
-      await TtcToolRecents.instance.touch('mood');
+      // 'mood' left the hub on 2026-09-27 (folded into 'symptoms').
+      await TtcToolRecents.instance.touch('symptoms');
       await tester.pump();
       expect(find.text('RECENTLY USED'), findsOneWidget);
     });

@@ -269,7 +269,7 @@ final List<PvRead> kTtcReadsHisSide = [
           'puberty, chemotherapy or radiotherapy, a swelling you can see in '
           'the scrotum, or trouble with erections or ejaculation. Treat it '
           "as urgent, this week, if there's a new lump, or pain and swelling "
-          'in one testis. Both need checking for reasons that have nothing '
+          'in one testis.\n\nBoth need checking for reasons that have nothing '
           'to do with fertility.'),
     ),
 

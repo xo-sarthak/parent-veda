@@ -56,7 +56,9 @@
 
 import 'package:flutter/material.dart' show Icons;
 
-import '../../data/hubs/ttc_hubs.dart' show kTtcActConsult;
+// Unused since the consult tiles name their offering (2026-09-27,
+// relevance audit). Kept for revert:
+// import '../../data/hubs/ttc_hubs.dart' show kTtcActConsult;
 import '../ttc_focus_data.dart';
 
 // =============================================================================
@@ -99,34 +101,34 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
   // it is where the section ends.
   groups: [
     TtcFocusGroup(
-        id: 'diet', mark: IntentMark.plate,
+        id: 'diet', mark: IntentMark.plate, tabMark: TtcTabMark.jarLeaf,
         label: 'Diet and supplements',
         icon: Icons.restaurant_outlined,
         hue: 104),
     // Added 2026-09-26 (gap plan, P1): the Indian meal plan, beside Diet
     // because it is Diet made practical. Six tabs; Your checklist stays last.
     TtcFocusGroup(
-        id: 'meals', mark: IntentMark.cookMark,
+        id: 'meals', mark: IntentMark.cookMark, tabMark: TtcTabMark.bowl,
         label: 'Meal plan',
         icon: Icons.soup_kitchen_outlined,
         hue: 26),
     TtcFocusGroup(
-        id: 'tests', mark: IntentMark.reportPage,
+        id: 'tests', mark: IntentMark.reportPage, tabMark: TtcTabMark.vialReport,
         label: 'Tests and vaccines',
         icon: Icons.biotech_outlined,
         hue: 206),
     TtcFocusGroup(
-        id: 'habits', mark: IntentMark.stepsMark,
+        id: 'habits', mark: IntentMark.stepsMark, tabMark: TtcTabMark.scale,
         label: 'Weight and habits',
         icon: Icons.self_improvement_outlined,
         hue: 42),
     TtcFocusGroup(
-        id: 'before', mark: IntentMark.nextStep,
+        id: 'before', mark: IntentMark.nextStep, tabMark: TtcTabMark.flagPath,
         label: 'Before you start',
         icon: Icons.event_note_outlined,
         hue: 344),
     TtcFocusGroup(
-        id: 'checklist', mark: IntentMark.checkMark,
+        id: 'checklist', mark: IntentMark.checkMark, tabMark: TtcTabMark.checklist,
         label: 'Your checklist',
         icon: Icons.checklist_rtl_rounded,
         hue: 160),
@@ -154,11 +156,24 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         // the first tile of the first tab of a door about preparation, and it
         // is the first chance in this area to say that preparation is not her
         // job alone.
+        // ⚠️ THE EATING ANSWER, NOT THE WHOLE READ (2026-09-27, relevance
+        // audit). "The three months before" opened folic acid, weight,
+        // cutting, the partner and money under a question about eating. It
+        // moved to "Before you start", where the whole read is the answer,
+        // and this tile opens the same read at its eating section, with the
+        // same words the fertile-window door uses for it.
+        // Kept for revert (2026-09-27, relevance audit):
+        // TtcArticleTile(
+        //   title: 'The three months before',
+        //   blurb: "What's worth changing in the months before you start, and "
+        //       "why it's for both of you, not just you.",
+        //   readId: 'ttc_read_three_months_before',
+        // ),
         TtcArticleTile(
-          title: 'The three months before',
-          blurb: "What's worth changing in the months before you start, and "
-              "why it's for both of you, not just you.",
+          title: 'What to eat and avoid',
+          blurb: 'Ordinary food. No special fertility diet.',
           readId: 'ttc_read_three_months_before',
+          atHeading: 'What should I eat?',
         ),
         // ⚠️ A FILM WAS HERE AND THE BRIEF NEVER ASKED FOR ONE — removed
         // 2026-09-03.
@@ -179,18 +194,24 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         // above says why the three months matter; this says what to cook on
         // Thursday. Filing the planner as an article was the mistake the
         // journey's own note records.
-        TtcToolTile(
-          title: 'Eating, day to day',
-          blurb: 'A week of real meals from an Indian kitchen, and what each '
-              'one does for you.',
-          surfaceId: 'ttc_nutrition',
-        ),
-        TtcArticleTile(
-          title: 'What to cut before trying',
-          blurb: 'Three things worth changing, and a longer list you can stop '
-              'feeling guilty about.',
-          readId: 'ttc_read_what_to_cut',
-        ),
+        // ⚠️ OFF THIS TAB (2026-09-27, relevance audit). The Meal plan tab
+        // next door opens the same tool as "Plan your own week", and owns it.
+        // Kept for revert (2026-09-27, relevance audit):
+        // TtcToolTile(
+        //   title: 'Eating, day to day',
+        //   blurb: 'A week of real meals from an Indian kitchen, and what each '
+        //       'one does for you.',
+        //   surfaceId: 'ttc_nutrition',
+        // ),
+        // ⚠️ MOVED TO "Everyday habits" (2026-09-27, relevance audit):
+        // tobacco, alcohol and caffeine are habits, not eating.
+        // Kept for revert (2026-09-27, relevance audit):
+        // TtcArticleTile(
+        //   title: 'What to cut before trying',
+        //   blurb: 'Three things worth changing, and a longer list you can stop '
+        //       'feeling guilty about.',
+        //   readId: 'ttc_read_what_to_cut',
+        // ),
       ],
     ),
 
@@ -270,6 +291,8 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
     //  "Eating, day to day" opens the same surface; one tool, two doors in,
     //  the way His side and IVF share the records folder. The brief test holds
     //  every title to one tile, so this one says what she does here: plan.
+  //  2026-09-27 (relevance audit): Diet's copy is commented out, so this tab
+  //  is now the one way in from this door.
     TtcFocusSection(
       heading: 'What can we cook this week?',
       group: 'meals',
@@ -434,6 +457,14 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
               'report card: no streaks and no score.',
           surfaceId: 'ttc_habits',
         ),
+        // Moved here from "Eating before you try" (2026-09-27, relevance
+        // audit).
+        TtcArticleTile(
+          title: 'What to cut before trying',
+          blurb: 'Three things worth changing, and a longer list you can stop '
+              'feeling guilty about.',
+          readId: 'ttc_read_what_to_cut',
+        ),
         // ⚠️ A STRESS ARTICLE WAS HERE, AND IT MISREAD THE BRIEF.
         //
         // Step 5c says the "Track what you're working on" **stress piece**
@@ -451,6 +482,15 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
       heading: 'Before you start',
       group: 'before',
       tiles: [
+        // Moved here from "Eating before you try" (2026-09-27, relevance
+        // audit). The whole read is the answer to "before you start", and it
+        // still says, early, that this is for both of you.
+        TtcArticleTile(
+          title: 'The three months before',
+          blurb: "What's worth changing in the months before you start, and "
+              "why it's for both of you, not just you.",
+          readId: 'ttc_read_three_months_before',
+        ),
         TtcArticleTile(
           title: 'Coming off birth control',
           blurb: 'What comes back quickly, what really takes months, and why '
@@ -526,11 +566,28 @@ const TtcFocusPage kTtcGettingReadyFocus = TtcFocusPage(
         // door about preparation should end by handing you to somebody who can
         // answer what a page cannot, and it is one tile rather than repeated
         // down the page.
+        // ⚠️ TWO PEOPLE, EACH OPENED BY NAME (2026-09-27, relevance audit).
+        // The consults shelf has no nutritionist, so "a doctor or a
+        // nutritionist" opened a shelf with half the promise on it. The
+        // gynaecologist offering names the check-up before trying; the
+        // nutritionist has a tile of their own.
+        // Kept for revert (2026-09-27, relevance audit):
+        // TtcTalkTile(
+        //   title: 'Talk to someone before you start',
+        //   blurb: 'A doctor or a nutritionist who helps before pregnancy, for '
+        //       'the questions that are yours.',
+        //   action: kTtcActConsult,
+        // ),
         TtcTalkTile(
           title: 'Talk to someone before you start',
-          blurb: 'A doctor or a nutritionist who helps before pregnancy, for '
-              'the questions that are yours.',
-          action: kTtcActConsult,
+          blurb: 'A gynaecologist who sees people before pregnancy, for the '
+              'questions that are yours.',
+          action: 'ttc_consult_gynae',
+        ),
+        TtcTalkTile(
+          title: 'Talk to a nutritionist',
+          blurb: 'A food plan for both of you, from what you already cook.',
+          action: 'ttc_nutrition_consult',
         ),
       ],
     ),

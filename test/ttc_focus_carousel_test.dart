@@ -129,7 +129,9 @@ TtcFocusPage fiveCardConceiving() {
   const tabOf = {
     'When should we have sex?': 'window',
     'How many times should we try?': 'trying',
-    'Which sex position is best?': 'trying',
+    // Retitled 2026-09-27 (relevance audit). Kept for revert:
+    // 'Which sex position is best?': 'trying',
+    'Positions, lying down and other myths': 'trying',
     'Does stress stop pregnancy?': 'trying',
     'What he should do': 'his',
     'What you should do': 'hers',

@@ -23,6 +23,8 @@
 //  to a pregnant mother).
 // =============================================================================
 
+import 'dart:ui' show ImageFilter;
+
 import 'package:flutter/material.dart';
 
 import '../../../localization/app_language.dart';
@@ -34,6 +36,7 @@ import '../../../widgets/pv_feedback.dart';
 import '../../../services/bracket_resolver.dart' show bracketById;
 import '../../../services/ttc_search_store.dart';
 import '../../../ttc/ttc_content_prefs.dart';
+import '../../doors/pv_live_search.dart' show PvLiveSearch;
 import '../../v2/v2_palette.dart';
 import '../ttc_focus_screen.dart'
     show iconForFormat, openTtcFocusTile, openTtcArticle;
@@ -290,6 +293,117 @@ class TtcDoorHitRow extends StatelessWidget {
           ),
         ),
       ),
+    );
+  }
+}
+
+// =============================================================================
+//  TtcDoorGlassSearchField — the door's field, as glass on the photograph
+// -----------------------------------------------------------------------------
+//  The user, walking build 13 (2026-09-27): the white search bar was "too
+//  wide/loud on the photo, maybe a little transparent". A solid white stadium
+//  48 high is the brightest object in the hero, brighter than the headline.
+//
+//  So on a photograph the field is glass: the photo blurred behind it, white
+//  at low opacity over that, a hairline of white, white type and icon, 44
+//  high. It still reads as a search field (the stadium, the magnifier and the
+//  "Search ..." hint are all there) and it keeps every behaviour, because it
+//  is the same `PvLiveSearch` controller, focus node and `fieldKey` the shared
+//  `PvLiveSearchField` uses: focus still rides it to the top, typing still
+//  fills the sheet, Back still releases it twice.
+//
+//  ⚠️ A TTC COPY, NOT AN EDIT TO `PvLiveSearchField`. The pregnancy doors
+//  use that field and are signed off. Where a TTC door has no photograph
+//  the door falls back to the shared solid field, because white type on the
+//  pale tinted field would not read.
+//
+//  Mobbin: Slopes' "Explore" search, a frosted stadium over a map, is the
+//  shape (https://mobbin.com/screens/12227f99-6404-4736-8d64-4ef2474e6bad).
+// =============================================================================
+
+class TtcDoorGlassSearchField extends StatelessWidget {
+  const TtcDoorGlassSearchField({
+    super.key,
+    required this.search,
+    required this.hint,
+    this.onSubmitted,
+  });
+
+  final PvLiveSearch search;
+  final String hint;
+  final ValueChanged<String>? onSubmitted;
+
+  static const double height = 44;
+
+  @override
+  Widget build(BuildContext context) {
+    final soft = Colors.white.withValues(alpha: 0.82);
+    return Row(
+      key: search.fieldKey,
+      children: [
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 14, sigmaY: 14),
+              child: Container(
+                height: height,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.18),
+                  borderRadius: BorderRadius.circular(999),
+                  border: Border.all(
+                    color: Colors.white.withValues(alpha: 0.38),
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    const SizedBox(width: 14),
+                    Icon(Icons.search_rounded, size: 18, color: soft),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: TextField(
+                        controller: search.ctl,
+                        focusNode: search.focus,
+                        textInputAction: TextInputAction.search,
+                        onSubmitted: onSubmitted,
+                        style: pvManrope(fontSize: 14.5, color: Colors.white),
+                        cursorColor: Colors.white,
+                        // Every border off, as the shared field learnt: the
+                        // theme's decoration draws a box inside the stadium.
+                        decoration: InputDecoration(
+                          isDense: true,
+                          hintText: hint,
+                          hintStyle: pvManrope(fontSize: 14.5, color: soft),
+                          border: InputBorder.none,
+                          enabledBorder: InputBorder.none,
+                          focusedBorder: InputBorder.none,
+                          disabledBorder: InputBorder.none,
+                          errorBorder: InputBorder.none,
+                          focusedErrorBorder: InputBorder.none,
+                          filled: false,
+                          contentPadding: EdgeInsets.zero,
+                        ),
+                      ),
+                    ),
+                    if (search.searching)
+                      IconButton(
+                        tooltip: 'Clear',
+                        onPressed: () {
+                          pvCommitFeedback();
+                          search.ctl.clear();
+                        },
+                        icon: Icon(Icons.close_rounded, size: 18, color: soft),
+                        visualDensity: VisualDensity.compact,
+                      )
+                    else
+                      const SizedBox(width: 14),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

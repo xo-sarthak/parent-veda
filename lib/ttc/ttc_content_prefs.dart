@@ -22,8 +22,29 @@ class TtcContentPrefs extends ChangeNotifier {
 
   static const String _kHideIntimate = 'ttc_hide_intimate';
 
+  /// Whether the switch has been offered once on the Sex and closeness tab
+  /// (2026-09-27). The offer is made one time only, and never again whatever
+  /// she answered: asking twice would be a nag.
+  static const String _kIntimateOffered = 'ttc_hide_intimate_offered';
+
   bool _loaded = false;
   bool _hideIntimate = false;
+  bool _intimateOffered = false;
+
+  /// True once the one-time offer has been shown.
+  bool get intimateOffered => _intimateOffered;
+
+  /// Records that the offer was shown, before she answers it, so closing
+  /// the sheet any way at all still counts as asked.
+  Future<void> markIntimateOffered() async {
+    if (_intimateOffered) return;
+    _intimateOffered = true;
+    notifyListeners();
+    try {
+      final p = await SharedPreferences.getInstance();
+      await p.setBool(_kIntimateOffered, true);
+    } catch (_) {/* best effort */}
+  }
 
   /// Whether sex and intimacy content is hidden. False until she chooses.
   bool get hideIntimate => _hideIntimate;
@@ -33,6 +54,7 @@ class TtcContentPrefs extends ChangeNotifier {
     try {
       final p = await SharedPreferences.getInstance();
       _hideIntimate = p.getBool(_kHideIntimate) ?? false;
+      _intimateOffered = p.getBool(_kIntimateOffered) ?? false;
     } catch (_) {/* keep the default */}
     _loaded = true;
     notifyListeners();
@@ -52,6 +74,7 @@ class TtcContentPrefs extends ChangeNotifier {
   void resetForTest() {
     _loaded = false;
     _hideIntimate = false;
+    _intimateOffered = false;
   }
 }
 

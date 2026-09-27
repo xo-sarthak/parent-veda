@@ -150,13 +150,18 @@ class TtcMindTodayBody extends StatelessWidget {
             const SizedBox(height: 18),
           ],
 
-          _inset(_label("TODAY'S MOVEMENT", p)),
-          const SizedBox(height: 10),
+          // Sentence case (tools pass, 2026-09-27). Kept for revert:
+          //   "TODAY'S MOVEMENT", "TODAY'S BREATH OR CALM",
+          //   'AND ONE THING TOGETHER', 'AND TWO SMALL THINGS'
+          _inset(_label("Today's movement", p)),
+          // 12 under a heading, the door's rhythm (2026-09-27; was 10).
+          const SizedBox(height: 12),
           _inset(_PracticeBlock(practice: move, hue: kTtcMoveHue, p: p)),
 
-          const SizedBox(height: 22),
-          _inset(_label("TODAY'S BREATH OR CALM", p)),
-          const SizedBox(height: 10),
+          // 24, the door's gap between blocks (2026-09-27; was 22).
+          const SizedBox(height: 24),
+          _inset(_label("Today's breathing", p)),
+          const SizedBox(height: 12),
           _inset(
               _PracticeBlock(practice: breathe, hue: kTtcBreatheHue, p: p)),
 
@@ -164,14 +169,21 @@ class TtcMindTodayBody extends StatelessWidget {
           // It is not a third practice and does not get a block — it is a line
           // she chose to be reminded of, and the brief offers "or neither".
           if (TtcGarbhCourseStore.instance.couple case final part?) ...[
-            const SizedBox(height: 22),
-            _inset(_label('AND ONE THING TOGETHER', p)),
-            const SizedBox(height: 10),
+            const SizedBox(height: 24),
+            _inset(_label('One thing together', p)),
+            const SizedBox(height: 12),
             _inset(_CouplePart(part: part, p: p)),
           ],
 
           const SizedBox(height: 24),
-          _inset(_label('AND TWO SMALL THINGS', p)),
+          _inset(_label('Two small things', p)),
+          // 6 under a serif heading before its one-line intro (was 4).
+          const SizedBox(height: 6),
+          // Why these two are here, in one line (tools pass, 2026-09-27).
+          _inset(Text(
+              'Two small habits that make the rest easier. Tick them when '
+              "they're done.",
+              style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2))),
           const SizedBox(height: 10),
 
           // ⚠️ TICKS, NOT TIMED SESSIONS — the brief is explicit. Both write
@@ -202,12 +214,24 @@ class TtcMindTodayBody extends StatelessWidget {
     );
   }
 
+  // Sentence-case labels read at 14 with no tracking (2026-09-27); the old
+  // style was 10.5 with 1.4 letter spacing, for capitals.
+  //
+  // ⚠️ THE DOOR'S ONE HEADING STYLE (door pass, 2026-09-27). Inside the Mind
+  // & body door this panel is a tab like any other, and a small bold sans
+  // heading here beside the serif headings on every other tab read as a
+  // random font (the user: "maintain consistency ... don't add random
+  // fonts"). The same numbers as `ttcDoorHeadingStyle` in
+  // doors/ttc_door_screen.dart, copied rather than imported so a tool body
+  // does not import the door that renders it. Kept for revert:
+  //   pvManrope(fontSize: 14, fontWeight: FontWeight.w800, color: p.ink1)
   static Widget _label(String s, V2Palette p) => Text(s,
-      style: pvManrope(
-          fontSize: 10.5,
-          fontWeight: FontWeight.w800,
-          letterSpacing: 1.4,
-          color: p.ink3));
+      style: pvFraunces(
+          fontSize: 21,
+          fontWeight: FontWeight.w600,
+          height: 1.2,
+          letterSpacing: -0.45,
+          color: p.ink1));
 }
 
 // =============================================================================
@@ -271,9 +295,10 @@ class _PracticeBlock extends StatelessWidget {
                 children: [
                   Row(children: [
                     _Chip(
+                        // Kept for revert (2026-09-27): 'MOVE' / 'BREATHE'.
                         label: practice.kind == TtcPracticeKind.move
-                            ? 'MOVE'
-                            : 'BREATHE',
+                            ? 'Move'
+                            : 'Breathe',
                         icon: practice.kind == TtcPracticeKind.move
                             ? Icons.self_improvement_rounded
                             : Icons.air_rounded,
@@ -287,15 +312,19 @@ class _PracticeBlock extends StatelessWidget {
                     // happened.
                     if (done)
                       _Chip(
-                          label: 'DONE TODAY',
+                          label: 'Done today',
                           icon: Icons.check_rounded,
                           fg: Colors.white,
                           bg: deep.withValues(alpha: 0.92)),
                   ]),
                   const SizedBox(height: 14),
+                  // 18, under the 21 of the heading above it now that the
+                  // heading is serif too (2026-09-27): a card title the same
+                  // size as its section heading flattens the hierarchy.
+                  // Kept for revert: 21.
                   Text(practice.title,
                       style: pvFraunces(
-                          fontSize: 21,
+                          fontSize: 18,
                           fontWeight: FontWeight.w600,
                           height: 1.18,
                           letterSpacing: -0.4,
@@ -350,6 +379,18 @@ class _PracticeBlock extends StatelessWidget {
                     const SizedBox(width: 5),
                     Icon(Icons.arrow_forward_rounded, size: 15, color: p.ink1),
                   ]),
+                  // ⚠️ WHAT "START" LEADS TO, SAID BEFORE THE TAP (tools pass,
+                  // 2026-09-27). She had to go in to find out it is a guided
+                  // page, and that the "Done today" chip comes from a button
+                  // at its end.
+                  if (!done) ...[
+                    const SizedBox(height: 4),
+                    Text(
+                        'Opens the steps and a timer. Tap "Mark done today" '
+                        'at the end.',
+                        style: pvManrope(
+                            fontSize: 12, height: 1.45, color: p.ink2)),
+                  ],
                 ]),
           ),
         ]),
@@ -380,10 +421,7 @@ class _Chip extends StatelessWidget {
           const SizedBox(width: 5),
           Text(label,
               style: pvManrope(
-                  fontSize: 9.5,
-                  fontWeight: FontWeight.w800,
-                  letterSpacing: 0.9,
-                  color: fg)),
+                  fontSize: 11.5, fontWeight: FontWeight.w800, color: fg)),
         ]),
       );
 }
@@ -410,7 +448,12 @@ class _YourPracticeStrip extends StatelessWidget {
             child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('The practice you built in session eight.',
+                  // Kept for revert (2026-09-27): 'The practice you built in
+                  // session eight.' Someone who came from a link does not know
+                  // what session eight is.
+                  Text(
+                      'You picked this practice in the free preconception '
+                      'course.',
                       style: pvManrope(
                           fontSize: 12.5, height: 1.5, color: p.ink2)),
                   const SizedBox(height: 6),
@@ -421,7 +464,7 @@ class _YourPracticeStrip extends StatelessWidget {
                   GestureDetector(
                     onTap: TtcGarbhCourseStore.instance.clearDailyPractice,
                     behavior: HitTestBehavior.opaque,
-                    child: Text('Go back to a different card each day',
+                    child: Text('Show a different practice each day instead',
                         style: pvManrope(
                             fontSize: 12.5,
                             fontWeight: FontWeight.w800,
@@ -504,6 +547,12 @@ class _TickPanel extends StatelessWidget {
           field: kTtcBedtimeField,
           label: bed == null ? 'In bed by about eleven' : 'In bed by about $bed',
           blurb: "Roughly is fine. You don't have to be strict about it.",
+          // ⚠️ THE TIME IS CHANGEABLE HERE (tools pass, 2026-09-27). It could
+          // only be set in session 5 of the course, which most people never
+          // open, so "eleven" read as a rule she was already failing. The
+          // same store field the course writes, so both stay in step.
+          action: bed == null ? 'Pick your own time' : 'Change time',
+          onAction: () => _pickBedtime(context, bed),
         ),
         Divider(height: 1, thickness: 1, color: p.line, indent: 15, endIndent: 15),
         _Tick(
@@ -520,17 +569,40 @@ class _TickPanel extends StatelessWidget {
   }
 }
 
+/// Opens a clock at her bedtime (or eleven) and saves only what she picks. A
+/// cancelled clock changes nothing.
+Future<void> _pickBedtime(BuildContext context, String? current) async {
+  TimeOfDay start = const TimeOfDay(hour: 23, minute: 0);
+  final parts = (current ?? '').split(':');
+  if (parts.length == 2) {
+    final h = int.tryParse(parts[0]);
+    final m = int.tryParse(parts[1]);
+    if (h != null && m != null) start = TimeOfDay(hour: h, minute: m);
+  }
+  final t = await showTimePicker(context: context, initialTime: start);
+  if (t == null) return;
+  TtcGarbhCourseStore.instance.setTimes(
+      bed: '${t.hour.toString().padLeft(2, '0')}:'
+          '${t.minute.toString().padLeft(2, '0')}');
+}
+
 class _Tick extends StatelessWidget {
   const _Tick(
       {required this.p,
       required this.field,
       required this.label,
-      required this.blurb});
+      required this.blurb,
+      this.action,
+      this.onAction});
 
   final V2Palette p;
   final String field;
   final String label;
   final String blurb;
+
+  /// An optional small link under the blurb (the bedtime's "Change time").
+  final String? action;
+  final VoidCallback? onAction;
 
   @override
   Widget build(BuildContext context) {
@@ -570,6 +642,19 @@ class _Tick extends StatelessWidget {
                   Text(blurb,
                       style: pvManrope(
                           fontSize: 12.5, height: 1.5, color: p.ink3)),
+                  if (action != null && onAction != null)
+                    GestureDetector(
+                      onTap: onAction,
+                      behavior: HitTestBehavior.opaque,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 6, bottom: 2),
+                        child: Text(action!,
+                            style: pvManrope(
+                                fontSize: 12.5,
+                                fontWeight: FontWeight.w800,
+                                color: p.action)),
+                      ),
+                    ),
                 ]),
           ),
         ]),

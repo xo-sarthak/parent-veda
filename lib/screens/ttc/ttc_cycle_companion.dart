@@ -54,7 +54,9 @@ import 'ttc_common.dart';
 import 'ttc_cycle_report_screen.dart';
 import 'ttc_cycle_report_v3.dart';
 import 'ttc_home_gap.dart' show showTtcPeriodCameNudge;
-import 'ttc_phase_colours.dart';
+import '../products/pv_store_chrome.dart' show pvSnack;
+import 'ttc_cycle_palette.dart';
+// Kept for revert (2026-09-27): import 'ttc_phase_colours.dart';
 import 'ttc_strings.dart';
 
 /// Which of the four the screen is in.
@@ -107,19 +109,34 @@ class _TtcCycleCompanionScreenState extends State<TtcCycleCompanionScreen> {
             screen = TtcCompanionState.healthy;
           }
 
+          // ⚠️ THE FIELD WEARS THE PART SHE IS IN, FROM THE ONE PALETTE
+          // (2026-09-27): rose in her period, violet in her fertile days, a
+          // near-grey otherwise. It was always violet-magenta (288), which on
+          // a page of cycle colours read as one more colour with no meaning.
+          // Kept for revert: accent: v2BlockTint(kTtcCompanionHue, p),
+          // chroma: v3FieldChroma(kTtcCompanionHue).
+          final herePhase = screen == TtcCompanionState.healthy
+              ? spans
+                  .where((s) => s.status == TtcSpanStatus.here)
+                  .firstOrNull
+                  ?.phase
+              : null;
+          final heroHue = TtcCycleColours.heroHue(herePhase);
+
           return Scaffold(
             backgroundColor: p.ground,
             body: Stack(children: [
               Positioned.fill(
                 child: V3HeroField(
-                  accent: v2BlockTint(kTtcCompanionHue, p),
+                  accent: v2BlockTint(heroHue, p),
                   ground: p.ground,
                   variant: switch (screen) {
                     TtcCompanionState.healthy => 2,
                     TtcCompanionState.empty => 4,
                     _ => 1,
                   },
-                  chroma: v3FieldChroma(kTtcCompanionHue),
+                  chroma: v3FieldChroma(heroHue) *
+                      TtcCycleColours.heroChromaScale(herePhase),
                 ),
               ),
               ListView(
@@ -164,25 +181,34 @@ class _Hero extends StatelessWidget {
     final today = TtcStore.instance.today;
     final here = spans.where((s) => s.status == TtcSpanStatus.here).firstOrNull;
 
+    // ⚠️ THE LINE SAYS WHAT THIS PAGE IS (tools pass, 2026-09-27). It was a
+    // motto ("here to understand, not to predict", "at your own pace") and
+    // never said that this is where her period dates live. Kept for revert:
+    //   empty: 'Get to know your own pattern, at your own pace.'
+    //   clinicHeld: 'Your clinic is guiding this cycle.'
+    //   noEstimate: "No estimate this month. That's on purpose."
+    //   healthy: '<first> to <last> · here to understand, not to predict'
     final (String title, String line) = switch (screen) {
       TtcCompanionState.empty => (
           'One date to start',
-          'Get to know your own pattern, at your own pace.',
+          'This is where your period dates live. Add the day your last '
+              "period started and we'll count your cycle from there.",
         ),
       TtcCompanionState.clinicHeld => (
           today.cycleDay == null ? 'Your cycle' : 'Cycle day ${today.cycleDay}',
-          'Your clinic is guiding this cycle.',
+          'Your period dates. Your clinic is guiding this cycle.',
         ),
       TtcCompanionState.noEstimate => (
           today.cycleDay == null ? 'Your cycle' : 'Cycle day ${today.cycleDay}',
-          "No estimate this month. That's on purpose.",
+          "Your period dates. We can't place your fertile days this month, "
+              'and below is why.',
         ),
       TtcCompanionState.healthy => (
           here?.phase.label ?? 'Your cycle',
           here == null
-              ? 'Here to understand, not to predict.'
-              : '${ttcShortDate(here.firstDay)} to ${ttcShortDate(here.lastDay)}'
-                  ' · here to understand, not to predict',
+              ? 'Your period dates, and where you are in your cycle.'
+              : 'Where you are now, until ${ttcShortDate(here.lastDay)}. '
+                  'Your period dates are below.',
         ),
     };
 
@@ -198,7 +224,9 @@ class _Hero extends StatelessWidget {
               _BackArrow(p: p),
               const SizedBox(width: 10),
               Expanded(
-                child: Text('Cycle Companion',
+                // One name with the Tools tile (2026-09-27). Kept for revert:
+                // 'Cycle Companion'.
+                child: Text('Cycle companion',
                     style: pvManrope(
                         fontSize: 14,
                         fontWeight: FontWeight.w700,
@@ -211,8 +239,12 @@ class _Hero extends StatelessWidget {
               // beside the title is the compromise the stage already uses — it
               // is there for the woman who counts, and ignorable by the one who
               // does not.
+              // Only where the big title is not already the cycle day
+              // (2026-09-27): "Cycle day 12" twice, a line apart, read as
+              // two different things. Kept for revert:
+              //   screen != TtcCompanionState.empty
               if (today.cycleDay != null &&
-                  screen != TtcCompanionState.empty) ...[
+                  screen == TtcCompanionState.healthy) ...[
                 const SizedBox(width: 10),
                 _SpineChip(p: p, label: 'Cycle day ${today.cycleDay}'),
               ],
@@ -385,8 +417,11 @@ class _CompanionSheet extends StatelessWidget {
   // ---------------------------------------------------------------------------
   //  Empty
   // ---------------------------------------------------------------------------
+  // ⚠️ `TtcCycleCard`, NOT `TtcCard`, ON EVERY CARD HERE (2026-09-27): the
+  // V1 card's violet drop shadow was the old look; the base UI is a hairline.
+  // Kept for revert: TtcCard( at the four call sites.
   List<Widget> _empty(BuildContext context) => [
-        TtcCard(
+        TtcCycleCard(
           child: Column(children: [
             Text('Your rhythm starts with one date',
                 textAlign: TextAlign.center,
@@ -418,7 +453,9 @@ class _CompanionSheet extends StatelessWidget {
         _Fact(
             p: p,
             label: 'After three',
-            value: 'The spread, and a picture of the whole cycle'),
+            // Kept for revert: 'The spread, and a picture of the whole cycle'.
+            value: 'How much your cycles vary, and a picture of the whole '
+                'cycle'),
         const SizedBox(height: 20),
         Text(
             "Nothing here is shared with anyone. You can remove a date any "
@@ -446,7 +483,7 @@ class _CompanionSheet extends StatelessWidget {
           clinic ? 'Who is guiding this cycle' : "Why there's no picture yet",
           p: p),
       const SizedBox(height: 12),
-      TtcCard(
+      TtcCycleCard(
         child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(
               clinic
@@ -488,8 +525,10 @@ class _CompanionSheet extends StatelessWidget {
             ),
           ],
           const SizedBox(height: 16),
+          // One name for the report everywhere (2026-09-27). Kept for
+          // revert: 'See your logged months in full'.
           _QuietAction(
-            label: 'See your logged months in full',
+            label: kTtcSeeCycleReport,
             onTap: () => _openReport(context),
           ),
         ]),
@@ -525,15 +564,43 @@ class _CompanionSheet extends StatelessWidget {
     return [
       Row(children: [
         Expanded(child: _Eyebrow('Your dates', p: p)),
-        GestureDetector(
-          onTap: () => showTtcPeriodLogSheet(context),
-          behavior: HitTestBehavior.opaque,
-          child: Text('Add a date',
-              style: ttcBody(13, color: ttcTitleInk, w: FontWeight.w800)),
+        // A pill you can hit, not a word (2026-09-27): a 13pt label with
+        // no edge was the only way to add a period once one existed. Kept
+        // for revert: GestureDetector(Text('Add a date', ttcBody(13, w800))).
+        Semantics(
+          button: true,
+          label: 'Add a period date',
+          excludeSemantics: true,
+          child: InkWell(
+            key: const ValueKey('ttc_companion_add_date'),
+            onTap: () => showTtcPeriodLogSheet(context),
+            borderRadius: BorderRadius.circular(999),
+            child: Container(
+              constraints: const BoxConstraints(minHeight: 36),
+              padding: const EdgeInsets.fromLTRB(10, 0, 14, 0),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(999),
+                border: Border.all(color: ttcLine, width: 1.2),
+              ),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                const Icon(Icons.add_rounded, size: 17, color: ttcTitleInk),
+                const SizedBox(width: 4),
+                Text('Add a date',
+                    style:
+                        ttcBody(13, color: ttcTitleInk, w: FontWeight.w800)),
+              ]),
+            ),
+          ),
         ),
       ]),
       const SizedBox(height: 6),
-      Text('Swipe a row left to fix or remove it.',
+      // ⚠️ A TAP, NOT ONLY A SWIPE (tools pass, 2026-09-27). The swipe was
+      // the only way to fix a date and nothing showed it; each row now
+      // carries a pencil and opens "Change" and "Remove" on a tap (Withings'
+      // pencil per row, mobbin a2b2a57e; Greg's action sheet, mobbin
+      // ce063299). The swipe still works. Kept for revert:
+      //   'Swipe a row left to fix or remove it.'
+      Text('Tap a date to change or remove it.',
           style: ttcBody(13, h: 1.45)),
       const SizedBox(height: 12),
       for (var i = starts.length - 1; i >= 0; i--) ...[
@@ -580,7 +647,7 @@ class _ThisCycleCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final ring = picture == TtcCompanionPicture.ring;
-    return TtcCard(
+    return TtcCycleCard(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Expanded(
@@ -588,14 +655,19 @@ class _ThisCycleCard extends StatelessWidget {
                 style: ttcFraunces(16.5,
                     w: FontWeight.w600, color: ttcTitleInk)),
           ),
+          // Named for what they show (2026-09-27), the same two words as the
+          // cycle report. Kept for revert: 'Ring', 'Days'.
           _Segmented(
-            left: 'Ring',
-            right: 'Days',
+            left: kTtcCirclePicture,
+            right: kTtcCalendarPicture,
             rightOn: !ring,
             onPick: (r) => onPicture(
                 r ? TtcCompanionPicture.days : TtcCompanionPicture.ring),
           ),
         ]),
+        const SizedBox(height: 6),
+        // The four parts named once, in plain words (2026-09-27).
+        Text(kTtcFourPartsLine, style: ttcBody(13, h: 1.45)),
         const SizedBox(height: 10),
         if (ring)
           TtcCycleRing(spans: spans, today: DateTime.now())
@@ -624,7 +696,8 @@ class _ThisCycleCard extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 10),
             child: Row(children: [
               Expanded(
-                child: Text('See this month in full',
+                // Kept for revert: 'See this month in full'.
+                child: Text(kTtcSeeCycleReport,
                     style: ttcBody(13,
                         color: ttcTitleInk, w: FontWeight.w800)),
               ),
@@ -633,8 +706,10 @@ class _ThisCycleCard extends StatelessWidget {
             ]),
           ),
         ),
-        Text('These dates are estimates, worked out from your own past cycles.',
-            style: ttcBody(13, h: 1.45)),
+        // The same "estimates" line sits at the foot of the page
+        // (`_Estimates`); once is enough (2026-09-27). Kept for revert:
+        //   Text('These dates are estimates, worked out from your own past '
+        //       'cycles.', style: ttcBody(13, h: 1.45)),
       ]),
     );
   }
@@ -653,8 +728,10 @@ class _StretchRow extends StatelessWidget {
         Container(
           width: 10,
           height: 10,
+          // The legend swatch is the ring's own fill (2026-09-27). Kept for
+          // revert: color: ttcPhaseMark(span.phase).
           decoration: BoxDecoration(
-              color: ttcPhaseMark(span.phase),
+              color: TtcCycleColours.fill(span.phase),
               borderRadius: BorderRadius.circular(3)),
         ),
         const SizedBox(width: 10),
@@ -753,7 +830,9 @@ class _DaysGrid extends StatelessWidget {
       const SizedBox(height: 8),
       Align(
         alignment: Alignment.centerLeft,
-        child: Text('Outlined square: when the next period is expected.',
+        // Says the colour it is (2026-09-27). Kept for revert:
+        //   'Outlined square: when the next period is expected.'
+        child: Text('Rose outline: when the next period is expected.',
             style: ttcBody(12.5, h: 1.35)),
       ),
     ]);
@@ -786,7 +865,12 @@ class _DayCell extends StatelessWidget {
     // colour, white type and a double halo -- two pictures of the same month
     // marking the same day two different ways. `ttcTodayRings` is now the one
     // definition and both use it.
-    final mark = phase == null ? ttcTitleInk : ttcPhaseMark(phase!);
+    // Today is ink and the expected period a rose outline, from the one
+    // palette (2026-09-27). Kept for revert:
+    //   final mark = phase == null ? ttcTitleInk : ttcPhaseMark(phase!);
+    //   color: ... : ttcPhaseBand(phase!),
+    //   border: expected ? Border.all(color: ttcBorder, width: 1.5) : null,
+    const mark = TtcCycleColours.today;
 
     return Container(
       decoration: BoxDecoration(
@@ -796,9 +880,11 @@ class _DayCell extends StatelessWidget {
                 ? mark
                 : phase == null
                     ? null
-                    : ttcPhaseBand(phase!),
+                    : TtcCycleColours.fill(phase!),
         borderRadius: BorderRadius.circular(11),
-        border: expected ? Border.all(color: ttcBorder, width: 1.5) : null,
+        border: expected
+            ? Border.all(color: TtcCycleColours.period, width: 1.6)
+            : null,
         boxShadow: isToday && !expected ? ttcTodayRings(mark) : null,
       ),
       child: Column(
@@ -813,7 +899,7 @@ class _DayCell extends StatelessWidget {
                           ? Colors.white
                           : phase == null
                               ? ttcMuted
-                              : ttcPhaseInk(phase!),
+                              : TtcCycleColours.onFill(phase!),
                       w: FontWeight.w800)),
             ),
           FittedBox(
@@ -823,10 +909,10 @@ class _DayCell extends StatelessWidget {
                     color: isToday && !expected
                         ? Colors.white
                         : expected
-                            ? ttcMuted
+                            ? TtcCycleColours.periodInk
                             : phase == null
                                 ? ttcSoft
-                                : ttcTitleInk,
+                                : TtcCycleColours.onFill(phase!),
                     w: isToday ? FontWeight.w800 : FontWeight.w700)),
           ),
           if (isToday && !expected)
@@ -869,7 +955,7 @@ class _RhythmCard extends StatelessWidget {
     final start = cycle.lastPeriodStart;
     final next = start?.add(Duration(days: usual));
 
-    return TtcCard(
+    return TtcCycleCard(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         Row(children: [
           Expanded(
@@ -878,13 +964,23 @@ class _RhythmCard extends StatelessWidget {
                 // ⚠️ ONE CYCLE IS NOT AN AVERAGE, and the old screen was right
                 // about this before the redesign. Calling a single observation
                 // "usual" invites her to plan around one month.
-                label: lengths.length <= 1 ? 'Your first full cycle' : 'Usual length',
+                // With no counted cycle the number is the starting guess (her
+                // stated length, else 28), not a cycle of hers (2026-09-27).
+                // Kept for revert:
+                //   lengths.length <= 1 ? 'Your first full cycle' : 'Usual length',
+                label: lengths.isEmpty
+                    ? 'A starting guess'
+                    : lengths.length == 1
+                        ? 'Your first full cycle'
+                        : 'Usual length',
                 value: '$usual days'),
           ),
           if (lengths.length > 1) ...[
             const SizedBox(width: 10),
             Expanded(
-              child: _Fact(p: p, label: 'Spread', value: '$lo to $hi days'),
+              // Kept for revert: label: 'Spread'.
+              child: _Fact(
+                  p: p, label: 'Shortest to longest', value: '$lo to $hi days'),
             ),
           ],
         ]),
@@ -961,15 +1057,22 @@ class _DateRowState extends State<_DateRow> {
     final store = CycleStore.instance;
     final bleed = store.bleedDaysFor(widget.start);
 
-    final gap = widget.previous == null
-        ? null
-        : widget.start.difference(widget.previous!).inDays;
-    // ⚠️ THE SAME PLAUSIBILITY WINDOW THE AVERAGE USES, READ FROM THE STORE
-    // RATHER THAN RETYPED. A row that says "54 days" while the average silently
-    // drops it is two screens disagreeing about one dataset, which is the exact
-    // defect `ttc_data_chain_test` exists to hold.
-    final counted = gap == null ||
-        (gap >= CycleStore.minPlausibleCycleDays && gap <= CycleStore.maxPlausibleCycleDays);
+    // ⚠️ THE CYCLE THAT BEGAN ON THIS DATE, FROM THE STORE (2026-09-27). The
+    // row used to measure `start - previous`, the cycle BEFORE it, so the
+    // verdict landed one row late: the current cycle read "NOT COUNTED" for
+    // the gap behind it. `CycleStore.cycleFrom` returns the length and the
+    // verdict from one call so they cannot disagree; the current cycle has
+    // not ended, so it has neither. Kept for revert:
+    //   final gap = widget.previous == null
+    //       ? null
+    //       : widget.start.difference(widget.previous!).inDays;
+    //   final counted = gap == null ||
+    //       (gap >= CycleStore.minPlausibleCycleDays &&
+    //           gap <= CycleStore.maxPlausibleCycleDays);
+    final cycle = widget.isCurrent ? null : store.cycleFrom(widget.start);
+    final gap = cycle?.days;
+    final counted = cycle == null || cycle.counted;
+    final tooShort = gap != null && gap < CycleStore.minPlausibleCycleDays;
 
     final meta = StringBuffer();
     if (widget.isCurrent) {
@@ -1025,7 +1128,11 @@ class _DateRowState extends State<_DateRow> {
             setState(() => _drag = 0);
             widget.onOpen(opened);
           },
-          onTap: widget.open ? () => widget.onOpen(false) : null,
+          // A tap opens Change and Remove (2026-09-27). Kept for revert:
+          //   onTap: widget.open ? () => widget.onOpen(false) : null,
+          onTap: widget.open
+              ? () => widget.onOpen(false)
+              : () => showTtcPeriodDateActions(context, widget.start),
           child: AnimatedContainer(
             duration: Duration(milliseconds: _drag == 0 ? 220 : 0),
             curve: Curves.easeOut,
@@ -1045,7 +1152,7 @@ class _DateRowState extends State<_DateRow> {
                       height: 11,
                       decoration: BoxDecoration(
                         color: widget.isCurrent
-                            ? ttcPhaseMark(TtcPhase.period)
+                            ? TtcCycleColours.period
                             : ttcBorder,
                         shape: BoxShape.circle,
                       ),
@@ -1067,8 +1174,28 @@ class _DateRowState extends State<_DateRow> {
                             ],
                           ]),
                     ),
-                    Icon(Icons.keyboard_double_arrow_left_rounded,
-                        size: 15, color: ttcMuted.withValues(alpha: 0.6)),
+                    // A pencil you can see, in place of the swipe hint
+                    // (2026-09-27). Kept for revert:
+                    //   Icon(Icons.keyboard_double_arrow_left_rounded,
+                    //       size: 15, color: ttcMuted.withValues(alpha: 0.6)),
+                    Semantics(
+                      button: true,
+                      label: 'Change or remove ${ttcLongDate(widget.start)}',
+                      excludeSemantics: true,
+                      child: InkWell(
+                        key: ValueKey('ttc_period_row_edit_'
+                            '${widget.start.toIso8601String()}'),
+                        onTap: () =>
+                            showTtcPeriodDateActions(context, widget.start),
+                        customBorder: const CircleBorder(),
+                        child: const SizedBox(
+                          width: 40,
+                          height: 40,
+                          child: Icon(Icons.edit_outlined,
+                              size: 18, color: ttcSoft),
+                        ),
+                      ),
+                    ),
                   ]),
                   if (!counted) ...[
                     const SizedBox(height: 12),
@@ -1083,7 +1210,9 @@ class _DateRowState extends State<_DateRow> {
                             decoration: BoxDecoration(
                                 color: ttcPanel,
                                 borderRadius: BorderRadius.circular(999)),
-                            child: Text('NOT COUNTED',
+                            // Says what it means (2026-09-27). Kept for
+                            // revert: 'NOT COUNTED'.
+                            child: Text('NOT IN YOUR AVERAGE',
                                 style: pvManrope(
                                     fontSize: 9.5,
                                     fontWeight: FontWeight.w800,
@@ -1092,10 +1221,18 @@ class _DateRowState extends State<_DateRow> {
                           ),
                           const SizedBox(width: 10),
                           Expanded(
+                            // One reason per kind of gap (2026-09-27): a
+                            // ten-day gap used to read "a gap this long".
+                            // Kept for revert: the long-gap sentence only.
                             child: Text(
-                                "A gap this long is usually a month that wasn't "
-                                "logged. We keep it, but we don't use it for your "
-                                'usual length.',
+                                tooShort
+                                    ? 'Too short to be a whole cycle. It may be '
+                                        'spotting, or a date logged twice. We keep '
+                                        "it, but we don't use it for your usual "
+                                        'length.'
+                                    : "A gap this long is usually a month that "
+                                        "wasn't logged. We keep it, but we don't "
+                                        'use it for your usual length.',
                                 style: ttcBody(13, h: 1.45)),
                           ),
                         ]),
@@ -1148,28 +1285,237 @@ void _removeWithUndo(BuildContext context, DateTime start) {
   store.removePeriodStart(start);
   HapticFeedback.selectionClick();
 
-  final messenger = ScaffoldMessenger.of(context);
-  messenger.clearSnackBars();
-  messenger.showSnackBar(SnackBar(
-          // Flutter 3.44 keeps a snackbar with an action on screen until it is
-          // dismissed (`persist` defaults to true when there is an action).
-          persist: false,
-    content: Text('${ttcShortDate(start)} removed',
-        style: pvManrope(fontSize: 13, color: Colors.white)),
-    backgroundColor: ttcTitleInk,
-    behavior: SnackBarBehavior.floating,
-    margin: const EdgeInsets.fromLTRB(18, 0, 18, 86),
-    shape:
-        RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-    duration: const Duration(seconds: 5),
-    action: SnackBarAction(
-      label: 'UNDO',
-      textColor: const Color(0xFFC9A8F0),
-      onPressed: () => store.restorePeriodStart(start,
-          bleed: kept.bleed, lh: kept.lh, temp: kept.temp),
-    ),
-  ));
+  // ⚠️ THE HOUSE NOTICE (2026-09-27): a white card with an ink "Undo" pill,
+  // the same one every other tool uses, instead of a dark bar with a
+  // lavender "UNDO" of its own. Kept for revert: a SnackBar with
+  // backgroundColor ttcTitleInk, margin 86, 5s, and a SnackBarAction 'UNDO'
+  // in 0xFFC9A8F0 calling the same restore.
+  pvSnack(
+    context,
+    'Removed the period from ${ttcShortDate(start)}',
+    action: 'Undo',
+    lift: 24,
+    onAction: () => store.restorePeriodStart(start,
+        bleed: kept.bleed, lh: kept.lh, temp: kept.temp),
+  );
 }
+
+/// "Change this date" and "Remove this date" for one logged period, from a
+/// tap on its row or its pencil (tools pass, 2026-09-27).
+///
+/// ⚠️ REMOVE STILL UNDOES, IT DOES NOT CONFIRM. Same trade as the swipe: the
+/// undo taxes only the mistake, and [CycleStore.detailsFor] brings back the
+/// bleed days, LH strip and temperature shift with the date.
+Future<void> showTtcPeriodDateActions(BuildContext context, DateTime start) =>
+    showModalBottomSheet<void>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      routeSettings: const RouteSettings(name: 'ttc/period_actions'),
+      builder: (sheet) => _PeriodActionsSheet(
+        start: start,
+        onChange: () {
+          Navigator.of(sheet).pop();
+          showTtcPeriodLogSheet(context, correcting: start);
+        },
+        onRemove: () {
+          Navigator.of(sheet).pop();
+          _removeWithUndo(context, start);
+        },
+      ),
+    );
+
+/// The Change / Remove sheet for one period, in the log sheet's own clothes.
+///
+/// ⚠️ THE SAME SHEET AS "LOG A PERIOD" (2026-09-27): the same surface, handle,
+/// eyebrow and Fraunces question, so opening a date feels like the tool and
+/// not a system menu. It also says what she saved about this period before
+/// she chooses, which the plain white menu did not (Withings' pencil per row,
+/// mobbin a2b2a57e; MacroFactor's period list with an edit per day, mobbin
+/// 3fd2db7d).
+class _PeriodActionsSheet extends StatelessWidget {
+  const _PeriodActionsSheet({
+    required this.start,
+    required this.onChange,
+    required this.onRemove,
+  });
+
+  final DateTime start;
+  final VoidCallback onChange;
+  final VoidCallback onRemove;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = V2PaletteStore.instance.current;
+    final store = CycleStore.instance;
+    final bleed = store.bleedDaysFor(start);
+    final isLast = store.lastPeriodStart != null &&
+        _sameDay(store.lastPeriodStart!, start);
+    final cycle = isLast ? null : store.cycleFrom(start);
+    final facts = <String>[
+      if (bleed == kBleedStillOn)
+        'Still on'
+      else if (bleed != null)
+        '$bleed bleeding ${bleed == 1 ? 'day' : 'days'}'
+      else
+        'Bleeding days not added',
+      if (cycle != null) 'a ${cycle.days}-day cycle',
+      if (isLast) 'your current cycle',
+    ];
+
+    Widget row(IconData icon, String label, String line, Color ink,
+            VoidCallback go, Key key) =>
+        InkWell(
+          key: key,
+          onTap: go,
+          borderRadius: BorderRadius.circular(16),
+          child: Container(
+            padding: const EdgeInsets.fromLTRB(14, 13, 14, 13),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: ttcLine),
+            ),
+            child: Row(children: [
+              Icon(icon, size: 20, color: ink),
+              const SizedBox(width: 13),
+              Expanded(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(label,
+                          style: ttcBody(15, color: ink, w: FontWeight.w800)),
+                      const SizedBox(height: 2),
+                      Text(line, style: ttcBody(12.5, h: 1.35)),
+                    ]),
+              ),
+              Icon(Icons.chevron_right_rounded, size: 20, color: ttcMuted),
+            ]),
+          ),
+        );
+
+    return Container(
+      decoration: BoxDecoration(
+        color: p.surface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(18, 14, 18, 18),
+          child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: Container(
+                    width: 38,
+                    height: 4,
+                    decoration: BoxDecoration(
+                        color: ttcBorder,
+                        borderRadius: BorderRadius.circular(999)),
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text('YOUR PERIOD',
+                    style: pvManrope(
+                        fontSize: 9.5,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 1.1,
+                        color: ttcMuted)),
+                const SizedBox(height: 8),
+                Text('Started ${ttcLongDate(start)}',
+                    style: ttcFraunces(22,
+                        w: FontWeight.w600, color: ttcTitleInk, h: 1.2)),
+                const SizedBox(height: 6),
+                Text(
+                    '${facts.first[0].toUpperCase()}${facts.first.substring(1)}'
+                    '${facts.length > 1 ? ', ${facts.skip(1).join(', ')}' : ''}.',
+                    key: const ValueKey('ttc_period_action_facts'),
+                    style: ttcBody(13, h: 1.45)),
+                const SizedBox(height: 18),
+                row(
+                    Icons.edit_calendar_outlined,
+                    'Change this date',
+                    'Or how many days you bled',
+                    ttcTitleInk,
+                    onChange,
+                    const ValueKey('ttc_period_action_change')),
+                const SizedBox(height: 10),
+                row(
+                    Icons.delete_outline_rounded,
+                    'Remove this date',
+                    'You can undo this straight after',
+                    const Color(0xFFB3261E),
+                    onRemove,
+                    const ValueKey('ttc_period_action_remove')),
+              ]),
+        ),
+      ),
+    );
+  }
+}
+
+// Kept for revert (2026-09-27): the plain white menu this sheet replaced.
+// Future<void> showTtcPeriodDateActions(BuildContext context, DateTime start) =>
+//     showModalBottomSheet<void>(
+//       context: context,
+//       backgroundColor: Colors.white,
+//       shape: const RoundedRectangleBorder(
+//           borderRadius: BorderRadius.vertical(top: Radius.circular(26))),
+//       builder: (sheet) {
+//         Widget row(IconData icon, String label, Color ink, VoidCallback go,
+//                 Key key) =>
+//             InkWell(
+//               key: key,
+//               onTap: () {
+//                 Navigator.of(sheet).pop();
+//                 go();
+//               },
+//               child: Padding(
+//                 padding:
+//                     const EdgeInsets.symmetric(horizontal: 22, vertical: 16),
+//                 child: Row(children: [
+//                   Icon(icon, size: 20, color: ink),
+//                   const SizedBox(width: 14),
+//                   Expanded(
+//                     child: Text(label,
+//                         style: ttcBody(15, color: ink, w: FontWeight.w700)),
+//                   ),
+//                 ]),
+//               ),
+//             );
+//         return SafeArea(
+//           top: false,
+//           child: Padding(
+//             padding: const EdgeInsets.only(top: 18, bottom: 10),
+//             child: Column(
+//                 mainAxisSize: MainAxisSize.min,
+//                 crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: [
+//                   Padding(
+//                     padding: const EdgeInsets.symmetric(horizontal: 22),
+//                     child: Text('Period that started ${ttcLongDate(start)}',
+//                         style: ttcFraunces(18,
+//                             w: FontWeight.w600, color: ttcTitleInk)),
+//                   ),
+//                   const SizedBox(height: 8),
+//                   row(
+//                       Icons.edit_calendar_outlined,
+//                       'Change this date',
+//                       ttcTitleInk,
+//                       () => showTtcPeriodLogSheet(context, correcting: start),
+//                       const ValueKey('ttc_period_action_change')),
+//                   row(
+//                       Icons.delete_outline_rounded,
+//                       'Remove this date',
+//                       const Color(0xFFB3261E),
+//                       () => _removeWithUndo(context, start),
+//                       const ValueKey('ttc_period_action_remove')),
+//                 ]),
+//           ),
+//         );
+//       },
+//     );
 
 // =============================================================================
 //  Logging a period — the date, and how long it lasted
@@ -1185,20 +1531,33 @@ void _removeWithUndo(BuildContext context, DateTime start) {
 const List<int> kTtcBleedChoices = [3, 4, 5, 6, 7];
 
 /// Opens the log sheet. Pass [correcting] to move an existing date instead.
+///
+/// [initial] picks a day in advance (the calendar's day card, 2026-09-27), so
+/// "Log a period" on the 12th opens on the 12th. A future day is not picked.
 Future<void> showTtcPeriodLogSheet(
   BuildContext context, {
   DateTime? correcting,
+  DateTime? initial,
 }) =>
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (_) => _LogSheet(correcting: correcting),
+      // The saved notice needs a Scaffold under the messenger; every screen
+      // that opens this sheet has one, and a bare host (a test) is told so.
+      builder: (_) => _LogSheet(
+          correcting: correcting,
+          initial: initial,
+          notify: Scaffold.maybeOf(context) != null),
     );
 
 class _LogSheet extends StatefulWidget {
-  const _LogSheet({this.correcting});
+  const _LogSheet({this.correcting, this.initial, this.notify = true});
   final DateTime? correcting;
+  final DateTime? initial;
+
+  /// Whether the screen underneath can show the saved notice.
+  final bool notify;
 
   @override
   State<_LogSheet> createState() => _LogSheetState();
@@ -1214,9 +1573,16 @@ class _LogSheetState extends State<_LogSheet> {
   @override
   void initState() {
     super.initState();
-    final seed = widget.correcting ?? DateTime.now();
+    final now = DateTime.now();
+    final todayD = DateTime(now.year, now.month, now.day);
+    final init = widget.initial == null
+        ? null
+        : DateTime(widget.initial!.year, widget.initial!.month,
+            widget.initial!.day);
+    final usable = init != null && !init.isAfter(todayD) ? init : null;
+    final seed = widget.correcting ?? usable ?? now;
     _month = DateTime(seed.year, seed.month);
-    _picked = widget.correcting;
+    _picked = widget.correcting ?? usable;
     _bleed = widget.correcting == null
         ? null
         : CycleStore.instance.bleedDaysFor(widget.correcting!);
@@ -1247,6 +1613,20 @@ class _LogSheetState extends State<_LogSheet> {
     final navigator = Navigator.of(context);
     final messenger = ScaffoldMessenger.maybeOf(context);
     navigator.maybePop();
+    // ⚠️ SHE IS TOLD IT SAVED (2026-09-27). The sheet closed and nothing
+    // said so; on a screen where the new date lands below the fold that read
+    // as a tap that did nothing. The "talk it through" offer, when it
+    // applies, replaces this notice (it says the period was logged too).
+    if (messenger != null && widget.notify) {
+      pvSnack(
+        navigator.context,
+        _isEdit
+            ? 'Changed to ${ttcShortDate(picked)}'
+            : 'Period saved: started ${ttcShortDate(picked)}',
+        icon: Icons.check_rounded,
+        lift: 24,
+      );
+    }
     if (!_isEdit && messenger != null) {
       showTtcPeriodCameNudge(
         navigator: navigator,
@@ -1711,3 +2091,18 @@ class _Estimates extends StatelessWidget {
         ],
       );
 }
+
+// ---- plain words, shared with the cycle report (tools pass, 2026-09-27) ----
+
+/// One name for the cycle report on every button that opens it.
+const String kTtcSeeCycleReport = 'See your cycle report';
+
+/// The picture toggle, the same two words here and on the report.
+const String kTtcCirclePicture = 'Circle';
+const String kTtcCalendarPicture = 'Calendar';
+
+/// The four parts of a cycle, named once in plain words.
+const String kTtcFourPartsLine =
+    'Your cycle has four parts: your period, the days before your fertile '
+    'days, your fertile days (when you can get pregnant), and the wait for '
+    'your next period.';

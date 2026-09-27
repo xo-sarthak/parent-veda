@@ -22,6 +22,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'package:parentveda/screens/ttc/ttc_cycle_screens.dart';
+import 'package:parentveda/screens/ttc/ttc_ovulation_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_journal_screen.dart';
 import 'package:parentveda/screens/ttc/ttc_strings.dart';
 import 'package:parentveda/screens/ttc/ttc_tests_screen.dart';
@@ -89,7 +90,11 @@ void main() {
       CycleStore.instance
           .logPeriodStart(DateTime.now().subtract(const Duration(days: 8)));
       await pumpTall(tester, const TtcOvulationScreen());
-      expect(find.text('Record it'), findsNWidgets(2));
+      // A strip is logged as its result since the tool rebuild (2026-09-27),
+      // one a day, not "recorded" once. Was:
+      //   expect(find.text('Record it'), findsNWidgets(2));
+      expect(find.text(kTtcOvPositiveLabel), findsOneWidget);
+      expect(find.text(kTtcOvNegativeLabel), findsOneWidget);
       expect(find.text('Mark as done'), findsNothing);
     });
   });

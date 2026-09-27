@@ -122,7 +122,8 @@ void main() {
       // unified store) and became the first tile of Plan and learn.
       // ⚠️ 24 -> 25 ON 2026-09-26. "Talk to expert" left the V3 bar and
       // became a Tools tile (Care and medicines), opening the same consults.
-      expect(TtcToolsScreen.toolCount, 25);
+      // ⚠️ 25 -> 24 ON 2026-09-27: Mood folded into "Symptoms and mood".
+      expect(TtcToolsScreen.toolCount, 24);
     });
 
     testWidgets('all nine Prepare categories render', (tester) async {

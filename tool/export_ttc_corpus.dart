@@ -349,7 +349,12 @@ void main() {
               if (s.callout != null)
                 join([l(s.callout!.title), l(s.callout!.body)]),
             ]),
-        for (final q in r.faqs) 'Q: ${l(q.question)}\nA: ${l(q.answer)}',
+        // ⚠️ THE FAQS LEFT THE READ'S BODY (2026-09-27): each is its own
+        // document below. Inside the body a question was packed into an
+        // 800-character chunk with its neighbours, so its meaning was averaged
+        // with theirs, and "cramps after embryo transfer" ranked 10th while
+        // the model reads the top 6 (STILL-OPEN 79.12b). Kept for revert:
+        //   for (final q in r.faqs) 'Q: ${l(q.question)}\nA: ${l(q.answer)}',
         join([l(r.whenToSeeSomeone.title), l(r.whenToSeeSomeone.body)]),
         l(r.evidence),
       ]);
@@ -366,6 +371,30 @@ void main() {
         bodyHi: readBody(r, hi: true),
         keywords: [r.kicker.en],
       );
+      // ⚠️ EACH FAQ, ITS OWN SMALL DOCUMENT (2026-09-27, the user's choice for
+      // STILL-OPEN 79.12b). A question matches a question far better than it
+      // matches a long article, and one short Q and A is one chunk whose
+      // meaning is the question's. Only the body is embedded (the service's
+      // `_text_body`), so the question leads the body. The read's title rides
+      // along so an answer can say where it came from. Kind 'ttcfaq', id
+      // `ttcfaq_<readId>_<n>`; the app opens the read it came from.
+      for (var i = 0; i < r.faqs.length; i++) {
+        final q = r.faqs[i];
+        String faqBody({bool hi = false}) => join([
+              'Q: ${lt(q.question, hi: hi)}\nA: ${lt(q.answer, hi: hi)}',
+              'From the read: ${lt(r.title, hi: hi)}',
+            ]);
+        add(
+          docId: 'ttcfaq_${r.id}_$i',
+          kind: 'ttcfaq',
+          sourceLabel: 'Trying to conceive',
+          titleEn: q.question.en,
+          titleHi: q.question.hi,
+          bodyEn: faqBody(),
+          bodyHi: faqBody(hi: true),
+          keywords: [r.kicker.en],
+        );
+      }
     }
 
     // ---- the phase and treatment daily cards (S4), 2026-09-27 ----------------

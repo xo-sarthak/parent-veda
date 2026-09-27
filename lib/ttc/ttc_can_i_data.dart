@@ -28,8 +28,16 @@ extension TtcVerdictCopy on TtcVerdict {
     switch (this) {
       case TtcVerdict.safe:
         return hi ? 'Haan, theek hai' : 'Yes, this is fine';
+      // ⚠️ ONE MEANING FOR THIS WORD (tool rebuild, 2026-09-27, night).
+      // "In moderation" sat on chai (a number: 200mg), alcohol ("now and
+      // then"), hot baths and workouts (no number at all), so the same pill
+      // meant a dose on one card and a kind of habit on the next. It now says
+      // what all four have in common, and every one of them carries its limit
+      // right beside the word (`TtcCanI.limit`), a number where there is one.
+      // No verdict moved: the enum value and every answer are unchanged.
+      // Kept for revert: 'In moderation'.
       case TtcVerdict.moderate:
-        return hi ? 'Thoda sa theek hai' : 'In moderation';
+        return hi ? 'Thoda sa theek hai' : 'Yes, with a limit';
       case TtcVerdict.avoid:
         return hi ? 'Behtar hai na karein' : 'Better not';
       case TtcVerdict.askDoctor:
@@ -51,7 +59,19 @@ class TtcCanI {
     required this.indianEn,
     required this.indianHi,
     this.forPartner = false,
+    this.limitEn,
+    this.limitHi,
   });
+
+  /// The limit a "Yes, with a limit" answer sets, said beside the verdict so
+  /// the word means one thing on every card (2026-09-27, night). A number
+  /// where the answer has one. Only on `moderate` answers; every limit is
+  /// the answer's own short line, shortened, never a new fact. English on
+  /// both sides where no Hindi was written (new copy is English).
+  final String? limitEn;
+  final String? limitHi;
+
+  String? limit(bool hi) => hi ? (limitHi ?? limitEn) : limitEn;
 
   final String id;
   final String questionEn;
@@ -81,6 +101,8 @@ class TtcCanI {
 const List<TtcCanI> ttcCanI = [
   TtcCanI(
     id: 'chai',
+    limitEn: 'about 200mg of caffeine a day',
+    limitHi: 'about 200mg of caffeine a day',
     questionEn: 'Can I drink chai and coffee?',
     questionHi: 'Kya main chai aur coffee pi sakti hoon?',
     verdict: TtcVerdict.moderate,
@@ -97,6 +119,8 @@ const List<TtcCanI> ttcCanI = [
   ),
   TtcCanI(
     id: 'alcohol',
+    limitEn: 'now and then, never heavy',
+    limitHi: 'now and then, never heavy',
     questionEn: 'Can I drink alcohol?',
     questionHi: 'Kya main sharab pi sakti hoon?',
     verdict: TtcVerdict.moderate,
@@ -149,6 +173,8 @@ const List<TtcCanI> ttcCanI = [
   ),
   TtcCanI(
     id: 'hot_bath',
+    limitEn: 'normal baths, not long very hot ones or saunas',
+    limitHi: 'normal baths, not long very hot ones or saunas',
     questionEn: 'Can he take long hot baths?',
     questionHi: 'Kya wo lambe garam paani ke nahaane le sakte hain?',
     forPartner: true,
@@ -166,6 +192,8 @@ const List<TtcCanI> ttcCanI = [
   ),
   TtcCanI(
     id: 'exercise',
+    limitEn: 'moderate exercise, not very hard training',
+    limitHi: 'moderate exercise, not very hard training',
     questionEn: 'Can I keep doing intense workouts?',
     questionHi: 'Kya main tez workout jaari rakh sakti hoon?',
     verdict: TtcVerdict.moderate,

@@ -2161,6 +2161,17 @@ app launch. Fix: an explicit order in `main.dart` (`ReminderStore.init()` → `T
 `TtcTreatmentStore.rearmAfterStartup()`). The general lesson: a "sync all" that starts with "cancel all" makes
 every other scheduler a dependent of it, whether or not the code says so — so say so, in one place.
 
+**It happened twice more (2026-09-27), which is the lesson proving itself.** The tools pass found the same trap
+in two more schedulers: the appointments' new "remind me the evening before" and — older, and in every stage — the
+**medication alarms**. `MedicineStore.init()` is started in `main.dart` without waiting and arms alarms as soon as it
+loads, so it *raced* `ReminderStore.init()`: when the medicine store won, the cancel-all wiped its alarms, and no
+medicine reminder fired until she next edited a medicine. A race is worse than an ordering bug because it passes
+most of the time, on most phones, and fails on the slow launch nobody tests. Both now hang off the same chain
+(`… → TtcAppointmentsStore.rearmAfterStartup()` → `syncMedicationAlarms(MedicineStore.instance.all)`). The trade-off:
+the chain is now a single point of order that every new scheduler must join, which is a thing to remember. The
+alternative — making `syncAll` cancel only the ids it owns — is the real fix and removes the dependency entirely;
+it is owed (`NotificationService` is shared with pregnancy and parenting, so it wants its own careful pass).
+
 ## 16n. One resolver, not five copies of the arithmetic — `ttcDayContext`
 
 **The situation.** "Where is she in her cycle today?" was being answered in five places: the home's top line, the

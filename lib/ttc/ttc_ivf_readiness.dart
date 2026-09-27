@@ -468,7 +468,14 @@ IvfReadinessResult ivfBuildReadiness(
       ),
       (
         label: 'Already known',
-        value: a.conditionsUnsure
+        // ⚠️ A SKIPPED QUESTION SAYS SO (tool rebuild, 2026-09-27). It read
+        // "Nothing so far" whenever no condition was ticked, including when she
+        // skipped the question, so her notes told a doctor "nothing known" on
+        // the strength of a question she never answered. Words only: the
+        // routing above never read this line. Kept for revert: no first arm.
+        value: !a.conditionsChecked
+            ? 'Not answered'
+            : a.conditionsUnsure
             ? 'Not sure'
             : a.conditions.isEmpty
                 ? 'Nothing so far'

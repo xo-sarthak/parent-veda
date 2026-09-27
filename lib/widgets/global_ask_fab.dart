@@ -152,6 +152,9 @@ class FabRouteObserver extends NavigatorObserver {
             // Search has its own "Ask Veda about …" row and a keyboard up;
             // the button sat on the results (2026-09-18).
             name == 'search' ||
+            // The TTC journal's writer: a keyboard is up and the button sat
+            // over the words (2026-09-27, the tools pass).
+            name == 'ttc/journal/write' ||
             // The skilling stage: every route there is either a CHILD screen,
             // where an adult surface (and a network call) must not be one tap
             // away, or a parent screen behind a gate the FAB would bypass.

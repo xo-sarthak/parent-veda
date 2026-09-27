@@ -28,6 +28,9 @@ import 'dart:async';
 import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 
 import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_practice_data.dart';
@@ -80,6 +83,12 @@ class TtcPracticeSkin {
   }
 }
 
+/// The wall clock the player reads. A seam for tests only (2026-09-27): a
+/// widget test's pump moves timers, not `DateTime.now`, so a test that wants
+/// to see a practice finish sets this and moves it. Never set it in the app.
+@visibleForTesting
+DateTime Function() ttcPracticeNow = DateTime.now;
+
 /// Where a session is, in whole seconds.
 ///
 /// ⚠️ ELAPSED IS COMPUTED FROM A TIMESTAMP, NOT COUNTED UP BY THE TICKER. A
@@ -94,13 +103,13 @@ class _Clock {
   bool get running => startedAt != null;
 
   Duration get elapsed =>
-      held + (startedAt == null ? Duration.zero : DateTime.now().difference(startedAt!));
+      held + (startedAt == null ? Duration.zero : ttcPracticeNow().difference(startedAt!));
 
-  void start() => startedAt ??= DateTime.now();
+  void start() => startedAt ??= ttcPracticeNow();
 
   void pause() {
     if (startedAt == null) return;
-    held += DateTime.now().difference(startedAt!);
+    held += ttcPracticeNow().difference(startedAt!);
     startedAt = null;
   }
 
@@ -123,16 +132,41 @@ class _Clock {
 /// So the widget holds what it actually draws with, and `TtcPracticeSession.sit`
 /// is the door for anything that has a duration and no card.
 class TtcPracticeSession extends StatefulWidget {
-  TtcPracticeSession({super.key, required TtcPractice practice})
-      : anim = practice.anim,
+  TtcPracticeSession({
+    super.key,
+    required TtcPractice practice,
+    this.onFinished,
+    this.onProgress,
+    this.caption,
+  })  : anim = practice.anim,
         steps = practice.steps,
         skinFor = (() => TtcPracticeSkin.of(practice));
 
   /// A ring, a clock, and nothing else. For a sit the course asks for.
-  TtcPracticeSession.sit({super.key, required int seconds})
-      : anim = TtcTimerAnim(seconds: seconds),
+  TtcPracticeSession.sit({
+    super.key,
+    required int seconds,
+    this.onFinished,
+  })  : anim = TtcTimerAnim(seconds: seconds),
         steps = const [],
+        onProgress = null,
+        caption = null,
         skinFor = (() => TtcPracticeSkin.breathe());
+
+  /// Called once, when the timer reaches the end on its own (never on a
+  /// pause, never when she leaves). The practice screen marks the practice
+  /// done here and says so, with an undo (2026-09-27): finishing a Headspace
+  /// or Calm session completes it, and a separate "Mark done" she had to
+  /// scroll to after the timer was the step people skip.
+  final VoidCallback? onFinished;
+
+  /// Every tick: how far through (0 to 1) and whether the clock is running.
+  /// The practice screen moves its lit step with this when she lets it.
+  final void Function(double progress, bool running)? onProgress;
+
+  /// What the middle of a drawn-figure ring says. Null keeps "Follow the
+  /// steps as you go".
+  final String? caption;
 
   final TtcPracticeAnim anim;
 
@@ -152,13 +186,91 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
   final _clock = _Clock();
   Timer? _ticker;
 
+  // ⚠️ HANDS-FREE, ADDED 2026-09-27 (tools rebuild). The circle was the only
+  // cue, so a practice done with eyes closed meant opening them to check.
+  // Three things now carry it without looking:
+  //  · a gentle vibration on each change of breath, OFF by default and
+  //    remembered on this phone (Headspace and Calm both offer it as an
+  //    opt-in; buzzing someone who did not ask is not calm);
+  //  · the screen stays awake while the timer runs (a phone that dims at
+  //    thirty seconds ends a five-minute practice on the mat);
+  //  · the timer stops itself at the end, with one last vibration if she
+  //    asked for them. Until now it ran on past zero with the button still
+  //    saying "Pause".
+  // Mobbin: Life Reset's breathing player (the phase word, the count and the
+  // time left, https://mobbin.com/screens/8cad3cd9-ead8-429c-8d48-a9fd14c76bc9),
+  // Opal's "Breathe In" with its Mute control
+  // (https://mobbin.com/screens/b7a85dff-8e86-4211-9dec-73f5bf2ac492).
+  static const _vibrateKey = 'ttc_practice_vibrate';
+  static bool? _vibrateCache;
+  bool _vibrate = _vibrateCache ?? false;
+  String? _lastPhase;
+
   int get _total => widget.anim.seconds;
   int get _left => (_total - _clock.elapsed.inSeconds).clamp(0, _total);
+
+  bool get _isBreath => widget.anim is TtcBreathAnim;
+
+  /// Whether the vibration is on. Public for a test.
+  bool get vibrate => _vibrate;
+
+  @override
+  void initState() {
+    super.initState();
+    if (_vibrateCache == null) {
+      SharedPreferences.getInstance().then((p) {
+        _vibrateCache = p.getBool(_vibrateKey) ?? false;
+        if (mounted) setState(() => _vibrate = _vibrateCache!);
+      }).catchError((Object _) {});
+    }
+  }
 
   @override
   void dispose() {
     _ticker?.cancel();
+    if (_clock.running) WakelockPlus.disable().catchError((Object _) {});
     super.dispose();
+  }
+
+  void _setVibrate(bool on) {
+    setState(() => _vibrate = on);
+    _vibrateCache = on;
+    if (on) HapticFeedback.mediumImpact();
+    SharedPreferences.getInstance()
+        .then((p) => p.setBool(_vibrateKey, on))
+        .catchError((Object _) => false);
+  }
+
+  double get _fraction => _total == 0
+      ? 0
+      : (_clock.elapsed.inMilliseconds / 1000.0 / _total).clamp(0.0, 1.0);
+
+  void _tick() {
+    if (!mounted) return;
+    final finished = _left == 0;
+    if (_vibrate && _isBreath && !finished) {
+      final m = (widget.anim as TtcBreathAnim)
+          .toBreathPattern()
+          .at(_clock.elapsed.inMilliseconds / 1000.0);
+      final key = '${m.cycle}:${m.index}';
+      if (_lastPhase != null && key != _lastPhase) {
+        HapticFeedback.mediumImpact();
+      }
+      _lastPhase = key;
+    }
+    if (finished) {
+      _clock.pause();
+      _ticker?.cancel();
+      _ticker = null;
+      WakelockPlus.disable().catchError((Object _) {});
+      if (_vibrate) HapticFeedback.heavyImpact();
+      setState(() {});
+      widget.onProgress?.call(1, false);
+      widget.onFinished?.call();
+      return;
+    }
+    setState(() {});
+    widget.onProgress?.call(_fraction, true);
   }
 
   void _toggle() {
@@ -167,15 +279,19 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
         _clock.pause();
         _ticker?.cancel();
         _ticker = null;
+        WakelockPlus.disable().catchError((Object _) {});
       } else {
         if (_left == 0) _clock.reset();
+        _lastPhase = null;
         _clock.start();
+        WakelockPlus.enable().catchError((Object _) {});
         // 100ms rather than 1s: the breathing circle moves continuously, and a
         // one-second tick makes it step rather than glide.
         _ticker = Timer.periodic(
-            const Duration(milliseconds: 100), (_) => setState(() {}));
+            const Duration(milliseconds: 100), (_) => _tick());
       }
     });
+    widget.onProgress?.call(_fraction, _clock.running);
   }
 
   @override
@@ -207,7 +323,8 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
               _BodyScan(steps: widget.steps, progress: progress, skin: skin),
             TtcListenAnim() =>
               _Listen(seconds: t, progress: progress, skin: skin),
-            TtcFigureAnim() => _Figure(progress: progress, skin: skin),
+            TtcFigureAnim() =>
+              _Figure(progress: progress, skin: skin, caption: widget.caption),
             TtcTimerAnim() =>
               _PlainTimer(left: _left, progress: progress, skin: skin),
           },
@@ -243,7 +360,9 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
                   _clock.running
                       ? 'Pause'
                       : done
-                          ? 'Again'
+                          // Was 'Again' (2026-09-27), which read as a prompt
+                          // to repeat the practice.
+                          ? 'Start again'
                           : 'Start',
                   style: pvManrope(
                       fontSize: 14.5,
@@ -254,16 +373,71 @@ class TtcPracticeSessionState extends State<TtcPracticeSession> {
         ),
       ]),
 
+      // ---- time left, once started (2026-09-27) ---------------------------
+      // The ring shows it; the words say it. The plain timer already prints
+      // its clock inside the ring, so it does not need a second one.
+      if (anim is! TtcTimerAnim && _clock.elapsed > Duration.zero && !done) ...[
+        const SizedBox(height: 10),
+        Text(_leftLabel(_left),
+            style: pvManrope(
+                fontSize: 12.5, fontWeight: FontWeight.w700, color: p.ink3)),
+      ],
+
+      // ---- the optional vibration, breathing only --------------------------
+      if (_isBreath) ...[
+        const SizedBox(height: 6),
+        Semantics(
+          button: true,
+          toggled: _vibrate,
+          label: 'Vibrate on each breath',
+          excludeSemantics: true,
+          child: InkWell(
+            onTap: () => _setVibrate(!_vibrate),
+            borderRadius: BorderRadius.circular(999),
+            child: Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Icon(
+                    _vibrate
+                        ? Icons.vibration_rounded
+                        : Icons.mobile_off_rounded,
+                    size: 16,
+                    color: _vibrate ? p.ink1 : p.ink3),
+                const SizedBox(width: 7),
+                Flexible(
+                  child: Text(
+                      _vibrate
+                          ? 'Vibrate on each breath: on'
+                          : 'Vibrate on each breath: off',
+                      style: pvManrope(
+                          fontSize: 12.5,
+                          fontWeight: FontWeight.w700,
+                          color: _vibrate ? p.ink1 : p.ink2)),
+                ),
+              ]),
+            ),
+          ),
+        ),
+      ],
+
       if (done) ...[
         const SizedBox(height: 14),
         // ⚠️ THE FLATTEST SENTENCE THAT IS STILL WARM. No "well done", no
         // score, no streak. The brief bans a celebration animation on finishing
         // and the reasoning goes further than the animation: praise for
         // finishing is what makes not finishing a failure.
-        Text("That's the whole thing.",
+        // Was "That's the whole thing." (2026-09-27): now says she can stop.
+        Text("That's the whole practice. You can stop here.",
             style: pvManrope(fontSize: 13, height: 1.5, color: p.ink2)),
       ],
     ]);
+  }
+
+  static String _leftLabel(int left) {
+    final m = left ~/ 60;
+    final sec = left % 60;
+    return '$m:${sec.toString().padLeft(2, '0')} left';
   }
 }
 
@@ -343,10 +517,12 @@ class _Breath extends StatelessWidget {
                           : (rounds.isOdd
                               ? 'Out through the right'
                               : 'Out through the left'),
+                      // Bigger and darker (2026-09-27, was 11.5 ink2): the
+                      // side is the point of this practice.
                       style: pvManrope(
-                          fontSize: 11.5,
-                          fontWeight: FontWeight.w700,
-                          color: skin.p.ink2)),
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          color: skin.p.ink1)),
               ]),
       ),
     ]);
@@ -439,9 +615,13 @@ class _Listen extends StatelessWidget {
 
 /// A drawn figure when one exists, and an honest placeholder until then.
 class _Figure extends StatelessWidget {
-  const _Figure({required this.progress, required this.skin});
+  const _Figure({required this.progress, required this.skin, this.caption});
   final double progress;
   final TtcPracticeSkin skin;
+
+  /// "Step 3 of 6" when the steps follow the timer (2026-09-27): the biggest
+  /// thing on screen then says where she is, readable from the mat.
+  final String? caption;
 
   @override
   Widget build(BuildContext context) {
@@ -470,6 +650,11 @@ class _Figure extends StatelessWidget {
       ),
       Icon(Icons.self_improvement_rounded,
           size: 104, color: skin.accent.withValues(alpha: 0.10)),
+      if (caption case final c?)
+        Text(c,
+            style: pvFraunces(
+                fontSize: 24, fontWeight: FontWeight.w600, color: skin.p.ink1))
+      else
       Column(mainAxisSize: MainAxisSize.min, children: [
         Text('Follow the steps',
             style: pvManrope(

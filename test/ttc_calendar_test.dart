@@ -106,12 +106,16 @@ void main() {
       expect(find.text('Today'), findsWidgets);
     });
 
-    testWidgets('and can still be folded away once she knows them',
+    // ⚠️ THE KEY IS ONE LINE NOW, ALWAYS SHOWN (2026-09-27, the calendar
+    // redesign): nothing to fold, and nothing hidden behind a title. Kept for
+    // revert: this test tapped "What the colours mean" and expected the rows
+    // to fold away.
+    testWidgets('the key is one line under the grid, always shown',
         (tester) async {
       await pumpCalendar(tester);
-      await tester.tap(find.textContaining('colours').first);
-      await tester.pumpAndSettle();
-      expect(find.text('Period'), findsNothing);
+      expect(find.textContaining('colours'), findsNothing);
+      expect(find.text('Period'), findsWidgets);
+      expect(find.text('Today'), findsWidgets);
     });
   });
 

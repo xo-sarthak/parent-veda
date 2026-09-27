@@ -127,8 +127,15 @@ final Map<String, List<String>> kPvProductPhotos = {
   'ttc_myo_inositol': [_u('1732900293895-233f769299b3'), _u('1707129785947-ddc627a8bab9')],
   'ttc_zinc': [_u('1624362772755-4d5843e67047'), _u('1664956618021-73c47736845e')],
   'ttc_fertility_blend': [_u('1707129785947-ddc627a8bab9'), _u('1624362772755-4d5843e67047')],
-  'ttc_lh_strips': [_u('1619183921628-9e6050dcd2e1'), _u('1647549228195-301269c33265')],
-  'ttc_preg_test': [_u('1647549228195-301269c33265'), _u('1619183921628-9e6050dcd2e1'), _u('1643659733565-94e097cdb7e9')],
+  // ⚠️ NO OTHER BRAND'S PRODUCT, AND NO BUMP (TTC launch walk, 2026-09-27):
+  // 1647549228195 is a Clearblue test, shown on a Prega News listing, and
+  // 1643659733565 is a pregnant belly on a shelf for people still trying.
+  // Both leave; the unbranded card test stays. A real LH strip photo is owed.
+  // Kept for revert:
+  //   'ttc_lh_strips': [_u('1619183921628-9e6050dcd2e1'), _u('1647549228195-301269c33265')],
+  //   'ttc_preg_test': [_u('1647549228195-301269c33265'), _u('1619183921628-9e6050dcd2e1'), _u('1643659733565-94e097cdb7e9')],
+  'ttc_lh_strips': [_u('1619183921628-9e6050dcd2e1')],
+  'ttc_preg_test': [_u('1619183921628-9e6050dcd2e1')],
   'ttc_lubricant': [_u('1580870069867-74c57ee1bb07')],
   'ttc_thermometer': [_u('1594790628624-9e563bea851d'), _u('1609725236589-d987ffc8133a')],
   'ttc_book_impatient': [_u('1497633762265-9d179a990aa6'), _u('1495446815901-a7297e633e8d')],

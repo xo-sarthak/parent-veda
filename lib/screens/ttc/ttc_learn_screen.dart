@@ -261,6 +261,14 @@ Bracket? _bracketById(String id) {
   return null;
 }
 
+/// The drawn mark of the door a read belongs to, or null (2026-09-27).
+BracketMark? _doorMarkOf(PvRead r) {
+  for (final b in kTtcBrackets) {
+    if (b.label.en == r.kicker.en) return bracketMarkFor(b.id);
+  }
+  return null;
+}
+
 /// The door hue for a read, so its row and its reader share one colour.
 double _hueOfRead(PvRead r) {
   for (final b in kTtcBrackets) {
@@ -299,10 +307,24 @@ class TtcLearnTopic {
 /// gathers other doors' reads without writing any, so building topics from
 /// shelves left it with no tile. The count comes from the door's own tiles,
 /// filtered the way the door itself filters them.
-List<TtcLearnTopic> ttcLearnTopics({bool? hideIntimate}) {
+///
+/// ⚠️ HIS SIDE (2026-09-27): viewed as him, his own door and Mind and body
+/// lead, then hers in their order. The library itself is the same for both,
+/// as Flo for Partners gives him the pieces about her body too.
+const List<String> kTtcHisLearnFirst = ['ttc_male_fertility', 'ttc_mind_body'];
+
+List<TtcLearnTopic> ttcLearnTopics({bool? hideIntimate, bool? him}) {
   final hide = hideIntimate ?? TtcContentPrefs.instance.hideIntimate;
+  final forHim = him ?? TtcPartnerMode.instance.on;
+  final brackets = !forHim
+      ? kTtcBrackets
+      : [
+          for (final id in kTtcHisLearnFirst) ?_bracketById(id),
+          for (final b in kTtcBrackets)
+            if (!kTtcHisLearnFirst.contains(b.id)) b,
+        ];
   return [
-    for (final b in kTtcBrackets)
+    for (final b in brackets)
       if (ttcFocusPageFor(b.id) case final page?)
         TtcLearnTopic(
           bracket: b,
@@ -566,6 +588,8 @@ class _TtcLearnScreenState extends State<TtcLearnScreen> {
         TtcLearnRecents.instance,
         // Her "Hide sex and intimacy content" choice (2026-09-26).
         TtcContentPrefs.instance,
+        // His side leads with his own door (2026-09-27).
+        TtcPartnerMode.instance,
       ]),
       builder: (context, _) {
         final p = pvStorePalette;
@@ -1019,8 +1043,15 @@ class _TtcLearnScreenState extends State<TtcLearnScreen> {
           VoidCallback? onTap}) =>
       PvListRow(
         p: p,
+        // ⚠️ THE DOOR'S DRAWING WHEN THERE IS NO PHOTO (2026-09-27): the home
+        // draws a read this way, so the same read looks the same in both
+        // places. Kept for revert: mark: IntentMark.pageMark alone.
         leading: PvMarkWell(
-            p: p, hue: hue, photo: r.imageUrl, mark: IntentMark.pageMark),
+            p: p,
+            hue: hue,
+            photo: r.imageUrl,
+            bracket: _doorMarkOf(r),
+            mark: _doorMarkOf(r) == null ? IntentMark.pageMark : null),
         title: r.title.en,
         line: r.teaser.en,
         meta: meta,

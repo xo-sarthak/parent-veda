@@ -71,8 +71,16 @@ void main() {
       }
     }
 
-    expect(checked, greaterThan(20),
+    // ⚠️ 20 -> 15 ON 2026-09-27: eight tools moved onto `TtcToolScaffold`,
+    // whose sheet reserves `ttcBottomInset` for every tool at once (checked
+    // just below), so there are fewer hand-rolled lists for this pattern to
+    // find. Kept for revert: greaterThan(20).
+    expect(checked, greaterThan(15),
         reason: 'the pattern stopped matching - this test went blind');
+    final shell =
+        File('lib/screens/ttc/ttc_tool_chrome.dart').readAsStringSync();
+    expect(shell, contains('padding: const EdgeInsets.only(bottom: ttcBottomInset)'),
+        reason: 'the tool shell must keep its sheet clear of the Ask button');
     expect(offenders, isEmpty,
         reason: 'content will sit under the Ask Veda FAB on these screens');
   });

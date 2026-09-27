@@ -304,7 +304,7 @@ final List<PvRead> kTtcReadsMindBody = [
           "you've stopped seeing people, if your cycles have stopped, or if "
           "you're drinking more to get through it. And talk to someone today, "
           'not at the next appointment, if you have thoughts of harming '
-          "yourself. None of this means you've failed to cope. It means the "
+          "yourself.\n\nNone of this means you've failed to cope. It means the "
           'right help now is a person rather than a practice.'),
     ),
 
@@ -581,7 +581,7 @@ final List<PvRead> kTtcReadsMindBody = [
           'condition. And talk to a person, not a practice, if the waiting has '
           "turned into low mood or anxiety you can't put down. Be extra "
           'careful with anyone offering garbh sanskar instead of fertility '
-          "treatment. The tradition itself doesn't claim that."),
+          "treatment.\n\nThe tradition itself doesn't claim that."),
     ),
 
     evidence: _en('Our description of garbh sanskar follows classical '

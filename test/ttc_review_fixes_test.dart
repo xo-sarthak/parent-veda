@@ -289,7 +289,8 @@ void main() {
         expect(row.subtitle, tool.descEn, reason: id);
       }
       expect(ttcToolById('cycle')!.nameEn, 'Cycle companion');
-      expect(ttcToolById('window')!.nameEn, 'Fertility window');
+      // One name since the launch walk (2026-09-27): 'Fertility window' before.
+      expect(ttcToolById('window')!.nameEn, 'Fertile window');
       expect(ttcToolById('records')!.nameEn, 'Records and reports');
     });
 
@@ -460,6 +461,32 @@ void main() {
       await tester.pump(const Duration(seconds: 5));
     });
 
+    testWidgets('the four quick actions are one row of one design (2026-09-27)',
+        (tester) async {
+      CycleStore.instance
+        ..logPeriodStart(ago(68))
+        ..logPeriodStart(ago(40))
+        ..logPeriodStart(ago(12));
+      await pumpHome(tester);
+      final keys = [
+        'ttc_home_quick_period',
+        'ttc_home_quick_symptoms',
+        'ttc_home_quick_sex',
+        'ttc_home_quick_test',
+      ].map((k) => find.byKey(ValueKey(k))).toList();
+      final rects = [for (final f in keys) tester.getRect(f)];
+      for (final r in rects) {
+        // Same row, same size: nothing looks more important than another.
+        expect(r.center.dy, closeTo(rects.first.center.dy, 0.5));
+        expect(r.size, rects.first.size);
+        expect(r.height, greaterThanOrEqualTo(44));
+      }
+      // Short words under the discs; the full action is for screen readers.
+      for (final w in ['Period', 'Symptoms', kTtcQuickSex, kTtcQuickTest]) {
+        expect(find.text(w), findsOneWidget, reason: w);
+      }
+    });
+
     testWidgets('H6: the header buttons are 44pt targets', (tester) async {
       await pumpHome(tester);
       expect(
@@ -494,7 +521,11 @@ void main() {
 
   // ===========================================================================
   group('Reader', () {
-    testWidgets('R1, R3: the short answer sits between hairlines, in English',
+    // ⚠️ NO HAIRLINES SINCE 2026-09-27 (the user: "two lines above the short
+    // answer, for what reason?"); still no tinted box, and the lede no longer
+    // repeats it. Kept for revert: the test's name said "between hairlines"
+    // and it expected `d.border` to be set.
+    testWidgets('R1, R3: the short answer, no box and no hairlines, in English',
         (tester) async {
       final read = kTtcReads.firstWhere(
           (r) => (r.shortAnswer?.en.trim() ?? '').isNotEmpty);
@@ -507,10 +538,10 @@ void main() {
       expect(tester.takeException(), isNull);
       final box = tester.widget<Container>(
           find.byKey(const ValueKey('pv_reader_short_answer')));
-      final d = box.decoration! as BoxDecoration;
-      expect(d.color, isNull, reason: 'no tinted fill');
-      expect(d.borderRadius, isNull, reason: 'no rounded box');
-      expect(d.border, isNotNull, reason: 'the two hairlines');
+      expect(box.decoration, isNull,
+          reason: 'no tinted fill, no rounded box, no hairlines');
+      expect(find.text(read.scaleSetter.en), findsNothing,
+          reason: 'the lede does not repeat the short answer');
       expect(find.text('THE SHORT ANSWER'), findsOneWidget,
           reason: 'English even in the Hindi build');
       expect(_code('lib/screens/reader/pv_reader_screen.dart'),

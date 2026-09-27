@@ -89,13 +89,36 @@ class TtcMoodFace extends StatelessWidget {
   final double size;
   final Color ink;
 
+  // ⚠️ A SCREEN READER HEARS THE MOOD (tools pass, 2026-09-27). A
+  // CustomPaint says nothing, so a face alone (the home's day strip) was
+  // silent. Kept for revert: the bare SizedBox below, without Semantics.
   @override
-  Widget build(BuildContext context) => SizedBox(
-        width: size,
-        height: size,
-        child: CustomPaint(painter: _FacePainter(mood: mood, ink: ink)),
+  Widget build(BuildContext context) => Semantics(
+        label: ttcMoodWord(mood),
+        image: true,
+        child: SizedBox(
+          width: size,
+          height: size,
+          child: CustomPaint(painter: _FacePainter(mood: mood, ink: ink)),
+        ),
       );
 }
+
+/// The mood's word, the same one its chip shows, for a screen reader.
+String ttcMoodWord(TtcMood mood) => switch (mood) {
+      TtcMood.calm => 'Calm',
+      TtcMood.happy => 'Happy',
+      TtcMood.energetic => 'Energetic',
+      TtcMood.low => 'Low',
+      TtcMood.anxious => 'Anxious',
+      TtcMood.irritated => 'Irritated',
+      TtcMood.swings => 'Mood swings',
+      TtcMood.tearful => 'Tearful',
+      TtcMood.hopeful => 'Hopeful',
+      TtcMood.guilty => 'Guilty',
+      TtcMood.looping => "Can't stop thinking about it",
+      TtcMood.hardOnSelf => 'Hard on myself',
+    };
 
 class _FacePainter extends CustomPainter {
   const _FacePainter({required this.mood, required this.ink});

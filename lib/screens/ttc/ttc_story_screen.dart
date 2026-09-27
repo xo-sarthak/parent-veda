@@ -298,7 +298,12 @@ class _Slide extends StatelessWidget {
                 color: skin.onTop.withValues(alpha: 0.16),
                 borderRadius: BorderRadius.circular(999),
               ),
-              child: Text('REVIEWED BY  ·  $reviewedBy',
+              // ⚠️ ONE BYLINE, AND ONLY A PERSON "REVIEWS" (launch walk,
+              // 2026-09-27). Values that already say "Reviewed by …" read
+              // twice, and "REVIEWED BY · ParentVeda team" claimed a review
+              // nobody did; the team is "BY", as in the reader.
+              // Kept for revert: Text('REVIEWED BY  ·  $reviewedBy',
+              child: Text(ttcStoryByline(reviewedBy!),
                   style: pvManrope(
                       fontSize: 9.5,
                       fontWeight: FontWeight.w800,
@@ -373,4 +378,14 @@ class _Chevron extends StatelessWidget {
           ),
         ),
       );
+}
+
+/// The pill on a story's first slide: "REVIEWED BY · Dr Name, role" for a
+/// person, "BY · ParentVeda team" for the team, and never the words twice.
+String ttcStoryByline(String raw) {
+  var who = raw.trim();
+  final lead = RegExp(r'^(reviewed\s+by|by)\s*[:·]?\s*', caseSensitive: false);
+  who = who.replaceFirst(lead, '');
+  final team = who.toLowerCase().contains('parentveda');
+  return '${team ? 'BY' : 'REVIEWED BY'}  ·  $who';
 }

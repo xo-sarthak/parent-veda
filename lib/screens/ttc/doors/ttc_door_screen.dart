@@ -47,6 +47,27 @@
 //    D5  the whole flag opens its read, and "Read the full piece" is a 44pt
 //        target, as the pregnancy flag is.
 //
+//  ⚠️ ONE SYSTEM, NOT NINE (the user walking build 13, 2026-09-27: the doors
+//  looked "bland" and "random", "so many elements placed but not blending",
+//  "everything should feel done on purpose rather than random"). Six
+//  changes, each fixing one source of "random":
+//    1  the hero is ONE height on every door ([kTtcDoorHeroHeight]); the
+//       headline clamps to two lines and the blurb to three, so a long blurb
+//       no longer makes a taller photograph. The scrim is lighter, and the
+//       photograph PARALLAXES: it climbs at under half the scroll speed
+//       while the sheet slides up over it (the doctor app's `DcHero`
+//       mechanism, copied, not shared: a scroll offset in a notifier, the
+//       photo translated by a fraction of it).
+//    2  the search field is glass on the photograph
+//       (`TtcDoorGlassSearchField`), not a white slab.
+//    3  every section is a rail of ONE card (`TtcDoorSectionCard`), never
+//       rows: the rows-when-all-written rule is retired (kept for revert).
+//       A card with no photo is typographic, not a faded ghost shape.
+//    4  a pinned red flag is one compact row that opens the full list in a
+//       sheet (`TtcDoorFlagRow`); nothing clinical removed, only folded.
+//    5  one heading style for every section: pvFraunces 21 w600.
+//    6  one vertical rhythm ([_kTtcDoorBlockGap], [_kTtcDoorHeadingGap]).
+//
 //  ⚠️ THE IVF DOOR'S TOP PANEL (B7): `TtcIvfRoundPanel`, "Your round" /
 //  "Between rounds" / "Positive test" / "Starting treatment?", and while a
 //  round is planned or running "Going through it" and "Track" lead the rail
@@ -58,6 +79,7 @@
 //  this file is keyed on a bracket id.
 // =============================================================================
 
+import 'package:flutter/foundation.dart' show ValueListenable;
 import 'package:flutter/material.dart';
 
 import '../../../localization/app_language.dart';
@@ -80,14 +102,18 @@ import '../../v2/v2_palette.dart';
 import '../../v2/v3_bracket_art.dart';
 import '../../v2/v3_hero_field.dart';
 import '../ttc_askveda_screen.dart' show openTtcAskVeda;
+// Kept for revert (2026-09-27): `iconForFormat` too, for `PvDoorRailCard`'s
+// icon; the TTC section card draws the format's mark instead.
 import '../ttc_focus_screen.dart'
-    show openTtcFocusTile, openTtcArticle, photoForTile, iconForFormat;
+    show openTtcFocusTile, openTtcArticle, photoForTile;
+import '../ttc_intimate_offer.dart' show ttcMaybeOfferIntimateSwitch;
 import '../ttc_strings.dart';
 import '../ttc_surface_router.dart' show ttcInlineToolFor, openTtcSurface;
 // Kept for revert: `show TtcStartTreatmentCard` (the panel draws it now).
 import '../ttc_treatment_round_screens.dart'
     show TtcIvfRoundPanel, ttcIvfRoundLeads;
 import '../../../ttc/ttc_treatment_store.dart';
+import 'ttc_door_card.dart';
 import 'ttc_door_rail.dart';
 import 'ttc_door_search.dart';
 
@@ -101,9 +127,34 @@ Key ttcDoorRowsKey(String heading) => ValueKey('ttc-door-rows-$heading');
 Key ttcDoorSectionRailKey(String heading) =>
     ValueKey('ttc-door-section-rail-$heading');
 
+const Key kTtcDoorHeroKey = ValueKey('ttc-door-hero');
+
 /// How far the photograph runs on under the sheet's rounded top. The rail
 /// lifts by `TtcDoorRail.overlap` on top of this; see `_Hero._bleed`.
 const double kTtcDoorHeroOverlap = 38;
+
+/// The hero's height under the status bar, the same on every door
+/// (2026-09-27, the user: "the hero image height differs door to door").
+/// Sized to hold the back button, the eyebrow, a two-line headline, a
+/// three-line blurb and the field, so the clamps below are what keep it
+/// fixed. At a very large text size the hero grows rather than overflow.
+const double kTtcDoorHeroHeight = 344;
+
+/// The one vertical rhythm on a door (2026-09-27): the gap between any two
+/// blocks (rail, panel, flag, note, tool, section, closing line), and the
+/// gap between a section's heading and its rail.
+const double _kTtcDoorBlockGap = 24;
+const double _kTtcDoorHeadingGap = 12;
+
+/// The section heading, one style for every section on every door (and the
+/// inline Mind & body Today panel matches it).
+TextStyle ttcDoorHeadingStyle(V2Palette p) => pvFraunces(
+  fontSize: 21,
+  fontWeight: FontWeight.w600,
+  height: 1.2,
+  letterSpacing: -0.45,
+  color: p.ink1,
+);
 
 // -----------------------------------------------------------------------------
 //  The one opener
@@ -155,6 +206,11 @@ bool openTtcDoor(
 bool ttcDoorTileIsWritten(TtcTile t) =>
     t is TtcArticleTile || t is TtcGuideTile;
 
+/// ⚠️ RETIRED ON THE DOOR 2026-09-27: every section is a card rail now (the
+/// user, of His side › Understand: rows for "Is it about him?" and cards for
+/// "Is it worth testing?" in one tab read as random; "Fertile window seems
+/// consistent because it follows the card design throughout"). The screen no
+/// longer calls this. Kept for revert, with the rows branch in `build`.
 bool ttcDoorSectionIsRows(List<TtcTile> tiles) =>
     tiles.isNotEmpty && tiles.every(ttcDoorTileIsWritten);
 
@@ -320,7 +376,14 @@ String ttcDoorDisclaimerFor(String bracketId) {
 /// loss and Mind and body travels intact. A full stop after a short
 /// abbreviation ("Dr.", "e.g.") or before a lowercase word or a number does
 /// not end a line.
+///
+/// ⚠️ ONLY THE FIRST BLOCK IS SIGNS (launch walk, 2026-09-27). A callout may
+/// close with advice after a blank line ("These are signs of heavy bleeding
+/// or infection. Both can be treated…"); split into sentences, that advice was
+/// drawn as four more bullets and an urgent list read as ten signs. The text
+/// after the first blank line is [ttcFlagProse] and renders as a paragraph.
 List<String> ttcFlagLines(String body) {
+  body = body.split('\n\n').first;
   final abbrev = RegExp(
       r'(?:\b(?:Dr|Mr|Mrs|Ms|St|vs|approx|No|e\.g|i\.e|etc)\.)$',
       caseSensitive: false);
@@ -343,6 +406,15 @@ List<String> ttcFlagLines(String body) {
   }
   return out;
 }
+
+/// The advice after a callout's signs: every block after the first blank
+/// line, each one a paragraph. Empty when the callout is signs only.
+List<String> ttcFlagProse(String body) => body
+    .split('\n\n')
+    .skip(1)
+    .map((b) => b.replaceAll('\n', ' ').trim())
+    .where((b) => b.isNotEmpty)
+    .toList();
 
 /// The IVF & IUI door's bracket, the only door whose order follows age.
 const String kTtcIvfBracketId = 'ttc_infertility';
@@ -410,6 +482,17 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
   final PvLiveSearch _search = PvLiveSearch();
   final GlobalKey _selectorAnchor = GlobalKey();
 
+  /// The list's scroll, for the hero's parallax and its words' fade
+  /// (2026-09-27). A notifier, so a scroll repaints the hero only, never the
+  /// whole door.
+  final ScrollController _scroll = ScrollController();
+  final ValueNotifier<double> _offset = ValueNotifier(0);
+
+  void _onScroll() {
+    final o = _scroll.offset;
+    if (o != _offset.value) _offset.value = o;
+  }
+
   /// The search index, built once per language and per switch position.
   List<TtcDoorHit>? _index;
   AppLanguage? _indexLang;
@@ -439,12 +522,20 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
   @override
   void initState() {
     super.initState();
+    _scroll.addListener(_onScroll);
     TtcSearchStore.instance.init();
     // Idempotent; main.dart has usually loaded it already.
     TtcContentPrefs.instance.init();
     // Her age band, for the IVF door's tab order. Idempotent; a failed read
     // is the default order.
     TtcFertilityHelpStore.instance.load().catchError((_) {});
+    // Opened straight onto Sex and closeness: the one-time shared-phone
+    // offer (2026-09-27, ttc_intimate_offer.dart). Additive.
+    if (widget.initialGroup == kTtcIntimateGroupId) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) ttcMaybeOfferIntimateSwitch(context);
+      });
+    }
   }
 
   @override
@@ -458,8 +549,30 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
 
   @override
   void dispose() {
+    _scroll.removeListener(_onScroll);
+    _scroll.dispose();
+    _offset.dispose();
     _search.dispose();
     super.dispose();
+  }
+
+  /// The pinned flag's full list, in a sheet. The same `TtcDoorRedFlag`
+  /// block the tab used to draw inline, so the words are the read's own.
+  void _openFlag(String rid, PvCallout callout, AppLanguage lang, V2Palette p) {
+    final hue = bracket.hue;
+    showTtcDoorFlagSheet(
+      context,
+      p: p,
+      body: (sheet) => TtcDoorRedFlag(
+        callout: callout,
+        lang: lang,
+        p: p,
+        onOpen: () {
+          Navigator.of(sheet).pop();
+          openTtcArticle(context, rid, hue: hue);
+        },
+      ),
+    );
   }
 
   AppLanguage get _lang =>
@@ -550,10 +663,14 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
                   ),
                 ),
                 ListView(
+                  // The hero's parallax reads this (2026-09-27).
+                  controller: _scroll,
                   // The sheet owns the bottom clearance, not the list.
                   padding: EdgeInsets.zero,
                   children: [
                     _Hero(
+                      key: kTtcDoorHeroKey,
+                      scroll: _offset,
                       page: page,
                       p: p,
                       tint: tint,
@@ -611,14 +728,22 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
                                   ],
                                   selected: groupIndex,
                                   p: p,
-                                  onPick: (i) =>
-                                      setState(() => _groupId = groups[i].id),
+                                  // Kept for revert: onPick: (i) =>
+                                  //   setState(() => _groupId = groups[i].id),
+                                  onPick: (i) {
+                                    setState(() => _groupId = groups[i].id);
+                                    // The one-time shared-phone offer
+                                    // (2026-09-27, ttc_intimate_offer.dart).
+                                    if (groups[i].id == kTtcIntimateGroupId) {
+                                      ttcMaybeOfferIntimateSwitch(context);
+                                    }
+                                  },
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 4),
+                            // Kept for revert (2026-09-27): 4, then 18.
                           ],
-                          const SizedBox(height: 18),
+                          const SizedBox(height: _kTtcDoorBlockGap),
 
                           // ---- "Starting treatment?" (2026-09-26, §2b) ------
                           // The IVF & IUI door only, while no round is saved:
@@ -645,33 +770,60 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
                               onRead: (id) =>
                                   openTtcArticle(context, id, hue: hue),
                             )),
-                            const SizedBox(height: 22),
+                            // Kept for revert (2026-09-27): 22.
+                            const SizedBox(height: _kTtcDoorBlockGap),
                           ],
 
                           // ---- the pinned red flag, above everything ------
                           // The read's OWN callout, never retyped here: one
                           // copy of "go to a hospital today". Rendered whole,
                           // so the self-harm line travels with it.
-                          if (group != null)
+                          //
+                          // FOLDED 2026-09-27 (the user: "alerting is fine,
+                          // it has to be done, but it's too much on the
+                          // face"): still first in the tab, now one compact
+                          // row with the read's own title; the whole list
+                          // opens in a sheet, the same block, words whole.
+                          // Two flags on one tab sit 8 apart, one group.
+                          // Kept for revert, the inline block:
+                          //   pvDoorPad(TtcDoorRedFlag(
+                          //     key: ttcDoorFlagKey(rid),
+                          //     callout: read.whenToSeeSomeone,
+                          //     lang: lang, p: p,
+                          //     onOpen: () =>
+                          //         openTtcArticle(context, rid, hue: hue),
+                          //   )),
+                          //   const SizedBox(height: 22),
+                          if (group != null &&
+                              group.pinnedRedFlagReadIds
+                                  .any((r) => ttcReadById(r) != null)) ...[
                             for (final rid in group.pinnedRedFlagReadIds)
-                              if (ttcReadById(rid) case final read?) ...[
-                                pvDoorPad(
-                                  TtcDoorRedFlag(
-                                    key: ttcDoorFlagKey(rid),
-                                    callout: read.whenToSeeSomeone,
-                                    lang: lang,
-                                    p: p,
-                                    onOpen: () =>
-                                        openTtcArticle(context, rid, hue: hue),
+                              if (ttcReadById(rid) case final read?)
+                                Padding(
+                                  padding: const EdgeInsets.only(bottom: 8),
+                                  child: pvDoorPad(
+                                    TtcDoorFlagRow(
+                                      key: ttcDoorFlagKey(rid),
+                                      callout: read.whenToSeeSomeone,
+                                      lang: lang,
+                                      p: p,
+                                      onOpen: () => _openFlag(
+                                        rid,
+                                        read.whenToSeeSomeone,
+                                        lang,
+                                        p,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                                const SizedBox(height: 22),
-                              ],
+                            const SizedBox(height: _kTtcDoorBlockGap - 8),
+                          ],
 
                           // ---- the tab's standing note --------------------
                           if (group?.note case final note?) ...[
                             pvDoorPad(_TabNote(note: note, p: p)),
-                            const SizedBox(height: 20),
+                            // Kept for revert (2026-09-27): 20.
+                            const SizedBox(height: _kTtcDoorBlockGap),
                           ],
 
                           // ---- the tool, in place, above the sections -----
@@ -686,69 +838,71 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
                               if (ttcInlineToolFor(surface)
                                   case final tool?) ...[
                                 tool,
-                                const SizedBox(height: 28),
+                                // Kept for revert (2026-09-27): 28.
+                                const SizedBox(height: _kTtcDoorBlockGap),
                               ],
 
                           // ---- this tab's sections ------------------------
+                          // ONE FORMAT (2026-09-27): a heading in the one
+                          // heading style, then a rail of the one card, cut
+                          // off at the right edge so it reads as "more this
+                          // way". Every section, every door.
                           for (final section in sections) ...[
                             pvDoorPad(
                               Text(
                                 section.heading,
-                                style: pvFraunces(
-                                  fontSize: 21,
-                                  fontWeight: FontWeight.w600,
-                                  height: 1.2,
-                                  letterSpacing: -0.45,
-                                  color: p.ink1,
-                                ),
+                                style: ttcDoorHeadingStyle(p),
                               ),
                             ),
-                            const SizedBox(height: 13),
-                            // All written: rows into the reader. Mixed: a
-                            // rail, cut off at the right edge so it reads
-                            // as "more this way".
-                            if (ttcDoorSectionIsRows(section.tiles))
-                              pvDoorPad(
-                                _ArticleList(
-                                  key: ttcDoorRowsKey(section.heading),
-                                  tiles: section.tiles,
-                                  p: p,
-                                  hue: hue,
-                                  onOpen: _openTile,
+                            // Kept for revert (2026-09-27): 13.
+                            const SizedBox(height: _kTtcDoorHeadingGap),
+                            // Kept for revert (2026-09-27), all written as
+                            // rows into the reader:
+                            //   if (ttcDoorSectionIsRows(section.tiles))
+                            //     pvDoorPad(_ArticleList(
+                            //       key: ttcDoorRowsKey(section.heading),
+                            //       tiles: section.tiles, p: p, hue: hue,
+                            //       onOpen: _openTile,
+                            //     ))
+                            //   else ...the rail below
+                            // and the shared card the rail used to draw:
+                            //   PvPress(child: PvDoorRailCard(
+                            //     p: p, hue: hue, index: i,
+                            //     icon: iconForFormat(t.format),
+                            //     mark: ttcDoorFormatMark(t.format),
+                            //     imageUrl: photoForTile(t),
+                            //     chip: ttcDoorChip(t), title: t.title,
+                            //     meta: ttcDoorTileMeta(t),
+                            //     onTap: () => _openTile(t),
+                            //   ))
+                            SizedBox(
+                              key: ttcDoorSectionRailKey(section.heading),
+                              height: kTtcDoorCardHeight,
+                              child: ListView.separated(
+                                scrollDirection: Axis.horizontal,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: kPvDoorGutter,
                                 ),
-                              )
-                            else
-                              SizedBox(
-                                key: ttcDoorSectionRailKey(section.heading),
-                                height: kPvRailCardHeight,
-                                child: ListView.separated(
-                                  scrollDirection: Axis.horizontal,
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: kPvDoorGutter,
-                                  ),
-                                  itemCount: section.tiles.length,
-                                  separatorBuilder: (_, _) =>
-                                      const SizedBox(width: kPvRailGap),
-                                  itemBuilder: (context, i) {
-                                    final t = section.tiles[i];
-                                    return PvPress(
-                                      child: PvDoorRailCard(
-                                        p: p,
-                                        hue: hue,
-                                        index: i,
-                                        icon: iconForFormat(t.format),
-                                        mark: ttcDoorFormatMark(t.format),
-                                        imageUrl: photoForTile(t),
-                                        chip: ttcDoorChip(t),
-                                        title: t.title,
-                                        meta: ttcDoorTileMeta(t),
-                                        onTap: () => _openTile(t),
-                                      ),
-                                    );
-                                  },
-                                ),
+                                itemCount: section.tiles.length,
+                                separatorBuilder: (_, _) =>
+                                    const SizedBox(width: kPvRailGap),
+                                itemBuilder: (context, i) {
+                                  final t = section.tiles[i];
+                                  return TtcDoorSectionCard(
+                                    p: p,
+                                    hue: hue,
+                                    mark: ttcDoorFormatMark(t.format),
+                                    kind: ttcDoorChip(t),
+                                    title: t.title,
+                                    meta: ttcDoorTileMeta(t),
+                                    imageUrl: photoForTile(t),
+                                    onTap: () => _openTile(t),
+                                  );
+                                },
                               ),
-                            const SizedBox(height: 26),
+                            ),
+                            // Kept for revert (2026-09-27): 26.
+                            const SizedBox(height: _kTtcDoorBlockGap),
                           ],
 
                           // ---- the closing line, unless the tab says it ---
@@ -765,7 +919,8 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
                                 ),
                               ),
                             ),
-                            const SizedBox(height: 22),
+                            // Kept for revert (2026-09-27): 22.
+                            const SizedBox(height: _kTtcDoorBlockGap),
                           ],
 
                           // D1: not medical advice, and the estimates line
@@ -804,12 +959,9 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
           hits.isEmpty
               ? 'Nothing here by that name yet'
               : 'In $label and the library',
-          style: pvFraunces(
-            fontSize: 22,
-            fontWeight: FontWeight.w600,
-            height: 1.15,
-            color: p.ink1,
-          ),
+          // The one heading style (2026-09-27). Kept for revert: pvFraunces
+          // 22, w600, height 1.15.
+          style: ttcDoorHeadingStyle(p),
         ),
       ),
       const SizedBox(height: 6),
@@ -893,8 +1045,283 @@ class _TtcDoorScreenState extends State<TtcDoorScreen> {
 //  The hero
 // =============================================================================
 
+/// The hero, fixed height, parallax, glass field (2026-09-27). See the file
+/// header, change 1 and 2.
+///
+/// The layout is a Stack whose SIZE comes from a `SizedBox` of
+/// [kTtcDoorHeroHeight] and the words column together (whichever is taller),
+/// with the words pinned to the bottom. Every door's words fit inside the
+/// fixed height once the headline is two lines and the blurb three, so every
+/// door is the same height; only an accessibility text size taller than that
+/// grows the hero, which is better than clipping her words.
 class _Hero extends StatelessWidget {
   const _Hero({
+    super.key,
+    required this.scroll,
+    required this.page,
+    required this.p,
+    required this.tint,
+    required this.eyebrow,
+    required this.bracket,
+    required this.search,
+    required this.hasRail,
+    required this.onSubmitted,
+  });
+
+  /// The list's offset: the photo climbs at [_kRate] of it, and the words
+  /// fade over the first [_kFade] points, so the sheet is never over type.
+  final ValueListenable<double> scroll;
+  final TtcFocusPage page;
+  final V2Palette p;
+  final Color tint;
+  final String eyebrow;
+  final Bracket bracket;
+  final PvLiveSearch search;
+  final bool hasRail;
+  final ValueChanged<String> onSubmitted;
+
+  /// Under half the scroll speed, so the picture reads as behind the page.
+  /// The doctor app's hero uses 0.5; a little less here, because the rail
+  /// straddles the seam and a fast photo behind it shimmered.
+  static const double _kRate = 0.45;
+  static const double _kFade = 200;
+
+  /// Room above the words for the back button (8 + 38 + 12).
+  static const double _kTopRoom = 58;
+
+  double get _bleed =>
+      hasRail ? kTtcDoorHeroOverlap + TtcDoorRail.overlap : kTtcDoorHeroOverlap;
+
+  @override
+  Widget build(BuildContext context) {
+    final mark = bracketMarkFor(bracket.id);
+    final photo = page.heroImageUrl;
+    final title = page.heroTitle ?? eyebrow;
+    final blurb = page.heroBlurb ?? page.intro;
+    final top = MediaQuery.paddingOf(context).top;
+    // A soft shadow under white type: insurance for a bright photograph now
+    // that the scrim is lighter.
+    const shadow = [Shadow(color: Color(0x59000000), blurRadius: 12)];
+
+    final words = PvLiveSearchWords(
+      search: search,
+      child: ValueListenableBuilder<double>(
+        valueListenable: scroll,
+        builder: (context, o, child) => Opacity(
+          opacity: (1 - o / _kFade).clamp(0.0, 1.0),
+          child: child,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              eyebrow.toUpperCase(),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: pvManrope(
+                fontSize: 11,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 1.4,
+                color: photo == null
+                    ? p.ink2
+                    : Colors.white.withValues(alpha: 0.86),
+              ).copyWith(shadows: photo == null ? null : shadow),
+            ),
+            const SizedBox(height: 8),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 300),
+              child: Text(
+                title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: pvFraunces(
+                  fontSize: photo == null ? 27 : 29,
+                  fontWeight: FontWeight.w600,
+                  height: 1.15,
+                  letterSpacing: -0.6,
+                  color: photo == null ? p.ink1 : Colors.white,
+                ).copyWith(shadows: photo == null ? null : shadow),
+              ),
+            ),
+            const SizedBox(height: 10),
+            ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 330),
+              child: Text(
+                blurb,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: pvManrope(
+                  fontSize: 13.5,
+                  height: 1.5,
+                  color: photo == null
+                      ? p.ink2
+                      : Colors.white.withValues(alpha: 0.94),
+                ).copyWith(shadows: photo == null ? null : shadow),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+
+    // Search, in the door: Flo's topic page. Live, so rows draw in the sheet
+    // as she types. Glass on a photograph; the shared solid field where
+    // there is none, because white type would not read on the pale field.
+    // Kept for revert: PvLiveSearchField(key: kTtcDoorSearchKey, ...) always.
+    final Widget field = photo == null
+        ? PvLiveSearchField(
+            key: kTtcDoorSearchKey,
+            search: search,
+            p: p,
+            hint: 'Search $eyebrow',
+            onSubmitted: onSubmitted,
+          )
+        : TtcDoorGlassSearchField(
+            key: kTtcDoorSearchKey,
+            search: search,
+            hint: 'Search $eyebrow',
+            onSubmitted: onSubmitted,
+          );
+
+    return Stack(
+      // `Clip.none` lets the picture run on under the sheet and the rail.
+      clipBehavior: Clip.none,
+      children: [
+        // ---- the photograph, parallaxed --------------------------------
+        // Translated DOWN by a fraction of the scroll, so on screen it
+        // climbs slower than the page. Its top edge stays above the screen
+        // (it moves down by less than the page moved up), and what runs on
+        // below is under the sheet, which paints over it.
+        if (photo != null)
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: -_bleed,
+            child: ValueListenableBuilder<double>(
+              valueListenable: scroll,
+              builder: (context, o, child) => Transform.translate(
+                // Clamped at 0 so an overscroll bounce cannot pull the photo
+                // off the top of its frame.
+                offset: Offset(0, (o * _kRate).clamp(0.0, double.infinity)),
+                child: child,
+              ),
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  // Both builders return nothing, so offline the hero is the
+                  // finished field, never a grey box.
+                  Image.network(
+                    photo,
+                    fit: BoxFit.cover,
+                    alignment: Alignment.topCenter,
+                    errorBuilder: (_, _, _) => const SizedBox.shrink(),
+                    loadingBuilder: (context, child, progress) =>
+                        progress == null ? child : const SizedBox.shrink(),
+                  ),
+                  // A dark scrim only; fading to the page colour reads as
+                  // fog. LIGHTER since 2026-09-27 (the photo is the picture,
+                  // not a dark band), with shadows under the type instead.
+                  // Kept for revert: 0.52 / 0.30 / 0.34 at 0 / 0.62 / 1.
+                  DecoratedBox(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withValues(alpha: 0.42),
+                          Colors.black.withValues(alpha: 0.20),
+                          Colors.black.withValues(alpha: 0.44),
+                        ],
+                        stops: const [0, 0.45, 1],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        if (photo == null)
+          Positioned(
+            right: -26,
+            top: 52,
+            child: Opacity(
+              opacity: 0.5,
+              child: SizedBox(
+                width: 146,
+                height: 146,
+                child: mark == null
+                    ? const SizedBox.shrink()
+                    : V3BracketArt(mark: mark, tint: tint),
+              ),
+            ),
+          ),
+
+        // ---- the size, and the words at the bottom of it -----------------
+        Padding(
+          padding: EdgeInsets.only(top: top),
+          child: Stack(
+            alignment: Alignment.bottomLeft,
+            children: [
+              const SizedBox(
+                height: kTtcDoorHeroHeight,
+                width: double.infinity,
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(
+                  20,
+                  _kTopRoom,
+                  22,
+                  20 + (hasRail ? TtcDoorRail.overlap - 12 : 0),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    words,
+                    const SizedBox(height: 16),
+                    field,
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+
+        // ---- back ----------------------------------------------------------
+        Positioned(
+          top: top + 8,
+          left: 20,
+          child: Material(
+            color: Colors.white.withValues(alpha: 0.55),
+            shape: const CircleBorder(),
+            clipBehavior: Clip.antiAlias,
+            child: InkWell(
+              onTap: () => Navigator.of(context).maybePop(),
+              child: SizedBox(
+                width: 38,
+                height: 38,
+                child: Icon(
+                  Icons.arrow_back_rounded,
+                  size: 19,
+                  color: p.ink1,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+/// The hero before 2026-09-27: its height followed the blurb's length (and a
+/// tenth of the screen), a heavier scrim, a solid white field, no parallax.
+/// Kept for revert.
+// ignore: unused_element
+class _HeroV1 extends StatelessWidget {
+  const _HeroV1({
     required this.page,
     required this.p,
     required this.tint,
@@ -1175,6 +1602,15 @@ class TtcDoorRedFlag extends StatelessWidget {
               ],
             ),
           ),
+        // The closing advice, as words rather than more signs (2026-09-27).
+        for (final para in ttcFlagProse(callout.body.of(lang)))
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              para,
+              style: pvManrope(fontSize: 14, height: 1.5, color: p.ink2),
+            ),
+          ),
         if (onOpen != null) ...[
           const SizedBox(height: 4),
           // D5: a 44pt row. The whole block opens the read too (below).
@@ -1259,8 +1695,12 @@ class _TabNote extends StatelessWidget {
 //  derived meta, a chevron, a hairline under. Presses and hums.
 // =============================================================================
 
+// Kept for revert (2026-09-27): no section draws as rows any more; see
+// `ttcDoorSectionIsRows`.
+// ignore: unused_element
 class _ArticleList extends StatelessWidget {
   const _ArticleList({
+    // ignore: unused_element_parameter
     super.key,
     required this.tiles,
     required this.p,

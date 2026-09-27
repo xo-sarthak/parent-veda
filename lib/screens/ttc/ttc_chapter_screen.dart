@@ -72,7 +72,8 @@ class _TtcChapterScreenState extends State<TtcChapterScreen> {
         final hi = t.hinglish;
         final chapter = widget.chapter;
         final content = ttcChapterContent[chapter]!;
-        final isCurrent = TtcStore.instance.today.chapter == chapter;
+        final current = TtcStore.instance.today.chapter;
+        final isCurrent = current == chapter;
 
         final sections = switch (_tab) {
           TtcChapterTab.me => content.me,
@@ -87,7 +88,12 @@ class _TtcChapterScreenState extends State<TtcChapterScreen> {
               padding: const EdgeInsets.fromLTRB(
                   ttcGutter, 8, ttcGutter, ttcBottomInset),
               children: [
-                TtcBackBar(title: t.yourChapter),
+                // ⚠️ "YOUR CHAPTER" ONLY WHEN IT IS HERS (2026-09-27). Opened
+                // from the map or search, a chapter she is not in was still
+                // headed "Your chapter". Kept for revert:
+                //   TtcBackBar(title: t.yourChapter),
+                TtcBackBar(
+                    title: isCurrent ? t.yourChapter : 'Part of your month'),
                 const SizedBox(height: 16),
 
                 _ChapterHero(
@@ -95,6 +101,11 @@ class _TtcChapterScreenState extends State<TtcChapterScreen> {
                     content: content,
                     t: t,
                     isCurrent: isCurrent),
+                // A way back to the part of the month she is really in.
+                if (!isCurrent) ...[
+                  const SizedBox(height: 12),
+                  _BackToCurrent(current: current, t: t),
+                ],
                 const SizedBox(height: 20),
 
                 _Tabs(
@@ -109,6 +120,20 @@ class _TtcChapterScreenState extends State<TtcChapterScreen> {
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          // ⚠️ WHO EACH "US" CARD IS FOR (2026-09-27). The tab
+                          // spoke to him in one card ("Don't ask her what day
+                          // it is") and to both of them in the next, and never
+                          // said which.
+                          if (_tab == TtcChapterTab.us) ...[
+                            Text(ttcUsCardAudience(s.titleEn).toUpperCase(),
+                                style: ttcBody(10.5,
+                                    color: ttcUsCardAudience(s.titleEn) ==
+                                            kTtcForHim
+                                        ? ttcCoral
+                                        : ttcPurple,
+                                    w: FontWeight.w800)),
+                            const SizedBox(height: 6),
+                          ],
                           Text(s.title(hi), style: ttcJakarta(16.5)),
                           const SizedBox(height: 10),
                           Text(s.body(hi),
@@ -118,14 +143,24 @@ class _TtcChapterScreenState extends State<TtcChapterScreen> {
                   const SizedBox(height: 12),
                 ],
 
-                // The action plan and the medical guidance live on the NEXT
-                // face, because that is what "what's next" means here.
+                // The action plan lives on the NEXT face, because that is
+                // what "what's next" means here.
+                //
+                // ⚠️ THE DOCTOR CARD IS ON EVERY FACE (2026-09-27). It was
+                // only on "What's next", so someone reading "Me" never saw
+                // the most safety-relevant card on the page. Kept for revert:
+                //   if (_tab == TtcChapterTab.next) ...[
+                //     const SizedBox(height: 6),
+                //     _ActionPlan(content: content, t: t),
+                //     const SizedBox(height: 12),
+                //     _MedicalCard(content: content, t: t),
+                //   ],
                 if (_tab == TtcChapterTab.next) ...[
                   const SizedBox(height: 6),
                   _ActionPlan(content: content, t: t),
                   const SizedBox(height: 12),
-                  _MedicalCard(content: content, t: t),
                 ],
+                _MedicalCard(content: content, t: t),
 
                 const SizedBox(height: 12),
                 _AskVedaCard(content: content, t: t),
@@ -182,6 +217,14 @@ class _ChapterHero extends StatelessWidget {
         if (isCurrent) const SizedBox(height: 12),
         Text(chapter.title(hi),
             style: ttcFraunces(27, w: FontWeight.w600, color: Colors.white)),
+        // ⚠️ WHAT PART OF THE MONTH THIS IS, IN PLAIN WORDS (2026-09-27).
+        // The chapter names are ours ("Knowing Your Rhythm"), and nothing
+        // said which days they cover or that they follow her cycle. One
+        // wording for the whole stage: `ttcChapterPlainPart`.
+        const SizedBox(height: 6),
+        Text(ttcChapterPlainPart(chapter),
+            style: ttcBody(13.5,
+                color: Colors.white, w: FontWeight.w700, h: 1.45)),
         const SizedBox(height: 10),
         Text(content.overview(hi),
             style: ttcBody(14,
@@ -414,6 +457,59 @@ class _WriteAboutIt extends StatelessWidget {
           const SizedBox(width: 5),
           const Icon(Icons.arrow_forward_rounded, size: 15, color: ttcPurple),
         ]),
+      ]),
+    );
+  }
+}
+
+// ---- who an "Us" card is for -------------------------------------------------
+
+/// The label over a card written to him alone.
+const String kTtcForHim = 'For him';
+
+/// The label over a card written to the two of them.
+const String kTtcForYouBoth = 'For you both';
+
+/// Who an "Us" card speaks to, keyed on its English title (the identity; the
+/// Hindi side is display). Anything not listed is written to both of them,
+/// which is the default voice of the Us tab.
+const Map<String, String> kTtcUsCardAudience = {
+  'Half of this is his': kTtcForHim,
+  'What he can track': kTtcForHim,
+  'His part, plainly': kTtcForHim,
+};
+
+String ttcUsCardAudience(String titleEn) =>
+    kTtcUsCardAudience[titleEn] ?? kTtcForYouBoth;
+
+// ---- back to the chapter she is in ------------------------------------------
+
+class _BackToCurrent extends StatelessWidget {
+  const _BackToCurrent({required this.current, required this.t});
+
+  final TtcChapter current;
+  final TtcS t;
+
+  @override
+  Widget build(BuildContext context) {
+    return TtcCard(
+      key: const ValueKey('ttc_chapter_back_to_current'),
+      color: ttcPanel,
+      onTap: () => Navigator.of(context).pushReplacement(MaterialPageRoute<void>(
+        builder: (_) => TtcChapterScreen(chapter: current),
+        settings: const RouteSettings(name: 'ttc/chapter'),
+      )),
+      child: Row(children: [
+        const Icon(Icons.my_location_rounded, size: 17, color: ttcPurple),
+        const SizedBox(width: 10),
+        Expanded(
+          child: Text(
+              "You're in ${current.title(t.hinglish)} right now. "
+              'Tap to open it.',
+              style: ttcBody(13, color: ttcTitleInk, w: FontWeight.w700, h: 1.4)),
+        ),
+        const SizedBox(width: 6),
+        const Icon(Icons.arrow_forward_rounded, size: 15, color: ttcPurple),
       ]),
     );
   }

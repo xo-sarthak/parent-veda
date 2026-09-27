@@ -726,7 +726,8 @@ void main() {
       for (final (index, ov) in [(1, 33 - 14), (2, 26 - 14)]) {
         final start = starts[starts.length - 1 - index];
         final opensOn = plus(start, ov - 5 - 1);
-        final closesOn = plus(start, ov + 1 - 1);
+        // Six days ending on ovulation since 2026-09-27 (was ov + 1).
+        final closesOn = plus(start, ov + ttcWindowClosesAfterOvulation - 1);
         for (var cd = 1; cd <= (index == 1 ? 33 : 26); cd++) {
           final d = plus(start, cd - 1);
           final ctx = ttcDayContext(d);
@@ -735,7 +736,8 @@ void main() {
           expect(ctx.ovulationDay, ov, reason: why);
           expect(ctx.windowOpensOn, opensOn, reason: why);
           expect(ctx.windowClosesOn, closesOn, reason: why);
-          final inside = cd >= ov - 5 && cd <= ov + 1;
+          final inside =
+              cd >= ov - 5 && cd <= ov + ttcWindowClosesAfterOvulation;
           // The calendar.
           final facts = ttcFactsFor(d);
           expect(facts.fertility != null && facts.fertility != FertilityLevel.low,
@@ -759,7 +761,8 @@ void main() {
         final report = ttcBuildCycleReport(index: index);
         expect(report.state, isNot(TtcReportState.noEstimate));
         for (final rd in report.days) {
-          final inside = rd.cycleDay >= ov - 5 && rd.cycleDay <= ov + 1;
+          final inside = rd.cycleDay >= ov - 5 &&
+              rd.cycleDay <= ov + ttcWindowClosesAfterOvulation;
           if (rd.cycleDay > 5) {
             expect(rd.phase == TtcPhase.fertileWindow, inside,
                 reason: 'report, cycle $index back, day ${rd.cycleDay}');
@@ -1376,8 +1379,16 @@ void main() {
           for (final e in r.dates.entries) {
             final f = ttcFactsFor(e.value);
             expect(f.isClinicDate, isTrue, reason: '$why: ${e.key.name}');
-            expect(f.treatment,
-                contains(ttcCalendarDateLabel(e.key, kind)),
+            // The trigger carries its time since 2026-09-27 (tools pass,
+            // "Trigger injection · 10:15pm"). Was:
+            //   expect(f.treatment,
+            //       contains(ttcCalendarDateLabel(e.key, kind)), ...);
+            expect(
+                f.treatment,
+                contains(e.key.needsTime
+                    ? '${ttcCalendarDateLabel(e.key, kind)} · '
+                        '${ttcRoundTime(e.value)}'
+                    : ttcCalendarDateLabel(e.key, kind)),
                 reason: '$why: ${e.key.name}');
           }
           for (final sc in r.scans) {
@@ -1553,7 +1564,8 @@ void main() {
     }
 
     testWidgets('back from the waiting days into the window', (tester) async {
-      // A 32-day history: the window is cycle days 13 to 19. Today is day 20,
+      // A 32-day history: the window is cycle days 13 to 18 (six days ending
+      // on ovulation since 2026-09-27; it was 13 to 19). Today is day 20,
       // the first of the waiting days, so the window door has already rolled
       // on to NEXT cycle's window. The strip steps back three days, to day 17.
       seed(const _Scenario('32', [32, 32]), 20);
@@ -1575,7 +1587,9 @@ void main() {
       // The hero: this cycle's window, counted from the selected day.
       final ctx = ttcDayContext(target);
       expect(ctx.phase, TtcDayPhase.window);
-      expect(find.text('today and 2 more days'), findsOneWidget,
+      // Day 17 to day 18: two days (was 'today and 2 more days' with the
+      // seventh day).
+      expect(find.text('today and tomorrow'), findsOneWidget,
           reason: 'the hero did not count from the selected day');
       final o = ctx.windowOpensOn!, c = ctx.windowClosesOn!;
       expect(

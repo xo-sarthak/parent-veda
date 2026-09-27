@@ -173,7 +173,8 @@ const List<TtcCourseSession> kTtcCourseSessions = [
         'still.',
     steps: [
       'Read the opening: where the practice comes from, and what it is for.',
-      'Read the four things this course leaves out, and why.',
+      // Was "the four things" (2026-09-27): the panel lists five.
+      'Read what this course leaves out, and why.',
       'Sit upright somewhere quiet, and start the two-minute timer.',
       "Do nothing. Let your thoughts come and go. You aren't trying to empty "
           'your mind.',

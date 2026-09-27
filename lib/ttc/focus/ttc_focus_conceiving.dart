@@ -123,32 +123,32 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
     //     icon: Icons.favorite_border_rounded,
     //     hue: 42),
     TtcFocusGroup(
-        id: 'trying', mark: IntentMark.cycleRing,
+        id: 'trying', mark: IntentMark.cycleRing, tabMark: TtcTabMark.windowRing,
         label: 'When and how',
         icon: Icons.center_focus_weak_outlined,
         hue: 344),
     TtcFocusGroup(
-        id: 'waiting', mark: IntentMark.calendarDay,
+        id: 'waiting', mark: IntentMark.calendarDay, tabMark: TtcTabMark.testStrip,
         label: 'Waiting and testing',
         icon: Icons.hourglass_empty_rounded,
         hue: 268),
     TtcFocusGroup(
-        id: 'sex', mark: IntentMark.cuppedHands,
+        id: 'sex', mark: IntentMark.cuppedHands, tabMark: TtcTabMark.twoCircles,
         label: 'Sex and closeness',
         icon: Icons.favorite_border_rounded,
         hue: 42),
     TtcFocusGroup(
-        id: 'his', mark: IntentMark.spermMark,
+        id: 'his', mark: IntentMark.spermMark, tabMark: TtcTabMark.sprout,
         label: 'What he can do',
         icon: Icons.self_improvement_outlined,
         hue: 186),
     TtcFocusGroup(
-        id: 'hers', mark: IntentMark.improveMark,
+        id: 'hers', mark: IntentMark.improveMark, tabMark: TtcTabMark.jarLeaf,
         label: 'What you can do',
         icon: Icons.eco_outlined,
         hue: 104),
     TtcFocusGroup(
-        id: 'doctor', mark: IntentMark.askDoctor,
+        id: 'doctor', mark: IntentMark.askDoctor, tabMark: TtcTabMark.doctorChat,
         label: 'See a doctor',
         icon: Icons.medical_services_outlined,
         hue: 206),
@@ -184,7 +184,13 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
           // The picture lives on the read now (`PvRead.imageUrl`, 2026-09-17)
           // and the rail reads it from there — see `photoForTile`. The URL
           // and its rationale moved with it.
-          readId: 'ttc_read_how_conception_works',
+          // ⚠️ THE READ THAT ANSWERS IT (launch walk, 2026-09-27): "How
+          // conception works" has no section on which days, so the tile
+          // promised one thing and opened another. The timing read's short
+          // answer is exactly this question. Kept for revert:
+          //   readId: 'ttc_read_how_conception_works',
+          readId: 'ttc_read_timing_myths',
+          atHeading: 'Why is the window six days long?',
         ),
         TtcCarouselTile(
           title: 'How the body shows the right days',
@@ -246,14 +252,17 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
           blurb: 'Every two days is enough. Really.',
           readId: 'ttc_read_timing_myths',
         ),
-        // "How many times" is also asked in months, not only in nights. The
-        // IVF door owns this read (Age and second baby); it is named here too
-        // because this is where the question first comes up.
-        TtcArticleTile(
-          title: 'How many months it usually takes',
-          blurb: "Most couples need several cycles. Here's what's normal.",
-          readId: 'ttc_read_how_long_it_takes',
-        ),
+        // ⚠️ MOVED TO "When should we see a doctor?" (2026-09-27, relevance
+        // audit). This section asks how OFTEN, and the tile answers how LONG.
+        // Kept for revert (2026-09-27, relevance audit):
+        // // "How many times" is also asked in months, not only in nights. The
+        // // IVF door owns this read (Age and second baby); it is named here too
+        // // because this is where the question first comes up.
+        // TtcArticleTile(
+        //   title: 'How many months it usually takes',
+        //   blurb: "Most couples need several cycles. Here's what's normal.",
+        //   readId: 'ttc_read_how_long_it_takes',
+        // ),
         TtcMythTile(
           title: 'Every day or not?',
           blurb: 'Does more often mean more likely?',
@@ -270,7 +279,10 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
     //  wrong answers are everywhere and the right answers are all short. An
     //  article here would bury three clean "no"s in six paragraphs.
     TtcFocusSection(
-      heading: 'Which sex position is best?',
+      // Retitled (2026-09-27, relevance audit): two of the three myths are
+      // about lying down and orgasm, not position. Kept for revert:
+      // heading: 'Which sex position is best?',
+      heading: 'Positions, lying down and other myths',
       group: 'trying',
       tiles: [
         TtcMythTile(
@@ -298,6 +310,15 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
               'to change whether someone gets pregnant. Nothing has gone wrong '
               "if it doesn't happen.",
         ),
+        // The written film on exactly these myths (2026-09-27, relevance
+        // audit). It was on no door, only at the head of the timing read.
+        TtcVideoTile(
+          title: 'Six myths about timing, one by one',
+          blurb: 'Positions, saving it up, lying still afterwards. What the '
+              'evidence says about each.',
+          slotId: 'ttc_vid_timing_myths',
+          duration: '6 MIN',
+        ),
       ],
     ),
 
@@ -319,11 +340,44 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
           blurb: 'Not the way people tell you it does.',
           readId: 'ttc_read_stress_fertility',
         ),
+        // ⚠️ THE FILM THAT ANSWERS THIS SECTION (2026-09-27, relevance
+        // audit). The pressure film was a coping film under a factual
+        // question, and a bare slot with no entry in `ttc_videos_data.dart`.
+        // This one is written and chaptered, and is the same film Mind & body
+        // shows. Kept for revert (2026-09-27, relevance audit):
+        // TtcVideoTile(
+        //   title: 'If you feel too much pressure',
+        //   blurb: 'For the months that feel heavy.',
+        //   slotId: 'ttc_video_pressure',
+        //   duration: '5 MIN',
+        // ),
         TtcVideoTile(
-          title: 'If you feel too much pressure',
-          blurb: 'For the months that feel heavy.',
-          slotId: 'ttc_video_pressure',
+          title: 'Why "just relax" is the wrong advice',
+          blurb: 'What the evidence shows about stress and getting pregnant.',
+          slotId: 'ttc_vid_stress_fertility',
           duration: '5 MIN',
+        ),
+      ],
+    ),
+
+    // ⚠️ ADDED 2026-09-27 (relevance audit). "How conception works" was the
+    // one read with no tile on any door, and the checklist puts it here. The
+    // film beside it is written and chaptered and was on no door either.
+    TtcFocusSection(
+      heading: 'How does it happen?',
+      group: 'trying',
+      tiles: [
+        TtcArticleTile(
+          title: 'How conception works',
+          blurb: "What your cycle is doing, and why it doesn't happen every "
+              'month.',
+          readId: 'ttc_read_how_conception_works',
+        ),
+        TtcVideoTile(
+          title: 'Your cycle, drawn out step by step',
+          blurb: 'The two halves of a cycle, and when you ovulate in yours.',
+          slotId: 'ttc_vid_cycle_basics',
+          duration: '6 MIN',
         ),
       ],
     ),
@@ -539,11 +593,21 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
             ),
           ],
         ),
+        // ⚠️ THE WRITTEN FILM WITH THIS PROMISE (2026-09-27, relevance
+        // audit). The old slot had no entry in `ttc_videos_data.dart`.
+        // Kept for revert (2026-09-27, relevance audit):
+        // TtcVideoTile(
+        //   title: 'Keep his sperm healthy',
+        //   blurb: "What helps, what doesn't, and how long it takes.",
+        //   slotId: 'ttc_video_sperm_health',
+        //   duration: '4 MIN',
+        // ),
         TtcVideoTile(
-          title: 'Keep his sperm healthy',
-          blurb: "What helps, what doesn't, and how long it takes.",
-          slotId: 'ttc_video_sperm_health',
-          duration: '4 MIN',
+          title: 'Three things that really change his numbers',
+          blurb: 'Tobacco, heat and time, and how long before any change '
+              'shows.',
+          slotId: 'ttc_vid_heat_habits',
+          duration: '5 MIN',
         ),
         // ⚠️ REFERENCED FROM HIS SIDE, NOT COPIED HERE — the his-side rebuild's
         // Step 5a, and the third of the three pointers it names. His side is
@@ -553,17 +617,34 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
         //
         // Nothing below is a second copy of any prose. Editing the article in
         // His side updates it here, because there is only ever one of it.
+        // ⚠️ SWAPPED FOR AN ACTION (2026-09-27, relevance audit). The section
+        // asks what he should do; "whose side" explains whose problem it is.
+        // Testing early is the one action His side leads with.
+        // Kept for revert (2026-09-27, relevance audit):
+        // TtcArticleTile(
+        //   title: 'Whose "side" is it, really',
+        //   blurb: 'About half of couples having difficulty have a male factor '
+        //       'somewhere in it, very often alongside a female one.',
+        //   readId: 'ttc_read_whose_side',
+        // ),
         TtcArticleTile(
-          title: 'Whose "side" is it, really',
-          blurb: 'About half of couples having difficulty have a male factor '
-              'somewhere in it, very often alongside a female one.',
-          readId: 'ttc_read_whose_side',
+          title: 'The case for testing early',
+          blurb: 'One simple, cheap test that answers what months of waiting '
+              "can't.",
+          readId: 'ttc_read_case_for_testing',
         ),
         TtcArticleTile(
           title: 'Heat, habits and time',
           blurb: 'The three things that really change sperm health, '
               'including the smokeless tobacco nobody counts.',
           readId: 'ttc_read_heat_habits',
+        ),
+        // A labelled way through to the door written about him
+        // (2026-09-27, relevance audit).
+        TtcDoorTile(
+          title: 'More in His side',
+          blurb: 'The test, his report, and what helps, in his own door.',
+          bracketId: 'ttc_male_fertility',
         ),
       ],
     ),
@@ -603,6 +684,8 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
           title: 'What to eat and avoid',
           blurb: 'Ordinary food. No special fertility diet.',
           readId: 'ttc_read_three_months_before',
+          // Lands on the section that answers the tile (launch walk, 2026-09-27).
+          atHeading: 'What should I eat?',
         ),
         TtcArticleTile(
           title: 'Folic acid: why you need it',
@@ -635,6 +718,14 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
               'any goal, and no numbers at all.',
           readId: 'ttc_read_weight_kindly',
         ),
+        // Three of the reads above belong to Getting ready, so the tab says
+        // where the rest of them live (2026-09-27, relevance audit).
+        TtcDoorTile(
+          title: 'More in Getting ready',
+          blurb: 'Food, tests, vaccines and habits for the months before, in '
+              'their own door.',
+          bracketId: 'ttc_preconception_health',
+        ),
       ],
     ),
 
@@ -651,6 +742,13 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
           title: 'Trying for many months?',
           blurb: 'How long is normal before asking for help.',
           readId: 'ttc_read_when_to_seek_help',
+        ),
+        // Moved here from "How many times should we try?" (2026-09-27,
+        // relevance audit): how LONG it takes is the doctor question.
+        TtcArticleTile(
+          title: 'How many months it usually takes',
+          blurb: "Most couples need several cycles. Here's what's normal.",
+          readId: 'ttc_read_how_long_it_takes',
         ),
         TtcCarouselTile(
           title: 'Signs not to wait',
@@ -682,14 +780,26 @@ const TtcFocusPage kTtcConceivingFocus = TtcFocusPage(
             ),
           ],
         ),
-        TtcBookingTile(
+        // ⚠️ THE GYNAECOLOGIST, NOT THE CONSULTS SHELF (2026-09-27, relevance
+        // audit). `ttc_consult` opens three cards and asks her to choose; a
+        // question about her own cycle is the gynaecologist's. A Talk tile,
+        // because `openTtcFocusTile` resolves an offering id only on Talk; a
+        // Booking tile with any action but the shared one opens nothing.
+        // Kept for revert (2026-09-27, relevance audit):
+        // TtcBookingTile(
+        //   title: 'Talk to a doctor',
+        //   blurb: 'A private video consultation about your own cycle.',
+        //   // ⚠️ THE BOOKING ENGINE, CONFIGURED — never a new appointment
+        //   // feature. Resolved by the caller's hub-action switch, which scopes
+        //   // it to consults; unscoped it opened nine categories and asked her to
+        //   // scroll past yoga to find the thing she tapped.
+        //   action: 'ttc_consult',
+        // ),
+        TtcTalkTile(
           title: 'Talk to a doctor',
-          blurb: 'A private video consultation about your own cycle.',
-          // ⚠️ THE BOOKING ENGINE, CONFIGURED — never a new appointment
-          // feature. Resolved by the caller's hub-action switch, which scopes
-          // it to consults; unscoped it opened nine categories and asked her to
-          // scroll past yoga to find the thing she tapped.
-          action: 'ttc_consult',
+          blurb: 'A private video consultation with a gynaecologist about '
+              'your own cycle.',
+          action: 'ttc_consult_gynae',
         ),
       ],
     ),

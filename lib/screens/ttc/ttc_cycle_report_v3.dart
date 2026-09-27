@@ -31,7 +31,8 @@ import 'package:flutter/material.dart';
 import '../../ttc/ttc_cycle_report.dart';
 import '../../theme/pv_fonts.dart';
 import 'ttc_common.dart';
-import 'ttc_phase_colours.dart';
+import 'ttc_cycle_palette.dart';
+// Kept for revert (2026-09-27): import 'ttc_phase_colours.dart';
 
 /// Which drawing is on screen.
 ///
@@ -120,7 +121,9 @@ class TtcCycleViewToggle extends StatelessWidget {
         borderRadius: BorderRadius.circular(999),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
-        seg('Dial', TtcCycleView.dial),
+        // "Circle", the word the Cycle companion uses for the same picture
+        // (tools pass, 2026-09-27). Kept for revert: seg('Dial', ...).
+        seg('Circle', TtcCycleView.dial),
         seg('Calendar', TtcCycleView.calendar),
       ]),
     );
@@ -182,7 +185,9 @@ class TtcCycleRing extends StatelessWidget {
                         fontSize: 9.5,
                         fontWeight: FontWeight.w800,
                         letterSpacing: 1.1,
-                        color: ttcPhaseInk(here.phase))),
+                        // Today is ink on every cycle picture (2026-09-27).
+                        // Kept for revert: color: ttcPhaseInk(here.phase).
+                        color: TtcCycleColours.today)),
                 const SizedBox(height: 2),
                 Text('Day ${here.firstCycleDay + here.dayInto! - 1}',
                     style: ttcFraunces(26,
@@ -228,13 +233,14 @@ class _RingPainter extends CustomPainter {
     // Day 0 at twelve o'clock, clockwise.
     double angle(double day) => -math.pi / 2 + math.pi * 2 * (day / length);
 
-    canvas.drawCircle(
-        centre,
-        radius,
-        Paint()
-          ..color = ttcPanel
-          ..style = PaintingStyle.stroke
-          ..strokeWidth = stroke * 1.12);
+    // ⚠️ NO GREY TRACK UNDER THE ARCS (2026-09-27). The palette's first grey
+    // (the days before the fertile days) sat on a grey track of nearly the
+    // same value, so that arc vanished. The white card between the arcs is
+    // the gap now. Kept for revert:
+    //   canvas.drawCircle(centre, radius, Paint()
+    //     ..color = ttcPanel
+    //     ..style = PaintingStyle.stroke
+    //     ..strokeWidth = stroke * 1.12);
 
     for (final span in spans) {
       final from = angle(span.firstCycleDay - 1 + _gapDays);
@@ -246,7 +252,9 @@ class _RingPainter extends CustomPainter {
           to - from,
           false,
           Paint()
-            ..color = ttcPhaseBand(span.phase)
+            // The one palette, full strength (2026-09-27). Kept for revert:
+            //   ..color = ttcPhaseBand(span.phase)
+            ..color = TtcCycleColours.fill(span.phase)
             ..style = PaintingStyle.stroke
             ..strokeWidth = stroke);
     }
@@ -260,8 +268,10 @@ class _RingPainter extends CustomPainter {
           centre + Offset(math.cos(at) * radius, math.sin(at) * radius);
       canvas.drawCircle(
           centreOfDay, stroke * 0.68, Paint()..color = Colors.white);
-      canvas.drawCircle(centreOfDay, stroke * 0.37,
-          Paint()..color = ttcPhaseMark(span.phase));
+      // Today is an ink dot on every picture (2026-09-27). Kept for revert:
+      //   Paint()..color = ttcPhaseMark(span.phase)
+      canvas.drawCircle(centreOfDay, stroke * 0.42,
+          Paint()..color = TtcCycleColours.today);
     }
 
     // ---- where the loop starts -------------------------------------------
@@ -388,10 +398,15 @@ class _Day extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final mark = ttcPhaseMark(phase);
+    // ⚠️ TODAY IS INK, THE PHASE IS THE FILL (2026-09-27). Today used to
+    // take the phase's mark, so a fertile "today" and a fertile day looked
+    // alike. Kept for revert: final mark = ttcPhaseMark(phase); color: today ?
+    // mark : ttcPhaseBand(phase).
+    const mark = TtcCycleColours.today;
+    final onFill = TtcCycleColours.onFill(phase);
     return Container(
       decoration: BoxDecoration(
-        color: today ? mark : ttcPhaseBand(phase),
+        color: today ? mark : TtcCycleColours.fill(phase),
         borderRadius: BorderRadius.circular(11),
         // ⚠️ A RING, NOT A BORDER. Today has to be findable in a grid of
         // twenty-eight, and a border would eat into the square and make it
@@ -405,7 +420,7 @@ class _Day extends StatelessWidget {
             fit: BoxFit.scaleDown,
             child: Text('$number',
                 style: ttcBody(11.5,
-                    color: today ? Colors.white : ttcPhaseInk(phase),
+                    color: today ? Colors.white : onFill,
                     w: today ? FontWeight.w800 : FontWeight.w700)),
           ),
           if (today)
@@ -425,7 +440,7 @@ class _Day extends StatelessWidget {
               width: 4,
               height: 4,
               decoration: BoxDecoration(
-                color: today ? Colors.white : ttcPhaseInk(phase),
+                color: today ? Colors.white : onFill,
                 shape: BoxShape.circle,
               ),
             ),
@@ -531,7 +546,7 @@ class _Stop extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            color: ttcPhaseBand(span.phase),
+                            color: TtcCycleColours.tint(span.phase),
                             borderRadius: BorderRadius.circular(999),
                           ),
                           child: Text('YOU ARE HERE',
@@ -539,7 +554,7 @@ class _Stop extends StatelessWidget {
                                   fontSize: 9,
                                   fontWeight: FontWeight.w800,
                                   letterSpacing: 1.1,
-                                  color: ttcPhaseInk(span.phase))),
+                                  color: TtcCycleColours.ink(span.phase))),
                         ),
                     ],
                   ),
@@ -609,7 +624,9 @@ class _NodeState extends State<_Node> with SingleTickerProviderStateMixin {
       width: 14,
       height: 14,
       decoration:
-          BoxDecoration(color: ttcPhaseMark(widget.phase), shape: BoxShape.circle),
+          BoxDecoration(
+              color: TtcCycleColours.mark(widget.phase),
+              shape: BoxShape.circle),
     );
     if (!widget.here) return dot;
 
@@ -622,7 +639,7 @@ class _NodeState extends State<_Node> with SingleTickerProviderStateMixin {
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                color: ttcPhaseBand(widget.phase)
+                color: TtcCycleColours.tint(widget.phase)
                     .withValues(alpha: 1 - 0.45 * t),
                 spreadRadius: 4 + 2.5 * t,
               ),
@@ -660,10 +677,15 @@ class TtcPhaseLegend extends StatelessWidget {
         runSpacing: 7,
         children: [
           for (final span in spans)
-            _Key(colour: ttcPhaseBand(span.phase), label: span.phase.label),
+            _Key(
+                colour: TtcCycleColours.fill(span.phase),
+                label: span.phase.label),
           if (loggedDots)
+            // Kept for revert: 'a dot means you logged' (2026-09-27).
             const _Key(
-                colour: ttcMuted, label: 'a dot means you logged', dot: true),
+                colour: TtcCycleColours.logged,
+                label: 'Dot: you logged that day',
+                dot: true),
         ],
       );
 }

@@ -123,7 +123,13 @@ class PvInsightTile extends StatelessWidget {
           ),
           clipBehavior: Clip.antiAlias,
           child: Stack(children: [
-            if (artWidget == null)
+            // ⚠️ NO PAINTED ART UNDER A CAPTION (2026-09-27, seen on the phone):
+            // the art is anchored bottom-right and a caption sits at the bottom,
+            // so "Counted from day 1 of your period" ran through the ring. The
+            // caption says what the card means; the drawing was decoration.
+            // Every stage shares this tile, so the rule holds everywhere. Kept
+            // for revert: `if (artWidget == null)` alone.
+            if (artWidget == null && caption == null)
               Positioned.fill(
                 child: CustomPaint(
                     painter: PvInsightMark(

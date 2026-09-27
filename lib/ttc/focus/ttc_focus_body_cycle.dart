@@ -23,7 +23,9 @@
 
 import 'package:flutter/material.dart' show Icons;
 
-import '../../data/hubs/ttc_hubs.dart' show kTtcActConsult;
+// Unused since the consult tiles name their offering (2026-09-27,
+// relevance audit). Kept for revert:
+// import '../../data/hubs/ttc_hubs.dart' show kTtcActConsult;
 import '../ttc_focus_data.dart';
 
 const TtcFocusPage kTtcBodyCycleFocus = TtcFocusPage(
@@ -49,22 +51,22 @@ const TtcFocusPage kTtcBodyCycleFocus = TtcFocusPage(
   //  someone today, and the words stay the read's, never retyped here.
   groups: [
     TtcFocusGroup(
-        id: 'cycle', mark: IntentMark.cycleRing,
+        id: 'cycle', mark: IntentMark.cycleRing, tabMark: TtcTabMark.cycleDrops,
         label: 'Your cycle',
         icon: Icons.loop_rounded,
         hue: 344),
     TtcFocusGroup(
-        id: 'intimate', mark: IntentMark.bodyMark,
+        id: 'intimate', mark: IntentMark.bodyMark, tabMark: TtcTabMark.tulip,
         label: 'Intimate health',
         icon: Icons.spa_outlined,
         hue: 268),
     TtcFocusGroup(
-        id: 'conditions', mark: IntentMark.reportPage,
+        id: 'conditions', mark: IntentMark.reportPage, tabMark: TtcTabMark.magnifier,
         label: 'Other conditions',
         icon: Icons.biotech_outlined,
         hue: 104),
     TtcFocusGroup(
-      id: 'doctor', mark: IntentMark.askDoctor,
+      id: 'doctor', mark: IntentMark.askDoctor, tabMark: TtcTabMark.doctorChat,
       label: 'See a doctor',
       icon: Icons.medical_services_outlined,
       hue: 206,
@@ -279,6 +281,17 @@ const TtcFocusPage kTtcBodyCycleFocus = TtcFocusPage(
       heading: 'When is it worth a visit?',
       group: 'doctor',
       tiles: [
+        // ⚠️ THE ANSWER TO THE HEADING, FIRST (2026-09-27, relevance audit).
+        // The gynaecologist read below is written for a visit before trying,
+        // so on its own it did not answer "when is it worth a visit". This
+        // section of the when-to-see-a-doctor read does.
+        TtcArticleTile(
+          title: "When it's worth going now",
+          blurb: 'The signs that mean you can ask to be seen now, whatever '
+              'the calendar says.',
+          readId: 'ttc_read_when_to_seek_help',
+          atHeading: "When shouldn't you wait at all?",
+        ),
         TtcArticleTile(
           title: 'Seeing a gynaecologist: what to ask',
           blurb: 'What to take along, and the questions that make it count.',
@@ -289,10 +302,21 @@ const TtcFocusPage kTtcBodyCycleFocus = TtcFocusPage(
           blurb: 'How long is usual before asking for help.',
           readId: 'ttc_read_when_to_seek_help',
         ),
-        TtcBookingTile(
+        // ⚠️ THE GYNAECOLOGIST, NOT THE CONSULTS SHELF (2026-09-27, relevance
+        // audit). A Talk tile, because `openTtcFocusTile` resolves an offering
+        // id only on Talk; a Booking tile with any action but the shared one
+        // opens nothing.
+        // Kept for revert (2026-09-27, relevance audit):
+        // TtcBookingTile(
+        //   title: 'Talk to a doctor',
+        //   blurb: 'A private video consultation about your own cycle.',
+        //   action: kTtcActConsult,
+        // ),
+        TtcTalkTile(
           title: 'Talk to a doctor',
-          blurb: 'A private video consultation about your own cycle.',
-          action: kTtcActConsult,
+          blurb: 'A private video consultation with a gynaecologist about '
+              'your own cycle.',
+          action: 'ttc_consult_gynae',
         ),
       ],
     ),

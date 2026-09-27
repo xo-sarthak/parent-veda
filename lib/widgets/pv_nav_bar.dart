@@ -73,6 +73,7 @@ class PvNavBar extends StatelessWidget {
     required this.items,
     required this.activeIndex,
     required this.onTap,
+    this.onReselect,
     this.accent,
     this.inactive,
     this.labelStyle,
@@ -81,6 +82,13 @@ class PvNavBar extends StatelessWidget {
   final List<PvNavItem> items;
   final int activeIndex;
   final ValueChanged<int> onTap;
+
+  /// A tap on the tab that is already lit. Null (the default, and every stage
+  /// but TTC) keeps the old behaviour: nothing happens. TTC passes one
+  /// (2026-09-27) because a page pushed from Today, the calendar, lights
+  /// Today, and a tap there must take her home rather than do nothing; on the
+  /// home itself it scrolls back to the top, as most apps do.
+  final ValueChanged<int>? onReselect;
 
   /// The stage's own accent. Defaults to the brand violet; the father shell and
   /// the TTC partner view pass their slate.
@@ -134,7 +142,8 @@ class PvNavBar extends StatelessWidget {
     // which is exactly the person who set it.
     return Expanded(
       child: GestureDetector(
-        onTap: () => activeIndex == i ? null : onTap(i),
+        // Kept for revert: onTap: () => activeIndex == i ? null : onTap(i),
+        onTap: () => activeIndex == i ? onReselect?.call(i) : onTap(i),
         behavior: HitTestBehavior.opaque,
         child: Padding(
           // A two-line label is drawn 9.5px + 9.5px ≈ the height of one 11px

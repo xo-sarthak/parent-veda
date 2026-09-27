@@ -219,6 +219,7 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
               decoration: InputDecoration(
                 hintText: t.hinglish ? 'Kuch bhi poochho…' : 'Ask anything…',
                 isDense: true,
+                filled: false, // the theme fills fields; this sits in its own pill
                 border: InputBorder.none,
                 enabledBorder: InputBorder.none,
                 focusedBorder: InputBorder.none,
@@ -732,6 +733,19 @@ class _TtcAskVedaScreenState extends State<TtcAskVedaScreen> {
     // has falls through to the sheet rather than opening the wrong read.
     if (id.startsWith('ttcread_')) {
       final readId = id.substring('ttcread_'.length);
+      if (ttcReadById(readId) == null) return false;
+      openTtcSurface(context, '$kTtcReadPrefix$readId');
+      return true;
+    }
+    // One of a read's questions (2026-09-27): `ttcfaq_<readId>_<n>`, exported
+    // as its own document so it can be found. It opens the read it belongs
+    // to. The read id may itself hold underscores, so the index is cut from
+    // the end.
+    if (id.startsWith('ttcfaq_')) {
+      final rest = id.substring('ttcfaq_'.length);
+      final cut = rest.lastIndexOf('_');
+      if (cut <= 0) return false;
+      final readId = rest.substring(0, cut);
       if (ttcReadById(readId) == null) return false;
       openTtcSurface(context, '$kTtcReadPrefix$readId');
       return true;

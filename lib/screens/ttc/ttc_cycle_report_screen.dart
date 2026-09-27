@@ -34,9 +34,14 @@ import '../../ttc/ttc_cycle_report.dart';
 import '../v2/v2_palette.dart';
 import '../../theme/pv_fonts.dart';
 import 'ttc_common.dart';
-import 'ttc_cycle_companion.dart' show kTtcCompanionHue, showTtcPeriodLogSheet;
+import '../v2/v3_hero_field.dart' show v3FieldChroma;
+import 'ttc_cycle_companion.dart' show showTtcPeriodLogSheet;
+// Kept for revert (2026-09-27): ... show kTtcCompanionHue, showTtcPeriodLogSheet;
+import 'ttc_cycle_palette.dart';
 import 'ttc_cycle_report_states.dart';
 import 'ttc_cycle_report_v3.dart';
+import 'ttc_symptom_log_screen.dart'
+    show TtcSymptomLogScreen, kTtcLogMeasurementsGroup;
 import 'ttc_surface_router.dart';
 import 'ttc_strings.dart';
 import 'ttc_tool_chrome.dart';
@@ -125,7 +130,9 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
     final (String chip, String title) = switch (r.state) {
       TtcReportState.noPeriod => ('No cycle yet', t.reportNoPeriod),
       TtcReportState.clinicHeld => (ttcClinicChip(), t.reportClinicTitle),
-      _ => ('Your dates are here', t.reportNoEstimateTitle),
+      // Kept for revert: 'Your dates are here', which did not say which of
+      // the three pages this is (2026-09-27).
+      _ => ('No estimate this cycle', t.reportNoEstimateTitle),
     };
 
     return TtcToolScaffold(
@@ -133,7 +140,13 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
       // empty page, 3 where we will not estimate, 5 where a clinic is running
       // it. One composition for every state would make three different
       // situations look like one screen that failed to load.
-      hue: kTtcCompanionHue,
+      // ⚠️ A NEAR-GREY FIELD WHERE NO PART IS NAMED (2026-09-27). It was the
+      // Companion's violet-magenta, one more colour meaning nothing on a page
+      // that is explaining why it draws no phases. Kept for revert:
+      //   hue: kTtcCompanionHue,
+      hue: TtcCycleColours.heroHue(null),
+      chroma: v3FieldChroma(TtcCycleColours.heroHue(null)) *
+          TtcCycleColours.heroChromaScale(null),
       variant: switch (r.state) {
         TtcReportState.noPeriod => 1,
         TtcReportState.clinicHeld => 5,
@@ -156,6 +169,8 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
             : r.start == null
                 ? ''
                 : '${_fmt(r.start!)} to ${_fmt(r.end!)}',
+        caption: empty ? null : ttcWhichCycle(_index, r.cyclesAvailable),
+        onLatest: _index > 0 ? () => setState(() => _index = 0) : null,
         canGoBack: !empty && _index + 1 < r.cyclesAvailable,
         canGoForward: !empty && _index > 0,
         onBack: () => setState(() => _index++),
@@ -188,10 +203,11 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
                 body: "You've marked this as a treatment cycle. Your clinic "
                     'is scanning you and choosing the dates, and they can see '
                     'things this page never will.',
+                // "Stretches" was our word; "parts" is hers (2026-09-27).
                 body2: "So we're not putting our estimate next to theirs. "
                     "Nothing is wrong with your dates. They're all below, "
-                    'and the four stretches come back the month after your '
-                    'treatment cycle ends.',
+                    'and the four parts of your cycle come back the month '
+                    'after your treatment cycle ends.',
                 actionLabel: 'Prepare questions for your next visit',
                 onAction: () => _openSurface(context, 'ttc_appointments'),
                 footLabel: "This isn't a treatment cycle",
@@ -212,22 +228,25 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
                 // will not do that itself.
                 body: facts.longestGap == null
                     ? "There isn't enough here yet to place the four "
-                        'stretches on a cycle.'
+                        'parts of your cycle.'
                     : 'One gap in your dates runs ${facts.longestGap} days. '
                         "That's long enough to be a month that went unlogged, "
                         'not a cycle that really lasted that long.',
                 body2: 'If we counted it in, the fertile days we showed could '
-                    "be off by more than a week. So we've left the four "
-                    'stretches off this cycle, instead of showing you dates we '
-                    "don't trust.",
+                    "be off by more than a week. So we've left them off this "
+                    "cycle, instead of showing you dates we don't trust.",
                 actionLabel: 'Fill in the missing month',
                 onAction: () => _openLog(context),
+                // The action that fixes it, above the reason (2026-09-27).
+                actionFirst: true,
                 note: facts.longestGap == null
                     ? null
                     : 'If you really had a ${facts.longestGap}-day cycle, leave '
                         'it as it is. Two more periods will settle the number '
                         'on their own.',
-                footLabel: 'Open the Cycle Companion',
+                // One name with the Tools tile (2026-09-27). Kept for revert:
+                // 'Open the Cycle Companion'.
+                footLabel: 'Open your cycle companion',
                 onFoot: () => _openSurface(context, 'ttc_cycle'),
                 footNote: 'Estimates come from your own dates and are never a '
                     "diagnosis. If your cycles stay irregular, it's worth "
@@ -240,7 +259,20 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
     );
   }
 
+  // Every card on this page is `TtcCycleCard` since 2026-09-27 (a hairline,
+  // not the V1 `TtcCard` shadow). Kept for revert: TtcCard( at five sites.
   void _openLog(BuildContext context) => showTtcPeriodLogSheet(context);
+
+  /// The daily log on today: where symptoms, weight and morning temperature
+  /// are all entered.
+  // Opens today's log scrolled to weight and temperature, the two things the
+  // button names (2026-09-28). Kept for revert:
+  //   openTtcSurface(context, 'ttc_symptom_log');
+  void _openLogToday(BuildContext context) =>
+      Navigator.of(context).push(MaterialPageRoute<void>(
+          settings: const RouteSettings(name: 'ttc/symptom_log'),
+          builder: (_) => const TtcSymptomLogScreen(
+              focusGroup: kTtcLogMeasurementsGroup)));
 
   void _openSurface(BuildContext context, String id) =>
       openTtcSurface(context, id);
@@ -328,7 +360,7 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
               if (_notes(r).isNotEmpty) ...[
                 ttcSectionTitle(t.reportWhatYouLogged),
                 for (final f in _notes(r)) ...[
-                  TtcCard(
+                  TtcCycleCard(
                     child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -375,26 +407,44 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
     final hasSeries =
         r.withWeight.length >= 2 || r.withTemp.length >= 2;
 
+    // ⚠️ THE FIELD FROM THE ONE PALETTE (2026-09-27). `here.phase.hue` gave
+    // each part its own hue, so the days before the fertile days opened on a
+    // BLUE page: "the colour above is blue… what was the need of blue?". Now
+    // rose in her period, violet in her fertile days, near-grey between.
+    // Kept for revert: hue: here.phase.hue,
+    final heroHue = TtcCycleColours.heroHue(here.phase);
     return TtcToolScaffold(
-      hue: here.phase.hue,
+      hue: heroHue,
+      chroma: v3FieldChroma(heroHue) *
+          TtcCycleColours.heroChromaScale(here.phase),
       variant: 2,
       eyebrow: t.reportTitle,
       title: _heroLine(here.phase),
       // An earlier cycle's stretches are worked out looking back from its own
       // length (2026-09-26), so they no longer shift and the words say so.
+      // "Stretches" was our word; the four parts are named in plain words
+      // (2026-09-27). Kept for revert: '... The four stretches are worked out
+      // looking back ...' / '... The four stretches are estimates ...'.
       intro: _index > 0
-          ? 'One whole cycle, start to finish. The four stretches are worked '
-              'out looking back, from how long this cycle ran.'
-          : 'One whole cycle, start to finish. The four stretches are '
-              'estimates from the dates you log, and they shift as you log '
-              'more.',
+          ? 'One whole cycle, start to finish. Its four parts are worked out '
+              'looking back, from how long this cycle ran.'
+          : 'One whole cycle, start to finish, split into four parts. The '
+              'dates are estimates from what you log, and they shift as you '
+              'log more.',
+      // ⚠️ THE i DOES ONE THING ON EVERY STATE (tools pass, 2026-09-27): it
+      // opened a sheet here and an inline panel on the other three. Now the
+      // same inline panel everywhere. Kept for revert:
+      //   onPressed: () => _showDisclaimer(context, t),
       action: IconButton(
         icon: const Icon(Icons.info_outline_rounded, size: 21),
         color: ttcMuted,
-        onPressed: () => _showDisclaimer(context, t),
+        tooltip: 'About this page',
+        onPressed: () => setState(() => _about = !_about),
       ),
       heroLead: _CyclePicker(
         label: r.start == null ? '' : '${_fmt(r.start!)} to ${_fmt(r.end!)}',
+        caption: ttcWhichCycle(_index, r.cyclesAvailable),
+        onLatest: _index > 0 ? () => setState(() => _index = 0) : null,
         canGoBack: _index + 1 < r.cyclesAvailable,
         canGoForward: _index > 0,
         onBack: () => setState(() => _index++),
@@ -405,6 +455,10 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 22),
+            if (_about) ...[
+              TtcReportAbout(text: t.reportDisclaimer),
+              const SizedBox(height: 18),
+            ],
 
             // ---- walk me through it (2026-09-26) --------------------------
             //
@@ -419,9 +473,11 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
             // ---- the picture, and the choice of picture ------------------
             Row(children: [
               Expanded(
+                // The intro above already says "one whole cycle, start to
+                // finish" (2026-09-27). Kept for revert: that line here.
                 child: Text(
                     _view == TtcCycleView.dial
-                        ? 'One whole cycle, start to finish'
+                        ? 'This cycle as a circle'
                         : t.reportThisCycle,
                     style: ttcJakarta(16)),
               ),
@@ -438,11 +494,11 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
                         'the first day of your period, and moves clockwise, '
                         'one step per day.'
                     : 'Every day of this cycle, in order. The colour of a day '
-                        'says which stretch it belongs to.',
+                        'says which part of your cycle it belongs to.',
                 style: ttcBody(13, h: 1.55)),
             const SizedBox(height: 18),
 
-            TtcCard(
+            TtcCycleCard(
               child: Column(children: [
                 // ⚠️ ONE KEY, NOT TWO. Swapping the picture must not swap the
                 // meaning of the colours underneath it, or the toggle stops
@@ -463,16 +519,21 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
             const SizedBox(height: 24),
 
             // ---- the four stops -----------------------------------------
-            ttcSectionTitle('The four stretches, in order'),
-            TtcCard(child: TtcCycleTimeline(spans: spans)),
-            const SizedBox(height: 10),
-            Text(
-                _index > 0
-                    ? 'Looking back: the fertile days are placed about 14 '
-                        'days before the period that ended this cycle.'
-                    : 'These four stretches are estimates from the dates you '
-                        'log. They shift as you log more.',
-                style: ttcBody(11.5, color: ttcMuted, h: 1.5)),
+            // Kept for revert: ttcSectionTitle('The four stretches, in order').
+            ttcSectionTitle(kTtcReportFourParts),
+            TtcCycleCard(child: TtcCycleTimeline(spans: spans)),
+            // ⚠️ THE "ESTIMATES" LINE ONCE, IN THE INTRO (2026-09-27). This
+            // said it a second time for the current cycle; the looking-back
+            // line stays, because it is a different fact. Kept for revert:
+            //   : 'These four stretches are estimates from the dates you '
+            //       'log. They shift as you log more.',
+            if (_index > 0) ...[
+              const SizedBox(height: 10),
+              Text(
+                  'Looking back: the fertile days are placed about 14 days '
+                  'before the period that ended this cycle.',
+                  style: ttcBody(11.5, color: ttcMuted, h: 1.5)),
+            ],
             const SizedBox(height: 24),
 
             // ---- changes during the cycle -------------------------------
@@ -505,17 +566,41 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
                 onPickSeries: (v) => setState(() => _showTemp = v),
                 showLegend: false,
               ),
+              // The way to add the next reading, under the chart it adds to
+              // (2026-09-27).
+              const SizedBox(height: 10),
+              _ReportLink(
+                key: const ValueKey('ttc_report_add_numbers'),
+                icon: Icons.add_rounded,
+                label: kTtcReportAddNumbers,
+                onTap: () => _openLogToday(context),
+              ),
               const SizedBox(height: 24),
             ] else ...[
-              TtcCard(
+              // ⚠️ THE LINE THAT ASKED HER TO ADD NUMBERS NOW HAS THE BUTTON
+              // (2026-09-27). The user on build 13: "there is 'add your
+              // temperature and weight' but there is no option to add. Why
+              // is it given to add? Where should the user go?" Both numbers
+              // live in the daily log, so the button opens it on today.
+              // Kept for revert: the card with the title and
+              // `t.reportNoNumbers` only.
+              TtcCycleCard(
+                key: const ValueKey('ttc_report_numbers_empty'),
                 child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text('Morning temperature and weight',
                           style: ttcJakarta(14)),
                       const SizedBox(height: 6),
-                      Text(t.reportNoNumbers,
+                      Text(kTtcReportNoNumbers,
                           style: ttcBody(12.5, color: ttcMuted, h: 1.5)),
+                      const SizedBox(height: 14),
+                      _ReportLink(
+                        key: const ValueKey('ttc_report_add_numbers'),
+                        icon: Icons.add_rounded,
+                        label: kTtcReportAddNumbers,
+                        onTap: () => _openLogToday(context),
+                      ),
                     ]),
               ),
               const SizedBox(height: 24),
@@ -531,12 +616,21 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
             if (r.state == TtcReportState.thin && _notes(r).isEmpty) ...[
               ttcSectionTitle(t.reportWhatYouLogged),
               _Note(title: t.reportThinTitle, body: t.reportThinBody),
+              // The note says this fills with logging; the way to log is
+              // here (2026-09-27).
+              const SizedBox(height: 12),
+              _ReportLink(
+                key: const ValueKey('ttc_report_log_today'),
+                icon: Icons.checklist_rounded,
+                label: kTtcReportLogToday,
+                onTap: () => _openLogToday(context),
+              ),
               const SizedBox(height: 10),
             ],
             if (_notes(r).isNotEmpty) ...[
               ttcSectionTitle(t.reportWhatYouLogged),
               for (final f in _notes(r)) ...[
-                TtcCard(
+                TtcCycleCard(
                   child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -565,7 +659,9 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
   /// sentence a fertility app is always one edit away from writing.
   static String _heroLine(TtcPhase phase) => switch (phase) {
         TtcPhase.period => "You're in your period days",
-        TtcPhase.beforeWindow => "You're before your fertile window",
+        // One name per thing: "fertile days", never "window" here
+        // (2026-09-27). Kept for revert: "You're before your fertile window".
+        TtcPhase.beforeWindow => 'Your fertile days are coming up',
         TtcPhase.fertileWindow => "You're in your fertile days",
         TtcPhase.afterWindow => "You're in the waiting days",
       };
@@ -575,6 +671,9 @@ class _TtcCycleReportScreenState extends State<TtcCycleReportScreen> {
     return [...r.findings, ?length];
   }
 
+  // Kept for revert: the i opened this sheet on the drawable state until
+  // 2026-09-27; it now opens the same inline panel as the other states.
+  // ignore: unused_element
   void _showDisclaimer(BuildContext context, TtcS t) => showModalBottomSheet(
         context: context,
         backgroundColor: Colors.white,
@@ -610,14 +709,17 @@ class _WalkMeThrough extends StatelessWidget {
             borderRadius: BorderRadius.circular(ttcCardRadius),
           ),
           child: Row(children: [
+            // Ink, not the brand violet, which on this page means fertile
+            // days (2026-09-27). Kept for revert: color: ttcPurple.
             const Icon(Icons.chat_bubble_outline_rounded,
-                size: 18, color: ttcPurple),
+                size: 18, color: ttcTitleInk),
             const SizedBox(width: 10),
             Expanded(
               child: Text(label,
                   style: ttcBody(14, color: ttcTitleInk, w: FontWeight.w800)),
             ),
-            const Icon(Icons.chevron_right_rounded, size: 20, color: ttcPurple),
+            const Icon(Icons.chevron_right_rounded,
+                size: 20, color: ttcMuted),
           ]),
         ),
       );
@@ -627,6 +729,8 @@ class _WalkMeThrough extends StatelessWidget {
 class _CyclePicker extends StatelessWidget {
   const _CyclePicker({
     required this.label,
+    this.caption,
+    this.onLatest,
     required this.canGoBack,
     required this.canGoForward,
     required this.onBack,
@@ -634,32 +738,134 @@ class _CyclePicker extends StatelessWidget {
   });
 
   final String label;
+
+  /// "This cycle · 3 of 3", "Last cycle · 2 of 3". Null keeps the old word.
+  final String? caption;
+
+  /// Jumps back to the newest cycle. Null on the newest (2026-09-27): after
+  /// paging four cycles back, the only way home was four taps.
+  final VoidCallback? onLatest;
   final bool canGoBack;
   final bool canGoForward;
   final VoidCallback onBack;
   final VoidCallback onForward;
 
+  // ⚠️ THE CAPTION SAYS WHICH CYCLE, NOT THAT ONE WAS CHOSEN (tools pass,
+  // 2026-09-27). "Chosen cycle" over a date range left her counting; now it
+  // is "Last cycle · 2 of 3". Kept for revert: Text(reportChosenCycle).
   @override
   Widget build(BuildContext context) => Row(children: [
         IconButton(
           icon: const Icon(Icons.chevron_left_rounded),
+          tooltip: 'Earlier cycle',
           color: canGoBack ? ttcTitleInk : ttcBorder,
           onPressed: canGoBack ? onBack : null,
         ),
         Expanded(
           child: Column(children: [
-            Text(TtcS.current().reportChosenCycle,
+            Text(caption ?? TtcS.current().reportChosenCycle,
+                key: const ValueKey('ttc_report_which_cycle'),
                 style: ttcBody(11, color: ttcMuted, w: FontWeight.w700)),
             const SizedBox(height: 2),
             Text(label, style: ttcJakarta(16)),
+            if (onLatest != null)
+              TextButton(
+                key: const ValueKey('ttc_report_back_to_latest'),
+                onPressed: onLatest,
+                style: TextButton.styleFrom(
+                    minimumSize: const Size(0, 36),
+                    padding: const EdgeInsets.symmetric(horizontal: 10)),
+                child: Text(kTtcReportBackToThisCycle,
+                    style: ttcBody(12.5,
+                        color: ttcTitleInk, w: FontWeight.w800)),
+              ),
           ]),
         ),
         IconButton(
           icon: const Icon(Icons.chevron_right_rounded),
+          tooltip: 'Later cycle',
           color: canGoForward ? ttcTitleInk : ttcBorder,
           onPressed: canGoForward ? onForward : null,
         ),
       ]);
+}
+
+/// "This cycle", "Last cycle", "3 cycles back", with where it sits among the
+/// cycles she has: index 0 is the newest.
+String ttcWhichCycle(int index, int available) {
+  final name = switch (index) {
+    0 => 'This cycle',
+    1 => 'Last cycle',
+    _ => '$index cycles back',
+  };
+  if (available <= 1) return name;
+  return '$name · ${available - index} of $available';
+}
+
+/// The heading over the timeline of the four parts.
+const String kTtcReportFourParts = 'The four parts of your cycle';
+
+// ---- the numbers, and the way to add them (2026-09-27) ---------------------
+
+/// Where weight and temperature are entered, said where the chart would be.
+const String kTtcReportNoNumbers =
+    'Add a weight or a morning temperature in your daily log on any day, and '
+    "a chart shows up here. You don't need either. This page works with "
+    'symptoms alone.';
+
+/// The button that opens the daily log on today.
+const String kTtcReportAddNumbers = "Add today's temperature or weight";
+
+/// The button under "A start", for a cycle with little logged.
+const String kTtcReportLogToday = 'Log how today went';
+
+/// The picker's way home from an earlier cycle.
+const String kTtcReportBackToThisCycle = 'Back to this cycle';
+
+/// A small outlined action on the report: an icon and a verb, 44pt tall.
+///
+/// ⚠️ ONE SHAPE FOR EVERY "DO THIS HERE" ON THE REPORT, so an invitation and
+/// its button read as one thing (the calendar's day card uses the same pill).
+class _ReportLink extends StatelessWidget {
+  const _ReportLink({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) => Semantics(
+        button: true,
+        label: label,
+        excludeSemantics: true,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(999),
+          child: Container(
+            constraints: const BoxConstraints(minHeight: 44),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(999),
+              border: Border.all(color: ttcBorder, width: 1.2),
+            ),
+            child: Row(mainAxisSize: MainAxisSize.min, children: [
+              Icon(icon, size: 17, color: ttcTitleInk),
+              const SizedBox(width: 7),
+              Flexible(
+                child: Text(label,
+                    style: ttcBody(13.5,
+                        color: ttcTitleInk, w: FontWeight.w800)),
+              ),
+            ]),
+          ),
+        ),
+      );
 }
 
 /// The whole month as one picture: phases, the line, and what happened.
@@ -691,7 +897,7 @@ class _CycleCard extends StatelessWidget {
     final series = temp ? report.withTemp : report.withWeight;
     final hasSeries = series.length >= 2;
 
-    return TtcCard(
+    return TtcCycleCard(
       child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
         // ---- what this chart is ------------------------------------------
         Row(children: [
@@ -719,13 +925,14 @@ class _CycleCard extends StatelessWidget {
               report: report,
               series: hasSeries ? series : const [],
               temp: temp,
-              band: (phase) =>
-                  v2BlockTint(phase.hue, p).withValues(alpha: 0.6),
+              // The one palette's soft tints (2026-09-27). Kept for revert:
+              //   v2BlockTint(phase.hue, p).withValues(alpha: 0.6),
+              band: (phase) => TtcCycleColours.tint(phase),
               plain: ttcPanel,
               line: ttcTitleInk,
               axis: ttcMuted,
-              markPeriod: ttcCoral,
-              markOther: ttcTitleInk,
+              markPeriod: TtcCycleColours.period,
+              markOther: TtcCycleColours.logged,
             ),
             size: Size.infinite,
           ),
@@ -747,9 +954,16 @@ class _CycleCard extends StatelessWidget {
           // ---- the legend, which is what makes the bands mean anything ----
           Wrap(spacing: 14, runSpacing: 7, children: [
             for (final phase in TtcPhase.values)
-              _Key(colour: v2BlockTint(phase.hue, p), label: phase.label),
-            _Key(colour: ttcCoral, label: t.reportKeyPeriod, dot: true),
-            _Key(colour: ttcTitleInk, label: t.reportKeyLogged, dot: true),
+              _Key(colour: TtcCycleColours.tint(phase), label: phase.label),
+            _Key(
+                colour: TtcCycleColours.period,
+                label: t.reportKeyPeriod,
+                dot: true),
+            _Key(
+                colour: TtcCycleColours.logged,
+                label: t.reportKeyLogged,
+                dot: true),
+
           ]),
         ],
       ]),

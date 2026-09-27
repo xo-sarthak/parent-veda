@@ -197,6 +197,13 @@ class TtcSupplementsStore extends ChangeNotifier with TtcSyncedStore {
 
   TtcSupplement add(String name,
       {String dose = '', TtcAuthor author = TtcAuthor.me}) {
+    // ⚠️ ONE ROW PER SUPPLEMENT, PER PERSON (launch walk, 2026-09-27): the
+    // list showed "Folic acid" twice, from the chip and from typing it. The
+    // same name for the same person returns the row she already has.
+    final key = name.trim().toLowerCase();
+    for (final e in _items) {
+      if (e.author == author && e.name.trim().toLowerCase() == key) return e;
+    }
     final item = TtcSupplement(
       id: 'ttcs_${DateTime.now().microsecondsSinceEpoch}',
       name: name.trim(),
@@ -207,6 +214,141 @@ class TtcSupplementsStore extends ChangeNotifier with TtcSyncedStore {
     _persist();
     notifyListeners();
     return item;
+  }
+
+  /// Change a supplement's name or dose, keeping its id and so every day she
+  /// ticked it (added 2026-09-27: doses were saved as "As advised" and could
+  /// never be corrected to what her doctor actually said).
+  ///
+  /// The push rides on `notifyListeners`, like every change here: the synced
+  /// mixin upserts the whole list by id, so an edit is the same write as an
+  /// add. Returns false when the new name would clash with another of that
+  /// person's rows, so the caller can say so rather than make a duplicate.
+  bool update(String id, {String? name, String? dose}) {
+    final i = _items.indexWhere((e) => e.id == id);
+    if (i < 0) return false;
+    final old = _items[i];
+    final newName = (name ?? old.name).trim();
+    if (newName.isEmpty) return false;
+    final key = newName.toLowerCase();
+    final clash = _items.any((e) =>
+        e.id != id &&
+        e.author == old.author &&
+        e.name.trim().toLowerCase() == key);
+    if (clash) return false;
+    _items[i] = TtcSupplement(
+      id: old.id,
+      name: newName,
+      dose: (dose ?? old.dose).trim(),
+      author: old.author,
+    );
+    _persist();
+    notifyListeners();
+    return true;
+  }
+
+  /// True when this person already has a supplement by this name.
+  bool has(String name, TtcAuthor author) {
+    final key = name.trim().toLowerCase();
+    return _items
+        .any((e) => e.author == author && e.name.trim().toLowerCase() == key);
+  }
+
+  /// True when anything on the list was ticked on [on]: the dot under a day
+  /// in the week strip. A yes or no, never a count (added 2026-09-27).
+  bool anyTakenOn(DateTime on) {
+    final day = _dayKey(on);
+    return _items.any((e) => _taken.contains('${e.id}|$day'));
+  }
+
+  // ---- duplicates -----------------------------------------------------------
+  //  ⚠️ ADDED 2026-09-27 (tool rebuild). `add` has refused a second row of the
+  //  same name for the same person since the launch walk, but lists saved
+  //  BEFORE that fix still hold two "Folic acid" rows, each with its own
+  //  ticks. Deleting one silently would lose the days ticked on it, and a
+  //  sync would bring it back anyway. So the screen shows the pair and asks,
+  //  and this merges on her say-so: the ticks move, the extra row goes.
+
+  static String _nameKey(String name) => name.trim().toLowerCase();
+
+  /// Rows that share a name with another row of the same person, grouped,
+  /// oldest first in each group (the list keeps the order they were added).
+  List<List<TtcSupplement>> duplicates() {
+    final groups = <String, List<TtcSupplement>>{};
+    for (final e in _items) {
+      groups.putIfAbsent('${e.author.name}|${_nameKey(e.name)}', () => []).add(e);
+    }
+    return groups.values.where((g) => g.length > 1).toList();
+  }
+
+  /// The dose a merge keeps: the first one that says something real, so a
+  /// row saved as "As advised" never overwrites "400 mcg daily".
+  static String mergedDose(List<TtcSupplement> group) {
+    for (final e in group) {
+      final d = e.dose.trim();
+      if (d.isNotEmpty && d.toLowerCase() != 'as advised') return d;
+    }
+    for (final e in group) {
+      if (e.dose.trim().isNotEmpty) return e.dose.trim();
+    }
+    return '';
+  }
+
+  /// Folds every row in [group] into its first: each day ticked on any of
+  /// them becomes a tick on the one that stays, and the rest are removed.
+  /// Returns the row that stayed, or null when there was nothing to merge.
+  ///
+  /// Cloud: the removed rows are deleted (their tick rows cascade), and the
+  /// moved ticks go up with the next push, which upserts every tick by
+  /// (supplement, day). The order does not matter: the delete never touches
+  /// the kept row's ticks.
+  TtcSupplement? merge(List<TtcSupplement> group) {
+    if (group.length < 2) return null;
+    final keepIndex = _items.indexWhere((e) => e.id == group.first.id);
+    if (keepIndex < 0) return null;
+    final keep = _items[keepIndex];
+    final dropIds = [
+      for (final e in group.skip(1))
+        if (e.author == keep.author && _items.any((x) => x.id == e.id)) e.id
+    ];
+    if (dropIds.isEmpty) return null;
+    for (final id in dropIds) {
+      final moved = _taken
+          .where((k) => k.startsWith('$id|'))
+          .map((k) => '${keep.id}|${k.substring(id.length + 1)}')
+          .toList();
+      _taken
+        ..removeWhere((k) => k.startsWith('$id|'))
+        ..addAll(moved);
+    }
+    _items.removeWhere((e) => dropIds.contains(e.id));
+    final kept = TtcSupplement(
+      id: keep.id,
+      name: keep.name,
+      dose: mergedDose(group),
+      author: keep.author,
+    );
+    _items[_items.indexWhere((e) => e.id == keep.id)] = kept;
+    _persist();
+    if (SupabaseRepo.isLoggedIn) {
+      for (final id in dropIds) {
+        SupabaseRepo.delete(TtcTables.supplements, id).catchError((_) {});
+      }
+    }
+    notifyListeners();
+    return kept;
+  }
+
+  /// The row with this id, or null once it has been removed or merged away.
+  TtcSupplement? byId(String id) =>
+      _items.where((e) => e.id == id).firstOrNull;
+
+  /// Adds a row exactly as given, bypassing the one-name-per-person check.
+  /// Tests only: it is how a list saved before that check is reproduced.
+  @visibleForTesting
+  void addRawForTest(TtcSupplement s) {
+    _items.add(s);
+    notifyListeners();
   }
 
   void remove(String id) {

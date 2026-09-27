@@ -115,27 +115,27 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
   // warm read tone for the tab that ends at a person.
   groups: [
     TtcFocusGroup(
-        id: 'understand', mark: IntentMark.bookMark,
+        id: 'understand', mark: IntentMark.bookMark, tabMark: TtcTabMark.openBook,
         label: 'Understand',
         icon: Icons.menu_book_outlined,
         hue: 186),
     TtcFocusGroup(
-        id: 'test', mark: IntentMark.reportPage,
+        id: 'test', mark: IntentMark.reportPage, tabMark: TtcTabMark.vialReport,
         label: 'Test and results',
         icon: Icons.biotech_outlined,
         hue: 206),
     TtcFocusGroup(
-        id: 'improve', mark: IntentMark.improveMark,
+        id: 'improve', mark: IntentMark.improveMark, tabMark: TtcTabMark.sprout,
         label: 'Improve his health',
         icon: Icons.eco_outlined,
         hue: 104),
     TtcFocusGroup(
-        id: 'track', mark: IntentMark.chartLog,
+        id: 'track', mark: IntentMark.chartLog, tabMark: TtcTabMark.chartLine,
         label: 'Track',
         icon: Icons.calendar_today_outlined,
         hue: 160),
     TtcFocusGroup(
-      id: 'talk', mark: IntentMark.askDoctor,
+      id: 'talk', mark: IntentMark.askDoctor, tabMark: TtcTabMark.twoBubbles,
       label: 'Talk',
       icon: Icons.chat_bubble_outline_rounded,
       hue: 42,
@@ -176,12 +176,24 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
               'somewhere in it. The word "fault" doesn\'t help anyone here.',
           readId: 'ttc_read_whose_side',
         ),
-        TtcVideoTile(
-          title: 'What affects sperm health',
-          blurb: 'The three things that really change it, and the many that '
-              "don't.",
-          slotId: 'ttc_vid_whose_side',
-          duration: '5 MIN',
+        // ⚠️ MOVED TO "Is it worth testing?" UNDER THE FILM'S OWN TITLE
+        // (2026-09-27, relevance audit). This slot is "Why his side gets
+        // tested last", not a film about what affects sperm health; that
+        // film is `ttc_vid_heat_habits`, now under "The three levers".
+        // Kept for revert (2026-09-27, relevance audit):
+        // TtcVideoTile(
+        //   title: 'What affects sperm health',
+        //   blurb: 'The three things that really change it, and the many that '
+        //       "don't.",
+        //   slotId: 'ttc_vid_whose_side',
+        //   duration: '5 MIN',
+        // ),
+        // Moved here from "Is it worth testing?" (2026-09-27, relevance
+        // audit): his age is a question about him, not about the test.
+        TtcArticleTile(
+          title: 'Does his age matter?',
+          blurb: "It changes more slowly than yours. Here's what changes.",
+          readId: 'ttc_read_his_age',
         ),
       ],
     ),
@@ -202,11 +214,22 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
               "a year of waiting can't.",
           readId: 'ttc_read_case_for_testing',
         ),
-        // Added 2026-09-26 (gap plan, His side P2).
-        TtcArticleTile(
-          title: 'Does his age matter?',
-          blurb: "It changes more slowly than yours. Here's what changes.",
-          readId: 'ttc_read_his_age',
+        // Moved to "Is it about him?" (2026-09-27, relevance audit).
+        // Kept for revert:
+        // // Added 2026-09-26 (gap plan, His side P2).
+        // TtcArticleTile(
+        //   title: 'Does his age matter?',
+        //   blurb: "It changes more slowly than yours. Here's what changes.",
+        //   readId: 'ttc_read_his_age',
+        // ),
+        // Moved here from "Is it about him?" under its own title (2026-09-27,
+        // relevance audit): the film is about why testing him comes last.
+        TtcVideoTile(
+          title: 'Why his side gets tested last',
+          blurb: 'A male factor plays a part for about half of couples, and '
+              'his side is the quickest to check.',
+          slotId: 'ttc_vid_whose_side',
+          duration: '5 MIN',
         ),
       ],
     ),
@@ -324,6 +347,15 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
               'the repeat test is booked before anything else.',
           readId: 'ttc_read_three_months',
         ),
+        // The film about what changes sperm health (2026-09-27, relevance
+        // audit). Written and chaptered, and was on no door.
+        TtcVideoTile(
+          title: 'Three things that really change his numbers',
+          blurb: 'Tobacco, heat and time, and how long before any change '
+              'shows.',
+          slotId: 'ttc_vid_heat_habits',
+          duration: '5 MIN',
+        ),
       ],
     ),
 
@@ -345,11 +377,32 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
         // evidence is weak. `zinc` is band `situational` and evidence `thin`;
         // CoQ10 the same. This door does not sell him a stack on the strength
         // of one report.
-        TtcProductTile.shelf(
-          title: 'Zinc / CoQ10',
-          blurb: 'Plain versions, at the doses the trials used. Read the piece '
-              'above before you spend anything.',
-          category: 'supplements',
+        //
+        // ⚠️ TWO PRODUCTS, NOT THE WHOLE SHELF (2026-09-27, relevance audit).
+        // The shelf opened folic acid, inositol and the rest, the same shelf
+        // Getting ready calls "Folic acid and preconception supplements". The
+        // tile named zinc and CoQ10, and both are in the catalogue, each with
+        // its own honest "best for" lines on its page. The old blurb's "at the
+        // doses the trials used" is not true of the CoQ10 entry, whose page
+        // says box doses vary, so the blurbs now say when each is worth it.
+        // Kept for revert (2026-09-27, relevance audit):
+        // TtcProductTile.shelf(
+        //   title: 'Zinc / CoQ10',
+        //   blurb: 'Plain versions, at the doses the trials used. Read the piece '
+        //       'above before you spend anything.',
+        //   category: 'supplements',
+        // ),
+        TtcProductTile(
+          title: 'Zinc',
+          blurb: 'Worth it only if a test showed his level is low. Read the '
+              'piece above before you spend anything.',
+          productId: 'zinc',
+        ),
+        TtcProductTile(
+          title: 'CoQ10',
+          blurb: 'Worth it only if a clinic has named it. Read the piece above '
+              'before you spend anything.',
+          productId: 'coq10',
         ),
       ],
     ),
@@ -432,12 +485,27 @@ const TtcFocusPage kTtcHisSideFocus = TtcFocusPage(
         // which is a pointer to a page rather than to the area. A door tile
         // opens the area itself, the way Mind and body's own "His part of
         // this" opens this one. Nothing about stress is built here.
-        TtcDoorTile(
-          title: 'His emotional side',
-          blurb: 'What this does to him, from the area that covers it. Men '
-              'are offered support far less often, mostly because nobody '
-              'asks.',
-          bracketId: 'ttc_mind_body',
+        //
+        // ⚠️ THE PIECE ABOUT HIM, NOT A DOOR THAT OPENS ON HER (2026-09-27,
+        // relevance audit). Mind & body opens on Today, her few calm
+        // minutes, and no section there is about him; a door tile cannot yet
+        // open another door on a chosen tab. The one section written about
+        // him going quiet lives in Mind & body's own read, so this names that
+        // section: still Mind & body's content, and nothing built here.
+        // Kept for revert (2026-09-27, relevance audit):
+        // TtcDoorTile(
+        //   title: 'His emotional side',
+        //   blurb: 'What this does to him, from the area that covers it. Men '
+        //       'are offered support far less often, mostly because nobody '
+        //       'asks.',
+        //   bracketId: 'ttc_mind_body',
+        // ),
+        TtcGuideTile(
+          title: 'When he goes quiet',
+          blurb: 'Why he may say little even when he cares. Men are offered '
+              'support far less often, mostly because nobody asks.',
+          readId: 'ttc_read_bringing_him_in',
+          atHeading: 'Why might he be quiet, even when he cares?',
         ),
       ],
     ),

@@ -1008,11 +1008,15 @@ class TtcS {
   String get ovulationToday => _p('Today', 'Aaj');
   String whichCycleDay(int day) => _p('Cycle day $day', 'Cycle din $day');
 
-  String get fertilityWindow => _p('Fertility Window', 'Fertility Window');
+  // One name for one thing (2026-09-27): the door, the home and the reads say
+  // "fertile window". Kept for revert: _p('Fertility Window', 'Fertility Window').
+  String get fertilityWindow => _p('Fertile window', 'Fertility Window');
   String get fertilityAcross => _p('Across this cycle', 'Is cycle mein');
   String get fertilityWindowNote => _p(
-      "About six days, ending on the day you ovulate. Sperm live about five days, and the egg about one. We also show the day after, in case ovulation comes a day later than we estimate. That's why it's a window: no single day has to be right.",
-      'Lagbhag chhe din, ovulation ke din tak. Hum agla din bhi dikhate hain, agar ovulation andaaze se ek din baad ho. Sperm lagbhag paanch din chalte hain; egg lagbhag ek. Yahi chaudai asli baat hai - kisi ek din ka sahi hona zaroori nahi.');
+      "About six days, ending on the day you ovulate. Sperm live about five days, and the egg about one. That's why it's a window: no single day has to be right.",
+      // Kept for revert (2026-09-27, the margin day is gone):
+      // "About six days, ending on the day you ovulate. Sperm live about five days, and the egg about one. We also show the day after, in case ovulation comes a day later than we estimate. That's why it's a window: no single day has to be right.",
+      'Lagbhag chhe din, ovulation ke din tak. Sperm lagbhag paanch din chalte hain; egg lagbhag ek. Yahi chaudai asli baat hai - kisi ek din ka sahi hona zaroori nahi.');
 
   // ---- supplements ----------------------------------------------------------
   String get supplements => _p('Supplements', 'Supplements');
@@ -1021,7 +1025,10 @@ class TtcS {
   String get supplementsEmptyTitle =>
       _p('Nothing added yet', 'Abhi kuch add nahi kiya');
   String get supplementsEmptyBody => _p(
-      'Add what you take, including anything your doctor prescribed. Folic acid has the strongest evidence behind it.',
+      // Kept for revert (2026-09-27, tools pass): 'Add what you take,
+      // including anything your doctor prescribed. ...' Prescriptions now go
+      // in Medication, and the screen says so.
+      'Add the vitamins you take, or tap one below. Folic acid has the strongest evidence behind it.',
       'Jo aap sach mein lete hain wo add karein, doctor ki di hui dawai bhi. Folic acid wo hai jiske peeche sabse mazboot saboot hai.');
   String get supplementsSuggested => _p('Commonly taken', 'Aam taur par liye jaate hain');
   String get supplementsDisclaimer => _p(
@@ -1188,7 +1195,11 @@ class TtcS {
       _p('Days 3 to 7, once a day', 'Din 3 se 7, roz ek baar');
   String get medNotes => _p('Anything to remember', 'Yaad rakhne layak kuch');
   String get medNotesHint => _p(
-      'Prescribed by Dr Rao, take after food', 'Dr Rao ne di, khaane ke baad');
+      // Kept for revert (2026-09-27, tools pass): 'Prescribed by Dr Rao, take
+      // after food'. Dr Rao is not a real expert on the roster, and a named
+      // doctor in a hint reads as a person we vouch for. The Hindi side is
+      // shipped and left as it is.
+      'Prescribed by my doctor, take after food', 'Dr Rao ne di, khaane ke baad');
   String get medReminders => _p('Reminders', 'Yaad dilana');
   String get medRemindersNote => _p(
       "Optional. Add a time and your phone will remind you. Leave it empty and it won't.",
@@ -1373,11 +1384,12 @@ class TtcS {
       'Sawaal tab likhein jab dimaag mein aayein, waiting room mein nahi. Raat 2 baje jo sawaal aaye the, unke saath jaana hi chhoti consultation ko kaam ka banata hai.');
 
   // ---- nutrition planner ----------------------------------------------------
-  String get nutritionTitle => _p('Nutrition Planner', 'Nutrition Planner');
+  // Was 'Nutrition Planner' (2026-09-27): nothing here plans; it is a week of ideas.
+  String get nutritionTitle => _p("This week's food ideas", 'Nutrition Planner');
   String get nutritionIntro => _p(
       'A week of ideas, not a plan to stick to. Nothing to tick off, no way to fall behind, and every day is for both of you.',
       'Ek hafte ke ideas, koi plan nahi jise nibhana ho. Na kuch tick karna hai, na kuch chhootne ka dar - aur har din aap dono ke liye hai.');
-  String get nutritionFocus => _p('What this week leans on', 'Is hafte kis par zor hai');
+  String get nutritionFocus => _p('Nutrients this week', 'Is hafte kis par zor hai');
   String get nutritionWeek => _p('The week ahead', 'Aane wala hafta');
   String get nutritionDisclaimer => _p(
       'General guidance, not a set diet. If you have diabetes, thyroid disease, PCOS or any condition that affects what you eat, plan your food with your doctor.',
@@ -1447,11 +1459,11 @@ class TtcS {
   String get treatmentAddDates =>
       _p('Add the dates your clinic gave you', 'Clinic ki di hui dates add karein');
   String get treatmentAddDatesBody => _p(
-      'Then we can remind you about the trigger shot and count the days to your blood test, instead of guessing at a period.',
+      'Then we can remind you about the trigger injection and count the days to your blood test, instead of guessing at a period.',
       'Phir hum trigger shot ki yaad dila payenge aur period ka andaaza lagane ke bajaye blood test tak gin payenge.');
   String get treatmentTriggerTime => _p('What time exactly?', 'Theek kitne baje?');
   String get treatmentTriggerReminder => _p(
-      "We'll remind you 4 hours before the trigger shot, and again 15 minutes before.",
+      "We'll remind you 4 hours before the trigger injection, and again 15 minutes before.",
       'Trigger shot se 4 ghante pehle, aur phir 15 minute pehle, hum yaad dila denge.');
   String get treatmentClear => _p('Clear this cycle', 'Ye cycle hata dein');
   String get treatmentClearBody => _p(
@@ -1466,7 +1478,7 @@ class TtcS {
       days <= 0 ? 'Today' : (days == 1 ? 'Tomorrow' : 'in $days days'),
       days <= 0 ? 'Aaj' : (days == 1 ? 'Kal' : '$days din mein'));
   String get betaWaitNote => _p(
-      'A home test before this can give a wrong result because of the trigger shot. The blood test gives the real answer.',
+      'A home test before this can give a wrong result because of the trigger injection. The blood test gives the real answer.',
       'Isse pehle ghar ka test trigger shot ki wajah se galat aa sakta hai. Blood test hi asli jawab hai.');
 
   // ---- the two pathway questions --------------------------------------------
@@ -1483,7 +1495,7 @@ class TtcS {
   //   also decide whether we can help with timing at all. If you're not sure,
   //   leave them, and we'll go with the safer answer."
   String get pathwayQuestionsWhy => _p(
-      "We don't go by the treatment's name. From your clinic's first treatment date, we follow your round instead of estimating fertile days. The kind of treatment, and whether there's a trigger shot, tells us the rest.",
+      "We don't go by the treatment's name. From your clinic's first treatment date, we follow your round instead of estimating fertile days. The kind of treatment, and whether there's a trigger injection, tells us the rest.",
       'Ek hi treatment inke hisaab se alag chalta hai, aur inhi se tay hota hai ki hum timing mein madad kar sakte hain ya nahi. Pata na ho toh chhod dein - hum surakshit jawab maan lete hain.');
   /// Asks the PRINCIPLE, not a clinical event.
   ///
@@ -1639,7 +1651,10 @@ class TtcS {
   String windowRange(String from, String to) =>
       hinglish ? '$from se $to' : '$from to $to';
   String get windowPeakDay => _p('Most likely', 'Sabse zyada mauka');
-  String get windowOpenNow => _p('Open now', 'Abhi khuli hai');
+  // "Open now" said nothing on its own (2026-09-27, build 11); the home's
+  // insight card says the same thing in these words. Kept for revert: 'Open now'.
+  String get windowOpenNow =>
+      _p('Your fertile days have begun', 'Abhi khuli hai');
   String windowOpensIn(int days) => hinglish
       ? days == 1
           ? 'Kal khulti hai'

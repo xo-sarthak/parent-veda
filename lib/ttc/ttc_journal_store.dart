@@ -171,6 +171,56 @@ class TtcJournalStore extends ChangeNotifier with TtcSyncedStore {
     return entry;
   }
 
+  /// Changes the words of an entry THIS person wrote (tools pass, 2026-09-27).
+  ///
+  /// Only her own: a partner's entry is his to change, and the cloud refuses a
+  /// forged author anyway (0041). The id and the written date stay the same,
+  /// so the edit is an upsert of the same row on the next push, never a second
+  /// entry. An empty edit is refused rather than saved: clearing the words is
+  /// not how a letter to a child should be deleted, and Delete has its own
+  /// confirm. Returns whether anything changed.
+  ///
+  /// [kind] is optional and additive (2026-09-27, tools rebuild): she can move
+  /// an entry she filed under the wrong kind, the way Day One lets any part of
+  /// an entry be changed. `kind` is already a synced column, so no schema
+  /// change rides on it.
+  bool update(String id, {required String text, TtcEntryKind? kind}) {
+    final i = _entries.indexWhere((e) => e.id == id);
+    if (i < 0) return false;
+    final old = _entries[i];
+    final next = text.trim();
+    final nextKind = kind ?? old.kind;
+    if (old.author != TtcAuthor.me ||
+        next.isEmpty ||
+        (next == old.text && nextKind == old.kind)) {
+      return false;
+    }
+    _entries[i] = TtcJournalEntry(
+      id: old.id,
+      dateIso: old.dateIso,
+      kind: nextKind,
+      text: next,
+      author: old.author,
+      prompt: old.prompt,
+      photoPath: old.photoPath,
+    );
+    _persist();
+    notifyListeners();
+    return true;
+  }
+
+  /// Puts back an entry she has just deleted, same id and date (the Undo on
+  /// "Entry deleted", 2026-09-27). The cloud delete has already gone out, so
+  /// the row is re-sent by the debounced push that `notifyListeners` starts,
+  /// as an upsert of the same id: the app-generated id is what makes this
+  /// safe, a restore can never become a second copy.
+  void restore(TtcJournalEntry entry) {
+    if (_entries.any((e) => e.id == entry.id)) return;
+    _entries.add(entry);
+    _persist();
+    notifyListeners();
+  }
+
   void remove(String id) {
     final before = _entries.length;
     _entries.removeWhere((e) => e.id == id);
@@ -220,7 +270,33 @@ class TtcJournalStore extends ChangeNotifier with TtcSyncedStore {
         orderBy: 'written_at', ascending: true);
     for (final row in rows) {
       final id = row['id'];
-      if (id is! String || _entries.any((e) => e.id == id)) continue;
+      if (id is! String) continue;
+      // ⚠️ EACH ENTRY IS OWNED BY ITS AUTHOR (2026-09-27, when edit arrived).
+      // Her own rows: the local copy wins, so an edit made offline is never
+      // overwritten by the older cloud text. His rows: the cloud wins, so an
+      // edit he makes on his phone reaches hers. Before edit existed, "skip
+      // what we already have" was enough; with edit it would freeze his words
+      // at whatever they said the first time her phone saw them.
+      final have = _entries.indexWhere((e) => e.id == id);
+      if (have >= 0) {
+        final local = _entries[have];
+        final body = row['body'] as String?;
+        if (local.author == TtcAuthor.partner &&
+            body != null &&
+            body.isNotEmpty &&
+            body != local.text) {
+          _entries[have] = TtcJournalEntry(
+            id: local.id,
+            dateIso: local.dateIso,
+            kind: local.kind,
+            text: body,
+            author: local.author,
+            prompt: local.prompt,
+            photoPath: local.photoPath,
+          );
+        }
+        continue;
+      }
       _entries.add(TtcJournalEntry(
         id: id,
         dateIso: SupabaseRepo.parseDbTime(row['written_at']).toIso8601String(),

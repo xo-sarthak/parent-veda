@@ -95,7 +95,11 @@ void main() {
 
   // ===========================================================================
   group('Prepare says where she is', () {
-    testWidgets('the eyebrow carries the chapter, not just the tab name',
+    // ⚠️ REVERSED BY THE USER, 2026-09-27: the chapter name ("Trying
+    // Together") over the experts list "makes no sense". The eyebrow names
+    // the stage; the chapter name is never shown alone. Kept for revert: the
+    // test expected the chapter title in capitals.
+    testWidgets('the eyebrow names the stage, never the chapter',
         (tester) async {
       tester.view.physicalSize = const Size(1200, 9000);
       tester.view.devicePixelRatio = 1.0;
@@ -106,8 +110,9 @@ void main() {
 
       final chapter =
           TtcStore.instance.today.chapter.title(false).toUpperCase();
-      expect(find.textContaining(chapter), findsWidgets,
-          reason: '"PREPARE" alone said nothing she did not already know');
+      expect(find.textContaining(chapter), findsNothing,
+          reason: 'a chapter name alone explains nothing (the user)');
+      expect(find.textContaining('TRYING TO CONCEIVE'), findsWidgets);
     });
   });
 }

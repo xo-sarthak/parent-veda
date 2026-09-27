@@ -178,7 +178,9 @@ void main() {
       healthy();
       await pump(tester);
       expect(find.text('This cycle'), findsOneWidget);
-      expect(find.text('See this month in full'), findsOneWidget,
+      // One name for the report, 2026-09-27 (tools pass). Was:
+      //   expect(find.text('See this month in full'), findsOneWidget,
+      expect(find.text('See your cycle report'), findsOneWidget,
           reason: 'the report was unreachable from here, which is the gap this '
               'rebuild existed to close');
       // All four stretches, named.
@@ -190,7 +192,9 @@ void main() {
     testWidgets('the picture can be switched to days', (tester) async {
       healthy();
       await pump(tester);
-      await tester.tap(find.text('Days'));
+      // "Calendar" since 2026-09-27, the report's word. Was:
+      //   await tester.tap(find.text('Days'));
+      await tester.tap(find.text('Calendar'));
       await tester.pump(const Duration(milliseconds: 300));
       expect(tester.takeException(), isNull);
       expect(find.textContaining('when the next period is expected'),

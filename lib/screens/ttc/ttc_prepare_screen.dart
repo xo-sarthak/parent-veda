@@ -45,6 +45,16 @@ class TtcPrepareScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) => PvLearnScreen(
         stage: LifeStage.tryingToConceive,
+        // The page says what it holds (launch walk, 2026-09-27): "Talk to an
+        // expert" opened a page titled "Learn".
+        title: switch (onlyCategory) {
+          'consults' => 'Talk to an expert',
+          'courses' => 'Courses',
+          // The unscoped list is what You calls it (2026-09-27): it opened
+          // under "Learn", which is a tab of its own.
+          null => 'Programmes and sessions',
+          _ => null,
+        },
         kind: switch (onlyCategory) {
           'consults' => PvLearnKind.consult,
           'courses' => PvLearnKind.course,

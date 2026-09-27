@@ -23,6 +23,7 @@ import 'package:parentveda/screens/ttc/ttc_surface_router.dart';
 import 'package:parentveda/ttc/focus/ttc_focus_his_side.dart';
 import 'package:parentveda/ttc/ttc_focus_data.dart';
 import 'package:parentveda/ttc/ttc_prepare_data.dart';
+import 'package:parentveda/ttc/ttc_products_data.dart';
 import 'package:parentveda/ttc/ttc_reads_data.dart';
 import 'package:parentveda/ttc/ttc_records_store.dart';
 import 'package:parentveda/ttc/ttc_semen_limits.dart';
@@ -317,7 +318,8 @@ void main() {
 
       // ⚠️ THE TWO ACTIONS EVERY PATH ENDS WITH, from the brief.
       expect(find.text('Have the report read properly'), findsOneWidget);
-      expect(find.text('Keep his reports with yours'), findsOneWidget);
+      // Neutral wording since 2026-09-27; was 'Keep his reports with yours'.
+      expect(find.text('Keep this with your reports'), findsOneWidget);
     });
 
     test('the surface resolves', () {
@@ -370,16 +372,34 @@ void main() {
       expect(ids.toSet().length, 1, reason: 'two different course ids');
     });
 
-    test('the emotional pointer is a DOOR to Mind and body, and builds nothing',
-        () {
-      // Step 4b: "a single pointer card that deep-links to the Mind and body
-      // focus area. Do not build stress content here." A door, not one of
-      // that area's articles — and the door must resolve.
+    // ⚠️ CHANGED 2026-09-27 (relevance audit). The door tile opened Mind &
+    // body on Today, her calm minutes, where no section is about him, and a
+    // door tile cannot choose a tab. It now names the one section Mind & body
+    // wrote about him going quiet: still that area's content, nothing built
+    // here. Kept for revert:
+    //
+    // test('the emotional pointer is a DOOR to Mind and body, and builds nothing',
+    //     () {
+    //   // Step 4b: "a single pointer card that deep-links to the Mind and body
+    //   // focus area. Do not build stress content here." A door, not one of
+    //   // that area's articles — and the door must resolve.
+    //   final tile = kTtcHisSideFocus.allTiles
+    //       .whereType<TtcDoorTile>()
+    //       .firstWhere((t) => t.title == 'His emotional side');
+    //   expect(tile.bracketId, 'ttc_mind_body');
+    //   expect(ttcFocusPageFor(tile.bracketId), isNotNull);
+    // });
+    test('the emotional pointer opens Mind and body\'s piece about him, and '
+        'builds nothing', () {
       final tile = kTtcHisSideFocus.allTiles
-          .whereType<TtcDoorTile>()
-          .firstWhere((t) => t.title == 'His emotional side');
-      expect(tile.bracketId, 'ttc_mind_body');
-      expect(ttcFocusPageFor(tile.bracketId), isNotNull);
+          .whereType<TtcGuideTile>()
+          .firstWhere((t) => t.title == 'When he goes quiet');
+      expect(tile.readId, 'ttc_read_bringing_him_in');
+      final read = ttcReadById(tile.readId)!;
+      expect(read.sections.map((s) => s.heading?.en), contains(tile.atHeading),
+          reason: 'the anchor no longer matches a heading, so it opens at '
+              'the top');
+      expect(ttcFocusPageFor('ttc_mind_body'), isNotNull);
     });
   });
 
@@ -422,9 +442,18 @@ void main() {
       final article = tileTitled('Zinc and CoQ10, honestly');
       expect(article, isA<TtcArticleTile>());
       expect(ttcReadById((article as TtcArticleTile).readId!), isNotNull);
-      final shelf = kTtcHisSideFocus.allTiles.whereType<TtcProductTile>();
-      expect(shelf.length, 1);
-      expect(shelf.single.category, 'supplements');
+      // ⚠️ TWO PRODUCTS SINCE 2026-09-27 (relevance audit): the shelf opened
+      // folic acid, inositol and the rest under a tile that named zinc and
+      // CoQ10. Kept for revert:
+      // final shelf = kTtcHisSideFocus.allTiles.whereType<TtcProductTile>();
+      // expect(shelf.length, 1);
+      // expect(shelf.single.category, 'supplements');
+      final products = kTtcHisSideFocus.allTiles.whereType<TtcProductTile>();
+      expect(products.map((p) => p.productId).toSet(), {'zinc', 'coq10'});
+      for (final p in products) {
+        expect(ttcProducts.any((x) => x.id == p.productId), isTrue,
+            reason: p.title);
+      }
       // Article before product, in the same section — the order is the ethics.
       final section = kTtcHisSideFocus.sections
           .firstWhere((s) => s.heading == 'Supplements, honestly');
@@ -550,7 +579,7 @@ void main() {
     });
 
     testWidgets(
-        '"Keep his reports with yours" writes ONE record and opens the folder',
+        '"Keep this with your reports" writes ONE record and opens the folder',
         (tester) async {
       tester.view.physicalSize = const Size(1200, 6000);
       tester.view.devicePixelRatio = 1.0;
@@ -567,7 +596,8 @@ void main() {
       await tester.tap(find.text('Read it back to me'));
       await tester.pumpAndSettle();
 
-      await tester.tap(find.text('Keep his reports with yours'));
+      // Was 'Keep his reports with yours' (renamed 2026-09-27).
+      await tester.tap(find.text('Keep this with your reports'));
       await tester.pumpAndSettle();
 
       expect(store.count, before + 1);

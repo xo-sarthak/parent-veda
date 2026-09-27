@@ -50,11 +50,23 @@ void main() {
     });
   });
 
-  group('the opening stretch is Chapter 1 regardless of the cycle', () {
-    test('a journey ten days old stays in Preparing Together', () {
+  // ⚠️ THE CYCLE WINS ONCE THERE IS ONE (launch walk, 2026-09-27). A young
+  // journey with a logged period used to stay in Preparing Together while the
+  // hero, on the same screen, named her fertile days. Kept for revert: this
+  // test expected preparingTogether.
+  group('the opening stretch is Chapter 1 only with no cycle to ride', () {
+    test('a journey ten days old with a period logged follows the cycle', () {
       final s = TtcJourneyState(
         journeyStart: today.subtract(const Duration(days: 10)),
         lastPeriodStart: today.subtract(const Duration(days: 13)), // day 14
+        today: today,
+      );
+      expect(engine.resolve(s).chapter, TtcChapter.tryingTogether);
+    });
+
+    test('a journey with nothing logged is Preparing Together', () {
+      final s = TtcJourneyState(
+        journeyStart: today.subtract(const Duration(days: 10)),
         today: today,
       );
       expect(engine.resolve(s).chapter, TtcChapter.preparingTogether);
@@ -162,7 +174,9 @@ void main() {
     test('high on either shoulder of the peak', () {
       expect(engine.fertilityFor(d(12), 12), FertilityLevel.high);
       expect(engine.fertilityFor(d(11), 11), FertilityLevel.high);
-      expect(engine.fertilityFor(d(15), 15), FertilityLevel.high);
+      // The day after ovulation is outside the six-day window since
+      // 2026-09-27 (was high).
+      expect(engine.fertilityFor(d(15), 15), FertilityLevel.low);
     });
 
     test('medium at the opening of the window - sperm survive ~5 days', () {
@@ -195,7 +209,8 @@ void main() {
   });
 
   group('chapters ride the cycle', () {
-    // 28-day cycle → ovulation 14, window 9-15.
+    // 28-day cycle → ovulation 14, window 9-14 (six days ending on
+    // ovulation since 2026-09-27; it was 9-15).
     TtcChapter at(int day) => engine.resolve(onDay(day, cycles: [28, 28])).chapter;
 
     test('day 1 to 8 is Knowing Your Rhythm', () {
@@ -203,10 +218,11 @@ void main() {
       expect(at(8), TtcChapter.knowingYourRhythm);
     });
 
-    test('the seven-day window is Trying Together', () {
+    test('the six-day window is Trying Together', () {
       expect(at(9), TtcChapter.tryingTogether);
       expect(at(14), TtcChapter.tryingTogether);
-      expect(at(15), TtcChapter.tryingTogether);
+      // The day after ovulation is the waiting days now (was Trying Together).
+      expect(at(15), TtcChapter.theWaitingDays);
     });
 
     test('after it, The Waiting Days', () {

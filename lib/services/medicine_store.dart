@@ -253,6 +253,46 @@ class MedicineStore extends ChangeNotifier {
     }
   }
 
+  /// Toggle the "taken" state for any past day, not only today.
+  ///
+  /// ⚠️ ADDITIVE (TTC tool rebuild, 2026-09-27). The TTC Medication page lets
+  /// her put right a day she forgot to tick, the way Apple Health's week strip
+  /// does. Same log row shape and the same cloud calls as `toggleToday`, which
+  /// is left exactly as it was so the pregnancy tracker is untouched.
+  Future<void> toggleOn(String medId, DateTime day) async {
+    final key = dateKey(day);
+    if (isTakenOn(medId, key)) {
+      final removed = _logs
+          .where((l) => l.medicationId == medId && l.dateKey == key)
+          .toList();
+      _logs.removeWhere((l) => l.medicationId == medId && l.dateKey == key);
+      notifyListeners();
+      await _persistLogs();
+      if (SupabaseRepo.isLoggedIn) {
+        try {
+          for (final l in removed) {
+            await SupabaseRepo.delete('medication_logs', l.id);
+          }
+        } catch (_) {}
+      }
+    } else {
+      final log = MedicationLog(
+        id: 'ml_${DateTime.now().microsecondsSinceEpoch}',
+        medicationId: medId,
+        dateKey: key,
+        takenAtIso: DateTime.now().toIso8601String(),
+      );
+      _logs.add(log);
+      notifyListeners();
+      await _persistLogs();
+      if (SupabaseRepo.isLoggedIn) {
+        try {
+          await SupabaseRepo.insert('medication_logs', _toLogRow(log));
+        } catch (_) {}
+      }
+    }
+  }
+
   // --- stats (gentle, judgment-free) -----------------------------------------
 
   /// Distinct days in the last 7 (incl. today) this medication was logged.

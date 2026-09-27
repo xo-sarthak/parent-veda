@@ -96,12 +96,15 @@ void main() {
 
   // ===========================================================================
   group('his palette, her structure', () {
-    testWidgets('the partner page renders on the slate background',
+    // ⚠️ 2026-09-27: both halves are on white, as her V3 home is; his sand
+    // ground read as the older app beside hers. His half still reads as his
+    // through the slate ink, cards and bar (the tests below). Kept for revert:
+    //   expect(scaffold.backgroundColor, ttcSlateBg, ...)
+    testWidgets('the partner page renders on the white ground, as hers does',
         (tester) async {
       await pumpTall(tester, const TtcPartnerTodayScreen());
       final scaffold = tester.widget<Scaffold>(find.byType(Scaffold).first);
-      expect(scaffold.backgroundColor, ttcSlateBg,
-          reason: 'his half should still read as his');
+      expect(scaffold.backgroundColor, ttcBg);
     });
 
     testWidgets('and hers does not', (tester) async {
@@ -110,12 +113,17 @@ void main() {
       expect(scaffold.backgroundColor, ttcBg);
     });
 
-    testWidgets('the mode switch survives the move to the shared page',
-        (tester) async {
-      // It sits in TtcPage's overlay slot now rather than a hand-rolled Stack.
+    // ⚠️ 2026-09-27: the floating Her / Him pill is gone from his page (it
+    // covered his cards, and his phone reaches this screen by pairing); the
+    // preview switch lives in You › Developer. Kept for revert: the page
+    // showed 'Her' and 'Him' once each.
+    testWidgets('no floating Her / Him switch over his page', (tester) async {
       await pumpTall(tester, const TtcPartnerTodayScreen());
-      expect(find.text('Her'), findsOneWidget);
-      expect(find.text('Him'), findsOneWidget);
+      expect(find.text('Her'), findsNothing);
+      expect(find.text('Him'), findsNothing);
+      final you = File('lib/screens/profile/pv_you_screen.dart')
+          .readAsStringSync();
+      expect(you, contains('TtcPartnerMode.instance.on = true'));
     });
   });
 

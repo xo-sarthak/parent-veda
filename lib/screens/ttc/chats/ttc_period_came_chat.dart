@@ -48,9 +48,14 @@ class TtcPeriodCameChat extends TtcChatScript {
 
   bool get _natural => ownership == TimingOwnership.parentveda;
 
+  /// The day this chat logged, if it did. Survives "Start again", so a second
+  /// run says it is logged instead of offering to log it twice (2026-09-27).
+  DateTime? _loggedHere;
+
   /// Already logged for today or yesterday, so the chat does not ask again.
   bool get alreadyLogged {
-    final s = lastStart;
+    // Kept for revert: `final s = lastStart;`
+    final s = _loggedHere ?? lastStart;
     if (s == null) return false;
     return !_day(s).isBefore(today.subtract(const Duration(days: 1)));
   }
@@ -83,7 +88,7 @@ class TtcPeriodCameChat extends TtcChatScript {
                 "to call on day 1 or 2 of your period, so they can plan what's "
                 'next.',
           if (alreadyLogged)
-            "It's logged for ${ttcDayDate(lastStart!)}."
+            "It's logged for ${ttcDayDate((_loggedHere ?? lastStart)!)}."
           else
             'Shall we log it?',
         ],
@@ -101,6 +106,7 @@ class TtcPeriodCameChat extends TtcChatScript {
 
   TtcChatStep logged(DateTime day) {
     logPeriod(day);
+    _loggedHere = day;
     return TtcChatStep(
       ['Done. Day 1 is ${ttcDayDate(day)}.', ...support().say],
       support().choices,

@@ -15,6 +15,32 @@
 //  how much is left, which is what makes a health questionnaire feel like an
 //  interrogation. Six short cards, visibly finite, answerable in any order and
 //  abandonable without losing anything.
+//
+//  ⚠️ HER ANSWERS ARE KEPT, AND COME BACK (tool rebuild, 2026-09-27). The six
+//  answers used to live only in this screen's state: `writeThrough` saved what
+//  the shipped store can hold and the form forgot the rest, so the next visit
+//  showed blank questions and seeing her read again meant answering again.
+//  They are kept whole in `TtcSelfCheckStore` when she asks for her read, and
+//  the next visit opens with a "Your last check" card (the date, "See my
+//  answer", "Clear my answers" with Undo) over the questions, filled in.
+//  Nothing about who is told to see a doctor, or when, changed: the same
+//  answers go into the same `ivfBuildReadiness`.
+//
+//  Also in this pass: "Pick as many as apply" is now drawn as blocks with
+//  ticks (the PCOS hair picker's control, Hers' "Have you ever experienced any
+//  of these" list on Mobbin), where it was a ragged wrap of pills with no mark
+//  saying several can be chosen; the "What we already know" box under the
+//  questions folded into the two notes it explained; the read says "Change my
+//  answers"; the notes page copies to the clipboard.
+//
+//  Mobbin: Hers "Complete treatment questionnaires"
+//  https://mobbin.com/flows/60448996-a8dd-4632-9b46-4ab745af1a4e (multi-select
+//  with ticks, "none of these" last); Lifesum life score
+//  https://mobbin.com/flows/376a68ad-85c8-4071-a09d-bbfe73ce7cf0 (last result
+//  on the way in, "Retake the test"); Equinox+ results "Retake"
+//  https://mobbin.com/screens/be7ba465-da7b-4941-9054-8e709fb6e45e . Gap
+//  analysis: Flo's Symptom Checker "Trying to get pregnant for a year or more
+//  · Present · Updated Aug 29 · Review conditions".
 // =============================================================================
 
 import 'package:flutter/material.dart';
@@ -23,6 +49,8 @@ import '../../theme/pv_fonts.dart';
 import '../../ttc/ttc_fertility_help_rules.dart';
 import '../../ttc/ttc_fertility_help_store.dart';
 import '../../ttc/ttc_ivf_readiness.dart';
+import '../../ttc/ttc_selfcheck_store.dart';
+import '../products/pv_store_chrome.dart' show pvSnack;
 import '../v2/v2_palette.dart';
 import 'ttc_common.dart';
 import 'ttc_prepare_screen.dart';
@@ -41,7 +69,11 @@ class TtcIvfReadinessScreen extends StatefulWidget {
 }
 
 class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
-  final _a = IvfReadinessAnswers();
+  // Not final since 2026-09-27: her saved answers replace it when they load.
+  // Kept for revert: final _a = IvfReadinessAnswers();
+  var _a = IvfReadinessAnswers();
+
+  TtcSelfCheckStore get _saved => TtcSelfCheckStore.instance;
 
   /// ⚠️ READ FROM THE SHIPPED STORE, NOT REBUILT. `FertilityHelpContext`
   /// already assembles how long she has been trying (`TtcStore`), her cycle
@@ -52,6 +84,70 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
   @override
   void initState() {
     super.initState();
+    _prefill();
+    _saved.load().then((_) {
+      if (!mounted) return;
+      setState(_restore);
+    });
+  }
+
+  /// Her saved answers, over the prefills.
+  ///
+  /// ⚠️ HER ANSWER WINS, WITH TWO EXCEPTIONS THAT ARE BOTH ABOUT TIME. Her age
+  /// is the one saved answer every tool shares (`ctx.ageBand`), so the newest
+  /// is used; and "how long have you been trying" moves on its own, so if her
+  /// logs now put her in a later band than the one she saved, the later band
+  /// shows. Either way the chip stays changeable. A stale "6 to 12 months"
+  /// must not hold back the twelve-month rule once she has passed it.
+  void _restore() {
+    final s = _saved.ivfAnswers;
+    if (s == null) return;
+    final derivedTrying = _a.trying;
+    s.age = _a.age ?? s.age;
+    if (s.trying == null ||
+        (derivedTrying != null && derivedTrying.index > s.trying!.index)) {
+      s.trying = derivedTrying;
+    }
+    s.cycles ??= _a.cycles;
+    _a = s;
+  }
+
+  void _see() {
+    // ⚠️ SAVED ON THE WAY THROUGH, NOT ON THE WAY IN. Writing each answer as
+    // it is tapped would record a half-finished questionnaire and set
+    // `hasCompleted` on somebody who abandoned it. The moment she asks what it
+    // means is the moment she has finished.
+    //
+    // Fire-and-forget: the push must not wait on shared_preferences, and a
+    // failed local write is not a reason to withhold her result.
+    _a.writeThrough(TtcFertilityHelpStore.instance);
+    _saved.saveIvf(_a);
+    Navigator.of(context).push(MaterialPageRoute<void>(
+      settings: const RouteSettings(name: 'ttc/ivf_readiness_result'),
+      builder: (_) =>
+          TtcIvfReadinessResultScreen(result: ivfBuildReadiness(_a, _ctx)),
+    ));
+  }
+
+  /// "Clear my answers": back to what the app can fill in, with Undo.
+  Future<void> _clear() async {
+    final was = await _saved.clearIvf();
+    if (!mounted) return;
+    setState(() {
+      _a = IvfReadinessAnswers();
+      _prefill();
+    });
+    pvSnack(context, 'Your answers are cleared.',
+        action: 'Undo',
+        lift: 24,
+        onAction: () async {
+          await _saved.restoreIvf(was);
+          if (mounted) setState(_restore);
+        });
+  }
+
+  /// What the app can fill in from her logs and her saved age.
+  void _prefill() {
     // ⚠️ TWO PREFILLS, AND BOTH ARE CONFIRMATIONS RATHER THAN ASSUMPTIONS. The
     // chips are selected and changeable: a prefill she cannot override is a
     // claim, not a convenience — and on a screen that routes to a specialist,
@@ -96,17 +192,41 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final derived = _ctx.monthsTrying != null || _ctx.hasEnoughCycleData;
+    // Only the "What we already know" box read this; kept for revert:
+    // final derived = _ctx.monthsTrying != null || _ctx.hasEnoughCycleData;
 
     return TtcToolScaffold(
       hue: kIvfHue,
-      eyebrow: 'Should I get help?',
+      // ⚠️ ONE TOOL, ONE NAME (2026-09-27): the Tools tile's name, word for
+      // word. Kept for revert: eyebrow: 'Should I get help?',
+      eyebrow: 'See a specialist?',
       title: 'Is it worth talking\nto someone yet?',
-      intro: "Six short questions. There's no score and no verdict. This only "
-          "tells you whether it's worth talking to someone. Only a specialist "
-          'can tell you more.',
+      // ⚠️ THE SKIP IS SAID UP FRONT (tools pass, 2026-09-27). A few of these
+      // are personal (a miscarriage, his test), and "you can leave any blank"
+      // used to sit under the button, after she had met them. Kept for
+      // revert: "Six short questions. There's no score and no verdict. This
+      // only tells you whether it's worth talking to someone. Only a
+      // specialist can tell you more."
+      intro: "Six short questions to see if it's time to talk to a fertility "
+          "doctor. A few are personal. Skip any you'd rather not answer. "
+          "There's no score and no verdict.",
       children: [
         const SizedBox(height: 22),
+
+        // ⚠️ HER LAST CHECK, FIRST (2026-09-27). See the file header.
+        if (_saved.ivfAt case final at?) ...[
+          ttcToolPad(TtcToolLastCheck(
+            key: const ValueKey('ttc_ivf_last'),
+            at: at,
+            line: 'Your answers are filled in below. Change anything '
+                "that's different, then see your answer again.",
+            seeLabel: 'See my answer',
+            onSee: _see,
+            againLabel: 'Clear my answers',
+            onAgain: _clear,
+          )),
+          const SizedBox(height: 18),
+        ],
 
         ttcToolPad(TtcToolProgress(done: _answered, total: 6)),
         const SizedBox(height: 18),
@@ -151,10 +271,15 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
           n: 3,
           hue: kIvfHue,
           title: 'What are your cycles like?',
+          // The logged range moved here from the "What we already know" box
+          // under the questions (2026-09-27), next to the answer it explains.
+          // Kept for revert: 'Filled in from your logged dates. Change it if
+          // that looks wrong.'
           note: ivfSuggestedCycles(_ctx) == null
               ? null
-              : 'Filled in from your logged dates. Change it if that looks '
-                  'wrong.',
+              : 'Filled in from your ${_ctx.cyclesLogged} logged cycles, '
+                  '${_ctx.cycleShortest} to ${_ctx.cycleLongest} days long. '
+                  'Change it if that looks wrong.',
           child: TtcToolChoice<IvfCycles>(
             value: _a.cycles,
             hue: kIvfHue,
@@ -167,7 +292,9 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
           n: 4,
           hue: kIvfHue,
           title: 'Has a doctor already told you about any of these?',
-          note: 'Tap anything that applies.',
+          // Kept for revert: 'Tap anything that applies.' It was easy to miss
+          // that more than one can be picked (tools pass, 2026-09-27).
+          note: "Pick as many as apply. Skip it if you'd rather not say.",
           child: _Conditions(
             selected: _a.conditions,
             checked: _a.conditionsChecked,
@@ -179,14 +306,23 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
                   ? _a.conditions.remove(id)
                   : _a.conditions.add(id);
             }),
+            // ⚠️ "NONE" AND "NOT SURE" TAP OFF AGAIN (2026-09-27), like every
+            // other answer in the stage's tools: a ticked block that cannot be
+            // unticked breaks the promise the tick makes. Tapped while already
+            // the answer, each clears the question. Kept for revert: both
+            // always set `conditionsChecked = true`.
             onNone: () => _set(() {
-              _a.conditionsChecked = true;
+              final wasNone = _a.conditionsChecked &&
+                  !_a.conditionsUnsure &&
+                  _a.conditions.isEmpty;
+              _a.conditionsChecked = !wasNone;
               _a.conditionsUnsure = false;
               _a.conditions.clear();
             }),
             onUnsure: () => _set(() {
-              _a.conditionsChecked = true;
-              _a.conditionsUnsure = true;
+              final wasUnsure = _a.conditionsUnsure;
+              _a.conditionsChecked = !wasUnsure;
+              _a.conditionsUnsure = !wasUnsure;
               _a.conditions.clear();
             }),
           ),
@@ -195,7 +331,9 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
         ttcToolPad(TtcToolQuestion(
           n: 5,
           hue: kIvfHue,
-          title: 'Has he had a semen test?',
+          // Kept for revert: 'Has he had a semen test?' (tools pass,
+          // 2026-09-27: names who, in one read).
+          title: 'Has your partner had a semen test?',
           // ⚠️ THIS QUESTION IS THE ONE THE SHIPPED FLOW DID NOT ASK, and it is
           // about half the answer. A tool that investigates only her is a tool
           // that can send a couple down a year of the wrong road.
@@ -222,6 +360,11 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
         )),
 
         const SizedBox(height: 6),
+        // ⚠️ COMMENTED OUT 2026-09-27 (tool rebuild, simplicity): under the
+        // questions it explained two prefills after she had met them, and each
+        // of those questions already says "Filled in from…" (Q3 now with the
+        // logged range). The PCOS check dropped its twin the same day. Kept for
+        // revert, with its history:
         // ⚠️ MOVED BELOW THE QUESTIONS ON 2026-09-03, ON REQUEST. It used to
         // open the screen, and opening a six-question tool with a paragraph
         // about what the app already knows delays the first question for
@@ -232,36 +375,28 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
         // which is where that explanation actually belongs. Down here the block
         // does the other job it was always doing — showing her that the answers
         // she gave sit on top of a history the app kept, rather than in a void.
-        if (derived) ...[
-          ttcToolPad(_FromYourLogs(ctx: _ctx)),
-          const SizedBox(height: 20),
-        ],
+        // if (derived) ...[
+        //   ttcToolPad(_FromYourLogs(ctx: _ctx)),
+        //   const SizedBox(height: 20),
+        // ],
+        const SizedBox(height: 8),
 
         ttcToolPad(TtcToolPrimary(
-          label: 'See what this means',
-          // ⚠️ SAVED ON THE WAY THROUGH, NOT ON THE WAY IN. Writing each answer
-          // as it is tapped would record a half-finished questionnaire and set
-          // `hasCompleted` on somebody who abandoned it. The moment she asks
-          // what it means is the moment she has finished.
-          //
-          // Fire-and-forget: the push must not wait on shared_preferences, and
-          // a failed local write is not a reason to withhold her result. Same
-          // trade the rest of this stage makes.
-          onTap: () {
-            _a.writeThrough(TtcFertilityHelpStore.instance);
-            Navigator.of(context).push(MaterialPageRoute<void>(
-              settings: const RouteSettings(name: 'ttc/ivf_readiness_result'),
-              builder: (_) => TtcIvfReadinessResultScreen(
-                  result: ivfBuildReadiness(_a, _ctx)),
-            ));
-          },
+          key: const ValueKey('ttc_ivf_see'),
+          // Says what she gets. Kept for revert: 'See what this means'.
+          label: "See if it's time to talk to someone",
+          // The write-through, the save and the push are `_see` now
+          // (2026-09-27), shared with the last-check card.
+          onTap: _see,
         )),
         const SizedBox(height: 14),
         ttcToolPad(Builder(builder: (context) {
           final p = V2PaletteStore.instance.current;
+          // The skip moved up into the intro (2026-09-27). Kept for revert:
+          // "You can leave any of these blank. When it's unsure, ..."
           return Text(
-              "You can leave any of these blank. When it's unsure, this check "
-              'leans towards talking to someone, not away from it.',
+              "When it's unsure, this check leans towards talking to someone, "
+              'not away from it. Your answers are kept for next time.',
               textAlign: TextAlign.center,
               style: pvManrope(fontSize: 11.5, height: 1.5, color: p.ink3));
         })),
@@ -272,6 +407,8 @@ class _TtcIvfReadinessScreenState extends State<TtcIvfReadinessScreen> {
 }
 
 /// What the app already knows, shown before the first question.
+// Unreached since 2026-09-27 (see the note where it rendered); kept for revert.
+// ignore: unused_element
 class _FromYourLogs extends StatelessWidget {
   const _FromYourLogs({required this.ctx});
 
@@ -337,27 +474,37 @@ class _Conditions extends StatelessWidget {
   final VoidCallback onNone;
   final VoidCallback onUnsure;
 
+  // ⚠️ BLOCKS WITH TICKS, NOT A WRAP OF PILLS (tool rebuild, 2026-09-27). The
+  // one question here that takes several answers looked exactly like the five
+  // that take one, and "Pick as many as apply" was the only sign. The tool
+  // chrome's own rule: a tick is the promise that more than one may be chosen,
+  // and this is the question that keeps it (the PCOS hair picker is the
+  // other). The wrap also left the ragged right edge the shared control was
+  // built to remove. Mobbin: Hers "Have you ever experienced any of these
+  // symptoms?" (ticks, "No, I have not…" last).
+  // Kept for revert: a Wrap(spacing: 8, runSpacing: 8) of TtcToolPill, one
+  // per condition, then 'None of these' and 'Not sure'.
   @override
-  Widget build(BuildContext context) => Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: [
+  Widget build(BuildContext context) => TtcToolOptions(
+        p: V2PaletteStore.instance.current,
+        hue: kIvfHue,
+        items: [
           for (final c in kIvfKnownConditions)
-            TtcToolPill(
+            TtcToolOption(
                 label: c.label,
                 on: selected.contains(c.id),
                 onTap: () => onToggle(c.id),
-                hue: kIvfHue),
-          TtcToolPill(
+                tick: true),
+          TtcToolOption(
               label: 'None of these',
               on: checked && !unsure && selected.isEmpty,
               onTap: onNone,
-              hue: kIvfHue),
-          TtcToolPill(
+              tick: true),
+          TtcToolOption(
               label: 'Not sure',
               on: unsure,
               onTap: onUnsure,
-              hue: kIvfHue),
+              tick: true),
         ],
       );
 }
@@ -378,7 +525,8 @@ class TtcIvfReadinessResultScreen extends StatelessWidget {
     return TtcToolScaffold(
       hue: kIvfHue,
       variant: 3,
-      eyebrow: 'Your answer',
+      // One tool, one name (2026-09-27). Kept for revert: 'Your answer'.
+      eyebrow: 'See a specialist?',
       // ⚠️ THE TITLE DESCRIBES WHAT SHE IS HOLDING, NOT WHAT SHE IS. This is
       // where a "you may be infertile" would go on a worse version of this
       // screen, and it is the first place the eye lands.
@@ -416,15 +564,19 @@ class TtcIvfReadinessResultScreen extends StatelessWidget {
         // not "come back and read about IVF". Told a conversation is worth
         // having, the specialist is the main action and everything else is
         // secondary.
+        // ⚠️ THE FREE STEP LEADS, THE PAID ONE FOLLOWS (tools pass,
+        // 2026-09-27). The notes are hers whoever she sees, her own doctor
+        // included; a consult is one way to use them. Kept for revert: the
+        // specialist was the primary pill and the notes the secondary.
         if (push) ...[
           ttcToolPad(TtcToolPrimary(
-            label: 'Speak to a fertility specialist',
-            onTap: () => _openConsults(context),
+            label: 'What to take with you',
+            onTap: () => _openNotes(context, result),
           )),
           const SizedBox(height: 10),
           ttcToolPad(TtcToolSecondary(
-            label: 'What to take with you',
-            onTap: () => _openNotes(context, result),
+            label: 'Book a fertility specialist',
+            onTap: () => _openConsults(context),
           )),
         ] else ...[
           ttcToolPad(TtcToolPrimary(
@@ -442,7 +594,22 @@ class TtcIvfReadinessResultScreen extends StatelessWidget {
           )),
         ],
 
-        const SizedBox(height: 22),
+        // ⚠️ THE WAY BACK TO HER ANSWERS, SAID (2026-09-27). The close
+        // button did it, but "close" reads as leaving the tool.
+        const SizedBox(height: 6),
+        Center(
+          child: TextButton(
+            key: const ValueKey('ttc_ivf_change'),
+            onPressed: () => Navigator.of(context).maybePop(),
+            child: Text('Change my answers',
+                style: pvManrope(
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                    color: V2PaletteStore.instance.current.ink2)),
+          ),
+        ),
+
+        const SizedBox(height: 16),
         ttcToolPad(const TtcToolPrivacyLine()),
         const SizedBox(height: 26),
       ],
@@ -475,17 +642,28 @@ class TtcIvfNotesScreen extends StatelessWidget {
   Widget build(BuildContext context) => TtcToolScaffold(
         hue: kIvfHue,
         variant: 4,
-        eyebrow: 'Appointment notes',
+        // One tool, one name (2026-09-27). Kept for revert:
+        // eyebrow: 'Appointment notes',
+        eyebrow: 'See a specialist?',
         title: 'What to take\nwith you.',
-        intro: "Take a screenshot, or read it out. It's six lines, all from "
-            'your answers.',
+        // Copy is offered now (2026-09-27). Kept for revert: "Take a
+        // screenshot, or read it out. It's six lines, all from your answers."
+        intro: 'Copy them into a message, take a screenshot, or read them '
+            "out. It's six lines, all from your answers.",
         children: [
           const SizedBox(height: 24),
           ttcToolPad(TtcToolNotesCard(
               rows: result.checklist, disclaimer: kIvfChecklistDisclaimer)),
           const SizedBox(height: 18),
-          ttcToolPad(TtcToolPrimary(
-            label: 'Speak to a fertility specialist',
+          ttcToolPad(TtcToolCopyNotes(
+              heading: 'My notes: see a specialist?',
+              rows: result.checklist,
+              disclaimer: kIvfChecklistDisclaimer)),
+          const SizedBox(height: 10),
+          // Secondary, not primary (2026-09-27): the page is her notes, and
+          // the paid step is one option for using them.
+          ttcToolPad(TtcToolSecondary(
+            label: 'Book a fertility specialist',
             onTap: () => _openConsults(context),
           )),
           const SizedBox(height: 22),

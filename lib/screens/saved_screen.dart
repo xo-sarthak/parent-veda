@@ -42,6 +42,17 @@ import '../services/read_to_baby_saved_store.dart';
 import '../services/saved_store.dart';
 import '../theme/pv_fonts.dart';
 import '../ttc/ttc_reads_data.dart';
+import '../ttc/ttc_lookup_reads.dart'
+    show
+        kTtcTestReadPrefix,
+        kTtcCanIReadPrefix,
+        openTtcTestRead,
+        openTtcCanIRead;
+import '../ttc/ttc_tests_data.dart' show ttcTestById;
+import '../ttc/ttc_can_i_data.dart' show ttcCanIById;
+import '../ttc/ttc_daily_data.dart' show TtcInsight, ttcAllInsights;
+import '../ttc/ttc_treatment_content.dart' show kTtcTreatmentInsights;
+import '../ttc/ttc_insight_read.dart' show kTtcInsightReadPrefix, openTtcInsight;
 import 'can_i_screen.dart' show openCanIAnswer;
 import 'community_screen.dart' show PostDetailScreen;
 import 'doors/pv_door_router.dart' show openPvDoorRead, pvDoorEntryForReadId, pvDoorEntryTitle, pvDoorEntryScreen;
@@ -602,6 +613,26 @@ class SavedItemOpener {
 
     switch (it.kind) {
       case SavedKind.article:
+        // ⚠️ THE TTC LOOK-UPS AND DAILY CARDS OPEN TOO (2026-09-28). The reader
+        // saves a test as `ttc_test_<id>`, a Can I answer as `ttc_cani_<id>`
+        // and a daily card as `ttc_insight_<id>`, and none of them resolved
+        // here: the bookmark saved and the row did nothing, the wiring gate's
+        // own failure. Each opens the way the stage opens it.
+        if (id.startsWith(kTtcTestReadPrefix)) {
+          final t = ttcTestById(id.substring(kTtcTestReadPrefix.length));
+          if (t != null) openTtcTestRead(context, t);
+          return;
+        }
+        if (id.startsWith(kTtcCanIReadPrefix)) {
+          final e = ttcCanIById(id.substring(kTtcCanIReadPrefix.length));
+          if (e != null) openTtcCanIRead(context, e);
+          return;
+        }
+        if (id.startsWith(kTtcInsightReadPrefix)) {
+          final i = _ttcInsight(id.substring(kTtcInsightReadPrefix.length));
+          if (i != null) openTtcInsight(context, i);
+          return;
+        }
         if (ttcReadById(id) != null) {
           openTtcSurface(context, kTtcReadPrefix + id);
         } else if (pregnancyReadById(id) != null && c != null) {
@@ -665,6 +696,16 @@ class SavedItemOpener {
   }
 
   // ---- catalogue lookups, each null for an unknown id --------------------------
+  static TtcInsight? _ttcInsight(String bare) {
+    for (final i in [
+      ...ttcAllInsights,
+      for (final set in kTtcTreatmentInsights.values) ...set,
+    ]) {
+      if (i.id == bare) return i;
+    }
+    return null;
+  }
+
   static Recipe? _recipe(String id) {
     for (final r in kRecipes) {
       if (r.id == id) return r;
